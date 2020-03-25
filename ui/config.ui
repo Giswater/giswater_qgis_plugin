@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>api_config</class>
- <widget class="QMainWindow" name="api_config">
+ <class>dlg_config</class>
+ <widget class="QMainWindow" name="dlg_config">
   <property name="geometry">
    <rect>
     <x>0</x>

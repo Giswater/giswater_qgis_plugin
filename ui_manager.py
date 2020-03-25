@@ -108,12 +108,12 @@ def get_ui_class(ui_file_name, subfolder=None):
 
 
 FORM_CLASS = get_ui_class('element.ui')
-class AddElement(GwDialog, FORM_CLASS):
+class ElementUi(GwDialog, FORM_CLASS):
     pass
 
 
 FORM_CLASS = get_ui_class('add_lot.ui')
-class AddLot(GwDialog, FORM_CLASS):
+class LotUi(GwDialog, FORM_CLASS):
     pass
 
 
@@ -127,38 +127,38 @@ class AddSum(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('add_visit.ui')
-class AddVisit(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('visit.ui')
+class VisitUi(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('api_basic_info.ui')
+FORM_CLASS = get_ui_class('info_basic.ui')
 class ApiBasicInfo(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('api_catalog.ui')
-class ApiCatalogUi(GwMainWindow, FORM_CLASS):
+FORM_CLASS = get_ui_class('info_catalog.ui')
+class InfoCatalogUi(GwMainWindow, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('api_cf.ui')
-class ApiCfUi(GwMainWindow, FORM_CLASS):
+FORM_CLASS = get_ui_class('info_full.ui')
+class InfoFullUi(GwMainWindow, FORM_CLASS):
     key_pressed = QtCore.pyqtSignal()
 
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key_Escape:
             self.key_pressed.emit()
-            return super(ApiCfUi, self).keyPressEvent(event)
+            return super(InfoFullUi, self).keyPressEvent(event)
 
 
-FORM_CLASS = get_ui_class('api_composers.ui')
-class ApiComposerUi(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('fastprint.ui')
+class FastPrint(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('api_config.ui')
-class ApiConfigUi(GwMainWindow, FORM_CLASS):
+FORM_CLASS = get_ui_class('config.ui')
+class ConfigUi(GwMainWindow, FORM_CLASS):
     pass
 
 
@@ -278,7 +278,7 @@ class DelFeature(GwDialog, FORM_CLASS):
 
 
 FORM_CLASS = get_ui_class('doc.ui')
-class AddDoc(GwDialog, FORM_CLASS):
+class DocUi(GwDialog, FORM_CLASS):
     pass
 
 

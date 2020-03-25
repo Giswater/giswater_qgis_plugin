@@ -16,7 +16,7 @@ from functools import partial
 
 from .. import utils_giswater
 from .api_parent import ApiParent
-from ..ui_manager import ApiConfigUi
+from ..ui_manager import ConfigUi
 
 
 class ApiConfig(ApiParent):
@@ -48,7 +48,7 @@ class ApiConfig(ApiParent):
         complet_list = self.controller.get_json('gw_api_getconfig', body, log_sql=True)
         if not complet_list: return False
 
-        self.dlg_config = ApiConfigUi()
+        self.dlg_config = ConfigUi()
         self.load_settings(self.dlg_config)
         self.dlg_config.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_config))
         self.dlg_config.btn_accept.clicked.connect(partial(self.update_values))

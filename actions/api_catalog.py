@@ -14,7 +14,7 @@ from collections import OrderedDict
 
 from .. import utils_giswater
 from .api_parent import ApiParent
-from ..ui_manager import ApiCatalogUi
+from ..ui_manager import InfoCatalogUi
 
 
 class ApiCatalog(ApiParent):
@@ -50,7 +50,7 @@ class ApiCatalog(ApiParent):
         groupBox_1 = QGroupBox("Filter")
         self.filter_form = QGridLayout()
 
-        self.dlg_catalog = ApiCatalogUi()
+        self.dlg_catalog = InfoCatalogUi()
         self.load_settings(self.dlg_catalog)
         self.dlg_catalog.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_catalog))
         self.dlg_catalog.btn_accept.clicked.connect(partial(self.fill_geomcat_id, previous_dialog, widget_name))

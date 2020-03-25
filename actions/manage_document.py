@@ -10,7 +10,7 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView
 from functools import partial
 
 from .. import utils_giswater
-from ..ui_manager import AddDoc, DocManagement
+from ..ui_manager import DocUi, DocManagement
 from .parent_manage import ParentManage
 
 
@@ -34,7 +34,7 @@ class ManageDocument(ParentManage):
         """ Button 34: Add document """
 
         # Create the dialog and signals
-        self.dlg_add_doc = AddDoc()
+        self.dlg_add_doc = DocUi()
         self.load_settings(self.dlg_add_doc)
         self.doc_id = None           
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>api_catalog</class>
- <widget class="QMainWindow" name="api_catalog">
+ <class>dlg_info_catalog</class>
+ <widget class="QMainWindow" name="dlg_info_catalog">
   <property name="geometry">
    <rect>
     <x>0</x>

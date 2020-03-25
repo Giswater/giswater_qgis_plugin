@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>add_visit</class>
- <widget class="QDialog" name="add_visit">
+ <class>dlg_visit</class>
+ <widget class="QDialog" name="dlg_visit">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -25,7 +25,7 @@
         <property name="currentIndex">
          <number>0</number>
         </property>
-        <widget class="QWidget" name="VisitTab">
+        <widget class="QWidget" name="tab_visit">
          <attribute name="title">
           <string>Visit</string>
          </attribute>
@@ -33,7 +33,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,1">
             <item>
-             <widget class="QLabel" name="label_node_type">
+             <widget class="QLabel" name="lbl_id">
               <property name="font">
                <font>
                 <pointsize>8</pointsize>
@@ -95,7 +95,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,0">
             <item>
-             <widget class="QLabel" name="label_node_type_3">
+             <widget class="QLabel" name="lbl_start_date">
               <property name="maximumSize">
                <size>
                 <width>66</width>
@@ -173,7 +173,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0,0">
             <item>
-             <widget class="QLabel" name="label_node_type_2">
+             <widget class="QLabel" name="lbl_end_date">
               <property name="maximumSize">
                <size>
                 <width>59</width>
@@ -251,7 +251,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,0,1">
             <item>
-             <widget class="QLabel" name="label_node_type_5">
+             <widget class="QLabel" name="lbl_user_name">
               <property name="font">
                <font>
                 <pointsize>8</pointsize>
@@ -313,7 +313,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="0,0,1">
             <item>
-             <widget class="QLabel" name="label_node_type_4">
+             <widget class="QLabel" name="lbl_code">
               <property name="font">
                <font>
                 <pointsize>8</pointsize>
@@ -375,7 +375,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0,0,1">
             <item>
-             <widget class="QLabel" name="label_flexunion_code_4">
+             <widget class="QLabel" name="lbl_visitcat_id">
               <property name="font">
                <font>
                 <pointsize>8</pointsize>
@@ -435,7 +435,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_15">
             <item>
-             <widget class="QLabel" name="label_2">
+             <widget class="QLabel" name="lbl_status">
               <property name="maximumSize">
                <size>
                 <width>40</width>
@@ -473,7 +473,7 @@
            </layout>
           </item>
           <item>
-           <widget class="QLabel" name="label_flexunion_code_5">
+           <widget class="QLabel" name="lbl_descript">
             <property name="font">
              <font>
               <pointsize>8</pointsize>
@@ -486,7 +486,7 @@
              <enum>QFrame::Plain</enum>
             </property>
             <property name="text">
-             <string>Descript:</string>
+             <string>Description:</string>
             </property>
             <property name="textFormat">
              <enum>Qt::AutoText</enum>
@@ -518,7 +518,7 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="RelationsTab">
+        <widget class="QWidget" name="tab_relations">
          <attribute name="title">
           <string>Relations</string>
          </attribute>
@@ -526,7 +526,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="0,1">
             <item>
-             <widget class="QLabel" name="label_feature_type">
+             <widget class="QLabel" name="lbl_feature_type">
               <property name="font">
                <font>
                 <pointsize>8</pointsize>
@@ -623,7 +623,7 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="EventTab">
+        <widget class="QWidget" name="tab_event">
          <attribute name="title">
           <string>Event</string>
          </attribute>
@@ -665,7 +665,7 @@
            </layout>
           </item>
           <item>
-           <widget class="QLabel" name="label">
+           <widget class="QLabel" name="lbl_info">
             <property name="font">
              <font>
               <weight>50</weight>
@@ -712,7 +712,7 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="DocumentTab">
+        <widget class="QWidget" name="tab_document">
          <attribute name="title">
           <string>Document</string>
          </attribute>
@@ -829,7 +829,7 @@
   <connection>
    <sender>button_box</sender>
    <signal>accepted()</signal>
-   <receiver>add_visit</receiver>
+   <receiver>dlg_visit</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -845,7 +845,7 @@
   <connection>
    <sender>button_box</sender>
    <signal>rejected()</signal>
-   <receiver>add_visit</receiver>
+   <receiver>dlg_visit</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

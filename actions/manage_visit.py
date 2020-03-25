@@ -23,7 +23,7 @@ from ..dao.om_visit_x_connec import OmVisitXConnec
 from ..dao.om_visit_x_node import OmVisitXNode
 from ..dao.om_visit_x_gully import OmVisitXGully
 from ..dao.om_visit_parameter import OmVisitParameter
-from ..ui_manager import AddVisit
+from ..ui_manager import VisitUi
 from ..ui_manager import EventStandard
 from ..ui_manager import EventUDarcStandard
 from ..ui_manager import EventUDarcRehabit
@@ -65,7 +65,7 @@ class ManageVisit(ParentManage, QObject):
 
         # Create the dialog and signals and related ORM Visit class
         self.current_visit = OmVisit(self.controller)
-        self.dlg_add_visit = AddVisit(tag)
+        self.dlg_add_visit = VisitUi(tag)
         self.load_settings(self.dlg_add_visit)
 
         # Get expl_id from previus dialog
@@ -136,8 +136,8 @@ class ManageVisit(ParentManage, QObject):
         if self.controller.user and self.user_name:
             self.user_name.setText(str(self.controller.user))
 
-        # set the start tab to be shown (e.g. VisitTab)
-        self.current_tab_index = self.tab_index('VisitTab')
+        # set the start tab to be shown (e.g. tab_visit)
+        self.current_tab_index = self.tab_index('tab_visit')
         self.tabs.setCurrentIndex(self.current_tab_index)
 
         # Set signals
@@ -186,7 +186,7 @@ class ManageVisit(ParentManage, QObject):
         """Set geom_type and listed feature_id in tbl_relation to lock it => disable related tab."""
         
         # disable tab
-        index = self.tab_index('RelationsTab')
+        index = self.tab_index('tab_relations')
         self.tabs.setTabEnabled(index, True)
 
         # set geometry_type
@@ -223,7 +223,7 @@ class ManageVisit(ParentManage, QObject):
         A) Trigger SELECT gw_fct_om_visit_multiplier (visit_id, feature_type)
         for multiple visits management."""
         # tab Visit
-        if self.current_tab_index == self.tab_index('VisitTab'):
+        if self.current_tab_index == self.tab_index('tab_visit'):
             self.manage_leave_visit_tab()
 
         # notify that a new visit has been added
@@ -340,7 +340,7 @@ class ManageVisit(ParentManage, QObject):
 
 
     def manage_leave_visit_tab(self):
-        """ manage all the action when leaving the VisitTab
+        """ manage all the action when leaving the tab_visit
         A) Manage sync between GUI values and Visit record in DB."""
 
         # A) fill Visit basing on GUI values
@@ -429,7 +429,7 @@ class ManageVisit(ParentManage, QObject):
         
         # manage leaving tab
         # tab Visit
-        if self.current_tab_index == self.tab_index('VisitTab'):
+        if self.current_tab_index == self.tab_index('tab_visit'):
             self.manage_leave_visit_tab()
             # need to create the relation record that is done only
             # changing tab
@@ -437,22 +437,22 @@ class ManageVisit(ParentManage, QObject):
                 self.update_relations(dialog)
 
         # tab Relation
-        if self.current_tab_index == self.tab_index('RelationsTab'):
+        if self.current_tab_index == self.tab_index('tab_relations'):
             self.update_relations(dialog)
 
         # manage arriving tab
         # tab Visit
         self.current_tab_index = index
-        if index == self.tab_index('VisitTab'):
+        if index == self.tab_index('tab_visit'):
             pass
         # tab Relation
-        if index == self.tab_index('RelationsTab'):
+        if index == self.tab_index('tab_relations'):
             pass
         # tab Event
-        if index == self.tab_index('EventTab'):
+        if index == self.tab_index('tab_event'):
             self.entered_event_tab(dialog)
         # tab Document
-        if index == self.tab_index('DocumentTab'):
+        if index == self.tab_index('tab_document'):
             pass
 
 

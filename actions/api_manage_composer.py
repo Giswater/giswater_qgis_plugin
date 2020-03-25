@@ -16,7 +16,7 @@ from functools import partial
 
 from .. import utils_giswater
 from .api_parent import ApiParent
-from ..ui_manager import ApiComposerUi
+from ..ui_manager import FastPrint
 
 
 class ApiManageComposer(ApiParent):
@@ -40,7 +40,7 @@ class ApiManageComposer(ApiParent):
 
         self.initial_rotation = self.iface.mapCanvas().rotation()
 
-        self.dlg_composer = ApiComposerUi()
+        self.dlg_composer = FastPrint()
         self.load_settings(self.dlg_composer)
 
         # Create and populate dialog

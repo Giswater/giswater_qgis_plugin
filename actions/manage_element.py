@@ -10,7 +10,7 @@ from functools import partial
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView
 
 from .. import utils_giswater
-from ..ui_manager import AddElement
+from ..ui_manager import ElementUi
 from ..ui_manager import ElementManagement
 from .parent_manage import ParentManage
 
@@ -28,7 +28,7 @@ class ManageElement(ParentManage):
         self.new_element_id = new_element_id
 
         # Create the dialog and signals
-        self.dlg_add_element = AddElement()
+        self.dlg_add_element = ElementUi()
         self.load_settings(self.dlg_add_element)
         self.element_id = None
 

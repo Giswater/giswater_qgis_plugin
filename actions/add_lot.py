@@ -24,7 +24,7 @@ import webbrowser
 from .. import utils_giswater
 from .manage_visit import ManageVisit
 from .parent_manage import ParentManage
-from ..ui_manager import AddLot
+from ..ui_manager import LotUi
 from ..ui_manager import BasicTable
 from ..ui_manager import LotManagement
 from ..ui_manager import Multirow_selector
@@ -66,7 +66,7 @@ class AddNewLot(ParentManage):
         if self.controller.get_project_type() == 'ud':
             self.layers['gully'] = [self.controller.get_layer_by_tablename('v_edit_gully')]
 
-        self.dlg_lot = AddLot()
+        self.dlg_lot = LotUi()
         self.load_settings(self.dlg_lot)
         self.load_user_values(self.dlg_lot)
         self.dropdown = self.dlg_lot.findChild(QToolButton, 'action_selector')

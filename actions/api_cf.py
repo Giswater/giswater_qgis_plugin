@@ -26,7 +26,7 @@ from .manage_element import ManageElement
 from .manage_gallery import ManageGallery
 from .manage_visit import ManageVisit
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
-from ..ui_manager import ApiBasicInfo, ApiCfUi, EventFull, LoadDocuments, Sections
+from ..ui_manager import ApiBasicInfo, InfoFullUi, EventFull, LoadDocuments, Sections
 
 
 class ApiCF(ApiParent, QObject):
@@ -177,7 +177,6 @@ class ApiCF(ApiParent, QObject):
         self.tab_element_loaded = False
         self.tab_relations_loaded = False
         self.tab_connections_loaded = False
-        self.tab_conections_loaded = False
         self.tab_hydrometer_loaded = False
         self.tab_hydrometer_val_loaded = False
         self.tab_om_loaded = False
@@ -332,7 +331,7 @@ class ApiCF(ApiParent, QObject):
     def open_custom_form(self, feature_id, complet_result, tab_type=None, sub_tag=None):
 
         # Dialog
-        self.dlg_cf = ApiCfUi(sub_tag)
+        self.dlg_cf = InfoFullUi(sub_tag)
         self.load_settings(self.dlg_cf)
         self.draw(complet_result, zoom=False)
 
@@ -468,7 +467,7 @@ class ApiCF(ApiParent, QObject):
             if widget is None: continue
 
             layout = self.dlg_cf.findChild(QGridLayout, field['layoutname'])
-            if layout:
+            if layout is not None:
                 # Take the QGridLayout with the intention of adding a QSpacerItem later
                 if layout not in layout_list and layout.objectName() not in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
                     layout_list.append(layout)
@@ -483,7 +482,7 @@ class ApiCF(ApiParent, QObject):
 
         # Get current feature id
         widget_field_id = self.dlg_cf.findChild(QLineEdit, f'{tab_type}_{self.field_id}')
-        if widget_field_id:
+        if widget_field_id is not None:
             self.feature_id = widget_field_id.text()
 
         # Add a QSpacerItem into each QGridLayout of the list
@@ -1201,7 +1200,7 @@ class ApiCF(ApiParent, QObject):
         elif self.tab_main.widget(index_tab).objectName() == 'tab_relations' and not self.tab_relations_loaded:
             self.fill_tab_relations()
             self.tab_relations_loaded = True
-        # Tab 'Conections'
+        # Tab 'Connections'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_connections' and not self.tab_connections_loaded:
             self.fill_tab_connections()
             self.tab_connections_loaded = True
