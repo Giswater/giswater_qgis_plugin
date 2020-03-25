@@ -136,6 +136,7 @@ class AddLayer(object):
         :param tab_idx:
         :param del_old_layers:
         :param group:
+        :param disable_tabs: set all tabs, except the last, enabled or disabled (boolean)
         :return:
         """
         colors = {'rnd': QColor(randrange(0, 256), randrange(0, 256), randrange(0, 256))}
@@ -278,6 +279,7 @@ class AddLayer(object):
         :param force_tab: Force show tab (boolean)
         :param reset_text: Reset(or not) text for each iteration (boolean)
         :param tab_idx: index of tab to force (integer)
+        :param disable_tabs: set all tabs, except the last, enabled or disabled (boolean)
         :return:
         """
         change_tab = False
