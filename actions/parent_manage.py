@@ -985,12 +985,17 @@ class ParentManage(ParentAction, object):
     def fill_table_object(self, widget, table_name, expr_filter=None):
         """ Set a model with selected filter. Attach that model to selected table """
 
+        self.controller.log_info("tablename1: " + str(self.schema_name))
+
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
+            self.controller.log_info("tablename2: " + str(table_name))
 
         # Set model
         model = QSqlTableModel()
+        self.controller.log_info("tablename3: " + str(table_name))
         model.setTable(table_name)
+        self.controller.log_info("tablename4: " + str(table_name))
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)
         model.sort(0, 1)
         if expr_filter:

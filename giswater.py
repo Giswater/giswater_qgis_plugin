@@ -572,6 +572,8 @@ class Giswater(QObject):
         # Disable and hide all plugin_toolbars and actions
         self.enable_toolbars(False)
 
+        self.controller.log_info("set_controllers")
+
         self.edit.set_controller(self.controller)
         self.go2epa.set_controller(self.controller)
         self.master.set_controller(self.controller)
@@ -624,17 +626,10 @@ class Giswater(QObject):
         self.controller.set_qgis_settings(self.qgis_settings)
         self.controller.set_giswater(self)
 
+        #self.initialize_toolbars()
+
         # Set main information button (always visible)
         self.set_info_button()
-
-        if enable_toolbars:
-            self.basic = Basic(self.iface, self.settings, self.controller, self.plugin_dir)
-            self.basic.set_giswater(self)
-            self.utils = Utils(self.iface, self.settings, self.controller, self.plugin_dir)
-            self.go2epa = Go2Epa(self.iface, self.settings, self.controller, self.plugin_dir)
-            self.om = Om(self.iface, self.settings, self.controller, self.plugin_dir)
-            self.edit = Edit(self.iface, self.settings, self.controller, self.plugin_dir)
-            self.master = Master(self.iface, self.settings, self.controller, self.plugin_dir)
 
 
     def manage_feature_cat(self):
@@ -826,6 +821,18 @@ class Giswater(QObject):
             return True
 
 
+    def initialize_toolbars(self):
+        """ Initialize toolbars """
+
+        self.basic = Basic(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.basic.set_giswater(self)
+        self.utils = Utils(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.go2epa = Go2Epa(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.om = Om(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.edit = Edit(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.master = Master(self.iface, self.settings, self.controller, self.plugin_dir)
+
+
     def project_new(self):
         """ Function executed when a user creates a new QGIS project """
 
@@ -850,6 +857,7 @@ class Giswater(QObject):
         self.controller.get_current_user()
         layer_source = self.controller.get_layer_source(self.layer_node)
         self.schema_name = layer_source['schema']
+        self.schema_name = self.schema_name.replace('"', '')
         self.controller.plugin_settings_set_value("schema_name", self.schema_name)
         self.controller.set_schema_name(self.schema_name)
 
@@ -878,6 +886,10 @@ class Giswater(QObject):
         self.wsoftware = self.controller.get_project_type()
         if self.wsoftware is None:
             return
+
+        # Initialize toolbars
+        self.controller.log_info("Initialize toolbars")
+        self.initialize_toolbars()
 
         self.get_buttons_to_hide()
 
@@ -911,6 +923,7 @@ class Giswater(QObject):
         # Set actions to controller class for further management
         self.controller.set_actions(self.actions)
 
+        self.controller.log_info("manage_map_tools")
         # Set objects for map tools classes
         self.manage_map_tools()
 
@@ -924,12 +937,15 @@ class Giswater(QObject):
         self.manage_expl_id()
 
         # Manage layer fields
+        self.controller.log_info("get_layers_to_config")
         self.get_layers_to_config()
         self.set_layer_config(self.available_layers)
 
         # Create a thread to listen selected database channels
         if self.settings.value('system_variables/use_notify').upper() == 'TRUE':
+            self.controller.log_info("NotifyFunctions")
             self.notify = NotifyFunctions(self.iface, self.settings, self.controller, self.plugin_dir)
+            self.notify.set_controller(self.controller)
             list_channels = ['desktop', self.controller.current_user]
             self.notify.start_listening(list_channels)
 
@@ -940,6 +956,7 @@ class Giswater(QObject):
         QgsProject.instance().legendLayersAdded.connect(self.get_new_layers_name)
 
         # Put add layers button into toc
+        self.controller.log_info("add_layers_button")
         self.add_layers_button()
 
         # Hide info button if giswater project is loaded
@@ -1062,8 +1079,11 @@ class Giswater(QObject):
 
         if self.wsoftware in ('ws', 'ud'):
             QApplication.setOverrideCursor(Qt.ArrowCursor)
-            self.check_project_result = CheckProjectResult(self.iface, self.settings, self.controller, self.plugin_dir)
-            status = self.check_project_result.populate_audit_check_project(layers, "true")
+            self.controller.log_info("CheckProjectResult")
+            #self.check_project_result = CheckProjectResult(self.iface, self.settings, self.controller, self.plugin_dir)
+            #self.check_project_result.set_controller(self.controller)
+            #status = self.check_project_result.populate_audit_check_project(layers, "true")
+            status = True
             QApplication.restoreOverrideCursor()
             if not status:
                 return False
@@ -1303,7 +1323,7 @@ class Giswater(QObject):
 
             feature = '"tableName":"' + str(layer_name) + '", "id":"", "isLayer":true'
             body = self.create_body(feature=feature)
-            complet_result = self.controller.get_json('gw_api_getinfofromid', body, log_sql=True)
+            complet_result = self.controller.get_json('gw_api_getinfofromid', body, log_sql=False)
             if not complet_result: continue
             
             for field in complet_result['body']['data']['fields']:
