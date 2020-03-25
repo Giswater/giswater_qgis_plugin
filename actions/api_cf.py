@@ -323,7 +323,7 @@ class ApiCF(ApiParent, QObject):
         self.hydro_info_dlg.btn_accept.setEnabled(False)
         self.hydro_info_dlg.rejected.connect(partial(self.resetRubberbands))
         # Open dialog
-        self.open_dialog(self.hydro_info_dlg)
+        self.open_dialog(self.hydro_info_dlg, dlg_name='info_basic')
         
         return result, self.hydro_info_dlg
 
@@ -550,7 +550,7 @@ class ApiCF(ApiParent, QObject):
         self.dlg_cf.key_pressed.connect(partial(self.close_dialog, self.dlg_cf))
 
         # Open dialog
-        self.open_dialog(self.dlg_cf)
+        self.open_dialog(self.dlg_cf, dlg_name='info_full')
         return self.complet_result, self.dlg_cf
 
 
@@ -2455,7 +2455,7 @@ class ApiCF(ApiParent, QObject):
 
         # Open dialog
         self.dlg_new_workcat.setWindowTitle("Create workcat")
-        self.open_dialog(self.dlg_new_workcat)
+        self.open_dialog(self.dlg_new_workcat, dlg_name='info_basic')
 
 
     def cf_manage_new_workcat_accept(self, table_object, tab_type):

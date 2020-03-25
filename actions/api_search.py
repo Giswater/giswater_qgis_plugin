@@ -96,6 +96,7 @@ class ApiSearch(ApiParent):
             gridlayout.addItem(vertical_spacer1)
 
         self.dlg_search.dlg_closed.connect(self.rubber_polygon.reset)
+        self.controller.manage_translation('search', self.dlg_search)
 
 
     def set_typeahead_completer(self, widget, completer=None):
@@ -387,7 +388,7 @@ class ApiSearch(ApiParent):
         field_id = str(result[0]['body']['feature']['idName'])
         self.populate_basic_info(self.hydro_info_dlg, result, field_id)
 
-        self.open_dialog(self.hydro_info_dlg)
+        self.open_dialog(self.hydro_info_dlg, dlg_name='info_basic')
 
 
     def workcat_open_table_items(self, item):

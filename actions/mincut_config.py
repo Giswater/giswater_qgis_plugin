@@ -243,7 +243,7 @@ class MincutConfig(ParentAction):
 
         self.api_parent.get_selector(self.dlg_selector, selector_values)
 
-        self.open_dialog(self.dlg_selector, maximize_button=False)
+        self.open_dialog(self.dlg_selector, dlg_name='selector', maximize_button=False)
 
 
     def populate_combos(self):

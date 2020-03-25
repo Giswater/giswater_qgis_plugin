@@ -92,7 +92,7 @@ class ApiDimensioning(ApiParent):
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
             layout.addItem(vertical_spacer1)
 
-        self.open_dialog(self.dlg_dim)
+        self.open_dialog(self.dlg_dim, dlg_name='dimensioning')
         return False, False
 
 

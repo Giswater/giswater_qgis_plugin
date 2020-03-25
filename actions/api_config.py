@@ -207,7 +207,7 @@ class ApiConfig(ApiParent):
             utils_giswater.remove_tab_by_tabName(self.dlg_config.tab_main, "tab_admin")
 
         # Open form
-        self.open_dialog(self.dlg_config)
+        self.open_dialog(self.dlg_config, dlg_name='config')
         
 
 

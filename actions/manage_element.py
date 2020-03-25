@@ -208,7 +208,7 @@ class ManageElement(ParentManage):
             self.exist_object(self.dlg_add_element, 'element')
 
         # Open the dialog    
-        self.open_dialog(self.dlg_add_element, maximize_button=False)
+        self.open_dialog(self.dlg_add_element, dlg_name='element', maximize_button=False)
         return self.dlg_add_element
 
 

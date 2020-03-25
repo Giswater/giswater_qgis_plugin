@@ -1235,7 +1235,7 @@ class UpdateSQL(ApiParent):
         self.dlg_import_inp.btn_close.clicked.connect(partial(self.execute_import_inp, accepted=False))
 
         # Open dialog
-        self.open_dialog(self.dlg_import_inp)
+        self.open_dialog(self.dlg_import_inp, dlg_name='main_importinp')
 
 
     def execute_last_process(self, new_project=False, schema_name='', schema_type='', locale=False):

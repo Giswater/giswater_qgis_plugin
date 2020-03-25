@@ -21,7 +21,7 @@ from functools import partial
 
 from .. import utils_giswater
 from .add_layer import AddLayer
-from ..ui_manager import BasicInfo, GwDialog, GwMainWindow
+from ..ui_manager import BasicInfoUi, GwDialog, GwMainWindow
 
 
 class ParentAction(object):
@@ -945,7 +945,7 @@ class ParentAction(object):
 
     def show_exceptions_msg(self, title, msg=""):
         cat_exception = {'KeyError': 'Key on returned json from ddbb is missed.'}
-        self.dlg_info = BasicInfo()
+        self.dlg_info = BasicInfoUi()
         self.dlg_info.btn_accept.setVisible(False)
         self.dlg_info.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_info))
         self.dlg_info.setWindowTitle(title)

@@ -48,19 +48,20 @@ class GwToolBox(ApiParent):
             self.controller.show_warning("Function not found in database", parameter=function_name)
             return
 
-        self.dlg_toolbox = ToolboxDockerUi()
-        self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dlg_toolbox)
-        self.dlg_toolbox.trv.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.dlg_toolbox.trv.setHeaderHidden(True)
+        self.dlg_toolbox_doc = ToolboxDockerUi()
+        self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dlg_toolbox_doc)
+        self.dlg_toolbox_doc.trv.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.dlg_toolbox_doc.trv.setHeaderHidden(True)
         extras = '"isToolbox":true'
         body = self.create_body(extras=extras)
         complet_result = self.controller.get_json('gw_api_gettoolbox', body)
         if not complet_result:
             return False
 
-        self.populate_trv(self.dlg_toolbox.trv, complet_result['body']['data'])
-        self.dlg_toolbox.txt_filter.textChanged.connect(partial(self.filter_functions))
-        self.dlg_toolbox.trv.doubleClicked.connect(partial(self.open_function))
+        self.populate_trv(self.dlg_toolbox_doc.trv, complet_result['body']['data'])
+        self.dlg_toolbox_doc.txt_filter.textChanged.connect(partial(self.filter_functions))
+        self.dlg_toolbox_doc.trv.doubleClicked.connect(partial(self.open_function))
+        self.controller.manage_translation('toolbox_docker', self.dlg_toolbox_doc)
 
 
     def filter_functions(self, text):
@@ -71,7 +72,7 @@ class GwToolBox(ApiParent):
         if not complet_result :
             return False
 
-        self.populate_trv(self.dlg_toolbox.trv, complet_result['body']['data'], expand=True)
+        self.populate_trv(self.dlg_toolbox_doc.trv, complet_result['body']['data'], expand=True)
 
 
     def open_function(self, index):
@@ -117,7 +118,7 @@ class GwToolBox(ApiParent):
         bool_dict = {"True": True, "true": True, "False": False, "false": False}
         self.dlg_functions.btn_run.setEnabled(bool_dict[enable_btn_run])
         self.dlg_functions.btn_cancel.setEnabled(bool_dict[enable_btn_run])
-        self.open_dialog(self.dlg_functions)
+        self.open_dialog(self.dlg_functions, dlg_name='toolbox')
 
 
     def remove_layers(self):

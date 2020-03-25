@@ -27,7 +27,7 @@ from .parent import ParentAction
 from .mincut_config import MincutConfig
 from .multiple_selection import MultipleSelection
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
-from ..ui_manager import BasicInfo
+from ..ui_manager import BasicInfoUi
 from ..ui_manager import Mincut
 from ..ui_manager import Mincut_fin
 from ..ui_manager import Mincut_add_hydrometer
@@ -666,7 +666,7 @@ class MincutParent(ParentAction):
                     self.add_layer.set_layer_symbology(layer, props)
                 layer.triggerRepaint()
                 self.iface.layerTreeView().refreshLayerSymbology(layer.id())
-            self.dlg_binfo = BasicInfo()
+            self.dlg_binfo = BasicInfoUi()
             self.load_settings(self.dlg_binfo)
             self.dlg_binfo.btn_close.setText('Cancel')
             self.dlg_binfo.btn_accept.setText('Continue')

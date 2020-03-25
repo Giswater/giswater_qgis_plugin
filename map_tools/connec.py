@@ -25,7 +25,7 @@ from qgis.PyQt.QtWidgets import QApplication
 
 from functools import partial
 
-from ..ui_manager import  BasicInfo
+from ..ui_manager import  BasicInfoUi
 from .parent import ParentMapTool
 
 
@@ -234,7 +234,7 @@ class ConnecMapTool(ParentMapTool):
             # Execute SQL function and show result to the user
             result = self.controller.get_json('gw_fct_connect_to_network', body, log_sql=True)
             if result:
-                self.dlg_binfo = BasicInfo()
+                self.dlg_binfo = BasicInfoUi()
                 self.load_settings(self.dlg_binfo)
                 self.dlg_binfo.btn_accept.hide()
                 self.dlg_binfo.setWindowTitle('Connect to network')

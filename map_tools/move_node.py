@@ -23,7 +23,7 @@ from qgis.PyQt.QtCore import Qt
 
 from .parent import ParentMapTool
 from ..actions.add_layer import AddLayer
-from ..ui_manager import BasicInfo
+from ..ui_manager import BasicInfoUi
 
 
 class MoveNodeMapTool(ParentMapTool):
@@ -53,7 +53,7 @@ class MoveNodeMapTool(ParentMapTool):
             result = self.controller.get_json('gw_fct_arc_divide', body)
             if not result: return
             if 'hideForm' not in result['body']['actions'] or not result['body']['actions']['hideForm']:
-                self.dlg_binfo = BasicInfo()
+                self.dlg_binfo = BasicInfoUi()
                 self.dlg_binfo.btn_accept.hide()
                 self.dlg_binfo.btn_close.clicked.connect(lambda: self.dlg_binfo.close())
                 text_result = self.populate_info_text(self.dlg_binfo, result['body']['data'], False, True, 1)

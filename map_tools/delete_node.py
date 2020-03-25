@@ -21,7 +21,7 @@ from qgis.PyQt.QtCore import Qt, QDate
 
 from .. import utils_giswater
 from .parent import ParentMapTool
-from ..ui_manager import ArcFusion, BasicInfo
+from ..ui_manager import ArcFusionUi, BasicInfoUi
 from functools import partial
 
 
@@ -62,7 +62,7 @@ class DeleteNodeMapTool(ParentMapTool):
 
         if snapped_feat:
             self.node_id = snapped_feat.attribute('node_id')
-            self.dlg_fusion = ArcFusion()
+            self.dlg_fusion = ArcFusionUi()
             self.load_settings(self.dlg_fusion)
 
             # Fill ComboBox workcat_id_end
@@ -78,7 +78,7 @@ class DeleteNodeMapTool(ParentMapTool):
             self.dlg_fusion.btn_accept.clicked.connect(self.exec_fusion)
             self.dlg_fusion.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_fusion))
 
-            self.open_dialog(self.dlg_fusion)
+            self.open_dialog(self.dlg_fusion, dlg_name='arc_fusion')
 
 
     def exec_fusion(self):

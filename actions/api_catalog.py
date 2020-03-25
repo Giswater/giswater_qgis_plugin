@@ -92,7 +92,7 @@ class ApiCatalog(ApiParent):
         dnom.currentIndexChanged.connect(partial(self.get_api_catalog, matcat_id, pnom, dnom, id, feature_type, geom_type))
 
         # Open form
-        self.open_dialog(self.dlg_catalog)
+        self.open_dialog(self.dlg_catalog, dlg_name='info_catalog')
 
 
     def get_api_catalog(self, matcat_id, pnom, dnom, id, feature_type, geom_type):

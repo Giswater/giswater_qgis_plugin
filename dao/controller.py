@@ -21,7 +21,7 @@ from .pg_dao import PgDao
 from .logger import Logger
 from .. import utils_giswater
 from .. import sys_manager
-from ..ui_manager import BasicInfo
+from ..ui_manager import BasicInfoUi
 
 
 class DaoController(object):
@@ -1620,7 +1620,7 @@ class DaoController(object):
     def show_exceptions_msg(self, title=None, msg="", window_title="Information about exception"):
         """ Show exception message in dialog """
 
-        self.dlg_info = BasicInfo()
+        self.dlg_info = BasicInfoUi()
         self.dlg_info.btn_accept.setVisible(False)
         self.dlg_info.btn_close.clicked.connect(lambda: self.dlg_info.close())
         self.dlg_info.setWindowTitle(window_title)

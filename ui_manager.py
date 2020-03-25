@@ -143,7 +143,7 @@ class InfoFullUi(GwMainWindow, FORM_CLASS):
 
 
 FORM_CLASS = get_ui_class('fastprint.ui')
-class FastPrint(GwDialog, FORM_CLASS):
+class FastPrintUi(GwDialog, FORM_CLASS):
     pass
 
 
@@ -188,7 +188,7 @@ class ToolboxUi(GwDialog, FORM_CLASS):
 
 
 FORM_CLASS = get_ui_class('arc_fusion.ui')
-class ArcFusion(GwDialog, FORM_CLASS):
+class ArcFusionUi(GwDialog, FORM_CLASS):
     pass
 
 
@@ -198,7 +198,7 @@ class ProjectCheckUi(GwDialog, FORM_CLASS):
 
 
 FORM_CLASS = get_ui_class('basic_info.ui')
-class BasicInfo(GwDialog, FORM_CLASS):
+class BasicInfoUi(GwDialog, FORM_CLASS):
     pass
 
 

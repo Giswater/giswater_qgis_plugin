@@ -29,7 +29,7 @@ from .. import utils_giswater
 from .parent import ParentAction
 from .HyperLinkLabel import HyperLinkLabel
 
-from ..ui_manager import BasicInfo
+from ..ui_manager import BasicInfoUi
 
 
 class ApiParent(ParentAction):
@@ -1122,7 +1122,7 @@ class ApiParent(ParentAction):
         self.rb_interpolate = []
         self.interpolate_result = None
         self.resetRubberbands()
-        self.dlg_binfo = BasicInfo()
+        self.dlg_binfo = BasicInfoUi()
         self.load_settings(self.dlg_binfo)
 
         utils_giswater.setWidgetText(self.dlg_binfo, self.dlg_binfo.txt_infolog, 'Interpolate tool')
