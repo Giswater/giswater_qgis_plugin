@@ -9,7 +9,7 @@ from qgis.core import QgsMessageLog, QgsCredentials, QgsExpressionContextUtils, 
 from qgis.PyQt.QtCore import QCoreApplication, QRegExp, QSettings, Qt, QTranslator
 from qgis.PyQt.QtGui import QTextCharFormat, QFont
 from qgis.PyQt.QtSql import QSqlDatabase
-from qgis.PyQt.QtWidgets import QCheckBox, QLabel, QMessageBox, QPushButton, QTabWidget, QToolBox
+from qgis.PyQt.QtWidgets import QCheckBox, QGroupBox, QLabel, QMessageBox, QPushButton, QTabWidget, QToolBox
 
 import os.path
 from functools import partial
@@ -778,6 +778,11 @@ class DaoController(object):
         for widget in widget_list:
             self.translate_widget(context_name, widget)
 
+        # Get objects of type: QTabWidget
+        widget_list = dialog.findChildren(QGroupBox)
+        for widget in widget_list:
+            self.translate_widget(context_name, widget)
+
         # Translate title of the form   
         text = self.tr('title', context_name)
         dialog.setWindowTitle(text)
@@ -816,6 +821,17 @@ class DaoController(object):
                         if text != widget_text:
                             widget.setItemText(i, text)
                     self.translate_tooltip(context_name, widget.widget(i))
+            elif  type(widget) is QGroupBox:
+                widget_name = widget.objectName()
+                text = self.tr(widget_name, context_name)
+                if text != widget_name:
+                    widget.setTitle(text)
+                else:
+                    widget_title = widget.title()
+                    text = self.tr(widget_title, context_name)
+                    if text != widget_title:
+                        widget.setTitle(text)
+                self.translate_tooltip(context_name, widget)
             else:
                 widget_name = widget.objectName()
                 text = self.tr(widget_name, context_name)
