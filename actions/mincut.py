@@ -260,7 +260,7 @@ class MincutParent(ParentAction):
         mincut_id = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
         sql = (f"SELECT notified FROM anl_mincut_result_cat "
                f"WHERE id = '{mincut_id}'")
-        row = self.controller.get_row(sql, commit=True, log_sql=True)
+        row = self.controller.get_row(sql, log_sql=True)
         if not row or row[0] is None:
             text = "Nothing to show"
             self.controller.show_info_box(str(text), "Sms info")
@@ -276,7 +276,7 @@ class MincutParent(ParentAction):
         # Show future id of mincut
         sql = ("SELECT setval('anl_mincut_result_cat_seq', (SELECT max(id::integer) "
                "FROM anl_mincut_result_cat), true)")
-        row = self.controller.get_row(sql, commit=True, log_sql=True)
+        row = self.controller.get_row(sql, log_sql=True)
         if not row or row[0] is None or row[0] < 1:
             result_mincut_id = '1'
         elif row[0]:
@@ -590,7 +590,7 @@ class MincutParent(ParentAction):
         if status:                                  
             message = "Values has been updated"
             self.controller.show_info(message)
-            self.update_result_selector(result_mincut_id, commit=True)
+            self.update_result_selector(result_mincut_id)
         else:
             message = "Error updating element in table, you need to review data"
             self.controller.show_warning(message)           
@@ -1646,7 +1646,7 @@ class MincutParent(ParentAction):
         # feature_type: type of snapped element (arc/node)
         # result_mincut_id: result_mincut_id from form
         sql =f"SELECT gw_fct_mincut('{elem_id}', '{elem_type}', '{real_mincut_id}');"
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        row = self.controller.get_row(sql, log_sql=True)
         if not row or not row[0]:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return False
@@ -2081,7 +2081,7 @@ class MincutParent(ParentAction):
         self.params = {}
         sql = ("SELECT parameter, value FROM config_param_system"
                " WHERE context = 'searchplus' ORDER BY parameter")
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         if rows:
             for row in rows:
                 self.params[row['parameter']] = str(row['value'])
@@ -2110,7 +2110,7 @@ class MincutParent(ParentAction):
         if expl_id != -1:
             sql += f" WHERE {self.street_field_expl[0]} = '{expl_id}' AND postcode IS NOT NULL"
         sql += " ORDER BY postcode;"
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         if not rows:
             return False
 
@@ -2347,7 +2347,7 @@ class MincutParent(ParentAction):
             sql = (f"SELECT {self.params['expl_field_name']}"
                    f" FROM {self.params['expl_layer']}"
                    f" WHERE {self.params['expl_field_code']} = {expl_id}")
-            row = self.controller.get_row(sql, commit=True)
+            row = self.controller.get_row(sql)
             if row:
                 utils_giswater.setSelectedItem(dialog, dialog.address_exploitation, row[0])
 

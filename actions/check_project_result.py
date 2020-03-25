@@ -173,7 +173,7 @@ class CheckProjectResult(ApiParent):
                            f" AND s.nspname = '{schemaname}' "
                            f" AND left (pg_catalog.format_type(a.atttypid, a.atttypmod), 8)='geometry' "
                            f" ORDER BY a.attnum limit 1")
-                    the_geom = self.controller.get_row(sql, commit=True)
+                    the_geom = self.controller.get_row(sql)
                 if not the_geom:
                     the_geom = None
                 self.add_layer.from_postgres_to_toc(check.objectName(), the_geom, check.property('field_id'), None)

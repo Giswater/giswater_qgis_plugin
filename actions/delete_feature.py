@@ -76,7 +76,7 @@ class DeleteFeature(ApiParent):
 
         # Get child layer
         sql = f"SELECT array_agg({feature_type}_id) FROM {feature_type} WHERE {feature_type}_id LIKE '%{feature_id}%' LIMIT 10"
-        self.rows_typeahead = self.controller.get_rows(sql, log_sql=True, commit=True)
+        self.rows_typeahead = self.controller.get_rows(sql, log_sql=True)
         self.rows_typeahead = self.rows_typeahead[0][0]
 
         if self.rows_typeahead is None:

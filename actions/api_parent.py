@@ -717,7 +717,7 @@ class ApiParent(ParentAction):
                f" FROM config_client_forms"
                f" WHERE table_id = '{table_name}'"
                f" ORDER BY column_index")
-        rows = self.controller.get_rows(sql, log_info=False, commit=True)
+        rows = self.controller.get_rows(sql, log_info=False)
         if not rows:
             return widget
 
@@ -1601,7 +1601,7 @@ class ApiParent(ParentAction):
         dialog.txt_infolog.clear()
 
         sql = "DELETE FROM temp_table WHERE fprocesscat_id=106;\n"
-        self.controller.execute_sql(sql, commit=True)
+        self.controller.execute_sql(sql)
         temp_layers_added = []
         for type_ in ['LineString', 'Point', 'Polygon']:
             sql = ""
@@ -1634,12 +1634,12 @@ class ApiParent(ParentAction):
                 geometry = self.add_layer.manage_geometry(feature.geometry())
                 sql = sql[:-2] + f"}}', (SELECT ST_GeomFromText('{geometry}', {srid})));\n"
                 if count != 0 and count % 500 == 0:
-                    status = self.controller.execute_sql(sql, commit=True)
+                    status = self.controller.execute_sql(sql)
                     if not status:
                         return False
                     sql = ""
             if sql != "":
-                status = self.controller.execute_sql(sql, commit=True)
+                status = self.controller.execute_sql(sql)
                 if not status:
                     return False
 
@@ -1678,7 +1678,7 @@ class ApiParent(ParentAction):
         main_tab = dialog.findChild(QTabWidget, 'main_tab')
         extras = f'"selector_type":{selector_type}'
         body = self.create_body(extras=extras)
-        complet_result = self.controller.get_json('gw_api_getselectors', body, commit=True, log_sql=True)
+        complet_result = self.controller.get_json('gw_api_getselectors', body, log_sql=True)
         if not complet_result: return False
 
         for form_tab in complet_result['body']['form']['formTabs']:
@@ -1720,7 +1720,7 @@ class ApiParent(ParentAction):
         extras += f'"result_name":"{widget.objectName()}", '
         extras += f'"result_value":"{widget.isChecked()}"'
         body = self.create_body(extras=extras)
-        complet_result = self.controller.get_json('gw_api_setselectors', body, log_sql=True, commit=True)
+        complet_result = self.controller.get_json('gw_api_setselectors', body, log_sql=True)
         if not complet_result: return False
         for layer_name in complet_result['body']['data']['indexingLayers'][selector_type]:
             self.controller.indexing_spatial_layer(layer_name)

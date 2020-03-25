@@ -41,7 +41,7 @@ class ApiCatalog(ApiParent):
         feature = f'"feature_type":"{feature_type}"'
         body = self.create_body(form, feature)
         sql = f"SELECT gw_api_getcatalog({body})::text"
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        row = self.controller.get_row(sql, log_sql=True)
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return
@@ -63,7 +63,7 @@ class ApiCatalog(ApiParent):
             label.setText(field['label'].capitalize())
             if field['widgettype'] == 'combo':
                 widget = self.add_combobox(self.dlg_catalog, field)
-            if field['position'] == 'layout_data_1':
+            if field['layoutname'] == 'lyt_data_1':
                 self.filter_form.addWidget(label, field['layout_order'], 0)
                 self.filter_form.addWidget(widget, field['layout_order'], 1)
 

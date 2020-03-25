@@ -110,15 +110,15 @@ class ManageElement(ParentManage):
         # TODO maybe all this values can be in one Json query
         # Fill combo boxes
         sql = "SELECT DISTINCT(elementtype_id), elementtype_id FROM cat_element ORDER BY elementtype_id"
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_add_element.element_type, rows, 1)
 
         sql = "SELECT expl_id, name FROM exploitation WHERE expl_id != '0' ORDER BY name"
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_add_element.expl_id, rows, 1)
 
         sql = "SELECT DISTINCT(id), name FROM value_state"
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_add_element.state, rows, 1)
 
         self.filter_state_type()
@@ -134,23 +134,23 @@ class ManageElement(ParentManage):
 
 
         sql = "SELECT DISTINCT(id), id FROM cat_owner"
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_add_element.ownercat_id, rows, 1, add_empty=True)
 
         sql = "SELECT DISTINCT(id), id FROM cat_builder"
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_add_element.buildercat_id, rows, 1, add_empty=True)
 
         sql = "SELECT DISTINCT(id), id FROM cat_work"
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_add_element.workcat_id, rows, 1, add_empty=True)
 
         sql = "SELECT DISTINCT(id), id FROM cat_work"
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_add_element.workcat_id_end, rows, 1, add_empty=True)
 
         sql = "SELECT DISTINCT(id), id FROM value_verified"
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_add_element.verified, rows, 1, add_empty=True)
         self.filter_elementcat_id()
 
@@ -216,7 +216,7 @@ class ManageElement(ParentManage):
         state = utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.state, 0)
         sql = (f"SELECT DISTINCT(id), name FROM value_state_type "
                f"WHERE state = {state}")
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_add_element.state_type, rows, 1)
 
 
@@ -449,7 +449,7 @@ class ManageElement(ParentManage):
         sql = (f"SELECT DISTINCT(id), id FROM cat_element"
                f" WHERE elementtype_id = '{element_type}'"
                f" ORDER BY id")
-        rows = self.controller.get_rows(sql, commit=True, log_sql=True)
+        rows = self.controller.get_rows(sql, log_sql=True)
         utils_giswater.set_item_data(self.dlg_add_element.elementcat_id, rows, 1)
 
 

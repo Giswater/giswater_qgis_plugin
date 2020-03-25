@@ -114,7 +114,7 @@ class ManageWorkcatEnd(ParentManage):
         """ Fill dates and combos cat_work/state type end """
 
         sql = 'SELECT id as id, name as idval FROM value_state_type WHERE id IS NOT NULL AND state = 0'
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_work_end.cmb_statetype_end, rows, 1)
         row = self.controller.get_config('statetype_end_vdefault')
 
@@ -130,7 +130,7 @@ class ManageWorkcatEnd(ParentManage):
         utils_giswater.setCalendarDate(self.dlg_work_end, "enddate", enddate)
 
         sql = "SELECT id FROM cat_work"
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows, allow_nulls=False)
         utils_giswater.set_autocompleter(self.dlg_work_end.workcat_id_end)
         row = self.controller.get_config('workcat_id_end_vdefault')
@@ -454,7 +454,7 @@ class ManageWorkcatEnd(ParentManage):
             sql = ("SELECT feature_type, feature_id, log_message "
                    "FROM audit_log_data "
                    "WHERE  fprocesscat_id = '28' AND user_name = current_user")
-            rows = self.controller.get_rows(sql, commit=True, log_sql=False)
+            rows = self.controller.get_rows(sql, log_sql=False)
             ids_ = ""
             if rows:
                 for row in rows:
@@ -545,7 +545,7 @@ class ManageWorkcatEnd(ParentManage):
                 sql = f"INSERT INTO cat_work ({fields}) VALUES ({values})"
                 self.controller.execute_sql(sql, log_sql=True)
                 sql = "SELECT id FROM cat_work ORDER BY id"
-                rows = self.controller.get_rows(sql, commit=True)
+                rows = self.controller.get_rows(sql)
                 if rows:
                     utils_giswater.fillComboBox(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows)
                     aux = self.dlg_work_end.workcat_id_end.findText(str(cat_work_id))

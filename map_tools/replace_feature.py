@@ -58,7 +58,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
         self.load_settings(self.dlg_replace)
 
         sql = "SELECT id FROM cat_work ORDER BY id"
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         if rows:
             utils_giswater.fillComboBox(self.dlg_replace, self.dlg_replace.workcat_id_end, rows)
             utils_giswater.set_autocompleter(self.dlg_replace.workcat_id_end)
@@ -97,7 +97,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
             feature_type = feature.attribute(self.feature_type_ud)
             if self.geom_type in ('node', 'connec'):
                 sql = f"SELECT DISTINCT(id) FROM {self.cat_table} ORDER BY id"
-                rows = self.controller.get_rows(sql, commit=True)
+                rows = self.controller.get_rows(sql)
                 utils_giswater.fillComboBox(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
 
         self.dlg_replace.feature_type.setText(feature_type)
@@ -109,7 +109,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
         sql = (f"SELECT DISTINCT(id) FROM {self.geom_type}_type "
                f"WHERE active is True "
                f"ORDER BY id")
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_replace, "feature_type_new", rows)
 
         self.dlg_replace.btn_new_workcat.clicked.connect(partial(self.new_workcat))
@@ -146,7 +146,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
             work_id = utils_giswater.getWidgetText(self.dlg_replace, self.dlg_replace.workcat_id_end)
             sql = (f"SELECT builtdate FROM cat_work "
                    f"WHERE id = '{work_id}'")
-            row = self.controller.get_row(sql, commit=True)
+            row = self.controller.get_row(sql)
             current_date = self.manage_dates(self.current_date)
             if row and row[0]:
                 builtdate = self.manage_dates(row[0])
@@ -219,13 +219,13 @@ class ReplaceFeatureMapTool(ParentMapTool):
                 sql = (f"SELECT DISTINCT(id) "
                        f"FROM {table_object} "
                        f"WHERE id = '{cat_work_id}'")
-                row = self.controller.get_row(sql, log_info=False, log_sql=True)
+                row = self.controller.get_row(sql, log_info=False)
                 if row is None:
                     sql = f"INSERT INTO cat_work ({fields}) VALUES ({values})"
                     self.controller.execute_sql(sql, log_sql=True)
 
                     sql = "SELECT id FROM cat_work ORDER BY id"
-                    rows = self.controller.get_rows(sql, commit=True)
+                    rows = self.controller.get_rows(sql)
                     if rows:
                         utils_giswater.fillComboBox(self.dlg_replace, self.dlg_replace.workcat_id_end, rows)
                         current_index = self.dlg_replace.workcat_id_end.findText(str(cat_work_id))
@@ -248,7 +248,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
         sql = (f"SELECT DISTINCT({field_id}) "
                f"FROM {tablename} "
                f"ORDER BY {field_id}")
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         if rows is None:
             return
 
@@ -295,7 +295,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
             # Execute SQL function and show result to the user
             function_name = "gw_fct_feature_replace"
             sql = f"SELECT {function_name}({body})::text"
-            row = self.controller.get_row(sql, log_sql=True, commit=True)
+            row = self.controller.get_row(sql, log_sql=True)
             if not row:
                 message = "Error replacing feature"
                 self.controller.show_warning(message)
@@ -474,7 +474,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
             sql = (f"SELECT DISTINCT(id) "
                    f"FROM {self.cat_table} "
                    f"WHERE {self.feature_type_ws} = '{feature_type_new}'")
-            rows = self.controller.get_rows(sql, commit=True)
+            rows = self.controller.get_rows(sql)
             utils_giswater.fillComboBox(self.dlg_replace, self.dlg_replace.featurecat_id, rows)
 
 

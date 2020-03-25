@@ -659,7 +659,7 @@ class Giswater(QObject):
                    "SELECT id, active FROM connec_type UNION "
                    "SELECT id, active FROM gully_type) a USING (id) "
                    "WHERE a.active IS TRUE ORDER BY id")
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         if not rows:
             return False
 
@@ -1000,7 +1000,7 @@ class Giswater(QObject):
                "WHEN 'v_edit_arc' THEN 'Arc' WHEN 'v_edit_connec' THEN 'Connec' "
                "WHEN 'v_edit_gully' THEN 'Gully' END ), parent_layer FROM cat_feature"
                " ORDER BY parent_layer")
-        parent_layers = self.controller.get_rows(sql, log_sql=True, commit=True)
+        parent_layers = self.controller.get_rows(sql, log_sql=True)
 
         for parent_layer in parent_layers:
             # Create sub menu
@@ -1014,7 +1014,7 @@ class Giswater(QObject):
                    f"   WHERE table_schema = '{schema_name}')"
                    f" ORDER BY child_layer")
 
-            child_layers = self.controller.get_rows(sql, log_sql=True, commit=True)
+            child_layers = self.controller.get_rows(sql, log_sql=True)
             child_layers.insert(0, ['Load all', 'Load all', 'Load all'])
             for child_layer in child_layers:
                 # Create actions
@@ -1249,7 +1249,7 @@ class Giswater(QObject):
               f"WHERE child_layer IN ("
               f"     SELECT table_name FROM information_schema.tables"
               f"     WHERE table_schema = '{schema_name}')")
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         self.available_layers = [layer[0] for layer in rows]
 
         self.set_form_suppress(self.available_layers)

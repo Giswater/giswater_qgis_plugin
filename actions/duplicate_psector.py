@@ -32,7 +32,7 @@ class DuplicatePsector(ParentManage, QObject):
 
         # Populate combo duplicate psector
         sql = "SELECT psector_id, name FROM plan_psector"
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_duplicate_psector.duplicate_psector, rows, 1)
 
         # Set QComboBox with selected psector

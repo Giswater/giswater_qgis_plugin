@@ -102,7 +102,7 @@ class Master(ParentAction):
         tablename = "config_param_user"
         sql = (f"SELECT * FROM {tablename}"
                f" WHERE cur_user = current_user")
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         exist_param = False
         if type(widget) != QDateEdit:
             if utils_giswater.getWidgetText(dialog, widget) != "":
@@ -275,7 +275,7 @@ class Master(ParentAction):
         sql = (f"SELECT id, name"
                f" FROM {table_name}"
                f" ORDER BY name")
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         if not rows:
             return
         
@@ -360,7 +360,7 @@ class Master(ParentAction):
                f" WHERE cur_user = current_user"
                f" AND result_type = 1"
                f" ORDER BY name")
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         if not rows:
             return
 

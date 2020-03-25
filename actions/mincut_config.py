@@ -61,7 +61,7 @@ class MincutConfig(ParentAction):
         model = QStringListModel()
 
         sql = "SELECT DISTINCT(id) FROM anl_mincut_result_cat WHERE id > 0 "
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         values = []
         if rows:
             for row in rows:
@@ -127,7 +127,7 @@ class MincutConfig(ParentAction):
                    f"JOIN anl_mincut_result_cat AS t2 ON t1.result_id = t2.id "
                    f"WHERE result_id = {id_}")
 
-            rows = self.controller.get_rows(sql, commit=True, log_sql=True)
+            rows = self.controller.get_rows(sql, log_sql=True)
             if not rows:
                 inf_text += "\nClients: None(No messages will be sent)"
                 continue
@@ -161,7 +161,7 @@ class MincutConfig(ParentAction):
                    f"JOIN anl_mincut_result_cat AS t2 ON t1.result_id = t2.id "
                    f"WHERE result_id = {id_}")
 
-            rows = self.controller.get_rows(sql, commit=True, log_sql=True)
+            rows = self.controller.get_rows(sql, log_sql=True)
             if not rows:
                 print("NOT ROWS")
                 continue
@@ -194,7 +194,7 @@ class MincutConfig(ParentAction):
             else:
                 sql += f"SET notified= concat(replace(notified::text,']',','),'{{\"code\":\"{result[0]}\",\"date\":\"{_date_sended}\",\"avisats\":\"{result[1]}\",\"afectats\":\"{result[2]}\"}}]')::json "
             sql += f"WHERE id = '{id_}'"
-            row = self.controller.execute_sql(sql, commit=True)
+            row = self.controller.execute_sql(sql)
 
             # Set a model with selected filter. Attach that model to selected table
             self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + ".v_ui_anl_mincut_result_cat")

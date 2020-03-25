@@ -173,7 +173,7 @@ class CrmTrace(ApiParent):
         self.controller.log_info(sql)
 
         # Execute function and show results
-        row = self.controller.get_row(sql, commit=True)
+        row = self.controller.get_row(sql)
         if not row or row[0] is None:
             self.controller.show_warning("Process failed", parameter=sql)
             return False

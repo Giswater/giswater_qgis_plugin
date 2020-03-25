@@ -1372,7 +1372,7 @@ class UpdateSQL(ApiParent):
             return
 
         sql = "SELECT schema_name, schema_name FROM information_schema.schemata"
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         available = False
         for row in rows:
             if str(project_name) == str(row[0]):
@@ -1526,7 +1526,7 @@ class UpdateSQL(ApiParent):
             self.schema = str(create_project)
 
         sql = "SELECT schema_name, schema_name FROM information_schema.schemata"
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
 
         for row in rows:
             if str(self.schema) == str(row[0]):
@@ -1821,11 +1821,11 @@ class UpdateSQL(ApiParent):
 
         # Manage widgets
         sql = "SELECT id, id as idval FROM sys_feature_type WHERE net_category=1"
-        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        rows = self.controller.get_rows(sql, log_sql=True)
         utils_giswater.set_item_data(self.dlg_manage_visit_class.feature_type, rows, 1)
 
         sql = "SELECT id, id as idval FROM om_visit_type"
-        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        rows = self.controller.get_rows(sql, log_sql=True)
         utils_giswater.set_item_data(self.dlg_manage_visit_class.visit_type, rows, 1)
 
         # Set listeners
@@ -1843,19 +1843,19 @@ class UpdateSQL(ApiParent):
 
         # Manage widgets
         sql = ("SELECT id, id as idval FROM om_visit_parameter_type")
-        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        rows = self.controller.get_rows(sql, log_sql=True)
         utils_giswater.set_item_data(self.dlg_manage_visit_param.parameter_type, rows, 1)
 
         sql = ("SELECT id, idval FROM config_api_typevalue WHERE typevalue = 'datatype'")
-        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        rows = self.controller.get_rows(sql, log_sql=True)
         utils_giswater.set_item_data(self.dlg_manage_visit_param.data_type, rows, 1)
 
         sql = ("SELECT id, id as idval FROM om_visit_parameter_form_type")
-        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        rows = self.controller.get_rows(sql, log_sql=True)
         utils_giswater.set_item_data(self.dlg_manage_visit_param.form_type, rows, 1)
 
         sql = ("SELECT id, idval FROM config_api_typevalue WHERE typevalue = 'widgettype'")
-        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        rows = self.controller.get_rows(sql, log_sql=True)
         utils_giswater.set_item_data(self.dlg_manage_visit_param.widget_type, rows, 1)
 
         # Set listeners
@@ -1964,7 +1964,7 @@ class UpdateSQL(ApiParent):
 
         # Populate Project data schema Name
         sql = "SELECT schema_name FROM information_schema.schemata"
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         if rows is None:
             return
 
@@ -1972,10 +1972,10 @@ class UpdateSQL(ApiParent):
             sql = ("SELECT EXISTS(SELECT * FROM information_schema.tables "
                    "WHERE table_schema = '" + str(row[0]) + "' "
                    "AND table_name = 'version')")
-            exists = self.controller.get_row(sql, commit=True)
+            exists = self.controller.get_row(sql)
             if exists and str(exists[0]) == 'True':
                 sql = ("SELECT wsoftware FROM " + str(row[0]) + ".version")
-                result = self.controller.get_row(sql, commit=True)
+                result = self.controller.get_row(sql)
                 if result is not None and result[0] == filter_.upper():
                     elem = [row[0], row[0]]
                     result_list.append(elem)
@@ -2020,14 +2020,14 @@ class UpdateSQL(ApiParent):
         else:
             # Check if exist column sample in table version
             sql = "SELECT column_name FROM information_schema.columns WHERE table_name='version' and column_name='sample' and table_schema='" + schema_name +"';"
-            result = self.controller.get_row(sql)
+            result = self.controller.get_row(sql, commit=False)
 
             if result is None:
                 sql = "SELECT giswater, language, epsg FROM " + schema_name + ".version ORDER BY id DESC LIMIT 1;"
-                result = self.controller.get_row(sql)
+                result = self.controller.get_row(sql, commit=False)
             else:
                 sql = "SELECT giswater, language, epsg, sample FROM " + schema_name + ".version ORDER BY id DESC LIMIT 1;"
-                result = self.controller.get_row(sql)
+                result = self.controller.get_row(sql, commit=False)
                 self.is_sample = result[3]
             self.project_data_schema_version = result[0]
             self.project_data_language = result[1]
@@ -2041,14 +2041,14 @@ class UpdateSQL(ApiParent):
 
         # Get parameters
         sql = "SELECT version();"
-        result = self.controller.get_row(sql)
+        result = self.controller.get_row(sql, commit=False)
         if result:
             database_version = result[0].split(',')
         else:
             database_version = ['']
 
         sql = "SELECT PostGIS_FULL_VERSION();"
-        result = self.controller.get_row(sql)
+        result = self.controller.get_row(sql, commit=False)
         if result:
             postgis_version = result[0].split('GEOS=')
         else:
@@ -2059,7 +2059,7 @@ class UpdateSQL(ApiParent):
         else:
             sql = ("SELECT value FROM " + schema_name + ".config_param_system "
                    "WHERE parameter = 'schema_manager'")
-            result = self.controller.get_row(sql)
+            result = self.controller.get_row(sql, commit=False)
 
         if result is None:
             result = ['{"title":"","author":"","date":""}']
@@ -2368,7 +2368,7 @@ class UpdateSQL(ApiParent):
 
         new_schema_name = utils_giswater.getWidgetText(self.dlg_readsql_copy, self.dlg_readsql_copy.schema_rename_copy)
         sql = "SELECT schema_name, schema_name FROM information_schema.schemata"
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
 
         for row in rows:
             if str(new_schema_name) == str(row[0]):
@@ -2459,7 +2459,7 @@ class UpdateSQL(ApiParent):
 
             body = self.create_body(extras=extras)
             sql = ("SELECT " + str(function_name) + "(" + body + ")::text")
-            row = self.controller.get_row(sql, log_sql=True, commit=True)
+            row = self.controller.get_row(sql, log_sql=True)
             self.task1 = GwTask('Manage schema')
             QgsApplication.taskManager().addTask(self.task1)
             self.task1.setProgress(50)
@@ -2573,11 +2573,11 @@ class UpdateSQL(ApiParent):
             content = f.read()
         sql = ("INSERT INTO " + schema_name + ".temp_csv2pg(source, csv1, csv2pgcat_id) VALUES('" +
                str(form_name_ui) + "', '" + str(content) + "', 20);")
-        status = self.controller.execute_sql(sql, log_sql=True, commit=True)
+        status = self.controller.execute_sql(sql, log_sql=True)
 
         # Import xml to database
         sql = ("SELECT " + schema_name + ".gw_fct_utils_import_ui_xml('" + str(form_name_ui) + "', " + str(status_update_childs) + ")::text")
-        status = self.controller.execute_sql(sql, log_sql=True, commit=True)
+        status = self.controller.execute_sql(sql, log_sql=True)
         self.manage_result_message(status, parameter="Import data into 'config_api_form_fields'")
 
         # Clear temp_csv2pg
@@ -2600,7 +2600,7 @@ class UpdateSQL(ApiParent):
         # Export xml from database
         sql = ("SELECT " + schema_name + ".gw_fct_utils_export_ui_xml('"
                + str(form_name_ui) + "', " + str(status_update_childs) + ")::text")
-        status = self.controller.execute_sql(sql, log_sql=True, commit=True)
+        status = self.controller.execute_sql(sql, log_sql=True)
         if status is False:
             msg = "Process finished with some errors"
             self.controller.show_info_box(msg, "Warning", parameter="Function import/export")
@@ -2610,7 +2610,7 @@ class UpdateSQL(ApiParent):
         sql = ("SELECT csv1 FROM " + schema_name + ".temp_csv2pg "
                "WHERE user_name = current_user AND source = '" + str(form_name_ui) + "' "
                "ORDER BY id DESC")
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        row = self.controller.get_row(sql, log_sql=True)
         if not row:
             return
 
@@ -2642,7 +2642,7 @@ class UpdateSQL(ApiParent):
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
         # Clear temp_csv2pg
         sql = ("DELETE FROM " + schema_name + ".temp_csv2pg WHERE user_name = current_user")
-        status = self.controller.execute_sql(sql, log_sql=True, commit=True)
+        status = self.controller.execute_sql(sql, log_sql=True)
 
 
     def select_file_ui(self):
@@ -2694,7 +2694,7 @@ class UpdateSQL(ApiParent):
             utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_sys_fields).setEnabled(True)
 
             sql = ("SELECT wsoftware FROM " + str(schema_name) + ".version")
-            wsoftware = self.controller.get_row(sql)
+            wsoftware = self.controller.get_row(sql, commit=False)
 
             if wsoftware[0].upper() == 'WS':
                 sql = ("SELECT cat_feature.child_layer, cat_feature.child_layer FROM " + schema_name + ".cat_feature JOIN "
@@ -2710,7 +2710,7 @@ class UpdateSQL(ApiParent):
             else:
                 return
 
-            rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+            rows = self.controller.get_rows(sql, log_sql=True)
             utils_giswater.set_item_data(self.dlg_readsql.cmb_formname_ui, rows, 1)
 
             if wsoftware[0].upper() == 'WS':
@@ -2727,7 +2727,7 @@ class UpdateSQL(ApiParent):
             else:
                 return
 
-            rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+            rows = self.controller.get_rows(sql, log_sql=True)
             utils_giswater.set_item_data(self.dlg_readsql.cmb_formname_fields, rows, 1)
             utils_giswater.set_item_data(self.dlg_readsql.cmb_feature_name_view, rows, 1)
             utils_giswater.set_item_data(self.dlg_readsql.cmb_feature_sys_fields, rows, 1)
@@ -2931,18 +2931,18 @@ class UpdateSQL(ApiParent):
 
         # Populate widgettype combo
         sql = ("SELECT DISTINCT(id), idval FROM " + schema_name + ".config_api_typevalue WHERE typevalue = 'widgettype_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
-        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        rows = self.controller.get_rows(sql, log_sql=True)
         utils_giswater.set_item_data(self.dlg_manage_fields.widgettype, rows, 1)
 
         # Populate datatype combo
         sql = ("SELECT id, idval FROM " + schema_name + ".config_api_typevalue WHERE typevalue = 'datatype_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
-        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        rows = self.controller.get_rows(sql, log_sql=True)
         utils_giswater.set_item_data(self.dlg_manage_fields.datatype, rows, 1)
 
         # Populate widgetfunction combo
         sql = ("SELECT null as id, null as idval UNION ALL "
                " SELECT id, idval FROM " + schema_name + ".config_api_typevalue WHERE typevalue = 'widgetfunction_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
-        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        rows = self.controller.get_rows(sql, log_sql=True)
         utils_giswater.set_item_data(self.dlg_manage_fields.widgetfunction, rows, 1)
 
         # Set default value for formtype widget
@@ -3006,7 +3006,7 @@ class UpdateSQL(ApiParent):
                    "FROM " + schema_name + ".ve_config_addfields "
                    "WHERE cat_feature_id = '" + form_name + "'")
 
-        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        rows = self.controller.get_rows(sql, log_sql=True)
         utils_giswater.set_item_data(self.dlg_manage_fields.cmb_fields, rows, 1)
 
 
@@ -3047,7 +3047,7 @@ class UpdateSQL(ApiParent):
 
         sql = sql[:-1]
         sql += f" WHERE cat_feature_id = '{form_name}' and column_id = '{column_id}'"
-        self.controller.execute_sql(sql, commit=True)
+        self.controller.execute_sql(sql)
 
         # Close dialog
         self.close_dialog(self.dlg_manage_sys_fields)
@@ -3060,7 +3060,7 @@ class UpdateSQL(ApiParent):
 
         # Execute manage add fields function
         sql = ("SELECT param_name FROM man_addfields_parameter WHERE param_name = '" + utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.column_id) + "'")
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        row = self.controller.get_row(sql, log_sql=True)
 
         if action == 'Create':
 
@@ -3352,7 +3352,7 @@ class UpdateSQL(ApiParent):
             self.schema_name = self.controller.schema_name
 
         sql = f"SELECT giswater FROM {self.schema_name}.version ORDER BY id DESC LIMIT 1"
-        row = self.controller.get_row(sql)
+        row = self.controller.get_row(sql, commit=False)
         if row:
             project_version = row[0]
 
@@ -3371,13 +3371,13 @@ class UpdateSQL(ApiParent):
         # Check if exist column sample in table version
         sql = (f"SELECT column_name FROM information_schema.columns "
                f"WHERE table_name = 'version' and column_name='sample' and table_schema = '{self.schema_name}';")
-        result = self.controller.get_row(sql, commit=True, log_sql=True)
+        result = self.controller.get_row(sql, log_sql=True)
         if result is None:
             sql = f"SELECT giswater, language FROM {self.schema_name}.version ORDER BY id DESC LIMIT 1;"
-            result = self.controller.get_row(sql, commit=True)
+            result = self.controller.get_row(sql)
         else:
             sql = f"SELECT giswater, language, sample FROM {self.schema_name}.version ORDER BY id DESC LIMIT 1;"
-            result = self.controller.get_row(sql, commit=True)
+            result = self.controller.get_row(sql)
             self.is_sample = result[2]
 
         self.project_data_schema_version = result[0]

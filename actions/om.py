@@ -138,7 +138,7 @@ class Om(ParentAction):
         row = selected_list[0].row()
         psector_id = qtbl_psm.model().record(row).value("psector_id")
         sql = "SELECT * FROM selector_psector WHERE cur_user = current_user"
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         if rows:
             sql = (f"UPDATE selector_psector"
                    f" SET psector_id = '{psector_id}'"
@@ -165,7 +165,7 @@ class Om(ParentAction):
 
         sql = 'SELECT * FROM ' + tablename
         sql += ' WHERE "cur_user" = current_user'
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         exist_param = False
         if type(widget) != QDateEdit:
             if utils_giswater.getWidgetText(dialog, widget) != "":

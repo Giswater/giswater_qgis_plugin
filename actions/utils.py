@@ -241,7 +241,7 @@ class Utils(ParentAction):
         extras += f', "csv2pgCat":"{csv2pgcat_id_aux}"'
         body = self.create_body(extras=extras)
         sql = ("SELECT " + str(self.func_name) + "($${" + body + "}$$)::text")
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        row = self.controller.get_row(sql, log_sql=True)
         if not row:
             self.controller.show_warning("NOT ROW FOR: " + sql)
             message = "Import failed"
@@ -289,12 +289,12 @@ class Utils(ParentAction):
             dialog.progressBar.setValue(progress)
 
             if progress % 500 == 0:
-                status = self.controller.execute_sql(sql, commit=True)
+                status = self.controller.execute_sql(sql)
                 if not status:
                     return False
                 sql = ""
         if sql != "":
-            status = self.controller.execute_sql(sql, commit=True)
+            status = self.controller.execute_sql(sql)
             if not status:
                 return False
 

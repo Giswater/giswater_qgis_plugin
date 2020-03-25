@@ -116,12 +116,12 @@ class ManageNewPsector(ParentManage):
         sql = ("SELECT expl_id, name from exploitation "
                " JOIN selector_expl USING (expl_id) "
                " WHERE exploitation.expl_id != 0 and cur_user = current_user")
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.cmb_expl_id, rows, 1)
 
         # Populate combo status
         sql = "SELECT id, idval FROM plan_typevalue WHERE typevalue = 'psector_status'"
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.cmb_status, rows, 1)
 
         if self.plan_om == 'om':
@@ -338,7 +338,7 @@ class ManageNewPsector(ParentManage):
             utils_giswater.set_combo_itemData(self.cmb_status, str(result[1]), 1)
 
         sql = "SELECT state_id FROM selector_state WHERE cur_user = current_user"
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         self.all_states = rows
         self.delete_psector_selector('selector_state')
         self.insert_psector_selector('selector_state', 'state_id', '1')
@@ -648,7 +648,7 @@ class ManageNewPsector(ParentManage):
                f" WHERE table_name = '{viewname}'"
                f" AND table_schema = '" + self.schema_name.replace('"', '') + "'"
                f" ORDER BY ordinal_position")
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         columns = []
 
         if not rows or rows is None or rows == '':
@@ -661,7 +661,7 @@ class ManageNewPsector(ParentManage):
 
         sql = (f"SELECT * FROM {viewname}"
                f" WHERE psector_id = '{utils_giswater.getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id)}'")
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         all_rows = []
         all_rows.append(columns)
         if not rows or rows is None or rows == '':
@@ -678,7 +678,7 @@ class ManageNewPsector(ParentManage):
         
         sql = (f"SELECT DISTINCT(column_name) FROM information_schema.columns"
                f" WHERE table_name = 'v_{self.plan_om}_current_psector'")
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         columns = []
         for i in range(0, len(rows)):
             column_name = rows[i]
@@ -813,7 +813,7 @@ class ManageNewPsector(ParentManage):
         
         sql = (f"SELECT name FROM {tablename} "
                f" WHERE LOWER(name) = '{utils_giswater.getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.name)}'")
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         if not rows:
             if self.dlg_plan_psector.name.text() != '':
                 self.enable_tabs(True)
@@ -826,13 +826,13 @@ class ManageNewPsector(ParentManage):
     def delete_psector_selector(self, tablename):
         sql = (f"DELETE FROM {tablename}"
                f" WHERE cur_user = current_user;")
-        self.controller.execute_sql(sql, commit=True)
+        self.controller.execute_sql(sql)
 
 
     def insert_psector_selector(self, tablename, field, value):
         sql = (f"INSERT INTO {tablename} ({field}, cur_user) "
                f"VALUES ('{value}', current_user);")
-        self.controller.execute_sql(sql, commit=True)
+        self.controller.execute_sql(sql)
 
 
     def check_tab_position(self):
@@ -874,7 +874,7 @@ class ManageNewPsector(ParentManage):
         index = self.dlg_plan_psector.psector_type.itemData(self.dlg_plan_psector.psector_type.currentIndex())
         sql = (f"SELECT result_type, name FROM {table_name}"
                f" WHERE result_type = {index[0]} ORDER BY name DESC")
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         if not rows:
             return False
 
@@ -898,7 +898,7 @@ class ManageNewPsector(ParentManage):
         if where:
             sql += where
         sql += f" ORDER BY {field_name}"
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         if not rows:
             return
         combo.blockSignals(True)
@@ -956,7 +956,7 @@ class ManageNewPsector(ParentManage):
 
         sql = (f"SELECT name FROM {self.plan_om}_psector"
                f" WHERE name = '{psector_name}'")
-        row = self.controller.get_row(sql, commit=True)
+        row = self.controller.get_row(sql)
         if row is None:
             return False
         return True
@@ -987,7 +987,7 @@ class ManageNewPsector(ParentManage):
                f"WHERE table_name = {viewname} "
                f"AND table_schema = '" + self.schema_name.replace('"', '') + "' "
                f"ORDER BY ordinal_position;")
-        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        rows = self.controller.get_rows(sql, log_sql=True)
         if not rows or rows is None or rows == '':
             message = "Check fields from table or view"
             self.controller.show_warning(message, parameter=viewname)
@@ -1054,7 +1054,7 @@ class ManageNewPsector(ParentManage):
 
         if not self.update:
             sql += " RETURNING psector_id;"
-            new_psector_id = self.controller.execute_returning(sql, search_audit=False, log_sql=True, commit=True)
+            new_psector_id = self.controller.execute_returning(sql, search_audit=False, log_sql=True)
             utils_giswater.setText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id, str(new_psector_id[0]))
             if new_psector_id and self.plan_om == 'plan':
                 row = self.controller.get_config('psector_vdefault')
@@ -1154,7 +1154,7 @@ class ManageNewPsector(ParentManage):
                    f" WHERE {id_des} = '{expl_id[i]}'"
                    f" AND psector_id = '{psector_id}'")
 
-            row = self.controller.get_row(sql, commit=True)
+            row = self.controller.get_row(sql)
             if row is not None:
                 # if exist - show warning
                 message = "Id already selected"

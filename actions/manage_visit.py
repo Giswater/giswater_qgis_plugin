@@ -469,7 +469,7 @@ class ManageVisit(ParentManage, QObject):
                f" WHERE UPPER (parameter_type) = '{self.parameter_type_id.currentText().upper()}'"
                f" AND UPPER (feature_type) = '{self.feature_type.currentText().upper()}'")
         sql += " ORDER BY id"
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
 
         if rows:
             utils_giswater.set_item_data(dialog.parameter_id, rows, 1)
@@ -684,7 +684,7 @@ class ManageVisit(ParentManage, QObject):
         sql = ("SELECT id, id "
                "FROM om_visit_parameter_type "
                "ORDER BY id")
-        parameter_type_ids = self.controller.get_rows(sql, commit=True)
+        parameter_type_ids = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_add_visit.parameter_type_id, parameter_type_ids, 1)
 
         # now get default value to be show in parameter_type_id
@@ -757,7 +757,7 @@ class ManageVisit(ParentManage, QObject):
         sql = (f"SELECT form_type"
                f" FROM om_visit_parameter"
                f" WHERE id = '{parameter_id}'")
-        row = self.controller.get_row(sql, commit=True)
+        row = self.controller.get_row(sql)
         form_type = str(row[0])
 
         if form_type == 'event_ud_arc_standard':
@@ -895,7 +895,7 @@ class ManageVisit(ParentManage, QObject):
         file_dialog.setFileMode(QFileDialog.Directory)
         # Get file types from catalog and populate QFileDialog filter
         sql = "SELECT filetype, fextension FROM  om_visit_filetype_x_extension"
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         f_types = rows
         file_types = ""
         for row in rows:
@@ -935,7 +935,7 @@ class ManageVisit(ParentManage, QObject):
         """ Save new files into DataBase """
         if self.files_added:
             sql = ("SELECT filetype, fextension FROM om_visit_filetype_x_extension")
-            f_types = self.controller.get_rows(sql, commit=True)
+            f_types = self.controller.get_rows(sql)
             sql = ""
             for path in self.files_added:
                 filename, file_extension = os.path.splitext(path)

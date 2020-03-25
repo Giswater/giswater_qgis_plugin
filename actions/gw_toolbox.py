@@ -348,7 +348,7 @@ class GwToolBox(ApiParent):
 
         body = self.create_body(feature=feature_field, extras=extras)
         sql = f"SELECT {function_name}({body})::text"
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        row = self.controller.get_row(sql, log_sql=True)
         if not row or row[0] is None:
             self.controller.show_message(f"Function : {function_name} executed with no result ", 3)
             dialog.progressBar.setVisible(False)
@@ -388,7 +388,7 @@ class GwToolBox(ApiParent):
         dialog.progressBar.setFormat("")
 
         sql = f"SELECT {function_name}()::text"
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        row = self.controller.get_row(sql, log_sql=True)
 
         if not row or row[0] is None:
             self.controller.show_message(f"Function : {function_name} executed with no result ", 3)
@@ -463,7 +463,7 @@ class GwToolBox(ApiParent):
                " UNION SELECT DISTINCT(parent_layer), feature_type, 0 FROM cat_feature WHERE feature_type='" + geom_type.upper() + "'"
                " UNION SELECT child_layer, feature_type, 2 as c FROM cat_feature WHERE feature_type = '" + geom_type.upper() + "') as t "
                " ORDER BY c, tablename")
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         if rows:
             for row in rows:
                 layer = self.controller.get_layer_by_tablename(row[0])

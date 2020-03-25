@@ -496,7 +496,7 @@ class DaoController(object):
         return sql
 
         
-    def get_row(self, sql, log_info=True, log_sql=False, commit=False, params=None):
+    def get_row(self, sql, log_info=True, log_sql=False, commit=True, params=None):
         """ Execute SQL. Check its result in log tables, and show it to the user """
         
         sql = self.get_sql(sql, log_sql, params)
@@ -512,7 +512,7 @@ class DaoController(object):
         return row
 
 
-    def get_rows(self, sql, log_info=True, log_sql=False, commit=False, params=None, add_empty_row=False):
+    def get_rows(self, sql, log_info=True, log_sql=False, commit=True, params=None, add_empty_row=False):
         """ Execute SQL. Check its result in log tables, and show it to the user """
 
         sql = self.get_sql(sql, log_sql, params)
@@ -1107,7 +1107,7 @@ class DaoController(object):
             sql = ("SELECT lower(wsoftware) "
                    "FROM " + schemaname + "." + tablename + " "
                    "ORDER BY id ASC LIMIT 1")
-            row = self.get_row(sql, commit=True)
+            row = self.get_row(sql)
             if row:
                 project_type = row[0]
         else:
@@ -1145,7 +1145,7 @@ class DaoController(object):
         schemaname = schemaname.replace('"', '')
         sql = "SELECT nspname FROM pg_namespace WHERE nspname = %s"
         params = [schemaname]
-        row = self.get_row(sql, commit=True, params=params)
+        row = self.get_row(sql, params=params)
         return row
     
     
@@ -1160,7 +1160,7 @@ class DaoController(object):
                "WHERE lower(routine_schema) = %s "
                "AND lower(routine_name) = %s ")
         params = [schema_name, function_name]
-        row = self.get_row(sql, commit=True, params=params)
+        row = self.get_row(sql, params=params)
         return row
     
     
@@ -1174,7 +1174,7 @@ class DaoController(object):
         sql = ("SELECT * FROM pg_tables "
                "WHERE schemaname = %s AND tablename = %s ")
         params = [schemaname, tablename]
-        row = self.get_row(sql, log_info=False, commit=True, params=params)
+        row = self.get_row(sql, log_info=False, params=params)
         return row
 
 
@@ -1188,7 +1188,7 @@ class DaoController(object):
         sql = ("SELECT * FROM pg_views "
                "WHERE schemaname = %s AND viewname = %s ")
         params = [schemaname, viewname]
-        row = self.get_row(sql, log_info=False, commit=True, params=params)
+        row = self.get_row(sql, log_info=False, params=params)
         return row
     
     
@@ -1202,7 +1202,7 @@ class DaoController(object):
         sql = ("SELECT * FROM information_schema.columns "
                "WHERE table_schema = %s AND table_name = %s AND column_name = %s ")
         params = [schemaname, tablename, columname]
-        row = self.get_row(sql, log_info=False, commit=True, params=params)
+        row = self.get_row(sql, log_info=False, params=params)
         return row
     
 
@@ -1244,7 +1244,7 @@ class DaoController(object):
             username = self.user
 
         sql = ("SELECT pg_has_role('" + username + "', '" + role_name + "', 'MEMBER');")
-        row = self.get_row(sql, commit=True)
+        row = self.get_row(sql)
         if row:
             return row[0]
         else:
@@ -1474,7 +1474,7 @@ class DaoController(object):
         if table == 'config_param_user':
             sql += " AND cur_user = current_user"
         sql += ";"
-        row = self.get_row(sql, commit=True, log_info=log_info)
+        row = self.get_row(sql, log_info=log_info)
         return row
 
 

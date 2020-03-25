@@ -119,7 +119,7 @@ class ApiDimensioning(ApiParent):
 
         srid = self.controller.plugin_settings_value('srid')
         sql = f"SELECT ST_GeomFromText('{new_feature.geometry().asWkt()}', {srid})"
-        the_geom = self.controller.get_row(sql, commit=True, log_sql=True)
+        the_geom = self.controller.get_row(sql, log_sql=True)
         fields += f'"the_geom":"{the_geom[0]}"'
 
         feature = '"tableName":"v_edit_dimensions"'

@@ -234,7 +234,7 @@ class TmBasic(TmParentAction):
         sql = (f"SELECT * FROM v_edit_price " 
               f"WHERE name = '{dialog.txt_campaign.text()}'"
                f" AND price is null")
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         if not rows:
             dialog.btn_accept.setEnabled(True)
         else:
@@ -275,7 +275,7 @@ class TmBasic(TmParentAction):
             if not status: return None
             sql = f"DELETE FROM selector_planning WHERE cur_user=current_user;"
             sql += f"INSERT INTO selector_planning VALUES ('{status}', current_user);"
-            self.controller.execute_sql(sql, commit=True, log_sql=True)
+            self.controller.execute_sql(sql, log_sql=True)
             if utils_giswater.isChecked(dialog, dialog.chk_campaign) and utils_giswater.get_item_data(dialog, dialog.cbx_campaigns, 0) != -1:
                 self.selected_camp = utils_giswater.get_item_data(dialog, dialog.cbx_campaigns, 0)
                 sql = (f"SELECT DISTINCT(campaign_id) FROM planning"
@@ -301,7 +301,7 @@ class TmBasic(TmParentAction):
             extras += f'"chk_campaign":{bool_dic[chk_campaign]}}}'
             body = self.parent.create_body(extras=extras)
             sql = ("SELECT tm_fct_copy_planning($${" + body + "}$$)::text")
-            row = self.controller.get_row(sql, commit=True)
+            row = self.controller.get_row(sql)
             self.tree_selector(update)
 
         else:
@@ -680,7 +680,7 @@ class TmBasic(TmParentAction):
         self.planned_camp_name = utils_giswater.get_item_data(dialog, dialog.cbx_years, 1)
         sql = f"DELETE FROM selector_planning WHERE cur_user=current_user;"
         sql += f"INSERT INTO selector_planning VALUES ('{self.planned_camp_id}', current_user);"
-        self.controller.execute_sql(sql, commit=True, log_sql=True)
+        self.controller.execute_sql(sql, log_sql=True)
 
         if self.planned_camp_id == -1:
             message = "No hi ha cap any planificat"
@@ -689,7 +689,7 @@ class TmBasic(TmParentAction):
         
         sql = f"DELETE FROM selector_planning WHERE cur_user=current_user;"
         sql += f"INSERT INTO selector_planning VALUES ('{self.planned_camp_id}', current_user);"
-        self.controller.execute_sql(sql, commit=True, log_sql=True)
+        self.controller.execute_sql(sql, log_sql=True)
 
         self.controller.log_info(str(self.planned_camp_id))
         self.close_dialog(dialog)

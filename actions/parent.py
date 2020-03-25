@@ -536,7 +536,7 @@ class ParentAction(object):
                f" FROM config_client_forms"
                f" WHERE table_id = '{table_name}'"
                f" ORDER BY column_index")
-        rows = self.controller.get_rows(sql, commit=True, log_info=False)
+        rows = self.controller.get_rows(sql, log_info=False)
         if not rows:
             return
 
@@ -696,7 +696,7 @@ class ParentAction(object):
         :param sql: Query to be executed, where will we get the list of items (string)
         :return list_items: List with the result of the query executed (List) ["item1","item2","..."]
         """
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         list_items = []
         if rows:
             for row in rows:
@@ -885,7 +885,7 @@ class ParentAction(object):
                f" FROM {table_name}"
                f" WHERE typevalue = '{typevalue}'"
                f" ORDER BY {order_by}")
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         return rows
 
 
@@ -1010,7 +1010,7 @@ class ParentAction(object):
         sql = (f"SELECT doc_id"
                f" FROM {tablename}"
                f" WHERE doc_id = '{doc_id}' AND {field} = '{field_value}'")
-        row = self.controller.get_row(sql, commit=True)
+        row = self.controller.get_row(sql)
         if row:
             msg = "Document already exist"
             self.controller.show_warning(msg)
@@ -1019,7 +1019,7 @@ class ParentAction(object):
         # Insert into new table
         sql = (f"INSERT INTO {tablename} (doc_id, {field})"
                f" VALUES ('{doc_id}', '{field_value}')")
-        status = self.controller.execute_sql(sql, commit=True)
+        status = self.controller.execute_sql(sql)
         if status:
             message = "Document inserted successfully"
             self.controller.show_info(message)

@@ -190,7 +190,7 @@ class CreateGisProject():
                f"ST_YMax(gometries) AS ymax, ST_YMin(gometries) AS ymin "
                f"FROM "
                f"(SELECT ST_Collect({geom_name}) AS gometries FROM {schema_name}.{table_name}) AS foo")
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        row = self.controller.get_row(sql, log_sql=True)
         if row:
             valor = row["xmin"]
             if valor is None:
