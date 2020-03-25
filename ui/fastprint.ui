@@ -74,7 +74,7 @@
     </widget>
    </item>
    <item row="0" column="0">
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="grb_map_options">
      <property name="title">
       <string>Map options:</string>
      </property>
