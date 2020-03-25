@@ -1057,7 +1057,7 @@ class Giswater(QObject):
         for layer in layers_list:
             layer_source = self.controller.get_layer_source(layer)
             # Collect only the layers of the work scheme
-            if 'schema' in layer_source and layer_source['schema'].replace("'", '') == self.schema_name:
+            if 'schema' in layer_source and layer_source['schema'].replace('"', '') == self.schema_name:
                 layers_name.append(layer.name())
 
         self.set_layer_config(layers_name)
@@ -1270,7 +1270,7 @@ class Giswater(QObject):
         for layer in all_layers_toc:
             layer_source = self.controller.get_layer_source(layer)
             # Filter to take only the layers of the current schema
-            if 'schema' not in layer_source or layer_source['schema'].replace("'", '') != self.schema_name: continue
+            if 'schema' not in layer_source or layer_source['schema'].replace('"', '') != self.schema_name: continue
             table_name = f"{self.controller.get_layer_source_table_name(layer)}"
             self.available_layers.append(table_name)
 
