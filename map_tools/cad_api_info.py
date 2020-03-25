@@ -17,7 +17,7 @@ from qgis.PyQt.QtWidgets import QAction
 
 from .parent import ParentMapTool
 from ..actions.api_cf import ApiCF
-from ..ui_manager import ApiDocker
+from ..ui_manager import DockerUi
 
 
 class CadApiInfo(ParentMapTool):
@@ -32,8 +32,7 @@ class CadApiInfo(ParentMapTool):
         self.tab_type = None
         # :var self.block_signal: used when the signal 'signal_activate' is emitted from the info, do not open another form
         self.block_signal = False
-
-        self.dlg_docker = ApiDocker()
+        self.dlg_docker = DockerUi()
 
 
     def create_point(self, event):
@@ -47,8 +46,6 @@ class CadApiInfo(ParentMapTool):
             return False
 
         return point
-
-
 
 
     def manage_docker_options(self, docker):
@@ -80,6 +77,7 @@ class CadApiInfo(ParentMapTool):
             x = self.iface.mainWindow().dockWidgetArea(docker)
             print(x)
             del self.dlg_docker
+
 
 
 
@@ -127,7 +125,8 @@ class CadApiInfo(ParentMapTool):
                 print("No point under mouse(RightButton)")
                 return
 
-            self.info_cf.hilight_feature(point, rb_list=self.rubberband_list, tab_type=self.tab_type, docker=self.dlg_docker)
+            self.info_cf.hilight_feature(point, rb_list=self.rubberband_list, tab_type=self.tab_type,
+                                         docker=self.dlg_docker)
 
 
     def reactivate_map_tool(self):

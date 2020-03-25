@@ -85,6 +85,16 @@
             <item>
              <widget class="QLineEdit" name="txt_selected_filter"/>
             </item>
+            <item>
+             <widget class="QLabel" name="lbl_builder">
+              <property name="text">
+               <string>Filtrar per empresa:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="cmb_filter_builder"/>
+            </item>
            </layout>
           </item>
          </layout>

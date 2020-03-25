@@ -17,7 +17,7 @@
 """
 # -*- coding: utf-8 -*-
 from qgis.gui import QgsMapCanvas, QgsVertexMarker
-from qgis.core import QgsFeatureRequest, QgsPointLocator, QgsPointXY, QgsProject, QgsSnappingUtils, QgsTolerance, QgsVectorLayer
+from qgis.core import QgsFeatureRequest, QgsPointLocator, QgsPointXY, QgsProject, QgsSnappingConfig, QgsSnappingUtils, QgsTolerance, QgsVectorLayer
 from qgis.PyQt.QtCore import QPoint
 from qgis.PyQt.QtGui import QColor
 
@@ -101,7 +101,14 @@ class SnappingConfigManager(object):
         """ Set snapping to 'arc' """
 
         QgsProject.instance().blockSignals(True)
-        self.snap_to_layer(self.layer_arc, QgsPointLocator.Edge, True)
+        layer_settings = self.snap_to_layer(self.layer_arc, QgsPointLocator.All, True)
+        if layer_settings:
+            layer_settings.setType(2)
+            layer_settings.setTolerance(15)
+            layer_settings.setEnabled(True)
+        else:
+            layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 2, 15, 1)
+        self.snapping_config.setIndividualLayerSettings(self.layer_arc, layer_settings)
         QgsProject.instance().blockSignals(False)
         QgsProject.instance().snappingConfigChanged.emit(self.snapping_config)
 
@@ -110,7 +117,14 @@ class SnappingConfigManager(object):
         """ Set snapping to 'node' """
 
         QgsProject.instance().blockSignals(True)
-        self.snap_to_layer(self.layer_node, QgsPointLocator.Vertex, True)
+        layer_settings = self.snap_to_layer(self.layer_node, QgsPointLocator.Vertex, True)
+        if layer_settings:
+            layer_settings.setType(1)
+            layer_settings.setTolerance(15)
+            layer_settings.setEnabled(True)
+        else:
+            layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 1, 15, 1)
+        self.snapping_config.setIndividualLayerSettings(self.layer_node, layer_settings)
         QgsProject.instance().blockSignals(False)
         QgsProject.instance().snappingConfigChanged.emit(self.snapping_config)
 
@@ -119,8 +133,25 @@ class SnappingConfigManager(object):
         """ Set snapping to 'connec' and 'gully' """
 
         QgsProject.instance().blockSignals(True)
-        self.snap_to_layer(self.layer_connec, QgsPointLocator.Vertex, True)
-        self.snap_to_layer(self.layer_gully, QgsPointLocator.Vertex, True)
+        layer_settings = self.snap_to_layer(self.layer_connec, QgsPointLocator.Vertex, True)
+        if layer_settings:
+            layer_settings.setType(1)
+            layer_settings.setTolerance(15)
+            layer_settings.setEnabled(True)
+        else:
+            layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 1, 15, 1)
+        self.snapping_config.setIndividualLayerSettings(self.layer_connec, layer_settings)
+
+        layer_settings = self.snap_to_layer(self.layer_gully, QgsPointLocator.Vertex, True)
+        if layer_settings:
+            layer_settings.setType(1)
+            layer_settings.setTolerance(15)
+            layer_settings.setEnabled(True)
+        else:
+            layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 1, 15, 1)
+
+        self.snapping_config.setIndividualLayerSettings(self.layer_gully, layer_settings)
+
         QgsProject.instance().blockSignals(False)
         QgsProject.instance().snappingConfigChanged.emit(self.snapping_config)
 
@@ -136,6 +167,7 @@ class SnappingConfigManager(object):
             layer_settings = self.snapping_config.individualLayerSettings(layer)
             layer_settings.setEnabled(True)
             self.snapping_config.setIndividualLayerSettings(layer, layer_settings)
+            return layer_settings
 
 
     def apply_snapping_options(self, snappings_options):

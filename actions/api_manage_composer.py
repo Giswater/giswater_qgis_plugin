@@ -1,25 +1,22 @@
 """
-This file is part of Giswater 2.0
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
 # -*- coding: latin-1 -*-
-
 from qgis.core import QgsLayoutItemMap, QgsPrintLayout, QgsLayoutItemLabel, QgsLayoutExporter
-
 from qgis.PyQt.QtGui import QRegExpValidator
-from qgis.PyQt.QtCore import QRegExp, Qt
+from qgis.PyQt.QtCore import QRegExp
 from qgis.PyQt.QtPrintSupport import QPrinter, QPrintDialog
 from qgis.PyQt.QtWidgets import QLineEdit, QDialog
 
 import json
-from collections import OrderedDict
 from functools import partial
 
 from .. import utils_giswater
 from .api_parent import ApiParent
-from ..ui_manager import ApiComposerUi
+from ..ui_manager import FastPrintUi
 
 
 class ApiManageComposer(ApiParent):
@@ -43,21 +40,17 @@ class ApiManageComposer(ApiParent):
 
         self.initial_rotation = self.iface.mapCanvas().rotation()
 
-        self.dlg_composer = ApiComposerUi()
+        self.dlg_composer = FastPrintUi()
         self.load_settings(self.dlg_composer)
 
         # Create and populate dialog
         extras = '"composers":' + str(composers_list)
         body = self.create_body(extras=extras)
-        sql = f"SELECT gw_api_getprint($${{{body}}}$$)::text"
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
-        if not row or row[0] is None:
-            self.controller.show_warning("NOT ROW FOR: " + sql)
-            return False
+        complet_result = self.controller.get_json('gw_api_getprint', body, log_sql=True)
+        if not complet_result: return False
 
-        complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-        if complet_result[0]['formTabs']:
-            fields = complet_result[0]['formTabs'][0]
+        if complet_result['formTabs']:
+            fields = complet_result['formTabs'][0]
             # This dialog is created from config_api_form_fieds
             # where formname == 'printGeneric' and formtype == 'utils'
             # At the moment, u can set column widgetfunction with 'gw_api_setprint' or open_composer
@@ -94,7 +87,7 @@ class ApiManageComposer(ApiParent):
         self.check_whidget_exist(self.dlg_composer)
         self.load_composer_values(self.dlg_composer)
         
-        self.open_dialog(self.dlg_composer)
+        self.open_dialog(self.dlg_composer, dlg_name='fastprint')
 
         # Control if no have composers
         if composers_list != '"{}"':
@@ -125,7 +118,7 @@ class ApiManageComposer(ApiParent):
                 widget.setStyleSheet("border: 1px solid red")
                 widget.setPlaceholderText(f"Widget '{widget.property('column_id')}' not found in the composer")
             elif type(item) == QgsLayoutItemLabel and item is not None:
-                widget.setStyleSheet("border: 1px solid gray")
+                widget.setStyleSheet(None)
 
 
     def load_composer_values(self, dialog):
@@ -299,17 +292,13 @@ class ApiManageComposer(ApiParent):
         form = '"form":{''}, '
         feature = '"feature":{''}, '
         data = '"data":' + str(my_json)
-        body = "" + client + form + feature + data
-        sql = f"SELECT gw_api_setprint($${{{body}}}$$)::text"
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
-        if not row or row[0] is None:
-            self.controller.show_warning("NOT ROW FOR: " + sql)
-            return False
+        body = "$${" + client + form + feature + data + "}$$"
+        complet_result = self.controller.get_json('gw_api_setprint', body, log_sql=True)
+        if not complet_result: return False
 
-        complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-        result = complet_result[0]['data']
+        result = complet_result['data']
         self.draw_rectangle(result)
-        map_index = complet_result[0]['data']['mapIndex']
+        map_index = complet_result['data']['mapIndex']
 
         maps = []
         active_composers = self.get_composers_list()

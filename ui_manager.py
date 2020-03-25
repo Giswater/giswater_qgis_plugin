@@ -108,117 +108,103 @@ def get_ui_class(ui_file_name, subfolder=None):
     return uic.loadUiType(ui_file_path)[0]
 
 
-FORM_CLASS = get_ui_class('add_doc.ui')
-class AddDoc(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('docker.ui')
+class DockerUi(GwDockWidget, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('add_element.ui')
-class AddElement(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('element.ui')
+class ElementUi(GwDialog, FORM_CLASS):
     pass
 
 
 FORM_CLASS = get_ui_class('add_lot.ui')
-class AddLot(GwDialog, FORM_CLASS):
+class LotUi(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('add_picture.ui')
-class AddPicture(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('visit.ui')
+class VisitUi(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('add_sum.ui')
-class AddSum(GwDialog, FORM_CLASS):
-    pass
-
-
-FORM_CLASS = get_ui_class('add_visit.ui')
-class AddVisit(GwDialog, FORM_CLASS):
-    pass
-
-
-FORM_CLASS = get_ui_class('api_basic_info.ui')
+FORM_CLASS = get_ui_class('info_basic.ui')
 class ApiBasicInfo(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('api_catalog.ui')
-class ApiCatalogUi(GwMainWindow, FORM_CLASS):
+FORM_CLASS = get_ui_class('info_catalog.ui')
+class InfoCatalogUi(GwMainWindow, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('api_cf.ui')
-class ApiCfUi(GwMainWindow, FORM_CLASS):
+FORM_CLASS = get_ui_class('info_full.ui')
+class InfoFullUi(GwMainWindow, FORM_CLASS):
     key_pressed = QtCore.pyqtSignal()
 
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key_Escape:
             self.key_pressed.emit()
-            return super(ApiCfUi, self).keyPressEvent(event)
+            return super(InfoFullUi, self).keyPressEvent(event)
 
 
-FORM_CLASS = get_ui_class('api_composers.ui')
-class ApiComposerUi(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('fastprint.ui')
+class FastPrintUi(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('api_config.ui')
-class ApiConfigUi(GwMainWindow, FORM_CLASS):
+FORM_CLASS = get_ui_class('config.ui')
+class ConfigUi(GwMainWindow, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('api_dimensioning.ui')
-class ApiDimensioningUi(GwMainWindow, FORM_CLASS):
-    pass
-
-FORM_CLASS = get_ui_class('api_docker.ui')
-class ApiDocker(GwDockWidget, FORM_CLASS):
-    pass
-
-FORM_CLASS = get_ui_class('api_epa_options.ui')
-class ApiEpaOptions(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('dimensioning.ui')
+class DimensioningUi(GwMainWindow, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('api_import_inp.ui')
-class ApiImportInp(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('options.ui')
+class OptionsUi(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('api_search.ui')
-class ApiSearchUi(GwDockWidget, FORM_CLASS):
+FORM_CLASS = get_ui_class('main_importinp.ui')
+class ImportInpUi(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('api_selector.ui')
-class ApiSelector(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('search.ui')
+class SearchUi(GwDockWidget, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('api_toolbox.ui')
-class ApiDlgToolbox(GwDockWidget, FORM_CLASS):
+FORM_CLASS = get_ui_class('selector.ui')
+class SelectorUi(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('api_toolbox_functions.ui')
-class ApiFunctionTb(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('toolbox_docker.ui')
+class ToolboxDockerUi(GwDockWidget, FORM_CLASS):
     pass
 
+
+FORM_CLASS = get_ui_class('toolbox.ui')
+class ToolboxUi(GwDialog, FORM_CLASS):
+    pass
 
 
 FORM_CLASS = get_ui_class('arc_fusion.ui')
-class ArcFusion(GwDialog, FORM_CLASS):
+class ArcFusionUi(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('audit_check_project_result.ui')
-class AuditCheckProjectResult(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('project_check.ui')
+class ProjectCheckUi(GwDialog, FORM_CLASS):
     pass
 
 
 FORM_CLASS = get_ui_class('basic_info.ui')
-class BasicInfo(GwDialog, FORM_CLASS):
+class BasicInfoUi(GwDialog, FORM_CLASS):
     pass
 
 
@@ -247,7 +233,7 @@ class Credentials(GwDialog, FORM_CLASS):
     def __init__(self, subtag=None):
         super().__init__()
         self.txt_pass.setClearButtonEnabled(True)
-        icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_open.svg'
+        icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_open.png'
         self.action = QAction("show")
         if os.path.exists(icon_path):
             icon = QIcon(icon_path)
@@ -259,11 +245,11 @@ class Credentials(GwDialog, FORM_CLASS):
     def show_pass(self):
         if self.txt_pass.echoMode() == 0:
             self.txt_pass.setEchoMode(QLineEdit.Password)
-            icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_open.svg'
+            icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_open.png'
             text = "Show password"
         elif self.txt_pass.echoMode() == 2:
             self.txt_pass.setEchoMode(QLineEdit.Normal)
-            icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_close.svg'
+            icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_close.png'
             text = "Hide password"
         if os.path.exists(icon_path):
             icon = QIcon(icon_path)
@@ -283,6 +269,11 @@ class Csv2Pg(GwDialog, FORM_CLASS):
 
 FORM_CLASS = get_ui_class('delete_feature.ui')
 class DelFeature(GwDialog, FORM_CLASS):
+    pass
+
+
+FORM_CLASS = get_ui_class('doc.ui')
+class DocUi(GwDialog, FORM_CLASS):
     pass
 
 
@@ -401,30 +392,11 @@ class ManageVisitParam(GwDialog, FORM_CLASS):
 
 FORM_CLASS = get_ui_class('mincut.ui')
 class Mincut(GwMainWindow, FORM_CLASS):
-    dlg_rejected = QtCore.pyqtSignal()
-    
+
     def __init__(self):
         self.closeMainWin = False
         self.mincutCanceled = True
         super().__init__()
-
-    def closeEvent(self, event):
-        """ Overwrite closeEvent method """
-        # If client don't touch nothing just rejected dialog or press cancel
-        if not self.closeMainWin and self.mincutCanceled:
-            event.accept()
-            self.dlg_rejected.emit()
-            return super(Mincut, self).closeEvent(event)
-        
-        if self.closeMainWin:
-            event.accept()
-            if self.mincutCanceled:
-                self.dlg_rejected.emit()
-                return super(Mincut, self).closeEvent(event)
-        else:
-            event.accept()
-            # QMessageBox.information(self, "", "Press cancel to exit")
-            # event.ignore()
 
 
 FORM_CLASS = get_ui_class('mincut_add_connec.ui')
@@ -497,6 +469,35 @@ class Psector_rapport(GwDialog, FORM_CLASS):
     pass
 
 
+FORM_CLASS = get_ui_class('qm_generator.ui')
+class QmGenerator(GwDialog, FORM_CLASS):
+    def __init__(self, subtag=None):
+        super().__init__()
+        self.txt_pass.setClearButtonEnabled(True)
+        icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_open.png'
+        self.action = QAction("show")
+        if os.path.exists(icon_path):
+            icon = QIcon(icon_path)
+            self.action = QAction(icon, "show")
+        self.action.triggered.connect(self.show_pass)
+        self.txt_pass.addAction(self.action, QLineEdit.TrailingPosition)
+
+
+    def show_pass(self):
+        if self.txt_pass.echoMode() == 0:
+            self.txt_pass.setEchoMode(QLineEdit.Password)
+            icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_open.png'
+            text = "Show password"
+        elif self.txt_pass.echoMode() == 2:
+            self.txt_pass.setEchoMode(QLineEdit.Normal)
+            icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_close.png'
+            text = "Hide password"
+        if os.path.exists(icon_path):
+            icon = QIcon(icon_path)
+            self.action.setIcon(icon)
+            self.action.setText(text)
+
+
 FORM_CLASS = get_ui_class('readsql.ui')
 class Readsql(GwMainWindow, FORM_CLASS):
     dlg_closed = QtCore.pyqtSignal()
@@ -513,8 +514,8 @@ class ReadsqlCreateGisProject(GwMainWindow, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('readsql_rename.ui')
-class ReadsqlRename(GwMainWindow, FORM_CLASS):
+FORM_CLASS = get_ui_class('readsql_rename_copy.ui')
+class ReadsqlRenameCopy(GwMainWindow, FORM_CLASS):
     pass
 
 
@@ -533,23 +534,8 @@ class SelectorDate(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('toolbox.ui')
-class Toolbox(GwDialog, FORM_CLASS):
-    pass
-
-
-FORM_CLASS = get_ui_class('ud_catalog.ui')
-class UDcatalog(GwDialog, FORM_CLASS):
-    pass
-
-
 FORM_CLASS = get_ui_class('user_management.ui')
 class UserManagement(GwMainWindow, FORM_CLASS):
-    pass
-
-
-FORM_CLASS = get_ui_class('cf_ud_catalog.ui')
-class CFUDcatalog(GwDialog, FORM_CLASS):
     pass
 
 
@@ -560,16 +546,6 @@ class VisitManagement(GwDialog, FORM_CLASS):
 
 FORM_CLASS = get_ui_class('workcat_end.ui')
 class WorkcatEnd(GwDialog, FORM_CLASS):
-    pass
-
-
-FORM_CLASS = get_ui_class('ws_catalog.ui')
-class WScatalog(GwDialog, FORM_CLASS):
-    pass
-
-
-FORM_CLASS = get_ui_class('cf_ws_catalog.ui')
-class CFWScatalog(GwDialog, FORM_CLASS):
     pass
 
 

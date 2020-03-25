@@ -1,19 +1,17 @@
 """
-This file is part of Giswater 2.0
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-
 # -*- coding: utf-8 -*-
-
 from qgis.core import QgsPointXY
 from qgis.PyQt.QtCore import QStringListModel
 
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtWidgets import QAbstractItemView, QComboBox, QCompleter, QFileDialog, QGridLayout, QLabel, QLineEdit
+from qgis.PyQt.QtWidgets import QAbstractItemView, QComboBox, QCompleter, QFileDialog, QGridLayout, QHeaderView, QLabel, QLineEdit
 from qgis.PyQt.QtWidgets import QSizePolicy, QSpacerItem, QTableView, QTabWidget, QWidget
 
 import csv
@@ -27,10 +25,11 @@ from collections import OrderedDict
 
 from .. import utils_giswater
 from .api_cf import ApiCF
+from .manage_document import ManageDocument
 from .manage_new_psector import ManageNewPsector
 from .manage_visit import ManageVisit
 from .api_parent import ApiParent
-from ..ui_manager import ApiSearchUi, ApiBasicInfo, ListItems
+from ..ui_manager import SearchUi, ApiBasicInfo, ListItems
 
 
 class ApiSearch(ApiParent):
@@ -50,7 +49,7 @@ class ApiSearch(ApiParent):
     def api_search(self):
         
         # Dialog
-        self.dlg_search = ApiSearchUi()
+        self.dlg_search = SearchUi()
         self.load_settings(self.dlg_search)
         self.dlg_search.lbl_msg.setStyleSheet("QLabel{color:red;}")
         self.dlg_search.lbl_msg.setVisible(False)
@@ -60,21 +59,19 @@ class ApiSearch(ApiParent):
 
         body = self.create_body()
         function_name = "gw_api_getsearch"
-        row = self.controller.execute_api_function(function_name, body)
-        if not row:
+        complet_list = self.controller.get_json(function_name, body)
+        if not complet_list:
             return False
-
-        complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
 
         main_tab = self.dlg_search.findChild(QTabWidget, 'main_tab')
         first_tab = None
         self.lineedit_list = []
-        for tab in complet_list[0]["form"]:
+        for tab in complet_list["form"]:
             if first_tab is None:
                 first_tab = tab['tabName']
             tab_widget = QWidget(main_tab)
             tab_widget.setObjectName(tab['tabName'])
-            main_tab.addTab(tab_widget, tab['tabtext'])
+            main_tab.addTab(tab_widget, tab['tabLabel'])
             gridlayout = QGridLayout()
             tab_widget.setLayout(gridlayout)
             x = 0
@@ -86,7 +83,7 @@ class ApiSearch(ApiParent):
                 if field['widgettype'] == 'typeahead':
                     completer = QCompleter()
                     widget = self.add_lineedit(field)
-                    widget = self.set_completer(widget, completer)
+                    widget = self.set_typeahead_completer(widget, completer)
                     self.lineedit_list.append(widget)
                 elif field['widgettype'] == 'combo':
                     widget = self.add_combobox(field)
@@ -99,9 +96,10 @@ class ApiSearch(ApiParent):
             gridlayout.addItem(vertical_spacer1)
 
         self.dlg_search.dlg_closed.connect(self.rubber_polygon.reset)
+        self.controller.manage_translation('search', self.dlg_search)
 
 
-    def set_completer(self, widget, completer=None):
+    def set_typeahead_completer(self, widget, completer=None):
         """ Set completer and add listeners """
 
         if completer:
@@ -121,7 +119,7 @@ class ApiSearch(ApiParent):
         line_list = self.dlg_search.main_tab.widget(index).findChildren(QLineEdit)
         for line_edit in line_list:
             line_edit.setReadOnly(False)
-            line_edit.setStyleSheet("QLineEdit { background: rgb(255, 255, 255); color: rgb(0, 0, 0)}")
+            line_edit.setStyleSheet(None)
 
         # Get selected row
         row = completer.popup().currentIndex().row()
@@ -259,7 +257,7 @@ class ApiSearch(ApiParent):
         extras_search = ''
         form_search_add = ''
         extras_search_add = ''
-        row = None
+        result = None
         index = self.dlg_search.main_tab.currentIndex()
         combo_list = self.dlg_search.main_tab.widget(index).findChildren(QComboBox)
         line_list = self.dlg_search.main_tab.widget(index).findChildren(QLineEdit)
@@ -285,13 +283,14 @@ class ApiSearch(ApiParent):
             extras_search += f'"{line_edit.property("column_id")}":{{"text":"{value}"}}'
             extras_search_add += f'"{line_edit.property("column_id")}":{{"text":"{value}"}}'
             body = self.create_body(form=form_search, extras=extras_search)
-            sql = f"SELECT gw_api_setsearch($${{{body}}}$$)"
-            row = self.controller.get_row(sql, log_sql=True, commit=True)
-            if row:
-                self.result_data = row[0]
+            result = self.controller.get_json('gw_api_setsearch', body, log_sql=True)
+            if not result: return False
+
+            if result:
+                self.result_data = result
 
         # Set label visible
-        if row:
+        if result:
             if self.result_data['data'] == {} and self.lbl_visible:
                 self.dlg_search.lbl_msg.setVisible(True)
                 if len(line_list) == 2:
@@ -316,11 +315,12 @@ class ApiSearch(ApiParent):
 
             extras_search_add += f', "{line_edit_add.property("column_id")}":{{"text":"{value}"}}'
             body = self.create_body(form=form_search_add, extras=extras_search_add)
-            sql = f"SELECT gw_api_setsearch_add($${{{body}}}$$)"
-            row = self.controller.get_row(sql, log_sql=True, commit=True)
-            if row:
-                self.result_data = row[0]
-                if row is not None:
+            result = self.controller.get_json('gw_api_setsearch_add', body, log_sql=True)
+            if not result: return False
+
+            if result:
+                self.result_data = result
+                if result is not None:
                     display_list = []
                     for data in self.result_data['data']:
                         display_list.append(data['display_name'])
@@ -376,11 +376,8 @@ class ApiSearch(ApiParent):
 
         feature = f'"tableName":"{table_name}", "id":"{feature_id}"'
         body = self.create_body(feature=feature)
-        sql = f"SELECT gw_api_getinfofromid($${{{body}}}$$)"
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
-        if not row:
-            self.controller.show_message("NOT ROW FOR: " + sql, 2)
-            return
+        result = [self.controller.get_json('gw_api_getinfofromid', body, log_sql=True)]
+        if not result: return
 
         self.hydro_info_dlg = ApiBasicInfo()
         self.load_settings(self.hydro_info_dlg)
@@ -388,18 +385,18 @@ class ApiSearch(ApiParent):
         self.hydro_info_dlg.btn_close.clicked.connect(partial(self.close_dialog, self.hydro_info_dlg))
         self.hydro_info_dlg.rejected.connect(partial(self.close_dialog, self.hydro_info_dlg))
         self.hydro_info_dlg.rejected.connect(partial(self.resetRubberbands))
-        field_id = str(row[0]['body']['feature']['idName'])
-        self.populate_basic_info(self.hydro_info_dlg, row, field_id)
+        field_id = str(result[0]['body']['feature']['idName'])
+        self.populate_basic_info(self.hydro_info_dlg, result, field_id)
 
-        self.open_dialog(self.hydro_info_dlg)
+        self.open_dialog(self.hydro_info_dlg, dlg_name='info_basic')
 
 
     def workcat_open_table_items(self, item):
         """ Create the view and open the dialog with his content """
 
         workcat_id = item['sys_id']
-        layer_name = item['sys_table_id']
         field_id = item['filter_text']
+        display_name = item ['display_name']
 
         if workcat_id is None:
             return False
@@ -410,6 +407,13 @@ class ApiSearch(ApiParent):
         #self.zoom_to_polygon(workcat_id, layer_name, field_id)
 
         self.items_dialog = ListItems()
+
+        self.items_dialog.setWindowTitle(f'Workcat: {display_name}')
+        self.set_icon(self.items_dialog.btn_doc_insert, "111")
+        self.set_icon(self.items_dialog.btn_doc_delete, "112")
+        self.set_icon(self.items_dialog.btn_doc_new, "34")
+        self.set_icon(self.items_dialog.btn_open_doc, "170")
+
         self.load_settings(self.items_dialog)
         self.items_dialog.btn_state1.setEnabled(False)
         self.items_dialog.btn_state0.setEnabled(False)
@@ -417,14 +421,32 @@ class ApiSearch(ApiParent):
 
         utils_giswater.setWidgetText(self.items_dialog, self.items_dialog.label_init, "Filter by: "+str(field_id))
         utils_giswater.setWidgetText(self.items_dialog, self.items_dialog.label_end, "Filter by: "+str(field_id))
+
         #
         self.items_dialog.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.items_dialog.tbl_psm.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.items_dialog.tbl_psm_end.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.items_dialog.tbl_psm_end.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.items_dialog.tbl_document.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.items_dialog.tbl_document.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+
         self.disable_qatable_by_state(self.items_dialog.tbl_psm, 1, self.items_dialog.btn_state1)
         self.disable_qatable_by_state(self.items_dialog.tbl_psm_end, 0, self.items_dialog.btn_state0)
 
+        # Create list for completer QLineEdit
+        sql = "SELECT DISTINCT(id) FROM v_ui_document ORDER BY id"
+        list_items = self.make_list_for_completer(sql)
+        self.set_completer_lineedit(self.items_dialog.doc_id, list_items)
+
         table_name = "v_ui_workcat_x_feature"
         table_name_end = "v_ui_workcat_x_feature_end"
+        table_doc = "v_ui_doc_x_workcat"
+        self.items_dialog.btn_doc_insert.clicked.connect(partial(self.document_insert, self.items_dialog, 'doc_x_workcat', 'workcat_id' ,item ['sys_id']))
+        self.items_dialog.btn_doc_delete.clicked.connect(partial(self.document_delete, self.items_dialog.tbl_document, 'doc_x_workcat'))
+        self.items_dialog.btn_doc_new.clicked.connect(partial(self.manage_document, self.items_dialog.tbl_document, item ['sys_id']))
+        self.items_dialog.btn_open_doc.clicked.connect(partial(self.document_open, self.items_dialog.tbl_document))
+        self.items_dialog.tbl_document.doubleClicked.connect(partial(self.document_open, self.items_dialog.tbl_document))
+
         self.items_dialog.btn_close.clicked.connect(partial(self.close_dialog, self.items_dialog))
         self.items_dialog.btn_path.clicked.connect(partial(self.get_folder_dialog, self.items_dialog, self.items_dialog.txt_path))
         self.items_dialog.rejected.connect(partial(self.close_dialog, self.items_dialog))
@@ -448,6 +470,10 @@ class ApiSearch(ApiParent):
         expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
         self.workcat_fill_table(self.items_dialog.tbl_psm_end, table_name_end, expr=expr)
         self.set_table_columns(self.items_dialog, self.items_dialog.tbl_psm_end, table_name_end)
+        expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
+        self.workcat_fill_table(self.items_dialog.tbl_document, table_doc, expr=expr)
+        self.set_table_columns(self.items_dialog, self.items_dialog.tbl_document, table_doc)
+
         #
         # Add data to workcat search form
         table_name = "v_ui_workcat_x_feature"
@@ -457,6 +483,15 @@ class ApiSearch(ApiParent):
         self.fill_label_data(workcat_id, table_name_end, extension)
 
         self.open_dialog(self.items_dialog)
+
+
+    def manage_document(self, qtable, item_id):
+        """ Access GUI to manage documents e.g Execute action of button 34 """
+
+        manage_document = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir, single_tool=False)
+        dlg_docman = manage_document.manage_document(tablename='workcat', qtable=qtable, item_id=item_id)
+        dlg_docman.btn_accept.clicked.connect(partial(self.set_completer_object, dlg_docman, 'doc'))
+        utils_giswater.remove_tab_by_tabName(dlg_docman.tabWidget, 'tab_rel')
 
 
     def force_expl(self,  workcat_id):
@@ -482,7 +517,7 @@ class ApiSearch(ApiParent):
                        f" VALUES('{row[0]}', current_user)")
                 self.controller.execute_sql(sql)
             msg = "Your exploitation selector has been updated"
-            self.controller.show_warning(msg)
+            self.controller.show_info(msg)
 
 
     def update_selector_workcat(self, workcat_id):
@@ -507,7 +542,7 @@ class ApiSearch(ApiParent):
 
     def get_folder_dialog(self, dialog, widget):
         """ Get folder dialog """
-
+        widget.setStyleSheet(None)
         if 'nt' in sys.builtin_module_names:
             folder_path = os.path.expanduser("~\Documents")
         else:
@@ -540,13 +575,16 @@ class ApiSearch(ApiParent):
         qtable.setEnabled(True)
         qbutton.setEnabled(False)
         self.refresh_map_canvas()
+        qtable.model().select()
 
 
     def export_to_csv(self, dialog, qtable_1=None, qtable_2=None, path=None):
 
         folder_path = utils_giswater.getWidgetText(dialog, path)
         if folder_path is None or folder_path == 'null':
+            path.setStyleSheet("border: 1px solid red")
             return
+        path.setStyleSheet(None)
         if folder_path.find('.csv') == -1:
             folder_path += '.csv'
         if qtable_1:
@@ -599,7 +637,7 @@ class ApiSearch(ApiParent):
             writer = csv.writer(output, lineterminator='\n')
             writer.writerows(all_rows)
         self.controller.plugin_settings_set_value("search_csv_path", utils_giswater.getWidgetText(dialog, 'txt_path'))
-        message = "Values has been updated"
+        message = "The csv file has been successfully exported"
         self.controller.show_info(message)
 
 

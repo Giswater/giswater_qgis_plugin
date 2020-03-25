@@ -16,8 +16,6 @@ from datetime import datetime
 
 from .. import utils_giswater
 from .parent import ParentMapTool
-from ..ui_manager import UDcatalog
-from ..ui_manager import WScatalog
 from ..ui_manager import FeatureReplace
 from ..ui_manager import NewWorkcat
 from ..actions.api_catalog import ApiCatalog
@@ -60,7 +58,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
         self.load_settings(self.dlg_replace)
 
         sql = "SELECT id FROM cat_work ORDER BY id"
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         if rows:
             utils_giswater.fillComboBox(self.dlg_replace, self.dlg_replace.workcat_id_end, rows)
             utils_giswater.set_autocompleter(self.dlg_replace.workcat_id_end)
@@ -99,7 +97,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
             feature_type = feature.attribute(self.feature_type_ud)
             if self.geom_type in ('node', 'connec'):
                 sql = f"SELECT DISTINCT(id) FROM {self.cat_table} ORDER BY id"
-                rows = self.controller.get_rows(sql, commit=True)
+                rows = self.controller.get_rows(sql)
                 utils_giswater.fillComboBox(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
 
         self.dlg_replace.feature_type.setText(feature_type)
@@ -111,7 +109,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
         sql = (f"SELECT DISTINCT(id) FROM {self.geom_type}_type "
                f"WHERE active is True "
                f"ORDER BY id")
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_replace, "feature_type_new", rows)
 
         self.dlg_replace.btn_new_workcat.clicked.connect(partial(self.new_workcat))
@@ -148,7 +146,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
             work_id = utils_giswater.getWidgetText(self.dlg_replace, self.dlg_replace.workcat_id_end)
             sql = (f"SELECT builtdate FROM cat_work "
                    f"WHERE id = '{work_id}'")
-            row = self.controller.get_row(sql, commit=True)
+            row = self.controller.get_row(sql)
             current_date = self.manage_dates(self.current_date)
             if row and row[0]:
                 builtdate = self.manage_dates(row[0])
@@ -221,13 +219,13 @@ class ReplaceFeatureMapTool(ParentMapTool):
                 sql = (f"SELECT DISTINCT(id) "
                        f"FROM {table_object} "
                        f"WHERE id = '{cat_work_id}'")
-                row = self.controller.get_row(sql, log_info=False, log_sql=True)
+                row = self.controller.get_row(sql, log_info=False)
                 if row is None:
                     sql = f"INSERT INTO cat_work ({fields}) VALUES ({values})"
                     self.controller.execute_sql(sql, log_sql=True)
 
                     sql = "SELECT id FROM cat_work ORDER BY id"
-                    rows = self.controller.get_rows(sql, commit=True)
+                    rows = self.controller.get_rows(sql)
                     if rows:
                         utils_giswater.fillComboBox(self.dlg_replace, self.dlg_replace.workcat_id_end, rows)
                         current_index = self.dlg_replace.workcat_id_end.findText(str(cat_work_id))
@@ -237,11 +235,6 @@ class ReplaceFeatureMapTool(ParentMapTool):
                 else:
                     msg = "This Workcat is already exist"
                     self.controller.show_info_box(msg, "Warning")
-
-
-    def cancel(self):
-        
-        self.close_dialog(self.dlg_cat)
 
 
     def set_completer_object(self, tablename, widget, field_id):
@@ -255,7 +248,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
         sql = (f"SELECT DISTINCT({field_id}) "
                f"FROM {tablename} "
                f"ORDER BY {field_id}")
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         if rows is None:
             return
 
@@ -279,8 +272,8 @@ class ReplaceFeatureMapTool(ParentMapTool):
 
         # Check null values
         if self.workcat_id_end_aux in (None, 'null'):
-            message = "Workcat_id field is mandatory."
-            self.controller.show_warning(message)
+            message = "Mandatory field is missing. Please, set a value"
+            self.controller.show_warning(message, parameter='Workcat_id')
             return
 
         feature_type_new = utils_giswater.getWidgetText(dialog, dialog.feature_type_new)
@@ -301,8 +294,8 @@ class ReplaceFeatureMapTool(ParentMapTool):
 
             # Execute SQL function and show result to the user
             function_name = "gw_fct_feature_replace"
-            sql = f"SELECT {function_name}($${{{body}}}$$)::text"
-            row = self.controller.get_row(sql, log_sql=True, commit=True)
+            sql = f"SELECT {function_name}({body})::text"
+            row = self.controller.get_row(sql, log_sql=True)
             if not row:
                 message = "Error replacing feature"
                 self.controller.show_warning(message)
@@ -481,187 +474,8 @@ class ReplaceFeatureMapTool(ParentMapTool):
             sql = (f"SELECT DISTINCT(id) "
                    f"FROM {self.cat_table} "
                    f"WHERE {self.feature_type_ws} = '{feature_type_new}'")
-            rows = self.controller.get_rows(sql, commit=True)
+            rows = self.controller.get_rows(sql)
             utils_giswater.fillComboBox(self.dlg_replace, self.dlg_replace.featurecat_id, rows)
 
-
-    def open_catalog_form(self, wsoftware, geom_type):
-        """ Set dialog depending water software """
-
-        feature_type_new = utils_giswater.getWidgetText(self.dlg_replace, "feature_type_new")
-        if feature_type_new == 'null':
-            message = "Select a custom feature type"
-            self.controller.show_warning(message)
-            return
-
-        if wsoftware == 'ws':
-            self.dlg_cat = WScatalog()
-            self.field2 = 'pnom'
-            self.field3 = 'dnom'
-        elif wsoftware == 'ud':
-            self.dlg_cat = UDcatalog()
-            self.field2 = 'shape'
-            self.field3 = 'geom1'
-        self.load_settings(self.dlg_cat)
-
-        self.feature_type_new = None
-        if wsoftware == 'ws':
-            self.feature_type_new = feature_type_new
-
-        sql = (f"SELECT DISTINCT(matcat_id) as matcat_id "
-               f"FROM cat_{geom_type}")
-        if wsoftware == 'ws':
-            sql += f" WHERE {geom_type}type_id = '{self.feature_type_new}'"
-
-        sql += " ORDER BY matcat_id"
-        rows = self.controller.get_rows(sql, commit=True)
-        utils_giswater.fillComboBox(self.dlg_cat, self.dlg_cat.matcat_id, rows)
-
-        sql = (f"SELECT DISTINCT({self.field2}) "
-               f"FROM cat_{geom_type}")
-        if wsoftware == 'ws':
-            sql += f" WHERE {geom_type}type_id = '{self.feature_type_new}'"
-
-        sql += f" ORDER BY {self.field2}"
-        rows = self.controller.get_rows(sql, commit=True)
-        utils_giswater.fillComboBox(self.dlg_cat, self.dlg_cat.filter2, rows)
-
-        self.fill_filter3(wsoftware, geom_type)
-
-        # Set signals and open dialog
-        self.dlg_cat.btn_ok.clicked.connect(self.fill_geomcat_id)
-        self.dlg_cat.btn_cancel.clicked.connect(partial(self.cancel))
-        self.dlg_cat.rejected.connect(partial(self.cancel))
-        self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
-        self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter2, wsoftware, geom_type))
-        self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter3, wsoftware, geom_type))
-        self.dlg_cat.filter2.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
-        self.dlg_cat.filter2.currentIndexChanged.connect(partial(self.fill_filter3, wsoftware, geom_type))
-        self.dlg_cat.filter3.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
-        self.open_dialog(self.dlg_cat)
-
-
-    def fill_geomcat_id(self):
-
-        catalog_id = utils_giswater.getWidgetText(self.dlg_cat, self.dlg_cat.id)
-        utils_giswater.setWidgetEnabled(self.dlg_replace, self.dlg_replace.featurecat_id, True)
-        utils_giswater.setWidgetText(self.dlg_replace, self.dlg_replace.featurecat_id, catalog_id)
-        self.close_dialog(self.dlg_cat)
-
-
-    def fill_filter2(self, wsoftware, geom_type):
-
-        # Get values from filters
-        mats = utils_giswater.getWidgetText(self.dlg_cat, self.dlg_cat.matcat_id)
-        
-        # Set SQL query
-        sql_where = ""
-        sql = (f"SELECT DISTINCT({self.field2}) "
-               f"FROM cat_{geom_type}")
-
-        # Build SQL filter
-        if mats != "null":
-            # TODO: useless check?
-            if sql_where == "":
-                sql_where = " WHERE"
-            sql_where += f" matcat_id = '{mats}'"
-        if wsoftware == 'ws' and self.feature_type_new is not None:
-            if sql_where == "":
-                sql_where = " WHERE"
-            else:
-                sql_where += " AND"
-            sql_where += f" {geom_type}type_id = '{self.feature_type_new}'"
-        sql += sql_where + " ORDER BY " + self.field2
-
-        rows = self.controller.get_rows(sql, commit=True)
-        utils_giswater.fillComboBox(self.dlg_cat, self.dlg_cat.filter2, rows)
-        self.fill_filter3(wsoftware, geom_type)
-
-
-    def fill_filter3(self, wsoftware, geom_type):
-
-        # Get values from filters
-        mats = utils_giswater.getWidgetText(self.dlg_cat, self.dlg_cat.matcat_id)
-        filter2 = utils_giswater.getWidgetText(self.dlg_cat, self.dlg_cat.filter2)
-
-        # Set SQL query
-        sql_where = ""
-        if wsoftware == 'ws' and geom_type != 'connec':
-            sql = f"SELECT {self.field3}"
-            sql += f" FROM (SELECT DISTINCT(regexp_replace(trim(' nm' FROM {self.field3}),'-','', 'g')) as x, {self.field3}"
-        elif wsoftware == 'ws' and geom_type == 'connec':
-            sql = f"SELECT DISTINCT(TRIM(TRAILING ' ' from {self.field3})) as {self.field3}"
-        else:
-            sql = f"SELECT DISTINCT({self.field3})"
-        sql += f" FROM cat_{geom_type}"
-
-        # Build SQL filter
-        if wsoftware == 'ws' and self.feature_type_new is not None:
-            sql_where = f" WHERE {geom_type}type_id = '{self.feature_type_new}'"
-
-        if mats != "null":
-            if sql_where == "":
-                sql_where = " WHERE"
-            else:
-                sql_where += " AND"
-            sql_where += f" matcat_id = '{mats}'"
-
-        if filter2 is not None and filter2 != "null":
-            if sql_where == "":
-                sql_where = " WHERE"
-            else:
-                sql_where += " AND"
-            sql_where += f" {self.field2} = '{filter2}'"
-        if wsoftware == 'ws' and geom_type != 'connec':
-            sql += sql_where + f" ORDER BY x) AS {self.field3}"
-        else:
-            sql += sql_where + f" ORDER BY {self.field3}"
-
-        rows = self.controller.get_rows(sql, commit=True)
-        utils_giswater.fillComboBox(self.dlg_cat, self.dlg_cat.filter3, rows)
-
-        self.fill_catalog_id(wsoftware, geom_type)
-
-
-    def fill_catalog_id(self, wsoftware, geom_type):
-
-        # Get values from filters
-        mats = utils_giswater.getWidgetText(self.dlg_cat, self.dlg_cat.matcat_id)
-        filter2 = utils_giswater.getWidgetText(self.dlg_cat, self.dlg_cat.filter2)
-        filter3 = utils_giswater.getWidgetText(self.dlg_cat, self.dlg_cat.filter3)
-
-        # Set SQL query
-        sql_where = ""
-        sql = (f"SELECT DISTINCT(id) as id "
-               f"FROM cat_{geom_type}")
-
-        if wsoftware == 'ws' and self.feature_type_new is not None:
-            sql_where = f" WHERE {geom_type}type_id = '{self.feature_type_new}'"
-        if mats != "null" and mats is not None:
-            if sql_where == "":
-                sql_where = " WHERE"
-            else:
-                sql_where += " AND"
-            sql_where += f" matcat_id = '{mats}'"
-
-        if filter2 is not None and filter2 != "null":
-            self.controller.log_info("filter2")
-            if sql_where == "":
-                sql_where = " WHERE"
-            else:
-                sql_where += " AND"
-            sql_where += f" {self.field2} = '{filter2}'"
-
-        if filter3 is not None and filter3 != "null":
-            if sql_where == "":
-                sql_where = " WHERE"
-            else:
-                sql_where += " AND"
-            sql_where += f" {self.field3} = '{filter3}'"
-        sql += sql_where + " ORDER BY id"
-
-        rows = self.controller.get_rows(sql, commit=True)
-        utils_giswater.fillComboBox(self.dlg_cat, self.dlg_cat.id, rows)
-        
 
 

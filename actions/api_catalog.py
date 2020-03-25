@@ -1,10 +1,9 @@
 """
-This file is part of Giswater 2.0
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-
 # -*- coding: latin-1 -*-
 from qgis.PyQt.QtWidgets import QGridLayout, QLabel, QLineEdit, QComboBox, QGroupBox, QSpacerItem, QSizePolicy, QWidget
 
@@ -15,7 +14,7 @@ from collections import OrderedDict
 
 from .. import utils_giswater
 from .api_parent import ApiParent
-from ..ui_manager import ApiCatalogUi
+from ..ui_manager import InfoCatalogUi
 
 
 class ApiCatalog(ApiParent):
@@ -41,8 +40,8 @@ class ApiCatalog(ApiParent):
         form = f'"formName":"{form_name}", "tabName":"data", "editable":"TRUE"'
         feature = f'"feature_type":"{feature_type}"'
         body = self.create_body(form, feature)
-        sql = f"SELECT gw_api_getcatalog($${{{body}}}$$)::text"
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        sql = f"SELECT gw_api_getcatalog({body})::text"
+        row = self.controller.get_row(sql, log_sql=True)
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return
@@ -51,7 +50,7 @@ class ApiCatalog(ApiParent):
         groupBox_1 = QGroupBox("Filter")
         self.filter_form = QGridLayout()
 
-        self.dlg_catalog = ApiCatalogUi()
+        self.dlg_catalog = InfoCatalogUi()
         self.load_settings(self.dlg_catalog)
         self.dlg_catalog.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_catalog))
         self.dlg_catalog.btn_accept.clicked.connect(partial(self.fill_geomcat_id, previous_dialog, widget_name))
@@ -64,7 +63,7 @@ class ApiCatalog(ApiParent):
             label.setText(field['label'].capitalize())
             if field['widgettype'] == 'combo':
                 widget = self.add_combobox(self.dlg_catalog, field)
-            if field['layout_id'] == 1:
+            if field['layoutname'] == 'lyt_data_1':
                 self.filter_form.addWidget(label, field['layout_order'], 0)
                 self.filter_form.addWidget(widget, field['layout_order'], 1)
 
@@ -93,7 +92,7 @@ class ApiCatalog(ApiParent):
         dnom.currentIndexChanged.connect(partial(self.get_api_catalog, matcat_id, pnom, dnom, id, feature_type, geom_type))
 
         # Open form
-        self.open_dialog(self.dlg_catalog)
+        self.open_dialog(self.dlg_catalog, dlg_name='info_catalog')
 
 
     def get_api_catalog(self, matcat_id, pnom, dnom, id, feature_type, geom_type):
@@ -111,7 +110,7 @@ class ApiCatalog(ApiParent):
             extras = f'"fields":{{"matcat_id":"{matcat_id_value}", "shape":"{pn_value}", "geom1":"{dn_value}"}}'
 
         body = self.create_body(form=form, feature=feature, extras=extras)
-        sql = f"SELECT gw_api_getcatalog($${{{body}}}$$)::text"
+        sql = f"SELECT gw_api_getcatalog({body})::text"
         row = self.controller.get_row(sql, log_sql=True)
         complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
         result = complet_list[0]['body']['data']
@@ -129,7 +128,7 @@ class ApiCatalog(ApiParent):
         feature = f'"feature_type":"{feature_type}"'
         extras = f'"fields":{{"matcat_id":"{matcat_id_value}"}}'
         body = self.create_body(form=form, feature=feature, extras=extras)
-        sql = f"SELECT gw_api_getcatalog($${{{body}}}$$)::text"
+        sql = f"SELECT gw_api_getcatalog({body})::text"
         row = self.controller.get_row(sql, log_sql=True)
         complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
         result = complet_list[0]['body']['data']

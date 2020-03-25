@@ -5,15 +5,13 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-import json
-from collections import OrderedDict
-
-from qgis.core import QgsCategorizedSymbolRenderer, QgsDataSourceUri, QgsFeature, QgsField, QgsGeometry, QgsMarkerSymbol,\
-    QgsLineSymbol, QgsProject, QgsRendererCategory, QgsSimpleFillSymbolLayer, QgsSymbol, QgsVectorLayer, QgsVectorLayerExporter
+from qgis.core import QgsCategorizedSymbolRenderer, QgsFillSymbol, QgsDataSourceUri, QgsFeature, QgsField, QgsGeometry, QgsMarkerSymbol,\
+    QgsLayerTreeLayer, QgsLineSymbol, QgsProject, QgsRectangle, QgsRendererCategory, QgsSimpleFillSymbolLayer, QgsSymbol,\
+    QgsVectorLayer, QgsVectorLayerExporter
 
 from qgis.PyQt.QtCore import QVariant
 from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtWidgets import QTabWidget
+from qgis.PyQt.QtWidgets import QPushButton, QTabWidget
 
 import os
 from random import randrange
@@ -128,11 +126,11 @@ class AddLayer(object):
             my_group.insertLayer(0, layer)
 
 
-    def add_temp_layer(self, dialog, data, function_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True, group='GW Temporal Layers'):
+    def add_temp_layer(self, dialog, data, layer_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True, group='GW Temporal Layers'):
         """ Add QgsVectorLayer into TOC
         :param dialog:
         :param data:
-        :param function_name:
+        :param layer_name:
         :param force_tab:
         :param reset_text:
         :param tab_idx:
@@ -140,11 +138,9 @@ class AddLayer(object):
         :param group:
         :return:
         """
-        colors = {'rnd':QColor(randrange(0, 256), randrange(0, 256), randrange(0, 256))}
+        colors = {'rnd': QColor(randrange(0, 256), randrange(0, 256), randrange(0, 256))}
         text_result = None
         temp_layers_added = []
-        if del_old_layers:
-            self.delete_layer_from_toc(function_name)
         srid = self.controller.plugin_settings_value('srid')
         for k, v in list(data.items()):
             if str(k) == 'setVisibleLayers':
@@ -152,22 +148,43 @@ class AddLayer(object):
             elif str(k) == "info":
                 text_result = self.populate_info_text(dialog, data, force_tab, reset_text, tab_idx)
             elif k in ('point', 'line', 'polygon'):
-                if not 'values' in data[k]: continue
-                counter = len(data[k]['values'])
+                if 'values' in data[k]:
+                    key = 'values'
+                elif 'features' in data[k]:
+                    key = 'features'
+                else: continue
+                counter = len(data[k][key])
                 if counter > 0:
-                    counter = len(data[k]['values'])
+                    counter = len(data[k][key])
                     geometry_type = data[k]['geometryType']
-                    v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", function_name, 'memory')
-                    self.populate_vlayer(v_layer, data, k, counter, group)
+                    try:
+                        if not layer_name:
+                            layer_name = data[k]['layerName']
+                    except KeyError:
+                        layer_name = 'Temporal layer'
+                    if del_old_layers:
+                        self.delete_layer_from_toc(layer_name)
+                    v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", layer_name, 'memory')
+                    layer_name = None
+                    #TODO This if controls if the function already works with GeoJson or is still to be refactored
+                    # once all are refactored the if should be: if 'feature' not in data [k]: continue
+                    if key == 'values':
+                        self.populate_vlayer_old(v_layer, data, k, counter, group)
+                    elif key == 'features':
+                        self.populate_vlayer(v_layer, data, k, counter, group)
                     if 'qmlPath' in data[k] and data[k]['qmlPath']:
                         qml_path = data[k]['qmlPath']
                         self.load_qml(v_layer, qml_path)
                     elif 'category_field' in data[k] and data[k]['category_field']:
                         cat_field = data[k]['category_field']
                         size = data[k]['size'] if 'size' in data[k] and data[k]['size'] else 2
-                        self.categoryze_layer(v_layer, cat_field, size)
+                        color_values = {'NEW': QColor(0, 255, 0), 'DUPLICATED': QColor(255, 0, 0),
+                                        'EXISTS': QColor(240, 150, 0)}
+                        self.categoryze_layer(v_layer, cat_field, size, color_values)
                     temp_layers_added.append(v_layer)
-        return {'text_result':text_result, 'temp_layers_added':temp_layers_added}
+                    v_layer.setOpacity(0.7)
+                    self.iface.setActiveLayer(v_layer)
+        return {'text_result': text_result, 'temp_layers_added': temp_layers_added}
 
 
     def set_layers_visible(self, layers):
@@ -177,7 +194,7 @@ class AddLayer(object):
                 self.controller.set_layer_visible(lyr)
 
 
-    def categoryze_layer(self, layer, cat_field, size):
+    def categoryze_layer(self, layer, cat_field, size, color_values, unique_values=None):
         """
         :param layer: QgsVectorLayer to be categorized (QgsVectorLayer)
         :param cat_field: Field to categorize (string)
@@ -187,9 +204,10 @@ class AddLayer(object):
         # get unique values
         fields = layer.fields()
         fni = fields.indexOf(cat_field)
-        unique_values = layer.dataProvider().uniqueValues(fni)
+        if not unique_values:
+            unique_values = layer.dataProvider().uniqueValues(fni)
         categories = []
-        color_values={'NEW':QColor(0, 255, 0), 'DUPLICATED':QColor(255, 0, 0), 'EXISTS':QColor(240, 150, 0)}
+
         for unique_value in unique_values:
             # initialize the default symbol for this geometry type
             symbol = QgsSymbol.defaultSymbol(layer.geometryType())
@@ -239,6 +257,21 @@ class AddLayer(object):
         self.iface.layerTreeView().refreshLayerSymbology(layer.id())
 
 
+    def set_layer_symbology(self, layer, properties=None):
+        renderer = layer.renderer()
+        symbol = renderer.symbol()
+
+        if type(symbol) == QgsLineSymbol:
+            layer.renderer().setSymbol(QgsLineSymbol.createSimple(properties))
+        elif type(symbol) == QgsMarkerSymbol:
+            layer.renderer().setSymbol(QgsMarkerSymbol.createSimple(properties))
+        elif type(symbol) == QgsFillSymbol:
+            layer.renderer().setSymbol(QgsFillSymbol.createSimple(properties))
+
+        layer.triggerRepaint()
+        self.iface.layerTreeView().refreshLayerSymbology(layer.id())
+
+
     def populate_info_text(self, dialog, data, force_tab=True, reset_text=True, tab_idx=1):
         """ Populate txt_infolog QTextEdit widget
         :param data: Json
@@ -262,15 +295,176 @@ class AddLayer(object):
                     text += "\n"
 
         utils_giswater.setWidgetText(dialog, 'txt_infolog', text+"\n")
-        qtabwidget = dialog.findChild(QTabWidget,'mainTab')
+        qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
         if change_tab and qtabwidget is not None:
             qtabwidget.setCurrentIndex(tab_idx)
+            self.disable_tabs(dialog)
 
         return text
 
 
+    def disable_tabs(self, dialog):
+        """ Disable all tabs in the dialog except the log one and change the state of the buttons
+        :param dialog: Dialog where tabs are disabled (QDialog)
+        :return:
+        """
+        qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
+        for x in range(0, qtabwidget.count()-1):
+            qtabwidget.widget(x).setEnabled(False)
+
+        btn_accept = dialog.findChild(QPushButton, 'btn_accept')
+        if btn_accept:
+            btn_accept.hide()
+
+        btn_cancel = dialog.findChild(QPushButton, 'btn_cancel')
+        if btn_cancel:
+            utils_giswater.setWidgetText(dialog, btn_accept, 'Close')
+
 
     def populate_vlayer(self, virtual_layer, data, layer_type, counter, group='GW Temporal Layers'):
+        """
+        :param virtual_layer: Memory QgsVectorLayer (QgsVectorLayer)
+        :param data: Json
+        :param layer_type: point, line, polygon...(string)
+        :param counter: control if json have values (integer)
+        :param group: group to which we want to add the layer (string)
+        :return:
+        """
+        prov = virtual_layer.dataProvider()
+        # Enter editing mode
+        virtual_layer.startEditing()
+
+        # Add headers to layer
+        if counter > 0:
+            for key, value in list(data[layer_type]['features'][0]['properties'].items()):
+                if key == 'the_geom': continue
+                prov.addAttributes([QgsField(str(key), QVariant.String)])
+
+        for feature in data[layer_type]['features']:
+            geometry = self.get_geometry(feature)
+            if not geometry: continue
+            attributes = []
+            fet = QgsFeature()
+            fet.setGeometry(geometry)
+            for key, value in feature['properties'].items():
+                if key =='the_geom': continue
+                attributes.append(value)
+
+            fet.setAttributes(attributes)
+            prov.addFeatures([fet])
+
+        # Commit changes
+        virtual_layer.commitChanges()
+        QgsProject.instance().addMapLayer(virtual_layer, False)
+        root = QgsProject.instance().layerTreeRoot()
+        my_group = root.findGroup(group)
+        if my_group is None:
+            my_group = root.insertGroup(0, group)
+        my_group.insertLayer(0, virtual_layer)
+
+
+    def get_geometry(self, feature):
+        """ Get coordinates from GeoJson and return QGsGeometry
+        :param feature: feature to get geometry type and coordinates (GeoJson)
+        :return: Geometry of the feature (QgsGeometry)
+        functions  called in -> getattr(self, f"get_{feature['geometry']['type'].lower()}")(feature):
+            def get_point(self, feature)
+            get_linestring(self, feature)
+            get_multilinestring(self, feature)
+            get_polygon(self, feature)
+            get_multipolygon(self, feature)
+        """
+        try:
+            coordinates = getattr(self, f"get_{feature['geometry']['type'].lower()}")(feature)
+            type_ = feature['geometry']['type']
+            geometry = f"{type_}{coordinates}"
+            return QgsGeometry.fromWkt(geometry)
+        except AttributeError as e:
+            print(f"{type(e).__name__} --> {e}")
+            return None
+
+
+    def get_point(self, feature):
+        """ Manage feature geometry when is Point
+        :param feature: feature to get geometry type and coordinates (GeoJson)
+        :return: Coordinates of the feature (String)
+        This function is called in def get_geometry(self, feature)
+              geometry = getattr(self, f"get_{feature['geometry']['type'].lower()}")(feature)
+          """
+        return f"({feature['geometry']['coordinates'][0]} {feature['geometry']['coordinates'][1]})"
+
+
+    def get_linestring(self, feature):
+        """ Manage feature geometry when is LineString
+        :param feature: feature to get geometry type and coordinates (GeoJson)
+        :return: Coordinates of the feature (String)
+        This function is called in def get_geometry(self, feature)
+              geometry = getattr(self, f"get_{feature['geometry']['type'].lower()}")(feature)
+          """
+        return self.get_coordinates(feature)
+
+
+    def get_multilinestring(self, feature):
+        """ Manage feature geometry when is MultiLineString
+        :param feature: feature to get geometry type and coordinates (GeoJson)
+        :return: Coordinates of the feature (String)
+        This function is called in def get_geometry(self, feature)
+              geometry = getattr(self, f"get_{feature['geometry']['type'].lower()}")(feature)
+          """
+        return self.get_multi_coordinates(feature)
+
+
+    def get_polygon(self, feature):
+        """ Manage feature geometry when is Polygon
+        :param feature: feature to get geometry type and coordinates (GeoJson)
+        :return: Coordinates of the feature (String)
+        This function is called in def get_geometry(self, feature)
+              geometry = getattr(self, f"get_{feature['geometry']['type'].lower()}")(feature)
+          """
+        return self.get_multi_coordinates(feature)
+
+
+    def get_multipolygon(self, feature):
+        """ Manage feature geometry when is MultiPolygon
+        :param feature: feature to get geometry type and coordinates (GeoJson)
+        :return: Coordinates of the feature (String)
+        This function is called in def get_geometry(self, feature)
+              geometry = getattr(self, f"get_{feature['geometry']['type'].lower()}")(feature)
+          """
+        coordinates = "("
+        for coords in feature['geometry']['coordinates']:
+            coordinates += "("
+            for cc in coords:
+                coordinates += "("
+                for c in cc:
+                    coordinates += f"{c[0]} {c[1]}, "
+                coordinates = coordinates[:-2] + "), "
+            coordinates = coordinates[:-2] + "), "
+        coordinates = coordinates[:-2] + ")"
+        return coordinates
+
+
+    def get_coordinates(self, feature):
+        coordinates = "("
+        for coords in feature['geometry']['coordinates']:
+            coordinates += f"{coords[0]} {coords[1]}, "
+        coordinates = coordinates[:-2]+")"
+        return coordinates
+
+
+    def get_multi_coordinates(self, feature):
+
+        coordinates = "("
+        for coords in feature['geometry']['coordinates']:
+            coordinates += "("
+            for c in coords:
+                coordinates += f"{c[0]} {c[1]}, "
+            coordinates = coordinates[:-2] + "), "
+        coordinates = coordinates[:-2] + ")"
+        return coordinates
+
+
+    def populate_vlayer_old(self, virtual_layer, data, layer_type, counter, group='GW Temporal Layers'):
         """
         :param virtual_layer: Memory QgsVectorLayer (QgsVectorLayer)
         :param data: Json
@@ -300,8 +494,9 @@ class AddLayer(object):
                 if str(k) in 'the_geom':
                     sql = f"SELECT St_AsText('{v}')"
                     row = self.controller.get_row(sql, log_sql=False)
-                    geometry = QgsGeometry.fromWkt(str(row[0]))
-                    fet.setGeometry(geometry)
+                    if row and row[0]:
+                        geometry = QgsGeometry.fromWkt(str(row[0]))
+                        fet.setGeometry(geometry)
             fet.setAttributes(attributes)
             prov.addFeatures([fet])
 
@@ -327,8 +522,19 @@ class AddLayer(object):
                 layer = lyr
                 break
         if layer is not None:
+            # Remove layer
             QgsProject.instance().removeMapLayer(layer)
+
+            #Remove group if is void
+            root = QgsProject.instance().layerTreeRoot()
+            group = root.findGroup('GW Temporal Layers')
+            if group:
+                layers = group.findLayers()
+                if not layers:
+                    root.removeChildNode(group)
             self.delete_layer_from_toc(layer_name)
+
+
 
 
     def load_qml(self, layer, qml_path):
@@ -352,3 +558,24 @@ class AddLayer(object):
         layer.triggerRepaint()
 
         return True
+
+
+    def zoom_to_group(self, group_name, buffer=10):
+        extent = QgsRectangle()
+        extent.setMinimal()
+
+        # Iterate through layers from certain group and combine their extent
+        root = QgsProject.instance().layerTreeRoot()
+        group = root.findGroup(group_name)  # Adjust this to fit your group's name
+        if not group: return False
+        for child in group.children():
+            if isinstance(child, QgsLayerTreeLayer):
+                extent.combineExtentWith(child.layer().extent())
+
+        xmax = extent.xMaximum() + buffer
+        xmin = extent.xMinimum() - buffer
+        ymax = extent.yMaximum() + buffer
+        ymin = extent.yMinimum() - buffer
+        extent.set(xmin, ymin, xmax, ymax)
+        self.iface.mapCanvas().setExtent(extent)
+        self.iface.mapCanvas().refresh()

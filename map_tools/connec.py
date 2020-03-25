@@ -23,6 +23,9 @@ from qgis.core import QgsVectorLayer, QgsRectangle
 from qgis.PyQt.QtCore import QRect, Qt
 from qgis.PyQt.QtWidgets import QApplication
 
+from functools import partial
+
+from ..ui_manager import  BasicInfoUi
 from .parent import ParentMapTool
 
 
@@ -141,12 +144,13 @@ class ConnecMapTool(ParentMapTool):
                 number_features += layer.selectedFeatureCount()
 
             if number_features > 0:
-                message = "Number of features selected in the 'connec' group"
+                message = "Number of features selected in the group of"
                 title = "Interpolate value - Do you want to update values"
-                answer = self.controller.ask_question(message, title, parameter=str(number_features))
+                answer = self.controller.ask_question(message, title, parameter='connec: '+str(number_features))
                 if answer:
                     # Create link
                     self.link_selected_features('connec', layer)
+                    self.cancel_map_tool()
                     
             layer = self.snapper_manager.layer_gully
             if layer:
@@ -155,12 +159,13 @@ class ConnecMapTool(ParentMapTool):
                 number_features += layer.selectedFeatureCount()
     
                 if number_features > 0:
-                    message = "Number of features selected in the 'gully' group"
+                    message = "Number of features selected in the group of"
                     title = "Interpolate value - Do you want to update values"
-                    answer = self.controller.ask_question(message, title, parameter=str(number_features))
+                    answer = self.controller.ask_question(message, title, parameter='gully: '+str(number_features))
                     if answer:
                         # Create link
                         self.link_selected_features('gully', layer)
+                        self.cancel_map_tool()
 
         # Force reload dataProvider of layer
         self.controller.indexing_spatial_layer('v_edit_link')
@@ -213,7 +218,7 @@ class ConnecMapTool(ParentMapTool):
             return
 
         # Get selected features from layers of selected @geom_type
-        aux = "{"
+        aux = "["
         field_id = geom_type + "_id"
 
         if layer.selectedFeatureCount() > 0:
@@ -222,13 +227,22 @@ class ConnecMapTool(ParentMapTool):
             for feature in features:
                 feature_id = feature.attribute(field_id)
                 aux += str(feature_id) + ", "
-            list_feature_id = aux[:-2] + "}"
+            list_feature_id = aux[:-2] + "]"
+            feature_id = f'"id":"{list_feature_id}"'
+            extras = f'"feature_type":"{geom_type.upper()}"'
+            body = self.create_body(feature=feature_id, extras=extras)
+            # Execute SQL function and show result to the user
+            result = self.controller.get_json('gw_fct_connect_to_network', body, log_sql=True)
+            if result:
+                self.dlg_binfo = BasicInfoUi()
+                self.load_settings(self.dlg_binfo)
+                self.dlg_binfo.btn_accept.hide()
+                self.dlg_binfo.setWindowTitle('Connect to network')
+                self.dlg_binfo.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_binfo))
+                self.dlg_binfo.rejected.connect(partial(self.close_dialog, self.dlg_binfo))
+                self.populate_info_text(self.dlg_binfo, result['body']['data'], False)
+                self.open_dialog(self.dlg_binfo)
 
-            # Execute function
-            function_name = "gw_fct_connect_to_network"
-            sql = (f"SELECT {function_name} "
-                   f"('{list_feature_id}', '{geom_type.upper()}');")
-            self.controller.execute_sql(sql, log_sql=True)
             layer.removeSelection()
 
         # Refresh map canvas

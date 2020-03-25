@@ -164,20 +164,9 @@ class NotifyFunctions(ParentAction):
 
             feature = '"tableName":"' + str(layer_name) + '", "id":""'
             body = self.create_body(feature=feature)
-            sql = f"SELECT gw_api_getinfofromid($${{{body}}}$$)"
-            row = self.controller.get_row(sql, log_sql=True, commit=True)
-            if not row:
-                self.controller.log_info(f'NOT ROW FOR: {sql}')
-                continue
-
-            # When info is nothing
-            if 'results' in row[0]:
-                if row[0]['results'] == 0:
-                    self.controller.log_info(f"{row[0]['message']['text']}")
-                    continue
-
-            complet_result = row[0]
-            for field in complet_result['body']['data']['fields']:
+            result = self.controller.get_json('gw_api_getinfofromid', body)
+            if not result: continue
+            for field in result['body']['data']['fields']:
                 _values = {}
                 # Get column index
                 fieldIndex = layer.fields().indexFromName(field['column_id'])

@@ -38,10 +38,17 @@
          <attribute name="title">
           <string>Workcat</string>
          </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0">
+         <layout class="QVBoxLayout" name="verticalLayout" stretch="0">
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0">
-            <item>
+           <layout class="QGridLayout" name="gridLayout_2">
+            <item row="1" column="0">
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string>State type end:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
              <widget class="QLabel" name="label_workcat_id_end">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -79,30 +86,14 @@
               </property>
              </widget>
             </item>
-            <item>
-             <spacer name="horizontalSpacer_2">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Fixed</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>11</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
+            <item row="0" column="1">
              <widget class="QComboBox" name="workcat_id_end">
               <property name="editable">
                <bool>true</bool>
               </property>
              </widget>
             </item>
-            <item>
+            <item row="0" column="2">
              <widget class="QPushButton" name="btn_new_workcat">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -117,15 +108,11 @@
                </size>
               </property>
               <property name="text">
-               <string>...</string>
+               <string/>
               </property>
              </widget>
             </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,0">
-            <item>
+            <item row="2" column="0">
              <widget class="QLabel" name="label_enddate">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -163,34 +150,7 @@
               </property>
              </widget>
             </item>
-            <item>
-             <spacer name="horizontalSpacer_3">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Fixed</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QDateEdit" name="enddate">
-              <property name="calendarPopup">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_17">
-            <item>
+            <item row="3" column="0">
              <widget class="QLabel" name="label_doc_id_3">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -203,37 +163,7 @@
               </property>
              </widget>
             </item>
-            <item>
-             <spacer name="horizontalSpacer_15">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Fixed</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>24</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QDateEdit" name="builtdate">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="calendarPopup">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_18">
-            <item alignment="Qt::AlignTop">
+            <item row="4" column="0">
              <widget class="QLabel" name="label_link">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -246,23 +176,7 @@
               </property>
              </widget>
             </item>
-            <item>
-             <spacer name="horizontalSpacer_16">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Fixed</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>36</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
+            <item row="4" column="1">
              <widget class="QTextEdit" name="descript">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -277,6 +191,26 @@
                </size>
               </property>
              </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QDateEdit" name="builtdate">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="calendarPopup">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QDateEdit" name="enddate">
+              <property name="calendarPopup">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QComboBox" name="cmb_statetype_end"/>
             </item>
            </layout>
           </item>
@@ -448,11 +382,6 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>workcat_id_end</tabstop>
-  <tabstop>btn_new_workcat</tabstop>
-  <tabstop>enddate</tabstop>
-  <tabstop>builtdate</tabstop>
-  <tabstop>descript</tabstop>
   <tabstop>btn_accept</tabstop>
   <tabstop>btn_cancel</tabstop>
   <tabstop>feature_id</tabstop>

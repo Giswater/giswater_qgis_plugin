@@ -32,9 +32,6 @@ class Om(ParentAction):
         self.manage_new_psector = ManageNewPsector(iface, settings, controller, plugin_dir)
         self.crm_trace = CrmTrace(iface, settings, controller, plugin_dir)
 
-        # Set project user
-        self.current_user = self.controller.get_project_user()
-
 
     def set_project_type(self, project_type):
         self.project_type = project_type
@@ -137,10 +134,11 @@ class Om(ParentAction):
             message = "Any record selected"
             self.controller.show_warning(message)
             return
+
         row = selected_list[0].row()
         psector_id = qtbl_psm.model().record(row).value("psector_id")
         sql = "SELECT * FROM selector_psector WHERE cur_user = current_user"
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         if rows:
             sql = (f"UPDATE selector_psector"
                    f" SET psector_id = '{psector_id}'"
@@ -167,7 +165,7 @@ class Om(ParentAction):
 
         sql = 'SELECT * FROM ' + tablename
         sql += ' WHERE "cur_user" = current_user'
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         exist_param = False
         if type(widget) != QDateEdit:
             if utils_giswater.getWidgetText(dialog, widget) != "":
@@ -240,6 +238,9 @@ class Om(ParentAction):
     def update_dates_into_db(self):
         """ Insert or update dates into data base """
 
+        # Set project user
+        self.current_user = self.controller.get_project_user()
+
         from_date = self.widget_date_from.date().toString('yyyy-MM-dd')
         to_date = self.widget_date_to.date().toString('yyyy-MM-dd')
         sql = (f"SELECT * FROM selector_date"
@@ -262,6 +263,7 @@ class Om(ParentAction):
 
     def update_date_to(self):
         """ If 'date from' is upper than 'date to' set 'date to' 1 day more than 'date from' """
+
         from_date = self.widget_date_from.date().toString('yyyy-MM-dd')
         to_date = self.widget_date_to.date().toString('yyyy-MM-dd')
         if from_date >= to_date:
@@ -271,6 +273,7 @@ class Om(ParentAction):
 
     def update_date_from(self):
         """ If 'date to' is lower than 'date from' set 'date from' 1 day less than 'date to' """
+
         from_date = self.widget_date_from.date().toString('yyyy-MM-dd')
         to_date = self.widget_date_to.date().toString('yyyy-MM-dd')
         if to_date <= from_date:
@@ -280,6 +283,9 @@ class Om(ParentAction):
 
     def get_default_dates(self):
         """ Load the dates from the DB for the current_user and set vars (self.from_date, self.to_date) """
+
+        # Set project user
+        self.current_user = self.controller.get_project_user()
 
         sql = (f"SELECT from_date, to_date FROM selector_date"
                f" WHERE cur_user = '{self.current_user}'")
@@ -297,17 +303,17 @@ class Om(ParentAction):
 
 
     def om_add_lot(self):
-        """''' Button 74: Add new lot '''"""
+        """ Button 74: Add new lot """
         self.new_lot.manage_lot()
 
 
     def om_lot_management(self):
-        """ '''Button 75: Lot management '''"""
+        """ Button 75: Lot management """
         self.new_lot.lot_manager()
 
 
     def om_selector_lot(self):
-        """ '''Button 76: Lot selector '''"""
+        """ Button 76: Lot selector """
         self.new_lot.lot_selector()
 
 

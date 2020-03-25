@@ -5,7 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-
 from qgis.core import QgsExpression, QgsFeatureRequest
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel
 from qgis.PyQt.QtSql import QSqlTableModel
@@ -47,7 +46,7 @@ class ManageWorkcatEnd(ParentManage):
         self.layers['arc'] = self.controller.get_group_layers('arc')
         self.layers['node'] = self.controller.get_group_layers('node')
         self.layers['connec'] = self.controller.get_group_layers('connec')
-        self.layers['element'] = self.controller.get_group_layers('element')
+        self.layers['element'] = [self.controller.get_layer_by_tablename('v_edit_element')]
 
         # Remove 'gully' for 'WS'
         self.project_type = self.controller.get_project_type()
@@ -60,6 +59,8 @@ class ManageWorkcatEnd(ParentManage):
         self.set_icon(self.dlg_work_end.btn_insert, "111")
         self.set_icon(self.dlg_work_end.btn_delete, "112")
         self.set_icon(self.dlg_work_end.btn_snapping, "137")
+        self.set_icon(self.dlg_work_end.btn_new_workcat, "193")
+
 
         # Adding auto-completion to a QLineEdit
         self.table_object = "cat_work"
@@ -110,9 +111,17 @@ class ManageWorkcatEnd(ParentManage):
 
 
     def fill_fields(self):
-        """ Fill dates and combo cat_work """
+        """ Fill dates and combos cat_work/state type end """
 
+        sql = 'SELECT id as id, name as idval FROM value_state_type WHERE id IS NOT NULL AND state = 0'
+        rows = self.controller.get_rows(sql)
+        utils_giswater.set_item_data(self.dlg_work_end.cmb_statetype_end, rows, 1)
+        row = self.controller.get_config('statetype_end_vdefault')
+
+        if row:
+            utils_giswater.set_combo_itemData(self.dlg_work_end.cmb_statetype_end, row[0], 0)
         row = self.controller.get_config('enddate_vdefault')
+
         if row:
             enddate = self.manage_dates(row[0]).date()
             self.dlg_work_end.enddate.setDate(enddate)
@@ -121,7 +130,7 @@ class ManageWorkcatEnd(ParentManage):
         utils_giswater.setCalendarDate(self.dlg_work_end, "enddate", enddate)
 
         sql = "SELECT id FROM cat_work"
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows, allow_nulls=False)
         utils_giswater.set_autocompleter(self.dlg_work_end.workcat_id_end)
         row = self.controller.get_config('workcat_id_end_vdefault')
@@ -183,7 +192,12 @@ class ManageWorkcatEnd(ParentManage):
     def manage_workcat_end_accept(self):
         """ Get elements from all the tables and update his data """
 
-        if self.workcat_id_end == 'null' or self.workcat_id_end is None:
+        # Setting values
+        self.workcat_id_end = utils_giswater.getWidgetText(self.dlg_work_end, self.dlg_work_end.workcat_id_end)
+        self.enddate = utils_giswater.getCalendarDate(self.dlg_work_end, self.dlg_work_end.enddate)
+        self.statetype_id_end = utils_giswater.get_item_data(self.dlg_work_end, self.dlg_work_end.cmb_statetype_end, 0)
+
+        if self.workcat_id_end in ('null', None):
             message = "Please select a workcat id end"
             self.controller.show_warning(message)
             return
@@ -240,6 +254,12 @@ class ManageWorkcatEnd(ParentManage):
 
             self.manage_close(self.dlg_work_end, self.table_object, self.cur_active_layer, force_downgrade=True)
 
+            # Remove selection for all layers in TOC
+            for layer in self.iface.mapCanvas().layers():
+                if layer.type() == layer.VectorLayer:
+                    layer.removeSelection()
+            self.iface.mapCanvas().refresh()
+
 
     def update_geom_type(self, geom_type, ids_list):
         """ Get elements from @geom_type and update his corresponding table """
@@ -251,7 +271,7 @@ class ManageWorkcatEnd(ParentManage):
         sql = ""
         for id_ in self.selected_list:
             sql += (f"UPDATE {tablename} "
-                    f"SET state = '0', workcat_id_end = '{self.workcat_id_end}', "
+                    f"SET state = '0', state_type = '{self.statetype_id_end}', workcat_id_end = '{self.workcat_id_end}', "
                     f"enddate = '{self.enddate}' "
                     f"WHERE {geom_type}_id = '{id_}';\n")
         if sql != "":
@@ -434,7 +454,7 @@ class ManageWorkcatEnd(ParentManage):
             sql = ("SELECT feature_type, feature_id, log_message "
                    "FROM audit_log_data "
                    "WHERE  fprocesscat_id = '28' AND user_name = current_user")
-            rows = self.controller.get_rows(sql, commit=True, log_sql=False)
+            rows = self.controller.get_rows(sql, log_sql=False)
             ids_ = ""
             if rows:
                 for row in rows:
@@ -525,7 +545,7 @@ class ManageWorkcatEnd(ParentManage):
                 sql = f"INSERT INTO cat_work ({fields}) VALUES ({values})"
                 self.controller.execute_sql(sql, log_sql=True)
                 sql = "SELECT id FROM cat_work ORDER BY id"
-                rows = self.controller.get_rows(sql, commit=True)
+                rows = self.controller.get_rows(sql)
                 if rows:
                     utils_giswater.fillComboBox(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows)
                     aux = self.dlg_work_end.workcat_id_end.findText(str(cat_work_id))

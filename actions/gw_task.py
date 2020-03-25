@@ -1,13 +1,19 @@
-# -*- coding: latin-1 -*-
+"""
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
+"""
+# -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import pyqtSignal, QObject
 from time import sleep
-from ..ui_manager import SelectorDate
-from qgis.core import QgsApplication, QgsTask, QgsMessageLog, Qgis
+from qgis.core import QgsTask, QgsMessageLog, Qgis
 
 
 MESSAGE_CATEGORY = 'giswater'
 class GwTask(QgsTask, QObject):
     """This shows how to subclass QgsTask"""
+
     fake_progress = pyqtSignal()
     def __init__(self, description, duration=0):
         QObject.__init__(self)
@@ -52,8 +58,6 @@ class GwTask(QgsTask, QObject):
             return True
 
 
-
-
     def finished(self, result):
         """This method is automatically called when self.run returns. result
         is the return value from self.run.
@@ -63,6 +67,7 @@ class GwTask(QgsTask, QObject):
         always called from the main thread, so it's safe to do GUI
         operations and raise Python exceptions here.
         """
+
         if result:
             QgsMessageLog.logMessage(f'Task {self.description()} completed', MESSAGE_CATEGORY, Qgis.Success)
         else:
@@ -76,5 +81,7 @@ class GwTask(QgsTask, QObject):
 
 
     def cancel(self):
+
         QgsMessageLog.logMessage(f'Task {self.description()} was cancelled', MESSAGE_CATEGORY, Qgis.Info)
         super().cancel()
+

@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
 """
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-
+# -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import Qt, QDate, QObject, QStringListModel, pyqtSignal
 from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QAbstractItemView, QDialogButtonBox, QCompleter, QLineEdit, QFileDialog, QTableView
@@ -24,7 +23,7 @@ from ..dao.om_visit_x_connec import OmVisitXConnec
 from ..dao.om_visit_x_node import OmVisitXNode
 from ..dao.om_visit_x_gully import OmVisitXGully
 from ..dao.om_visit_parameter import OmVisitParameter
-from ..ui_manager import AddVisit
+from ..ui_manager import VisitUi
 from ..ui_manager import EventStandard
 from ..ui_manager import EventUDarcStandard
 from ..ui_manager import EventUDarcRehabit
@@ -66,7 +65,7 @@ class ManageVisit(ParentManage, QObject):
 
         # Create the dialog and signals and related ORM Visit class
         self.current_visit = OmVisit(self.controller)
-        self.dlg_add_visit = AddVisit(tag)
+        self.dlg_add_visit = VisitUi(tag)
         self.load_settings(self.dlg_add_visit)
 
         # Get expl_id from previus dialog
@@ -137,13 +136,14 @@ class ManageVisit(ParentManage, QObject):
         if self.controller.user and self.user_name:
             self.user_name.setText(str(self.controller.user))
 
-        # set the start tab to be shown (e.g. VisitTab)
-        self.current_tab_index = self.tab_index('VisitTab')
+        # set the start tab to be shown (e.g. tab_visit)
+        self.current_tab_index = self.tab_index('tab_visit')
         self.tabs.setCurrentIndex(self.current_tab_index)
 
         # Set signals
         self.dlg_add_visit.rejected.connect(self.manage_rejected)
         self.dlg_add_visit.rejected.connect(partial(self.close_dialog, self.dlg_add_visit))
+        self.dlg_add_visit.accepted.connect(partial(self.update_relations, self.dlg_add_visit))
         self.dlg_add_visit.accepted.connect(self.manage_accepted)
         self.dlg_add_visit.btn_event_insert.clicked.connect(self.event_insert)
         self.dlg_add_visit.btn_event_delete.clicked.connect(self.event_delete)
@@ -179,14 +179,14 @@ class ManageVisit(ParentManage, QObject):
             self.set_locked_relation()
 
         # Open the dialog
-        self.open_dialog(self.dlg_add_visit, dlg_name="add_visit")
+        self.open_dialog(self.dlg_add_visit, dlg_name="visit")
 
 
     def set_locked_relation(self):
         """Set geom_type and listed feature_id in tbl_relation to lock it => disable related tab."""
         
         # disable tab
-        index = self.tab_index('RelationsTab')
+        index = self.tab_index('tab_relations')
         self.tabs.setTabEnabled(index, True)
 
         # set geometry_type
@@ -223,7 +223,7 @@ class ManageVisit(ParentManage, QObject):
         A) Trigger SELECT gw_fct_om_visit_multiplier (visit_id, feature_type)
         for multiple visits management."""
         # tab Visit
-        if self.current_tab_index == self.tab_index('VisitTab'):
+        if self.current_tab_index == self.tab_index('tab_visit'):
             self.manage_leave_visit_tab()
 
         # notify that a new visit has been added
@@ -340,7 +340,7 @@ class ManageVisit(ParentManage, QObject):
 
 
     def manage_leave_visit_tab(self):
-        """ manage all the action when leaving the VisitTab
+        """ manage all the action when leaving the tab_visit
         A) Manage sync between GUI values and Visit record in DB."""
 
         # A) fill Visit basing on GUI values
@@ -429,7 +429,7 @@ class ManageVisit(ParentManage, QObject):
         
         # manage leaving tab
         # tab Visit
-        if self.current_tab_index == self.tab_index('VisitTab'):
+        if self.current_tab_index == self.tab_index('tab_visit'):
             self.manage_leave_visit_tab()
             # need to create the relation record that is done only
             # changing tab
@@ -437,22 +437,22 @@ class ManageVisit(ParentManage, QObject):
                 self.update_relations(dialog)
 
         # tab Relation
-        if self.current_tab_index == self.tab_index('RelationsTab'):
+        if self.current_tab_index == self.tab_index('tab_relations'):
             self.update_relations(dialog)
 
         # manage arriving tab
         # tab Visit
         self.current_tab_index = index
-        if index == self.tab_index('VisitTab'):
+        if index == self.tab_index('tab_visit'):
             pass
         # tab Relation
-        if index == self.tab_index('RelationsTab'):
+        if index == self.tab_index('tab_relations'):
             pass
         # tab Event
-        if index == self.tab_index('EventTab'):
+        if index == self.tab_index('tab_event'):
             self.entered_event_tab(dialog)
         # tab Document
-        if index == self.tab_index('DocumentTab'):
+        if index == self.tab_index('tab_document'):
             pass
 
 
@@ -469,7 +469,7 @@ class ManageVisit(ParentManage, QObject):
                f" WHERE UPPER (parameter_type) = '{self.parameter_type_id.currentText().upper()}'"
                f" AND UPPER (feature_type) = '{self.feature_type.currentText().upper()}'")
         sql += " ORDER BY id"
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
 
         if rows:
             utils_giswater.set_item_data(dialog.parameter_id, rows, 1)
@@ -499,7 +499,7 @@ class ManageVisit(ParentManage, QObject):
 
         # set table model and completer
         # set a fake where expression to avoid to set model to None
-        fake_filter = f'{self.geom_type}_id::integer IN ("-1")'
+        fake_filter = f'{self.geom_type}_id IN (-1)'
         self.set_table_model(dialog, self.tbl_relation, self.geom_type, fake_filter)
 
         # set the callback to setup all events later
@@ -517,11 +517,11 @@ class ManageVisit(ParentManage, QObject):
         rows = self.controller.get_rows(sql, commit=self.autocommit)
         if not rows or not rows[0]:
             return
-        ids = [x[0] for x in rows]
+        ids = [f"'{x[0]}'" for x in rows]
 
         # select list of related features
         # Set 'expr_filter' with features that are in the list
-        expr_filter = f'"{self.geom_type}_id"::integer IN ({",".join(ids)})'
+        expr_filter = f"{self.geom_type}_id IN ({','.join(ids)})"
 
         # Check expression
         (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
@@ -684,7 +684,7 @@ class ManageVisit(ParentManage, QObject):
         sql = ("SELECT id, id "
                "FROM om_visit_parameter_type "
                "ORDER BY id")
-        parameter_type_ids = self.controller.get_rows(sql, commit=True)
+        parameter_type_ids = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_add_visit.parameter_type_id, parameter_type_ids, 1)
 
         # now get default value to be show in parameter_type_id
@@ -757,7 +757,7 @@ class ManageVisit(ParentManage, QObject):
         sql = (f"SELECT form_type"
                f" FROM om_visit_parameter"
                f" WHERE id = '{parameter_id}'")
-        row = self.controller.get_row(sql, commit=True)
+        row = self.controller.get_row(sql)
         form_type = str(row[0])
 
         if form_type == 'event_ud_arc_standard':
@@ -895,7 +895,7 @@ class ManageVisit(ParentManage, QObject):
         file_dialog.setFileMode(QFileDialog.Directory)
         # Get file types from catalog and populate QFileDialog filter
         sql = "SELECT filetype, fextension FROM  om_visit_filetype_x_extension"
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         f_types = rows
         file_types = ""
         for row in rows:
@@ -935,7 +935,7 @@ class ManageVisit(ParentManage, QObject):
         """ Save new files into DataBase """
         if self.files_added:
             sql = ("SELECT filetype, fextension FROM om_visit_filetype_x_extension")
-            f_types = self.controller.get_rows(sql, commit=True)
+            f_types = self.controller.get_rows(sql)
             sql = ""
             for path in self.files_added:
                 filename, file_extension = os.path.splitext(path)
@@ -1164,7 +1164,7 @@ class ManageVisit(ParentManage, QObject):
         # ask for deletion
         message = "Are you sure you want to delete these records?"
         if any_docs:
-            message += "\nSome events have documents:"
+            message += "\nSome events have documents"
         title = "Delete records"
         answer = self.controller.ask_question(message, title, list_id)
         if not answer:
@@ -1244,7 +1244,7 @@ class ManageVisit(ParentManage, QObject):
 
 
     def document_insert(self):
-        """Insert a docmet related to the current visit."""
+        """Insert a document related to the current visit."""
         
         doc_id = self.doc_id.text()
         visit_id = self.visit_id.text()

@@ -13,7 +13,8 @@ from .manage_document import ManageDocument
 from .manage_workcat_end import ManageWorkcatEnd
 from .delete_feature import DeleteFeature
 from .parent import ParentAction
-from ..ui_manager import ApiDocker
+from ..ui_manager import DockerUi
+
 
 class Edit(ParentAction):
 
@@ -48,7 +49,7 @@ class Edit(ParentAction):
             self.iface.actionAddFeature().trigger()
             self.layer.featureAdded.connect(self.open_new_feature)
         else:
-            message = "Selected layer name not found"
+            message = "Layer not found"
             self.controller.show_warning(message, parameter=feature_cat.parent_layer)
 
 
@@ -70,8 +71,7 @@ class Edit(ParentAction):
             list_points += f', "x2":{last_point.x()}, "y2":{last_point.y()}'
         else:
             self.controller.log_info(str(type("NO FEATURE TYPE DEFINED")))
-
-        dlg_docker = self.manage_docker_options(ApiDocker())
+        dlg_docker = self.manage_docker_options(DockerUi())
         self.api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, 'data')
         result, dialog = self.api_cf.open_form(point=list_points, feature_cat=self.feature_cat,
                                                new_feature_id=feature_id, layer_new_feature=self.layer,

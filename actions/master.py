@@ -10,9 +10,7 @@ from qgis.PyQt.QtGui import QDoubleValidator
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtCore import Qt
 
-import json
 import operator
-from collections import OrderedDict
 from functools import partial
 
 from .. import utils_giswater
@@ -104,7 +102,7 @@ class Master(ParentAction):
         tablename = "config_param_user"
         sql = (f"SELECT * FROM {tablename}"
                f" WHERE cur_user = current_user")
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         exist_param = False
         if type(widget) != QDateEdit:
             if utils_giswater.getWidgetText(dialog, widget) != "":
@@ -277,7 +275,7 @@ class Master(ParentAction):
         sql = (f"SELECT id, name"
                f" FROM {table_name}"
                f" ORDER BY name")
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         if not rows:
             return
         
@@ -315,20 +313,14 @@ class Master(ParentAction):
                   f'", "resultType":"{result_type}", "resultId":"{result_id}"}}')
         extras += ', "saveOnDatabase":' + str(utils_giswater.isChecked(dialog, dialog.chk_save)).lower()
         body = self.create_body(extras=extras)
-        sql = f"SELECT gw_fct_plan_result($${{{body}}}$$)::text"
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
-        if not row or row[0] is None:
-            self.controller.show_warning("NOT ROW FOR: " + sql)
-            message = "Import failed"
+        result = self.controller.get_json('gw_fct_plan_result', body, log_sql=True)
+        if not result: return False
+
+        if result['status'] == "Accepted":
+            self.add_layer.populate_info_text(dialog, result['body']['data'])
+        message = result['message']['text']
+        if message is not None:
             self.controller.show_info_box(message)
-            return
-        else:
-            complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-            if complet_result[0]['status'] == "Accepted":
-                self.add_layer.populate_info_text(dialog, complet_result[0]['body']['data'])
-            message = complet_result[0]['message']['text']
-            if message is not None:
-                self.controller.show_info_box(message)
         # Refresh canvas and close dialog
         self.iface.mapCanvas().refreshAllLayers()
 
@@ -357,7 +349,7 @@ class Master(ParentAction):
         # TODO pending translation
         # Manage i18n of the form and open it
         # self.controller.translate_form(self.dlg_estimate_result_selector, 'estimate_result_selector')
-        self.open_dialog(self.dlg_estimate_result_selector, dlg_name="plan_estimate_result_selector", maximize_button=False)
+        self.open_dialog(self.dlg_estimate_result_selector, dlg_name="plan_estimate_result_selector",  maximize_button=False)
 
 
     def populate_combo(self, combo, table_result):
@@ -368,7 +360,7 @@ class Master(ParentAction):
                f" WHERE cur_user = current_user"
                f" AND result_type = 1"
                f" ORDER BY name")
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         if not rows:
             return
 
@@ -448,7 +440,7 @@ class Master(ParentAction):
 
         # Open form
         self.dlg_merm.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.open_dialog(self.dlg_merm,dlg_name="plan_estimate_result_manager")
+        self.open_dialog(self.dlg_merm, dlg_name="plan_estimate_result_manager")
 
 
     def charge_plan_estimate_result(self, dialog):
@@ -491,5 +483,4 @@ class Master(ParentAction):
         self.duplicate_psector.is_duplicated.connect(partial(self.fill_table_psector, self.qtbl_psm, 'plan_psector'))
         self.duplicate_psector.is_duplicated.connect(partial(self.set_label_current_psector, self.dlg_psector_mng))
         self.duplicate_psector.manage_duplicate_psector(psector_id)
-
 

@@ -74,13 +74,15 @@ class Logger(object):
         
         try:
             module_path = inspect.stack()[stack_level][1]  
+            file_name = os.path.basename(module_path)
             function_line = inspect.stack()[stack_level][2]
             function_name = inspect.stack()[stack_level][3]
-            header = "{" + module_path + " | Line " + str(function_line) + " (" + str(function_name) + ")}"        
+            header = "{" + file_name + " | Line " + str(function_line) + " (" + str(function_name) + ")}"
             text = header
             if msg:
                 text+= "\n" + str(msg)    
             self.logger_file.log(log_level, text)
+
         except Exception as e:
             self.controller.log_warning("Error logging: " + str(e), logger_file=False)
         
@@ -107,5 +109,12 @@ class Logger(object):
         self.log(msg, logging.ERROR, stack_level + stack_level_increase + 1)
         if sum_error:
             self.num_errors += 1
+
+
+    def critical(self, msg=None, stack_level=2, stack_level_increase=0, sum_error=True):
+        """ Logger message into logger file with level CRITICAL (50) """
+        self.log(msg, logging.CRITICAL, stack_level + stack_level_increase + 1)
+        if sum_error:
+            self.num_errors+= 1
         
                 

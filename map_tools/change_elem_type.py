@@ -13,6 +13,7 @@ from functools import partial
 from .. import utils_giswater
 from ..ui_manager import ChangeNodeType
 from ..actions.api_catalog import ApiCatalog
+from ..actions.api_cf import ApiCF
 from .parent import ParentMapTool
 
 
@@ -54,41 +55,18 @@ class ChangeElemType(ParentMapTool):
         if node_node_type_new != "null":
                     
             if (node_nodecat_id != "null" and node_nodecat_id is not None and project_type == 'ws') or (project_type == 'ud'):
-                sql = (f"SELECT man_table FROM node_type "
-                       f"WHERE id = '{old_node_type}'")
-                row = self.controller.get_row(sql)
-                if not row:
-                    return
-
-                # Delete from current table 
-                sql = (f"DELETE FROM {row[0]} "
-                       f"WHERE node_id = '{self.node_id}'")
-                self.controller.execute_sql(sql)
-
-                sql = (f"SELECT man_table FROM node_type "
-                       f"WHERE id = '{node_node_type_new}'")
-                row = self.controller.get_row(sql)
-                if not row:
-                    return
-
-                # Insert into new table
-                sql = (f"INSERT INTO {row[0]} (node_id) "
-                       f"VALUES ('{self.node_id}')")
-                self.controller.execute_sql(sql)
-
                 # Update field 'nodecat_id'
-                sql = (f"UPDATE node SET nodecat_id = '{node_nodecat_id}' "
+                sql = (f"UPDATE v_edit_node SET nodecat_id = '{node_nodecat_id}' "
                        f"WHERE node_id = '{self.node_id}'")
                 self.controller.execute_sql(sql)
 
                 if project_type == 'ud':
-                    sql = (f"UPDATE node SET node_type = '{node_node_type_new}' "
+                    sql = (f"UPDATE v_edit_node SET node_type = '{node_node_type_new}' "
                            f"WHERE node_id = '{self.node_id}'")
                     self.controller.execute_sql(sql)
                     
                 # Set active layer
-                viewname = f"v_edit_{row[0]}"
-                layer = self.controller.get_layer_by_tablename(viewname)
+                layer = self.controller.get_layer_by_tablename('v_edit_node')
                 if layer:
                     self.iface.setActiveLayer(layer)
                 message = "Values has been updated"
@@ -100,7 +78,7 @@ class ChangeElemType(ParentMapTool):
                 return
                 
         else:
-            message = "The node has not been updated because no catalog has been selected!"
+            message = "The node has not been updated because no catalog has been selected"
             self.controller.show_warning(message)
 
 
@@ -124,8 +102,15 @@ class ChangeElemType(ParentMapTool):
 
         it = layer.getFeatures(QgsFeatureRequest(expr))
         features = [i for i in it]
-        if features:
-            self.iface.openFeatureForm(layer, features[0])
+        if features[0]:
+            self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, tab_type='data')
+            self.ApiCF.user_current_layer = self.current_layer
+            complet_result, dialog = self.ApiCF.open_form(table_name='v_edit_node', feature_id=features[0]["node_id"], tab_type='data')
+            if not complet_result:
+                print("FAIL")
+                return
+
+            dialog.dlg_closed.connect(self.ApiCF.restore_user_layer)
 
 
     def change_elem_type(self, feature):
@@ -142,7 +127,7 @@ class ChangeElemType(ParentMapTool):
         elif project_type == 'ud':
             node_type = feature.attribute('node_type')
             sql = "SELECT DISTINCT(id), id FROM cat_node  ORDER BY id"
-            rows = self.controller.get_rows(sql, commit=True)
+            rows = self.controller.get_rows(sql)
             utils_giswater.set_item_data(self.dlg_chg_node_type.node_nodecat_id, rows, 1)
 
         self.dlg_chg_node_type.node_node_type.setText(node_type)
@@ -155,7 +140,7 @@ class ChangeElemType(ParentMapTool):
         sql = ("SELECT DISTINCT(id) FROM node_type "
                "WHERE active is True "
                "ORDER BY id")
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_chg_node_type, "node_node_type_new", rows)
 
         # Open dialog
@@ -172,7 +157,7 @@ class ChangeElemType(ParentMapTool):
 
         # Populate catalog_id
         sql = f"SELECT DISTINCT(id), id FROM cat_node WHERE nodetype_id = '{node_node_type_new}' ORDER BY id"
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_chg_node_type.node_nodecat_id, rows, 1)
 
 
@@ -233,7 +218,7 @@ class ChangeElemType(ParentMapTool):
 
         # Clear snapping
         self.snapper_manager.enable_snapping()
-
+        self.current_layer = self.iface.activeLayer()
         # Set active layer to 'v_edit_node'
         self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
         self.iface.setActiveLayer(self.layer_node)  

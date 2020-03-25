@@ -1,26 +1,21 @@
 """
-This file is part of Giswater 2.0
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-
 # -*- coding: latin-1 -*-
-from qgis.core import Qgis, QgsPointXY
+from qgis.core import QgsPointXY
 from qgis.gui import QgsMapToolEmitPoint, QgsMapTip
-
 from qgis.PyQt.QtCore import Qt, QTimer
-from qgis.PyQt.QtWidgets import QAction, QCompleter, QGridLayout, QLabel, QLineEdit, QPushButton, QSizePolicy,\
-    QSpacerItem, QWidget
+from qgis.PyQt.QtWidgets import QAction, QCompleter, QGridLayout, QLabel, QLineEdit, QSizePolicy, QSpacerItem
 
-import json
-from collections import OrderedDict
 from functools import partial
 
 from .. import utils_giswater
 from .api_parent import ApiParent
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
-from ..ui_manager import ApiDimensioningUi
+from ..ui_manager import DimensioningUi
 
 
 class ApiDimensioning(ApiParent):
@@ -44,7 +39,7 @@ class ApiDimensioning(ApiParent):
 
 
     def open_form(self, new_feature=None, layer=None, new_feature_id=None):
-        self.dlg_dim = ApiDimensioningUi()
+        self.dlg_dim = DimensioningUi()
         self.load_settings(self.dlg_dim)
 
         # Set signals
@@ -69,14 +64,8 @@ class ApiDimensioning(ApiParent):
         self.create_map_tips()
         body = self.create_body()
         # Get layers under mouse clicked
-        sql = f"SELECT gw_api_getdimensioning($${{{body}}}$$)::text"
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
-
-        if row is None or row[0] is None:
-            self.controller.show_message("NOT ROW FOR: " + sql, 2)
-            return False
-        # Parse string to order dict into List
-        complet_result = [json.loads(row[0],  object_pairs_hook=OrderedDict)]
+        complet_result = [self.controller.get_json('gw_api_getdimensioning', body, log_sql=True)]
+        if not complet_result: return False
 
         layout_list = []
         for field in complet_result[0]['body']['data']['fields']:
@@ -85,12 +74,14 @@ class ApiDimensioning(ApiParent):
             if widget.objectName() == 'id':
                 utils_giswater.setWidgetText(self.dlg_dim, widget, new_feature_id)
             layout = self.dlg_dim.findChild(QGridLayout, field['layoutname'])
-           # Take the QGridLayout with the intention of adding a QSpacerItem later
-            if layout not in layout_list and layout.objectName() not in ('top_layout', 'bot_layout_1', 'bot_layout_2'):
+            # Take the QGridLayout with the intention of adding a QSpacerItem later
+            if layout not in layout_list and layout.objectName() not in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
                 layout_list.append(layout)
 
             # Add widgets into layout
-            if field['layoutname'] in ('top_layout', 'bot_layout_1', 'bot_layout_2'):
+                layout.addWidget(label, 0, field['layout_order'])
+                layout.addWidget(widget, 1, field['layout_order'])
+            if field['layoutname'] in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
                 layout.addWidget(label, 0, field['layout_order'])
                 layout.addWidget(widget, 1, field['layout_order'])
             else:
@@ -101,7 +92,7 @@ class ApiDimensioning(ApiParent):
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
             layout.addItem(vertical_spacer1)
 
-        self.open_dialog(self.dlg_dim)
+        self.open_dialog(self.dlg_dim, dlg_name='dimensioning')
         return False, False
 
 
@@ -128,15 +119,12 @@ class ApiDimensioning(ApiParent):
 
         srid = self.controller.plugin_settings_value('srid')
         sql = f"SELECT ST_GeomFromText('{new_feature.geometry().asWkt()}', {srid})"
-        the_geom = self.controller.get_row(sql, commit=True, log_sql=True)
+        the_geom = self.controller.get_row(sql, log_sql=True)
         fields += f'"the_geom":"{the_geom[0]}"'
 
         feature = '"tableName":"v_edit_dimensions"'
         body = self.create_body(feature=feature, filter_fields=fields)
-
-        # Execute query
-        sql = f"SELECT gw_api_setdimensioning($${{{body}}}$$)::text"
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        row = self.controller.get_json('gw_api_setdimensioning', body, log_sql=True)
 
         # Close dialog
         self.close_dialog(self.dlg_dim)

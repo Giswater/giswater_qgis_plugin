@@ -231,7 +231,7 @@ class DrawProfiles(ParentMapTool):
         self.dlg_load.btn_delete_profile.clicked.connect(self.delete_profile)
         
         sql = "SELECT DISTINCT(profile_id) FROM anl_arc_profile_value"
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         if rows:
             for row in rows:
                 item_arc = QListWidgetItem(str(row[0]))
@@ -272,7 +272,7 @@ class DrawProfiles(ParentMapTool):
         sql = ("SELECT arc_id"
                " FROM anl_arc_profile_value"
                " WHERE profile_id = '" + selected_profile + "'")
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         if not rows:
             return
 
@@ -292,7 +292,7 @@ class DrawProfiles(ParentMapTool):
             # Select feature from v_edit_man_@sys_type
             sys_type = str(row[0].lower())
             sql = "SELECT parent_layer FROM cat_feature WHERE system_id = '" + sys_type.upper() + "' LIMIT 1"
-            row = self.controller.get_row(sql, log_sql=True, commit=True)
+            row = self.controller.get_row(sql, log_sql=True)
             self.layer_feature = self.controller.get_layer_by_tablename(row[0])
             aux = ""
             for row in arc_id:
@@ -333,7 +333,7 @@ class DrawProfiles(ParentMapTool):
             # Select feature from v_edit_man_@sys_type
             sys_type = str(row[0].lower())
             sql = "SELECT parent_layer FROM cat_feature WHERE system_id = '" + sys_type.upper() + "' LIMIT 1"
-            row = self.controller.get_row(sql, log_sql=True, commit=True)
+            row = self.controller.get_row(sql, log_sql=True,)
             self.layer_feature = self.controller.get_layer_by_tablename(row[0])
             aux = ""
             for row in node_id:
@@ -1322,7 +1322,7 @@ class DrawProfiles(ParentMapTool):
             return
         sql += ")"
 
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = self.controller.get_rows(sql)
         for i in range(0, len(rows)):
             if self.version == '2':
                 self.rnode_id.append(str(rows[i][1]))
@@ -1365,7 +1365,7 @@ class DrawProfiles(ParentMapTool):
             # Select feature of v_edit_man_@sys_type
             sys_type = str(row[0].lower())
             sql = f"SELECT parent_layer FROM cat_feature WHERE system_id = '{sys_type.upper()}' LIMIT 1"
-            row = self.controller.get_row(sql, log_sql=True, commit=True)
+            row = self.controller.get_row(sql, log_sql=True)
             self.layer_feature = self.controller.get_layer_by_tablename(row[0])
             aux = ""
             for row in self.arc_id:
@@ -1388,7 +1388,7 @@ class DrawProfiles(ParentMapTool):
             # Select feature of v_edit_man_@sys_type
             sys_type = str(row[0].lower())
             sql = f"SELECT parent_layer FROM cat_feature WHERE system_id = '{sys_type.upper()}' LIMIT 1"
-            row = self.controller.get_row(sql, log_sql=True, commit=True)
+            row = self.controller.get_row(sql, log_sql=True)
             self.layer_feature = self.controller.get_layer_by_tablename(row[0])
             aux = ""
             for row in self.node_id:
@@ -1661,7 +1661,7 @@ class DrawProfiles(ParentMapTool):
                 return
             sql += ")"
 
-            rows = self.controller.get_rows(sql, commit=True)
+            rows = self.controller.get_rows(sql)
             for i in range(0, len(rows)):
                 if self.version == '2':
                     self.rnode_id.append(str(rows[i][1]))
@@ -1702,7 +1702,7 @@ class DrawProfiles(ParentMapTool):
                 # Select feature of v_edit_man_@sys_type
                 sys_type = str(row[0].lower())
                 sql = f"SELECT parent_layer FROM cat_feature WHERE system_id = '{sys_type.upper()}' LIMIT 1"
-                row = self.controller.get_row(sql, log_sql=True, commit=True)
+                row = self.controller.get_row(sql, log_sql=True)
                 self.layer_feature = self.controller.get_layer_by_tablename(row[0])
                 aux = ""
                 for row in self.arc_id:
@@ -1725,7 +1725,7 @@ class DrawProfiles(ParentMapTool):
                 # Select feature of v_edit_man_@sys_type
                 sys_type = str(row[0].lower())
                 sql = f"SELECT parent_layer FROM cat_feature WHERE system_id = '{sys_type.upper()}' LIMIT 1"
-                row = self.controller.get_row(sql, log_sql=True, commit=True)
+                row = self.controller.get_row(sql, log_sql=True)
                 self.layer_feature = self.controller.get_layer_by_tablename(row[0])
                 aux = ""
                 for row in self.node_id:
