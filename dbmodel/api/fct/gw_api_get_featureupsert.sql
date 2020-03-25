@@ -342,13 +342,13 @@ BEGIN
 	----------------------------
 	IF  p_configtable is TRUE THEN 
 	
-		PERFORM gw_fct_debug(concat('{"data":{"msg":"--> Configuration fields are defined on config_api_form_fields table <--", "variables":"',v_debug,'"}}')::json);
+		PERFORM gw_fct_debug(concat('{"data":{"msg":"--> Configuration fields are defined on config_api_form_fields table <--", "variables":""}}')::json);
 
 		-- Call the function of feature fields generation
 		SELECT gw_api_get_formfields( v_formname, 'feature', v_tabname, v_tablename, p_idname, p_id, p_columntype, p_tg_op, null, p_device , v_values_array) INTO v_fields_array; 
 
 	ELSE	
-		PERFORM gw_fct_debug(concat('{"data":{"msg":"--> Configuration fields are NOT defined on config_api_form_fields table. System values are used <--", "variables":"',v_debug,'"}}')::json);
+		PERFORM gw_fct_debug(concat('{"data":{"msg":"--> Configuration fields are NOT defined on config_api_form_fields table. System values are used <--", "variables":""}}')::json);
 	
 		-- Get fields
 		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM 
