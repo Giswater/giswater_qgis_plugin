@@ -162,11 +162,6 @@ class OptionsUi(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('main_importinp.ui')
-class ImportInpUi(GwDialog, FORM_CLASS):
-    pass
-
-
 FORM_CLASS = get_ui_class('search.ui')
 class SearchUi(GwDockWidget, FORM_CLASS):
     pass
