@@ -88,7 +88,7 @@ class CreateGisProject():
 
         if get_database_parameters:
             # Get database parameters from layer source
-            status = self.get_database_parameters()
+            status = self.get_database_parameters(schema)
             if not status:
                 return False, None
 
@@ -132,7 +132,7 @@ class CreateGisProject():
             self.controller.show_warning(message, parameter=qgs_path)
 
 
-    def get_database_parameters(self):
+    def get_database_parameters(self, schema):
         """ Get database parameters from layer source """
 
         layer_source, not_version = self.controller.get_layer_source_from_credentials()

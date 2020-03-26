@@ -122,26 +122,6 @@ class TestQgis:
         return True
 
 
-    def create_project(self):
-
-        print("\nStart create_project")
-
-        # Load main plugin class
-        self.load_plugin()
-
-        # Connect to a database providing a service_name set in .pg_service.conf
-        service_name = "localhost_giswater"
-        if not self.connect_to_database(service_name):
-            return
-
-        user = "gisadmin"
-        self.giswater.update_sql.init_sql(False, user)
-        self.giswater.update_sql.init_dialog_create_project()
-        self.giswater.update_sql.create_project_data_schema('test_ws', 'test_ws_title', 'ws', '25831', 'EN', True)
-
-        print("Finish create_project")
-
-
     def check_project(self):
 
         print("\nStart check_project")
@@ -166,12 +146,6 @@ def test_open_qgis():
     test.init_config()
     test.load_layer()
     test.open_qgis(True)
-
-
-def test_create_project():
-
-    test = TestQgis()
-    test.create_project()
 
 
 def test_check_project():

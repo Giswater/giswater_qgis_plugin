@@ -114,8 +114,7 @@ class TestQgis:
             return False
 
         # Connect to a database providing a service_name set in .pg_service.conf
-        service_name = "localhost_giswater"
-        if not self.connect_to_database(service_name):
+        if not self.connect_to_database(self.service_name):
             return False
 
         self.test_giswater.update_sql.init_sql(False, self.user, show_dialog=False)
