@@ -1101,30 +1101,41 @@ class ParentAction(object):
             pass
 
 
-    def manage_docker_options(self, docker):
+    def manage_docker_options(self):
         """ Check if user want dock the dialog or not """
-        row = self.controller.get_config('dock_dialogs')
-        row = 1
-        if not row:
-            docker = None
-        else:
-            # Load last docker position
-            cur_user = self.controller.get_current_user()
-            pos = self.controller.plugin_settings_value(f"docker_info_{cur_user}")
-            docker.position = pos if type(pos) is int else 2
 
-            # If user want to dock the dialog, we reset rubberbands for each info
-            # For the first time, cf_info does not exist, therefore we cannot access it and reset rubberbands
-            try:
-                self.info_cf.resetRubberbands()
-            except AttributeError as e:
-                pass
-        return docker
+        # Load last docker position
+        cur_user = self.controller.get_current_user()
+        pos = self.controller.plugin_settings_value(f"docker_info_{cur_user}")
+
+        # Docker positions: 1=Left, 2=right, 8=bottom, 4= top
+        if type(pos) is int and pos in (1, 2, 4, 8):
+            self.dlg_docker.position = pos
+        else:
+            self.dlg_docker.position = 2
+
+        # If user want to dock the dialog, we reset rubberbands for each info
+        # For the first time, cf_info does not exist, therefore we cannot access it and reset rubberbands
+        try:
+            self.info_cf.resetRubberbands()
+        except AttributeError as e:
+            pass
+
+
+    def close_docker(self):
+        """ Save QDockWidget position (1=Left, 2=right, 8=bottom, 4=top),
+            remove from iface and del class
+        """
+        cur_user = self.controller.get_current_user()
+        x = self.iface.mainWindow().dockWidgetArea(self.dlg_docker)
+        self.controller.plugin_settings_set_value("docker_info_" + cur_user, x)
+        self.iface.removeDockWidget(self.dlg_docker)
+        del self.dlg_docker
+
 
 
     def get_all_actions(self):
 
-        self.controller.log_info(str("TEST"))
         actions_list = self.iface.mainWindow().findChildren(QAction)
         for action in actions_list:
            self.controller.log_info(str(action.objectName()))

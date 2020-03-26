@@ -187,7 +187,7 @@ class I18NGenerator(ParentAction):
                 name = py_dlg['dialog_name']
                 line = '\t<context>\n'
                 line += f'\t\t<name>{name}</name>\n'
-                title =  self.get_title(py_dialogs, name, key_lbl)
+                title = self.get_title(py_dialogs, name, key_lbl)
                 if title:
                     line += f'\t\t<message>\n'
                     line += f'\t\t\t<source>title</source>\n'

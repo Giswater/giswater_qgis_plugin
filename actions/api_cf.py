@@ -542,13 +542,7 @@ class ApiCF(ApiParent, QObject):
         btn_accept = self.dlg_cf.findChild(QPushButton, 'btn_accept')
         btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_cf))
         btn_cancel.clicked.connect(self.roll_back)
-        btn_accept.clicked.connect(partial(self.accept, self.dlg_cf, self.complet_result[0], self.my_json))
-        self.dlg_cf.dlg_closed.connect(self.roll_back)
-        self.dlg_cf.dlg_closed.connect(partial(self.resetRubberbands))
-        self.dlg_cf.dlg_closed.connect(partial(self.save_settings, self.dlg_cf))
-        self.dlg_cf.dlg_closed.connect(partial(self.set_vdefault_edition))
-        self.dlg_cf.dlg_closed.connect(partial(self.close_docker, docker, False))
-        self.dlg_cf.key_pressed.connect(partial(self.close_dialog, self.dlg_cf))
+        btn_accept.clicked.connect(partial(self.accept, self.dlg_cf, self.complet_result[0], self.my_json, docker=docker))
 
         if docker:
             # Delete las form from memory
@@ -556,30 +550,24 @@ class ApiCF(ApiParent, QObject):
             if last_info:
                 last_info.setParent(None)
                 del last_info
-            # Remove las docker from iface and put the new docker
-            self.iface.removeDockWidget(docker)
+
             self.dock_dialog(docker, self.dlg_cf)
-            # self.load_settings(docker)
             docker.dlg_closed.connect(self.roll_back)
             docker.dlg_closed.connect(partial(self.resetRubberbands))
             docker.dlg_closed.connect(partial(self.set_vdefault_edition))
-            docker.dlg_closed.connect(partial(self.close_docker, docker))
-            #docker.dlg_closed.connect(partial(self.save_settings, docker))
+            docker.dlg_closed.connect(lambda: self.layer.disconnect())
+            btn_cancel.clicked.connect(lambda: docker.close())
+        else:
+            self.dlg_cf.dlg_closed.connect(self.roll_back)
+            self.dlg_cf.dlg_closed.connect(partial(self.resetRubberbands))
+            self.dlg_cf.dlg_closed.connect(partial(self.save_settings, self.dlg_cf))
+            self.dlg_cf.dlg_closed.connect(partial(self.set_vdefault_edition))
+            self.dlg_cf.dlg_closed.connect(lambda: self.layer.disconnect())
+            self.dlg_cf.key_pressed.connect(partial(self.close_dialog, self.dlg_cf))
 
         # Open dialog
         self.open_dialog(self.dlg_cf, dlg_name='info_full')
         return self.complet_result, self.dlg_cf
-
-
-    def close_docker(self, docker, save_pos=True):
-        """1=Left,  2=right, 8=bottom, 4=top"""
-        if docker and save_pos:
-            cur_user = self.controller.get_current_user()
-            x = self.iface.mainWindow().dockWidgetArea(docker)
-            print(f"X --> {x}")
-            self.controller.plugin_settings_set_value("docker_info_" + cur_user, x)
-            self.iface.removeDockWidget(docker)
-        del docker
 
 
     def get_feature(self, tab_type):
@@ -620,6 +608,7 @@ class ApiCF(ApiParent, QObject):
 
 
     def set_vdefault_edition(self):
+
         if 'toggledition' in self.complet_result[0]['body']:
             force_open = self.complet_result[0]['body']['toggledition']
             if not force_open and self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').isChecked():
@@ -877,7 +866,7 @@ class ApiCF(ApiParent, QObject):
         self.open_dialog(dlg_sections, maximize_button=False)
 
 
-    def accept(self, dialog, complet_result, _json, p_widget=None, clear_json=False, close_dialog=True):
+    def accept(self, dialog, complet_result, _json, p_widget=None, clear_json=False, close_dialog=True, docker=None):
         """
         :param dialog:
         :param complet_result:
@@ -887,9 +876,15 @@ class ApiCF(ApiParent, QObject):
         :param close_dialog:
         :return:
         """
-        
+        print(f"D1 -> {docker}")
         if _json == '' or str(_json) == '{}':
+            print(f"D2 -> {docker}")
             self.close_dialog(dialog)
+
+            print(f"D3 -> {docker}")
+            if docker is not None:
+                print(f"D4 -> {docker}")
+                docker.close()
             return
 
         p_table_id = complet_result['body']['feature']['tableName']
@@ -953,7 +948,15 @@ class ApiCF(ApiParent, QObject):
             msg = "FAIL"
             self.controller.show_message(msg, message_level=2)
         if close_dialog:
+            print(f"D22 -> {docker}")
             self.close_dialog(dialog)
+
+            print(f"D33 -> {docker}")
+            if docker is not None:
+                print(f"D44 -> {docker}")
+                docker.close()
+
+
 
 
     def get_scale_zoom(self):

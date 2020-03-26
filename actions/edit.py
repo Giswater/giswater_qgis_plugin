@@ -5,6 +5,8 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+from functools import partial
+
 from qgis.PyQt.QtCore import QSettings
 
 from .api_cf import ApiCF
@@ -63,7 +65,7 @@ class Edit(ParentAction):
         if self.layer.geometryType() == 0:
             points = geom.asPoint()
             list_points = f'"x1":{points.x()}, "y1":{points.y()}'
-        elif self.layer.geometryType() in(1, 2):
+        elif self.layer.geometryType() in (1, 2):
             points = geom.asPolyline()
             init_point = points[0]
             last_point = points[-1]
@@ -71,11 +73,23 @@ class Edit(ParentAction):
             list_points += f', "x2":{last_point.x()}, "y2":{last_point.y()}'
         else:
             self.controller.log_info(str(type("NO FEATURE TYPE DEFINED")))
-        dlg_docker = self.manage_docker_options(DockerUi())
+
+        if hasattr(self, 'dlg_docker') and type(self.dlg_docker) is DockerUi:
+            self.close_docker()
+
+        row = self.controller.get_config('dock_dialogs')
+        row = 1
+        if not row:
+            self.dlg_docker = None
+        else:
+            self.dlg_docker = DockerUi()
+            self.dlg_docker.dlg_closed.connect(self.close_docker)
+            self.manage_docker_options()
+
         self.api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, 'data')
         result, dialog = self.api_cf.open_form(point=list_points, feature_cat=self.feature_cat,
                                                new_feature_id=feature_id, layer_new_feature=self.layer,
-                                               tab_type='data', new_feature=feature, docker=dlg_docker)
+                                               tab_type='data', new_feature=feature, docker=self.dlg_docker)
 
         # Restore user value (Settings/Options/Digitizing/Suppress attribute from pop-up after feature creation)
         QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", self.suppres_form)
