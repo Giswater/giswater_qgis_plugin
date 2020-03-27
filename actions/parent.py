@@ -48,6 +48,7 @@ class ParentAction(object):
         self.rubber_polygon.setColor(Qt.darkRed)
         self.rubber_polygon.setIconSize(20)
         self.user_current_layer = None
+        self.dlg_docker = None
     
     def set_controller(self, controller):
         """ Set controller class """

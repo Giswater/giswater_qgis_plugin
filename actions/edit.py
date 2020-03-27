@@ -100,6 +100,17 @@ class Edit(ParentAction):
 
         #self.iface.actionPan().trigger()
 
+    def close_docker(self):
+        """ Save QDockWidget position (1=Left, 2=right, 8=bottom, 4=top),
+            remove from iface and del class
+        """
+
+        cur_user = self.controller.get_current_user()
+        x = self.iface.mainWindow().dockWidgetArea(self.dlg_docker)
+        self.controller.plugin_settings_set_value("docker_info_" + cur_user, x)
+        self.iface.removeDockWidget(self.dlg_docker)
+        del self.dlg_docker
+
 
     def get_feature_by_id(self, layer, id_):
 
