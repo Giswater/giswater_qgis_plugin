@@ -1,6 +1,12 @@
 from qgis.core import QgsApplication, QgsProviderRegistry
+from qgis.PyQt.QtWidgets import QApplication, QDialog
+import os
+import uic
+import sys
 from test_giswater import TestGiswater
 from actions.create_gis_project import CreateGisProject
+#from actions.check_project_result import CheckProjectResult
+#from ui_manager import ReadsqlCreateGisProject, ApiEpaOptions
 
 
 # dummy instance to replace qgis.utils.iface
@@ -14,10 +20,11 @@ class QgisInterfaceDummy(object):
         return dummy
 
 
-class TestQgis:
+class TestQgis(QApplication):
 
     def __init__(self):
 
+        super(TestQgis, self).__init__()
         self.service_name = "localhost_giswater"
         self.user = "gisadmin"
 
@@ -138,6 +145,75 @@ class TestQgis:
         return True
 
 
+    def create_gis_project_ui(self, project_type='ws'):
+
+        print("\nStart create_gis_project_ui")
+
+        # Load main plugin class
+        if not self.load_plugin():
+            return False
+
+        # Connect to a database providing a service_name set in .pg_service.conf
+        if not self.connect_to_database(self.service_name):
+            return False
+
+        self.test_giswater.update_sql.init_sql(False, self.user, show_dialog=False)
+        self.test_giswater.update_sql.init_dialog_create_project(project_type)
+
+        self.test_giswater.update_sql.open_form_create_gis_project()
+
+        return
+
+        dlg = ReadsqlCreateGisProject()
+        print(type(dlg))
+        dlg.exec()
+        res = dlg.exec()
+        if res == QDialog.Accepted:
+            print('Accepted')
+        else:
+            print('Rejected')
+
+        return
+
+        # Generate QGIS project
+        project_name = f"test_{project_type}"
+        gis_folder = "C:/Users/David/giswater/qgs"
+        gis_file = project_name
+        export_passwd = True
+        roletype = 'admin'
+        sample = True
+        get_database_parameters = False
+        gis = CreateGisProject(self.test_giswater.controller, self.test_giswater.plugin_dir)
+        gis.set_database_parameters("host", "port", "db", "user", "password", "25831")
+        gis.gis_project_database(gis_folder, gis_file, project_type, project_name, export_passwd,
+            roletype, sample, get_database_parameters)
+
+        print("Finish create_gis_project_ui")
+
+        return True
+
+
+    def check_project_result(self, project_type='ws'):
+
+        print("\nStart check_project_result")
+
+        # Load main plugin class
+        if not self.load_plugin():
+            return False
+
+        # Connect to a database providing a service_name set in .pg_service.conf
+        if not self.connect_to_database(self.service_name):
+            return False
+
+        cpr = CheckProjectResult(self.iface, self.test_giswater.settings, self.test_giswater.controller,
+            self.test_giswater.plugin_dir)
+        #layers = self.test_giswater.controller.get_layers()
+
+        print("Finish check_project_result")
+
+        return True
+
+
 def test_create_project():
     test = TestQgis()
     status = test.create_project()
@@ -152,12 +228,40 @@ def test_update_project():
 
 def test_create_gis_project():
     test = TestQgis()
-    status = test.create_gis_project('ws')
+    status = test.create_gis_project('ud')
     print(status)
+
+
+def test_create_gis_project_ui():
+    test = TestQgis()
+    status = test.create_gis_project_ui('ud')
+    print(status)
+
+
+def get_ui_class(ui_file_name, subfolder=None):
+    """ Get UI Python class from @ui_file_name """
+
+    # Folder that contains UI files
+    ui_folder_path = os.path.dirname(os.path.dirname(__file__)) + os.sep + 'ui'
+    if subfolder:
+        ui_folder_path += os.sep + subfolder
+    ui_file_path = os.path.abspath(os.path.join(ui_folder_path, ui_file_name))
+
+    return uic.loadUiType(ui_file_path)[0]
+
+
+def test_ui():
+
+    app = QApplication(sys.argv)
+    my_main = mc.matc_main.MyMainClass(app)
+    my_main.main_window_qmainwindow.show()
+    my_qapplication.exec_()
+    #sys.exit(my_qapplication.exec_())
 
 
 if __name__ == '__main__':
     print("MAIN")
-    test = TestQgis()
-    test.create_gis_project('ws')
+    #test = TestQgis()
+    #test.test_ui('ud')
+    test_ui()
 

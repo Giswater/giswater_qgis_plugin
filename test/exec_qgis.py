@@ -1,10 +1,15 @@
 from qgis.core import QgsProject, QgsApplication, QgsProviderRegistry, QgsVectorLayer, QgsFeature, QgsGeometry
 from qgis.gui import QgsMapCanvas
 from qgis.PyQt.QtGui import QColor
+from qgis.PyQt import QtCore, QtWidgets
 
 import os
+import sys
+import pytest
+import pytestqt
 
-import giswater
+import first_plugin
+#from test_giswater import TestGiswater
 
 
 # dummy instance to replace qgis.utils.iface
@@ -24,9 +29,9 @@ class TestQgis:
         """ Load main plugin class """
 
         self.init_config()
-        self.giswater = giswater.classFactory(self.iface)
-        self.giswater.init_plugin(False)
-        #print(self.plugin.plugin_dir)
+        self.test_giswater = TestGiswater(self.iface)
+        self.test_giswater.init_plugin(False)
+        print(self.test_giswater.plugin_dir)
 
 
     def init_config(self):
@@ -46,10 +51,10 @@ class TestQgis:
     def connect_to_database(self, service_name):
         """ Connect to a database providing a service_name set in .pg_service.conf """
 
-        status = self.giswater.controller.connect_to_database_service(service_name)
-        self.giswater.controller.logged = status
-        if self.giswater.controller.last_error:
-            msg = self.giswater.controller.last_error
+        status = self.test_giswater.controller.connect_to_database_service(service_name)
+        self.test_giswater.controller.logged = status
+        if self.test_giswater.controller.last_error:
+            msg = self.test_giswater.controller.last_error
             print(f"Database connection error: {msg}")
             return False
 
@@ -59,7 +64,8 @@ class TestQgis:
     def load_layer(self):
 
         # Check using assertion versus normal check
-        layer_path = r'/home/david/workspace/temp/comarques.shp'
+        #layer_path = r'/home/david/workspace/temp/comarques.shp'
+        layer_path = r'C:/Dropbox/I+D/pytest/capes/comarques.shp'
         if not os.path.exists(layer_path):
             print(f"File not found: {layer_path}")
             return False
@@ -99,15 +105,24 @@ class TestQgis:
         #canvas.zoomToFullExtent()
 
 
-    def import_plugin(self):
+    def import_plugin(self, qtbot):
 
-        import first_plugin
+        # Initialize plugin 'first_plugin'
+        plugin = first_plugin.classFactory(self.iface)
+        plugin.initGui()
+        plugin.dlg.txt_prova.setText("PROVA")
+        plugin.dlg.btn_prova.setText("PROVA")
 
-        self.plugin = first_plugin.classFactory(self.iface)
-        self.plugin.initGui()
-        self.dlg = self.plugin.dlg
-        self.dlg.btn_prova.setText("PROVA")
-        self.dlg.show()
+        # Create test application
+        app = QtWidgets.QApplication(sys.argv)
+        qtbot.addWidget(plugin.dlg)
+
+        # Execute application
+        plugin.dlg.show()
+        sys.exit(app.exec_())
+        #app.exec_()
+
+        #assert self.first_plugin.dlg.btn_prova.text() == "PROVA"
 
 
     def open_qgis(self, open_qgis=False):
@@ -122,22 +137,11 @@ class TestQgis:
         return True
 
 
-    def check_project(self):
+def test_import_plugin(qtbot):
 
-        print("\nStart check_project")
-
-        # Load main plugin class
-        self.load_plugin()
-
-        # Connect to a database providing a service_name set in .pg_service.conf
-        service_name = "localhost_giswater"
-        if not self.connect_to_database(service_name):
-            return
-
-        layers = self.giswater.controller.get_layers()
-        status = self.giswater.populate_audit_check_project(layers)
-
-        print("Finish check_project")
+    test = TestQgis()
+    test.init_config()
+    test.import_plugin(qtbot)
 
 
 def test_open_qgis():
@@ -148,14 +152,8 @@ def test_open_qgis():
     test.open_qgis(True)
 
 
-def test_check_project():
-
-    test = TestQgis()
-    test.check_project()
-
-
 if __name__ == '__main__':
 
     test = TestQgis()
-    test.check_project()
+    test.import_plugin()
 
