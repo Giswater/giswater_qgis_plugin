@@ -125,6 +125,10 @@ DROP VIEW IF EXISTS v_inp_lidcontrol;
 DROP VIEW IF EXISTS v_inp_subcatch2node;
 DROP VIEW IF EXISTS v_inp_subcatchcentroid;
 
+DROP VIEW IF EXISTS vi_subcatchcentroid;
+DROP VIEW IF EXISTS vi_subcatch2node;
+
+
 DROP VIEW IF EXISTS vi_groundwater;
 DROP VIEW IF EXISTS vi_infiltration;
 DROP VIEW IF EXISTS vi_coverages;
@@ -310,8 +314,8 @@ arc_type.type AS sys_type,
 arc.arccat_id,
 arc.matcat_id,
 cat_arc.shape,
-cat_arc.geom1,
-cat_arc.geom2,
+cat_arc.geom1 as cat_geom1,
+cat_arc.geom2 as cat_geom2,
 cat_arc.width,
 arc.epa_type,
 arc.expl_id,
@@ -776,7 +780,7 @@ CREATE OR REPLACE VIEW v_edit_inp_conduit AS
     v_arc.arccat_id,
     v_arc.matcat_id AS cat_matcat_id,
     v_arc.shape AS cat_shape,
-    v_arc.geom1 AS cat_geom1,
+    v_arc.cat_geom1,
     v_arc.gis_length,
     v_arc.sector_id,
     v_arc.macrosector_id,
@@ -3084,8 +3088,8 @@ CREATE OR REPLACE VIEW v_edit_man_conduit AS
     v_arc.arccat_id,
     v_arc.matcat_id,
     v_arc.shape,
-    v_arc.geom1 AS cat_geom1,
-    v_arc.geom2 AS cat_geom2,
+    v_arc.cat_geom1,
+    v_arc.cat_geom2,
     v_arc.gis_length,
     v_arc.epa_type,
     v_arc.sector_id,
@@ -3657,8 +3661,8 @@ CREATE OR REPLACE VIEW v_edit_man_siphon AS
     v_arc.arccat_id,
     v_arc.matcat_id,
     v_arc.shape,
-    v_arc.geom1 AS cat_geom1,
-    v_arc.geom2 AS cat_geom2,
+    v_arc.cat_geom1,
+    v_arc.cat_geom2,
     v_arc.gis_length,
     v_arc.epa_type,
     v_arc.sector_id,
@@ -3882,8 +3886,8 @@ CREATE OR REPLACE VIEW v_edit_man_varc AS
     v_arc.arccat_id,
     v_arc.matcat_id,
     v_arc.shape,
-    v_arc.geom1 AS cat_geom1,
-    v_arc.geom2 AS cat_geom2,
+    v_arc.cat_geom1,
+    v_arc.cat_geom2,
     v_arc.gis_length,
     v_arc.epa_type,
     v_arc.sector_id,
@@ -3956,8 +3960,8 @@ CREATE OR REPLACE VIEW v_edit_man_waccel AS
     v_arc.arccat_id,
     v_arc.matcat_id,
     v_arc.shape,
-    v_arc.geom1 AS cat_geom1,
-    v_arc.geom2 AS cat_geom2,
+    v_arc.cat_geom1,
+    v_arc.cat_geom2,
     v_arc.gis_length,
     v_arc.epa_type,
     v_arc.sector_id,
