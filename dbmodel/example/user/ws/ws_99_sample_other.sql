@@ -440,3 +440,5 @@ update config_api_form_fields SET layout_order = 4 where column_id='state_type' 
 
 -- reconnect planned connecs
 SELECT gw_fct_connect_to_network($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{"id":"[114462, 114461]"}, "data":{"filterFields":{}, "pageInfo":{}, "feature_type":"CONNEC"}}$$);
+
+UPDATE node_type set isprofilesurface = true;

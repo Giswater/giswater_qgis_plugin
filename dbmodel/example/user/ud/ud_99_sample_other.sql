@@ -314,4 +314,4 @@ UPDATE config_api_form_fields SET stylesheet ='{"label":"color:red; font-weight:
 update config_api_form_fields SET layout_order = 3 where column_id='state' and formname like '%ve_connec_%';
 update config_api_form_fields SET layout_order = 4 where column_id='state_type' and formname like '%ve_connec_%';
 
-
+UPDATE node_type set isprofilesurface = true;
