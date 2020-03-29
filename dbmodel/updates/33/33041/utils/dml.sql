@@ -25,4 +25,13 @@ isdeprecated, istoolbox, alias, isparametric)
 VALUES (2832, 'gw_fct_getprofilevalues', 'utils', 'function', null, null, null,'Function to manage profile values', 'role_om',
 false, false, null, false) ON CONFLICT (id) DO NOTHING;
 
+-- deprecate config_param_system variables
+UPDATE config_param_system SET isdeprecated = true where parameter in
+(top_elev_vd,ymax_vd,sys_elev_vd,geom1_vd,z1_vd,z2_vd,cat_geom1_vd,sys_elev1_vd,sys_elev2_vd,y1_vd,y2_vd,slope_vd)
+
+UPDATE config_param_system SET isdeprecated = true where parameter in
+(expl_layer,expl_field_code,expl_field_name,scale_zoom,street_layer,street_field_code,street_field_name,portal_layer,portal_field_code,portal_field_number,portal_field_postal,street_field_expl)
+
+UPDATE config_param_system SET isdeprecated = false where isdeprecated is null;
+
 

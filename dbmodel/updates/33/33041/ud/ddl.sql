@@ -7,7 +7,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"vnode_topelev", "dataType":"float"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_node", "column":"top_elev", "dataType":"float"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_node", "column":"elev", "dataType":"float"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_node", "column":"ymax", "dataType":"float"}}$$);

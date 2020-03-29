@@ -11,6 +11,8 @@ create table IF NOT EXISTS om_profile (
 profile_id text PRIMARY KEY,
 values json);
 
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"vnode_topelev", "dataType":"float"}}$$);
+
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_arc", "column":"node_1", "dataType":"character varying(16)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_arc", "column":"node_2", "dataType":"character varying(16)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_arc", "column":"sys_type", "dataType":"character varying(30)"}}$$);

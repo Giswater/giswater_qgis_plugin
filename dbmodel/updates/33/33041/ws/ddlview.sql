@@ -39,7 +39,6 @@ CREATE OR REPLACE VIEW v_edit_link AS
             sector.macrosector_id,
             arc.dma_id,
 			vnode_topelev,
-			fluid_type,
             dma.macrodma_id,
             arc.expl_id,
                 CASE
@@ -72,11 +71,11 @@ CREATE OR REPLACE VIEW v_edit_link AS
              LEFT JOIN plan_psector_x_connec USING (arc_id, connec_id)) a
   WHERE a.state < 2;
 
-
+DROP VIEW IF EXISTS v_arc_x_vnode;
 CREATE OR REPLACE VIEW v_arc_x_vnode AS 
  SELECT 
-    link_id,
-    a.vnode_id,
+	link_id,
+	a.vnode_id,
     a.arc_id,
     a.feature_type,
     a.feature_id,
@@ -84,32 +83,26 @@ CREATE OR REPLACE VIEW v_arc_x_vnode AS
     a.node_2,
     (a.length * a.locate::double precision)::numeric(12,3) AS vnode_distfromnode1,
     (a.length * (1::numeric - a.locate)::double precision)::numeric(12,3) AS vnode_distfromnode2,
-    case when vnode_topelev IS NULL THEN (a.top_elev1 - a.locate * (a.top_elev1 - a.top_elev2))::numeric(12,3) 
-	ELSE vnode_topelev END AS vnode_topelev,
-    (a.sys_y1 - a.locate * (a.sys_y1 - a.sys_y2))::numeric(12,3) AS vnode_ymax,
-    (a.sys_elev1 - a.locate * (a.sys_elev1 - a.sys_elev2))::numeric(12,3) AS vnode_elev
-       FROM ( SELECT 
-		link_id,
-		vnode.vnode_id,
-            v_edit_arc.arc_id,
+	case when vnode_topelev IS NULL THEN (a.elevation1 - a.locate * (a.elevation1 - a.elevation2))::numeric(12,3) 
+	ELSE vnode_topelev END AS vnode_topelev
+    FROM ( SELECT 
+			link_id,
+			vnode.vnode_id,
+            v_arc.arc_id,
             a_1.feature_type,
             a_1.feature_id,
-            vnode_topelev,
-            st_length(v_edit_arc.the_geom) AS length,
-            st_linelocatepoint(v_edit_arc.the_geom, vnode.the_geom)::numeric(12,3) AS locate,
-            v_edit_arc.node_1,
-            v_edit_arc.node_2,
-            v_edit_arc.sys_elev1,
-            v_edit_arc.sys_elev2,
-            v_edit_arc.sys_y1,
-            v_edit_arc.sys_y2,
-            v_edit_arc.sys_elev1 + v_edit_arc.sys_y1 AS top_elev1,
-            v_edit_arc.sys_elev2 + v_edit_arc.sys_y2 AS top_elev2
-           FROM v_edit_arc,
-            vnode
+			vnode_topelev,
+            st_length(v_arc.the_geom) AS length,
+            st_linelocatepoint(v_arc.the_geom, vnode.the_geom)::numeric(12,3) AS locate,
+            v_arc.node_1,
+            v_arc.node_2,
+            v_arc.elevation1,
+            v_arc.elevation2
+           FROM v_arc,vnode
              JOIN v_edit_link a_1 ON vnode.vnode_id = a_1.exit_id::integer
-          WHERE st_dwithin(v_edit_arc.the_geom, vnode.the_geom, 0.01::double precision) AND v_edit_arc.state > 0 AND vnode.state > 0) a
+          WHERE st_dwithin(v_arc.the_geom, vnode.the_geom, 0.01::double precision) AND v_arc.state > 0 AND vnode.state > 0) a
   ORDER BY a.arc_id, a.node_2 DESC;
+ 
 
 
 CREATE OR REPLACE VIEW v_edit_vnode AS 
@@ -156,7 +149,4 @@ CREATE OR REPLACE VIEW v_edit_vnode AS
              LEFT JOIN v_state_connec ON link.feature_id::text = v_state_connec.connec_id::text
              LEFT JOIN plan_psector_x_connec USING (arc_id, connec_id)
           WHERE link.feature_id::text = v_state_connec.connec_id::text) a
-  WHERE a.state < 2;
-
-ALTER TABLE v_edit_vnode
-  OWNER TO postgres;
+  WHERE a.state < 2
