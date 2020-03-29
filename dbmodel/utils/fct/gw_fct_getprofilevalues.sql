@@ -12,11 +12,6 @@ $BODY$
 
 
 /*example
-UD
-SELECT gw_fct_getprofilevalues($${"data":{"initNode":"111", "endNode":"116", "legendFactor":1, "linksDistance":1, "scale":{"scaleToFit":false, "eh":1000, "ev":200}}}$$)
-WS
-SELECT gw_fct_getprofilevalues($${"data":{"initNode":"111", "endNode":"1038", "legendFactor":1074, "linksDistance":1, "scale":{"scaleToFit":false, "eh":1000, "ev":200}}}$$)
-
 SELECT SCHEMA_NAME.gw_fct_getprofilevalues($${"client":{},
 	"data":{"initNode":"116", "endNode":"111", "composer":"mincutA4", "legendFactor":1, "linksDistance":1, "scale":{"scaleToFit":false, "eh":2000, "ev":50},	
 		"ComposerTemplates":[{"ComposerTemplate":"mincutA4", "ComposerMap":[{"width":"179.0","height":"140.826","index":0, "name":"map0"},{"width":"77.729","height":"55.9066","index":1, "name":"map7"}]},
@@ -28,32 +23,6 @@ SELECT SCHEMA_NAME.gw_fct_getprofilevalues($${"client":{},
 		"ComposerTemplates":[{"ComposerTemplate":"mincutA4", "ComposerMap":[{"width":"179.0","height":"140.826","index":0, "name":"map0"},{"width":"77.729","height":"55.9066","index":1, "name":"map7"}]},
 				     {"ComposerTemplate":"mincutA3","ComposerMap":[{"width":"53.44","height":"55.9066","index":0, "name":"map7"},{"width":"337.865","height":"275.914","index":1, "name":"map6"}]}]
 				     }}$$); 
-
-- Cal minimitzar peticions SQL. Haurien de desapareixer totes
-- hi ha un nou dialeg principal (petit refactor) 
-	- Si scale to fit -> groupbox scale deshabilitat
-	- tot mes facil per usuari, més directe (icon de maptool per doble click en mapa)
-	- Els widgets del composer haurien de ser dinàmics com els del getprint
-
-Alhora de pintar:
-- Hi ha quatre tipus de nodes
-	- els que pugen fins dalt trencant (TOP-REAL) -> cal pintar normal
-	- els que pugen fins dalt trencant (TOP-ESTIMATED) -> cal pintar les ratlles de pujada i baixada en discotinu
-	- els que no puguen pero trenquen tram (BOTTOM) -> no puja
-	- els que no puguen i no trenquen (son els sys_type  = 'LINK') 
-	->>>>> PODEM FER EL QUE SIGUI MÉS FÀCIL PER CODI PYTHON. M'HA SEMBLAT QUE AIXÒ HO ERA PERO SEGUR QUE HI HA COSES MILLORS.. EN PARLEM....
-	
-- cal posar una fila més en la llegenda 
-	longitud total (TOTAL LENGTH)
-
-- S'evien configuració de tres tipus de text (llegenda, guitarra i escala)
-		
-- millorar llegenda
-	- cal posar els valors d'escala sota del caixeti de la guitarra (scale)
-	- cal usar el legend factor per pintar amb una alçada concreta la part fixa de la guitarra (per defecte 1)
-
-- en cas de no tenir composer cal fer servir els valors de extension per generar el llençol
-- en cas de tenir perfil no se que passa.......
 */
 
 

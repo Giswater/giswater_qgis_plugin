@@ -98,11 +98,11 @@ BEGIN
 		FOR v_tablename IN SELECT table_name FROM information_schema.tables WHERE table_schema=v_schemaname and substring(table_name,1 , 1) = '_' 
 		LOOP
 			EXECUTE 'DROP TABLE IF EXISTS '||v_tablename.table_name||' CASCADE';
-		END LOOP
+		END LOOP;
 		
 		-- drop deprecated variables
-		DELETE FROM config_param_system WHERE isdeprecated = true;
-		DELETE FROM audit_cat_param_user WHERE isdeprecated = true;
+		DELETE FROM config_param_system WHERE isdeprecated ='true';
+		DELETE FROM audit_cat_param_user WHERE isdeprecated is true;
 		
 		-- drop deprecated views
 		IF v_projecttype = 'WS' THEN 
