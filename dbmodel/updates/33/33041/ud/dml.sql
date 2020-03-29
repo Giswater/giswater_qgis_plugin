@@ -28,7 +28,7 @@ ON CONFLICT (parameter) DO NOTHING;
 
 INSERT INTO config_param_system (parameter, value, context, descript, label, isenabled, layout_order, project_type, datatype, widgettype, ismandatory, isdeprecated)
 VALUES ('profile_guitartext',
-'{"arc":"SELECT arc_id AS arc_id, concat(matcat_id,''-Ø'',(c.geom1*100)::integer) as catalog, concat((100*slope)::numeric(12,2),''%-'',gis_length::numeric(12,2),''m'') as dimensions , arc_id as code FROM v_edit_arc JOIN cat_arc c ON id = arccat_id",
+'{"arc":"SELECT arc_id AS arc_id, concat(matcat_id,''-Ø'',(c.geom1*100)::integer) as catalog, concat((100*slope)::numeric(12,2),''-'',gis_length::numeric(12,2),''m'') as dimensions , arc_id as code FROM v_edit_arc JOIN cat_arc c ON id = arccat_id",
 "node":"SELECT node_id AS node_id, sys_top_elev as top_elev, sys_elev as elev, ymax AS ymax code as code FROM v_edit_node"}',
 'system', 'Profile stylesheet', 'Profile guitar stylesheet configuration', TRUE, null, 'ud', 'json', 'linetext', true, false) 
 ON CONFLICT (parameter) DO NOTHING;

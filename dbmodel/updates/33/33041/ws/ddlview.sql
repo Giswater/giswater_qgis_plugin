@@ -84,20 +84,26 @@ CREATE OR REPLACE VIEW v_arc_x_vnode AS
     (a.length * a.locate::double precision)::numeric(12,3) AS vnode_distfromnode1,
     (a.length * (1::numeric - a.locate)::double precision)::numeric(12,3) AS vnode_distfromnode2,
 	case when vnode_topelev IS NULL THEN (a.elevation1 - a.locate * (a.elevation1 - a.elevation2))::numeric(12,3) 
-	ELSE vnode_topelev END AS vnode_topelev
+	ELSE vnode_topelev END AS vnode_topelev,
+	(a.depth1 - a.locate * (a.depth1 - a.depth2))::numeric(12,3) AS vnode_ymax,
+	(a.elev1 - a.locate * (a.elev1 - a.elev2))::numeric(12,3) AS vnode_elev
     FROM ( SELECT 
-			link_id,
-			vnode.vnode_id,
+	    link_id,
+            vnode.vnode_id,
             v_arc.arc_id,
             a_1.feature_type,
             a_1.feature_id,
-			vnode_topelev,
+	    vnode_topelev,
             st_length(v_arc.the_geom) AS length,
             st_linelocatepoint(v_arc.the_geom, vnode.the_geom)::numeric(12,3) AS locate,
             v_arc.node_1,
             v_arc.node_2,
             v_arc.elevation1,
-            v_arc.elevation2
+            v_arc.elevation2,
+            v_arc.depth1,
+            v_arc.depth2,
+	    v_arc.elevation1 - v_arc.depth1 as elev1,
+            v_arc.elevation2 - v_arc.depth2 as elev2
            FROM v_arc,vnode
              JOIN v_edit_link a_1 ON vnode.vnode_id = a_1.exit_id::integer
           WHERE st_dwithin(v_arc.the_geom, vnode.the_geom, 0.01::double precision) AND v_arc.state > 0 AND vnode.state > 0) a

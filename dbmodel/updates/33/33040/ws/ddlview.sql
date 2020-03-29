@@ -257,7 +257,7 @@ CREATE OR REPLACE VIEW vu_arc AS
     arc.comment,
     st_length2d(arc.the_geom)::numeric(12,2) AS gis_length,
     arc.custom_length,
-	arc.minsector_id,
+    arc.minsector_id,
     arc.dma_id,
     dma.macrodma_id,
     arc.presszonecat_id,

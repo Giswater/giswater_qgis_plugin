@@ -149,7 +149,8 @@ BEGIN
 	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'widgettype' = 'image' 
 	LOOP
       		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'imageVal', COALESCE((aux_json->>'queryText'), ''));
-      		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT], 'queryText', 'orderById', 'isNullValue', 'parentId', 'queryTextFilter');
+      		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT], 
+      		'queryText', 'orderById', 'isNullValue', 'parentId', 'queryTextFilter');
 	END LOOP;
 		
 	-- combo no childs	
@@ -272,13 +273,14 @@ BEGIN
 	-- for the rest of widgets removing the not used keys
 	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'widgettype' NOT IN ('image', 'combo', 'typeahead')
 	LOOP
-		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT], 'queryText', 'orderById', 'isNullValue', 'parentId', 'queryTextFilter');
+		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT], 
+		'queryText', 'orderById', 'isNullValue', 'parentId', 'queryTextFilter');
 	END LOOP;
 	
 	-- Convert to json
 	fields := array_to_json(fields_array);
 	
-	PERFORM gw_fct_debug(concat('{"data":{"msg":"<---- OUTPUT FOR gw_api_get_formfields: ", "variables":"',fields,'"}}')::json);
+	PERFORM gw_fct_debug(concat('{"data":{"msg":"<---- OUTPUT FOR gw_api_get_formfields: ", "variables":""}}')::json);
 	 
 	-- Return
 	RETURN fields_array;
