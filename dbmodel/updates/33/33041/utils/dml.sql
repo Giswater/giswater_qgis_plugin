@@ -14,7 +14,7 @@ VALUES ('om_profile', 'O&M', 'Table to store profiles', 'role_om', 0, 'role_om',
 ON CONFLICT (id) DO NOTHING;
 
 UPDATE audit_cat_table SET isdeprecated = true 
-WHERE id IN ('anl_arc_profile_value','v_edit_vnode');
+WHERE id IN ('anl_arc_profile_value');
 
 INSERT INTO sys_fprocess_cat(id, fprocess_name, context, project_type)
 VALUES (122,'Profile analysis','om','utils') ON CONFLICT (id) DO NOTHING;

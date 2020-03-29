@@ -337,8 +337,10 @@ BEGIN
 		END IF;
 		
 
-		INSERT INTO link (link_id, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom)
-		VALUES (NEW.link_id, NEW.feature_type, NEW.feature_id, NEW.expl_id, NEW.exit_id, NEW.exit_type, TRUE, NEW.state, NEW.the_geom);
+		INSERT INTO link (link_id, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, 
+		state, the_geom, vnode_topelev)
+		VALUES (NEW.link_id, NEW.feature_type, NEW.feature_id, NEW.expl_id, NEW.exit_id, NEW.exit_type, TRUE,
+		NEW.state, NEW.the_geom, NEW.vnode_topelev );
 		
 		RETURN NEW;
 		
@@ -347,7 +349,8 @@ BEGIN
 		IF NEW.ispsectorgeom IS FALSE THEN -- if geometry comes from link table
 
 			IF st_equals (OLD.the_geom, NEW.the_geom) IS FALSE THEN
-				UPDATE link SET userdefined_geom='TRUE', exit_id = NEW.exit_id , exit_type = NEW.exit_type, the_geom=NEW.the_geom WHERE link_id=NEW.link_id;
+				UPDATE link SET userdefined_geom='TRUE', exit_id = NEW.exit_id , exit_type = NEW.exit_type, 
+				the_geom=NEW.the_geom vnode_topelev = NEW.vnode_topelev WHERE link_id=NEW.link_id;
 				UPDATE vnode SET the_geom=St_endpoint(NEW.the_geom) WHERE vnode_id=NEW.exit_id::integer;
 			END IF;
 						

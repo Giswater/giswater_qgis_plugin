@@ -17,7 +17,7 @@ ON CONFLICT (parameter) DO NOTHING;
 
 INSERT INTO config_param_system (parameter, value, context, descript, label, isenabled, layout_order, project_type, datatype, widgettype, ismandatory, isdeprecated)
 VALUES ('profile_stylesheet',
-'{"guitartext":{"color":black, "italic":true, "bold":true},"legendtext":{"color":black, "italic":true, "bold":true},"scaletext":{"color":black, "height":10, "italic":true, "bold":true}",
+'{"guitartext":{"color":"black", "italic":true, "bold":true},"legendtext":{"color":"black", "italic":true, "bold":true},"scaletext":{"color":"black", "height":10, "italic":true, "bold":true},
 "ground":{"color":"black", "width":0.2}, "infra":{"color":"black", "width":0.2}, "guitar":{"color":"black", "width":0.2}, "estimated":{"color":"black", "width":0.2}}'::json, 
 'system', 'Profile stylesheet', 'Profile guitar stylesheet configuration', TRUE, null, 'ud', 'json', 'linetext', true, false) 
 ON CONFLICT (parameter) DO NOTHING;

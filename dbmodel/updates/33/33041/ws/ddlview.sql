@@ -39,6 +39,7 @@ CREATE OR REPLACE VIEW v_edit_link AS
             sector.macrosector_id,
             arc.dma_id,
 			vnode_topelev,
+			fluid_type,
             dma.macrodma_id,
             arc.expl_id,
                 CASE
@@ -110,3 +111,52 @@ CREATE OR REPLACE VIEW v_arc_x_vnode AS
           WHERE st_dwithin(v_edit_arc.the_geom, vnode.the_geom, 0.01::double precision) AND v_edit_arc.state > 0 AND vnode.state > 0) a
   ORDER BY a.arc_id, a.node_2 DESC;
 
+
+CREATE OR REPLACE VIEW v_edit_vnode AS 
+ SELECT a.vnode_id,
+    a.vnode_type,
+    a.feature_type,
+    a.elev,
+    a.sector_id,
+    a.dma_id,
+    a.state,
+    a.annotation,
+    a.the_geom,
+    a.expl_id,
+    a.rotation,
+    a.ispsectorgeom,
+    a.psector_rowid
+   FROM ( SELECT DISTINCT ON (vnode.vnode_id) vnode.vnode_id,
+            vnode.vnode_type,
+            link.feature_type,
+            vnode.elev,
+            vnode.sector_id,
+            vnode.dma_id,
+                CASE
+                    WHEN plan_psector_x_connec.vnode_geom IS NULL THEN link.state
+                    ELSE plan_psector_x_connec.state
+                END AS state,
+            vnode.annotation,
+                CASE
+                    WHEN plan_psector_x_connec.vnode_geom IS NULL THEN vnode.the_geom
+                    ELSE plan_psector_x_connec.vnode_geom
+                END AS the_geom,
+            vnode.expl_id,
+            vnode.rotation,
+                CASE
+                    WHEN plan_psector_x_connec.link_geom IS NULL THEN false
+                    ELSE true
+                END AS ispsectorgeom,
+                CASE
+                    WHEN plan_psector_x_connec.link_geom IS NULL THEN NULL::integer
+                    ELSE plan_psector_x_connec.id
+                END AS psector_rowid
+           FROM v_edit_link link
+             JOIN vnode ON link.exit_id::text = vnode.vnode_id::text AND link.exit_type::text = 'VNODE'::text
+             LEFT JOIN v_state_connec ON link.feature_id::text = v_state_connec.connec_id::text
+             LEFT JOIN plan_psector_x_connec USING (arc_id, connec_id)
+          WHERE link.feature_id::text = v_state_connec.connec_id::text) a
+  WHERE a.state < 2;
+
+ALTER TABLE v_edit_vnode
+  OWNER TO postgres;

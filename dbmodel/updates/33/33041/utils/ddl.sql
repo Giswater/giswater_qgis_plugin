@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-create table IF NOT EXITS om_profile (
+create table IF NOT EXISTS om_profile (
 profile_id text PRIMARY KEY,
 values json);
 

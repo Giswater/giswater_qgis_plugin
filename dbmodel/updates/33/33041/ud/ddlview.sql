@@ -38,6 +38,7 @@ CREATE OR REPLACE VIEW v_edit_link AS
             link.exit_type,
             link.exit_id,
             link.vnode_topelev,
+			fluid_type,
             arc.sector_id,
             arc.dma_id,
             arc.expl_id,
@@ -78,6 +79,7 @@ CREATE OR REPLACE VIEW v_edit_link AS
             link.exit_type,
             link.exit_id,
             link.vnode_topelev,
+			fluid_type,
             arc.sector_id,
             arc.dma_id,
             arc.expl_id,
@@ -111,6 +113,7 @@ CREATE OR REPLACE VIEW v_edit_link AS
           WHERE link.feature_id::text = v_state_gully.gully_id::text) a
   WHERE a.state < 2;
 
+DROP VIEW IF EXISTS v_arc_x_vnode;
 CREATE OR REPLACE VIEW v_arc_x_vnode AS 
  SELECT 
     link_id,
@@ -148,4 +151,82 @@ CREATE OR REPLACE VIEW v_arc_x_vnode AS
              JOIN v_edit_link a_1 ON vnode.vnode_id = a_1.exit_id::integer
           WHERE st_dwithin(v_edit_arc.the_geom, vnode.the_geom, 0.01::double precision) AND v_edit_arc.state > 0 AND vnode.state > 0) a
   ORDER BY a.arc_id, a.node_2 DESC;
+
+
+CREATE OR REPLACE VIEW v_edit_vnode AS 
+ SELECT a.vnode_id,
+    a.vnode_type,
+    a.feature_type,
+    a.top_elev,
+    a.sector_id,
+    a.dma_id,
+    a.state,
+    a.annotation,
+    a.the_geom,
+    a.expl_id,
+    a.rotation,
+    a.ispsectorgeom,
+    a.psector_rowid
+   FROM ( SELECT DISTINCT ON (vnode.vnode_id) vnode.vnode_id,
+            vnode.vnode_type,
+            link.feature_type,
+            vnode.top_elev,
+            vnode.sector_id,
+            vnode.dma_id,
+                CASE
+                    WHEN plan_psector_x_connec.vnode_geom IS NULL THEN link.state
+                    ELSE plan_psector_x_connec.state
+                END AS state,
+            vnode.annotation,
+                CASE
+                    WHEN plan_psector_x_connec.vnode_geom IS NULL THEN vnode.the_geom
+                    ELSE plan_psector_x_connec.vnode_geom
+                END AS the_geom,
+            vnode.expl_id,
+            vnode.rotation,
+                CASE
+                    WHEN plan_psector_x_connec.link_geom IS NULL THEN false
+                    ELSE true
+                END AS ispsectorgeom,
+                CASE
+                    WHEN plan_psector_x_connec.link_geom IS NULL THEN NULL::integer
+                    ELSE plan_psector_x_connec.id
+                END AS psector_rowid
+           FROM v_edit_link link
+             JOIN vnode ON link.exit_id::text = vnode.vnode_id::text AND link.exit_type::text = 'VNODE'::text
+             LEFT JOIN v_state_connec ON link.feature_id::text = v_state_connec.connec_id::text
+             LEFT JOIN plan_psector_x_connec USING (arc_id, connec_id)
+          WHERE link.feature_id::text = v_state_connec.connec_id::text
+        UNION
+         SELECT DISTINCT ON (vnode.vnode_id) vnode.vnode_id,
+            vnode.vnode_type,
+            link.feature_type,
+            vnode.top_elev,
+            vnode.sector_id,
+            vnode.dma_id,
+                CASE
+                    WHEN plan_psector_x_gully.vnode_geom IS NULL THEN link.state
+                    ELSE plan_psector_x_gully.state
+                END AS state,
+            vnode.annotation,
+                CASE
+                    WHEN plan_psector_x_gully.vnode_geom IS NULL THEN vnode.the_geom
+                    ELSE plan_psector_x_gully.vnode_geom
+                END AS the_geom,
+            vnode.expl_id,
+            vnode.rotation,
+                CASE
+                    WHEN plan_psector_x_gully.link_geom IS NULL THEN false
+                    ELSE true
+                END AS ispsectorgeom,
+                CASE
+                    WHEN plan_psector_x_gully.link_geom IS NULL THEN NULL::integer
+                    ELSE plan_psector_x_gully.id
+                END AS psector_rowid
+           FROM v_edit_link link
+             JOIN vnode ON link.exit_id::text = vnode.vnode_id::text AND link.exit_type::text = 'VNODE'::text
+             LEFT JOIN v_state_gully ON link.feature_id::text = v_state_gully.gully_id::text
+             LEFT JOIN plan_psector_x_gully USING (arc_id, gully_id)
+          WHERE link.feature_id::text = v_state_gully.gully_id::text) a
+  WHERE a.state < 2;
 

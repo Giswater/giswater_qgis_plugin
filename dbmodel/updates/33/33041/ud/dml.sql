@@ -10,7 +10,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2020/03/28
 INSERT INTO om_profile (profile_id, values)
-SELECT distinct on (profile_id) profile_id, concat('{"initNode":"',start_point, '", "endNode":"', end_point,'"}') 
+SELECT distinct on (profile_id) profile_id, (concat('{"initNode":"',start_point, '", "endNode":"', end_point,'"}'))::json
 FROM _anl_arc_profile_value_;
 
 INSERT INTO config_param_system (parameter, value, context, descript, label, isenabled, layout_order, project_type, datatype, widgettype, ismandatory, isdeprecated)
@@ -21,7 +21,7 @@ ON CONFLICT (parameter) DO NOTHING;
 
 INSERT INTO config_param_system (parameter, value, context, descript, label, isenabled, layout_order, project_type, datatype, widgettype, ismandatory, isdeprecated)
 VALUES ('profile_stylesheet',
-'{"guitarText":{"color":black, "italic":true, "bold":true},"legendText":{"color":black, "italic":true, "bold":true},"scaleText":{"color":black, "height":10, "italic":true, "bold":true}",
+'{"guitarText":{"color":"black", "italic":true, "bold":true},"legendText":{"color":"black", "italic":true, "bold":true},"scaleText":{"color":"black", "height":10, "italic":true, "bold":true},
 "ground":{"color":"black", "width":0.2}, "infra":{"color":"black", "width":0.2}, "guitar":{"color":"black", "width":0.2}, "estimated":{"color":"black", "width":0.2}}'::json, 
 'system', 'Profile stylesheet', 'Profile guitar stylesheet configuration', TRUE, null, 'ud', 'json', 'linetext', true, false) 
 ON CONFLICT (parameter) DO NOTHING;
