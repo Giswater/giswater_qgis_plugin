@@ -11,6 +11,13 @@ create table IF NOT EXISTS om_profile (
 profile_id text PRIMARY KEY,
 values json);
 
+-- refactor config_param_system.isdeprecated to boolean
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_param_system", "column":"isdep", "dataType":"boolean"}}$$);
+UPDATE config_param_system SET isdep = isdeprecated::boolean;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_param_system", "column":"isdeprecated"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"config_param_system", "column":"isdep", "newName":"isdeprecated"}}$$);
+
+
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"vnode_topelev", "dataType":"float"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_arc", "column":"node_1", "dataType":"character varying(16)"}}$$);

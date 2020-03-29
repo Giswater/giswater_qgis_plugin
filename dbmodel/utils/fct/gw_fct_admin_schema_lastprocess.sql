@@ -101,7 +101,7 @@ BEGIN
 		END LOOP;
 		
 		-- drop deprecated variables
-		DELETE FROM config_param_system WHERE isdeprecated ='true';
+		DELETE FROM config_param_system WHERE isdeprecated is true;
 		DELETE FROM audit_cat_param_user WHERE isdeprecated is true;
 		
 		-- drop deprecated views

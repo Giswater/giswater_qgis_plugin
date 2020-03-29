@@ -35,8 +35,6 @@ UPDATE config_param_system SET isdeprecated = true where parameter in
 ('expl_layer','expl_field_code','expl_field_name','scale_zoom','street_layer','street_field_code','street_field_name','portal_layer',
 'portal_field_code','portal_field_number','portal_field_postal','street_field_expl');
 
-UPDATE config_param_system SET isdeprecated = false where isdeprecated is null;
-
 INSERT INTO audit_cat_param_user (id, formname, descript, sys_role_id, idval, label, dv_querytext, dv_parent_id, isenabled, layout_order, project_type, 
 isparent, dv_querytext_filterc, feature_field_id, feature_dv_parent_value, isautoupdate, datatype, widgettype, ismandatory, widgetcontrols, 
 vdefault, layoutname, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, placeholder, isdeprecated) 
@@ -46,3 +44,26 @@ false, NULL, NULL, NULL,  null, 'json', 'linetext', true, NULL,
 "ground":{"color":"black", "width":0.2}, "infra":{"color":"black", "width":0.2}, "guitar":{"color":"black", "width":0.2}, "estimated":{"color":"black", "width":0.2}}'::json, 
 'lyt_om', true, NULL, NULL, NULL, NULL, false)
 ON conflict (id) DO NOTHING;
+
+
+-- update values on config_param_system and audit_cat_param_user
+
+UPDATE config_param_system SET isdeprecated = false where isdeprecated is null;
+UPDATE config_param_system SET project_type = 'utils' where project_type is null;
+UPDATE config_param_system SET context = 'api', datatype = 'text', descript='Api Version', label='Api Version' where parameter = 'ApiVersion';
+UPDATE config_param_system SET dv_isparent = null, isautoupdate = null, datatype = 'json'  where parameter = 'edit_replace_doc_folderpath';
+UPDATE config_param_system SET ismandatory = false where layoutname is  not null and ismandatory is null;
+UPDATE config_param_system SET dv_isparent = false where layoutname is  not null and dv_isparent is null;
+UPDATE config_param_system SET isautoupdate = false where layoutname is  not null and isautoupdate is null;
+UPDATE config_param_system SET datatype = 'json' where parameter  IN ('api_search_muni', 'api_search_gully');
+UPDATE config_param_system SET widgettype = null, ismandatory = null, layout_order = null WHERE layoutname is null;
+UPDATE config_param_system SET context = 'api' where parameter  IN ('api_search_exploitation');
+UPDATE config_param_system SET context = 'api', descript = 'Api configuration parameteres' where context IN ('api_search_network', 'api_search_workcat', 'api_search_adress');
+UPDATE config_param_system SET descript = 'Variable to configure prefix on subcathcments' where parameter = 'inp_subc_seq_id_prefix';
+UPDATE config_param_system SET isenabled = true where isenabled is null;
+
+UPDATE audit_cat_param_user SET project_type = 'utils' where project_type is null;
+UPDATE audit_cat_param_user SET isenabled = true where isenabled is null;
+UPDATE audit_cat_param_user SET isdeprecated = false where isdeprecated is null;
+UPDATE audit_cat_param_user SET project_type = 'utils' where project_type is null;
+UPDATE audit_cat_param_user SET isenabled = true where isenabled is null;
