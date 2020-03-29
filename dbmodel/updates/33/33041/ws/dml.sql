@@ -16,19 +16,11 @@ VALUES ('profile_guitarlegend',
 ON CONFLICT (parameter) DO NOTHING;
 
 INSERT INTO config_param_system (parameter, value, context, descript, label, isenabled, layout_order, project_type, datatype, widgettype, ismandatory, isdeprecated)
-VALUES ('profile_stylesheet',
-'{"guitartext":{"color":"black", "italic":true, "bold":true},"legendtext":{"color":"black", "italic":true, "bold":true},"scaletext":{"color":"black", "height":10, "italic":true, "bold":true},
-"ground":{"color":"black", "width":0.2}, "infra":{"color":"black", "width":0.2}, "guitar":{"color":"black", "width":0.2}, "estimated":{"color":"black", "width":0.2}}'::json, 
-'system', 'Profile stylesheet', 'Profile guitar stylesheet configuration', TRUE, null, 'ud', 'json', 'linetext', true, false) 
-ON CONFLICT (parameter) DO NOTHING;
-
-INSERT INTO config_param_system (parameter, value, context, descript, label, isenabled, layout_order, project_type, datatype, widgettype, ismandatory, isdeprecated)
 VALUES ('profile_guitartext',
 '{"arc":"SELECT	arc_id AS arc_id, arccat_id as catalog, concat((100*(elevation1-elevation2)/gis_length)::numeric(12,2),'%-',gis_length::numeric(12,2),'m') as dimensions , arc_id as code FROM v_edit_arc",
 "node":"SELECT node_id AS node_id, elevation as top_elev, elevation-depth AS elev, depth AS depth, code AS code FROM v_edit_node"}',
 'system', 'Profile profile_guitartext', 'Profile guitar stylesheet configuration', TRUE, null, 'ud', 'json', 'linetext', true, false) 
 ON CONFLICT (parameter) DO NOTHING;
-
 
 INSERT INTO config_param_system (parameter, value, context, descript, label, isenabled, layout_order, project_type, datatype, widgettype, ismandatory, isdeprecated)
 VALUES ('profile_vdefault', 

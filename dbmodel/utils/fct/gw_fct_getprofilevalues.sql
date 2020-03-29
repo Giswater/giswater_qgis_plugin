@@ -139,7 +139,7 @@ BEGIN
 
 	-- get systemvalues
 	SELECT value INTO v_guitarlegend FROM config_param_system WHERE parameter = 'profile_guitarlegend';
-	SELECT value INTO v_stylesheet FROM config_param_system WHERE parameter = 'profile_stylesheet';
+	SELECT value INTO v_stylesheet FROM config_param_user WHERE parameter = 'profile_stylesheet' AND cur_user = current_user;
 	SELECT value::json->>'arc' INTO v_textarc FROM config_param_system WHERE parameter = 'profile_guitartext';
 	SELECT value::json->>'node' INTO v_textnode FROM config_param_system WHERE parameter = 'profile_guitartext';
 	SELECT value INTO v_vdefault FROM config_param_system WHERE parameter = 'profile_vdefault';

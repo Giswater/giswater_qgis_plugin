@@ -34,4 +34,12 @@ UPDATE config_param_system SET isdeprecated = true where parameter in
 
 UPDATE config_param_system SET isdeprecated = false where isdeprecated is null;
 
-
+INSERT INTO audit_cat_param_user (id, formname, description, sys_role_id, idval, label, dv_querytext, dv_parent_id, isenabled, layout_order, project_type, 
+isparent, dv_querytext_filterc, feature_field_id, feature_dv_parent_value, isautoupdate, datatype, widgettype, 
+ismandatory, widgetcontrols, vdefault, layoutname, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, placeholder, isdeprecated) 
+VALUES ('profile_stylesheet', 'hidden', 'Parameter to customize stylesheet for profile tool', 'role_om', NULL, 'Profile stylesheet', NULL, NULL, true, 10, 'utils', 
+false, NULL, NULL, NULL, , null, null, 'json', 'linetext', true, NULL, 
+'{"guitartext":{"color":"black", "italic":true, "bold":true},"legendtext":{"color":"black", "italic":true, "bold":true},"scaletext":{"color":"black", "height":10, "italic":true, "bold":true},
+"ground":{"color":"black", "width":0.2}, "infra":{"color":"black", "width":0.2}, "guitar":{"color":"black", "width":0.2}, "estimated":{"color":"black", "width":0.2}}'::json, 
+lyt_om, true, NULL, NULL, NULL, NULL, false)
+ON conflict (id) DO NOTHING;
