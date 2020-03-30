@@ -16,9 +16,7 @@ $BODY$
 /*
 
 SELECT SCHEMA_NAME.gw_fct_om_visit_multiplier($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
-"form":{"},
-"feature":{"id":2345}}$$)
+"client":{"device":3, "infoType":100, "lang":"ES"}, "feature":{"id":2345}}$$)
 
 */
 
@@ -45,11 +43,7 @@ BEGIN
 
 	-- get input data
 	v_visitid :=  ((p_data ->>'feature')::json->>'id')::integer;
-	
-	--test
-	v_return = '{"text":"test"}';
-
-    
+	   
 	-- looking for all node features relateds to visit
 	FOR v_feature IN SELECT * FROM om_visit_x_node WHERE visit_id=v_visitid
 	LOOP 
@@ -79,7 +73,7 @@ BEGIN
 				INSERT INTO om_visit_event_photo (visit_id, event_id, tstamp, value, text, compass) 
 				VALUES (v_idlast, v_eventlast, v_photo.tstamp, v_photo.value, v_photo.text, v_photo.compass);
 			END LOOP;
-		END LOOP;
+		END LOOP;		
 	END LOOP;
 
 	-- looking for all arc features relateds to visit
