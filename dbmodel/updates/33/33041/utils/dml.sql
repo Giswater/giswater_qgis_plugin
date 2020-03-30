@@ -67,3 +67,23 @@ UPDATE audit_cat_param_user SET isenabled = true where isenabled is null;
 UPDATE audit_cat_param_user SET isdeprecated = false where isdeprecated is null;
 UPDATE audit_cat_param_user SET project_type = 'utils' where project_type is null;
 UPDATE audit_cat_param_user SET isenabled = true where isenabled is null;
+
+-- insert triggers into audit_cat_function in order to preserve id (created in 3.1.132)
+
+INSERT INTO audit_cat_function VALUES (2834, 'gw_trg_edit_team_x_user', 'utils', 'function trigger', NULL, NULL, NULL, 'Makes editable v_om_user_x_team', 'role_om', false) 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_function VALUES (2836, 'gw_trg_edit_team_x_visitclass', 'utils', 'function trigger', NULL, NULL, NULL, 'Makes editable v_om_team_x_visitclass', 'role_om', false) 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_function VALUES (2838, 'gw_trg_edit_cat_team', 'utils', 'function trigger', NULL, NULL, NULL, 'Makes editable v_edit_cat_team', 'role_om', false) 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_function VALUES (2840, 'gw_trg_edit_cat_vehicle', 'utils', 'function trigger', NULL, NULL, NULL, 'Makes editable v_ext_cat_vehicle', 'role_om', false) 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_function VALUES (2842, 'gw_trg_edit_lot_x_user', 'utils', 'function trigger', NULL, NULL, NULL, 'Makes editable v_om_lot_x_user', 'role_om', false) 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_function VALUES (2844, 'gw_trg_edit_team_x_vehicle', 'utils', 'function trigger', NULL, NULL, NULL, 'Makes editable v_om_team_x_vehicle', 'role_om', false) 
+ON CONFLICT (id) DO NOTHING;
