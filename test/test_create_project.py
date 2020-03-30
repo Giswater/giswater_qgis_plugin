@@ -1,7 +1,6 @@
 from qgis.core import QgsApplication, QgsProviderRegistry
 from qgis.PyQt.QtWidgets import QApplication, QDialog
 import os
-import uic
 import sys
 from test_giswater import TestGiswater
 from actions.create_gis_project import CreateGisProject
@@ -20,7 +19,7 @@ class QgisInterfaceDummy(object):
         return dummy
 
 
-class TestQgis(QApplication):
+class TestQgis():
 
     def __init__(self):
 
@@ -238,30 +237,8 @@ def test_create_gis_project_ui():
     print(status)
 
 
-def get_ui_class(ui_file_name, subfolder=None):
-    """ Get UI Python class from @ui_file_name """
-
-    # Folder that contains UI files
-    ui_folder_path = os.path.dirname(os.path.dirname(__file__)) + os.sep + 'ui'
-    if subfolder:
-        ui_folder_path += os.sep + subfolder
-    ui_file_path = os.path.abspath(os.path.join(ui_folder_path, ui_file_name))
-
-    return uic.loadUiType(ui_file_path)[0]
-
-
-def test_ui():
-
-    app = QApplication(sys.argv)
-    my_main = mc.matc_main.MyMainClass(app)
-    my_main.main_window_qmainwindow.show()
-    my_qapplication.exec_()
-    #sys.exit(my_qapplication.exec_())
-
-
 if __name__ == '__main__':
     print("MAIN")
-    #test = TestQgis()
-    #test.test_ui('ud')
-    test_ui()
+    test = TestQgis()
+    test.create_project('ud')
 

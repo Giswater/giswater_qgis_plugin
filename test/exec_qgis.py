@@ -9,7 +9,7 @@ import pytest
 import pytestqt
 
 import first_plugin
-#from test_giswater import TestGiswater
+from .test_giswater import TestGiswater
 
 
 # dummy instance to replace qgis.utils.iface
