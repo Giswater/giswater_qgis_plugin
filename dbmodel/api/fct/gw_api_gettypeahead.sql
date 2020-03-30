@@ -31,10 +31,14 @@ SELECT SCHEMA_NAME.gw_api_gettypeahead($${
 "data":{"queryText":"SELECT id AS id, id AS idval FROM cat_arc WHERE id IS NOT NULL",
 	"textToSearch":"FC"}}$$)
 	
-SELECT gw_api_gettypeahead($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, 
+SELECT SCHEMA_NAME.gw_api_gettypeahead($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, 
 "queryText":"SELECT id AS id, a.name AS idval FROM ext_streetaxis a JOIN ext_municipality m USING (muni_id) WHERE id IS NOT NULL", 
-"queryTextFilter":"AND a.name", "parentId":"muni_id", "parentValue":"Sant Boi del Llobregat", "textToSearch":"A"}}$$);
-	
+"queryTextFilter":"AND m.name", "parentId":"muni_id", "parentValue":"", "textToSearch":"Ave"}}$$);
+
+SELECT SCHEMA_NAME.gw_api_gettypeahead($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, 
+"queryText":"SELECT a.postnumber AS id, a.postnumber AS idval FROM ext_address a JOIN ext_streetaxis m ON streetaxis_id=m.id WHERE a.id IS NOT NULL", 
+"queryTextFilter":"AND m.name", "parentId":"streetname", "parentValue":"Avenida de Aragó", "textToSearch":"1"}}$$);
+
 */
 
 DECLARE
@@ -64,6 +68,11 @@ BEGIN
 	v_parentvalue :=  ((p_data ->>'data')::json->>'parentValue')::text;
 	v_textosearch :=  ((p_data ->>'data')::json->>'textToSearch')::text;
 	v_textosearch := concat('%',v_textosearch,'%');
+
+	-- control nulls for parent mapzone hidden (muni_id) the only parent mapzone with typeahead childs
+	IF v_parentvalue = '' AND v_parent = 'muni_id' THEN
+		v_parentvalue =  (SELECT name FROM ext_municipality WHERE active IS TRUE LIMIT 1);
+	END IF;
 
 	-- building query text
 	IF v_parent IS NULL OR v_querytextparent IS NULL OR v_parentvalue IS NULL OR v_querytextparent = '' THEN
