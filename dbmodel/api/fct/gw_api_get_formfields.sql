@@ -80,7 +80,7 @@ BEGIN
 	v_debug = concat ('formname:', p_formname, ', formtype:', p_formtype ,', tabname:', p_tabname ,', tablename:', p_tablename , ', idname:', p_idname,
 			', id:' ,p_id ,', columntype:', p_columntype ,', tgop:', p_tgop ,', filterfield:', p_filterfield ,', device:', p_device, ', values_array:' ,p_values_array);
 
-	PERFORM gw_fct_debug(concat('{"data":{"msg":"----> INPUT FOR gw_api_get_formfields: ", "variables":"',v_debug,'"}}')::json);
+	--PERFORM gw_fct_debug(concat('{"data":{"msg":"----> INPUT FOR gw_api_get_formfields: ", "variables":"',v_debug,'"}}')::json);
 
 	-- setting tabname
 	IF p_tabname IS NULL THEN
