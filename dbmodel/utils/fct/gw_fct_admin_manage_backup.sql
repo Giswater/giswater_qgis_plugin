@@ -16,35 +16,35 @@ INSTRUCTIONS
 CREATE, create a backup for all data for related table into temp_table with fprocesscat_id = 111
 RESTORE, delete all rows from original table and restore all rows from backup name. To prevent damages into original table two strategies have been developed:
 	1 - It is mandatory to fill both keys (backupName and table) as as security check
-	2- Before restore the backup , a new backup from original table is created with backupName of concat(tablename, _backup). As result, if you try to restore two times the same table, you will need to delete this system backup before because it wiil exists there.
-DELETE A backup name on temp_table
-	It is mandatory to fill two keys (backupName and table) as as security check.
+	2- Before restore the backup , a new backup from original table is created using the key newBackupName. 
+	As result, if you try to restore and that backup name already exists you will need to delete this system backup before because it will exists there.
+DELETE,a backup name on temp_table. 
+	1- It is mandatory to fill two keys (backupName and table) as as security check.
 	
 EXAMPLE
 -------
-SELECT SCHEMA_NAME.gw_fct_admin_manage_backup ($${"data":{"action":"CREATE", "backupName":"test6", "table":"config_api_form_fields"}}$$)
-SELECT SCHEMA_NAME.gw_fct_admin_manage_backup ($${"data":{"action":"RESTORE", "backupName":"test5", "table":"config_api_form_fields"}}$$)
+SELECT SCHEMA_NAME.gw_fct_admin_manage_backup ($${"data":{"action":"CREATE", "backupName":"test8", "table":"config_api_form_fields"}}$$)
+SELECT SCHEMA_NAME.gw_fct_admin_manage_backup ($${"data":{"action":"RESTORE", "backupName":"test6", "newBackupName":"test5", "table":"config_api_form_fields"}}$$)
 SELECT SCHEMA_NAME.gw_fct_admin_manage_backup ($${"data":{"action":"DELETE", "backupName":"test4","table":"config_api_form_fields" }}$$)
-SELECT SCHEMA_NAME.gw_fct_admin_manage_backup ($${"data":{"action":"DELETE", "backupName":"config_api_form_fields_backup","table":"config_api_form_fields"}}$$)
 */
 
 
 DECLARE 
-	v_querytext text;
-	v_priority integer = 0;
-	v_message text;
-	v_action text;
-	v_backupname text;
-	v_tablename text;
-	v_fields text[];
-	v_field text;
-	v_count int4 = 0;
-	v_schemaname text;
-	v_columntype text;
-	v_bkname text;
-	v_addmessage text;
-	v_tablename_check text;
-	
+v_querytext text;
+v_priority integer = 0;
+v_message text;
+v_action text;
+v_backupname text;
+v_tablename text;
+v_fields text[];
+v_field text;
+v_count int4 = 0;
+v_schemaname text;
+v_columntype text;
+v_addmessage text;
+v_tablename_check text;
+v_newbackupname text;
+		
 BEGIN 
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
@@ -54,12 +54,12 @@ BEGIN
 	-- get input parameters
 	v_action := (p_data ->> 'data')::json->> 'action';
 	v_backupname := (p_data ->> 'data')::json->> 'backupName';
+	v_newbackupname:= (p_data ->> 'data')::json->> 'newBackupName';
 	v_tablename:= (p_data ->> 'data')::json->> 'table';
 
 	IF v_backupname IS NULL OR v_backupname IS NULL OR v_backupname IS NULL THEN
 		RAISE EXCEPTION 'Some mandatory key is missing, action %, backupName %, table %', v_action, v_backupname, v_tablename;
 	END IF;
-	
 
 	IF v_action ='CREATE' THEN
 
@@ -76,39 +76,35 @@ BEGIN
 		
 	ELSIF v_action ='RESTORE' THEN
 
-		-- get table from backup
-		SELECT text_column::json->>'table' INTO v_tablename_check FROM temp_table WHERE text_column::json->>'name' = v_backupname AND fprocesscat_id=111 LIMIT 1;
-
 		-- check consistency on tablename
 		IF v_tablename != v_tablename_check THEN
 			RAISE EXCEPTION 'Backup % has no data related to % table. Please check it before continue', v_backupname, v_tablename;
 		END IF;
 
-		-- create a security backup of previous data on restored table
-		v_bkname = v_tablename||'_backup';
-
-		-- check if previous security backup if exists
-		SELECT count(*) INTO v_count FROM temp_table WHERE text_column::json->>'name' = v_bkname;
-		IF v_count > 0 THEN
-			RAISE EXCEPTION 'Exists another security backup (created by system) for table % called %. Before continue you need to delete it', v_tablename, v_bkname;
-		END IF;
-
+		-- automatic backup creation
 		-- check if backup exists
-		SELECT count(*) INTO v_count FROM temp_table WHERE text_column::json->>'name' = v_backupname;
-		IF v_count = 0 THEN
-			RAISE EXCEPTION 'There is no backup with provided name. Please check it before continue';
+		IF (SELECT count(*) FROM temp_table WHERE text_column::json->>'name' = v_newbackupname ) > 0 THEN
+			RAISE EXCEPTION 'The name for the new backup you are trying to do already exists. Try with other name or delete it before';
 		END IF;
-			
-		v_querytext = 'INSERT INTO temp_table (fprocesscat_id, text_column, addparam) SELECT 111, ''{"name":"'||v_bkname||'", "table":"'||v_tablename||'"}'', row_to_json(row) FROM (SELECT * FROM '||v_tablename||') row';
+
+		v_querytext = 'INSERT INTO temp_table (fprocesscat_id, text_column, addparam) SELECT 111, ''{"name":"'||v_newbackupname||'", "table":"'||v_tablename||'"}'', row_to_json(row) FROM (SELECT * FROM '||v_tablename||') row';
+
+		EXECUTE 'SELECT count(*) FROM '||v_tablename
+			INTO v_count;
+
 		EXECUTE v_querytext;
+
+		-- restore		
+		-- get table from backup
+		SELECT text_column::json->>'table' INTO v_tablename_check FROM temp_table WHERE text_column::json->>'name' = v_backupname AND fprocesscat_id=111 LIMIT 1;
 
 		-- delete table
 		v_querytext = 'DELETE FROM '||v_tablename;
 		EXECUTE v_querytext;
 			
 		-- get fields from table
-		select array_agg(json_keys) into v_fields from (
-		select json_object_keys(addparam) as json_keys from (SELECT addparam FROM temp_table limit 1)a)b;
+		select array_agg(json_keys) into v_fields from ( select json_object_keys(addparam) as json_keys FROM 
+		(SELECT addparam FROM temp_table WHERE fprocesscat_id =111 AND text_column::json->>'name' = v_backupname limit 1)a)b;
 
 		-- build querytext (init)
 		v_querytext = 'INSERT INTO '||v_tablename||' SELECT';
@@ -140,7 +136,9 @@ BEGIN
 
 		RAISE NOTICE 'v_querytext %', v_querytext;
 
-		v_addmessage = 'Previous data from table before retore have been saved on temp_table ( '||v_bkname||' )';
+		v_addmessage = 'Previous data from table before retore have been saved on temp_table <<'||v_newbackupname||'>>';
+
+		RAISE NOTICE 'v_addmessage %', v_addmessage;
 
 	ELSIF v_action= 'DELETE' THEN
 
@@ -155,7 +153,7 @@ BEGIN
 	END IF;
 
 	-- message
-	v_message =  concat ('BACKUP ''',v_backupname,''' for ',v_tablename,' table sucessfully ',v_action,'D. Rows affected: ',v_count, '.', v_addmessage);
+	v_message =  concat ('BACKUP <<',v_backupname,'>> for ',v_tablename,' table sucessfully ',v_action,'D. Rows affected: ',v_count, '.', v_addmessage);
 
 	--    Control NULL's
 	v_message := COALESCE(v_message, '');
