@@ -543,7 +543,6 @@ class ApiCF(ApiParent, QObject):
         btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_cf))
         btn_cancel.clicked.connect(self.roll_back)
         btn_accept.clicked.connect(partial(self.accept, self.dlg_cf, self.complet_result[0], self.my_json, docker=docker))
-
         if docker:
             # Delete las form from memory
             last_info = docker.findChild(GwMainWindow, 'api_cf')
@@ -552,11 +551,9 @@ class ApiCF(ApiParent, QObject):
                 del last_info
 
             self.dock_dialog(docker, self.dlg_cf)
-            docker.dlg_closed.connect(self.roll_back)
-            docker.dlg_closed.connect(partial(self.resetRubberbands))
-            docker.dlg_closed.connect(partial(self.set_vdefault_edition))
-            docker.dlg_closed.connect(lambda: self.layer.disconnect())
-            btn_cancel.clicked.connect(lambda: docker.close())
+            docker.dlg_closed.connect(partial(self.manage_docker_close))
+            btn_cancel.clicked.connect(partial(self.close_docker, docker))
+
         else:
             self.dlg_cf.dlg_closed.connect(self.roll_back)
             self.dlg_cf.dlg_closed.connect(partial(self.resetRubberbands))
@@ -565,11 +562,23 @@ class ApiCF(ApiParent, QObject):
             self.dlg_cf.dlg_closed.connect(lambda: self.layer.disconnect())
             self.dlg_cf.key_pressed.connect(partial(self.close_dialog, self.dlg_cf))
 
+
         # Open dialog
         self.open_dialog(self.dlg_cf, dlg_name='info_full')
         return self.complet_result, self.dlg_cf
 
 
+    def manage_docker_close(self):
+        self.roll_back()
+        self.resetRubberbands()
+        self.set_vdefault_edition()
+        self.layer.disconnect()
+
+
+    def close_docker(self, docker):
+        docker.close()
+
+        
     def get_feature(self, tab_type):
         """ Get current QgsFeature """
 
@@ -876,14 +885,10 @@ class ApiCF(ApiParent, QObject):
         :param close_dialog:
         :return:
         """
-        print(f"D1 -> {docker}")
-        if _json == '' or str(_json) == '{}':
-            print(f"D2 -> {docker}")
-            self.close_dialog(dialog)
 
-            print(f"D3 -> {docker}")
+        if _json == '' or str(_json) == '{}':
+            self.close_dialog(dialog)
             if docker is not None:
-                print(f"D4 -> {docker}")
                 docker.close()
             return
 
@@ -923,6 +928,8 @@ class ApiCF(ApiParent, QObject):
             my_json = json.dumps(_json)
             if my_json == '' or str(my_json) == '{}':
                 self.close_dialog(dialog)
+                if docker is not None:
+                    docker.close()
                 return
             feature = f'"id":"{self.new_feature.attribute(id_name)}", '
 
@@ -935,7 +942,8 @@ class ApiCF(ApiParent, QObject):
         extras = f'"fields":{my_json}, "reload":"{fields_reload}"'
         body = self.create_body(feature=feature, extras=extras)
         result = self.controller.get_json('gw_api_setfields', body, log_sql=True)
-        if not result: return
+        if not result:
+            return
 
         if clear_json:
             _json = {}
@@ -948,15 +956,9 @@ class ApiCF(ApiParent, QObject):
             msg = "FAIL"
             self.controller.show_message(msg, message_level=2)
         if close_dialog:
-            print(f"D22 -> {docker}")
             self.close_dialog(dialog)
-
-            print(f"D33 -> {docker}")
             if docker is not None:
-                print(f"D44 -> {docker}")
                 docker.close()
-
-
 
 
     def get_scale_zoom(self):
