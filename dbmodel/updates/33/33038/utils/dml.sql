@@ -29,7 +29,7 @@ VALUES (119,'Define visit class','edit','utils') ON CONFLICT (id) DO NOTHING;
 
 --2020/03/06
 INSERT INTO config_param_system (parameter, value, context, descript, label, isenabled, project_type, datatype, widgettype, ismandatory, isdeprecated, standardvalue) 
-VALUES ('i18n_update_mode', '0', 'system', 'Manage updates of i18n labels and tooltips. (0: update always owerwriting current values, 1: update only when value is null, 2:newer update}', 
+VALUES ('i18n_update_mode', '1', 'system', 'Manage updates of i18n labels and tooltips. (0: update always owerwriting current values, 1: update only when value is null, 2:newer update}', 
 'Update label & tooltips mode:', TRUE, 'utils', 'integer', 'linetext', true, false, '0') 
 ON CONFLICT (parameter) DO NOTHING;
 
