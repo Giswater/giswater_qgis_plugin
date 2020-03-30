@@ -42,7 +42,6 @@ v_message text;
 v_audit_result text; 
 v_guitarlegend json;
 v_textarc text;
-v_textnode text;
 v_vdefault json;
 v_leaflet json;
 v_composer text;
@@ -110,7 +109,6 @@ BEGIN
 	SELECT value INTO v_guitarlegend FROM config_param_system WHERE parameter = 'profile_guitarlegend';
 	SELECT value INTO v_stylesheet FROM config_param_user WHERE parameter = 'profile_stylesheet' AND cur_user = current_user;
 	SELECT value::json->>'arc' INTO v_textarc FROM config_param_system WHERE parameter = 'profile_guitartext';
-	SELECT value::json->>'node' INTO v_textnode FROM config_param_system WHERE parameter = 'profile_guitartext';
 	SELECT value INTO v_vdefault FROM config_param_system WHERE parameter = 'profile_vdefault';
 	SELECT value::json->>'vs' INTO v_vstext FROM config_param_system WHERE parameter = 'profile_guitarlegend';
   	SELECT value::json->>'hs' INTO v_hstext FROM config_param_system WHERE parameter = 'profile_guitarlegend';
@@ -201,11 +199,10 @@ BEGIN
 
 	-- update descript
 	EXECUTE 'UPDATE anl_arc SET descript = a.descript FROM (SELECT arc_id, (row_to_json(row)) AS descript FROM ('||v_textarc||')row)a WHERE a.arc_id = anl_arc.arc_id';
-	EXECUTE 'UPDATE anl_node SET descript = a.descript FROM (SELECT node_id, (row_to_json(row)) AS descript FROM ('||v_textnode||')row)a WHERE a.node_id = anl_node.node_id';
 	EXECUTE' UPDATE anl_node SET descript = a.descript FROM (SELECT node_id, (row_to_json(row)) AS descript FROM 
-					(SELECT node_id, '||v_ftopelev||' as top_elev, '||v_fymax||' as ymax, elev , code FROM anl_node WHERE fprocesscat_id=122 AND cur_user = current_user)row)a
-					WHERE fprocesscat_id=122 AND cur_user = current_user AND a.node_id = anl_node.node_id AND anl_node.descript IS NULL';
-
+				(SELECT node_id, '||v_ftopelev||' as top_elev, '||v_fymax||' as ymax, elev , code, 
+				total_distance FROM anl_node WHERE fprocesscat_id=122 AND cur_user = current_user)row)a
+				WHERE fprocesscat_id=122 AND cur_user = current_user AND a.node_id = anl_node.node_id';
 	-- delete not used keys
 	UPDATE anl_arc SET descript = gw_fct_json_object_delete_keys(descript::json, 'arc_id') WHERE fprocesscat_id=122 AND cur_user = current_user ;
 	UPDATE anl_node SET descript = gw_fct_json_object_delete_keys(descript::json, 'node_id') WHERE fprocesscat_id=122 AND cur_user = current_user ;
