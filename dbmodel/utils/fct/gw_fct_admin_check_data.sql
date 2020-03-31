@@ -269,7 +269,7 @@ END IF;
 	END IF;
 
 	--check if definitions has duplicated layout_order for different layouts - 
-	SELECT array_agg(a::text) into v_field_array FROM (SELECT concat('Formname: ',formname, ', layoutname: ',layoutname, ', layout_order: ',layout_order)
+	SELECT array_agg(a.list::text) into v_field_array FROM (SELECT concat('Formname: ',formname, ', layoutname: ',layoutname, ', layout_order: ',layout_order) as list
 	FROM config_api_form_fields WHERE formtype = 'feature' AND hidden is false group by layout_order,formname,layoutname having count(id)>1)a;
 
 	IF v_field_array IS NOT NULL THEN
@@ -280,7 +280,7 @@ END IF;
 		FOREACH rec_fields IN ARRAY(v_field_array)
 		LOOP
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-			VALUES (95, 3,  replace(replace(rec_fields::text,'("',''),'")',''));
+			VALUES (95, 3, rec_fields); --replace(replace(rec_fields::text,'("',''),'")',''));
 		END LOOP;
 	ELSE
 		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
