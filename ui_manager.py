@@ -121,6 +121,9 @@ FORM_CLASS = get_ui_class('visit.ui')
 class VisitUi(GwDialog, FORM_CLASS):
     pass
 
+FORM_CLASS = get_ui_class('new_visit.ui')
+class NewVisitUi(GwDialog, FORM_CLASS):
+    pass
 
 FORM_CLASS = get_ui_class('info_basic.ui')
 class ApiBasicInfo(GwDialog, FORM_CLASS):
