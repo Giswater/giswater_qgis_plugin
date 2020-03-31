@@ -60,7 +60,8 @@ v_editability text;
 v_label text;     
 v_clause text;
 v_device text;
-v_debug text;
+v_debug boolean;
+v_debug_var text;
        
 BEGIN
 	-- Set search path to local schema
@@ -76,11 +77,14 @@ BEGIN
 	-- get project type
 	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
 	SELECT value INTO v_bmapsclient FROM config_param_system WHERE parameter = 'api_bmaps_client';
+	SELECT value::boolean INTO v_debug FROM config_param_user WHERE parameter='debug_mode';
 
-	v_debug = concat ('formname:', p_formname, ', formtype:', p_formtype ,', tabname:', p_tabname ,', tablename:', p_tablename , ', idname:', p_idname,
-			', id:' ,p_id ,', columntype:', p_columntype ,', tgop:', p_tgop ,', filterfield:', p_filterfield ,', device:', p_device, ', values_array:' ,p_values_array);
+	IF v_debug = TRUE THEN
+		v_debug_var = (SELECT jsonb_build_object('formname',  p_formname,'formtype',   p_formtype, 'tabname', p_tabname,'tablename', p_tablename, 'idname', p_idname,
+		'id',p_id, 'columntype', p_columntype, 'tgop', p_tgop, 'filterfield', p_filterfield, 'device', p_device, 'values_array', p_values_array	));
 
-	--PERFORM gw_fct_debug(concat('{"data":{"msg":"----> INPUT FOR gw_api_get_formfields: ", "variables":"',v_debug,'"}}')::json);
+		PERFORM gw_fct_debug(concat('{"data":{"msg":"----> INPUT FOR gw_api_get_formfields: ", "variables":',v_debug_var,'}}')::json);
+	END IF;
 
 	-- setting tabname
 	IF p_tabname IS NULL THEN
