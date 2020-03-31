@@ -65,6 +65,7 @@ DROP VIEW IF EXISTS v_edit_man_wjump;
 DROP VIEW IF EXISTS v_edit_man_wwtp;
 DROP VIEW IF EXISTS v_edit_man_wwtp_pol;
 
+DROP VIEW IF EXISTS v_edit_inp_connec;
 DROP VIEW IF EXISTS v_edit_inp_conduit;
 DROP VIEW IF EXISTS v_edit_inp_divider;
 DROP VIEW IF EXISTS v_edit_inp_junction;
@@ -822,6 +823,24 @@ CREATE OR REPLACE VIEW v_edit_inp_conduit AS
 	 JOIN vi_parent_arc USING (arc_id)
 	 JOIN inp_conduit ON v_arc.arc_id::text = inp_conduit.arc_id::text;
 	  
+
+CREATE OR REPLACE VIEW v_edit_inp_connec AS 
+ SELECT connec.connec_id,
+	connec.elevation,
+	connec.depth,
+	connec.connecat_id,
+	connec.arc_id,
+	connec.sector_id,
+	connec.state,
+	connec.state_type,
+	connec.annotation,
+	inp_connec.demand,
+	inp_connec.pattern_id,
+	connec.the_geom
+   FROM inp_selector_sector,
+	connec
+	 JOIN inp_connec USING (connec_id)
+  WHERE connec.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 
 
 CREATE OR REPLACE VIEW v_edit_inp_divider AS 

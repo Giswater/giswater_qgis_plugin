@@ -114,6 +114,6 @@ ON ve_pol_register FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_man_node_pol('man_
 CREATE TRIGGER gw_trg_edit_man_fountain_pol INSTEAD OF INSERT OR UPDATE OR DELETE
 ON ve_pol_fountain FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_man_connec_pol('man_fountain_pol');
 
-
-  
-  
+ 
+CREATE TRIGGER gw_trg_edit_inp_connec INSTEAD OF INSERT OR UPDATE OR DELETE
+ON v_edit_inp_connec FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_connec();
