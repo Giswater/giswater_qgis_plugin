@@ -8,8 +8,7 @@ or (at your option) any later version.
 from qgis.core import QgsEditorWidgetSetup, QgsExpressionContextUtils, QgsFieldConstraints
 from qgis.core import QgsPointLocator, QgsProject, QgsSnappingUtils, QgsTolerance
 from qgis.PyQt.QtCore import QObject, QPoint, QSettings, Qt
-from qgis.PyQt.QtWidgets import QAction, QActionGroup, QApplication, QDockWidget
-from qgis.PyQt.QtWidgets import QMenu, QToolBar, QToolButton
+from qgis.PyQt.QtWidgets import QAction, QActionGroup, QApplication, QDockWidget, QMenu, QToolBar, QToolButton
 from qgis.PyQt.QtGui import QIcon, QKeySequence, QCursor
 
 import configparser
@@ -515,10 +514,10 @@ class Giswater(QObject):
             parser = configparser.RawConfigParser()
             parser.add_section('toolbars_position')
 
-        if len(own_toolbars)==8:
+        if len(own_toolbars) == 8:
             for w in own_toolbars:
                 parser['toolbars_position']['pos_' + str(x)] = (w.property('gw_name') + "," + str(w.x()) + "," + str(w.y()))
-                x+=1
+                x += 1
             with open(path, 'w') as configfile:
                 parser.write(configfile)
                 configfile.close()
@@ -557,15 +556,15 @@ class Giswater(QObject):
         parser.read(path)
         # Call each of the functions that configure the toolbars 'def toolbar_xxxxx(self, toolbar_id, x=0, y=0):'
         for pos, tb in enumerate(toolbar_names):
-            toolbar_id = parser.get("toolbars_position", 'pos_'+str(pos)).split(',')
+            toolbar_id = parser.get("toolbars_position", 'pos_' + str(pos)).split(',')
             if toolbar_id:
-                getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[0], toolbar_id[1], toolbar_id[2])
+                getattr(self, 'toolbar_' + str(toolbar_id[0]))(toolbar_id[0], toolbar_id[1], toolbar_id[2])
 
         # Manage action group of every toolbar
         parent = self.iface.mainWindow()
         for plugin_toolbar in list(self.plugin_toolbars.values()):
             ag = QActionGroup(parent)
-            ag.setProperty('gw_name','gw_QActionGroup')
+            ag.setProperty('gw_name', 'gw_QActionGroup')
             for index_action in plugin_toolbar.list_actions:
                 self.add_action(index_action, plugin_toolbar.toolbar, ag)
 
@@ -624,8 +623,6 @@ class Giswater(QObject):
         self.controller.set_qgis_settings(self.qgis_settings)
         self.controller.set_giswater(self)
 
-        #self.initialize_toolbars()
-
         # Set main information button (always visible)
         self.set_info_button()
 
@@ -683,7 +680,7 @@ class Giswater(QObject):
             dockwidget = self.iface.mainWindow().findChild(QDockWidget, 'Layers')
             toolbar = dockwidget.findChildren(QToolBar)[0]
             # TODO improve this, now remove last action
-            toolbar.removeAction(toolbar.actions()[len(toolbar.actions())-1])
+            toolbar.removeAction(toolbar.actions()[len(toolbar.actions()) - 1])
             self.btn_add_layers = None
 
         # Save toolbar position after unload plugin
@@ -735,7 +732,7 @@ class Giswater(QObject):
     def enable_actions(self, enable=True, start=1, stop=100):
         """ Utility to enable/disable all actions """
 
-        for i in range(start, stop+1):
+        for i in range(start, stop + 1):
             self.enable_action(enable, i)
 
 
@@ -966,7 +963,7 @@ class Giswater(QObject):
 
         self.list_to_hide = []
         try:
-            #db format of value for parameter qgis_toolbar_hidebuttons -> {"index_action":[199, 74,75]}
+            # db format of value for parameter qgis_toolbar_hidebuttons -> {"index_action":[199, 74,75]}
             row = self.controller.get_config('qgis_toolbar_hidebuttons')
             if not row: return
             json_list = json.loads(row[0], object_pairs_hook=OrderedDict)
@@ -1046,7 +1043,7 @@ class Giswater(QObject):
                         child_layers=child_layers, group=None))
                 else:
                     action.triggered.connect(partial(self.add_layer.from_postgres_to_toc,
-                        child_layer[0], "the_geom", child_layer[1]+"_id", None, None))
+                        child_layer[0], "the_geom", child_layer[1] + "_id", None, None))
 
         main_menu.exec_(click_point)
 
@@ -1148,9 +1145,9 @@ class Giswater(QObject):
                 else:
                     self.iface.mapCanvas().unsetMapTool(map_tool)
         except AttributeError as e:
-            self.controller.show_warning("AttributeError: "+str(e))
+            self.controller.show_warning("AttributeError: " + str(e))
         except KeyError as e:
-            self.controller.show_warning("KeyError: "+str(e))
+            self.controller.show_warning("KeyError: " + str(e))
 
 
     def manage_expl_id(self):
@@ -1255,13 +1252,13 @@ class Giswater(QObject):
     def get_layers_to_config(self):
         """ Get available layers to be configured """
 
-        schema_name = self.schema_name.replace('"','')
-        sql =(f"SELECT DISTINCT(parent_layer) FROM cat_feature "
-              f"UNION "
-              f"SELECT DISTINCT(child_layer) FROM cat_feature "
-              f"WHERE child_layer IN ("
-              f"     SELECT table_name FROM information_schema.tables"
-              f"     WHERE table_schema = '{schema_name}')")
+        schema_name = self.schema_name.replace('"', '')
+        sql = (f"SELECT DISTINCT(parent_layer) FROM cat_feature "
+               f"UNION "
+               f"SELECT DISTINCT(child_layer) FROM cat_feature "
+               f"WHERE child_layer IN ("
+               f"     SELECT table_name FROM information_schema.tables"
+               f"     WHERE table_schema = '{schema_name}')")
         rows = self.controller.get_rows(sql)
         self.available_layers = [layer[0] for layer in rows]
 
@@ -1318,7 +1315,7 @@ class Giswater(QObject):
             body = self.create_body(feature=feature)
             complet_result = self.controller.get_json('gw_api_getinfofromid', body, log_sql=True)
             if not complet_result: continue
-            
+
             for field in complet_result['body']['data']['fields']:
                 _values = {}
 
