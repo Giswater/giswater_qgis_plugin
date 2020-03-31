@@ -33,6 +33,8 @@ v_result_id text;
 v_querytext text;
 v_feature_list text;
 v_param_list text;
+rec_fields text;
+v_field_array text[];
 
 BEGIN
 
@@ -68,7 +70,7 @@ BEGIN
 --list active cat_feature
 IF v_project_type ='WS' THEN
 	v_querytext = 'SELECT * FROM cat_feature JOIN (SELECT id,active FROM node_type 
-    UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type) a USING (id) WHERE a.active IS TRUE;';
+	UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type) a USING (id) WHERE a.active IS TRUE;';
 
 ELSIF v_project_type ='UD' THEN
 
@@ -128,7 +130,7 @@ END IF;
 	--check if all active features have child view name in cat_feature table
 	IF v_project_type ='WS' THEN
 		SELECT count(*),string_agg(id,',')  INTO v_count,v_feature_list FROM cat_feature JOIN (SELECT id,active FROM node_type 
-	    UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type) a USING (id) WHERE a.active IS TRUE AND child_layer IS NULL;
+		UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type) a USING (id) WHERE a.active IS TRUE AND child_layer IS NULL;
 
 	ELSIF v_project_type ='UD' THEN
 
@@ -266,6 +268,25 @@ END IF;
 		VALUES (95, 1, 'INFO: All addfields are defined in config_api_form_fields.');
 	END IF;
 
+	--check if definitions has duplicated layout_order for different layouts - 
+	SELECT array_agg(a::text) into v_field_array FROM (SELECT concat('Formname: ',formname, ', layoutname: ',layoutname, ', layout_order: ',layout_order)
+	FROM config_api_form_fields WHERE formtype = 'feature' AND hidden is false group by layout_order,formname,layoutname having count(id)>1)a;
+
+	IF v_field_array IS NOT NULL THEN
+		v_errortext=concat('ERROR: There is/are form names with duplicated layout order defined in config_api_form_fields: ');
+		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+		VALUES (95, 3, v_errortext);
+
+		FOREACH rec_fields IN ARRAY(v_field_array)
+		LOOP
+			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+			VALUES (95, 3,  replace(replace(rec_fields::text,'("',''),'")',''));
+		END LOOP;
+	ELSE
+		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+		VALUES (95, 1, 'INFO: All fields defined in config_api_form_fields have unduplicated order.');
+	END IF;
+
 -- get results
 	-- info
 
@@ -283,15 +304,15 @@ END IF;
 	v_result_info := COALESCE(v_result_info, '{}'); 
 
 --  Return
-    RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
-             ',"body":{"form":{}'||
-		     ',"data":{ "info":'||v_result_info||','||
-		    	'"setVisibleLayers":[]'||','||
+	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
+			 ',"body":{"form":{}'||
+			 ',"data":{ "info":'||v_result_info||','||
+				'"setVisibleLayers":[]'||','||
 				'"point":{"geometryType":"", "values":[]}'||','||
 				'"line":{"geometryType":"", "values":[]}'||','||
 				'"polygon":{"geometryType":"", "values":[]}'||
-		       '}}'||
-	    '}')::json;
+			   '}}'||
+		'}')::json;
 
 END;
 $BODY$
