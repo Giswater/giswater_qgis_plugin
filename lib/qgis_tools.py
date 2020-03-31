@@ -5,8 +5,9 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+from qgis.PyQt.QtWidgets import QDockWidget
+
 import configparser
-import json
 import os.path
 
 
@@ -28,7 +29,7 @@ class QgisTools:
         """ Get @parameter from metadata.txt file """
 
         # Check if metadata file exists
-        metadata_file = os.path.join(self.plugin_dir, 'metadata66.txt')
+        metadata_file = os.path.join(self.plugin_dir, 'metadata.txt')
         if not os.path.exists(metadata_file):
             message = f"Metadata file not found: {metadata_file}"
             self.iface.messageBar().pushMessage("", message, 1, 20)
