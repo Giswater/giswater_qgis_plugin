@@ -15,11 +15,11 @@ import configparser
 import json
 import os.path
 import sys
-import webbrowser
 from collections import OrderedDict
 from functools import partial
 from json import JSONDecodeError
 
+from .lib.qgis_tools import QgisTools
 from .actions.add_layer import AddLayer
 from .actions.basic import Basic
 from .actions.check_project_result import CheckProjectResult
@@ -77,7 +77,8 @@ class Giswater(QObject):
 
         # Initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)
-        self.plugin_name = self.get_value_from_metadata('name', 'giswater')
+        self.qgis_tools = QgisTools(iface, self.plugin_dir)
+        self.plugin_name = self.qgis_tools.get_value_from_metadata('name', 'giswater')
         self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep
 
         # Check if config file exists
@@ -94,7 +95,7 @@ class Giswater(QObject):
         # Enable Python console and Log Messages panel if parameter 'enable_python_console' = True
         enable_python_console = self.settings.value('system_variables/enable_python_console', 'FALSE').upper()
         if enable_python_console == 'TRUE':
-            self.enable_python_console()
+            self.qgis_tools.enable_python_console()
 
         # Set QGIS settings. Stored in the registry (on Windows) or .ini file (on Unix)
         self.qgis_settings = QSettings()
@@ -147,23 +148,6 @@ class Giswater(QObject):
 
         if self.action:
             self.action.setVisible(visible)
-
-
-    def enable_python_console(self):
-        """ Enable Python console and Log Messages panel if parameter 'enable_python_console' = True """
-
-        # Manage Python console
-        python_console = self.iface.mainWindow().findChild(QDockWidget, 'PythonConsole')
-        if python_console:
-            python_console.setVisible(True)
-        else:
-            import console
-            console.show_console()
-
-        # Manage Log Messages panel
-        message_log = self.iface.mainWindow().findChild(QDockWidget, 'MessageLog')
-        if message_log:
-            message_log.setVisible(True)
 
 
     def tr(self, message):
@@ -335,11 +319,6 @@ class Giswater(QObject):
             action = self.create_action(index_action, text_action, toolbar, True, function_name, action_group)
 
         return action
-
-
-    def open_browser(self, web_tag):
-        """ Open the web browser according to the drop down menu of the feature to insert """
-        webbrowser.open_new_tab('https://giswater.org/giswater-manual/#' + web_tag)
 
 
     def manage_map_tool(self, index_action, function_name):
@@ -1224,29 +1203,6 @@ class Giswater(QObject):
         self.enable_toolbar("utils")
         self.enable_toolbar("tm_basic")
         self.tm_basic.set_controller(self.controller)
-
-
-    def get_value_from_metadata(self, parameter, default_value):
-        """ Get @parameter from metadata.txt file """
-
-        # Check if metadata file exists
-        metadata_file = os.path.join(self.plugin_dir, 'metadata.txt')
-        if not os.path.exists(metadata_file):
-            message = f"Metadata file not found: {metadata_file}"
-            self.iface.messageBar().pushMessage("", message, 1, 20)
-            return default_value
-
-        value = None
-        try:
-            metadata = configparser.ConfigParser()
-            metadata.read(metadata_file)
-            value = metadata.get('general', parameter)
-        except configparser.NoOptionError:
-            message = f"Parameter not found: {parameter}"
-            self.iface.messageBar().pushMessage("", message, 1, 20)
-            value = default_value
-        finally:
-            return value
 
 
     def get_layers_to_config(self):

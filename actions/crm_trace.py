@@ -5,16 +5,13 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsProject, QgsFeature, QgsGeometry, QgsVectorLayer, QgsField
-from qgis.PyQt.QtCore import Qt, QVariant
-
 import json
 import os
 import subprocess
 from collections import OrderedDict
 from functools import partial
 
-from .. import sys_manager
+from lib import os_tools
 from .. import utils_giswater
 from ..ui_manager import DlgTrace
 from .api_parent import ApiParent
@@ -113,7 +110,7 @@ class CrmTrace(ApiParent):
         status = True
 
         # Get script log file path
-        log_file = sys_manager.manage_tstamp()
+        log_file = os_tools.manage_tstamp()
         log_path = script_folder + os.sep + "log" + os.sep + log_file
         self.controller.log_info(log_path)
 

@@ -20,7 +20,7 @@ import sys
 from .pg_dao import PgDao
 from .logger import Logger
 from .. import utils_giswater
-from .. import sys_manager
+from lib import os_tools
 from ..ui_manager import BasicInfoUi
 
 
@@ -431,7 +431,7 @@ class DaoController(object):
         widget = self.iface.messageBar().createMessage(self.tr(text, context_name), self.tr(inf_text))
         button = QPushButton(widget)
         button.setText(self.tr("Open file"))
-        button.clicked.connect(partial(sys_manager.open_file, file_path))
+        button.clicked.connect(partial(os_tools.open_file, file_path))
         widget.layout().addWidget(button)
         self.iface.messageBar().pushWidget(widget, 1)
 
@@ -1534,7 +1534,7 @@ class DaoController(object):
         try:
             stack_level += stack_level_increase
             module_path = inspect.stack()[stack_level][1]
-            file_name = sys_manager.get_file_with_parents(module_path, 2)
+            file_name = os_tools.get_file_with_parents(module_path, 2)
             function_line = inspect.stack()[stack_level][2]
             function_name = inspect.stack()[stack_level][3]
 
@@ -1608,7 +1608,7 @@ class DaoController(object):
 
                 stack_level += stack_level_increase
                 module_path = inspect.stack()[stack_level][1]
-                file_name = sys_manager.get_file_with_parents(module_path, 2)
+                file_name = os_tools.get_file_with_parents(module_path, 2)
                 function_line = inspect.stack()[stack_level][2]
                 function_name = inspect.stack()[stack_level][3]
 
