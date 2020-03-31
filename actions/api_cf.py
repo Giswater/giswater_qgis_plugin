@@ -364,7 +364,6 @@ class ApiCF(ApiParent, QObject):
 
         # Get feature type (Junction, manhole, valve, fountain...)
         self.feature_type = complet_result[0]['body']['feature']['childType']
-        self.dlg_cf.setWindowTitle(self.feature_type.capitalize())
 
         # Get tableParent and select layer
         self.table_parent = str(complet_result[0]['body']['feature']['tableParent'])
@@ -551,6 +550,7 @@ class ApiCF(ApiParent, QObject):
 
         # Open dialog
         self.open_dialog(self.dlg_cf, dlg_name='info_full')
+        self.dlg_cf.setWindowTitle(f"{self.feature_type.upper()} - {self.feature_id}")
         return self.complet_result, self.dlg_cf
 
 
