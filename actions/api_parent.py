@@ -617,7 +617,7 @@ class ApiParent(ParentAction):
 
     def manage_lineedit(self, field, dialog, widget, completer):
         if field['widgettype'] == 'typeahead':
-            if 'queryText' not in field or 'queryTextFilter' not in field or 'parentId' not in field:
+            if 'queryText' not in field or 'queryTextFilter' not in field:
                 return widget
             model = QStringListModel()
             widget.textChanged.connect(partial(self.populate_lineedit, completer, model, field, dialog, widget))
@@ -633,10 +633,13 @@ class ApiParent(ParentAction):
 
         if not widget:
             return
+        parent_id = ""
+        if 'parentId' in field:
+            parent_id = field["parentId"]
 
         extras = f'"queryText":"{field["queryText"]}"'
         extras += f', "queryTextFilter":"{field["queryTextFilter"]}"'
-        extras += f', "parentId":"{field["parentId"]}"'
+        extras += f', "parentId":"{parent_id}"'
         extras += f', "parentValue":"{utils_giswater.getWidgetText(dialog, "data_" + str(field["parentId"]))}"'
         extras += f', "textToSearch":"{utils_giswater.getWidgetText(dialog, widget)}"'
         body = self.create_body(extras=extras)
