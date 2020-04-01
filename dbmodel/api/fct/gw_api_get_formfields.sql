@@ -161,7 +161,7 @@ BEGIN
       		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT], 
       		'queryText', 'orderById', 'isNullValue', 'parentId', 'queryTextFilter');
 	END LOOP;
-		
+
 	-- combo no childs	
 	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'widgettype' = 'combo' AND  a->>'parentId' IS NULL
 	LOOP
@@ -171,9 +171,11 @@ BEGIN
 		ELSE 
 			v_orderby='idval';
 		END IF;
-	
+			
 		-- Get combo id's
-		EXECUTE 'SELECT (array_agg(id)) FROM ('|| (aux_json->>'queryText') ||' ORDER BY '||v_orderby||')a' INTO v_array;
+		IF  (aux_json->>'queryText') IS NOT NULL THEN
+			EXECUTE 'SELECT (array_agg(id)) FROM ('|| (aux_json->>'queryText') ||' ORDER BY '||v_orderby||')a' INTO v_array;
+		END IF;
 		
 		-- Enable null values
 		IF (aux_json->>'isNullValue')::boolean IS TRUE THEN
@@ -184,7 +186,9 @@ BEGIN
 		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'comboIds', COALESCE(combo_json, '[]'));		
 
 		-- Get combo values
-		EXECUTE 'SELECT (array_agg(idval)) FROM ('||(aux_json->>'queryText')||' ORDER BY '||v_orderby||')a' INTO v_array;
+		IF  (aux_json->>'queryText') IS NOT NULL THEN
+			EXECUTE 'SELECT (array_agg(idval)) FROM ('||(aux_json->>'queryText')||' ORDER BY '||v_orderby||')a' INTO v_array;
+		END IF;
 		
 		-- Enable null values
 		IF (aux_json->>'isNullValue')::boolean IS TRUE THEN
@@ -198,6 +202,7 @@ BEGIN
 		'queryText', 'orderById', 'isNullValue', 'parentId', 'queryTextFilter');
 
 	END LOOP;
+
 
 	-- combo childs
 	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'widgettype' = 'combo' AND  a->>'parentId' IS NOT NULL
