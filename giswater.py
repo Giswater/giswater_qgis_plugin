@@ -301,15 +301,12 @@ class Giswater(QObject):
         """
 
         text_action = self.tr(index_action + '_text')
-        function_name = global_vars.settings.value('actions/' + str(index_action) + '_function')
+        function_name = global_vars.settings.value(f'actions/{index_action}_function')
         if not function_name:
             return None
 
         # Buttons NOT checkable (normally because they open a form)
-        list_actions = (18, 23, 25, 26, 27, 29, 33, 34, 38, 41, 45, 46, 47, 48, 49, 50, 58, 59, 86, 64, 65, 66, 67, 68, 69,
-                        74, 75, 76, 81, 82, 83, 84, 98, 99, 196, 206, 301, 302, 303, 304, 305)
-
-        if int(index_action) in list_actions:
+        if index_action in self.buttons_not_checkable:
             action = self.create_action(index_action, text_action, toolbar, False, function_name, action_group)
 
         # Buttons checkable (normally related with 'map_tools')
@@ -603,10 +600,13 @@ class Giswater(QObject):
         self.set_info_button()
 
         # Manage section 'actions_list' of config file
-        self.manage_actions_list()
+        self.manage_section_actions_list()
+
+        # Manage section 'actions' of config file
+        self.manage_section_actions()
 
 
-    def manage_actions_list(self):
+    def manage_section_actions_list(self):
         """ Manage section 'actions_list' of config file """
 
         # List of toolbars defined in section 'action_list'
@@ -620,6 +620,13 @@ class Giswater(QObject):
                 self.controller.show_warning(f"Action list not set in section 'actions_list' of config file: '{key}'")
 
         self.controller.log_info(self.dict_actions)
+
+
+    def manage_section_actions(self):
+        """ Manage section 'actions' of config file """
+
+        # Load list of buttons that are not checkable
+        self.buttons_not_checkable = global_vars.settings.value(f"actions/not_checkable")
 
 
     def manage_feature_cat(self):
