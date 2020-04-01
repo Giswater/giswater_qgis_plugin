@@ -48,6 +48,7 @@ DROP VIEW IF EXISTS v_arc_x_vnode;
 DROP VIEW IF EXISTS v_edit_inp_virtualvalve;
 DROP VIEW IF EXISTS v_edit_inp_pipe;
 
+DROP VIEW IF EXISTS v_edit_inp_connec;
 DROP VIEW IF EXISTS v_edit_inp_inlet;
 DROP VIEW IF EXISTS v_edit_inp_junction;
 DROP VIEW IF EXISTS v_edit_inp_pump;
@@ -728,6 +729,24 @@ CREATE OR REPLACE VIEW vi_parent_dma AS
    FROM dma
 	 JOIN vi_parent_arc USING (dma_id);
 
+
+CREATE OR REPLACE VIEW v_edit_inp_connec AS 
+ SELECT connec.connec_id,
+    connec.elevation,
+    connec.depth,
+    connec.connecat_id,
+    connec.arc_id,
+    connec.sector_id,
+    connec.state,
+    connec.state_type,
+    connec.annotation,
+    inp_connec.demand,
+    inp_connec.pattern_id,
+    connec.the_geom
+   FROM inp_selector_sector,
+    connec
+     JOIN inp_connec USING (connec_id)
+  WHERE connec.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 
 	 
 CREATE OR REPLACE VIEW v_edit_inp_inlet AS 
