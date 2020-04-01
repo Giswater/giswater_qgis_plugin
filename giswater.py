@@ -369,16 +369,11 @@ class Giswater(QObject):
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
 
-        list_actions = None
-        if self.controller.get_project_type() == 'ws':
-            list_actions = ['37', '41', '48', '86', '32']
-        elif self.controller.get_project_type() == 'ud':
-            list_actions = ['37', '41', '48', '32']
-        elif self.controller.get_project_type() in ('tm', 'pl'):
-            list_actions = ['37', '41', '48', '32']
+        toolbar_key = f"{toolbar_id}_{self.controller.get_project_type()}"
+        list_actions = self.dict_toolbars[toolbar_key]
         self.manage_toolbar(toolbar_id, list_actions)
         if x and y:
-            self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
+            self.set_toolbar_position(self.tr(f'toolbar_{toolbar_id}_name'), x, y)
 
 
     def toolbar_utils(self, toolbar_id, x=None, y=None):
@@ -386,14 +381,11 @@ class Giswater(QObject):
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
 
-        list_actions = None
-        if self.controller.get_project_type() in ('ws', 'ud'):
-            list_actions = ['206', '99', '83', '58', '59']
-        elif self.controller.get_project_type() in ('tm', 'pl'):
-            list_actions = ['206', '99', '83', '58']
+        toolbar_key = f"{toolbar_id}_{self.controller.get_project_type()}"
+        list_actions = self.dict_toolbars[toolbar_key]
         self.manage_toolbar(toolbar_id, list_actions)
         if x and y:
-            self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
+            self.set_toolbar_position(self.tr(f'toolbar_{toolbar_id}_name'), x, y)
 
         self.basic.set_controller(self.controller)
         self.utils.set_controller(self.controller)
@@ -406,9 +398,9 @@ class Giswater(QObject):
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
 
-        list_actions = ['26', '27', '74', '75', '76', '61', '64', '65', '84', '18']
+        list_actions = self.dict_toolbars[toolbar_id]
         self.manage_toolbar(toolbar_id, list_actions)
-        self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
+        self.set_toolbar_position(self.tr(f'toolbar_{toolbar_id}_name'), x, y)
 
 
     def toolbar_om_ud(self, toolbar_id, x=0, y=0):
@@ -416,9 +408,9 @@ class Giswater(QObject):
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
 
-        list_actions = ['43', '56', '57', '74', '75', '76', '61', '64', '65', '84']
+        list_actions = self.dict_toolbars[toolbar_id]
         self.manage_toolbar(toolbar_id, list_actions)
-        self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
+        self.set_toolbar_position(self.tr(f'toolbar_{toolbar_id}_name'), x, y)
 
 
     def toolbar_edit(self, toolbar_id, x=0, y=0):
@@ -426,9 +418,9 @@ class Giswater(QObject):
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
 
-        list_actions = ['01', '02', '44', '16', '17', '28', '20', '68', '69', '39', '34', '66', '33', '67']
+        list_actions = self.dict_toolbars[toolbar_id]
         self.manage_toolbar(toolbar_id, list_actions)
-        self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
+        self.set_toolbar_position(self.tr(f'toolbar_{toolbar_id}_name'), x, y)
 
 
     def toolbar_cad(self, toolbar_id, x=0, y=0):
@@ -436,9 +428,9 @@ class Giswater(QObject):
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
 
-        list_actions = ['71', '72']
+        list_actions = self.dict_toolbars[toolbar_id]
         self.manage_toolbar(toolbar_id, list_actions)
-        self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
+        self.set_toolbar_position(self.tr(f'toolbar_{toolbar_id}_name'), x, y)
 
 
     def toolbar_epa(self, toolbar_id, x=0, y=0):
@@ -446,9 +438,9 @@ class Giswater(QObject):
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
 
-        list_actions = ['199', '196', '23', '25', '29']
+        list_actions = self.dict_toolbars[toolbar_id]
         self.manage_toolbar(toolbar_id, list_actions)
-        self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
+        self.set_toolbar_position(self.tr(f'toolbar_{toolbar_id}_name'), x, y)
 
 
     def toolbar_master(self, toolbar_id, x=0, y=0):
@@ -456,9 +448,9 @@ class Giswater(QObject):
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
 
-        list_actions = ['45', '46', '47', '38', '49', '50']
+        list_actions = self.dict_toolbars[toolbar_id]
         self.manage_toolbar(toolbar_id, list_actions)
-        self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
+        self.set_toolbar_position(self.tr(f'toolbar_{toolbar_id}_name'), x, y)
 
 
     def save_toolbars_position(self):
@@ -568,9 +560,8 @@ class Giswater(QObject):
         if list_actions is None:
             return
 
-        toolbar_name = self.tr('toolbar_' + toolbar_id + '_name')
+        toolbar_name = self.tr(f'toolbar_{toolbar_id}_name')
         plugin_toolbar = PluginToolbar(toolbar_id, toolbar_name, True)
-
         plugin_toolbar.toolbar = self.iface.addToolBar(toolbar_name)
         plugin_toolbar.toolbar.setObjectName(toolbar_name)
         plugin_toolbar.toolbar.setProperty('gw_name', toolbar_id)
@@ -605,19 +596,23 @@ class Giswater(QObject):
         # Manage section 'actions' of config file
         self.manage_section_actions()
 
+        # Manage section 'toolbars' of config file
+        self.manage_section_toolbars()
+
 
     def manage_section_actions_list(self):
         """ Manage section 'actions_list' of config file """
 
         # List of toolbars defined in section 'action_list'
+        section = 'actions_list'
         list_keys = ['basic', 'mincut', 'om', 'edit', 'go2epa', 'master', 'utils', 'tm_basic']
         self.dict_actions = {}
         for key in list_keys:
-            list_values = global_vars.settings.value(f"actions_list/{key}")
+            list_values = global_vars.settings.value(f"{section}/{key}")
             if list_values:
                 self.dict_actions[key] = list_values
             else:
-                self.controller.show_warning(f"Action list not set in section 'actions_list' of config file: '{key}'")
+                self.controller.show_warning(f"Parameter not set in section '{section}' of config file: '{key}'")
 
         self.controller.log_info(self.dict_actions)
 
@@ -627,6 +622,21 @@ class Giswater(QObject):
 
         # Load list of buttons that are not checkable
         self.buttons_not_checkable = global_vars.settings.value(f"actions/not_checkable")
+
+
+    def manage_section_toolbars(self):
+        """ Manage section 'toolbars' of config file """
+
+        # List of toolbars defined in section 'toolbars'
+        section = 'toolbars'
+        list_keys = ['basic_ws', 'basic_ud', 'utils_ws', 'utils_ud', 'om_ws', 'om_ud', 'edit', 'cad', 'epa', 'master']
+        self.dict_toolbars = {}
+        for key in list_keys:
+            list_values = global_vars.settings.value(f"{section}/{key}")
+            if list_values:
+                self.dict_toolbars[key] = list_values
+            else:
+                self.controller.show_warning(f"Parameter not set in section '{section}' of config file: '{key}'")
 
 
     def manage_feature_cat(self):
