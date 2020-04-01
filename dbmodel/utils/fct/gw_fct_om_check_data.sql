@@ -472,6 +472,7 @@ BEGIN
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	
 		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 			VALUES (25, 2, concat('WARNING: There is/are ',v_count,' rows on man_addfields_value without parent feature. We recommend you to clean data before continue.'));
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 			VALUES (25, 2, concat('SELECT * FROM man_addfields_value WHERE feature_id NOT IN (SELECT arc_id FROM arc UNION SELECT node_id FROM node UNION SELECT connec_id FROM connec UNION SELECT gully_id FROM gully)'));
