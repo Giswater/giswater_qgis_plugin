@@ -442,3 +442,43 @@ update config_api_form_fields SET layout_order = 4 where column_id='state_type' 
 SELECT gw_fct_connect_to_network($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{"id":"[114462, 114461]"}, "data":{"filterFields":{}, "pageInfo":{}, "feature_type":"CONNEC"}}$$);
 
 UPDATE node_type set isprofilesurface = true;
+
+--refactor of forms
+UPDATE config_api_form_fields SET layoutname = 'lyt_data_3', layout_order = 11 where column_id ='pjoint_id';
+UPDATE config_api_form_fields SET layoutname = 'lyt_data_3', layout_order = 12 where column_id ='pjoint_type';
+UPDATE config_api_form_fields SET layoutname = 'lyt_data_3', layout_order = 13 where column_id ='descript';
+UPDATE config_api_form_fields SET layoutname = 'lyt_data_3', layout_order = 14 where column_id = 'annotation';
+UPDATE config_api_form_fields SET layoutname = 'lyt_data_3', layout_order = 15 where column_id = 'observ';
+UPDATE config_api_form_fields SET layoutname = 'lyt_data_3', layout_order = 16 where column_id = 'lastupdate';
+UPDATE config_api_form_fields SET layoutname ='lyt_data_3' , layout_order = 17 where column_id = 'lastupdate_user';
+UPDATE config_api_form_fields SET layoutname = 'lyt_data_3', layout_order = 18 where column_id ='link';
+
+UPDATE config_api_form_fields SET  hidden = true where column_id = 'macrodma_id';
+UPDATE config_api_form_fields SET  hidden = true where column_id = 'inventory';
+UPDATE config_api_form_fields SET  hidden = true where column_id = 'feature_id';
+UPDATE config_api_form_fields SET  hidden = true where column_id = 'featurecat_id';
+UPDATE config_api_form_fields SET  hidden = true where column_id = 'connec_length';
+
+UPDATE config_api_form_fields SET  hidden = true where column_id = 'depth' AND formname LIKE '%_connec_%';
+UPDATE config_api_form_fields SET  hidden = true where column_id = 'function_type' AND formname LIKE '%_connec_%';
+UPDATE config_api_form_fields SET  hidden = true where column_id = 'descript' AND formname LIKE '%_connec_%';
+UPDATE config_api_form_fields SET  hidden = true where column_id = 'annotation' AND formname LIKE '%_connec_%';
+
+UPDATE config_api_form_fields SET layoutname = 'lyt_bot_1' where column_id ='state';
+UPDATE config_api_form_fields SET layoutname = 'lyt_bot_1' where column_id ='state_type';
+UPDATE config_api_form_fields SET layoutname = 'lyt_bot_1' where column_id ='sector_id';
+UPDATE config_api_form_fields SET layoutname = 'lyt_data_1',layout_order = 997 where column_id ='hemisphere';
+UPDATE config_api_form_fields SET layout_order = 2 where column_id ='dma_id';
+
+UPDATE config_api_form_fields SET layoutname = 'lyt_data_2', layout_order = 30 where column_id ='verified';
+UPDATE config_api_form_fields SET layoutname = 'lyt_data_2', layout_order = 31 where column_id ='presszonecat_id';
+UPDATE config_api_form_fields SET layoutname = 'lyt_data_2', layout_order = 32 where column_id ='dqa_id';
+UPDATE config_api_form_fields SET layoutname = 'lyt_data_2', layout_order = 33 where column_id ='expl_id';
+UPDATE config_api_form_fields SET layoutname = 'lyt_data_1', layout_order = 998 where column_id ='parent_id';
+
+
+-- refactor of type's
+UPDATE man_type_fluid SET fluid_type = replace (fluid_type, 'Standard', 'St.');
+UPDATE man_type_category SET category_type = replace (category_type, 'Standard', 'St.');
+UPDATE man_type_location SET location_type = replace (location_type, 'Standard', 'St.');
+UPDATE man_type_function SET function_type = replace (function_type, 'Standard', 'St.');
