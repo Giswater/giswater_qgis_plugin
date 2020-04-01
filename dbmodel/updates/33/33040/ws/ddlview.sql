@@ -740,6 +740,7 @@ CREATE OR REPLACE VIEW v_edit_inp_connec AS
     connec.state,
     connec.state_type,
     connec.annotation,
+    connec.expl_id,
     inp_connec.demand,
     inp_connec.pattern_id,
     connec.the_geom
