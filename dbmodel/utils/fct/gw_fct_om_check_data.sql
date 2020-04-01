@@ -39,6 +39,10 @@ v_features text;
 v_edit text;
 v_config_param text;
 v_error_context text;
+v_feature_id text;
+v_arc_array text[];
+rec_arc text;
+v_node_1 text;
 
 BEGIN
 
@@ -165,7 +169,7 @@ BEGIN
 		v_querytext = concat (v_querytext, ' UNION SELECT a.gully_id FROM '||v_edit||'gully a RIGHT JOIN plan_psector_x_gully USING (gully_id) WHERE a.state = 2 AND a.gully_id IS NULL');
 	END IF;
 		
-	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')') INTO v_count;
+	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
@@ -224,6 +228,53 @@ BEGIN
 		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 		VALUES (25, 1, 'INFO: No arcs with state > 0 AND state_type.is_operative on FALSE found.');
 	END IF;
+
+	--check if all tanks are defined in anl_mincut_inlet_x_exploitation  (fprocesscat = 77)
+	IF v_project_type = 'WS' THEN
+		v_querytext = 'SELECT node_id, nodecat_id, the_geom FROM '||v_edit||'node 
+		JOIN cat_node ON nodecat_id=cat_node.id
+		JOIN cat_feature ON cat_node.nodetype_id = cat_feature.id
+		WHERE system_id = ''TANK'' and node_id NOT IN (SELECT node_id FROM anl_mincut_inlet_x_exploitation)';
+		
+		EXECUTE concat('SELECT count(*) FROM (',v_querytext,') a ') INTO v_count;
+		EXECUTE concat('SELECT string_agg(a.node_id::text,'','') FROM (',v_querytext,') a ') INTO v_feature_id;
+
+		IF v_count > 0 THEN
+			EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) 
+			SELECT 77, node_id, nodecat_id, ''Tanks not defined in anl_mincut_inlet_x_exploitation'', the_geom FROM (', v_querytext,')a');
+			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+			VALUES (25, 2, concat('WARNING: There is/are ',v_count,' tanks which are not defined on anl_mincut_inlet_x_exploitation. Node_id: ',v_feature_id,'. Please, check your data before continue'));
+		ELSE
+			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+			VALUES (25, 1, 'INFO: All tanks are defined in anl_mincut_inlet_x_exploitation.');
+		END IF;
+	END IF;
+
+	--check if drawn arc direction is the same as defined node_1, node_2
+	v_querytext = 'SELECT array_agg(arc_id)  FROM '||v_edit||'arc';
+
+	EXECUTE v_querytext INTO v_arc_array;
+
+	FOREACH rec_arc IN ARRAY(v_arc_array)
+	LOOP
+		
+		EXECUTE 'SELECT node_1 FROM '||v_edit||'arc WHERE arc_id = '||quote_literal(rec_arc)||';'
+		INTO v_node_1;
+
+		EXECUTE 'SELECT node_id FROM '||v_edit||'arc, '||v_edit||'node
+		WHERE st_dwithin(St_StartPoint('||v_edit||'arc.the_geom), '||v_edit||'node.the_geom, 0.1) 
+		AND '||v_edit||'arc.arc_id = '||quote_literal(rec_arc)||' AND '||v_edit||'node.state = 1;'
+		INTO v_feature_id;
+
+		IF v_node_1 != v_feature_id THEN
+			EXECUTE concat ('INSERT INTO anl_arc (fprocesscat_id, arc_id, arccat_id, descript, the_geom) 
+			SELECT 123, arc_id, arccat_id, ''Drawing direction different than definition of node_1, node_2'', the_geom 
+			FROM '||v_edit||'arc WHERE arc_id = '||quote_literal(rec_arc)||';');
+
+			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+			VALUES (25, 2, concat('WARNING: Drawing direction of arc ',rec_arc,' is different than definition of node_1, node_2. Please, check your data before continue.'));
+		END IF;
+	END LOOP;
 
 
 	-- Check nulls customer code for connecs (110)
@@ -691,7 +742,7 @@ BEGIN
     'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
   	FROM (SELECT id, node_id as feature_id, nodecat_id as feature_catalog, state, expl_id, descript,fprocesscat_id, the_geom FROM anl_node WHERE cur_user="current_user"() 
-	AND fprocesscat_id IN (4,87,96,87,102,103)
+	AND fprocesscat_id IN (4,77,87,96,87,102,103)
 	UNION
 	SELECT id, connec_id, connecat_id, state, expl_id, descript,fprocesscat_id, the_geom FROM anl_connec WHERE cur_user="current_user"() 
 	AND fprocesscat_id IN (101,102,104,105,106)) row) features;
@@ -714,7 +765,7 @@ BEGIN
     'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
   	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, fprocesscat_id, the_geom
-  	FROM  anl_arc WHERE cur_user="current_user"() AND fprocesscat_id IN (4, 88, 102)) row) features;
+  	FROM  anl_arc WHERE cur_user="current_user"() AND fprocesscat_id IN (4, 88, 102, 123)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 

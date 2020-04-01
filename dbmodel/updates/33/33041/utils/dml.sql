@@ -88,3 +88,7 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO audit_cat_function VALUES (2844, 'gw_trg_edit_team_x_vehicle', 'utils', 'function trigger', NULL, NULL, NULL, 'Makes editable v_om_team_x_vehicle', 'role_om', false) 
 ON CONFLICT (id) DO NOTHING;
 
+--2020/04/01
+
+INSERT INTO sys_fprocess_cat(id, fprocess_name, context, fprocess_i18n, project_type)
+VALUES (123,'Check arc drawing direction','om', 'utils') ON CONFLICT (id) DO NOTHING;
