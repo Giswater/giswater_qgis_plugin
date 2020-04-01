@@ -146,6 +146,7 @@ DECLARE
 	v_startdate text;
 	v_columntype text;
 
+	v_listtype text;
 BEGIN
 
 -- Set search path to local schema
@@ -258,14 +259,14 @@ BEGIN
 			INTO v_the_geom;
 
 		--  get querytext
-		EXECUTE 'SELECT query_text, vdefault FROM config_api_list WHERE tablename = $1 AND device = $2'
-			INTO v_query_result, v_default
+		EXECUTE 'SELECT query_text, listtype FROM config_api_list WHERE tablename = $1 AND device = $2'
+			INTO v_query_result, v_listtype
 			USING v_tablename, v_device;
 
 		-- if v_device is not configured on config_api_list table
 		IF v_query_result IS NULL THEN
-			EXECUTE 'SELECT query_text, vdefault FROM config_api_list WHERE tablename = $1 LIMIT 1'
-				INTO v_query_result, v_default
+			EXECUTE 'SELECT query_text, listtype FROM config_api_list WHERE tablename = $1 LIMIT 1'
+				INTO v_query_result, v_listtype
 				USING v_tablename;
 		END IF;	
 
@@ -276,14 +277,14 @@ BEGIN
 
 	ELSE
 		--  get querytext
-		EXECUTE 'SELECT query_text, vdefault FROM config_api_list WHERE tablename = $1 AND device = $2'
-			INTO v_query_result, v_default
+		EXECUTE 'SELECT query_text, vdefault, listtype FROM config_api_list WHERE tablename = $1 AND device = $2'
+			INTO v_query_result, v_default, v_listtype
 			USING v_tablename, v_device;
 
 		-- if v_device is not configured on config_api_list table
 		IF v_query_result IS NULL THEN
-			EXECUTE 'SELECT query_text, vdefault FROM config_api_list WHERE tablename = $1 LIMIT 1'
-				INTO v_query_result, v_default
+			EXECUTE 'SELECT query_text, vdefault, listtype FROM config_api_list WHERE tablename = $1 LIMIT 1'
+				INTO v_query_result, v_default, v_listtype
 				USING v_tablename;
 		END IF;	
 	END IF;
@@ -304,7 +305,10 @@ BEGIN
 	
 			-- Getting the sign of the filter
 			SELECT listfilterparam->>'sign' INTO v_sign FROM config_api_form_fields WHERE formname=v_tablename  AND column_id=v_field;
-			IF v_sign IS NULL THEN
+
+			IF v_listtype = 'attributeTable' THEN
+				v_sign = 'LIKE';
+			ELSIF v_sign IS NULL THEN
 				v_sign = '=';
 			END IF;
 
