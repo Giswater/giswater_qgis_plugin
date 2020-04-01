@@ -370,6 +370,9 @@ class Giswater(QObject):
         """
 
         toolbar_key = f"{toolbar_id}_{self.controller.get_project_type()}"
+        if toolbar_id not in self.dict_toolbars:
+            return
+
         list_actions = self.dict_toolbars[toolbar_key]
         self.manage_toolbar(toolbar_id, list_actions)
         if x and y:
@@ -382,6 +385,9 @@ class Giswater(QObject):
         """
 
         toolbar_key = f"{toolbar_id}_{self.controller.get_project_type()}"
+        if toolbar_id not in self.dict_toolbars:
+            return
+
         list_actions = self.dict_toolbars[toolbar_key]
         self.manage_toolbar(toolbar_id, list_actions)
         if x and y:
@@ -398,6 +404,9 @@ class Giswater(QObject):
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
 
+        if toolbar_id not in self.dict_toolbars:
+            return
+
         list_actions = self.dict_toolbars[toolbar_id]
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr(f'toolbar_{toolbar_id}_name'), x, y)
@@ -407,6 +416,9 @@ class Giswater(QObject):
         """ Function called in def manage_toolbars(...)
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
+
+        if toolbar_id not in self.dict_toolbars:
+            return
 
         list_actions = self.dict_toolbars[toolbar_id]
         self.manage_toolbar(toolbar_id, list_actions)
@@ -418,6 +430,9 @@ class Giswater(QObject):
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
 
+        if toolbar_id not in self.dict_toolbars:
+            return
+
         list_actions = self.dict_toolbars[toolbar_id]
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr(f'toolbar_{toolbar_id}_name'), x, y)
@@ -427,6 +442,9 @@ class Giswater(QObject):
         """ Function called in def manage_toolbars(...)
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
+
+        if toolbar_id not in self.dict_toolbars:
+            return
 
         list_actions = self.dict_toolbars[toolbar_id]
         self.manage_toolbar(toolbar_id, list_actions)
@@ -438,6 +456,9 @@ class Giswater(QObject):
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
 
+        if toolbar_id not in self.dict_toolbars:
+            return
+
         list_actions = self.dict_toolbars[toolbar_id]
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr(f'toolbar_{toolbar_id}_name'), x, y)
@@ -447,6 +468,9 @@ class Giswater(QObject):
         """ Function called in def manage_toolbars(...)
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
+
+        if toolbar_id not in self.dict_toolbars:
+            return
 
         list_actions = self.dict_toolbars[toolbar_id]
         self.manage_toolbar(toolbar_id, list_actions)
@@ -603,9 +627,11 @@ class Giswater(QObject):
     def manage_section_actions_list(self):
         """ Manage section 'actions_list' of config file """
 
-        # List of toolbars defined in section 'action_list'
+        # Dynamically get parameters defined in section 'actions_list'
         section = 'actions_list'
-        list_keys = ['basic', 'mincut', 'om', 'edit', 'go2epa', 'master', 'utils', 'tm_basic']
+        global_vars.settings.beginGroup(section)
+        list_keys = global_vars.settings.allKeys()
+        global_vars.settings.endGroup()
         self.dict_actions = {}
         for key in list_keys:
             list_values = global_vars.settings.value(f"{section}/{key}")
@@ -627,9 +653,11 @@ class Giswater(QObject):
     def manage_section_toolbars(self):
         """ Manage section 'toolbars' of config file """
 
-        # List of toolbars defined in section 'toolbars'
+        # Dynamically get parameters defined in section 'toolbars'
         section = 'toolbars'
-        list_keys = ['basic_ws', 'basic_ud', 'utils_ws', 'utils_ud', 'om_ws', 'om_ud', 'edit', 'cad', 'epa', 'master']
+        global_vars.settings.beginGroup(section)
+        list_keys = global_vars.settings.allKeys()
+        global_vars.settings.endGroup()
         self.dict_toolbars = {}
         for key in list_keys:
             list_values = global_vars.settings.value(f"{section}/{key}")
