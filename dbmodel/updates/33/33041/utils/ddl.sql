@@ -17,8 +17,6 @@ UPDATE config_param_system SET isdep = isdeprecated::boolean;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_param_system", "column":"isdeprecated"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"config_param_system", "column":"isdep", "newName":"isdeprecated"}}$$);
 
-ALTER TABLE ext_rtc_scada_dma_period RENAME TO ext_rtc_dma_period;
-
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"ext_rtc_dma_period", "column":"m3_min"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"ext_rtc_dma_period", "column":"m3_max"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"ext_rtc_dma_period", "column":"m3_avg"}}$$);

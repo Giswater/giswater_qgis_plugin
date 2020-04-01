@@ -377,3 +377,5 @@ UPDATE man_type_location SET location_type = replace (location_type, 'Standard',
 UPDATE man_type_function SET function_type = replace (function_type, 'Standard', 'St.');
 
 update config_api_form_fields SET widgettype = 'text' WHERE column_id  = 'macrosector_id', dv_querytext = null, placeholder  ='Ex.macrosector_id';
+
+UPDATE connec SET connec_depth = 1.5;

@@ -7,6 +7,10 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+
+ALTER TABLE ext_rtc_scada_dma_period RENAME TO ext_rtc_dma_period;
+
+
 --2020/03/13
 CREATE INDEX node_sector ON node USING btree (sector_id);
 CREATE INDEX node_nodecat ON node USING btree (nodecat_id);

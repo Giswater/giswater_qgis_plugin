@@ -1144,7 +1144,7 @@ CREATE OR REPLACE VIEW v_rtc_period_hydrometer AS
 	 JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint
 	 JOIN v_connec ON v_connec.connec_id::text = rtc_hydrometer_x_connec.connec_id::text
 	 JOIN rpt_inp_arc ON v_connec.arc_id::text = rpt_inp_arc.arc_id::text
-	 JOIN ext_rtc_scada_dma_period c ON c.cat_period_id::text = ext_cat_period.id::text AND c.dma_id::integer = v_connec.dma_id
+	 JOIN ext_rtc_dma_period c ON c.cat_period_id::text = ext_cat_period.id::text AND c.dma_id::integer = v_connec.dma_id
   WHERE ext_cat_period.id::text = (( SELECT config_param_user.value
 		   FROM config_param_user
 		  WHERE config_param_user.cur_user::name = "current_user"() AND config_param_user.parameter::text = 'inp_options_rtc_period_id'::text)) AND rpt_inp_arc.result_id::text = ((( SELECT inp_selector_result.result_id
@@ -1177,7 +1177,7 @@ UNION
 	 JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint
 	 LEFT JOIN v_connec ON v_connec.connec_id::text = rtc_hydrometer_x_connec.connec_id::text
 	 JOIN rpt_inp_node ON concat('VN', v_connec.pjoint_id) = rpt_inp_node.node_id::text
-	 JOIN ext_rtc_scada_dma_period c ON c.cat_period_id::text = ext_cat_period.id::text AND v_connec.dma_id::text = c.dma_id::text
+	 JOIN ext_rtc_dma_period c ON c.cat_period_id::text = ext_cat_period.id::text AND v_connec.dma_id::text = c.dma_id::text
   WHERE v_connec.pjoint_type::text = 'VNODE'::text AND ext_cat_period.id::text = (( SELECT config_param_user.value
 		   FROM config_param_user
 		  WHERE config_param_user.cur_user::name = "current_user"() AND config_param_user.parameter::text = 'inp_options_rtc_period_id'::text)) AND rpt_inp_node.result_id::text = ((( SELECT inp_selector_result.result_id
@@ -1210,7 +1210,7 @@ UNION
 	 JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint
 	 LEFT JOIN v_connec ON v_connec.connec_id::text = rtc_hydrometer_x_connec.connec_id::text
 	 JOIN rpt_inp_node ON v_connec.pjoint_id::text = rpt_inp_node.node_id::text
-	 JOIN ext_rtc_scada_dma_period c ON c.cat_period_id::text = ext_cat_period.id::text AND v_connec.dma_id::text = c.dma_id::text
+	 JOIN ext_rtc_dma_period c ON c.cat_period_id::text = ext_cat_period.id::text AND v_connec.dma_id::text = c.dma_id::text
   WHERE v_connec.pjoint_type::text = 'NODE'::text AND ext_cat_period.id::text = (( SELECT config_param_user.value
 		   FROM config_param_user
 		  WHERE config_param_user.cur_user::name = "current_user"() AND config_param_user.parameter::text = 'inp_options_rtc_period_id'::text)) AND rpt_inp_node.result_id::text = ((( SELECT inp_selector_result.result_id
@@ -1702,7 +1702,7 @@ CREATE OR REPLACE VIEW v_rtc_period_dma AS
 	sum(v_rtc_period_hydrometer.m3_total_period) AS m3_total_period,
 	a.pattern_id
    FROM v_rtc_period_hydrometer
-	 JOIN ext_rtc_scada_dma_period a ON a.dma_id::text = v_rtc_period_hydrometer.dma_id::text AND v_rtc_period_hydrometer.period_id::text = a.cat_period_id::text
+	 JOIN ext_rtc_dma_period a ON a.dma_id::text = v_rtc_period_hydrometer.dma_id::text AND v_rtc_period_hydrometer.period_id::text = a.cat_period_id::text
   GROUP BY v_rtc_period_hydrometer.dma_id, v_rtc_period_hydrometer.period_id, a.pattern_id;
 
 
@@ -2119,13 +2119,8 @@ JOIN v_price_compost price_m3excess ON cat_soil.m3excess_cost::text = price_m3ex
 JOIN v_price_compost price_m2trenchl ON cat_soil.m2trenchl_cost::text = price_m2trenchl.id::text
 WHERE cat_soil.m2trenchl_cost::text = price_m2trenchl.id::text OR cat_soil.m2trenchl_cost::text = NULL::text;
 
-CREATE OR REPLACE VIEW v_plan_aux_arc_connec AS 
-SELECT DISTINCT ON (connec.arc_id) connec.arc_id,
-sum(connec.connec_length * (v_price_x_catconnec.cost_mlconnec + v_price_x_catconnec.cost_m3trench * connec.depth * 0.333) + v_price_x_catconnec.cost_ut)::numeric(12,2) AS connec_total_cost
-FROM connec
-JOIN v_price_x_catconnec ON v_price_x_catconnec.id::text = connec.connecat_id::text
-GROUP BY connec.arc_id;
-  
+
+ 
 CREATE OR REPLACE VIEW v_plan_node AS 
  SELECT v_node.node_id,
 	v_node.nodecat_id,
@@ -2397,47 +2392,59 @@ CREATE OR REPLACE VIEW v_edit_man_pipe AS
 	 JOIN man_pipe ON man_pipe.arc_id::text = v_arc.arc_id::text;
 
 
-CREATE OR REPLACE VIEW v_plan_aux_arc_ml AS 
- SELECT v_arc.arc_id,
-	v_arc.depth1,
-	v_arc.depth2,
-		CASE
-			WHEN (v_arc.depth1 * v_arc.depth2) = 0::numeric OR (v_arc.depth1 * v_arc.depth2) IS NULL THEN v_price_x_catarc.estimated_depth
-			ELSE ((v_arc.depth1 + v_arc.depth2) / 2::numeric)::numeric(12,2)
-		END AS mean_depth,
-	v_arc.arccat_id,
-	(v_price_x_catarc.dint / 1000::numeric)::numeric(12,4) AS dint,
-	v_price_x_catarc.z1,
-	v_price_x_catarc.z2,
-	v_price_x_catarc.area,
-	v_price_x_catarc.width,
-	(v_price_x_catarc.bulk / 1000::numeric)::numeric(12,4) AS bulk,
-	v_price_x_catarc.cost_unit,
-	v_price_x_catarc.cost::numeric(12,2) AS arc_cost,
-	v_price_x_catarc.m2bottom_cost::numeric(12,2) AS m2bottom_cost,
-	v_price_x_catarc.m3protec_cost::numeric(12,2) AS m3protec_cost,
-	v_price_x_catsoil.id AS soilcat_id,
-	v_price_x_catsoil.y_param,
-	v_price_x_catsoil.b,
-	v_price_x_catsoil.trenchlining,
-	v_price_x_catsoil.m3exc_cost::numeric(12,2) AS m3exc_cost,
-	v_price_x_catsoil.m3fill_cost::numeric(12,2) AS m3fill_cost,
-	v_price_x_catsoil.m3excess_cost::numeric(12,2) AS m3excess_cost,
-	v_price_x_catsoil.m2trenchl_cost::numeric(12,2) AS m2trenchl_cost,
-	v_plan_aux_arc_pavement.thickness,
-	v_plan_aux_arc_pavement.m2pav_cost,
-	v_arc.state,
-	v_arc.expl_id,
-	v_arc.the_geom
-   FROM v_arc
-	 LEFT JOIN v_price_x_catarc ON v_arc.arccat_id::text = v_price_x_catarc.id::text
-	 LEFT JOIN v_price_x_catsoil ON v_arc.soilcat_id::text = v_price_x_catsoil.id::text
-	 LEFT JOIN plan_arc_x_pavement ON plan_arc_x_pavement.arc_id::text = v_arc.arc_id::text
-	 LEFT JOIN v_plan_aux_arc_pavement ON v_plan_aux_arc_pavement.arc_id::text = v_arc.arc_id::text;
-
-
-CREATE OR REPLACE VIEW v_plan_aux_arc_cost AS 
- SELECT v_plan_aux_arc_ml.arc_id,
+CREATE OR REPLACE VIEW v_plan_arc AS 
+WITH v_plan_aux_arc_cost AS 
+	(WITH v_plan_aux_arc_ml AS
+		(SELECT v_arc.arc_id,
+		v_arc.depth1,
+		v_arc.depth2,
+			CASE
+				WHEN (v_arc.depth1 * v_arc.depth2) = 0::numeric OR (v_arc.depth1 * v_arc.depth2) IS NULL THEN v_price_x_catarc.estimated_depth
+				ELSE ((v_arc.depth1 + v_arc.depth2) / 2::numeric)::numeric(12,2)
+			END AS mean_depth,
+		v_arc.arccat_id,
+		(v_price_x_catarc.dint / 1000::numeric)::numeric(12,4) AS dint,
+		v_price_x_catarc.z1,
+		v_price_x_catarc.z2,
+		v_price_x_catarc.area,
+		v_price_x_catarc.width,
+		(v_price_x_catarc.bulk / 1000::numeric)::numeric(12,4) AS bulk,
+		v_price_x_catarc.cost_unit,
+		v_price_x_catarc.cost::numeric(12,2) AS arc_cost,
+		v_price_x_catarc.m2bottom_cost::numeric(12,2) AS m2bottom_cost,
+		v_price_x_catarc.m3protec_cost::numeric(12,2) AS m3protec_cost,
+		v_price_x_catsoil.id AS soilcat_id,
+		v_price_x_catsoil.y_param,
+		v_price_x_catsoil.b,
+		v_price_x_catsoil.trenchlining,
+		v_price_x_catsoil.m3exc_cost::numeric(12,2) AS m3exc_cost,
+		v_price_x_catsoil.m3fill_cost::numeric(12,2) AS m3fill_cost,
+		v_price_x_catsoil.m3excess_cost::numeric(12,2) AS m3excess_cost,
+		v_price_x_catsoil.m2trenchl_cost::numeric(12,2) AS m2trenchl_cost,
+		v_plan_aux_arc_pavement.thickness,
+		v_plan_aux_arc_pavement.m2pav_cost,
+		v_arc.state,
+		v_arc.expl_id,
+		v_arc.the_geom
+		FROM v_arc
+		 LEFT JOIN v_price_x_catarc ON v_arc.arccat_id::text = v_price_x_catarc.id::text
+		 LEFT JOIN v_price_x_catsoil ON v_arc.soilcat_id::text = v_price_x_catsoil.id::text
+		 LEFT JOIN plan_arc_x_pavement ON plan_arc_x_pavement.arc_id::text = v_arc.arc_id::text
+		 LEFT JOIN (
+			SELECT plan_arc_x_pavement.arc_id,
+				CASE
+				WHEN sum(v_price_x_catpavement.thickness * plan_arc_x_pavement.percent) IS NULL THEN 0::numeric(12,2)
+				ELSE sum(v_price_x_catpavement.thickness * plan_arc_x_pavement.percent)::numeric(12,2)
+				END AS thickness,
+				CASE
+				WHEN sum(v_price_x_catpavement.m2pav_cost) IS NULL THEN 0::numeric(12,2)
+				ELSE sum(v_price_x_catpavement.m2pav_cost::numeric(12,2) * plan_arc_x_pavement.percent)
+				END AS m2pav_cost
+			FROM ws_sample.plan_arc_x_pavement
+			LEFT JOIN ws_sample.v_price_x_catpavement ON v_price_x_catpavement.pavcat_id::text = plan_arc_x_pavement.pavcat_id::text
+			GROUP BY plan_arc_x_pavement.arc_id) v_plan_aux_arc_pavement ON v_plan_aux_arc_pavement.arc_id::text = v_arc.arc_id::text
+		)
+	SELECT v_plan_aux_arc_ml.arc_id,
 	v_plan_aux_arc_ml.depth1,
 	v_plan_aux_arc_ml.depth2,
 	v_plan_aux_arc_ml.mean_depth,
@@ -2473,13 +2480,7 @@ CREATE OR REPLACE VIEW v_plan_aux_arc_cost AS
 	((v_plan_aux_arc_ml.mean_depth + v_plan_aux_arc_ml.z1 + v_plan_aux_arc_ml.bulk - v_plan_aux_arc_ml.thickness) * (2::numeric * ((v_plan_aux_arc_ml.mean_depth + v_plan_aux_arc_ml.z1 + v_plan_aux_arc_ml.bulk - v_plan_aux_arc_ml.thickness) / v_plan_aux_arc_ml.y_param) + v_plan_aux_arc_ml.width + v_plan_aux_arc_ml.b * 2::numeric + v_plan_aux_arc_ml.b * 2::numeric + v_plan_aux_arc_ml.width) / 2::numeric - (v_plan_aux_arc_ml.z1 + v_plan_aux_arc_ml.dint + v_plan_aux_arc_ml.bulk * 2::numeric + v_plan_aux_arc_ml.z2) * ((2::numeric * ((v_plan_aux_arc_ml.z1 + v_plan_aux_arc_ml.dint + v_plan_aux_arc_ml.bulk * 2::numeric + v_plan_aux_arc_ml.z2) / v_plan_aux_arc_ml.y_param) + v_plan_aux_arc_ml.width + v_plan_aux_arc_ml.b * 2::numeric + (v_plan_aux_arc_ml.b * 2::numeric + v_plan_aux_arc_ml.width)) / 2::numeric))::numeric(12,3) AS m3mlfill,
 	((v_plan_aux_arc_ml.z1 + v_plan_aux_arc_ml.dint + v_plan_aux_arc_ml.bulk * 2::numeric + v_plan_aux_arc_ml.z2) * ((2::numeric * ((v_plan_aux_arc_ml.z1 + v_plan_aux_arc_ml.dint + v_plan_aux_arc_ml.bulk * 2::numeric + v_plan_aux_arc_ml.z2) / v_plan_aux_arc_ml.y_param) + v_plan_aux_arc_ml.width + v_plan_aux_arc_ml.b * 2::numeric + (v_plan_aux_arc_ml.b * 2::numeric + v_plan_aux_arc_ml.width)) / 2::numeric))::numeric(12,3) AS m3mlexcess,
 	v_plan_aux_arc_ml.the_geom
-   FROM v_plan_aux_arc_ml;
-
-
-
-
-
-CREATE OR REPLACE VIEW v_plan_arc AS 
+   FROM v_plan_aux_arc_ml)
  SELECT v_plan_aux_arc_cost.arc_id,
 	arc.node_1,
 	arc.node_2,
@@ -2579,7 +2580,13 @@ CREATE OR REPLACE VIEW v_plan_arc AS
 	v_plan_aux_arc_cost.the_geom
    FROM v_plan_aux_arc_cost
 	 JOIN arc ON arc.arc_id::text = v_plan_aux_arc_cost.arc_id::text
-	 LEFT JOIN v_plan_aux_arc_connec ON v_plan_aux_arc_connec.arc_id::text = v_plan_aux_arc_cost.arc_id::text;
+	 LEFT JOIN (
+		SELECT DISTINCT ON (connec.arc_id) connec.arc_id,
+		sum(connec.connec_length * (v_price_x_catconnec.cost_mlconnec + v_price_x_catconnec.cost_m3trench * connec.depth * 0.333) + v_price_x_catconnec.cost_ut)::numeric(12,2) AS connec_total_cost
+		FROM connec
+		JOIN v_price_x_catconnec ON v_price_x_catconnec.id::text = connec.connecat_id::text
+		GROUP BY connec.arc_id
+		 ) v_plan_aux_arc_connec ON v_plan_aux_arc_connec.arc_id::text = v_plan_aux_arc_cost.arc_id::text;
 
 
 CREATE OR REPLACE VIEW v_plan_result_arc AS 
