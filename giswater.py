@@ -827,7 +827,7 @@ class Giswater(QObject):
 
         # Manage schema name
         self.controller.get_current_user()
-        layer_source = self.qgis_tools.get_layer_source(self.layer_node)
+        layer_source = self.qgis_tools.qgis_get_layer_source(self.layer_node)
         self.schema_name = layer_source['schema']
         self.schema_name = self.schema_name.replace('"', '')
         self.controller.plugin_settings_set_value("schema_name", self.schema_name)
@@ -1029,7 +1029,7 @@ class Giswater(QObject):
 
         layers_name = []
         for layer in layers_list:
-            layer_source = self.qgis_tools.get_layer_source(layer)
+            layer_source = self.qgis_tools.qgis_get_layer_source(layer)
             # Collect only the layers of the work scheme
             if 'schema' in layer_source and layer_source['schema'].replace('"', '') == self.schema_name:
                 layers_name.append(layer.name())
@@ -1041,7 +1041,7 @@ class Giswater(QObject):
         """ Get references to project main layers """
 
         # Check if we have any layer loaded
-        layers = self.qgis_tools.get_layers()
+        layers = self.qgis_tools.qgis_get_layers()
         if len(layers) == 0:
             return False
 
@@ -1213,12 +1213,12 @@ class Giswater(QObject):
         self.available_layers = [layer[0] for layer in rows]
 
         self.set_form_suppress(self.available_layers)
-        all_layers_toc = self.qgis_tools.get_layers()
+        all_layers_toc = self.qgis_tools.qgis_get_layers()
         for layer in all_layers_toc:
-            layer_source = self.qgis_tools.get_layer_source(layer)
+            layer_source = self.qgis_tools.qgis_get_layer_source(layer)
             # Filter to take only the layers of the current schema
             if 'schema' not in layer_source or layer_source['schema'].replace('"', '') != self.schema_name: continue
-            table_name = f"{self.qgis_tools.get_layer_source_table_name(layer)}"
+            table_name = f"{self.qgis_tools.qgis_get_layer_source_table_name(layer)}"
             self.available_layers.append(table_name)
 
 

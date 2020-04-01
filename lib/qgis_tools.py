@@ -78,7 +78,7 @@ class QgisTools:
             return value
 
 
-    def get_layers(self):
+    def qgis_get_layers(self):
         """ Return layers in the same order as listed in TOC """
 
         layers = [layer.layer() for layer in QgsProject.instance().layerTreeRoot().findLayers()]
@@ -86,7 +86,7 @@ class QgisTools:
         return layers
 
 
-    def get_layer_source(self, layer):
+    def qgis_get_layer_source(self, layer):
         """ Get database connection paramaters of @layer """
 
         # Initialize variables
@@ -142,7 +142,7 @@ class QgisTools:
         return layer_source
 
 
-    def get_layer_source_table_name(self, layer):
+    def qgis_get_layer_source_table_name(self, layer):
         """ Get table or view name of selected layer """
 
         if layer is None:
@@ -159,7 +159,7 @@ class QgisTools:
         return uri_table
 
 
-    def get_layer_primary_key(self, layer=None):
+    def qgis_get_layer_primary_key(self, layer=None):
         """ Get primary key of selected layer """
 
         uri_pk = None
