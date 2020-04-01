@@ -164,41 +164,40 @@ class Giswater(QObject):
 
         action = None
         try:
+
             action = self.actions[index_action]
+            callback_function = None
 
             # Basic toolbar actions
-            if int(index_action) in (32, 41, 48, 86):
+            if 'basic' in self.dict_actions and index_action in self.dict_actions['basic']:
                 callback_function = getattr(self.basic, function_name)
-                action.triggered.connect(callback_function)
             # Mincut toolbar actions
-            elif int(index_action) in (26, 27) and self.wsoftware == 'ws':
-                callback_function = getattr(self.mincut, function_name)
-                action.triggered.connect(callback_function)
+            elif 'mincut' in self.dict_actions and index_action in self.dict_actions['mincut']:
+                if self.wsoftware == 'ws':
+                    callback_function = getattr(self.mincut, function_name)
             # OM toolbar actions
-            elif int(index_action) in (18, 64, 65, 74, 75, 76, 81, 82, 84):
+            elif 'om' in self.dict_actions and index_action in self.dict_actions['om']:
                 callback_function = getattr(self.om, function_name)
-                action.triggered.connect(callback_function)
             # Edit toolbar actions
-            elif int(index_action) in (1, 2, 33, 34, 66, 67, 68, 69):
+            elif 'edit' in self.dict_actions and index_action in self.dict_actions['edit']:
                 callback_function = getattr(self.edit, function_name)
-                action.triggered.connect(callback_function)
             # Go2epa toolbar actions
-            elif int(index_action) in (23, 25, 29, 196):
+            elif 'go2epa' in self.dict_actions and index_action in self.dict_actions['go2epa']:
                 callback_function = getattr(self.go2epa, function_name)
-                action.triggered.connect(callback_function)
             # Master toolbar actions
-            elif int(index_action) in (45, 46, 47, 38, 49, 50):
+            elif 'master' in self.dict_actions and index_action in self.dict_actions['master']:
                 callback_function = getattr(self.master, function_name)
-                action.triggered.connect(callback_function)
             # Utils toolbar actions
-            elif int(index_action) in (206, 58, 83, 99, 59):
+            elif 'utils' in self.dict_actions and index_action in self.dict_actions['utils']:
                 callback_function = getattr(self.utils, function_name)
-                action.triggered.connect(callback_function)
             # Tm Basic toolbar actions
-            elif int(index_action) in (301, 302, 303, 304, 305):
+            elif 'tm_basic' in self.dict_actions and index_action in self.dict_actions['tm_basic']:
                 callback_function = getattr(self.tm_basic, function_name)
+
+            # Action found
+            if callback_function:
                 action.triggered.connect(callback_function)
-            # Generic function
+            # Action not found: execute generic function
             else:
                 callback_function = getattr(self, 'action_triggered')
                 action.triggered.connect(partial(callback_function, function_name))
@@ -602,6 +601,25 @@ class Giswater(QObject):
 
         # Set main information button (always visible)
         self.set_info_button()
+
+        # Manage section 'actions_list' of config file
+        self.manage_actions_list()
+
+
+    def manage_actions_list(self):
+        """ Manage section 'actions_list' of config file """
+
+        # List of toolbars defined in section 'action_list'
+        list_keys = ['basic', 'mincut', 'om', 'edit', 'go2epa', 'master', 'utils', 'tm_basic']
+        self.dict_actions = {}
+        for key in list_keys:
+            list_values = global_vars.settings.value(f"actions_list/{key}")
+            if list_values:
+                self.dict_actions[key] = list_values
+            else:
+                self.controller.show_warning(f"Action list not set in section 'actions_list' of config file: '{key}'")
+
+        self.controller.log_info(self.dict_actions)
 
 
     def manage_feature_cat(self):
