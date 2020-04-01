@@ -77,3 +77,101 @@ class QgisTools:
         finally:
             return value
 
+
+    def get_layers(self):
+        """ Return layers in the same order as listed in TOC """
+
+        layers = [layer.layer() for layer in QgsProject.instance().layerTreeRoot().findLayers()]
+
+        return layers
+
+
+    def get_layer_source(self, layer):
+        """ Get database connection paramaters of @layer """
+
+        # Initialize variables
+        layer_source = {'db': None, 'schema': None, 'table': None,
+                        'host': None, 'port': None, 'user': None, 'password': None}
+
+        if layer is None:
+            return layer_source
+
+        # Get dbname, host, port, user and password
+        uri = layer.dataProvider().dataSourceUri()
+        pos_db = uri.find('dbname=')
+        pos_host = uri.find(' host=')
+        pos_port = uri.find(' port=')
+        pos_user = uri.find(' user=')
+        pos_password = uri.find(' password=')
+        pos_sslmode = uri.find(' sslmode=')
+        pos_key = uri.find(' key=')
+        if pos_db != -1 and pos_host != -1:
+            uri_db = uri[pos_db + 8:pos_host - 1]
+            layer_source['db'] = uri_db
+        if pos_host != -1 and pos_port != -1:
+            uri_host = uri[pos_host + 6:pos_port]
+            layer_source['host'] = uri_host
+        if pos_port != -1:
+            if pos_user != -1:
+                pos_end = pos_user
+            elif pos_sslmode != -1:
+                pos_end = pos_sslmode
+            elif pos_key != -1:
+                pos_end = pos_key
+            else:
+                pos_end = pos_port + 10
+            uri_port = uri[pos_port + 6:pos_end]
+            layer_source['port'] = uri_port
+        if pos_user != -1 and pos_password != -1:
+            uri_user = uri[pos_user + 7:pos_password - 1]
+            layer_source['user'] = uri_user
+        if pos_password != -1 and pos_sslmode != -1:
+            uri_password = uri[pos_password + 11:pos_sslmode - 1]
+            layer_source['password'] = uri_password
+
+            # Get schema and table or view name
+        pos_table = uri.find('table=')
+        pos_end_schema = uri.rfind('.')
+        pos_fi = uri.find('" ')
+        if pos_table != -1 and pos_fi != -1:
+            uri_schema = uri[pos_table + 6:pos_end_schema]
+            uri_table = uri[pos_end_schema + 2:pos_fi]
+            layer_source['schema'] = uri_schema
+            layer_source['table'] = uri_table
+
+        return layer_source
+
+
+    def get_layer_source_table_name(self, layer):
+        """ Get table or view name of selected layer """
+
+        if layer is None:
+            return None
+
+        uri_table = None
+        uri = layer.dataProvider().dataSourceUri().lower()
+        pos_ini = uri.find('table=')
+        pos_end_schema = uri.rfind('.')
+        pos_fi = uri.find('" ')
+        if pos_ini != -1 and pos_fi != -1:
+            uri_table = uri[pos_end_schema + 2:pos_fi]
+
+        return uri_table
+
+
+    def get_layer_primary_key(self, layer=None):
+        """ Get primary key of selected layer """
+
+        uri_pk = None
+        if layer is None:
+            layer = self.iface.activeLayer()
+        if layer is None:
+            return uri_pk
+        uri = layer.dataProvider().dataSourceUri().lower()
+        pos_ini = uri.find('key=')
+        pos_end = uri.rfind('srid=')
+        if pos_ini != -1:
+            uri_pk = uri[pos_ini + 5:pos_end - 2]
+
+        return uri_pk
+

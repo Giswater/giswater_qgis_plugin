@@ -11,6 +11,7 @@ import sys
 settings = None
 qgis_settings = None
 plugin_name = None
+qgis_tools = None
 
 
 def init_settings(setting_file):
@@ -26,6 +27,12 @@ def init_qgis_settings(p_plugin_name):
     plugin_name = p_plugin_name
     qgis_settings = QSettings()
     qgis_settings.setIniCodec(sys.getfilesystemencoding())
+
+
+def init_qgis_tools(p_qgis_tools):
+
+    global qgis_tools
+    qgis_tools = p_qgis_tools
 
 
 def plugin_settings_set_value(key, value):
