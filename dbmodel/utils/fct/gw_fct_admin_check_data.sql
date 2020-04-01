@@ -242,11 +242,10 @@ END IF;
 
 	--check if all the fields defined as combo or typeahead have dv_querytext defined
 	SELECT count(*), string_agg(concat(formname,'.',column_id),',') INTO v_count, v_view_list  FROM config_api_form_fields 
-	WHERE (widgettype = 'combo' or widgettype ='typeahead') and dv_querytext is null AND formtype='feature';
+	WHERE (widgettype = 'combo' or widgettype ='typeahead') and dv_querytext is null;
 
 	IF v_count > 0 THEN
-		v_errortext = concat('ERROR: There is/are ',v_count,' feature form fields in config_api_form_fields that are combo or typeahead but don''t have dv_querytext defined. 
-		Fields: ',v_view_list,'.');
+		v_errortext = concat('ERROR: There is/are ',v_count,' feature form fields in config_api_form_fields that are combo or typeahead but don''t have dv_querytext defined. Fields: ',v_view_list,'.');
 		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 		VALUES (95, 3, v_errortext);
 	ELSE
