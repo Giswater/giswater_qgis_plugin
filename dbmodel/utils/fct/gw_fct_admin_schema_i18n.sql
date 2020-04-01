@@ -34,6 +34,7 @@ v_querytext text;
 v_parent_layer text;
 v_clause_view text;
 v_formname text;
+v_man_type text;
 
 rec_child_layer text;
 
@@ -61,11 +62,19 @@ BEGIN
 			v_parent_layer = (quote_literal('ve_connec'), quote_literal('v_edit_connec'));
 		ELSIF v_formname = 've_arc' THEN
 			v_parent_layer = (quote_literal('ve_arc'), quote_literal('v_edit_arc'));
-		ELSIF v_clause ~ 've_gully' THEN
+		ELSIF v_formname = 've_gully' THEN
 			v_parent_layer = (quote_literal('ve_gully'), quote_literal('v_edit_gully'));
+		ELSIF v_formname ILIKE 've_node_%' THEN
+			v_man_type = upper(replace(v_formname,'ve_node_',''));
+		ELSIF v_formname ILIKE 've_connec_%' THEN
+			v_man_type = upper(replace(v_formname,'ve_connec_',''));
+		ELSIF v_formname ILIKE 've_arc_%' THEN
+			v_man_type = upper(replace(v_formname,'ve_arc_',''));
+		ELSIF v_formname ILIKE 've_gully_%' THEN
+			v_man_type = upper(replace(v_formname,'ve_gully_',''));
 		END IF;
 	END IF;
-	
+
 	-- vmodeclause
 	IF v_mode = 0 THEN
 		v_modelabel = ' ; ';
@@ -95,7 +104,20 @@ BEGIN
 				v_querytext = 'UPDATE '|| v_table ||' SET '|| v_label_col ||' = '|| quote_literal(v_label_val) ||' '|| v_clause_view ||' '|| v_modelabel;
 				EXECUTE v_querytext;
 
-				v_querytext = 'UPDATE '|| v_table ||' SET '|| v_tooltip_col ||' = '|| quote_literal(v_tooltip_val) ||' '|| v_clause_view ||' '|| v_modelabel;
+				v_querytext = 'UPDATE '|| v_table ||' SET '|| v_tooltip_col ||' = '|| quote_literal(v_tooltip_val) ||' '|| v_clause_view ||' '|| v_modetooltip;
+				EXECUTE v_querytext;
+
+			END LOOP;
+		ELSIF v_man_type IS NOT NULL THEN
+
+			FOR rec_child_layer IN EXECUTE 'SELECT child_layer FROM cat_feature WHERE system_id = '||quote_literal(v_man_type)||';'
+			LOOP
+				v_clause_view = replace(v_clause, v_formname, rec_child_layer);
+
+				v_querytext = 'UPDATE '|| v_table ||' SET '|| v_label_col ||' = '|| quote_literal(v_label_val) ||' '|| v_clause_view ||' '|| v_modelabel;
+				EXECUTE v_querytext;
+
+				v_querytext = 'UPDATE '|| v_table ||' SET '|| v_tooltip_col ||' = '|| quote_literal(v_tooltip_val) ||' '|| v_clause_view ||' '|| v_modetooltip;
 				EXECUTE v_querytext;
 
 			END LOOP;
