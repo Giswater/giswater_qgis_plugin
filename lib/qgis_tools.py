@@ -5,6 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+from qgis.core import QgsExpressionContextUtils, QgsProject
 from qgis.PyQt.QtWidgets import QDockWidget
 
 import configparser
@@ -63,4 +64,16 @@ class QgisTools:
         message_log = self.iface.mainWindow().findChild(QDockWidget, 'MessageLog')
         if message_log:
             message_log.setVisible(True)
+
+
+    def get_project_variable(self, var_name):
+        """ Get project variable """
+
+        value = None
+        try:
+            value = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable(var_name)
+        except Exception:
+            pass
+        finally:
+            return value
 

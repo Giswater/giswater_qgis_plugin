@@ -1130,11 +1130,7 @@ class Giswater(QObject):
         """ Manage project variable 'expl_id' """
 
         # Get project variable 'expl_id'
-        try:
-            expl_id = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('expl_id')
-        except:
-            pass
-
+        expl_id = self.qgis_tools.get_project_variable('expl_id')
         if expl_id is None:
             return
 
