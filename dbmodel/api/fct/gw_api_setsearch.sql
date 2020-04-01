@@ -168,44 +168,44 @@ BEGIN
 IF tab_arg = 'network' THEN
 
     -- Layers to search:
-    SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_arc FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_arc';
-    SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_node FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_node';
-    SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_connec FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_connec';
-    SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_gully FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_gully';
-    SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_element FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_element';
-    SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_visit FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_visit';
+    SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_arc FROM config_param_system WHERE parameter='api_search_arc';
+    SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_node FROM config_param_system WHERE parameter='api_search_node';
+    SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_connec FROM config_param_system WHERE parameter='api_search_connec';
+    SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_gully FROM config_param_system WHERE parameter='api_search_gully';
+    SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_element FROM config_param_system WHERE parameter='api_search_element';
+    SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_visit FROM config_param_system WHERE parameter='api_search_visit';
 
     -- Layer's primary key;
-    SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_arc_id FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_arc';
-    SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_node_id FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_node';
-    SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_connec_id FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_connec';
-    SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_gully_id FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_gully';
-    SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_element_id FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_element';
-    SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_visit_id FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_visit';
+    SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_arc_id FROM config_param_system WHERE parameter='api_search_arc';
+    SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_node_id FROM config_param_system WHERE parameter='api_search_node';
+    SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_connec_id FROM config_param_system WHERE parameter='api_search_connec';
+    SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_gully_id FROM config_param_system WHERE parameter='api_search_gully';
+    SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_element_id FROM config_param_system WHERE parameter='api_search_element';
+    SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_visit_id FROM config_param_system WHERE parameter='api_search_visit';
 
     -- Layer's field to search:
-    SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_arc FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_arc';
-    SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_node FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_node';
-    SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_connec FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_connec';
-    SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_gully FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_gully';
-    SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_element FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_element';
-    SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_visit FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_visit';
+    SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_arc FROM config_param_system WHERE parameter='api_search_arc';
+    SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_node FROM config_param_system WHERE parameter='api_search_node';
+    SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_connec FROM config_param_system WHERE parameter='api_search_connec';
+    SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_gully FROM config_param_system WHERE parameter='api_search_gully';
+    SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_element FROM config_param_system WHERE parameter='api_search_element';
+    SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_visit FROM config_param_system WHERE parameter='api_search_visit';
    
     -- Layer's catalog field;
-    SELECT ((value::json)->>'cat_field') INTO p_network_search_field_arc_cat FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_arc';
-    SELECT ((value::json)->>'cat_field') INTO p_network_search_field_node_cat FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_node';
-    SELECT ((value::json)->>'cat_field') INTO p_network_search_field_connec_cat FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_connec';
-    SELECT ((value::json)->>'cat_field') INTO p_network_search_field_gully_cat FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_gully';
-    SELECT ((value::json)->>'cat_field') INTO p_network_search_field_element_cat FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_element';
-    SELECT ((value::json)->>'cat_field') INTO p_network_search_field_visit_cat FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_visit';
+    SELECT ((value::json)->>'cat_field') INTO p_network_search_field_arc_cat FROM config_param_system WHERE parameter='api_search_arc';
+    SELECT ((value::json)->>'cat_field') INTO p_network_search_field_node_cat FROM config_param_system WHERE parameter='api_search_node';
+    SELECT ((value::json)->>'cat_field') INTO p_network_search_field_connec_cat FROM config_param_system WHERE parameter='api_search_connec';
+    SELECT ((value::json)->>'cat_field') INTO p_network_search_field_gully_cat FROM config_param_system WHERE parameter='api_search_gully';
+    SELECT ((value::json)->>'cat_field') INTO p_network_search_field_element_cat FROM config_param_system WHERE parameter='api_search_element';
+    SELECT ((value::json)->>'cat_field') INTO p_network_search_field_visit_cat FROM config_param_system WHERE parameter='api_search_visit';
 
     -- xxxxx:
-    SELECT ((value::json)->>'feature_type') INTO v_feature_type_arc FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_arc';
-    SELECT ((value::json)->>'feature_type') INTO v_feature_type_node FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_node';
-    SELECT ((value::json)->>'feature_type') INTO v_feature_type_connec FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_connec';
-    SELECT ((value::json)->>'feature_type') INTO v_feature_type_gully FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_gully';
-    SELECT ((value::json)->>'feature_type') INTO v_feature_type_element FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_element';
-    SELECT ((value::json)->>'feature_type') INTO v_feature_type_visit FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_visit';
+    SELECT ((value::json)->>'feature_type') INTO v_feature_type_arc FROM config_param_system WHERE parameter='api_search_arc';
+    SELECT ((value::json)->>'feature_type') INTO v_feature_type_node FROM config_param_system WHERE parameter='api_search_node';
+    SELECT ((value::json)->>'feature_type') INTO v_feature_type_connec FROM config_param_system WHERE parameter='api_search_connec';
+    SELECT ((value::json)->>'feature_type') INTO v_feature_type_gully FROM config_param_system WHERE parameter='api_search_gully';
+    SELECT ((value::json)->>'feature_type') INTO v_feature_type_element FROM config_param_system WHERE parameter='api_search_element';
+    SELECT ((value::json)->>'feature_type') INTO v_feature_type_visit FROM config_param_system WHERE parameter='api_search_visit';
     
 
     

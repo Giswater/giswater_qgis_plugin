@@ -58,7 +58,8 @@ UPDATE config_param_system SET isautoupdate = false where layoutname is  not nul
 UPDATE config_param_system SET datatype = 'json' where parameter  IN ('api_search_muni', 'api_search_gully');
 UPDATE config_param_system SET widgettype = null, ismandatory = null, layout_order = null WHERE layoutname is null;
 UPDATE config_param_system SET context = 'api' where parameter  IN ('api_search_exploitation');
-UPDATE config_param_system SET context = 'api', descript = 'Api configuration parameteres' where context IN ('api_search_network', 'api_search_workcat', 'api_search_adress');
+UPDATE config_param_system SET context = 'api_search', descript = 'Search configuration parameteres' 
+where context IN ('api_search_network', 'api_search_workcat', 'api_search_adress', 'api_search_hydrometer', 'api_search_visit', 'api_search_psector', 'api');
 UPDATE config_param_system SET descript = 'Variable to configure prefix on subcathcments' where parameter = 'inp_subc_seq_id_prefix';
 UPDATE config_param_system SET isenabled = true where isenabled is null;
 

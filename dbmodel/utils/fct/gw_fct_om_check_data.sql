@@ -136,6 +136,22 @@ BEGIN
 		VALUES (25, 1, 'INFO: No arcs with state=1 using nodes with state=0 found.');
 	END IF;
 
+	-- check conduits (UD) with negative slope and inverted slope is not checked
+	IF v_project_type  ='UD' THEN
+		v_querytext = '(SELECT a.arc_id, arccat_id, a.the_geom FROM '||v_edit||'arc a WHERE sys_slope < 0 AND inverted_slope IS FALSE)';
+		
+		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+			VALUES (25, 3, concat('ERROR: There is/are ',v_count,' arcs with inverted slope false and slope negative values. Please, check your data before continue'));
+			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+			VALUES (25, 3, concat('SELECT * FROM arc WHERE state > 0 AND sys_slope < 0 AND inverted_slope IS FALSE'));
+		ELSE
+			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+			VALUES (25, 1, 'INFO: No arcs with state=1 using nodes with state=0 found.');
+		END IF;	
+	END IF;
+
 	-- Chec state 1 arcs with state 2 nodes (97)
 	v_querytext = '(SELECT a.arc_id, arccat_id, a.the_geom FROM '||v_edit||'arc a JOIN '||v_edit||'node n ON node_1=node_id WHERE a.state =1 AND n.state=2 UNION
 			SELECT a.arc_id, arccat_id, a.the_geom FROM '||v_edit||'arc a JOIN '||v_edit||'node n ON node_2=node_id WHERE a.state =1 AND n.state=2) a';
@@ -165,7 +181,7 @@ BEGIN
 		v_querytext = concat (v_querytext, ' UNION SELECT a.gully_id FROM '||v_edit||'gully a RIGHT JOIN plan_psector_x_gully USING (gully_id) WHERE a.state = 2 AND a.gully_id IS NULL');
 	END IF;
 		
-	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')') INTO v_count;
+	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
@@ -748,8 +764,8 @@ BEGIN
 
 --  Exception handling
 	EXCEPTION WHEN OTHERS THEN
-	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 
 END;
