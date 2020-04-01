@@ -370,7 +370,7 @@ class Giswater(QObject):
         """
 
         toolbar_key = f"{toolbar_id}_{self.controller.get_project_type()}"
-        if toolbar_id not in self.dict_toolbars:
+        if toolbar_key not in self.dict_toolbars:
             return
 
         list_actions = self.dict_toolbars[toolbar_key]
@@ -385,7 +385,7 @@ class Giswater(QObject):
         """
 
         toolbar_key = f"{toolbar_id}_{self.controller.get_project_type()}"
-        if toolbar_id not in self.dict_toolbars:
+        if toolbar_key not in self.dict_toolbars:
             return
 
         list_actions = self.dict_toolbars[toolbar_key]
