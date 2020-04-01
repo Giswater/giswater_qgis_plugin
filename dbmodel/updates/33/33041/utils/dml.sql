@@ -16,6 +16,8 @@ ON CONFLICT (id) DO NOTHING;
 UPDATE audit_cat_table SET isdeprecated = true 
 WHERE id IN ('anl_arc_profile_value');
 
+UPDATE audit_cat_table SET id  ='ext_rtc_dma_period' WHERE id = 'ext_rtc_scada_dma_period';
+
 INSERT INTO sys_fprocess_cat(id, fprocess_name, context, project_type)
 VALUES (122,'Profile analysis','om','utils') 
 ON CONFLICT (id) DO NOTHING;
@@ -91,5 +93,5 @@ ON CONFLICT (id) DO NOTHING;
 
 --2020/04/01
 
-INSERT INTO sys_fprocess_cat(id, fprocess_name, context, fprocess_i18n, project_type)
+INSERT INTO sys_fprocess_cat(id, fprocess_name, context, project_type)
 VALUES (123,'Check arc drawing direction','om', 'utils') ON CONFLICT (id) DO NOTHING;

@@ -107,7 +107,7 @@ BEGIN
 							-- Patterns is estimated unitary pattern for dma applied to each node of that dma.
 			UPDATE rpt_inp_node SET demand=((lps_avg*v_epaunits)/d.effc)::numeric(12,8), pattern_id = d.pattern_id
 						FROM v_rtc_period_node n 
-						JOIN ext_rtc_scada_dma_period d ON n.dma_id=d.dma_id AND n.period_id=d.cat_period_id
+						JOIN ext_rtc_dma_period d ON n.dma_id=d.dma_id AND n.period_id=d.cat_period_id
 						WHERE n.node_id=rpt_inp_node.node_id AND result_id=result_id_var;		
 
 		ELSIF v_patternmethod = 24 THEN  	-- NODE PERIOD (Blanes model)
