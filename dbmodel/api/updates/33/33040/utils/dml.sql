@@ -99,3 +99,8 @@ UPDATE config_api_form_fields SET hidden = true WHERE column_id = 'connectype_id
 
 UPDATE config_api_form_fields SET widgettype = 'text' where column_id = 'lastupdate';
 UPDATE config_api_form_fields SET widgettype = 'combo' where column_id = 'macrosector_id';
+
+--2020/03/31
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"sys_feature_cat", "column":"orderby"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"sys_feature_cat", "column":"shortcut_key"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"sys_feature_cat", "column":"tablename"}}$$);

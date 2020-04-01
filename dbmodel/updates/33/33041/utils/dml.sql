@@ -88,7 +88,3 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO audit_cat_function VALUES (2844, 'gw_trg_edit_team_x_vehicle', 'utils', 'function trigger', NULL, NULL, NULL, 'Makes editable v_om_team_x_vehicle', 'role_om', false) 
 ON CONFLICT (id) DO NOTHING;
 
---2020/03/31
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"sys_feature_cat", "column":"orderby"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"sys_feature_cat", "column":"shortcut_key"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"sys_feature_cat", "column":"tablename"}}$$);
