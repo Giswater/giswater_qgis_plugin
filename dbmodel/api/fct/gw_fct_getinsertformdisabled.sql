@@ -36,6 +36,8 @@ DECLARE
     v_force_canvasrefresh text = 'FALSE';
     v_enable_editgeom text = 'TRUE';
     v_enable_delfeaeture text = 'TRUE';
+    v_dv_querytext text;
+    v_array text[];
     
 
 BEGIN
@@ -88,9 +90,10 @@ BEGIN
 
  --    Get fields
     EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT id, label, name, type, ''TRUE'' AS disabled, "dataType", placeholder, (ROW_NUMBER() OVER(ORDER BY orderby asc)) AS rownum, 
-        dv_table, dv_id_column, dv_name_column FROM config_web_fields WHERE table_id = $1 order by 8) a'
+        dv_table, dv_id_column, dv_name_column, dv_querytext FROM config_web_fields WHERE table_id = $1 order by 8) a'
         INTO fields_array
         USING table_id;  
+
     fields_array := COALESCE(fields_array, '{}');
 
 --    Update combos
@@ -101,27 +104,19 @@ BEGIN
 
 		raise notice 'aux_json %', aux_json;
 
-	--      Get combo id's
-		EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'dv_id_column') || '::text)) FROM (SELECT ' || quote_ident(aux_json->>'dv_id_column') || ' FROM ' 
-		|| quote_ident(aux_json->>'dv_table') || ' ORDER BY '||quote_ident(aux_json->>'dv_name_column') || ') a'
-		INTO combo_json; 
+		v_dv_querytext=(aux_json->>'dv_querytext');
 
-	--        Update array
+		-- Get combo id's
+		EXECUTE 'SELECT (array_agg(id)) FROM ('||(v_dv_querytext)||')a'
+			INTO v_array;
+		combo_json = array_to_json(v_array);
 		fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'comboIds', COALESCE(combo_json, '[]'));
-		IF combo_json IS NOT NULL THEN
-			fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'selectedId', combo_json->0);
-		ELSE
-			fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'selectedId', to_json('Fred said "Hi."'::text));        
-		END IF;
 
-	--        Get combo values
-		EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'dv_name_column') || ')) FROM (SELECT ' || quote_ident(aux_json->>'dv_name_column') ||  ' FROM '
-		|| quote_ident(aux_json->>'dv_table') || ' ORDER BY '||quote_ident(aux_json->>'dv_name_column') || ') a'
-		INTO combo_json; 
-		combo_json := COALESCE(combo_json, '[]');
-	
-	--      Update array
-		fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'comboNames', combo_json);
+		-- Get combo values
+		EXECUTE 'SELECT (array_agg(idval)) FROM ('||(v_dv_querytext)||')a'
+			INTO v_array;
+		combo_json = array_to_json(v_array);
+		fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'comboNames', COALESCE(combo_json, '[]'));
 	END IF;
 	
     END LOOP;
