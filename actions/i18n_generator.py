@@ -341,11 +341,13 @@ class I18NGenerator(ParentAction):
             if row['context'] in ('config_param_system', 'audit_cat_param_user'):
                 line +=(f'{{"data":'
                             f'{{"table":"{table}", '                                
+                                f'"formname":"{form_name}", '
                                 f'"label":{{"column":"label", "value":"{lbl_value}"}}, '
                                 f'"tooltip":{{"column":"descript", "value":"{tt_value}"}}')
             elif row['context'] not in ('config_param_system', 'audit_cat_param_user'):
                 line += (f'{{"data":'
                          f'{{"table":"{table}", '                         
+                         f'"formname":"{form_name}", '
                          f'"label":{{"column":"label", "value":"{lbl_value}"}}, '
                          f'"tooltip":{{"column":"tooltip", "value":"{tt_value}"}}')
 
