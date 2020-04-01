@@ -5,8 +5,8 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsEditorWidgetSetup, QgsExpressionContextUtils, QgsFieldConstraints
-from qgis.core import QgsPointLocator, QgsProject, QgsSnappingUtils, QgsTolerance
+from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsPointLocator, QgsProject, QgsSnappingUtils, \
+    QgsTolerance
 from qgis.PyQt.QtCore import QObject, QPoint, QSettings, Qt
 from qgis.PyQt.QtWidgets import QAction, QActionGroup, QApplication, QDockWidget, QMenu, QToolBar, QToolButton
 from qgis.PyQt.QtGui import QIcon, QKeySequence, QCursor
@@ -19,6 +19,7 @@ from collections import OrderedDict
 from functools import partial
 from json import JSONDecodeError
 
+from . import global_vars
 from .lib.qgis_tools import QgisTools
 from .actions.add_layer import AddLayer
 from .actions.basic import Basic
@@ -88,18 +89,15 @@ class Giswater(QObject):
             self.iface.messageBar().pushMessage("", message, 1, 20)
             return
 
-        # Set plugin settings
-        self.settings = QSettings(setting_file, QSettings.IniFormat)
-        self.settings.setIniCodec(sys.getfilesystemencoding())
+        # Set plugin and QGIS settings: stored in the registry (on Windows) or .ini file (on Unix)
+        global_vars.init_settings(setting_file)
+        global_vars.init_qgis_settings(self.plugin_name)
+        global_vars.plugin_settings_set_value('aaa', 'vbrgs')
 
         # Enable Python console and Log Messages panel if parameter 'enable_python_console' = True
-        enable_python_console = self.settings.value('system_variables/enable_python_console', 'FALSE').upper()
+        enable_python_console = global_vars.settings.value('system_variables/enable_python_console', 'FALSE').upper()
         if enable_python_console == 'TRUE':
             self.qgis_tools.enable_python_console()
-
-        # Set QGIS settings. Stored in the registry (on Windows) or .ini file (on Unix)
-        self.qgis_settings = QSettings()
-        self.qgis_settings.setIniCodec(sys.getfilesystemencoding())
 
         # Define signals
         self.set_signals()
@@ -129,7 +127,7 @@ class Giswater(QObject):
             self.action = QAction("Show info", self.iface.mainWindow())
 
         self.toolButton.setDefaultAction(self.action)
-        self.update_sql = UpdateSQL(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.update_sql = UpdateSQL(self.iface, global_vars.settings, self.controller, self.plugin_dir)
         self.action.triggered.connect(self.update_sql.init_sql)
 
 
@@ -303,7 +301,7 @@ class Giswater(QObject):
         """
 
         text_action = self.tr(index_action + '_text')
-        function_name = self.settings.value('actions/' + str(index_action) + '_function')
+        function_name = global_vars.settings.value('actions/' + str(index_action) + '_function')
         if not function_name:
             return None
 
@@ -331,31 +329,31 @@ class Giswater(QObject):
 
         # Check if the @action has an associated map_tool
         if int(index_action) == 16:
-            map_tool = MoveNodeMapTool(self.iface, self.settings, action, index_action)
+            map_tool = MoveNodeMapTool(self.iface, global_vars.settings, action, index_action)
         elif int(index_action) == 17:
-            map_tool = DeleteNodeMapTool(self.iface, self.settings, action, index_action)
+            map_tool = DeleteNodeMapTool(self.iface, global_vars.settings, action, index_action)
         elif int(index_action) == 20:
-            map_tool = ConnecMapTool(self.iface, self.settings, action, index_action)
+            map_tool = ConnecMapTool(self.iface, global_vars.settings, action, index_action)
         elif int(index_action) == 28:
-            map_tool = ChangeElemType(self.iface, self.settings, action, index_action)
+            map_tool = ChangeElemType(self.iface, global_vars.settings, action, index_action)
         elif int(index_action) in (37, 199):
-            map_tool = CadApiInfo(self.iface, self.settings, action, index_action)
+            map_tool = CadApiInfo(self.iface, global_vars.settings, action, index_action)
         elif int(index_action) == 39:
-            map_tool = Dimensioning(self.iface, self.settings, action, index_action)
+            map_tool = Dimensioning(self.iface, global_vars.settings, action, index_action)
         elif int(index_action) == 43:
-            map_tool = DrawProfiles(self.iface, self.settings, action, index_action)
+            map_tool = DrawProfiles(self.iface, global_vars.settings, action, index_action)
         elif int(index_action) == 44:
-            map_tool = ReplaceFeatureMapTool(self.iface, self.settings, action, index_action)
+            map_tool = ReplaceFeatureMapTool(self.iface, global_vars.settings, action, index_action)
         elif int(index_action) == 56:
-            map_tool = FlowTraceFlowExitMapTool(self.iface, self.settings, action, index_action)
+            map_tool = FlowTraceFlowExitMapTool(self.iface, global_vars.settings, action, index_action)
         elif int(index_action) == 57:
-            map_tool = FlowTraceFlowExitMapTool(self.iface, self.settings, action, index_action)
+            map_tool = FlowTraceFlowExitMapTool(self.iface, global_vars.settings, action, index_action)
         elif int(index_action) == 61:
-            map_tool = OpenVisit(self.iface, self.settings, action, index_action)
+            map_tool = OpenVisit(self.iface, global_vars.settings, action, index_action)
         elif int(index_action) == 71:
-            map_tool = CadAddCircle(self.iface, self.settings, action, index_action)
+            map_tool = CadAddCircle(self.iface, global_vars.settings, action, index_action)
         elif int(index_action) == 72:
-            map_tool = CadAddPoint(self.iface, self.settings, action, index_action)
+            map_tool = CadAddPoint(self.iface, global_vars.settings, action, index_action)
 
         # If this action has an associated map tool, add this to dictionary of available map_tools
         if map_tool:
@@ -597,9 +595,8 @@ class Giswater(QObject):
         """ Plugin main initialization function """
 
         # Set controller (no database connection yet)
-        self.controller = DaoController(self.settings, self.plugin_name, self.iface, create_logger=True)
+        self.controller = DaoController(self.plugin_name, self.iface, create_logger=True)
         self.controller.set_plugin_dir(self.plugin_dir)
-        self.controller.set_qgis_settings(self.qgis_settings)
         self.controller.set_giswater(self)
 
         # Set main information button (always visible)
@@ -670,7 +667,7 @@ class Giswater(QObject):
 
         try:
             # Unlisten notify channel and stop thread
-            if self.settings.value('system_variables/use_notify').upper() == 'TRUE' and hasattr(self, 'notify'):
+            if global_vars.settings.value('system_variables/use_notify').upper() == 'TRUE' and hasattr(self, 'notify'):
                 list_channels = ['desktop', self.controller.current_user]
                 self.notify.stop_listening(list_channels)
 
@@ -798,13 +795,13 @@ class Giswater(QObject):
     def initialize_toolbars(self):
         """ Initialize toolbars """
 
-        self.basic = Basic(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.basic = Basic(self.iface, global_vars.settings, self.controller, self.plugin_dir)
         self.basic.set_giswater(self)
-        self.utils = Utils(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.go2epa = Go2Epa(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.om = Om(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.edit = Edit(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.master = Master(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.utils = Utils(self.iface, global_vars.settings, self.controller, self.plugin_dir)
+        self.go2epa = Go2Epa(self.iface, global_vars.settings, self.controller, self.plugin_dir)
+        self.om = Om(self.iface, global_vars.settings, self.controller, self.plugin_dir)
+        self.edit = Edit(self.iface, global_vars.settings, self.controller, self.plugin_dir)
+        self.master = Master(self.iface, global_vars.settings, self.controller, self.plugin_dir)
 
 
     def project_new(self):
@@ -853,8 +850,8 @@ class Giswater(QObject):
         self.srid = self.controller.get_srid('v_edit_node', self.schema_name)
         self.controller.plugin_settings_set_value("srid", self.srid)
 
-        self.parent = ParentAction(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.add_layer = AddLayer(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.parent = ParentAction(self.iface, global_vars.settings, self.controller, self.plugin_dir)
+        self.add_layer = AddLayer(self.iface, global_vars.settings, self.controller, self.plugin_dir)
 
         # Get water software from table 'version'
         self.wsoftware = self.controller.get_project_type()
@@ -879,7 +876,7 @@ class Giswater(QObject):
 
         # Set custom plugin toolbars (one action class per toolbar)
         if self.wsoftware == 'ws':
-            self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)
+            self.mincut = MincutParent(self.iface, global_vars.settings, self.controller, self.plugin_dir)
 
         # Manage layers
         if not self.manage_layers():
@@ -914,8 +911,8 @@ class Giswater(QObject):
         self.set_layer_config(self.available_layers)
 
         # Create a thread to listen selected database channels
-        if self.settings.value('system_variables/use_notify').upper() == 'TRUE':
-            self.notify = NotifyFunctions(self.iface, self.settings, self.controller, self.plugin_dir)
+        if global_vars.settings.value('system_variables/use_notify').upper() == 'TRUE':
+            self.notify = NotifyFunctions(self.iface, global_vars.settings, self.controller, self.plugin_dir)
             self.notify.set_controller(self.controller)
             list_channels = ['desktop', self.controller.current_user]
             self.notify.start_listening(list_channels)
@@ -1050,7 +1047,7 @@ class Giswater(QObject):
         if self.wsoftware in ('ws', 'ud'):
             QApplication.setOverrideCursor(Qt.ArrowCursor)
             self.controller.log_info("CheckProjectResult")
-            self.check_project_result = CheckProjectResult(self.iface, self.settings, self.controller, self.plugin_dir)
+            self.check_project_result = CheckProjectResult(self.iface, global_vars.settings, self.controller, self.plugin_dir)
             self.check_project_result.set_controller(self.controller)
             status = self.check_project_result.populate_audit_check_project(layers, "true")
             QApplication.restoreOverrideCursor()
@@ -1166,7 +1163,7 @@ class Giswater(QObject):
         """ Function executed when a user opens a QGIS project of type 'tm' """
 
         # Set actions classes (define one class per plugin toolbar)
-        self.tm_basic = TmBasic(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.tm_basic = TmBasic(self.iface, global_vars.settings, self.controller, self.plugin_dir)
         self.tm_basic.set_tree_manage(self)
 
         # Manage actions of the different plugin_toolbars

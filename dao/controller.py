@@ -17,6 +17,7 @@ import inspect
 import traceback
 import sys
 
+from .. import global_vars
 from .pg_dao import PgDao
 from .logger import Logger
 from .. import utils_giswater
@@ -26,11 +27,12 @@ from ..ui_manager import BasicInfoUi
 
 class DaoController(object):
     
-    def __init__(self, settings, plugin_name, iface, logger_name='plugin', create_logger=True):
+    def __init__(self, plugin_name, iface, logger_name='plugin', create_logger=True):
         """ Class constructor """
         
-        self.settings = settings      
-        self.plugin_name = plugin_name               
+        self.settings = global_vars.settings
+        self.qgis_settings = global_vars.qgis_settings
+        self.plugin_name = plugin_name
         self.iface = iface               
         self.translator = None           
         self.plugin_dir = None           
@@ -65,11 +67,7 @@ class DaoController(object):
 
     def set_schema_name(self, schema_name):
         self.schema_name = schema_name
-                
 
-    def set_qgis_settings(self, qgis_settings):
-        self.qgis_settings = qgis_settings       
-        
 
     def set_plugin_dir(self, plugin_dir):
         self.plugin_dir = plugin_dir
