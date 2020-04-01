@@ -62,11 +62,14 @@ v_clause text;
 v_device text;
 v_debug boolean;
 v_debug_var text;
+v_formtype text;
        
 BEGIN
+
+	
 	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
-
+	
 	-- Get schema name
 	schemas_array := current_schemas(FALSE);
 
@@ -116,14 +119,16 @@ BEGIN
 	
 	-- starting process - get fields	
 	IF p_formname!='infoplan' THEN 
-	
+		SELECT formtype INTO v_formtype FROM config_api_form_fields WHERE formname = p_formname LIMIT 1;
+		
 		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT '||v_label||', column_id, concat('||quote_literal(p_tabname)||',''_'',column_id) AS widgetname, widgettype, 
 			widgetfunction, '||v_device||' hidden, widgetdim, datatype , tooltip, placeholder, iseditable, row_number()over(ORDER BY layoutname, layout_order) AS orderby, 
 			layoutname, layout_order, dv_parent_id AS "parentId", isparent, ismandatory, linkedaction, dv_querytext AS "queryText", dv_querytext_filterc AS "queryTextFilter", isautoupdate,
 			dv_orderby_id AS "orderById", dv_isnullvalue AS "isNullValue", stylesheet, widgetcontrols
 			FROM config_api_form_fields WHERE formname = $1 AND formtype= $2 '||v_clause||' ORDER BY orderby) a'
 				INTO fields_array
-				USING p_formname, p_formtype;
+				USING p_formname, v_formtype;
+
 	ELSE
 		EXECUTE 'SELECT array_agg(row_to_json(b)) FROM (
 			SELECT (row_number()over(ORDER BY 1)) AS layout_order, (row_number()over(ORDER BY 1)) AS orderby, * FROM 
