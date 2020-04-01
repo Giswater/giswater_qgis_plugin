@@ -12,7 +12,7 @@ $BODY$
 
 /*EXAMPLE
 set
-SELECT SCHEMA_NAME.gw_fct_admin_schema_i18n($${"data":{"table":"config_api_form_fields", "clause":"WHERE formname = 've_arc' AND column_id = 'arc_id'", 
+SELECT SCHEMA_NAME.gw_fct_admin_schema_i18n($${"data":{"table":"config_api_form_fields", "formname":"ve_arc", "clause":"WHERE formname = 've_arc' AND column_id = 'arc_id'", 
 "label":{"column":"label", "value":"test"}, "tooltip":{"column":"tooltip", "value":"test"}}}$$)
 check 
 SELECT * FROM SCHEMA_NAME.config_api_form_fields WHERE formname = 've_arc' AND column_id = 'arc_id'
@@ -31,8 +31,12 @@ v_modelabel text;
 v_modetooltip text;
 v_error_context text;
 v_querytext text;
+v_parent_layer text;
+v_clause_view text;
+v_formname text;
 
-	
+rec_child_layer text;
+
 BEGIN 
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
@@ -42,12 +46,26 @@ BEGIN
 
 	-- get input parameters
 	v_table := (p_data ->> 'data')::json->> 'table';
+	v_formname := (p_data ->> 'data')::json->> 'formname';
 	v_clause := (p_data ->> 'data')::json->> 'clause';
 	v_label_col := ((p_data ->> 'data')::json->>'label')::json->>'column';
 	v_label_val := ((p_data ->> 'data')::json->>'label')::json->>'value';
 	v_tooltip_col := ((p_data ->> 'data')::json->>'tooltip')::json->>'column';
 	v_tooltip_val := ((p_data ->> 'data')::json->>'tooltip')::json->>'value';
 
+	--select parent view
+	IF v_table = 'config_api_form_fields' THEN
+		IF v_formname = 've_node' THEN
+			v_parent_layer = (quote_literal('ve_node'), quote_literal('v_edit_node'));
+		ELSIF v_formname = 've_connec' THEN
+			v_parent_layer = (quote_literal('ve_connec'), quote_literal('v_edit_connec'));
+		ELSIF v_formname = 've_arc' THEN
+			v_parent_layer = (quote_literal('ve_arc'), quote_literal('v_edit_arc'));
+		ELSIF v_clause ~ 've_gully' THEN
+			v_parent_layer = (quote_literal('ve_gully'), quote_literal('v_edit_gully'));
+		END IF;
+	END IF;
+	
 	-- vmodeclause
 	IF v_mode = 0 THEN
 		v_modelabel = ' ; ';
@@ -62,13 +80,26 @@ BEGIN
 	IF  v_mode < 2 THEN
 		-- querytext
 		v_querytext = 'UPDATE '|| v_table ||' SET '|| v_label_col ||' = '|| quote_literal(v_label_val) ||' '|| v_clause ||' '|| v_modelabel;
-		raise notice 'v_querytext %', v_querytext;
 		EXECUTE v_querytext;
 
 		v_querytext = 'UPDATE '|| v_table ||' SET '|| v_tooltip_col ||' = '|| quote_literal(v_tooltip_val) ||' '|| v_clause ||' '|| v_modetooltip;
-		raise notice 'v_querytext %', v_querytext;
 		EXECUTE v_querytext;
-		
+
+		--update values for child layers
+		IF v_parent_layer IS NOT NULL THEN
+			FOR rec_child_layer IN EXECUTE 'SELECT child_layer FROM cat_feature WHERE parent_layer IN '||v_parent_layer||'' 
+			LOOP
+
+				v_clause_view = replace(v_clause, v_formname, rec_child_layer);
+
+				v_querytext = 'UPDATE '|| v_table ||' SET '|| v_label_col ||' = '|| quote_literal(v_label_val) ||' '|| v_clause_view ||' '|| v_modelabel;
+				EXECUTE v_querytext;
+
+				v_querytext = 'UPDATE '|| v_table ||' SET '|| v_tooltip_col ||' = '|| quote_literal(v_tooltip_val) ||' '|| v_clause_view ||' '|| v_modelabel;
+				EXECUTE v_querytext;
+
+			END LOOP;
+		END IF;
 	END IF;
 
 	-- Return
