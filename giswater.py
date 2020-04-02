@@ -34,6 +34,7 @@ from .actions.parent import ParentAction
 from .actions.tm_basic import TmBasic
 from .actions.update_sql import UpdateSQL
 from .actions.utils import Utils
+from .actions.custom import Custom
 from .dao.controller import DaoController
 from .map_tools.cad_add_circle import CadAddCircle
 from .map_tools.cad_add_point import CadAddPoint
@@ -193,6 +194,9 @@ class Giswater(QObject):
             # Tm Basic toolbar actions
             elif 'tm_basic' in self.dict_actions and index_action in self.dict_actions['tm_basic']:
                 callback_function = getattr(self.tm_basic, function_name)
+            # Custom toolbar actions
+            elif 'custom' in self.dict_actions and index_action in self.dict_actions['custom']:
+                callback_function = getattr(self.custom, function_name)
 
             # Action found
             if callback_function:
@@ -437,13 +441,13 @@ class Giswater(QObject):
             parser = configparser.RawConfigParser()
             parser.add_section('toolbars_position')
 
-        if len(own_toolbars) == 8:
-            for w in own_toolbars:
-                parser['toolbars_position'][f'pos_{x}'] = f"{w.property('gw_name')},{w.x()},{w.y()}"
-                x += 1
-            with open(path, 'w') as configfile:
-                parser.write(configfile)
-                configfile.close()
+        # Save position of Giswater toolbars
+        for w in own_toolbars:
+            parser['toolbars_position'][f'pos_{x}'] = f"{w.property('gw_name')},{w.x()},{w.y()}"
+            x += 1
+        with open(path, 'w') as configfile:
+            parser.write(configfile)
+            configfile.close()
 
 
     def set_toolbar_position(self, tb_name, x, y):
@@ -476,7 +480,7 @@ class Giswater(QObject):
         """
 
         # TODO: Dynamically get from config file
-        toolbar_names = ('basic', 'om_ud', 'om_ws', 'edit', 'cad', 'epa', 'master', 'utils')
+        toolbar_names = ('basic', 'om_ud', 'om_ws', 'edit', 'cad', 'epa', 'master', 'utils', 'custom')
 
         # Get user UI config file
         parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
@@ -494,6 +498,10 @@ class Giswater(QObject):
         parser.read(path)
         # Call each of the functions that configure the toolbars 'def toolbar_xxxxx(self, toolbar_id, x=0, y=0):'
         for pos, tb in enumerate(toolbar_names):
+            # If not exists, add it and set it in last position
+            if not parser.has_option('toolbars_position', f'pos_{pos}'):
+                parser['toolbars_position'][f'pos_{pos}'] = f"{tb},{4000},{98}"
+
             toolbar_id = parser.get("toolbars_position", f'pos_{pos}').split(',')
             if toolbar_id:
                 if toolbar_id[0] in ('basic', 'utils'):
@@ -518,11 +526,13 @@ class Giswater(QObject):
         if self.wsoftware == 'ws':
             self.mincut.set_controller(self.controller)
         self.om.set_controller(self.controller)
+        self.custom.set_controller(self.controller)
 
         self.edit.set_project_type(self.wsoftware)
         self.go2epa.set_project_type(self.wsoftware)
         self.master.set_project_type(self.wsoftware)
         self.om.set_project_type(self.wsoftware)
+        self.custom.set_project_type(self.wsoftware)
 
         # Enable toolbar 'basic' and 'utils'
         self.enable_toolbar("basic")
@@ -818,6 +828,7 @@ class Giswater(QObject):
         self.om = Om(self.iface, global_vars.settings, self.controller, self.plugin_dir)
         self.edit = Edit(self.iface, global_vars.settings, self.controller, self.plugin_dir)
         self.master = Master(self.iface, global_vars.settings, self.controller, self.plugin_dir)
+        self.custom = Custom(self.iface, global_vars.settings, self.controller, self.plugin_dir)
 
 
     def project_new(self):
@@ -988,6 +999,7 @@ class Giswater(QObject):
             self.enable_toolbar("cad")
             self.enable_toolbar("epa")
             self.enable_toolbar("master")
+            self.enable_toolbar("custom")
 
 
     def get_buttons_to_hide(self):
@@ -1317,7 +1329,7 @@ class Giswater(QObject):
 
             feature = '"tableName":"' + str(layer_name) + '", "id":"", "isLayer":true'
             body = self.create_body(feature=feature)
-            complet_result = self.controller.get_json('gw_api_getinfofromid', body, log_sql=True)
+            complet_result = self.controller.get_json('gw_api_getinfofromid', body, log_sql=False)
             if not complet_result: continue
 
             for field in complet_result['body']['data']['fields']:
