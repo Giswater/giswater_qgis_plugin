@@ -9,13 +9,13 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 INSERT INTO value_state_type(id,state, name, is_operative, is_doable)
-VALUES (98,0, 'EJECUTADO PLANIFICADO',true, false);
+VALUES (98,0, 'EJECUTADO PLANIFICADO',true, false) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO value_state_type(id,state, name, is_operative, is_doable)
-VALUES (97,0, 'EJECUTADO FICTICIO',true, false);
+VALUES (97,0, 'EJECUTADO FICTICIO',true, false) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO value_state_type(id,state, name, is_operative, is_doable)
-VALUES (96,0, 'CANCELADO PLANIFICADO',true, false);
+VALUES (96,0, 'CANCELADO PLANIFICADO',true, false) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO value_state_type(id,state, name, is_operative, is_doable)
-VALUES (95,0, 'CANCELADO FICTICIO',true, false);
+VALUES (95,0, 'CANCELADO FICTICIO',true, false) ON CONFLICT (id) DO NOTHING;
