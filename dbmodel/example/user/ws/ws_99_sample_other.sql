@@ -483,4 +483,4 @@ UPDATE man_type_category SET category_type = replace (category_type, 'Standard',
 UPDATE man_type_location SET location_type = replace (location_type, 'Standard', 'St.');
 UPDATE man_type_function SET function_type = replace (function_type, 'Standard', 'St.');
 
-update config_api_form_fields SET widgettype = 'text' WHERE column_id  = 'macrosector_id', dv_querytext = null, placeholder  ='Ex.macrosector_id';
+update config_api_form_fields SET widgettype = 'text' WHERE column_id  = 'macrosector_id' AND dv_querytext = null AND placeholder  ='Ex.macrosector_id';

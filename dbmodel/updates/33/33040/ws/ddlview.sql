@@ -2440,8 +2440,8 @@ WITH v_plan_aux_arc_cost AS
 				WHEN sum(v_price_x_catpavement.m2pav_cost) IS NULL THEN 0::numeric(12,2)
 				ELSE sum(v_price_x_catpavement.m2pav_cost::numeric(12,2) * plan_arc_x_pavement.percent)
 				END AS m2pav_cost
-			FROM ws_sample.plan_arc_x_pavement
-			LEFT JOIN ws_sample.v_price_x_catpavement ON v_price_x_catpavement.pavcat_id::text = plan_arc_x_pavement.pavcat_id::text
+			FROM plan_arc_x_pavement
+			LEFT JOIN v_price_x_catpavement ON v_price_x_catpavement.pavcat_id::text = plan_arc_x_pavement.pavcat_id::text
 			GROUP BY plan_arc_x_pavement.arc_id) v_plan_aux_arc_pavement ON v_plan_aux_arc_pavement.arc_id::text = v_arc.arc_id::text
 		)
 	SELECT v_plan_aux_arc_ml.arc_id,
