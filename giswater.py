@@ -399,75 +399,8 @@ class Giswater(QObject):
         self.utils.set_project_type(self.wsoftware)
 
 
-    def toolbar_om_ws(self, toolbar_id, x=0, y=0):
-        """ Function called in def manage_toolbars(...)
-                getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
-        """
-
-        if toolbar_id not in self.dict_toolbars:
-            return
-
-        list_actions = self.dict_toolbars[toolbar_id]
-        self.manage_toolbar(toolbar_id, list_actions)
-        self.set_toolbar_position(self.tr(f'toolbar_{toolbar_id}_name'), x, y)
-
-
-    def toolbar_om_ud(self, toolbar_id, x=0, y=0):
-        """ Function called in def manage_toolbars(...)
-                getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
-        """
-
-        if toolbar_id not in self.dict_toolbars:
-            return
-
-        list_actions = self.dict_toolbars[toolbar_id]
-        self.manage_toolbar(toolbar_id, list_actions)
-        self.set_toolbar_position(self.tr(f'toolbar_{toolbar_id}_name'), x, y)
-
-
-    def toolbar_edit(self, toolbar_id, x=0, y=0):
-        """ Function called in def manage_toolbars(...)
-                getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
-        """
-
-        if toolbar_id not in self.dict_toolbars:
-            return
-
-        list_actions = self.dict_toolbars[toolbar_id]
-        self.manage_toolbar(toolbar_id, list_actions)
-        self.set_toolbar_position(self.tr(f'toolbar_{toolbar_id}_name'), x, y)
-
-
-    def toolbar_cad(self, toolbar_id, x=0, y=0):
-        """ Function called in def manage_toolbars(...)
-                getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
-        """
-
-        if toolbar_id not in self.dict_toolbars:
-            return
-
-        list_actions = self.dict_toolbars[toolbar_id]
-        self.manage_toolbar(toolbar_id, list_actions)
-        self.set_toolbar_position(self.tr(f'toolbar_{toolbar_id}_name'), x, y)
-
-
-    def toolbar_epa(self, toolbar_id, x=0, y=0):
-        """ Function called in def manage_toolbars(...)
-                getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
-        """
-
-        if toolbar_id not in self.dict_toolbars:
-            return
-
-        list_actions = self.dict_toolbars[toolbar_id]
-        self.manage_toolbar(toolbar_id, list_actions)
-        self.set_toolbar_position(self.tr(f'toolbar_{toolbar_id}_name'), x, y)
-
-
-    def toolbar_master(self, toolbar_id, x=0, y=0):
-        """ Function called in def manage_toolbars(...)
-                getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
-        """
+    def toolbar_common(self, toolbar_id, x=0, y=0):
+        """ Manage toolbars: 'om_ud', 'om_ws', 'edit', 'cad', 'epa', 'master' """
 
         if toolbar_id not in self.dict_toolbars:
             return
@@ -563,7 +496,10 @@ class Giswater(QObject):
         for pos, tb in enumerate(toolbar_names):
             toolbar_id = parser.get("toolbars_position", f'pos_{pos}').split(',')
             if toolbar_id:
-                getattr(self, f'toolbar_{toolbar_id[0]}')(toolbar_id[0], toolbar_id[1], toolbar_id[2])
+                if toolbar_id[0] in ('basic', 'utils'):
+                    getattr(self, f'toolbar_{toolbar_id[0]}')(toolbar_id[0], toolbar_id[1], toolbar_id[2])
+                else:
+                    self.toolbar_common(toolbar_id[0], toolbar_id[1], toolbar_id[2])
 
         # Manage action group of every toolbar
         parent = self.iface.mainWindow()
