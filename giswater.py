@@ -300,7 +300,7 @@ class Giswater(QObject):
             Associate it to corresponding @action_group
         """
 
-        text_action = self.tr(index_action + '_text')
+        text_action = self.tr(f'{index_action}_text')
         function_name = global_vars.settings.value(f'actions/{index_action}_function')
         if not function_name:
             return None
@@ -613,6 +613,9 @@ class Giswater(QObject):
         for key in list_keys:
             list_values = global_vars.settings.value(f"{section}/{key}")
             if list_values:
+                # Check if list_values has only one value
+                if type(list_values) is str:
+                    list_values = [list_values]
                 self.dict_toolbars[key] = list_values
             else:
                 self.controller.show_warning(f"Parameter not set in section '{section}' of config file: '{key}'")
