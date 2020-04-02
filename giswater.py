@@ -479,8 +479,9 @@ class Giswater(QObject):
         project_type in ('ws', 'ud')
         """
 
-        # TODO: Dynamically get from config file
-        toolbar_names = ('basic', 'om_ud', 'om_ws', 'edit', 'cad', 'epa', 'master', 'utils', 'custom')
+        # Dynamically get list of toolbars from config file
+        toolbar_names = global_vars.settings.value(f"toolbars/list_toolbars")
+        self.controller.log_info(toolbar_names)
 
         # Get user UI config file
         parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
