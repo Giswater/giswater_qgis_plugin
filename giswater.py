@@ -467,7 +467,9 @@ class Giswater(QObject):
     def save_toolbars_position(self):
 
         parser = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
-        path = os.path.dirname(__file__) + '/config/ui_config.config'
+        main_folder = os.path.join(os.path.expanduser("~"), self.plugin_name)
+        config_folder = main_folder + os.sep + "config" + os.sep
+        path = config_folder + 'ui_config.config'
         if not os.path.exists(path):
             self.controller.log_warning("File not found", parameter=path)
             return
@@ -507,7 +509,9 @@ class Giswater(QObject):
         """
 
         parser = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
-        path = os.path.dirname(__file__) + '/config/ui_config.config'
+        main_folder = os.path.join(os.path.expanduser("~"), self.plugin_name)
+        config_folder = main_folder + os.sep + "config" + os.sep
+        path = config_folder + 'ui_config.config'
         if not os.path.exists(path):
             self.controller.log_warning("File not found", parameter=path)
             return
