@@ -560,7 +560,6 @@ class Giswater(QObject):
         # Set controller (no database connection yet)
         self.controller = DaoController(self.plugin_name, self.iface, create_logger=True)
         self.controller.set_plugin_dir(self.plugin_dir)
-        self.controller.set_giswater(self)
 
         # Set main information button (always visible)
         self.set_info_button()
@@ -814,7 +813,6 @@ class Giswater(QObject):
         """ Initialize toolbars """
 
         self.basic = Basic(self.iface, global_vars.settings, self.controller, self.plugin_dir)
-        self.basic.set_giswater(self)
         self.utils = Utils(self.iface, global_vars.settings, self.controller, self.plugin_dir)
         self.go2epa = Go2Epa(self.iface, global_vars.settings, self.controller, self.plugin_dir)
         self.om = Om(self.iface, global_vars.settings, self.controller, self.plugin_dir)

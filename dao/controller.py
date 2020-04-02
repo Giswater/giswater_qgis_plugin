@@ -37,7 +37,6 @@ class DaoController(object):
         self.iface = iface
         self.translator = None
         self.plugin_dir = None
-        self.giswater = None
         self.logged = False
         self.postgresql_version = None
         self.logger = None
@@ -60,11 +59,7 @@ class DaoController(object):
             if not self.dao.close_db():
                 self.log_info(str(self.last_error))
             del self.dao
-        
-        
-    def set_giswater(self, giswater):
-        self.giswater = giswater
-                
+
 
     def set_schema_name(self, schema_name):
         self.schema_name = schema_name
