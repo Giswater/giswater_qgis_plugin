@@ -517,8 +517,8 @@ class Giswater(QObject):
 
         if len(own_toolbars)==8:
             for w in own_toolbars:
-                parser['toolbars_position']['pos_' + str(x)] = (w.property('gw_name') + "," + str(w.x()) + "," + str(w.y()))
-                x+=1
+                parser['toolbars_position'][f'pos_{x}'] = f"{w.property('gw_name')},{w.x()},{w.y()}"
+                x += 1
             with open(path, 'w') as configfile:
                 parser.write(configfile)
                 configfile.close()
@@ -530,36 +530,51 @@ class Giswater(QObject):
         toolbar.move(int(x), int(y))
 
 
+    def init_ui_config_file(self, path, toolbar_names):
+        """ Initialize UI config file with default values """
+
+        # Create file and configure section 'toolbars_position'
+        parser = configparser.RawConfigParser()
+        parser.add_section('toolbars_position')
+        for pos, tb in enumerate(toolbar_names):
+            parser.set('toolbars_position', f'pos_{pos}', f'{tb}, {pos * 10}, 98')
+
+        # Writing our configuration file to 'ui_config.config'
+        with open(path, 'w') as configfile:
+            parser.write(configfile)
+            configfile.close()
+            del configfile
+
+        return parser
+
+
     def manage_toolbars(self):
         """ Manage actions of the custom plugin toolbars.
         project_type in ('ws', 'ud')
         """
 
+        # TODO: Dynamically get from config file
+        toolbar_names = ('basic', 'om_ud', 'om_ws', 'edit', 'cad', 'epa', 'master', 'utils')
+
+        # Get user UI config file
         parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
         main_folder = os.path.join(os.path.expanduser("~"), self.plugin_name)
-        config_folder = main_folder + os.sep + "config" + os.sep
-        path = config_folder + 'ui_config.config'
+        path = main_folder + os.sep + "config" + os.sep + 'ui_config.config'
 
-        toolbar_names = ('basic', 'om_ud', 'om_ws', 'edit', 'cad', 'epa', 'master', 'utils')
+        # If file not found or file found and section not exists
         if not os.path.exists(path):
-            # Create file and configure section 'toolbars_position'
-            parser = configparser.RawConfigParser()
-            parser.add_section('toolbars_position')
-            for pos, tb in enumerate(toolbar_names):
-                parser.set('toolbars_position', f'pos_{pos}', f'{tb}, {pos *10}, 98')
-
-            # Writing our configuration file to 'ui_config.config'
-            with open(path, 'w') as configfile:
-                parser.write(configfile)
-                configfile.close()
-                del configfile
+            parser = self.init_ui_config_file(path, toolbar_names)
+        else:
+            parser.read(path)
+            if not parser.has_section("toolbars_position"):
+                parser = self.init_ui_config_file(path, toolbar_names)
 
         parser.read(path)
         # Call each of the functions that configure the toolbars 'def toolbar_xxxxx(self, toolbar_id, x=0, y=0):'
         for pos, tb in enumerate(toolbar_names):
-            toolbar_id = parser.get("toolbars_position", 'pos_'+str(pos)).split(',')
+            toolbar_id = parser.get("toolbars_position", f'pos_{pos}').split(',')
             if toolbar_id:
-                getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[0], toolbar_id[1], toolbar_id[2])
+                getattr(self, f'toolbar_{toolbar_id[0]}')(toolbar_id[0], toolbar_id[1], toolbar_id[2])
 
         # Manage action group of every toolbar
         parent = self.iface.mainWindow()
