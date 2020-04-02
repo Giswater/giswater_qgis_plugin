@@ -1226,49 +1226,6 @@ class DaoController(object):
             roles += ")"
         
         return roles        
-             
-        
-    def check_user_roles(self):
-        """ Check roles of this user to show or hide toolbars """
-        
-        restriction = self.get_restriction()
-
-        if restriction == 'role_basic':
-            pass
-        elif restriction == 'role_om':
-            if self.giswater.wsoftware == 'ws':
-                self.giswater.enable_toolbar("om_ws")
-            elif self.giswater.wsoftware == 'ud':
-                self.giswater.enable_toolbar("om_ud")
-        elif restriction == 'role_edit':
-            if self.giswater.wsoftware == 'ws':
-                self.giswater.enable_toolbar("om_ws")
-            elif self.giswater.wsoftware == 'ud':
-                self.giswater.enable_toolbar("om_ud")
-            self.giswater.enable_toolbar("edit")
-            self.giswater.enable_toolbar("cad")
-        elif restriction == 'role_epa':
-            if self.giswater.wsoftware == 'ws':
-                self.giswater.enable_toolbar("om_ws")
-            elif self.giswater.wsoftware == 'ud':
-                self.giswater.enable_toolbar("om_ud")
-            self.giswater.enable_toolbar("edit")
-            self.giswater.enable_toolbar("cad")
-            self.giswater.enable_toolbar("epa")
-            self.giswater.enable_toolbar("master")
-            self.giswater.hide_action(False, 38)
-            self.giswater.hide_action(False, 47)
-            self.giswater.hide_action(False, 49)
-            self.giswater.hide_action(False, 50)
-        elif restriction == 'role_master':
-            self.giswater.enable_toolbar("master")
-            self.giswater.enable_toolbar("epa")
-            self.giswater.enable_toolbar("edit")
-            self.giswater.enable_toolbar("cad")
-            if self.giswater.wsoftware == 'ws':
-                self.giswater.enable_toolbar("om_ws")
-            elif self.giswater.wsoftware == 'ud':
-                self.giswater.enable_toolbar("om_ud")
 
 
     def get_columns_list(self, tablename, schemaname=None):

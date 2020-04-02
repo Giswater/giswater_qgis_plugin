@@ -919,7 +919,7 @@ class Giswater(QObject):
         self.controller.plugin_settings_set_value("node2arc", "0")
 
         # Check roles of this user to show or hide toolbars
-        self.controller.check_user_roles()
+        self.check_user_roles()
 
         # Manage project variable 'expl_id'
         self.manage_expl_id()
@@ -951,6 +951,45 @@ class Giswater(QObject):
         # Log it
         message = "Project read successfully"
         self.controller.log_info(message)
+
+
+    def check_user_roles(self):
+        """ Check roles of this user to show or hide toolbars """
+
+        restriction = self.controller.get_restriction()
+
+        if restriction == 'role_basic':
+            pass
+
+        elif restriction == 'role_om':
+            if self.wsoftware in ('ws', 'ud'):
+                self.enable_toolbar(f"om_{self.wsoftware}")
+
+        elif restriction == 'role_edit':
+            if self.wsoftware in ('ws', 'ud'):
+                self.enable_toolbar(f"om_{self.wsoftware}")
+            self.enable_toolbar("edit")
+            self.enable_toolbar("cad")
+
+        elif restriction == 'role_epa':
+            if self.wsoftware in ('ws', 'ud'):
+                self.enable_toolbar(f"om_{self.wsoftware}")
+            self.enable_toolbar("edit")
+            self.enable_toolbar("cad")
+            self.enable_toolbar("epa")
+            self.enable_toolbar("master")
+            self.hide_action(False, 38)
+            self.hide_action(False, 47)
+            self.hide_action(False, 49)
+            self.hide_action(False, 50)
+
+        elif restriction == 'role_master':
+            if self.wsoftware in ('ws', 'ud'):
+                self.enable_toolbar(f"om_{self.wsoftware}")
+            self.enable_toolbar("edit")
+            self.enable_toolbar("cad")
+            self.enable_toolbar("epa")
+            self.enable_toolbar("master")
 
 
     def get_buttons_to_hide(self):
