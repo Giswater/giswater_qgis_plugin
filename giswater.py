@@ -435,6 +435,8 @@ class Giswater(QObject):
 
         # Order list of toolbar in function of X position
         own_toolbars = sorted(own_toolbars, key=lambda k: k.x())
+        if len(own_toolbars) == 0:
+            return
 
         # Check if section toolbars_position exists in file
         if 'toolbars_position' not in parser:
@@ -445,6 +447,7 @@ class Giswater(QObject):
         for w in own_toolbars:
             parser['toolbars_position'][f'pos_{x}'] = f"{w.property('gw_name')},{w.x()},{w.y()}"
             x += 1
+
         with open(path, 'w') as configfile:
             parser.write(configfile)
             configfile.close()
@@ -458,6 +461,9 @@ class Giswater(QObject):
 
     def init_ui_config_file(self, path, toolbar_names):
         """ Initialize UI config file with default values """
+
+        self.controller.log_info(f"init_ui_config_file: {path}")
+        self.controller.log_info(toolbar_names)
 
         # Create file and configure section 'toolbars_position'
         parser = configparser.RawConfigParser()
