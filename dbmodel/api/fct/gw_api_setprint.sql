@@ -118,8 +118,9 @@ BEGIN
     SELECT a->>'index' INTO v_index FROM json_array_elements(v_json3) AS a WHERE a->>'name' = v_mapcomposer_name;  
     
 
-  raise notice 'v_rotation %', v_rotation;
+	raise notice 'v_rotation %', v_rotation;
 
+	v_width = v_width - 0.05;  -- reduce width in 0.05mm (let say nothing) to prevent possible rounds to better approach to scale
 
     -- calculate center coordinates
     v_x = (v_x1+v_x2)/2;
