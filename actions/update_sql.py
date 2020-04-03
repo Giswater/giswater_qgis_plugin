@@ -2490,11 +2490,11 @@ class UpdateSQL(ApiParent):
     def create_qgis_template(self):
 
         msg = ("Warning: Are you sure to continue?. This button will update your plugin qgis templates file replacing "
-               "all strings defined on the config/dev.config file. Be sure your config file is OK before continue")
+               "all strings defined on the config/system.config file. Be sure your config file is OK before continue")
         result = self.controller.ask_question(msg, "Info")
         if result:
             # Get dev config file
-            setting_file = os.path.join(self.plugin_dir, 'config', 'dev.config')
+            setting_file = os.path.join(self.plugin_dir, 'config', 'system.config')
             if not os.path.exists(setting_file):
                 message = "File not found"
                 self.controller.show_warning(message, parameter=setting_file)
