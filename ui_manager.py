@@ -39,9 +39,7 @@ class GwDialog(QDialog):
         if event.type() == QtCore.QEvent.EnterWhatsThisMode and self.isActiveWindow():
             QWhatsThis.leaveWhatsThisMode()
             parser = configparser.ConfigParser()
-            main_folder = os.path.join(os.path.expanduser("~"), self.plugin_name)
-            config_folder = main_folder + os.sep + "config" + os.sep
-            path = config_folder + 'ui_config.config'
+            path = os.path.dirname(__file__) + '/config/ui_config.config'
             parser.read(path)
             
             if self.subtag is not None:
@@ -80,9 +78,7 @@ class GwMainWindow(QMainWindow):
         if event.type() == QtCore.QEvent.EnterWhatsThisMode and self.isActiveWindow():
             QWhatsThis.leaveWhatsThisMode()
             parser = configparser.ConfigParser()
-            main_folder = os.path.join(os.path.expanduser("~"), self.plugin_name)
-            config_folder = main_folder + os.sep + "config" + os.sep
-            path = config_folder + 'ui_config.config'
+            path = os.path.dirname(__file__) + '/config/ui_config.config'
             parser.read(path)
         
             if self.subtag is not None:
