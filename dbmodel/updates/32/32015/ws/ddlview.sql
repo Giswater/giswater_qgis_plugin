@@ -52,7 +52,6 @@ UNION
   WHERE rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text AND inp_typevalue.typevalue::text = 'inp_value_status_pipe'::text;
 
   
-DROP VIEW IF EXISTS vu_node;
 CREATE OR REPLACE VIEW vu_node AS 
  SELECT node.node_id,
     node.code,
