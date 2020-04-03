@@ -614,7 +614,12 @@ class Giswater(QObject):
         """ Manage section 'actions' of config file """
 
         # Load list of buttons that are not checkable
-        self.buttons_not_checkable = global_vars.settings.value(f"actions/not_checkable")
+        aux = []
+        for list_actions in self.dict_actions.values():
+            for elem in list_actions:
+                aux.append(elem)
+
+        self.buttons_not_checkable = sorted(aux)
 
 
     def manage_section_toolbars(self):
