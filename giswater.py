@@ -506,24 +506,6 @@ class Giswater(QObject):
         toolbar.move(int(x), int(y))
 
 
-    def init_ui_config_file(self, path, toolbar_names):
-        """ Initialize UI config file with default values """
-
-        # Create file and configure section 'toolbars_position'
-        parser = configparser.RawConfigParser()
-        parser.add_section('toolbars_position')
-        for pos, tb in enumerate(toolbar_names):
-            parser.set('toolbars_position', f'pos_{pos}', f'{tb}, {pos * 10}, 98')
-
-        # Writing our configuration file to 'ui_config.config'
-        with open(path, 'w') as configfile:
-            parser.write(configfile)
-            configfile.close()
-            del configfile
-
-        return parser
-
-
     def manage_toolbars(self):
         """ Manage actions of the custom plugin toolbars.
         project_type in ('ws', 'ud')
