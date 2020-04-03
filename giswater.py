@@ -469,11 +469,9 @@ class Giswater(QObject):
         parser = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
         main_folder = os.path.join(os.path.expanduser("~"), self.plugin_name)
         config_folder = main_folder + os.sep + "config" + os.sep
+        if not os.path.exists(config_folder):
+            os.makedirs(config_folder)
         path = config_folder + 'ui_config.config'
-        if not os.path.exists(path):
-            self.controller.log_warning("File not found", parameter=path)
-            return
-
         parser.read(path)
 
         # Get all QToolBar
@@ -489,6 +487,11 @@ class Giswater(QObject):
         # Order list of toolbar in function of X position
         own_toolbars = sorted(own_toolbars, key=lambda k: k.x())
 
+        # Check if section toolbars_position exists in file
+        if 'toolbars_position' not in parser:
+            parser = configparser.RawConfigParser()
+            parser.add_section('toolbars_position')
+
         if len(own_toolbars)==8:
             for w in own_toolbars:
                 parser['toolbars_position']['pos_' + str(x)] = (w.property('gw_name') + "," + str(w.x()) + "," + str(w.y()))
@@ -501,6 +504,24 @@ class Giswater(QObject):
     def set_toolbar_position(self, tb_name, x, y):
         toolbar = self.iface.mainWindow().findChild(QToolBar, tb_name)
         toolbar.move(int(x), int(y))
+
+
+    def init_ui_config_file(self, path, toolbar_names):
+        """ Initialize UI config file with default values """
+
+        # Create file and configure section 'toolbars_position'
+        parser = configparser.RawConfigParser()
+        parser.add_section('toolbars_position')
+        for pos, tb in enumerate(toolbar_names):
+            parser.set('toolbars_position', f'pos_{pos}', f'{tb}, {pos * 10}, 98')
+
+        # Writing our configuration file to 'ui_config.config'
+        with open(path, 'w') as configfile:
+            parser.write(configfile)
+            configfile.close()
+            del configfile
+
+        return parser
 
 
     def manage_toolbars(self):
@@ -525,7 +546,7 @@ class Giswater(QObject):
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
 
         # Manage action group of every toolbar
-        parent = self.iface.mainWindow()           
+        parent = self.iface.mainWindow()
         for plugin_toolbar in list(self.plugin_toolbars.values()):
             ag = QActionGroup(parent)
             ag.setProperty('gw_name','gw_QActionGroup')
@@ -533,14 +554,14 @@ class Giswater(QObject):
                 self.add_action(index_action, plugin_toolbar.toolbar, ag)
 
         # Disable and hide all plugin_toolbars and actions
-        self.enable_toolbars(False) 
+        self.enable_toolbars(False)
 
-        self.edit.set_controller(self.controller)            
-        self.go2epa.set_controller(self.controller)            
+        self.edit.set_controller(self.controller)
+        self.go2epa.set_controller(self.controller)
         self.master.set_controller(self.controller)
         if self.wsoftware == 'ws':
             self.mincut.set_controller(self.controller)
-        self.om.set_controller(self.controller)  
+        self.om.set_controller(self.controller)
 
         self.edit.set_project_type(self.wsoftware)
         self.go2epa.set_project_type(self.wsoftware)
