@@ -421,7 +421,7 @@ class Giswater(QObject):
         config_folder = main_folder + os.sep + "config" + os.sep
         if not os.path.exists(config_folder):
             os.makedirs(config_folder)
-        path = config_folder + 'ui_config.config'
+        path = config_folder + 'user.config'
         parser.read(path)
 
         # Get all QToolBar
@@ -459,10 +459,10 @@ class Giswater(QObject):
         toolbar.move(int(x), int(y))
 
 
-    def init_ui_config_file(self, path, toolbar_names):
+    def init_user_config_file(self, path, toolbar_names):
         """ Initialize UI config file with default values """
 
-        self.controller.log_info(f"init_ui_config_file: {path}")
+        self.controller.log_info(f"init_user_config_file: {path}")
         self.controller.log_info(toolbar_names)
 
         # Create file and configure section 'toolbars_position'
@@ -471,7 +471,7 @@ class Giswater(QObject):
         for pos, tb in enumerate(toolbar_names):
             parser.set('toolbars_position', f'pos_{pos}', f'{tb}, {pos * 10}, 98')
 
-        # Writing our configuration file to 'ui_config.config'
+        # Writing our configuration file to 'user.config'
         with open(path, 'w') as configfile:
             parser.write(configfile)
             configfile.close()
@@ -492,15 +492,15 @@ class Giswater(QObject):
         # Get user UI config file
         parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
         main_folder = os.path.join(os.path.expanduser("~"), self.plugin_name)
-        path = main_folder + os.sep + "config" + os.sep + 'ui_config.config'
+        path = main_folder + os.sep + "config" + os.sep + 'user.config'
 
         # If file not found or file found and section not exists
         if not os.path.exists(path):
-            parser = self.init_ui_config_file(path, toolbar_names)
+            parser = self.init_user_config_file(path, toolbar_names)
         else:
             parser.read(path)
             if not parser.has_section("toolbars_position"):
-                parser = self.init_ui_config_file(path, toolbar_names)
+                parser = self.init_user_config_file(path, toolbar_names)
 
         parser.read(path)
         # Call each of the functions that configure the toolbars 'def toolbar_xxxxx(self, toolbar_id, x=0, y=0):'
