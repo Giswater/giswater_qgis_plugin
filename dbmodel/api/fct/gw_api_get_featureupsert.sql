@@ -103,7 +103,7 @@ v_automatic_ccode_field text;
 v_use_fire_code_seq boolean;
 v_node1 text;
 v_node2 text;
-
+v_formtype text;
 BEGIN
 
 	-- get basic parameters
@@ -345,7 +345,8 @@ BEGIN
 		PERFORM gw_fct_debug(concat('{"data":{"msg":"--> Configuration fields are defined on config_api_form_fields table <--", "variables":""}}')::json);
 
 		-- Call the function of feature fields generation
-		SELECT gw_api_get_formfields( v_formname, 'feature', v_tabname, v_tablename, p_idname, p_id, p_columntype, p_tg_op, null, p_device , v_values_array) INTO v_fields_array; 
+		SELECT formtype INTO v_formtype FROM config_api_form_fields WHERE formname = p_table_id LIMIT 1;
+		SELECT gw_api_get_formfields( v_formname, v_formtype, v_tabname, v_tablename, p_idname, p_id, p_columntype, p_tg_op, null, p_device , v_values_array) INTO v_fields_array; 
 
 	ELSE	
 		PERFORM gw_fct_debug(concat('{"data":{"msg":"--> Configuration fields are NOT defined on config_api_form_fields table. System values are used <--", "variables":""}}')::json);
