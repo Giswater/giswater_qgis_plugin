@@ -15,7 +15,8 @@ widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcon
 VALUES ('v_edit_inp_virtualvalve', 'form', 'id', 12, 'text', 'combo', 'State type', 
 NULL, NULL, NULL, TRUE, NULL, TRUE, NULL, 'SELECT id, name as idval FROM value_state_type WHERE id IS NOT NULL' , 
 NULL, NULL, 'state',  ' AND value_state_type.state = ', 
-NULL, NULL, NULL, NULL, 'data_1', NULL, FALSE);
+NULL, NULL, NULL, NULL, 'data_1', NULL, FALSE)
+ON CONFLICT (formname, formtype, column_id) DO NOTHING;
 
 
 INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order,  datatype, widgettype, label, 
@@ -25,4 +26,5 @@ widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcon
 VALUES ('v_edit_inp_pipe', 'form', 'state_type', 12, 'text', 'combo', 'State type',
 NULL, NULL, NULL, TRUE, NULL, TRUE, NULL, 'SELECT id, name as idval FROM value_state_type WHERE id IS NOT NULL' , 
 NULL, NULL, 'state',  ' AND value_state_type.state = ', 
-NULL, NULL, NULL, NULL, 'data_1', NULL, FALSE);
+NULL, NULL, NULL, NULL, 'data_1', NULL, FALSE)
+ON CONFLICT (formname, formtype, column_id) DO NOTHING;
