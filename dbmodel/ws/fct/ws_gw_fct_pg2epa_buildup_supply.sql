@@ -91,6 +91,10 @@ BEGIN
 	UPDATE rpt_inp_arc SET addparam = gw_fct_json_object_set_key (addparam::json, 'pressure', v_pressurepsv) 
 	WHERE epa_type = 'VALVE' AND addparam::json->>'valv_type' IN ('PSV') AND addparam::json->>'pressure'='' AND result_id  = p_result;
 
+	RAISE NOTICE 'setting curve for BINODE2ARC-PRV valves';
+	UPDATE rpt_inp_arc SET addparam = gw_fct_json_object_set_key (addparam::json, 'pressure', 0) 
+	WHERE arc_type = 'BINODE2ARC-PRV' AND result_id  = p_result;
+
 	RAISE NOTICE 'setting roughness for null values';
 	SELECT avg(roughness) INTO v_roughness FROM rpt_inp_arc WHERE result_id=p_result;
 	UPDATE rpt_inp_arc SET roughness = v_roughness WHERE roughness IS NULL AND result_id= p_result;
@@ -99,7 +103,7 @@ BEGIN
 	IF v_defaultdemand IS NOT NULL AND v_demandtype = 1 THEN
 		UPDATE rpt_inp_node SET demand = v_defaultdemand WHERE demand IS NULL AND result_id= p_result;
 	END IF;
-	
+
 	RAISE NOTICE 'setting diameter for null values';
 	UPDATE rpt_inp_arc SET diameter = v_diameter WHERE diameter IS NULL AND result_id= p_result;
 
@@ -148,8 +152,8 @@ BEGIN
 
 
 	RAISE NOTICE 'deleting nodes disconnected from any reservoir';
-	DELETE FROM rpt_inp_node WHERE node_id IN (SELECT node_1 FROM anl_arc JOIN arc USING (arc_id) WHERE fprocesscat_id=39 AND cur_user=current_user 
-						   UNION SELECT node_2 FROM anl_arc JOIN arc USING (arc_id) WHERE fprocesscat_id=39 AND cur_user=current_user) AND result_id=p_result;
+	DELETE FROM rpt_inp_node WHERE node_id IN (SELECT arc.node_1 FROM anl_arc JOIN arc USING (arc_id) WHERE fprocesscat_id=39 AND cur_user=current_user 
+						   UNION SELECT arc.node_2 FROM anl_arc JOIN arc USING (arc_id) WHERE fprocesscat_id=39 AND cur_user=current_user) AND result_id=p_result;
 
 	RAISE NOTICE 'deleting arcs disconnected from any reservoir';
 	DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user) AND result_id=p_result;

@@ -97,10 +97,10 @@ BEGIN
 		
 	-- insert into result table the dry nodes (as they are extremal nodes from disconnected arcs, all it's ok
 	INSERT INTO anl_node (fprocesscat_id, result_id, node_id, the_geom, descript)
-	SELECT 39, p_result_id, node_1, n.the_geom, 'Node disconnected from any reservoir' FROM rpt_inp_arc JOIN anl_arc USING (arc_id) 
-		JOIN rpt_inp_node n ON node_1=node_id WHERE fprocesscat_id=39 AND n.result_id = p_result_id AND cur_user=current_user UNION
-		SELECT 39, p_result_id, node_2, n.the_geom, 'Node disconnected from any reservoir' FROM rpt_inp_arc JOIN anl_arc USING (arc_id) 
-		JOIN rpt_inp_node n ON node_2=node_id WHERE fprocesscat_id=39 AND n.result_id = p_result_id AND cur_user=current_user;
+	SELECT 39, p_result_id, rpt_inp_arc.node_1, n.the_geom, 'Node disconnected from any reservoir' FROM rpt_inp_arc JOIN anl_arc USING (arc_id) 
+		JOIN rpt_inp_node n ON rpt_inp_arc.node_1=node_id WHERE fprocesscat_id=39 AND n.result_id = p_result_id AND cur_user=current_user UNION
+		SELECT 39, p_result_id, rpt_inp_arc.node_2, n.the_geom, 'Node disconnected from any reservoir' FROM rpt_inp_arc JOIN anl_arc USING (arc_id) 
+		JOIN rpt_inp_node n ON rpt_inp_arc.node_2=node_id WHERE fprocesscat_id=39 AND n.result_id = p_result_id AND cur_user=current_user;
 
 RETURN v_cont;
 

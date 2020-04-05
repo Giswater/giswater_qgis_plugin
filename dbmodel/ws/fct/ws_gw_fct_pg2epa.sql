@@ -13,10 +13,13 @@ RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${
+SELECT SCHEMA_NAME.gw_fct_pg2epa($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{},"data":{"parameters":{"geometryLog":false, "resultId":"t1","saveOnDatabase":true, "useNetworkGeom":"false", "useNetworkDemand":"false"}}}$$)
+"feature":{},"data":{"geometryLog":false, "resultId":"v41","saveOnDatabase":true, "useNetworkGeom":"false", "useNetworkDemand":"false", "export":"false"}}$$)
+
 */
+
+
 
 DECLARE
 v_networkmode integer = 1;
@@ -104,14 +107,14 @@ BEGIN
 
 		RAISE NOTICE '7 - profilactic issue to repair topology when length has no longitude';
 		UPDATE rpt_inp_arc SET length=0.05 WHERE length=0 AND result_id=v_result;
-
+		
 
 		IF v_buildupmode = 1 THEN -- no check data, go...go...
 
 			-- checking all arcs/node disconnected from any reservoir
-			PERFORM gw_fct_pg2epa_inlet_flowtrace(v_result);
-			DELETE FROM rpt_inp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=39 AND cur_user=current_user) and result_id = v_result;
-			DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user) and result_id = v_result;
+			--PERFORM gw_fct_pg2epa_inlet_flowtrace(v_result);
+			--DELETE FROM rpt_inp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=39 AND cur_user=current_user) and result_id = v_result;
+			--DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user) and result_id = v_result;
 
 			-- setting the minimun expression of return json
 			RAISE NOTICE '8 - Ignoring gw_fct_pg2epa_check_data';

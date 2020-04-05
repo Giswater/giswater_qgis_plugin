@@ -48,11 +48,11 @@ drop view IF EXISTS vi_tanks;
 CREATE OR REPLACE VIEW vi_tanks AS 
  SELECT rpt_inp_node.node_id,
     rpt_inp_node.elevation,
-    (rpt_inp_node.addparam::json ->> 'initlevel'::text)::numeric AS initlevel,
-    (rpt_inp_node.addparam::json ->> 'minlevel'::text)::numeric AS minlevel,
-    (rpt_inp_node.addparam::json ->> 'maxlevel'::text)::numeric AS maxlevel,
-    (rpt_inp_node.addparam::json ->> 'diameter'::text)::numeric AS diameter,
-    (rpt_inp_node.addparam::json ->> 'minvol'::text)::numeric AS minvol,
+    replace((rpt_inp_node.addparam::json ->> 'initlevel'::text),'',null)::numeric AS initlevel,
+    replace((rpt_inp_node.addparam::json ->> 'minlevel'::text),'',null)::numeric AS minlevel,
+    replace((rpt_inp_node.addparam::json ->> 'maxlevel'::text),'',null)::numeric AS maxlevel,
+    replace((rpt_inp_node.addparam::json ->> 'diameter'::text),'',null)::numeric AS diameter,
+    replace((rpt_inp_node.addparam::json ->> 'minvol'::text),'',null)::numeric AS minvol,
     (rpt_inp_node.addparam::json ->> 'curve_id'::text) AS curve_id
    FROM inp_selector_result,
     rpt_inp_node
@@ -60,11 +60,11 @@ CREATE OR REPLACE VIEW vi_tanks AS
 UNION
  SELECT rpt_inp_node.node_id,
     rpt_inp_node.elevation,
-    (rpt_inp_node.addparam::json ->> 'initlevel'::text)::numeric AS initlevel,
-    (rpt_inp_node.addparam::json ->> 'minlevel'::text)::numeric AS minlevel,
-    (rpt_inp_node.addparam::json ->> 'maxlevel'::text)::numeric AS maxlevel,
-    (rpt_inp_node.addparam::json ->> 'diameter'::text)::numeric AS diameter,
-    (rpt_inp_node.addparam::json ->> 'minvol'::text)::numeric AS minvol,
+    replace((rpt_inp_node.addparam::json ->> 'initlevel'::text),'',null)::numeric AS initlevel,
+    replace((rpt_inp_node.addparam::json ->> 'minlevel'::text),'',null)::numeric AS minlevel,
+    replace((rpt_inp_node.addparam::json ->> 'maxlevel'::text),'',null)::numeric AS maxlevel,
+    replace((rpt_inp_node.addparam::json ->> 'diameter'::text),'',null)::numeric AS diameter,
+    replace((rpt_inp_node.addparam::json ->> 'minvol'::text),'',null)::numeric AS minvol,
     (rpt_inp_node.addparam::json ->> 'curve_id'::text) AS curve_id
    FROM inp_selector_result,
     rpt_inp_node
@@ -101,9 +101,9 @@ CREATE OR REPLACE VIEW vi_pumps AS
       
 CREATE TRIGGER gw_trg_vi_pumps
   INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON SCHEMA_NAME.vi_pumps
+  ON vi_pumps
   FOR EACH ROW
-  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_vi('vi_pumps');
+  EXECUTE PROCEDURE gw_trg_vi('vi_pumps');
 
 
 

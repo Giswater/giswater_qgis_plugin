@@ -22,6 +22,7 @@ v_arcsearchnodes float;
 v_nodarc_min float;
 v_buildupmode int2 = 2;
 v_query_number text;
+v_node record;
 
 BEGIN
 
@@ -51,7 +52,7 @@ BEGIN
 							UNION ALL SELECT node_1 FROM v_edit_inp_virtualvalve
 							UNION ALL SELECT node_2 FROM v_edit_inp_virtualvalve) a using (node_id) group by n.node_id';
 
-	-- query text to make easy later sql senteces (in fucntion of all nod2arcs have been choosed or not)
+	-- query text to make easy later sql senteces (in function of all nod2arcs have been choosed or not)
 	v_querytext = 'SELECT a.*, inp_valve.to_arc FROM rpt_inp_node a JOIN inp_valve ON a.node_id=inp_valve.node_id WHERE result_id='||quote_literal(result_id_var)||' 
 				UNION  
 				SELECT a.*, inp_pump.to_arc FROM rpt_inp_node a JOIN inp_pump ON a.node_id=inp_pump.node_id WHERE result_id='||quote_literal(result_id_var);
@@ -74,6 +75,7 @@ BEGIN
 		FROM rpt_inp_arc c JOIN ('||v_querytext||') n ON node_2 = node_id
 		WHERE arc_id != to_arc AND to_arc IS NOT NULL )b )';
 
+	
 	RAISE NOTICE 'new nodes when numarcs = 1';
 	EXECUTE 'INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, 
 			nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, 
@@ -196,6 +198,20 @@ BEGIN
 					WHERE rpt_inp_node.node_id = b.node_id AND result_id = '||quote_literal(result_id_var);
 
 	EXECUTE ' DELETE FROM rpt_inp_node WHERE epa_type =''NODE2DELETE'' AND result_id = '||quote_literal(result_id_var);
+
+	RAISE NOTICE ' Fix all that nodarcs without to_arc informed, because extremal nodes may appear two times as node_1';
+	FOR v_node IN SELECT count(*), node_id FROM rpt_inp_node where result_id = result_id_var AND substring(reverse(node_id),0,2) = '1' group by node_id having count(*) > 1 order by 1 desc
+	LOOP
+		UPDATE rpt_inp_node SET node_id = concat(reverse(substring(reverse(v_node.node_id),2,99)),'2') 
+		WHERE id IN (SELECT id FROM rpt_inp_node WHERE node_id = v_node.node_id AND result_id = result_id_var LIMIT 1);
+	END LOOP;
+
+	RAISE NOTICE ' Fix all that nodarcs without to_arc informed, because extremal nodes may appear two times as node_2';
+	FOR v_node IN SELECT count(*), node_id FROM rpt_inp_node where result_id = result_id_var AND substring(reverse(node_id),0,2) = '2' group by node_id having count(*) > 1 order by 1 desc
+	LOOP
+		UPDATE rpt_inp_node SET node_id = concat(reverse(substring(reverse(v_node.node_id),2,99)),'1') 
+		WHERE id IN (SELECT id FROM rpt_inp_node WHERE node_id = v_node.node_id AND result_id = result_id_var LIMIT 1);
+	END LOOP;
 	
 	RETURN 1;
 		
