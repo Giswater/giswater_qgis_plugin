@@ -235,10 +235,10 @@ BEGIN
 
 
 		
-		-- Parent id
-		SELECT substring (tablename from 8 for 30), pol_id INTO v_tablename, v_pol_id FROM polygon JOIN sys_feature_cat ON sys_feature_cat.id=polygon.sys_type
+		-- Parent id		
+		SELECT concat('man_',lower(system_id)), pol_id INTO v_tablename, v_pol_id FROM polygon JOIN cat_feature ON cat_feature.id=polygon.sys_type
 		WHERE ST_DWithin(NEW.the_geom, polygon.the_geom, 0.001) LIMIT 1;
-	
+
 		IF v_pol_id IS NOT NULL THEN
 			v_sql:= 'SELECT node_id FROM '||v_tablename||' WHERE pol_id::bigint='||v_pol_id||' LIMIT 1';
 			EXECUTE v_sql INTO v_node_id;
@@ -557,7 +557,7 @@ BEGIN
 			UPDATE node SET the_geom=NEW.the_geom WHERE node_id = OLD.node_id;
 			
 			-- Parent id
-			SELECT substring (tablename from 8 for 30), pol_id INTO v_tablename, v_pol_id FROM polygon JOIN sys_feature_cat ON sys_feature_cat.id=polygon.sys_type
+			SELECT concat('man_',lower(system_id)), pol_id INTO v_tablename, v_pol_id FROM polygon JOIN cat_feature ON cat_feature.id=polygon.sys_type
 			WHERE ST_DWithin(NEW.the_geom, polygon.the_geom, 0.001) LIMIT 1;
 	
 			IF v_pol_id IS NOT NULL THEN
