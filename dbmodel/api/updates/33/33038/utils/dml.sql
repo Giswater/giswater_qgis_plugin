@@ -8,13 +8,27 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2020/02/27
+UPDATE config_api_typevalue SET id='lyt_bot_1', idval='lyt_bot_1' WHERE id='bot_layout_1' AND typevalue = 'layout_name_typevalue';
+UPDATE config_api_typevalue SET id='lyt_bot_2', idval='lyt_bot_2' WHERE id='bot_layout_2' AND typevalue = 'layout_name_typevalue';
+UPDATE config_api_typevalue SET id='lyt_data_1', idval='lyt_data_1' WHERE id='layout_data_1' AND typevalue = 'layout_name_typevalue';
+UPDATE config_api_typevalue SET id='lyt_data_2', idval='lyt_data_2' WHERE id='layout_data_2' AND typevalue = 'layout_name_typevalue';
+UPDATE config_api_typevalue SET id='lyt_data_3', idval='lyt_data_3' WHERE id='layout_data_3' AND typevalue = 'layout_name_typevalue';
+UPDATE config_api_typevalue SET id='lyt_data_1', idval='lyt_data_1' WHERE id='layout_data_1' AND typevalue = 'layout_name_typevalue';
+UPDATE config_api_typevalue SET id='lyt_top_1', idval='lyt_top_1' WHERE id='top_layout' AND typevalue = 'layout_name_typevalue';
+UPDATE config_api_typevalue SET id='lyt_distance', idval='lyt_distance' WHERE id='distance_layout' AND typevalue = 'layout_name_typevalue';
+UPDATE config_api_typevalue SET id='lyt_symbology', idval='lyt_symbology' WHERE id='symbology_layout' AND typevalue = 'layout_name_typevalue';
+UPDATE config_api_typevalue SET id='lyt_depth', idval='lyt_depth' WHERE id='depth_layout' AND typevalue = 'layout_name_typevalue';
+UPDATE config_api_typevalue SET id='lyt_other', idval='lyt_other' WHERE id='other_layout' AND typevalue = 'layout_name_typevalue';
+
+
+
 UPDATE config_api_typevalue SET addparam='{"createAddfield":"TRUE"}' WHERE id IN ('button', 'check', 'combo', 'datepikertime', 'doubleSpinbox', 'hyperlink', 'text', 'typeahead') AND typevalue = 'widgettype_typevalue';
 
 UPDATE config_api_typevalue SET addparam='{"createAddfield":"TRUE"}' WHERE id IN ('boolean', 'date', 'dobule', 'integer', 'numeric', 'smallint', 'text') AND typevalue = 'datatype_typevalue';
 
 UPDATE config_api_typevalue SET addparam='{"createAddfield":"TRUE"}' WHERE id IN ('gw_api_open_url') AND typevalue = 'widgetfunction_typevalue';
 
-UPDATE config_api_typevalue SET addparam='{"createAddfield":"TRUE"}' WHERE id IN ('bot_layout_1', 'bot_layout_2', 'layout_data_1', 'layout_data_2', 'layout_data_3', 'top_layout') AND typevalue = 'layout_name_typevalue';
+UPDATE config_api_typevalue SET addparam='{"createAddfield":"TRUE"}' WHERE id IN ('lyt_bot_1', 'lyt_bot_2', 'lyt_data_1', 'lyt_data_2', 'lyt_data_3', 'lyt_top_1') AND typevalue = 'layout_name_typevalue';
 
 
 SELECT setval('SCHEMA_NAME.config_api_form_fields_id_seq', (SELECT max(id) FROM config_api_form_fields), true);
