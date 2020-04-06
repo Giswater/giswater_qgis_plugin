@@ -548,6 +548,15 @@ class ApiCF(ApiParent, QObject):
         self.dlg_cf.dlg_closed.connect(partial(self.set_vdefault_edition))
         self.dlg_cf.key_pressed.connect(partial(self.close_dialog, self.dlg_cf))
 
+        # Set title for toolbox
+        toolbox_cf = self.dlg_cf.findChild(QWidget, 'toolBox')
+        row = self.controller.get_config('custom_form_param', 'value', 'config_param_system')
+        if row:
+            results = json.loads(row[0], object_pairs_hook=OrderedDict)
+
+            for result in results['custom_form_tab_labels']:
+                toolbox_cf.setItemText(int(result['index']), result['text'])
+
         # Open dialog
         self.open_dialog(self.dlg_cf, dlg_name='info_full')
         self.dlg_cf.setWindowTitle(f"{self.feature_type.upper()} - {self.feature_id}")
