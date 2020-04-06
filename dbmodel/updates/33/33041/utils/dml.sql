@@ -95,3 +95,9 @@ ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_fprocess_cat(id, fprocess_name, context, project_type)
 VALUES (123,'Check arc drawing direction','om', 'utils') ON CONFLICT (id) DO NOTHING;
+
+--2020/04/06
+INSERT INTO config_param_system (parameter, value, context, descript, label, isenabled, layout_order, project_type, datatype, widgettype, ismandatory, isdeprecated)
+VALUES ('custom_form_tab_labels', '{{"index":"0", "text":"Main Data"}, {"index":"1", "text":"Additional data"}}',
+'edit', 'Custom form tab labels', 'Used to manage labels on diferent tabs in custom form Data tab', FALSE, null, 'utils', 'json', 'linetext', false, false) 
+ON CONFLICT (parameter) DO NOTHING;
