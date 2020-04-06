@@ -63,7 +63,7 @@ BEGIN
 			
 		ELSIF v_valvemode = 2 THEN -- inventory
 			UPDATE rpt_inp_arc a SET status='CLOSED'
-			FROM v_edit_man_valve v
+			FROM man_valve v
 				WHERE a.arc_id=concat(v.node_id,'_n2a') AND a.result_id=result_id_var AND closed=true;
 		
 		ELSIF v_valvemode = 1 THEN -- epa tables

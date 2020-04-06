@@ -12,7 +12,10 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_nod2arc(result_id_var varch
 AS $BODY$
 
 /*example
-select SCHEMA_NAME.gw_fct_pg2epa_nod2arc ('testbgeo3', true)
+SELECT SCHEMA_NAME.gw_fct_pg2epa($${
+"client":{"device":3, "infoType":100, "lang":"ES"},
+"feature":{},"data":{"geometryLog":false, "resultId":"t1","saveOnDatabase":true, "useNetworkGeom":"false", "useNetworkDemand":"false", "export":"false"}}$$)
+
 */
 
 DECLARE
@@ -74,7 +77,6 @@ BEGIN
 		SELECT c.arc_id, n.node_id as node_1, n.to_arc
 		FROM rpt_inp_arc c JOIN ('||v_querytext||') n ON node_2 = node_id
 		WHERE arc_id != to_arc AND to_arc IS NOT NULL )b )';
-
 	
 	RAISE NOTICE 'new nodes when numarcs = 1';
 	EXECUTE 'INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, 
@@ -108,6 +110,7 @@ BEGIN
 			FROM rpt_inp_arc c JOIN ('||v_querytext||') n ON node_2 = node_id
 			WHERE n.numarcs = 1 AND c.result_id = '||quote_literal(result_id_var);
 
+
 	RAISE NOTICE ' new nodes when numarcs = 2';
 	EXECUTE 'INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, 
 			nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, 
@@ -126,6 +129,22 @@ BEGIN
 			FROM rpt_inp_arc c JOIN ('||v_querytext||') n ON node_2 = node_id
 			WHERE n.numarcs = 2 AND c.result_id = '||quote_literal(result_id_var);
 
+	RAISE NOTICE ' Fix all that nodarcs without to_arc informed, because extremal nodes may appear two times as node_1';
+	FOR v_node IN SELECT count(*), node_id FROM rpt_inp_node where result_id = result_id_var AND substring(reverse(node_id),0,2) = '1' group by node_id having count(*) > 1 order by 1 desc
+	LOOP
+		raise notice '1- v_node %', v_node;
+		UPDATE rpt_inp_node SET node_id = concat(reverse(substring(reverse(v_node.node_id),2,99)),'2'), addparam = gw_fct_json_object_set_key(addparam::json, 'arcPosition', '2'::text)
+		WHERE id IN (SELECT id FROM rpt_inp_node WHERE node_id = v_node.node_id AND result_id = result_id_var LIMIT 1);
+	END LOOP;
+
+	RAISE NOTICE ' Fix all that nodarcs without to_arc informed, because extremal nodes may appear two times as node_2';
+	FOR v_node IN SELECT count(*), node_id FROM rpt_inp_node where result_id = result_id_var AND substring(reverse(node_id),0,2) = '2' group by node_id having count(*) > 1 order by 1 desc
+	LOOP
+		raise notice '2 - v_node %', v_node;
+		UPDATE rpt_inp_node SET node_id = concat(reverse(substring(reverse(v_node.node_id),2,99)),'1'), addparam = gw_fct_json_object_set_key(addparam::json, 'arcPosition', '1'::text) 
+		WHERE id IN (SELECT id FROM rpt_inp_node WHERE node_id = v_node.node_id AND result_id = result_id_var LIMIT 1);
+	END LOOP;
+	
 	RAISE NOTICE 'new arcs when numarcs = 1';
 	EXECUTE 'INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, expl_id, state, state_type, diameter, roughness, annotation, length, status, the_geom, minorloss, addparam)
 			SELECT DISTINCT ON (a.addparam::json->>''nodeParent'')
@@ -199,20 +218,6 @@ BEGIN
 
 	EXECUTE ' DELETE FROM rpt_inp_node WHERE epa_type =''NODE2DELETE'' AND result_id = '||quote_literal(result_id_var);
 
-	RAISE NOTICE ' Fix all that nodarcs without to_arc informed, because extremal nodes may appear two times as node_1';
-	FOR v_node IN SELECT count(*), node_id FROM rpt_inp_node where result_id = result_id_var AND substring(reverse(node_id),0,2) = '1' group by node_id having count(*) > 1 order by 1 desc
-	LOOP
-		UPDATE rpt_inp_node SET node_id = concat(reverse(substring(reverse(v_node.node_id),2,99)),'2') 
-		WHERE id IN (SELECT id FROM rpt_inp_node WHERE node_id = v_node.node_id AND result_id = result_id_var LIMIT 1);
-	END LOOP;
-
-	RAISE NOTICE ' Fix all that nodarcs without to_arc informed, because extremal nodes may appear two times as node_2';
-	FOR v_node IN SELECT count(*), node_id FROM rpt_inp_node where result_id = result_id_var AND substring(reverse(node_id),0,2) = '2' group by node_id having count(*) > 1 order by 1 desc
-	LOOP
-		UPDATE rpt_inp_node SET node_id = concat(reverse(substring(reverse(v_node.node_id),2,99)),'1') 
-		WHERE id IN (SELECT id FROM rpt_inp_node WHERE node_id = v_node.node_id AND result_id = result_id_var LIMIT 1);
-	END LOOP;
-	
 	RETURN 1;
 		
 END;
