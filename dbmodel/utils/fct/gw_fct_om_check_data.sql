@@ -250,7 +250,8 @@ BEGIN
 		v_querytext = 'SELECT node_id, nodecat_id, the_geom FROM '||v_edit||'node 
 		JOIN cat_node ON nodecat_id=cat_node.id
 		JOIN cat_feature ON cat_node.nodetype_id = cat_feature.id
-		WHERE system_id = ''TANK'' and node_id NOT IN (SELECT node_id FROM anl_mincut_inlet_x_exploitation)';
+		JOIN value_state_type ON state_type = value_state_type.id
+		WHERE value_state_type.is_operative IS TRUE AND system_id = ''TANK'' and node_id NOT IN (SELECT node_id FROM anl_mincut_inlet_x_exploitation)';
 		
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,') a ') INTO v_count;
 		EXECUTE concat('SELECT string_agg(a.node_id::text,'','') FROM (',v_querytext,') a ') INTO v_feature_id;
