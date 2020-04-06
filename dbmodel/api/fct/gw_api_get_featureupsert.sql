@@ -207,18 +207,34 @@ BEGIN
 					IF v_project_type = 'WS' THEN
 						IF v_noderecord1.presszonecat_id = v_noderecord2.presszonecat_id THEN
 							v_presszone_id = v_noderecord1.presszonecat_id;
+						ELSIF v_noderecord1.presszonecat_id = 0 THEN
+							v_presszone_id = v_noderecord2.presszonecat_id;
+						ELSIF v_noderecord2.presszonecat_id = 0 THEN
+							v_presszone_id = v_noderecord1.presszonecat_id;
 						END IF;
 					END IF;
 
 					IF v_noderecord1.sector_id = v_noderecord2.sector_id THEN
 						v_sector_id = v_noderecord1.sector_id;
+					ELSIF v_noderecord1.sector_id = 0 THEN
+						v_sector_id = v_noderecord2.sector_id;
+					ELSIF v_noderecord2.sector_id = 0 THEN
+						v_sector_id = v_noderecord1.sector_id;
 					END IF;
-
+					
 					IF v_noderecord1.dma_id = v_noderecord2.dma_id THEN
 						v_dma_id = v_noderecord1.dma_id;
+					ELSIF v_noderecord1.dma_id = 0 THEN
+						v_dma_id = v_noderecord2.dma_id;
+					ELSIF v_noderecord2.dma_id = 0 THEN
+						v_dma_id = v_noderecord1.dma_id;
 					END IF;
-
+						
 					IF v_noderecord1.expl_id = v_noderecord2.expl_id THEN
+						v_expl_id = v_noderecord1.expl_id;
+					ELSIF v_noderecord1.expl_id = 0 THEN
+						v_expl_id = v_noderecord2.expl_id;
+					ELSIF v_noderecord2.expl_id = 0 THEN
 						v_expl_id = v_noderecord1.expl_id;
 					END IF;
 
@@ -269,8 +285,8 @@ BEGIN
 				IF count_aux = 1 THEN
 					v_presszone_id := (SELECT id FROM cat_presszone WHERE ST_DWithin(p_reduced_geometry, cat_presszone.the_geom,0.001) LIMIT 1);
 				ELSE
-					v_presszone_id =(SELECT presszonecat_id FROM v_edit_node WHERE ST_DWithin(p_reduced_geometry, v_edit_node.the_geom, v_promixity_buffer) 
-					order by ST_Distance (p_reduced_geometry, v_edit_node.the_geom) LIMIT 1);
+					v_presszone_id =(SELECT presszonecat_id FROM v_edit_arc WHERE ST_DWithin(p_reduced_geometry, v_edit_arc.the_geom, v_promixity_buffer) 
+					order by ST_Distance (p_reduced_geometry, v_edit_arc.the_geom) LIMIT 1);
 				END IF;	
 			END IF;
 
@@ -282,8 +298,8 @@ BEGIN
 			IF count_aux = 1 THEN
 				v_sector_id = (SELECT sector_id FROM sector WHERE ST_DWithin(p_reduced_geometry, sector.the_geom,0.001) LIMIT 1);
 			ELSE
-				v_sector_id =(SELECT sector_id FROM v_edit_node WHERE ST_DWithin(p_reduced_geometry, v_edit_node.the_geom, v_promixity_buffer) 
-				order by ST_Distance (p_reduced_geometry, v_edit_node.the_geom) LIMIT 1);
+				v_sector_id =(SELECT sector_id FROM v_edit_arc WHERE ST_DWithin(p_reduced_geometry, v_edit_arc.the_geom, v_promixity_buffer) 
+				order by ST_Distance (p_reduced_geometry, v_edit_arc.the_geom) LIMIT 1);
 			END IF;	
 		END IF;
 	
@@ -293,8 +309,8 @@ BEGIN
 			IF count_aux = 1 THEN
 				v_dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(p_reduced_geometry, dma.the_geom,0.001) LIMIT 1);
 			ELSE
-				v_dma_id =(SELECT dma_id FROM v_edit_node WHERE ST_DWithin(p_reduced_geometry, v_edit_node.the_geom, v_promixity_buffer) 
-				order by ST_Distance (p_reduced_geometry, v_edit_node.the_geom) LIMIT 1);
+				v_dma_id =(SELECT dma_id FROM v_edit_arc WHERE ST_DWithin(p_reduced_geometry, v_edit_arc.the_geom, v_promixity_buffer) 
+				order by ST_Distance (p_reduced_geometry, v_edit_arc.the_geom) LIMIT 1);
 			END IF;	
 		END IF;
 
@@ -304,8 +320,8 @@ BEGIN
 			IF count_aux = 1 THEN
 				v_expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(p_reduced_geometry, exploitation.the_geom,0.001) LIMIT 1);
 			ELSE
-				v_expl_id =(SELECT expl_id FROM v_edit_node WHERE ST_DWithin(p_reduced_geometry, v_edit_node.the_geom, v_promixity_buffer) 
-				order by ST_Distance (p_reduced_geometry, v_edit_node.the_geom) LIMIT 1);
+				v_expl_id =(SELECT expl_id FROM v_edit_arc WHERE ST_DWithin(p_reduced_geometry, v_edit_arc.the_geom, v_promixity_buffer) 
+				order by ST_Distance (p_reduced_geometry, v_edit_arc.the_geom) LIMIT 1);
 			END IF;
 		END IF;
 	
