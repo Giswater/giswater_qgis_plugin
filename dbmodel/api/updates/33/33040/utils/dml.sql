@@ -104,3 +104,11 @@ UPDATE config_api_form_fields SET widgettype = 'combo' where column_id = 'macros
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"sys_feature_cat", "column":"orderby"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"sys_feature_cat", "column":"shortcut_key"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"sys_feature_cat", "column":"tablename"}}$$);
+
+--2020/04/06
+UPDATE config_api_form_fields SET ismandatory=FALSE WHERE ismandatory IS NULL;
+UPDATE config_api_form_fields SET isparent=FALSE WHERE isparent IS NULL;
+UPDATE config_api_form_fields SET iseditable=FALSE WHERE iseditable IS NULL;
+UPDATE config_api_form_fields SET isautoupdate=FALSE WHERE isautoupdate IS NULL;
+UPDATE config_api_form_fields SET dv_orderby_id=TRUE WHERE dv_orderby_id IS NULL AND widgettype = 'combo';
+UPDATE config_api_form_fields SET dv_isnullvalue=FALSE WHERE dv_isnullvalue IS NULL AND widgettype = 'combo';
