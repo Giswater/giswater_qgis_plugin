@@ -268,7 +268,7 @@ BEGIN
 				SELECT count(*) into count_aux FROM cat_presszone WHERE ST_DWithin(p_reduced_geometry, cat_presszone.the_geom,0.001);
 				IF count_aux = 1 THEN
 					v_presszone_id := (SELECT id FROM cat_presszone WHERE ST_DWithin(p_reduced_geometry, cat_presszone.the_geom,0.001) LIMIT 1);
-				ELSIF count_aux > 1 THEN
+				ELSE
 					v_presszone_id =(SELECT presszonecat_id FROM v_edit_node WHERE ST_DWithin(p_reduced_geometry, v_edit_node.the_geom, v_promixity_buffer) 
 					order by ST_Distance (p_reduced_geometry, v_edit_node.the_geom) LIMIT 1);
 				END IF;	
@@ -277,11 +277,11 @@ BEGIN
 		END IF;
 			
 		-- Sector ID
-		IF v_presszone_id IS NULL THEN
+		IF v_sector_id IS NULL THEN
 			SELECT count(*) into count_aux FROM sector WHERE ST_DWithin(p_reduced_geometry, sector.the_geom,0.001);
 			IF count_aux = 1 THEN
 				v_sector_id = (SELECT sector_id FROM sector WHERE ST_DWithin(p_reduced_geometry, sector.the_geom,0.001) LIMIT 1);
-			ELSIF count_aux > 1 THEN
+			ELSE
 				v_sector_id =(SELECT sector_id FROM v_edit_node WHERE ST_DWithin(p_reduced_geometry, v_edit_node.the_geom, v_promixity_buffer) 
 				order by ST_Distance (p_reduced_geometry, v_edit_node.the_geom) LIMIT 1);
 			END IF;	
@@ -292,7 +292,7 @@ BEGIN
 			SELECT count(*) into count_aux FROM dma WHERE ST_DWithin(p_reduced_geometry, dma.the_geom,0.001);
 			IF count_aux = 1 THEN
 				v_dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(p_reduced_geometry, dma.the_geom,0.001) LIMIT 1);
-			ELSIF count_aux > 1 THEN
+			ELSE
 				v_dma_id =(SELECT dma_id FROM v_edit_node WHERE ST_DWithin(p_reduced_geometry, v_edit_node.the_geom, v_promixity_buffer) 
 				order by ST_Distance (p_reduced_geometry, v_edit_node.the_geom) LIMIT 1);
 			END IF;	
@@ -303,7 +303,7 @@ BEGIN
 			SELECT count(*) into count_aux FROM exploitation WHERE ST_DWithin(p_reduced_geometry, exploitation.the_geom,0.001);
 			IF count_aux = 1 THEN
 				v_expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(p_reduced_geometry, exploitation.the_geom,0.001) LIMIT 1);
-			ELSIF count_aux > 1 THEN
+			ELSE
 				v_expl_id =(SELECT expl_id FROM v_edit_node WHERE ST_DWithin(p_reduced_geometry, v_edit_node.the_geom, v_promixity_buffer) 
 				order by ST_Distance (p_reduced_geometry, v_edit_node.the_geom) LIMIT 1);
 			END IF;
