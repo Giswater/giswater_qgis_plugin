@@ -98,6 +98,6 @@ VALUES (123,'Check arc drawing direction','om', 'utils') ON CONFLICT (id) DO NOT
 
 --2020/04/06
 INSERT INTO config_param_system (parameter, value, context, descript, label, isenabled, layout_order, project_type, datatype, widgettype, ismandatory, isdeprecated)
-VALUES ('custom_form_tab_labels', '{{"index":"0", "text":"Main Data"}, {"index":"1", "text":"Additional data"}}',
+VALUES ('custom_form_param', '{"custom_form_tab_labels":[{"index":"0", "text":"Main data"}, {"index":"1", "text":"Additional data"}]}',
 'edit', 'Custom form tab labels', 'Used to manage labels on diferent tabs in custom form Data tab', FALSE, null, 'utils', 'json', 'linetext', false, false) 
 ON CONFLICT (parameter) DO NOTHING;
