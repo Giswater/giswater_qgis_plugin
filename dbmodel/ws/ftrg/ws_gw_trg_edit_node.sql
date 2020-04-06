@@ -107,25 +107,34 @@ BEGIN
 		
 		-- Sector ID
 		IF (NEW.sector_id IS NULL) THEN
-				IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-		        	"data":{"error":"1008", "function":"1320","debug_msg":null}}$$);';
-				END IF;
-					SELECT count(*)into v_count FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001);
+			
+			-- control error without any mapzones defined on the table of mapzone
+			IF ((SELECT COUNT(*) FROM sector) = 0) THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+		       	"data":{"error":"1008", "function":"1320","debug_msg":null}}$$);';
+			END IF;
+			
+			-- getting value default
+			IF (NEW.sector_id IS NULL) THEN
+				NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='sector_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			END IF;
+			
+			-- getting value from geometry of mapzone
+			IF (NEW.sector_id IS NULL) THEN
+				SELECT count(*)into v_count FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001);
 				IF v_count = 1 THEN
 					NEW.sector_id = (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
-				ELSIF v_count > 1 THEN
+				ELSE
 					NEW.sector_id =(SELECT sector_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, v_promixity_buffer) 
 					order by ST_Distance (NEW.the_geom, v_edit_node.the_geom) LIMIT 1);
 				END IF;	
-				IF (NEW.sector_id IS NULL) THEN
-					NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='sector_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-				END IF;
-				IF (NEW.sector_id IS NULL) THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-					"data":{"error":"1010", "function":"1320","debug_msg":"'||NEW.node_id::text||'"}}$$);';
-
-		    END IF;            
+			END IF;
+			
+			-- control error when no value
+			IF (NEW.sector_id IS NULL) THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				"data":{"error":"1010", "function":"1320","debug_msg":"'||NEW.node_id::text||'"}}$$);';
+			END IF;            
 		END IF;
 		
 		-- Dma ID
