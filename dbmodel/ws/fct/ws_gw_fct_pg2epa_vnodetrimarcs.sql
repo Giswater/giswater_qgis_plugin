@@ -148,7 +148,7 @@ BEGIN
 	UPDATE rpt_inp_arc SET length=0.01 WHERE length < 0.01 AND result_id=result_id_var;
 
 	RAISE NOTICE 'delete those repeated vnodes when more than one link is sharing same vnode';
-	DELETE FROM rpt_inp_node a USING rpt_inp_node b WHERE a.id < b.id AND a.node_id = b.node_id;
+	DELETE FROM rpt_inp_node a USING rpt_inp_node b WHERE a.id < b.id AND a.node_id = b.node_id AND a.result_id=result_id_var;
  
 RETURN v_result;
 END;

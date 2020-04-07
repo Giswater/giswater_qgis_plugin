@@ -14,20 +14,3 @@ UPDATE audit_cat_function set function_name = 'gw_fct_pg2epa_demand' where funct
 
 INSERT INTO audit_cat_function VALUES (2846, 'gw_fct_pg2epa_vdefault', 'ws', 'Default values for epanet', NULL, NULL, NULL, 'Default values for epanet', 'role_epa', false) 
 ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO audit_cat_param_user (id, formname, descript, sys_role_id, label, isenabled, project_type, isparent , isautoupdate, datatype, widgettype,
-vdefault,ismandatory, isdeprecated)
-VALUES 
-('inp_options_settings', 'hidden_value', 'Additional settings for go2epa', 'role_epa', 'Additional settings for go2epa', true, 'ws', false, false, 'text', 'linetext', 
-'{"vdefault":{"node":{"nullElevBuffer":100, "ceroElevBuffer":100}, 
-			  "pipe":{"diameter":"160","roughness":"avg"}},
-  "advanced": {"status":"false", 
-			   "junction":{"baseDemand":0},
-			   "reservoir":{"addElevation":1}, 
-			   "tank":{"addElevation":1}, 
-			   "valve":{"length":"0.3", "diameter":"100", "minorloss":0.2, "roughness":{"H-W":100, "D-W":0.5, "C-M":0.011}}, 
-			   "pump":{"length":0.3, "diameter":100, "roughness":{"H-W":100, "D-W":0.5, "C-M":0.011}}}
-  "debug":{"export":true, "useNetworkDemand":false, "checkData":true, "onlyIsOperative":true}
- }',
-true, false)
-ON conflict (id) DO NOTHING;

@@ -47,7 +47,7 @@ BEGIN
 	v_statsmethod = (SELECT ((value::json->>'vdefault')::json->>'pipe')::json->>'roughness' FROM config_param_user WHERE parameter='inp_options_settings' AND cur_user=current_user);
 
 	RAISE NOTICE 'setting roughness for null values';
-	EXECUTE 'SELECT '||v_statsmethod||'(roughness) FROM rpt_inp_arc WHERE result_id='||v_result
+	EXECUTE 'SELECT '||v_statsmethod||'(roughness) FROM rpt_inp_arc WHERE result_id='||quote_literal(v_result)
 	INTO v_roughness;
 	UPDATE rpt_inp_arc SET roughness = v_roughness WHERE roughness IS NULL AND result_id= v_result;
 

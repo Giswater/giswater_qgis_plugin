@@ -29,7 +29,7 @@ v_onlymandatory_nodarc boolean = false;
 v_vnode_trimarcs boolean = false;
 v_response integer;
 v_message text;
-v_usenetworkdemand boolean;
+v_setdemand boolean;
 v_buildupmode integer;
 v_usenetworkgeom boolean;
 v_inpoptions json;
@@ -53,7 +53,7 @@ BEGIN
 	v_buildupmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_buildup_mode' AND cur_user=current_user);
 
 	-- Get debug parameters (settings)
-	v_usenetworkdemand = (SELECT (value::json->>'debug')::json->>'isOperative' FROM config_param_user WHERE parameter='inp_options_settings' AND cur_user=current_user)::boolean;
+	v_setdemand = (SELECT (value::json->>'debug')::json->>'setDemand' FROM config_param_user WHERE parameter='inp_options_settings' AND cur_user=current_user)::boolean;
 	v_export = (SELECT (value::json->>'debug')::json->>'export' FROM config_param_user WHERE parameter='inp_options_settings' AND cur_user=current_user)::boolean;
 	v_checkdata = (SELECT (value::json->>'debug')::json->>'checkData' FROM config_param_user WHERE parameter='inp_options_settings' AND cur_user=current_user)::boolean;
 
@@ -108,9 +108,12 @@ BEGIN
 
 		RAISE NOTICE '7 - profilactic issue to repair topology when length has no longitude';
 		UPDATE rpt_inp_arc SET length=0.05 WHERE length=0 AND result_id=v_result;
-		
 
-		IF v_checkdata THEN -- (only debug mode no network check data)
+		-- Upsert on node rpt_inp result manager table
+		DELETE FROM inp_selector_result WHERE cur_user=current_user;
+		INSERT INTO inp_selector_result (result_id, cur_user) VALUES (v_result, current_user);
+		
+		IF v_checkdata THEN
 			RAISE NOTICE '8 - Calling gw_fct_pg2epa_check_data';
 			v_input = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"geometryLog":false, 
 			"resultId":"',v_result,'", "useNetworkGeom":"', v_usenetworkgeom,'"}, "saveOnDatabase":true}}')::json;
@@ -143,24 +146,24 @@ BEGIN
 		END IF;
 
 		RAISE NOTICE '12 - Default values';
-		PERFORM gw_fct_pg2epa_vdefault(v_result);
+		PERFORM gw_fct_pg2epa_vdefault((concat('{"data":{"geometryLog":false, "resultId":"',v_result,'", "useNetworkGeom":"false"}}'))::json);
 
 		RAISE NOTICE '13 - Fixing inconsistency values on network data';
 		-- deleting nodes disconnected from any reservoir
 		DELETE FROM rpt_inp_node WHERE node_id IN (SELECT arc.node_1 FROM anl_arc JOIN arc USING (arc_id) WHERE fprocesscat_id=39 AND cur_user=current_user 
-							UNION SELECT arc.node_2 FROM anl_arc JOIN arc USING (arc_id) WHERE fprocesscat_id=39 AND cur_user=current_user) AND result_id=p_result;
+							UNION SELECT arc.node_2 FROM anl_arc JOIN arc USING (arc_id) WHERE fprocesscat_id=39 AND cur_user=current_user) AND result_id=v_result;
 
 		-- deleting arcs disconnected from any reservoir';
-		DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user) AND result_id=p_result;
+		DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user) AND result_id=v_result;
 
 		-- delete orphan nodes'
-		DELETE FROM rpt_inp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=7 AND cur_user=current_user) AND result_id=p_result;
+		DELETE FROM rpt_inp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=7 AND cur_user=current_user) AND result_id=v_result;
 
 		-- deleting arcs without extremal nodes'
-		DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=3 AND cur_user=current_user) AND result_id=p_result;	
+		DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=3 AND cur_user=current_user) AND result_id=v_result;	
 
 		-- setting cero on elevation those have null values in spite of previous processes (profilactic issue in order to do not crash the epanet file)';
-		UPDATE rpt_inp_node SET elevation = 0 WHERE elevation IS NULL AND result_id=p_result;
+		UPDATE rpt_inp_node SET elevation = 0 WHERE elevation IS NULL AND result_id=v_result;
 		
 	ELSE 
 		-- delete rpt_* tables keeping rpt_inp_tables
@@ -176,22 +179,16 @@ BEGIN
 	END IF;
 
 	RAISE NOTICE '14 - update demands & patterns';
-	IF v_usenetworkdemand IS NOT FALSE THEN
 	
-		-- set demand and patterns in function of demand type and pattern method choosed
-		PERFORM gw_fct_pg2epa_demand(v_result);	
+	-- set demand and patterns in function of demand type and pattern method choosed
+	PERFORM gw_fct_pg2epa_demand(v_result);	
 		
-		-- Update demand values filtering by dscenario
-		PERFORM gw_fct_pg2epa_dscenario(v_result);
-
-	END IF;
+	-- Update demand values filtering by dscenario
+	PERFORM gw_fct_pg2epa_dscenario(v_result);
 
 	RAISE NOTICE '15 - Calling for modify the valve status';
 	PERFORM gw_fct_pg2epa_valve_status(v_result);
 
-	-- Upsert on node rpt_inp result manager table
-	DELETE FROM inp_selector_result WHERE cur_user=current_user;
-	INSERT INTO inp_selector_result (result_id, cur_user) VALUES (v_result, current_user);
 	
 	IF v_export IS NOT FALSE THEN  -- debug mode
 	

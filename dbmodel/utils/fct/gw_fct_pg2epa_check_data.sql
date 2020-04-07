@@ -791,7 +791,7 @@ BEGIN
 					WHERE v_edit_node.epa_type IN ('VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user)
 					UNION ALL
 					SELECT node_id, nodecat_id, v_edit_node.the_geom FROM v_edit_node JOIN v_edit_arc a1 ON node_id=a1.node_2
-					WHERE v_edit_node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user))a
+					WHERE v_edit_node.epa_type IN ('VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user))a
 				GROUP by node_id, nodecat_id, the_geom
 				HAVING count(*) < 2;
 
@@ -1282,7 +1282,7 @@ BEGIN
 			
 				IF  v_count = 0 THEN
 					INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
-					VALUES (14, v_result_id, 2, concat('WARNING: There aren''t dma''s defined on the dma-period table (ext_rtc_scada_dma_period). Please check it before continue.'));
+					VALUES (14, v_result_id, 2, concat('WARNING: There aren''t dma''s defined on the dma-period table (ext_rtc_dma_period). Please check it before continue.'));
 					v_countglobal=v_countglobal+1;
 					v_count=0;	
 				
@@ -1304,13 +1304,13 @@ BEGIN
 					
 					-- check if pattern is defined on dma-period table
 					SELECT count(*) INTO v_count FROM vi_parent_dma JOIN v_rtc_period_dma USING (dma_id) 
-					JOIN ext_rtc_scada_dma_period c ON  c.dma_id::integer=vi_parent_dma.dma_id  WHERE c.pattern_id IS NOT NULL;
+					JOIN ext_rtc_dma_period c ON  c.dma_id::integer=vi_parent_dma.dma_id  WHERE c.pattern_id IS NOT NULL;
 					SELECT count(*) INTO v_count_2 FROM (SELECT dma_id, count(*) FROM vi_parent_arc WHERE dma_id >0 GROUP BY dma_id) a;
 			
 					IF  v_count = 0 THEN
 						INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
 						VALUES (14, v_result_id, 3, concat(
-						'ERROR: According with the pattern method used there are not dma''s with pattern defined on the dma-period table (ext_rtc_scada_dma_period). Please check it before continue.'));
+						'ERROR: According with the pattern method used there are not dma''s with pattern defined on the dma-period table (ext_rtc_dma_period). Please check it before continue.'));
 						v_countglobal=v_countglobal+1;
 						v_count=0;
 					ELSIF v_count_2 > v_count THEN
@@ -1321,7 +1321,7 @@ BEGIN
 					ELSE
 						INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
 						VALUES (14, v_result_id, 1, concat(
-						'INFO: According with the pattern method used, all dma''s on the dma-period table (ext_rtc_scada_dma_period) have defined pattern_id.'));			
+						'INFO: According with the pattern method used, all dma''s on the dma-period table (ext_rtc_dma_period) have defined pattern_id.'));			
 						v_countglobal=v_countglobal;
 						v_count=0;
 					END IF;

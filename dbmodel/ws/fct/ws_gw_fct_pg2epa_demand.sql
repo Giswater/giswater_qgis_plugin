@@ -30,7 +30,7 @@ BEGIN
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
 
-	RAISE NOTICE 'Starting pg2epa rtc.';
+	RAISE NOTICE 'Starting pg2epa demand';
 
 	-- get user values
 	v_units =  (SELECT value FROM config_param_user WHERE parameter='inp_options_units' AND cur_user=current_user);
@@ -49,19 +49,19 @@ BEGIN
 	-- starting pattern methods
 	IF v_demandtype = 1 THEN
 
-		IF v_patternmethod = 11 THEN	-- UNIQUE ESTIMATED 
+		IF v_patternmethod = 11 THEN	-- UNIQUE ESTIMATED->NODE
 		
 	
-		ELSIF v_patternmethod = 12 THEN -- DMA ESTIMATED
+		ELSIF v_patternmethod = 12 THEN -- DMA ESTIMATED->NODE
 						-- Unique pattern applied to the whole dma
 						
 			UPDATE rpt_inp_node SET pattern_id=dma.pattern_id 
 			FROM node JOIN dma ON dma.dma_id=node.dma_id WHERE rpt_inp_node.node_id=node.node_id AND result_id=result_id_var;
 
-		ELSIF v_patternmethod = 13 THEN -- NODE ESTIMATED
+		ELSIF v_patternmethod = 13 THEN -- NODE ESTIMATED->NODE
 		
 			
-		ELSIF v_patternmethod = 14 THEN -- CONNEC ESTIMATED
+		ELSIF v_patternmethod = 14 THEN -- CONNEC ESTIMATED->PJOINT
 						-- update demands & patterns, demand is calculated on pattern. Only need units factor. Patterns are sumatory of demands by pattern. 
 						-- Values patterns are expressed on l/s. Due this v_epaunits is mandatory to convert values
 			
@@ -75,10 +75,14 @@ BEGIN
 			UNION
 			SELECT result_id_var, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
-				   FROM v_inp_pjointpattern JOIN node ON pattern_id=node_id ORDER by 3,4;		
+				   FROM vi_pjointpattern JOIN node ON pattern_id=node_id ORDER by 3,4;		
 
 			UPDATE rpt_inp_node SET demand=(1*v_epaunits)::numeric(12,8), pattern_id=node_id 
 			WHERE node_id IN (SELECT DISTINCT pattern_id FROM rpt_inp_pattern_value WHERE result_id=result_id_var) AND result_id=result_id_var;
+
+		ELSIF v_patternmethod = 15 THEN -- UNIQUE ESTIMATED->PJOINT
+		
+			UPDATE rpt_inp_node SET demand=(1*v_epaunits*sum)::numeric(12,8) FROM vi_pjoint WHERE pjoint_id = concat('VN',node_id) AND result_id=result_id_var;
 		
 		END IF;
 	
@@ -96,7 +100,7 @@ BEGIN
 			UPDATE rpt_inp_node SET demand=(lps_max::float*v_epaunits)::numeric(12,8), pattern_id=NULL 
 			FROM v_rtc_hydrometer_x_node_period a WHERE result_id=result_id_var AND rpt_inp_node.node_id=a.node_id;
 
-		ELSIF v_patternmethod = 23 THEN  	-- DMAPERIOD>NODE (Vilablareix model)
+		ELSIF v_patternmethod = 23 THEN  	-- DMA PERIOD->NODE (Vilablareix model)
 							-- Demand is real demand (l/s). Need units factor and DMAxPERIOD efficiency
 							-- Patterns is estimated unitary pattern for dma applied to each node of that dma.
 			UPDATE rpt_inp_node SET demand=((lps_avg*v_epaunits)/d.effc)::numeric(12,8), pattern_id = d.pattern_id
@@ -104,7 +108,7 @@ BEGIN
 						JOIN ext_rtc_dma_period d ON n.dma_id=d.dma_id AND n.period_id=d.cat_period_id
 						WHERE n.node_id=rpt_inp_node.node_id AND result_id=result_id_var;		
 
-		ELSIF v_patternmethod = 24 THEN  	-- HYDROPERIOD>NODE (Blanes model)
+		ELSIF v_patternmethod = 24 THEN  	-- HYDRO PERIOD->NODE (Blanes model)
 							-- Demand is calculated on pattern. Need units factor and DMAxPERIOD efficiency
 							-- Patterns are sumatory(demand*pattern) of all hydrometers for each node and are expressed on l/s. It's mandatory to convert values
 
@@ -119,7 +123,7 @@ BEGIN
 			WHERE node_id IN (SELECT DISTINCT pattern_id FROM rpt_inp_pattern_value WHERE result_id=result_id_var) AND result_id=result_id_var;				
 		
 	
-		ELSIF v_patternmethod = 25 THEN 	-- DMAINTERVAL>NODE (Manresa model)
+		ELSIF v_patternmethod = 25 THEN 	-- DMA INTERVAL->NODE (Manresa model)
 							-- Demand is weight factor on dma and are normalized (total node / total dma). 
 							-- Patterns is the same for the whole dma and it's real flow from scada. Values are expressed on l/s. It's mandatory to convert values
 					
@@ -127,7 +131,7 @@ BEGIN
 			FROM v_rtc_period_node a JOIN v_rtc_period_dma c ON a.dma_id::integer=c.dma_id
 			WHERE rpt_inp_node.node_id=a.node_id AND result_id = result_id_var;	
 
-		ELSIF v_patternmethod = 26 THEN 	-- HYDROPERIOD>NODE::DMAINTERVAL (Manresa + Blanes mixed model)
+		ELSIF v_patternmethod = 26 THEN 	-- HYDRO PERIOD->NODE::DMA INTERVAL (Manresa + Blanes mixed model)
 							-- Demand is calculated on pattern. Only need units factor.
 							-- Patterns are sumatory(demand*pattern) of all hydrometers for each node and are expressed on l/s. 
 							-- It's mandatory to convert values
@@ -206,7 +210,7 @@ BEGIN
 
 			WHERE f.idrow=e.idrow and f.dma_id=e.dma_id;
 	
-		ELSIF v_patternmethod = 27 THEN 	-- HYDROPERIOD>PJOINT (Guipuzkoako urak model)
+		ELSIF v_patternmethod = 27 THEN 	-- HYDRO PERIOD->PJOINT (Guipuzkoako urak model)
 							-- Demand is calculated on pattern. Only need units factor. 
 							-- Patterns are sumatory(demand*pattern) of all hydrometers for each pjoint (VNODE or NODE) are expressed on l/s. 
 							-- It's mandatory to convert values
@@ -227,17 +231,13 @@ BEGIN
 			WHERE node_id IN (SELECT DISTINCT pattern_id FROM rpt_inp_pattern_value WHERE result_id=result_id_var) AND result_id=result_id_var;
 
 
-		ELSIF v_patternmethod = 28 THEN 	-- UNIQUEPERIOD>PJOINT (Guipuzkoako urak model)
-							-- Demand is calculated on pattern. Only need units factor. 
-							-- Patterns are sumatory(demand*pattern) of all hydrometers for each pjoint (VNODE or NODE) are expressed on l/s. 
-							-- It's mandatory to convert values
-	
-			UPDATE rpt_inp_node SET demand=(1*v_epaunits)::numeric(12,8), pattern_id=node_id 
-			WHERE node_id IN (SELECT DISTINCT pattern_id FROM rpt_inp_pattern_value WHERE result_id=result_id_var) AND result_id=result_id_var;
+		ELSIF v_patternmethod = 28 THEN 	-- UNIQUE PERIOD->PJOINT (Manresa simplified)
+							
+			UPDATE rpt_inp_node SET demand = (1*v_epaunits*lps_avg) FROM v_rtc_period_pjoint WHERE node_id = pjoint_id AND result_id=result_id_var;
 
 		ELSIF v_patternmethod = 29 THEN
 		
-			-- TODO: pattern Blanes + Gipuzkoako Urak (using vnodes) + Manresa models
+			-- TODO:
 
 		END IF;
 
@@ -252,10 +252,10 @@ BEGIN
 
 	-- base demand
 	IF v_advanced THEN
-		UPDATE rpt_inp_node SET demand = demand + v_basedemand WHERE result_id=result_id_var;
+		--UPDATE rpt_inp_node SET demand = demand + v_basedemand WHERE result_id=result_id_var;
 	ELSE
 		-- profilactic control of null demands (because epanet cmd does not runs with null demands
-		UPDATE rpt_inp_node SET demand=0 WHERE result_id=result_id_var AND demand IS NULL;
+		--UPDATE rpt_inp_node SET demand=0 WHERE result_id=result_id_var AND demand IS NULL;
 	END IF;
 	
 RETURN 0;

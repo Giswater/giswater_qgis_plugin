@@ -1034,7 +1034,7 @@ CREATE OR REPLACE VIEW v_edit_inp_storage AS
 	v_node.sys_elev,
 	v_node.nodecat_id,
 	v_node.sector_id,
-	a.macrosector_id,
+	macrosector_id,
 	v_node.state,
 	v_node.state_type,
 	v_node.annotation,
