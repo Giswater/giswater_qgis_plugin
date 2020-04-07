@@ -18,13 +18,23 @@ class CreateGisProject():
 
         self.controller = controller
         self.plugin_dir = plugin_dir
+        self.host = None
+        self.port = None
+        self.db = None
+        self.user = None
+        self.password = None
+        self.srid = None
 
 
     def gis_project_database(self, folder_path=None, filename=None, project_type='ws', schema='ws_sample',
-                             export_passwd=False, roletype='admin', chk_sample=False):
+                             export_passwd=False, roletype='admin', chk_sample=False, get_database_parameters=True):
 
         # Get locale of QGIS application
-        locale = QSettings().value('locale/userLocale').lower()
+        try:
+            locale = QSettings().value('locale/userLocale').lower()
+        except AttributeError:
+            locale = "en"
+
         if locale == 'es_es' or locale == 'es':
             locale = 'es'
         elif locale == 'es_ca':
@@ -54,19 +64,6 @@ class CreateGisProject():
             self.controller.show_warning("Template GIS file not found", parameter=template_path, duration=20)
             return False, None
 
-        # Get database parameters from layer source
-        layer_source, not_version = self.controller.get_layer_source_from_credentials()
-        if layer_source is None:
-            self.controller.show_warning("Error getting database parameters")
-            return False, None
-
-        host = layer_source['host']
-        port = layer_source['port']
-        db = layer_source['db']
-        user = layer_source['user']
-        password = layer_source['password']
-        srid = self.controller.get_srid('v_edit_node', schema)
-
         # Manage default parameters
         if folder_path is None:
             folder_path = gis_locale_path
@@ -89,6 +86,12 @@ class CreateGisProject():
         self.controller.log_info("Creating GIS file... " + qgs_path)
         shutil.copyfile(template_path, qgs_path)
 
+        if get_database_parameters:
+            # Get database parameters from layer source
+            status = self.get_database_parameters(schema)
+            if not status:
+                return False, None
+
         # Read file content
         with open(qgs_path) as f:
             content = f.read()
@@ -97,21 +100,21 @@ class CreateGisProject():
         sqlite_conn = self.connect_sqlite()
 
         # Replace spatialrefsys and extent parameters
-        content = self.replace_spatial_parameters(srid, content, sqlite_conn)
+        content = self.replace_spatial_parameters(self.srid, content, sqlite_conn)
         content = self.replace_extent_parameters(schema, content)
 
         # Replace SCHEMA_NAME for schemaName parameter. SRID_VALUE for srid parameter
         content = content.replace("SCHEMA_NAME", schema)
-        content = content.replace("SRID_VALUE", str(srid))
+        content = content.replace("SRID_VALUE", str(self.srid))
 
         # Replace __DBNAME__ for db parameter. __HOST__ for host parameter, __PORT__ for port parameter
-        content = content.replace("__DBNAME__", db)
-        content = content.replace("__HOST__", host)
+        content = content.replace("__DBNAME__", self.db)
+        content = content.replace("__HOST__", self.host)
 
         # Manage username and password
-        credentials = port
+        credentials = self.port
         if export_passwd:
-            credentials = port + " username=" + user + " password=" + password
+            credentials = self.port + " username=" + self.user + " password=" + self.password
         content = content.replace("__PORT__", credentials)
 
         # Write contents and show message
@@ -127,6 +130,30 @@ class CreateGisProject():
         except IOError:
             message = "File cannot be created. Check if it is already opened"
             self.controller.show_warning(message, parameter=qgs_path)
+
+
+    def get_database_parameters(self, schema):
+        """ Get database parameters from layer source """
+
+        layer_source, not_version = self.controller.get_layer_source_from_credentials()
+        if layer_source is None:
+            self.controller.show_warning("Error getting database parameters")
+            return False
+
+        self.set_database_parameters(layer_source['host'], layer_source['port'], layer_source['db'], layer_source['user'],
+            layer_source['password'], self.controller.get_srid('v_edit_node', schema))
+
+        return True
+
+
+    def set_database_parameters(self, host, port, db, user, password, srid):
+
+        self.host = host
+        self.port = port
+        self.db = db
+        self.user = user
+        self.password = password
+        self.srid = srid
 
 
     def connect_sqlite(self):

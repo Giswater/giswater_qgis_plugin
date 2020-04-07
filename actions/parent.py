@@ -40,14 +40,22 @@ class ParentAction(object):
         self.project_type = None
         self.plugin_version = self.get_plugin_version()
         self.add_layer = AddLayer(iface, settings, controller, plugin_dir)
-        self.rubber_point = QgsRubberBand(self.canvas, 0)
-        self.rubber_point.setColor(Qt.yellow)
-        self.rubber_point.setIconSize(10)
-        self.rubber_polygon = QgsRubberBand(self.canvas, 2)
-        self.rubber_polygon.setColor(Qt.darkRed)
-        self.rubber_polygon.setIconSize(20)
         self.user_current_layer = None
-    
+
+
+    def init_rubber(self):
+
+        try:
+            self.rubber_point = QgsRubberBand(self.canvas, 0)
+            self.rubber_point.setColor(Qt.yellow)
+            self.rubber_point.setIconSize(10)
+            self.rubber_polygon = QgsRubberBand(self.canvas, 2)
+            self.rubber_polygon.setColor(Qt.darkRed)
+            self.rubber_polygon.setIconSize(20)
+        except:
+            pass
+
+
     def set_controller(self, controller):
         """ Set controller class """
         
@@ -1120,6 +1128,9 @@ class ParentAction(object):
         """ Draw 'line' over canvas following list of points
          :param duration_time: integer milliseconds ex: 3000 for 3 seconds
          """
+
+        if self.rubber_polygon is None:
+            self.init_rubber()
 
         rb = self.rubber_polygon
         polyline = QgsGeometry.fromPolylineXY(points)
