@@ -15,6 +15,7 @@ DECLARE
 v_usedmapattern boolean;
 v_buildupmode integer;
 v_statetype text;
+v_isoperative boolean;
 
 BEGIN
 
@@ -23,23 +24,25 @@ BEGIN
 
 	--  Get variables
 	v_usedmapattern = (SELECT value FROM config_param_user WHERE parameter='inp_options_use_dma_pattern' AND cur_user=current_user);
-	v_usedmapattern = (SELECT value FROM config_param_user WHERE parameter='inp_options_use_dma_pattern' AND cur_user=current_user);
-	SELECT value INTO v_buildupmode FROM config_param_user WHERE parameter = 'inp_options_buildup_mode' AND cur_user=current_user;
+	v_buildupmode = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_buildup_mode' AND cur_user=current_user);
 
-	raise notice 'delete previous values from same result';
+	-- get debug parameters
+	v_isoperative = (SELECT (value::json->>'debug')::json->>'onlyIsOperative' FROM config_param_user WHERE parameter='inp_options_settings' AND cur_user=current_user)::boolean;
+
+	raise notice 'Delete previous values from same result';
 
 	-- Delete previous results on rpt_inp_node & arc tables
 	DELETE FROM rpt_inp_node WHERE result_id=result_id_var;
 	DELETE FROM rpt_inp_arc WHERE result_id=result_id_var;
 
 	--Use state_type only is operative true or not
-	IF v_buildupmode = 1 THEN
-		v_statetype = ' AND (value_state_type.is_operative = TRUE OR value_state_type.is_operative = FALSE)';
-	ELSE
+	IF v_isoperative THEN
 		v_statetype = ' AND value_state_type.is_operative = TRUE ';
+	ELSE
+		v_statetype = ' AND (value_state_type.is_operative = TRUE OR value_state_type.is_operative = FALSE)';
 	END IF;
 
-	raise notice 'inserting nodes on rpt_inp_node table';
+	raise notice 'Inserting nodes on rpt_inp_node table';
 
 	-- the strategy of selector_sector is not used for nodes. The reason is to enable the posibility to export the sector=-1. In addition using this it's impossible to export orphan nodes
 	EXECUTE ' INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, expl_id)

@@ -24,15 +24,6 @@ ON v_edit_man_varc FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_arc('man_varc');
 CREATE TRIGGER gw_trg_edit_man_pipe INSTEAD OF INSERT OR UPDATE OR DELETE
 ON v_edit_man_pipe  FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_arc('man_pipe');
 
-CREATE TRIGGER gw_trg_edit_inp_arc_pipe INSTEAD OF INSERT OR UPDATE OR DELETE
-ON v_edit_inp_pipe FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_arc('inp_pipe');
-
-CREATE TRIGGER gw_trg_edit_inp_node_valve INSTEAD OF INSERT OR UPDATE OR DELETE
-ON v_edit_inp_valve FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_valve', 'VALVE');
-
-CREATE TRIGGER gw_trg_edit_inp_arc_virtualvalve INSTEAD OF INSERT OR UPDATE OR DELETE
-ON v_edit_inp_virtualvalve FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_arc('inp_virtualvalve');
-
 CREATE TRIGGER gw_trg_edit_man_expansiontank INSTEAD OF INSERT OR UPDATE OR DELETE
 ON v_edit_man_expansiontank FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_node('man_expansiontank');
 
@@ -113,7 +104,3 @@ ON ve_pol_register FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_man_node_pol('man_
  
 CREATE TRIGGER gw_trg_edit_man_fountain_pol INSTEAD OF INSERT OR UPDATE OR DELETE
 ON ve_pol_fountain FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_man_connec_pol('man_fountain_pol');
-
- 
-CREATE TRIGGER gw_trg_edit_inp_connec INSTEAD OF INSERT OR UPDATE OR DELETE
-ON v_edit_inp_connec FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_connec();

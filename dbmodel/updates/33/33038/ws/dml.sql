@@ -7,14 +7,19 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+
 UPDATE audit_cat_param_user SET vdefault =
-'{"node":{"nullElevBuffer":100, "ceroElevBuffer":100}, "pipe":{"diameter":"160"}, "junction":{"defaultDemand":"0.001"}, "tank":{"distVirtualReservoir":0.01}, "pressGroup":{"status":"ACTIVE", "forceStatus":"ACTIVE", "defaultCurve":"GP30"}, "pumpStation":{"status":"CLOSED", "forceStatus":"CLOSED", "defaultCurve":"IM00"}, 
-"PRV":{"status":"ACTIVE", "forceStatus":"ACTIVE", "pressure":"30"}, "PSV":{"status":"ACTIVE", "forceStatus":"ACTIVE", "pressure":"30"}, "reservoir":{"switch2Junction":["ETAP", "POU", "CAPTACIO"]}}'
+'{ 
+"reservoir":{"switch2Junction":["ETAP", "POU", "CAPTACIO"]},
+"tank":{"distVirtualReservoir":0.01}, 
+"pressGroup":{"status":"ACTIVE", "forceStatus":"ACTIVE", "defaultCurve":"GP30"}, 
+"pumpStation":{"status":"CLOSED", "forceStatus":"CLOSED", "defaultCurve":"IM00"}, 
+"PRV":{"status":"ACTIVE", "forceStatus":"ACTIVE", "pressure":"30"}, 
+"PSV":{"status":"ACTIVE", "forceStatus":"ACTIVE", "pressure":"30"}
+}'
 WHERE id = 'inp_options_buildup_supply';
 
-UPDATE audit_cat_param_user SET vdefault = 
-'{"status":"true", "parameters":{"valve":{"length":"0.3", "diameter":"100", "minorloss":0.2, "roughness":{"H-W":100, "D-W":0.5, "C-M":0.011}}, "reservoir":{"addElevation":1}, "pipe":{}, "tank":{"addElevation":1}, "pump":{"length":0.3, "diameter":100, "roughness":{"H-W":100, "D-W":0.5, "C-M":0.011}}}}'
-WHERE  id = 'inp_options_advancedsettings';
+
 
 -- 09/03/2020
 INSERT INTO config_client_forms (location_type, project_type, table_id, column_id, column_index, status) 

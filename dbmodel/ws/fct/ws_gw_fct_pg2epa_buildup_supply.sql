@@ -34,8 +34,6 @@ v_cerobuffer float;
 v_n2nlength float;
 v_querytext text;
 v_diameter float;
-v_defaultdemand float;
-v_demandtype int2;
 v_switch2junction text;
 v_defaultcurve1 text;
 v_defaultcurve2 text;
@@ -53,10 +51,6 @@ BEGIN
 	SELECT epsg INTO v_srid FROM version LIMIT 1;
 
 	-- get user variables
-	SELECT (value::json->>'node')::json->>'nullElevBuffer' INTO v_nullbuffer FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
-	SELECT (value::json->>'node')::json->>'ceroElevBuffer' INTO v_cerobuffer FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
-	SELECT (value::json->>'junction')::json->>'defaultDemand' INTO v_defaultdemand FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
-	SELECT (value::json->>'pipe')::json->>'diameter' INTO v_diameter FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
 	SELECT (value::json->>'tank')::json->>'distVirtualReservoir' INTO v_n2nlength FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
 	SELECT (value::json->>'pressGroup')::json->>'status' INTO v_statuspg FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
 	SELECT (value::json->>'pressGroup')::json->>'forceStatus' INTO v_forcestatuspg FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
@@ -71,7 +65,6 @@ BEGIN
 	SELECT (value::json->>'reservoir')::json->>'switch2Junction' INTO v_switch2junction FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
 	SELECT (value::json->>'pressGroup')::json->>'defaultCurve' INTO v_defaultcurve1 FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
 	SELECT (value::json->>'pumpStation')::json->>'defaultCurve' INTO v_defaultcurve2 FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user;
-	SELECT value INTO v_demandtype FROM config_param_user WHERE parameter = 'inp_options_demandtype' AND cur_user=current_user;
 	
 	RAISE NOTICE 'switch to junction an specific list of RESERVOIRS';
 	UPDATE rpt_inp_node SET epa_type = 'JUNCTION' WHERE node_id IN (select node_id FROM v_edit_node
@@ -94,33 +87,6 @@ BEGIN
 	RAISE NOTICE 'setting curve for BINODE2ARC-PRV valves';
 	UPDATE rpt_inp_arc SET addparam = gw_fct_json_object_set_key (addparam::json, 'pressure', 0) 
 	WHERE arc_type = 'BINODE2ARC-PRV' AND result_id  = p_result;
-
-	RAISE NOTICE 'setting roughness for null values';
-	SELECT avg(roughness) INTO v_roughness FROM rpt_inp_arc WHERE result_id=p_result;
-	UPDATE rpt_inp_arc SET roughness = v_roughness WHERE roughness IS NULL AND result_id= p_result;
-
-	RAISE NOTICE 'setting demands for null values';
-	IF v_defaultdemand IS NOT NULL AND v_demandtype = 1 THEN
-		UPDATE rpt_inp_node SET demand = v_defaultdemand WHERE demand IS NULL AND result_id= p_result;
-	END IF;
-
-	RAISE NOTICE 'setting diameter for null values';
-	UPDATE rpt_inp_arc SET diameter = v_diameter WHERE diameter IS NULL AND result_id= p_result;
-
-	RAISE NOTICE 'setting null elevation values using closest points values';
-	UPDATE rpt_inp_node SET elevation = d.elevation FROM
-		(SELECT c.n1 as node_id, e2 as elevation FROM (SELECT DISTINCT ON (a.node_id) a.node_id as n1, a.elevation as e1, a.the_geom as n1_geom, b.node_id as n2, b.elevation as e2, b.the_geom as n2_geom FROM node a, node b 
-		WHERE st_dwithin (a.the_geom, b.the_geom, v_nullbuffer) AND a.node_id != b.node_id AND a.elevation IS NULL AND b.elevation IS NOT NULL) c order by st_distance (n1_geom, n2_geom))d
-		WHERE rpt_inp_node.elevation IS NULL AND d.node_id=rpt_inp_node.node_id AND result_id=p_result;
-
-	RAISE NOTICE 'setting cero elevation values using closest points values';
-	UPDATE rpt_inp_node SET elevation = d.elevation FROM
-		(SELECT c.n1 as node_id, e2 as elevation FROM (SELECT DISTINCT ON (a.node_id) a.node_id as n1, a.elevation as e1, a.the_geom as n1_geom, b.node_id as n2, b.elevation as e2, b.the_geom as n2_geom FROM node a, node b 
-		WHERE st_dwithin (a.the_geom, b.the_geom, v_cerobuffer) AND a.node_id != b.node_id AND a.elevation = 0 AND b.elevation > 0) c order by st_distance (n1_geom, n2_geom))d
-		WHERE rpt_inp_node.elevation IS NULL AND d.node_id=rpt_inp_node.node_id AND result_id=p_result;
-	
-	RAISE NOTICE 'setting cero on elevation those have null values in spite of previous processes (profilactic issue in order to do not crash the epanet file)';
-	UPDATE rpt_inp_node SET elevation = 0 WHERE elevation IS NULL AND result_id=p_result;
 
 	RAISE NOTICE 'transform all tanks by reservoirs with link and junction';
 	v_querytext = 'SELECT * FROM rpt_inp_node WHERE (epa_type = ''TANK'' OR epa_type = ''INLET'') AND result_id = '||quote_literal(p_result);

@@ -15,10 +15,9 @@ $BODY$
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_pg2epa($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{},"data":{"geometryLog":false, "resultId":"v41","saveOnDatabase":true, "useNetworkGeom":"false", "useNetworkDemand":"false", "export":"false"}}$$)
+"feature":{},"data":{"geometryLog":false, "resultId":"v41", "useNetworkGeom":"false"}}$$)
 
 */
-
 
 
 DECLARE
@@ -38,26 +37,28 @@ v_advancedsettings boolean;
 v_file json;
 v_body json;
 v_export boolean;
-
+v_checkdata boolean;
 	
 BEGIN
-
 
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
 	
 	--  Get input data
 	v_result = (p_data->>'data')::json->>'resultId';
-
-	-- get controls to make faster this function
 	v_usenetworkgeom = (p_data->>'data')::json->>'useNetworkGeom';  -- use network previously defined
-	v_usenetworkdemand = (p_data->>'data')::json->>'useNetworkDemand'; -- use demand previuously defined
-	v_export = (p_data->>'data')::json->>'export'; -- don't export
 
-	-- Getting user parameteres
+	-- Get user parameteres
 	v_networkmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user);
 	v_buildupmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_buildup_mode' AND cur_user=current_user);
-	v_advancedsettings = (SELECT value::json->>'status' FROM config_param_user WHERE parameter='inp_options_advancedsettings' AND cur_user=current_user)::boolean;
+
+	-- Get debug parameters (settings)
+	v_usenetworkdemand = (SELECT (value::json->>'debug')::json->>'isOperative' FROM config_param_user WHERE parameter='inp_options_settings' AND cur_user=current_user)::boolean;
+	v_export = (SELECT (value::json->>'debug')::json->>'export' FROM config_param_user WHERE parameter='inp_options_settings' AND cur_user=current_user)::boolean;
+	v_checkdata = (SELECT (value::json->>'debug')::json->>'checkData' FROM config_param_user WHERE parameter='inp_options_settings' AND cur_user=current_user)::boolean;
+
+	-- Get advanced parameters (settings)
+	v_advancedsettings = (SELECT (value::json->>'avanced')::json->>'status' FROM config_param_user WHERE parameter='inp_options_settings' AND cur_user=current_user)::boolean;
 	
 	-- only mandatory nodarc
 	IF v_networkmode = 1 OR v_networkmode = 3 THEN 
@@ -109,41 +110,57 @@ BEGIN
 		UPDATE rpt_inp_arc SET length=0.05 WHERE length=0 AND result_id=v_result;
 		
 
-		IF v_buildupmode = 1 THEN -- no check data, go...go...
-
-			RAISE NOTICE '8.1 - checking all arcs/node disconnected from any reservoir';
+		IF v_checkdata THEN -- (only debug mode no network check data)
+			RAISE NOTICE '8 - Calling gw_fct_pg2epa_check_data';
+			v_input = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"geometryLog":false, 
+			"resultId":"',v_result,'", "useNetworkGeom":"', v_usenetworkgeom,'"}, "saveOnDatabase":true}}')::json;
+			SELECT gw_fct_pg2epa_check_data(v_input) INTO v_return;			
+			
+		ELSE	
+			RAISE NOTICE '8 - checking all arcs/node disconnected from any reservoir';
 			PERFORM gw_fct_pg2epa_inlet_flowtrace(v_result);
 			DELETE FROM rpt_inp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=39 AND cur_user=current_user) and result_id = v_result;
 			DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user) and result_id = v_result;
 
 			-- setting the minimun expression of return json
-			RAISE NOTICE '8.2 - Ignoring gw_fct_pg2epa_check_data';
+			RAISE NOTICE '9 - Ignoring gw_fct_pg2epa_check_data';
 			SELECT gw_fct_get_jsonbody('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
 			"data":{"parameters":{"text":"Inp export done succesfully"}}}'::json) INTO v_return;
-		ELSE	
-
-			RAISE NOTICE '8 - Calling gw_fct_pg2epa_check_data';
-			v_input = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"geometryLog":false, 
-			"resultId":"',v_result,'", "useNetworkGeom":"', v_usenetworkgeom,'"}, "saveOnDatabase":true}}')::json;
-			SELECT gw_fct_pg2epa_check_data(v_input) INTO v_return;			
 		END IF;
 		
 		IF v_buildupmode = 1 THEN
-	
-			RAISE NOTICE '9 - Use supply buildup model (modifying values in order to force buildupmode 1)';
+			RAISE NOTICE '10 - Use supply buildup model (modifying values in order to force buildupmode 1)';
 			PERFORM gw_fct_pg2epa_buildup_supply(v_result);
 			
 		ELSIF v_buildupmode = 2 THEN
-		
-			RAISE NOTICE '9 - Use transport buildup model (modifying values in order to force buildupmode 2)';
+			RAISE NOTICE '10 - Use transport buildup model (modifying values in order to force buildupmode 2)';
 			PERFORM gw_fct_pg2epa_buildup_transport(v_result);
 		END IF;
 
 		IF v_advancedsettings THEN
-		
-			RAISE NOTICE '10 - Fixing advanced settings';
+			RAISE NOTICE '11 - Fixing advanced settings';
 			PERFORM gw_fct_pg2epa_advancedsettings(v_result);
 		END IF;
+
+		RAISE NOTICE '12 - Default values';
+		PERFORM gw_fct_pg2epa_vdefault(v_result);
+
+		RAISE NOTICE '13 - Fixing inconsistency values on network data';
+		-- deleting nodes disconnected from any reservoir
+		DELETE FROM rpt_inp_node WHERE node_id IN (SELECT arc.node_1 FROM anl_arc JOIN arc USING (arc_id) WHERE fprocesscat_id=39 AND cur_user=current_user 
+							UNION SELECT arc.node_2 FROM anl_arc JOIN arc USING (arc_id) WHERE fprocesscat_id=39 AND cur_user=current_user) AND result_id=p_result;
+
+		-- deleting arcs disconnected from any reservoir';
+		DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user) AND result_id=p_result;
+
+		-- delete orphan nodes'
+		DELETE FROM rpt_inp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=7 AND cur_user=current_user) AND result_id=p_result;
+
+		-- deleting arcs without extremal nodes'
+		DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=3 AND cur_user=current_user) AND result_id=p_result;	
+
+		-- setting cero on elevation those have null values in spite of previous processes (profilactic issue in order to do not crash the epanet file)';
+		UPDATE rpt_inp_node SET elevation = 0 WHERE elevation IS NULL AND result_id=p_result;
 		
 	ELSE 
 		-- delete rpt_* tables keeping rpt_inp_tables
@@ -158,27 +175,27 @@ BEGIN
 		"data":{"parameters":{"text":"Inp export using existing gesometry from previous result done succesfully"}}}'::json) INTO v_return;
 	END IF;
 
-	RAISE NOTICE '11 - update demands & patterns';
+	RAISE NOTICE '14 - update demands & patterns';
 	IF v_usenetworkdemand IS NOT FALSE THEN
 	
 		-- set demand and patterns in function of demand type and pattern method choosed
-		PERFORM gw_fct_pg2epa_rtc(v_result);	
+		PERFORM gw_fct_pg2epa_demand(v_result);	
 		
 		-- Update demand values filtering by dscenario
-		PERFORM gw_fct_pg2epa_dscenario(v_result);	
+		PERFORM gw_fct_pg2epa_dscenario(v_result);
+
 	END IF;
 
-	RAISE NOTICE '12 - Calling for modify the valve status';
+	RAISE NOTICE '15 - Calling for modify the valve status';
 	PERFORM gw_fct_pg2epa_valve_status(v_result);
-	
 
 	-- Upsert on node rpt_inp result manager table
 	DELETE FROM inp_selector_result WHERE cur_user=current_user;
 	INSERT INTO inp_selector_result (result_id, cur_user) VALUES (v_result, current_user);
 	
-	IF v_export IS NOT FALSE THEN
+	IF v_export IS NOT FALSE THEN  -- debug mode
 	
-		RAISE NOTICE '13 - Calling for the export function';
+		RAISE NOTICE '16 - Calling for the export function';
 		SELECT gw_fct_utils_csv2pg_export_epanet_inp(v_result, null) INTO v_file;
 	END IF;
 	

@@ -11,11 +11,10 @@ RETURNS integer
 AS $BODY$
 
 /*example
-SELECT SCHEMA_NAME.gw_fct_pg2epa_advancedsettings('t1')
+SELECT SCHEMA_NAME.gw_fct_pg2epa_advancedsettings('v45')
 */
 
 DECLARE
-
 v_reservoir json;
 v_tank json;
 v_junction json;
@@ -24,34 +23,31 @@ v_pump json;
 v_valve json;
 v_headloss text;
 
-
 BEGIN
 
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- get user variables
-	SELECT ((value::json->>'parameters')::json->>'valve')::json INTO v_valve FROM config_param_user WHERE parameter = 'inp_options_advancedsettings' AND cur_user=current_user;
-	SELECT ((value::json->>'parameters')::json->>'reservoir')::json INTO v_reservoir FROM config_param_user WHERE parameter = 'inp_options_advancedsettings' AND cur_user=current_user;
-	SELECT ((value::json->>'parameters')::json->>'pipe')::json INTO v_pipe FROM config_param_user WHERE parameter = 'inp_options_advancedsettings' AND cur_user=current_user;
-	SELECT ((value::json->>'parameters')::json->>'tank')::json INTO v_tank FROM config_param_user WHERE parameter = 'inp_options_advancedsettings' AND cur_user=current_user;
-	SELECT ((value::json->>'parameters')::json->>'pump')::json INTO v_pump FROM config_param_user WHERE parameter = 'inp_options_advancedsettings' AND cur_user=current_user;
-	SELECT ((value::json->>'parameters')::json->>'junction')::json INTO v_junction FROM config_param_user WHERE parameter = 'inp_options_advancedsettings' AND cur_user=current_user;
-	SELECT value INTO v_headloss FROM config_param_user WHERE parameter = 'inp_options_headloss' AND cur_user=current_user;	
+	SELECT ((value::json->>'advanced')::json->>'junction')::json INTO v_junction FROM config_param_user WHERE parameter = 'inp_options_settings' AND cur_user=current_user;
 
-	RAISE NOTICE '% % % % %', v_valve, v_reservoir, v_pipe, v_tank, v_pump;
+	SELECT ((value::json->>'advanced')::json->>'valve')::json INTO v_valve FROM config_param_user WHERE parameter = 'inp_options_settings' AND cur_user=current_user;
+	SELECT ((value::json->>'advanced')::json->>'reservoir')::json INTO v_reservoir FROM config_param_user WHERE parameter = 'inp_options_settings' AND cur_user=current_user;
+	SELECT ((value::json->>'advanced')::json->>'pipe')::json INTO v_pipe FROM config_param_user WHERE parameter = 'inp_options_settings' AND cur_user=current_user;
+	SELECT ((value::json->>'advanced')::json->>'tank')::json INTO v_tank FROM config_param_user WHERE parameter = 'inp_options_settings' AND cur_user=current_user;
+	SELECT ((value::json->>'advanced')::json->>'pump')::json INTO v_pump FROM config_param_user WHERE parameter = 'inp_options_settings' AND cur_user=current_user;
+	SELECT value INTO v_headloss FROM config_param_user WHERE parameter = 'inp_options_headloss' AND cur_user=current_user;	
 
 	-- update values for valves
 	UPDATE rpt_inp_arc SET minorloss = (v_valve->>'minorloss')::float WHERE epa_type='VALVE' AND (minorloss = 0 OR minorloss is null) AND result_id  = p_result;
 	UPDATE rpt_inp_arc SET roughness = ((v_valve->>'roughness')::json->>v_headloss)::float	WHERE epa_type='VALVE' AND (roughness = 0 OR roughness is null) AND result_id  = p_result;
 	UPDATE rpt_inp_arc SET length = (v_valve->>'length')::float WHERE epa_type='VALVE' AND result_id  = p_result;
 	UPDATE rpt_inp_arc SET diameter = (v_valve->>'diameter')::float WHERE epa_type='VALVE' AND (diameter = 0 OR diameter is null) AND result_id  = p_result;
-
 	
 	-- update values for reservoirs
 	UPDATE rpt_inp_node SET elevation = elevation + (v_reservoir->>'addElevation')::float WHERE epa_type='RESERVOIR' AND result_id  = p_result;
 
-	-- update values for reservoirs
+	-- update values for tanks
 	UPDATE rpt_inp_node SET elevation = elevation + (v_tank->>'addElevation')::float WHERE epa_type='TANK' AND result_id  = p_result;
 
 	-- update values for pumps

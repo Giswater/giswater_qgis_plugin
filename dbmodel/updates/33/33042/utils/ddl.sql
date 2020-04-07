@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = ws, public, pg_catalog;
+SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 CREATE INDEX anl_node_node_id_index ON anl_node USING btree (node_id);
 CREATE INDEX anl_node_fprocesscat_id_index ON anl_node USING btree (fprocesscat_id);
@@ -19,9 +19,5 @@ CREATE INDEX rpt_inp_node_nodeparent ON rpt_inp_node USING btree (nodeparent);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_node", "column":"state_type", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_node", "column":"sector_id", "dataType":"integer"}}$$);
-
-INSERT INTO sys_fprocess_cat(id, fprocess_name, context, project_type)
-VALUES (124,'Go2epa-temporal nodarcs','ws', 'epa') ON CONFLICT (id) DO NOTHING;
-
 
 

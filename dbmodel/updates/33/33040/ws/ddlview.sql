@@ -5,13 +5,13 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = ws, public, pg_catalog;
+SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 --2020/03/18
 
 SELECT gw_fct_admin_manage_child_views($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{},
-"data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-DELETE" }}$$);
+"data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-DELETE"}}$$);
 
 
 -- independent
@@ -748,9 +748,9 @@ CREATE OR REPLACE VIEW v_edit_inp_connec AS
      JOIN inp_connec USING (connec_id)
   WHERE connec.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 
-CREATE TRIGGER gw_trg_edit_inp_node_inlet
+CREATE TRIGGER gw_trg_edit_inp_connec
   INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON v_edit_inp_inlet
+  ON v_edit_inp_connec
   FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_edit_inp_connec();
 
@@ -866,97 +866,7 @@ CREATE OR REPLACE VIEW v_edit_inp_reservoir AS
   FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_reservoir');
 
-
-
-CREATE OR REPLACE VIEW v_edit_inp_pipe AS 
- SELECT arc.arc_id,
-	arc.node_1,
-	arc.node_2,
-	arc.arccat_id,
-	arc.sector_id,
-	arc.macrosector_id,
-	arc.state,
-	arc.state_type,
-	arc.annotation,
-	arc.expl_id,
-	arc.custom_length,
-	inp_pipe.minorloss,
-	inp_pipe.status,
-	inp_pipe.custom_roughness,
-	inp_pipe.custom_dint,
-	arc.the_geom
-   FROM inp_selector_sector, v_arc arc
-   JOIN inp_pipe USING (arc_id)
-   WHERE arc.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
-
-CREATE TRIGGER gw_trg_edit_inp_node_shortpipe
-  INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON v_edit_inp_shortpipe
-  FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_pipe');
-
-
-CREATE OR REPLACE VIEW v_edit_inp_virtualvalve AS 
- SELECT v_arc.arc_id,
-	v_arc.node_1,
-	v_arc.node_2,
-	(v_arc.elevation1 + v_arc.elevation2) / 2::numeric AS elevation,
-	(v_arc.depth1 + v_arc.depth2) / 2::numeric AS depth,
-	v_arc.arccat_id,
-	v_arc.sector_id,
-	v_arc.macrosector_id,
-	v_arc.state,
-	v_arc.state_type,
-	v_arc.annotation,
-	v_arc.expl_id,
-	inp_virtualvalve.valv_type,
-	inp_virtualvalve.pressure,
-	inp_virtualvalve.flow,
-	inp_virtualvalve.coef_loss,
-	inp_virtualvalve.curve_id,
-	inp_virtualvalve.minorloss,
-	inp_virtualvalve.to_arc,
-	inp_virtualvalve.status,
-	v_arc.the_geom
-   FROM inp_selector_sector,
-	v_arc
-	 JOIN inp_virtualvalve USING (arc_id)
-  WHERE v_arc.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
-
-CREATE TRIGGER gw_trg_edit_inp_node_shortpipe
-  INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON v_edit_inp_shortpipe
-  FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_virtualvalve');
-
-
-
-CREATE OR REPLACE VIEW v_edit_inp_shortpipe AS 
- SELECT n.node_id,
-	elevation,
-	depth,
-	nodecat_id,
-	n.sector_id,
-	macrosector_id,
-	state,
-	state_type,
-	annotation,
-	expl_id,
-	minorloss,
-	to_arc,
-	status,
-	the_geom
-       FROM inp_selector_sector, v_node n
-   JOIN inp_shortpipe USING (node_id)
-   WHERE n.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
-
-CREATE TRIGGER gw_trg_edit_inp_node_shortpipe
-  INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON v_edit_inp_shortpipe
-  FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_shortpipe');
-
-
+  
 CREATE OR REPLACE VIEW v_edit_inp_tank AS 
  SELECT n.node_id,
 	elevation,
@@ -985,7 +895,92 @@ CREATE TRIGGER gw_trg_edit_inp_node_tank
   FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_tank');
 
+    
+CREATE OR REPLACE VIEW v_edit_inp_shortpipe AS 
+ SELECT n.node_id,
+	elevation,
+	depth,
+	nodecat_id,
+	n.sector_id,
+	macrosector_id,
+	state,
+	state_type,
+	annotation,
+	expl_id,
+	minorloss,
+	to_arc,
+	status,
+	the_geom
+       FROM inp_selector_sector, v_node n
+   JOIN inp_shortpipe USING (node_id)
+   WHERE n.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 
+CREATE TRIGGER gw_trg_edit_inp_node_shortpipe
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_shortpipe
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_shortpipe');
+  
+
+CREATE OR REPLACE VIEW v_edit_inp_pipe AS 
+ SELECT arc.arc_id,
+	arc.node_1,
+	arc.node_2,
+	arc.arccat_id,
+	arc.sector_id,
+	arc.macrosector_id,
+	arc.state,
+	arc.state_type,
+	arc.annotation,
+	arc.expl_id,
+	arc.custom_length,
+	inp_pipe.minorloss,
+	inp_pipe.status,
+	inp_pipe.custom_roughness,
+	inp_pipe.custom_dint,
+	arc.the_geom
+   FROM inp_selector_sector, v_arc arc
+   JOIN inp_pipe USING (arc_id)
+   WHERE arc.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
+
+CREATE TRIGGER gw_trg_edit_inp_arc_pipe
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_pipe
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_arc('inp_pipe');
+  
+
+CREATE OR REPLACE VIEW v_edit_inp_virtualvalve AS 
+ SELECT v_arc.arc_id,
+	v_arc.node_1,
+	v_arc.node_2,
+	(v_arc.elevation1 + v_arc.elevation2) / 2::numeric AS elevation,
+	(v_arc.depth1 + v_arc.depth2) / 2::numeric AS depth,
+	v_arc.arccat_id,
+	v_arc.sector_id,
+	v_arc.macrosector_id,
+	v_arc.state,
+	v_arc.state_type,
+	v_arc.annotation,
+	v_arc.expl_id,
+	inp_virtualvalve.valv_type,
+	inp_virtualvalve.pressure,
+	inp_virtualvalve.flow,
+	inp_virtualvalve.coef_loss,
+	inp_virtualvalve.curve_id,
+	inp_virtualvalve.minorloss,
+	inp_virtualvalve.to_arc,
+	inp_virtualvalve.status,
+	v_arc.the_geom
+   FROM inp_selector_sector, v_arc
+	 JOIN inp_virtualvalve USING (arc_id)
+  WHERE v_arc.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
+
+CREATE TRIGGER gw_trg_edit_inp_arc_virtualvalve
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_virtualvalve
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_arc('inp_virtualvalve');
 
   
 CREATE OR REPLACE VIEW v_rtc_period_hydrometer AS 
