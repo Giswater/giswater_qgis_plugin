@@ -13,6 +13,7 @@ import sys
 
 from giswater_qgis_plugin.dao.controller import DaoController
 from giswater_qgis_plugin.actions.update_sql import UpdateSQL
+from giswater_qgis_plugin.actions.manage_visit import ManageVisit
 
 
 class TestGiswater(QObject):
@@ -53,7 +54,7 @@ class TestGiswater(QObject):
         self.qgis_settings.setIniCodec(sys.getfilesystemencoding())
 
 
-    def init_plugin(self, enable_toolbars=True):
+    def init_plugin(self, schema_name=None):
         """ Plugin main initialization function """
 
         print("init_plugin")
@@ -63,8 +64,12 @@ class TestGiswater(QObject):
         self.controller.set_plugin_dir(self.plugin_dir)
         self.controller.set_qgis_settings(self.qgis_settings)
         self.controller.set_giswater(self)
+        if schema_name:
+            self.controller.set_schema_name(schema_name)
 
+        # Set test classes
         self.update_sql = UpdateSQL(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.manage_visit = ManageVisit(self.iface, self.settings, self.controller, self.plugin_dir)
 
 
     def get_value_from_metadata(self, parameter, default_value):

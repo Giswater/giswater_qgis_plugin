@@ -28,12 +28,12 @@ class TestQgis():
         self.user = "gisadmin"
 
 
-    def load_plugin(self):
+    def load_plugin(self, schema_name=None):
         """ Load main plugin class """
 
         self.init_config()
         self.test_giswater = TestGiswater(self.iface)
-        self.test_giswater.init_plugin(False)
+        self.test_giswater.init_plugin(schema_name)
 
         return True
 
@@ -57,6 +57,7 @@ class TestQgis():
 
         status = self.test_giswater.controller.connect_to_database_service(service_name)
         self.test_giswater.controller.logged = status
+
         if self.test_giswater.controller.last_error:
             msg = self.test_giswater.controller.last_error
             print(f"Database connection error: {msg}")
@@ -144,28 +145,22 @@ class TestQgis():
         return True
 
 
-    def create_gis_project_ui(self, project_type='ws'):
+    def manage_visit(self, project_type='ws'):
 
-        print("\nStart create_gis_project_ui")
+        print("\nStart manage_visit")
 
         # Load main plugin class
-        if not self.load_plugin():
+        if not self.load_plugin('test_ws'):
             return False
 
         # Connect to a database providing a service_name set in .pg_service.conf
         if not self.connect_to_database(self.service_name):
             return False
 
-        self.test_giswater.update_sql.init_sql(False, self.user, show_dialog=False)
-        self.test_giswater.update_sql.init_dialog_create_project(project_type)
+        self.test_giswater.manage_visit.manage_visit()
 
-        self.test_giswater.update_sql.open_form_create_gis_project()
-
-        return
-
-        dlg = ReadsqlCreateGisProject()
+        dlg = self.test_giswater.manage_visit.dlg_add_visit
         print(type(dlg))
-        dlg.exec()
         res = dlg.exec()
         if res == QDialog.Accepted:
             print('Accepted')
@@ -173,23 +168,6 @@ class TestQgis():
             print('Rejected')
 
         return
-
-        # Generate QGIS project
-        project_name = f"test_{project_type}"
-        gis_folder = "C:/Users/David/giswater/qgs"
-        gis_file = project_name
-        export_passwd = True
-        roletype = 'admin'
-        sample = True
-        get_database_parameters = False
-        gis = CreateGisProject(self.test_giswater.controller, self.test_giswater.plugin_dir)
-        gis.set_database_parameters("host", "port", "db", "user", "password", "25831")
-        gis.gis_project_database(gis_folder, gis_file, project_type, project_name, export_passwd,
-            roletype, sample, get_database_parameters)
-
-        print("Finish create_gis_project_ui")
-
-        return True
 
 
     def check_project_result(self, project_type='ws'):
@@ -231,14 +209,14 @@ def test_create_gis_project():
     print(status)
 
 
-def test_create_gis_project_ui():
+def test_manage_visit():
     test = TestQgis()
-    status = test.create_gis_project_ui('ud')
+    status = test.manage_visit('ws')
     print(status)
 
 
 if __name__ == '__main__':
     print("MAIN")
     test = TestQgis()
-    test.create_project('ud')
+    test.manage_visit('ws')
 
