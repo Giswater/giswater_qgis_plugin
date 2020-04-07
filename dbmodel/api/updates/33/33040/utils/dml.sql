@@ -7,6 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+SELECT setval('SCHEMA_NAME.config_api_form_fields_id_seq', (SELECT max(id) FROM config_api_form_fields), true);
 
 --2020/03/13
 UPDATE config_api_form_fields SET dv_querytext_filterc = replace(dv_querytext_filterc,'=','') WHERE dv_querytext_filterc is not null;
@@ -112,3 +113,6 @@ UPDATE config_api_form_fields SET iseditable=FALSE WHERE iseditable IS NULL;
 UPDATE config_api_form_fields SET isautoupdate=FALSE WHERE isautoupdate IS NULL;
 UPDATE config_api_form_fields SET dv_orderby_id=TRUE WHERE dv_orderby_id IS NULL AND widgettype = 'combo';
 UPDATE config_api_form_fields SET dv_isnullvalue=FALSE WHERE dv_isnullvalue IS NULL AND widgettype = 'combo';
+
+UPDATE config_api_form_fields SET dv_querytext = 'SELECT macrosector_id as id, name as idval FROM macrosector where macrosector_id is not null' WHERE column_id='macrosector_id' AND formname='v_edit_macrosector';
+UPDATE config_api_form_fields SET widgettype = 'nowidget' WHERE column_id='net_code' AND formname='search';
