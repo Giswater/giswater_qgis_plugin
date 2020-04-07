@@ -174,7 +174,6 @@ class UpdateSQL(ApiParent):
             utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "api_manager")
             utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "custom")
             self.project_types = self.settings.value('system_variables/project_types')
-            utils_giswater.setWidgetVisible(self.dlg_readsql, 'btn_task_example', False)
         else:
             self.project_types = self.settings.value('system_variables/project_types_dev')
 
@@ -208,7 +207,6 @@ class UpdateSQL(ApiParent):
         """ Set signals. Function has to be executed only once (during form initialization) """
 
         self.dlg_readsql.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_readsql))
-        self.dlg_readsql.btn_task_example.clicked.connect(partial(self.task_example))
         self.dlg_readsql.btn_schema_create.clicked.connect(partial(self.open_create_project))
         self.dlg_readsql.btn_api_create.clicked.connect(partial(self.implement_api))
         self.dlg_readsql.btn_custom_load_file.clicked.connect(
