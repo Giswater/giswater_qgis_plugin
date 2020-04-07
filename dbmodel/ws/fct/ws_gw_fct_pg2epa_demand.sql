@@ -6,31 +6,24 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2330
 
-/*
-This file is part of Giswater 3
-The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-This version of Giswater is provided by Giswater Association
-*/
-
---FUNCTION CODE: 2330
-
-
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_rtc(result_id_var character varying)  RETURNS integer AS 
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_demand(result_id_var character varying)  RETURNS integer AS 
 $BODY$
 /*
-SELECT SCHEMA_NAME.gw_fct_pg2epa_rtc('p1')
+SELECT SCHEMA_NAME.gw_fct_pg2epa_demand('v45')
 */
 
 DECLARE
-	v_rec		record;
-	v_demand	double precision;
-	v_epaunits	double precision;
-	v_units 	text;
-	v_sql 		text;
-	v_demandtype 	integer;
-	v_patternmethod integer;
-	v_timestep	text;
-	v_networkmode   integer;
+v_rec record;
+v_demand double precision;
+v_epaunits double precision;
+v_units	text;
+v_sql text;
+v_demandtype integer;
+v_patternmethod integer;
+v_timestep text;
+v_networkmode integer;
+v_basedemand float;
+v_advanced  boolean = false;
       
 BEGIN
 
@@ -45,10 +38,11 @@ BEGIN
 	v_patternmethod = (SELECT value FROM config_param_user WHERE parameter='inp_options_patternmethod' AND cur_user=current_user); 
 	v_timestep = (SELECT value FROM config_param_user WHERE parameter='inp_times_duration' AND cur_user=current_user); 
 	v_networkmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user);
+	v_basedemand = (SELECT ((value::json->>'advanced')::json->>'junction')::json->>'baseDemand' FROM config_param_user WHERE parameter = 'inp_options_settings' AND cur_user=current_user);
+	v_advanced = (SELECT (value::json->>'advanced')::json->>'status' FROM config_param_user WHERE parameter = 'inp_options_settings' AND cur_user=current_user);
 
 	EXECUTE 'SELECT (value::json->>'||quote_literal(v_units)||')::float FROM config_param_system WHERE parameter=''epa_units_factor'''
 		INTO v_epaunits;
-
 
 	RAISE NOTICE ' DEMAND TYPE: % PATTERN METHOD: %', v_demandtype, v_patternmethod;
 
@@ -102,7 +96,7 @@ BEGIN
 			UPDATE rpt_inp_node SET demand=(lps_max::float*v_epaunits)::numeric(12,8), pattern_id=NULL 
 			FROM v_rtc_hydrometer_x_node_period a WHERE result_id=result_id_var AND rpt_inp_node.node_id=a.node_id;
 
-		ELSIF v_patternmethod = 23 THEN  	-- DMA PERIOD (Vilablareix model)
+		ELSIF v_patternmethod = 23 THEN  	-- DMAPERIOD>NODE (Vilablareix model)
 							-- Demand is real demand (l/s). Need units factor and DMAxPERIOD efficiency
 							-- Patterns is estimated unitary pattern for dma applied to each node of that dma.
 			UPDATE rpt_inp_node SET demand=((lps_avg*v_epaunits)/d.effc)::numeric(12,8), pattern_id = d.pattern_id
@@ -110,7 +104,7 @@ BEGIN
 						JOIN ext_rtc_dma_period d ON n.dma_id=d.dma_id AND n.period_id=d.cat_period_id
 						WHERE n.node_id=rpt_inp_node.node_id AND result_id=result_id_var;		
 
-		ELSIF v_patternmethod = 24 THEN  	-- NODE PERIOD (Blanes model)
+		ELSIF v_patternmethod = 24 THEN  	-- HYDROPERIOD>NODE (Blanes model)
 							-- Demand is calculated on pattern. Need units factor and DMAxPERIOD efficiency
 							-- Patterns are sumatory(demand*pattern) of all hydrometers for each node and are expressed on l/s. It's mandatory to convert values
 
@@ -125,7 +119,7 @@ BEGIN
 			WHERE node_id IN (SELECT DISTINCT pattern_id FROM rpt_inp_pattern_value WHERE result_id=result_id_var) AND result_id=result_id_var;				
 		
 	
-		ELSIF v_patternmethod = 25 THEN 	-- DMA INTERVAL (Manresa model)
+		ELSIF v_patternmethod = 25 THEN 	-- DMAINTERVAL>NODE (Manresa model)
 							-- Demand is weight factor on dma and are normalized (total node / total dma). 
 							-- Patterns is the same for the whole dma and it's real flow from scada. Values are expressed on l/s. It's mandatory to convert values
 					
@@ -133,7 +127,7 @@ BEGIN
 			FROM v_rtc_period_node a JOIN v_rtc_period_dma c ON a.dma_id::integer=c.dma_id
 			WHERE rpt_inp_node.node_id=a.node_id AND result_id = result_id_var;	
 
-		ELSIF v_patternmethod = 26 THEN 	-- NODE PERIOD - DMA INTERVAL (Manresa + Blanes mixed model)
+		ELSIF v_patternmethod = 26 THEN 	-- HYDROPERIOD>NODE::DMAINTERVAL (Manresa + Blanes mixed model)
 							-- Demand is calculated on pattern. Only need units factor.
 							-- Patterns are sumatory(demand*pattern) of all hydrometers for each node and are expressed on l/s. 
 							-- It's mandatory to convert values
@@ -212,7 +206,7 @@ BEGIN
 
 			WHERE f.idrow=e.idrow and f.dma_id=e.dma_id;
 	
-		ELSIF v_patternmethod = 27 THEN 	-- CONNEC PERIOD (Guipuzkoako urak model)
+		ELSIF v_patternmethod = 27 THEN 	-- HYDROPERIOD>PJOINT (Guipuzkoako urak model)
 							-- Demand is calculated on pattern. Only need units factor. 
 							-- Patterns are sumatory(demand*pattern) of all hydrometers for each pjoint (VNODE or NODE) are expressed on l/s. 
 							-- It's mandatory to convert values
@@ -232,7 +226,16 @@ BEGIN
 			UPDATE rpt_inp_node SET demand=(1*v_epaunits)::numeric(12,8), pattern_id=node_id 
 			WHERE node_id IN (SELECT DISTINCT pattern_id FROM rpt_inp_pattern_value WHERE result_id=result_id_var) AND result_id=result_id_var;
 
-		ELSIF v_patternmethod = 28 THEN
+
+		ELSIF v_patternmethod = 28 THEN 	-- UNIQUEPERIOD>PJOINT (Guipuzkoako urak model)
+							-- Demand is calculated on pattern. Only need units factor. 
+							-- Patterns are sumatory(demand*pattern) of all hydrometers for each pjoint (VNODE or NODE) are expressed on l/s. 
+							-- It's mandatory to convert values
+	
+			UPDATE rpt_inp_node SET demand=(1*v_epaunits)::numeric(12,8), pattern_id=node_id 
+			WHERE node_id IN (SELECT DISTINCT pattern_id FROM rpt_inp_pattern_value WHERE result_id=result_id_var) AND result_id=result_id_var;
+
+		ELSIF v_patternmethod = 29 THEN
 		
 			-- TODO: pattern Blanes + Gipuzkoako Urak (using vnodes) + Manresa models
 
@@ -246,9 +249,14 @@ BEGIN
 			
 			END IF;
 	END IF;
-	
-	-- profilactic control of null demands (because epanet cmd does not runs with null demands
-	UPDATE rpt_inp_node SET demand=0 WHERE result_id=result_id_var AND demand IS NULL;
+
+	-- base demand
+	IF v_advanced THEN
+		UPDATE rpt_inp_node SET demand = demand + v_basedemand WHERE result_id=result_id_var;
+	ELSE
+		-- profilactic control of null demands (because epanet cmd does not runs with null demands
+		UPDATE rpt_inp_node SET demand=0 WHERE result_id=result_id_var AND demand IS NULL;
+	END IF;
 	
 RETURN 0;
 END;
