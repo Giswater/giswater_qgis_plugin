@@ -79,8 +79,11 @@ class ManageVisit(ParentManage, QObject):
         self.layers['node'] = self.controller.get_group_layers('node')
         self.layers['connec'] = self.controller.get_group_layers('connec')
         self.layers['element'] = self.controller.get_group_layers('element')
+
         # Remove 'gully' for 'WS'
-        if self.controller.get_project_type() != 'ws':
+        if self.controller.get_project_type() == 'ws':
+            self.dlg_add_visit.tab_feature.removeTab(3)
+        elif self.controller.get_project_type() == 'ud':
             self.layers['gully'] = self.controller.get_group_layers('gully')
 
         # Feature type of selected parameter
@@ -145,7 +148,31 @@ class ManageVisit(ParentManage, QObject):
         self.current_tab_index = self.tab_index('tab_visit')
         self.tabs.setCurrentIndex(self.current_tab_index)
 
+        self.table_object = "visit"
+
         # Set signals
+        self.set_signals()
+
+        # Set autocompleters of the form
+        self.set_completers()
+
+        # Show id of visit. If not set, infer a new value
+        self.fill_combos(visit_id=visit_id)
+        if not visit_id:
+            visit_id = self.current_visit.nextval(commit=self.autocommit)
+
+        self.visit_id.setText(str(visit_id))
+
+        # manage relation locking
+        if self.locked_geom_type:
+            self.set_locked_relation()
+
+        # Open the dialog
+        #self.open_dialog(self.dlg_add_visit, dlg_name="visit")
+
+
+    def set_signals(self):
+
         self.dlg_add_visit.rejected.connect(self.manage_rejected)
         self.dlg_add_visit.rejected.connect(partial(self.close_dialog, self.dlg_add_visit))
         self.dlg_add_visit.accepted.connect(partial(self.update_relations, self.dlg_add_visit))
@@ -164,28 +191,13 @@ class ManageVisit(ParentManage, QObject):
         self.dlg_add_visit.btn_open_doc.clicked.connect(partial(self.document_open, self.tbl_document))
         self.tbl_document.doubleClicked.connect(partial(self.document_open, self.tbl_document))
         self.dlg_add_visit.btn_add_geom.clicked.connect(self.add_point)
+        #self.dlg_add_visit.tab_feature.currentChanged.connect(partial(
+        #    self.tab_feature_changed, self.dlg_add_visit, self.table_object, excluded_layers=["v_edit_element"]))
 
         # Fill combo boxes of the form and related events
         self.feature_type.currentIndexChanged.connect(partial(self.event_feature_type_selected, self.dlg_add_visit))
         self.parameter_type_id.currentIndexChanged.connect(partial(self.set_parameter_id_combo, self.dlg_add_visit))
         self.parameter_id.currentIndexChanged.connect(self.get_feature_type_of_parameter)
-        self.fill_combos(visit_id=visit_id)
-
-        # Set autocompleters of the form
-        self.set_completers()
-
-        # Show id of visit. If not set, infer a new value
-        if not visit_id:
-            visit_id = self.current_visit.nextval(commit=self.autocommit)
-
-        self.visit_id.setText(str(visit_id))
-
-        # manage relation locking
-        if self.locked_geom_type:
-            self.set_locked_relation()
-
-        # Open the dialog
-        self.open_dialog(self.dlg_add_visit, dlg_name="visit")
 
 
     def set_locked_relation(self):
@@ -260,17 +272,20 @@ class ManageVisit(ParentManage, QObject):
         """Do all action when closed the dialog with Cancel or X.
         e.g. all necessary rollbacks and cleanings."""
 
-        if hasattr(self, 'xyCoordinates_conected'):
-            if self.xyCoordinates_conected:
-                self.canvas.xyCoordinates.disconnect()
-                self.xyCoordinates_conected = False
-        self.canvas.setMapTool(self.previous_map_tool)
-        # removed current working visit. This should cascade removing of all related records
-        if hasattr(self, 'it_is_new_visit') and self.it_is_new_visit:
-            self.current_visit.delete()
-            
-        # Remove all previous selections            
-        self.remove_selection()            
+        try:
+            if hasattr(self, 'xyCoordinates_conected'):
+                if self.xyCoordinates_conected:
+                    self.canvas.xyCoordinates.disconnect()
+                    self.xyCoordinates_conected = False
+            self.canvas.setMapTool(self.previous_map_tool)
+            # removed current working visit. This should cascade removing of all related records
+            if hasattr(self, 'it_is_new_visit') and self.it_is_new_visit:
+                self.current_visit.delete()
+
+            # Remove all previous selections
+            self.remove_selection()
+        except Exception:
+            pass
 
 
     def tab_index(self, tab_name):
@@ -488,9 +503,22 @@ class ManageVisit(ParentManage, QObject):
         sql = (f"SELECT feature_type "
                f"FROM om_visit_parameter "
                f"WHERE descript = '{self.parameter_id.currentText()}'")
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql)
         if row:
             self.feature_type_parameter = row[0]
+            self.geom_type = self.feature_type_parameter.lower()
+
+            # Enable only tab of this geometry type
+            self.dlg_add_visit.tab_feature.setTabEnabled(0, False)
+            self.dlg_add_visit.tab_feature.setTabEnabled(1, False)
+            self.dlg_add_visit.tab_feature.setTabEnabled(2, False)
+            self.dlg_add_visit.tab_feature.setTabEnabled(3, False)
+            if self.geom_type == 'arc':
+                self.dlg_add_visit.tab_feature.setTabEnabled(0, True)
+            elif self.geom_type == 'node':
+                self.dlg_add_visit.tab_feature.setTabEnabled(1, True)
+            elif self.geom_type == 'connec':
+                self.dlg_add_visit.tab_feature.setTabEnabled(2, True)
 
 
     def config_relation_table(self, dialog):
@@ -1278,4 +1306,33 @@ class ManageVisit(ParentManage, QObject):
         node_list.append([node_1, "node 1: " + str(node_1)])
         node_list.append([node_2, "node 2: " + str(node_2)])
         utils_giswater.set_item_data(self.dlg_event.position_id, node_list, 1, True, False)
+
+
+    def tab_feature_changed(self, dialog, table_object, excluded_layers=[]):
+        """ Set geom_type and layer depending selected tab """
+
+        self.controller.log_info("tab_feature_changed")
+
+        tab_position = dialog.tab_feature.currentIndex()
+        if tab_position == 0:
+            self.geom_type = "arc"
+        elif tab_position == 1:
+            self.geom_type = "node"
+        elif tab_position == 2:
+            self.geom_type = "connec"
+        elif tab_position == 3:
+            self.geom_type = "gully"
+
+        self.hide_generic_layers(excluded_layers=excluded_layers)
+        widget_name = f"tbl_{table_object}_x_{self.geom_type}"
+        viewname = f"v_edit_{self.geom_type}"
+        self.widget = utils_giswater.getWidget(dialog, widget_name)
+
+        # Adding auto-completion to a QLineEdit
+        self.set_completer_feature_id(dialog.feature_id, self.geom_type, viewname)
+
+        try:
+            self.iface.actionPan().trigger()
+        except Exception:
+            pass
 

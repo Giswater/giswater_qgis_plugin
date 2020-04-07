@@ -45,6 +45,7 @@ class DaoController(object):
         self.min_log_level = 20
         self.min_message_level = 0
         self.last_error = None
+        self.user = None
 
         if create_logger:
             self.set_logger(logger_name)
@@ -1073,7 +1074,11 @@ class DaoController(object):
         """ Manage locale and corresponding 'i18n' file """ 
         
         # Get locale of QGIS application
-        locale = QSettings().value('locale/userLocale').lower()
+        try:
+            locale = QSettings().value('locale/userLocale').lower()
+        except AttributeError:
+            locale = "en"
+
         if locale == 'es_es':
             locale = 'es'
         elif locale == 'es_ca':
