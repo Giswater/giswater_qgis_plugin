@@ -1725,5 +1725,6 @@ class ApiParent(ParentAction):
         body = self.create_body(extras=extras)
         complet_result = self.controller.get_json('gw_api_setselectors', body, log_sql=True)
         if not complet_result: return False
-        for layer_name in complet_result['body']['data']['indexingLayers'][selector_type]:
-            self.controller.indexing_spatial_layer(layer_name)
+        if selector_type in complet_result['body']['data']['indexingLayers']:
+            for layer_name in complet_result['body']['data']['indexingLayers'][selector_type]:
+                self.controller.indexing_spatial_layer(layer_name)

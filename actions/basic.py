@@ -9,18 +9,18 @@ import os
 from functools import partial
 
 from .. import utils_giswater
-from ..ui_manager import Multirow_selector
+from ..ui_manager import Multirow_selector, SelectorUi
 from .api_search import ApiSearch
-from .parent import ParentAction
+from .api_parent import ApiParent
 
 
-class Basic(ParentAction):
+class Basic(ApiParent):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'basic' """
 
         self.minor_version = "3.0"
-        ParentAction.__init__(self, iface, settings, controller, plugin_dir)
+        ApiParent.__init__(self, iface, settings, controller, plugin_dir)
         self.login_file = os.path.join(self.plugin_dir, 'config', 'login.auth')
         self.logged = False
 
@@ -35,32 +35,16 @@ class Basic(ParentAction):
 
     def basic_exploitation_selector(self):
         """ Button 41: Explotation selector """
-                
-        self.dlg_expoitation = Multirow_selector('exploitation')
-        self.load_settings(self.dlg_expoitation)
 
-        self.dlg_expoitation.btn_ok.clicked.connect(partial(self.close_dialog, self.dlg_expoitation))
-        self.dlg_expoitation.rejected.connect(partial(self.close_dialog, self.dlg_expoitation))
-        self.dlg_expoitation.setWindowTitle("Explotation selector")
-        utils_giswater.setWidgetText(self.dlg_expoitation, self.dlg_expoitation.lbl_filter, self.controller.tr('Filter by: Exploitation name', context_name='labels'))
-        utils_giswater.setWidgetText(self.dlg_expoitation, self.dlg_expoitation.lbl_unselected, self.controller.tr('Unselected exploitations', context_name='labels'))
-        utils_giswater.setWidgetText(self.dlg_expoitation, self.dlg_expoitation.lbl_selected, self.controller.tr('Selected exploitations', context_name='labels'))
+        selector_values = f'{{"exploitation": {{"ids":[]}}}}'
+        self.dlg_selector = SelectorUi()
+        self.load_settings(self.dlg_selector)
+        self.dlg_selector.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_selector))
+        self.dlg_selector.rejected.connect(partial(self.save_settings, self.dlg_selector))
 
-        tableleft = "exploitation"
-        tableright = "selector_expl"
-        field_id_left = "expl_id"
-        field_id_right = "expl_id"
-        schema_name = self.schema_name.replace('"', '')
-        query = ""
-        row = self.controller.get_config('sys_exploitation_x_user', 'value', 'config_param_system')
-        if row and row[0].lower() == 'true':
-            query = f" AND expl_id IN (SELECT expl_id FROM {schema_name}.exploitation_x_user WHERE username = current_user)"
-        query += f" AND expl_id != 0 AND active IS NOT FALSE"
+        self.get_selector(self.dlg_selector, selector_values)
 
-        self.multi_row_selector(self.dlg_expoitation, tableleft, tableright, field_id_left, field_id_right, aql=query)
-
-        # Open dialog
-        self.open_dialog(self.dlg_expoitation, maximize_button=False)
+        self.open_dialog(self.dlg_selector, dlg_name='selector', maximize_button=False)
 
 
     def basic_state_selector(self):
