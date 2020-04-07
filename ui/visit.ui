@@ -378,6 +378,95 @@
           </item>
          </layout>
         </widget>
+        <widget class="QWidget" name="tab_event">
+         <attribute name="title">
+          <string>Event</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_5">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_10" stretch="1">
+            <item>
+             <widget class="QComboBox" name="parameter_type_id">
+              <property name="editable">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="1">
+            <item>
+             <widget class="QComboBox" name="parameter_id">
+              <property name="editable">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_12">
+            <item>
+             <widget class="QPushButton" name="btn_event_insert">
+              <property name="text">
+               <string>INSERT EVENT</string>
+              </property>
+              <property name="autoDefault">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QLabel" name="lbl_info">
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <italic>false</italic>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>From toolbar only STANDARD EVENTS are enabled.</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="Line" name="line">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_13">
+            <item>
+             <widget class="QPushButton" name="btn_event_update">
+              <property name="text">
+               <string>UPDATE EVENT</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btn_event_delete">
+            <property name="text">
+             <string>DELETE EVENT</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTableView" name="tbl_event">
+            <property name="sortingEnabled">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
         <widget class="QWidget" name="tab_relations">
          <attribute name="title">
           <string>Relations</string>
@@ -475,99 +564,100 @@
            </layout>
           </item>
           <item>
-           <widget class="QTableView" name="tbl_relation">
-            <property name="sortingEnabled">
-             <bool>true</bool>
+           <widget class="QTabWidget" name="tab_relations_2">
+            <property name="currentIndex">
+             <number>4</number>
             </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="tab_event">
-         <attribute name="title">
-          <string>Event</string>
-         </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout_5">
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_10" stretch="1">
-            <item>
-             <widget class="QComboBox" name="parameter_type_id">
-              <property name="editable">
+            <widget class="QWidget" name="tab_arc">
+             <attribute name="title">
+              <string>Arc</string>
+             </attribute>
+             <widget class="QTableView" name="tbl_visit_x_arc">
+              <property name="geometry">
+               <rect>
+                <x>10</x>
+                <y>10</y>
+                <width>461</width>
+                <height>381</height>
+               </rect>
+              </property>
+              <property name="sortingEnabled">
                <bool>true</bool>
               </property>
              </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="1">
-            <item>
-             <widget class="QComboBox" name="parameter_id">
-              <property name="editable">
+            </widget>
+            <widget class="QWidget" name="tab_node">
+             <attribute name="title">
+              <string>Node</string>
+             </attribute>
+             <widget class="QTableView" name="tbl_visit_x_node">
+              <property name="geometry">
+               <rect>
+                <x>10</x>
+                <y>10</y>
+                <width>461</width>
+                <height>381</height>
+               </rect>
+              </property>
+              <property name="sortingEnabled">
                <bool>true</bool>
               </property>
              </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_12">
-            <item>
-             <widget class="QPushButton" name="btn_event_insert">
-              <property name="text">
-               <string>INSERT EVENT</string>
+            </widget>
+            <widget class="QWidget" name="tab_connec">
+             <attribute name="title">
+              <string>Connec</string>
+             </attribute>
+             <widget class="QTableView" name="tbl_visit_x_connec">
+              <property name="geometry">
+               <rect>
+                <x>10</x>
+                <y>10</y>
+                <width>461</width>
+                <height>381</height>
+               </rect>
               </property>
-              <property name="autoDefault">
+              <property name="sortingEnabled">
                <bool>true</bool>
               </property>
              </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <widget class="QLabel" name="lbl_info">
-            <property name="font">
-             <font>
-              <weight>50</weight>
-              <italic>false</italic>
-              <bold>false</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>From toolbar only STANDARD EVENTS are enabled.</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="Line" name="line">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_13">
-            <item>
-             <widget class="QPushButton" name="btn_event_update">
-              <property name="text">
-               <string>UPDATE EVENT</string>
+            </widget>
+            <widget class="QWidget" name="tab_gully">
+             <attribute name="title">
+              <string>Gully</string>
+             </attribute>
+             <widget class="QTableView" name="tbl_visit_x_gully">
+              <property name="geometry">
+               <rect>
+                <x>10</x>
+                <y>10</y>
+                <width>461</width>
+                <height>381</height>
+               </rect>
+              </property>
+              <property name="sortingEnabled">
+               <bool>true</bool>
               </property>
              </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <widget class="QPushButton" name="btn_event_delete">
-            <property name="text">
-             <string>DELETE EVENT</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QTableView" name="tbl_event">
-            <property name="sortingEnabled">
-             <bool>true</bool>
-            </property>
+            </widget>
+            <widget class="QWidget" name="tab_relation">
+             <attribute name="title">
+              <string>Relations</string>
+             </attribute>
+             <widget class="QTableView" name="tbl_relation">
+              <property name="geometry">
+               <rect>
+                <x>10</x>
+                <y>10</y>
+                <width>461</width>
+                <height>381</height>
+               </rect>
+              </property>
+              <property name="sortingEnabled">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </widget>
            </widget>
           </item>
          </layout>
@@ -664,7 +754,6 @@
   <tabstop>btn_feature_insert</tabstop>
   <tabstop>btn_feature_delete</tabstop>
   <tabstop>btn_feature_snapping</tabstop>
-  <tabstop>tbl_relation</tabstop>
   <tabstop>parameter_type_id</tabstop>
   <tabstop>parameter_id</tabstop>
   <tabstop>btn_event_insert</tabstop>
