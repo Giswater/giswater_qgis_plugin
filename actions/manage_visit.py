@@ -82,7 +82,10 @@ class ManageVisit(ParentManage, QObject):
         # Remove 'gully' for 'WS'
         if self.controller.get_project_type() != 'ws':
             self.layers['gully'] = self.controller.get_group_layers('gully')
-          
+
+        # Feature type of selected parameter
+        self.feature_type_parameter = None
+
         # Reset geometry  
         self.x = None
         self.y = None
@@ -128,6 +131,7 @@ class ManageVisit(ParentManage, QObject):
         self.tbl_document.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         self.set_selectionbehavior(self.dlg_add_visit)
+
         # Set current date and time
         current_date = QDate.currentDate()
         self.dlg_add_visit.startdate.setDate(current_date)
@@ -164,6 +168,7 @@ class ManageVisit(ParentManage, QObject):
         # Fill combo boxes of the form and related events
         self.feature_type.currentIndexChanged.connect(partial(self.event_feature_type_selected, self.dlg_add_visit))
         self.parameter_type_id.currentIndexChanged.connect(partial(self.set_parameter_id_combo, self.dlg_add_visit))
+        self.parameter_id.currentIndexChanged.connect(self.get_feature_type_of_parameter)
         self.fill_combos(visit_id=visit_id)
 
         # Set autocompleters of the form
@@ -464,17 +469,28 @@ class ManageVisit(ParentManage, QObject):
 
 
     def set_parameter_id_combo(self, dialog):
-        """set parameter_id combo basing on current selections."""
+        """ Set parameter_id combo basing on current selections """
 
         dialog.parameter_id.clear()
-        sql = (f"SELECT id, descript"
-               f" FROM om_visit_parameter"
-               f" WHERE UPPER (parameter_type) = '{self.parameter_type_id.currentText().upper()}'"
-               f" AND UPPER (feature_type) = '{self.feature_type.currentText().upper()}'")
-        sql += " ORDER BY id"
+        sql = (f"SELECT id, descript "
+               f"FROM om_visit_parameter "
+               f"WHERE UPPER(parameter_type) = '{self.parameter_type_id.currentText().upper()}' "
+               f"AND UPPER(feature_type) = '{self.feature_type.currentText().upper()}' "
+               f"ORDER BY id")
         rows = self.controller.get_rows(sql)
         if rows:
             utils_giswater.set_item_data(dialog.parameter_id, rows, 1)
+
+
+    def get_feature_type_of_parameter(self):
+        """ Get feature type of selected parameter """
+
+        sql = (f"SELECT feature_type "
+               f"FROM om_visit_parameter "
+               f"WHERE descript = '{self.parameter_id.currentText()}'")
+        row = self.controller.get_row(sql, log_sql=True)
+        if row:
+            self.feature_type_parameter = row[0]
 
 
     def config_relation_table(self, dialog):
