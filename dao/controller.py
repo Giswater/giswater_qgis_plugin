@@ -505,7 +505,7 @@ class DaoController(object):
         if not row:
             # Check if any error has been raised
             if self.last_error:
-                self.manage_exception_db(self.last_error, sql, stack_level_increase=1)
+                self.manage_exception_db(self.last_error, sql)
             elif self.last_error is None and log_info:
                 self.log_info("Any record found", parameter=sql, stack_level_increase=1)
           
