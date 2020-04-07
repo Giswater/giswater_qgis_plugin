@@ -39,9 +39,9 @@ BEGIN
 	v_result_value := (p_data ->> 'data')::json->> 'result_value';
 	
 	IF v_result_value = 'True' THEN
-		EXECUTE 'INSERT INTO ' || v_tableName || ' (result_id, cur_user) VALUES('|| v_result_name ||', '''|| current_user ||''')';
+		EXECUTE 'INSERT INTO ' || v_tableName || ' ('|| v_column_id ||', cur_user) VALUES('|| v_result_name ||', '''|| current_user ||''')';
 	ELSE
-		EXECUTE 'DELETE FROM ' || v_tableName || ' WHERE result_id = '|| v_result_name ||'';
+		EXECUTE 'DELETE FROM ' || v_tableName || ' WHERE ' || v_column_id || ' = '|| v_result_name ||'';
 	END IF;
 	
 	-- Return
@@ -51,8 +51,7 @@ BEGIN
 			',"formActions":[]}'||
 			',"feature":{}'||
 			',"data":{"indexingLayers": {	"mincut": ["anl_mincut_result_selector", "v_anl_mincut_result_valve", "v_anl_mincut_result_cat", "v_anl_mincut_result_connec", "v_anl_mincut_result_node", "v_anl_mincut_result_arc"],
-							"state_selector": ["xxx","zzz"],
-							"expl": ["aklsdfhajs"]
+							"exploitation": ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element"]
 			}}}'||'}')::json;
 -- Exception handling
 --	EXCEPTION WHEN OTHERS THEN

@@ -26,7 +26,7 @@ DECLARE
 --	Variables
 	selected_json json;	
 	form_json json;
-	v_formTabs_minuct  json;
+	v_formTabsAux  json;
 	v_formTabs text;
 	json_array json[];
 	api_version json;
@@ -43,6 +43,9 @@ DECLARE
 	v_label text;
 	v_table text;
 	v_selector text;
+	v_table_id text;
+	v_selector_id text;
+	v_query_filter text;
 
 BEGIN
 
@@ -60,12 +63,12 @@ BEGIN
 
 -- Manage list ids
 	v_selectors_list = replace(replace(v_selectors_list, '[', '('), ']', ')');
-	
+
 -- Start the construction of the tabs array
 	v_formTabs := '[';
 	
 	SELECT array_agg(row_to_json(a)) FROM (SELECT * FROM json_object_keys(v_selector_type))a into fields_array;
-	
+
 	
 	FOREACH v_aux_json IN ARRAY fields_array
 	LOOP		
@@ -74,45 +77,51 @@ BEGIN
 	IF rec_tab.id IS NOT NULL THEN
 
 		-- get selector parameters
-		v_parameter_selector = (SELECT value::json FROM config_param_system WHERE parameter = 'api_selector_mincut');
+		v_parameter_selector = (SELECT value::json FROM config_param_system WHERE parameter = concat('api_selector_', lower(v_aux_json->>'json_object_keys')::text));
+		
 		v_label = v_parameter_selector->>'label';
 		v_table = v_parameter_selector->>'table';
 		v_selector = v_parameter_selector->>'selector';
+		v_table_id = v_parameter_selector->>'table_id';
+		v_selector_id = v_parameter_selector->>'selector_id';
 
 		-- Manage selectors list
-		IF v_selectors_list = '()' THEN
-			v_selectors_list = '(-1)';
+		IF v_selectors_list IS NULL THEN
+			v_query_filter = '';
+		ELSIF v_selectors_list = '()' THEN
+			v_query_filter = ' AND ' || v_table_id || ' IN (-1) ';
+		ELSE
+			v_query_filter = ' AND ' || v_table_id || ' IN '|| v_selectors_list || ' ';
 		END IF;
-		
+
 		-- Get exploitations, selected and unselected with selectors list
 		EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-		SELECT concat(' || v_label || ') AS label, id::text as widgetname, ''result_id'' as column_id, ''check'' as type, ''boolean'' as "dataType", true as "value" 
-		FROM '|| v_table ||' WHERE id IN (SELECT result_id FROM '|| v_selector ||' WHERE cur_user=' || quote_literal(current_user) || ') AND id IN '|| v_selectors_list ||'
+		SELECT concat(' || v_label || ') AS label, ' || v_table_id || '::text as widgetname, ''' || v_selector_id || ''' as column_id, ''check'' as type, ''boolean'' as "dataType", true as "value" 
+		FROM '|| v_table ||' WHERE ' || v_table_id || ' IN (SELECT ' || v_selector_id || ' FROM '|| v_selector ||' WHERE cur_user=' || quote_literal(current_user) || ') '|| v_query_filter ||'
 		UNION
-		SELECT concat(' || v_label || ') AS label, id::text as widgetname, ''result_id'' as column_id, ''check'' as type, ''boolean'' as "dataType", false as "value" 
-		FROM '|| v_table ||' WHERE id NOT IN (SELECT result_id FROM '|| v_selector ||' WHERE cur_user=' || quote_literal(current_user) || ') AND id IN '|| v_selectors_list ||'
+		SELECT concat(' || v_label || ') AS label, ' || v_table_id || '::text as widgetname, ''' || v_selector_id || ''' as column_id, ''check'' as type, ''boolean'' as "dataType", false as "value" 
+		FROM '|| v_table ||' WHERE ' || v_table_id || ' NOT IN (SELECT ' || v_selector_id || ' FROM '|| v_selector ||' WHERE cur_user=' || quote_literal(current_user) || ') '|| v_query_filter ||'
 		ORDER BY label) a'
-		INTO v_formTabs_minuct;
-
+		INTO v_formTabsAux;
 		
 		-- Add tab name to json
-		IF v_formTabs_minuct IS NULL THEN
-			v_formTabs_minuct := ('{"fields":[]}')::json;
+		IF v_formTabsAux IS NULL THEN
+			v_formTabsAux := ('{"fields":[]}')::json;
 		ELSE
-			v_formTabs_minuct := ('{"fields":' || v_formTabs_minuct || '}')::json;
+			v_formTabsAux := ('{"fields":' || v_formTabsAux || '}')::json;
 		END IF;
 
-		v_formTabs_minuct := gw_fct_json_object_set_key(v_formTabs_minuct, 'tabName', rec_tab.tabname::TEXT);
-		v_formTabs_minuct := gw_fct_json_object_set_key(v_formTabs_minuct, 'tableName', v_selector);
-		v_formTabs_minuct := gw_fct_json_object_set_key(v_formTabs_minuct, 'tabLabel', rec_tab.label::TEXT);
-		v_formTabs_minuct := gw_fct_json_object_set_key(v_formTabs_minuct, 'tooltip', rec_tab.tooltip::TEXT);
-		v_formTabs_minuct := gw_fct_json_object_set_key(v_formTabs_minuct, 'selectorType', rec_tab.formname::TEXT);
+		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'tabName', rec_tab.tabname::TEXT);
+		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'tableName', v_selector);
+		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'tabLabel', rec_tab.label::TEXT);
+		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'tooltip', rec_tab.tooltip::TEXT);
+		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'selectorType', rec_tab.formname::TEXT);
 
 		-- Create tabs array
 		IF v_firsttab THEN 
-			v_formTabs := v_formTabs || ',' || v_formTabs_minuct::text;
+			v_formTabs := v_formTabs || ',' || v_formTabsAux::text;
 		ELSE 
-			v_formTabs := v_formTabs || v_formTabs_minuct::text;
+			v_formTabs := v_formTabs || v_formTabsAux::text;
 		END IF;
 
 		v_firsttab := TRUE;
