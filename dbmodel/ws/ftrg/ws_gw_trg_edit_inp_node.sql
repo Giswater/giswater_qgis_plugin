@@ -17,7 +17,6 @@ $BODY$
 DECLARE 
     v_node_table varchar;
     v_man_table varchar;
-    v_epa_type varchar;
     v_sql varchar;
     v_old_nodetype varchar;
     v_new_nodetype varchar;
@@ -29,7 +28,6 @@ BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
     v_node_table:= TG_ARGV[0];
-    v_epa_type:= TG_ARGV[1];
 
    
     -- Control insertions ID
