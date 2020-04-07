@@ -1230,7 +1230,7 @@ class UpdateSQL(ApiParent):
 
         extras += ', "isToolbox":false'
         body = self.create_body(extras=extras)
-        complet_result = self.controller.get_json('gw_api_gettoolbox', body, schema_name=self.schema)
+        complet_result = self.controller.get_json('gw_api_gettoolbox', body, schema_name=self.schema, commit=False)
         if not complet_result: return False
         self.populate_functions_dlg(self.dlg_import_inp, complet_result['body']['data'])
 
@@ -1273,7 +1273,7 @@ class UpdateSQL(ApiParent):
         client = '"client":{"device":9, "lang":"'+locale+'"}, '
         data = '"data":{' + extras + '}'
         body = "$${" + client + data + "}$$"
-        status = self.controller.get_json('gw_fct_admin_schema_lastprocess', body, schema_name=self.schema_name)
+        status = self.controller.get_json('gw_fct_admin_schema_lastprocess', body, schema_name=self.schema_name, commit=False)
         if status is False:
             self.error_count = self.error_count + 1
 
@@ -1376,7 +1376,7 @@ class UpdateSQL(ApiParent):
             return
 
         sql = "SELECT schema_name, schema_name FROM information_schema.schemata"
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=False)
         available = False
         for row in rows:
             if str(project_name) == str(row[0]):
@@ -2388,7 +2388,7 @@ class UpdateSQL(ApiParent):
         extras = f'"parameters":{{"source_schema":"{schema}", "dest_schema":"{new_schema_name}"}}'
         body = self.create_body(extras=extras)
         self.task1.setProgress(50)
-        result = self.controller.get_json('gw_fct_clone_schema', body, schema_name=schema, log_sql=True)
+        result = self.controller.get_json('gw_fct_clone_schema', body, schema_name=schema, log_sql=True, commit=False)
         if not result: return
         self.task1.setProgress(100)
 
@@ -2463,7 +2463,7 @@ class UpdateSQL(ApiParent):
 
             body = self.create_body(extras=extras)
             sql = ("SELECT " + str(function_name) + "(" + body + ")::text")
-            row = self.controller.get_row(sql, log_sql=True)
+            row = self.controller.get_row(sql, log_sql=True, commit=False)
             self.task1 = GwTask('Manage schema')
             QgsApplication.taskManager().addTask(self.task1)
             self.task1.setProgress(50)
@@ -2750,7 +2750,7 @@ class UpdateSQL(ApiParent):
         body = body.replace('""', 'null')
 
         # Execute query
-        status = self.controller.get_json('gw_fct_admin_manage_child_views', body, schema_name=schema_name)
+        status = self.controller.get_json('gw_fct_admin_manage_child_views', body, schema_name=schema_name, commit=False)
         self.manage_result_message(status, parameter="Created child view")
 
 
@@ -3116,7 +3116,7 @@ class UpdateSQL(ApiParent):
             body = body.replace('""', 'null')
 
             # Execute manage add fields function
-            status = self.controller.get_json('gw_fct_admin_manage_addfields', body, schema_name=schema_name)
+            status = self.controller.get_json('gw_fct_admin_manage_addfields', body, schema_name=schema_name, commit=False)
             self.manage_result_message(status, parameter="Created field into 'config_api_form_fields'")
             if not status:
                 return
@@ -3156,7 +3156,7 @@ class UpdateSQL(ApiParent):
             body = body.replace('""', 'null')
 
             # Execute manage add fields function
-            status = self.controller.get_json('gw_fct_admin_manage_addfields', body, schema_name=schema_name)
+            status = self.controller.get_json('gw_fct_admin_manage_addfields', body, schema_name=schema_name, commit=False)
             self.manage_result_message(status, parameter="Update field into 'config_api_form_fields'")
             if not status:
                 return
@@ -3172,7 +3172,7 @@ class UpdateSQL(ApiParent):
             body = self.create_body(feature=feature, extras=extras)
 
             # Execute manage add fields function
-            status = self.controller.get_json('gw_fct_admin_manage_addfields', body, schema_name=schema_name)
+            status = self.controller.get_json('gw_fct_admin_manage_addfields', body, schema_name=schema_name, commit=False)
             self.manage_result_message(status, parameter="Delete function")
 
         # Close dialog

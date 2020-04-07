@@ -689,7 +689,7 @@ class DaoController(object):
         """
 
         # Check if function exists
-        row = self.check_function(function_name, schema_name)
+        row = self.check_function(function_name, schema_name, commit)
         if not row:
             self.show_warning("Function not found in database", parameter=function_name)
             return None
@@ -1165,7 +1165,7 @@ class DaoController(object):
         return row
     
     
-    def check_function(self, function_name, schema_name=None):
+    def check_function(self, function_name, schema_name=None, commit=True):
         """ Check if @function_name exists in selected schema """
 
         if schema_name is None:
@@ -1176,7 +1176,7 @@ class DaoController(object):
                "WHERE lower(routine_schema) = %s "
                "AND lower(routine_name) = %s ")
         params = [schema_name, function_name]
-        row = self.get_row(sql, params=params)
+        row = self.get_row(sql, params=params, commit=commit)
         return row
     
     
