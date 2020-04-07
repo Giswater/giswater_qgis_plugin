@@ -39,6 +39,7 @@ class ManageVisit(ParentManage, QObject):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control 'Add visit' of toolbar 'edit' """
+
         QObject.__init__(self)
         ParentManage.__init__(self, iface, settings, controller, plugin_dir)
 
@@ -154,10 +155,10 @@ class ManageVisit(ParentManage, QObject):
         self.tabs.currentChanged.connect(partial(self.manage_tab_changed, self.dlg_add_visit))
         self.visit_id.textChanged.connect(partial(self.manage_visit_id_change, self.dlg_add_visit))
         self.dlg_add_visit.btn_doc_insert.clicked.connect(self.document_insert)
-        self.dlg_add_visit.btn_doc_delete.clicked.connect(self.document_delete)
+        self.dlg_add_visit.btn_doc_delete.clicked.connect(partial(self.document_delete, self.tbl_document, "doc_x_visit"))
         self.dlg_add_visit.btn_doc_new.clicked.connect(self.manage_document)
-        self.dlg_add_visit.btn_open_doc.clicked.connect(self.document_open)
-        self.tbl_document.doubleClicked.connect(partial(self.document_open))
+        self.dlg_add_visit.btn_open_doc.clicked.connect(partial(self.document_open, self.tbl_document))
+        self.tbl_document.doubleClicked.connect(partial(self.document_open, self.tbl_document))
         self.dlg_add_visit.btn_add_geom.clicked.connect(self.add_point)
 
         # Fill combo boxes of the form and related events
@@ -222,6 +223,7 @@ class ManageVisit(ParentManage, QObject):
         e.g. all necessary commits and cleanings.
         A) Trigger SELECT gw_fct_om_visit_multiplier (visit_id, feature_type)
         for multiple visits management."""
+
         # tab Visit
         if self.current_tab_index == self.tab_index('tab_visit'):
             self.manage_leave_visit_tab()
@@ -463,6 +465,7 @@ class ManageVisit(ParentManage, QObject):
 
     def set_parameter_id_combo(self, dialog):
         """set parameter_id combo basing on current selections."""
+
         dialog.parameter_id.clear()
         sql = (f"SELECT id, descript"
                f" FROM om_visit_parameter"
@@ -470,7 +473,6 @@ class ManageVisit(ParentManage, QObject):
                f" AND UPPER (feature_type) = '{self.feature_type.currentText().upper()}'")
         sql += " ORDER BY id"
         rows = self.controller.get_rows(sql)
-
         if rows:
             utils_giswater.set_item_data(dialog.parameter_id, rows, 1)
 
@@ -591,7 +593,8 @@ class ManageVisit(ParentManage, QObject):
 
 
     def filter_visit(self, dialog, widget_table, widget_txt, table_object, expr_filter, filed_to_filter):
-        """ Filter om_visit in self.dlg_man.tbl_visit based on (id AND text AND between dates)"""
+        """ Filter om_visit in self.dlg_man.tbl_visit based on (id AND text AND between dates) """
+
         object_id = utils_giswater.getWidgetText(dialog, widget_txt)
         visit_start = dialog.date_event_from.date()
         visit_end = dialog.date_event_to.date()
@@ -891,6 +894,7 @@ class ManageVisit(ParentManage, QObject):
 
     def get_added_files(self, visit_id, event_id, save):
         """  Get path of new files """
+
         file_dialog = QFileDialog()
         file_dialog.setFileMode(QFileDialog.Directory)
         # Get file types from catalog and populate QFileDialog filter
@@ -931,10 +935,12 @@ class ManageVisit(ParentManage, QObject):
             if save:
                 self.save_files_added(visit_id, event_id)
 
+
     def save_files_added(self, visit_id, event_id):
         """ Save new files into DataBase """
+
         if self.files_added:
-            sql = ("SELECT filetype, fextension FROM om_visit_filetype_x_extension")
+            sql = "SELECT filetype, fextension FROM om_visit_filetype_x_extension"
             f_types = self.controller.get_rows(sql)
             sql = ""
             for path in self.files_added:
@@ -995,12 +1001,14 @@ class ManageVisit(ParentManage, QObject):
     def manage_events_changed(self):
         """Action when at a Event model is changed.
         A) if some record is available => enable OK button of VisitDialog"""
+
         state = (self.tbl_event.model().rowCount() > 0)
         self.button_box.button(QDialogButtonBox.Ok).setEnabled(state)
 
 
     def event_update(self):
         """Update selected event."""
+
         # Parameter to save all selected files associated to events
         self.files_added = []
         self.files_all = []
@@ -1184,65 +1192,6 @@ class ManageVisit(ParentManage, QObject):
         self.manage_events_changed()
 
 
-    def document_open(self):
-        """Open selected document."""
-        
-        # Get selected rows
-        field_index = self.tbl_document.model().fieldIndex('path')
-        selected_list = self.dlg_add_visit.tbl_document.selectionModel().selectedRows(field_index)
-        if not selected_list:
-            message = "Any record selected"
-            self.controller.show_info_box(message)
-            return
-        elif len(selected_list) > 1:
-            message = "More then one document selected. Select just one document."
-            self.controller.show_warning(message)
-            return
-
-        path = selected_list[0].data()
-        # Check if file exist
-        if os.path.exists(path):
-            # Open the document
-            if sys.platform == "win32":
-                os.startfile(path)
-            else:
-                opener = "open" if sys.platform == "darwin" else "xdg-open"
-                subprocess.call([opener, path])
-        else:
-            webbrowser.open(path)
-
-
-    def document_delete(self):
-        """Delete record from selected rows in tbl_document."""
-        
-        # Get selected rows. 0 is the column of the pk 0 'id'
-        selected_list = self.tbl_document.selectionModel().selectedRows(0)  
-        if len(selected_list) == 0:
-            message = "Any record selected"
-            self.controller.show_info_box(message)
-            return
-
-        selected_id = []
-        for index in selected_list:
-            doc_id = index.data()
-            selected_id.append(str(doc_id))
-        message = "Are you sure you want to delete these records?"
-        title = "Delete records"
-        answer = self.controller.ask_question(message, title, ','.join(selected_id))
-        if answer:
-            sql = (f"DELETE FROM doc_x_visit"
-                   f" WHERE id IN ({','.join(selected_id)})")
-            status = self.controller.execute_sql(sql)
-            if not status:
-                message = "Error deleting data"
-                self.controller.show_warning(message)
-                return
-            else:
-                message = "Event deleted"
-                self.controller.show_info(message)
-                self.dlg_add_visit.tbl_document.model().select()
-
-
     def document_insert(self):
         """Insert a document related to the current visit."""
         
@@ -1306,11 +1255,11 @@ class ManageVisit(ParentManage, QObject):
 
 
     def populate_position_id(self):
+
         node_list = []
         node_1 = self.dlg_add_visit.tbl_relation.model().record(0).value('node_1')
         node_2 = self.dlg_add_visit.tbl_relation.model().record(0).value('node_2')
         node_list.append([node_1, "node 1: " + str(node_1)])
         node_list.append([node_2, "node 2: " + str(node_2)])
         utils_giswater.set_item_data(self.dlg_event.position_id, node_list, 1, True, False)
-
 
