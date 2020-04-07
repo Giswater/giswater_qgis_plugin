@@ -213,7 +213,7 @@ BEGIN
 		DELETE FROM audit_cat_param_user WHERE id IN (SELECT audit_cat_param_user.id FROM audit_cat_param_user, connec_type 
 		WHERE active=false AND concat(lower(connec_type.id),'_vdefault') = audit_cat_param_user.id);
 
-		v_errortext=concat('Checked on audit_cat_param_user table possible deprecated vdefault parameters.');
+		v_errortext=concat('Inactive parameters have been deleted from audit_cat_param_user.');
 		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) VALUES (101, 4, v_errortext);
 		
 	END IF;
@@ -258,7 +258,7 @@ BEGIN
 
 		IF v_psector_vdef IS NOT NULL THEN
 			INSERT INTO selector_psector (psector_id, cur_user) VALUES (v_psector_vdef, current_user) ON CONFLICT (psector_id, cur_user) DO NOTHING;
-			v_errortext=concat('Current psector is ',v_psector_vdef);
+			v_errortext=concat('Current psector: ',v_psector_vdef);
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) VALUES (101, 4, v_errortext);
 		END IF;
 	END IF;
