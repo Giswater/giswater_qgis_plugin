@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = SCHEMA_NAME, public, pg_catalog;
+SET search_path = ws, public, pg_catalog;
 
 
 --2020/03/18
@@ -744,375 +744,246 @@ CREATE OR REPLACE VIEW v_edit_inp_connec AS
     inp_connec.demand,
     inp_connec.pattern_id,
     connec.the_geom
-   FROM inp_selector_sector,
-    connec
+   FROM inp_selector_sector, connec
      JOIN inp_connec USING (connec_id)
   WHERE connec.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 
+CREATE TRIGGER gw_trg_edit_inp_node_inlet
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_inlet
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_connec();
+
 	 
 CREATE OR REPLACE VIEW v_edit_inp_inlet AS 
- SELECT DISTINCT ON (a.node_id) a.node_id,
-	a.elevation,
-	a.depth,
-	a.nodecat_id,
-	a.sector_id,
-	a.macrosector_id,
-	a.state,
-	a.state_type,
-	a.annotation,
-	a.expl_id,
-	a.initlevel,
-	a.minlevel,
-	a.maxlevel,
-	a.diameter,
-	a.minvol,
-	a.curve_id,
-	a.pattern_id,
-	a.the_geom
-   FROM ( SELECT v_node.node_id,
-			v_node.elevation,
-			v_node.depth,
-			v_node.nodecat_id,
-			v_node.sector_id,
-			a_1.macrosector_id,
-			v_node.state,
-			v_node.state_type,
-			v_node.annotation,
-			v_node.expl_id,
-			inp_inlet.initlevel,
-			inp_inlet.minlevel,
-			inp_inlet.maxlevel,
-			inp_inlet.diameter,
-			inp_inlet.minvol,
-			inp_inlet.curve_id,
-			inp_inlet.pattern_id,
-			v_node.the_geom
-		   FROM node v_node
-			 JOIN inp_inlet USING (node_id)
-			 JOIN vi_parent_arc a_1 ON a_1.node_1::text = v_node.node_id::text OR a_1.node_2::text = v_node.node_id::text
-		UNION
-		 SELECT v_node.node_id,
-			v_node.elevation,
-			v_node.depth,
-			v_node.nodecat_id,
-			v_node.sector_id,
-			a_1.macrosector_id,
-			v_node.state,
-			v_node.state_type,
-			v_node.annotation,
-			v_node.expl_id,
-			inp_inlet.initlevel,
-			inp_inlet.minlevel,
-			inp_inlet.maxlevel,
-			inp_inlet.diameter,
-			inp_inlet.minvol,
-			inp_inlet.curve_id,
-			inp_inlet.pattern_id,
-			v_node.the_geom
-		   FROM node v_node
-			 JOIN inp_inlet USING (node_id)
-			 JOIN vi_parent_arc a_1 ON a_1.node_2::text = v_node.node_id::text) a;
+ SELECT n.node_id,
+	elevation,
+	depth,
+	nodecat_id,
+	n.sector_id,
+	macrosector_id,
+	state,
+	state_type,
+	annotation,
+	expl_id,
+	initlevel,
+	minlevel,
+	maxlevel,
+	diameter,
+	minvol,
+	curve_id,
+	pattern_id,
+	the_geom
+   FROM inp_selector_sector, v_node n
+   JOIN inp_inlet USING (node_id)
+   WHERE n.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 
 
 CREATE TRIGGER gw_trg_edit_inp_node_inlet
   INSTEAD OF INSERT OR UPDATE OR DELETE
   ON v_edit_inp_inlet
   FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_inlet', 'INLET');
+  EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_inlet');
 
 
 CREATE OR REPLACE VIEW v_edit_inp_junction AS 
- SELECT DISTINCT ON (a.node_id) a.node_id,
-	a.elevation,
-	a.depth,
-	a.nodecat_id,
-	a.sector_id,
-	a.macrosector_id,
-	a.state,
-	a.state_type,
-	a.annotation,
-	a.demand,
-	a.pattern_id,
-	a.the_geom
-   FROM ( SELECT v_node.node_id,
-			v_node.elevation,
-			v_node.depth,
-			v_node.nodecat_id,
-			v_node.sector_id,
-			a_1.macrosector_id,
-			v_node.state,
-			v_node.state_type,
-			v_node.annotation,
-			v_node.expl_id,
-			inp_junction.demand,
-			inp_junction.pattern_id,
-			v_node.the_geom
-		   FROM node v_node
-			 JOIN inp_junction USING (node_id)
-			 JOIN vi_parent_arc a_1 ON a_1.node_1::text = v_node.node_id::text
-		UNION
-		 SELECT v_node.node_id,
-			v_node.elevation,
-			v_node.depth,
-			v_node.nodecat_id,
-			v_node.sector_id,
-			a_1.macrosector_id,
-			v_node.state,
-			v_node.state_type,
-			v_node.annotation,
-			v_node.expl_id,
-			inp_junction.demand,
-			inp_junction.pattern_id,
-			v_node.the_geom
-		   FROM node v_node
-			 JOIN inp_junction USING (node_id)
-			 JOIN vi_parent_arc a_1 ON a_1.node_2::text = v_node.node_id::text) a;
+ SELECT n.node_id,
+	elevation,
+	depth,
+	nodecat_id,
+	n.sector_id,
+	macrosector_id,
+	state,
+	state_type,
+	annotation,
+	demand,
+	pattern_id,
+	the_geom
+   FROM inp_selector_sector, v_node n
+   JOIN inp_junction USING (node_id)
+   WHERE n.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 
+ 
 CREATE TRIGGER gw_trg_edit_inp_node_junction
   INSTEAD OF INSERT OR UPDATE OR DELETE
   ON v_edit_inp_junction
   FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_junction', 'JUNCTION');
+  EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_junction');
 
 
 CREATE OR REPLACE VIEW v_edit_inp_pump AS 
- SELECT DISTINCT ON (a.node_id) a.node_id,
-	a.elevation,
-	a.depth,
-	a.nodecat_id,
-	a.sector_id,
-	a.macrosector_id,
-	a.state,
-	a.state_type,
-	a.annotation,
-	a.expl_id,
-	a.power,
-	a.curve_id,
-	a.speed,
-	a.pattern,
-	a.to_arc,
-	a.status,
-	a.pump_type,
-	a.the_geom
-   FROM ( SELECT v_node.node_id,
-			v_node.elevation,
-			v_node.depth,
-			v_node.nodecat_id,
-			v_node.sector_id,
-			a_1.macrosector_id,
-			v_node.state,
-			v_node.state_type,
-			v_node.annotation,
-			v_node.expl_id,
-			inp_pump.power,
-			inp_pump.curve_id,
-			inp_pump.speed,
-			inp_pump.pattern,
-			inp_pump.to_arc,
-			inp_pump.status,
-			inp_pump.pump_type,
-			v_node.the_geom
-		   FROM node v_node
-			 JOIN inp_pump USING (node_id)
-			 JOIN vi_parent_arc a_1 ON a_1.node_1::text = v_node.node_id::text
-		UNION
-		 SELECT v_node.node_id,
-			v_node.elevation,
-			v_node.depth,
-			v_node.nodecat_id,
-			v_node.sector_id,
-			a_1.macrosector_id,
-			v_node.state,
-			v_node.state_type,
-			v_node.annotation,
-			v_node.expl_id,
-			inp_pump.power,
-			inp_pump.curve_id,
-			inp_pump.speed,
-			inp_pump.pattern,
-			inp_pump.to_arc,
-			inp_pump.status,
-			inp_pump.pump_type,
-			v_node.the_geom
-		   FROM node v_node
-			 JOIN inp_pump USING (node_id)
-			 JOIN vi_parent_arc a_1 ON a_1.node_2::text = v_node.node_id::text) a;
+ SELECT n.node_id,
+	elevation,
+	depth,
+	nodecat_id,
+	n.sector_id,
+	macrosector_id,
+	state,
+	state_type,
+	annotation,
+	expl_id,
+	power,
+	curve_id,
+	speed,
+	pattern,
+	to_arc,
+	status,
+	pump_type,
+	the_geom
+    FROM inp_selector_sector, v_node n
+   JOIN inp_pump USING (node_id)
+   WHERE n.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 
 
 CREATE TRIGGER gw_trg_edit_inp_node_pump
   INSTEAD OF INSERT OR UPDATE OR DELETE
   ON v_edit_inp_pump
   FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_pump', 'PUMP');
+  EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_pump');
 
 
 
 CREATE OR REPLACE VIEW v_edit_inp_reservoir AS 
- SELECT v_node.node_id,
-	v_node.elevation,
-	v_node.depth,
-	v_node.nodecat_id,
-	v_node.sector_id,
-	a.macrosector_id,
-	v_node.state,
-	v_node.state_type,
-	v_node.annotation,
-	v_node.expl_id,
-	inp_reservoir.pattern_id,
-	v_node.the_geom
-   FROM node v_node
-	 JOIN inp_reservoir USING (node_id)
-	 JOIN vi_parent_arc a ON a.node_1::text = v_node.node_id::text
-UNION
- SELECT v_node.node_id,
-	v_node.elevation,
-	v_node.depth,
-	v_node.nodecat_id,
-	v_node.sector_id,
-	a.macrosector_id,
-	v_node.state,
-	v_node.state_type,
-	v_node.annotation,
-	v_node.expl_id,
-	inp_reservoir.pattern_id,
-	v_node.the_geom
-   FROM node v_node
-	 JOIN inp_reservoir USING (node_id)
-	 JOIN vi_parent_arc a ON a.node_2::text = v_node.node_id::text;
+ SELECT n.node_id,
+	n.elevation,
+	n.depth,
+	n.nodecat_id,
+	n.sector_id,
+	macrosector_id,
+	state,
+	state_type,
+	annotation,
+	expl_id,
+	pattern_id,
+	the_geom
+    FROM inp_selector_sector, v_node n
+   JOIN inp_reservoir USING (node_id)
+   WHERE n.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 
-
-CREATE TRIGGER gw_trg_edit_inp_node_reservoir
+ CREATE TRIGGER gw_trg_edit_inp_node_reservoir
   INSTEAD OF INSERT OR UPDATE OR DELETE
   ON v_edit_inp_reservoir
   FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_reservoir', 'RESERVOIR');
+  EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_reservoir');
 
 
-CREATE OR REPLACE VIEW v_edit_inp_shortpipe AS 
- SELECT DISTINCT ON (a.node_id) a.node_id,
-	a.elevation,
-	a.depth,
-	a.nodecat_id,
-	a.sector_id,
-	a.macrosector_id,
-	a.state,
-	a.state_type,
-	a.annotation,
-	a.expl_id,
-	a.minorloss,
-	a.to_arc,
-	a.status,
-	a.the_geom
-   FROM ( SELECT v_node.node_id,
-			v_node.elevation,
-			v_node.depth,
-			v_node.nodecat_id,
-			v_node.sector_id,
-			a_1.macrosector_id,
-			v_node.state,
-			v_node.state_type,
-			v_node.annotation,
-			v_node.expl_id,
-			inp_shortpipe.minorloss,
-			inp_shortpipe.to_arc,
-			inp_shortpipe.status,
-			v_node.the_geom
-		   FROM node v_node
-			 JOIN inp_shortpipe USING (node_id)
-			 JOIN vi_parent_arc a_1 ON a_1.node_1::text = v_node.node_id::text
-		UNION
-		 SELECT v_node.node_id,
-			v_node.elevation,
-			v_node.depth,
-			v_node.nodecat_id,
-			v_node.sector_id,
-			a_1.macrosector_id,
-			v_node.state,
-			v_node.state_type,
-			v_node.annotation,
-			v_node.expl_id,
-			inp_shortpipe.minorloss,
-			inp_shortpipe.to_arc,
-			inp_shortpipe.status,
-			v_node.the_geom
-		   FROM node v_node
-			 JOIN inp_shortpipe USING (node_id)
-			 JOIN vi_parent_arc a_1 ON a_1.node_2::text = v_node.node_id::text) a;
 
+CREATE OR REPLACE VIEW v_edit_inp_pipe AS 
+ SELECT arc.arc_id,
+	arc.node_1,
+	arc.node_2,
+	arc.arccat_id,
+	arc.sector_id,
+	arc.macrosector_id,
+	arc.state,
+	arc.state_type,
+	arc.annotation,
+	arc.expl_id,
+	arc.custom_length,
+	inp_pipe.minorloss,
+	inp_pipe.status,
+	inp_pipe.custom_roughness,
+	inp_pipe.custom_dint,
+	arc.the_geom
+   FROM inp_selector_sector, v_arc arc
+   JOIN inp_pipe USING (arc_id)
+   WHERE arc.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 
 CREATE TRIGGER gw_trg_edit_inp_node_shortpipe
   INSTEAD OF INSERT OR UPDATE OR DELETE
   ON v_edit_inp_shortpipe
   FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_shortpipe', 'SHORTPIPE');
+  EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_pipe');
+
+
+CREATE OR REPLACE VIEW v_edit_inp_virtualvalve AS 
+ SELECT v_arc.arc_id,
+	v_arc.node_1,
+	v_arc.node_2,
+	(v_arc.elevation1 + v_arc.elevation2) / 2::numeric AS elevation,
+	(v_arc.depth1 + v_arc.depth2) / 2::numeric AS depth,
+	v_arc.arccat_id,
+	v_arc.sector_id,
+	v_arc.macrosector_id,
+	v_arc.state,
+	v_arc.state_type,
+	v_arc.annotation,
+	v_arc.expl_id,
+	inp_virtualvalve.valv_type,
+	inp_virtualvalve.pressure,
+	inp_virtualvalve.flow,
+	inp_virtualvalve.coef_loss,
+	inp_virtualvalve.curve_id,
+	inp_virtualvalve.minorloss,
+	inp_virtualvalve.to_arc,
+	inp_virtualvalve.status,
+	v_arc.the_geom
+   FROM inp_selector_sector,
+	v_arc
+	 JOIN inp_virtualvalve USING (arc_id)
+  WHERE v_arc.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
+
+CREATE TRIGGER gw_trg_edit_inp_node_shortpipe
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_shortpipe
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_virtualvalve');
+
+
+
+CREATE OR REPLACE VIEW v_edit_inp_shortpipe AS 
+ SELECT n.node_id,
+	elevation,
+	depth,
+	nodecat_id,
+	n.sector_id,
+	macrosector_id,
+	state,
+	state_type,
+	annotation,
+	expl_id,
+	minorloss,
+	to_arc,
+	status,
+	the_geom
+       FROM inp_selector_sector, v_node n
+   JOIN inp_shortpipe USING (node_id)
+   WHERE n.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
+
+CREATE TRIGGER gw_trg_edit_inp_node_shortpipe
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_shortpipe
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_shortpipe');
 
 
 CREATE OR REPLACE VIEW v_edit_inp_tank AS 
- SELECT DISTINCT ON (a.node_id) a.node_id,
-	a.elevation,
-	a.depth,
-	a.nodecat_id,
-	a.sector_id,
-	a.macrosector_id,
-	a.state,
-	a.state_type,
-	a.annotation,
-	a.expl_id,
-	a.initlevel,
-	a.minlevel,
-	a.maxlevel,
-	a.diameter,
-	a.minvol,
-	a.curve_id,
-	a.the_geom
-   FROM ( SELECT v_node.node_id,
-			v_node.elevation,
-			v_node.depth,
-			v_node.nodecat_id,
-			v_node.sector_id,
-			a_1.macrosector_id,
-			v_node.state,
-			v_node.state_type,
-			v_node.annotation,
-			v_node.expl_id,
-			inp_tank.initlevel,
-			inp_tank.minlevel,
-			inp_tank.maxlevel,
-			inp_tank.diameter,
-			inp_tank.minvol,
-			inp_tank.curve_id,
-			v_node.the_geom
-		   FROM node v_node
-			 JOIN inp_tank USING (node_id)
-			 JOIN vi_parent_arc a_1 ON a_1.node_1::text = v_node.node_id::text
-		UNION
-		 SELECT v_node.node_id,
-			v_node.elevation,
-			v_node.depth,
-			v_node.nodecat_id,
-			v_node.sector_id,
-			a_1.macrosector_id,
-			v_node.state,
-			v_node.state_type,
-			v_node.annotation,
-			v_node.expl_id,
-			inp_tank.initlevel,
-			inp_tank.minlevel,
-			inp_tank.maxlevel,
-			inp_tank.diameter,
-			inp_tank.minvol,
-			inp_tank.curve_id,
-			v_node.the_geom
-		   FROM node v_node
-			 JOIN inp_tank USING (node_id)
-			 JOIN vi_parent_arc a_1 ON a_1.node_2::text = v_node.node_id::text) a;
-
+ SELECT n.node_id,
+	elevation,
+	depth,
+	nodecat_id,
+	n.sector_id,
+	macrosector_id,
+	state,
+	state_type,
+	annotation,
+	expl_id,
+	initlevel,
+	minlevel,
+	maxlevel,
+	diameter,
+	minvol,
+	curve_id,
+	the_geom
+       FROM inp_selector_sector, v_node n
+   JOIN inp_tank USING (node_id)
+   WHERE n.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 
 CREATE TRIGGER gw_trg_edit_inp_node_tank
   INSTEAD OF INSERT OR UPDATE OR DELETE
   ON v_edit_inp_tank
   FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_tank', 'TANK');
+  EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_tank');
 
 
 
@@ -3429,59 +3300,6 @@ CREATE OR REPLACE VIEW v_ui_arc_x_node AS
    FROM v_arc
 	 LEFT JOIN node a ON a.node_id::text = v_arc.node_1::text
 	 LEFT JOIN node b ON b.node_id::text = v_arc.node_2::text;
-
-
-
-CREATE OR REPLACE VIEW v_edit_inp_pipe AS 
- SELECT arc.arc_id,
-	arc.node_1,
-	arc.node_2,
-	arc.arccat_id,
-	arc.sector_id,
-	arc.macrosector_id,
-	arc.state,
-	arc.state_type,
-	arc.annotation,
-	arc.expl_id,
-	arc.custom_length,
-	inp_pipe.minorloss,
-	inp_pipe.status,
-	inp_pipe.custom_roughness,
-	inp_pipe.custom_dint,
-	arc.the_geom
-   FROM inp_selector_sector,
-	v_arc arc
-	 JOIN inp_pipe USING (arc_id)
-  WHERE arc.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
-
-
-
-CREATE OR REPLACE VIEW v_edit_inp_virtualvalve AS 
- SELECT v_arc.arc_id,
-	v_arc.node_1,
-	v_arc.node_2,
-	(v_arc.elevation1 + v_arc.elevation2) / 2::numeric AS elevation,
-	(v_arc.depth1 + v_arc.depth2) / 2::numeric AS depth,
-	v_arc.arccat_id,
-	v_arc.sector_id,
-	v_arc.macrosector_id,
-	v_arc.state,
-	v_arc.state_type,
-	v_arc.annotation,
-	v_arc.expl_id,
-	inp_virtualvalve.valv_type,
-	inp_virtualvalve.pressure,
-	inp_virtualvalve.flow,
-	inp_virtualvalve.coef_loss,
-	inp_virtualvalve.curve_id,
-	inp_virtualvalve.minorloss,
-	inp_virtualvalve.to_arc,
-	inp_virtualvalve.status,
-	v_arc.the_geom
-   FROM inp_selector_sector,
-	v_arc
-	 JOIN inp_virtualvalve USING (arc_id)
-  WHERE v_arc.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 
 
 CREATE OR REPLACE VIEW v_edit_man_expansiontank AS 

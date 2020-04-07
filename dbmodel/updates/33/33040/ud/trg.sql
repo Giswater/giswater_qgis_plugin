@@ -89,34 +89,34 @@ CREATE TRIGGER gw_trg_edit_man_wwtp_pol INSTEAD OF INSERT OR UPDATE OR DELETE
 ON v_edit_man_wwtp_pol FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_man_node_pol('man_wwtp_pol');
 
 CREATE TRIGGER gw_trg_edit_inp_arc_conduit INSTEAD OF INSERT OR UPDATE OR DELETE
-ON v_edit_inp_conduit FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_arc('inp_conduit', 'CONDUIT');
+ON v_edit_inp_conduit FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_arc('inp_conduit');
 
 CREATE TRIGGER gw_trg_edit_inp_node_divider INSTEAD OF INSERT OR UPDATE OR DELETE
-ON v_edit_inp_divider FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_divider', 'DIVIDER');
+ON v_edit_inp_divider FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_divider');
   
 CREATE TRIGGER gw_trg_edit_inp_node_junction INSTEAD OF INSERT OR UPDATE OR DELETE
-ON v_edit_inp_junction FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_junction', 'JUNCTION');
+ON v_edit_inp_junction FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_junction');
 
 CREATE TRIGGER gw_trg_edit_inp_arc_orifice INSTEAD OF INSERT OR UPDATE OR DELETE
-ON v_edit_inp_orifice FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_arc('inp_orifice', 'ORIFICE');
+ON v_edit_inp_orifice FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_arc('inp_orifice');
 
 CREATE TRIGGER gw_trg_edit_inp_node_outfall INSTEAD OF INSERT OR UPDATE OR DELETE
-ON v_edit_inp_outfall FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_outfall', 'OUTFALL');
+ON v_edit_inp_outfall FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_outfall');
 
 CREATE TRIGGER gw_trg_edit_inp_arc_outlet INSTEAD OF INSERT OR UPDATE OR DELETE
-ON v_edit_inp_outlet FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_arc('inp_outlet', 'OUTLET');
+ON v_edit_inp_outlet FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_arc('inp_outlet');
 
 CREATE TRIGGER gw_trg_edit_inp_arc_pump INSTEAD OF INSERT OR UPDATE OR DELETE 
-ON v_edit_inp_pump FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_arc('inp_pump', 'PUMP');
+ON v_edit_inp_pump FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_arc('inp_pump');
  
 CREATE TRIGGER gw_trg_edit_inp_node_storage INSTEAD OF INSERT OR UPDATE OR DELETE
-ON v_edit_inp_storage FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_storage', 'STORAGE');
+ON v_edit_inp_storage FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_storage');
 
 CREATE TRIGGER gw_trg_edit_inp_arc_virtual INSTEAD OF INSERT OR UPDATE OR DELETE
-ON v_edit_inp_virtual FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_arc('inp_virtual', 'VIRTUAL');
+ON v_edit_inp_virtual FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_arc('inp_virtual');
   
 CREATE TRIGGER gw_trg_edit_inp_arc_weir INSTEAD OF INSERT OR UPDATE OR DELETE
-ON v_edit_inp_weir FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_arc('inp_weir', 'WEIR');
+ON v_edit_inp_weir FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_arc('inp_weir');
 
 CREATE TRIGGER gw_trg_edit_man_netgully_pol INSTEAD OF INSERT OR UPDATE OR DELETE
 ON ve_pol_netgully FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_man_node_pol('man_netgully_pol');

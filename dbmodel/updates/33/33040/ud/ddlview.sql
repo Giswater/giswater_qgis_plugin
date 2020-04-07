@@ -821,10 +821,10 @@ CREATE OR REPLACE VIEW v_edit_inp_conduit AS
 	inp_conduit.seepage,
 	inp_conduit.custom_n,
 	v_arc.the_geom
-   FROM v_arc
-	 JOIN vi_parent_arc USING (arc_id)
-	 JOIN inp_conduit ON v_arc.arc_id::text = inp_conduit.arc_id::text;
-	  
+	FROM inp_selector_sector, v_arc
+	JOIN inp_conduit USING (arc_id)
+	WHERE v_arc.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
+
 
 CREATE OR REPLACE VIEW v_edit_inp_divider AS 
  SELECT v_node.node_id,
@@ -834,10 +834,10 @@ CREATE OR REPLACE VIEW v_edit_inp_divider AS
 	v_node.custom_ymax,
 	v_node.elev,
 	v_node.custom_elev,
-	v_node._sys_elev AS sys_elev,
+	v_node.sys_elev,
 	v_node.nodecat_id,
 	v_node.sector_id,
-	a.macrosector_id,
+	v_node.macrosector_id,
 	v_node.state,
 	v_node.state_type,
 	v_node.annotation,
@@ -852,38 +852,10 @@ CREATE OR REPLACE VIEW v_edit_inp_divider AS
 	inp_divider.ysur,
 	inp_divider.apond,
 	v_node.the_geom
-   FROM node v_node
-	 JOIN inp_divider ON v_node.node_id::text = inp_divider.node_id::text
-	 JOIN vi_parent_arc a ON a.node_1::text = v_node.node_id::text
-UNION
- SELECT v_node.node_id,
-	v_node.top_elev,
-	v_node.custom_top_elev,
-	v_node.ymax,
-	v_node.custom_ymax,
-	v_node.elev,
-	v_node.custom_elev,
-	v_node._sys_elev AS sys_elev,
-	v_node.nodecat_id,
-	v_node.sector_id,
-	a.macrosector_id,
-	v_node.state,
-	v_node.state_type,
-	v_node.annotation,
-	v_node.expl_id,
-	inp_divider.divider_type,
-	inp_divider.arc_id,
-	inp_divider.curve_id,
-	inp_divider.qmin,
-	inp_divider.ht,
-	inp_divider.cd,
-	inp_divider.y0,
-	inp_divider.ysur,
-	inp_divider.apond,
-	v_node.the_geom
-   FROM node v_node
-	 JOIN inp_divider ON v_node.node_id::text = inp_divider.node_id::text
-	 JOIN vi_parent_arc a ON a.node_1::text = v_node.node_id::text OR a.node_2::text = v_node.node_id::text;
+  	FROM inp_selector_sector, v_node
+	JOIN inp_divider ON v_node.node_id::text = inp_divider.node_id::text
+	WHERE v_node.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
+
 
 	 
 CREATE OR REPLACE VIEW v_edit_inp_junction AS 
@@ -897,7 +869,7 @@ CREATE OR REPLACE VIEW v_edit_inp_junction AS
 	v_node.elev AS sys_elev,
 	v_node.nodecat_id,
 	v_node.sector_id,
-	a.macrosector_id,
+	macrosector_id,
 	v_node.state,
 	v_node.state_type,
 	v_node.annotation,
@@ -907,33 +879,10 @@ CREATE OR REPLACE VIEW v_edit_inp_junction AS
 	inp_junction.apond,
 	inp_junction.outfallparam::text AS outfallparam,
 	v_node.the_geom
-   FROM node v_node
-	 JOIN inp_junction ON inp_junction.node_id::text = v_node.node_id::text
-	 JOIN vi_parent_arc a ON a.node_1::text = v_node.node_id::text
-UNION
- SELECT v_node.node_id,
-	v_node.top_elev,
-	v_node.custom_top_elev,
-	v_node.ymax,
-	v_node.custom_ymax,
-	v_node.elev,
-	v_node.custom_elev,
-	v_node.elev AS sys_elev,
-	v_node.nodecat_id,
-	v_node.sector_id,
-	a.macrosector_id,
-	v_node.state,
-	v_node.state_type,
-	v_node.annotation,
-	v_node.expl_id,
-	inp_junction.y0,
-	inp_junction.ysur,
-	inp_junction.apond,
-	inp_junction.outfallparam::text AS outfallparam,
-	v_node.the_geom
-   FROM node v_node
-	 JOIN inp_junction ON inp_junction.node_id::text = v_node.node_id::text
-	 JOIN vi_parent_arc a ON a.node_2::text = v_node.node_id::text;
+  	FROM inp_selector_sector, v_node
+	JOIN inp_junction USING (node_id)
+	WHERE v_node.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
+
 
 	 
 CREATE OR REPLACE VIEW v_edit_inp_orifice AS 
@@ -971,10 +920,10 @@ CREATE OR REPLACE VIEW v_edit_inp_orifice AS
 	inp_orifice.geom3,
 	inp_orifice.geom4,
 	v_arc.the_geom
-   FROM v_arc
-	 JOIN vi_parent_arc USING (arc_id)
-	 JOIN inp_orifice ON v_arc.arc_id::text = inp_orifice.arc_id::text;
-  
+	FROM inp_selector_sector, v_arc
+	JOIN inp_orifice USING (arc_id)
+	WHERE v_arc.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
+
   
 CREATE OR REPLACE VIEW v_edit_inp_outfall AS 
  SELECT v_node.node_id,
@@ -984,10 +933,10 @@ CREATE OR REPLACE VIEW v_edit_inp_outfall AS
 	v_node.custom_ymax,
 	v_node.elev,
 	v_node.custom_elev,
-	v_node._sys_elev AS sys_elev,
+	v_node.sys_elev,
 	v_node.nodecat_id,
 	v_node.sector_id,
-	a.macrosector_id,
+	macrosector_id,
 	v_node.state,
 	v_node.state_type,
 	v_node.annotation,
@@ -998,34 +947,9 @@ CREATE OR REPLACE VIEW v_edit_inp_outfall AS
 	inp_outfall.timser_id,
 	inp_outfall.gate,
 	v_node.the_geom
-   FROM node v_node
-	 JOIN inp_outfall ON v_node.node_id::text = inp_outfall.node_id::text
-	 JOIN vi_parent_arc a ON a.node_1::text = v_node.node_id::text
-UNION
- SELECT v_node.node_id,
-	v_node.top_elev,
-	v_node.custom_top_elev,
-	v_node.ymax,
-	v_node.custom_ymax,
-	v_node.elev,
-	v_node.custom_elev,
-	v_node._sys_elev AS sys_elev,
-	v_node.nodecat_id,
-	v_node.sector_id,
-	a.macrosector_id,
-	v_node.state,
-	v_node.state_type,
-	v_node.annotation,
-	v_node.expl_id,
-	inp_outfall.outfall_type,
-	inp_outfall.stage,
-	inp_outfall.curve_id,
-	inp_outfall.timser_id,
-	inp_outfall.gate,
-	v_node.the_geom
-   FROM node v_node
-	 JOIN inp_outfall ON v_node.node_id::text = inp_outfall.node_id::text
-	 JOIN vi_parent_arc a ON a.node_2::text = v_node.node_id::text;
+	FROM inp_selector_sector, v_node
+	JOIN inp_outfall USING (node_id)
+	WHERE v_node.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 
 
 
@@ -1060,9 +984,9 @@ CREATE OR REPLACE VIEW v_edit_inp_outlet AS
 	inp_outlet.cd2,
 	inp_outlet.flap,
 	v_arc.the_geom
-   FROM v_arc
-	 JOIN vi_parent_arc USING (arc_id)
-	 JOIN inp_outlet ON v_arc.arc_id::text = inp_outlet.arc_id::text;
+	FROM inp_selector_sector, v_arc
+	JOIN inp_outlet USING (arc_id)
+	WHERE v_arc.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 	 
   
 CREATE OR REPLACE VIEW v_edit_inp_pump AS 
@@ -1094,9 +1018,9 @@ CREATE OR REPLACE VIEW v_edit_inp_pump AS
 	inp_pump.startup,
 	inp_pump.shutoff,
 	v_arc.the_geom
-   FROM v_arc
-	 JOIN vi_parent_arc USING (arc_id)
-	 JOIN inp_pump ON v_arc.arc_id::text = inp_pump.arc_id::text;
+	FROM inp_selector_sector, v_arc
+	JOIN inp_pump USING (arc_id)
+	WHERE v_arc.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 
   
 CREATE OR REPLACE VIEW v_edit_inp_storage AS 
@@ -1107,7 +1031,7 @@ CREATE OR REPLACE VIEW v_edit_inp_storage AS
 	v_node.custom_ymax,
 	v_node.elev,
 	v_node.custom_elev,
-	v_node._sys_elev AS sys_elev,
+	v_node.sys_elev,
 	v_node.nodecat_id,
 	v_node.sector_id,
 	a.macrosector_id,
@@ -1128,41 +1052,9 @@ CREATE OR REPLACE VIEW v_edit_inp_storage AS
 	inp_storage.ysur,
 	inp_storage.apond,
 	v_node.the_geom
-   FROM node v_node
-	 JOIN inp_storage ON v_node.node_id::text = inp_storage.node_id::text
-	 JOIN vi_parent_arc a ON a.node_1::text = v_node.node_id::text
-UNION
- SELECT v_node.node_id,
-	v_node.top_elev,
-	v_node.custom_top_elev,
-	v_node.ymax,
-	v_node.custom_ymax,
-	v_node.elev,
-	v_node.custom_elev,
-	v_node._sys_elev AS sys_elev,
-	v_node.nodecat_id,
-	v_node.sector_id,
-	a.macrosector_id,
-	v_node.state,
-	v_node.state_type,
-	v_node.annotation,
-	v_node.expl_id,
-	inp_storage.storage_type,
-	inp_storage.curve_id,
-	inp_storage.a1,
-	inp_storage.a2,
-	inp_storage.a0,
-	inp_storage.fevap,
-	inp_storage.sh,
-	inp_storage.hc,
-	inp_storage.imd,
-	inp_storage.y0,
-	inp_storage.ysur,
-	inp_storage.apond,
-	v_node.the_geom
-   FROM node v_node
-	 JOIN inp_storage ON v_node.node_id::text = inp_storage.node_id::text
-	 JOIN vi_parent_arc a ON a.node_2::text = v_node.node_id::text;
+	FROM inp_selector_sector, v_node
+	JOIN inp_storage USING (node_id)
+	WHERE v_node.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 
  
 CREATE OR REPLACE VIEW v_edit_inp_virtual AS 
@@ -1178,9 +1070,9 @@ CREATE OR REPLACE VIEW v_edit_inp_virtual AS
 	inp_virtual.fusion_node,
 	inp_virtual.add_length,
 	v_arc.the_geom
-   FROM v_arc
-	 JOIN vi_parent_arc USING (arc_id)
-	 JOIN inp_virtual ON v_arc.arc_id::text = inp_virtual.arc_id::text;
+	FROM inp_selector_sector, v_arc
+	JOIN inp_virtual USING (arc_id)
+	WHERE v_arc.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 	 
 
 CREATE OR REPLACE VIEW v_edit_inp_weir AS 
@@ -1219,9 +1111,9 @@ CREATE OR REPLACE VIEW v_edit_inp_weir AS
 	inp_weir.geom4,
 	inp_weir.surcharge,
 	v_arc.the_geom
-   FROM v_arc
-	 JOIN vi_parent_arc USING (arc_id)
-	 JOIN inp_weir ON v_arc.arc_id::text = inp_weir.arc_id::text;
+	FROM inp_selector_sector, v_arc
+	JOIN inp_weir USING (arc_id)
+	WHERE v_arc.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
 
 
 -- links
