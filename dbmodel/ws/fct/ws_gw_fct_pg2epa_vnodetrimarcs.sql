@@ -12,8 +12,6 @@ $BODY$
 
 --SELECT link_id, vnode_id FROM SCHEMA_NAME.link, SCHEMA_NAME.vnode where st_dwithin(st_endpoint(link.the_geom), vnode.the_geom, 0.01) and vnode.state = 0 and link.state > 0
 
-
-
 /*
 SELECT SCHEMA_NAME.gw_fct_pg2epa_vnodetrimarcs('t1')
 */
@@ -30,12 +28,12 @@ BEGIN
 
 	RAISE NOTICE 'Starting pg2epa vnode trim arcs';
 	DELETE FROM temp_go2epa;
-	
+
 	RAISE NOTICE 'insert data on temp_table new nodarcs';
 	INSERT INTO temp_go2epa (arc_id, vnode_id, locate, elevation, depth)
-	SELECT  arc_id, vnode_id, locate,
-	(elevation1 - locate*(elevation1-elevation2))::numeric(12,3),
-	(CASE WHEN (depth1 - locate*(depth1-depth2)) IS NULL THEN 0 ELSE (depth1 - locate*(depth1-depth2)) END)::numeric (12,3) as depth
+	SELECT  arc.arc_id, vnode_id, locate,
+	(n1.elevation - locate*(n1.elevation-n2.elevation))::numeric(12,3),
+	(CASE WHEN (n1.depth - locate*(n1.depth-n1.depth)) IS NULL THEN 0 ELSE (n1.depth - locate*(n1.depth-n1.depth)) END)::numeric (12,3) as depth
 	FROM (
 		SELECT  vnode_id, arc_id, locate
 		FROM (
@@ -49,15 +47,17 @@ BEGIN
 			when st_linelocatepoint (rpt_inp_arc.the_geom , vnode.the_geom) < 0.1 then 0.1
 			else (st_linelocatepoint (rpt_inp_arc.the_geom , vnode.the_geom))::numeric(12,4) end as locate
 		FROM rpt_inp_arc , vnode
-		JOIN v_edit_link a ON vnode_id=exit_id::integer
-		WHERE st_dwithin ( rpt_inp_arc.the_geom, vnode.the_geom, 0.001) AND vnode.state > 0 AND rpt_inp_arc.arc_type != 'NODE2ARC' AND result_id = result_id_var
+		JOIN link a ON vnode_id=exit_id::integer
+		WHERE st_dwithin ( rpt_inp_arc.the_geom, vnode.the_geom, 0.001) AND vnode.state > 0 AND rpt_inp_arc.arc_type != 'NODE2ARC' AND result_id = result_id_var and a.state > 0
 		union
 		SELECT  vnode_id, arc_id, locate
 		FROM (
 			SELECT node_2 as vnode_id, arc_id,  1 as locate FROM rpt_inp_arc WHERE result_id = result_id_var AND arc_type != 'NODE2ARC'
 			)z
 		) a
-	JOIN v_arc USING (arc_id)
+	JOIN arc USING (arc_id)
+	JOIN node n1 ON node_1 = node_id
+	JOIN node n2 ON node_2 = n2.node_id
 	ORDER BY arc_id, locate;
 
 
@@ -99,7 +99,8 @@ BEGIN
 
 		
 	RAISE NOTICE 'new arcs on rpt_inp_arc table';
-	INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, diameter, roughness, length, status, the_geom, flw_code, minorloss, addparam)
+	INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, diameter, roughness, length, status, 
+	the_geom, flw_code, minorloss, addparam, arcparent)
 
 	WITH a AS (SELECT  a.idmin, a.id, a.arc_id as arc_id, a.vnode_id as node_1, (a.locate)::numeric(12,4) as locate_1 ,
 			b.vnode_id as node_2, (b.locate)::numeric(12,4) as locate_2
@@ -127,16 +128,17 @@ BEGIN
 			ELSE null END AS the_geom,
 		rpt_inp_arc.flw_code,
 		rpt_inp_arc.minorloss,
-		gw_fct_json_object_set_key (rpt_inp_arc.addparam::json, 'parentArc', a.arc_id)		
+		rpt_inp_arc.addparam,
+		a.arc_id
 		FROM a
 		JOIN rpt_inp_arc USING (arc_id)
-		WHERE result_id='t1' AND (a.node_1 ilike 'VN%' OR a.node_2 ilike 'VN%')
-		ORDER BY arc_id, a.id;
+		WHERE result_id=result_id_var AND (a.node_1 ilike 'VN%' OR a.node_2 ilike 'VN%')
+		ORDER BY rpt_inp_arc.arc_id, a.id;
 
 	
 	RAISE NOTICE 'delete only trimmed arc on rpt_inp_arc table  - step 1';
 	UPDATE rpt_inp_arc SET epa_type ='PIPENOTUSED' 
-		FROM (SELECT DISTINCT (addparam::json->>'parentArc') AS arc_id FROM rpt_inp_arc WHERE addparam::json->>'parentArc' !='' AND result_id=result_id_var) a
+		FROM (SELECT DISTINCT arcparent AS arc_id FROM rpt_inp_arc WHERE arcparent !='' AND result_id=result_id_var) a
 		WHERE a.arc_id = rpt_inp_arc.arc_id AND result_id=result_id_var;
 
 	RAISE NOTICE 'delete only trimmed arc on rpt_inp_arc table - step 2';

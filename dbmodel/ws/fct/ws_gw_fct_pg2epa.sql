@@ -111,13 +111,13 @@ BEGIN
 
 		IF v_buildupmode = 1 THEN -- no check data, go...go...
 
-			-- checking all arcs/node disconnected from any reservoir
-			--PERFORM gw_fct_pg2epa_inlet_flowtrace(v_result);
-			--DELETE FROM rpt_inp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=39 AND cur_user=current_user) and result_id = v_result;
-			--DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user) and result_id = v_result;
+			RAISE NOTICE '8.1 - checking all arcs/node disconnected from any reservoir';
+			PERFORM gw_fct_pg2epa_inlet_flowtrace(v_result);
+			DELETE FROM rpt_inp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=39 AND cur_user=current_user) and result_id = v_result;
+			DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user) and result_id = v_result;
 
 			-- setting the minimun expression of return json
-			RAISE NOTICE '8 - Ignoring gw_fct_pg2epa_check_data';
+			RAISE NOTICE '8.2 - Ignoring gw_fct_pg2epa_check_data';
 			SELECT gw_fct_get_jsonbody('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
 			"data":{"parameters":{"text":"Inp export done succesfully"}}}'::json) INTO v_return;
 		ELSE	
@@ -156,7 +156,6 @@ BEGIN
 
 		SELECT gw_fct_get_jsonbody('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
 		"data":{"parameters":{"text":"Inp export using existing gesometry from previous result done succesfully"}}}'::json) INTO v_return;
-		
 	END IF;
 
 	RAISE NOTICE '11 - update demands & patterns';
