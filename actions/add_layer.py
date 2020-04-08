@@ -298,10 +298,11 @@ class AddLayer(object):
 
         utils_giswater.setWidgetText(dialog, 'txt_infolog', text+"\n")
         qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
-        if change_tab and qtabwidget is not None:
-            qtabwidget.setCurrentIndex(tab_idx)
-        if disable_tabs:
-            self.disable_tabs(dialog)
+        if qtabwidget is not None:
+            if change_tab and qtabwidget is not None:
+                qtabwidget.setCurrentIndex(tab_idx)
+            if disable_tabs:
+                self.disable_tabs(dialog)
 
         return text
 
