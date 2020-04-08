@@ -9293,6 +9293,7 @@ INSERT INTO man_junction VALUES ('1060');
 INSERT INTO man_junction VALUES ('1063');
 INSERT INTO man_junction VALUES ('1064');
 INSERT INTO man_junction VALUES ('1065');
+INSERT INTO man_junction VALUES ('1067');
 INSERT INTO man_junction VALUES ('1068');
 INSERT INTO man_junction VALUES ('1069');
 INSERT INTO man_junction VALUES ('1071');
@@ -9676,9 +9677,11 @@ INSERT INTO man_pipe VALUES ('114457');
 INSERT INTO man_pump VALUES (1105);
 INSERT INTO man_pump VALUES (113951);
 
-INSERT INTO man_reduction VALUES (1067);
+
 INSERT INTO man_reduction VALUES (114002);
 INSERT INTO man_reduction VALUES (114014);
+INSERT INTO man_reduction VALUES (113873, 200, 110);
+INSERT INTO man_reduction VALUES (113883, 160, 110);
 
 INSERT INTO man_register VALUES (114223, 114226);
 INSERT INTO man_register VALUES (134);
