@@ -6,9 +6,10 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.core import Qgis, QgsApplication
-from qgis.PyQt.QtCore import QDate, QStringListModel, QTime,  Qt
+from qgis.PyQt.QtCore import QDate, QStringListModel, QTime,  Qt, QRegExp
 from qgis.PyQt.QtWidgets import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QComboBox, QCompleter, \
     QFileDialog, QMessageBox
+from qgis.PyQt.QtGui import QRegExpValidator
 
 import csv
 import json
@@ -1112,6 +1113,10 @@ class Go2Epa(ApiParent):
         # Create the dialog
         self.dlg_manager = EpaResultManager()
         self.load_settings(self.dlg_manager)
+
+        # Manage widgets
+        reg_exp = QRegExp("^[A-Za-z0-9_]{1,16}$")
+        self.dlg_manager.txt_result_id.setValidator(QRegExpValidator(reg_exp))
 
         # Fill combo box and table view
         self.fill_combo_result_id()
