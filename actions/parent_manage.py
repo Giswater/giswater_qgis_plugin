@@ -476,7 +476,10 @@ class ParentManage(ParentAction, object):
         """ Set autocomplete of widget 'feature_id' 
             getting id's from selected @viewname 
         """
-             
+
+        if geom_type == '':
+            return
+
         # Adding auto-completion to a QLineEdit
         self.completer = QCompleter()
         self.completer.setCaseSensitivity(Qt.CaseInsensitive)
@@ -858,7 +861,7 @@ class ParentManage(ParentAction, object):
         # Clear list of ids
         if remove_ids:
             self.ids = []
-        field_id = self.geom_type + "_id"
+        field_id = f"{self.geom_type}_id"
 
         feature_id = utils_giswater.getWidgetText(dialog, "feature_id")
         expr_filter = f"{field_id} = '{feature_id}'"

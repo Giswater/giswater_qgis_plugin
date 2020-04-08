@@ -157,7 +157,7 @@ class TestQgis():
         if not self.connect_to_database(self.service_name):
             return False
 
-        self.test_giswater.manage_visit.manage_visit()
+        self.test_giswater.manage_visit.manage_visit(open_dialog=False)
 
         dlg = self.test_giswater.manage_visit.dlg_add_visit
         print(type(dlg))

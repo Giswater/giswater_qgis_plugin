@@ -23,7 +23,7 @@
       <item>
        <widget class="QTabWidget" name="tab_widget">
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="tab_visit">
          <attribute name="title">
@@ -395,6 +395,13 @@
            </layout>
           </item>
           <item>
+           <widget class="QComboBox" name="feature_type">
+            <property name="editable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
            <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="1">
             <item>
              <widget class="QComboBox" name="parameter_id">
@@ -473,60 +480,13 @@
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="0,1">
-            <item>
-             <widget class="QLabel" name="lbl_feature_type">
-              <property name="font">
-               <font>
-                <pointsize>8</pointsize>
-               </font>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::NoFrame</enum>
-              </property>
-              <property name="frameShadow">
-               <enum>QFrame::Plain</enum>
-              </property>
-              <property name="text">
-               <string>Feature type:</string>
-              </property>
-              <property name="textFormat">
-               <enum>Qt::AutoText</enum>
-              </property>
-              <property name="scaledContents">
-               <bool>false</bool>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-              </property>
-              <property name="margin">
-               <number>3</number>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QComboBox" name="feature_type">
-              <property name="editable">
-               <bool>true</bool>
-              </property>
-              <property name="sizeAdjustPolicy">
-               <enum>QComboBox::AdjustToContents</enum>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <widget class="Line" name="line_2">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
            <layout class="QHBoxLayout" name="horizontalLayout_9">
             <item>
-             <widget class="QLineEdit" name="feature_id"/>
+             <widget class="QLineEdit" name="feature_id">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+             </widget>
             </item>
             <item>
              <widget class="QPushButton" name="btn_feature_insert">
@@ -565,8 +525,11 @@
           </item>
           <item>
            <widget class="QTabWidget" name="tab_feature">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
             <property name="currentIndex">
-             <number>0</number>
+             <number>2</number>
             </property>
             <widget class="QWidget" name="tab_arc">
              <attribute name="title">
@@ -749,7 +712,6 @@
   <tabstop>descript</tabstop>
   <tabstop>btn_add_geom</tabstop>
   <tabstop>button_box</tabstop>
-  <tabstop>feature_type</tabstop>
   <tabstop>feature_id</tabstop>
   <tabstop>btn_feature_insert</tabstop>
   <tabstop>btn_feature_delete</tabstop>
