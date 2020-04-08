@@ -489,4 +489,56 @@ UPDATE v_edit_node SET nodecat_id = 'CHK-VALVE100-PN16' WHERE node_id = '1092';
 
 INSERT INTO anl_mincut_checkvalve (node_id, to_arc) VALUES ('1092', '2104');
 
-UPDATE SCHEMA_NAME.inp_connec SET demand  = 0.01;
+UPDATE inp_connec SET demand  = 0.01;
+
+--add tooltips for specific fields
+UPDATE config_api_form_fields SET tooltip = 'broken - Para establecer si la válvula esta rota o no' WHERE column_id = 'broken' AND tooltip IS NULL;
+UPDATE config_api_form_fields SET tooltip = 'buried - Para establecer si la válvula esta enterrada o no' WHERE column_id = 'buried' AND tooltip IS NULL;
+UPDATE config_api_form_fields SET tooltip = 'cat_valve2 - Catálogo para una segunda válvula en el mismo elemento' WHERE column_id = 'cat_valve2' AND tooltip IS NULL;
+UPDATE config_api_form_fields SET tooltip = 'closed - Para establecer si la válvula se encuentra cerrada o no' WHERE column_id = 'closed' AND tooltip IS NULL;
+UPDATE config_api_form_fields SET tooltip = 'depth_valveshaft - Profundidad del eje de la válvula' WHERE column_id = 'depth_valveshaft' AND tooltip IS NULL;
+UPDATE config_api_form_fields SET tooltip = 'drive_type - Tipo de conducción para desague' WHERE column_id = 'drive_type' AND tooltip IS NULL;
+UPDATE config_api_form_fields SET tooltip = 'exit_code - Identificador del elemento dónde desagua' WHERE column_id = 'exit_code' AND tooltip IS NULL;
+UPDATE config_api_form_fields SET tooltip = 'exit_type - Tipo de salida para desague' WHERE column_id = 'exit_type' AND tooltip IS NULL;
+UPDATE config_api_form_fields SET tooltip = 'irrigation_indicator - Para establecer si tiene indicador de riego o no' WHERE column_id = 'irrigation_indicator' AND tooltip IS NULL;
+UPDATE config_api_form_fields SET tooltip = 'lin_meters - Longitud del desague en metros' WHERE column_id = 'lin_meters' AND tooltip IS NULL;
+UPDATE config_api_form_fields SET tooltip = 'pression_entry - Pressión de entrada (habitualmente en  kg/cm2)' WHERE column_id = 'pression_entry' AND tooltip IS NULL;
+UPDATE config_api_form_fields SET tooltip = 'pression_exit - Pressión de salida (habitualmente en  kg/cm2)' WHERE column_id = 'pression_exit' AND tooltip IS NULL;
+UPDATE config_api_form_fields SET tooltip = 'regulator_location - Localización concreta de la válvula de regulación' WHERE column_id = 'regulator_location' AND tooltip IS NULL;
+UPDATE config_api_form_fields SET tooltip = 'regulator_observ - Observaciones asociadas a la válvula de regulación' WHERE column_id = 'regulator_observ' AND tooltip IS NULL;
+UPDATE config_api_form_fields SET tooltip = 'regulator_situation - Calle dónde de situa la válvula de regulación' WHERE column_id = 'regulator_situation' AND tooltip IS NULL;
+UPDATE config_api_form_fields SET tooltip = 'arq_patrimony - Para establecer si la fuente es patrimonio arquitectónico o no' WHERE column_id = 'arq_patrimony' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'chlorinator - Para establecer si tiene clorador o no' WHERE column_id = 'chlorinator' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'container_number - Número de contenedores de agua de la fuente' WHERE column_id = 'container_number' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'linked_connec - Identificador de la acometida asociada' WHERE column_id = 'linked_connec' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'power - Potencia total' WHERE column_id = 'power' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'pump_number - Número de bombas' WHERE column_id = 'pump_number' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'regulation_tank - Para establecer la existencia o no de un depósito de regulación' WHERE column_id = 'regulation_tank' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'vmax - Volumen máximo' WHERE column_id = 'vmax' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'vtotal - Volumen total' WHERE column_id = 'vtotal' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'communication - Para establecer si se ha comunicado la información del hidrante' WHERE column_id = 'communication' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'fire_code - Código para bomberos' WHERE column_id = 'fire_code' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'valve - Válvula vinculada con el hidrante' WHERE column_id = 'valve' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'serial_number - Número de serie del elemento' WHERE column_id = 'serial_number' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'lab_code - Código para laboratorio' WHERE column_id = 'lab_code' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'elev_height - Altura de la bomba' WHERE column_id = 'elev_height' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'max_flow - Flujo máximo' WHERE column_id = 'max_flow' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'min_flow - Flujo mínimo' WHERE column_id = 'min_flow' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'nom_flow - Flujo óptimo' WHERE column_id = 'nom_flow' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'pressure - Pressión' WHERE column_id = 'pressure' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'diam1 - Diámetro inicial' WHERE column_id = 'diam1' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'diam2 - Diámetro final' WHERE column_id = 'diam2' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'area - Área del depósito en m2' WHERE column_id = 'area' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'chlorination - Para establecer si tiene clorador o no' WHERE column_id = 'chlorination' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'vutil - Volumen útil' WHERE column_id = 'vutil' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'cat_valve - Catálogo de la válvula asociada' WHERE column_id = 'cat_valve' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'com_state - Para establecer si se ha comunicado o no si el agua es potable' WHERE column_id = 'com_state' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'drain_diam - Diámetro del tubo de drenaje' WHERE column_id = 'drain_diam' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'drain_distance - Distancia del desague' WHERE column_id = 'drain_distance' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'drain_exit - Tipo de salida del desague' WHERE column_id = 'drain_exit' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'drain_gully - Identificador de la reja de desague' WHERE column_id = 'drain_gully' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'customer_code - Código comercial' WHERE column_id = 'customer_code' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'top_floor - Número máximo de plantas del edificio a abastecer' WHERE column_id = 'top_floor' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'pol_id - Identificador del polígono relacionado' WHERE column_id = 'pol_id' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'name - Nombre específico del elemento' WHERE column_id = 'name' AND tooltip IS NULL AND formtype='feature';
+

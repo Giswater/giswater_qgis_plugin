@@ -36,62 +36,62 @@ WHERE column_id = 'streetaxis2_id';
 
 INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order,  datatype, widgettype, label, widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
-VALUES ('v_edit_arc', 'feature', 'macroexpl_id', null , 'text', 'text', 'Macroexploitation', NULL, 'Macroexploitation', NULL, TRUE, NULL, TRUE, NULL, NULL, 
+VALUES ('v_edit_arc', 'feature', 'macroexpl_id', null , 'text', 'text', 'Macroexploitation', NULL, 'macroexploitation - Identificador de la macroexplotacion. Se rellena automáticamente en función de la explotacion', NULL, TRUE, NULL, TRUE, NULL, NULL, 
 NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, TRUE);
 
 INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order,  datatype, widgettype, label, widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
-VALUES ('v_edit_arc', 'feature', 'tstamp', null, 'text', 'text', 'Insert tstamp', NULL, 'Insert tstamp', NULL, TRUE, NULL, TRUE, NULL, NULL, 
+VALUES ('v_edit_arc', 'feature', 'tstamp', null, 'text', 'text', 'Insert tstamp', NULL, 'tstamp - Fecha de inserción del elemento a la base de datos', NULL, TRUE, NULL, TRUE, NULL, NULL, 
 NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, TRUE);
 
 INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order,  datatype, widgettype, label, widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
-VALUES ('v_edit_node', 'feature', 'macroexpl_id', null , 'text', 'text', 'Macroexploitation', NULL, 'Macroexploitation', NULL, TRUE, NULL, TRUE, NULL, NULL, 
+VALUES ('v_edit_node', 'feature', 'macroexpl_id', null , 'text', 'text', 'Macroexploitation', NULL, 'macroexploitation - Identificador de la macroexplotacion. Se rellena automáticamente en función de la explotacion', NULL, TRUE, NULL, TRUE, NULL, NULL, 
 NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, TRUE);
 
 INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order,  datatype, widgettype, label, widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
-VALUES ('v_edit_node', 'feature', 'tstamp', null, 'text', 'text', 'Insert tstamp', NULL, 'Insert timestamp', NULL, TRUE, NULL, TRUE, NULL, NULL, 
+VALUES ('v_edit_node', 'feature', 'tstamp', null, 'text', 'text', 'Insert tstamp', NULL, 'tstamp - Fecha de inserción del elemento a la base de datos', NULL, TRUE, NULL, TRUE, NULL, NULL, 
 NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, TRUE);
 
 INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order,  datatype, widgettype, label, widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
-VALUES ('v_edit_connec', 'feature', 'macroexpl_id', null , 'text', 'text', 'Macroexploitation', NULL, 'Macroexploitation', NULL, TRUE, NULL, TRUE, NULL, NULL, 
+VALUES ('v_edit_connec', 'feature', 'macroexpl_id', null , 'text', 'text', 'Macroexploitation', NULL, 'macroexploitation - Identificador de la macroexplotacion. Se rellena automáticamente en función de la explotacion', NULL, TRUE, NULL, TRUE, NULL, NULL, 
 NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, TRUE);
 
 INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order,  datatype, widgettype, label, widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
-VALUES ('v_edit_connec', 'feature', 'tstamp', null, 'text', 'text', 'Insert tstamp', NULL, 'Insert tstamp', NULL, TRUE, NULL, TRUE, NULL, NULL, 
+VALUES ('v_edit_connec', 'feature', 'tstamp', null, 'text', 'text', 'Insert tstamp', NULL, 'tstamp - Fecha de inserción del elemento a la base de datos', NULL, TRUE, NULL, TRUE, NULL, NULL, 
 NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, TRUE);
 
 INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order,  datatype, widgettype, label, widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
-VALUES ('ve_arc', 'feature', 'macroexpl_id', null , 'text', 'text', 'Macroexploitation', NULL, 'Macroexploitation', NULL, TRUE, NULL, TRUE, NULL, NULL, 
+VALUES ('ve_arc', 'feature', 'macroexpl_id', null , 'text', 'text', 'Macroexploitation', NULL, 'macroexploitation - Identificador de la macroexplotacion. Se rellena automáticamente en función de la explotacion', NULL, TRUE, NULL, TRUE, NULL, NULL, 
 NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, TRUE);
 
 INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order,  datatype, widgettype, label, widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
-VALUES ('ve_arc', 'feature', 'tstamp', null, 'text', 'text', 'Insert tstamp', NULL, 'Insert tstamp', NULL, TRUE, NULL, TRUE, NULL, NULL, 
+VALUES ('ve_arc', 'feature', 'tstamp', null, 'text', 'text', 'Insert tstamp', NULL, 'tstamp - Fecha de inserción del elemento a la base de datos', NULL, TRUE, NULL, TRUE, NULL, NULL, 
 NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, TRUE);
 
 INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order,  datatype, widgettype, label, widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
-VALUES ('ve_node', 'feature', 'macroexpl_id', null , 'text', 'text', 'Macroexploitation', NULL, 'Macroexploitation', NULL, TRUE, NULL, TRUE, NULL, NULL, 
+VALUES ('ve_node', 'feature', 'macroexpl_id', null , 'text', 'text', 'Macroexploitation', NULL, 'macroexploitation - Identificador de la macroexplotacion. Se rellena automáticamente en función de la explotacion', NULL, TRUE, NULL, TRUE, NULL, NULL, 
 NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, TRUE);
 
 INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order,  datatype, widgettype, label, widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
-VALUES ('ve_node', 'feature', 'tstamp', null, 'text', 'text', 'Insert tstamp', NULL, 'Insert tstamp', NULL, TRUE, NULL, TRUE, NULL, NULL, 
+VALUES ('ve_node', 'feature', 'tstamp', null, 'text', 'text', 'Insert tstamp', NULL, 'tstamp - Fecha de inserción del elemento a la base de datos', NULL, TRUE, NULL, TRUE, NULL, NULL, 
 NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, TRUE);
 
 INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order,  datatype, widgettype, label, widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
-VALUES ('ve_connec', 'feature', 'macroexpl_id', null , 'text', 'text', 'Macroexploitation', NULL, 'Macroexploitation', NULL, TRUE, NULL, TRUE, NULL, NULL, 
+VALUES ('ve_connec', 'feature', 'macroexpl_id', null , 'text', 'text', 'Macroexploitation', NULL, 'macroexploitation - Identificador de la macroexplotacion. Se rellena automáticamente en función de la explotacion', NULL, TRUE, NULL, TRUE, NULL, NULL, 
 NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, TRUE);
 
 INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order,  datatype, widgettype, label, widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
-VALUES ('ve_connec', 'feature', 'tstamp', null, 'text', 'text', 'Insert tstamp', NULL, 'Insert tstamp', NULL, TRUE, NULL, TRUE, NULL, NULL, 
+VALUES ('ve_connec', 'feature', 'tstamp', null, 'text', 'text', 'Insert tstamp', NULL, 'tstamp - Fecha de inserción del elemento a la base de datos', NULL, TRUE, NULL, TRUE, NULL, NULL, 
 NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, TRUE);
 
 UPDATE config_api_form_fields SET hidden = true WHERE column_id = 'cat_arctype_id' and (formname  like '%ve_arc%' or formname  = 'v_edit_arc');
@@ -116,3 +116,15 @@ UPDATE config_api_form_fields SET dv_isnullvalue=FALSE WHERE dv_isnullvalue IS N
 
 UPDATE config_api_form_fields SET dv_querytext = 'SELECT macrosector_id as id, name as idval FROM macrosector where macrosector_id is not null' WHERE column_id='macrosector_id' AND formname='v_edit_macrosector';
 UPDATE config_api_form_fields SET widgettype = 'nowidget' WHERE column_id='net_code' AND formname='search';
+
+UPDATE config_api_form_fields SET tooltip = 'pjoint_id - Identificador del punto de unión con la red' WHERE column_id = 'pjoint_id' AND tooltip = 'pjoint_id' AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'pjoint_type - Tipo de punto de unión con la red' WHERE column_id = 'pjoint_type' AND tooltip = 'pjoint_type' AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'feature_id - Identificador del elemento al cual se conecta' WHERE column_id = 'feature_id' AND tooltip = 'feature_id' AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'featurecat_id - Catálogo del elemento al cual se conecta' WHERE column_id = 'featurecat_id' AND tooltip = 'featurecat_id' AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'inventory - Para establecer si el elemento pertenece o debe pertenecer a inventario o no' WHERE column_id = 'inventory' AND tooltip = 'inventory' AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'publish - Para establecer si el elemento es publicable o no' WHERE column_id = 'publish' AND tooltip = 'publish' AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'undelete - Para establecer si el elemento no se puede eliminar' WHERE column_id = 'undelete' AND tooltip = 'undelete' AND formtype='feature';
+
+
+UPDATE config_api_form_fields SET tooltip = 'pol_id - Identificador del polígono relacionado' WHERE column_id = 'pol_id' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'name - Nombre específico del elemento' WHERE column_id = 'name' AND tooltip IS NULL AND formtype='feature';

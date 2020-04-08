@@ -379,3 +379,22 @@ UPDATE man_type_function SET function_type = replace (function_type, 'Standard',
 update config_api_form_fields SET widgettype = 'text', dv_querytext = null, placeholder  ='Ex.macrosector_id' WHERE column_id  = 'macrosector_id';
 
 UPDATE connec SET connec_depth = 1.5;
+
+
+-- add tooltips for specific fields
+UPDATE config_api_form_fields SET tooltip = 'accessibility - Para establecer si es accesible o no' WHERE column_id = 'accessibility' AND tooltip IS NULL;
+UPDATE config_api_form_fields SET tooltip = 'bottom_channel - Para establecer si tiene canal al fondo o no' WHERE column_id = 'bottom_channel' AND tooltip IS NULL;
+UPDATE config_api_form_fields SET tooltip = 'length - Longitud total' WHERE column_id = 'length' AND tooltip IS NULL;
+UPDATE config_api_form_fields SET tooltip = 'max_volume - Volumen máximo' WHERE column_id = 'max_volume' AND tooltip IS NULL;
+UPDATE config_api_form_fields SET tooltip = 'sander_depth - Profundidad del arenero' WHERE column_id = 'sander_depth' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'util_volume - Volumen útil' WHERE column_id = 'util_volume' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'width - Anchura total' WHERE column_id = 'width' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'prot_surface - Para establecer si existe un protector en superfície' WHERE column_id = 'prot_surface' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'serial_number - Número de serie del elemento' WHERE column_id = 'serial_number' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'siphon - Para establecer si tiene sifón o no' WHERE column_id = 'siphon' AND (tooltip IS NULL OR tooltip='siphon') AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'units - Número de rejas' WHERE column_id = 'units' AND (tooltip IS NULL OR tooltip = 'units') AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'sander_length - Longitud del arenero' WHERE column_id = 'sander_length' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'min_height - Altura mínima' WHERE column_id = 'min_height' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'custom_area - Area útil del depósito' WHERE column_id = 'custom_area' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'groove - Para establecer si hay ranura en el encintado' WHERE column_id = 'groove' AND tooltip = 'groove' AND formtype='feature';
+UPDATE config_api_form_fields SET tooltip = 'inlet - Elemento con aportaciones' WHERE column_id = 'inlet' AND tooltip IS NULL;
