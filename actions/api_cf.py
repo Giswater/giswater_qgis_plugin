@@ -695,6 +695,7 @@ class ApiCF(ApiParent, QObject):
         widget = self.set_reg_exp(widget, field)
         widget = self.set_auto_update_lineedit(field, dialog, widget)
         widget = self.set_data_type(field, widget)
+        widget = self.set_max_length(widget, field)
 
         return widget
 
@@ -710,6 +711,16 @@ class ApiCF(ApiParent, QObject):
             if 'max' in field['widgetcontrols']['maxMinValues']:
                 widget.setProperty('maxValue', field['widgetcontrols']['maxMinValues']['max'])
                 
+        return widget
+
+
+    def set_max_length(self, widget, field):
+        """ Set max and min values allowed """
+
+        if field['widgetcontrols'] and 'maxLength' in field['widgetcontrols']:
+            if field['widgetcontrols']['maxLength'] is not None:
+                widget.setProperty('maxLength', field['widgetcontrols']['maxLength'])
+
         return widget
 
 
