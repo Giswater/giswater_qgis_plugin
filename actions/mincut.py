@@ -807,7 +807,7 @@ class MincutParent(ParentAction):
         # Set icons
         self.set_icon(self.dlg_connec.btn_insert, "111")
         self.set_icon(self.dlg_connec.btn_delete, "112")
-        self.set_icon(self.dlg_connec.btn_snapping, "129")
+        self.set_icon(self.dlg_connec.btn_snapping, "137")
 
         # Set signals
         self.dlg_connec.btn_insert.clicked.connect(partial(self.insert_connec))
