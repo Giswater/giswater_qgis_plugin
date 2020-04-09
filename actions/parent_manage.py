@@ -67,8 +67,8 @@ class ParentManage(ParentAction, object):
     def reset_model(self, dialog, table_object, geom_type):
         """ Reset model of the widget """ 
 
-        table_relation = table_object + "_x_" + geom_type
-        widget_name = "tbl_" + table_relation
+        table_relation = f"{table_object}_x_{geom_type}"
+        widget_name = f"tbl_{table_relation}"
         widget = utils_giswater.getWidget(dialog, widget_name)
         if widget:              
             widget.setModel(None)
@@ -561,7 +561,7 @@ class ParentManage(ParentAction, object):
                 return expr
 
         # Set a model with selected filter expression
-        table_name = "v_edit_" + geom_type
+        table_name = f"v_edit_{geom_type}"
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
 
@@ -718,7 +718,7 @@ class ParentManage(ParentAction, object):
             self.reload_qtable(dialog, self.geom_type, self.plan_om)
         else:
             self.reload_table(dialog, table_object, self.geom_type, expr_filter)
-            self.apply_lazy_init(table_object)
+            #self.apply_lazy_init(table_object)
 
         # Select features with previous filter
         # Build a list of feature id's and select them
@@ -744,6 +744,7 @@ class ParentManage(ParentAction, object):
                 self.remove_selection(True)
         else:
             self.remove_selection(True)
+
         self.reset_model(dialog, table_object, "arc")
         self.reset_model(dialog, table_object, "node")
         self.reset_model(dialog, table_object, "connec")
@@ -771,8 +772,9 @@ class ParentManage(ParentAction, object):
 
     def selection_changed(self, dialog, table_object, geom_type, query=False):
         """ Slot function for signal 'canvas.selectionChanged' """
+
         self.disconnect_signal_selection_changed()
-        field_id = geom_type + "_id"
+        field_id = f"{geom_type}_id"
 
         if self.remove_ids:
             self.ids = []
@@ -822,7 +824,7 @@ class ParentManage(ParentAction, object):
             self.reload_qtable(dialog, geom_type, self.plan_om)
         else:
             self.reload_table(dialog, table_object, self.geom_type, expr_filter)
-            self.apply_lazy_init(table_object)
+            #self.apply_lazy_init(table_object)
 
         # Remove selection in generic 'v_edit' layers
         if self.plan_om == 'plan':
@@ -917,12 +919,14 @@ class ParentManage(ParentAction, object):
             self.remove_selection()
         else:
             self.reload_table(dialog, table_object, self.geom_type, expr_filter)
-            self.apply_lazy_init(table_object)            
+            #self.apply_lazy_init(table_object)
 
         # Update list
         self.list_ids[self.geom_type] = self.ids
         self.enable_feature_type(dialog)
         self.connect_signal_selection_changed(dialog, table_object)
+
+        self.controller.log_info(self.list_ids[self.geom_type])
 
 
     def insert_feature_to_plan(self, dialog, geom_type):
@@ -1130,7 +1134,7 @@ class ParentManage(ParentAction, object):
         """ Connect signal selectionChanged """
         
         try:
-            self.canvas.selectionChanged.connect(partial(self.selection_changed, dialog,  table_object, self.geom_type, query))
+            self.canvas.selectionChanged.connect(partial(self.selection_changed, dialog, table_object, self.geom_type, query))
         except Exception:    
             pass
     

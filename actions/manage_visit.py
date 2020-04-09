@@ -151,6 +151,12 @@ class ManageVisit(ParentManage, QObject):
 
         self.table_object = "visit"
 
+        self.event_feature_type_selected(self.dlg_add_visit, "arc")
+        self.event_feature_type_selected(self.dlg_add_visit, "node")
+        self.event_feature_type_selected(self.dlg_add_visit, "connec")
+        if self.controller.get_project_type() == 'ud':
+            self.event_feature_type_selected(self.dlg_add_visit, "gully")
+
         # Set signals
         self.set_signals()
 
@@ -165,8 +171,8 @@ class ManageVisit(ParentManage, QObject):
         self.visit_id.setText(str(visit_id))
 
         # manage relation locking
-        if self.locked_geom_type:
-            self.set_locked_relation()
+        #if self.locked_geom_type:
+        #    self.set_locked_relation()
 
         # Open the dialog
         if open_dialog:
@@ -182,9 +188,9 @@ class ManageVisit(ParentManage, QObject):
         self.dlg_add_visit.btn_event_insert.clicked.connect(self.event_insert)
         self.dlg_add_visit.btn_event_delete.clicked.connect(self.event_delete)
         self.dlg_add_visit.btn_event_update.clicked.connect(self.event_update)
-        self.dlg_add_visit.btn_feature_insert.clicked.connect(partial(self.insert_feature, self.dlg_add_visit, self.tbl_relation))
-        self.dlg_add_visit.btn_feature_delete.clicked.connect(partial(self.delete_records, self.dlg_add_visit, self.tbl_relation))
-        self.dlg_add_visit.btn_feature_snapping.clicked.connect(partial(self.selection_init, self.dlg_add_visit, self.tbl_relation))
+        self.dlg_add_visit.btn_feature_insert.clicked.connect(partial(self.insert_feature, self.dlg_add_visit, "visit"))
+        self.dlg_add_visit.btn_feature_delete.clicked.connect(partial(self.delete_records, self.dlg_add_visit, "visit"))
+        self.dlg_add_visit.btn_feature_snapping.clicked.connect(partial(self.selection_init, self.dlg_add_visit, "visit"))
         self.tabs.currentChanged.connect(partial(self.manage_tab_changed, self.dlg_add_visit))
         self.visit_id.textChanged.connect(partial(self.manage_visit_id_change, self.dlg_add_visit))
         self.dlg_add_visit.btn_doc_insert.clicked.connect(self.document_insert)
@@ -197,7 +203,7 @@ class ManageVisit(ParentManage, QObject):
         #    self.tab_feature_changed, self.dlg_add_visit, self.table_object, excluded_layers=["v_edit_element"]))
 
         # Fill combo boxes of the form and related events
-        self.feature_type.currentIndexChanged.connect(partial(self.event_feature_type_selected, self.dlg_add_visit))
+        self.feature_type.currentIndexChanged.connect(partial(self.event_feature_type_selected, self.dlg_add_visit, None))
         self.parameter_type_id.currentIndexChanged.connect(partial(self.set_parameter_id_combo, self.dlg_add_visit))
         self.parameter_id.currentIndexChanged.connect(self.get_feature_type_of_parameter)
 
@@ -220,12 +226,9 @@ class ManageVisit(ParentManage, QObject):
         else:
             self.feature_type.currentIndexChanged.emit(feature_type_index)
 
-        # load feature if in tbl_relation
-        # select list of related features
+        # Load feature if in tbl_relation. Select list of related features
         # Set 'expr_filter' with features that are in the list
         expr_filter = f'"{self.geom_type}_id"::integer IN ({self.locked_feature_id})'
-
-        # Check expression
         (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
         if not is_valid:
             return
@@ -384,70 +387,95 @@ class ManageVisit(ParentManage, QObject):
         self.current_visit.upsert(commit=self.autocommit)
 
 
-    def update_relations(self, dialog):
-        """Save current selected features in tbl_relations. Steps are:
-        A) remove all old relations related with current visit_id.
-        B) save new relations get from that listed in tbl_relations."""
-        
-        # A) remove all old relations related with current visit_id.
-        db_record = None
-        for index in range(self.feature_type.count()):
-            # feture_type combobox contain all the geometry type 
-            # allows basing on project type
-            geometry_type = self.feature_type.itemText(index).lower()
-            if geometry_type == '':
-                continue
+    def update_relations(self, dialog, delete_old_relations=False):
+        """ Save current selected features in every table of geom_type """
 
-            # TODO: the next "if" code can be substituded with something like:
-            # exec("db_record = OmVisitX{}{}(self.controller)".format(geometry_type[0].upper(), geometry_type[1:]))"
-            if geometry_type == 'arc':
-                db_record = OmVisitXArc(self.controller)
-            elif geometry_type == 'node':
-                db_record = OmVisitXNode(self.controller)
-            elif geometry_type == 'connec':
-                db_record = OmVisitXConnec(self.controller)
-            elif geometry_type == 'gully':
-                db_record = OmVisitXGully(self.controller)
+        if delete_old_relations:
+            for index in range(self.feature_type.count()):
+                # Remove all old relations related with current visit_id and @geom_type
+                geom_type = self.feature_type.itemText(index).lower()
+                self.delete_relations_geom_type(geom_type)
 
-            # remove all actual saved records related with visit_id
-            where_clause = f"visit_id = '{self.visit_id.text()}'"
+        # Save new relations listed in every table of geom_type
+        self.update_relations_geom_type("arc")
+        self.update_relations_geom_type("node")
+        self.update_relations_geom_type("connec")
+        if self.controller.get_project_type() == 'ud':
+            self.update_relations_geom_type("gully")
 
-            db_record.delete(where_clause=where_clause, commit=self.autocommit)
+        #self.enable_feature_type(dialog)
 
-        # do nothing if model is None or no element is present
-        if not self.tbl_relation.model() or not self.tbl_relation.model().rowCount():
+
+    def delete_relations_geom_type(self, geom_type):
+        """ Remove all old relations related with current visit_id and @geom_type """
+
+        self.controller.log_info(f"delete_relations_geom_type: {geom_type}")
+        if geom_type == '':
             return
 
-        # set the current db_record tyope to do insert of new records
-        # all the new records belong to the same geom_type
         # TODO: the next "if" code can be substituded with something like:
         # exec("db_record = OmVisitX{}{}(self.controller)".format(geometry_type[0].upper(), geometry_type[1:]))"
-        if self.geom_type == 'arc':
+        if geom_type == 'arc':
             db_record = OmVisitXArc(self.controller)
-        elif self.geom_type == 'node':
+        elif geom_type == 'node':
             db_record = OmVisitXNode(self.controller)
-        elif self.geom_type == 'connec':
+        elif geom_type == 'connec':
             db_record = OmVisitXConnec(self.controller)
-        elif self.geom_type == 'gully':
+        elif geom_type == 'gully':
             db_record = OmVisitXGully(self.controller)
 
+        # remove all actual saved records related with visit_id
+        where_clause = f"visit_id = '{self.visit_id.text()}'"
+
+        db_record.delete(where_clause=where_clause, commit=self.autocommit)
+
+
+    def update_relations_geom_type(self, geom_type):
+        """ Update relations of specific @geom_type """
+
+        self.controller.log_info(f"update_relations_geom_type: {geom_type}")
+
+        if geom_type == '':
+            return
+
         # for each showed element of a specific geom_type create an db entry
-        column_name = self.geom_type + "_id"
-        for row in range(self.tbl_relation.model().rowCount()):
+        column_name = f"{geom_type}_id"
+        widget = utils_giswater.getWidget(self.dlg_add_visit, f"tbl_visit_x_{geom_type}")
+        if not widget:
+            message = "Widget not found"
+            self.controller.log_info(message, parameter=widget_name)
+            return None
+
+        # do nothing if model is None or no element is present
+        if not widget.model(): #or not widget.rowCount():
+            self.controller.log_info(f"Widget model is none: tbl_visit_x_{geom_type}")
+            return
+
+        if geom_type == 'arc':
+            db_record = OmVisitXArc(self.controller)
+        elif geom_type == 'node':
+            db_record = OmVisitXNode(self.controller)
+        elif geom_type == 'connec':
+            db_record = OmVisitXConnec(self.controller)
+        elif geom_type == 'gully':
+            db_record = OmVisitXGully(self.controller)
+
+        for row in range(widget.model().rowCount()):
             # get modelIndex to get data
-            index = self.tbl_relation.model().index(row, 0)
+            index = widget.model().index(row, 0)
 
             # set common fields
             db_record.id = db_record.max_pk() + 1
             db_record.visit_id = int(self.visit_id.text())
 
             # set value for column <geom_type>_id
+            # db_record.column_name = index.data()
             setattr(db_record, column_name, index.data())
 
             # than save the showed records
             db_record.upsert(commit=self.autocommit)
 
-        self.enable_feature_type(dialog)
+        #self.enable_feature_type(dialog)
 
 
     def manage_tab_changed(self, dialog, index):
@@ -460,8 +488,8 @@ class ManageVisit(ParentManage, QObject):
             self.manage_leave_visit_tab()
             # need to create the relation record that is done only
             # changing tab
-            if self.locked_geom_type:
-                self.update_relations(dialog)
+            #if self.locked_geom_type:
+            #    self.update_relations(dialog)
 
         # tab Relation
         if self.current_tab_index == self.tab_index('tab_relations'):
@@ -513,23 +541,29 @@ class ManageVisit(ParentManage, QObject):
         if row:
             self.feature_type_parameter = row[0]
             self.geom_type = self.feature_type_parameter.lower()
+            self.manage_tabs_enabled()
 
-            # Disable all tabs
+
+    def manage_tabs_enabled(self, disable_tabs=False):
+        """ Enable/Disable tabs depending geom_type """
+
+        # Disable all tabs
+        if disable_tabs:
             for i in range(self.dlg_add_visit.tab_feature.count() - 1):
                 self.dlg_add_visit.tab_feature.setTabEnabled(i, False)
 
-            if self.geom_type == 'arc':
-                tab_index = 0
-            elif self.geom_type == 'node':
-                tab_index = 1
-            elif self.geom_type == 'connec':
-                tab_index = 2
-            elif self.geom_type == 'gully':
-                tab_index = 3
+        if self.geom_type == 'arc':
+            tab_index = 0
+        elif self.geom_type == 'node':
+            tab_index = 1
+        elif self.geom_type == 'connec':
+            tab_index = 2
+        elif self.geom_type == 'gully':
+            tab_index = 3
 
-            # Enable only tab of this geometry type
-            self.dlg_add_visit.tab_feature.setTabEnabled(tab_index, True)
-            self.dlg_add_visit.tab_feature.setCurrentIndex(tab_index)
+        # Enable only tab of this geometry type
+        self.dlg_add_visit.tab_feature.setTabEnabled(tab_index, True)
+        self.dlg_add_visit.tab_feature.setCurrentIndex(tab_index)
 
 
     def config_relation_table(self, dialog):
@@ -537,32 +571,47 @@ class ManageVisit(ParentManage, QObject):
         It's necessary a centralised call because base class can create a None model
         where all callbacks are lost ance can't be registered."""
 
+        if self.geom_type == '':
+            return
+
         # configure model visibility
-        table_name = "v_edit_" + self.geom_type
-        self.set_configuration(dialog, self.tbl_relation, table_name)
+        table_name = f"v_edit_{self.geom_type}"
+        self.set_configuration(dialog, "tbl_relation", table_name)
+        self.set_configuration(dialog, "tbl_visit_x_arc", table_name)
+        self.set_configuration(dialog, "tbl_visit_x_node", table_name)
+        self.set_configuration(dialog, "tbl_visit_x_connec", table_name)
+        self.set_configuration(dialog, "tbl_visit_x_gully", table_name)
 
 
-    def event_feature_type_selected(self, dialog):
+    def event_feature_type_selected(self, dialog, geom_type=None):
         """Manage selection change in feature_type combo box.
         THis means that have to set completer for feature_id QTextLine and
         setup model for features to select table."""
-        
+
         # 1) set the model linked to selecte features
         # 2) check if there are features related to the current visit
         # 3) if so, select them => would appear in the table associated to the model
-        self.geom_type = self.feature_type.currentText().lower()
-        viewname = f"v_edit_{self.geom_type}"
-        self.set_completer_feature_id(dialog.feature_id, self.geom_type, viewname)
+        if geom_type is None:
+            geom_type = self.feature_type.currentText().lower()
+            self.geom_type = geom_type
+
+        if geom_type == '':
+            return
+
+        viewname = f"v_edit_{geom_type}"
+        self.set_completer_feature_id(dialog.feature_id, geom_type, viewname)
 
         # set table model and completer
         # set a fake where expression to avoid to set model to None
-        fake_filter = f'{self.geom_type}_id IN (-1)'
-        self.set_table_model(dialog, self.tbl_relation, self.geom_type, fake_filter)
+        fake_filter = f'{geom_type}_id IN (-1)'
+        widget_name = f'tbl_visit_x_{geom_type}'
+        self.controller.log_info(f"set_table_model: {geom_type}")
+        self.set_table_model(dialog, widget_name, geom_type, fake_filter)
 
         # set the callback to setup all events later
         # its not possible to setup listener in this moment beacouse set_table_model without
         # a valid expression parameter return a None model => no events can be triggered
-        self.lazy_configuration(self.tbl_relation, self.config_relation_table)
+        #self.lazy_configuration(widget_name, self.config_relation_table)
 
         # check if there are features related to the current visit
         if not self.visit_id.text():
@@ -571,11 +620,8 @@ class ManageVisit(ParentManage, QObject):
         # Fill combo parameter_id depending geom_type
         self.fill_combo_parameter_id()
 
-        if self.geom_type == '':
-            return
-
-        table_name = f'om_visit_x_{self.geom_type}'
-        sql = f"SELECT {self.geom_type}_id FROM {table_name} WHERE visit_id = '{int(self.visit_id.text())}'"
+        table_name = f'om_visit_x_{geom_type}'
+        sql = f"SELECT {geom_type}_id FROM {table_name} WHERE visit_id = '{int(self.visit_id.text())}'"
         rows = self.controller.get_rows(sql, commit=self.autocommit)
         if not rows or not rows[0]:
             return
@@ -584,15 +630,15 @@ class ManageVisit(ParentManage, QObject):
 
         # select list of related features
         # Set 'expr_filter' with features that are in the list
-        expr_filter = f"{self.geom_type}_id IN ({','.join(ids)})"
+        expr_filter = f"{geom_type}_id IN ({','.join(ids)})"
         (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
         if not is_valid:
             return
 
-        # do selection allowing the tbl_relation to be linked to canvas selectionChanged
+        # do selection allowing @widget_name to be linked to canvas selectionChanged
         self.disconnect_signal_selection_changed()
-        self.connect_signal_selection_changed(dialog, self.tbl_relation)
-        self.select_features_by_ids(self.geom_type, expr)
+        self.connect_signal_selection_changed(dialog, widget_name)
+        self.select_features_by_ids(geom_type, expr)
         self.disconnect_signal_selection_changed()
 
 
@@ -749,7 +795,7 @@ class ManageVisit(ParentManage, QObject):
         utils_giswater.set_item_data(self.dlg_add_visit.parameter_type_id, parameter_type_ids, 1)
 
         # now get default value to be show in parameter_type_id
-        row = self.controller.get_config('om_param_type_vdefault')
+        row = self.controller.get_config('om_param_type_vdefault', log_info=False)
         if row:
             utils_giswater.set_combo_itemData(self.dlg_add_visit.parameter_type_id, row[0], 0)
 
@@ -880,6 +926,7 @@ class ManageVisit(ParentManage, QObject):
             return
 
         for field_name in event.field_names():
+            value = None
             if not hasattr(self.dlg_event, field_name):
                 continue
             if type(getattr(self.dlg_event, field_name)) is QLineEdit:
@@ -898,18 +945,19 @@ class ManageVisit(ParentManage, QObject):
         # save new event
         event.upsert()
         self.save_files_added(event.visit_id, event.id)
+
         # update Table
         self.tbl_event.model().select()
         self.manage_events_changed()
 
 
     def open_file(self):
+
         # Get row index
         index = self.dlg_event.tbl_docs_x_event.selectionModel().selectedRows()[0]
         column_index = utils_giswater.get_col_index_by_col_name(self.dlg_event.tbl_docs_x_event, 'value')
         
         path = index.sibling(index.row(), column_index).data()
-        # Check if file exist
         if os.path.exists(path):
             # Open the document
             if sys.platform == "win32":
@@ -928,6 +976,7 @@ class ManageVisit(ParentManage, QObject):
         self.dlg_event.tbl_docs_x_event.setModel(model)
         self.dlg_event.tbl_docs_x_event.horizontalHeader().setStretchLastSection(True)
         self.dlg_event.tbl_docs_x_event.horizontalHeader().setSectionResizeMode(3)
+
         # Get columns name and set headers of model with that
         columns_name = self.controller.get_columns_list('om_visit_event_photo')
         headers = []
@@ -1030,7 +1079,8 @@ class ManageVisit(ParentManage, QObject):
 
 
     def delete_files(self, qtable, visit_id, event_id):
-        """  Delete rows from table om_visit_event_photo, NOT DELETE FILES FROM DISC"""
+        """ Delete rows from table om_visit_event_photo, NOT DELETE FILES FROM DISC """
+
         # Get selected rows
         selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
@@ -1287,7 +1337,7 @@ class ManageVisit(ParentManage, QObject):
 
 
     def set_configuration(self, dialog, widget, table_name):
-        """Configuration of tables. Set visibility and width of columns."""
+        """ Configuration of tables. Set visibility and width of columns """
 
         widget = utils_giswater.getWidget(dialog, widget)
         if not widget:
@@ -1325,11 +1375,13 @@ class ManageVisit(ParentManage, QObject):
 
     def populate_position_id(self):
 
+        self.controller.log_info("populate_position_id")
+
         node_list = []
         node_1 = self.dlg_add_visit.tbl_relation.model().record(0).value('node_1')
         node_2 = self.dlg_add_visit.tbl_relation.model().record(0).value('node_2')
-        node_list.append([node_1, "node 1: " + str(node_1)])
-        node_list.append([node_2, "node 2: " + str(node_2)])
+        node_list.append([node_1, f"node 1: {node_1}"])
+        node_list.append([node_2, f"node 2: {node_2}"])
         utils_giswater.set_item_data(self.dlg_event.position_id, node_list, 1, True, False)
 
 
@@ -1347,6 +1399,9 @@ class ManageVisit(ParentManage, QObject):
             self.geom_type = "connec"
         elif tab_position == 3:
             self.geom_type = "gully"
+
+        if self.gem_type == '':
+            return
 
         self.hide_generic_layers(excluded_layers=excluded_layers)
         widget_name = f"tbl_{table_object}_x_{self.geom_type}"
