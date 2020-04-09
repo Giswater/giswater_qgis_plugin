@@ -362,7 +362,7 @@ class AddNewLot(ParentManage):
             if manage_type == 'team':
                 self.populate_cmb_team()
             else:
-                print(str(model.lastError().text()))
+                self.controller.log_info(model.lastError().text())
 
 
     def manage_widget_lot(self, lot_id):

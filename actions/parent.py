@@ -214,7 +214,7 @@ class ParentAction(object):
         except AttributeError:
             pass
         except Exception as e:
-            print(type(e).__name__)
+            self.controller.log_info(type(e).__name__)
         
         
     def multi_row_selector(self, dialog, tableleft, tableright, field_id_left, field_id_right, name='name',

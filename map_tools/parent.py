@@ -198,6 +198,7 @@ class ParentMapTool(QgsMapTool):
         for layer_refresh in self.canvas.layers():
             layer_refresh.triggerRepaint()
 
+
     def open_dialog(self, dlg=None, dlg_name=None, info=True, maximize_button=True, stay_on_top=True):
         """ Open dialog """
 
@@ -229,7 +230,6 @@ class ParentMapTool(QgsMapTool):
         elif issubclass(type(dlg), GwMainWindow):
             dlg.show()
         else:
-            print(f"WARNING: dialog type {type(dlg)} is not handled!")
             dlg.show()
                     
 

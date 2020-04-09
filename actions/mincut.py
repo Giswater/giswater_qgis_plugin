@@ -352,19 +352,19 @@ class MincutParent(ParentAction):
         try:
             self.canvas.xyCoordinates.disconnect()
         except TypeError as e:
-            print(f"{type(e).__name__} --> {e}")
+            self.controller.log_info(f"{type(e).__name__} --> {e}")
 
         try:
             self.emit_point.canvasClicked.disconnect()
         except TypeError as e:
-            print(f"{type(e).__name__} --> {e}")
+            self.controller.log_info(f"{type(e).__name__} --> {e}")
 
         if action_pan:
             self.iface.actionPan().trigger()
         try:
             self.vertex_marker.hide()
         except AttributeError as e:
-            print(f"{type(e).__name__} --> {e}")
+            self.controller.log_info(f"{type(e).__name__} --> {e}")
 
 
     def real_start(self):
