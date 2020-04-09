@@ -312,7 +312,21 @@ class DaoController(object):
 
         return status
 
-    
+
+    def check_db_connection(self):
+        """ Check database connection. Reconnect if needed """
+
+        opened = True
+        try:
+            opened = self.db.isOpen()
+            if not opened:
+                self.db.open()
+        except Exception:
+            pass
+        finally:
+            return opened
+
+
     def get_error_message(self, log_code_id):    
         """ Get error message from selected error code """
         
@@ -844,9 +858,8 @@ class DaoController(object):
                         widget.setText(text)
                 self.translate_tooltip(context_name, widget)
 
-
         except Exception as e:
-            print(f"{widget_name} --> {type(e).__name__} --> {e}")
+            self.log_info(f"{widget_name} --> {type(e).__name__} --> {e}")
             pass
         
         
