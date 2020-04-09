@@ -499,6 +499,8 @@ BEGIN
 					IF v_sys_raster_dem AND v_edit_upsert_elevation_from_dem THEN
 						field_value = (SELECT ST_Value(rast,1,NEW.the_geom,false) FROM ext_raster_dem WHERE 
 						id = (SELECT id FROM ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
+					ELSE
+						field_value = null;
 					END IF;
 								
 				-- catalog values
