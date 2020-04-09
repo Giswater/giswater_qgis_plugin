@@ -77,12 +77,10 @@ class CadApiInfo(ParentMapTool):
             complet_result, dialog = self.info_cf.open_form(point, tab_type=self.tab_type)
 
         if complet_result is False:
-            print("No point under mouse(LeftButton)")
             return
         elif event.button() == Qt.RightButton:
             point = self.create_point(event)
             if point is False:
-                print("No point under mouse(RightButton)")
                 return
 
             self.info_cf.hilight_feature(point, rb_list=self.rubberband_list, tab_type=self.tab_type)
@@ -90,6 +88,7 @@ class CadApiInfo(ParentMapTool):
 
     def reactivate_map_tool(self):
         """ Reactivate tool """
+
         self.block_signal = True
         info_action = self.iface.mainWindow().findChild(QAction, 'map_tool_api_info_data')
         info_action.trigger()

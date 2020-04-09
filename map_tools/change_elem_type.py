@@ -107,7 +107,6 @@ class ChangeElemType(ParentMapTool):
             self.ApiCF.user_current_layer = self.current_layer
             complet_result, dialog = self.ApiCF.open_form(table_name='v_edit_node', feature_id=features[0]["node_id"], tab_type='data')
             if not complet_result:
-                print("FAIL")
                 return
 
             dialog.dlg_closed.connect(self.ApiCF.restore_user_layer)

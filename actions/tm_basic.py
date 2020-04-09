@@ -410,7 +410,6 @@ class TmBasic(TmParentAction):
                 f" OR (campaign_id IS null AND mu_id NOT IN ({ids}))")
         (is_valid, exp) = self.check_expression(expr)
         if not is_valid:
-            print("IS NOT VALID")
             return
         model.setFilter(expr)
         

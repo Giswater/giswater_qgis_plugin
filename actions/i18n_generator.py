@@ -421,7 +421,6 @@ class I18NGenerator(ParentAction):
             self.cursor = self.conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
             status = True
         except psycopg2.DatabaseError as e:
-            print(f'Connection error: {e}')
             self.last_error = e
             status = False
         return status

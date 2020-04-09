@@ -1646,12 +1646,3 @@ class DaoController(object):
         self.set_text_bold(self.dlg_info.txt_infolog)
         self.dlg_info.show()
 
-
-    def test_exception(self):
-        """ Function to test exception manager """
-
-        try:
-            print(4 / 0)
-        except Exception:
-            self.manage_exception()
-

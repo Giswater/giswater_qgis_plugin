@@ -148,7 +148,6 @@ class ApiSearch(ApiParent):
             self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, tab_type='data')
             complet_result, dialog = self.ApiCF.open_form(table_name=item['sys_table_id'], feature_id=item['sys_id'], tab_type='data')
             if not complet_result:
-                print("FAIL")
                 return
             self.draw(complet_result)
             self.resetRubberbands()

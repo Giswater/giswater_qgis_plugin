@@ -112,7 +112,7 @@ class Giswater(QObject):
             self.iface.projectRead.connect(self.project_read)
             self.iface.newProjectCreated.connect(self.project_new)
         except AttributeError as e:
-            print(f"set_signals: {e}")
+            pass
 
 
     def set_info_button(self):
@@ -736,7 +736,7 @@ class Giswater(QObject):
                 self.set_info_button_visible()
 
         except Exception as e:
-            print(str(e))
+            pass
         finally:
             # Reset instance attributes
             self.actions = {}
