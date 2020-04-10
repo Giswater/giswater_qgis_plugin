@@ -15,8 +15,8 @@ $BODY$
 /*
 delete from temp_anlgraf
 TO EXECUTE
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"exploitation":"[1,2]", "usePsectors":"TRUE", "updateFeature":"TRUE", "updateMinsectorGeom":2 ,"geomParamUpdate":10}}}');
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"arc":"2002", "usePsectors":"TRUE", "updateFeature":"TRUE", "updateMinsectorGeom":2, "geomParamUpdate":10}}}')
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"exploitation":"[1,2]", "checkQualityData": false, "usePsectors":"TRUE", "updateFeature":"TRUE", "updateMinsectorGeom":3 ,"geomParamUpdate":10}}}');
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"arc":"2002", "checkQualityData": true, "usePsectors":"TRUE", "updateFeature":"TRUE", "updateMinsectorGeom":2, "geomParamUpdate":10}}}')
 
 delete from SCHEMA_NAME.audit_log_data;
 delete from SCHEMA_NAME.temp_anlgraf
@@ -49,7 +49,7 @@ v_result_point json;
 v_result_line json;
 v_result_polygon json;
 v_result text;
-v_count	integer;
+v_count integer = 0;
 v_version text;
 v_updatemapzgeom integer;
 v_geomparamupdate float;
@@ -59,6 +59,7 @@ v_visible_layer text;
 v_usepsectors boolean;
 v_concavehull float = 0.85;
 v_error_context text;
+v_checkdata boolean;
 
 BEGIN
 
@@ -73,6 +74,7 @@ BEGIN
 	v_updatemapzgeom = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
 	v_geomparamupdate = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'geomParamUpdate');
 	v_usepsectors = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'usePsectors');
+	v_checkdata = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'checkQualityData');
 
 
 	-- select config values
@@ -84,11 +86,13 @@ BEGIN
 	v_featuretype='arc';
 
 	-- data quality analysis
-	v_input = '{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}'::json;
-	PERFORM gw_fct_om_check_data(v_input);
+	IF v_checkdata THEN
+		v_input = '{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}'::json;
+		PERFORM gw_fct_om_check_data(v_input);
+		SELECT count(*) INTO v_count FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=25 AND criticity=3;
+	END IF;
 
 	-- check criticity of data in order to continue or not
-	SELECT count(*) INTO v_count FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=25 AND criticity=3;
 	IF v_count > 3 THEN
 	
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
@@ -123,8 +127,6 @@ BEGIN
 		INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, 
 		concat('INFO: All psectors have been disabled to execute this analysis'));
 	END IF;
-
-	
 		
 	-- reset selectors
 	DELETE FROM selector_state WHERE cur_user=current_user;
@@ -144,15 +146,15 @@ BEGIN
 
 	-- create graf
 	INSERT INTO temp_anlgraf ( arc_id, node_1, node_2, water, flag, checkf )
-	SELECT  arc_id::integer, node_1::integer, node_2::integer, 0, 0, 0 FROM v_edit_arc JOIN value_state_type ON state_type=id 
+	SELECT  arc_id, node_1, node_2, 0, 0, 0 FROM v_edit_arc JOIN value_state_type ON state_type=id 
 	WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE
 	UNION
-	SELECT  arc_id::integer, node_2::integer, node_1::integer, 0, 0, 0 FROM v_edit_arc JOIN value_state_type ON state_type=id 
+	SELECT  arc_id, node_2, node_1, 0, 0, 0 FROM v_edit_arc JOIN value_state_type ON state_type=id 
 	WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE;
 	
 	-- set boundary conditions of graf table	
 	UPDATE temp_anlgraf SET flag=2 FROM node_type a JOIN cat_node b ON a.id=nodetype_id JOIN node c ON nodecat_id=b.id 
-	WHERE c.node_id::integer=temp_anlgraf.node_1 AND graf_delimiter !='NONE' ;
+	WHERE c.node_id=temp_anlgraf.node_1 AND graf_delimiter !='NONE' ;
 			
 	-- starting process
 	LOOP
@@ -167,19 +169,19 @@ BEGIN
 		-- when arc_id is provided as a parameter
 		IF v_arcid IS NULL THEN
 			SELECT a.arc_id INTO v_arc FROM (SELECT arc_id, max(checkf) as checkf FROM temp_anlgraf GROUP by arc_id) a 
-			JOIN v_edit_arc b ON a.arc_id::integer=b.arc_id::integer WHERE checkf=0 LIMIT 1;
+			JOIN v_edit_arc b ON a.arc_id=b.arc_id WHERE checkf=0 LIMIT 1;
 		END IF;
 
 		EXIT WHEN v_arc IS NULL;
 				
 		-- set the starting element
-		v_querytext = 'UPDATE temp_anlgraf SET flag=1, water=1, checkf=1 WHERE arc_id='||quote_literal(v_arc)||'::integer';
+		v_querytext = 'UPDATE temp_anlgraf SET flag=1, water=1, checkf=1 WHERE arc_id='||quote_literal(v_arc)||'';
 		EXECUTE v_querytext;
 
 		-- inundation process
 		LOOP	
 			v_cont1 = v_cont1+1;
-			UPDATE temp_anlgraf n SET water= 1, flag=n.flag+1, checkf=1 FROM v_anl_graf a WHERE n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id;
+			UPDATE temp_anlgraf n SET water= 1, flag=n.flag+1, checkf=1 FROM v_anl_graf a WHERE n.node_1 = a.node_1 AND n.arc_id = a.arc_id;
 			GET DIAGNOSTICS v_affectedrows =row_count;
 			EXIT WHEN v_affectedrows = 0;
 			EXIT WHEN v_cont1 = 200;
@@ -191,19 +193,19 @@ BEGIN
 		-- insert arc results into audit table
 		EXECUTE 'INSERT INTO anl_arc (fprocesscat_id, arccat_id, arc_id, the_geom, descript) 
 			SELECT DISTINCT ON (arc_id)'||v_fprocesscat_id||', arccat_id, a.arc_id, the_geom, '||(v_arc)||' 
-			FROM (SELECT arc_id, max(water) as water FROM temp_anlgraf WHERE water=1 GROUP by arc_id) a JOIN v_edit_arc b ON a.arc_id::integer=b.arc_id::integer';
+			FROM (SELECT arc_id, max(water) as water FROM temp_anlgraf WHERE water=1 GROUP by arc_id) a JOIN v_edit_arc b ON a.arc_id=b.arc_id';
 	
 		-- insert node results into audit table
 		EXECUTE 'INSERT INTO anl_node (fprocesscat_id, nodecat_id, node_id, the_geom, descript) 
 			SELECT DISTINCT ON (node_id) '||v_fprocesscat_id||', nodecat_id, b.node_id, the_geom, '||(v_arc)||' FROM (SELECT node_1 as node_id FROM
 			(SELECT node_1,water FROM temp_anlgraf UNION SELECT node_2,water FROM temp_anlgraf)a
-			GROUP BY node_1, water HAVING water=1)b JOIN v_edit_node c ON c.node_id::integer=b.node_id::integer';
+			GROUP BY node_1, water HAVING water=1)b JOIN v_edit_node c ON c.node_id=b.node_id';
 
 		-- insert node delimiters into audit table
 		EXECUTE 'INSERT INTO anl_node (fprocesscat_id, nodecat_id, node_id, the_geom, descript) 
 			SELECT DISTINCT ON (node_id) '||v_fprocesscat_id||', nodecat_id, b.node_id, the_geom, 0 FROM 
 			(SELECT node_1 as node_id FROM (SELECT node_1,water FROM temp_anlgraf UNION ALL SELECT node_2,water FROM temp_anlgraf)a
-			GROUP BY node_1, water HAVING water=1 AND count(node_1)=2)b JOIN v_edit_node c ON c.node_id::integer=b.node_id::integer';
+			GROUP BY node_1, water HAVING water=1 AND count(node_1)=2)b JOIN v_edit_node c ON c.node_id=b.node_id';
 		-- NOTE: node delimiter are inserted two times in table, as node from minsector trace and as node delimiter
 
 				
@@ -313,7 +315,6 @@ BEGIN
 		VALUES (v_fprocesscat_id, 2, concat('WARNING: Geometry of mapzone ',v_class ,' have been modified by this process'));
 	END IF;
 	
-	
 	-- set selector
 	DELETE FROM selector_audit WHERE cur_user=current_user;
 	INSERT INTO selector_audit (fprocesscat_id, cur_user) VALUES (v_fprocesscat_id, current_user);
@@ -347,9 +348,8 @@ BEGIN
 	v_result_line := COALESCE(v_result_line, '{}'); 
 	v_result_polygon := COALESCE(v_result_polygon, '{}');
 	
-
---  Return
-    RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Mapzones dynamic analysis done succesfully"}, "version":"'||v_version||'"'||
+	--  Return
+	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Mapzones dynamic analysis done succesfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 				'"setVisibleLayers":["'||v_visible_layer||'"],'||
@@ -358,13 +358,11 @@ BEGIN
 				'"polygon":'||v_result_polygon||'}'||
 		       '}'||
 	    '}')::json;
-	
-RETURN v_cont1;
 
---  Exception handling
+	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN
-	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$

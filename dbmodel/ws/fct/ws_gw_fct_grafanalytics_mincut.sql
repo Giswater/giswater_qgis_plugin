@@ -25,12 +25,12 @@ v_data json;
 v_arcid text;
 v_mincutid integer;
 v_mincutstep integer;
-v_arc integer;
+v_arc text;
 v_querytext text;
 affected_rows numeric;
 cont1 integer default 0;
-v_arctwin integer;
-v_nodetwin integer;
+v_arctwin text;
+v_nodetwin text;
 v_checkvalve record;
 
 BEGIN
@@ -53,10 +53,10 @@ BEGIN
 
 	-- create graf
 	INSERT INTO temp_anlgraf (arc_id, node_1, node_2, water, flag, checkf )
-	SELECT arc_id::integer, node_1::integer, node_2::integer, 0, 0, 0 FROM v_edit_arc JOIN value_state_type ON state_type=id 
+	SELECT arc_id, node_1, node_2, 0, 0, 0 FROM v_edit_arc JOIN value_state_type ON state_type=id 
 	WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE
 	UNION
-	SELECT arc_id::integer, node_2::integer, node_1::integer, 0, 0, 0 FROM v_edit_arc JOIN value_state_type ON state_type=id 
+	SELECT arc_id, node_2, node_1, 0, 0, 0 FROM v_edit_arc JOIN value_state_type ON state_type=id 
 	WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE;
 	
 	-- set boundary conditions of graf table
@@ -64,23 +64,23 @@ BEGIN
 		-- setting on the graf matrix proposable valves
 		UPDATE temp_anlgraf SET flag=1
 		FROM anl_mincut_result_valve WHERE result_id=v_mincutid AND ((unaccess = FALSE AND broken = FALSE))
-		AND (temp_anlgraf.node_1 = anl_mincut_result_valve.node_id::integer OR temp_anlgraf.node_2 = anl_mincut_result_valve.node_id::integer);
+		AND (temp_anlgraf.node_1 = anl_mincut_result_valve.node_id OR temp_anlgraf.node_2 = anl_mincut_result_valve.node_id);
 		
 	ELSIF v_mincutstep = 2 THEN 
 		-- setting on the graf matrix only proposed valves on step1
 		UPDATE temp_anlgraf SET flag=1 
 		FROM anl_mincut_result_valve WHERE result_id=v_mincutid AND proposed = TRUE
-		AND (temp_anlgraf.node_1 = anl_mincut_result_valve.node_id::integer OR temp_anlgraf.node_2 = anl_mincut_result_valve.node_id::integer);
+		AND (temp_anlgraf.node_1 = anl_mincut_result_valve.node_id OR temp_anlgraf.node_2 = anl_mincut_result_valve.node_id);
 	END IF;
 	-- setting the graf matrix with closed valves
 	UPDATE temp_anlgraf SET flag=1 
 	FROM anl_mincut_result_valve WHERE result_id=v_mincutid AND closed=TRUE 
-	AND (temp_anlgraf.node_1 = anl_mincut_result_valve.node_id::integer OR temp_anlgraf.node_2 = anl_mincut_result_valve.node_id::integer);
+	AND (temp_anlgraf.node_1 = anl_mincut_result_valve.node_id OR temp_anlgraf.node_2 = anl_mincut_result_valve.node_id);
 	
 	-- setting the graf matrix with tanks
 	UPDATE temp_anlgraf SET flag=1 
 	FROM anl_mincut_inlet_x_exploitation 
-	WHERE (temp_anlgraf.node_1 = anl_mincut_inlet_x_exploitation.node_id::integer OR temp_anlgraf.node_2 = anl_mincut_inlet_x_exploitation.node_id::integer);
+	WHERE (temp_anlgraf.node_1 = anl_mincut_inlet_x_exploitation.node_id OR temp_anlgraf.node_2 = anl_mincut_inlet_x_exploitation.node_id);
 
 	-- reset water flag
 	UPDATE temp_anlgraf SET water=0;
@@ -103,7 +103,7 @@ BEGIN
 	EXECUTE v_querytext;-- inundation process
 	LOOP	
 		cont1 = cont1+1;
-		UPDATE temp_anlgraf n SET water= 1, flag=n.flag+1 FROM v_anl_graf a WHERE n.node_1::integer = a.node_1::integer AND n.arc_id::integer = a.arc_id::integer;
+		UPDATE temp_anlgraf n SET water= 1, flag=n.flag+1 FROM v_anl_graf a WHERE n.node_1 = a.node_1 AND n.arc_id = a.arc_id;
 		GET DIAGNOSTICS affected_rows =row_count;
 		EXIT WHEN affected_rows = 0;
 		EXIT WHEN cont1 = 100;
@@ -119,14 +119,14 @@ BEGIN
 	-- insert arc results into table
 	EXECUTE 'INSERT INTO anl_mincut_result_arc (result_id, arc_id, the_geom)
 		SELECT '||v_mincutid||', a.arc_id, the_geom FROM (SELECT DISTINCT arc_id FROM temp_anlgraf WHERE water=1)a
-		JOIN arc ON arc.arc_id::integer=a.arc_id
+		JOIN arc ON arc.arc_id=a.arc_id
 		ON CONFLICT (arc_id, result_id) DO NOTHING';
 
 	-- insert node results into table
 	EXECUTE 'INSERT INTO anl_mincut_result_node (result_id, node_id, the_geom)
 		SELECT '||v_mincutid||', b.node_1, the_geom FROM (SELECT DISTINCT node_1, the_geom FROM
 		(SELECT node_1,water FROM temp_anlgraf UNION SELECT node_2,water FROM temp_anlgraf)a
-		JOIN node ON node.node_id::integer = a.node_1
+		JOIN node ON node.node_id = a.node_1
 		GROUP BY node_1, water, the_geom HAVING water=1) b
 		ON CONFLICT (node_id, result_id) DO NOTHING';
 
