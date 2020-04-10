@@ -15,33 +15,32 @@ $BODY$
 	SELECT SCHEMA_NAME.gw_fct_anl_node_exit_upper_intro($${
 	"client":{"device":3, "infoType":100, "lang":"ES"},
 	"feature":{"tableName":"v_edit_man_manhole", "id":["60"]},
-	"data":{"selectionMode":"previousSelection", "parameters":{"saveOnDatabase":true}
+	"data":{"parameters":{"saveOnDatabase":true}
 	}}$$)
 */
 
 
 DECLARE
-	v_sys_elev1 numeric(12,3);
-	v_sys_elev2 numeric(12,3);
-	v_version text;
-	v_saveondatabase boolean;
-	v_result json;
-	v_result_info json;
-	v_result_point json;
-	v_id json;
-	v_selectionmode text;
-	v_worklayer text;
-	v_array text;
-	v_sql text;
-	v_querytext text;
-	v_querytextres record;
-	v_i integer;
-	v_count text;
-    v_qmlpointpath	text;
-    v_error_context text;
-	
-	rec_node record;
-	rec_arc record;
+rec_node record;
+rec_arc record;
+
+v_sys_elev1 numeric(12,3);
+v_sys_elev2 numeric(12,3);
+v_version text;
+v_saveondatabase boolean;
+v_result json;
+v_result_info json;
+v_result_point json;
+v_id json;
+v_worklayer text;
+v_array text;
+v_sql text;
+v_querytext text;
+v_querytextres record;
+v_i integer;
+v_count text;
+v_qmlpointpath	text;
+v_error_context text;
 	
 BEGIN
 
@@ -57,7 +56,6 @@ BEGIN
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
 	v_array :=  replace(replace(replace (v_id::text, ']', ')'),'"', ''''), '[', '(');
 	v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
-	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
 	v_saveondatabase :=  (((p_data ->>'data')::json->>'parameters')::json->>'saveOnDatabase')::boolean;
 
 	--select default geometry style

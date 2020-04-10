@@ -15,7 +15,7 @@ $BODY$
 	SELECT SCHEMA_NAME.gw_fct_anl_node_sink($${
 	"client":{"device":3, "infoType":100, "lang":"ES"},
 	"feature":{"tableName":"v_edit_man_manhole", "id":["240"]},
-	"data":{"selectionMode":"previousSelection",  "parameters":{"saveOnDatabase":true}}}$$)
+	"data":{"parameters":{"saveOnDatabase":true}}}$$)
 */
 
 
@@ -29,7 +29,6 @@ DECLARE
 	v_sql text;
 	v_worklayer text;
 	v_array text;
-	v_selectionmode text;
 	v_id json;
     v_qmlpointpath	text;
     v_error_context text;
@@ -50,7 +49,6 @@ BEGIN
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
 	v_array :=  replace(replace(replace (v_id::text, ']', ')'),'"', ''''), '[', '(');
 	v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
-	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
 	v_saveondatabase :=  (((p_data ->>'data')::json->>'parameters')::json->>'saveOnDatabase')::boolean;
 
 	--select default geometry style
@@ -98,15 +96,6 @@ BEGIN
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "features":',v_result, '}'); 
-
-	IF v_saveondatabase IS FALSE THEN 
-		-- delete previous results
-		DELETE FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=12;
-	ELSE
-		-- set selector
-		DELETE FROM selector_audit WHERE fprocesscat_id=12 AND cur_user=current_user;    
-		INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (12, current_user);
-	END IF;
 
 	IF v_saveondatabase IS FALSE THEN 
 		-- delete previous results
