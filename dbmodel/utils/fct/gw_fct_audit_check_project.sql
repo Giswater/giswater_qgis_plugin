@@ -290,8 +290,7 @@ BEGIN
 		IF 'role_epa' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
 
 				EXECUTE 'SELECT gw_fct_pg2epa_check_data($${
-				"client":{"device":3, "infoType":100, "lang":"ES"},
-				"feature":{},"data":{}}$$)';
+				"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{}}$$)';
 				-- insert results 
 				INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) 
 				SELECT 101, criticity, replace(error_message,':', ' (DB EPA):') FROM audit_check_data 
@@ -300,8 +299,12 @@ BEGIN
 
 		IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
 
-			-- TODO: function to check data without result need to be developed. Unique function gw_fct_plan_check_data to check data must be divided into two functions
-			
+				EXECUTE 'SELECT gw_fct_plan_check_data($${
+				"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{}}$$)';
+				-- insert results 
+				INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) 
+				SELECT 101, criticity, replace(error_message,':', ' (DB EPA):') FROM audit_check_data 
+				WHERE fprocesscat_id=15 AND criticity < 4 AND error_message !='' AND user_name=current_user OFFSET 6					
 		END IF;
 
 		IF 'role_admin' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
