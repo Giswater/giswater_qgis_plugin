@@ -6,13 +6,13 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2526
 
-DROP FUNCTION IF EXISTS  SCHEMA_NAME.gw_fct_utils_csv2pg_export_epanet_inp(character varying, text);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_export_epanet_inp(p_result_id character varying,  p_path text)
+DROP FUNCTION IF EXISTS  SCHEMA_NAME.gw_fct_pg2epa_create_inp(character varying, text);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_create_inp(p_result_id character varying,  p_path text)
 RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_export_epanet_inp('result_1', 'D:\dades\test.inp')
+SELECT SCHEMA_NAME.gw_fct_pg2epa_create_inp('result_1', 'D:\dades\test.inp')
 */
 
 DECLARE
