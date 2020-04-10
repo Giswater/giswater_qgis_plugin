@@ -23,7 +23,7 @@ VALUES
 			   "tank":{"addElevation":1}, 
 			   "valve":{"length":"0.3", "diameter":"100", "minorloss":0.2, "roughness":{"H-W":100, "D-W":0.5, "C-M":0.011}}, 
 			   "pump":{"length":0.3, "diameter":100, "roughness":{"H-W":100, "D-W":0.5, "C-M":0.011}}},
-  "debug":{"export":true, "setDemand":true, "checkData":true, "onlyIsOperative":true}
+  "debug":{"onlyExport":false, "setDemand":true, "onlyIsOperative":true}
  }',
 true, false)
 ON conflict (id) DO NOTHING;
