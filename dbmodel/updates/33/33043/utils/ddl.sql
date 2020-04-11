@@ -34,3 +34,7 @@ CREATE INDEX temp_anlgraf_node_1
 
 CREATE INDEX temp_anlgraf_node_2
   ON temp_anlgraf  USING btree  (node_2);
+  
+ALTER TABLE ext_rtc_dma_period ADD COLUMN pattern_volume double precision;
+
+ALTER TABLE inp_pattern DROP COLUMN pattern_type;

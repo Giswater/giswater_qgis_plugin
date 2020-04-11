@@ -35,7 +35,10 @@ v_advancedsettings boolean;
 v_file json;
 v_body json;
 v_onlyexport boolean;
+v_checkdata boolean;
 v_checknetwork boolean;
+v_checkresult boolean;
+
 	
 BEGIN
 
@@ -53,8 +56,9 @@ BEGIN
 	-- get debug parameters (settings)
 	v_onlyexport = (SELECT (value::json->>'debug')::json->>'export' FROM config_param_user WHERE parameter='inp_options_settings' AND cur_user=current_user)::boolean;
 	v_setdemand = (SELECT (value::json->>'debug')::json->>'setDemand' FROM config_param_user WHERE parameter='inp_options_settings' AND cur_user=current_user)::boolean;
-	v_checknetwork = (SELECT (value::json->>'debug')::json->>'checkInlets' FROM config_param_user WHERE parameter='inp_options_settings' AND cur_user=current_user)::boolean;
-
+	v_checkdata = (SELECT (value::json->>'debug')::json->>'checkData' FROM config_param_user WHERE parameter='inp_options_settings' AND cur_user=current_user)::boolean;
+	v_checknetwork = (SELECT (value::json->>'debug')::json->>'checkNetwork' FROM config_param_user WHERE parameter='inp_options_settings' AND cur_user=current_user)::boolean;
+	
 	-- get advanced parameters (settings)
 	v_advancedsettings = (SELECT (value::json->>'avanced')::json->>'status' FROM config_param_user WHERE parameter='inp_options_settings' AND cur_user=current_user)::boolean;
 
@@ -100,7 +104,9 @@ BEGIN
 	ELSE 
 	
 		RAISE NOTICE '1 - check system data';
-		PERFORM gw_fct_pg2epa_check_data(v_input);
+		IF v_checkdata THEN
+			PERFORM gw_fct_pg2epa_check_data(v_input);
+		END IF;
 			
 		RAISE NOTICE '2 - Upsert on rpt_cat_table';
 		DELETE FROM rpt_cat_result WHERE result_id=v_result;
@@ -157,7 +163,9 @@ BEGIN
 		UPDATE rpt_inp_arc SET length=0.05 WHERE length=0 AND result_id=v_result;
 		
 		RAISE NOTICE '13 - Check result network';
-		PERFORM gw_fct_pg2epa_check_network(v_input);			
+		IF v_checknetwork THEN
+			PERFORM gw_fct_pg2epa_check_network(v_input);			
+		END IF;
 		
 		RAISE NOTICE '14 - delete disconnected arcs with associated nodes';
 		DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user) and result_id = v_result;

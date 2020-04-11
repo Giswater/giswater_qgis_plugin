@@ -23,26 +23,26 @@ SELECT SCHEMA_NAME.gw_fct_grafanalytics_check_data($${
 
 
 DECLARE
-v_project_type 		text;
-v_count				integer;
-v_saveondatabase 	boolean;
-v_result 			text;
-v_version			text;
-v_result_info 		json;
-v_result_point		json;
-v_result_line 		json;
-v_result_polygon	json;
-v_querytext			text;
-v_result_id 		text;
-v_features 			text;
-v_edit				text;
-v_config_param 		text;
-v_sector			boolean;
-v_presszone			boolean;
-v_dma				boolean;
-v_dqa				boolean;
-v_minsector			boolean;
-v_grafclass			text;
+v_project_type text;
+v_count	integer;
+v_saveondatabase boolean;
+v_result text;
+v_version text;
+v_result_info json;
+v_result_point json;
+v_result_line json;
+v_result_polygon json;
+v_querytext text;
+v_result_id text;
+v_features text;
+v_edit text;
+v_config_param text;
+v_sector boolean;
+v_presszone boolean;
+v_dma boolean;
+v_dqa boolean;
+v_minsector boolean;
+v_grafclass text;
 v_error_context text;
 
 BEGIN
@@ -360,7 +360,7 @@ BEGIN
 	v_result_line := COALESCE(v_result_line, '{}'); 
 	v_result_polygon := COALESCE(v_result_polygon, '{}'); 
 	
---  Return
+	-- Return
     RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
@@ -371,10 +371,10 @@ BEGIN
 		       '}'||
 	    '}')::json;
 
---  Exception handling
+	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN
-	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
    
 END;

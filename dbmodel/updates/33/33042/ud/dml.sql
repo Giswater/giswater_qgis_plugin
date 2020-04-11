@@ -14,7 +14,7 @@ VALUES
 ('inp_options_settings', 'hidden_value', 'Additional settings for go2epa', 'role_epa', 'Additional settings for go2epa', true, 'ws', false, false, 'text', 'linetext', 
 '{"vdefault":{"text":"Default values for user of q0, outfall_type, barrels, y0 and scf for user have been taken"},
   "advanced": {"text":"There is no advanced settings configured"},
-  "debug":{"onlyExport":false, "onlyIsOperative":true}
+  "debug":{"onlyExport":false, "checkData":true, "checkNetwork":true, "checkResult":true, "onlyIsOperative":true}
  }',
 true, false)
 ON conflict (id) DO NOTHING;

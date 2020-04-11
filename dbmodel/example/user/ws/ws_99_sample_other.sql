@@ -542,3 +542,6 @@ UPDATE config_api_form_fields SET tooltip = 'top_floor - Número máximo de plan
 UPDATE config_api_form_fields SET tooltip = 'pol_id - Identificador del polígono relacionado' WHERE column_id = 'pol_id' AND tooltip IS NULL AND formtype='feature';
 UPDATE config_api_form_fields SET tooltip = 'name - Nombre específico del elemento' WHERE column_id = 'name' AND tooltip IS NULL AND formtype='feature';
 
+
+
+UPDATE ext_rtc_dma_period SET min = null, max = null, pattern_volume = 10;

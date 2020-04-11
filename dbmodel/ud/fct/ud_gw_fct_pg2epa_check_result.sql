@@ -71,6 +71,7 @@ v_debug text;
 v_debugmode boolean;
 v_dumpsubc boolean;
 v_hydroscenario text;
+v_checkresult boolean;
 
 BEGIN
 
@@ -82,10 +83,14 @@ BEGIN
 	v_fprocesscat_id := ((p_data ->>'data')::json->>'parameters')::json->>'fprocesscatId';
 	v_dumpsubc := ((p_data ->>'data')::json->>'parameters')::json->>'dumpSubcatchments';
 
-	
-	-- select config values
+	-- get system values
 	SELECT wsoftware, giswater  INTO v_project_type, v_version FROM version order by 1 desc limit 1 ;
 
+	-- get user values
+	v_checkresult = (SELECT (value::json->>'debug')::json->>'checkResult' FROM config_param_user 
+	WHERE parameter='inp_options_settings' AND cur_user=current_user)::boolean;
+
+	
 	-- manage no results
 	IF (SELECT result_id FROM rpt_cat_result WHERE result_id=v_result_id) IS NULL THEN	
 		RAISE EXCEPTION 'You need to create a result before';
@@ -132,192 +137,196 @@ BEGIN
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Advanced settings: ', v_advancedsettings));
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Debug: ', v_debug));	
 
-	IF v_debug::boolean THEN
-		v_debugmode = (SELECT value(value->>'advanced') FROM config_param_user WHERE parameter = 'inp_options_settings' AND cur_user=current_user);
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Debug mode: ', v_debugmode));
-	END IF;
-	
-	
-	RAISE NOTICE '1- Check subcatchments';
-	SELECT count(*) INTO v_count FROM v_edit_subcatchment WHERE outlet_id is null;
-	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column outlet_id column.'));
-		v_count=0;
-	ELSE
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (14, v_result_id, 1, concat('INFO: Column oulet_id on subcatchment table have been checked without any values missed.'));
-	END IF;
-
-	SELECT count(*) INTO v_count FROM v_edit_subcatchment where rg_id is null;
-	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column rg_id column.'));
-		v_count=0;
-	ELSE
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (14, v_result_id, 1, concat('INFO: Column rg_id on subcatchment table have been checked without any values missed.'));
-	END IF;
-
-	SELECT count(*) INTO v_count FROM v_edit_subcatchment where area is null;
-	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column area column.'));
-		v_count=0;
-	ELSE
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (14, v_result_id, 1, concat('INFO: Column area on subcatchment table have been checked without any values missed.'));
-	END IF;
-
-	SELECT count(*) INTO v_count FROM v_edit_subcatchment where width is null;
-	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column width column.'));
-		v_count=0;
-	ELSE
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (14, v_result_id, 1, concat('INFO: Column width on subcatchment table have been checked without any values missed.'));
-	END IF;
-	
-	SELECT count(*) INTO v_count FROM v_edit_subcatchment where slope is null;
-	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column slope column.'));
-		v_count=0;
-	ELSE
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (14, v_result_id, 1, concat('INFO: Column slope on subcatchment table have been checked without any values missed.'));
-	END IF;
-
-	SELECT count(*) INTO v_count FROM v_edit_subcatchment where clength is null;
-	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column clength column.'));
-		v_count=0;
-	ELSE
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (14, v_result_id, 1, concat('INFO: Column clength on subcatchment table have been checked without any values missed.'));
-	END IF;
-
-	SELECT count(*) INTO v_count FROM v_edit_subcatchment where nimp is null;
-	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column nimp column.'));
-		v_count=0;
-	ELSE
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (14, v_result_id, 1, concat('INFO: Column nimp on subcatchment table have been checked without any values missed.'));
-	END IF;
-	
-	SELECT count(*) INTO v_count FROM v_edit_subcatchment where nperv is null;
-	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column nperv column.'));
-		v_count=0;
-	ELSE
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (14, v_result_id, 1, concat('INFO: Column nperv on subcatchment table have been checked without any values missed.'));
-	END IF;
-
-	SELECT count(*) INTO v_count FROM v_edit_subcatchment where simp is null;
-	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column simp column.'));
-		v_count=0;
-	ELSE
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (14, v_result_id, 1, concat('INFO: Column simp on subcatchment table have been checked without any values missed.'));
-	END IF;
-
-	SELECT count(*) INTO v_count FROM v_edit_subcatchment where sperv is null;
-	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column sperv column.'));
-		v_count=0;
-	ELSE
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (14, v_result_id, 1, concat('INFO: Column sperv on subcatchment table have been checked without any values missed.'));
-	END IF;
-	
-	SELECT count(*) INTO v_count FROM v_edit_subcatchment where zero is null;
-	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column zero column.'));
-		v_count=0;
-	ELSE
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (14, v_result_id, 1, concat('INFO: Column zero on subcatchment table have been checked without any values missed.'));
-	END IF;
-
-	SELECT count(*) INTO v_count FROM v_edit_subcatchment where routeto is null;
-	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column routeto column.'));
-		v_count=0;
-	ELSE
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (14, v_result_id, 1, concat('INFO: Column routeto on subcatchment table have been checked without any values missed.'));
-	END IF;
-
-	
-	SELECT count(*) INTO v_count FROM v_edit_subcatchment where rted is null;
-	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column rted column.'));
-		v_count=0;
-	ELSE
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (14, v_result_id, 1, concat('INFO: Column rted on subcatchment table have been checked without any values missed.'));
-	END IF;
-
-	SELECT infiltration INTO v_infiltration FROM cat_hydrology JOIN inp_selector_hydrology
-	ON inp_selector_hydrology.hydrology_id=cat_hydrology.hydrology_id WHERE cur_user=current_user;
-	
-	IF v_infiltration='CURVE_NUMBER' THEN
-	
-		SELECT count(*) INTO v_count FROM v_edit_subcatchment where (curveno is null) 
-		OR (conduct_2 is null) OR (drytime_2 is null);
+	IF v_checkresult THEN
 		
-		IF v_count > 0 THEN
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,	' subcatchment(s) with null values on mandatory columns of curve number infiltartion method (curveno, conduct_2, drytime_2).'));
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 3, concat(' Acording EPA SWMM user''s manual, conduct_2 is deprecated, but anywat need to be informed. Any value is valid because always will be ignored by SWMM.'));
-			v_count=0;
-		ELSE
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 	
-			VALUES (14, v_result_id, 1, concat('INFO: All mandatory columns for ''CURVE_NUMBER'' infiltration method on subcatchment table (curveno, conduct_2, drytime_2) have been checked without any values missed.'));
+		IF v_debug::boolean THEN
+			v_debugmode = (SELECT value(value->>'advanced') FROM config_param_user WHERE parameter = 'inp_options_settings' AND cur_user=current_user);
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Debug mode: ', v_debugmode));
 		END IF;
-	
-	ELSIF v_infiltration='GREEN_AMPT' THEN
-	
-		SELECT count(*) INTO v_count FROM v_edit_subcatchment where (suction is null) 
-		OR (conduct_ยก is null) OR (initdef is null);
 		
+		
+		RAISE NOTICE '1- Check subcatchments';
+		SELECT count(*) INTO v_count FROM v_edit_subcatchment WHERE outlet_id is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory columns of Green-Apt infiltartion method (suction, conduct, initdef).'));
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column outlet_id column.'));
 			v_count=0;
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 1, concat('INFO: All mandatory columns for ''GREEN_AMPT'' infiltration method on subcatchment table (suction, conduct, initdef) have been checked without any values missed.'));
+			VALUES (14, v_result_id, 1, concat('INFO: Column oulet_id on subcatchment table have been checked without any values missed.'));
 		END IF;
-	
-	
-	ELSIF v_infiltration='HORTON' OR v_infiltration='MODIFIED_HORTON' THEN
-	
-		SELECT count(*) INTO v_count FROM v_edit_subcatchment where (maxrate is null) 
-		OR (minrate is null) OR (decay is null) OR (drytime is null) OR (maxinfil is null);
-		
+
+		SELECT count(*) INTO v_count FROM v_edit_subcatchment where rg_id is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory columns of Horton/Horton modified infiltartion method (maxrate, minrate, decay, drytime, maxinfil).'));
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column rg_id column.'));
 			v_count=0;
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (14, v_result_id, 1, concat('INFO: All mandatory columns for ''MODIFIED_HORTON'' infiltration method on subcatchment table (maxrate, minrate, decay, drytime, maxinfil) have been checked without any values missed.'));
+			VALUES (14, v_result_id, 1, concat('INFO: Column rg_id on subcatchment table have been checked without any values missed.'));
+		END IF;
+
+		SELECT count(*) INTO v_count FROM v_edit_subcatchment where area is null;
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column area column.'));
+			v_count=0;
+		ELSE
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 1, concat('INFO: Column area on subcatchment table have been checked without any values missed.'));
+		END IF;
+
+		SELECT count(*) INTO v_count FROM v_edit_subcatchment where width is null;
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column width column.'));
+			v_count=0;
+		ELSE
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 1, concat('INFO: Column width on subcatchment table have been checked without any values missed.'));
 		END IF;
 		
+		SELECT count(*) INTO v_count FROM v_edit_subcatchment where slope is null;
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column slope column.'));
+			v_count=0;
+		ELSE
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 1, concat('INFO: Column slope on subcatchment table have been checked without any values missed.'));
+		END IF;
+
+		SELECT count(*) INTO v_count FROM v_edit_subcatchment where clength is null;
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column clength column.'));
+			v_count=0;
+		ELSE
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 1, concat('INFO: Column clength on subcatchment table have been checked without any values missed.'));
+		END IF;
+
+		SELECT count(*) INTO v_count FROM v_edit_subcatchment where nimp is null;
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column nimp column.'));
+			v_count=0;
+		ELSE
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 1, concat('INFO: Column nimp on subcatchment table have been checked without any values missed.'));
+		END IF;
+		
+		SELECT count(*) INTO v_count FROM v_edit_subcatchment where nperv is null;
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column nperv column.'));
+			v_count=0;
+		ELSE
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 1, concat('INFO: Column nperv on subcatchment table have been checked without any values missed.'));
+		END IF;
+
+		SELECT count(*) INTO v_count FROM v_edit_subcatchment where simp is null;
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column simp column.'));
+			v_count=0;
+		ELSE
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 1, concat('INFO: Column simp on subcatchment table have been checked without any values missed.'));
+		END IF;
+
+		SELECT count(*) INTO v_count FROM v_edit_subcatchment where sperv is null;
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column sperv column.'));
+			v_count=0;
+		ELSE
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 1, concat('INFO: Column sperv on subcatchment table have been checked without any values missed.'));
+		END IF;
+		
+		SELECT count(*) INTO v_count FROM v_edit_subcatchment where zero is null;
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column zero column.'));
+			v_count=0;
+		ELSE
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 1, concat('INFO: Column zero on subcatchment table have been checked without any values missed.'));
+		END IF;
+
+		SELECT count(*) INTO v_count FROM v_edit_subcatchment where routeto is null;
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column routeto column.'));
+			v_count=0;
+		ELSE
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 1, concat('INFO: Column routeto on subcatchment table have been checked without any values missed.'));
+		END IF;
+
+		
+		SELECT count(*) INTO v_count FROM v_edit_subcatchment where rted is null;
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column rted column.'));
+			v_count=0;
+		ELSE
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (14, v_result_id, 1, concat('INFO: Column rted on subcatchment table have been checked without any values missed.'));
+		END IF;
+
+		SELECT infiltration INTO v_infiltration FROM cat_hydrology JOIN inp_selector_hydrology
+		ON inp_selector_hydrology.hydrology_id=cat_hydrology.hydrology_id WHERE cur_user=current_user;
+		
+		IF v_infiltration='CURVE_NUMBER' THEN
+		
+			SELECT count(*) INTO v_count FROM v_edit_subcatchment where (curveno is null) 
+			OR (conduct_2 is null) OR (drytime_2 is null);
+			
+			IF v_count > 0 THEN
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+				VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,	' subcatchment(s) with null values on mandatory columns of curve number infiltartion method (curveno, conduct_2, drytime_2).'));
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+				VALUES (14, v_result_id, 3, concat(' Acording EPA SWMM user''s manual, conduct_2 is deprecated, but anywat need to be informed. Any value is valid because always will be ignored by SWMM.'));
+				v_count=0;
+			ELSE
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 	
+				VALUES (14, v_result_id, 1, concat('INFO: All mandatory columns for ''CURVE_NUMBER'' infiltration method on subcatchment table (curveno, conduct_2, drytime_2) have been checked without any values missed.'));
+			END IF;
+		
+		ELSIF v_infiltration='GREEN_AMPT' THEN
+		
+			SELECT count(*) INTO v_count FROM v_edit_subcatchment where (suction is null) 
+			OR (conduct_ยก is null) OR (initdef is null);
+			
+			IF v_count > 0 THEN
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+				VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory columns of Green-Apt infiltartion method (suction, conduct, initdef).'));
+				v_count=0;
+			ELSE
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+				VALUES (14, v_result_id, 1, concat('INFO: All mandatory columns for ''GREEN_AMPT'' infiltration method on subcatchment table (suction, conduct, initdef) have been checked without any values missed.'));
+			END IF;
+		
+		
+		ELSIF v_infiltration='HORTON' OR v_infiltration='MODIFIED_HORTON' THEN
+		
+			SELECT count(*) INTO v_count FROM v_edit_subcatchment where (maxrate is null) 
+			OR (minrate is null) OR (decay is null) OR (drytime is null) OR (maxinfil is null);
+			
+			IF v_count > 0 THEN
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+				VALUES (14, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory columns of Horton/Horton modified infiltartion method (maxrate, minrate, decay, drytime, maxinfil).'));
+				v_count=0;
+			ELSE
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+				VALUES (14, v_result_id, 1, concat('INFO: All mandatory columns for ''MODIFIED_HORTON'' infiltration method on subcatchment table (maxrate, minrate, decay, drytime, maxinfil) have been checked without any values missed.'));
+			END IF;
+			
+		END IF;
+	
 	END IF;
 	
 	-- insert spacers for log
@@ -371,10 +380,10 @@ BEGIN
 			'}'||
 		'}')::json;
 
-	--  Exception handling
-	--EXCEPTION WHEN OTHERS THEN
-	--GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	--RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$
