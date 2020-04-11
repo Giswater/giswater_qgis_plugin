@@ -20,7 +20,7 @@ SELECT * from SCHEMA_NAME.arc where arc_id='2205'
 
 TO EXECUTE
 -- for any exploitation you want
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_mincutzones('{"data":{"parameters":{"exploitation": "[1]"}}}');
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_mincutzones('{"data":{"parameters":{"exploitation": "[1]", "checkData":true}}}');
 
 29 & 49 fprocesscat are relationed
 29 it is one row for mincut to resume data for each minsector
@@ -36,22 +36,22 @@ TO SEE RESULTS ON SYSTEM TABLES (IN CASE OF "upsertAttributes":"TRUE")
 */
 
 DECLARE
-v_count1 		integer = 0;
-v_expl 			json;
-v_data 			json;
-v_arc 			text;
-v_result_info 		json;
-v_result_point		json;
-v_result_line 		json;
-v_result_polygon	json;
-v_result 		text;
-v_count			integer;
-v_version		text;
-v_fprocesscat_id	integer = 29;
-v_input			json;
-v_count2		integer;
+v_count1 integer = 0;
+v_expl json;
+v_data json;
+v_arc text;
+v_result_info json;
+v_result_point json;
+v_result_line json;
+v_result_polygon json;
+v_result text;
+v_count	integer;
+v_version text;
+v_fprocesscat_id integer = 29;
+v_input	json;
+v_count2 integer;
 v_error_context text;
-
+v_checkdata boolean;
 
 BEGIN
 	-- Search path
@@ -59,13 +59,16 @@ BEGIN
 
 	-- get variables
 	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
+	v_checkdata = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'checkData');
 
 	-- select config values
 	SELECT giswater INTO v_version FROM version order by 1 desc limit 1;
 
 	-- data quality analysis
-	v_input = '{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}'::json;
-	PERFORM gw_fct_om_check_data(v_input);
+	IF v_checkdata THEN
+		v_input = '{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}'::json;
+		PERFORM gw_fct_om_check_data(v_input);
+	END IF;
 
 	-- check criticity of data in order to continue or not
 	SELECT count(*) INTO v_count FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=25 AND criticity=3;

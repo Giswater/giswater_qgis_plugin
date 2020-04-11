@@ -303,7 +303,7 @@ BEGIN
 				"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{}}$$)';
 				-- insert results 
 				INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) 
-				SELECT 101, criticity, replace(error_message,':', ' (DB EPA):') FROM audit_check_data 
+				SELECT 101, criticity, replace(error_message,':', ' (DB PLAN):') FROM audit_check_data 
 				WHERE fprocesscat_id=15 AND criticity < 4 AND error_message !='' AND user_name=current_user OFFSET 6;				
 		END IF;
 

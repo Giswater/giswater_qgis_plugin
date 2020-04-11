@@ -13,9 +13,7 @@ RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_pg2epa($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{},"data":{"geometryLog":false, "resultId":"v41", "useNetworkGeom":"false"}}$$)
+SELECT SCHEMA_NAME.gw_fct_pg2epa($${"data":{ "resultId":"r1", "useNetworkGeom":"false"}}$$)
 */
 
 DECLARE
@@ -62,10 +60,6 @@ BEGIN
 	-- get advanced parameters (settings)
 	v_advancedsettings = (SELECT (value::json->>'avanced')::json->>'status' FROM config_param_user WHERE parameter='inp_options_settings' AND cur_user=current_user)::boolean;
 
-	-- upsert on node rpt_inp result manager table
-	DELETE FROM inp_selector_result WHERE cur_user=current_user;
-	INSERT INTO inp_selector_result (result_id, cur_user) VALUES (v_result, current_user);
-
 	-- delete audit table
 	DELETE FROM audit_check_data WHERE fprocesscat_id = 127 AND user_name=current_user;
 	
@@ -108,10 +102,12 @@ BEGIN
 			PERFORM gw_fct_pg2epa_check_data(v_input);
 		END IF;
 			
-		RAISE NOTICE '2 - Upsert on rpt_cat_table';
+		RAISE NOTICE '2 - Upsert on rpt_cat_table and set selectors';
 		DELETE FROM rpt_cat_result WHERE result_id=v_result;
 		INSERT INTO rpt_cat_result (result_id, inpoptions) VALUES (v_result, v_inpoptions);
-		
+		DELETE FROM inp_selector_result WHERE cur_user=current_user;
+		INSERT INTO inp_selector_result (result_id, cur_user) VALUES (v_result, current_user);
+
 		RAISE NOTICE '3 - Fill inprpt tables';
 		PERFORM gw_fct_pg2epa_fill_data(v_result);
 

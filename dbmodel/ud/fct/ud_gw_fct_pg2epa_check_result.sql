@@ -61,17 +61,17 @@ v_qmlpointpath text = '';
 v_qmllinepath text = '';
 v_qmlpolpath text = '';
 v_doublen2a integer;
-v_advancedsettings text;
-v_advancedsettingsval text;
 v_curvedefault text;
 v_options json;
 v_error_context text;
-v_defaultvalues text;
-v_debug text;
-v_debugmode boolean;
+
 v_dumpsubc boolean;
 v_hydroscenario text;
 v_checkresult boolean;
+
+v_debug boolean;
+v_debugval text;
+
 
 BEGIN
 
@@ -91,10 +91,13 @@ BEGIN
 	WHERE parameter='inp_options_settings' AND cur_user=current_user)::boolean;
 
 	
-	-- manage no results
-	IF (SELECT result_id FROM rpt_cat_result WHERE result_id=v_result_id) IS NULL THEN	
-		RAISE EXCEPTION 'You need to create a result before';
-	END IF;
+	-- manage no found results
+	IF (SELECT result_id FROM rpt_cat_result WHERE result_id=v_result_id) IS NULL THEN
+		v_result  = (SELECT array_to_json(array_agg(row_to_json(row))) FROM (SELECT 1::integer as id, 'No result found whith this name....' as  message)row);
+		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+		RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"No result found"}, "version":"'||v_version||'"'||
+			',"body":{"form":{}, "data":{"info":'||v_result_info||',"setVisibleLayers":[] }}}')::json;		
+	END IF; 
 		
 	-- init variables
 	v_count=0;
@@ -109,9 +112,11 @@ BEGIN
 
 	-- get user parameters
 	v_hydroscenario = (SELECT hydrology_id FROM inp_selector_hydrology WHERE cur_user = current_user);
-	v_defaultvalues = (SELECT (value::json->>'vdefault')::json->>'text' FROM config_param_user WHERE parameter = 'inp_options_settings' AND cur_user=current_user);
-	v_advancedsettings = (SELECT (value::json->>'advanced')::json->>'text' FROM config_param_user WHERE parameter = 'inp_options_settings' AND cur_user=current_user);
+
+	-- get settings values
 	v_debug = (SELECT (value::json->>'debug')::json->>'status' FROM config_param_user WHERE parameter = 'inp_options_settings' AND cur_user=current_user);
+	v_debugval = (SELECT (value::json->>'debug') FROM config_param_user WHERE parameter = 'inp_options_settings' AND cur_user=current_user);
+	
 
 	-- Header
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('CHECK RESULT WITH CURRENT USER-OPTIONS ACORDING EPA RULES'));
@@ -125,25 +130,21 @@ BEGIN
 
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 1, 'INFO');
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 1, '-------');	
-	
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 0, 'NETWORK ANALYTICS');
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 0, '-------------------------');	
 
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Result id: ', v_result_id));
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Created by: ', current_user, ', on ', to_char(now(),'YYYY-MM-DD HH-MM-SS')));
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Hidrology scenario:', v_hydroscenario));	
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Dump subcatchments: ',v_dumpsubc::text));		
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Default values: ', v_defaultvalues));
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Advanced settings: ', v_advancedsettings));
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Debug: ', v_debug));	
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Default values: ', 'Values from options dialog have been choosed'));
+	
 
 	IF v_checkresult THEN
 		
 		IF v_debug::boolean THEN
-			v_debugmode = (SELECT value(value->>'advanced') FROM config_param_user WHERE parameter = 'inp_options_settings' AND cur_user=current_user);
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Debug mode: ', v_debugmode));
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Debug: ', v_defaultval));
+		ELSE 
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Debug: ', v_debug));
 		END IF;
-		
 		
 		RAISE NOTICE '1- Check subcatchments';
 		SELECT count(*) INTO v_count FROM v_edit_subcatchment WHERE outlet_id is null;

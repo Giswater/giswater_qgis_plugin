@@ -543,5 +543,5 @@ UPDATE config_api_form_fields SET tooltip = 'pol_id - Identificador del polígon
 UPDATE config_api_form_fields SET tooltip = 'name - Nombre específico del elemento' WHERE column_id = 'name' AND tooltip IS NULL AND formtype='feature';
 
 
-
 UPDATE ext_rtc_dma_period SET minc = null, maxc = null, pattern_volume = 10;
+UPDATE v_edit_node SET epa_type = 'NOT DEFINED' WHERE node_id = '1007';

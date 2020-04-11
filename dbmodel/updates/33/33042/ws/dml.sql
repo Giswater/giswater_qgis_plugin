@@ -40,16 +40,10 @@ INSERT INTO audit_cat_param_user (id, formname, descript, sys_role_id, label, is
 vdefault,ismandatory, isdeprecated)
 VALUES 
 ('inp_options_settings', 'hidden_value', 'Additional settings for go2epa', 'role_epa', 'Additional settings for go2epa', true, 'ws', false, false, 'text', 'linetext', 
-'{"vdefault":{"node":{"nullElevBuffer":100, "ceroElevBuffer":100}, 
-			  "pipe":{"diameter":"160","roughness":"avg"}},
-  "advanced": {"status":"false", 
-			   "junction":{"baseDemand":0},
-			   "reservoir":{"addElevation":1}, 
-			   "tank":{"addElevation":1}, 
-			   "valve":{"length":"0.3", "diameter":"100", "minorloss":0.2, "roughness":{"H-W":100, "D-W":0.5, "C-M":0.011}}, 
-			   "pump":{"length":0.3, "diameter":100, "roughness":{"H-W":100, "D-W":0.5, "C-M":0.011}}},
-  "debug":{"onlyExport":false, "setDemand":true, "checkData":true, "checkNetwork":true, "checkResult":true, "onlyIsOperative":true}
- }',
+select '{"vdefault":{"status":false, "node":{"nullElevBuffer":100, "ceroElevBuffer":100}, "pipe":{"diameter":"160","roughness":"avg"}},
+  "advanced": {"status":false, "junction":{"baseDemand":0},  "reservoir":{"addElevation":1},  "tank":{"addElevation":1}, "valve":{"length":"0.3", "diameter":"100", "minorloss":0.2, "roughness":{"H-W":100, "D-W":0.5, "C-M":0.011}},"pump":{"length":0.3, "diameter":100, "roughness":{"H-W":100, "D-W":0.5, "C-M":0.011}}},
+  "debug":{"status":false, "onlyExport":false, "setDemand":true, "checkData":true, "checkNetwork":true, "checkResult":true, "onlyIsOperative":true}}'::json
+  ,
 true, false)
 ON conflict (id) DO NOTHING;
 

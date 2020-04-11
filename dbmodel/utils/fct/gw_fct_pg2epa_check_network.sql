@@ -61,10 +61,13 @@ BEGIN
 	SELECT value INTO v_qmllinepath FROM config_param_user WHERE parameter='qgis_qml_linelayer_path' AND cur_user=current_user;
 	SELECT value INTO v_qmlpointpath FROM config_param_user WHERE parameter='qgis_qml_pointlayer_path' AND cur_user=current_user;
 	
-	-- manage no results
-	IF (SELECT result_id FROM rpt_cat_result LIMIT 1) IS NULL THEN	
-		RAISE EXCEPTION 'You need to create a result before';
-	END IF;
+	-- manage no found results
+	IF (SELECT result_id FROM rpt_cat_result WHERE result_id=v_result_id) IS NULL THEN
+		v_result  = (SELECT array_to_json(array_agg(row_to_json(row))) FROM (SELECT 1::integer as id, 'No result found whith this name....' as  message)row);
+		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+		RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"No result found"}, "version":"'||v_version||'"'||
+			',"body":{"form":{}, "data":{"info":'||v_result_info||',"setVisibleLayers":[] }}}')::json;		
+	END IF; 
 	
 	-- elements
 	IF v_project_type  = 'WS' THEN
@@ -111,11 +114,11 @@ BEGIN
 		EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) 
 		SELECT 128, node_id, nodecat_id, ''Orphan node'', the_geom FROM ', v_querytext);
 		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-		VALUES (v_fprocesscat_id, 3, concat('ERROR: For this result there is/are ',v_count,
-		' node''s orphan. Some inconsistency may have been generated because state_type.'));
+		VALUES (v_fprocesscat_id, 3, concat('ERROR: There is/are ',v_count,
+		' node''s orphan on this result. Some inconsistency may have been generated because state_type.'));
 	ELSE
 		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-		VALUES (v_fprocesscat_id, 1, 'INFO: For this result no node(s) orphan found.');
+		VALUES (v_fprocesscat_id, 1, 'INFO: No node(s) orphan found on this result.');
 	END IF;
 
 	
@@ -136,11 +139,11 @@ BEGIN
 	IF v_count > 0 THEN
 		EXECUTE 'INSERT INTO anl_arc (fprocesscat_id, arc_id, arccat_id, state, expl_id, the_geom, result_id, descript)'||v_querytext;
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (v_fprocesscat_id, v_result_id, 3, concat('ERROR: Fort this result there is/are ',v_count,
-		' arc(s) without start/end nodes. Some inconsistency may have been generated because state_type.'));
+		VALUES (v_fprocesscat_id, v_result_id, 3, concat('ERROR: There is/are ',v_count,
+		' arc(s) without start/end nodes on this result. Some inconsistency may have been generated because state_type.'));
 	ELSE
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (v_fprocesscat_id, v_result_id, 1,'INFO: For this result there is/are no arcs without start/end nodes.');
+		VALUES (v_fprocesscat_id, v_result_id, 1,'INFO: There is/are no arcs without start/end nodes on this result.');
 	END IF;
 	
 
@@ -202,7 +205,7 @@ BEGIN
 		VALUES (v_fprocesscat_id, v_result_id, 3, concat('ERROR: There is/are ',v_count,' arc(s) totally disconnected from any ', v_boundaryelem));
 	ELSE
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (v_fprocesscat_id, v_result_id, 1, concat('INFO: No arcs founded disconected from any ', v_boundaryelem));
+		VALUES (v_fprocesscat_id, v_result_id, 1, concat('INFO: No features (arcs and nodes) disconnected found on this result from any ', v_boundaryelem));
 	END IF;
 
 
@@ -255,16 +258,17 @@ BEGIN
 		concat('Data analysis for node elevation. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));	
 	END IF;
 	
+
 	-- insert spacers on log	
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (39, v_result_id, 4, '');	
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (39, v_result_id, 3, '');	
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (39, v_result_id, 2, '');	
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (39, v_result_id, 1, '');	
-	
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (39, v_result_id, 1, '');
+
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id = v_fprocesscat_id order by id) row; 
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id = v_fprocesscat_id order by criticity desc, id asc) row; 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 

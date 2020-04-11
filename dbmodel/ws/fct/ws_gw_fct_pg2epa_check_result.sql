@@ -12,8 +12,8 @@ $BODY$
 
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"gw_check_project","fprocesscatId":127}}}$$) when is called from go2epa_main from toolbox
-SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"gw_check_project"}}}$$) -- when is called from toolbox
+SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"gw_check_project","fprocesscatId":127}}}$$) --when is called from go2epa_main from toolbox
+SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"r1"}}}$$) -- when is called from toolbox
 
 */
 
@@ -62,16 +62,21 @@ v_qmlpointpath text = '';
 v_qmllinepath text = '';
 v_qmlpolpath text = '';
 v_doublen2a integer;
-v_advancedsettings text;
-v_advancedsettingsval text;
 v_curvedefault text;
 v_options json;
 v_error_context text;
-v_defaultvalues text;
-v_debug text;
+
+v_default boolean;
+v_defaultval text;
+v_debug boolean;
+v_debugval text;
+v_advanced boolean;
+v_advancedval text;
+
 v_values text;
-v_debugmode boolean;
 v_checkresult boolean;
+v_count2 integer;
+
 
 BEGIN
 
@@ -89,11 +94,14 @@ BEGIN
 	v_checkresult = (SELECT (value::json->>'debug')::json->>'checkResult' FROM config_param_user 
 	WHERE parameter='inp_options_settings' AND cur_user=current_user)::boolean;
 
-	-- manage no results
-	IF (SELECT result_id FROM rpt_cat_result WHERE result_id=v_result_id) IS NULL THEN	
-		RAISE EXCEPTION 'You need to create a result before';
-	END IF;
-		
+	-- manage no found results
+	IF (SELECT result_id FROM rpt_cat_result WHERE result_id=v_result_id) IS NULL THEN
+		v_result  = (SELECT array_to_json(array_agg(row_to_json(row))) FROM (SELECT 1::integer as id, 'No result found whith this name....' as  message)row);
+		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+		RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"No result found"}, "version":"'||v_version||'"'||
+			',"body":{"form":{}, "data":{"info":'||v_result_info||',"setVisibleLayers":[] }}}')::json;		
+	END IF; 
+			
 	-- init variables
 	v_count=0;
 	IF v_fprocesscat_id is null THEN
@@ -121,9 +129,6 @@ BEGIN
 	SELECT value INTO v_networkmode FROM config_param_user WHERE parameter = 'inp_options_networkmode' AND cur_user=current_user;
 	SELECT value INTO v_qualitymode FROM config_param_user WHERE parameter = 'inp_options_quality_mode' AND cur_user=current_user;
 	SELECT value INTO v_buildupmode FROM config_param_user WHERE parameter = 'inp_options_buildup_mode' AND cur_user=current_user;
-	SELECT value INTO v_advancedsettings FROM config_param_user WHERE parameter = 'inp_options_advancedsettings' AND cur_user=current_user;
-	SELECT value::json->>'debug' INTO v_debug FROM config_param_user WHERE parameter = 'inp_options_advancedsettings' AND cur_user=current_user;
-
 	
 	SELECT idval INTO v_demandtypeval FROM inp_typevalue WHERE id=v_demandtype::text AND typevalue ='inp_value_demandtype';
 	SELECT idval INTO v_valvemodeval FROM inp_typevalue WHERE id=v_valvemode::text AND typevalue ='inp_value_opti_valvemode';
@@ -131,11 +136,23 @@ BEGIN
 	SELECT idval INTO v_networkmodeval FROM inp_typevalue WHERE id=v_networkmode::text AND typevalue ='inp_options_networkmode';
 	SELECT idval INTO v_qualmodeval FROM inp_typevalue WHERE id=v_qualitymode::text AND typevalue ='inp_value_opti_qual';
 	SELECT idval INTO v_buildmodeval FROM inp_typevalue WHERE id=v_buildupmode::text AND typevalue ='inp_options_buildup_mode';
-	
-	v_defaultvalues = (SELECT (value::json->>'vdefault') FROM config_param_user WHERE parameter = 'inp_options_settings' AND cur_user=current_user);
-	v_advancedsettings = (SELECT (value::json->>'advanced') FROM config_param_user WHERE parameter = 'inp_options_settings' AND cur_user=current_user);
+
+	-- get buildup mode parameters
+	IF v_buildupmode = 1 THEN
+		v_values = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user);
+	ELSIF v_buildupmode = 2 THEN
+		v_values = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_buildup_transport' AND cur_user=current_user);
+	END IF;
+
+	-- get settings values
+	v_default = (SELECT (value::json->>'vdefault')::json->>'status' FROM config_param_user WHERE parameter = 'inp_options_settings' AND cur_user=current_user);
+	v_advanced = (SELECT (value::json->>'advanced')::json->>'status' FROM config_param_user WHERE parameter = 'inp_options_settings' AND cur_user=current_user);
 	v_debug = (SELECT (value::json->>'debug')::json->>'status' FROM config_param_user WHERE parameter = 'inp_options_settings' AND cur_user=current_user);
-	
+
+	v_defaultval = (SELECT (value::json->>'vdefault') FROM config_param_user WHERE parameter = 'inp_options_settings' AND cur_user=current_user);
+	v_advancedval = (SELECT (value::json->>'advanced') FROM config_param_user WHERE parameter = 'inp_options_settings' AND cur_user=current_user);
+	v_debugval = (SELECT (value::json->>'debug') FROM config_param_user WHERE parameter = 'inp_options_settings' AND cur_user=current_user);
+
 	-- Header
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('CHECK RESULT WITH CURRENT USER-OPTIONS ACORDING EPA RULES'));
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, '---------------------------------------------------------------------------------');
@@ -148,10 +165,7 @@ BEGIN
 
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 1, 'INFO');
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 1, '-------');	
-	
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 0, 'NETWORK ANALYTICS');
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 0, '-------------------------');	
-	
+		
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Result id: ', v_result_id));
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Created by: ', current_user, ', on ', to_char(now(),'YYYY-MM-DD HH-MM-SS')));
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Network export mode: ', v_networkmodeval));
@@ -160,22 +174,27 @@ BEGIN
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Valve mode: ', v_valvemodeval));	
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Quality mode: ', v_qualmodeval));
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Number of pumps as Double-n2a: ', v_doublen2a));		
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Buildup mode: ', v_buildmodeval));
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Default values: ', v_defaultvalues));
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Advanced settings: ', v_advancedsettings));
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Debug: ', v_debug));	
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Buildup mode: ', v_buildmodeval, '. Parameters:', v_values));
 
 	IF v_checkresult THEN
 	
-		IF v_buildupmode = 1 THEN
-			v_values = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user);
+		IF v_default::boolean THEN
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Default values: ', v_defaultval));
+		ELSE 
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Default values: ', v_default));
+		END IF;
+
+		IF v_advanced::boolean THEN
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Advanced settings: ', v_advancedval));
+		ELSE 
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Advanced settings: ', v_advanced));
 		END IF;
 
 		IF v_debug::boolean THEN
-			v_debugmode = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_settings' AND cur_user=current_user);
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Debug mode: ', v_debugmode));
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Debug: ', v_defaultval));
+		ELSE 
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Debug: ', v_debug));
 		END IF;
-
 
 		RAISE NOTICE '1 - Check pumps with 3-point curves (because of bug of EPANET this kind of curves are forbidden on the exportation)';
 		SELECT count(*) INTO v_count FROM (select curve_id, count(*) as ct from (select * from inp_curve join (select distinct curve_id FROM vi_curves JOIN v_edit_inp_pump 
@@ -408,7 +427,7 @@ BEGIN
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 3, '');	
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 2, '');	
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 1, '');	
-
+	
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
