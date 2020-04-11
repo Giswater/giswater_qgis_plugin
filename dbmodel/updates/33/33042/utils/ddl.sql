@@ -20,4 +20,7 @@ CREATE INDEX rpt_inp_node_nodeparent ON rpt_inp_node USING btree (nodeparent);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_node", "column":"state_type", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_node", "column":"sector_id", "dataType":"integer"}}$$);
 
-
+DROP FUNCTION IF EXISTS gw_fct_pg2epa_nodescouplecapacity(json);
+DROP FUNCTION IF EXISTS gw_fct_pg2epa_singlenodecapacity(json);
+DROP FUNCTION IF EXISTS gw_fct_module_activate(text);
+DROP FUNCTION IF EXISTS gw_fct_node_replace(character varying, character varying, date, boolean);
