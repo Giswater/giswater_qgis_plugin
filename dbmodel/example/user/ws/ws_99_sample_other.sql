@@ -544,4 +544,4 @@ UPDATE config_api_form_fields SET tooltip = 'name - Nombre específico del eleme
 
 
 
-UPDATE ext_rtc_dma_period SET min = null, max = null, pattern_volume = 10;
+UPDATE ext_rtc_dma_period SET minc = null, maxc = null, pattern_volume = 10;

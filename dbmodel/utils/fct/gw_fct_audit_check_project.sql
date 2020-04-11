@@ -294,7 +294,7 @@ BEGIN
 				-- insert results 
 				INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) 
 				SELECT 101, criticity, replace(error_message,':', ' (DB EPA):') FROM audit_check_data 
-				WHERE fprocesscat_id=125 AND criticity < 4 AND error_message !='' AND user_name=current_user OFFSET 6		
+				WHERE fprocesscat_id=125 AND criticity < 4 AND error_message !='' AND user_name=current_user OFFSET 6;		
 		END IF;
 
 		IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
@@ -304,7 +304,7 @@ BEGIN
 				-- insert results 
 				INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) 
 				SELECT 101, criticity, replace(error_message,':', ' (DB EPA):') FROM audit_check_data 
-				WHERE fprocesscat_id=15 AND criticity < 4 AND error_message !='' AND user_name=current_user OFFSET 6					
+				WHERE fprocesscat_id=15 AND criticity < 4 AND error_message !='' AND user_name=current_user OFFSET 6;				
 		END IF;
 
 		IF 'role_admin' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
@@ -525,9 +525,9 @@ BEGIN
 		
 	--  Return	   
 	RETURN v_return;
-
---  Exception handling
-    EXCEPTION WHEN OTHERS THEN
+	
+	--  Exception handling
+	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;  
 	RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_error_context) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 	  
