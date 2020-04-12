@@ -308,8 +308,8 @@ INSERT INTO cat_presszone VALUES ('6', 'pzone2-2d', 2,  NULL, NULL, '{"use":[{"n
 
 delete from dma;
 INSERT INTO dma VALUES (1, 'dma1-1d', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,'{"use":[{"nodeParent":"113766", "toArc":[113906]}], "ignore":[]}');
-INSERT INTO dma VALUES (2, 'dma1-2d', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,'{"use":[{"nodeParent":"1080", "toArc":[2092]}], "ignore":[]}');
-INSERT INTO dma VALUES (3, 'dma2-1d', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,'{"use":[{"nodeParent":"113952", "toArc":[114146]}], "ignore":[]}');
+INSERT INTO dma VALUES (2, 'dma1-2d', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'dma02_estimated', NULL,'{"use":[{"nodeParent":"1080", "toArc":[2092]}], "ignore":[]}');
+INSERT INTO dma VALUES (3, 'dma2-1d', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'dma03_estimated', NULL,'{"use":[{"nodeParent":"113952", "toArc":[114146]}], "ignore":[]}');
 INSERT INTO dma VALUES (4, 'source-1', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,'{"use":[{"nodeParent":"1101", "toArc":[2205]},{"nodeParent":"1097", "toArc":[2207]}], "ignore":[]}');
 INSERT INTO dma VALUES (5, 'source-2', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,'{"use":[{"nodeParent":"111111", "toArc":[114025]}], "ignore":[]}');
 
@@ -438,9 +438,6 @@ UPDATE config_api_form_fields SET label = 'Presszone' WHERE column_id = 'presszo
 update config_api_form_fields SET layout_order = 3 where column_id='state' and formname like '%ve_connec_%';
 update config_api_form_fields SET layout_order = 4 where column_id='state_type' and formname like '%ve_connec_%';
 
--- reconnect planned connecs
-SELECT gw_fct_connect_to_network($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{"id":"[114462, 114461]"}, "data":{"filterFields":{}, "pageInfo":{}, "feature_type":"CONNEC"}}$$);
-
 UPDATE node_type set isprofilesurface = true;
 
 --refactor of forms
@@ -543,5 +540,41 @@ UPDATE config_api_form_fields SET tooltip = 'pol_id - Identificador del polígon
 UPDATE config_api_form_fields SET tooltip = 'name - Nombre específico del elemento' WHERE column_id = 'name' AND tooltip IS NULL AND formtype='feature';
 
 
-UPDATE ext_rtc_dma_period SET minc = null, maxc = null, pattern_volume = 10;
+UPDATE ext_rtc_dma_period SET minc = null, maxc = null, pattern_volume = 32;
 UPDATE v_edit_node SET epa_type = 'NOT DEFINED' WHERE node_id = '1007';
+
+-- reconnect connecs
+DELETE FROM selector_psector;
+
+-- deprecated on psector 1 and 2
+SELECT gw_fct_connect_to_network($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{"id":"[3104, 3103]"}, "data":{"filterFields":{}, "pageInfo":{}, "feature_type":"CONNEC"}}$$);
+
+INSERT INTO selector_psector (psector_id, cur_user) VALUES (1, current_user);
+INSERT INTO selector_psector (psector_id, cur_user) VALUES (2, current_user);
+
+-- planned on psector 1 and 2
+SELECT gw_fct_connect_to_network($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{"id":"[114463, 114462, 114461]"}, "data":{"filterFields":{}, "pageInfo":{}, "feature_type":"CONNEC"}}$$);
+
+-- update demands and patterns for connec
+UPDATE inp_connec SET pattern_id = 'pattern_01', demand = demand*0.5 FROM (SELECT * FROM connec LIMIT 100 OFFSET 0) a WHERE a.connec_id = inp_connec.connec_id;
+UPDATE inp_connec SET pattern_id = 'pattern_02', demand = demand*0.3 FROM (SELECT * FROM connec LIMIT 100 OFFSET 100) a WHERE a.connec_id = inp_connec.connec_id;
+UPDATE inp_connec SET pattern_id = 'pattern_03', demand = demand*0.25 FROM (SELECT * FROM connec LIMIT 100 OFFSET 200) a WHERE a.connec_id = inp_connec.connec_id;
+UPDATE inp_connec SET pattern_id = 'pattern_01', demand = demand*0.5 FROM (SELECT * FROM connec LIMIT 300 OFFSET 300) a WHERE a.connec_id = inp_connec.connec_id;
+
+
+-- update patterns
+UPDATE inp_pattern_value set factor_1 = factor_1/41.71,factor_2 = factor_2/41.71,factor_3 = factor_3/41.71,factor_4 = factor_4/41.71,
+factor_5 = factor_5/41.71,factor_6 = factor_6/41.71,factor_7 = factor_7/41.71,factor_8 = factor_8/41.71,
+factor_9 = factor_9/41.71,factor_10 = factor_10/41.71,factor_11 = factor_11/41.71,factor_12 = factor_12/41.71-0.02 
+where pattern_id = 'dma02_period05';
+
+UPDATE inp_pattern_value set factor_1 = factor_1/42.97,factor_2 = factor_2/42.97,factor_3 = factor_3/42.97,factor_4 = factor_4/42.97,
+factor_5 = factor_5/42.97,factor_6 = factor_6/42.97,factor_7 = factor_7/42.97,factor_8 = factor_8/42.97,
+factor_9 = factor_9/42.97,factor_10 = factor_10/42.97,factor_11 = factor_11/42.97,factor_12 = factor_12/42.97+0.01 
+where pattern_id = 'dma02_period06';
+
+UPDATE inp_pattern_value set factor_1 = factor_1/42.4849,factor_2 = factor_2/42.4849,factor_3 = factor_3/42.4849,factor_4 = factor_4/42.4849,
+factor_5 = factor_5/42.4849,factor_6 = factor_6/42.4849,factor_7 = factor_7/42.4849,factor_8 = factor_8/42.4849,
+factor_9 = factor_9/42.4849,factor_10 = factor_10/42.4849,factor_11 = factor_11/42.4849,factor_12 = factor_12/42.4849 
+where pattern_id = 'dma02_period07';
+

@@ -35,6 +35,7 @@ v_body json;
 v_onlyexport boolean;
 v_checkdata boolean;
 v_checknetwork boolean;
+v_vdefault boolean;
 	
 BEGIN
 
@@ -48,15 +49,16 @@ BEGIN
 	-- get user parameteres
 	v_networkmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user);
 	v_buildupmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_buildup_mode' AND cur_user=current_user);
+	v_advancedsettings = (SELECT (value::json->>'avanced')::json->>'status' FROM config_param_user WHERE parameter='inp_options_settings' AND cur_user=current_user)::boolean;
+	v_vdefault = (SELECT value::json->>'status' FROM config_param_user WHERE parameter='inp_options_vdefault' AND cur_user=current_user);
 
 	-- get debug parameters (settings)
 	v_onlyexport = (SELECT value::json->>'onlyExport' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
-	v_setdemand = (SELECT value::json->>'setDemand' FROM config_param_user WHERE parameter='inp_options_settings' AND cur_user=current_user)::boolean;
-	v_checkdata = (SELECT value::json->>'checkData' FROM config_param_user WHERE parameter='inp_options_settings' AND cur_user=current_user)::boolean;
-	v_checknetwork = (SELECT value::json->>'checkNetwork' FROM config_param_user WHERE parameter='inp_options_settings' AND cur_user=current_user)::boolean;
-	
-	-- get advanced parameters (settings)
-	v_advancedsettings = (SELECT (value::json->>'avanced')::json->>'status' FROM config_param_user WHERE parameter='inp_options_settings' AND cur_user=current_user)::boolean;
+	v_setdemand = (SELECT value::json->>'setDemand' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
+	v_checkdata = (SELECT value::json->>'checkData' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
+	v_checknetwork = (SELECT value::json->>'checkNetwork' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
+
+	raise notice ' % % % %', v_onlyexport, v_setdemand, v_checkdata,v_checknetwork;
 
 	-- delete audit table
 	DELETE FROM audit_check_data WHERE fprocesscat_id = 127 AND user_name=current_user;
@@ -74,7 +76,7 @@ BEGIN
 	
 	-- only export
 	IF v_onlyexport THEN
-		SELECT gw_fct_pg2epa_check_resultoptions(v_input) INTO v_return ;
+		SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return ;
 		SELECT gw_fct_pg2epa_create_inp(v_result, null) INTO v_file;
 		
 		v_body = gw_fct_json_object_set_key((v_return->>'body')::json, 'file', v_file);
@@ -83,8 +85,18 @@ BEGIN
 		'"message":{"priority":1, "text":"Inp export done succesfully"}')::json;
 		RETURN v_return;
 	END IF;
-	
+
+	-- check consistency for user options 
+	SELECT SCHEMA_NAME.gw_fct_pg2epa_check_options(v_input)
+		INTO v_return;
+	IF v_return->>'status' = 'Failed' THEN
+		--v_return = replace(v_return::text, 'Failed', 'Accepted');
+		RETURN v_return;
+	END IF;
+
 	IF v_usenetworkgeom IS TRUE THEN
+
+		-- todo check: consistency againts user options for demands and network topology
 
 		-- delete rpt_* tables keeping rpt_inp_tables
 		DELETE FROM rpt_arc WHERE result_id = v_result;
@@ -148,7 +160,9 @@ BEGIN
 		END IF;
 
 		RAISE NOTICE '10 - Set default values';
-		PERFORM gw_fct_pg2epa_vdefault((concat('{"data":{"geometryLog":false, "resultId":"',v_result,'", "useNetworkGeom":"false"}}'))::json);
+		IF v_vdefault THEN
+			PERFORM gw_fct_pg2epa_vdefault((concat('{"data":{"geometryLog":false, "resultId":"',v_result,'", "useNetworkGeom":"false"}}'))::json);
+		END IF;
 
 		RAISE NOTICE '11 - Set cero on elevation those have null values in spite of previous processes (profilactic issue in order to do not crash the epanet file)';
 		UPDATE rpt_inp_node SET elevation = 0 WHERE elevation IS NULL AND result_id=v_result;

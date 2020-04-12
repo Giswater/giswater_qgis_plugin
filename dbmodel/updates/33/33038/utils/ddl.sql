@@ -9,7 +9,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --mandatory update on ddl to save value of editability, typeahead, reg_exp columns
 UPDATE audit_cat_param_user SET isparent=True, editability='{"trueWhenParentIn":[11]}' WHERE id ='inp_options_pattern';-- (audit_cat_param_user)
-UPDATE audit_cat_param_user SET widgetcontrols = gw_fct_json_object_set_key(widgetcontrols,'comboEnableWhenParent', editability->>'trueWhenParentIn') where editability is not null; --editability (enableWhenParent)
+UPDATE audit_cat_param_user SET widgetcontrols = gw_fct_json_object_set_key(widgetcontrols,'enableWhenParent', editability->>'trueWhenParentIn') where editability is not null; --editability (enableWhenParent)
 UPDATE audit_cat_param_user SET widgetcontrols = gw_fct_json_object_set_key(widgetcontrols,'regexpControl', reg_exp) where reg_exp is not null; --reg_exp
 
 -- drop fields

@@ -129,7 +129,7 @@ dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunctio
 VALUES ('ve_config_sysfields', 'form', 'widgettype', 12, 'text', 'combo', 'Widgettype', NULL, 
 'widgettype - Widget of the field. Must match with the data type. Advanced configuration on widgetcontrols field is possible
 If widgettype=''text'', you can force values using "maxMinValues":{"min": or "max":} or "maxLength" or "regexpControl". In addition you can enable multiline widget using "setQgisMultiline"
-If widgettype=''combo'', you can only make editable combo for specific values of child using comboEnableWhenParent
+If widgettype=''combo'', you can only make editable combo for specific values of child using enableWhenParent
 If widgettype=''typeahead'' additional rules must be followed: id and idval for dv_querytext must be the same in exception of the fields streetaxis(2)_id/ streetname(2)', 
 NULL, TRUE, NULL, TRUE, NULL, 'SELECT id, idval FROM config_api_typevalue WHERE typevalue=''widgettype_typevalue'' AND addparam->>''createAddfield''=''TRUE''', 
 NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, TRUE)
@@ -221,9 +221,9 @@ dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunctio
 VALUES ('ve_config_sysfields', 'form', 'widgetcontrols', 24, 'text', 'text', 'Widget controls', NULL, 
 'widgetcontrols - Advanced options to control the widget.
 If widgettype=''text'', you can force values using "minValue" or "maxValue" or "regexpControl". In addition you can enable multiline widget using "setQgisMultiline"
-If widgettype=''combo'', you can only make editable combo for specific values of child using comboEnableWhenParent
+If widgettype=''combo'', you can only make editable combo for specific values of child using enableWhenParent
 If isautoupdate=true, you can use autoupdateReloadFields to identify fields must be reloaded with updated values',
-'{"setQgisMultiline":true, "maxMinValues":{"min":0.001, "max":100}, "maxLength":16, "autoupdateReloadFields":["a", "b"], "comboEnableWhenParent":["a", "b"], "regexpControl":""}', 
+'{"setQgisMultiline":true, "maxMinValues":{"min":0.001, "max":100}, "maxLength":16, "autoupdateReloadFields":["a", "b"], "enableWhenParent":["a", "b"], "regexpControl":""}', 
 FALSE, NULL, TRUE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, FALSE)
 ON CONFLICT (formname, formtype, column_id) DO NOTHING;
 

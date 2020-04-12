@@ -50,4 +50,6 @@ descript ='This function analyze network topology for specific result. Nodes orp
 alias = 'Check network topology for specific result'
 WHERE function_name = 'gw_fct_pg2epa_check_network';
 
-DELETE FROM audit_cat_param_user WHERE id IN ('inp_options_rtc_coefficient', 'inp_options_rtc_period_id');
+INSERT INTO audit_cat_function VALUES (2850, 'gw_fct_pg2epa_check_options', 'utils', 'Check consistency options for epa result', NULL, NULL, NULL, 'Check consistency options for epa result', 'role_epa', false) 
+ON CONFLICT (id) DO NOTHING;
+

@@ -23,8 +23,6 @@ v_record record;
 v_project_type text;
 v_count	integer;
 v_count_2 integer;
-v_infiltration text;
-v_scenario text;
 v_min_node2arc float;
 v_saveondatabase boolean;
 v_result text;
@@ -76,8 +74,7 @@ v_advancedval text;
 v_values text;
 v_checkresult boolean;
 v_count2 integer;
-v_period_type integer;
-
+v_periodtype integer;
 
 BEGIN
 
@@ -155,17 +152,17 @@ BEGIN
 	v_debugval = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_debug' AND cur_user=current_user);
 
 	-- Header
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('CHECK RESULT WITH CURRENT USER-OPTIONS ACORDING EPA RULES'));
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, '---------------------------------------------------------------------------------');
+	INSERT INTO audit_check_data (id, fprocesscat_id, result_id, criticity, error_message) VALUES (-8, v_fprocesscat_id, v_result_id, 4, concat('CHECK RESULT WITH CURRENT USER-OPTIONS ACORDING EPA RULES'));
+	INSERT INTO audit_check_data (id, fprocesscat_id, result_id, criticity, error_message) VALUES (-7, v_fprocesscat_id, v_result_id, 4, '---------------------------------------------------------------------------------');
 
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 3, 'CRITICAL ERRORS');	
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 3, '----------------------');	
+	INSERT INTO audit_check_data (id, fprocesscat_id, result_id, criticity, error_message) VALUES (-6, v_fprocesscat_id, v_result_id, 3, 'CRITICAL ERRORS');	
+	INSERT INTO audit_check_data (id, fprocesscat_id, result_id, criticity, error_message) VALUES (-5, v_fprocesscat_id, v_result_id, 3, '----------------------');	
 
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 2, 'WARNINGS');	
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 2, '--------------');	
+	INSERT INTO audit_check_data (id, fprocesscat_id, result_id, criticity, error_message) VALUES (-4, v_fprocesscat_id, v_result_id, 2, 'WARNINGS');	
+	INSERT INTO audit_check_data (id, fprocesscat_id, result_id, criticity, error_message) VALUES (-3, v_fprocesscat_id, v_result_id, 2, '--------------');	
 
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 1, 'INFO');
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 1, '-------');	
+	INSERT INTO audit_check_data (id, fprocesscat_id, result_id, criticity, error_message) VALUES (-2, v_fprocesscat_id, v_result_id, 1, 'INFO');
+	INSERT INTO audit_check_data (id, fprocesscat_id, result_id, criticity, error_message) VALUES (-1, v_fprocesscat_id, v_result_id, 1, '-------');	
 		
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Result id: ', v_result_id));
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Created by: ', current_user, ', on ', to_char(now(),'YYYY-MM-DD HH-MM-SS')));
@@ -195,7 +192,8 @@ BEGIN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Debug: ', v_defaultval));
 		END IF;
 
-		RAISE NOTICE '1 - Check pumps with 3-point curves (because of bug of EPANET this kind of curves are forbidden on the exportation)';
+
+		RAISE NOTICE '2 - Check pumps with 3-point curves (because of bug of EPANET this kind of curves are forbidden on the exportation)';
 		SELECT count(*) INTO v_count FROM (select curve_id, count(*) as ct from (select * from inp_curve join (select distinct curve_id FROM vi_curves JOIN v_edit_inp_pump 
 				USING (curve_id))a using (curve_id)) b group by curve_id having count(*)=3)c;
 		IF v_count > 0 THEN
@@ -270,7 +268,6 @@ BEGIN
 			END IF;
 		END IF;
 			
-
 		RAISE NOTICE '5 - Check for network mode';
 		IF v_networkmode = 3 OR v_networkmode = 4 THEN
 
@@ -287,7 +284,6 @@ BEGIN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 				VALUES (v_fprocesscat_id, v_result_id, 2, concat('SELECT * FROM anl_node WHERE fprocesscat_id=59 AND cur_user=current_user'));		
 
-				DELETE FROM anl_node WHERE fprocesscat_id=59 and cur_user=current_user;				
 				INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, state, expl_id, the_geom, result_id, descript)
 				SELECT 59, vnode_id, 'VNODE', 1, rpt_inp_arc.expl_id, vnode.the_geom, v_result_id, 'Vnode overlaping nodarcs'  
 				FROM rpt_inp_arc , vnode JOIN v_edit_link a ON vnode_id=exit_id::integer
@@ -298,23 +294,6 @@ BEGIN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 				VALUES (v_fprocesscat_id, v_result_id, 1, 'INFO: Vnodes checked. There is/are not vnodes over nodarcs.');
 			END IF;
-
-			-- check if pattern method is compatible
-			IF v_patternmethod IN (14,15,16,22,33,34,43,44) THEN 
-				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (v_fprocesscat_id, v_result_id, 3, concat('ERROR: The pattern method used, ',v_patternmethodval,' it is incompatible with the export network mode used, ',v_networkmodeval)); 
-				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (v_fprocesscat_id, v_result_id, 3, ' Change the pattern method using some of the (NODE) method avaliable or change export network USING some of NOT TRIMED ARCS method avaliable.');
-			END IF;		
-			
-		ELSE
-			-- check if pattern method is compatible
-			IF v_patternmethod IN (11,12,13,21,31,32,41,42) THEN 
-				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (v_fprocesscat_id, v_result_id, 3, concat('ERROR: The pattern method used, ',v_patternmethodval,' it is incompatible with the export network mode used, ',v_networkmodeval)); 
-				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (v_fprocesscat_id, v_result_id, 3, ' Change the pattern method using some of the (PJOINT) method avaliable or change export network USING some of TRIMED ARCS method avaliable.');
-			END IF;		
 		END IF;
 
 
@@ -450,7 +429,7 @@ BEGIN
 
 			-- check ext_hydrometer_category_x_pattern
 			SELECT distinct(category_id) INTO v_count from ext_hydrometer_category_x_pattern WHERE period_type = v_periodtype;
-			SELECT distinct(category_id) INTO v_count2 from  v_rtc_hydrometer
+			SELECT distinct(category_id) INTO v_count2 from  v_rtc_hydrometer;
 			
 			IF v_count = 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
@@ -499,10 +478,10 @@ BEGIN
 	END IF;
 	
 	-- insert spacers for log
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 4, '');	
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 3, '');	
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 2, '');	
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 1, '');	
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, '');	
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 3, '');	
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 2, '');	
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 1, '');	
 	
 	-- get results
 	-- info

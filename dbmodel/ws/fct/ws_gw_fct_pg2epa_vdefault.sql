@@ -41,10 +41,12 @@ BEGIN
 	v_result = (p_data->>'data')::json->>'resultId';
 
 	-- get user variables
-	v_nullbuffer = (SELECT ((value::json->>'vdefault')::json->>'node')::json->>'nullElevBuffer' FROM config_param_user WHERE parameter='inp_options_settings' AND cur_user=current_user);
-	v_cerobuffer = (SELECT ((value::json->>'vdefault')::json->>'node')::json->>'ceroElevBuffer' FROM config_param_user WHERE parameter='inp_options_settings' AND cur_user=current_user);
-	v_diameter = (SELECT ((value::json->>'vdefault')::json->>'pipe')::json->>'diameter' FROM config_param_user WHERE parameter='inp_options_settings' AND cur_user=current_user);
-	v_statsmethod = (SELECT ((value::json->>'vdefault')::json->>'pipe')::json->>'roughness' FROM config_param_user WHERE parameter='inp_options_settings' AND cur_user=current_user);
+	v_nullbuffer = (SELECT ((value::json->>'parameters')::json->>'node')::json->>'nullElevBuffer' FROM config_param_user WHERE parameter='inp_options_vdefault' AND cur_user=current_user);
+	v_cerobuffer = (SELECT ((value::json->>'parameters')::json->>'node')::json->>'ceroElevBuffer' FROM config_param_user WHERE parameter='inp_options_vdefault' AND cur_user=current_user);
+	v_diameter = (SELECT ((value::json->>'parameters')::json->>'pipe')::json->>'diameter' FROM config_param_user WHERE parameter='inp_options_vdefault' AND cur_user=current_user);
+	v_statsmethod = (SELECT ((value::json->>'parameters')::json->>'pipe')::json->>'roughness' FROM config_param_user WHERE parameter='inp_options_vdefault' AND cur_user=current_user);
+
+	raise notice ' % % % %',v_nullbuffer,v_cerobuffer,v_diameter,v_statsmethod;
 
 	RAISE NOTICE 'setting roughness for null values';
 	EXECUTE 'SELECT '||v_statsmethod||'(roughness) FROM rpt_inp_arc WHERE result_id='||quote_literal(v_result)

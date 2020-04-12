@@ -84,11 +84,11 @@ BEGIN
 
 		
 	RAISE NOTICE '1 - Check orphan nodes (fprocesscat = 7)';
-	v_querytext = '(SELECT node_id, nodecat_id, the_geom FROM (
-			SELECT node_id FROM v_edit_node EXCEPT 
-			(SELECT node_1 as node_id FROM v_edit_arc UNION SELECT node_2 FROM v_edit_arc))a
-			JOIN v_edit_node USING (node_id)
-			JOIN inp_selector_sector USING (sector_id) WHERE cur_user = current_user) b';
+	v_querytext = '(SELECT node_id, nodecat_id, the_geom FROM (SELECT node_id FROM v_edit_node EXCEPT 
+			(SELECT node_1 as node_id FROM v_edit_arc UNION SELECT node_2 FROM v_edit_arc))a JOIN v_edit_node USING (node_id)
+			JOIN inp_selector_sector USING (sector_id) 
+			JOIN value_state_type v ON state_type = v.id
+			WHERE epa_type != ''NOT DEFINED'' and is_operative = true and cur_user = current_user ) b';	
 		
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 	IF v_count > 0 THEN
