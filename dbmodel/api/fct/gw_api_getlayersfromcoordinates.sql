@@ -65,8 +65,8 @@ DECLARE
 BEGIN
 
     
---  Set search path to local schema
-    SET search_path = "SCHEMA_NAME", public;
+	--  Set search path to local schema
+	SET search_path = "SCHEMA_NAME", public;
     schemas_array := current_schemas(FALSE);
 
 --  get api version
@@ -80,19 +80,18 @@ BEGIN
 	v_ycoord := ((p_data ->> 'data')::json->> 'pointClickCoords')::json->>'ycoord';
 	v_visibleLayers := (p_data ->> 'data')::json->> 'visibleLayers';
 	v_zoomScale := (p_data ->> 'data')::json->> 'zoomScale';
-	v_epsg := (p_data ->> 'data')::json->> 'srid';
+	v_epsg := (SELECT epsg FROM version LIMIT 1);
 
 
-
--- Sensibility factor
-    IF v_device=1 OR v_device=2 THEN
+	-- Sensibility factor
+	IF v_device=1 OR v_device=2 THEN
         EXECUTE 'SELECT value::float FROM config_param_system WHERE parameter=''api_sensibility_factor_web'''
 		INTO v_sensibility_f;
 		-- 10 pixels of base sensibility
 		v_sensibility = (v_zoomScale * 10 * v_sensibility_f);
 		v_config_layer='config_web_layer';
 		
-    ELSIF  v_device=3 THEN
+	ELSIF  v_device=3 THEN
         EXECUTE 'SELECT value::float FROM config_param_system WHERE parameter=''api_sensibility_factor_mobile'''
 		INTO v_sensibility_f;     
 		-- 10 pixels of base sensibility

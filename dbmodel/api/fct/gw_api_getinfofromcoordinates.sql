@@ -72,7 +72,7 @@ BEGIN
 	v_device := (p_data ->> 'client')::json->> 'device';
 	v_xcoord := ((p_data ->> 'data')::json->> 'coordinates')::json->>'xcoord';
 	v_ycoord := ((p_data ->> 'data')::json->> 'coordinates')::json->>'ycoord';
-	v_epsg := ((p_data ->> 'data')::json->> 'coordinates')::json->>'epsg';
+	v_epsg := (SELECT epsg FROM version LIMIT 1);
 	v_zoomratio := ((p_data ->> 'data')::json->> 'coordinates')::json->>'zoomRatio';
 	v_toolbar := ((p_data ->> 'data')::json->> 'toolBar');
 	v_role = (p_data ->> 'data')::json->> 'rolePermissions';
