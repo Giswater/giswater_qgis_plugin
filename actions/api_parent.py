@@ -803,10 +803,10 @@ class ApiParent(ParentAction):
 
             self.populate_child(dialog, combo_child)
             if 'widgetcontrols' not in combo_child or not combo_child['widgetcontrols'] or \
-                    'comboEnableWhenParent' not in combo_child['widgetcontrols']:
+                    'enableWhenParent' not in combo_child['widgetcontrols']:
                 return
             #
-            if (str(utils_giswater.get_item_data(dialog, combo_parent, 0)) in str(combo_child['widgetcontrols']['comboEnableWhenParent'])) \
+            if (str(utils_giswater.get_item_data(dialog, combo_parent, 0)) in str(combo_child['widgetcontrols']['enableWhenParent'])) \
                     and (utils_giswater.get_item_data(dialog, combo_parent, 0) not in (None, '')):
                 # The keepDisbled property is used to keep the edition enabled or disabled,
                 # when we activate the layer and call the "enable_all" function
