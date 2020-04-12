@@ -10,7 +10,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 UPDATE audit_cat_table SET isdeprecated = true WHERE id = 'anl_mincut_arc_x_node';
 UPDATE audit_cat_table SET isdeprecated = true WHERE id = 'v_anl_mincut_flowtrace';
 
-
 UPDATE audit_cat_function SET
 alias = ''
 WHERE function_name = 'gw_fct_debug';
@@ -50,3 +49,5 @@ isparametric= true,
 descript ='This function analyze network topology for specific result. Nodes orphan and disconnected elements are checked.',
 alias = 'Check network topology for specific result'
 WHERE function_name = 'gw_fct_pg2epa_check_network';
+
+DELETE FROM audit_cat_param_user WHERE id IN ('inp_options_rtc_coefficient', 'inp_options_rtc_period_id');

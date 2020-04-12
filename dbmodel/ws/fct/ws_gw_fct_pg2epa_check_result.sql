@@ -76,6 +76,7 @@ v_advancedval text;
 v_values text;
 v_checkresult boolean;
 v_count2 integer;
+v_period_type integer;
 
 
 BEGIN
@@ -145,13 +146,13 @@ BEGIN
 	END IF;
 
 	-- get settings values
-	v_default = (SELECT (value::json->>'vdefault')::json->>'status' FROM config_param_user WHERE parameter = 'inp_options_settings' AND cur_user=current_user);
-	v_advanced = (SELECT (value::json->>'advanced')::json->>'status' FROM config_param_user WHERE parameter = 'inp_options_settings' AND cur_user=current_user);
-	v_debug = (SELECT (value::json->>'debug')::json->>'status' FROM config_param_user WHERE parameter = 'inp_options_settings' AND cur_user=current_user);
+	v_default = (SELECT value::json->>'status' FROM config_param_user WHERE parameter = 'inp_options_vdefault' AND cur_user=current_user);
+	v_advanced = (SELECT value::json->>'status' FROM config_param_user WHERE parameter = 'inp_options_advancedsettings' AND cur_user=current_user);
+	v_debug = (SELECT value::json->>'showLog' FROM config_param_user WHERE parameter = 'inp_options_debug' AND cur_user=current_user);
 
-	v_defaultval = (SELECT (value::json->>'vdefault') FROM config_param_user WHERE parameter = 'inp_options_settings' AND cur_user=current_user);
-	v_advancedval = (SELECT (value::json->>'advanced') FROM config_param_user WHERE parameter = 'inp_options_settings' AND cur_user=current_user);
-	v_debugval = (SELECT (value::json->>'debug') FROM config_param_user WHERE parameter = 'inp_options_settings' AND cur_user=current_user);
+	v_defaultval = (SELECT value::json->>'parameters' FROM config_param_user WHERE parameter = 'inp_options_vdefault' AND cur_user=current_user);
+	v_advancedval = (SELECT value::json->>'parameters' FROM config_param_user WHERE parameter = 'inp_options_advancedsettings' AND cur_user=current_user);
+	v_debugval = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_debug' AND cur_user=current_user);
 
 	-- Header
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('CHECK RESULT WITH CURRENT USER-OPTIONS ACORDING EPA RULES'));
@@ -181,19 +182,17 @@ BEGIN
 		IF v_default::boolean THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Default values: ', v_defaultval));
 		ELSE 
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Default values: ', v_default));
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Default values: No default values used'));
 		END IF;
 
 		IF v_advanced::boolean THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Advanced settings: ', v_advancedval));
 		ELSE 
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Advanced settings: ', v_advanced));
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Advanced settings: No advanced settings used'));
 		END IF;
 
 		IF v_debug::boolean THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Debug: ', v_defaultval));
-		ELSE 
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Debug: ', v_debug));
 		END IF;
 
 		RAISE NOTICE '1 - Check pumps with 3-point curves (because of bug of EPANET this kind of curves are forbidden on the exportation)';
@@ -272,7 +271,7 @@ BEGIN
 		END IF;
 			
 
-		RAISE NOTICE '5 - Advanced network mode (vnodes)';
+		RAISE NOTICE '5 - Check for network mode';
 		IF v_networkmode = 3 OR v_networkmode = 4 THEN
 
 			-- vnode over nodarc for case of use vnode treaming arcs on network model
@@ -299,30 +298,41 @@ BEGIN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 				VALUES (v_fprocesscat_id, v_result_id, 1, 'INFO: Vnodes checked. There is/are not vnodes over nodarcs.');
 			END IF;
-		ELSE
-			-- check if demand type for connec is used
-			IF v_patternmethod = v_fprocesscat_id  OR v_patternmethod = 27 THEN 
+
+			-- check if pattern method is compatible
+			IF v_patternmethod IN (14,15,16,22,33,34,43,44) THEN 
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 				VALUES (v_fprocesscat_id, v_result_id, 3, concat('ERROR: The pattern method used, ',v_patternmethodval,' it is incompatible with the export network mode used, ',v_networkmodeval)); 
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (v_fprocesscat_id, v_result_id, 3, ' Change the pattern method using some of the CONNEC method avaliable or change export network USING some of TRIMED ARCS method avaliable.');
+				VALUES (v_fprocesscat_id, v_result_id, 3, ' Change the pattern method using some of the (NODE) method avaliable or change export network USING some of NOT TRIMED ARCS method avaliable.');
+			END IF;		
+			
+		ELSE
+			-- check if pattern method is compatible
+			IF v_patternmethod IN (11,12,13,21,31,32,41,42) THEN 
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+				VALUES (v_fprocesscat_id, v_result_id, 3, concat('ERROR: The pattern method used, ',v_patternmethodval,' it is incompatible with the export network mode used, ',v_networkmodeval)); 
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+				VALUES (v_fprocesscat_id, v_result_id, 3, ' Change the pattern method using some of the (PJOINT) method avaliable or change export network USING some of TRIMED ARCS method avaliable.');
 			END IF;		
 		END IF;
 
 
-		RAISE NOTICE '6 - Demand type analysis';	
-		IF v_demandtype = 1 THEN
+		RAISE NOTICE '6 - Check for demand type';	
+		IF v_demandtype IN (1,2) THEN
 
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (v_fprocesscat_id, v_result_id, 1, concat('INFO: Demand type estimated is used. No inconsistence have been analyzed.'));
 
-		ELSIF v_demandtype > 1 THEN --(2 or 3)
+		ELSIF v_demandtype > 2 THEN
 
 			SELECT value INTO v_period FROM config_param_user WHERE parameter = 'inp_options_rtc_period_id' AND cur_user=current_user;
 			SELECT code INTO v_periodval FROM ext_cat_period WHERE id=v_period::text;
+			SELECT period_type INTO v_periodtype FROM ext_cat_period WHERE id=v_period::text;
 
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('CRM Period used: ', v_periodval));
-
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('CRM Period type: ', v_periodtype));
+			
 			-- check hydrometers if exists
 			SELECT count(*) INTO v_count FROM vi_parent_hydrometer;
 						
@@ -365,19 +375,16 @@ BEGIN
 				VALUES (v_fprocesscat_id, v_result_id, 2, concat('SELECT * FROM anl_connec WHERE fprocesscat_id=60 AND cur_user=current_user'));
 			END IF;
 
-			-- check mandatory values for ext_rtc_dma_period table
-			SELECT count(*) INTO v_count FROM ext_rtc_dma_period WHERE dma_id IS NOT NULL AND period_id IS NOT NULL AND m3_total_period IS NOT NULL AND eff IS NOT NULL AND pattern_id IS NOT NULL AND pattern_volume IS NOT NULL;
-			SELECT count(*) INTO v_count2 FROM ext_rtc_dma_period;
-			
-			IF  v_count2 >  v_count THEN
-				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
-				VALUES (v_fprocesscat_id, v_result_id, 2, concat('WARNING: Some mandatory values on ext_rtc_dma_period (m3_total_period, eff, pattern_id, pattern_volume) are missed. Please check it before continue.'));
-			ELSE
-				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
-				VALUES (v_fprocesscat_id, v_result_id, 1, concat('INFO: All mandatory values on ext_rtc_dma_period (m3_total_period, eff, pattern_id, pattern_volume) are filled.'));
-			END IF;
+		END IF;
 
-			-- check dma-period table
+		RAISE NOTICE '7 - Check for dma-period values';
+		IF v_demandtype IN (1,2,3) THEN
+	
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			VALUES (v_fprocesscat_id, v_result_id, 1, concat('INFO: No dma period values are need.'));
+
+		ELSIF v_demandtype IN (4,5) THEN -- dma needs rows on ext_rtc_dma_period
+
 			SELECT count(*) INTO v_count FROM vi_parent_dma JOIN v_rtc_period_dma USING (dma_id);
 			SELECT count(*) INTO v_count_2 FROM (SELECT dma_id, count(*) FROM vi_parent_connec WHERE dma_id >0 GROUP BY dma_id) a;
 
@@ -395,12 +402,78 @@ BEGIN
 			END IF;
 		END IF;
 
-		RAISE NOTICE '7 - Pattern method analysis';
-		-- check for hydrometer period patterns
-		IF v_patternmethod IN (23,26,33) THEN --hydro period needs patterns 
+		RAISE NOTICE '8 - Check for losses strategy values';	
+		IF  v_demandtype = 4 THEN -- dma needs effc on ext_rtc_dma_period
 
+			SELECT count(*) INTO v_count FROM ext_rtc_dma_period WHERE effc IS NOT NULL;
+			SELECT count(*) INTO v_count2 FROM ext_rtc_dma_period;
+			
+			IF  v_count2 >  v_count THEN
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
+				VALUES (v_fprocesscat_id, v_result_id, 2, concat('WARNING: Some mandatory values on ext_rtc_dma_period (eff) are missed. Please check it before continue.'));
+			ELSE
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
+				VALUES (v_fprocesscat_id, v_result_id, 1, concat('INFO: All mandatory values on ext_rtc_dma_period (eff) are filled.'));
+			END IF;
+
+		ELSIF  v_demandtype = 5 THEN -- dma needs pattern_volume on ext_rtc_dma_period
+
+			SELECT count(*) INTO v_count FROM ext_rtc_dma_period WHERE pattern_volume IS NOT NULL;
+			SELECT count(*) INTO v_count2 FROM ext_rtc_dma_period;
+			
+			IF  v_count2 >  v_count THEN
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
+				VALUES (v_fprocesscat_id, v_result_id, 2, concat('WARNING: Some values for pattern_volume on ext_rtc_dma_period are missed. Please check it before continue.'));
+			ELSE
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
+				VALUES (v_fprocesscat_id, v_result_id, 1, concat('INFO: All pattern_volume values on ext_rtc_dma_period are filled.'));
+			END IF;
+		END IF;
+		
+
+		RAISE NOTICE '9 - Check for pattern method';
+		IF v_patternmethod IN (41,43,51,53) THEN -- dma needs pattern
+			
+			-- check mandatory values for ext_rtc_dma_period table
+			SELECT count(*) INTO v_count FROM ext_rtc_dma_period WHERE pattern_id IS NOT NULL;
+			SELECT count(*) INTO v_count2 FROM ext_rtc_dma_period;
+			
+			IF  v_count2 >  v_count THEN
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
+				VALUES (v_fprocesscat_id, v_result_id, 2, concat('WARNING: Some values for pattern on ext_rtc_dma_period are missed. Please check it before continue.'));
+			ELSE
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
+				VALUES (v_fprocesscat_id, v_result_id, 1, concat('INFO: All pattern values on ext_rtc_dma_period are filled.'));
+			END IF;
+
+		ELSIF v_patternmethod IN (42,44,52,54) THEN -- hydro needs patterns 
+
+			-- check ext_hydrometer_category_x_pattern
+			SELECT distinct(category_id) INTO v_count from ext_hydrometer_category_x_pattern WHERE period_type = v_periodtype;
+			SELECT distinct(category_id) INTO v_count2 from  v_rtc_hydrometer
+			
+			IF v_count = 0 THEN
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
+				VALUES (v_fprocesscat_id, v_result_id, 3, concat(
+				'ERROR: There is not values on ext_hydrometer_category_x_pattern for this period_type. Please check it before continue.'));
+			ELSIF v_count2 > v_count THEN
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
+				VALUES (v_fprocesscat_id, v_result_id, 3, concat(
+				'ERROR: There is more category_type hydrometers on network that defined on ext_hydrometer_category_x_pattern. Please check it before continue.'));
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
+				VALUES (v_fprocesscat_id, v_result_id, 3, concat('HINT: UPDATE ext_rtc_hydrometer_x_data SET pattern_id = pattern_id FROM .'));
+			ELSE
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
+				VALUES (v_fprocesscat_id, v_result_id, 1, concat(
+				'INFO: All the hydrometers are well-configured with volume and pattern on the the hydrometer-period table (ext_rtc_hydrometer_x_data).'));			
+				v_count=0;
+			END IF;
+			
+		
+			-- check hydrometer
 			SELECT count (*) FROM ext_rtc_hydrometer_x_data a JOIN vi_parent_hydrometer USING (hydrometer_id) 
-			WHERE a.cat_period_id = v_period AND sum IS NOT NULL; -- hydrometers with value		
+			WHERE a.cat_period_id = v_period AND sum IS NOT NULL; -- hydrometers with value	
+				
 			SELECT count (*) INTO v_count_2 FROM ext_rtc_hydrometer_x_data a JOIN vi_parent_hydrometer USING (hydrometer_id) 
 			WHERE a.cat_period_id = v_period AND sum IS NOT NULL AND a.pattern_id IS not NULL; -- hydrometers with value and pattern	
 
@@ -408,7 +481,9 @@ BEGIN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
 				VALUES (v_fprocesscat_id, v_result_id, 3, concat(
 				'ERROR: By using this pattern method, hydrometers''s must be defined with pattern on the hydrometer-period table (ext_rtc_hydrometer_x_data). Please check it before continue.'));
-				v_count=0;
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
+				VALUES (v_fprocesscat_id, v_result_id, 3, concat(
+				'HINT: UPDATE ext_rtc_hydrometer_x_data SET pattern_id = pattern_id FROM .'));
 			ELSIF v_count > v_count_2 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
 				VALUES (v_fprocesscat_id, v_result_id, 2, concat('WARNING: There is/are ', v_count, ' hydrometers''s with volume but only', v_count_2,
@@ -420,6 +495,7 @@ BEGIN
 				v_count=0;
 			END IF;
 		END IF;
+		
 	END IF;
 	
 	-- insert spacers for log

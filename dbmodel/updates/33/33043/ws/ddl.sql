@@ -11,3 +11,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 ALTER TABLE IF EXISTS anl_mincut_arc_x_node RENAME to _anl_mincut_arc_x_node_ ;
 
 ALTER TABLE inp_pattern DROP COLUMN pattern_type;
+
+ALTER TABLE ext_rtc_dma_period DROP COLUMN m3_total_period;
+ALTER TABLE ext_rtc_dma_period DROP COLUMN m3_total_period_hydro;

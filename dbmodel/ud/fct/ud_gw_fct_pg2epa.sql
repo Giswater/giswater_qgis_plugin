@@ -26,6 +26,9 @@ v_dumpsubcatch boolean;
 v_inpoptions json;
 v_file json;
 v_body json;
+v_onlyexport boolean;
+v_checkdata boolean;
+v_checknetwork boolean;
 
 BEGIN
 
@@ -36,6 +39,12 @@ BEGIN
 	v_result =  (p_data->>'data')::json->>'resultId';
 	v_usenetworkgeom =  (p_data->>'data')::json->>'useNetworkGeom';
 	v_dumpsubcatch =  (p_data->>'data')::json->>'dumpSubcatch';
+
+	-- get debug parameters (settings)
+	v_onlyexport = (SELECT value::json->>'onlyExport' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
+	v_checkdata = (SELECT value::json->>'checkData' FROM config_param_user WHERE parameter='inp_options_settings' AND cur_user=current_user)::boolean;
+	v_checknetwork = (SELECT value::json->>'checkNetwork' FROM config_param_user WHERE parameter='inp_options_settings' AND cur_user=current_user)::boolean;
+	
 	
 	-- delete audit table
 	DELETE FROM audit_check_data WHERE fprocesscat_id = 127 AND user_name=current_user;
@@ -46,6 +55,18 @@ BEGIN
 	v_inpoptions = (SELECT (replace (replace (replace (array_to_json(array_agg(json_build_object((t.parameter),(t.value))))::text,'},{', ' , '),'[',''),']',''))::json 
 				FROM (SELECT parameter, value FROM config_param_user 
 				JOIN audit_cat_param_user a ON a.id=parameter	WHERE cur_user=current_user AND formname='epaoptions')t);
+
+	-- only export
+	IF v_onlyexport THEN
+		SELECT gw_fct_pg2epa_check_resultoptions(v_input) INTO v_return ;
+		SELECT gw_fct_pg2epa_create_inp(v_result, null) INTO v_file;
+		
+		v_body = gw_fct_json_object_set_key((v_return->>'body')::json, 'file', v_file);
+		v_return = gw_fct_json_object_set_key(v_return, 'body', v_body);
+		v_return = replace(v_return::text, '"message":{"priority":1, "text":"Data quality analysis done succesfully"}', 
+		'"message":{"priority":1, "text":"Inp export done succesfully"}')::json;
+		RETURN v_return;
+	END IF;
 	
 	RAISE NOTICE '1 - check system data';
 	IF v_checkdata THEN

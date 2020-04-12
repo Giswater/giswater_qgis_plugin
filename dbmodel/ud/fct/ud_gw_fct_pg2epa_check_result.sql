@@ -114,8 +114,8 @@ BEGIN
 	v_hydroscenario = (SELECT hydrology_id FROM inp_selector_hydrology WHERE cur_user = current_user);
 
 	-- get settings values
-	v_debug = (SELECT (value::json->>'debug')::json->>'status' FROM config_param_user WHERE parameter = 'inp_options_settings' AND cur_user=current_user);
-	v_debugval = (SELECT (value::json->>'debug') FROM config_param_user WHERE parameter = 'inp_options_settings' AND cur_user=current_user);
+	v_debug = (SELECT value::json->>'showLog' FROM config_param_user WHERE parameter = 'inp_options_debug' AND cur_user=current_user);
+	v_debugval = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_debug' AND cur_user=current_user);
 	
 
 	-- Header
@@ -142,8 +142,6 @@ BEGIN
 		
 		IF v_debug::boolean THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Debug: ', v_defaultval));
-		ELSE 
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 4, concat('Debug: ', v_debug));
 		END IF;
 		
 		RAISE NOTICE '1- Check subcatchments';

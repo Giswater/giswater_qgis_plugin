@@ -35,8 +35,6 @@ v_body json;
 v_onlyexport boolean;
 v_checkdata boolean;
 v_checknetwork boolean;
-v_checkresult boolean;
-
 	
 BEGIN
 
@@ -52,10 +50,10 @@ BEGIN
 	v_buildupmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_buildup_mode' AND cur_user=current_user);
 
 	-- get debug parameters (settings)
-	v_onlyexport = (SELECT (value::json->>'debug')::json->>'export' FROM config_param_user WHERE parameter='inp_options_settings' AND cur_user=current_user)::boolean;
-	v_setdemand = (SELECT (value::json->>'debug')::json->>'setDemand' FROM config_param_user WHERE parameter='inp_options_settings' AND cur_user=current_user)::boolean;
-	v_checkdata = (SELECT (value::json->>'debug')::json->>'checkData' FROM config_param_user WHERE parameter='inp_options_settings' AND cur_user=current_user)::boolean;
-	v_checknetwork = (SELECT (value::json->>'debug')::json->>'checkNetwork' FROM config_param_user WHERE parameter='inp_options_settings' AND cur_user=current_user)::boolean;
+	v_onlyexport = (SELECT value::json->>'onlyExport' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
+	v_setdemand = (SELECT value::json->>'setDemand' FROM config_param_user WHERE parameter='inp_options_settings' AND cur_user=current_user)::boolean;
+	v_checkdata = (SELECT value::json->>'checkData' FROM config_param_user WHERE parameter='inp_options_settings' AND cur_user=current_user)::boolean;
+	v_checknetwork = (SELECT value::json->>'checkNetwork' FROM config_param_user WHERE parameter='inp_options_settings' AND cur_user=current_user)::boolean;
 	
 	-- get advanced parameters (settings)
 	v_advancedsettings = (SELECT (value::json->>'avanced')::json->>'status' FROM config_param_user WHERE parameter='inp_options_settings' AND cur_user=current_user)::boolean;
