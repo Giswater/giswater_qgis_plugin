@@ -57,13 +57,11 @@ class ApiCF(ApiParent, QObject):
 
         visible_layers = self.get_visible_layers(as_list=True)
         scale_zoom = self.iface.mapCanvas().scale()
-        srid = self.controller.plugin_settings_value('srid')
 
         # Get layers under mouse clicked
         extras = f'"pointClickCoords":{{"xcoord":{point.x()}, "ycoord":{point.y()}}}, '
         extras += f'"visibleLayers":{visible_layers}, '
-        extras += f'"zoomScale":{scale_zoom}, '
-        extras += '"srid":' + str(srid)
+        extras += f'"zoomScale":{scale_zoom} '
         body = self.create_body(extras=extras)
         complet_list = self.controller.get_json('gw_api_getlayersfromcoordinates', body, log_sql=True)
         if not complet_list: return False
@@ -189,8 +187,6 @@ class ApiCF(ApiParent, QObject):
         self.my_json = {}
         self.tab_type = tab_type
 
-        # Get srid
-        self.srid = self.controller.plugin_settings_value('srid')
         self.new_feature = new_feature
 
         if self.iface.activeLayer() is None or type(self.iface.activeLayer()) != QgsVectorLayer:
@@ -229,7 +225,7 @@ class ApiCF(ApiParent, QObject):
             scale_zoom = self.iface.mapCanvas().scale()
             extras += f', "activeLayer":"{active_layer}"'
             extras += f', "visibleLayer":{visible_layer}'
-            extras += f', "coordinates":{{"epsg":{self.srid}, "xcoord":{point.x()},"ycoord":{point.y()}, "zoomRatio":{scale_zoom}}}'
+            extras += f', "coordinates":{{"xcoord":{point.x()},"ycoord":{point.y()}, "zoomRatio":{scale_zoom}}}'
             body = self.create_body(extras=extras)
             function_name = 'gw_api_getinfofromcoordinates'
         # IF come from QPushButtons node1 or node2 from custom form or RightButton
