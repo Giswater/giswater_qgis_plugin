@@ -29,6 +29,8 @@ v_checkdata boolean;
 v_checknetwork boolean;
 v_advancedsettings boolean;
 v_input json;
+v_vdefault boolean;
+
 
 BEGIN
 
@@ -42,6 +44,7 @@ BEGIN
 
 	-- get user parameters
 	v_advancedsettings = (SELECT value::json->>'status' FROM config_param_user WHERE parameter='inp_options_advancedsettings' AND cur_user=current_user)::boolean;
+	v_vdefault = (SELECT value::json->>'status' FROM config_param_user WHERE parameter='inp_options_vdefault' AND cur_user=current_user);
 
 	-- get debug parameters (settings)
 	v_onlyexport = (SELECT value::json->>'onlyExport' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
@@ -108,7 +111,7 @@ BEGIN
 
 	RAISE NOTICE '9 - Set default values';
 	IF v_vdefault THEN
-		PERFORM gw_fct_pg2epa_vdefault(v_input))::json);
+		PERFORM gw_fct_pg2epa_vdefault(v_input);
 	END IF;
 
 	RAISE NOTICE '10 - Check result network';

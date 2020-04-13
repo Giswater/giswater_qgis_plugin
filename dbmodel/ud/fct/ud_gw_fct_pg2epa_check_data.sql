@@ -172,17 +172,22 @@ BEGIN
 
 	RAISE NOTICE '6- Nodes sink';
 	INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom, descript)
-	SELECT 13, node_id, nodecat_id, v_edit_node.the_geom, 'Node sink' FROM v_edit_node JOIN v_edit_arc a ON node_1 = node_id WHERE slope < 0 EXCEPT (
-	SELECT  13, node_1, c.nodecat_id, c.the_geom, 'Node sink' FROM arc JOIN (SELECT node_id, nodecat_id, v_edit_node.the_geom FROM v_edit_node 
-	JOIN v_edit_arc a ON node_1 = node_id WHERE slope < 0)c ON node_id=node_1
-	JOIN inp_selector_sector USING (sector_id)
-	WHERE cur_user = current_user AND arc_id NOT IN (SELECT a.arc_id FROM node JOIN v_edit_arc a ON node_1 = node_id WHERE sys_slope < 0));
+	
+	SELECT 13, node_id, nodecat_id, v_edit_node.the_geom, 'Node sink' FROM v_edit_node WHERE node_id IN
+
+	-- those nodes as node_1 on arc no pump with negative slope except arcs with this node as node_1 and positive slope
+	(SELECT node_1 FROM (SELECT arc_id, node_1, node_2 FROM v_edit_arc JOIN cat_arc c ON c.id = arccat_id 
+	JOIN inp_selector_sector USING (sector_id) JOIN cat_arc_shape s ON c.shape = s.id WHERE slope < 0 AND s.epa != 'FORCE_MAIN')a
+	EXCEPT 
+	SELECT node_1 FROM (SELECT arc_id, node_1, node_2 FROM v_edit_arc JOIN cat_arc c ON c.id = arccat_id 
+	JOIN inp_selector_sector USING (sector_id) JOIN cat_arc_shape s ON c.shape = s.id WHERE slope > 0)a);
 	
 	SELECT count(*) into v_count FROM anl_node WHERE fprocesscat_id=13 AND cur_user=current_user;
 	
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (v_fprocesscat_id, v_result_id, 2, concat('WARNING: There is/are ',v_count,' junction(s) type sink which means that junction only have entry arcs without any exit arc.'));
+		VALUES (v_fprocesscat_id, v_result_id, 2, concat('WARNING: There is/are ',v_count,
+		' junction(s) type sink which means that junction only have entry arcs without any exit arc (FORCE_MAIN is not valid).'));
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 		VALUES (v_fprocesscat_id, v_result_id, 2, concat('SELECT * FROM anl_node WHERE fprocesscat_id=13 AND cur_user=current_user'));		
 

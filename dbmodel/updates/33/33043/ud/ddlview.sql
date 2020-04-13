@@ -19,6 +19,7 @@ SELECT rpt_inp_arc.arc_id,
     rpt_inp_arc.q0::numeric(12,4),
     rpt_inp_arc.qmax::numeric(12,4)
    FROM inp_selector_result, rpt_inp_arc
+   JOIN inp_conduit ON rpt_inp_arc.arc_id::text = inp_conduit.arc_id::text
    WHERE rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text;
    
    
