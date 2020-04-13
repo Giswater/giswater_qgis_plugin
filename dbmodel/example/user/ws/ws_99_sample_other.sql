@@ -578,3 +578,6 @@ factor_5 = factor_5/42.4849,factor_6 = factor_6/42.4849,factor_7 = factor_7/42.4
 factor_9 = factor_9/42.4849,factor_10 = factor_10/42.4849,factor_11 = factor_11/42.4849,factor_12 = factor_12/42.4849 
 where pattern_id = 'dma02_period07';
 
+UPDATE inp_cat_mat_roughness set roughness  = 0.003;
+UPDATE cat_arc SET dint = 999, dext = null, dnom = '999', descript = 'Virtual arc. Mandatory fill dint to use with EPANET' WHERE arctype_id = 'VARC';
+UPDATE arc SET arccat_id = 'FD300' WHERE arc_id IN ('114025','114026','113905','2205','113884')

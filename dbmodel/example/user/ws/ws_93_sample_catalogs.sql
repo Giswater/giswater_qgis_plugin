@@ -45,7 +45,7 @@ INSERT INTO cat_arc VALUES ('PVC90-PN16', 'PIPE', 'PVC', '16', '90', 82.00000, 9
 INSERT INTO cat_arc VALUES ('VFD150-PN16', 'VARC', 'FD', '16', '150', 153.00000, 170.00000, 'FD pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'fd150.svg', 0.10, 0.10, 0.17, 0.0227, 0.97, 8.50, 'm', 'A_FD150', 'S_REP', 'S_NULL', true, null, 'CIRCULAR');
 INSERT INTO cat_arc VALUES ('VFC110-PN10', 'VARC', 'FC', '10', '110', 99.00000, 110.00000, 'FC pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'fc110.svg', 0.10, 0.10, 0.09, 0.0095, 0.91, 4.00, 'm', 'A_FC110_PN10', 'S_REP', 'S_NULL', false, null, 'CIRCULAR');
 INSERT INTO cat_arc VALUES ('VIRTUAL', 'VARC', 'PE-HD', NULL, NULL, 999, NULL, 'Virtual arc. Mandatory to fill some diameter and some material because EPANET needs some values to work with', 'c:\\users\users\catalog.pdf', NULL, NULL, 'fc110.svg', 0.10, 0.10, 0.09, 0.0095, 0.91, 4.00, 'm', 'A_FC110_PN10', 'S_REP', 'S_NULL', false, null, 'CIRCULAR');
-
+INSERT INTO cat_arc VALUES ('FD300', 'PIPE', 'FD', '16', '300', 315.00000, 345.00000, 'FD pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'fd300.svg', 0.10, 0.10, 0.22, 0.0387, 1.02, 11.10, 'm', 'A_FD200', 'S_REP', 'S_NULL', true, null, 'CIRCULAR');
 
 INSERT INTO cat_brand VALUES ('brand1');
 INSERT INTO cat_brand VALUES ('brand2');

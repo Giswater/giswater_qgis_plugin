@@ -7,12 +7,4 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-ALTER 
-CREATE OR REPLACE VIEW vi_pjoint AS 
-SELECT connec.pjoint_id,
-sum(inp_connec.demand)
-FROM inp_connec
-JOIN connec USING (connec_id)
-GROUP BY pjoint_id;
-
 ALTER VIEW v_inp_pjointpattern RENAME TO vi_pjointpattern;

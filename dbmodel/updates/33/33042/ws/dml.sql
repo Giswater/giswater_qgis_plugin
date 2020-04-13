@@ -9,12 +9,12 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 ALTER TABLE inp_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
 
-DELETE FROM inp_typevalue WHERE typevalue IN ('inp_value_demandtype','inp_value_patternmethod', 'inp_value_networkmode');
+DELETE FROM inp_typevalue WHERE typevalue IN ('inp_value_demandtype','inp_value_patternmethod', 'inp_options_networkmode');
 
-INSERT INTO inp_typevalue VALUES ('inp_value_networkmode', '1', 'NODE (MANDATORY NODARCS)', NULL);
-INSERT INTO inp_typevalue VALUES ('inp_value_networkmode', '2', 'NODE (ALL NODARCS)', NULL);
-INSERT INTO inp_typevalue VALUES ('inp_value_networkmode', '3', 'PJOINT (MANDATORY NODARCS)', NULL);
-INSERT INTO inp_typevalue VALUES ('inp_value_networkmode', '4', 'PJOINT (ALL NODARCS)', NULL);
+INSERT INTO inp_typevalue VALUES ('inp_options_networkmode', '1', 'NODE (MANDATORY NODARCS)', NULL);
+INSERT INTO inp_typevalue VALUES ('inp_options_networkmode', '2', 'NODE (ALL NODARCS)', NULL);
+INSERT INTO inp_typevalue VALUES ('inp_options_networkmode', '3', 'PJOINT (MANDATORY NODARCS)', NULL);
+INSERT INTO inp_typevalue VALUES ('inp_options_networkmode', '4', 'PJOINT (ALL NODARCS)', NULL);
 
 INSERT INTO inp_typevalue VALUES ('inp_value_demandtype', '1', 'NODE ESTIMATED', NULL);
 INSERT INTO inp_typevalue VALUES ('inp_value_demandtype', '2', 'CONNEC ESTIMATED', NULL);
