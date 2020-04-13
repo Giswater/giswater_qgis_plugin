@@ -878,7 +878,7 @@ class Giswater(QObject):
         self.controller.manage_translation(self.plugin_name)
 
         # Set PostgreSQL parameter 'search_path'
-        self.controller.set_search_path(layer_source['db'], layer_source['schema'])
+        self.controller.set_search_path(layer_source['schema'])
 
         # Cache error message with log_code = -1 (uncatched error)
         self.controller.get_error_message(-1)

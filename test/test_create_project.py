@@ -1,7 +1,5 @@
 from qgis.core import QgsApplication, QgsProviderRegistry
-from qgis.PyQt.QtWidgets import QApplication, QDialog
-import os
-import sys
+from qgis.PyQt.QtWidgets import QDialog
 from test_giswater import TestGiswater
 from actions.create_gis_project import CreateGisProject
 #from actions.check_project_result import CheckProjectResult
@@ -145,17 +143,19 @@ class TestQgis():
         return True
 
 
-    def manage_visit(self, project_type='ws'):
+    def manage_visit(self, project_name='test_ud'):
 
         print("\nStart manage_visit")
 
         # Load main plugin class
-        if not self.load_plugin('test_ws'):
+        if not self.load_plugin(project_name):
             return False
 
         # Connect to a database providing a service_name set in .pg_service.conf
         if not self.connect_to_database(self.service_name):
             return False
+
+        self.test_giswater.controller.set_search_path(project_name)
 
         self.test_giswater.manage_visit.manage_visit(open_dialog=False)
 
@@ -182,8 +182,8 @@ class TestQgis():
         if not self.connect_to_database(self.service_name):
             return False
 
-        cpr = CheckProjectResult(self.iface, self.test_giswater.settings, self.test_giswater.controller,
-            self.test_giswater.plugin_dir)
+        #cpr = CheckProjectResult(self.iface, self.test_giswater.settings, self.test_giswater.controller,
+        #    self.test_giswater.plugin_dir)
         #layers = self.test_giswater.controller.get_layers()
 
         print("Finish check_project_result")
@@ -211,12 +211,12 @@ def test_create_gis_project():
 
 def test_manage_visit():
     test = TestQgis()
-    status = test.manage_visit('ws')
+    status = test.manage_visit()
     print(status)
 
 
 if __name__ == '__main__':
     print("MAIN")
     test = TestQgis()
-    test.manage_visit('ws')
+    test.manage_visit()
 

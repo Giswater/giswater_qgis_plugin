@@ -1417,10 +1417,10 @@ class DaoController(object):
         return layers
 
 
-    def set_search_path(self, dbname, schema_name):
+    def set_search_path(self, schema_name):
         """ Set parameter search_path for current QGIS project """
 
-        sql = ("SET search_path = " + str(schema_name) + ", public;")
+        sql = f"SET search_path = {schema_name}, public;"
         self.execute_sql(sql, log_sql=True)
 
 
