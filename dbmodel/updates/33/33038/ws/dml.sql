@@ -9,8 +9,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 UPDATE audit_cat_param_user SET vdefault =
-'{ 
-"reservoir":{"switch2Junction":["ETAP", "POU", "CAPTACIO"]},
+'{"reservoir":{"switch2Junction":["ETAP", "POU", "CAPTACIO"]},
 "tank":{"distVirtualReservoir":0.01}, 
 "pressGroup":{"status":"ACTIVE", "forceStatus":"ACTIVE", "defaultCurve":"GP30"}, 
 "pumpStation":{"status":"CLOSED", "forceStatus":"CLOSED", "defaultCurve":"IM00"}, 

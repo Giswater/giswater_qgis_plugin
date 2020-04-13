@@ -48,25 +48,25 @@ drop view IF EXISTS vi_tanks;
 CREATE OR REPLACE VIEW vi_tanks AS 
  SELECT rpt_inp_node.node_id,
     rpt_inp_node.elevation,
-    replace((rpt_inp_node.addparam::json ->> 'initlevel'::text),'',null)::numeric AS initlevel,
-    replace((rpt_inp_node.addparam::json ->> 'minlevel'::text),'',null)::numeric AS minlevel,
-    replace((rpt_inp_node.addparam::json ->> 'maxlevel'::text),'',null)::numeric AS maxlevel,
-    replace((rpt_inp_node.addparam::json ->> 'diameter'::text),'',null)::numeric AS diameter,
-    replace((rpt_inp_node.addparam::json ->> 'minvol'::text),'',null)::numeric AS minvol,
-    (rpt_inp_node.addparam::json ->> 'curve_id'::text) AS curve_id
+    cast((rpt_inp_node.addparam::json ->> 'initlevel'::text) as numeric) AS initlevel,
+    cast((rpt_inp_node.addparam::json ->> 'minlevel'::text) as numeric) AS minlevel,
+    cast((rpt_inp_node.addparam::json ->> 'maxlevel'::text) as numeric) AS maxlevel,
+    cast((rpt_inp_node.addparam::json ->> 'diameter'::text) as numeric) AS diameter,
+    cast((rpt_inp_node.addparam::json ->> 'minvol'::text) as numeric) AS minvol,
+    replace((rpt_inp_node.addparam::json ->> 'curve_id'::text),''::text, NULL::text) AS curve_id
    FROM inp_selector_result,
     rpt_inp_node
   WHERE rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND rpt_inp_node.epa_type::text = 'TANK'::text AND inp_selector_result.cur_user = "current_user"()::text
 UNION
  SELECT rpt_inp_node.node_id,
     rpt_inp_node.elevation,
-    replace((rpt_inp_node.addparam::json ->> 'initlevel'::text),'',null)::numeric AS initlevel,
-    replace((rpt_inp_node.addparam::json ->> 'minlevel'::text),'',null)::numeric AS minlevel,
-    replace((rpt_inp_node.addparam::json ->> 'maxlevel'::text),'',null)::numeric AS maxlevel,
-    replace((rpt_inp_node.addparam::json ->> 'diameter'::text),'',null)::numeric AS diameter,
-    replace((rpt_inp_node.addparam::json ->> 'minvol'::text),'',null)::numeric AS minvol,
-    (rpt_inp_node.addparam::json ->> 'curve_id'::text) AS curve_id
-   FROM inp_selector_result,
+    cast((rpt_inp_node.addparam::json ->> 'initlevel'::text) as numeric) AS initlevel,
+    cast((rpt_inp_node.addparam::json ->> 'minlevel'::text) as numeric) AS minlevel,
+    cast((rpt_inp_node.addparam::json ->> 'maxlevel'::text) as numeric) AS maxlevel,
+    cast((rpt_inp_node.addparam::json ->> 'diameter'::text) as numeric) AS diameter,
+    cast((rpt_inp_node.addparam::json ->> 'minvol'::text) as numeric) AS minvol,
+    replace((rpt_inp_node.addparam::json ->> 'curve_id'::text),''::text, NULL::text) AS curve_id   
+    FROM inp_selector_result,
     rpt_inp_node
      LEFT JOIN ( SELECT a.node_id,
             count(*) AS ct
@@ -81,6 +81,7 @@ UNION
                   WHERE rpt_inp_arc.result_id::text = inp_selector_result_1.result_id::text AND inp_selector_result_1.cur_user = "current_user"()::text) a
           GROUP BY a.node_id) b USING (node_id)
   WHERE b.ct > 1 AND rpt_inp_node.epa_type::text = 'INLET'::text;
+
 
 
 drop view vi_pumps;

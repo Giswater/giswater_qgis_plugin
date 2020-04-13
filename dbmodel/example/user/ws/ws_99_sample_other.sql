@@ -7,9 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-UPDATE inp_shortpipe SET to_arc='2092' WHERE node_id='1080';
 UPDATE inp_shortpipe SET to_arc=null WHERE node_id='114254';
-
 
 INSERT INTO cat_users VALUES ('user1','user1');
 INSERT INTO cat_users VALUES ('user2','user2');

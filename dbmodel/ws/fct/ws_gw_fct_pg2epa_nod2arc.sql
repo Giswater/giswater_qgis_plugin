@@ -12,9 +12,8 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_nod2arc(result_id_var varch
 AS $BODY$
 
 /*example
-SELECT SCHEMA_NAME.gw_fct_pg2epa($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{},"data":{"geometryLog":false, "resultId":"t1","saveOnDatabase":true, "useNetworkGeom":"false", "useNetworkDemand":"false", "export":"false"}}$$)
+SELECT SCHEMA_NAME.gw_fct_pg2epa($${"data":{"geometryLog":false, "resultId":"t1", "useNetworkGeom":"false"}}$$)
+
 
 */
 
@@ -66,18 +65,31 @@ BEGIN
 				FROM ( ',v_querytext, ' ) b JOIN ( ',v_query_number,' ) c USING (node_id)');
 	EXECUTE v_querytext; 
 
+	/*
+		INSERT INTO anl_node (num_arcs, arc_id, node_id, elevation, elev, nodecat_id, sector_id, state, state_type, descript, arc_distance, the_geom, fprocesscat_id, cur_user)
+		SELECT c.numarcs, to_arc, b.node_id, elevation, elev, nodecat_id, sector_id, state, state_type, annotation, demand, the_geom, 124, current_user 
+		FROM ( 
+			SELECT a.*, inp_valve.to_arc FROM rpt_inp_node a JOIN inp_valve ON a.node_id=inp_valve.node_id 
+			UNION  
+			SELECT a.*, inp_pump.to_arc FROM rpt_inp_node a JOIN inp_pump ON a.node_id=inp_pump.node_id
+			) b 
+			JOIN ( SELECT count(*)as numarcs, node_id FROM node n JOIN 
+					(SELECT node_1 as node_id FROM v_edit_arc 
+					UNION ALL SELECT node_2 FROM v_edit_arc) a using (node_id) group by n.node_id ) c USING (node_id);
+*/
+
 	RAISE NOTICE ' reverse geometries when node acts as node1 from arc but must be node2';
 	EXECUTE 'UPDATE rpt_inp_arc SET the_geom = st_reverse(the_geom) , node_1 = node_2 , node_2 = node_1 WHERE arc_id IN (SELECT arc_id FROM (
-		SELECT c.arc_id, n.node_id as node_1, n.arc_id as to_arc
+		SELECT c.arc_id, n.node_id, n.arc_id as to_arc
 		FROM rpt_inp_arc c JOIN anl_node n ON node_1 = node_id
 		WHERE c.arc_id != n.arc_id AND n.arc_id IS NOT NULL
 		AND fprocesscat_id  = 124 AND cur_user = current_user)b )';
 
 	RAISE NOTICE ' reverse geometries when node acts as node2 from arc but must be node1';
 	EXECUTE 'UPDATE rpt_inp_arc SET the_geom = st_reverse(the_geom) , node_1 = node_2 , node_2 = node_1 WHERE arc_id IN (SELECT arc_id FROM (
-		SELECT c.arc_id, n.node_id as node_1, n.arc_id as to_arc
+		SELECT c.arc_id, n.node_id , n.arc_id as to_arc
 		FROM rpt_inp_arc c JOIN anl_node n ON node_2 = node_id
-		WHERE c.arc_id != n.arc_id AND n.arc_id IS NOT NULL
+		WHERE c.arc_id = n.arc_id AND n.arc_id IS NOT NULL
 		AND fprocesscat_id  = 124 AND cur_user = current_user )b )';
 
 	RAISE NOTICE 'new nodes when numarcs = 1';
@@ -195,8 +207,8 @@ BEGIN
 			SELECT DISTINCT ON (a.nodeparent)
 			a.result_id,
 			concat (a.nodeparent, ''_n2a'') as arc_id,
-			a.node_id,
 			b.node_id,
+			a.node_id,
 			''NODE2ARC'', 
 			a.nodecat_id as arccat_id, 
 			c.epa_type,

@@ -156,7 +156,7 @@ BEGIN
 
 		RAISE NOTICE '9 - Set default values';
 		IF v_vdefault THEN
-			PERFORM gw_fct_pg2epa_vdefault(v_input)::json);
+			PERFORM gw_fct_pg2epa_vdefault(v_input);
 		END IF;
 
 		RAISE NOTICE '10 - Set cero on elevation those have null values in spite of previous processes (profilactic issue in order to do not crash the epanet file)';

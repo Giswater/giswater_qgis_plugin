@@ -57,3 +57,5 @@ UPDATE audit_cat_function SET
 istoolbox= false 
 WHERE function_name = 'gw_fct_update_elevation_from_dem';
 
+UPDATE config_client_forms SET status = false WHERE table_id = 'v_ui_rpt_cat_result' AND column_id = 'id';
+

@@ -451,12 +451,10 @@ BEGIN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
 				VALUES (v_fprocesscat_id, v_result_id, 1, concat(
 				'INFO: All the hydrometers are well-configured with volume and pattern on the the hydrometer-period table (ext_rtc_hydrometer_x_data).'));			
-				v_count=0;
 			END IF;
 			
-		
 			-- check hydrometer
-			SELECT count (*) FROM ext_rtc_hydrometer_x_data a JOIN vi_parent_hydrometer USING (hydrometer_id) 
+			SELECT count (*) INTO v_count FROM ext_rtc_hydrometer_x_data a JOIN vi_parent_hydrometer USING (hydrometer_id) 
 			WHERE a.cat_period_id = v_period AND sum IS NOT NULL; -- hydrometers with value	
 				
 			SELECT count (*) INTO v_count_2 FROM ext_rtc_hydrometer_x_data a JOIN vi_parent_hydrometer USING (hydrometer_id) 

@@ -31,5 +31,5 @@ vdefault,ismandatory, isdeprecated) VALUES
 '{"status":true, "parameters":{"junction":{"y0":0, "ysur":0}, "outfall":{"outfallType":"NORMAL"}, "conduit":{"barrels":1, "q0":0, "qmax":0}, "raingage":{"scf":1}}}',
 true, false);
 
-DELETE FROM audit_cat_param_user WHERE IN 
-('epa_outfall_type_vdefault','epa_conduit_q0_vdefault','epa_conduit_barrels_vdefault','epa_junction_y0_vdefault','epa_rgage_scf_vdefault');
+DELETE FROM audit_cat_param_user WHERE id IN ('epa_outfall_type_vdefault','epa_conduit_q0_vdefault','epa_conduit_barrels_vdefault',
+'epa_junction_y0_vdefault','epa_rgage_scf_vdefault');
