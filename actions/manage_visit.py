@@ -200,7 +200,7 @@ class ManageVisit(ParentManage, QObject):
         #    self.tab_feature_changed, self.dlg_add_visit, self.table_object, excluded_layers=["v_edit_element"]))
 
         # Fill combo boxes of the form and related events
-        self.parameter_type_id.currentIndexChanged.connect(partial(self.set_parameter_id_combo, self.dlg_add_visit))
+        self.parameter_type_id.currentTextChanged.connect(partial(self.set_parameter_id_combo, self.dlg_add_visit))
         self.feature_type.currentTextChanged.connect(partial(self.event_feature_type_selected, self.dlg_add_visit, None))
         self.feature_type.currentTextChanged.connect(partial(self.manage_tabs_enabled, True))
         self.parameter_id.currentTextChanged.connect(self.get_feature_type_of_parameter)
@@ -403,7 +403,8 @@ class ManageVisit(ParentManage, QObject):
         if self.controller.get_project_type() == 'ud':
             self.update_relations_geom_type("gully")
 
-        #self.enable_feature_type(dialog)
+        widget_name = f"tbl_visit_x_{self.geom_type}"
+        self.enable_feature_type(dialog, widget_name)
 
 
     def delete_relations_geom_type(self, geom_type):
@@ -451,6 +452,7 @@ class ManageVisit(ParentManage, QObject):
             self.controller.log_info(f"Widget model is none: tbl_visit_x_{geom_type}")
             return
 
+        db_record = None
         if geom_type == 'arc':
             db_record = OmVisitXArc(self.controller)
         elif geom_type == 'node':
@@ -460,22 +462,21 @@ class ManageVisit(ParentManage, QObject):
         elif geom_type == 'gully':
             db_record = OmVisitXGully(self.controller)
 
-        for row in range(widget.model().rowCount()):
-            # get modelIndex to get data
-            index = widget.model().index(row, 0)
+        if db_record:
+            for row in range(widget.model().rowCount()):
+                # get modelIndex to get data
+                index = widget.model().index(row, 0)
 
-            # set common fields
-            db_record.id = db_record.max_pk() + 1
-            db_record.visit_id = int(self.visit_id.text())
+                # set common fields
+                db_record.id = db_record.max_pk() + 1
+                db_record.visit_id = int(self.visit_id.text())
 
-            # set value for column <geom_type>_id
-            # db_record.column_name = index.data()
-            setattr(db_record, column_name, index.data())
+                # set value for column <geom_type>_id
+                # db_record.column_name = index.data()
+                setattr(db_record, column_name, index.data())
 
-            # than save the showed records
-            db_record.upsert(commit=self.autocommit)
-
-        #self.enable_feature_type(dialog)
+                # than save the showed records
+                db_record.upsert(commit=self.autocommit)
 
 
     def manage_tab_changed(self, dialog, index):
@@ -488,31 +489,19 @@ class ManageVisit(ParentManage, QObject):
             self.manage_leave_visit_tab()
             # need to create the relation record that is done only
             # changing tab
-            #if self.locked_geom_type:
-            #    self.update_relations(dialog)
+            if self.locked_geom_type:
+                self.update_relations(dialog)
 
         # tab Relation
         if self.current_tab_index == self.tab_index('tab_relations'):
             self.update_relations(dialog)
 
         # manage arriving tab
-        # tab Visit
         self.current_tab_index = index
-        if index == self.tab_index('tab_visit'):
-            pass
-        # tab Relation
-        if index == self.tab_index('tab_relations'):
-            pass
-        # tab Event
-        if index == self.tab_index('tab_event'):
-            self.entered_event_tab(dialog)
-        # tab Document
-        if index == self.tab_index('tab_document'):
-            pass
 
 
     def entered_event_tab(self, dialog):
-        """Manage actions when the Event tab is entered."""
+        """ Manage actions when the Event tab is entered """
         self.set_parameter_id_combo(dialog)
 
 
@@ -793,7 +782,7 @@ class ManageVisit(ParentManage, QObject):
                "WHERE net_category = 1 "
                "ORDER BY id")
         rows = self.controller.get_rows(sql, commit=self.autocommit)
-        utils_giswater.fillComboBox(self.dlg_add_visit, "feature_type", rows, allow_nulls=True)
+        utils_giswater.fillComboBox(self.dlg_add_visit, "feature_type", rows, False)
 
         # Event tab
         # Fill ComboBox parameter_type_id
@@ -826,7 +815,7 @@ class ManageVisit(ParentManage, QObject):
 
         sql += where
         sql += f"ORDER BY id"
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_add_visit.parameter_id, rows, 1)
 
 

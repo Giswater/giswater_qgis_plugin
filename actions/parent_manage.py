@@ -842,10 +842,10 @@ class ParentManage(ParentAction, object):
         self.controller.execute_sql(sql)
 
 
-    def enable_feature_type(self, dialog):
+    def enable_feature_type(self, dialog, widget_name='tbl_relation'):
 
         feature_type = dialog.findChild(QComboBox, 'feature_type')
-        table = dialog.findChild(QTableView, 'tbl_relation')
+        table = dialog.findChild(QTableView, widget_name)
         if feature_type is not None and table is not None:
             if len(self.ids) > 0:
                 feature_type.setEnabled(False)
