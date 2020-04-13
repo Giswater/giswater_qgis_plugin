@@ -20,10 +20,7 @@ v_units	text;
 v_sql text;
 v_demandtype integer;
 v_patternmethod integer;
-v_timestep text;
 v_networkmode integer;
-v_basedemand float;
-v_advanced  boolean = false;
 v_uniquepattern text;
 v_queryfrom text;
       
@@ -40,10 +37,7 @@ BEGIN
 	v_units =  (SELECT value FROM config_param_user WHERE parameter='inp_options_units' AND cur_user=current_user);
 	v_demandtype = (SELECT value FROM config_param_user WHERE parameter='inp_options_demandtype' AND cur_user=current_user);
 	v_patternmethod = (SELECT value FROM config_param_user WHERE parameter='inp_options_patternmethod' AND cur_user=current_user); 
-	v_timestep = (SELECT value FROM config_param_user WHERE parameter='inp_times_duration' AND cur_user=current_user); 
 	v_networkmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user);
-	v_basedemand = (SELECT ((value::json->>'advanced')::json->>'junction')::json->>'baseDemand' FROM config_param_user WHERE parameter = 'inp_options_settings' AND cur_user=current_user);
-	v_advanced = (SELECT (value::json->>'advanced')::json->>'status' FROM config_param_user WHERE parameter = 'inp_options_settings' AND cur_user=current_user);
 
 	EXECUTE 'SELECT (value::json->>'||quote_literal(v_units)||')::float FROM config_param_system WHERE parameter=''epa_units_factor'''
 		INTO v_epaunits;
@@ -367,14 +361,6 @@ BEGIN
 		SELECT result_id_var, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, 
 			factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18
 			FROM inp_pattern_value WHERE pattern_id IN (SELECT pattern_id FROM rpt_inp_node WHERE result_id = result_id_var);
-	END IF;
-
-	-- base demand
-	IF v_advanced THEN
-		--UPDATE rpt_inp_node SET demand = demand + v_basedemand WHERE result_id=result_id_var;
-	ELSE
-		-- profilactic control of null demands (because epanet cmd does not runs with null demands
-		--UPDATE rpt_inp_node SET demand=0 WHERE result_id=result_id_var AND demand IS NULL;
 	END IF;
 
 	UPDATE rpt_inp_node SET pattern_id = null WHERE demand = 0 AND result_id = result_id_var;

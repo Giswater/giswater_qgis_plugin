@@ -79,7 +79,7 @@ BEGIN
 	-- todo: UPDATE childparam for inp_outfall, inp_storage inp_divider, inp_junction
 
          -- Insert on arc rpt_inp table
-	INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, length, n, expl_id, the_geom)
+	INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, length, n, expl_id, the_geom, q0, qmax, barrels)
 	SELECT
 	result_id_var,
 	a.arc_id, node_1, node_2, a.sys_elev1, a.sys_elev2, a.arc_type, arccat_id, epa_type, a.sector_id, a.state, 
@@ -93,7 +93,10 @@ BEGIN
 		ELSE n
 	END AS n,
 	a.expl_id, 
-	a.the_geom
+	a.the_geom,
+	q0,
+	qmax,
+	barrels
 	FROM inp_selector_sector, v_arc a
 		LEFT JOIN value_state_type ON id=state_type
 		LEFT JOIN cat_arc ON a.arccat_id = cat_arc.id

@@ -53,3 +53,7 @@ WHERE function_name = 'gw_fct_pg2epa_check_network';
 INSERT INTO audit_cat_function VALUES (2850, 'gw_fct_pg2epa_check_options', 'utils', 'Check consistency options for epa result', NULL, NULL, NULL, 'Check consistency options for epa result', 'role_epa', false) 
 ON CONFLICT (id) DO NOTHING;
 
+UPDATE audit_cat_function SET
+istoolbox= false 
+WHERE function_name = 'gw_fct_update_elevation_from_dem';
+

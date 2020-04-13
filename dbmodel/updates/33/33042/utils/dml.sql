@@ -48,7 +48,7 @@ DELETE FROM audit_cat_function WHERE function_name IN
 
 DELETE FROM audit_cat_function WHERE id = 2648; -- duplicated gw_fct_admin_schema_manage_ct
 
-INSERT INTO audit_cat_function VALUES (2846, 'gw_fct_pg2epa_vdefault', 'ws', 'Default values for epa', NULL, NULL, NULL, 'Default values for epa', 'role_epa', false) 
+INSERT INTO audit_cat_function VALUES (2846, 'gw_fct_pg2epa_vdefault', 'utils', 'Default values for epa', NULL, NULL, NULL, 'Default values for epa', 'role_epa', false) 
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO audit_cat_function VALUES (2848, 'gw_fct_pg2epa_check_result', 'utils', 'Check data for epa result', NULL, NULL, NULL, 'Check data for epa result', 'role_epa', false) 

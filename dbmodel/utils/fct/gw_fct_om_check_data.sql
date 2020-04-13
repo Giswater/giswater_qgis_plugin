@@ -735,6 +735,22 @@ BEGIN
 		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 		VALUES (25, 1, 'INFO: No features with end date earlier than built date');
 	END IF;
+
+	--Automatic links with more than 100 mts (longitude out-of-range)
+	EXECUTE 'SELECT count(*) FROM v_edit_link where userdefined_geom  = false AND st_length(the_geom) > 100'
+	INTO v_count;
+
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+		VALUES (25, 2, concat('WARNING: There is/are ',v_count,' automatic links with longitude out-of-range found.'));
+		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+		VALUES (25, 2, concat('QUERY: SELECT count(*) FROM v_edit_link where userdefined_geom  = false AND st_length(the_geom) > 100'));
+		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+		VALUES (25, 2, concat('HINT: If link is ok, change userdefined_geom from false to true. Does not make sense automatic link with this longitude.'));
+	ELSE
+		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+		VALUES (25, 1, 'INFO: No automatic links with out-of-range Longitude found'.);
+	END IF;
 		
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, v_result_id, 4, '');	
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, v_result_id, 3, '');	

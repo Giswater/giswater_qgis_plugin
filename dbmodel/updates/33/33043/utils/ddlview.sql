@@ -28,8 +28,5 @@ CREATE OR REPLACE VIEW v_anl_graf AS
            FROM temp_anlgraf anl_graf_1
           WHERE anl_graf_1.water = 1) a ON anl_graf.node_1 = a.node_2
   WHERE anl_graf.flag < 2 AND anl_graf.water = 0 AND a.flag < 2;
-  
-
- 
 
   

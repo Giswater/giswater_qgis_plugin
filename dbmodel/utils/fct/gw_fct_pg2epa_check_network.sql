@@ -15,12 +15,13 @@ $BODY$
 
 /*
 --EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_pg2epa_check_network('{"data":{"parameters":{"resultId":"gw_check_project","fprocesscatId":127}}}')::json; -- when is called from toolbox
+SELECT SCHEMA_NAME.gw_fct_pg2epa_check_network('{"data":{"parameters":{"resultId":"r1","fprocesscatId":127}}}')::json; -- when is called from toolbox
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_network('{"data":{"parameters":{"resultId":"gw_check_project"}}}')::json; -- when is called from toolbox
 
 --RESULTS
 SELECT arc_id FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user
 SELECT node_id FROM anl_node WHERE fprocesscat_id=39 AND cur_user=current_user
+SELECT * FROM audit_check_data WHERE fprocesscat_id=127
 SELECT * FROM temp_anlgraf;
 */
 
@@ -52,6 +53,7 @@ BEGIN
 
 	--  Get input data
 	v_result_id = ((p_data->>'data')::json->>'parameters')::json->>'resultId';
+	v_fprocesscat_id := ((p_data ->>'data')::json->>'parameters')::json->>'fprocesscatId';
 	
 	-- get project type
 	v_project_type = (SELECT wsoftware FROM version LIMIT 1);
@@ -117,8 +119,8 @@ BEGIN
 		VALUES (v_fprocesscat_id, 3, concat('ERROR: There is/are ',v_count,
 		' node''s orphan on this result. Some inconsistency may have been generated because state_type.'));
 	ELSE
-		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-		VALUES (v_fprocesscat_id, 1, 'INFO: No node(s) orphan found on this result.');
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (v_fprocesscat_id, v_result_id, 1, 'INFO: No node(s) orphan found on this result.');
 	END IF;
 
 	
@@ -232,29 +234,29 @@ BEGIN
 	ELSIF v_project_type  ='UD' THEN
 		
 		SELECT min(length), max(length) INTO v_min, v_max FROM vi_conduits;
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 0, 
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 0, 
 		concat('Data analysis for conduit length. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 
 		SELECT min(n), max(n) INTO v_min, v_max FROM vi_conduits;
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 0, 
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 0, 
 		concat('Data analysis for conduit manning roughness coeficient. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 
 		SELECT min(z1), max(z1) INTO v_min, v_max FROM vi_conduits;
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 0, 
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 0, 
 		concat('Data analysis for conduit z1. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 		
 		SELECT min(z2), max(z2) INTO v_min, v_max FROM vi_conduits;
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 0, 
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 0, 
 		concat('Data analysis for conduit z2. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 	
 		SELECT min(slope), max(slope) INTO v_min, v_max FROM v_edit_arc WHERE sector_id IN 
 		(SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user);
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 0, 
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 0, 
 		concat('Data analysis for conduit slope. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 		
 		SELECT min(sys_elev), max(sys_elev) INTO v_min, v_max FROM v_edit_node WHERE sector_id IN 
 		(SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user);
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, v_result_id, 0, 
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 0, 
 		concat('Data analysis for node elevation. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));	
 	END IF;
 	

@@ -38,7 +38,7 @@ BEGIN
 	SELECT epsg INTO v_srid FROM version LIMIT 1;
 	
 	-- get input data
-	v_result = (p_data->>'data')::json->>'resultId';
+	v_result = ((p_data->>'data')::json->>'parameters')::json->>'resultId';
 
 	-- get user variables
 	v_nullbuffer = (SELECT ((value::json->>'parameters')::json->>'node')::json->>'nullElevBuffer' FROM config_param_user WHERE parameter='inp_options_vdefault' AND cur_user=current_user);

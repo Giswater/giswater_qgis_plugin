@@ -49,7 +49,7 @@ BEGIN
 	-- get user parameteres
 	v_networkmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user);
 	v_buildupmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_buildup_mode' AND cur_user=current_user);
-	v_advancedsettings = (SELECT (value::json->>'avanced')::json->>'status' FROM config_param_user WHERE parameter='inp_options_settings' AND cur_user=current_user)::boolean;
+	v_advancedsettings = (SELECT value::json->>'status' FROM config_param_user WHERE parameter='inp_options_advancedsettings' AND cur_user=current_user)::boolean;
 	v_vdefault = (SELECT value::json->>'status' FROM config_param_user WHERE parameter='inp_options_vdefault' AND cur_user=current_user);
 
 	-- get debug parameters (settings)
@@ -154,49 +154,49 @@ BEGIN
 			PERFORM gw_fct_pg2epa_buildup_transport(v_result);
 		END IF;
 
-		RAISE NOTICE '9 - Advanced settings';
-		IF v_advancedsettings THEN
-			PERFORM gw_fct_pg2epa_advancedsettings(v_result);
-		END IF;
-
-		RAISE NOTICE '10 - Set default values';
+		RAISE NOTICE '9 - Set default values';
 		IF v_vdefault THEN
-			PERFORM gw_fct_pg2epa_vdefault((concat('{"data":{"geometryLog":false, "resultId":"',v_result,'", "useNetworkGeom":"false"}}'))::json);
+			PERFORM gw_fct_pg2epa_vdefault(v_input)::json);
 		END IF;
 
-		RAISE NOTICE '11 - Set cero on elevation those have null values in spite of previous processes (profilactic issue in order to do not crash the epanet file)';
+		RAISE NOTICE '10 - Set cero on elevation those have null values in spite of previous processes (profilactic issue in order to do not crash the epanet file)';
 		UPDATE rpt_inp_node SET elevation = 0 WHERE elevation IS NULL AND result_id=v_result;
 		
-		RAISE NOTICE '12 - Set > 0 values for length';
+		RAISE NOTICE '11 - Set > 0 values for length';
 		UPDATE rpt_inp_arc SET length=0.05 WHERE length=0 AND result_id=v_result;
 		
-		RAISE NOTICE '13 - Check result network';
+		RAISE NOTICE '12 - Check result network';
 		IF v_checknetwork THEN
 			PERFORM gw_fct_pg2epa_check_network(v_input);			
 		END IF;
 		
-		RAISE NOTICE '14 - delete disconnected arcs with associated nodes';
+		RAISE NOTICE '13 - delete disconnected arcs with associated nodes';
 		DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user) and result_id = v_result;
 		DELETE FROM rpt_inp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=39 AND cur_user=current_user) and result_id = v_result;
 		
-		RAISE NOTICE '15 - delete orphan nodes';
+		RAISE NOTICE '14 - delete orphan nodes';
 		DELETE FROM rpt_inp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=7 AND cur_user=current_user) AND result_id=v_result;
 
-		RAISE NOTICE '16 delete arcs without extremal nodes';
+		RAISE NOTICE '15 delete arcs without extremal nodes';
 		DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=3 AND cur_user=current_user) AND result_id=v_result;	
 
 	END IF;
 
-	RAISE NOTICE '17 - Try to set demands & patterns';
+	RAISE NOTICE '16 - Try to set demands & patterns';
 	IF v_setdemand THEN
 		PERFORM gw_fct_pg2epa_demand(v_result);		
 	END IF;
 
-	RAISE NOTICE '18 - Setting dscenarios';
+	RAISE NOTICE '17 - Setting dscenarios';
 	PERFORM gw_fct_pg2epa_dscenario(v_result);
 	
-	RAISE NOTICE '19 - Setting valve status';
+	RAISE NOTICE '18 - Setting valve status';
 	PERFORM gw_fct_pg2epa_valve_status(v_result);
+		
+	RAISE NOTICE '19 - Advanced settings';
+	IF v_advancedsettings THEN
+		PERFORM gw_fct_pg2epa_advancedsettings(v_result);
+	END IF;
 
 	RAISE NOTICE '20 - check result previous exportation';
 	SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return ;

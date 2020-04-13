@@ -46,6 +46,7 @@ BEGIN
 
 	-- getting input data 	
 	v_result_id := ((p_data ->>'data')::json->>'parameters')::json->>'resultId'::text;
+	v_fprocesscat_id := ((p_data ->>'data')::json->>'parameters')::json->>'fprocesscatId';
 
 	-- select config values
 	SELECT wsoftware, giswater  INTO v_project_type, v_version FROM version order by 1 desc limit 1 ;
@@ -65,6 +66,7 @@ BEGIN
 	DELETE FROM anl_arc WHERE fprocesscat_id IN (88) AND cur_user=current_user;
 	DELETE FROM anl_node WHERE fprocesscat_id IN (7,11,13,87) AND cur_user=current_user;
 
+	raise notice 'v_fprocesscat_id %',v_fprocesscat_id;
 
 	-- Header
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (125, v_result_id, 4, concat('DATA QUALITY ANALYSIS ACORDING EPA RULES'));
@@ -78,11 +80,7 @@ BEGIN
 
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (125, v_result_id, 1, 'INFO');
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (125, v_result_id, 1, '-------');	
-	
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (125, v_result_id, 0, 'NETWORK ANALYTICS');
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (125, v_result_id, 0, '-------------------------');	
-
-		
+			
 	RAISE NOTICE '1 - Check orphan nodes (fprocesscat = 7)';
 	v_querytext = '(SELECT node_id, nodecat_id, the_geom FROM (SELECT node_id FROM v_edit_node EXCEPT 
 			(SELECT node_1 as node_id FROM v_edit_arc UNION SELECT node_2 FROM v_edit_arc))a JOIN v_edit_node USING (node_id)
@@ -94,11 +92,11 @@ BEGIN
 	IF v_count > 0 THEN
 		EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) SELECT 7, node_id, nodecat_id, ''Orphan node'', 
 		the_geom FROM ', v_querytext);
-		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-		VALUES (v_fprocesscat_id, 3, concat('ERROR: There is/are ',v_count,' node''s orphan. Take a look on temporal for details.'));
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (v_fprocesscat_id, v_result_id, 3, concat('ERROR: There is/are ',v_count,' node''s orphan. Take a look on temporal for details.'));
 	ELSE
-		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-		VALUES (v_fprocesscat_id, 1, 'INFO: No node(s) orphan found.');
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (v_fprocesscat_id, v_result_id, 1, 'INFO: No node(s) orphan found.');
 	END IF;
 
 
@@ -110,16 +108,15 @@ BEGIN
 	IF v_count > 0 THEN
 		EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) SELECT 87, node_id, nodecat_id, ''nodes 
 		with state_type isoperative = false'', the_geom FROM (', v_querytext,')a');
-		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-		VALUES (v_fprocesscat_id, 2, concat('WARNING: There is/are ',v_count,' node(s) with state > 0 and state_type.is_operative on FALSE. Please, check your 
+		INSERT INTO audit_check_data (fprocesscat_id, result_id,  criticity, error_message) 
+		VALUES (v_fprocesscat_id, v_result_id, 2, concat('WARNING: There is/are ',v_count,' node(s) with state > 0 and state_type.is_operative on FALSE. Please, check your 
 		data before continue. ()'));
-		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-		VALUES (v_fprocesscat_id, 2, concat('SELECT * FROM anl_node WHERE fprocesscat_id=87 AND cur_user=current_user'));
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (v_fprocesscat_id, v_result_id, 2, concat('SELECT * FROM anl_node WHERE fprocesscat_id=87 AND cur_user=current_user'));
 	ELSE
-		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-		VALUES (v_fprocesscat_id, 1, 'INFO: No nodes with state > 0 AND state_type.is_operative on FALSE found.');
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (v_fprocesscat_id, v_result_id, 1, 'INFO: No nodes with state > 0 AND state_type.is_operative on FALSE found.');
 	END IF;
-		
 		
 	RAISE NOTICE '3 - Check arcs with state_type isoperative = false (fprocesscat = 88)';
 	v_querytext = 'SELECT arc_id, arccat_id, the_geom FROM v_edit_arc a JOIN inp_selector_sector USING (sector_id) JOIN value_state_type ON value_state_type.id=state_type WHERE a.state > 0 
@@ -129,14 +126,14 @@ BEGIN
 	IF v_count > 0 THEN
 		EXECUTE concat ('INSERT INTO anl_arc (fprocesscat_id, arc_id, arccat_id, descript, the_geom) SELECT 88, arc_id, arccat_id, ''arcs with state_type 
 		isoperative = false'', the_geom FROM (', v_querytext,')a');
-		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-		VALUES (v_fprocesscat_id, 2, concat('WARNING: There is/are ',v_count,' arc(s) with state > 0 and state_type.is_operative on FALSE. Please, check your data before 
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (v_fprocesscat_id, v_result_id, 2, concat('WARNING: There is/are ',v_count,' arc(s) with state > 0 and state_type.is_operative on FALSE. Please, check your data before 
 		continue'));
-		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-		VALUES (v_fprocesscat_id, 2, concat('SELECT * FROM anl_arc WHERE fprocesscat_id=88 AND cur_user=current_user'));
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (v_fprocesscat_id, v_result_id, 2, concat('SELECT * FROM anl_arc WHERE fprocesscat_id=88 AND cur_user=current_user'));
 	ELSE
-		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-		VALUES (v_fprocesscat_id, 1, 'INFO: No arcs with state > 0 AND state_type.is_operative on FALSE found.');
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (v_fprocesscat_id, v_result_id, 1, 'INFO: No arcs with state > 0 AND state_type.is_operative on FALSE found.');
 	END IF;
 	
 	
@@ -147,11 +144,11 @@ BEGIN
 
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-		VALUES (v_fprocesscat_id, 3, concat('ERROR: There is/are ',v_count,' topologic features (arc, node) with state_type with NULL values. Please, check your data before continue'));
+		INSERT INTO audit_check_data (fprocesscat_id, result_id,  criticity, error_message) 
+		VALUES (v_fprocesscat_id, v_result_id, 3, concat('ERROR: There is/are ',v_count,' topologic features (arc, node) with state_type with NULL values. Please, check your data before continue'));
 	ELSE
-		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-		VALUES (v_fprocesscat_id, 1, 'INFO: No topologic features (arc, node) with state_type NULL values found.');
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (v_fprocesscat_id, v_result_id, 1, 'INFO: No topologic features (arc, node) with state_type NULL values found.');
 	END IF;
 	
 	
@@ -166,11 +163,11 @@ BEGIN
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 
 	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-		VALUES (v_fprocesscat_id, 3, concat('ERROR: There is/are ',v_count,' missed features on inp tables. Please, check your data before continue'));
+		INSERT INTO audit_check_data (fprocesscat_id, result_id,  criticity, error_message) 
+		VALUES (v_fprocesscat_id, v_result_id, 3, concat('ERROR: There is/are ',v_count,' missed features on inp tables. Please, check your data before continue'));
 	ELSE
-		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-		VALUES (v_fprocesscat_id, 1, 'INFO: No features missed on inp_tables found.');
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (v_fprocesscat_id, v_result_id, 1, 'INFO: No features missed on inp_tables found.');
 	END IF;
 
 	RAISE NOTICE '6- Nodes sink';
@@ -210,10 +207,10 @@ BEGIN
 	END IF;
 	
 	RAISE NOTICE '7- Node exit upper intro';
-	INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom, descript)
-	SELECT 11, node_id, nodecat_id, a.the_geom, concat('Node exit upper intro with: Max. entry: ', max_entry , ', Max. exit:',max_exit) 
-	FROM ( SELECT node_id, max(sys_elev1) AS max_exit, nodecat_id, node.the_geom FROM v_edit_arc JOIN node ON node_1 = node_id GROUP BY node_id )a
-	JOIN (	SELECT node_id, max(sys_elev2) AS max_entry FROM v_edit_arc JOIN node ON node_2 = node_id GROUP BY node_id )b USING (node_id)
+	INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, sector_id, the_geom, descript)
+	SELECT 11, node_id, nodecat_id, sector_id, a.the_geom, concat('Node exit upper intro with: Max. entry: ', max_entry , ', Max. exit:',max_exit) 
+	FROM ( SELECT node_id, max(sys_elev1) AS max_exit, nodecat_id, node.sector_id, node.the_geom FROM v_edit_arc JOIN node ON node_1 = node_id GROUP BY node_id, node.sector_id )a
+	JOIN ( SELECT node_id, max(sys_elev2) AS max_entry FROM v_edit_arc JOIN node ON node_2 = node_id GROUP BY node_id )b USING (node_id)
 	JOIN inp_selector_sector USING (sector_id) 
 	WHERE max_entry < max_exit AND cur_user = current_user;
 
@@ -223,7 +220,7 @@ BEGIN
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 		VALUES (v_fprocesscat_id, v_result_id, 2, concat('WARNING: There is/are ',v_count,' junction(s) with exits upper intro'));
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (v_fprocesscat_id, v_result_id, 2, concat('SELECT * FROM anl_node WHERE fprocesscat_id=13 AND cur_user=current_user'));		
+		VALUES (v_fprocesscat_id, v_result_id, 2, concat('SELECT * FROM anl_node WHERE fprocesscat_id=11 AND cur_user=current_user'));		
 	ELSE 
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 		VALUES (v_fprocesscat_id, v_result_id, 1, concat('INFO: Any junction have been detected with exits upper intro.'));
@@ -297,7 +294,7 @@ BEGIN
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() 
+	FROM (SELECT error_message as message FROM audit_check_data WHERE user_name="current_user"() 
 	AND fprocesscat_id=v_fprocesscat_id order by criticity desc, id asc) row; 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
@@ -366,9 +363,9 @@ BEGIN
 		'}')::json;
 
 	--  Exception handling
-	EXCEPTION WHEN OTHERS THEN
-	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	--EXCEPTION WHEN OTHERS THEN
+	--GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	--RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$
