@@ -23,7 +23,7 @@
       <item>
        <widget class="QTabWidget" name="tab_widget">
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="tab_visit">
          <attribute name="title">
@@ -529,7 +529,7 @@
              <bool>true</bool>
             </property>
             <property name="currentIndex">
-             <number>2</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="tab_arc">
              <attribute name="title">
@@ -590,24 +590,6 @@
               <string>Gully</string>
              </attribute>
              <widget class="QTableView" name="tbl_visit_x_gully">
-              <property name="geometry">
-               <rect>
-                <x>10</x>
-                <y>10</y>
-                <width>461</width>
-                <height>381</height>
-               </rect>
-              </property>
-              <property name="sortingEnabled">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </widget>
-            <widget class="QWidget" name="tab_relation">
-             <attribute name="title">
-              <string>Relations</string>
-             </attribute>
-             <widget class="QTableView" name="tbl_relation">
               <property name="geometry">
                <rect>
                 <x>10</x>

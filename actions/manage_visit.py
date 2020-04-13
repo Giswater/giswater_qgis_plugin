@@ -116,14 +116,11 @@ class ManageVisit(ParentManage, QObject):
         self.ext_code = self.dlg_add_visit.findChild(QLineEdit, "ext_code")
         self.visitcat_id = self.dlg_add_visit.findChild(QComboBox, "visitcat_id")
 
-        # Tab 'Relations'
-        self.feature_type = self.dlg_add_visit.findChild(QComboBox, "feature_type")
-        self.tbl_relation = self.dlg_add_visit.findChild(QTableView, "tbl_relation")
-
         # tab 'Event'
         self.tbl_event = self.dlg_add_visit.findChild(QTableView, "tbl_event")
         self.parameter_type_id = self.dlg_add_visit.findChild(QComboBox, "parameter_type_id")
         self.parameter_id = self.dlg_add_visit.findChild(QComboBox, "parameter_id")
+        self.feature_type = self.dlg_add_visit.findChild(QComboBox, "feature_type")
 
         # tab 'Document'
         self.doc_id = self.dlg_add_visit.findChild(QLineEdit, "doc_id")
@@ -171,8 +168,8 @@ class ManageVisit(ParentManage, QObject):
         self.visit_id.setText(str(visit_id))
 
         # manage relation locking
-        #if self.locked_geom_type:
-        #    self.set_locked_relation()
+        if self.locked_geom_type:
+            self.set_locked_relation()
 
         # Open the dialog
         if open_dialog:
@@ -203,15 +200,16 @@ class ManageVisit(ParentManage, QObject):
         #    self.tab_feature_changed, self.dlg_add_visit, self.table_object, excluded_layers=["v_edit_element"]))
 
         # Fill combo boxes of the form and related events
-        self.feature_type.currentIndexChanged.connect(partial(self.event_feature_type_selected, self.dlg_add_visit, None))
         self.parameter_type_id.currentIndexChanged.connect(partial(self.set_parameter_id_combo, self.dlg_add_visit))
-        self.parameter_id.currentIndexChanged.connect(self.get_feature_type_of_parameter)
+        self.feature_type.currentTextChanged.connect(partial(self.event_feature_type_selected, self.dlg_add_visit, None))
+        self.feature_type.currentTextChanged.connect(partial(self.manage_tabs_enabled, True))
+        self.parameter_id.currentTextChanged.connect(self.get_feature_type_of_parameter)
 
 
     def set_locked_relation(self):
-        """Set geom_type and listed feature_id in tbl_relation to lock it => disable related tab."""
+        """ Set geom_type and listed feature_id in @table_name to lock it """
         
-        # disable tab
+        # Enable tab
         index = self.tab_index('tab_relations')
         self.tabs.setTabEnabled(index, True)
 
@@ -226,18 +224,20 @@ class ManageVisit(ParentManage, QObject):
         else:
             self.feature_type.currentIndexChanged.emit(feature_type_index)
 
-        # Load feature if in tbl_relation. Select list of related features
+        # Load feature if in @table_name. Select list of related features
         # Set 'expr_filter' with features that are in the list
-        expr_filter = f'"{self.geom_type}_id"::integer IN ({self.locked_feature_id})'
-        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
-        if not is_valid:
-            return
+        if self.locked_feature_id:
+            table_name = f'om_visit_x_{self.geom_type}'
+            expr_filter = f'"{self.geom_type}_id"::integer IN ({self.locked_feature_id})'
+            (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+            if not is_valid:
+                return
 
-        # do selection allowing the tbl_relation to be linked to canvas selectionChanged
-        self.disconnect_signal_selection_changed()
-        self.connect_signal_selection_changed(self.dlg_add_visit, self.tbl_relation)
-        self.select_features_by_ids(self.geom_type, expr)
-        self.disconnect_signal_selection_changed()
+            # do selection allowing @table_name to be linked to canvas selectionChanged
+            self.disconnect_signal_selection_changed()
+            self.connect_signal_selection_changed(self.dlg_add_visit, table_name)
+            self.select_features_by_ids(self.geom_type, expr)
+            self.disconnect_signal_selection_changed()
 
 
     def manage_accepted(self):
@@ -343,15 +343,15 @@ class ManageVisit(ParentManage, QObject):
         for index in range(self.feature_type.count()):
             # feture_type combobox is filled before the visit_id is changed
             # it will contain all the geometry type allows basing on project type
-            geometry_type = self.feature_type.itemText(index).lower()
-            if geometry_type != '':
-                table_name = f'om_visit_x_{geometry_type}'
+            geom_type = self.feature_type.itemText(index).lower()
+            if geom_type != '' and geom_type != 'all':
+                table_name = f'om_visit_x_{geom_type}'
                 sql = f"SELECT id FROM {table_name} WHERE visit_id = '{self.current_visit.id}'"
                 rows = self.controller.get_rows(sql, commit=self.autocommit)
                 if not rows or not rows[0]:
                     continue
 
-                feature_type = geometry_type
+                feature_type = geom_type
                 feature_type_index = index
                 break
 
@@ -410,7 +410,7 @@ class ManageVisit(ParentManage, QObject):
         """ Remove all old relations related with current visit_id and @geom_type """
 
         self.controller.log_info(f"delete_relations_geom_type: {geom_type}")
-        if geom_type == '':
+        if geom_type == '' or geom_type.lower() == 'all':
             return
 
         # TODO: the next "if" code can be substituded with something like:
@@ -435,7 +435,7 @@ class ManageVisit(ParentManage, QObject):
 
         self.controller.log_info(f"update_relations_geom_type: {geom_type}")
 
-        if geom_type == '':
+        if geom_type == '' or geom_type.lower() == 'all':
             return
 
         # for each showed element of a specific geom_type create an db entry
@@ -541,11 +541,17 @@ class ManageVisit(ParentManage, QObject):
         if row:
             self.feature_type_parameter = row[0]
             self.geom_type = self.feature_type_parameter.lower()
-            self.manage_tabs_enabled()
+            self.manage_tabs_enabled(True)
 
 
     def manage_tabs_enabled(self, disable_tabs=False):
         """ Enable/Disable tabs depending geom_type """
+
+        # If geom_type = 'all': enable all tabs
+        if self.geom_type == 'all':
+            for i in range(self.dlg_add_visit.tab_feature.count() - 1):
+                self.dlg_add_visit.tab_feature.setTabEnabled(i, True)
+            return
 
         # Disable all tabs
         if disable_tabs:
@@ -576,7 +582,6 @@ class ManageVisit(ParentManage, QObject):
 
         # configure model visibility
         table_name = f"v_edit_{self.geom_type}"
-        self.set_configuration(dialog, "tbl_relation", table_name)
         self.set_configuration(dialog, "tbl_visit_x_arc", table_name)
         self.set_configuration(dialog, "tbl_visit_x_node", table_name)
         self.set_configuration(dialog, "tbl_visit_x_connec", table_name)
@@ -584,18 +589,24 @@ class ManageVisit(ParentManage, QObject):
 
 
     def event_feature_type_selected(self, dialog, geom_type=None):
-        """Manage selection change in feature_type combo box.
+        """ Manage selection change in feature_type combo box.
         THis means that have to set completer for feature_id QTextLine and
-        setup model for features to select table."""
+        setup model for features to select table """
 
         # 1) set the model linked to selecte features
         # 2) check if there are features related to the current visit
         # 3) if so, select them => would appear in the table associated to the model
         if geom_type is None:
             geom_type = self.feature_type.currentText().lower()
-            self.geom_type = geom_type
 
+        self.geom_type = geom_type
         if geom_type == '':
+            return
+
+        # Fill combo parameter_id depending geom_type
+        self.fill_combo_parameter_id()
+
+        if geom_type.lower() == 'all':
             return
 
         viewname = f"v_edit_{geom_type}"
@@ -616,9 +627,6 @@ class ManageVisit(ParentManage, QObject):
         # check if there are features related to the current visit
         if not self.visit_id.text():
             return
-
-        # Fill combo parameter_id depending geom_type
-        self.fill_combo_parameter_id()
 
         table_name = f'om_visit_x_{geom_type}'
         sql = f"SELECT {geom_type}_id FROM {table_name} WHERE visit_id = '{int(self.visit_id.text())}'"
@@ -757,11 +765,11 @@ class ManageVisit(ParentManage, QObject):
             elif visit_id is not None:
                 sql = (f"SELECT visitcat_id"
                        f" FROM om_visit"
-                       f" WHERE id ='{visit_id}' ")
+                       f" WHERE id = '{visit_id}' ")
                 id_visitcat = self.controller.get_row(sql)
                 sql = (f"SELECT id, name"
                        f" FROM om_visit_cat"
-                       f" WHERE active is true AND id ='{id_visitcat[0]}' "
+                       f" WHERE active is true AND id = '{id_visitcat[0]}' "
                        f" ORDER BY name")
                 row = self.controller.get_row(sql)
                 utils_giswater.set_combo_itemData(self.dlg_add_visit.visitcat_id, str(row[1]), 1)
@@ -773,16 +781,17 @@ class ManageVisit(ParentManage, QObject):
             if visit_id is not None:
                 sql = (f"SELECT status "
                        f"FROM om_visit "
-                       f"WHERE id ='{visit_id}' ")
+                       f"WHERE id = '{visit_id}'")
                 status = self.controller.get_row(sql)
                 utils_giswater.set_combo_itemData(self.dlg_add_visit.status, str(status[0]), 0)
 
         # Relations tab
         # fill feature_type
-        sql = ("SELECT id"
-               " FROM sys_feature_type"
-               " WHERE net_category = 1"
-               " ORDER BY id")
+        sql = ("SELECT 'ALL' as id "
+               "UNION SELECT id "
+               "FROM sys_feature_type "
+               "WHERE net_category = 1 "
+               "ORDER BY id")
         rows = self.controller.get_rows(sql, commit=self.autocommit)
         utils_giswater.fillComboBox(self.dlg_add_visit, "feature_type", rows, allow_nulls=True)
 
@@ -805,8 +814,17 @@ class ManageVisit(ParentManage, QObject):
 
         sql = (f"SELECT id, descript "
                f"FROM om_visit_parameter ")
+        where = None
+        parameter_type_id = utils_giswater.getWidgetText(self.dlg_add_visit, "parameter_type_id")
+        if parameter_type_id:
+            where = f"WHERE parameter_type = '{parameter_type_id}' "
         if self.geom_type:
-            sql += f"WHERE UPPER(feature_type) = '{self.geom_type.upper()}' "
+            if where is None:
+                where = f"WHERE UPPER(feature_type) = '{self.geom_type.upper()}' "
+            else:
+                where += f"AND UPPER(feature_type) = '{self.geom_type.upper()}' "
+
+        sql += where
         sql += f"ORDER BY id"
         rows = self.controller.get_rows(sql, log_sql=True)
         utils_giswater.set_item_data(self.dlg_add_visit.parameter_id, rows, 1)
@@ -1378,8 +1396,9 @@ class ManageVisit(ParentManage, QObject):
         self.controller.log_info("populate_position_id")
 
         node_list = []
-        node_1 = self.dlg_add_visit.tbl_relation.model().record(0).value('node_1')
-        node_2 = self.dlg_add_visit.tbl_relation.model().record(0).value('node_2')
+        table_name = f'om_visit_x_{self.geom_type}'
+        node_1 = self.dlg_add_visit.table_name.model().record(0).value('node_1')
+        node_2 = self.dlg_add_visit.table_name.model().record(0).value('node_2')
         node_list.append([node_1, f"node 1: {node_1}"])
         node_list.append([node_2, f"node 2: {node_2}"])
         utils_giswater.set_item_data(self.dlg_event.position_id, node_list, 1, True, False)
