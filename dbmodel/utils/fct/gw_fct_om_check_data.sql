@@ -749,7 +749,7 @@ BEGIN
 		VALUES (25, 2, concat('HINT: If link is ok, change userdefined_geom from false to true. Does not make sense automatic link with this longitude.'));
 	ELSE
 		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-		VALUES (25, 1, 'INFO: No automatic links with out-of-range Longitude found'.);
+		VALUES (25, 1, 'INFO: No automatic links with out-of-range Longitude found.');
 	END IF;
 		
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (25, v_result_id, 4, '');	
