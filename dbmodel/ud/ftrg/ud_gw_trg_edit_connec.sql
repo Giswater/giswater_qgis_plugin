@@ -39,40 +39,41 @@ BEGIN
 	IF v_promixity_buffer IS NULL THEN v_promixity_buffer=0.5; END IF;
 
 	-- transforming streetaxis name into id
-	v_streetaxis = (SELECT id FROM ext_streetaxis WHERE muni_id = NEW.muni_id AND name = NEW.streetname LIMIT 1);
-	v_streetaxis2 = (SELECT id FROM ext_streetaxis WHERE muni_id = NEW.muni_id AND name = NEW.streetname2 LIMIT 1);
+	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
+		v_streetaxis = (SELECT id FROM ext_streetaxis WHERE muni_id = NEW.muni_id AND name = NEW.streetname LIMIT 1);
+		v_streetaxis2 = (SELECT id FROM ext_streetaxis WHERE muni_id = NEW.muni_id AND name = NEW.streetname2 LIMIT 1);
+	END IF;
         
-    -- Control insertions ID
-    IF TG_OP = 'INSERT' THEN
+	-- Control insertions ID
+	IF TG_OP = 'INSERT' THEN
 
-        -- connec ID
-        IF (NEW.connec_id IS NULL) THEN
+		-- connec ID
+		IF (NEW.connec_id IS NULL) THEN
 			PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
-            NEW.connec_id:= (SELECT nextval('urn_id_seq'));
-        END IF;
+			NEW.connec_id:= (SELECT nextval('urn_id_seq'));
+		END IF;
 
-        -- connec type
-        IF (NEW.connec_type IS NULL) AND v_customfeature IS NOT NULL THEN
+		-- connec type
+		IF (NEW.connec_type IS NULL) AND v_customfeature IS NOT NULL THEN
 		    	NEW.connec_type:= v_customfeature;
 		ELSIF (NEW.connec_type IS NULL) THEN
 			  NEW.connec_type:= (SELECT "value" FROM config_param_user WHERE "parameter"='connectype_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			IF (NEW.connec_type IS NULL) THEN
 				NEW.connec_type:=(SELECT id FROM connec_type LIMIT 1);
 			END IF;
-        END IF;
+		END IF;
         
-        -- connec Catalog ID
-        IF (NEW.connecat_id IS NULL) THEN
-        	IF ((SELECT COUNT(*) FROM cat_connec) = 0) THEN
-               EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+		-- connec Catalog ID
+		IF (NEW.connecat_id IS NULL) THEN
+			IF ((SELECT COUNT(*) FROM cat_connec) = 0) THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
 				"data":{"error":"1022", "function":"1204","debug_msg":null}}$$);';
-            END IF;
-			   NEW.connecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='connecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			END IF;
+				NEW.connecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='connecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			IF (NEW.connecat_id IS NULL) THEN
 				NEW.connecat_id:=(SELECT id FROM cat_connec LIMIT 1);
 			END IF;
-        END IF;
-		
+		END IF;
 		
 		-- Exploitation
 		IF (NEW.expl_id IS NULL) THEN

@@ -53,55 +53,54 @@ BEGIN
 	SELECT ((value::json)->>'value') INTO v_double_geom_buffer FROM config_param_system WHERE parameter='insert_double_geometry';
 
 	-- transforming streetaxis name into id
-	v_streetaxis = (SELECT id FROM ext_streetaxis WHERE muni_id = NEW.muni_id AND name = NEW.streetname LIMIT 1);
-	v_streetaxis2 = (SELECT id FROM ext_streetaxis WHERE muni_id = NEW.muni_id AND name = NEW.streetname2 LIMIT 1);
-
+	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
+		v_streetaxis = (SELECT id FROM ext_streetaxis WHERE muni_id = NEW.muni_id AND name = NEW.streetname LIMIT 1);
+		v_streetaxis2 = (SELECT id FROM ext_streetaxis WHERE muni_id = NEW.muni_id AND name = NEW.streetname2 LIMIT 1);
+	END IF;
 	
-    -- Control insertions ID
-    IF TG_OP = 'INSERT' THEN
+	-- Control insertions ID
+	IF TG_OP = 'INSERT' THEN
 
-        -- Node ID
-        IF (NEW.node_id IS NULL) THEN
+		-- Node ID
+		IF (NEW.node_id IS NULL) THEN
 			PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
-	        NEW.node_id:= (SELECT nextval('urn_id_seq'));
-        END IF;
+			NEW.node_id:= (SELECT nextval('urn_id_seq'));
+		END IF;
 
-      
-        -- Node type
-        IF (NEW.node_type IS NULL) THEN
-            IF ((SELECT COUNT(*) FROM node_type) = 0) THEN
-                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-      		 	"data":{"error":"1004", "function":"1220","debug_msg":null}}$$);';
-            END IF;
+		-- Node type
+		IF (NEW.node_type IS NULL) THEN
+			IF ((SELECT COUNT(*) FROM node_type) = 0) THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				"data":{"error":"1004", "function":"1220","debug_msg":null}}$$);';
+			END IF;
             
  			If v_customfeature IS NOT NULL THEN
  				NEW.node_type:=v_customfeature;
  			ELSE
-            	NEW.node_type:= (SELECT "value" FROM config_param_user WHERE "parameter"='nodetype_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-            END IF;
+				NEW.node_type:= (SELECT "value" FROM config_param_user WHERE "parameter"='nodetype_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			END IF;
 
-            IF (NEW.node_type IS NULL) AND v_man_table='parent' THEN
-            	NEW.node_type:= (SELECT id FROM node_type LIMIT 1);
+			IF (NEW.node_type IS NULL) AND v_man_table='parent' THEN
+				NEW.node_type:= (SELECT id FROM node_type LIMIT 1);
 
-            ELSIF (NEW.node_type IS NULL) AND v_man_table !='parent' THEN
-            	NEW.node_type:= (SELECT id FROM node_type WHERE node_type.man_table=v_type_v_man_table LIMIT 1);
-            END IF;
-        END IF;
+			ELSIF (NEW.node_type IS NULL) AND v_man_table !='parent' THEN
+				NEW.node_type:= (SELECT id FROM node_type WHERE node_type.man_table=v_type_v_man_table LIMIT 1);
+			END IF;
+		END IF;
 
-         -- Epa type
-        IF (NEW.epa_type IS NULL) THEN
+		-- Epa type
+		IF (NEW.epa_type IS NULL) THEN
 			NEW.epa_type:= (SELECT epa_default FROM node_type WHERE node_type.id=NEW.node_type LIMIT 1)::text;   
 		END IF;
 
-        -- Node Catalog ID
-        IF (NEW.nodecat_id IS NULL) THEN
-            IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
-                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-      		 	"data":{"error":"1006", "function":"1220","debug_msg":null}}$$);'; 
-            END IF;      
-			NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='nodecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-        END IF;
-		
+		-- Node Catalog ID
+		IF (NEW.nodecat_id IS NULL) THEN
+			IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				"data":{"error":"1006", "function":"1220","debug_msg":null}}$$);'; 
+			END IF;      
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='nodecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
 		
 		-- Exploitation
 		IF (NEW.expl_id IS NULL) THEN

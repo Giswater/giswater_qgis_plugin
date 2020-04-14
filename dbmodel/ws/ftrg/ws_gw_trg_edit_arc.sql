@@ -31,7 +31,7 @@ v_streetaxis2 text;
 
 BEGIN
 
-    EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	        v_man_table:= TG_ARGV[0];
 
 	--modify values for custom view inserts	
@@ -44,19 +44,21 @@ BEGIN
 	v_edit_enable_arc_nodes_update = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_enable_arc_nodes_update');
 
 	-- transforming streetaxis name into id
-	v_streetaxis = (SELECT id FROM ext_streetaxis WHERE muni_id = NEW.muni_id AND name = NEW.streetname LIMIT 1);
-	v_streetaxis2 = (SELECT id FROM ext_streetaxis WHERE muni_id = NEW.muni_id AND name = NEW.streetname2 LIMIT 1);
+	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
+		v_streetaxis = (SELECT id FROM ext_streetaxis WHERE muni_id = NEW.muni_id AND name = NEW.streetname LIMIT 1);
+		v_streetaxis2 = (SELECT id FROM ext_streetaxis WHERE muni_id = NEW.muni_id AND name = NEW.streetname2 LIMIT 1);
+	END IF;
 
 	
-    IF TG_OP = 'INSERT' THEN
+	IF TG_OP = 'INSERT' THEN
     
-        -- Arc ID
-        IF (NEW.arc_id IS NULL) THEN
+		-- Arc ID
+		IF (NEW.arc_id IS NULL) THEN
 			PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
-            NEW.arc_id:= (SELECT nextval('urn_id_seq'));
-        END IF;
-        
-        -- Arc catalog ID
+			NEW.arc_id:= (SELECT nextval('urn_id_seq'));
+		END IF;
+
+		-- Arc catalog ID
 		IF (NEW.arccat_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM cat_arc) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
