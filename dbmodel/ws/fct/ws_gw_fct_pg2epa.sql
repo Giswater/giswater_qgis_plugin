@@ -127,7 +127,7 @@ BEGIN
 		PERFORM gw_fct_pg2epa_pump_additional(v_result);
 
 		RAISE NOTICE '7 - manage varcs';
-		PERFORM gw_fct_pg2epa_join_virtual(v_result);	
+		PERFORM gw_fct_pg2epa_manage_varc(v_result);	
 
 		RAISE NOTICE '7 - Try to trim arcs with vnode';
 		IF v_networkmode = 3 OR v_networkmode = 4 THEN

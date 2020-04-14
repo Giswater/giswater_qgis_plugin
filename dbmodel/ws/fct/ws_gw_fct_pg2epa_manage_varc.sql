@@ -24,10 +24,10 @@ BEGIN
 			-- those arcs VARC-PIPE close to JUNCTION with same sector. In case of two JUNCTION on diferent sector -> select distinct is applied but problem is served
 			with virtual AS
 				(SELECT distinct on(arc_id) arc_id, node_1 as node_id, n.epa_type FROM rpt_inp_arc a JOIN rpt_inp_node n ON node_1 = node_id 
-				WHERE arc_type = 'VARC' AND a.epa_type ='PIPE' AND n.epa_type = 'JUNCTION' AND a.sector_id = n.sector_id AND result_id  = result_id_var 
+				WHERE arc_type = 'VARC' AND a.epa_type ='PIPE' AND n.epa_type = 'JUNCTION' AND a.sector_id = n.sector_id AND a.result_id  = result_id_var 
 				UNION
 				SELECT distinct on(arc_id) arc_id, node_2, n.epa_type FROM rpt_inp_arc a JOIN rpt_inp_node n ON node_2 = node_id 
-				WHERE arc_type = 'VARC' AND a.epa_type ='PIPE' AND n.epa_type = 'JUNCTION'  AND a.sector_id = n.sector_id AND result_id  = result_id_var )
+				WHERE arc_type = 'VARC' AND a.epa_type ='PIPE' AND n.epa_type = 'JUNCTION'  AND a.sector_id = n.sector_id AND a.result_id  = result_id_var )
 
 			-- those arcs PIPE-PIPE close to JUNCTION identified before
 			SELECT v.arc_id, diameter, roughness FROM rpt_inp_arc a JOIN virtual v ON node_id = node_1 OR node_id = node_2
