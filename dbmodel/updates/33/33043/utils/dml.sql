@@ -59,3 +59,6 @@ WHERE function_name = 'gw_fct_update_elevation_from_dem';
 
 UPDATE config_client_forms SET status = false WHERE table_id = 'v_ui_rpt_cat_result' AND column_id = 'id';
 
+INSERT INTO audit_cat_function VALUES (2852, 'gw_fct_lot_psector_geom', 'utils', 'function', NULL, NULL, NULL, 'Generate lot geometry', 'role_om', false) 
+ON CONFLICT (id) DO NOTHING;
+
