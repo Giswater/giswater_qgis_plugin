@@ -67,3 +67,5 @@ UPDATE config_client_forms SET status = false WHERE table_id = 'v_ui_rpt_cat_res
 
 UPDATE config_param_system set standardvalue ='{"status":false, "server":""}' WHERE parameter  ='sys_transaction_db';
 UPDATE config_param_system set standardvalue ='1' WHERE parameter  ='i18n_update_mode';
+
+UPDATE audit_cat_table SET isdeprecated  = true where id  like '%v_edit_man_%';
