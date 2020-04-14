@@ -158,8 +158,8 @@ BEGIN
 	"data":{"action":"RENAMESCHEMA","source":"'||v_source_schema||'", "target":"'||v_dest_schema||'"}}$$);';
 
 	--Functions
-	raise notice 'FCT';
-	EXECUTE 'SELECT replace(''SCHEMA_NAMEoftware'', '''||v_source_schema||''','''||v_dest_schema||''')'
+
+	EXECUTE 'SELECT replace(''wsoftware'', '''||v_source_schema||''','''||v_dest_schema||''')'
 	into v_software;
 
 	FOR rec_fct IN 
