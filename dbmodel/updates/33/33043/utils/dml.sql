@@ -56,7 +56,7 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO audit_cat_function VALUES (2852, 'gw_fct_lot_psector_geom', 'utils', 'function', NULL, NULL, NULL, 'Generate lot geometry', 'role_om', false) 
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO audit_cat_function VALUES (2854, 'gw_fct_pg2epa_manage_varc', 'utils', 'function, NULL, NULL, NULL, 'Manage varcs when export to epa', 'role_epa', false) 
+INSERT INTO audit_cat_function VALUES (2854, 'gw_fct_pg2epa_manage_varc', 'utils', 'function', NULL, NULL, NULL, 'Manage varcs when export to epa', 'role_epa', false) 
 ON CONFLICT (id) DO NOTHING;
 
 UPDATE audit_cat_function SET
@@ -65,3 +65,5 @@ WHERE function_name = 'gw_fct_update_elevation_from_dem';
 
 UPDATE config_client_forms SET status = false WHERE table_id = 'v_ui_rpt_cat_result' AND column_id = 'id';
 
+UPDATE config_param_system set standardvalue ='{"status":false, "server":""}' WHERE parameter  ='sys_transaction_db';
+UPDATE config_param_system set standardvalue ='1' WHERE parameter  ='i18n_update_mode';
