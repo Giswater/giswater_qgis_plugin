@@ -12,7 +12,7 @@ SELECT setval('SCHEMA_NAME.config_api_form_fields_id_seq', (SELECT max(id) FROM 
 -- 07/04/2020
 
 INSERT INTO config_api_form_tabs (id, formname, tabname, label,  tooltip, sys_role) 
-VALUES (710, 'exploitation', 'tabExploitation', 'Exploitation', 'Exploitation Selector', 'role_basic');
+VALUES (710, 'exploitation', 'tabExploitation', 'Exploitation', 'Exploitation Selector', 'role_basic') ON CONFLICT (id) DO NOTHING;
 
 SELECT setval('config_param_system_id_seq', (SELECT max(id) FROM config_param_system), true);
 INSERT INTO config_param_system (parameter, value, context,  descript, label, project_type, datatype, isdeprecated) 
