@@ -171,6 +171,12 @@ class ManageVisit(ParentManage, QObject):
         if self.locked_geom_type:
             self.set_locked_relation()
 
+        # Initialize geom_type to 'arc'
+        self.geom_type = 'arc'
+
+        # Force tab_feature_changed
+        self.tab_feature_changed(self.dlg_add_visit, self.table_object, excluded_layers = ["v_edit_element"])
+
         # Open the dialog
         if open_dialog:
             self.open_dialog(self.dlg_add_visit, dlg_name="visit")
@@ -196,8 +202,8 @@ class ManageVisit(ParentManage, QObject):
         self.dlg_add_visit.btn_open_doc.clicked.connect(partial(self.document_open, self.tbl_document))
         self.tbl_document.doubleClicked.connect(partial(self.document_open, self.tbl_document))
         self.dlg_add_visit.btn_add_geom.clicked.connect(self.add_point)
-        #self.dlg_add_visit.tab_feature.currentChanged.connect(partial(
-        #    self.tab_feature_changed, self.dlg_add_visit, self.table_object, excluded_layers=["v_edit_element"]))
+        self.dlg_add_visit.tab_feature.currentChanged.connect(partial(
+            self.tab_feature_changed, self.dlg_add_visit, self.table_object, excluded_layers=["v_edit_element"]))
 
         # Fill combo boxes of the form and related events
         self.parameter_type_id.currentTextChanged.connect(partial(self.set_parameter_id_combo, self.dlg_add_visit))
@@ -544,7 +550,7 @@ class ManageVisit(ParentManage, QObject):
 
         # Disable all tabs
         if disable_tabs:
-            for i in range(self.dlg_add_visit.tab_feature.count() - 1):
+            for i in range(self.dlg_add_visit.tab_feature.count()):
                 self.dlg_add_visit.tab_feature.setTabEnabled(i, False)
 
         if self.geom_type == 'arc':
@@ -679,15 +685,17 @@ class ManageVisit(ParentManage, QObject):
             partial(self.open_selected_object, self.dlg_man, self.dlg_man.tbl_visit, table_object))
         self.dlg_man.btn_delete.clicked.connect(
             partial(self.delete_selected_object, self.dlg_man.tbl_visit, table_object))
-        self.dlg_man.txt_filter.textChanged.connect(
-            partial(self.filter_visit, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object, expr_filter, filed_to_filter))
+        self.dlg_man.txt_filter.textChanged.connect(partial(self.filter_visit, self.dlg_man, self.dlg_man.tbl_visit,
+            self.dlg_man.txt_filter, table_object, expr_filter, filed_to_filter))
 
         # set timeStart and timeEnd as the min/max dave values get from model
         self.set_dates_from_to(self.dlg_man.date_event_from, self.dlg_man.date_event_to, 'om_visit', 'startdate', 'enddate')
 
         # set date events
-        self.dlg_man.date_event_from.dateChanged.connect(partial(self.filter_visit, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object, expr_filter, filed_to_filter))
-        self.dlg_man.date_event_to.dateChanged.connect(partial(self.filter_visit, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object, expr_filter, filed_to_filter))
+        self.dlg_man.date_event_from.dateChanged.connect(partial(self.filter_visit, self.dlg_man,
+            self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object, expr_filter, filed_to_filter))
+        self.dlg_man.date_event_to.dateChanged.connect(partial(self.filter_visit, self.dlg_man,
+            self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object, expr_filter, filed_to_filter))
 
         # Open form
         self.open_dialog(self.dlg_man, dlg_name="visit_management")
@@ -1408,7 +1416,7 @@ class ManageVisit(ParentManage, QObject):
         elif tab_position == 3:
             self.geom_type = "gully"
 
-        if self.gem_type == '':
+        if self.geom_type == '':
             return
 
         self.hide_generic_layers(excluded_layers=excluded_layers)
