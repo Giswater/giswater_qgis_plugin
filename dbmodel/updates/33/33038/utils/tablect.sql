@@ -14,3 +14,9 @@ ALTER TABLE man_addfields_parameter ADD CONSTRAINT man_addfields_parameter_uniqu
 
 ALTER TABLE link DROP CONSTRAINT IF EXISTS link_unique;
 ALTER TABLE link ADD CONSTRAINT link_unique UNIQUE(feature_id, feature_type, state);
+
+
+ALTER TABLE om_visit_parameter DROP CONSTRAINT om_visit_parameter_feature_type_fkey;
+UPDATE om_visit_parameter SET feature_type='ALL' WHERE feature_type IS NULL;
+ALTER TABLE om_visit_parameter ADD CONSTRAINT om_visit_parameter_feature_type_check CHECK (feature_type::text=ANY 
+(ARRAY['ARC', 'NODE', 'CONNEC', 'GULLY', 'ALL']));
