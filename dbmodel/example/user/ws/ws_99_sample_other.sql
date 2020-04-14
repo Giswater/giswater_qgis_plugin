@@ -545,13 +545,8 @@ UPDATE v_edit_node SET epa_type = 'NOT DEFINED' WHERE node_id = '1007';
 DELETE FROM selector_psector;
 
 -- deprecated on psector 1 and 2
-SELECT gw_fct_connect_to_network($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{"id":"[3104, 3103]"}, "data":{"filterFields":{}, "pageInfo":{}, "feature_type":"CONNEC"}}$$);
+SELECT gw_fct_connect_to_network($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{"id":"[3104, 3103, 3076, 3177]"}, "data":{"filterFields":{}, "pageInfo":{}, "feature_type":"CONNEC"}}$$);
 
-INSERT INTO selector_psector (psector_id, cur_user) VALUES (1, current_user);
-INSERT INTO selector_psector (psector_id, cur_user) VALUES (2, current_user);
-
--- planned on psector 1 and 2
-SELECT gw_fct_connect_to_network($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{"id":"[114463, 114462, 114461]"}, "data":{"filterFields":{}, "pageInfo":{}, "feature_type":"CONNEC"}}$$);
 
 -- update demands and patterns for connec
 UPDATE inp_connec SET pattern_id = 'pattern_01', demand = demand*0.5 FROM (SELECT * FROM connec LIMIT 100 OFFSET 0) a WHERE a.connec_id = inp_connec.connec_id;
@@ -581,3 +576,7 @@ UPDATE v_edit_arc SET arccat_id = 'VIRTUAL' WHERE arc_type = 'VARC';
 UPDATE inp_cat_mat_roughness set roughness  = 0.003;
 UPDATE cat_arc SET dint = null, dext = null, dnom = null, descript = 'Virtual arc' WHERE arctype_id = 'VARC';
 DELETE FROM cat_arc  WHERE arctype_id = 'VARC' AND id !='VIRTUAL';
+
+
+UPDATE config_api_form_fields SET dv_querytext_filterc  = ' AND id ' 
+WHERE form IN ('upsert_catalog_node', 'upsert_catalog_arc', 'upsert_catalog_connec') AND column_id ='matcat_id';
