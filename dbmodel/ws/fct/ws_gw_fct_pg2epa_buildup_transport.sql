@@ -11,22 +11,36 @@ RETURNS integer
 AS $BODY$
 
 /*example
-SELECT SCHEMA_NAME.gw_fct_pg2epa($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
-"data":{"resultId":"t12", "useNetworkGeom":"false"}}$$)
+
 */
 
 DECLARE
-
+rec_node record;
+v_count integer;
 
 BEGIN
 
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
 
-	
-    RETURN 1;
+	-- transformn on the fly those inlets int tank or reservoir in function of how many sectors they has	
+	FOR rec_node IN SELECT * FROM rpt_inp_node WHERE epa_type = 'INLET' AND result_id = p_result
+	LOOP
+		-- get how many sectors are attached
+		SELECT count(*) INTO v_count FROM (
+				SELECT sector_id FROM rpt_inp_arc WHERE node_1 = rec_node.node_id 
+				UNION 
+				SELECT sector_id FROM rpt_inp_arc WHERE node_2 = rec_node.node_id)a;
 
+		IF v_count = 1 THEN
+			UPDATE rpt_inp_node SET epa_type  = 'RESERVOIR' WHERE node_id =  rec_node.node_id AND result_id = p_result;
+		ELSE
+			UPDATE rpt_inp_node SET epa_type  = 'TANK' WHERE node_id =  rec_node.node_id AND result_id = p_result;
+		END IF;
+	END LOOP;
+
+	
+	RETURN 1;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

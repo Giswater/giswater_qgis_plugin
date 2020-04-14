@@ -85,50 +85,43 @@ BEGIN
 	DELETE FROM inp_selector_result WHERE cur_user=current_user;
 	INSERT INTO inp_selector_result (result_id, cur_user) VALUES (v_result, current_user);
 	
-	RAISE NOTICE '3 - Set value default';
-	UPDATE inp_outfall SET outfall_type=(SELECT value FROM config_param_user WHERE parameter='epa_outfall_type_vdefault' AND cur_user=current_user) WHERE outfall_type IS NULL;
-	UPDATE inp_conduit SET q0=(SELECT value FROM config_param_user WHERE parameter='epa_conduit_q0_vdefault' AND cur_user=current_user)::float WHERE q0 IS NULL;
-	UPDATE inp_conduit SET barrels=(SELECT value FROM config_param_user WHERE parameter='epa_conduit_barrels_vdefault' AND cur_user=current_user)::integer WHERE barrels IS NULL;
-	UPDATE inp_junction SET y0=(SELECT value FROM config_param_user WHERE parameter='epa_junction_y0_vdefault' AND cur_user=current_user)::float WHERE y0 IS NULL;
-	UPDATE raingage SET scf=(SELECT value FROM config_param_user WHERE parameter='epa_rgage_scf_vdefault' AND cur_user=current_user)::float WHERE scf IS NULL;
-
-	RAISE NOTICE '4 - Fill inprpt tables';
+	RAISE NOTICE '3 - Fill inprpt tables';
 	PERFORM gw_fct_pg2epa_fill_data(v_result);
 	
-	RAISE NOTICE '5 - Make virtual arcs (EPA) transparents for hydraulic model';
-	PERFORM gw_fct_pg2epa_join_virtual(v_result);
+	RAISE NOTICE '4 - manage varcs';
+	PERFORM gw_fct_pg2epa_manage_varc(v_result);
 	
-	RAISE NOTICE '6 - Call nod2arc function';
+	RAISE NOTICE '5 - Call nod2arc function';
 	PERFORM gw_fct_pg2epa_nod2arc_geom(v_result);
 	
-	RAISE NOTICE '7 - Calling for gw_fct_pg2epa_flowreg_additional function';
+	RAISE NOTICE '6 - Calling for gw_fct_pg2epa_flowreg_additional function';
 	PERFORM gw_fct_pg2epa_nod2arc_data(v_result);
 	
-	RAISE NOTICE '8 - Try to dump subcatchments';
+	RAISE NOTICE '7 - Try to dump subcatchments';
 	IF v_dumpsubcatch THEN
 		PERFORM gw_fct_pg2epa_dump_subcatch();
 	END IF;
 
-	RAISE NOTICE '9 - Set default values';
+	RAISE NOTICE '8 - Set default values';
 	IF v_vdefault THEN
 		PERFORM gw_fct_pg2epa_vdefault(v_input);
 	END IF;
 
-	RAISE NOTICE '10 - Check result network';
+	RAISE NOTICE '19 - Check result network';
 	IF v_checknetwork THEN
 		PERFORM gw_fct_pg2epa_check_network(v_input);
 	END IF;
 	
-	RAISE NOTICE '11 - Advanced settings';
+	RAISE NOTICE '10 - Advanced settings';
 	IF v_advancedsettings THEN
 		PERFORM gw_fct_pg2epa_advancedsettings(v_result);
 	END IF;
 
-	RAISE NOTICE '12 - check result previous exportation';
+	RAISE NOTICE '11 - check result previous exportation';
 	SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return ;
 	
 	
-	RAISE NOTICE '13 - Create the inp file structure';	
+	RAISE NOTICE '12 - Create the inp file structure';	
 	SELECT gw_fct_pg2epa_create_inp(v_result, null) INTO v_file;
 
 	-- manage return message

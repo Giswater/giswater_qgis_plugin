@@ -58,8 +58,6 @@ BEGIN
 	v_checkdata = (SELECT value::json->>'checkData' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 	v_checknetwork = (SELECT value::json->>'checkNetwork' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 
-	raise notice ' % % % %', v_onlyexport, v_setdemand, v_checkdata,v_checknetwork;
-
 	-- delete audit table
 	DELETE FROM audit_check_data WHERE fprocesscat_id = 127 AND user_name=current_user;
 	
@@ -96,8 +94,6 @@ BEGIN
 
 	IF v_usenetworkgeom IS TRUE THEN
 
-		-- todo check: consistency againts user options for demands and network topology
-
 		-- delete rpt_* tables keeping rpt_inp_tables
 		DELETE FROM rpt_arc WHERE result_id = v_result;
 		DELETE FROM rpt_node WHERE result_id = v_result;
@@ -129,6 +125,9 @@ BEGIN
 				
 		RAISE NOTICE '6 - Call gw_fct_pg2epa_pump_additional function';
 		PERFORM gw_fct_pg2epa_pump_additional(v_result);
+
+		RAISE NOTICE '7 - manage varcs';
+		PERFORM gw_fct_pg2epa_join_virtual(v_result);	
 
 		RAISE NOTICE '7 - Try to trim arcs with vnode';
 		IF v_networkmode = 3 OR v_networkmode = 4 THEN
@@ -162,7 +161,7 @@ BEGIN
 		RAISE NOTICE '10 - Set cero on elevation those have null values in spite of previous processes (profilactic issue in order to do not crash the epanet file)';
 		UPDATE rpt_inp_node SET elevation = 0 WHERE elevation IS NULL AND result_id=v_result;
 		
-		RAISE NOTICE '11 - Set > 0 values for length';
+		RAISE NOTICE '11 - Set length > 0.05 when length is 0';
 		UPDATE rpt_inp_arc SET length=0.05 WHERE length=0 AND result_id=v_result;
 		
 		RAISE NOTICE '12 - Check result network';
@@ -173,6 +172,8 @@ BEGIN
 		RAISE NOTICE '13 - delete disconnected arcs with associated nodes';
 		DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user) and result_id = v_result;
 		DELETE FROM rpt_inp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=39 AND cur_user=current_user) and result_id = v_result;
+
+--select 
 		
 		RAISE NOTICE '14 - delete orphan nodes';
 		DELETE FROM rpt_inp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=7 AND cur_user=current_user) AND result_id=v_result;

@@ -16,11 +16,9 @@ WHERE a.result_id = b.result_id AND cur_user = current_user
 ORDER BY pattern_id, idrow;
 	
 
-
 CREATE OR REPLACE VIEW vi_pjoint AS 
 SELECT pjoint_id, sum(demand) AS sum
 FROM v_edit_inp_connec WHERE pjoint_id IS NOT NULL GROUP BY pjoint_id;
-
 
 DROP VIEW v_rtc_period_dma;
 
@@ -33,3 +31,27 @@ CREATE OR REPLACE VIEW v_rtc_period_dma AS
      JOIN ext_rtc_dma_period a ON a.dma_id::text = v_rtc_period_hydrometer.dma_id::text 
 	 AND v_rtc_period_hydrometer.period_id::text = a.cat_period_id::text
   GROUP BY v_rtc_period_hydrometer.dma_id, v_rtc_period_hydrometer.period_id, a.pattern_id;
+  
+CREATE OR REPLACE VIEW vi_reservoirs AS 
+ SELECT node_id,
+    rpt_inp_node.elevation AS head,
+    rpt_inp_node.pattern_id
+   FROM inp_selector_result, rpt_inp_node
+  WHERE rpt_inp_node.epa_type::text = 'RESERVOIR'::text 
+  AND rpt_inp_node.result_id::text = inp_selector_result.result_id::text 
+  AND inp_selector_result.cur_user = "current_user"()::text;
+
+CREATE OR REPLACE VIEW vi_tanks AS 
+ SELECT rpt_inp_node.node_id,
+    rpt_inp_node.elevation,
+    (rpt_inp_node.addparam::json ->> 'initlevel'::text)::numeric AS initlevel,
+    (rpt_inp_node.addparam::json ->> 'minlevel'::text)::numeric AS minlevel,
+    (rpt_inp_node.addparam::json ->> 'maxlevel'::text)::numeric AS maxlevel,
+    (rpt_inp_node.addparam::json ->> 'diameter'::text)::numeric AS diameter,
+    (rpt_inp_node.addparam::json ->> 'minvol'::text)::numeric AS minvol,
+    replace(rpt_inp_node.addparam::json ->> 'curve_id'::text, ''::text, NULL::text) AS curve_id
+   FROM inp_selector_result, rpt_inp_node
+  WHERE rpt_inp_node.result_id::text = inp_selector_result.result_id::text 
+  AND rpt_inp_node.epa_type::text = 'TANK'::text 
+  AND inp_selector_result.cur_user = "current_user"()::text
+
