@@ -2187,13 +2187,13 @@ class AddNewLot(ParentManage):
         team_name = utils_giswater.getWidgetText(self.dlg_resources_man, self.dlg_resources_man.cmb_team)
 
         # Populate tables
-        query = ("SELECT user_id AS " + '"' + "Usuari" + '"' + " FROM v_om_user_x_team WHERE team = '" + str(team_name) + "'")
+        query = ("SELECT user_id AS " + '"' + "Usuari" + '"' + " FROM " + self.schema_name + ".v_om_user_x_team WHERE team = '" + str(team_name) + "'")
         self.fill_table_by_query(self.dlg_resources_man.tbl_view_team_user, query)
 
-        query = ("SELECT vehicle  AS " + '"' + "Vehicle" + '"' + " FROM v_om_team_x_vehicle WHERE team = '" + str(team_name) + "'")
+        query = ("SELECT vehicle  AS " + '"' + "Vehicle" + '"' + " FROM " + self.schema_name + ".v_om_team_x_vehicle WHERE team = '" + str(team_name) + "'")
         self.fill_table_by_query(self.dlg_resources_man.tbl_view_team_vehicle, query)
 
-        query = ("SELECT visitclass  AS " + '"' + "Classe visita" + '"' + " FROM v_om_team_x_visitclass WHERE team = '" + str(team_name) + "'")
+        query = ("SELECT visitclass  AS " + '"' + "Classe visita" + '"' + " FROM " + self.schema_name + ".v_om_team_x_visitclass WHERE team = '" + str(team_name) + "'")
         self.fill_table_by_query(self.dlg_resources_man.tbl_view_team_visitclass, query)
 
 
@@ -2203,7 +2203,7 @@ class AddNewLot(ParentManage):
         vehicle_name = utils_giswater.getWidgetText(self.dlg_resources_man, self.dlg_resources_man.cmb_vehicle)
 
         # Populate tables
-        query = ("SELECT * FROM v_ext_cat_vehicle WHERE " + '"' + "Vehicle" + '"' + " = '" + str(vehicle_name) + "'")
+        query = ("SELECT * FROM " + self.schema_name + ".v_ext_cat_vehicle WHERE " + '"' + "Vehicle" + '"' + " = '" + str(vehicle_name) + "'")
         self.fill_table_by_query(self.dlg_resources_man.tbl_view_vehicle, query)
         self.hide_colums(self.dlg_resources_man.tbl_view_vehicle, [0])
 
