@@ -233,15 +233,15 @@ class ManageVisit(ParentManage, QObject):
         # Load feature if in @table_name. Select list of related features
         # Set 'expr_filter' with features that are in the list
         if self.locked_feature_id:
-            table_name = f'om_visit_x_{self.geom_type}'
             expr_filter = f'"{self.geom_type}_id"::integer IN ({self.locked_feature_id})'
             (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
             if not is_valid:
                 return
 
             # do selection allowing @table_name to be linked to canvas selectionChanged
+            widget_name = f'tbl_visit_x_{geom_type}'
             self.disconnect_signal_selection_changed()
-            self.connect_signal_selection_changed(self.dlg_add_visit, table_name)
+            self.connect_signal_selection_changed(self.dlg_add_visit, widget_name)
             self.select_features_by_ids(self.geom_type, expr)
             self.disconnect_signal_selection_changed()
 
@@ -617,7 +617,8 @@ class ManageVisit(ParentManage, QObject):
         # set the callback to setup all events later
         # its not possible to setup listener in this moment beacouse set_table_model without
         # a valid expression parameter return a None model => no events can be triggered
-        #self.lazy_configuration(widget_name, self.config_relation_table)
+        widget_table = utils_giswater.getWidget(dialog, widget_name)
+        self.lazy_configuration(widget_table, self.config_relation_table)
 
         # check if there are features related to the current visit
         if not self.visit_id.text():

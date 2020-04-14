@@ -529,9 +529,7 @@ class ParentManage(ParentAction, object):
         """ Reload @widget with contents of @tablename applying selected @expr_filter """
 
         if type(table_object) is str:
-            widget_name = f"tbl_{table_object}_x_{geom_type}"
-            widget = utils_giswater.getWidget(dialog, widget_name)
-
+            widget = utils_giswater.getWidget(dialog, table_object)
             if not widget:
                 message = "Widget not found"
                 self.controller.log_info(message, parameter=widget_name)
@@ -718,7 +716,7 @@ class ParentManage(ParentAction, object):
             self.reload_qtable(dialog, self.geom_type, self.plan_om)
         else:
             self.reload_table(dialog, table_object, self.geom_type, expr_filter)
-            #self.apply_lazy_init(table_object)
+            self.apply_lazy_init(table_object)
 
         # Select features with previous filter
         # Build a list of feature id's and select them
@@ -824,7 +822,7 @@ class ParentManage(ParentAction, object):
             self.reload_qtable(dialog, geom_type, self.plan_om)
         else:
             self.reload_table(dialog, table_object, self.geom_type, expr_filter)
-            #self.apply_lazy_init(table_object)
+            self.apply_lazy_init(table_object)
 
         # Remove selection in generic 'v_edit' layers
         if self.plan_om == 'plan':
@@ -919,7 +917,7 @@ class ParentManage(ParentAction, object):
             self.remove_selection()
         else:
             self.reload_table(dialog, table_object, self.geom_type, expr_filter)
-            #self.apply_lazy_init(table_object)
+            self.apply_lazy_init(table_object)
 
         # Update list
         self.list_ids[self.geom_type] = self.ids
