@@ -555,22 +555,6 @@ UPDATE inp_connec SET pattern_id = 'pattern_03', demand = demand*0.25 FROM (SELE
 UPDATE inp_connec SET pattern_id = 'pattern_01', demand = demand*0.5 FROM (SELECT * FROM connec LIMIT 300 OFFSET 300) a WHERE a.connec_id = inp_connec.connec_id;
 
 
--- update patterns
-UPDATE inp_pattern_value set factor_1 = factor_1/41.71,factor_2 = factor_2/41.71,factor_3 = factor_3/41.71,factor_4 = factor_4/41.71,
-factor_5 = factor_5/41.71,factor_6 = factor_6/41.71,factor_7 = factor_7/41.71,factor_8 = factor_8/41.71,
-factor_9 = factor_9/41.71,factor_10 = factor_10/41.71,factor_11 = factor_11/41.71,factor_12 = factor_12/41.71-0.02 
-where pattern_id = 'dma02_period05';
-
-UPDATE inp_pattern_value set factor_1 = factor_1/42.97,factor_2 = factor_2/42.97,factor_3 = factor_3/42.97,factor_4 = factor_4/42.97,
-factor_5 = factor_5/42.97,factor_6 = factor_6/42.97,factor_7 = factor_7/42.97,factor_8 = factor_8/42.97,
-factor_9 = factor_9/42.97,factor_10 = factor_10/42.97,factor_11 = factor_11/42.97,factor_12 = factor_12/42.97+0.01 
-where pattern_id = 'dma02_period06';
-
-UPDATE inp_pattern_value set factor_1 = factor_1/42.4849,factor_2 = factor_2/42.4849,factor_3 = factor_3/42.4849,factor_4 = factor_4/42.4849,
-factor_5 = factor_5/42.4849,factor_6 = factor_6/42.4849,factor_7 = factor_7/42.4849,factor_8 = factor_8/42.4849,
-factor_9 = factor_9/42.4849,factor_10 = factor_10/42.4849,factor_11 = factor_11/42.4849,factor_12 = factor_12/42.4849 
-where pattern_id = 'dma02_period07';
-
 UPDATE v_edit_arc SET arccat_id = 'VIRTUAL' WHERE arc_type = 'VARC';
 
 UPDATE inp_cat_mat_roughness set roughness  = 0.003;
@@ -579,4 +563,7 @@ DELETE FROM cat_arc  WHERE arctype_id = 'VARC' AND id !='VIRTUAL';
 
 
 UPDATE config_api_form_fields SET dv_querytext_filterc  = ' AND id ' 
-WHERE form IN ('upsert_catalog_node', 'upsert_catalog_arc', 'upsert_catalog_connec') AND column_id ='matcat_id';
+WHERE formname IN ('upsert_catalog_node', 'upsert_catalog_arc', 'upsert_catalog_connec') AND column_id ='matcat_id';
+
+UPDATE inp_junction SET demand = 0 WHERE demand = 16.000000;
+UPDATE inp_junction SET demand = 0 , pattern_id  = 'pattern_02' WHERE pattern_id = 'pattern_hydrant';
