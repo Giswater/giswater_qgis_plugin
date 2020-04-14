@@ -62,9 +62,10 @@ BEGIN
 	FOR rec_table IN
 		SELECT sequence_name FROM information_schema.SEQUENCES WHERE sequence_schema = v_source_schema
 	LOOP
+
 		EXECUTE 'CREATE SEQUENCE ' || v_dest_schema || '.' || rec_table;
 	END LOOP;
-	 
+
 	-- Tables
 	FOR rec_table IN
 		SELECT table_name FROM information_schema.TABLES WHERE table_schema = v_source_schema AND table_type = 'BASE TABLE' ORDER BY table_name
@@ -73,12 +74,15 @@ BEGIN
 		-- Create table in destination schema
 		v_tablename := v_dest_schema || '.' || rec_table;
 		EXECUTE 'CREATE TABLE ' || v_tablename || ' (LIKE ' || v_source_schema || '.' || rec_table || ' INCLUDING CONSTRAINTS INCLUDING INDEXES INCLUDING DEFAULTS)';
-		
+	
 		-- Set contraints
 		FOR v_column, v_default IN
-			SELECT column_name, REPLACE(column_default, v_source_schema, v_dest_schema) 
+
+			EXECUTE 'SELECT column_name, REPLACE(column_default, concat('||quote_literal(v_source_schema)||',''.''), 
+			concat('||quote_literal(v_dest_schema)||',''.'')) 
 			FROM information_schema.COLUMNS 
-			WHERE table_schema = v_dest_schema AND table_name = rec_table AND column_default LIKE 'nextval(%' || v_source_schema || '%::regclass)'
+			WHERE table_schema = '''||v_dest_schema||''' AND table_name = '''||rec_table||''' AND column_default 
+			LIKE ''nextval(%' || v_source_schema || '%::regclass)'''
 		LOOP
 			EXECUTE 'ALTER TABLE ' || v_tablename || ' ALTER COLUMN ' || v_column || ' SET DEFAULT ' || v_default;
 		END LOOP;
@@ -87,7 +91,7 @@ BEGIN
 		EXECUTE 'INSERT INTO ' || v_tablename || ' SELECT * FROM ' || v_source_schema || '.' || rec_table;  
 		
 	END LOOP;
-	
+
 
 -- fk,check
 
@@ -98,7 +102,7 @@ BEGIN
 		join   information_schema.table_constraints tc ON conname=constraint_name WHERE contype IN (''f'',''c'',''u'')
 		AND nspname = '''||v_source_schema||''' AND  conname not ilike ''%category_type%'';'
 	LOOP
-			raise notice 'rec_fk,%',rec_fk.constraintname;
+			
 		v_query_text:=  'ALTER TABLE '||v_dest_schema || '.' || rec_fk.tablename||' DROP CONSTRAINT IF EXISTS '|| rec_fk.constraintname||' CASCADE;';
 		EXECUTE v_query_text;
 		v_query_text:=  'ALTER TABLE '||v_dest_schema || '.' || rec_fk.tablename||' ADD CONSTRAINT '|| rec_fk.constraintname|| ' '||rec_fk.definition||';';
@@ -135,10 +139,10 @@ BEGIN
 
 	EXECUTE 'SELECT setval('''||v_dest_schema||'.urn_id_seq'', gw_fct_setvalurn(),true);';
 
-	-- VieSCHEMA_NAME
+	-- View
 	FOR rec_view IN
 		EXECUTE 'SELECT table_name, view_definition as definition 
-		FROM information_schema.VIESCHEMA_NAME WHERE table_schema = '''||v_source_schema||''''
+		FROM information_schema.views	 WHERE table_schema = '''||v_source_schema||''''
 	LOOP
 
 		EXECUTE 'CREATE VIEW ' || v_dest_schema || '.' || rec_view.table_name || ' AS  
@@ -148,7 +152,7 @@ BEGIN
 	FOR rec_view IN 
 		EXECUTE 'SELECT schemaname, matviewname, replace(definition, 
 		concat('||quote_literal(v_source_schema)||',''.''),concat('||quote_literal(v_dest_schema)||',''.'')) AS definition 
-		from pg_matvieSCHEMA_NAME WHERE schemaname='''||v_source_schema||''''
+		from pg_matviews WHERE schemaname='''||v_source_schema||''''
 	LOOP
 		EXECUTE 'CREATE MATERIALIZED VIEW ' || v_dest_schema || '.' || rec_view.matviewname || ' AS  
 		'||rec_view.definition||';';
@@ -158,7 +162,6 @@ BEGIN
 	"data":{"action":"RENAMESCHEMA","source":"'||v_source_schema||'", "target":"'||v_dest_schema||'"}}$$);';
 
 	--Functions
-
 	EXECUTE 'SELECT replace(''wsoftware'', '''||v_source_schema||''','''||v_dest_schema||''')'
 	into v_software;
 
@@ -171,7 +174,7 @@ BEGIN
 	LOOP
 		EXECUTE 'select * from pg_get_functiondef('''||v_source_schema||'.'|| rec_fct.routine_name||'''::regproc)'
 		INTO v_fct_definition;
-		v_fct_definition = REPLACE (v_fct_definition,v_source_schema, v_dest_schema);
+		v_fct_definition = REPLACE (v_fct_definition,concat(v_source_schema,'.'), concat(v_dest_schema,'.'));
 		
 		IF v_fct_definition ~* v_software THEN
 		v_fct_definition = REPLACE (v_fct_definition,v_software, 'wsoftware');
@@ -197,7 +200,8 @@ BEGIN
 		
 		IF v_trg_fields IS NULL THEN 
 
-			rec_trg.definition = replace(replace(rec_trg.definition,'EXECUTE PROCEDURE',''),v_source_schema,v_dest_schema);
+			rec_trg.definition = replace(replace(rec_trg.definition,'EXECUTE PROCEDURE',''),concat(v_source_schema,'.'), 
+				concat(v_dest_schema,'.'));
 
 			EXECUTE 'CREATE TRIGGER '||rec_trg.trigger_name||' '||rec_trg.activation||' '||v_replace_query||'
 			ON '||v_dest_schema||'.'||rec_trg.table_name||' FOR EACH ROW EXECUTE PROCEDURE '|| rec_trg.definition||';';
