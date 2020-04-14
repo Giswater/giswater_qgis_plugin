@@ -674,7 +674,7 @@ class AddNewLot(ParentManage):
 
         sql = "SELECT max("+str(pk)+"::integer) FROM "+str(table_name)+";"
         row = self.controller.get_row(sql)
-        if not row or not row[0]:
+        if row is None or row[0] is None:
             return 0
         else:
             return row[0] + 1
