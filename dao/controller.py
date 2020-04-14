@@ -707,7 +707,7 @@ class DaoController(object):
         if not row:
             self.show_warning("Function not found in database", parameter=function_name)
             return None
-        if schema_name: sql = sql = f"SELECT {schema_name}.{function_name}("
+        if schema_name: sql = f"SELECT {schema_name}.{function_name}("
         else: sql = f"SELECT {function_name}("
         if parameters: sql += f"{parameters}"
         sql += f");"
@@ -771,7 +771,8 @@ class DaoController(object):
             if tooltip != f'tooltip_{widget_name}':
                 widget.setToolTip(tooltip)
             elif widget.toolTip() == "":
-                widget.setToolTip(widget.text())
+                if type(widget) is QGroupBox: widget.setToolTip(widget.title())
+                else: widget.setToolTip(widget.text())
 
 
     def translate_form(self, dialog, context_name):
