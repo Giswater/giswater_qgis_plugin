@@ -461,7 +461,7 @@ BEGIN
 	
 	
 	RAISE NOTICE '19 - Check dint value for catalog of arcs';
-	SELECT count(*) INTO v_count FROM cat_arc WHERE dint IS NULL;
+	SELECT count(*) INTO v_count FROM cat_arc WHERE dint IS NULL AND arctype_id !='VARC';
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 		VALUES (v_fprocesscat_id, v_result_id, 3, concat(

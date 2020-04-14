@@ -50,6 +50,9 @@ BEGIN
 	--  Search path	
 	SET search_path = "SCHEMA_NAME", public;
 
+
+SELECT * FROM anl_node WHERE fprocesscat_id = 108 AND cur_user = current_user
+
 	-- getting input data 	
 	v_features := ((p_data ->>'data')::json->>'parameters')::json->>'selectionMode'::text;
 	v_grafclass := ((p_data ->>'data')::json->>'parameters')::json->>'grafClass'::text;
@@ -96,9 +99,9 @@ BEGIN
 	
 	-- Check if there are nodes type 'ischange=1 or 2 (true or maybe)' without changing catalog of acs (108)
 	v_querytext = '(SELECT n.node_id, count(*), nodecat_id, the_geom FROM 
-			(SELECT node_1 as node_id, arccat_id FROM '||v_edit||'arc WHERE node_1 IN (SELECT node_id FROM vu_node JOIN cat_node ON id=nodecat_id WHERE ischange=1)
+			(SELECT node_1 as node_id, arccat_id FROM v_edit_arc WHERE node_1 IN (SELECT node_id FROM vu_node JOIN cat_node ON id=nodecat_id WHERE ischange=1)
 			  UNION
-			 SELECT node_2, arccat_id FROM '||v_edit||'arc WHERE node_2 IN (SELECT node_id FROM vu_node JOIN cat_node ON id=nodecat_id WHERE ischange=1)
+			 SELECT node_2, arccat_id FROM v_edit_arc WHERE node_2 IN (SELECT node_id FROM vu_node JOIN cat_node ON id=nodecat_id WHERE ischange=1)
 			GROUP BY 1,2) a	JOIN node n USING (node_id) GROUP BY 1,3,4 HAVING count(*) <> 2)';
 
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext,' b') INTO v_count;
@@ -106,9 +109,11 @@ BEGIN
 	IF v_count > 0 THEN
 		EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) 
 			SELECT 108, node_id, nodecat_id, ''Node with ischange=1 without any variation of arcs in terms of diameter, pn or material'', the_geom FROM (', v_querytext,') b');
-
 		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 		VALUES (111, 2, concat('WARNING: There is/are ',v_count,' nodes with ischange on 1 (true) without any variation of arcs in terms of diameter, pn or material. Please, check your data before continue.'));
+
+		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+		VALUES (111, 2, concat('SELECT * FROM anl_node WHERE fprocescat_id = 108 AND cur_user = current_user.'));
 
 	-- is defined as warning because error (3) will break topologic issues of mapzones
 	ELSE
@@ -130,6 +135,8 @@ BEGIN
 		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 		VALUES (111, 2, concat('WARNING: There is/are ',v_count,' nodes where arc catalog changes without nodecat with ischange on 0 or 2 (false or maybe). Please, check your data before continue.'));
 			-- is defined as warning because error (3) will break topologic issues of mapzones
+		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+		VALUES (111, 2, concat('SELECT * FROM anl_node WHERE fprocescat_id = 109 AND cur_user = current_user.'));
 	ELSE
 		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 		VALUES (111, 1, 'INFO: No nodes without ''ischange'' where arc changes have been found');
