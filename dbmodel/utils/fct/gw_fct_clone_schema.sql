@@ -169,13 +169,12 @@ BEGIN
 		WHERE routines.specific_schema='''||v_source_schema||''' and routine_name!=''audit_function'' and routine_name!=''gw_fct_repair_arc''
 		group by routine_name'
 	LOOP
-	raise notice 'rec_fct.routine_name,%',rec_fct.routine_name;
 		EXECUTE 'select * from pg_get_functiondef('''||v_source_schema||'.'|| rec_fct.routine_name||'''::regproc)'
 		INTO v_fct_definition;
 		v_fct_definition = REPLACE (v_fct_definition,v_source_schema, v_dest_schema);
 		
 		IF v_fct_definition ~* v_software THEN
-		v_fct_definition = REPLACE (v_fct_definition,v_software, 'SCHEMA_NAMEoftware');
+		v_fct_definition = REPLACE (v_fct_definition,v_software, 'wsoftware');
 		END IF; 
 		EXECUTE v_fct_definition;
 
