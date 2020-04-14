@@ -207,9 +207,9 @@ BEGIN
 					IF v_project_type = 'WS' THEN
 						IF v_noderecord1.presszonecat_id = v_noderecord2.presszonecat_id THEN
 							v_presszone_id = v_noderecord1.presszonecat_id;
-						ELSIF v_noderecord1.presszonecat_id = 0 THEN
+						ELSIF v_noderecord1.presszonecat_id = 0::text THEN
 							v_presszone_id = v_noderecord2.presszonecat_id;
-						ELSIF v_noderecord2.presszonecat_id = 0 THEN
+						ELSIF v_noderecord2.presszonecat_id = 0::text THEN
 							v_presszone_id = v_noderecord1.presszonecat_id;
 						END IF;
 					END IF;
