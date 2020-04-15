@@ -214,8 +214,8 @@ BEGIN
 	RAISE NOTICE '7- Node exit upper intro';
 	INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, sector_id, the_geom, descript)
 	SELECT 11, node_id, nodecat_id, sector_id, a.the_geom, concat('Node exit upper intro with: Max. entry: ', max_entry , ', Max. exit:',max_exit) 
-	FROM ( SELECT node_id, max(sys_elev1) AS max_exit, nodecat_id, node.sector_id, node.the_geom FROM v_edit_arc JOIN node ON node_1 = node_id GROUP BY node_id, node.sector_id )a
-	JOIN ( SELECT node_id, max(sys_elev2) AS max_entry FROM v_edit_arc JOIN node ON node_2 = node_id GROUP BY node_id )b USING (node_id)
+	FROM ( SELECT node_id, max(sys_elev1) AS max_exit, nodecat_id, node.sector_id, node.the_geom FROM v_edit_arc JOIN node ON node_1 = node_id JOIN node_type ON node_type = id WHERE isexitupperintro = 0 GROUP BY node_id, node.sector_id )a
+	JOIN ( SELECT node_id, max(sys_elev2) AS max_entry FROM v_edit_arc JOIN node ON node_2 = node_id JOIN node_type ON node_type = id WHERE isexitupperintro = 0 GROUP BY node_id )b USING (node_id)
 	JOIN inp_selector_sector USING (sector_id) 
 	WHERE max_entry < max_exit AND cur_user = current_user;
 

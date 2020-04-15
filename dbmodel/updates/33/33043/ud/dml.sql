@@ -7,8 +7,5 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node_type", "column":"isexitupperintro", "dataType":"int2"}}$$);
-ALTER TABLE node_type ALTER COLUMN isexitupperintro SET DEFAULT 0;
-COMMENT ON TABLE node_type IS 'FIELD isexitupperintro has three values 0-false (by default), 1-true, 2-maybe';
-
+UPDATE node_type SET isexitupperintro = 0 WHERE type NOT IN ('STORAGE','CHAMBER');
+UPDATE node_type SET isexitupperintro = 2 WHERE type IN ('STORAGE','CHAMBER');

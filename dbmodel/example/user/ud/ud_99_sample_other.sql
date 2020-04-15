@@ -398,3 +398,5 @@ UPDATE config_api_form_fields SET tooltip = 'min_height - Altura mínima' WHERE 
 UPDATE config_api_form_fields SET tooltip = 'custom_area - Area útil del depósito' WHERE column_id = 'custom_area' AND tooltip IS NULL AND formtype='feature';
 UPDATE config_api_form_fields SET tooltip = 'groove - Para establecer si hay ranura en el encintado' WHERE column_id = 'groove' AND tooltip = 'groove' AND formtype='feature';
 UPDATE config_api_form_fields SET tooltip = 'inlet - Elemento con aportaciones' WHERE column_id = 'inlet' AND tooltip IS NULL;
+
+UPDATE node_type SET isexitupperintro = 2 WHERE id = 'VIRTUAL_NODE';
