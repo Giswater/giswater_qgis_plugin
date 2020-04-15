@@ -12,6 +12,91 @@ UPDATE config_api_form_fields set layout_order = 4 WHERE (formname = 've_connec'
 UPDATE config_api_form_fields set layout_order = 3 WHERE (formname = 've_connec' OR formname = 'v_edit_connec') AND column_id = 'state';
 
 
+--2020/04/14
+
+INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order,  datatype, widgettype, label, widgetdim, tooltip, placeholder, 
+	ismandatory, isparent, iseditable, isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
+	widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
+VALUES ('v_edit_inp_pipe', 'form', 'dma_id', null , 'integer', 'combo', 'Dma', NULL, 
+	'dma_id - Identificador de la dma a la que pertenece el elemento. Si no se modifica la configuración, el programa la selecciona automáticamente en función de la geometría',
+	'Dma', FALSE, FALSE, TRUE, FALSE, 
+	'SELECT dma_id as id, name as idval FROM dma WHERE dma_id = 0 UNION SELECT dma_id as id, name as idval FROM dma WHERE dma_id IS NOT NULL',
+TRUE, FALSE, 'expl_id', ' AND dma.expl_id', NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) ON CONFLICT (formname, formtype, column_id) DO NOTHING;
+
+INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order,  datatype, widgettype, label, widgetdim, tooltip, placeholder, 
+	ismandatory, isparent, iseditable, isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
+	widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
+VALUES ('v_edit_inp_virtualvalve', 'form', 'dma_id', null , 'integer', 'combo', 'Dma', NULL, 
+	'dma_id - Identificador de la dma a la que pertenece el elemento. Si no se modifica la configuración, el programa la selecciona automáticamente en función de la geometría',
+	'Dma', FALSE, FALSE, TRUE, FALSE, 
+	'SELECT dma_id as id, name as idval FROM dma WHERE dma_id = 0 UNION SELECT dma_id as id, name as idval FROM dma WHERE dma_id IS NOT NULL',
+TRUE, FALSE, 'expl_id', ' AND dma.expl_id', NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) ON CONFLICT (formname, formtype, column_id) DO NOTHING;
+
+INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order,  datatype, widgettype, label, widgetdim, tooltip, placeholder, 
+	ismandatory, isparent, iseditable, isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
+	widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
+VALUES ('v_edit_inp_inlet', 'form', 'dma_id', null , 'integer', 'combo', 'Dma', NULL, 
+	'dma_id - Identificador de la dma a la que pertenece el elemento. Si no se modifica la configuración, el programa la selecciona automáticamente en función de la geometría',
+	'Dma', FALSE, FALSE, TRUE, FALSE, 
+	'SELECT dma_id as id, name as idval FROM dma WHERE dma_id = 0 UNION SELECT dma_id as id, name as idval FROM dma WHERE dma_id IS NOT NULL',
+TRUE, FALSE, 'expl_id', ' AND dma.expl_id', NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) ON CONFLICT (formname, formtype, column_id) DO NOTHING;
+
+INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order,  datatype, widgettype, label, widgetdim, tooltip, placeholder, 
+	ismandatory, isparent, iseditable, isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
+	widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
+VALUES ('v_edit_inp_tank', 'form', 'dma_id', null , 'integer', 'combo', 'Dma', NULL, 
+	'dma_id - Identificador de la dma a la que pertenece el elemento. Si no se modifica la configuración, el programa la selecciona automáticamente en función de la geometría',
+	'Dma', FALSE, FALSE, TRUE, FALSE, 
+	'SELECT dma_id as id, name as idval FROM dma WHERE dma_id = 0 UNION SELECT dma_id as id, name as idval FROM dma WHERE dma_id IS NOT NULL',
+TRUE, FALSE, 'expl_id', ' AND dma.expl_id', NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) ON CONFLICT (formname, formtype, column_id) DO NOTHING;
+
+INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order,  datatype, widgettype, label, widgetdim, tooltip, placeholder, 
+	ismandatory, isparent, iseditable, isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
+	widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
+VALUES ('v_edit_inp_reservoir', 'form', 'dma_id', null , 'integer', 'combo', 'Dma', NULL, 
+	'dma_id - Identificador de la dma a la que pertenece el elemento. Si no se modifica la configuración, el programa la selecciona automáticamente en función de la geometría',
+	'Dma', FALSE, FALSE, TRUE, FALSE, 
+	'SELECT dma_id as id, name as idval FROM dma WHERE dma_id = 0 UNION SELECT dma_id as id, name as idval FROM dma WHERE dma_id IS NOT NULL',
+TRUE, FALSE, 'expl_id', ' AND dma.expl_id', NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) ON CONFLICT (formname, formtype, column_id) DO NOTHING;
+
+INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order,  datatype, widgettype, label, widgetdim, tooltip, placeholder, 
+	ismandatory, isparent, iseditable, isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
+	widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
+VALUES ('v_edit_inp_connec', 'form', 'dma_id', null , 'integer', 'combo', 'Dma', NULL, 
+	'dma_id - Identificador de la dma a la que pertenece el elemento. Si no se modifica la configuración, el programa la selecciona automáticamente en función de la geometría',
+	'Dma', FALSE, FALSE, TRUE, FALSE, 
+	'SELECT dma_id as id, name as idval FROM dma WHERE dma_id = 0 UNION SELECT dma_id as id, name as idval FROM dma WHERE dma_id IS NOT NULL',
+TRUE, FALSE, 'expl_id', ' AND dma.expl_id', NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) ON CONFLICT (formname, formtype, column_id) DO NOTHING;
+
+INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order,  datatype, widgettype, label, widgetdim, tooltip, placeholder, 
+	ismandatory, isparent, iseditable, isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
+	widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
+VALUES ('v_edit_inp_junction', 'form', 'dma_id', null , 'integer', 'combo', 'Dma', NULL, 
+	'dma_id - Identificador de la dma a la que pertenece el elemento. Si no se modifica la configuración, el programa la selecciona automáticamente en función de la geometría',
+	'Dma', FALSE, FALSE, TRUE, FALSE, 
+	'SELECT dma_id as id, name as idval FROM dma WHERE dma_id = 0 UNION SELECT dma_id as id, name as idval FROM dma WHERE dma_id IS NOT NULL',
+TRUE, FALSE, 'expl_id', ' AND dma.expl_id', NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) ON CONFLICT (formname, formtype, column_id) DO NOTHING;
+
+INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order,  datatype, widgettype, label, widgetdim, tooltip, placeholder, 
+	ismandatory, isparent, iseditable, isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
+	widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
+VALUES ('v_edit_inp_pump', 'form', 'dma_id', null , 'integer', 'combo', 'Dma', NULL, 
+	'dma_id - Identificador de la dma a la que pertenece el elemento. Si no se modifica la configuración, el programa la selecciona automáticamente en función de la geometría',
+	'Dma', FALSE, FALSE, TRUE, FALSE, 
+	'SELECT dma_id as id, name as idval FROM dma WHERE dma_id = 0 UNION SELECT dma_id as id, name as idval FROM dma WHERE dma_id IS NOT NULL',
+TRUE, FALSE, 'expl_id', ' AND dma.expl_id', NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) ON CONFLICT (formname, formtype, column_id) DO NOTHING;
+
+
+INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order,  datatype, widgettype, label, widgetdim, tooltip, placeholder, 
+	ismandatory, isparent, iseditable, isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
+	widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
+VALUES ('v_edit_inp_valve', 'form', 'dma_id', null , 'integer', 'combo', 'Dma', NULL, 
+	'dma_id - Identificador de la dma a la que pertenece el elemento. Si no se modifica la configuración, el programa la selecciona automáticamente en función de la geometría',
+	'Dma', FALSE, FALSE, TRUE, FALSE, 
+	'SELECT dma_id as id, name as idval FROM dma WHERE dma_id = 0 UNION SELECT dma_id as id, name as idval FROM dma WHERE dma_id IS NOT NULL',
+TRUE, FALSE, 'expl_id', ' AND dma.expl_id', NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE) ON CONFLICT (formname, formtype, column_id) DO NOTHING;
+
+
 --2020/04/15
 SELECT setval('SCHEMA_NAME.config_api_form_fields_id_seq', (SELECT max(id) FROM config_api_form_fields), true);
 
