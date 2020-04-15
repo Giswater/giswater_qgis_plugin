@@ -7,6 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+
 UPDATE audit_cat_table SET isdeprecated = true WHERE id = 'anl_mincut_arc_x_node';
 UPDATE audit_cat_table SET isdeprecated = true WHERE id = 'v_anl_mincut_flowtrace';
 
@@ -70,6 +71,10 @@ ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO audit_cat_function VALUES (2862, 'gw_api_setlot', 'utils', 'function', NULL, NULL, NULL, 'Set lot', 'role_om', false) 
 ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_function VALUES (2864, 'gw_trg_manage_raster_dem', 'utils', 'trigger function', NULL, NULL, NULL, 'Trigger to manage raster', 'role_edit', false) 
+ON CONFLICT (id) DO NOTHING;
+
 
 UPDATE audit_cat_function SET
 istoolbox= false 
