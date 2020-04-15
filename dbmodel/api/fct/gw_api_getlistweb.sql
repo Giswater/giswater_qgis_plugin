@@ -115,9 +115,12 @@ BEGIN
 	numberPages := (((((result ->> 'body')::JSON ->> 'data')::JSON ->> 'pageInfo')::JSON) ->> 'lastPage')::INT;
 
 --	Get keys
-	--SELECT json_agg(column_name) INTO fieldsJson FROM information_schema.columns WHERE table_schema = 'SCHEMA_NAME' AND table_name = 'v_anl_mincut_result_node';
-	query_text := 'SELECT json_agg(column_name) FROM information_schema.columns WHERE table_schema = ' || quote_literal(v_schemaname) || ' AND table_name = ' || quote_literal(v_tablename);
-	EXECUTE query_text INTO fieldsJson;
+	IF allRecords IS NULL THEN
+		query_text := 'SELECT json_agg(column_name) FROM information_schema.columns WHERE table_schema = ' || quote_literal(v_schemaname) || ' AND table_name = ' || quote_literal(v_tablename);
+		EXECUTE query_text INTO fieldsJson;
+	ELSE
+		SELECT json_agg(ARRAY(select json_object_keys(allRecords->0)))->0 INTO fieldsJson;
+	END IF;
 
 --	NULL's control
 	fieldsJson := COALESCE(fieldsJson, '[]');

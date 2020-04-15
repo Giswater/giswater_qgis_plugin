@@ -59,6 +59,18 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO audit_cat_function VALUES (2854, 'gw_fct_pg2epa_manage_varc', 'utils', 'function', NULL, NULL, NULL, 'Manage varcs when export to epa', 'role_epa', false) 
 ON CONFLICT (id) DO NOTHING;
 
+INSERT INTO audit_cat_function VALUES (2856, 'gw_api_getunexpected', 'utils', 'function', NULL, NULL, NULL, 'Get unexpected visit', 'role_om', false) 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_function VALUES (2858, 'gw_api_get_combochilds', 'utils', 'function', NULL, NULL, NULL, 'Get combo childs', 'role_om', false) 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_function VALUES (2860, 'gw_api_getselectors', 'utils', 'function', NULL, NULL, NULL, 'Get selectors', 'role_om', false) 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_function VALUES (2862, 'gw_api_setlot', 'utils', 'function', NULL, NULL, NULL, 'Set lot', 'role_om', false) 
+ON CONFLICT (id) DO NOTHING;
+
 UPDATE audit_cat_function SET
 istoolbox= false 
 WHERE function_name = 'gw_fct_update_elevation_from_dem';
