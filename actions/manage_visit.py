@@ -264,7 +264,21 @@ class ManageVisit(ParentManage, QObject):
         if self.x:
             self.update_geom()
 
+        # If new visit, execute PG function
+        if self.it_is_new_visit:
+            self.execute_pgfunction()
+
         self.refresh_map_canvas()
+
+
+    def execute_pgfunction(self):
+        """ Execute function 'gw_fct_om_visit_multiplier' """
+
+        feature = f'"id":"{self.current_visit.id}"'
+        body = self.create_body(feature=feature)
+        sql = f"SELECT gw_fct_om_visit_multiplier({body})::text"
+        row = self.controller.get_row(sql, log_sql=True)
+        self.controller.log_info(f"execute_pgfunction: {row}")
 
 
     def update_geom(self):
