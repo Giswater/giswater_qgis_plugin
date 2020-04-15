@@ -146,8 +146,6 @@ class ManageVisit(ParentManage, QObject):
         self.current_tab_index = self.tab_index('tab_visit')
         self.tabs.setCurrentIndex(self.current_tab_index)
 
-        self.table_object = "visit"
-
         self.event_feature_type_selected(self.dlg_add_visit, "arc")
         self.event_feature_type_selected(self.dlg_add_visit, "node")
         self.event_feature_type_selected(self.dlg_add_visit, "connec")
@@ -191,9 +189,6 @@ class ManageVisit(ParentManage, QObject):
         self.dlg_add_visit.btn_event_insert.clicked.connect(self.event_insert)
         self.dlg_add_visit.btn_event_delete.clicked.connect(self.event_delete)
         self.dlg_add_visit.btn_event_update.clicked.connect(self.event_update)
-        self.dlg_add_visit.btn_feature_insert.clicked.connect(partial(self.insert_feature, self.dlg_add_visit, "visit"))
-        self.dlg_add_visit.btn_feature_delete.clicked.connect(partial(self.delete_records, self.dlg_add_visit, "visit"))
-        self.dlg_add_visit.btn_feature_snapping.clicked.connect(partial(self.selection_init, self.dlg_add_visit, "visit"))
         self.tabs.currentChanged.connect(partial(self.manage_tab_changed, self.dlg_add_visit))
         self.visit_id.textChanged.connect(partial(self.manage_visit_id_change, self.dlg_add_visit))
         self.dlg_add_visit.btn_doc_insert.clicked.connect(self.document_insert)
@@ -203,7 +198,7 @@ class ManageVisit(ParentManage, QObject):
         self.tbl_document.doubleClicked.connect(partial(self.document_open, self.tbl_document))
         self.dlg_add_visit.btn_add_geom.clicked.connect(self.add_point)
         self.dlg_add_visit.tab_feature.currentChanged.connect(partial(
-            self.tab_feature_changed, self.dlg_add_visit, self.table_object, excluded_layers=["v_edit_element"]))
+            self.tab_feature_changed, self.dlg_add_visit, excluded_layers=["v_edit_element"]))
 
         # Fill combo boxes of the form and related events
         self.parameter_type_id.currentTextChanged.connect(partial(self.set_parameter_id_combo, self.dlg_add_visit))
@@ -260,6 +255,8 @@ class ManageVisit(ParentManage, QObject):
         self.visit_added.emit(self.current_visit.id)
 
         # Remove all previous selections
+        self.controller.log_info("remove_selection accepted")
+        self.disconnect_signal_selection_changed()
         self.remove_selection()
         
         # Update geometry field (if user have selected a point)
@@ -294,9 +291,10 @@ class ManageVisit(ParentManage, QObject):
                 self.current_visit.delete()
 
             # Remove all previous selections
+            self.disconnect_signal_selection_changed()
             self.remove_selection()
-        except Exception:
-            pass
+        except Exception as e:
+            self.controller.log_info(f"manage_rejected: {e}")
 
 
     def tab_index(self, tab_name):
@@ -393,8 +391,10 @@ class ManageVisit(ParentManage, QObject):
         self.current_visit.upsert(commit=self.autocommit)
 
 
-    def update_relations(self, dialog, delete_old_relations=False):
+    def update_relations(self, dialog, delete_old_relations=True):
         """ Save current selected features in every table of geom_type """
+
+        self.controller.log_info(f"update_relations: {self.geom_type}")
 
         if delete_old_relations:
             for index in range(self.feature_type.count()):
@@ -488,7 +488,9 @@ class ManageVisit(ParentManage, QObject):
     def manage_tab_changed(self, dialog, index):
         """Do actions when tab is exit and entered.
         Actions depend on tab index"""
-        
+
+        self.controller.log_info(f"manage_tab_changed: {index}")
+
         # manage leaving tab
         # tab Visit
         if self.current_tab_index == self.tab_index('tab_visit'):
@@ -496,11 +498,13 @@ class ManageVisit(ParentManage, QObject):
             # need to create the relation record that is done only
             # changing tab
             if self.locked_geom_type:
+                self.controller.log_info(f"manage_tab_changed: self.locked_geom_type")
                 self.update_relations(dialog)
 
         # tab Relation
         if self.current_tab_index == self.tab_index('tab_relations'):
-            self.update_relations(dialog)
+            #self.update_relations(dialog)
+            self.tab_feature_changed(self.dlg_add_visit, excluded_layers = ["v_edit_element"])
 
         # manage arriving tab
         self.current_tab_index = index
@@ -539,13 +543,33 @@ class ManageVisit(ParentManage, QObject):
             self.manage_tabs_enabled(True)
 
 
+    def connect_signal_tab_feature_signal(self, connect=True):
+
+        try:
+            widget_name = f"tbl_visit_x_{self.geom_type}"
+            self.controller.log_info(f"connect_signal_tab_feature_signal: {widget_name}")
+            if connect:
+                self.dlg_add_visit.tab_feature.currentChanged.connect(partial(
+                    self.tab_feature_changed, self.dlg_add_visit, excluded_layers=["v_edit_element"]))
+                self.controller.log_info("connect_signal_tab_feature_signal: True")
+            else:
+                self.dlg_add_visit.tab_feature.currentChanged.disconnect()
+                self.controller.log_info("connect_signal_tab_feature_signal: False")
+        except Exception as e:
+            self.controller.log_info(f"connect_signal_tab_feature_signal error: {e}")
+
+
     def manage_tabs_enabled(self, disable_tabs=False):
         """ Enable/Disable tabs depending geom_type """
 
+        self.controller.log_info(f"manage_tabs_enabled: {self.geom_type}")
+        self.connect_signal_tab_feature_signal(False)
+
         # If geom_type = 'all': enable all tabs
         if self.geom_type == 'all':
-            for i in range(self.dlg_add_visit.tab_feature.count() - 1):
+            for i in range(self.dlg_add_visit.tab_feature.count()):
                 self.dlg_add_visit.tab_feature.setTabEnabled(i, True)
+            self.connect_signal_tab_feature_signal(True)
             return
 
         # Disable all tabs
@@ -553,6 +577,7 @@ class ManageVisit(ParentManage, QObject):
             for i in range(self.dlg_add_visit.tab_feature.count()):
                 self.dlg_add_visit.tab_feature.setTabEnabled(i, False)
 
+        tab_index = 0
         if self.geom_type == 'arc':
             tab_index = 0
         elif self.geom_type == 'node':
@@ -565,6 +590,8 @@ class ManageVisit(ParentManage, QObject):
         # Enable only tab of this geometry type
         self.dlg_add_visit.tab_feature.setTabEnabled(tab_index, True)
         self.dlg_add_visit.tab_feature.setCurrentIndex(tab_index)
+
+        self.connect_signal_tab_feature_signal(True)
 
 
     def config_relation_table(self, dialog):
@@ -641,7 +668,7 @@ class ManageVisit(ParentManage, QObject):
 
         # do selection allowing @widget_name to be linked to canvas selectionChanged
         self.disconnect_signal_selection_changed()
-        self.connect_signal_selection_changed(dialog, widget_name)
+        self.connect_signal_selection_changed(dialog, widget_table)
         self.select_features_by_ids(geom_type, expr)
         self.disconnect_signal_selection_changed()
 
@@ -1391,22 +1418,20 @@ class ManageVisit(ParentManage, QObject):
 
     def populate_position_id(self):
 
-        self.controller.log_info("populate_position_id")
-
         node_list = []
-        table_name = f'om_visit_x_{self.geom_type}'
-        node_1 = self.dlg_add_visit.table_name.model().record(0).value('node_1')
-        node_2 = self.dlg_add_visit.table_name.model().record(0).value('node_2')
+        widget_name = f"tbl_visit_x_{self.geom_type}"
+        widget_table = utils_giswater.getWidget(self.dlg_add_visit, widget_name)
+        node_1 = widget_table.model().record(0).value('node_1')
+        node_2 = widget_table.model().record(0).value('node_2')
         node_list.append([node_1, f"node 1: {node_1}"])
         node_list.append([node_2, f"node 2: {node_2}"])
         utils_giswater.set_item_data(self.dlg_event.position_id, node_list, 1, True, False)
 
 
-    def tab_feature_changed(self, dialog, table_object, excluded_layers=[]):
+    def tab_feature_changed(self, dialog, excluded_layers=[]):
         """ Set geom_type and layer depending selected tab """
 
-        self.controller.log_info("tab_feature_changed")
-
+        # Get selected tab to set geometry type
         tab_position = dialog.tab_feature.currentIndex()
         if tab_position == 0:
             self.geom_type = "arc"
@@ -1417,15 +1442,32 @@ class ManageVisit(ParentManage, QObject):
         elif tab_position == 3:
             self.geom_type = "gully"
 
+        self.controller.log_info(f"tab_feature_changed: {self.geom_type}")
         if self.geom_type == '':
+            self.controller.log_info("tab_feature_changed return")
             return
 
         self.hide_generic_layers(excluded_layers=excluded_layers)
-        widget_name = f"tbl_{table_object}_x_{self.geom_type}"
+        widget_name = f"tbl_visit_x_{self.geom_type}"
         viewname = f"v_edit_{self.geom_type}"
-        self.widget = utils_giswater.getWidget(dialog, widget_name)
+        widget_table = utils_giswater.getWidget(dialog, widget_name)
+
+        try:
+            self.dlg_add_visit.btn_feature_insert.clicked.disconnect()
+            self.dlg_add_visit.btn_feature_delete.clicked.disconnect()
+            self.dlg_add_visit.btn_feature_snapping.clicked.disconnect()
+        except Exception as e:
+            self.controller.log_info(f"tab_feature_changed exception: {e}")
+        finally:
+            self.dlg_add_visit.btn_feature_insert.clicked.connect(
+                partial(self.insert_feature, self.dlg_add_visit, widget_table))
+            self.dlg_add_visit.btn_feature_delete.clicked.connect(
+                partial(self.delete_records, self.dlg_add_visit, widget_table))
+            self.dlg_add_visit.btn_feature_snapping.clicked.connect(
+                partial(self.selection_init, self.dlg_add_visit, widget_table))
 
         # Adding auto-completion to a QLineEdit
+        self.controller.log_info(f"tab_feature_changed: {self.geom_type}")
         self.set_completer_feature_id(dialog.feature_id, self.geom_type, viewname)
 
         try:

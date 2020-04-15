@@ -529,12 +529,12 @@ class ParentManage(ParentAction, object):
         """ Reload @widget with contents of @tablename applying selected @expr_filter """
 
         if type(table_object) is str:
-            widget = utils_giswater.getWidget(dialog, table_object)
+            widget_name = f"tbl_{table_object}_x_{geom_type}"
+            widget = utils_giswater.getWidget(dialog, widget_name)
             if not widget:
                 message = "Widget not found"
                 self.controller.log_info(message, parameter=widget_name)
                 return None
-
         elif type(table_object) is QTableView:
             widget = table_object
         else:
@@ -660,7 +660,6 @@ class ParentManage(ParentAction, object):
         except AttributeError as e:
             selected_list = []
 
-
         if len(selected_list) == 0:
             message = "Any record selected"
             self.controller.show_info_box(message)
@@ -724,9 +723,10 @@ class ParentManage(ParentAction, object):
 
         if query:
             self.remove_selection()
+
         # Update list
         self.list_ids[self.geom_type] = self.ids
-        self.enable_feature_type(dialog)
+        self.enable_feature_type(dialog, table_object)
         self.connect_signal_selection_changed(dialog, table_object)
 
 
@@ -771,6 +771,8 @@ class ParentManage(ParentAction, object):
     def selection_changed(self, dialog, table_object, geom_type, query=False):
         """ Slot function for signal 'canvas.selectionChanged' """
 
+        self.controller.log_info(f"selection_changed: {geom_type}")
+
         self.disconnect_signal_selection_changed()
         field_id = f"{geom_type}_id"
 
@@ -778,7 +780,7 @@ class ParentManage(ParentAction, object):
             self.ids = []
 
         # Iterate over all layers of the group
-        for layer in self.layers[self.geom_type]:
+        for layer in self.layers[geom_type]:
             if layer.selectedFeatureCount() > 0:
                 # Get selected features of the layer
                 features = layer.selectedFeatures()
@@ -808,26 +810,27 @@ class ParentManage(ParentAction, object):
             expr_filter = expr_filter[:-2] + ")"
 
             # Check expression
-            (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+            (is_valid, expr) = self.check_expression(expr_filter, log_info=True)   #@UnusedVariable
             if not is_valid:
                 return                                           
                           
             self.select_features_by_ids(geom_type, expr)
-                        
+
         # Reload contents of table 'tbl_@table_object_x_@geom_type'
         if query:
-            self.insert_feature_to_plan(dialog, self.geom_type)
+            self.insert_feature_to_plan(dialog, geom_type)
             if self.plan_om == 'plan':
                 self.remove_selection()
             self.reload_qtable(dialog, geom_type, self.plan_om)
         else:
-            self.reload_table(dialog, table_object, self.geom_type, expr_filter)
+            self.controller.log_info("selection_changed: reload_table")
+            self.reload_table(dialog, table_object, geom_type, expr_filter)
             self.apply_lazy_init(table_object)
 
         # Remove selection in generic 'v_edit' layers
         if self.plan_om == 'plan':
             self.remove_selection(False)
-        self.enable_feature_type(dialog)
+        self.enable_feature_type(dialog, table_object)
         self.connect_signal_selection_changed(dialog, table_object)
 
 
@@ -842,13 +845,17 @@ class ParentManage(ParentAction, object):
 
     def enable_feature_type(self, dialog, widget_name='tbl_relation'):
 
-        feature_type = dialog.findChild(QComboBox, 'feature_type')
-        table = dialog.findChild(QTableView, widget_name)
-        if feature_type is not None and table is not None:
+        feature_type = utils_giswater.getWidget(dialog, 'feature_type')
+        widget_table = utils_giswater.getWidget(dialog, widget_name)
+        if feature_type is not None and widget_table is not None:
             if len(self.ids) > 0:
+                self.controller.log_info("enable_feature_type: False")
                 feature_type.setEnabled(False)
             else:
+                self.controller.log_info("enable_feature_type: True")
                 feature_type.setEnabled(True)
+        else:
+            self.controller.log_info("enable_feature_type: else")
 
 
     def insert_feature(self, dialog, table_object, query=False, remove_ids=True):
@@ -921,7 +928,7 @@ class ParentManage(ParentAction, object):
 
         # Update list
         self.list_ids[self.geom_type] = self.ids
-        self.enable_feature_type(dialog)
+        self.enable_feature_type(dialog, table_object)
         self.connect_signal_selection_changed(dialog, table_object)
 
         self.controller.log_info(self.list_ids[self.geom_type])
@@ -1127,14 +1134,15 @@ class ParentManage(ParentAction, object):
             if layer and "v_edit_gully" not in excluded_layers:
                 self.controller.set_layer_visible(layer)
         
-    
+
     def connect_signal_selection_changed(self, dialog, table_object, query=False):
         """ Connect signal selectionChanged """
         
         try:
+            self.controller.log_info(f"connect_signal_selection_changed: {self.geom_type}")
             self.canvas.selectionChanged.connect(partial(self.selection_changed, dialog, table_object, self.geom_type, query))
-        except Exception:    
-            pass
+        except Exception as e:
+            self.controller.log_info(f"connect_signal_selection_changed: {e}")
     
     
     def disconnect_signal_selection_changed(self):
@@ -1162,13 +1170,14 @@ class ParentManage(ParentAction, object):
             elif type(widget) == QDateTimeEdit:
                 widget.setDateTime(value if value else QDateTime.currentDateTime())
 
-
             if type(widget) in [QLineEdit, QTextEdit]:
                 if value:
                     widget.setText(value)
                 else:
                     widget.clear()
             if type(widget) in [QComboBox]:
+                self.controller.log_info(f"fill_widget_with_fields: {widget.name()}")
+                self.controller.log_info(f"fill_widget_with_fields: {value}")
                 if not value:
                     widget.setCurrentIndex(0)
                     continue
