@@ -574,12 +574,14 @@ class ParentManage(ParentAction, object):
 
         # Attach model to selected widget
         if type(table_object) is str:
+            self.controller.log_info(f"set_table_model (str): {table_object}")
             widget = utils_giswater.getWidget(dialog, table_object)
             if not widget:
                 message = "Widget not found"
                 self.controller.log_info(message, parameter=table_object)
                 return expr
         elif type(table_object) is QTableView:
+            self.controller.log_info(f"set_table_model: {table_object.objectName()}")
             widget = table_object
         else:
             msg = "Table_object is not a table name or QTableView"
@@ -1176,7 +1178,7 @@ class ParentManage(ParentAction, object):
                 else:
                     widget.clear()
             if type(widget) in [QComboBox]:
-                self.controller.log_info(f"fill_widget_with_fields: {widget.name()}")
+                self.controller.log_info(f"fill_widget_with_fields: {widget.objectName()}")
                 self.controller.log_info(f"fill_widget_with_fields: {value}")
                 if not value:
                     widget.setCurrentIndex(0)

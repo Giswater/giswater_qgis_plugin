@@ -173,7 +173,7 @@ class ManageVisit(ParentManage, QObject):
         self.geom_type = 'arc'
 
         # Force tab_feature_changed
-        self.tab_feature_changed(self.dlg_add_visit, self.table_object, excluded_layers = ["v_edit_element"])
+        self.tab_feature_changed(self.dlg_add_visit, excluded_layers = ["v_edit_element"])
 
         # Open the dialog
         if open_dialog:
@@ -234,9 +234,10 @@ class ManageVisit(ParentManage, QObject):
                 return
 
             # do selection allowing @table_name to be linked to canvas selectionChanged
-            widget_name = f'tbl_visit_x_{geom_type}'
+            widget_name = f'tbl_visit_x_{self.geom_type}'
+            widget_table = utils_giswater.getWidget(dialog, widget_name)
             self.disconnect_signal_selection_changed()
-            self.connect_signal_selection_changed(self.dlg_add_visit, widget_name)
+            self.connect_signal_selection_changed(self.dlg_add_visit, widget_table)
             self.select_features_by_ids(self.geom_type, expr)
             self.disconnect_signal_selection_changed()
 
@@ -394,20 +395,23 @@ class ManageVisit(ParentManage, QObject):
     def update_relations(self, dialog, delete_old_relations=True):
         """ Save current selected features in every table of geom_type """
 
-        self.controller.log_info(f"update_relations: {self.geom_type}")
-
         if delete_old_relations:
             for index in range(self.feature_type.count()):
                 # Remove all old relations related with current visit_id and @geom_type
                 geom_type = self.feature_type.itemText(index).lower()
                 self.delete_relations_geom_type(geom_type)
 
+        feature_type = utils_giswater.getWidgetText(self.dlg_add_visit, self.feature_type).lower()
         # Save new relations listed in every table of geom_type
-        self.update_relations_geom_type("arc")
-        self.update_relations_geom_type("node")
-        self.update_relations_geom_type("connec")
-        if self.controller.get_project_type() == 'ud':
-            self.update_relations_geom_type("gully")
+        if feature_type == 'all':
+            self.controller.log_info(f"update_relations - ALL")
+            self.update_relations_geom_type("arc")
+            self.update_relations_geom_type("node")
+            self.update_relations_geom_type("connec")
+            if self.controller.get_project_type() == 'ud':
+                self.update_relations_geom_type("gully")
+        else:
+            self.update_relations_geom_type(self.geom_type)
 
         widget_name = f"tbl_visit_x_{self.geom_type}"
         self.enable_feature_type(dialog, widget_name)
@@ -486,8 +490,7 @@ class ManageVisit(ParentManage, QObject):
 
 
     def manage_tab_changed(self, dialog, index):
-        """Do actions when tab is exit and entered.
-        Actions depend on tab index"""
+        """ Do actions when tab is exit and entered. Actions depend on tab index """
 
         self.controller.log_info(f"manage_tab_changed: {index}")
 
@@ -577,6 +580,13 @@ class ManageVisit(ParentManage, QObject):
             for i in range(self.dlg_add_visit.tab_feature.count()):
                 self.dlg_add_visit.tab_feature.setTabEnabled(i, False)
 
+        self.manage_geom_type_selected()
+
+
+    def manage_geom_type_selected(self):
+
+        self.controller.log_info(f"manage_geom_type_selected: {self.geom_type}")
+
         tab_index = 0
         if self.geom_type == 'arc':
             tab_index = 0
@@ -592,6 +602,29 @@ class ManageVisit(ParentManage, QObject):
         self.dlg_add_visit.tab_feature.setCurrentIndex(tab_index)
 
         self.connect_signal_tab_feature_signal(True)
+
+        #self.hide_generic_layers(excluded_layers=excluded_layers)
+        widget_name = f"tbl_visit_x_{self.geom_type}"
+        viewname = f"v_edit_{self.geom_type}"
+        widget_table = utils_giswater.getWidget(self.dlg_add_visit, widget_name)
+
+        try:
+            self.dlg_add_visit.btn_feature_insert.clicked.disconnect()
+            self.dlg_add_visit.btn_feature_delete.clicked.disconnect()
+            self.dlg_add_visit.btn_feature_snapping.clicked.disconnect()
+        except Exception as e:
+            self.controller.log_info(f"manage_geom_type_selected exception: {e}")
+        finally:
+            self.dlg_add_visit.btn_feature_insert.clicked.connect(
+                partial(self.insert_feature, self.dlg_add_visit, widget_table))
+            self.dlg_add_visit.btn_feature_delete.clicked.connect(
+                partial(self.delete_records, self.dlg_add_visit, widget_table))
+            self.dlg_add_visit.btn_feature_snapping.clicked.connect(
+                partial(self.selection_init, self.dlg_add_visit, widget_table))
+
+        # Adding auto-completion to a QLineEdit
+        self.controller.log_info(f"manage_geom_type_selected_2: {self.geom_type}")
+        self.set_completer_feature_id(self.dlg_add_visit.feature_id, self.geom_type, viewname)
 
 
     def config_relation_table(self, dialog):
