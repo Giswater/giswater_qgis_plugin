@@ -23,7 +23,7 @@ num_col_rec record;
 num_column text;
 result_id_aux varchar;
 title_aux varchar;
-pg2csvcat_id integer = 10;
+v_pg2csvcat_id integer = 10;
 v_return json;
 
 BEGIN

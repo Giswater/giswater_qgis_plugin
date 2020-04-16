@@ -7,21 +7,28 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2726
 
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_rpt2pg_main(character varying );
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_rpt2pg(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_rpt2pg_main(p_data json)  
 RETURNS json AS $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_rpt2pg_main($${"data":{"resultId":"test1"}}$$)
 SELECT SCHEMA_NAME.gw_fct_rpt2pg_main($${"data":{"resultId":"test1"}}$$) 
 */
 
 DECLARE
+rec_table record;
+
 v_result text;
+v_val integer;
+
   
 BEGIN
 
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
+
+	-- get parameters
+	v_result  = (p_data ->>'data')::json->>'resultId';
 
 	RAISE NOTICE 'Starting epa2pg process.';
 
@@ -29,18 +36,18 @@ BEGIN
 	PERFORM gw_fct_rpt2pg_import_rpt(p_data);
 	
 	-- Reset sequences of rpt_* tables
-	FOR rec_var IN SELECT id FROM audit_cat_table WHERE context='Hydraulic result data' AND sys_sequence IS NOT NULL
+	FOR rec_table IN SELECT * FROM audit_cat_table WHERE context='Hydraulic result data' AND sys_sequence IS NOT NULL
 	LOOP
-		EXECUTE 'SELECT max(id) INTO setvalue_int FROM '||rec_var.id||';';
-		EXECUTE 'SELECT setval(SCHEMA_NAME.'||rec_var.sys_sequence||', '||setvalue_int||', true);';
+		-- EXECUTE 'SELECT max(id) FROM '||quote_ident(rec_table.id) INTO v_val;
+		-- EXECUTE 'SELECT setval(SCHEMA_NAME.'||rec_table.sys_sequence||', '||v_val||', true);';
 	END LOOP;
 		
 	-- set result on result selector: In spite of there are two selectors tables (rpt_selector_result, rpt_selector_compare) only it's setted one
 	DELETE FROM rpt_selector_result WHERE cur_user=current_user;
-	INSERT INTO rpt_selector_result (result_id, cur_user) VALUES (result_id_var, current_user);
+	INSERT INTO rpt_selector_result (result_id, cur_user) VALUES (v_result, current_user);
 
 	-- create log
-	RETURN gw_fct_rpt2pg_log (result_id_var);
+	RETURN gw_fct_rpt2pg_log (v_result);
 
 	
 END;

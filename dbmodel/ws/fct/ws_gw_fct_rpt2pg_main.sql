@@ -6,36 +6,43 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2322
 
-
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_rpt2pg(character varying );
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_rpt2pg(result_id_var character varying)  
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_rpt2pg(json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_rpt2pg_main(p_data json)  
 RETURNS json AS $BODY$
 
+/*EXAMPLE
+SELECT SCHEMA_NAME.gw_fct_rpt2pg_main($${"data":{"resultId":"test1"}}$$) 
+*/
+
 DECLARE
+v_result text;
 
 BEGIN
 
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
 
-	RAISE NOTICE 'Starting rpt2pg process.';
+	-- get parameters
+	v_result  = (p_data ->>'data')::json->>'resultId';
+
+	RAISE NOTICE 'Starting rpt2pg process. adsgfdasg sdg ';
 
 	-- reordening data
-	SELECT gw_fct_rpt2pg_import_rpt($${"data":{"resultId":"r1"}}$$)
+	PERFORM gw_fct_rpt2pg_import_rpt(p_data);
 	
 	-- Reverse geometries where flow is negative and updating flow values with absolute value
-	UPDATE rpt_inp_arc SET the_geom=st_reverse(the_geom) FROM rpt_arc WHERE rpt_arc.arc_id=rpt_inp_arc.arc_id AND flow<0 AND rpt_inp_arc.result_id=result_id_var;
-	UPDATE rpt_arc SET flow=(-1)*flow WHERE flow<0 and result_id=result_id_var;
+	UPDATE rpt_inp_arc SET the_geom=st_reverse(the_geom) FROM rpt_arc WHERE rpt_arc.arc_id=rpt_inp_arc.arc_id AND flow<0 AND rpt_inp_arc.result_id=v_result;
+	UPDATE rpt_arc SET flow=(-1)*flow WHERE flow<0 and result_id=v_result;
 	
 	-- set result on result selector
 	-- NOTE: In spite of there are four selectors tables (rpt_selector_result, rpt_selector_compare, rpt_selector_hourly, rpt_selector_hourly_compare) only it's setted one
 	DELETE FROM rpt_selector_result WHERE cur_user=current_user;
-	INSERT INTO rpt_selector_result (result_id, cur_user) VALUES (result_id_var, current_user);
+	INSERT INTO rpt_selector_result (result_id, cur_user) VALUES (v_result, current_user);
 
 	-- create log message
-	SELECT gw_fct_rpt2pg_log(result_id_var) INTO v_return;
+	RETURN gw_fct_rpt2pg_log(v_result);
 	
-RETURN v_return;
 		
 END;
 $BODY$

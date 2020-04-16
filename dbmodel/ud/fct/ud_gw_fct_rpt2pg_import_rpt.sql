@@ -6,8 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2528
 
-DROP FUNCTION IF EXISTS  SCHEMA_NAME.gw_fct_rpt2pg_import_swmm_rpt(text, text);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_rpt2pg_import_swmm_rpt(p_data json)
+DROP FUNCTION IF EXISTS  SCHEMA_NAME.gw_fct_utils_csv2pg_import_swmm_rpt(text, text);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_rpt2pg_import_rpt(p_data json)
   RETURNS json AS
 $BODY$
 
@@ -257,8 +257,6 @@ BEGIN
 		END IF;
 	END LOOP;
 	
-	PERFORM gw_fct_rpt2pg(v_result_id);
-
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (40, 'Rpt file import process -> Finished. Check your data');
 
 	-- get results

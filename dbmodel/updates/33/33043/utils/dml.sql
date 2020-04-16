@@ -108,3 +108,4 @@ UPDATE audit_cat_function SET function_name = 'gw_fct_pg2epa_export_inp' WHERE i
 UPDATE audit_cat_function SET function_name = 'gw_fct_pg2epa_import_rpt' WHERE id = 2536;
 UPDATE audit_cat_function SET function_name = 'gw_fct_pg2epa_import_rpt' WHERE id = 2530;
 
+UPDATE sys_csv2pg_cat SET isdeprecated = true WHERE id IN (10,11,12);
