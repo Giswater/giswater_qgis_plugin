@@ -946,9 +946,13 @@ class TmBasic(TmParentAction):
         table_name = "v_ui_om_visit_incident"
         self.update_table(self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name)
 
+        sql = "SELECT id, idval FROM om_visit_typevalue WHERE typevalue = 'incident_status'"
+        rows = self.controller.get_rows(sql, log_sql=True)
+        utils_giswater.set_item_data(self.dlg_incident_manager.cmb_status, rows, 1)
+
         # Signals
         self.dlg_incident_manager.txt_visit_id.textChanged.connect(partial(self.update_table, self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name))
-        # self.dlg_incident_manager.cmb_status.currentIndexChanged.connect(partial(self.update_table, self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name))
+        self.dlg_incident_manager.cmb_status.currentIndexChanged.connect(partial(self.update_table, self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name))
         self.dlg_incident_manager.btn_process.clicked.connect(partial(self.open_incident_planning, 'PROCESS'))
         self.dlg_incident_manager.btn_discard.clicked.connect(partial(self.open_incident_planning, 'DISCARD'))
 
@@ -960,12 +964,12 @@ class TmBasic(TmParentAction):
     def update_table(self, dialog, qtable, table_name):
 
         visit_id = utils_giswater.getWidgetText(dialog, dialog.txt_visit_id)
-        # status_id = utils_giswater.get_item_data(dialog, dialog.cmb_status, 1)
+        status_id = utils_giswater.get_item_data(dialog, dialog.cmb_status, 1)
 
         expr_filter = f"1=1"
 
-        # if visit_id not in (None, '', 'null'): expr_filter += f" AND visit_id LIKE '%{visit_id}%'"
-        # if status_id: expr_filter += f" AND status ='{status_id}'"
+        # if visit_id not in (None, '', 'null'): expr_filter += f" AND visit_id::text LIKE '%{visit_id}%'"
+        if status_id: expr_filter += f" AND status ='{status_id}'"
 
         self.fill_table_incident(qtable, table_name, expr_filter=expr_filter)
 
@@ -1064,15 +1068,17 @@ class TmBasic(TmParentAction):
         self.incident_user = self.dlg_incident_manager.tbl_incident.model().record(row).value("incident_user")
         self.parameter_id = self.dlg_incident_manager.tbl_incident.model().record(row).value("parameter_id")
         self.incident_comment = self.dlg_incident_manager.tbl_incident.model().record(row).value("incident_comment")
-
+        if self.incident_comment in (None, 'null', 'NULL'):
+            self.incident_comment = ''
         utils_giswater.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.visit_id, self.visit_id)
         utils_giswater.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.node_id, self.node_id)
-        utils_giswater.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.incident_date, self.incident_date)
+        utils_giswater.setCalendarDate(self.dlg_incident_planning, self.dlg_incident_planning.incident_date, self.incident_date)
         utils_giswater.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.incident_user, self.incident_user)
         utils_giswater.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.parameter_id, self.parameter_id)
         utils_giswater.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.incident_comment, self.incident_comment)
         utils_giswater.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.process_user, self.controller.get_current_user())
 
+        utils_giswater.setCalendarDate(self.dlg_incident_planning, self.dlg_incident_planning.process_date, None)
 
         # Set signals
         self.dlg_incident_planning.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_incident_planning))
@@ -1100,7 +1106,7 @@ class TmBasic(TmParentAction):
             extras += f', "campaign_id":{campaign_id}'
             extras += f', "work_id":{work_id}'
             body = self.create_body(extras=extras)
-            result = self.controller.get_json('tm_fct_incident', body, log_sql=True)
+            result = self.controller.get_json('tm_fct_incident_check_plan', body, log_sql=True)
 
             if result['message']['level'] == 1:
                 message = "Are you sure you want continue?"

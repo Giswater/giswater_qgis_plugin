@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>465</width>
+    <width>460</width>
     <height>502</height>
    </rect>
   </property>
@@ -16,71 +16,6 @@
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
     <layout class="QGridLayout" name="gridLayout_2">
-     <item row="3" column="1">
-      <widget class="QLineEdit" name="incident_user">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="8" column="0">
-      <widget class="QLabel" name="lbl_work_id">
-       <property name="text">
-        <string>Tipus treball:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="label_incident_date">
-       <property name="text">
-        <string>Data incidencia:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="9" column="1">
-      <widget class="QComboBox" name="builder_id"/>
-     </item>
-     <item row="4" column="1">
-      <widget class="QLineEdit" name="parameter_id">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="9" column="0">
-      <widget class="QLabel" name="lbl_builder_id">
-       <property name="text">
-        <string>Builder:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="0">
-      <widget class="QLabel" name="label_process_user">
-       <property name="text">
-        <string>Usuari tramit:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="7" column="0">
-      <widget class="QLabel" name="lbl_campaign_id">
-       <property name="text">
-        <string>Campanya:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0">
-      <widget class="QLabel" name="label_parameter_id">
-       <property name="text">
-        <string>Problema reportat:</string>
-       </property>
-      </widget>
-     </item>
      <item row="10" column="0">
       <widget class="QLabel" name="lbl_priority_id">
        <property name="text">
@@ -102,23 +37,6 @@
        </property>
       </widget>
      </item>
-     <item row="6" column="1">
-      <widget class="QLineEdit" name="process_user">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="label_visit_id">
-       <property name="text">
-        <string>ID incidencia:</string>
-       </property>
-      </widget>
-     </item>
      <item row="5" column="0">
       <widget class="QLabel" name="label_process_date">
        <property name="text">
@@ -129,15 +47,39 @@
      <item row="10" column="1">
       <widget class="QComboBox" name="priority_id"/>
      </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_node_id">
+     <item row="7" column="0">
+      <widget class="QLabel" name="lbl_campaign_id">
        <property name="text">
-        <string>ID arbol:</string>
+        <string>Campanya:</string>
        </property>
       </widget>
      </item>
-     <item row="2" column="1">
-      <widget class="QLineEdit" name="incident_date">
+     <item row="11" column="1">
+      <widget class="QPlainTextEdit" name="incident_comment"/>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="label_parameter_id">
+       <property name="text">
+        <string>Problema reportat:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_incident_date">
+       <property name="text">
+        <string>Data incidencia:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_visit_id">
+       <property name="text">
+        <string>ID incidencia:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QLineEdit" name="parameter_id">
        <property name="enabled">
         <bool>false</bool>
        </property>
@@ -146,11 +88,8 @@
        </property>
       </widget>
      </item>
-     <item row="8" column="1">
-      <widget class="QComboBox" name="work_id"/>
-     </item>
-     <item row="7" column="1">
-      <widget class="QComboBox" name="campaign_id"/>
+     <item row="9" column="1">
+      <widget class="QComboBox" name="builder_id"/>
      </item>
      <item row="1" column="1">
       <widget class="QLineEdit" name="node_id">
@@ -162,6 +101,63 @@
        </property>
       </widget>
      </item>
+     <item row="5" column="1">
+      <widget class="QDateEdit" name="process_date"/>
+     </item>
+     <item row="8" column="0">
+      <widget class="QLabel" name="lbl_work_id">
+       <property name="text">
+        <string>Tipus treball:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="0">
+      <widget class="QLabel" name="lbl_builder_id">
+       <property name="text">
+        <string>Builder:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="1">
+      <widget class="QComboBox" name="work_id"/>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLineEdit" name="incident_user">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="0">
+      <widget class="QLabel" name="label_process_user">
+       <property name="text">
+        <string>Usuari tramit:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <widget class="QLineEdit" name="process_user">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="1">
+      <widget class="QComboBox" name="campaign_id"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_node_id">
+       <property name="text">
+        <string>ID arbol:</string>
+       </property>
+      </widget>
+     </item>
      <item row="11" column="0">
       <widget class="QLabel" name="label_incident_comment">
        <property name="text">
@@ -169,11 +165,8 @@
        </property>
       </widget>
      </item>
-     <item row="11" column="1">
-      <widget class="QPlainTextEdit" name="incident_comment"/>
-     </item>
-     <item row="5" column="1">
-      <widget class="QDateEdit" name="process_date"/>
+     <item row="2" column="1">
+      <widget class="QDateEdit" name="incident_date"/>
      </item>
     </layout>
    </item>
