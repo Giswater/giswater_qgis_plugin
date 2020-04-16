@@ -114,8 +114,8 @@ BEGIN
 		--loop over selected nodes, intersect node with raster
 		FOR rec IN EXECUTE v_query LOOP
 
-			EXECUTE 'SELECT ST_Value(rast,1,$1,false) FROM ext_raster_dem WHERE id =
-					(SELECT id FROM ext_raster_dem WHERE st_dwithin (envelope, $1, 1) LIMIT 1)'
+			EXECUTE 'SELECT ST_Value(rast,1,$1,false) FROM v_ext_raster_dem WHERE id =
+					(SELECT id FROM v_ext_raster_dem WHERE st_dwithin (envelope, $1, 1) LIMIT 1)'
 				USING rec.the_geom
 				INTO v_elevation;
 

@@ -28,5 +28,25 @@ CREATE OR REPLACE VIEW v_anl_graf AS
            FROM temp_anlgraf anl_graf_1
           WHERE anl_graf_1.water = 1) a ON anl_graf.node_1 = a.node_2
   WHERE anl_graf.flag < 2 AND anl_graf.water = 0 AND a.flag < 2;
-
   
+ 
+ 
+CREATE OR REPLACE VIEW v_ext_raster_dem AS 
+SELECT r.id,
+code,
+alias,
+raster_type, 
+c.descript,
+source,
+provider,
+year,
+r.rast,
+a.expl_id,
+r.rastercat_id,
+r.envelope
+FROM 
+exploitation a, ext_raster_dem r
+JOIN ext_cat_raster c ON c.id=rastercat_id
+WHERE st_dwithin(r.envelope, a.the_geom, 0::double precision);
+
+ 

@@ -86,3 +86,5 @@ UPDATE config_param_system set standardvalue ='{"status":false, "server":""}' WH
 UPDATE config_param_system set standardvalue ='1' WHERE parameter  ='i18n_update_mode';
 
 UPDATE audit_cat_table SET isdeprecated  = true where id  like '%v_edit_man_%';
+
+INSERT INTO audit_cat_table VALUES (v_ext_raster_dem);
