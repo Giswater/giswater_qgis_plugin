@@ -563,6 +563,15 @@ FORM_CLASS = get_ui_class('event_standard.ui', 'tm')
 class EventStandardTm(GwDialog, FORM_CLASS):
     pass
 
+FORM_CLASS = get_ui_class('incident_planning.ui', 'tm')
+class IncidentPlanning(GwDialog, FORM_CLASS):
+    pass
+
+
+FORM_CLASS = get_ui_class('incident_manager.ui', 'tm')
+class IncidentManager(GwDialog, FORM_CLASS):
+    pass
+
 
 FORM_CLASS = get_ui_class('planning_unit.ui', 'tm')
 class PlaningUnit(GwDialog, FORM_CLASS):

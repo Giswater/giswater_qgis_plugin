@@ -21,6 +21,9 @@ from ..ui.tm.new_prices import NewPrices
 from ..ui.tm.price_management import PriceManagement
 from ..ui.tm.tree_manage import TreeManage
 from ..ui.tm.tree_selector import TreeSelector
+from ..ui.tm.incident_manager import IncidentManager
+from ..ui_manager import IncidentPlanning
+
 from .. import utils_giswater
 
 
@@ -931,3 +934,201 @@ class TmBasic(TmParentAction):
         plan_unit = TmPlanningUnit(self.iface, self.settings, self.controller, self.plugin_dir)
         plan_unit.open_form()
 
+
+    def open_incident_manager(self):
+        """ Button 309: Add visit """
+
+        self.dlg_incident_manager = IncidentManager()
+        self.load_settings(self.dlg_incident_manager)
+
+        # Poulate TableView
+        utils_giswater.set_qtv_config(self.dlg_incident_manager.tbl_incident, edit_triggers=QTableView.NoEditTriggers)
+        table_name = "v_ui_om_visit_incident"
+        self.update_table(self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name)
+
+        # Signals
+        self.dlg_incident_manager.txt_visit_id.textChanged.connect(partial(self.update_table, self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name))
+        # self.dlg_incident_manager.cmb_status.currentIndexChanged.connect(partial(self.update_table, self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name))
+        self.dlg_incident_manager.btn_process.clicked.connect(partial(self.open_incident_planning, 'PROCESS'))
+        self.dlg_incident_manager.btn_discard.clicked.connect(partial(self.open_incident_planning, 'DISCARD'))
+
+        # Open form
+        self.dlg_incident_manager.setWindowTitle("Incident Manager")
+        self.dlg_incident_manager.exec_()
+
+
+    def update_table(self, dialog, qtable, table_name):
+
+        visit_id = utils_giswater.getWidgetText(dialog, dialog.txt_visit_id)
+        # status_id = utils_giswater.get_item_data(dialog, dialog.cmb_status, 1)
+
+        expr_filter = f"1=1"
+
+        # if visit_id not in (None, '', 'null'): expr_filter += f" AND visit_id LIKE '%{visit_id}%'"
+        # if status_id: expr_filter += f" AND status ='{status_id}'"
+
+        self.fill_table_incident(qtable, table_name, expr_filter=expr_filter)
+
+        self.get_id_list()
+
+
+    def fill_table_incident(self, qtable, table_name,  expr_filter=None):
+
+        expr = None
+        if expr_filter:
+            # Check expression
+            (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
+            if not is_valid:
+                return expr
+
+        # Set a model with selected filter expression
+        if self.schema_name not in table_name:
+            table_name = self.schema_name + "." + table_name
+
+        # Set model
+        model = QSqlTableModel()
+        model.setTable(table_name)
+        model.setEditStrategy(QSqlTableModel.OnFieldChange)
+        model.setSort(0, 0)
+        model.select()
+
+        # Check for errors
+        if model.lastError().isValid():
+            self.controller.show_warning(model.lastError().text())
+        # Attach model to table view
+        if expr:
+            qtable.setModel(model)
+            qtable.model().setFilter(expr_filter)
+        else:
+            qtable.setModel(model)
+
+        return expr
+
+
+    def get_id_list(self):
+
+        self.ids = []
+        column_index = utils_giswater.get_col_index_by_col_name(self.dlg_incident_manager.tbl_incident, 'node_id')
+        for x in range(0, self.dlg_incident_manager.tbl_incident.model().rowCount()):
+            _id = self.dlg_incident_manager.tbl_incident.model().data(self.dlg_incident_manager.tbl_incident.model().index(x, column_index))
+            self.ids.append(_id)
+
+
+    def open_incident_planning(self, action):
+
+        self.dlg_incident_planning = IncidentPlanning()
+        self.load_settings(self.dlg_incident_planning)
+
+
+        #Hide widgets
+        if action == 'DISCARD':
+            self.dlg_incident_planning.lbl_campaign_id.setVisible(False)
+            self.dlg_incident_planning.lbl_work_id.setVisible(False)
+            self.dlg_incident_planning.lbl_builder_id.setVisible(False)
+            self.dlg_incident_planning.lbl_priority_id.setVisible(False)
+            self.dlg_incident_planning.campaign_id.setVisible(False)
+            self.dlg_incident_planning.work_id.setVisible(False)
+            self.dlg_incident_planning.builder_id.setVisible(False)
+            self.dlg_incident_planning.priority_id.setVisible(False)
+        else:
+            sql = "SELECT id, name FROM cat_campaign"
+            rows = self.controller.get_rows(sql, log_sql=True)
+            utils_giswater.set_item_data(self.dlg_incident_planning.campaign_id, rows, 1)
+            sql = "SELECT id, name FROM cat_work"
+            rows = self.controller.get_rows(sql, add_empty_row=True)
+            utils_giswater.set_item_data(self.dlg_incident_planning.work_id, rows, 1)
+            sql = "SELECT id, name FROM cat_builder"
+            rows = self.controller.get_rows(sql, add_empty_row=True)
+            utils_giswater.set_item_data(self.dlg_incident_planning.builder_id, rows, 1)
+            sql = "SELECT id, name FROM cat_priority"
+            rows = self.controller.get_rows(sql, add_empty_row=True)
+            utils_giswater.set_item_data(self.dlg_incident_planning.priority_id, rows, 1)
+
+        # Get record selected
+        selected_list = self.dlg_incident_manager.tbl_incident.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+        elif len(selected_list) > 1:
+            message = "More than one record selected"
+            self.controller.show_warning(message)
+            return
+
+        row = selected_list[0].row()
+
+        # Get object_id from selected row
+        self.visit_id = self.dlg_incident_manager.tbl_incident.model().record(row).value("visit_id")
+        self.node_id = self.dlg_incident_manager.tbl_incident.model().record(row).value("node_id")
+        self.incident_date = self.dlg_incident_manager.tbl_incident.model().record(row).value("incident_date")
+        self.incident_user = self.dlg_incident_manager.tbl_incident.model().record(row).value("incident_user")
+        self.parameter_id = self.dlg_incident_manager.tbl_incident.model().record(row).value("parameter_id")
+        self.incident_comment = self.dlg_incident_manager.tbl_incident.model().record(row).value("incident_comment")
+
+        utils_giswater.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.visit_id, self.visit_id)
+        utils_giswater.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.node_id, self.node_id)
+        utils_giswater.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.incident_date, self.incident_date)
+        utils_giswater.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.incident_user, self.incident_user)
+        utils_giswater.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.parameter_id, self.parameter_id)
+        utils_giswater.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.incident_comment, self.incident_comment)
+        utils_giswater.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.process_user, self.controller.get_current_user())
+
+
+        # Set signals
+        self.dlg_incident_planning.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_incident_planning))
+        self.dlg_incident_planning.btn_accept.clicked.connect(partial(self.manage_incident_planning, action))
+
+        self.open_dialog(self.dlg_incident_planning)
+
+
+    def manage_incident_planning(self, action):
+
+        if action == 'PROCESS':
+
+            campaign_id = utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.campaign_id, 0)
+            work_id =utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.work_id, 0)
+            priority_id = utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.priority_id, 0)
+            builder_id = utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.builder_id, 0)
+
+            if self.visit_id in ('', None, 'null') or campaign_id in ('', None, 'null') or work_id in ('', None, 'null')\
+                    or priority_id in ('', None, 'null') or builder_id in ('', None, 'null'):
+                message = "Some parameters are missing."
+                self.controller.show_info(message)
+                return
+
+            extras = f'"visit_id":{self.visit_id}'
+            extras += f', "campaign_id":{campaign_id}'
+            extras += f', "work_id":{work_id}'
+            body = self.create_body(extras=extras)
+            result = self.controller.get_json('tm_fct_incident', body, log_sql=True)
+
+            if result['message']['level'] == 1:
+                message = "Are you sure you want continue?"
+                answer = self.controller.ask_question(message)
+                if not answer:
+                    return
+
+            extras = f'"action":"{action}"'
+            extras += f', "visit_id":{self.visit_id}'
+            extras += f', "process_date":"{utils_giswater.getCalendarDate(self.dlg_incident_planning, self.dlg_incident_planning.process_date)}"'
+            extras += f', "campaign_id":{utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.campaign_id, 0)}'
+            extras += f', "builder_id":{utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.builder_id, 0)}'
+            extras += f', "priority_id":{utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.priority_id, 0)}'
+            extras += f', "work_id":{utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.work_id, 0)}'
+            extras += f', "incident_comment":"{utils_giswater.getWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.incident_comment)}"'
+            body = self.create_body(extras=extras)
+
+            result = self.controller.get_json('tm_fct_incident', body, log_sql=True)
+
+        elif action == 'DISCARD':
+            extras = f'"action":"{action}"'
+            extras += f', "visit_id":{self.visit_id}'
+            extras += f', "process_date":"{utils_giswater.getCalendarDate(self.dlg_incident_planning, self.dlg_incident_planning.process_date)}"'
+            extras += f', "incident_comment":"{utils_giswater.getWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.incident_comment)}"'
+            body = self.create_body(extras=extras)
+
+            result = self.controller.get_json('tm_fct_incident', body, log_sql=True)
+
+        if result['status'] == "Accepted":
+            self.close_dialog(self.dlg_incident_planning)
+            self.fill_table_incident(self.dlg_incident_manager.tbl_incident, "v_ui_om_visit_incident")

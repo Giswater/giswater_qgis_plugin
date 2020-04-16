@@ -27,7 +27,7 @@
       </widget>
      </item>
      <item row="8" column="0">
-      <widget class="QLabel" name="work_id">
+      <widget class="QLabel" name="lbl_work_id">
        <property name="text">
         <string>Tipus treball:</string>
        </property>
@@ -41,7 +41,7 @@
       </widget>
      </item>
      <item row="9" column="1">
-      <widget class="QComboBox" name="builder_id_2"/>
+      <widget class="QComboBox" name="builder_id"/>
      </item>
      <item row="4" column="1">
       <widget class="QLineEdit" name="parameter_id">
@@ -54,7 +54,7 @@
       </widget>
      </item>
      <item row="9" column="0">
-      <widget class="QLabel" name="builder_id">
+      <widget class="QLabel" name="lbl_builder_id">
        <property name="text">
         <string>Builder:</string>
        </property>
@@ -68,7 +68,7 @@
       </widget>
      </item>
      <item row="7" column="0">
-      <widget class="QLabel" name="label_campaign_id">
+      <widget class="QLabel" name="lbl_campaign_id">
        <property name="text">
         <string>Campanya:</string>
        </property>
@@ -82,7 +82,7 @@
       </widget>
      </item>
      <item row="10" column="0">
-      <widget class="QLabel" name="label_priority_id">
+      <widget class="QLabel" name="lbl_priority_id">
        <property name="text">
         <string>Prioritat:</string>
        </property>
@@ -147,7 +147,7 @@
       </widget>
      </item>
      <item row="8" column="1">
-      <widget class="QComboBox" name="work_id_2"/>
+      <widget class="QComboBox" name="work_id"/>
      </item>
      <item row="7" column="1">
       <widget class="QComboBox" name="campaign_id"/>

@@ -379,3 +379,20 @@ class TmParentAction(object):
         qtable.model().setData(i, elem[0])
         i = qtable.model().index(pos_x, col_update)
         qtable.model().setData(i, elem[0])
+
+
+    def create_body(self, form='', feature='', filter_fields='', extras=None):
+        """ Create and return parameters as body to functions"""
+
+        client = f'$${{"client":{{"device":9, "infoType":100, "lang":"ES"}}, '
+        form = '"form":{' + form + '}, '
+        feature = '"feature":{' + feature + '}, '
+        filter_fields = '"filterFields":{' + filter_fields + '}'
+        page_info = '"pageInfo":{}'
+        data = '"data":{' + filter_fields + ', ' + page_info
+        if extras is not None:
+            data += ', ' + extras
+        data += f'}}}}$$'
+        body = "" + client + form + feature + data
+
+        return body
