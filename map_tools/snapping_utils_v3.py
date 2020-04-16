@@ -35,6 +35,7 @@ class SnappingConfigManager(object):
 
         # Snapper
         self.snapping_config = self.get_snapping_options()
+        self.snapping_config.setEnabled(True)
         self.snapper = self.get_snapper()
         proj = QgsProject.instance()
         proj.writeEntry('Digitizing', 'SnappingMode', 'advanced')
