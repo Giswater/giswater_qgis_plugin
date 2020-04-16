@@ -8,12 +8,13 @@ This version of Giswater is provided by Giswater Association
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa(character varying, boolean, boolean);
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa(character varying, boolean);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa(p_data json)  
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa(p_data);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_main(p_data json)  
 RETURNS json AS 
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_pg2epa($${"data":{ "resultId":"r1", "useNetworkGeom":"false"}}$$)
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"data":{ "resultId":"r1", "useNetworkGeom":"false"}}$$)
 */
 
 DECLARE
@@ -208,7 +209,10 @@ BEGIN
 	-- manage return message
 	v_body = gw_fct_json_object_set_key((v_return->>'body')::json, 'file', v_file);
 	v_return = gw_fct_json_object_set_key(v_return, 'body', v_body);
-	v_return = replace(v_return::text, '"message":{"priority":1, "text":"Data quality analysis done succesfully"}', '"message":{"priority":1, "text":"Inp export done succesfully"}')::json;
+	v_return =  gw_fct_json_object_set_key (v_return, 'continue', false);                                
+	v_return =  gw_fct_json_object_set_key (v_return, 'steps', 0);
+	v_return = replace(v_return::text, '"message":{"priority":1, "text":"Data quality analysis done succesfully"}', 
+	'"message":{"priority":1, "text":"Inp export done succesfully"}')::json;
 
 	RETURN v_return;
 END;

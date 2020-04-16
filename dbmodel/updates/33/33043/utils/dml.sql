@@ -88,3 +88,13 @@ UPDATE config_param_system set standardvalue ='1' WHERE parameter  ='i18n_update
 UPDATE audit_cat_table SET isdeprecated  = true where id  like '%v_edit_man_%';
 
 INSERT INTO audit_cat_table VALUES (v_ext_raster_dem);
+
+--16/04/2020
+INSERT INTO audit_cat_table(id, context, description, sys_role_id, sys_criticity, qgis_criticity,isdeprecated)
+VALUES ('v_ext_raster_dem', 'table to external', 'Raster dem view', 'role_basic', 0, 0, false) ON CONFLICT (id) DO NOTHING;
+
+UPDATE audit_cat_table SET id = 'gw_fct_rpt2pg_import_rpt'  WHERE id = 'gw_fct_utils_csv2pg_import_epanet_rpt';
+UPDATE audit_cat_table SET id = 'gw_fct_rpt2pg_import_rpt'  WHERE id = 'gw_fct_utils_csv2pg_import_epanet_rpt';
+
+DELETE FROM audit_cat_function WHERE function_name = 'gw_fct_pg2epa';
+

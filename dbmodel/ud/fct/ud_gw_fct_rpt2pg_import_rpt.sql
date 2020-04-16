@@ -6,38 +6,35 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2528
 
-DROP FUNCTION IF EXISTS  SCHEMA_NAME.gw_fct_utils_csv2pg_import_swmm_rpt(text, text);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_swmm_rpt(p_data json)
+DROP FUNCTION IF EXISTS  SCHEMA_NAME.gw_fct_rpt2pg_import_swmm_rpt(text, text);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_rpt2pg_import_swmm_rpt(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_swmm_rpt($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{},
-"data":{"resultId":"r1"}}$$)
+SELECT SCHEMA_NAME.gw_fct_rpt2pg_import_swmm_rpt($${"data":{"resultId":"r1"}}$$)
 */
 
 DECLARE
-	units_rec record;
-	element_rec record;
-	addfields_rec record;
-	id_last int8;
-	hour_aux text;
-	type_aux text;
-	rpt_rec record;
-	project_type_aux varchar;
-	v_csv2pgcat_id integer =11;
-	v_target text;
-	v_id text;
-	v_result 	json;
-	v_result_info 	json;
-	v_result_point	json;
-	v_result_line 	json;
-	v_version	text;
-	v_path 		text;
-	v_result_id	text;
-	v_error_context text;
+units_rec record;
+element_rec record;
+addfields_rec record;
+id_last int8;
+hour_aux text;
+type_aux text;
+rpt_rec record;
+project_type_aux varchar;
+v_csv2pgcat_id integer =11;
+v_target text;
+v_id text;
+v_result json;
+v_result_info json;
+v_result_point json;
+v_result_line json;
+v_version text;
+v_path text;
+v_result_id text;
+v_error_context text;
 
 BEGIN
 

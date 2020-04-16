@@ -7,15 +7,13 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE:2520
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_rpt(text, text);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_rpt(p_data json)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_rpt(p_data);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_rpt2pg_import_rpt(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_rpt($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{},
-"data":{"resultId":"r1"}}$$)
+SELECT SCHEMA_NAME.gw_fct_rpt2pg_import_rpt($${"data":{"resultId":"r1"}}$$)
 */
 
 DECLARE

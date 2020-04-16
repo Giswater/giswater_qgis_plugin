@@ -6,26 +6,25 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2528
 
-DROP FUNCTION IF EXISTS  SCHEMA_NAME.gw_fct_pg2epa_create_inp(character varying, text);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_create_inp(p_result_id character varying,  p_path text)
+DROP FUNCTION IF EXISTS  SCHEMA_NAME.gw_fct_utils_csv2pg_export_swmm_inp(character varying, text);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_export_inp(p_result_id character varying,  p_path text)
 RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_pg2epa_create_inp('result_1', 'D:\dades\test_ud.inp')
+SELECT SCHEMA_NAME.gw_fct_pg2epa_export_inp('result_1', 'D:\dades\test_ud.inp')
 */
 
 DECLARE
-	rec_table record;
-	column_number integer;
-	id_last integer;
-	num_col_rec record;
-	num_column text;
-	result_id_aux varchar;
-	title_aux varchar;
-	v_pg2csvcat_id integer = 10;
-	v_return json;
-
+rec_table record;
+column_number integer;
+id_last integer;
+num_col_rec record;
+num_column text;
+result_id_aux varchar;
+title_aux varchar;
+pg2csvcat_id integer = 10;
+v_return json;
 
 BEGIN
 
