@@ -9,3 +9,9 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 UPDATE node_type SET isexitupperintro = 0 WHERE type NOT IN ('STORAGE','CHAMBER');
 UPDATE node_type SET isexitupperintro = 2 WHERE type IN ('STORAGE','CHAMBER');
+
+INSERT INTO audit_cat_table(id, context, descript, sys_role_id, sys_criticity, qgis_role_id, isdeprecated) 
+VALUES ('rpt_selector_timestep', 'Hydraulic selector', 'Selector of an alternative result (to compare with other results)', 'role_epa', 0, 'role_epa', false);
+
+INSERT INTO audit_cat_table(id, context, descript, sys_role_id, sys_criticity, qgis_role_id, isdeprecated) 
+VALUES ('rpt_selector_timestep_compare', 'Hydraulic selector', 'Selector of an alternative result (to compare with other results)', 'role_epa', 0, 'role_epa', false);

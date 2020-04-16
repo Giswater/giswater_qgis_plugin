@@ -26,3 +26,9 @@ WHERE id = 'inp_options_rtc_period_id';
 UPDATE audit_cat_param_user SET
 dv_isnullvalue = true
 WHERE id IN ('inp_options_pattern','inp_options_rtc_period_id');
+
+INSERT INTO audit_cat_table(id, context, descript, sys_role_id, sys_criticity, qgis_role_id, isdeprecated) 
+VALUES ('rpt_selector_hourly', 'Hydraulic selector', 'Selector of an alternative result (to compare with other results)', 'role_epa', 0, 'role_epa', false);
+
+INSERT INTO audit_cat_table(id, context, descript, sys_role_id, sys_criticity, qgis_role_id, isdeprecated) 
+VALUES ('rpt_selector_hourly_compare', 'Hydraulic selector', 'Selector of an alternative result (to compare with other results)', 'role_epa', 0, 'role_epa', false);
