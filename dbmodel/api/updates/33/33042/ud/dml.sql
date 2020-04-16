@@ -8,9 +8,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2020/04/14
-UPDATE config_api_form_fields set layoutname = 'lyt_data_1' WHERE column_id = 'width' AND
-(formname = 've_node_chamber' OR formname = 've_node_pump_station' OR formname = 've_node_weir');
-
 UPDATE config_api_form_fields SET layout_order = 1 WHERE column_id = 'arc_id' and formname in ('v_edit_inp_conduit','v_edit_inp_orifice','v_edit_inp_outlet','v_edit_inp_pump','v_edit_inp_virtual','v_edit_inp_weir');
 UPDATE config_api_form_fields SET layout_order = 2 WHERE column_id = 'node_1' and formname in ('v_edit_inp_conduit','v_edit_inp_orifice','v_edit_inp_outlet','v_edit_inp_pump','v_edit_inp_virtual','v_edit_inp_weir');
 UPDATE config_api_form_fields SET layout_order = 3 WHERE column_id = 'node_2' and formname in ('v_edit_inp_conduit','v_edit_inp_orifice','v_edit_inp_outlet','v_edit_inp_pump','v_edit_inp_virtual','v_edit_inp_weir');

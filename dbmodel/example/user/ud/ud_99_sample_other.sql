@@ -400,3 +400,7 @@ UPDATE config_api_form_fields SET tooltip = 'groove - Para establecer si hay ran
 UPDATE config_api_form_fields SET tooltip = 'inlet - Elemento con aportaciones' WHERE column_id = 'inlet' AND tooltip IS NULL;
 
 UPDATE node_type SET isexitupperintro = 2 WHERE id = 'VIRTUAL_NODE';
+
+UPDATE config_api_form_fields set layoutname = 'lyt_data_1' WHERE column_id = 'width' AND formname ='ve_node_chamber';
+UPDATE config_api_form_fields set layoutname = 'lyt_data_1' WHERE column_id = 'width' AND formname ='ve_node_pump_station';
+UPDATE config_api_form_fields set layoutname = 'lyt_data_1' WHERE column_id = 'width' AND formname ='ve_node_weir';
