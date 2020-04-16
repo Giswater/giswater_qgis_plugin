@@ -941,14 +941,14 @@ class TmBasic(TmParentAction):
         self.dlg_incident_manager = IncidentManager()
         self.load_settings(self.dlg_incident_manager)
 
+        sql = "SELECT id, idval FROM om_visit_typevalue WHERE typevalue = 'incident_status'"
+        rows = self.controller.get_rows(sql, log_sql=True)
+        utils_giswater.set_item_data(self.dlg_incident_manager.cmb_status, rows, 1, add_empty=True)
+
         # Poulate TableView
         utils_giswater.set_qtv_config(self.dlg_incident_manager.tbl_incident, edit_triggers=QTableView.NoEditTriggers)
         table_name = "v_ui_om_visit_incident"
         self.update_table(self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name)
-
-        sql = "SELECT id, idval FROM om_visit_typevalue WHERE typevalue = 'incident_status'"
-        rows = self.controller.get_rows(sql, log_sql=True)
-        utils_giswater.set_item_data(self.dlg_incident_manager.cmb_status, rows, 1)
 
         # Signals
         self.dlg_incident_manager.txt_visit_id.textChanged.connect(partial(self.update_table, self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name))
@@ -1109,7 +1109,7 @@ class TmBasic(TmParentAction):
             result = self.controller.get_json('tm_fct_incident_check_plan', body, log_sql=True)
 
             if result['message']['level'] == 1:
-                message = "Are you sure you want continue?"
+                message = str(result['body']['data'] ['info']) + '\n' + "Continue?"
                 answer = self.controller.ask_question(message)
                 if not answer:
                     return
@@ -1137,4 +1137,4 @@ class TmBasic(TmParentAction):
 
         if result['status'] == "Accepted":
             self.close_dialog(self.dlg_incident_planning)
-            self.fill_table_incident(self.dlg_incident_manager.tbl_incident, "v_ui_om_visit_incident")
+            self.update_table(self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident,"v_ui_om_visit_incident")
