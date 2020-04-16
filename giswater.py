@@ -1228,7 +1228,7 @@ class Giswater(QObject):
         """ Manage actions of the different plugin toolbars """
 
         toolbar_id = "tm_basic"
-        list_actions = ['303', '301', '302', '304', '305']
+        list_actions = ['303', '301', '302', '304', '305', '309']
         self.manage_toolbar(toolbar_id, list_actions)
 
         # Manage action group of every toolbar
