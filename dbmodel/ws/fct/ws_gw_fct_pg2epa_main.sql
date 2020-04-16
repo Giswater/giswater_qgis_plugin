@@ -173,8 +173,6 @@ BEGIN
 		RAISE NOTICE '13 - delete disconnected arcs with associated nodes';
 		DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user) and result_id = v_result;
 		DELETE FROM rpt_inp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=39 AND cur_user=current_user) and result_id = v_result;
-
---select 
 		
 		RAISE NOTICE '14 - delete orphan nodes';
 		DELETE FROM rpt_inp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=7 AND cur_user=current_user) AND result_id=v_result;
@@ -204,7 +202,7 @@ BEGIN
 	SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return ;
 
 	RAISE NOTICE '21 - Create the inp file structure';	
-	SELECT gw_fct_pg2epa_create_inp(v_result, null) INTO v_file;
+	SELECT gw_fct_pg2epa_export_inp(v_result, null) INTO v_file;
 	
 	-- manage return message
 	v_body = gw_fct_json_object_set_key((v_return->>'body')::json, 'file', v_file);

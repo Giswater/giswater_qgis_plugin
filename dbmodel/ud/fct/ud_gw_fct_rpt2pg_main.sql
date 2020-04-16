@@ -39,6 +39,7 @@ BEGIN
 	DELETE FROM rpt_selector_result WHERE cur_user=current_user;
 	INSERT INTO rpt_selector_result (result_id, cur_user) VALUES (result_id_var, current_user);
 
+	-- create log
 	RETURN gw_fct_rpt2pg_log (result_id_var);
 
 	

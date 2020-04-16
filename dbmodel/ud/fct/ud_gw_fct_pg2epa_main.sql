@@ -123,7 +123,7 @@ BEGIN
 	
 	
 	RAISE NOTICE '12 - Create the inp file structure';	
-	SELECT gw_fct_pg2epa_create_inp(v_result, null) INTO v_file;
+	SELECT gw_fct_pg2epa_export_inp(v_result, null) INTO v_file;
 
 	-- manage return message
 	v_body = gw_fct_json_object_set_key((v_return->>'body')::json, 'file', v_file);

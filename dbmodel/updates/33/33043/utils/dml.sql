@@ -87,14 +87,24 @@ UPDATE config_param_system set standardvalue ='1' WHERE parameter  ='i18n_update
 
 UPDATE audit_cat_table SET isdeprecated  = true where id  like '%v_edit_man_%';
 
-INSERT INTO audit_cat_table VALUES (v_ext_raster_dem);
 
 --16/04/2020
-INSERT INTO audit_cat_table(id, context, description, sys_role_id, sys_criticity, qgis_criticity,isdeprecated)
+INSERT INTO audit_cat_table(id, context, descript, sys_role_id, sys_criticity, qgis_criticity, isdeprecated)
 VALUES ('v_ext_raster_dem', 'table to external', 'Raster dem view', 'role_basic', 0, 0, false) ON CONFLICT (id) DO NOTHING;
 
+-- put in order audit_cat_table
 UPDATE audit_cat_table SET id = 'gw_fct_rpt2pg_import_rpt'  WHERE id = 'gw_fct_utils_csv2pg_import_epanet_rpt';
-UPDATE audit_cat_table SET id = 'gw_fct_rpt2pg_import_rpt'  WHERE id = 'gw_fct_utils_csv2pg_import_epanet_rpt';
-
+UPDATE audit_cat_table SET id = 'gw_fct_rpt2pg_import_rpt'  WHERE id = 'gw_fct_utils_csv2pg_import_swmm_rpt';
 DELETE FROM audit_cat_function WHERE function_name = 'gw_fct_pg2epa';
+DELETE FROM audit_cat_function WHERE function_name like '%join_virtual%';
+UPDATE audit_cat_function SET project_type = 'ws' WHERE id = 2800;
+UPDATE audit_cat_function SET function_name = 'gw_fct_pg2epa_nod2arc' WHERE id = 2224;
+UPDATE audit_cat_function SET function_type = 'function' WHERE id = 2224;
+DELETE FROM audit_cat_function WHERE function_name like 'gw_fct_pg2epa_export_epa';
+DELETE FROM audit_cat_function WHERE function_name like 'gw_fct_utils_csv2pg';
+UPDATE audit_cat_function SET function_name = 'gw_fct_pg2epa_export_inp' WHERE id = 2526;
+DELETE FROM audit_cat_function WHERE id = 2518;
+UPDATE audit_cat_function SET function_name = 'gw_fct_pg2epa_export_inp' WHERE id = 2528;
+UPDATE audit_cat_function SET function_name = 'gw_fct_pg2epa_import_rpt' WHERE id = 2536;
+UPDATE audit_cat_function SET function_name = 'gw_fct_pg2epa_import_rpt' WHERE id = 2530;
 

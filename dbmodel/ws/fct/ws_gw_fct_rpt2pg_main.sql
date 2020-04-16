@@ -12,16 +12,16 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_rpt2pg(result_id_var character var
 RETURNS json AS $BODY$
 
 DECLARE
-   rec_var record;
-   v_return json;   
 
 BEGIN
 
---  Search path
-    SET search_path = "SCHEMA_NAME", public;
+	--  Search path
+	SET search_path = "SCHEMA_NAME", public;
 
 	RAISE NOTICE 'Starting rpt2pg process.';
-	
+
+	-- reordening data
+	SELECT gw_fct_rpt2pg_import_rpt($${"data":{"resultId":"r1"}}$$)
 	
 	-- Reverse geometries where flow is negative and updating flow values with absolute value
 	UPDATE rpt_inp_arc SET the_geom=st_reverse(the_geom) FROM rpt_arc WHERE rpt_arc.arc_id=rpt_inp_arc.arc_id AND flow<0 AND rpt_inp_arc.result_id=result_id_var;
@@ -32,6 +32,7 @@ BEGIN
 	DELETE FROM rpt_selector_result WHERE cur_user=current_user;
 	INSERT INTO rpt_selector_result (result_id, cur_user) VALUES (result_id_var, current_user);
 
+	-- create log message
 	SELECT gw_fct_rpt2pg_log(result_id_var) INTO v_return;
 	
 RETURN v_return;

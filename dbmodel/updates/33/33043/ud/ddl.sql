@@ -12,3 +12,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node_type",
 ALTER TABLE node_type ALTER COLUMN isexitupperintro SET DEFAULT 0;
 COMMENT ON TABLE node_type IS 'FIELD isexitupperintro has three values 0-false (by default), 1-true, 2-maybe';
 
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_arc", "column":"q0", "dataType":"float"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_arc", "column":"qmax", "dataType":"float"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_arc", "column":"barrels", "dataType":"integer"}}$$);
