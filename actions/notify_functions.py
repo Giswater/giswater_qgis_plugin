@@ -19,6 +19,7 @@ from .parent import ParentAction
 class NotifyFunctions(ParentAction):
     # :var conn_failed: some times, when user click so fast 2 actions, LISTEN channel is stopped, and we need to
     #                   re-LISTEN all channels
+
     conn_failed = False
     list_channels = None
     def __init__(self, iface, settings, controller, plugin_dir):
@@ -80,6 +81,7 @@ class NotifyFunctions(ParentAction):
 
 
     def wait_notifications(self):
+
         try:
             if self.conn_failed:
                 for channel_name in self.list_channels:
@@ -92,10 +94,10 @@ class NotifyFunctions(ParentAction):
             thread.start()
 
             # Check if any notification to process
-            conn = self.controller.dao.conn
-            conn.poll()
-            while conn.notifies:
-                notify = conn.notifies.pop()
+            dao = self.controller.dao
+            dao.get_poll()
+            while dao.conn.notifies:
+                notify = dao.conn.notifies.pop()
                 msg = f'<font color="blue"><bold>Got NOTIFY: </font>'
                 msg += f'<font color="black"><bold>{notify.pid}, {notify.channel}, {notify.payload} </font>'
                 self.controller.log_info(msg)
@@ -133,6 +135,7 @@ class NotifyFunctions(ParentAction):
     def indexing_spatial_layer(self, **kwargs):
         """ Force reload dataProvider of layer """
         """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params) """
+
         # Get list of layer names
         layers_name_list = kwargs['tableName']
         if not layers_name_list:

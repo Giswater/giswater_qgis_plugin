@@ -45,7 +45,29 @@ class PgDao(object):
             status = False
             
         return status
-        
+
+
+    def check_cursor(self, is_notify=False):
+        """ Check if cursor is closed """
+
+        if self.cursor.closed:
+            self.init_db()
+
+
+    def cursor_execute(self, sql):
+        """ Check if cursor is closed before execution """
+
+        self.check_cursor()
+        self.cursor.execute(sql)
+
+
+    def get_poll(self):
+
+        try:
+            self.conn.poll()
+        except psycopg2.OperationalError:
+            self.init_db()
+
 
     def get_conn_encoding(self):
         return self.conn.encoding
@@ -83,7 +105,7 @@ class PgDao(object):
         self.last_error = None
         rows = None
         try:
-            self.cursor.execute(sql)
+            self.cursor_execute(sql)
             rows = self.cursor.fetchall()     
             if commit:
                 self.commit()             
@@ -101,7 +123,7 @@ class PgDao(object):
         self.last_error = None
         row = None
         try:
-            self.cursor.execute(sql)
+            self.cursor_execute(sql)
             row = self.cursor.fetchone()
             if commit:
                 self.commit()
@@ -118,6 +140,7 @@ class PgDao(object):
 
         name = None
         try:
+            self.check_cursor()
             name = self.cursor.description[index][0]
         except Exception as e:
             self.last_error = e
@@ -131,6 +154,7 @@ class PgDao(object):
 
         total = None
         try:
+            self.check_cursor()
             total = len(self.cursor.description)
         except Exception as e:
             self.last_error = e
@@ -145,7 +169,7 @@ class PgDao(object):
         self.last_error = None         
         status = True
         try:
-            self.cursor.execute(sql) 
+            self.cursor_execute(sql)
             if commit:
                 self.commit()
         except Exception as e: 
@@ -163,7 +187,7 @@ class PgDao(object):
         self.last_error = None
         value = None
         try:
-            self.cursor.execute(sql)
+            self.cursor_execute(sql)
             value = self.cursor.fetchone()
             if commit:
                 self.commit()
@@ -175,17 +199,20 @@ class PgDao(object):
 
 
     def get_rowcount(self):       
-        """ Returns number of rows of current query """         
+        """ Returns number of rows of current query """
+        self.check_cursor()
         return self.cursor.rowcount      
  
  
     def commit(self):
         """ Commit current database transaction """
+        self.check_cursor()
         self.conn.commit()
         
         
     def rollback(self):
         """ Rollback current database transaction """
+        self.check_cursor()
         self.conn.rollback()
         
         
