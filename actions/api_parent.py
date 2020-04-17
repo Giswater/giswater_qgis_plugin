@@ -154,14 +154,12 @@ class ApiParent(ParentAction):
 
     def close_dialog(self, dlg=None):
         """ Close dialog """
+
         try:
             self.save_settings(dlg)
             dlg.close()
-        except AttributeError as e:
-            print(type(e).__name__)
-            pass
         except Exception as e:
-            print(type(e).__name__)
+            pass
 
             
     def check_expression(self, expr_filter, log_info=False):
@@ -1692,6 +1690,7 @@ class ApiParent(ParentAction):
         :param column_name: name of the column that we have to update
         :param state: sent by widget when stateChange
         """
+
         extras = f'"selector_type":"{widget.property("selector_type")}", '
         extras += f'"tableName":"{table_name}", '
         extras += f'"column_id":"{column_name}", '

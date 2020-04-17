@@ -112,6 +112,10 @@ class TmParentAction(object):
     def open_dialog(self, dlg=None, dlg_name=None, info=True, maximize_button=True, stay_on_top=True):
         """ Open dialog """
 
+        # Check database connection before opening dialog
+        if not self.controller.check_db_connection():
+            return
+
         if dlg is None or type(dlg) is bool:
             dlg = self.dlg
 
