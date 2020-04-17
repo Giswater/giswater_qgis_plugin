@@ -1027,7 +1027,7 @@ class Giswater(QObject):
                "WHEN 'v_edit_arc' THEN 'Arc' WHEN 'v_edit_connec' THEN 'Connec' "
                "WHEN 'v_edit_gully' THEN 'Gully' END ), parent_layer FROM cat_feature"
                " ORDER BY parent_layer")
-        parent_layers = self.controller.get_rows(sql, log_sql=True)
+        parent_layers = self.controller.get_rows(sql)
 
         for parent_layer in parent_layers:
             # Create sub menu
@@ -1041,7 +1041,7 @@ class Giswater(QObject):
                    f"   WHERE table_schema = '{schema_name}')"
                    f" ORDER BY child_layer")
 
-            child_layers = self.controller.get_rows(sql, log_sql=True)
+            child_layers = self.controller.get_rows(sql)
             child_layers.insert(0, ['Load all', 'Load all', 'Load all'])
             for child_layer in child_layers:
                 # Create actions
@@ -1073,8 +1073,10 @@ class Giswater(QObject):
         for layer in layers_list:
             layer_source = self.controller.get_layer_source(layer)
             # Collect only the layers of the work scheme
-            if 'schema' in layer_source and layer_source['schema'].replace('"', '') == self.schema_name:
-                layers_name.append(layer.name())
+            if 'schema' in layer_source:
+                schema = layer_source['schema']
+                if schema and schema.replace('"', '') == self.schema_name:
+                    layers_name.append(layer.name())
 
         self.set_layer_config(layers_name)
 
@@ -1332,7 +1334,7 @@ class Giswater(QObject):
 
             feature = '"tableName":"' + str(layer_name) + '", "id":"", "isLayer":true'
             body = self.create_body(feature=feature)
-            complet_result = self.controller.get_json('gw_api_getinfofromid', body, log_sql=True)
+            complet_result = self.controller.get_json('gw_api_getinfofromid', body)
             if not complet_result: continue
             
             for field in complet_result['body']['data']['fields']:
