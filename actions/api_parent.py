@@ -335,7 +335,7 @@ class ApiParent(ParentAction):
             self.emit_point.canvasClicked.disconnect()
             self.canvas.setMapTool(self.previous_map_tool)
         except Exception as e:
-            print(type(e).__name__)
+            self.controller.log_info(type(e).__name__)
 
 
     def api_action_copy_paste(self, dialog, geom_type, tab_type=None):

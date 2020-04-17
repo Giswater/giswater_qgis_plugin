@@ -323,13 +323,21 @@ class MincutParent(ParentAction):
         """ Select 'Pan' as current map tool and disconnect snapping """
 
         try:
-            self.canvas.xyCoordinates.disconnect()             
+            self.canvas.xyCoordinates.disconnect()
+        except TypeError as e:
+            self.controller.log_info(f"{type(e).__name__} --> {e}")
+
+        try:
             self.emit_point.canvasClicked.disconnect()
-            if action_pan:
-                self.iface.actionPan().trigger()     
+        except TypeError as e:
+            self.controller.log_info(f"{type(e).__name__} --> {e}")
+
+        if action_pan:
+            self.iface.actionPan().trigger()
+        try:
             self.vertex_marker.hide()
-        except Exception as e:
-            print(f"{type(e).__name__} --> {e}")
+        except AttributeError as e:
+            self.controller.log_info(f"{type(e).__name__} --> {e}")
 
 
     def real_start(self):

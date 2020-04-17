@@ -219,7 +219,6 @@ class AddLayer(object):
             # layer_style['vertical_anchor_point'] = '6'
 
             # symbol_layer = QgsSimpleFillSymbolLayer.create(layer_style)
-            # print(f"Symbollaye --> {symbol_layer}")
             # # replace default symbol layer with the configured one
             # if symbol_layer is not None:
             #     symbol.changeSymbolLayer(0, symbol_layer)
