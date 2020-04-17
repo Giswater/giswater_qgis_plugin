@@ -1178,8 +1178,6 @@ class ParentManage(ParentAction, object):
                 else:
                     widget.clear()
             if type(widget) in [QComboBox]:
-                self.controller.log_info(f"fill_widget_with_fields: {widget.objectName()}")
-                self.controller.log_info(f"fill_widget_with_fields: {value}")
                 if not value:
                     widget.setCurrentIndex(0)
                     continue

@@ -60,8 +60,10 @@ class ManageVisit(ParentManage, QObject):
 
         # bool to distinguish if we entered to edit an exisiting Visit or creating a new one
         self.it_is_new_visit = (not visit_id)
+        self.visit_id_value = visit_id
 
         # set vars to manage if GUI have to lock the relation
+        self.controller.log_info(f"manage_visit (new visit): {self.it_is_new_visit}")
         self.locked_geom_type = geom_type
         self.locked_feature_id = feature_id
 
@@ -80,12 +82,12 @@ class ManageVisit(ParentManage, QObject):
         self.layers['node'] = self.controller.get_group_layers('node')
         self.layers['connec'] = self.controller.get_group_layers('connec')
         self.layers['element'] = self.controller.get_group_layers('element')
+        if self.controller.get_project_type() == 'ud':
+            self.layers['gully'] = self.controller.get_group_layers('gully')
 
         # Remove 'gully' for 'WS'
         if self.controller.get_project_type() == 'ws':
             self.dlg_add_visit.tab_feature.removeTab(3)
-        elif self.controller.get_project_type() == 'ud':
-            self.layers['gully'] = self.controller.get_group_layers('gully')
 
         # Feature type of selected parameter
         self.feature_type_parameter = None
@@ -197,8 +199,6 @@ class ManageVisit(ParentManage, QObject):
         self.dlg_add_visit.btn_open_doc.clicked.connect(partial(self.document_open, self.tbl_document))
         self.tbl_document.doubleClicked.connect(partial(self.document_open, self.tbl_document))
         self.dlg_add_visit.btn_add_geom.clicked.connect(self.add_point)
-        self.dlg_add_visit.tab_feature.currentChanged.connect(partial(
-            self.tab_feature_changed, self.dlg_add_visit, excluded_layers=["v_edit_element"]))
 
         # Fill combo boxes of the form and related events
         self.parameter_type_id.currentTextChanged.connect(partial(self.set_parameter_id_combo, self.dlg_add_visit))
@@ -332,19 +332,24 @@ class ManageVisit(ParentManage, QObject):
         self.current_visit.id = int(text)
         exist = self.current_visit.fetch()
         if exist:
+            self.controller.log_info(f"manage_visit_id_change - exist")
             # B) Fill the GUI values of the current visit
             self.fill_widget_with_fields(self.dlg_add_visit, self.current_visit, self.current_visit.field_names())
+            # Get parameter_id and feature_type from his event
+            self.event_parameter_id, self.event_feature_type = self.get_data_from_event(self.visit_id_value)
+            utils_giswater.setWidgetText(self.dlg_add_visit, 'parameter_id', self.event_parameter_id)
+            utils_giswater.setWidgetEnabled(self.dlg_add_visit, 'parameter_id', False)
 
         # C) load all related events in the relative table
         self.filter = f"visit_id = '{text}'"
-        table_name = self.schema_name + ".om_visit_event"
+        table_name = f"{self.schema_name}.om_visit_event"
         self.fill_table_object(self.tbl_event, table_name, self.filter)
         self.set_configuration(dialog, self.tbl_event, table_name)
         self.manage_events_changed()
 
         # D) load all related documents in the relative table
-        table_name = self.schema_name + ".v_ui_doc_x_visit"
-        self.fill_table_object(self.tbl_document, self.schema_name + ".v_ui_doc_x_visit", self.filter)
+        table_name = f"{self.schema_name}.v_ui_doc_x_visit"
+        self.fill_table_object(self.tbl_document, table_name, self.filter)
         self.set_configuration(dialog, self.tbl_document, table_name)
 
         # E) load all related Relations in the relative table
@@ -392,13 +397,13 @@ class ManageVisit(ParentManage, QObject):
 
         # A) fill Visit basing on GUI values
         self.current_visit.id = int(self.visit_id.text())
-        self.current_visit.startdate = utils_giswater.getCalendarDate(self.dlg_add_visit, self.dlg_add_visit.startdate)
-        self.current_visit.enddate = utils_giswater.getCalendarDate(self.dlg_add_visit, self.dlg_add_visit.enddate)
+        self.current_visit.startdate = utils_giswater.getCalendarDate(self.dlg_add_visit, 'startdate')
+        self.current_visit.enddate = utils_giswater.getCalendarDate(self.dlg_add_visit, 'enddate')
         self.current_visit.user_name = self.user_name.text()
         self.current_visit.ext_code = self.ext_code.text()
-        self.current_visit.visitcat_id = utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.visitcat_id, 0)
+        self.current_visit.visitcat_id = utils_giswater.get_item_data(self.dlg_add_visit, 'visitcat_id', 0)
         self.current_visit.descript = utils_giswater.getWidgetText(self.dlg_add_visit, 'descript', False, False)
-        self.current_visit.status = utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.status, 0)
+        self.current_visit.status = utils_giswater.get_item_data(self.dlg_add_visit, 'status', 0)
         if self.expl_id:
             self.current_visit.expl_id = self.expl_id
             
@@ -434,12 +439,12 @@ class ManageVisit(ParentManage, QObject):
     def delete_relations_geom_type(self, geom_type):
         """ Remove all old relations related with current visit_id and @geom_type """
 
-        self.controller.log_info(f"delete_relations_geom_type: {geom_type}")
         if geom_type == '' or geom_type.lower() == 'all':
             return
 
         # TODO: the next "if" code can be substituded with something like:
         # exec("db_record = OmVisitX{}{}(self.controller)".format(geometry_type[0].upper(), geometry_type[1:]))"
+        db_record = None
         if geom_type == 'arc':
             db_record = OmVisitXArc(self.controller)
         elif geom_type == 'node':
@@ -452,7 +457,8 @@ class ManageVisit(ParentManage, QObject):
         # remove all actual saved records related with visit_id
         where_clause = f"visit_id = '{self.visit_id.text()}'"
 
-        db_record.delete(where_clause=where_clause, commit=self.autocommit)
+        if db_record:
+            db_record.delete(where_clause=where_clause, commit=self.autocommit)
 
 
     def update_relations_geom_type(self, geom_type):
@@ -506,8 +512,6 @@ class ManageVisit(ParentManage, QObject):
     def manage_tab_changed(self, dialog, index):
         """ Do actions when tab is exit and entered. Actions depend on tab index """
 
-        self.controller.log_info(f"manage_tab_changed: {index}")
-
         # manage leaving tab
         # tab Visit
         if self.current_tab_index == self.tab_index('tab_visit'):
@@ -518,22 +522,14 @@ class ManageVisit(ParentManage, QObject):
                 self.controller.log_info(f"manage_tab_changed: self.locked_geom_type")
                 self.update_relations(dialog)
 
-        # tab Relation
-        if self.current_tab_index == self.tab_index('tab_relations'):
-            #self.update_relations(dialog)
-            self.tab_feature_changed(self.dlg_add_visit, excluded_layers = ["v_edit_element"])
-
         # manage arriving tab
         self.current_tab_index = index
 
 
-    def entered_event_tab(self, dialog):
-        """ Manage actions when the Event tab is entered """
-        self.set_parameter_id_combo(dialog)
-
-
     def set_parameter_id_combo(self, dialog):
         """ Set parameter_id combo basing on current selections """
+
+        self.controller.log_info("set_parameter_id_combo")
 
         dialog.parameter_id.clear()
         sql = (f"SELECT id, descript "
@@ -557,6 +553,7 @@ class ManageVisit(ParentManage, QObject):
         if row:
             self.feature_type_parameter = row[0]
             self.geom_type = self.feature_type_parameter.lower()
+            self.controller.log_info(f"get_feature_type_of_parameter: {self.geom_type}")
             self.manage_tabs_enabled(True)
 
 
@@ -568,10 +565,8 @@ class ManageVisit(ParentManage, QObject):
             if connect:
                 self.dlg_add_visit.tab_feature.currentChanged.connect(partial(
                     self.tab_feature_changed, self.dlg_add_visit, excluded_layers=["v_edit_element"]))
-                self.controller.log_info("connect_signal_tab_feature_signal: True")
             else:
                 self.dlg_add_visit.tab_feature.currentChanged.disconnect()
-                self.controller.log_info("connect_signal_tab_feature_signal: False")
         except Exception as e:
             self.controller.log_info(f"connect_signal_tab_feature_signal error: {e}")
 
@@ -685,7 +680,6 @@ class ManageVisit(ParentManage, QObject):
         # set a fake where expression to avoid to set model to None
         fake_filter = f'{geom_type}_id IN (-1)'
         widget_name = f'tbl_visit_x_{geom_type}'
-        self.controller.log_info(f"set_table_model: {geom_type}")
         self.set_table_model(dialog, widget_name, geom_type, fake_filter)
 
         # set the callback to setup all events later
@@ -698,24 +692,35 @@ class ManageVisit(ParentManage, QObject):
         if not self.visit_id.text():
             return
 
+        self.get_features_visit_geom_type(self.visit_id.text(), geom_type, widget_table)
+
+
+    def get_features_visit_geom_type(self, visit_id, geom_type, widget_table=None):
+        """ Get features from table om_visit_x@geom_type of selected @visit_id
+        Select them in canvas and automatically load them into @widget_table """
+
         table_name = f'om_visit_x_{geom_type}'
-        sql = f"SELECT {geom_type}_id FROM {table_name} WHERE visit_id = '{int(self.visit_id.text())}'"
+        sql = f"SELECT {geom_type}_id FROM {table_name} WHERE visit_id = '{visit_id}'"
         rows = self.controller.get_rows(sql, commit=self.autocommit)
         if not rows or not rows[0]:
             return
 
         ids = [f"'{x[0]}'" for x in rows]
 
-        # select list of related features
+        # Select list of related features
         # Set 'expr_filter' with features that are in the list
         expr_filter = f"{geom_type}_id IN ({','.join(ids)})"
         (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
         if not is_valid:
             return
 
-        # do selection allowing @widget_name to be linked to canvas selectionChanged
+        if widget_table is None:
+            widget_name = f'tbl_visit_x_{geom_type}'
+            widget_table = utils_giswater.getWidget(self.dlg_add_visit, widget_name)
+
+        # Do selection allowing @widget_table to be linked to canvas selectionChanged
         self.disconnect_signal_selection_changed()
-        self.connect_signal_selection_changed(dialog, widget_table)
+        self.connect_signal_selection_changed(self.dlg_add_visit, widget_table)
         self.select_features_by_ids(geom_type, expr)
         self.disconnect_signal_selection_changed()
 
@@ -1489,9 +1494,7 @@ class ManageVisit(ParentManage, QObject):
         elif tab_position == 3:
             self.geom_type = "gully"
 
-        self.controller.log_info(f"tab_feature_changed: {self.geom_type}")
         if self.geom_type == '':
-            self.controller.log_info("tab_feature_changed return")
             return
 
         self.hide_generic_layers(excluded_layers=excluded_layers)
@@ -1517,8 +1520,41 @@ class ManageVisit(ParentManage, QObject):
         self.controller.log_info(f"tab_feature_changed: {self.geom_type}")
         self.set_completer_feature_id(dialog.feature_id, self.geom_type, viewname)
 
+        self.selection_changed(dialog, widget_table, self.geom_type, False)
+
         try:
             self.iface.actionPan().trigger()
         except Exception:
             pass
+
+
+    def manage_visit_multifeature(self):
+        """ Manage existing visit with feature_type = 'all' """
+
+        self.controller.log_info(f"manage_visit_multifeature")
+
+        self.geom_type = 'arc'
+        self.get_features_visit_geom_type(self.current_visit.id, 'arc')
+        self.get_features_visit_geom_type(self.current_visit.id, 'node')
+        self.get_features_visit_geom_type(self.current_visit.id, 'connec')
+        self.geom_type = 'all'
+
+
+    def get_data_from_event(self, visit_id):
+        """ Get parameter_id and feature_type from event of @visit_id """
+
+        parameter_id = None
+        feature_type = None
+        sql = (f"SELECT visit_id, parameter_id, feature_type "
+               f"FROM om_visit_event "
+               f"INNER JOIN om_visit_parameter ON parameter_id = om_visit_parameter.id "
+               f"WHERE visit_id = {visit_id}")
+        row = self.controller.get_row(sql, log_sql=True)
+        if row:
+            parameter_id = row["parameter_id"]
+            feature_type = row["feature_type"].lower()
+            self.controller.log_info(f"get_feature_type_of_event: {parameter_id}")
+            self.controller.log_info(f"get_feature_type_of_event: {feature_type}")
+
+        return parameter_id, feature_type
 
