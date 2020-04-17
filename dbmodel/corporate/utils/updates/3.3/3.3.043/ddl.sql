@@ -8,5 +8,9 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 -- 2020/01/08
-DROP TRIGGER IF EXISTS SCHEMA_NAME.gw_trg_manage_raster_dem ON SCHEMA_NAME.raster_dem;
+DROP TRIGGER IF EXISTS gw_trg_manage_raster_dem ON raster_dem;
+DROP TRIGGER IF EXISTS gw_trg_manage_raster_dem_insert ON ext_raster_dem;
+DROP TRIGGER IF EXISTS gw_trg_manage_raster_dem_delete ON ext_raster_dem;
 DROP FUNCTION IF EXISTS gw_trg_manage_raster_dem();
+
+

@@ -5,11 +5,14 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = "SCHEMA_NAME", public, pg_catalog;
+SET search_path = "utils", public, pg_catalog;
 
 -- 2020/04/15
 DROP TRIGGER IF EXISTS gw_trg_manage_raster_dem ON utils.raster_dem;
-CREATE TRIGGER gw_trg_manage_raster_dem
-AFTER INSERT OR DELETE ON utils.raster_dem
-FOR EACH ROW
-EXECUTE PROCEDURE utils.gw_trg_manage_raster_dem();
+DROP TRIGGER IF EXISTS gw_trg_manage_raster_dem_insert ON utils.raster_dem;
+CREATE TRIGGER gw_trg_manage_raster_dem_insert BEFORE INSERT ON utils.raster_dem
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_manage_raster_dem();
+
+DROP TRIGGER IF EXISTS gw_trg_manage_raster_dem_delete ON utils.raster_dem;
+CREATE TRIGGER gw_trg_manage_raster_dem_delete AFTER DELETE ON utils.raster_dem
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_manage_raster_dem();

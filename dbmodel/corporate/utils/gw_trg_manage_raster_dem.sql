@@ -21,7 +21,7 @@ BEGIN
 		INSERT INTO cat_raster (id, raster_type, tstamp, insert_user) VALUES (NEW.rastercat_id, 'DEM', now(), current_user)
 		ON CONFLICT (id) DO NOTHING;
 
-		UPDATE cat_raster SET envelope  =  (
+		UPDATE raster_dem SET envelope  =  (
 					SELECT ST_MakeEnvelope(ST_UpperLeftX(NEW.rast), ST_UpperLeftY(NEW.rast),ST_UpperLeftX(NEW.rast) + ST_ScaleX(NEW.rast)*ST_width(NEW.rast),
 					ST_UpperLeftY(NEW.rast) + ST_ScaleY(NEW.rast)*ST_height(NEW.rast), SRID_VALUE) WHERE rastercat_id = NEW.rastercat_id);
 		RETURN NEW;
