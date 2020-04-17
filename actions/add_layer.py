@@ -247,11 +247,15 @@ class AddLayer(object):
         :param tab_idx: index of tab to force (integer)
         :return:
         """
+
         change_tab = False
         text = utils_giswater.getWidgetText(dialog, dialog.txt_infolog, return_string_null=False)
-
         if reset_text:
             text = ""
+
+        if 'values' not in data['info']:
+            return text
+
         for item in data['info']['values']:
             if 'message' in item:
                 if item['message'] is not None:
