@@ -945,6 +945,9 @@ class TmBasic(TmParentAction):
         rows = self.controller.get_rows(sql, log_sql=True)
         utils_giswater.set_item_data(self.dlg_incident_manager.cmb_status, rows, 1, add_empty=True)
 
+        self.set_dates_from_to(self.dlg_incident_manager.date_from, self.dlg_incident_manager.date_to,
+                               'v_ui_om_visit_incident', 'incident_date', 'incident_date')
+
         # Poulate TableView
         utils_giswater.set_qtv_config(self.dlg_incident_manager.tbl_incident, edit_triggers=QTableView.NoEditTriggers)
         table_name = "v_ui_om_visit_incident"
@@ -955,6 +958,10 @@ class TmBasic(TmParentAction):
         self.dlg_incident_manager.cmb_status.currentIndexChanged.connect(partial(self.update_table, self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name))
         self.dlg_incident_manager.btn_process.clicked.connect(partial(self.open_incident_planning, 'PROCESS'))
         self.dlg_incident_manager.btn_discard.clicked.connect(partial(self.open_incident_planning, 'DISCARD'))
+        self.dlg_incident_manager.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_incident_manager))
+        self.dlg_incident_manager.date_from.dateChanged.connect(partial(self.update_table, self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name))
+        self.dlg_incident_manager.date_to.dateChanged.connect(partial(self.update_table, self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name))
+
 
         # Open form
         self.dlg_incident_manager.setWindowTitle("Incident Manager")
@@ -965,8 +972,25 @@ class TmBasic(TmParentAction):
 
         visit_id = utils_giswater.getWidgetText(dialog, dialog.txt_visit_id)
         status_id = utils_giswater.get_item_data(dialog, dialog.cmb_status, 1)
+        visit_start = dialog.date_from.date()
+        visit_end = dialog.date_to.date()
 
-        expr_filter = f"1=1"
+        date_from = visit_start.toString('ddMMyyyy')
+        date_to = visit_end.toString('ddMMyyyy')
+
+        if date_from > date_to:
+            message = "Selected date interval is not valid"
+            self.controller.show_warning(message)
+            return
+
+        expr_filter = f"1=1 "
+
+        format_low = 'dd-MM-yyyy' + ' 00:00:00.000'
+        format_high = 'dd-MM-yyyy' + ' 23:59:59.999'
+        interval = "'" + str(visit_start.toString(format_low)) + "'::timestamp AND '" + str(
+            visit_end.toString(format_high)) + "'::timestamp"
+
+        # expr_filter = " AND (incident_date BETWEEN " + str(interval) + ")"
 
         # if visit_id not in (None, '', 'null'): expr_filter += f" AND visit_id::text LIKE '%{visit_id}%'"
         if status_id: expr_filter += f" AND status ='{status_id}'"

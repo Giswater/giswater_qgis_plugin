@@ -7,7 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 
 from qgis.core import QgsExpression
-from qgis.PyQt.QtCore import QStringListModel, Qt
+from qgis.PyQt.QtCore import QStringListModel, Qt,QDate
 from qgis.PyQt.QtGui import QCursor, QIcon, QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QApplication, QComboBox, QCompleter, QTableView
@@ -396,3 +396,21 @@ class TmParentAction(object):
         body = "" + client + form + feature + data
 
         return body
+
+
+    def set_dates_from_to(self, widget_from, widget_to, table_name, field_from, field_to):
+
+        sql = ("SELECT MIN(LEAST("+field_from+", "+field_to+")),"
+               " MAX(GREATEST("+field_from+", "+field_to+"))"
+               " FROM "+table_name+"")
+        row = self.controller.get_row(sql, log_sql=False)
+        current_date = QDate.currentDate()
+        if row:
+            if row[0]:
+                widget_from.setDate(row[0])
+            else:
+                widget_from.setDate(current_date)
+            if row[1]:
+                widget_to.setDate(row[1])
+            else:
+                widget_to.setDate(current_date)
