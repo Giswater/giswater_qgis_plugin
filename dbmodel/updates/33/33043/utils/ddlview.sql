@@ -41,11 +41,10 @@ source,
 provider,
 year,
 r.rast,
-a.expl_id,
 r.rastercat_id,
 r.envelope
 FROM 
-exploitation a, ext_raster_dem r
+v_edit_exploitation a, ext_raster_dem r
 JOIN ext_cat_raster c ON c.id=rastercat_id
 WHERE st_dwithin(r.envelope, a.the_geom, 0::double precision);
 
