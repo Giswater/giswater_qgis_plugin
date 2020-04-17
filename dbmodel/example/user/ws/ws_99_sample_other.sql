@@ -567,3 +567,6 @@ WHERE formname IN ('upsert_catalog_node', 'upsert_catalog_arc', 'upsert_catalog_
 
 UPDATE inp_junction SET demand = 0 WHERE demand = 16.000000;
 UPDATE inp_junction SET demand = 0 , pattern_id  = 'pattern_02' WHERE pattern_id = 'pattern_hydrant';
+
+UPDATE config_param_system SET value='TRUE' WHERE parameter='sys_raster_dem';
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_upser_elevation_from_dem', 'true', 'postgres');

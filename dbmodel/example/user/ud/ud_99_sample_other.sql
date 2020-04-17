@@ -404,3 +404,6 @@ UPDATE node_type SET isexitupperintro = 2 WHERE id = 'VIRTUAL_NODE';
 UPDATE config_api_form_fields set layoutname = 'lyt_data_1' WHERE column_id = 'width' AND formname ='ve_node_chamber';
 UPDATE config_api_form_fields set layoutname = 'lyt_data_1' WHERE column_id = 'width' AND formname ='ve_node_pump_station';
 UPDATE config_api_form_fields set layoutname = 'lyt_data_1' WHERE column_id = 'width' AND formname ='ve_node_weir';
+
+UPDATE config_param_system SET value='TRUE' WHERE parameter='sys_raster_dem';
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_upser_elevation_from_dem', 'true', 'postgres');
