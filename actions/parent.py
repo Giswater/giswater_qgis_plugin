@@ -188,7 +188,6 @@ class ParentAction(object):
         elif issubclass(type(dlg), GwMainWindow):
             dlg.show()
         else:
-            print(f"WARNING: dialog type {type(dlg)} is not handled!")
             dlg.show()
     
         

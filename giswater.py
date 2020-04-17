@@ -110,8 +110,11 @@ class Giswater(QObject):
     def set_signals(self): 
         """ Define widget and event signals """
 
-        self.iface.projectRead.connect(self.project_read)
-        self.iface.newProjectCreated.connect(self.project_new)
+        try:
+            self.iface.projectRead.connect(self.project_read)
+            self.iface.newProjectCreated.connect(self.project_new)
+        except AttributeError as e:
+            pass
 
 
     def set_info_button(self):

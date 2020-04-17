@@ -1441,3 +1441,149 @@ class DaoController(object):
         layer = self.get_layer_by_tablename(layer_name)
         if layer:
             layer.dataProvider().forceReload()
+
+
+    def manage_exception(self, title=None, description=None, sql=None):
+        """ Manage exception and show information to the user """
+
+        # Get traceback
+        trace = traceback.format_exc()
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        path = exc_tb.tb_frame.f_code.co_filename
+        file_name = os.path.split(path)[1]
+        #folder_name = os.path.dirname(path)
+
+        # Set exception message details
+        msg = ""
+        msg += f"Error type: {exc_type}\n"
+        msg += f"File name: {file_name}\n"
+        msg += f"Line number: {exc_tb.tb_lineno}\n"
+        msg += f"{trace}\n"
+        if description:
+            msg += f"Description: {description}\n"
+        if sql:
+            msg += f"SQL:\n {sql}\n"
+
+        # Show exception message in dialog and log it
+        self.show_exceptions_msg(title, msg)
+        self.log_warning(msg)
+
+
+    def manage_exception_db(self, description=None, sql=None, stack_level=2, stack_level_increase=0):
+        """ Manage exception in database queries and show information to the user """
+
+        try:
+            stack_level += stack_level_increase
+            module_path = inspect.stack()[stack_level][1]
+            file_name = sys_manager.get_file_with_parents(module_path, 2)
+            function_line = inspect.stack()[stack_level][2]
+            function_name = inspect.stack()[stack_level][3]
+
+            # Set exception message details
+            msg = ""
+            msg += f"File name: {file_name}\n"
+            msg += f"Function name: {function_name}\n"
+            msg += f"Line number: {function_line}\n"
+            if description:
+                msg += f"Description:\n {description}\n"
+            if sql:
+                msg += f"SQL:\n {sql}\n"
+
+            # Show exception message in dialog and log it
+            title = "Database error"
+            self.show_exceptions_msg(title, msg)
+            self.log_warning(msg, stack_level_increase=2)
+
+        except Exception as e:
+            self.manage_exception("Unhandled Error")
+
+
+    def set_text_bold(self, widget, pattern=None):
+        """ Set bold text when word match with pattern
+        :param widget:QTextEdit
+        :param pattern: Text to find used as pattern for QRegExp (String)
+        :return:
+        """
+        if not pattern:
+            pattern = "File\sname:|Function\sname:|Line\snumber:|SQL:|Detail:|Context:"
+        cursor = widget.textCursor()
+        format = QTextCharFormat()
+        format.setFontWeight(QFont.Bold)
+        regex = QRegExp(pattern)
+        pos = 0
+        index = regex.indexIn(widget.toPlainText(), pos)
+        while index != -1:
+            # Set cursor at begin of match
+            cursor.setPosition(index, 0)
+            pos = index + regex.matchedLength()
+            # Set cursor at end of match
+            cursor.setPosition(pos, 1)
+
+            # Select the matched text and apply the desired format
+            cursor.mergeCharFormat(format)
+
+            # Move to the next match
+            index = regex.indexIn(widget.toPlainText(), pos)
+
+
+
+    def manage_exception_api(self, json_result, sql=None, stack_level=2, stack_level_increase=0):
+        """ Manage exception in JSON database queries and show information to the user """
+
+        try:
+
+            if 'message' in json_result:
+
+                parameter = None
+                level = 1
+                if 'level' in json_result['message']:
+                    level = int(json_result['message']['level'])
+                if 'text' in json_result['message']:
+                    msg = json_result['message']['text']
+                else:
+                    parameter = 'text'
+                    msg = "Key on returned json from ddbb is missed"
+                self.show_message(msg, level, parameter=parameter)
+
+            else:
+
+                stack_level += stack_level_increase
+                module_path = inspect.stack()[stack_level][1]
+                file_name = sys_manager.get_file_with_parents(module_path, 2)
+                function_line = inspect.stack()[stack_level][2]
+                function_name = inspect.stack()[stack_level][3]
+
+                # Set exception message details
+                title = "Database API execution failed"
+                msg = ""
+                msg += f"File name: {file_name}\n"
+                msg += f"Function name: {function_name}\n"
+                msg += f"Line number:> {function_line}\n"
+                if 'SQLERR' in json_result:
+                    msg += f"Detail: {json_result['SQLERR']}\n"
+                if 'SQLCONTEXT' in json_result:
+                    msg += f"Context: {json_result['SQLCONTEXT']}\n"
+                if sql:
+                    msg += f"SQL: {sql}"
+
+                # Show exception message in dialog and log it
+                self.show_exceptions_msg(title, msg)
+                self.log_warning(msg, stack_level_increase=2)
+
+        except Exception as e:
+            self.manage_exception("Unhandled Error")
+
+
+    def show_exceptions_msg(self, title=None, msg="", window_title="Information about exception"):
+        """ Show exception message in dialog """
+
+        self.dlg_info = BasicInfoUi()
+        self.dlg_info.btn_accept.setVisible(False)
+        self.dlg_info.btn_close.clicked.connect(lambda: self.dlg_info.close())
+        self.dlg_info.setWindowTitle(window_title)
+        if title: self.dlg_info.lbl_title.setText(title)
+        utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.txt_infolog, msg)
+        self.dlg_info.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.set_text_bold(self.dlg_info.txt_infolog)
+        self.dlg_info.show()
+
