@@ -121,7 +121,7 @@ BEGIN
 	--  get project type
 	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
 	
-	--  get config parameters   
+	--  get system parameters   
 	SELECT ((value::json)->>'activated') INTO v_node_proximity_control FROM config_param_system WHERE parameter='node_proximity';
 	SELECT ((value::json)->>'value') INTO v_node_proximity FROM config_param_system WHERE parameter='node_proximity';
 	SELECT ((value::json)->>'activated') INTO v_connec_proximity_control FROM config_param_system WHERE parameter='connec_proximity';
@@ -135,6 +135,11 @@ BEGIN
 	SELECT value INTO v_use_fire_code_seq FROM config_param_system WHERE parameter='use_fire_code_seq';
 	SELECT ((value::json)->>'status') INTO v_automatic_ccode FROM config_param_system WHERE parameter='customer_code_autofill';
 	SELECT ((value::json)->>'field') INTO v_automatic_ccode_field FROM config_param_system WHERE parameter='customer_code_autofill';
+	SELECT (value)::boolean INTO v_sys_raster_dem FROM config_param_system WHERE parameter='sys_raster_dem';
+
+	-- get user parameters
+	SELECT (value)::boolean INTO v_edit_upsert_elevation_from_dem FROM config_param_user WHERE parameter='edit_upsert_elevation_from_dem' AND cur_user = current_user;
+
 	    
 	IF v_automatic_ccode IS TRUE AND v_automatic_ccode_field ='connec_id' THEN v_automatic_ccode = TRUE; ELSE v_automatic_ccode = FALSE; END IF;
 
@@ -497,8 +502,8 @@ BEGIN
 				-- elevation from raster
 				WHEN 'elevation', 'top_elev' THEN 
 					IF v_sys_raster_dem AND v_edit_upsert_elevation_from_dem THEN
-						field_value = (SELECT ST_Value(rast,1,NEW.the_geom,false) FROM v_ext_raster_dem WHERE 
-						id = (SELECT id FROM v_ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
+						field_value = (SELECT ST_Value(rast,1, p_reduced_geometry, false) FROM v_ext_raster_dem WHERE 
+						id = (SELECT id FROM v_ext_raster_dem WHERE st_dwithin (envelope, p_reduced_geometry, 1) LIMIT 1))::numeric (12,3);
 					ELSE
 						field_value = null;
 					END IF;
