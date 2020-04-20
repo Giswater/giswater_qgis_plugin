@@ -127,8 +127,7 @@ BEGIN
 		EXECUTE concat ('INSERT INTO anl_arc (fprocesscat_id, arc_id, arccat_id, descript, the_geom) SELECT 88, arc_id, arccat_id, ''arcs with state_type 
 		isoperative = false'', the_geom FROM (', v_querytext,')a');
 		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-		VALUES (v_fprocesscat_id, 2, concat('WARNING: There is/are ',v_count,' arc(s) with state > 0 and state_type.is_operative on FALSE. Please, check your data before 
-		continue'));
+		VALUES (v_fprocesscat_id, 2, concat('WARNING: There is/are ',v_count,' arc(s) with state > 0 and state_type.is_operative on FALSE. Please, check your data before continue'));
 		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 		VALUES (v_fprocesscat_id, 2, concat('SELECT * FROM anl_arc WHERE fprocesscat_id=88 AND cur_user=current_user'));
 	ELSE

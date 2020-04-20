@@ -11,6 +11,7 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_pg2epa_fill_data(result_id_var v
 DECLARE
    
 v_rainfall text;
+v_isoperative boolean;
 
 BEGIN
 
@@ -23,11 +24,22 @@ BEGIN
    
    -- set all timeseries of raingage using user's value
    v_rainfall:= (SELECT value FROM config_param_user WHERE parameter='inp_options_setallraingages' AND cur_user=current_user);
+
+	v_isoperative = (SELECT value::json->>'onlyIsOperative' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
+
 	
 	IF v_rainfall IS NOT NULL THEN
 		UPDATE raingage SET timser_id=v_rainfall, rgage_type='TIMESERIES' WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=current_user);
 	END IF;
 
+	--Use state_type only is operative true or not
+	IF v_isoperative THEN
+		v_statetype = ' AND value_state_type.is_operative = TRUE ';
+	ELSE
+		v_statetype = ' AND (value_state_type.is_operative = TRUE OR value_state_type.is_operative = FALSE)';
+	END IF;
+
+	-- to do: implement isoperative strategy
    
 	-- Insert on node rpt_inp table
 	-- the strategy of selector_sector is not used for nodes. The reason is to enable the posibility to export the sector=-1. In addition using this it's impossible to export orphan nodes

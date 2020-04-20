@@ -27,7 +27,7 @@ BEGIN
 	v_buildupmode = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_buildup_mode' AND cur_user=current_user);
 
 	-- get debug parameters
-	v_isoperative = (SELECT (value::json->>'debug')::json->>'onlyIsOperative' FROM config_param_user WHERE parameter='inp_options_settings' AND cur_user=current_user)::boolean;
+	v_isoperative = (SELECT value::json->>'onlyIsOperative' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 
 	raise notice 'Delete previous values from same result';
 
