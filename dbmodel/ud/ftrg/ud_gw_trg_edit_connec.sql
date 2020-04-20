@@ -391,6 +391,11 @@ BEGIN
 				NEW.top_elev = (SELECT ST_Value(rast,1,NEW.the_geom,false) FROM v_ext_raster_dem WHERE id =
 							(SELECT id FROM v_ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
 			END IF;	
+			
+			--update associated geometry of element (if exists)
+			UPDATE element SET the_geom = NEW.the_geom WHERE St_dwidthin(NEW.the_geom, the_geom, 0.001) 
+			AND element_id IN (SELECT element_id FROM element_x_connec WHERE connec_id = NEW.connec_id);	
+			
 		END IF;
 		
 		-- Reconnect arc_id

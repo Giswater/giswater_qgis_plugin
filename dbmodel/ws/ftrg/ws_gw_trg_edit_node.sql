@@ -661,10 +661,15 @@ BEGIN
 			
 			--update elevation from raster
 			IF (SELECT upper(value) FROM config_param_system WHERE parameter='sys_raster_dem') = 'TRUE' AND (NEW.elevation = OLD.elevation) AND 
-			(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_upsert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
+				(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_upsert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
 				NEW.elevation = (SELECT ST_Value(rast,1,NEW.the_geom,false) FROM v_ext_raster_dem WHERE id =
 							(SELECT id FROM v_ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
 			END IF;
+			
+			--update associated geometry of element (if exists)
+			UPDATE element SET the_geom = NEW.the_geom WHERE St_dwidthin(NEW.the_geom, the_geom, 0.001) 
+			AND element_id IN (SELECT element_id FROM element_x_node WHERE node_id = NEW.node_id);		
+			
 		END IF;
 	
 		--Hemisphere

@@ -484,13 +484,13 @@ BEGIN
 				END IF;	
 			END LOOP;
 		END IF;		
-									 
+
 		RETURN NEW;
 
 	
 	ELSIF TG_OP = 'UPDATE' THEN
 
-		-- UPDATE geom/dma/sector/expl_id
+		-- UPDATE geom
 		IF st_equals(NEW.the_geom, OLD.the_geom) IS FALSE AND geometrytype(NEW.the_geom)='POINT'  THEN
 			UPDATE connec SET the_geom=NEW.the_geom WHERE connec_id = OLD.connec_id;
 
@@ -500,6 +500,10 @@ BEGIN
 				NEW.elevation = (SELECT ST_Value(rast,1,NEW.the_geom,false) FROM v_ext_raster_dem WHERE id =
 							(SELECT id FROM v_ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
 			END IF;	
+			
+			--update associated geometry of element (if exists)
+			UPDATE element SET the_geom = NEW.the_geom WHERE St_dwidthin(NEW.the_geom, the_geom, 0.001) 
+			AND element_id IN (SELECT element_id FROM element_x_connec WHERE connec_id = NEW.connec_id);		
 		
 		ELSIF st_equals( NEW.the_geom, OLD.the_geom) IS FALSE AND geometrytype(NEW.the_geom)='MULTIPOLYGON'  THEN
 			UPDATE polygon SET the_geom=NEW.the_geom WHERE pol_id = OLD.pol_id;
