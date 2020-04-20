@@ -1047,6 +1047,7 @@ class ApiParent(ParentAction):
                 label.setToolTip(field['tooltip'])
             else:
                 label.setToolTip(field['label'].capitalize())
+
             if field['widgettype'] in ('text', 'textline') or field['widgettype'] == 'typeahead':
                 completer = QCompleter()
                 widget = self.add_lineedit(field)
@@ -1070,6 +1071,9 @@ class ApiParent(ParentAction):
             elif field['widgettype'] in ('check','checkbox'):
                 widget = self.add_checkbox(field)
                 widget.stateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
+            elif field['widgettype'] == 'button':
+                widget = self.add_button(dialog, field)
+
             grid_layout.addWidget(label,x, 0)
             grid_layout.addWidget(widget, x, 1)
 
