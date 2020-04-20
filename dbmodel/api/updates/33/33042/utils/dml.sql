@@ -16,5 +16,5 @@ VALUES (710, 'exploitation', 'tabExploitation', 'Exploitation', 'Exploitation Se
 
 SELECT setval('config_param_system_id_seq', (SELECT max(id) FROM config_param_system), true);
 INSERT INTO config_param_system (parameter, value, context,  descript, label, project_type, datatype, isdeprecated) 
-VALUES ('api_selector_exploitation', '{"table":"exploitation", "selector":"selector_expl", "table_id":"expl_id",  "selector_id":"expl_id",  "label":"expl_id, '' - '', name, '' '', CASE WHEN descript IS NULL THEN '' ELSE concat('' - '', descript) END, ''"}', 'system', 'Select which label to display for selectors', 'Selector labels:', 'utils', 'json', FALSE);
+VALUES ('api_selector_exploitation', '{"table":"exploitation", "selector":"selector_expl", "table_id":"expl_id",  "selector_id":"expl_id",  "label":"expl_id, '' - '', name, '' '', CASE WHEN descript IS NULL THEN '''' ELSE concat('' - '', descript) END"}', 'system', 'Select which label to display for selectors', 'Selector labels:', 'utils', 'json', FALSE);
 
