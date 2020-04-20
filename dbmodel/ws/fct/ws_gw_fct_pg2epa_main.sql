@@ -37,6 +37,7 @@ v_onlyexport boolean;
 v_checkdata boolean;
 v_checknetwork boolean;
 v_vdefault boolean;
+v_delnetwork boolean;
 	
 BEGIN
 
@@ -58,6 +59,7 @@ BEGIN
 	v_setdemand = (SELECT value::json->>'setDemand' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 	v_checkdata = (SELECT value::json->>'checkData' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 	v_checknetwork = (SELECT value::json->>'checkNetwork' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
+	v_delnetwork = (SELECT value::json->>'delDisconnNetwork' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 
 	-- delete audit table
 	DELETE FROM audit_check_data WHERE fprocesscat_id = 127 AND user_name=current_user;
@@ -170,15 +172,17 @@ BEGIN
 			PERFORM gw_fct_pg2epa_check_network(v_input);			
 		END IF;
 		
-		RAISE NOTICE '13 - delete disconnected arcs with associated nodes';
-		DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user) and result_id = v_result;
-		DELETE FROM rpt_inp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=39 AND cur_user=current_user) and result_id = v_result;
-		
-		RAISE NOTICE '14 - delete orphan nodes';
-		DELETE FROM rpt_inp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=7 AND cur_user=current_user) AND result_id=v_result;
+		IF v_delnetwork
+			RAISE NOTICE '13 - delete disconnected arcs with associated nodes';
+			DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user) and result_id = v_result;
+			DELETE FROM rpt_inp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=39 AND cur_user=current_user) and result_id = v_result;
+			
+			RAISE NOTICE '14 - delete orphan nodes';
+			DELETE FROM rpt_inp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=7 AND cur_user=current_user) AND result_id=v_result;
 
-		RAISE NOTICE '15 delete arcs without extremal nodes';
-		DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=3 AND cur_user=current_user) AND result_id=v_result;	
+			RAISE NOTICE '15 delete arcs without extremal nodes';
+			DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=3 AND cur_user=current_user) AND result_id=v_result;		
+		END IF;
 
 	END IF;
 

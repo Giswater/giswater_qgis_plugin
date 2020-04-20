@@ -15,8 +15,8 @@ $BODY$
 
 /*
 --EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_pg2epa_check_network('{"data":{"parameters":{"resultId":"r1","fprocesscatId":127}}}')::json; -- when is called from toolbox
-SELECT SCHEMA_NAME.gw_fct_pg2epa_check_network('{"data":{"parameters":{"resultId":"gw_check_project"}}}')::json; -- when is called from toolbox
+SELECT SCHEMA_NAME.gw_fct_pg2epa_check_network('{"data":{"parameters":{"resultId":"r1","fprocesscatId":127}}}')::json; -- when is called from go2epa
+SELECT SCHEMA_NAME.gw_fct_pg2epa_check_network('{"data":{"parameters":{"resultId":"r1"}}}')::json; -- when is called from toolbox
 
 --RESULTS
 SELECT arc_id FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user
@@ -204,7 +204,10 @@ BEGIN
 
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (v_fprocesscat_id, v_result_id, 3, concat('ERROR: There is/are ',v_count,' arc(s) totally disconnected from any ', v_boundaryelem));
+		VALUES (v_fprocesscat_id, v_result_id, 3, concat('ERROR: There is/are ',v_count,' arc(s) totally disconnected from any ', v_boundaryelem
+		,'. Main reasons may be: state_type, epa_type, sector_id or expl_id or some node not connected'));
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		VALUES (v_fprocesscat_id, v_result_id, 3, concat('HINT: Use toolbox function ''Check network topology for specific result'' for more information'));
 	ELSE
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 		VALUES (v_fprocesscat_id, v_result_id, 1, concat('INFO: No features (arcs and nodes) disconnected found on this result from any ', v_boundaryelem));
@@ -283,11 +286,8 @@ BEGIN
 		'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
 		'properties', to_jsonb(row) - 'the_geom_p'
 		) AS feature
-		FROM (SELECT id, node_id, arccat_id, state, expl_id, descript, fprocesscat_id, the_geom
-			  FROM  anl_arc_x_node WHERE cur_user="current_user"() AND fprocesscat_id=39
-			  UNION
-			  SELECT id, node_id, nodecat_id, state, expl_id, descript, fprocesscat_id, the_geom
-			  FROM  anl_node WHERE cur_user="current_user"() AND fprocesscat_id=128
+		FROM (SELECT id, node_id, node_id, state, expl_id, descript, fprocesscat_id, the_geom
+			  FROM  anl_node WHERE cur_user="current_user"() AND (fprocesscat_id=39 OR fprocesscat_id=127)
 		) row) features;
   	
 	v_result := COALESCE(v_result, '{}'); 
@@ -303,10 +303,7 @@ BEGIN
 		'properties', to_jsonb(row) - 'the_geom'
 		) AS feature
 		FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript,fprocesscat_id, the_geom
-			  FROM  anl_arc_x_node WHERE cur_user="current_user"() AND fprocesscat_id=39
-			  UNION
-			  SELECT id, arc_id, arccat_id, state, expl_id, descript,fprocesscat_id, the_geom
-			  FROM  anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=131
+			  FROM  anl_arc WHERE cur_user="current_user"() AND  (fprocesscat_id=39 OR fprocesscat_id=127)
 			 ) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
