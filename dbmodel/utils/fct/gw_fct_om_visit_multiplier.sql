@@ -8,14 +8,14 @@ This version of Giswater is provided by Giswater Association
 
 
 
-DROP FUNCTION IF EXISTS test_ws.gw_fct_om_visit_multiplier(integer, text);
-CREATE OR REPLACE FUNCTION test_ws.gw_fct_om_visit_multiplier(p_data json) 
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_om_visit_multiplier(integer, text);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_om_visit_multiplier(p_data json) 
 RETURNS json AS
 $BODY$
 
 /*
 
-SELECT test_ws.gw_fct_om_visit_multiplier($${
+SELECT SCHEMA_NAME.gw_fct_om_visit_multiplier($${
 "client":{"device":3, "infoType":100, "lang":"ES"}, "feature":{"id":2345}}$$)
 
 */
@@ -35,7 +35,7 @@ v_visitid integer;
 BEGIN 
 
 
-    SET search_path = "test_ws", public;
+    SET search_path = "SCHEMA_NAME", public;
 
 	-- get system variables
     SELECT * INTO v_visit FROM om_visit WHERE id=v_visitid;
@@ -46,7 +46,7 @@ BEGIN
 	SELECT * INTO v_visit FROM om_visit WHERE id=v_visitid;
 
     -- Advance sequence to avoid errors in plugin
-    PERFORM nextval('test_ws.om_visit_event_id_seq');
+    PERFORM nextval('SCHEMA_NAME.om_visit_event_id_seq');
 
 	-- looking for all node features relateds to visit
 	FOR v_feature IN SELECT * FROM om_visit_x_node WHERE visit_id=v_visitid
