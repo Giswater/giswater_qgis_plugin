@@ -83,7 +83,7 @@ class Go2EpaOptions(ApiParent):
             if field['isparent']:
                 widget = self.dlg_options.findChild(QComboBox, field['widgetname'])
                 widget.currentIndexChanged.connect(partial(self.fill_child, self.dlg_options, widget))
-                widget.currentIndexChanged.emit(widget.currentIndex())
+
 
     def fill_child(self, dialog, widget):
 
