@@ -43,6 +43,7 @@ BEGIN
 
 	-- get input data
 	v_visitid :=  ((p_data ->>'feature')::json->>'id')::integer;
+	SELECT * INTO v_visit FROM om_visit WHERE id=v_visitid;
 	   
 	-- looking for all node features relateds to visit
 	FOR v_feature IN SELECT * FROM om_visit_x_node WHERE visit_id=v_visitid
