@@ -498,7 +498,7 @@ BEGIN
 			END IF;
 		
 			--update associated geometry of element (if exists)
-			UPDATE element SET the_geom = NEW.the_geom WHERE St_dwidthin(NEW.the_geom, the_geom, 0.001) 
+			UPDATE element SET the_geom = NEW.the_geom WHERE St_dwithin(OLD.the_geom, the_geom, 0.001) 
 			AND element_id IN (SELECT element_id FROM element_x_gully WHERE gully_id = NEW.gully_id);
 			
 		END IF;	

@@ -502,7 +502,7 @@ BEGIN
 			END IF;	
 			
 			--update associated geometry of element (if exists)
-			UPDATE element SET the_geom = NEW.the_geom WHERE St_dwidthin(NEW.the_geom, the_geom, 0.001) 
+			UPDATE element SET the_geom = NEW.the_geom WHERE St_dwithin(OLD.the_geom, the_geom, 0.001) 
 			AND element_id IN (SELECT element_id FROM element_x_connec WHERE connec_id = NEW.connec_id);		
 		
 		ELSIF st_equals( NEW.the_geom, OLD.the_geom) IS FALSE AND geometrytype(NEW.the_geom)='MULTIPOLYGON'  THEN

@@ -1,3 +1,4 @@
 3.3.043
 *************
 - Arrange temp_anlgraf table using varchar for arc_id, node_1 and node_2
+- Update associated geometry of element (if exists)
