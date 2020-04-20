@@ -32,7 +32,7 @@ CREATE OR REPLACE VIEW v_anl_graf AS
  
  
 CREATE OR REPLACE VIEW v_ext_raster_dem AS 
-SELECT r.id,
+SELECT DISTINCT ON (r.id) r.id,
 code,
 alias,
 raster_type, 
