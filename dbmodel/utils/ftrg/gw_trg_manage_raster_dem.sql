@@ -23,7 +23,7 @@ BEGIN
 
 		UPDATE ext_raster_dem SET envelope  =  (
 					SELECT ST_MakeEnvelope(ST_UpperLeftX(NEW.rast), ST_UpperLeftY(NEW.rast),ST_UpperLeftX(NEW.rast) + ST_ScaleX(NEW.rast)*ST_width(NEW.rast),
-					ST_UpperLeftY(NEW.rast) + ST_ScaleY(NEW.rast)*ST_height(NEW.rast), SRID_VALUE) WHERE rastercat_id = NEW.rastercat_id);
+					ST_UpperLeftY(NEW.rast) + ST_ScaleY(NEW.rast)*ST_height(NEW.rast), SRID_VALUE) WHERE id = NEW.id);
 		RETURN NEW;
 				
     ELSIF TG_OP = 'DELETE' THEN  
