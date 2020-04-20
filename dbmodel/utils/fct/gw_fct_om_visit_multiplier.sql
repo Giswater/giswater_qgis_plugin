@@ -8,14 +8,14 @@ This version of Giswater is provided by Giswater Association
 
 
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_om_visit_multiplier(integer, text);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_om_visit_multiplier(p_data json) 
+DROP FUNCTION IF EXISTS test_ws.gw_fct_om_visit_multiplier(integer, text);
+CREATE OR REPLACE FUNCTION test_ws.gw_fct_om_visit_multiplier(p_data json) 
 RETURNS json AS
 $BODY$
 
 /*
 
-SELECT SCHEMA_NAME.gw_fct_om_visit_multiplier($${
+SELECT test_ws.gw_fct_om_visit_multiplier($${
 "client":{"device":3, "infoType":100, "lang":"ES"}, "feature":{"id":2345}}$$)
 
 */
@@ -35,7 +35,7 @@ v_visitid integer;
 BEGIN 
 
 
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "test_ws", public;
 
 	-- get system variables
     SELECT * INTO v_visit FROM om_visit WHERE id=v_visitid;
@@ -44,7 +44,10 @@ BEGIN
 	-- get input data
 	v_visitid :=  ((p_data ->>'feature')::json->>'id')::integer;
 	SELECT * INTO v_visit FROM om_visit WHERE id=v_visitid;
-	   
+
+    -- Advance sequence to avoid errors in plugin
+    PERFORM nextval('test_ws.om_visit_event_id_seq');
+
 	-- looking for all node features relateds to visit
 	FOR v_feature IN SELECT * FROM om_visit_x_node WHERE visit_id=v_visitid
 	LOOP 
@@ -98,7 +101,7 @@ BEGIN
 		LOOP
 			INSERT INTO om_visit_event (event_code, visit_id, position_id, position_value, parameter_id, value, value1, value2, geom1, geom2, geom3, tstamp, text, index_val, is_last) 
 			VALUES (v_event.event_code, v_idlast, v_event.position_id, v_event.position_value, v_event.parameter_id, v_event.value, v_event.value1, 
-			v_event.value2, v_event.geom1, v_event.geom2, v_event.geom3, v_event.tstamp, v_event.text, v_event.index_val, v_event.is_last) RETURNING id INTO v_eventlast;
+			v_event.value2, v_event.geom1, v_event.geom2, v_event.geom3, v_event.tstamp, v_event.text, v_event.index_val, v_event.is_last) ON CONFLICT DO NOTHING RETURNING id INTO v_eventlast;
 
 			-- looking for photo relateds to event
 			FOR v_photo IN SELECT * FROM om_visit_event_photo WHERE event_id=v_event.id
@@ -130,7 +133,7 @@ BEGIN
 		LOOP
 			INSERT INTO om_visit_event (event_code, visit_id, position_id, position_value, parameter_id, value, value1, value2, geom1, geom2, geom3, tstamp, text, index_val, is_last) 
 			VALUES (v_event.event_code, v_idlast, v_event.position_id, v_event.position_value, v_event.parameter_id, v_event.value, v_event.value1, 
-			v_event.value2, v_event.geom1, v_event.geom2, v_event.geom3, v_event.tstamp, v_event.text, v_event.index_val, v_event.is_last) RETURNING id INTO v_eventlast;
+			v_event.value2, v_event.geom1, v_event.geom2, v_event.geom3, v_event.tstamp, v_event.text, v_event.index_val, v_event.is_last) ON CONFLICT DO NOTHING RETURNING id INTO v_eventlast;
 
 			-- looking for photo relateds to event
 			FOR v_photo IN SELECT * FROM om_visit_event_photo WHERE event_id=v_event.id
@@ -164,7 +167,7 @@ BEGIN
 			LOOP
 				INSERT INTO om_visit_event (event_code, visit_id, position_id, position_value, parameter_id, value, value1, value2, geom1, geom2, geom3, tstamp, text, index_val, is_last) 
 				VALUES (v_event.event_code, v_idlast, v_event.position_id, v_event.position_value, v_event.parameter_id, v_event.value, v_event.value1, 
-				v_event.value2, v_event.geom1, v_event.geom2, v_event.geom3, v_event.tstamp, v_event.text, v_event.index_val, v_event.is_last) RETURNING id INTO v_eventlast;
+				v_event.value2, v_event.geom1, v_event.geom2, v_event.geom3, v_event.tstamp, v_event.text, v_event.index_val, v_event.is_last) ON CONFLICT DO NOTHING RETURNING id INTO v_eventlast;
 	
 				-- looking for photo relateds to event
 				FOR v_photo IN SELECT * FROM om_visit_event_photo WHERE event_id=v_event.id
