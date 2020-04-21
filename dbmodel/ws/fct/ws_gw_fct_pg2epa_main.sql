@@ -8,13 +8,16 @@ This version of Giswater is provided by Giswater Association
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa(character varying, boolean, boolean);
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa(character varying, boolean);
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa(p_data);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_main(p_data json)  
 RETURNS json AS 
 $BODY$
 
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"data":{ "resultId":"r1", "useNetworkGeom":"false"}}$$)
+
+delete from SCHEMA_NAME.rpt_cat_result
+
 */
 
 DECLARE
@@ -132,7 +135,7 @@ BEGIN
 		RAISE NOTICE '7 - manage varcs';
 		PERFORM gw_fct_pg2epa_manage_varc(v_result);	
 
-		RAISE NOTICE '7 - Try to trim arcs with vnode';
+		RAISE NOTICE '8 - Try to trim arcs with vnode';
 		IF v_networkmode = 3 OR v_networkmode = 4 THEN
 			SELECT gw_fct_pg2epa_vnodetrimarcs(v_result) INTO v_response;
 				
@@ -140,7 +143,7 @@ BEGIN
 			IF v_response = 0 THEN
 				v_message = concat ('INFO: vnodes over nodarcs have been checked without any inconsistency. In terms of vnode/nodarc topological relation network is ok');
 			ELSE
-				v_message = concat ('WARNING: vnodes over nodarcs have been checked. In order to keep inlet flows from connecs using vnode_id, ' , 
+				v_message = concat ('WARNING: vnodes over nodarcs have been checked. In order to keep inlet floSCHEMA_NAME from connecs using vnode_id, ' , 
 				v_response, ' nodarc nodes have been renamed using vnode_id');
 			END IF;
 		ELSE
@@ -148,7 +151,7 @@ BEGIN
 			v_message = concat ('INFO: The process to check vnodes over nodarcs is disabled because on this export mode arcs will not trimed using vnodes');
 		END IF;
 
-		RAISE NOTICE '8 - Execute buildup model';
+		RAISE NOTICE '9 - Execute buildup model';
 		IF v_buildupmode = 1 THEN
 			PERFORM gw_fct_pg2epa_buildup_supply(v_result);
 			
@@ -156,56 +159,56 @@ BEGIN
 			PERFORM gw_fct_pg2epa_buildup_transport(v_result);
 		END IF;
 
-		RAISE NOTICE '9 - Set default values';
+		RAISE NOTICE '10 - Set default values';
 		IF v_vdefault THEN
 			PERFORM gw_fct_pg2epa_vdefault(v_input);
 		END IF;
 
-		RAISE NOTICE '10 - Set cero on elevation those have null values in spite of previous processes (profilactic issue in order to do not crash the epanet file)';
+		RAISE NOTICE '11 - Set cero on elevation those have null values in spite of previous processes (profilactic issue in order to do not crash the epanet file)';
 		UPDATE rpt_inp_node SET elevation = 0 WHERE elevation IS NULL AND result_id=v_result;
 		
-		RAISE NOTICE '11 - Set length > 0.05 when length is 0';
+		RAISE NOTICE '12 - Set length > 0.05 when length is 0';
 		UPDATE rpt_inp_arc SET length=0.05 WHERE length=0 AND result_id=v_result;
 		
-		RAISE NOTICE '12 - Check result network';
+		RAISE NOTICE '13 - Check result network';
 		IF v_checknetwork THEN
 			PERFORM gw_fct_pg2epa_check_network(v_input);			
 		END IF;
 		
 		IF v_delnetwork THEN
-			RAISE NOTICE '13 - delete disconnected arcs with associated nodes';
+			RAISE NOTICE '14 - delete disconnected arcs with associated nodes';
 			DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user) and result_id = v_result;
 			DELETE FROM rpt_inp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=39 AND cur_user=current_user) and result_id = v_result;
 			
-			RAISE NOTICE '14 - delete orphan nodes';
+			RAISE NOTICE '15 - delete orphan nodes';
 			DELETE FROM rpt_inp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=7 AND cur_user=current_user) AND result_id=v_result;
 
-			RAISE NOTICE '15 delete arcs without extremal nodes';
+			RAISE NOTICE '16 delete arcs without extremal nodes';
 			DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=3 AND cur_user=current_user) AND result_id=v_result;		
 		END IF;
 
 	END IF;
 
-	RAISE NOTICE '16 - Try to set demands & patterns';
+	RAISE NOTICE '17 - Try to set demands & patterns';
 	IF v_setdemand THEN
 		PERFORM gw_fct_pg2epa_demand(v_result);		
 	END IF;
 
-	RAISE NOTICE '17 - Setting dscenarios';
+	RAISE NOTICE '18 - Setting dscenarios';
 	PERFORM gw_fct_pg2epa_dscenario(v_result);
 	
-	RAISE NOTICE '18 - Setting valve status';
+	RAISE NOTICE '19 - Setting valve status';
 	PERFORM gw_fct_pg2epa_valve_status(v_result);
 		
-	RAISE NOTICE '19 - Advanced settings';
+	RAISE NOTICE '20 - Advanced settings';
 	IF v_advancedsettings THEN
 		PERFORM gw_fct_pg2epa_advancedsettings(v_result);
 	END IF;
 
-	RAISE NOTICE '20 - check result previous exportation';
+	RAISE NOTICE '21 - check result previous exportation';
 	SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return ;
 
-	RAISE NOTICE '21 - Create the inp file structure';	
+	RAISE NOTICE '22 - Create the inp file structure';	
 	SELECT gw_fct_pg2epa_export_inp(v_result, null) INTO v_file;
 	
 	-- manage return message
@@ -215,6 +218,7 @@ BEGIN
 	v_return =  gw_fct_json_object_set_key (v_return, 'steps', 0);
 	v_return = replace(v_return::text, '"message":{"priority":1, "text":"Data quality analysis done succesfully"}', 
 	'"message":{"priority":1, "text":"Inp export done succesfully"}')::json;
+
 
 	RETURN v_return;
 END;
