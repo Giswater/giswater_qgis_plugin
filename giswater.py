@@ -1288,9 +1288,11 @@ class Giswater(QObject):
         for layer in all_layers_toc:
             layer_source = self.controller.get_layer_source(layer)
             # Filter to take only the layers of the current schema
-            if 'schema' not in layer_source or layer_source['schema'].replace('"', '') != self.schema_name: continue
-            table_name = f"{self.controller.get_layer_source_table_name(layer)}"
-            self.available_layers.append(table_name)
+            if 'schema' in layer_source:
+                schema = layer_source['schema']
+                if schema and schema.replace('"', '') == self.schema_name:
+                    table_name = f"{self.controller.get_layer_source_table_name(layer)}"
+                    self.available_layers.append(table_name)
 
 
     def set_form_suppress(self, layers_list):
