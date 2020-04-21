@@ -11,6 +11,7 @@ from functools import partial
 from qgis.PyQt.QtCore import QDate
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView
 from qgis.PyQt.QtSql import QSqlTableModel
+from qgis.core import QgsFeatureRequest
 from .parent import ParentAction
 from .tm_parent import TmParentAction
 from .tm_manage_visit import TmManageVisit
@@ -958,6 +959,8 @@ class TmBasic(TmParentAction):
         self.dlg_incident_manager.cmb_status.currentIndexChanged.connect(partial(self.update_table, self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name))
         self.dlg_incident_manager.btn_process.clicked.connect(partial(self.open_incident_planning, 'PROCESS'))
         self.dlg_incident_manager.btn_discard.clicked.connect(partial(self.open_incident_planning, 'DISCARD'))
+        self.dlg_incident_manager.btn_zoom.clicked.connect(partial(self.zoom_to_element))
+        self.dlg_incident_manager.btn_image.clicked.connect(partial(self.open_image))
         self.dlg_incident_manager.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_incident_manager))
         self.dlg_incident_manager.date_from.dateChanged.connect(partial(self.update_table, self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name))
         self.dlg_incident_manager.date_to.dateChanged.connect(partial(self.update_table, self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name))
@@ -1162,3 +1165,57 @@ class TmBasic(TmParentAction):
         if result['status'] == "Accepted":
             self.close_dialog(self.dlg_incident_planning)
             self.update_table(self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident,"v_ui_om_visit_incident")
+
+
+    def zoom_to_element(self):
+
+        # Get record selected
+        selected_list = self.dlg_incident_manager.tbl_incident.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+        elif len(selected_list) > 1:
+            message = "More than one record selected"
+            self.controller.show_warning(message)
+            return
+
+        row = selected_list[0].row()
+
+        # Get object_id from selected row
+        node_id = self.dlg_incident_manager.tbl_incident.model().record(row).value("node_id")
+
+        # Select node of shortest path on v_edit_node for ZOOM SELECTION
+        expr_filter = f"node_id IN ({node_id})"
+        (is_valid, expr) = self.check_expression(expr_filter, True)  # @UnusedVariable
+
+        if not is_valid:
+            return
+
+        self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
+        it = self.layer_node.getFeatures(QgsFeatureRequest(expr))
+        self.id_list = [i.id() for i in it]
+        self.layer_node.selectByIds(self.id_list)
+
+        # Center shortest path in canvas - ZOOM SELECTION
+        self.canvas.zoomToSelected(self.layer_node)
+
+
+    def open_image(self):
+        return
+
+
+    def select_features_by_ids(self, geom_type, expr, layer_name):
+        """ Select features of layers of group @geom_type applying @expr """
+
+        # Build a list of feature id's and select them
+        layer = self.controller.get_layer_by_tablename(layer_name)
+        if expr is None:
+            layer.removeSelection()
+        else:
+            it = layer.getFeatures(QgsFeatureRequest(expr))
+            id_list = [i.id() for i in it]
+            if len(id_list) > 0:
+                layer.selectByIds(id_list)
+            else:
+                layer.removeSelection()
