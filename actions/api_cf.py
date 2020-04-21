@@ -237,6 +237,7 @@ class ApiCF(ApiParent, QObject):
             feature = f'"tableName":"{table_name}", "id":"{feature_id}"'
             body = self.create_body(feature=feature, extras=extras)
             function_name = 'gw_api_getinfofromid'
+
         row = [self.controller.get_json(function_name, body, log_sql=True)]
         if not row or row[0] is False: return False, None
         # When something is wrong
@@ -544,7 +545,7 @@ class ApiCF(ApiParent, QObject):
         btn_cancel.clicked.connect(self.roll_back)
         btn_accept.clicked.connect(partial(self.accept, self.dlg_cf, self.complet_result[0], self.my_json, docker=docker))
         if docker:
-            # Delete las form from memory
+            # Delete last form from memory
             last_info = docker.findChild(GwMainWindow, 'api_cf')
             if last_info:
                 last_info.setParent(None)
@@ -562,13 +563,14 @@ class ApiCF(ApiParent, QObject):
             self.dlg_cf.dlg_closed.connect(lambda: self.layer.disconnect())
             self.dlg_cf.key_pressed.connect(partial(self.close_dialog, self.dlg_cf))
 
-
         # Open dialog
         self.open_dialog(self.dlg_cf, dlg_name='info_full')
+
         return self.complet_result, self.dlg_cf
 
 
     def manage_docker_close(self):
+
         self.roll_back()
         self.resetRubberbands()
         self.set_vdefault_edition()
