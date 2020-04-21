@@ -184,6 +184,7 @@ BEGIN
 	v_limit = ((p_data ->>'data')::json->>'fields')::json->>'limit'::text;
 	v_filterlot = ((p_data ->>'data')::json->>'fields')::json->>'lot_id'::text;
 	v_filterteam = ((p_data ->>'data')::json->>'fields')::json->>'team_id'::text;
+	v_offset := ((p_data ->> 'data')::json->> 'pageInfo')::json->>'offset';
 
 	
 	IF v_tabname IS NULL THEN
@@ -415,7 +416,9 @@ BEGIN
 	END IF;
 
 	-- add offset
-	v_offset := (v_currentpage-1)*v_limit;
+	IF v_offset IS NULL THEN
+		v_offset := (v_currentpage-1)*v_limit;
+	END IF;
 	IF v_offset IS NOT NULL THEN
 		v_query_result := v_query_result || ' OFFSET '|| v_offset;
 	END IF;
