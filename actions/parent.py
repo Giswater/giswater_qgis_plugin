@@ -24,7 +24,6 @@ from .add_layer import AddLayer
 from ..ui_manager import BasicInfoUi, GwDialog, GwMainWindow, DockerUi
 
 
-
 class ParentAction(object):
 
     def __init__(self, iface, settings, controller, plugin_dir):  
@@ -49,7 +48,8 @@ class ParentAction(object):
         self.rubber_polygon.setIconSize(20)
         self.user_current_layer = None
         self.dlg_docker = None
-    
+
+
     def set_controller(self, controller):
         """ Set controller class """
         
@@ -1089,16 +1089,16 @@ class ParentAction(object):
 
 
     def dock_dialog(self, docker, dialog):
-        positions = {8:Qt.TopDockWidgetArea, 4:Qt.BottomDockWidgetArea,
+
+        positions = {8:Qt.BottomDockWidgetArea, 4:Qt.TopDockWidgetArea,
                      2:Qt.RightDockWidgetArea, 1:Qt.LeftDockWidgetArea}
         try:
             docker.setWindowTitle(dialog.windowTitle())
             docker.setWidget(dialog)
             docker.setWindowFlags(Qt.WindowContextHelpButtonHint)
-            # self.iface.addDockWidget(docker.position, docker)
             self.iface.addDockWidget(positions[docker.position], docker)
         except RuntimeError as e:
-            print(f"{type(e).__name__} --> {e}")
+            self.controller.log_warning(f"{type(e).__name__} --> {e}")
             pass
 
 
