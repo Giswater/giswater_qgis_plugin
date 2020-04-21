@@ -172,7 +172,7 @@ BEGIN
 			PERFORM gw_fct_pg2epa_check_network(v_input);			
 		END IF;
 		
-		IF v_delnetwork
+		IF v_delnetwork THEN
 			RAISE NOTICE '13 - delete disconnected arcs with associated nodes';
 			DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user) and result_id = v_result;
 			DELETE FROM rpt_inp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=39 AND cur_user=current_user) and result_id = v_result;
