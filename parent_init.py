@@ -1349,7 +1349,7 @@ class ParentDialog(QDialog):
         # Fill ComboBox cmb_visit_class
         sql = ("SELECT DISTINCT(class_id), om_visit_class.idval"
                " FROM " + self.schema_name + ".v_ui_om_visit_x_" + feature_type.lower() + ""
-               " JOIN " + self.schema_name + ".om_visit_class ON om_visit_class.id = v_ui_om_visit_x_gully.class_id"
+               " JOIN " + self.schema_name + ".om_visit_class ON om_visit_class.id = v_ui_om_visit_x_" + feature_type.lower() + ".class_id"
                " WHERE " + feature_key + " IS NOT NULL")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.cmb_visit_class, rows, 1)
@@ -1369,6 +1369,7 @@ class ParentDialog(QDialog):
 
         self.set_model_to_table(widget, table_name, filter_)
         self.set_filter_dates('startdate', 'enddate', table_name, self.date_event_from, self.date_event_to)
+        self.set_configuration(widget, table_name)
 
 
     def set_filter_table_event(self, widget, table_name):
@@ -1386,6 +1387,7 @@ class ParentDialog(QDialog):
         # Set model of selected widget
         table_name = str(table_name[utils_giswater.get_item_data(self.dialog, self.cmb_visit_class, 0)])
         self.set_model_to_table(widget, table_name)
+        self.set_configuration(widget, table_name)
         self.set_filter_dates('startdate', 'enddate', table_name, self.date_event_from, self.date_event_to)
 
         # Set filter to model
