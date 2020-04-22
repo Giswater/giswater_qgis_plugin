@@ -7,6 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from functools import partial
+import webbrowser
 
 from qgis.PyQt.QtCore import QDate
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView
@@ -960,11 +961,13 @@ class TmBasic(TmParentAction):
         self.dlg_incident_manager.btn_process.clicked.connect(partial(self.open_incident_planning, 'PROCESS'))
         self.dlg_incident_manager.btn_discard.clicked.connect(partial(self.open_incident_planning, 'DISCARD'))
         self.dlg_incident_manager.btn_zoom.clicked.connect(partial(self.zoom_to_element))
-        self.dlg_incident_manager.btn_image.clicked.connect(partial(self.open_image))
+        self.dlg_incident_manager.btn_image.clicked.connect(partial(self.open_image, self.dlg_incident_manager.tbl_incident))
         self.dlg_incident_manager.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_incident_manager))
         self.dlg_incident_manager.date_from.dateChanged.connect(partial(self.update_table, self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name))
         self.dlg_incident_manager.date_to.dateChanged.connect(partial(self.update_table, self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name))
-
+        self.dlg_incident_manager.tbl_incident.selectionModel().selectionChanged.connect(
+            partial(self.enable_widget_x_qtable, self.dlg_incident_manager.tbl_incident,
+                    self.dlg_incident_manager.btn_image, 'incident_foto'))
 
         # Open form
         self.dlg_incident_manager.setWindowTitle("Incident Manager")
@@ -1001,6 +1004,11 @@ class TmBasic(TmParentAction):
         self.fill_table_incident(qtable, table_name, expr_filter=expr_filter)
 
         self.get_id_list()
+
+        # Set selection model
+        self.dlg_incident_manager.tbl_incident.selectionModel().selectionChanged.connect(
+            partial(self.enable_widget_x_qtable, self.dlg_incident_manager.tbl_incident,
+                    self.dlg_incident_manager.btn_image, 'incident_foto'))
 
 
     def fill_table_incident(self, qtable, table_name,  expr_filter=None):
@@ -1201,21 +1209,46 @@ class TmBasic(TmParentAction):
         self.canvas.zoomToSelected(self.layer_node)
 
 
-    def open_image(self):
-        return
+    def open_image(self, qtable):
 
+        selected_list = qtable.selectionModel().selectedRows()
 
-    def select_features_by_ids(self, geom_type, expr, layer_name):
-        """ Select features of layers of group @geom_type applying @expr """
+        if selected_list == 0 or str(selected_list) == '[]':
+            message = "Any load selected"
+            self.controller.show_info_box(message)
+            return
 
-        # Build a list of feature id's and select them
-        layer = self.controller.get_layer_by_tablename(layer_name)
-        if expr is None:
-            layer.removeSelection()
+        elif len(selected_list) > 1:
+            message = "More then one event selected. Select just one"
+            self.controller.show_warning(message)
+            return
+
+        index = selected_list[0]
+        row = index.row()
+        column_index = utils_giswater.get_col_index_by_col_name(qtable, 'visit_id')
+        visit_id = index.sibling(row, column_index).data()
+
+        sql = ("SELECT value FROM om_visit_event_photo WHERE visit_id = " + str(visit_id))
+        rows = self.controller.get_rows(sql, commit=True)
+        # TODO:: Open manage photos when visit have more than one
+        if rows:
+            for row in rows:
+                webbrowser.open(row[0])
         else:
-            it = layer.getFeatures(QgsFeatureRequest(expr))
-            id_list = [i.id() for i in it]
-            if len(id_list) > 0:
-                layer.selectByIds(id_list)
-            else:
-                layer.removeSelection()
+            message = "This incident has no linked image"
+            self.controller.show_info(message)
+
+
+    def enable_widget_x_qtable(self, qtable, widget, column_name):
+
+        selected_list = qtable.selectionModel().selectedRows()
+        if selected_list:
+            row = selected_list[0].row()
+
+            # Get object_id from selected row
+            result = self.dlg_incident_manager.tbl_incident.model().record(row).value(column_name)
+            # Set enabled
+            utils_giswater.setWidgetEnabled(self.dlg_incident_manager, widget, result)
+
+
+
