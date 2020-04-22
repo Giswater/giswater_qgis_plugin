@@ -1325,19 +1325,16 @@ class ParentDialog(QDialog):
         self.date_event_to.setDate(date)
 
         btn_open_gallery = self.dialog.findChild(QPushButton, "btn_open_gallery")
-        btn_open_visit_doc = self.dialog.findChild(QPushButton, "btn_open_visit_doc")
 
         btn_open_gallery.setEnabled(False)
-        btn_open_visit_doc.setEnabled(False)
 
         # Set signals
         widget.clicked.connect(partial(self.tbl_event_clicked, table_name))
-        self.cmb_visit_class.activated.connect(partial(self.set_filter_table_event, widget))
-        self.date_event_to.dateChanged.connect(partial(self.set_filter_table_event, widget))
-        self.date_event_from.dateChanged.connect(partial(self.set_filter_table_event, widget))
+        self.cmb_visit_class.activated.connect(partial(self.set_filter_table_event, widget, table_name))
+        self.date_event_to.dateChanged.connect(partial(self.set_filter_table_event, widget, table_name))
+        self.date_event_from.dateChanged.connect(partial(self.set_filter_table_event, widget, table_name))
 
         btn_open_gallery.clicked.connect(self.open_gallery)
-        btn_open_visit_doc.clicked.connect(self.open_visit_doc)
 
         feature_key = self.controller.get_layer_primary_key()
         if feature_key == 'node_id':
@@ -1348,7 +1345,6 @@ class ParentDialog(QDialog):
             feature_type = 'ARC'
         if feature_key == 'gully_id':
             feature_type = 'GULLY'
-
 
         # Fill ComboBox cmb_visit_class
         sql = ("SELECT DISTINCT(class_id), om_visit_class.idval"
@@ -1365,15 +1361,17 @@ class ParentDialog(QDialog):
             message = "Selected date interval is not valid"
             self.controller.show_warning(message)
             return
-        # filter_ += " AND visit_start >= '" + date_from + "' AND visit_start <= '" + date_to + "'"
+
         filter_ += " AND startdate >= '" + date_from + "' AND startdate <= '" + date_to + "'"
 
         # Set model of selected widget
+        table_name = str(table_name[utils_giswater.get_item_data(self.dialog, self.cmb_visit_class, 0)])
+
         self.set_model_to_table(widget, table_name, filter_)
-        # self.set_filter_dates('visit_start', 'visit_end', table_name, self.date_event_from, self.date_event_to)
         self.set_filter_dates('startdate', 'enddate', table_name, self.date_event_from, self.date_event_to)
 
-    def set_filter_table_event(self, widget):
+
+    def set_filter_table_event(self, widget, table_name):
         """ Get values selected by the user and sets a new filter for its table model """
 
         # Get selected dates
@@ -1385,9 +1383,13 @@ class ParentDialog(QDialog):
             self.controller.show_warning(message)
             return
 
+        # Set model of selected widget
+        table_name = str(table_name[utils_giswater.get_item_data(self.dialog, self.cmb_visit_class, 0)])
+        self.set_model_to_table(widget, table_name)
+        self.set_filter_dates('startdate', 'enddate', table_name, self.date_event_from, self.date_event_to)
+
         # Set filter to model
         expr = self.field_id + " = '" + self.id + "'"
-        # expr += " AND visit_start >= '" + date_from + "' AND visit_start <= '" + date_to + "'"
         expr += " AND startdate >= '" + date_from + "' AND startdate <= '" + date_to + "'"
 
         # Get selected values in Comboboxes

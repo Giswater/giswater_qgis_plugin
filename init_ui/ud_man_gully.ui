@@ -2820,7 +2820,7 @@
      <widget class="QPushButton" name="btn_open_gallery">
       <property name="geometry">
        <rect>
-        <x>503</x>
+        <x>535</x>
         <y>70</y>
         <width>24</width>
         <height>24</height>
@@ -2835,32 +2835,6 @@
       <property name="icon">
        <iconset>
         <normaloff>../icons/136b.png</normaloff>../icons/136b.png</iconset>
-      </property>
-      <property name="iconSize">
-       <size>
-        <width>22</width>
-        <height>22</height>
-       </size>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_open_visit_doc">
-      <property name="geometry">
-       <rect>
-        <x>535</x>
-        <y>70</y>
-        <width>24</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open document&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="icon">
-       <iconset>
-        <normaloff>../icons/170b.png</normaloff>../icons/170b.png</iconset>
       </property>
       <property name="iconSize">
        <size>
@@ -3606,7 +3580,6 @@
   <tabstop>tbl_visit_gully</tabstop>
   <tabstop>cmb_visit_class</tabstop>
   <tabstop>btn_open_gallery</tabstop>
-  <tabstop>btn_open_visit_doc</tabstop>
   <tabstop>tab_main</tabstop>
   <tabstop>tbl_document</tabstop>
   <tabstop>date_document_to</tabstop>
