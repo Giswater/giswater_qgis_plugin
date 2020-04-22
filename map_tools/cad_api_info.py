@@ -107,10 +107,9 @@ class CadApiInfo(ParentMapTool):
         if hasattr(self, 'dlg_docker') and type(self.dlg_docker) is DockerUi:
             self.close_docker()
 
-        row = self.controller.get_config('dock_dialogs')
-        if not row or row[0].lower() != 'true':
-            self.dlg_docker = None
-        else:
+        self.dlg_docker = None
+        row = self.controller.get_config('api_info_modal')
+        if not row or row[0].lower() == 'false':
             self.dlg_docker = DockerUi()
             self.dlg_docker.dlg_closed.connect(partial(self.close_docker))
             self.manage_docker_options()
