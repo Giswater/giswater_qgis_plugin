@@ -11,24 +11,24 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut_inverted_flowtrace(result_i
 $BODY$
 DECLARE
 
-rec_valve 	record;
-rec_tank	record;
-mincut_rec	record;
-exists_id      	text;
-arc_aux    	public.geometry;
-polygon_aux2   	public.geometry;
-node_aux      	public.geometry;    
-rec_table      	record;
-rec_result 	record;
-first_row      	boolean;
-inlet_path      boolean=false;
-element_id_arg  varchar(16);
-controlValue	smallint;
-node_1_aux	varchar(16);
-node_2_aux	varchar(16);
-query_text	text;
-v_debug		Boolean;
-v_data		json;
+rec_valve record;
+rec_tank record;
+mincut_rec record;
+exists_id text;
+arc_aux public.geometry;
+polygon_aux2 public.geometry;
+node_aux public.geometry;    
+rec_table record;
+rec_result record;
+first_row boolean;
+inlet_path boolean=false;
+element_id_arg varchar(16);
+controlValue smallint;
+node_1_aux varchar(16);
+node_2_aux varchar(16);
+query_text text;
+v_debug Boolean;
+v_data json;
 v_macroexpl integer;
 v_mincutversion integer;
 
@@ -70,29 +70,43 @@ BEGIN
 				1) Arcs into the proposed sector with node1 or node2 as proposed valves
 				2) Arcs out of the proposed sector with node1 or node2 as (closed valves and not proposed valves)
 			*/
+
 		
 			query_text:= 'SELECT * FROM pgr_dijkstra( 
-				''SELECT v_edit_arc.arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, 
-				(case when closed=true then -1 else 1 end) as cost,
-				(case when closed=true then -1 else 1 end) as reverse_cost
-				FROM SCHEMA_NAME.v_edit_arc 
-				JOIN SCHEMA_NAME.exploitation ON v_edit_arc.expl_id=exploitation.expl_id 
-				LEFT JOIN (
-					SELECT arc_id, true as closed FROM SCHEMA_NAME.v_edit_arc JOIN SCHEMA_NAME.exploitation ON v_edit_arc.expl_id=exploitation.expl_id
-					WHERE 
-						(node_1 IN (SELECT node_id FROM SCHEMA_NAME.anl_mincut_result_valve WHERE ((proposed=TRUE) AND result_id='||result_id_arg||'))
-						AND arc_id IN(SELECT arc_id FROM SCHEMA_NAME.anl_mincut_result_arc WHERE result_id='||result_id_arg||'))
+				''			
+				SELECT
+				a.id,
+				a.source,
+				a.target,
+				(case when (a.id = b.id and a.source::text = b.source::text) then -1 else cost end) as cost, 			-- close especial case of anl_mincut_checkvalve only direct sense
+				(case when (a.id = b.id and a.source::text != b.source::text) then -1 else reverse_cost end) as reverse_cost  	-- close especial case of anl_mincut_checkvalve only reverse sense
+				FROM (
+					SELECT v_edit_arc.arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, 
+					(case when a.closed=true then -1 else 1 end) as cost,
+					(case when a.closed=true then -1 else 1 end) as reverse_cost
+					FROM v_edit_arc 
+					JOIN exploitation ON v_edit_arc.expl_id=exploitation.expl_id
+					LEFT JOIN (
+							SELECT arc_id, true as closed FROM v_edit_arc JOIN exploitation ON v_edit_arc.expl_id=exploitation.expl_id
+							WHERE 
+							(node_1 IN (SELECT node_id FROM anl_mincut_result_valve WHERE ((proposed=TRUE) AND result_id='||result_id_arg||'))
+							AND arc_id IN(SELECT arc_id FROM anl_mincut_result_arc WHERE result_id='||result_id_arg||'))
 						
-						OR (node_2 IN (SELECT node_id FROM SCHEMA_NAME.anl_mincut_result_valve WHERE ((proposed=TRUE) AND result_id='||result_id_arg||'))
-						AND arc_id IN(SELECT arc_id FROM SCHEMA_NAME.anl_mincut_result_arc WHERE result_id='||result_id_arg||')) 
+							OR (node_2 IN (SELECT node_id FROM anl_mincut_result_valve WHERE ((proposed=TRUE) AND result_id='||result_id_arg||'))
+							AND arc_id IN(SELECT arc_id FROM anl_mincut_result_arc WHERE result_id='||result_id_arg||')) 
 	
-						OR (node_1 IN (SELECT node_id FROM SCHEMA_NAME.anl_mincut_result_valve WHERE closed=TRUE AND proposed IS NOT TRUE AND result_id='||result_id_arg||'))
+							OR (node_1 IN (SELECT node_id FROM anl_mincut_result_valve WHERE closed=TRUE AND proposed IS NOT TRUE AND result_id='||result_id_arg||'))
 						
-						OR (node_2 IN (SELECT node_id FROM SCHEMA_NAME.anl_mincut_result_valve WHERE closed=TRUE AND proposed IS NOT TRUE AND result_id='||result_id_arg||'))	
-					UNION
-					SELECT json_array_elements_text((config->>''''inletArc'''')::json) as arc_id, true as closed FROM SCHEMA_NAME.anl_mincut_inlet_x_exploitation	
-					)a ON a.arc_id=v_edit_arc.arc_id
-				WHERE node_1 is not null and node_2 is not null'','||rec_valve.node_id||'::int8, '||rec_tank.node_id||'::int8)';
+							OR (node_2 IN (SELECT node_id FROM anl_mincut_result_valve WHERE closed=TRUE AND proposed IS NOT TRUE AND result_id='||result_id_arg||'))	
+							UNION
+							SELECT json_array_elements_text((config->>''''inletArc'''')::json) as arc_id, true as closed FROM anl_mincut_inlet_x_exploitation
+						)a 
+						ON a.arc_id=v_edit_arc.arc_id
+					WHERE node_1 is not null and node_2 is not null
+					)a	
+				LEFT JOIN (SELECT to_arc::int8 AS id, node_id::int8 AS source FROM anl_mincut_checkvalve)b USING (id)'',
+
+				'||rec_valve.node_id||'::int8, '||rec_tank.node_id||'::int8)';
 
 			IF query_text IS NOT NULL THEN	
 				IF (select value::boolean from config_param_system where parameter='om_mincut_valve2tank_traceability') IS TRUE THEN 

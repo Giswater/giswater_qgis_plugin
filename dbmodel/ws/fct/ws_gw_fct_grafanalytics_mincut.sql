@@ -32,6 +32,7 @@ cont1 integer default 0;
 v_arctwin text;
 v_nodetwin text;
 v_checkvalve record;
+v_isrecursive boolean;
 
 BEGIN
 
@@ -42,7 +43,7 @@ BEGIN
 	v_mincutstep = (SELECT (p_data::json->>'data')::json->>'step');
 	v_arc = (SELECT (p_data::json->>'data')::json->>'arc');
 	v_mincutid = ((SELECT (p_data::json->>'data')::json->>'parameters')::json->>'id');
-
+	v_isrecursive = ((SELECT (p_data::json->>'data')::json->>'parameters')::json->>'isRecursive');
 
 	-- reset graf & audit_log tables
 	DELETE FROM temp_anlgraf;
@@ -58,7 +59,7 @@ BEGIN
 	UNION
 	SELECT arc_id, node_2, node_1, 0, 0, 0 FROM v_edit_arc JOIN value_state_type ON state_type=id 
 	WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE;
-	
+
 	-- set boundary conditions of graf table
 	IF v_mincutstep = 1 THEN 
 		-- setting on the graf matrix proposable valves
@@ -72,8 +73,14 @@ BEGIN
 		FROM anl_mincut_result_valve WHERE result_id=v_mincutid AND proposed = TRUE
 		AND (temp_anlgraf.node_1 = anl_mincut_result_valve.node_id OR temp_anlgraf.node_2 = anl_mincut_result_valve.node_id);
 	END IF;
+
+	-- closing check-valves
+	UPDATE temp_anlgraf SET flag = 1 
+	FROM anl_mincut_checkvalve c 
+	WHERE (temp_anlgraf.node_1 = c.node_id::integer OR temp_anlgraf.node_2 = c.node_id::integer);
+	
 	-- setting the graf matrix with closed valves
-	UPDATE temp_anlgraf SET flag=1 
+	UPDATE temp_anlgraf SET flag = 1 
 	FROM anl_mincut_result_valve WHERE result_id=v_mincutid AND closed=TRUE 
 	AND (temp_anlgraf.node_1 = anl_mincut_result_valve.node_id OR temp_anlgraf.node_2 = anl_mincut_result_valve.node_id);
 	
@@ -84,19 +91,12 @@ BEGIN
 
 	-- reset water flag
 	UPDATE temp_anlgraf SET water=0;
-	
+
+
 	------------------
 	-- starting engine
 
-	-- get arc_id twin in case of exists to remove results (arc twin is that arc closest choosed arc connected with valve)
-	-- 1) get node twin
-	v_nodetwin = (select node_id FROM (SELECT node_1 AS node_id FROM temp_anlgraf WHERE arc_id = v_arc UNION 
-		SELECT node_2 FROM temp_anlgraf WHERE arc_id = v_arc)a WHERE node_id::varchar IN 
-		     (SELECT node_id FROM anl_mincut_result_valve WHERE result_id=v_mincutid AND ((unaccess = FALSE AND broken = FALSE))));
-	-- get arc_id twin
-	SELECT arc_id INTO v_arctwin FROM temp_anlgraf WHERE (node_1 = v_nodetwin OR node_2 = v_nodetwin) AND arc_id <> v_arc;
-	
-	-- 2) set the starting element
+	-- 1) set the starting element
 	v_querytext = 'UPDATE temp_anlgraf SET water=1 , flag = 1 WHERE arc_id='||quote_literal(v_arc); 
 	EXECUTE v_querytext;
 	
@@ -109,11 +109,17 @@ BEGIN
 		EXIT WHEN cont1 = 100;
 	END LOOP;
 
-	IF v_arctwin IS NOT NULL THEN 
-		v_querytext = 'UPDATE temp_anlgraf SET water=0 WHERE arc_id IN (SELECT arc_id FROM temp_anlgraf WHERE arc_id='||quote_literal(v_arctwin)||' LIMIT 1)';
-		EXECUTE v_querytext;
-	END IF;
-	
+	-- 2) remove results (arc twin as closest choosed arc connected with valve if click on user takes it)
+	UPDATE temp_anlgraf SET water=0 WHERE arc_id IN (
+
+			SELECT distinct (t.arc_id) FROM temp_anlgraf t JOIN 
+			(SELECT node_1 AS node_id, arc_id FROM temp_anlgraf WHERE arc_id = v_arc UNION SELECT node_2, arc_id FROM temp_anlgraf WHERE arc_id = v_arc) a
+			ON a.node_id = node_1 or a.node_id = node_2
+			JOIN anl_mincut_result_valve v on v.node_id = a.node_id::text
+			WHERE result_id=v_mincutid AND (unaccess = FALSE AND broken = FALSE)
+			AND t.arc_id <> a.arc_id);
+						
+
 	-- finish engine
 	----------------
 	-- insert arc results into table
@@ -153,21 +159,31 @@ BEGIN
 			)a group by node_1  having sum(flag) = 6)';
 	EXECUTE v_querytext;
 
+
 	-- looking for check-valves
 	FOR v_checkvalve IN SELECT anl_mincut_checkvalve.* FROM anl_mincut_result_valve JOIN anl_mincut_checkvalve USING (node_id) WHERE proposed = true and result_id = v_mincutid
 	LOOP
-		IF v_checkvalve.to_arc NOT IN (SELECT arc_id FROM anl_mincut_result_arc WHERE result_id = v_mincutid) THEN -- checkvalve is proposed valve and to_arc is dry
+		IF v_checkvalve.to_arc IN (SELECT arc_id FROM anl_mincut_result_arc WHERE result_id = v_mincutid) AND v_isrecursive IS NOT TRUE THEN  -- checkvalve is proposed valve and to_arc is wet
+
+			v_arc = (SELECT distinct(arc_id) FROM temp_anlgraf WHERE (node_1::text = v_checkvalve.node_id OR  node_2::text = v_checkvalve.node_id) AND arc_id::text != v_checkvalve.to_arc::text);
+		
 			-- mincut must continue
-			PERFORM gw_fct_grafanalytics_mincut(concat('{"data":{"arc":"',v_checkvalve.to_arc,'", "step":1, "parameters":{"id":',v_mincutid,'}}}')::json);
+			PERFORM gw_fct_grafanalytics_mincut(concat('{"data":{"arc":"',v_arc,'", "step":1, "parameters":{"isRecursive":true, "id":',v_mincutid,'}}}')::json);
+
 		END IF;
 	END LOOP;
-	
+
 	-- set proposed = false for broken valves
 	v_querytext = 'UPDATE anl_mincut_result_valve SET proposed=FALSE WHERE broken = TRUE AND result_id = '||v_mincutid;
 	EXECUTE v_querytext;	
 
 	-- set proposed = false for closed valves
 	v_querytext = 'UPDATE anl_mincut_result_valve SET proposed=FALSE WHERE closed = TRUE AND result_id = '||v_mincutid;
+	EXECUTE v_querytext;
+
+	-- set proposed = false for check valves (as they act as automatic mode)
+	v_querytext = 'UPDATE anl_mincut_result_valve v SET proposed=FALSE FROM (SELECT node_id FROM anl_mincut_checkvalve) a 
+		       WHERE a.node_id = v.node_id AND result_id = '||v_mincutid;
 	EXECUTE v_querytext;
 
 	
