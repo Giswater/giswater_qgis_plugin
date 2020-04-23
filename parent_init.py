@@ -1330,7 +1330,7 @@ class ParentDialog(QDialog):
 
         # Set signals
         widget.clicked.connect(partial(self.tbl_event_clicked, table_name))
-        self.cmb_visit_class.activated.connect(partial(self.set_filter_table_event, widget, table_name))
+        self.cmb_visit_class.activated.connect(partial(self.set_filter_table_event, widget, table_name, set_date=True))
         self.date_event_to.dateChanged.connect(partial(self.set_filter_table_event, widget, table_name))
         self.date_event_from.dateChanged.connect(partial(self.set_filter_table_event, widget, table_name))
 
@@ -1373,7 +1373,7 @@ class ParentDialog(QDialog):
         self.set_configuration(widget, table_name)
 
 
-    def set_filter_table_event(self, widget, table_name):
+    def set_filter_table_event(self, widget, table_name, set_date=False):
         """ Get values selected by the user and sets a new filter for its table model """
 
         # Get selected dates
@@ -1388,8 +1388,12 @@ class ParentDialog(QDialog):
         # Set model of selected widget
         table_name = str(table_name[utils_giswater.get_item_data(self.dialog, self.cmb_visit_class, 0)])
         self.set_model_to_table(widget, table_name)
+        if set_date is True:
+            self.set_filter_dates('startdate', 'enddate', table_name, self.date_event_from, self.date_event_to)
 
-        self.set_filter_dates('startdate', 'enddate', table_name, self.date_event_from, self.date_event_to)
+        # Get new selected dates
+        date_from = self.date_event_from.date().toString('yyyyMMdd 00:00:00')
+        date_to = self.date_event_to.date().toString('yyyyMMdd 23:59:59')
 
         # Set filter to model
         expr = self.field_id + " = '" + self.id + "'"
