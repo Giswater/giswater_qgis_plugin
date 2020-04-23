@@ -11,7 +11,12 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_debug( p_data json)
 $BODY$
 
 /*
-PERFORM gw_fct_debug(concat('{"data":{"msg":"Toolbar", "variables":"',v_point,'"}}')::json);
+PERFORM SCHEMA_NAME.gw_fct_debug(concat('{"data":{"msg":"Toolbar", "variables":"',v_point,'"}}')::json);
+SELECT SCHEMA_NAME.gw_fct_debug(concat('{"data":{"msg":"Toolbar", "variables":"a"}}')::json);
+
+UPDATE config_param_system SET value = '{"status":true}' WHERE parameter = 'sys_transaction_db'
+UPDATE config_param_user SET value = 'true' WHERE parameter = 'debug_mode';
+
 */
 
 DECLARE
@@ -55,7 +60,10 @@ BEGIN
 		IF v_systranstaction_db THEN
 		
 			-- using additional db for transactions
-			INSERT INTO tran.log (channel, cur_user, message) VALUES (replace(current_user,'.','_'), current_user, v_message);
+			--INSERT INTO notify (channel, cur_user, message) VALUES (replace(current_user,'.','_'), current_user, v_message);
+			
+			INSERT INTO audit (fid, log_message) VALUES (998, v_message);
+			--raise exception 'adshadsfhadfhbdasfhdfh';
 				
 		ELSE 
 			-- using normal notify with personal channel

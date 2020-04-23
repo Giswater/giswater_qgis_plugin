@@ -118,8 +118,8 @@ BEGIN
 			AND cur_user = current_user'::text) as ct(cur_user varchar(50), inp_options_interval_from text, inp_options_interval_to text))row
 	INTO v_options;		
 			
-	SELECT  count(*) INTO v_doublen2a FROM inp_pump JOIN rpt_inp_arc ON concat(node_id, '_n2a_4') = arc_id 
-	JOIN inp_curve_id c ON c.id=curve_id WHERE result_id=v_result_id;
+	SELECT  count(*) INTO v_doublen2a FROM inp_pump JOIN temp_arc ON concat(node_id, '_n2a_4') = arc_id 
+	JOIN inp_curve_id c ON c.id=curve_id;
 	
 	SELECT value INTO v_demandtype FROM config_param_user WHERE parameter = 'inp_options_demandtype' AND cur_user=current_user;
 	SELECT value INTO v_patternmethod FROM config_param_user WHERE parameter = 'inp_options_patternmethod' AND cur_user=current_user;
@@ -212,7 +212,7 @@ BEGIN
 
 
 		RAISE NOTICE '2 - Check nod2arc length control';	
-		v_nodearc_real = (SELECT st_length (the_geom) FROM rpt_inp_arc WHERE  arc_type='NODE2ARC' AND result_id=v_result_id LIMIT 1);
+		v_nodearc_real = (SELECT st_length (the_geom) FROM temp_arc WHERE  arc_type='NODE2ARC' LIMIT 1);
 		v_nodearc_user = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_nodarc_length' AND cur_user=current_user);
 
 		IF  v_nodearc_user > (v_nodearc_real+0.01) THEN 
@@ -254,7 +254,7 @@ BEGIN
 		RAISE NOTICE '4 - Check curves 3p';
 		IF v_buildupmode = 1 THEN
 
-			SELECT count(*) INTO v_count FROM rpt_inp_arc WHERE epa_type='PUMP' AND addparam::json->>'curve_id' = '' AND addparam::json->>'pump_type' = '1' AND result_id=v_result_id;
+			SELECT count(*) INTO v_count FROM temp_arc WHERE epa_type='PUMP' AND addparam::json->>'curve_id' = '' AND addparam::json->>'pump_type' = '1';
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 				VALUES (v_fprocesscat_id, v_result_id, 4, concat('SUPPLY MODE: There is/are ',v_count,' pump_type = 1 with null values on curve_id column. Default user value for curve of pumptype = 1 ( ',
@@ -262,7 +262,7 @@ BEGIN
 				v_count=0;
 			END IF;	
 		ELSE
-			SELECT count(*) INTO v_count FROM rpt_inp_arc WHERE epa_type='PUMP' AND addparam::json->>'curve_id' = '' AND result_id=v_result_id;
+			SELECT count(*) INTO v_count FROM temp_arc WHERE epa_type='PUMP' AND addparam::json->>'curve_id' = '';
 
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
@@ -278,9 +278,8 @@ BEGIN
 		IF v_networkmode = 3 OR v_networkmode = 4 THEN
 
 			-- vnode over nodarc for case of use vnode treaming arcs on network model
-			SELECT count(vnode_id) INTO v_count FROM rpt_inp_arc , vnode JOIN v_edit_link a ON vnode_id=exit_id::integer
-			WHERE st_dwithin ( rpt_inp_arc.the_geom, vnode.the_geom, 0.01) AND vnode.state > 0 AND arc_type = 'NODE2ARC'
-			AND result_id=v_result_id;
+			SELECT count(vnode_id) INTO v_count FROM temp_arc , vnode JOIN v_edit_link a ON vnode_id=exit_id::integer
+			WHERE st_dwithin ( temp_arc.the_geom, vnode.the_geom, 0.01) AND vnode.state > 0 AND arc_type = 'NODE2ARC';
 
 			IF v_count > 0 THEN
 
@@ -291,10 +290,9 @@ BEGIN
 				VALUES (v_fprocesscat_id, v_result_id, 2, concat('SELECT * FROM anl_node WHERE fprocesscat_id=59 AND cur_user=current_user'));		
 
 				INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, state, expl_id, the_geom, result_id, descript)
-				SELECT 59, vnode_id, 'VNODE', 1, rpt_inp_arc.expl_id, vnode.the_geom, v_result_id, 'Vnode overlaping nodarcs'  
-				FROM rpt_inp_arc , vnode JOIN v_edit_link a ON vnode_id=exit_id::integer
-				WHERE st_dwithin ( rpt_inp_arc.the_geom, vnode.the_geom, 0.01) AND vnode.state > 0 AND arc_type = 'NODE2ARC'
-				AND result_id=v_result_id;
+				SELECT 59, vnode_id, 'VNODE', 1, temp_arc.expl_id, vnode.the_geom, v_result_id, 'Vnode overlaping nodarcs'  
+				FROM temp_arc , vnode JOIN v_edit_link a ON vnode_id=exit_id::integer
+				WHERE st_dwithin ( temp_arc.the_geom, vnode.the_geom, 0.01) AND vnode.state > 0 AND arc_type = 'NODE2ARC';
 				v_count=0;	
 			ELSE
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 

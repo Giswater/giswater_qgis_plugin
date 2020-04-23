@@ -22,18 +22,18 @@ BEGIN
 
 	-- 
 	IF v_demandpriority = 1 THEN -- Dscenario overwrites base demand
-		UPDATE rpt_inp_node SET demand=a.demand, pattern_id=a.pattern_id FROM vi_demands a WHERE a.node_id=rpt_inp_node.node_id AND result_id=result_id_var;
+		UPDATE temp_node SET demand=a.demand, pattern_id=a.pattern_id FROM vi_demands a WHERE a.node_id=temp_node.node_id;
 
 	ELSIF v_demandpriority = 2 THEN -- Ignore Dscenario when base demand exists
-		UPDATE rpt_inp_node SET demand=a.demand FROM vi_demands a WHERE a.node_id=rpt_inp_node.node_id AND result_id=result_id_var AND rpt_inp_node.demand =0;
+		UPDATE temp_node SET demand=a.demand FROM vi_demands a WHERE a.node_id=temp_node.node_id AND temp_node.demand =0;
 
 	ELSIF v_demandpriority = 3 THEN -- Dscenario and base demand are joined
-		UPDATE rpt_inp_node SET demand=demand + a.demand FROM vi_demands a WHERE a.node_id=rpt_inp_node.node_id AND result_id=result_id_var;
+		UPDATE temp_node SET demand=demand + a.demand FROM vi_demands a WHERE a.node_id=temp_node.node_id;
 	
 	END IF;
 	
 	-- set cero where null in orther to prevent user's null values on demand table
-	UPDATE rpt_inp_node SET demand=0 WHERE demand IS NULL AND result_id=result_id_var;
+	UPDATE temp_node SET demand=0 WHERE demand IS NULL;
 
 RETURN 1;
 	

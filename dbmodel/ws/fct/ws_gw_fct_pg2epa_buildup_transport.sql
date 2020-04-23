@@ -24,18 +24,18 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- transformn on the fly those inlets int tank or reservoir in function of how many sectors they has	
-	FOR rec_node IN SELECT * FROM rpt_inp_node WHERE epa_type = 'INLET' AND result_id = p_result
+	FOR rec_node IN SELECT * FROM temp_node WHERE epa_type = 'INLET'
 	LOOP
 		-- get how many sectors are attached
 		SELECT count(*) INTO v_count FROM (
-				SELECT sector_id FROM rpt_inp_arc WHERE node_1 = rec_node.node_id 
+				SELECT sector_id FROM temp_arc WHERE node_1 = rec_node.node_id 
 				UNION 
-				SELECT sector_id FROM rpt_inp_arc WHERE node_2 = rec_node.node_id)a;
+				SELECT sector_id FROM temp_arc WHERE node_2 = rec_node.node_id)a;
 
 		IF v_count = 1 THEN
-			UPDATE rpt_inp_node SET epa_type  = 'RESERVOIR' WHERE node_id =  rec_node.node_id AND result_id = p_result;
+			UPDATE temp_node SET epa_type  = 'RESERVOIR' WHERE node_id =  rec_node.node_id;
 		ELSE
-			UPDATE rpt_inp_node SET epa_type  = 'TANK' WHERE node_id =  rec_node.node_id AND result_id = p_result;
+			UPDATE temp_node SET epa_type  = 'TANK' WHERE node_id =  rec_node.node_id;
 		END IF;
 	END LOOP;
 

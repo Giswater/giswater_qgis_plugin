@@ -19,21 +19,24 @@ BEGIN
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
 
-	UPDATE rpt_inp_arc SET diameter = a.diameter, roughness = a.roughness FROM (
+	UPDATE temp_arc SET diameter = a.diameter, roughness = a.roughness FROM (
 	
 			-- those arcs VARC-PIPE close to JUNCTION with same sector. In case of two JUNCTION on diferent sector -> select distinct is applied but problem is served
 			with virtual AS
-				(SELECT distinct on(arc_id) arc_id, node_1 as node_id, n.epa_type FROM rpt_inp_arc a JOIN rpt_inp_node n ON node_1 = node_id 
-				WHERE arc_type = 'VARC' AND a.epa_type ='PIPE' AND n.epa_type = 'JUNCTION' AND a.sector_id = n.sector_id AND a.result_id  = 'result_id_var' 
+				(SELECT distinct on(arc_id) arc_id, node_1 as node_id, n.epa_type FROM temp_arc a JOIN rpt_inp_node n ON node_1 = node_id 
+				WHERE arc_type = 'VARC' AND a.epa_type ='PIPE' AND n.epa_type = 'JUNCTION' AND a.sector_id = n.sector_id 
 				UNION
-				SELECT distinct on(arc_id) arc_id, node_2, n.epa_type FROM rpt_inp_arc a JOIN rpt_inp_node n ON node_2 = node_id 
-				WHERE arc_type = 'VARC' AND a.epa_type ='PIPE' AND n.epa_type = 'JUNCTION'  AND a.sector_id = n.sector_id AND a.result_id  = 'result_id_var' )
+				SELECT distinct on(arc_id) arc_id, node_2, n.epa_type FROM temp_arc a JOIN rpt_inp_node n ON node_2 = node_id 
+				WHERE arc_type = 'VARC' AND a.epa_type ='PIPE' AND n.epa_type = 'JUNCTION'  AND a.sector_id = n.sector_id)
 
 			-- those arcs PIPE-PIPE close to JUNCTION identified before
-			SELECT DISTINCT ON (v.arc_id) v.arc_id, diameter, roughness FROM rpt_inp_arc a JOIN virtual v ON node_id = node_1 OR node_id = node_2
+			SELECT DISTINCT ON (v.arc_id) v.arc_id, diameter, roughness FROM temp_arc a JOIN virtual v ON node_id = node_1
+			WHERE a.arc_id != v.arc_id
+			UNION
+			SELECT DISTINCT ON (v.arc_id) v.arc_id, diameter, roughness FROM temp_arc a JOIN virtual v ON node_id = node_2
 			WHERE a.arc_id != v.arc_id) a 
 
-			WHERE a.arc_id = rpt_inp_arc.arc_id AND result_id  = result_id_var;
+			WHERE a.arc_id = temp_arc.arc_id;
 	
 	RETURN 1;
 		

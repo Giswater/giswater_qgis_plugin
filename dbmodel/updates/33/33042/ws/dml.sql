@@ -68,7 +68,7 @@ DELETE FROM audit_cat_param_user WHERE id = 'inp_options_debug';
 INSERT INTO audit_cat_param_user (id, formname, descript, sys_role_id, label, isenabled, project_type, isparent , isautoupdate, datatype, widgettype,
 vdefault,ismandatory, isdeprecated) VALUES 
 ('inp_options_debug', 'hidden_value', 'Additional settings for go2epa', 'role_epa', 'Additional settings for go2epa', true, 'ws', false, false, 'text', 'linetext', 
-'{"showLog":false, "onlyExport":false, "setDemand":true, "checkData":true, "checkNetwork":true, "checkResult":true, "onlyIsOperative":true, "delDisconnNetwork":true}',
+'{"showLog":false, "onlyExport":false, "setDemand":true, "checkData":true, "checkNetwork":true, "checkResult":true, "onlyIsOperative":true, "delDisconnNetwork":false}',
 true, false);
 
 

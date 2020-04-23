@@ -14,7 +14,7 @@ RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"data":{ "resultId":"r1", "useNetworkGeom":"false"}}$$)
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"data":{ "resultId":"z1", "useNetworkGeom":"false"}}$$)
 
 delete from SCHEMA_NAME.rpt_cat_result
 
@@ -143,7 +143,7 @@ BEGIN
 			IF v_response = 0 THEN
 				v_message = concat ('INFO: vnodes over nodarcs have been checked without any inconsistency. In terms of vnode/nodarc topological relation network is ok');
 			ELSE
-				v_message = concat ('WARNING: vnodes over nodarcs have been checked. In order to keep inlet floSCHEMA_NAME from connecs using vnode_id, ' , 
+				v_message = concat ('WARNING: vnodes over nodarcs have been checked. In order to keep inlet flows from connecs using vnode_id, ' , 
 				v_response, ' nodarc nodes have been renamed using vnode_id');
 			END IF;
 		ELSE
@@ -164,11 +164,12 @@ BEGIN
 			PERFORM gw_fct_pg2epa_vdefault(v_input);
 		END IF;
 
-		RAISE NOTICE '11 - Set cero on elevation those have null values in spite of previous processes (profilactic issue in order to do not crash the epanet file)';
-		UPDATE rpt_inp_node SET elevation = 0 WHERE elevation IS NULL AND result_id=v_result;
+		RAISE NOTICE '11 - Set ceros';
+		UPDATE temp_node SET elevation = 0 WHERE elevation IS NULL;
+		UPDATE temp_node SET addparam = replace (addparam, '""','null');
 		
 		RAISE NOTICE '12 - Set length > 0.05 when length is 0';
-		UPDATE rpt_inp_arc SET length=0.05 WHERE length=0 AND result_id=v_result;
+		UPDATE temp_arc SET length=0.05 WHERE length=0;
 		
 		RAISE NOTICE '13 - Check result network';
 		IF v_checknetwork THEN
@@ -177,14 +178,14 @@ BEGIN
 		
 		IF v_delnetwork THEN
 			RAISE NOTICE '14 - delete disconnected arcs with associated nodes';
-			DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user) and result_id = v_result;
-			DELETE FROM rpt_inp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=39 AND cur_user=current_user) and result_id = v_result;
+			DELETE FROM temp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user);
+			DELETE FROM temp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=39 AND cur_user=current_user);
 			
 			RAISE NOTICE '15 - delete orphan nodes';
-			DELETE FROM rpt_inp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=7 AND cur_user=current_user) AND result_id=v_result;
+			DELETE FROM temp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=7 AND cur_user=current_user);
 
 			RAISE NOTICE '16 delete arcs without extremal nodes';
-			DELETE FROM rpt_inp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=3 AND cur_user=current_user) AND result_id=v_result;		
+			DELETE FROM temp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=3 AND cur_user=current_user);		
 		END IF;
 
 	END IF;
@@ -208,7 +209,13 @@ BEGIN
 	RAISE NOTICE '21 - check result previous exportation';
 	SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return ;
 
-	RAISE NOTICE '22 - Create the inp file structure';	
+	RAISE NOTICE '22 - Move from temp tables';
+	UPDATE temp_arc SET result_id  = v_result;
+	UPDATE temp_node SET result_id  = v_result;
+	INSERT INTO rpt_inp_arc SELECT * FROM temp_arc;
+	INSERT INTO rpt_inp_node SELECT * FROM temp_node;
+
+	RAISE NOTICE '23 - Create the inp file structure';	
 	SELECT gw_fct_pg2epa_export_inp(v_result, null) INTO v_file;
 	
 	-- manage return message

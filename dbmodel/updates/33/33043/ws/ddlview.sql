@@ -41,17 +41,54 @@ CREATE OR REPLACE VIEW vi_reservoirs AS
   AND rpt_inp_node.result_id::text = inp_selector_result.result_id::text 
   AND inp_selector_result.cur_user = "current_user"()::text;
 
+drop VIEW if exists vi_curves;
+drop VIEW if exists vi_tanks;
 CREATE OR REPLACE VIEW vi_tanks AS 
  SELECT rpt_inp_node.node_id,
     rpt_inp_node.elevation,
-    (rpt_inp_node.addparam::json ->> 'initlevel'::text)::numeric AS initlevel,
-    (rpt_inp_node.addparam::json ->> 'minlevel'::text)::numeric AS minlevel,
-    (rpt_inp_node.addparam::json ->> 'maxlevel'::text)::numeric AS maxlevel,
-    (rpt_inp_node.addparam::json ->> 'diameter'::text)::numeric AS diameter,
-    (rpt_inp_node.addparam::json ->> 'minvol'::text)::numeric AS minvol,
+    cast((rpt_inp_node.addparam::json ->> 'initlevel'::text) as numeric) AS initlevel,
+    cast((rpt_inp_node.addparam::json ->> 'minlevel'::text) as numeric) AS minlevel,
+    cast((rpt_inp_node.addparam::json ->> 'maxlevel'::text) as numeric) AS maxlevel,
+    cast((rpt_inp_node.addparam::json ->> 'diameter'::text) as numeric) AS diameter,
+    cast((rpt_inp_node.addparam::json ->> 'minvol'::text) as numeric) AS minvol,
     replace(rpt_inp_node.addparam::json ->> 'curve_id'::text, ''::text, NULL::text) AS curve_id
    FROM inp_selector_result, rpt_inp_node
   WHERE rpt_inp_node.result_id::text = inp_selector_result.result_id::text 
   AND rpt_inp_node.epa_type::text = 'TANK'::text 
-  AND inp_selector_result.cur_user = "current_user"()::text
+  AND inp_selector_result.cur_user = "current_user"()::text;
+
+
+
+CREATE OR REPLACE VIEW vi_curves AS 
+ SELECT
+        CASE
+            WHEN a.x_value IS NULL THEN a.curve_type::character varying(16)
+            ELSE a.curve_id
+        END AS curve_id,
+    a.x_value::numeric(12,4) AS x_value,
+    a.y_value::numeric(12,4) AS y_value,
+    NULL::text AS other
+   FROM ( SELECT DISTINCT ON (inp_curve.curve_id) ( SELECT min(sub.id) AS min
+                   FROM inp_curve sub
+                  WHERE sub.curve_id::text = inp_curve.curve_id::text) AS id,
+            inp_curve.curve_id,
+            concat(';', inp_curve_id.curve_type, ':', inp_curve_id.descript) AS curve_type,
+            NULL::numeric AS x_value,
+            NULL::numeric AS y_value
+           FROM inp_curve_id
+             JOIN inp_curve ON inp_curve.curve_id::text = inp_curve_id.id::text
+        UNION
+         SELECT inp_curve.id,
+            inp_curve.curve_id,
+            inp_curve_id.curve_type,
+            inp_curve.x_value,
+            inp_curve.y_value
+           FROM inp_curve
+             JOIN inp_curve_id ON inp_curve.curve_id::text = inp_curve_id.id::text
+  ORDER BY 1, 4 DESC) a
+  WHERE 	((a.curve_id::text IN (SELECT vi_tanks.curve_id::text FROM vi_tanks)) 
+		OR (concat('HEAD ', a.curve_id) IN ( SELECT vi_pumps.head FROM vi_pumps)) 
+		OR (concat('GPV ', a.curve_id) IN ( SELECT vi_valves.setting FROM vi_valves)) 
+		OR (a.curve_id::text IN ( SELECT vi_energy.energyvalue FROM vi_energy WHERE vi_energy.idval::text = 'EFFIC'::text)))
+		OR (SELECT value FROM config_param_user WHERE parameter = 'inp_options_buildup_mode' and cur_user=current_user)::integer = 1;
 

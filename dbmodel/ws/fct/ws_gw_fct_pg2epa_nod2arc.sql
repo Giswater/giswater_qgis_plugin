@@ -24,6 +24,9 @@ v_arcsearchnodes float;
 v_nodarc_min float;
 v_query_number text;
 v_node record;
+v_offset integer = 0;
+v_limit integer = 5000;
+v_count integer = 0;
 
 BEGIN
 
@@ -31,7 +34,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	--  Looking for nodarc values
-	SELECT min(st_length(the_geom)) FROM rpt_inp_arc JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_arc.sector_id WHERE result_id=result_id_var
+	SELECT min(st_length(the_geom)) FROM temp_arc JOIN inp_selector_sector ON inp_selector_sector.sector_id=temp_arc.sector_id
 		INTO v_nodarc_min;
 
 	v_nod2arc := (SELECT value::float FROM config_param_user WHERE parameter = 'inp_options_nodarc_length' and cur_user=current_user limit 1)::float;
@@ -51,13 +54,12 @@ BEGIN
 							UNION ALL SELECT node_2 FROM v_edit_arc) a using (node_id) group by n.node_id';
 
 	-- query text to make easy later sql senteces (in function of all nod2arcs have been choosed or not)
-	v_querytext = 'SELECT a.*, inp_valve.to_arc FROM rpt_inp_node a JOIN inp_valve ON a.node_id=inp_valve.node_id WHERE result_id='||quote_literal(result_id_var)||' 
+	v_querytext = 'SELECT a.*, inp_valve.to_arc FROM temp_node a JOIN inp_valve ON a.node_id=inp_valve.node_id  
 				UNION  
-				SELECT a.*, inp_pump.to_arc FROM rpt_inp_node a JOIN inp_pump ON a.node_id=inp_pump.node_id WHERE result_id='||quote_literal(result_id_var);
+				SELECT a.*, inp_pump.to_arc FROM temp_node a JOIN inp_pump ON a.node_id=inp_pump.node_id';
 				
 	IF p_only_mandatory_nodarc IS FALSE THEN
-		v_querytext = concat(v_querytext , ' UNION SELECT a.*, inp_shortpipe.to_arc FROM rpt_inp_node a JOIN inp_shortpipe ON a.node_id=inp_shortpipe.node_id
-		WHERE result_id ='||quote_literal(result_id_var));
+		v_querytext = concat(v_querytext , ' UNION SELECT a.*, inp_shortpipe.to_arc FROM temp_node a JOIN inp_shortpipe ON a.node_id=inp_shortpipe.node_id');
 	END IF;
 
 	v_querytext = concat (' INSERT INTO anl_node (num_arcs, arc_id, node_id, elevation, elev, nodecat_id, sector_id, state, state_type, descript, arc_distance, the_geom, fprocesscat_id, cur_user)
@@ -69,9 +71,9 @@ BEGIN
 		INSERT INTO anl_node (num_arcs, arc_id, node_id, elevation, elev, nodecat_id, sector_id, state, state_type, descript, arc_distance, the_geom, fprocesscat_id, cur_user)
 		SELECT c.numarcs, to_arc, b.node_id, elevation, elev, nodecat_id, sector_id, state, state_type, annotation, demand, the_geom, 124, current_user 
 		FROM ( 
-			SELECT a.*, inp_valve.to_arc FROM rpt_inp_node a JOIN inp_valve ON a.node_id=inp_valve.node_id 
+			SELECT a.*, inp_valve.to_arc FROM temp_node a JOIN inp_valve ON a.node_id=inp_valve.node_id 
 			UNION  
-			SELECT a.*, inp_pump.to_arc FROM rpt_inp_node a JOIN inp_pump ON a.node_id=inp_pump.node_id
+			SELECT a.*, inp_pump.to_arc FROM temp_node a JOIN inp_pump ON a.node_id=inp_pump.node_id
 			) b 
 			JOIN ( SELECT count(*)as numarcs, node_id FROM node n JOIN 
 					(SELECT node_1 as node_id FROM v_edit_arc 
@@ -79,60 +81,80 @@ BEGIN
 */
 
 	RAISE NOTICE ' reverse geometries when node acts as node1 from arc but must be node2';
-	EXECUTE 'UPDATE rpt_inp_arc SET the_geom = st_reverse(the_geom) , node_1 = node_2 , node_2 = node_1 WHERE arc_id IN (SELECT arc_id FROM (
+	EXECUTE 'UPDATE temp_arc SET the_geom = st_reverse(the_geom) , node_1 = node_2 , node_2 = node_1 WHERE arc_id IN (SELECT arc_id FROM (
 		SELECT c.arc_id, n.node_id, n.arc_id as to_arc
-		FROM rpt_inp_arc c JOIN anl_node n ON node_1 = node_id
+		FROM temp_arc c JOIN anl_node n ON node_1 = node_id
 		WHERE c.arc_id != n.arc_id AND n.arc_id IS NOT NULL
 		AND fprocesscat_id  = 124 AND cur_user = current_user)b )';
 
 	RAISE NOTICE ' reverse geometries when node acts as node2 from arc but must be node1';
-	EXECUTE 'UPDATE rpt_inp_arc SET the_geom = st_reverse(the_geom) , node_1 = node_2 , node_2 = node_1 WHERE arc_id IN (SELECT arc_id FROM (
+	EXECUTE 'UPDATE temp_arc SET the_geom = st_reverse(the_geom) , node_1 = node_2 , node_2 = node_1 WHERE arc_id IN (SELECT arc_id FROM (
 		SELECT c.arc_id, n.node_id , n.arc_id as to_arc
-		FROM rpt_inp_arc c JOIN anl_node n ON node_2 = node_id
+		FROM temp_arc c JOIN anl_node n ON node_2 = node_id
 		WHERE c.arc_id = n.arc_id AND n.arc_id IS NOT NULL
 		AND fprocesscat_id  = 124 AND cur_user = current_user )b )';
 
-	RAISE NOTICE 'new nodes when numarcs = 1';
-	EXECUTE 'INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, 
-			nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, 
-			the_geom, nodeparent, arcposition) 
-			WITH querytext AS (SELECT node_id, num_arcs, elevation, elev, nodecat_id,state, state_type, descript, 
-			arc_distance, the_geom FROM anl_node WHERE fprocesscat_id = 124 AND cur_user = current_user)
-			SELECT c.result_id, concat(n.node_id, ''_n2a_1'') as node_id, elevation, elev, ''NODE2ARC'',
-			nodecat_id, ''JUNCTION'', c.sector_id, n.state, n.state_type, n.descript as annotation, arc_distance as demand,
-			ST_LineInterpolatePoint (c.the_geom, ('||0.5*v_nod2arc||'/length)) AS the_geom,
-			n.node_id,
-			3
-			FROM rpt_inp_arc c JOIN querytext n ON node_1 = node_id
-			WHERE n.num_arcs = 1 AND c.result_id = '||quote_literal(result_id_var)||'
-		UNION
-			SELECT c.result_id, concat(n.node_id, ''_n2a_2'') as node_id, elevation, elev, ''NODE2ARC'', 
-			nodecat_id, ''JUNCTION'', c.sector_id, n.state, n.state_type, n.descript as annotation, arc_distance as demand,
-			ST_LineInterpolatePoint (c.the_geom, (1 - '||0.5*v_nod2arc||'/length)) AS the_geom,
-			n.node_id,
-			4
-			FROM rpt_inp_arc c JOIN querytext n ON node_2 = node_id
-			WHERE n.num_arcs = 1 AND c.result_id = '||quote_literal(result_id_var)||'
-		UNION
-			SELECT c.result_id, concat(n.node_id, ''_n2a_2'') as node_id, elevation, elev, ''NODE2ARC'', 
-			nodecat_id, ''JUNCTION'', c.sector_id, n.state, n.state_type, n.descript as annotation, arc_distance as demand,
-			ST_startpoint(c.the_geom) AS the_geom,
-			n.node_id,
-			4
-			FROM rpt_inp_arc c JOIN querytext n ON node_1 = node_id
-			WHERE n.num_arcs = 1 AND c.result_id = '||quote_literal(result_id_var)||'
-		UNION
-			SELECT c.result_id, concat(n.node_id, ''_n2a_1'') as node_id, elevation, elev, ''NODE2ARC'', 
-			nodecat_id, ''JUNCTION'', c.sector_id, n.state, n.state_type, n.descript as annotation, arc_distance as demand,
-			ST_endpoint(c.the_geom) AS the_geom,
-			n.node_id,
-			3
-			FROM rpt_inp_arc c JOIN querytext n ON node_2 = node_id
-			WHERE n.num_arcs = 1 AND c.result_id = '||quote_literal(result_id_var);
 
-	RAISE NOTICE 'new nodes when numarcs = 2';
-	
-	EXECUTE 'INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, 
+	RAISE NOTICE 'new nodes when numarcs = 1 (1)';
+	EXECUTE 'INSERT INTO temp_node (result_id, node_id, elevation, elev, node_type, 
+		nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, 
+		the_geom, nodeparent, arcposition) 
+		WITH querytext AS (SELECT node_id, num_arcs, elevation, elev, nodecat_id,state, state_type, descript, 
+		arc_distance, the_geom FROM anl_node WHERE fprocesscat_id = 124 AND cur_user = current_user)
+		SELECT c.result_id, concat(n.node_id, ''_n2a_1'') as node_id, elevation, elev, ''NODE2ARC'',
+		nodecat_id, ''JUNCTION'', c.sector_id, n.state, n.state_type, n.descript as annotation, arc_distance as demand,
+		ST_LineInterpolatePoint (c.the_geom, ('||0.5*v_nod2arc||'/length)) AS the_geom,
+		n.node_id,
+		3
+		FROM temp_arc c LEFT JOIN querytext n ON node_1 = node_id
+		WHERE n.num_arcs = 1';
+
+	RAISE NOTICE 'new nodes when numarcs = 1 (2)';
+	EXECUTE 'INSERT INTO temp_node (result_id, node_id, elevation, elev, node_type, 
+		nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, 
+		the_geom, nodeparent, arcposition) 
+		WITH querytext AS (SELECT node_id, num_arcs, elevation, elev, nodecat_id,state, state_type, descript, 
+		arc_distance, the_geom FROM anl_node WHERE fprocesscat_id = 124 AND cur_user = current_user)
+		SELECT c.result_id, concat(n.node_id, ''_n2a_2'') as node_id, elevation, elev, ''NODE2ARC'', 
+		nodecat_id, ''JUNCTION'', c.sector_id, n.state, n.state_type, n.descript as annotation, arc_distance as demand,
+		ST_LineInterpolatePoint (c.the_geom, (1 - '||0.5*v_nod2arc||'/length)) AS the_geom,
+		n.node_id,
+		4
+		FROM temp_arc c LEFT JOIN querytext n ON node_2 = node_id
+		WHERE n.num_arcs = 1';
+
+	RAISE NOTICE 'new nodes when numarcs = 1 (3)';
+	EXECUTE 'INSERT INTO temp_node (result_id, node_id, elevation, elev, node_type, 
+		nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, 
+		the_geom, nodeparent, arcposition) 
+		WITH querytext AS (SELECT node_id, num_arcs, elevation, elev, nodecat_id,state, state_type, descript, 
+		arc_distance, the_geom FROM anl_node WHERE fprocesscat_id = 124 AND cur_user = current_user)
+		SELECT c.result_id, concat(n.node_id, ''_n2a_2'') as node_id, elevation, elev, ''NODE2ARC'', 
+		nodecat_id, ''JUNCTION'', c.sector_id, n.state, n.state_type, n.descript as annotation, arc_distance as demand,
+		ST_startpoint(c.the_geom) AS the_geom,
+		n.node_id,
+		4
+		FROM temp_arc c LEFT JOIN querytext n ON node_1 = node_id
+		WHERE n.num_arcs = 1';
+
+	RAISE NOTICE 'new nodes when numarcs = 1 (4)';
+	EXECUTE 'INSERT INTO temp_node (result_id, node_id, elevation, elev, node_type, 
+		nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, 
+		the_geom, nodeparent, arcposition) 
+		WITH querytext AS (SELECT node_id, num_arcs, elevation, elev, nodecat_id,state, state_type, descript, 
+		arc_distance, the_geom FROM anl_node WHERE fprocesscat_id = 124 AND cur_user = current_user)
+		SELECT c.result_id, concat(n.node_id, ''_n2a_1'') as node_id, elevation, elev, ''NODE2ARC'', 
+		nodecat_id, ''JUNCTION'', c.sector_id, n.state, n.state_type, n.descript as annotation, arc_distance as demand,
+		ST_endpoint(c.the_geom) AS the_geom,
+		n.node_id,
+		3
+		FROM temp_arc c LEFT JOIN querytext n ON node_2 = node_id
+		WHERE n.num_arcs = 1';
+
+
+
+	RAISE NOTICE 'new nodes when numarcs = 2 (1)';
+	EXECUTE 'INSERT INTO temp_node (result_id, node_id, elevation, elev, node_type, 
 		nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, 
 		the_geom, nodeparent, arcposition) 
 		WITH querytext AS (SELECT node_id, num_arcs, elevation, elev, nodecat_id,state, state_type, descript, 
@@ -143,36 +165,42 @@ BEGIN
 		ST_LineInterpolatePoint (c.the_geom, ('||0.5*v_nod2arc||'/length)) AS the_geom,
 		n.node_id,
 		1
-		FROM rpt_inp_arc c JOIN querytext n ON node_1 = node_id
-		WHERE n.num_arcs = 2 AND c.result_id = '||quote_literal(result_id_var)||'
-		UNION
+		FROM temp_arc c LEFT JOIN querytext n ON node_1 = node_id
+		WHERE n.num_arcs = 2';
+
+	RAISE NOTICE 'new nodes when numarcs = 2 (2)';
+	EXECUTE 'INSERT INTO temp_node (result_id, node_id, elevation, elev, node_type, 
+		nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, 
+		the_geom, nodeparent, arcposition) 
+		WITH querytext AS (SELECT node_id, num_arcs, elevation, elev, nodecat_id,state, state_type, descript, 
+		arc_distance, the_geom FROM anl_node WHERE fprocesscat_id = 124 AND cur_user = current_user)		
 		SELECT c.result_id, concat(n.node_id, ''_n2a_2'') as node_id, elevation, elev, ''NODE2ARC'', 
 		nodecat_id, ''JUNCTION'', c.sector_id, n.state, n.state_type, n.descript as annotation, arc_distance as demand,
 		ST_LineInterpolatePoint (c.the_geom, (1 - '||0.5*v_nod2arc||'/length)) AS the_geom,
 		n.node_id,
 		2
-		FROM rpt_inp_arc c JOIN querytext n ON node_2 = node_id
-		WHERE n.num_arcs = 2 AND c.result_id = '||quote_literal(result_id_var);
+		FROM temp_arc c LEFT JOIN querytext n ON node_2 = node_id
+		WHERE n.num_arcs = 2 ';
 
 
 	RAISE NOTICE ' Fix all that nodarcs without to_arc informed, because extremal nodes may appear two times as node_1';
-	FOR v_node IN SELECT count(*), node_id FROM rpt_inp_node where result_id = result_id_var AND substring(reverse(node_id),0,2) = '1' group by node_id having count(*) > 1 order by 1 desc
+	FOR v_node IN SELECT count(*), node_id FROM temp_node WHERE substring(reverse(node_id),0,2) = '1' group by node_id having count(*) > 1 order by 1 desc
 	LOOP
-		UPDATE rpt_inp_node SET node_id = concat(reverse(substring(reverse(v_node.node_id),2,99)),'2'), arcposition = 2
-		WHERE id IN (SELECT id FROM rpt_inp_node WHERE node_id = v_node.node_id AND result_id = result_id_var LIMIT 1);
+		UPDATE temp_node SET node_id = concat(reverse(substring(reverse(v_node.node_id),2,99)),'2'), arcposition = 2
+		WHERE id IN (SELECT id FROM temp_node WHERE node_id = v_node.node_id LIMIT 1);
 	END LOOP;
 
 	RAISE NOTICE ' Fix all that nodarcs without to_arc informed, because extremal nodes may appear two times as node_2';
-	FOR v_node IN SELECT count(*), node_id FROM rpt_inp_node where result_id = result_id_var AND substring(reverse(node_id),0,2) = '2' group by node_id having count(*) > 1 order by 1 desc
+	FOR v_node IN SELECT count(*), node_id FROM temp_node where substring(reverse(node_id),0,2) = '2' group by node_id having count(*) > 1 order by 1 desc
 	LOOP
-		UPDATE rpt_inp_node SET node_id = concat(reverse(substring(reverse(v_node.node_id),2,99)),'1'), arcposition = 1
-		WHERE id IN (SELECT id FROM rpt_inp_node WHERE node_id = v_node.node_id AND result_id = result_id_var LIMIT 1);
+		UPDATE temp_node SET node_id = concat(reverse(substring(reverse(v_node.node_id),2,99)),'1'), arcposition = 1
+		WHERE id IN (SELECT id FROM temp_node WHERE node_id = v_node.node_id LIMIT 1);
 	END LOOP;
 
 	RAISE NOTICE 'new arcs when numarcs = 1';
-	EXECUTE 'INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, expl_id, state, state_type, diameter, roughness, annotation, length,
+	EXECUTE 'INSERT INTO temp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, expl_id, state, state_type, diameter, roughness, annotation, length,
 		status, the_geom, minorloss, addparam)
-			WITH result AS (SELECT * FROM rpt_inp_node WHERE result_id = '||quote_literal(result_id_var)||')
+			WITH result AS (SELECT * FROM temp_node)
 			SELECT DISTINCT ON (a.nodeparent)
 			a.result_id,
 			concat (a.nodeparent, ''_n2a'') as arc_id,
@@ -198,12 +226,16 @@ BEGIN
 				JOIN result c ON c.node_id = b.nodeparent
 				WHERE a.nodeparent = b.nodeparent AND a.arcposition = 3 AND b.arcposition = 4';
 					
-	
-	RAISE NOTICE 'new arcs when numarcs = 2';
-	EXECUTE 'INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, expl_id, state, state_type, diameter, roughness, annotation, length, 
+	LOOP
+
+		v_offset  = v_offset + v_limit;
+		v_count = (SELECT count(*) FROM  temp_node);
+			
+		RAISE NOTICE 'new arcs when numarcs = 2 ( % )', v_offset;
+		EXECUTE 'INSERT INTO temp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, expl_id, state, state_type, diameter, roughness, annotation, length, 
 			status, the_geom, minorloss, addparam)
 
-			WITH result AS (SELECT * FROM rpt_inp_node WHERE result_id = '||quote_literal(result_id_var)||')
+			WITH result AS (SELECT * FROM temp_node LIMIT '||v_limit||' OFFSET '||v_offset||')
 			SELECT DISTINCT ON (a.nodeparent)
 			a.result_id,
 			concat (a.nodeparent, ''_n2a'') as arc_id,
@@ -228,23 +260,24 @@ BEGIN
 				result b
 				JOIN result c ON c.node_id = b.nodeparent
 				WHERE a.nodeparent = b.nodeparent AND a.arcposition = 1 AND b.arcposition = 2';
+				
+		EXIT WHEN v_count < v_offset + v_limit;
 
+	END LOOP;
 
 	RAISE NOTICE ' update geometries and node_1';
-	EXECUTE 'UPDATE rpt_inp_arc SET the_geom = ST_linesubstring(rpt_inp_arc.the_geom, ('||0.5*v_nod2arc||' / length) , 1), node_1 = concat(node_1, ''_n2a_1'') 
-			FROM anl_node n WHERE n.node_id = node_1 AND fprocesscat_id  = 124 and cur_user = current_user
-			AND rpt_inp_arc.result_id = '||quote_literal(result_id_var);
+	EXECUTE 'UPDATE temp_arc SET the_geom = ST_linesubstring(temp_arc.the_geom, ('||0.5*v_nod2arc||' / length) , 1), node_1 = concat(node_1, ''_n2a_1'') 
+			FROM anl_node n WHERE n.node_id = node_1 AND fprocesscat_id  = 124 and cur_user = current_user';
 
 	RAISE NOTICE ' update geometries and node_2';
-	EXECUTE 'UPDATE rpt_inp_arc SET the_geom = ST_linesubstring(rpt_inp_arc.the_geom, 0, ( 1 - '||0.5*v_nod2arc||' / length)), node_2 = concat(node_2, ''_n2a_2'') 
-			FROM anl_node n WHERE n.node_id = node_2 AND fprocesscat_id  = 124 and cur_user = current_user
-			AND rpt_inp_arc.result_id = '||quote_literal(result_id_var);
+	EXECUTE 'UPDATE temp_arc SET the_geom = ST_linesubstring(temp_arc.the_geom, 0, ( 1 - '||0.5*v_nod2arc||' / length)), node_2 = concat(node_2, ''_n2a_2'') 
+			FROM anl_node n WHERE n.node_id = node_2 AND fprocesscat_id  = 124 and cur_user = current_user';
 
 	RAISE NOTICE ' Deleting old node from node table';
-	EXECUTE ' UPDATE rpt_inp_node SET epa_type =''NODE2DELETE'' FROM (SELECT node_id FROM  anl_node a WHERE fprocesscat_id  = 124 and cur_user = current_user ) b
-					WHERE rpt_inp_node.node_id = b.node_id AND result_id = '||quote_literal(result_id_var);
+	EXECUTE ' UPDATE temp_node SET epa_type =''NODE2DELETE'' FROM (SELECT node_id FROM  anl_node a WHERE fprocesscat_id  = 124 and cur_user = current_user ) b 
+		  WHERE b.node_id  = temp_node.node_id';
 
-	EXECUTE ' DELETE FROM rpt_inp_node WHERE epa_type =''NODE2DELETE'' AND result_id = '||quote_literal(result_id_var);
+	EXECUTE ' DELETE FROM temp_node WHERE epa_type =''NODE2DELETE''';
 
 	RETURN 1;
 		

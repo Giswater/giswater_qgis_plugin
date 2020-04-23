@@ -48,10 +48,10 @@ BEGIN
     RAISE NOTICE 'Starting additional pumps process.';
 	
 --  Loop for pumping stations
-    FOR node_id_aux IN (SELECT DISTINCT node_id FROM inp_pump_additional JOIN rpt_inp_arc ON concat(node_id,'_n2a')=arc_id WHERE result_id=result_id_var)
+    FOR node_id_aux IN (SELECT DISTINCT node_id FROM inp_pump_additional JOIN temp_arc ON concat(node_id,'_n2a')=arc_id)
     LOOP
 
-	SELECT * INTO arc_rec FROM rpt_inp_arc WHERE arc_id=concat(node_id_aux,'_n2a') AND result_id=result_id_var;
+	SELECT * INTO arc_rec FROM temp_arc WHERE arc_id=concat(node_id_aux,'_n2a');
 	
 --  	Loop for additional pumps
 	FOR pump_rec IN SELECT * FROM inp_pump_additional WHERE node_id=node_id_aux
@@ -106,9 +106,9 @@ BEGIN
 				     arc_rec.addparam::json->>'to_arc','", "energyparam":"',pump_rec.energyparam,'","energyvalue":"',pump_rec.energyvalue,'","pump_type":"',
 				     arc_rec.addparam::json->>'pump_type','"}');	
 
-		-- Inserting into rpt_inp_arc
-		INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, epa_type, sector_id, arccat_id, state, state_type, status, the_geom, expl_id, flw_code, addparam, length, diameter, roughness) 
-		VALUES (result_id_var, record_new_arc.arc_id, record_new_arc.node_1, record_new_arc.node_2, 'NODE2ARC', record_new_arc.epa_type, record_new_arc.sector_id, 
+		-- Inserting into temp_arc
+		INSERT INTO temp_arc (arc_id, node_1, node_2, arc_type, epa_type, sector_id, arccat_id, state, state_type, status, the_geom, expl_id, flw_code, addparam, length, diameter, roughness) 
+		VALUES (record_new_arc.arc_id, record_new_arc.node_1, record_new_arc.node_2, 'NODE2ARC', record_new_arc.epa_type, record_new_arc.sector_id, 
 		record_new_arc.arccat_id, record_new_arc.state, arc_rec.state_type, pump_rec.status, record_new_arc.the_geom, arc_rec.expl_id, v_old_arc_id, v_addparam, arc_rec.length, arc_rec.diameter, arc_rec.roughness);			
 	END LOOP;
 

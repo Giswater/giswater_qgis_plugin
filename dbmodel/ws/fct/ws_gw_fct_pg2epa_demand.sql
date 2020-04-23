@@ -45,7 +45,7 @@ BEGIN
 	RAISE NOTICE ' DEMAND TYPE: % PATTERN METHOD: %', v_demandtype, v_patternmethod;
 
 	-- Reset values of inp_rpt table
-	UPDATE rpt_inp_node SET demand=0, pattern_id=null WHERE result_id=result_id_var;
+	UPDATE temp_node SET demand=0, pattern_id=null;
 
 	-- delete previous results on rpt_inp_pattern_value
 	DELETE FROM rpt_inp_pattern_value WHERE result_id=result_id_var;	
@@ -54,37 +54,37 @@ BEGIN
 
 		IF v_patternmethod = 11 THEN -- UNIQUE ESTIMATED (NODE)
 			-- demand & pattern
-			UPDATE rpt_inp_node SET demand=inp_junction.demand, pattern_id = v_uniquepattern
-			FROM inp_junction WHERE rpt_inp_node.node_id=inp_junction.node_id AND result_id=result_id_var;	
+			UPDATE temp_node SET demand=inp_junction.demand, pattern_id = v_uniquepattern
+			FROM inp_junction WHERE temp_node.node_id=inp_junction.node_id;	
 			
 		ELSIF v_patternmethod = 12 THEN -- DMA ESTIMATED (NODE)
 			-- demand
-			UPDATE rpt_inp_node SET demand=inp_junction.demand 
-			FROM inp_junction WHERE rpt_inp_node.node_id=inp_junction.node_id AND result_id=result_id_var;	
+			UPDATE temp_node SET demand=inp_junction.demand 
+			FROM inp_junction WHERE temp_node.node_id=inp_junction.node_id;
 			-- pattern
-			UPDATE rpt_inp_node SET pattern_id=dma.pattern_id 
-			FROM node JOIN dma ON dma.dma_id=node.dma_id WHERE rpt_inp_node.node_id=node.node_id AND result_id=result_id_var;
+			UPDATE temp_node SET pattern_id=dma.pattern_id 
+			FROM node JOIN dma ON dma.dma_id=node.dma_id WHERE temp_node.node_id=node.node_id;
 		
 		ELSIF v_patternmethod = 13 THEN -- NODE ESTIMATED (NODE)
 			-- demand & pattern
-			UPDATE rpt_inp_node SET pattern_id=a.pattern_id, demand = a.demand
-			FROM inp_junction a WHERE rpt_inp_node.node_id=a.node_id AND result_id=result_id_var;
+			UPDATE temp_node SET pattern_id=a.pattern_id, demand = a.demand
+			FROM inp_junction a WHERE temp_node.node_id=a.node_id;
 		END IF;
 
 	ELSIF v_demandtype = 2 THEN -- CONNEC ESTIMATED
 						
 		IF v_patternmethod  = 21 THEN -- UNIQUE ESTIMATED (PJOINT)
 			-- demand & pattern
-			UPDATE rpt_inp_node SET demand=sum::numeric(12,8), pattern_id = v_uniquepattern 
-			FROM vi_pjoint WHERE concat('VN', pjoint_id) = node_id AND result_id=result_id_var;
+			UPDATE temp_node SET demand=sum::numeric(12,8), pattern_id = v_uniquepattern 
+			FROM vi_pjoint WHERE concat('VN', pjoint_id) = node_id;
 
 		ELSIF v_patternmethod  = 22 THEN -- DMA ESTIMATED (PJOINT)
 			-- demand
-			UPDATE rpt_inp_node SET demand=sum::numeric(12,8) 
-			FROM vi_pjoint WHERE concat('VN', pjoint_id) = node_id AND result_id=result_id_var;
+			UPDATE temp_node SET demand=sum::numeric(12,8) 
+			FROM vi_pjoint WHERE concat('VN', pjoint_id) = node_id;
 			-- pattern
-			UPDATE rpt_inp_node SET pattern_id=dma.pattern_id 
-			FROM v_edit_inp_connec JOIN dma USING (dma_id) WHERE rpt_inp_node.node_id=concat('VN',pjoint_id) AND result_id=result_id_var;
+			UPDATE temp_node SET pattern_id=dma.pattern_id 
+			FROM v_edit_inp_connec JOIN dma USING (dma_id) WHERE temp_node.node_id=concat('VN',pjoint_id);
 		
 		ELSIF v_patternmethod = 23 THEN -- CONNEC ESTIMATED (PJOINT)
 			-- demand & pattern			
@@ -100,7 +100,7 @@ BEGIN
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
 				   FROM vi_pjointpattern JOIN node ON pattern_id=node_id ORDER by 3,4;		
 
-			UPDATE rpt_inp_node SET demand = 1, pattern_id=node_id 
+			UPDATE temp_node SET demand = 1, pattern_id=node_id 
 			FROM vi_pjoint WHERE node_id = concat('VN',pjoint_id) AND result_id=result_id_var;
 		END IF;	
 		
@@ -108,9 +108,9 @@ BEGIN
 
 		IF v_patternmethod = 31 THEN -- UNIQUE PERIOD (NODE)
 			-- demand & pattern
-			UPDATE rpt_inp_node SET demand = ((lps_avg*v_epaunits))::numeric(12,8), pattern_id = v_uniquepattern
+			UPDATE temp_node SET demand = ((lps_avg*v_epaunits))::numeric(12,8), pattern_id = v_uniquepattern
 			FROM v_rtc_period_node n JOIN ext_rtc_dma_period d ON n.dma_id=d.dma_id AND n.period_id=d.cat_period_id
-			WHERE n.node_id=rpt_inp_node.node_id AND result_id=result_id_var;	
+			WHERE n.node_id=temp_node.node_id;
 
 		ELSIF v_patternmethod = 32 THEN	-- HYDRO PERIOD (NODE)
 			-- demand & pattern			
@@ -126,14 +126,14 @@ BEGIN
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
 				   FROM v_rtc_period_nodepattern JOIN node ON pattern_id=node_id ORDER by 3,4;
 
-			UPDATE rpt_inp_node SET demand=(1*v_epaunits)::numeric(12,8), pattern_id=node_id
-			FROM v_rtc_period_nodepattern a WHERE node_id = a.pattern_id AND result_id=result_id_var;	
+			UPDATE temp_node SET demand=(1*v_epaunits)::numeric(12,8), pattern_id=node_id
+			FROM v_rtc_period_nodepattern a WHERE node_id = a.pattern_id;
 
 		ELSIF v_patternmethod = 33 THEN	-- UNIQUE PERIOD (PJOINT)
 			-- demand & pattern						
-			UPDATE rpt_inp_node SET demand = ((lps_avg*v_epaunits))::numeric(12,8), pattern_id = v_uniquepattern 
+			UPDATE temp_node SET demand = ((lps_avg*v_epaunits))::numeric(12,8), pattern_id = v_uniquepattern 
 			FROM v_rtc_period_pjoint 
-			WHERE node_id = pjoint_id AND result_id=result_id_var;
+			WHERE node_id = pjoint_id;
 
 		ELSIF v_patternmethod = 34 THEN	-- HYDRO PERIOD (PJOINT)
 			-- demand & pattern			
@@ -149,17 +149,17 @@ BEGIN
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
 				   FROM v_rtc_period_pjointpattern JOIN node ON pattern_id=node_id ORDER by 3,4;
 
-			UPDATE rpt_inp_node SET demand=(1*v_epaunits)::numeric(12,8), pattern_id=node_id 
-			FROM v_rtc_period_pjointpattern a WHERE node_id = a.pattern_id AND result_id=result_id_var;
+			UPDATE temp_node SET demand=(1*v_epaunits)::numeric(12,8), pattern_id=node_id 
+			FROM v_rtc_period_pjointpattern a WHERE node_id = a.pattern_id;
 		END IF;
 
 	ELSIF v_demandtype = 4 THEN  -- DMA EFICIENCY PERIOD (losses as eficiency factor for each dma-period)
 
 		IF v_patternmethod = 41 THEN -- DMA PERIOD (NODE)
 			-- demand & pattern
-			UPDATE rpt_inp_node SET demand=((lps_avg*v_epaunits)/d.effc)::numeric(12,8), pattern_id = d.pattern_id
+			UPDATE temp_node SET demand=((lps_avg*v_epaunits)/d.effc)::numeric(12,8), pattern_id = d.pattern_id
 			FROM v_rtc_period_node n JOIN ext_rtc_dma_period d ON n.dma_id=d.dma_id AND n.period_id=d.cat_period_id
-			WHERE n.node_id=rpt_inp_node.node_id AND result_id=result_id_var;		
+			WHERE n.node_id=temp_node.node_id;
 
 		ELSIF v_patternmethod = 42 THEN	-- HYDRO PERIOD (NODE)
 			-- demand & pattern			
@@ -170,14 +170,14 @@ BEGIN
 				factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18
 				FROM v_rtc_period_nodepattern JOIN node ON pattern_id=node_id ORDER by 3,4;
 
-			UPDATE rpt_inp_node SET demand = ((1*v_epaunits))::numeric(12,8), pattern_id = node_id 
-			FROM v_rtc_period_nodepattern a WHERE node_id = a.pattern_id AND result_id=result_id_var;	
+			UPDATE temp_node SET demand = ((1*v_epaunits))::numeric(12,8), pattern_id = node_id 
+			FROM v_rtc_period_nodepattern a WHERE node_id = a.pattern_id;
 							 
 		ELSIF v_patternmethod = 43 THEN	-- DMA PERIOD (PJOINT)
 			-- demand & pattern						
-			UPDATE rpt_inp_node SET demand = ((lps_avg*v_epaunits)/v.effc)::numeric(12,8), pattern_id = t.pattern_id 
+			UPDATE temp_node SET demand = ((lps_avg*v_epaunits)/v.effc)::numeric(12,8), pattern_id = t.pattern_id 
 			FROM v_rtc_period_pjoint v, ext_rtc_dma_period t WHERE v.dma_id = t.dma_id AND v.period_id = t.cat_period_id
-			AND node_id = pjoint_id AND result_id=result_id_var;		
+			AND node_id = pjoint_id;
 
 		ELSIF v_patternmethod = 44 THEN -- HYDRO PERIOD (PJOINT)
 			-- demand & pattern			
@@ -193,8 +193,8 @@ BEGIN
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
 				   FROM v_rtc_period_pjointpattern JOIN node ON pattern_id=node_id ORDER by 3,4;
 
-			UPDATE rpt_inp_node SET demand = ((1*v_epaunits)), pattern_id=node_id 
-			FROM v_rtc_period_pjointpattern a WHERE node_id = a.pattern_id AND result_id=result_id_var;	
+			UPDATE temp_node SET demand = ((1*v_epaunits)), pattern_id=node_id 
+			FROM v_rtc_period_pjointpattern a WHERE node_id = a.pattern_id;
 		END IF;
 	
 	ELSIF v_demandtype = 5	THEN
@@ -215,9 +215,9 @@ BEGIN
 				WHERE ext.cat_period_id = period_id;
 				
 			-- demand & pattern
-			UPDATE rpt_inp_node SET demand=(a.m3_total_period/c.m3_total_period)*v_epaunits::numeric(12,8), pattern_id=c.pattern_id 
+			UPDATE temp_node SET demand=(a.m3_total_period/c.m3_total_period)*v_epaunits::numeric(12,8), pattern_id=c.pattern_id 
 			FROM v_rtc_period_node a JOIN v_rtc_period_dma c ON a.dma_id::integer=c.dma_id
-			WHERE rpt_inp_node.node_id=a.node_id AND result_id = result_id_var;	
+			WHERE temp_node.node_id=a.node_id;
 
 		ELSIF v_patternmethod = 52 THEN	-- HYDRO PERIOD (NODE)
 
@@ -232,7 +232,7 @@ BEGIN
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
 				   FROM v_rtc_period_nodepattern JOIN node ON pattern_id=node_id ORDER by 3,4;
 
-			UPDATE rpt_inp_node SET demand=(1*v_epaunits)::numeric(12,8), pattern_id=node_id WHERE result_id=result_id_var;	
+			UPDATE temp_node SET demand=(1*v_epaunits)::numeric(12,8), pattern_id=node_id;
 
 		ELSIF v_patternmethod = 53 THEN	-- DMA PERIOD (PJOINT)
 
@@ -249,9 +249,9 @@ BEGIN
 				WHERE ext.cat_period_id = period_id;
 				
 			-- demand & pattern
-			UPDATE rpt_inp_node SET demand=(a.m3_total_period*v_epaunits/c.m3_total_period)::numeric(12,8), pattern_id=c.pattern_id 
+			UPDATE temp_node SET demand=(a.m3_total_period*v_epaunits/c.m3_total_period)::numeric(12,8), pattern_id=c.pattern_id 
 			FROM v_rtc_period_pjoint a JOIN v_rtc_period_dma c ON a.dma_id::integer=c.dma_id
-			WHERE rpt_inp_node.node_id=a.pjoint_id AND result_id = result_id_var;	
+			WHERE temp_node.node_id=a.pjoint_id;
 							
 
 		ELSIF v_patternmethod = 54 THEN -- HYDRO PERIOD (PJOINT)
@@ -272,8 +272,8 @@ BEGIN
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
 				   FROM v_rtc_period_pjointpattern JOIN node ON pattern_id=node_id ORDER by 3,4;
 
-			UPDATE rpt_inp_node SET demand=(1*v_epaunits)::numeric(12,8), pattern_id=node_id 
-			WHERE node_id IN (SELECT DISTINCT pattern_id FROM rpt_inp_pattern_value WHERE result_id=result_id_var) AND result_id=result_id_var;
+			UPDATE temp_node SET demand=(1*v_epaunits)::numeric(12,8), pattern_id=node_id 
+			WHERE node_id IN (SELECT DISTINCT pattern_id FROM rpt_inp_pattern_value WHERE result_id=result_id_var);
 	
 		END IF;
 
@@ -360,10 +360,10 @@ BEGIN
 			factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18)
 		SELECT result_id_var, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, 
 			factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18
-			FROM inp_pattern_value WHERE pattern_id IN (SELECT pattern_id FROM rpt_inp_node WHERE result_id = result_id_var);
+			FROM inp_pattern_value WHERE pattern_id IN (SELECT pattern_id FROM temp_node);
 	END IF;
 
-	UPDATE rpt_inp_node SET pattern_id = null WHERE demand = 0 AND result_id = result_id_var;
+	UPDATE rpt_inp_node SET pattern_id = null WHERE demand = 0;
 
 RETURN 0;
 END;

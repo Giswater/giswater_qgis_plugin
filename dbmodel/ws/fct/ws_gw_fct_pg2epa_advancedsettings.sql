@@ -36,23 +36,23 @@ BEGIN
 	SELECT ((value::json->>'junction')::json)->>'baseDemand' INTO v_basedemand FROM config_param_user WHERE parameter = 'inp_options_advancedsettings' AND cur_user=current_user;	
 
 	-- update values for valves
-	UPDATE rpt_inp_arc SET minorloss = (v_valve->>'minorloss')::float WHERE epa_type='VALVE' AND (minorloss = 0 OR minorloss is null) AND result_id  = p_result;
-	UPDATE rpt_inp_arc SET roughness = ((v_valve->>'roughness')::json->>v_headloss)::float	WHERE epa_type='VALVE' AND (roughness = 0 OR roughness is null) AND result_id  = p_result;
-	UPDATE rpt_inp_arc SET length = (v_valve->>'length')::float WHERE epa_type='VALVE' AND result_id  = p_result;
-	UPDATE rpt_inp_arc SET diameter = (v_valve->>'diameter')::float WHERE epa_type='VALVE' AND (diameter = 0 OR diameter is null) AND result_id  = p_result;
+	UPDATE temp_arc SET minorloss = (v_valve->>'minorloss')::float WHERE epa_type='VALVE' AND (minorloss = 0 OR minorloss is null);
+	UPDATE temp_arc SET roughness = ((v_valve->>'roughness')::json->>v_headloss)::float	WHERE epa_type='VALVE' AND (roughness = 0 OR roughness is null);
+	UPDATE temp_arc SET length = (v_valve->>'length')::float WHERE epa_type='VALVE';
+	UPDATE temp_arc SET diameter = (v_valve->>'diameter')::float WHERE epa_type='VALVE' AND (diameter = 0 OR diameter is null);
 	
 	-- update values for reservoirs
-	UPDATE rpt_inp_node SET elevation = elevation + (v_reservoir->>'addElevation')::float WHERE epa_type='RESERVOIR' AND result_id  = p_result;
+	UPDATE temp_node SET elevation = elevation + (v_reservoir->>'addElevation')::float WHERE epa_type='RESERVOIR';
 
 	-- update values for tanks
-	UPDATE rpt_inp_node SET elevation = elevation + (v_tank->>'addElevation')::float WHERE epa_type='TANK' AND result_id  = p_result;
+	UPDATE temp_node SET elevation = elevation + (v_tank->>'addElevation')::float WHERE epa_type='TANK';
 
 	-- update values for pumps
-	UPDATE rpt_inp_arc SET length = (v_pump->>'length')::float, diameter = (v_pump ->>'diameter')::float, roughness = ((v_pump->>'roughness')::json->>v_headloss)::float 
-	WHERE epa_type='PUMP' AND result_id = p_result;
+	UPDATE temp_arc SET length = (v_pump->>'length')::float, diameter = (v_pump ->>'diameter')::float, roughness = ((v_pump->>'roughness')::json->>v_headloss)::float 
+	WHERE epa_type='PUMP';
 
 	IF v_basedemand IS NOT NULL THEN
-		UPDATE rpt_inp_node SET demand = demand + v_basedemand WHERE result_id=result_id_var AND epa_type  = 'JUNCTION';
+		UPDATE temp_node SET demand = demand + v_basedemand WHERE epa_type  = 'JUNCTION';
 	END IF;
 		
     RETURN 1;
