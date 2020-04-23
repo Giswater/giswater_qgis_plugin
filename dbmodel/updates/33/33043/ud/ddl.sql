@@ -11,7 +11,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node_type", "column":"isexitupperintro", "dataType":"int2"}}$$);
 ALTER TABLE node_type ALTER COLUMN isexitupperintro SET DEFAULT 0;
 COMMENT ON TABLE node_type IS 'FIELD isexitupperintro has three values 0-false (by default), 1-true, 2-maybe';
-te
+
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_arc", "column":"q0", "dataType":"float"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_arc", "column":"qmax", "dataType":"float"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_arc", "column":"barrels", "dataType":"integer"}}$$);
@@ -43,7 +43,7 @@ CREATE TABLE temp_arc(
   q0 double precision,
   qmax double precision,
   barrels integer,
-  CONSTRAINT temp_arc_pkey PRIMARY KEY (id);
+  CONSTRAINT temp_arc_pkey PRIMARY KEY (id));
   
   
 CREATE INDEX temp_arc_arc_id

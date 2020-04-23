@@ -50,7 +50,7 @@ BEGIN
 	JOIN inp_selector_sector ON inp_selector_sector.sector_id=temp_node.sector_id
 		UNION 
 	SELECT DISTINCT temp_node.node_id,  to_arc, flwreg_length, 'weir'::text as flw_type FROM inp_flwreg_weir JOIN temp_node ON temp_node.node_id=inp_flwreg_weir.node_id 
-	JOIN inp_selector_sector ON inp_selector_sector.sector_id=temp_node.sector_id
+	JOIN inp_selector_sector ON inp_selector_sector.sector_id=temp_node.sector_id)a
 	GROUP BY node_id, to_arc, flw_type
 	ORDER BY node_id, to_arc
 				

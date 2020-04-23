@@ -12,6 +12,7 @@ DECLARE
    
 v_rainfall text;
 v_isoperative boolean;
+v_statetype text;
 
 BEGIN
 
