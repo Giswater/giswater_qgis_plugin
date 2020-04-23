@@ -64,7 +64,8 @@ class ManArcDialog(ParentDialog):
         self.tbl_element = self.dialog.findChild(QTableView, "tbl_element")   
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document") 
         self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_arc")  
-        self.tbl_relations = self.dialog.findChild(QTableView, "tbl_relations")          
+        self.tbl_relations = self.dialog.findChild(QTableView, "tbl_relations")
+        self.tbl_visit = self.dialog.findChild(QTableView, "tbl_visit_arc")
         state_type = self.dialog.findChild(QComboBox, 'state_type')
         dma_id = self.dialog.findChild(QComboBox, 'dma_id')
 
@@ -310,9 +311,10 @@ class ManArcDialog(ParentDialog):
             
     def fill_tab_om(self):
         """ Fill tab 'O&M' (event) """
-        
-        table_event_arc = "v_ui_om_visit_x_arc"        
-        self.fill_tbl_event(self.tbl_event, self.schema_name + "." + table_event_arc, self.filter)
+
+        table_event_arc = "v_ui_om_visit_x_arc"
+        table_event_arc_dict = {3: "ve_visit_revisio_tram"}
+        self.fill_tbl_event(self.tbl_visit, table_event_arc_dict, self.filter)
         self.tbl_event.doubleClicked.connect(self.open_visit_event)
         self.set_configuration(self.tbl_event, table_event_arc)
         

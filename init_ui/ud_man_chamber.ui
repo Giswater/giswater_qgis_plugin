@@ -996,8 +996,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1544,8 +1544,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2238,8 +2238,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3096,7 +3096,7 @@
        <enum>QFrame::Raised</enum>
       </property>
       <property name="text">
-       <string>Parameter type:</string>
+       <string>Visit class:</string>
       </property>
       <property name="textFormat">
        <enum>Qt::AutoText</enum>
@@ -3128,7 +3128,7 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QComboBox" name="event_type">
+     <widget class="QComboBox" name="cmb_visit_class">
       <property name="geometry">
        <rect>
         <x>270</x>
@@ -3136,39 +3136,6 @@
         <width>145</width>
         <height>18</height>
        </rect>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_event_parameter">
-      <property name="geometry">
-       <rect>
-        <x>420</x>
-        <y>8</y>
-        <width>91</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>8</pointsize>
-       </font>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::NoFrame</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-      <property name="text">
-       <string>Parameter:</string>
-      </property>
-      <property name="textFormat">
-       <enum>Qt::AutoText</enum>
-      </property>
-      <property name="scaledContents">
-       <bool>false</bool>
-      </property>
-      <property name="margin">
-       <number>3</number>
       </property>
      </widget>
      <widget class="QLabel" name="label_data_event_to">
@@ -3240,17 +3207,7 @@
        <number>3</number>
       </property>
      </widget>
-     <widget class="QComboBox" name="event_id">
-      <property name="geometry">
-       <rect>
-        <x>420</x>
-        <y>30</y>
-        <width>145</width>
-        <height>18</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QTableView" name="tbl_event_node">
+     <widget class="QTableView" name="tbl_visit_node">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -3279,8 +3236,8 @@
      <widget class="QPushButton" name="btn_open_gallery">
       <property name="geometry">
        <rect>
-        <x>478</x>
-        <y>70</y>
+        <x>535</x>
+        <y>75</y>
         <width>24</width>
         <height>24</height>
        </rect>
@@ -3294,110 +3251,6 @@
       <property name="icon">
        <iconset>
         <normaloff>../icons/136b.png</normaloff>../icons/136b.png</iconset>
-      </property>
-      <property name="iconSize">
-       <size>
-        <width>22</width>
-        <height>22</height>
-       </size>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_open_visit">
-      <property name="geometry">
-       <rect>
-        <x>13</x>
-        <y>70</y>
-        <width>24</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Visit manager</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="icon">
-       <iconset>
-        <normaloff>../icons/65b.png</normaloff>../icons/65b.png</iconset>
-      </property>
-      <property name="iconSize">
-       <size>
-        <width>22</width>
-        <height>22</height>
-       </size>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_new_visit">
-      <property name="geometry">
-       <rect>
-        <x>45</x>
-        <y>70</y>
-        <width>24</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Add visit</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="icon">
-       <iconset>
-        <normaloff>../icons/64b.png</normaloff>../icons/64b.png</iconset>
-      </property>
-      <property name="iconSize">
-       <size>
-        <width>22</width>
-        <height>22</height>
-       </size>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_open_visit_event">
-      <property name="geometry">
-       <rect>
-        <x>542</x>
-        <y>70</y>
-        <width>24</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Event data&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="icon">
-       <iconset>
-        <normaloff>../icons/134b.png</normaloff>../icons/134b.png</iconset>
-      </property>
-      <property name="iconSize">
-       <size>
-        <width>22</width>
-        <height>22</height>
-       </size>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_open_visit_doc">
-      <property name="geometry">
-       <rect>
-        <x>510</x>
-        <y>70</y>
-        <width>24</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open document&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="icon">
-       <iconset>
-        <normaloff>../icons/170b.png</normaloff>../icons/170b.png</iconset>
       </property>
       <property name="iconSize">
        <size>
@@ -4618,14 +4471,9 @@
   <tabstop>tab_main</tabstop>
   <tabstop>date_event_to</tabstop>
   <tabstop>date_event_from</tabstop>
-  <tabstop>event_type</tabstop>
-  <tabstop>event_id</tabstop>
-  <tabstop>tbl_event_node</tabstop>
+  <tabstop>cmb_visit_class</tabstop>
+  <tabstop>tbl_visit_node</tabstop>
   <tabstop>btn_open_gallery</tabstop>
-  <tabstop>btn_open_visit</tabstop>
-  <tabstop>btn_new_visit</tabstop>
-  <tabstop>btn_open_visit_event</tabstop>
-  <tabstop>btn_open_visit_doc</tabstop>
   <tabstop>date_el_from</tabstop>
   <tabstop>date_el_to</tabstop>
   <tabstop>tab_scada</tabstop>

@@ -1228,8 +1228,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>300</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1965,8 +1965,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>300</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2728,7 +2728,7 @@
      <widget class="QTableView" name="tbl_visit_gully">
       <property name="geometry">
        <rect>
-        <x>7</x>
+        <x>15</x>
         <y>100</y>
         <width>556</width>
         <height>271</height>

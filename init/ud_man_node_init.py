@@ -82,6 +82,7 @@ class ManNodeDialog(ParentDialog):
         self.tbl_scada_value = self.dialog.findChild(QTableView, "tbl_scada_value") 
         self.tbl_costs = self.dialog.findChild(QTableView, "tbl_masterplan")
         self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
+        self.tbl_visit = self.dialog.findChild(QTableView, "tbl_visit_node")
         state_type = self.dialog.findChild(QComboBox, 'state_type')
         dma_id = self.dialog.findChild(QComboBox, 'dma_id')
 
@@ -603,8 +604,9 @@ class ManNodeDialog(ParentDialog):
     def fill_tab_om(self):
         """ Fill tab 'O&M' (event) """
         
-        table_event_node = "v_ui_om_visit_x_node"     
-        self.fill_tbl_event(self.tbl_event, self.schema_name + "." + table_event_node, self.filter)
+        table_event_node = "v_ui_om_visit_x_node"
+        table_event_node_dict = {4: "ve_visit_revisio_unio", 5: "ve_visit_revisio_outfall", 6: "ve_visit_revisio_valve", 7: "ve_visit_revisio_chamger", 8: "ve_visit_revisio_pous", 9: "ve_visit_revisio_inici"}
+        self.fill_tbl_event(self.tbl_visit, table_event_node_dict, self.filter)
         self.tbl_event.doubleClicked.connect(self.open_visit_event)
         self.set_configuration(self.tbl_event, table_event_node)
         

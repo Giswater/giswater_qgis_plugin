@@ -1387,7 +1387,7 @@ class ParentDialog(QDialog):
         # Set model of selected widget
         table_name = str(table_name[utils_giswater.get_item_data(self.dialog, self.cmb_visit_class, 0)])
         self.set_model_to_table(widget, table_name)
-        self.set_configuration(widget, table_name)
+
         self.set_filter_dates('startdate', 'enddate', table_name, self.date_event_from, self.date_event_to)
 
         # Set filter to model
@@ -1401,6 +1401,7 @@ class ParentDialog(QDialog):
         # Refresh model with selected filter
         widget.model().setFilter(expr)
         widget.model().select()
+        self.set_configuration(widget, table_name)
 
 
     def set_filter_table_event2(self, widget):
