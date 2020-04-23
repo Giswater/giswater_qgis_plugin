@@ -121,8 +121,13 @@ BEGIN
 	RAISE NOTICE '11 - check result previous exportation';
 	SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return ;
 	
-	
-	RAISE NOTICE '12 - Create the inp file structure';	
+	RAISE NOTICE '12 - Move from temp tables';
+	UPDATE temp_arc SET result_id  = v_result;
+	UPDATE temp_node SET result_id  = v_result;
+	INSERT INTO rpt_inp_arc SELECT * FROM temp_arc;
+	INSERT INTO rpt_inp_node SELECT * FROM temp_node;
+
+	RAISE NOTICE '13 - Create the inp file structure';	
 	SELECT gw_fct_pg2epa_export_inp(v_result, null) INTO v_file;
 
 	-- manage return message

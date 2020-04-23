@@ -58,11 +58,11 @@ BEGIN
 	UPDATE v_edit_raingage SET scf=(SELECT value FROM config_param_user WHERE parameter='epa_rgage_scf_vdefault' AND cur_user=current_user)::float WHERE scf IS NULL;
 
 	RAISE NOTICE '2 - Set result default values';
-	UPDATE rpt_inp_arc SET q0 = v_q0 WHERE q0 IS NULL AND result_id = v_result;
-	UPDATE rpt_inp_arc SET qmax = v_qmax WHERE qmax IS NULL AND result_id = v_result;
-	UPDATE rpt_inp_arc SET barrels = v_barrels WHERE barrels IS NULL AND result_id = v_result;
-	UPDATE rpt_inp_node SET y0 = v_y0 WHERE y0 IS NULL AND result_id = v_result;
-	UPDATE rpt_inp_node SET ysur = v_ysur WHERE ysur IS NULL AND result_id = v_result;
+	UPDATE temp_arc SET q0 = v_q0 WHERE q0 IS NULL;
+	UPDATE temp_arc SET qmax = v_qmax WHERE qmax IS NULL;
+	UPDATE temp_arc SET barrels = v_barrels WHERE barrels IS NULL;
+	UPDATE temp_node SET y0 = v_y0 WHERE y0 IS NULL;
+	UPDATE temp_node SET ysur = v_ysur WHERE ysur IS NULL;
 	
     RETURN 1;
 
