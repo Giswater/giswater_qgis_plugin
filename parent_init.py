@@ -1350,7 +1350,8 @@ class ParentDialog(QDialog):
         sql = ("SELECT DISTINCT(class_id), om_visit_class.idval"
                " FROM " + self.schema_name + ".v_ui_om_visit_x_" + feature_type.lower() + ""
                " JOIN " + self.schema_name + ".om_visit_class ON om_visit_class.id = v_ui_om_visit_x_" + feature_type.lower() + ".class_id"
-               " WHERE " + feature_key + " IS NOT NULL")
+               " WHERE " + feature_key + " IS NOT NULL AND " + str(feature_key) + " = '" + str(self.id) + "'")
+
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.cmb_visit_class, rows, 1)
 

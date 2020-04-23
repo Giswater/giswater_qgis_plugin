@@ -152,7 +152,7 @@ class ManGullyDialog(ParentDialog):
         """ Fill tab 'O&M' (event) """
         
         table_event_gully = "ve_visit_emb_neteja"
-        table_event_gully_dict = {10: "ve_visit_emb_neteja", 11: "ve_visit_emb_incidencia"}
+        table_event_gully_dict = {2:"ve_visit_revisio_embornal", 10: "ve_visit_emb_neteja", 11: "ve_visit_emb_incidencia"}
         # table_event_gully_dict = {7: "ve_visit_emb_neteja", 6: "ve_visit_emb_incidencia"}
         self.fill_tbl_event(self.tbl_visit, table_event_gully_dict, self.filter)
         self.tbl_visit.doubleClicked.connect(self.open_visit_event)
