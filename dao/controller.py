@@ -5,15 +5,14 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-
 from qgis.core import QgsMessageLog, QgsCredentials, QgsExpressionContextUtils, QgsProject, QgsDataSourceUri
-
-from qgis.PyQt.QtCore import QCoreApplication, QSettings, Qt, QTranslator 
+from qgis.PyQt.QtCore import QCoreApplication, QSettings, Qt, QTranslator
 from qgis.PyQt.QtWidgets import QCheckBox, QLabel, QMessageBox, QPushButton, QTabWidget, QToolBox
 from qgis.PyQt.QtSql import QSqlDatabase
 
-
-import json, os.path
+import configparser
+import json
+import os
 
 from collections import OrderedDict
 from functools import partial
@@ -45,6 +44,8 @@ class DaoController(object):
         self.current_user = None
         self.min_log_level = 20
         self.min_message_level = 0
+        self.user_settings = None
+        self.user_settings_path = None
 
         if create_logger:
             self.set_logger(logger_name)
@@ -157,7 +158,56 @@ class DaoController(object):
         self.logged = True
         return True, not_version
     
-    
+
+    def get_sslmode(self):
+        """ Get sslmode for database connection """
+
+        sslmode = 'disable'
+        if self.user_settings is None:
+            return sslmode
+
+        if not self.user_settings.has_section('system'):
+            self.user_settings.add_section('system')
+            self.user_settings.set('system', 'sslmode', sslmode)
+            self.save_user_settings()
+
+        sslmode = self.user_settings.get('system', 'sslmode').lower()
+        self.log_info(f"get_sslmode: {sslmode}")
+
+        return sslmode
+
+
+    def save_user_settings(self):
+        """ Save user settings file """
+
+        try:
+            with open(self.user_settings_path, 'w') as configfile:
+                self.user_settings.write(configfile)
+                configfile.close()
+        except Exception as e:
+            self.log_warning(str(e))
+
+
+    def manage_user_config_file(self):
+        """ Manage user configuration file """
+
+        if self.user_settings:
+            return
+
+        self.user_settings = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
+        main_folder = os.path.join(os.path.expanduser("~"), self.plugin_name)
+        config_folder = main_folder + os.sep + "config" + os.sep
+        self.user_settings_path = config_folder + 'user.config'
+        if not os.path.exists(self.user_settings_path):
+            self.log_info(f"File not found: {self.user_settings_path}")
+            self.save_user_settings()
+        else:
+            self.log_info(f"User settings file: {self.user_settings_path}")
+
+        # Open file
+        self.user_settings.read(self.user_settings_path)
+
+
     def get_layer_source_from_credentials(self):
         """ Get database parameters from layer 'v_edit_node' or  database connection settings """
 
@@ -174,8 +224,8 @@ class DaoController(object):
             self.last_error = self.tr("Layer not found") + ": 'v_edit_node'"
             return None, not_version
 
-        # Get sslmode for database connection
-        sslmode = self.settings.value('system_variables/sslmode', 'prefer').lower()
+        self.manage_user_config_file()
+        sslmode = self.get_sslmode()
 
         if layer:
             not_version = False
