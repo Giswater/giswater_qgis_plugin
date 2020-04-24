@@ -730,6 +730,7 @@ class Giswater(QObject):
 
         self.unload(False)
         self.set_info_button()
+        self.enable_info_button(True)
 
                           
     def project_read(self, show_warning=True): 
@@ -863,6 +864,9 @@ class Giswater(QObject):
         self.get_layers_to_config()
         self.set_layer_config(self.available_layers)
 
+        # Disable info button
+        self.enable_info_button(False)
+
         # Create a thread to listen selected database channels
         if self.settings.value('system_variables/use_notify').upper() == 'TRUE':
             self.notify = NotifyFunctions(self.iface, self.settings, self.controller, self.plugin_dir)
@@ -882,6 +886,13 @@ class Giswater(QObject):
         # Log it
         message = "Project read successfully"
         self.controller.log_info(message)
+
+
+    def enable_info_button(self, enable=True):
+        """ Enable/Disable info button """
+
+        if self.action_info:
+            self.action_info.setEnabled(enable)
 
 
     def add_layers_button(self):
