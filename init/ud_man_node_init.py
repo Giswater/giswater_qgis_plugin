@@ -605,7 +605,7 @@ class ManNodeDialog(ParentDialog):
         """ Fill tab 'O&M' (event) """
         
         table_event_node = "v_ui_om_visit_x_node"
-        table_event_node_dict = {4: "ve_visit_revisio_unio", 5: "ve_visit_revisio_outfall", 6: "ve_visit_revisio_valve", 7: "ve_visit_revisio_chamger", 8: "ve_visit_revisio_pous", 9: "ve_visit_revisio_inici"}
+        table_event_node_dict = {4: "ve_visit_revisio_unio", 5: "ve_visit_revisio_outfall", 6: "ve_visit_revisio_valve", 7: "ve_visit_revisio_chamger", 8: "ve_visit_revisio_pou", 9: "ve_visit_revisio_inici"}
         self.fill_tbl_event(self.tbl_visit, table_event_node_dict, self.filter)
         self.tbl_event.doubleClicked.connect(self.open_visit_event)
         self.set_configuration(self.tbl_event, table_event_node)
