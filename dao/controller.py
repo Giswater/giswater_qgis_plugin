@@ -174,9 +174,13 @@ class DaoController(object):
             self.last_error = self.tr("Layer not found") + ": 'v_edit_node'"
             return None, not_version
 
+        # Get sslmode for database connection
+        sslmode = self.settings.value('system_variables/sslmode', 'prefer').lower()
+
         if layer:
             not_version = False
             credentials = self.get_layer_source(layer)
+            credentials['sslmode'] = sslmode
             self.schema_name = credentials['schema']
             conn_info = QgsDataSourceUri(layer.dataProvider().dataSourceUri()).connectionInfo()
             status, credentials = self.connect_to_database_credentials(credentials, conn_info)
@@ -193,7 +197,7 @@ class DaoController(object):
             default_connection = settings.value('selected')
             settings.endGroup()
             credentials = {'db': None, 'schema': None, 'table': None,
-                           'host': None, 'port': None, 'user': None, 'password': None}
+                           'host': None, 'port': None, 'user': None, 'password': None, 'sslmode': None}
             if default_connection:
                 settings.beginGroup("PostgreSQL/connections/" + default_connection)
                 if settings.value('host') in (None, ""):
@@ -204,6 +208,7 @@ class DaoController(object):
                 credentials['db'] = settings.value('database')
                 credentials['user'] = settings.value('username')
                 credentials['password'] = settings.value('password')
+                credentials['sslmode'] = sslmode
                 settings.endGroup()
                 status, credentials = self.connect_to_database_credentials(credentials)
                 if not status:
@@ -214,7 +219,9 @@ class DaoController(object):
                 self.log_warning("Error getting default connection (settings)")
                 self.last_error = self.tr("Error getting default connection")
                 return None, not_version
+
         self.credentials = credentials
+
         return credentials, not_version
 
 
@@ -229,12 +236,12 @@ class DaoController(object):
                 (success, credentials['user'], credentials['password']) = QgsCredentials.instance().get(conn_info,
                     credentials['user'], credentials['password'])
             logged = self.connect_to_database(credentials['host'], credentials['port'], credentials['db'],
-                credentials['user'], credentials['password'])
+                credentials['user'], credentials['password'], credentials['sslmode'])
 
         return logged, credentials
 
     
-    def connect_to_database(self, host, port, db, user, pwd):
+    def connect_to_database(self, host, port, db, user, pwd, sslmode):
         """ Connect to database with selected parameters """
         
         # Check if selected parameters is correct
@@ -263,7 +270,7 @@ class DaoController(object):
         
         # Connect to Database 
         self.dao = PgDao()     
-        self.dao.set_params(host, port, db, user, pwd)
+        self.dao.set_params(host, port, db, user, pwd, sslmode)
         status = self.dao.init_db()
         if not status:
             message = "Database connection error. Please open plugin log file to get more details"
@@ -883,7 +890,7 @@ class DaoController(object):
 
         # Initialize variables
         layer_source = {'db': None, 'schema': None, 'table': None, 
-                        'host': None, 'port': None, 'user': None, 'password': None}
+                        'host': None, 'port': None, 'user': None, 'password': None, 'sslmode': None}
 
         if layer is None:
             return layer_source

@@ -74,7 +74,7 @@ class PgDao(object):
         return self.conn.encoding
 
 
-    def set_params(self, host, port, dbname, user, password):
+    def set_params(self, host, port, dbname, user, password, sslmode):
         """ Set database parameters """
 
         self.host = host
@@ -83,9 +83,16 @@ class PgDao(object):
         self.user = user
         self.password = password
         self.conn_string = f"host={self.host} port={self.port} dbname={self.dbname} user='{self.user}'"
+        if sslmode:
+            self.conn_string += f" sslmode={sslmode}"
         if self.password is not None:
-            self.conn_string += f"password={self.password}"
-        
+            self.conn_string += f" password={self.password}"
+
+
+    def set_service(self, service):
+
+        self.conn_string = f"service={service}"
+
         
     def mogrify(self, sql, params):
         """ Return a query string after arguments binding """
