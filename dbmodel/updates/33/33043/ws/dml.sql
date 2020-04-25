@@ -43,3 +43,11 @@ UPDATE config_param_system SET value =
 WHERE  parameter = 'api_selector_exploitation';
 
 UPDATE audit_cat_param_user SET widgetcontrols = null WHERE id = 'inp_times_duration';
+
+UPDATE sys_csv2pg_config SET 
+target = '{Node Results, MINIMUM Node, MAXIMUM Node, AVERAGE Node, DIFFERENTIAL Node}'
+WHERE pg2csvcat_id = 11 AND tablename = 'rpt_node';
+
+UPDATE sys_csv2pg_config SET 
+target = '{Link Results, MINIMUM Link, MAXIMUM Link, AVERAGE Link, DIFFERENTIAL Link}'
+WHERE pg2csvcat_id = 11 AND tablename = 'rpt_arc';

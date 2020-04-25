@@ -17,40 +17,40 @@ SELECT SCHEMA_NAME.gw_fct_rpt2pg_import_rpt($${"data":{"resultId":"r1"}}$$)
 */
 
 DECLARE
-	v_hour text;
-	v_type text;
-	v_rpt record;
-	v_csv2pgcat_id integer = 11;
-	v_result 	json;
-	v_result_info 	json;
-	v_result_point	json;
-	v_result_line 	json;
-	v_version	text;
-	v_path 		text;
-	v_result_id	text;
-	v_njunction integer;
-	v_nreservoir integer;
-	v_ntanks integer;
-	v_npipes integer;
-	v_npumps integer;
-	v_nvalves integer;
-	v_headloss text;
-	v_htstep text;
-	v_haccuracy numeric;
-	v_statuscheck numeric;
-	v_mcheck  numeric;
-	v_dthreshold numeric;
-	v_mtrials numeric;
-	v_qanalysis text;
-	v_sgravity  numeric;
-	v_rkinematic  numeric;
-	v_rchemical  numeric;
-	v_dmultiplier numeric;
-	v_tduration text;
-	v_qtimestep text;
-	v_qtolerance text;
-	v_type_2 text;
-	v_error_context text;
+v_hour text;
+v_type text;
+v_rpt record;
+v_csv2pgcat_id integer = 11;
+v_result json;
+v_result_info json;
+v_result_point json;
+v_result_line json;
+v_version text;
+v_path text;
+v_result_id text;
+v_njunction integer;
+v_nreservoir integer;
+v_ntanks integer;
+v_npipes integer;
+v_npumps integer;
+v_nvalves integer;
+v_headloss text;
+v_htstep text;
+v_haccuracy numeric;
+v_statuscheck numeric;
+v_mcheck  numeric;
+v_dthreshold numeric;
+v_mtrials numeric;
+v_qanalysis text;
+v_sgravity numeric;
+v_rkinematic numeric;
+v_rchemical numeric;
+v_dmultiplier numeric;
+v_tduration text;
+v_qtimestep text;
+v_qtolerance text;
+v_type_2 text;
+v_error_context text;
 
 BEGIN
 
@@ -89,14 +89,14 @@ BEGIN
 	v_hour=null;
 
 	-- rpt_node
-	DELETE FROM temp_csv2pg WHERE source='rpt_node' AND (csv1='Node' or csv1='Elevation' or csv1='MINIMUM');
+	DELETE FROM temp_csv2pg WHERE source='rpt_node' AND (csv1='Node' or csv1='Elevation' or csv1='MINIMUM' or csv1='MAXIMUM' or csv1='DIFFERENTIAL' or csv1='AVERAGE');
 	UPDATE temp_csv2pg SET csv6=null WHERE source='rpt_node' AND (csv6='Reservoir' OR csv6='Tank'); -- delete Reservoir AND tank word when quality is not enabled
 	INSERT INTO rpt_node (node_id, result_id, "time", elevation, demand, head, press, quality) 
 	SELECT csv1, v_result_id, csv40, csv2::numeric, csv3::numeric, csv4::numeric, csv5::numeric, csv6::numeric
 	FROM temp_csv2pg WHERE source='rpt_node' AND csv2pgcat_id=11 AND user_name=current_user ORDER BY id;
 
 	-- rpt_arc
-	DELETE FROM temp_csv2pg WHERE source='rpt_arc' AND (csv1='Link' or csv1='Length' or csv1='Analysis' or csv1='MINIMUM');
+	DELETE FROM temp_csv2pg WHERE source='rpt_arc' AND (csv1='Link' or csv1='Length' or csv1='Analysis' or csv1='MINIMUM' or csv1='MAXIMUM' or csv1='DIFFERENTIAL' or csv1='AVERAGE');
 	INSERT INTO rpt_arc(arc_id,result_id,"time",length, diameter, flow, vel, headloss,setting,reaction, ffactor,other)
 	SELECT csv1,v_result_id, csv40, csv2::numeric, csv3::numeric, csv4::numeric, csv5::numeric, csv6::numeric, csv7::numeric, csv8::numeric, csv9::numeric, csv10
 	FROM temp_csv2pg WHERE source='rpt_arc' AND csv2pgcat_id=11 AND user_name=current_user ORDER BY id;
