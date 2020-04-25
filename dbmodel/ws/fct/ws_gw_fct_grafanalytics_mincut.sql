@@ -77,7 +77,7 @@ BEGIN
 	-- closing check-valves
 	UPDATE temp_anlgraf SET flag = 1 
 	FROM anl_mincut_checkvalve c 
-	WHERE (temp_anlgraf.node_1 = c.node_id::integer OR temp_anlgraf.node_2 = c.node_id::integer);
+	WHERE (temp_anlgraf.node_1 = c.node_id OR temp_anlgraf.node_2 = c.node_id);
 	
 	-- setting the graf matrix with closed valves
 	UPDATE temp_anlgraf SET flag = 1 
