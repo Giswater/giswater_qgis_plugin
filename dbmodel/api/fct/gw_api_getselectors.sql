@@ -13,58 +13,54 @@ $BODY$
 
 /*example
 CURRENT
-SELECT gw_api_getselectors($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, 
-"selector_type":{"mincut": {"ids":[1, 10, 12, 13, 14, 15, 16, 17], "table":"anl_mincut_result_selector", "view":"anl_mincut_result_cat"}}}}$$)::text
-
-PROPOSED
-SELECT gw_api_getselectors($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, selectorType":"mincut"}}$$)::text
+SELECT gw_api_getselectors($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selector_type":{"mincut": {"ids":[]}}}}$$);
+SELECT gw_api_getselectors($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selector_type":{"exploitation": {"ids":[]}}}}$$);
 */
 
 DECLARE
 
-
---	Variables
-	selected_json json;	
-	form_json json;
-	v_formTabsAux  json;
-	v_formTabs text;
-	json_array json[];
-	api_version json;
-	rec_tab record;
-	v_active boolean=true;
-	v_firsttab boolean=false;
-	v_selectors_list text;
-	v_selector_type json;
-	v_aux_json json;
-	fields_array json[];
-	v_result_list text[];
-	v_filter_name text;
-	v_parameter_selector json;
-	v_label text;
-	v_table text;
-	v_selector text;
-	v_table_id text;
-	v_selector_id text;
-	v_query_filter text;
+-- Variables
+selected_json json;	
+form_json json;
+v_formTabsAux  json;
+v_formTabs text;
+json_array json[];
+api_version json;
+rec_tab record;
+v_active boolean=true;
+v_firsttab boolean=false;
+v_selectors_list text;
+v_selector_type json;
+v_aux_json json;
+fields_array json[];
+v_result_list text[];
+v_filter_name text;
+v_parameter_selector json;
+v_label text;
+v_table text;
+v_selector text;
+v_table_id text;
+v_selector_id text;
+v_query_filter text;
+v_query_filteradd text;
 
 BEGIN
 
-
--- Set search path to local schema
+	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
 
---  get api version
+	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
 		INTO api_version;
 
--- Get input parameters:
+	-- Get input parameters:
 	v_selector_type := (p_data ->> 'data')::json->> 'selector_type';
 	v_selectors_list := (((p_data ->> 'data')::json->>'selector_type')::json ->>'mincut')::json->>'ids';
 
--- Manage list ids
+	-- Manage list ids
 	v_selectors_list = replace(replace(v_selectors_list, '[', '('), ']', ')');
 
--- Start the construction of the tabs array
+	-- Start the construction of the tabs array
 	v_formTabs := '[';
 	
 	SELECT array_agg(row_to_json(a)) FROM (SELECT * FROM json_object_keys(v_selector_type))a into fields_array;
@@ -84,6 +80,7 @@ BEGIN
 		v_selector = v_parameter_selector->>'selector';
 		v_table_id = v_parameter_selector->>'table_id';
 		v_selector_id = v_parameter_selector->>'selector_id';
+		v_query_filteradd = v_parameter_selector->>'query_filter';
 
 		-- Manage selectors list
 		IF v_selectors_list IS NULL THEN
@@ -97,11 +94,12 @@ BEGIN
 		-- Get exploitations, selected and unselected with selectors list
 		EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
 		SELECT concat(' || v_label || ') AS label, ' || v_table_id || '::text as widgetname, ''' || v_selector_id || ''' as column_id, ''check'' as type, ''boolean'' as "dataType", true as "value" 
-		FROM '|| v_table ||' WHERE ' || v_table_id || ' IN (SELECT ' || v_selector_id || ' FROM '|| v_selector ||' WHERE cur_user=' || quote_literal(current_user) || ') '|| v_query_filter ||'
-		UNION
+		FROM '|| v_table ||' WHERE ' || v_table_id || ' IN (SELECT ' || v_selector_id || ' FROM '|| v_selector ||' WHERE cur_user=' || quote_literal(current_user) || ') '|| v_query_filter ||' '
+		||v_query_filteradd||' 
+		UNION 
 		SELECT concat(' || v_label || ') AS label, ' || v_table_id || '::text as widgetname, ''' || v_selector_id || ''' as column_id, ''check'' as type, ''boolean'' as "dataType", false as "value" 
-		FROM '|| v_table ||' WHERE ' || v_table_id || ' NOT IN (SELECT ' || v_selector_id || ' FROM '|| v_selector ||' WHERE cur_user=' || quote_literal(current_user) || ') '|| v_query_filter ||'
-		ORDER BY label) a'
+		FROM '|| v_table ||' WHERE ' || v_table_id || ' NOT IN (SELECT ' || v_selector_id || ' FROM '|| v_selector ||' WHERE cur_user=' || quote_literal(current_user) || ') '|| v_query_filter ||' '
+		||v_query_filteradd||'  ORDER BY label) a'
 		INTO v_formTabsAux;
 		
 		-- Add tab name to json

@@ -31,3 +31,13 @@ UPDATE audit_cat_table SET descript='Selector of an alternative result (to compa
 
 INSERT INTO audit_cat_table(id, context, descript, sys_role_id, sys_criticity, qgis_role_id, isdeprecated) 
 VALUES ('rpt_selector_hourly_compare', 'Hydraulic selector', 'Selector of an alternative result (to compare with other results)', 'role_epa', 0, 'role_epa', false);
+
+
+UPDATE config_param_system SET value =
+'{"table":"anl_mincut_result_cat", "table_id":"id", "selector":"anl_mincut_result_selector", "selector_id":"result_id", "label":"id, ''('', CASE WHEN work_order IS NULL THEN ''N/I'' ELSE work_order END, '') on '', forecast_start::date, '' at '', forecast_start::time, ''H-'', forecast_end::time,''H''", "query_filter":" AND id > 0 "}'
+WHERE parameter = 'api_selector_mincut';
+
+
+UPDATE config_param_system SET value =
+'{"table":"exploitation", "selector":"selector_expl", "table_id":"expl_id",  "selector_id":"expl_id",  "label":"expl_id, '' - '', name, '' '', CASE WHEN descript IS NULL THEN '''' ELSE concat('' - '', descript) END", "query_filter":" AND expl_id > 0 "}'
+WHERE  parameter = 'api_selector_exploitation';
