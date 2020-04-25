@@ -30,7 +30,7 @@ v_count integer = 0;
 
 BEGIN
 
---  Search path
+	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
 
 	--  Looking for nodarc values
@@ -204,8 +204,8 @@ BEGIN
 			SELECT DISTINCT ON (a.nodeparent)
 			a.result_id,
 			concat (a.nodeparent, ''_n2a'') as arc_id,
-			a.node_id,
 			b.node_id,
+			a.node_id,
 			''NODE2ARC'', 
 			a.nodecat_id as arccat_id, 
 			c.epa_type,
@@ -223,14 +223,10 @@ BEGIN
 			c.addparam
 			FROM 	result a,
 				result b
-				JOIN result c ON c.node_id = b.nodeparent
+				LEFT JOIN result c ON c.node_id = b.nodeparent
 				WHERE a.nodeparent = b.nodeparent AND a.arcposition = 3 AND b.arcposition = 4';
 					
 	LOOP
-
-		v_offset  = v_offset + v_limit;
-		v_count = (SELECT count(*) FROM  temp_node);
-			
 		RAISE NOTICE 'new arcs when numarcs = 2 ( % )', v_offset;
 		EXECUTE 'INSERT INTO temp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, expl_id, state, state_type, diameter, roughness, annotation, length, 
 			status, the_geom, minorloss, addparam)
@@ -258,10 +254,12 @@ BEGIN
 			c.addparam
 			FROM 	result a,
 				result b
-				JOIN result c ON c.node_id = b.nodeparent
+				LEFT JOIN result c ON c.node_id = b.nodeparent
 				WHERE a.nodeparent = b.nodeparent AND a.arcposition = 1 AND b.arcposition = 2';
-				
-		EXIT WHEN v_count < v_offset + v_limit;
+
+		v_count = (SELECT count(*) FROM  temp_node);
+		v_offset  = v_offset + v_limit;					
+		EXIT WHEN v_count < v_offset;
 
 	END LOOP;
 

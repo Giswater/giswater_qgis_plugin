@@ -29,7 +29,13 @@ INSERT INTO sys_fprocess_cat(id, fprocess_name, context, project_type)
 VALUES (130,'arcs less than 5 cm.','utils', 'edit') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_fprocess_cat(id, fprocess_name, context, project_type)
-VALUES (131,'Go2epa check arc without some node','utils', 'edit') ON CONFLICT (id) DO NOTHING;
+VALUES (131,'Go2epa check arc without some node','utils', 'epa') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_fprocess_cat(id, fprocess_name, context, project_type)
+VALUES (132,'Go2epa check dry arcs','ws', 'epa') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_fprocess_cat(id, fprocess_name, context, project_type)
+VALUES (133,'Go2epa check dry nodes with positive demand','ws', 'epa') ON CONFLICT (id) DO NOTHING;
 
 
 UPDATE audit_cat_function set function_name = 'gw_fct_pg2epa_demand' where function_name = 'gw_fct_pg2epa_rtc';
@@ -48,9 +54,9 @@ DELETE FROM audit_cat_function WHERE function_name IN
 
 DELETE FROM audit_cat_function WHERE id = 2648; -- duplicated gw_fct_admin_schema_manage_ct
 
-INSERT INTO audit_cat_function VALUES (2846, 'gw_fct_pg2epa_vdefault', 'utils', 'Default values for epa', NULL, NULL, NULL, 'Default values for epa', 'role_epa', false) 
+INSERT INTO audit_cat_function VALUES (2846, 'gw_fct_pg2epa_vdefault', 'utils', 'Function', NULL, NULL, NULL, 'Default values for epa', 'role_epa', false) 
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO audit_cat_function VALUES (2848, 'gw_fct_pg2epa_check_result', 'utils', 'Check data for epa result', NULL, NULL, NULL, 'Check data for epa result', 'role_epa', false) 
+INSERT INTO audit_cat_function VALUES (2848, 'gw_fct_pg2epa_check_result', 'utils', 'Function', NULL, NULL, NULL, 'Check data for epa result', 'role_epa', false) 
 ON CONFLICT (id) DO NOTHING;
 

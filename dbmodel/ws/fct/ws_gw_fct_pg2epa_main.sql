@@ -41,6 +41,8 @@ v_checkdata boolean;
 v_checknetwork boolean;
 v_vdefault boolean;
 v_delnetwork boolean;
+v_removedemand boolean;
+
 	
 BEGIN
 
@@ -63,6 +65,7 @@ BEGIN
 	v_checkdata = (SELECT value::json->>'checkData' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 	v_checknetwork = (SELECT value::json->>'checkNetwork' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 	v_delnetwork = (SELECT value::json->>'delDisconnNetwork' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
+	v_removedemand = (SELECT value::json->>'removeDemandOnDryNodes' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 
 	-- delete audit table
 	DELETE FROM audit_check_data WHERE fprocesscat_id = 127 AND user_name=current_user;
@@ -170,52 +173,56 @@ BEGIN
 		
 		RAISE NOTICE '12 - Set length > 0.05 when length is 0';
 		UPDATE temp_arc SET length=0.05 WHERE length=0;
-		
-		RAISE NOTICE '13 - Check result network';
-		IF v_checknetwork THEN
-			PERFORM gw_fct_pg2epa_check_network(v_input);			
-		END IF;
-		
-		IF v_delnetwork THEN
-			RAISE NOTICE '14 - delete disconnected arcs with associated nodes';
-			DELETE FROM temp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user);
-			DELETE FROM temp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=39 AND cur_user=current_user);
-			
-			RAISE NOTICE '15 - delete orphan nodes';
-			DELETE FROM temp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=7 AND cur_user=current_user);
-
-			RAISE NOTICE '16 delete arcs without extremal nodes';
-			DELETE FROM temp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=3 AND cur_user=current_user);		
-		END IF;
-
 	END IF;
 
-	RAISE NOTICE '17 - Try to set demands & patterns';
+	RAISE NOTICE '13 - Try to set demands & patterns';
 	IF v_setdemand THEN
 		PERFORM gw_fct_pg2epa_demand(v_result);		
 	END IF;
 
-	RAISE NOTICE '18 - Setting dscenarios';
+	RAISE NOTICE '14 - Setting dscenarios';
 	PERFORM gw_fct_pg2epa_dscenario(v_result);
 	
-	RAISE NOTICE '19 - Setting valve status';
+	RAISE NOTICE '15 - Setting valve status';
 	PERFORM gw_fct_pg2epa_valve_status(v_result);
 		
-	RAISE NOTICE '20 - Advanced settings';
+	RAISE NOTICE '16 - Advanced settings';
 	IF v_advancedsettings THEN
 		PERFORM gw_fct_pg2epa_advancedsettings(v_result);
 	END IF;
+	
+	RAISE NOTICE '17 - Check result network';
+	IF v_checknetwork THEN
+		PERFORM gw_fct_pg2epa_check_network(v_input);	
+	END IF;
+		
+	IF v_delnetwork THEN
+		RAISE NOTICE '18 - delete disconnected arcs with associated nodes';
+		DELETE FROM temp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user);
+		DELETE FROM temp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=39 AND cur_user=current_user);
+			
+		RAISE NOTICE '19 - delete orphan nodes';
+		DELETE FROM temp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=7 AND cur_user=current_user);
 
-	RAISE NOTICE '21 - check result previous exportation';
+		RAISE NOTICE '20 delete arcs without extremal nodes';
+		DELETE FROM temp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=3 AND cur_user=current_user);
+	END IF;
+
+	IF v_removedemand THEN
+		RAISE NOTICE '21 Set demand = 0 for dry nodes';
+		UPDATE temp_node n SET demand = 0 FROM anl_node a WHERE fprocesscat_id = 132 AND cur_user = current_user AND a.node_id = t.node_id;
+	END IF;
+
+	RAISE NOTICE '22 - check result previous exportation';
 	SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return ;
 
-	RAISE NOTICE '22 - Move from temp tables';
+	RAISE NOTICE '23 - Move from temp tables';
 	UPDATE temp_arc SET result_id  = v_result;
 	UPDATE temp_node SET result_id  = v_result;
 	INSERT INTO rpt_inp_arc SELECT * FROM temp_arc;
 	INSERT INTO rpt_inp_node SELECT * FROM temp_node;
 
-	RAISE NOTICE '23 - Create the inp file structure';	
+	RAISE NOTICE '24 - Create the inp file structure';	
 	SELECT gw_fct_pg2epa_export_inp(v_result, null) INTO v_file;
 	
 	-- manage return message
