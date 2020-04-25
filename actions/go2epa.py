@@ -244,6 +244,7 @@ class Go2Epa(ApiParent):
 
         cur_user = self.controller.get_current_user()
 
+        self.dlg_go2epa.txt_result_name.setMaxLength(16)
         self.result_name = self.controller.plugin_settings_value('go2epa_RESULT_NAME' + cur_user)
         self.dlg_go2epa.txt_result_name.setText(self.result_name)
         self.file_inp = self.controller.plugin_settings_value('go2epa_FILE_INP' + cur_user)
