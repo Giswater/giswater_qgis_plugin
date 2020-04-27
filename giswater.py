@@ -321,7 +321,7 @@ class Giswater(QObject):
 
         text_action = self.tr(index_action + '_text')
         function_name = self.settings.value('actions/' + str(index_action) + '_function')
-        self.controller.log_info(str("TEST 4 -> "+ str(function_name)))
+
         if not function_name:
             return None
 

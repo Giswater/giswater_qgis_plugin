@@ -308,7 +308,7 @@ class GwToolBox(ApiParent):
                         if type(widget) in ('', QLineEdit):
                             widget.setStyleSheet(None)
                             value = utils_giswater.getWidgetText(dialog, widget, False, False)
-                            extras += f'"{param_name}":"{value}", '.replace('""','null')
+                            extras += f'"{param_name}":"{value}", '.replace('""', 'null')
                             if value is '' and widget.property('is_mandatory'):
                                 widget_is_void = True
                                 widget.setStyleSheet("border: 1px solid red")
