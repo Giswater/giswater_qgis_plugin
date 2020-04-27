@@ -560,7 +560,6 @@ class ApiCF(ApiParent, QObject):
             self.dlg_cf.dlg_closed.connect(partial(self.resetRubberbands))
             self.dlg_cf.dlg_closed.connect(partial(self.save_settings, self.dlg_cf))
             self.dlg_cf.dlg_closed.connect(partial(self.set_vdefault_edition))
-            self.dlg_cf.dlg_closed.connect(lambda: self.layer.disconnect())
             self.dlg_cf.key_pressed.connect(partial(self.close_dialog, self.dlg_cf))
 
         # Open dialog
@@ -574,7 +573,6 @@ class ApiCF(ApiParent, QObject):
         self.roll_back()
         self.resetRubberbands()
         self.set_vdefault_edition()
-        self.layer.disconnect()
 
 
     def close_docker(self, docker):
@@ -652,8 +650,13 @@ class ApiCF(ApiParent, QObject):
 
 
     def roll_back(self):
-        """ discard changes in current layer """
-        self.iface.actionRollbackEdits().trigger()
+        """ Discard changes in current layer """
+
+        try:
+            self.iface.actionRollbackEdits().trigger()
+            self.layer.disconnect()
+        except TypeError:
+            pass
 
 
     def set_widgets(self, dialog, complet_result, field):

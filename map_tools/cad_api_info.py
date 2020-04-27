@@ -38,11 +38,12 @@ class CadApiInfo(ParentMapTool):
         """
 
         if hasattr(self, 'dlg_docker') and type(self.dlg_docker) is DockerUi:
-            cur_user = self.controller.get_current_user()
-            docker_pos = self.iface.mainWindow().dockWidgetArea(self.dlg_docker)
-            self.controller.plugin_settings_set_value(f"docker_info_{cur_user}", docker_pos)
-            self.iface.removeDockWidget(self.dlg_docker)
-            del self.dlg_docker
+            if not self.dlg_docker.isFloating():
+                cur_user = self.controller.get_current_user()
+                docker_pos = self.iface.mainWindow().dockWidgetArea(self.dlg_docker)
+                self.controller.plugin_settings_set_value(f"docker_info_{cur_user}", docker_pos)
+                self.iface.removeDockWidget(self.dlg_docker)
+                del self.dlg_docker
 
 
     def create_point(self, event):
@@ -104,18 +105,17 @@ class CadApiInfo(ParentMapTool):
             self.block_signal = False
             return
 
-        if hasattr(self, 'dlg_docker') and type(self.dlg_docker) is DockerUi:
-            self.close_docker()
-
-        self.dlg_docker = None
-        row = self.controller.get_config('api_info_modal')
-        if not row or row[0].lower() == 'false':
-            self.dlg_docker = DockerUi()
-            self.dlg_docker.dlg_closed.connect(partial(self.close_docker))
-            self.manage_docker_options()
-
-        self.api_cf = ApiCF(self.iface, self.settings, self.controller, self.controller.plugin_dir, self.tab_type)
-        self.api_cf.signal_activate.connect(self.reactivate_map_tool)
+        row = self.controller.get_config('qgis_form_docker')
+        if row:
+            if row[0].lower() == 'true':
+                self.close_docker()
+                self.dlg_docker = DockerUi()
+                self.dlg_docker.dlg_closed.connect(partial(self.close_docker))
+                self.manage_docker_options()
+            else:
+                self.dlg_docker = None
+        else:
+            self.dlg_docker = None
 
         if event.button() == Qt.LeftButton:
             point = self.create_point(event)
@@ -127,7 +127,6 @@ class CadApiInfo(ParentMapTool):
             point = self.create_point(event)
             if point is False:
                 return
-
             self.api_cf.hilight_feature(point, self.rubberband_list, self.tab_type, self.dlg_docker)
 
 
@@ -152,6 +151,9 @@ class CadApiInfo(ParentMapTool):
             self.tab_type = 'data'
         elif self.index_action == '199':
             self.tab_type = 'inp'
+
+        self.api_cf = ApiCF(self.iface, self.settings, self.controller, self.controller.plugin_dir, self.tab_type)
+        self.api_cf.signal_activate.connect(self.reactivate_map_tool)
 
 
     def deactivate(self):
