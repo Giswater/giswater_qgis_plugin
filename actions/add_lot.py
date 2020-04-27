@@ -1232,8 +1232,7 @@ class AddNewLot(ParentManage):
                    " SET "+str(update)+""
                    " WHERE id = '"+str(lot_id)+"'; \n")
             self.controller.execute_sql(sql)
-
-        self.save_relations(lot, lot_id)
+        self.save_relations(lot, lot_id, lot['feature_type'])
         sql = ("SELECT gw_fct_lot_psector_geom(" + str(lot_id) + ")")
         self.controller.execute_sql(sql)
         status = self.save_visits()
@@ -1243,7 +1242,7 @@ class AddNewLot(ParentManage):
             self.manage_rejected()
 
 
-    def save_relations(self, lot, lot_id):
+    def save_relations(self, lot, lot_id, column_id):
 
         # Manage relations
         if not lot['feature_type']:
@@ -1265,7 +1264,12 @@ class AddNewLot(ParentManage):
                 valid = False
                 # if key in (lot['feature_type'] + '_id', 'code', 'status', 'observ', 'validate'):
                 # if str(key) in ('Id embornal', 'Codi', 'Estat', 'observ', 'validate'):
-                if str(key) == 'Id embornal':
+                sql_aux = "SELECT alias FROM " + self.schema_name + ".config_client_forms WHERE location_type = 'tbl_relations' AND column_id = '" + str(
+                    column_id) + "_id'"
+                row = self.controller.get_row(sql_aux)
+                if row:
+                    column_name = row[0]
+                if str(key) == column_name:
                     key = lot['feature_type'] + '_id'
                     valid = True
                 elif str(key) == 'Codi':
