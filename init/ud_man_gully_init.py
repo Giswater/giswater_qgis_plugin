@@ -151,12 +151,14 @@ class ManGullyDialog(ParentDialog):
     def fill_tab_om(self):
         """ Fill tab 'O&M' (event) """
         
-        table_event_gully = "ve_visit_emb_neteja"
-        table_event_gully_dict = {2:"ve_visit_revisio_embornal", 10: "ve_visit_emb_neteja", 11: "ve_visit_emb_incidencia"}
-        # table_event_gully_dict = {7: "ve_visit_emb_neteja", 6: "ve_visit_emb_incidencia"}
+        sql = "SELECT id, tablename FROM " + self.schema_name + ".om_visit_class WHERE feature_type = 'GULLY'"
+        rows = self.controller.get_rows(sql)
+        table_event_gully_dict = {}
+        for row in rows:
+            table_event_gully_dict[row[0]] = str(row[1])
+
         self.fill_tbl_event(self.tbl_visit, table_event_gully_dict, self.filter)
         self.tbl_visit.doubleClicked.connect(self.open_visit_event)
-        # self.set_configuration(self.tbl_visit, table_event_gully)
 
 
     def fill_tab_custom_fields(self):

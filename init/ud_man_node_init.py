@@ -603,13 +603,15 @@ class ManNodeDialog(ParentDialog):
             
     def fill_tab_om(self):
         """ Fill tab 'O&M' (event) """
-        
-        table_event_node = "v_ui_om_visit_x_node"
-        table_event_node_dict = {4: "ve_visit_revisio_unio", 5: "ve_visit_revisio_outfall", 6: "ve_visit_revisio_valve", 7: "ve_visit_revisio_chamger", 8: "ve_visit_revisio_pou", 9: "ve_visit_revisio_inici"}
+
+        sql = "SELECT id, tablename FROM " + self.schema_name + ".om_visit_class WHERE feature_type = 'NODE'"
+        rows = self.controller.get_rows(sql)
+        table_event_node_dict = {}
+        for row in rows:
+            table_event_node_dict[row[0]] = str(row[1])
         self.fill_tbl_event(self.tbl_visit, table_event_node_dict, self.filter)
         self.tbl_event.doubleClicked.connect(self.open_visit_event)
-        self.set_configuration(self.tbl_event, table_event_node)
-        
+
             
     def fill_tab_scada(self):
         """ Fill tab 'Scada' """

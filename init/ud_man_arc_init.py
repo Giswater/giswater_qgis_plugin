@@ -312,12 +312,14 @@ class ManArcDialog(ParentDialog):
     def fill_tab_om(self):
         """ Fill tab 'O&M' (event) """
 
-        table_event_arc = "v_ui_om_visit_x_arc"
-        table_event_arc_dict = {3: "ve_visit_revisio_tram"}
+        sql = "SELECT id, tablename FROM " + self.schema_name + ".om_visit_class WHERE feature_type = 'ARC'"
+        rows = self.controller.get_rows(sql)
+        table_event_arc_dict = {}
+        for row in rows:
+            table_event_arc_dict[row[0]] = str(row[1])
         self.fill_tbl_event(self.tbl_visit, table_event_arc_dict, self.filter)
         self.tbl_event.doubleClicked.connect(self.open_visit_event)
-        self.set_configuration(self.tbl_event, table_event_arc)
-        
+
         
     def fill_tab_cost(self):
         """ Fill tab 'Cost' """
