@@ -21,7 +21,7 @@ from functools import partial
 
 from .. import utils_giswater
 from .add_layer import AddLayer
-from ..ui_manager import BasicInfoUi, GwDialog, GwMainWindow
+from ..ui_manager import BasicInfoUi, GwDialog, GwMainWindow, DockerUi
 
 
 class ParentAction(object):
@@ -819,9 +819,8 @@ class ParentAction(object):
 
 
     def create_body(self, form='', feature='', filter_fields='', extras=None):
-        """ Create and return parameters as body to functions """
+        """ Create and return parameters as body to functions"""
 
-        # f'$${{{body}}}$$'
         client = f'$${{"client":{{"device":9, "infoType":100, "lang":"ES"}}, '
         form = f'"form":{{{form}}}, '
         feature = f'"feature":{{{feature}}}, '
@@ -964,6 +963,7 @@ class ParentAction(object):
 
 
     def show_exceptions_msg(self, title, msg=""):
+
         cat_exception = {'KeyError': 'Key on returned json from ddbb is missed.'}
         self.dlg_info = BasicInfoUi()
         self.dlg_info.btn_accept.setVisible(False)
@@ -1107,9 +1107,43 @@ class ParentAction(object):
                 qtable.model().select()
 
 
+    def dock_dialog(self, docker, dialog):
+
+        positions = {8:Qt.BottomDockWidgetArea, 4:Qt.TopDockWidgetArea,
+                     2:Qt.RightDockWidgetArea, 1:Qt.LeftDockWidgetArea}
+        try:
+            docker.setWindowTitle(dialog.windowTitle())
+            docker.setWidget(dialog)
+            docker.setWindowFlags(Qt.WindowContextHelpButtonHint)
+            self.iface.addDockWidget(positions[docker.position], docker)
+        except RuntimeError as e:
+            self.controller.log_warning(f"{type(e).__name__} --> {e}")
+            pass
+
+
+    def manage_docker_options(self):
+        """ Check if user want dock the dialog or not """
+
+        # Load last docker position
+        cur_user = self.controller.get_current_user()
+        pos = self.controller.plugin_settings_value(f"docker_info_{cur_user}")
+
+        # Docker positions: 1=Left, 2=right, 8=bottom, 4= top
+        if type(pos) is int and pos in (1, 2, 4, 8):
+            self.dlg_docker.position = pos
+        else:
+            self.dlg_docker.position = 2
+
+        # If user want to dock the dialog, we reset rubberbands for each info
+        # For the first time, cf_info does not exist, therefore we cannot access it and reset rubberbands
+        try:
+            self.info_cf.resetRubberbands()
+        except AttributeError as e:
+            pass
+
+
     def get_all_actions(self):
 
-        self.controller.log_info(str("TEST"))
         actions_list = self.iface.mainWindow().findChildren(QAction)
         for action in actions_list:
            self.controller.log_info(str(action.objectName()))

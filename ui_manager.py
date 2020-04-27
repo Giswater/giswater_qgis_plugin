@@ -12,7 +12,7 @@ class GwDockWidget(QDockWidget):
 
     dlg_closed = QtCore.pyqtSignal()
     
-    def __init__(self, subtag=None):
+    def __init__(self, subtag=None, position=None):
         super().__init__()
         self.setupUi(self)
         self.subtag = subtag
@@ -105,6 +105,11 @@ def get_ui_class(ui_file_name, subfolder=None):
         ui_folder_path += os.sep + subfolder
     ui_file_path = os.path.abspath(os.path.join(ui_folder_path, ui_file_name))
     return uic.loadUiType(ui_file_path)[0]
+
+
+FORM_CLASS = get_ui_class('docker.ui')
+class DockerUi(GwDockWidget, FORM_CLASS):
+    pass
 
 
 FORM_CLASS = get_ui_class('element.ui')
