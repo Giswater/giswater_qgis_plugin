@@ -60,22 +60,6 @@ class ConnecMapTool(ParentMapTool):
             self.select_rect.setBottomRight(event.pos())
             self.set_rubber_band()
 
-        else:
-
-            # Hide marker and get coordinates
-            self.vertex_marker.hide()
-            event_point = self.snapper_manager.get_event_point(event)
-
-            # Snapping
-            result = self.snapper_manager.snap_to_background_layers(event_point)
-            if self.snapper_manager.result_is_valid():
-                # Check if it belongs to 'connec' or 'gully' group
-                layer = self.snapper_manager.get_snapped_layer(result)
-                exist_connec = self.snapper_manager.check_connec_group(layer)
-                exist_gully = self.snapper_manager.check_gully_group(layer)
-                if exist_connec or exist_gully:
-                    self.snapper_manager.add_marker(result, self.vertex_marker)
-
 
     def canvasPressEvent(self, event):   #@UnusedVariable
 

@@ -308,7 +308,7 @@ class GwToolBox(ApiParent):
                         if type(widget) in ('', QLineEdit):
                             widget.setStyleSheet(None)
                             value = utils_giswater.getWidgetText(dialog, widget, False, False)
-                            extras += f'"{param_name}":"{value}", '.replace('""','null')
+                            extras += f'"{param_name}":"{value}", '.replace('""', 'null')
                             if value is '' and widget.property('is_mandatory'):
                                 widget_is_void = True
                                 widget.setStyleSheet("border: 1px solid red")
@@ -459,11 +459,9 @@ class GwToolBox(ApiParent):
 
         list_items = []
         sql = ("SELECT tablename, type FROM "
-               "(SELECT tablename, type, 1 as c FROM sys_feature_cat"
-               " WHERE type = '" + geom_type.upper() + "'"
-               " UNION SELECT DISTINCT(parent_layer), feature_type, 0 FROM cat_feature WHERE feature_type='" + geom_type.upper() + "'"
-               " UNION SELECT child_layer, feature_type, 2 as c FROM cat_feature WHERE feature_type = '" + geom_type.upper() + "') as t "
-               " ORDER BY c, tablename")
+               "(SELECT DISTINCT(parent_layer) AS tablename, feature_type as type, 0 as c FROM cat_feature WHERE feature_type='" + geom_type.upper() + "'"
+               "UNION SELECT child_layer, feature_type, 2 as c FROM cat_feature WHERE feature_type = '" + geom_type.upper() + "') as t "
+               "ORDER BY c, tablename")
         rows = self.controller.get_rows(sql)
         if rows:
             for row in rows:

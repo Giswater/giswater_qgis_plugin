@@ -7,36 +7,34 @@ import os
 import webbrowser
 from functools import partial
 
+
 class GwDockWidget(QDockWidget):
+
     dlg_closed = QtCore.pyqtSignal()
     
     def __init__(self, subtag=None, position=None):
         super().__init__()
         self.setupUi(self)
-        
         self.subtag = subtag
-        self.position = position
-        
-        print(f'{type(self)}: {self.objectName()}')
-    
+
+
     def closeEvent(self, event):
         self.dlg_closed.emit()
         return super().closeEvent(event)
 
 
 class GwDialog(QDialog):
+
     def __init__(self, subtag=None):
         super().__init__()
         self.setupUi(self)
-        
         self.subtag = subtag
-
         # Enable event filter
         self.installEventFilter(self)
-        
-        print(f'{type(self)}: {self.objectName()}')
-    
+
+
     def eventFilter(self, object, event):
+
         if event.type() == QtCore.QEvent.EnterWhatsThisMode and self.isActiveWindow():
             QWhatsThis.leaveWhatsThisMode()
             parser = configparser.ConfigParser()
@@ -47,7 +45,7 @@ class GwDialog(QDialog):
                 tag = f'{self.objectName()}_{self.subtag}'
             else:
                 tag = str(self.objectName())
-                
+
             try:
                 web_tag = parser.get('web_tag', tag)
                 webbrowser.open_new_tab('https://giswater.org/giswater-manual/#' + web_tag)
@@ -59,23 +57,24 @@ class GwDialog(QDialog):
 
 
 class GwMainWindow(QMainWindow):
+
     dlg_closed = QtCore.pyqtSignal()
     
     def __init__(self, subtag=None):
         super().__init__()
         self.setupUi(self)
-        
         self.subtag = subtag
-        
         # Enable event filter
         self.installEventFilter(self)
-        print(f'{type(self)}: {self.objectName()}')
-    
+
+
     def closeEvent(self, event):
         self.dlg_closed.emit()
         return super().closeEvent(event)
-    
+
+
     def eventFilter(self, object, event):
+
         if event.type() == QtCore.QEvent.EnterWhatsThisMode and self.isActiveWindow():
             QWhatsThis.leaveWhatsThisMode()
             parser = configparser.ConfigParser()
@@ -128,6 +127,10 @@ class VisitUi(GwDialog, FORM_CLASS):
     pass
 
 
+FORM_CLASS = get_ui_class('new_visit.ui')
+class NewVisitUi(GwDialog, FORM_CLASS):
+    pass
+
 FORM_CLASS = get_ui_class('info_basic.ui')
 class ApiBasicInfo(GwDialog, FORM_CLASS):
     pass
@@ -165,11 +168,6 @@ class DimensioningUi(GwMainWindow, FORM_CLASS):
 
 FORM_CLASS = get_ui_class('options.ui')
 class OptionsUi(GwDialog, FORM_CLASS):
-    pass
-
-
-FORM_CLASS = get_ui_class('main_importinp.ui')
-class ImportInpUi(GwDialog, FORM_CLASS):
     pass
 
 
@@ -230,7 +228,9 @@ class ChangeNodeType(GwDialog, FORM_CLASS):
 
 FORM_CLASS = get_ui_class('credentials.ui')
 class Credentials(GwDialog, FORM_CLASS):
+
     def __init__(self, subtag=None):
+
         super().__init__()
         self.txt_pass.setClearButtonEnabled(True)
         icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_open.png'
@@ -243,6 +243,7 @@ class Credentials(GwDialog, FORM_CLASS):
 
 
     def show_pass(self):
+
         if self.txt_pass.echoMode() == 0:
             self.txt_pass.setEchoMode(QLineEdit.Password)
             icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_open.png'
@@ -471,7 +472,9 @@ class Psector_rapport(GwDialog, FORM_CLASS):
 
 FORM_CLASS = get_ui_class('qm_generator.ui')
 class QmGenerator(GwDialog, FORM_CLASS):
+
     def __init__(self, subtag=None):
+
         super().__init__()
         self.txt_pass.setClearButtonEnabled(True)
         icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_open.png'
@@ -484,6 +487,7 @@ class QmGenerator(GwDialog, FORM_CLASS):
 
 
     def show_pass(self):
+
         if self.txt_pass.echoMode() == 0:
             self.txt_pass.setEchoMode(QLineEdit.Password)
             icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_open.png'
@@ -562,6 +566,15 @@ class AddVisitTm(GwDialog, FORM_CLASS):
 
 FORM_CLASS = get_ui_class('event_standard.ui', 'tm')
 class EventStandardTm(GwDialog, FORM_CLASS):
+    pass
+
+FORM_CLASS = get_ui_class('incident_planning.ui', 'tm')
+class IncidentPlanning(GwDialog, FORM_CLASS):
+    pass
+
+
+FORM_CLASS = get_ui_class('incident_manager.ui', 'tm')
+class IncidentManager(GwDialog, FORM_CLASS):
     pass
 
 

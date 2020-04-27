@@ -5,18 +5,18 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsVectorLayerExporter, QgsDataSourceUri, QgsExpression, QgsFeature, QgsFeatureRequest, QgsField, QgsGeometry, QgsPointXY, QgsProject, QgsRectangle, QgsVectorLayer
+from qgis.core import QgsExpression, QgsFeatureRequest, QgsGeometry, QgsPointXY, QgsProject, QgsRectangle
 from qgis.gui import QgsRubberBand
-from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTimer, QVariant
-from qgis.PyQt.QtWidgets import QGroupBox, QAbstractItemView, QTableView, QFileDialog, QApplication, QCompleter, QAction, QWidget, QSpacerItem, QLabel, QComboBox, QCheckBox, QSizePolicy, QPushButton, QLineEdit, QDoubleSpinBox, QTextEdit, QTabWidget, QGridLayout
+from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTimer
+from qgis.PyQt.QtWidgets import QGroupBox, QAbstractItemView, QTableView, QFileDialog, QApplication, QCompleter, \
+    QAction, QWidget, QComboBox, QCheckBox, QPushButton, QLineEdit, QDoubleSpinBox, QTextEdit
 from qgis.PyQt.QtGui import QIcon, QColor, QCursor, QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel
 
-import configparser, json, os, re, subprocess, sys, webbrowser
+import configparser, os, re, subprocess, sys, webbrowser
 if 'nt' in sys.builtin_module_names:
     import ctypes
 
-from collections import OrderedDict
 from functools import partial
 
 from .. import utils_giswater
@@ -40,14 +40,22 @@ class ParentAction(object):
         self.project_type = None
         self.plugin_version = self.get_plugin_version()
         self.add_layer = AddLayer(iface, settings, controller, plugin_dir)
-        self.rubber_point = QgsRubberBand(self.canvas, 0)
-        self.rubber_point.setColor(Qt.yellow)
-        self.rubber_point.setIconSize(10)
-        self.rubber_polygon = QgsRubberBand(self.canvas, 2)
-        self.rubber_polygon.setColor(Qt.darkRed)
-        self.rubber_polygon.setIconSize(20)
         self.user_current_layer = None
-        self.dlg_docker = None
+        self.rubber_point = None
+        self.rubber_polygon = None
+
+
+    def init_rubber(self):
+
+        try:
+            self.rubber_point = QgsRubberBand(self.canvas, 0)
+            self.rubber_point.setColor(Qt.yellow)
+            self.rubber_point.setIconSize(10)
+            self.rubber_polygon = QgsRubberBand(self.canvas, 2)
+            self.rubber_polygon.setColor(Qt.darkRed)
+            self.rubber_polygon.setIconSize(20)
+        except:
+            pass
 
 
     def set_controller(self, controller):
@@ -170,6 +178,10 @@ class ParentAction(object):
     def open_dialog(self, dlg=None, dlg_name=None, info=True, maximize_button=True, stay_on_top=True):
         """ Open dialog """
 
+        # Check database connection before opening dialog
+        if not self.controller.check_db_connection():
+            return
+
         if dlg is None or type(dlg) is bool:
             dlg = self.dlg
             
@@ -198,7 +210,6 @@ class ParentAction(object):
         elif issubclass(type(dlg), GwMainWindow):
             dlg.show()
         else:
-            print(f"WARNING: dialog type {type(dlg)} is not handled!")
             dlg.show()
     
         
@@ -217,7 +228,7 @@ class ParentAction(object):
         except AttributeError:
             pass
         except Exception as e:
-            print(type(e).__name__)
+            self.controller.log_info(type(e).__name__)
         
         
     def multi_row_selector(self, dialog, tableleft, tableright, field_id_left, field_id_right, name='name',
@@ -650,9 +661,9 @@ class ParentAction(object):
                 layer.removeSelection()
 
 
-
     def hide_void_groupbox(self, dialog):
         """ Hide empty groupbox """
+
         grb_list = {}
         grbox_list = dialog.findChildren(QGroupBox)
         for grbox in grbox_list:
@@ -663,6 +674,7 @@ class ParentAction(object):
                 grbox.setVisible(False)
 
         return grb_list
+
 
     def zoom_to_selected_features(self, layer, geom_type=None, zoom=None):
         """ Zoom to selected features of the @layer with @geom_type """
@@ -698,6 +710,7 @@ class ParentAction(object):
         :param sql: Query to be executed, where will we get the list of items (string)
         :return list_items: List with the result of the query executed (List) ["item1","item2","..."]
         """
+
         rows = self.controller.get_rows(sql)
         list_items = []
         if rows:
@@ -711,6 +724,7 @@ class ParentAction(object):
         :param qlineedit: Object where to set the completer (QLineEdit)
         :param list_items: List of items to set into the completer (List)["item1","item2","..."]
         """
+
         completer = QCompleter()
         completer.setCaseSensitivity(Qt.CaseInsensitive)
         completer.setMaxVisibleItems(10)
@@ -747,6 +761,7 @@ class ParentAction(object):
                 max_y = y
 
         return max_x, max_y, min_x, min_y
+
 
     def zoom_to_rectangle(self, x1, y1, x2, y2, margin=5):
 
@@ -805,7 +820,7 @@ class ParentAction(object):
 
     def create_body(self, form='', feature='', filter_fields='', extras=None):
         """ Create and return parameters as body to functions"""
-        # f'$${{{body}}}$$'
+
         client = f'$${{"client":{{"device":9, "infoType":100, "lang":"ES"}}, '
         form = f'"form":{{{form}}}, '
         feature = f'"feature":{{{feature}}}, '
@@ -896,6 +911,7 @@ class ParentAction(object):
             This function is called in def set_datatype_validator(self, value, widget, btn)
             widget = getattr(self, f"{widget.property('datatype')}_validator")( value, widget, btn)
         """
+
         if value is None or bool(re.search("^\d*$", value)):
             widget.setStyleSheet(None)
             btn_accept.setEnabled(True)
@@ -909,6 +925,7 @@ class ParentAction(object):
             This function is called in def set_datatype_validator(self, value, widget, btn)
             widget = getattr(self, f"{widget.property('datatype')}_validator")( value, widget, btn)
         """
+
         if value is None or bool(re.search("^\d*$", value)) or bool(re.search("^\d+\.\d+$", value)):
             widget.setStyleSheet(None)
             btn_accept.setEnabled(True)
@@ -946,6 +963,7 @@ class ParentAction(object):
 
 
     def show_exceptions_msg(self, title, msg=""):
+
         cat_exception = {'KeyError': 'Key on returned json from ddbb is missed.'}
         self.dlg_info = BasicInfoUi()
         self.dlg_info.btn_accept.setVisible(False)
@@ -1002,6 +1020,7 @@ class ParentAction(object):
         :param field: Field of the table to make the where clause (string)
         :param field_value: Value to compare in the clause where (string)
         """
+
         doc_id = dialog.doc_id.text()
         if not doc_id:
             message = "You need to insert doc_id"
@@ -1157,6 +1176,9 @@ class ParentAction(object):
          :param duration_time: integer milliseconds ex: 3000 for 3 seconds
          """
 
+        if self.rubber_polygon is None:
+            self.init_rubber()
+
         rb = self.rubber_polygon
         polyline = QgsGeometry.fromPolylineXY(points)
         rb.setToGeometry(polyline, None)
@@ -1170,15 +1192,21 @@ class ParentAction(object):
 
         return rb
 
+
     def resetRubberbands(self):
+
+        if self.rubber_polygon is None:
+            self.init_rubber()
 
         self.rubber_point.reset(0)
         self.rubber_polygon.reset(2)
 
 
     def restore_user_layer(self):
+
         if self.user_current_layer:
             self.iface.setActiveLayer(self.user_current_layer)
         else:
             layer = self.controller.get_layer_by_tablename('v_edit_node')
             if layer: self.iface.setActiveLayer(layer)
+

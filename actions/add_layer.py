@@ -126,7 +126,7 @@ class AddLayer(object):
             my_group.insertLayer(0, layer)
 
 
-    def add_temp_layer(self, dialog, data, layer_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True, group='GW Temporal Layers'):
+    def add_temp_layer(self, dialog, data, layer_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True, group='GW Temporal Layers', disable_tabs=True):
         """ Add QgsVectorLayer into TOC
         :param dialog:
         :param data:
@@ -136,6 +136,7 @@ class AddLayer(object):
         :param tab_idx:
         :param del_old_layers:
         :param group:
+        :param disable_tabs: set all tabs, except the last, enabled or disabled (boolean)
         :return:
         """
         colors = {'rnd': QColor(randrange(0, 256), randrange(0, 256), randrange(0, 256))}
@@ -146,7 +147,7 @@ class AddLayer(object):
             if str(k) == 'setVisibleLayers':
                 self.set_layers_visible(v)
             elif str(k) == "info":
-                text_result = self.populate_info_text(dialog, data, force_tab, reset_text, tab_idx)
+                text_result = self.populate_info_text(dialog, data, force_tab, reset_text, tab_idx, disable_tabs)
             elif k in ('point', 'line', 'polygon'):
                 if 'values' in data[k]:
                     key = 'values'
@@ -236,7 +237,6 @@ class AddLayer(object):
             # layer_style['vertical_anchor_point'] = '6'
 
             # symbol_layer = QgsSimpleFillSymbolLayer.create(layer_style)
-            # print(f"Symbollaye --> {symbol_layer}")
             # # replace default symbol layer with the configured one
             # if symbol_layer is not None:
             #     symbol.changeSymbolLayer(0, symbol_layer)
@@ -272,12 +272,13 @@ class AddLayer(object):
         self.iface.layerTreeView().refreshLayerSymbology(layer.id())
 
 
-    def populate_info_text(self, dialog, data, force_tab=True, reset_text=True, tab_idx=1):
+    def populate_info_text(self, dialog, data, force_tab=True, reset_text=True, tab_idx=1, disable_tabs=True):
         """ Populate txt_infolog QTextEdit widget
         :param data: Json
         :param force_tab: Force show tab (boolean)
         :param reset_text: Reset(or not) text for each iteration (boolean)
         :param tab_idx: index of tab to force (integer)
+        :param disable_tabs: set all tabs, except the last, enabled or disabled (boolean)
         :return:
         """
         change_tab = False
@@ -296,9 +297,11 @@ class AddLayer(object):
 
         utils_giswater.setWidgetText(dialog, 'txt_infolog', text+"\n")
         qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
-        if change_tab and qtabwidget is not None:
-            qtabwidget.setCurrentIndex(tab_idx)
-            self.disable_tabs(dialog)
+        if qtabwidget is not None:
+            if change_tab and qtabwidget is not None:
+                qtabwidget.setCurrentIndex(tab_idx)
+            if disable_tabs:
+                self.disable_tabs(dialog)
 
         return text
 
@@ -380,7 +383,7 @@ class AddLayer(object):
             geometry = f"{type_}{coordinates}"
             return QgsGeometry.fromWkt(geometry)
         except AttributeError as e:
-            print(f"{type(e).__name__} --> {e}")
+            self.controller.log_info(f"{type(e).__name__} --> {e}")
             return None
 
 

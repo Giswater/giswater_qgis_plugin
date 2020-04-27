@@ -14,6 +14,7 @@ from functools import partial
 from .. import utils_giswater
 from .add_lot import AddNewLot
 from .manage_visit import ManageVisit
+# from .new_manage_visit import ManageVisit
 from .manage_new_psector import ManageNewPsector
 from .parent import ParentAction
 from .crm_trace import CrmTrace

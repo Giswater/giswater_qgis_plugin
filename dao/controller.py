@@ -45,6 +45,7 @@ class DaoController(object):
         self.min_log_level = 20
         self.min_message_level = 0
         self.last_error = None
+        self.user = None
 
         if create_logger:
             self.set_logger(logger_name)
@@ -312,7 +313,21 @@ class DaoController(object):
 
         return status
 
-    
+
+    def check_db_connection(self):
+        """ Check database connection. Reconnect if needed """
+
+        opened = True
+        try:
+            opened = self.db.isOpen()
+            if not opened:
+                self.db.open()
+        except Exception:
+            pass
+        finally:
+            return opened
+
+
     def get_error_message(self, log_code_id):    
         """ Get error message from selected error code """
         
@@ -505,7 +520,7 @@ class DaoController(object):
         if not row:
             # Check if any error has been raised
             if self.last_error:
-                self.manage_exception_db(self.last_error, sql, stack_level_increase=1)
+                self.manage_exception_db(self.last_error, sql)
             elif self.last_error is None and log_info:
                 self.log_info("Any record found", parameter=sql, stack_level_increase=1)
           
@@ -689,11 +704,11 @@ class DaoController(object):
         """
 
         # Check if function exists
-        row = self.check_function(function_name, schema_name)
+        row = self.check_function(function_name, schema_name, commit)
         if not row:
             self.show_warning("Function not found in database", parameter=function_name)
             return None
-        if schema_name: sql = sql = f"SELECT {schema_name}.{function_name}("
+        if schema_name: sql = f"SELECT {schema_name}.{function_name}("
         else: sql = f"SELECT {function_name}("
         if parameters: sql += f"{parameters}"
         sql += f");"
@@ -757,7 +772,8 @@ class DaoController(object):
             if tooltip != f'tooltip_{widget_name}':
                 widget.setToolTip(tooltip)
             elif widget.toolTip() == "":
-                widget.setToolTip(widget.text())
+                if type(widget) is QGroupBox: widget.setToolTip(widget.title())
+                else: widget.setToolTip(widget.text())
 
 
     def translate_form(self, dialog, context_name):
@@ -844,9 +860,8 @@ class DaoController(object):
                         widget.setText(text)
                 self.translate_tooltip(context_name, widget)
 
-
         except Exception as e:
-            print(f"{widget_name} --> {type(e).__name__} --> {e}")
+            self.log_info(f"{widget_name} --> {type(e).__name__} --> {e}")
             pass
         
         
@@ -1073,7 +1088,11 @@ class DaoController(object):
         """ Manage locale and corresponding 'i18n' file """ 
         
         # Get locale of QGIS application
-        locale = QSettings().value('locale/userLocale').lower()
+        try:
+            locale = QSettings().value('locale/userLocale').lower()
+        except AttributeError:
+            locale = "en"
+
         if locale == 'es_es':
             locale = 'es'
         elif locale == 'es_ca':
@@ -1165,7 +1184,7 @@ class DaoController(object):
         return row
     
     
-    def check_function(self, function_name, schema_name=None):
+    def check_function(self, function_name, schema_name=None, commit=True):
         """ Check if @function_name exists in selected schema """
 
         if schema_name is None:
@@ -1176,7 +1195,7 @@ class DaoController(object):
                "WHERE lower(routine_schema) = %s "
                "AND lower(routine_name) = %s ")
         params = [schema_name, function_name]
-        row = self.get_row(sql, params=params)
+        row = self.get_row(sql, params=params, commit=commit)
         return row
     
     
@@ -1412,10 +1431,10 @@ class DaoController(object):
         return layers
 
 
-    def set_search_path(self, dbname, schema_name):
+    def set_search_path(self, schema_name):
         """ Set parameter search_path for current QGIS project """
 
-        sql = ("SET search_path = " + str(schema_name) + ", public;")
+        sql = f"SET search_path = {schema_name}, public;"
         self.execute_sql(sql, log_sql=True)
 
 
@@ -1645,13 +1664,4 @@ class DaoController(object):
         self.dlg_info.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.set_text_bold(self.dlg_info.txt_infolog)
         self.dlg_info.show()
-
-
-    def test_exception(self):
-        """ Function to test exception manager """
-
-        try:
-            print(4 / 0)
-        except Exception:
-            self.manage_exception()
 

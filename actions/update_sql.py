@@ -34,7 +34,8 @@ from .create_gis_project import CreateGisProject
 from .gw_task import GwTask
 from .i18n_generator import I18NGenerator
 from ..ui_manager import Readsql, InfoShowInfo, ReadsqlCreateProject, ReadsqlRenameCopy, ReadsqlShowInfo, \
-    ReadsqlCreateGisProject, ImportInpUi, ManageFields, ManageVisitClass, ManageVisitParam, ManageSysFields, Credentials
+    ReadsqlCreateGisProject, ToolboxUi, ManageFields, ManageVisitClass, ManageVisitParam, ManageSysFields, Credentials
+
 
 
 class UpdateSQL(ApiParent):
@@ -52,9 +53,10 @@ class UpdateSQL(ApiParent):
         self.project_type = None
         self.dlg_readsql = None
         self.dlg_info = None
+        self.dlg_readsql_create_project = None
 
 
-    def init_sql(self, set_database_connection=False):
+    def init_sql(self, set_database_connection=False, username=None, show_dialog=True):
         """ Button 100: Execute SQL. Info show info """
 
         # Populate combo connections
@@ -87,7 +89,7 @@ class UpdateSQL(ApiParent):
         if self.project_type is not None and len(layers) != 0:
             self.info_show_info()
         else:
-            self.info_show_database()
+            self.info_show_database(username=username, show_dialog=show_dialog)
 
 
     def populate_combo_connections(self):
@@ -105,7 +107,7 @@ class UpdateSQL(ApiParent):
         return default_connection
 
 
-    def init_show_database(self):
+    def init_show_database(self, project_type=None):
         """ Initialization code of the form (to be executed only once) """
 
         # Get SQL folder and check if exists
@@ -127,7 +129,7 @@ class UpdateSQL(ApiParent):
             self.super_users.append(str(super_user))
 
         # Get locale of QGIS application
-        self.locale = QSettings().value('locale/userLocale').lower()
+        self.locale = self.controller.plugin_settings_value('locale/userLocale', 'en_us').lower()
         if self.locale == 'es_es':
             self.locale = 'ES'
         elif self.locale == 'es_ca':
@@ -174,16 +176,17 @@ class UpdateSQL(ApiParent):
             utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "api_manager")
             utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "custom")
             self.project_types = self.settings.value('system_variables/project_types')
-            utils_giswater.setWidgetVisible(self.dlg_readsql, 'btn_task_example', False)
         else:
             self.project_types = self.settings.value('system_variables/project_types_dev')
 
         # Populate combo types
-        #self.cmb_project_type.blockSignals(True)
         self.cmb_project_type.clear()
-        #self.cmb_project_type.blockSignals(False)
         for project_type in self.project_types:
             self.cmb_project_type.addItem(str(project_type))
+
+        if project_type:
+            utils_giswater.setWidgetText(self.dlg_readsql, self.cmb_project_type, project_type)
+
         self.change_project_type(self.cmb_project_type)
 
         # Get widgets form
@@ -208,7 +211,6 @@ class UpdateSQL(ApiParent):
         """ Set signals. Function has to be executed only once (during form initialization) """
 
         self.dlg_readsql.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_readsql))
-        self.dlg_readsql.btn_task_example.clicked.connect(partial(self.task_example))
         self.dlg_readsql.btn_schema_create.clicked.connect(partial(self.open_create_project))
         self.dlg_readsql.btn_api_create.clicked.connect(partial(self.implement_api))
         self.dlg_readsql.btn_custom_load_file.clicked.connect(
@@ -249,11 +251,12 @@ class UpdateSQL(ApiParent):
 
 
     def manage_translations(self):
+      
         qm_gen = I18NGenerator(self.iface, self.settings, self.controller, self.plugin_dir)
         qm_gen.init_dialog()
 
 
-    def info_show_database(self, connection_status=True):
+    def info_show_database(self, connection_status=True, username=None, show_dialog=False):
 
         self.message_update = ''
         self.error_count = 0
@@ -263,7 +266,9 @@ class UpdateSQL(ApiParent):
         self.last_connection = self.get_last_connection()
 
         # Get database connection user and role
-        self.username = self.get_user_connection(self.last_connection)
+        self.username = username
+        if username is None:
+            self.username = self.get_user_connection(self.last_connection)
 
         self.dlg_readsql.btn_info.setText('Update Project Schema')
         self.dlg_readsql.lbl_status_text.setStyleSheet("QLabel {color:red;}")
@@ -277,11 +282,10 @@ class UpdateSQL(ApiParent):
         # Set last connection for default
         utils_giswater.set_combo_itemData(self.cmb_connection, str(self.last_connection), 1)
 
-        # Open dialog
+        # Set title
         connection = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_connection)
         window_title = f'Giswater ({connection} - {self.plugin_version})'
         self.dlg_readsql.setWindowTitle(window_title)
-        self.open_dialog(self.dlg_readsql)
 
         if connection_status is False:
             msg = "Connection Failed. Please, check connection parameters"
@@ -290,6 +294,7 @@ class UpdateSQL(ApiParent):
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
             utils_giswater.setWidgetText(self.dlg_readsql, 'lbl_status_text', msg)
             utils_giswater.setWidgetText(self.dlg_readsql, 'lbl_schema_name', '')
+            self.open_dialog(self.dlg_readsql)
             return
 
         # Create extension postgis if not exist
@@ -334,6 +339,9 @@ class UpdateSQL(ApiParent):
         if str(self.controller.plugin_settings_value('last_schema_name_selected')) != '':
             utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name,
                 str(self.controller.plugin_settings_value('last_schema_name_selected')))
+
+        if show_dialog:
+            self.open_dialog(self.dlg_readsql)
 
 
     def set_credentials(self, dialog, new_connection=False):
@@ -384,8 +392,16 @@ class UpdateSQL(ApiParent):
             self.controller.show_info_box(msg, "Warning")
 
         # Generate QGIS project
+        self.generate_qgis_project(gis_folder, gis_file, project_type, schema_name, export_passwd, roletype, sample)
+
+
+    def generate_qgis_project(self, gis_folder, gis_file, project_type, schema_name, export_passwd, roletype, sample,
+        get_database_parameters=True):
+        """ Generate QGIS project """
+
         gis = CreateGisProject(self.controller, self.plugin_dir)
-        result, qgs_path = gis.gis_project_database(gis_folder, gis_file, project_type, schema_name, export_passwd, roletype, sample)
+        result, qgs_path = gis.gis_project_database(gis_folder, gis_file, project_type, schema_name, export_passwd,
+            roletype, sample, get_database_parameters)
 
         self.close_dialog(self.dlg_create_gis_project)
         self.close_dialog(self.dlg_readsql)
@@ -916,8 +932,8 @@ class UpdateSQL(ApiParent):
 
     def load_sample_data(self, project_type=False):
 
-        sql = 'UPDATE ' + self.schema + '.version SET sample=True ' \
-              'WHERE id = (SELECT id FROM ' + self.schema + '.version ORDER BY id DESC LIMIT 1)'
+        sql = (f"UPDATE {self.schema}.version SET sample=True "
+               f"WHERE id = (SELECT id FROM {self.schema}.version ORDER BY id DESC LIMIT 1)")
         self.controller.execute_sql(sql, commit=False)
 
         if str(project_type) == 'ws' or str(project_type) == 'ud':
@@ -1211,8 +1227,12 @@ class UpdateSQL(ApiParent):
     def execute_import_data(self, schema_type=''):
 
         # Create dialog
-        self.dlg_import_inp = ImportInpUi()
+        self.dlg_import_inp = ToolboxUi()
         self.load_settings(self.dlg_import_inp)
+
+        # Hide widgets
+        self.dlg_import_inp.grb_input_layer.setVisible(False)
+        self.dlg_import_inp.grb_selection_type.setVisible(False)
 
         self.dlg_import_inp.progressBar.setVisible(False)
 
@@ -1226,7 +1246,7 @@ class UpdateSQL(ApiParent):
 
         extras += ', "isToolbox":false'
         body = self.create_body(extras=extras)
-        complet_result = self.controller.get_json('gw_api_gettoolbox', body, schema_name=self.schema)
+        complet_result = self.controller.get_json('gw_api_gettoolbox', body, schema_name=self.schema, commit=False)
         if not complet_result: return False
         self.populate_functions_dlg(self.dlg_import_inp, complet_result['body']['data'])
 
@@ -1238,7 +1258,7 @@ class UpdateSQL(ApiParent):
         self.open_dialog(self.dlg_import_inp, dlg_name='main_importinp')
 
 
-    def execute_last_process(self, new_project=False, schema_name='', schema_type='', locale=False):
+    def execute_last_process(self, new_project=False, schema_name='', schema_type='', locale=False, srid=None):
         """ Execute last process function """
 
         if new_project is True:
@@ -1247,7 +1267,9 @@ class UpdateSQL(ApiParent):
             extras = '"isNewProject":"' + str('FALSE') + '", '
         extras += '"gwVersion":"' + str(self.version_metadata) + '", '
         extras += '"projectType":"' + str(schema_type).upper() + '", '
-        extras += '"epsg":' + str(self.filter_srid_value).replace('"', '')
+        if srid is None:
+            srid = self.filter_srid_value
+        extras += '"epsg":' + str(srid).replace('"', '')
         if new_project is True:
             if str(self.title) != 'null':
                 extras += ', ' + '"title":"' + str(self.title) + '"'
@@ -1260,16 +1282,14 @@ class UpdateSQL(ApiParent):
         self.schema_name = schema_name
 
         # Get current locale
-        if locale:
-            locale = ''
-        else:
+        if not locale:
             locale = utils_giswater.getWidgetText(self.dlg_readsql_create_project,
                                                   self.dlg_readsql_create_project.cmb_locale)
 
-        client = '"client":{"device":9, "lang":"'+locale+'"}, '
+        client = '"client":{"device":9, "lang":"' + str(locale) + '"}, '
         data = '"data":{' + extras + '}'
         body = "$${" + client + data + "}$$"
-        status = self.controller.get_json('gw_fct_admin_schema_lastprocess', body, schema_name=self.schema_name)
+        status = self.controller.get_json('gw_fct_admin_schema_lastprocess', body, schema_name=self.schema_name, commit=False)
         if status is False:
             self.error_count = self.error_count + 1
 
@@ -1339,40 +1359,30 @@ class UpdateSQL(ApiParent):
         QgsApplication.taskManager().addTask(task1)
 
 
-    def create_project_data_schema(self):
+    def check_project_name(self, project_name, project_title):
+        """ Check if @project_name and @project_title are is valid """
 
-        # Save user values
-        project_name_schema = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'project_name')
-        project_title_schema = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'project_title')
-        inp_file_path = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'data_file')
-        self.controller.plugin_settings_set_value('project_name_schema', project_name_schema)
-        self.controller.plugin_settings_set_value('project_title_schema', project_title_schema)
-        self.controller.plugin_settings_set_value('inp_file_path', inp_file_path)
-
-        self.title = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.project_title)
-        project_name = str(utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.project_name))
-        schema_type = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'cmb_create_project_type')
-        self.filter_srid_value = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'srid_id')
-
+        # Check if project name is valid
         if project_name == 'null':
             msg = "The 'Project_name' field is required."
             self.controller.show_info_box(msg, "Info")
-            return
+            return False
         elif any(c.isupper() for c in project_name) is True:
             msg = "The 'Project_name' field require only lower caracters"
             self.controller.show_info_box(msg, "Info")
-            return
+            return False
         elif (bool(re.match('^[a-z0-9_]*$', project_name))) is False:
             msg = "The 'Project_name' field have invalid character"
             self.controller.show_info_box(msg, "Info")
-            return
-        if self.title == 'null':
+            return False
+        if project_title == 'null':
             msg = "The 'Title' field is required."
             self.controller.show_info_box(msg, "Info")
-            return
+            return False
 
+        # Check is project name already exists
         sql = "SELECT schema_name, schema_name FROM information_schema.schemata"
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=False)
         available = False
         for row in rows:
             if str(project_name) == str(row[0]):
@@ -1394,17 +1404,48 @@ class UpdateSQL(ApiParent):
                                 available = True
                     self.rename_project_data_schema(str(project_name), str(project_name) + "_bk_" + str(i))
                 else:
-                    return
+                    return False
 
-        self.schema = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'project_name')
-        project_type = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'cmb_create_project_type')
-        self.locale = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'cmb_locale')
+        return True
 
-        self.task1 = GwTask('Manage schema')
-        QgsApplication.taskManager().addTask(self.task1)
-        self.task1.setProgress(0)
 
-        # Initial checks
+    def create_project_data_schema(self, project_name_schema=None, project_title_schema=None,  project_type=None,
+            project_srid=None, project_locale=None, is_test=False, exec_last_process=True, example_data=True):
+
+        # Get project parameters
+        if project_name_schema is None or not project_name_schema:
+            project_name_schema = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'project_name')
+        if project_title_schema is None or not project_title_schema:
+            project_title_schema = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'project_title')
+        if project_type is None:
+            project_type = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'cmb_create_project_type')
+        if project_srid is None:
+            project_srid = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'srid_id')
+        if project_locale is None:
+            project_locale = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'cmb_locale')
+
+        # Set class variables
+        self.schema = project_name_schema
+        self.title = project_title_schema
+        self.schema_type = project_type
+        self.filter_srid_value = project_srid
+        self.locale = project_locale
+
+        # Save in settings
+        self.controller.plugin_settings_set_value('project_name_schema', project_name_schema)
+        self.controller.plugin_settings_set_value('project_title_schema', project_title_schema)
+        inp_file_path = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'data_file')
+        self.controller.plugin_settings_set_value('inp_file_path', inp_file_path)
+
+        # Check if project name is valid
+        if not self.check_project_name(project_name_schema, project_title_schema):
+            return
+
+        if not is_test:
+            self.task1 = GwTask('Manage schema')
+            QgsApplication.taskManager().addTask(self.task1)
+            self.task1.setProgress(0)
+
         if self.rdb_import_data.isChecked():
             self.file_inp = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'data_file')
             if self.file_inp is 'null':
@@ -1419,10 +1460,9 @@ class UpdateSQL(ApiParent):
                 result = self.controller.ask_question(msg, "Info Message")
                 if result:
                     self.filter_srid_value = '25831'
-                    utils_giswater.setWidgetText(self.dlg_readsql_create_project, 'srid_id', '25831')
-                    utils_giswater.setWidgetText(self.dlg_readsql_create_project, 'cmb_locale', 'EN')
-                    self.task1 = GwTask('Manage schema')
-                    QgsApplication.taskManager().addTask(self.task1)
+                    self.locale = 'EN'
+                    utils_giswater.setWidgetText(self.dlg_readsql_create_project, 'srid_id', self.filter_srid_value)
+                    utils_giswater.setWidgetText(self.dlg_readsql_create_project, 'cmb_locale', self.locale)
                 else:
                     return
 
@@ -1432,77 +1472,81 @@ class UpdateSQL(ApiParent):
             self.manage_process_result()
             return
 
-        self.task1.setProgress(10)
+        if not is_test: self.task1.setProgress(10)
         status = self.update_30to31(new_project=True, project_type=project_type)
         if not status and self.dev_commit == 'FALSE':
             self.manage_process_result()
             return
-        self.task1.setProgress(20)
+        if not is_test: self.task1.setProgress(20)
         status = self.load_views(project_type=project_type)
         if not status and self.dev_commit == 'FALSE':
             self.manage_process_result()
             return
-        self.task1.setProgress(30)
+        if not is_test: self.task1.setProgress(30)
         status = self.load_trg(project_type=project_type)
         if not status and self.dev_commit == 'FALSE':
             self.manage_process_result()
             return
-        self.task1.setProgress(40)
+        if not is_test: self.task1.setProgress(40)
         status = self.update_31to39(new_project=True, project_type=project_type)
         if not status and self.dev_commit == 'FALSE':
             self.manage_process_result()
             return
-        self.task1.setProgress(50)
+        if not is_test: self.task1.setProgress(50)
         status = self.api(new_api=True, project_type=project_type)
         if not status and self.dev_commit == 'FALSE':
             self.manage_process_result()
             return
-        self.task1.setProgress(60)
-        status = self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
+        if not is_test: self.task1.setProgress(60)
+
+        status = True
+        if exec_last_process:
+            status = self.execute_last_process(new_project=True, schema_name=project_name_schema,
+                schema_type=self.schema_type, locale=project_locale, srid=project_srid)
+
         if not status and self.dev_commit == 'FALSE':
             self.manage_process_result()
             return
-        self.task1.setProgress(70)
+
         # Custom execution
         if self.rdb_import_data.isChecked():
             #TODO:
-            self.task1.setProgress(100)
+            if not is_test: self.task1.setProgress(100)
             self.controller.plugin_settings_set_value('create_schema_type', 'rdb_import_data')
             msg = ("The sql files have been correctly executed."
                    "\nNow, a form will be opened to manage the import inp.")
             self.controller.show_info_box(msg, "Info")
-            self.execute_import_data(schema_type=schema_type)
+            self.execute_import_data(schema_type=project_type)
             return
-
-        elif self.rdb_sample.isChecked():
+        elif self.rdb_sample.isChecked() and example_data:
             self.controller.plugin_settings_set_value('create_schema_type', 'rdb_sample')
             self.load_sample_data(project_type=project_type)
-            self.task1.setProgress(80)
+            if not is_test: self.task1.setProgress(80)
         elif self.rdb_sample_dev.isChecked():
             self.controller.plugin_settings_set_value('create_schema_type', 'rdb_sample_dev')
             self.load_sample_data(project_type=project_type)
             self.load_dev_data(project_type=project_type)
-            self.task1.setProgress(80)
+            if not is_test: self.task1.setProgress(80)
         elif self.rdb_data.isChecked():
             self.controller.plugin_settings_set_value('create_schema_type', 'rdb_data')
-            pass
 
-        self.manage_process_result(project_name_schema)
+        self.manage_process_result(project_name_schema, is_test)
 
         # Update composer path on config_param_user
         self.manage_user_params()
 
 
-    def manage_process_result(self, schema_name=None):
+    def manage_process_result(self, schema_name=None, is_test=False):
 
-        self.task1.setProgress(100)
+        if not is_test: self.task1.setProgress(100)
         status = (self.error_count == 0)
         self.manage_result_message(status, parameter="Create project")
         if status:
             self.controller.dao.commit()
             self.close_dialog(self.dlg_readsql_create_project)
-            # Refresh data main dialog
-            self.event_change_connection()
+            if not is_test:
+                # Refresh data main dialog
+                self.event_change_connection()
             if schema_name is not None:
                 utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name, schema_name)
             self.set_info_project()
@@ -1516,7 +1560,7 @@ class UpdateSQL(ApiParent):
 
         if create_project is None or create_project is False:
             close_dlg_rename = True
-            self.schema = utils_giswater.getWidgetText(self.dlg_readsql_rename,self.dlg_readsql_rename.schema_rename_copy)
+            self.schema = utils_giswater.getWidgetText(self.dlg_readsql_rename, self.dlg_readsql_rename.schema_rename_copy)
             if str(self.schema) == str(schema):
                 msg = "Please, select a diferent project name than current."
                 self.controller.show_info_box(msg, "Info")
@@ -1657,11 +1701,13 @@ class UpdateSQL(ApiParent):
     """ Checkbox calling functions """
 
 
-    def load_updates(self, project_type, update_changelog=False):
+    def load_updates(self, project_type, update_changelog=False, schema_name=None):
 
         # Get current schema selected
-        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
-        self.schema = None
+        if schema_name is None:
+            schema_name = self.get_schema_name()
+
+        self.schema = schema_name
         self.locale = self.project_data_language
 
         self.task1 = GwTask('Manage schema')
@@ -1694,6 +1740,12 @@ class UpdateSQL(ApiParent):
             self.error_count = 0
 
         return status
+
+
+    def get_schema_name(self):
+
+        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        return schema_name
 
 
     def reload_tablect(self, project_type=False):
@@ -1820,8 +1872,8 @@ class UpdateSQL(ApiParent):
         self.load_settings(self.dlg_manage_visit_class)
 
         # Manage widgets
-        sql = "SELECT id, id as idval FROM sys_feature_type WHERE net_category=1"
-        rows = self.controller.get_rows(sql, log_sql=True)
+        sql = "SELECT id, id as idval FROM sys_feature_type WHERE net_category = 1"
+        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         utils_giswater.set_item_data(self.dlg_manage_visit_class.feature_type, rows, 1)
 
         sql = "SELECT id, id as idval FROM om_visit_type"
@@ -1842,20 +1894,20 @@ class UpdateSQL(ApiParent):
         self.load_settings(self.dlg_manage_visit_param)
 
         # Manage widgets
-        sql = ("SELECT id, id as idval FROM om_visit_parameter_type")
-        rows = self.controller.get_rows(sql, log_sql=True)
+        sql = "SELECT id, id as idval FROM om_visit_parameter_type"
+        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         utils_giswater.set_item_data(self.dlg_manage_visit_param.parameter_type, rows, 1)
 
-        sql = ("SELECT id, idval FROM config_api_typevalue WHERE typevalue = 'datatype'")
-        rows = self.controller.get_rows(sql, log_sql=True)
+        sql = "SELECT id, idval FROM config_api_typevalue WHERE typevalue = 'datatype'"
+        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         utils_giswater.set_item_data(self.dlg_manage_visit_param.data_type, rows, 1)
 
-        sql = ("SELECT id, id as idval FROM om_visit_parameter_form_type")
-        rows = self.controller.get_rows(sql, log_sql=True)
+        sql = "SELECT id, id as idval FROM om_visit_parameter_form_type"
+        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         utils_giswater.set_item_data(self.dlg_manage_visit_param.form_type, rows, 1)
 
-        sql = ("SELECT id, idval FROM config_api_typevalue WHERE typevalue = 'widgettype'")
-        rows = self.controller.get_rows(sql, log_sql=True)
+        sql = "SELECT id, idval FROM config_api_typevalue WHERE typevalue = 'widgettype'"
+        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         utils_giswater.set_item_data(self.dlg_manage_visit_param.widget_type, rows, 1)
 
         # Set listeners
@@ -2019,15 +2071,16 @@ class UpdateSQL(ApiParent):
             utils_giswater.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", False)
         else:
             # Check if exist column sample in table version
-            sql = "SELECT column_name FROM information_schema.columns WHERE table_name='version' and column_name='sample' and table_schema='" + schema_name +"';"
-            result = self.controller.get_row(sql, commit=False)
+            sql = (f"SELECT column_name FROM information_schema.columns "
+                   f"WHERE table_name = 'version' and column_name = 'sample' and table_schema = '{schema_name}';")
+            result = self.controller.get_row(sql)
 
             if result is None:
-                sql = "SELECT giswater, language, epsg FROM " + schema_name + ".version ORDER BY id DESC LIMIT 1;"
-                result = self.controller.get_row(sql, commit=False)
+                sql = f"SELECT giswater, language, epsg FROM {schema_name}.version ORDER BY id DESC LIMIT 1;"
+                result = self.controller.get_row(sql)
             else:
-                sql = "SELECT giswater, language, epsg, sample FROM " + schema_name + ".version ORDER BY id DESC LIMIT 1;"
-                result = self.controller.get_row(sql, commit=False)
+                sql = f"SELECT giswater, language, epsg, sample FROM {schema_name}.version ORDER BY id DESC LIMIT 1;"
+                result = self.controller.get_row(sql)
                 self.is_sample = result[3]
             self.project_data_schema_version = result[0]
             self.project_data_language = result[1]
@@ -2152,9 +2205,13 @@ class UpdateSQL(ApiParent):
         self.error_count = 0
 
 
-    def open_create_project(self):
+    def init_dialog_create_project(self, project_type=None):
+        """ Initialize dialog (only once) """
 
         # Create dialog
+        if self.dlg_readsql_create_project is not None:
+            return
+
         self.dlg_readsql_create_project = ReadsqlCreateProject()
         self.load_settings(self.dlg_readsql_create_project)
 
@@ -2167,7 +2224,7 @@ class UpdateSQL(ApiParent):
         self.rdb_import_data = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_import_data')
         self.data_file = self.dlg_readsql_create_project.findChild(QLineEdit, 'data_file')
 
-        #Load user values
+        # Load user values
         self.project_name.setText(str(self.controller.plugin_settings_value('project_name_schema')))
         self.project_title.setText(str(self.controller.plugin_settings_value('project_title_schema')))
         create_schema_type = self.controller.plugin_settings_value('create_schema_type')
@@ -2196,15 +2253,13 @@ class UpdateSQL(ApiParent):
 
         # Populate Table
         self.fill_table_by_query(self.tbl_srid, sql)
-        # return esto
         self.cmb_create_project_type = self.dlg_readsql_create_project.findChild(QComboBox, 'cmb_create_project_type')
 
-        for porject_type in self.project_types:
-            self.cmb_create_project_type.addItem(str(porject_type))
+        for project_type in self.project_types:
+            self.cmb_create_project_type.addItem(str(project_type))
 
-        utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.cmb_create_project_type,
-                                     utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type))
-
+        cmb_project_type = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
+        utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.cmb_create_project_type, project_type)
         self.change_project_type(self.cmb_create_project_type)
 
         # Enable_disable data file widgets
@@ -2229,11 +2284,17 @@ class UpdateSQL(ApiParent):
             if locale == 'EN':
                 utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.cmb_locale, 'EN')
 
-        # Get connection ddb name
-        connection_name = str(utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_connection))
+        # Get database connection name
+        self.connection_name = str(utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_connection))
+
+
+    def open_create_project(self):
+
+        # Initialize dialog (only once)
+        self.init_dialog_create_project()
 
         # Open dialog
-        self.dlg_readsql_create_project.setWindowTitle('Create Project - ' + str(connection_name))
+        self.dlg_readsql_create_project.setWindowTitle(f"Create Project - {self.connection_name}")
         self.open_dialog(self.dlg_readsql_create_project)
 
 
@@ -2384,7 +2445,7 @@ class UpdateSQL(ApiParent):
         extras = f'"parameters":{{"source_schema":"{schema}", "dest_schema":"{new_schema_name}"}}'
         body = self.create_body(extras=extras)
         self.task1.setProgress(50)
-        result = self.controller.get_json('gw_fct_clone_schema', body, schema_name=schema, log_sql=True)
+        result = self.controller.get_json('gw_fct_clone_schema', body, schema_name=schema, log_sql=True, commit=False)
         if not result: return
         self.task1.setProgress(100)
 
@@ -2459,7 +2520,7 @@ class UpdateSQL(ApiParent):
 
             body = self.create_body(extras=extras)
             sql = ("SELECT " + str(function_name) + "(" + body + ")::text")
-            row = self.controller.get_row(sql, log_sql=True)
+            row = self.controller.get_row(sql, log_sql=True, commit=False)
             self.task1 = GwTask('Manage schema')
             QgsApplication.taskManager().addTask(self.task1)
             self.task1.setProgress(50)
@@ -2746,7 +2807,7 @@ class UpdateSQL(ApiParent):
         body = body.replace('""', 'null')
 
         # Execute query
-        status = self.controller.get_json('gw_fct_admin_manage_child_views', body, schema_name=schema_name)
+        status = self.controller.get_json('gw_fct_admin_manage_child_views', body, schema_name=schema_name, commit=False)
         self.manage_result_message(status, parameter="Created child view")
 
 
@@ -3018,6 +3079,7 @@ class UpdateSQL(ApiParent):
         elif dlg_to_close.objectName() == 'dlg_man_addfields':
             self.open_manage_field('Update')
 
+
     def manage_sys_update(self, form_name):
 
         list_widgets = self.dlg_manage_sys_fields.Create.findChildren(QWidget)
@@ -3105,14 +3167,13 @@ class UpdateSQL(ApiParent):
                         result_json = json.dumps(_json)
 
             # Create body
-
             feature = '"catFeature":"' + form_name + '"'
             extras = '"action":"CREATE", "multi_create":' + str(self.chk_multi_insert).lower() + ', "parameters":' + result_json + ''
             body = self.create_body(feature=feature, extras=extras)
             body = body.replace('""', 'null')
 
             # Execute manage add fields function
-            status = self.controller.get_json('gw_fct_admin_manage_addfields', body, schema_name=schema_name)
+            status = self.controller.get_json('gw_fct_admin_manage_addfields', body, schema_name=schema_name, commit=False)
             self.manage_result_message(status, parameter="Created field into 'config_api_form_fields'")
             if not status:
                 return
@@ -3145,14 +3206,12 @@ class UpdateSQL(ApiParent):
             # Create body
             feature = '"catFeature":"' + form_name + '"'
             extras = '"action":"UPDATE"'
-
-
             extras += ', "multi_create":' + str(self.chk_multi_insert).lower() + ', "parameters":' + result_json + ''
             body = self.create_body(feature=feature, extras=extras)
             body = body.replace('""', 'null')
 
             # Execute manage add fields function
-            status = self.controller.get_json('gw_fct_admin_manage_addfields', body, schema_name=schema_name)
+            status = self.controller.get_json('gw_fct_admin_manage_addfields', body, schema_name=schema_name, commit=False)
             self.manage_result_message(status, parameter="Update field into 'config_api_form_fields'")
             if not status:
                 return
@@ -3168,7 +3227,7 @@ class UpdateSQL(ApiParent):
             body = self.create_body(feature=feature, extras=extras)
 
             # Execute manage add fields function
-            status = self.controller.get_json('gw_fct_admin_manage_addfields', body, schema_name=schema_name)
+            status = self.controller.get_json('gw_fct_admin_manage_addfields', body, schema_name=schema_name, commit=False)
             self.manage_result_message(status, parameter="Delete function")
 
         # Close dialog

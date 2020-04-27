@@ -6,9 +6,10 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.core import Qgis, QgsApplication
-from qgis.PyQt.QtCore import QDate, QStringListModel, QTime,  Qt
+from qgis.PyQt.QtCore import QDate, QStringListModel, QTime,  Qt, QRegExp
 from qgis.PyQt.QtWidgets import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QComboBox, QCompleter, \
     QFileDialog, QMessageBox
+from qgis.PyQt.QtGui import QRegExpValidator
 
 import csv
 import json
@@ -243,6 +244,7 @@ class Go2Epa(ApiParent):
 
         cur_user = self.controller.get_current_user()
 
+        self.dlg_go2epa.txt_result_name.setMaxLength(16)
         self.result_name = self.controller.plugin_settings_value('go2epa_RESULT_NAME' + cur_user)
         self.dlg_go2epa.txt_result_name.setText(self.result_name)
         self.file_inp = self.controller.plugin_settings_value('go2epa_FILE_INP' + cur_user)
@@ -530,7 +532,7 @@ class Go2Epa(ApiParent):
                     elif bool(re.search('(\d\..*\.\d)', str(dirty_list[x]))):
                         # when -> 0.00859373.7500
                         if 'Version' not in dirty_list and 'VERSION' not in dirty_list:
-                            print(f"Error near line {line_number+1} -> {dirty_list}")
+                            self.controller.log_info(f"Error near line {line_number+1} -> {dirty_list}")
                             message = ("The rpt file has a heavy inconsistency. As a result it's not posible to import it. " 
                                   "Columns are overlaped one againts other, this is a not valid simulation. " 
                                   "Please ckeck and fix it before continue")
@@ -552,7 +554,7 @@ class Go2Epa(ApiParent):
                 except IndexError:
                     pass
                 except Exception as e:
-                    print(type(e).__name__)
+                    self.controller.log_info(type(e).__name__)
 
             if len(sp_n) > 0:
                 sql += f"INSERT INTO temp_csv2pg (csv2pgcat_id, source, csv40, "
@@ -650,10 +652,11 @@ class Go2Epa(ApiParent):
                 message = "Export failed"
                 self.controller.show_info_box(message)
                 return
+
             steps = f"{counter}/{complet_result['steps']}"
             utils_giswater.setWidgetText(self.dlg_go2epa, self.dlg_go2epa.lbl_counter, steps)
             counter += 1
-            print(f"{counter}:{complet_result['steps']}:{complet_result['continue']}")
+            self.controller.log_info(f"{counter}:{complet_result['steps']}:{complet_result['continue']}")
             _continue = False
             common_msg = ""
             message = None
@@ -1112,6 +1115,10 @@ class Go2Epa(ApiParent):
         # Create the dialog
         self.dlg_manager = EpaResultManager()
         self.load_settings(self.dlg_manager)
+
+        # Manage widgets
+        reg_exp = QRegExp("^[A-Za-z0-9_]{1,16}$")
+        self.dlg_manager.txt_result_id.setValidator(QRegExpValidator(reg_exp))
 
         # Fill combo box and table view
         self.fill_combo_result_id()

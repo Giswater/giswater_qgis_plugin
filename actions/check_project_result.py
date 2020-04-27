@@ -34,6 +34,7 @@ class CheckProjectResult(ApiParent):
             if layer is None: continue
             if layer.providerType() != 'postgres': continue
             layer_source = self.controller.get_layer_source(layer)
+            layer_source['schema'] = layer_source['schema'].replace('"', '')
             if 'schema' not in layer_source or layer_source['schema'] != self.schema_name: continue
             # TODO:: Find differences between PostgreSQL and query layers, and replace this if condition.
             uri = layer.dataProvider().dataSourceUri()
@@ -94,7 +95,7 @@ class CheckProjectResult(ApiParent):
         # Populate info_log and missing layers
         critical_level = 0
         text_result = self.add_layer.add_temp_layer(self.dlg_audit_project, result['body']['data'],
-            'gw_fct_audit_check_project_result', True, False, 0, True)
+            'gw_fct_audit_check_project_result', True, False, 0, True, disable_tabs=False)
 
         if 'missingLayers' in result['body']['data']:
             critical_level = self.get_missing_layers(self.dlg_audit_project,

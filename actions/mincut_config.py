@@ -163,7 +163,6 @@ class MincutConfig(ParentAction):
 
             rows = self.controller.get_rows(sql, log_sql=True)
             if not rows:
-                print("NOT ROWS")
                 continue
 
             from_date = ""

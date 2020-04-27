@@ -57,13 +57,11 @@ class ApiCF(ApiParent, QObject):
 
         visible_layers = self.get_visible_layers(as_list=True)
         scale_zoom = self.iface.mapCanvas().scale()
-        srid = self.controller.plugin_settings_value('srid')
 
         # Get layers under mouse clicked
         extras = f'"pointClickCoords":{{"xcoord":{point.x()}, "ycoord":{point.y()}}}, '
         extras += f'"visibleLayers":{visible_layers}, '
-        extras += f'"zoomScale":{scale_zoom}, '
-        extras += '"srid":' + str(srid)
+        extras += f'"zoomScale":{scale_zoom} '
         body = self.create_body(extras=extras)
         complet_list = self.controller.get_json('gw_api_getlayersfromcoordinates', body, log_sql=True)
         if not complet_list: return False
@@ -189,8 +187,6 @@ class ApiCF(ApiParent, QObject):
         self.my_json = {}
         self.tab_type = tab_type
 
-        # Get srid
-        self.srid = self.controller.plugin_settings_value('srid')
         self.new_feature = new_feature
 
         if self.iface.activeLayer() is None or type(self.iface.activeLayer()) != QgsVectorLayer:
@@ -229,7 +225,7 @@ class ApiCF(ApiParent, QObject):
             scale_zoom = self.iface.mapCanvas().scale()
             extras += f', "activeLayer":"{active_layer}"'
             extras += f', "visibleLayer":{visible_layer}'
-            extras += f', "coordinates":{{"epsg":{self.srid}, "xcoord":{point.x()},"ycoord":{point.y()}, "zoomRatio":{scale_zoom}}}'
+            extras += f', "coordinates":{{"xcoord":{point.x()},"ycoord":{point.y()}, "zoomRatio":{scale_zoom}}}'
             body = self.create_body(extras=extras)
             function_name = 'gw_api_getinfofromcoordinates'
         # IF come from QPushButtons node1 or node2 from custom form or RightButton
@@ -365,7 +361,6 @@ class ApiCF(ApiParent, QObject):
 
         # Get feature type (Junction, manhole, valve, fountain...)
         self.feature_type = complet_result[0]['body']['feature']['childType']
-        self.dlg_cf.setWindowTitle(self.feature_type.capitalize())
 
         # Get tableParent and select layer
         self.table_parent = str(complet_result[0]['body']['feature']['tableParent'])
@@ -463,10 +458,8 @@ class ApiCF(ApiParent, QObject):
         layout_list = []
         for field in complet_result[0]['body']['data']['fields']:
             if 'hidden' in field and field['hidden']: continue
-
             label, widget = self.set_widgets(self.dlg_cf, complet_result, field)
             if widget is None: continue
-
             layout = self.dlg_cf.findChild(QGridLayout, field['layoutname'])
             if layout is not None:
                 # Take the QGridLayout with the intention of adding a QSpacerItem later
@@ -562,6 +555,16 @@ class ApiCF(ApiParent, QObject):
             self.dlg_cf.dlg_closed.connect(partial(self.set_vdefault_edition))
             self.dlg_cf.key_pressed.connect(partial(self.close_dialog, self.dlg_cf))
 
+
+        # Set title for toolbox
+        toolbox_cf = self.dlg_cf.findChild(QWidget, 'toolBox')
+        row = self.controller.get_config('custom_form_param', 'value', 'config_param_system')
+        if row:
+            results = json.loads(row[0], object_pairs_hook=OrderedDict)
+
+            for result in results['custom_form_tab_labels']:
+                toolbox_cf.setItemText(int(result['index']), result['text'])
+
         # Open dialog
         self.open_dialog(self.dlg_cf, dlg_name='info_full')
 
@@ -614,6 +617,19 @@ class ApiCF(ApiParent, QObject):
         layer.selectByIds([self.feature.id()])
         canvas.zoomToSelected(layer)
         canvas.zoomOut()
+        expr_filter = f"{self.field_id} = '{self.feature_id}'"
+        self.feature = self.get_feature_by_expr(self.layer, expr_filter)
+        return self.feature
+
+
+    def api_action_zoom_in(self, canvas, layer):
+        """ Zoom in """
+
+        if not self.feature:
+            self.get_feature(self.tab_type)
+        layer.selectByIds([self.feature.id()])
+        canvas.zoomToSelected(layer)
+        canvas.zoomIn()
 
 
     def set_vdefault_edition(self):
@@ -717,6 +733,7 @@ class ApiCF(ApiParent, QObject):
         widget = self.set_reg_exp(widget, field)
         widget = self.set_auto_update_lineedit(field, dialog, widget)
         widget = self.set_data_type(field, widget)
+        widget = self.set_max_length(widget, field)
 
         return widget
 
@@ -732,6 +749,16 @@ class ApiCF(ApiParent, QObject):
             if 'max' in field['widgetcontrols']['maxMinValues']:
                 widget.setProperty('maxValue', field['widgetcontrols']['maxMinValues']['max'])
                 
+        return widget
+
+
+    def set_max_length(self, widget, field):
+        """ Set max and min values allowed """
+
+        if field['widgetcontrols'] and 'maxLength' in field['widgetcontrols']:
+            if field['widgetcontrols']['maxLength'] is not None:
+                widget.setProperty('maxLength', field['widgetcontrols']['maxLength'])
+
         return widget
 
 
@@ -890,7 +917,7 @@ class ApiCF(ApiParent, QObject):
         :param close_dialog:
         :return:
         """
-
+        
         if _json == '' or str(_json) == '{}':
             self.close_dialog(dialog)
             if docker is not None:
