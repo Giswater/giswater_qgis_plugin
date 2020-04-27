@@ -35,7 +35,7 @@ from functools import partial
 import urlparse as parse
 import webbrowser
 import json
-
+from collections import OrderedDict
 
 from .. import utils_giswater
 from .manage_visit import ManageVisit
@@ -184,12 +184,14 @@ class AddNewLot(ParentManage):
         self.set_icon(self.dlg_lot.btn_open_image, "136b")
         self.dlg_lot.btn_open_image.clicked.connect(partial(self.open_load_image, self.tbl_load, 'v_ui_om_vehicle_x_parameters'))
 
+        table_name = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 3)
+
         if lot_id is not None:
             self.set_values(lot_id)
             self.geom_type = utils_giswater.get_item_data(self.dlg_lot, self.visit_class, 2).lower()
             self.populate_table_relations(lot_id)
             self.update_id_list()
-            self.set_dates_from_to(self.dlg_lot.date_event_from, self.dlg_lot.date_event_to, 've_visit_emb_neteja',
+            self.set_dates_from_to(self.dlg_lot.date_event_from, self.dlg_lot.date_event_to, table_name,
                                    'startdate', 'enddate')
             self.reload_table_visit()
             self.manage_cmb_status()
@@ -630,7 +632,7 @@ class AddNewLot(ParentManage):
 
         # Fill ComboBox cmb_visit_class
         if ot_result:
-            sql = ("SELECT DISTINCT(om_visit_class.id), om_visit_class.idval, feature_type, tablename "
+            sql = ("SELECT DISTINCT(om_visit_class.id), om_visit_class.idval, feature_type, om_visit_class.tablename, param_options::text "
                    " FROM om_visit_class"
                    " INNER JOIN om_visit_class_x_wo "
                    " ON om_visit_class_x_wo.visitclass_id = om_visit_class.id "
@@ -638,9 +640,8 @@ class AddNewLot(ParentManage):
                    " ON config_api_visit.visitclass_id = om_visit_class_x_wo.visitclass_id "
                    " WHERE ismultifeature is False AND feature_type IS NOT null")
         else:
-            sql = ("SELECT DISTINCT(id), idval, feature_type, tablename FROM om_visit_class"
+            sql = ("SELECT DISTINCT(id), idval, feature_type, om_visit_class.tablename, param_options::text FROM om_visit_class"
                    " INNER JOIN config_api_visit ON config_api_visit.visitclass_id = om_visit_class.id")
-
         visitclass_ids = self.controller.get_rows(sql, commit=True)
         if visitclass_ids:
             visitclass_ids.append(['', '', '', ''])
@@ -689,6 +690,7 @@ class AddNewLot(ParentManage):
         # 2) check if there are features related to the current visit
         # 3) if so, select them => would appear in the table associated to the model
         self.geom_type = self.feature_type.currentText().lower()
+        self.sys_type = json.loads(utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 4), object_pairs_hook=OrderedDict)
 
         viewname = "v_edit_" + self.geom_type
         self.set_completer_feature_id(dialog.feature_id, self.geom_type, viewname)
@@ -785,7 +787,12 @@ class AddNewLot(ParentManage):
     def update_id_list(self):
 
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.feature_type, 1).lower()
-        list_ids = self.get_table_values(self.tbl_relation, feature_type)
+        sql = "SELECT alias FROM " + self.schema_name + ".config_client_forms WHERE location_type = 'tbl_relations' AND column_id = '" + str(
+            feature_type) + "_id'"
+        row = self.controller.get_row(sql)
+        if row:
+            column_name = row[0]
+        list_ids = self.get_table_values(self.tbl_relation, column_name)
         for id_ in list_ids:
             if id_ not in self.ids:
                 self.ids.append(id_)
@@ -793,11 +800,11 @@ class AddNewLot(ParentManage):
         self.check_for_ids()
 
 
-    def get_table_values(self, qtable, geom_type):
+    def get_table_values(self, qtable, column_name):
 
         if qtable.model() is None:
             return []
-        column_index = utils_giswater.get_col_index_by_col_name(qtable, geom_type + '_id')
+        column_index = utils_giswater.get_col_index_by_col_name(qtable, column_name)
         model = qtable.model()
 
         id_list = []
@@ -813,19 +820,23 @@ class AddNewLot(ParentManage):
         self.dropdown.setDefaultAction(action)
         self.disconnect_signal_selection_changed()
         self.iface.mainWindow().findChild(QAction, action_name).triggered.connect(
-            partial(self.selection_changed_by_expr, dialog, self.layer_lot, self.geom_type))
+            partial(self.selection_changed_by_expr, dialog, self.layer_lot, self.geom_type, self.sys_type))
         self.iface.mainWindow().findChild(QAction, action_name).trigger()
 
 
-    def selection_changed_by_expr(self, dialog, layer, geom_type):
+    def selection_changed_by_expr(self, dialog, layer, geom_type, sys_type):
 
-        self.canvas.selectionChanged.connect(partial(self.manage_selection, dialog, layer, geom_type))
+        self.canvas.selectionChanged.connect(partial(self.manage_selection, dialog, layer, geom_type, sys_type))
 
 
-    def manage_selection(self, dialog, layer, geom_type):
+    def manage_selection(self, dialog, layer, geom_type, sys_type):
         """ Slot function for signal 'canvas.selectionChanged' """
-
         field_id = geom_type + "_id"
+        if 'sysType' in sys_type:
+            sys_type = sys_type['sysType']
+        else:
+            sys_type = None
+
         # Iterate over layer
         if layer.selectedFeatureCount() > 0:
             # Get selected features of the layer
@@ -833,8 +844,12 @@ class AddNewLot(ParentManage):
             for feature in features:
                 # Append 'feature_id' into the list
                 selected_id = feature.attribute(field_id)
-                if selected_id not in self.ids:
-                    self.ids.append(selected_id)
+                if sys_type and (feature.attribute('sys_type') == sys_type and selected_id not in self.ids):
+                    self.ids.append(str(selected_id))
+                elif sys_type is None and selected_id not in self.ids:
+                    self.ids.append(str(selected_id))
+                else:
+                    return
         self.reload_table_relations()
         self.check_for_ids()
 
@@ -845,11 +860,16 @@ class AddNewLot(ParentManage):
         standard_model = self.tbl_relation.model()
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.feature_type, 1).lower()
         lot_id = utils_giswater.getWidgetText(self.dlg_lot, self.lot_id)
-        id_list = self.get_table_values(self.tbl_relation, feature_type)
+        sql = "SELECT alias FROM " + self.schema_name + ".config_client_forms WHERE location_type = 'tbl_relations' AND column_id = '" + str(feature_type) + "_id'"
+        row = self.controller.get_row(sql)
+        column_name = ''
+        if row:
+            column_name = row[0]
+        id_list = self.get_table_values(self.tbl_relation, column_name)
         layer_name = 'v_edit_' + utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.feature_type, 0).lower()
         field_id = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.feature_type, 0).lower() + str('_id')
         layer = self.controller.get_layer_by_tablename(layer_name)
-
+        table_name = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 3)
         for feature_id in self.ids:
             item = []
             if feature_id not in id_list:
@@ -875,7 +895,7 @@ class AddNewLot(ParentManage):
                 if len(row) > 0:
                     standard_model.appendRow(row)
         self.hilight_features(self.rb_list)
-        self.set_dates_from_to(self.dlg_lot.date_event_from, self.dlg_lot.date_event_to, 've_visit_emb_neteja',
+        self.set_dates_from_to(self.dlg_lot.date_event_from, self.dlg_lot.date_event_to, table_name,
                                'startdate', 'enddate')
         self.reload_table_visit()
 
@@ -927,6 +947,7 @@ class AddNewLot(ParentManage):
 
         self.disconnect_signal_selection_changed()
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.feature_type, 0).lower()
+        table_name = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 3)
         # Get selected rows
         index_list = qtable.selectionModel().selectedRows()
 
@@ -941,13 +962,18 @@ class AddNewLot(ParentManage):
             row = index_list[i].row()
             column_index = utils_giswater.get_col_index_by_col_name(qtable, feature_type + '_id')
             feature_id = index.sibling(row, column_index).data()
-            list_ids = self.get_table_values(self.tbl_relation, feature_type)
+            sql = "SELECT alias FROM " + self.schema_name + ".config_client_forms WHERE location_type = 'tbl_relations' AND column_id = '" + str(
+                feature_type) + "_id'"
+            row = self.controller.get_row(sql)
+            if row:
+                column_name = row[0]
+            list_ids = self.get_table_values(self.tbl_relation, column_name)
             list_ids.remove(feature_id)
             model.takeRow(row)
 
         self.check_for_ids()
         self.hilight_features(self.rb_list)
-        self.set_dates_from_to(self.dlg_lot.date_event_from, self.dlg_lot.date_event_to, 've_visit_emb_neteja',
+        self.set_dates_from_to(self.dlg_lot.date_event_from, self.dlg_lot.date_event_to, table_name,
                                'startdate', 'enddate')
         self.reload_table_visit()
 
@@ -975,7 +1001,7 @@ class AddNewLot(ParentManage):
         """ Connect signal selectionChanged """
 
         try:
-            self.canvas.selectionChanged.connect(partial(self.manage_selection, dialog, self.layer_lot, self.geom_type))
+            self.canvas.selectionChanged.connect(partial(self.manage_selection, dialog, self.layer_lot, self.geom_type, self.sys_type))
         except:
             pass
 
@@ -1116,6 +1142,7 @@ class AddNewLot(ParentManage):
             rows = self.controller.get_rows(sql, commit=True)
             self.set_table_columns(self.dlg_lot, self.dlg_lot.tbl_relation, "ve_lot_x_" + str(feature_type),
                                    isQStandardItemModel=True)
+
             if rows is None:
                 return
             for row in rows:
