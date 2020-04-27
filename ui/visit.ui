@@ -378,111 +378,6 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="tab_relations">
-         <attribute name="title">
-          <string>Relations</string>
-         </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout_4">
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="0,1">
-            <item>
-             <widget class="QLabel" name="lbl_feature_type">
-              <property name="font">
-               <font>
-                <pointsize>8</pointsize>
-               </font>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::NoFrame</enum>
-              </property>
-              <property name="frameShadow">
-               <enum>QFrame::Plain</enum>
-              </property>
-              <property name="text">
-               <string>Feature type:</string>
-              </property>
-              <property name="textFormat">
-               <enum>Qt::AutoText</enum>
-              </property>
-              <property name="scaledContents">
-               <bool>false</bool>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-              </property>
-              <property name="margin">
-               <number>3</number>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QComboBox" name="feature_type">
-              <property name="editable">
-               <bool>true</bool>
-              </property>
-              <property name="sizeAdjustPolicy">
-               <enum>QComboBox::AdjustToContents</enum>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <widget class="Line" name="line_2">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_9">
-            <item>
-             <widget class="QLineEdit" name="feature_id"/>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btn_feature_insert">
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>../icons/111.png</normaloff>../icons/111.png</iconset>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btn_feature_delete">
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>../icons/112.png</normaloff>../icons/112.png</iconset>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btn_feature_snapping">
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>../icons/137.png</normaloff>../icons/137.png</iconset>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <widget class="QTableView" name="tbl_relation">
-            <property name="sortingEnabled">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
         <widget class="QWidget" name="tab_event">
          <attribute name="title">
           <string>Event</string>
@@ -498,6 +393,13 @@
              </widget>
             </item>
            </layout>
+          </item>
+          <item>
+           <widget class="QComboBox" name="feature_type">
+            <property name="editable">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="1">
@@ -568,6 +470,139 @@
             <property name="sortingEnabled">
              <bool>true</bool>
             </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tab_relations">
+         <attribute name="title">
+          <string>Relations</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_9">
+            <item>
+             <widget class="QLineEdit" name="feature_id">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_feature_insert">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset>
+                <normaloff>../icons/111.png</normaloff>../icons/111.png</iconset>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_feature_delete">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset>
+                <normaloff>../icons/112.png</normaloff>../icons/112.png</iconset>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_feature_snapping">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset>
+                <normaloff>../icons/137.png</normaloff>../icons/137.png</iconset>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QTabWidget" name="tab_feature">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="currentIndex">
+             <number>0</number>
+            </property>
+            <widget class="QWidget" name="tab_arc">
+             <attribute name="title">
+              <string>Arc</string>
+             </attribute>
+             <widget class="QTableView" name="tbl_visit_x_arc">
+              <property name="geometry">
+               <rect>
+                <x>10</x>
+                <y>10</y>
+                <width>461</width>
+                <height>381</height>
+               </rect>
+              </property>
+              <property name="sortingEnabled">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </widget>
+            <widget class="QWidget" name="tab_node">
+             <attribute name="title">
+              <string>Node</string>
+             </attribute>
+             <widget class="QTableView" name="tbl_visit_x_node">
+              <property name="geometry">
+               <rect>
+                <x>10</x>
+                <y>10</y>
+                <width>461</width>
+                <height>381</height>
+               </rect>
+              </property>
+              <property name="sortingEnabled">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </widget>
+            <widget class="QWidget" name="tab_connec">
+             <attribute name="title">
+              <string>Connec</string>
+             </attribute>
+             <widget class="QTableView" name="tbl_visit_x_connec">
+              <property name="geometry">
+               <rect>
+                <x>10</x>
+                <y>10</y>
+                <width>461</width>
+                <height>381</height>
+               </rect>
+              </property>
+              <property name="sortingEnabled">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </widget>
+            <widget class="QWidget" name="tab_gully">
+             <attribute name="title">
+              <string>Gully</string>
+             </attribute>
+             <widget class="QTableView" name="tbl_visit_x_gully">
+              <property name="geometry">
+               <rect>
+                <x>10</x>
+                <y>10</y>
+                <width>461</width>
+                <height>381</height>
+               </rect>
+              </property>
+              <property name="sortingEnabled">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </widget>
            </widget>
           </item>
          </layout>
@@ -659,12 +694,10 @@
   <tabstop>descript</tabstop>
   <tabstop>btn_add_geom</tabstop>
   <tabstop>button_box</tabstop>
-  <tabstop>feature_type</tabstop>
   <tabstop>feature_id</tabstop>
   <tabstop>btn_feature_insert</tabstop>
   <tabstop>btn_feature_delete</tabstop>
   <tabstop>btn_feature_snapping</tabstop>
-  <tabstop>tbl_relation</tabstop>
   <tabstop>parameter_type_id</tabstop>
   <tabstop>parameter_id</tabstop>
   <tabstop>btn_event_insert</tabstop>

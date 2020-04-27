@@ -35,7 +35,7 @@ from ..ui_manager import BasicInfoUi
 class ApiParent(ParentAction):
 
     def __init__(self, iface, settings, controller, plugin_dir):
-    
+
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
         self.dlg_is_destroyed = None
         self.tabs_removed = 0
@@ -169,7 +169,6 @@ class ApiParent(ParentAction):
                 layer.removeSelection()
 
 
-
     def get_feature_by_id(self, layer, id, field_id):
 
         features = layer.getFeatures()
@@ -181,6 +180,7 @@ class ApiParent(ParentAction):
 
 
     def get_feature_by_expr(self, layer, expr_filter):
+
         # Check filter and existence of fields
         expr = QgsExpression(expr_filter)
         if expr.hasParserError():
@@ -192,6 +192,7 @@ class ApiParent(ParentAction):
         # Iterate over features
         for feature in it:
             return feature
+
         return False
 
 
@@ -466,7 +467,7 @@ class ApiParent(ParentAction):
 
         if schema_name is not None:
             self.schema_name = schema_name
-            self.controller.set_search_path('', self.schema_name)
+            self.controller.set_search_path(self.schema_name)
 
         # Set width and alias of visible columns
         columns_to_delete = []
@@ -669,10 +670,12 @@ class ApiParent(ParentAction):
                     return widget
         # Call def gw_api_open_rpt_result(self, widget, complet_result) of class ApiCf
         widget.doubleClicked.connect(partial(getattr(self, function_name), widget, complet_result))
+
         return widget
 
 
     def no_function_associated(self, **kwargs):
+
         widget = kwargs['widget']
         message_level = kwargs['message_level']
         message = f"No function associated to"
@@ -694,6 +697,7 @@ class ApiParent(ParentAction):
             headers.append(x)
         # Set headers
         standar_model.setHorizontalHeaderLabels(headers)
+
         return widget
 
 
@@ -706,6 +710,7 @@ class ApiParent(ParentAction):
                 row.append(QStandardItem(str(value)))
             if len(row) > 0:
                 standar_model.appendRow(row)
+
         return widget
 
 
@@ -942,6 +947,7 @@ class ApiParent(ParentAction):
 
 
     def draw(self, complet_result, zoom=True, reset_rb=True):
+
         if complet_result[0]['body']['feature']['geometry'] is None:
             return
         if complet_result[0]['body']['feature']['geometry']['st_astext'] is None:
@@ -965,11 +971,15 @@ class ApiParent(ParentAction):
         """
         :param duration_time: integer milliseconds ex: 3000 for 3 seconds
         """
+
+        if self.rubber_point is None:
+            self.init_rubber()
+
         if is_new:
             rb = QgsRubberBand(self.canvas, 0)
-
         else:
             rb = self.rubber_point
+
         rb.setColor(color)
         rb.setWidth(width)
         rb.addPoint(point)
@@ -980,12 +990,13 @@ class ApiParent(ParentAction):
         return rb
 
 
-
-
     def draw_polygon(self, points, border=QColor(255, 0, 0, 100), width=3, duration_time=None, fill_color=None):
         """ Draw 'polygon' over canvas following list of points
         :param duration_time: integer milliseconds ex: 3000 for 3 seconds
         """
+
+        if self.rubber_polygon is None:
+            self.init_rubber()
 
         rb = self.rubber_polygon
         polygon = QgsGeometry.fromPolygonXY([points])
@@ -1002,10 +1013,7 @@ class ApiParent(ParentAction):
 
         return rb
 
-
-
-
-            
+           
     def fill_table(self, widget, table_name, filter_=None):
         """ Set a model with selected filter.
         Attach that model to selected table """
@@ -1119,11 +1127,15 @@ class ApiParent(ParentAction):
 
         return widget
 
+
     def manage_close_interpolate(self):
+
         self.save_settings(self.dlg_binfo)
         self.remove_interpolate_rb()
 
+
     def activate_snapping(self, complet_result, ep):
+
         self.rb_interpolate = []
         self.interpolate_result = None
         self.resetRubberbands()
@@ -1171,14 +1183,13 @@ class ApiParent(ParentAction):
 
 
     def dlg_destroyed(self, layer=None, vertex=None):
-        self.dlg_is_destroyed = True
 
+        self.dlg_is_destroyed = True
         if layer is not None:
             self.iface.setActiveLayer(layer)
         else:
             if self.layer is not None:
                 self.iface.setActiveLayer(self.layer)
-
         if vertex is not None:
             self.iface.mapCanvas().scene().removeItem(vertex)
         else:
@@ -1189,6 +1200,7 @@ class ApiParent(ParentAction):
             self.canvas.xyCoordinates.disconnect()
         except:
             pass
+
 
     def snapping_node(self, ep, point, button):
         """ Get id of selected nodes (node1 and node2) """
@@ -1239,6 +1251,7 @@ class ApiParent(ParentAction):
 
 
     def chek_for_existing_values(self):
+
         text = False
         for k, v in self.interpolate_result['body']['data']['fields'][0].items():
             widget = self.dlg_cf.findChild(QWidget, k)
@@ -1255,6 +1268,7 @@ class ApiParent(ParentAction):
 
 
     def set_values(self):
+
         # Set values tu info form
         for k, v in self.interpolate_result['body']['data']['fields'][0].items():
             widget = self.dlg_cf.findChild(QWidget, k)
@@ -1266,12 +1280,14 @@ class ApiParent(ParentAction):
 
 
     def remove_interpolate_rb(self):
+
         # Remove the circumferences made by the interpolate
         for rb in self.rb_interpolate:
             self.iface.mapCanvas().scene().removeItem(rb)
 
 
     def mouse_move(self, point):
+
         # Get clicked point
         event_point = self.snapper_manager.get_event_point(point=point)
 
@@ -1489,6 +1505,7 @@ class ApiParent(ParentAction):
                 _json[str(widget.property('column_id'))] = None
             else:
                 _json[str(widget.property('column_id'))] = str(value)
+
 
     def set_function_associated(self, dialog, widget, field):
 
