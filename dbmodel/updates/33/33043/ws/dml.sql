@@ -51,3 +51,9 @@ WHERE pg2csvcat_id = 11 AND tablename = 'rpt_node';
 UPDATE sys_csv2pg_config SET 
 target = '{Link Results, MINIMUM Link, MAXIMUM Link, AVERAGE Link, DIFFERENTIAL Link}'
 WHERE pg2csvcat_id = 11 AND tablename = 'rpt_arc';
+
+
+INSERT INTO audit_cat_param_user (id, formname, descript, sys_role_id, label, isenabled, project_type, isparent , isautoupdate, datatype, widgettype,
+vdefault, ismandatory, isdeprecated, layoutname, layout_order)  VALUES
+('qgis_form_docker', 'config', 'Force use docker for forms', 'role_basic', 'Force use docker for forms', true, 'utils', false, false, 'boolean', 'check', 'false', true, false, 'lyt_other', 21)
+ON CONFLICT (id) DO NOTHING;
