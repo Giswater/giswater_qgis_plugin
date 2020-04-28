@@ -96,7 +96,6 @@ class Go2Epa(ApiParent):
             self.dlg_go2epa.chk_exec.setEnabled(False)
             self.dlg_go2epa.chk_exec.setText('Execute EPA software (Runs only on Windows)')
 
-
         self.set_completer_result(self.dlg_go2epa.txt_result_name, 'v_ui_rpt_cat_result', 'result_id')
 
         # Open dialog
@@ -147,7 +146,6 @@ class Go2Epa(ApiParent):
             else:
                 utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_recurrent, False)
                 self.dlg_go2epa.chk_recurrent.setCheckState(0)
-
 
 
     def check_inp_chk(self, file_inp):
@@ -469,6 +467,8 @@ class Go2Epa(ApiParent):
 
     def insert_rpt_into_db(self, folder_path=None):
 
+        self.controller.log_info(f"Import RPT to database - Start")
+
         _file = open(folder_path, "r+")
         full_file = _file.readlines()
         progress = 0
@@ -477,8 +477,7 @@ class Go2Epa(ApiParent):
         self.dlg_go2epa.progressBar.setValue(progress)
 
         # Create dict with sources
-        sql = (f"SELECT tablename, target FROM sys_csv2pg_config "
-               f"WHERE pg2csvcat_id = '11';")
+        sql = "SELECT tablename, target FROM sys_csv2pg_config WHERE pg2csvcat_id = '11';"
         rows = self.controller.get_rows(sql)
         sources = {}
         for row in rows:
@@ -492,13 +491,16 @@ class Go2Epa(ApiParent):
         csv40 = "null"
         sql = ""
         row_count = sum(1 for rows in full_file)  # @UnusedVariable
-        self.dlg_go2epa.progressBar.setMaximum(row_count)
+
+        self.controller.log_info(f"Import RPT to database - row_count: {row_count}")
+
         self.task_rpt_to_db = GwTask('Import RPT to database')
         QgsApplication.taskManager().addTask(self.task_rpt_to_db)
+
         for line_number, row in enumerate(full_file):
+
             self.task_rpt_to_db.setProgress((line_number * 100) / row_count)
             progress += 1
-            self.dlg_go2epa.progressBar.setValue(progress)
             if '**' in row or '--' in row:
                 continue
 
@@ -514,12 +516,6 @@ class Go2Epa(ApiParent):
             if len(dirty_list) > 0:
                 for x in range(0, len(dirty_list)):
                     if bool(re.search('[0-9][-]\d{1,2}[.]]*', str(dirty_list[x]))):
-                        # when -> 0.00-2.56e+007-2.56e+007 cut into -> 0.00 -2.56e+007 -2.56e+007
-
-                        # sp_n.append(dirty_list[x][:4])
-                        # sp_n.append(dirty_list[x][4:14])
-                        # sp_n.append(dirty_list[x][14:])
-
                         last_index = 0
                         for i, c in enumerate(dirty_list[x]):
                             if "-" == c:
@@ -530,7 +526,6 @@ class Go2Epa(ApiParent):
                         sp_n.append(aux)
 
                     elif bool(re.search('(\d\..*\.\d)', str(dirty_list[x]))):
-                        # when -> 0.00859373.7500
                         if 'Version' not in dirty_list and 'VERSION' not in dirty_list:
                             self.controller.log_info(f"Error near line {line_number+1} -> {dirty_list}")
                             message = ("The rpt file has a heavy inconsistency. As a result it's not posible to import it. " 
@@ -570,24 +565,33 @@ class Go2Epa(ApiParent):
                 sql = sql[:-2] + ") "
                 values = values[:-2] + ");\n"
                 sql += values
-            if progress % 500 == 0:
+
+            # Execute SQL every in batches of 20000 records
+            if progress % 20000 == 0:
+                self.controller.log_info(f"insert_rpt_into_db - progress: {progress}")
                 self.controller.execute_sql(sql)
                 sql = ""
+
         if sql != "":
             self.controller.execute_sql(sql)
 
         _file.close()
         del _file
+
+        self.controller.log_info(f"Import RPT to database - End")
+
         return True
 
 
     def show_widgets(self, visible=False):
+
         self.dlg_go2epa.progressBar.setVisible(visible)
         self.dlg_go2epa.lbl_counter.setVisible(visible)
 
 
     def go2epa_accept(self):
         """ Save INP, RPT and result name into GSW file """
+
         # Save user values
         self.save_user_values()
         
@@ -760,7 +764,6 @@ class Go2Epa(ApiParent):
         if message is not None and self.imports_canceled is False:
             self.controller.show_info_box(message)
 
-
         self.show_widgets(False)
         self.check_result_id()
 
@@ -798,7 +801,7 @@ class Go2Epa(ApiParent):
         result_id = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_result_name)
         sql = (f"SELECT result_id FROM v_ui_rpt_cat_result"
                f" WHERE result_id = '{result_id}'")
-        row = self.controller.get_row(sql)
+        row = self.controller.get_row(sql, log_info=False)
         if not row:
             self.dlg_go2epa.chk_only_check.setChecked(False)
             self.dlg_go2epa.chk_only_check.setEnabled(False)
@@ -976,12 +979,14 @@ class Go2Epa(ApiParent):
 
 
     def populate_date_time(self, combo_date):
+
         result_id = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id,0)
         sql = (f"SELECT DISTINCT(resultdate), resultdate FROM rpt_arc "
                f"WHERE result_id = '{result_id}' "
                f"ORDER BY resultdate")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(combo_date, rows)
+
 
     def populate_time(self, combo_result, combo_time):
         """ Populate combo times """
