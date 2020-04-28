@@ -261,7 +261,8 @@ class DaoController(object):
         # We need to create this connections for Table Views
         self.db = QSqlDatabase.addDatabase("QPSQL")
         self.db.setHostName(host)
-        self.db.setPort(int(port))
+        if port != '':
+            self.db.setPort(int(port))
         self.db.setDatabaseName(db)
         self.db.setUserName(user)
         self.db.setPassword(pwd)
