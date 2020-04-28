@@ -184,13 +184,12 @@ class AddNewLot(ParentManage):
         self.set_icon(self.dlg_lot.btn_open_image, "136b")
         self.dlg_lot.btn_open_image.clicked.connect(partial(self.open_load_image, self.tbl_load, 'v_ui_om_vehicle_x_parameters'))
 
-        table_name = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 3)
-
         if lot_id is not None:
             self.set_values(lot_id)
             self.geom_type = utils_giswater.get_item_data(self.dlg_lot, self.visit_class, 2).lower()
             self.populate_table_relations(lot_id)
             self.update_id_list()
+            table_name = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 3)
             self.set_dates_from_to(self.dlg_lot.date_event_from, self.dlg_lot.date_event_to, table_name,
                                    'startdate', 'enddate')
             self.reload_table_visit()
@@ -849,7 +848,7 @@ class AddNewLot(ParentManage):
                 elif sys_type is None and selected_id not in self.ids:
                     self.ids.append(str(selected_id))
                 else:
-                    return
+                    continue
         self.reload_table_relations()
         self.check_for_ids()
 
