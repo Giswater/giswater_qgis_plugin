@@ -1153,8 +1153,8 @@ class TmBasic(TmParentAction):
 
                 self.dlg_incident_info.txt_infolog.setText(message)
 
-                self.dlg_incident_info.btn_duplicate.clicked.connect(partial(self.manage_process_planning, action))
-                self.dlg_incident_info.btn_overwrite.clicked.connect(partial(self.manage_process_planning, 'OVERWRITE'))
+                self.dlg_incident_info.btn_duplicate.clicked.connect(partial(self.manage_process_planning, action, True))
+                self.dlg_incident_info.btn_overwrite.clicked.connect(partial(self.manage_process_planning, 'OVERWRITE', True))
                 self.dlg_incident_info.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_incident_info))
 
                 self.open_dialog(self.dlg_incident_info)
@@ -1175,7 +1175,10 @@ class TmBasic(TmParentAction):
                 self.update_table(self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident,"v_ui_om_visit_incident")
 
 
-    def manage_process_planning(self, action):
+    def manage_process_planning(self, action, close_dlg_aux=False):
+
+        if close_dlg_aux:
+            self.close_dialog(self.dlg_incident_info)
 
         extras = f'"action":"{action}"'
         extras += f', "visit_id":{self.visit_id}'

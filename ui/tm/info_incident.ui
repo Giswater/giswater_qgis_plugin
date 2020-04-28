@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Informació Incidencia</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="2" column="0">
@@ -42,21 +42,21 @@
      <item>
       <widget class="QPushButton" name="btn_duplicate">
        <property name="text">
-        <string>Duplicate</string>
+        <string>Duplicar</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="btn_overwrite">
        <property name="text">
-        <string>Overwrite</string>
+        <string>Sobreescriure</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="btn_cancel">
        <property name="text">
-        <string>Cancel</string>
+        <string>Cancelar</string>
        </property>
       </widget>
      </item>
