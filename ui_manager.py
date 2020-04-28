@@ -151,6 +151,11 @@ class InfoFullUi(GwMainWindow, FORM_CLASS):
             return super(InfoFullUi, self).keyPressEvent(event)
 
 
+FORM_CLASS = get_ui_class('info_incident.ui')
+class InfoIncident(GwDialog, FORM_CLASS):
+    pass
+
+
 FORM_CLASS = get_ui_class('fastprint.ui')
 class FastPrintUi(GwDialog, FORM_CLASS):
     pass

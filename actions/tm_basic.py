@@ -25,6 +25,8 @@ from ..ui.tm.tree_manage import TreeManage
 from ..ui.tm.tree_selector import TreeSelector
 from ..ui.tm.incident_manager import IncidentManager
 from ..ui_manager import IncidentPlanning
+from ..ui_manager import InfoIncident
+
 
 from .. import utils_giswater
 
@@ -938,7 +940,7 @@ class TmBasic(TmParentAction):
 
 
     def open_incident_manager(self):
-        """ Button 309: Add visit """
+        """ Button 309: Incident Manager """
 
         self.dlg_incident_manager = IncidentManager()
         self.load_settings(self.dlg_incident_manager)
@@ -1144,22 +1146,20 @@ class TmBasic(TmParentAction):
             result = self.controller.get_json('tm_fct_incident_check_plan', body, log_sql=True)
 
             if result['message']['level'] == 1:
-                message = str(result['body']['data'] ['info']) + '\n' + "Continue?"
-                answer = self.controller.ask_question(message)
-                if not answer:
-                    return
+                message = str(result['body']['data'] ['info'])
 
-            extras = f'"action":"{action}"'
-            extras += f', "visit_id":{self.visit_id}'
-            extras += f', "process_date":"{utils_giswater.getCalendarDate(self.dlg_incident_planning, self.dlg_incident_planning.process_date)}"'
-            extras += f', "campaign_id":{utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.campaign_id, 0)}'
-            extras += f', "builder_id":{utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.builder_id, 0)}'
-            extras += f', "priority_id":{utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.priority_id, 0)}'
-            extras += f', "work_id":{utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.work_id, 0)}'
-            extras += f', "incident_comment":"{utils_giswater.getWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.incident_comment)}"'
-            body = self.create_body(extras=extras)
+                self.dlg_incident_info = InfoIncident()
+                self.load_settings(self.dlg_incident_info)
 
-            result = self.controller.get_json('tm_fct_incident', body, log_sql=True)
+                self.dlg_incident_info.txt_infolog.setText(message)
+
+                self.dlg_incident_info.btn_duplicate.clicked.connect(partial(self.manage_process_planning, action))
+                self.dlg_incident_info.btn_overwrite.clicked.connect(partial(self.manage_process_planning, 'OVERWRITE'))
+                self.dlg_incident_info.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_incident_info))
+
+                self.open_dialog(self.dlg_incident_info)
+            else:
+                self.manage_process_planning(action)
 
         elif action == 'DISCARD':
             extras = f'"action":"{action}"'
@@ -1170,9 +1170,29 @@ class TmBasic(TmParentAction):
 
             result = self.controller.get_json('tm_fct_incident', body, log_sql=True)
 
+            if result['status'] == "Accepted":
+                self.close_dialog(self.dlg_incident_planning)
+                self.update_table(self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident,"v_ui_om_visit_incident")
+
+
+    def manage_process_planning(self, action):
+
+        extras = f'"action":"{action}"'
+        extras += f', "visit_id":{self.visit_id}'
+        extras += f', "process_date":"{utils_giswater.getCalendarDate(self.dlg_incident_planning, self.dlg_incident_planning.process_date)}"'
+        extras += f', "campaign_id":{utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.campaign_id, 0)}'
+        extras += f', "builder_id":{utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.builder_id, 0)}'
+        extras += f', "priority_id":{utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.priority_id, 0)}'
+        extras += f', "work_id":{utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.work_id, 0)}'
+        extras += f', "incident_comment":"{utils_giswater.getWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.incident_comment)}"'
+        body = self.create_body(extras=extras)
+
+        result = self.controller.get_json('tm_fct_incident', body, log_sql=True)
+
         if result['status'] == "Accepted":
             self.close_dialog(self.dlg_incident_planning)
-            self.update_table(self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident,"v_ui_om_visit_incident")
+            self.update_table(self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident,
+                              "v_ui_om_visit_incident")
 
 
     def zoom_to_element(self):
