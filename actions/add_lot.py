@@ -1737,9 +1737,9 @@ class AddNewLot(ParentManage):
         tbl_all_rows = dialog.findChild(QTableView, "all_rows")
         tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        query_left = "SELECT * FROM "+tableleft+" WHERE id NOT IN "
-        query_left += "(SELECT "+tableleft+".id FROM "+tableleft+""
-        query_left += " RIGHT JOIN "+tableright+" ON "+tableleft+"."+field_id_left+" = "+tableright+"."+field_id_right+""
+        query_left = "SELECT * FROM " + self.schema_name + "." +tableleft+" WHERE id NOT IN "
+        query_left += "(SELECT "+tableleft+".id FROM "+ self.schema_name + "." +tableleft+""
+        query_left += " RIGHT JOIN "+ self.schema_name + "." +tableright+" ON "+tableleft+"."+field_id_left+" = "+tableright+"."+field_id_right+""
         query_left += " WHERE cur_user = current_user)"
         query_left += " AND id::text = ANY(ARRAY" + str(data) + ")"
         query_left += " AND "+field_id_left+" > -1 ORDER BY id desc"
@@ -1752,8 +1752,8 @@ class AddNewLot(ParentManage):
         tbl_selected_rows = dialog.findChild(QTableView, "selected_rows")
         tbl_selected_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        query_right = "SELECT "+tableright+".lot_id, * FROM " + tableleft + ""
-        query_right += " JOIN "+tableright+" ON "+tableleft+"."+field_id_left+" = "+tableright+"."+field_id_right+""
+        query_right = "SELECT " + tableright + ".lot_id, * FROM " + self.schema_name + "." + tableleft + ""
+        query_right += " JOIN " + self.schema_name + "." + tableright + " ON " + tableleft + "."+field_id_left+" = "+tableright+"."+field_id_right+""
         query_right += " WHERE cur_user = current_user AND lot_id::text = ANY(ARRAY" + str(data) + ") ORDER BY " + tableleft +".id desc"
 
         self.fill_table_by_query(tbl_selected_rows, query_right)
