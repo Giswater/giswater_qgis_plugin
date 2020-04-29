@@ -56,6 +56,7 @@ class ApiSearch(ApiParent):
         self.dlg_search.lbl_msg.setVisible(False)
         self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dlg_search)
         self.dlg_search.dlg_closed.connect(self.reset_rubber_polygon)
+        self.dlg_search.dlg_closed.connect(self.close_search)
 
 
     def api_search(self):
@@ -63,6 +64,7 @@ class ApiSearch(ApiParent):
         if self.dlg_search is None:
             self.init_dialog()
 
+        self.controller.set_user_settings_value('open_search', 'true')
         body = self.create_body()
         function_name = "gw_api_getsearch"
         complet_list = self.controller.get_json(function_name, body)
@@ -109,7 +111,11 @@ class ApiSearch(ApiParent):
         if self.rubber_polygon:
             self.rubber_polygon.reset()
 
+
+    def close_search(self):
+
         self.dlg_search = None
+        self.controller.set_user_settings_value('open_search', 'false')
 
 
     def set_typeahead_completer(self, widget, completer=None):
