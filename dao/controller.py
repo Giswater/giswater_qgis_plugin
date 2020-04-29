@@ -6,7 +6,6 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.core import QgsMessageLog, QgsCredentials, QgsExpressionContextUtils, QgsProject, QgsDataSourceUri
-<<<<<<< HEAD
 from qgis.PyQt.QtCore import QCoreApplication, QRegExp, QSettings, Qt, QTranslator
 from qgis.PyQt.QtGui import QTextCharFormat, QFont
 from qgis.PyQt.QtSql import QSqlDatabase
@@ -188,7 +187,6 @@ class DaoController(object):
             self.save_user_settings()
 
         sslmode = self.user_settings.get('system', 'sslmode').lower()
-        self.log_info(f"get_sslmode: {sslmode}")
 
         return sslmode
 
@@ -821,6 +819,7 @@ class DaoController(object):
             If we find a translation, it will be put
             If the object does not have a tooltip we will put the object text itself as a tooltip
         """
+
         if type(widget) is QTabWidget:
             widget_name = widget.widget(idx).objectName()
             tooltip = self.tr(f'tooltip_{widget_name}', context_name)
@@ -1184,7 +1183,6 @@ class DaoController(object):
             self.translate_form(dialog, locale_name)
 
 
-      
     def get_project_type(self, schemaname=None):
         """ Get water software from table 'version' """
 
