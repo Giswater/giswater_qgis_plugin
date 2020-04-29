@@ -405,7 +405,7 @@ UPDATE config_api_form_fields set layoutname = 'lyt_data_1' WHERE column_id = 'w
 UPDATE config_api_form_fields set layoutname = 'lyt_data_1' WHERE column_id = 'width' AND formname ='ve_node_weir';
 
 UPDATE config_param_system SET value='TRUE' WHERE parameter='sys_raster_dem';
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_upser_elevation_from_dem', 'true', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_upser_elevation_from_dem', 'true', current_user)
 ON CONFLICT (parameter, cur_user) DO NOTHING;
 
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('qgis_form_docker', 'true', current_user)
