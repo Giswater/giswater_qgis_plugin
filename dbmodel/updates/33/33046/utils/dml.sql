@@ -111,3 +111,7 @@ UPDATE audit_cat_function SET function_name = 'gw_fct_pg2epa_import_rpt' WHERE i
 UPDATE sys_csv2pg_cat SET isdeprecated = true WHERE id IN (10,11,12);
 
 UPDATE config_param_system SET widgettype = 'check', layout_order = 5, isenabled = true, layoutname = 'lyt_system' WHERE parameter = 'sys_raster_dem';
+
+--29/04/2020
+UPDATE audit_cat_table SET notify_action = '[{"channel":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"expl_id, name","featureType":["arc", "node", "connec","v_edit_link", "v_edit_vnode","v_edit_element", "v_edit_samplepoint","v_edit_pond", "v_edit_pool", "v_edit_dma"]}]'
+WHERE id = 'exploitation';
