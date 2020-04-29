@@ -1766,7 +1766,10 @@ class UpdateSQL(ApiParent):
 
         connection_name = str(utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_connection))
 
-        credentials = {'db': None, 'host': None, 'port': None, 'user': None, 'password': None}
+        credentials = {'db': None, 'host': None, 'port': None, 'user': None, 'password': None, 'sslmode': None}
+
+        # Get sslmode for database connection
+        sslmode = self.settings.value('system_variables/sslmode', 'disabled').lower()
 
         settings = QSettings()
         settings.beginGroup("PostgreSQL/connections/" + connection_name)
@@ -1778,11 +1781,11 @@ class UpdateSQL(ApiParent):
         credentials['db'] = settings.value('database')
         credentials['user'] = settings.value('username')
         credentials['password'] = settings.value('password')
+        credentials['sslmode'] = sslmode
         settings.endGroup()
 
         self.logged = self.controller.connect_to_database(credentials['host'], credentials['port'],
-                                               credentials['db'], credentials['user'],
-                                               credentials['password'])
+            credentials['db'], credentials['user'], credentials['password'], credentials['sslmode'])
 
         if not self.logged:
             self.close_dialog(self.dlg_readsql)
