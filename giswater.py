@@ -326,8 +326,8 @@ class Giswater(QObject):
             return None
 
         # Buttons NOT checkable (normally because they open a form)
-        list_actions = (18, 23, 25, 26, 27, 29, 33, 34, 38, 41, 45, 46, 47, 48, 49, 50, 58, 59, 86, 64, 65, 66, 67, 68, 69,
-                        74, 75, 76, 81, 82, 83, 84, 98, 99, 196, 206, 301, 302, 303, 304, 305, 309)
+        list_actions = (18, 23, 25, 26, 27, 29, 32, 33, 34, 38, 41, 45, 46, 47, 48, 49, 50, 58, 59, 86, 64, 65, 66,
+                        67, 68, 69, 74, 75, 76, 81, 82, 83, 84, 98, 99, 196, 206, 301, 302, 303, 304, 305, 309)
 
         if int(index_action) in list_actions:
             action = self.create_action(index_action, text_action, toolbar, False, function_name, action_group)
@@ -972,6 +972,9 @@ class Giswater(QObject):
         # Hide info button if giswater project is loaded
         if show_warning:
             self.set_info_button_visible(False)
+
+        # Open search by default
+        self.basic.basic_api_search()
 
         # Log it
         message = "Project read successfully"

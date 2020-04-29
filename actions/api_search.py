@@ -44,18 +44,24 @@ class ApiSearch(ApiParent):
         self.project_type = controller.get_project_type()
         self.json_search = {}
         self.lbl_visible = False
+        self.dlg_search = None
 
 
-    def api_search(self):
-        
-        # Dialog
+    def init_dialog(self):
+        """ Initialize dialog. Make it dockable in left dock widget area """
+
         self.dlg_search = SearchUi()
         self.load_settings(self.dlg_search)
         self.dlg_search.lbl_msg.setStyleSheet("QLabel{color:red;}")
         self.dlg_search.lbl_msg.setVisible(False)
-
-        # Make it dockable in left dock widget area
         self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dlg_search)
+        self.dlg_search.dlg_closed.connect(self.reset_rubber_polygon)
+
+
+    def api_search(self):
+
+        if self.dlg_search is None:
+            self.init_dialog()
 
         body = self.create_body()
         function_name = "gw_api_getsearch"
@@ -95,8 +101,15 @@ class ApiSearch(ApiParent):
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
             gridlayout.addItem(vertical_spacer1)
 
-        self.dlg_search.dlg_closed.connect(self.rubber_polygon.reset)
         self.controller.manage_translation('search', self.dlg_search)
+
+
+    def reset_rubber_polygon(self):
+
+        if self.rubber_polygon:
+            self.rubber_polygon.reset()
+
+        self.dlg_search = None
 
 
     def set_typeahead_completer(self, widget, completer=None):
@@ -711,7 +724,7 @@ class ApiSearch(ApiParent):
         list_coord = re.search('\((.*)\)', str(complet_result[0]['body']['feature']['geometry']['st_astext']))
 
         points = self.get_points(list_coord)
-        self.rubber_polygon.reset()
+        self.reset_rubber_polygon()
         self.draw_polyline(points)
 
         max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
@@ -729,27 +742,25 @@ class ApiSearch(ApiParent):
                    f" FROM {table_name}")
             sql += f" WHERE workcat_id = '{workcat_id}' AND feature_type = '{feature}'"
             rows = self.controller.get_rows(sql)
-
-
             if extension is not None:
                 widget_name = f"lbl_total_{feature.lower()}{extension}"
             else:
                 widget_name = f"lbl_total_{feature.lower()}"
 
             widget = self.items_dialog.findChild(QLabel, str(widget_name))
-
             if not rows:
                 total = 0
             else:
                 total = len(rows)
-            # Add data to workcat search form
 
+            # Add data to workcat search form
             widget.setText(str(feature.lower().title()) + "s: " + str(total))
             if self.project_type == 'ws' and feature == 'GULLY':
                 widget.setVisible(False)
             
             if not rows:
                 continue
+
             length = 0
             if feature == 'ARC':
                 for row in rows:
@@ -765,10 +776,10 @@ class ApiSearch(ApiParent):
                         self.controller.show_warning(message, parameter = arc_id)
                         return
                 if extension is not  None:
-                    widget = self.items_dialog.findChild(QLabel, "lbl_length" + str(extension))
+                    widget = self.items_dialog.findChild(QLabel, f"lbl_length{extension}")
                 else:
                     widget = self.items_dialog.findChild(QLabel, "lbl_length")
 
                 # Add data to workcat search form
-                widget.setText("Total arcs length: " + str(length))
+                widget.setText(f"Total arcs length: {length}")
 

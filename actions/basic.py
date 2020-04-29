@@ -23,6 +23,7 @@ class Basic(ApiParent):
         ApiParent.__init__(self, iface, settings, controller, plugin_dir)
         self.login_file = os.path.join(self.plugin_dir, 'config', 'login.auth')
         self.logged = False
+        self.api_search = None
 
 
     def set_giswater(self, giswater):
@@ -41,9 +42,7 @@ class Basic(ApiParent):
         self.load_settings(self.dlg_selector)
         self.dlg_selector.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_selector))
         self.dlg_selector.rejected.connect(partial(self.save_settings, self.dlg_selector))
-
         self.get_selector(self.dlg_selector, selector_values)
-
         self.open_dialog(self.dlg_selector, dlg_name='selector', maximize_button=False)
 
 
@@ -93,8 +92,9 @@ class Basic(ApiParent):
 
     def basic_api_search(self):
         """ Button 32: ApiSearch """
-        self.api_search = ApiSearch(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.api_search.api_search()
-     
 
+        if self.api_search is None:
+            self.api_search = ApiSearch(self.iface, self.settings, self.controller, self.plugin_dir)
+
+        self.api_search.api_search()
 
