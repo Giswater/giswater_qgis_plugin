@@ -7,11 +7,19 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-UPDATE node_type SET isexitupperintro = 0 WHERE type NOT IN ('STORAGE','CHAMBER');
-UPDATE node_type SET isexitupperintro = 2 WHERE type IN ('STORAGE','CHAMBER');
+
+--2020/03/18
+UPDATE audit_cat_table SET isdeprecated = true 
+WHERE id IN ('v_arc_dattrib','v_node_dattrib','vi_parent_node','v_connec_dattrib','v_gully_dattrib', 
+'vp_epa_node','vp_epa_arc', 'v_node_x_arc', 'v_arc_x_node'
+'v_plan_aux_arc_ml','v_plan_aux_arc_cost','v_plan_aux_arc_connec','v_plan_aux_arc_gully','v_plan_aux_arc_pavement');
 
 INSERT INTO audit_cat_table(id, context, descript, sys_role_id, sys_criticity, qgis_role_id, isdeprecated) 
-VALUES ('rpt_selector_timestep', 'Hydraulic selector', 'Selector of an alternative result (to compare with other results)', 'role_epa', 0, 'role_epa', false);
+VALUES ('v_connec', 'GIS feature', 'Auxiliar view for connecs', 'role_basic', 0, 'role_basic', false);
 
 INSERT INTO audit_cat_table(id, context, descript, sys_role_id, sys_criticity, qgis_role_id, isdeprecated) 
-VALUES ('rpt_selector_timestep_compare', 'Hydraulic selector', 'Selector of an alternative result (to compare with other results)', 'role_epa', 0, 'role_epa', false);
+VALUES ('v_gully', 'GIS feature', 'Auxiliar view for gully', 'role_basic', 0, 'role_basic', false);
+
+update audit_cat_table set isdeprecated = true where id like '%v_inp%';
+update audit_cat_table set id = 'vi_subcatch2node' WHERE id = 'v_inp_subcatch2node';
+update audit_cat_table set id = 'vi_subcatchcentroid' WHERE id = 'v_inp_subcatchcentroid';

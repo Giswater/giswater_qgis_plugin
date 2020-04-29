@@ -7,36 +7,37 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-create table IF NOT EXISTS om_profile (
-profile_id text PRIMARY KEY,
-values json);
+--mandatory update on ddl to save value of editability, typeahead, reg_exp columns
+UPDATE audit_cat_param_user SET isparent=True, editability='{"trueWhenParentIn":[11]}' WHERE id ='inp_options_pattern';-- (audit_cat_param_user)
+UPDATE audit_cat_param_user SET widgetcontrols = gw_fct_json_object_set_key(widgetcontrols,'enableWhenParent', editability->>'trueWhenParentIn') where editability is not null; --editability (enableWhenParent)
+UPDATE audit_cat_param_user SET widgetcontrols = gw_fct_json_object_set_key(widgetcontrols,'regexpControl', reg_exp) where reg_exp is not null; --reg_exp
 
--- refactor config_param_system.isdeprecated to boolean
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_param_system", "column":"isdep", "dataType":"boolean"}}$$);
-UPDATE config_param_system SET isdep = isdeprecated::boolean;
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_param_system", "column":"isdeprecated"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"config_param_system", "column":"isdep", "newName":"isdeprecated"}}$$);
+-- drop fields
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"audit_cat_param_user", "column":"editability"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"audit_cat_param_user", "column":"typeahead"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"audit_cat_param_user", "column":"reg_exp"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"audit_cat_param_user", "column":"qgis_message"}}$$);
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"ext_rtc_dma_period", "column":"m3_min"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"ext_rtc_dma_period", "column":"m3_max"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"ext_rtc_dma_period", "column":"m3_avg"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"ext_rtc_dma_period", "column":"isscada"}}$$);
+--2020/02/24
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox,isparametric)
+VALUES (2808, 'gw_trg_edit_config_addfields', 'utils','trigger function', 'Trigger to manage the editability of ve_config_addfields', 
+'role_admin', FALSE, FALSE, FALSE) ON CONFLICT (id) DO NOTHING;
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"vnode_topelev", "dataType":"float"}}$$);
+--2020/03/07
+INSERT INTO audit_cat_param_user (id, formname, description, sys_role_id, idval, label, dv_querytext, dv_parent_id, isenabled, layout_id, layout_order, project_type, 
+isparent, dv_querytext_filterc, feature_field_id, feature_dv_parent_value, isautoupdate, datatype, widgettype, 
+ismandatory, widgetcontrols, vdefault, layoutname, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, placeholder, isdeprecated) 
+VALUES ('api_form_show_columname_on_label', 'config', 'Use column_id in spite of label to see the widget on api forms', 'role_edit', NULL, 'Label with column_id on api forms', NULL, NULL, true, 1,6, 'utils', 
+false, NULL, NULL, NULL, false, 'boolean', 'check', 
+true, NULL, 'false', NULL, NULL, NULL, NULL, NULL, NULL, false)
+ON conflict (id) DO NOTHING;
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_arc", "column":"node_1", "dataType":"character varying(16)"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_arc", "column":"node_2", "dataType":"character varying(16)"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_arc", "column":"sys_type", "dataType":"character varying(30)"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_arc", "column":"code", "dataType":"character varying(30)"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_arc", "column":"cat_geom1", "dataType":"float"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_arc", "column":"length", "dataType":"float"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_arc", "column":"slope", "dataType":"float"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_arc", "column":"total_length", "dataType":"numeric(12,3)"}}$$);
+--2020/03/11
+UPDATE config_param_system SET datatype = data_type where datatype IS NULL;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_param_system", "column":"data_type"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_param_system", "column":"tooltip"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"audit_cat_param_user", "column":"description","newName":"descript"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"audit_cat_table", "column":"description","newName":"descript"}}$$);
 
-
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_node", "column":"total_distance", "dataType":"numeric(12,3)"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_node", "column":"sys_type", "dataType":"character varying(30)"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_node", "column":"code", "dataType":"character varying(30)"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_node", "column":"cat_geom1", "dataType":"float"}}$$);
-
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node_type", "column":"isprofilesurface", "dataType":"boolean"}}$$);
+--2020/03/12
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_param_system", "column":"layoutname", "dataType":"text"}}$$);

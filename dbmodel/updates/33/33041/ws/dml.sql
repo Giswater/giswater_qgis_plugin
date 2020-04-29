@@ -8,21 +8,28 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
---2020/03/28
-INSERT INTO config_param_system (parameter, value, context, descript, label, isenabled, layout_order, project_type, datatype, widgettype, ismandatory, isdeprecated)
-VALUES ('profile_guitarlegend',
-'{"catalog":"CATALOG", "vs":"VS", "hs":"HS", "referencePlane":"RF", "dimensions":"SLOPE/LENGTH", "ordinates": "ORDINATES", "topelev":"ELEVATION", "ymax":"DEPTH", "elev": "ELEV", "code":"CODE"}'::json,
-'system', 'Profile guitar legend', 'Profile guitar legend configuration', TRUE, null, 'ud', 'json', 'linetext', true, false) 
-ON CONFLICT (parameter) DO NOTHING;
+UPDATE audit_cat_param_user SET vdefault =
+'{"reservoir":{"switch2Junction":["ETAP", "POU", "CAPTACIO"]},
+"tank":{"distVirtualReservoir":0.01}, 
+"pressGroup":{"status":"ACTIVE", "forceStatus":"ACTIVE", "defaultCurve":"GP30"}, 
+"pumpStation":{"status":"CLOSED", "forceStatus":"CLOSED", "defaultCurve":"IM00"}, 
+"PRV":{"status":"ACTIVE", "forceStatus":"ACTIVE", "pressure":"30"}, 
+"PSV":{"status":"ACTIVE", "forceStatus":"ACTIVE", "pressure":"30"}
+}'
+WHERE id = 'inp_options_buildup_supply';
 
-INSERT INTO config_param_system (parameter, value, context, descript, label, isenabled, layout_order, project_type, datatype, widgettype, ismandatory, isdeprecated)
-VALUES ('profile_guitartext',
-'{"arc":"SELECT arc_id AS arc_id, arccat_id as catalog, concat((100*(elevation1-elevation2)/gis_length)::numeric(12,2),''-'',gis_length::numeric(12,2),''m'') as dimensions , arc_id as code FROM v_edit_arc"}',
-'system', 'Profile profile_guitartext', 'Profile guitar stylesheet configuration', TRUE, null, 'ud', 'json', 'linetext', true, false) 
-ON CONFLICT (parameter) DO NOTHING;
 
-INSERT INTO config_param_system (parameter, value, context, descript, label, isenabled, layout_order, project_type, datatype, widgettype, ismandatory, isdeprecated)
-VALUES ('profile_vdefault', 
-'{"arc":{"cat_geom1":"110"}, "node":{"cat_geom1":"1"}}',
-'system', 'Profile vdefault', 'Profile vdefault', TRUE, null, 'ud', 'json', 'linetext', true, false) 
-ON CONFLICT (parameter) DO NOTHING;
+
+-- 09/03/2020
+INSERT INTO config_client_forms (location_type, project_type, table_id, column_id, column_index, status) 
+VALUES ('mincut form', 'ws', 'v_anl_mincut_result_hydrometer', 'id', 1, false);
+INSERT INTO config_client_forms (location_type, project_type, table_id, column_id, column_index, status) 
+VALUES ('mincut form', 'ws', 'v_anl_mincut_result_hydrometer', 'result_id', 2, false);
+INSERT INTO config_client_forms (location_type, project_type, table_id, column_id, column_index, status) 
+VALUES ('mincut form', 'ws', 'v_anl_mincut_result_hydrometer', 'work_order', 3, false);
+
+
+-- 12/03/2020
+UPDATE audit_cat_param_user 
+SET widgetcontrols = (replace (widgetcontrols::text, '{"minValue":0.001, "maxValue":100}', '{"maxMinValues":{"min":0.001, "max":100}}'))::json 
+WHERE widgetcontrols is not null;

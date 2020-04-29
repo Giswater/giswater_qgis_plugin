@@ -1,3 +1,0 @@
-3.3.036
-*************
-- Enhance dynamic mapzones using plot geometry (if exists)

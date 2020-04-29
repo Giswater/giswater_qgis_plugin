@@ -1,5 +1,3 @@
 3.3.039
 *************
-- Enhance gw_fct_message managing also debug issues
-- Drop layout_id on config_param_system & audit_cat_param_user
-- Deprecate materialized view for workcat
+- Enhance dynamic mapzones using plot geometry (if exists)

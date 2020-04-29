@@ -8,6 +8,11 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
---2020/04/04
-CREATE TRIGGER gw_trg_edit_vnode INSTEAD OF INSERT OR UPDATE OR DELETE  ON v_edit_vnode
-FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_vnode();
+DROP TRIGGER IF EXISTS gw_trg_connec_proximity_insert ON SCHEMA_NAME.gully;
+CREATE TRIGGER gw_trg_gully_proximity_insert BEFORE INSERT
+ON SCHEMA_NAME.gully FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_gully_proximity();
+  
+  
+DROP TRIGGER IF EXISTS gw_trg_gully_proximity_update ON SCHEMA_NAME.gully;
+CREATE TRIGGER gw_trg_gully_proximity_update AFTER UPDATE OF the_geom
+ON SCHEMA_NAME.gully  FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_gully_proximity();

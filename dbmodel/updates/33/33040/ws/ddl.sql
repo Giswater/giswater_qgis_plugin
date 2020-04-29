@@ -8,7 +8,15 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
---2020/03/18
-CREATE INDEX node_dqa ON node USING btree (dqa_id);
-CREATE INDEX arc_dqa ON arc USING btree (dqa_id);
-CREATE INDEX connec_dqa ON connec USING btree (dqa_id);
+-- 2020/01/30
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"inp_","table":"inp_pump_additional", "column":"to_arc", "dataType":"varchar(16)", "isUtils":"False"}}$$);
+
+
+--2020/03/05
+CREATE SEQUENCE IF NOT EXISTS man_hydrant_fire_code_seq
+  INCREMENT 1
+  MINVALUE 1
+  MAXVALUE 9223372036854775807
+  START 1
+  CACHE 1;
+

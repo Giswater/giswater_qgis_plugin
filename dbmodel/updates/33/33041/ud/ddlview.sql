@@ -4,229 +4,89 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-
 SET search_path = SCHEMA_NAME, public, pg_catalog;
+--2020/03/11
+
+DROP VIEW IF EXISTS v_anl_flow_gully;
+CREATE OR REPLACE VIEW v_anl_flow_gully AS 
+ SELECT v_edit_gully.gully_id,
+    CASE WHEN fprocesscat_id=120 THEN 'Flow trace'
+    WHEN fprocesscat_id = 121 THEN 'Flow exit' end as context,
+    anl_arc.expl_id,
+    v_edit_gully.the_geom
+   FROM anl_arc
+     JOIN v_edit_gully ON anl_arc.arc_id::text = v_edit_gully.arc_id::text
+     JOIN selector_expl ON anl_arc.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text 
+     AND anl_arc.cur_user::name = "current_user"() AND (fprocesscat_id = 120 OR fprocesscat_id = 121);
 
 
---2020/03/28
-DROP view if exists v_edit_vnode;
-
-CREATE OR REPLACE VIEW v_edit_link AS 
- SELECT DISTINCT ON (a.link_id) a.link_id,
-    a.feature_type,
-    a.feature_id,
-    a.macrosector_id,
-    a.macrodma_id,
-    a.exit_type,
-    a.exit_id,
-    a.sector_id,
-    a.dma_id,
-    a.expl_id,
-    a.state,
-    a.gis_length,
-    a.userdefined_geom,
-    a.the_geom,
-    a.ispsectorgeom,
-    a.psector_rowid,
-	a.fluid_type,
-	a.vnode_topelev
-   FROM ( SELECT link.link_id,
-            link.feature_type,
-            link.feature_id,
-            sector.macrosector_id,
-            dma.macrodma_id,
-            link.exit_type,
-            link.exit_id,
-            link.vnode_topelev,
-			fluid_type,
-            arc.sector_id,
-            arc.dma_id,
-            arc.expl_id,
-                CASE
-                    WHEN plan_psector_x_connec.link_geom IS NULL THEN link.state
-                    ELSE plan_psector_x_connec.state
-                END AS state,
-            st_length2d(link.the_geom) AS gis_length,
-                CASE
-                    WHEN plan_psector_x_connec.link_geom IS NULL THEN link.userdefined_geom
-                    ELSE plan_psector_x_connec.userdefined_geom
-                END AS userdefined_geom,
-                CASE
-                    WHEN plan_psector_x_connec.link_geom IS NULL THEN link.the_geom
-                    ELSE plan_psector_x_connec.link_geom
-                END AS the_geom,
-                CASE
-                    WHEN plan_psector_x_connec.link_geom IS NULL THEN false
-                    ELSE true
-                END AS ispsectorgeom,
-                CASE
-                    WHEN plan_psector_x_connec.link_geom IS NULL THEN NULL::integer
-                    ELSE plan_psector_x_connec.id
-                END AS psector_rowid
-           FROM link
-             JOIN v_state_connec ON link.feature_id::text = v_state_connec.connec_id::text
-             JOIN arc USING (arc_id)
-             JOIN sector ON sector.sector_id::text = arc.sector_id::text
-             JOIN dma ON dma.dma_id::text = arc.dma_id::text
-             LEFT JOIN plan_psector_x_connec USING (arc_id, connec_id)
-          WHERE link.feature_id::text = v_state_connec.connec_id::text
-        UNION
-         SELECT link.link_id,
-            link.feature_type,
-            link.feature_id,
-            sector.macrosector_id,
-            dma.macrodma_id,
-            link.exit_type,
-            link.exit_id,
-            link.vnode_topelev,
-			fluid_type,
-            arc.sector_id,
-            arc.dma_id,
-            arc.expl_id,
-                CASE
-                    WHEN plan_psector_x_gully.link_geom IS NULL THEN link.state
-                    ELSE plan_psector_x_gully.state
-                END AS state,
-            st_length2d(link.the_geom) AS gis_length,
-                CASE
-                    WHEN plan_psector_x_gully.link_geom IS NULL THEN link.userdefined_geom
-                    ELSE plan_psector_x_gully.userdefined_geom
-                END AS userdefined_geom,
-                CASE
-                    WHEN plan_psector_x_gully.link_geom IS NULL THEN link.the_geom
-                    ELSE plan_psector_x_gully.link_geom
-                END AS the_geom,
-                CASE
-                    WHEN plan_psector_x_gully.link_geom IS NULL THEN false
-                    ELSE true
-                END AS ispsectorgeom,
-                CASE
-                    WHEN plan_psector_x_gully.link_geom IS NULL THEN NULL::integer
-                    ELSE plan_psector_x_gully.id
-                END AS psector_rowid
-           FROM link
-             JOIN v_state_gully ON link.feature_id::text = v_state_gully.gully_id::text
-             LEFT JOIN arc USING (arc_id)
-             JOIN sector ON sector.sector_id::text = arc.sector_id::text
-             JOIN dma ON dma.dma_id::text = arc.dma_id::text
-             LEFT JOIN plan_psector_x_gully USING (arc_id, gully_id)
-          WHERE link.feature_id::text = v_state_gully.gully_id::text) a
-  WHERE a.state < 2;
-
-DROP VIEW IF EXISTS v_arc_x_vnode;
-CREATE OR REPLACE VIEW v_arc_x_vnode AS 
- SELECT 
-    link_id,
-    a.vnode_id,
-    a.arc_id,
-    a.feature_type,
-    a.feature_id,
-    a.node_1,
-    a.node_2,
-    (a.length * a.locate::double precision)::numeric(12,3) AS vnode_distfromnode1,
-    (a.length * (1::numeric - a.locate)::double precision)::numeric(12,3) AS vnode_distfromnode2,
-    case when vnode_topelev IS NULL THEN (a.top_elev1 - a.locate * (a.top_elev1 - a.top_elev2))::numeric(12,3) 
-	ELSE vnode_topelev END AS vnode_topelev,
-    (a.sys_y1 - a.locate * (a.sys_y1 - a.sys_y2))::numeric(12,3) AS vnode_ymax,
-    (a.sys_elev1 - a.locate * (a.sys_elev1 - a.sys_elev2))::numeric(12,3) AS vnode_elev
-       FROM ( SELECT 
-		link_id,
-		vnode.vnode_id,
-            v_edit_arc.arc_id,
-            a_1.feature_type,
-            a_1.feature_id,
-            vnode_topelev,
-            st_length(v_edit_arc.the_geom) AS length,
-            st_linelocatepoint(v_edit_arc.the_geom, vnode.the_geom)::numeric(12,3) AS locate,
-            v_edit_arc.node_1,
-            v_edit_arc.node_2,
-            v_edit_arc.sys_elev1,
-            v_edit_arc.sys_elev2,
-            v_edit_arc.sys_y1,
-            v_edit_arc.sys_y2,
-            v_edit_arc.sys_elev1 + v_edit_arc.sys_y1 AS top_elev1,
-            v_edit_arc.sys_elev2 + v_edit_arc.sys_y2 AS top_elev2
-           FROM v_edit_arc,
-            vnode
-             JOIN v_edit_link a_1 ON vnode.vnode_id = a_1.exit_id::integer
-          WHERE st_dwithin(v_edit_arc.the_geom, vnode.the_geom, 0.01::double precision) AND v_edit_arc.state > 0 AND vnode.state > 0) a
-  ORDER BY a.arc_id, a.node_2 DESC;
+DROP VIEW IF EXISTS v_anl_flow_connec;
+CREATE OR REPLACE VIEW v_anl_flow_connec AS 
+ SELECT v_edit_connec.connec_id,
+    CASE WHEN fprocesscat_id=120 THEN 'Flow trace'
+    WHEN fprocesscat_id = 121 THEN 'Flow exit' end as context,
+    anl_arc.expl_id,
+    v_edit_connec.the_geom
+   FROM anl_arc
+     JOIN v_edit_connec ON anl_arc.arc_id::text = v_edit_connec.arc_id::text
+     JOIN selector_expl ON anl_arc.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text 
+     AND anl_arc.cur_user::name = "current_user"() AND (fprocesscat_id = 120 OR fprocesscat_id = 121);
 
 
-CREATE OR REPLACE VIEW v_edit_vnode AS 
- SELECT a.vnode_id,
-    a.vnode_type,
-    a.feature_type,
-    a.top_elev,
-    a.sector_id,
-    a.dma_id,
-    a.state,
-    a.annotation,
-    a.the_geom,
-    a.expl_id,
-    a.rotation,
-    a.ispsectorgeom,
-    a.psector_rowid
-   FROM ( SELECT DISTINCT ON (vnode.vnode_id) vnode.vnode_id,
-            vnode.vnode_type,
-            link.feature_type,
-            vnode.top_elev,
-            vnode.sector_id,
-            vnode.dma_id,
-                CASE
-                    WHEN plan_psector_x_connec.vnode_geom IS NULL THEN link.state
-                    ELSE plan_psector_x_connec.state
-                END AS state,
-            vnode.annotation,
-                CASE
-                    WHEN plan_psector_x_connec.vnode_geom IS NULL THEN vnode.the_geom
-                    ELSE plan_psector_x_connec.vnode_geom
-                END AS the_geom,
-            vnode.expl_id,
-            vnode.rotation,
-                CASE
-                    WHEN plan_psector_x_connec.link_geom IS NULL THEN false
-                    ELSE true
-                END AS ispsectorgeom,
-                CASE
-                    WHEN plan_psector_x_connec.link_geom IS NULL THEN NULL::integer
-                    ELSE plan_psector_x_connec.id
-                END AS psector_rowid
-           FROM v_edit_link link
-             JOIN vnode ON link.exit_id::text = vnode.vnode_id::text AND link.exit_type::text = 'VNODE'::text
-             LEFT JOIN v_state_connec ON link.feature_id::text = v_state_connec.connec_id::text
-             LEFT JOIN plan_psector_x_connec USING (arc_id, connec_id)
-          WHERE link.feature_id::text = v_state_connec.connec_id::text
-        UNION
-         SELECT DISTINCT ON (vnode.vnode_id) vnode.vnode_id,
-            vnode.vnode_type,
-            link.feature_type,
-            vnode.top_elev,
-            vnode.sector_id,
-            vnode.dma_id,
-                CASE
-                    WHEN plan_psector_x_gully.vnode_geom IS NULL THEN link.state
-                    ELSE plan_psector_x_gully.state
-                END AS state,
-            vnode.annotation,
-                CASE
-                    WHEN plan_psector_x_gully.vnode_geom IS NULL THEN vnode.the_geom
-                    ELSE plan_psector_x_gully.vnode_geom
-                END AS the_geom,
-            vnode.expl_id,
-            vnode.rotation,
-                CASE
-                    WHEN plan_psector_x_gully.link_geom IS NULL THEN false
-                    ELSE true
-                END AS ispsectorgeom,
-                CASE
-                    WHEN plan_psector_x_gully.link_geom IS NULL THEN NULL::integer
-                    ELSE plan_psector_x_gully.id
-                END AS psector_rowid
-           FROM v_edit_link link
-             JOIN vnode ON link.exit_id::text = vnode.vnode_id::text AND link.exit_type::text = 'VNODE'::text
-             LEFT JOIN v_state_gully ON link.feature_id::text = v_state_gully.gully_id::text
-             LEFT JOIN plan_psector_x_gully USING (arc_id, gully_id)
-          WHERE link.feature_id::text = v_state_gully.gully_id::text) a
-  WHERE a.state < 2;
+DROP VIEW IF EXISTS v_anl_flow_arc;
+CREATE OR REPLACE VIEW v_anl_flow_arc AS 
+ SELECT anl_arc.id,
+    anl_arc.arc_id,
+    anl_arc.arccat_id as arc_type,
+    CASE WHEN fprocesscat_id=120 THEN 'Flow trace'
+    WHEN fprocesscat_id = 121 THEN 'Flow exit' end as context,
+    anl_arc.expl_id,
+    anl_arc.the_geom
+   FROM selector_expl,
+    anl_arc
+  WHERE anl_arc.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text 
+  AND anl_arc.cur_user::name = "current_user"() AND (fprocesscat_id = 120 OR fprocesscat_id = 121);
+
+
+DROP VIEW IF EXISTS v_anl_flow_node;
+CREATE OR REPLACE VIEW v_anl_flow_node AS 
+ SELECT anl_node.id ,
+    anl_node.node_id,
+    anl_node.nodecat_id as node_type,
+    CASE WHEN fprocesscat_id=120 THEN 'Flow trace'
+    WHEN fprocesscat_id = 121 THEN 'Flow exit' end as context,
+    anl_node.expl_id,
+    anl_node.the_geom
+   FROM selector_expl,
+    anl_node
+  WHERE anl_node.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text AND 
+  anl_node.cur_user::name = "current_user"() AND (fprocesscat_id = 120 OR fprocesscat_id = 121);
+
+
+--2020/03/13
+DROP VIEW IF EXISTS v_ui_node_x_connection_downstream;
+CREATE OR REPLACE VIEW v_ui_node_x_connection_downstream AS 
+ SELECT row_number() OVER (ORDER BY v_edit_arc.node_1)+1000000 AS rid,
+    v_edit_arc.node_1 AS node_id,
+    v_edit_arc.arc_id AS feature_id,
+    v_edit_arc.code AS feature_code,
+    v_edit_arc.arc_type AS featurecat_id,
+    v_edit_arc.arccat_id,
+    v_edit_arc.y2 AS depth,
+    st_length2d(v_edit_arc.the_geom)::numeric(12,2) AS length,
+    node.node_id AS downstream_id,
+    node.code AS downstream_code,
+    node.node_type AS downstream_type,
+    v_edit_arc.y1 AS downstream_depth,
+    sys_type,
+    st_x(st_lineinterpolatepoint(v_edit_arc.the_geom, 0.5::double precision)) AS x,
+    st_y(st_lineinterpolatepoint(v_edit_arc.the_geom, 0.5::double precision)) AS y,
+    cat_arc.descript,
+    value_state.name AS state,
+    'v_edit_arc'::text as sys_table_id
+   FROM v_edit_arc
+     JOIN node ON v_edit_arc.node_2::text = node.node_id::text
+     JOIN arc_type ON arc_type.id::text = v_edit_arc.arc_type::text
+     LEFT JOIN cat_arc ON v_edit_arc.arccat_id::text = cat_arc.id::text
+     JOIN value_state ON v_edit_arc.state = value_state.id;
 

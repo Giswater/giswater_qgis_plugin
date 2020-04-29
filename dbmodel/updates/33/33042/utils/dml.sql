@@ -7,56 +7,52 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-INSERT INTO sys_fprocess_cat(id, fprocess_name, context, project_type)
-VALUES (124,'Go2epa-temporal nodarcs','ws', 'epa') ON CONFLICT (id) DO NOTHING;
+--2020/03/13
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_param_system", "column":"layout_id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"audit_cat_param_user", "column":"layout_id"}}$$);
 
-INSERT INTO sys_fprocess_cat(id, fprocess_name, context, project_type)
-VALUES (125,'role epa check network data','utils', 'epa') ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO sys_fprocess_cat(id, fprocess_name, context, project_type)
-VALUES (126,'Go2epa check demands data','ws', 'epa') ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO sys_fprocess_cat(id, fprocess_name, context, project_type)
-VALUES (127,'Go2epa check','ws', 'epa') ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO sys_fprocess_cat(id, fprocess_name, context, project_type)
-VALUES (128,'Go2epa check orphan nodes','utils', 'epa') ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO sys_fprocess_cat(id, fprocess_name, context, project_type)
-VALUES (129,'arcs less than 20 cm.','utils', 'edit') ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO sys_fprocess_cat(id, fprocess_name, context, project_type)
-VALUES (130,'arcs less than 5 cm.','utils', 'edit') ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO sys_fprocess_cat(id, fprocess_name, context, project_type)
-VALUES (131,'Go2epa check arc without some node','utils', 'epa') ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO sys_fprocess_cat(id, fprocess_name, context, project_type)
-VALUES (132,'Go2epa check dry arcs','ws', 'epa') ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO sys_fprocess_cat(id, fprocess_name, context, project_type)
-VALUES (133,'Go2epa check dry nodes with positive demand','ws', 'epa') ON CONFLICT (id) DO NOTHING;
+INSERT INTO config_param_system (parameter, value, context, descript, label, isenabled, project_type, datatype, widgettype, ismandatory, isdeprecated, standardvalue) 
+VALUES ('sys_transaction_db', '{"status":false, "server":""}', 'system', 'Parameteres for use an additional database to scape transtaction logics of PostgreSQL in order to audit processes step by step', 
+'Additional transactional database:', TRUE, 'utils', 'json', 'linetext', false, false, 'false') 
+ON CONFLICT (parameter) DO NOTHING;
 
 
-UPDATE audit_cat_function set function_name = 'gw_fct_pg2epa_demand' where function_name = 'gw_fct_pg2epa_rtc';
+UPDATE audit_cat_param_user SET layoutname = 'lyt_other', formname='config', iseditable = true, layout_order=19 WHERE id ='debug_mode';
+UPDATE audit_cat_param_user SET layoutname = 'lyt_inventory' , layout_order=9 WHERE id ='verified_vdefault';
+UPDATE audit_cat_param_user SET layoutname = 'lyt_inventory' , layout_order=9 WHERE id ='verified_vdefault';
+UPDATE audit_cat_param_user SET layoutname = 'lyt_inventory' , layout_order=10 WHERE id ='cad_tools_base_layer_vdefault';
+UPDATE audit_cat_param_user SET layoutname = 'lyt_inventory' , layout_order=11 WHERE id ='edit_gully_doublegeom';
+UPDATE audit_cat_param_user SET layoutname = 'lyt_other' , layout_order=17 WHERE id ='edit_upsert_elevation_from_dem';
+UPDATE audit_cat_param_user SET formname ='hidden_param' WHERE id IN ('audit_project_epa_result', 'audit_project_plan_result');
+UPDATE audit_cat_param_user SET layoutname = 'lyt_other' , layout_order=18 WHERE id ='api_form_show_columname_on_label';
 
-UPDATE audit_cat_function set function_name = 'gw_fct_pg2epa_check_network', project_type = 'utils' WHERE id = 2680;
+UPDATE audit_cat_param_user SET formname ='hidden_param' , project_type = 'utils' WHERE id IN ('qgis_qml_linelayer_path', 'qgis_qml_pointlayer_path', 'qgis_qml_polygonlayer_path');
 
-UPDATE audit_cat_function set function_name = 'gw_fct_connect_to_network' where function_name = 'gw_fct_connec_to_network';
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
+VALUES (2828, 'gw_api_get_visit', 'utils','api function', 'Get visit', 'role_basic',FALSE, FALSE, FALSE)
+ON conflict (id) DO NOTHING;
 
-UPDATE audit_cat_function set function_name = 'gw_trg_edit_inp_connec' where function_name = 'trg_edit_inp_connec';
+INSERT INTO audit_cat_error (id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3098, 'If widgettype=typeahead and dv_querytext_filterc is not null dv_parent_id must be combo', NULL, 2, TRUE, 'utils', false) ON CONFLICT (id) DO NOTHING;
 
-UPDATE audit_cat_function set function_name = 'gw_fct_pg2epa_build_supply' where function_name = 'gw_fct_go2epa_fast_buildup';
+INSERT INTO audit_cat_error (id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3100, 'If widgettype=typeahead, id and idval for dv_querytext expression must be the same field', NULL, 2, TRUE, 'utils', false) ON CONFLICT (id) DO NOTHING;
 
-DELETE FROM audit_cat_function WHERE function_name IN 
-('gw_fct_pg2epa_nodescouplecapacity', 'gw_state_searchnodes', 'gw_fct_pg2epa_singlenodecapacity', 
-'gw_fct_audit_function', 'gw_fct_module_activate', 'gw_fct_dinlet', 'gw_fct_node_replace');
+INSERT INTO audit_cat_error (id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3102, 'If dv_querytext_filterc is not null dv_parent_id is mandatory', NULL, 2, TRUE, 'utils', false) ON CONFLICT (id) DO NOTHING;
 
-DELETE FROM audit_cat_function WHERE id = 2648; -- duplicated gw_fct_admin_schema_manage_ct
+INSERT INTO audit_cat_error (id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3104, 'When dv_querytext_filterc, dv_parent_id must be a valid column for this form. Please check form because there is not column_id with this name', NULL, 2, TRUE, 'utils', false) ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO audit_cat_function VALUES (2846, 'gw_fct_pg2epa_vdefault', 'utils', 'Function', NULL, NULL, NULL, 'Default values for epa', 'role_epa', false) 
-ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO audit_cat_function VALUES (2848, 'gw_fct_pg2epa_check_result', 'utils', 'Function', NULL, NULL, NULL, 'Check data for epa result', 'role_epa', false) 
-ON CONFLICT (id) DO NOTHING;
+--2020/02/26
+INSERT INTO audit_cat_param_user (id, formname, descript, sys_role_id, idval, label, dv_querytext, dv_parent_id, isenabled, layoutname, 
+layout_order, project_type, isparent, dv_querytext_filterc, feature_field_id, feature_dv_parent_value, isautoupdate, datatype, widgettype, 
+ismandatory, widgetcontrols, vdefault, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, placeholder, isdeprecated) 
+VALUES ('qgis_form_log_hidden', 'config', 'Hide log form after executing a process', 'role_edit', NULL, 'Hide log form', NULL, NULL, true, 'lyt_other', 
+20, 'utils', false, NULL, NULL, NULL, false, 'boolean', 'check', true, NULL, 'true', NULL, NULL, NULL, NULL, NULL, false)
+ON conflict (id) DO NOTHING;
 
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
+VALUES (2830, 'gw_fct_debug', 'utils','Function to manage messages', 'Function to manage messages', 'role_basic',FALSE, FALSE, FALSE)
+ON conflict (id) DO NOTHING;

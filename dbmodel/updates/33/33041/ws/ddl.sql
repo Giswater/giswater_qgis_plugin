@@ -8,7 +8,8 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"vnode_elevation", "dataType":"numeric(12,3)"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_node", "column":"elevation", "dataType":"float"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_node", "column":"elev", "dataType":"float"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_node", "column":"depth", "dataType":"float"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_pump_importinp", "column":"to_arc", "dataType":"character varying(16)", "isUtils":"False"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_go2epa", "column":"idmin", "dataType":"integer", "isUtils":"False"}}$$);
+
+COMMENT ON VIEW v_ui_hydroval_x_connec IS 'This view can be modified by user, but connec_id, hydrometer_id and cat_period_id must remain in the definition without alias in order to use filters in QGIS. If you need to hide or use alias for these fields use config_client_forms';
