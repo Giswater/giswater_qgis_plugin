@@ -42,7 +42,7 @@ UPDATE config_param_system SET value =
 '{"table":"exploitation", "selector":"selector_expl", "table_id":"expl_id",  "selector_id":"expl_id",  "label":"expl_id, '' - '', name, '' '', CASE WHEN descript IS NULL THEN '''' ELSE concat('' - '', descript) END", "query_filter":" AND expl_id > 0 "}'
 WHERE  parameter = 'api_selector_exploitation';
 
-UPDATE audit_cat_param_user SET widgetcontrols = null WHERE id = 'inp_times_duration';
+UPDATE audit_cat_param_user SET widgetcontrols = null, placeholder='24' WHERE id = 'inp_times_duration';
 
 UPDATE sys_csv2pg_config SET 
 target = '{Node Results, MINIMUM Node, MAXIMUM Node, AVERAGE Node, DIFFERENTIAL Node}'
