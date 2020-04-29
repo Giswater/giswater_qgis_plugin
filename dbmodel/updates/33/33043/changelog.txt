@@ -1,3 +1,4 @@
 3.3.043
 *************
 - Enhance streetname & postnumber. Huge refactor of whole feature views
+- New field for man_valve to manage the ordinary status

@@ -12,3 +12,5 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 CREATE INDEX node_dqa ON node USING btree (dqa_id);
 CREATE INDEX arc_dqa ON arc USING btree (dqa_id);
 CREATE INDEX connec_dqa ON connec USING btree (dqa_id);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_valve", "column":"ordinarystatus", "dataType":"int2"}}$$);

@@ -4567,7 +4567,8 @@ CREATE OR REPLACE VIEW v_edit_man_valve AS
 	man_valve.exit_type,
 	man_valve.exit_code,
 	man_valve.drive_type,
-	man_valve.cat_valve2
+	man_valve.cat_valve2,
+	man_valve.ordinarystatus
    FROM v_node
 	 JOIN man_valve ON man_valve.node_id::text = v_node.node_id::text;
 
@@ -4795,7 +4796,8 @@ CREATE OR REPLACE VIEW v_edit_field_valve AS
 	man_valve.exit_type,
 	man_valve.exit_code,
 	man_valve.drive_type,
-	man_valve.cat_valve2
+	man_valve.cat_valve2,
+	man_valve.ordinarystatus
    FROM v_node
 	 JOIN man_valve ON man_valve.node_id::text = v_node.node_id::text;
 
