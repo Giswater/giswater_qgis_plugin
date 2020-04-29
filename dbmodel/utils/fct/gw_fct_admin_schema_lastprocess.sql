@@ -185,6 +185,11 @@ BEGIN
 		-- fk from utils schema
 		PERFORM gw_fct_admin_schema_utils_fk();  -- this is the posiition to use it because of we need values on version table to workwith
 		
+		-- generate child views 
+		PERFORM gw_fct_admin_manage_child_views($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{},
+		"data":{"filterFields":{}, "pageInfo":{}, "multi_create":true}}$$)::text;
+
+		
 	ELSIF v_isnew IS FALSE THEN
 		
         v_oldversion = (SELECT giswater FROM version ORDER BY id DESC LIMIT 1);

@@ -94,9 +94,6 @@ where ext_rtc_hydrometer.id = a.hydrometer_id;
 
 SELECT gw_fct_audit_check_project($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "version":"0", "fprocesscat_id":1}}$$)::text;
 
-SELECT 	gw_fct_admin_manage_child_views($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{"catFeature":"PIPE"},
- "data":{"filterFields":{}, "pageInfo":{}, "multi_create":"TRUE" }}$$);
-
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"OUTFALL_VALVE"},
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"outfallvalve_param_1", "datatype":"string", 
