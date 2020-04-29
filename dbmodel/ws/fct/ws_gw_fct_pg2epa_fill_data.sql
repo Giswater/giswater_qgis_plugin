@@ -103,7 +103,9 @@ BEGIN
 			LEFT JOIN inp_cat_mat_roughness ON inp_cat_mat_roughness.matcat_id = cat_mat_arc.id 
 			WHERE (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 >= inp_cat_mat_roughness.init_age 
 			AND (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 < inp_cat_mat_roughness.end_age '
-			||v_statetype||' AND v_arc.sector_id=inp_selector_sector.sector_id AND inp_selector_sector.cur_user=current_user';
+			||v_statetype||' AND v_arc.sector_id=inp_selector_sector.sector_id AND inp_selector_sector.cur_user=current_user
+			AND epa_type != ''NOT DEFINED''';
+
 
         raise notice 'updating inp_pipe';
         
