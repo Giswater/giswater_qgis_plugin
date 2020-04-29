@@ -610,7 +610,7 @@ class Giswater(QObject):
 
         if list_actions is None:
             return
-        self.controller.log_info(str("TEST1 -> " + str(list_actions)))
+
         toolbar_name = self.tr('toolbar_' + toolbar_id + '_name')
         plugin_toolbar = PluginToolbar(toolbar_id, toolbar_name, True)
 
@@ -902,7 +902,6 @@ class Giswater(QObject):
             return
 
         # Initialize toolbars
-        self.controller.log_info("Initialize toolbars")
         self.initialize_toolbars()
 
         self.get_buttons_to_hide()
@@ -973,8 +972,10 @@ class Giswater(QObject):
         if show_warning:
             self.set_info_button_visible(False)
 
-        # Open search by default
-        self.basic.basic_api_search()
+        # Open automatically 'search docker' depending its value in user settings
+        open_search = self.controller.get_user_setting_value('open_search', 'true')
+        if open_search == 'true':
+            self.basic.basic_api_search()
 
         # Log it
         message = "Project read successfully"

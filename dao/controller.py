@@ -115,7 +115,7 @@ class DaoController(object):
                 
     def tr(self, message, context_name=None):
         """ Translate @message looking it in @context_name """
-        #text = self.tr('title', context_name)
+
         if context_name is None:
             context_name = self.plugin_name
 
@@ -174,21 +174,43 @@ class DaoController(object):
         return True, not_version
     
 
-    def get_sslmode(self):
-        """ Get sslmode for database connection """
+    def check_user_settings(self, parameter, value=None, section='system'):
+        """ Check if @section and @parameter exists in user settings file. If not add them with @value """
 
-        sslmode = 'disable'
-        if self.user_settings is None:
-            return sslmode
-
-        if not self.user_settings.has_section('system'):
-            self.user_settings.add_section('system')
-            self.user_settings.set('system', 'sslmode', sslmode)
+        # Check if @section exists
+        if not self.user_settings.has_section(section):
+            self.user_settings.add_section(section)
+            self.user_settings.set(section, parameter, value)
             self.save_user_settings()
 
-        sslmode = self.user_settings.get('system', 'sslmode').lower()
+        # Check if @parameter exists
+        if not self.user_settings.has_option(section, parameter):
+            self.user_settings.set(section, parameter, value)
+            self.save_user_settings()
 
-        return sslmode
+
+    def get_user_setting_value(self, parameter, default_value=None, section='system'):
+        """ Get value from user settings file of selected @parameter located in @section """
+
+        value = default_value
+        if self.user_settings is None:
+            return value
+
+        self.check_user_settings(parameter, value)
+        value = self.user_settings.get(section, parameter).lower()
+
+        return value
+
+
+    def set_user_settings_value(self, parameter, value, section='system'):
+        """ Set @value from user settings file of selected @parameter located in @section """
+
+        if self.user_settings is None:
+            return value
+
+        self.check_user_settings(parameter, value)
+        self.user_settings.set(section, parameter, value)
+        self.save_user_settings()
 
 
     def save_user_settings(self):
@@ -239,7 +261,7 @@ class DaoController(object):
             return None, not_version
 
         self.manage_user_config_file()
-        sslmode = self.get_sslmode()
+        sslmode = self.get_user_setting_value('sslmode', 'disable')
 
         if layer:
             not_version = False
