@@ -15,3 +15,12 @@ VALUES ('rpt_selector_timestep', 'Hydraulic selector', 'Selector of an alternati
 
 INSERT INTO audit_cat_table(id, context, descript, sys_role_id, sys_criticity, qgis_role_id, isdeprecated) 
 VALUES ('rpt_selector_timestep_compare', 'Hydraulic selector', 'Selector of an alternative result (to compare with other results)', 'role_epa', 0, 'role_epa', false);
+
+--29/04/2020
+UPDATE sys_feature_cat set epa_default = 'JUNCTION' WHERE id IN ('JUNCTION', 'MANHOLE','REGISTER', 'WWTP', 'WJUMP', 'NETELEMENT', 'NETGULLY', 'NETINIT', 'VALVE');
+UPDATE sys_feature_cat set epa_default = 'OUTFALL' WHERE id IN ('OUTFALL');
+UPDATE sys_feature_cat set epa_default = 'STORAGE' WHERE id IN ('STORAGE', 'CHAMBER');
+
+UPDATE sys_feature_cat set epa_default = 'SIPHON' WHERE id IN ('SIPHON');
+UPDATE sys_feature_cat set epa_default = 'VIRTUAL' WHERE id IN ('VARC');
+UPDATE sys_feature_cat set epa_default = 'CONDUIT' WHERE id IN ('WACCEL','CONDUIT');

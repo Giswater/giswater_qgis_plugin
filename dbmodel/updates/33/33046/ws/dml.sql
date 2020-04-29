@@ -57,3 +57,12 @@ INSERT INTO audit_cat_param_user (id, formname, descript, sys_role_id, label, is
 vdefault, ismandatory, isdeprecated, layoutname, layout_order)  VALUES
 ('qgis_form_docker', 'config', 'Force use docker for forms', 'role_basic', 'Force use docker for forms', true, 'utils', false, false, 'boolean', 'check', 'false', true, false, 'lyt_other', 21)
 ON CONFLICT (id) DO NOTHING;
+
+--29/04/2020
+UPDATE sys_feature_cat set epa_default = 'JUNCTION' WHERE id IN ('JUNCTION', 'EXPANSIONTANK', 'FLEXUNION', 'METER', 'HYDRANT','MANHOLE', 'WATERWELL','REGISTER', 'NETWJOIN','SOURCE','REDUCTION', 'NETSAMPLEPOINT', 'NETELEMENT');
+UPDATE sys_feature_cat set epa_default = 'TANK' WHERE id IN ('TANK');
+UPDATE sys_feature_cat set epa_default = 'RESERVOIR' WHERE id IN ('WTP');
+UPDATE sys_feature_cat set epa_default = 'VALVE' WHERE id IN ('VALVE');
+UPDATE sys_feature_cat set epa_default = 'SHORTPIPE' WHERE id IN ('FILTER');
+UPDATE sys_feature_cat set epa_default = 'PUMP' WHERE id IN ('PUMP');
+UPDATE sys_feature_cat set epa_default = 'PIPE' WHERE id IN ('PIPE', 'VARC');

@@ -34,3 +34,7 @@ CREATE INDEX temp_anlgraf_node_2
   ON temp_anlgraf  USING btree  (node_2);
   
 ALTER TABLE ext_rtc_dma_period ADD COLUMN pattern_volume double precision;
+
+
+--29/04/2020
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_feature_cat", "column":"epa_default", "dataType":"varchar(16)", "isUtils":"True"}}$$);
