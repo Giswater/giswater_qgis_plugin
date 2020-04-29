@@ -326,11 +326,11 @@ BEGIN
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 0, 
 		concat('Data analysis for conduit manning roughness coeficient. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 
-		SELECT min(z1), max(z1) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'CONDUIT';
+		SELECT min(elevmax1), max(elevmax1) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'CONDUIT';
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 0, 
 		concat('Data analysis for conduit z1. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 		
-		SELECT min(z2), max(z2) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'CONDUIT';
+		SELECT min(elevmax2), max(elevmax2) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'CONDUIT';
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 0, 
 		concat('Data analysis for conduit z2. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 	
@@ -338,7 +338,7 @@ BEGIN
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 0, 
 		concat('Data analysis for conduit slope. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 		
-		SELECT min(sys_elev), max(sys_elev) INTO v_min, v_max FROM temp_node;
+		SELECT min(elev), max(elev) INTO v_min, v_max FROM temp_node;
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 0, 
 		concat('Data analysis for node elevation. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));	
 	END IF;
