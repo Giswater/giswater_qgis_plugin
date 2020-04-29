@@ -1769,7 +1769,7 @@ class UpdateSQL(ApiParent):
         credentials = {'db': None, 'host': None, 'port': None, 'user': None, 'password': None, 'sslmode': None}
 
         # Get sslmode for database connection
-        sslmode = self.settings.value('system_variables/sslmode', 'disabled').lower()
+        sslmode = 'prefer'
 
         settings = QSettings()
         settings.beginGroup("PostgreSQL/connections/" + connection_name)
