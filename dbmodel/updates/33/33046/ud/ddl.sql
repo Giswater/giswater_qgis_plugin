@@ -16,8 +16,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_arc
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_arc", "column":"qmax", "dataType":"float"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_arc", "column":"barrels", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_inp_arc", "column":"slope", "dataType":"float"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_arc", "column":"slope", "dataType":"float"}}$$);
-
 
 
 CREATE TABLE temp_arc(
@@ -46,6 +44,7 @@ CREATE TABLE temp_arc(
   q0 double precision,
   qmax double precision,
   barrels integer,
+  slope double precision
   CONSTRAINT temp_arc_pkey PRIMARY KEY (id));
   
   
