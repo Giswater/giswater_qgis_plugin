@@ -6,19 +6,19 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2832
 
-CREATE OR REPLACE FUNCTION "ud_sample".gw_fct_getprofilevalues(p_data json)  
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_getprofilevalues(p_data json)  
 RETURNS json AS 
 $BODY$
 
 
 /*example
-SELECT ud_sample.gw_fct_getprofilevalues($${"client":{},
+SELECT SCHEMA_NAME.gw_fct_getprofilevalues($${"client":{},
 	"data":{"initNode":"116", "endNode":"111", "composer":"mincutA4", "legendFactor":1, "linksDistance":1, "scale":{"scaleToFit":false, "eh":2000, "ev":500},	
 		"ComposerTemplates":[{"ComposerTemplate":"mincutA4", "ComposerMap":[{"width":"179.0","height":"140.826","index":0, "name":"map0"},{"width":"77.729","height":"55.9066","index":1, "name":"map7"}]},
 				     {"ComposerTemplate":"mincutA3","ComposerMap":[{"width":"53.44","height":"55.9066","index":0, "name":"map7"},{"width":"337.865","height":"275.914","index":1, "name":"map6"}]}]
 				     }}$$);
 
-SELECT ud_sample.gw_fct_getprofilevalues($${"client":{},
+SELECT SCHEMA_NAME.gw_fct_getprofilevalues($${"client":{},
 	"data":{"initNode":"116", "endNode":"111", "composer":"mincutA4", "legendFactor":1, "linksDistance":1, "scale":{"scaleToFit":false, "eh":2000, "ev":500},	
 		"ComposerTemplates":[{"ComposerTemplate":"mincutA4", "ComposerMap":[{"width":"179.0","height":"140.826","index":0, "name":"map0"},{"width":"77.729","height":"55.9066","index":1, "name":"map7"}]},
 				     {"ComposerTemplate":"mincutA3","ComposerMap":[{"width":"53.44","height":"55.9066","index":0, "name":"map7"},{"width":"337.865","height":"275.914","index":1, "name":"map6"}]}]
@@ -106,7 +106,7 @@ BEGIN
 	v_templates := (p_data ->> 'data')::json->> 'ComposerTemplates';
 
 	--  Search path
-	SET search_path = "ud_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- get projectytpe
 	SELECT wsoftware, giswater FROM version LIMIT 1 INTO v_project_type, v_version;
