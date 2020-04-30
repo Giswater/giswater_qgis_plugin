@@ -38,3 +38,11 @@ ALTER TABLE ext_rtc_dma_period ADD COLUMN pattern_volume double precision;
 
 --29/04/2020
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_feature_cat", "column":"epa_default", "dataType":"varchar(16)", "isUtils":"True"}}$$);
+
+-- 30/04/2020
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_arc", "column":"z1", "dataType":"float"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_arc", "column":"z2", "dataType":"float"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_arc", "column":"y1", "dataType":"float"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_arc", "column":"y2", "dataType":"float"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_arc", "column":"elev1", "dataType":"float"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_arc", "column":"elev2", "dataType":"float"}}$$);

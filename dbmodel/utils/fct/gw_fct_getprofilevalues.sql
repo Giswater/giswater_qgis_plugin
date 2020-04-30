@@ -6,19 +6,19 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2832
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_getprofilevalues(p_data json)  
+CREATE OR REPLACE FUNCTION "ud_sample".gw_fct_getprofilevalues(p_data json)  
 RETURNS json AS 
 $BODY$
 
 
 /*example
-SELECT SCHEMA_NAME.gw_fct_getprofilevalues($${"client":{},
-	"data":{"initNode":"116", "endNode":"111", "composer":"mincutA4", "legendFactor":1, "linksDistance":1, "scale":{"scaleToFit":false, "eh":2000, "ev":50},	
+SELECT ud_sample.gw_fct_getprofilevalues($${"client":{},
+	"data":{"initNode":"116", "endNode":"111", "composer":"mincutA4", "legendFactor":1, "linksDistance":1, "scale":{"scaleToFit":false, "eh":2000, "ev":500},	
 		"ComposerTemplates":[{"ComposerTemplate":"mincutA4", "ComposerMap":[{"width":"179.0","height":"140.826","index":0, "name":"map0"},{"width":"77.729","height":"55.9066","index":1, "name":"map7"}]},
 				     {"ComposerTemplate":"mincutA3","ComposerMap":[{"width":"53.44","height":"55.9066","index":0, "name":"map7"},{"width":"337.865","height":"275.914","index":1, "name":"map6"}]}]
 				     }}$$);
 
-SELECT SCHEMA_NAME.gw_fct_getprofilevalues($${"client":{},
+SELECT ud_sample.gw_fct_getprofilevalues($${"client":{},
 	"data":{"initNode":"116", "endNode":"111", "composer":"mincutA4", "legendFactor":1, "linksDistance":1, "scale":{"scaleToFit":false, "eh":2000, "ev":500},	
 		"ComposerTemplates":[{"ComposerTemplate":"mincutA4", "ComposerMap":[{"width":"179.0","height":"140.826","index":0, "name":"map0"},{"width":"77.729","height":"55.9066","index":1, "name":"map7"}]},
 				     {"ComposerTemplate":"mincutA3","ComposerMap":[{"width":"53.44","height":"55.9066","index":0, "name":"map7"},{"width":"337.865","height":"275.914","index":1, "name":"map6"}]}]
@@ -29,8 +29,8 @@ SELECT SCHEMA_NAME.gw_fct_getprofilevalues($${"client":{},
 DECLARE
 v_init  text;
 v_end text;
-v_hs integer;
-v_vs integer;
+v_hs float;
+v_vs float;
 v_arc json;
 v_node json;
 v_llegend json;
@@ -85,6 +85,12 @@ v_fsysymax text;
 v_querytext text;
 v_qnode1 text;
 v_qnode2 text;
+v_elev1 text;
+v_elev2 text;
+v_z1 text;
+v_z2 text;
+v_y1 text;
+v_y2 text;
 
 BEGIN
 
@@ -100,7 +106,7 @@ BEGIN
 	v_templates := (p_data ->> 'data')::json->> 'ComposerTemplates';
 
 	--  Search path
-	SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "ud_sample", public;
 
 	-- get projectytpe
 	SELECT wsoftware, giswater FROM version LIMIT 1 INTO v_project_type, v_version;
@@ -117,7 +123,10 @@ BEGIN
 
 	-- define variables in function of the project type
 	IF v_project_type = 'UD' THEN
-		v_fcatgeom = 'cat_geom1'; v_ftopelev = 'top_elev'; v_fymax = 'ymax'; v_fslope = 'slope'; 
+		v_fcatgeom = 'cat_geom1'; 
+		v_ftopelev = 'top_elev'; 
+		v_fymax = 'ymax'; 
+		v_fslope = 'slope'; 
 		v_fsystopelev = 'sys_top_elev';	v_fsyselev = 'sys_elev'; v_fsysymax = 'sys_ymax';
 
 		v_querytext = ' UNION SELECT c.arc_id, vnode_id,link_id,''LINK'',gully_id, vnode_topelev, vnode_ymax, vnode_elev, vnode_distfromnode1, total_length
@@ -128,6 +137,12 @@ BEGIN
 				AND anl_arc.node_1 = v_arc_x_vnode.';
 		v_qnode1 = 'node_1 ';
 		v_qnode2 = 'node_2 ';
+		v_elev1 = 'sys_elev1';
+		v_elev2 = 'sys_elev2';
+		v_z1 = 'b.z1';
+		v_z2 = 'b.z2';
+		v_y1 = 'sys_y1';
+		v_y2 = 'sys_y2';
 
 	ELSIF v_project_type = 'WS' THEN
 		v_fcatgeom = 'cat_dnom::float*0.01'; v_ftopelev = 'elevation'; v_fymax = 'depth'; v_fslope = '100*(elevation1 - depth1 - elevation2 + depth2)/gis_length';
@@ -135,6 +150,12 @@ BEGIN
 		v_querytext = '';
 		v_qnode1 = '';
 		v_qnode2 = '';
+		v_elev1 = 'elevation1';
+		v_elev2 = 'elevation2';
+		v_z1 = '0::integer';
+		v_z2 = '0::integer';
+		v_y1 = 'depth1';
+		v_y2 = 'depth2';
 	END IF;
 
 	-- start process
@@ -142,8 +163,9 @@ BEGIN
 	DELETE FROM anl_node WHERE fprocesscat_id=122 AND cur_user = current_user;
 
 	-- insert edge values on anl_arc table
-	EXECUTE 'INSERT INTO anl_arc (fprocesscat_id, arc_id, code, node_1, sys_type, arccat_id, cat_geom1, length, slope, total_length)
-		SELECT  122, arc_id, code, node_id, sys_type, arccat_id, '||v_fcatgeom||', gis_length, '||v_fslope||', total_length FROM v_edit_arc JOIN cat_arc ON arccat_id = id JOIN
+	EXECUTE 'INSERT INTO anl_arc (fprocesscat_id, arc_id, code, node_1, node_2, sys_type, arccat_id, cat_geom1, length, slope, total_length, z1, z2, y1, y2, elev1, elev2)
+		SELECT  122, arc_id, code, node_id, node_2, sys_type, arccat_id, '||v_fcatgeom||', gis_length, '||v_fslope||', total_length, '||v_z1||', '||v_z2||', '||v_y1||', '||v_y2||', '
+		||v_elev1||', '||v_elev2||' FROM v_edit_arc b JOIN cat_arc ON arccat_id = id JOIN 
 		(SELECT edge::text AS arc_id, node::text AS node_id, agg_cost as total_length FROM pgr_dijkstra(''SELECT arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, gis_length::float as cost, 
 		gis_length::float as reverse_cost FROM v_edit_arc'', '||v_init||','||v_end||'))a
 		USING (arc_id)';
@@ -196,6 +218,7 @@ BEGIN
 			END IF;			
 		END LOOP;
 	END IF;
+	
 
 	-- update descript
 	EXECUTE 'UPDATE anl_arc SET descript = a.descript FROM (SELECT arc_id, (row_to_json(row)) AS descript FROM ('||v_textarc||')row)a WHERE a.arc_id = anl_arc.arc_id';
@@ -208,7 +231,7 @@ BEGIN
 	UPDATE anl_node SET descript = gw_fct_json_object_delete_keys(descript::json, 'node_id') WHERE fprocesscat_id=122 AND cur_user = current_user ;
 
 	-- update node table setting default values
-	UPDATE anl_arc SET cat_geom1 = v_arc_geom1 WHERE cat_geom1 IS NULL AND fprocesscat_id=122 AND cur_user = current_user ;
+	UPDATE anl_arc SET cat_geom1 = v_arc_geom1 WHERE cat_geom1 IS NULL AND fprocesscat_id=122 AND cur_user = current_user;
 	UPDATE anl_node SET cat_geom1 = v_node_geom1 WHERE cat_geom1 IS NULL AND fprocesscat_id=122 AND cur_user = current_user AND sys_type !='LINK';
 
 	-- update node table when node has not values and need to be interpolated
@@ -243,7 +266,9 @@ BEGIN
 			END IF;
 			UPDATE anl_node SET  result_id = 'estimated', descript = gw_fct_json_object_set_key(descript::json, 'elev', 'N/I'::text) 
 			WHERE fprocesscat_id=122 AND cur_user = current_user AND node_id = v_nid[i];
-		END IF;		
+		END IF;	
+
+		UPDATE 	anl_node SET nodecat_id = 'VNODE' WHERE fprocesscat_id=122 AND cur_user = current_user AND node_id = v_nid[i] AND nodecat_id IS NULL;
 	END LOOP;
 
 	-- update node table those ymax nulls
@@ -279,7 +304,7 @@ BEGIN
 
 		IF v_scaletofit THEN
 			v_vs = (v_compheight - v_legendfactor*50 - 10)/(1000*v_elevation);
-			v_hs = (v_compwidth - v_legendfactor*20 - 10)/(1000*v_distance);
+			v_hs = (v_compwidth - v_legendfactor*20 - 10)/(1000*v_distance);		
 		ELSE 
 			IF v_compheight < v_profheigtht THEN
 				v_level = 2;
@@ -301,16 +326,18 @@ BEGIN
 	v_scale = concat('1:',v_hs, '(',v_hstext,') - 1:',v_vs,'(',v_vstext,')');
 	
 	-- update values using scale factor
-	v_hs = 200/v_hs;
-	v_vs = 1000/v_vs;
+	v_hs = 2000/v_hs;
+	v_vs = 500/v_vs;
+
+	raise notice '% %', v_hs, v_vs;
 	
-	UPDATE anl_arc SET cat_geom1 = cat_geom1*v_hs, length = length*v_hs WHERE fprocesscat_id=122 AND cur_user = current_user;
+	UPDATE anl_arc SET cat_geom1 = cat_geom1*v_vs, length = length*v_hs WHERE fprocesscat_id=122 AND cur_user = current_user;
 	EXECUTE 'UPDATE anl_node SET cat_geom1 = cat_geom1*'||v_vs||', '||v_ftopelev||' = '||v_ftopelev||'*'||v_vs||', elev = elev*'||v_vs||', '||
 	v_fymax||' = '||v_fymax||'*'||v_vs||' WHERE fprocesscat_id=122 AND cur_user = current_user';
 
 	-- recover values form temp table into response (filtering by spacing certain distance of length in order to not collapse profile)
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_arc
-	FROM (SELECT arc_id, descript, cat_geom1, length FROM anl_arc WHERE fprocesscat_id=122 AND cur_user = current_user) row;
+	FROM (SELECT arc_id, descript, cat_geom1, length, z1, z2, y1, y2, elev1, elev2, node_1, node_2 FROM anl_arc WHERE fprocesscat_id=122 AND cur_user = current_user) row;
 
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(row))) FROM (SELECT node_id, descript, sys_type, cat_geom1, '||
 		v_ftopelev||' AS top_elev, elev, '||v_fymax||' AS ymax FROM anl_node WHERE fprocesscat_id=122 AND cur_user = current_user) row'
@@ -340,6 +367,8 @@ BEGIN
 			'"stylesheet":'||v_stylesheet||','||
 			'"node":'||v_node||','||
 			'"arc":'||v_arc||'}}}')::json;
+
+	
 
 	--EXCEPTION WHEN OTHERS THEN
 	--GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
