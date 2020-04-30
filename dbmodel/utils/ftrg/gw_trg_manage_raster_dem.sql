@@ -17,10 +17,12 @@ BEGIN
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	
     IF TG_OP = 'INSERT' THEN
-	
+
+		-- before insert
 		INSERT INTO ext_cat_raster (id, raster_type, tstamp, insert_user) VALUES (NEW.rastercat_id, 'DEM', now(), current_user)
 		ON CONFLICT (id) DO NOTHING;
 
+		-- after insert
 		UPDATE ext_raster_dem SET envelope  =  (
 					SELECT ST_MakeEnvelope(ST_UpperLeftX(NEW.rast), ST_UpperLeftY(NEW.rast),ST_UpperLeftX(NEW.rast) + ST_ScaleX(NEW.rast)*ST_width(NEW.rast),
 					ST_UpperLeftY(NEW.rast) + ST_ScaleY(NEW.rast)*ST_height(NEW.rast), SRID_VALUE)) WHERE id = NEW.id;
@@ -28,7 +30,7 @@ BEGIN
 				
     ELSIF TG_OP = 'DELETE' THEN  
 
-		-- only if it's last row for that raster
+		-- after delete and only if it's last row for that raster
 		IF (SELECT count(*) FROM ext_raster_dem WHERE rastercat_id=OLD.rastercat_id) = 0 THEN
 	 		DELETE FROM ext_cat_raster WHERE id = OLD.rastercat_id;		
 	 	END IF;

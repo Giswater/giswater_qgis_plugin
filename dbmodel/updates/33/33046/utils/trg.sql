@@ -11,7 +11,6 @@ DROP TRIGGER IF EXISTS gw_trg_manage_raster_dem ON ext_raster_dem;
 CREATE TRIGGER gw_trg_manage_raster_dem_insert BEFORE INSERT ON ext_raster_dem
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_manage_raster_dem();
 
-DROP TRIGGER IF EXISTS gw_trg_manage_raster_dem ON ext_raster_dem;
-CREATE TRIGGER gw_trg_manage_raster_dem_delete AFTER DELETE ON ext_raster_dem
-FOR EACH ROW EXECUTE PROCEDURE gw_trg_manage_raster_dem();
-
+DROP TRIGGER gw_trg_manage_raster_dem_delete ON ext_raster_dem;
+CREATE TRIGGER gw_trg_manage_raster_dem_delete AFTER INSERT OR DELETE
+ON ext_raster_dem FOR EACH ROW EXECUTE PROCEDURE gw_trg_manage_raster_dem();
