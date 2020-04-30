@@ -41,11 +41,11 @@ BEGIN
 		--check if there are values on the defined fileds that already have a value that is not present in a catalog
 		IF NEW.parameter_id IS NULL THEN
 			EXECUTE 'SELECT count('||NEW.target_field||') FROM '||NEW.target_table||' WHERE '||NEW.target_field||' is not null 
-				AND '||NEW.target_field||' NOT IN (SELECT id FROM '||NEW.typevalue_table||' WHERE typevalue = '''||NEW.typevalue_name||''')'
+				AND '||NEW.target_field||'::text NOT IN (SELECT id::text FROM '||NEW.typevalue_table||' WHERE typevalue = '''||NEW.typevalue_name||''')'
 			into v_count;
 		ELSE
 			EXECUTE 'SELECT count('||NEW.target_field||') FROM '||NEW.target_table||' WHERE parameter_id = '||NEW.parameter_id||' AND  '||NEW.target_field||' is not null 
-				AND '||NEW.target_field||' NOT IN (SELECT id FROM '||NEW.typevalue_table||' WHERE typevalue = '''||NEW.typevalue_name||''')'
+				AND '||NEW.target_field||'::text NOT IN (SELECT id::text FROM '||NEW.typevalue_table||' WHERE typevalue = '''||NEW.typevalue_name||''')'
 
 			into v_count;
 		END IF;
