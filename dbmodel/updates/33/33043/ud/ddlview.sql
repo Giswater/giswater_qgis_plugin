@@ -224,7 +224,9 @@ WITH vu_node as (
 	node.node_type,
 	node_type.type AS sys_type,
 	node.nodecat_id,
-	cat_node.matcat_id AS cat_matcat_id,
+	CASE
+	WHEN node.matcat_id IS NULL THEN cat_node.matcat_id
+	ELSE node.matcat_id END AS matcat_id,
 	node.epa_type,
 	node.expl_id,
 	exploitation.macroexpl_id,
@@ -410,7 +412,9 @@ connec.connecat_id,
 connec.connec_type,
 connec_type.type AS sys_type,
 connec.private_connecat_id,
-cat_connec.matcat_id AS cat_matcat_id,
+CASE
+WHEN connec.matcat_id IS NULL THEN cat_connec.matcat_id
+ELSE connec.matcat_id END AS matcat_id,
 connec.expl_id,
 macroexpl_id,
 connec.sector_id,

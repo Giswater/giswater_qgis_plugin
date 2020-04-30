@@ -14,3 +14,7 @@ CREATE INDEX gully_exploitation ON gully USING btree (expl_id);
 CREATE INDEX gully_dma ON gully USING btree (dma_id);
 CREATE INDEX gully_street1 ON gully USING btree (streetaxis_id);
 CREATE INDEX gully_street2 ON gully USING btree (streetaxis2_id);
+
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"matcat_id", "dataType":"varchar(30)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"matcat_id", "dataType":"varchar(30)"}}$$);

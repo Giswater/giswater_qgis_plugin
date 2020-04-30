@@ -33,6 +33,8 @@ v_featurecat text;
 v_auto_pol_id text;
 v_streetaxis text;
 v_streetaxis2 text;
+v_matfromcat boolean = false;
+
 
 BEGIN
 
@@ -52,10 +54,16 @@ BEGIN
 	SELECT ((value::json)->>'activated')::boolean INTO v_insert_double_geom FROM config_param_system WHERE parameter='insert_double_geometry';
 	SELECT ((value::json)->>'value') INTO v_double_geom_buffer FROM config_param_system WHERE parameter='insert_double_geometry';
 
-	-- transforming streetaxis name into id
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
+		-- transforming streetaxis name into id	
 		v_streetaxis = (SELECT id FROM ext_streetaxis WHERE muni_id = NEW.muni_id AND name = NEW.streetname LIMIT 1);
 		v_streetaxis2 = (SELECT id FROM ext_streetaxis WHERE muni_id = NEW.muni_id AND name = NEW.streetname2 LIMIT 1);
+		
+		-- managing matcat
+		IF (SELECT matcat_id FROM cat_node WHERE id = NEW.nodecat_id) IS NOT NULL THEN
+			v_matfromcat = true;
+		END IF;
+		
 	END IF;
 	
 	-- Control insertions ID
@@ -344,7 +352,8 @@ BEGIN
 		END IF; 
 
             -- FEATURE INSERT
-		INSERT INTO node (node_id, code, top_elev, custom_top_elev, ymax, custom_ymax, elev, custom_elev, node_type,nodecat_id,epa_type,sector_id,"state", state_type, annotation,observ,"comment",
+		IF v_matfromcat THEN
+			INSERT INTO node (node_id, code, top_elev, custom_top_elev, ymax, custom_ymax, elev, custom_elev, node_type,nodecat_id,epa_type,sector_id,"state", state_type, annotation,observ,"comment",
 			dma_id,soilcat_id, function_type, category_type,fluid_type,location_type,workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id,
 			muni_id, streetaxis_id, postcode,streetaxis2_id,postnumber, postnumber2, postcomplement, postcomplement2, descript,rotation,link,verified,
 			undelete,label_x,label_y,label_rotation,the_geom, expl_id, publish, inventory, uncertain, xyz_date, unconnected, num_value, lastupdate, lastupdate_user)
@@ -354,6 +363,18 @@ BEGIN
 			NEW.muni_id, v_streetaxis, NEW.postcode,v_streetaxis2,NEW.postnumber,NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
 			NEW.descript, NEW.rotation,NEW.link, NEW.verified, NEW.undelete, NEW.label_x,NEW.label_y,NEW.label_rotation,NEW.the_geom,
 			NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.xyz_date, NEW.unconnected, NEW.num_value, now(), current_user);	
+		ELSE
+			INSERT INTO node (node_id, code, top_elev, custom_top_elev, ymax, custom_ymax, elev, custom_elev, node_type,nodecat_id,epa_type,sector_id,"state", state_type, annotation,observ,"comment",
+			dma_id,soilcat_id, function_type, category_type,fluid_type,location_type,workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id,
+			muni_id, streetaxis_id, postcode,streetaxis2_id,postnumber, postnumber2, postcomplement, postcomplement2, descript,rotation,link,verified,
+			undelete,label_x,label_y,label_rotation,the_geom, expl_id, publish, inventory, uncertain, xyz_date, unconnected, num_value, lastupdate, lastupdate_user, matcat_id)
+			VALUES (NEW.node_id,NEW.code, NEW.top_elev,NEW.custom_top_elev, NEW.ymax, NEW. custom_ymax, NEW. elev, NEW. custom_elev, NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id, 
+			NEW.state, NEW.state_type, NEW.annotation,NEW.observ, NEW.comment,NEW.dma_id,NEW.soilcat_id, NEW. function_type, NEW.category_type,NEW.fluid_type,NEW.location_type,
+			NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id,NEW.builtdate, NEW.enddate, NEW.ownercat_id,
+			NEW.muni_id, v_streetaxis, NEW.postcode,v_streetaxis2,NEW.postnumber,NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
+			NEW.descript, NEW.rotation,NEW.link, NEW.verified, NEW.undelete, NEW.label_x,NEW.label_y,NEW.label_rotation,NEW.the_geom,
+			NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.xyz_date, NEW.unconnected, NEW.num_value, now(), current_user, NEW.matcat_id);	
+		END IF;
 				
 		IF v_man_table='man_junction' THEN
 					
@@ -473,7 +494,7 @@ BEGIN
 			END IF;
 		END IF;
 
-	-- man addfields insert
+		-- man addfields insert
 		IF v_customfeature IS NOT NULL THEN
 			FOR v_addfields IN SELECT * FROM man_addfields_parameter 
 			WHERE (cat_feature_id = v_customfeature OR cat_feature_id is null) AND active IS TRUE AND iseditable IS TRUE
@@ -540,7 +561,7 @@ BEGIN
 
         END IF;
 
-    -- UPDATE management values
+		-- UPDATE management values
 
 		-- node type
 		IF (NEW.node_type <> OLD.node_type) THEN 
@@ -633,16 +654,28 @@ BEGIN
 				UPDATE	node SET top_elev=NEW.top_elev, custom_top_elev=NEW.custom_top_elev, ymax=NEW.ymax, custom_ymax=NEW.custom_ymax, elev=NEW.elev, custom_elev=NEW.custom_elev
 				WHERE node_id = OLD.node_id;
 		END IF;
-					
-		UPDATE node 
-		SET code=NEW.code, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type, annotation=NEW.annotation, 
-		"observ"=NEW.observ, "comment"=NEW.comment, dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type,fluid_type=NEW.fluid_type, 
-		location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate,
-		ownercat_id=NEW.ownercat_id, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, muni_id=NEW.muni_id, streetaxis_id=v_streetaxis, postcode=NEW.postcode,
-		streetaxis2_id=v_streetaxis2, postnumber=NEW.postnumber, postnumber2=NEW.postnumber2, descript=NEW.descript, link=NEW.link, verified=NEW.verified, undelete=NEW.undelete, 
-		label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, rotation=NEW.rotation, uncertain=NEW.uncertain,
-		xyz_date=NEW.xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.num_value, lastupdate=now(), lastupdate_user=current_user
-		WHERE node_id = OLD.node_id;
+		
+		IF v_matfromcat THEN
+			UPDATE node 
+			SET code=NEW.code, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type, annotation=NEW.annotation, 
+			"observ"=NEW.observ, "comment"=NEW.comment, dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type,fluid_type=NEW.fluid_type, 
+			location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate,
+			ownercat_id=NEW.ownercat_id, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, muni_id=NEW.muni_id, streetaxis_id=v_streetaxis, postcode=NEW.postcode,
+			streetaxis2_id=v_streetaxis2, postnumber=NEW.postnumber, postnumber2=NEW.postnumber2, descript=NEW.descript, link=NEW.link, verified=NEW.verified, undelete=NEW.undelete, 
+			label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, rotation=NEW.rotation, uncertain=NEW.uncertain,
+			xyz_date=NEW.xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.num_value, lastupdate=now(), lastupdate_user=current_user
+			WHERE node_id = OLD.node_id;
+		ELSE
+			UPDATE node 
+			SET code=NEW.code, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type, annotation=NEW.annotation, 
+			"observ"=NEW.observ, "comment"=NEW.comment, dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type,fluid_type=NEW.fluid_type, 
+			location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate,
+			ownercat_id=NEW.ownercat_id, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, muni_id=NEW.muni_id, streetaxis_id=v_streetaxis, postcode=NEW.postcode,
+			streetaxis2_id=v_streetaxis2, postnumber=NEW.postnumber, postnumber2=NEW.postnumber2, descript=NEW.descript, link=NEW.link, verified=NEW.verified, undelete=NEW.undelete, 
+			label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, rotation=NEW.rotation, uncertain=NEW.uncertain,
+			xyz_date=NEW.xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.num_value, lastupdate=now(), lastupdate_user=current_user, matcat_id = NEW.matcat_id
+			WHERE node_id = OLD.node_id;		
+		END IF;
 			
 		IF v_man_table ='man_junction' THEN			
 			UPDATE man_junction SET node_id=NEW.node_id
