@@ -44,7 +44,7 @@ CREATE TABLE temp_arc(
   q0 double precision,
   qmax double precision,
   barrels integer,
-  slope double precision
+  slope double precision,
   CONSTRAINT temp_arc_pkey PRIMARY KEY (id));
   
   
