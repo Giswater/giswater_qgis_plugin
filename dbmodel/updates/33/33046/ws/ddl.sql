@@ -10,11 +10,9 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 ALTER TABLE IF EXISTS anl_mincut_arc_x_node RENAME to _anl_mincut_arc_x_node_ ;
 
-ALTER TABLE inp_pattern DROP COLUMN pattern_type;
-
-ALTER TABLE ext_rtc_dma_period DROP COLUMN m3_total_period;
-ALTER TABLE ext_rtc_dma_period DROP COLUMN m3_total_period_hydro;
-
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_pattern", "column":"pattern_type"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"ext_rtc_dma_period", "column":"m3_total_period"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"ext_rtc_dma_period", "column":"m3_total_period_hydro"}}$$);
 
 
 drop table if exists temp_arc;
