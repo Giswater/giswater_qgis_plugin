@@ -89,6 +89,8 @@ BEGIN
 	WHERE arc_type = 'BINODE2ARC-PRV';
 
 	RAISE NOTICE 'transform all tanks by reservoirs with link and junction';
+
+	v_roughness = (SELECT avg(roughness) FROM temp_arc);
 	v_querytext = 'SELECT * FROM temp_node WHERE (epa_type = ''TANK'' OR epa_type = ''INLET'')';
 	FOR v_record IN EXECUTE v_querytext
 	LOOP
@@ -103,7 +105,7 @@ BEGIN
 
 		-- modify the epa_type of the existing node
 		UPDATE temp_node SET epa_type='JUNCTION' WHERE id = v_record.id;
-
+		
 		-- insert new pipe
 		INSERT INTO temp_arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, diameter, roughness, length, status, the_geom, expl_id, minorloss) VALUES
 		(concat(v_record.node_id,'_n2n'), v_record.node_id, concat(v_record.node_id,'_n2n_r'), 'NODE2NODE', v_record.node_id, 'SHORTPIPE', v_record.sector_id, v_record.state, v_record.state_type, v_record.annotation, 

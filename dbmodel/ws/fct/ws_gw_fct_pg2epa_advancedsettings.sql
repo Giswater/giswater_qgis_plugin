@@ -11,7 +11,7 @@ RETURNS integer
 AS $BODY$
 
 /*example
-SELECT SCHEMA_NAME.gw_fct_pg2epa_advancedsettings('v45')
+SELECT SCHEMA_NAME.gw_fct_pg2epa_advancedsettings('r1')
 */
 
 DECLARE
@@ -28,14 +28,15 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- get user variables
-	SELECT (value::json->>'valve')::json INTO v_valve FROM config_param_user WHERE parameter = 'inp_options_advancedsettings' AND cur_user=current_user;
-	SELECT (value::json->>'reservoir')::json INTO v_reservoir FROM config_param_user WHERE parameter = 'inp_options_advancedsettings' AND cur_user=current_user;
-	SELECT (value::json->>'tank')::json INTO v_tank FROM config_param_user WHERE parameter = 'inp_options_advancedsettings' AND cur_user=current_user;
-	SELECT (value::json->>'pump')::json INTO v_pump FROM config_param_user WHERE parameter = 'inp_options_advancedsettings' AND cur_user=current_user;
+	SELECT ((value::json->>'parameters')::json->>'valve')::json INTO v_valve FROM config_param_user WHERE parameter = 'inp_options_advancedsettings' AND cur_user=current_user;
+	SELECT ((value::json->>'parameters')::json->>'reservoir')::json INTO v_reservoir FROM config_param_user WHERE parameter = 'inp_options_advancedsettings' AND cur_user=current_user;
+	SELECT ((value::json->>'parameters')::json->>'tank')::json INTO v_tank FROM config_param_user WHERE parameter = 'inp_options_advancedsettings' AND cur_user=current_user;
+	SELECT ((value::json->>'parameters')::json->>'pump')::json INTO v_pump FROM config_param_user WHERE parameter = 'inp_options_advancedsettings' AND cur_user=current_user;
 	SELECT value INTO v_headloss FROM config_param_user WHERE parameter = 'inp_options_headloss' AND cur_user=current_user;	
 	SELECT ((value::json->>'junction')::json)->>'baseDemand' INTO v_basedemand FROM config_param_user WHERE parameter = 'inp_options_advancedsettings' AND cur_user=current_user;	
 
 	-- update values for valves
+	RAISE NOTICE 'v_valve %',v_valve;
 	UPDATE temp_arc SET minorloss = (v_valve->>'minorloss')::float WHERE epa_type='VALVE' AND (minorloss = 0 OR minorloss is null);
 	UPDATE temp_arc SET roughness = ((v_valve->>'roughness')::json->>v_headloss)::float	WHERE epa_type='VALVE' AND (roughness = 0 OR roughness is null);
 	UPDATE temp_arc SET length = (v_valve->>'length')::float WHERE epa_type='VALVE';

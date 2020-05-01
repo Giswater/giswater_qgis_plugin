@@ -57,6 +57,14 @@ BEGIN
 	ELSIF v_networkmode = 2 OR v_networkmode = 4 THEN -- Because shut-off valves are exported as nodarcs, directly we can set the status of shut-off valves
 				
 		IF v_valvemode = 3 THEN --mincut results
+			UPDATE temp_arc a SET status='CLOSED'
+			FROM man_valve v
+				WHERE a.arc_id=concat(v.node_id,'_n2a') AND closed=true;
+
+			UPDATE temp_arc a SET status='OPEN'
+			FROM man_valve v
+				WHERE a.arc_id=concat(v.node_id,'_n2a') AND closed=false;
+		
 			UPDATE temp_arc a SET status='CLOSED' 
 			FROM anl_mincut_result_valve v
 			WHERE a.arc_id=concat(v.node_id,'_n2a') AND v.result_id = v_mincutresult AND (proposed IS TRUE OR closed IS TRUE);
@@ -65,6 +73,10 @@ BEGIN
 			UPDATE temp_arc a SET status='CLOSED'
 			FROM man_valve v
 				WHERE a.arc_id=concat(v.node_id,'_n2a') AND closed=true;
+
+			UPDATE temp_arc a SET status='OPEN'
+			FROM man_valve v
+				WHERE a.arc_id=concat(v.node_id,'_n2a') AND closed=false;
 		
 		ELSIF v_valvemode = 1 THEN -- epa tables
 			UPDATE temp_arc a SET status=p.status 

@@ -42,6 +42,7 @@ BEGIN
 		v_statetype = ' AND (value_state_type.is_operative = TRUE OR value_state_type.is_operative = FALSE)';
 	END IF;
 
+
 	raise notice 'Inserting nodes on temp_node table';
 
 	-- the strategy of selector_sector is not used for nodes. The reason is to enable the posibility to export the sector=-1. In addition using this it's impossible to export orphan nodes
@@ -50,9 +51,9 @@ BEGIN
 			JOIN value_state_type ON ve_arc.state_type = value_state_type.id
 			WHERE ve_arc.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text '
 			||v_statetype||')
-		SELECT DISTINCT ON (v_node.node_id)
-		v_node.node_id, elevation, elevation-depth as elev, nodetype_id, nodecat_id, epa_type, a.sector_id, v_node.state, v_node.state_type, v_node.annotation, v_node.the_geom, v_node.expl_id
-		FROM node v_node 
+		SELECT DISTINCT ON (n.node_id)
+		n.node_id, elevation, elevation-depth as elev, nodetype_id, nodecat_id, epa_type, a.sector_id, n.state, n.state_type, n.annotation, n.the_geom, n.expl_id
+		FROM node n 
 		JOIN (SELECT node_1 AS node_id, sector_id FROM b UNION SELECT node_2, sector_id FROM b)a USING (node_id)
 		JOIN cat_node c ON c.id=nodecat_id';
 

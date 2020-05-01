@@ -42,7 +42,7 @@ v_checknetwork boolean;
 v_vdefault boolean;
 v_delnetwork boolean;
 v_removedemand boolean;
-
+v_fprocesscat_id integer = 127;
 	
 BEGIN
 
@@ -68,7 +68,8 @@ BEGIN
 	v_removedemand = (SELECT value::json->>'removeDemandOnDryNodes' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 
 	-- delete audit table
-	DELETE FROM audit_check_data WHERE fprocesscat_id = 127 AND user_name=current_user;
+	DELETE FROM audit_check_data WHERE fprocesscat_id = v_fprocesscat_id AND user_name=current_user;
+	DELETE FROM audit_log_data WHERE fprocesscat_id = v_fprocesscat_id AND user_name=current_user;
 	
 	-- setting variables
 	v_input = concat('{"data":{"parameters":{"resultId":"',v_result,'", "fprocesscatId":127}}}')::json;
@@ -80,21 +81,22 @@ BEGIN
 	v_inpoptions = (SELECT (replace (replace (replace (array_to_json(array_agg(json_build_object((t.parameter),(t.value))))::text,'},{', ' , '),'[',''),']',''))::json 
 				FROM (SELECT parameter, value FROM config_param_user 
 				JOIN audit_cat_param_user a ON a.id=parameter	WHERE cur_user=current_user AND formname='epaoptions')t);
-	
-	-- only export
+		
 	IF v_onlyexport THEN
 		SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return ;
-		SELECT gw_fct_pg2epa_create_inp(v_result, null) INTO v_file;
+		SELECT gw_fct_pg2epa_export_inp(v_result, null) INTO v_file;
 		
 		v_body = gw_fct_json_object_set_key((v_return->>'body')::json, 'file', v_file);
 		v_return = gw_fct_json_object_set_key(v_return, 'body', v_body);
+		v_return =  gw_fct_json_object_set_key (v_return, 'continue', false);                                
+		v_return =  gw_fct_json_object_set_key (v_return, 'steps', 0);
 		v_return = replace(v_return::text, '"message":{"priority":1, "text":"Data quality analysis done succesfully"}', 
 		'"message":{"priority":1, "text":"Inp export done succesfully"}')::json;
 		RETURN v_return;
 	END IF;
 
 	-- check consistency for user options 
-	SELECT SCHEMA_NAME.gw_fct_pg2epa_check_options(v_input)
+	SELECT gw_fct_pg2epa_check_options(v_input)
 		INTO v_return;
 	IF v_return->>'status' = 'Failed' THEN
 		--v_return = replace(v_return::text, 'Failed', 'Accepted');
@@ -197,14 +199,23 @@ BEGIN
 	END IF;
 		
 	IF v_delnetwork THEN
-		RAISE NOTICE '18 - delete disconnected arcs with associated nodes';
+		RAISE NOTICE '18 - Delete disconnected arcs with associated nodes';
+		INSERT INTO audit_log_data (fprocesscat_id, feature_id, feature_type, log_message) SELECT v_fprocesscat_id, arc_id, arc_type, '18 - Delete disconnected arcs with associated nodes' 
+		FROM temp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user);
 		DELETE FROM temp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user);
+		
+		INSERT INTO audit_log_data (fprocesscat_id, feature_id, feature_type, log_message) SELECT v_fprocesscat_id, node_id, node_type, '18 - Delete disconnected arcs with associated nodes' 
+		FROM temp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=39 AND cur_user=current_user);
 		DELETE FROM temp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=39 AND cur_user=current_user);
 			
-		RAISE NOTICE '19 - delete orphan nodes';
+		RAISE NOTICE '19 - Delete orphan nodes';
+		INSERT INTO audit_log_data (fprocesscat_id, feature_id, feature_type, log_message) SELECT v_fprocesscat_id, node_id, node_type, '19 - Delete orphan nodes' 
+		FROM temp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=7 AND cur_user=current_user);
 		DELETE FROM temp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=7 AND cur_user=current_user);
 
-		RAISE NOTICE '20 delete arcs without extremal nodes';
+		RAISE NOTICE '20 - Delete arcs without extremal nodes';
+		INSERT INTO audit_log_data (fprocesscat_id, feature_id, feature_type, log_message) SELECT v_fprocesscat_id, arc_id, arc_type, '20 - Delete arcs without extremal nodes' 
+		FROM temp_arc  WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=3 AND cur_user=current_user);
 		DELETE FROM temp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=3 AND cur_user=current_user);
 	END IF;
 
@@ -213,16 +224,34 @@ BEGIN
 		UPDATE temp_node n SET demand = 0 FROM anl_node a WHERE fprocesscat_id = 132 AND cur_user = current_user AND a.node_id = t.node_id;
 	END IF;
 
-	RAISE NOTICE '22 - check result previous exportation';
+	RAISE NOTICE '22 - Check result previous exportation';
 	SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return ;
 
-	RAISE NOTICE '23 - Move from temp tables';
+	RAISE NOTICE '23 - Profilactic last control';
+	-- arcs without nodes
+	INSERT INTO audit_log_data (fprocesscat_id, feature_id, feature_type, log_message) SELECT v_fprocesscat_id, arc_id, arc_type, '23 - Profilactic last delete' 
+	FROM temp_arc WHERE node_1 NOT IN (SELECT node_id FROM temp_node);
+	INSERT INTO audit_log_data (fprocesscat_id, feature_id, feature_type, log_message) SELECT v_fprocesscat_id, arc_id, arc_type, '23 - Profilactic last delete' 
+	FROM temp_arc WHERE node_2 NOT IN (SELECT node_id FROM temp_node);
+	DELETE FROM temp_arc WHERE node_1 NOT IN (SELECT node_id FROM temp_node);
+	DELETE FROM temp_arc WHERE node_2 NOT IN (SELECT node_id FROM temp_node);
+
+	-- nodes without arcs
+	INSERT INTO audit_log_data (fprocesscat_id, feature_id, feature_type, log_message) SELECT v_fprocesscat_id, node_id, node_type, '23 - Profilactic last delete' 
+	FROM temp_node WHERE node_id NOT IN (SELECT node_1 FROM temp_arc UNION SELECT node_2 FROM temp_arc);
+	DELETE FROM temp_node WHERE node_id NOT IN (SELECT node_1 FROM temp_arc UNION SELECT node_2 FROM temp_arc);
+
+	-- values without value
+	UPDATE temp_arc SET minorloss = 0 WHERE minorloss IS NULL;
+	UPDATE temp_arc SET status = 'OPEN' WHERE status IS NULL OR status = '';
+
+	RAISE NOTICE '24 - Move from temp tables to rpt_inp tables';
 	UPDATE temp_arc SET result_id  = v_result;
 	UPDATE temp_node SET result_id  = v_result;
 	INSERT INTO rpt_inp_arc SELECT * FROM temp_arc;
 	INSERT INTO rpt_inp_node SELECT * FROM temp_node;
 
-	RAISE NOTICE '24 - Create the inp file structure';	
+	RAISE NOTICE '25 - Create the inp file structure';	
 	SELECT gw_fct_pg2epa_export_inp(v_result, null) INTO v_file;
 	
 	-- manage return message

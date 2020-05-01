@@ -199,8 +199,15 @@ BEGIN
 	INSERT INTO anl_node (fprocesscat_id, result_id, node_id, the_geom, descript)
 	SELECT DISTINCT ON (a.node_1) 39, v_result, a.node_1, the_geom, concat('Node disconnected from any', v_boundaryelem)  
 		FROM temp_anlgraf a
-		JOIN temp_node b ON a.node_1=b.node_id OR a.node_2=b.node_id
+		JOIN temp_node b ON a.node_1=b.node_id
 		GROUP BY a.node_1,the_geom
+		having max(water) = 0;
+
+	INSERT INTO anl_node (fprocesscat_id, result_id, node_id, the_geom, descript)
+	SELECT DISTINCT ON (a.node_2) 39, v_result, a.node_2, the_geom, concat('Node disconnected from any', v_boundaryelem)  
+		FROM temp_anlgraf a
+		JOIN temp_node b ON a.node_2=b.node_id
+		GROUP BY a.node_2,the_geom
 		having max(water) = 0;
 
 	SELECT count(*) FROM anl_arc INTO v_count WHERE fprocesscat_id=39 AND cur_user=current_user;

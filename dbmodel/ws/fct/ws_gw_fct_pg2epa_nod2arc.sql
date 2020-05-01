@@ -27,6 +27,8 @@ v_node record;
 v_offset integer = 0;
 v_limit integer = 5000;
 v_count integer = 0;
+v_diameter float = 200;
+v_roughness float;
 
 BEGIN
 
@@ -45,6 +47,8 @@ BEGIN
 	IF v_nod2arc > v_nodarc_min-0.01 THEN
 		v_nod2arc = v_nodarc_min-0.01;
 	END IF;
+
+	v_roughness = (SELECT avg(roughness) FROM temp_arc);
 
 	delete from anl_node  WHERE fprocesscat_id  = 124 and cur_user = current_user;
 					
@@ -206,15 +210,15 @@ BEGIN
 			concat (a.nodeparent, ''_n2a'') as arc_id,
 			b.node_id,
 			a.node_id,
-			''NODE2ARC'', 
+			''NODE2ARC-1'', 
 			a.nodecat_id as arccat_id, 
 			c.epa_type,
 			a.sector_id, 
 			a.expl_id,
 			a.state,
 			a.state_type,
-			case when (c.addparam::json->>''diameter'')::text !='''' then  (c.addparam::json->>''diameter'')::numeric else 0 end as diameter,
-			case when (c.addparam::json->>''roughness'')::text !='''' then  (c.addparam::json->>''roughness'')::numeric else 0 end as roughness,
+			case when (c.addparam::json->>''diameter'')::text !='''' then  (c.addparam::json->>''diameter'')::numeric else '||v_diameter||' end as diameter,
+			case when (c.addparam::json->>''roughness'')::text !='''' then  (c.addparam::json->>''roughness'')::numeric else '||v_roughness||' end as roughness,
 			c.annotation,
 			st_length2d(st_makeline(a.the_geom, b.the_geom)) as length,
 			c.addparam::json->>''status'' status,
@@ -225,44 +229,37 @@ BEGIN
 				result b
 				LEFT JOIN result c ON c.node_id = b.nodeparent
 				WHERE a.nodeparent = b.nodeparent AND a.arcposition = 3 AND b.arcposition = 4';
-					
-	LOOP
-		RAISE NOTICE 'new arcs when numarcs = 2 ( % )', v_offset;
-		EXECUTE 'INSERT INTO temp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, expl_id, state, state_type, diameter, roughness, annotation, length, 
-			status, the_geom, minorloss, addparam)
 
-			WITH result AS (SELECT * FROM temp_node LIMIT '||v_limit||' OFFSET '||v_offset||')
-			SELECT DISTINCT ON (a.nodeparent)
-			a.result_id,
-			concat (a.nodeparent, ''_n2a'') as arc_id,
-			b.node_id,
-			a.node_id,
-			''NODE2ARC'', 
-			a.nodecat_id as arccat_id, 
-			c.epa_type,
-			c.sector_id, 
-			c.expl_id,
-			a.state,
-			a.state_type,
-			case when (c.addparam::json->>''diameter'')::text !='''' then  (c.addparam::json->>''diameter'')::numeric else 0 end as diameter,
-			case when (c.addparam::json->>''roughness'')::text !='''' then  (c.addparam::json->>''roughness'')::numeric else 0 end as roughness,
-			c.annotation,
-			st_length2d(st_makeline(a.the_geom, b.the_geom)) as length,
-			c.addparam::json->>''status'' status,
-			st_makeline(a.the_geom, b.the_geom) AS the_geom,
-			case when (c.addparam::json->>''minorloss'')::text !='''' then  (c.addparam::json->>''minorloss'')::numeric else 0 end as minorloss,
-			c.addparam
-			FROM 	result a,
-				result b
-				LEFT JOIN result c ON c.node_id = b.nodeparent
-				WHERE a.nodeparent = b.nodeparent AND a.arcposition = 1 AND b.arcposition = 2';
+	RAISE NOTICE 'new arcs when numarcs = 2 ( % )', v_offset;
+	EXECUTE 'INSERT INTO temp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, expl_id, state, state_type, diameter, roughness, annotation, length, 
+		status, the_geom, minorloss, addparam)
 
-		v_count = (SELECT count(*) FROM  temp_node);
-		v_offset  = v_offset + v_limit;					
-		EXIT WHEN v_count < v_offset;
-
-	END LOOP;
-
+		WITH result AS (SELECT * FROM temp_node) 
+		SELECT DISTINCT ON (a.nodeparent)
+		a.result_id,
+		concat (a.nodeparent, ''_n2a'') as arc_id,
+		b.node_id,
+		a.node_id,
+		''NODE2ARC-2'', 
+		a.nodecat_id as arccat_id, 
+		c.epa_type,
+		c.sector_id, 
+		c.expl_id,
+		a.state,
+		a.state_type,
+		case when (c.addparam::json->>''diameter'')::text !='''' then  (c.addparam::json->>''diameter'')::numeric else '||v_diameter||' end as diameter,
+		case when (c.addparam::json->>''roughness'')::text !='''' then  (c.addparam::json->>''roughness'')::numeric else '||v_roughness||' end as roughness,
+		c.annotation,
+		st_length2d(st_makeline(a.the_geom, b.the_geom)) as length,
+		c.addparam::json->>''status'' status,
+		st_makeline(a.the_geom, b.the_geom) AS the_geom,
+		case when (c.addparam::json->>''minorloss'')::text !='''' then  (c.addparam::json->>''minorloss'')::numeric else 0 end as minorloss,
+		c.addparam
+		FROM 	result a,
+			result b
+			LEFT JOIN result c ON c.node_id = b.nodeparent
+			WHERE a.nodeparent = b.nodeparent AND a.arcposition = 1 AND b.arcposition = 2';
+			
 	RAISE NOTICE ' update geometries and node_1';
 	EXECUTE 'UPDATE temp_arc SET the_geom = ST_linesubstring(temp_arc.the_geom, ('||0.5*v_nod2arc||' / length) , 1), node_1 = concat(node_1, ''_n2a_1'') 
 			FROM anl_node n WHERE n.node_id = node_1 AND fprocesscat_id  = 124 and cur_user = current_user';
@@ -272,10 +269,10 @@ BEGIN
 			FROM anl_node n WHERE n.node_id = node_2 AND fprocesscat_id  = 124 and cur_user = current_user';
 
 	RAISE NOTICE ' Deleting old node from node table';
-	EXECUTE ' UPDATE temp_node SET epa_type =''NODE2DELETE'' FROM (SELECT node_id FROM  anl_node a WHERE fprocesscat_id  = 124 and cur_user = current_user ) b 
+	EXECUTE ' UPDATE temp_node SET epa_type =''TODELETE'' FROM (SELECT node_id FROM  anl_node a WHERE fprocesscat_id  = 124 and cur_user = current_user ) b 
 		  WHERE b.node_id  = temp_node.node_id';
 
-	EXECUTE ' DELETE FROM temp_node WHERE epa_type =''NODE2DELETE''';
+	EXECUTE ' DELETE FROM temp_node WHERE epa_type =''TODELETE''';
 
 	RETURN 1;
 		
