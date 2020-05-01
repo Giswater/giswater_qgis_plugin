@@ -50,9 +50,6 @@ BEGIN
 	--  Search path	
 	SET search_path = "SCHEMA_NAME", public;
 
-
-SELECT * FROM anl_node WHERE fprocesscat_id = 108 AND cur_user = current_user
-
 	-- getting input data 	
 	v_features := ((p_data ->>'data')::json->>'parameters')::json->>'selectionMode'::text;
 	v_grafclass := ((p_data ->>'data')::json->>'parameters')::json->>'grafClass'::text;
