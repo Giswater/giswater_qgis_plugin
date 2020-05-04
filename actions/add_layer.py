@@ -5,22 +5,23 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsCategorizedSymbolRenderer, QgsFillSymbol, QgsDataSourceUri, QgsFeature, QgsField, QgsGeometry, QgsMarkerSymbol,\
-    QgsLayerTreeLayer, QgsLineSymbol, QgsProject, QgsRectangle, QgsRendererCategory, QgsSimpleFillSymbolLayer, QgsSymbol,\
-    QgsVectorLayer, QgsVectorLayerExporter
-
+from qgis.core import QgsCategorizedSymbolRenderer, QgsFillSymbol, QgsDataSourceUri, QgsFeature, QgsField, \
+    QgsGeometry, QgsMarkerSymbol, QgsLayerTreeLayer, QgsLineSymbol, QgsProject, QgsRectangle, QgsRendererCategory, \
+    QgsSimpleFillSymbolLayer, QgsSymbol, QgsVectorLayer, QgsVectorLayerExporter
 from qgis.PyQt.QtCore import QVariant
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QPushButton, QTabWidget
 
 import os
 from random import randrange
+
 from .. import utils_giswater
 
 
 class AddLayer(object):
 
     def __init__(self, iface, settings, controller, plugin_dir):
+
         # Initialize instance attributes
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
@@ -45,7 +46,7 @@ class AddLayer(object):
     def manage_geometry(self, geometry):
         """ Get QgsGeometry and return as text
          :param geometry: (QgsGeometry)
-         """
+        """
         geometry = geometry.asWkt().replace('Z (', ' (')
         geometry = geometry.replace(' 0)', ')')
         return geometry
@@ -73,6 +74,7 @@ class AddLayer(object):
         :param layer: (QgsVectorLayer)
         :param crs: QgsVectorLayer.crs() (crs)
         """
+
         sql = f'DROP TABLE "{layer.name()}";'
         self.controller.execute_sql(sql, log_sql=True)
 
@@ -81,12 +83,12 @@ class AddLayer(object):
         self.uri.setDataSource(schema_name, layer.name(), None, "", layer.name())
 
         error = QgsVectorLayerExporter.exportLayer(layer, self.uri.uri(), self.controller.credentials['user'], crs, False)
-
         if error[0] != 0:
             self.controller.log_info(F"ERROR --> {error[1]}")
 
 
-    def from_postgres_to_toc(self, tablename=None, the_geom="the_geom", field_id="id",  child_layers=None, group="GW Layers"):
+    def from_postgres_to_toc(self, tablename=None, the_geom="the_geom", field_id="id",  child_layers=None,
+        group="GW Layers"):
         """ Put selected layer into TOC
         :param tablename: Postgres table name (string)
         :param the_geom: Geometry field of the table (string)
@@ -94,6 +96,7 @@ class AddLayer(object):
         :param child_layers: List of layers (stringList)
         :param group: Name of the group that will be created in the toc (string)
         """
+
         self.set_uri()
         schema_name = self.controller.credentials['schema'].replace('"', '')
         if child_layers is not None:
@@ -126,7 +129,8 @@ class AddLayer(object):
             my_group.insertLayer(0, layer)
 
 
-    def add_temp_layer(self, dialog, data, layer_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True, group='GW Temporal Layers', disable_tabs=True):
+    def add_temp_layer(self, dialog, data, layer_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True,
+        group='GW Temporal Layers', disable_tabs=True):
         """ Add QgsVectorLayer into TOC
         :param dialog:
         :param data:
@@ -139,7 +143,7 @@ class AddLayer(object):
         :param disable_tabs: set all tabs, except the last, enabled or disabled (boolean)
         :return:
         """
-        colors = {'rnd': QColor(randrange(0, 256), randrange(0, 256), randrange(0, 256))}
+
         text_result = None
         temp_layers_added = []
         srid = self.controller.plugin_settings_value('srid')
@@ -185,10 +189,12 @@ class AddLayer(object):
                     temp_layers_added.append(v_layer)
                     v_layer.setOpacity(0.7)
                     self.iface.setActiveLayer(v_layer)
+
         return {'text_result': text_result, 'temp_layers_added': temp_layers_added}
 
 
     def set_layers_visible(self, layers):
+
         for layer in layers:
             lyr = self.controller.get_layer_by_tablename(layer)
             if lyr:
@@ -258,6 +264,7 @@ class AddLayer(object):
 
 
     def set_layer_symbology(self, layer, properties=None):
+
         renderer = layer.renderer()
         symbol = renderer.symbol()
 
@@ -281,6 +288,7 @@ class AddLayer(object):
         :param disable_tabs: set all tabs, except the last, enabled or disabled (boolean)
         :return:
         """
+
         change_tab = False
         text = utils_giswater.getWidgetText(dialog, dialog.txt_infolog, return_string_null=False)
 
@@ -311,6 +319,7 @@ class AddLayer(object):
         :param dialog: Dialog where tabs are disabled (QDialog)
         :return:
         """
+
         qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
         for x in range(0, qtabwidget.count()-1):
             qtabwidget.widget(x).setEnabled(False)
@@ -333,6 +342,7 @@ class AddLayer(object):
         :param group: group to which we want to add the layer (string)
         :return:
         """
+
         prov = virtual_layer.dataProvider()
         # Enter editing mode
         virtual_layer.startEditing()
@@ -377,6 +387,7 @@ class AddLayer(object):
             get_polygon(self, feature)
             get_multipolygon(self, feature)
         """
+
         try:
             coordinates = getattr(self, f"get_{feature['geometry']['type'].lower()}")(feature)
             type_ = feature['geometry']['type']
@@ -433,7 +444,8 @@ class AddLayer(object):
         :return: Coordinates of the feature (String)
         This function is called in def get_geometry(self, feature)
               geometry = getattr(self, f"get_{feature['geometry']['type'].lower()}")(feature)
-          """
+        """
+
         coordinates = "("
         for coords in feature['geometry']['coordinates']:
             coordinates += "("
@@ -448,6 +460,7 @@ class AddLayer(object):
 
 
     def get_coordinates(self, feature):
+
         coordinates = "("
         for coords in feature['geometry']['coordinates']:
             coordinates += f"{coords[0]} {coords[1]}, "
@@ -476,6 +489,7 @@ class AddLayer(object):
         :param group: group to which we want to add the layer (string)
         :return:
         """
+
         prov = virtual_layer.dataProvider()
 
         # Enter editing mode
@@ -517,7 +531,7 @@ class AddLayer(object):
     def delete_layer_from_toc(self, layer_name):
         """ Delete layer from toc if exist
          :param layer_name: Name's layer (string)
-         """
+        """
 
         layer = None
         for lyr in list(QgsProject.instance().mapLayers().values()):
@@ -564,6 +578,7 @@ class AddLayer(object):
 
 
     def zoom_to_group(self, group_name, buffer=10):
+
         extent = QgsRectangle()
         extent.setMinimal()
 
@@ -582,3 +597,4 @@ class AddLayer(object):
         extent.set(xmin, ymin, xmax, ymax)
         self.iface.mapCanvas().setExtent(extent)
         self.iface.mapCanvas().refresh()
+

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>615</width>
+    <width>485</width>
     <height>537</height>
    </rect>
   </property>
@@ -378,34 +378,7 @@
              </widget>
             </item>
             <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_4">
-              <item>
-               <widget class="QProgressBar" name="progressBar">
-                <property name="value">
-                 <number>0</number>
-                </property>
-                <property name="textVisible">
-                 <bool>true</bool>
-                </property>
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="invertedAppearance">
-                 <bool>false</bool>
-                </property>
-                <property name="textDirection">
-                 <enum>QProgressBar::TopToBottom</enum>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="lbl_counter">
-                <property name="text">
-                 <string>00/00</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
+             <layout class="QHBoxLayout" name="horizontalLayout_4"/>
             </item>
            </layout>
           </widget>

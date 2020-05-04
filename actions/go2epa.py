@@ -60,10 +60,6 @@ class Go2Epa(ApiParent):
             self.dlg_go2epa.chk_recurrent.setVisible(False)
             self.dlg_go2epa.chk_recurrent.setChecked(False)
 
-        self.dlg_go2epa.progressBar.setMaximum(0)
-        self.dlg_go2epa.progressBar.setMinimum(0)
-        self.show_widgets(False)
-
         # Set signals
         self.dlg_go2epa.chk_only_check.stateChanged.connect(partial(self.active_recurrent))
         self.dlg_go2epa.chk_recurrent.stateChanged.connect(partial(self.recurrent))
@@ -446,29 +442,16 @@ class Go2Epa(ApiParent):
     def insert_into_inp(self, folder_path=None, all_rows=None):
 
         progress = 0
-        # sys.stdout.flush()
-        self.dlg_go2epa.progressBar.setFormat("The INP file is begin exported...")
-        self.dlg_go2epa.progressBar.setAlignment(Qt.AlignCenter)
-        self.dlg_go2epa.progressBar.setValue(progress)
-        # self.show_widgets(True)
         row_count = sum(1 for rows in all_rows)  # @UnusedVariable
-        self.dlg_go2epa.progressBar.setMaximum(row_count)
         file1 = open(folder_path, "w")
         for row in all_rows:
             progress += 1
-            self.dlg_go2epa.progressBar.setValue(progress)
             if 'text' in row and row['text'] is not None:
                 line = row['text'].rstrip() + "\n"
                 file1.write(line)
 
         file1.close()
         del file1
-
-
-    def show_widgets(self, visible=False):
-
-        self.dlg_go2epa.progressBar.setVisible(visible)
-        self.dlg_go2epa.lbl_counter.setVisible(visible)
 
 
     def go2epa_accept(self):
@@ -532,7 +515,7 @@ class Go2Epa(ApiParent):
 
             complet_result = self.controller.get_json('gw_fct_pg2epa_main', body, log_sql=True, commit=True)
             if not complet_result:
-                self.controller.show_warning("NOT ROW FOR: " + sql)
+                self.controller.show_warning(str(self.controller.last_error))
                 message = "Export failed"
                 self.controller.show_info_box(message)
                 return
@@ -546,12 +529,13 @@ class Go2Epa(ApiParent):
             # Export to inp file
             if export_inp is True:
                 if complet_result['status'] == "Accepted":
-                    self.add_layer.add_temp_layer(self.dlg_go2epa, complet_result['body']['data'], 'INP results', True, True, 1, False)
+                    self.add_layer.add_temp_layer(self.dlg_go2epa, complet_result['body']['data'], 'INP results',
+                        True, True, 1, False)
 
                 # Get values from complet_result['body']['file'] and insert into INP file
                 if 'file' not in complet_result['body']:
-                    self.show_widgets(False)
                     return
+
                 self.insert_into_inp(self.file_inp, complet_result['body']['file'])
                 message = complet_result['message']['text']
                 common_msg += "Export INP finished. "
@@ -561,7 +545,6 @@ class Go2Epa(ApiParent):
                 if self.file_rpt == "null":
                     message = "You have to set this parameter"
                     self.controller.show_warning(message, parameter="RPT file")
-                    self.show_widgets(False)
                     return
 
                 msg = "INP file not found"
@@ -572,11 +555,6 @@ class Go2Epa(ApiParent):
                 else:
                     self.controller.show_warning(msg, parameter=str(self.file_inp))
                     return
-
-                self.dlg_go2epa.progressBar.setMaximum(0)
-                self.dlg_go2epa.progressBar.setMinimum(0)
-                self.dlg_go2epa.progressBar.setFormat("Epa software is running...")
-                self.dlg_go2epa.progressBar.setAlignment(Qt.AlignCenter)
 
                 subprocess.call([opener, self.file_inp, self.file_rpt], shell=False)
                 common_msg += "EPA model finished. "
@@ -610,7 +588,7 @@ class Go2Epa(ApiParent):
         if message is not None and self.imports_canceled is False:
             self.controller.show_info_box(message)
         """
-        #self.show_widgets(False)
+
         #self.check_result_id()
 
 
