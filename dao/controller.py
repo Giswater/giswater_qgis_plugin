@@ -6,7 +6,8 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.core import QgsMessageLog, QgsCredentials, QgsExpressionContextUtils, QgsProject, QgsDataSourceUri
-from qgis.PyQt.QtCore import QCoreApplication, QSettings, Qt, QTranslator
+from qgis.PyQt.QtCore import QCoreApplication, QRegExp, QSettings, Qt, QTranslator
+from qgis.PyQt.QtGui import QTextCharFormat, QFont
 from qgis.PyQt.QtWidgets import QCheckBox, QLabel, QMessageBox, QPushButton, QTabWidget, QToolBox
 from qgis.PyQt.QtSql import QSqlDatabase
 
@@ -1593,6 +1594,7 @@ class DaoController(object):
         :param pattern: Text to find used as pattern for QRegExp (String)
         :return:
         """
+
         if not pattern:
             pattern = "File\sname:|Function\sname:|Line\snumber:|SQL:|Detail:|Context:"
         cursor = widget.textCursor()
@@ -1613,7 +1615,6 @@ class DaoController(object):
 
             # Move to the next match
             index = regex.indexIn(widget.toPlainText(), pos)
-
 
 
     def manage_exception_api(self, json_result, sql=None, stack_level=2, stack_level_increase=0):
