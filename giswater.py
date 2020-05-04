@@ -505,8 +505,27 @@ class Giswater(QObject):
 
 
     def set_toolbar_position(self, tb_name, x, y):
+
         toolbar = self.iface.mainWindow().findChild(QToolBar, tb_name)
         toolbar.move(int(x), int(y))
+
+
+    def init_ui_config_file(self, path, toolbar_names):
+        """ Initialize UI config file with default values """
+
+        # Create file and configure section 'toolbars_position'
+        parser = configparser.RawConfigParser()
+        parser.add_section('toolbars_position')
+        for pos, tb in enumerate(toolbar_names):
+            parser.set('toolbars_position', f'pos_{pos}', f'{tb}, {pos * 10}, 98')
+
+        # Writing our configuration file to 'ui_config.config'
+        with open(path, 'w') as configfile:
+            parser.write(configfile)
+            configfile.close()
+            del configfile
+
+        return parser
 
 
     def manage_toolbars(self):
@@ -514,13 +533,21 @@ class Giswater(QObject):
         project_type in ('ws', 'ud')
         """
 
-        parser = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
+        # TODO: Dynamically get from config file
+        toolbar_names = ('basic', 'om_ud', 'om_ws', 'edit', 'cad', 'epa', 'master', 'utils')
+
+        # Get user UI config file
+        parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
         main_folder = os.path.join(os.path.expanduser("~"), self.plugin_name)
-        config_folder = main_folder + os.sep + "config" + os.sep
-        path = config_folder + 'ui_config.config'
+        path = main_folder + os.sep + "config" + os.sep + 'ui_config.config'
+
+        # If file not found or file found and section not exists
         if not os.path.exists(path):
-            self.controller.log_warning("File not found", parameter=path)
-            return
+            parser = self.init_ui_config_file(path, toolbar_names)
+        else:
+            parser.read(path)
+            if not parser.has_section("toolbars_position"):
+                parser = self.init_ui_config_file(path, toolbar_names)
 
         parser.read(path)
 
