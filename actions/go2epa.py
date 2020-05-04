@@ -61,8 +61,6 @@ class Go2Epa(ApiParent):
             self.dlg_go2epa.chk_recurrent.setVisible(False)
             self.dlg_go2epa.chk_recurrent.setChecked(False)
 
-        self.dlg_go2epa.progressBar.setMaximum(0)
-        self.dlg_go2epa.progressBar.setMinimum(0)
         self.show_widgets(False)
 
         # Set signals
@@ -448,17 +446,10 @@ class Go2Epa(ApiParent):
     def insert_into_inp(self, folder_path=None, all_rows=None):
 
         progress = 0
-        # sys.stdout.flush()
-        self.dlg_go2epa.progressBar.setFormat("The INP file is begin exported...")
-        self.dlg_go2epa.progressBar.setAlignment(Qt.AlignCenter)
-        self.dlg_go2epa.progressBar.setValue(progress)
-        # self.show_widgets(True)
         row_count = sum(1 for rows in all_rows)  # @UnusedVariable
-        self.dlg_go2epa.progressBar.setMaximum(row_count)
         file1 = open(folder_path, "w")
         for row in all_rows:
             progress += 1
-            self.dlg_go2epa.progressBar.setValue(progress)
             line = ""
             for x in range(0, len(row)):
                 if row[x] is not None:
@@ -486,9 +477,6 @@ class Go2Epa(ApiParent):
         _file = open(folder_path, "r+")
         full_file = _file.readlines()
         progress = 0
-        self.dlg_go2epa.progressBar.setFormat("The RPT file is begin imported...")
-        self.dlg_go2epa.progressBar.setAlignment(Qt.AlignCenter)
-        self.dlg_go2epa.progressBar.setValue(progress)
 
         # Create dict with sources
         sql = (f"SELECT tablename, target FROM sys_csv2pg_config "
@@ -506,13 +494,11 @@ class Go2Epa(ApiParent):
         csv40 = "null"
         sql = ""
         row_count = sum(1 for rows in full_file)  # @UnusedVariable
-        self.dlg_go2epa.progressBar.setMaximum(row_count)
         self.task_rpt_to_db = GwTask('Import RPT to database')
         QgsApplication.taskManager().addTask(self.task_rpt_to_db)
         for line_number, row in enumerate(full_file):
             self.task_rpt_to_db.setProgress((line_number * 100) / row_count)
             progress += 1
-            self.dlg_go2epa.progressBar.setValue(progress)
             if '**' in row or '--' in row:
                 continue
 
@@ -528,12 +514,6 @@ class Go2Epa(ApiParent):
             if len(dirty_list) > 0:
                 for x in range(0, len(dirty_list)):
                     if bool(re.search('[0-9][-]\d{1,2}[.]]*', str(dirty_list[x]))):
-                        # when -> 0.00-2.56e+007-2.56e+007 cut into -> 0.00 -2.56e+007 -2.56e+007
-
-                        # sp_n.append(dirty_list[x][:4])
-                        # sp_n.append(dirty_list[x][4:14])
-                        # sp_n.append(dirty_list[x][14:])
-
                         last_index = 0
                         for i, c in enumerate(dirty_list[x]):
                             if "-" == c:
@@ -602,6 +582,7 @@ class Go2Epa(ApiParent):
 
     def go2epa_accept(self):
         """ Save INP, RPT and result name into GSW file """
+
         # Save user values
         self.save_user_values()
         
@@ -642,8 +623,6 @@ class Go2Epa(ApiParent):
         elif self.project_type in 'ud':
             opener = self.plugin_dir + "/epa/ud_swmm50022.exe"
 
-        self.show_widgets(True)
-
         counter = 0
 
         extras = '"iterative":"off"'
@@ -670,9 +649,8 @@ class Go2Epa(ApiParent):
 
             complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
             steps = f"{counter}/{complet_result[0]['steps']}"
-            utils_giswater.setWidgetText(self.dlg_go2epa, self.dlg_go2epa.lbl_counter, steps)
             counter += 1
-            print(f"{counter}:{complet_result[0]['steps']}:{complet_result[0]['continue']}")
+            self.controller.log_info(f"{counter}:{complet_result[0]['steps']}:{complet_result[0]['continue']}")
             _continue = False
             common_msg = ""
             message = None
@@ -694,11 +672,10 @@ class Go2Epa(ApiParent):
                        "FROM temp_csv2pg "
                        "WHERE csv2pgcat_id=10 AND user_name = current_user ORDER BY id")
                 rows = self.controller.get_rows(sql, commit=True)
-
                 if rows is None:
                     self.controller.show_message("NOT ROW FOR: " + sql, 2)
-                    self.show_widgets(False)
                     return
+
                 self.insert_into_inp(self.file_inp, rows)
                 common_msg += "Export INP finished. "
 
@@ -707,7 +684,6 @@ class Go2Epa(ApiParent):
                 if self.file_rpt == "null":
                     message = "You have to set this parameter"
                     self.controller.show_warning(message, parameter="RPT file")
-                    self.show_widgets(False)
                     return
 
                 msg = "INP file not found"
@@ -718,11 +694,6 @@ class Go2Epa(ApiParent):
                 else:
                     self.controller.show_warning(msg, parameter=str(self.file_inp))
                     return
-
-                self.dlg_go2epa.progressBar.setMaximum(0)
-                self.dlg_go2epa.progressBar.setMinimum(0)
-                self.dlg_go2epa.progressBar.setFormat("Epa software is running...")
-                self.dlg_go2epa.progressBar.setAlignment(Qt.AlignCenter)
 
                 subprocess.call([opener, self.file_inp, self.file_rpt], shell=False)
                 common_msg += "EPA model finished. "
@@ -739,7 +710,6 @@ class Go2Epa(ApiParent):
                     # Importing file to temporal table
                     status = self.insert_rpt_into_db(self.file_rpt)
                     if not status:
-                        self.show_widgets(False)
                         self.check_result_id()
                         return
 
@@ -786,8 +756,6 @@ class Go2Epa(ApiParent):
         if message is not None and self.imports_canceled is False:
             self.controller.show_info_box(message)
 
-
-        self.show_widgets(False)
         self.check_result_id()
 
 
