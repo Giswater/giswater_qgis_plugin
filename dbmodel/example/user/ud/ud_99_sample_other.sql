@@ -409,3 +409,12 @@ INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_upser_e
 ON CONFLICT (parameter, cur_user) DO NOTHING;
 
 UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'qgis_form_docker' AND cur_user = current_user;
+
+UPDATE config_api_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_node' 
+WHERE column_id='cat_matcat_id' AND formname LIKE 've_node%';
+
+UPDATE config_api_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_arc' 
+WHERE column_id='cat_matcat_id' AND formname LIKE 've_connec%';
+
+UPDATE config_api_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_arc' 
+WHERE column_id='cat_matcat_id' AND formname LIKE 've_arc%';
