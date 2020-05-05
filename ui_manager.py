@@ -209,6 +209,33 @@ class InfoShowInfo(QtGui.QDialog, FORM_CLASS):
         self.setupUi(self)
 
 
+FORM_CLASS = get_ui_class('basic_table.ui')
+class BasicTable(QtGui.QDialog, FORM_CLASS):
+    def __init__(self):
+        QtGui.QDialog.__init__(self)
+        self.setupUi(self)
+
+
+FORM_CLASS = get_ui_class('lot_selector.ui')
+class Lot_selector(QtGui.QDialog, FORM_CLASS):
+    def __init__(self):
+        QtGui.QDialog.__init__(self)
+        self.setupUi(self)
+
+
+FORM_CLASS = get_ui_class('lot_management.ui')
+class LotManagement(QtGui.QDialog, FORM_CLASS):
+    def __init__(self):
+        QtGui.QDialog.__init__(self)
+        self.setupUi(self)
+
+FORM_CLASS = get_ui_class('work_management.ui')
+class WorkManagement(QtGui.QMainWindow, FORM_CLASS):
+    def __init__(self):
+        QMainWindow.__init__(self)
+        self.setupUi(self)
+
+
 FORM_CLASS = get_ui_class('load_documents.ui')
 class LoadDocuments(QtGui.QDialog, FORM_CLASS):
     def __init__(self):
@@ -375,8 +402,21 @@ class ReadsqlShowInfo(QMainWindow, FORM_CLASS):
         QMainWindow.__init__(self)
         self.setupUi(self)
 
+FORM_CLASS = get_ui_class('resources_management.ui')
+class ResourcesManagement(QtGui.QDialog, FORM_CLASS):
+    def __init__(self):
+        QtGui.QDialog.__init__(self)
+        self.setupUi(self)
+
 FORM_CLASS = get_ui_class('selector_date.ui')
 class SelectorDate(QtGui.QDialog, FORM_CLASS):
+    def __init__(self):
+        QtGui.QDialog.__init__(self)
+        self.setupUi(self)
+
+
+FORM_CLASS = get_ui_class('team_management.ui')
+class TeamManagement(QtGui.QDialog, FORM_CLASS):
     def __init__(self):
         QtGui.QDialog.__init__(self)
         self.setupUi(self)
@@ -410,6 +450,13 @@ class UDoptions(QtGui.QDialog, FORM_CLASS):
 
 FORM_CLASS = get_ui_class('ud_times.ui')
 class UDtimes(QtGui.QDialog, FORM_CLASS):
+    def __init__(self):
+        QtGui.QDialog.__init__(self)
+        self.setupUi(self)
+
+
+FORM_CLASS = get_ui_class('load_management.ui')
+class LoadManagement(QtGui.QDialog, FORM_CLASS):
     def __init__(self):
         QtGui.QDialog.__init__(self)
         self.setupUi(self)

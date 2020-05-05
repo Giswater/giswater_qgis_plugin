@@ -307,5 +307,5 @@ class Om(ParentAction):
         self.new_lot.lot_manager()
 
     def om_selector_lot(self):
-        """ Button 76: Lot selector """
-        self.new_lot.lot_selector()
+        """ Button 76: Resources Management """
+        self.new_lot.resources_management()

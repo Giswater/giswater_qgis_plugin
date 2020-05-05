@@ -2218,8 +2218,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>307</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3379,16 +3379,6 @@
      <attribute name="title">
       <string>O&amp;&amp;M</string>
      </attribute>
-     <widget class="QComboBox" name="event_id">
-      <property name="geometry">
-       <rect>
-        <x>420</x>
-        <y>30</y>
-        <width>145</width>
-        <height>18</height>
-       </rect>
-      </property>
-     </widget>
      <widget class="QDateEdit" name="date_event_to">
       <property name="geometry">
        <rect>
@@ -3458,40 +3448,7 @@
        <enum>Qt::Horizontal</enum>
       </property>
      </widget>
-     <widget class="QLabel" name="label_event_parameter">
-      <property name="geometry">
-       <rect>
-        <x>420</x>
-        <y>8</y>
-        <width>91</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>8</pointsize>
-       </font>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::NoFrame</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-      <property name="text">
-       <string>Parameter:</string>
-      </property>
-      <property name="textFormat">
-       <enum>Qt::AutoText</enum>
-      </property>
-      <property name="scaledContents">
-       <bool>false</bool>
-      </property>
-      <property name="margin">
-       <number>3</number>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="event_type">
+     <widget class="QComboBox" name="cmb_visit_class">
       <property name="geometry">
        <rect>
         <x>265</x>
@@ -3525,7 +3482,7 @@
        <enum>QFrame::Raised</enum>
       </property>
       <property name="text">
-       <string>Parameter type:</string>
+       <string>Visit class:</string>
       </property>
       <property name="textFormat">
        <enum>Qt::AutoText</enum>
@@ -3537,7 +3494,7 @@
        <number>3</number>
       </property>
      </widget>
-     <widget class="QTableView" name="tbl_event_arc">
+     <widget class="QTableView" name="tbl_visit_arc">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -3606,7 +3563,7 @@
      <widget class="QPushButton" name="btn_open_gallery">
       <property name="geometry">
        <rect>
-        <x>476</x>
+        <x>535</x>
         <y>75</y>
         <width>24</width>
         <height>24</height>
@@ -3621,110 +3578,6 @@
       <property name="icon">
        <iconset>
         <normaloff>../icons/136b.png</normaloff>../icons/136b.png</iconset>
-      </property>
-      <property name="iconSize">
-       <size>
-        <width>22</width>
-        <height>22</height>
-       </size>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_open_visit">
-      <property name="geometry">
-       <rect>
-        <x>15</x>
-        <y>75</y>
-        <width>24</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Visit manager</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="icon">
-       <iconset>
-        <normaloff>../icons/65b.png</normaloff>../icons/65b.png</iconset>
-      </property>
-      <property name="iconSize">
-       <size>
-        <width>22</width>
-        <height>22</height>
-       </size>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_new_visit">
-      <property name="geometry">
-       <rect>
-        <x>47</x>
-        <y>75</y>
-        <width>24</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Add visit</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="icon">
-       <iconset>
-        <normaloff>../icons/64b.png</normaloff>../icons/64b.png</iconset>
-      </property>
-      <property name="iconSize">
-       <size>
-        <width>22</width>
-        <height>22</height>
-       </size>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_open_visit_event">
-      <property name="geometry">
-       <rect>
-        <x>540</x>
-        <y>75</y>
-        <width>24</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Event data&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="icon">
-       <iconset>
-        <normaloff>../icons/134b.png</normaloff>../icons/134b.png</iconset>
-      </property>
-      <property name="iconSize">
-       <size>
-        <width>22</width>
-        <height>22</height>
-       </size>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_open_visit_doc">
-      <property name="geometry">
-       <rect>
-        <x>508</x>
-        <y>75</y>
-        <width>24</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open document&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="icon">
-       <iconset>
-        <normaloff>../icons/170b.png</normaloff>../icons/170b.png</iconset>
       </property>
       <property name="iconSize">
        <size>
@@ -3755,8 +3608,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>327</height>
         </rect>
        </property>
        <attribute name="label">
@@ -7135,9 +6988,6 @@
   <tabstop>undelete</tabstop>
   <tabstop>publish</tabstop>
   <tabstop>ok</tabstop>
-  <tabstop>btn_new_visit</tabstop>
-  <tabstop>btn_open_visit_event</tabstop>
-  <tabstop>btn_open_visit_doc</tabstop>
   <tabstop>m3excess_cost</tabstop>
   <tabstop>cost</tabstop>
   <tabstop>arc_cost_2</tabstop>
@@ -7199,20 +7049,18 @@
   <tabstop>date_document_from</tabstop>
   <tabstop>open_element</tabstop>
   <tabstop>tab_main</tabstop>
-  <tabstop>btn_open_visit</tabstop>
   <tabstop>tbl_element</tabstop>
   <tabstop>element_id</tabstop>
   <tabstop>btn_delete</tabstop>
   <tabstop>date_event_from</tabstop>
   <tabstop>doc_id</tabstop>
-  <tabstop>event_type</tabstop>
+  <tabstop>cmb_visit_class</tabstop>
   <tabstop>date_event_to</tabstop>
   <tabstop>date_document_to</tabstop>
   <tabstop>btn_doc_insert</tabstop>
-  <tabstop>tbl_event_arc</tabstop>
+  <tabstop>tbl_visit_arc</tabstop>
   <tabstop>btn_open_gallery</tabstop>
   <tabstop>btn_doc_new</tabstop>
-  <tabstop>event_id</tabstop>
   <tabstop>btn_doc_delete</tabstop>
   <tabstop>btn_open_doc</tabstop>
  </tabstops>

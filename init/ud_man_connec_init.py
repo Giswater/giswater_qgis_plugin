@@ -70,6 +70,7 @@ class ManConnecDialog(ParentDialog):
         self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_connec")  
         self.tbl_hydrometer = self.dialog.findChild(QTableView, "tbl_hydrometer")
         self.tbl_hydrometer_value = self.dialog.findChild(QTableView, "tbl_hydrometer_value")
+        self.tbl_visit = self.dialog.findChild(QTableView, "tbl_visit_connec")
         state_type = self.dialog.findChild(QComboBox, 'state_type')
         dma_id = self.dialog.findChild(QComboBox, 'dma_id')
         
@@ -180,12 +181,15 @@ class ManConnecDialog(ParentDialog):
 
     def fill_tab_om(self):
         """ Fill tab 'O&M' (event) """
-        
-        table_event_connec = "v_ui_om_visit_x_connec"    
-        self.fill_tbl_event(self.tbl_event, self.schema_name + "." + table_event_connec, self.filter)
+
+        sql = "SELECT id, tablename FROM " + self.schema_name + ".om_visit_class WHERE feature_type = 'CONNEC'"
+        rows = self.controller.get_rows(sql)
+        table_event_connec_dict = {}
+        for row in rows:
+            table_event_connec_dict[row[0]] = str(row[1])
+        self.fill_tbl_event(self.tbl_visit, table_event_connec_dict, self.filter)
         self.tbl_event.doubleClicked.connect(self.open_visit_event)
-        self.set_configuration(self.tbl_event, table_event_connec)
-        
+
 
     def fill_tab_custom_fields(self):
         """ Fill tab 'Custom fields' """
