@@ -1567,7 +1567,7 @@ class ApiCF(ApiParent, QObject):
         """ Fill the table control to show hydrometers """
 
         txt_hydrometer_id = self.dlg_cf.findChild(QLineEdit, "txt_hydrometer_id")
-        filter = f"connec_id ILIKE '%{self.feature_id}%' "
+        filter = f"connec_id::text = '{self.feature_id}' "
         filter += f" AND hydrometer_customer_code ILIKE '%{txt_hydrometer_id.text()}%'"
 
         # Set model of selected widget
