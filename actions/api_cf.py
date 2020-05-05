@@ -1656,7 +1656,7 @@ class ApiCF(ApiParent, QObject):
         """ Fill the table control to show hydrometers """
 
         txt_hydrometer_id = self.dlg_cf.findChild(QLineEdit, "txt_hydrometer_id")
-        filter = f"connec_id ILIKE '%{self.feature_id}%' "
+        filter = f"connec_id = '{self.feature_id}' "
         filter += f" AND hydrometer_customer_code ILIKE '%{txt_hydrometer_id.text()}%'"
 
         # Set model of selected widget
@@ -1676,15 +1676,16 @@ class ApiCF(ApiParent, QObject):
         rows = self.controller.get_rows(sql)
         if not rows:
             return False
-
         utils_giswater.set_item_data(self.dlg_cf.cmb_cat_period_id_filter, rows, add_empty=True, sort_combo=False)
 
         sql = ("SELECT hydrometer_id, hydrometer_customer_code "
                " FROM v_rtc_hydrometer "
                " WHERE connec_id = '"+str(self.feature_id)+"' "
                " ORDER BY hydrometer_customer_code")
-        rows = [('', '')]
-        rows.extend(self.controller.get_rows(sql, log_sql=True))
+        rows_list = ['', '']
+        rows = self.controller.get_rows(sql, log_sql=True)
+        if rows:
+            rows_list.append(rows)
         utils_giswater.set_item_data(self.dlg_cf.cmb_hyd_customer_code, rows, 1)
 
 
