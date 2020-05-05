@@ -188,7 +188,18 @@ BEGIN
 		-- generate child views 
 		PERFORM gw_fct_admin_manage_child_views($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{},
 		"data":{"filterFields":{}, "pageInfo":{}, "multi_create":true}}$$)::text;
+		
+		--change widgettype for matcat_id when new empty data project (UD)
+		IF v_projecttype = 'UD' THEN 
+			UPDATE config_api_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_node' 
+			WHERE column_id='matcat_id' AND formname LIKE 've_node%';
 
+			UPDATE config_api_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_arc' 
+			WHERE column_id='matcat_id' AND formname LIKE 've_connec%';
+
+			UPDATE config_api_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_arc' 
+			WHERE column_id='matcat_id' AND formname LIKE 've_arc%';
+		END IF;
 		
 	ELSIF v_isnew IS FALSE THEN
 		

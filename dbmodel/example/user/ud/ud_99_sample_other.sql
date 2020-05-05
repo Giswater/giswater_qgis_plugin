@@ -410,11 +410,69 @@ ON CONFLICT (parameter, cur_user) DO NOTHING;
 
 UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'qgis_form_docker' AND cur_user = current_user;
 
+-- updates to manage matcat_id separately from catalog
 UPDATE config_api_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_node' 
-WHERE column_id='cat_matcat_id' AND formname LIKE 've_node%';
+WHERE column_id='matcat_id' AND formname LIKE 've_node%';
 
 UPDATE config_api_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_arc' 
-WHERE column_id='cat_matcat_id' AND formname LIKE 've_connec%';
+WHERE column_id='matcat_id' AND formname LIKE 've_connec%';
 
 UPDATE config_api_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_arc' 
-WHERE column_id='cat_matcat_id' AND formname LIKE 've_arc%';
+WHERE column_id='matcat_id' AND formname LIKE 've_arc%';
+
+UPDATE node SET nodecat_id='C_MANHOLE_100', matcat_id='Brick' WHERE nodecat_id='C_MANHOLE-BR100';
+UPDATE node SET nodecat_id='C_MANHOLE_100', matcat_id='Concret' WHERE nodecat_id='C_MANHOLE-CON100';
+UPDATE node SET nodecat_id='C_MANHOLE_80', matcat_id='Concret' WHERE nodecat_id='C_MANHOLE-CON80';
+UPDATE node SET matcat_id='Concret' WHERE nodecat_id='CHAMBER-01';
+UPDATE node SET matcat_id='Brick' WHERE nodecat_id='HIGH POINT-01';
+UPDATE node SET matcat_id='Concret' WHERE nodecat_id='JUMP-01';
+UPDATE node SET matcat_id='Concret' WHERE nodecat_id='NETGULLY-01';
+UPDATE node SET nodecat_id='R_MANHOLE_100', matcat_id='Brick' WHERE nodecat_id='R_MANHOLE-BR100';
+UPDATE node SET nodecat_id='R_MANHOLE_100', matcat_id='Concret' WHERE nodecat_id='R_MANHOLE-CON100';
+UPDATE node SET nodecat_id='R_MANHOLE_150', matcat_id='Concret' WHERE nodecat_id='R_MANHOLE-CON150';
+UPDATE node SET nodecat_id='R_MANHOLE_200', matcat_id='Concret' WHERE nodecat_id='R_MANHOLE-CON200';
+UPDATE node SET matcat_id='Concret' WHERE nodecat_id='SEW_STORAGE-01';
+UPDATE node SET matcat_id='Brick' WHERE nodecat_id='VALVE-01';
+UPDATE node SET matcat_id='Concret' WHERE nodecat_id='WEIR-01';
+UPDATE node SET matcat_id='Brick' WHERE nodecat_id='NETINIT-01';
+UPDATE node SET matcat_id='Brick' WHERE nodecat_id='NETELEMENT-01';
+UPDATE node SET matcat_id='Brick' WHERE nodecat_id='JUNCTION-01';
+UPDATE node SET matcat_id='Concret' WHERE nodecat_id='OUTFALL-01';
+UPDATE node SET matcat_id='Concret' WHERE nodecat_id='NODE-01';
+UPDATE node SET matcat_id='Brick' WHERE nodecat_id='VIR_NODE-01';
+UPDATE node SET matcat_id='Concret' WHERE nodecat_id='WWTP-01';
+
+DELETE FROM cat_node WHERE id IN ('C_MANHOLE-BR100','C_MANHOLE-CON100','C_MANHOLE-CON80','R_MANHOLE-BR100','R_MANHOLE-CON100','R_MANHOLE-CON150',
+'R_MANHOLE-CON200');
+
+UPDATE arc SET arccat_id='CC100', matcat_id='Concret' WHERE arccat_id='CON-CC100';
+UPDATE arc SET matcat_id='Concret' WHERE arccat_id='SIPHON-CC100';
+UPDATE arc SET arccat_id='CC040', matcat_id='PVC' WHERE arccat_id='PVC-CC040';
+UPDATE arc SET arccat_id='CC060', matcat_id='PVC' WHERE arccat_id='PVC-CC060';
+UPDATE arc SET arccat_id='CC080', matcat_id='PVC' WHERE arccat_id='PVC-CC080';
+UPDATE arc SET matcat_id='PVC' WHERE arccat_id='WACCEL-CC020';
+UPDATE arc SET arccat_id='CC020', matcat_id='PVC' WHERE arccat_id='PVC-CC020';
+UPDATE arc SET arccat_id='CC040', matcat_id='Concret' WHERE arccat_id='CON-CC040';
+UPDATE arc SET arccat_id='CC060', matcat_id='Concret' WHERE arccat_id='CON-CC060';
+UPDATE arc SET arccat_id='CC080', matcat_id='Concret' WHERE arccat_id='CON-CC080';
+UPDATE arc SET arccat_id='EG150', matcat_id='Concret' WHERE arccat_id='CON-EG150';
+UPDATE arc SET arccat_id='RC150', matcat_id='Concret' WHERE arccat_id='CON-RC150';
+UPDATE arc SET arccat_id='RC200', matcat_id='Concret' WHERE arccat_id='CON-RC200';
+UPDATE arc SET arccat_id='PP020', matcat_id='PEAD' WHERE arccat_id='PE-PP020';
+UPDATE arc SET arccat_id='CC040', matcat_id='PEC' WHERE arccat_id='PEC-CC040';
+UPDATE arc SET matcat_id='Virtual' WHERE arccat_id='WEIR_60';
+UPDATE arc SET matcat_id='Virtual' WHERE arccat_id='PUMP_01';
+UPDATE arc SET arccat_id='CC315', matcat_id='PEC' WHERE arccat_id='PEC-CC315';
+UPDATE arc SET matcat_id='Virtual' WHERE arccat_id='VIRTUAL';
+
+DELETE FROM cat_arc WHERE id IN ('CON-CC100','PVC-CC040','PVC-CC060','PVC-CC080','PVC-CC020','CON-CC040','CON-CC060','CON-CC080','CON-EG150','CON-RC150',
+'CON-RC200','PE-PP020','PEC-CC040','PEC-CC315');
+
+UPDATE connec SET connecat_id='CC025_D', matcat_id='PVC' WHERE connecat_id='PVC-CC025_D';
+UPDATE connec SET connecat_id='CC040_I', matcat_id='Concret' WHERE connecat_id='CON-CC040_I';
+UPDATE connec SET connecat_id='CC025_T', matcat_id='PVC' WHERE connecat_id='PVC-CC025_T';
+UPDATE connec SET connecat_id='CC030_D', matcat_id='PVC' WHERE connecat_id='PVC-CC030_D';
+UPDATE connec SET connecat_id='CC020_D', matcat_id='Concret' WHERE connecat_id='CON-CC020_D';
+UPDATE connec SET connecat_id='CC030_D', matcat_id='Concret' WHERE connecat_id='CON-CC030_D';
+UPDATE connec SET matcat_id='Virtual' WHERE connecat_id='VIRTUAL';
+
