@@ -92,8 +92,21 @@ class ManageNewPsector(ParentManage):
         atlas_id.setValidator(QIntValidator())
 
         self.populate_combos(self.dlg_plan_psector.psector_type, 'name', 'id', self.plan_om + '_psector_cat_type', False)
-        self.populate_combos(self.cmb_expl_id, 'name', 'expl_id', 'exploitation', False)
-        self.populate_combos(self.cmb_sector_id, 'name', 'sector_id', 'sector', False)
+
+        # Set visible FALSE for cmb_sector
+        sql = ("SELECT sector_id, name FROM sector")
+        rows = self.controller.get_rows(sql, commit=True)
+        utils_giswater.set_item_data(self.cmb_sector_id, rows, 1)
+        self.dlg_plan_psector.lbl_sector.setVisible(False)
+        self.cmb_sector_id.setVisible(False)
+
+        # Populate combo expl_id
+        sql = ("SELECT expl_id, name FROM exploitation "
+               " JOIN selector_expl USING (expl_id) "
+               " WHERE exploitation.expl_id != 0 and cur_user = current_user")
+        rows = self.controller.get_rows(sql, commit=True)
+
+        utils_giswater.set_item_data(self.cmb_expl_id, rows, 1)
 
         # Populate combo status
         sql = "SELECT id, idval FROM plan_typevalue WHERE typevalue = 'psector_status'"
@@ -251,6 +264,13 @@ class ManageNewPsector(ParentManage):
             filter_ = "psector_id = '" + str(psector_id) + "'"
             self.fill_table_object(self.tbl_document, self.schema_name + ".v_ui_doc_x_psector", filter_)
             self.tbl_document.doubleClicked.connect(partial(self.document_open))
+
+        else:
+
+            # Set psector_status vdefault
+            sql = ("SELECT id, idval FROM plan_typevalue WHERE typevalue = 'psector_status' and id = 2")
+            result = self.controller.get_row(sql)
+            utils_giswater.set_combo_itemData(self.cmb_status, str(result[1]), 1)
 
         sql = ("SELECT state_id FROM " + self.schema_name + ".selector_state WHERE cur_user = current_user")
         rows = self.controller.get_rows(sql)
@@ -886,7 +906,8 @@ class ManageNewPsector(ParentManage):
                 if row:
                     sql = ("UPDATE " + self.schema_name + ".config_param_user "
                            " SET value = '" + str(new_psector_id[0]) + "' "
-                           " WHERE parameter = 'psector_vdefault'")
+                           " WHERE parameter = 'psector_vdefault'"
+                           " AND cur_user=current_user ")
                 else:
                     sql = ("INSERT INTO " + self.schema_name + ".config_param_user (parameter, value, cur_user) "
                            " VALUES ('psector_vdefault', '" + str(new_psector_id[0]) + "', current_user)")

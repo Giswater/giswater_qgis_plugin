@@ -593,6 +593,8 @@ class Giswater(QObject):
         # Disable for Linux 'go2epa' actions
         self.manage_actions_linux()           
         
+        self.hide_actions()
+        
         # Set objects for map tools classes
         self.manage_map_tools()
 
@@ -610,7 +612,7 @@ class Giswater(QObject):
         
         # Manage project variable 'expl_id'
         self.manage_expl_id()           
-        self.hide_actions()
+        
         # Log it
         message = "Project read successfully"
         self.controller.log_info(message)
@@ -1102,25 +1104,10 @@ class Giswater(QObject):
 
     def hide_actions(self):
         """ Function added in order to hide actions (by index_action) temporarily"""
-        # Example list_to_hide = ['74', '75']
-
-        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user "
-               " WHERE parameter = 'qgis_toolbar_hidebuttons' "
-               " AND cur_user = current_user")
-        row = self.controller.get_row(sql, commit=True)
-        if not row or row[0] is None:
+        # Example qgis_toolbar_hidebuttons = 74, 75
+        list_to_hide = self.settings.value('system_variables/qgis_toolbar_hidebuttons')
+        if not list_to_hide or list_to_hide is None:
             return
-        list_to_hide = []
-        try:
-            #db format of value for parameter qgis_toolbar_hidebuttons -> {"action_index":[199, 74,75]}
-            json_list = json.loads(row[0], object_pairs_hook=OrderedDict)
-            list_to_hide = [str(x) for x in json_list['action_index']]
-        except KeyError as e:
-            pass
-        except JSONDecodeError as e:
-            # Control if json have a correct format
-            pass
-
         action_list = self.iface.mainWindow().findChildren(QAction)
         for action in action_list:
             _property = action.property('index_action')

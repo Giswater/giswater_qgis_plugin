@@ -175,7 +175,9 @@ class Om(ParentAction):
                 if exist_param:
                     sql = "UPDATE " + self.schema_name + "." + tablename + " SET value="
                     if widget.objectName() != 'state_vdefault':
-                        sql += "'" + utils_giswater.getWidgetText(dialog, widget) + "' WHERE parameter='" + parameter + "'"
+                        sql += "'" + utils_giswater.getWidgetText(dialog, widget) + "' "
+                        sql += " WHERE parameter='" + parameter + "' "
+                        sql += " AND cur_user = current_user"
                     else:
                         sql += ("(SELECT id FROM " + self.schema_name + ".value_state"
                                 " WHERE name = '" + utils_giswater.getWidgetText(dialog, widget) + "')"
@@ -196,6 +198,7 @@ class Om(ParentAction):
                 sql = "UPDATE " + self.schema_name + "." + tablename + " SET value="
                 _date = widget.dateTime().toString('yyyy-MM-dd')
                 sql += "'" + str(_date) + "' WHERE parameter='" + parameter + "'"
+                sql += " AND cur_user = current_user"
             else:
                 sql = "INSERT INTO " + self.schema_name + "." + tablename + "(parameter, value, cur_user)"
                 _date = widget.dateTime().toString('yyyy-MM-dd')

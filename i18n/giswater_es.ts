@@ -86,6 +86,10 @@
         <source>75_text</source>
         <translation>Gestor de lotes</translation>
     </message>
+     <message>
+        <source>76_text</source>
+        <translation>Selector de lotes</translation>
+    </message>
     <message>
         <source>76_text</source>
         <translation>Administrador de recursos</translation>

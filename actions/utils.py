@@ -345,6 +345,12 @@ class Utils(ParentAction):
         if row:
             utils_giswater.setChecked(self.dlg_config, self.dlg_config.chk_cf_keep_opened_edition, row)
 
+        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user "
+               " WHERE cur_user = current_user AND parameter = 'edit_connect_force_automatic_connect2network'")
+        row = self.controller.get_row(sql)
+        if row:
+            utils_giswater.setChecked(self.dlg_config, self.dlg_config.chk_edit_connect_force_automatic_connect2network, row)
+
         sql = ("SELECT DISTINCT(dma_id),name FROM " + self.schema_name + ".dma"
                " WHERE expl_id = '" + str(utils_giswater.get_item_data(self.dlg_config, self.dlg_config.exploitation_vdefault, 0)) + "'")
         rows = self.controller.get_rows(sql)
@@ -540,6 +546,7 @@ class Utils(ParentAction):
         self.manage_config_param_user("dim_tooltip", True)
         self.manage_config_param_user("edit_arc_division_dsbl", True)
         self.manage_config_param_user("cf_keep_opened_edition", True)
+        self.manage_config_param_user("edit_connect_force_automatic_connect2network", True)
         self.manage_config_param_user("plan_arc_vdivision_dsbl", True)
         self.manage_config_param_user("cad_tools_base_layer_vdefault_1")
 

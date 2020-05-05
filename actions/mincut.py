@@ -204,11 +204,10 @@ class MincutParent(ParentAction, MultipleSelection):
         sql = ("SELECT setval('" + self.schema_name + ".anl_mincut_result_cat_seq', (SELECT max(id::integer) "
                "FROM " + self.schema_name + ".anl_mincut_result_cat) , true)")
         row = self.controller.get_row(sql, log_sql=True)
-
         if not row or row[0] is None:
             result_mincut_id = '1'
         elif row[0]:
-            result_mincut_id = str(int(row[0]) + 1)
+            result_mincut_id = str(int(row[0])+1)
 
         utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id, str(result_mincut_id))
 
