@@ -154,4 +154,4 @@ UPDATE config_api_form_fields SET layout_order = 20 WHERE column_id = 'gate' and
 delete from config_api_form_fields where formname ilike 'v_edit_inp_connec'and column_id='dma_id';
 
 UPDATE config_api_form_fields SET column_id='matcat_id' WHERE column_id='cat_matcat_id';
-UPDATE config_api_form_fields SET column_id='matcat_id' WHERE label='cat_matcat_id';
+UPDATE config_api_form_fields SET label='matcat_id' WHERE label='cat_matcat_id';
