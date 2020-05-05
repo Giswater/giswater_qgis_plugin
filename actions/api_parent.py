@@ -249,13 +249,8 @@ class ApiParent(ParentAction):
         """ Open PDF file with selected @wsoftware and @geom_type """
 
         # Get locale of QGIS application
-        locale = QSettings().value('locale/userLocale').lower()
-        if locale == 'es_es':
-            locale = 'es'
-        elif locale == 'es_ca':
-            locale = 'ca'
-        elif locale == 'en_us':
-            locale = 'en'
+        locale = self.controller.get_locale()
+
         wsoftware = self.controller.get_project_type()
         # Get PDF file
         pdf_folder = os.path.join(self.plugin_dir, 'png')

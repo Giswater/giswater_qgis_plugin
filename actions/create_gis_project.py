@@ -24,15 +24,7 @@ class CreateGisProject():
                              export_passwd=False, roletype='admin', chk_sample=False):
 
         # Get locale of QGIS application
-        locale = QSettings().value('locale/userLocale').lower()
-        if locale == 'es_es' or locale == 'es':
-            locale = 'es'
-        elif locale == 'es_ca':
-            locale = 'ca'
-        elif locale == 'en_us':
-            locale = 'en'
-        else:
-            locale = "en"
+        locale = self.controller.get_locale()
 
         # Get folder with QGS templates
         gis_extension = "qgs"

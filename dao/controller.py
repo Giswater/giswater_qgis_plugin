@@ -1106,19 +1106,31 @@ class DaoController(object):
         else:
             if log_info:
                 self.log_info("Locale not found", parameter=locale_path)
-            
+
+
+    def get_locale(self):
+        """ Get locale of QGIS application """
+
+        locale = "en"
+        try:
+            locale = QSettings().value('locale/userLocale').lower()
+        except AttributeError:
+            pass
+        finally:
+            if locale == 'es_es' or locale == 'es':
+                locale = 'es'
+            elif locale == 'es_ca':
+                locale = 'ca'
+            elif locale == 'en_us':
+                locale = 'en'
+            return locale
+
                     
     def manage_translation(self, locale_name, dialog=None, log_info=False):  
         """ Manage locale and corresponding 'i18n' file """ 
         
         # Get locale of QGIS application
-        locale = QSettings().value('locale/userLocale').lower()
-        if locale == 'es_es':
-            locale = 'es'
-        elif locale == 'es_ca':
-            locale = 'ca'
-        elif locale == 'en_us':
-            locale = 'en'
+        locale = self.get_locale()
             
         # If user locale file not found, set English one by default
         locale_path = os.path.join(self.plugin_dir, 'i18n', locale_name+'_{}.qm'.format(locale))

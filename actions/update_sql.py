@@ -144,13 +144,8 @@ class UpdateSQL(ApiParent):
                 self.super_users.append(str(super_user))
 
             # Get locale of QGIS application
-            self.locale = QSettings().value('locale/userLocale').lower()
-            if self.locale == 'es_es':
-                self.locale = 'ES'
-            elif self.locale == 'es_ca':
-                self.locale = 'CA'
-            elif self.locale == 'en_us':
-                self.locale = 'EN'
+            locale = self.controller.get_locale()
+            self.locale = locale.upper()
 
             self.schema = None
 
