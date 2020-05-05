@@ -1595,8 +1595,10 @@ class ApiCF(ApiParent, QObject):
                " FROM v_rtc_hydrometer "
                " WHERE connec_id = '"+str(self.feature_id)+"' "
                " ORDER BY hydrometer_customer_code")
-        rows = [('', '')]
-        rows.extend(self.controller.get_rows(sql, log_sql=True))
+        rows_list = ['', '']
+        rows = self.controller.get_rows(sql, log_sql=True)
+        if rows:
+            rows_list.append(rows)
         utils_giswater.set_item_data(self.dlg_cf.cmb_hyd_customer_code, rows, 1)
 
         self.fill_tbl_hydrometer_values(self.tbl_hydrometer_value, table_hydro_value)
