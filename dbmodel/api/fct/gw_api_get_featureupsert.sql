@@ -159,16 +159,17 @@ BEGIN
 		v_active_feature = 'SELECT cat_feature.*, a.code_autofill, a.active FROM cat_feature JOIN 
 				(SELECT id, active, code_autofill FROM node_type UNION SELECT id, active, code_autofill FROM arc_type 
 				UNION SELECT id, active, code_autofill FROM connec_type) a USING (id) WHERE a.active IS TRUE 
-				AND child_layer = '''|| p_table_id ||''' ORDER BY cat_feature.id';
+				AND (child_layer = '''|| p_table_id ||''' OR parent_layer = ''' || p_table_id || ''') ORDER BY cat_feature.id';
 	ELSE 
 		v_active_feature = 'SELECT cat_feature.*, a.code_autofill, a.active FROM cat_feature JOIN 
 				(SELECT id,active, code_autofill FROM node_type UNION SELECT id,active, code_autofill FROM arc_type 
 				UNION SELECT id,active, code_autofill FROM connec_type UNION SELECT id,active, code_autofill FROM gully_type) a 
-				USING (id) WHERE a.active IS TRUE AND child_layer =  '''|| p_table_id ||''' ORDER BY cat_feature.id';
+				USING (id) WHERE a.active IS TRUE AND (child_layer = '''|| p_table_id ||''' OR parent_layer = ''' || p_table_id || ''') ORDER BY cat_feature.id';
 	END IF;
 
 	EXECUTE v_active_feature INTO v_catfeature;
-
+    
+	IF v_catfeature.feature_type IS NOT NULL THEN
 
 	--  Starting control process
 	----------------------------
@@ -578,7 +579,8 @@ BEGIN
 			END IF;
 		END LOOP;  
 	END IF;
-  
+    END IF;
+	
 	-- Convert to json
 	v_fields := array_to_json(v_fields_array);
 
