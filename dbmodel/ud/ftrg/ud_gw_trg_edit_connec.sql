@@ -45,7 +45,7 @@ BEGIN
 		v_streetaxis2 = (SELECT id FROM ext_streetaxis WHERE muni_id = NEW.muni_id AND name = NEW.streetname2 LIMIT 1);
 		
 		-- managing matcat
-		IF (SELECT matcat_id FROM cat_connec WHERE id = NEW.conecat_id) IS NOT NULL THEN
+		IF (SELECT matcat_id FROM cat_connec WHERE id = NEW.connecat_id) IS NOT NULL THEN
 			v_matfromcat = true;
 		END IF;
 		
