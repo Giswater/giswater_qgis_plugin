@@ -1120,7 +1120,7 @@ class ManageVisit(ParentManage, QObject):
                 setattr(event, field_name, value)
 
         # set fixed values
-        self.dlg_event.parameter_id.setText(parameter_id)
+        self.dlg_event.parameter_id.setText(str(parameter_id))
 
         self.dlg_event.setWindowFlags(Qt.WindowStaysOnTopHint)
         if self.dlg_event.exec_():
