@@ -1,4 +1,4 @@
-3.3.040
+3.4.002
 *************
 - Update go2epa capabilities, refactoring buildup models
 - Create doc_x_workcat table and view
