@@ -1686,7 +1686,8 @@ class ApiCF(ApiParent, QObject):
         rows = self.controller.get_rows(sql, log_sql=True)
         rows_list.append(['', ''])
         if rows:
-            rows_list.append(rows[0])
+            for row in rows:
+                rows_list.append(row)
         utils_giswater.set_item_data(self.dlg_cf.cmb_hyd_customer_code, rows_list, 1)
 
         self.fill_tbl_hydrometer_values(self.tbl_hydrometer_value, table_hydro_value)
