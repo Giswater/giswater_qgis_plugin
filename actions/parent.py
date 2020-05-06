@@ -408,9 +408,9 @@ class ParentAction(object):
         tbl_all_rows = dialog.findChild(QTableView, "all_rows")
         tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        query_left = "SELECT * FROM "+tableleft+" WHERE "+name+" NOT IN "
-        query_left += "(SELECT "+tableleft+"."+name+" FROM "+tableleft+""
-        query_left += " RIGHT JOIN "+tableright+" ON "+tableleft+"."+field_id_left+" = "+tableright+"."+field_id_right+""
+        query_left = "SELECT * FROM " + self.schema_name + "." + tableleft + " WHERE "+name+" NOT IN "
+        query_left += "(SELECT " + tableleft + "." + name + " FROM " + self.schema_name + "." + tableleft + ""
+        query_left += " RIGHT JOIN " + self.schema_name + "." +tableright+" ON "+tableleft+"."+field_id_left+" = "+tableright+"."+field_id_right+""
         query_left += " WHERE cur_user = current_user)"
         query_left += " AND  "+field_id_left+" > -1"
         query_left += aql
@@ -425,8 +425,8 @@ class ParentAction(object):
         tbl_selected_rows = dialog.findChild(QTableView, "selected_rows")
         tbl_selected_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        query_right = "SELECT "+tableleft+"."+name+", cur_user, "+tableleft+"."+field_id_left+", "+tableright+"."+field_id_right+" FROM "+tableleft+""
-        query_right += " JOIN "+tableright+" ON "+tableleft+"."+field_id_left+" = "+tableright+"."+field_id_right+""
+        query_right = "SELECT "+tableleft+"."+name+", cur_user, "+tableleft+"."+field_id_left+", "+tableright+"."+field_id_right+" FROM " + self.schema_name + "."+tableleft+""
+        query_right += " JOIN " + self.schema_name + "."+tableright+" ON "+tableleft+"."+field_id_left+" = "+tableright+"."+field_id_right+""
 
         query_right += " WHERE cur_user = current_user"
 
