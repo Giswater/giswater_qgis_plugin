@@ -179,9 +179,9 @@ BEGIN
 			SELECT gw_api_getmessage(v_feature, 40) INTO v_message;
 			
 		END LOOP;
-		EXECUTE 'UPDATE om_visit_event SET value = ''true'' WHERE visit_id = ' || v_id || ' AND parameter_id = ''emb_imatge''';
+		EXECUTE 'UPDATE om_visit_event SET value = ''true'' WHERE visit_id = ' || v_id || ' AND parameter_id = ''photo''';
 	ELSE
-		EXECUTE 'UPDATE om_visit_event SET value = ''false'' WHERE visit_id = ' || v_id || ' AND parameter_id = ''emb_imatge''';
+		EXECUTE 'UPDATE om_visit_event SET value = ''false'' WHERE visit_id = ' || v_id || ' AND parameter_id = ''photo''';
 
 	END IF;
 	
