@@ -491,7 +491,6 @@ class ApiCF(ApiParent, QObject):
                     widget = self.dlg_cf.findChild(QComboBox, field['widgetname'])
                     if widget is not None:
                         widget.currentIndexChanged.connect(partial(self.fill_child, self.dlg_cf, widget, self.feature_type, self.tablename, self.field_id))
-                        self.fill_child(self.dlg_cf, widget, self.feature_type, self.tablename, self.field_id)
 
         # Set variables
         self.filter = str(complet_result[0]['body']['feature']['idName']) + " = '" + str(self.feature_id) + "'"
