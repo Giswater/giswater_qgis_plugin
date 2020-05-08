@@ -1321,11 +1321,12 @@ class ParentDialog(QDialog):
         self.cmb_visit_class = self.dialog.findChild(QComboBox, "cmb_visit_class")
         self.date_event_to = self.dialog.findChild(QDateEdit, "date_event_to")
         self.date_event_from = self.dialog.findChild(QDateEdit, "date_event_from")
+        btn_new_visit = self.dialog.findChild(QPushButton, "btn_new_visit")
         date = QDate.currentDate()
         self.date_event_to.setDate(date)
 
         btn_open_gallery = self.dialog.findChild(QPushButton, "btn_open_gallery")
-
+        btn_open_visit = self.dialog.findChild(QPushButton, "btn_open_visit")
         btn_open_gallery.setEnabled(False)
 
         # Set signals
@@ -1335,6 +1336,8 @@ class ParentDialog(QDialog):
         self.date_event_from.dateChanged.connect(partial(self.set_filter_table_event, widget, table_name))
 
         btn_open_gallery.clicked.connect(self.open_gallery)
+        btn_new_visit.clicked.connect(partial(self.new_visit, table_name))
+        btn_open_visit.clicked.connect(self.open_visit)
 
         feature_key = self.controller.get_layer_primary_key()
         if feature_key == 'node_id':

@@ -388,7 +388,7 @@
                <enum>QFrame::Plain</enum>
               </property>
               <property name="text">
-               <string>Visitcat id:*</string>
+               <string>Class id:*</string>
               </property>
               <property name="textFormat">
                <enum>Qt::AutoText</enum>
@@ -421,7 +421,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="QComboBox" name="visitcat_id">
+             <widget class="QComboBox" name="visitclass_id">
               <property name="editable">
                <bool>true</bool>
               </property>
@@ -788,7 +788,7 @@
   <tabstop>enddate</tabstop>
   <tabstop>user_name</tabstop>
   <tabstop>ext_code</tabstop>
-  <tabstop>visitcat_id</tabstop>
+  <tabstop>visitclass_id</tabstop>
   <tabstop>descript</tabstop>
   <tabstop>btn_add_geom</tabstop>
   <tabstop>button_box</tabstop>

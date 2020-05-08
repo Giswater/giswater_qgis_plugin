@@ -654,10 +654,9 @@ class ParentAction(object):
         # Set width and alias of visible columns
         columns_to_delete = []
         sql = ("SELECT column_index, width, alias, status"
-               " FROM config_client_forms"
+               " FROM " + self.schema_name + ".config_client_forms"
                " WHERE table_id = '"+table_name+"'"
                " ORDER BY column_index")
-
         rows = self.controller.get_rows(sql, commit=True, log_info=False)
         if not rows:
             return

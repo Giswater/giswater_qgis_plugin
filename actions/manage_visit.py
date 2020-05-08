@@ -109,7 +109,7 @@ class ManageVisit(ParentManage, QObject):
         self.visit_id = self.dlg_add_visit.findChild(QLineEdit, "visit_id")
         self.user_name = self.dlg_add_visit.findChild(QLineEdit, "user_name")
         self.ext_code = self.dlg_add_visit.findChild(QLineEdit, "ext_code")
-        self.visitcat_id = self.dlg_add_visit.findChild(QComboBox, "visitcat_id")
+        self.visitclass_id = self.dlg_add_visit.findChild(QComboBox, "visitclass_id")
 
         # Tab 'Relations'
         self.feature_type = self.dlg_add_visit.findChild(QComboBox, "feature_type")
@@ -351,7 +351,7 @@ class ManageVisit(ParentManage, QObject):
         self.current_visit.enddate = utils_giswater.getCalendarDate(self.dlg_add_visit, self.dlg_add_visit.enddate)
         self.current_visit.user_name = self.user_name.text()
         self.current_visit.ext_code = self.ext_code.text()
-        self.current_visit.visitcat_id = utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.visitcat_id, 0)
+        self.current_visit.visitclass_id = utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.visitclass_id, 0)
         self.current_visit.descript = utils_giswater.getWidgetText(self.dlg_add_visit, 'descript', False, False)
         self.current_visit.is_done = utils_giswater.isChecked(self.dlg_add_visit, 'is_done')
         if self.expl_id:
@@ -461,16 +461,30 @@ class ManageVisit(ParentManage, QObject):
     def entered_event_tab(self, dialog):
         """Manage actions when the Event tab is entered."""
         self.set_parameter_id_combo(dialog)
+        self.manage_cmb_parameter_id()
+
+
+    def manage_cmb_parameter_id(self):
+
+        self.dlg_add_visit.tbl_event.selectRow(0)
+        self.dlg_add_visit.tbl_event.setFocus()
+        parameter_id = self.dlg_add_visit.tbl_event.model().record(0).value('parameter_id')
+        if parameter_id is not None:
+            utils_giswater.set_combo_itemData(self.dlg_add_visit.parameter_id, parameter_id, 0)
+            self.dlg_add_visit.parameter_id.setEnabled(False)
+        else:
+            self.dlg_add_visit.parameter_id.setEnabled(True)
+        self.dlg_add_visit.tbl_event.clearFocus()
 
 
     def set_parameter_id_combo(self, dialog):
         """set parameter_id combo basing on current selections."""
 
         dialog.parameter_id.clear()
-        sql = ("SELECT id, descript"
-               " FROM " + self.schema_name + ".om_visit_parameter"
-               " WHERE UPPER (parameter_type) = '" + self.parameter_type_id.currentText().upper() + "'"
-               " AND UPPER (feature_type) = '" + self.feature_type.currentText().upper() + "'")
+        sql = ("SELECT b.id, descript FROM " + self.schema_name + ".om_visit_class_x_parameter a"
+               " JOIN " + self.schema_name + ".om_visit_parameter b ON b.id = a.parameter_id"
+               " WHERE class_id::text = '" + str(utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.visitclass_id, 0)) + "'"
+               " AND parameter_type = '" + str(utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.parameter_type_id, 0)) + "'")
         sql += " ORDER BY id"
         rows = self.controller.get_rows(sql, commit=True)
 
@@ -638,17 +652,18 @@ class ManageVisit(ParentManage, QObject):
         """ Fill combo boxes of the form """
 
         # Visit tab
-        # Fill ComboBox visitcat_id
-        # save result in self.visitcat_ids to get id depending on selected combo
-        sql = ("SELECT id, name"
-               " FROM " + self.schema_name + ".om_visit_cat"
+        # Fill ComboBox visitclass_id
+        # save result in self.visitclass_ids to get id depending on selected combo
+        sql = ("SELECT id, idval"
+               " FROM " + self.schema_name + ".om_visit_class"
                " WHERE active is true"
-               " ORDER BY name")
-        self.visitcat_ids = self.controller.get_rows(sql, commit=self.autocommit)
-        
-        if self.visitcat_ids:
-            utils_giswater.set_item_data(self.dlg_add_visit.visitcat_id, self.visitcat_ids, 1)
-            # now get default value to be show in visitcat_id
+               " ORDER BY idval")
+
+        self.visitclass_ids = self.controller.get_rows(sql, commit=self.autocommit)
+
+        if self.visitclass_ids:
+            utils_giswater.set_item_data(self.dlg_add_visit.visitclass_id, self.visitclass_ids, 1)
+            # now get default value to be show in visitclass_id
             sql = ("SELECT value"
                    " FROM " + self.schema_name + ".config_param_user"
                    " WHERE parameter = 'visitcat_vdefault' AND cur_user = current_user")
@@ -656,11 +671,11 @@ class ManageVisit(ParentManage, QObject):
             if row:
                 # if int then look for default row ans set it
                 try:
-                    utils_giswater.set_combo_itemData(self.dlg_add_visit.visitcat_id, row[0], 0)
-                    for i in range(0, self.dlg_add_visit.visitcat_id.count()):
-                        elem = self.dlg_add_visit.visitcat_id.itemData(i)
-                        if str(row[0]) == str(elem[0]):                         
-                            utils_giswater.setWidgetText(self.dlg_add_visit.visitcat_id, (elem[1]))
+                    utils_giswater.set_combo_itemData(self.dlg_add_visit.visitclass_id, row[0], 0)
+                    for i in range(0, self.dlg_add_visit.visitclass_id.count()):
+                        elem = self.dlg_add_visit.visitclass_id.itemData(i)
+                        if str(row[0]) == str(elem[0]):
+                            utils_giswater.setWidgetText(self.dlg_add_visit.visitclass_id, (elem[1]))
                 except TypeError:
                     pass
                 except ValueError:
@@ -675,7 +690,7 @@ class ManageVisit(ParentManage, QObject):
                        " WHERE active is true AND id ='"+str(id_visitcat[0])+"' "
                        " ORDER BY name")
                 row = self.controller.get_row(sql)
-                utils_giswater.set_combo_itemData(self.dlg_add_visit.visitcat_id, str(row[1]), 1)
+                utils_giswater.set_combo_itemData(self.dlg_add_visit.visitclass_id, str(row[1]), 1)
 
         # Relations tab
         # fill feature_type
@@ -688,9 +703,10 @@ class ManageVisit(ParentManage, QObject):
 
         # Event tab
         # Fill ComboBox parameter_type_id
-        sql = ("SELECT id, id "
-               "FROM " + self.schema_name + ".om_visit_parameter_type "
-               "ORDER BY id")
+        sql = ("SELECT distinct(parameter_type), parameter_type FROM " + self.schema_name + ".om_visit_class_x_parameter a"
+               " JOIN " + self.schema_name + ".om_visit_parameter b ON b.id = a.parameter_id"
+               " WHERE class_id::text = '" + str(utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.visitclass_id, 0)) + "'")
+        sql += " ORDER BY parameter_type"
         parameter_type_ids = self.controller.get_rows(sql, commit=True)
         utils_giswater.set_item_data(self.dlg_add_visit.parameter_type_id, parameter_type_ids, 1)
 
@@ -839,6 +855,9 @@ class ManageVisit(ParentManage, QObject):
         # update Table
         self.tbl_event.model().select()
         self.manage_events_changed()
+
+        # Manage parameter_id
+        self.manage_cmb_parameter_id()
 
 
     def open_file(self):
@@ -1198,6 +1217,9 @@ class ManageVisit(ParentManage, QObject):
         self.tbl_event.model().select()
         self.manage_events_changed()
 
+        # Manage parameter_id
+        self.manage_cmb_parameter_id()
+
 
     def document_open(self):
         """Open selected document."""
@@ -1285,7 +1307,6 @@ class ManageVisit(ParentManage, QObject):
 
     def set_configuration(self, dialog, widget, table_name):
         """Configuration of tables. Set visibility and width of columns."""
-
         widget = utils_giswater.getWidget(dialog, widget)
         if not widget:
             return
