@@ -61,7 +61,7 @@ INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('statetype_pl
 
 -- insert mandatory values
 INSERT INTO config_param_user (parameter, value, cur_user)
-		SELECT audit_cat_param_user.id, vdefault, current_user FROM config_param_user RIGHT JOIN audit_cat_param_user ON audit_cat_param_user.id=parameter 
+		SELECT sys_param_user.id, vdefault, current_user FROM config_param_user RIGHT JOIN sys_param_user ON sys_param_user.id=parameter 
 		WHERE ismandatory IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member')) ON CONFLICT (parameter, cur_user) DO NOTHING;
 
 

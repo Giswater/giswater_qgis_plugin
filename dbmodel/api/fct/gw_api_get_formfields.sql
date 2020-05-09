@@ -216,7 +216,7 @@ BEGIN
 				v_selected_id = (SELECT value FROM config_param_user WHERE parameter = 'municipality_vdefault' AND cur_user = current_user);
 
 			ELSE 
-				EXECUTE 'SELECT value::text FROM audit_cat_param_user JOIN config_param_user ON audit_cat_param_user.id=parameter 
+				EXECUTE 'SELECT value::text FROM sys_param_user JOIN config_param_user ON sys_param_user.id=parameter 
 					WHERE cur_user=current_user AND feature_field_id='||quote_literal(quote_ident(aux_json->>'parentId'))
 					INTO v_selected_id;
 			END IF;	

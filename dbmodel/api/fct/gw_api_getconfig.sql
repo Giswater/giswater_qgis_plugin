@@ -98,12 +98,12 @@ BEGIN
 
 	-- Get all parameters from audit_cat param_user
 	EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (
-		SELECT label, audit_cat_param_user.id as widgetname, value , datatype, widgettype, layout_order, layoutname, 
+		SELECT label, sys_param_user.id as widgetname, value , datatype, widgettype, layout_order, layoutname, 
 		(CASE WHEN iseditable IS NULL OR iseditable IS TRUE THEN ''True'' ELSE ''False'' END) AS iseditable,
 		row_number()over(ORDER BY layoutname, layout_order) AS orderby, isparent, sys_role_id, project_type, widgetcontrols,
 		(CASE WHEN value IS NOT NULL AND value != ''false'' THEN ''True'' ELSE ''False'' END) AS checked, placeholder, descript AS tooltip, 
 		dv_parent_id, dv_querytext, dv_querytext_filterc, dv_orderby_id, dv_isnullvalue	
-		FROM audit_cat_param_user LEFT JOIN (SELECT * FROM config_param_user WHERE cur_user=current_user) a ON a.parameter=audit_cat_param_user.id 
+		FROM sys_param_user LEFT JOIN (SELECT * FROM config_param_user WHERE cur_user=current_user) a ON a.parameter=sys_param_user.id 
 		WHERE sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))	
 		AND formname ='||quote_literal(lower(v_formname))||'
 		AND (epaversion::json->>''from''= '||quote_literal(v_epaversion)||' or formname !=''epaoptions'')
@@ -328,7 +328,7 @@ BEGIN
 
 --  Construction of groupbox - formlayouts
     EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (SELECT layoutname AS "layout", label FROM config_api_form_groupbox WHERE formname=$1 AND layoutname IN 
-			(SELECT layoutname FROM audit_cat_param_user WHERE sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))	
+			(SELECT layoutname FROM sys_param_user WHERE sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))	
 			UNION SELECT layoutname FROM config_param_system WHERE ''role_admin'' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member'')))
 		ORDER BY layoutname) a'
 		INTO v_formgroupbox

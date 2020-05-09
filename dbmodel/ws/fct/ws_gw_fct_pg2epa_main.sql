@@ -80,7 +80,7 @@ BEGIN
 
 	v_inpoptions = (SELECT (replace (replace (replace (array_to_json(array_agg(json_build_object((t.parameter),(t.value))))::text,'},{', ' , '),'[',''),']',''))::json 
 				FROM (SELECT parameter, value FROM config_param_user 
-				JOIN audit_cat_param_user a ON a.id=parameter	WHERE cur_user=current_user AND formname='epaoptions')t);
+				JOIN sys_param_user a ON a.id=parameter	WHERE cur_user=current_user AND formname='epaoptions')t);
 		
 	IF v_onlyexport THEN
 		SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return ;

@@ -132,7 +132,7 @@ BEGIN
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 1, '----------------------------------------');
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
 	SELECT 14, p_result, 1, concat (label, ' : ', value) FROM config_param_user 
-	JOIN audit_cat_param_user a ON a.id=parameter WHERE cur_user=current_user AND formname='epaoptions' AND value is not null;
+	JOIN sys_param_user a ON a.id=parameter WHERE cur_user=current_user AND formname='epaoptions' AND value is not null;
 	
 	-- get results
 	-- info

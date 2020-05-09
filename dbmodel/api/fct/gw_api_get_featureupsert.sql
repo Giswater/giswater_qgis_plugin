@@ -412,8 +412,8 @@ BEGIN
 	IF p_tg_op ='INSERT' THEN 
 	
 		-- getting vdefault values
-		EXECUTE 'SELECT to_json(array_agg(row_to_json(a)))::text FROM (SELECT audit_cat_param_user.id as parameter, feature_field_id as param, value::text AS vdef FROM audit_cat_param_user 
-			JOIN config_param_user ON audit_cat_param_user.id=parameter WHERE cur_user=current_user AND feature_field_id IS NOT NULL AND 
+		EXECUTE 'SELECT to_json(array_agg(row_to_json(a)))::text FROM (SELECT sys_param_user.id as parameter, feature_field_id as param, value::text AS vdef FROM sys_param_user 
+			JOIN config_param_user ON sys_param_user.id=parameter WHERE cur_user=current_user AND feature_field_id IS NOT NULL AND 
 			config_param_user.parameter NOT IN (''enddate_vdefault'', ''statetype_plan_vdefault'', ''statetype_end_vdefault''))a'
 			INTO v_values_array;
 
@@ -536,7 +536,7 @@ BEGIN
 					-- getting parent value
 					SELECT (a->>'vdef') INTO v_state_value FROM json_array_elements(v_values_array) AS a WHERE (a->>'param') = 'state';
 					
-					EXECUTE 'SELECT value::text FROM audit_cat_param_user JOIN config_param_user ON audit_cat_param_user.id=parameter 
+					EXECUTE 'SELECT value::text FROM sys_param_user JOIN config_param_user ON sys_param_user.id=parameter 
 					WHERE cur_user=current_user AND parameter = concat(''statetype_'','||v_state_value||',''_vdefault'')' INTO field_value;
 							
 				-- rest (including addfields)

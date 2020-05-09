@@ -57,7 +57,7 @@ BEGIN
 		
 		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT id as column_id, widgettype, datatype, id as widgetname,
 		dv_querytext, isparent, dv_parent_id, row_number()over(ORDER BY layoutname, layout_order) AS orderby , dv_querytext_filterc, isautoupdate, widgetcontrols
-		FROM audit_cat_param_user WHERE dv_parent_id='||quote_literal(p_comboparent)||' ORDER BY orderby) a WHERE widgettype = ''combo'''
+		FROM sys_param_user WHERE dv_parent_id='||quote_literal(p_comboparent)||' ORDER BY orderby) a WHERE widgettype = ''combo'''
 		INTO v_combo_rows_child;
 		v_combo_rows_child := COALESCE(v_combo_rows_child, '{}');
 		v_formtype='config';
@@ -120,17 +120,17 @@ BEGIN
 		IF v_formtype != 'feature' THEN
 			v_fields_array[(v_aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields_array[(v_aux_json_child->>'orderby')::INT], 'selectedId', COALESCE(combo_json_child->0, '[]'));
 		ELSE
-			--looping for the differents velues on audit_cat_param_user that are coincident with the child parameter
-			FOR v_config_param_user IN SELECT * FROM audit_cat_param_user WHERE feature_field_id = (v_aux_json_child->>'column_id')
+			--looping for the differents velues on sys_param_user that are coincident with the child parameter
+			FOR v_config_param_user IN SELECT * FROM sys_param_user WHERE feature_field_id = (v_aux_json_child->>'column_id')
 			LOOP
 				IF v_config_param_user.feature_dv_parent_value IS NULL THEN 
 					-- if there is only one because dv_parent_value is null then
-					v_current_value = (SELECT value FROM config_param_user JOIN audit_cat_param_user ON audit_cat_param_user.id=config_param_user.parameter 
+					v_current_value = (SELECT value FROM config_param_user JOIN sys_param_user ON sys_param_user.id=config_param_user.parameter 
 							WHERE feature_field_id = (v_aux_json_child->>'column_id')
 							AND cur_user=current_user);			
 				ELSE
 					-- if there are more than one, taking that parameter with the same feature_dv_parent_value
-					v_current_value = (SELECT value FROM config_param_user JOIN audit_cat_param_user ON audit_cat_param_user.id=config_param_user.parameter 
+					v_current_value = (SELECT value FROM config_param_user JOIN sys_param_user ON sys_param_user.id=config_param_user.parameter 
 							WHERE feature_field_id = quote_ident(v_aux_json_child->>'column_id')
 							AND feature_dv_parent_value = p_combovalue
 							AND cur_user=current_user);

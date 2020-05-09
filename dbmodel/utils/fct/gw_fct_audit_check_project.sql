@@ -185,11 +185,11 @@ BEGIN
 	INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) VALUES (101, 4, v_errortext);
 
 	-- set mandatory values of config_param_user in case of not exists (for new users or for updates)
-	FOR v_rectable IN SELECT * FROM audit_cat_param_user WHERE ismandatory IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member'))
+	FOR v_rectable IN SELECT * FROM sys_param_user WHERE ismandatory IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member'))
 	LOOP
 		IF v_rectable.id NOT IN (SELECT parameter FROM config_param_user WHERE cur_user=current_user) THEN
 			INSERT INTO config_param_user (parameter, value, cur_user) 
-			SELECT audit_cat_param_user.id, vdefault, current_user FROM audit_cat_param_user WHERE audit_cat_param_user.id = v_rectable.id;	
+			SELECT sys_param_user.id, vdefault, current_user FROM sys_param_user WHERE sys_param_user.id = v_rectable.id;	
 
 			v_errortext=concat('Set value for new variable in config param user: ',v_rectable.id,'.');
 
@@ -204,22 +204,22 @@ BEGIN
 	-- manage mandatory values of config_param_user where feature is deprecated
 	IF 'role_admin' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) AND v_project_type='WS' THEN
 	
-		DELETE FROM audit_cat_param_user WHERE id IN (SELECT audit_cat_param_user.id FROM audit_cat_param_user, node_type 
-		WHERE active=false AND concat(lower(node_type.id),'_vdefault') = audit_cat_param_user.id);
+		DELETE FROM sys_param_user WHERE id IN (SELECT sys_param_user.id FROM sys_param_user, node_type 
+		WHERE active=false AND concat(lower(node_type.id),'_vdefault') = sys_param_user.id);
 
-		DELETE FROM audit_cat_param_user WHERE id IN (SELECT audit_cat_param_user.id FROM audit_cat_param_user, arc_type 
-		WHERE active=false AND concat(lower(arc_type.id),'_vdefault') = audit_cat_param_user.id);
+		DELETE FROM sys_param_user WHERE id IN (SELECT sys_param_user.id FROM sys_param_user, arc_type 
+		WHERE active=false AND concat(lower(arc_type.id),'_vdefault') = sys_param_user.id);
 
-		DELETE FROM audit_cat_param_user WHERE id IN (SELECT audit_cat_param_user.id FROM audit_cat_param_user, connec_type 
-		WHERE active=false AND concat(lower(connec_type.id),'_vdefault') = audit_cat_param_user.id);
+		DELETE FROM sys_param_user WHERE id IN (SELECT sys_param_user.id FROM sys_param_user, connec_type 
+		WHERE active=false AND concat(lower(connec_type.id),'_vdefault') = sys_param_user.id);
 
-		v_errortext=concat('Inactive parameters have been deleted from audit_cat_param_user.');
+		v_errortext=concat('Inactive parameters have been deleted from sys_param_user.');
 		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) VALUES (101, 4, v_errortext);
 		
 	END IF;
 
-	-- delete on config_param_user fron updated values on audit_cat_param_user
-	DELETE FROM config_param_user WHERE parameter NOT IN (SELECT id FROM audit_cat_param_user) AND cur_user = current_user;
+	-- delete on config_param_user fron updated values on sys_param_user
+	DELETE FROM config_param_user WHERE parameter NOT IN (SELECT id FROM sys_param_user) AND cur_user = current_user;
 
 	-- Force exploitation selector in case of null values
 	IF (SELECT count(*) FROM selector_expl WHERE cur_user=current_user) < 1 THEN 

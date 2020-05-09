@@ -220,7 +220,7 @@ INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_link_co
 UPDATE link SET the_geom=the_geom;
 
 
---update audit_cat_param_user with cat_feature vdefaults
+--update sys_param_user with cat_feature vdefaults
 UPDATE cat_feature SET id=id;
 
 --set enddate NULL for on service features

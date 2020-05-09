@@ -313,14 +313,14 @@ BEGIN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 				VALUES (118, null, 4, 'Insert parameter definition into man_addfields_parameter.');
 
-				SELECT max(layout_order) + 1 INTO v_param_user_id FROM audit_cat_param_user WHERE layoutname='lyt_addfields';
+				SELECT max(layout_order) + 1 INTO v_param_user_id FROM sys_param_user WHERE layoutname='lyt_addfields';
 
 				IF v_param_user_id IS NULL THEN
 					v_param_user_id=1;
 				END IF;
 
-				IF concat(v_param_name,'_vdefault') NOT IN (SELECT id FROM audit_cat_param_user) THEN
-					INSERT INTO audit_cat_param_user (id, formname, descript, sys_role_id, label,  layoutname, layout_order,
+				IF concat(v_param_name,'_vdefault') NOT IN (SELECT id FROM sys_param_user) THEN
+					INSERT INTO sys_param_user (id, formname, descript, sys_role_id, label,  layoutname, layout_order,
 					project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated, dv_querytext, dv_querytext_filterc,feature_field_id, isenabled)
 					VALUES (concat(v_param_name,'_vdefault'),'config', concat('Default value of addfield ',v_param_name), 'role_edit', v_param_name,
 					'lyt_addfields', v_param_user_id, lower(v_project_type), false, false, v_audit_datatype, v_audit_widgettype, false, false,
@@ -339,7 +339,7 @@ BEGIN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 				VALUES (118, null, 4, 'Update parameter definition in man_addfields_parameter.');
 
-				UPDATE audit_cat_param_user SET datatype = v_audit_datatype, widgettype=v_audit_widgettype, dv_querytext = v_dv_querytext,
+				UPDATE sys_param_user SET datatype = v_audit_datatype, widgettype=v_audit_widgettype, dv_querytext = v_dv_querytext,
 				dv_querytext_filterc = v_dv_querytext_filterc WHERE id = concat(v_param_name,'_vdefault');
 
 			
@@ -353,7 +353,7 @@ BEGIN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 				VALUES (118, null, 4, 'Delete values from config_api_form_fields related to parameter.');
 
-				DELETE FROM audit_cat_param_user WHERE id = concat(v_param_name,'_vdefault');
+				DELETE FROM sys_param_user WHERE id = concat(v_param_name,'_vdefault');
 
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 				VALUES (118, null, 4, concat('Delete definition of vdefault: ', concat(v_param_name,'_vdefault')));
@@ -635,13 +635,13 @@ BEGIN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (118, null, 4, 'Insert parameter definition into config_api_form_fields.');
 
-			SELECT max(layout_order) + 1 INTO v_param_user_id FROM audit_cat_param_user WHERE layoutname='lyt_addfields';
+			SELECT max(layout_order) + 1 INTO v_param_user_id FROM sys_param_user WHERE layoutname='lyt_addfields';
 			
 			IF v_param_user_id IS NULL THEN
 				v_param_user_id=1;
 			END IF;
 
-			INSERT INTO audit_cat_param_user (id, formname, descript, sys_role_id, label,  layoutname, layout_order, 
+			INSERT INTO sys_param_user (id, formname, descript, sys_role_id, label,  layoutname, layout_order, 
 			project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated,dv_querytext, dv_querytext_filterc, feature_field_id, isenabled)
 			VALUES (concat(v_param_name,'_',lower(v_cat_feature),'_vdefault'),'config', 
 			concat('Default value of addfield ',v_param_name, ' for ', v_cat_feature), 
@@ -676,7 +676,7 @@ BEGIN
 
 			END IF;
 
-			UPDATE audit_cat_param_user SET datatype = v_audit_datatype, widgettype=v_audit_widgettype, dv_querytext = v_dv_querytext,
+			UPDATE sys_param_user SET datatype = v_audit_datatype, widgettype=v_audit_widgettype, dv_querytext = v_dv_querytext,
 			dv_querytext_filterc = v_dv_querytext_filterc WHERE id = concat(v_param_name,'_',lower(v_cat_feature),'_vdefault');
 
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
@@ -685,7 +685,7 @@ BEGIN
 		ELSIF v_action = 'DELETE' THEN
 			EXECUTE 'DELETE FROM man_addfields_parameter WHERE param_name='''||v_param_name||''' AND cat_feature_id='''||v_cat_feature||''';';
 
-			DELETE FROM audit_cat_param_user WHERE id = concat(v_param_name,'_',lower(v_cat_feature),'_vdefault');
+			DELETE FROM sys_param_user WHERE id = concat(v_param_name,'_',lower(v_cat_feature),'_vdefault');
 
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (118, null, 4, 'Delete values from config_api_form_fields related to parameter.');

@@ -102,7 +102,7 @@ BEGIN
 		
 		-- drop deprecated variables
 		DELETE FROM config_param_system WHERE isdeprecated = 'true';
-		DELETE FROM audit_cat_param_user WHERE isdeprecated is true;
+		DELETE FROM sys_param_user WHERE isdeprecated is true;
 		
 		-- drop deprecated views
 		IF v_projecttype = 'WS' THEN 

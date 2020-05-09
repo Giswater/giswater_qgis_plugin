@@ -62,8 +62,8 @@ INSERT INTO utils.type_street
   SELECT * FROM ws.ext_type_street;
 
 
-delete from ws.audit_cat_table where id='ext_type_street';
-delete from ws.audit_cat_table where id='ext_type_street';
+delete from ws.sys_cat_table where id='ext_type_street';
+delete from ws.sys_cat_table where id='ext_type_street';
 
 
 INSERT INTO utils.config_param_system(id, parameter, value, data_type, context, descript)
