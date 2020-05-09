@@ -23,7 +23,7 @@ BEGIN
 -- Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
 
-    SELECT * INTO v_record FROM audit_cat_error WHERE id=p_message;
+    SELECT * INTO v_record FROM sys_message WHERE id=p_message;
 
     IF v_record.message_type='alone' OR p_data IS NULL THEN
 		v_message = concat('{"level":"',v_record.loglevel,'", "text":"',v_record.error_message,'", "hint":"',v_record.hint_message,'"}');
