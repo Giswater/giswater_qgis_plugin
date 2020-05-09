@@ -509,9 +509,9 @@ BEGIN
 			END IF;
 		END IF;
 
-		--insert tank into anl_mincut_inlet_x_exploitation
+		--insert tank into config_mincut_inlet
 		IF v_man_table='man_tank' THEN
-			INSERT INTO anl_mincut_inlet_x_exploitation(node_id, expl_id)
+			INSERT INTO config_mincut_inlet(node_id, expl_id)
 			VALUES (NEW.node_id, NEW.expl_id);
 		END IF;
 
@@ -729,9 +729,9 @@ BEGIN
 			UPDATE man_tank SET pol_id=NEW.pol_id, vmax=NEW.vmax, vutil=NEW.vutil, area=NEW.area, chlorination=NEW.chlorination, name=NEW.name
 			WHERE node_id=OLD.node_id;
 			
-			--update anl_mincut_inlet_x_exploitation if exploitation changes
+			--update config_mincut_inlet if exploitation changes
 			IF NEW.expl_id != OLD.expl_id THEN
-				UPDATE anl_mincut_inlet_x_exploitation SET expl_id=NEW.expl_id WHERE node_id=NEW.node_id;
+				UPDATE config_mincut_inlet SET expl_id=NEW.expl_id WHERE node_id=NEW.node_id;
 			END IF;
 	
 		ELSIF v_man_table ='man_pump' THEN
@@ -850,8 +850,8 @@ BEGIN
 		-- delete from node table
 		DELETE FROM node WHERE node_id = OLD.node_id;
 
-		--remove node from anl_mincut_inlet_x_exploitation
-		DELETE FROM anl_mincut_inlet_x_exploitation WHERE node_id=OLD.node_id;
+		--remove node from config_mincut_inlet
+		DELETE FROM config_mincut_inlet WHERE node_id=OLD.node_id;
 
 		--Delete addfields (after or before deletion of node, doesn't matter)
 		DELETE FROM man_addfields_value WHERE feature_id = OLD.node_id  and parameter_id in 

@@ -76,7 +76,7 @@ BEGIN
 
 	-- closing check-valves
 	UPDATE temp_anlgraf SET flag = 1 
-	FROM anl_mincut_checkvalve c 
+	FROM config_mincut_checkvalve c 
 	WHERE (temp_anlgraf.node_1 = c.node_id OR temp_anlgraf.node_2 = c.node_id);
 	
 	-- setting the graf matrix with closed valves
@@ -161,7 +161,7 @@ BEGIN
 
 
 	-- looking for check-valves
-	FOR v_checkvalve IN SELECT anl_mincut_checkvalve.* FROM anl_mincut_result_valve JOIN anl_mincut_checkvalve USING (node_id) WHERE proposed = true and result_id = v_mincutid
+	FOR v_checkvalve IN SELECT config_mincut_checkvalve.* FROM anl_mincut_result_valve JOIN config_mincut_checkvalve USING (node_id) WHERE proposed = true and result_id = v_mincutid
 	LOOP
 		IF v_checkvalve.to_arc IN (SELECT arc_id FROM anl_mincut_result_arc WHERE result_id = v_mincutid) AND v_isrecursive IS NOT TRUE THEN  -- checkvalve is proposed valve and to_arc is wet
 
@@ -182,7 +182,7 @@ BEGIN
 	EXECUTE v_querytext;
 
 	-- set proposed = false for check valves (as they act as automatic mode)
-	v_querytext = 'UPDATE anl_mincut_result_valve v SET proposed=FALSE FROM (SELECT node_id FROM anl_mincut_checkvalve) a 
+	v_querytext = 'UPDATE anl_mincut_result_valve v SET proposed=FALSE FROM (SELECT node_id FROM config_mincut_checkvalve) a 
 		       WHERE a.node_id = v.node_id AND result_id = '||v_mincutid;
 	EXECUTE v_querytext;
 

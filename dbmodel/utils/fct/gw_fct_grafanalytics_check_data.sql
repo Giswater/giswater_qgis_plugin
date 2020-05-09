@@ -155,14 +155,14 @@ BEGIN
 	END IF;
 
 	-- inlet_x_exploitation
-	SELECT count(*) INTO v_count FROM anl_mincut_inlet_x_exploitation WHERE expl_id NOT IN (SELECT expl_id FROM exploitation);
+	SELECT count(*) INTO v_count FROM config_mincut_inlet WHERE expl_id NOT IN (SELECT expl_id FROM exploitation);
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 		VALUES (111, 3, concat('ERROR: There is/are at least ',v_count,' 
-		exploitation(s) bad configured on the anl_mincut_inlet_x_exploitation table. Please check your data before continue'));
+		exploitation(s) bad configured on the config_mincut_inlet table. Please check your data before continue'));
 	ELSE
 		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-		VALUES (111, 1, 'INFO: It seems anl_mincut_inlet_x_exploitation table is well configured. At least, table is filled with nodes from all exploitations.');
+		VALUES (111, 1, 'INFO: It seems config_mincut_inlet table is well configured. At least, table is filled with nodes from all exploitations.');
 	END IF;
 			
 	-- nodetype.grafdelimiter values

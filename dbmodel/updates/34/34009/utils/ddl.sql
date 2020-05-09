@@ -47,6 +47,8 @@ ALTER TABLE audit_log_feature RENAME to _audit_log_feature_ ;
 ALTER TABLE audit_log_project RENAME to _audit_log_project_ ;
 ALTER TABLE audit_log_csv2pg RENAME to _audit_log_csv2pg_ ;
 ALTER TABLE audit_log_arc_traceability RENAME to audit_arc_traceability;
+ALTER TABLE typevalue_fk RENAME to config_typevalue_fk;
+
 
 ALTER TABLE audit_cat_column RENAME to _audit_cat_column_;
 ALTER TABLE audit_price_simple RENAME to _audit_price_simple_;
