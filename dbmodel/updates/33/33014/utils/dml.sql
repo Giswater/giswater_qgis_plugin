@@ -24,10 +24,6 @@ WHERE id=2758;
 UPDATE audit_cat_param_user SET ismandatory=true WHERE formname = 'epaoptions';
 
 
--- 13/11/2019
-UPDATE typevalue_fk SET target_table='ext_cat_raster' WHERE target_table='cat_raster';
-
-
 INSERT INTO audit_cat_table(id, context, description, sys_role_id, sys_criticity, qgis_criticity,  isdeprecated)
     VALUES ('ext_cat_raster', 'external catalog', 'Catalog of rasters', 'role_edit', 0, 0, false)
     ON CONFLICT (id) DO NOTHING;

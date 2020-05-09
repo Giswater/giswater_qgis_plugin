@@ -9,3 +9,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2020/05/09
 SELECT gw_fct_admin_schema_manage_triggers('notify',null);
+
+-- 13/11/2019
+UPDATE config_typevalue_fk SET target_table='ext_cat_raster' WHERE target_table='cat_raster';

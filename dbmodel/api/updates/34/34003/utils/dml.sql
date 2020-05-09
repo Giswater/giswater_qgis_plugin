@@ -35,7 +35,7 @@ UPDATE config_api_form_fields SET layoutname = 'lyt_symbology' WHERE formtype='c
 UPDATE config_api_form_fields SET layoutname = 'lyt_other' WHERE formtype='catalog' AND layoutname = 'other_layout';
 
 -- 2020/03/19
-UPDATE typevalue_fk SET target_table = 'sys_message', target_field = 'message_type' WHERE typevalue_name = 'mtype_typevalue';
+UPDATE config_typevalue_fk SET target_table = 'sys_message', target_field = 'message_type' WHERE typevalue_name = 'mtype_typevalue';
 
 -- 2020/03/24
 UPDATE config_api_form_fields SET formtype= 'feature'  WHERE formname = 've_config_sysfields';

@@ -382,10 +382,10 @@ VALUES ('v_edit_samplepoint','form', 'verified', null, null, true, 'string',  'c
 
 --config_api_typevalue values and foreign keys config
 
-INSERT INTO typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
+INSERT INTO config_typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
 VALUES ('config_api_typevalue','widgettype_typevalue','config_api_form_fields','widgettype');
 
-INSERT INTO typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
+INSERT INTO config_typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
 VALUES ('config_api_typevalue','datatype_typevalue','config_api_form_fields','datatype');
 
 INSERT INTO config_api_typevalue (typevalue, id, idval) VALUES ('layout_name_typevalue','bot_layout_1','bot_layout_1');
@@ -401,7 +401,7 @@ INSERT INTO config_api_typevalue (typevalue, id, idval) VALUES ('layout_name_typ
 INSERT INTO config_api_typevalue (typevalue, id, idval) VALUES ('layout_name_typevalue','symbology_layout','symbology_layout');
 INSERT INTO config_api_typevalue (typevalue, id, idval) VALUES ('layout_name_typevalue','top_layout','top_layout');
 
-INSERT INTO typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
+INSERT INTO config_typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
 VALUES ('config_api_typevalue','layout_name_typevalue','config_api_form_fields','layout_name');
 
 INSERT INTO config_api_typevalue (typevalue, id, idval) VALUES ('formtype_typevalue','listHeader','listHeader');
@@ -413,13 +413,13 @@ INSERT INTO config_api_typevalue (typevalue, id, idval) VALUES ('formtype_typeva
 INSERT INTO config_api_typevalue (typevalue, id, idval) VALUES ('formtype_typevalue','lot','lot');
 INSERT INTO config_api_typevalue (typevalue, id, idval) VALUES ('formtype_typevalue','listfilter','listfilter');
 
-INSERT INTO typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
+INSERT INTO config_typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
 VALUES ('config_api_typevalue','formtype_typevalue','config_api_form_fields','formtype');
 
 INSERT INTO config_api_typevalue (typevalue, id, idval) VALUES ('formtemplate_typevalue','GENERIC','GENERIC');
 INSERT INTO config_api_typevalue (typevalue, id, idval) VALUES ('formtemplate_typevalue','custom feature','custom feature');
 
-INSERT INTO typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
+INSERT INTO config_typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
 VALUES ('config_api_typevalue','formtemplate_typevalue','config_api_layer','formtemplate');
 
 INSERT INTO config_api_typevalue (typevalue, id, idval) VALUES ('widgetfunction_typevalue','gwGetVisitManager','gwGetVisitManager');
@@ -435,7 +435,7 @@ INSERT INTO config_api_typevalue (typevalue, id, idval) VALUES ('widgetfunction_
 INSERT INTO config_api_typevalue (typevalue, id, idval) VALUES ('widgetfunction_typevalue','gwGetLot','gwGetLot');
 INSERT INTO config_api_typevalue (typevalue, id, idval) VALUES ('widgetfunction_typevalue','get_catalog_id','get_catalog_id');
 
-INSERT INTO typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
+INSERT INTO config_typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
 VALUES ('config_api_typevalue','widgetfunction_typevalue','config_api_form_fields','widgetfunction');
 
 INSERT INTO config_api_typevalue (typevalue, id, idval) VALUES ('tabname_typevalue','tab_hydrometer_val','tab_hydrometer_val');
@@ -465,20 +465,20 @@ INSERT INTO config_api_typevalue (typevalue, id, idval) VALUES ('tabname_typeval
 INSERT INTO config_api_typevalue (typevalue, id, idval) VALUES ('tabname_typevalue','tab_address','tab_address');
 INSERT INTO config_api_typevalue (typevalue, id, idval) VALUES ('tabname_typevalue','tab_connections','tab_connections');
 
-INSERT INTO typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
+INSERT INTO config_typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
 VALUES ('config_api_typevalue','tabname_typevalue','config_api_form_tabs','tabname');
 
 INSERT INTO config_api_typevalue (typevalue, id, idval) VALUES ('mtype_typevalue','withfeature','withfeature');
 INSERT INTO config_api_typevalue (typevalue, id, idval) VALUES ('mtype_typevalue','alone','alone');
 
-INSERT INTO typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
+INSERT INTO config_typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
 VALUES ('config_api_typevalue','mtype_typevalue','config_api_message','mtype');
 
 INSERT INTO config_api_typevalue (typevalue, id, idval) VALUES ('action_function_typevalue','action_workcat','action_workcat');
 INSERT INTO config_api_typevalue (typevalue, id, idval) VALUES ('action_function_typevalue','action_link','action_link');
 INSERT INTO config_api_typevalue (typevalue, id, idval) VALUES ('action_function_typevalue','action_catalog','action_catalog');
 
-INSERT INTO typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
+INSERT INTO config_typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
 VALUES ('config_api_typevalue','action_function_typevalue','config_api_form_fields','action_function');
 
 DELETE FROM config_api_visit WHERE visitclass_id NOT IN (SELECT id FROM om_visit_class);

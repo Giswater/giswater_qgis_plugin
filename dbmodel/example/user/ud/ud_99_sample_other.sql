@@ -226,11 +226,11 @@ INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('chamber_param_1','2','c
 INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('chamber_param_1','3','combo3');
 INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('chamber_param_1','4','combo4');
 
-INSERT INTO typevalue_fk(typevalue_table, typevalue_name, target_table, target_field, parameter_id) 
+INSERT INTO config_typevalue_fk(typevalue_table, typevalue_name, target_table, target_field, parameter_id) 
 SELECT 'edit_typevalue','sewstorage_param_1','man_addfields_value','value_param',id FROM man_addfields_parameter WHERE param_name='sewstorage_param_1';
-INSERT INTO typevalue_fk(typevalue_table, typevalue_name, target_table, target_field, parameter_id) 
+INSERT INTO config_typevalue_fk(typevalue_table, typevalue_name, target_table, target_field, parameter_id) 
 SELECT 'edit_typevalue','grate_param_1','man_addfields_value','value_param',id FROM man_addfields_parameter WHERE param_name='grate_param_1';
-INSERT INTO typevalue_fk(typevalue_table, typevalue_name, target_table, target_field, parameter_id) 
+INSERT INTO config_typevalue_fk(typevalue_table, typevalue_name, target_table, target_field, parameter_id) 
 SELECT 'edit_typevalue','chamber_param_1','man_addfields_value','value_param',id FROM man_addfields_parameter WHERE param_name='chamber_param_1';
 
 
