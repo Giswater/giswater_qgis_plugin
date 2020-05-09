@@ -57,7 +57,7 @@ BEGIN
         ELSE
 
             -- Check if extreme is being a inlet
-	    SELECT COUNT(*) INTO controlValue FROM anl_mincut_inlet_x_exploitation WHERE node_id = node_id_arg;
+	    SELECT COUNT(*) INTO controlValue FROM config_mincut_inlet WHERE node_id = node_id_arg;
 	    IF controlValue = 1 THEN
 		IF v_debug THEN
 			RAISE NOTICE ' Inserting into anl_mincut_result_node; %', node_id_arg;

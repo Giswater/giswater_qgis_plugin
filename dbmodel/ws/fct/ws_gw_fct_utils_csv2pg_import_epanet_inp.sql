@@ -93,7 +93,7 @@ BEGIN
 	IF v_delete_prev THEN
 		
 		DELETE FROM rpt_cat_result;
-		DELETE FROM anl_mincut_selector_valve;
+		DELETE FROM config_mincut_valve;
 
 		-- Disable constraints
 		PERFORM gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$);

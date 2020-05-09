@@ -17,8 +17,8 @@ INSERT INTO cat_users VALUES ('user4','user4');
 INSERT INTO cat_manager (idval, expl_id, username, active) VALUES ('general manager', '{1,2}', concat('{',current_user,'}')::text[], true);
 
 
-INSERT INTO anl_mincut_inlet_x_exploitation VALUES (2, 113766, 1, '{113906}');
-INSERT INTO anl_mincut_inlet_x_exploitation VALUES (3, 113952, 2, '{114146}');
+INSERT INTO config_mincut_inlet VALUES (2, 113766, 1, '{113906}');
+INSERT INTO config_mincut_inlet VALUES (3, 113952, 2, '{114146}');
 
 
 UPDATE plan_arc_x_pavement SET pavcat_id = 'Asphalt';
@@ -77,10 +77,10 @@ UPDATE node_type SET graf_delimiter='DQA' WHERE id IN('CLORINATHOR');
 UPDATE node_type SET graf_delimiter='DMA' WHERE id IN('FLOWMETER');
 UPDATE node_type SET graf_delimiter='SECTOR' WHERE id IN('SOURCE','TANK','WATERWELL','WTP');
 
-INSERT INTO anl_mincut_selector_valve VALUES('CHECK_VALVE');
-INSERT INTO anl_mincut_selector_valve VALUES('FL_CONTR_VALVE');
-INSERT INTO anl_mincut_selector_valve VALUES('GEN_PURP_VALVE');
-INSERT INTO anl_mincut_selector_valve VALUES('THROTTLE_VALVE');
+INSERT INTO config_mincut_valve VALUES('CHECK_VALVE');
+INSERT INTO config_mincut_valve VALUES('FL_CONTR_VALVE');
+INSERT INTO config_mincut_valve VALUES('GEN_PURP_VALVE');
+INSERT INTO config_mincut_valve VALUES('THROTTLE_VALVE');
 
 
 update ext_rtc_hydrometer SET state_id=1;
@@ -387,7 +387,7 @@ UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'audit_project_use
 
 --deprecated fields
 UPDATE arc SET _sys_length=NULL;
-UPDATE anl_mincut_inlet_x_exploitation SET _to_arc= NULL;
+UPDATE config_mincut_inlet SET _to_arc= NULL;
 
 
 -- adjustment of ischange
@@ -422,10 +422,10 @@ WHERE parameter = 'om_dynamicmapzones_status';
 
 UPDATE element SET code = concat ('E',element_id);
 
-UPDATE anl_mincut_inlet_x_exploitation SET config = '{"inletArc":["113907", "113905"]}'
+UPDATE config_mincut_inlet SET config = '{"inletArc":["113907", "113905"]}'
 WHERE node_id = '113766';
 
-UPDATE anl_mincut_inlet_x_exploitation SET config = '{"inletArc":["114145"]}'
+UPDATE config_mincut_inlet SET config = '{"inletArc":["114145"]}'
 WHERE node_id = '113952';
 
 UPDATE config_api_form_fields SET label = 'Presszone' WHERE column_id = 'presszonecat_id';

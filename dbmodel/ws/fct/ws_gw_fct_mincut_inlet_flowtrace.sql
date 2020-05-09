@@ -61,9 +61,9 @@ BEGIN
 		-- Init all inlets on graf table
 		UPDATE anl_mincut_arc_x_node
 		SET flag1=1, water=1 
-		FROM anl_mincut_inlet_x_exploitation 
-		JOIN selector_expl ON selector_expl.expl_id=anl_mincut_inlet_x_exploitation.expl_id 
-		WHERE anl_mincut_arc_x_node.node_id=anl_mincut_inlet_x_exploitation.node_id 
+		FROM config_mincut_inlet 
+		JOIN selector_expl ON selector_expl.expl_id=config_mincut_inlet.expl_id 
+		WHERE anl_mincut_arc_x_node.node_id=config_mincut_inlet.node_id 
 		AND anl_mincut_arc_x_node.node_id NOT IN (select node_id FROM anl_mincut_result_node WHERE result_id=result_id_arg)
 		AND cur_user=current_user AND anl_mincut_arc_x_node.user_name=current_user; 
 	ELSE 

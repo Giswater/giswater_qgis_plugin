@@ -189,7 +189,7 @@ BEGIN
 				
 			ELSE
 				-- Check if extreme if being a inlet
-				SELECT COUNT(*) INTO controlValue FROM anl_mincut_inlet_x_exploitation WHERE node_id = node_1_aux;
+				SELECT COUNT(*) INTO controlValue FROM config_mincut_inlet WHERE node_id = node_1_aux;
 			
 				IF controlValue = 0 THEN
 					-- Compute the tributary area using DFS
@@ -217,7 +217,7 @@ BEGIN
 				END IF;
 			ELSE
 				-- Check if extreme if being a inlet
-				SELECT COUNT(*) INTO controlValue FROM anl_mincut_inlet_x_exploitation WHERE node_id = node_2_aux;
+				SELECT COUNT(*) INTO controlValue FROM config_mincut_inlet WHERE node_id = node_2_aux;
 				IF controlValue = 0 THEN
 					-- Compute the tributary area using DFS
 					PERFORM gw_fct_mincut_engine(node_2_aux, result_id_arg);	
