@@ -806,36 +806,6 @@ class DaoController(object):
 
         return json_result
 
-
-    def get_error_from_audit(self, commit=True):
-        """ Get last error from audit tables that has not been showed to the user """
-        
-        if self.schema_name is None:
-            return                  
-        
-        sql = ("SELECT audit_function_actions.id, error_message, log_level, show_user"
-               " FROM audit_function_actions"
-               " INNER JOIN audit_cat_error"
-               " ON audit_function_actions.audit_cat_error_id = audit_cat_error.id"
-               " WHERE audit_cat_error.id != 0 AND debug_info is null"
-               " ORDER BY audit_function_actions.id DESC LIMIT 1")
-        result = self.dao.get_row(sql, commit)
-        if result:
-            if result['log_level'] <= 2:
-                sql = ("UPDATE audit_function_actions"
-                       " SET debug_info = 'showed'"
-                       " WHERE id = " + str(result['id']))
-                self.dao.execute_sql(sql, commit)
-                if result['show_user']:
-                    self.show_message(result['error_message'], result['log_level'])
-                return False    
-            elif result['log_level'] == 3:
-                # Debug message
-                pass
-            
-        return True
-
-
     def translate_tooltip(self, context_name, widget, idx=None):
         """ Translate tooltips widgets of the form to current language
             If we find a translation, it will be put
