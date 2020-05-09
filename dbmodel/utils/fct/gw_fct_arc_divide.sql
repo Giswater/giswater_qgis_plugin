@@ -306,7 +306,7 @@ BEGIN
 					END IF;
 							
 					-- Insert data into traceability table
-					INSERT INTO audit_log_arc_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", "user") 
+					INSERT INTO audit_arc_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", "cur_user") 
 					VALUES ('DIVIDE ARC',  v_arc_id, rec_aux1.arc_id, rec_aux2.arc_id, v_node_id,CURRENT_TIMESTAMP,CURRENT_USER);
 
 					-- Update elements from old arc to new arcs
@@ -508,7 +508,7 @@ BEGIN
 					VALUES (112, 1,concat('Insert arcs into current psector: ',v_psector,'.'));
 					
 					-- Insert data into traceability table
-					INSERT INTO audit_log_arc_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", "user") 
+					INSERT INTO audit_arc_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", "cur_user") 
 					VALUES ('DIVIDE WITH PLANIFIED NODE',  v_arc_id, rec_aux1.arc_id, rec_aux2.arc_id, v_node_id,CURRENT_TIMESTAMP,CURRENT_USER);
 
 					-- Set addparam (parent/child)
@@ -620,7 +620,7 @@ BEGIN
 					END IF;
 								
 					-- Insert data into traceability table
-					INSERT INTO audit_log_arc_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", "user") 
+					INSERT INTO audit_arc_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", "cur_user") 
 					VALUES ('DIVIDE PLANIFIED ARC',  v_arc_id, rec_aux1.arc_id, rec_aux2.arc_id, v_node_id,CURRENT_TIMESTAMP,CURRENT_USER);
 				
 					-- Update elements from old arc to new arcs

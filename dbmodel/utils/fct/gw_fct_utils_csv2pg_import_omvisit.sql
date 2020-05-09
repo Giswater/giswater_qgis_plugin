@@ -127,13 +127,6 @@ BEGIN
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('--------------------------------------------------------------------------------------'));
    
  	-- starting process
-	-- Insert into audit table
-	INSERT INTO audit_log_csv2pg 
-	(csv2pgcat_id, user_name,csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12,csv13,csv14,csv15,csv16,csv17,csv18,csv19,csv20)
-	SELECT csv2pgcat_id, user_name,csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12,csv13,csv14,csv15,csv16,csv17,csv18,csv19,csv20
-	FROM temp_csv2pg WHERE csv2pgcat_id=v_csv2pgcat_id AND user_name=current_user;
-
-
 	FOR v_visit IN SELECT * FROM temp_csv2pg WHERE csv2pgcat_id=v_csv2pgcat_id AND user_name=current_user
 	LOOP
 		RAISE NOTICE 'v_visit %', v_visit;

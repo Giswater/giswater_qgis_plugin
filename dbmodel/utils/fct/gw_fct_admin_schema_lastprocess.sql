@@ -213,14 +213,6 @@ BEGIN
 	
 		-- check project consistency
 		IF v_projecttype = 'WS' THEN
-	
-			-- look for inp_pattern_value bug (+18 values are not possible)
-			IF 	(SELECT id FROM inp_pattern_value where 
-				(factor_19 is not null or factor_20 is not null or factor_21 is not null or factor_22 is not null or factor_23 is not null or factor_24 is not null) LIMIT 1) THEN
-					INSERT INTO audit_log_project (fprocesscat_id, table_id, log_message) 
-					VALUES (33, 'inp_pattern_value', '{"version":"'||v_gwversion||'", "message":"There are some values on columns form 19 to 24. It must be deleted because it causes a bug on EPANET"}');
-					v_priority=1;
-			END IF;
 			
 		ELSIF v_projecttype = 'UD' THEN
 

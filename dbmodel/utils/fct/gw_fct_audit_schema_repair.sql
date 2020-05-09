@@ -31,7 +31,7 @@ BEGIN
 	SET search_path='SCHEMA_NAME', public;
 
 
-	DELETE FROM audit_log_project WHERE fprocesscat_id=18 AND user_name=current_user;
+	DELETE FROM audit_check_data WHERE fprocesscat_id=18 AND user_name=current_user;
 
 
 	-- UPDATE COLUMNS
@@ -58,16 +58,16 @@ BEGIN
 		
 		
 		IF rec_column.is_nullable='NO' THEN
-			INSERT INTO audit_log_project (fprocesscat_id, table_id, column_id, enabled, log_message) 
+			INSERT INTO audit_check_data (fprocesscat_id, table_id, column_id, enabled, error_message) 
 			VALUES (18, rec_column.table_name,rec_column.column_name, false, 'NOT NULL values for new columns are not enabled to automatic copy/paste of this function');
 		END IF;
 		
 		IF rec_column.udt_name='geometry' THEN 
-			INSERT INTO audit_log_project (fprocesscat_id, table_id, column_id, enabled, log_message) 
+			INSERT INTO audit_check_data (fprocesscat_id, table_id, column_id, enabled, error_message) 
 			VALUES (18, rec_column.table_name,rec_column.column_name, false, 'Geometry columns are not enabled to automatic copy/paste of this function');
 		ELSE
 			IF v_sql IS NOT NULL THEN
-				INSERT INTO audit_log_project (fprocesscat_id, table_id, column_id, enabled, log_message) 
+				INSERT INTO audit_check_data (fprocesscat_id, table_id, column_id, enabled, error_message) 
 				VALUES (18, rec_column.table_name,rec_column.column_name, true, v_sql );
 				EXECUTE v_sql;
 			END IF;
@@ -99,7 +99,7 @@ BEGIN
 	LOOP
 		IF rec_column.is_nullable != (select is_nullable FROM information_schema.columns where table_schema=p_schemaname 
 		AND table_name=rec_column.table_name AND column_name=rec_column.table_name) THEN
-			INSERT INTO audit_log_project (fprocesscat_id, table_id, column_id, enabled, log_message) 
+			INSERT INTO audit_check_data (fprocesscat_id, table_id, column_id, enabled, error_message) 
 			VALUES (18, rec_column.table_name,rec_column.column_name, false,  'NOT NULL constraint are diferents in both columns. Check it');
 			
 		END IF;
@@ -115,7 +115,7 @@ BEGIN
 	AND table_type = 'BASE TABLE'
 
 	LOOP
-			INSERT INTO audit_log_project (fprocesscat_id, table_id, column_id, enabled, log_message) 
+			INSERT INTO audit_check_data (fprocesscat_id, table_id, column_id, enabled, error_message) 
 			VALUES (18, rec_column.table_name, rec_column.column_name, false, concat('Data type is diferent. Should be: ',rec_column_record.udt_name' and it is different'));
 
 	END LOOP;
@@ -132,7 +132,7 @@ BEGIN
 		v_sql := concat('CREATE TABLE ',p_schemaname,'.',rec_table,' (LIKE SCHEMA_NAME.',rec_table,' INCLUDING CONSTRAINTS INCLUDING INDEXES INCLUDING DEFAULTS)');
 		EXECUTE v_sql;
 
-		INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) 
+		INSERT INTO audit_check_data (fprocesscat_id, table_id, enabled, error_message) 
 		VALUES (18, rec_table, true, v_sql);
 		
 		-- Set contraints
@@ -144,7 +144,7 @@ BEGIN
 
 		EXECUTE 'ALTER TABLE ' || rec_table || ' ALTER COLUMN ' || column_ || ' SET DEFAULT ' || v_default;
 
-		INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) 
+		INSERT INTO audit_check_data (fprocesscat_id, table_id, enabled, error_message) 
 		 VALUES (18, rec_table, true, concat('ALTER TABLE ',tablename,' ALTER COLUMN ',column_,' SET DEFAULT ',v_default ));
 		END LOOP;
 		
@@ -161,7 +161,7 @@ BEGIN
 	LOOP
 		EXECUTE 'CREATE SEQUENCE ' || p_schemaname || '.' || rec_table ||' INCREMENT 1  NO MINVALUE  NO MAXVALUE  START 1  CACHE 1';
 
-		INSERT INTO audit_log_project (fprocesscat_id, table_id, column_id, enabled, log_message) 
+		INSERT INTO audit_check_data (fprocesscat_id, table_id, column_id, enabled, error_message) 
 
 		VALUES (18, 'Sequence', v_sequence, true, concat ('CREATE SEQUENCE ',p_schemaname,'.',rec_table,' INCREMENT 1  NO MINVALUE  NO MAXVALUE  START 1  CACHE 1' ));
 	END LOOP;
@@ -172,10 +172,10 @@ BEGIN
 		SELECT column_name INTO column_aux FROM information_schema.columns WHERE table_schema='SCHEMA_NAME' AND table_name=rec_tablename.id AND ordinal_position=1;
 		IF column_aux IS NOT NULL THEN 
 			EXECUTE 'ALTER TABLE '||p_schemaname||'.'||rec_tablename.id||' ALTER COLUMN '||column_aux||' SET DEFAULT nextval('' '||p_schemaname||'.'||rec_tablename.sys_sequence||' ''::regclass)';
-			INSERT INTO audit_log_project (fprocesscat_id, table_id, column_id, enabled, log_message) 
+			INSERT INTO audit_check_data (fprocesscat_id, table_id, column_id, enabled, error_message) 
 			VALUES (18, rec_tablename.id, column_aux, true, v_sql );
 		ELSE
-			INSERT INTO audit_log_project (fprocesscat_id, table_id, column_id, enabled, log_message) 
+			INSERT INTO audit_check_data (fprocesscat_id, table_id, column_id, enabled, error_message) 
 			VALUES (18, v_tablename, column_aux, FALSE, 'Due an unexpected reason it was not possible to set default sequence value' );
 		END IF;
 			
