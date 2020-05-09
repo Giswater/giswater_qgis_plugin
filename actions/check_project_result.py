@@ -27,7 +27,7 @@ class CheckProjectResult(ApiParent):
         """ Fill table 'audit_check_project' with layers data """
 
         sql = ("DELETE FROM audit_check_project "
-               "WHERE user_name = current_user AND fprocesscat_id = 1")
+               "WHERE cur_user = current_user AND fprocesscat_id = 1")
         self.controller.execute_sql(sql)
         sql = ""
         for layer in layers:

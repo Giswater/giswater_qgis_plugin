@@ -711,7 +711,7 @@ class Go2Epa(ApiParent):
 
                     # delete previous values of user on temp table
                     sql = ("DELETE FROM temp_csv2pg "
-                           "WHERE user_name = current_user AND csv2pgcat_id = 11")
+                           "WHERE cur_user = current_user AND csv2pgcat_id = 11")
                     self.controller.execute_sql(sql)
 
                     # Importing file to temporal table

@@ -453,7 +453,7 @@ class ManageWorkcatEnd(ParentManage):
         if force_downgrade:
             sql = ("SELECT feature_type, feature_id, log_message "
                    "FROM audit_log_data "
-                   "WHERE  fprocesscat_id = '28' AND user_name = current_user")
+                   "WHERE  fprocesscat_id = '28' AND cur_user = current_user")
             rows = self.controller.get_rows(sql, log_sql=False)
             ids_ = ""
             if rows:
