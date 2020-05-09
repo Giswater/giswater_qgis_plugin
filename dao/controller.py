@@ -417,7 +417,7 @@ class DaoController(object):
             return       
 
         sql = ("SELECT error_message "
-               "FROM audit_cat_error "
+               "FROM sys_cat_error "
                "WHERE id = " + str(log_code_id))
         result = self.dao.get_row(sql)  
         if result:
