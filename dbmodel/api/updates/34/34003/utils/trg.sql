@@ -7,9 +7,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-INSERT INTO sys_table(id, context, description, sys_role_id, sys_criticity, qgis_criticity,isdeprecated)
-VALUES ('ext_district', 'table to external', 'Catalog of districts', 'role_edit', 0, 0, false);
-
-    
-UPDATE sys_table SET context='view from external schema'  WHERE id = 'ext_district';
+CREATE TRIGGER gw_trg_typevalue_fk AFTER INSERT OR UPDATE
+ON sys_message FOR EACH ROW EXECUTE PROCEDURE gw_trg_typevalue_fk('sys_message');
 

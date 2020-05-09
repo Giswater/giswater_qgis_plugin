@@ -128,8 +128,6 @@ UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh
 
 UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["cat_element"]}]' WHERE id ='element_type';
 
-SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_triggers('notify',null);
-
 INSERT INTO audit_cat_function(id, function_name, project_type, function_type,descript, sys_role_id, isdeprecated, istoolbox, isparametric)
 VALUES (2746, 'gw_fct_admin_manage_visit', 'utils', 'function', 'Create new visit class with parameters and form configuration',
 'role_om', FALSE, FALSE, FALSE);

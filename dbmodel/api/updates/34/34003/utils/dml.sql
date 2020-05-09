@@ -11,11 +11,11 @@ update config_api_form_fields SET dv_parent_id = 'arccat_id' WHERE formname = 'u
 update config_api_form_fields SET dv_parent_id = 'nodecat_id' WHERE formname = 'upsert_catalog_node' and formtype = 'catalog' and column_id ='matcat_id';
 update config_api_form_fields SET dv_parent_id = 'connecat_id' WHERE formname = 'upsert_catalog_connec' and formtype = 'catalog' and column_id ='matcat_id';
 
-INSERT INTO audit_cat_error (id, log_level, error_message, hint_message, message_type) SELECT * FROM config_api_message;
+INSERT INTO sys_message (id, log_level, error_message, hint_message, message_type) SELECT * FROM config_api_message;
 
 ALTER TABLE config_api_message RENAME TO _config_api_message_;
 
-UPDATE audit_cat_table SET isdeprecated = true WHERE id = 'config_api_message';
+UPDATE sys_table SET isdeprecated = true WHERE id = 'config_api_message';
 
 --2020/03/13
 UPDATE config_api_form_fields SET dv_querytext_filterc = replace(dv_querytext_filterc,'=','') WHERE dv_querytext_filterc is not null;
@@ -35,7 +35,7 @@ UPDATE config_api_form_fields SET layoutname = 'lyt_symbology' WHERE formtype='c
 UPDATE config_api_form_fields SET layoutname = 'lyt_other' WHERE formtype='catalog' AND layoutname = 'other_layout';
 
 -- 2020/03/19
-UPDATE typevalue_fk SET target_table = 'audit_cat_error', target_field = 'message_type' WHERE typevalue_name = 'mtype_typevalue';
+UPDATE typevalue_fk SET target_table = 'sys_message', target_field = 'message_type' WHERE typevalue_name = 'mtype_typevalue';
 
 -- 2020/03/24
 UPDATE config_api_form_fields SET formtype= 'feature'  WHERE formname = 've_config_sysfields';

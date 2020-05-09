@@ -25,7 +25,7 @@ BEGIN
 	v_schemaname = 'SCHEMA_NAME';
 
 
-	FOR table_record IN SELECT * FROM sys_cat_table WHERE isaudit  IS TRUE
+	FOR table_record IN SELECT * FROM sys_table WHERE isaudit  IS TRUE
 	LOOP 
 		EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_audit'||table_record.id||' ON '||table_record.id;
 		IF p_action='enable' THEN

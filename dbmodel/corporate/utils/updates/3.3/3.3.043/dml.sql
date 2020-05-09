@@ -8,5 +8,5 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
     
-UPDATE sys_cat_table SET context='view from external schema'  WHERE id = 'v_ext_raster_dem';
+UPDATE sys_table SET context='view from external schema'  WHERE id = 'v_ext_raster_dem';
 

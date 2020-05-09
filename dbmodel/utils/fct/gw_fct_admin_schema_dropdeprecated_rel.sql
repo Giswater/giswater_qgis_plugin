@@ -27,14 +27,14 @@ BEGIN
 	--TODO 
 
 	-- Drop views
-	FOR v_tablerecord IN SELECT * FROM sys_cat_table WHERE isdeprecated IS TRUE AND id IN (SELECT table_name FROM information_schema.views WHERE table_schema=v_schemaname) 
+	FOR v_tablerecord IN SELECT * FROM sys_table WHERE isdeprecated IS TRUE AND id IN (SELECT table_name FROM information_schema.views WHERE table_schema=v_schemaname) 
 	LOOP
 		v_query_text:= 'DROP VIEW IF EXISTS '||v_tablerecord.id||';';
 		EXECUTE v_query_text;
 	END LOOP;
 
 	-- Drop tables
-	FOR v_tablerecord IN SELECT * FROM sys_cat_table WHERE isdeprecated IS TRUE AND id NOT IN (SELECT table_name FROM information_schema.views WHERE table_schema=v_schemaname) 
+	FOR v_tablerecord IN SELECT * FROM sys_table WHERE isdeprecated IS TRUE AND id NOT IN (SELECT table_name FROM information_schema.views WHERE table_schema=v_schemaname) 
 	LOOP
 		v_query_text:= 'DROP TABLE IF EXISTS '||v_tablerecord.id||' CASCADE;';
 		EXECUTE v_query_text;

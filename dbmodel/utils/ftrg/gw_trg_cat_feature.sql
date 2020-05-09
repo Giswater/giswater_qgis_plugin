@@ -62,14 +62,14 @@ BEGIN
 	END IF;
 
 
-	-- manage audit_cat_param_user parameters
+	-- manage sys_param_user parameters
 	IF (TG_OP = 'INSERT' OR  TG_OP = 'UPDATE') THEN
 
 		-- set layoutname
 		v_layout = concat('lyt_', lower(NEW.feature_type),'_vdef');
 		
 		-- set layout_order
-		SELECT max(layout_order)+1 INTO v_layout_order FROM audit_cat_param_user WHERE formname='config' and layoutname=v_layout;
+		SELECT max(layout_order)+1 INTO v_layout_order FROM sys_param_user WHERE formname='config' and layoutname=v_layout;
 
 		IF v_projecttype = 'WS' THEN
 			v_partialquerytext =  concat('JOIN ',lower(NEW.feature_type),'_type ON ',lower(NEW.feature_type),'_type.id = ',
@@ -98,10 +98,10 @@ BEGIN
 
 		-- insert parameter
 		IF TG_OP = 'UPDATE' THEN
-			DELETE FROM audit_cat_param_user WHERE id = concat(lower(OLD.id),'_vdefault');        
+			DELETE FROM sys_param_user WHERE id = concat(lower(OLD.id),'_vdefault');        
 		END IF;
 
-		INSERT INTO audit_cat_param_user(id, formname, descript, sys_role_id, label, isenabled, layoutname, layout_order, 
+		INSERT INTO sys_param_user(id, formname, descript, sys_role_id, label, isenabled, layoutname, layout_order, 
 		dv_querytext, feature_field_id, project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated, iseditable)
 		VALUES (concat(v_id,'_vdefault'),'config',concat ('Value default catalog for ',v_id,' cat_feature'), 'role_edit', concat ('Default catalog for ', v_id), true, v_layout ,v_layout_order,
 		v_querytext, v_feature_field_id, lower(v_projecttype),false,false,'text', 'combo', true, false, true)
@@ -205,8 +205,8 @@ BEGIN
 		--delete definition from config_api_tableinfo_x_infotype
 		DELETE FROM config_api_tableinfo_x_infotype where tableinfo_id=OLD.child_layer OR tableinfotype_id=OLD.child_layer;
 
-		-- delete audit_cat_param_user parameters
-		DELETE FROM audit_cat_param_user WHERE id = concat(lower(OLD.id),'_vdefault');
+		-- delete sys_param_user parameters
+		DELETE FROM sys_param_user WHERE id = concat(lower(OLD.id),'_vdefault');
 
 		RETURN NULL;
 

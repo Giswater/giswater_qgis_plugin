@@ -76,9 +76,6 @@ isdeprecated, istoolbox, alias, isparametric)
 VALUES (2822, 'gw_fct_manage_roles', 'utils', 'function', null, null, null,'Function to manage system roles', 'role_admin',
 false, false, null, false) ON CONFLICT (id) DO NOTHING;
 
---update audit_cat_param_user with cat_feature vdefaults
-UPDATE cat_feature SET id=id;
-
 
 INSERT INTO audit_cat_function(id, function_name, project_type, function_type, input_params, return_type, context, descript, sys_role_id, 
 isdeprecated, istoolbox, alias, isparametric)

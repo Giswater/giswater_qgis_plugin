@@ -245,9 +245,6 @@ UPDATE audit_cat_table SET notify_action =
 '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"dscenario_id","featureType":["v_edit_inp_demand"]}]' 
 WHERE id='cat_dscenario';	
 
-
-SELECT gw_fct_admin_schema_manage_triggers('notify',null);
-
 UPDATE sys_csv2pg_config SET target='Node Results, MINIMUM Node' WHERE tablename='rpt_node';
 UPDATE sys_csv2pg_config SET target='MINIMUM Link, Link Results' WHERE tablename='rpt_arc';
 UPDATE sys_csv2pg_config SET target='Pump Factor' WHERE tablename='rpt_energy_usage';

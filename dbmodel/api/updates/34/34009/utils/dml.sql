@@ -7,6 +7,9 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-CREATE TRIGGER gw_trg_typevalue_fk AFTER INSERT OR UPDATE
-ON audit_cat_error FOR EACH ROW EXECUTE PROCEDURE gw_trg_typevalue_fk('audit_cat_error');
+ALTER TABLE config_api_visit RENAME TO _config_api_visit_;
 
+UPDATE om_visit_class SET formname = a.formname, tablename = a.tablename FROM _config_api_visit_ a WHERE om_visit_class.id = a.visitclass_id;
+
+--update audit_cat_param_user with cat_feature vdefaults
+UPDATE cat_feature SET id=id;

@@ -25,7 +25,6 @@ ON CONFLICT (parameter) DO NOTHING;
 UPDATE audit_cat_table SET notify_action = replace(notify_action::text,'refresh_canvas','indexing_spatial_layer')::json WHERE 
 notify_action::text ilike '%refresh_canvas%';
 
-select gw_fct_admin_schema_manage_triggers('notify',null);
 
 INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
 VALUES (2762, 'gw_fct_odbc2pg_main', 'utils', 'function', 'Main function to return with values from ODBC systems','role_om',FALSE, FALSE,FALSE)

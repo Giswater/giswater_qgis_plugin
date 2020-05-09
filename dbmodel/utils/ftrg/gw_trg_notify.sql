@@ -48,7 +48,7 @@ BEGIN
 
 	v_table = TG_ARGV[0];
 
-	v_query = 'SELECT json_array_elements_text(notify_action) as data FROM audit_cat_table WHERE id ='''||v_table||'''';
+	v_query = 'SELECT json_array_elements_text(notify_action) as data FROM sys_table WHERE id ='''||v_table||'''';
 	
 	FOR rec IN EXECUTE v_query LOOP
 

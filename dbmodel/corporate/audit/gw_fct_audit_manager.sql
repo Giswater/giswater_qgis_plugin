@@ -17,7 +17,7 @@ BEGIN
 --	Set search path to local schema
 	SET search_path = SCHEMA_NAME, public;
 	
-	FOR table_record IN SELECT * FROM sys_cat_table WHERE isaudit  IS TRUE
+	FOR table_record IN SELECT * FROM sys_table WHERE isaudit  IS TRUE
 	LOOP 
 		DELETE FROM audit.log WHERE (date (now())- date (tstamp)) > table_record.keepauditdays;
 	END LOOP;	

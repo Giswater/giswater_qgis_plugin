@@ -51,7 +51,7 @@ BEGIN
 
 
 	-- copy data using primary key
-	FOR v_tablerecord IN SELECT * FROM sys_cat_table WHERE isdeprecated IS FALSE AND id NOT IN ('config_param_system')
+	FOR v_tablerecord IN SELECT * FROM sys_table WHERE isdeprecated IS FALSE AND id NOT IN ('config_param_system')
 	AND id IN (SELECT table_name FROM information_schema.tables WHERE table_schema=v_fromschema AND table_type='BASE TABLE') 
 	AND id IN (SELECT table_name FROM information_schema.tables WHERE table_schema=v_toschema AND table_type='BASE TABLE') AND id NOT IN('price_value_unit', 'temp_table')
 	LOOP

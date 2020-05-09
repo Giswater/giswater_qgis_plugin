@@ -13,15 +13,14 @@ INSERT INTO om_visit_cat VALUES (3, 'Test num.3','2017-8-1', '2017-9-30', NULL, 
 INSERT INTO om_visit_cat VALUES (4, 'Test num.4','2017-10-1', '2017-12-31', NULL, TRUE);
 
 
-INSERT INTO om_visit_class VALUES (6, 'Inspection and clean arc', NULL, true, false, true, 'ARC', 'role_om', 1);
-INSERT INTO om_visit_class VALUES (5, 'Inspection and clean node', NULL, true, false, true, 'NODE', 'role_om', 1);
-INSERT INTO om_visit_class VALUES (7, 'Inspection and clean embornals', NULL, true, false, true, 'CONNEC', 'role_om', 1);
-INSERT INTO om_visit_class VALUES (1, 'Leak on pipe', NULL, true, false, false, 'ARC', 'role_om', 1);
-INSERT INTO om_visit_class VALUES (0, 'Open visit', NULL, true, true, false, NULL, 'role_om');
-INSERT INTO om_visit_class VALUES (2, 'Inspection and clean connec', NULL, true, false, true, 'CONNEC', 'role_om', 1);
-INSERT INTO om_visit_class VALUES (4, 'Leak on connec', NULL, true, false, false, 'CONNEC', 'role_om', 1);
-INSERT INTO om_visit_class VALUES (3, 'Leak on node', NULL, true, false, false, 'NODE', 'role_om', 1);
-INSERT INTO om_visit_class VALUES (8, 'Incident', NULL, true, false, true, null, 'role_om', 2);
+INSERT INTO om_visit_class VALUES (6, 'Inspection and clean arc', NULL, true, false, true, 'ARC', 'role_om', 1, null, 'visit_arc_insp', 've_visit_arc_insp');
+INSERT INTO om_visit_class VALUES (5, 'Inspection and clean node', NULL, true, false, true, 'NODE', 'role_om', 1, null, 'visit_node_insp', 've_visit_node_insp');
+INSERT INTO om_visit_class VALUES (1, 'Leak on pipe', NULL, true, false, false, 'ARC', 'role_om', 1, null, 'visit_arc_leak', 've_visit_arc_singlevent');
+INSERT INTO om_visit_class VALUES (0, 'Open visit', NULL, true, true, false, NULL, 'role_om', null,  null,'visit_class_0', 'om_visit');
+INSERT INTO om_visit_class VALUES (2, 'Inspection and clean connec', NULL, true, false, true, 'CONNEC', 'role_om', 1, null, 'visit_connec_insp', 've_visit_connec_insp');
+INSERT INTO om_visit_class VALUES (4, 'Leak on connec', NULL, true, false, false, 'CONNEC', 'role_om', 1, null, 'visit_connec_leak', 've_visit_connec_singlevent');
+INSERT INTO om_visit_class VALUES (3, 'Leak on node', NULL, true, false, false, 'NODE', 'role_om', 1, null, 'visit_node_leak', 've_visit_node_singlevent');
+
 
 SELECT setval('SCHEMA_NAME.om_visit_class_id_seq', (SELECT max(id) FROM om_visit_class), true);
 
@@ -54,9 +53,7 @@ INSERT INTO om_visit_class_x_parameter VALUES (7, 5, 'defect_node');
 INSERT INTO om_visit_class_x_parameter VALUES (8, 5, 'clean_node');
 INSERT INTO om_visit_class_x_parameter VALUES (9, 1, 'leak_arc');
 INSERT INTO om_visit_class_x_parameter VALUES (10, 3, 'leak_node');
-INSERT INTO om_visit_class_x_parameter VALUES (11, 4, 'leak_connec');
-INSERT INTO om_visit_class_x_parameter VALUES (12, 8, 'incident_comment');
-INSERT INTO om_visit_class_x_parameter VALUES (13, 8, 'incident_type');
+INSERT INTO om_visit_class_x_parameter VALUES (11, 4, 'leak_connec');;
 INSERT INTO om_visit_class_x_parameter VALUES (3, 6, 'defect_arc');
 INSERT INTO om_visit_class_x_parameter VALUES (14, 2, 'defect_connec');
 
@@ -220,14 +217,6 @@ INSERT INTO config_api_visit_x_featuretable VALUES ('v_edit_node', 3);
 INSERT INTO config_api_visit_x_featuretable VALUES ('v_edit_connec', 4);
 INSERT INTO config_api_visit_x_featuretable VALUES ('v_edit_connec', 2);
 
-truncate config_api_visit;
-INSERT INTO config_api_visit VALUES (2, 'visit_connec_insp', 've_visit_connec_insp');
-INSERT INTO config_api_visit VALUES (1, 'visit_arc_leak', 've_visit_arc_singlevent');
-INSERT INTO config_api_visit VALUES (3, 'visit_node_leak', 've_visit_node_singlevent');
-INSERT INTO config_api_visit VALUES (4, 'visit_connec_leak', 've_visit_connec_singlevent');
-INSERT INTO config_api_visit VALUES (5, 'visit_node_insp', 've_visit_node_insp');
-INSERT INTO config_api_visit VALUES (6, 'visit_arc_insp', 've_visit_arc_insp');
-INSERT INTO config_api_visit VALUES (0, 'visit_class_0', 'om_visit');
 
 SELECT setval('SCHEMA_NAME.config_api_form_fields_id_seq', (SELECT max(id) FROM config_api_form_fields), true);
 

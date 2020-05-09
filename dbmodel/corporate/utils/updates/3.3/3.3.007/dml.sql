@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "utils", public, pg_catalog;
 
 
-UPDATE sys_cat_table SET context='view from external schema'  WHERE id IN ('ext_municipality','ext_streetaxis','ext_plot','ext_type_street','ext_address');
+UPDATE sys_table SET context='view from external schema'  WHERE id IN ('ext_municipality','ext_streetaxis','ext_plot','ext_type_street','ext_address');
 
 
 

@@ -8,3 +8,4 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2020/05/09
+SELECT gw_fct_admin_schema_manage_triggers('notify',null);

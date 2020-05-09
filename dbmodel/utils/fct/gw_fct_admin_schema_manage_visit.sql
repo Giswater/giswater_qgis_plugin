@@ -284,12 +284,12 @@ IF v_action = 'CREATE' THEN
 		
 	ELSIF v_action_type = 'parameter' THEN
 		
-		IF v_viewname NOT IN (SELECT id FROM sys_cat_table) AND v_ismultievent iS TRUE THEN
-			INSERT INTO sys_cat_table (id, context, description, sys_role_id, sys_criticity, qgis_criticity, isdeprecated)
+		IF v_viewname NOT IN (SELECT id FROM sys_table) AND v_ismultievent iS TRUE THEN
+			INSERT INTO sys_table (id, context, description, sys_role_id, sys_criticity, qgis_criticity, isdeprecated)
 			VALUES (v_viewname, 'O&M', 'Editable view that saves visits', 'role_om', 0, 0, false);
 
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (119, null, 4, concat('Insert view name into sys_cat_table.'));
+			VALUES (119, null, 4, concat('Insert view name into sys_table.'));
 		END IF;
 
 		--insert new parameter
@@ -376,7 +376,7 @@ IF v_action = 'UPDATE' AND v_action_type = 'class' THEN
 
  		EXECUTE 'ALTER VIEW '||v_old_viewname||' RENAME TO '||v_viewname||';';
 
- 		UPDATE sys_cat_table SET id = v_viewname WHERE id = v_old_viewname;
+ 		UPDATE sys_table SET id = v_viewname WHERE id = v_old_viewname;
 
  		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 		VALUES (119, null, 4, concat('Change visit view name to ',v_viewname,' for class ',v_class_id,'.'));
@@ -467,7 +467,7 @@ ELSIF v_action = 'DELETE' AND v_action_type = 'class' THEN
 			DELETE FROM om_visit_class_x_parameter WHERE class_id = v_class_id;
 			DELETE FROM om_visit_parameter WHERE id IN (SELECT parameter_id FROM om_visit_class_x_parameter WHERE class_id = v_class_id);
 			DELETE FROM om_visit_class WHERE id = v_class_id;
-			DELETE FROM sys_cat_table WHERE id = v_viewname;			
+			DELETE FROM sys_table WHERE id = v_viewname;			
 			
 		ELSE
 			UPDATE om_visit_class SET active = FALSE WHERE id = v_class_id;
@@ -496,13 +496,13 @@ ELSIF v_action = 'CONFIGURATION' THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (119, null, 4, concat('Insert visit configuration into config_api_visit. Class: ',v_class_id, ', view: ',v_viewname, '.'));
 			
-			IF v_viewname NOT IN (SELECT id FROM sys_cat_table) AND v_ismultievent iS TRUE THEN
-				INSERT INTO sys_cat_table (id, context, description, sys_role_id, sys_criticity, qgis_criticity, isdeprecated)
+			IF v_viewname NOT IN (SELECT id FROM sys_table) AND v_ismultievent iS TRUE THEN
+				INSERT INTO sys_table (id, context, description, sys_role_id, sys_criticity, qgis_criticity, isdeprecated)
 				VALUES (v_viewname, 'O&M', 'Editable view that saves visits', 'role_om', 0, 0, false);
-				raise notice 'multi -  sys_cat_table';
+				raise notice 'multi -  sys_table';
 
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (119, null, 4, concat('Insert view name into sys_cat_table.'));
+				VALUES (119, null, 4, concat('Insert view name into sys_table.'));
 			END IF;
 
 

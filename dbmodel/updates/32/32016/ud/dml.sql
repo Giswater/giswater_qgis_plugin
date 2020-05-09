@@ -150,8 +150,6 @@ UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh
 
 UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"location_type, feature_type","featureType":["arc", "node", "connec","gully"]}]' WHERE id ='man_type_location';
 
-SELECT gw_fct_admin_schema_manage_triggers('notify',null);
-
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_temp', 'WINDSPEED MONTHLY', 'WINDSPEED MONTHLY');
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_temp', 'WINDSPEED FILE', 'WINDSPEED FILE');
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_temp', 'ADC IMPERVIOUS', 'ADC IMPERVIOUS');

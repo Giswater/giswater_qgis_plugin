@@ -17,7 +17,5 @@ UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh
 UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_config_user_variables", "enabled":"true", "trg_fields":"parameter,value, cur_user","featureType":[""]}]' WHERE id = 'config_param_user';
 UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_config_system_variables", "enabled":"true", "trg_fields":"parameter, value, data_type, context, descript, label","featureType":[""]}]' WHERE id = 'config_param_system';
 
---create notify trg
-SELECT gw_fct_admin_schema_manage_triggers('notify',null);
 
 UPDATE audit_cat_param_user SET dv_querytext = 'SELECT id as id, id as idval FROM cat_node WHERE id IS null', isenabled = TRUE, layout_id = 5, layout_order = 6 , formname = 'config' WHERE id = 'cad_tools_base_layer_vdefault';

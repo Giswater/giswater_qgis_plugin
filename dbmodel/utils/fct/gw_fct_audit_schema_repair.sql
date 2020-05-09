@@ -167,7 +167,7 @@ BEGIN
 	END LOOP;
 	
 	-- Set sequences
-	FOR rec_tablename IN SELECT * FROM sys_cat_table WHERE sys_sequence IS NOT NULL AND isdeprecated IS FALSE
+	FOR rec_tablename IN SELECT * FROM sys_table WHERE sys_sequence IS NOT NULL AND isdeprecated IS FALSE
 	LOOP 
 		SELECT column_name INTO column_aux FROM information_schema.columns WHERE table_schema='SCHEMA_NAME' AND table_name=rec_tablename.id AND ordinal_position=1;
 		IF column_aux IS NOT NULL THEN 
