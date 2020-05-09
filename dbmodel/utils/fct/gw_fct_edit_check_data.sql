@@ -18,7 +18,7 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
 	
-	DELETE FROM audit_check_data WHERE user_name="current_user"() AND audit_check_data.fprocesscat_id=38;
+	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND audit_check_data.fprocesscat_id=38;
 	
 	
     RETURN vjson;

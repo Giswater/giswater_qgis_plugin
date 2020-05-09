@@ -72,7 +72,7 @@ BEGIN
 	p_node2 = (((p_data ->>'data')::json->>'parameters')::json->>'node2')::text;
 
 	-- manage log (fprocesscat = 113)
-	DELETE FROM audit_check_data WHERE fprocesscat_id=113 AND user_name=current_user;
+	DELETE FROM audit_check_data WHERE fprocesscat_id=113 AND cur_user=current_user;
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (113,  concat('NODE INTERPOLATE'));
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (113,  concat('------------------------------'));
 
@@ -152,7 +152,7 @@ BEGIN
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=113 order by 
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=113 order by 
 	criticity desc, id asc) row; 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result,'}');

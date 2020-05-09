@@ -108,8 +108,8 @@ BEGIN
 
 	-- Insert into audit table
 	INSERT INTO audit_log_csv2pg 
-	(csv2pgcat_id, user_name,csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12,csv13,csv14,csv15,csv16,csv17,csv18,csv19,csv20)
-	SELECT csv2pgcat_id, user_name,csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12,csv13,csv14,csv15,csv16,csv17,csv18,csv19,csv20
+	(csv2pgcat_id, cur_user,csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12,csv13,csv14,csv15,csv16,csv17,csv18,csv19,csv20)
+	SELECT csv2pgcat_id, cur_user,csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12,csv13,csv14,csv15,csv16,csv17,csv18,csv19,csv20
 	FROM temp_csv2pg WHERE csv2pgcat_id=17 order by id;
 
 	-- insert into ext_timeseries table
@@ -118,35 +118,35 @@ BEGIN
 		FROM crosstab('SELECT csv2pgcat_id,csv1, csv2 FROM temp_csv2pg WHERE csv2pgcat_id=17'::text, ' VALUES (''code''),(''operator''),(''catalog_id''),(''element''),(''param''),(''period''),(''timestep'')'::text) 
 				ct(id integer, code text, operator text, catalog_id text, element text, param text, period text, timestep text) 
 		JOIN (select 17 as id , (array_agg(value))::float[] as val from (
-			SELECT id, 2 as row, csv2 as value FROM temp_csv2pg WHERE csv1='val' AND csv2 IS NOT NULL AND csv2pgcat_id=17 AND user_name=current_user UNION
-			SELECT id, 3, csv3 FROM temp_csv2pg WHERE csv1='val' AND csv3 IS NOT NULL AND csv2pgcat_id=17 AND user_name=current_user UNION
-			SELECT id, 4, csv4 FROM temp_csv2pg WHERE csv1='val' AND csv4 IS NOT NULL AND csv2pgcat_id=17 AND user_name=current_user UNION
-			SELECT id, 5, csv5 FROM temp_csv2pg WHERE csv1='val' AND csv5 IS NOT NULL AND csv2pgcat_id=17 AND user_name=current_user UNION
-			SELECT id, 6, csv6 FROM temp_csv2pg WHERE csv1='val' AND csv6 IS NOT NULL AND csv2pgcat_id=17 AND user_name=current_user UNION
-			SELECT id, 7, csv7 FROM temp_csv2pg WHERE csv1='val' AND csv7 IS NOT NULL AND csv2pgcat_id=17 AND user_name=current_user UNION
-			SELECT id, 8, csv8 FROM temp_csv2pg WHERE csv1='val' AND csv8 IS NOT NULL AND csv2pgcat_id=17 AND user_name=current_user UNION
-			SELECT id, 9, csv9 FROM temp_csv2pg WHERE csv1='val' AND csv9 IS NOT NULL AND csv2pgcat_id=17 AND user_name=current_user UNION
-			SELECT id, 10, csv10 FROM temp_csv2pg WHERE csv1='val' AND csv10 IS NOT NULL AND csv2pgcat_id=17 AND user_name=current_user UNION
-			SELECT id, 11, csv11 FROM temp_csv2pg WHERE csv1='val' AND csv11 IS NOT NULL AND csv2pgcat_id=17 AND user_name=current_user UNION
-			SELECT id, 12, csv12 FROM temp_csv2pg WHERE csv1='val' AND csv12 IS NOT NULL AND csv2pgcat_id=17 AND user_name=current_user UNION
-			SELECT id, 13, csv13 FROM temp_csv2pg WHERE csv1='val' AND csv13 IS NOT NULL AND csv2pgcat_id=17 AND user_name=current_user UNION
-			SELECT id, 14, csv14 FROM temp_csv2pg WHERE csv1='val' AND csv14 IS NOT NULL AND csv2pgcat_id=17 AND user_name=current_user UNION
-			SELECT id, 15, csv15 FROM temp_csv2pg WHERE csv1='val' AND csv15 IS NOT NULL AND csv2pgcat_id=17 AND user_name=current_user UNION
-			SELECT id, 16, csv16 FROM temp_csv2pg WHERE csv1='val' AND csv16 IS NOT NULL AND csv2pgcat_id=17 AND user_name=current_user UNION
-			SELECT id, 17, csv17 FROM temp_csv2pg WHERE csv1='val' AND csv17 IS NOT NULL AND csv2pgcat_id=17 AND user_name=current_user UNION
-			SELECT id, 18, csv18 FROM temp_csv2pg WHERE csv1='val' AND csv18 IS NOT NULL AND csv2pgcat_id=17 AND user_name=current_user UNION
-			SELECT id, 19, csv19 FROM temp_csv2pg WHERE csv1='val' AND csv19 IS NOT NULL AND csv2pgcat_id=17 AND user_name=current_user UNION
-			SELECT id, 20, csv20 FROM temp_csv2pg WHERE csv1='val' AND csv20 IS NOT NULL AND csv2pgcat_id=17 AND user_name=current_user UNION
-			SELECT id, 21, csv21 FROM temp_csv2pg WHERE csv1='val' AND csv21 IS NOT NULL AND csv2pgcat_id=17 AND user_name=current_user UNION
-			SELECT id, 22, csv22 FROM temp_csv2pg WHERE csv1='val' AND csv22 IS NOT NULL AND csv2pgcat_id=17 AND user_name=current_user UNION
-			SELECT id, 23, csv23 FROM temp_csv2pg WHERE csv1='val' AND csv23 IS NOT NULL AND csv2pgcat_id=17 AND user_name=current_user UNION
-			SELECT id, 24, csv24 FROM temp_csv2pg WHERE csv1='val' AND csv24 IS NOT NULL AND csv2pgcat_id=17 AND user_name=current_user UNION
-			SELECT id, 25, csv25 FROM temp_csv2pg WHERE csv1='val' AND csv25 IS NOT NULL AND csv2pgcat_id=17 AND user_name=current_user UNION
-			SELECT id, 26, csv26 FROM temp_csv2pg WHERE csv1='val' AND csv26 IS NOT NULL AND csv2pgcat_id=17 AND user_name=current_user UNION
-			SELECT id, 27, csv27 FROM temp_csv2pg WHERE csv1='val' AND csv27 IS NOT NULL AND csv2pgcat_id=17 AND user_name=current_user UNION
-			SELECT id, 28, csv28 FROM temp_csv2pg WHERE csv1='val' AND csv28 IS NOT NULL AND csv2pgcat_id=17 AND user_name=current_user UNION
-			SELECT id, 29, csv29 FROM temp_csv2pg WHERE csv1='val' AND csv29 IS NOT NULL AND csv2pgcat_id=17 AND user_name=current_user UNION
-			SELECT id, 30, csv30 FROM temp_csv2pg WHERE csv1='val' AND csv30 IS NOT NULL AND csv2pgcat_id=17 AND user_name=current_user UNION
+			SELECT id, 2 as row, csv2 as value FROM temp_csv2pg WHERE csv1='val' AND csv2 IS NOT NULL AND csv2pgcat_id=17 AND cur_user=current_user UNION
+			SELECT id, 3, csv3 FROM temp_csv2pg WHERE csv1='val' AND csv3 IS NOT NULL AND csv2pgcat_id=17 AND cur_user=current_user UNION
+			SELECT id, 4, csv4 FROM temp_csv2pg WHERE csv1='val' AND csv4 IS NOT NULL AND csv2pgcat_id=17 AND cur_user=current_user UNION
+			SELECT id, 5, csv5 FROM temp_csv2pg WHERE csv1='val' AND csv5 IS NOT NULL AND csv2pgcat_id=17 AND cur_user=current_user UNION
+			SELECT id, 6, csv6 FROM temp_csv2pg WHERE csv1='val' AND csv6 IS NOT NULL AND csv2pgcat_id=17 AND cur_user=current_user UNION
+			SELECT id, 7, csv7 FROM temp_csv2pg WHERE csv1='val' AND csv7 IS NOT NULL AND csv2pgcat_id=17 AND cur_user=current_user UNION
+			SELECT id, 8, csv8 FROM temp_csv2pg WHERE csv1='val' AND csv8 IS NOT NULL AND csv2pgcat_id=17 AND cur_user=current_user UNION
+			SELECT id, 9, csv9 FROM temp_csv2pg WHERE csv1='val' AND csv9 IS NOT NULL AND csv2pgcat_id=17 AND cur_user=current_user UNION
+			SELECT id, 10, csv10 FROM temp_csv2pg WHERE csv1='val' AND csv10 IS NOT NULL AND csv2pgcat_id=17 AND cur_user=current_user UNION
+			SELECT id, 11, csv11 FROM temp_csv2pg WHERE csv1='val' AND csv11 IS NOT NULL AND csv2pgcat_id=17 AND cur_user=current_user UNION
+			SELECT id, 12, csv12 FROM temp_csv2pg WHERE csv1='val' AND csv12 IS NOT NULL AND csv2pgcat_id=17 AND cur_user=current_user UNION
+			SELECT id, 13, csv13 FROM temp_csv2pg WHERE csv1='val' AND csv13 IS NOT NULL AND csv2pgcat_id=17 AND cur_user=current_user UNION
+			SELECT id, 14, csv14 FROM temp_csv2pg WHERE csv1='val' AND csv14 IS NOT NULL AND csv2pgcat_id=17 AND cur_user=current_user UNION
+			SELECT id, 15, csv15 FROM temp_csv2pg WHERE csv1='val' AND csv15 IS NOT NULL AND csv2pgcat_id=17 AND cur_user=current_user UNION
+			SELECT id, 16, csv16 FROM temp_csv2pg WHERE csv1='val' AND csv16 IS NOT NULL AND csv2pgcat_id=17 AND cur_user=current_user UNION
+			SELECT id, 17, csv17 FROM temp_csv2pg WHERE csv1='val' AND csv17 IS NOT NULL AND csv2pgcat_id=17 AND cur_user=current_user UNION
+			SELECT id, 18, csv18 FROM temp_csv2pg WHERE csv1='val' AND csv18 IS NOT NULL AND csv2pgcat_id=17 AND cur_user=current_user UNION
+			SELECT id, 19, csv19 FROM temp_csv2pg WHERE csv1='val' AND csv19 IS NOT NULL AND csv2pgcat_id=17 AND cur_user=current_user UNION
+			SELECT id, 20, csv20 FROM temp_csv2pg WHERE csv1='val' AND csv20 IS NOT NULL AND csv2pgcat_id=17 AND cur_user=current_user UNION
+			SELECT id, 21, csv21 FROM temp_csv2pg WHERE csv1='val' AND csv21 IS NOT NULL AND csv2pgcat_id=17 AND cur_user=current_user UNION
+			SELECT id, 22, csv22 FROM temp_csv2pg WHERE csv1='val' AND csv22 IS NOT NULL AND csv2pgcat_id=17 AND cur_user=current_user UNION
+			SELECT id, 23, csv23 FROM temp_csv2pg WHERE csv1='val' AND csv23 IS NOT NULL AND csv2pgcat_id=17 AND cur_user=current_user UNION
+			SELECT id, 24, csv24 FROM temp_csv2pg WHERE csv1='val' AND csv24 IS NOT NULL AND csv2pgcat_id=17 AND cur_user=current_user UNION
+			SELECT id, 25, csv25 FROM temp_csv2pg WHERE csv1='val' AND csv25 IS NOT NULL AND csv2pgcat_id=17 AND cur_user=current_user UNION
+			SELECT id, 26, csv26 FROM temp_csv2pg WHERE csv1='val' AND csv26 IS NOT NULL AND csv2pgcat_id=17 AND cur_user=current_user UNION
+			SELECT id, 27, csv27 FROM temp_csv2pg WHERE csv1='val' AND csv27 IS NOT NULL AND csv2pgcat_id=17 AND cur_user=current_user UNION
+			SELECT id, 28, csv28 FROM temp_csv2pg WHERE csv1='val' AND csv28 IS NOT NULL AND csv2pgcat_id=17 AND cur_user=current_user UNION
+			SELECT id, 29, csv29 FROM temp_csv2pg WHERE csv1='val' AND csv29 IS NOT NULL AND csv2pgcat_id=17 AND cur_user=current_user UNION
+			SELECT id, 30, csv30 FROM temp_csv2pg WHERE csv1='val' AND csv30 IS NOT NULL AND csv2pgcat_id=17 AND cur_user=current_user UNION
 			SELECT id, 31, csv31 FROM temp_csv2pg WHERE csv1='val' AND csv31 IS NOT NULL
 			ORDER BY 1,2) a ) b USING (id) 
 			RETURNING id INTO v_id;

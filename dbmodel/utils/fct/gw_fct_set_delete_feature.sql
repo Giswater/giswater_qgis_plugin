@@ -59,7 +59,7 @@ BEGIN
  	UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'edit_arc_downgrade_force' AND cur_user=current_user;
 
 	-- manage log (fprocesscat = 52)
-	DELETE FROM audit_check_data WHERE fprocesscat_id=52 AND user_name=current_user;
+	DELETE FROM audit_check_data WHERE fprocesscat_id=52 AND cur_user=current_user;
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (52, v_result_id, concat('DELETE FEATURE'));
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (52, v_result_id, concat('------------------------------'));
  	--get information about feature
@@ -265,7 +265,7 @@ BEGIN
  	UPDATE config_param_user SET value = 'FALSE' WHERE parameter = 'edit_arc_downgrade_force' AND cur_user=current_user;
 
  	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=52) 
+	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=52) 
 	row; 
 
 	v_result := COALESCE(v_result, '{}'); 

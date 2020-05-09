@@ -101,7 +101,7 @@ BEGIN
 
     -- delete previous registers if user selection is enabled
     IF del_previous_bool IS TRUE THEN 
-	DELETE FROM temp_table WHERE fprocesscat_id=27 and user_name=current_user;
+	DELETE FROM temp_table WHERE fprocesscat_id=27 and cur_user=current_user;
     END IF;
     
     -- Insert into temporal table the values

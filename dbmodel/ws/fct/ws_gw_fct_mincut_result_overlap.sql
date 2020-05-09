@@ -73,7 +73,7 @@ BEGIN
 	v_visiblelayer := '"v_anl_mincut_result_arc", "v_anl_mincut_result_node", "v_anl_mincut_result_connec", "v_anl_mincut_init_point"';
 
 	-- Reset temporal tables
-	DELETE FROM audit_check_data WHERE fprocesscat_id = 116 and user_name=current_user;
+	DELETE FROM audit_check_data WHERE fprocesscat_id = 116 and cur_user=current_user;
 
 	DELETE FROM anl_mincut_result_cat WHERE id=-2;
 
@@ -318,7 +318,7 @@ BEGIN
 		-- info
 		v_result = null;
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-		FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=116 order by id) row; 
+		FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=116 order by id) row; 
 		v_result := COALESCE(v_result, '{}'); 
 		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
@@ -450,7 +450,7 @@ BEGIN
 		-- info
 		v_result = null;
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-		FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=116 order by id) row; 
+		FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=116 order by id) row; 
 		v_result := COALESCE(v_result, '{}'); 
 		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 

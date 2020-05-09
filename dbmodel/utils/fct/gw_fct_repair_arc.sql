@@ -31,8 +31,8 @@ BEGIN
 	SET search_path= 'SCHEMA_NAME','public';
 
 	-- Delete previous log results
-	DELETE FROM audit_log_data WHERE fprocesscat_id=3 AND user_name=current_user;
-	DELETE FROM audit_log_data WHERE fprocesscat_id=4 AND user_name=current_user;
+	DELETE FROM audit_log_data WHERE fprocesscat_id=3 AND cur_user=current_user;
+	DELETE FROM audit_log_data WHERE fprocesscat_id=4 AND cur_user=current_user;
 
 	-- select config values
 	SELECT wsoftware, giswater  INTO v_projecttype, v_version FROM version order by 1 desc limit 1;
@@ -59,7 +59,7 @@ BEGIN
 	UPDATE config_param_system SET value=FALSE WHERE parameter='edit_topocontrol_dsbl_error' ;
 	
 	-- get results
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result FROM (SELECT * FROM audit_check_data WHERE user_name="current_user"() AND ( fprocesscat_id=3 OR fprocesscat_id=4)) row; 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result FROM (SELECT * FROM audit_check_data WHERE cur_user="current_user"() AND ( fprocesscat_id=3 OR fprocesscat_id=4)) row; 
 
 	
 

@@ -109,7 +109,7 @@ BEGIN
     where macroexpl_id=macroexpl_id_arg and expl_id not in (select expl_id from selector_expl);
 
     -- save state selector 
-    DELETE FROM temp_table WHERE fprocesscat_id=99 AND user_name=current_user;
+    DELETE FROM temp_table WHERE fprocesscat_id=99 AND cur_user=current_user;
     INSERT INTO temp_table (fprocesscat_id, text_column)  
     SELECT 99, (array_agg(state_id)) FROM selector_state WHERE cur_user=current_user;
 
@@ -322,7 +322,7 @@ BEGIN
 			
 	-- restore state selector
 	INSERT INTO selector_state (state_id, cur_user)
-	select unnest(text_column::integer[]), current_user from temp_table where fprocesscat_id=99 and user_name=current_user
+	select unnest(text_column::integer[]), current_user from temp_table where fprocesscat_id=99 and cur_user=current_user
 	ON CONFLICT (state_id, cur_user) DO NOTHING;
 
 	-- returning

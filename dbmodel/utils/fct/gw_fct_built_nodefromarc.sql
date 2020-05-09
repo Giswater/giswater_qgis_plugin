@@ -54,7 +54,7 @@ BEGIN
 
 
 	--  Reset values
-	DELETE FROM temp_table WHERE user_name=current_user AND fprocesscat_id=16;
+	DELETE FROM temp_table WHERE cur_user=current_user AND fprocesscat_id=16;
 	DELETE FROM anl_node WHERE cur_user=current_user AND fprocesscat_id=16;
 
 	-- inserting all extrem nodes on temp_node
@@ -65,7 +65,7 @@ BEGIN
 	
 	
 	-- inserting into node table
-	FOR rec_table IN SELECT * FROM temp_table WHERE user_name=current_user AND fprocesscat_id=16
+	FOR rec_table IN SELECT * FROM temp_table WHERE cur_user=current_user AND fprocesscat_id=16
 	LOOP
 	        -- Check existing nodes  
 	        numNodes:= 0;
@@ -106,7 +106,7 @@ BEGIN
 	-- get log
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT * FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=16) row; 
+	FROM (SELECT * FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=16) row; 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 

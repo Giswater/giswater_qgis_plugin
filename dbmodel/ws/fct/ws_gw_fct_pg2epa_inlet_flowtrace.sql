@@ -19,7 +19,7 @@ SELECT gw_fct_pg2epa_inlet_flowtrace('testbgeo11')
 --RESULTS
 SELECT arc_id FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user
 SELECT node_id FROM anl_node WHERE fprocesscat_id=39 AND cur_user=current_user
-SELECT * FROM anl_mincut_arc_x_node  where user_name=current_user;
+SELECT * FROM anl_mincut_arc_x_node  where cur_user=current_user;
 */
 
 
@@ -36,7 +36,7 @@ BEGIN
 	-- get user values
 	v_buildupmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_buildup_mode' AND cur_user=current_user);
 
-	delete FROM anl_mincut_arc_x_node where user_name=current_user;
+	delete FROM anl_mincut_arc_x_node where cur_user=current_user;
 	delete FROM anl_arc where cur_user=current_user AND fprocesscat_id=39;
 	delete FROM anl_node where cur_user=current_user AND fprocesscat_id=39;
 
@@ -50,10 +50,10 @@ BEGIN
 	select  arc.arc_id, case when node_2 is null then '00000' else node_2 end, current_user, null, case when node_1 is null then '00000' else node_1 end, null, 0, 0
 	from rpt_inp_arc arc
 	WHERE arc.result_id=p_result_id
-	) ON CONFLICT (arc_id, node_id, user_name) DO NOTHING;
+	) ON CONFLICT (arc_id, node_id, cur_user) DO NOTHING;
 	
 	-- Delete from the graf table all that rows that only exists one time (it means that arc don't have the correct topology)
-	DELETE FROM anl_mincut_arc_x_node WHERE user_name=current_user AND arc_id IN 
+	DELETE FROM anl_mincut_arc_x_node WHERE cur_user=current_user AND arc_id IN 
 	(SELECT a.arc_id FROM (SELECT count(*) AS count, arc_id FROM anl_mincut_arc_x_node GROUP BY 2 HAVING count(*)=1 ORDER BY 2)a);
 
 	-- init inlets
@@ -92,8 +92,8 @@ BEGIN
 	SELECT DISTINCT ON (a.arc_id) 39, p_result_id, a.arc_id, the_geom, 'Arc disconnected from any reservoir'  
 		FROM anl_mincut_arc_x_node a
 		JOIN rpt_inp_arc b ON a.arc_id=b.arc_id
-		GROUP BY a.arc_id, user_name, the_geom
-		having max(water) = 0 and user_name=current_user;
+		GROUP BY a.arc_id, cur_user, the_geom
+		having max(water) = 0 and cur_user=current_user;
 		
 	-- insert into result table the dry nodes (as they are extremal nodes from disconnected arcs, all it's ok
 	INSERT INTO anl_node (fprocesscat_id, result_id, node_id, the_geom, descript)

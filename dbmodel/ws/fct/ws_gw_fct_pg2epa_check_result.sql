@@ -106,7 +106,7 @@ BEGIN
 	END IF;
 	
 	-- delete old values on result table
-	DELETE FROM audit_check_data WHERE fprocesscat_id = 14 AND user_name=current_user;
+	DELETE FROM audit_check_data WHERE fprocesscat_id = 14 AND cur_user=current_user;
 	DELETE FROM audit_check_data WHERE id < 0;
 	DELETE FROM anl_node WHERE fprocesscat_id IN (59) AND cur_user=current_user;
 	DELETE FROM anl_arc WHERE fprocesscat_id IN (3) AND cur_user=current_user;
@@ -488,7 +488,7 @@ BEGIN
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=v_fprocesscat_id 
+	FROM (SELECT error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id 
 	order by criticity desc, id asc) row; 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');

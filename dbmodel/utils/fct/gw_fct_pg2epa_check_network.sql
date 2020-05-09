@@ -82,7 +82,7 @@ BEGIN
 	DELETE FROM temp_anlgraf;
 	DELETE FROM anl_arc where cur_user=current_user AND fprocesscat_id IN (132,131,39);
 	DELETE FROM anl_node where cur_user=current_user AND fprocesscat_id IN (133,128,39);
-	DELETE FROM audit_check_data where user_name=current_user AND fprocesscat_id = 39;
+	DELETE FROM audit_check_data where cur_user=current_user AND fprocesscat_id = 39;
 		
 	IF v_fprocesscat_id is null THEN
 		v_fprocesscat_id = 39;
@@ -367,7 +367,7 @@ BEGIN
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id = v_fprocesscat_id order by criticity desc, id asc) row; 
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id = v_fprocesscat_id order by criticity desc, id asc) row; 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 

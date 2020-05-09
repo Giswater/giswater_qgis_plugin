@@ -49,7 +49,7 @@ BEGIN
 	v_path := ((p_data ->>'data')::json->>'path')::text;
 
 	-- delete previous data on log table
-	DELETE FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=40;
+	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=40;
 
 	-- Starting process
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (40, v_result_id, concat('IMPORT RPT FILE'));
@@ -57,9 +57,9 @@ BEGIN
 	
 	-- use the copy function of postgres to import from file in case of file must be provided as a parameter
 	IF v_path IS NOT NULL THEN
-		DELETE FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_csv2pgcat_id;
+		DELETE FROM temp_csv2pg WHERE cur_user=current_user AND csv2pgcat_id=v_csv2pgcat_id;
 		EXECUTE 'COPY temp_csv2pg (csv1, csv2, csv3, csv4, csv5, csv6, csv7, csv8, csv9, csv10, csv11, csv12) FROM '||quote_literal(v_path)||' WITH (NULL '''', FORMAT TEXT)';	
-		UPDATE temp_csv2pg SET csv2pgcat_id=v_csv2pgcat_id WHERE csv2pgcat_id IS NULL AND user_name=current_user;
+		UPDATE temp_csv2pg SET csv2pgcat_id=v_csv2pgcat_id WHERE csv2pgcat_id IS NULL AND cur_user=current_user;
 	END IF;
 	
 	--remove data from with the same result_id
@@ -69,7 +69,7 @@ BEGIN
 	END LOOP;
 
 
-	FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_csv2pgcat_id order by id
+	FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE cur_user=current_user AND csv2pgcat_id=v_csv2pgcat_id order by id
 	LOOP
 
 		IF (SELECT tablename FROM config_csv_param WHERE target=concat(rpt_rec.csv1,' ',rpt_rec.csv2) AND pg2csvcat_id=v_csv2pgcat_id) IS NOT NULL THEN
@@ -262,7 +262,7 @@ BEGIN
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=40  order by id) row; 
+	FROM (SELECT error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=40  order by id) row; 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 	

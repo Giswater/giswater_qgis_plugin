@@ -36,7 +36,7 @@ BEGIN
 
 	
 	-- delete old values on result table
-	DELETE FROM audit_check_data WHERE fprocesscat_id=14 AND user_name=current_user;
+	DELETE FROM audit_check_data WHERE fprocesscat_id=14 AND cur_user=current_user;
 	DELETE FROM anl_arc WHERE fprocesscat_id IN (3, 14, 39) AND cur_user=current_user;
 	DELETE FROM anl_node WHERE fprocesscat_id IN (7, 14, 64, 66, 70, 71, 98) AND cur_user=current_user;
 
@@ -104,15 +104,15 @@ BEGIN
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (14, p_result, 1, '-----------------------');	
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
 		SELECT 14, p_result, 1, concat(csv1,' ',csv2, ' ',csv3, ' ',csv4, ' ',csv5, ' ',csv6, ' ',csv7, ' ',csv8, ' ',csv9, ' ',csv10, ' ',csv11, ' ',csv12) from temp_csv2pg 
-		where csv2pgcat_id=11 and source='rpt_warning_summary' and user_name=current_user;
+		where csv2pgcat_id=11 and source='rpt_warning_summary' and cur_user=current_user;
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
 		SELECT 14, p_result, 1, concat(csv1,' ',csv2, ' ',csv3, ' ',csv4, ' ',csv5, ' ',csv6, ' ',csv7, ' ',csv8, ' ',csv9, ' ',csv10, ' ',csv11, ' ',csv12) from temp_csv2pg 
-		where csv2pgcat_id=11 and source='rpt_warning_summary' and user_name=current_user;
+		where csv2pgcat_id=11 and source='rpt_warning_summary' and cur_user=current_user;
 
 	
 	END IF;
 
-	v_stats = (SELECT array_to_json(array_agg(error_message)) FROM audit_check_data WHERE result_id='stats' AND fprocesscat_id=14 AND user_name=current_user);
+	v_stats = (SELECT array_to_json(array_agg(error_message)) FROM audit_check_data WHERE result_id='stats' AND fprocesscat_id=14 AND cur_user=current_user);
 
 	UPDATE rpt_cat_result SET stats = v_stats WHERE result_id=p_result;
 
@@ -123,7 +123,7 @@ BEGIN
 
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message)
 	SELECT 14, p_result, 1, concat(csv1,' ',csv2, ' ',csv3, ' ',csv4, ' ',csv5, ' ',csv6, ' ',csv7, ' ',csv8, ' ',csv9, ' ',csv10, ' ',csv11, ' ',csv12) from temp_csv2pg 
-	where csv2pgcat_id=11 and source='rpt_cat_result' and user_name=current_user;
+	where csv2pgcat_id=11 and source='rpt_cat_result' and cur_user=current_user;
 
 
 	-- detalied user inp options
@@ -137,7 +137,7 @@ BEGIN
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=14 order by criticity desc, id asc) row; 
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=14 order by criticity desc, id asc) row; 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 	

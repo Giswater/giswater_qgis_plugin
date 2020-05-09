@@ -81,8 +81,8 @@ BEGIN
 		rec_node.startdate= (SELECT startdate::date from om_visit join om_visit_x_node on visit_id=om_visit.id where node_id=rec_node.node_id order by startdate desc limit 1 );
        
 		-- insert visit
-		INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, user_name, webclient_id, expl_id, descript, is_done,status, class_id)
-		SELECT visitcat_id, ext_code, startdate, enddate, user_name, webclient_id, expl_id, descript, is_done, 4, v_newclass
+		INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, cur_user, webclient_id, expl_id, descript, is_done,status, class_id)
+		SELECT visitcat_id, ext_code, startdate, enddate, cur_user, webclient_id, expl_id, descript, is_done, 4, v_newclass
 		FROM om_visit WHERE id=visit_id_aux RETURNING id into id_last;
 
 		INSERT INTO om_visit_x_node (visit_id,node_id) VALUES (id_last, rec_node.node_id);

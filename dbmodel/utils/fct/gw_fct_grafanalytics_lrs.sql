@@ -24,7 +24,7 @@ delete from SCHEMA_NAME.temp_anlgraf
 
 SELECT * FROM SCHEMA_NAME.anl_arc WHERE fprocesscat_id=34 AND cur_user=current_user
 SELECT * FROM SCHEMA_NAME.anl_node WHERE fprocesscat_id=34 AND cur_user=current_user
-SELECT * FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=34 AND user_name=current_user
+SELECT * FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=34 AND cur_user=current_user
 
 
 */
@@ -106,11 +106,11 @@ BEGIN
 	
 	-- reset tables (graf & audit_log)
 	DELETE FROM temp_anlgraf;
-	DELETE FROM audit_log_data WHERE fprocesscat_id=v_fprocesscat_id AND user_name=current_user;
+	DELETE FROM audit_log_data WHERE fprocesscat_id=v_fprocesscat_id AND cur_user=current_user;
 	--DELETE FROM anl_node WHERE fprocesscat_id=v_fprocesscat_id AND cur_user=current_user;
 	--DELETE FROM anl_node;
 	DELETE FROM anl_arc WHERE fprocesscat_id=v_fprocesscat_id AND cur_user=current_user;
-	DELETE FROM audit_check_data WHERE fprocesscat_id=v_fprocesscat_id AND user_name=current_user;
+	DELETE FROM audit_check_data WHERE fprocesscat_id=v_fprocesscat_id AND cur_user=current_user;
 
 	-- reset user's state
 	DELETE FROM selector_state WHERE cur_user=current_user;
@@ -340,7 +340,7 @@ BEGIN
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=v_fprocesscat_id order by id) row; 
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id order by id) row; 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 	

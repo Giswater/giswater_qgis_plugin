@@ -20,7 +20,7 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
     --  Reset values
-    DELETE FROM temp_table WHERE user_name=current_user AND fprocesscat_id=17;
+    DELETE FROM temp_table WHERE cur_user=current_user AND fprocesscat_id=17;
 
     -- Dump node coordinates for every polygon
     FOR row_id IN SELECT subc_id FROM v_edit_subcatchment
@@ -40,7 +40,7 @@ BEGIN
     END LOOP;
 
     -- Return the temporal table
-    RETURN QUERY SELECT text_column::varchar FROM temp_table WHERE user_name=current_user AND fprocesscat_id=17;
+    RETURN QUERY SELECT text_column::varchar FROM temp_table WHERE cur_user=current_user AND fprocesscat_id=17;
 
 END
 $$;

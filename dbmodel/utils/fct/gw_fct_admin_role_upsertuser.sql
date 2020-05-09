@@ -92,7 +92,7 @@ BEGIN
 	v_gw_schema_array = (SELECT array_agg(a.key) result FROM json_each(v_manager_x_schema) a);
 
 	-- delete old values on result table
-	DELETE FROM audit_check_data WHERE fprocesscat_id=107 AND user_name=current_user;
+	DELETE FROM audit_check_data WHERE fprocesscat_id=107 AND cur_user=current_user;
 	
 	-- Starting process
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (107, null, 4, 'ROLE MANAGEMENT');
@@ -305,7 +305,7 @@ BEGIN
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() 
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() 
 	AND fprocesscat_id=107 order by criticity desc, id asc) row; 
 
 	IF v_audit_result is null THEN

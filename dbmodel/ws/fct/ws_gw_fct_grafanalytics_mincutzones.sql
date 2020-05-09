@@ -27,8 +27,8 @@ SELECT SCHEMA_NAME.gw_fct_grafanalytics_mincutzones('{"data":{"parameters":{"exp
 49 it is detailed data for each minsector
 
 TO SEE RESULTS ON LOG TABLE
-SELECT log_message FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=49 AND user_name=current_user
-SELECT log_message FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=29 AND user_name=current_user
+SELECT log_message FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=49 AND cur_user=current_user
+SELECT log_message FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=29 AND cur_user=current_user
 
 
 TO SEE RESULTS ON SYSTEM TABLES (IN CASE OF "upsertAttributes":"TRUE")
@@ -71,11 +71,11 @@ BEGIN
 	END IF;
 
 	-- check criticity of data in order to continue or not
-	SELECT count(*) INTO v_count FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=25 AND criticity=3;
+	SELECT count(*) INTO v_count FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=25 AND criticity=3;
 	IF v_count > 3 THEN
 	
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-		FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=25 order by criticity desc, id asc) row;
+		FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=25 order by criticity desc, id asc) row;
 
 		v_result := COALESCE(v_result, '{}'); 
 		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
@@ -89,8 +89,8 @@ BEGIN
 	END IF;
  
 	-- reset previous data
-	DELETE FROM audit_log_data WHERE user_name=current_user AND fprocesscat_id IN (29,49);
-	DELETE FROM audit_check_data WHERE user_name=current_user AND fprocesscat_id =v_fprocesscat_id;
+	DELETE FROM audit_log_data WHERE cur_user=current_user AND fprocesscat_id IN (29,49);
+	DELETE FROM audit_check_data WHERE cur_user=current_user AND fprocesscat_id =v_fprocesscat_id;
 
 	-- Starting process
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, concat('MASSIVE MINCUT ANALYSIS (FPROCESSCAT_ID 29 & 49)'));
@@ -167,17 +167,17 @@ BEGIN
 		INSERT INTO audit_check_data (fprocesscat_id, error_message) 
 		VALUES (v_fprocesscat_id, concat('RESUME (fprocesscat_id : 29)'));
 		INSERT INTO audit_check_data (fprocesscat_id, error_message)
-		VALUES (v_fprocesscat_id, concat('SELECT log_message FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=29 AND user_name=current_user'));
+		VALUES (v_fprocesscat_id, concat('SELECT log_message FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=29 AND cur_user=current_user'));
 		INSERT INTO audit_check_data (fprocesscat_id, error_message) 
 		VALUES (v_fprocesscat_id, concat('DETAIL (fprocesscat_id : 49)')); 
 		INSERT INTO audit_check_data (fprocesscat_id, error_message) 
-		VALUES (v_fprocesscat_id, concat('SELECT log_message FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=49 AND user_name=current_user'));	
+		VALUES (v_fprocesscat_id, concat('SELECT log_message FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=49 AND cur_user=current_user'));	
 		INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, '');
 		INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, 'RESUME');
 		INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, '-------------------------------------------------');
 		INSERT INTO audit_check_data (fprocesscat_id, error_message)
 		SELECT 29, reverse(substring(reverse(substring(log_message,2,999)),2,999)) FROM audit_log_data 
-		WHERE fprocesscat_id=29 AND user_name=current_user ORDER BY (((log_message::json->>'connecs')::json->>'hydrometers')::json->>'total')::integer desc;
+		WHERE fprocesscat_id=29 AND cur_user=current_user ORDER BY (((log_message::json->>'connecs')::json->>'hydrometers')::json->>'total')::integer desc;
 
 		
 	END IF;
@@ -185,7 +185,7 @@ BEGIN
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=v_fprocesscat_id order by id) row; 
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id order by id) row; 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 	

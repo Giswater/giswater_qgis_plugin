@@ -68,8 +68,8 @@ BEGIN
 	v_removedemand = (SELECT value::json->>'removeDemandOnDryNodes' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 
 	-- delete audit table
-	DELETE FROM audit_check_data WHERE fprocesscat_id = v_fprocesscat_id AND user_name=current_user;
-	DELETE FROM audit_log_data WHERE fprocesscat_id = v_fprocesscat_id AND user_name=current_user;
+	DELETE FROM audit_check_data WHERE fprocesscat_id = v_fprocesscat_id AND cur_user=current_user;
+	DELETE FROM audit_log_data WHERE fprocesscat_id = v_fprocesscat_id AND cur_user=current_user;
 	
 	-- setting variables
 	v_input = concat('{"data":{"parameters":{"resultId":"',v_result,'", "fprocesscatId":127}}}')::json;

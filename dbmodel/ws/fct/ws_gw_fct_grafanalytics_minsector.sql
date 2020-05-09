@@ -23,7 +23,7 @@ delete from SCHEMA_NAME.temp_anlgraf
 
 SELECT * FROM SCHEMA_NAME.anl_arc WHERE fprocesscat_id=34 AND cur_user=current_user
 SELECT * FROM SCHEMA_NAME.anl_node WHERE fprocesscat_id=34 AND cur_user=current_user
-SELECT * FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=34 AND user_name=current_user
+SELECT * FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=34 AND cur_user=current_user
 
 
 */
@@ -89,14 +89,14 @@ BEGIN
 	IF v_checkdata THEN
 		v_input = '{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}'::json;
 		PERFORM gw_fct_om_check_data(v_input);
-		SELECT count(*) INTO v_count FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=25 AND criticity=3;
+		SELECT count(*) INTO v_count FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=25 AND criticity=3;
 	END IF;
 
 	-- check criticity of data in order to continue or not
 	IF v_count > 3 THEN
 	
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-		FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=25 order by criticity desc, id asc) row;
+		FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=25 order by criticity desc, id asc) row;
 
 		v_result := COALESCE(v_result, '{}'); 
 		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
@@ -111,10 +111,10 @@ BEGIN
  
 	-- reset graf & audit_log tables
 	DELETE FROM temp_anlgraf;
-	DELETE FROM audit_log_data WHERE fprocesscat_id=v_fprocesscat_id AND user_name=current_user;
+	DELETE FROM audit_log_data WHERE fprocesscat_id=v_fprocesscat_id AND cur_user=current_user;
 	DELETE FROM anl_node WHERE fprocesscat_id=34 AND cur_user=current_user;
 	DELETE FROM anl_arc WHERE fprocesscat_id=34 AND cur_user=current_user;
-	DELETE FROM audit_check_data WHERE fprocesscat_id=34 AND user_name=current_user;
+	DELETE FROM audit_check_data WHERE fprocesscat_id=34 AND cur_user=current_user;
 
 	-- Starting process
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, concat('MINSECTOR DYNAMIC SECTORITZATION'));
@@ -322,7 +322,7 @@ BEGIN
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=v_fprocesscat_id order by id) row; 
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id order by id) row; 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 	

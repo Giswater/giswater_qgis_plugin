@@ -67,7 +67,7 @@ BEGIN
 
 	-- reset graf & audit tables
 	DELETE FROM anl_arc where cur_user=current_user AND fprocesscat_id=v_fprocesscat_id;
-	DELETE FROM audit_check_data WHERE fprocesscat_id=v_fprocesscat_id AND user_name=current_user;
+	DELETE FROM audit_check_data WHERE fprocesscat_id=v_fprocesscat_id AND cur_user=current_user;
 	DELETE FROM temp_anlgraf;	
 
 	-- reset exploitation
@@ -150,7 +150,7 @@ BEGIN
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=v_fprocesscat_id order by criticity desc, id asc) row; 
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id order by criticity desc, id asc) row; 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 

@@ -53,7 +53,7 @@ BEGIN
 	v_checknetwork = (SELECT value::json->>'checkNetwork' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 
 	-- delete audit table
-	DELETE FROM audit_check_data WHERE fprocesscat_id = 127 AND user_name=current_user;
+	DELETE FROM audit_check_data WHERE fprocesscat_id = 127 AND cur_user=current_user;
 
 	v_inpoptions = (SELECT (replace (replace (replace (array_to_json(array_agg(json_build_object((t.parameter),(t.value))))::text,'},{', ' , '),'[',''),']',''))::json 
 				FROM (SELECT parameter, value FROM config_param_user 

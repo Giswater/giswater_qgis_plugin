@@ -35,19 +35,19 @@ BEGIN
 	SELECT wsoftware, giswater  INTO v_project_type, v_version FROM version order by 1 desc limit 1;
    
 	-- manage log (fprocesscat 42)
-	DELETE FROM audit_check_data WHERE fprocesscat_id=42 AND user_name=current_user;
+	DELETE FROM audit_check_data WHERE fprocesscat_id=42 AND cur_user=current_user;
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('IMPORT ADD FIELDS FILE'));
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('------------------------------'));
    
  	-- starting process
-	FOR v_addfields IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=4
+	FOR v_addfields IN SELECT * FROM temp_csv2pg WHERE cur_user=current_user AND csv2pgcat_id=4
 	LOOP
 		INSERT INTO man_addfields_value (feature_id, parameter_id, value_param) VALUES
 		(v_addfields.csv1, v_addfields.csv2::integer, v_addfields.csv3);			
 	END LOOP;
 
 	-- Delete values on temporal table
-	DELETE FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=4;
+	DELETE FROM temp_csv2pg WHERE cur_user=current_user AND csv2pgcat_id=4;
 
 	-- manage log (fprocesscat 42)
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('Reading values from temp_csv2pg table -> Done'));
@@ -57,7 +57,7 @@ BEGIN
 
 	-- get log (fprocesscat 42)
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=42) row; 
+	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=42) row; 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 			

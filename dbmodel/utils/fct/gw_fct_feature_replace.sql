@@ -91,7 +91,7 @@ BEGIN
 	SELECT  value::json->>'activated' INTO v_arc_searchnodes_active FROM config_param_system where parameter = 'arc_searchnodes';
 
 		-- manage log (fprocesscat = 43)
-	DELETE FROM audit_check_data WHERE fprocesscat_id=43 AND user_name=current_user;
+	DELETE FROM audit_check_data WHERE fprocesscat_id=43 AND cur_user=current_user;
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (43, v_result_id, concat('REPLACE FEATURE'));
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (43, v_result_id, concat('------------------------------'));
 
@@ -411,7 +411,7 @@ BEGIN
 
 -- get log (fprocesscat 43)
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=43) row; 
+	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=43) row; 
 
 	IF v_audit_result is null THEN
         v_status = 'Accepted';

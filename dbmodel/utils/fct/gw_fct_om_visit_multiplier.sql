@@ -52,7 +52,7 @@ BEGIN
 	FOR v_feature IN SELECT * FROM om_visit_x_node WHERE visit_id=v_visitid
 	LOOP 
 		-- inserting new visit on visit table
-		INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, user_name, descript, is_done)
+		INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, cur_user, descript, is_done)
 		VALUES (v_visit.visitcat_id, v_visit.ext_code, v_visit.startdate, v_visit.enddate, v_visit.user_name, v_visit.descript, v_visit.is_done) RETURNING id INTO v_idlast;
 	
 		-- looking for documents
@@ -84,7 +84,7 @@ BEGIN
 	FOR v_feature IN SELECT * FROM om_visit_x_arc WHERE visit_id=v_visitid
 	LOOP 
 		-- inserting new visit on visit table
-		INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, user_name, descript, is_done)
+		INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, cur_user, descript, is_done)
 		VALUES (v_visit.visitcat_id, v_visit.ext_code, v_visit.startdate, v_visit.enddate, v_visit.user_name, v_visit.descript, v_visit.is_done) RETURNING id INTO v_idlast;
 		
 		-- looking for documents
@@ -116,7 +116,7 @@ BEGIN
 	FOR v_feature IN SELECT * FROM om_visit_x_connec WHERE visit_id=v_visitid
 	LOOP 
 		-- inserting new visit on visit table
-		INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, user_name, descript, is_done)
+		INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, cur_user, descript, is_done)
 		VALUES (v_visit.visitcat_id, v_visit.ext_code, v_visit.startdate, v_visit.enddate, v_visit.user_name, v_visit.descript, v_visit.is_done) RETURNING id INTO v_idlast;
 
 		-- looking for documents
@@ -150,7 +150,7 @@ BEGIN
 		FOR v_feature IN SELECT * FROM om_visit_x_gully WHERE visit_id=v_visitid
 		LOOP 
 			-- inserting new visit on visit table
-			INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, user_name, descript, is_done)
+			INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, cur_user, descript, is_done)
 			VALUES (v_visit.visitcat_id, v_visit.ext_code, v_visit.startdate, v_visit.enddate, v_visit.user_name, v_visit.descript, v_visit.is_done) RETURNING id INTO v_idlast;
 			
 			-- looking for documents

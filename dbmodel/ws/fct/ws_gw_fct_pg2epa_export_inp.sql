@@ -41,7 +41,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	--Delete previous
-	DELETE FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_pg2csvcat_id;
+	DELETE FROM temp_csv2pg WHERE cur_user=current_user AND csv2pgcat_id=v_pg2csvcat_id;
 
 	-- get parameters to put on header
 	SELECT result_id INTO result_id_aux FROM inp_selector_result where cur_user=current_user;
@@ -125,23 +125,23 @@ BEGIN
 	-- use the copy function of postgres to export to file in case of file must be provided as a parameter
 	IF p_path IS NOT NULL THEN
 		EXECUTE 'COPY (SELECT csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12,csv13,csv14,csv15,csv16,csv17,csv18 ,csv19 
-		FROM temp_csv2pg WHERE csv2pgcat_id=10 and user_name=current_user order by id) TO '''||p_path||''' WITH (DELIMITER E''\t'', FORMAT CSV);';
+		FROM temp_csv2pg WHERE csv2pgcat_id=10 and cur_user=current_user order by id) TO '''||p_path||''' WITH (DELIMITER E''\t'', FORMAT CSV);';
 	END IF;
 
 	-- build return
 	select (array_to_json(array_agg(row_to_json(row))))::json  -- spacer-19 it's used because a rare bug reading epanet when spacer=20 on target [PATTERNS]????
 	into v_return 
 		from ( select text from
-		(select id, concat(rpad(csv1,18), ' ', csv2)as text from temp_csv2pg where csv2pgcat_id  = 10 and user_name = current_user and source is null
+		(select id, concat(rpad(csv1,18), ' ', csv2)as text from temp_csv2pg where csv2pgcat_id  = 10 and cur_user = current_user and source is null
 		union
-		select id, concat(rpad(csv1,18), ' ', csv2)as text from temp_csv2pg where csv2pgcat_id  = 10 and user_name = current_user and source in ('header')
+		select id, concat(rpad(csv1,18), ' ', csv2)as text from temp_csv2pg where csv2pgcat_id  = 10 and cur_user = current_user and source in ('header')
 		union
-		select id, csv1 as text from temp_csv2pg where csv2pgcat_id  = 10 and user_name = current_user and source in ('vi_controls','vi_rules', 'vi_backdrop')
+		select id, csv1 as text from temp_csv2pg where csv2pgcat_id  = 10 and cur_user = current_user and source in ('vi_controls','vi_rules', 'vi_backdrop')
 		union
 		select id, concat(rpad(csv1,18),' ',rpad(csv2,18),' ', rpad(csv3,18),' ',rpad(csv4,18),' ',rpad(csv5,18),' ',rpad(csv6,18),' ',rpad(csv7,18),' ',
 		rpad(csv8,18),' ',rpad(csv9,18),' ',rpad(csv10,18),' ',rpad(csv11,18),' ',rpad(csv12,18),' ',rpad(csv13,18),' ',rpad(csv14,18),' ',rpad(csv15,18),' ',
 		rpad(csv15,18),' ',rpad(csv16,18),' ',rpad(csv17,18),' ', rpad(csv18,18), ' ', rpad(csv19,18),' ',rpad(csv20,18)) as text
-		from temp_csv2pg where csv2pgcat_id  = 10 and user_name = current_user and source not in ('header','vi_controls','vi_rules', 'vi_backdrop')
+		from temp_csv2pg where csv2pgcat_id  = 10 and cur_user = current_user and source not in ('header','vi_controls','vi_rules', 'vi_backdrop')
 		order by id)a )row;
 	
 RETURN v_return;

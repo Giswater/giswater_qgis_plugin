@@ -41,14 +41,14 @@ TO EXECUTE
 -- SECTOR
 SELECT SCHEMA_NAME.gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "exploitation": "[1,2]", "checkData": false, "updateFeature":"FALSE", "updateMapZone":2, "geomParamUpdate":15, "debug":"false"}}}');
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "node":"113952", "updateFeature":TRUE}}}');
-SELECT count(*), log_message FROM audit_log_data WHERE fprocesscat_id=30 AND user_name=current_user group by log_message order by 2 --SECTOR
+SELECT count(*), log_message FROM audit_log_data WHERE fprocesscat_id=30 AND cur_user=current_user group by log_message order by 2 --SECTOR
 SELECT sector_id, count(sector_id) from v_edit_arc group by sector_id order by 1;
 
 
 -- DMA
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation": "[1,2]", "checkData": false,"updateFeature":"TRUE", "updateMapZone":2, "geomParamUpdate":15,"debug":"false"}}}');
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "node":"1046", "updateFeature":"TRUE", "updateMapZone":2,"concaveHullParam":0.85,"debug":"false"}}}');
-SELECT count(*), log_message FROM audit_log_data WHERE fprocesscat_id=45 AND user_name=current_user group by log_message order by 2 --DMA
+SELECT count(*), log_message FROM audit_log_data WHERE fprocesscat_id=45 AND cur_user=current_user group by log_message order by 2 --DMA
 SELECT dma_id, count(dma_id) from v_edit_arc  group by dma_id order by 1;
 UPDATE arc SET dma_id=0
 
@@ -56,14 +56,14 @@ UPDATE arc SET dma_id=0
 -- DQA
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DQA", "exploitation": "[1,2]", "checkData": false,"updateFeature":"TRUE", "updateMapZone":2 , "geomParamUpdate":15, "debug":"false"}}}');
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DQA", "node":"113952", "updateFeature":TRUE}}}');
-SELECT count(*), log_message FROM audit_log_data WHERE fprocesscat_id=44 AND user_name=current_user group by log_message order by 2 --DQA
+SELECT count(*), log_message FROM audit_log_data WHERE fprocesscat_id=44 AND cur_user=current_user group by log_message order by 2 --DQA
 SELECT dqa_id, count(dma_id) from v_edit_arc  group by dqa_id order by 1;
 
 
 -- PRESZZONE
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"PRESSZONE","exploitation":"[1,2]", "checkData": false, "updateFeature":"TRUE", "updateMapZone":2, "geomParamUpdate":15,"debug":"false"}}}');
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"PRESSZONE", "node":"113952", "updateFeature":TRUE}}}');
-SELECT count(*), log_message FROM audit_log_data WHERE fprocesscat_id=48 AND user_name=current_user group by log_message order by 2 --PZONE
+SELECT count(*), log_message FROM audit_log_data WHERE fprocesscat_id=48 AND cur_user=current_user group by log_message order by 2 --PZONE
 SELECT presszonecat_id, count(presszonecat_id) from v_edit_arc  group by presszonecat_id order by 1;
 
 
@@ -173,13 +173,13 @@ BEGIN
 	IF v_checkdata THEN
 		v_input = '{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}'::json;
 		PERFORM gw_fct_om_check_data(v_input);
-		SELECT count(*) INTO v_count FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=25 AND criticity=3;
+		SELECT count(*) INTO v_count FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=25 AND criticity=3;
 	END IF;
 
 	-- check criticity of data in order to continue or not
 	IF v_count > 3 THEN
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-		FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=25 order by criticity desc, id asc) row;
+		FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=25 order by criticity desc, id asc) row;
 
 		v_result := COALESCE(v_result, '{}'); 
 		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
@@ -242,7 +242,7 @@ BEGIN
 		DELETE FROM anl_arc where cur_user=current_user and fprocesscat_id=v_fprocesscat_id;
 		DELETE FROM anl_node where cur_user=current_user and fprocesscat_id=v_fprocesscat_id;
 		DELETE FROM temp_anlgraf;
-		DELETE FROM audit_check_data WHERE fprocesscat_id=v_fprocesscat_id AND user_name=current_user;
+		DELETE FROM audit_check_data WHERE fprocesscat_id=v_fprocesscat_id AND cur_user=current_user;
 			
 		-- reset selectors
 		DELETE FROM selector_state WHERE cur_user=current_user;
@@ -272,10 +272,10 @@ BEGIN
 			 to enable it '));
 		
 		-- (2) check data quality in order to continue or not
-		ELSIF (SELECT count(*) FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=111 AND criticity=3) > 3 THEN
+		ELSIF (SELECT count(*) FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=111 AND criticity=3) > 3 THEN
 		
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-			SELECT 44, criticity, error_message FROM audit_check_data WHERE user_name=current_user AND fprocesscat_id=111 AND criticity=3 AND error_message LIKE('%ERROR:%');
+			SELECT 44, criticity, error_message FROM audit_check_data WHERE cur_user=current_user AND fprocesscat_id=111 AND criticity=3 AND error_message LIKE('%ERROR:%');
 		ELSE 
 			-- start build log message
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, NULL, 2, 'WARNINGS');	
@@ -479,7 +479,7 @@ BEGIN
 					-- recalculate staticpressure (fprocesscat_id=47)
 					IF v_fprocesscat_id=30 THEN 
 					
-						DELETE FROM audit_log_data WHERE fprocesscat_id=47 AND user_name=current_user;
+						DELETE FROM audit_log_data WHERE fprocesscat_id=47 AND cur_user=current_user;
 				
 						INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) SELECT 47, 'node', n.node_id, 
 						concat('{"staticpressure":',case when (a.elevation - n.elevation::float) is null then 0 ELSE (a.elevation - n.elevation::float) END, 
@@ -491,7 +491,7 @@ BEGIN
 
 						-- update node table those elements connected on graf
 						UPDATE node SET staticpressure=(log_message::json->>'staticpressure')::float FROM audit_log_data a WHERE a.feature_id=node_id 
-						AND fprocesscat_id=47 AND user_name=current_user;
+						AND fprocesscat_id=47 AND cur_user=current_user;
 						
 						-- update node table those elements disconnected from graf
 						UPDATE node SET staticpressure=(staticpress1-(staticpress1-staticpress2)*st_linelocatepoint(v_edit_arc.the_geom, n.the_geom))::numeric(12,3)
@@ -589,7 +589,7 @@ BEGIN
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=v_fprocesscat_id order by criticity desc, id asc) row; 
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id order by criticity desc, id asc) row; 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 

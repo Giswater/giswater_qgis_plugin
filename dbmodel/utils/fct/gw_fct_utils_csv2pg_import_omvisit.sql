@@ -122,19 +122,19 @@ BEGIN
 	RAISE NOTICE 'v_isvisitexists % v_visittablename % v_visitcolumnname  % v_featuretablename %', v_isvisitexists, v_visittablename, v_visitcolumnname, v_featuretablename;
 
 	-- manage log (fprocesscat 42)
-	DELETE FROM audit_check_data WHERE fprocesscat_id=42 AND user_name=current_user;
+	DELETE FROM audit_check_data WHERE fprocesscat_id=42 AND cur_user=current_user;
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('LOG IMPORTACIO DE FITXER DE VISITES DE LA CONTRATA DE SANEJAMENT'));
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('--------------------------------------------------------------------------------------'));
    
  	-- starting process
-	FOR v_visit IN SELECT * FROM temp_csv2pg WHERE csv2pgcat_id=v_csv2pgcat_id AND user_name=current_user
+	FOR v_visit IN SELECT * FROM temp_csv2pg WHERE csv2pgcat_id=v_csv2pgcat_id AND cur_user=current_user
 	LOOP
 		RAISE NOTICE 'v_visit %', v_visit;
 	
 		IF v_isvisitexists IS FALSE OR v_isvisitexists IS NULL THEN
 		
 			-- Insert into visit table
-			INSERT INTO om_visit (id, visitcat_id, visit_type, class_id, startdate, enddate, ext_code, user_name, descript) 
+			INSERT INTO om_visit (id, visitcat_id, visit_type, class_id, startdate, enddate, ext_code, cur_user, descript) 
 			VALUES(v_visit.csv1::integer, v_visit.csv2::integer, v_visit.csv3::integer, v_visit.csv4::integer, v_visit.csv6::date, v_visit.csv6::date, v_visit.csv7, v_visit.csv5, v_visit_descript);
 	
 			-- Insert into feature table
@@ -236,7 +236,7 @@ BEGIN
 	END LOOP;
 
 	-- Delete values on temporal table
-	DELETE FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_csv2pgcat_id;
+	DELETE FROM temp_csv2pg WHERE cur_user=current_user AND csv2pgcat_id=v_csv2pgcat_id;
 
 	
 
@@ -251,7 +251,7 @@ BEGIN
 
 	-- get log (fprocesscat 42)
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=42) row; 
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=42) row; 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 			

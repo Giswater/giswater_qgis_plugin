@@ -79,7 +79,7 @@ BEGIN
    v_enddate = ((p_data ->>'data')::json->>'enddate')::date;
 
     -- delete old values on result table
-    DELETE FROM audit_check_data WHERE fprocesscat_id=114 AND user_name=current_user;
+    DELETE FROM audit_check_data WHERE fprocesscat_id=114 AND cur_user=current_user;
     
     -- Starting process
     INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (114, null, 4, 'ARC FUSION');
@@ -304,7 +304,7 @@ BEGIN
 
     SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
     FROM (SELECT id, error_message as message FROM audit_check_data 
-    WHERE user_name="current_user"() AND fprocesscat_id=114 ORDER BY criticity desc, id asc) row; 
+    WHERE cur_user="current_user"() AND fprocesscat_id=114 ORDER BY criticity desc, id asc) row; 
     
     IF v_audit_result is null THEN
         v_status = 'Accepted';

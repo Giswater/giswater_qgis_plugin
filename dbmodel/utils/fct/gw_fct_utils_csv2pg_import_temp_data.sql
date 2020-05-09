@@ -17,7 +17,7 @@ $BODY$
 
 	--  Search path
 		SET search_path = "SCHEMA_NAME", public;
-			DELETE FROM temp_csv2pg WHERE csv2pgcat_id=csv2pgcat_id_aux AND user_name=current_user;
+			DELETE FROM temp_csv2pg WHERE csv2pgcat_id=csv2pgcat_id_aux AND cur_user=current_user;
 
 			EXECUTE 'COPY temp_csv2pg(csv1) FROM '''||path_aux||''' WITH (FORMAT text);';
 			
@@ -32,7 +32,7 @@ $BODY$
 			csv14=split_part(trim(regexp_replace(csv1, '\s+', ' ', 'g')),' ',14),csv15=split_part(trim(regexp_replace(csv1, '\s+', ' ', 'g')),' ',15),
 			csv16=split_part(trim(regexp_replace(csv1, '\s+', ' ', 'g')),' ',16),csv17=split_part(trim(regexp_replace(csv1, '\s+', ' ', 'g')),' ',17),
 			csv18=split_part(trim(regexp_replace(csv1, '\s+', ' ', 'g')),' ',18),csv19=split_part(trim(regexp_replace(csv1, '\s+', ' ', 'g')),' ',19),
-			csv20=split_part(trim(regexp_replace(csv1, '\s+', ' ', 'g')),' ',20) WHERE csv2pgcat_id is null AND user_name=current_user;
+			csv20=split_part(trim(regexp_replace(csv1, '\s+', ' ', 'g')),' ',20) WHERE csv2pgcat_id is null AND cur_user=current_user;
 
 			DELETE FROM temp_csv2pg WHERE csv1 ilike '-------%';
 			DELETE FROM temp_csv2pg WHERE csv1 ilike '*%';

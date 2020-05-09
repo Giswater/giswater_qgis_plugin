@@ -31,7 +31,7 @@ BEGIN
 	SET search_path='SCHEMA_NAME', public;
 
 
-	DELETE FROM audit_check_data WHERE fprocesscat_id=18 AND user_name=current_user;
+	DELETE FROM audit_check_data WHERE fprocesscat_id=18 AND cur_user=current_user;
 
 
 	-- UPDATE COLUMNS

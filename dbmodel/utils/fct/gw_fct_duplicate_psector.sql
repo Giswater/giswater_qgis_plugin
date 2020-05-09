@@ -58,7 +58,7 @@ BEGIN
 	INTO v_api_version;
 
 	-- manage log (fprocesscat = 51)
-	DELETE FROM audit_check_data WHERE fprocesscat_id=53 AND user_name=current_user;
+	DELETE FROM audit_check_data WHERE fprocesscat_id=53 AND cur_user=current_user;
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (53, v_result_id, concat('DUPLICATE PSECTOR'));
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (53, v_result_id, concat('------------------------------'));
 		
@@ -211,7 +211,7 @@ BEGIN
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (53, v_result_id, concat('Activate topology control.'));
 	
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=53) row; 
+	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=53) row; 
 
 	-- Control nulls
 	v_result := COALESCE(v_result, '{}'); 

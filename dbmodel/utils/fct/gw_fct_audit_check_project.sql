@@ -97,8 +97,8 @@ BEGIN
 	v_count=0;
 
 	-- delete old values on result table
-	DELETE FROM audit_check_data WHERE fprocesscat_id=101 AND user_name=current_user;
-	DELETE FROM audit_check_data WHERE fprocesscat_id IN (14,15,25,95) AND user_name=current_user;
+	DELETE FROM audit_check_data WHERE fprocesscat_id=101 AND cur_user=current_user;
+	DELETE FROM audit_check_data WHERE fprocesscat_id IN (14,15,25,95) AND cur_user=current_user;
 
 	
 	-- Starting process
@@ -273,7 +273,7 @@ BEGIN
 			-- insert results 
 			INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) 
 			SELECT 101, criticity, replace(error_message,':', ' (DB OM):') FROM audit_check_data 
-			WHERE fprocesscat_id=25 AND criticity < 4 AND error_message !='' AND user_name=current_user OFFSET 6 ;
+			WHERE fprocesscat_id=25 AND criticity < 4 AND error_message !='' AND cur_user=current_user OFFSET 6 ;
 
 			IF v_project_type = 'WS' THEN
 
@@ -283,7 +283,7 @@ BEGIN
 				-- insert results 
 				INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) 
 				SELECT 101, criticity, replace(error_message,':', ' (DB OM):') FROM audit_check_data 
-				WHERE fprocesscat_id=111 AND criticity < 4 AND error_message !='' AND user_name=current_user OFFSET 6 ;
+				WHERE fprocesscat_id=111 AND criticity < 4 AND error_message !='' AND cur_user=current_user OFFSET 6 ;
 			END IF;
 		END IF;
 
@@ -294,7 +294,7 @@ BEGIN
 				-- insert results 
 				INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) 
 				SELECT 101, criticity, replace(error_message,':', ' (DB EPA):') FROM audit_check_data 
-				WHERE fprocesscat_id=125 AND criticity < 4 AND error_message !='' AND user_name=current_user OFFSET 6;		
+				WHERE fprocesscat_id=125 AND criticity < 4 AND error_message !='' AND cur_user=current_user OFFSET 6;		
 		END IF;
 
 		IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
@@ -304,7 +304,7 @@ BEGIN
 				-- insert results 
 				INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) 
 				SELECT 101, criticity, replace(error_message,':', ' (DB PLAN):') FROM audit_check_data 
-				WHERE fprocesscat_id=15 AND criticity < 4 AND error_message !='' AND user_name=current_user OFFSET 6;				
+				WHERE fprocesscat_id=15 AND criticity < 4 AND error_message !='' AND cur_user=current_user OFFSET 6;				
 		END IF;
 
 		IF 'role_admin' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
@@ -314,7 +314,7 @@ BEGIN
 			-- insert results 
 			INSERT INTO audit_check_data  (fprocesscat_id, criticity, error_message) 
 			SELECT 101, criticity, replace(error_message,':', ' (DB ADMIN):') FROM audit_check_data 
-			WHERE fprocesscat_id=95 AND criticity < 4 AND error_message !='' AND user_name=current_user OFFSET 6;
+			WHERE fprocesscat_id=95 AND criticity < 4 AND error_message !='' AND cur_user=current_user OFFSET 6;
 			
 		END IF;
 	END IF;
@@ -334,11 +334,11 @@ BEGIN
 		
 			-- get values using v_edit_node as 'current'  (in case v_edit_node is wrong all will he wrong)
 			SELECT table_host, table_dbname, table_schema INTO v_table_host, v_table_dbname, v_table_schema 
-			FROM audit_check_project where table_id = 'v_edit_node' and user_name=current_user;
+			FROM audit_check_project where table_id = 'v_edit_node' and cur_user=current_user;
 			
 			--check layers host
 			SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list 
-			FROM audit_check_project WHERE table_host != v_table_host AND user_name=current_user;
+			FROM audit_check_project WHERE table_host != v_table_host AND cur_user=current_user;
 			
 			IF v_count>0 THEN
 				v_errortext = concat('ERROR( QGIS PROJ): There is/are ',v_count,' layers that come from differen host: ',v_layer_list,'.');
@@ -352,7 +352,7 @@ BEGIN
 			
 			--check layers database
 			SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list 
-			FROM audit_check_project WHERE table_dbname != v_table_dbname AND user_name=current_user;
+			FROM audit_check_project WHERE table_dbname != v_table_dbname AND cur_user=current_user;
 			
 			IF v_count>0 THEN
 				v_errortext = concat('ERROR (QGIS PROJ): There is/are ',v_count,' layers that come from different database: ',v_layer_list,'.');
@@ -366,7 +366,7 @@ BEGIN
 
 			--check layers database
 			SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list 
-			FROM audit_check_project WHERE table_schema != v_table_schema AND user_name=current_user;
+			FROM audit_check_project WHERE table_schema != v_table_schema AND cur_user=current_user;
 			
 			IF v_count>0 THEN
 				v_errortext = concat('ERROR (QGIS PROJ): There is/are ',v_count,' layers that come from different schema: ',v_layer_list,'.');
@@ -380,7 +380,7 @@ BEGIN
 
 			--check layers user
 			SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list 
-			FROM audit_check_project WHERE user_name != table_user AND table_user != 'None' AND user_name=current_user;
+			FROM audit_check_project WHERE cur_user != table_user AND table_user != 'None' AND cur_user=current_user;
 			
 			IF v_count>0 THEN
 				v_errortext = concat('ERROR (QGIS PROJ): There is/are ',v_count,' layers that have been added by different user: ',v_layer_list,'.');
@@ -398,7 +398,7 @@ BEGIN
 			LOOP
 			
 				--RAISE NOTICE 'v_count % id % ', v_count, v_rectable.id;
-				IF v_rectable.id NOT IN (SELECT table_id FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=v_fprocesscat_id_aux) THEN
+				IF v_rectable.id NOT IN (SELECT table_id FROM audit_check_project WHERE cur_user=current_user AND fprocesscat_id=v_fprocesscat_id_aux) THEN
 					INSERT INTO audit_check_project (table_id, fprocesscat_id, criticity, enabled, message) VALUES (v_rectable.id, 1, v_rectable.qgis_criticity, FALSE, v_rectable.qgis_message);
 				--ELSE 
 				--	UPDATE audit_check_project SET criticity=v_rectable.qgis_criticity, enabled=TRUE WHERE table_id=v_rectable.id;
@@ -407,7 +407,7 @@ BEGIN
 			END LOOP;
 			
 			--error 1 (criticity = 3 and false)
-			SELECT count (*) INTO v_error FROM audit_check_project WHERE user_name=current_user AND fprocesscat_id=1 AND criticity=3 AND enabled=FALSE;
+			SELECT count (*) INTO v_error FROM audit_check_project WHERE cur_user=current_user AND fprocesscat_id=1 AND criticity=3 AND enabled=FALSE;
 
 			--list missing layers with criticity 3 and 2
 
@@ -449,7 +449,7 @@ BEGIN
 		-- get results
 		-- info
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
-		FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=101 order by criticity desc, id asc) row; 
+		FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=101 order by criticity desc, id asc) row; 
 		v_result := COALESCE(v_result, '{}'); 
 		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 

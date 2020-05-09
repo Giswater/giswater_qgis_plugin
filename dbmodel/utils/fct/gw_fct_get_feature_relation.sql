@@ -62,7 +62,7 @@ BEGIN
 	SELECT wsoftware, giswater  INTO v_project_type, v_version FROM version order by 1 desc limit 1;
 
 	-- manage log (fprocesscat = 51)
-	DELETE FROM audit_check_data WHERE fprocesscat_id=51 AND user_name=current_user;
+	DELETE FROM audit_check_data WHERE fprocesscat_id=51 AND cur_user=current_user;
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('FEATURE RELATIONS'));
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('------------------------------'));
 
@@ -190,7 +190,7 @@ BEGIN
 
 
 SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-FROM (SELECT id, error_message AS message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=51) row; 
+FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=51) row; 
 
 
 v_result := COALESCE(v_result, '{}'); 

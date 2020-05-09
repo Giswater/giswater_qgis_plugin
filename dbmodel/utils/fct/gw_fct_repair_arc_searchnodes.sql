@@ -20,8 +20,8 @@ BEGIN
 	SET search_path= 'SCHEMA_NAME','public';
 
 	-- Delete previous log results
-	DELETE FROM audit_log_data WHERE fprocesscat_id=3 AND user_name=current_user;
-	DELETE FROM audit_log_data WHERE fprocesscat_id=4 AND user_name=current_user;
+	DELETE FROM audit_log_data WHERE fprocesscat_id=3 AND cur_user=current_user;
+	DELETE FROM audit_log_data WHERE fprocesscat_id=4 AND cur_user=current_user;
     
 	-- Set config parameter
 	UPDATE config_param_system SET value=TRUE WHERE parameter='edit_topocontrol_dsbl_error' ;

@@ -14,7 +14,6 @@ ALTER TABLE sys_typevalue_cat RENAME TO sys_typevalue;
 ALTER TABLE sys_csv2pg_cat RENAME TO config_csv;
 ALTER TABLE audit_cat_function RENAME TO sys_function;
 
-
 CREATE TABLE config_toolbox (
 id integer PRIMARY KEY,
 alias text,
@@ -64,3 +63,4 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"audit_ch
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"temp_table", "column":"user_name", "newName":"cur_user"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"audit_log_arc_traceability", "column":"user", "newName":"cur_user"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"temp_csv2pg", "column":"user_name", "newName":"cur_user"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"rpt_cat_result", "column":"user_name", "newName":"cur_user"}}$$);

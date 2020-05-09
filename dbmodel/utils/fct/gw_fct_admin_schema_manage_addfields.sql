@@ -166,7 +166,7 @@ BEGIN
 	v_hidden = COALESCE(v_hidden, FALSE);
 
 	-- delete old values on result table
-	DELETE FROM audit_check_data WHERE fprocesscat_id=118 AND user_name=current_user;
+	DELETE FROM audit_check_data WHERE fprocesscat_id=118 AND cur_user=current_user;
 	
 	-- Starting process
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (118, null, 4, 'CREATE ADDFIELDS');
@@ -826,7 +826,7 @@ BEGIN
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data 
-	WHERE user_name="current_user"() AND fprocesscat_id=118 ORDER BY criticity desc, id asc) row; 
+	WHERE cur_user="current_user"() AND fprocesscat_id=118 ORDER BY criticity desc, id asc) row; 
 	
 	IF v_audit_result is null THEN
         v_status = 'Accepted';

@@ -121,7 +121,7 @@ BEGIN
 	SELECT value::boolean INTO v_hide_form FROM config_param_user where parameter='qgis_form_log_hidden' AND cur_user=current_user;
 
 	-- delete old values on result table
-	DELETE FROM audit_check_data WHERE fprocesscat_id=112 AND user_name=current_user;
+	DELETE FROM audit_check_data WHERE fprocesscat_id=112 AND cur_user=current_user;
 	
 	-- Starting process
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (112, null, 4, 'ARC DIVIDE');
@@ -345,12 +345,12 @@ BEGIN
 							IF rec_visit.the_geom IS NULL THEN -- if visit does not has geometry, events may have. It's mandatory to distribute one by one
 
 								-- Get visit data into two new visits
-								INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, user_name, webclient_id,expl_id,descript,is_done, lot_id, class_id, status, visit_type) 
-								SELECT visitcat_id, ext_code, startdate, enddate, user_name, webclient_id, expl_id, descript, is_done, lot_id, class_id, status, visit_type 
+								INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, cur_user, webclient_id,expl_id,descript,is_done, lot_id, class_id, status, visit_type) 
+								SELECT visitcat_id, ext_code, startdate, enddate, cur_user, webclient_id, expl_id, descript, is_done, lot_id, class_id, status, visit_type 
 								FROM om_visit WHERE id=rec_visit.id RETURNING id INTO v_newvisit1;
 
-								INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, user_name, webclient_id, expl_id, descript, is_done, lot_id, class_id, status, visit_type) 
-								SELECT visitcat_id, ext_code, startdate, enddate, user_name, webclient_id, expl_id, descript, is_done, lot_id, class_id, status, visit_type 
+								INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, cur_user, webclient_id, expl_id, descript, is_done, lot_id, class_id, status, visit_type) 
+								SELECT visitcat_id, ext_code, startdate, enddate, cur_user, webclient_id, expl_id, descript, is_done, lot_id, class_id, status, visit_type 
 								FROM om_visit WHERE id=rec_visit.id RETURNING id INTO v_newvisit2;
 								
 								FOR rec_event IN SELECT * FROM om_visit_event WHERE visit_id=rec_visit.id LOOP
@@ -742,7 +742,7 @@ END IF;
 
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data 
-	WHERE user_name="current_user"() AND fprocesscat_id=112 ORDER BY criticity desc, id asc) row; 
+	WHERE cur_user="current_user"() AND fprocesscat_id=112 ORDER BY criticity desc, id asc) row; 
 	
 	IF v_audit_result is null THEN
         v_status = 'Accepted';
