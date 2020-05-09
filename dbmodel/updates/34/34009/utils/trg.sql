@@ -8,3 +8,8 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2020/05/09
+ALTER TABLE edit_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
+ALTER TABLE inp_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
+ALTER TABLE plan_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
+ALTER TABLE om_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
+ 

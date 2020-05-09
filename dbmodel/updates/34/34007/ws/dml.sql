@@ -7,8 +7,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-ALTER TABLE inp_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
-
 DELETE FROM inp_typevalue WHERE typevalue IN ('inp_value_demandtype','inp_value_patternmethod', 'inp_options_networkmode');
 
 INSERT INTO inp_typevalue VALUES ('inp_options_networkmode', '1', 'NODE (MANDATORY NODARCS)', NULL);
@@ -44,9 +42,6 @@ INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod', '51', 'DMA PERIOD (
 INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod', '52', 'HYDRO PERIOD (NODE)', NULL, '{"DemandType":5}');
 INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod', '53', 'DMA PERIOD (PJOINT)', NULL, '{"DemandType":5}');
 INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod', '54', 'HYDRO PERIOD (PJOINT)', NULL, '{"DemandType":5}');
-
-ALTER TABLE inp_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
-
 
 DELETE FROM audit_cat_param_user WHERE id = 'inp_options_vdefault';
 INSERT INTO audit_cat_param_user (id, formname, descript, sys_role_id, label, isenabled, project_type, isparent , isautoupdate, datatype, widgettype,

@@ -9,17 +9,11 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 update connec set pjoint_id = exit_id, pjoint_type='VNODE' FROM link WHERE link.feature_id=connec_id;
 
-
-ALTER TABLE inp_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
-
 UPDATE inp_typevalue SET idval='DMAPERIOD>NODE' WHERE typevalue='inp_value_patternmethod' AND id='23';
 UPDATE inp_typevalue SET idval='HYDROPERIOD>NODE' WHERE typevalue='inp_value_patternmethod' AND id='24';
 UPDATE inp_typevalue SET idval='DMAINTERVAL>NODE' WHERE typevalue='inp_value_patternmethod' AND id='25';
 UPDATE inp_typevalue SET idval='HYDROPERIOD>NODE::DMAINTERVAL' WHERE typevalue='inp_value_patternmethod' AND id='26';
 UPDATE inp_typevalue SET idval='HYDROPERIOD>PJOINT' WHERE typevalue='inp_value_patternmethod' AND id='27';
-
-ALTER TABLE inp_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
-
 
 INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod', '27', 'DMAPERIOD>PJOINT')
 ON CONFLICT (typevalue, id) DO NOTHING;
