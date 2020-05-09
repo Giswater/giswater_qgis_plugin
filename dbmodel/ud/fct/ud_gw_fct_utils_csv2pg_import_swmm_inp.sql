@@ -115,14 +115,14 @@ BEGIN
 		DELETE FROM config_param_user WHERE parameter ILIKE 'inp_options%' AND cur_user = current_user;
 		DELETE FROM config_param_user WHERE parameter ILIKE 'inp_report%' AND cur_user = current_user;
 
-		FOR v_id IN SELECT id FROM audit_cat_table WHERE (sys_role_id ='role_edit' AND id NOT LIKE 'v%') AND isdeprecated = FALSE
+		FOR v_id IN SELECT id FROM sys_cat_table WHERE (sys_role_id ='role_edit' AND id NOT LIKE 'v%') AND isdeprecated = FALSE
 		LOOP 
 			--RAISE NOTICE 'v_id %', v_id;
 			EXECUTE 'DELETE FROM '||quote_ident(v_id);
 		END LOOP;
 
 		
-		FOR v_id IN SELECT id FROM audit_cat_table WHERE (sys_role_id ='role_epa' AND id NOT LIKE 'v%') AND isdeprecated = FALSE
+		FOR v_id IN SELECT id FROM sys_cat_table WHERE (sys_role_id ='role_epa' AND id NOT LIKE 'v%') AND isdeprecated = FALSE
 		LOOP 
 			--RAISE NOTICE 'v_id %', v_id;
 			EXECUTE 'DELETE FROM '||quote_ident(v_id);

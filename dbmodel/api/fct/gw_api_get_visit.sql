@@ -270,8 +270,8 @@ BEGIN
 
 	
 	--  get formname and tablename
-	v_formname := (SELECT formname FROM config_api_visit WHERE visitclass_id=v_visitclass);
-	v_tablename := (SELECT tablename FROM config_api_visit WHERE visitclass_id=v_visitclass);
+	v_formname := (SELECT formname FROM om_visit_class WHERE id=v_visitclass);
+	v_tablename := (SELECT tablename FROM om_visit_class WHERE id=v_visitclass);
 	v_ismultievent := (SELECT ismultievent FROM om_visit_class WHERE id=v_visitclass);
 	
 	-- getting provisional visit id if is new visit
@@ -302,8 +302,8 @@ BEGIN
 	IF isnewvisit IS FALSE THEN
 
 		v_extvisitclass := (SELECT class_id FROM om_visit WHERE id=v_id::int8);
-		v_formname := (SELECT formname FROM config_api_visit WHERE visitclass_id=v_visitclass);
-		v_tablename := (SELECT tablename FROM config_api_visit WHERE visitclass_id=v_visitclass);
+		v_formname := (SELECT formname FROM om_visit_class WHERE visitclass_id=v_visitclass);
+		v_tablename := (SELECT tablename FROM om_visit_class WHERE visitclass_id=v_visitclass);
 		v_ismultievent := (SELECT ismultievent FROM om_visit_class WHERE id=v_visitclass);
 	END IF;
 

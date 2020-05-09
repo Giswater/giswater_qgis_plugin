@@ -36,7 +36,7 @@ BEGIN
 
 	IF p_action = 'notify' THEN
 
-		FOR rec IN (select * FROM audit_cat_table WHERE notify_action IS NOT NULL 
+		FOR rec IN (select * FROM sys_cat_table WHERE notify_action IS NOT NULL 
 			AND context !='view from external schema' AND isdeprecated IS FALSE) LOOP
 			v_notify_action = rec.notify_action;
 

@@ -14,6 +14,12 @@ ALTER TABLE sys_typevalue_cat RENAME TO sys_typevalue;
 ALTER TABLE sys_csv2pg_cat RENAME TO config_csv;
 ALTER TABLE audit_cat_function RENAME TO sys_function;
 
+ALTER TABLE audit_cat_param_user RENAME TO sys_param_user;
+ALTER TABLE audit_cat_error RENAME TO sys_error;
+ALTER TABLE audit_cat_table RENAME TO sys_table;
+ALTER TABLE audit_cat_sequence RENAME TO sys_sequence;
+
+
 CREATE TABLE config_toolbox (
 id integer PRIMARY KEY,
 alias text,
@@ -22,10 +28,6 @@ functionparams json,
 inputparams json,
 observ text
 );
-
-
-INSERT INTO config_toolbox
-SELECT id, alias, isparametric, input_params::json, return_type::json, context FROM sys_function WHERE istoolbox IS TRUE;
 
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"sys_function", "column":"istoolbox"}}$$);
@@ -42,6 +44,11 @@ ALTER TABLE audit_log_project RENAME to _audit_log_project_ ;
 ALTER TABLE audit_log_csv2pg RENAME to _audit_log_csv2pg_ ;
 ALTER TABLE audit_log_arc_traceability RENAME to audit_arc_traceability;
 
+ALTER TABLE audit_cat_column RENAME to _audit_cat_column_;
+ALTER TABLE audit_price_simple RENAME to _audit_price_simple_;
+ALTER TABLE config_api_visit RENAME to _config_api_visit_;
+ALTER TABLE audit_cat_column RENAME to _audit_cat_column_;
+
 
 --harmonize audit_log_data
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_log_data", "column":"table_id", "dataType":"text"}}$$);
@@ -52,6 +59,9 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_log_d
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_check_data", "column":"feature_type", "dataType":"text"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_check_data", "column":"feature_id", "dataType":"text"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_check_data", "column":"addparam", "dataType":"json"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit_class", "column":"formname", "dataType":"text"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit_class", "column":"tablename", "dataType":"text"}}$$);
 
 -- harmonize cur_user
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"audit_log_data", "column":"user_name", "newName":"cur_user"}}$$);

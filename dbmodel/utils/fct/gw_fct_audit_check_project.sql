@@ -172,7 +172,7 @@ BEGIN
 	END IF;
 
 	--Reset the rest of sequences
-	FOR v_rectable IN SELECT * FROM audit_cat_table WHERE sys_sequence IS NOT NULL AND sys_sequence_field IS NOT NULL AND sys_sequence!='urn_id_seq' AND sys_sequence!='doc_seq' AND isdeprecated IS NOT TRUE
+	FOR v_rectable IN SELECT * FROM sys_cat_table WHERE sys_sequence IS NOT NULL AND sys_sequence_field IS NOT NULL AND sys_sequence!='urn_id_seq' AND sys_sequence!='doc_seq' AND isdeprecated IS NOT TRUE
 	LOOP 
 		v_query_string:= 'SELECT max('||v_rectable.sys_sequence_field||') FROM '||v_rectable.id||';' ;
 		EXECUTE v_query_string INTO v_max_seq_id;	
@@ -393,7 +393,7 @@ BEGIN
 			END IF;
 
 			-- start process
-			FOR v_rectable IN SELECT * FROM audit_cat_table WHERE qgis_role_id IN 
+			FOR v_rectable IN SELECT * FROM sys_cat_table WHERE qgis_role_id IN 
 			(SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member') AND isdeprecated IS FALSE)
 			LOOP
 			
@@ -416,9 +416,9 @@ BEGIN
 			FROM '||v_schema||'.audit_check_project 
 			JOIN information_schema.columns ON table_name = table_id 
 			AND columns.table_schema = '''||v_schema||''' and ordinal_position=1 
-			LEFT JOIN '||v_schema||'.audit_cat_table ON audit_cat_table.id=audit_check_project.table_id
+			LEFT JOIN '||v_schema||'.sys_cat_table ON sys_cat_table.id=audit_check_project.table_id
 			INNER JOIN (SELECT column_name ,table_name FROM information_schema.columns
-			WHERE table_schema = '''||v_schema||''' AND udt_name = ''geometry'')b ON b.table_name=audit_cat_table.id
+			WHERE table_schema = '''||v_schema||''' AND udt_name = ''geometry'')b ON b.table_name=sys_cat_table.id
 			WHERE criticity=3 and enabled IS NOT TRUE) a'
 			INTO v_result_layers_criticity3;
 
@@ -428,9 +428,9 @@ BEGIN
 			FROM '||v_schema||'.audit_check_project 
 			JOIN information_schema.columns ON table_name = table_id 
 			AND columns.table_schema = '''||v_schema||''' and ordinal_position=1 
-			LEFT JOIN '||v_schema||'.audit_cat_table ON audit_cat_table.id=audit_check_project.table_id
+			LEFT JOIN '||v_schema||'.sys_cat_table ON sys_cat_table.id=audit_check_project.table_id
 			INNER JOIN (SELECT column_name ,table_name FROM information_schema.columns
-			WHERE table_schema = '''||v_schema||''' AND udt_name = ''geometry'')b ON b.table_name=audit_cat_table.id
+			WHERE table_schema = '''||v_schema||''' AND udt_name = ''geometry'')b ON b.table_name=sys_cat_table.id
 			WHERE criticity=2 and enabled IS NOT TRUE) a'
 			INTO v_result_layers_criticity2;
 

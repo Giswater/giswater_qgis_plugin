@@ -94,11 +94,6 @@ BEGIN
 			"data":{"error":"2092", "function":"2440","debug_msg":null}}$$);'INTO v_audit_result;
 		END IF;
 	
-		-- Insert into audit table
-		INSERT INTO audit_price_simple (id, pricecat_id, unit, descript, text, price, cur_user)
-		SELECT csv1, v_label, csv2, csv3, csv4, csv5::numeric(12,4), current_user
-		FROM temp_csv2pg WHERE cur_user=current_user AND csv2pgcat_id=1;
-				
 		-- Insert into price_cat_simple table
 		IF v_label NOT IN (SELECT id FROM price_cat_simple) THEN
 			INSERT INTO price_cat_simple (id) VALUES (v_label);
