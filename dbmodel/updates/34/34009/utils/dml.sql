@@ -12,3 +12,6 @@ SELECT gw_fct_admin_schema_manage_triggers('notify',null);
 
 -- 13/11/2019
 UPDATE config_typevalue_fk SET target_table='ext_cat_raster' WHERE target_table='cat_raster';
+
+UPDATE sys_fprocess SET issystem=true;
+UPDATE sys_function SET issystem=true;

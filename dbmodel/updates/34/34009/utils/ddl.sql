@@ -54,10 +54,16 @@ ALTER TABLE audit_cat_column RENAME to _audit_cat_column_;
 ALTER TABLE audit_price_simple RENAME to _audit_price_simple_;
 
 
---harmonize audit_log_data
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_log_data", "column":"table_id", "dataType":"text"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_log_data", "column":"column_id", "dataType":"text"}}$$);
+--create issystem param
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_fprocess", "column":"issystem", "dataType":"boolean"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_function", "column":"issystem", "dataType":"boolean"}}$$);
+
+
+-- create fprocesstype
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_log_data", "column":"addparam", "dataType":"json"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_log_data", "column":"addparam", "dataType":"json"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_log_data", "column":"addparam", "dataType":"json"}}$$);
+
 
 --harmonize audit_check_data
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_check_data", "column":"feature_type", "dataType":"text"}}$$);
