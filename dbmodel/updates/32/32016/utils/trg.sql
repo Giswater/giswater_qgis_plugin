@@ -43,3 +43,9 @@ CREATE TRIGGER gw_trg_typevalue_config_fk AFTER INSERT OR UPDATE OR DELETE ON om
 CREATE TRIGGER gw_trg_cat_manager AFTER INSERT OR UPDATE OR DELETE ON cat_manager FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_cat_manager();
   
+  
+ALTER TABLE edit_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
+ALTER TABLE inp_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
+ALTER TABLE plan_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
+ALTER TABLE om_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
+ 

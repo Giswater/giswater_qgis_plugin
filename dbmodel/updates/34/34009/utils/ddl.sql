@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = ws_sample, public, pg_catalog;
+SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2020/05/09
 ALTER TABLE sys_csv2pg_config RENAME TO config_csv_param;
@@ -26,9 +26,6 @@ observ text
 
 INSERT INTO config_toolbox
 SELECT id, alias, isparametric, input_params::json, return_type::json, context FROM sys_function WHERE istoolbox IS TRUE;
-
-SELECT * FROM audit_log_data
-SELECT * FROM audit_check_data
 
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"sys_function", "column":"istoolbox"}}$$);
@@ -58,7 +55,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_check
 
 -- harmonize cur_user
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"audit_log_data", "column":"user_name", "newName":"cur_user"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"audit_check_project", "column":"user_name", "newName":"cur_user"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"audit_check_data", "column":"user_name", "newName":"cur_user"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"audit_check_project", "column":"user_name", "newName":"cur_user"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"temp_table", "column":"user_name", "newName":"cur_user"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"audit_log_arc_traceability", "column":"user", "newName":"cur_user"}}$$);
