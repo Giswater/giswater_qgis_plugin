@@ -27,22 +27,20 @@ SELECT SCHEMA_NAME.gw_api_gettoolbox($${
 */
 
 DECLARE
-	v_apiversion text;
-	v_role text;
-	v_projectype text;
-	v_filter text;
-	v_om_fields json;
-	v_edit_fields json;
-	v_epa_fields json;
-	v_master_fields json;
-	v_admin_fields json;
-	v_isepa boolean = false;
-	v_epa_user text;
-	v_istoolbox boolean = true;
-	v_querytext text;
-	v_querytext_mod text;
-	v_queryresult text;
-
+v_apiversion text;
+v_role text;
+v_projectype text;
+v_filter text;
+v_om_fields json;
+v_edit_fields json;
+v_epa_fields json;
+v_master_fields json;
+v_admin_fields json;
+v_isepa boolean = false;
+v_epa_user text;
+v_querytext text;
+v_querytext_mod text;
+v_queryresult text;
 
 BEGIN
 
@@ -56,13 +54,7 @@ BEGIN
 	-- get input parameter
 	v_filter := (p_data ->> 'data')::json->> 'filterText';
 	v_filter := COALESCE(v_filter, '');
-	v_istoolbox := ((p_data ->> 'data')::json->> 'isToolbox')::boolean;
 
-	IF v_istoolbox IS NULL THEN
-		v_istoolbox = TRUE;
-	END IF;
-
-	
 	-- get project type
         SELECT lower(wsoftware) INTO v_projectype FROM version LIMIT 1;
 
@@ -77,27 +69,30 @@ BEGIN
 
 	-- get om toolbox parameters
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-		 SELECT alias, descript, input_params::json, return_type::json, context as isnotparammsg, sys_role_id, function_name as functionname, isparametric
-		 FROM audit_cat_function
-		 WHERE istoolbox is '||v_istoolbox||' AND alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_om''
+		 SELECT alias, descript, functionparams AS input_params, inputparams AS return_type, observ AS isnotparammsg, sys_role_id, function_name as functionname, isparametric
+		 FROM sys_function 
+		 JOIN config_toolbox USING (id)
+		 WHERE alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_om''
 		 AND (project_type='||quote_literal(v_projectype)||' or project_type=''utils'')) a'
 		USING v_filter
 		INTO v_om_fields;
 
 	-- get edit toolbox parameters
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-		 SELECT alias, descript, input_params::json, return_type::json,  context as isnotparammsg, sys_role_id, function_name as functionname, isparametric
-		 FROM audit_cat_function
-		 WHERE istoolbox is '||v_istoolbox||' AND alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_edit''
+		 SELECT alias, descript, functionparams AS input_params, inputparams AS return_type, observ AS isnotparammsg, sys_role_id, function_name as functionname, isparametric
+		 FROM sys_function
+ 		 JOIN config_toolbox USING (id)
+		 WHERE alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_edit''
 		 AND ( project_type='||quote_literal(v_projectype)||' or project_type=''utils'')) a'
 		USING v_filter
 		INTO v_edit_fields;
 
 	-- get epa toolbox parameters
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-		SELECT alias, descript, input_params::json,return_type::json,  context as isnotparammsg, sys_role_id, function_name as functionname, isparametric
-		FROM audit_cat_function
-		WHERE istoolbox is '||v_istoolbox||' AND alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_epa''
+		 SELECT alias, descript, functionparams AS input_params, inputparams AS return_type, observ AS isnotparammsg, sys_role_id, function_name as functionname, isparametric
+		FROM sys_function
+		JOIN config_toolbox USING (id)
+		WHERE alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_epa''
 		AND ( project_type='||quote_literal(v_projectype)||' or project_type=''utils'')) a'
 		USING v_filter
 		INTO v_epa_fields;
@@ -106,26 +101,31 @@ BEGIN
 
 	-- get master toolbox parameters
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-		 SELECT alias, descript, input_params::json,return_type::json,  context as isnotparammsg, sys_role_id, function_name as functionname, isparametric
-		 FROM audit_cat_function
-		 WHERE istoolbox is '||v_istoolbox||' AND alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_master''
+		 SELECT alias, descript, functionparams AS input_params, inputparams AS return_type, observ AS isnotparammsg, sys_role_id, function_name as functionname, isparametric
+		 FROM sys_function
+ 		 JOIN config_toolbox USING (id)
+		 WHERE alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_master''
 		 AND (project_type='||quote_literal(v_projectype)||' OR project_type=''utils'')) a'
 		USING v_filter
 		INTO v_master_fields;
         
 	-- get admin toolbox parameters
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-		 SELECT alias, descript, input_params::json,return_type::json,  context as isnotparammsg, sys_role_id, function_name as functionname, isparametric
-		 FROM audit_cat_function
-		 WHERE istoolbox is '||v_istoolbox||' AND alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_admin''
+		 SELECT alias, descript, functionparams AS input_params, inputparams AS return_type, observ AS isnotparammsg, sys_role_id, function_name as functionname, isparametric
+		 FROM sys_function
+		 JOIN config_toolbox USING (id)
+		 WHERE alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_admin''
 		 AND (project_type='||quote_literal(v_projectype)||' or project_type=''utils'')) a'
 		USING v_filter
 		INTO v_admin_fields;
 
 
 	-- refactor dvquerytext		
-	FOR v_querytext in select distinct querytext from (SELECT id, json_array_elements_text (return_type::json)::json->>'widgetname' as widgetname, json_array_elements_text (return_type::json)::json->>'dvQueryText'
-		as querytext FROM audit_cat_function  where istoolbox=true AND alias = v_filter AND (project_type=v_projectype OR project_type='utils'))a WHERE querytext is not null
+	FOR v_querytext in select distinct querytext from (
+		
+		SELECT id, json_array_elements_text (inputparams::json)::json->>'widgetname' as widgetname, json_array_elements_text (inputparams::json)::json->>'dvQueryText'
+		as querytext FROM sys_function JOIN config_toolbox USING (id) where alias = v_filter AND (project_type=v_projectype OR project_type='utils'))a
+		WHERE querytext is not null
 		LOOP
 		
 			v_querytext_mod =  'SELECT concat (''"comboIds":'',array_to_json(array_agg(to_json(id::text))) , '', "comboNames":'',array_to_json(array_agg(to_json(idval::text)))) FROM ('||v_querytext||')a';
@@ -147,8 +147,8 @@ BEGIN
 	v_admin_fields := COALESCE(v_admin_fields, '[]');
 
 		
---    Return
-    RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "apiVersion":'||v_apiversion||
+	-- Return
+	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "apiVersion":'||v_apiversion||
              ',"body":{"form":{}'||
 		     ',"feature":{}'||
 		     ',"data":{"fields":{'||
@@ -159,9 +159,9 @@ BEGIN
 					 ' , "admin":' || v_admin_fields ||'}}}'||
 	    '}')::json;
        
---    Exception handling
---    EXCEPTION WHEN OTHERS THEN 
-        --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_apiversion || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	--Exception handling
+	EXCEPTION WHEN OTHERS THEN 
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_apiversion || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

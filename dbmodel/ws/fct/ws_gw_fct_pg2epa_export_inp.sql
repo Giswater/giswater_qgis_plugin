@@ -69,7 +69,7 @@ BEGIN
 	INSERT INTO temp_csv2pg (csv1,csv2pgcat_id) VALUES (NULL,v_pg2csvcat_id); 
 
 	--node
-	FOR rec_table IN SELECT * FROM sys_csv2pg_config WHERE pg2csvcat_id=v_pg2csvcat_id AND csvversion::json->>'from'='2.0.12' order by id
+	FOR rec_table IN SELECT * FROM config_csv_param WHERE pg2csvcat_id=v_pg2csvcat_id AND csvversion::json->>'from'='2.0.12' order by id
 	LOOP
 		-- insert header
 		INSERT INTO temp_csv2pg (csv1,csv2pgcat_id) VALUES (NULL,v_pg2csvcat_id); 

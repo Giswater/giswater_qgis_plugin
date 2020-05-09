@@ -61,7 +61,7 @@ BEGIN
 	ELSIF TG_OP = 'UPDATE' and v_table IN (SELECT DISTINCT typevalue_table FROM typevalue_fk) THEN
 		
 		--select configuration from the typevalue_fk and related typevalue for the selected value
-		IF OLD.typevalue IN (SELECT typevalue_name FROM sys_typevalue_cat) THEN
+		IF OLD.typevalue IN (SELECT typevalue_name FROM sys_typevalue) THEN
 			IF NEW.typevalue != OLD.typevalue OR NEW.id != OLD.id THEN
 
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
@@ -93,7 +93,7 @@ BEGIN
 		v_query = 'SELECT * FROM SCHEMA_NAME.'||v_table||' WHERE '||v_table||'.typevalue = '''|| OLD.typevalue||''' AND  '||v_table||'.id = '''||OLD.id||''';';
 
 		--if typevalue is a system typevalue - error, cant delete the value, else proceed with the delete process
-		IF OLD.typevalue IN (SELECT typevalue_name FROM sys_typevalue_cat) THEN
+		IF OLD.typevalue IN (SELECT typevalue_name FROM sys_typevalue) THEN
 			
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
        		"data":{"error":"3028", "function":"2750","debug_msg":"'||OLD.typevalue||'"}}$$);';

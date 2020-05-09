@@ -63,7 +63,7 @@ BEGIN
 	END IF;
 	
 	--remove data from with the same result_id
-	FOR rpt_rec IN SELECT tablename FROM sys_csv2pg_config WHERE pg2csvcat_id=v_csv2pgcat_id EXCEPT SELECT tablename FROM sys_csv2pg_config WHERE tablename='rpt_cat_result' 
+	FOR rpt_rec IN SELECT tablename FROM config_csv_param WHERE pg2csvcat_id=v_csv2pgcat_id EXCEPT SELECT tablename FROM config_csv_param WHERE tablename='rpt_cat_result' 
 	LOOP
 		EXECUTE 'DELETE FROM '||rpt_rec.tablename||' WHERE result_id='''||v_result_id||''';';
 	END LOOP;
@@ -72,8 +72,8 @@ BEGIN
 	FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_csv2pgcat_id order by id
 	LOOP
 
-		IF (SELECT tablename FROM sys_csv2pg_config WHERE target=concat(rpt_rec.csv1,' ',rpt_rec.csv2) AND pg2csvcat_id=v_csv2pgcat_id) IS NOT NULL THEN
-			type_aux=(SELECT tablename FROM sys_csv2pg_config WHERE target=concat(rpt_rec.csv1,' ',rpt_rec.csv2) AND pg2csvcat_id=v_csv2pgcat_id);
+		IF (SELECT tablename FROM config_csv_param WHERE target=concat(rpt_rec.csv1,' ',rpt_rec.csv2) AND pg2csvcat_id=v_csv2pgcat_id) IS NOT NULL THEN
+			type_aux=(SELECT tablename FROM config_csv_param WHERE target=concat(rpt_rec.csv1,' ',rpt_rec.csv2) AND pg2csvcat_id=v_csv2pgcat_id);
 		ELSIF rpt_rec.csv1 = 'WARNING' THEN
 			type_aux = 'rpt_warning_summary';
 		END IF;	

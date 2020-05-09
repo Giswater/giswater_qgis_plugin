@@ -355,7 +355,7 @@ BEGIN
 
 
 	-- LOOPING THE EDITABLE VIEWS TO INSERT DATA
-	FOR v_rec_table IN SELECT * FROM sys_csv2pg_config WHERE reverse_pg2csvcat_id=v_csv2pgcat_id AND tablename NOT IN ('vi_pipes', 'vi_junctions') order by id
+	FOR v_rec_table IN SELECT * FROM config_csv_param WHERE reverse_pg2csvcat_id=v_csv2pgcat_id AND tablename NOT IN ('vi_pipes', 'vi_junctions') order by id
 	LOOP
 		--identifing the number of fields of the editable view
 		FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns where table_name=v_rec_table.tablename AND table_schema='SCHEMA_NAME'
