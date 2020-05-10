@@ -574,9 +574,9 @@ class MincutParent(ParentAction):
                 
         sql += f" WHERE id = '{result_mincut_id}';\n"
         
-        # Update table 'anl_mincut_result_selector'
-        sql += (f"DELETE FROM anl_mincut_result_selector WHERE cur_user = current_user;\n"
-                f"INSERT INTO anl_mincut_result_selector (cur_user, result_id) VALUES "
+        # Update table 'selector_mincut_result'
+        sql += (f"DELETE FROM selector_mincut_result WHERE cur_user = current_user;\n"
+                f"INSERT INTO selector_mincut_result (cur_user, result_id) VALUES "
                 f"(current_user, {result_mincut_id});")
         
         # Check if any 'connec' or 'hydro' associated
@@ -731,15 +731,15 @@ class MincutParent(ParentAction):
 
 
     def update_result_selector(self, result_mincut_id, commit=True):    
-        """ Update table 'anl_mincut_result_selector' """    
+        """ Update table 'selector_mincut_result' """
             
-        sql = (f"DELETE FROM anl_mincut_result_selector WHERE cur_user = current_user;"
-               f"\nINSERT INTO anl_mincut_result_selector (cur_user, result_id) VALUES"
+        sql = (f"DELETE FROM selector_mincut_result WHERE cur_user = current_user;"
+               f"\nINSERT INTO selector_mincut_result (cur_user, result_id) VALUES"
                f" (current_user, {result_mincut_id});")
         status = self.controller.execute_sql(sql, commit)    
         if not status:    
             message = "Error updating table"    
-            self.controller.show_warning(message, parameter='anl_mincut_result_selector')   
+            self.controller.show_warning(message, parameter='selector_mincut_result')
                 
 
     def real_end_accept(self):
@@ -1695,9 +1695,9 @@ class MincutParent(ParentAction):
             self.action_add_connec.setDisabled(True)
             self.action_add_hydrometer.setDisabled(True)
             self.action_mincut_composer.setDisabled(False)
-            # Update table 'anl_mincut_result_selector'
-            sql = (f"DELETE FROM anl_mincut_result_selector WHERE cur_user = current_user;\n"
-                   f"INSERT INTO anl_mincut_result_selector (cur_user, result_id) VALUES"
+            # Update table 'selector_mincut_result'
+            sql = (f"DELETE FROM selector_mincut_result WHERE cur_user = current_user;\n"
+                   f"INSERT INTO selector_mincut_result (cur_user, result_id) VALUES"
                    f" (current_user, {real_mincut_id});")
             self.controller.execute_sql(sql, log_error=True, log_sql=True)
             self.task1.setProgress(75)
@@ -1878,7 +1878,7 @@ class MincutParent(ParentAction):
         utils_giswater.setWidgetText(self.dlg_mincut, "depth", row['exec_depth'])
         utils_giswater.setWidgetText(self.dlg_mincut, "assigned_to", row['assigned_to_name'])
 
-        # Update table 'anl_mincut_result_selector'
+        # Update table 'selector_mincut_result'
         self.update_result_selector(result_mincut_id)
         self.refresh_map_canvas()
         self.current_state = str(row['mincut_state'])
