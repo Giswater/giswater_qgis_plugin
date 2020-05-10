@@ -27,3 +27,8 @@ INSERT INTO sys_function VALUES (2876, 'gw_api_getunexpected', 'utils', 'functio
 INSERT INTO sys_function VALUES (2878, 'gw_fct_getvisitsfromfeature', 'utils', 'function',null, null, 'Function to manage visit from feature', 'role_basic', FALSE, null, TRUE);
 INSERT INTO sys_function VALUES (2880, 'gw_fct_setdimensioning', 'utils', 'function',null, null, 'Function to manage dimensioning', 'role_basic', FALSE, null, TRUE);
 INSERT INTO sys_function VALUES (2882, 'gw_api_setvisitmanager', 'utils', 'function',null, null, 'Function to manage visit manager', 'role_basic', FALSE, null, TRUE);
+
+
+INSERT INTO sys_table(id, context, description, sys_role_id, sys_criticity, qgis_criticity,  isdeprecated)
+    VALUES ('config_visit_x_feature', 'visit', 'Table to configure visit class related to feature', 'role_om', 0, 0, false)
+    ON CONFLICT (id) DO NOTHING;
