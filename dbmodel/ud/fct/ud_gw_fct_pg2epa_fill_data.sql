@@ -49,7 +49,7 @@ BEGIN
 	result_id_var,
 	node.node_id, sys_top_elev, sys_ymax, v_edit_node.sys_elev, node.node_type, node.nodecat_id, node.epa_type, node.sector_id, node.state, 
 	node.state_type, node.annotation, node.expl_id, y0, ysur, apond, node.the_geom
-	FROM inp_selector_sector, node  -- we need to use node to make more easy the relation sector againts exploitation
+	FROM selector_sector, node  -- we need to use node to make more easy the relation sector againts exploitation
 		LEFT JOIN v_edit_node USING (node_id) -- we need to use v_edit_node to work with sys_* fields
 		JOIN inp_junction ON node.node_id=inp_junction.node_id
 		JOIN (SELECT node_1 AS node_id FROM vi_parent_arc UNION SELECT node_2 FROM vi_parent_arc)a ON node.node_id=a.node_id
@@ -58,7 +58,7 @@ BEGIN
 	result_id_var,
 	node.node_id, sys_top_elev, sys_ymax, v_edit_node.sys_elev, node.node_type, node.nodecat_id, node.epa_type, node.sector_id, node.state, 
 	node.state_type, node.annotation, node.expl_id, y0, ysur, apond, node.the_geom
-	FROM inp_selector_sector, node 
+	FROM selector_sector, node 
 		LEFT JOIN v_edit_node USING (node_id) 
 		JOIN inp_divider ON node.node_id=inp_divider.node_id
 		JOIN (SELECT node_1 AS node_id FROM vi_parent_arc UNION SELECT node_2 FROM vi_parent_arc)a ON node.node_id=a.node_id
@@ -67,7 +67,7 @@ BEGIN
 	result_id_var,
 	node.node_id, sys_top_elev, sys_ymax, v_edit_node.sys_elev, node.node_type, node.nodecat_id, node.epa_type, node.sector_id, 
 	node.state, node.state_type, node.annotation, node.expl_id, y0, ysur, apond, node.the_geom
-	FROM inp_selector_sector, node 
+	FROM selector_sector, node 
 		LEFT JOIN v_edit_node USING (node_id) 	
 		JOIN inp_storage ON node.node_id=inp_storage.node_id
 		JOIN (SELECT node_1 AS node_id FROM vi_parent_arc UNION SELECT node_2 FROM vi_parent_arc)a ON node.node_id=a.node_id
@@ -76,7 +76,7 @@ BEGIN
 	result_id_var,
 	node.node_id, sys_top_elev, sys_ymax, v_edit_node.sys_elev, node.node_type, node.nodecat_id, node.epa_type, node.sector_id, 
 	node.state, node.state_type, node.annotation, node.expl_id, null, null, null, node.the_geom
-	FROM inp_selector_sector, node 
+	FROM selector_sector, node 
 		LEFT JOIN v_edit_node USING (node_id)
 		JOIN inp_outfall ON node.node_id=inp_outfall.node_id
 		JOIN (SELECT node_1 AS node_id FROM vi_parent_arc UNION SELECT node_2 FROM vi_parent_arc)a ON node.node_id=a.node_id;
@@ -111,13 +111,13 @@ BEGIN
 	qmax,
 	barrels,
 	slope
-	FROM inp_selector_sector, v_arc a
+	FROM selector_sector, v_arc a
 		LEFT JOIN value_state_type ON id=state_type
 		LEFT JOIN cat_arc ON a.arccat_id = cat_arc.id
 		LEFT JOIN cat_mat_arc ON cat_arc.matcat_id = cat_mat_arc.id
 		LEFT JOIN inp_conduit ON a.arc_id = inp_conduit.arc_id
 		WHERE (is_operative IS TRUE)
-		AND a.sector_id=inp_selector_sector.sector_id AND inp_selector_sector.cur_user=current_user;
+		AND a.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user;
 
 	-- todo: UPDATE childparam for inp_weir, inp_orifice, inp_outlet, inp_pump, inp_conduit
 

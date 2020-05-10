@@ -52,8 +52,8 @@ BEGIN
 	VALUES ( v_result_id, v_result_type, v_coefficient, now(), 
 		current_user, v_descript, (SELECT id FROM price_cat_simple ORDER BY tstamp DESC LIMIT 1))  RETURNING result_id INTO id_last;
 	
-	DELETE FROM plan_result_selector WHERE cur_user=current_user;
-	INSERT INTO plan_result_selector (result_id, cur_user) VALUES (id_last, current_user);
+	DELETE FROM selector_plan_result WHERE cur_user=current_user;
+	INSERT INTO selector_plan_result (result_id, cur_user) VALUES (id_last, current_user);
 	
 	IF v_result_type=1 THEN
 	

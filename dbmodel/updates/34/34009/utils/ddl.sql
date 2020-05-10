@@ -81,3 +81,21 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"temp_tab
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"audit_log_arc_traceability", "column":"user", "newName":"cur_user"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"temp_csv2pg", "column":"user_name", "newName":"cur_user"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"rpt_cat_result", "column":"user_name", "newName":"cur_user"}}$$);
+
+
+-- harmonize selectors
+ALTER TABLE anl_mincut_result_selector RENAME to selector_mincut_result ;
+ALTER TABLE inp_selector_result RENAME to selector_inp_result ;
+ALTER TABLE inp_selector_sector RENAME to selector_sector ;
+ALTER TABLE rpt_selector_compare RENAME to selector_rpt_compare ;
+ALTER TABLE rpt_selector_result RENAME to selector_rpt_main ;
+ALTER TABLE plan_result_relector RENAME to selector_plan_result ;
+
+--ws
+ALTER TABLE rpt_selector_hourly_compare RENAME to selector_rpt_compare_tstep ;
+ALTER TABLE rpt_selector_hourly RENAME to selector_rpt_main_tstep ;
+
+--ud
+ALTER TABLE rpt_selector_timestep_compare RENAME to selector_rpt_compare_tstep ;
+ALTER TABLE rpt_selector_timestep RENAME to selector_rpt_main_tstep ;
+

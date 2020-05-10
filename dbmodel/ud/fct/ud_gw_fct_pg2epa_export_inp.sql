@@ -34,7 +34,7 @@ BEGIN
 	--Delete previous
 	DELETE FROM temp_csv2pg WHERE cur_user=current_user AND csv2pgcat_id=v_pg2csvcat_id;
       
-	SELECT result_id INTO result_id_aux FROM inp_selector_result where cur_user=current_user;
+	SELECT result_id INTO result_id_aux FROM selector_inp_result where cur_user=current_user;
 	SELECT title INTO title_aux FROM inp_project_id where author=current_user;
 
 	INSERT INTO temp_csv2pg (source, csv1,csv2pgcat_id) VALUES ('header','[TITLE]',v_pg2csvcat_id);

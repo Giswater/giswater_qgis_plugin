@@ -84,7 +84,7 @@ BEGIN
 	RAISE NOTICE '1 - Check orphan nodes (fprocesscat = 7)';
 	v_querytext = '(SELECT node_id, nodecat_id, the_geom FROM (SELECT node_id FROM v_edit_node EXCEPT 
 			(SELECT node_1 as node_id FROM v_edit_arc UNION SELECT node_2 FROM v_edit_arc))a JOIN v_edit_node USING (node_id)
-			JOIN inp_selector_sector USING (sector_id) 
+			JOIN selector_sector USING (sector_id) 
 			JOIN value_state_type v ON state_type = v.id
 			WHERE epa_type != ''NOT DEFINED'' and is_operative = true and cur_user = current_user ) b';	
 		
@@ -101,7 +101,7 @@ BEGIN
 
 
 	RAISE NOTICE '2 - Check nodes with state_type isoperative = false (fprocesscat = 87)';
-	v_querytext = 'SELECT node_id, nodecat_id, the_geom FROM v_edit_node n JOIN inp_selector_sector USING (sector_id) JOIN value_state_type ON value_state_type.id=state_type 
+	v_querytext = 'SELECT node_id, nodecat_id, the_geom FROM v_edit_node n JOIN selector_sector USING (sector_id) JOIN value_state_type ON value_state_type.id=state_type 
 	WHERE n.state > 0 AND is_operative IS FALSE AND cur_user = current_user';
 	
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
@@ -119,7 +119,7 @@ BEGIN
 	END IF;
 		
 	RAISE NOTICE '3 - Check arcs with state_type isoperative = false (fprocesscat = 88)';
-	v_querytext = 'SELECT arc_id, arccat_id, the_geom FROM v_edit_arc a JOIN inp_selector_sector USING (sector_id) JOIN value_state_type ON value_state_type.id=state_type WHERE a.state > 0 
+	v_querytext = 'SELECT arc_id, arccat_id, the_geom FROM v_edit_arc a JOIN selector_sector USING (sector_id) JOIN value_state_type ON value_state_type.id=state_type WHERE a.state > 0 
 	AND is_operative IS FALSE AND cur_user = current_user';
 	
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
@@ -138,9 +138,9 @@ BEGIN
 	
 	
 	RAISE NOTICE '4 - Check state_type nulls (arc, node)';
-	v_querytext = '(SELECT arc_id, arccat_id, the_geom FROM v_edit_arc JOIN inp_selector_sector USING (sector_id) WHERE state_type IS NULL AND cur_user = current_user
+	v_querytext = '(SELECT arc_id, arccat_id, the_geom FROM v_edit_arc JOIN selector_sector USING (sector_id) WHERE state_type IS NULL AND cur_user = current_user
 			UNION 
-			SELECT node_id, nodecat_id, the_geom FROM v_edit_node JOIN inp_selector_sector USING (sector_id) WHERE state_type IS NULL AND cur_user = current_user) a';
+			SELECT node_id, nodecat_id, the_geom FROM v_edit_node JOIN selector_sector USING (sector_id) WHERE state_type IS NULL AND cur_user = current_user) a';
 
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 	IF v_count > 0 THEN
@@ -177,10 +177,10 @@ BEGIN
 
 	-- those nodes as node_1 on arc no pump with negative slope except arcs with this node as node_1 and positive slope
 	(SELECT node_1 FROM (SELECT arc_id, node_1, node_2 FROM v_edit_arc JOIN cat_arc c ON c.id = arccat_id 
-	JOIN inp_selector_sector USING (sector_id) JOIN cat_arc_shape s ON c.shape = s.id WHERE slope < 0 AND s.epa != 'FORCE_MAIN')a
+	JOIN selector_sector USING (sector_id) JOIN cat_arc_shape s ON c.shape = s.id WHERE slope < 0 AND s.epa != 'FORCE_MAIN')a
 	EXCEPT 
 	SELECT node_1 FROM (SELECT arc_id, node_1, node_2 FROM v_edit_arc JOIN cat_arc c ON c.id = arccat_id 
-	JOIN inp_selector_sector USING (sector_id) JOIN cat_arc_shape s ON c.shape = s.id WHERE slope > 0)a);
+	JOIN selector_sector USING (sector_id) JOIN cat_arc_shape s ON c.shape = s.id WHERE slope > 0)a);
 	
 	SELECT count(*) into v_count FROM anl_node WHERE fprocesscat_id=13 AND cur_user=current_user;
 	
@@ -216,7 +216,7 @@ BEGIN
 	SELECT 11, node_id, nodecat_id, sector_id, a.the_geom, concat('Node exit upper intro with: Max. entry: ', max_entry , ', Max. exit:',max_exit) 
 	FROM ( SELECT node_id, max(sys_elev1) AS max_exit, nodecat_id, node.sector_id, node.the_geom FROM v_edit_arc JOIN node ON node_1 = node_id JOIN node_type ON node_type = id WHERE isexitupperintro = 0 GROUP BY node_id, node.sector_id )a
 	JOIN ( SELECT node_id, max(sys_elev2) AS max_entry FROM v_edit_arc JOIN node ON node_2 = node_id JOIN node_type ON node_type = id WHERE isexitupperintro = 0 GROUP BY node_id )b USING (node_id)
-	JOIN inp_selector_sector USING (sector_id) 
+	JOIN selector_sector USING (sector_id) 
 	WHERE max_entry < max_exit AND cur_user = current_user;
 
 	SELECT count(*) into v_count FROM anl_node WHERE fprocesscat_id=11 AND cur_user=current_user;
@@ -233,7 +233,7 @@ BEGIN
 
 
 	RAISE NOTICE '8 - Null elevation control (fprocesscat 64)';
-	SELECT count(*) INTO v_count FROM v_edit_node JOIN inp_selector_sector USING (sector_id) WHERE sys_elev IS NULL AND cur_user = current_user;
+	SELECT count(*) INTO v_count FROM v_edit_node JOIN selector_sector USING (sector_id) WHERE sys_elev IS NULL AND cur_user = current_user;
 	
 	IF v_count > 0 THEN
 		INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom) 
@@ -245,7 +245,7 @@ BEGIN
 		VALUES (v_fprocesscat_id, v_result_id, 1, 'INFO: No nodes with null values on field elevation have been found.');
 	END IF;
 
-	SELECT count(*) INTO v_count FROM v_edit_arc JOIN inp_selector_sector USING (sector_id) WHERE cur_user = current_user AND sys_elev1 = NULL OR sys_elev2 = NULL;
+	SELECT count(*) INTO v_count FROM v_edit_arc JOIN selector_sector USING (sector_id) WHERE cur_user = current_user AND sys_elev1 = NULL OR sys_elev2 = NULL;
 	IF v_count > 0 THEN
 		INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom) 
 		SELECT 64, node_id, nodecat_id, the_geom FROM v_edit_node WHERE result_id=v_result_id AND elevation IS NULL;

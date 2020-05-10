@@ -44,7 +44,7 @@ BEGIN
 	DELETE FROM temp_csv2pg WHERE cur_user=current_user AND csv2pgcat_id=v_pg2csvcat_id;
 
 	-- get parameters to put on header
-	SELECT result_id INTO result_id_aux FROM inp_selector_result where cur_user=current_user;
+	SELECT result_id INTO result_id_aux FROM selector_inp_result where cur_user=current_user;
 	SELECT title INTO title_aux FROM inp_project_id where author=current_user;
 	SELECT value INTO v_demandtype FROM config_param_user WHERE parameter = 'inp_options_demandtype' AND cur_user=current_user;
 	SELECT value INTO v_patternmethod FROM config_param_user WHERE parameter = 'inp_options_patternmethod' AND cur_user=current_user;

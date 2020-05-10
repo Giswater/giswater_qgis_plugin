@@ -107,8 +107,8 @@ BEGIN
 	DELETE FROM anl_arc WHERE fprocesscat_id IN (3) AND cur_user=current_user;
 
 	-- get user parameters
-	v_hydroscenario = (SELECT hydrology_id FROM inp_selector_hydrology WHERE cur_user = current_user);
-	v_hydroscenarioval = (SELECT name FROM inp_selector_hydrology JOIN cat_hydrology USING (hydrology_id) WHERE cur_user = current_user);
+	v_hydroscenario = (SELECT hydrology_id FROM selector_inp_hydrology WHERE cur_user = current_user);
+	v_hydroscenarioval = (SELECT name FROM selector_inp_hydrology JOIN cat_hydrology USING (hydrology_id) WHERE cur_user = current_user);
 
 	-- get settings values
 	v_default = (SELECT value::json->>'status' FROM config_param_user WHERE parameter = 'inp_options_vdefault' AND cur_user=current_user);
@@ -296,8 +296,8 @@ BEGIN
 			VALUES (v_fprocesscat_id, v_result_id, 1, concat('INFO: Column rted on scenario subcatchments have been checked without any values missed.'));
 		END IF;
 
-		SELECT infiltration INTO v_infiltration FROM cat_hydrology JOIN inp_selector_hydrology
-		ON inp_selector_hydrology.hydrology_id=cat_hydrology.hydrology_id WHERE cur_user=current_user;
+		SELECT infiltration INTO v_infiltration FROM cat_hydrology JOIN selector_inp_hydrology
+		ON selector_inp_hydrology.hydrology_id=cat_hydrology.hydrology_id WHERE cur_user=current_user;
 		
 		IF v_infiltration='CURVE_NUMBER' THEN
 		

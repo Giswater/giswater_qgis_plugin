@@ -8,3 +8,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2020/05/09
+ALTER TABLE rpt_selector_timestep_compare RENAME to selector_rpt_compare_tstep ;
+ALTER TABLE rpt_selector_timestep RENAME to selector_rpt_main_tstep ;
+ALTER TABLE inp_selector_hydrology RENAME to selector_inp_hydrology ;

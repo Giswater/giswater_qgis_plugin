@@ -122,8 +122,8 @@ BEGIN
 		RAISE NOTICE '2 - Upsert on rpt_cat_table and set selectors';
 		DELETE FROM rpt_cat_result WHERE result_id=v_result;
 		INSERT INTO rpt_cat_result (result_id, inpoptions) VALUES (v_result, v_inpoptions);
-		DELETE FROM inp_selector_result WHERE cur_user=current_user;
-		INSERT INTO inp_selector_result (result_id, cur_user) VALUES (v_result, current_user);
+		DELETE FROM selector_inp_result WHERE cur_user=current_user;
+		INSERT INTO selector_inp_result (result_id, cur_user) VALUES (v_result, current_user);
 
 		RAISE NOTICE '3 - Fill inprpt tables';
 		PERFORM gw_fct_pg2epa_fill_data(v_result);

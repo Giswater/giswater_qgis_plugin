@@ -42,9 +42,9 @@ BEGIN
 		-- EXECUTE 'SELECT setval(SCHEMA_NAME.'||rec_table.sys_sequence||', '||v_val||', true);';
 	END LOOP;
 		
-	-- set result on result selector: In spite of there are two selectors tables (rpt_selector_result, rpt_selector_compare) only it's setted one
-	DELETE FROM rpt_selector_result WHERE cur_user=current_user;
-	INSERT INTO rpt_selector_result (result_id, cur_user) VALUES (v_result, current_user);
+	-- set result on result selector: In spite of there are two selectors tables () only it's setted one
+	DELETE FROM selector_rpt_main WHERE cur_user=current_user;
+	INSERT INTO selector_rpt_main (result_id, cur_user) VALUES (v_result, current_user);
 
 	-- create log
 	RETURN gw_fct_rpt2pg_log (v_result);

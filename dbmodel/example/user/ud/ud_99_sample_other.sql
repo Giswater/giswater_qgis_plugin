@@ -264,7 +264,7 @@ UPDATE gully SET enddate=NULL WHERE state=1;
 UPDATE connec SET customer_code=NULL;
 
 
-INSERT INTO inp_selector_sector (sector_id, cur_user)
+INSERT INTO selector_sector (sector_id, cur_user)
 SELECT sector_id, current_user FROM sector
 ON CONFLICT (sector_id, cur_user) DO NOTHING;
 

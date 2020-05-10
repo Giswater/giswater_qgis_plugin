@@ -83,7 +83,7 @@ BEGIN
 	RAISE NOTICE '1 - Check orphan nodes (fprocesscat = 7)';
 	v_querytext = '(SELECT node_id, nodecat_id, the_geom FROM (SELECT node_id FROM v_edit_node EXCEPT 
 			(SELECT node_1 as node_id FROM v_edit_arc UNION SELECT node_2 FROM v_edit_arc))a JOIN v_edit_node USING (node_id)
-			JOIN inp_selector_sector USING (sector_id) 
+			JOIN selector_sector USING (sector_id) 
 			JOIN value_state_type v ON state_type = v.id
 			WHERE epa_type != ''NOT DEFINED'' and is_operative = true and cur_user = current_user ) b';		
 			
@@ -100,7 +100,7 @@ BEGIN
 
 			
 	RAISE NOTICE '2 - Check nodes with state_type isoperative = false (fprocesscat = 87)';
-	v_querytext = 'SELECT node_id, nodecat_id, the_geom FROM v_edit_node n JOIN inp_selector_sector USING (sector_id) JOIN value_state_type ON value_state_type.id=state_type 
+	v_querytext = 'SELECT node_id, nodecat_id, the_geom FROM v_edit_node n JOIN selector_sector USING (sector_id) JOIN value_state_type ON value_state_type.id=state_type 
 			WHERE n.state > 0 AND is_operative IS FALSE AND cur_user = current_user';
 	
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
@@ -119,7 +119,7 @@ BEGIN
 		
 		
 	RAISE NOTICE '3 - Check arcs with state_type isoperative = false (fprocesscat = 88)';
-	v_querytext = 'SELECT arc_id, arccat_id, the_geom FROM v_edit_arc a JOIN inp_selector_sector USING (sector_id) 
+	v_querytext = 'SELECT arc_id, arccat_id, the_geom FROM v_edit_arc a JOIN selector_sector USING (sector_id) 
 			JOIN value_state_type ON value_state_type.id=state_type WHERE a.state > 0 AND is_operative IS FALSE AND cur_user = current_user';
 	
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
@@ -136,9 +136,9 @@ BEGIN
 	END IF;
 	
 	RAISE NOTICE '4 - Check state_type nulls (arc, node)';
-	v_querytext = '(SELECT arc_id, arccat_id, the_geom FROM v_edit_arc JOIN inp_selector_sector USING (sector_id) WHERE state_type IS NULL AND cur_user = current_user
+	v_querytext = '(SELECT arc_id, arccat_id, the_geom FROM v_edit_arc JOIN selector_sector USING (sector_id) WHERE state_type IS NULL AND cur_user = current_user
 			UNION 
-			SELECT node_id, nodecat_id, the_geom FROM v_edit_node JOIN inp_selector_sector USING (sector_id) WHERE state_type IS NULL AND cur_user = current_user) a';
+			SELECT node_id, nodecat_id, the_geom FROM v_edit_node JOIN selector_sector USING (sector_id) WHERE state_type IS NULL AND cur_user = current_user) a';
 
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 	IF v_count > 0 THEN
@@ -167,7 +167,7 @@ BEGIN
 
 	
 	RAISE NOTICE '6 - Null elevation control (fprocesscat 64)';
-	SELECT count(*) INTO v_count FROM v_edit_node JOIN inp_selector_sector USING (sector_id) WHERE elevation IS NULL AND cur_user = current_user;
+	SELECT count(*) INTO v_count FROM v_edit_node JOIN selector_sector USING (sector_id) WHERE elevation IS NULL AND cur_user = current_user;
 		
 	IF v_count > 0 THEN
 		INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom) 
@@ -181,7 +181,7 @@ BEGIN
 
 	
 	RAISE NOTICE '7 - Elevation control with cero values (fprocesscat 65)';
-	SELECT count(*) INTO v_count FROM v_edit_node JOIN inp_selector_sector USING (sector_id) WHERE elevation = 0 AND cur_user = current_user;
+	SELECT count(*) INTO v_count FROM v_edit_node JOIN selector_sector USING (sector_id) WHERE elevation = 0 AND cur_user = current_user;
 
 	IF v_count > 0 THEN
 		INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom, descript) 
@@ -200,14 +200,14 @@ BEGIN
 	INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom, descript)
 	SELECT 66, a.node_id, a.nodecat_id, a.the_geom, 'Node2arc with more than two arcs' FROM (
 		SELECT node_id, nodecat_id, v_edit_node.the_geom FROM v_edit_node
-		JOIN inp_selector_sector USING (sector_id) 
+		JOIN selector_sector USING (sector_id) 
 		JOIN v_edit_arc a1 ON node_id=a1.node_1 WHERE cur_user = current_user
-		AND v_edit_node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user)
+		AND v_edit_node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user=current_user)
 		UNION ALL
 		SELECT node_id, nodecat_id, v_edit_node.the_geom FROM v_edit_node
-		JOIN inp_selector_sector USING (sector_id) 
+		JOIN selector_sector USING (sector_id) 
 		JOIN v_edit_arc a1 ON node_id=a1.node_2 WHERE cur_user = current_user
-		AND v_edit_node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user))a
+		AND v_edit_node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user=current_user))a
 	GROUP by node_id, nodecat_id, the_geom
 	HAVING count(*) >2;
 	
@@ -225,14 +225,14 @@ BEGIN
 	INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, the_geom, descript)
 	SELECT 67, a.node_id, a.nodecat_id, a.the_geom, 'Node2arc with less than two arcs' FROM (
 		SELECT node_id, nodecat_id, v_edit_node.the_geom FROM v_edit_node
-		JOIN inp_selector_sector USING (sector_id) 
+		JOIN selector_sector USING (sector_id) 
 		JOIN v_edit_arc a1 ON node_id=a1.node_1 WHERE cur_user = current_user
-		AND v_edit_node.epa_type IN ('VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user)
+		AND v_edit_node.epa_type IN ('VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user=current_user)
 		UNION ALL
 		SELECT node_id, nodecat_id, v_edit_node.the_geom FROM v_edit_node
-		JOIN inp_selector_sector USING (sector_id) 
+		JOIN selector_sector USING (sector_id) 
 		JOIN v_edit_arc a1 ON node_id=a1.node_1 WHERE cur_user = current_user
-		AND v_edit_node.epa_type IN ('VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM inp_selector_sector WHERE cur_user=current_user))a
+		AND v_edit_node.epa_type IN ('VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user=current_user))a
 	GROUP by node_id, nodecat_id, the_geom
 	HAVING count(*) < 2;
 

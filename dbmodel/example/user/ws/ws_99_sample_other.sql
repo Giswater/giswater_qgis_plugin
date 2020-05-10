@@ -375,7 +375,7 @@ update connec set pjoint_id = exit_id, pjoint_type='VNODE' FROM link WHERE link.
 
 UPDATE connec SET label_rotation=24.5, label_x=3 WHERE connec_id='3014';
 
-INSERT INTO inp_selector_sector (sector_id, cur_user)
+INSERT INTO selector_sector (sector_id, cur_user)
 SELECT sector_id, current_user FROM sector
 ON CONFLICT (sector_id, cur_user) DO NOTHING;
 

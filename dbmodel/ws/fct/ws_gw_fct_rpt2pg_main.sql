@@ -36,9 +36,9 @@ BEGIN
 	UPDATE rpt_arc SET flow=(-1)*flow WHERE flow<0 and result_id=v_result;
 	
 	-- set result on result selector
-	-- NOTE: In spite of there are four selectors tables (rpt_selector_result, rpt_selector_compare, rpt_selector_hourly, rpt_selector_hourly_compare) only it's setted one
-	DELETE FROM rpt_selector_result WHERE cur_user=current_user;
-	INSERT INTO rpt_selector_result (result_id, cur_user) VALUES (v_result, current_user);
+	-- NOTE: In spite of there are four selectors tables () only it's setted one
+	DELETE FROM selector_rpt_main WHERE cur_user=current_user;
+	INSERT INTO selector_rpt_main (result_id, cur_user) VALUES (v_result, current_user);
 
 	-- create log message
 	RETURN gw_fct_rpt2pg_log(v_result);

@@ -185,8 +185,8 @@ BEGIN
 	--insert values into selectors
 	INSERT INTO selector_expl(expl_id,cur_user) VALUES (1,current_user);
 	INSERT INTO selector_state(state_id,cur_user) VALUES (1,current_user);
-	INSERT INTO inp_selector_sector(sector_id,cur_user) VALUES (1,current_user);
-	INSERT INTO inp_selector_hydrology(hydrology_id,cur_user) VALUES (1,current_user);
+	INSERT INTO selector_sector(sector_id,cur_user) VALUES (1,current_user);
+	INSERT INTO selector_inp_hydrology(hydrology_id,cur_user) VALUES (1,current_user);
 	INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('inp_options_dwfscenario', '1', current_user);
 
 

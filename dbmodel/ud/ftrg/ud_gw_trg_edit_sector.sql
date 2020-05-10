@@ -30,7 +30,7 @@ BEGIN
 			INSERT INTO sector (sector_id, name, descript, macrosector_id, the_geom, undelete)
 			VALUES (NEW.sector_id, NEW.name, NEW.descript, NEW.macrosector_id, NEW.the_geom, NEW.undelete);
 	
-			INSERT INTO inp_selector_sector (sector_id, cur_user) VALUES (NEW.sector_id, current_user);
+			INSERT INTO selector_sector (sector_id, cur_user) VALUES (NEW.sector_id, current_user);
 		
 		RETURN NEW;
 		

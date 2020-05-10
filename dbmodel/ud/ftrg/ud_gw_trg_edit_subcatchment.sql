@@ -29,7 +29,7 @@ BEGIN
         END IF;
 
         -- hydrology_id
-		NEW.hydrology_id=(SELECT "hydrology_id" FROM inp_selector_hydrology WHERE "cur_user"="current_user"() LIMIT 1);
+		NEW.hydrology_id=(SELECT "hydrology_id" FROM selector_inp_hydrology WHERE "cur_user"="current_user"() LIMIT 1);
 		IF (NEW.hydrology_id IS NULL) THEN
 		END IF;
 	

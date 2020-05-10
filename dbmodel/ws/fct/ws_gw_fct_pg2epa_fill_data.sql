@@ -47,9 +47,9 @@ BEGIN
 
 	-- the strategy of selector_sector is not used for nodes. The reason is to enable the posibility to export the sector=-1. In addition using this it's impossible to export orphan nodes
 	EXECUTE ' INSERT INTO temp_node (node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, expl_id)
-		WITH b AS (SELECT ve_arc.* FROM inp_selector_sector, ve_arc
+		WITH b AS (SELECT ve_arc.* FROM selector_sector, ve_arc
 			JOIN value_state_type ON ve_arc.state_type = value_state_type.id
-			WHERE ve_arc.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text '
+			WHERE ve_arc.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text '
 			||v_statetype||')
 		SELECT DISTINCT ON (n.node_id)
 		n.node_id, elevation, elevation-depth as elev, nodetype_id, nodecat_id, epa_type, a.sector_id, n.state, n.state_type, n.annotation, n.the_geom, n.expl_id
@@ -96,7 +96,7 @@ BEGIN
 		(CASE WHEN inp_pipe.custom_dint IS NOT NULL THEN custom_dint ELSE dint END),  -- diameter is child value but in order to make simple the query getting values from v_edit_arc (dint)...
 		v_arc.the_geom,
 		v_arc.expl_id
-		FROM inp_selector_sector, v_arc
+		FROM selector_sector, v_arc
 			LEFT JOIN value_state_type ON id=state_type
 			LEFT JOIN cat_arc ON v_arc.arccat_id = cat_arc.id
 			LEFT JOIN cat_mat_arc ON cat_arc.matcat_id = cat_mat_arc.id
@@ -104,7 +104,7 @@ BEGIN
 			LEFT JOIN inp_cat_mat_roughness ON inp_cat_mat_roughness.matcat_id = cat_mat_arc.id 
 			WHERE (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 >= inp_cat_mat_roughness.init_age 
 			AND (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 < inp_cat_mat_roughness.end_age '
-			||v_statetype||' AND v_arc.sector_id=inp_selector_sector.sector_id AND inp_selector_sector.cur_user=current_user
+			||v_statetype||' AND v_arc.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user
 			AND epa_type != ''NOT DEFINED''';
 
 

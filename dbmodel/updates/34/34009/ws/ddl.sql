@@ -11,3 +11,8 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 ALTER TABLE anl_mincut_inlet_x_exploitation RENAME to config_mincut_inlet;
 ALTER TABLE anl_mincut_selector_valve RENAME to config_mincut_valve;
 ALTER TABLE anl_mincut_checkvalve RENAME to config_mincut_checkvalve;
+
+ALTER TABLE inp_selector_dscenario RENAME to selector_inp_demand;
+ALTER TABLE rpt_selector_hourly_compare RENAME to selector_rpt_compare_tstep;
+ALTER TABLE rpt_selector_hourly RENAME to selector_rpt_main_tstep;
+

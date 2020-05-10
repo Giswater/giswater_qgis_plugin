@@ -41,16 +41,16 @@ BEGIN
     FOR rec_flowreg IN 
 	SELECT DISTINCT ON (node_id, to_arc) node_id,  to_arc, max(flwreg_length) AS flwreg_length, flw_type FROM 
 	(SELECT temp_node.node_id, to_arc, flwreg_length, 'ori'::text as flw_type FROM inp_flwreg_orifice JOIN temp_node ON temp_node.node_id=inp_flwreg_orifice.node_id 
-	JOIN inp_selector_sector ON inp_selector_sector.sector_id=temp_node.sector_id
+	JOIN selector_sector ON selector_sector.sector_id=temp_node.sector_id
 		UNION 
 	SELECT DISTINCT temp_node.node_id,  to_arc, flwreg_length, 'out'::text as flw_type FROM inp_flwreg_outlet JOIN temp_node ON temp_node.node_id=inp_flwreg_outlet.node_id 
-	JOIN inp_selector_sector ON inp_selector_sector.sector_id=temp_node.sector_id
+	JOIN selector_sector ON selector_sector.sector_id=temp_node.sector_id
 		UNION 
 	SELECT DISTINCT temp_node.node_id,  to_arc, flwreg_length, 'pump'::text as flw_type FROM inp_flwreg_pump JOIN temp_node ON temp_node.node_id=inp_flwreg_pump.node_id 
-	JOIN inp_selector_sector ON inp_selector_sector.sector_id=temp_node.sector_id
+	JOIN selector_sector ON selector_sector.sector_id=temp_node.sector_id
 		UNION 
 	SELECT DISTINCT temp_node.node_id,  to_arc, flwreg_length, 'weir'::text as flw_type FROM inp_flwreg_weir JOIN temp_node ON temp_node.node_id=inp_flwreg_weir.node_id 
-	JOIN inp_selector_sector ON inp_selector_sector.sector_id=temp_node.sector_id)a
+	JOIN selector_sector ON selector_sector.sector_id=temp_node.sector_id)a
 	GROUP BY node_id, to_arc, flw_type
 	ORDER BY node_id, to_arc
 				

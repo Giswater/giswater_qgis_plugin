@@ -68,18 +68,18 @@ BEGIN
 		INSERT INTO selector_workcat (workcat_id, cur_user) SELECT workcat_id, v_user FROM selector_workcat WHERE cur_user=v_copyfromuser;
 	
 		-- role epa
-		DELETE FROM inp_selector_sector WHERE cur_user=v_user;
-		DELETE FROM inp_selector_result WHERE cur_user=v_user;
+		DELETE FROM selector_sector WHERE cur_user=v_user;
+		DELETE FROM selector_inp_result WHERE cur_user=v_user;
 		
-		INSERT INTO inp_selector_sector (sector_id, cur_user) SELECT sector_id, v_user FROM inp_selector_sector WHERE cur_user=v_copyfromuser;
-		INSERT INTO inp_selector_result (result_id, cur_user) SELECT result_id, v_user FROM inp_selector_result WHERE cur_user=v_copyfromuser;
+		INSERT INTO selector_sector (sector_id, cur_user) SELECT sector_id, v_user FROM selector_sector WHERE cur_user=v_copyfromuser;
+		INSERT INTO selector_inp_result (result_id, cur_user) SELECT result_id, v_user FROM selector_inp_result WHERE cur_user=v_copyfromuser;
 		
 		IF v_projecttype ='UD' THEN
-			DELETE FROM inp_selector_hydrology WHERE cur_user=v_user;
-			INSERT INTO inp_selector_hydrology (hydrology_id, cur_user) SELECT hydrology_id, v_user FROM inp_selector_hydrology WHERE cur_user=v_copyfromuser;
+			DELETE FROM selector_inp_hydrology WHERE cur_user=v_user;
+			INSERT INTO selector_inp_hydrology (hydrology_id, cur_user) SELECT hydrology_id, v_user FROM selector_inp_hydrology WHERE cur_user=v_copyfromuser;
 		ELSE
-			DELETE FROM inp_selector_dscenario WHERE cur_user=v_user;
-			INSERT INTO inp_selector_dscenario (dscenario_id, cur_user) SELECT dscenario_id, v_user FROM inp_selector_dscenario WHERE cur_user=v_copyfromuser;
+			DELETE FROM selector_inp_demand WHERE cur_user=v_user;
+			INSERT INTO selector_inp_demand (dscenario_id, cur_user) SELECT dscenario_id, v_user FROM selector_inp_demand WHERE cur_user=v_copyfromuser;
 		END IF;
 
 	-- setting values wihtout user sample

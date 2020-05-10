@@ -49,16 +49,16 @@ BEGIN
     
     FOR rec_flowreg IN
 	SELECT rpt_inp_node.node_id, flwreg_id, to_arc, flwreg_length, 'ori'::text as flw_type FROM inp_flwreg_orifice JOIN rpt_inp_node ON rpt_inp_node.node_id=inp_flwreg_orifice.node_id  
-	JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id WHERE result_id=result_id_var 
+	JOIN selector_sector ON selector_sector.sector_id=rpt_inp_node.sector_id WHERE result_id=result_id_var 
 		UNION 
 	SELECT rpt_inp_node.node_id, flwreg_id,  to_arc, flwreg_length, 'out'::text as flw_type FROM inp_flwreg_outlet JOIN rpt_inp_node ON rpt_inp_node.node_id=inp_flwreg_outlet.node_id 
-	JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id WHERE result_id=result_id_var 		
+	JOIN selector_sector ON selector_sector.sector_id=rpt_inp_node.sector_id WHERE result_id=result_id_var 		
 		UNION 
 	SELECT rpt_inp_node.node_id, flwreg_id,  to_arc, flwreg_length, 'pump'::text as flw_type FROM inp_flwreg_pump JOIN rpt_inp_node ON rpt_inp_node.node_id=inp_flwreg_pump.node_id 
-	JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id WHERE result_id=result_id_var
+	JOIN selector_sector ON selector_sector.sector_id=rpt_inp_node.sector_id WHERE result_id=result_id_var
 		UNION 
 	SELECT rpt_inp_node.node_id, flwreg_id, to_arc, flwreg_length, 'weir'::text as flw_type FROM inp_flwreg_weir 
-	JOIN rpt_inp_node ON rpt_inp_node.node_id=inp_flwreg_weir.node_id JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id WHERE result_id=result_id_var
+	JOIN rpt_inp_node ON rpt_inp_node.node_id=inp_flwreg_weir.node_id JOIN selector_sector ON selector_sector.sector_id=rpt_inp_node.sector_id WHERE result_id=result_id_var
 	ORDER BY node_id, to_arc DESC, flwreg_id ASC
 
 	LOOP

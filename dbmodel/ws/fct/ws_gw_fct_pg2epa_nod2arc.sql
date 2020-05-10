@@ -36,7 +36,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	--  Looking for nodarc values
-	SELECT min(st_length(the_geom)) FROM temp_arc JOIN inp_selector_sector ON inp_selector_sector.sector_id=temp_arc.sector_id
+	SELECT min(st_length(the_geom)) FROM temp_arc JOIN selector_sector ON selector_sector.sector_id=temp_arc.sector_id
 		INTO v_nodarc_min;
 
 	v_nod2arc := (SELECT value::float FROM config_param_user WHERE parameter = 'inp_options_nodarc_length' and cur_user=current_user limit 1)::float;
