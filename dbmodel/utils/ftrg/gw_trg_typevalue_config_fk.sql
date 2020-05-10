@@ -54,7 +54,7 @@ BEGIN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
        		"data":{"error":"3032", "function":"2750","debug_msg":null}}$$);';
 		ELSE 
-			PERFORM SCHEMA_NAME.gw_fct_admin_schema_manage_triggers('fk', NEW.target_table);
+			PERFORM gw_fct_admin_manage_triggers('fk', NEW.target_table);
 		END IF;
 
 	--in case of update on one of the defined typevalue table

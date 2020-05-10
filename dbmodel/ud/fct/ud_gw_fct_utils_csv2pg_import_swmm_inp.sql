@@ -80,7 +80,7 @@ BEGIN
 		DELETE FROM plan_psector;
 		
 		-- Disable constraints
-		PERFORM gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$);
+		PERFORM gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$);
 
 		-- Delete system and user catalogs
 		DELETE FROM macroexploitation;
@@ -130,7 +130,7 @@ BEGIN
 			
 	ELSE 
 		-- Disable constraints
-		PERFORM gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$);		
+		PERFORM gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$);		
 	END IF;
 
 	RAISE NOTICE 'step 1/7';
@@ -386,7 +386,7 @@ BEGIN
 	update ext_municipality SET the_geom=v_extend_val;
 
 	-- Enable constraints
-	PERFORM gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"},"data":{"action":"ADD"}}$$);
+	PERFORM gw_fct_admin_manage_ct($${"client":{"lang":"ES"},"data":{"action":"ADD"}}$$);
 
 	RAISE NOTICE 'step-7/7';
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Enabling constraints -> Done');

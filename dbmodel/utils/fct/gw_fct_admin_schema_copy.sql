@@ -16,7 +16,7 @@ $BODY$
 /*EXAMPLE
 
 DISABLE CONSTRAINTS:
-SELECT gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$);
+SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$);
 
 EXECUTE:
 SELECT SCHEMA_NAME.gw_fct_admin_schema_copy($${"client":{"lang":"CA"}, "data":{"fromSchema":"bgeo_treball", "toSchema":"ud"}}$$)
@@ -24,7 +24,7 @@ WARNING: need to decide before what to do with configs: config_api_* AND config_
 
 
 ENABLE CONSTRAINTS:
-SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"ADD"}}$$)
+SELECT SCHEMA_NAME.gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"ADD"}}$$)
 */
 
 

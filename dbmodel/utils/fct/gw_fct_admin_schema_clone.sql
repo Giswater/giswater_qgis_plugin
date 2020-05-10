@@ -7,12 +7,12 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2122
 
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".clone_schema(text, text);
-
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_clone_schema(p_data json)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_clone_schema(json);
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_admin_schema_clone(p_data json)
 RETURNS json AS
 $BODY$
 /*
-SELECT SCHEMA_NAME.gw_fct_clone_schema($${
+SELECT SCHEMA_NAME.gw_fct_admin_schema_clone($${
 "client":{"device":9, "infoType":100, "lang":"ES"}, 
 "form":{}, 
 "data":{"parameters":{"source_schema":"SCHEMA_NAME","dest_schema":"SCHEMA_NAME_2"}}}$$);

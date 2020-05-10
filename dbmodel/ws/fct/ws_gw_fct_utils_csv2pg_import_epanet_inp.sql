@@ -96,7 +96,7 @@ BEGIN
 		DELETE FROM config_mincut_valve;
 
 		-- Disable constraints
-		PERFORM gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$);
+		PERFORM gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$);
 
 		-- Delete system and user catalogs
 		DELETE FROM macroexploitation;
@@ -163,7 +163,7 @@ BEGIN
 		DELETE FROM rpt_cat_result;
 	ELSE 
 		-- Disable constraints
-		PERFORM gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$);		
+		PERFORM gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$);		
 	END IF;
 	
 
@@ -551,8 +551,9 @@ BEGIN
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Creating arc geometries -> Done');
 
 
+
 	-- Enable constraints
-	PERFORM gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"},"data":{"action":"ADD"}}$$);
+	PERFORM gw_fct_admin_manage_ct($${"client":{"lang":"ES"},"data":{"action":"ADD"}}$$);
 
 	IF v_arc2node_reverse THEN -- Reconnect those arcs connected to dissapeared nodarcs to the new node
 	

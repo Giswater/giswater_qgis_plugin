@@ -290,7 +290,7 @@ UPDATE config_form_fields SET stylesheet ='{"label":"color:red; font-weight:bold
 
 
 -- drop constraints
-SELECT gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$);
+SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$);
 
 delete from cat_presszone;
 INSERT INTO cat_presszone VALUES ('1', 'pzone1-1s', 1, NULL, NULL,  '{"use":[{"nodeParent":"1097", "toArc":[2207]}], "ignore":[]}');
@@ -344,7 +344,7 @@ INSERT INTO sector VALUES (0, 'Undefined', 0);
 INSERT INTO cat_presszone VALUES (0, 'Undefined',0);
 
 -- add constraints
-SELECT gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"ADD"}}$$);
+SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"ADD"}}$$);
 
 
 -- dynamic sectorization

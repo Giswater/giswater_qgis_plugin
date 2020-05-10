@@ -6,16 +6,16 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2818
 
-
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_schema_manage_triggers(p_action text, p_table text)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_admin_schema_manage_triggers(json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_manage_triggers(p_action text, p_table text)
  RETURNS void AS
 $BODY$
 /*
 EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_triggers('notify',null);
-SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_triggers('fk',null);
-SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_triggers('fk','ALL');
-SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_triggers('fk','CHECK');
+SELECT SCHEMA_NAME.gw_fct_admin_manage_triggers('notify',null);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_triggers('fk',null);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_triggers('fk','ALL');
+SELECT SCHEMA_NAME.gw_fct_admin_manage_triggers('fk','CHECK');
 */
 
 DECLARE

@@ -6,7 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2724
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_schema_manage_ct(p_data json)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_admin_schema_manage_ct(json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_manage_ct(p_data json)
   RETURNS json AS
 $BODY$
 
@@ -17,21 +18,21 @@ ALTER TABLE gully_type DROP CONSTRAINT gully_type_id_fkey;
 ALTER TABLE gully_type  ADD CONSTRAINT gully_type_id_fkey FOREIGN KEY (id) REFERENCES SCHEMA_NAME.cat_feature (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
       
-SELECT gw_fct_admin_schema_manage_ct($${
+SELECT gw_fct_admin_manage_ct($${
 "client":{"lang":"ES"}, 
 "data":{"action":"DROP"}}$$)
 
-SELECT gw_fct_admin_schema_manage_ct($${
+SELECT gw_fct_admin_manage_ct($${
 "client":{"lang":"ES"}, 
 "data":{"action":"ADD"}}$$)
 
 
-SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_ct($${
+SELECT SCHEMA_NAME.gw_fct_admin_manage_ct($${
 "client":{"lang":"ES"}, 
 "data":{"action":"DISABLE TOPO-TRIGGERS"}}$$)
 
 
-SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_ct($${
+SELECT SCHEMA_NAME.gw_fct_admin_manage_ct($${
 "client":{"lang":"ES"}, 
 "data":{"action":"ENABLE TOPO-TRIGGERS"}}$$)
 */
