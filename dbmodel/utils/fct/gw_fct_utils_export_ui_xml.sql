@@ -27,7 +27,7 @@
 	SET search_path=SCHEMA_NAME;
 
 	--iterate over fields defined for the selected form
-		FOR rec IN (SELECT * FROM config_api_form_fields where formname=p_formname AND formtype='feature' order by layout_order) LOOP
+		FOR rec IN (SELECT * FROM config_form_fields where formname=p_formname AND formtype='feature' order by layout_order) LOOP
 
 			IF p_parent IS TRUE THEN
 				IF (SELECT param_name FROM man_addfields_parameter 

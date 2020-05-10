@@ -18,7 +18,6 @@ $BODY$
  SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views_view 
 				('ws', 'aaa_ve_acom', 'connec', 'wjoin', 'man_wjoin.top_floor, man_wjoin.cat_valve', 
 				'ACOMETIDA',3,null, null, null, null);
-
 */
 
 DECLARE 

@@ -29,7 +29,7 @@ BEGIN
 
 		IF v_configtable = 'audit_cat_param_user' THEN 
 			
-		ELSIF v_configtable = 'config_api_form_fields' THEN 
+		ELSIF v_configtable = 'config_form_fields' THEN 
 		
 			IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
 
@@ -52,7 +52,7 @@ BEGIN
 							"debug":null, "variables":"',v_variables,'"}}');
 							SELECT gw_fct_getmessage(v_message);
 						ELSE
-							EXECUTE 'SELECT column_id FROM config_api_form_fields WHERE column_id = '||quote_literal(NEW.dv_parent_id)||' AND formname = '||
+							EXECUTE 'SELECT column_id FROM config_form_fields WHERE column_id = '||quote_literal(NEW.dv_parent_id)||' AND formname = '||
 							quote_literal(NEW.formname)
 								INTO v_widgettype;
 

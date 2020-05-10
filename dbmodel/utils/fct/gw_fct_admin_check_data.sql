@@ -176,28 +176,28 @@ END IF;
 	END IF;
 
 
-	--check if all views with active cat_feature have a definition in config_api_form_fields
+	--check if all views with active cat_feature have a definition in config_form_fields
 	IF v_project_type ='WS' THEN
 	   SELECT count(id), string_agg(child_layer,',')  INTO v_count,v_view_list FROM cat_feature JOIN (SELECT id,active FROM node_type 
 	   UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type) a USING (id) WHERE a.active IS TRUE AND 
-	   child_layer not in (select formname FROM config_api_form_fields);
+	   child_layer not in (select formname FROM config_form_fields);
 
 	ELSIF v_project_type ='UD' THEN
 
 		SELECT count(id), string_agg(child_layer,',')  INTO v_count, v_view_list FROM cat_feature JOIN (SELECT id,active FROM node_type 
 		UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type UNION SELECT id,active FROM gully_type) a USING (id) WHERE a.active IS TRUE AND 
-		child_layer not in (select formname FROM config_api_form_fields);
+		child_layer not in (select formname FROM config_form_fields);
 
 	END IF;
 
 	IF v_count > 0 THEN
-		v_errortext = concat('ERROR: There is/are ',v_count,' active features which views are not defined in config_api_form_fields. Undefined views: ',v_view_list,'.');
+		v_errortext = concat('ERROR: There is/are ',v_count,' active features which views are not defined in config_form_fields. Undefined views: ',v_view_list,'.');
 		
 		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 		VALUES (95, 3,v_errortext );
 	ELSE
 		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-		VALUES (95, 1, 'INFO: All active features have child view defined in config_api_form_fields');
+		VALUES (95, 1, 'INFO: All active features have child view defined in config_form_fields');
 	END IF;
 
 	--check if all ve_node_*,ve_arc_* etc views created in schema are related to any feature in cat_feature
@@ -217,10 +217,10 @@ END IF;
 	--CHECK CONFIG API FORM FIELDS
 
 	--check if all the fields has defined datatype
-	SELECT count(*), string_agg(concat(formname,'.',column_id),',') INTO v_count, v_view_list FROM config_api_form_fields WHERE datatype IS NULL AND formtype='feature';
+	SELECT count(*), string_agg(concat(formname,'.',column_id),',') INTO v_count, v_view_list FROM config_form_fields WHERE datatype IS NULL AND formtype='feature';
 
 	IF v_count > 0 THEN
-		v_errortext =  concat('ERROR: There is/are ',v_count,' feature form fields in config_api_form_fields that don''t have data type. Fields: ',v_view_list,'.');
+		v_errortext =  concat('ERROR: There is/are ',v_count,' feature form fields in config_form_fields that don''t have data type. Fields: ',v_view_list,'.');
 		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 		VALUES (95, 3,v_errortext);
 	ELSE
@@ -229,10 +229,10 @@ END IF;
 	END IF;
 
 	--check if all the fields has defined widgettype 
-	SELECT count(*), string_agg(concat(formname,'.',column_id),',') INTO v_count, v_view_list FROM config_api_form_fields WHERE widgettype IS NULL AND formtype='feature';
+	SELECT count(*), string_agg(concat(formname,'.',column_id),',') INTO v_count, v_view_list FROM config_form_fields WHERE widgettype IS NULL AND formtype='feature';
 
 	IF v_count > 0 THEN
-		v_errortext = concat('ERROR: There is/are ',v_count,' feature form fields in config_api_form_fields that don''t have widget type. Fields: ',v_view_list,'.');
+		v_errortext = concat('ERROR: There is/are ',v_count,' feature form fields in config_form_fields that don''t have widget type. Fields: ',v_view_list,'.');
 		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 		VALUES (95, 3,v_errortext);
 	ELSE
@@ -241,11 +241,11 @@ END IF;
 	END IF;
 
 	--check if all the fields defined as combo or typeahead have dv_querytext defined
-	SELECT count(*), string_agg(concat(formname,'.',column_id),',') INTO v_count, v_view_list  FROM config_api_form_fields 
+	SELECT count(*), string_agg(concat(formname,'.',column_id),',') INTO v_count, v_view_list  FROM config_form_fields 
 	WHERE (widgettype = 'combo' or widgettype ='typeahead') and dv_querytext is null;
 
 	IF v_count > 0 THEN
-		v_errortext = concat('ERROR: There is/are ',v_count,' feature form fields in config_api_form_fields that are combo or typeahead but don''t have dv_querytext defined. Fields: ',v_view_list,'.');
+		v_errortext = concat('ERROR: There is/are ',v_count,' feature form fields in config_form_fields that are combo or typeahead but don''t have dv_querytext defined. Fields: ',v_view_list,'.');
 		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 		VALUES (95, 3, v_errortext);
 	ELSE
@@ -253,26 +253,26 @@ END IF;
 		VALUES (95, 1, 'INFO: All feature form fields with widget type combo or typeahead have dv_querytext defined.');
 	END IF;
 
-	--check if all addfields are defined in config_api_form_fields
+	--check if all addfields are defined in config_form_fields
 	SELECT count(*), string_agg(concat(child_layer,': ',param_name),',') INTO v_count, v_view_list FROM man_addfields_parameter 
 	JOIN cat_feature ON cat_feature.id=man_addfields_parameter.cat_feature_id
-	WHERE active IS TRUE AND param_name not IN (SELECT column_id FROM config_api_form_fields JOIN cat_feature ON cat_feature.child_layer=formname);
+	WHERE active IS TRUE AND param_name not IN (SELECT column_id FROM config_form_fields JOIN cat_feature ON cat_feature.child_layer=formname);
 
 	IF v_count > 0 THEN
-		v_errortext=concat('ERROR: There is/are ',v_count,'addfields that are not defined in config_api_form_fields. Addfields: ',v_view_list,'.');
+		v_errortext=concat('ERROR: There is/are ',v_count,'addfields that are not defined in config_form_fields. Addfields: ',v_view_list,'.');
 		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 		VALUES (95, 3, v_errortext);
 	ELSE
 		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-		VALUES (95, 1, 'INFO: All addfields are defined in config_api_form_fields.');
+		VALUES (95, 1, 'INFO: All addfields are defined in config_form_fields.');
 	END IF;
 
 	--check if definitions has duplicated layout_order for different layouts - 
 	SELECT array_agg(a.list::text) into v_field_array FROM (SELECT concat('Formname: ',formname, ', layoutname: ',layoutname, ', layout_order: ',layout_order) as list
-	FROM config_api_form_fields WHERE formtype = 'feature' AND hidden is false group by layout_order,formname,layoutname having count(id)>1)a;
+	FROM config_form_fields WHERE formtype = 'feature' AND hidden is false group by layout_order,formname,layoutname having count(id)>1)a;
 
 	IF v_field_array IS NOT NULL THEN
-		v_errortext=concat('ERROR: There is/are form names with duplicated layout order defined in config_api_form_fields: ');
+		v_errortext=concat('ERROR: There is/are form names with duplicated layout order defined in config_form_fields: ');
 		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 		VALUES (95, 3, v_errortext);
 
@@ -283,7 +283,7 @@ END IF;
 		END LOOP;
 	ELSE
 		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-		VALUES (95, 1, 'INFO: All fields defined in config_api_form_fields have unduplicated order.');
+		VALUES (95, 1, 'INFO: All fields defined in config_form_fields have unduplicated order.');
 	END IF;
 
 -- get results

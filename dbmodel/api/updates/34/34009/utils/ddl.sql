@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = ws6, public, pg_catalog;
+SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 ALTER TABLE config_api_form_actions RENAME TO config_form_actions;
 ALTER TABLE config_api_form_fields RENAME TO config_form_fields;
@@ -18,4 +18,7 @@ ALTER TABLE config_api_tableinfo_x_infotype RENAME TO config_info_table_x_type;
 ALTER TABLE config_api_typevalue RENAME TO config_form_typevalue;
 ALTER TABLE config_client_forms RENAME TO config_form_tableview;
 
+ALTER TABLE config_api_visit RENAME TO _config_api_visit_;
+
+ALTER SEQUENCE SCHEMA_NAME.config_api_form_fields_id_seq RENAME TO config_form_fields_id_seq;
 

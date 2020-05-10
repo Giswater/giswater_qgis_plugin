@@ -74,7 +74,7 @@ BEGIN
 			EXECUTE 'DROP VIEW IF EXISTS '||v_childview||' CASCADE';
 
 			IF v_project_type IS NOT NULL THEN -- only for that existing projects (projecttype not null)
-				EXECUTE 'DELETE FROM config_api_form_fields WHERE formname = '||quote_literal(v_childview);
+				EXECUTE 'DELETE FROM config_form_fields WHERE formname = '||quote_literal(v_childview);
 			END IF;
 
 			PERFORM gw_fct_debug(concat('{"data":{"msg":"Deleted layer: ", "variables":"',v_childview,'"}}')::json);
@@ -227,7 +227,7 @@ BEGIN
 					CONTINUE;
 				END IF;
 
-				IF 	v_viewname NOT IN (SELECT formname FROM config_api_form_fields) THEN
+				IF 	v_viewname NOT IN (SELECT formname FROM config_form_fields) THEN
 					EXECUTE 'SELECT gw_fct_admin_manage_child_config($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, 
 					"feature":{"catFeature":"'||v_cat_feature||'"}, 
 					"data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'", "feature_type":"'||v_feature_type||'" }}$$);';
@@ -355,7 +355,7 @@ BEGIN
 				END IF;
 
 
-			IF 	v_viewname NOT IN (SELECT formname FROM config_api_form_fields) THEN
+			IF 	v_viewname NOT IN (SELECT formname FROM config_form_fields) THEN
 				EXECUTE 'SELECT gw_fct_admin_manage_child_config($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, 
 				"feature":{"catFeature":"'||v_cat_feature||'"}, 
 				"data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'", "feature_type":"'||v_feature_type||'" }}$$);';

@@ -218,11 +218,11 @@ INSERT INTO config_api_visit_x_featuretable VALUES ('v_edit_connec', 4);
 INSERT INTO config_api_visit_x_featuretable VALUES ('v_edit_connec', 2);
 
 
-SELECT setval('SCHEMA_NAME.config_api_form_fields_id_seq', (SELECT max(id) FROM config_api_form_fields), true);
+SELECT setval('SCHEMA_NAME.config_form_fields_id_seq', (SELECT max(id) FROM config_form_fields), true);
 
 
 --VISIT_CLASS_0
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -231,7 +231,7 @@ NULL, NULL, NULL, false, false, true, NULL, 'SELECT id, idval FROM om_visit_clas
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -240,7 +240,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -249,7 +249,7 @@ NULL, NULL, NULL, false, false, true, NULL, 'SELECT DISTINCT id AS id, name AS i
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -258,7 +258,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -267,7 +267,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -276,7 +276,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -285,7 +285,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 'gwSetVisit' ,NULL, NULL, NULL, 'data_9', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -302,7 +302,7 @@ NULL, NULL, NULL, NULL,
 
 
 --UNEXPECTED_NOINFRA
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -311,7 +311,7 @@ NULL, NULL, NULL, false, false, true, NULL, 'SELECT id, idval FROM om_visit_clas
 NULL, NULL, NULL, NULL, 
 'gwGetVisit' ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -320,7 +320,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -329,7 +329,7 @@ NULL, NULL, NULL, false, false, true, NULL, 'SELECT id, idval FROM om_typevalue 
 NULL, NULL, NULL, NULL, 
 NULL, NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -338,7 +338,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -347,7 +347,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -356,7 +356,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -365,7 +365,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -374,7 +374,7 @@ NULL, NULL, NULL, false, false, true, NULL, 'SELECT DISTINCT (id) AS id,  idval 
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -383,7 +383,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 'gwSetVisit' ,NULL, NULL, NULL, 'data_9', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -396,7 +396,7 @@ NULL, NULL, NULL, NULL,
 
 
 --VISIT_ARC_INSP
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -405,7 +405,7 @@ NULL, NULL, NULL, false, false, true, NULL, 'SELECT id, idval FROM om_visit_clas
 NULL, NULL, NULL, NULL, 
 'gwGetVisit',NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -414,7 +414,7 @@ NULL, NULL, NULL, false, false, true, NULL, 'SELECT row_to_json(res) FROM (SELEC
 NULL, NULL, NULL, NULL, 
 NULL,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -423,7 +423,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -432,7 +432,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -441,7 +441,7 @@ NULL, NULL, NULL, false, false, true, NULL, 'SELECT id , id as idval FROM om_vis
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -450,7 +450,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -459,7 +459,7 @@ NULL, NULL, 'Ex.: 10 (en cmts.)', false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -468,7 +468,7 @@ NULL, NULL, NULL, false, false, true, NULL, 'SELECT id, idval FROM om_typevalue 
 NULL, NULL, NULL, NULL, 
 NULL, NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -477,7 +477,7 @@ NULL, NULL, NULL, false, false, true, NULL, 'SELECT id, idval FROM om_typevalue 
 NULL, NULL, NULL, NULL, 
 NULL, NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -486,7 +486,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -495,7 +495,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -504,7 +504,7 @@ NULL, NULL, NULL, false, false, true, NULL, 'SELECT DISTINCT (id) AS id,  idval 
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -513,7 +513,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -522,7 +522,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 'gwSetVisit' ,NULL, NULL, NULL, 'data_9', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -535,7 +535,7 @@ NULL, NULL, NULL, NULL,
 
 
 --VISIT_CONNEC_INSP
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -544,7 +544,7 @@ NULL, NULL, NULL, false, false, true, NULL, 'SELECT id, idval FROM om_visit_clas
 NULL, NULL, NULL, NULL, 
 'gwGetVisit' ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -553,7 +553,7 @@ NULL, NULL, NULL, false, false, true, NULL, 'SELECT row_to_json(res) FROM (SELEC
 NULL, NULL, NULL, NULL, 
 NULL,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -562,7 +562,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -571,7 +571,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -580,7 +580,7 @@ NULL, NULL, NULL, false, false, true, NULL, 'SELECT DISTINCT id AS id, name AS i
 NULL, NULL, NULL, NULL, 
 NULL,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -589,7 +589,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -598,7 +598,7 @@ NULL, NULL, NULL, false, false, true, NULL, 'SELECT id, idval FROM om_typevalue 
 NULL, NULL, NULL, NULL, 
 NULL, NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -607,7 +607,7 @@ NULL, NULL, NULL, false, false, true, NULL, 'SELECT id, idval FROM om_typevalue 
 NULL, NULL, NULL, NULL, 
 NULL, NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -616,7 +616,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 'gwSetVisit' ,NULL, NULL, NULL, 'data_9', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -628,7 +628,7 @@ NULL, NULL, NULL, NULL,
 
 
 --VISIT_NODE_INSP
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -637,7 +637,7 @@ NULL, NULL, NULL, false, false, true, NULL, 'SELECT id, idval FROM om_visit_clas
 NULL, NULL, NULL, NULL, 
 'gwGetVisit', NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -646,7 +646,7 @@ NULL, NULL, NULL, false, false, true, NULL, 'SELECT row_to_json(res) FROM (SELEC
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -655,7 +655,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -664,7 +664,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -673,7 +673,7 @@ NULL, NULL, NULL, false, false, true, NULL, 'SELECT DISTINCT id AS id, name AS i
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -682,7 +682,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -691,7 +691,7 @@ NULL, NULL, 'Ex.: 10 (en cmts.)', false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -700,7 +700,7 @@ NULL, NULL, NULL, false, false, true, NULL, 'SELECT id, idval FROM om_typevalue 
 NULL, NULL, NULL, NULL, 
 NULL, NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -709,7 +709,7 @@ NULL, NULL, NULL, false, false, true, NULL, 'SELECT id, idval FROM om_typevalue 
 NULL, NULL, NULL, NULL, 
 NULL, NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -718,7 +718,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 'gwSetVisit' ,NULL, NULL, NULL, 'data_9', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -731,7 +731,7 @@ NULL, NULL, NULL, NULL,
 
 
 --VISIT_ARC_LEAK
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -740,7 +740,7 @@ NULL, NULL, NULL, false, false, true, NULL, 'SELECT id, idval FROM om_visit_clas
 NULL, NULL, NULL, NULL, 
 'gwGetVisit' ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -749,7 +749,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL, NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -758,7 +758,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -767,7 +767,7 @@ NULL, NULL, NULL, false, false, true, NULL, 'SELECT id , id as idval FROM om_vis
 NULL, NULL, NULL, NULL, 
 NULL,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -776,7 +776,7 @@ NULL, NULL, 'Ex.: Work order code', false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -785,7 +785,7 @@ NULL, NULL, NULL, false, false, true, NULL, 'SELECT id AS id, descript AS idval 
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -795,7 +795,7 @@ NULL, NULL, NULL, NULL,
 NULL,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -804,7 +804,7 @@ NULL, NULL, 'Ex.: 10 (en cmts.)', false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -813,7 +813,7 @@ NULL, NULL, 'Ex.: 34.57', false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -822,7 +822,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -832,7 +832,7 @@ SELECT DISTINCT node_2 AS id, node_2 AS idval FROM arc) a WHERE id IS NOT NULL',
 NULL, NULL, 'arc_id', ' AND arc.arc_id.arc_id=', 
 NULL,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -841,7 +841,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -850,7 +850,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -859,7 +859,7 @@ NULL, NULL, NULL, false, false, true, NULL, 'SELECT DISTINCT (id) AS id,  idval 
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -868,7 +868,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 'gwSetVisit' ,NULL, NULL, NULL, 'data_9', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -881,7 +881,7 @@ NULL, NULL, NULL, NULL,
 
 
 --VISIT_CONNEC_LEAK
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -890,7 +890,7 @@ NULL, NULL, NULL, false, false, true, NULL, 'SELECT id, idval FROM om_visit_clas
 NULL, NULL, NULL, NULL, 
 'gwGetVisit',NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -899,7 +899,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -908,7 +908,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -917,7 +917,7 @@ NULL, NULL, NULL, false, false, true, NULL, 'SELECT DISTINCT id AS id, name AS i
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -926,7 +926,7 @@ NULL, NULL, 'Ex.: Work order code', false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL, NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -935,7 +935,7 @@ NULL, NULL, NULL, false, false, true, NULL, 'SELECT id AS id, descript AS idval 
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -944,7 +944,7 @@ NULL, NULL, 'Ex.: Parameter code', false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL, NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -953,7 +953,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -962,7 +962,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 'gwSetVisit' ,NULL, NULL, NULL, 'data_9', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -974,7 +974,7 @@ NULL, NULL, NULL, NULL,
 
 
 --VISIT_NODE_LEAK
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -983,7 +983,7 @@ NULL, NULL, NULL, false, false, true, NULL, 'SELECT id, idval FROM om_visit_clas
 NULL, NULL, NULL, NULL, 
 'gwGetVisit' ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -992,7 +992,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -1001,7 +1001,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -1010,7 +1010,7 @@ NULL, NULL, NULL, false, false, true, NULL, 'SELECT DISTINCT id AS id, name AS i
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -1019,7 +1019,7 @@ NULL, NULL, 'Ex.: Work order code', false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -1028,7 +1028,7 @@ NULL, NULL, NULL, false, false, true, NULL, 'SELECT id AS id, descript AS idval 
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -1037,7 +1037,7 @@ NULL, NULL, 'Ex.: Parameter code', false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL, NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -1046,7 +1046,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -1055,7 +1055,7 @@ NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 'gwSetVisit' ,NULL, NULL, NULL, 'data_9', NULL, FALSE);
 
-INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
+INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, label, 
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 

@@ -23,9 +23,9 @@ DELETE,a backup name on temp_table.
 	
 EXAMPLE
 -------
-SELECT SCHEMA_NAME.gw_fct_admin_manage_backup ($${"data":{"action":"CREATE", "backupName":"test8", "table":"config_api_form_fields"}}$$)
-SELECT SCHEMA_NAME.gw_fct_admin_manage_backup ($${"data":{"action":"RESTORE", "backupName":"test6", "newBackupName":"test5", "table":"config_api_form_fields"}}$$)
-SELECT SCHEMA_NAME.gw_fct_admin_manage_backup ($${"data":{"action":"DELETE", "backupName":"test4","table":"config_api_form_fields" }}$$)
+SELECT SCHEMA_NAME.gw_fct_admin_manage_backup ($${"data":{"action":"CREATE", "backupName":"test8", "table":"config_form_fields"}}$$)
+SELECT SCHEMA_NAME.gw_fct_admin_manage_backup ($${"data":{"action":"RESTORE", "backupName":"test6", "newBackupName":"test5", "table":"config_form_fields"}}$$)
+SELECT SCHEMA_NAME.gw_fct_admin_manage_backup ($${"data":{"action":"DELETE", "backupName":"test4","table":"config_form_fields" }}$$)
 */
 
 

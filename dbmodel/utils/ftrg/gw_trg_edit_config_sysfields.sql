@@ -17,7 +17,7 @@ BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	 
-	UPDATE config_api_form_fields SET
+	UPDATE config_form_fields SET
 	formname = NEW.formname,
 	formtype = NEW.formtype,
 	column_id = NEW.column_id,

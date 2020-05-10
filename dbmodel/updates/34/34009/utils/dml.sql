@@ -16,7 +16,7 @@ UPDATE config_typevalue_fk SET target_table='ext_cat_raster' WHERE target_table=
 UPDATE sys_fprocess SET iscustom=false;
 UPDATE sys_function SET iscustom=false;
 
-UPDATE sys_function SET function_type = function WHERE function_type IN ('api function','Function to manage messages');
+UPDATE sys_function SET function_type = 'function' WHERE function_type IN ('api function','Function to manage messages');
 
 INSERT INTO sys_function VALUES (2866, 'gw_fct_get_combochilds', 'utils', 'function',null, null, 'Function to manage combos', 'role_basic', FALSE, null, TRUE);
 INSERT INTO sys_function VALUES (2868, 'gw_fct_getinsertformdisabled', 'utils', 'function',null, null, 'Function to manage disabled forms', 'role_basic', FALSE, null, TRUE);

@@ -297,76 +297,76 @@ UPDATE ext_streetaxis SET muni_id = 2 WHERE expl_id  = 2;
 
 
 -- hidden
-UPDATE config_api_form_fields SET hidden = true WHERE column_id 
+UPDATE config_form_fields SET hidden = true WHERE column_id 
 IN ('undelete', 'publish', 'buildercat_id', 'comment', 'num_value', 'svg', 'macrodqa_id', 'macrosector_id',
 'macroexpl_id', 'custom_length', 'staticpressure1', 'staticpressure2', 'pipe_param_1');
 
-UPDATE config_api_form_fields SET hidden = true WHERE column_id IN ('label_x', 'label_y') AND formname LIKE 've_arc%';
+UPDATE config_form_fields SET hidden = true WHERE column_id IN ('label_x', 'label_y') AND formname LIKE 've_arc%';
 
 -- reorder sample
-UPDATE config_api_form_fields SET layout_order =90, layoutname = 'lyt_data_1' WHERE column_id ='link';
-UPDATE config_api_form_fields SET layout_order =1 , layoutname ='lyt_bot_2' WHERE column_id ='sector_id';
-UPDATE config_api_form_fields SET layout_order =4 , layoutname ='lyt_bot_1' , label = 'Dqa' WHERE column_id ='dqa_id';
-UPDATE config_api_form_fields SET layout_order =70 , layoutname ='lyt_data_1' WHERE column_id ='macrosector_id';
-UPDATE config_api_form_fields SET stylesheet ='{"label":"color:red; font-weight:bold"}' WHERE column_id IN ('expl_id', 'sector_id');
+UPDATE config_form_fields SET layout_order =90, layoutname = 'lyt_data_1' WHERE column_id ='link';
+UPDATE config_form_fields SET layout_order =1 , layoutname ='lyt_bot_2' WHERE column_id ='sector_id';
+UPDATE config_form_fields SET layout_order =4 , layoutname ='lyt_bot_1' , label = 'Dqa' WHERE column_id ='dqa_id';
+UPDATE config_form_fields SET layout_order =70 , layoutname ='lyt_data_1' WHERE column_id ='macrosector_id';
+UPDATE config_form_fields SET stylesheet ='{"label":"color:red; font-weight:bold"}' WHERE column_id IN ('expl_id', 'sector_id');
 
-update config_api_form_fields SET layout_order = 3 where column_id='state' and formname like '%ve_connec_%';
-update config_api_form_fields SET layout_order = 4 where column_id='state_type' and formname like '%ve_connec_%';
+update config_form_fields SET layout_order = 3 where column_id='state' and formname like '%ve_connec_%';
+update config_form_fields SET layout_order = 4 where column_id='state_type' and formname like '%ve_connec_%';
 
 UPDATE node_type set isprofilesurface = true;
 
 --refactor of forms
-UPDATE config_api_form_fields SET layoutname = 'lyt_data_3', layout_order = 11 where column_id ='pjoint_id';
-UPDATE config_api_form_fields SET layoutname = 'lyt_data_3', layout_order = 12 where column_id ='pjoint_type';
-UPDATE config_api_form_fields SET layoutname = 'lyt_data_3', layout_order = 13 where column_id ='descript';
-UPDATE config_api_form_fields SET layoutname = 'lyt_data_3', layout_order = 14 where column_id = 'annotation';
-UPDATE config_api_form_fields SET layoutname = 'lyt_data_3', layout_order = 15 where column_id = 'observ';
-UPDATE config_api_form_fields SET layoutname = 'lyt_data_3', layout_order = 16 where column_id = 'lastupdate';
-UPDATE config_api_form_fields SET layoutname ='lyt_data_3' , layout_order = 17 where column_id = 'lastupdate_user';
-UPDATE config_api_form_fields SET layoutname = 'lyt_data_3', layout_order = 18 where column_id ='link';
+UPDATE config_form_fields SET layoutname = 'lyt_data_3', layout_order = 11 where column_id ='pjoint_id';
+UPDATE config_form_fields SET layoutname = 'lyt_data_3', layout_order = 12 where column_id ='pjoint_type';
+UPDATE config_form_fields SET layoutname = 'lyt_data_3', layout_order = 13 where column_id ='descript';
+UPDATE config_form_fields SET layoutname = 'lyt_data_3', layout_order = 14 where column_id = 'annotation';
+UPDATE config_form_fields SET layoutname = 'lyt_data_3', layout_order = 15 where column_id = 'observ';
+UPDATE config_form_fields SET layoutname = 'lyt_data_3', layout_order = 16 where column_id = 'lastupdate';
+UPDATE config_form_fields SET layoutname ='lyt_data_3' , layout_order = 17 where column_id = 'lastupdate_user';
+UPDATE config_form_fields SET layoutname = 'lyt_data_3', layout_order = 18 where column_id ='link';
 
-UPDATE config_api_form_fields SET  hidden = true where column_id = 'macrodma_id';
-UPDATE config_api_form_fields SET  hidden = true where column_id = 'inventory';
-UPDATE config_api_form_fields SET  hidden = true where column_id = 'feature_id';
-UPDATE config_api_form_fields SET  hidden = true where column_id = 'featurecat_id';
-UPDATE config_api_form_fields SET  hidden = true where column_id = 'connec_length';
+UPDATE config_form_fields SET  hidden = true where column_id = 'macrodma_id';
+UPDATE config_form_fields SET  hidden = true where column_id = 'inventory';
+UPDATE config_form_fields SET  hidden = true where column_id = 'feature_id';
+UPDATE config_form_fields SET  hidden = true where column_id = 'featurecat_id';
+UPDATE config_form_fields SET  hidden = true where column_id = 'connec_length';
 
-UPDATE config_api_form_fields SET  hidden = true where column_id = 'cmanhole_param_1';
-UPDATE config_api_form_fields SET  hidden = true where column_id = 'cmanhole_param_2';
-
-
-UPDATE config_api_form_fields SET  hidden = true where column_id IN ('accessibility', 'inlet');
-
-UPDATE config_api_form_fields SET  layoutname = 'lyt_data_2' where column_id IN ('bottom_channel','sander_depth','length', 'width') AND formname LIKE '%_node_%';
-
-UPDATE config_api_form_fields SET layoutname = 'lyt_data_2',  layout_order = 40 where column_id ='workcat_id_end' AND formname LIKE '%_connec_%';
-UPDATE config_api_form_fields SET layoutname = 'lyt_data_2' , layout_order = 40 where column_id ='workcat_id_end' AND formname LIKE '%_gully_%';
-UPDATE config_api_form_fields SET layoutname = 'lyt_data_2' , layout_order = 40 where column_id ='workcat_id_end' AND formname LIKE '%_arc_%';
+UPDATE config_form_fields SET  hidden = true where column_id = 'cmanhole_param_1';
+UPDATE config_form_fields SET  hidden = true where column_id = 'cmanhole_param_2';
 
 
-UPDATE config_api_form_fields SET  hidden = true where column_id = 'z1';
-UPDATE config_api_form_fields SET  hidden = true where column_id = 'z2';
-UPDATE config_api_form_fields SET  hidden = true where column_id = 'cat_geom2' AND formname LIKE '%_arc_%';
-UPDATE config_api_form_fields SET  hidden = true where column_id = 'cat_shape' AND formname LIKE '%_arc_%';
-UPDATE config_api_form_fields SET  hidden = true where column_id = 'soilcat_id' AND formname LIKE '%_arc_%';
+UPDATE config_form_fields SET  hidden = true where column_id IN ('accessibility', 'inlet');
+
+UPDATE config_form_fields SET  layoutname = 'lyt_data_2' where column_id IN ('bottom_channel','sander_depth','length', 'width') AND formname LIKE '%_node_%';
+
+UPDATE config_form_fields SET layoutname = 'lyt_data_2',  layout_order = 40 where column_id ='workcat_id_end' AND formname LIKE '%_connec_%';
+UPDATE config_form_fields SET layoutname = 'lyt_data_2' , layout_order = 40 where column_id ='workcat_id_end' AND formname LIKE '%_gully_%';
+UPDATE config_form_fields SET layoutname = 'lyt_data_2' , layout_order = 40 where column_id ='workcat_id_end' AND formname LIKE '%_arc_%';
 
 
-UPDATE config_api_form_fields SET  hidden = true where column_id = 'depth' AND formname LIKE '%_connec_%';
-UPDATE config_api_form_fields SET  hidden = true where column_id = 'function_type' AND formname LIKE '%_connec_%';
-UPDATE config_api_form_fields SET  hidden = true where column_id = 'descript' AND formname LIKE '%_connec_%';
-UPDATE config_api_form_fields SET  hidden = true where column_id = 'annotation' AND formname LIKE '%_connec_%';
+UPDATE config_form_fields SET  hidden = true where column_id = 'z1';
+UPDATE config_form_fields SET  hidden = true where column_id = 'z2';
+UPDATE config_form_fields SET  hidden = true where column_id = 'cat_geom2' AND formname LIKE '%_arc_%';
+UPDATE config_form_fields SET  hidden = true where column_id = 'cat_shape' AND formname LIKE '%_arc_%';
+UPDATE config_form_fields SET  hidden = true where column_id = 'soilcat_id' AND formname LIKE '%_arc_%';
 
-UPDATE config_api_form_fields SET layoutname = 'lyt_bot_1', layout_order = 3 where column_id ='state';
-UPDATE config_api_form_fields SET layoutname = 'lyt_bot_1', layout_order = 4 where column_id ='state_type';
-UPDATE config_api_form_fields SET layoutname = 'lyt_bot_1' where column_id ='sector_id';
-UPDATE config_api_form_fields SET layoutname = 'lyt_data_1',layout_order = 997 where column_id ='hemisphere';
-UPDATE config_api_form_fields SET layout_order = 2 where column_id ='dma_id';
 
-UPDATE config_api_form_fields SET layoutname = 'lyt_data_2', layout_order = 30 where column_id ='verified';
-UPDATE config_api_form_fields SET layoutname = 'lyt_data_2', layout_order = 31 where column_id ='presszonecat_id';
-UPDATE config_api_form_fields SET layoutname = 'lyt_data_2', layout_order = 32 where column_id ='dqa_id';
-UPDATE config_api_form_fields SET layoutname = 'lyt_data_2', layout_order = 33 where column_id ='expl_id';
-UPDATE config_api_form_fields SET layoutname = 'lyt_data_1', layout_order = 998 where column_id ='parent_id';
+UPDATE config_form_fields SET  hidden = true where column_id = 'depth' AND formname LIKE '%_connec_%';
+UPDATE config_form_fields SET  hidden = true where column_id = 'function_type' AND formname LIKE '%_connec_%';
+UPDATE config_form_fields SET  hidden = true where column_id = 'descript' AND formname LIKE '%_connec_%';
+UPDATE config_form_fields SET  hidden = true where column_id = 'annotation' AND formname LIKE '%_connec_%';
+
+UPDATE config_form_fields SET layoutname = 'lyt_bot_1', layout_order = 3 where column_id ='state';
+UPDATE config_form_fields SET layoutname = 'lyt_bot_1', layout_order = 4 where column_id ='state_type';
+UPDATE config_form_fields SET layoutname = 'lyt_bot_1' where column_id ='sector_id';
+UPDATE config_form_fields SET layoutname = 'lyt_data_1',layout_order = 997 where column_id ='hemisphere';
+UPDATE config_form_fields SET layout_order = 2 where column_id ='dma_id';
+
+UPDATE config_form_fields SET layoutname = 'lyt_data_2', layout_order = 30 where column_id ='verified';
+UPDATE config_form_fields SET layoutname = 'lyt_data_2', layout_order = 31 where column_id ='presszonecat_id';
+UPDATE config_form_fields SET layoutname = 'lyt_data_2', layout_order = 32 where column_id ='dqa_id';
+UPDATE config_form_fields SET layoutname = 'lyt_data_2', layout_order = 33 where column_id ='expl_id';
+UPDATE config_form_fields SET layoutname = 'lyt_data_1', layout_order = 998 where column_id ='parent_id';
 
 
 -- refactor of type's
@@ -375,34 +375,34 @@ UPDATE man_type_category SET category_type = replace (category_type, 'Standard',
 UPDATE man_type_location SET location_type = replace (location_type, 'Standard', 'St.');
 UPDATE man_type_function SET function_type = replace (function_type, 'Standard', 'St.');
 
-update config_api_form_fields SET widgettype = 'text', dv_querytext = null, placeholder  ='Ex.macrosector_id' WHERE column_id  = 'macrosector_id';
+update config_form_fields SET widgettype = 'text', dv_querytext = null, placeholder  ='Ex.macrosector_id' WHERE column_id  = 'macrosector_id';
 
 UPDATE connec SET connec_depth = 1.5;
 
 
 -- add tooltips for specific fields
-UPDATE config_api_form_fields SET tooltip = 'accessibility - Para establecer si es accesible o no' WHERE column_id = 'accessibility' AND tooltip IS NULL;
-UPDATE config_api_form_fields SET tooltip = 'bottom_channel - Para establecer si tiene canal al fondo o no' WHERE column_id = 'bottom_channel' AND tooltip IS NULL;
-UPDATE config_api_form_fields SET tooltip = 'length - Longitud total' WHERE column_id = 'length' AND tooltip IS NULL;
-UPDATE config_api_form_fields SET tooltip = 'max_volume - Volumen máximo' WHERE column_id = 'max_volume' AND tooltip IS NULL;
-UPDATE config_api_form_fields SET tooltip = 'sander_depth - Profundidad del arenero' WHERE column_id = 'sander_depth' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_api_form_fields SET tooltip = 'util_volume - Volumen útil' WHERE column_id = 'util_volume' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_api_form_fields SET tooltip = 'width - Anchura total' WHERE column_id = 'width' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_api_form_fields SET tooltip = 'prot_surface - Para establecer si existe un protector en superfície' WHERE column_id = 'prot_surface' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_api_form_fields SET tooltip = 'serial_number - Número de serie del elemento' WHERE column_id = 'serial_number' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_api_form_fields SET tooltip = 'siphon - Para establecer si tiene sifón o no' WHERE column_id = 'siphon' AND (tooltip IS NULL OR tooltip='siphon') AND formtype='feature';
-UPDATE config_api_form_fields SET tooltip = 'units - Número de rejas' WHERE column_id = 'units' AND (tooltip IS NULL OR tooltip = 'units') AND formtype='feature';
-UPDATE config_api_form_fields SET tooltip = 'sander_length - Longitud del arenero' WHERE column_id = 'sander_length' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_api_form_fields SET tooltip = 'min_height - Altura mínima' WHERE column_id = 'min_height' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_api_form_fields SET tooltip = 'custom_area - Area útil del depósito' WHERE column_id = 'custom_area' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_api_form_fields SET tooltip = 'groove - Para establecer si hay ranura en el encintado' WHERE column_id = 'groove' AND tooltip = 'groove' AND formtype='feature';
-UPDATE config_api_form_fields SET tooltip = 'inlet - Elemento con aportaciones' WHERE column_id = 'inlet' AND tooltip IS NULL;
+UPDATE config_form_fields SET tooltip = 'accessibility - Para establecer si es accesible o no' WHERE column_id = 'accessibility' AND tooltip IS NULL;
+UPDATE config_form_fields SET tooltip = 'bottom_channel - Para establecer si tiene canal al fondo o no' WHERE column_id = 'bottom_channel' AND tooltip IS NULL;
+UPDATE config_form_fields SET tooltip = 'length - Longitud total' WHERE column_id = 'length' AND tooltip IS NULL;
+UPDATE config_form_fields SET tooltip = 'max_volume - Volumen máximo' WHERE column_id = 'max_volume' AND tooltip IS NULL;
+UPDATE config_form_fields SET tooltip = 'sander_depth - Profundidad del arenero' WHERE column_id = 'sander_depth' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'util_volume - Volumen útil' WHERE column_id = 'util_volume' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'width - Anchura total' WHERE column_id = 'width' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'prot_surface - Para establecer si existe un protector en superfície' WHERE column_id = 'prot_surface' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'serial_number - Número de serie del elemento' WHERE column_id = 'serial_number' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'siphon - Para establecer si tiene sifón o no' WHERE column_id = 'siphon' AND (tooltip IS NULL OR tooltip='siphon') AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'units - Número de rejas' WHERE column_id = 'units' AND (tooltip IS NULL OR tooltip = 'units') AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'sander_length - Longitud del arenero' WHERE column_id = 'sander_length' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'min_height - Altura mínima' WHERE column_id = 'min_height' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'custom_area - Area útil del depósito' WHERE column_id = 'custom_area' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'groove - Para establecer si hay ranura en el encintado' WHERE column_id = 'groove' AND tooltip = 'groove' AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'inlet - Elemento con aportaciones' WHERE column_id = 'inlet' AND tooltip IS NULL;
 
 UPDATE node_type SET isexitupperintro = 2 WHERE id = 'VIRTUAL_NODE';
 
-UPDATE config_api_form_fields set layoutname = 'lyt_data_1' WHERE column_id = 'width' AND formname ='ve_node_chamber';
-UPDATE config_api_form_fields set layoutname = 'lyt_data_1' WHERE column_id = 'width' AND formname ='ve_node_pump_station';
-UPDATE config_api_form_fields set layoutname = 'lyt_data_1' WHERE column_id = 'width' AND formname ='ve_node_weir';
+UPDATE config_form_fields set layoutname = 'lyt_data_1' WHERE column_id = 'width' AND formname ='ve_node_chamber';
+UPDATE config_form_fields set layoutname = 'lyt_data_1' WHERE column_id = 'width' AND formname ='ve_node_pump_station';
+UPDATE config_form_fields set layoutname = 'lyt_data_1' WHERE column_id = 'width' AND formname ='ve_node_weir';
 
 UPDATE config_param_system SET value='TRUE' WHERE parameter='sys_raster_dem';
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_upser_elevation_from_dem', 'true', current_user)
@@ -411,13 +411,13 @@ ON CONFLICT (parameter, cur_user) DO NOTHING;
 UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'qgis_form_docker' AND cur_user = current_user;
 
 -- updates to manage matcat_id separately from catalog
-UPDATE config_api_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_node' 
+UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_node' 
 WHERE column_id='matcat_id' AND formname LIKE 've_node%';
 
-UPDATE config_api_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_arc' 
+UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_arc' 
 WHERE column_id='matcat_id' AND formname LIKE 've_connec%';
 
-UPDATE config_api_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_arc' 
+UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_arc' 
 WHERE column_id='matcat_id' AND formname LIKE 've_arc%';
 
 UPDATE node SET nodecat_id='C_MANHOLE_100', matcat_id='Brick' WHERE nodecat_id='C_MANHOLE-BR100';

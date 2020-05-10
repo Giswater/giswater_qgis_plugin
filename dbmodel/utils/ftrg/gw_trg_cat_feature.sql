@@ -181,8 +181,8 @@ BEGIN
 					EXECUTE 'DROP VIEW '||v_schemaname||'.'||OLD.child_layer||';';
 				END IF;
 
-				--rename config_api_form_fields formname
-				UPDATE config_api_form_fields SET formname=NEW.child_layer WHERE formname=OLD.child_layer AND formtype='feature';
+				--rename config_form_fields formname
+				UPDATE config_form_fields SET formname=NEW.child_layer WHERE formname=OLD.child_layer AND formtype='feature';
 
 				--rename config_api_tableinfo_x_infotype tableinfo_id and tableinfotype_id
 				UPDATE config_api_tableinfo_x_infotype SET tableinfo_id=v_viewname WHERE tableinfo_id=OLD.child_layer;

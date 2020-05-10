@@ -12,10 +12,10 @@ $BODY$
 
 /*EXAMPLE
 set
-SELECT SCHEMA_NAME.gw_fct_admin_schema_i18n($${"data":{"table":"config_api_form_fields", "formname":"ve_arc", "clause":"WHERE formname = 've_arc' AND column_id = 'arc_id'", 
+SELECT SCHEMA_NAME.gw_fct_admin_schema_i18n($${"data":{"table":"config_form_fields", "formname":"ve_arc", "clause":"WHERE formname = 've_arc' AND column_id = 'arc_id'", 
 "label":{"column":"label", "value":"test"}, "tooltip":{"column":"tooltip", "value":"test"}}}$$)
 check 
-SELECT * FROM SCHEMA_NAME.config_api_form_fields WHERE formname = 've_arc' AND column_id = 'arc_id'
+SELECT * FROM SCHEMA_NAME.config_form_fields WHERE formname = 've_arc' AND column_id = 'arc_id'
 */
 
 
@@ -55,7 +55,7 @@ BEGIN
 	v_tooltip_val := ((p_data ->> 'data')::json->>'tooltip')::json->>'value';
 
 	--select parent view
-	IF v_table = 'config_api_form_fields' THEN
+	IF v_table = 'config_form_fields' THEN
 		IF v_formname = 've_node' THEN
 			v_parent_layer = (quote_literal('ve_node'), quote_literal('v_edit_node'));
 		ELSIF v_formname = 've_connec' THEN

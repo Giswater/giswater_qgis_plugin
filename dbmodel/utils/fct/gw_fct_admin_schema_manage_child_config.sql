@@ -55,7 +55,7 @@ BEGIN
 
 	v_feature_system_id  = (SELECT lower(system_id) FROM cat_feature where id=v_cat_feature);
 
-	IF v_view_name NOT IN (SELECT tableinfo_id FROM config_api_tableinfo_x_infotype) THEN
+	IF v_view_name NOT IN (SELECT tableinfo_id FROM config_info_table_x_type) THEN
 		INSERT INTO sys_table(id, context, descript, sys_role_id, sys_criticity, qgis_role_id, qgis_criticity, isdeprecated)
 	    VALUES (v_view_name, 'Editable view', concat('Custom editable view for ',v_cat_feature), 'role_edit', 0, null,0,false);
 
@@ -63,34 +63,34 @@ BEGIN
 	
 	END IF;
 
-	IF v_view_name NOT IN (SELECT tableinfo_id FROM config_api_tableinfo_x_infotype) THEN
-		INSERT INTO config_api_tableinfo_x_infotype(tableinfo_id, infotype_id, tableinfotype_id) VALUES (v_view_name,100,v_view_name);
+	IF v_view_name NOT IN (SELECT tableinfo_id FROM config_info_table_x_type) THEN
+		INSERT INTO config_info_table_x_type(tableinfo_id, infotype_id, tableinfotype_id) VALUES (v_view_name,100,v_view_name);
 	END IF;
 
-	--select list of fields different than id from config_api_form_fields
+	--select list of fields different than id from config_form_fields
 	EXECUTE 'SELECT DISTINCT string_agg(column_name::text,'' ,'')
-	FROM information_schema.columns WHERE table_name=''config_api_form_fields'' and table_schema='''||v_schemaname||'''
+	FROM information_schema.columns WHERE table_name=''config_form_fields'' and table_schema='''||v_schemaname||'''
 	AND column_name!=''id'';'
 	INTO v_config_fields;
 	
-	--select list of fields different than id and formname from config_api_form_fields
+	--select list of fields different than id and formname from config_form_fields
 	EXECUTE 'SELECT DISTINCT string_agg(concat(column_name)::text,'' ,'')
-	FROM information_schema.columns WHERE table_name=''config_api_form_fields'' and table_schema='''||v_schemaname||'''
+	FROM information_schema.columns WHERE table_name=''config_form_fields'' and table_schema='''||v_schemaname||'''
 	AND column_name!=''id'' AND column_name!=''formname'';'
 	INTO v_insert_fields;
 
-	PERFORM setval('SCHEMA_NAME.config_api_form_fields_id_seq', (SELECT max(id) FROM config_api_form_fields), true);
+	PERFORM setval('SCHEMA_NAME.config_form_fields_id_seq', (SELECT max(id) FROM config_form_fields), true);
 	
 	--insert configuration copied from the parent view config
-	FOR rec IN (SELECT * FROM config_api_form_fields WHERE formname=concat('ve_',v_feature_type))
+	FOR rec IN (SELECT * FROM config_form_fields WHERE formname=concat('ve_',v_feature_type))
 	LOOP
-		EXECUTE 'INSERT INTO config_api_form_fields('||v_config_fields||')
-		SELECT '''||v_view_name||''','||v_insert_fields||' FROM config_api_form_fields WHERE id='''||rec.id||''';';
+		EXECUTE 'INSERT INTO config_form_fields('||v_config_fields||')
+		SELECT '''||v_view_name||''','||v_insert_fields||' FROM config_form_fields WHERE id='''||rec.id||''';';
 
 	END LOOP;
 
 	--update configuration of man_type fields setting featurecat related to the view
-	EXECUTE 'UPDATE config_api_form_fields SET dv_querytext = concat(dv_querytext, ''OR featurecat_id = '''||quote_literal(v_cat_feature)||''''')
+	EXECUTE 'UPDATE config_form_fields SET dv_querytext = concat(dv_querytext, ''OR featurecat_id = '''||quote_literal(v_cat_feature)||''''')
 	WHERE formname = '''||v_view_name||'''
 	and (column_id =''location_type'' OR column_id =''fluid_type'' OR column_id =''function_type'' OR column_id =''category_type'')
 	AND dv_querytext NOT ILIKE ''%OR%'';';
@@ -105,7 +105,7 @@ BEGIN
 	FOR rec IN  EXECUTE v_man_fields LOOP
 
 		--capture max layout_id for the view
-		EXECUTE 'SELECT max(layout_order::integer) + 1 FROM config_api_form_fields WHERE formname = '''||v_view_name||''' AND  layoutname=''lyt_data_1'';'
+		EXECUTE 'SELECT max(layout_order::integer) + 1 FROM config_form_fields WHERE formname = '''||v_view_name||''' AND  layoutname=''lyt_data_1'';'
 		INTO v_orderby;
 
 		--transform data and widget types
@@ -129,8 +129,8 @@ BEGIN
 			v_widgettype='text';
 		END IF;
 
-		--insert into config_api_form_fields
-		INSERT INTO config_api_form_fields (formname,formtype,column_id,datatype,widgettype, layoutname, layout_order, 
+		--insert into config_form_fields
+		INSERT INTO config_form_fields (formname,formtype,column_id,datatype,widgettype, layoutname, layout_order, 
 			label, ismandatory, isparent, iseditable, isautoupdate) 
 		VALUES (v_view_name,'feature', rec.column_name, v_datatype, v_widgettype, 'lyt_data_1',v_orderby, 
 			rec.column_name, false, false,true,false);
@@ -143,7 +143,7 @@ BEGIN
 	--insert configuration for the addfields of the feature type
 	FOR rec IN EXECUTE v_man_addfields LOOP
 		--capture max layout_id for the view
-		EXECUTE 'SELECT max(layout_order::integer) + 1 FROM config_api_form_fields WHERE formname = '''||v_view_name||''' AND  layoutname=''lyt_data_1'';'
+		EXECUTE 'SELECT max(layout_order::integer) + 1 FROM config_form_fields WHERE formname = '''||v_view_name||''' AND  layoutname=''lyt_data_1'';'
 		INTO v_orderby;
 		
 		--transform data and widget types
@@ -161,8 +161,8 @@ BEGIN
 			v_widgettype='text';
 		END IF;
 		
-		--insert into config_api_form_fields
-		INSERT INTO config_api_form_fields (formname,formtype,column_id,datatype,widgettype, layoutname,layout_order, 
+		--insert into config_form_fields
+		INSERT INTO config_form_fields (formname,formtype,column_id,datatype,widgettype, layoutname,layout_order, 
 			label, ismandatory,isparent,iseditable,isautoupdate) 
 		VALUES (v_view_name,'feature',rec.param_name, v_datatype,v_widgettype, 'lyt_data_1',v_orderby,
 			rec.param_name, rec.is_mandatory, false,rec.iseditable,false);

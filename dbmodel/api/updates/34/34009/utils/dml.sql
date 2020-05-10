@@ -11,3 +11,8 @@ UPDATE om_visit_class SET formname = a.formname, tablename = a.tablename FROM _c
 
 --update audit_cat_param_user with cat_feature vdefaults
 UPDATE cat_feature SET id=id;
+
+UPDATE config_typevalue_fk SET target_table = 'config_form_fields' WHERE target_table = 'config_api_form_fields';
+UPDATE config_typevalue_fk SET target_table = 'config_info_layer' WHERE target_table = 'config_api_layer';
+UPDATE config_typevalue_fk SET target_table = 'config_form_tabs' WHERE target_table = 'config_api_form_tabs';
+UPDATE config_typevalue_fk SET target_table = 'config_form_fields' WHERE target_table = 'config_api_form_fields';

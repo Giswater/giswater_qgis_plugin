@@ -17,8 +17,8 @@ BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
-	-- config_api_form_fields table
-	UPDATE config_api_form_fields SET 
+	-- config_form_fields table
+	UPDATE config_form_fields SET 
 	datatype = NEW.datatype,
 	widgettype = NEW.widgettype,
 	widgetdim = NEW.widgetdim,

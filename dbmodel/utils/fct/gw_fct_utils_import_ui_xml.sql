@@ -55,7 +55,7 @@ FOR rec IN 1..3 LOOP
 			SELECT quote_literal((v_json_aux)->>'field_name')::TEXT INTO v_field_name;
 			SELECT quote_literal((v_json_aux)->>'label_name')::TEXT INTO v_label_name;
 	
-	--update config_api_form_fields with values from new ui
+	--update config_form_fields with values from new ui
 			IF p_parent IS TRUE THEN
 
 				EXECUTE 'SELECT parent_layer  FROM cat_feature WHERE child_layer='''||p_formname||''';'
@@ -63,12 +63,12 @@ FOR rec IN 1..3 LOOP
 
 				FOR rec_parent IN EXECUTE 'SELECT child_layer FROM SCHEMA_NAME.cat_feature WHERE parent_layer='''||v_parent_layer||''' ORDER BY id' LOOP
 
-					EXECUTE 'UPDATE config_api_form_fields SET layout_name='||v_layout||', layout_order='||v_item_row||', label='||v_label_name||'
+					EXECUTE 'UPDATE config_form_fields SET layout_name='||v_layout||', layout_order='||v_item_row||', label='||v_label_name||'
 					WHERE formname='''||rec_parent.child_layer||''' and column_id='||v_field_name||';';
 				end loop;
 			
 			ELSE 	
-				EXECUTE 'UPDATE config_api_form_fields SET layout_name='||v_layout||', layout_order='||v_item_row||', label='||v_label_name||'
+				EXECUTE 'UPDATE config_form_fields SET layout_name='||v_layout||', layout_order='||v_item_row||', label='||v_label_name||'
 				WHERE formname='''||p_formname||''' and column_id='||v_field_name||';';
 			END IF;
 	--		widgettype='||v_widget_type||'
