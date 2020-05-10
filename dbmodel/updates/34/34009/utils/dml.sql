@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2020/05/09
-SELECT gw_fct_admin_schema_manage_triggers('notify',null);
+SELECT gw_fct_admin_manage_triggers('notify',null);
 
 -- 13/11/2019
 UPDATE config_typevalue_fk SET target_table='ext_cat_raster' WHERE target_table='cat_raster';
@@ -32,8 +32,8 @@ INSERT INTO sys_function VALUES (2884, 'gw_fct_import_omvisitlot', 'utils', 'fun
 
 UPDATE config_csv SET functionname = 'gw_fct_utils_csv2pg_import_addfields' WHERE functionname = 'gw_fct_import_addfields';
 UPDATE config_csv SET functionname = 'gw_fct_utils_csv2pg_import_dbprices' WHERE functionname = 'gw_fct_import_dbprices';
-UPDATE config_csv SET functionname = 'gw_fct_utils_csv2pg_import_elements' WHERE functionname = gw_fct_import_elements
-UPDATE config_csv SET functionname = 'gw_fct_utils_csv2pg_import_omvisit' WHERE functionname = gw_fct_import_omvisit'';
+UPDATE config_csv SET functionname = 'gw_fct_utils_csv2pg_import_elements' WHERE functionname = 'gw_fct_import_elements';
+UPDATE config_csv SET functionname = 'gw_fct_utils_csv2pg_import_omvisit' WHERE functionname = 'gw_fct_import_omvisit';
 UPDATE config_csv SET functionname = 'gw_fct_utils_csv2pg_import_omvisitlot' WHERE functionname = 'gw_fct_import_omvisitlot';
 UPDATE config_csv SET functionname = 'gw_fct_utils_csv2pg_import_timeseries' WHERE functionname = 'gw_fct_import_timeseries';
 UPDATE config_csv SET functionname = 'gw_fct_utils_csv2pg_importblock' WHERE functionname = 'gw_fct_importblock';
@@ -42,6 +42,6 @@ UPDATE config_csv SET functionname = 'gw_fct_utils_import_ui_xml' WHERE function
 
 UPDATE sys_function SET isdeprecated  = true WHERE id = 2502;
 
-INSERT INTO sys_table(id, context, description, sys_role_id, sys_criticity, qgis_criticity,  isdeprecated)
+INSERT INTO sys_table (id, context, descript, sys_role_id, sys_criticity, qgis_criticity,  isdeprecated)
     VALUES ('config_visit_x_feature', 'visit', 'Table to configure visit class related to feature', 'role_om', 0, 0, false)
     ON CONFLICT (id) DO NOTHING;
