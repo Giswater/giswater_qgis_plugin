@@ -466,7 +466,7 @@ class UpdateSQL(ApiParent):
             lbl_constrains_info.setText('(Constrains enabled)  ')
             if call_function:
                 # Enable constrains
-                sql = 'SELECT gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"ADD"}}$$)'
+                sql = 'SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"ADD"}}$$)'
                 self.controller.execute_sql(sql)
 
         elif button.text() == 'ON':
@@ -474,7 +474,7 @@ class UpdateSQL(ApiParent):
             lbl_constrains_info.setText('(Constrains dissabled)')
             if call_function:
                 # Disable constrains
-                sql = 'SELECT gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$)'
+                sql = 'SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$)'
                 self.controller.execute_sql(sql)
 
 
@@ -1592,7 +1592,7 @@ class UpdateSQL(ApiParent):
             self.task1.setProgress(40)
             self.api(False)
             self.task1.setProgress(60)
-            sql = ('SELECT ' + str(self.schema) + '.gw_fct_admin_schema_rename_fixviews($${"data":{"currentSchemaName":"' + self.schema + '","oldSchemaName":"' + str(schema) + '"}}$$)::text')
+            sql = ('SELECT ' + str(self.schema) + '.gw_fct_admin_rename_fixviews($${"data":{"currentSchemaName":"' + self.schema + '","oldSchemaName":"' + str(schema) + '"}}$$)::text')
             status = self.controller.execute_sql(sql, commit=False)
             self.execute_last_process(schema_name=self.schema, locale=True)
         self.task1.setProgress(100)
@@ -2448,7 +2448,7 @@ class UpdateSQL(ApiParent):
         extras = f'"parameters":{{"source_schema":"{schema}", "dest_schema":"{new_schema_name}"}}'
         body = self.create_body(extras=extras)
         self.task1.setProgress(50)
-        result = self.controller.get_json('gw_fct_clone_schema', body, schema_name=schema, log_sql=True, commit=False)
+        result = self.controller.get_json('gw_fct_admin_schema_clone', body, schema_name=schema, log_sql=True, commit=False)
         if not result: return
         self.task1.setProgress(100)
 
