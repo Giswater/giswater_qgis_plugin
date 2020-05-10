@@ -2502,11 +2502,11 @@ class UpdateSQL(ApiParent):
 
             # Execute import data
             if schema_type.lower() == 'ws':
-                function_name = 'gw_fct_utils_csv2pg_import_epanet_inp'
+                function_name = 'gw_fct_import_epanet_inp'
                 useNode2arc = self.dlg_import_inp.findChild(QWidget, 'useNode2arc')
                 extras = '"parameters":{"useNode2arc":"' + str(useNode2arc.isChecked()) + '"}'
             elif schema_type.lower() == 'ud':
-                function_name = 'gw_fct_utils_csv2pg_import_swmm_inp'
+                function_name = 'gw_fct_import_swmm_inp'
                 createSubcGeom = self.dlg_import_inp.findChild(QWidget, 'createSubcGeom')
                 extras = '"parameters":{"createSubcGeom":"' + str(createSubcGeom.isChecked()) + '"}'
             else:
@@ -2640,7 +2640,7 @@ class UpdateSQL(ApiParent):
         status = self.controller.execute_sql(sql, log_sql=True)
 
         # Import xml to database
-        sql = ("SELECT " + schema_name + ".gw_fct_utils_import_ui_xml('" + str(form_name_ui) + "', " + str(status_update_childs) + ")::text")
+        sql = ("SELECT " + schema_name + ".gw_fct_import_ui_xml('" + str(form_name_ui) + "', " + str(status_update_childs) + ")::text")
         status = self.controller.execute_sql(sql, log_sql=True)
         self.manage_result_message(status, parameter="Import data into 'config_api_form_fields'")
 
@@ -2662,7 +2662,7 @@ class UpdateSQL(ApiParent):
             return
 
         # Export xml from database
-        sql = ("SELECT " + schema_name + ".gw_fct_utils_export_ui_xml('"
+        sql = ("SELECT " + schema_name + ".gw_fct_export_ui_xml('"
                + str(form_name_ui) + "', " + str(status_update_childs) + ")::text")
         status = self.controller.execute_sql(sql, log_sql=True)
         if status is False:
