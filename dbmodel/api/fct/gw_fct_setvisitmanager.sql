@@ -79,7 +79,7 @@ BEGIN
 		EXECUTE 'INSERT INTO selector_lot (lot_id, cur_user) VALUES ('|| v_lot ||', '''|| v_user ||''')';
 		
 		-- message
-		SELECT gw_api_getmessage(null, 70) INTO v_message;
+		SELECT gw_fct_getmessage(null, 70) INTO v_message;
 		v_data = p_data->>'data';
 		v_data = gw_fct_json_object_set_key (v_data, 'message', v_message);
 		p_data = gw_fct_json_object_set_key (p_data, 'data', v_data);
@@ -100,7 +100,7 @@ BEGIN
 			EXECUTE 'INSERT INTO selector_lot (lot_id, cur_user) VALUES ('|| v_lot ||', '''|| v_user ||''')';
 			
 			-- message
-			SELECT gw_api_getmessage(null, 70) INTO v_message;
+			SELECT gw_fct_getmessage(null, 70) INTO v_message;
 			v_data = p_data->>'data';
 			v_data = gw_fct_json_object_set_key (v_data, 'message', v_message);
 			p_data = gw_fct_json_object_set_key (p_data, 'data', v_data);
@@ -112,7 +112,7 @@ BEGIN
 			EXECUTE 'DELETE FROM selector_lot WHERE cur_user='''|| v_user ||'''';
 			
 			-- message
-			SELECT gw_api_getmessage(null, 80) INTO v_message;
+			SELECT gw_fct_getmessage(null, 80) INTO v_message;
 			v_data = p_data->>'data';
 			v_data = gw_fct_json_object_set_key (v_data, 'message', v_message);
 			p_data = gw_fct_json_object_set_key (p_data, 'data', v_data);
@@ -121,7 +121,7 @@ BEGIN
 
 	
 	-- Return
-	RETURN gw_api_getvisitmanager(p_data); 
+	RETURN gw_fct_getvisitmanager(p_data); 
 
 --    Exception handling
    -- EXCEPTION WHEN OTHERS THEN 

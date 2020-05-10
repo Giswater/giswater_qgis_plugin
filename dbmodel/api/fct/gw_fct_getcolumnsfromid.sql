@@ -63,7 +63,7 @@ BEGIN
 	v_parentname =((p_data ->>'feature')::json->>'parentField')::text;
 
 	SELECT ARRAY(SELECT json_array_elements((replace(v_fieldsreload, '''','"'))::json))
-	FROM  config_api_form_fields LIMIT 1 INTO v_fields_array;
+	FROM  config_form_fields LIMIT 1 INTO v_fields_array;
 	
 	FOREACH v_field IN array v_fields_array
 	LOOP	
@@ -72,13 +72,13 @@ BEGIN
 		IF v_exists is not null THEN
 			EXECUTE 'SELECT LOWER(feature_type) FROM cat_feature WHERE child_layer = '''||v_tablename||'''' INTO v_featureType;
 			EXECUTE 'SELECT '|| replace(v_field, '"','') ||' FROM ' || v_tablename ||' WHERE '||v_featureType||'_id = '''|| v_feature_id ||'''' INTO v_result;
-			EXECUTE 'SELECT iseditable FROM config_api_form_fields WHERE formname = '''|| v_tablename ||''' AND column_id = '''|| replace(v_field, '"','') ||'''' INTO v_iseditable;
+			EXECUTE 'SELECT iseditable FROM config_form_fields WHERE formname = '''|| v_tablename ||''' AND column_id = '''|| replace(v_field, '"','') ||'''' INTO v_iseditable;
 			v_json_array[i] := gw_fct_json_object_set_key(v_json_array[i], 'value', COALESCE(v_result, ''));
 			v_json_array[i] := gw_fct_json_object_set_key(v_json_array[i], 'iseditable', v_iseditable);
 			i = i+1;
 		ELSE
-			EXECUTE 'SELECT id FROM config_api_form_fields WHERE formname ='''||v_tablename||''' AND column_id = '''||v_parentname||'''' INTO v_parentid;
-			v_message := 'API is bad configurated. Check column ''reload_fields'' for parameter '''|| v_parentname ||''' with id -> '''||v_parentid||''' on config_api_form_fields';
+			EXECUTE 'SELECT id FROM config_form_fields WHERE formname ='''||v_tablename||''' AND column_id = '''||v_parentname||'''' INTO v_parentid;
+			v_message := 'API is bad configurated. Check column ''reload_fields'' for parameter '''|| v_parentname ||''' with id -> '''||v_parentid||''' on config_form_fields';
 			v_result := '{"level":0, "text":"'||v_message||'"}';
 			v_json_array[i] := gw_fct_json_object_set_key(v_json_array[i], 'value', ''::text);
 			v_json_array[i] := gw_fct_json_object_set_key(v_json_array[i], 'message', v_result::json);

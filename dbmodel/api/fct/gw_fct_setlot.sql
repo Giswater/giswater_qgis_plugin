@@ -81,7 +81,7 @@ BEGIN
 		EXECUTE 'UPDATE ' || quote_ident(v_tablename) ||' SET descript = ' || quote_literal(v_descript) ||', status = ' || quote_literal(v_status) ||', visitclass_id = ' || quote_literal(v_visitclass_id) ||' WHERE id = ' || quote_literal(v_id) ||'' ;
 
 		-- message
-		SELECT gw_api_getmessage(null, 50) INTO v_message;
+		SELECT gw_ft_getmessage(null, 50) INTO v_message;
 		v_data = p_data->>'data';
 		v_data = gw_fct_json_object_set_key (v_data, 'message', v_message);
 		p_data = gw_fct_json_object_set_key (p_data, 'data', v_data);
@@ -93,7 +93,7 @@ BEGIN
 		EXECUTE 'INSERT INTO selector_lot (lot_id, cur_user) VALUES ('|| v_id ||', ''qgisserver'')';
 		
 		-- message
-		SELECT gw_api_getmessage(null, 40) INTO v_message;
+		SELECT gw_fct_getmessage(null, 40) INTO v_message;
 		v_data = p_data->>'data';
 		v_data = gw_fct_json_object_set_key (v_data, 'message', v_message);
 		p_data = gw_fct_json_object_set_key (p_data, 'data', v_data);
@@ -114,10 +114,10 @@ BEGIN
 	END IF;
 	
 
-	raise notice 'RETURN => %','SELECT SCHEMA_NAME.gw_api_getlot('|| p_data || ')';
+	raise notice 'RETURN => %','SELECT SCHEMA_NAME.gw_fct_getlot('|| p_data || ')';
 	
 	-- Return
-	RETURN gw_api_getlot(p_data);
+	RETURN gw_fct_getlot(p_data);
 
 END;
 $BODY$

@@ -163,7 +163,7 @@ BEGIN
 		v_feature = gw_fct_json_object_set_key (v_feature, 'id', v_id);
 		v_outputparameter = gw_fct_json_object_set_key (v_outputparameter, 'feature', v_feature);
 
-		SELECT gw_api_setinsert (v_outputparameter) INTO v_insertresult;
+		SELECT gw_fct_setinsert (v_outputparameter) INTO v_insertresult;
 
 		-- getting new id
 		IF (((v_insertresult->>'body')::json->>'feature')::json->>'id')::integer IS NOT NULL THEN
@@ -179,9 +179,9 @@ BEGIN
 		UPDATE om_visit SET the_geom=v_thegeom WHERE id=v_id;
 
 		-- getting message
-		SELECT gw_api_getmessage(v_feature, 40) INTO v_message;
+		SELECT gw_fct_getmessage(v_feature, 40) INTO v_message;
 
-		RAISE NOTICE '--- INSERT NEW VISIT gw_api_setinsert WITH MESSAGE: % ---', v_message;
+		RAISE NOTICE '--- INSERT NEW VISIT gw_fct_setinsert WITH MESSAGE: % ---', v_message;
 	
 	ELSE 
 
@@ -194,12 +194,12 @@ BEGIN
 		END IF;
 		
 		--setting the update
-		PERFORM gw_api_setfields (v_outputparameter);
+		PERFORM gw_fct_setfields (v_outputparameter);
 	
 		-- getting message
-		SELECT gw_api_getmessage(v_feature, 50) INTO v_message;
+		SELECT gw_fct_getmessage(v_feature, 50) INTO v_message;
 
-		RAISE NOTICE '--- UPDATE VISIT gw_api_setfields USING v_id % WITH MESSAGE: % ---', v_id, v_message;
+		RAISE NOTICE '--- UPDATE VISIT gw_fct_setfields USING v_id % WITH MESSAGE: % ---', v_id, v_message;
 
 	END IF;
 
@@ -214,7 +214,7 @@ BEGIN
 			EXECUTE 'INSERT INTO om_visit_event_photo (visit_id, event_id, tstamp, value, text, hash) VALUES('''||v_id||''', '''||v_event_id||''', '''||NOW()||''', '''||CONCAT((v_addphotos->>'json_array_elements')::json->>'photo_url'::text, (v_addphotos->>'json_array_elements')::json->>'hash'::text)||''', ''demo image'', '''||((v_addphotos->>'json_array_elements')::json->>'hash'::text)::text||''')';
 			
 			-- getting message
-			SELECT gw_api_getmessage(v_feature, 40) INTO v_message;
+			SELECT gw_fct_getmessage(v_feature, 40) INTO v_message;
 			
 		END LOOP;
 		EXECUTE 'UPDATE om_visit_event SET value = ''true'' WHERE visit_id = ' || v_id || ' AND parameter_id = ''photo''';
@@ -240,10 +240,10 @@ BEGIN
 		v_addfile = gw_fct_json_object_set_key(v_addfile, 'feature', v_filefeature);
 		v_addfile = gw_fct_json_object_set_key(v_addfile, 'client', v_client);
 
-		RAISE NOTICE '--- CALL gw_api_setfileinsert PASSING (v_addfile): % ---', v_addfile;
+		RAISE NOTICE '--- CALL gw_fct_setfileinsert PASSING (v_addfile): % ---', v_addfile;
 	
 		-- calling insert files function
-		SELECT gw_api_setfileinsert (v_addfile) INTO v_addfile;
+		SELECT gw_fct_setfileinsert (v_addfile) INTO v_addfile;
 		
 		-- building message
 		v_message1 = v_message::text;
@@ -257,10 +257,10 @@ BEGIN
 		v_filefeature = gw_fct_json_object_set_key(v_filefeature, 'id', v_fileid);
 		v_deletefile = gw_fct_json_object_set_key(v_deletefile, 'feature', v_filefeature);
 
-		RAISE NOTICE '--- CALL gw_api_setdelete PASSING (v_deletefile): % ---', v_deletefile;
+		RAISE NOTICE '--- CALL gw_fct_setdelete PASSING (v_deletefile): % ---', v_deletefile;
 
 		-- calling input function
-		SELECT gw_api_setdelete(v_deletefile) INTO v_deletefile;
+		SELECT gw_fct_setdelete(v_deletefile) INTO v_deletefile;
 		v_message = (v_deletefile ->>'message')::json;
 		
 	END IF;

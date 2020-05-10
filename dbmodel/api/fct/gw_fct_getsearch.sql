@@ -69,12 +69,12 @@ BEGIN
 
 -- Network Tab
 -------------------------
-    SELECT * INTO rec_tab FROM config_api_form_tabs WHERE formname='search' AND tabname='tab_network' ;
+    SELECT * INTO rec_tab FROM config_form_tabs WHERE formname='search' AND tabname='tab_network' ;
 
     IF rec_tab.id IS NOT NULL THEN
 
         -- Init combo json
-        SELECT * INTO rec_fields FROM config_api_form_fields WHERE formname='search' AND column_id='net_type';
+        SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND column_id='net_type';
 
         comboType := json_build_object('label',rec_fields.label,'column_id', rec_fields.column_id, 'widgetname', concat('network_',rec_fields.column_id),
         'widgettype','combo','datatype','string','placeholder','','disabled',false);
@@ -98,7 +98,7 @@ BEGIN
 
 
         -- Add edit box to introduce search text
-        SELECT * INTO rec_fields FROM config_api_form_fields WHERE formname='search' AND column_id='net_code';
+        SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND column_id='net_code';
         editCode := json_build_object('label',rec_fields.label,'column_id', rec_fields.column_id, 'widgetname', concat('network_',rec_fields.column_id),'widgettype','typeahead','datatype',
         'string','placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
         
@@ -123,11 +123,11 @@ BEGIN
 
 -- Search tab
 -------------
-    SELECT * INTO rec_tab FROM config_api_form_tabs WHERE formname='search' AND tabname='tab_search' ;
+    SELECT * INTO rec_tab FROM config_form_tabs WHERE formname='search' AND tabname='tab_search' ;
     IF rec_tab.id IS NOT NULL THEN
     
         -- Create search field
-        SELECT * INTO rec_fields FROM config_api_form_fields WHERE formname='search' AND column_id='generic_search';
+        SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND column_id='generic_search';
         editCode := json_build_object('label',rec_fields.label,'column_id', rec_fields.column_id,'widgetname', concat('network_',rec_fields.column_id),'widgettype','typeahead', 'searchService', 
         (SELECT value FROM config_param_system WHERE parameter='api_search_service' LIMIT 1),'datatype','string','placeholder','','disabled',false,'noresultsMsg',
         'No results','loadingMsg','Searching...');
@@ -155,7 +155,7 @@ BEGIN
 
 -- Address tab
 -------------
-    SELECT * INTO rec_tab FROM config_api_form_tabs WHERE formname='search' AND tabname='tab_address' ;
+    SELECT * INTO rec_tab FROM config_form_tabs WHERE formname='search' AND tabname='tab_address' ;
     IF rec_tab.id IS NOT NULL THEN
 
         -- Parameters of the municipality layer
@@ -168,7 +168,7 @@ BEGIN
         SELECT value::integer INTO v_search_vdef FROM config_param_user WHERE parameter='search_municipality_vdefault' AND cur_user=current_user;
         
         -- Init combo json
-        SELECT * INTO rec_fields FROM config_api_form_fields WHERE formname='search' AND column_id='add_muni';
+        SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND column_id='add_muni';
         comboType := json_build_object('label',rec_fields.label,'column_id', rec_fields.column_id,'widgetname', concat('address_',rec_fields.column_id),
         'widgettype','combo','datatype','string','placeholder','','disabled',false);
 
@@ -197,13 +197,13 @@ BEGIN
 
 
         -- Create street search field
-        SELECT * INTO rec_fields FROM config_api_form_fields WHERE formname='search' AND column_id='add_street';
+        SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND column_id='add_street';
         editCode1 := json_build_object('label',rec_fields.label,'column_id', rec_fields.column_id,'widgetname', concat('address_',rec_fields.column_id),
         'widgettype','typeahead','datatype','string','placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
                 
 
         -- Create postnumber search field
-        SELECT * INTO rec_fields FROM config_api_form_fields WHERE formname='search' AND column_id='add_postnumber';
+        SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND column_id='add_postnumber';
         editCode2 := json_build_object('label',rec_fields.label,'column_id', rec_fields.column_id,'widgetname', concat('address_',rec_fields.column_id),
         'widgettype','typeahead','threshold', 
         (SELECT value::integer FROM config_param_system WHERE parameter='api_search_minimsearch' LIMIT 1),
@@ -235,11 +235,11 @@ BEGIN
 
 -- Hydro tab
 ------------
-    SELECT * INTO rec_tab FROM config_api_form_tabs WHERE formname='search' AND tabname='tab_hydro' ;
+    SELECT * INTO rec_tab FROM config_form_tabs WHERE formname='search' AND tabname='tab_hydro' ;
     IF rec_tab.id IS NOT NULL THEN
 
         -- Init combo json
-        SELECT * INTO rec_fields FROM config_api_form_fields WHERE formname='search' AND column_id='hydro_expl';
+        SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND column_id='hydro_expl';
         comboType := json_build_object('label',rec_fields.label,'column_id', rec_fields.column_id,'widgetname', concat('hydro_',rec_fields.column_id),
         'widgettype','combo','datatype','string','placeholder','','disabled',false);
 
@@ -273,7 +273,7 @@ BEGIN
     
     
         -- Add edit box to introduce search text
-        SELECT * INTO rec_fields FROM config_api_form_fields WHERE formname='search' AND column_id='hydro_search';
+        SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND column_id='hydro_search';
         editCode := json_build_object('label',rec_fields.label,'column_id', rec_fields.column_id,'widgetname', concat('hydro_',rec_fields.column_id),
         'widgettype','typeahead','datatype','string','placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
     
@@ -300,11 +300,11 @@ BEGIN
 
 -- Workcat tab
 --------------
-    SELECT * INTO rec_tab FROM config_api_form_tabs WHERE formname='search' AND tabname='tab_workcat' ;
+    SELECT * INTO rec_tab FROM config_form_tabs WHERE formname='search' AND tabname='tab_workcat' ;
     IF rec_tab.id IS NOT NULL THEN
 
         -- Add edit box to introduce search text
-        SELECT * INTO rec_fields FROM config_api_form_fields WHERE formname='search' AND column_id='workcat_search';
+        SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND column_id='workcat_search';
         editCode := json_build_object('label',rec_fields.label,'column_id', rec_fields.column_id,'widgetname', concat('workcat_',rec_fields.column_id),
         'widgettype','typeahead','datatype','string','placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
 
@@ -332,11 +332,11 @@ BEGIN
 
 -- Psector tab
 --------------
-    SELECT * INTO rec_tab FROM config_api_form_tabs WHERE formname='search' AND tabname='tab_psector' ;
+    SELECT * INTO rec_tab FROM config_form_tabs WHERE formname='search' AND tabname='tab_psector' ;
     IF rec_tab.id IS NOT NULL THEN
 
         -- Init combo json
-        SELECT * INTO rec_fields FROM config_api_form_fields WHERE formname='search' AND column_id='psector_expl';
+        SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND column_id='psector_expl';
         comboType := json_build_object('label',rec_fields.label,'column_id', rec_fields.column_id,'widgetname', concat('psector_',rec_fields.column_id),
         'widgettype','combo','datatype','string','placeholder','','disabled',false);
 
@@ -369,7 +369,7 @@ BEGIN
         comboType := gw_fct_json_object_set_key(comboType, 'comboNames', combo_json);
     
         -- Add edit box to introduce search text
-        SELECT * INTO rec_fields FROM config_api_form_fields WHERE formname='search' AND column_id='psector_search';
+        SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND column_id='psector_search';
         editCode := json_build_object('label',rec_fields.label,'column_id', rec_fields.column_id,'widgetname', concat('psector_',rec_fields.column_id),
         'widgettype','typeahead','datatype','string','placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
     
@@ -393,11 +393,11 @@ BEGIN
 
 -- Visit tab
 --------------
-    SELECT * INTO rec_tab FROM config_api_form_tabs WHERE formname='search' AND tabname='tab_visit' ;
+    SELECT * INTO rec_tab FROM config_form_tabs WHERE formname='search' AND tabname='tab_visit' ;
     IF rec_tab.id IS NOT NULL THEN
 
         -- Add edit box to introduce search text
-        SELECT * INTO rec_fields FROM config_api_form_fields WHERE formname='search' AND column_id='visit_search';
+        SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND column_id='visit_search';
         editCode := json_build_object('label',rec_fields.label,'column_id', rec_fields.column_id,'widgetname', concat('visit_',rec_fields.column_id),
         'widgettype','typeahead','datatype','string','placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
 

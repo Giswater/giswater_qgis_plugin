@@ -70,10 +70,10 @@ BEGIN
 	v_data =  gw_fct_json_object_set_key(v_data, 'fields', v_fields);
 	v_outputparameter := concat('{"client":',((p_data)->>'client'),', "feature":',((p_data)->>'feature'),', "data":',v_data,'}')::json;
 
-	RAISE NOTICE '--- CALL gw_api_setinsert USING v_outputparameter: % ---', v_outputparameter;
+	RAISE NOTICE '--- CALL gw_fct_setinsert USING v_outputparameter: % ---', v_outputparameter;
 
 	-- set insert
-	SELECT gw_api_setinsert (v_outputparameter) INTO v_insertresult;
+	SELECT gw_fct_setinsert (v_outputparameter) INTO v_insertresult;
 
 	-- set new id
 	v_id=(((v_insertresult->>'body')::json->>'feature')::json->>'id')::integer;

@@ -206,7 +206,7 @@ BEGIN
 	
 		v_data = '{"client":{"device":9, "infoType":100, "lang":"ES"},"data":{"formName": "'||v_tablename||'"}}';
 		
-		SELECT gw_api_get_filtervaluesvdef(v_data) INTO v_filter_values;
+		SELECT gw_fct_get_filtervaluesvdef(v_data) INTO v_filter_values;
 
 		RAISE NOTICE 'gw_fct_getlist - Init Values setted by default %', v_filter_values;
 
@@ -261,31 +261,31 @@ BEGIN
 			INTO v_the_geom;
 
 		--  get querytext
-		EXECUTE 'SELECT query_text, listtype FROM config_api_list WHERE tablename = $1 AND device = $2'
+		EXECUTE 'SELECT query_text, listtype FROM config_form_list WHERE tablename = $1 AND device = $2'
 			INTO v_query_result, v_listtype
 			USING v_tablename, v_device;
 
-		-- if v_device is not configured on config_api_list table
+		-- if v_device is not configured on config_form_list table
 		IF v_query_result IS NULL THEN
-			EXECUTE 'SELECT query_text, listtype FROM config_api_list WHERE tablename = $1 LIMIT 1'
+			EXECUTE 'SELECT query_text, listtype FROM config_form_list WHERE tablename = $1 LIMIT 1'
 				INTO v_query_result, v_listtype
 				USING v_tablename;
 		END IF;	
 
-		-- if v_tablename is not configured on config_api_list table
+		-- if v_tablename is not configured on config_form_list table
 		IF v_query_result IS NULL THEN
 			v_query_result = 'SELECT * FROM '||v_tablename||' WHERE '||v_idname||' IS NOT NULL ';
 		END IF;
 
 	ELSE
 		--  get querytext
-		EXECUTE 'SELECT query_text, vdefault, listtype FROM config_api_list WHERE tablename = $1 AND device = $2'
+		EXECUTE 'SELECT query_text, vdefault, listtype FROM config_form_list WHERE tablename = $1 AND device = $2'
 			INTO v_query_result, v_default, v_listtype
 			USING v_tablename, v_device;
 
-		-- if v_device is not configured on config_api_list table
+		-- if v_device is not configured on config_form_list table
 		IF v_query_result IS NULL THEN
-			EXECUTE 'SELECT query_text, vdefault, listtype FROM config_api_list WHERE tablename = $1 LIMIT 1'
+			EXECUTE 'SELECT query_text, vdefault, listtype FROM config_form_list WHERE tablename = $1 LIMIT 1'
 				INTO v_query_result, v_default, v_listtype
 				USING v_tablename;
 		END IF;	
@@ -306,7 +306,7 @@ BEGIN
 			raise notice 'v_field % v_value %', v_field, v_value;
 	
 			-- Getting the sign of the filter
-			SELECT listfilterparam->>'sign' INTO v_sign FROM config_api_form_fields WHERE formname=v_tablename  AND column_id=v_field;
+			SELECT listfilterparam->>'sign' INTO v_sign FROM config_form_fields WHERE formname=v_tablename  AND column_id=v_field;
 
 			IF v_listtype = 'attributeTable' THEN
 				v_sign = 'LIKE';
@@ -436,7 +436,7 @@ BEGIN
 	v_pageinfo := json_build_object('orderBy',v_orderby, 'orderType', v_ordertype, 'currentPage', v_currentpage, 'lastPage', v_lastpage);
 
 	-- getting filter fields
-	SELECT gw_api_get_formfields(v_tablename, 'listHeader', v_tabname, null, null, null, null,'INSERT', null, v_device, null)
+	SELECT gw_fct_get_formfields(v_tablename, 'listHeader', v_tabname, null, null, null, null,'INSERT', null, v_device, null)
 		INTO v_filter_fields;
 
 		--  setting values of filter fields
@@ -479,7 +479,7 @@ BEGIN
 	-- adding the widget of list
 	v_i = cardinality(v_filter_fields) ;
 	
-	EXECUTE 'SELECT listclass FROM config_api_list WHERE tablename = $1 LIMIT 1'
+	EXECUTE 'SELECT listclass FROM config_form_list WHERE tablename = $1 LIMIT 1'
 		INTO v_listclass
 		USING v_tablename;
 
@@ -495,7 +495,7 @@ BEGIN
 	END IF;
 
 	-- getting footer buttons
-	SELECT gw_api_get_formfields(v_tablename, 'listFooter', v_tabname, null, null, null, null,'INSERT', null, v_device, null)
+	SELECT gw_fct_get_formfields(v_tablename, 'listFooter', v_tabname, null, null, null, null,'INSERT', null, v_device, null)
 		INTO v_footer_fields;
 
 	FOREACH aux_json IN ARRAY v_footer_fields
@@ -507,7 +507,7 @@ BEGIN
 
 
 	raise notice 'v_tablename -->> %',v_tablename;
-   	SELECT gw_api_get_formfields(v_tablename, 'listfilter', v_tabname, null, null, null, null,'INSERT', null, v_device, null)
+   	SELECT gw_fct_get_formfields(v_tablename, 'listfilter', v_tabname, null, null, null, null,'INSERT', null, v_device, null)
 		INTO v_filter_fields_;
 		
 		

@@ -70,7 +70,7 @@ BEGIN
 	FOREACH v_aux_json IN ARRAY fields_array
 	LOOP		
 
-	SELECT * INTO rec_tab FROM config_api_form_tabs WHERE formname=v_aux_json->>'json_object_keys';
+	SELECT * INTO rec_tab FROM config_form_tabs WHERE formname=v_aux_json->>'json_object_keys';
 	IF rec_tab.id IS NOT NULL THEN
 
 		-- get selector parameters

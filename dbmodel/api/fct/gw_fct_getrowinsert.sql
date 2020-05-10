@@ -56,7 +56,7 @@ BEGIN
 
 
 	-- get if it's cofigured
-	IF (SELECT distinct formname from config_api_form_fields WHERE formname=v_tablename AND formtype='listrow') IS NOT NULL THEN 
+	IF (SELECT distinct formname from config_form_fields WHERE formname=v_tablename AND formtype='listrow') IS NOT NULL THEN 
 		v_configtabledefined = TRUE;
 	ELSE 
 		v_configtabledefined = FALSE;
@@ -80,13 +80,13 @@ BEGIN
 
 	-- executing form fields
 	IF  v_configtabledefined is TRUE THEN 
-		raise notice 'Configuration fields are defined on config_api_layer_field';
+		raise notice 'Configuration fields are defined on config_info_layer_field';
 		
 		-- Call the function of feature fields generation
-		SELECT gw_api_get_formfields( v_tablename, 'listrow', null, null, null, null, null, 'INSERT', null, v_device, null) INTO v_fields; 
+		SELECT gw_fct_get_formfields( v_tablename, 'listrow', null, null, null, null, null, 'INSERT', null, v_device, null) INTO v_fields; 
 		
 	ELSE
-		raise notice 'Configuration fields are NOT defined on config_api_layer_field. System values will be used';
+		raise notice 'Configuration fields are NOT defined on config_info_layer_field. System values will be used';
 	
 		-- Get fields
 		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM 

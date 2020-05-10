@@ -184,7 +184,7 @@ BEGIN
 	------------------------------------------
         -- to build json
         EXECUTE 'SELECT row_to_json(row) FROM (SELECT formtemplate AS template, headertext AS "headerText"
-            FROM config_api_layer WHERE layer_id = $1 LIMIT 1) row'
+            FROM config_info_layer WHERE layer_id = $1 LIMIT 1) row'
             INTO v_forminfo
             USING v_tablename; 
 
@@ -192,7 +192,7 @@ BEGIN
         IF v_forminfo IS NULL AND v_table_parent IS NOT NULL THEN
 
 		EXECUTE 'SELECT row_to_json(row) FROM (SELECT formtemplate AS template , headertext AS "headerText"
-			FROM config_api_layer WHERE layer_id = $1 LIMIT 1) row'
+			FROM config_info_layer WHERE layer_id = $1 LIMIT 1) row'
 			INTO v_forminfo
 			USING v_table_parent; 
         END IF;
@@ -274,7 +274,7 @@ BEGIN
 	
 	-- Get link (if exists) for the layer
 	------------------------------------------
-	link_id_aux := (SELECT link_id FROM config_api_layer WHERE layer_id=v_tablename);
+	link_id_aux := (SELECT link_id FROM config_info_layer WHERE layer_id=v_tablename);
 
 	IF  link_id_aux IS NOT NULL THEN 
 
@@ -293,7 +293,7 @@ BEGIN
 	-- Get tabs for form
 	--------------------------------
         EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT tabname as "tabName", label as "tabLabel", tooltip as "tooltip", tabfunction as "tabFunction", tabactions as tabActions 
-		FROM config_api_form_tabs WHERE formname = $1 order by id desc) a'
+		FROM config_form_tabs WHERE formname = $1 order by id desc) a'
             INTO form_tabs
             USING v_tablename;
 
@@ -302,32 +302,32 @@ BEGIN
         
 		-- Get form_tabs
 		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT tabname as "tabName", label as "tabLabel", tooltip as "tooltip", tabfunction as "tabFunction", 
-		tabactions as tabActions FROM config_api_form_tabs WHERE formname = $1 order by id desc) a'
+		tabactions as tabActions FROM config_form_tabs WHERE formname = $1 order by id desc) a'
 			INTO form_tabs
 			USING v_table_parent;	
 	END IF;
 
 	-- Getting actions and layer manager
 	------------------------------------------
-        EXECUTE 'SELECT actions,  layermanager FROM config_api_form WHERE formname = $1 AND projecttype='||quote_literal(LOWER(v_project_type))
+        EXECUTE 'SELECT actions,  layermanager FROM config_form WHERE formname = $1 AND projecttype='||quote_literal(LOWER(v_project_type))
 		INTO v_formactions, v_layermanager
 		USING v_tablename;
 
 	-- IF actions and tooltip are null's and layer it's child layer --> parent form_tabs is used
         IF v_formactions IS NULL AND v_table_parent IS NOT NULL THEN
-		EXECUTE 'SELECT actions,  layermanager FROM config_api_form WHERE formname = $1 AND projecttype='||quote_literal(LOWER(v_project_type))
+		EXECUTE 'SELECT actions,  layermanager FROM config_form WHERE formname = $1 AND projecttype='||quote_literal(LOWER(v_project_type))
 			INTO v_formactions, v_layermanager
 			USING v_table_parent;
 		END IF;
 
 	-- Check if it is parent table 
 	-------------------------------------
-        IF v_tablename IN (SELECT layer_id FROM config_api_layer WHERE is_parent IS TRUE) AND v_toolbar !='epa' AND v_id IS NOT NULL THEN
+        IF v_tablename IN (SELECT layer_id FROM config_info_layer WHERE is_parent IS TRUE) AND v_toolbar !='epa' AND v_id IS NOT NULL THEN
 
 		parent_child_relation:=true;
 
 		-- check parent_view
-		EXECUTE 'SELECT tableparent_id from config_api_layer WHERE layer_id=$1'
+		EXECUTE 'SELECT tableparent_id from config_info_layer WHERE layer_id=$1'
 			INTO tableparent_id_arg
 			USING v_tablename;
                 
@@ -335,7 +335,7 @@ BEGIN
 
 		-- Identify tableinfotype_id		
 		EXECUTE' SELECT tableinfotype_id FROM cat_feature
-			JOIN config_api_tableinfo_x_infotype ON child_layer=tableinfo_id 
+			JOIN config_info_table_x_type ON child_layer=tableinfo_id 
 			WHERE cat_feature.id= (SELECT custom_type FROM '||quote_ident(tableparent_id_arg)||' WHERE nid::text=$1) 
 			AND infotype_id=$2'
 			INTO v_tablename
@@ -344,7 +344,7 @@ BEGIN
 		raise notice'Parent-Child. Table child: %, v_infotype: %' , v_tablename, v_infotype;
 
 	-- parent, and epa toolbar
-	ELSIF v_tablename IN (SELECT layer_id FROM config_api_layer WHERE is_parent IS TRUE) AND v_toolbar ='epa' THEN
+	ELSIF v_tablename IN (SELECT layer_id FROM config_info_layer WHERE is_parent IS TRUE) AND v_toolbar ='epa' THEN
 
 		parent_child_relation:=true;
 		v_tablename_original = v_tablename;
@@ -352,7 +352,7 @@ BEGIN
 		raise notice'Parent-Child. Table child: %, v_infotype: %' , v_tablename, v_infotype;
 
 		-- check parent_epa_view
-		EXECUTE 'SELECT tableparentepa_id from config_api_layer WHERE layer_id=$1'
+		EXECUTE 'SELECT tableparentepa_id from config_info_layer WHERE layer_id=$1'
 			INTO tableparent_id_arg
 			USING v_tablename;
 	
@@ -368,13 +368,13 @@ BEGIN
 			v_message  = '{"level":1, "text":"Epa type is not defined for this feature. Basic values are used"}';
 
 			-- check parent_view
-			EXECUTE 'SELECT tableparent_id from config_api_layer WHERE layer_id=$1'
+			EXECUTE 'SELECT tableparent_id from config_info_layer WHERE layer_id=$1'
 				INTO tableparent_id_arg
 				USING v_tablename_original;
 
 			-- Identify tableinfotype_id		
 			EXECUTE' SELECT tableinfotype_id FROM cat_feature
-				JOIN config_api_tableinfo_x_infotype ON child_layer.tableinfo_id 
+				JOIN config_info_table_x_type ON child_layer.tableinfo_id 
 				WHERE cat_feature.id= (SELECT custom_type FROM '||quote_ident(tableparent_id_arg)||' WHERE nid::text=$1) 
 				AND infotype_id=$2'
 				INTO v_tablename
@@ -382,18 +382,18 @@ BEGIN
 		END IF;
 					
 	-- not parent, not editable and has tableinfo_id
-	ELSIF v_tablename IN (SELECT layer_id FROM config_api_layer WHERE is_parent IS FALSE AND is_editable IS FALSE AND tableinfo_id IS NOT NULL) THEN
+	ELSIF v_tablename IN (SELECT layer_id FROM config_info_layer WHERE is_parent IS FALSE AND is_editable IS FALSE AND tableinfo_id IS NOT NULL) THEN
 
 		-- Identify tableinfotype_id 
-		EXECUTE 'SELECT tableinfotype_id FROM config_api_layer
-		JOIN config_api_tableinfo_x_infotype ON config_api_layer.tableinfo_id=config_api_tableinfo_x_infotype.tableinfo_id 
+		EXECUTE 'SELECT tableinfotype_id FROM config_info_layer
+		JOIN config_info_table_x_type ON config_info_layer.tableinfo_id=config_info_table_x_type.tableinfo_id 
 		WHERE layer_id=$1 AND infotype_id=$2'
 			INTO v_tablename
 		USING v_tablename, v_infotype;
 		raise notice 'NO parent-child, NO editable, Informable: %, v_infotype: %' , v_tablename, v_infotype;
 
 	-- Check if it is not parent, not editable and has not tableinfo_id (is not informable)
-	ELSIF v_tablename IN (SELECT layer_id FROM config_api_layer WHERE is_parent IS FALSE AND is_editable IS FALSE AND tableinfo_id IS NULL) THEN 
+	ELSIF v_tablename IN (SELECT layer_id FROM config_info_layer WHERE is_parent IS FALSE AND is_editable IS FALSE AND tableinfo_id IS NULL) THEN 
 		v_tablename= null;
 		raise notice 'NO parent-child, NO editable NO informable: %' , v_tablename;
         END IF;
@@ -408,7 +408,7 @@ BEGIN
 	------------------------------
 	IF v_tablename IS NULL THEN 
 
-		v_message='{"priority":2, "text":"The API is bad configured. Please take a look on table config layers (config_api_tableinfo_x_infotype or config_api_layer)", "results":0}';
+		v_message='{"priority":2, "text":"The API is bad configured. Please take a look on table config layers (config_info_table_x_type or config_info_layer)", "results":0}';
 	
 	ELSIF v_tablename IS NOT NULL THEN 
 
@@ -465,16 +465,16 @@ BEGIN
 		-- Get editability
 		------------------------
 		IF v_editable THEN 
-			EXECUTE 'SELECT gw_api_getpermissions($${"tableName":"'||quote_ident(v_tablename)||'"}$$::json)'
+			EXECUTE 'SELECT gw_fct_getpermissions($${"tableName":"'||quote_ident(v_tablename)||'"}$$::json)'
 				INTO v_permissions;
 				v_editable := v_permissions->>'isEditable';
 		ELSE
 			v_editable := FALSE;
 		END IF;
 	
-		--  Get if field's table are configured on config_api_layer_field
+		--  Get if field's table are configured on config_info_layer_field
 		------------------------------------------------------------------
-		IF (SELECT distinct formname from config_api_form_fields WHERE formname=v_tablename) IS NOT NULL THEN 
+		IF (SELECT distinct formname from config_form_fields WHERE formname=v_tablename) IS NOT NULL THEN 
 			v_configtabledefined  = TRUE;
 		ELSE 
 			v_configtabledefined  = FALSE;
@@ -496,7 +496,7 @@ BEGIN
 		IF v_editable THEN
 			RAISE NOTICE 'User has permissions to edit table and table';
 			-- call edit form function
-			EXECUTE 'SELECT gw_api_get_featureupsert($1, $2, $3, $4, $5, $6, $7, $8, $9)'
+			EXECUTE 'SELECT gw_fct_get_featureupsert($1, $2, $3, $4, $5, $6, $7, $8, $9)'
 			INTO v_fields
 			USING v_tablename, v_id, v_inputgeometry, v_device, v_infotype, v_tg_op, v_configtabledefined, v_idname, column_type;
 	
@@ -510,20 +510,20 @@ BEGIN
 		
 			RAISE NOTICE 'User has NOT permissions to edit table';
 			-- call info form function
-			EXECUTE 'SELECT gw_api_get_featureinfo($1, $2, $3, $4, $5, $6, $7, $8)'
+			EXECUTE 'SELECT gw_fct_get_featureinfo($1, $2, $3, $4, $5, $6, $7, $8)'
 			INTO v_fields
 			USING v_tablename, v_id, v_device, v_infotype, v_configtabledefined, v_idname, column_type, v_tg_op;
 		END IF;
 
 	ELSE
-		IF (SELECT distinct formname from config_api_form_fields WHERE formname=v_table_parent) IS NOT NULL THEN 
+		IF (SELECT distinct formname from config_form_fields WHERE formname=v_table_parent) IS NOT NULL THEN 
 			v_configtabledefined  = TRUE;
 		ELSE 
 			v_configtabledefined  = FALSE;
 		END IF;
 		
 		-- call info form function for parent layer
-		EXECUTE 'SELECT gw_api_get_featureinfo($1, $2, $3, $4, $5, $6, $7, $8)'
+		EXECUTE 'SELECT gw_fct_get_featureinfo($1, $2, $3, $4, $5, $6, $7, $8)'
 		INTO v_fields
 		USING v_table_parent, v_id, v_device, v_infotype, v_configtabledefined, v_idname, column_type, v_tg_op;
 

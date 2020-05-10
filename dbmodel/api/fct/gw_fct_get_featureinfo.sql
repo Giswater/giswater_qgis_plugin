@@ -57,13 +57,13 @@ BEGIN
 
 	IF  p_configtable THEN 
 
-		raise notice 'Configuration fields are defined on config_api_layer_field, calling gw_api_get_formfields with formname: % tablename: % id %', p_table_id, p_table_id, p_id;
-		SELECT formtype INTO v_formtype FROM config_api_form_fields WHERE formname = p_table_id LIMIT 1;
+		raise notice 'Configuration fields are defined on config_info_layer_field, calling gw_fct_get_formfields with formname: % tablename: % id %', p_table_id, p_table_id, p_id;
+		SELECT formtype INTO v_formtype FROM config_form_fields WHERE formname = p_table_id LIMIT 1;
 
 		-- Call the function of feature fields generation      	
-		SELECT gw_api_get_formfields( p_table_id, v_formtype, 'data', p_table_id, p_idname, p_id, null, 'SELECT',null, p_device, v_values_array) INTO fields_array;
+		SELECT gw_fct_get_formfields( p_table_id, v_formtype, 'data', p_table_id, p_idname, p_id, null, 'SELECT',null, p_device, v_values_array) INTO fields_array;
 	ELSE
-		raise notice 'Configuration fields are NOT defined on config_api_layer_field. System values will be used';
+		raise notice 'Configuration fields are NOT defined on config_info_layer_field. System values will be used';
 
 		-- Get fields
 		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM 

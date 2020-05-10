@@ -216,10 +216,10 @@ BEGIN
 
 	-- upserting data on tabData
 	IF v_currentactivetab = 'tabData' THEN
-		--SELECT gw_api_setvisitmanager (p_data) INTO v_return;
+		--SELECT gw_fct_setvisitmanager (p_data) INTO v_return;
 		v_id = ((v_return->>'body')::json->>'feature')::json->>'id';
 		v_message = (v_return->>'message');
-		RAISE NOTICE '--- UPSERT USER MANAGER CALLING gw_api_setvisitmnager WITH MESSAGE: % ---', v_message;
+		RAISE NOTICE '--- UPSERT USER MANAGER CALLING gw_fct_setvisitmnager WITH MESSAGE: % ---', v_message;
 	END IF;
 
 	--  Create tabs array	
@@ -240,7 +240,7 @@ BEGIN
 					v_disable_widget_name = '{data_endbutton}';
 				END IF;
 
-				SELECT gw_api_get_formfields( 'visitManager', 'visit', 'data', null, null, null, null, 'INSERT', null, v_device, null) INTO v_fields;
+				SELECT gw_fct_get_formfields( 'visitManager', 'visit', 'data', null, null, null, null, 'INSERT', null, v_device, null) INTO v_fields;
 
 				-- getting values from feature
 				EXECUTE FORMAT ('SELECT (row_to_json(a)) FROM 
@@ -282,7 +282,7 @@ BEGIN
 							
 						ELSIF (aux_json->>'column_id')='lot_id' AND v_team IS NOT NULL THEN
 							
-							EXECUTE ('SELECT gw_api_getchilds($${
+							EXECUTE ('SELECT gw_fct_getchilds($${
 							"client":{"device":3, "infoType":100, "lang":"ES"},
 							"form":{},
 							"feature":{"tableName":"visitManager"},
@@ -315,9 +315,9 @@ BEGIN
 			END IF;		
 			
 			-- building
-			SELECT * INTO v_tab FROM config_api_form_tabs WHERE formname='visitManager' AND tabname='tabData' and device = v_device LIMIT 1;
+			SELECT * INTO v_tab FROM config_form_tabs WHERE formname='visitManager' AND tabname='tabData' and device = v_device LIMIT 1;
 			IF v_tab IS NULL THEN 
-				SELECT * INTO v_tab FROM config_api_form_tabs WHERE formname='visitManager' AND tabname='tabData' LIMIT 1;			
+				SELECT * INTO v_tab FROM config_form_tabs WHERE formname='visitManager' AND tabname='tabData' LIMIT 1;			
 			END IF;
 		
 			v_tabaux := json_build_object('tabName',v_tab.tabname,'tabLabel',v_tab.label, 'tooltip',v_tab.tooltip, 
@@ -343,8 +343,8 @@ BEGIN
 				--refactor tabNames
 				p_data := replace (p_data::text, 'tabFeature', 'feature');
 				
-				RAISE NOTICE '--- CALLING gw_api_getlist ON LOTS TAB USING p_data: % ---', p_data;
-				SELECT gw_api_getlist (p_data) INTO v_fields_json;
+				RAISE NOTICE '--- CALLING gw_fct_getlist ON LOTS TAB USING p_data: % ---', p_data;
+				SELECT gw_fct_getlist (p_data) INTO v_fields_json;
 
 				-- getting pageinfo and list values
 				v_pageinfo = ((v_fields_json->>'body')::json->>'data')::json->>'pageInfo';
@@ -355,10 +355,10 @@ BEGIN
 			END IF;
 
 			-- building
-			SELECT * INTO v_tab FROM config_api_form_tabs WHERE formname='visitManager' AND tabname='tabLots' and device = v_device LIMIT 1;
+			SELECT * INTO v_tab FROM config_form_tabs WHERE formname='visitManager' AND tabname='tabLots' and device = v_device LIMIT 1;
 
 			IF v_tab IS NULL THEN 
-				SELECT * INTO v_tab FROM config_api_form_tabs WHERE formname='visitManager' AND tabname='tabLots' LIMIT 1;			
+				SELECT * INTO v_tab FROM config_form_tabs WHERE formname='visitManager' AND tabname='tabLots' LIMIT 1;			
 			END IF;
 
 			v_tabaux := json_build_object('tabName',v_tab.tabname,'tabLabel',v_tab.label, 'tooltip',v_tab.tooltip, 
@@ -415,8 +415,8 @@ BEGIN
 				--refactor tabNames
 				p_data := replace (p_data::text, 'tabFeature', 'feature');
 			
-				RAISE NOTICE '--- CALLING gw_api_getlist - VISITS p_data: % ---', p_data;
-				SELECT gw_api_getlist (p_data) INTO v_fields_json;
+				RAISE NOTICE '--- CALLING gw_fct_getlist - VISITS p_data: % ---', p_data;
+				SELECT gw_fct_getlist (p_data) INTO v_fields_json;
 				
 
 				-- getting pageinfo and list values
@@ -427,10 +427,10 @@ BEGIN
 		END IF;
 
 		-- building
-		SELECT * INTO v_tab FROM config_api_form_tabs WHERE formname='visitManager' AND tabname='tabDone' and device = v_device LIMIT 1;
+		SELECT * INTO v_tab FROM config_form_tabs WHERE formname='visitManager' AND tabname='tabDone' and device = v_device LIMIT 1;
 
 		IF v_tab IS NULL THEN 
-			SELECT * INTO v_tab FROM config_api_form_tabs WHERE formname='visitManager' AND tabname='tabDone' LIMIT 1;			
+			SELECT * INTO v_tab FROM config_form_tabs WHERE formname='visitManager' AND tabname='tabDone' LIMIT 1;			
 		END IF;
 
 		v_tabaux := json_build_object('tabName',v_tab.tabname,'tabLabel',v_tab.label, 'tooltip',v_tab.tooltip, 
@@ -480,8 +480,8 @@ BEGIN
 			--refactor tabNames
 			p_data := replace (p_data::text, 'tabFeature', 'feature');
 			
-			RAISE NOTICE '--- CALLING gw_api_getlist - VISITS p_data: % ---', p_data;
-			SELECT gw_api_getlist (p_data) INTO v_fields_json;
+			RAISE NOTICE '--- CALLING gw_fct_getlist - VISITS p_data: % ---', p_data;
+			SELECT gw_fct_getlist (p_data) INTO v_fields_json;
 			array_index = 0;
 			
 			-- getting pageinfo and list values
@@ -493,10 +493,10 @@ BEGIN
 		END IF;
 		
 		-- building
-		SELECT * INTO v_tab FROM config_api_form_tabs WHERE formname='visitManager' AND tabname='tabTeam' and device = v_device LIMIT 1;
+		SELECT * INTO v_tab FROM config_form_tabs WHERE formname='visitManager' AND tabname='tabTeam' and device = v_device LIMIT 1;
 		
 		IF v_tab IS NULL THEN 
-			SELECT * INTO v_tab FROM config_api_form_tabs WHERE formname='visitManager' AND tabname='tabTeam' LIMIT 1;			
+			SELECT * INTO v_tab FROM config_form_tabs WHERE formname='visitManager' AND tabname='tabTeam' LIMIT 1;			
 		END IF;
 
 		v_tabaux := json_build_object('tabName',v_tab.tabname,'tabLabel',v_tab.label, 'tooltip',v_tab.tooltip, 
@@ -521,7 +521,7 @@ BEGIN
 		END IF;
 	
 		-- actions and layermanager
-		EXECUTE FORMAT ('SELECT actions, layermanager FROM config_api_form WHERE formname = ''visitManager'' AND (projecttype = %s OR projecttype = ''utils'')', quote_literal(LOWER(v_projecttype)))
+		EXECUTE FORMAT ('SELECT actions, layermanager FROM config_form WHERE formname = ''visitManager'' AND (projecttype = %s OR projecttype = ''utils'')', quote_literal(LOWER(v_projecttype)))
 			INTO v_formactions, v_layermanager;
 
 		v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formActions', v_formactions);

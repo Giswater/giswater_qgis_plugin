@@ -314,7 +314,7 @@ BEGIN
 		UPDATE om_visit SET class_id=v_visitclass WHERE id=v_id::int8;
 
 		-- message
-		SELECT gw_api_getmessage(v_feature, 60) INTO v_message;
+		SELECT gw_fct_getmessage(v_feature, 60) INTO v_message;
 	END IF;
 
 	-- setting values default of new visit
@@ -390,18 +390,18 @@ BEGIN
 			USING v_schemaname, v_tablename, v_idname
 			INTO v_columntype;
 
-	RAISE NOTICE '--- gw_api_getvisit : Visit parameters: p_visittype % isnewvisit: % featuretype: %, feature_id % v_isclasschanged: % visitclass: %,  v_visit: %,  v_status %  formname: %,  tablename: %,  idname: %, columntype %, device: % ---',
+	RAISE NOTICE '--- gw_fct_getvisit : Visit parameters: p_visittype % isnewvisit: % featuretype: %, feature_id % v_isclasschanged: % visitclass: %,  v_visit: %,  v_status %  formname: %,  tablename: %,  idname: %, columntype %, device: % ---',
 							     p_visittype, isnewvisit, v_featuretype, v_featureid, v_isclasschanged, v_visitclass, v_id, v_status, v_formname, v_tablename, v_idname, v_columntype, v_device;
 
 	-- upserting data when change from tabData to tabFile
 	IF v_currentactivetab = 'tabData' AND (v_isclasschanged IS FALSE OR v_tab_data IS FALSE) AND v_status > 0 THEN
 
-		RAISE NOTICE '--- gw_api_getvisit: Upsert visit calling ''gw_api_setvisit'' with : % ---', p_data;
-		SELECT gw_api_setvisit (p_data) INTO v_return;
+		RAISE NOTICE '--- gw_fct_getvisit: Upsert visit calling ''gw_fct_setvisit'' with : % ---', p_data;
+		SELECT gw_fct_setvisit (p_data) INTO v_return;
 		v_id = ((v_return->>'body')::json->>'feature')::json->>'id';
 		v_message = (v_return->>'message');
 
-		RAISE NOTICE '--- UPSERT VISIT CALLED gw_api_setvisit WITH MESSAGE: % ---', v_message;
+		RAISE NOTICE '--- UPSERT VISIT CALLED gw_fct_setvisit WITH MESSAGE: % ---', v_message;
 	END IF;
 	
 	-- manage actions
@@ -422,10 +422,10 @@ BEGIN
 		v_addfile = gw_fct_json_object_set_key(v_addfile, 'feature', v_filefeature);
 		v_addfile = gw_fct_json_object_set_key(v_addfile, 'client', v_client);
 
-		RAISE NOTICE '--- CALL gw_api_setfileinsert PASSING (v_addfile): % ---', v_addfile;
+		RAISE NOTICE '--- CALL gw_fct_setfileinsert PASSING (v_addfile): % ---', v_addfile;
 	
 		-- calling insert files function
-		SELECT gw_api_setfileinsert (v_addfile) INTO v_addfile;
+		SELECT gw_fct_setfileinsert (v_addfile) INTO v_addfile;
 
 		-- building message
 		v_message1 = v_message::text;
@@ -439,10 +439,10 @@ BEGIN
 		v_filefeature = gw_fct_json_object_set_key(v_filefeature, 'id', v_fileid);
 		v_deletefile = gw_fct_json_object_set_key(v_deletefile, 'feature', v_filefeature);
 
-		RAISE NOTICE '--- CALL gw_api_setdelete PASSING (v_deletefile): % ---', v_deletefile;
+		RAISE NOTICE '--- CALL gw_fct_setdelete PASSING (v_deletefile): % ---', v_deletefile;
 
 		-- calling input function
-		SELECT gw_api_setdelete(v_deletefile) INTO v_deletefile;
+		SELECT gw_fct_setdelete(v_deletefile) INTO v_deletefile;
 		v_message = (v_deletefile ->>'message')::json;
 		
 	END IF;
@@ -465,7 +465,7 @@ BEGIN
 				END IF;
 				
 				RAISE NOTICE ' --- GETTING tabData DEFAULT VALUES ON NEW VISIT ---';
-				SELECT gw_api_get_formfields( v_formname, 'visit', 'data', v_tablename, null, null, null, 'INSERT', null, v_device) INTO v_fields;
+				SELECT gw_fct_get_formfields( v_formname, 'visit', 'data', v_tablename, null, null, null, 'INSERT', null, v_device) INTO v_fields;
 
 				FOREACH aux_json IN ARRAY v_fields
 				LOOP					
@@ -550,7 +550,7 @@ BEGIN
 					
 				END LOOP;
 			ELSE 
-				SELECT gw_api_get_formfields( v_formname, 'visit', 'data', v_tablename, null, null, null, 'INSERT', null, v_device) INTO v_fields;
+				SELECT gw_fct_get_formfields( v_formname, 'visit', 'data', v_tablename, null, null, null, 'INSERT', null, v_device) INTO v_fields;
 
 				RAISE NOTICE ' --- GETTING tabData VALUES ON VISIT  ---';
 
@@ -623,10 +623,10 @@ BEGIN
 
 		END IF;
 
-		SELECT * INTO v_tab FROM config_api_form_tabs WHERE formname='visit' AND tabname='tabData' and device = v_device LIMIT 1;
+		SELECT * INTO v_tab FROM config_form_tabs WHERE formname='visit' AND tabname='tabData' and device = v_device LIMIT 1;
 
 		IF v_tab IS NULL THEN 
-			SELECT * INTO v_tab FROM config_api_form_tabs WHERE formname='visit' AND tabname='tabData' LIMIT 1;
+			SELECT * INTO v_tab FROM config_form_tabs WHERE formname='visit' AND tabname='tabData' LIMIT 1;
 		END IF;
 
 		IF v_status = 0 or v_offline = 'true' THEN
@@ -673,8 +673,8 @@ BEGIN
 				--refactor tabNames
 				p_data := replace (p_data::text, 'tabFeature', 'feature');
 			
-				RAISE NOTICE '--- CALLING gw_api_getlist USING p_data: % ---', p_data;
-				SELECT gw_api_getlist (p_data) INTO v_fields_json;
+				RAISE NOTICE '--- CALLING gw_fct_getlist USING p_data: % ---', p_data;
+				SELECT gw_fct_getlist (p_data) INTO v_fields_json;
 
 				-- getting pageinfo and list values
 				v_pageinfo = ((v_fields_json->>'body')::json->>'data')::json->>'pageInfo';
@@ -688,10 +688,10 @@ BEGIN
 			v_fields_json := COALESCE(v_fields_json, '{}');
 
 			-- building tab
-			SELECT * INTO v_tab FROM config_api_form_tabs WHERE formname='visit' AND tabname='tabFiles' and device = v_device LIMIT 1;
+			SELECT * INTO v_tab FROM config_form_tabs WHERE formname='visit' AND tabname='tabFiles' and device = v_device LIMIT 1;
 		
 			IF v_tab IS NULL THEN 
-				SELECT * INTO v_tab FROM config_api_form_tabs WHERE formname='visit' AND tabname='tabFiles' LIMIT 1;
+				SELECT * INTO v_tab FROM config_form_tabs WHERE formname='visit' AND tabname='tabFiles' LIMIT 1;
 			END IF;
 
 			IF v_status = 0 THEN

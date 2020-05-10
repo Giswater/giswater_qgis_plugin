@@ -56,8 +56,8 @@ BEGIN
 		v_input_geometry:= ST_SetSRID(ST_MakeLine(ST_MakePoint(v_x1, v_y1), ST_MakePoint(v_x2, v_y2)), v_epsg);
 	END IF;
 	
-	-- Call gw_api_getinfofromid
-	RETURN gw_api_getinfofromid(concat('{"client":',(p_data->>'client'),',"form":{"editable":"True"},"feature":{"tableName":"',v_tablename,'","inputGeometry":"',v_input_geometry,'"},"data":{}}')::json);
+	-- Call gw_fct_getinfofromid
+	RETURN gw_fct_getinfofromid(concat('{"client":',(p_data->>'client'),',"form":{"editable":"True"},"feature":{"tableName":"',v_tablename,'","inputGeometry":"',v_input_geometry,'"},"data":{}}')::json);
 
 --    Exception handling
  --   EXCEPTION WHEN OTHERS THEN 

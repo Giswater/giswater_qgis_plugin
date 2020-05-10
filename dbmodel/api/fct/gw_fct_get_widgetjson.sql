@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2564
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_get_widgetjson(text, text, text, text, boolean, text);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_get_widgetjson(
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_get_widgetjson(
     label_arg text,
     name_arg text,
     type_arg text,

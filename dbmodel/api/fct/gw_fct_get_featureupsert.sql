@@ -367,14 +367,14 @@ BEGIN
 	----------------------------
 	IF  p_configtable is TRUE THEN 
 	
-		PERFORM gw_fct_debug(concat('{"data":{"msg":"--> Configuration fields are defined on config_api_form_fields table <--", "variables":""}}')::json);
+		PERFORM gw_fct_debug(concat('{"data":{"msg":"--> Configuration fields are defined on config_form_fields table <--", "variables":""}}')::json);
 
 		-- Call the function of feature fields generation
-		SELECT formtype INTO v_formtype FROM config_api_form_fields WHERE formname = p_table_id LIMIT 1;
-		SELECT gw_api_get_formfields( v_formname, v_formtype, v_tabname, v_tablename, p_idname, p_id, p_columntype, p_tg_op, null, p_device , v_values_array) INTO v_fields_array; 
+		SELECT formtype INTO v_formtype FROM config_form_fields WHERE formname = p_table_id LIMIT 1;
+		SELECT gw_fct_get_formfields( v_formname, v_formtype, v_tabname, v_tablename, p_idname, p_id, p_columntype, p_tg_op, null, p_device , v_values_array) INTO v_fields_array; 
 
 	ELSE	
-		PERFORM gw_fct_debug(concat('{"data":{"msg":"--> Configuration fields are NOT defined on config_api_form_fields table. System values are used <--", "variables":""}}')::json);
+		PERFORM gw_fct_debug(concat('{"data":{"msg":"--> Configuration fields are NOT defined on config_form_fields table. System values are used <--", "variables":""}}')::json);
 	
 		-- Get fields
 		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM 
@@ -450,7 +450,7 @@ BEGIN
 	IF v_project_type = 'UD' THEN
 
 		v_input = '{"client":{"device":3,"infoType":100,"lang":"es"}, "feature":{"featureType":"'||v_catfeature.feature_type||'", "id":"'||p_id||'"}, "data":{"tgOp":"'||p_tg_op||'", "node1":"'||v_node1||'", "node2":"'||v_node2||'"}}';	
-		SELECT gw_api_get_widgetvalues (v_input) INTO v_widgetvalues;
+		SELECT gw_fct_get_widgetvalues (v_input) INTO v_widgetvalues;
 		
 	END IF;	
 

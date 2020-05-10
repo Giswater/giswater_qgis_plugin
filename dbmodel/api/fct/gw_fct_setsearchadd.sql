@@ -7,12 +7,12 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2620
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_setsearch_add(json);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_setsearchadd(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setsearchadd(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT "SCHEMA_NAME".gw_api_setsearchadd($${
+SELECT "SCHEMA_NAME".gw_fct_setsearchadd($${
 		"client":{"device":9, "infoType":100, "lang":"ES"}, 
 		"form":{"tabName":"address"}, "feature":{}, 
 		"data":{"filterFields":{}, "pageInfo":{}, "add_muni":{"id":"1", "name":"Sant Boi del Llobregat"}, 

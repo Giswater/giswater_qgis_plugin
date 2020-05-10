@@ -75,7 +75,7 @@ BEGIN
 	
 	
 	-- getting message
-	SELECT gw_api_getmessage(v_feature, 40) INTO v_message;
+	SELECT gw_fct_getmessage(v_feature, 40) INTO v_message;
 		
 	--  Control NULL's
 	v_apiversion := COALESCE(v_apiversion, '{}');

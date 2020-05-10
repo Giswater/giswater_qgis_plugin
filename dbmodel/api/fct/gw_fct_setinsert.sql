@@ -195,7 +195,7 @@ BEGIN
 	v_feature =  gw_fct_json_object_set_key (v_feature, 'id', v_newid);
 
 	-- set message
-	SELECT gw_api_getmessage(v_feature::json, 40) INTO v_message;
+	SELECT gw_fct_getmessage(v_feature::json, 40) INTO v_message;
 	
 	RAISE NOTICE '--- Returning from (gw_fct_setinsert) with this message :: % ---', v_message;
 

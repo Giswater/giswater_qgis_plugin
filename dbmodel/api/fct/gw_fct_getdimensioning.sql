@@ -54,7 +54,7 @@ BEGIN
 	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
 
 
-	EXECUTE 'SELECT gw_api_get_formfields($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)'
+	EXECUTE 'SELECT gw_fct_get_formfields($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)'
 	INTO v_fields_array
 	USING 'dimensioning', 'catalog', '', NULL, NULL, NULL, NULL, 'SELECT', null, 3, null::json;
 

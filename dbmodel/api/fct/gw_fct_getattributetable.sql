@@ -46,7 +46,7 @@ BEGIN
    	v_formactions = '[{"actionName":"actionZoom","actionTooltip":"Zoom"},{"actionName":"actionSelect","actionTooltip":"Select"}
 			,{"actionName":"actionLink","actionTooltip":"Link"},{"actionName":"actionDelete","actionTooltip":"Delete"}]';
 
-	SELECT gw_api_getlist (p_data) INTO v_return;
+	SELECT gw_fct_getlist (p_data) INTO v_return;
 
 -- getting idname
 	v_tablename = (p_data->>'feature')::json->>'tableName';

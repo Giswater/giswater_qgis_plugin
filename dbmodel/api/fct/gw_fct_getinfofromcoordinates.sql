@@ -106,7 +106,7 @@ BEGIN
 		INTO v_sensibility_f;
 		-- ESCALE 1:5000 as base sensibility
 		v_sensibility = ((v_zoomratio/5000) * 10 * v_sensibility_f);
-		v_config_layer='config_api_layer';
+		v_config_layer='config_info_layer';
 
 	END IF;
 
@@ -195,8 +195,8 @@ BEGIN
 
 	PERFORM gw_fct_debug(concat('{"data":{"msg":"Toolbar", "variables":"',v_toolbar,'"}}')::json);
 			
-	--   Call and return gw_api_getinfofromid
-	RETURN gw_api_getinfofromid(concat('{"client":',(p_data->>'client'),',"form":{"editable":"',v_iseditable, 
+	--   Call and return gw_fct_getinfofromid
+	RETURN gw_fct_getinfofromid(concat('{"client":',(p_data->>'client'),',"form":{"editable":"',v_iseditable, 
 	'"},"feature":{"tableName":"',v_layer.layer_id,'","id":"',v_id,'"},"data":{"toolBar":"'||v_toolbar||'","rolePermissions":"', v_role,'"}}')::json);
 	
 	-- Exception handling

@@ -12,21 +12,21 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setsearch(p_data json)
 $BODY$
 
 /*example
-SELECT SCHEMA_NAME.gw_api_setsearch($${
+SELECT SCHEMA_NAME.gw_fct_setsearch($${
 		"client":{"device":9, "infoType":100, "lang":"ES"},
 		"form":{"tabName": "network"},
 		"feature":{},
 		"data":{"net_type": {"id": "ve_arc", "name": "Arcs"}, "network_net_code": {"text": "2"}}}$$)
 
 
-SELECT SCHEMA_NAME.gw_api_setsearch($${
+SELECT SCHEMA_NAME.gw_fct_setsearch($${
 		"client":{"device":9, "infoType":100, "lang":"ES"},
 		"form":{"tabName": "address"},
 		"feature":{},
 		"data":{"add_muni": {"id": 1, "name": "Sant Boi del Llobregat"}, "add_street": {"text": "Calle de Francesc Layret"}}}$$)
 
 
-SELECT SCHEMA_NAME.gw_api_setsearch($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{"tabName":"workcat"}, 
+SELECT SCHEMA_NAME.gw_fct_setsearch($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{"tabName":"workcat"}, 
 		"feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "workcat_search":{"text":"work2 - descript"}}}$$)
 
 */

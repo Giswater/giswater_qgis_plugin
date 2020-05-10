@@ -70,16 +70,16 @@ BEGIN
 	
 
 	-- message
-	SELECT gw_api_getmessage(null, 70) INTO v_message;
+	SELECT gw_fct_getmessage(null, 70) INTO v_message;
 	v_data = p_data->>'data';
 	v_data = gw_fct_json_object_set_key (v_data, 'message', v_message);
 	v_data = gw_fct_json_object_set_key (v_data, 'widget_actions', '{"widget_disabled":"data_startbutton"}'::json);
 	p_data = gw_fct_json_object_set_key (p_data, 'data', v_data);	
 
-	RAISE NOTICE 'RETURN => gw_api_getvisitmanager(%)',p_data;
+	RAISE NOTICE 'RETURN => gw_fct_getvisitmanager(%)',p_data;
 	
 	-- Return
-	RETURN gw_api_getvisitmanager(p_data);
+	RETURN gw_fct_getvisitmanager(p_data);
 
 END;
 $BODY$

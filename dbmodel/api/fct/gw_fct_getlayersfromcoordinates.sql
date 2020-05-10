@@ -104,7 +104,7 @@ BEGIN
 		INTO v_sensibility_f;
 		-- ESCALE 1:5000 as base sensibility
 		v_sensibility = ((v_zoomScale/5000) * 10 * v_sensibility_f);
-		v_config_layer='config_api_layer';
+		v_config_layer='config_info_layer';
 
 
 	END IF;

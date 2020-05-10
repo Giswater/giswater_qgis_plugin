@@ -11,7 +11,7 @@ character varying, character varying, character varying, character varying, char
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_get_formfields(character varying, character varying, character varying, 
 character varying, character varying, character varying, character varying, character varying, character varying, integer, json);
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_get_formfields(
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_get_formfields(
     p_formname character varying,
     p_formtype character varying,
     p_tabname character varying,
@@ -27,14 +27,14 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_get_formfields(
 $BODY$
 
 /*EXAMPLE
-SELECT "SCHEMA_NAME".gw_api_get_formfields('visit_arc_insp', 'visit', 'data', NULL, NULL, NULL, NULL, 'INSERT', null, 3)
-SELECT "SCHEMA_NAME".gw_api_get_formfields('go2epa', 'form', 'data', null, null, null, null, null, null,null)
-SELECT "SCHEMA_NAME".gw_api_get_formfields('ve_arc_conduit', 'feature', 'data', 've_arc_conduit', 'arc_id', '2001', NULL, 'SELECT', null, 9)
-SELECT "SCHEMA_NAME".gw_api_get_formfields('ve_arc_pipe', 'feature', NULL, NULL, NULL, NULL, NULL, 'INSERT', null, 9)
-SELECT "SCHEMA_NAME".gw_api_get_formfields( 'printGeneric', 'utils', 'data', null, null, null, null, 'SELECT', null, 3);
+SELECT "SCHEMA_NAME".gw_fct_get_formfields('visit_arc_insp', 'visit', 'data', NULL, NULL, NULL, NULL, 'INSERT', null, 3)
+SELECT "SCHEMA_NAME".gw_fct_get_formfields('go2epa', 'form', 'data', null, null, null, null, null, null,null)
+SELECT "SCHEMA_NAME".gw_fct_get_formfields('ve_arc_conduit', 'feature', 'data', 've_arc_conduit', 'arc_id', '2001', NULL, 'SELECT', null, 9)
+SELECT "SCHEMA_NAME".gw_fct_get_formfields('ve_arc_pipe', 'feature', NULL, NULL, NULL, NULL, NULL, 'INSERT', null, 9)
+SELECT "SCHEMA_NAME".gw_fct_get_formfields( 'printGeneric', 'utils', 'data', null, null, null, null, 'SELECT', null, 3);
 
-PERFORM gw_fct_debug(concat('{"data":{"msg":"----> INPUT FOR gw_api_get_formfields: ", "variables":"',v_debug,'"}}')::json);
-PERFORM gw_fct_debug(concat('{"data":{"msg":"<---- OUTPUT FOR gw_api_get_formfields: ", "variables":"',v_debug,'"}}')::json);
+PERFORM gw_fct_debug(concat('{"data":{"msg":"----> INPUT FOR gw_fct_get_formfields: ", "variables":"',v_debug,'"}}')::json);
+PERFORM gw_fct_debug(concat('{"data":{"msg":"<---- OUTPUT FOR gw_fct_get_formfields: ", "variables":"',v_debug,'"}}')::json);
 UPDATE config_param_user SET value =  'true' WHERE parameter = 'debug_mode' and cur_user = current_user;
 */
 
@@ -90,7 +90,7 @@ BEGIN
 		v_debug_var = (SELECT jsonb_build_object('formname',  p_formname,'formtype',   p_formtype, 'tabname', p_tabname,'tablename', p_tablename, 'idname', p_idname,
 		'id',p_id, 'columntype', p_columntype, 'tgop', p_tgop, 'filterfield', p_filterfield, 'device', p_device, 'values_array', p_values_array	));
 
-		PERFORM gw_fct_debug(concat('{"data":{"msg":"----> INPUT FOR gw_api_get_formfields: ", "variables":',v_debug_var,'}}')::json);
+		PERFORM gw_fct_debug(concat('{"data":{"msg":"----> INPUT FOR gw_fct_get_formfields: ", "variables":',v_debug_var,'}}')::json);
 	END IF;
 
 	-- setting tabname
@@ -123,13 +123,13 @@ BEGIN
 	
 	-- starting process - get fields	
 	IF p_formname!='infoplan' THEN 
-		SELECT formtype INTO v_formtype FROM config_api_form_fields WHERE formname = p_formname LIMIT 1;
+		SELECT formtype INTO v_formtype FROM config_form_fields WHERE formname = p_formname LIMIT 1;
 		
 		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT '||v_label||', column_id, concat('||quote_literal(p_tabname)||',''_'',column_id) AS widgetname, widgettype, 
 			widgetfunction, '||v_device||' hidden, widgetdim, datatype , tooltip, placeholder, iseditable, row_number()over(ORDER BY layoutname, layout_order) AS orderby, 
 			layoutname, layout_order, dv_parent_id AS "parentId", isparent, ismandatory, linkedaction, dv_querytext AS "queryText", dv_querytext_filterc AS "queryTextFilter", isautoupdate,
 			dv_orderby_id AS "orderById", dv_isnullvalue AS "isNullValue", stylesheet, widgetcontrols
-			FROM config_api_form_fields WHERE formname = $1 AND formtype= $2 '||v_clause||' ORDER BY orderby) a'
+			FROM config_form_fields WHERE formname = $1 AND formtype= $2 '||v_clause||' ORDER BY orderby) a'
 				INTO fields_array
 				USING p_formname, v_formtype;
 
@@ -150,7 +150,7 @@ BEGIN
 				tooltip, placeholder, iseditable, layout_order+100 as layout_order, ''lyt_plan_1'' as layoutname,  NULL AS dv_parent_id, NULL AS isparent, ismandatory,  
 				NULL AS widgetfunction, NULL AS dv_querytext, 
 				NULL AS dv_querytext_filterc, NULL AS linkedaction, NULL AS isautoupdate, null as value, null as stylesheet, widgetcontrols::text, hidden
-				FROM config_api_form_fields WHERE formname  = ''infoplan'' ORDER BY layoutname, layout_order) a
+				FROM config_form_fields WHERE formname  = ''infoplan'' ORDER BY layoutname, layout_order) a
 			ORDER BY 1) b'
 			INTO fields_array
 			USING p_formname, p_id ;
@@ -298,7 +298,7 @@ BEGIN
 	-- Convert to json
 	fields := array_to_json(fields_array);
 	
-	PERFORM gw_fct_debug(concat('{"data":{"msg":"<---- OUTPUT FOR gw_api_get_formfields: ", "variables":""}}')::json);
+	PERFORM gw_fct_debug(concat('{"data":{"msg":"<---- OUTPUT FOR gw_fct_get_formfields: ", "variables":""}}')::json);
 	 
 	-- Return
 	RETURN fields_array;

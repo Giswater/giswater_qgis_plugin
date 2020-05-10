@@ -40,13 +40,13 @@ BEGIN
 	v_formname := (p_data ->> 'form')::json->> 'formName';
 
 -- getting the form widgets
-	SELECT gw_api_get_formfields(v_formname, 'form', 'data', null, null, null, null, null,null, null, null)
+	SELECT gw_fct_get_formfields(v_formname, 'form', 'data', null, null, null, null, null,null, null, null)
 		INTO v_fields; 
 
 	v_fields_json = array_to_json (v_fields);
 
 --  Construction of groupbox formlayouts
-	EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (SELECT layout_id AS "layout", label FROM config_api_form_groupbox 
+	EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (SELECT layout_id AS "layout", label FROM config_form_groupbox 
 		WHERE formname=$1 ORDER BY layout_id) a'
 			INTO v_formgroupbox
 			USING v_formname;

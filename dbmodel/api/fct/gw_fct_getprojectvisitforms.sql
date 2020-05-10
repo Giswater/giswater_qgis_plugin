@@ -121,14 +121,14 @@ Generate one form for layer and one form for visitclass=incident
 		-----------
 		RAISE NOTICE ' --- GETTING tabData DEFAULT VALUES ON NEW VISIT ---';
 
-		SELECT gw_api_get_formfields( v_formname, 'visit', 'data', null, null, null, null, 'INSERT', null, v_device, null) INTO v_fields;
+		SELECT gw_fct_get_formfields( v_formname, 'visit', 'data', null, null, null, null, 'INSERT', null, v_device, null) INTO v_fields;
 		v_fields_json = array_to_json (v_fields);
 		v_fields_json := COALESCE(v_fields_json, '{}');	
 
-		SELECT * INTO v_tab FROM config_api_form_tabs WHERE formname='visit' AND tabname='tabData' and device = v_device LIMIT 1;
+		SELECT * INTO v_tab FROM config_form_tabs WHERE formname='visit' AND tabname='tabData' and device = v_device LIMIT 1;
 
 		IF v_tab IS NULL THEN 
-			SELECT * INTO v_tab FROM config_api_form_tabs WHERE formname='visit' AND tabname='tabData' LIMIT 1;
+			SELECT * INTO v_tab FROM config_form_tabs WHERE formname='visit' AND tabname='tabData' LIMIT 1;
 		END IF;
 
 		v_tabaux := json_build_object('tabName',v_tab.tabname,'tabLabel',v_tab.tablabel, 'tooltip',v_tab.tooltip, 
@@ -157,8 +157,8 @@ Generate one form for layer and one form for visitclass=incident
 		--refactor tabNames
 		p_data := replace (p_data::text, 'tabFeature', 'feature');
 			
-		RAISE NOTICE '--- CALLING gw_api_getlist USING p_data: % ---', p_data;
-		SELECT gw_api_getlist (p_data) INTO v_fields_json;
+		RAISE NOTICE '--- CALLING gw_fct_getlist USING p_data: % ---', p_data;
+		SELECT gw_fct_getlist (p_data) INTO v_fields_json;
 
 		-- getting pageinfo and list values
 		v_pageinfo = ((v_fields_json->>'body')::json->>'data')::json->>'pageInfo';
@@ -167,10 +167,10 @@ Generate one form for layer and one form for visitclass=incident
 		v_fields_json := COALESCE(v_fields_json, '{}');
 
 		-- building tab
-		SELECT * INTO v_tab FROM config_api_form_tabs WHERE formname='visit' AND tabname='tabFiles' and device = v_device LIMIT 1;
+		SELECT * INTO v_tab FROM config_form_tabs WHERE formname='visit' AND tabname='tabFiles' and device = v_device LIMIT 1;
 		
 		IF v_tab IS NULL THEN 
-			SELECT * INTO v_tab FROM config_api_form_tabs WHERE formname='visit' AND tabname='tabFiles' LIMIT 1;
+			SELECT * INTO v_tab FROM config_form_tabs WHERE formname='visit' AND tabname='tabFiles' LIMIT 1;
 		END IF;
 		
 		v_tabaux := json_build_object('tabName',v_tab.tabname,'tabLabel',v_tab.tablabel, 'tooltip',v_tab.tooltip, 
@@ -190,7 +190,7 @@ Generate one form for layer and one form for visitclass=incident
 	v_formheader :=concat('VISIT - ',v_id);	
 
 	-- actions and layermanager
-	EXECUTE 'SELECT actions, layermanager FROM config_api_form WHERE formname = ''visit'' AND (projecttype ='||quote_literal(LOWER(v_projecttype))||' OR projecttype=''utils'')'
+	EXECUTE 'SELECT actions, layermanager FROM config_form WHERE formname = ''visit'' AND (projecttype ='||quote_literal(LOWER(v_projecttype))||' OR projecttype=''utils'')'
 			INTO v_formactions, v_layermanager;
 
 	RAISE NOTICE 'v_layermanager %', v_layermanager;

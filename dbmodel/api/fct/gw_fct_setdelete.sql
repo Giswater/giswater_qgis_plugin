@@ -77,10 +77,10 @@ BEGIN
 	-- if exists
 	IF v_result IS NOT NULL THEN
 		v_querytext := 'DELETE FROM ' || quote_ident(v_tablename) ||' WHERE '|| quote_ident(v_idname) ||' = '||quote_literal(v_id);
-		SELECT gw_api_getmessage(v_feature,20) INTO v_message;
+		SELECT gw_fct_getmessage(v_feature,20) INTO v_message;
 		EXECUTE v_querytext ;
 	ELSE
-		SELECT gw_api_getmessage(v_feature,30) INTO v_message;
+		SELECT gw_fct_getmessage(v_feature,30) INTO v_message;
 	END IF;
 
 --    Return
