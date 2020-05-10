@@ -4,10 +4,10 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 2630
+--FUNCTION CODE: 2564
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_createwidgetjson(json);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_createwidgetjson(
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_get_widgetjson(text, text, text, text, boolean, text);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_get_widgetjson(
     label_arg text,
     name_arg text,
     type_arg text,
@@ -30,11 +30,8 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 	schemas_array := current_schemas(FALSE);
 
-
-RAISE NOTICE 'gw_fct_createwidgetjson() Args: %, %, %, %, %, %', label_arg, name_arg, type_arg, datatype_arg, placeholder_arg, disabled_arg;
-
 --	Create JSON
-	widget_json := json_build_object('label', label_arg, 'widgetname', name_arg, 'type', type_arg, 'dataType', datatype_arg, 'placeholder', placeholder_arg, 'disabled', disabled_arg);
+	widget_json := json_build_object('label', label_arg, 'name', name_arg, 'type', type_arg, 'dataType', datatype_arg, 'placeholder', placeholder_arg, 'disabled', disabled_arg);
 
 --	Cast value
 	IF datatype_arg = 'integer' THEN
@@ -46,14 +43,12 @@ RAISE NOTICE 'gw_fct_createwidgetjson() Args: %, %, %, %, %, %', label_arg, name
 	ELSE
 		value_type = 'TEXT';
 	END IF;
-
-RAISE NOTICE 'TYPE: %, %', datatype_arg, value_type;
 	
 --	Add 'value' field
 	IF value_arg ISNULL THEN
 		widget_json := gw_fct_json_object_set_key(widget_json, 'value', 'NULL'::TEXT);
 	ELSE
-		EXECUTE 'SELECT gw_fct_json_object_set_key($1, ''value'', CAST(' || quote_literal(value_arg) || ' AS ' || value_type || '))'    
+		EXECUTE 'SELECT gw_fct_json_object_set_key($1, ''value'', CAST(' || quote_literal(value_arg) || ' AS ' || quote_literal(value_type) || '))'    
 			INTO widget_json
 			USING widget_json;
 	END IF;

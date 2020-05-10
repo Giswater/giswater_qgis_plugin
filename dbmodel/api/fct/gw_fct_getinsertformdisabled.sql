@@ -4,8 +4,9 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 
+--FUNCTION CODE: 2868
 
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_getinsertformdisabled(varchar, varchar, varchar);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getinsertformdisabled(
     table_id character varying,
     lang character varying,
