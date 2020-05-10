@@ -65,8 +65,8 @@ class MincutParent(ParentAction):
         """ Serialize data of table 'anl_mincut_cat_state' """
         
         self.states = {}
-        sql = ("SELECT id, name "
-               "FROM anl_mincut_cat_state "
+        sql = ("SELECT id, idval "
+               "FROM om_typevalue WHERE typevalue = 'mincut_state' "
                "ORDER BY id")
         rows = self.controller.get_rows(sql)
         if not rows:
