@@ -40,7 +40,7 @@ class Go2EpaOptions(ApiParent):
 
         form = '"formName":"epaoptions"'
         body = self.create_body(form=form)
-        complet_result = self.controller.get_json('gw_api_getconfig', body, log_sql=True)
+        complet_result = self.controller.get_json('gw_fct_getconfig', body, log_sql=True)
         if not complet_result: return False
 
         self.construct_form_param_user(self.dlg_options, complet_result['body']['form']['formTabs'], 0, self.epa_options_list)
@@ -69,7 +69,7 @@ class Go2EpaOptions(ApiParent):
         form = '"formName":"epaoptions"'
         extras = f'"fields":{my_json}'
         body = self.create_body(form=form, extras=extras)
-        result = self.controller.get_json('gw_api_setconfig', body, log_sql=True)
+        result = self.controller.get_json('gw_fct_setconfig', body, log_sql=True)
         if not result: return False
 
         message = "Values has been updated"
@@ -89,7 +89,7 @@ class Go2EpaOptions(ApiParent):
 
         combo_parent = widget.objectName()
         combo_id = utils_giswater.get_item_data(self.dlg_options, widget)
-        result = self.controller.get_json('gw_api_get_combochilds', f"'epaoptions', '', '', '{combo_parent}', '{combo_id}', ''", log_sql=True)
+        result = self.controller.get_json('gw_fct_get_combochilds', f"'epaoptions', '', '', '{combo_parent}', '{combo_id}', ''", log_sql=True)
         if not result: return False
 
         for combo_child in result['fields']:

@@ -156,8 +156,8 @@ class ApiCatalog(ApiParent):
 
         combo_parent = widget.objectName()
         combo_id = utils_giswater.get_item_data(self.dlg_catalog, widget)
-        # TODO cambiar por gw_api_getchilds
-        sql = f"SELECT gw_api_get_combochilds('catalog' ,'' ,'' ,'{combo_parent}', '{combo_id}','{geom_type}')"
+        # TODO cambiar por gw_fct_getchilds
+        sql = f"SELECT gw_fct_get_combochilds('catalog' ,'' ,'' ,'{combo_parent}', '{combo_id}','{geom_type}')"
         row = self.controller.get_row(sql, log_sql=True)
         for combo_child in row[0]['fields']:
             if combo_child is not None:

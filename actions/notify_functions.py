@@ -167,7 +167,7 @@ class NotifyFunctions(ParentAction):
 
             feature = '"tableName":"' + str(layer_name) + '", "id":""'
             body = self.create_body(feature=feature)
-            result = self.controller.get_json('gw_api_getinfofromid', body)
+            result = self.controller.get_json('gw_fct_getinfofromid', body)
             if not result: continue
             for field in result['body']['data']['fields']:
                 _values = {}

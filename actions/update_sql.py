@@ -1246,7 +1246,7 @@ class UpdateSQL(ApiParent):
 
         extras += ', "isToolbox":false'
         body = self.create_body(extras=extras)
-        complet_result = self.controller.get_json('gw_api_gettoolbox', body, schema_name=self.schema, commit=False)
+        complet_result = self.controller.get_json('gw_fct_gettoolbox', body, schema_name=self.schema, commit=False)
         if not complet_result: return False
         self.populate_functions_dlg(self.dlg_import_inp, complet_result['body']['data'])
 

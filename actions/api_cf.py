@@ -63,7 +63,7 @@ class ApiCF(ApiParent, QObject):
         extras += f'"visibleLayers":{visible_layers}, '
         extras += f'"zoomScale":{scale_zoom} '
         body = self.create_body(extras=extras)
-        complet_list = self.controller.get_json('gw_api_getlayersfromcoordinates', body, log_sql=True)
+        complet_list = self.controller.get_json('gw_fct_getlayersfromcoordinates', body, log_sql=True)
         if not complet_list: return False
 
         # hide QMenu identify if no feature under mouse
@@ -218,7 +218,7 @@ class ApiCF(ApiParent, QObject):
             feature = f'"tableName":"{feature_cat.child_layer.lower()}"'
             extras += f', "coordinates":{{{point}}}'
             body = self.create_body(feature=feature, extras=extras)
-            function_name = 'gw_api_getfeatureinsert'
+            function_name = 'gw_fct_getfeatureinsert'
         # IF click over canvas
         elif point:
             visible_layer = self.get_visible_layers(as_list=True)
@@ -227,12 +227,12 @@ class ApiCF(ApiParent, QObject):
             extras += f', "visibleLayer":{visible_layer}'
             extras += f', "coordinates":{{"xcoord":{point.x()},"ycoord":{point.y()}, "zoomRatio":{scale_zoom}}}'
             body = self.create_body(extras=extras)
-            function_name = 'gw_api_getinfofromcoordinates'
+            function_name = 'gw_fct_getinfofromcoordinates'
         # IF come from QPushButtons node1 or node2 from custom form or RightButton
         elif feature_id:
             feature = f'"tableName":"{table_name}", "id":"{feature_id}"'
             body = self.create_body(feature=feature, extras=extras)
-            function_name = 'gw_api_getinfofromid'
+            function_name = 'gw_fct_getinfofromid'
 
         row = [self.controller.get_json(function_name, body, log_sql=True)]
         if not row or row[0] is False: return False, None
@@ -889,7 +889,7 @@ class ApiCF(ApiParent, QObject):
         self.load_settings(dlg_sections)
         feature = '"id":"'+self.feature_id+'"'
         body = self.create_body(feature=feature)
-        section_result = self.controller.get_json('gw_api_getinfocrossection', body)
+        section_result = self.controller.get_json('gw_fct_getinfocrossection', body)
         if not section_result: return False
         # Set image
         img = section_result['body']['data']['shapepng']
@@ -972,7 +972,7 @@ class ApiCF(ApiParent, QObject):
         feature += f'"tableName":"{p_table_id}"'
         extras = f'"fields":{my_json}, "reload":"{fields_reload}"'
         body = self.create_body(feature=feature, extras=extras)
-        result = self.controller.get_json('gw_api_setfields', body, log_sql=True)
+        result = self.controller.get_json('gw_fct_setfields', body, log_sql=True)
         if not result:
             return
 
@@ -2383,7 +2383,7 @@ class ApiCF(ApiParent, QObject):
         id_name = complet_result[0]['body']['feature']['idName']
         feature = f'"tableName":"{self.tablename}", "idName":"{id_name}", "id":"{self.feature_id}"'
         body = self.create_body(form, feature,  filter_fields)
-        complet_list = [self.controller.get_json('gw_api_getlist', body)]
+        complet_list = [self.controller.get_json('gw_fct_getlist', body)]
         if not complet_list: return False
         return complet_list
 
@@ -2471,7 +2471,7 @@ class ApiCF(ApiParent, QObject):
             feature += f'"idName":"{self.field_id}", '
             feature += f'"id":"{self.feature_id}"'
             body = self.create_body(form, feature, filter_fields='')
-            complet_list = self.controller.get_json('gw_api_getinfoplan', body)
+            complet_list = self.controller.get_json('gw_fct_getinfoplan', body)
             if not complet_list: return False
             result = complet_list['body']['data']
             if 'fields' not in result:

@@ -45,7 +45,7 @@ class ApiConfig(ApiParent):
 
         self.list_update = []
         body = self.create_body(form='"formName":"config"')
-        complet_list = self.controller.get_json('gw_api_getconfig', body, log_sql=True)
+        complet_list = self.controller.get_json('gw_fct_getconfig', body, log_sql=True)
         if not complet_list: return False
 
         self.dlg_config = ConfigUi()
@@ -421,10 +421,10 @@ class ApiConfig(ApiParent):
 
         combo_parent = widget.objectName()
         combo_id = utils_giswater.get_item_data(self.dlg_config, widget)
-        # TODO cambiar por gw_api_getchilds
-        sql = f"SELECT gw_api_get_combochilds('config' ,'' ,'' ,'{combo_parent}', '{combo_id}','')"
+        # TODO cambiar por gw_fct_getchilds
+        sql = f"SELECT gw_fct_get_combochilds('config' ,'' ,'' ,'{combo_parent}', '{combo_id}','')"
         row = self.controller.get_row(sql, log_sql=True)
-        #TODO::Refactor input and output for function "gw_api_get_combochilds" and refactor "row[0]['fields']"
+        #TODO::Refactor input and output for function "gw_fct_get_combochilds" and refactor "row[0]['fields']"
         for combo_child in row[0]['fields']:
             if combo_child is not None:
                 self.populate_child(combo_child)
@@ -535,7 +535,7 @@ class ApiConfig(ApiParent):
         my_json = json.dumps(self.list_update)
         extras = f'"fields":{my_json}'
         body = self.create_body(form='"formName":"config"', extras=extras)
-        result = self.controller.get_json('gw_api_setconfig', body, log_sql=True)
+        result = self.controller.get_json('gw_fct_setconfig', body, log_sql=True)
         if not result: return False
 
         message = "Values has been updated"
