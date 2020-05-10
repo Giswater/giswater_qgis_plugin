@@ -30,7 +30,7 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
 	delete FROM anl_mincut_arc_x_node where cur_user=current_user;
-	delete FROM anl_mincut_result_arc where result_id=result_id_arg;
+	delete FROM om_mincut_arc where result_id=result_id_arg;
 
 	-- fill the graf table
 	insert into anl_mincut_arc_x_node (
@@ -52,8 +52,8 @@ BEGIN
 	-- Init valves on graf table
 	UPDATE anl_mincut_arc_x_node 
 	SET flag1=2
-	FROM anl_mincut_result_valve WHERE result_id=result_id_arg AND (proposed=TRUE OR closed=TRUE)
-	AND anl_mincut_arc_x_node.node_id = anl_mincut_result_valve.node_id 
+	FROM om_mincut_valve WHERE result_id=result_id_arg AND (proposed=TRUE OR closed=TRUE)
+	AND anl_mincut_arc_x_node.node_id = om_mincut_valve.node_id 
 	AND cur_user=current_user;
 
 	-- init inlets
@@ -64,7 +64,7 @@ BEGIN
 		FROM config_mincut_inlet 
 		JOIN selector_expl ON selector_expl.expl_id=config_mincut_inlet.expl_id 
 		WHERE anl_mincut_arc_x_node.node_id=config_mincut_inlet.node_id 
-		AND anl_mincut_arc_x_node.node_id NOT IN (select node_id FROM anl_mincut_result_node WHERE result_id=result_id_arg)
+		AND anl_mincut_arc_x_node.node_id NOT IN (select node_id FROM om_mincut_node WHERE result_id=result_id_arg)
 		AND cur_user=current_user AND anl_mincut_arc_x_node.user_name=current_user; 
 	ELSE 
 		-- In only the p_node inlet
@@ -94,13 +94,13 @@ BEGIN
 	-- update to false the dry valves (water=0) on both sides
 	WITH result_valve_false AS (
 		SELECT 
-		anl_mincut_result_valve.node_id, sum(water) as sumwater FROM anl_mincut_arc_x_node, anl_mincut_result_valve 
+		om_mincut_valve.node_id, sum(water) as sumwater FROM anl_mincut_arc_x_node, om_mincut_valve 
 		where cur_user=current_user 
-		AND result_id=result_id_arg AND anl_mincut_result_valve.node_id=anl_mincut_arc_x_node.node_id_a
+		AND result_id=result_id_arg AND om_mincut_valve.node_id=anl_mincut_arc_x_node.node_id_a
 		group by 1)
 		
-		UPDATE anl_mincut_result_valve SET proposed=FALSE 
-		FROM result_valve_false WHERE result_valve_false.node_id=anl_mincut_result_valve.node_id
+		UPDATE om_mincut_valve SET proposed=FALSE 
+		FROM result_valve_false WHERE result_valve_false.node_id=om_mincut_valve.node_id
 		AND result_id=result_id_arg AND sumwater=0;
 	 
 	-- insert into result table the dry arcs (water=0)
@@ -112,9 +112,9 @@ BEGIN
 		GROUP BY arc_id, cur_user
 		having max(water) = 0 and cur_user=current_user)
 
-		insert into anl_mincut_result_arc (result_id, arc_id)
+		insert into om_mincut_arc (result_id, arc_id)
 		select distinct on (arc_id) result_id_arg, result_arc.arc_id
-		from result_arc left join anl_mincut_result_arc on result_arc.arc_id = anl_mincut_result_arc.arc_id;
+		from result_arc left join om_mincut_arc on result_arc.arc_id = om_mincut_arc.arc_id;
 
 		-- Working with the case of study of inlet dynamic sector analysis (om_mincut_analysis_dinletsector=true)
 		IF (SELECT value::boolean FROM config_param_user WHERE parameter='om_mincut_analysis_dinletsector' AND cur_user=current_user) IS TRUE THEN
@@ -129,7 +129,7 @@ BEGIN
 		
 			INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) 
 			SELECT  distinct on (result_arc.arc_id) 35, 'arc', result_arc.arc_id, p_node_id 
-			from result_arc left join SCHEMA_NAME.anl_mincut_result_arc on result_arc.arc_id = anl_mincut_result_arc.arc_id;
+			from result_arc left join SCHEMA_NAME.om_mincut_arc on result_arc.arc_id = om_mincut_arc.arc_id;
 		END IF;
 RETURN cont1;
 END;

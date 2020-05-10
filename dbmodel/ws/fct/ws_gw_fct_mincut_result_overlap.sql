@@ -70,12 +70,12 @@ BEGIN
 	-- get input data 
 	v_step :=  ((p_data ->>'data')::json->>'step')::text;
 	v_mincutid :=  ((p_data ->>'data')::json->>'result')::integer;
-	v_visiblelayer := '"v_anl_mincut_result_arc", "v_anl_mincut_result_node", "v_anl_mincut_result_connec", "v_anl_mincut_init_point"';
+	v_visiblelayer := '"v_om_mincut_arc", "v_om_mincut_node", "v_om_mincut_connec", "v_anl_mincut_init_point"';
 
 	-- Reset temporal tables
 	DELETE FROM audit_check_data WHERE fprocesscat_id = 116 and cur_user=current_user;
 
-	DELETE FROM anl_mincut_result_cat WHERE id=-2;
+	DELETE FROM om_mincut WHERE id=-2;
 
 	DELETE FROM anl_arc WHERE fprocesscat_id=116 and cur_user=current_user;
 	DELETE FROM anl_connec WHERE fprocesscat_id=116 and cur_user=current_user;
@@ -90,7 +90,7 @@ BEGIN
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (116, concat('--------------------------------------'));
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (116, concat('Minimun cut have been checked looking for overlaps againts other mincuts'));
 
-	SELECT * INTO v_mincutrec FROM anl_mincut_result_cat WHERE id = v_mincutid;
+	SELECT * INTO v_mincutrec FROM om_mincut WHERE id = v_mincutid;
 
 	IF v_step  = 'check' THEN
 
@@ -99,10 +99,10 @@ BEGIN
 		DELETE FROM anl_connec WHERE fprocesscat_id=31 and cur_user=current_user;
 		DELETE FROM anl_node WHERE fprocesscat_id=31 and cur_user=current_user;
 
-		SELECT count(*) INTO v_count FROM anl_mincut_result_arc WHERE result_id = v_mincutid;
+		SELECT count(*) INTO v_count FROM om_mincut_arc WHERE result_id = v_mincutid;
 	    
 		-- timedate overlap control
-		FOR v_rec IN SELECT * FROM anl_mincut_result_cat
+		FOR v_rec IN SELECT * FROM om_mincut
 		WHERE (forecast_start, forecast_end) OVERLAPS (v_mincutrec.forecast_start, v_mincutrec.forecast_end) AND id::text != v_mincutid::text
 		LOOP
 			-- if exist timedate overlap
@@ -118,18 +118,18 @@ BEGIN
 					IF v_overlaps IS FALSE THEN
 
 						-- create temp result for joined analysis
-						INSERT INTO anl_mincut_result_cat (id, work_order, mincut_state, mincut_class, expl_id, macroexpl_id) 
+						INSERT INTO om_mincut (id, work_order, mincut_state, mincut_class, expl_id, macroexpl_id) 
 						VALUES (-2, 'Conflict Mincut (system)', 2, 1, v_mincutrec.expl_id, v_mincutrec.macroexpl_id);
 
-						-- copying proposed valves and afected arcs from original mincut result to temp result into anl_mincut_result_valve 
-						v_querytext:='INSERT INTO anl_mincut_result_valve (result_id, node_id,  closed,  broken, unaccess, proposed, the_geom)
+						-- copying proposed valves and afected arcs from original mincut result to temp result into om_mincut_valve 
+						v_querytext:='INSERT INTO om_mincut_valve (result_id, node_id,  closed,  broken, unaccess, proposed, the_geom)
 							     SELECT '||v_conflict_id||', node_id,  closed,  broken, unaccess, proposed, the_geom 
-							     FROM anl_mincut_result_valve WHERE result_id='||v_mincutid||' AND proposed=TRUE';
+							     FROM om_mincut_valve WHERE result_id='||v_mincutid||' AND proposed=TRUE';
 						EXECUTE v_querytext;
 
-						v_querytext:='INSERT INTO anl_mincut_result_arc ( result_id, arc_id, the_geom)
+						v_querytext:='INSERT INTO om_mincut_arc ( result_id, arc_id, the_geom)
 							     SELECT '||v_conflict_id||', arc_id, the_geom 
-							     FROM anl_mincut_result_arc WHERE result_id='||v_mincutid;
+							     FROM om_mincut_arc WHERE result_id='||v_mincutid;
 						EXECUTE v_querytext;	
 
 						--identifing overlap
@@ -137,20 +137,20 @@ BEGIN
 					END IF;
 
 					-- copying proposed valves and afected arcs from overlaped mincut result 
-					v_querytext:='INSERT INTO anl_mincut_result_valve ( result_id, node_id,  closed,  broken, unaccess, proposed, the_geom)
+					v_querytext:='INSERT INTO om_mincut_valve ( result_id, node_id,  closed,  broken, unaccess, proposed, the_geom)
 						     SELECT '||v_conflict_id||', node_id,  closed,  broken, unaccess, proposed, the_geom 
-						     FROM anl_mincut_result_valve WHERE result_id='||v_rec.id||' AND proposed=TRUE
+						     FROM om_mincut_valve WHERE result_id='||v_rec.id||' AND proposed=TRUE
 						     ON conflict (result_id, node_id) DO NOTHING';     
 					EXECUTE v_querytext;
 
-					v_querytext:='INSERT INTO anl_mincut_result_arc ( result_id, arc_id, the_geom)
+					v_querytext:='INSERT INTO om_mincut_arc ( result_id, arc_id, the_geom)
 						     SELECT '||v_conflict_id||', arc_id, the_geom 
-						     FROM anl_mincut_result_arc WHERE result_id='||v_rec.id||'
+						     FROM om_mincut_arc WHERE result_id='||v_rec.id||'
 						     ON conflict (result_id, arc_id) DO NOTHING';     
 					EXECUTE v_querytext;	
 
 					-- count arc_id afected on the overlaped mincut result
-					v_count:=v_count+(SELECT count(*) FROM anl_mincut_result_arc WHERE result_id=v_rec.id);
+					v_count:=v_count+(SELECT count(*) FROM om_mincut_arc WHERE result_id=v_rec.id);
 
 					-- Storing information about possible conflict
 					IF v_conflictmsg IS NULL THEN
@@ -173,7 +173,7 @@ BEGIN
 			raise notice 'Execute mincut again mixing overlaped valves';
 			PERFORM gw_fct_mincut_inverted_flowtrace (v_conflict_id);
 
-			v_count2:=(SELECT count(*) FROM anl_mincut_result_arc WHERE result_id=v_conflict_id) ;
+			v_count2:=(SELECT count(*) FROM om_mincut_arc WHERE result_id=v_conflict_id) ;
 			
 			IF v_count < v_count2 THEN -- check for overlaps with additional affectations
 
@@ -184,18 +184,18 @@ BEGIN
 				-- insert conflict mincuts (result_id = all mincuts intersected with current mincut)
 				EXECUTE 'INSERT INTO anl_arc (arc_id, fprocesscat_id, expl_id, cur_user, the_geom, result_id, descript) 
 					SELECT DISTINCT ON (arc_id) arc_id, 31, expl_id, current_user, a.the_geom, result_id, ''Opposite mincuts'' 
-					FROM anl_mincut_result_arc JOIN arc a USING (arc_id) WHERE result_id IN ('||v_querytext||')';
+					FROM om_mincut_arc JOIN arc a USING (arc_id) WHERE result_id IN ('||v_querytext||')';
 
 				-- insert current mincut (result_id = current mincut)
 				INSERT INTO anl_arc (arc_id, fprocesscat_id, expl_id, cur_user, the_geom, result_id, descript) 
 					SELECT DISTINCT ON (arc_id) arc_id, 31, expl_id, current_user, a.the_geom, result_id, 'Current mincut' 
-					FROM anl_mincut_result_arc JOIN arc a USING (arc_id) WHERE result_id = v_mincutid;
+					FROM om_mincut_arc JOIN arc a USING (arc_id) WHERE result_id = v_mincutid;
 
 				-- insert additional affectations (result_id =-2)
 				EXECUTE 'INSERT INTO anl_arc (arc_id, fprocesscat_id, expl_id, cur_user, the_geom, result_id, descript) 
 					SELECT DISTINCT ON (arc_id) arc_id, 31, expl_id, current_user, a.the_geom, result_id, ''Additional affectation''
-					FROM anl_mincut_result_arc JOIN arc a USING (arc_id)  WHERE result_id::integer = '||v_conflict_id||' AND a.arc_id NOT IN 
-					(SELECT arc_id FROM anl_mincut_result_arc WHERE result_id IN ('||v_querytext||') UNION SELECT arc_id FROM anl_mincut_result_arc WHERE result_id = '||v_mincutid||')';
+					FROM om_mincut_arc JOIN arc a USING (arc_id)  WHERE result_id::integer = '||v_conflict_id||' AND a.arc_id NOT IN 
+					(SELECT arc_id FROM om_mincut_arc WHERE result_id IN ('||v_querytext||') UNION SELECT arc_id FROM om_mincut_arc WHERE result_id = '||v_mincutid||')';
 
 				-- getting the number of connecs with additional affectation
 				EXECUTE 'SELECT count(*) FROM v_edit_connec JOIN anl_arc USING (arc_id) WHERE fprocesscat_id = 31 AND result_id::integer = '||v_conflict_id
@@ -210,8 +210,8 @@ BEGIN
 					-- insert additional connecs
 					EXECUTE 'INSERT INTO anl_connec (connec_id, fprocesscat_id, expl_id, cur_user, the_geom, result_id, descript) 
 						SELECT DISTINCT ON (connec_id) connec_id, 31, expl_id, current_user, a.the_geom, result_id, '||quote_literal(v_message)||'
-						FROM anl_mincut_result_arc JOIN connec a USING (arc_id)  WHERE result_id = '||v_conflict_id||' AND a.arc_id NOT IN 
-						(SELECT arc_id FROM anl_mincut_result_arc WHERE result_id IN ('||v_querytext||') UNION SELECT arc_id FROM anl_mincut_result_arc WHERE result_id = '||v_mincutid||')';
+						FROM om_mincut_arc JOIN connec a USING (arc_id)  WHERE result_id = '||v_conflict_id||' AND a.arc_id NOT IN 
+						(SELECT arc_id FROM om_mincut_arc WHERE result_id IN ('||v_querytext||') UNION SELECT arc_id FROM om_mincut_arc WHERE result_id = '||v_mincutid||')';
 
 					-- info
 					INSERT INTO audit_check_data (fprocesscat_id, error_message) 
@@ -255,8 +255,8 @@ BEGIN
 					-- insert conflict arcs
 					v_querytext =  'INSERT INTO anl_arc (arc_id, fprocesscat_id, expl_id, cur_user, the_geom, result_id) 
 						SELECT DISTINCT ON (arc_id) arc_id, 31, expl_id, current_user, a.the_geom, '||v_id||' 
-						FROM anl_mincut_result_arc JOIN arc a USING (arc_id)  WHERE result_id = '||v_mincutid||' AND a.arc_id IN 
-						(SELECT arc_id FROM anl_mincut_result_arc WHERE result_id = '||v_id||')';
+						FROM om_mincut_arc JOIN arc a USING (arc_id)  WHERE result_id = '||v_mincutid||' AND a.arc_id IN 
+						(SELECT arc_id FROM om_mincut_arc WHERE result_id = '||v_id||')';
 
 					EXECUTE v_querytext;
 				END LOOP;
@@ -291,8 +291,8 @@ BEGIN
 				END IF;			
 			END IF;
 
-			DELETE FROM  anl_mincut_result_cat WHERE id=v_conflict_id;
-			PERFORM setval('SCHEMA_NAME.anl_mincut_result_cat_seq', (select max(id) from anl_mincut_result_cat) , true);  
+			DELETE FROM  om_mincut WHERE id=v_conflict_id;
+			PERFORM setval('SCHEMA_NAME.om_mincut_seq', (select max(id) from om_mincut) , true);  
 
 		ELSE -- There is no temporal overlap on same exploitaiton
 
@@ -364,8 +364,8 @@ BEGIN
 		v_result_pol = concat ('{"geometryType":"MultiPolygon", "layerName":"Overlap affected arcs", "qmlPath":"',v_qmlpolygonpath,'", "features":',v_result, '}'); 
 
 		-- geometry (the boundary of mincut using arcs and valves)
-		EXECUTE ' SELECT st_astext(st_envelope(st_extent(st_buffer(the_geom,20)))) FROM (SELECT the_geom FROM anl_mincut_result_arc WHERE result_id='||v_mincutid||
-		' UNION SELECT the_geom FROM anl_mincut_result_valve WHERE result_id='||v_mincutid||') a'    
+		EXECUTE ' SELECT st_astext(st_envelope(st_extent(st_buffer(the_geom,20)))) FROM (SELECT the_geom FROM om_mincut_arc WHERE result_id='||v_mincutid||
+		' UNION SELECT the_geom FROM om_mincut_valve WHERE result_id='||v_mincutid||') a'    
 	        INTO v_geometry;
 		
 		-- Control nulls
@@ -390,36 +390,36 @@ BEGIN
 	ELSIF v_step  = 'continue' THEN
 	
 		-- update mincut details
-		INSERT INTO anl_mincut_result_arc (arc_id, result_id, the_geom)	
+		INSERT INTO om_mincut_arc (arc_id, result_id, the_geom)	
 		SELECT arc_id, v_mincutid, the_geom FROM anl_arc WHERE fprocesscat_id = 31 AND cur_user = current_user AND result_id = '-2'
 		ON CONFLICT (arc_id, result_id) DO NOTHING;
 	
-		INSERT INTO anl_mincut_result_connec (connec_id, result_id, the_geom)
+		INSERT INTO om_mincut_connec (connec_id, result_id, the_geom)
 		SELECT connec_id, v_mincutid, the_geom FROM anl_connec WHERE fprocesscat_id = 31 AND cur_user = current_user AND result_id = '-2'
 		ON CONFLICT (connec_id, result_id) DO NOTHING;
 
-		INSERT INTO anl_mincut_result_hydrometer (result_id, hydrometer_id)
+		INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
 		SELECT v_mincutid,rtc_hydrometer_x_connec.hydrometer_id FROM rtc_hydrometer_x_connec 
-		JOIN anl_mincut_result_connec ON rtc_hydrometer_x_connec.connec_id=anl_mincut_result_connec.connec_id 
+		JOIN om_mincut_connec ON rtc_hydrometer_x_connec.connec_id=om_mincut_connec.connec_id 
 		LEFT JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_connec.hydrometer_id
 		WHERE result_id=v_mincutid
 		ON CONFLICT (hydrometer_id, result_id) DO NOTHING;
 
 		-- count arcs
-		SELECT count(arc_id), sum(st_length(arc.the_geom))::numeric(12,2) INTO v_numarcs, v_length FROM anl_mincut_result_arc JOIN arc USING (arc_id) WHERE result_id=v_mincutid group by result_id;
-		SELECT sum(area*st_length(arc.the_geom))::numeric(12,2) INTO v_volume FROM anl_mincut_result_arc JOIN arc USING (arc_id) JOIN cat_arc ON arccat_id=cat_arc.id WHERE result_id=v_mincutid group by result_id, arccat_id;
+		SELECT count(arc_id), sum(st_length(arc.the_geom))::numeric(12,2) INTO v_numarcs, v_length FROM om_mincut_arc JOIN arc USING (arc_id) WHERE result_id=v_mincutid group by result_id;
+		SELECT sum(area*st_length(arc.the_geom))::numeric(12,2) INTO v_volume FROM om_mincut_arc JOIN arc USING (arc_id) JOIN cat_arc ON arccat_id=cat_arc.id WHERE result_id=v_mincutid group by result_id, arccat_id;
 
 		-- count connec
-		SELECT count(connec_id) INTO v_numconnecs FROM connec JOIN anl_mincut_result_arc ON connec.arc_id=anl_mincut_result_arc.arc_id WHERE result_id=v_mincutid AND state=1;
+		SELECT count(connec_id) INTO v_numconnecs FROM connec JOIN om_mincut_arc ON connec.arc_id=om_mincut_arc.arc_id WHERE result_id=v_mincutid AND state=1;
 
 		-- count hydrometers
-		SELECT count (rtc_hydrometer_x_connec.hydrometer_id) INTO v_numhydrometer FROM rtc_hydrometer_x_connec JOIN anl_mincut_result_connec ON rtc_hydrometer_x_connec.connec_id=anl_mincut_result_connec.connec_id 
+		SELECT count (rtc_hydrometer_x_connec.hydrometer_id) INTO v_numhydrometer FROM rtc_hydrometer_x_connec JOIN om_mincut_connec ON rtc_hydrometer_x_connec.connec_id=om_mincut_connec.connec_id 
 		JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_connec.hydrometer_id
 		JOIN connec ON connec.connec_id=v_rtc_hydrometer.connec_id WHERE result_id=v_mincutid;
 
 		-- priority hydrometers
 		v_priority = 	(SELECT (array_to_json(array_agg((b)))) FROM (SELECT concat('{"category":"',category_id,'","number":"', count(rtc_hydrometer_x_connec.hydrometer_id), '"}')::json as b FROM rtc_hydrometer_x_connec 
-				JOIN anl_mincut_result_connec ON rtc_hydrometer_x_connec.connec_id=anl_mincut_result_connec.connec_id 
+				JOIN om_mincut_connec ON rtc_hydrometer_x_connec.connec_id=om_mincut_connec.connec_id 
 				JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_connec.hydrometer_id
 				JOIN connec ON connec.connec_id=v_rtc_hydrometer.connec_id WHERE result_id=v_mincutid GROUP BY category_id ORDER BY category_id)a);
 				
@@ -431,8 +431,8 @@ BEGIN
 		v_output = concat ('{', v_mincutdetails , '}');
 			
 		--update output results and gettin it
-		UPDATE anl_mincut_result_cat SET output = v_output WHERE id = v_mincutid;
-		SELECT * INTO v_mincutrec FROM anl_mincut_result_cat WHERE id=v_mincutid;
+		UPDATE om_mincut SET output = v_output WHERE id = v_mincutid;
+		SELECT * INTO v_mincutrec FROM om_mincut WHERE id=v_mincutid;
 
 		-- creating log
 		INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (116, 'WARNING: Mincut have been executed with conflicts. All additional affetations have been joined to present mincut');
@@ -455,8 +455,8 @@ BEGIN
 		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
 		-- geometry (the boundary of mincut using arcs and valves)
-		EXECUTE ' SELECT st_astext(st_envelope(st_extent(st_buffer(the_geom,20)))) FROM (SELECT the_geom FROM anl_mincut_result_arc WHERE result_id='||v_mincutid||
-		' UNION SELECT the_geom FROM anl_mincut_result_valve WHERE result_id='||v_mincutid||') a'    
+		EXECUTE ' SELECT st_astext(st_envelope(st_extent(st_buffer(the_geom,20)))) FROM (SELECT the_geom FROM om_mincut_arc WHERE result_id='||v_mincutid||
+		' UNION SELECT the_geom FROM om_mincut_valve WHERE result_id='||v_mincutid||') a'    
 	        INTO v_geometry;
 
 		-- Control nulls

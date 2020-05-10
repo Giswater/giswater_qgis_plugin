@@ -33,9 +33,9 @@ BEGIN
 
 		IF v_valvemode = 3 THEN	--mincut results
 			UPDATE temp_arc SET status='CLOSED' 
-				FROM (SELECT arc_id FROM temp_arc join anl_mincut_result_valve ON node_id=node_1 AND result_id=v_mincutresult AND (proposed IS TRUE OR closed IS TRUE)
+				FROM (SELECT arc_id FROM temp_arc join om_mincut_valve ON node_id=node_1 AND result_id=v_mincutresult AND (proposed IS TRUE OR closed IS TRUE)
 					UNION
-					SELECT arc_id FROM temp_arc join anl_mincut_result_valve ON node_id=node_2 AND result_id=v_mincutresult AND (proposed IS TRUE OR closed IS TRUE)
+					SELECT arc_id FROM temp_arc join om_mincut_valve ON node_id=node_2 AND result_id=v_mincutresult AND (proposed IS TRUE OR closed IS TRUE)
 					) a 
 				WHERE a.arc_id=temp_arc.arc_id;
 
@@ -66,7 +66,7 @@ BEGIN
 				WHERE a.arc_id=concat(v.node_id,'_n2a') AND closed=false;
 		
 			UPDATE temp_arc a SET status='CLOSED' 
-			FROM anl_mincut_result_valve v
+			FROM om_mincut_valve v
 			WHERE a.arc_id=concat(v.node_id,'_n2a') AND v.result_id = v_mincutresult AND (proposed IS TRUE OR closed IS TRUE);
 			
 		ELSIF v_valvemode = 2 THEN -- inventory
@@ -89,7 +89,7 @@ BEGIN
     
     -- Reset demands if node is into mincut affectation
     IF v_valvemode = 3 THEN
-		UPDATE temp_node SET demand=0 WHERE temp_node.node_id IN (SELECT node_id FROM anl_mincut_result_node WHERE result_id=v_mincutresult) ;
+		UPDATE temp_node SET demand=0 WHERE temp_node.node_id IN (SELECT node_id FROM om_mincut_node WHERE result_id=v_mincutresult) ;
     END IF; 
 
     -- all that not are closed are open

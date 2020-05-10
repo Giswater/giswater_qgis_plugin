@@ -97,7 +97,7 @@ BEGIN
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, concat('----------------------------------------------------------------------'));
 
 	
-	INSERT INTO anl_mincut_result_cat VALUES (-1, 'Massive Mincut (system)') ON CONFLICT (id) DO nothing;
+	INSERT INTO om_mincut VALUES (-1, 'Massive Mincut (system)') ON CONFLICT (id) DO nothing;
 
 	-- reset selectors
 	DELETE FROM selector_state WHERE cur_user=current_user;
@@ -145,19 +145,19 @@ BEGIN
 		
 			-- insert results into audit table
 			INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message)
-			SELECT 49, v_arc, concat('"minsector_id":"',v_arc,'","node_id":"',node_id,'"') FROM anl_mincut_result_node WHERE result_id=-1;
+			SELECT 49, v_arc, concat('"minsector_id":"',v_arc,'","node_id":"',node_id,'"') FROM om_mincut_node WHERE result_id=-1;
 
 			INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message)
-			SELECT 49, v_arc, concat('"minsector_id":"',v_arc,'","arc_id":"',arc_id,'"') FROM anl_mincut_result_arc WHERE result_id=-1;
+			SELECT 49, v_arc, concat('"minsector_id":"',v_arc,'","arc_id":"',arc_id,'"') FROM om_mincut_arc WHERE result_id=-1;
 		
 			INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message)
-			SELECT 49, v_arc, concat('"minsector_id":"',v_arc,'","connec_id":"',connec_id,'"') FROM anl_mincut_result_connec WHERE result_id=-1;
+			SELECT 49, v_arc, concat('"minsector_id":"',v_arc,'","connec_id":"',connec_id,'"') FROM om_mincut_connec WHERE result_id=-1;
 
 			INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message)
-			SELECT 49, v_arc, concat('"minsector_id":"',v_arc,'","valve_id":"',node_id,'"') FROM anl_mincut_result_valve WHERE result_id=-1;
+			SELECT 49, v_arc, concat('"minsector_id":"',v_arc,'","valve_id":"',node_id,'"') FROM om_mincut_valve WHERE result_id=-1;
 		
 			INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message)
-			SELECT 49, v_arc, concat('"minsector_id":"',v_arc,'","hydrometer_id":"',hydrometer_id,'"') FROM anl_mincut_result_hydrometer WHERE result_id=-1;
+			SELECT 49, v_arc, concat('"minsector_id":"',v_arc,'","hydrometer_id":"',hydrometer_id,'"') FROM om_mincut_hydrometer WHERE result_id=-1;
 
 		END LOOP;
 

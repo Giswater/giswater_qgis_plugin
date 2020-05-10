@@ -11,7 +11,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut( element_id_arg character v
 $BODY$
 
 /*EXAMPLE
-INSERT INTO SCHEMA_NAME.anl_mincut_result_cat VALUES (1);
+INSERT INTO SCHEMA_NAME.om_mincut VALUES (1);
 SELECT SCHEMA_NAME.gw_fct_mincut('2001', 'arc', 1)
 */
 
@@ -77,12 +77,12 @@ BEGIN
     IF v_debug THEN
 	RAISE NOTICE '1-Delete previous data from same result_id';
     END IF;
-    DELETE FROM "anl_mincut_result_node" where result_id=result_id_arg;
-    DELETE FROM "anl_mincut_result_arc" where result_id=result_id_arg;
-    DELETE FROM "anl_mincut_result_polygon" where result_id=result_id_arg;
-    DELETE FROM "anl_mincut_result_connec" where result_id=result_id_arg;
-    DELETE FROM "anl_mincut_result_hydrometer" where result_id=result_id_arg; 
-    DELETE FROM "anl_mincut_result_valve" where result_id=result_id_arg;
+    DELETE FROM "om_mincut_node" where result_id=result_id_arg;
+    DELETE FROM "om_mincut_arc" where result_id=result_id_arg;
+    DELETE FROM "om_mincut_polygon" where result_id=result_id_arg;
+    DELETE FROM "om_mincut_connec" where result_id=result_id_arg;
+    DELETE FROM "om_mincut_hydrometer" where result_id=result_id_arg; 
+    DELETE FROM "om_mincut_valve" where result_id=result_id_arg;
 
     IF v_debug THEN
 	RAISE NOTICE '2-Identification exploitation, macroexploitation and municipality';
@@ -97,7 +97,7 @@ BEGIN
     
     SELECT macroexpl_id INTO macroexpl_id_arg FROM exploitation WHERE expl_id=expl_id_arg;
 
-    UPDATE anl_mincut_result_cat SET muni_id=v_muni_id WHERE id=result_id_arg;
+    UPDATE om_mincut SET muni_id=v_muni_id WHERE id=result_id_arg;
     
     IF v_debug THEN
 	RAISE NOTICE '3-Update user selectors';
@@ -120,24 +120,24 @@ BEGIN
     IF v_debug THEN
 	RAISE NOTICE '4-update values of mincut cat table';
     END IF;
-    UPDATE anl_mincut_result_cat SET expl_id=expl_id_arg WHERE id=result_id_arg;
-    UPDATE anl_mincut_result_cat SET macroexpl_id=macroexpl_id_arg WHERE id=result_id_arg;
+    UPDATE om_mincut SET expl_id=expl_id_arg WHERE id=result_id_arg;
+    UPDATE om_mincut SET macroexpl_id=macroexpl_id_arg WHERE id=result_id_arg;
 
     IF v_debug THEN
 	RAISE NOTICE '5-Start mincut process';
     END IF;     
-    INSERT INTO anl_mincut_result_valve (result_id, node_id, unaccess, closed, broken, the_geom) 
+    INSERT INTO om_mincut_valve (result_id, node_id, unaccess, closed, broken, the_geom) 
     SELECT result_id_arg, node.node_id, false::boolean, closed, broken, node.the_geom
-    FROM v_anl_mincut_selected_valve
-    JOIN node on node.node_id=v_anl_mincut_selected_valve.node_id
+    FROM v_om_mincut_selected_valve
+    JOIN node on node.node_id=v_om_mincut_selected_valve.node_id
     JOIN exploitation ON node.expl_id=exploitation.expl_id
     WHERE macroexpl_id=macroexpl_id_arg;
 
     IF v_debug THEN
 	RAISE NOTICE '6-Identify unaccess valves';
     END IF;
-    UPDATE anl_mincut_result_valve SET unaccess=true, proposed = false WHERE result_id=result_id_arg AND node_id IN 
-    (SELECT node_id FROM anl_mincut_result_valve_unaccess WHERE result_id=result_id_arg);
+    UPDATE om_mincut_valve SET unaccess=true, proposed = false WHERE result_id=result_id_arg AND node_id IN 
+    (SELECT node_id FROM om_mincut_valve_unaccess WHERE result_id=result_id_arg);
 
      -- The element to isolate could be an arc or a node
     IF type_element_arg = 'arc' OR type_element_arg='ARC' THEN
@@ -167,7 +167,7 @@ BEGIN
 		ELSIF v_mincutversion = 3 THEN
 		
 			-- insert the initial arc
-			INSERT INTO anl_mincut_result_arc (arc_id, the_geom, result_id) 
+			INSERT INTO om_mincut_arc (arc_id, the_geom, result_id) 
 			SELECT arc_id, the_geom, result_id_arg FROM arc WHERE arc_id = element_id_arg;
  	
 			-- Run for extremes node
@@ -180,12 +180,12 @@ BEGIN
     
 
 			-- Check extreme being a valve
-			SELECT COUNT(*) INTO controlValue FROM anl_mincut_result_valve 
+			SELECT COUNT(*) INTO controlValue FROM om_mincut_valve 
 			WHERE node_id = node_1_aux AND result_id=result_id_arg AND ((unaccess = FALSE AND broken = FALSE) OR (closed = TRUE));
 
 			IF controlValue = 1 THEN
 				-- Set proposed valve
-				UPDATE anl_mincut_result_valve SET proposed = TRUE WHERE node_id=node_1_aux AND result_id=result_id_arg;
+				UPDATE om_mincut_valve SET proposed = TRUE WHERE node_id=node_1_aux AND result_id=result_id_arg;
 				
 			ELSE
 				-- Check if extreme if being a inlet
@@ -196,23 +196,23 @@ BEGIN
 					PERFORM gw_fct_mincut_engine(node_1_aux, result_id_arg);	
 				ELSE
 					SELECT the_geom INTO node_aux FROM v_edit_node WHERE node_id = node_1_aux;
-					INSERT INTO anl_mincut_result_node (node_id, the_geom, result_id) VALUES (node_1_aux, node_aux, result_id_arg);	
+					INSERT INTO om_mincut_node (node_id, the_geom, result_id) VALUES (node_1_aux, node_aux, result_id_arg);	
 				END IF;
 			END IF;
 
 			-- Check other extreme being a valve
-			SELECT COUNT(*) INTO controlValue FROM anl_mincut_result_valve 
+			SELECT COUNT(*) INTO controlValue FROM om_mincut_valve 
 			WHERE node_id = node_2_aux AND result_id=result_id_arg AND ((unaccess = FALSE AND broken = FALSE) OR (closed = TRUE));
 			IF controlValue = 1 THEN
 
 				-- Check if the valve is already computed
-				SELECT node_id INTO exists_id FROM anl_mincut_result_valve 
+				SELECT node_id INTO exists_id FROM om_mincut_valve 
 				WHERE node_id = node_2_aux AND (proposed = TRUE) AND result_id=result_id_arg;
 	
 				-- Compute proceed
 				IF NOT FOUND THEN
 					-- Set proposed valve
-					UPDATE anl_mincut_result_valve SET proposed = TRUE 
+					UPDATE om_mincut_valve SET proposed = TRUE 
 					WHERE node_id=node_2_aux AND result_id=result_id_arg;
 				END IF;
 			ELSE
@@ -223,7 +223,7 @@ BEGIN
 					PERFORM gw_fct_mincut_engine(node_2_aux, result_id_arg);	
 				ELSE 
 					SELECT the_geom INTO node_aux FROM v_edit_node WHERE node_id = node_2_aux;
-					INSERT INTO anl_mincut_result_node (node_id, the_geom, result_id) VALUES(node_2_aux, node_aux, result_id_arg);		
+					INSERT INTO om_mincut_node (node_id, the_geom, result_id) VALUES(node_2_aux, node_aux, result_id_arg);		
 				END IF;	
 			END IF;
 			
@@ -246,12 +246,12 @@ BEGIN
 
 	IF v_debug THEN RAISE NOTICE '8-Delete valves not proposed, not unaccessible, not closed and not broken'; END IF;
 	
-	DELETE FROM anl_mincut_result_valve WHERE node_id NOT IN (SELECT node_1 FROM arc JOIN anl_mincut_result_arc ON anl_mincut_result_arc.arc_id=arc.arc_id 
+	DELETE FROM om_mincut_valve WHERE node_id NOT IN (SELECT node_1 FROM arc JOIN om_mincut_arc ON om_mincut_arc.arc_id=arc.arc_id 
 					WHERE result_id=result_id_arg UNION 
-					SELECT node_2 FROM arc JOIN anl_mincut_result_arc ON anl_mincut_result_arc.arc_id=arc.arc_id WHERE result_id=result_id_arg)
+					SELECT node_2 FROM arc JOIN om_mincut_arc ON om_mincut_arc.arc_id=arc.arc_id WHERE result_id=result_id_arg)
 					AND result_id=result_id_arg;
 					
-	UPDATE anl_mincut_result_valve SET proposed = FALSE WHERE closed = TRUE AND result_id=result_id_arg ;
+	UPDATE om_mincut_valve SET proposed = FALSE WHERE closed = TRUE AND result_id=result_id_arg ;
 
 
 	IF v_debug THEN	RAISE NOTICE '10-Update mincut selector'; END IF;
@@ -269,35 +269,35 @@ BEGIN
 		INSERT INTO selector_mincut_result(cur_user, result_id) VALUES (v_publish_user, result_id_arg);
 	END IF;	
 	
-	IF v_debug THEN	RAISE NOTICE '11-Insert into anl_mincut_result_connec table ';	END IF;			
+	IF v_debug THEN	RAISE NOTICE '11-Insert into om_mincut_connec table ';	END IF;			
 	
-	INSERT INTO anl_mincut_result_connec (result_id, connec_id, the_geom)
-	SELECT result_id_arg, connec_id, connec.the_geom FROM connec JOIN anl_mincut_result_arc ON connec.arc_id=anl_mincut_result_arc.arc_id WHERE result_id=result_id_arg AND state=1;
+	INSERT INTO om_mincut_connec (result_id, connec_id, the_geom)
+	SELECT result_id_arg, connec_id, connec.the_geom FROM connec JOIN om_mincut_arc ON connec.arc_id=om_mincut_arc.arc_id WHERE result_id=result_id_arg AND state=1;
 
-	IF v_debug THEN RAISE NOTICE '12-Insert into anl_mincut_result_hydrometer table ';	END IF;
+	IF v_debug THEN RAISE NOTICE '12-Insert into om_mincut_hydrometer table ';	END IF;
 	
-	INSERT INTO anl_mincut_result_hydrometer (result_id, hydrometer_id)
+	INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
 	SELECT result_id_arg,rtc_hydrometer_x_connec.hydrometer_id FROM rtc_hydrometer_x_connec 
-	JOIN anl_mincut_result_connec ON rtc_hydrometer_x_connec.connec_id=anl_mincut_result_connec.connec_id 
+	JOIN om_mincut_connec ON rtc_hydrometer_x_connec.connec_id=om_mincut_connec.connec_id 
 	LEFT JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_connec.hydrometer_id
 	WHERE result_id=result_id_arg;
 
 	-- Insert hazard values on audit_log_data table
 	-- count arcs
-	SELECT count(arc_id), sum(st_length(arc.the_geom))::numeric(12,2) INTO v_numarcs, v_length FROM anl_mincut_result_arc JOIN arc USING (arc_id) WHERE result_id=result_id_arg group by result_id;
-	SELECT sum(area*st_length(arc.the_geom))::numeric(12,2) INTO v_volume FROM anl_mincut_result_arc JOIN arc USING (arc_id) JOIN cat_arc ON arccat_id=cat_arc.id WHERE result_id=result_id_arg group by result_id, arccat_id;
+	SELECT count(arc_id), sum(st_length(arc.the_geom))::numeric(12,2) INTO v_numarcs, v_length FROM om_mincut_arc JOIN arc USING (arc_id) WHERE result_id=result_id_arg group by result_id;
+	SELECT sum(area*st_length(arc.the_geom))::numeric(12,2) INTO v_volume FROM om_mincut_arc JOIN arc USING (arc_id) JOIN cat_arc ON arccat_id=cat_arc.id WHERE result_id=result_id_arg group by result_id, arccat_id;
 
 	-- count connec
-	SELECT count(connec_id) INTO v_numconnecs FROM connec JOIN anl_mincut_result_arc ON connec.arc_id=anl_mincut_result_arc.arc_id WHERE result_id=result_id_arg AND state=1;
+	SELECT count(connec_id) INTO v_numconnecs FROM connec JOIN om_mincut_arc ON connec.arc_id=om_mincut_arc.arc_id WHERE result_id=result_id_arg AND state=1;
 
 	-- count hydrometers
-	SELECT count (rtc_hydrometer_x_connec.hydrometer_id) INTO v_numhydrometer FROM rtc_hydrometer_x_connec JOIN anl_mincut_result_connec ON rtc_hydrometer_x_connec.connec_id=anl_mincut_result_connec.connec_id 
+	SELECT count (rtc_hydrometer_x_connec.hydrometer_id) INTO v_numhydrometer FROM rtc_hydrometer_x_connec JOIN om_mincut_connec ON rtc_hydrometer_x_connec.connec_id=om_mincut_connec.connec_id 
 	JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_connec.hydrometer_id
 	JOIN connec ON connec.connec_id=v_rtc_hydrometer.connec_id WHERE result_id=result_id_arg;
 
 	-- priority hydrometers
 	v_priority = 	(SELECT (array_to_json(array_agg((b)))) FROM (SELECT concat('{"category":"',category_id,'","number":"', count(rtc_hydrometer_x_connec.hydrometer_id), '"}')::json as b FROM rtc_hydrometer_x_connec 
-			JOIN anl_mincut_result_connec ON rtc_hydrometer_x_connec.connec_id=anl_mincut_result_connec.connec_id 
+			JOIN om_mincut_connec ON rtc_hydrometer_x_connec.connec_id=om_mincut_connec.connec_id 
 			JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_connec.hydrometer_id
 			JOIN connec ON connec.connec_id=v_rtc_hydrometer.connec_id WHERE result_id=result_id_arg GROUP BY category_id ORDER BY category_id)a);
 				
@@ -311,11 +311,11 @@ BEGIN
 	INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) VALUES (29, 'arc', element_id_arg, v_output);
 
 	--update output results
-	UPDATE anl_mincut_result_cat SET output = v_output WHERE id = result_id_arg;
+	UPDATE om_mincut SET output = v_output WHERE id = result_id_arg;
 
 	-- calculate the boundary of mincut using arcs and valves
-	EXECUTE ' SELECT st_astext(st_envelope(st_extent(st_buffer(the_geom,20)))) FROM (SELECT the_geom FROM anl_mincut_result_arc WHERE result_id='||result_id_arg||
-		' UNION SELECT the_geom FROM anl_mincut_result_valve WHERE result_id='||result_id_arg||') a'    
+	EXECUTE ' SELECT st_astext(st_envelope(st_extent(st_buffer(the_geom,20)))) FROM (SELECT the_geom FROM om_mincut_arc WHERE result_id='||result_id_arg||
+		' UNION SELECT the_geom FROM om_mincut_valve WHERE result_id='||result_id_arg||') a'    
 	        INTO v_geometry;
 
 	RAISE NOTICE 'v_output %', v_output;
@@ -346,7 +346,7 @@ BEGIN
      v_return = ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
-		     	'"setVisibleLayers":["v_anl_mincut_init_point", "v_anl_mincut_result_arc", "v_anl_mincut_result_node", "v_anl_mincut_result_valve", "v_anl_mincut_result_connec"]'||','||
+		     	'"setVisibleLayers":["v_om_mincut_initpoint", "v_om_mincut_arc", "v_om_mincut_node", "v_om_mincut_valve", "v_om_mincut_connec"]'||','||
 				'"point":'||v_result_point||','||
 				'"line":'||v_result_line||','||
 				'"polygon":'||v_result_polygon||'}'||
