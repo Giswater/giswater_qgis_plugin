@@ -7,12 +7,13 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE:2504
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_csv2pg_import_dxfblock(integer);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_dxfblock(p_data json)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_csv2pg_import_dxfblock(json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_import_dxfblock(p_data json)
 RETURNS json AS
 $BODY$
 
 /*
-SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_dxfblock($${
+SELECT SCHEMA_NAME.gw_fct_import_dxfblock($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{},"data":{}}$$)
 

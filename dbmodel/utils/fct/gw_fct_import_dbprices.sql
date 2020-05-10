@@ -7,12 +7,13 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE:2510
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_csv2pg_import_dbprices(integer, text);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_dbprices(p_data json)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_csv2pg_import_dbprices(json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_import_dbprices(p_data json)
 RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_dbprices($${
+SELECT SCHEMA_NAME.gw_fct_import_dbprices($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{},"data":{}}$$)
 */

@@ -7,7 +7,8 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2738
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_timeseries()
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_csv2pg_import_timeseries();
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_import_timeseries()
   RETURNS integer AS
 $BODY$
 
@@ -15,7 +16,7 @@ $BODY$
 /*INSTRUCTIONS
 
 TO EXECUTE:
-SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_timeseries()
+SELECT SCHEMA_NAME.gw_fct_import_timeseries()
 
 TO CHECK RESULTS:
 GENERAL

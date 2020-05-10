@@ -7,12 +7,13 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE:2514
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_csv2pg_import_elements(integer, text);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_elements(p_data json)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_csv2pg_import_elements(json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_import_elements(p_data json)
 RETURNS json AS
 $BODY$
 
 /*
-SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_elements($${
+SELECT SCHEMA_NAME.gw_fct_import_elements($${
 "client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{},
 "data":{"filterFields":{}, "pageInfo":{}, "importParam":"node", "csv2pgCat":"3"}}$$)::text
 */

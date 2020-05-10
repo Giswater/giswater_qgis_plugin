@@ -6,11 +6,12 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2694
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_import_ui_xml(p_formname text, p_parent boolean)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_import_ui_xml(text, boolean);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_import_ui_xml(p_formname text, p_parent boolean)
   RETURNS json AS
 $BODY$
 
---select SCHEMA_NAME.gw_fct_utils_import_ui_xml('ve_node_x',TRUE);
+--select SCHEMA_NAME.gw_fct_import_ui_xml('ve_node_x',TRUE);
 
 DECLARE
 	rec record;

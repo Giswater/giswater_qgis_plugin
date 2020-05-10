@@ -8,14 +8,15 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2512
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_csv2pg_import_omvisit(boolean, boolean, text);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_omvisit(p_data json)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_csv2pg_import_omvisit(json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_import_omvisit(p_data json)
 RETURNS json AS
 $BODY$
 
 /*
 EXAMPLE
 -------
-SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_omvisit($${
+SELECT SCHEMA_NAME.gw_fct_import_omvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{},
 "data":{"csv2pgCat":13, "importParam":"Test"}}$$)

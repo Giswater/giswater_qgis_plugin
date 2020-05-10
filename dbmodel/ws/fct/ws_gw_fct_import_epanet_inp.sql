@@ -6,14 +6,15 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2522
 
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_inp(text);
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_inp(json);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_inp(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_import_epanet_inp(p_data json)
   RETURNS json AS
 
 $BODY$
 
 /*
-SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_inp($${
+SELECT SCHEMA_NAME.gw_fct_import_epanet_inp($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{},
 "data":{"parameters":{"useNod2arc":true}}}$$)

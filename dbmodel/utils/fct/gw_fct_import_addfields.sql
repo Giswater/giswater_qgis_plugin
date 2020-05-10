@@ -7,12 +7,13 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE:2516
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_csv2pg_import_addfields(integer, text);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_addfields(p_data json)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_csv2pg_import_addfields(json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_import_addfields(p_data json)
 RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_addfields($${
+SELECT SCHEMA_NAME.gw_fct_import_addfields($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{},"data":{}}$$)
 */

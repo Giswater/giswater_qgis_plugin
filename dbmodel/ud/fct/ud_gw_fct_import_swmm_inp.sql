@@ -5,12 +5,14 @@ This version of Giswater is provided by Giswater Association
 */
 
 --FUNCTION CODE:2524
+
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_csv2pg_import_swmm_inp(text);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_swmm_inp(p_data json)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_csv2pg_import_swmm_inp(json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_import_swmm_inp(p_data json)
   RETURNS json AS
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_swmm_inp($${
+SELECT SCHEMA_NAME.gw_fct_import_swmm_inp($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{},
 "data":{"parameters":{"createSubcGeom":false}}}$$)
