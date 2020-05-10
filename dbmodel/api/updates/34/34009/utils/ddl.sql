@@ -17,6 +17,9 @@ ALTER TABLE config_api_list RENAME TO config_form_list;
 ALTER TABLE config_api_tableinfo_x_infotype RENAME TO config_info_table_x_type;
 ALTER TABLE config_api_typevalue RENAME TO config_form_typevalue;
 ALTER TABLE config_client_forms RENAME TO config_form_tableview;
+ALTER TABLE config_api_form RENAME TO config_form;
+ALTER TABLE config_api_visit_x_featuretable RENAME TO config_visit_x_feature;
+
 
 ALTER TABLE config_api_visit RENAME TO _config_api_visit_;
 

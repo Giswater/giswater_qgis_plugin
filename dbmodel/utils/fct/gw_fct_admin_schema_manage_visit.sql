@@ -228,11 +228,11 @@ IF v_action = 'CREATE' THEN
 			VALUES (119, null, 4, concat('Insert values into config_api_visit.'));
 		END IF;
 		
-		IF (SELECT visitclass_id FROM config_api_visit_x_featuretable WHERE visitclass_id = v_class_id) IS NULL THEN
-			INSERT INTO config_api_visit_x_featuretable (visitclass_id, tablename) VALUES (v_class_id, concat('v_edit_',v_feature_system_id));	
+		IF (SELECT visitclass_id FROM config_visit_x_feature WHERE visitclass_id = v_class_id) IS NULL THEN
+			INSERT INTO config_visit_x_feature (visitclass_id, tablename) VALUES (v_class_id, concat('v_edit_',v_feature_system_id));	
 
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (119, null, 4, concat('Insert values into config_api_visit_x_featuretable.'));
+			VALUES (119, null, 4, concat('Insert values into config_visit_x_feature.'));
 		END IF;
 		
 		IF (SELECT formname FROM config_form_fields WHERE formname = v_viewname) IS NULL THEN
@@ -461,7 +461,7 @@ ELSIF v_action = 'DELETE' AND v_action_type = 'class' THEN
 
 		IF (SELECT count(id) FROM om_visit WHERE class_id = v_class_id) = 0 THEN
 			RAISE NOTICE 'DELETE ALL';
-			DELETE FROM config_api_visit_x_featuretable WHERE visitclass_id = v_class_id;
+			DELETE FROM config_visit_x_feature WHERE visitclass_id = v_class_id;
 			DELETE FROM config_form_fields WHERE formtype='visit' and formname IN (SELECT formname FROM config_api_visit WHERE visitclass_id = v_class_id);
 			DELETE FROM config_api_visit WHERE visitclass_id = v_class_id;
 			DELETE FROM om_visit_class_x_parameter WHERE class_id = v_class_id;
@@ -513,10 +513,10 @@ ELSIF v_action = 'CONFIGURATION' THEN
 			VALUES (119, null, 4, concat('Insert visit configuration into config_api_visit. Class: ',v_class_id, ', view: ',concat('ve_visit_',v_feature_system_id,'_singlevent'), '.'));
 		END IF;
 
-		INSERT INTO config_api_visit_x_featuretable (visitclass_id, tablename) VALUES (v_class_id, concat('v_edit_',v_feature_system_id));	
+		INSERT INTO config_visit_x_feature (visitclass_id, tablename) VALUES (v_class_id, concat('v_edit_',v_feature_system_id));	
 		
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (119, null, 4, concat('Insert view name into config_api_visit_x_featuretable.'));
+		VALUES (119, null, 4, concat('Insert view name into config_visit_x_feature.'));
 		
 		IF (SELECT formname FROM config_form_fields WHERE formname = v_viewname) IS NULL THEN
 			--capture common fields names that need to be copied for the specific visit form
