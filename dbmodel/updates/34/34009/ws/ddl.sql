@@ -12,7 +12,36 @@ ALTER TABLE anl_mincut_inlet_x_exploitation RENAME to config_mincut_inlet;
 ALTER TABLE anl_mincut_selector_valve RENAME to config_mincut_valve;
 ALTER TABLE anl_mincut_checkvalve RENAME to config_mincut_checkvalve;
 
+ALTER TABLE anl_mincut_result_selector RENAME to selector_mincut_result ;
 ALTER TABLE inp_selector_dscenario RENAME to selector_inp_demand;
 ALTER TABLE rpt_selector_hourly_compare RENAME to selector_rpt_compare_tstep;
 ALTER TABLE rpt_selector_hourly RENAME to selector_rpt_main_tstep;
 
+-- remove id from selectors
+ALTER TABLE selector_inp_demand DROP CONSTRAINT dscenario_id_cur_user_unique;
+ALTER TABLE selector_inp_demand DROP CONSTRAINT inp_selector_dscenario_pkey;
+ALTER TABLE selector_inp_demand ADD CONSTRAINT selector_inp_demand_pkey PRIMARY KEY(dscenario_id, cur_user);
+ALTER TABLE selector_inp_demand DROP COLUMN id;
+
+ALTER TABLE selector_mincut_result DROP CONSTRAINT result_id_cur_user_unique;
+ALTER TABLE selector_mincut_result DROP CONSTRAINT anl_mincut_result_selector_pkey;
+ALTER TABLE selector_mincut_result ADD CONSTRAINT selector_mincut_result_pkey PRIMARY KEY(result_id, cur_user);
+ALTER TABLE selector_mincut_result DROP COLUMN id;
+
+ALTER TABLE selector_rpt_compare DROP CONSTRAINT rpt_selector_compare_result_id_cur_user_unique;
+ALTER TABLE selector_rpt_compare DROP CONSTRAINT rpt_selector_compare_pkey;
+ALTER TABLE selector_rpt_compare ADD CONSTRAINT selector_rpt_compare_pkey PRIMARY KEY(result_id, cur_user);
+ALTER TABLE selector_rpt_compare DROP COLUMN id;
+
+ALTER TABLE selector_rpt_compare_tstep DROP CONSTRAINT rpt_selector_result_hourly_compare_pkey;
+ALTER TABLE selector_rpt_compare_tstep ADD CONSTRAINT selector_rpt_compare_tstep_pkey PRIMARY KEY("time", cur_user);
+ALTER TABLE selector_rpt_compare_tstep DROP COLUMN id;
+
+ALTER TABLE selector_rpt_main DROP CONSTRAINT rpt_selector_result_id_cur_user_unique;
+ALTER TABLE selector_rpt_main DROP CONSTRAINT rpt_selector_result_pkey;
+ALTER TABLE selector_rpt_main ADD CONSTRAINT selector_rpt_main_pkey PRIMARY KEY(result_id, cur_user);
+ALTER TABLE selector_rpt_main DROP COLUMN id;
+
+ALTER TABLE selector_rpt_main_tstep DROP CONSTRAINT rpt_selector_result_hourly_pkey;
+ALTER TABLE selector_rpt_main_tstep ADD CONSTRAINT selector_rpt_main_tstep_pkey PRIMARY KEY("time", cur_user);
+ALTER TABLE selector_rpt_main_tstep DROP COLUMN id;

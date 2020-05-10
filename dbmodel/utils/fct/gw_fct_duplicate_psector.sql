@@ -89,7 +89,7 @@ BEGIN
  	vat, other, active, the_geom, enable_all, status, ext_code) SELECT v_new_psector_name, psector_type, descript, expl_id, priority, text1, text2, observ, rotation, scale, sector_id, atlas_id, gexpenses, 
  	vat, other, active, the_geom, enable_all, status, ext_code FROM plan_psector WHERE psector_id=v_old_psector_id RETURNING psector_id INTO v_new_psector_id;
 
- 	INSERT INTO plan_psector_selector(psector_id,cur_user) VALUES (v_new_psector_id, current_user);
+ 	INSERT INTO selector_plan_psector(psector_id,cur_user) VALUES (v_new_psector_id, current_user);
 	
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
 	VALUES (53, v_result_id, concat('Copy psector ',v_old_psector_id,' as ',v_new_psector_name,'.' ));

@@ -10,3 +10,5 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2020/05/09
 SELECT gw_fct_admin_schema_manage_triggers('notify',null);
+
+UPDATE sys_table SET sys_sequence = null, sys_sequence_field = null WHERE id LIKE '%selector%';

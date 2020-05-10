@@ -84,18 +84,69 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"rpt_cat_
 
 
 -- harmonize selectors
-ALTER TABLE anl_mincut_result_selector RENAME to selector_mincut_result ;
 ALTER TABLE inp_selector_result RENAME to selector_inp_result ;
 ALTER TABLE inp_selector_sector RENAME to selector_sector ;
 ALTER TABLE rpt_selector_compare RENAME to selector_rpt_compare ;
 ALTER TABLE rpt_selector_result RENAME to selector_rpt_main ;
-ALTER TABLE plan_result_relector RENAME to selector_plan_result ;
+ALTER TABLE plan_result_selector RENAME to selector_plan_result;
+ALTER TABLE plan_psector_selector RENAME to selector_plan_psector;
 
---ws
-ALTER TABLE rpt_selector_hourly_compare RENAME to selector_rpt_compare_tstep ;
-ALTER TABLE rpt_selector_hourly RENAME to selector_rpt_main_tstep ;
 
---ud
-ALTER TABLE rpt_selector_timestep_compare RENAME to selector_rpt_compare_tstep ;
-ALTER TABLE rpt_selector_timestep RENAME to selector_rpt_main_tstep ;
+-- remove id from all selectors
+ALTER TABLE selector_audit DROP CONSTRAINT selector_audit_fprocesscat_id_cur_user_unique;
+ALTER TABLE selector_audit DROP CONSTRAINT selector_audit_pkey;
+ALTER TABLE selector_audit ADD CONSTRAINT selector_audit_pkey PRIMARY KEY(fprocesscat_id, cur_user);
+ALTER TABLE selector_audit DROP COLUMN id;
 
+ALTER TABLE selector_date DROP CONSTRAINT selector_date_pkey;
+ALTER TABLE selector_date ADD CONSTRAINT selector_date_pkey PRIMARY KEY(context, cur_user);
+ALTER TABLE selector_date DROP COLUMN id;
+
+ALTER TABLE selector_expl DROP CONSTRAINT expl_id_cur_user_unique;
+ALTER TABLE selector_expl DROP CONSTRAINT selector_expl_pkey;
+ALTER TABLE selector_expl ADD CONSTRAINT selector_expl_pkey PRIMARY KEY(expl_id, cur_user);
+ALTER TABLE selector_expl DROP COLUMN id;
+
+ALTER TABLE selector_hydrometer DROP CONSTRAINT selector_hydrometer_state_id_cur_user_unique;
+ALTER TABLE selector_hydrometer DROP CONSTRAINT selector_hydrometer_pkey;
+ALTER TABLE selector_hydrometer ADD CONSTRAINT selector_hydrometer_pkey PRIMARY KEY(state_id, cur_user);
+ALTER TABLE selector_hydrometer DROP COLUMN id;
+
+ALTER TABLE selector_inp_result DROP CONSTRAINT inp_selector_result_result_id_cur_user_unique;
+ALTER TABLE selector_inp_result DROP CONSTRAINT inp_selector_result_pkey;
+ALTER TABLE selector_inp_result ADD CONSTRAINT selector_inp_result_pkey PRIMARY KEY(result_id, cur_user);
+ALTER TABLE selector_inp_result DROP COLUMN id;
+
+ALTER TABLE selector_lot DROP CONSTRAINT selector_lot_lot_id_cur_user_unique;
+ALTER TABLE selector_lot DROP CONSTRAINT selector_lot_pkey;
+ALTER TABLE selector_lot ADD CONSTRAINT selector_lot_pkey PRIMARY KEY(lot_id, cur_user);
+ALTER TABLE selector_lot DROP COLUMN id;
+
+ALTER TABLE selector_plan_result DROP CONSTRAINT plan_result_selector_result_id_cur_user_unique;
+ALTER TABLE selector_plan_result DROP CONSTRAINT plan_result_selector_pkey;
+ALTER TABLE selector_plan_result ADD CONSTRAINT selector_plan_result_pkey PRIMARY KEY(result_id, cur_user);
+ALTER TABLE selector_plan_result DROP COLUMN id;
+
+ALTER TABLE selector_psector DROP CONSTRAINT psector_id_cur_user_unique;
+ALTER TABLE selector_psector DROP CONSTRAINT selector_psector_pkey;
+ALTER TABLE selector_psector ADD CONSTRAINT selector_psector_pkey PRIMARY KEY(psector_id, cur_user);
+ALTER TABLE selector_psector DROP COLUMN id;
+
+ALTER TABLE selector_sector DROP CONSTRAINT inp_selector_sector_sector_id_cur_user_unique;
+ALTER TABLE selector_sector DROP CONSTRAINT inp_selector_sector_pkey;
+ALTER TABLE selector_sector ADD CONSTRAINT selector_sector_pkey PRIMARY KEY(sector_id, cur_user);
+ALTER TABLE selector_sector DROP COLUMN id;
+
+ALTER TABLE selector_state DROP CONSTRAINT state_id_cur_user_unique;
+ALTER TABLE selector_state DROP CONSTRAINT selector_state_pkey;
+ALTER TABLE selector_state ADD CONSTRAINT selector_state_pkey PRIMARY KEY(state_id, cur_user);
+ALTER TABLE selector_state DROP COLUMN id;
+
+ALTER TABLE selector_workcat DROP CONSTRAINT selector_workcat_workcat_cur_user_unique;
+ALTER TABLE selector_workcat DROP CONSTRAINT selector_workcat_pkey;
+ALTER TABLE selector_workcat ADD CONSTRAINT selector_workcat_pkey PRIMARY KEY(workcat_id, cur_user);
+ALTER TABLE selector_workcat DROP COLUMN id;
+
+ALTER TABLE selector_plan_psector DROP CONSTRAINT plan_psector_selector_pkey;
+ALTER TABLE selector_plan_psector ADD CONSTRAINT plan_psector_selector_pkey PRIMARY KEY(psector_id, cur_user);
+ALTER TABLE selector_plan_psector DROP COLUMN id;
