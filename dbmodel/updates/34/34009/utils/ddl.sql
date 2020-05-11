@@ -71,6 +71,8 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_check
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit_class", "column":"formname", "dataType":"text"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit_class", "column":"tablename", "dataType":"text"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_visit_class", "column":"ui_tablename", "dataType":"text"}}$$);
+
 
 -- harmonize cur_user
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"audit_log_data", "column":"user_name", "newName":"cur_user"}}$$);
