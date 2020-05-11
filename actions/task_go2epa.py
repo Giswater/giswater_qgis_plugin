@@ -19,41 +19,45 @@ class TaskGo2Epa(QgsTask):
     """ This shows how to subclass QgsTask """
 
     fake_progress = pyqtSignal()
-    def __init__(self, description, controller, dlg_go2epa, file_rpt, result_name):
+    def __init__(self, description, controller, go2epa):
 
         super().__init__(description, QgsTask.CanCancel)
         self.exception = None
         self.controller = controller
-        self.dlg_go2epa = dlg_go2epa
-        self.file_rpt = file_rpt
-        self.result_name = result_name
+        self.go2epa = go2epa
         self.error_msg = None
         self.message = None
+        self.common_msg = None
         self._file = None
+        self.set_variables_from_go2epa()
         self.add_layer = AddLayer(self.controller.iface, None, controller, None)
         #self.progressChanged.connect(self.progress_changed)
+
+
+    def set_variables_from_go2epa(self):
+        """ Set variables from object Go2Epa """
+
+        self.dlg_go2epa = self.go2epa.dlg_go2epa
+        self.complet_result = self.go2epa.complet_result
+        self.result_name = self.go2epa.result_name
+        self.file_inp = self.go2epa.file_inp
+        self.file_rpt = self.go2epa.file_rpt
+        self.export_inp = self.go2epa.export_inp
+        self.exec_epa = self.go2epa.exec_epa
+        self.import_result = self.go2epa.import_result
 
 
     def run(self):
 
         self.controller.log_info(f"Task started: {self.description()}")
 
-        #self.dlg_go2epa.close()
-        self.setProgress(0)
-        status = False
-        try:
-            # Delete previous values of user on temp table
-            sql = ("DELETE FROM temp_csv2pg "
-                   "WHERE user_name = current_user AND csv2pgcat_id = 11")
-            self.controller.execute_sql(sql)
-            # Importing file to temporal table
-            status = self.insert_rpt_into_db(self.file_rpt)
-            if status:
-                self.finish_rpt()
-        except Exception as e:
-            self.error_msg = str(e)
-        finally:
-            return status
+        if self.export_inp:
+            self.export_to_inp()
+
+        if self.import_result:
+            self.import_rpt()
+
+
 
 
     def finished(self, result):
@@ -104,6 +108,56 @@ class TaskGo2Epa(QgsTask):
         if self._file:
             self._file.close()
             del self._file
+
+
+    def export_to_inp(self):
+
+        if self.complet_result['status'] == "Accepted":
+            self.add_layer.add_temp_layer(self.dlg_go2epa, self.complet_result['body']['data'], 'INP results',
+                True, True, 1, False)
+
+        # Get values from complet_result['body']['file'] and insert into INP file
+        if 'file' not in self.complet_result['body']:
+            return
+
+        self.fill_inp_file(self.file_inp, self.complet_result['body']['file'])
+        self.message = self.complet_result['message']['text']
+        self.common_msg += "Export INP finished. "
+
+
+    def fill_inp_file(self, folder_path=None, all_rows=None):
+
+        progress = 0
+        row_count = sum(1 for rows in all_rows)  # @UnusedVariable
+        file1 = open(folder_path, "w")
+        for row in all_rows:
+            progress += 1
+            if 'text' in row and row['text'] is not None:
+                line = row['text'].rstrip() + "\n"
+                file1.write(line)
+
+        file1.close()
+        del file1
+
+
+    def import_rpt(self):
+
+        self.setProgress(0)
+        status = False
+        try:
+            # Delete previous values of user on temp table
+            sql = ("DELETE FROM temp_csv2pg "
+                   "WHERE user_name = current_user AND csv2pgcat_id = 11")
+            self.controller.execute_sql(sql)
+            # Importing file to temporal table
+            status = self.insert_rpt_into_db(self.file_rpt)
+            if not status:
+                return
+            self.exec_rpt()
+        except Exception as e:
+            self.error_msg = str(e)
+        finally:
+            return status
 
 
     def insert_rpt_into_db(self, folder_path=None):
@@ -210,24 +264,7 @@ class TaskGo2Epa(QgsTask):
         if sql != "":
             self.controller.execute_sql(sql)
 
-
-        # Call function gw_fct_rpt2pg_main
-        function_name = 'gw_fct_rpt2pg_main'
-        extras = '"iterative":"disabled"'
-        #if is_iterative and _continue:
-        #    extras = '"iterative":"enabled"'
-        extras += f', "resultId":"{self.result_name}"'
-        extras += f', "currentStep":"{counter}"'
-        extras += f', "continue":"{False}"'
-        body = self.create_body(extras=extras)
-        sql = f"SELECT {function_name}({body})::text"
-        row = self.controller.get_row(sql, log_sql=True)
-        if not row or row[0] is None:
-            self.controller.show_warning(f"NOT ROW FOR: {sql}")
-            self.message = "Import failed"
-            return False
-
-        self.rpt_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+        self.close_file()
 
         return True
 
@@ -247,4 +284,34 @@ class TaskGo2Epa(QgsTask):
         body = "" + client + form + feature + data
 
         return body
+
+
+    def exec_function_rpt2pg(self):
+        """ Call function gw_fct_rpt2pg_main """
+
+        function_name = 'gw_fct_rpt2pg_main'
+        extras = '"iterative":"disabled"'
+        extras += f', "resultId":"{self.result_name}"'
+        extras += f', "currentStep":"{counter}"'
+        extras += f', "continue":"{_continue}"'
+        body = self.create_body(extras=extras)
+        sql = f"SELECT {function_name}({body})::text"
+        row = self.controller.get_row(sql)
+        if not row or row[0] is None:
+            self.controller.show_warning(self.controller.last_error)
+            message = "Import failed"
+            self.controller.show_info_box(message)
+            return
+        else:
+            rpt_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+            if 'status' in rpt_result[0]:
+                if rpt_result[0]['status'] == "Accepted":
+                    if 'body' in rpt_result[0]:
+                        if 'data' in rpt_result[0]['body']:
+                            self.add_layer.add_temp_layer(self.dlg_go2epa, rpt_result[0]['body']['data'], 'RPT results',
+                                True, True, 1, False)
+            self.message = rpt_result[0]['message']['text']
+
+        # final message
+        self.common_msg += "Import RPT finished."
 
