@@ -182,7 +182,7 @@ class ManConnecDialog(ParentDialog):
     def fill_tab_om(self):
         """ Fill tab 'O&M' (event) """
 
-        sql = "SELECT id, tablename FROM " + self.schema_name + ".om_visit_class WHERE feature_type = 'CONNEC'"
+        sql = "SELECT id, ui_tablename FROM " + self.schema_name + ".om_visit_class WHERE feature_type = 'CONNEC'"
         rows = self.controller.get_rows(sql)
         table_event_connec_dict = {}
         for row in rows:

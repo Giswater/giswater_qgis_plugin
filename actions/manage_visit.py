@@ -52,7 +52,6 @@ class ManageVisit(ParentManage, QObject):
         if geom_type => lock geom_type in relations tab
         if feature_id => load related feature basing on geom_type in relation
         if single_tool notify that the tool is used called from another dialog."""
-
         # parameter to set if the dialog is working as single tool or integrated in another tool
         self.single_tool_mode = single_tool
 
@@ -461,30 +460,18 @@ class ManageVisit(ParentManage, QObject):
     def entered_event_tab(self, dialog):
         """Manage actions when the Event tab is entered."""
         self.set_parameter_id_combo(dialog)
-        self.manage_cmb_parameter_id()
-
-
-    def manage_cmb_parameter_id(self):
-
-        self.dlg_add_visit.tbl_event.selectRow(0)
-        self.dlg_add_visit.tbl_event.setFocus()
-        parameter_id = self.dlg_add_visit.tbl_event.model().record(0).value('parameter_id')
-        if parameter_id is not None:
-            utils_giswater.set_combo_itemData(self.dlg_add_visit.parameter_id, parameter_id, 0)
-            self.dlg_add_visit.parameter_id.setEnabled(False)
-        else:
-            self.dlg_add_visit.parameter_id.setEnabled(True)
-        self.dlg_add_visit.tbl_event.clearFocus()
+        self.set_parameter_id_combo(dialog)
 
 
     def set_parameter_id_combo(self, dialog):
         """set parameter_id combo basing on current selections."""
-
         dialog.parameter_id.clear()
         sql = ("SELECT b.id, descript FROM " + self.schema_name + ".om_visit_class_x_parameter a"
-               " JOIN " + self.schema_name + ".om_visit_parameter b ON b.id = a.parameter_id"
-               " WHERE class_id::text = '" + str(utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.visitclass_id, 0)) + "'"
-               " AND parameter_type = '" + str(utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.parameter_type_id, 0)) + "'")
+                " JOIN " + self.schema_name + ".om_visit_parameter b ON b.id = a.parameter_id"
+                " WHERE class_id::text = '" + str(utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.visitclass_id, 0)) + "'"
+                " AND parameter_type = '" + str(utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.parameter_type_id, 0)) + "'"
+                " AND b.id::text NOT IN (SELECT parameter_id FROM " + self.schema_name + ".om_visit_event WHERE visit_id::text = '"
+                + str(utils_giswater.getWidgetText(self.dlg_add_visit, self.dlg_add_visit.visit_id)) + "')")
         sql += " ORDER BY id"
         rows = self.controller.get_rows(sql, commit=True)
 
@@ -681,16 +668,12 @@ class ManageVisit(ParentManage, QObject):
                 except ValueError:
                     pass
             elif visit_id is not None:
-                sql = ("SELECT visitcat_id"
+
+                sql = ("SELECT class_id"
                        " FROM " + self.schema_name + ".om_visit"
                        " WHERE id ='" + str(visit_id) + "' ")
                 id_visitcat = self.controller.get_row(sql)
-                sql = ("SELECT id, name"
-                       " FROM " + self.schema_name + ".om_visit_cat"
-                       " WHERE active is true AND id ='"+str(id_visitcat[0])+"' "
-                       " ORDER BY name")
-                row = self.controller.get_row(sql)
-                utils_giswater.set_combo_itemData(self.dlg_add_visit.visitclass_id, str(row[1]), 1)
+                utils_giswater.set_combo_itemData(self.dlg_add_visit.visitclass_id, str(id_visitcat[0]), 0)
 
         # Relations tab
         # fill feature_type
@@ -857,7 +840,7 @@ class ManageVisit(ParentManage, QObject):
         self.manage_events_changed()
 
         # Manage parameter_id
-        self.manage_cmb_parameter_id()
+        self.set_parameter_id_combo(self.dlg_add_visit)
 
 
     def open_file(self):
@@ -1218,7 +1201,7 @@ class ManageVisit(ParentManage, QObject):
         self.manage_events_changed()
 
         # Manage parameter_id
-        self.manage_cmb_parameter_id()
+        self.set_parameter_id_combo(self.dlg_add_visit)
 
 
     def document_open(self):

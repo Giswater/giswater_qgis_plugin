@@ -1373,7 +1373,6 @@ class ParentDialog(QDialog):
 
         self.set_model_to_table(widget, table_name, filter_)
         self.set_filter_dates('startdate', 'enddate', table_name, self.date_event_from, self.date_event_to)
-        self.set_configuration(widget, table_name)
 
 
     def set_filter_table_event(self, widget, table_name, set_date=False):
@@ -1409,7 +1408,6 @@ class ParentDialog(QDialog):
         # Refresh model with selected filter
         widget.model().setFilter(expr)
         widget.model().select()
-        self.set_configuration(widget, table_name)
 
 
     def set_filter_table_event2(self, widget):

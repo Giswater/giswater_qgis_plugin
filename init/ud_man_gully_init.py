@@ -151,7 +151,7 @@ class ManGullyDialog(ParentDialog):
     def fill_tab_om(self):
         """ Fill tab 'O&M' (event) """
         
-        sql = "SELECT id, tablename FROM " + self.schema_name + ".om_visit_class WHERE feature_type = 'GULLY'"
+        sql = "SELECT id, ui_tablename FROM " + self.schema_name + ".om_visit_class WHERE feature_type = 'GULLY'"
         rows = self.controller.get_rows(sql)
         table_event_gully_dict = {}
         for row in rows:
