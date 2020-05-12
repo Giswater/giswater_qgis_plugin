@@ -97,10 +97,10 @@ class MincutConfig(ParentAction):
         self.dlg_min_edit.state_edit.activated.connect(partial(self.filter_by_id, self.tbl_mincut_edit))
 
         # Set a model with selected filter. Attach that model to selected table
-        self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + ".v_ui_om_mincut")
-        self.set_table_columns(self.dlg_min_edit, self.tbl_mincut_edit, "v_ui_om_mincut")
+        self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + ".v_ui_mincut")
+        self.set_table_columns(self.dlg_min_edit, self.tbl_mincut_edit, "v_ui_mincut")
 
-        #self.mincut.set_table_columns(self.tbl_mincut_edit, "v_ui_om_mincut")
+        #self.mincut.set_table_columns(self.tbl_mincut_edit, "v_ui_mincut")
 
         # Open the dialog
         self.open_dialog(self.dlg_min_edit)
@@ -196,8 +196,8 @@ class MincutConfig(ParentAction):
             row = self.controller.execute_sql(sql)
 
             # Set a model with selected filter. Attach that model to selected table
-            self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + ".v_ui_om_mincut")
-            self.set_table_columns(self.dlg_min_edit, self.tbl_mincut_edit, "v_ui_om_mincut")
+            self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + ".v_ui_mincut")
+            self.set_table_columns(self.dlg_min_edit, self.tbl_mincut_edit, "v_ui_mincut")
 
 
     def set_state_cancel_mincut(self):

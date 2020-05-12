@@ -333,7 +333,7 @@ class Master(ParentAction):
         self.load_settings(self.dlg_estimate_result_selector)
         
         # Populate combo
-        self.populate_combo(self.dlg_estimate_result_selector.rpt_selector_result_id, 'plan_result_selector')
+        self.populate_combo(self.dlg_estimate_result_selector.rpt_selector_result_id, 'selector_plan_result')
 
         # Set current value
         table_name = "om_result_cat"

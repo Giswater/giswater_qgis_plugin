@@ -145,7 +145,7 @@ class MincutParent(ParentAction):
 
         # Fill ComboBox cause
         sql = ("SELECT id, descript "
-               "FROM anl_mincut_cat_cause "
+               "FROM om_typevalue WHERE typevalue = 'mincut_cause "
                "ORDER BY id")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_mincut.cause, rows, 1)

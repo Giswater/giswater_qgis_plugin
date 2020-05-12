@@ -2671,7 +2671,7 @@ class UpdateSQL(ApiParent):
 
         # Populate UI file
         sql = ("SELECT csv1 FROM " + schema_name + ".temp_csv2pg "
-               "WHERE user_name = current_user AND source = '" + str(form_name_ui) + "' "
+               "WHERE cur_user = current_user AND source = '" + str(form_name_ui) + "' "
                "ORDER BY id DESC")
         row = self.controller.get_row(sql, log_sql=True)
         if not row:
@@ -2704,7 +2704,7 @@ class UpdateSQL(ApiParent):
 
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
         # Clear temp_csv2pg
-        sql = ("DELETE FROM " + schema_name + ".temp_csv2pg WHERE user_name = current_user")
+        sql = ("DELETE FROM " + schema_name + ".temp_csv2pg WHERE cur_user = current_user")
         status = self.controller.execute_sql(sql, log_sql=True)
 
 

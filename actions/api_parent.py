@@ -907,7 +907,7 @@ class ApiParent(ParentAction):
         else:
             message = "Parameter not found"
             self.controller.show_message(message, 2, parameter='widgetfunction')
-        # Call def gw_api_open_url(self, widget) or def no_function_associated(self, widget=None, message_level=1)
+        # Call function (self, widget) or def no_function_associated(self, widget=None, message_level=1)
         widget.clicked.connect(partial(getattr(self, func_name), widget))
         return widget
 
@@ -1564,11 +1564,11 @@ class ApiParent(ParentAction):
                 break
 
         if widget:
-            # Call def  def gw_api_open_url(self, widget)
+            # Call def  function (self, widget)
             getattr(self, function_name)(widget)
 
 
-    def gw_api_open_url(self, widget):
+    def gwOpenUrl(self, widget):
 
         path = widget.text()
         # Check if file exist

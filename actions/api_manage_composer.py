@@ -234,7 +234,7 @@ class ApiManageComposer(ApiParent):
         pass
 
 
-    def gw_fct_setprint(self, dialog, my_json):
+    def gwSetPrint(self, dialog, my_json):
 
         if my_json['composer'] != '-1':
             self.check_whidget_exist(self.dlg_composer)
@@ -242,7 +242,7 @@ class ApiManageComposer(ApiParent):
             self.accept(dialog, my_json)
 
 
-    def gw_api_set_composer(self, dialog, my_json):
+    def gwSetComposer(self, dialog, my_json):
 
         if my_json['composer'] != '-1':
             self.preview(dialog, False)
