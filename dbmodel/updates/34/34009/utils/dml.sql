@@ -59,7 +59,9 @@ UPDATE config_form_fields SET widgetfunction = 'gwInfoNode' WHERE widgetfunction
 UPDATE config_form_fields SET widgetfunction = NULL WHERE widgetfunction = 'get_catalog_id';
 
 
-UPDATE SCHEMA_NAME.config_form_fields SET dv_querytext = replace (dv_querytext, 'config_api_images', 'config_form_images');
-UPDATE SCHEMA_NAME.config_form_fields SET dv_querytext = replace (dv_querytext, 'config_api_typevalue', 'config_form_typevalue');
-UPDATE SCHEMA_NAME.sys_param_user SET dv_querytext = replace (dv_querytext, 'user_name', 'cur_user') where dv_querytext like '%user_name%'
+UPDATE config_form_fields SET dv_querytext = replace (dv_querytext, 'config_api_images', 'config_form_images');
+UPDATE config_form_fields SET dv_querytext = replace (dv_querytext, 'config_api_typevalue', 'config_form_typevalue');
+UPDATE sys_param_user SET dv_querytext = replace (dv_querytext, 'user_name', 'cur_user') where dv_querytext like '%user_name%';
+
+UPDATE sys_function set function_name = 'gw_fct_mincut_inlet_flowtrace' where function_name like 'gw_fct_inlet_flowtrace';
 

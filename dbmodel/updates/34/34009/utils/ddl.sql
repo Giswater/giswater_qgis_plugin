@@ -151,3 +151,26 @@ ALTER TABLE selector_workcat DROP COLUMN id;
 ALTER TABLE selector_plan_psector DROP CONSTRAINT plan_psector_selector_pkey;
 ALTER TABLE selector_plan_psector ADD CONSTRAINT plan_psector_selector_pkey PRIMARY KEY(psector_id, cur_user);
 ALTER TABLE selector_plan_psector DROP COLUMN id;
+
+ALTER SEQUENCE SCHEMA_NAME.config_api_form_groupbox_id_seq RENAME TO config_form_groupbox_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.config_api_form_id_seq RENAME TO config_form_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.config_api_form_layout_id_seq RENAME TO config_form_layout_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.config_api_images_id_seq RENAME TO config_form_images_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.config_api_list_id_seq RENAME TO config_form_list_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.config_api_tableinfo_x_inforole_id_seq RENAME TO config_info_table_x_type_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.config_client_forms_id_seq RENAME TO config_form_tableview_id_seq;
+
+ALTER SEQUENCE SCHEMA_NAME.anl_mincut_inlet_x_exploitation_id_seq RENAME TO config_mincut_inlet_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.anl_mincut_result_arc_id_seq RENAME TO om_mincut_arc_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.anl_mincut_result_connec_id_seq RENAME TO om_mincut_connec_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.anl_mincut_result_hydrometer_id_seq RENAME TO om_mincut_hydrometer_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.anl_mincut_result_node_id_seq RENAME TO om_mincut_node_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.anl_mincut_result_polygon_id_seq RENAME TO om_mincut_polygon_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.anl_mincut_result_valve_id_seq RENAME TO om_mincut_valve_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.anl_mincut_result_valve_unaccess_id_seq RENAME TO om_mincut_valve_unaccess_id_seq;
+
+ALTER SEQUENCE SCHEMA_NAME.sys_csv2pg_cat_id_seq RENAME TO config_csv_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.sys_csv2pg_config_id_seq RENAME TO config_csv_param_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.sample_id_seq RENAME TO samplepoint_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.audit_log_arc_traceability_id_seq RENAME TO audit_arc_traceability_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.typevalue_fk_id_seq RENAME TO config_typevalue_fk_id_seq;

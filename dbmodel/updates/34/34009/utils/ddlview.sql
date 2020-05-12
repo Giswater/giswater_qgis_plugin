@@ -8,3 +8,4 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2020/05/09
+DROP VIEW IF EXISTS v_price_x_catsoil4;

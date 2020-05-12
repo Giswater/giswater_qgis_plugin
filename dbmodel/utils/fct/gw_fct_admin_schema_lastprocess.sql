@@ -132,7 +132,19 @@ BEGIN
 			DROP VIEW IF EXISTS v_edit_man_wjoin;
 			DROP VIEW IF EXISTS v_edit_man_fountain_pol;
 			DROP VIEW IF EXISTS v_edit_man_register_pol;
-			DROP VIEW IF EXISTS v_edit_man_tank_pol;					
+			DROP VIEW IF EXISTS v_edit_man_tank_pol;
+			DROP VIEW IF EXISTS v_anl_mincut_planified_arc;	
+			DROP VIEW IF EXISTS v_anl_mincut_planified_valve;
+			DROP VIEW IF EXISTS v_anl_mincut_result_arc;
+			DROP VIEW IF EXISTS v_anl_mincut_result_audit;			
+			DROP VIEW IF EXISTS v_anl_mincut_result_conflict_arc;
+			DROP VIEW IF EXISTS v_anl_mincut_result_conflict_valve;
+			DROP VIEW IF EXISTS v_anl_mincut_result_connec;
+			DROP VIEW IF EXISTS v_anl_mincut_result_hydrometer;
+			DROP VIEW IF EXISTS v_anl_mincut_result_node;
+			DROP VIEW IF EXISTS v_anl_mincut_result_polygon;
+			DROP VIEW IF EXISTS v_anl_mincut_result_valve;
+			
 		
 		ELSIF v_projecttype = 'UD' THEN
 		
