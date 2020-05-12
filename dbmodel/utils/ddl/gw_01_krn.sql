@@ -325,7 +325,8 @@ CREATE TABLE "man_type_function" (
 "feature_type" varchar(30),
 "featurecat_id" varchar(300),
 "observ" varchar(150),
-CONSTRAINT man_type_function_pkey PRIMARY KEY (id)
+CONSTRAINT man_type_function_pkey PRIMARY KEY (id),
+CONSTRAINT man_type_function_unique UNIQUE (function_type, feature_type)
 );
 
 CREATE TABLE "man_type_category" (
@@ -334,7 +335,8 @@ CREATE TABLE "man_type_category" (
 "feature_type" varchar(30),
 "featurecat_id" varchar(300),
 "observ" varchar(150),
-CONSTRAINT man_type_category_pkey PRIMARY KEY (id)
+CONSTRAINT man_type_category_pkey PRIMARY KEY (id),
+CONSTRAINT man_type_category_unique UNIQUE (category_type, feature_type)
 );
 
 
@@ -344,7 +346,8 @@ CREATE TABLE "man_type_fluid" (
 "feature_type" varchar(30),
 "featurecat_id" varchar(300),
 "observ" varchar(150),
-CONSTRAINT man_type_fluid_pkey PRIMARY KEY (id)
+CONSTRAINT man_type_fluid_pkey PRIMARY KEY (id),
+CONSTRAINT man_type_fluid_unique UNIQUE (fluid_type, feature_type)
 );
 
 
@@ -354,7 +357,8 @@ CREATE TABLE "man_type_location" (
 "feature_type" varchar(30),
 "featurecat_id" varchar(300),
 "observ" varchar(150),
-CONSTRAINT man_type_location_pkey PRIMARY KEY (id)
+CONSTRAINT man_type_location_pkey PRIMARY KEY (id),
+CONSTRAINT man_type_location_unique UNIQUE (location_type, feature_type)
 );
 
 

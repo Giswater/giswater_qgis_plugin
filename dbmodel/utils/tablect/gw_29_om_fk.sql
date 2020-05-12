@@ -73,19 +73,15 @@ ALTER TABLE "om_visit" ADD CONSTRAINT "om_visit_expl_id_fkey" FOREIGN KEY ("expl
 
 ALTER TABLE "om_visit_event" ADD CONSTRAINT "om_visit_event_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "om_visit" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "om_visit_event" ADD CONSTRAINT "om_visit_event_parameter_id_fkey" FOREIGN KEY ("parameter_id") REFERENCES "om_visit_parameter" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "om_visit_event"  ADD CONSTRAINT "om_visit_event_position_id_fkey" FOREIGN KEY ("position_id") REFERENCES "node" ("node_id") ON UPDATE CASCADE ON DELETE RESTRICT;
 
 ALTER TABLE "om_visit_event_photo" ADD CONSTRAINT "om_visit_event_foto_event_id_fkey" FOREIGN KEY ("event_id") REFERENCES "om_visit_event" ("id") MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "om_visit_event_photo" ADD CONSTRAINT "om_visit_event_foto_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "om_visit" ("id") MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE "om_visit_x_node" ADD CONSTRAINT "om_visit_x_node_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "om_visit" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "om_visit_x_node" ADD CONSTRAINT "om_visit_x_node_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "om_visit_x_arc" ADD CONSTRAINT "om_visit_x_arc_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "om_visit" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "om_visit_x_arc" ADD CONSTRAINT "om_visit_x_arc_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "om_visit_x_connec" ADD CONSTRAINT "om_visit_x_connec_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "om_visit" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "om_visit_x_connec" ADD CONSTRAINT "om_visit_x_connec_connec_id_fkey" FOREIGN KEY ("connec_id") REFERENCES "connec" ("connec_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "om_psector"  ADD CONSTRAINT "om_psector_psector_type_fkey" FOREIGN KEY ("psector_type") REFERENCES "om_psector_cat_type" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "om_psector"  ADD CONSTRAINT "om_psector_expl_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -95,10 +91,10 @@ ALTER TABLE "om_psector" ADD CONSTRAINT "om_psector_result_id_fkey" FOREIGN KEY 
 
 ALTER TABLE "om_psector_selector" ADD CONSTRAINT "om_psector_selector_psector_id_fkey" FOREIGN KEY ("psector_id") REFERENCES "om_psector" ("psector_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "om_psector_x_arc" ADD CONSTRAINT "om_psector_x_arc_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
 ALTER TABLE "om_psector_x_arc" ADD CONSTRAINT "om_psector_x_arc_psector_id_fkey" FOREIGN KEY ("psector_id") REFERENCES "om_psector" ("psector_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "om_psector_x_node" ADD CONSTRAINT "om_psector_x_node_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
 ALTER TABLE "om_psector_x_node" ADD CONSTRAINT "om_psector_x_node_psector_id_fkey" FOREIGN KEY ("psector_id") REFERENCES "om_psector" ("psector_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "om_psector_x_other" ADD CONSTRAINT "om_psector_x_other_price_id_fkey" FOREIGN KEY ("price_id") REFERENCES "price_compost" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
