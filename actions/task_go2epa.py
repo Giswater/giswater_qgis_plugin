@@ -72,6 +72,23 @@ class TaskGo2Epa(QgsTask):
         self.close_file()
 
         if result:
+
+            if self.export_inp:
+                if self.complet_result['status'] == "Accepted":
+                    if 'body' in self.complet_result:
+                        if 'data' in self.complet_result['body']:
+                            self.add_layer.add_temp_layer(self.dlg_go2epa, self.complet_result['body']['data'],
+                                'INP results', True, True, 1, False)
+
+            if self.import_result:
+                if 'status' in self.rpt_result[0]:
+                    if self.rpt_result[0]['status'] == "Accepted":
+                        if 'body' in self.rpt_result[0]:
+                            if 'data' in self.rpt_result[0]['body']:
+                                self.add_layer.add_temp_layer(self.dlg_go2epa, self.rpt_result[0]['body']['data'],
+                                    'RPT results', True, True, 1, False)
+                self.message = self.rpt_result[0]['message']['text']
+
             if self.common_msg != "":
                 self.controller.show_info(self.common_msg)
             if self.message is not None:
@@ -117,10 +134,6 @@ class TaskGo2Epa(QgsTask):
 
 
     def export_to_inp(self):
-
-        if self.complet_result['status'] == "Accepted":
-            self.add_layer.add_temp_layer(self.dlg_go2epa, self.complet_result['body']['data'], 'INP results',
-                True, True, 1, False)
 
         # Get values from complet_result['body']['file'] and insert into INP file
         if 'file' not in self.complet_result['body']:
@@ -334,14 +347,7 @@ class TaskGo2Epa(QgsTask):
             self.controller.show_info_box(message)
             return False
         else:
-            rpt_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-            if 'status' in rpt_result[0]:
-                if rpt_result[0]['status'] == "Accepted":
-                    if 'body' in rpt_result[0]:
-                        if 'data' in rpt_result[0]['body']:
-                            self.add_layer.add_temp_layer(self.dlg_go2epa, rpt_result[0]['body']['data'],
-                                'RPT results', True, True, 1, False)
-            self.message = rpt_result[0]['message']['text']
+            self.rpt_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
 
         # final message
         self.common_msg += "Import RPT finished."
