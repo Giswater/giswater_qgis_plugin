@@ -52,6 +52,7 @@ class ManageVisit(ParentManage, QObject):
         if geom_type => lock geom_type in relations tab
         if feature_id => load related feature basing on geom_type in relation
         if single_tool notify that the tool is used called from another dialog."""
+
         # parameter to set if the dialog is working as single tool or integrated in another tool
         self.single_tool_mode = single_tool
 
@@ -109,6 +110,7 @@ class ManageVisit(ParentManage, QObject):
         self.user_name = self.dlg_add_visit.findChild(QLineEdit, "user_name")
         self.ext_code = self.dlg_add_visit.findChild(QLineEdit, "ext_code")
         self.visitclass_id = self.dlg_add_visit.findChild(QComboBox, "visitclass_id")
+        self.status = self.dlg_add_visit.findChild(QComboBox, "cmb_status")
 
         # Tab 'Relations'
         self.feature_type = self.dlg_add_visit.findChild(QComboBox, "feature_type")
@@ -223,6 +225,7 @@ class ManageVisit(ParentManage, QObject):
         A) Trigger SELECT gw_fct_om_visit_multiplier (visit_id, feature_type)
         for multiple visits management."""
         # tab Visit
+
         if self.current_tab_index == self.tab_index('VisitTab'):
             self.manage_leave_visit_tab()
 
@@ -350,9 +353,11 @@ class ManageVisit(ParentManage, QObject):
         self.current_visit.enddate = utils_giswater.getCalendarDate(self.dlg_add_visit, self.dlg_add_visit.enddate)
         self.current_visit.user_name = self.user_name.text()
         self.current_visit.ext_code = self.ext_code.text()
-        self.current_visit.visitclass_id = utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.visitclass_id, 0)
+        self.current_visit.class_id = utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.visitclass_id, 0)
         self.current_visit.descript = utils_giswater.getWidgetText(self.dlg_add_visit, 'descript', False, False)
         self.current_visit.is_done = utils_giswater.isChecked(self.dlg_add_visit, 'is_done')
+        self.current_visit.status = utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.cmb_status, 0)
+
         if self.expl_id:
             self.current_visit.expl_id = self.expl_id
             
@@ -564,6 +569,7 @@ class ManageVisit(ParentManage, QObject):
             filed_to_filter = "code"
             table_object = "v_ui_om_visitman_x_" + str(geom_type)
             expr_filter = geom_type + "_id = '" + feature_id + "'"
+
             # Refresh model with selected filter            
             self.fill_table_object(self.dlg_man.tbl_visit, self.schema_name + "." + table_object, expr_filter)
             self.set_table_columns(self.dlg_man, self.dlg_man.tbl_visit, table_object)
@@ -639,6 +645,18 @@ class ManageVisit(ParentManage, QObject):
         """ Fill combo boxes of the form """
 
         # Visit tab
+
+        # Fill ComboBox Status
+        sql = ("SELECT id, idval"
+               " FROM " + self.schema_name + ".om_typevalue"
+               " WHERE typevalue = 'visit_cat_status'"
+               " ORDER BY id")
+
+        self.status_ids = self.controller.get_rows(sql, commit=self.autocommit)
+        utils_giswater.set_item_data(self.dlg_add_visit.cmb_status, self.status_ids, 1)
+        # Set Finished status
+        utils_giswater.set_combo_itemData(self.dlg_add_visit.cmb_status, 4, 0)
+
         # Fill ComboBox visitclass_id
         # save result in self.visitclass_ids to get id depending on selected combo
         sql = ("SELECT id, idval"
@@ -690,6 +708,7 @@ class ManageVisit(ParentManage, QObject):
                " JOIN " + self.schema_name + ".om_visit_parameter b ON b.id = a.parameter_id"
                " WHERE class_id::text = '" + str(utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.visitclass_id, 0)) + "'")
         sql += " ORDER BY parameter_type"
+
         parameter_type_ids = self.controller.get_rows(sql, commit=True)
         utils_giswater.set_item_data(self.dlg_add_visit.parameter_type_id, parameter_type_ids, 1)
 

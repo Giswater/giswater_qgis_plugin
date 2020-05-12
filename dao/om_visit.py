@@ -21,7 +21,7 @@ class OmVisit(Table):
     """ Class to serialize table 'om_visit' """
 
     id = GenericDescriptor(-1)
-    visitcat_id = GenericDescriptor(None)
+    class_id = GenericDescriptor(None)
     ext_code = GenericDescriptor(None)
     startdate = GenericDescriptor(None)
     enddate = GenericDescriptor(None)
@@ -31,6 +31,7 @@ class OmVisit(Table):
     the_geom = GenericDescriptor(None)
     descript = GenericDescriptor(None)
     is_done = GenericDescriptor(None)
+    status = GenericDescriptor(None)
 
     def __init__(self, controller):
         """ Class constructor """
