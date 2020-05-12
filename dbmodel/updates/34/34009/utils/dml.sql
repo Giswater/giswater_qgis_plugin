@@ -45,3 +45,21 @@ UPDATE sys_function SET isdeprecated  = true WHERE id = 2502;
 INSERT INTO sys_table (id, context, descript, sys_role_id, sys_criticity, qgis_criticity,  isdeprecated)
     VALUES ('config_visit_x_feature', 'visit', 'Table to configure visit class related to feature', 'role_om', 0, 0, false)
     ON CONFLICT (id) DO NOTHING;
+
+UPDATE config_param_system SET value =
+ '{"table":"exploitation", "selector":"selector_expl", "table_id":"expl_id",  "selector_id":"expl_id",  "label":"expl_id, '' - '', name, '''', CASE WHEN descript IS NULL THEN '''' ELSE concat('' - '', descript) END", 
+ "manageAll":true, "query_filter":"AND expl_id > 0", "typeaheadFilter":{"queryText":"SELECT expl_id as id, name AS idval FROM v_edit_exploitation WHERE expl_id > 0"}}'
+ WHERE parameter = 'api_selector_exploitation';
+ 
+  
+UPDATE config_form_fields SET widgetfunction = 'gwSetComposer' WHERE widgetfunction = 'gw_api_setcomposer';
+UPDATE config_form_fields SET widgetfunction = 'gwSetPrint' WHERE widgetfunction = 'gw_api_setprint';
+UPDATE config_form_fields SET widgetfunction = 'gwOpenUrl' WHERE widgetfunction = 'gw_api_open_url';
+UPDATE config_form_fields SET widgetfunction = 'gwInfoNode' WHERE widgetfunction = 'gw_api_open_node';
+UPDATE config_form_fields SET widgetfunction = NULL WHERE widgetfunction = 'get_catalog_id';
+
+
+UPDATE SCHEMA_NAME.config_form_fields SET dv_querytext = replace (dv_querytext, 'config_api_images', 'config_form_images');
+UPDATE SCHEMA_NAME.config_form_fields SET dv_querytext = replace (dv_querytext, 'config_api_typevalue', 'config_form_typevalue');
+UPDATE SCHEMA_NAME.sys_param_user SET dv_querytext = replace (dv_querytext, 'user_name', 'cur_user') where dv_querytext like '%user_name%'
+

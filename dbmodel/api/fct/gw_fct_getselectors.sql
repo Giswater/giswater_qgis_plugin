@@ -44,6 +44,8 @@ v_table_id text;
 v_selector_id text;
 v_query_filter text;
 v_query_filteradd text;
+v_manageall boolean;
+v_typeaheadFilter text;
 
 BEGIN
 
@@ -82,6 +84,9 @@ BEGIN
 		v_table_id = v_parameter_selector->>'table_id';
 		v_selector_id = v_parameter_selector->>'selector_id';
 		v_query_filteradd = v_parameter_selector->>'query_filter';
+		v_manageall = v_parameter_selector->>'manageAll';
+		v_typeaheadFilter = v_parameter_selector->>'typeaheadFilter';
+
 
 		-- Manage selectors list
 		IF v_selectors_list IS NULL THEN
@@ -91,6 +96,10 @@ BEGIN
 		ELSE
 			v_query_filter = ' AND ' || v_table_id || ' IN '|| v_selectors_list || ' ';
 		END IF;
+
+		IF v_query_filteradd IS NULL THEN v_query_filteradd ='' ; END IF;
+
+		RAISE NOTICE ' % % % % % % % % ', v_label, v_table_id, v_selector_id, v_table, v_selector_id, v_selector, v_query_filter, v_query_filteradd;
 
 		-- Get exploitations, selected and unselected with selectors list
 		EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
@@ -115,6 +124,9 @@ BEGIN
 		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'tabLabel', rec_tab.label::TEXT);
 		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'tooltip', rec_tab.tooltip::TEXT);
 		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'selectorType', rec_tab.formname::TEXT);
+		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'manageAll', v_manageall::TEXT);
+		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'typeaheadFilter', v_typeaheadFilter::TEXT);
+
 
 		-- Create tabs array
 		IF v_firsttab THEN 
@@ -126,8 +138,7 @@ BEGIN
 		v_firsttab := TRUE;
 		v_active :=FALSE;
 	END IF;
-
-
+	
 	END LOOP;
 
 -- Finish the construction of the tabs array

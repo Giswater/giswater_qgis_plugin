@@ -152,7 +152,7 @@ BEGIN
 	v_formname = p_table_id;
 
 	-- Special case of visits
-	SELECT tablename INTO v_visit_tablename FROM config_api_visit WHERE formname=p_table_id;
+	SELECT tablename INTO v_visit_tablename FROM om_visit_class WHERE formname=p_table_id;
 	IF v_visit_tablename IS NOT NULL THEN v_tablename = v_visit_tablename; v_formname = p_table_id;	END IF;
 
 

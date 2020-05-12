@@ -50,7 +50,6 @@ DECLARE
     fields json;
     v_geometry json;
     v_all_geom json;
-
     
     v_xcoord float;
     v_ycoord float;
@@ -60,17 +59,14 @@ DECLARE
     v_infotype integer;
     v_epsg integer;
     v_icon text;
-
-    
-
+  
 BEGIN
-
-    
+  
 	--  Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
     schemas_array := current_schemas(FALSE);
 
---  get api version
+	--  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
         INTO api_version;
 
@@ -109,13 +105,13 @@ BEGIN
 
 	END IF;
 
--- TODO:: REFORMAT v_visiblelayers
+	-- TODO:: REFORMAT v_visiblelayers
 
 	v_visibleLayers = REPLACE (v_visibleLayers, '[', '{');
 	v_visibleLayers = REPLACE (v_visibleLayers, ']', '}');
 	raise notice '============== -> %',v_visibleLayers;
 
---   Make point
+	--   Make point
      SELECT ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_epsg) INTO v_point;
 
      v_sql := 'SELECT layer_id, 0 as orderby FROM  '||quote_ident(v_config_layer)||' WHERE layer_id= '''' UNION 
@@ -124,115 +120,101 @@ BEGIN
 	raise notice 'v_sql -> %', v_sql;
     FOR v_layer IN EXECUTE v_sql 
     LOOP
-	raise notice 'v_layer -> %', v_layer;
-        v_count=v_count+1;
-            --    Get id column
-        EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
-            INTO v_idname
-            USING v_layer;
-        --    For views it suposse pk is the first column
-        IF v_idname IS NULL THEN
-            EXECUTE 'SELECT a.attname FROM pg_attribute a   JOIN pg_class t on a.attrelid = t.oid  JOIN pg_namespace s on t.relnamespace = s.oid WHERE a.attnum > 0   AND NOT a.attisdropped
-		    AND t.relname = $1 
-		    AND s.nspname = $2
-		    ORDER BY a.attnum LIMIT 1'
-		    INTO v_idname
-		    USING v_layer, schemas_array[1];
+		raise notice 'v_layer -> %', v_layer;
+			v_count=v_count+1;
+				--    Get id column
+			EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
+				INTO v_idname
+				USING v_layer;
+			--    For views it suposse pk is the first column
+			IF v_idname IS NULL THEN
+				EXECUTE 'SELECT a.attname FROM pg_attribute a   JOIN pg_class t on a.attrelid = t.oid  JOIN pg_namespace s on t.relnamespace = s.oid WHERE a.attnum > 0   AND NOT a.attisdropped
+				AND t.relname = $1 
+				AND s.nspname = $2
+				ORDER BY a.attnum LIMIT 1'
+				INTO v_idname
+				USING v_layer, schemas_array[1];
 
-        END IF;
+			END IF;
 
-        --     Get geometry_column
-        EXECUTE 'SELECT attname FROM pg_attribute a        
-                JOIN pg_class t on a.attrelid = t.oid
-                JOIN pg_namespace s on t.relnamespace = s.oid
-                WHERE a.attnum > 0 
-                AND NOT a.attisdropped
-                AND t.relname = $1
-                AND s.nspname = $2
-                AND left (pg_catalog.format_type(a.atttypid, a.atttypmod), 8)=''geometry''
-                ORDER BY a.attnum' 
-	        INTO v_the_geom
-	        USING v_layer, schemas_array[1];
-	        raise notice 'v_the_geom -> %',v_the_geom;
-	
-
-        --  Indentify geometry type
-        EXECUTE 'SELECT st_geometrytype ('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_layer)||';' 
-        INTO v_geometrytype;
-
-	RAISE NOTICE 'Feature geometry: % ', v_geometry;
-		RAISE NOTICE 'Feature v_geometrytype: % ', v_geometrytype;
+			--     Get geometry_column
+			EXECUTE 'SELECT attname FROM pg_attribute a        
+					JOIN pg_class t on a.attrelid = t.oid
+					JOIN pg_namespace s on t.relnamespace = s.oid
+					WHERE a.attnum > 0 
+					AND NOT a.attisdropped
+					AND t.relname = $1
+					AND s.nspname = $2
+					AND left (pg_catalog.format_type(a.atttypid, a.atttypmod), 8)=''geometry''
+					ORDER BY a.attnum' 
+				INTO v_the_geom
+				USING v_layer, schemas_array[1];
+				raise notice 'v_the_geom -> %',v_the_geom;
 
 
-	-- get icon
-	IF v_geometrytype = 'ST_Point'::text OR v_geometrytype= 'ST_Multipoint'::text THEN
-		v_icon='11';
-	ELSIF v_geometrytype = 'ST_LineString'::text OR v_geometrytype= 'ST_MultiLineString'::text THEN
-		v_icon='12';
-        ELSIF v_geometrytype = 'ST_Polygon'::text OR v_geometrytype= 'ST_Multipolygon'::text THEN
-		v_icon='13';
-	END IF;
+			--  Indentify geometry type
+			EXECUTE 'SELECT st_geometrytype ('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_layer)||';' 
+			INTO v_geometrytype;
 
-	raise notice 'v_icon %', v_icon;
+		RAISE NOTICE 'Feature geometry: % ', v_geometry;
+			RAISE NOTICE 'Feature v_geometrytype: % ', v_geometrytype;
 
-	-- Get element
-	IF v_geometrytype = 'ST_Polygon'::text OR v_geometrytype= 'ST_Multipolygon'::text THEN
-            --  Get element from active layer, using the area of the elements to order possible multiselection (minor as first)        
-            EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (
-		    SELECT '||quote_ident(v_idname)||' AS id, '||quote_ident(v_the_geom)||' as the_geom, (SELECT St_AsText('||quote_ident(v_the_geom)||') as geometry) FROM '||quote_ident(v_layer)||' WHERE st_dwithin ($1, '||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $2) 
-		    ORDER BY  ST_area('||v_layer||'.'||v_the_geom||') asc) a'
-                    INTO v_ids
-                    USING v_point, v_sensibility;
-                
-        ELSE
-        raise notice 'v_point %',v_point;
-        raise notice 'v_sensibility %',v_sensibility;
-            --  Get element from active layer, using the distance from the clicked point to order possible multiselection (minor as first)
-            EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (
-		    SELECT '||quote_ident(v_idname)||' AS id, '||quote_ident(v_the_geom)||' as the_geom, (SELECT St_AsText('||quote_ident(v_the_geom)||') as geometry) FROM '||quote_ident(v_layer)||' WHERE st_dwithin ($1, '||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $2) 
-		    ORDER BY  ST_Distance('||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $1) asc) a'
-                    INTO v_ids
-                    USING v_point, v_sensibility;
-                    xxx:='SELECT array_agg(row_to_json(a)) FROM (
-		    SELECT '||v_idname||' AS id, '||v_the_geom||' as the_geom FROM '||v_layer||' WHERE st_dwithin ($1, '||v_layer||'.'||v_the_geom||', $2) 
-		    ORDER BY  ST_Distance('||v_layer||'.'||v_the_geom||', $1) asc) a';
-                   
-                    
-		raise notice 'yyyy %',xxx;
-        END IF;
 
-       --     Get geometry (to feature response)
-------------------------------------------
-	IF v_the_geom IS NOT NULL THEN
-		EXECUTE 'SELECT row_to_json(row) FROM (SELECT St_AsText('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_layer)||' WHERE '||quote_ident(v_idname)||' = ('||quote_nullable(v_ids)||'))row'
-		INTO v_geometry;
-	END IF;
-	
-	raise notice 'v_ids  %',v_ids;
-        IF v_ids IS NOT NULL THEN
-		fields_array[(x)::INT] := gw_fct_json_object_set_key(fields_array[(x)::INT], 'layerName', COALESCE(v_layer, '[]'));
-		fields_array[(x)::INT] := gw_fct_json_object_set_key(fields_array[(x)::INT], 'ids', COALESCE(v_ids, '{}'));
-		fields_array[(x)::INT] := gw_fct_json_object_set_key(fields_array[(x)::INT], 'icon', COALESCE(v_icon, '{}'));
-		x = x+1;
-        END IF;
-        
+		-- get icon
+		IF v_geometrytype = 'ST_Point'::text OR v_geometrytype= 'ST_Multipoint'::text THEN
+			v_icon='11';
+		ELSIF v_geometrytype = 'ST_LineString'::text OR v_geometrytype= 'ST_MultiLineString'::text THEN
+			v_icon='12';
+			ELSIF v_geometrytype = 'ST_Polygon'::text OR v_geometrytype= 'ST_Multipolygon'::text THEN
+			v_icon='13';
+		END IF;
 
+		raise notice 'v_icon %', v_icon;
+
+		-- Get element
+		IF v_geometrytype = 'ST_Polygon'::text OR v_geometrytype= 'ST_Multipolygon'::text THEN
+				--  Get element from active layer, using the area of the elements to order possible multiselection (minor as first)        
+				EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (
+				SELECT '||quote_ident(v_idname)||' AS id, '||quote_ident(v_the_geom)||' as the_geom, (SELECT St_AsText('||quote_ident(v_the_geom)||') as geometry) FROM '||quote_ident(v_layer)||' WHERE st_dwithin ($1, '||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $2) 
+				ORDER BY  ST_area('||v_layer||'.'||v_the_geom||') asc) a'
+						INTO v_ids
+						USING v_point, v_sensibility;
+					
+			ELSE
+			raise notice 'v_point %',v_point;
+			raise notice 'v_sensibility %',v_sensibility;
+				--  Get element from active layer, using the distance from the clicked point to order possible multiselection (minor as first)
+				EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (
+				SELECT '||quote_ident(v_idname)||' AS id, '||quote_ident(v_the_geom)||' as the_geom, (SELECT St_AsText('||quote_ident(v_the_geom)||') as geometry) FROM '||quote_ident(v_layer)||' WHERE st_dwithin ($1, '||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $2) 
+				ORDER BY  ST_Distance('||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $1) asc) a'
+						INTO v_ids
+						USING v_point, v_sensibility;
+						xxx:='SELECT array_agg(row_to_json(a)) FROM (
+				SELECT '||v_idname||' AS id, '||v_the_geom||' as the_geom FROM '||v_layer||' WHERE st_dwithin ($1, '||v_layer||'.'||v_the_geom||', $2) 
+				ORDER BY  ST_Distance('||v_layer||'.'||v_the_geom||', $1) asc) a';
+					   
+						
+			raise notice 'yyyy %',xxx;
+			END IF;
+
+		--     Get geometry (to feature response)
+		------------------------------------------
+		IF v_the_geom IS NOT NULL THEN
+			EXECUTE 'SELECT row_to_json(row) FROM (SELECT St_AsText('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_layer)||' WHERE '||quote_ident(v_idname)||' = ('||quote_nullable(v_ids)||'))row'
+			INTO v_geometry;
+		END IF;
+
+		raise notice 'v_ids  %',v_ids;
+		IF v_ids IS NOT NULL THEN
+			fields_array[(x)::INT] := gw_fct_json_object_set_key(fields_array[(x)::INT], 'layerName', COALESCE(v_layer, '[]'));
+			fields_array[(x)::INT] := gw_fct_json_object_set_key(fields_array[(x)::INT], 'ids', COALESCE(v_ids, '{}'));
+			fields_array[(x)::INT] := gw_fct_json_object_set_key(fields_array[(x)::INT], 'icon', COALESCE(v_icon, '{}'));
+			x = x+1;
+		END IF;
     END LOOP;
     
-raise notice 'fields_array <<<<<<<<<<<<<<<<<<<< %',fields_array;
-
 	fields := array_to_json(fields_array);
 	fields := COALESCE(fields, '[]');    
-
-   
-
---    Return
-
-
-   /* RETURN ('{"status":"Accepted"' ||
-        ', "apiVersion":'|| api_version ||
-        ', "fields":' || fields ||
-        '}')::json;*/
 
 --    Return
     RETURN ('{"status":"Accepted", "apiVersion":'||api_version||
@@ -242,10 +224,8 @@ raise notice 'fields_array <<<<<<<<<<<<<<<<<<<< %',fields_array;
 			',"data":{"layersNames":' || fields ||'}}'||
 	    '}')::json;
 
-   
-
---    Exception handling
- --     RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	Exception handling
+    RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;

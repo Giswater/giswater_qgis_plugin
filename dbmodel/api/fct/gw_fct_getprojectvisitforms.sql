@@ -108,8 +108,8 @@ Generate one form for layer and one form for visitclass=incident
 	
 	
 	--  get formname and tablename
-	v_formname := (SELECT formname FROM config_api_visit WHERE visitclass_id=v_visitclass);
-	v_tablename := (SELECT tablename FROM config_api_visit WHERE visitclass_id=v_visitclass);
+	v_formname := (SELECT formname FROM om_visit_class WHERE visitclass_id=v_visitclass);
+	v_tablename := (SELECT tablename FROM om_visit_class WHERE visitclass_id=v_visitclass);
 
 	RAISE NOTICE '--- VISIT PARAMETERS: newvisitform: % featuretype: %,  visitclass: %,  formname: %,  tablename: %,  device: % ---',isnewvisit, v_featuretype, v_visitclass, v_formname, v_tablename, v_device;
 
