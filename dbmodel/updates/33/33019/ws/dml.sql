@@ -15,6 +15,7 @@ UPDATE inp_typevalue SET idval='DMAINTERVAL>NODE' WHERE typevalue='inp_value_pat
 UPDATE inp_typevalue SET idval='HYDROPERIOD>NODE::DMAINTERVAL' WHERE typevalue='inp_value_patternmethod' AND id='26';
 UPDATE inp_typevalue SET idval='HYDROPERIOD>PJOINT' WHERE typevalue='inp_value_patternmethod' AND id='27';
 
+ALTER TABLE inp_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
 INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod', '27', 'DMAPERIOD>PJOINT')
 ON CONFLICT (typevalue, id) DO NOTHING;
 

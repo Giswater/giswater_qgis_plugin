@@ -43,6 +43,8 @@ project_type, isparent, isautoupdate, datatype, widgettype,ismandatory, isdeprec
 VALUES ('edit_upsert_elevation_from_dem','config','If true, the the elevation will be automatically inserted from the DEM raster',
 'role_edit', 'Elevation from DEM:', true, 5,7,'utils',false,false,'boolean','check',false,false);
 
+ALTER TABLE edit_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
+
 INSERT INTO edit_typevalue (typevalue, id, idval) VALUES ('raster_type', 'DEM','DEM');
 INSERT INTO edit_typevalue (typevalue, id, idval) VALUES ('raster_type', 'Slope','Slope');
 

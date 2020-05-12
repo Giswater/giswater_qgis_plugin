@@ -8,6 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2020/03/07
+ALTER TABLE edit_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
 
 DELETE FROM sys_typevalue_cat WHERE typevalue_name='man_addfields_cat_widgettype';
 DELETE FROM typevalue_fk WHERE target_table = 'man_addfields_parameter' AND target_field='widgettype_id';

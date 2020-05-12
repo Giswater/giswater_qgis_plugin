@@ -19,6 +19,7 @@ UPDATE audit_cat_param_user SET isparent=True, editability='{"trueWhenParentIn":
 							
 							
 --16/11/2019
+ALTER TABLE inp_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
 INSERT INTO inp_typevalue (typevalue, id, idval, descript) VALUES ('inp_typevalue_pumptype', 1, 'PRESSURE GROUP', NULL);
 INSERT INTO inp_typevalue (typevalue, id, idval, descript) VALUES ('inp_typevalue_pumptype', 2, 'PUMP STATION', NULL);
 

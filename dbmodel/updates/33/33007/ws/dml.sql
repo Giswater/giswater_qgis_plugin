@@ -8,6 +8,8 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 19/10/2019
+ALTER TABLE inp_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
+
 INSERT INTO inp_typevalue VALUES ('inp_value_opti_hyd', 'NONE','') ON CONFLICT (typevalue, id) DO NOTHING;
 
 UPDATE audit_cat_param_user SET vdefault='NONE',
