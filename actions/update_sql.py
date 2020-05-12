@@ -2364,17 +2364,18 @@ class UpdateSQL(ApiParent):
 
         status = False
         try:
-            f = open(filedir + os.sep + file, 'r')
+            filepath = filedir + os.sep + file
+            f = open(filepath, 'r')
             if f:
                 f_to_read = str(f.read().replace("SCHEMA_NAME", schema_name).replace("SRID_VALUE", filter_srid_value))
                 if self.dev_commit == 'TRUE':
-                    status = self.controller.execute_sql(str(f_to_read))
+                    status = self.controller.execute_sql(str(f_to_read), filepath=filepath)
                 else:
-                    status = self.controller.execute_sql(str(f_to_read), commit=False)
+                    status = self.controller.execute_sql(str(f_to_read), commit=False, filepath=filepath)
 
                 if status is False:
                     self.error_count = self.error_count + 1
-                    self.controller.log_info(str("read_execute_file error"), parameter=filedir + os.sep + file)
+                    self.controller.log_info(str("read_execute_file error"), parameter=filepath)
                     self.controller.log_info(str('Message: ' + str(self.controller.last_error)))
                     if self.dev_commit == 'TRUE':
                         self.controller.dao.rollback()

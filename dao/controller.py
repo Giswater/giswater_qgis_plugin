@@ -632,7 +632,7 @@ class DaoController(object):
         return rows  
     
             
-    def execute_sql(self, sql, search_audit=False, log_sql=False, log_error=False, commit=True):
+    def execute_sql(self, sql, search_audit=False, log_sql=False, log_error=False, commit=True, filepath=None):
         """ Execute SQL. Check its result in log tables, and show it to the user """
 
         if log_sql:
@@ -642,7 +642,7 @@ class DaoController(object):
         if not result:
             if log_error:
                 self.log_info(sql, stack_level_increase=1)
-            self.manage_exception_db(self.last_error, sql)
+            self.manage_exception_db(self.last_error, sql, filepath=filepath)
             return False
         else:
             if search_audit:
@@ -1599,7 +1599,7 @@ class DaoController(object):
         self.log_warning(msg)
 
 
-    def manage_exception_db(self, description=None, sql=None, stack_level=2, stack_level_increase=0):
+    def manage_exception_db(self, description=None, sql=None, stack_level=2, stack_level_increase=0, filepath=None):
         """ Manage exception in database queries and show information to the user """
 
         try:
@@ -1616,6 +1616,8 @@ class DaoController(object):
             msg += f"Line number: {function_line}\n"
             if description:
                 msg += f"Description:\n {description}\n"
+            if filepath:
+                msg += f"SQL file:\n {filepath}\n\n"
             if sql:
                 msg += f"SQL:\n {sql}\n"
 
@@ -1630,12 +1632,13 @@ class DaoController(object):
 
     def set_text_bold(self, widget, pattern=None):
         """ Set bold text when word match with pattern
-        :param widget:QTextEdit
+        :param widget: QTextEdit
         :param pattern: Text to find used as pattern for QRegExp (String)
         :return:
         """
+
         if not pattern:
-            pattern = "File\sname:|Function\sname:|Line\snumber:|SQL:|Detail:|Context:"
+            pattern = "File\sname:|Function\sname:|Line\snumber:|SQL:|SQL\sfile:|Detail:|Context:"
         cursor = widget.textCursor()
         format = QTextCharFormat()
         format.setFontWeight(QFont.Bold)
@@ -1648,13 +1651,10 @@ class DaoController(object):
             pos = index + regex.matchedLength()
             # Set cursor at end of match
             cursor.setPosition(pos, 1)
-
             # Select the matched text and apply the desired format
             cursor.mergeCharFormat(format)
-
             # Move to the next match
             index = regex.indexIn(widget.toPlainText(), pos)
-
 
 
     def manage_exception_api(self, json_result, sql=None, stack_level=2, stack_level_increase=0):
