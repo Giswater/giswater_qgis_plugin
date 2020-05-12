@@ -174,3 +174,9 @@ ALTER SEQUENCE SCHEMA_NAME.sys_csv2pg_config_id_seq RENAME TO config_csv_param_i
 ALTER SEQUENCE SCHEMA_NAME.sample_id_seq RENAME TO samplepoint_id_seq;
 ALTER SEQUENCE SCHEMA_NAME.audit_log_arc_traceability_id_seq RENAME TO audit_arc_traceability_id_seq;
 ALTER SEQUENCE SCHEMA_NAME.typevalue_fk_id_seq RENAME TO config_typevalue_fk_id_seq;
+
+ALTER TABLE config_toolbox ADD CONSTRAINT config_toolbox_id_fkey FOREIGN KEY (id)
+REFERENCES sys_function (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE config_csv ADD CONSTRAINT config_csv_functionname_fkey FOREIGN KEY (functionname)
+REFERENCES sys_function (function_name) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
