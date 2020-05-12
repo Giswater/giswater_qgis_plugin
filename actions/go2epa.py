@@ -24,7 +24,6 @@ from functools import partial
 from .. import utils_giswater
 from .api_go2epa_options import Go2EpaOptions
 from .api_parent import ApiParent
-from .task_import_rpt import TaskImportRpt
 from .task_go2epa import TaskGo2Epa
 from .update_sql import UpdateSQL
 from ..ui_manager import EpaResultCompareSelector, EpaResultManager, FileManager, HydrologySelector, Multirow_selector
@@ -402,34 +401,19 @@ class Go2Epa(ApiParent):
         self.import_result = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result)
 
         # Check for sector selector
-        if export_inp:
+        if self.export_inp:
             sql = "SELECT sector_id FROM inp_selector_sector LIMIT 1"
             row = self.controller.get_row(sql)
             if row is None:
                 msg = "You need to select some sector"
-                msg_box = QMessageBox()
-                msg_box.setIcon(3)
-                msg_box.setWindowTitle("Warning")
-                msg_box.setText(msg)
-                msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
-                msg_box.exec_()
+                self.controller.show_info_box(msg)
                 return
-
-        # Set file to execute
-        if self.project_type in 'ws':
-            opener = self.plugin_dir + "/epa/ws_epanet20012.exe"
-        elif self.project_type in 'ud':
-            opener = self.plugin_dir + "/epa/ud_swmm50022.exe"
 
         extras = '"iterative":"off"'
         extras += f', "resultId":"{self.result_name}"'
         extras += f', "useNetworkGeom":"{net_geom}"'
         extras += f', "dumpSubcatch":"{export_subcatch}"'
         body = self.create_body(extras=extras)
-
-        # Start process
-        counter = 0
-
         complet_result = self.controller.get_json('gw_fct_pg2epa_main', body, log_sql=True, commit=True)
         if not complet_result:
             self.controller.show_warning(str(self.controller.last_error))
@@ -437,59 +421,12 @@ class Go2Epa(ApiParent):
             self.controller.show_info_box(message)
             return
 
-        counter += 1
-        self.controller.log_info(f"{counter}:{complet_result['steps']}:{complet_result['continue']}")
-        common_msg = ""
-        message = None
-
         # Set background task 'Go2Epa'
         description = f"Go2Epa"
         self.complet_result = complet_result
         self.task_go2epa = TaskGo2Epa(description, self.controller, self)
         QgsApplication.taskManager().addTask(self.task_go2epa)
         QgsApplication.taskManager().triggerTask(self.task_go2epa)
-
-        # Execute epa
-        if exec_epa is True:
-            if self.file_rpt == "null":
-                message = "You have to set this parameter"
-                self.controller.show_warning(message, parameter="RPT file")
-                return
-
-            msg = "INP file not found"
-            if self.file_inp is not None:
-                if not os.path.exists(self.file_inp):
-                    self.controller.show_warning(msg, parameter=str(self.file_inp))
-                    return
-            else:
-                self.controller.show_warning(msg, parameter=str(self.file_inp))
-                return
-
-            subprocess.call([opener, self.file_inp, self.file_rpt], shell=False)
-            common_msg += "EPA model finished. "
-
-        # Import to DB
-        if import_result is True:
-            if os.path.exists(self.file_rpt):
-
-                # Set background task 'Import RPT to database'
-                description = f"Import RPT to database: result_name = '{self.result_name}'"
-                self.task_rpt_to_db = TaskImportRpt(description, self.controller, self.dlg_go2epa, self.file_rpt,
-                    self.result_name)
-                QgsApplication.taskManager().addTask(self.task_rpt_to_db)
-                QgsApplication.taskManager().triggerTask(self.task_rpt_to_db)
-
-            else:
-                msg = "Can't export rpt, File not found"
-                self.controller.show_warning(msg, parameter=self.file_rpt)
-
-
-        if common_msg != "" and self.imports_canceled is False:
-            self.controller.show_info(common_msg)
-        if message is not None and self.imports_canceled is False:
-            self.controller.show_info_box(message)
-
-        #self.check_result_id()
 
 
     def set_completer_result(self, widget, viewname, field_name):

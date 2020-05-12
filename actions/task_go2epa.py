@@ -11,6 +11,8 @@ from qgis.core import QgsTask, QgsMessageLog, Qgis
 from collections import OrderedDict
 import re
 import json
+import os
+import subprocess
 
 from .add_layer import AddLayer
 
@@ -27,7 +29,7 @@ class TaskGo2Epa(QgsTask):
         self.go2epa = go2epa
         self.error_msg = None
         self.message = None
-        self.common_msg = None
+        self.common_msg = ""
         self._file = None
         self.set_variables_from_go2epa()
         self.add_layer = AddLayer(self.controller.iface, None, controller, None)
@@ -45,6 +47,8 @@ class TaskGo2Epa(QgsTask):
         self.export_inp = self.go2epa.export_inp
         self.exec_epa = self.go2epa.exec_epa
         self.import_result = self.go2epa.import_result
+        self.project_type = self.go2epa.project_type
+        self.plugin_dir = self.go2epa.plugin_dir
 
 
     def run(self):
@@ -54,10 +58,13 @@ class TaskGo2Epa(QgsTask):
         if self.export_inp:
             self.export_to_inp()
 
+        if self.exec_epa:
+            self.execute_epa()
+
         if self.import_result:
             self.import_rpt()
 
-
+        return True
 
 
     def finished(self, result):
@@ -65,15 +72,11 @@ class TaskGo2Epa(QgsTask):
         self.close_file()
 
         if result:
-            self.controller.log_info(f"Task finished: {self.description()}")
-            if 'status' in self.rpt_result[0]:
-                if self.rpt_result[0]['status'] == "Accepted":
-                    if 'body' in self.rpt_result[0]:
-                        if 'data' in self.rpt_result[0]['body']:
-                            self.add_layer.add_temp_layer(self.dlg_go2epa, self.rpt_result[0]['body']['data'],
-                                'RPT results', True, True, 1, False)
-            self.message = self.rpt_result[0]['message']['text']
-            self.controller.show_info_box(self.message)
+            if self.common_msg != "":
+                self.controller.show_info(self.common_msg)
+            if self.message is not None:
+                self.controller.show_info_box(self.message)
+            self.go2epa.check_result_id()
             return
 
         if self.error_msg:
@@ -103,11 +106,14 @@ class TaskGo2Epa(QgsTask):
         self.controller.log_info(f"progressChanged: {progress}")
 
 
-    def close_file(self):
+    def close_file(self, file=None):
 
-        if self._file:
-            self._file.close()
-            del self._file
+        if file is None:
+            file = self._file
+
+        if file:
+            file.close()
+            del file
 
 
     def export_to_inp(self):
@@ -118,7 +124,7 @@ class TaskGo2Epa(QgsTask):
 
         # Get values from complet_result['body']['file'] and insert into INP file
         if 'file' not in self.complet_result['body']:
-            return
+            return False
 
         self.fill_inp_file(self.file_inp, self.complet_result['body']['file'])
         self.message = self.complet_result['message']['text']
@@ -127,20 +133,46 @@ class TaskGo2Epa(QgsTask):
 
     def fill_inp_file(self, folder_path=None, all_rows=None):
 
-        progress = 0
-        row_count = sum(1 for rows in all_rows)  # @UnusedVariable
+        self.controller.log_info(f"fill_inp_file: {folder_path}")
+
         file1 = open(folder_path, "w")
         for row in all_rows:
-            progress += 1
             if 'text' in row and row['text'] is not None:
                 line = row['text'].rstrip() + "\n"
                 file1.write(line)
 
-        file1.close()
-        del file1
+        self.close_file(file1)
+
+
+    def execute_epa(self):
+
+        if self.file_rpt == "null":
+            message = "You have to set this parameter"
+            self.controller.show_warning(message, parameter="RPT file")
+            return
+
+        msg = "INP file not found"
+        if self.file_inp is not None:
+            if not os.path.exists(self.file_inp):
+                self.controller.show_warning(msg, parameter=str(self.file_inp))
+                return
+        else:
+            self.controller.show_warning(msg, parameter=str(self.file_inp))
+            return
+
+        # Set file to execute
+        if self.project_type in 'ws':
+            opener = f"{self.plugin_dir}/epa/ws_epanet20012.exe"
+        elif self.project_type in 'ud':
+            opener = f"{self.plugin_dir}/epa/ud_swmm50022.exe"
+
+        subprocess.call([opener, self.file_inp, self.file_rpt], shell=False)
+        self.common_msg += "EPA model finished. "
 
 
     def import_rpt(self):
+
+        self.controller.log_info(f"import_rpt: {self.file_rpt}")
 
         self.setProgress(0)
         status = False
@@ -152,8 +184,8 @@ class TaskGo2Epa(QgsTask):
             # Importing file to temporal table
             status = self.insert_rpt_into_db(self.file_rpt)
             if not status:
-                return
-            self.exec_rpt()
+                return False
+            status = self.exec_function_rpt2pg()
         except Exception as e:
             self.error_msg = str(e)
         finally:
@@ -165,7 +197,6 @@ class TaskGo2Epa(QgsTask):
         self._file = open(folder_path, "r+")
         full_file = self._file.readlines()
         progress = 0
-        counter = 1
 
         # Create dict with sources
         sql = "SELECT tablename, target FROM sys_csv2pg_config WHERE pg2csvcat_id = '11';"
@@ -292,8 +323,8 @@ class TaskGo2Epa(QgsTask):
         function_name = 'gw_fct_rpt2pg_main'
         extras = '"iterative":"disabled"'
         extras += f', "resultId":"{self.result_name}"'
-        extras += f', "currentStep":"{counter}"'
-        extras += f', "continue":"{_continue}"'
+        extras += f', "currentStep":"1"'
+        extras += f', "continue":"False"'
         body = self.create_body(extras=extras)
         sql = f"SELECT {function_name}({body})::text"
         row = self.controller.get_row(sql)
@@ -301,17 +332,19 @@ class TaskGo2Epa(QgsTask):
             self.controller.show_warning(self.controller.last_error)
             message = "Import failed"
             self.controller.show_info_box(message)
-            return
+            return False
         else:
             rpt_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
             if 'status' in rpt_result[0]:
                 if rpt_result[0]['status'] == "Accepted":
                     if 'body' in rpt_result[0]:
                         if 'data' in rpt_result[0]['body']:
-                            self.add_layer.add_temp_layer(self.dlg_go2epa, rpt_result[0]['body']['data'], 'RPT results',
-                                True, True, 1, False)
+                            self.add_layer.add_temp_layer(self.dlg_go2epa, rpt_result[0]['body']['data'],
+                                'RPT results', True, True, 1, False)
             self.message = rpt_result[0]['message']['text']
 
         # final message
         self.common_msg += "Import RPT finished."
+
+        return True
 
