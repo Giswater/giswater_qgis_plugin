@@ -65,3 +65,4 @@ UPDATE sys_param_user SET dv_querytext = replace (dv_querytext, 'user_name', 'cu
 
 UPDATE sys_function set function_name = 'gw_fct_mincut_inlet_flowtrace' where function_name like 'gw_fct_inlet_flowtrace';
 
+UPDATE sys_function SET return_type = null, input_params = null;
