@@ -73,7 +73,7 @@ class MincutParent(ParentAction):
             return
         
         for row in rows:
-            self.states[row['id']] = row['name']
+            self.states[row['id']] = row['idval']
 
 
     def init_map_tool(self):
