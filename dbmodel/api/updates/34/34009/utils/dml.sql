@@ -16,3 +16,13 @@ UPDATE config_typevalue_fk SET target_table = 'config_form_fields' WHERE target_
 UPDATE config_typevalue_fk SET target_table = 'config_info_layer' WHERE target_table = 'config_api_layer';
 UPDATE config_typevalue_fk SET target_table = 'config_form_tabs' WHERE target_table = 'config_api_form_tabs';
 UPDATE config_typevalue_fk SET target_table = 'config_form_fields' WHERE target_table = 'config_api_form_fields';
+
+
+COMMENT ON TABLE sys_function
+  IS 'INSTRUCTIONS TO WORK WITH THIS TABLE:
+It is possible to create own functions. Ids from 10000 to 20000 are reserved to work with. Check true on iscustom column';
+
+
+COMMENT ON TABLE sys_fprocess
+  IS 'INSTRUCTIONS TO WORK WITH THIS TABLE:
+It is possible to create own process. Ids from 10000 to 20000 are reserved to work with. Check true on iscustom column';

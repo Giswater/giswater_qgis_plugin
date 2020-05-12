@@ -10,6 +10,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 UPDATE audit_cat_param_user SET dv_querytext = 'SELECT id, idval FROM inp_typevalue WHERE typevalue=''inp_value_opti_hyd'''
 WHERE id='inp_options_hydraulics';
 
+ALTER TABLE inp_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
 INSERT INTO inp_typevalue VALUES ('inp_value_opti_hyd', 'NONE', '') ON CONFLICT (typevalue, id) DO NOTHING;
 
 
