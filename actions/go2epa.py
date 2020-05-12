@@ -47,7 +47,6 @@ class Go2Epa(ApiParent):
     def go2epa(self):
         """ Button 23: Open form to set INP, RPT and project """
 
-        self.imports_canceled = False
         # Create dialog
         self.dlg_go2epa = FileManager()
         self.load_settings(self.dlg_go2epa)
@@ -55,20 +54,11 @@ class Go2Epa(ApiParent):
         if self.project_type in 'ws':
             self.dlg_go2epa.chk_export_subcatch.setVisible(False)
 
-        # Check if user can use recursion or not
-        go2epaiterative = self.settings.value('system_variables/go2epaiterative')
-        if str(go2epaiterative) == "FALSE":
-            self.dlg_go2epa.chk_recurrent.setVisible(False)
-            self.dlg_go2epa.chk_recurrent.setChecked(False)
-
         # Set signals
-        self.dlg_go2epa.chk_only_check.stateChanged.connect(partial(self.active_recurrent))
-        self.dlg_go2epa.chk_recurrent.stateChanged.connect(partial(self.recurrent))
         self.dlg_go2epa.txt_result_name.textChanged.connect(partial(self.check_result_id))
         self.dlg_go2epa.btn_file_inp.clicked.connect(self.go2epa_select_file_inp)
         self.dlg_go2epa.btn_file_rpt.clicked.connect(self.go2epa_select_file_rpt)
         self.dlg_go2epa.btn_accept.clicked.connect(self.go2epa_accept)
-        self.dlg_go2epa.btn_cancel.clicked.connect(partial(self.cancel_imports))
         self.dlg_go2epa.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_go2epa))
         self.dlg_go2epa.rejected.connect(partial(self.close_dialog, self.dlg_go2epa))
         self.dlg_go2epa.btn_options.clicked.connect(self.epa_options)
@@ -97,52 +87,6 @@ class Go2Epa(ApiParent):
 
         # Open dialog
         self.open_dialog(self.dlg_go2epa)
-
-
-    def cancel_imports(self):
-
-        self.counter = self.iterations
-        self.imports_canceled = True
-
-
-    def active_recurrent(self, state):
-
-        if state == 2:  # Checked
-            self.dlg_go2epa.chk_recurrent.setEnabled(True)
-        elif state == 0:  # UnChecked
-            self.dlg_go2epa.chk_recurrent.setEnabled(False)
-            utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_recurrent, False)
-            self.recurrent(0)
-
-
-    def recurrent(self, state):
-
-        if state == 0:
-            utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export, False)
-            utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch, False)
-            utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec, False)
-            utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result, False)
-            self.dlg_go2epa.chk_export.setEnabled(True)
-            self.dlg_go2epa.chk_export_subcatch.setEnabled(True)
-            self.dlg_go2epa.chk_exec.setEnabled(True)
-            self.dlg_go2epa.chk_import_result.setEnabled(True)
-        elif state == 2:
-            msg = ("You have activated the iterative functionality. It will take a lot of time. Check iterative "
-                   "function is well configured and your python console is open. Would you like to contiue?")
-            title = "Activate iterative"
-            answer = self.controller.ask_question(msg, title)
-            if answer:
-                utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export, True)
-                utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch, True)
-                utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec, True)
-                utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result, True)
-                self.dlg_go2epa.chk_export.setEnabled(False)
-                self.dlg_go2epa.chk_export_subcatch.setEnabled(False)
-                self.dlg_go2epa.chk_exec.setEnabled(False)
-                self.dlg_go2epa.chk_import_result.setEnabled(False)
-            else:
-                utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_recurrent, False)
-                self.dlg_go2epa.chk_recurrent.setCheckState(0)
 
 
     def check_inp_chk(self, file_inp):
@@ -250,9 +194,6 @@ class Go2Epa(ApiParent):
         value = self.controller.plugin_settings_value('go2epa_chk_NETWORK_GEOM' + cur_user)
         if str(value) == 'true':
             utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check, True)
-        value = self.controller.plugin_settings_value('go2epa_chk_RECURSIVE' + cur_user)
-        if str(value) == 'true':
-            utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_recurrent, True)
         value = self.controller.plugin_settings_value('go2epa_chk_INP' + cur_user)
         if str(value) == 'true':
             utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export, True)
@@ -279,8 +220,6 @@ class Go2Epa(ApiParent):
             utils_giswater.getWidgetText(self.dlg_go2epa, 'txt_file_rpt', return_string_null=False))
         self.controller.plugin_settings_set_value('go2epa_chk_NETWORK_GEOM' + cur_user,
             utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check))
-        self.controller.plugin_settings_set_value('go2epa_chk_RECURSIVE' + cur_user,
-            utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_recurrent))
         self.controller.plugin_settings_set_value('go2epa_chk_INP' + cur_user,
             utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export))
         self.controller.plugin_settings_set_value('go2epa_chk_UD' + cur_user,
