@@ -464,8 +464,30 @@ class ManageVisit(ParentManage, QObject):
 
     def entered_event_tab(self, dialog):
         """Manage actions when the Event tab is entered."""
+        self.set_paramteter_type_id_combo(dialog)
         self.set_parameter_id_combo(dialog)
-        self.set_parameter_id_combo(dialog)
+
+
+
+    def set_paramteter_type_id_combo(self, dialog):
+        # Event tab
+        self.controller.log_info(str(utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.visitclass_id, 0)))
+        # Fill ComboBox parameter_type_id
+        sql = ("SELECT distinct(parameter_type), parameter_type FROM " + self.schema_name + ".om_visit_class_x_parameter a"
+               " JOIN " + self.schema_name + ".om_visit_parameter b ON b.id = a.parameter_id"
+               " WHERE class_id::text = '" + str(utils_giswater.get_item_data(dialog, dialog.visitclass_id, 0)) + "'")
+        sql += " ORDER BY parameter_type"
+
+        parameter_type_ids = self.controller.get_rows(sql, commit=True)
+        utils_giswater.set_item_data(dialog.parameter_type_id, parameter_type_ids, 1)
+
+        # now get default value to be show in parameter_type_id
+        sql = ("SELECT value"
+               " FROM " + self.schema_name + ".config_param_user"
+               " WHERE parameter = 'om_param_type_vdefault' AND cur_user = current_user")
+        row = self.controller.get_row(sql, commit=True)
+        if row:
+            utils_giswater.set_combo_itemData(dialog.parameter_type_id, row[0], 0)
 
 
     def set_parameter_id_combo(self, dialog):
@@ -701,24 +723,6 @@ class ManageVisit(ParentManage, QObject):
                " ORDER BY id")
         rows = self.controller.get_rows(sql, commit=self.autocommit)
         utils_giswater.fillComboBox(self.dlg_add_visit, "feature_type", rows, allow_nulls=False)
-
-        # Event tab
-        # Fill ComboBox parameter_type_id
-        sql = ("SELECT distinct(parameter_type), parameter_type FROM " + self.schema_name + ".om_visit_class_x_parameter a"
-               " JOIN " + self.schema_name + ".om_visit_parameter b ON b.id = a.parameter_id"
-               " WHERE class_id::text = '" + str(utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.visitclass_id, 0)) + "'")
-        sql += " ORDER BY parameter_type"
-
-        parameter_type_ids = self.controller.get_rows(sql, commit=True)
-        utils_giswater.set_item_data(self.dlg_add_visit.parameter_type_id, parameter_type_ids, 1)
-
-        # now get default value to be show in parameter_type_id
-        sql = ("SELECT value"
-               " FROM " + self.schema_name + ".config_param_user"
-               " WHERE parameter = 'om_param_type_vdefault' AND cur_user = current_user")
-        row = self.controller.get_row(sql, commit=True)
-        if row:
-            utils_giswater.set_combo_itemData(self.dlg_add_visit.parameter_type_id, row[0], 0)
 
 
     def set_completers(self):
