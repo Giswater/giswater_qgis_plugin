@@ -2751,7 +2751,7 @@ class ApiCF(ApiParent, QObject):
 
     """ FUNCTIONS ASSOCIATED TO BUTTONS FROM POSTGRES"""
 
-    def gwInfoNode(self, **kwargs):
+    def info_node(self, **kwargs):
         """ Function called in class ApiParent.add_button(...) -->
                 widget.clicked.connect(partial(getattr(self, function_name), **kwargs)) """
 

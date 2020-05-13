@@ -1568,7 +1568,7 @@ class ApiParent(ParentAction):
             getattr(self, function_name)(widget)
 
 
-    def gwOpenUrl(self, widget):
+    def open_url(self, widget):
 
         path = widget.text()
         # Check if file exist
