@@ -9,8 +9,6 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 --DROP CHECK
 
-
-
 ALTER TABLE "inp_typevalue_timeseries" DROP CONSTRAINT IF EXISTS "inp_typevalue_timeseries_check";
 ALTER TABLE "inp_timser_id" DROP CONSTRAINT IF EXISTS "inp_timser_id_check";
 ALTER TABLE "inp_value_files_actio" DROP CONSTRAINT IF EXISTS "inp_value_files_actio_check";
