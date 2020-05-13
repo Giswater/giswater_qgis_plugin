@@ -40,7 +40,6 @@ class TaskGo2Epa(QgsTask):
         """ Set variables from object Go2Epa """
 
         self.dlg_go2epa = self.go2epa.dlg_go2epa
-        self.complet_result = self.go2epa.complet_result
         self.result_name = self.go2epa.result_name
         self.file_inp = self.go2epa.file_inp
         self.file_rpt = self.go2epa.file_rpt
@@ -49,11 +48,16 @@ class TaskGo2Epa(QgsTask):
         self.import_result = self.go2epa.import_result
         self.project_type = self.go2epa.project_type
         self.plugin_dir = self.go2epa.plugin_dir
+        self.net_geom = self.go2epa.net_geom
+        self.export_subcatch = self.go2epa.export_subcatch
 
 
     def run(self):
 
         self.controller.log_info(f"Task started: {self.description()}")
+
+        if not self.exec_function_pg2epa():
+            return False
 
         if self.export_inp:
             self.export_to_inp()
@@ -133,6 +137,24 @@ class TaskGo2Epa(QgsTask):
             del file
 
 
+    def exec_function_pg2epa(self):
+
+        self.setProgress(0)
+        extras = '"iterative":"off"'
+        extras += f', "resultId":"{self.result_name}"'
+        extras += f', "useNetworkGeom":"{self.net_geom}"'
+        extras += f', "dumpSubcatch":"{self.export_subcatch}"'
+        body = self.create_body(extras=extras)
+        self.complet_result = self.controller.get_json('gw_fct_pg2epa_main', body, log_sql=True, commit=True)
+        if not self.complet_result:
+            self.controller.show_warning(str(self.controller.last_error))
+            message = "Export failed"
+            self.controller.show_info_box(message)
+            return False
+
+        return True
+
+
     def export_to_inp(self):
 
         # Get values from complet_result['body']['file'] and insert into INP file
@@ -187,7 +209,6 @@ class TaskGo2Epa(QgsTask):
 
         self.controller.log_info(f"import_rpt: {self.file_rpt}")
 
-        self.setProgress(0)
         status = False
         try:
             # Delete previous values of user on temp table

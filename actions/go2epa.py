@@ -392,9 +392,9 @@ class Go2Epa(ApiParent):
 
         # Get widgets values
         self.result_name = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_result_name, False, False)
-        net_geom = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check)
+        self.net_geom = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check)
         self.export_inp = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export)
-        export_subcatch = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch)
+        self.export_subcatch = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch)
         self.file_inp = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp)
         self.exec_epa = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec)
         self.file_rpt = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt)
@@ -409,21 +409,8 @@ class Go2Epa(ApiParent):
                 self.controller.show_info_box(msg)
                 return
 
-        extras = '"iterative":"off"'
-        extras += f', "resultId":"{self.result_name}"'
-        extras += f', "useNetworkGeom":"{net_geom}"'
-        extras += f', "dumpSubcatch":"{export_subcatch}"'
-        body = self.create_body(extras=extras)
-        complet_result = self.controller.get_json('gw_fct_pg2epa_main', body, log_sql=True, commit=True)
-        if not complet_result:
-            self.controller.show_warning(str(self.controller.last_error))
-            message = "Export failed"
-            self.controller.show_info_box(message)
-            return
-
         # Set background task 'Go2Epa'
         description = f"Go2Epa"
-        self.complet_result = complet_result
         self.task_go2epa = TaskGo2Epa(description, self.controller, self)
         QgsApplication.taskManager().addTask(self.task_go2epa)
         QgsApplication.taskManager().triggerTask(self.task_go2epa)
