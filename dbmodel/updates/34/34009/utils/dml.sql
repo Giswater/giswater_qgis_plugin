@@ -52,17 +52,11 @@ UPDATE config_param_system SET value =
  WHERE parameter = 'api_selector_exploitation';
  
   
-UPDATE config_form_fields SET widgetfunction = 'gwSetComposer' WHERE widgetfunction = 'gw_api_setcomposer';
-UPDATE config_form_fields SET widgetfunction = 'gwSetPrint' WHERE widgetfunction = 'gw_api_setprint';
-UPDATE config_form_fields SET widgetfunction = 'gwOpenUrl' WHERE widgetfunction = 'gw_api_open_url';
-UPDATE config_form_fields SET widgetfunction = 'gwInfoNode' WHERE widgetfunction = 'gw_api_open_node';
-UPDATE config_form_fields SET widgetfunction = NULL WHERE widgetfunction = 'get_catalog_id';
-
-
-UPDATE config_form_fields SET dv_querytext = replace (dv_querytext, 'config_api_images', 'config_form_images');
-UPDATE config_form_fields SET dv_querytext = replace (dv_querytext, 'config_api_typevalue', 'config_form_typevalue');
 UPDATE sys_param_user SET dv_querytext = replace (dv_querytext, 'user_name', 'cur_user') where dv_querytext like '%user_name%';
 
 UPDATE sys_function set function_name = 'gw_fct_mincut_inlet_flowtrace' where function_name like 'gw_fct_inlet_flowtrace';
 
 UPDATE sys_function SET return_type = null, input_params = null;
+
+DELETE FROM sys_function where function_name like '%trg_review_audit%';
+DELETE FROM sys_function WHERE id IN (1322, 1224, 1326, 1230, 1324, 1226, 1228, 2856, 2442);

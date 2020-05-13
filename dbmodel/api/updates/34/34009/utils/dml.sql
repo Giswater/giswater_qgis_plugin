@@ -17,6 +17,16 @@ UPDATE config_typevalue_fk SET target_table = 'config_info_layer' WHERE target_t
 UPDATE config_typevalue_fk SET target_table = 'config_form_tabs' WHERE target_table = 'config_api_form_tabs';
 UPDATE config_typevalue_fk SET target_table = 'config_form_fields' WHERE target_table = 'config_api_form_fields';
 
+UPDATE config_form_fields SET widgetfunction = 'gwSetComposer' WHERE widgetfunction = 'gw_api_setcomposer';
+UPDATE config_form_fields SET widgetfunction = 'gwSetPrint' WHERE widgetfunction = 'gw_api_setprint';
+UPDATE config_form_fields SET widgetfunction = 'gwOpenUrl' WHERE widgetfunction = 'gw_api_open_url';
+UPDATE config_form_fields SET widgetfunction = 'gwInfoNode' WHERE widgetfunction = 'gw_api_open_node';
+UPDATE config_form_fields SET widgetfunction = NULL WHERE widgetfunction = 'get_catalog_id';
+
+
+UPDATE config_form_fields SET dv_querytext = replace (dv_querytext, 'config_api_images', 'config_form_images');
+UPDATE config_form_fields SET dv_querytext = replace (dv_querytext, 'config_api_typevalue', 'config_form_typevalue');
+
 
 COMMENT ON TABLE sys_function
   IS 'INSTRUCTIONS TO WORK WITH THIS TABLE:

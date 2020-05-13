@@ -25,3 +25,32 @@ ALTER TABLE config_api_visit RENAME TO _config_api_visit_;
 
 ALTER SEQUENCE SCHEMA_NAME.config_api_form_fields_id_seq RENAME TO config_form_fields_id_seq;
 
+
+ALTER SEQUENCE SCHEMA_NAME.config_api_form_groupbox_id_seq RENAME TO config_form_groupbox_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.config_api_form_id_seq RENAME TO config_form_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.config_api_form_layout_id_seq RENAME TO config_form_layout_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.config_api_images_id_seq RENAME TO config_form_images_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.config_api_list_id_seq RENAME TO config_form_list_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.config_api_tableinfo_x_inforole_id_seq RENAME TO config_info_table_x_type_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.config_client_forms_id_seq RENAME TO config_form_tableview_id_seq;
+
+ALTER SEQUENCE SCHEMA_NAME.anl_mincut_inlet_x_exploitation_id_seq RENAME TO config_mincut_inlet_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.anl_mincut_result_arc_id_seq RENAME TO om_mincut_arc_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.anl_mincut_result_connec_id_seq RENAME TO om_mincut_connec_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.anl_mincut_result_hydrometer_id_seq RENAME TO om_mincut_hydrometer_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.anl_mincut_result_node_id_seq RENAME TO om_mincut_node_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.anl_mincut_result_polygon_id_seq RENAME TO om_mincut_polygon_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.anl_mincut_result_valve_id_seq RENAME TO om_mincut_valve_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.anl_mincut_result_valve_unaccess_id_seq RENAME TO om_mincut_valve_unaccess_id_seq;
+
+ALTER SEQUENCE SCHEMA_NAME.sys_csv2pg_cat_id_seq RENAME TO config_csv_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.sys_csv2pg_config_id_seq RENAME TO config_csv_param_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.sample_id_seq RENAME TO samplepoint_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.audit_log_arc_traceability_id_seq RENAME TO audit_arc_traceability_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.typevalue_fk_id_seq RENAME TO config_typevalue_fk_id_seq;
+
+ALTER TABLE config_toolbox ADD CONSTRAINT config_toolbox_id_fkey FOREIGN KEY (id)
+REFERENCES sys_function (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE sys_function ADD CONSTRAINT sys_function_function_name_unique UNIQUE (function_name, project_type);
+
