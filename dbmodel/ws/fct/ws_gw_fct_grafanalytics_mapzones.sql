@@ -46,7 +46,7 @@ SELECT sector_id, count(sector_id) from v_edit_arc group by sector_id order by 1
 
 
 -- DMA
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation": "[1,2]", "checkData": false,"updateFeature":"TRUE", "updateMapZone":2, "geomParamUpdate":15,"debug":"false"}}}');
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation": "[532]", "checkData": false,"updateFeature":"TRUE", "updateMapZone":2, "geomParamUpdate":15,"debug":"false"}}}');
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "node":"1046", "updateFeature":"TRUE", "updateMapZone":2,"concaveHullParam":0.85,"debug":"false"}}}');
 SELECT count(*), log_message FROM audit_log_data WHERE fprocesscat_id=45 AND cur_user=current_user group by log_message order by 2 --DMA
 SELECT dma_id, count(dma_id) from v_edit_arc  group by dma_id order by 1;
@@ -539,14 +539,17 @@ BEGIN
 							)a WHERE a.'||quote_ident(v_field)||'='||quote_ident(v_table)||'.'||quote_ident(v_fieldmp)||' AND '||quote_ident(v_table)||'.'||
 							quote_ident(v_fieldmp)||'::text != 0::text';
 					EXECUTE v_querytext;
-					
+
 				ELSIF  v_updatemapzgeom = 2 THEN
 				
 					-- pipe buffer
 					v_querytext = '	UPDATE '||quote_ident(v_table)||' set the_geom = geom FROM
 							(SELECT '||quote_ident(v_field)||', st_multi(st_buffer(st_collect(the_geom),'||v_geomparamupdate||')) as geom from arc where '||
-							quote_ident(v_field)||'::integer > 0 group by '||quote_ident(v_field)||')a 
-							WHERE a.'||quote_ident(v_field)||'='||quote_ident(v_table)||'.'||quote_ident(v_fieldmp);			
+							quote_ident(v_field)||'::integer > 0 AND arc.'||quote_ident(v_field)||' IN
+							(SELECT DISTINCT '||quote_ident(v_field)||' FROM arc JOIN anl_arc USING (arc_id) WHERE fprocesscat_id = '||v_fprocesscat_id||' and cur_user = current_user)
+							group by '||quote_ident(v_field)||')a 
+							WHERE a.'||quote_ident(v_field)||'='||quote_ident(v_table)||'.'||quote_ident(v_fieldmp);
+
 					EXECUTE v_querytext;
 
 				ELSIF  v_updatemapzgeom = 3 THEN
@@ -555,10 +558,15 @@ BEGIN
 					v_querytext = '	UPDATE '||quote_ident(v_table)||' set the_geom = geom FROM
 								(SELECT '||quote_ident(v_field)||', st_multi(st_buffer(st_collect(geom),0.01)) as geom FROM
 								(SELECT '||quote_ident(v_field)||', st_buffer(st_collect(the_geom), '||v_geomparamupdate||') as geom from arc 
-								where '||quote_ident(v_field)||'::integer > 0  group by '||quote_ident(v_field)||'
+								where '||quote_ident(v_field)||'::integer > 0 AND arc.'||quote_ident(v_field)||' IN
+								(SELECT DISTINCT '||quote_ident(v_field)||' FROM arc JOIN anl_arc USING (arc_id) WHERE fprocesscat_id = '||v_fprocesscat_id||' and cur_user = current_user)
+								group by '||quote_ident(v_field)||'
 								UNION
 								SELECT '||quote_ident(v_field)||', st_collect(ext_plot.the_geom) as geom FROM v_edit_connec, ext_plot
-								WHERE '||quote_ident(v_field)||'::integer > 0 AND st_dwithin(v_edit_connec.the_geom, ext_plot.the_geom, 0.001)
+								WHERE '||quote_ident(v_field)||'::integer > 0 
+								AND v_edit_connec.'||quote_ident(v_field)||' IN
+								(SELECT DISTINCT '||quote_ident(v_field)||' FROM arc JOIN anl_arc USING (arc_id) WHERE fprocesscat_id = '||v_fprocesscat_id||' and cur_user = current_user)
+								AND st_dwithin(v_edit_connec.the_geom, ext_plot.the_geom, 0.001)
 								group by '||quote_ident(v_field)||'	
 								)a group by '||quote_ident(v_field)||')b 
 							WHERE b.'||quote_ident(v_field)||'='||quote_ident(v_table)||'.'||quote_ident(v_fieldmp);
