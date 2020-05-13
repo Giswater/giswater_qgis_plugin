@@ -2204,12 +2204,8 @@ class UpdateSQL(ApiParent):
         self.error_count = 0
 
 
-    def init_dialog_create_project(self, project_type=None):
+    def init_dialog_create_project(self):
         """ Initialize dialog (only once) """
-
-        # Create dialog
-        if self.dlg_readsql_create_project is not None:
-            return
 
         self.dlg_readsql_create_project = ReadsqlCreateProject()
         self.load_settings(self.dlg_readsql_create_project)
@@ -2252,31 +2248,17 @@ class UpdateSQL(ApiParent):
 
         # Populate Table
         self.fill_table_by_query(self.tbl_srid, sql)
-        self.cmb_create_project_type = self.dlg_readsql_create_project.findChild(QComboBox, 'cmb_create_project_type')
 
         # Fill combo 'project_type'
+        self.cmb_create_project_type = self.dlg_readsql_create_project.findChild(QComboBox, 'cmb_create_project_type')
         for aux in self.project_types:
             self.cmb_create_project_type.addItem(str(aux))
-
-        if project_type:
-            self.cmb_project_type = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
-            utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.cmb_create_project_type, project_type)
-            self.change_project_type(self.cmb_create_project_type)
 
         # Enable_disable data file widgets
         self.enable_datafile()
 
         # Get combo locale
         self.cmb_locale = self.dlg_readsql_create_project.findChild(QComboBox, 'cmb_locale')
-
-        # Set listeners
-        self.dlg_readsql_create_project.btn_accept.clicked.connect(partial(self.create_project_data_schema))
-        self.dlg_readsql_create_project.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_readsql_create_project))
-        self.dlg_readsql_create_project.btn_push_file.clicked.connect(partial(self.select_file_inp))
-        self.cmb_create_project_type.currentIndexChanged.connect(partial(self.change_project_type, self.cmb_create_project_type))
-        self.cmb_locale.currentIndexChanged.connect(partial(self.update_locale))
-        self.rdb_import_data.toggled.connect(partial(self.enable_datafile))
-        self.filter_srid.textChanged.connect(partial(self.filter_srid_changed))
 
         # Populate combo with all locales
         locales = sorted(os.listdir(self.sql_dir + os.sep + 'i18n' + os.sep))
@@ -2288,11 +2270,35 @@ class UpdateSQL(ApiParent):
         # Get database connection name
         self.connection_name = str(utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_connection))
 
+        # Set signals
+        self.set_signals_create_project()
+
+
+    def set_signals_create_project(self):
+
+        self.dlg_readsql_create_project.btn_accept.clicked.connect(partial(self.create_project_data_schema))
+        self.dlg_readsql_create_project.btn_close.clicked.connect(
+            partial(self.close_dialog, self.dlg_readsql_create_project))
+        self.dlg_readsql_create_project.btn_push_file.clicked.connect(partial(self.select_file_inp))
+        self.cmb_create_project_type.currentIndexChanged.connect(
+            partial(self.change_project_type, self.cmb_create_project_type))
+        self.cmb_locale.currentIndexChanged.connect(partial(self.update_locale))
+        self.rdb_import_data.toggled.connect(partial(self.enable_datafile))
+        self.filter_srid.textChanged.connect(partial(self.filter_srid_changed))
+
 
     def open_create_project(self):
 
-        # Initialize dialog (only once)
-        self.init_dialog_create_project()
+        # Create dialog and signals
+        if self.dlg_readsql_create_project is None:
+            self.controller.log_info("init_dialog_create_project")
+            self.init_dialog_create_project()
+
+        # Get project_type from previous dialog
+        self.cmb_project_type = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
+        utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.cmb_create_project_type,
+            self.cmb_project_type)
+        self.change_project_type(self.cmb_create_project_type)
 
         # Open dialog
         self.dlg_readsql_create_project.setWindowTitle(f"Create Project - {self.connection_name}")
@@ -2482,7 +2488,6 @@ class UpdateSQL(ApiParent):
             if status:
                 msg = "Process finished successfully"
                 self.controller.show_info_box(msg, "Info", parameter="Delete schema")
-
                 self.populate_data_schema_name(self.cmb_project_type)
                 self.set_info_project()
 
