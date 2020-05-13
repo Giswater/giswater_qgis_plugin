@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>615</width>
+    <width>485</width>
     <height>537</height>
    </rect>
   </property>
@@ -146,6 +146,13 @@
                 </property>
                </widget>
               </item>
+              <item row="0" column="2">
+               <widget class="QCheckBox" name="chk_only_check">
+                <property name="text">
+                 <string>Use result network geometry</string>
+                </property>
+               </widget>
+              </item>
               <item row="0" column="1">
                <widget class="QLineEdit" name="txt_result_name">
                 <property name="sizePolicy">
@@ -156,20 +163,6 @@
                 </property>
                 <property name="text">
                  <string/>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="2">
-               <widget class="QCheckBox" name="chk_only_check">
-                <property name="text">
-                 <string>Use result network geometry</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="2">
-               <widget class="QCheckBox" name="chk_recurrent">
-                <property name="text">
-                 <string>Use iterative calls</string>
                 </property>
                </widget>
               </item>
@@ -378,34 +371,7 @@
              </widget>
             </item>
             <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_4">
-              <item>
-               <widget class="QProgressBar" name="progressBar">
-                <property name="value">
-                 <number>0</number>
-                </property>
-                <property name="textVisible">
-                 <bool>true</bool>
-                </property>
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="invertedAppearance">
-                 <bool>false</bool>
-                </property>
-                <property name="textDirection">
-                 <enum>QProgressBar::TopToBottom</enum>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="lbl_counter">
-                <property name="text">
-                 <string>00/00</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
+             <layout class="QHBoxLayout" name="horizontalLayout_4"/>
             </item>
            </layout>
           </widget>
