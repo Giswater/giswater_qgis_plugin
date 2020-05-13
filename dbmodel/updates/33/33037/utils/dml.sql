@@ -11,5 +11,5 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 UPDATE audit_cat_table SET sys_role_id = 'role_basic'  WHERE id = 'audit_check_data';
 
 --2020/05/09
-UPDATE ws.audit_cat_table SET sys_role_id = 'role_master' WHERE id = 'config_api_form_fields';
+UPDATE ws.audit_cat_table SET sys_role_id = 'role_master' WHERE id = 'config_form_fields';
 
