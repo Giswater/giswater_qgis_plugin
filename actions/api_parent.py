@@ -472,7 +472,7 @@ class ApiParent(ParentAction):
         # Set width and alias of visible columns
         columns_to_delete = []
         sql = (f"SELECT column_index, width, alias, status"
-               f" FROM config_client_forms"
+               f" FROM config_form_tableview"
                f" WHERE table_id = '{table_name}'"
                f" ORDER BY column_index")
         rows = self.controller.get_rows(sql, log_info=False)
@@ -507,7 +507,7 @@ class ApiParent(ParentAction):
         # Set width and alias of visible columns
         columns_to_show = ""
         sql = (f"SELECT column_index, width, column_id, alias, status"
-               f" FROM config_client_forms"
+               f" FROM config_form_tableview"
                f" WHERE table_id = '{table_name}'"
                f" ORDER BY column_index")
         rows = self.controller.get_rows(sql, log_sql=False)
@@ -642,7 +642,7 @@ class ApiParent(ParentAction):
         extras += f', "parentValue":"{utils_giswater.getWidgetText(dialog, "data_" + str(field["parentId"]))}"'
         extras += f', "textToSearch":"{utils_giswater.getWidgetText(dialog, widget)}"'
         body = self.create_body(extras=extras)
-        complet_list = self.controller.get_json('gw_api_gettypeahead', body)
+        complet_list = self.controller.get_json('gw_fct_gettypeahead', body)
         if not complet_list: return False
 
         list_items = []
@@ -793,7 +793,7 @@ class ApiParent(ParentAction):
         feature += f'"idName":"{field_id}"'
         extras = f'"comboParent":"{combo_parent}", "comboId":"{combo_id}"'
         body = self.create_body(feature=feature, extras=extras)
-        result = self.controller.get_json('gw_api_getchilds', body)
+        result = self.controller.get_json('gw_fct_getchilds', body)
         if not result: return False
 
         for combo_child in result['body']['data']:
@@ -907,7 +907,7 @@ class ApiParent(ParentAction):
         else:
             message = "Parameter not found"
             self.controller.show_message(message, 2, parameter='widgetfunction')
-        # Call def gw_api_open_url(self, widget) or def no_function_associated(self, widget=None, message_level=1)
+        # Call function (self, widget) or def no_function_associated(self, widget=None, message_level=1)
         widget.clicked.connect(partial(getattr(self, func_name), widget))
         return widget
 
@@ -1481,7 +1481,7 @@ class ApiParent(ParentAction):
             if 'widgetfunction' in field:
                 if field['widgetfunction'] is not None:
                     function_name = field['widgetfunction']
-                    # Call def gw_api_setprint(self, dialog, my_json): of the class ApiManageComposer
+                    # Call def gw_fct_setprint(self, dialog, my_json): of the class ApiManageComposer
                     widget.currentIndexChanged.connect(partial(getattr(self, function_name), dialog, self.my_json))
 
         return label, widget
@@ -1521,7 +1521,7 @@ class ApiParent(ParentAction):
             self.controller.show_message(message, 2, parameter='button_function')
 
         if type(widget) == QLineEdit:
-            # Call def gw_api_setprint(self, dialog, my_json): of the class ApiManageComposer
+            # Call def gw_fct_setprint(self, dialog, my_json): of the class ApiManageComposer
             widget.editingFinished.connect(partial(getattr(self, function_name), dialog, self.my_json))
             widget.returnPressed.connect(partial(getattr(self, function_name), dialog, self.my_json))
 
@@ -1564,11 +1564,11 @@ class ApiParent(ParentAction):
                 break
 
         if widget:
-            # Call def  def gw_api_open_url(self, widget)
+            # Call def  function (self, widget)
             getattr(self, function_name)(widget)
 
 
-    def gw_api_open_url(self, widget):
+    def open_url(self, widget):
 
         path = widget.text()
         # Check if file exist
@@ -1700,7 +1700,7 @@ class ApiParent(ParentAction):
         main_tab = dialog.findChild(QTabWidget, 'main_tab')
         extras = f'"selector_type":{selector_type}'
         body = self.create_body(extras=extras)
-        complet_result = self.controller.get_json('gw_api_getselectors', body, log_sql=True)
+        complet_result = self.controller.get_json('gw_fct_getselectors', body, log_sql=True)
         if not complet_result: return False
 
         for form_tab in complet_result['body']['form']['formTabs']:
@@ -1743,7 +1743,7 @@ class ApiParent(ParentAction):
         extras += f'"result_name":"{widget.objectName()}", '
         extras += f'"result_value":"{widget.isChecked()}"'
         body = self.create_body(extras=extras)
-        complet_result = self.controller.get_json('gw_api_setselectors', body, log_sql=True)
+        complet_result = self.controller.get_json('gw_fct_setselectors', body, log_sql=True)
         if not complet_result: return False
         if selector_type in complet_result['body']['data']['indexingLayers']:
             for layer_name in complet_result['body']['data']['indexingLayers'][selector_type]:

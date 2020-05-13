@@ -63,7 +63,7 @@ class ApiCF(ApiParent, QObject):
         extras += f'"visibleLayers":{visible_layers}, '
         extras += f'"zoomScale":{scale_zoom} '
         body = self.create_body(extras=extras)
-        complet_list = self.controller.get_json('gw_api_getlayersfromcoordinates', body, log_sql=True)
+        complet_list = self.controller.get_json('gw_fct_getlayersfromcoordinates', body, log_sql=True)
         if not complet_list: return False
 
         # hide QMenu identify if no feature under mouse
@@ -218,7 +218,7 @@ class ApiCF(ApiParent, QObject):
             feature = f'"tableName":"{feature_cat.child_layer.lower()}"'
             extras += f', "coordinates":{{{point}}}'
             body = self.create_body(feature=feature, extras=extras)
-            function_name = 'gw_api_getfeatureinsert'
+            function_name = 'gw_fct_getfeatureinsert'
         # IF click over canvas
         elif point:
             visible_layer = self.get_visible_layers(as_list=True)
@@ -227,12 +227,12 @@ class ApiCF(ApiParent, QObject):
             extras += f', "visibleLayer":{visible_layer}'
             extras += f', "coordinates":{{"xcoord":{point.x()},"ycoord":{point.y()}, "zoomRatio":{scale_zoom}}}'
             body = self.create_body(extras=extras)
-            function_name = 'gw_api_getinfofromcoordinates'
+            function_name = 'gw_fct_getinfofromcoordinates'
         # IF come from QPushButtons node1 or node2 from custom form or RightButton
         elif feature_id:
             feature = f'"tableName":"{table_name}", "id":"{feature_id}"'
             body = self.create_body(feature=feature, extras=extras)
-            function_name = 'gw_api_getinfofromid'
+            function_name = 'gw_fct_getinfofromid'
 
         row = [self.controller.get_json(function_name, body, log_sql=True)]
         if not row or row[0] is False: return False, None
@@ -491,7 +491,6 @@ class ApiCF(ApiParent, QObject):
                     widget = self.dlg_cf.findChild(QComboBox, field['widgetname'])
                     if widget is not None:
                         widget.currentIndexChanged.connect(partial(self.fill_child, self.dlg_cf, widget, self.feature_type, self.tablename, self.field_id))
-                        self.fill_child(self.dlg_cf, widget, self.feature_type, self.tablename, self.field_id)
 
         # Set variables
         self.filter = str(complet_result[0]['body']['feature']['idName']) + " = '" + str(self.feature_id) + "'"
@@ -890,7 +889,7 @@ class ApiCF(ApiParent, QObject):
         self.load_settings(dlg_sections)
         feature = '"id":"'+self.feature_id+'"'
         body = self.create_body(feature=feature)
-        section_result = self.controller.get_json('gw_api_getinfocrossection', body)
+        section_result = self.controller.get_json('gw_fct_getinfocrossection', body)
         if not section_result: return False
         # Set image
         img = section_result['body']['data']['shapepng']
@@ -973,7 +972,7 @@ class ApiCF(ApiParent, QObject):
         feature += f'"tableName":"{p_table_id}"'
         extras = f'"fields":{my_json}, "reload":"{fields_reload}"'
         body = self.create_body(feature=feature, extras=extras)
-        result = self.controller.get_json('gw_api_setfields', body, log_sql=True)
+        result = self.controller.get_json('gw_fct_setfields', body, log_sql=True)
         if not result:
             return
 
@@ -1656,7 +1655,7 @@ class ApiCF(ApiParent, QObject):
         """ Fill the table control to show hydrometers """
 
         txt_hydrometer_id = self.dlg_cf.findChild(QLineEdit, "txt_hydrometer_id")
-        filter = f"connec_id ILIKE '%{self.feature_id}%' "
+        filter = f"connec_id = '{self.feature_id}' "
         filter += f" AND hydrometer_customer_code ILIKE '%{txt_hydrometer_id.text()}%'"
 
         # Set model of selected widget
@@ -1676,17 +1675,19 @@ class ApiCF(ApiParent, QObject):
         rows = self.controller.get_rows(sql)
         if not rows:
             return False
-
         utils_giswater.set_item_data(self.dlg_cf.cmb_cat_period_id_filter, rows, add_empty=True, sort_combo=False)
 
         sql = ("SELECT hydrometer_id, hydrometer_customer_code "
                " FROM v_rtc_hydrometer "
                " WHERE connec_id = '"+str(self.feature_id)+"' "
                " ORDER BY hydrometer_customer_code")
-        rows = [('', '')]
-        rows.extend(self.controller.get_rows(sql, log_sql=True))
-        utils_giswater.set_item_data(self.dlg_cf.cmb_hyd_customer_code, rows, 1)
-
+        rows_list = []
+        rows = self.controller.get_rows(sql, log_sql=True)
+        rows_list.append(['', ''])
+        if rows:
+            for row in rows:
+                rows_list.append(row)
+        utils_giswater.set_item_data(self.dlg_cf.cmb_hyd_customer_code, rows_list, 1)
 
         self.fill_tbl_hydrometer_values(self.tbl_hydrometer_value, table_hydro_value)
         self.set_columns_config(self.tbl_hydrometer_value, table_hydro_value)
@@ -2382,7 +2383,7 @@ class ApiCF(ApiParent, QObject):
         id_name = complet_result[0]['body']['feature']['idName']
         feature = f'"tableName":"{self.tablename}", "idName":"{id_name}", "id":"{self.feature_id}"'
         body = self.create_body(form, feature,  filter_fields)
-        complet_list = [self.controller.get_json('gw_api_getlist', body)]
+        complet_list = [self.controller.get_json('gw_fct_getlist', body)]
         if not complet_list: return False
         return complet_list
 
@@ -2470,7 +2471,7 @@ class ApiCF(ApiParent, QObject):
             feature += f'"idName":"{self.field_id}", '
             feature += f'"id":"{self.feature_id}"'
             body = self.create_body(form, feature, filter_fields='')
-            complet_list = self.controller.get_json('gw_api_getinfoplan', body)
+            complet_list = self.controller.get_json('gw_fct_getinfoplan', body)
             if not complet_list: return False
             result = complet_list['body']['data']
             if 'fields' not in result:
@@ -2750,7 +2751,7 @@ class ApiCF(ApiParent, QObject):
 
     """ FUNCTIONS ASSOCIATED TO BUTTONS FROM POSTGRES"""
 
-    def gw_api_open_node(self, **kwargs):
+    def info_node(self, **kwargs):
         """ Function called in class ApiParent.add_button(...) -->
                 widget.clicked.connect(partial(getattr(self, function_name), **kwargs)) """
 

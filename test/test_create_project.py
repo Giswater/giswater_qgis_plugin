@@ -64,7 +64,7 @@ class TestQgis():
         return True
 
 
-    def create_project(self, project_type='ws'):
+    def create_project(self, project_type='ws', project_name=None, project_title=None):
 
         print("\nStart create_project")
 
@@ -78,8 +78,10 @@ class TestQgis():
 
         self.test_giswater.update_sql.init_sql(False, self.user, show_dialog=False)
         self.test_giswater.update_sql.init_dialog_create_project(project_type)
-        project_name = f"test_{project_type}"
-        project_title = f"test_{project_type}"
+        if project_name is None:
+            project_name = f"test_{project_type}"
+        if project_title is None:
+            project_title = f"test_{project_type}"
         self.test_giswater.update_sql.create_project_data_schema(project_name, project_title, project_type,
             '25831', 'EN', is_test=True, exec_last_process=True, example_data=True)
 
@@ -218,5 +220,5 @@ def test_manage_visit():
 if __name__ == '__main__':
     print("MAIN")
     test = TestQgis()
-    test.manage_visit()
+    test.create_project('ws', 'ws_dev34')
 

@@ -42,7 +42,7 @@ class GwToolBox(ApiParent):
 
     def open_toolbox(self):
 
-        function_name = "gw_api_gettoolbox"
+        function_name = "gw_fct_gettoolbox"
         row = self.controller.check_function(function_name)
         if not row:
             self.controller.show_warning("Function not found in database", parameter=function_name)
@@ -54,7 +54,7 @@ class GwToolBox(ApiParent):
         self.dlg_toolbox_doc.trv.setHeaderHidden(True)
         extras = '"isToolbox":true'
         body = self.create_body(extras=extras)
-        complet_result = self.controller.get_json('gw_api_gettoolbox', body)
+        complet_result = self.controller.get_json('gw_fct_gettoolbox', body)
         if not complet_result:
             return False
 
@@ -68,7 +68,7 @@ class GwToolBox(ApiParent):
 
         extras = f'"filterText":"{text}"'
         body = self.create_body(extras=extras)
-        complet_result = self.controller.get_json('gw_api_gettoolbox', body)
+        complet_result = self.controller.get_json('gw_fct_gettoolbox', body)
         if not complet_result :
             return False
 
@@ -98,7 +98,7 @@ class GwToolBox(ApiParent):
         extras = f'"filterText":"{self.alias_function}"'
         extras += ', "isToolbox":true'
         body = self.create_body(extras=extras)
-        complet_result = self.controller.get_json('gw_api_gettoolbox', body, log_sql=True)
+        complet_result = self.controller.get_json('gw_fct_gettoolbox', body, log_sql=True)
         if not complet_result: return False
 
         status = self.populate_functions_dlg(self.dlg_functions, complet_result['body']['data'])
@@ -555,7 +555,7 @@ class GwToolBox(ApiParent):
                         icon = QIcon(path_icon_red)
                         label.setIcon(icon)
                         label.setForeground(QColor(255, 0, 0))
-                        msg = f"Function {function['functionname']} configured on the table audit_cat_function, but not found in the database"
+                        msg = f"Function {function['functionname']} configured on the table config_toolbox, but not found in the database"
                         label.setToolTip(msg)
                         self.no_clickable_items.append(str(function['alias']))
                 else:

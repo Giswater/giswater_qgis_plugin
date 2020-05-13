@@ -65,15 +65,15 @@ class MincutParent(ParentAction):
         """ Serialize data of table 'anl_mincut_cat_state' """
         
         self.states = {}
-        sql = ("SELECT id, name "
-               "FROM anl_mincut_cat_state "
+        sql = ("SELECT id, idval "
+               "FROM om_typevalue WHERE typevalue = 'mincut_state' "
                "ORDER BY id")
         rows = self.controller.get_rows(sql)
         if not rows:
             return
         
         for row in rows:
-            self.states[row['id']] = row['name']
+            self.states[row['id']] = row['idval']
 
 
     def init_map_tool(self):
@@ -145,7 +145,7 @@ class MincutParent(ParentAction):
 
         # Fill ComboBox cause
         sql = ("SELECT id, descript "
-               "FROM anl_mincut_cat_cause "
+               "FROM om_typevalue WHERE typevalue = 'mincut_cause "
                "ORDER BY id")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_mincut.cause, rows, 1)
@@ -233,8 +233,8 @@ class MincutParent(ParentAction):
         result_mincut_id = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
         expr_filter = f"result_id={result_mincut_id}"
         utils_giswater.set_qtv_config(self.dlg_mincut.tbl_hydro, edit_triggers=QTableView.DoubleClicked)
-        self.fill_table(self.dlg_mincut.tbl_hydro, 'v_anl_mincut_result_hydrometer', expr_filter=expr_filter)
-        self.set_table_columns(self.dlg_mincut, self.dlg_mincut.tbl_hydro, 'v_anl_mincut_result_hydrometer')
+        self.fill_table(self.dlg_mincut.tbl_hydro, 'v_om_mincut_hydrometer', expr_filter=expr_filter)
+        self.set_table_columns(self.dlg_mincut, self.dlg_mincut.tbl_hydro, 'v_om_mincut_hydrometer')
 
 
     def check_dates_coherence(self, date_from, date_to, time_from, time_to):
@@ -258,7 +258,7 @@ class MincutParent(ParentAction):
     def show_notified_list(self):
 
         mincut_id = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
-        sql = (f"SELECT notified FROM anl_mincut_result_cat "
+        sql = (f"SELECT notified FROM om_mincut "
                f"WHERE id = '{mincut_id}'")
         row = self.controller.get_row(sql, log_sql=True)
         if not row or row[0] is None:
@@ -274,8 +274,8 @@ class MincutParent(ParentAction):
     def set_id_val(self):
 
         # Show future id of mincut
-        sql = ("SELECT setval('anl_mincut_result_cat_seq', (SELECT max(id::integer) "
-               "FROM anl_mincut_result_cat), true)")
+        sql = ("SELECT setval('om_mincut_seq', (SELECT max(id::integer) "
+               "FROM om_mincut), true)")
         row = self.controller.get_row(sql, log_sql=True)
         if not row or row[0] is None or row[0] < 1:
             result_mincut_id = '1'
@@ -326,11 +326,11 @@ class MincutParent(ParentAction):
         # If id exists in data base on btn_cancel delete
         if self.action == "mg_mincut":
             result_mincut_id = self.dlg_mincut.result_mincut_id.text()
-            sql = (f"SELECT id FROM anl_mincut_result_cat"
+            sql = (f"SELECT id FROM om_mincut"
                    f" WHERE id = {result_mincut_id}")
             row = self.controller.get_row(sql)
             if row:
-                sql = (f"DELETE FROM anl_mincut_result_cat"
+                sql = (f"DELETE FROM om_mincut"
                        f" WHERE id = {result_mincut_id}")
                 self.controller.execute_sql(sql)
                 self.controller.show_info("Mincut canceled!")                   
@@ -522,20 +522,20 @@ class MincutParent(ParentAction):
             self.set_id_val()
             self.is_new = False
 
-        # Check if id exist in table 'anl_mincut_result_cat'
+        # Check if id exist in table 'om_mincut'
         result_mincut_id = self.dlg_mincut.result_mincut_id.text()
-        sql = (f"SELECT id FROM anl_mincut_result_cat "
+        sql = (f"SELECT id FROM om_mincut "
                f"WHERE id = '{result_mincut_id}';")
         rows = self.controller.get_rows(sql)
         
         # If not found Insert just its 'id'
         sql = ""
         if not rows:
-            sql = (f"INSERT INTO anl_mincut_result_cat (id) "
+            sql = (f"INSERT INTO om_mincut (id) "
                    f"VALUES ('{result_mincut_id}');\n")
 
         # Update all the fields
-        sql += (f"UPDATE anl_mincut_result_cat"
+        sql += (f"UPDATE om_mincut"
                 f" SET mincut_state = '{mincut_result_state}',"
                 f" mincut_type = '{mincut_result_type}', anl_cause = '{anl_cause}',"
                 f" anl_tstamp = '{received_date}', received_date = '{received_date}',"
@@ -574,9 +574,9 @@ class MincutParent(ParentAction):
                 
         sql += f" WHERE id = '{result_mincut_id}';\n"
         
-        # Update table 'anl_mincut_result_selector'
-        sql += (f"DELETE FROM anl_mincut_result_selector WHERE cur_user = current_user;\n"
-                f"INSERT INTO anl_mincut_result_selector (cur_user, result_id) VALUES "
+        # Update table 'selector_mincut_result'
+        sql += (f"DELETE FROM selector_mincut_result WHERE cur_user = current_user;\n"
+                f"INSERT INTO selector_mincut_result (cur_user, result_id) VALUES "
                 f"(current_user, {result_mincut_id});")
         
         # Check if any 'connec' or 'hydro' associated
@@ -597,7 +597,7 @@ class MincutParent(ParentAction):
         
         # Close dialog and disconnect snapping
         self.disconnect_snapping()
-        sql = (f"SELECT mincut_state, mincut_class FROM anl_mincut_result_cat "
+        sql = (f"SELECT mincut_state, mincut_class FROM om_mincut "
                f" WHERE id = '{result_mincut_id}'")
         row = self.controller.get_row(sql, log_sql=True)
         if not row or (str(row[0]) != '0' or str(row[1]) != '1'):
@@ -731,15 +731,15 @@ class MincutParent(ParentAction):
 
 
     def update_result_selector(self, result_mincut_id, commit=True):    
-        """ Update table 'anl_mincut_result_selector' """    
+        """ Update table 'selector_mincut_result' """
             
-        sql = (f"DELETE FROM anl_mincut_result_selector WHERE cur_user = current_user;"
-               f"\nINSERT INTO anl_mincut_result_selector (cur_user, result_id) VALUES"
+        sql = (f"DELETE FROM selector_mincut_result WHERE cur_user = current_user;"
+               f"\nINSERT INTO selector_mincut_result (cur_user, result_id) VALUES"
                f" (current_user, {result_mincut_id});")
         status = self.controller.execute_sql(sql, commit)    
         if not status:    
             message = "Error updating table"    
-            self.controller.show_warning(message, parameter='anl_mincut_result_selector')   
+            self.controller.show_warning(message, parameter='selector_mincut_result')
                 
 
     def real_end_accept(self):
@@ -784,12 +784,12 @@ class MincutParent(ParentAction):
 
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
 
-        # Check if id exist in anl_mincut_result_cat
-        sql = (f"SELECT id FROM anl_mincut_result_cat"
+        # Check if id exist in om_mincut
+        sql = (f"SELECT id FROM om_mincut"
                f" WHERE id = '{result_mincut_id_text}';")
         exist_id = self.controller.get_row(sql)
         if not exist_id:
-            sql = (f"INSERT INTO anl_mincut_result_cat (id, mincut_class) "
+            sql = (f"INSERT INTO om_mincut (id, mincut_class) "
                    f" VALUES ('{result_mincut_id_text}', 2);")
             self.controller.execute_sql(sql)
             self.is_new = False
@@ -820,7 +820,7 @@ class MincutParent(ParentAction):
         # Set autocompleter for 'customer_code'
         self.set_completer_customer_code(self.dlg_connec.connec_id)
 
-        # On opening form check if result_id already exist in anl_mincut_result_connec
+        # On opening form check if result_id already exist in om_mincut_connec
         # if exist show data in form / show selection!!!
         if exist_id:
             # Read selection and reload table
@@ -947,12 +947,12 @@ class MincutParent(ParentAction):
         self.connec_list = []
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
 
-        # Check if id exist in table 'anl_mincut_result_cat'
-        sql = (f"SELECT id FROM anl_mincut_result_cat"
+        # Check if id exist in table 'om_mincut'
+        sql = (f"SELECT id FROM om_mincut"
                f" WHERE id = '{result_mincut_id_text}';")
         exist_id = self.controller.get_row(sql)
         if not exist_id:
-            sql = (f"INSERT INTO anl_mincut_result_cat (id, mincut_class)"
+            sql = (f"INSERT INTO om_mincut (id, mincut_class)"
                    f" VALUES ('{result_mincut_id_text}', 3);")
             self.controller.execute_sql(sql)
             self.is_new = False
@@ -1089,7 +1089,7 @@ class MincutParent(ParentAction):
                     
         # Set 'expr_filter' of connecs related with current mincut
         result_mincut_id = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
-        sql = (f"SELECT connec_id FROM anl_mincut_result_connec"
+        sql = (f"SELECT connec_id FROM om_mincut_connec"
                f" WHERE result_id = {result_mincut_id}")
         rows = self.controller.get_rows(sql)
         if rows:
@@ -1121,7 +1121,7 @@ class MincutParent(ParentAction):
         # Set 'expr_filter' of connecs related with current mincut
         result_mincut_id = utils_giswater.getWidgetText(self.dlg_hydro, self.result_mincut_id)
         sql = (f"SELECT DISTINCT(connec_id) FROM rtc_hydrometer_x_connec AS rtc"
-               f" INNER JOIN anl_mincut_result_hydrometer AS anl"
+               f" INNER JOIN om_mincut_hydrometer AS anl"
                f" ON anl.hydrometer_id = rtc.hydrometer_id"
                f" WHERE result_id = {result_mincut_id}")
         rows = self.controller.get_rows(sql)
@@ -1145,7 +1145,7 @@ class MincutParent(ParentAction):
 
         # Get list of 'hydrometer_id' belonging to current result_mincut
         result_mincut_id = utils_giswater.getWidgetText(self.dlg_hydro, self.result_mincut_id)
-        sql = (f"SELECT hydrometer_id FROM anl_mincut_result_hydrometer"
+        sql = (f"SELECT hydrometer_id FROM om_mincut_hydrometer"
                f" WHERE result_id = {result_mincut_id}")
         rows = self.controller.get_rows(sql)
 
@@ -1441,7 +1441,7 @@ class MincutParent(ParentAction):
 
     def accept_connec(self, dlg, element):
         """ Slot function widget 'btn_accept' of 'connec' dialog 
-            Insert into table 'anl_mincut_result_connec' values of current mincut 
+            Insert into table 'om_mincut_connec' values of current mincut
         """
         
         result_mincut_id = utils_giswater.getWidgetText(dlg, self.dlg_mincut.result_mincut_id)
@@ -1460,8 +1460,8 @@ class MincutParent(ParentAction):
             rows = self.controller.get_rows(sql2)
             if rows:
                 for row in rows:
-                    # Hydrometers associated to selected connec inserted to the table anl_mincut_result_hydrometer
-                    sql += (f"INSERT INTO anl_mincut_result_hydrometer"
+                    # Hydrometers associated to selected connec inserted to the table om_mincut_hydrometer
+                    sql += (f"INSERT INTO om_mincut_hydrometer"
                             f" (result_id, hydrometer_id) "
                             f" VALUES ('{result_mincut_id}', '{row[0]}');\n")
 
@@ -1472,7 +1472,7 @@ class MincutParent(ParentAction):
 
     def accept_hydro(self, dlg, element):
         """ Slot function widget 'btn_accept' of 'hydrometer' dialog 
-            Insert into table 'anl_mincut_result_hydrometer' values of current mincut 
+            Insert into table 'om_mincut_hydrometer' values of current mincut
         """
 
         result_mincut_id = utils_giswater.getWidgetText(dlg, self.dlg_mincut.result_mincut_id)
@@ -1557,20 +1557,20 @@ class MincutParent(ParentAction):
     def set_visible_mincut_layers(self, zoom=False):
         """ Set visible mincut result layers """
         
-        layer = self.controller.get_layer_by_tablename("v_anl_mincut_result_valve") 
+        layer = self.controller.get_layer_by_tablename("v_om_mincut_valve")
         if layer:
             self.controller.set_layer_visible(layer)
                     
-        layer = self.controller.get_layer_by_tablename("v_anl_mincut_result_arc") 
+        layer = self.controller.get_layer_by_tablename("v_om_mincut_arc")
         if layer:
             self.controller.set_layer_visible(layer)
             
-        layer = self.controller.get_layer_by_tablename("v_anl_mincut_result_connec") 
+        layer = self.controller.get_layer_by_tablename("v_om_mincut_connec")
         if layer:            
             self.controller.set_layer_visible(layer)
 
         # Refresh extension of layer
-        layer = self.controller.get_layer_by_tablename("v_anl_mincut_result_node")
+        layer = self.controller.get_layer_by_tablename("v_om_mincut_node")
         if layer:
             self.controller.set_layer_visible(layer)
             if zoom:
@@ -1589,7 +1589,7 @@ class MincutParent(ParentAction):
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
         srid = self.controller.plugin_settings_value('srid')
 
-        sql = (f"UPDATE anl_mincut_result_cat"
+        sql = (f"UPDATE om_mincut"
                f" SET exec_the_geom = ST_SetSRID(ST_Point({point.x()}, {point.y()}), {srid})"
                f" WHERE id = '{result_mincut_id_text}'")
         status = self.controller.execute_sql(sql)
@@ -1628,12 +1628,12 @@ class MincutParent(ParentAction):
             self.set_id_val()
             self.is_new = False
 
-            sql = ("INSERT INTO anl_mincut_result_cat (mincut_state)"
+            sql = ("INSERT INTO om_mincut (mincut_state)"
                    " VALUES (0) RETURNING id;")
             new_mincut_id = self.controller.execute_returning(sql, log_sql=True)
             if new_mincut_id[0] < 1:
                 real_mincut_id = 1
-                sql = (f"UPDATE anl_mincut_result_cat SET(id) = (1) "
+                sql = (f"UPDATE om_mincut SET(id) = (1) "
                        f"WHERE id = {new_mincut_id[0]};")
                 self.controller.execute_sql(sql, log_sql=True)
             else:
@@ -1673,7 +1673,7 @@ class MincutParent(ParentAction):
             x1, y1 = polygon[0].split(' ')
             x2, y2 = polygon[2].split(' ')
             self.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
-            sql = (f"UPDATE anl_mincut_result_cat"
+            sql = (f"UPDATE om_mincut"
                    f" SET mincut_class = 1, "
                    f" anl_the_geom = ST_SetSRID(ST_Point({snapping_x}, "
                    f"{snapping_y}), {srid}),"
@@ -1695,9 +1695,9 @@ class MincutParent(ParentAction):
             self.action_add_connec.setDisabled(True)
             self.action_add_hydrometer.setDisabled(True)
             self.action_mincut_composer.setDisabled(False)
-            # Update table 'anl_mincut_result_selector'
-            sql = (f"DELETE FROM anl_mincut_result_selector WHERE cur_user = current_user;\n"
-                   f"INSERT INTO anl_mincut_result_selector (cur_user, result_id) VALUES"
+            # Update table 'selector_mincut_result'
+            sql = (f"DELETE FROM selector_mincut_result WHERE cur_user = current_user;\n"
+                   f"INSERT INTO selector_mincut_result (cur_user, result_id) VALUES"
                    f" (current_user, {real_mincut_id});")
             self.controller.execute_sql(sql, log_error=True, log_sql=True)
             self.task1.setProgress(75)
@@ -1732,7 +1732,7 @@ class MincutParent(ParentAction):
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
 
         # Set active layer
-        viewname = 'v_anl_mincut_result_valve'
+        viewname = 'v_om_mincut_valve'
         layer = self.controller.get_layer_by_tablename(viewname, log_info=True)
         if layer:
             self.iface.setActiveLayer(layer)
@@ -1753,7 +1753,7 @@ class MincutParent(ParentAction):
             layer = self.snapper_manager.get_snapped_layer(result)
             # Check feature
             viewname = self.controller.get_layer_source_table_name(layer)
-            if viewname == 'v_anl_mincut_result_valve':
+            if viewname == 'v_om_mincut_valve':
                 self.snapper_manager.add_marker(result, self.vertex_marker)
 
 
@@ -1791,7 +1791,7 @@ class MincutParent(ParentAction):
             # Check feature
             layer = self.snapper_manager.get_snapped_layer(result)
             viewname = self.controller.get_layer_source_table_name(layer)
-            if viewname == 'v_anl_mincut_result_valve':
+            if viewname == 'v_om_mincut_valve':
                 # Get the point. Leave selection
                 snapped_feat = self.snapper_manager.get_snapped_feature(result, True)
                 element_id = snapped_feat.attribute('node_id')
@@ -1848,13 +1848,13 @@ class MincutParent(ParentAction):
         # Force fill form mincut
         self.result_mincut_id.setText(str(result_mincut_id))
 
-        sql = (f"SELECT anl_mincut_result_cat.*, anl_mincut_cat_state.name AS state_name, cat_users.name AS assigned_to_name"
-               f" FROM anl_mincut_result_cat"
+        sql = (f"SELECT om_mincut.*, anl_mincut_cat_state.name AS state_name, cat_users.name AS assigned_to_name"
+               f" FROM om_mincut"
                f" INNER JOIN anl_mincut_cat_state"
-               f" ON anl_mincut_result_cat.mincut_state = anl_mincut_cat_state.id"
+               f" ON om_mincut.mincut_state = anl_mincut_cat_state.id"
                f" INNER JOIN cat_users"
-               f" ON cat_users.id = anl_mincut_result_cat.assigned_to"
-               f" WHERE anl_mincut_result_cat.id = '{result_mincut_id}'")
+               f" ON cat_users.id = om_mincut.assigned_to"
+               f" WHERE om_mincut.id = '{result_mincut_id}'")
 
         row = self.controller.get_row(sql, log_sql=False)
         if not row:
@@ -1878,11 +1878,11 @@ class MincutParent(ParentAction):
         utils_giswater.setWidgetText(self.dlg_mincut, "depth", row['exec_depth'])
         utils_giswater.setWidgetText(self.dlg_mincut, "assigned_to", row['assigned_to_name'])
 
-        # Update table 'anl_mincut_result_selector'
+        # Update table 'selector_mincut_result'
         self.update_result_selector(result_mincut_id)
         self.refresh_map_canvas()
         self.current_state = str(row['mincut_state'])
-        sql = (f"SELECT mincut_class FROM anl_mincut_result_cat"
+        sql = (f"SELECT mincut_class FROM om_mincut"
                f" WHERE id = '{result_mincut_id}'")
         row = self.controller.get_row(sql)
         mincut_class_status = None
@@ -1893,7 +1893,7 @@ class MincutParent(ParentAction):
 
         expr_filter = f"result_id={result_mincut_id}"
         utils_giswater.set_qtv_config(self.dlg_mincut.tbl_hydro)
-        self.fill_table(self.dlg_mincut.tbl_hydro, 'v_anl_mincut_result_hydrometer',  expr_filter=expr_filter)
+        self.fill_table(self.dlg_mincut.tbl_hydro, 'v_om_mincut_hydrometer',  expr_filter=expr_filter)
 
         # Depend of mincut_state and mincut_clase desable/enable widgets
         # Current_state == '0': Planified

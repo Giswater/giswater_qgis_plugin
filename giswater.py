@@ -690,10 +690,16 @@ class Giswater(QObject):
         return True
 
 
-    def unload(self, remove_modules=True):
-        """ Removes plugin menu items and icons from QGIS GUI
-            :param @remove_modules is True when plugin is disabled or reloaded
-        """
+    def remove_dockers(self):
+        """ Remove Giswater dockers """
+
+        docker_search = self.iface.mainWindow().findChild(QDockWidget, 'dlg_search')
+        if docker_search:
+            self.iface.removeDockWidget(docker_search)
+
+        docker_info = self.iface.mainWindow().findChild(QDockWidget, 'docker')
+        if docker_info:
+            self.iface.removeDockWidget(docker_info)
 
         if self.btn_add_layers:
             dockwidget = self.iface.mainWindow().findChild(QDockWidget, 'Layers')
@@ -701,6 +707,15 @@ class Giswater(QObject):
             # TODO improve this, now remove last action
             toolbar.removeAction(toolbar.actions()[len(toolbar.actions())-1])
             self.btn_add_layers = None
+
+
+    def unload(self, remove_modules=True):
+        """ Removes plugin menu items and icons from QGIS GUI
+            :param @remove_modules is True when plugin is disabled or reloaded
+        """
+
+        # Remove Giswater dockers
+        self.remove_dockers()
 
         # Save toolbar position after unload plugin
         try:
@@ -1340,7 +1355,7 @@ class Giswater(QObject):
 
             feature = '"tableName":"' + str(layer_name) + '", "id":"", "isLayer":true'
             body = self.create_body(feature=feature)
-            complet_result = self.controller.get_json('gw_api_getinfofromid', body)
+            complet_result = self.controller.get_json('gw_fct_getinfofromid', body)
             if not complet_result: continue
             
             for field in complet_result['body']['data']['fields']:

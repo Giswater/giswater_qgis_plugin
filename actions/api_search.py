@@ -66,7 +66,7 @@ class ApiSearch(ApiParent):
 
         self.controller.set_user_settings_value('open_search', 'true')
         body = self.create_body()
-        function_name = "gw_api_getsearch"
+        function_name = "gw_fct_getsearch"
         complet_list = self.controller.get_json(function_name, body)
         if not complet_list:
             return False
@@ -301,7 +301,7 @@ class ApiSearch(ApiParent):
             extras_search += f'"{line_edit.property("column_id")}":{{"text":"{value}"}}'
             extras_search_add += f'"{line_edit.property("column_id")}":{{"text":"{value}"}}'
             body = self.create_body(form=form_search, extras=extras_search)
-            result = self.controller.get_json('gw_api_setsearch', body, log_sql=True)
+            result = self.controller.get_json('gw_fct_setsearch', body, log_sql=True)
             if not result: return False
 
             if result:
@@ -333,7 +333,7 @@ class ApiSearch(ApiParent):
 
             extras_search_add += f', "{line_edit_add.property("column_id")}":{{"text":"{value}"}}'
             body = self.create_body(form=form_search_add, extras=extras_search_add)
-            result = self.controller.get_json('gw_api_setsearch_add', body, log_sql=True)
+            result = self.controller.get_json('gw_fct_setsearchadd', body, log_sql=True)
             if not result: return False
 
             if result:
@@ -394,7 +394,7 @@ class ApiSearch(ApiParent):
 
         feature = f'"tableName":"{table_name}", "id":"{feature_id}"'
         body = self.create_body(feature=feature)
-        result = [self.controller.get_json('gw_api_getinfofromid', body, log_sql=True)]
+        result = [self.controller.get_json('gw_fct_getinfofromid', body, log_sql=True)]
         if not result: return
 
         self.hydro_info_dlg = ApiBasicInfo()

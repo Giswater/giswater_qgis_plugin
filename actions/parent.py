@@ -546,7 +546,7 @@ class ParentAction(object):
         # Set width and alias of visible columns
         columns_to_delete = []
         sql = (f"SELECT column_index, width, alias, status"
-               f" FROM config_client_forms"
+               f" FROM config_form_tableview"
                f" WHERE table_id = '{table_name}'"
                f" ORDER BY column_index")
         rows = self.controller.get_rows(sql, log_info=False)
@@ -1128,11 +1128,10 @@ class ParentAction(object):
         cur_user = self.controller.get_current_user()
         pos = self.controller.plugin_settings_value(f"docker_info_{cur_user}")
 
-        # Docker positions: 1=Left, 2=right, 8=bottom, 4= top
+        # Docker positions: 1=Left, 2=Right, 4=Top, 8=Bottom
+        self.dlg_docker.position = 2
         if type(pos) is int and pos in (1, 2, 4, 8):
             self.dlg_docker.position = pos
-        else:
-            self.dlg_docker.position = 2
 
         # If user want to dock the dialog, we reset rubberbands for each info
         # For the first time, cf_info does not exist, therefore we cannot access it and reset rubberbands

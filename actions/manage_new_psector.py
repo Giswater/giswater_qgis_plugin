@@ -281,10 +281,10 @@ class ManageNewPsector(ParentManage):
             self.update = True
             psector_id_aux = utils_giswater.getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id)
             if psector_id_aux != 'null':
-                sql = (f"DELETE FROM {self.plan_om}_psector_selector "
+                sql = (f"DELETE FROM selector_plan_psector "
                        f"WHERE cur_user= current_user")
                 self.controller.execute_sql(sql)
-                self.insert_psector_selector(self.plan_om + '_psector_selector', 'psector_id', psector_id_aux)
+                self.insert_psector_selector('selector_plan_psector', 'psector_id', psector_id_aux)
             if self.plan_om == 'plan':
                 sql = (f"DELETE FROM selector_psector "
                        f"WHERE cur_user = current_user AND psector_id = '{psector_id_aux}'")
@@ -824,13 +824,13 @@ class ManageNewPsector(ParentManage):
 
 
     def delete_psector_selector(self, tablename):
-        sql = (f"DELETE FROM {tablename}"
+        sql = (f"DELETE FROM selector_plan_psector"
                f" WHERE cur_user = current_user;")
         self.controller.execute_sql(sql)
 
 
     def insert_psector_selector(self, tablename, field, value):
-        sql = (f"INSERT INTO {tablename} ({field}, cur_user) "
+        sql = (f"INSERT INTO selector_plan_psector ({field}, cur_user) "
                f"VALUES ('{value}', current_user);")
         self.controller.execute_sql(sql)
 

@@ -46,7 +46,7 @@ class MincutConfig(ParentAction):
         # Create the dialog and signals
         self.dlg_min_edit = Mincut_edit()
         self.load_settings(self.dlg_min_edit)
-        self.set_dates_from_to(self.dlg_min_edit.date_from, self.dlg_min_edit.date_to, 'anl_mincut_result_cat', 'forecast_start, exec_start', 'forecast_end, exec_end')
+        self.set_dates_from_to(self.dlg_min_edit.date_from, self.dlg_min_edit.date_to, 'om_mincut', 'forecast_start, exec_start', 'forecast_end, exec_end')
         self.dlg_min_edit.date_from.setEnabled(False)
         self.dlg_min_edit.date_to.setEnabled(False)
         self.set_icon(self.dlg_min_edit.btn_selector_mincut, "191")
@@ -60,7 +60,7 @@ class MincutConfig(ParentAction):
         self.txt_mincut_id.setCompleter(self.completer)
         model = QStringListModel()
 
-        sql = "SELECT DISTINCT(id) FROM anl_mincut_result_cat WHERE id > 0 "
+        sql = "SELECT DISTINCT(id) FROM om_mincut WHERE id > 0 "
         rows = self.controller.get_rows(sql)
         values = []
         if rows:
@@ -80,7 +80,7 @@ class MincutConfig(ParentAction):
         self.dlg_min_edit.tbl_mincut_edit.doubleClicked.connect(self.open_mincut)
         self.dlg_min_edit.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_min_edit))
         self.dlg_min_edit.rejected.connect(partial(self.close_dialog, self.dlg_min_edit))
-        self.dlg_min_edit.btn_delete.clicked.connect(partial(self.delete_mincut_management, self.tbl_mincut_edit, "anl_mincut_result_cat", "id"))
+        self.dlg_min_edit.btn_delete.clicked.connect(partial(self.delete_mincut_management, self.tbl_mincut_edit, "om_mincut", "id"))
         self.dlg_min_edit.btn_selector_mincut.clicked.connect(partial(self.mincut_selector, self.tbl_mincut_edit, 'id'))
         self.btn_notify = self.dlg_min_edit.findChild(QPushButton, "btn_notify")
         self.btn_notify.clicked.connect(partial(self.get_clients_codes, self.dlg_min_edit.tbl_mincut_edit))
@@ -97,10 +97,10 @@ class MincutConfig(ParentAction):
         self.dlg_min_edit.state_edit.activated.connect(partial(self.filter_by_id, self.tbl_mincut_edit))
 
         # Set a model with selected filter. Attach that model to selected table
-        self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + ".v_ui_anl_mincut_result_cat")
-        self.set_table_columns(self.dlg_min_edit, self.tbl_mincut_edit, "v_ui_anl_mincut_result_cat")
+        self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + ".v_ui_mincut")
+        self.set_table_columns(self.dlg_min_edit, self.tbl_mincut_edit, "v_ui_mincut")
 
-        #self.mincut.set_table_columns(self.tbl_mincut_edit, "v_ui_anl_mincut_result_cat")
+        #self.mincut.set_table_columns(self.tbl_mincut_edit, "v_ui_mincut")
 
         # Open the dialog
         self.open_dialog(self.dlg_min_edit)
@@ -122,9 +122,9 @@ class MincutConfig(ParentAction):
             id_ = qtable.model().record(row).value(str('id'))
             inf_text += f"\n\nMincut: {id_}"
             sql = (f"SELECT t3.{field_code}, t2.forecast_start, t2.forecast_end, anl_cause "
-                   f"FROM anl_mincut_result_hydrometer AS t1 "
+                   f"FROM om_mincut_hydrometer AS t1 "
                    f"JOIN ext_rtc_hydrometer AS t3 ON t1.hydrometer_id::bigint = t3.id::bigint "
-                   f"JOIN anl_mincut_result_cat AS t2 ON t1.result_id = t2.id "
+                   f"JOIN om_mincut AS t2 ON t1.result_id = t2.id "
                    f"WHERE result_id = {id_}")
 
             rows = self.controller.get_rows(sql, log_sql=True)
@@ -156,9 +156,9 @@ class MincutConfig(ParentAction):
             row = selected_list[i].row()
             id_ = qtable.model().record(row).value(str('id'))
             sql = (f"SELECT t3.{field_code}, t2.forecast_start, t2.forecast_end, anl_cause, notified  "
-                   f"FROM anl_mincut_result_hydrometer AS t1 "
+                   f"FROM om_mincut_hydrometer AS t1 "
                    f"JOIN ext_rtc_hydrometer AS t3 ON t1.hydrometer_id::bigint = t3.id::bigint "
-                   f"JOIN anl_mincut_result_cat AS t2 ON t1.result_id = t2.id "
+                   f"JOIN om_mincut AS t2 ON t1.result_id = t2.id "
                    f"WHERE result_id = {id_}")
 
             rows = self.controller.get_rows(sql, log_sql=True)
@@ -187,7 +187,7 @@ class MincutConfig(ParentAction):
             result = subprocess.call([path, _cause, from_date, to_date, list_clients])
 
             _date_sended = datetime.datetime.now().strftime('%d/%m/%Y %H:%M')
-            sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat ")
+            sql = ("UPDATE " + self.schema_name + ".om_mincut ")
             if row[4] is None:
                 sql += f"SET notified = ('[{{\"code\":\"{result[0]}\",\"date\":\"{_date_sended}\",\"avisats\":\"{result[1]}\",\"afectats\":\"{result[2]}\"}}]') "
             else:
@@ -196,8 +196,8 @@ class MincutConfig(ParentAction):
             row = self.controller.execute_sql(sql)
 
             # Set a model with selected filter. Attach that model to selected table
-            self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + ".v_ui_anl_mincut_result_cat")
-            self.set_table_columns(self.dlg_min_edit, self.tbl_mincut_edit, "v_ui_anl_mincut_result_cat")
+            self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + ".v_ui_mincut")
+            self.set_table_columns(self.dlg_min_edit, self.tbl_mincut_edit, "v_ui_mincut")
 
 
     def set_state_cancel_mincut(self):
@@ -220,7 +220,7 @@ class MincutConfig(ParentAction):
         title = "Cancel mincuts"
         answer = self.controller.ask_question(message, title, inf_text)
         if answer:
-            sql = (f"UPDATE anl_mincut_result_cat SET mincut_state = 3 "
+            sql = (f"UPDATE om_mincut SET mincut_state = 3 "
                    f" WHERE id::text IN ({list_id})")
             self.controller.execute_sql(sql, log_sql=False)
             self.tbl_mincut_edit.model().select()
@@ -402,21 +402,21 @@ class MincutConfig(ParentAction):
                    f" WHERE {column_id} IN ({list_id})")
             self.controller.execute_sql(sql)
             widget.model().select()
-            layer = self.controller.get_layer_by_tablename('v_anl_mincut_result_node')
+            layer = self.controller.get_layer_by_tablename('v_om_mincut_node')
             if layer is not None:
                 layer.triggerRepaint()
-            layer = self.controller.get_layer_by_tablename('v_anl_mincut_result_connec')
+            layer = self.controller.get_layer_by_tablename('v_om_mincut_connec')
             if layer is not None:
                 layer.triggerRepaint()
-            layer = self.controller.get_layer_by_tablename('v_anl_mincut_result_arc')
+            layer = self.controller.get_layer_by_tablename('v_om_mincut_arc')
             if layer is not None:
                 layer.triggerRepaint()
-            layer = self.controller.get_layer_by_tablename('v_anl_mincut_result_valve')
+            layer = self.controller.get_layer_by_tablename('v_om_mincut_valve')
             if layer is not None:
                 layer.triggerRepaint()
-            layer = self.controller.get_layer_by_tablename('v_anl_mincut_result_cat')
+            layer = self.controller.get_layer_by_tablename('v_om_mincut')
             if layer is not None:
                 layer.triggerRepaint()
-            layer = self.controller.get_layer_by_tablename('v_anl_mincut_result_hydrometer')
+            layer = self.controller.get_layer_by_tablename('v_om_mincut_hydrometer')
             if layer is not None:
                 layer.triggerRepaint()

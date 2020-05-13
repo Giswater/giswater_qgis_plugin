@@ -5,9 +5,10 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from functools import partial
-
 from qgis.PyQt.QtCore import QSettings
+from qgis.PyQt.QtWidgets import QDockWidget
+
+from functools import partial
 
 from .api_cf import ApiCF
 from .manage_element import ManageElement
@@ -41,11 +42,8 @@ class Edit(ParentAction):
         self.feature_cat = feature_cat
         self.layer = self.controller.get_layer_by_tablename(feature_cat.parent_layer)
         if self.layer:
-            # Get user values (Settings/Options/Digitizing/Suppress attribute from pop-up after feature creation)
-            # and set True
             self.suppres_form = QSettings().value("/Qgis/digitizing/disable_enter_attribute_values_dialog")
             QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", True)
-
             self.iface.setActiveLayer(self.layer)
             self.layer.startEditing()
             self.iface.actionAddFeature().trigger()
@@ -77,14 +75,17 @@ class Edit(ParentAction):
         if hasattr(self, 'dlg_docker') and type(self.dlg_docker) is DockerUi:
             self.close_docker()
 
-        row = self.controller.get_config('dock_dialogs')
-        row = 1
-        if not row:
-            self.dlg_docker = None
+        row = self.controller.get_config('qgis_form_docker')
+        if row:
+            if row[0].lower() == 'true':
+                self.close_docker()
+                self.dlg_docker = DockerUi()
+                self.dlg_docker.dlg_closed.connect(self.close_docker)
+                self.manage_docker_options()
+            else:
+                self.dlg_docker = None
         else:
-            self.dlg_docker = DockerUi()
-            self.dlg_docker.dlg_closed.connect(self.close_docker)
-            self.manage_docker_options()
+            self.dlg_docker = None
 
         self.api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, 'data')
         result, dialog = self.api_cf.open_form(point=list_points, feature_cat=self.feature_cat,
@@ -98,18 +99,19 @@ class Edit(ParentAction):
             self.layer.deleteFeature(feature.id())
             self.iface.actionRollbackEdits().trigger()
 
-        #self.iface.actionPan().trigger()
 
     def close_docker(self):
         """ Save QDockWidget position (1=Left, 2=right, 8=bottom, 4=top),
             remove from iface and del class
         """
 
-        cur_user = self.controller.get_current_user()
-        x = self.iface.mainWindow().dockWidgetArea(self.dlg_docker)
-        self.controller.plugin_settings_set_value("docker_info_" + cur_user, x)
-        self.iface.removeDockWidget(self.dlg_docker)
-        del self.dlg_docker
+        if hasattr(self, 'dlg_docker') and type(self.dlg_docker) is DockerUi:
+            if not self.dlg_docker.isFloating():
+                cur_user = self.controller.get_current_user()
+                docker_pos = self.iface.mainWindow().dockWidgetArea(self.dlg_docker)
+                self.controller.plugin_settings_set_value(f"docker_info_{cur_user}", docker_pos)
+                self.iface.removeDockWidget(self.dlg_docker)
+                del self.dlg_docker
 
 
     def get_feature_by_id(self, layer, id_):

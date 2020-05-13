@@ -333,12 +333,12 @@ class Master(ParentAction):
         self.load_settings(self.dlg_estimate_result_selector)
         
         # Populate combo
-        self.populate_combo(self.dlg_estimate_result_selector.rpt_selector_result_id, 'plan_result_selector')
+        self.populate_combo(self.dlg_estimate_result_selector.rpt_selector_result_id, 'selector_plan_result')
 
         # Set current value
         table_name = "om_result_cat"
         sql = (f"SELECT name FROM {table_name} "
-               f" WHERE cur_user = current_user AND result_type = 1 AND result_id = (SELECT result_id FROM plan_result_selector)")
+               f" WHERE cur_user = current_user AND result_type = 1 AND result_id = (SELECT result_id FROM selector_plan_result)")
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText(self.dlg_estimate_result_selector, self.dlg_estimate_result_selector.rpt_selector_result_id, str(row[0]))

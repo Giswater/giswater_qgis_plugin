@@ -65,7 +65,7 @@ class Go2Epa(ApiParent):
         if self.project_type == 'ws':
             self.dlg_go2epa.btn_hs_ds.setText("Dscenario Selector")
             tableleft = "cat_dscenario"
-            tableright = "inp_selector_dscenario"
+            tableright = "selector_inp_demand"
             field_id_left = "dscenario_id"
             field_id_right = "dscenario_id"
 
@@ -170,7 +170,7 @@ class Go2Epa(ApiParent):
     def go2epa_sector_selector(self):
 
         tableleft = "sector"
-        tableright = "inp_selector_sector"
+        tableright = "selector_sector"
         field_id_left = "sector_id"
         field_id_right = "sector_id"
         aql = f" AND sector_id != 0"
@@ -286,7 +286,7 @@ class Go2Epa(ApiParent):
         utils_giswater.set_item_data(self.dlg_hydrology_selector.hydrology, rows)
 
         sql = ("SELECT DISTINCT(t1.name) FROM cat_hydrology AS t1 "
-               "INNER JOIN inp_selector_hydrology AS t2 ON t1.hydrology_id = t2.hydrology_id "
+               "INNER JOIN selector_inp_hydrology AS t2 ON t1.hydrology_id = t2.hydrology_id "
                "WHERE t2.cur_user = current_user")
         row = self.controller.get_row(sql)
         if row:
@@ -301,15 +301,15 @@ class Go2Epa(ApiParent):
     def save_hydrology(self):
 
         hydrology_id = utils_giswater.get_item_data(self.dlg_hydrology_selector, self.dlg_hydrology_selector.hydrology, 1)
-        sql = ("SELECT cur_user FROM inp_selector_hydrology "
+        sql = ("SELECT cur_user FROM selector_inp_hydrology "
                "WHERE cur_user = current_user")
         row = self.controller.get_row(sql)
         if row:
-            sql = (f"UPDATE inp_selector_hydrology "
+            sql = (f"UPDATE selector_inp_hydrology "
                    f"SET hydrology_id = {hydrology_id} "
                    f"WHERE cur_user = current_user")
         else:
-            sql = (f"INSERT INTO inp_selector_hydrology (hydrology_id, cur_user) "
+            sql = (f"INSERT INTO selector_inp_hydrology (hydrology_id, cur_user) "
                    f"VALUES('{hydrology_id}', current_user)")
         self.controller.execute_sql(sql)
 
@@ -613,11 +613,11 @@ class Go2Epa(ApiParent):
                 self.dlg_go2epa_result.rpt_selector_compare_id, self.dlg_go2epa_result.cmb_com_time))
 
         # Get current data from tables 'rpt_selector_result' and 'rpt_selector_compare'
-        sql = "SELECT result_id FROM rpt_selector_result"
+        sql = "SELECT result_id FROM selector_rpt_main"
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.set_combo_itemData(self.dlg_go2epa_result.rpt_selector_result_id, row["result_id"], 0)
-        sql = "SELECT result_id FROM rpt_selector_compare"
+        sql = "SELECT result_id FROM selector_rpt_compare"
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.set_combo_itemData(self.dlg_go2epa_result.rpt_selector_compare_id, row["result_id"], 0)
@@ -661,14 +661,10 @@ class Go2Epa(ApiParent):
         user = self.controller.get_project_user()
 
         # Delete previous values
-        sql = (f"DELETE FROM rpt_selector_result WHERE cur_user = '{user}';\n"
-               f"DELETE FROM rpt_selector_compare WHERE cur_user = '{user}';\n")
-        if self.project_type == 'ws':
-            sql += (f"DELETE FROM rpt_selector_hourly WHERE cur_user = '{user}';\n"
-                    f"DELETE FROM rpt_selector_hourly_compare WHERE cur_user = '{user}';\n")
-        if self.project_type == 'ud':
-            sql += (f"DELETE FROM rpt_selector_timestep WHERE cur_user = '{user}';\n"
-                    f"DELETE FROM rpt_selector_timestep_compare WHERE cur_user = '{user}';\n")
+        sql = (f"DELETE FROM selector_rpt_main WHERE cur_user = '{user}';\n"
+               f"DELETE FROM selector_rpt_compare WHERE cur_user = '{user}';\n")
+        sql += (f"DELETE FROM selector_rpt_main_tstep WHERE cur_user = '{user}';\n"
+               f"DELETE FROM selector_rpt_compare_tstep WHERE cur_user = '{user}';\n")
         self.controller.execute_sql(sql)
 
         # Get new values from widgets of type QComboBox
@@ -685,11 +681,11 @@ class Go2Epa(ApiParent):
             time_to_compare = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_com_time)
 
         if rpt_selector_result_id not in (None, -1, ''):
-            sql = (f"INSERT INTO rpt_selector_result (result_id, cur_user)"
+            sql = (f"INSERT INTO selector_rpt_main (result_id, cur_user)"
                    f" VALUES ('{rpt_selector_result_id}', '{user}');\n")
             self.controller.execute_sql(sql)
         if rpt_selector_compare_id not in (None, -1, ''):
-            sql = (f"INSERT INTO rpt_selector_compare (result_id, cur_user)"
+            sql = (f"INSERT INTO selector_rpt_compare (result_id, cur_user)"
                    f" VALUES ('{rpt_selector_compare_id}', '{user}');\n")
             self.controller.execute_sql(sql)
         if self.project_type == 'ws':
