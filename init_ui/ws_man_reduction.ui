@@ -2803,16 +2803,6 @@
      <attribute name="title">
       <string>O&amp;&amp;M</string>
      </attribute>
-     <widget class="QComboBox" name="event_id">
-      <property name="geometry">
-       <rect>
-        <x>430</x>
-        <y>25</y>
-        <width>145</width>
-        <height>18</height>
-       </rect>
-      </property>
-     </widget>
      <widget class="QPushButton" name="btn_new_visit">
       <property name="geometry">
        <rect>
@@ -2872,7 +2862,7 @@
        <enum>QFrame::Raised</enum>
       </property>
       <property name="text">
-       <string>Parameter type:</string>
+       <string>Visit class:</string>
       </property>
       <property name="textFormat">
        <enum>Qt::AutoText</enum>
@@ -2884,7 +2874,7 @@
        <number>3</number>
       </property>
      </widget>
-     <widget class="QComboBox" name="event_type">
+     <widget class="QComboBox" name="cmb_visit_class">
       <property name="geometry">
        <rect>
         <x>275</x>
@@ -2917,7 +2907,7 @@
      <widget class="QPushButton" name="btn_open_gallery">
       <property name="geometry">
        <rect>
-        <x>480</x>
+        <x>545</x>
         <y>70</y>
         <width>24</width>
         <height>24</height>
@@ -2941,39 +2931,6 @@
         <width>22</width>
         <height>22</height>
        </size>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_event_parameter">
-      <property name="geometry">
-       <rect>
-        <x>430</x>
-        <y>3</y>
-        <width>91</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>8</pointsize>
-       </font>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::NoFrame</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-      <property name="text">
-       <string>Parameter:</string>
-      </property>
-      <property name="textFormat">
-       <enum>Qt::AutoText</enum>
-      </property>
-      <property name="scaledContents">
-       <bool>false</bool>
-      </property>
-      <property name="margin">
-       <number>3</number>
       </property>
      </widget>
      <widget class="QDateEdit" name="date_event_from">
@@ -3089,64 +3046,6 @@
       </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_open_visit_doc">
-      <property name="geometry">
-       <rect>
-        <x>518</x>
-        <y>70</y>
-        <width>24</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open document&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="styleSheet">
-       <string notr="true"/>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="icon">
-       <iconset>
-        <normaloff>../icons/170b.png</normaloff>../icons/170b.png</iconset>
-      </property>
-      <property name="iconSize">
-       <size>
-        <width>22</width>
-        <height>22</height>
-       </size>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_open_visit_event">
-      <property name="geometry">
-       <rect>
-        <x>550</x>
-        <y>70</y>
-        <width>24</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Event data&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="styleSheet">
-       <string notr="true"/>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="icon">
-       <iconset>
-        <normaloff>../icons/134b.png</normaloff>../icons/134b.png</iconset>
-      </property>
-      <property name="iconSize">
-       <size>
-        <width>22</width>
-        <height>22</height>
-       </size>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_open_visit">
@@ -4236,13 +4135,12 @@
   <tabstop>doc_type</tabstop>
   <tabstop>btn_open_gallery</tabstop>
   <tabstop>date_document_from</tabstop>
-  <tabstop>event_type</tabstop>
+  <tabstop>cmb_visit_class</tabstop>
   <tabstop>open_element</tabstop>
   <tabstop>tbl_document</tabstop>
   <tabstop>element_id</tabstop>
   <tabstop>new_element</tabstop>
   <tabstop>btn_doc_delete</tabstop>
-  <tabstop>event_id</tabstop>
   <tabstop>btn_doc_insert</tabstop>
   <tabstop>btn_doc_new</tabstop>
   <tabstop>btn_delete</tabstop>
@@ -4256,10 +4154,8 @@
   <tabstop>tbl_scada_value</tabstop>
   <tabstop>date_event_to</tabstop>
   <tabstop>tbl_scada_3</tabstop>
-  <tabstop>btn_open_visit_event</tabstop>
   <tabstop>tbl_masterplan</tabstop>
   <tabstop>date_el_from</tabstop>
-  <tabstop>btn_open_visit_doc</tabstop>
   <tabstop>date_el_to</tabstop>
   <tabstop>tbl_scada</tabstop>
  </tabstops>
