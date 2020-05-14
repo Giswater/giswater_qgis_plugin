@@ -435,23 +435,23 @@ class ParentDialog(QDialog):
 
         # Check for errors
         if model.lastError().isValid():
-            self.controller.show_warning(model.lastError().text())      
+            self.controller.show_warning(model.lastError().text())
 
         # Attach model to table view
         if widget:
-            widget.setModel(model)   
+            widget.setModel(model)
         else:
             self.controller.log_info("set_model_to_table: widget not found")
 
 
     def manage_document(self, dialog, doc_id=None, feature=None, table_name=None):
         """ Execute action of button 34 """
-                
-        doc = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir)          
+
+        doc = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir)
         doc.manage_document(feature=feature, geom_type=self.geom_type)
         doc.dlg_add_doc.accepted.connect(partial(self.manage_document_new, dialog, doc, table_name))
         doc.dlg_add_doc.rejected.connect(partial(self.manage_document_new, dialog, doc, table_name))
-                 
+
         # Set completer
         self.set_completer_object(dialog, self.table_object)
         if doc_id:
@@ -474,8 +474,8 @@ class ParentDialog(QDialog):
 
     def manage_element(self, dialog, element_id=None, feature=None):
         """ Execute action of button 33 """
-        
-        elem = ManageElement(self.iface, self.settings, self.controller, self.plugin_dir)          
+
+        elem = ManageElement(self.iface, self.settings, self.controller, self.plugin_dir)
         elem.manage_element(feature=feature, geom_type=self.geom_type)
         elem.dlg_add_element.accepted.connect(partial(self.manage_element_new, dialog, elem))
         elem.dlg_add_element.rejected.connect(partial(self.manage_element_new, dialog, elem))
@@ -540,18 +540,18 @@ class ParentDialog(QDialog):
                    " WHERE id::integer IN (" + list_id + ")")
             self.controller.execute_sql(sql)
             widget.model().select()
- 
-         
+
+
     def delete_records_hydro(self, widget):
         """ Delete selected elements of the table """
 
         # Get selected rows
-        selected_list = widget.selectionModel().selectedRows()    
+        selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            self.controller.show_warning(message) 
+            self.controller.show_warning(message)
             return
-        
+
         inf_text = ""
         list_id = ""
         row_index = ""
@@ -561,7 +561,7 @@ class ParentDialog(QDialog):
             inf_text+= str(id_)+", "
             list_id = list_id+"'"+str(id_)+"', "
             row_index += str(row+1)+", "
-            
+
         row_index = row_index[:-2]
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
@@ -579,31 +579,31 @@ class ParentDialog(QDialog):
                    " WHERE hydrometer_id IN (" + list_id + ")")
             self.controller.execute_sql(sql)
             widget.model().select()
-            
-                   
+
+
     def insert_records(self):
         """ Insert value Hydrometer | Hydrometer"""
-        
+
         # Create the dialog and signals
-        self.dlg_sum = AddSum()   
-              
+        self.dlg_sum = AddSum()
+
         # Set signals
         self.dlg_sum.findChild(QPushButton, "btn_accept").clicked.connect(self.btn_accept)
         self.dlg_sum.findChild(QPushButton, "btn_close").clicked.connect(partial(self.close_dialog, self.dlg_sum))
-              
+
         # Open the dialog
-        self.dlg_sum.exec_() 
-        
-        
+        self.dlg_sum.exec_()
+
+
     def btn_accept(self):
         """ Save new value oh hydrometer"""
-  
+
         # Get widget text - hydtometer_id
-        widget_hydro = self.dlg_sum.findChild(QLineEdit, "hydrometer_id_new")          
+        widget_hydro = self.dlg_sum.findChild(QLineEdit, "hydrometer_id_new")
         self.hydro_id = widget_hydro.text()
 
-        # Get connec_id       
-        widget_connec = self.dialog.findChild(QLineEdit, "connec_id")          
+        # Get connec_id
+        widget_connec = self.dialog.findChild(QLineEdit, "connec_id")
         self.connec_id = widget_connec.text()
 
         # Check if Hydrometer_id already exists
@@ -620,40 +620,40 @@ class ParentDialog(QDialog):
             # Insert hydrometer_id in v_rtc_hydrometer
             sql = "INSERT INTO "+self.schema_name+".rtc_hydrometer (hydrometer_id) "
             sql += " VALUES ('"+self.hydro_id+"')"
-            self.controller.execute_sql(sql) 
-            
+            self.controller.execute_sql(sql)
+
             # insert hydtometer_id and connec_id in rtc_hydrometer_x_connec
             sql = "INSERT INTO "+self.schema_name+".rtc_hydrometer_x_connec (hydrometer_id, connec_id) "
             sql+= " VALUES ('"+self.hydro_id+"','"+self.connec_id+"')"
-            self.controller.execute_sql(sql) 
-        
+            self.controller.execute_sql(sql)
+
             # Refresh table in Qtableview
             # Fill tab Hydrometer
             table_hydrometer = "v_rtc_hydrometer"
             self.fill_tbl_hydrometer(self.tbl_hydrometer, table_hydrometer, self.filter)
-          
+
             self.dlg_sum.close_dialog()
-                
-              
+
+
     def btn_close(self):
         """ Close form without saving """
         self.dlg_sum.close_dialog()
 
-                    
+
     def open_selected_document(self, widget):
         """ Open selected document of the @widget """
-        
+
         # Get selected rows
-        selected_list = widget.selectionModel().selectedRows()    
+        selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            self.controller.show_warning(message) 
+            self.controller.show_warning(message)
             return
         elif len(selected_list) > 1:
             message = "Select just one document"
             self.controller.show_warning(message)
             return
-        
+
         # Get document path (can be relative or absolute)
         row = selected_list[0].row()
         path = widget.model().record(row).value("path")
@@ -668,7 +668,7 @@ class ParentDialog(QDialog):
                 subprocess.call([opener, path])
         else:
             webbrowser.open(path)
-        
+
     def set_filter_table_man(self, widget):
         """ Get values selected by the user and sets a new filter for its table model """
          # Get selected dates
@@ -684,19 +684,19 @@ class ParentDialog(QDialog):
         expr = self.field_id+" = '"+self.id+"'"
         expr+= " AND date >= '"+date_from+"' AND date <= '"+date_to+"'"
 
-        # Get selected values in Comboboxes        
+        # Get selected values in Comboboxes
         doc_type_value = utils_giswater.getWidgetText(self.dialog, "doc_type", return_string_null=False)
         if doc_type_value  not in ('', None):
             expr += " AND doc_type = '"+str(doc_type_value)+"'"
 
         # Refresh model with selected filter
         widget.model().setFilter(expr)
-        widget.model().select()  
-        
-        
+        widget.model().select()
+
+
     def set_configuration(self, widget, table_name, sort_order=0, isQStandardItemModel=False):
         """ Configuration of tables. Set visibility and width of columns """
-        
+
         widget = utils_giswater.getWidget(self.dialog, widget)
         if not widget:
             return
@@ -736,36 +736,36 @@ class ParentDialog(QDialog):
         # Delete columns
         for column in columns_to_delete:
             widget.hideColumn(column)
-        
-        
+
+
     def fill_tbl_document_man(self, dialog, widget, table_name, expr_filter):
         """ Fill the table control to show documents """
-        
-        # Get widgets  
-        widget.setSelectionBehavior(QAbstractItemView.SelectRows)        
-        self.doc_id = self.dialog.findChild(QLineEdit, "doc_id")             
+
+        # Get widgets
+        widget.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.doc_id = self.dialog.findChild(QLineEdit, "doc_id")
         doc_type = self.dialog.findChild(QComboBox, "doc_type")
         self.date_document_to = self.dialog.findChild(QDateEdit, "date_document_to")
         self.date_document_from = self.dialog.findChild(QDateEdit, "date_document_from")
         btn_open_doc = self.dialog.findChild(QPushButton, "btn_open_doc")
-        btn_doc_delete = self.dialog.findChild(QPushButton, "btn_doc_delete")         
-        btn_doc_insert = self.dialog.findChild(QPushButton, "btn_doc_insert")         
-        btn_doc_new = self.dialog.findChild(QPushButton, "btn_doc_new")         
- 
+        btn_doc_delete = self.dialog.findChild(QPushButton, "btn_doc_delete")
+        btn_doc_insert = self.dialog.findChild(QPushButton, "btn_doc_insert")
+        btn_doc_new = self.dialog.findChild(QPushButton, "btn_doc_new")
+
         # Set signals
         doc_type.activated.connect(partial(self.set_filter_table_man, widget))
         self.date_document_to.dateChanged.connect(partial(self.set_filter_table_man, widget))
         self.date_document_from.dateChanged.connect(partial(self.set_filter_table_man, widget))
         self.tbl_document.doubleClicked.connect(partial(self.open_selected_document, widget))
-        btn_open_doc.clicked.connect(partial(self.open_selected_document, widget)) 
-        btn_doc_delete.clicked.connect(partial(self.delete_records, widget, table_name))            
+        btn_open_doc.clicked.connect(partial(self.open_selected_document, widget))
+        btn_doc_delete.clicked.connect(partial(self.delete_records, widget, table_name))
         btn_doc_insert.clicked.connect(partial(self.add_object, widget, "doc", "v_ui_document"))
         btn_doc_new.clicked.connect(partial(self.manage_document, dialog, None, self.feature, table_name))
 
         # Set dates
         date = QDate.currentDate()
         self.date_document_to.setDate(date)
-        
+
         # Fill ComboBox doc_type
         sql = ("SELECT id"
                " FROM " + self.schema_name + ".doc_type"
@@ -777,7 +777,7 @@ class ParentDialog(QDialog):
         self.set_model_to_table(widget, table_name, expr_filter)
         self.set_filter_dates('date', 'date', table_name, self.date_document_from, self.date_document_to)
         # Adding auto-completion to a QLineEdit
-        self.table_object = "doc"        
+        self.table_object = "doc"
         self.set_completer_object(dialog, self.table_object)
 
 
@@ -802,14 +802,14 @@ class ParentDialog(QDialog):
 
 
     def set_completer_object(self, dialog, table_object):
-        """ Set autocomplete of widget @table_object + "_id" 
-            getting id's from selected @table_object 
+        """ Set autocomplete of widget @table_object + "_id"
+            getting id's from selected @table_object
         """
-        
+
         widget = utils_giswater.getWidget(dialog, table_object + "_id")
         if not widget:
             return
-        
+
         # Set SQL
         field_object_id = "id"
         if table_object == "element":
@@ -827,19 +827,19 @@ class ParentDialog(QDialog):
         widget.setCompleter(self.completer)
         model = QStringListModel()
         model.setStringList(row)
-        self.completer.setModel(model)        
+        self.completer.setModel(model)
 
 
     def add_object(self, widget, table_object, view_object):
         """ Add object (doc or element) to selected feature """
-        
+
         # Get values from dialog
         object_id = utils_giswater.getWidgetText(self.dialog, table_object + "_id")
         if object_id == 'null':
             message = "You need to insert data"
             self.controller.show_warning(message, parameter=table_object + "_id")
             return
-        
+
         # Check if this object exists
         field_object_id = "id"
         sql = ("SELECT * FROM " + self.schema_name + "." + view_object + ""
@@ -848,7 +848,7 @@ class ParentDialog(QDialog):
         if not row:
             self.controller.show_warning("Object id not found", parameter=object_id)
             return
-        
+
         # Check if this object is already associated to current feature
         field_object_id = table_object + "_id"
         tablename = table_object + "_x_" + self.geom_type
@@ -857,7 +857,7 @@ class ParentDialog(QDialog):
                " WHERE " + str(self.field_id) + " = '" + str(self.id) + "'"
                " AND " + str(field_object_id) + " = '" + str(object_id) + "'")
         row = self.controller.get_row(sql, log_info=False)
-        
+
         # If object already exist show warning message
         if row:
             message = "Object already associated with this feature"
@@ -869,64 +869,64 @@ class ParentDialog(QDialog):
                    "(" + str(field_object_id) + ", " + str(self.field_id) + ")"
                    " VALUES ('" + str(object_id) + "', '" + str(self.id) + "');")
             self.controller.execute_sql(sql)
-            widget.model().select()        
-            
-            
+            widget.model().select()
+
+
     def fill_tbl_element_man(self, dialog, widget, table_name, expr_filter):
         """ Fill the table control to show elements """
-        
+
         # Get widgets
-        widget.setSelectionBehavior(QAbstractItemView.SelectRows)        
-        self.element_id = self.dialog.findChild(QLineEdit, "element_id")             
+        widget.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.element_id = self.dialog.findChild(QLineEdit, "element_id")
         open_element = self.dialog.findChild(QPushButton, "open_element")
-        btn_delete = self.dialog.findChild(QPushButton, "btn_delete")         
-        btn_insert = self.dialog.findChild(QPushButton, "btn_insert")         
-        new_element = self.dialog.findChild(QPushButton, "new_element")         
- 
+        btn_delete = self.dialog.findChild(QPushButton, "btn_delete")
+        btn_insert = self.dialog.findChild(QPushButton, "btn_insert")
+        new_element = self.dialog.findChild(QPushButton, "new_element")
+
         # Set signals
         self.tbl_element.doubleClicked.connect(partial(self.open_selected_element, dialog, widget))
         open_element.clicked.connect(partial(self.open_selected_element, dialog, widget))
-        btn_delete.clicked.connect(partial(self.delete_records, widget, table_name))            
+        btn_delete.clicked.connect(partial(self.delete_records, widget, table_name))
         btn_insert.clicked.connect(partial(self.add_object, widget, "element", "v_ui_element"))
         new_element.clicked.connect(partial(self.manage_element, dialog, feature=self.feature))
-        
+
         # Set model of selected widget
         self.set_model_to_table(widget, table_name, expr_filter)
-        
+
         # Adding auto-completion to a QLineEdit
-        self.table_object = "element"        
+        self.table_object = "element"
         self.set_completer_object(dialog, self.table_object)
-                    
+
 
     def open_selected_element(self, dialog, widget):
         """ Open form of selected element of the @widget?? """
 
         # Get selected rows
-        selected_list = widget.selectionModel().selectedRows()    
+        selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            self.controller.show_warning(message) 
+            self.controller.show_warning(message)
             return
-              
+
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             element_id = widget.model().record(row).value("element_id")
             break
-        
+
         # Open selected element
 
         self.manage_element(dialog, element_id)
-        
-            
+
+
     def check_expression(self, expr_filter, log_info=False):
         """ Check if expression filter @expr is valid """
-        
+
         if log_info:
             self.controller.log_info(expr_filter)
         expr = QgsExpression(expr_filter)
         if expr.hasParserError():
             message = "Expression Error"
-            self.controller.log_warning(message, parameter=expr_filter)      
+            self.controller.log_warning(message, parameter=expr_filter)
             return (False, expr)
         return (True, expr)
 
@@ -939,7 +939,7 @@ class ParentDialog(QDialog):
         manage_visit.edit_visit(self.geom_type, self.id)
 
 
-    def new_visit(self, table_name=None):
+    def new_visit(self, table_name=None, refresh_table=None):
         """ Call button 64: om_add_visit """
         # Get expl_id to save it on om_visit and show the geometry of visit
         sql = ("SELECT expl_id FROM " + self.schema_name + ".exploitation "
@@ -956,7 +956,7 @@ class ParentDialog(QDialog):
                " LIMIT 1")
         self.controller.get_rows(sql, commit=True)
 
-        manage_visit.manage_visit(geom_type=self.geom_type, feature_id=self.id, expl_id=expl_id[0])
+        manage_visit.manage_visit(geom_type=self.geom_type, feature_id=self.id, expl_id=expl_id[0], refresh_table=refresh_table)
         self.set_filter_dates('visit_start', 'visit_end', table_name, self.date_event_from, self.date_event_to)
 
     # creat the new visit GUI
@@ -1140,7 +1140,7 @@ class ParentDialog(QDialog):
         self.dlg_event_full.tbl_docs_x_event.doubleClicked.connect(self.open_file)
 
         self.dlg_event_full.open()
-        
+
 
     def populate_tbl_docs_x_event(self):
 
@@ -1276,7 +1276,7 @@ class ParentDialog(QDialog):
             folder_path = self.plugin_dir
         else:
             folder_path = os.path.dirname(file_path)
-            
+
         # Open dialog to select file
         os.chdir(folder_path)
         file_dialog = QFileDialog()
@@ -1335,8 +1335,9 @@ class ParentDialog(QDialog):
         self.date_event_to.dateChanged.connect(partial(self.set_filter_table_event, widget, table_name))
         self.date_event_from.dateChanged.connect(partial(self.set_filter_table_event, widget, table_name))
 
+        parameters = [widget, table_name, filter_, self.dialog]
+        btn_new_visit.clicked.connect(partial(self.new_visit, table_name, refresh_table=parameters))
         btn_open_gallery.clicked.connect(self.open_gallery)
-        btn_new_visit.clicked.connect(partial(self.new_visit, table_name))
         btn_open_visit.clicked.connect(self.open_visit)
 
         feature_key = self.controller.get_layer_primary_key()
@@ -1370,7 +1371,7 @@ class ParentDialog(QDialog):
 
         # Set model of selected widget
         table_name = str(table_name[utils_giswater.get_item_data(self.dialog, self.cmb_visit_class, 0)])
-
+        self.controller.plugin_settings_set_value("om_visit_table_name", str(table_name))
         self.set_model_to_table(widget, table_name, filter_)
         self.set_filter_dates('startdate', 'enddate', table_name, self.date_event_from, self.date_event_to)
 

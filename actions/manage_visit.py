@@ -10,6 +10,7 @@ or (at your option) any later version.
 from PyQt4.QtCore import Qt, QDate, pyqtSignal, QObject
 from PyQt4.QtGui import QAbstractItemView, QDialogButtonBox, QCompleter, QFileDialog, QLineEdit, QTableView
 from PyQt4.QtGui import QHeaderView
+from PyQt4.QtSql import QSqlTableModel
 from PyQt4.QtGui import QStringListModel, QTextEdit, QPushButton, QComboBox, QTabWidget, QStandardItem, QStandardItemModel
 import os
 import sys
@@ -46,7 +47,7 @@ class ManageVisit(ParentManage, QObject):
         ParentManage.__init__(self, iface, settings, controller, plugin_dir)
 
 
-    def manage_visit(self, visit_id=None, geom_type=None, feature_id=None, single_tool=True, expl_id=None):
+    def manage_visit(self, visit_id=None, geom_type=None, feature_id=None, single_tool=True, expl_id=None, refresh_table=None):
         """ Button 64. Add visit.
         if visit_id => load record related to the visit_id
         if geom_type => lock geom_type in relations tab
@@ -147,7 +148,7 @@ class ManageVisit(ParentManage, QObject):
         # Set signals
         self.dlg_add_visit.rejected.connect(self.manage_rejected)
         self.dlg_add_visit.rejected.connect(partial(self.close_dialog, self.dlg_add_visit))
-        self.dlg_add_visit.accepted.connect(self.manage_accepted)
+        self.dlg_add_visit.accepted.connect(partial(self.manage_accepted, refresh_table))
         self.dlg_add_visit.btn_event_insert.clicked.connect(self.event_insert)
         self.dlg_add_visit.btn_event_delete.clicked.connect(self.event_delete)
         self.dlg_add_visit.btn_event_update.clicked.connect(self.event_update)
@@ -219,7 +220,7 @@ class ManageVisit(ParentManage, QObject):
         self.disconnect_signal_selection_changed()
 
 
-    def manage_accepted(self):
+    def manage_accepted(self, refresh_table):
         """Do all action when closed the dialog with Ok.
         e.g. all necessary commits and cleanings.
         A) Trigger SELECT gw_fct_om_visit_multiplier (visit_id, feature_type)
@@ -240,6 +241,36 @@ class ManageVisit(ParentManage, QObject):
             self.update_geom()
 
         self.refresh_map_canvas()
+
+        if refresh_table is not None:
+            table_name = self.controller.plugin_settings_value('om_visit_table_name')
+            self.update_table_visit(refresh_table[0], table_name, refresh_table[2])
+
+
+    def update_table_visit(self, widget, table_name, expr_filter=None):
+
+        """ Set a model with selected filter.
+                Attach that model to selected table """
+        if self.schema_name not in table_name:
+            table_name = self.schema_name + "." + table_name
+
+        # Set model
+        model = QSqlTableModel()
+        model.setTable(table_name)
+        model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        if expr_filter is not None:
+            model.setFilter(expr_filter)
+        model.select()
+
+        # Check for errors
+        if model.lastError().isValid():
+            self.controller.show_warning(model.lastError().text())
+
+            # Attach model to table view
+        if widget:
+            widget.setModel(model)
+        else:
+            self.controller.log_info("set_model_to_table: widget not found")
 
 
     def update_geom(self):
