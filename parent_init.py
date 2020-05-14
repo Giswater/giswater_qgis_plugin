@@ -931,12 +931,12 @@ class ParentDialog(QDialog):
         return (True, expr)
 
 
-    def open_visit(self):
+    def open_visit(self, refresh_table):
         """ Call button 65: om_visit_management """
 
         manage_visit = ManageVisit(self.iface, self.settings, self.controller, self.plugin_dir)
         manage_visit.visit_added.connect(self.update_visit_table)
-        manage_visit.edit_visit(self.geom_type, self.id)
+        manage_visit.edit_visit(self.geom_type, self.id, refresh_table)
 
 
     def new_visit(self, table_name=None, refresh_table=None):
@@ -1338,7 +1338,7 @@ class ParentDialog(QDialog):
         parameters = [widget, table_name, filter_, self.dialog]
         btn_new_visit.clicked.connect(partial(self.new_visit, table_name, refresh_table=parameters))
         btn_open_gallery.clicked.connect(self.open_gallery)
-        btn_open_visit.clicked.connect(self.open_visit)
+        btn_open_visit.clicked.connect(partial(self.open_visit, refresh_table=parameters))
 
         feature_key = self.controller.get_layer_primary_key()
         if feature_key == 'node_id':

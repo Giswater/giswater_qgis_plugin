@@ -597,7 +597,7 @@ class ManageVisit(ParentManage, QObject):
         self.disconnect_signal_selection_changed()
 
 
-    def edit_visit(self, geom_type=None, feature_id=None):
+    def edit_visit(self, geom_type=None, feature_id=None, refresh_table=None):
         """ Button 65: Edit visit """
 
         # Create the dialog
@@ -638,6 +638,10 @@ class ManageVisit(ParentManage, QObject):
             partial(self.open_selected_object, self.dlg_man, self.dlg_man.tbl_visit, table_object))
         self.dlg_man.btn_delete.clicked.connect(
             partial(self.delete_selected_object, self.dlg_man.tbl_visit, table_object))
+        if refresh_table:
+            table_name = self.controller.plugin_settings_value('om_visit_table_name')
+            self.dlg_man.btn_delete.clicked.connect(
+                partial(self.update_table_visit, refresh_table[0], table_name, refresh_table[2]))
         self.dlg_man.txt_filter.textChanged.connect(
             partial(self.filter_visit, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object, expr_filter, filed_to_filter))
 
