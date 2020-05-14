@@ -2993,7 +2993,7 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QTableView" name="tbl_event_node">
+     <widget class="QTableView" name="tbl_visit_node">
       <property name="geometry">
        <rect>
         <x>7</x>
@@ -4193,7 +4193,7 @@
   <tabstop>btn_insert</tabstop>
   <tabstop>open_element</tabstop>
   <tabstop>btn_doc_new</tabstop>
-  <tabstop>tbl_event_node</tabstop>
+  <tabstop>tbl_visit_node</tabstop>
   <tabstop>tbl_document</tabstop>
   <tabstop>btn_delete</tabstop>
   <tabstop>doc_id</tabstop>

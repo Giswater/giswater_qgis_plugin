@@ -2892,7 +2892,7 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QTableView" name="tbl_event_node">
+     <widget class="QTableView" name="tbl_visit_node">
       <property name="geometry">
        <rect>
         <x>7</x>
@@ -4087,7 +4087,7 @@
   <tabstop>btn_doc_delete</tabstop>
   <tabstop>cmb_visit_class</tabstop>
   <tabstop>btn_open_visit</tabstop>
-  <tabstop>tbl_event_node</tabstop>
+  <tabstop>tbl_visit_node</tabstop>
   <tabstop>tbl_scada_value</tabstop>
   <tabstop>new_element</tabstop>
   <tabstop>tbl_scada_3</tabstop>

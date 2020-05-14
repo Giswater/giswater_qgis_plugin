@@ -1128,8 +1128,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1398,8 +1398,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2092,8 +2092,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3050,7 +3050,7 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QTableView" name="tbl_event_node">
+     <widget class="QTableView" name="tbl_visit_node">
       <property name="geometry">
        <rect>
         <x>7</x>
@@ -4252,7 +4252,7 @@
   <tabstop>tbl_scada_3</tabstop>
   <tabstop>tbl_scada_value</tabstop>
   <tabstop>date_el_from</tabstop>
-  <tabstop>tbl_event_node</tabstop>
+  <tabstop>tbl_visit_node</tabstop>
   <tabstop>tbl_scada</tabstop>
   <tabstop>date_event_from</tabstop>
   <tabstop>btn_open_visit</tabstop>

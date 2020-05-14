@@ -2879,7 +2879,7 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QTableView" name="tbl_event_node">
+     <widget class="QTableView" name="tbl_visit_node">
       <property name="geometry">
        <rect>
         <x>7</x>
@@ -4068,7 +4068,7 @@
   <tabstop>doc_type</tabstop>
   <tabstop>date_document_to</tabstop>
   <tabstop>btn_open_doc</tabstop>
-  <tabstop>tbl_event_node</tabstop>
+  <tabstop>tbl_visit_node</tabstop>
   <tabstop>date_el_to</tabstop>
   <tabstop>btn_doc_delete</tabstop>
   <tabstop>btn_doc_insert</tabstop>

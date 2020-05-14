@@ -2305,7 +2305,7 @@
        <number>3</number>
       </property>
      </widget>
-     <widget class="QTableView" name="tbl_event_arc">
+     <widget class="QTableView" name="tbl_visit_arc">
       <property name="geometry">
        <rect>
         <x>7</x>
@@ -6077,7 +6077,7 @@
   <tabstop>doc_type</tabstop>
   <tabstop>element_id</tabstop>
   <tabstop>btn_insert</tabstop>
-  <tabstop>tbl_event_arc</tabstop>
+  <tabstop>tbl_visit_arc</tabstop>
   <tabstop>btn_open_doc</tabstop>
   <tabstop>btn_doc_delete</tabstop>
   <tabstop>btn_delete</tabstop>

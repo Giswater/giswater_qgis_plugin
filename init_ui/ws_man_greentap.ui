@@ -2920,7 +2920,7 @@
        <number>3</number>
       </property>
      </widget>
-     <widget class="QTableView" name="tbl_event_connec">
+     <widget class="QTableView" name="tbl_visit_connec">
       <property name="geometry">
        <rect>
         <x>7</x>
@@ -3858,7 +3858,7 @@
   <tabstop>delete_row_doc</tabstop>
   <tabstop>date_event_from</tabstop>
   <tabstop>doc_id</tabstop>
-  <tabstop>tbl_event_connec</tabstop>
+  <tabstop>tbl_visit_connec</tabstop>
   <tabstop>btn_doc_insert</tabstop>
   <tabstop>btn_open_doc</tabstop>
   <tabstop>date_event_to</tabstop>
