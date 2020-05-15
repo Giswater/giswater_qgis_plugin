@@ -60,3 +60,10 @@ UPDATE sys_function SET return_type = null, input_params = null;
 
 DELETE FROM sys_function where function_name like '%trg_review_audit%';
 DELETE FROM sys_function WHERE id IN (1322, 1224, 1326, 1230, 1324, 1226, 1228, 2856, 2442);
+
+-- 15/05/2020
+SELECT setval('SCHEMA_NAME.config_param_system_id_seq', (SELECT max(id) FROM config_param_system), true);
+
+INSERT INTO config_param_system(parameter, value, data_type, context, descript, label,isenabled, project_type, isdeprecated)
+VALUES ('sys_vpn_permissions', FALSE, 'boolean', 'system', 'Variable to check if vpn connexion with server is used in order to assign correct permissions to the database',
+'Sys vpn permissions', FALSE, 'utils', FALSE) ON CONFLICT (parameter) DO NOTHING;

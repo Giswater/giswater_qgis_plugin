@@ -22,7 +22,9 @@ DECLARE
 	v_apiservice boolean;	
 	v_rolepermissions boolean;
 	v_apipublishuser varchar;
-	
+	v_vpn_dbuser boolean;
+
+	rec_user record;
 
 BEGIN 
 
@@ -36,8 +38,9 @@ BEGIN
 	v_schema_array := current_schemas(FALSE);
 	v_schemaname :=v_schema_array[1];
 	
-    v_rolepermissions = (SELECT value::boolean FROM config_param_system WHERE parameter='sys_role_permissions');
+	v_rolepermissions = (SELECT value::boolean FROM config_param_system WHERE parameter='sys_role_permissions');
 	v_apiservice = (SELECT value::boolean FROM config_param_system WHERE parameter='sys_api_service');
+	v_vpn_dbuser = (SELECT value::boolean FROM config_param_system WHERE parameter='sys_vpn_permissions');
 	
 	-- role permissions for schema
 	IF v_rolepermissions THEN 
@@ -89,9 +92,20 @@ BEGIN
 		GRANT role_admin TO postgres; 	
 	
 		-- Grant generic permissions
-		v_query_text:= 'GRANT ALL ON DATABASE '||v_dbnname||' TO "role_basic";';
-		EXECUTE v_query_text;	
-	
+		IF v_vpn_dbuser THEN
+		
+			v_query_text:= 'REVOKE ALL ON DATABASE '||v_dbnname||' FROM "role_basic";';
+			EXECUTE v_query_text;		
+				
+			FOR rec_user IN (SELECT * FROM cat_users) LOOP
+				v_query_text:= 'GRANT ALL ON DATABASE '||v_dbnname||' TO '||rec_user.id||'';
+				EXECUTE v_query_text;				
+			END LOOP;
+		ELSE
+			v_query_text:= 'GRANT ALL ON DATABASE '||v_dbnname||' TO "role_basic";';
+			EXECUTE v_query_text;	
+		END IF;
+
 		v_query_text:= 'GRANT ALL ON SCHEMA '||v_schemaname||' TO "role_basic";';
 		EXECUTE v_query_text;
 	
@@ -127,7 +141,7 @@ BEGIN
 	-- role permissions for api
 	IF v_apiservice THEN
 	
-	    v_apipublishuser = (SELECT value FROM config_param_system WHERE parameter='api_publish_user');
+		v_apipublishuser = (SELECT value FROM config_param_system WHERE parameter='api_publish_user');
 	
 		-- Grant generic permissions
 		v_query_text:= 'GRANT ALL ON DATABASE '||v_dbnname||' TO '||v_apipublishuser;
