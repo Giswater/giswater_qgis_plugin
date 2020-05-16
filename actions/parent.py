@@ -1212,7 +1212,7 @@ class ParentAction(object):
             if layer: self.iface.setActiveLayer(layer)
 
 
- def set_layer_simbology_polcategorized(self, layer, column, opacity):
+    def set_layer_simbology_polcategorized(self, layer, column, opacity):
         """ Symbolyze dynamic polygon layers using categorized expression """
 
         lyr = self.controller.get_layer_by_tablename(layer)
