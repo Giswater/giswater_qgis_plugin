@@ -377,17 +377,17 @@ class GwToolBox(ApiParent):
             self.set_layers_visible(complet_result[0]['body']['data']['setVisibleLayers'])
             self.controller.log_info('test1')
 
-            #simbology
-            simb_status = complet_result[0]['body']['data']['setSimbology']['status']
-            if simb_status == "true":
-                self.controller.log_info('test2')
-                self.simb_layer = complet_result[0]['body']['data']['setSimbology']['layer']
-                self.simb_column = complet_result[0]['body']['data']['setSimbology']['column']
-                self.simb_opacity = complet_result[0]['body']['data']['setSimbology']['opacity']
-                simb_type = complet_result[0]['body']['data']['setSimbology']['type']
-                if simb_type == "polCategorized":
-                    #call function to simbolize
-                    self.set_layer_simbology_polcategorized(self.simb_layer, self.simb_column, self.simb_opacity)
+            #getting on the fly simbology capabilities
+            if 'setSimbology' in complet_result[0]['body']['data']:
+                simb_status = complet_result[0]['body']['data']['setSimbology']['status']
+                if simb_status == "true":
+                    self.simb_layer = complet_result[0]['body']['data']['setSimbology']['layer']
+                    self.simb_column = complet_result[0]['body']['data']['setSimbology']['column']
+                    self.simb_opacity = complet_result[0]['body']['data']['setSimbology']['opacity']
+                    simb_type = complet_result[0]['body']['data']['setSimbology']['type']
+                    if simb_type == "polCategorized":
+                        #call function to simbolize
+                        self.set_layer_simbology_polcategorized(self.simb_layer, self.simb_column, self.simb_opacity)
 
 
         except KeyError as e:
