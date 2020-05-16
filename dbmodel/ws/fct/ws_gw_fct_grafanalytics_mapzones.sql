@@ -46,7 +46,7 @@ SELECT sector_id, count(sector_id) from v_edit_arc group by sector_id order by 1
 
 
 -- DMA
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation": "[532]", "checkData": false,"updateFeature":"TRUE", "updateMapZone":2, "geomParamUpdate":15,"debug":"false"}}}');
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation": "[1]", "checkData": false,"updateFeature":"TRUE", "updateMapZone":2, "geomParamUpdate":15,"debug":"false"}}}');
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "node":"1046", "updateFeature":"TRUE", "updateMapZone":2,"concaveHullParam":0.85,"debug":"false"}}}');
 SELECT count(*), log_message FROM audit_log_data WHERE fprocesscat_id=45 AND cur_user=current_user group by log_message order by 2 --DMA
 SELECT dma_id, count(dma_id) from v_edit_arc  group by dma_id order by 1;
@@ -144,6 +144,8 @@ v_level integer;
 v_status text;
 v_message text;
 v_checkdata boolean;
+v_mapzonename text;
+v_dynsymbolstatus boolean;
 
 
 BEGIN
@@ -165,6 +167,9 @@ BEGIN
 	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 	v_debug = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'debug');
 	v_checkdata = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'checkData');
+
+	-- select system variables
+	v_dynsymbolstatus = (SELECT value FROM config_param_system WHERE parameter = 'mapzones_dynamic_symbology');
 
 	-- select config values
 	SELECT giswater, epsg INTO v_version, v_srid FROM version order by 1 desc limit 1;
@@ -199,6 +204,7 @@ BEGIN
 		v_field = 'presszonecat_id';
 		v_fieldmp = 'id';
 		v_visible_layer ='v_edit_presszone';
+		v_mapzonename = 'descript';
 			
 	ELSIF v_class = 'DMA' THEN 
 		v_fprocesscat_id=45; 
@@ -206,6 +212,7 @@ BEGIN
 		v_field = 'dma_id';
 		v_fieldmp = 'dma_id';
 		v_visible_layer ='v_edit_dma';
+		v_mapzonename = 'name';
 			
 	ELSIF v_class = 'DQA' THEN 
 		v_fprocesscat_id=44;
@@ -213,6 +220,7 @@ BEGIN
 		v_field = 'dqa_id';
 		v_fieldmp = 'dqa_id';
 		v_visible_layer ='v_edit_dqa';
+		v_mapzonename = 'name';
 			
 	ELSIF v_class = 'SECTOR' THEN 
 		v_fprocesscat_id=30; 
@@ -220,6 +228,7 @@ BEGIN
 		v_field = 'sector_id';
 		v_fieldmp = 'sector_id';
 		v_visible_layer ='v_edit_sector';
+		v_mapzonename = 'name';
 	ELSE
 		
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
@@ -698,6 +707,8 @@ BEGIN
 	RETURN  ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}, "data":{ "info":'||v_result_info||','||
 					  '"setVisibleLayers":["'||v_visible_layer||'"],'||
+  					  '"setSimbology":{"status":"'||v_dynsymbolstatus||'", "type":"polCategorized", "layer":"'||v_visible_layer||
+						'", "column":"'||v_mapzonename||'", "opacity":"0.5"},'||
 					  '"point":'||v_result_point||','||
 					  '"line":'||v_result_line||
 					  '}}}')::json;

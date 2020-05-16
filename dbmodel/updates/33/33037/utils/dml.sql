@@ -13,3 +13,7 @@ UPDATE audit_cat_table SET sys_role_id = 'role_basic'  WHERE id = 'audit_check_d
 --2020/05/09
 UPDATE ws.audit_cat_table SET sys_role_id = 'role_master' WHERE id = 'config_form_fields';
 
+--2020/05/14
+INSERT INTO config_param_system (parameter, value, data_type, context, descript, label, isenabled, layout_id, layout_order, project_type, datatype, widgettype, ismandatory, isdeprecated) 
+VALUES ('mapzones_dynamic_symbology', 'false', 'boolean', 'system', 'Mapzones dynamic symbology', null, FALSE, null, null, 'ws', 'boolean', null, null, false) 
+ON CONFLICT (parameter) DO NOTHING;
