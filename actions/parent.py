@@ -5,7 +5,8 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsExpression, QgsFeatureRequest, QgsGeometry, QgsPointXY, QgsProject, QgsRectangle
+from qgis.core import QgsExpression, QgsFeatureRequest, QgsGeometry, QgsPointXY, QgsProject, QgsRectangle, QgsSymbol, \
+    QgsRendererCategory, QgsCategorizedSymbolRenderer
 from qgis.gui import QgsRubberBand
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTimer
 from qgis.PyQt.QtWidgets import QGroupBox, QAbstractItemView, QTableView, QFileDialog, QApplication, QCompleter, \
@@ -13,6 +14,7 @@ from qgis.PyQt.QtWidgets import QGroupBox, QAbstractItemView, QTableView, QFileD
 from qgis.PyQt.QtGui import QIcon, QColor, QCursor, QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel
 
+import random
 import configparser, os, re, subprocess, sys, webbrowser
 if 'nt' in sys.builtin_module_names:
     import ctypes
@@ -1209,3 +1211,42 @@ class ParentAction(object):
             layer = self.controller.get_layer_by_tablename('v_edit_node')
             if layer: self.iface.setActiveLayer(layer)
 
+
+ def set_layer_simbology_polcategorized(self, layer, column, opacity):
+        """ Symbolyze dynamic polygon layers using categorized expression """
+
+        lyr = self.controller.get_layer_by_tablename(layer)
+        if lyr:
+            # get unique values
+            fni = lyr.fields().indexFromName(column)
+            unique_ids = lyr.dataProvider().uniqueValues(fni)
+            #get number of unique values
+            totalval = len(sorted(list(lyr.uniqueValues(fni))))
+
+            categories = []
+
+            for unique_id in unique_ids:
+                # initialize the default symbol for this geometry type
+                symbol = QgsSymbol.defaultSymbol(lyr.geometryType())
+                symbol.setOpacity(float(opacity))
+
+                R = random.randint(0, 255)
+                G = random.randint(0, 255)
+                B = random.randint(0, 255)
+
+                layer_style = {}
+                layer_style['color'] = '{}, {}, {}'.format(int(R), int(G), int(B))
+                layer_style['outline'] = 'black'
+                layer_style['opacity'] = '0.8'
+                symbolLayer = QgsSimpleFillSymbolLayer.create(layer_style)
+
+                if symbolLayer is not None:
+                    symbol.changeSymbolLayer(0, symbolLayer)
+                category = QgsRendererCategory(unique_id, symbol, str(unique_id))
+                categories.append(category)
+
+            # apply symbol to layer renderer
+            lyr.setRenderer(QgsCategorizedSymbolRenderer (column, categories))
+
+            # repaint layer
+            lyr.triggerRepaint()

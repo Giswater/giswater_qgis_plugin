@@ -44,6 +44,16 @@ class Basic(ApiParent):
         self.dlg_selector.rejected.connect(partial(self.save_settings, self.dlg_selector))
         self.get_selector(self.dlg_selector, selector_values)
         self.open_dialog(self.dlg_selector, dlg_name='selector', maximize_button=False)
+		
+		# call dynamic mapzones repaint
+        row = self.controller.get_config('mapzones_dynamic_symbology', 'value', 'config_param_system')
+        if row and row[0].lower() == 'true':
+            if field_id_right == "expl_id":
+                self.set_layer_simbology_polcategorized('v_edit_dma', 'name', 0.5)
+                self.set_layer_simbology_polcategorized('v_edit_dqa', 'name', 0.5)
+                self.set_layer_simbology_polcategorized('v_edit_presszone', 'descript', 0.5)
+
+        self.refresh_map_canvas()
 
 
     def basic_state_selector(self):
