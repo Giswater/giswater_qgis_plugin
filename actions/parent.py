@@ -22,6 +22,8 @@ from .. import utils_giswater
 from .add_layer import AddLayer
 from ..ui_manager import BasicInfo, GwDialog, GwMainWindow
 
+from qgis.core import *
+import random
 
 class ParentAction(object):
 
@@ -320,6 +322,15 @@ class ParentAction(object):
         col_to_sort = qtable_right.model().headerData(idx, Qt.Horizontal)
         query_right += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
         self.fill_table_by_query(qtable_right, query_right)
+
+        # call dynamic mapzones repaint
+        row = self.controller.get_config('mapzones_dynamic_symbology', 'value', 'config_param_system')
+        if row and row[0].lower() == 'true':
+            if field_id_right == "expl_id":
+                self.set_layer_simbology_polcategorized('v_edit_dma', 'name', 0.5)
+                self.set_layer_simbology_polcategorized('v_edit_dqa', 'name', 0.5)
+                self.set_layer_simbology_polcategorized('v_edit_presszone', 'descript', 0.5)
+
         self.refresh_map_canvas()
 
 
@@ -379,6 +390,15 @@ class ParentAction(object):
         col_to_sort = qtable_right.model().headerData(idx, Qt.Horizontal)
         query_right += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
         self.fill_table_by_query(qtable_left, query_left)
+
+        # call dynamic mapzones repaint
+        row = self.controller.get_config('mapzones_dynamic_symbology', 'value', 'config_param_system')
+        if row and row[0].lower() == 'true':
+            if tablename_des == "selector_expl":
+                self.set_layer_simbology_polcategorized('v_edit_dma', 'name', 0.5)
+                self.set_layer_simbology_polcategorized('v_edit_dqa', 'name', 0.5)
+                self.set_layer_simbology_polcategorized('v_edit_presszone', 'descript', 0.5)
+
         self.refresh_map_canvas()
 
 
@@ -1034,3 +1054,42 @@ class ParentAction(object):
         utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.txt_infolog, msg)
         self.open_dialog(self.dlg_info)
 
+
+    def set_layer_simbology_polcategorized(self, layer, column, opacity):
+        """ Symbolyze dynamic polygon layers using categorized expression """
+
+        lyr = self.controller.get_layer_by_tablename(layer)
+        if lyr:
+            # get unique values
+            fni = lyr.fields().indexFromName(column)
+            unique_ids = lyr.dataProvider().uniqueValues(fni)
+            #get number of unique values
+            totalval = len(sorted(list(lyr.uniqueValues(fni))))
+
+            categories = []
+
+            for unique_id in unique_ids:
+                # initialize the default symbol for this geometry type
+                symbol = QgsSymbol.defaultSymbol(lyr.geometryType())
+                symbol.setOpacity(float(opacity))
+
+                R = random.randint(0, 255)
+                G = random.randint(0, 255)
+                B = random.randint(0, 255)
+
+                layer_style = {}
+                layer_style['color'] = '{}, {}, {}'.format(int(R), int(G), int(B))
+                layer_style['outline'] = 'black'
+                layer_style['opacity'] = '0.8'
+                symbolLayer = QgsSimpleFillSymbolLayer.create(layer_style)
+
+                if symbolLayer is not None:
+                    symbol.changeSymbolLayer(0, symbolLayer)
+                category = QgsRendererCategory(unique_id, symbol, str(unique_id))
+                categories.append(category)
+
+            # apply symbol to layer renderer
+            lyr.setRenderer(QgsCategorizedSymbolRenderer (column, categories))
+
+            # repaint layer
+            lyr.triggerRepaint()
