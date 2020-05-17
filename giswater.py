@@ -1250,7 +1250,26 @@ class Giswater(QObject):
                 self.dlg_audit_project.chk_hide_form.stateChanged.connect(partial(self.update_config))
                 self.parent.open_dialog(self.dlg_audit_project)
 
+        print (result)
+
+        #manage guidemap
+        if result['body']['data']['actions']['useGuideMap'] == 'true':
+
+            #guide map works using v_edit_exploitation
+            layer = self.controller.get_layer_by_tablename('v_edit_exploitation')
+            self.iface.setActiveLayer(layer)
+            self.iface.zoomToActiveLayer()
+
+            self.iface.actionSelect().trigger
+            #wait for selection of user
+
+            #zoom to selection
+
+            layer.removeSelection()
+
         return True
+
+
 
 
     def update_config(self, state):
