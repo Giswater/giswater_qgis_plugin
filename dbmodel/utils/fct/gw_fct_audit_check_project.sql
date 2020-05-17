@@ -61,6 +61,7 @@ v_hidden_form boolean;
 v_init_project boolean;
 v_qgisversion text;
 v_osversion text;
+v_qgis_init_guide_map boolean;
 
 BEGIN 
 
@@ -85,6 +86,7 @@ BEGIN
 	SELECT value INTO v_user_control FROM config_param_user where parameter='audit_project_user_control' AND cur_user=current_user;
 	SELECT value INTO v_layer_log FROM config_param_user where parameter='audit_project_layer_log' AND cur_user=current_user;
 	SELECT value INTO v_hidden_form FROM config_param_user where parameter='qgis_form_initproject_hidden' AND cur_user=current_user;
+	SELECT value INTO v_qgis_init_guide_map FROM config_param_user where parameter='qgis_init_guide_map' AND cur_user=current_user;
 
 	-- when funcion gw_fct_audit_check_project is called by click on utils button, force to show user dialog and user control
 	IF v_init_project IS FALSE THEN
@@ -201,6 +203,12 @@ BEGIN
 			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) VALUES (101, 4, v_errortext);
 		END IF;
 	END LOOP;
+
+	-- set all exploitations when v_qgis_init_guide_map is true
+	IF v_qgis_init_guide_map THEN
+		INSERT INTO selector_expl (expl_id, cur_user) SELECT expl_id, current_user FROM exploitation
+		ON CONFLICT (expl_id, cur_user) DO NOTHING;
+	END IF;
 
 	-- arrange vnode
 	UPDATE vnode set state=0 FROM link WHERE link.exit_type ='VNODE' and exit_id = vnode_id::text AND link.state=0;
@@ -516,7 +524,7 @@ BEGIN
 						'"line":'||v_result_line||','||
 						'"polygon":'||v_result_polygon||','||
 						'"missingLayers":'||v_missing_layers||'}'||
-				', "actions":{"hideForm":' || v_hidden_form || '}}}')::json;
+				', "actions":{"hideForm":' || v_hidden_form || ', "useGuideMap":'||v_qgis_init_guide_map||'}}}')::json;
 	ELSE
 		v_return= ('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'" '||
 			',"body":{"form":{}'||
@@ -525,7 +533,7 @@ BEGIN
 						'"line":{},'||
 						'"polygon":{},'||
 						'"missingLayers":{}}'||
-				', "actions":{"hideForm":true}}}')::json;
+				', "actions":{"hideForm":true, "useGuideMap":'||v_qgis_init_guide_map||'}}}')::json;
 	END IF;
 		
 	--  Return	   
