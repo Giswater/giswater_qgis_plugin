@@ -195,8 +195,12 @@ class ApiCF(ApiParent, QObject):
         self.feature = None
         self.my_json = {}
 
-        # Get srid
+        # Get values
         self.srid = self.controller.plugin_settings_value('srid')
+        self.qgis_project_add_schema = self.controller.plugin_settings_value('addSchema')
+        self.qgis_project_infotype = self.controller.plugin_settings_value('infoType')
+        self.qgis_project_role = self.controller.plugin_settings_value('projectRole')
+
         self.new_feature = new_feature
         if self.iface.activeLayer() is None:
             active_layer = ""
@@ -237,6 +241,9 @@ class ApiCF(ApiParent, QObject):
             scale_zoom = self.iface.mapCanvas().scale()
             extras += f', "activeLayer":"{active_layer}"'
             extras += f', "visibleLayer":{visible_layer}'
+            extras += f', "addSchema":"{self.qgis_project_add_schema}"'
+            extras += f', "infoType":"{self.qgis_project_infotype}"'
+            extras += f', "projecRole":"{self.qgis_project_role}"'
             extras += f', "coordinates":{{"epsg":{self.srid}, "xcoord":{point.x()},"ycoord":{point.y()}, "zoomRatio":{scale_zoom}}}'
             body = self.create_body(extras=extras)
             sql = f"SELECT gw_api_getinfofromcoordinates($${{{body}}}$$)"

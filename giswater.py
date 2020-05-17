@@ -823,6 +823,9 @@ class Giswater(QObject):
         # Get water software from table 'version'
         self.wsoftware = self.controller.get_project_type()
 
+        # get variables from qgis project
+        self.get_qgis_project_variables()
+
         # Manage project read of type 'tm'
         if self.wsoftware == 'tm':
             self.project_read_tm(show_warning)
@@ -1587,3 +1590,17 @@ class Giswater(QObject):
         body = "" + client + form + feature + data
 
         return body
+
+    def get_qgis_project_variables(self):
+        """ Manage qgis project variables """
+
+        self.qgis_project_infotype = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('gwInfoType')
+        self.qgis_project_add_schema = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('gwAddSchema')
+        self.qgis_project_type = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('gwProjectType')
+        self.qgis_project_role = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('gwProjectRole')
+        self.controller.plugin_settings_set_value("infoType", self.qgis_project_infotype)
+        self.controller.plugin_settings_set_value("addSchema", self.qgis_project_add_schema)
+        self.controller.plugin_settings_set_value("projecType", self.qgis_project_type)
+        self.controller.plugin_settings_set_value("projectRole", self.qgis_project_role)
+
+        return

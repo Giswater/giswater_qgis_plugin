@@ -1473,7 +1473,7 @@ class DaoController(object):
     def get_restriction(self):
 
         # Get project variable 'project_role'
-        project_role = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('project_role')
+        qgis_project_role = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('gwProjectRole')
 
         role_edit = False
         role_om = False
@@ -1500,15 +1500,15 @@ class DaoController(object):
             if self.user in super_users:
                 role_master = True
 
-        if role_basic or project_role == 'role_basic':
+        if role_basic or qgis_project_role == 'role_basic':
             return 'role_basic'
-        elif role_om or project_role == 'role_om':
+        elif role_om or qgis_project_role == 'role_om':
             return 'role_om'
-        elif role_edit or project_role == 'role_edit':
+        elif role_edit or qgis_project_role == 'role_edit':
             return 'role_edit'
-        elif role_epa or project_role == 'role_epa':
+        elif role_epa or qgis_project_role == 'role_epa':
             return 'role_epa'
-        elif role_master or project_role == 'role_master':
+        elif role_master or qgis_project_role == 'role_master':
             return 'role_master'
         else:
             return 'role_basic'
