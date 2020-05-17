@@ -18,6 +18,9 @@ SELECT SCHEMA_NAME.gw_fct_getinfofromcoordinates($${
 		"feature":{},
 		"data":{"activeLayer":"ve_node",
 			"visibleLayer":["ve_node","ve_arc"],
+			"addSchema":"ud",
+			"infoType":"full"
+			"projecRole":"role_admin"
 			"toolBar":"basic",
 			"coordinates":{"epsg":25831, "xcoord":419204.96, "ycoord":4576509.27, "zoomRatio":1000}}}$$)
 SELECT SCHEMA_NAME.gw_fct_getinfofromcoordinates($${
@@ -59,6 +62,10 @@ v_config_layer text;
 v_toolbar text;
 v_role text;
 v_errcontext text;
+v_addschema text; 
+v_projectrole text; 
+v_flag boolean = false;
+v_infotype text;
 
 BEGIN
 
@@ -77,6 +84,9 @@ BEGIN
 	v_zoomratio := ((p_data ->> 'data')::json->> 'coordinates')::json->>'zoomRatio';
 	v_toolbar := ((p_data ->> 'data')::json->> 'toolBar');
 	v_role = (p_data ->> 'data')::json->> 'rolePermissions';
+	v_projectrole = (p_data ->> 'data')::json->> 'projecRole';
+	v_addschema = (p_data ->> 'data')::json->> 'addSchema';
+	v_infotype = (p_data ->> 'data')::json->> 'infoType';
 
 	v_activelayer := (p_data ->> 'data')::json->> 'activeLayer';
 	v_visiblelayer := (p_data ->> 'data')::json->> 'visibleLayer';
@@ -172,12 +182,23 @@ BEGIN
 		END IF;      
 
 		IF v_id IS NOT NULL THEN 
+			v_flag = true;
 			exit;
 		ELSE 
 		-- RAISE NOTICE 'Searching for layer....loop number: % layer: % ,idname: %, id: %', v_count, v_layer, v_idname, v_id;    
 		END IF;
 	END LOOP;
-
+	
+	-- looking for additional schema 
+	IF v_addschema IS NOT NULL AND v_addschema != v_schemaname AND v_flag IS FALSE THEN
+		
+		EXECUTE 'SET search_path = '||v_addschema||', public';
+		SELECT gw_api_getinfofromcoordinates(p_data) INTO v_return;
+		SET search_path = 'ws_sample', public;
+		RAISE NOTICE 'returned';
+		RETURN v_return;
+	END IF;
+	
 	-- Control NULL's
 	IF v_id IS NULL THEN
 		RETURN ('{"status":"Accepted", "message":{"level":0, "text":"No feature found"}, "results":0, "apiVersion":'|| api_version 
