@@ -64,38 +64,43 @@ BEGIN
 		SELECT gw_fct_get_formfields( p_table_id, v_formtype, 'data', p_table_id, p_idname, p_id, null, 'SELECT',null, p_device, v_values_array) INTO fields_array;
 	ELSE
 		raise notice 'Configuration fields are NOT defined on config_info_layer_field. System values will be used';
-
-		-- Get fields
-		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM 
-			(SELECT a.attname as label, 
-			concat('||quote_literal(v_tabname)||',''_'',a.attname) AS widgetname,
-			(case when a.atttypid=16 then ''check'' else ''text'' end ) as widgettype, 
-			(case when a.atttypid=16 then ''boolean'' else ''string'' end ) as "datatype", 
-			''::TEXT AS tooltip, 
-			''::TEXT as placeholder, 
-			false AS iseditable,
-			row_number()over() AS orderby, 
-			null as stylesheet, 
-			row_number()over() AS layout_order, 
-			FALSE AS isparent, 
-			null AS widgetfunction, 
-			null AS linkedaction, 
-			FALSE AS isautoupdate,
-			''lyt_data_1'' AS layoutname, 
-			null as widgetcontrols,
-			FALSE as hidden
-			FROM pg_attribute a
-			JOIN pg_class t on a.attrelid = t.oid
-			JOIN pg_namespace s on t.relnamespace = s.oid
-			WHERE a.attnum > 0 
-			AND NOT a.attisdropped
-			AND t.relname = $1 
-			AND s.nspname = $2
-			AND a.attname !=''the_geom''
-			AND a.attname !=''geom''
-			ORDER BY a.attnum) a'
-			INTO fields_array
-			USING p_table_id, schemas_array[1]; 
+		
+		IF p_id IS NULL THEH
+			RETURN '{}'; -- returning null for those layers are not configured and id is null (first call on load project)
+			
+		ELSE
+			-- Get fields
+			EXECUTE 'SELECT array_agg(row_to_json(a)) FROM 
+				(SELECT a.attname as label, 
+				concat('||quote_literal(v_tabname)||',''_'',a.attname) AS widgetname,
+				(case when a.atttypid=16 then ''check'' else ''text'' end ) as widgettype, 
+				(case when a.atttypid=16 then ''boolean'' else ''string'' end ) as "datatype", 
+				''::TEXT AS tooltip, 
+				''::TEXT as placeholder, 
+				false AS iseditable,
+				row_number()over() AS orderby, 
+				null as stylesheet, 
+				row_number()over() AS layout_order, 
+				FALSE AS isparent, 
+				null AS widgetfunction, 
+				null AS linkedaction, 
+				FALSE AS isautoupdate,
+				''lyt_data_1'' AS layoutname, 
+				null as widgetcontrols,
+				FALSE as hidden
+				FROM pg_attribute a
+				JOIN pg_class t on a.attrelid = t.oid
+				JOIN pg_namespace s on t.relnamespace = s.oid
+				WHERE a.attnum > 0 
+				AND NOT a.attisdropped
+				AND t.relname = $1 
+				AND s.nspname = $2
+				AND a.attname !=''the_geom''
+				AND a.attname !=''geom''
+				ORDER BY a.attnum) a'
+				INTO fields_array
+				USING p_table_id, schemas_array[1]; 
+		END IF;
 	END IF;
 
 	IF p_tgop !='LAYER' THEN
