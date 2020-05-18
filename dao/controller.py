@@ -87,7 +87,6 @@ class DaoController(object):
             self.min_log_level = int(self.settings.value('status/log_level'))
             log_suffix = self.settings.value('status/log_suffix')
             self.logger = Logger(self, logger_name, self.min_log_level, log_suffix)
-            self.log_info("Logger initialized")
 
             if self.min_log_level == 10:
                 self.min_message_level = 0
@@ -1036,7 +1035,6 @@ class DaoController(object):
             tab_name = self.plugin_name
 
         if message_level >= self.min_message_level:
-            msg = "QGIS: " + str(msg)
             QgsMessageLog.logMessage(msg, tab_name, message_level)
 
         return msg
@@ -1528,6 +1526,7 @@ class DaoController(object):
 
 
     def get_config(self, parameter='', columns='value', table='config_param_user', sql_added=None, log_info=True):
+
         sql = f"SELECT {columns} FROM {table} WHERE parameter = '{parameter}' "
         if sql_added:
             sql += sql_added
@@ -1535,11 +1534,13 @@ class DaoController(object):
             sql += " AND cur_user = current_user"
         sql += ";"
         row = self.get_row(sql, commit=True, log_info=log_info)
+
         return row
 
 
     def indexing_spatial_layer(self, layer_name):
         """ Force reload dataProvider of layer """
+
         layer = self.get_layer_by_tablename(layer_name)
         if layer:
             layer.dataProvider().forceReload()

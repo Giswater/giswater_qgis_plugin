@@ -796,7 +796,6 @@ class Giswater(QObject):
 
         # Set PostgreSQL parameter 'search_path'
         self.controller.set_search_path(layer_source['db'], layer_source['schema'])
-        self.controller.log_info("Set search_path")
 
         self.set_info_button()
 
@@ -995,6 +994,7 @@ class Giswater(QObject):
 
 
     def get_new_layers_name(self, layers_list):
+
         layers_name = []
         for layer in layers_list:
             layer_source = self.controller.get_layer_source(layer)
@@ -1161,6 +1161,7 @@ class Giswater(QObject):
         except KeyError as e:
             self.controller.show_warning("KeyError: "+str(e))
 
+
     def manage_expl_id(self):
         """ Manage project variable 'expl_id' """
         
@@ -1182,6 +1183,7 @@ class Giswater(QObject):
 
     def populate_audit_check_project(self, layers):
         """ Fill table 'audit_check_project' with layers data """
+
         sql = ("DELETE FROM audit_check_project"
                " WHERE user_name = current_user AND fprocesscat_id = 1")
         self.controller.execute_sql(sql)
@@ -1239,7 +1241,8 @@ class Giswater(QObject):
 
         # Populate info_log and missing layers
         critical_level = 0
-        text_result = self.add_layer.add_temp_layer(self.dlg_audit_project, result['body']['data'], 'gw_fct_audit_check_project_result', True, False, 0, True)
+        text_result = self.add_layer.add_temp_layer(self.dlg_audit_project, result['body']['data'],
+            'gw_fct_audit_check_project_result', True, False, 0, True)
 
         if 'missingLayers' in result['body']['data']:
             critical_level= self.get_missing_layers(self.dlg_audit_project, result['body']['data']['missingLayers'], critical_level)
@@ -1325,6 +1328,7 @@ class Giswater(QObject):
 
 
     def add_selected_layers(self):
+
         checks = self.dlg_audit_project.scrollArea.findChildren(QCheckBox)
         schemaname = self.schema_name.replace('"','')
         for check in checks:
@@ -1423,8 +1427,8 @@ class Giswater(QObject):
 
 
     def get_layers_to_config(self):
-
         """ Get available layers to be configured """
+
         schema_name = self.schema_name.replace('"','')
         sql =(f"SELECT DISTINCT(parent_layer) FROM cat_feature " 
               f"UNION " 
@@ -1447,6 +1451,7 @@ class Giswater(QObject):
 
     def set_form_suppress(self, layers_list):
         """ Set form suppress on "Hide form on add feature (global settings) """
+
         for layer_name in layers_list:
             layer = self.controller.get_layer_by_tablename(layer_name)
             if layer is None: continue
@@ -1457,6 +1462,7 @@ class Giswater(QObject):
 
     def set_read_only(self, layer, field, field_index):
         """ Set field readOnly according to client configuration into config_api_form_fields (field 'iseditable')"""
+
         # Get layer config
         config = layer.editFormConfig()
         try:
@@ -1472,8 +1478,8 @@ class Giswater(QObject):
 
     def set_layer_config(self, layers):
         """ Set layer fields configured according to client configuration.
-            At the moment manage:
-                Column names as alias, combos and typeahead as ValueMap"""
+            At the moment manage: Column names as alias, combos and typeahead as ValueMap """
+
         msg_failed = ""
         msg_key = ""
         for layer_name in layers:
@@ -1498,7 +1504,6 @@ class Giswater(QObject):
                     continue
 
             if 'status' in complet_result and complet_result['status'] == 'Failed':
-                print(sql)
                 try:
                     msg_failed += f"<b>Error: </b>{complet_result['SQLERR']}<br>"
                     msg_failed += f"<b>Context: </b>{complet_result['SQLCONTEXT']} <br><br>"
@@ -1557,6 +1562,7 @@ class Giswater(QObject):
 
     def set_column_visibility(self, layer, col_name, hidden):
         """ Hide selected fields according table config_api_form_fields.hidden """
+
         config = layer.attributeTableConfig()
         columns = config.columns()
         for column in columns:
@@ -1569,6 +1575,7 @@ class Giswater(QObject):
         
     def set_column_multiline(self, layer, field, fieldIndex):
         """ Set multiline selected fields according table config_api_form_fields.widgetcontrols['setQgisMultiline'] """
+
         if field['widgettype'] == 'text':
             if field['widgetcontrols'] and 'setQgisMultiline' in field['widgetcontrols']:
                 editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': field['widgetcontrols']['setQgisMultiline']})
@@ -1591,6 +1598,7 @@ class Giswater(QObject):
 
         return body
 
+
     def get_qgis_project_variables(self):
         """ Manage qgis project variables """
 
@@ -1603,4 +1611,3 @@ class Giswater(QObject):
         self.controller.plugin_settings_set_value("projecType", self.qgis_project_type)
         self.controller.plugin_settings_set_value("projectRole", self.qgis_project_role)
 
-        return
