@@ -1047,7 +1047,9 @@ class Giswater(QObject):
             layers = self.controller.get_layers()
             status, result = self.populate_audit_check_project(layers)
             try:
-                if result['body']['data']['actions']['useGuideMap'] == 'true':
+                guided_map = result['body']['actions']['useGuideMap']
+                if guided_map:
+                    self.controller.log_info("manage_guided_map")
                     self.manage_guided_map()
             except Exception as e:
                 self.controller.log_info(str(e))
@@ -1222,7 +1224,6 @@ class Giswater(QObject):
         body = self.create_body(extras=extras)
         sql = f"SELECT gw_fct_audit_check_project($${{{body}}}$$)::text"
         row = self.controller.get_row(sql, commit=True, log_sql=True)
-        
         if not row:
             return False, None
 
@@ -1278,14 +1279,24 @@ class Giswater(QObject):
 
 
     def selection_changed(self):
+        """ Get selected expl_id and execute function setselectors """
 
         features = self.layer_expl.getSelectedFeatures()
         for feature in features:
             expl_id = feature["expl_id"]
             self.controller.log_info(f"Selected expl_id: {expl_id}")
+            break
 
         self.iface.mapCanvas().selectionChanged.disconnect()
         self.layer_expl.removeSelection()
+
+        extras = f'"selector_type":"exploitation", "check":true, "onlyone":true, "id":{expl_id}'
+        body = self.create_body(extras=extras)
+        sql = f"SELECT gw_fct_setselectors($${{{body}}}$$)::text"
+        row = self.controller.get_row(sql, commit=True, log_sql=True)
+        if row:
+            self.canvas.refreshAllLayers()
+            self.layer_expl.triggerRepaint()
 
 
     def update_config(self, state):
