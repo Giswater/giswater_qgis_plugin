@@ -1045,10 +1045,15 @@ class Giswater(QObject):
         if self.wsoftware in ('ws', 'ud'):
             QApplication.setOverrideCursor(Qt.ArrowCursor)
             layers = self.controller.get_layers()
-            status = self.populate_audit_check_project(layers)
-            QApplication.restoreOverrideCursor()
-            if not status:
-                return False
+            status, result = self.populate_audit_check_project(layers)
+            try:
+                if result['body']['data']['actions']['useGuideMap'] == 'true':
+                    self.manage_guided_map()
+            except Exception as e:
+                self.controller.log_info(str(e))
+            finally:
+                QApplication.restoreOverrideCursor()
+                return status
 
         return True
 
@@ -1209,7 +1214,7 @@ class Giswater(QObject):
                 
         status = self.controller.execute_sql(sql)
         if not status:
-            return False
+            return False, None
 
         version = self.parent.get_plugin_version()
         extras = f'"version":"{version}"'
@@ -1219,7 +1224,7 @@ class Giswater(QObject):
         row = self.controller.get_row(sql, commit=True, log_sql=True)
         
         if not row:
-            return False
+            return False, None
 
         result = json.loads(row[0], object_pairs_hook=OrderedDict)
         if 'status' in result and result['status'] == 'Failed':
@@ -1233,7 +1238,7 @@ class Giswater(QObject):
                 msg += f"<b>Python file: </b>{__name__} <br>"
                 msg += f"<b>Python function: </b>{self.populate_audit_check_project.__name__} <br><br>"
             self.controller.show_exceptions_msg(title, msg)
-            return True
+            return True, None
 
         self.dlg_audit_project = AuditCheckProjectResult()
         self.parent.load_settings(self.dlg_audit_project)
@@ -1256,30 +1261,36 @@ class Giswater(QObject):
                 self.dlg_audit_project.chk_hide_form.stateChanged.connect(partial(self.update_config))
                 self.parent.open_dialog(self.dlg_audit_project)
 
-        print (result)
-
-        #manage guidemap
-        if result['body']['data']['actions']['useGuideMap'] == 'true':
-
-            #guide map works using v_edit_exploitation
-            layer = self.controller.get_layer_by_tablename('v_edit_exploitation')
-            self.iface.setActiveLayer(layer)
-            self.iface.zoomToActiveLayer()
-
-            self.iface.actionSelect().trigger
-            #wait for selection of user
-
-            #zoom to selection
-
-            layer.removeSelection()
-
-        return True
+        return True, result
 
 
+    def manage_guided_map(self):
+        """ Guide map works using v_edit_exploitation """
+
+        self.layer_expl = self.controller.get_layer_by_tablename('v_edit_exploitation')
+        if self.layer_expl is None:
+            return
+
+        self.iface.setActiveLayer(self.layer_expl)
+        self.iface.zoomToActiveLayer()
+        self.iface.actionSelect().trigger()
+        self.iface.mapCanvas().selectionChanged.connect(self.selection_changed)
+
+
+    def selection_changed(self):
+
+        features = self.layer_expl.getSelectedFeatures()
+        for feature in features:
+            expl_id = feature["expl_id"]
+            self.controller.log_info(f"Selected expl_id: {expl_id}")
+
+        self.iface.mapCanvas().selectionChanged.disconnect()
+        self.layer_expl.removeSelection()
 
 
     def update_config(self, state):
         """ Set qgis_form_initproject_hidden True or False into config_param_user """
+
         value = {0:"False", 2:"True"}
         sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) "
                f" VALUES('qgis_form_initproject_hidden', '{value[state]}', current_user) "
@@ -1491,11 +1502,12 @@ class Giswater(QObject):
                 
             feature = '"tableName":"' + str(layer_name) + '", "id":""'
             body = self.create_body(feature=feature)
-            sql = (f"SELECT gw_api_getinfofromid($${{{body}}}$$)")
-            row = self.controller.get_row(sql, commit=True, log_sql=True)
+            sql = f"SELECT gw_api_getinfofromid($${{{body}}}$$)"
+            row = self.controller.get_row(sql, commit=True)
             if not row:
                 self.controller.show_message("NOT ROW FOR: " + sql, 2)
                 continue
+
             complet_result = row[0]
             # When info is nothing
             if 'results' in complet_result:
