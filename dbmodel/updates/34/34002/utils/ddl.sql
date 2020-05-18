@@ -73,3 +73,53 @@ USING btree (arc_id COLLATE pg_catalog."default");
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_anlgraf", "column":"length", "dataType":"numeric(12,4)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_anlgraf", "column":"cost", "dataType":"numeric(12,4)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_anlgraf", "column":"value", "dataType":"numeric(12,4)", "isUtils":"False"}}$$);
+
+
+
+
+--mandatory update on ddl to save value of editability, typeahead, reg_exp columns
+UPDATE config_api_form_fields  SET widgetcontrols = gw_fct_json_object_set_key(widgetcontrols,'autoupdateReloadFields', (reload_field->>'reload')::json) where reload_field is not null; --reload
+
+DROP VIEW IF EXISTS ve_config_addfields;
+DROP VIEW IF EXISTS ve_config_sys_fields;
+DROP VIEW IF EXISTS ve_config_sysfields;
+
+-- drop fields
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_api_form_fields", "column":"isenabled"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_api_form_fields", "column":"layout_id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_api_form_fields", "column":"isnotupdate"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_api_form_fields", "column":"editability"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_api_form_fields", "column":"reload_field"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_api_form_fields", "column":"typeahead"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_api_form_fields", "column":"field_length"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_api_form_fields", "column":"num_decimals"}}$$);
+
+--rename fields
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"config_api_form_fields", "column":"action_function", "newName":"linkedaction"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"config_api_form_fields", "column":"layout_name", "newName":"layoutname"}}$$);
+
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_api_form_groupbox", "column":"tooltip", "dataType":"text"}}$$);
+
+
+CREATE TABLE config_api_form_actions(
+  actionname text primary key,
+  label text,
+  tooltip text); 
+
+  
+--2020/03/11
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_api_form_tabs", "column":"tooltip"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"config_api_form_tabs", "column":"tabtext", "newName":"tooltip"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"config_api_form_tabs", "column":"tablabel", "newName":"label"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"config_api_form_groupbox", "column":"label", "newName":"label_"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_api_form_groupbox", "column":"layoutname", "dataType":"text"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_api_form_groupbox", "column":"label", "dataType":"text"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_api_form_groupbox", "column":"tooltip", "dataType":"text"}}$$);
+
+UPDATE config_api_form_groupbox SET layoutname = layout_id;
+UPDATE config_api_form_groupbox SET label = label_;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_api_form_groupbox", "column":"layout_id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_api_form_groupbox", "column":"label_"}}$$);

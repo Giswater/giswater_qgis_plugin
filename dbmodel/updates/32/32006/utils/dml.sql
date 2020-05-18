@@ -123,3 +123,10 @@ WHERE id='om_mincut_analysis_dminsector';
 UPDATE audit_cat_param_user
 SET dv_querytext ='SELECT id, id as idval FROM anl_mincut_result_cat WHERE id IS NOT NULL'
 WHERE id='om_mincut_analysis_pipehazard';
+
+
+INSERT INTO config_api_form_fields VALUES (nextval('SCHEMA_NAME.config_api_form_fields_id_seq'::regclass), 'printGeneric', 'utils', 'composer', 1, 1, true, NULL, 'combo', 'Composer:', NULL, NULL, NULL, NULL, NULL, false, NULL, true, NULL, 'SELECT 1 as id, ''1'' as idval FROM arc WHERE arc_id=''''', NULL, NULL, NULL, NULL, 'gw_api_setprint', NULL, NULL, NULL, NULL, NULL, NULL) ON CONFLICT ON CONSTRAINT config_api_form_fields_pkey2 DO NOTHING;
+INSERT INTO config_api_form_fields VALUES (nextval('SCHEMA_NAME.config_api_form_fields_id_seq'::regclass),'printGeneric', 'utils', 'title', 2, 1, true, 'string', 'text', 'Title:', NULL, NULL, NULL, NULL, NULL, false, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, 'gw_api_setprint', NULL, NULL, NULL, NULL, NULL, NULL) ON CONFLICT ON CONSTRAINT config_api_form_fields_pkey2 DO NOTHING;
+INSERT INTO config_api_form_fields VALUES (nextval('SCHEMA_NAME.config_api_form_fields_id_seq'::regclass),'printGeneric', 'utils', 'scale', 1, 2, true, 'double', 'text', 'Escale:', NULL, NULL, NULL, NULL, NULL, false, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, 'gw_api_setprint', NULL, NULL, NULL, NULL, NULL, NULL) ON CONFLICT ON CONSTRAINT config_api_form_fields_pkey2 DO NOTHING;
+INSERT INTO config_api_form_fields VALUES (nextval('SCHEMA_NAME.config_api_form_fields_id_seq'::regclass),'printGeneric', 'utils', 'rotation', 1, 3, true, 'double', 'text', 'Rotation:', NULL, NULL, NULL, NULL, NULL, false, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, 'gw_api_setprint', NULL, NULL, NULL, NULL, NULL, NULL) ON CONFLICT ON CONSTRAINT config_api_form_fields_pkey2 DO NOTHING;
+

@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path=SCHEMA_NAME;
+SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 INSERT INTO config_api_message VALUES (10, 2, 'No class visit', NULL, 'alone');
 INSERT INTO config_api_message VALUES (20, 0, 'sucessfully deleted', NULL, 'withfeature');

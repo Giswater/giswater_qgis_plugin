@@ -14,3 +14,6 @@ UPDATE audit_cat_param_user set layout_order=2 where id = 'arccat_vdefault';
 
 
 update audit_cat_param_user SET vdefault=NULL WHERE id IN ('inp_report_links','inp_report_nodes','inp_report_subcatchments');
+
+-- 01/10/2019
+UPDATE config_api_form_fields SET dv_querytext = NULL WHERE formname = 'v_edit_subcatchment' AND column_id = 'outlet_id';

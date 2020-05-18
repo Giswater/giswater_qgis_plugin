@@ -41,3 +41,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"audit_ca
 
 --2020/03/12
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_param_system", "column":"layoutname", "dataType":"text"}}$$);
+
+--2020/03/14
+ALTER TABLE audit_cat_error ADD COLUMN message_type text;

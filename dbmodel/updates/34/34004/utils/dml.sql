@@ -32,18 +32,6 @@ INSERT INTO audit_cat_function(id, function_name, project_type, function_type, d
 VALUES (2828, 'gw_api_get_visit', 'utils','api function', 'Get visit', 'role_basic',FALSE, FALSE, FALSE)
 ON conflict (id) DO NOTHING;
 
-INSERT INTO audit_cat_error (id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
-VALUES (3098, 'If widgettype=typeahead and dv_querytext_filterc is not null dv_parent_id must be combo', NULL, 2, TRUE, 'utils', false) ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO audit_cat_error (id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
-VALUES (3100, 'If widgettype=typeahead, id and idval for dv_querytext expression must be the same field', NULL, 2, TRUE, 'utils', false) ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO audit_cat_error (id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
-VALUES (3102, 'If dv_querytext_filterc is not null dv_parent_id is mandatory', NULL, 2, TRUE, 'utils', false) ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO audit_cat_error (id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
-VALUES (3104, 'When dv_querytext_filterc, dv_parent_id must be a valid column for this form. Please check form because there is not column_id with this name', NULL, 2, TRUE, 'utils', false) ON CONFLICT (id) DO NOTHING;
-
 
 --2020/02/26
 INSERT INTO audit_cat_param_user (id, formname, descript, sys_role_id, idval, label, dv_querytext, dv_parent_id, isenabled, layoutname, 

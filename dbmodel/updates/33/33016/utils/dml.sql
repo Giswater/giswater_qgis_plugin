@@ -48,3 +48,10 @@ VALUES (98, 'Tanks with null mandatory values', 'EPA', 'Tanks with null mandator
 
 INSERT INTO sys_fprocess_cat(id, fprocess_name, context, fprocess_i18n, project_type)
 VALUES (99, 'Mincut process', 'om', 'Mincut process', 'ws');
+
+
+--20/11/2019
+UPDATE config_api_form_fields SET dv_isnullvalue = true WHERE formtype='form' AND (column_id='pattern' OR column_id ='pattern_id') 
+AND formname != 'inp_pattern' AND formname != 'inp_pattern_value';
+
+UPDATE config_api_form_fields SET dv_isnullvalue = true WHERE formtype='form' AND column_id='curve_id' AND formname != 'inp_curve';

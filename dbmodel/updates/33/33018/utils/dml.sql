@@ -36,3 +36,33 @@ VALUES (2780,'gw_fct_admin_role_upsertuser', 'utils', 'function',
 
 INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
 VALUES (3040, 'User with this name already exists',null, 2, true, 'utils',false) ON CONFLICT (id) DO NOTHING;
+
+
+--28/11/2019
+SELECT setval('SCHEMA_NAME.config_api_form_fields_id_seq', (SELECT max(id) FROM config_api_form_fields), true);
+
+INSERT INTO config_api_typevalue(typevalue, id, idval)
+VALUES ('layout_name_typevalue', 'other_layout', 'other_layout');
+
+INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_id, layout_order, isenabled, 
+       datatype, widgettype, label, ismandatory, isparent, iseditable, 
+       isautoupdate, isreload, layout_name, hidden)
+VALUES ('dimensioning', 'catalog','observ',1,1,true,'string', 'text', 'observations',false,false,true,false,false,
+'other_layout',false);
+
+INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_id, layout_order, isenabled, 
+       datatype, widgettype, label, ismandatory, isparent, iseditable, 
+       isautoupdate, isreload, layout_name, hidden)
+VALUES ('dimensioning', 'catalog','comment',1,2,true,'string', 'text', 'comment',false,false,true,false,false,
+'other_layout',false);
+
+-- 03/12/2019
+INSERT INTO config_api_typevalue (typevalue, id, idval) VALUES ('tabname_typevalue', 'tabMincut', 'tabMincut');
+
+INSERT INTO config_api_form_tabs (id, formname, tabname, tablabel, tabtext, sys_role, tooltip) VALUES (700, 'mincut', 'tabMincut', 'Mincut', 'Mincut Selector', 'role_basic', 'Mincut');
+
+INSERT INTO config_api_list (id, tablename, query_text, device) VALUES (16, 'om_vehicle_x_parameters', 'SELECT * FROM om_vehicle_x_parameters', 3);
+
+-- 04/12/2019
+INSERT INTO config_param_system (parameter, value, datatype, context, descript, label, project_type, isdeprecated) VALUES ('api_selector_label', '{"mincut": ["name", "work_order", "state"], "state": ["id", "name"]}', 'json', 'system', 'Select which label to display for selectors', 'Selector labels:', 'utils', 'false');
+

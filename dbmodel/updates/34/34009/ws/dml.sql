@@ -16,8 +16,6 @@ INSERT INTO om_typevalue SELECT 'mincut_cause', row_number() over (order by id),
 INSERT INTO om_typevalue SELECT 'mincut_class', id, name FROM _anl_mincut_cat_class_;
 INSERT INTO om_typevalue SELECT 'mincut_state', id, name FROM _anl_mincut_cat_state_;
 
-SELECT setval('SCHEMA_NAME.typevalue_fk_id_seq', max(id), true) FROM config_typevalue_fk;
-
 INSERT INTO config_typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('om_typevalue','mincut_cause','om_mincut','anl_cause');
 INSERT INTO config_typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('om_typevalue','mincut_class','om_mincut','mincut_class');
 INSERT INTO config_typevalue_fk (typevalue_table, typevalue_name, target_table, target_field) VALUES ('om_typevalue','mincut_state','om_mincut','mincut_state');

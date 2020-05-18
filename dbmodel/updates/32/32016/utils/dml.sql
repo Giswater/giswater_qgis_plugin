@@ -517,3 +517,53 @@ UPDATE audit_cat_param_user SET feature_field_id = 'connecat_id' WHERE id='conne
 UPDATE audit_cat_param_user SET feature_field_id = 'nodecat_id' WHERE id='nodecat_vdefault';
 UPDATE audit_cat_param_user SET feature_field_id = 'elementcat_id' WHERE id='elementcat_vdefault';
 
+INSERT INTO audit_cat_table VALUES ('config_api_form', 'System', 'List of forms used by the API', 'role_admin', 2, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL) ON CONFLICT (id) DO NOTHING;
+INSERT INTO audit_cat_table VALUES ('config_api_form_fields', 'System', 'Table whichs saves all values, widgets and configurations for atribute tables and forms in QGIS', 'role_admin', 2, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL) ON CONFLICT (id) DO NOTHING;
+INSERT INTO audit_cat_table VALUES ('config_api_form_groupbox', 'System', NULL, 'role_admin', 2, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL) ON CONFLICT (id) DO NOTHING;
+INSERT INTO audit_cat_table VALUES ('config_api_form_tabs', 'System', 'List of tabs in forms used by the API', 'role_admin', 2, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL) ON CONFLICT (id) DO NOTHING;
+INSERT INTO audit_cat_table VALUES ('config_api_images', 'System', 'Saves images used by the API', 'role_admin', 2, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL) ON CONFLICT (id) DO NOTHING;
+INSERT INTO audit_cat_table VALUES ('config_api_layer', 'System', 'List of layers used by the API', 'role_admin', 2, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL) ON CONFLICT (id) DO NOTHING;
+INSERT INTO audit_cat_table VALUES ('config_api_list', 'System', 'Saves diferent query_texts related to tables', 'role_admin', 2, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL) ON CONFLICT (id) DO NOTHING;
+INSERT INTO audit_cat_table VALUES ('config_api_message', 'System', 'List of messages used by the API', 'role_admin', 2, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL) ON CONFLICT (id) DO NOTHING;
+INSERT INTO audit_cat_table VALUES ('config_api_tableinfo_x_infotype', 'System', 'Table of relations between one table and the table which will be openend based', 'role_admin', 2, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL) ON CONFLICT (id) DO NOTHING;
+INSERT INTO audit_cat_table VALUES ('config_api_typevalue', 'System', 'Relation of id/idval for diferent typevalues in order to manage diferent combo values', 'role_admin', 2, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL) ON CONFLICT (id) DO NOTHING;
+INSERT INTO audit_cat_table VALUES ('config_api_visit', 'System', 'Allow the relation of a formname and a tablename to visitclass_id', 'role_admin', 2, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL) ON CONFLICT (id) DO NOTHING;
+INSERT INTO audit_cat_table VALUES ('config_api_visit_x_featuretable', 'System', 'Relates visitclass_id to a generic tablename', 'role_admin', 2, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_table VALUES ('ve_config_addfields', 'System', 'View which shows existent addfields and its configuration', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL) ON CONFLICT (id) DO NOTHING;
+INSERT INTO audit_cat_table VALUES ('ve_config_sys_fields', 'System', 'Shows ', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, FALSE, NULL) ON CONFLICT (id) DO NOTHING;
+
+
+update config_api_form_fields set ismandatory=false where column_id = 'arc_id';
+update config_api_form_fields set ismandatory=false where column_id = 'node_id';
+update config_api_form_fields set ismandatory=false where column_id = 'connec_id';
+
+
+INSERT INTO typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
+VALUES ('config_api_typevalue','widgettype_typevalue','config_api_form_fields','widgettype');
+
+INSERT INTO typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
+VALUES ('config_api_typevalue','datatype_typevalue','config_api_form_fields','datatype');
+
+INSERT INTO typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
+VALUES ('config_api_typevalue','layout_name_typevalue','config_api_form_fields','layout_name');
+
+INSERT INTO typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
+VALUES ('config_api_typevalue','formtype_typevalue','config_api_form_fields','formtype');
+
+INSERT INTO typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
+VALUES ('config_api_typevalue','formtemplate_typevalue','config_api_layer','formtemplate');
+
+INSERT INTO typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
+VALUES ('config_api_typevalue','widgetfunction_typevalue','config_api_form_fields','widgetfunction');
+
+INSERT INTO typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
+VALUES ('config_api_typevalue','tabname_typevalue','config_api_form_tabs','tabname');
+
+INSERT INTO typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
+VALUES ('config_api_typevalue','mtype_typevalue','config_api_message','mtype');
+
+INSERT INTO typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
+VALUES ('config_api_typevalue','action_function_typevalue','config_api_form_fields','action_function');
+
+

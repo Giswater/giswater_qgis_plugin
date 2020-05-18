@@ -36,3 +36,10 @@ project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdepre
 VALUES ('inp_options_buildup_mode','epaoptions','Mode to built up epanet assuming certain simplifications in order to make the first model as fast as possible (default management of null elevations, onfly transformations from tanks to reservoirs and status of valves and pumps)',
 'role_epa', 'Buildup mode:', true, 1, 10, 'SELECT id, idval FROM inp_typevalue WHERE typevalue  = ''inp_options_buildup_mode''', 'ws', false, false, 'text', 'combo', true, false, 'grl_general_1', 2, '{"from":"2.0.12", "to":null, "language":"english"}')
 ON CONFLICT (id) DO NOTHING;
+
+
+--20/11/2019
+SELECT setval('SCHEMA_NAME.config_api_form_fields_id_seq', (SELECT max(id) FROM config_api_form_fields), true);
+
+INSERT INTO config_api_form_fields (formname, formtype, column_id, isenabled, ismandatory, datatype, widgettype, dv_querytext, label, iseditable, hidden)
+VALUES ('v_inp_edit_pump', 'form','pump_type', true, false, 'string','combo', 'SELECT id, idval FROM inp_typevalue WHERE typevalue  = ''inp_typevalue_pumptype''','pump_type', true, false);

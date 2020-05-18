@@ -47,3 +47,14 @@ UPDATE node_type SET active=TRUE WHERE active IS NULL;
 UPDATE node_type SET code_autofill=TRUE WHERE code_autofill IS NULL;
 UPDATE node_type SET choose_hemisphere=TRUE WHERE choose_hemisphere IS NULL;
 UPDATE node_type SET isarcdivide=TRUE WHERE isarcdivide IS NULL;
+
+
+-- 2020/02/13
+UPDATE config_api_layer SET is_editable = TRUE WHERE layer_id = ANY(ARRAY['v_edit_arc', 'v_edit_node','v_edit_connec']);
+
+--17/02/2020
+UPDATE config_api_form_fields SET dv_isnullvalue=TRUE WHERE column_id='verified' AND formtype='feature';
+UPDATE config_api_form_fields SET dv_isnullvalue=TRUE WHERE column_id='ownercat_id' AND formtype='feature';
+UPDATE config_api_form_fields SET dv_isnullvalue=TRUE WHERE column_id='buildercat_id' AND formtype='feature';
+UPDATE config_api_form_fields SET dv_isnullvalue=TRUE WHERE column_id='streetaxis_id' AND formtype='feature';
+UPDATE config_api_form_fields SET dv_isnullvalue=TRUE WHERE column_id='streetaxis2_id' AND formtype='feature';

@@ -41,3 +41,11 @@ UPDATE config_param_system SET standardvalue = 'TRUE' WHERE parameter IN ('state
 
 INSERT INTO sys_fprocess_cat(id, fprocess_name, context, fprocess_i18n, project_type)
 VALUES (110,'Connecs with customer code null','edit','Connecs with customer code null','utils') ON CONFLICT (id) DO NOTHING;
+
+
+--2019/12/23
+UPDATE SCHEMA_NAME.config_api_form_fields SET iseditable=false where column_id='arc_id' AND formname LIKE 've_arc%';
+UPDATE SCHEMA_NAME.config_api_form_fields SET iseditable=false where column_id='node_id' AND formname LIKE 've_node%';
+UPDATE SCHEMA_NAME.config_api_form_fields SET iseditable=false where column_id='connec_id' AND formname LIKE 've_connec%';
+
+UPDATE config_param_system SET context='api_search_visit' WHERE parameter='api_search_visit';

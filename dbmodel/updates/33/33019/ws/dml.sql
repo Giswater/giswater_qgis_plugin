@@ -177,6 +177,55 @@ VALUES ('anl_mincut_arc_x_node','Mincut','Table of minimum cut analysis related 
 
 
 
+DELETE FROM config_api_form_tabs WHERE formname ='v_edit_connec' AND tabname = 'tab_plan';
+
+DELETE FROM config_api_form_tabs WHERE formname ='ve_arc';
+DELETE FROM config_api_form_tabs WHERE formname ='ve_node';
+DELETE FROM config_api_form_tabs WHERE formname ='ve_connec';
+
+
+UPDATE config_api_form_tabs SET tabactions= '[
+{"actionName":"actionEdit", "actionTooltip":"Edit",  "disabled":false},
+{"actionName":"actionZoom", "actionTooltip":"Zoom In",  "disabled":false},
+{"actionName":"actionCentered", "actionTooltip":"Center",  "disabled":false},
+{"actionName":"actionZoomOut", "actionTooltip":"Zoom Out",  "disabled":false},
+{"actionName":"actionCatalog", "actionTooltip":"Change Catalog",  "disabled":false},
+{"actionName":"actionWorkcat", "actionTooltip":"Add Workcat",  "disabled":false},
+{"actionName":"actionCopyPaste", "actionTooltip":"Copy Paste",  "disabled":false},
+{"actionName":"actionLink", "actionTooltip":"Open Link",  "disabled":false},
+{"actionName":"actionHelp", "actionTooltip":"Help",  "disabled":false},
+{"actionName":"actionGetParentId", "actionTooltip":"Set parent_id",  "disabled":false}]'
+WHERE formname ='v_edit_node';
+
+
+UPDATE config_api_form_tabs SET tabactions= '[
+{"actionName":"actionEdit", "actionTooltip":"Edit",  "disabled":false},
+{"actionName":"actionZoom", "actionTooltip":"Zoom In",  "disabled":false},
+{"actionName":"actionCentered", "actionTooltip":"Center",  "disabled":false},
+{"actionName":"actionZoomOut", "actionTooltip":"Zoom Out",  "disabled":false},
+{"actionName":"actionCatalog", "actionTooltip":"Change Catalog",  "disabled":false},
+{"actionName":"actionWorkcat", "actionTooltip":"Add Workcat",  "disabled":false},
+{"actionName":"actionCopyPaste", "actionTooltip":"Copy Paste",  "disabled":false},
+{"actionName":"actionSection", "actionTooltip":"Show Section",  "disabled":false},
+{"actionName":"actionLink", "actionTooltip":"Open Link",  "disabled":false},
+{"actionName":"actionHelp", "actionTooltip":"Help",  "disabled":false}]' 
+WHERE formname ='v_edit_arc';
+
+
+UPDATE config_api_form_tabs SET tabactions= '[
+{"actionName":"actionEdit", "actionTooltip":"Edit",  "disabled":false},
+{"actionName":"actionZoom", "actionTooltip":"Zoom In",  "disabled":false},
+{"actionName":"actionCentered", "actionTooltip":"Center",  "disabled":false},
+{"actionName":"actionZoomOut", "actionTooltip":"Zoom Out",  "disabled":false},
+{"actionName":"actionCatalog", "actionTooltip":"Change Catalog",  "disabled":false},
+{"actionName":"actionWorkcat", "actionTooltip":"Add Workcat",  "disabled":false},
+{"actionName":"actionCopyPaste", "actionTooltip":"Copy Paste",  "disabled":false},
+{"actionName":"actionLink", "actionTooltip":"Open Link",  "disabled":false},
+{"actionName":"actionHelp", "actionTooltip":"Help",  "disabled":false},
+{"actionName":"actionGetArcId", "actionTooltip":"Set arc_id",  "disabled":false}]'
+WHERE formname ='v_edit_connec';
+
+
 
 
 

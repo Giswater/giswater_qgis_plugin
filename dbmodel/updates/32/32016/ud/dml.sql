@@ -293,3 +293,5 @@ UPDATE audit_cat_table SET isdeprecated=TRUE WHERE id='inp_windspeed ';
 UPDATE audit_cat_param_user SET feature_field_id = 'gully_type' WHERE id='gullycat_vdefault';
 UPDATE audit_cat_param_user SET feature_field_id = 'node_type' WHERE id='nodetype_vdefault';
 UPDATE audit_cat_param_user SET feature_field_id = 'gratecat_id' WHERE id='gratecat_vdefault';
+
+update config_api_form_fields set ismandatory=false where column_id = 'gully_id';

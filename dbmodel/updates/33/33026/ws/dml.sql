@@ -29,3 +29,8 @@ UPDATE config_param_system SET value = 'TRUE' WHERE parameter = 'om_mincut_valve
 
 -- 2020/01/29
 UPDATE audit_cat_param_user SET formname = 'hidden_value' WHERE id='inp_options_buildup_mode';
+
+-- 2020/01/28
+UPDATE config_param_system SET parameter = 'api_selector_mincut', value =
+'{"table":"anl_mincut_result_cat", "selector":"anl_mincut_result_selector", "label":"id, '' ('', CASE WHEN work_order IS NULL THEN ''N/I'' ELSE work_order END, '') on '', forecast_start::date, '' at '', forecast_start::time, ''H-'', forecast_end::time,''H''"}'
+WHERE parameter = 'api_selector_label';

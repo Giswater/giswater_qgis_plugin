@@ -54,3 +54,86 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_addfiel
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_municipality", "column":"active", "dataType":"boolean", "isUtils":"True"}}$$);
 
+-----------------------
+-- create sequences
+-----------------------
+
+CREATE SEQUENCE config_api_form_layout_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+CREATE SEQUENCE config_api_tableinfo_x_inforole_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+CREATE SEQUENCE config_api_visit_cat_multievent_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+    
+
+
+-----------------------
+-- create api config tables
+-----------------------
+
+
+CREATE TABLE config_api_cat_datatype
+(  id character varying(30) NOT NULL,
+  descript text,
+  CONSTRAINT config_api_cat_datatype_pkey PRIMARY KEY (id)
+);
+
+
+
+CREATE TABLE config_api_cat_formtemplate
+(  id character varying(30) NOT NULL,
+  descript text,
+  CONSTRAINT config_api_cat_form_pkey PRIMARY KEY (id)
+);
+
+
+CREATE TABLE config_api_cat_widgettype
+(  id character varying(30) NOT NULL,
+  descript text,
+  CONSTRAINT config_api_cat_widgettype_pkey PRIMARY KEY (id)
+);
+
+
+
+CREATE TABLE config_api_layer
+(  layer_id text NOT NULL,
+  is_parent boolean,
+  tableparent_id text,
+  is_editable boolean,
+  tableinfo_id text,
+  formtemplate text,
+  headertext text,
+  orderby integer,
+  link_id text,
+  is_tiled boolean,
+  tableparentepa_id text,
+  CONSTRAINT config_api_layer_pkey PRIMARY KEY (layer_id)
+);
+
+
+
+CREATE TABLE config_api_tableinfo_x_infotype
+(  id integer NOT NULL DEFAULT nextval('SCHEMA_NAME.config_api_tableinfo_x_inforole_id_seq'::regclass),
+  tableinfo_id character varying(50),
+  infotype_id integer,
+  tableinfotype_id text,
+  CONSTRAINT config_api_tableinfo_x_inforole_pkey PRIMARY KEY (id)
+);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_api_form_fields", "column":"layout_name", "dataType":"varchar(16)"}}$$);

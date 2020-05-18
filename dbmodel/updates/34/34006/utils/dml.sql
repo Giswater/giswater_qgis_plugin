@@ -102,14 +102,3 @@ VALUES ('custom_form_param', '{"custom_form_tab_labels":[{"index":"0", "text":"M
 'edit', 'Custom form tab labels', 'Used to manage labels on diferent tabs in custom form Data tab', FALSE, null, 'utils', 'json', 'linetext', false, false) 
 ON CONFLICT (parameter) DO NOTHING;
 
---2020/04/07
-INSERT INTO audit_cat_error (id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
-VALUES (3106, 'There is no presszone defined in the model', NULL, 2, TRUE, 'ws', false) ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO audit_cat_error (id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
-VALUES (3108, 'Feature is out of any presszone, feature_id:', NULL, 2, TRUE, 'ws', false) ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO audit_cat_error (id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
-VALUES (3110, 'There is no municipality defined in the model', NULL, 2, TRUE, 'utils', false) ON CONFLICT (id) DO NOTHING;
-
-

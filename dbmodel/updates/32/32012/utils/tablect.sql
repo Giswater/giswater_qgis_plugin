@@ -10,6 +10,10 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --DROP CONSTRAINT
 DROP INDEX IF EXISTS shortcut_unique;
+ALTER TABLE config_api_form_fields DROP CONSTRAINT IF EXISTS config_api_form_fields_pkey2;
+ALTER TABLE config_api_visit DROP CONSTRAINT IF EXISTS cconfig_api_visit_fkey;
+ALTER TABLE config_api_visit DROP CONSTRAINT IF EXISTS cconfig_api_visit_formname_key;
 
 --ADD CONSTRAINT
 CREATE UNIQUE INDEX shortcut_unique ON cat_feature USING btree (shortcut_key COLLATE pg_catalog."default");
+ALTER TABLE config_api_form_fields ADD CONSTRAINT config_api_form_fields_pkey2 UNIQUE(formname, formtype, column_id);

@@ -61,3 +61,13 @@ ALTER TABLE anl_mincut_result_hydrometer RENAME to om_mincut_hydrometer;
 ALTER TABLE anl_mincut_result_polygon RENAME to om_mincut_polygon;
 ALTER TABLE anl_mincut_result_valve RENAME to om_mincut_valve;
 ALTER TABLE anl_mincut_result_valve_unaccess RENAME to om_mincut_valve_unaccess;
+
+
+ALTER SEQUENCE SCHEMA_NAME.anl_mincut_inlet_x_exploitation_id_seq RENAME TO config_mincut_inlet_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.anl_mincut_result_arc_id_seq RENAME TO om_mincut_arc_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.anl_mincut_result_connec_id_seq RENAME TO om_mincut_connec_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.anl_mincut_result_hydrometer_id_seq RENAME TO om_mincut_hydrometer_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.anl_mincut_result_node_id_seq RENAME TO om_mincut_node_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.anl_mincut_result_polygon_id_seq RENAME TO om_mincut_polygon_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.anl_mincut_result_valve_id_seq RENAME TO om_mincut_valve_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.anl_mincut_result_valve_unaccess_id_seq RENAME TO om_mincut_valve_unaccess_id_seq;

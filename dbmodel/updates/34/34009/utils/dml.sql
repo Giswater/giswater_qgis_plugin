@@ -68,3 +68,58 @@ INSERT INTO config_param_system(parameter, value, context, descript, label,isena
 VALUES ('sys_vpn_permissions', FALSE, 'system', 'Variable to check if vpn connexion with server is used in order to assign correct permissions to the database',
 'Sys vpn permissions', FALSE, 'utils', FALSE) ON CONFLICT (parameter) DO NOTHING;
 
+UPDATE om_visit_class SET formname = a.formname, tablename = a.tablename FROM _config_api_visit_ a WHERE om_visit_class.id = a.visitclass_id;
+
+--update audit_cat_param_user with cat_feature vdefaults
+UPDATE cat_feature SET id=id;
+
+UPDATE config_typevalue_fk SET target_table = 'config_form_fields' WHERE target_table = 'config_api_form_fields';
+UPDATE config_typevalue_fk SET target_table = 'config_info_layer' WHERE target_table = 'config_api_layer';
+UPDATE config_typevalue_fk SET target_table = 'config_form_tabs' WHERE target_table = 'config_api_form_tabs';
+UPDATE config_typevalue_fk SET target_table = 'config_form_fields' WHERE target_table = 'config_api_form_fields';
+
+UPDATE config_form_fields SET widgetfunction = 'set_composer' WHERE widgetfunction = 'gw_api_setcomposer';
+UPDATE config_form_fields SET widgetfunction = 'set_print' WHERE widgetfunction = 'gw_api_setprint';
+UPDATE config_form_fields SET widgetfunction = 'open_url' WHERE widgetfunction = 'gw_api_open_url';
+UPDATE config_form_fields SET widgetfunction = 'info_node' WHERE widgetfunction = 'gw_api_open_node';
+UPDATE config_form_fields SET widgetfunction = NULL WHERE widgetfunction = 'get_catalog_id';
+
+
+UPDATE config_form_fields SET dv_querytext = replace (dv_querytext, 'config_api_images', 'config_form_images');
+UPDATE config_form_fields SET dv_querytext = replace (dv_querytext, 'config_api_typevalue', 'config_form_typevalue');
+
+
+COMMENT ON TABLE sys_function
+  IS 'INSTRUCTIONS TO WORK WITH THIS TABLE:
+It is possible to create own functions. Ids from 10000 to 20000 are reserved to work with. Check true on iscustom column';
+
+
+COMMENT ON TABLE sys_fprocess
+  IS 'INSTRUCTIONS TO WORK WITH THIS TABLE:
+It is possible to create own process. Ids from 10000 to 20000 are reserved to work with. Check true on iscustom column';
+
+-- 2020/03/19
+--UPDATE config_typevalue_fk SET target_table = 'sys_message', target_field = 'message_type' WHERE typevalue_name = 'mtype_typevalue';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3098, 'If widgettype=typeahead and dv_querytext_filterc is not null dv_parent_id must be combo', NULL, 2, TRUE, 'utils', false) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3100, 'If widgettype=typeahead, id and idval for dv_querytext expression must be the same field', NULL, 2, TRUE, 'utils', false) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3102, 'If dv_querytext_filterc is not null dv_parent_id is mandatory', NULL, 2, TRUE, 'utils', false) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3104, 'When dv_querytext_filterc, dv_parent_id must be a valid column for this form. Please check form because there is not column_id with this name', NULL, 2, TRUE, 'utils', false) ON CONFLICT (id) DO NOTHING;
+
+--2020/04/07
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3106, 'There is no presszone defined in the model', NULL, 2, TRUE, 'ws', false) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3108, 'Feature is out of any presszone, feature_id:', NULL, 2, TRUE, 'ws', false) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3110, 'There is no municipality defined in the model', NULL, 2, TRUE, 'utils', false) ON CONFLICT (id) DO NOTHING;
+

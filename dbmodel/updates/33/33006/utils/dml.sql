@@ -39,3 +39,177 @@ UPDATE audit_cat_table SET sys_role_id='role_basic' WHERE id = 'temp_table';
 -- 17/10/2019
 UPDATE audit_cat_param_user SET description = 'If true, link will be automatically generated when inserting a new connec with state=1. For planified connecs, link will always be automatically generated'
 WHERE id = 'edit_connect_force_automatic_connect2network';
+
+
+
+UPDATE config_api_form_fields SET dv_querytext=concat('SELECT location_type as id, location_type as idval FROM man_type_location WHERE (featurecat_id is null AND feature_type=''NODE'') OR featurecat_id =',quote_literal(cat_feature.id)),
+dv_querytext_filterc=NULL, dv_parent_id=null
+FROM cat_feature WHERE child_layer = formname AND column_id ='location_type' AND cat_feature.feature_type='NODE';
+
+UPDATE config_api_form_fields SET dv_querytext=concat('SELECT location_type as id, location_type as idval FROM man_type_location WHERE (featurecat_id is null AND feature_type=''ARC'') OR featurecat_id =',quote_literal(cat_feature.id)),
+dv_querytext_filterc=NULL, dv_parent_id=null
+FROM cat_feature WHERE child_layer = formname AND column_id ='location_type' AND cat_feature.feature_type='ARC';
+
+UPDATE config_api_form_fields SET dv_querytext=concat('SELECT location_type as id, location_type as idval FROM man_type_location WHERE (featurecat_id is null AND feature_type=''CONNEC'') OR featurecat_id =',quote_literal(cat_feature.id)),
+dv_querytext_filterc=NULL, dv_parent_id=null
+FROM cat_feature WHERE child_layer = formname AND column_id ='location_type' AND cat_feature.feature_type='CONNEC';
+
+UPDATE config_api_form_fields SET dv_querytext=concat('SELECT fluid_type as id, fluid_type as idval FROM man_type_fluid WHERE (featurecat_id is null AND feature_type=''NODE'') OR featurecat_id =',quote_literal(cat_feature.id)),
+dv_querytext_filterc=NULL, dv_parent_id=null
+FROM cat_feature WHERE child_layer = formname AND column_id ='fluid_type' AND cat_feature.feature_type='NODE';
+
+UPDATE config_api_form_fields SET dv_querytext=concat('SELECT fluid_type as id, fluid_type as idval FROM man_type_fluid WHERE (featurecat_id is null AND feature_type=''ARC'') OR featurecat_id =',quote_literal(cat_feature.id)),
+dv_querytext_filterc=NULL, dv_parent_id=null
+FROM cat_feature WHERE child_layer = formname AND column_id ='fluid_type' AND cat_feature.feature_type='ARC';
+
+UPDATE config_api_form_fields SET dv_querytext=concat('SELECT fluid_type as id, fluid_type as idval FROM man_type_fluid WHERE (featurecat_id is null AND feature_type=''CONNEC'') OR featurecat_id =',quote_literal(cat_feature.id)),
+dv_querytext_filterc=NULL, dv_parent_id=null
+FROM cat_feature WHERE child_layer = formname AND column_id ='fluid_type' AND cat_feature.feature_type='CONNEC';
+
+UPDATE config_api_form_fields SET dv_querytext=concat('SELECT category_type as id, category_type as idval FROM man_type_category WHERE (featurecat_id is null AND feature_type=''NODE'') OR featurecat_id =',quote_literal(cat_feature.id)),
+dv_querytext_filterc=NULL, dv_parent_id=null
+FROM cat_feature WHERE child_layer = formname AND column_id ='category_type' AND cat_feature.feature_type='NODE';
+
+UPDATE config_api_form_fields SET dv_querytext=concat('SELECT category_type as id, category_type as idval FROM man_type_category WHERE (featurecat_id is null AND feature_type=''ARC'') OR featurecat_id =',quote_literal(cat_feature.id)),
+dv_querytext_filterc=NULL, dv_parent_id=null
+FROM cat_feature WHERE child_layer = formname AND column_id ='category_type' AND cat_feature.feature_type='ARC';
+
+UPDATE config_api_form_fields SET dv_querytext=concat('SELECT category_type as id, category_type as idval FROM man_type_category WHERE (featurecat_id is null AND feature_type=''CONNEC'') OR featurecat_id =',quote_literal(cat_feature.id)),
+dv_querytext_filterc=NULL, dv_parent_id=null
+FROM cat_feature WHERE child_layer = formname AND column_id ='category_type' AND cat_feature.feature_type='CONNEC';
+
+UPDATE config_api_form_fields SET dv_querytext=concat('SELECT function_type as id, function_type as idval FROM man_type_function WHERE (featurecat_id is null AND feature_type=''NODE'') OR featurecat_id =',quote_literal(cat_feature.id)),
+dv_querytext_filterc=NULL, dv_parent_id=null
+FROM cat_feature WHERE child_layer = formname AND column_id ='function_type' AND cat_feature.feature_type='NODE';
+
+UPDATE config_api_form_fields SET dv_querytext=concat('SELECT function_type as id, function_type as idval FROM man_type_function WHERE (featurecat_id is null AND feature_type=''ARC'') OR featurecat_id =',quote_literal(cat_feature.id)),
+dv_querytext_filterc=NULL, dv_parent_id=null
+FROM cat_feature WHERE child_layer = formname AND column_id ='function_type' AND cat_feature.feature_type='ARC';
+
+UPDATE config_api_form_fields SET dv_querytext=concat('SELECT function_type as id, function_type as idval FROM man_type_function WHERE (featurecat_id is null AND feature_type=''CONNEC'') OR featurecat_id =',quote_literal(cat_feature.id)),
+dv_querytext_filterc=NULL, dv_parent_id=null
+FROM cat_feature WHERE child_layer = formname AND column_id ='function_type' AND cat_feature.feature_type='CONNEC';
+
+
+
+
+UPDATE config_api_form_fields SET 
+dv_querytext='SELECT location_type as id, location_type as idval FROM man_type_location WHERE (featurecat_id is null AND feature_type=''NODE'') ',
+dv_querytext_filterc=NULL, dv_parent_id=null
+WHERE formname = 've_node' and column_id = 'location_type';
+
+UPDATE config_api_form_fields SET 
+dv_querytext='SELECT location_type as id, location_type as idval FROM man_type_location WHERE feature_type=''NODE'' ',
+dv_querytext_filterc=NULL, dv_parent_id=null
+WHERE formname = 'v_edit_node' and column_id = 'location_type';
+
+UPDATE config_api_form_fields SET 
+dv_querytext='SELECT fluid_type as id, fluid_type as idval FROM man_type_fluid WHERE (featurecat_id is null AND feature_type=''NODE'') ',
+dv_querytext_filterc=NULL, dv_parent_id=null
+WHERE formname = 've_node' and column_id = 'fluid_type';
+
+UPDATE config_api_form_fields SET 
+dv_querytext='SELECT fluid_type as id, fluid_type as idval FROM man_type_fluid WHERE feature_type=''NODE'' ',
+dv_querytext_filterc=NULL, dv_parent_id=null
+WHERE formname = 'v_edit_node' and column_id = 'fluid_type';
+
+UPDATE config_api_form_fields SET 
+dv_querytext='SELECT function_type as id, function_type as idval FROM man_type_function WHERE (featurecat_id is null AND feature_type=''NODE'') ',
+dv_querytext_filterc=NULL, dv_parent_id=null
+WHERE formname = 've_node' and column_id = 'function_type';
+
+UPDATE config_api_form_fields SET 
+dv_querytext='SELECT function_type as id, function_type as idval FROM man_type_function WHERE feature_type=''NODE'' ',
+dv_querytext_filterc=NULL, dv_parent_id=null
+WHERE formname = 'v_edit_node' and column_id = 'function_type';
+
+UPDATE config_api_form_fields SET 
+dv_querytext='SELECT location_type as id, location_type as idval FROM man_type_location WHERE (featurecat_id is null AND feature_type=''NODE'') ',
+dv_querytext_filterc=NULL, dv_parent_id=null
+WHERE formname = 've_node' and column_id = 'location_type';
+
+UPDATE config_api_form_fields SET 
+dv_querytext='SELECT location_type as id, location_type as idval FROM man_type_location WHERE feature_type=''NODE'' ',
+dv_querytext_filterc=NULL, dv_parent_id=null
+WHERE formname = 'v_edit_node' and column_id = 'location_type';
+
+
+UPDATE config_api_form_fields SET 
+dv_querytext='SELECT location_type as id, location_type as idval FROM man_type_location WHERE (featurecat_id is null AND feature_type=''ARC'') ',
+dv_querytext_filterc=NULL, dv_parent_id=null
+WHERE formname = 've_arc' and column_id = 'location_type';
+
+UPDATE config_api_form_fields SET 
+dv_querytext='SELECT location_type as id, location_type as idval FROM man_type_location WHERE feature_type=''ARC'' ',
+dv_querytext_filterc=NULL, dv_parent_id=null
+WHERE formname = 'v_edit_arc' and column_id = 'location_type';
+
+UPDATE config_api_form_fields SET 
+dv_querytext='SELECT fluid_type as id, fluid_type as idval FROM man_type_fluid WHERE (featurecat_id is null AND feature_type=''ARC'') ',
+dv_querytext_filterc=NULL, dv_parent_id=null
+WHERE formname = 've_arc' and column_id = 'fluid_type';
+
+UPDATE config_api_form_fields SET 
+dv_querytext='SELECT fluid_type as id, fluid_type as idval FROM man_type_fluid WHERE feature_type=''ARC'' ',
+dv_querytext_filterc=NULL, dv_parent_id=null
+WHERE formname = 'v_edit_arc' and column_id = 'fluid_type';
+
+UPDATE config_api_form_fields SET 
+dv_querytext='SELECT function_type as id, function_type as idval FROM man_type_function WHERE (featurecat_id is null AND feature_type=''ARC'') ',
+dv_querytext_filterc=NULL, dv_parent_id=null
+WHERE formname = 've_arc' and column_id = 'function_type';
+
+UPDATE config_api_form_fields SET 
+dv_querytext='SELECT function_type as id, function_type as idval FROM man_type_function WHERE feature_type=''ARC'' ',
+dv_querytext_filterc=NULL, dv_parent_id=null
+WHERE formname = 'v_edit_arc' and column_id = 'function_type';
+
+UPDATE config_api_form_fields SET 
+dv_querytext='SELECT location_type as id, location_type as idval FROM man_type_location WHERE (featurecat_id is null AND feature_type=''ARC'') ',
+dv_querytext_filterc=NULL, dv_parent_id=null
+WHERE formname = 've_arc' and column_id = 'location_type';
+
+UPDATE config_api_form_fields SET 
+dv_querytext='SELECT location_type as id, location_type as idval FROM man_type_location WHERE feature_type=''ARC'' ',
+dv_querytext_filterc=NULL, dv_parent_id=null
+WHERE formname = 'v_edit_arc' and column_id = 'location_type';
+
+UPDATE config_api_form_fields SET 
+dv_querytext='SELECT location_type as id, location_type as idval FROM man_type_location WHERE (featurecat_id is null AND feature_type=''CONNEC'') ',
+dv_querytext_filterc=NULL, dv_parent_id=null
+WHERE formname = 've_connec' and column_id = 'location_type';
+
+UPDATE config_api_form_fields SET 
+dv_querytext='SELECT location_type as id, location_type as idval FROM man_type_location WHERE feature_type=''CONNEC'' ',
+dv_querytext_filterc=NULL, dv_parent_id=null
+WHERE formname = 'v_edit_connec' and column_id = 'location_type';
+
+UPDATE config_api_form_fields SET 
+dv_querytext='SELECT fluid_type as id, fluid_type as idval FROM man_type_fluid WHERE (featurecat_id is null AND feature_type=''CONNEC'') ',
+dv_querytext_filterc=NULL, dv_parent_id=null
+WHERE formname = 've_connec' and column_id = 'fluid_type';
+
+UPDATE config_api_form_fields SET 
+dv_querytext='SELECT fluid_type as id, fluid_type as idval FROM man_type_fluid WHERE feature_type=''CONNEC'' ',
+dv_querytext_filterc=NULL, dv_parent_id=null
+WHERE formname = 'v_edit_connec' and column_id = 'fluid_type';
+
+UPDATE config_api_form_fields SET 
+dv_querytext='SELECT function_type as id, function_type as idval FROM man_type_function WHERE (featurecat_id is null AND feature_type=''CONNEC'') ',
+dv_querytext_filterc=NULL, dv_parent_id=null
+WHERE formname = 've_connec' and column_id = 'function_type';
+
+UPDATE config_api_form_fields SET 
+dv_querytext='SELECT function_type as id, function_type as idval FROM man_type_function WHERE feature_type=''CONNEC'' ',
+dv_querytext_filterc=NULL, dv_parent_id=null
+WHERE formname = 'v_edit_connec' and column_id = 'function_type';
+
+UPDATE config_api_form_fields SET 
+dv_querytext='SELECT location_type as id, location_type as idval FROM man_type_location WHERE (featurecat_id is null AND feature_type=''CONNEC'') ',
+dv_querytext_filterc=NULL, dv_parent_id=null
+WHERE formname = 've_connec' and column_id = 'location_type';
+
+UPDATE config_api_form_fields SET 
+dv_querytext='SELECT location_type as id, location_type as idval FROM man_type_location WHERE feature_type=''CONNEC'' ',
+dv_querytext_filterc=NULL, dv_parent_id=null
+WHERE formname = 'v_edit_connec' and column_id = 'location_type';

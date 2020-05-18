@@ -25,3 +25,6 @@ UPDATE audit_cat_param_user SET label = 'Default type for gully (parent layer)',
 --17/02/2020
 UPDATE gully_type SET active=TRUE WHERE active IS NULL;
 UPDATE gully_type SET code_autofill=TRUE WHERE code_autofill IS NULL;
+
+-- 2020/02/13
+UPDATE config_api_layer SET is_editable = TRUE WHERE layer_id = 'v_edit_gully';

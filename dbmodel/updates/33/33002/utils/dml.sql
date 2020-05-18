@@ -27,3 +27,13 @@ UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh
 UPDATE audit_cat_table SET notify_action = '[{"action":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"macroexpl_id, name","featureType":["v_edit_exploitation"]}]' WHERE id='macroexploitation';
 
 UPDATE audit_cat_table SET notify_action = '[{"action":"user","name":"refresh_config_system_variables", "enabled":"true", "trg_fields":"parameter, value, data_type, context, descript, label","featureType":[""]}]' WHERE id = 'config_param_system';
+
+-- 08/10/2019
+update config_api_form_fields set ismandatory = false where column_id='private_connecat_id';
+
+UPDATE config_api_form_fields SET widgettype='typeahead', dv_querytext = 'SELECT pol_id AS id, pol_id AS idval FROM polygon WHERE pol_id is not null ', 
+typeahead='{"fieldToSearch": "pol_id", "threshold": 3, "noresultsMsg": "No results", "loadingMsg": "Searching"}' WHERE column_id = 'pol_id';
+
+
+UPDATE  config_api_form_fields SET widgettype='typeahead', dv_querytext = 'SELECT id, id as idval FROM cat_grate WHERE id IS NOT NULL', isreload = false,
+typeahead = '{"fieldToSearch": "id", "threshold": 3, "noresultsMsg": "No results", "loadingMsg": "Searching"}' WHERE column_id = 'gratecat_id';

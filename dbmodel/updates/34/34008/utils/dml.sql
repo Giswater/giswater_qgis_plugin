@@ -60,9 +60,6 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO audit_cat_function VALUES (2854, 'gw_fct_pg2epa_manage_varc', 'utils', 'function', NULL, NULL, NULL, 'Manage varcs when export to epa', 'role_epa', false) 
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO audit_cat_function VALUES (2856, 'gw_api_getunexpected', 'utils', 'function', NULL, NULL, NULL, 'Get unexpected visit', 'role_om', false) 
-ON CONFLICT (id) DO NOTHING;
-
 INSERT INTO audit_cat_function VALUES (2858, 'gw_api_get_combochilds', 'utils', 'function', NULL, NULL, NULL, 'Get combo childs', 'role_om', false) 
 ON CONFLICT (id) DO NOTHING;
 

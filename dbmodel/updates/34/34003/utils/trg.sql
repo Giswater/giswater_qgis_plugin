@@ -7,8 +7,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
---20/11/2019
-UPDATE config_api_form_fields SET dv_isnullvalue = true WHERE formtype='form' AND (column_id='pattern' OR column_id ='pattern_id') 
-AND formname != 'inp_pattern' AND formname != 'inp_pattern_value';
+CREATE TRIGGER gw_trg_typevalue_fk AFTER INSERT OR UPDATE
+ON audit_cat_error FOR EACH ROW EXECUTE PROCEDURE gw_trg_typevalue_fk('sys_message');
 
-UPDATE config_api_form_fields SET dv_isnullvalue = true WHERE formtype='form' AND column_id='curve_id' AND formname != 'inp_curve';

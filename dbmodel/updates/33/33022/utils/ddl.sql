@@ -13,3 +13,9 @@ ALTER TABLE arc RENAME sys_length TO _sys_length;
 
 ALTER TABLE rpt_cat_result ADD COLUMN inpoptions json;
 ALTER TABLE rpt_cat_result ADD COLUMN stats json;
+
+
+--2020/01/07
+DROP VIEW IF EXISTS ve_config_addfields;
+ALTER TABLE config_api_form_fields DROP COLUMN isreload;
+ALTER TABLE config_api_form_fields ADD COLUMN reload_field json;
