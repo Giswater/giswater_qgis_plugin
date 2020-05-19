@@ -44,12 +44,13 @@ v_result_polygon json;
 v_result_line json;
 v_count integer;
 v_software text;
+v_project_type text;
 BEGIN
 
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
 
-	SELECT giswater INTO v_version FROM version order by id desc limit 1;
+	SELECT giswater, upper(wsoftware) INTO v_version, v_project_type FROM version order by id desc limit 1;
 
 	-- get input data   
 	v_source_schema := ((p_data ->>'data')::json->>'parameters')::json->>'source_schema'::text;
@@ -78,11 +79,11 @@ BEGIN
 		-- Set contraints
 		FOR v_column, v_default IN
 
-			EXECUTE 'SELECT column_name, REPLACE(column_default, concat('||quote_literal(v_source_schema)||',''.''), 
-			concat('||quote_literal(v_dest_schema)||',''.'')) 
-			FROM information_schema.COLUMNS 
-			WHERE table_schema = '''||v_dest_schema||''' AND table_name = '''||rec_table||''' AND column_default 
-			LIKE ''nextval(%' || v_source_schema || '%::regclass)'''
+			EXECUTE 'SELECT column_name,  REPLACE(column_default, concat('''||rec_table||''',''_'',column_name), 
+			concat('''||v_dest_schema||''',''.'','''||rec_table||''',''_'',column_name)) 
+			FROM information_schema.columns 
+			WHERE table_schema = '''||v_source_schema||''' AND table_name = '''||rec_table||''' AND column_default 
+			LIKE ''nextval(%' || rec_table || '%::regclass)'''
 		LOOP
 			EXECUTE 'ALTER TABLE ' || v_tablename || ' ALTER COLUMN ' || v_column || ' SET DEFAULT ' || v_default;
 		END LOOP;
@@ -92,6 +93,16 @@ BEGIN
 		
 	END LOOP;
 
+	IF v_project_type = 'WS' OR v_project_type = 'UD' THEN
+		EXECUTE 'ALTER TABLE '|| v_dest_schema ||'.arc ALTER COLUMN arc_id SET DEFAULT nextval('''||v_dest_schema||'.urn_id_seq''::regclass);';
+		EXECUTE 'ALTER TABLE '|| v_dest_schema ||'.node ALTER COLUMN node_id SET DEFAULT nextval('''||v_dest_schema||'.urn_id_seq''::regclass);';
+		EXECUTE 'ALTER TABLE '|| v_dest_schema ||'.anl_node ALTER COLUMN node_id SET DEFAULT nextval('''||v_dest_schema||'.urn_id_seq''::regclass);';
+		EXECUTE 'ALTER TABLE '|| v_dest_schema ||'.connec ALTER COLUMN connec_id SET DEFAULT nextval('''||v_dest_schema||'.urn_id_seq''::regclass);';
+	END IF;
+
+	IF  v_project_type = 'UD' THEN
+		EXECUTE 'ALTER TABLE '|| v_dest_schema ||'.gully ALTER COLUMN gully_id SET DEFAULT nextval('''||v_dest_schema||'.urn_id_seq''::regclass);';
+	END IF;
 
 -- fk,check
 
