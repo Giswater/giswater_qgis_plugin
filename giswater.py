@@ -53,7 +53,6 @@ from .models.sys_feature_cat import SysFeatureCat
 from .ui_manager import AuditCheckProjectResult
 
 
-
 class Giswater(QObject):  
     
     def __init__(self, iface):
@@ -1273,7 +1272,9 @@ class Giswater(QObject):
             return
 
         self.iface.setActiveLayer(self.layer_expl)
-        self.iface.zoomToActiveLayer()
+        self.layer_expl.selectAll()
+        self.iface.actionZoomToSelected().trigger()
+        self.layer_expl.removeSelection()
         self.iface.actionSelect().trigger()
         self.iface.mapCanvas().selectionChanged.connect(self.selection_changed)
 
@@ -1288,8 +1289,8 @@ class Giswater(QObject):
             break
 
         self.iface.mapCanvas().selectionChanged.disconnect()
+        self.iface.actionZoomToSelected().trigger()
         self.layer_expl.removeSelection()
-        self.iface.zoomToActiveLayer()
 
         extras = f'"selector_type":"exploitation", "check":true, "onlyone":true, "id":{expl_id}'
         body = self.create_body(extras=extras)
