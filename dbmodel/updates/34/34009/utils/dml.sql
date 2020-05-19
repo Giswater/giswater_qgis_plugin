@@ -7,8 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
--- 2020/05/09
-SELECT gw_fct_admin_manage_triggers('notify',null);
+
 
 -- 13/11/2019
 UPDATE config_typevalue_fk SET target_table='ext_cat_raster' WHERE target_table='cat_raster';
@@ -123,3 +122,9 @@ VALUES (3108, 'Feature is out of any presszone, feature_id:', NULL, 2, TRUE, 'ws
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
 VALUES (3110, 'There is no municipality defined in the model', NULL, 2, TRUE, 'utils', false) ON CONFLICT (id) DO NOTHING;
 
+-- 2020/05/18
+UPDATE sys_table SET isdeprecated = TRUE WHERE id IN ('value_verified', 'value_review_status', 'value_review_validation');
+
+
+-- 2020/05/09
+SELECT gw_fct_admin_manage_triggers('notify',null);

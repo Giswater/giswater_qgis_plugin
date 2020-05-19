@@ -113,16 +113,6 @@ UPDATE config_param_system SET widgettype = 'check', layout_order = 5, isenabled
 UPDATE audit_cat_table SET notify_action = '[{"channel":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"expl_id, name","featureType":["arc", "node", "connec","v_edit_link", "v_edit_vnode","v_edit_element", "v_edit_samplepoint","v_edit_pond", "v_edit_pool", "v_edit_dma"]}]'
 WHERE id = 'exploitation';
 
---2020/05/18
-INSERT INTO sys_typevalue (typevalue_table,typevalue_name)
-VALUES ('edit_typevalue','value_verified') ON CONFLICT (typevalue_table, typevalue_name) DO NOTHING;
-
-INSERT INTO sys_typevalue (typevalue_table,typevalue_name)
-VALUES ('edit_typevalue','value_review_status') ON CONFLICT (typevalue_table, typevalue_name) DO NOTHING;
-
-INSERT INTO sys_typevalue (typevalue_table,typevalue_name)
-VALUES ('edit_typevalue','value_review_validation') ON CONFLICT (typevalue_table,typevalue_name) DO NOTHING;
-
 INSERT INTO edit_typevalue(typevalue, id, idval)
 SELECT 'value_verified', id, id FROM value_verified  ON CONFLICT (typevalue, id) DO NOTHING;
 
@@ -131,14 +121,3 @@ SELECT 'value_review_status', id, name,descript  FROM value_review_status  ON CO
 
 INSERT INTO edit_typevalue(typevalue, id, idval)
 SELECT 'value_review_validation', id, name  FROM value_review_validation  ON CONFLICT (typevalue, id) DO NOTHING;	
-
-INSERT INTO config_typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
-VALUES ('edit_typevalue','value_verified', 'arc', 'verified') ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;	
-
-INSERT INTO config_typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
-VALUES('edit_typevalue','value_verified', 'node', 'verified') ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;	
-
-INSERT INTO config_typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
-VALUES ('edit_typevalue','value_verified', 'connec', 'verified') ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;	
-
-UPDATE config_form_fields SET dv_querytext = 'SELECT id, id as idval FROM edit_typevalue WHERE typevalue = ''value_verified''' where column_id = 'verified';
