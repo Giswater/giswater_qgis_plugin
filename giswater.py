@@ -1273,7 +1273,6 @@ class Giswater(QObject):
             return
 
         self.iface.setActiveLayer(self.layer_expl)
-        self.iface.zoomToActiveLayer()
         self.iface.actionSelect().trigger()
         self.iface.mapCanvas().selectionChanged.connect(self.selection_changed)
 
@@ -1289,13 +1288,14 @@ class Giswater(QObject):
 
         self.iface.mapCanvas().selectionChanged.disconnect()
         self.layer_expl.removeSelection()
+        self.iface.zoomToActiveLayer()
 
         extras = f'"selector_type":"exploitation", "check":true, "onlyone":true, "id":{expl_id}'
         body = self.create_body(extras=extras)
         sql = f"SELECT gw_fct_setselectors($${{{body}}}$$)::text"
         row = self.controller.get_row(sql, commit=True, log_sql=True)
         if row:
-            self.canvas.refreshAllLayers()
+            self.iface.mapCanvas().refreshAllLayers()
             self.layer_expl.triggerRepaint()
 
 
