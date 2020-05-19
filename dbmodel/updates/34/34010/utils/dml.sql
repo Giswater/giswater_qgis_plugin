@@ -9,6 +9,9 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 --2020/05/18
+SELECT setval('SCHEMA_NAME.config_typevalue_fk_id_seq', (SELECT max(id) FROM config_typevalue_fk), true);
+SELECT setval('SCHEMA_NAME.sys_typevalue_cat_id_seq', (SELECT max(id) FROM sys_typevalue), true);
+
 INSERT INTO sys_typevalue (typevalue_table,typevalue_name)
 VALUES ('edit_typevalue','value_verified') ON CONFLICT (typevalue_table, typevalue_name) DO NOTHING;
 
