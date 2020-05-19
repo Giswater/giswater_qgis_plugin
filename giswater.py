@@ -990,14 +990,13 @@ class Giswater(QObject):
         if show_warning:
             self.set_info_button_visible(False)
 		
-		# manage guide_map if user has configured
-        try
-            guide_map = result['body']['actions']['userGuideMap']
-            if guide_map
-                self.controller.log_ino("manage_guide_map")
-                self.manage_guide_map()
+		# Manage guided_map if user has configured
+        try:
+            guided_map = result['body']['actions']['userGuideMap']
+            if guided_map:
+                self.manage_guided_map()
         except Exception as e:
-            self.controller.log_ino(str(e))
+            self.controller.log_info(str(e))
 
         # Open automatically 'search docker' depending its value in user settings
         open_search = self.controller.get_user_setting_value('open_search', 'true')
@@ -1472,6 +1471,7 @@ class Giswater(QObject):
 
         return
 
+
     def manage_guided_map(self):
         """ Guide map works using v_edit_exploitation """
 
@@ -1480,7 +1480,9 @@ class Giswater(QObject):
             return
 
         self.iface.setActiveLayer(self.layer_expl)
-        self.iface.zoomToActiveLayer()
+        self.layer_expl.selectAll()
+        self.iface.actionZoomToSelected().trigger()
+        self.layer_expl.removeSelection()
         self.iface.actionSelect().trigger()
         self.iface.mapCanvas().selectionChanged.connect(self.selection_changed)
 
@@ -1495,6 +1497,7 @@ class Giswater(QObject):
             break
 
         self.iface.mapCanvas().selectionChanged.disconnect()
+        self.iface.actionZoomToSelected().trigger()
         self.layer_expl.removeSelection()
 
         extras = f'"selector_type":"exploitation", "check":true, "onlyone":true, "id":{expl_id}'
@@ -1504,3 +1507,5 @@ class Giswater(QObject):
         if row:
             self.iface.mapCanvas().refreshAllLayers()
             self.layer_expl.triggerRepaint()
+            self.iface.actionZoomIn().trigger()
+
