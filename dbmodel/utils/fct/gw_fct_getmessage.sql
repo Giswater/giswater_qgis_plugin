@@ -65,7 +65,7 @@ BEGIN
 		-- log_level of type 'WARNING' (mostly applied to functions)
 		ELSIF rec_cat_error.log_level = 1 THEN
 			SELECT  concat('Function: ',function_name,' - ',rec_cat_error.error_message,'. HINT: ', rec_cat_error.hint_message,'.')  INTO v_return_text 
-			FROM audit_cat_function WHERE audit_cat_function.id=v_function_id; 
+			FROM sys_function WHERE sys_function.id=v_function_id; 
 		
 			v_level = 1;
 			v_status = 'Failed';
@@ -75,10 +75,10 @@ BEGIN
 
 			IF v_message IS NOT NULL THEN
 				SELECT  concat('Function: ',function_name,' - ',rec_cat_error.error_message, ' ',v_message,'. HINT: ', rec_cat_error.hint_message,'.')  INTO v_return_text 
-				FROM audit_cat_function WHERE audit_cat_function.id=v_function_id; 
+				FROM sys_function WHERE sys_function.id=v_function_id; 
 			ELSE
 				SELECT  concat('Function: ',function_name,' - ',rec_cat_error.error_message,'. HINT: ', rec_cat_error.hint_message,'.')  INTO v_return_text 
-				FROM audit_cat_function WHERE audit_cat_function.id=v_function_id; 
+				FROM sys_function WHERE sys_function.id=v_function_id; 
 			END IF;
 
 			v_level = 2;
@@ -96,14 +96,14 @@ BEGIN
 		IF rec_cat_error.log_level = 1 THEN
 
 			SELECT * INTO rec_function 
-			FROM audit_cat_function WHERE audit_cat_function.id=v_function_id; 
+			FROM sys_function WHERE sys_function.id=v_function_id; 
 			RAISE WARNING 'Function: [%] - %. HINT: %', rec_function.function_name, rec_cat_error.error_message, rec_cat_error.hint_message ;
 		
 		-- log_level of type 'ERROR' (mostly applied to trigger functions) 
 		ELSIF rec_cat_error.log_level = 2 THEN
 
 			SELECT * INTO rec_function 
-			FROM audit_cat_function WHERE audit_cat_function.id=v_function_id; 
+			FROM sys_function WHERE sys_function.id=v_function_id; 
 
 			IF v_message IS NOT NULL THEN
 				RAISE EXCEPTION 'Function: [%] - %. HINT: % - % ', rec_function.function_name, concat(rec_cat_error.error_message, ' ',v_message), rec_cat_error.hint_message, v_variables ;
