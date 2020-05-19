@@ -1299,7 +1299,7 @@ class Giswater(QObject):
         if row:
             self.iface.mapCanvas().refreshAllLayers()
             self.layer_expl.triggerRepaint()
-
+            self.iface.actionZoomIn().trigger()
 
     def update_config(self, state):
         """ Set qgis_form_initproject_hidden True or False into config_param_user """
