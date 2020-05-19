@@ -1502,5 +1502,5 @@ class Giswater(QObject):
         sql = f"SELECT gw_fct_setselectors($${{{body}}}$$)::text"
         row = self.controller.get_row(sql, commit=True, log_sql=True)
         if row:
-            self.canvas.refreshAllLayers()
+            self.iface.mapCanvas().refreshAllLayers()
             self.layer_expl.triggerRepaint()
