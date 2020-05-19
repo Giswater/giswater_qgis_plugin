@@ -781,7 +781,7 @@ class ParentDialog(QDialog):
         self.set_completer_object(dialog, self.table_object)
 
 
-    def set_filter_dates(self, mindate, maxdate, table_name, widget_fromdate, widget_todate, column_filter=None, value_filter=None):
+    def set_filter_dates(self, mindate, maxdate, table_name, widget_fromdate, widget_todate, column_filter=None, value_filter=None, widget=None):
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
 
@@ -789,7 +789,7 @@ class ParentDialog(QDialog):
                " FROM {}".format(str(table_name)))
         if column_filter is not None and value_filter is not None:
             sql += " WHERE " + str(column_filter) + " = '" + str(value_filter) + "'"
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql)
         if row:
             widget_fromdate.blockSignals(True)
             widget_todate.blockSignals(True)
@@ -798,16 +798,16 @@ class ParentDialog(QDialog):
             else:
                 current_date = QDate.currentDate()
                 widget_fromdate.setDate(current_date)
-            widget_fromdate.blockSignals(False)
-            widget_todate.blockSignals(False)
             if row[1]:
                 widget_todate.setDate(row[1])
             else:
                 current_date = QDate.currentDate()
                 widget_todate.setDate(current_date)
 
-
-        self.controller.log_info(str("TEST 3 -> " + str(datetime.datetime.now())))
+            widget_fromdate.blockSignals(False)
+            widget_todate.blockSignals(False)
+            if widget is not None:
+                self.set_filter_table_event(widget, table_name)
 
 
     def set_completer_object(self, dialog, table_object):
@@ -993,8 +993,7 @@ class ParentDialog(QDialog):
                " FROM " + table_name + ""
                " WHERE emb_imatge IS TRUE AND visit_id = '" + str(self.visit_id) + "'")
         row = self.controller.get_row(sql)
-        self.controller.log_info(str(sql))
-        self.controller.log_info(str(row))
+
         if not row:
             return
 
@@ -1338,17 +1337,6 @@ class ParentDialog(QDialog):
         btn_open_visit = self.dialog.findChild(QPushButton, "btn_open_visit")
         btn_open_gallery.setEnabled(False)
 
-        # Set signals
-        widget.clicked.connect(partial(self.tbl_event_clicked, table_name))
-        self.cmb_visit_class.activated.connect(partial(self.set_filter_table_event, widget, table_name, set_date=True))
-        self.date_event_to.dateChanged.connect(partial(self.set_filter_table_event, widget, table_name))
-        self.date_event_from.dateChanged.connect(partial(self.set_filter_table_event, widget, table_name))
-
-        parameters = [widget, table_name, filter_, self.dialog]
-        btn_new_visit.clicked.connect(partial(self.new_visit, table_name, refresh_table=parameters))
-        btn_open_gallery.clicked.connect(self.open_gallery)
-        btn_open_visit.clicked.connect(partial(self.open_visit, refresh_table=parameters))
-
         feature_key = self.controller.get_layer_primary_key()
         if feature_key == 'node_id':
             feature_type = 'NODE'
@@ -1358,6 +1346,17 @@ class ParentDialog(QDialog):
             feature_type = 'ARC'
         if feature_key == 'gully_id':
             feature_type = 'GULLY'
+
+        # Set signals
+        widget.clicked.connect(partial(self.tbl_event_clicked, table_name))
+        self.cmb_visit_class.activated.connect(partial(self.set_filter_table_event, widget, table_name, set_date=True, column_filter=feature_key, value_filter=self.id))
+        self.date_event_to.dateChanged.connect(partial(self.set_filter_table_event, widget, table_name, column_filter=feature_key, value_filter=self.id))
+        self.date_event_from.dateChanged.connect(partial(self.set_filter_table_event, widget, table_name, column_filter=feature_key, value_filter=self.id))
+
+        parameters = [widget, table_name, filter_, self.dialog]
+        btn_new_visit.clicked.connect(partial(self.new_visit, table_name, refresh_table=parameters))
+        btn_open_gallery.clicked.connect(self.open_gallery)
+        btn_open_visit.clicked.connect(partial(self.open_visit, refresh_table=parameters))
 
         # Fill ComboBox cmb_visit_class
         sql = ("SELECT DISTINCT(class_id), om_visit_class.idval"
@@ -1382,12 +1381,11 @@ class ParentDialog(QDialog):
         table_name = str(table_name[utils_giswater.get_item_data(self.dialog, self.cmb_visit_class, 0)])
         self.controller.plugin_settings_set_value("om_visit_table_name", str(table_name))
         self.set_model_to_table(widget, table_name, filter_)
-        self.set_filter_dates('startdate', 'enddate', table_name, self.date_event_from, self.date_event_to, column_filter=feature_key, value_filter=self.id)
+        self.set_filter_dates('startdate', 'enddate', table_name, self.date_event_from, self.date_event_to, column_filter=feature_key, value_filter=self.id, widget=widget)
 
 
-    def set_filter_table_event(self, widget, table_name, set_date=False):
+    def set_filter_table_event(self, widget, table_name, set_date=False, column_filter=None, value_filter=None):
         """ Get values selected by the user and sets a new filter for its table model """
-
         # Get selected dates
         date_from = self.date_event_from.date().toString('yyyyMMdd 00:00:00')
         date_to = self.date_event_to.date().toString('yyyyMMdd 23:59:59')
@@ -1399,9 +1397,9 @@ class ParentDialog(QDialog):
 
         # Set model of selected widget
         table_name = str(table_name[utils_giswater.get_item_data(self.dialog, self.cmb_visit_class, 0)])
-        self.set_model_to_table(widget, table_name)
+        # self.set_model_to_table(widget, table_name)
         if set_date is True:
-            self.set_filter_dates('startdate', 'enddate', table_name, self.date_event_from, self.date_event_to)
+            self.set_filter_dates('startdate', 'enddate', table_name, self.date_event_from, self.date_event_to, column_filter, value_filter)
 
         # Get new selected dates
         date_from = self.date_event_from.date().toString('yyyyMMdd 00:00:00')
