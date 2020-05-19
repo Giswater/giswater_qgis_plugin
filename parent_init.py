@@ -782,23 +782,33 @@ class ParentDialog(QDialog):
 
 
     def set_filter_dates(self, mindate, maxdate, table_name, widget_fromdate, widget_todate):
+    def set_filter_dates(self, mindate, maxdate, table_name, widget_fromdate, widget_todate, column_filter=None, value_filter=None):
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
 
         sql = ("SELECT MIN("+str(mindate)+"), MAX("+str(maxdate)+")"
                " FROM {}".format(str(table_name)))
+        if column_filter is not None and value_filter is not None:
+            sql += " WHERE " + str(column_filter) + " = '" + str(value_filter) + "'"
         row = self.controller.get_row(sql, log_sql=True)
         if row:
+            widget_fromdate.blockSignals(True)
+            widget_todate.blockSignals(True)
             if row[0]:
                 widget_fromdate.setDate(row[0])
             else:
                 current_date = QDate.currentDate()
                 widget_fromdate.setDate(current_date)
+            widget_fromdate.blockSignals(False)
+            widget_todate.blockSignals(False)
             if row[1]:
                 widget_todate.setDate(row[1])
             else:
                 current_date = QDate.currentDate()
                 widget_todate.setDate(current_date)
+
+
+        self.controller.log_info(str("TEST 3 -> " + str(datetime.datetime.now())))
 
 
     def set_completer_object(self, dialog, table_object):
@@ -1373,7 +1383,7 @@ class ParentDialog(QDialog):
         table_name = str(table_name[utils_giswater.get_item_data(self.dialog, self.cmb_visit_class, 0)])
         self.controller.plugin_settings_set_value("om_visit_table_name", str(table_name))
         self.set_model_to_table(widget, table_name, filter_)
-        self.set_filter_dates('startdate', 'enddate', table_name, self.date_event_from, self.date_event_to)
+        self.set_filter_dates('startdate', 'enddate', table_name, self.date_event_from, self.date_event_to, column_filter=feature_key, value_filter=self.id)
 
 
     def set_filter_table_event(self, widget, table_name, set_date=False):
