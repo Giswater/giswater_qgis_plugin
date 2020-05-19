@@ -98,7 +98,9 @@ COMMENT ON TABLE sys_fprocess
 It is possible to create own process. Ids from 10000 to 20000 are reserved to work with. Check true on iscustom column';
 
 -- 2020/03/19
---UPDATE config_typevalue_fk SET target_table = 'sys_message', target_field = 'message_type' WHERE typevalue_name = 'mtype_typevalue';
+UPDATE config_typevalue_fk SET typevalue_table = 'config_form_typevalue' WHERE typevalue_table ='config_api_typevalue';
+
+UPDATE config_typevalue_fk SET target_table = 'sys_message', target_field = 'message_type' WHERE typevalue_name = 'mtype_typevalue';
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
 VALUES (3098, 'If widgettype=typeahead and dv_querytext_filterc is not null dv_parent_id must be combo', NULL, 2, TRUE, 'utils', false) ON CONFLICT (id) DO NOTHING;

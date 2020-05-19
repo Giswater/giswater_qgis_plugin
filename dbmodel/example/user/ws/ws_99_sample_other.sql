@@ -208,6 +208,8 @@ INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('shtvalve_param_1','2','
 INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('shtvalve_param_1','3','combo3');
 INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('shtvalve_param_1','4','combo4');
 
+SELECT setval('SCHEMA_NAME.config_typevalue_fk_id_seq', (SELECT max(id) FROM config_typevalue_fk), true);
+
 INSERT INTO config_typevalue_fk(typevalue_table, typevalue_name, target_table, target_field, parameter_id) 
 SELECT 'edit_typevalue','hydrant_param_1','man_addfields_value','value_param',id FROM man_addfields_parameter WHERE param_name='hydrant_param_1';
 INSERT INTO config_typevalue_fk(typevalue_table, typevalue_name, target_table, target_field, parameter_id) 
