@@ -194,6 +194,6 @@ REFERENCES sys_function (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE sys_function ADD CONSTRAINT sys_function_function_name_unique UNIQUE (function_name, project_type);
 
 --2020/05/18
-ALTER TABLE value_verified RENAME TO _value_verified;
-ALTER TABLE value_review_status RENAME TO _value_review_status;
-ALTER TABLE value_review_validation RENAME TO _value_review_validation;
+ALTER TABLE value_verified RENAME TO _value_verified_;
+ALTER TABLE value_review_status RENAME TO _value_review_status_;
+ALTER TABLE value_review_validation RENAME TO _value_review_validation_;
