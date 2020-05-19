@@ -1273,6 +1273,7 @@ class Giswater(QObject):
             return
 
         self.iface.setActiveLayer(self.layer_expl)
+        self.iface.zoomToActiveLayer()
         self.iface.actionSelect().trigger()
         self.iface.mapCanvas().selectionChanged.connect(self.selection_changed)
 
