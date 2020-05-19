@@ -989,6 +989,15 @@ class Giswater(QObject):
         # Hide info button if giswater project is loaded
         if show_warning:
             self.set_info_button_visible(False)
+		
+		# manage guide_map if user has configured
+        try
+            guide_map = result['body']['actions']['userGuideMap']
+            if guide_map
+                self.controller.log_ino("manage_guide_map")
+                self.manage_guide_map()
+        except Exception as e:
+            self.controller.log_ino(str(e))
 
         # Open automatically 'search docker' depending its value in user settings
         open_search = self.controller.get_user_setting_value('open_search', 'true')
@@ -1463,3 +1472,35 @@ class Giswater(QObject):
 
         return
 
+    def manage_guided_map(self):
+        """ Guide map works using v_edit_exploitation """
+
+        self.layer_expl = self.controller.get_layer_by_tablename('v_edit_exploitation')
+        if self.layer_expl is None:
+            return
+
+        self.iface.setActiveLayer(self.layer_expl)
+        self.iface.zoomToActiveLayer()
+        self.iface.actionSelect().trigger()
+        self.iface.mapCanvas().selectionChanged.connect(self.selection_changed)
+
+
+    def selection_changed(self):
+        """ Get selected expl_id and execute function setselectors """
+
+        features = self.layer_expl.getSelectedFeatures()
+        for feature in features:
+            expl_id = feature["expl_id"]
+            self.controller.log_info(f"Selected expl_id: {expl_id}")
+            break
+
+        self.iface.mapCanvas().selectionChanged.disconnect()
+        self.layer_expl.removeSelection()
+
+        extras = f'"selector_type":"exploitation", "check":true, "onlyone":true, "id":{expl_id}'
+        body = self.create_body(extras=extras)
+        sql = f"SELECT gw_fct_setselectors($${{{body}}}$$)::text"
+        row = self.controller.get_row(sql, commit=True, log_sql=True)
+        if row:
+            self.canvas.refreshAllLayers()
+            self.layer_expl.triggerRepaint()
