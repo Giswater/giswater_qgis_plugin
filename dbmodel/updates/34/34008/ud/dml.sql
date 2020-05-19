@@ -27,4 +27,4 @@ UPDATE sys_feature_cat set epa_default = 'CONDUIT' WHERE id IN ('WACCEL','CONDUI
 
 --2020/05/18
 INSERT INTO config_typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
-VALUE ('edit_typevalue','value_verified', 'gully', 'verified');
+VALUE ('edit_typevalue','value_verified', 'gully', 'verified')  ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
