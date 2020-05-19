@@ -87,6 +87,11 @@ BEGIN
 	v_projectrole = (p_data ->> 'data')::json->> 'projecRole';
 	v_addschema = (p_data ->> 'data')::json->> 'addSchema';
 	v_infotype = (p_data ->> 'data')::json->> 'infoType';
+	
+	-- control strange null
+	IF lower(v_addschema) = 'none' THEN 
+		v_addschema = null;
+	END IF;
 
 	v_activelayer := (p_data ->> 'data')::json->> 'activeLayer';
 	v_visiblelayer := (p_data ->> 'data')::json->> 'visibleLayer';
