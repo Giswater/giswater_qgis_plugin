@@ -24,3 +24,7 @@ UPDATE sys_feature_cat set epa_default = 'STORAGE' WHERE id IN ('STORAGE', 'CHAM
 UPDATE sys_feature_cat set epa_default = 'SIPHON' WHERE id IN ('SIPHON');
 UPDATE sys_feature_cat set epa_default = 'VIRTUAL' WHERE id IN ('VARC');
 UPDATE sys_feature_cat set epa_default = 'CONDUIT' WHERE id IN ('WACCEL','CONDUIT');
+
+--2020/05/18
+INSERT INTO config_typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
+VALUE ('edit_typevalue','value_verified', 'gully', 'verified');
