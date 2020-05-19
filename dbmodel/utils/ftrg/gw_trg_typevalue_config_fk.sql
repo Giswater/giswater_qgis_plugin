@@ -85,7 +85,12 @@ BEGIN
 				END LOOP;
 			END IF;
 		END IF;
+		
+	ELSIF TG_OP = 'UPDATE' AND v_table = 'typevalue_fk' THEN
 
+		EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_typevalue_fk ON '||OLD.target_table||';';
+		
+		PERFORM gw_fct_admin_manage_triggers('fk', NEW.target_table);
 
 	ELSIF TG_OP = 'DELETE' then --and v_table IN (SELECT typevalue_table FROM config_typevalue_fk) THEN
 
