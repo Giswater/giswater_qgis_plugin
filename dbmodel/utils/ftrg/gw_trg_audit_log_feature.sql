@@ -42,6 +42,7 @@ BEGIN
 			INSERT INTO audit_log_data (fprocesscat_id,feature_type,log_message,feature_id, addparam)
 			SELECT 17,OLD.feature_type,'UPDATE',row_to_json(row) FROM node WHERE node_id=OLD.node_id;
 			RETURN OLD;
+		END IF;
 		
 	-- CONNEC
 	ELSIF OLD.feature_type = 'CONNEC' THEN
@@ -54,6 +55,7 @@ BEGIN
 			INSERT INTO audit_log_data (fprocesscat_id,feature_type,log_message,feature_id, addparam)
 			SELECT 17,OLD.feature_type,'UPDATE',row_to_json(row) FROM connec WHERE connec_id=OLD.connec_id;
 			RETURN OLD;
+		END IF;
 
 	-- ELEMENT
 	ELSIF OLD.feature_type = 'ELEMENT' THEN
@@ -66,6 +68,7 @@ BEGIN
 			INSERT INTO audit_log_data (fprocesscat_id,feature_type,log_message,feature_id, addparam)
 			SELECT 17,OLD.feature_type,'UPDATE',row_to_json(row) FROM element WHERE element_id=OLD.element_id;
 			RETURN OLD;
+		END IF;
 	END IF;
 	
 	IF project_type_aux='UD' AND OLD.feature_type = 'GULLY' THEN

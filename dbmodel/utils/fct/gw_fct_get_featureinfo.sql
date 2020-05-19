@@ -65,7 +65,7 @@ BEGIN
 	ELSE
 		raise notice 'Configuration fields are NOT defined on config_info_layer_field. System values will be used';
 		
-		IF p_id IS NULL THEH
+		IF p_id IS NULL THEN
 			RETURN '{}'; -- returning null for those layers are not configured and id is null (first call on load project)
 			
 		ELSE

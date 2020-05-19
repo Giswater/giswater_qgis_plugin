@@ -224,7 +224,7 @@ BEGIN
 			',"data":{"layersNames":' || fields ||'}}'||
 	    '}')::json;
 
-	Exception handling
+--	Exception handling
     RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
