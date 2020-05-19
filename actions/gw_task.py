@@ -25,7 +25,7 @@ class GwTask(QgsTask, QObject):
 
     def run(self):
 
-        self.controller.log_info(f"Started task {self.description()}")
+        self.manage_message(f"Started task {self.description()}")
 
         if self.duration is 0:
             if self.isCanceled():
@@ -51,14 +51,20 @@ class GwTask(QgsTask, QObject):
             self.controller.log_info(f"Task {self.description()} completed")
         else:
             if self.exception is None:
-                self.controller.log_warning(f"Task {self.description()} not successful but without exception")
+                self.manage_message(f"Task {self.description()} not successful but without exception")
             else:
-                self.controller.log_warning(f"Task {self.description()} Exception: {self.exception}")
+                self.manage_message(f"Task {self.description()} Exception: {self.exception}")
                 raise self.exception
 
 
     def cancel(self):
 
-        self.controller.log_info(f"Task {self.description()} was cancelled")
+        self.manage_message(f"Task {self.description()} was cancelled")
         super().cancel()
+
+
+    def manage_message(self, msg):
+
+        if self.controller:
+            self.controller.log_info(msg)
 
