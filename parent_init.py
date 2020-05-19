@@ -781,7 +781,6 @@ class ParentDialog(QDialog):
         self.set_completer_object(dialog, self.table_object)
 
 
-    def set_filter_dates(self, mindate, maxdate, table_name, widget_fromdate, widget_todate):
     def set_filter_dates(self, mindate, maxdate, table_name, widget_fromdate, widget_todate, column_filter=None, value_filter=None):
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
