@@ -72,10 +72,22 @@ UPDATE om_visit_class SET formname = a.formname, tablename = a.tablename FROM _c
 --update audit_cat_param_user with cat_feature vdefaults
 UPDATE cat_feature SET id=id;
 
-UPDATE config_typevalue_fk SET target_table = 'config_form_fields' WHERE target_table = 'config_api_form_fields';
-UPDATE config_typevalue_fk SET target_table = 'config_info_layer' WHERE target_table = 'config_api_layer';
-UPDATE config_typevalue_fk SET target_table = 'config_form_tabs' WHERE target_table = 'config_api_form_tabs';
-UPDATE config_typevalue_fk SET target_table = 'config_form_fields' WHERE target_table = 'config_api_form_fields';
+
+UPDATE config_typevalue_fk SET target_table = 'sys_message', target_field = 'message_type' WHERE typevalue_name = 'mtype_typevalue';
+
+ALTER TABLE config_typevalue_fk DISABLE TRIGGER gw_trg_typevalue_config_fk;
+
+UPDATE config_typevalue_fk SET typevalue_table = 'config_form_typevalue' WHERE typevalue_table ='config_api_typevalue';
+
+ALTER TABLE config_typevalue_fk ENABLE TRIGGER gw_trg_typevalue_config_fk;
+
+
+INSERT INTO config_form_typevalue(typevalue, id, idval) VALUES ('widgetfunction_typevalue', 'open_url', 'open_url');
+
+INSERT INTO config_form_typevalue(typevalue, id, idval) VALUES ('widgetfunction_typevalue', 'info_node', 'info_node');
+
+INSERT INTO config_form_typevalue(typevalue, id, idval) VALUES ('widgetfunction_typevalue', 'set_print', 'set_print');
+
 
 UPDATE config_form_fields SET widgetfunction = 'set_composer' WHERE widgetfunction = 'gw_api_setcomposer';
 UPDATE config_form_fields SET widgetfunction = 'set_print' WHERE widgetfunction = 'gw_api_setprint';
@@ -83,10 +95,14 @@ UPDATE config_form_fields SET widgetfunction = 'open_url' WHERE widgetfunction =
 UPDATE config_form_fields SET widgetfunction = 'info_node' WHERE widgetfunction = 'gw_api_open_node';
 UPDATE config_form_fields SET widgetfunction = NULL WHERE widgetfunction = 'get_catalog_id';
 
-
 UPDATE config_form_fields SET dv_querytext = replace (dv_querytext, 'config_api_images', 'config_form_images');
 UPDATE config_form_fields SET dv_querytext = replace (dv_querytext, 'config_api_typevalue', 'config_form_typevalue');
 
+
+UPDATE config_typevalue_fk SET target_table = 'config_form_fields' WHERE target_table = 'config_api_form_fields';
+UPDATE config_typevalue_fk SET target_table = 'config_info_layer' WHERE target_table = 'config_api_layer';
+UPDATE config_typevalue_fk SET target_table = 'config_form_tabs' WHERE target_table = 'config_api_form_tabs';
+UPDATE config_typevalue_fk SET target_table = 'config_form_fields' WHERE target_table = 'config_api_form_fields';
 
 COMMENT ON TABLE sys_function
   IS 'INSTRUCTIONS TO WORK WITH THIS TABLE:
@@ -98,9 +114,10 @@ COMMENT ON TABLE sys_fprocess
 It is possible to create own process. Ids from 10000 to 20000 are reserved to work with. Check true on iscustom column';
 
 -- 2020/03/19
-UPDATE config_typevalue_fk SET typevalue_table = 'config_form_typevalue' WHERE typevalue_table ='config_api_typevalue';
 
 UPDATE config_typevalue_fk SET target_table = 'sys_message', target_field = 'message_type' WHERE typevalue_name = 'mtype_typevalue';
+
+UPDATE config_typevalue_fk SET typevalue_table = 'config_form_typevalue' WHERE typevalue_table ='config_api_typevalue';
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
 VALUES (3098, 'If widgettype=typeahead and dv_querytext_filterc is not null dv_parent_id must be combo', NULL, 2, TRUE, 'utils', false) ON CONFLICT (id) DO NOTHING;
