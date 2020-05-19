@@ -17,7 +17,6 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_odbc2pg_hydro_filldata($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{},"data":{"parameters":{"exploitation":"524", "period":"2T", "year":"2019"}}}$$)
-
 */
 
 
@@ -96,8 +95,8 @@ BEGIN
 	ON CONFLICT (dma_id, cat_period_id) DO NOTHING;
 
 	-- ext_rtc_hydrometer_category_x_pattern
-	INSERT INTO ext_hydrometer_category_x_pattern (category_id, period_type, pattern_id) 
-	SELECT category_id, period_type, c.pattern_id
+	INSERT INTO ext_hydrometer_category_x_pattern (category_id, period_type) 
+	SELECT category_id, period_type
 	FROM audit_log_data 
 	JOIN ext_cat_period a ON CONCAT(log_message::json->>'year', 0, log_message::json->>'period') = a.id
 	JOIN ext_rtc_hydrometer b ON b.id=feature_id
@@ -107,14 +106,19 @@ BEGIN
 
 	--ext_rtc_hydrometer_x_data
 	INSERT INTO ext_rtc_hydrometer_x_data (hydrometer_id, sum, cat_period_id, pattern_id) 
-	SELECT feature_id, (log_message::json->>'value')::numeric(12,5)*2*30*24*3.6, concat(log_message::json->>'year', '-', log_message::json->>'period'), c.pattern_id
+	SELECT feature_id, (((log_message::json->>'value')::numeric(12,5)*(log_message::json->>'periodSeconds')::numeric)/1000)::numeric(12,2) as m3value, concat(log_message::json->>'year', '-', log_message::json->>'period'), c.pattern_id
 	FROM audit_log_data 
-	JOIN ext_rtc_hydrometer a ON a.id=feature_id
-	JOIN ext_cat_period b ON CONCAT(log_message::json->>'year', 0, log_message::json->>'period') = a.id
-	JOIN ext_hydrometer_category_x_pattern c ON a.category_id=c.category_id::integer
+	LEFT JOIN ext_rtc_hydrometer a ON a.id=feature_id
+	LEFT JOIN ext_cat_period b ON CONCAT(log_message::json->>'year', 0, log_message::json->>'period') = a.id
+	LEFT JOIN ext_hydrometer_category_x_pattern c ON a.category_id=c.category_id::integer
 	WHERE log_message::json->>'year' IS NOT NULL AND log_message::json->>'period' IS NOT NULL AND fprocesscat_id=74
-	AND b.period_type = c.period_type
 	ON CONFLICT (hydrometer_id, cat_period_id) DO NOTHING;
+
+	UPDATE connec SET num_value = m3value FROM (
+	WITH query AS (
+	SELECT log_message::json->>'periodSeconds' as ps, log_message::json->>'value' as value, log_message::json->>'connec_id'::text as connec_id, log_message::json->>'expl_id' as expl_id
+	FROM audit_log_data WHERE fprocesscat_id = 74 and user_name = current_user)
+	SELECT sum(ps::integer*value::numeric(12,5)/1000)::numeric(12,2) as m3value, connec_id, expl_id::integer FROM query group by expl_id, connec_id) a WHERE connec.expl_id = a.expl_id and connec.code = a.connec_id;
 
 	-- delete audit_log_data
 	DELETE FROM audit_log_data WHERE fprocesscat_id=74;
