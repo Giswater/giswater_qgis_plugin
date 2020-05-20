@@ -1067,9 +1067,8 @@ class UpdateSQL(ApiParent):
             return False
 
         if not os.path.exists(self.folderUpdatesApi):
-            self.controller.show_message("The api folder was not found in sql folder.", 1)
-            self.error_count = self.error_count + 1
-            return
+            self.controller.log_info(f"Folder not found: {self.folderUpdatesApi}")
+            return True
 
         if project_type is False:
             project_type = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
@@ -3495,6 +3494,5 @@ class UpdateSQL(ApiParent):
         sql = (f"UPDATE {self.schema_name}.config_param_user "
                f"SET value = '{composers_path_vdef}' "
                f"WHERE parameter = 'qgis_composers_path' AND cur_user = current_user")
-        
         self.controller.execute_sql(sql)
 
