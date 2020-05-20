@@ -1349,11 +1349,11 @@ class ParentDialog(QDialog):
 
         # Set signals
         widget.clicked.connect(partial(self.tbl_event_clicked, table_name))
-        self.cmb_visit_class.activated.connect(partial(self.set_filter_table_event, widget, table_name, set_date=True, column_filter=feature_key, value_filter=self.id))
+        self.cmb_visit_class.currentIndexChanged.connect(partial(self.set_filter_table_event, widget, table_name, set_date=True, column_filter=feature_key,value_filter=self.id))
         self.date_event_to.dateChanged.connect(partial(self.set_filter_table_event, widget, table_name, column_filter=feature_key, value_filter=self.id))
         self.date_event_from.dateChanged.connect(partial(self.set_filter_table_event, widget, table_name, column_filter=feature_key, value_filter=self.id))
 
-        parameters = [widget, table_name, filter_, self.dialog]
+        parameters = [widget, table_name, filter_, self.cmb_visit_class, self.id]
         btn_new_visit.clicked.connect(partial(self.new_visit, table_name, refresh_table=parameters))
         btn_open_gallery.clicked.connect(self.open_gallery)
         btn_open_visit.clicked.connect(partial(self.open_visit, refresh_table=parameters))

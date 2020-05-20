@@ -244,10 +244,10 @@ class ManageVisit(ParentManage, QObject):
 
         if refresh_table is not None:
             table_name = self.controller.plugin_settings_value('om_visit_table_name')
-            self.update_table_visit(refresh_table[0], table_name, refresh_table[2])
+            self.update_table_visit(refresh_table[0], table_name, refresh_table[2], refresh_table[3], refresh_table[4])
 
 
-    def update_table_visit(self, widget, table_name, expr_filter=None):
+    def update_table_visit(self, widget, table_name, expr_filter=None, cmb_visitclass=None, id=None):
 
         """ Set a model with selected filter.
                 Attach that model to selected table """
@@ -271,6 +271,24 @@ class ManageVisit(ParentManage, QObject):
             widget.setModel(model)
         else:
             self.controller.log_info("set_model_to_table: widget not found")
+        current_visit_class = utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.visitclass_id, 0)
+        feature_key = self.controller.get_layer_primary_key()
+        if feature_key == 'node_id':
+            feature_type = 'NODE'
+        if feature_key == 'connec_id':
+            feature_type = 'CONNEC'
+        if feature_key == 'arc_id':
+            feature_type = 'ARC'
+        if feature_key == 'gully_id':
+            feature_type = 'GULLY'
+        # Fill ComboBox cmb_visit_class
+        sql = ("SELECT DISTINCT(class_id), om_visit_class.idval"
+               " FROM " + self.schema_name + ".v_ui_om_visit_x_" + feature_type.lower() + ""
+               " JOIN " + self.schema_name + ".om_visit_class ON om_visit_class.id = v_ui_om_visit_x_" + feature_type.lower() + ".class_id"
+               " WHERE " + str(feature_key) + " IS NOT NULL AND " + str(feature_key) + " = '" + str(id) + "'")
+        rows = self.controller.get_rows(sql)
+        utils_giswater.set_item_data(cmb_visitclass, rows, 1)
+        utils_giswater.set_combo_itemData(cmb_visitclass, str(current_visit_class), 0)
 
 
     def update_geom(self):
