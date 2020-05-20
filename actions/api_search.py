@@ -6,13 +6,11 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.core import QgsPointXY
-from qgis.PyQt.QtCore import QStringListModel
-
-from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtCore import QStringListModel, Qt
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtWidgets import QAbstractItemView, QComboBox, QCompleter, QFileDialog, QGridLayout, QHeaderView, QLabel, QLineEdit
-from qgis.PyQt.QtWidgets import QSizePolicy, QSpacerItem, QTableView, QTabWidget, QWidget
+from qgis.PyQt.QtWidgets import QAbstractItemView, QComboBox, QCompleter, QFileDialog, QGridLayout, QHeaderView, \
+    QLabel, QLineEdit, QSizePolicy, QSpacerItem, QTableView, QTabWidget, QWidget
 
 import csv
 import json
@@ -29,7 +27,7 @@ from .manage_document import ManageDocument
 from .manage_new_psector import ManageNewPsector
 from .manage_visit import ManageVisit
 from .api_parent import ApiParent
-from ..ui_manager import SearchUi, ApiBasicInfo, ListItems
+from ..ui_manager import SearchUi, ApiBasicInfo, ListItems, DockerUi
 
 
 class ApiSearch(ApiParent):
@@ -134,6 +132,7 @@ class ApiSearch(ApiParent):
 
         # We look for the index of current tab so we can search by name
         index = self.dlg_search.main_tab.currentIndex()
+
         # Get all QLineEdit for activate or we cant write when tab have more than 1 QLineEdit
         line_list = self.dlg_search.main_tab.widget(index).findChildren(QLineEdit)
         for line_edit in line_list:
@@ -147,36 +146,52 @@ class ApiSearch(ApiParent):
 
         # Get text from selected row
         _key = completer.completionModel().index(row, 0).data()
-        # Search text into self.result_data
-        # (this variable contains all the matching objects in the function "make_list())"
+        # Search text into self.result_data: this variable contains all matching objects in the function "make_list()"
         item = None
         for data in self.result_data['data']:
             if _key == data['display_name']:
                 item = data
                 break
 
-        # IF for zoom to tab network
-        if self.dlg_search.main_tab.widget(index).objectName() == 'network':
-            # layer = self.controller.get_layer_by_tablename(item['sys_table_id'])
-            # if layer is None:
-            #     msg = "Layer not found"
-            #     self.controller.show_message(msg, message_level=2, duration=3)
-            #     return
-            #
-            # self.iface.setActiveLayer(layer)
+        # Show info in docker?
+        row = self.controller.get_config('qgis_form_docker')
+        if row:
+            if row[0].lower() == 'true':
+                self.close_docker()
+                self.dlg_docker = DockerUi()
+                self.dlg_docker.dlg_closed.connect(partial(self.close_docker))
+                self.manage_docker_options()
+            else:
+                self.dlg_docker = None
+        else:
+            self.dlg_docker = None
+
+        self.close_docker()
+        self.dlg_docker = DockerUi()
+        self.dlg_docker.dlg_closed.connect(partial(self.close_docker))
+        self.manage_docker_options()
+
+        # Get selected tab name
+        tab_selected = self.dlg_search.main_tab.widget(index).objectName()
+
+        # Tab 'network'
+        if tab_selected == 'network':
+            self.controller.log_info("network")
             self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, tab_type='data')
-            complet_result, dialog = self.ApiCF.open_form(table_name=item['sys_table_id'], feature_id=item['sys_id'], tab_type='data')
+            complet_result, dialog = self.ApiCF.open_form(table_name=item['sys_table_id'], feature_id=item['sys_id'],
+                tab_type='data', docker=self.dlg_docker)
             if not complet_result:
                 return
             self.draw(complet_result)
             self.resetRubberbands()
 
-        elif self.dlg_search.main_tab.widget(index).objectName() == 'search':
+        # Tab 'search'
+        elif tab_selected == 'search':
             # TODO
             return
 
-        # IF for zoom to tab address (streets)
-        elif self.dlg_search.main_tab.widget(index).objectName() == 'address' and 'id' in item and 'sys_id' not in item:
+        # Tab 'address' (streets)
+        elif tab_selected == 'address' and 'id' in item and 'sys_id' not in item:
             polygon = item['st_astext']
             if polygon:
                 polygon = polygon[9:len(polygon)-2]
@@ -188,28 +203,17 @@ class ApiSearch(ApiParent):
                 message = f"Zoom unavailable. Doesn't exist the geometry for the street"
                 self.controller.show_info(message, parameter=item['display_name'])
                 
-        # IF for zoom to tab address (postnumbers)
-        elif self.dlg_search.main_tab.widget(index).objectName() == 'address' and 'sys_x' in item and 'sys_y' in item:
+        # Tab 'address' (postnumbers)
+        elif tab_selected == 'address' and 'sys_x' in item and 'sys_y' in item:
             x1 = item['sys_x']
             y1 = item['sys_y']
             point = QgsPointXY(float(x1), float(y1))
-
             self.draw_point(point, duration_time=5000)
             self.zoom_to_rectangle(x1, y1, x1, y1)
-
-            # textItem = QgsTextAnnotationItem(self.iface.mapCanvas())
-            # document = QTextDocument()
-            # #document.setHtml("<strong>" + str("TEST") + "</strong></br><p>hola<p/>")
-            # document.setPlainText("HOLA")
-            # textItem.setDocument(document)
-            # # symbol = QgsMarkerSymbolV2()
-            # # symbol.setSize(9)
-            # # textItem.setMarkerSymbol(symbol)
-            # textItem.setMapPosition(point)
-
             self.canvas.refresh()
 
-        elif self.dlg_search.main_tab.widget(index).objectName() == 'hydro':
+        # Tab 'hydro'
+        elif tab_selected == 'hydro':
             x1 = item['sys_x']
             y1 = item['sys_y']
             point = QgsPointXY(float(x1), float(y1))
@@ -217,7 +221,8 @@ class ApiSearch(ApiParent):
             self.zoom_to_rectangle(x1, y1, x1, y1)
             self.open_hydrometer_dialog(table_name=item['sys_table_id'], feature_id=item['sys_id'])
 
-        elif self.dlg_search.main_tab.widget(index).objectName() == 'workcat':
+        # Tab 'workcat'
+        elif tab_selected == 'workcat':
             list_coord = re.search('\(\((.*)\)\)', str(item['sys_geometry']))
             if not list_coord:
                 msg = "Empty coordinate list"
@@ -231,9 +236,9 @@ class ApiSearch(ApiParent):
             self.workcat_open_table_items(item)
             return
 
-        elif self.dlg_search.main_tab.widget(index).objectName() == 'psector':
+        # Tab 'psector'
+        elif tab_selected == 'psector':
             list_coord = re.search('\(\((.*)\)\)', str(item['sys_geometry']))
-
             self.manage_new_psector.new_psector(item['sys_id'], 'plan', is_api=True)
             self.manage_new_psector.dlg_plan_psector.rejected.connect(self.resetRubberbands)
             if not list_coord:
@@ -246,8 +251,8 @@ class ApiSearch(ApiParent):
             max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
             self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
 
-
-        elif self.dlg_search.main_tab.widget(index).objectName() == 'visit':
+        # Tab 'visit'
+        elif tab_selected == 'visit':
             list_coord = re.search('\((.*)\)', str(item['sys_geometry']))
             if not list_coord:
                 msg = "Empty coordinate list"
@@ -258,7 +263,6 @@ class ApiSearch(ApiParent):
             point = QgsPointXY(float(max_x), float(max_y))
             self.draw_point(point)
             self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
-
             self.manage_visit.manage_visit(visit_id=item['sys_id'])
             self.manage_visit.dlg_add_visit.rejected.connect(self.resetRubberbands)
             return
@@ -353,6 +357,7 @@ class ApiSearch(ApiParent):
         line_edit_add.setText('')
         line_edit_add.blockSignals(False)
 
+
     def add_combobox(self, field):
 
         widget = QComboBox()
@@ -364,6 +369,7 @@ class ApiSearch(ApiParent):
         widget.currentIndexChanged.connect(partial(self.clear_lineedits))
 
         return widget
+
 
     def clear_lineedits(self):
 
@@ -425,7 +431,6 @@ class ApiSearch(ApiParent):
         #self.zoom_to_polygon(workcat_id, layer_name, field_id)
 
         self.items_dialog = ListItems()
-
         self.items_dialog.setWindowTitle(f'Workcat: {display_name}')
         self.set_icon(self.items_dialog.btn_doc_insert, "111")
         self.set_icon(self.items_dialog.btn_doc_delete, "112")
@@ -435,12 +440,12 @@ class ApiSearch(ApiParent):
         self.load_settings(self.items_dialog)
         self.items_dialog.btn_state1.setEnabled(False)
         self.items_dialog.btn_state0.setEnabled(False)
-        utils_giswater.setWidgetText(self.items_dialog, self.items_dialog.txt_path, self.controller.plugin_settings_value('search_csv_path'))
 
-        utils_giswater.setWidgetText(self.items_dialog, self.items_dialog.label_init, "Filter by: "+str(field_id))
-        utils_giswater.setWidgetText(self.items_dialog, self.items_dialog.label_end, "Filter by: "+str(field_id))
+        search_csv_path = self.controller.plugin_settings_value('search_csv_path')
+        utils_giswater.setWidgetText(self.items_dialog, self.items_dialog.txt_path, search_csv_path)
+        utils_giswater.setWidgetText(self.items_dialog, self.items_dialog.label_init, f"Filter by: {field_id}")
+        utils_giswater.setWidgetText(self.items_dialog, self.items_dialog.label_end, f"Filter by: {field_id}")
 
-        #
         self.items_dialog.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.items_dialog.tbl_psm.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.items_dialog.tbl_psm_end.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -560,6 +565,7 @@ class ApiSearch(ApiParent):
 
     def get_folder_dialog(self, dialog, widget):
         """ Get folder dialog """
+
         widget.setStyleSheet(None)
         if 'nt' in sys.builtin_module_names:
             folder_path = os.path.expanduser("~\Documents")
@@ -788,4 +794,18 @@ class ApiSearch(ApiParent):
 
                 # Add data to workcat search form
                 widget.setText(f"Total arcs length: {length}")
+
+
+    def close_docker(self):
+        """ Save QDockWidget position (1=Left, 2=right, 8=bottom, 4=top),
+            remove from iface and del class
+        """
+
+        if hasattr(self, 'dlg_docker') and type(self.dlg_docker) is DockerUi:
+            if not self.dlg_docker.isFloating():
+                cur_user = self.controller.get_current_user()
+                docker_pos = self.iface.mainWindow().dockWidgetArea(self.dlg_docker)
+                self.controller.plugin_settings_set_value(f"docker_info_{cur_user}", docker_pos)
+                self.iface.removeDockWidget(self.dlg_docker)
+                del self.dlg_docker
 
