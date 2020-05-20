@@ -1375,7 +1375,7 @@ class ParentDialog(QDialog):
             self.controller.show_warning(message)
             return
 
-        filter_ += " AND startdate >= '" + date_from + "' AND startdate <= '" + date_to + "' ORDER BY startdate"
+        filter_ += " AND startdate >= '" + date_from + "' AND startdate <= '" + date_to + "' ORDER BY startdate desc"
 
         # Set model of selected widget
         table_name = str(table_name[utils_giswater.get_item_data(self.dialog, self.cmb_visit_class, 0)])
@@ -1413,7 +1413,7 @@ class ParentDialog(QDialog):
         visit_class_value = utils_giswater.get_item_data(self.dialog, self.cmb_visit_class, 0)
         if str(visit_class_value) != 'null':
             expr += " AND class_id::text = '" + str(visit_class_value) + "'"
-        expr += " ORDER BY startdate"
+        expr += " ORDER BY startdate desc"
         # Refresh model with selected filter
         widget.model().setFilter(expr)
         widget.model().select()
