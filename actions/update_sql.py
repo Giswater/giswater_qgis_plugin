@@ -2204,7 +2204,7 @@ class UpdateSQL(ApiParent):
         self.error_count = 0
 
 
-    def init_dialog_create_project(self):
+    def init_dialog_create_project(self, project_type=None):
         """ Initialize dialog (only once) """
 
         self.dlg_readsql_create_project = ReadsqlCreateProject()
@@ -2253,6 +2253,10 @@ class UpdateSQL(ApiParent):
         self.cmb_create_project_type = self.dlg_readsql_create_project.findChild(QComboBox, 'cmb_create_project_type')
         for aux in self.project_types:
             self.cmb_create_project_type.addItem(str(aux))
+
+        if project_type:
+            utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.cmb_create_project_type, project_type)
+            self.change_project_type(self.cmb_create_project_type)
 
         # Enable_disable data file widgets
         self.enable_datafile()

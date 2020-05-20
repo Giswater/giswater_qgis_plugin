@@ -6,12 +6,9 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.core import QgsPointXY, QgsVectorLayer
-from qgis.PyQt.QtCore import QStringListModel
-from ..map_tools.snapping_utils_v3 import SnappingConfigManager
-
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsExpressionContextUtils, QgsRectangle, QgsGeometry, QgsProject
 from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand, QgsDateTimeEdit
-from qgis.PyQt.QtCore import Qt, QSettings, QTimer, QDate, QRegExp
+from qgis.PyQt.QtCore import Qt, QSettings, QTimer, QDate, QRegExp, QStringListModel
 from qgis.PyQt.QtGui import QColor, QIntValidator, QDoubleValidator, QRegExpValidator, QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QLineEdit, QSizePolicy, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel, QCheckBox
 from qgis.PyQt.QtWidgets import QCompleter, QToolButton, QFrame, QSpinBox, QDoubleSpinBox, QDateEdit, QGroupBox, QAction
@@ -28,7 +25,7 @@ from functools import partial
 from .. import utils_giswater
 from .parent import ParentAction
 from .HyperLinkLabel import HyperLinkLabel
-
+from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 from ..ui_manager import BasicInfoUi
 
 

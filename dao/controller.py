@@ -93,7 +93,6 @@ class DaoController(object):
             self.min_log_level = int(self.settings.value('status/log_level'))
             log_suffix = self.settings.value('status/log_suffix')
             self.logger = Logger(self, logger_name, self.min_log_level, log_suffix)
-            self.log_info("Logger initialized")
 
             if self.min_log_level == 10:
                 self.min_message_level = 0

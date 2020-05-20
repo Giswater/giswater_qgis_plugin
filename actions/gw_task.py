@@ -48,7 +48,7 @@ class GwTask(QgsTask, QObject):
     def finished(self, result):
 
         if result:
-            self.controller.log_info(f"Task {self.description()} completed")
+            self.manage_message(f"Task {self.description()} completed")
         else:
             if self.exception is None:
                 self.manage_message(f"Task {self.description()} not successful but without exception")
