@@ -162,12 +162,11 @@ BEGIN
 					order by ST_Distance (NEW.the_geom, v_edit_arc.the_geom) LIMIT 1);
 				END IF;	
 			END IF;
-			
-			-- control error when no value
+
+			-- force cero values always - undefined
 			IF (NEW.sector_id IS NULL) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-				"data":{"error":"1010", "function":"1320","debug_msg":"'||NEW.node_id::text||'"}}$$);';
-			END IF;            
+				NEW.sector_id := 0;
+			END IF; 		
 		END IF;
 		
 		
@@ -195,12 +194,11 @@ BEGIN
 					order by ST_Distance (NEW.the_geom, v_edit_arc.the_geom) LIMIT 1);
 				END IF;	
 			END IF;
-			
-			-- control error when no value
+
+			-- force cero values always - undefined
 			IF (NEW.dma_id IS NULL) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-				"data":{"error":"1014", "function":"1320","debug_msg":"'||NEW.node_id::text||'"}}$$);';
-			END IF;            
+				NEW.dma_id := 0;
+			END IF; 		
 		END IF;
 			
 			
@@ -229,13 +227,11 @@ BEGIN
 				END IF;	
 			END IF;
 			
-			-- control error when no value
+			-- force cero values always - undefined
 			IF (NEW.presszonecat_id IS NULL) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-				"data":{"error":"3108", "function":"1320","debug_msg":"'||NEW.node_id::text||'"}}$$);';
+				NEW.presszonecat_id := 0;
 			END IF;            
 		END IF;
-		
 		
 		-- Municipality 
 		IF (NEW.muni_id IS NULL) THEN
@@ -339,7 +335,7 @@ BEGIN
 		END IF;
 
 		
-		-- LINK
+		-- link
 		IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_automatic_insert_link')::boolean=TRUE THEN
 			NEW.link=NEW.node_id;
 		END IF;

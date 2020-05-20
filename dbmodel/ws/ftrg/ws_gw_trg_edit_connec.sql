@@ -67,14 +67,14 @@ BEGIN
 	-- Control insertions ID
 	IF TG_OP = 'INSERT' THEN
 
-        -- connec ID
-        IF (NEW.connec_id IS NULL) THEN
-			PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
-            NEW.connec_id:= (SELECT nextval('urn_id_seq'));
-        END IF;
+		-- connec ID
+		IF (NEW.connec_id IS NULL) THEN
+				PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
+		    NEW.connec_id:= (SELECT nextval('urn_id_seq'));
+		END IF;
 
-        -- connec Catalog ID
-        IF (NEW.connecat_id IS NULL) THEN
+		-- connec Catalog ID
+		IF (NEW.connecat_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM cat_connec) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
 			  "data":{"error":"1022", "function":"1304","debug_msg":null, "variables":null}}$$);';
@@ -89,7 +89,6 @@ BEGIN
 				IF (NEW.connecat_id IS NULL) THEN
 					NEW.connecat_id := (SELECT id FROM cat_connec LIMIT 1);
 				END IF;
-
 			END IF;
 
 			IF (NEW.connecat_id IS NULL) THEN
@@ -97,14 +96,14 @@ BEGIN
 				 "data":{"error":"1086", "function":"1304","debug_msg":null, "variables":null}}$$);';
 			END IF;				
 		END IF;
-		
+			
 		-- Exploitation
 		IF (NEW.expl_id IS NULL) THEN
 			
 			-- control error without any mapzones defined on the table of mapzone
 			IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-		       	"data":{"error":"1110", "function":"1304","debug_msg":null}}$$);';
+			"data":{"error":"1110", "function":"1304","debug_msg":null}}$$);';
 			END IF;
 			
 			-- getting value default
@@ -130,14 +129,13 @@ BEGIN
 			END IF;            
 		END IF;
 		
-		
 		-- Sector ID
 		IF (NEW.sector_id IS NULL) THEN
 			
 			-- control error without any mapzones defined on the table of mapzone
 			IF ((SELECT COUNT(*) FROM sector) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-		       	"data":{"error":"1008", "function":"1304","debug_msg":null}}$$);';
+			"data":{"error":"1008", "function":"1304","debug_msg":null}}$$);';
 			END IF;
 			
 			-- getting value default
@@ -156,21 +154,19 @@ BEGIN
 				END IF;	
 			END IF;
 			
-			-- control error when no value
-			IF (NEW.sector_id IS NULL) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-				"data":{"error":"1010", "function":"1304","debug_msg":"'||NEW.connec_id::text||'"}}$$);';
-			END IF;            
+			-- control when no value
+			IF NEW.sector_id IS NULL THEN
+				NEW.sector_id = 0;
+			END IF;
 		END IF;
-		
-		
+
 		-- Dma ID
 		IF (NEW.dma_id IS NULL) THEN
 			
 			-- control error without any mapzones defined on the table of mapzone
 			IF ((SELECT COUNT(*) FROM dma) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-		       	"data":{"error":"1012", "function":"1304","debug_msg":null}}$$);';
+			"data":{"error":"1012", "function":"1304","debug_msg":null}}$$);';
 			END IF;
 			
 			-- getting value default
@@ -189,11 +185,10 @@ BEGIN
 				END IF;	
 			END IF;
 			
-			-- control error when no value
-			IF (NEW.dma_id IS NULL) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-				"data":{"error":"1014", "function":"1304","debug_msg":"'||NEW.connec_id::text||'"}}$$);';
-			END IF;            
+			-- control when no value
+			IF NEW.dma_id IS NULL THEN
+				NEW.dma_id = 0;
+			END IF;           
 		END IF;
 			
 			
@@ -203,7 +198,7 @@ BEGIN
 			-- control error without any mapzones defined on the table of mapzone
 			IF ((SELECT COUNT(*) FROM cat_presszone) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-		       	"data":{"error":"3106", "function":"1304","debug_msg":null}}$$);';
+			"data":{"error":"3106", "function":"1304","debug_msg":null}}$$);';
 			END IF;
 			
 			-- getting value default
@@ -222,11 +217,10 @@ BEGIN
 				END IF;	
 			END IF;
 			
-			-- control error when no value
-			IF (NEW.presszonecat_id IS NULL) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-				"data":{"error":"3108", "function":"1304","debug_msg":"'||NEW.connec_id::text||'"}}$$);';
-			END IF;            
+			-- control when no value
+			IF NEW.presszonecat_id IS NULL THEN
+				NEW.presszonecat_id = 0;
+			END IF;           
 		END IF;
 		
 		
@@ -236,7 +230,7 @@ BEGIN
 			-- control error without any mapzones defined on the table of mapzone
 			IF ((SELECT COUNT(*) FROM ext_municipality) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-		       	"data":{"error":"3110", "function":"1304","debug_msg":null}}$$);';
+			"data":{"error":"3110", "function":"1304","debug_msg":null}}$$);';
 			END IF;
 			
 			-- getting value default
@@ -261,23 +255,23 @@ BEGIN
 				"data":{"error":"2024", "function":"1304","debug_msg":"'||NEW.connec_id::text||'"}}$$);';
 			END IF;            
 		END IF;
-		
-		
-	    -- State
-		IF (NEW.state IS NULL) THEN
-            NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='state_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-        END IF;
-		
-		-- State_type
-		IF (NEW.state_type IS NULL) THEN
-			NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='statetype_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-        END IF;
-		
-		--check relation state - state_type
-        IF NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
-        	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-      	  		"data":{"error":"3036", "function":"1318","debug_msg":"'||NEW.state::text||'"}}$$);';
-       	END IF;
+			
+			
+		    -- State
+			IF (NEW.state IS NULL) THEN
+		    NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='state_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
+			
+			-- State_type
+			IF (NEW.state_type IS NULL) THEN
+				NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='statetype_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
+			
+			--check relation state - state_type
+		IF NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				"data":{"error":"3036", "function":"1318","debug_msg":"'||NEW.state::text||'"}}$$);';
+		END IF;
 
 		--Inventory	
 		NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
@@ -292,24 +286,24 @@ BEGIN
 		END IF;
 		
 		-- Ownercat_id
-        IF (NEW.ownercat_id IS NULL) THEN
-            NEW.ownercat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='ownercat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-        END IF;
-		
-		-- Soilcat_id
-        IF (NEW.soilcat_id IS NULL) THEN
-            NEW.soilcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='soilcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-        END IF;
+		IF (NEW.ownercat_id IS NULL) THEN
+		    NEW.ownercat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='ownercat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
 			
+		-- Soilcat_id
+		IF (NEW.soilcat_id IS NULL) THEN
+		    NEW.soilcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='soilcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
+				
 		--Builtdate
 		IF (NEW.builtdate IS NULL) THEN
 			NEW.builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;
 		
 		-- Verified
-        IF (NEW.verified IS NULL) THEN
-            NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-        END IF;
+		IF (NEW.verified IS NULL) THEN
+		    NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
 
 		SELECT code_autofill INTO v_code_autofill_bool FROM connec_type join cat_connec on connec_type.id=cat_connec.connectype_id where cat_connec.id=NEW.connecat_id;
 		
@@ -318,12 +312,12 @@ BEGIN
 			NEW.code=NEW.connec_id;
 		END IF;	 
 		
-	    -- LINK
-	    IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_automatic_insert_link')::boolean=TRUE THEN
-	       NEW.link=NEW.connec_id;
-	    END IF;
+		-- LINK
+		IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_automatic_insert_link')::boolean=TRUE THEN
+			NEW.link=NEW.connec_id;
+		END IF;
 
-	    -- Customer code  
+		-- Customer code  
 		IF NEW.customer_code IS NULL AND (SELECT (value::json->>'status')::boolean FROM config_param_system WHERE parameter = 'customer_code_autofill') IS TRUE
 		AND (SELECT (value::json->>'field')::text FROM config_param_system WHERE parameter = 'customer_code_autofill')='code'  THEN
 		
@@ -381,7 +375,7 @@ BEGIN
 				(SELECT id FROM v_ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
 		END IF; 	
 
-        -- FEATURE INSERT
+		-- FEATURE INSERT
 		INSERT INTO connec (connec_id, code, elevation, depth,connecat_id,  sector_id, customer_code,  state, state_type, annotation, observ, comment,dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type, 
 		workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, streetaxis2_id, postnumber, postnumber2, muni_id, streetaxis_id, postcode, postcomplement, postcomplement2, descript, link, verified, rotation, 
 		the_geom, undelete, label_x,label_y,label_rotation, expl_id, publish, inventory,num_value, connec_length, arc_id, minsector_id, dqa_id, staticpressure) 
@@ -443,7 +437,7 @@ BEGIN
 				EXECUTE 'UPDATE '||v_man_table||' SET pol_id = '''||v_auto_pol_id||''' WHERE connec_id = '''||NEW.connec_id||''';';
 			END IF;
 
-	    END IF;
+		END IF;
 
 		
 		IF NEW.state=1 THEN
