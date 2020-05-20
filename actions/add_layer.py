@@ -186,10 +186,16 @@ class AddLayer(object):
                         color_values = {'NEW': QColor(0, 255, 0), 'DUPLICATED': QColor(255, 0, 0),
                                         'EXISTS': QColor(240, 150, 0)}
                         self.categoryze_layer(v_layer, cat_field, size, color_values)
+                    else:
+                        if geometry_type == 'Point':
+                            v_layer.renderer().symbol().setSize(3.5)
+                            v_layer.renderer().symbol().setColor(QColor("red"))
+                        elif geometry_type == 'LineString':
+                            v_layer.renderer().symbol().setWidth(1.5)
+                            v_layer.renderer().symbol().setColor(QColor("red"))
+                        v_layer.renderer().symbol().setOpacity(0.7)
                     temp_layers_added.append(v_layer)
-                    v_layer.setOpacity(0.7)
-                    self.iface.setActiveLayer(v_layer)
-
+                    self.iface.layerTreeView().refreshLayerSymbology(v_layer.id())
         return {'text_result': text_result, 'temp_layers_added': temp_layers_added}
 
 
