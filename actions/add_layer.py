@@ -175,8 +175,9 @@ class AddLayer(object):
                             self.v_layer.renderer().symbol().setWidth(1.5)
                             self.v_layer.renderer().symbol().setColor(QColor("red"))
                     self.v_layer.renderer().symbol().setOpacity(0.7)
-                    temp_layers_added.append(self.v_layer)
                     self.iface.layerTreeView().refreshLayerSymbology(self.v_layer.id())
+                    temp_layers_added.append(self.v_layer)
+
         return {'text_result':text_result, 'temp_layers_added':temp_layers_added}
 
 

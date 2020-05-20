@@ -219,6 +219,15 @@ class CrmTrace(ApiParent):
                     if 'qmlPath' in data[k]:
                         qml_path = data[k]['qmlPath']
                         self.load_qml(v_layer, qml_path)
+                    else:
+                        if geometry_type == 'Point':
+                            v_layer.renderer().symbol().setSize(3.5)
+                            v_layer.renderer().symbol().setColor(QColor("red"))
+                        elif geometry_type == 'LineString':
+                            v_layer.renderer().symbol().setWidth(1.5)
+                            v_layer.renderer().symbol().setColor(QColor("red"))
+                    v_layer.renderer().symbol().setOpacity(0.7)
+                    iface.layerTreeView().refreshLayerSymbology(v_layer.id())
                 else:
                     self.controller.log_info("No data found")
 
@@ -257,9 +266,9 @@ class CrmTrace(ApiParent):
         QgsProject.instance().addMapLayer(virtual_layer, False)
 
         root = QgsProject.instance().layerTreeRoot()
-        my_group = root.findGroup('GW Functions results')
+        my_group = root.findGroup('GW Temporal Layers')
         if my_group is None:
-            my_group = root.insertGroup(0, 'GW Functions results')
+            my_group = root.insertGroup(0, 'GW Temporal Layers')
 
         my_group.insertLayer(0, virtual_layer)
 
