@@ -420,12 +420,8 @@ BEGIN
 						
 						GET DIAGNOSTICS v_affectrows = row_count;
 						EXIT WHEN v_affectrows = 0;
-						EXIT WHEN v_count = 150;
-						
-						v_count = v_count + v_affectrows;
+						EXIT WHEN v_count = 200;
 
-						--raise notice 'Counter % Feature_id % Affected rows % ', v_count, v_featureid, v_affectrows;
-						
 					END LOOP;
 					
 					-- finish engine
@@ -450,8 +446,7 @@ BEGIN
 					AND cur_user=current_user;			
 				
 					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
-					VALUES (v_fprocesscat_id, 1, concat('INFO: ', v_class ,' for node: ',v_featureid ,' have been processed. ARCS (', v_count1, '), NODES (', v_count2, '), 
-					CONNECS (', v_count3,')'));
+					VALUES (v_fprocesscat_id, 1, concat('INFO: ', v_class ,' for node: ',v_featureid ,' have been processed. ARCS (', v_count1, '), NODES (', v_count2, '), CONNECS (', v_count3,')'));
 
 				END LOOP;
 
@@ -520,6 +515,18 @@ BEGIN
 					-- message
 					INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 					VALUES (v_fprocesscat_id, 2, concat('WARNING: Attribute ', v_class ,' on arc/node/connec features have been updated by this process'));
+
+					-- disconnected arcs
+					SELECT count(*) INTO v_count FROM v_edit_arc WHERE arc_id NOT IN 
+					(SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id);
+					INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message)
+					VALUES (v_fprocesscat_id, 2, concat('WARNING: ', v_count ,' arcs have been disconnected'));
+
+					-- disconnected connecs
+					SELECT count(*) INTO v_count FROM v_edit_connec c WHERE arc_id NOT IN 
+					(SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id);
+					INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message)
+					VALUES (v_fprocesscat_id, 2, concat('WARNING: ', v_count ,' connecs have been disconnected'));
 				ELSE
 					-- message
 					INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
@@ -587,7 +594,7 @@ BEGIN
 				IF v_updatemapzgeom > 0 THEN
 					-- message
 					INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-					VALUES (v_fprocesscat_id, 2, concat('WARNING: Geometry of mapzone ',v_class ,' have been modified by this process'));
+					VALUES (v_fprocesscat_id, 1, concat('INFO: Geometry of mapzone ',v_class ,' have been modified by this process'));
 				END IF;
 
 				-- insert spacer for warning and info
