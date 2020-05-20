@@ -54,7 +54,6 @@ class CrmTrace(ApiParent):
 
         # Get selected 'exploitation'
         expl_name = utils_giswater.getWidgetText(self.dlg_trace, 'cbo_expl')
-        self.controller.log_info(str(expl_name))
 
         # Execute synchronization script
         status = self.execute_script(expl_name)
@@ -178,7 +177,7 @@ class CrmTrace(ApiParent):
 
         # Process result
         result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-        self.controller.log_info(str(row[0]))
+        #self.controller.log_info(str(row[0]))
         if 'status' not in result[0]:
             self.controller.show_warning("Parameter not found", parameter="status")
             return False
@@ -190,7 +189,7 @@ class CrmTrace(ApiParent):
             if 'body' in result[0]:
                 if 'data' in result[0]['body']:
                     data = result[0]['body']['data']
-                    tab_main = self.dlg_trace.tab_main
+                    tab_main = self.dlg_trace.mainTab
                     txt_infolog = self.dlg_trace.txt_infolog
                     self.add_temp_layer(self.dlg_trace, tab_main, txt_infolog, data, function_name)
 
@@ -209,7 +208,7 @@ class CrmTrace(ApiParent):
         for k, v in list(data.items()):
             if str(k) == "info":
                 self.controller.log_info("populate_info_text")
-                self.populate_info_text(dialog, tab_main, txt_infolog, data)
+                self.populate_info_text(dialog, data)
             else:
                 counter = len(data[k]['values'])
                 if counter > 0:

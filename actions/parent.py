@@ -846,10 +846,11 @@ class ParentAction(object):
     def populate_info_text(self, dialog, data, force_tab=True, reset_text=True, tab_idx=1):
 
         change_tab = False
-        text = utils_giswater.getWidgetText(dialog, dialog.txt_infolog, return_string_null=False)
+        text = utils_giswater.getWidgetText(dialog, 'txt_infolog', return_string_null=False)
 
         if reset_text:
             text = ""
+
         for item in data['info']['values']:
             if 'message' in item:
                 if item['message'] is not None:
@@ -860,7 +861,7 @@ class ParentAction(object):
                     text += "\n"
 
         utils_giswater.setWidgetText(dialog, 'txt_infolog', text+"\n")
-        qtabwidget = dialog.findChild(QTabWidget,'mainTab')
+        qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
         if change_tab and qtabwidget is not None:
             qtabwidget.setCurrentIndex(tab_idx)
 
