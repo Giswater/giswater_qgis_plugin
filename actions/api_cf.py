@@ -154,10 +154,10 @@ class ApiCF(ApiParent, QObject):
         parent_menu = action.associatedWidgets()[0]
         layer = self.controller.get_layer_by_layername(parent_menu.title())
         if layer:
-            table_name = self.controller.get_layer_source(layer)
+            layer_source = self.controller.get_layer_source(layer)
             self.iface.setActiveLayer(layer)
             complet_result, dialog = self.open_form(
-                table_name=table_name['table'], feature_id=action.text(), tab_type=tab_type, docker=docker)
+                table_name=layer_source['table'], feature_id=action.text(), tab_type=tab_type, docker=docker)
             self.draw(complet_result)
 
 

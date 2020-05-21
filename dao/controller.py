@@ -163,13 +163,15 @@ class DaoController(object):
         
         self.layer_source, not_version = self.get_layer_source_from_credentials()
         if self.layer_source:
-            if self.layer_source['db'] is None or self.layer_source['host'] is None or self.layer_source['user'] is None \
-                    or self.layer_source['password'] is None or self.layer_source['port'] is None:
+            if self.layer_source['service'] is None and (self.layer_source['db'] is None
+                or self.layer_source['host'] is None or self.layer_source['user'] is None
+                or self.layer_source['password'] is None or self.layer_source['port'] is None):
                 return False, not_version
         else:
             return False, not_version
 
         self.logged = True
+
         return True, not_version
     
 
@@ -259,8 +261,10 @@ class DaoController(object):
             self.last_error = self.tr("Layer not found") + ": 'v_edit_node'"
             return None, not_version
 
+        # Get sslmode from user config file
         self.manage_user_config_file()
         sslmode = self.get_user_setting_value('sslmode', 'disable')
+        self.log_info(f"sslmode user config file: {sslmode}")
 
         if layer:
             not_version = False
@@ -281,7 +285,7 @@ class DaoController(object):
             not_version = True
             default_connection = settings.value('selected')
             settings.endGroup()
-            credentials = {'db': None, 'schema': None, 'table': None,
+            credentials = {'db': None, 'schema': None, 'table': None, 'service': None,
                            'host': None, 'port': None, 'user': None, 'password': None, 'sslmode': None}
             if default_connection:
                 settings.beginGroup("PostgreSQL/connections/" + default_connection)
@@ -313,13 +317,18 @@ class DaoController(object):
     def connect_to_database_credentials(self, credentials, conn_info=None, max_attempts=2):
         """ Connect to database with selected database @credentials """
 
+        # Check if credential parameter 'service' is set
+        if credentials['service']:
+            logged = self.connect_to_database_service(credentials['service'], credentials['sslmode'])
+            return logged, credentials
+
         attempt = 0
         logged = False
         while not logged and attempt <= max_attempts:
             attempt += 1
             if conn_info and attempt > 1:
-                (success, credentials['user'], credentials['password']) = QgsCredentials.instance().get(conn_info,
-                    credentials['user'], credentials['password'])
+                (success, credentials['user'], credentials['password']) = \
+                    QgsCredentials.instance().get(conn_info, credentials['user'], credentials['password'])
             logged = self.connect_to_database(credentials['host'], credentials['port'], credentials['db'],
                 credentials['user'], credentials['password'], credentials['sslmode'])
 
@@ -328,7 +337,9 @@ class DaoController(object):
     
     def connect_to_database(self, host, port, db, user, pwd, sslmode):
         """ Connect to database with selected parameters """
-        
+
+        self.log_info(f"connect_to_database - sslmode: {sslmode}")
+
         # Check if selected parameters is correct
         if None in (host, port, db, user, pwd):
             message = "Database connection error. Please check your connection parameters."
@@ -367,13 +378,19 @@ class DaoController(object):
         return status
 
 
-    def connect_to_database_service(self, service):
+    def connect_to_database_service(self, service, sslmode=None):
         """ Connect to database trough selected service
         This service must exist in file pg_service.conf """
 
+        conn_string = f"service={service}"
+        if sslmode:
+            conn_string += f" sslmode={sslmode}"
+
+        self.log_info(f"connect_to_database_service: {conn_string}")
+
         # We need to create this connections for Table Views
         self.db = QSqlDatabase.addDatabase("QPSQL")
-        self.db.setConnectOptions(f"service={service}")
+        self.db.setConnectOptions(conn_string)
         status = self.db.open()
         if not status:
             message = "Database connection error (QSqlDatabase). Please open plugin log file to get more details"
@@ -384,7 +401,7 @@ class DaoController(object):
 
         # Connect to Database
         self.dao = PgDao()
-        self.dao.set_service(service)
+        self.dao.set_conn_string(conn_string)
         status = self.dao.init_db()
         if not status:
             message = "Database connection error (PgDao). Please open plugin log file to get more details"
@@ -959,20 +976,28 @@ class DaoController(object):
         """ Get database connection paramaters of @layer """
 
         # Initialize variables
-        layer_source = {'db': None, 'schema': None, 'table': None, 
+        layer_source = {'db': None, 'schema': None, 'table': None, 'service': None,
                         'host': None, 'port': None, 'user': None, 'password': None, 'sslmode': None}
 
         if layer is None:
             return layer_source
 
-        # Get dbname, host, port, user and password
+        # Get uri to parse it
         uri = layer.dataProvider().dataSourceUri()
+
+        # Check if service is set
+        pos_service = uri.find('service=')
+        pos_sslmode = uri.find(' sslmode=')
+        if pos_service != -1 and pos_sslmode != -1:
+            uri_service = uri[pos_service + 9:pos_sslmode]
+            layer_source['service'] = uri_service.replace("'", "")
+
+        # Get dbname, host, port, user and password
         pos_db = uri.find('dbname=')
         pos_host = uri.find(' host=')
         pos_port = uri.find(' port=')
         pos_user = uri.find(' user=')
         pos_password = uri.find(' password=')
-        pos_sslmode = uri.find(' sslmode=')        
         pos_key = uri.find(' key=')        
         if pos_db != -1 and pos_host != -1:
             uri_db = uri[pos_db + 8:pos_host - 1]

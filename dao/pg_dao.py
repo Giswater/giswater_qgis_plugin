@@ -89,9 +89,16 @@ class PgDao(object):
             self.conn_string += f" password={self.password}"
 
 
-    def set_service(self, service):
+    def set_conn_string(self, conn_string):
+
+        self.conn_string = conn_string
+
+
+    def set_service(self, service, sslmode=None):
 
         self.conn_string = f"service={service}"
+        if sslmode:
+            self.conn_string += f" sslmode={sslmode}"
 
         
     def mogrify(self, sql, params):
