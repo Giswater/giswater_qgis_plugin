@@ -2158,7 +2158,7 @@ class UpdateSQL(ApiParent):
     def process_folder(self, folderPath, filePattern):
 
         try:
-            self.controller.log_info(str(sorted(os.listdir(folderPath + filePattern))))
+            os.listdir(folderPath + filePattern)
             return True
         except Exception:
             return False
@@ -2378,7 +2378,7 @@ class UpdateSQL(ApiParent):
         status = False
         try:
             filepath = filedir + os.sep + file
-            f = open(filepath, 'r')
+            f = open(filepath, 'r', encoding="utf8")
             if f:
                 f_to_read = str(f.read().replace("SCHEMA_NAME", schema_name).replace("SRID_VALUE", filter_srid_value))
                 if self.dev_commit == 'TRUE':
