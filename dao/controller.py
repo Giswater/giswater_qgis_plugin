@@ -1315,19 +1315,23 @@ class DaoController(object):
     def check_role(self, role_name):
         """ Check if @role_name exists """
         
-        sql = ("SELECT * FROM pg_roles WHERE lower(rolname) = '" + role_name + "'")
+        sql = f"SELECT * FROM pg_roles WHERE lower(rolname) = '{role_name}'"
         row = self.get_row(sql, log_info=False)
         return row
     
     
     def check_role_user(self, role_name, username=None):
         """ Check if current user belongs to @role_name """
-        
+
+        # Check both @role_name and @username exists
         if not self.check_role(role_name):
             return False
 
         if username is None:
             username = self.user
+
+        if not self.check_role(username):
+            return False
 
         sql = ("SELECT pg_has_role('" + username + "', '" + role_name + "', 'MEMBER');")
         row = self.get_row(sql)

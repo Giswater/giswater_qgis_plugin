@@ -303,6 +303,10 @@ class UpdateSQL(ApiParent):
         self.update_manage_ui()
         self.visit_manager()
 
+        if not self.controller.check_role(self.username) and not show_dialog:
+            self.controller.log_warning(f"User not found: {self.username}")
+            return
+
         role_admin = self.controller.check_role_user("role_admin", self.username)
         if not role_admin and self.username not in self.super_users:
             msg = "You don't have permissions to administrate project schemas on this connection"
