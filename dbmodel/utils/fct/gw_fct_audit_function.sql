@@ -8,7 +8,6 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2116
 
 
-
 DROP FUNCTION IF EXISTS SCHEMA_NAME.audit_function (integer, integer, text);
 DROP FUNCTION IF EXISTS SCHEMA_NAME.audit_function (integer, integer);
 

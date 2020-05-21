@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 2798
+--FUNCTION CODE: 2906
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_advancedsettings(p_result text)
 RETURNS integer 

@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 2642
+--FUNCTION CODE: 2644
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_setvisitmanagerend(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setvisitmanagerend(p_data json)

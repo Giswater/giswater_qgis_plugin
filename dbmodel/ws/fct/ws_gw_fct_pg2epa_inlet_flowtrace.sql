@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 -- The code of this inundation function have been provided by Enric Amat (FISERSA)
 
 
---FUNCTION CODE: 2680
+--FUNCTION CODE: 2902
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_inlet_flowtrace(p_result_id text)
 RETURNS integer AS

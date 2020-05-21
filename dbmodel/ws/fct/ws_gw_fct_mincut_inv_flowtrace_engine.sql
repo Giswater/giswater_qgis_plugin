@@ -4,10 +4,10 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 2322
+--FUNCTION CODE: 2324
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_mincut_inverted_flowtrace_engine(character varying, integer);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut_inverted_flowtrace_engine(    node_id_arg character varying,    result_id_arg integer)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut_inverted_flowtrace_engine(node_id_arg character varying, result_id_arg integer)
 RETURNS void AS
 $BODY$
 DECLARE

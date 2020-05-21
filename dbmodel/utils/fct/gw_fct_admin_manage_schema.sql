@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 2084
+--FUNCTION CODE: 2804
 
 --drop function SCHEMA_NAME.gw_fct_admin_manage_schema(json)
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_manage_schema(p_data json)

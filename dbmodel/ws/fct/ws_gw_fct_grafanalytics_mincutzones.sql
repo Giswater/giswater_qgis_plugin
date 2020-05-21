@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 -- The code of this inundation function have been provided by Enric Amat (FISERSA)
 
---FUNCTION CODE: 2710
+--FUNCTION CODE: 2712
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_grafanalytics_mincutzones(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_grafanalytics_mincutzones(p_data json)

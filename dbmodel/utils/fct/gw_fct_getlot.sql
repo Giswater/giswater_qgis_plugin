@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 2640
+--FUNCTION CODE: 2898
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_getlot(p_data json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getlot(p_data json)

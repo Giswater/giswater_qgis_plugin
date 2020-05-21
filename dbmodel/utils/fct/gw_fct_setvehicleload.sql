@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 2884
+--FUNCTION CODE: 2912
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_setvehicleload(json);
 CREATE OR REPLACE FUNCTION gw_fct_setvehicleload(p_data json)

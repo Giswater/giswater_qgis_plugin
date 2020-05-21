@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 2846
+--FUNCTION CODE: 2908
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa_vdefault(p_data json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_vdefault(p_data json)
