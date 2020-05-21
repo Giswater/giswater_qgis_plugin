@@ -33,7 +33,7 @@ v_hs float;
 v_vs float;
 v_arc json;
 v_node json;
-v_vnode json;
+v_terrain json;
 v_llegend json;
 v_stylesheet json;
 v_version text;
@@ -74,6 +74,7 @@ v_compheight float;
 v_compwidth float;
 v_profheigtht float;
 v_profwidth float;
+v_error_context text;
 
 -- field variables to work with UD/WS
 v_fcatgeom text;
@@ -219,7 +220,6 @@ BEGIN
 			END IF;			
 		END LOOP;
 	END IF;
-	
 
 	-- update descript
 	EXECUTE 'UPDATE anl_arc SET descript = a.descript FROM (SELECT arc_id, (row_to_json(row)) AS descript FROM ('||v_textarc||')row)a WHERE a.arc_id = anl_arc.arc_id';
@@ -341,12 +341,16 @@ BEGIN
 	FROM (SELECT arc_id, descript, cat_geom1, length, z1, z2, y1, y2, elev1, elev2, node_1, node_2 FROM anl_arc WHERE fprocesscat_id=122 AND cur_user = current_user) row;
 
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(row))) FROM (SELECT node_id, descript, sys_type, cat_geom1, '||
-		v_ftopelev||' AS top_elev, elev, '||v_fymax||' AS ymax FROM anl_node WHERE fprocesscat_id=122 AND cur_user = current_user AND nodecat_id != ''VNODE'' ORDER BY total_distance) row'
-		INTO v_node;
+			v_ftopelev||' AS top_elev, elev, '||v_fymax||' AS ymax FROM anl_node WHERE fprocesscat_id=122 AND cur_user = current_user AND nodecat_id != ''VNODE'' ORDER BY total_distance) row'
+			INTO v_node;
 
-	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(row))) FROM (SELECT node_id, descript, sys_type, cat_geom1, '||
-		v_ftopelev||' AS top_elev, elev, '||v_fymax||' AS ymax FROM anl_node WHERE fprocesscat_id=122 AND cur_user = current_user AND nodecat_id = ''VNODE'' ORDER BY total_distance) row'
-		INTO v_vnode;
+	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(row))) FROM (
+			WITH querytext AS (SELECT row_number() over (order by total_distance) as rid, * FROM anl_node where fprocesscat_id = 122 AND cur_user = current_user ORDER by total_distance)
+			select row_number() over (order by a.total_distance) as rid, a.'||v_ftopelev||' as top_n1, b.'||v_ftopelev||' as top_n2, (b.'||v_ftopelev||'-a.'||v_ftopelev||')::numeric(12,3) as delta_y, 
+			b.total_distance - a.total_distance as delta_x, a.total_distance as total_x, a.descript as label_n1 from querytext a
+			join querytext b ON a.rid = b.rid-1 
+			join (select * from anl_arc where fprocesscat_id = 122 AND cur_user = current_user) c ON a.arc_id = c.arc_id) row'
+			INTO v_terrain;
 
 	-- control null values
 	IF v_guitarlegend IS NULL THEN v_guitarlegend='{}'; END IF;
@@ -371,14 +375,12 @@ BEGIN
 			'"extension":'||v_extension||','||
 			'"stylesheet":'||v_stylesheet||','||
 			'"node":'||v_node||','||
-			'"arc":'||v_arc||','||
-			'"vnode":'||v_vnode||'}}}')::json;
-
+			'"terrain":'||v_terrain||','||
+			'"arc":'||v_arc||'}}}')::json;
 	
-
 	--EXCEPTION WHEN OTHERS THEN
-	--GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	--RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 	
 END;
 $BODY$
