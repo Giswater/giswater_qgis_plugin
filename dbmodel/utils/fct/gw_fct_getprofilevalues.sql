@@ -33,6 +33,7 @@ v_hs float;
 v_vs float;
 v_arc json;
 v_node json;
+v_vnode json;
 v_llegend json;
 v_stylesheet json;
 v_version text;
@@ -164,7 +165,7 @@ BEGIN
 
 	-- insert edge values on anl_arc table
 	EXECUTE 'INSERT INTO anl_arc (fprocesscat_id, arc_id, code, node_1, node_2, sys_type, arccat_id, cat_geom1, length, slope, total_length, z1, z2, y1, y2, elev1, elev2)
-		SELECT  122, arc_id, code, node_id, node_2, sys_type, arccat_id, '||v_fcatgeom||', gis_length, '||v_fslope||', total_length, '||v_z1||', '||v_z2||', '||v_y1||', '||v_y2||', '
+		SELECT  122, arc_id, code, node_id, case when node_1=node_id then node_2 else node_1 end as node_2, sys_type, arccat_id, '||v_fcatgeom||', gis_length, '||v_fslope||', total_length, '||v_z1||', '||v_z2||', '||v_y1||', '||v_y2||', '
 		||v_elev1||', '||v_elev2||' FROM v_edit_arc b JOIN cat_arc ON arccat_id = id JOIN 
 		(SELECT edge::text AS arc_id, node::text AS node_id, agg_cost as total_length FROM pgr_dijkstra(''SELECT arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, gis_length::float as cost, 
 		gis_length::float as reverse_cost FROM v_edit_arc'', '||v_init||','||v_end||'))a
@@ -340,8 +341,12 @@ BEGIN
 	FROM (SELECT arc_id, descript, cat_geom1, length, z1, z2, y1, y2, elev1, elev2, node_1, node_2 FROM anl_arc WHERE fprocesscat_id=122 AND cur_user = current_user) row;
 
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(row))) FROM (SELECT node_id, descript, sys_type, cat_geom1, '||
-		v_ftopelev||' AS top_elev, elev, '||v_fymax||' AS ymax FROM anl_node WHERE fprocesscat_id=122 AND cur_user = current_user) row'
+		v_ftopelev||' AS top_elev, elev, '||v_fymax||' AS ymax FROM anl_node WHERE fprocesscat_id=122 AND cur_user = current_user AND nodecat_id != ''VNODE'' ORDER BY total_distance) row'
 		INTO v_node;
+
+	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(row))) FROM (SELECT node_id, descript, sys_type, cat_geom1, '||
+		v_ftopelev||' AS top_elev, elev, '||v_fymax||' AS ymax FROM anl_node WHERE fprocesscat_id=122 AND cur_user = current_user AND nodecat_id = ''VNODE'' ORDER BY total_distance) row'
+		INTO v_vnode;
 
 	-- control null values
 	IF v_guitarlegend IS NULL THEN v_guitarlegend='{}'; END IF;
@@ -366,7 +371,8 @@ BEGIN
 			'"extension":'||v_extension||','||
 			'"stylesheet":'||v_stylesheet||','||
 			'"node":'||v_node||','||
-			'"arc":'||v_arc||'}}}')::json;
+			'"arc":'||v_arc||','||
+			'"vnode":'||v_vnode||'}}}')::json;
 
 	
 
