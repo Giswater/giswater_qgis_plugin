@@ -32,3 +32,25 @@ INSERT INTO config_typevalue_fk(typevalue_table, typevalue_name, target_table, t
 VALUES ('edit_typevalue','value_verified', 'connec', 'verified') ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;	
 
 UPDATE config_form_fields SET dv_querytext = 'SELECT id, id as idval FROM edit_typevalue WHERE typevalue = ''value_verified''' where column_id = 'verified';
+
+--2020/05/23
+UPDATE sys_function SET isdeprecated = true WHERE id = 2224;
+UPDATE sys_function SET isdeprecated = true WHERE id = 2226;
+UPDATE sys_function SET function_name = 'gw_fct_rpt2pg_main' WHERE id = 2232;
+UPDATE sys_function SET isdeprecated = true WHERE id = 2308;
+UPDATE sys_function SET isdeprecated = true WHERE id = 2310;
+UPDATE sys_function SET isdeprecated = false WHERE id = 2322;
+UPDATE sys_function SET id = 2300 WHERE id = 2300;
+UPDATE sys_function SET id = 2324 WHERE id = 2402;
+UPDATE sys_function SET isdeprecated = false WHERE id = 2506;
+UPDATE sys_function SET id = 2556 WHERE id = 2554;
+UPDATE sys_function SET function_type ='function' WHERE id = 2720;
+UPDATE sys_function SET project_type ='utils' WHERE id = 2772;
+UPDATE sys_function SET project_type ='utils' WHERE id = 2790;
+UPDATE sys_function SET isdeprecated = true WHERE id = 2852;
+
+DELETE FROM sys_function WHERE id = 2704;
+DELETE FROM sys_function WHERE id = 2414;
+DELETE FROM sys_function WHERE id = 2860;
+DELETE FROM sys_function WHERE id = 2858;
+DELETE FROM sys_function WHERE id = 2434;
