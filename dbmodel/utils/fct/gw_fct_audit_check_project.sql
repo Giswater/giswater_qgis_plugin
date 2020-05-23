@@ -174,8 +174,10 @@ BEGIN
 	END IF;
 	
 	--Set hydrology_selector when null values from user
-	IF v_project_type='UD' AND (SELECT hydrology_id FROM selector_inp_hydrology WHERE cur_user = current_user) IS NULL THEN
-		INSERT INTO selector_inp_hydrology (hydrology_id, cur_user) VALUES (1, current_user);
+	IF v_project_type='UD' THEN
+		IF (SELECT hydrology_id FROM selector_inp_hydrology WHERE cur_user = current_user) IS NULL THEN
+			INSERT INTO selector_inp_hydrology (hydrology_id, cur_user) VALUES (1, current_user);
+		END IF;
 	END IF;
 
 	--Reset the rest of sequences
@@ -333,7 +335,7 @@ BEGIN
 	END IF;
 
 	-- force hydrometer_selector
-	IF (select id FROM selector_hydrometer WHERE cur_user = current_user limit 1) IS NULL THEN
+	IF (select cur_user FROM selector_hydrometer WHERE cur_user = current_user limit 1) IS NULL THEN
 		INSERT INTO selector_hydrometer (state_id, cur_user) 
 		SELECT id, current_user FROM ext_rtc_hydrometer_state ON CONFLICT (state_id, cur_user) DO NOTHING;
 	END IF;

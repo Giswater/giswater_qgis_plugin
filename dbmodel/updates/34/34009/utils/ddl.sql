@@ -169,9 +169,10 @@ ALTER TABLE config_api_visit_x_featuretable RENAME TO config_visit_x_feature;
 
 
 ALTER TABLE config_api_visit RENAME TO _config_api_visit_;
+ALTER TABLE sys_sequence RENAME TO _sys_sequence_;
+
 
 ALTER SEQUENCE SCHEMA_NAME.config_api_form_fields_id_seq RENAME TO config_form_fields_id_seq;
-
 
 ALTER SEQUENCE SCHEMA_NAME.config_api_form_groupbox_id_seq RENAME TO config_form_groupbox_id_seq;
 ALTER SEQUENCE SCHEMA_NAME.config_api_form_id_seq RENAME TO config_form_id_seq;
@@ -187,6 +188,9 @@ ALTER SEQUENCE SCHEMA_NAME.sys_csv2pg_config_id_seq RENAME TO config_csv_param_i
 ALTER SEQUENCE SCHEMA_NAME.sample_id_seq RENAME TO samplepoint_id_seq;
 ALTER SEQUENCE SCHEMA_NAME.audit_log_arc_traceability_id_seq RENAME TO audit_arc_traceability_id_seq;
 ALTER SEQUENCE SCHEMA_NAME.typevalue_fk_id_seq RENAME TO config_typevalue_fk_id_seq;
+
+DROP SEQUENCE IF EXISTS SCHEMA_NAME.config_api_visit_cat_multievent_id_seq;
+
 
 ALTER TABLE config_toolbox ADD CONSTRAINT config_toolbox_id_fkey FOREIGN KEY (id)
 REFERENCES sys_function (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;

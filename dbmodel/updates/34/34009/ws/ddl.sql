@@ -71,3 +71,4 @@ ALTER SEQUENCE SCHEMA_NAME.anl_mincut_result_node_id_seq RENAME TO om_mincut_nod
 ALTER SEQUENCE SCHEMA_NAME.anl_mincut_result_polygon_id_seq RENAME TO om_mincut_polygon_id_seq;
 ALTER SEQUENCE SCHEMA_NAME.anl_mincut_result_valve_id_seq RENAME TO om_mincut_valve_id_seq;
 ALTER SEQUENCE SCHEMA_NAME.anl_mincut_result_valve_unaccess_id_seq RENAME TO om_mincut_valve_unaccess_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.anl_mincut_result_polygon_polygon_seq RENAME TO om_mincut_polygon_polygon_seq;

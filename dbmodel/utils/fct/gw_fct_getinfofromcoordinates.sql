@@ -32,6 +32,8 @@ SELECT SCHEMA_NAME.gw_fct_getinfofromcoordinates($${
 			"toolBar":"epa",
 			"coordinates":{"epsg":25831, "xcoord":419204.96, "ycoord":4576509.27, "zoomRatio":1000}}}$$)
 
+ SELECT gw_fct_getinfofromcoordinates($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic", "rolePermissions":"None", "activeLayer":"", "visibleLayer":["v_edit_arc", "v_edit_dma", "v_edit_connec", "v_edit_element", "v_edit_node", "v_edit_link", "v_edit_sector", "v_edit_exploitation"], "addSchema":"None", "infoType":"None", "projecRole":"None", "coordinates":{"xcoord":418911.7807826943,"ycoord":4576796.706092382, "zoomRatio":5804.613871393841}}}$$);
+
 */
 
 DECLARE
@@ -53,10 +55,10 @@ v_sql2 text;
 v_iseditable text;
 v_return json;
 v_idname text;
-schemas_array text[];
+v_schemaname text;
 v_count int2=0;
 v_geometrytype text;
-api_version text;
+v_apiversion text;
 v_the_geom text;
 v_config_layer text;
 v_toolbar text;
@@ -67,14 +69,15 @@ v_projectrole text;
 v_flag boolean = false;
 v_infotype text;
 
+
 BEGIN
 
 	--  Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
-	schemas_array := current_schemas(FALSE);
+	v_schemaname := 'SCHEMA_NAME';
 
 	--  get system parameters
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'  INTO api_version;
+	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'  INTO v_apiversion;
 
 	-- get input parameters
 	v_device := (p_data ->> 'client')::json->> 'device';
@@ -153,7 +156,7 @@ BEGIN
 			AND s.nspname = $2
 			ORDER BY a.attnum LIMIT 1'
 			INTO v_idname
-			USING v_layer.layer_id, schemas_array[1];
+			USING v_layer.layer_id, v_schemaname;
 
 		END IF;
 
@@ -168,7 +171,7 @@ BEGIN
                 AND left (pg_catalog.format_type(a.atttypid, a.atttypmod), 8)=''geometry''
                 ORDER BY a.attnum' 
 	        INTO v_the_geom
-	        USING v_layer.layer_id, schemas_array[1];
+	        USING v_layer.layer_id, v_schemaname;
 	        
 		IF v_layer.geomtype = 'polygon' THEN
 
@@ -199,14 +202,14 @@ BEGIN
 		
 		EXECUTE 'SET search_path = '||v_addschema||', public';
 		SELECT gw_api_getinfofromcoordinates(p_data) INTO v_return;
-		SET search_path = 'ws_sample', public;
+		SET search_path = 'SCHEMA_NAME', public;
 		RAISE NOTICE 'returned';
 		RETURN v_return;
 	END IF;
 	
 	-- Control NULL's
 	IF v_id IS NULL THEN
-		RETURN ('{"status":"Accepted", "message":{"level":0, "text":"No feature found"}, "results":0, "apiVersion":'|| api_version 
+		RETURN ('{"status":"Accepted", "message":{"level":0, "text":"No feature found"}, "results":0, "apiVersion":'|| v_apiversion 
 		||', "formTabs":[] , "tableName":"", "featureType": "","idName": "", "geometry":"", "linkPath":"", "editData":[] }')::json;
 	END IF;
 

@@ -142,7 +142,7 @@ BEGIN
 
 	-- check conduits (UD) with negative slope and inverted slope is not checked
 	IF v_project_type  ='UD' THEN
-		v_querytext = '(SELECT a.arc_id, arccat_id, a.the_geom FROM '||v_edit||'arc a WHERE sys_slope < 0 AND inverted_slope IS FALSE)';
+		v_querytext = '(SELECT a.arc_id, arccat_id, a.the_geom FROM '||v_edit||'arc a WHERE sys_slope < 0 AND inverted_slope IS FALSE) a';
 		
 		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 		IF v_count > 0 THEN
