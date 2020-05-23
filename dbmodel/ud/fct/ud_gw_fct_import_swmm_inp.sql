@@ -387,6 +387,9 @@ BEGIN
 	update dma SET the_geom=v_extend_val;
 	update ext_municipality SET the_geom=v_extend_val;
 
+	-- Create cat_mat_arc on import inp function
+	INSERT INTO cat_mat_arc	SELECT DISTINCT (matcat_id) FROM arc WHERE matcat_id IS NOT NULL;
+
 	-- Enable constraints
 	PERFORM gw_fct_admin_manage_ct($${"client":{"lang":"ES"},"data":{"action":"ADD"}}$$);
 
