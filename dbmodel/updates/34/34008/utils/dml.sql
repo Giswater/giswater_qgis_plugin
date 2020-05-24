@@ -11,6 +11,16 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 UPDATE audit_cat_table SET isdeprecated = true WHERE id = 'anl_mincut_arc_x_node';
 UPDATE audit_cat_table SET isdeprecated = true WHERE id = 'v_anl_mincut_flowtrace';
 
+INSERT INTO audit_cat_param_user (id, formname, descript, sys_role_id, label, isenabled, project_type, isparent , isautoupdate, datatype, widgettype,
+vdefault, ismandatory, isdeprecated, layoutname, layout_order)  VALUES
+('qgis_form_docker', 'config', 'Force use docker for forms(only for those forms that are normalized to be dockerized like mincut or profile)', 'role_basic', 'Force use docker for forms', true, 'utils', false, false, 'boolean', 'check', 'false', true, false, 'lyt_other', 21)
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO audit_cat_param_user (id, formname, descript, sys_role_id, label, isenabled, project_type, isparent , isautoupdate, datatype, widgettype,
+vdefault, ismandatory, isdeprecated, layoutname, layout_order)  VALUES
+('qgis_info_docker', 'config', 'Force use docker for info', 'role_basic', 'Force use docker for info', true, 'utils', false, false, 'boolean', 'check', 'false', true, false, 'lyt_other', 22)
+ON CONFLICT (id) DO NOTHING;
+
 UPDATE audit_cat_function SET
 alias = ''
 WHERE function_name = 'gw_fct_debug';

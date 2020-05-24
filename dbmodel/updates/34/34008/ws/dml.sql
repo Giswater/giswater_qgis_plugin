@@ -54,11 +54,6 @@ target = '{Link Results, MINIMUM Link, MAXIMUM Link, AVERAGE Link, DIFFERENTIAL 
 WHERE pg2csvcat_id = 11 AND tablename = 'rpt_arc';
 
 
-INSERT INTO audit_cat_param_user (id, formname, descript, sys_role_id, label, isenabled, project_type, isparent , isautoupdate, datatype, widgettype,
-vdefault, ismandatory, isdeprecated, layoutname, layout_order)  VALUES
-('qgis_form_docker', 'config', 'Force use docker for forms', 'role_basic', 'Force use docker for forms', true, 'utils', false, false, 'boolean', 'check', 'false', true, false, 'lyt_other', 21)
-ON CONFLICT (id) DO NOTHING;
-
 --29/04/2020
 UPDATE sys_feature_cat set epa_default = 'JUNCTION' WHERE id IN ('JUNCTION', 'EXPANSIONTANK', 'FLEXUNION', 'METER', 'HYDRANT','MANHOLE', 'WATERWELL','REGISTER', 'NETWJOIN','SOURCE','REDUCTION', 'NETSAMPLEPOINT', 'NETELEMENT');
 UPDATE sys_feature_cat set epa_default = 'TANK' WHERE id IN ('TANK');
