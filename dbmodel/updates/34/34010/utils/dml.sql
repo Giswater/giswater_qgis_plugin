@@ -237,3 +237,4 @@ UPDATE config_form_fields SET formname = 'visit_manager' WHERE formname = 'visit
 
 UPDATE sys_table SET sys_sequence = null WHERE id like 'v_inp_vertice';
 
+UPDATE sys_table SET id = 'config_exploitation_x_user' WHERE id = 'exploitation_x_user';

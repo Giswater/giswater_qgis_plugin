@@ -46,6 +46,7 @@ v_query_filter text;
 v_query_filteradd text;
 v_manageall boolean;
 v_typeaheadFilter text;
+v_expl_x_user boolean;
 
 BEGIN
 
@@ -60,6 +61,9 @@ BEGIN
 	v_selector_type := (p_data ->> 'data')::json->> 'selector_type';
 	v_selectors_list := (((p_data ->> 'data')::json->>'selector_type')::json ->>'mincut')::json->>'ids';
 
+	-- get system variables:
+	v_expl_x_user = (SELECT value FROM config_param_system WHERE parameter = 'sys_exploitation_x_user');
+	
 	-- Manage list ids
 	v_selectors_list = replace(replace(v_selectors_list, '[', '('), ']', ')');
 
@@ -87,6 +91,9 @@ BEGIN
 		v_manageall = v_parameter_selector->>'manageAll';
 		v_typeaheadFilter = v_parameter_selector->>'typeaheadFilter';
 
+		IF v_selector = 'selector_expl' AND v_expl_x_user THEN
+			v_query_filteradd = concat (v_query_filteradd, ' AND expl_id IN (SELECT expl_id FROM config_exploitation_x_user WHERE username = current_user)');
+		END IF;
 
 		-- Manage selectors list
 		IF v_selectors_list IS NULL THEN
@@ -141,14 +148,13 @@ BEGIN
 	
 	END LOOP;
 
--- Finish the construction of the tabs array
+	-- Finish the construction of the tabs array
 	v_formTabs := v_formTabs ||']';
 
-
--- Check null
+	-- Check null
 	v_formTabs := COALESCE(v_formTabs, '[]');	
 
--- Return
+	-- Return
 	IF v_firsttab IS FALSE THEN
 		-- Return not implemented
 		RETURN ('{"status":"Accepted"' ||
@@ -167,9 +173,9 @@ BEGIN
 		    '}')::json;
 	END IF;
 
--- Exception handling
---	EXCEPTION WHEN OTHERS THEN 
-		--RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN 
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;
