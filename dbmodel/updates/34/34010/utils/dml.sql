@@ -233,5 +233,6 @@ UPDATE sys_function SET function_name = 'gw_fct_import_ui_xml' WHERE function_na
 UPDATE sys_function SET function_name = 'gw_fct_import_ui_xml' WHERE function_name = 'gw_fct_utils_import_ui_xml';
 DELETE FROM sys_function WHERE function_name = 'gw_fct_mincut_inlet_flowtrace';
 
+UPDATE config_form_fields SET formname = 'visit_manager' WHERE formname = 'visitManager';
 
 
