@@ -165,7 +165,7 @@ BEGIN
 		END IF;
 		
 		RAISE NOTICE '1- Check subcatchments';
-		SELECT count(*) INTO v_count FROM v_edit_subcatchment WHERE outlet_id is null;
+		SELECT count(*) INTO v_count FROM v_edit_inp_subcatchment WHERE outlet_id is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (v_fprocesscat_id, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column outlet_id column.'));
@@ -175,17 +175,17 @@ BEGIN
 			VALUES (v_fprocesscat_id, v_result_id, 1, concat('INFO: Column oulet_id on subcatchment table have been checked without any values missed.'));
 		END IF;
 
-		SELECT count(*) INTO v_count FROM v_edit_subcatchment where rg_id is null;
+		SELECT count(*) INTO v_count FROM v_edit_inp_subcatchment where rg_id is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (v_fprocesscat_id, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column rg_id column.'));
+			VALUES (v_fprocesscat_id, v_result_id, 3, concat('ERROR: There is/are ',v_count,' inp_subcatchment(s) with null values on mandatory column rg_id column.'));
 			v_count=0;
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (v_fprocesscat_id, v_result_id, 1, concat('INFO: Column rg_id on scenario subcatchments have been checked without any values missed.'));
 		END IF;
 
-		SELECT count(*) INTO v_count FROM v_edit_subcatchment where area is null;
+		SELECT count(*) INTO v_count FROM v_edit_inp_subcatchment where area is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (v_fprocesscat_id, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column area column.'));
@@ -195,7 +195,7 @@ BEGIN
 			VALUES (v_fprocesscat_id, v_result_id, 1, concat('INFO: Column area on scenario subcatchments have been checked without any values missed.'));
 		END IF;
 
-		SELECT count(*) INTO v_count FROM v_edit_subcatchment where width is null;
+		SELECT count(*) INTO v_count FROM v_edit_inp_subcatchment where width is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (v_fprocesscat_id, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column width column.'));
@@ -205,7 +205,7 @@ BEGIN
 			VALUES (v_fprocesscat_id, v_result_id, 1, concat('INFO: Column width on scenario subcatchments have been checked without any values missed.'));
 		END IF;
 		
-		SELECT count(*) INTO v_count FROM v_edit_subcatchment where slope is null;
+		SELECT count(*) INTO v_count FROM v_edit_inp_subcatchment where slope is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (v_fprocesscat_id, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column slope column.'));
@@ -215,7 +215,7 @@ BEGIN
 			VALUES (v_fprocesscat_id, v_result_id, 1, concat('INFO: Column slope on scenario subcatchments have been checked without any values missed.'));
 		END IF;
 
-		SELECT count(*) INTO v_count FROM v_edit_subcatchment where clength is null;
+		SELECT count(*) INTO v_count FROM v_edit_inp_subcatchment where clength is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (v_fprocesscat_id, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column clength column.'));
@@ -225,7 +225,7 @@ BEGIN
 			VALUES (v_fprocesscat_id, v_result_id, 1, concat('INFO: Column clength on scenario subcatchments have been checked without any values missed.'));
 		END IF;
 
-		SELECT count(*) INTO v_count FROM v_edit_subcatchment where nimp is null;
+		SELECT count(*) INTO v_count FROM v_edit_inp_subcatchment where nimp is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (v_fprocesscat_id, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column nimp column.'));
@@ -235,7 +235,7 @@ BEGIN
 			VALUES (v_fprocesscat_id, v_result_id, 1, concat('INFO: Column nimp on scenario subcatchments have been checked without any values missed.'));
 		END IF;
 		
-		SELECT count(*) INTO v_count FROM v_edit_subcatchment where nperv is null;
+		SELECT count(*) INTO v_count FROM v_edit_inp_subcatchment where nperv is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (v_fprocesscat_id, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column nperv column.'));
@@ -245,7 +245,7 @@ BEGIN
 			VALUES (v_fprocesscat_id, v_result_id, 1, concat('INFO: Column nperv on scenario subcatchments have been checked without any values missed.'));
 		END IF;
 
-		SELECT count(*) INTO v_count FROM v_edit_subcatchment where simp is null;
+		SELECT count(*) INTO v_count FROM v_edit_inp_subcatchment where simp is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (v_fprocesscat_id, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column simp column.'));
@@ -255,7 +255,7 @@ BEGIN
 			VALUES (v_fprocesscat_id, v_result_id, 1, concat('INFO: Column simp on scenario subcatchments have been checked without any values missed.'));
 		END IF;
 
-		SELECT count(*) INTO v_count FROM v_edit_subcatchment where sperv is null;
+		SELECT count(*) INTO v_count FROM v_edit_inp_subcatchment where sperv is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (v_fprocesscat_id, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column sperv column.'));
@@ -265,7 +265,7 @@ BEGIN
 			VALUES (v_fprocesscat_id, v_result_id, 1, concat('INFO: Column sperv on scenario subcatchments have been checked without any values missed.'));
 		END IF;
 		
-		SELECT count(*) INTO v_count FROM v_edit_subcatchment where zero is null;
+		SELECT count(*) INTO v_count FROM v_edit_inp_subcatchment where zero is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (v_fprocesscat_id, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column zero column.'));
@@ -275,7 +275,7 @@ BEGIN
 			VALUES (v_fprocesscat_id, v_result_id, 1, concat('INFO: Column zero on scenario subcatchments have been checked without any values missed.'));
 		END IF;
 
-		SELECT count(*) INTO v_count FROM v_edit_subcatchment where routeto is null;
+		SELECT count(*) INTO v_count FROM v_edit_inp_subcatchment where routeto is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (v_fprocesscat_id, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column routeto column.'));
@@ -286,7 +286,7 @@ BEGIN
 		END IF;
 
 		
-		SELECT count(*) INTO v_count FROM v_edit_subcatchment where rted is null;
+		SELECT count(*) INTO v_count FROM v_edit_inp_subcatchment where rted is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (v_fprocesscat_id, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column rted column.'));
@@ -301,7 +301,7 @@ BEGIN
 		
 		IF v_infiltration='CURVE_NUMBER' THEN
 		
-			SELECT count(*) INTO v_count FROM v_edit_subcatchment where (curveno is null) 
+			SELECT count(*) INTO v_count FROM v_edit_inp_subcatchment where (curveno is null) 
 			OR (conduct_2 is null) OR (drytime_2 is null);
 			
 			IF v_count > 0 THEN
@@ -320,7 +320,7 @@ BEGIN
 		
 		ELSIF v_infiltration='GREEN_AMPT' THEN
 		
-			SELECT count(*) INTO v_count FROM v_edit_subcatchment where (suction is null) 
+			SELECT count(*) INTO v_count FROM v_edit_inp_subcatchment where (suction is null) 
 			OR (conduct_ยก is null) OR (initdef is null);
 			
 			IF v_count > 0 THEN
@@ -337,7 +337,7 @@ BEGIN
 		
 		ELSIF v_infiltration='HORTON' OR v_infiltration='MODIFIED_HORTON' THEN
 		
-			SELECT count(*) INTO v_count FROM v_edit_subcatchment where (maxrate is null) 
+			SELECT count(*) INTO v_count FROM v_edit_inp_subcatchment where (maxrate is null) 
 			OR (minrate is null) OR (decay is null) OR (drytime is null) OR (maxinfil is null);
 			
 			IF v_count > 0 THEN

@@ -336,7 +336,7 @@ BEGIN
 	-- Subcatchments geometry
 	IF v_createsubcgeom THEN
 		--Create points out of vertices defined in inp file create a line out all points and transform it into a polygon.
-		FOR v_data IN SELECT * FROM subcatchment LOOP
+		FOR v_data IN SELECT * FROM inp_subcatchment LOOP
 		
 			FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE cur_user=current_user AND csv2pgcat_id=v_csv2pgcat_id and source ilike '[Polygons]' AND csv1=v_data.subc_id order by id 
 			LOOP	
@@ -357,12 +357,12 @@ BEGIN
 				INSERT INTO temp_table (text_column,geom_line) VALUES (v_data.subc_id,v_line_geom);
 
 				IF ST_IsClosed(v_line_geom) THEN
-					UPDATE subcatchment SET the_geom=ST_Multi(ST_Polygon(v_line_geom,v_epsg)) where subc_id=v_data.subc_id;
+					UPDATE inp_subcatchment SET the_geom=ST_Multi(ST_Polygon(v_line_geom,v_epsg)) where subc_id=v_data.subc_id;
 					INSERT INTO temp_table (geom_line) VALUES (v_line_geom);
 				ELSE
 					v_line_geom = ST_AddPoint(v_line_geom, ST_StartPoint(v_line_geom));
 					IF ST_IsClosed(v_line_geom) THEN
-						UPDATE subcatchment SET the_geom=ST_Multi(ST_Polygon(v_line_geom,v_epsg)) where subc_id=v_data.subc_id;
+						UPDATE inp_subcatchment SET the_geom=ST_Multi(ST_Polygon(v_line_geom,v_epsg)) where subc_id=v_data.subc_id;
 						INSERT INTO temp_table (geom_line) VALUES (v_line_geom);
 					ELSE
 						RAISE NOTICE 'The polygon cant be created because the geometry is not closed. Subc_id: ,%', v_data.subc_id;

@@ -23,11 +23,11 @@ BEGIN
     DELETE FROM temp_table WHERE cur_user=current_user AND fprocesscat_id=17;
 
     -- Dump node coordinates for every polygon
-    FOR row_id IN SELECT subc_id FROM v_edit_subcatchment
+    FOR row_id IN SELECT subc_id FROM v_edit_inp_subcatchment
     LOOP
 
         -- Get the geom and remain fields
-        SELECT INTO subcatchment_polygon the_geom FROM subcatchment WHERE subc_id = row_id;
+        SELECT INTO subcatchment_polygon the_geom FROM inp_subcatchment WHERE subc_id = row_id;
 
         -- Loop for nodes
         index_point := 1;

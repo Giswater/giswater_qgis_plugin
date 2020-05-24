@@ -177,7 +177,7 @@ BEGIN
 			VALUES (v_result_id,CONCAT(rpt_rec.csv1,' ',rpt_rec.csv2,' ',rpt_rec.csv3,' ',rpt_rec.csv4,' ',rpt_rec.csv5,' ',
 			rpt_rec.csv6,' ',rpt_rec.csv7));
 
-		ELSIF rpt_rec.csv1 IN (SELECT subc_id FROM subcatchment) AND type_aux='rpt_subcathrunoff_sum' then 
+		ELSIF rpt_rec.csv1 IN (SELECT subc_id FROM inp_subcatchment) AND type_aux='rpt_subcathrunoff_sum' then 
 			INSERT INTO rpt_subcathrunoff_sum(result_id, subc_id, tot_precip, tot_runon, tot_evap, tot_infil,tot_runoff, tot_runofl, peak_runof, runoff_coe, vxmax, vymax, depth, vel, vhmax) 
 			VALUES (v_result_id,rpt_rec.csv1,rpt_rec.csv2::numeric,rpt_rec.csv3::numeric,rpt_rec.csv4::numeric,rpt_rec.csv5::numeric,rpt_rec.csv6::numeric,
 			rpt_rec.csv7::numeric,rpt_rec.csv8::numeric,rpt_rec.csv9::numeric,rpt_rec.csv10::numeric,rpt_rec.csv11::numeric,rpt_rec.csv12::numeric,
