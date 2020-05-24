@@ -470,6 +470,7 @@ UPDATE sys_message SET id = 3130 WHERE id = 100;
 DELETE FROM sys_function WHERE id = 2594;
 UPDATE sys_function SET input_params = 'json' WHERE id = 2820;
 
+UPDATE sys_table SET sys_sequence = null where id = 'config_exploitation_x_user';
 
 
 
