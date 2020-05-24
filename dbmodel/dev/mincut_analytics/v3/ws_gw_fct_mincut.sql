@@ -106,7 +106,7 @@ BEGIN
 	
 		IF (SELECT state FROM arc WHERE (arc_id = element_id_arg))=0 THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-       		"data":{"error":"3002", "function":"2304","debug_msg":"'||element_id_arg||'"}}$$);';
+       		"data":{"message":"3002", "function":"2304","debug_msg":"'||element_id_arg||'"}}$$);';
 		END IF;
 		
         -- Check an existing arc

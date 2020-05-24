@@ -122,12 +122,12 @@ BEGIN
 		IF v_connect.state=2 AND v_link.exit_id IS NOT NULL THEN
 			IF v_feature_type = 'CONNEC' THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-				"data":{"error":"3052", "function":"2124","debug_msg":"'||v_connect_id||'"}}$$);' INTO v_audit_result;
+				"data":{"message":"3052", "function":"2124","debug_msg":"'||v_connect_id||'"}}$$);' INTO v_audit_result;
 
 			ELSIF v_feature_type = 'GULLY' THEN
 		
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-				"data":{"error":"3054", "function":"2124","debug_msg":"'||v_connect_id||'"}}$$);' INTO v_audit_result;
+				"data":{"message":"3054", "function":"2124","debug_msg":"'||v_connect_id||'"}}$$);' INTO v_audit_result;
 			END IF;
 		END IF;
 
@@ -155,7 +155,7 @@ BEGIN
 		-- state control
 		IF v_arc.state=2 AND v_connect.state=1 THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-			"data":{"error":"3050", "function":"2124","debug_msg":null}}$$);' INTO v_audit_result;
+			"data":{"message":"3050", "function":"2124","debug_msg":null}}$$);' INTO v_audit_result;
 		END IF;
 
 		-- compute link
@@ -288,7 +288,7 @@ BEGIN
 
    
   --  EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-  --"data":{"error":"0", "function":"2124","debug_msg":null}}$$);' INTO v_audit_result;
+  --"data":{"message":"0", "function":"2124","debug_msg":null}}$$);' INTO v_audit_result;
 -- get results
 	-- info
 

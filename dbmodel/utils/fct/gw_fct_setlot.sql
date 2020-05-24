@@ -21,20 +21,21 @@ SELECT SCHEMA_NAME.gw_fct_setlot($${
 */
 
 DECLARE
-	v_message json;
-	v_data json;
-	v_apiversion text;
-	v_id text;
-	v_idname text;
-	v_device integer;
-	v_tablename text;
-	v_client json;
-	v_descript text;
-	v_status text;
-	v_result text;
-	v_visitclass_id text;
-	v_team text;
-	v_real_enddate text;
+v_message json;
+v_data json;
+v_apiversion text;
+v_id text;
+v_idname text;
+v_device integer;
+v_tablename text;
+v_client json;
+v_descript text;
+v_status text;
+v_result text;
+v_visitclass_id text;
+v_team text;
+v_real_enddate text;
+v_error_context text;
 
 BEGIN
 
@@ -81,7 +82,8 @@ BEGIN
 		EXECUTE 'UPDATE ' || quote_ident(v_tablename) ||' SET descript = ' || quote_literal(v_descript) ||', status = ' || quote_literal(v_status) ||', visitclass_id = ' || quote_literal(v_visitclass_id) ||' WHERE id = ' || quote_literal(v_id) ||'' ;
 
 		-- message
-		SELECT gw_ft_getmessage(null, 50) INTO v_message;
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+		"data":{"message":"3120", "function":"2862","debug_msg":""}}$$);'INTO v_message;
 		v_data = p_data->>'data';
 		v_data = gw_fct_json_object_set_key (v_data, 'message', v_message);
 		p_data = gw_fct_json_object_set_key (p_data, 'data', v_data);
@@ -93,7 +95,8 @@ BEGIN
 		EXECUTE 'INSERT INTO selector_lot (lot_id, cur_user) VALUES ('|| v_id ||', ''qgisserver'')';
 		
 		-- message
-		SELECT gw_fct_getmessage(null, 40) INTO v_message;
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+		"data":{"message":"3118", "function":"2862","debug_msg":""}}$$);'INTO v_message;
 		v_data = p_data->>'data';
 		v_data = gw_fct_json_object_set_key (v_data, 'message', v_message);
 		p_data = gw_fct_json_object_set_key (p_data, 'data', v_data);
@@ -118,6 +121,11 @@ BEGIN
 	
 	-- Return
 	RETURN gw_fct_getlot(p_data);
+	
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;	
 
 END;
 $BODY$

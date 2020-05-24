@@ -28,7 +28,7 @@ BEGIN
 		--Exploitation ID
             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
                 --PERFORM gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-				--"data":{"error":"1110", "function":"1330","debug_msg":null, "variables":null}}$$);
+				--"data":{"message":"1110", "function":"1330","debug_msg":null, "variables":null}}$$);
 				RETURN NULL;				
             END IF;
             expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
@@ -49,7 +49,7 @@ BEGIN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
 
                --PERFORM gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-				--"data":{"error":"1012", "function":"1330","debug_msg":null, "variables":null}}$$);
+				--"data":{"message":"1012", "function":"1330","debug_msg":null, "variables":null}}$$);
                 RETURN NULL;                         
             END IF;
             NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
@@ -58,7 +58,7 @@ BEGIN
 			END IF; 
             IF (NEW.dma_id IS NULL) THEN
              --PERFORM gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-				--"data":{"error":"1014", "function":"1330","debug_msg":null, "variables":null}}$$);
+				--"data":{"message":"1014", "function":"1330","debug_msg":null, "variables":null}}$$);
                 RETURN NULL; 
             END IF;
         END IF;
@@ -112,7 +112,7 @@ BEGIN
 		END IF;
 		
         EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-				"data":{"error":"2", "function":"1302","debug_msg":null}}$$);';
+				"data":{"message":"2", "function":"1302","debug_msg":null}}$$);';
         RETURN NEW;
 
 		 ELSIF TG_OP = 'DELETE' THEN  
@@ -127,7 +127,7 @@ BEGIN
 			END IF;
 		
         PERFORM gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-		"data":{"error":"3", "function":"1302","debug_msg":null, "variables":null}}$$);
+		"data":{"message":"3", "function":"1302","debug_msg":null, "variables":null}}$$);
         RETURN NULL;
      
      END IF;

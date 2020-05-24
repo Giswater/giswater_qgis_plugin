@@ -131,10 +131,10 @@ BEGIN
 	-- State control
 	IF v_state=0 THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-		"data":{"error":"1050", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;
+		"data":{"message":"1050", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;
 	ELSIF v_state_node=0 THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-		"data":{"error":"1052", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;
+		"data":{"message":"1052", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;
 	ELSE
 
 	-- Control if node divides arc
@@ -172,7 +172,7 @@ BEGIN
 			IF (ST_GeometryType(v_line1) = 'ST_Point') OR (ST_GeometryType(v_line2) = 'ST_Point') THEN
 
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-				"data":{"error":"3094", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;
+				"data":{"message":"3094", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;
 			ELSE
 		
 				-- Get arc data
@@ -711,27 +711,27 @@ BEGIN
 					
 			ELSIF (v_state=2 AND v_state_node=1) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-				"data":{"error":"3042", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;
+				"data":{"message":"3042", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;
 
 			ELSE  
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-				"data":{"error":"2120", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;
+				"data":{"message":"2120", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;
 
 			END IF;
 			END IF;
 		ELSE
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-				"data":{"error":"3044", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;
+				"data":{"message":"3044", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;
 
 		END IF;
 	ELSE
 		IF v_node_type IS NOT NULL THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-			"data":{"error":"3046", "function":"2114","debug_msg":"'||v_node_type||'"}}$$);' INTO v_audit_result;
+			"data":{"message":"3046", "function":"2114","debug_msg":"'||v_node_type||'"}}$$);' INTO v_audit_result;
 		ELSE 
 
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-			"data":{"error":"3046", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;
+			"data":{"message":"3046", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;
 		END IF;
 
 	END IF;

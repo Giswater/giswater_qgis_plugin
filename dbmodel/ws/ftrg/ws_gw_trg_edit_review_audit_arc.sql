@@ -30,7 +30,7 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 			IF NEW.new_arccat_id IS NULL THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-        			"data":{"error":"3056", "function":"2488","debug_msg":"'||NEW.arc_id'"}}$$);';
+        			"data":{"message":"3056", "function":"2488","debug_msg":"'||NEW.arc_id'"}}$$);';
 			END IF;
 			
 			UPDATE review_audit_arc SET new_arccat_id=NEW.new_arccat_id, is_validated=NEW.is_validated WHERE arc_id=NEW.arc_id;

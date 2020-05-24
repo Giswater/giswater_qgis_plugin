@@ -25,7 +25,7 @@ BEGIN
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-      		 		"data":{"error":"2012", "function":"1216","debug_msg":"'||NEW.rg_id||'"}}$$);';
+      		 		"data":{"message":"2012", "function":"1216","debug_msg":"'||NEW.rg_id||'"}}$$);';
 				END IF;		
 			END IF;
 		END IF;	

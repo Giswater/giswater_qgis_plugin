@@ -144,7 +144,7 @@ BEGIN
 	
 		IF (SELECT state FROM arc WHERE (arc_id = element_id_arg))=0 THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-        	"data":{"error":"3002", "function":"2304","debug_msg":"'||element_id_arg::text||'"}}$$);' INTO v_audit_result;
+        	"data":{"message":"3002", "function":"2304","debug_msg":"'||element_id_arg::text||'"}}$$);' INTO v_audit_result;
 		END IF;
 		
         -- Check an existing arc
@@ -175,7 +175,7 @@ BEGIN
 
 			IF node_1_aux IS NULL OR node_2_aux IS NULL THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-        	"data":{"error":"3006", "function":"2304","debug_msg":"'||element_id_arg::text||'"}}$$);' INTO v_audit_result;
+        	"data":{"message":"3006", "function":"2304","debug_msg":"'||element_id_arg::text||'"}}$$);' INTO v_audit_result;
 			END IF;
     
 
@@ -232,12 +232,12 @@ BEGIN
 		-- The arc_id was not found
 		ELSE 
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-        	"data":{"error":"1082", "function":"2304","debug_msg":"'||element_id_arg::text||'"}}$$);' INTO v_audit_result;
+        	"data":{"message":"1082", "function":"2304","debug_msg":"'||element_id_arg::text||'"}}$$);' INTO v_audit_result;
 		END IF;
 
     ELSE
     	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-        "data":{"error":"3092", "function":"2304","debug_msg":null}}$$);' INTO v_audit_result;
+        "data":{"message":"3092", "function":"2304","debug_msg":null}}$$);' INTO v_audit_result;
     END IF;
 
 	IF v_debug THEN	RAISE NOTICE '7-Compute flow trace on network';	END IF;	

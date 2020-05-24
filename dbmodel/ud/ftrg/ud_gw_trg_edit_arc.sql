@@ -70,7 +70,7 @@ BEGIN
 		IF (NEW.arc_type IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM arc_type) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-			"data":{"error":"1018", "function":"1202","debug_msg":null}}$$);';
+			"data":{"message":"1018", "function":"1202","debug_msg":null}}$$);';
 			END IF;
 
 			IF v_customfeature IS NOT NULL THEN
@@ -97,7 +97,7 @@ BEGIN
 		IF (NEW.arccat_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM cat_arc) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-			"data":{"error":"1020", "function":"1202","debug_msg":null}}$$);';
+			"data":{"message":"1020", "function":"1202","debug_msg":null}}$$);';
 			END IF; 
 				NEW.arccat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='arccat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			IF (NEW.arccat_id IS NULL) THEN
@@ -115,7 +115,7 @@ BEGIN
 			-- control error without any mapzones defined on the table of mapzone
 			IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-		       	"data":{"error":"1110", "function":"1202","debug_msg":null}}$$);';
+		       	"data":{"message":"1110", "function":"1202","debug_msg":null}}$$);';
 			END IF;
 			
 			-- getting value default
@@ -137,7 +137,7 @@ BEGIN
 			-- control error when no value
 			IF (NEW.expl_id IS NULL) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-				"data":{"error":"2012", "function":"1202","debug_msg":"'||NEW.arc_id::text||'"}}$$);';
+				"data":{"message":"2012", "function":"1202","debug_msg":"'||NEW.arc_id::text||'"}}$$);';
 			END IF;            
 		END IF;
 		
@@ -148,7 +148,7 @@ BEGIN
 			-- control error without any mapzones defined on the table of mapzone
 			IF ((SELECT COUNT(*) FROM sector) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-		       	"data":{"error":"1008", "function":"1202","debug_msg":null}}$$);';
+		       	"data":{"message":"1008", "function":"1202","debug_msg":null}}$$);';
 			END IF;
 			
 			-- getting value default
@@ -170,7 +170,7 @@ BEGIN
 			-- control error when no value
 			IF (NEW.sector_id IS NULL) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-				"data":{"error":"1010", "function":"1202","debug_msg":"'||NEW.arc_id::text||'"}}$$);';
+				"data":{"message":"1010", "function":"1202","debug_msg":"'||NEW.arc_id::text||'"}}$$);';
 			END IF;            
 		END IF;
 		
@@ -181,7 +181,7 @@ BEGIN
 			-- control error without any mapzones defined on the table of mapzone
 			IF ((SELECT COUNT(*) FROM dma) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-		       	"data":{"error":"1012", "function":"1202","debug_msg":null}}$$);';
+		       	"data":{"message":"1012", "function":"1202","debug_msg":null}}$$);';
 			END IF;
 			
 			-- getting value default
@@ -203,7 +203,7 @@ BEGIN
 			-- control error when no value
 			IF (NEW.dma_id IS NULL) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-				"data":{"error":"1014", "function":"1202","debug_msg":"'||NEW.arc_id::text||'"}}$$);';
+				"data":{"message":"1014", "function":"1202","debug_msg":"'||NEW.arc_id::text||'"}}$$);';
 			END IF;            
 		END IF;
 		
@@ -214,7 +214,7 @@ BEGIN
 			-- control error without any mapzones defined on the table of mapzone
 			IF ((SELECT COUNT(*) FROM ext_municipality) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-		       	"data":{"error":"3110", "function":"1202","debug_msg":null}}$$);';
+		       	"data":{"message":"3110", "function":"1202","debug_msg":null}}$$);';
 			END IF;
 			
 			-- getting value default
@@ -236,7 +236,7 @@ BEGIN
 			-- control error when no value
 			IF (NEW.muni_id IS NULL) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-				"data":{"error":"2024", "function":"1202","debug_msg":"'||NEW.arc_id::text||'"}}$$);';
+				"data":{"message":"2024", "function":"1202","debug_msg":"'||NEW.arc_id::text||'"}}$$);';
 			END IF;            
 		END IF;
 		
@@ -259,7 +259,7 @@ BEGIN
 		--check relation state - state_type
 	        IF NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
 	        	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-       			"data":{"error":"3036", "function":"1202","debug_msg":"'||NEW.state::text||'"}}$$);'; 
+       			"data":{"message":"3036", "function":"1202","debug_msg":"'||NEW.state::text||'"}}$$);'; 
 	       	END IF;			
    
 
@@ -468,7 +468,7 @@ BEGIN
 				NEW.state_type=(SELECT id from value_state_type WHERE state=0 LIMIT 1);
 					IF NEW.state_type IS NULL THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-				"data":{"error":"2110", "function":"1318","debug_msg":null}}$$);';
+				"data":{"message":"2110", "function":"1318","debug_msg":null}}$$);';
 					END IF;
 				END IF;
 			END IF;
@@ -477,7 +477,7 @@ BEGIN
 		--check relation state - state_type
 		IF (NEW.state_type != OLD.state_type) AND NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-		"data":{"error":"3036", "function":"1202","debug_msg":"'||NEW.state::text||'"}}$$);';
+		"data":{"message":"3036", "function":"1202","debug_msg":"'||NEW.state::text||'"}}$$);';
 		END IF;		
 	       					
 		-- The geom

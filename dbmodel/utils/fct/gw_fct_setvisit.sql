@@ -40,40 +40,39 @@ SELECT SCHEMA_NAME.gw_fct_setvisit($${
 */
 
 DECLARE
-	v_tablename text;
-	v_apiversion text;
-	v_id integer;
-	v_outputparameter json;
-	v_insertresult json;
-	v_message json;
-	v_feature json;
-	v_geometry json;
-	v_thegeom public.geometry;
-	v_class integer;
-	v_ckeckchangeclass int8;
-	v_xcoord float;
-	v_ycoord float;
-	v_visitextcode text;
-	v_visitcat int2;
-	v_status int2;
-	return_event_manager_aux json;
-	v_event_manager json;
-	v_node_id integer;
-	v_version varchar;
-	v_addfile json;
-	v_deletefile json;
-	v_fields_json json;
-	v_message1 text;
-	v_message2 text;
-	v_fileid text;
-	v_filefeature json;
-	v_client json;
-	v_addphotos json;
-	v_addphotos_array json[];
-	v_list_photos text[];
-	v_event_id bigint;
-	
-
+v_tablename text;
+v_apiversion text;
+v_id integer;
+v_outputparameter json;
+v_insertresult json;
+v_message json;
+v_feature json;
+v_geometry json;
+v_thegeom public.geometry;
+v_class integer;
+v_ckeckchangeclass int8;
+v_xcoord float;
+v_ycoord float;
+v_visitextcode text;
+v_visitcat int2;
+v_status int2;
+return_event_manager_aux json;
+v_event_manager json;
+v_node_id integer;
+v_version varchar;
+v_addfile json;
+v_deletefile json;
+v_fields_json json;
+v_message1 text;
+v_message2 text;
+v_fileid text;
+v_filefeature json;
+v_client json;
+v_addphotos json;
+v_addphotos_array json[];
+v_list_photos text[];
+v_event_id bigint;
+v_error_context text;
 
 BEGIN
 
@@ -178,8 +177,9 @@ BEGIN
 		-- updating visit
 		UPDATE om_visit SET the_geom=v_thegeom WHERE id=v_id;
 
-		-- getting message
-		SELECT gw_fct_getmessage(v_feature, 40) INTO v_message;
+		-- message
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+		"data":{"message":"3118", "function":"2622","debug_msg":""}}$$);'INTO v_message;
 
 		RAISE NOTICE '--- INSERT NEW VISIT gw_fct_setinsert WITH MESSAGE: % ---', v_message;
 	
@@ -196,8 +196,9 @@ BEGIN
 		--setting the update
 		PERFORM gw_fct_setfields (v_outputparameter);
 	
-		-- getting message
-		SELECT gw_fct_getmessage(v_feature, 50) INTO v_message;
+		-- message
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+		"data":{"message":"3120", "function":"2662","debug_msg":""}}$$);'INTO v_message;
 
 		RAISE NOTICE '--- UPDATE VISIT gw_fct_setfields USING v_id % WITH MESSAGE: % ---', v_id, v_message;
 
@@ -213,8 +214,9 @@ BEGIN
 			-- Inserting data
 			EXECUTE 'INSERT INTO om_visit_event_photo (visit_id, event_id, tstamp, value, text, hash) VALUES('''||v_id||''', '''||v_event_id||''', '''||NOW()||''', '''||CONCAT((v_addphotos->>'json_array_elements')::json->>'photo_url'::text, (v_addphotos->>'json_array_elements')::json->>'hash'::text)||''', ''demo image'', '''||((v_addphotos->>'json_array_elements')::json->>'hash'::text)::text||''')';
 			
-			-- getting message
-			SELECT gw_fct_getmessage(v_feature, 40) INTO v_message;
+			-- message
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			"data":{"message":"3118", "function":"2622","debug_msg":""}}$$);'INTO v_message;
 			
 		END LOOP;
 		EXECUTE 'UPDATE om_visit_event SET value = ''true'' WHERE visit_id = ' || v_id || ' AND parameter_id = ''photo''';
@@ -297,18 +299,15 @@ BEGIN
 	v_geometry := COALESCE(v_geometry, '{}');
 	return_event_manager_aux := COALESCE(return_event_manager_aux, '{}');
 				  
---    Return
-
+	-- Return
 	RETURN ('{"status":"Accepted", "message":'||v_message||', "apiVersion":'|| v_apiversion ||', 
 	"body": {"feature":{"id":"'||v_id||'"}, "data":{"geometry":'|| return_event_manager_aux ||'}}}')::json; 
 
-      
---    Exception handling
-   -- EXCEPTION WHEN OTHERS THEN 
-    --    RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ', "apiVersion":'|| v_apiversion ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;    
-
-      
-
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

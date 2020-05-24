@@ -28,18 +28,19 @@ SELECT SCHEMA_NAME.gw_fct_setdelete('{"client":{"device":3, "infoType":100, "lan
 */
 
 DECLARE
---    Variables
-    v_tablename text;
-    v_id  character varying;
-    v_querytext varchar;
-    v_apiversion json;
-    v_schemaname text;
-    v_featuretype text;
-    v_idname text;
-    v_message text;
-    v_result text;
-    v_messagelevel integer = 0;
-    v_feature json;
+v_tablename text;
+v_id  character varying;
+v_querytext varchar;
+v_apiversion json;
+v_schemaname text;
+v_featuretype text;
+v_idname text;
+v_message text;
+v_result text;
+v_messagelevel integer = 0;
+v_feature json;
+v_error_context text;
+
 
 BEGIN
 	--  Set search path to local schema
@@ -77,19 +78,24 @@ BEGIN
 	-- if exists
 	IF v_result IS NOT NULL THEN
 		v_querytext := 'DELETE FROM ' || quote_ident(v_tablename) ||' WHERE '|| quote_ident(v_idname) ||' = '||quote_literal(v_id);
-		SELECT gw_fct_getmessage(v_feature,20) INTO v_message;
+		
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+		"data":{"message":"3114", "function":"2608","debug_msg":""}}$$)'
+		INTO v_message;
 		EXECUTE v_querytext ;
 	ELSE
-		SELECT gw_fct_getmessage(v_feature,30) INTO v_message;
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+		"data":{"message":"3116", "function":"2608","debug_msg":""}}$$)' 
+		INTO v_message;
 	END IF;
 
---    Return
+	-- Return
     RETURN ('{"status":"Accepted", "message":'||v_message||', "apiVersion":'|| v_apiversion ||
 	    ', "body": {"feature":{"tableName":"'||v_tablename||'", "id":"'||v_id||'"}}}')::json;    
 
---    Exception handling
-  --  EXCEPTION WHEN OTHERS THEN 
-    --    RETURN ('{"status":"Failed","message":' || (to_json(SQLERRM)) || ', "apiVersion":'|| v_apiversion ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;    
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN 
+    RETURN ('{"status":"Failed","message":' || (to_json(SQLERRM)) || ', "apiVersion":'|| v_apiversion ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;    
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

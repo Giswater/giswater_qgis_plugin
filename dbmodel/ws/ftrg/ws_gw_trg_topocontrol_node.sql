@@ -70,7 +70,7 @@ BEGIN
 			
 					IF v_dsbl_error IS NOT TRUE THEN
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-        			"data":{"error":"1097", "function":"1334","debug_msg":"'||NEW.node_id'"}}$$);';
+        			"data":{"message":"1097", "function":"1334","debug_msg":"'||NEW.node_id'"}}$$);';
 					ELSE
 						INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (4, NEW.node_id, 'Node with state 1 over another node with state=1 it is not allowed');
 					END IF;
@@ -87,7 +87,7 @@ BEGIN
 			
 					IF v_dsbl_error IS NOT TRUE THEN
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-        			"data":{"error":"1096", "function":"1334","debug_msg":"'||NEW.node_id'"}}$$);';
+        			"data":{"message":"1096", "function":"1334","debug_msg":"'||NEW.node_id'"}}$$);';
 					ELSE
 						INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (4, 
 						NEW.node_id, 'Node with state 2 over another node with state=2 on same alternative it is not allowed');

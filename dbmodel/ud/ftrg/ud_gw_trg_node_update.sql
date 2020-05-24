@@ -56,7 +56,7 @@ BEGIN
 			
 			IF (v_numNodes >1) AND (v_node_proximity_control IS TRUE) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-				"data":{"error":"1096", "function":"1234","debug_msg":null}}$$);';
+				"data":{"message":"1096", "function":"1234","debug_msg":null}}$$);';
 				
 			ELSIF (v_numNodes =1) AND (v_node_proximity_control IS TRUE) THEN
 				SELECT * INTO rec_node FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom, v_node_proximity) AND node.node_id != NEW.node_id AND node.state!=0;
@@ -122,7 +122,7 @@ BEGIN
 				
 				ELSIF (NEW.state=2 AND rec_node.state=2) THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-				"data":{"error":"1100", "function":"1234","debug_msg":null}}$$);';
+				"data":{"message":"1100", "function":"1234","debug_msg":null}}$$);';
 				END IF;
 			END IF;
 			

@@ -54,7 +54,7 @@ BEGIN
 					CONTINUE;
 				ELSE 
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-					"data":{"error":"3022", "function":"2744","debug_msg":"'||concat(rec.typevalue_table,', ',rec.target_field)||'"}}$$);';	
+					"data":{"message":"3022", "function":"2744","debug_msg":"'||concat(rec.typevalue_table,', ',rec.target_field)||'"}}$$);';	
 
 				END IF;
 				

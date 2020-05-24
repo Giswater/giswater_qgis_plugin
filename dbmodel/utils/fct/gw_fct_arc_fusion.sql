@@ -159,7 +159,7 @@ BEGIN
 
                 IF rec_addfield1.value_param!=rec_addfield2.value_param  THEN
                     EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
-                    "data":{"error":"3008", "function":"2112","debug_msg":null}}$$)' INTO v_audit_result;
+                    "data":{"message":"3008", "function":"2112","debug_msg":null}}$$)' INTO v_audit_result;
 
                 ELSIF rec_addfield2.value_param IS NULL and rec_addfield1.value_param IS NOT NULL THEN
                     UPDATE man_addfields_value SET feature_id=v_new_record.arc_id WHERE feature_id=v_my_record1.arc_id AND parameter_id=rec_param.parameter_id;
@@ -276,7 +276,7 @@ BEGIN
             ELSE
 
                 EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
-                "data":{"error":"2004", "function":"2112","debug_msg":null}}$$)' INTO v_audit_result;
+                "data":{"message":"2004", "function":"2112","debug_msg":null}}$$)' INTO v_audit_result;
 
             END IF;
          
@@ -284,20 +284,20 @@ BEGIN
         ELSE
 
             EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
-            "data":{"error":"2006", "function":"2112","debug_msg":null}}$$)' INTO v_audit_result;  
+            "data":{"message":"2006", "function":"2112","debug_msg":null}}$$)' INTO v_audit_result;  
         END IF;
 
     -- Node not found
     ELSE 
 
         EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
-        "data":{"error":"2002", "function":"2112","debug_msg":null}}$$)' INTO v_audit_result;  
+        "data":{"message":"2002", "function":"2112","debug_msg":null}}$$)' INTO v_audit_result;  
 
     END IF;
 
 
    -- EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-   -- "data":{"error":"0", "function":"2112","debug_msg":null}}$$)' INTO v_audit_result;  
+   -- "data":{"message":"0", "function":"2112","debug_msg":null}}$$)' INTO v_audit_result;  
 
 -- get results
     -- info

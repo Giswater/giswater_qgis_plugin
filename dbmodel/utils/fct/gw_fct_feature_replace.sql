@@ -167,7 +167,7 @@ BEGIN
 	-- Control of state(1)
 	IF (v_state=0 OR v_state=2 OR v_state IS NULL) THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-        "data":{"error":"1070", "function":"2126","debug_msg":"'||v_state||'"}}$$);' INTO v_audit_result;
+        "data":{"message":"1070", "function":"2126","debug_msg":"'||v_state||'"}}$$);' INTO v_audit_result;
 	ELSE
 
 		-- new feature_id

@@ -68,7 +68,7 @@ BEGIN
 
 			IF v_node_2=rec_flowreg.node_id THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-				"data":{"error":"2038", "function":"2240","debug_msg":"'||v_arc||'"}}$$);';
+				"data":{"message":"2038", "function":"2240","debug_msg":"'||v_arc||'"}}$$);';
 				
 			ELSE 
 				-- Create the extrem nodes of the new nodarc
@@ -80,7 +80,7 @@ BEGIN
 				
 				IF ST_GeometryType(v_arc_reduced_geom) != 'ST_LineString' THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-					"data":{"error":"2040", "function":"2240","debug_msg":"'||concat(rec_arc1.arc_id,',',ST_GeometryType(v_arc_reduced_geom))||'"}}$$);';
+					"data":{"message":"2040", "function":"2240","debug_msg":"'||concat(rec_arc1.arc_id,',',ST_GeometryType(v_arc_reduced_geom))||'"}}$$);';
 				END IF;
   
 				-- Create new arc geometry

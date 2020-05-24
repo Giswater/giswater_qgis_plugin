@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2820
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getmessage( p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getmessage(p_data json)
   RETURNS json AS
 $BODY$
 
@@ -14,7 +14,7 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_getmessage($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{},
-"data":{"error":"2", "function":"1312","debug_msg":null, "variables":"value"}}$$)
+"data":{"message":"2", "function":"1312","debug_msg":null, "variables":"value"}}$$)
 */
 
 DECLARE
@@ -29,7 +29,7 @@ v_result_info json;
 v_projectype text;
 v_version text;
 v_status text;
-v_error_id integer;
+v_message_id integer;
 v_function_id integer;
 v_message text;
 v_variables text;
@@ -43,15 +43,16 @@ BEGIN
 	v_schemaname = 'SCHEMA_NAME';
     
 	-- Get parameters from input json
-	v_error_id = lower(((p_data ->>'data')::json->>'error')::text);
+	v_message_id = lower(((p_data ->>'data')::json->>'message')::text);
 	v_function_id = lower(((p_data ->>'data')::json->>'function')::text);
 	v_message = lower(((p_data ->>'data')::json->>'debug_msg')::text);
 	v_variables = lower(((p_data ->>'data')::json->>'variables')::text);
 	
+	
 	SELECT giswater, wsoftware INTO v_version, v_projectype FROM version order by 1 desc limit 1;
 	
 	-- get flow parameters
-	SELECT * INTO rec_cat_error FROM sys_message WHERE sys_message.id=v_error_id; 
+	SELECT * INTO rec_cat_error FROM sys_message WHERE sys_message.id=v_message_id; 
 	SELECT txid_current() INTO v_txid;
 				
 	-- message process

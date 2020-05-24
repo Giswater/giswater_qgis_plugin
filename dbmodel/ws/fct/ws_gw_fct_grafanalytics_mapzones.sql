@@ -232,7 +232,7 @@ BEGIN
 	ELSE
 		
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-		"data":{"error":"3090", "function":"2710","debug_msg":null}}$$);'  INTO v_audit_result;
+		"data":{"message":"3090", "function":"2710","debug_msg":null}}$$);'  INTO v_audit_result;
 	END IF;
 	
 	IF v_audit_result IS NULL THEN

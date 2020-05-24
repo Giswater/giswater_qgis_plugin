@@ -67,7 +67,7 @@ BEGIN
 
 		IF v_units IS NULL THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-			"data":{"error":"2086", "function":"2440","debug_msg":null}}$$);'INTO v_audit_result;
+			"data":{"message":"2086", "function":"2440","debug_msg":null}}$$);'INTO v_audit_result;
 		END IF;
 	
 		-- control of price units (csv2)
@@ -76,7 +76,7 @@ BEGIN
 
 		IF v_units IS NOT NULL THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-			"data":{"error":"2088", "function":"2440","debug_msg":"'||v_units||'"}}$$);'INTO v_audit_result;
+			"data":{"message":"2088", "function":"2440","debug_msg":"'||v_units||'"}}$$);'INTO v_audit_result;
 		END IF;
 
 		-- control of price descript (csv3)
@@ -84,7 +84,7 @@ BEGIN
 
 		IF v_units IS NULL THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-			"data":{"error":"2090", "function":"2440","debug_msg":null}}$$);'INTO v_audit_result;
+			"data":{"message":"2090", "function":"2440","debug_msg":null}}$$);'INTO v_audit_result;
 		END IF;
 
 		-- control of null prices(csv5)
@@ -92,7 +92,7 @@ BEGIN
 
 		IF v_units IS NULL THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-			"data":{"error":"2092", "function":"2440","debug_msg":null}}$$);'INTO v_audit_result;
+			"data":{"message":"2092", "function":"2440","debug_msg":null}}$$);'INTO v_audit_result;
 		END IF;
 	
 		-- Insert into price_cat_simple table
@@ -151,10 +151,8 @@ BEGIN
 	    '}')::json;
 	    
 	EXCEPTION WHEN OTHERS THEN
-	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
-
- 
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 	
 END;
 $BODY$

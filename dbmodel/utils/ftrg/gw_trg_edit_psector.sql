@@ -174,7 +174,7 @@ BEGIN
 				--show information about performed state update
 
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-       			"data":{"error":"3034", "function":"2446","debug_msg":null}}$$);';
+       			"data":{"message":"3034", "function":"2446","debug_msg":null}}$$);';
 			END LOOP;
 			
 		END IF;

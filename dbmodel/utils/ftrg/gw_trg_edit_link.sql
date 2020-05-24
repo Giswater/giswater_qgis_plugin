@@ -52,7 +52,7 @@ BEGIN
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
                 EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-       			 "data":{"error":"1008", "function":"1116","debug_msg":null}}$$);';
+       			 "data":{"message":"1008", "function":"1116","debug_msg":null}}$$);';
             END IF;
 			NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
 			IF (NEW.sector_id IS NULL) THEN
@@ -60,7 +60,7 @@ BEGIN
 			END IF;
             IF (NEW.sector_id IS NULL) THEN
                 EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-       			 "data":{"error":"1010", "function":"1116","debug_msg":"'||NEW.link_id::text||'"}}$$);';
+       			 "data":{"message":"1010", "function":"1116","debug_msg":"'||NEW.link_id::text||'"}}$$);';
             END IF;
         END IF;
         
@@ -68,7 +68,7 @@ BEGIN
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
                 EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-       			 "data":{"error":"1012", "function":"1116","debug_msg":null}}$$);';
+       			 "data":{"message":"1012", "function":"1116","debug_msg":null}}$$);';
             END IF;
 			NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
 			IF (NEW.dma_id IS NULL) THEN
@@ -76,7 +76,7 @@ BEGIN
 			END IF; 
             IF (NEW.dma_id IS NULL) THEN
                 EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-       			 "data":{"error":"1014", "function":"1116","debug_msg":"'||NEW.link_id::text||'"}}$$);';
+       			 "data":{"message":"1014", "function":"1116","debug_msg":"'||NEW.link_id::text||'"}}$$);';
             END IF;
         END IF;
 
@@ -95,7 +95,7 @@ BEGIN
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-       				"data":{"error":"2012", "function":"1116","debug_msg":"'||NEW.link_id::text||'"}}$$);';
+       				"data":{"message":"2012", "function":"1116","debug_msg":"'||NEW.link_id::text||'"}}$$);';
 				END IF;		
 			END IF;
 		END IF;	
@@ -128,7 +128,7 @@ BEGIN
 			
 			IF v_connect IS NULL THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-       			"data":{"error":"3070", "function":"1116","debug_msg":null}}$$);';
+       			"data":{"message":"3070", "function":"1116","debug_msg":null}}$$);';
 			END IF;		
 		END IF;
 
@@ -145,7 +145,7 @@ BEGIN
 		IF v_projectype = 'WS' AND v_node IS NOT NULL THEN
 			IF v_node.node_id IN (SELECT node_id FROM inp_valve UNION SELECT node_id FROM inp_pump) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-       			"data":{"error":"3072", "function":"1116","debug_msg":null}}$$);';
+       			"data":{"message":"3072", "function":"1116","debug_msg":null}}$$);';
 			END IF;
 		END IF;
 		
@@ -181,7 +181,7 @@ BEGIN
 		-- feature control
 		IF NEW.feature_type IS NULL THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-       		"data":{"error":"3074", "function":"1116","debug_msg":null}}$$);';
+       		"data":{"message":"3074", "function":"1116","debug_msg":null}}$$);';
 		END IF;	
 
 		-- end control
@@ -307,7 +307,7 @@ BEGIN
 		-- control of null exit_type
 		IF NEW.exit_type IS NULL THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-       		"data":{"error":"2015", "function":"1116","debug_msg":null}}$$);';
+       		"data":{"message":"2015", "function":"1116","debug_msg":null}}$$);';
 		END IF;
 		
 		-- upsert link
@@ -323,17 +323,17 @@ BEGIN
 		IF (SELECT feature_id FROM link WHERE feature_id=NEW.feature_id) IS NOT NULL THEN
 			IF NEW.feature_type = 'CONNEC' THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-       			"data":{"error":"3076", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';
+       			"data":{"message":"3076", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';
 			ELSIF NEW.feature_type = 'GULLY' THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-       			"data":{"error":"3078", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';
+       			"data":{"message":"3078", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';
 			END IF;		
 		END IF;
 
 		-- state control
 		IF v_connect.state=1 AND v_end_state=2 THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-       		"data":{"error":"3080", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';
+       		"data":{"message":"3080", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';
 		END IF;
 		
 
@@ -359,7 +359,7 @@ BEGIN
 			-- control endfeature (only VNODE it is possible)
 			IF NEW.exit_type!='VNODE' THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-       			"data":{"error":"3082", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';
+       			"data":{"message":"3082", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';
 			END IF;
 			
 			-- if geometry have changed by user 

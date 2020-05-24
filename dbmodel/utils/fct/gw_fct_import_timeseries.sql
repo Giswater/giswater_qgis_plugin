@@ -161,7 +161,7 @@ BEGIN
 		-- control if pattern exists
 		IF (SELECT pattern_id FROM inp_pattern WHERE pattern_id=v_pattern) IS NOT NULL THEN
 			SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-			"data":{"error":"3064", "function":"2738","debug_msg":null}}$$);
+			"data":{"message":"3064", "function":"2738","debug_msg":null}}$$);
 		END IF;
 	
 		-- inserting new pattern
@@ -205,12 +205,12 @@ BEGIN
 			-- control of existency of row on dmaRtc table
 			IF (SELECT id FROM ext_rtc_scada_dma_period WHERE dma_id=v_dma and cat_period_id=v_period) IS NULL THEN
 				SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-				"data":{"error":"3066", "function":"2738","debug_msg":null}}$$);
+				"data":{"message":"3066", "function":"2738","debug_msg":null}}$$);
 			
 			ELSE
 				IF (SELECT pattern_id FROM ext_rtc_scada_dma_period WHERE dma_id=v_dma and cat_period_id=v_period) IS NOT NULL THEN
 					SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-					"data":{"error":"3068", "function":"2738","debug_msg":null}}$$);
+					"data":{"message":"3068", "function":"2738","debug_msg":null}}$$);
 				ELSE	
 					UPDATE ext_rtc_scada_dma_period SET pattern_id=v_pattern WHERE dma_id=v_dma and cat_period_id=v_period;
 

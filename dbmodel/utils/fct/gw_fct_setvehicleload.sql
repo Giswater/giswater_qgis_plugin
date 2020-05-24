@@ -18,26 +18,26 @@ SELECT SCHEMA_NAME.gw_fct_setvehicleload($${"client":{"device":3,"infoType":0,"l
 */
 
 DECLARE
-	v_tablename text;
-	v_apiversion text;
-	v_id integer;
-	v_message json;
-	v_feature json;
-	v_geometry json;
-	v_thegeom public.geometry;
-	v_version varchar;
-	v_client json;
-	v_user_id text;
-	v_team_id text;
-	v_lot_id text;
-	v_vehicle_name text;
-	v_load text;
-	v_vehicle_id integer;
-	v_hash text;
-	v_record record;
-	v_photo_url text;
-	v_image text;
-	
+v_tablename text;
+v_apiversion text;
+v_id integer;
+v_message json;
+v_feature json;
+v_geometry json;
+v_thegeom public.geometry;
+v_version varchar;
+v_client json;
+v_user_id text;
+v_team_id text;
+v_lot_id text;
+v_vehicle_name text;
+v_load text;
+v_vehicle_id integer;
+v_hash text;
+v_record record;
+v_photo_url text;
+v_image text;
+v_error_context text;
 
 BEGIN
 
@@ -74,25 +74,24 @@ BEGIN
 	END IF;
 	
 	
-	-- getting message
-	SELECT gw_fct_getmessage(v_feature, 40) INTO v_message;
-		
+	-- message
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+	"data":{"message":"3118", "function":"2912","debug_msg":""}}$$);'INTO v_message;		
+
 	--  Control NULL's
 	v_apiversion := COALESCE(v_apiversion, '{}');
 	v_message := COALESCE(v_message, '{}');
 	v_geometry := COALESCE(v_geometry, '{}');
-				  
---    Return
 
+	-- Return
 	RETURN ('{"status":"Accepted", "message":'||v_message||', "apiVersion":'|| v_apiversion ||', 
 	"body": {}, "data":{}}')::json; 
 
-      
---    Exception handling
-   -- EXCEPTION WHEN OTHERS THEN 
-    --    RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ', "apiVersion":'|| v_apiversion ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;    
-
-      
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	
 
 END;
 $BODY$

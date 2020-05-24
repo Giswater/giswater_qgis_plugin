@@ -20,17 +20,18 @@ SELECT SCHEMA_NAME.gw_fct_setvisitmanagerend($${
 */
 
 DECLARE
-	v_message json;
-	v_data json;
-	v_user text;
-	v_date text;
-	v_team text;
-	v_lot text;
-	v_thegeom public.geometry;
-	v_x float;
-	v_y float;
-	v_result text;
-	v_apiversion text;
+v_message json;
+v_data json;
+v_user text;
+v_date text;
+v_team text;
+v_lot text;
+v_thegeom public.geometry;
+v_x float;
+v_y float;
+v_result text;
+v_apiversion text;
+v_error_context text;
 
 BEGIN
 
@@ -69,7 +70,8 @@ BEGIN
 
 	
 	-- message
-	SELECT gw_fct_getmessage(null, 80) INTO v_message;
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+	"data":{"message":"3126", "function":"2644","debug_msg":""}}$$);'INTO v_message;
 	v_data = p_data->>'data';
 	v_data = gw_fct_json_object_set_key (v_data, 'message', v_message);
 	v_data = gw_fct_json_object_set_key (v_data, 'widget_actions', '{"widget_disabled":"data_endbutton"}'::json);
@@ -79,6 +81,12 @@ BEGIN
 	
 	-- Return
 	RETURN gw_fct_getvisitmanager(p_data);
+
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	
 
 END;
 $BODY$

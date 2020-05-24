@@ -21,23 +21,23 @@ SELECT "SCHEMA_NAME".gw_fct_setvisitmanager($${"client":{"device":3, "infoType":
 */
 
 DECLARE
-	v_tablename text;
-	v_apiversion text;
-	v_id text;
-	v_outputparameter json;
-	v_insertresult json;
-	v_message json;
-	v_feature json;
-	v_lot integer;
-	v_team integer;
-	v_thegeom public.geometry;
-	v_x float;
-	v_y float;
-	v_user text;
-	v_date text;
-	v_data json;
-	v_record record;
-	
+v_tablename text;
+v_apiversion text;
+v_id text;
+v_outputparameter json;
+v_insertresult json;
+v_message json;
+v_feature json;
+v_lot integer;
+v_team integer;
+v_thegeom public.geometry;
+v_x float;
+v_y float;
+v_user text;
+v_date text;
+v_data json;
+v_record record;
+v_error_context text;
 
 BEGIN
 
@@ -79,7 +79,8 @@ BEGIN
 		EXECUTE 'INSERT INTO selector_lot (lot_id, cur_user) VALUES ('|| v_lot ||', '''|| v_user ||''')';
 		
 		-- message
-		SELECT gw_fct_getmessage(null, 70) INTO v_message;
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+		"data":{"message":"3124", "function":"2882","debug_msg":""}}$$);'INTO v_message;		
 		v_data = p_data->>'data';
 		v_data = gw_fct_json_object_set_key (v_data, 'message', v_message);
 		p_data = gw_fct_json_object_set_key (p_data, 'data', v_data);
@@ -99,8 +100,10 @@ BEGIN
 			EXECUTE 'DELETE FROM selector_lot WHERE cur_user='''|| v_user ||'''';
 			EXECUTE 'INSERT INTO selector_lot (lot_id, cur_user) VALUES ('|| v_lot ||', '''|| v_user ||''')';
 			
+			
 			-- message
-			SELECT gw_fct_getmessage(null, 70) INTO v_message;
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			"data":{"message":"3124", "function":"2882","debug_msg":""}}$$);'INTO v_message;
 			v_data = p_data->>'data';
 			v_data = gw_fct_json_object_set_key (v_data, 'message', v_message);
 			p_data = gw_fct_json_object_set_key (p_data, 'data', v_data);
@@ -112,23 +115,22 @@ BEGIN
 			EXECUTE 'DELETE FROM selector_lot WHERE cur_user='''|| v_user ||'''';
 			
 			-- message
-			SELECT gw_fct_getmessage(null, 80) INTO v_message;
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			"data":{"message":"3126", "function":"2882","debug_msg":""}}$$);'INTO v_message;
 			v_data = p_data->>'data';
 			v_data = gw_fct_json_object_set_key (v_data, 'message', v_message);
 			p_data = gw_fct_json_object_set_key (p_data, 'data', v_data);
 		END IF;	
 	END IF;
-
 	
 	-- Return
 	RETURN gw_fct_getvisitmanager(p_data); 
 
---    Exception handling
-   -- EXCEPTION WHEN OTHERS THEN 
-    --    RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ', "apiVersion":'|| v_apiversion ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;    
-
-      
-
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

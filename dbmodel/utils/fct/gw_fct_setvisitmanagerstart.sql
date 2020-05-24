@@ -20,17 +20,18 @@ SELECT SCHEMA.gw_fct_setvisitmanagerstart($${
 */
 
 DECLARE
-	v_message json;
-	v_data json;
-	v_user text;
-	v_date text;
-	v_team text;
-	v_lot text;
-	v_thegeom public.geometry;
-	v_x float;
-	v_y float;
-	v_result text;
-	v_apiversion text;
+v_message json;
+v_data json;
+v_user text;
+v_date text;
+v_team text;
+v_lot text;
+v_thegeom public.geometry;
+v_x float;
+v_y float;
+v_result text;
+v_apiversion text;
+v_error_context text;
 
 BEGIN
 
@@ -66,11 +67,13 @@ BEGIN
 	END IF;
 
 	-- Insert start work day
-	EXECUTE 'INSERT INTO om_visit_lot_x_user (user_id,starttime,team_id,lot_id,the_geom) VALUES ('||quote_literal(v_user)||', '||quote_literal(v_date)||', '||quote_literal(v_team)||', '||quote_literal(v_lot)||', '||quote_literal(v_thegeom::text) ||')';
-	
+	EXECUTE 'INSERT INTO om_visit_lot_x_user (user_id,starttime,team_id,lot_id,the_geom) VALUES ('||quote_literal(v_user)||', '||quote_literal(v_date)||', '||
+	quote_literal(v_team)||', '||quote_literal(v_lot)||', '||quote_literal(v_thegeom::text) ||')';
 
 	-- message
-	SELECT gw_fct_getmessage(null, 70) INTO v_message;
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+	"data":{"message":"3126", "function":"2642","debug_msg":""}}$$);'INTO v_message;
+	
 	v_data = p_data->>'data';
 	v_data = gw_fct_json_object_set_key (v_data, 'message', v_message);
 	v_data = gw_fct_json_object_set_key (v_data, 'widget_actions', '{"widget_disabled":"data_startbutton"}'::json);
@@ -80,6 +83,13 @@ BEGIN
 	
 	-- Return
 	RETURN gw_fct_getvisitmanager(p_data);
+
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	
+
 
 END;
 $BODY$

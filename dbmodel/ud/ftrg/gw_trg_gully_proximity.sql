@@ -35,7 +35,7 @@ BEGIN
     -- If there is an existing gully closer than 'rec.gully_tolerance' meters --> error
     IF (v_numConnecs > 0) AND (v_gully_proximity_control IS TRUE) THEN
         EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-        "data":{"error":"1044", "function":"2814","debug_msg":"'||NEW.gully_id||'"}}$$);';
+        "data":{"message":"1044", "function":"2814","debug_msg":"'||NEW.gully_id||'"}}$$);';
     END IF;
 
     RETURN NEW;

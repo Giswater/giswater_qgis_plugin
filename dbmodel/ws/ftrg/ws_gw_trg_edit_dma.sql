@@ -22,12 +22,12 @@ BEGIN
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN  
                 --PERFORM  gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
-       			 -- "data":{"error":"1008", "function":"1320","debug_msg":null, "variables":null}}$$); 
+       			 -- "data":{"message":"1008", "function":"1320","debug_msg":null, "variables":null}}$$); 
             END IF;
             NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
             IF (NEW.sector_id IS NULL) THEN
                 --PERFORM  gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
-       			 -- "data":{"error":"1010", "function":"1320","debug_msg":null, "variables":null}}$$);    
+       			 -- "data":{"message":"1010", "function":"1320","debug_msg":null, "variables":null}}$$);    
             END IF;            
         END IF;
 		*/
@@ -35,13 +35,13 @@ BEGIN
 		--Exploitation ID
         IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
             --PERFORM gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
-       			 -- "data":{"error":"1012", "function":"1112","debug_msg":null, "variables":null}}$$); 
+       			 -- "data":{"message":"1012", "function":"1112","debug_msg":null, "variables":null}}$$); 
 			RETURN NULL;				
             END IF;
             expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
             IF (expl_id_int IS NULL) THEN
                 --PERFORM gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
-       			 -- "data":{"error":"1014", "function":"1112","debug_msg":null, "variables":null}}$$); 
+       			 -- "data":{"message":"1014", "function":"1112","debug_msg":null, "variables":null}}$$); 
 				RETURN NULL; 
             END IF;
 			
@@ -52,7 +52,7 @@ BEGIN
 			IF (NEW.muni_id IS NULL) THEN
 				NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) LIMIT 1);
 					--PERFORM gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
-       			 -- "data":{"error":"2024", "function":"1112","debug_msg":null, "variables":null}}$$); 
+       			 -- "data":{"message":"2024", "function":"1112","debug_msg":null, "variables":null}}$$); 
 			END IF;
 		END IF;
 		*/

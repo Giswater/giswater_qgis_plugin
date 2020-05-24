@@ -455,3 +455,27 @@ UPDATE sys_function SET input_params ='json', return_type ='json' WHERE id =2880
 UPDATE sys_function SET input_params ='json', return_type ='json' WHERE id =2882;
 UPDATE sys_function SET input_params ='json', return_type ='json' WHERE id =2884;
 
+
+UPDATE sys_message SET id = 3112 WHERE id = 10;
+UPDATE sys_message SET id = 3114 WHERE id = 20;
+UPDATE sys_message SET id = 3116 WHERE id = 30;
+UPDATE sys_message SET id = 3118 WHERE id = 40;
+UPDATE sys_message SET id = 3120 WHERE id = 50;
+UPDATE sys_message SET id = 3122 WHERE id = 60;
+UPDATE sys_message SET id = 3124 WHERE id = 70;
+UPDATE sys_message SET id = 3126 WHERE id = 80;
+UPDATE sys_message SET id = 3128 WHERE id = 90;
+UPDATE sys_message SET id = 3130 WHERE id = 100;
+
+DELETE FROM sys_function WHERE id = 2594;
+UPDATE sys_function SET input_params = 'json' WHERE id = 2820;
+
+
+
+
+
+
+
+
+
+

@@ -42,31 +42,32 @@ any row, any element:
 */
 
 DECLARE
---    Variables
-    v_device integer;
-    v_infotype integer;
-    v_tablename text;
-    v_id  character varying;
-    v_fields json;
-    v_columntype character varying;
-    v_querytext varchar;
-    v_columntype_id character varying;
-    v_apiversion json;
-    v_text text[];
-    v_jsonfield json;
-    text text;
-    i integer=1;
-    v_field text;
-    v_value text;
-    v_return text;
-    v_schemaname text;
-    v_type text;
-    v_epsg integer;
-    v_newid text;
-    v_idname text;
-    v_feature json;
-    v_message json;
-    v_first boolean;
+v_device integer;
+v_infotype integer;
+v_tablename text;
+v_id  character varying;
+v_fields json;
+v_columntype character varying;
+v_querytext varchar;
+v_columntype_id character varying;
+v_apiversion json;
+v_text text[];
+v_jsonfield json;
+text text;
+i integer=1;
+v_field text;
+v_value text;
+v_return text;
+v_schemaname text;
+v_type text;
+v_epsg integer;
+v_newid text;
+v_idname text;
+v_feature json;
+v_message json;
+v_first boolean;
+v_error_context text;
+
 
 BEGIN
 	--    Set search path to local schema
@@ -195,17 +196,20 @@ BEGIN
 	v_feature =  gw_fct_json_object_set_key (v_feature, 'id', v_newid);
 
 	-- set message
-	SELECT gw_fct_getmessage(v_feature::json, 40) INTO v_message;
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+	"data":{"message":"3118", "function":"2616","debug_msg":""}}$$);'INTO v_message;
 	
 	RAISE NOTICE '--- Returning from (gw_fct_setinsert) with this message :: % ---', v_message;
 
---    Return
+	-- Return
     RETURN ('{"status":"Accepted", "message":'|| v_message ||', "apiVersion":'|| v_apiversion ||
 	    ', "body": {"feature":{"tableName":"'||v_tablename||'", "id":"'||v_newid||'"}}}')::json;    
 
---    Exception handling
-  --  EXCEPTION WHEN OTHERS THEN 
-    --    RETURN ('{"status":"Failed","message":' || (to_json(SQLERRM)) || ', "apiVersion":'|| v_apiversion ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;    
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

@@ -36,7 +36,7 @@ BEGIN
     IF (v_numConnecs > 0) AND (v_connec_proximity_control IS TRUE) THEN
 
        EXECUTE 'EXECUTE gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-        "data":{"error":"1044", "function":"1106","debug_msg":"'||NEW.connec_id||'"}}$$);';
+        "data":{"message":"1044", "function":"1106","debug_msg":"'||NEW.connec_id||'"}}$$);';
 
     END IF;
 
