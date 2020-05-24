@@ -9,4 +9,4 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 --2020/05/24
-DROP SEQUENCE IF EXISTS 'inp_vertice_id_seq';
+DROP SEQUENCE IF EXISTS inp_vertice_id_seq;

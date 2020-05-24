@@ -17,13 +17,12 @@ CREATE TRIGGER gw_trg_vi_subareas INSTEAD OF INSERT OR UPDATE OR DELETE ON SCHEM
 CREATE TRIGGER gw_trg_vi_subcatchments INSTEAD OF INSERT OR UPDATE OR DELETE ON SCHEMA_NAME.vi_subcatchments FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_vi('vi_subcatchments');
 CREATE TRIGGER gw_trg_vi_gwf INSTEAD OF INSERT OR UPDATE OR DELETE ON SCHEMA_NAME.vi_gwf FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_vi('vi_gwf');
 
-CREATE TRIGGER gw_trg_edit_subcatchment INSTEAD OF INSERT OR UPDATE OR DELETE  ON SCHEMA_NAME.v_edit_subcatchment  
-FOR EACH ROW  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_edit_subcatchment('subcatchment');
+-- trigger deleted on 3.4.010
+--CREATE TRIGGER gw_trg_edit_subcatchment INSTEAD OF INSERT OR UPDATE OR DELETE  ON SCHEMA_NAME.v_edit_subcatchment  
+--FOR EACH ROW  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_edit_subcatchment('subcatchment');
 
- 
 CREATE TRIGGER gw_trg_plan_psector_x_gully BEFORE INSERT OR UPDATE OF gully_id ON plan_psector_x_gully 
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_plan_psector_x_gully();
-
   
 CREATE TRIGGER gw_trg_plan_psector_x_gully_geom AFTER INSERT OR UPDATE OR DELETE  ON plan_psector_x_gully
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_plan_psector_geom('plan');

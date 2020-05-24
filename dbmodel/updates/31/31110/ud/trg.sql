@@ -11,7 +11,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2019/03/19
 
-DROP TRIGGER IF EXISTS gw_trg_edit_subcatchment ON SCHEMA_NAME.v_edit_subcatchment;
-
-CREATE TRIGGER gw_trg_edit_subcatchment INSTEAD OF INSERT OR UPDATE OR DELETE  ON SCHEMA_NAME.v_edit_subcatchment  
-FOR EACH ROW  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_edit_subcatchment('subcatchment');
+-- trigger deleted on 3.4.010
+--DROP TRIGGER IF EXISTS gw_trg_edit_subcatchment ON SCHEMA_NAME.v_edit_subcatchment;
+--CREATE TRIGGER gw_trg_edit_subcatchment INSTEAD OF INSERT OR UPDATE OR DELETE  ON SCHEMA_NAME.v_edit_subcatchment  
+--FOR EACH ROW  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_edit_subcatchment('subcatchment');

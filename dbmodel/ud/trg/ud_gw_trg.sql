@@ -176,9 +176,10 @@ DROP TRIGGER IF EXISTS gw_trg_edit_samplepoint ON "SCHEMA_NAME".v_edit_samplepoi
 CREATE TRIGGER gw_trg_edit_samplepoint INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_samplepoint 
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_samplepoint('samplepoint');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_subcatchment ON "SCHEMA_NAME".v_edit_subcatchment;
-CREATE TRIGGER gw_trg_edit_subcatchment INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_subcatchment
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_subcatchment(subcatchment);
+-- trigger deleted on 3.4.010
+--DROP TRIGGER IF EXISTS gw_trg_edit_subcatchment ON "SCHEMA_NAME".v_edit_subcatchment;
+--CREATE TRIGGER gw_trg_edit_subcatchment INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_subcatchment
+--FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_subcatchment(subcatchment);
 
 DROP TRIGGER IF EXISTS gw_trg_flw_regulator ON "SCHEMA_NAME"."inp_flwreg_orifice";
 CREATE TRIGGER gw_trg_flw_regulator BEFORE INSERT OR UPDATE ON "SCHEMA_NAME"."inp_flwreg_orifice" 

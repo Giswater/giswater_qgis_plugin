@@ -15,7 +15,7 @@ UPDATE sys_table SET id ='subcatchment' WHERE id ='inp_subcatchment';
 
 UPDATE sys_table SET id ='v_edit_subcatchment',sys_sequence = 'inp_subcatchment_subc_id_seq' WHERE id ='v_edit_inp_subcatchment';
 
-UPDATE sys_function SET function_name ='gw_trg_edit_inp_subcatchment' WHERE id ='gw_trg_edit_subcatchment';
+UPDATE sys_function SET function_name ='gw_trg_edit_inp_subcatchment' WHERE function_name ='gw_trg_edit_subcatchment';
 
 UPDATE config_form_fields SET formname = 'v_edit_inp_subcatchment' WHERE formname = 'v_edit_subcatchment';
 UPDATE sys_table SET notify_action = (replace(notify_action::text, 'v_edit_subcatchment', 'v_edit_inp_subcatchment'))::json;
