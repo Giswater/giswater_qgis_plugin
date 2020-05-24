@@ -235,4 +235,5 @@ DELETE FROM sys_function WHERE function_name = 'gw_fct_mincut_inlet_flowtrace';
 
 UPDATE config_form_fields SET formname = 'visit_manager' WHERE formname = 'visitManager';
 
+UPDATE sys_table SET sys_sequence = null WHERE id like 'v_inp_vertice';
 

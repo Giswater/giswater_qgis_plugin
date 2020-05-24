@@ -7,10 +7,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-ALTER TABLE subcatchment RENAME TO inp_subcatchment;
 
-ALTER TABLE v_edit_subcatchment RENAME TO v_edit_inp_subcatchment;
-
-ALTER SEQUENCE subcatchment_subc_id_seq RENAME TO inp_subcatchment_subc_id_seq;
-
-DROP SEQUENCE IF EXISTS 'inp_vertice_seq';
+--2020/05/24
+DROP SEQUENCE IF EXISTS 'inp_vertice_id_seq';

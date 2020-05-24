@@ -167,12 +167,6 @@ BEGIN
 		EXECUTE 'SELECT setval(''SCHEMA_NAME.doc_seq'','||v_max_seq_id||', true)';
 	END IF;
 	
-	IF v_project_type='WS' THEN 
-		PERFORM setval('SCHEMA_NAME.inp_vertice_id_seq', 1, true);
-	ELSE 
-		PERFORM setval('SCHEMA_NAME.inp_vertice_seq', 1, true);
-	END IF;
-	
 	--Set hydrology_selector when null values from user
 	IF v_project_type='UD' THEN
 		IF (SELECT hydrology_id FROM selector_inp_hydrology WHERE cur_user = current_user) IS NULL THEN
