@@ -989,14 +989,6 @@ class Giswater(QObject):
         # Hide info button if giswater project is loaded
         if show_warning:
             self.set_info_button_visible(False)
-		
-		# Manage guided_map if user has configured
-        try:
-            guided_map = result['body']['actions']['userGuideMap']
-            if guided_map:
-                self.manage_guided_map()
-        except Exception as e:
-            self.controller.log_info(str(e))
 
         # Open automatically 'search docker' depending its value in user settings
         open_search = self.controller.get_user_setting_value('open_search', 'true')
@@ -1131,10 +1123,19 @@ class Giswater(QObject):
             QApplication.setOverrideCursor(Qt.ArrowCursor)
             self.check_project_result = CheckProjectResult(self.iface, self.settings, self.controller, self.plugin_dir)
             self.check_project_result.set_controller(self.controller)
-            status = self.check_project_result.populate_audit_check_project(layers, "true")
-            QApplication.restoreOverrideCursor()
-            if not status:
-                return False
+            status, result = self.check_project_result.populate_audit_check_project(layers, "true")
+            try:
+                if 'actions' in result['body']:
+                    if 'useGuideMap' in result['body']['actions']:
+                        guided_map = result['body']['actions']['useGuideMap']
+                        if guided_map:
+                            self.controller.log_info("manage_guided_map")
+                            self.manage_guided_map()
+            except Exception as e:
+                self.controller.log_info(str(e))
+            finally:
+                QApplication.restoreOverrideCursor()
+                return status
 
         return True
 
@@ -1463,6 +1464,7 @@ class Giswater(QObject):
         body = "" + client + form + feature + data
 
         return body
+
 
     def get_qgis_project_variables(self):
         """ Manage qgis project variables """

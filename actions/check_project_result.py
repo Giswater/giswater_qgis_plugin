@@ -53,12 +53,12 @@ class CheckProjectResult(ApiParent):
 
         status = self.controller.execute_sql(sql)
         if not status:
-            return False
+            return False, None
 
         # Execute function 'gw_fct_audit_check_project'
-        self.execute_audit_check_project(init_project)
+        result = self.execute_audit_check_project(init_project)
 
-        return True
+        return True, result
 
 
     def execute_audit_check_project(self, init_project):
@@ -73,15 +73,16 @@ class CheckProjectResult(ApiParent):
         body = self.create_body(extras=extras)
         result = self.controller.get_json('gw_fct_audit_check_project', body, log_sql=True)
         try:
-            if not result or (result['body']['actions']['hideForm'] == True): return True
+            if not result or (result['body']['actions']['hideForm'] == True):
+                return result
         except KeyError as e:
             self.controller.log_warning(f"EXCEPTION: {type(e).__name__}, {e}")
-            return True
+            return result
 
         # Show dialog with audit check project result
         self.show_check_project_result(result)
 
-        return True
+        return result
 
 
     def show_check_project_result(self, result):
