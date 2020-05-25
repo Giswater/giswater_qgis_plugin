@@ -33,6 +33,12 @@ VALUES ('edit_typevalue','value_verified', 'connec', 'verified') ON CONFLICT (ty
 
 UPDATE config_form_fields SET dv_querytext = 'SELECT id, id as idval FROM edit_typevalue WHERE typevalue = ''value_verified''' where column_id = 'verified';
 
+INSERT INTO config_typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
+VALUES ('plan_typevalue','value_priority', 'plan_psector', 'plan_psector') ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;	
+
+UPDATE config_form_fields SET dv_querytext = 'SELECT idval as id,idval FROM plan_typevalue WHERE typevalue=''value_priority''' WHERE formname = 'v_edit_plan_psector' 
+and column_id = 'priority';
+
 --2020/05/23
 UPDATE sys_function SET isdeprecated = true WHERE id = 2224;
 UPDATE sys_function SET isdeprecated = true WHERE id = 2226;

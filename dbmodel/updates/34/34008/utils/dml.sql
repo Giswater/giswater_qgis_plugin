@@ -131,3 +131,6 @@ SELECT 'value_review_status', id, name,descript  FROM value_review_status  ON CO
 
 INSERT INTO edit_typevalue(typevalue, id, idval)
 SELECT 'value_review_validation', id, name  FROM value_review_validation  ON CONFLICT (typevalue, id) DO NOTHING;	
+
+INSERT INTO plan_typevalue(typevalue, id, idval)
+SELECT 'value_priority',  row_number() OVER (), id  FROM value_priority  ON CONFLICT (typevalue, id) DO NOTHING;

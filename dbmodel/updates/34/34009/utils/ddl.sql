@@ -201,3 +201,5 @@ ALTER TABLE sys_function ADD CONSTRAINT sys_function_function_name_unique UNIQUE
 ALTER TABLE value_verified RENAME TO _value_verified_;
 ALTER TABLE value_review_status RENAME TO _value_review_status_;
 ALTER TABLE value_review_validation RENAME TO _value_review_validation_;
+ALTER TABLE value_yesno RENAME TO _value_yesno_;
+ALTER TABLE value_priority RENAME TO _value_priority_;
