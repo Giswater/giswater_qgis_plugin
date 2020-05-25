@@ -46,6 +46,9 @@ class Go2Epa(ApiParent):
     def go2epa(self):
         """ Button 23: Open form to set INP, RPT and project """
 
+        # Show form in docker?
+        docker = self.init_docker('qgis_form_docker')
+
         # Create dialog
         self.dlg_go2epa = FileManager()
         self.load_settings(self.dlg_go2epa)
@@ -54,13 +57,7 @@ class Go2Epa(ApiParent):
             self.dlg_go2epa.chk_export_subcatch.setVisible(False)
 
         # Set signals
-        self.dlg_go2epa.txt_result_name.textChanged.connect(partial(self.check_result_id))
-        self.dlg_go2epa.btn_file_inp.clicked.connect(self.go2epa_select_file_inp)
-        self.dlg_go2epa.btn_file_rpt.clicked.connect(self.go2epa_select_file_rpt)
-        self.dlg_go2epa.btn_accept.clicked.connect(self.go2epa_accept)
-        self.dlg_go2epa.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_go2epa))
-        self.dlg_go2epa.rejected.connect(partial(self.close_dialog, self.dlg_go2epa))
-        self.dlg_go2epa.btn_options.clicked.connect(self.epa_options)
+        self.set_signals()
 
         if self.project_type == 'ws':
             self.dlg_go2epa.btn_hs_ds.setText("Dscenario Selector")
@@ -68,7 +65,6 @@ class Go2Epa(ApiParent):
             tableright = "selector_inp_demand"
             field_id_left = "dscenario_id"
             field_id_right = "dscenario_id"
-
             self.dlg_go2epa.btn_hs_ds.clicked.connect(
                 partial(self.sector_selection, tableleft, tableright, field_id_left, field_id_right, aql=""))
 
@@ -84,8 +80,23 @@ class Go2Epa(ApiParent):
 
         self.set_completer_result(self.dlg_go2epa.txt_result_name, 'v_ui_rpt_cat_result', 'result_id')
 
-        # Open dialog
-        self.open_dialog(self.dlg_go2epa)
+        if docker:
+            self.dock_dialog(docker, self.dlg_go2epa)
+            self.dlg_go2epa.btn_cancel.clicked.disconnect()
+            self.dlg_go2epa.btn_cancel.clicked.connect(partial(self.close_docker, docker, self.dlg_go2epa))
+        else:
+            self.open_dialog(self.dlg_go2epa)
+
+
+    def set_signals(self):
+
+        self.dlg_go2epa.txt_result_name.textChanged.connect(partial(self.check_result_id))
+        self.dlg_go2epa.btn_file_inp.clicked.connect(self.go2epa_select_file_inp)
+        self.dlg_go2epa.btn_file_rpt.clicked.connect(self.go2epa_select_file_rpt)
+        self.dlg_go2epa.btn_accept.clicked.connect(self.go2epa_accept)
+        self.dlg_go2epa.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_go2epa))
+        self.dlg_go2epa.rejected.connect(partial(self.close_dialog, self.dlg_go2epa))
+        self.dlg_go2epa.btn_options.clicked.connect(self.epa_options)
 
 
     def check_inp_chk(self, file_inp):
@@ -402,7 +413,7 @@ class Go2Epa(ApiParent):
 
         # Check for sector selector
         if self.export_inp:
-            sql = "SELECT sector_id FROM inp_selector_sector LIMIT 1"
+            sql = "SELECT sector_id FROM selector_sector LIMIT 1"
             row = self.controller.get_row(sql)
             if row is None:
                 msg = "You need to select some sector"
