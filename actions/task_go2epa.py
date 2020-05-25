@@ -213,7 +213,7 @@ class TaskGo2Epa(QgsTask):
         try:
             # Delete previous values of user on temp table
             sql = ("DELETE FROM temp_csv2pg "
-                   "WHERE user_name = current_user AND csv2pgcat_id = 11")
+                   "WHERE cur_user = current_user AND csv2pgcat_id = 11")
             self.controller.execute_sql(sql)
             # Importing file to temporal table
             status = self.insert_rpt_into_db(self.file_rpt)
@@ -233,7 +233,7 @@ class TaskGo2Epa(QgsTask):
         progress = 0
 
         # Create dict with sources
-        sql = "SELECT tablename, target FROM sys_csv2pg_config WHERE pg2csvcat_id = '11';"
+        sql = "SELECT tablename, target FROM config_csv_param WHERE pg2csvcat_id = '11';"
         rows = self.controller.get_rows(sql)
         sources = {}
         for row in rows:
