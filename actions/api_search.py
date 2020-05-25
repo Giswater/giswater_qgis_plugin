@@ -154,22 +154,7 @@ class ApiSearch(ApiParent):
                 break
 
         # Show info in docker?
-        row = self.controller.get_config('qgis_form_docker')
-        if row:
-            if row[0].lower() == 'true':
-                self.close_docker()
-                self.dlg_docker = DockerUi()
-                self.dlg_docker.dlg_closed.connect(partial(self.close_docker))
-                self.manage_docker_options()
-            else:
-                self.dlg_docker = None
-        else:
-            self.dlg_docker = None
-
-        self.close_docker()
-        self.dlg_docker = DockerUi()
-        self.dlg_docker.dlg_closed.connect(partial(self.close_docker))
-        self.manage_docker_options()
+        self.init_docker()
 
         # Get selected tab name
         tab_selected = self.dlg_search.main_tab.widget(index).objectName()

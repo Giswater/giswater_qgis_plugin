@@ -16,7 +16,6 @@ from .manage_document import ManageDocument
 from .manage_workcat_end import ManageWorkcatEnd
 from .delete_feature import DeleteFeature
 from .parent import ParentAction
-from ..ui_manager import DockerUi
 
 
 class Edit(ParentAction):
@@ -72,20 +71,8 @@ class Edit(ParentAction):
         else:
             self.controller.log_info(str(type("NO FEATURE TYPE DEFINED")))
 
-        if hasattr(self, 'dlg_docker') and type(self.dlg_docker) is DockerUi:
-            self.close_docker()
-
-        row = self.controller.get_config('qgis_form_docker')
-        if row:
-            if row[0].lower() == 'true':
-                self.close_docker()
-                self.dlg_docker = DockerUi()
-                self.dlg_docker.dlg_closed.connect(self.close_docker)
-                self.manage_docker_options()
-            else:
-                self.dlg_docker = None
-        else:
-            self.dlg_docker = None
+        self.close_docker()
+        self.init_docker()
 
         self.api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, 'data')
         result, dialog = self.api_cf.open_form(point=list_points, feature_cat=self.feature_cat,
@@ -98,20 +85,6 @@ class Edit(ParentAction):
         if not result:
             self.layer.deleteFeature(feature.id())
             self.iface.actionRollbackEdits().trigger()
-
-
-    def close_docker(self):
-        """ Save QDockWidget position (1=Left, 2=right, 8=bottom, 4=top),
-            remove from iface and del class
-        """
-
-        if hasattr(self, 'dlg_docker') and type(self.dlg_docker) is DockerUi:
-            if not self.dlg_docker.isFloating():
-                cur_user = self.controller.get_current_user()
-                docker_pos = self.iface.mainWindow().dockWidgetArea(self.dlg_docker)
-                self.controller.plugin_settings_set_value(f"docker_info_{cur_user}", docker_pos)
-                self.iface.removeDockWidget(self.dlg_docker)
-                del self.dlg_docker
 
 
     def get_feature_by_id(self, layer, id_):

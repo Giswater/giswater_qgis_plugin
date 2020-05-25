@@ -59,6 +59,23 @@ class CadApiInfo(ParentMapTool):
         return point
 
 
+    def init_docker(self, docker_param='qgis_info_docker'):
+        """ Get user config parameter @docker_param """
+
+        # Show info or form in docker?
+        row = self.controller.get_config(docker_param)
+        if row:
+            if row[0].lower() == 'true':
+                self.close_docker()
+                self.dlg_docker = DockerUi()
+                self.dlg_docker.dlg_closed.connect(self.close_docker)
+                self.manage_docker_options()
+            else:
+                self.dlg_docker = None
+        else:
+            self.dlg_docker = None
+
+
     def manage_docker_options(self):
         """ Check if user want dock the dialog or not """
 
@@ -105,17 +122,7 @@ class CadApiInfo(ParentMapTool):
             self.block_signal = False
             return
 
-        row = self.controller.get_config('qgis_form_docker')
-        if row:
-            if row[0].lower() == 'true':
-                self.close_docker()
-                self.dlg_docker = DockerUi()
-                self.dlg_docker.dlg_closed.connect(partial(self.close_docker))
-                self.manage_docker_options()
-            else:
-                self.dlg_docker = None
-        else:
-            self.dlg_docker = None
+        self.init_docker()
 
         if event.button() == Qt.LeftButton:
             point = self.create_point(event)

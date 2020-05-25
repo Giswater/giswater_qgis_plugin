@@ -1123,6 +1123,39 @@ class ParentAction(object):
             pass
 
 
+    def init_docker(self, docker_param='qgis_info_docker'):
+        """ Get user config parameter @docker_param """
+
+        # Show info or form in docker?
+        row = self.controller.get_config(docker_param)
+        if row:
+            if row[0].lower() == 'true':
+                self.close_docker()
+                self.dlg_docker = DockerUi()
+                self.dlg_docker.dlg_closed.connect(self.close_docker)
+                self.manage_docker_options()
+            else:
+                self.dlg_docker = None
+        else:
+            self.dlg_docker = None
+
+        return self.dlg_docker
+
+
+    def close_docker(self):
+        """ Save QDockWidget position (1=Left, 2=right, 8=bottom, 4=top),
+            remove from iface and del class
+        """
+
+        if hasattr(self, 'dlg_docker') and type(self.dlg_docker) is DockerUi:
+            if not self.dlg_docker.isFloating():
+                cur_user = self.controller.get_current_user()
+                docker_pos = self.iface.mainWindow().dockWidgetArea(self.dlg_docker)
+                self.controller.plugin_settings_set_value(f"docker_info_{cur_user}", docker_pos)
+                self.iface.removeDockWidget(self.dlg_docker)
+                del self.dlg_docker
+
+
     def manage_docker_options(self):
         """ Check if user want dock the dialog or not """
 
