@@ -216,3 +216,6 @@ UPDATE config_param_system SET datatype = 'json', widgettype = 'linetext' WHERE 
 
 UPDATE sys_function SET function_type ='trigger function' WHERE function_type ='function trigger';
 
+UPDATE sys_param_user SET widgettype = 'check' where id = 'utils_debug_mode';
+UPDATE sys_param_user SET layout_order=6 where id = 'edit_builtdate_vdefault';
+
