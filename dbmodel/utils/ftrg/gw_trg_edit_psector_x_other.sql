@@ -21,7 +21,7 @@ BEGIN
 		
 		-- measurement_vdefault
 			IF (NEW.measurement IS NULL) THEN
-				NEW.measurement := (SELECT "value" FROM config_param_user WHERE "parameter"='psector_measurement_vdefault' AND "cur_user"="current_user"())::float;
+				NEW.measurement := (SELECT "value" FROM config_param_user WHERE "parameter"='plan_psector_measurement_vdefault' AND "cur_user"="current_user"())::float;
 				IF (NEW.measurement IS NULL) THEN NEW.measurement=1;
 				END IF;
 			END IF;

@@ -573,8 +573,8 @@ INSERT INTO audit_cat_param_user VALUES ('pipecat_vdefault', NULL, NULL, 'role_e
 INSERT INTO audit_cat_param_user VALUES ('presszone_vdefault', NULL, NULL, 'role_edit', NULL, 'cat_presszone', 'id', NULL, 'text');
 INSERT INTO audit_cat_param_user VALUES ('state_vdefault', NULL, NULL, 'role_edit', NULL, 'value_state', 'id', NULL, 'integer');
 INSERT INTO audit_cat_param_user VALUES ('soilcat_vdefault', NULL, NULL, 'role_edit', NULL, 'cat_soil', 'id', NULL, 'text');
-INSERT INTO audit_cat_param_user VALUES ('sector_vdefault', NULL, NULL, 'role_edit', NULL, 'sector', 'sector_id', NULL, 'integer');
-INSERT INTO audit_cat_param_user VALUES ('psector_vdefault', NULL, NULL, 'role_master', NULL, 'plan_psector', 'psector_id', NULL, 'integer');
+INSERT INTO audit_cat_param_user VALUES ('edit_sector_vdefault', NULL, NULL, 'role_edit', NULL, 'sector', 'sector_id', NULL, 'integer');
+INSERT INTO audit_cat_param_user VALUES ('plan_psector_vdefault', NULL, NULL, 'role_master', NULL, 'plan_psector', 'psector_id', NULL, 'integer');
 INSERT INTO audit_cat_param_user VALUES ('exploitation_vdefault', NULL, NULL, 'role_edit', NULL, 'exploitation', 'expl_id', NULL, 'integer');
 INSERT INTO audit_cat_param_user VALUES ('elementcat_vdefault', NULL, NULL, 'role_edit', NULL, 'cat_element', 'id', NULL, 'text');
 INSERT INTO audit_cat_param_user VALUES ('workcat_vdefault', NULL, NULL, 'role_edit', NULL, 'cat_work', 'id', NULL, 'text');

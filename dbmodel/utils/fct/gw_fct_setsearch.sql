@@ -347,8 +347,8 @@ ELSIF tab_arg = 'address' THEN
 
 
     -- Fix municipality vdefault
-    DELETE FROM config_param_user WHERE parameter='search_municipality_vdefault' AND cur_user=current_user;
-    INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('search_municipality_vdefault',id_arg, current_user);
+    DELETE FROM config_param_user WHERE parameter='basic_search_municipality_vdefault' AND cur_user=current_user;
+    INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('basic_search_municipality_vdefault',id_arg, current_user);
 
     -- Get street
     EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) 
@@ -382,8 +382,8 @@ ELSIF tab_arg = 'address' THEN
     text_arg := concat('%', edit1->>'text' ,'%');
 
     -- Fix exploitation vdefault
-    DELETE FROM config_param_user WHERE parameter='search_exploitation_vdefault' AND cur_user=current_user;
-    INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('search_exploitation_vdefault',id_arg, current_user);
+    DELETE FROM config_param_user WHERE parameter='basic_search_exploitation_vdefault' AND cur_user=current_user;
+    INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('basic_search_exploitation_vdefault',id_arg, current_user);
 
     
     -- Get hydrometer 
@@ -505,8 +505,8 @@ ELSIF tab_arg = 'address' THEN
     text_arg := concat('%', edit1->>'text' ,'%');
 
     -- Fix exploitation vdefault
-    DELETE FROM config_param_user WHERE parameter='search_exploitation_vdefault' AND cur_user=current_user;
-    INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('search_exploitation_vdefault',id_arg, current_user);
+    DELETE FROM config_param_user WHERE parameter='basic_search_exploitation_vdefault' AND cur_user=current_user;
+    INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('basic_search_exploitation_vdefault',id_arg, current_user);
 
     -- Get psector (improved version)
     EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) 

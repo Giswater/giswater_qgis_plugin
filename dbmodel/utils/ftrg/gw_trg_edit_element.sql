@@ -26,18 +26,18 @@ BEGIN
 
 		-- Cat element
 		IF (NEW.elementcat_id IS NULL) THEN
-			NEW.elementcat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='elementcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			NEW.elementcat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='edit_elementcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;
 	
 	
 		-- Verified
 		IF (NEW.verified IS NULL) THEN
-			NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;
 	
 		-- State
 		IF (NEW.state IS NULL) THEN
-			NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='state_vdefault' AND "cur_user"="current_user"());
+			NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_state_vdefault' AND "cur_user"="current_user"());
 		END IF;
         
         -- State type
@@ -47,7 +47,7 @@ BEGIN
 	
 		-- Exploitation
 		IF (NEW.expl_id IS NULL) THEN
-			NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='exploitation_vdefault' AND "cur_user"="current_user"());
+			NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_exploitation_vdefault' AND "cur_user"="current_user"());
 			IF (NEW.expl_id IS NULL) THEN
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN

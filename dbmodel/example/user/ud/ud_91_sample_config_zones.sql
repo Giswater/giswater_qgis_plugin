@@ -6,50 +6,11 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('state_vdefault', '1', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('gratecat_vdefault', 'N/I', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('verified_vdefault', 'VERIFIED', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('arccat_vdefault', 'CON-CC040', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('connecat_vdefault', 'PVC-CC025_D', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('elementcat_vdefault', 'COVER70', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('nodecat_vdefault', 'C_MANHOLE-BR100', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('gullycat_vdefault', 'GULLY', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('visitcat_vdefault', '1', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('om_param_type_vdefault', '1', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('psector_scale_vdefault', '1000', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('psector_rotation_vdefault', '0', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('psector_gexpenses_vdefault', '19', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('psector_vat_vdefault', '21', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('psector_other_vdefault', '4', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('psector_type_vdefault', '1', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('pavement_vdefault', 'Asphalt', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('virtual_polygon_vdefault', 'Temporal Polygon Layer', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('virtual_point_vdefault', 'Temporal Point Layer', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('virtual_line_vdefault', 'Temporal Line Layer', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('epa_outfall_type_vdefault', 'NORMAL', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('epa_conduit_q0_vdefault', '0', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('epa_junction_y0_vdefault', '0', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('epa_rgage_scf_vdefault', '1', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('psector_vdefault', '1', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('statetype_vdefault', '2', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('workcat_vdefault', 'work1', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('ownercat_vdefault', 'owner1', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('soilcat_vdefault', 'soil1', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('qgis_template_folder_path', NULL, current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_arc_downgrade_force', 'FALSE', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_arc_division_dsbl', 'FALSE', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('plan_arc_vdivision_dsbl', 'FALSE', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('statetype_plan_vdefault', 3, current_user);
-
 
 -- insert mandatory values
 INSERT INTO config_param_user (parameter, value, cur_user)
 		SELECT sys_param_user.id, vdefault, current_user FROM config_param_user RIGHT JOIN sys_param_user ON sys_param_user.id=parameter 
 		WHERE ismandatory IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member')) ON CONFLICT (parameter, cur_user) DO NOTHING;
-
-
-
-
 
 
 INSERT INTO macroexploitation VALUES ('1', 'Macroexploitation-1', 'Macroexplotation-1');

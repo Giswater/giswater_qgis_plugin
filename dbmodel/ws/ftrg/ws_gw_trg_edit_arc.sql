@@ -69,7 +69,7 @@ BEGIN
 			IF v_customfeature IS NOT NULL THEN
 				NEW.arccat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"=lower(concat(v_customfeature,'_vdefault')) AND "cur_user"="current_user"() LIMIT 1);
 			ELSE
-				NEW.arccat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='arccat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+				NEW.arccat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='edit_arccat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 
 				-- get first value (last chance)
 				IF (NEW.arccat_id IS NULL) THEN
@@ -106,7 +106,7 @@ BEGIN
 			
 			-- getting value default
 			IF (NEW.expl_id IS NULL) THEN
-				NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='exploitation_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+				NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_exploitation_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF;
 			
 			-- getting value from geometry of mapzone
@@ -139,7 +139,7 @@ BEGIN
 			
 			-- getting value default
 			IF (NEW.sector_id IS NULL) THEN
-				NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='sector_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+				NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_sector_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF;
 			
 			-- getting value from geometry of mapzone
@@ -172,7 +172,7 @@ BEGIN
 			
 			-- getting value default
 			IF (NEW.dma_id IS NULL) THEN
-				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='dma_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_dma_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF;
 			
 			-- getting value from geometry of mapzone
@@ -238,7 +238,7 @@ BEGIN
 			
 			-- getting value default
 			IF (NEW.muni_id IS NULL) THEN
-				NEW.muni_id := (SELECT "value" FROM config_param_user WHERE "parameter"='municipality_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+				NEW.muni_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_municipality_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF;
 			
 			-- getting value from geometry of mapzone
@@ -262,7 +262,7 @@ BEGIN
 		
 		-- State
         IF (NEW.state IS NULL) THEN
-            NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='state_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+            NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_state_vdefault' AND "cur_user"="current_user"() LIMIT 1);
         END IF;
 
 		-- State_type
@@ -293,27 +293,27 @@ BEGIN
 
 		-- Workcat_id
 		IF (NEW.workcat_id IS NULL) THEN
-			NEW.workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			NEW.workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_workcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;
 		
 		-- Ownercat_id
         IF (NEW.ownercat_id IS NULL) THEN
-            NEW.ownercat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='ownercat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+            NEW.ownercat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_ownercat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
         END IF;
 		
 		-- Soilcat_id
         IF (NEW.soilcat_id IS NULL) THEN
-            NEW.soilcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='soilcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+            NEW.soilcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_soilcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
         END IF;
 
 		-- Builtdate
 		IF (NEW.builtdate IS NULL) THEN
-			NEW.builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			NEW.builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='edit_builtdate_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;
 		
 		-- Verified
         IF (NEW.verified IS NULL) THEN
-            NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+            NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
         END IF;
 	
 		-- LINK
@@ -324,39 +324,39 @@ BEGIN
 		v_featurecat = (SELECT arctype_id FROM cat_arc WHERE id = NEW.arccat_id);
 
 		--Location type
-		IF NEW.location_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'feature_location_vdefault' AND cur_user = current_user)  = v_featurecat THEN
+		IF NEW.location_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'edit_feature_location_vdefault' AND cur_user = current_user)  = v_featurecat THEN
 			NEW.location_type = (SELECT value FROM config_param_user WHERE parameter = 'featureval_location_vdefault' AND cur_user = current_user);
 		END IF;
 
 		IF NEW.location_type IS NULL THEN
-			NEW.location_type = (SELECT value FROM config_param_user WHERE parameter = 'arc_location_vdefault' AND cur_user = current_user);
+			NEW.location_type = (SELECT value FROM config_param_user WHERE parameter = 'edit_arc_location_vdefault' AND cur_user = current_user);
 		END IF;
 
 		--Fluid type
-		IF NEW.fluid_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'feature_fluid_vdefault' AND cur_user = current_user)  = v_featurecat THEN
-			NEW.fluid_type = (SELECT value FROM config_param_user WHERE parameter = 'featureval_fluid_vdefault' AND cur_user = current_user);
+		IF NEW.fluid_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'edit_feature_fluid_vdefault' AND cur_user = current_user)  = v_featurecat THEN
+			NEW.fluid_type = (SELECT value FROM config_param_user WHERE parameter = 'edit_featureval_fluid_vdefault' AND cur_user = current_user);
 		END IF;
 
 		IF NEW.fluid_type IS NULL THEN
-			NEW.fluid_type = (SELECT value FROM config_param_user WHERE parameter = 'arc_fluid_vdefault' AND cur_user = current_user);
+			NEW.fluid_type = (SELECT value FROM config_param_user WHERE parameter = 'edit_arc_fluid_vdefault' AND cur_user = current_user);
 		END IF;
 
 		--Category type
-		IF NEW.category_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'feature_category_vdefault' AND cur_user = current_user)  = v_featurecat THEN
-			NEW.category_type = (SELECT value FROM config_param_user WHERE parameter = 'featureval_category_vdefault' AND cur_user = current_user);
+		IF NEW.category_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'edit_feature_category_vdefault' AND cur_user = current_user)  = v_featurecat THEN
+			NEW.category_type = (SELECT value FROM config_param_user WHERE parameter = 'edit_featureval_category_vdefault' AND cur_user = current_user);
 		END IF;
 
 		IF NEW.category_type IS NULL THEN
-			NEW.category_type = (SELECT value FROM config_param_user WHERE parameter = 'arc_category_vdefault' AND cur_user = current_user);
+			NEW.category_type = (SELECT value FROM config_param_user WHERE parameter = 'edit_arc_category_vdefault' AND cur_user = current_user);
 		END IF;	
 
 		--Function type
-		IF NEW.function_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'feature_function_vdefault' AND cur_user = current_user)  = v_featurecat THEN
-			NEW.function_type = (SELECT value FROM config_param_user WHERE parameter = 'featureval_function_vdefault' AND cur_user = current_user);
+		IF NEW.function_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'edit_feature_function_vdefault' AND cur_user = current_user)  = v_featurecat THEN
+			NEW.function_type = (SELECT value FROM config_param_user WHERE parameter = 'edit_featureval_function_vdefault' AND cur_user = current_user);
 		END IF;
 
 		IF NEW.function_type IS NULL THEN
-			NEW.function_type = (SELECT value FROM config_param_user WHERE parameter = 'arc_function_vdefault' AND cur_user = current_user);
+			NEW.function_type = (SELECT value FROM config_param_user WHERE parameter = 'edit_arc_function_vdefault' AND cur_user = current_user);
 		END IF;
 
         -- FEATURE INSERT
@@ -443,7 +443,7 @@ BEGIN
 			IF NEW.state = 2 AND OLD.state=1 THEN
 				INSERT INTO plan_psector_x_arc (arc_id, psector_id, state, doable)
 				VALUES (NEW.arc_id, (SELECT config_param_user.value::integer AS value FROM config_param_user WHERE config_param_user.parameter::text
-				= 'psector_vdefault'::text AND config_param_user.cur_user::name = "current_user"() LIMIT 1), 1, true);
+				= 'plan_psector_vdefault'::text AND config_param_user.cur_user::name = "current_user"() LIMIT 1), 1, true);
 			END IF;
 			IF NEW.state = 1 AND OLD.state=2 THEN
 				DELETE FROM plan_psector_x_arc WHERE arc_id=NEW.arc_id;					

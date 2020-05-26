@@ -86,10 +86,10 @@ BEGIN
 	
 		-- set isarcdivide of chosed nodetype on false
 		IF v_projecttype ='WS' THEN
-			v_nodecat =  (SELECT value FROM config_param_user WHERE parameter='nodecat_vdefault' AND cur_user=current_user);
+			v_nodecat =  (SELECT value FROM config_param_user WHERE parameter='edit_nodecat_vdefault' AND cur_user=current_user);
 			SELECT nodetype_id INTO v_nodetype_id FROM cat_node WHERE id=v_nodecat;
 		ELSE
-			v_nodetype_id =  (SELECT value FROM config_param_user WHERE parameter='nodetype_vdefault' AND cur_user=current_user);		
+			v_nodetype_id =  (SELECT value FROM config_param_user WHERE parameter='edit_nodetype_vdefault' AND cur_user=current_user);
 		END IF;
 	
 		SELECT isarcdivide INTO v_isarcdivide FROM node_type WHERE id=v_nodetype_id;

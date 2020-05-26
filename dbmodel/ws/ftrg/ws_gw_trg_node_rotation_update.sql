@@ -25,7 +25,7 @@ DECLARE
 BEGIN 
 
 -- The goal of this function are two:
---1) to update automatic rotation node values using the hemisphere values when the variable edit_noderotation_update_dissbl is TRUE
+--1) to update automatic rotation node values using the hemisphere values when the variable edit_noderotation_disable_update is TRUE
 --2) when node is disconnected from arcs update rotation taking values from nearest arc if exists and use also hemisphere if it's configured
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -33,7 +33,7 @@ BEGIN
 	-- get parameters;
 	SELECT choose_hemisphere INTO v_hemisphere FROM node_type JOIN cat_node ON node_type.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id limit 1;
 	SELECT num_arcs INTO v_numarcs FROM node_type JOIN cat_node ON node_type.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id limit 1;
-	SELECT value::boolean INTO v_rotation_disable FROM config_param_user WHERE parameter='edit_noderotation_update_dissbl' AND cur_user=current_user;
+	SELECT value::boolean INTO v_rotation_disable FROM config_param_user WHERE parameter='edit_noderotation_disable_update' AND cur_user=current_user;
 
 	-- for disconnected nodes
 	IF v_numarcs = 0 THEN

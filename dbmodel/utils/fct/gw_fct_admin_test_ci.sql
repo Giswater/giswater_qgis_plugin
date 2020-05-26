@@ -92,7 +92,7 @@ BEGIN
 						INSERT INTO selector_state (state_id,cur_user) VALUES (1, current_user) ON CONFLICT (state_id, cur_user) DO NOTHING;
 
 						--set default values of states
-						INSERT INTO  config_param_user (parameter, value, cur_user) VALUES ('state_vdefault', rec_state, current_user)
+						INSERT INTO  config_param_user (parameter, value, cur_user) VALUES ('edit_state_vdefault', rec_state, current_user)
 						ON CONFLICT (parameter, cur_user)  DO
 						UPDATE SET value = rec_state;
 
@@ -126,7 +126,7 @@ BEGIN
 							ELSIF v_project_type = 'UD' THEN
 								SELECT id INTO v_nodecat FROM cat_node LIMIT 1;
 								INSERT INTO  config_param_user (parameter, value, cur_user)
-								VALUES ('nodecat_vdefault', v_nodecat, current_user) 
+								VALUES ('edit_nodecat_vdefault', v_nodecat, current_user)
 								ON CONFLICT (parameter, cur_user) DO
 								UPDATE SET value = v_nodecat;
 							END IF;
@@ -136,7 +136,7 @@ BEGIN
 								AND parameter = concat(lower(rec_node_type.id), '_vdefault')) is not null) OR
 								(v_project_type = 'UD' AND 
 								(SELECT value FROM config_param_user WHERE cur_user = current_user 
-								AND parameter = 'nodecat_vdefault') is not null) THEN
+								AND parameter = 'edit_nodecat_vdefault') is not null) THEN
 								
 								IF rec_state=1 THEN
 									--insert new nodes with state 1
@@ -167,7 +167,7 @@ BEGIN
 									INSERT INTO selector_state (state_id,cur_user) VALUES (2, current_user) ON CONFLICT (state_id, cur_user) DO NOTHING;
 								
 									SELECT psector_id INTO v_psector_id FROM plan_psector LIMIT 1;
-									INSERT INTO  config_param_user (parameter, value, cur_user) VALUES ('psector_vdefault',1, current_user)
+									INSERT INTO  config_param_user (parameter, value, cur_user) VALUES ('plan_psector_vdefault',1, current_user)
 									ON CONFLICT (parameter, cur_user)  DO
 									UPDATE SET value = v_psector_id;
 

@@ -165,7 +165,7 @@ BEGIN
         SELECT ((value::json)->>'sys_geom_field') INTO v_search_muni_geom_field FROM config_param_system WHERE parameter='api_search_muni';
         
         -- Get municipality vdefault
-        SELECT value::integer INTO v_search_vdef FROM config_param_user WHERE parameter='search_municipality_vdefault' AND cur_user=current_user;
+        SELECT value::integer INTO v_search_vdef FROM config_param_user WHERE parameter='basic_search_municipality_vdefault' AND cur_user=current_user;
         
         -- Init combo json
         SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND column_id='add_muni';
@@ -244,7 +244,7 @@ BEGIN
         'widgettype','combo','datatype','string','placeholder','','disabled',false);
 
         -- Get exploitation vdefault
-        SELECT value::integer INTO v_search_vdef FROM config_param_user WHERE parameter='search_exploitation_vdefault' AND cur_user=current_user 
+        SELECT value::integer INTO v_search_vdef FROM config_param_user WHERE parameter='basic_search_exploitation_vdefault' AND cur_user=current_user
         AND value::integer IN (SELECT expl_id FROM selector_expl WHERE cur_user=current_user);
         IF v_search_vdef IS NULL THEN v_search_vdef=(SELECT expl_id FROM selector_expl WHERE cur_user=current_user LIMIT 1); END IF;
         
@@ -341,7 +341,7 @@ BEGIN
         'widgettype','combo','datatype','string','placeholder','','disabled',false);
 
         -- Get exploitation vdefault
-        SELECT value::integer INTO v_search_vdef FROM config_param_user WHERE parameter='search_exploitation_vdefault' AND cur_user=current_user 
+        SELECT value::integer INTO v_search_vdef FROM config_param_user WHERE parameter='basic_search_exploitation_vdefault' AND cur_user=current_user
         AND value::integer IN (SELECT expl_id FROM selector_expl WHERE cur_user=current_user);
         IF v_search_vdef IS NULL THEN v_search_vdef=(SELECT expl_id FROM selector_expl WHERE cur_user=current_user LIMIT 1); END IF;
             

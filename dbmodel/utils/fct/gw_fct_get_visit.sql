@@ -322,9 +322,9 @@ BEGIN
 	
 		-- dynamics (last user's choice)--
 		-- excode
-		v_visitextcode =  (SELECT value FROM config_param_user WHERE parameter = 'visitextcode_vdefault' AND cur_user=current_user)::text;		
+		v_visitextcode =  (SELECT value FROM config_param_user WHERE parameter = 'om_visit_extcode_vdefault' AND cur_user=current_user)::text;
 		--visitcat
-		v_visitcat = (SELECT value FROM config_param_user WHERE parameter = 'visitcat_vdefault' AND cur_user=current_user)::integer;
+		v_visitcat = (SELECT value FROM config_param_user WHERE parameter = 'om_visit_cat_vdefault' AND cur_user=current_user)::integer;
 		--code
 		EXECUTE 'SELECT feature_type FROM om_visit_class WHERE id = '||v_visitclass INTO v_check_code;
 		IF v_check_code IS NOT NULL THEN
@@ -338,23 +338,23 @@ BEGIN
 
 		-- statics (configured on config_param_user forcing values)--
 		--status
-		v_status = (SELECT value FROM config_param_user WHERE parameter = 'visitstatus_vdefault' AND cur_user=current_user)::integer;
+		v_status = (SELECT value FROM config_param_user WHERE parameter = 'om_visit_status_vdefault' AND cur_user=current_user)::integer;
 		IF v_status IS NULL THEN
 			v_status = 4;
 		END IF;
 		-- startdate
-		v_startdate = (SELECT value FROM config_param_user WHERE parameter = 'visitstartdate_vdefault' AND cur_user=current_user)::integer;
+		v_startdate = (SELECT value FROM config_param_user WHERE parameter = 'om_visit_startdate_vdefault' AND cur_user=current_user)::integer;
 		IF v_startdate IS NULL THEN
 			v_startdate = left (date_trunc('minute', now())::text, 16);
 		END IF;
 		-- enddate
-		v_enddate = (SELECT value FROM config_param_user WHERE parameter = 'visitenddate_vdefault' AND cur_user=current_user)::integer;				
+		v_enddate = (SELECT value FROM config_param_user WHERE parameter = 'om_visit_enddate_vdefault' AND cur_user=current_user)::integer;
 		-- parameter on singlevisit	
-		v_parameter = (SELECT value FROM config_param_user WHERE parameter = 'visitparameter_vdefault' AND cur_user=current_user)::text;			
+		v_parameter = (SELECT value FROM config_param_user WHERE parameter = 'om_visit_parameter_vdefault' AND cur_user=current_user)::text;
 		-- value for parameter on singlevisit	
-		v_value = (SELECT value FROM config_param_user WHERE parameter = 'visitparametervalue_vdefault' AND cur_user=current_user)::text;
+		v_value = (SELECT value FROM config_param_user WHERE parameter = 'om_visit_paramvalue_vdefault' AND cur_user=current_user)::text;
 
-		-- if visitparametervalue_vdefault is used as date
+		-- if om_visit_paramvalue_vdefault is used as date
 		IF  (SELECT value FROM config_param_system WHERE parameter = 'om_visit_parameter_value_datatype') = 'timestamp' AND v_value IS NULL THEN 
 			v_value = left (date_trunc('minute', now())::text, 16);
 		END IF;

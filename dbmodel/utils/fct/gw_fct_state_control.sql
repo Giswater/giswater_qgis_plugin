@@ -213,7 +213,7 @@ BEGIN
 			END IF;
 
 			-- check user's variable
-			SELECT value INTO v_psector_vdefault FROM config_param_user WHERE parameter='psector_vdefault' AND cur_user="current_user"();
+			SELECT value INTO v_psector_vdefault FROM config_param_user WHERE parameter='plan_psector_vdefault' AND cur_user="current_user"();
 			IF v_psector_vdefault IS NULL THEN	
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
 				"data":{"message":"1083", "function":"2130","debug_msg":null}}$$);';
@@ -231,7 +231,7 @@ BEGIN
 			END IF;
 
 			-- check user's variable
-			SELECT value INTO v_psector_vdefault FROM config_param_user WHERE parameter='psector_vdefault' AND cur_user="current_user"();
+			SELECT value INTO v_psector_vdefault FROM config_param_user WHERE parameter='plan_psector_vdefault' AND cur_user="current_user"();
 			IF v_psector_vdefault IS NULL THEN	
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
 				"data":{"message":"1083", "function":"2130","debug_msg":null}}$$);';

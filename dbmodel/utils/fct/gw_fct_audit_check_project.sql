@@ -83,8 +83,8 @@ BEGIN
 	SELECT value INTO v_qmlpointpath FROM config_param_user WHERE parameter='qgis_qml_pointlayer_path' AND cur_user=current_user;
 	SELECT value INTO v_qmllinepath FROM config_param_user WHERE parameter='qgis_qml_linelayer_path' AND cur_user=current_user;
 	SELECT value INTO v_qmlpolpath FROM config_param_user WHERE parameter='qgis_qml_pollayer_path' AND cur_user=current_user;
-	SELECT value INTO v_user_control FROM config_param_user where parameter='audit_project_user_control' AND cur_user=current_user;
-	SELECT value INTO v_layer_log FROM config_param_user where parameter='audit_project_layer_log' AND cur_user=current_user;
+	SELECT value INTO v_user_control FROM config_param_user where parameter='utils_checkproject_database' AND cur_user=current_user;
+	SELECT value INTO v_layer_log FROM config_param_user where parameter='utils_checkproject_qgislayer' AND cur_user=current_user;
 	SELECT value INTO v_hidden_form FROM config_param_user where parameter='qgis_form_initproject_hidden' AND cur_user=current_user;
 	SELECT value INTO v_qgis_init_guide_map FROM config_param_user where parameter='qgis_init_guide_map' AND cur_user=current_user;
 
@@ -255,7 +255,7 @@ BEGIN
 	-- Force psector vdefault visible to current_user (only to => role_master)
 	IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
 	
-		SELECT value::integer INTO v_psector_vdef FROM config_param_user WHERE parameter='psector_vdefault' AND cur_user=current_user;
+		SELECT value::integer INTO v_psector_vdef FROM config_param_user WHERE parameter='plan_psector_vdefault' AND cur_user=current_user;
 
 		IF v_psector_vdef IS NULL THEN
 			SELECT psector_id INTO v_psector_vdef FROM plan_psector WHERE status=2 LIMIT 1;

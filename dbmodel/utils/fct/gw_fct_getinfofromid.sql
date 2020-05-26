@@ -208,7 +208,7 @@ BEGIN
 
 	-- Get vdefault values
 	-- Create List
-	list_values = ARRAY['from_date_vdefault','to_date_vdefault','parameter_vdefault','om_param_type_vdefault','document_type_vdefault'];
+	list_values = ARRAY['from_date_vdefault','to_date_vdefault','parameter_vdefault','om_param_type_vdefault','edit_doc_type_vdefault'];
 
 	FOREACH v_value IN ARRAY list_values
 	LOOP

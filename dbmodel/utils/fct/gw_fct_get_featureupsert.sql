@@ -31,7 +31,7 @@ SELECT SCHEMA_NAME.gw_fct_get_featureupsert('ve_arc_pipe', '2001', null, 9, 100,
 
 PERFORM gw_fct_debug(concat('{"data":{"msg":"----> INPUT FOR gw_fct_get_featureupsert: ", "variables":"',v_debug,'"}}')::json);
 PERFORM gw_fct_debug(concat('{"data":{"msg":"<---- OUTPUT FOR gw_fct_get_featureupsert: ", "variables":"',v_debug,'"}}')::json);
-UPDATE config_param_user SET value =  'true' WHERE parameter = 'debug_mode' and cur_user = current_user;
+UPDATE config_param_user SET value =  'true' WHERE parameter = 'utils_debug_mode' and cur_user = current_user;
 */
 
 DECLARE
@@ -278,8 +278,8 @@ BEGIN
 
 		-- get vdefaults user's mapzones (for vdefault is disabled because values are taken using heritage from nodes)
 		IF upper(v_catfeature.feature_type) != 'ARC' THEN
-			SELECT value INTO v_sector_id FROM config_param_user WHERE parameter = 'sector_vdefault' and cur_user = current_user;
-			SELECT value INTO v_dma_id FROM config_param_user WHERE parameter = 'dma_vdefault' and cur_user = current_user;
+			SELECT value INTO v_sector_id FROM config_param_user WHERE parameter = 'edit_sector_vdefault' and cur_user = current_user;
+			SELECT value INTO v_dma_id FROM config_param_user WHERE parameter = 'edit_dma_vdefault' and cur_user = current_user;
 			SELECT value INTO v_expl_id FROM config_param_user WHERE parameter = 'expl_vdefault' and cur_user = current_user;
 			SELECT value INTO v_muni_id FROM config_param_user WHERE parameter = 'muni_vdefault' and cur_user = current_user;
 			SELECT value INTO v_presszone_id FROM config_param_user WHERE parameter = 'presszone_vdefault' and cur_user = current_user;
@@ -344,12 +344,12 @@ BEGIN
 		v_muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(p_reduced_geometry, ext_municipality.the_geom,0.001) LIMIT 1); 
 		
 		-- upsert parent expl_id values for user
-		DELETE FROM config_param_user WHERE parameter = 'exploitation_vdefault' AND cur_user = current_user;
-		INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('exploitation_vdefault', v_expl_id, current_user);
+		DELETE FROM config_param_user WHERE parameter = 'edit_exploitation_vdefault' AND cur_user = current_user;
+		INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_exploitation_vdefault', v_expl_id, current_user);
 	
 		-- upsert parent muni_id values for user
-		DELETE FROM config_param_user WHERE parameter = 'municipality_vdefault' AND cur_user = current_user;
-		INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('municipality_vdefault', v_muni_id, current_user);
+		DELETE FROM config_param_user WHERE parameter = 'edit_municipality_vdefault' AND cur_user = current_user;
+		INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_municipality_vdefault', v_muni_id, current_user);
 
 	ELSIF p_tg_op ='UPDATE' OR p_tg_op ='SELECT' THEN
 
@@ -417,7 +417,7 @@ BEGIN
 		-- getting vdefault values
 		EXECUTE 'SELECT to_json(array_agg(row_to_json(a)))::text FROM (SELECT sys_param_user.id as parameter, feature_field_id as param, value::text AS vdef FROM sys_param_user 
 			JOIN config_param_user ON sys_param_user.id=parameter WHERE cur_user=current_user AND feature_field_id IS NOT NULL AND 
-			config_param_user.parameter NOT IN (''enddate_vdefault'', ''statetype_plan_vdefault'', ''statetype_end_vdefault''))a'
+			config_param_user.parameter NOT IN (''edit_enddate_vdefault'', ''statetype_plan_vdefault'', ''statetype_end_vdefault''))a'
 			INTO v_values_array;
 
 
@@ -540,7 +540,7 @@ BEGIN
 					SELECT (a->>'vdef') INTO v_state_value FROM json_array_elements(v_values_array) AS a WHERE (a->>'param') = 'state';
 					
 					EXECUTE 'SELECT value::text FROM sys_param_user JOIN config_param_user ON sys_param_user.id=parameter 
-					WHERE cur_user=current_user AND parameter = concat(''statetype_'','||v_state_value||',''_vdefault'')' INTO field_value;
+					WHERE cur_user=current_user AND parameter = concat(''edit_statetype_'','||v_state_value||',''_vdefault'')' INTO field_value;
 							
 				-- rest (including addfields)
 				ELSE SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a WHERE (a->>'param') = (aux_json->>'column_id'); 

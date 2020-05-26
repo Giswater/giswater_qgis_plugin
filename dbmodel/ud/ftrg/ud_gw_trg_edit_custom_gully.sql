@@ -45,7 +45,7 @@ BEGIN
 		
         -- grate Catalog ID
         IF (NEW.gratecat_id IS NULL) THEN
-				NEW.gratecat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='gratecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+				NEW.gratecat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_gratecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 							IF (NEW.gratecat_id IS NULL) THEN
 				NEW.gratecat_id:=(SELECT id FROM cat_grate LIMIT 1);
 			END IF;
@@ -54,7 +54,7 @@ BEGIN
         
         -- Arc Catalog ID
         IF (NEW.connec_arccat_id IS NULL) THEN
-				NEW.connec_arccat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='connecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+				NEW.connec_arccat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_connecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 							IF (NEW.connec_arccat_id IS NULL) THEN
 				NEW.connec_arccat_id:=(SELECT id FROM cat_connec LIMIT 1);
 
@@ -76,7 +76,7 @@ BEGIN
 				order by ST_Distance (NEW.the_geom, v_edit_node.the_geom) LIMIT 1);
 			END IF;	
 			IF (NEW.sector_id IS NULL) THEN
-				NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='sector_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+				NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_sector_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF;
 			IF (NEW.sector_id IS NULL) THEN
                 EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
@@ -98,7 +98,7 @@ BEGIN
 				order by ST_Distance (NEW.the_geom, v_edit_node.the_geom) LIMIT 1);
 			END IF;
 			IF (NEW.dma_id IS NULL) THEN
-				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='dma_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_dma_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF; 
             IF (NEW.dma_id IS NULL) THEN
                 EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
@@ -108,12 +108,12 @@ BEGIN
 
   	    -- Verified
         IF (NEW.verified IS NULL) THEN
-            NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+            NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
         END IF;
 
 		-- State
         IF (NEW.state IS NULL) THEN
-            NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='state_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+            NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_state_vdefault' AND "cur_user"="current_user"() LIMIT 1);
         END IF;
 		
 		-- State_type
@@ -123,22 +123,22 @@ BEGIN
 		
 		-- Workcat_id
         IF (NEW.workcat_id IS NULL) THEN
-            NEW.workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+            NEW.workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_workcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
         END IF;
 		
 		-- Ownercat_id
         IF (NEW.ownercat_id IS NULL) THEN
-            NEW.ownercat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='ownercat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+            NEW.ownercat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_ownercat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
         END IF;
 		
 		-- Soilcat_id
         IF (NEW.soilcat_id IS NULL) THEN
-            NEW.soilcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='soilcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+            NEW.soilcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_soilcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
         END IF;
 	
 		--Builtdate
 		IF (NEW.builtdate IS NULL) THEN
-			NEW.builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			NEW.builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='edit_builtdate_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;  
 
 		--Inventory	
@@ -152,7 +152,7 @@ BEGIN
         		
 		-- Exploitation
 		IF (NEW.expl_id IS NULL) THEN
-			NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='exploitation_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_exploitation_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			IF (NEW.expl_id IS NULL) THEN
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
@@ -164,7 +164,7 @@ BEGIN
 
 		-- Municipality 
 		IF (NEW.muni_id IS NULL) THEN
-			NEW.muni_id := (SELECT "value" FROM config_param_user WHERE "parameter"='municipality_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			NEW.muni_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_municipality_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			IF (NEW.muni_id IS NULL) THEN
 				NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) LIMIT 1);
 				IF (NEW.muni_id IS NULL) THEN
@@ -216,7 +216,7 @@ BEGIN
         END IF;  
 
 		-- Control of automatic insert of link and vnode
-		IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connect_force_automatic_connect2network' 
+		IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_gully_automatic_link'
 		AND cur_user=current_user LIMIT 1) IS TRUE THEN
 			
 			EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
@@ -256,7 +256,7 @@ BEGIN
 				EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
 				"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY"}}$$)';	
 				
-			ELSIF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connect_force_automatic_connect2network' AND cur_user=current_user LIMIT 1) IS TRUE THEN
+			ELSIF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_gully_automatic_link' AND cur_user=current_user LIMIT 1) IS TRUE THEN
 				EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
 				"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY"}}$$)';	
 			END IF;
@@ -276,7 +276,7 @@ BEGIN
 			END IF;
 			
 			-- Control of automatic downgrade of associated link/vnode
-			IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connect_force_downgrade_linkvnode' 
+			IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connect_downgrade_link'
 			AND cur_user=current_user LIMIT 1) IS TRUE THEN	
 				UPDATE link SET state=0 WHERE feature_id=OLD.gully_id;
 				UPDATE vnode SET state=0 WHERE vnode_id=(SELECT exit_id FROM link WHERE feature_id=OLD.gully_id LIMIT 1)::integer;

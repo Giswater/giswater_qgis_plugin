@@ -8,45 +8,47 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2020/05/25
-DELETE FROM config_param_system WHERE parameter = 'custom_giswater_folder;
-DELETE FROM config_param_system WHERE parameter = 'sys_scada_schema;
-DELETE FROM config_param_system WHERE parameter = 'sys_utils_schema;
-DELETE FROM config_param_system WHERE parameter = 'chk_state_topo;
-DELETE FROM config_param_system WHERE parameter = 'link_searchbuffer;
-DELETE FROM config_param_system WHERE parameter = 'nodetype_change_enabled;
-DELETE FROM config_param_system WHERE parameter = 'inventory_update_date;
-DELETE FROM config_param_system WHERE parameter = 'rev_node_depth_tol;
-DELETE FROM config_param_system WHERE parameter = 'rev_node_top_elev_tol;
-DELETE FROM config_param_system WHERE parameter = 'rev_node_ymax_tol;
-DELETE FROM config_param_system WHERE parameter = 'rev_node_geom1_tol;
-DELETE FROM config_param_system WHERE parameter = 'rev_node_geom2_tol;
-DELETE FROM config_param_system WHERE parameter = 'rev_arc_y2_tol;
-DELETE FROM config_param_system WHERE parameter = 'rev_arc_geom1_tol;
-DELETE FROM config_param_system WHERE parameter = 'rev_arc_geom2_tol;
-DELETE FROM config_param_system WHERE parameter = 'rev_connec_y2_tol;
-DELETE FROM config_param_system WHERE parameter = 'rev_connec_geom1_tol;
-DELETE FROM config_param_system WHERE parameter = 'rev_connec_geom2_tol;
-DELETE FROM config_param_system WHERE parameter = 'rev_gully_ymax_tol;
-DELETE FROM config_param_system WHERE parameter = 'rev_gully_sandbox_tol;
-DELETE FROM config_param_system WHERE parameter = 'rev_gully_connec_geom1_tol;
-DELETE FROM config_param_system WHERE parameter = 'rev_gully_connec_geom2_tol;
-DELETE FROM config_param_system WHERE parameter = 'rev_gully_units_tol;
-DELETE FROM config_param_system WHERE parameter = 'sys_api_service;
-DELETE FROM config_param_system WHERE parameter = 'sys_custom_views;
-DELETE FROM config_param_system WHERE parameter = 'code_vd;
-DELETE FROM config_param_system WHERE parameter = 'audit_function_control;
-DELETE FROM config_param_system WHERE parameter = 'node2arc;
-DELETE FROM config_param_system WHERE parameter = 'api_sensibility_factor_web;
-DELETE FROM config_param_system WHERE parameter = 'api_sensibility_factor_desktop;
-DELETE FROM config_param_system WHERE parameter = 'inp_fast_buildup;
-DELETE FROM config_param_system WHERE parameter = 'api_selector_label;
-			
-UPDATE config_param_system SET parameter = 'basic_info_sensibility_factor', value ='{"mobile":2, "web":1, "desktop":1}'	' WHERE parameter = 'api_sensibility_factor_web';
-UPDATE config_param_system SET parameter = 'edit_review_node_tolerance', value ='{"topelev":1, "elevation":1, "depth":1, "ymax":1}'	' WHERE parameter = 'rev_node_elevation_tol';
-UPDATE config_param_system SET parameter = 'edit_review_arc_tolerance', value ='{"y1":1,"y2":1}'	' WHERE parameter = 'rev_arc_y1_tol';
-UPDATE config_param_system SET parameter = 'edit_review_connec_tolerance', value ='{"y1":1,"y2":1}'	' WHERE parameter = 'rev_connec_y1_tol';
-UPDATE config_param_system SET parameter = 'edit_review_gully_tolerance', value ='{"topelev":1, "ymax":1,"sandbox":0.1, "units":1}'	' WHERE parameter = 'rev_gully_top_elev_tol';
-			
+
+-- system param updates
+DELETE FROM config_param_system WHERE parameter = 'custom_giswater_folder';
+DELETE FROM config_param_system WHERE parameter = 'sys_scada_schema';
+DELETE FROM config_param_system WHERE parameter = 'sys_utils_schema';
+DELETE FROM config_param_system WHERE parameter = 'chk_state_topo';
+DELETE FROM config_param_system WHERE parameter = 'link_searchbuffer';
+DELETE FROM config_param_system WHERE parameter = 'nodetype_change_enabled';
+DELETE FROM config_param_system WHERE parameter = 'inventory_update_date';
+DELETE FROM config_param_system WHERE parameter = 'rev_node_depth_tol';
+DELETE FROM config_param_system WHERE parameter = 'rev_node_top_elev_tol';
+DELETE FROM config_param_system WHERE parameter = 'rev_node_ymax_tol';
+DELETE FROM config_param_system WHERE parameter = 'rev_node_geom1_tol';
+DELETE FROM config_param_system WHERE parameter = 'rev_node_geom2_tol';
+DELETE FROM config_param_system WHERE parameter = 'rev_arc_y2_tol';
+DELETE FROM config_param_system WHERE parameter = 'rev_arc_geom1_tol';
+DELETE FROM config_param_system WHERE parameter = 'rev_arc_geom2_tol';
+DELETE FROM config_param_system WHERE parameter = 'rev_connec_y2_tol';
+DELETE FROM config_param_system WHERE parameter = 'rev_connec_geom1_tol';
+DELETE FROM config_param_system WHERE parameter = 'rev_connec_geom2_tol';
+DELETE FROM config_param_system WHERE parameter = 'rev_gully_ymax_tol';
+DELETE FROM config_param_system WHERE parameter = 'rev_gully_sandbox_tol';
+DELETE FROM config_param_system WHERE parameter = 'rev_gully_connec_geom1_tol';
+DELETE FROM config_param_system WHERE parameter = 'rev_gully_connec_geom2_tol';
+DELETE FROM config_param_system WHERE parameter = 'rev_gully_units_tol';
+DELETE FROM config_param_system WHERE parameter = 'sys_api_service';
+DELETE FROM config_param_system WHERE parameter = 'sys_custom_view's;
+DELETE FROM config_param_system WHERE parameter = 'code_vd';
+DELETE FROM config_param_system WHERE parameter = 'audit_function_control';
+DELETE FROM config_param_system WHERE parameter = 'node2arc';
+DELETE FROM config_param_system WHERE parameter = 'api_sensibility_factor_web';
+DELETE FROM config_param_system WHERE parameter = 'api_sensibility_factor_desktop';
+DELETE FROM config_param_system WHERE parameter = 'inp_fast_buildup';
+DELETE FROM config_param_system WHERE parameter = 'api_selector_labe';
+DELETE FROM config_param_system WHERE parameter = 'profile_stylesheet';
+
+UPDATE config_param_system SET parameter = 'basic_info_sensibility_factor', value ='{"mobile":2, "web":1, "desktop":1}'	WHERE parameter = 'api_sensibility_factor_web';
+UPDATE config_param_system SET parameter = 'edit_review_node_tolerance', value ='{"topelev":1, "elevation":1, "depth":1, "ymax":1}'	WHERE parameter = 'rev_node_elevation_tol';
+UPDATE config_param_system SET parameter = 'edit_review_arc_tolerance', value ='{"y1":1,"y2":1}' WHERE parameter = 'rev_arc_y1_tol';
+UPDATE config_param_system SET parameter = 'edit_review_connec_tolerance', value ='{"y1":1,"y2":1}'	WHERE parameter = 'rev_connec_y1_tol';
+UPDATE config_param_system SET parameter = 'edit_review_gully_tolerance', value ='{"topelev":1, "ymax":1,"sandbox":0.1, "units":1}'	WHERE parameter = 'rev_gully_top_elev_tol';
 UPDATE config_param_system SET parameter = 'admin_crm_schema' WHERE parameter = 'sys_crm_schema';
 UPDATE config_param_system SET parameter = 'admin_currency' WHERE parameter = 'sys_currency';
 UPDATE config_param_system SET parameter = 'admin_crm_script_folderpath' WHERE parameter = 'crm_daily_script_folderpath';
@@ -112,3 +114,91 @@ UPDATE config_param_system SET parameter = 'edit_node_doublegeom' WHERE paramete
 UPDATE config_param_system SET parameter = 'admin_version' WHERE parameter = 'ApiVersion';
 UPDATE config_param_system SET parameter = 'admin_transaction_db' WHERE parameter = 'sys_transaction_db';
 UPDATE config_param_system SET parameter = 'admin_customform_param' WHERE parameter = 'custom_form_param';
+
+
+-- user param updates
+DELETE FROM sys_param_user WHERE id = 	audit_project_epa_result		
+DELETE FROM sys_param_user WHERE id = 	audit_project_plan_result		
+DELETE FROM sys_param_user WHERE id = 	gullytype_vdefault		
+DELETE FROM sys_param_user WHERE id = 	qgistemplate_folder_path		
+DELETE FROM sys_param_user WHERE id = 	epaversion		
+DELETE FROM sys_param_user WHERE id = 	gully_vdefault		
+
+UPDATE sys_param_user SET id ='utils_checkproject_qgislayer' WHERE id = 'audit_project_layer_log';
+UPDATE sys_param_user SET id ='utils_checkproject_database' WHERE id = 'audit_project_user_control';
+UPDATE sys_param_user SET id ='utils_debug_mode' WHERE id = 'debug_mode';
+UPDATE sys_param_user SET id ='utils_dim_tooltip' WHERE id = 'dim_tooltip';
+UPDATE sys_param_user SET id ='basic_search_exploitation_vdefaut' WHERE id = 'search_exploitation_vdefault';
+UPDATE sys_param_user SET id ='basic_search_municipality_vdefaut' WHERE id = 'search_municipality_vdefault';
+UPDATE sys_param_user SET id ='utils_formlabel_show_columname' WHERE id = 'api_form_show_columname_on_label';
+UPDATE sys_param_user SET id ='edit_arc_category_vdefault' WHERE id = 'arc_category_vdefault';
+UPDATE sys_param_user SET id ='edit_arc_downgrade_force' WHERE id = 'edit_arc_downgrade_force';
+UPDATE sys_param_user SET id ='edit_arc_fluid_vdefault' WHERE id = 'arc_fluid_vdefault';
+UPDATE sys_param_user SET id ='edit_arc_function_vdefault' WHERE id = 'arc_function_vdefault';
+UPDATE sys_param_user SET id ='edit_arc_location_vdefault' WHERE id = 'arc_location_vdefault';
+UPDATE sys_param_user SET id ='edit_arccat_vdefault' WHERE id = 'arccat_vdefault';
+UPDATE sys_param_user SET id ='edit_arctype_vdefault' WHERE id = 'arctype_vdefault';
+UPDATE sys_param_user SET id ='edit_builtdate_vdefault' WHERE id = 'builtdate_vdefault';
+UPDATE sys_param_user SET id ='edit_cadtools_baselayer_vdefault' WHERE id = 'cad_tools_base_layer_vdefault';
+UPDATE sys_param_user SET id ='edit_connecat_vdefault' WHERE id = 'connecat_vdefault';
+UPDATE sys_param_user SET id ='edit_connec_automatic_link' WHERE id = 'edit_connect_force_automatic_connect2network';
+UPDATE sys_param_user SET id ='edit_connect_downgrade_link' WHERE id = 'edit_connect_force_downgrade_linkvnode';
+UPDATE sys_param_user SET id ='edit_connectype_vdefault' WHERE id = 'connectype_vdefault';
+UPDATE sys_param_user SET id ='edit_disable_statetopocontrol' WHERE id = 'edit_disable_statetopocontrol';
+UPDATE sys_param_user SET id ='edit_dma_vdefault' WHERE id = 'dma_vdefault';
+UPDATE sys_param_user SET id ='edit_doctype_vdefault' WHERE id = 'document_type_vdefault';
+UPDATE sys_param_user SET id ='edit_elementcat_vdefault' WHERE id = 'elementcat_vdefault';
+UPDATE sys_param_user SET id ='edit_enddate_vdefault' WHERE id = 'enddate_vdefault';
+UPDATE sys_param_user SET id ='edit_exploitation_vdefault' WHERE id = 'exploitation_vdefault';
+UPDATE sys_param_user SET id ='edit_feature_category_vdefault' WHERE id = 'feature_category_vdefault';
+UPDATE sys_param_user SET id ='edit_feature_fluid_vdefault' WHERE id = 'feature_fluid_vdefault';
+UPDATE sys_param_user SET id ='edit_feature_function_vdefault' WHERE id = 'feature_function_vdefault';
+UPDATE sys_param_user SET id ='edit_feature_location_vdefault' WHERE id = 'feature_location_vdefault';
+UPDATE sys_param_user SET id ='edit_featureval_category_vdefault' WHERE id = 'featureval_category_vdefault';
+UPDATE sys_param_user SET id ='edit_featureval_fluid_vdefault' WHERE id = 'featureval_fluid_vdefault';
+UPDATE sys_param_user SET id ='edit_featureval_function_vdefault' WHERE id = 'featureval_function_vdefault';
+UPDATE sys_param_user SET id ='edit_featureval_location_vdefault' WHERE id = 'featureval_location_vdefault';
+UPDATE sys_param_user SET id ='edit_gratecat_vdefault' WHERE id = 'gratecat_vdefault';
+UPDATE sys_param_user SET id ='edit_gully_autoupdate_polgeom' WHERE id = 'edit_gully_automatic_update_polgeom';
+UPDATE sys_param_user SET id ='edit_gully_category_vdefault' WHERE id = 'gully_category_vdefault';
+UPDATE sys_param_user SET id ='edit_gully_doublegeom' WHERE id = 'edit_gully_doublegeom';
+UPDATE sys_param_user SET id ='edit_gully_fluid_vdefault' WHERE id = 'gully_fluid_vdefault';
+UPDATE sys_param_user SET id ='edit_gully_automatic_link' WHERE id = 'edit_gully_force_automatic_connect2network';
+UPDATE sys_param_user SET id ='edit_gully_function_vdefault' WHERE id = 'gully_function_vdefault';
+UPDATE sys_param_user SET id ='edit_gully_location_vdefault' WHERE id = 'gully_location_vdefault';
+UPDATE sys_param_user SET id ='edit_link_update_connecrotation' WHERE id = 'edit_link_connecrotation_update';
+UPDATE sys_param_user SET id ='edit_municipality_vdefault' WHERE id = 'municipality_vdefault';
+UPDATE sys_param_user SET id ='edit_node_category_vdefault' WHERE id = 'node_category_vdefault';
+UPDATE sys_param_user SET id ='edit_node_fluid_vdefault' WHERE id = 'node_fluid_vdefault';
+UPDATE sys_param_user SET id ='edit_node_function_vdefault' WHERE id = 'node_function_vdefault';
+UPDATE sys_param_user SET id ='edit_node_location_vdefault' WHERE id = 'node_location_vdefault';
+UPDATE sys_param_user SET id ='edit_nodecat_vdefault' WHERE id = 'nodecat_vdefault';
+UPDATE sys_param_user SET id ='edit_noderotation_disable_update' WHERE id = 'edit_noderotation_update_dissbl';
+UPDATE sys_param_user SET id ='edit_nodetype_vdefault' WHERE id = 'nodetype_vdefault';
+UPDATE sys_param_user SET id ='edit_ownercat_vdefault' WHERE id = 'ownercat_vdefault';
+UPDATE sys_param_user SET id ='edit_pavement_vdefault' WHERE id = 'pavement_vdefault';
+UPDATE sys_param_user SET id ='edit_sector_vdefault' WHERE id = 'sector_vdefault';
+UPDATE sys_param_user SET id ='edit_soilcat_vdefault' WHERE id = 'soilcat_vdefault';
+UPDATE sys_param_user SET id ='edit_state_vdefault' WHERE id = 'state_vdefault';
+UPDATE sys_param_user SET id ='edit_statetype_0_vdefault' WHERE id = 'statetype_0_vdefault';
+UPDATE sys_param_user SET id ='edit_statetype_1_vdefault' WHERE id = 'statetype_1_vdefault';
+UPDATE sys_param_user SET id ='edit_statetype_2_vdefault' WHERE id = 'statetype_2_vdefault';
+UPDATE sys_param_user SET id ='edit_upsert_elevation_from_dem' WHERE id = 'edit_upsert_elevation_from_dem';
+UPDATE sys_param_user SET id ='edit_verified_vdefault' WHERE id = 'verified_vdefault';
+UPDATE sys_param_user SET id ='edit_workcat_end_vdefault' WHERE id = 'workcat_id_end_vdefault';
+UPDATE sys_param_user SET id ='edit_workcat_vdefault' WHERE id = 'workcat_vdefault';
+UPDATE sys_param_user SET id ='om_profile_stylesheet' WHERE id = 'profile_stylesheet';
+UPDATE sys_param_user SET id ='om_visit_cat_vdefault' WHERE id = 'visitcat_vdefault';
+UPDATE sys_param_user SET id ='om_visit_class_vdefault' WHERE id = 'visitclass_vdefault';
+UPDATE sys_param_user SET id ='om_visit_enddate_vdefault' WHERE id = 'visitenddate_vdefault';
+UPDATE sys_param_user SET id ='om_visit_extcode_vdefault' WHERE id = 'visitextcode_vdefault';
+UPDATE sys_param_user SET id ='om_visit_parameter_vdefault' WHERE id = 'visitparameter_vdefault';
+UPDATE sys_param_user SET id ='om_visit_paramvalue_vdefault' WHERE id = 'visitparametervalue_vdefault';
+UPDATE sys_param_user SET id ='om_visit_startdate_vdefault' WHERE id = 'visitstartdate_vdefault';
+UPDATE sys_param_user SET id ='om_visit_status_vdefault' WHERE id = 'visitstatus_vdefault';
+UPDATE sys_param_user SET id ='plan_psector_gexpenses_vdefault' WHERE id = 'psector_gexpenses_vdefault';
+UPDATE sys_param_user SET id ='plan_psector_measurement_vdefault' WHERE id = 'psector_measurement_vdefault';
+UPDATE sys_param_user SET id ='plan_psector_other_vdefault' WHERE id = 'psector_other_vdefault';
+UPDATE sys_param_user SET id ='plan_psector_vat_vdefault' WHERE id = 'psector_vat_vdefault';
+UPDATE sys_param_user SET id ='plan_psector_vdefault' WHERE id = 'psector_vdefault';
+UPDATE sys_param_user SET id ='qgis_composers_folderpath' WHERE id = 'qgis_composers_path';

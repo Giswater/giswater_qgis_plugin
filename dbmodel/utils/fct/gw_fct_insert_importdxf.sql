@@ -114,7 +114,7 @@ BEGIN
 	IF v_state = 2 THEN
 		select name into v_current_psector from config_param_user  
 		JOIN plan_psector on plan_psector.psector_id=config_param_user.value::integer
-		where parameter='psector_vdefault' and cur_user=current_user;
+		where parameter='plan_psector_vdefault' and cur_user=current_user;
 
 		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
 		VALUES (106, 2, concat('Features are assigned to psector: ',v_current_psector,'.'));

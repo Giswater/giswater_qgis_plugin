@@ -89,14 +89,14 @@ BEGIN
 						(SELECT node_id FROM plan_psector_x_node 
 						 WHERE plan_psector_x_node.node_id=node.node_id AND state=0 AND psector_id = 
 							(SELECT value::integer FROM config_param_user 
-							WHERE parameter='psector_vdefault' AND cur_user="current_user"() LIMIT 1 )))
+							WHERE parameter='plan_psector_vdefault' AND cur_user="current_user"() LIMIT 1 )))
 					
 					-- looking for planified nodes that belongs on the same alternatives that arc
 					OR (NEW.state=2 AND node.state=2 AND node_id IN 
 						(SELECT node_id FROM plan_psector_x_node 
 						 WHERE plan_psector_x_node.node_id=node.node_id AND state=1 AND psector_id =
 							(SELECT value::integer FROM config_param_user 
-							WHERE parameter='psector_vdefault' AND cur_user="current_user"() LIMIT 1))))
+							WHERE parameter='plan_psector_vdefault' AND cur_user="current_user"() LIMIT 1))))
 
 					ORDER BY ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
 	
@@ -108,14 +108,14 @@ BEGIN
 						(SELECT node_id FROM plan_psector_x_node 
 						 WHERE plan_psector_x_node.node_id=node.node_id AND state=0 AND psector_id = 
 							(SELECT value::integer FROM config_param_user 
-							WHERE parameter='psector_vdefault' AND cur_user="current_user"() LIMIT 1)))
+							WHERE parameter='plan_psector_vdefault' AND cur_user="current_user"() LIMIT 1)))
 					
 					-- looking for planified nodes that belongs on the same alternatives that arc
 					OR (NEW.state=2 AND node.state=2 AND node_id IN 
 						(SELECT node_id FROM plan_psector_x_node 
 						 WHERE plan_psector_x_node.node_id=node.node_id AND state=1 AND psector_id =
 							(SELECT value::integer FROM config_param_user 
-							WHERE parameter='psector_vdefault' AND cur_user="current_user"() LIMIT 1 ))))
+							WHERE parameter='plan_psector_vdefault' AND cur_user="current_user"() LIMIT 1 ))))
 
 					ORDER BY ST_Distance(node.the_geom, ST_endpoint(NEW.the_geom)) LIMIT 1;
 
@@ -303,7 +303,7 @@ BEGIN
 			(SELECT nextval('urn_id_seq')),
 			(SELECT sector_id FROM sector WHERE (ST_endpoint(NEW.the_geom) @ sector.the_geom) LIMIT 1),
 			'JUNCTION'::text,
-			(SELECT "value" FROM config_param_user WHERE "parameter"='nodecat_vdefault' AND "cur_user"="current_user"()),
+			(SELECT "value" FROM config_param_user WHERE "parameter"='edit_nodecat_vdefault' AND "cur_user"="current_user"()),
 			(SELECT dma_id FROM dma WHERE (ST_endpoint(NEW.the_geom) @ dma.the_geom) LIMIT 1), 
 			ST_endpoint(NEW.the_geom)
 			);

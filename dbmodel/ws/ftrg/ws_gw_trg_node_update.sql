@@ -44,7 +44,7 @@ BEGIN
 		RETURN NEW;
 
     ELSE 
-		v_psector_id := (SELECT value FROM config_param_user WHERE cur_user=current_user AND parameter = 'psector_vdefault');
+		v_psector_id := (SELECT value FROM config_param_user WHERE cur_user=current_user AND parameter = 'plan_psector_vdefault');
 	
 		IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE ' THEN
 

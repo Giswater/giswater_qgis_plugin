@@ -7,64 +7,10 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
--- drop constraints
-
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('pipecat_vdefault', 'FC110-PN10', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('psector_measurement_vdefault', '1', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('tankcat_vdefault', 'TANK_01', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('hydrantcat_vdefault', 'HYDRANT 1X110', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('junctioncat_vdefault', 'JUNCTION DN110', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('pumpcat_vdefault', 'PUMP-01', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('valvecat_vdefault', 'AIR VALVE DN50', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('metercat_vdefault', 'PRESSUREMETERDN110 PN16', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('sourcecat_vdefault', 'SOURCE-01', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('filtercat_vdefault', 'FILTER-01-DN200', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('registercat_vdefault', 'REGISTER', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('netwjoincat_vdefault', 'WATER-CONNECTION', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('expansiontankcat_vdefault', 'EXPANTANK', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('flexuioncat_vdefault', 'FLEXUNION', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('netelementcat_vdefault', 'NETELEMENT', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('netsamplepointcat_vdefault', 'NETSAMPLEPOINT', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('greentapcat_vdefault', 'PVC50-PN16-GRE', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('wjoincat_vdefault', 'PVC25-PN16-DOM', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('fountaincat_vdefault', 'PVC63-PN16-FOU', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('tapcat_vdefault', 'PVC25-PN16-TAP', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('psector_scale_vdefault', '2.00', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('psector_rotation_vdefault', '0.0000', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('psector_gexpenses_vdefault', '19.00', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('psector_vat_vdefault', '21.00', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('psector_type_vdefault', '1', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('psector_other_vdefault', '4.00', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('presszone_vdefault', '3', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('flexunioncat_vdefault', 'FLEXUNION', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('arccat_vdefault', 'FC110-PN10', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('state_vdefault', '1', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('workcat_vdefault', 'work1', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('verified_vdefault', 'VERIFIED', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('connecat_vdefault', 'PVC25-PN16-DOM', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('nodecat_vdefault', 'AIR VALVE DN50', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('pavementcat_vdefault', 'Asphalt', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('elementcat_vdefault', 'COVER', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('soilcat_vdefault', 'soil1', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('statetype_vdefault', '2', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('ownercat_vdefault', 'owner1', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('wtpcat_vdefault', 'ETAP', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('psector_vdefault', '1', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('cad_tools_base_layer_vdefault', 'Streetaxis', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('dim_tooltip', 'false', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('qgis_template_folder_path', NULL, current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_arc_downgrade_force', 'FALSE', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_arc_division_dsbl', 'FALSE', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('plan_arc_vdivision_dsbl', 'FALSE', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('statetype_plan_vdefault', 3, current_user);
-
-
 -- insert mandatory values
 INSERT INTO config_param_user (parameter, value, cur_user)
 		SELECT sys_param_user.id, vdefault, current_user FROM config_param_user RIGHT JOIN sys_param_user ON sys_param_user.id=parameter 
 		WHERE ismandatory IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member')) ON CONFLICT (parameter, cur_user) DO NOTHING;
-
-
 
 INSERT INTO macroexploitation VALUES (1, 'Macroexploitation-1', 'Macroexploitation-1', NULL);
 

@@ -40,11 +40,12 @@ v_type record;
 v_connec_proximity json;
 v_gully_proximity json;
 v_sql text;
-v_connect2network text;
 v_psector_vdefault text;
 v_schemaname text;
 v_feature_list text;
 v_error_context text;
+v_connecautolink text;
+v_gullyautolink text;
 
 BEGIN
 
@@ -71,15 +72,13 @@ BEGIN
 	
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (53, v_result_id, concat('Deactivate topology control for connecs and gullies.' ));
 	
-	--capture current value and deactivate automatic link creation
-	SELECT value INTO v_connect2network FROM config_param_user WHERE parameter='edit_connect_force_automatic_connect2network' and cur_user=current_user;
-	
-	IF v_connect2network is not null then
-		update config_param_user SET value=FALSE WHERE parameter='edit_connect_force_automatic_connect2network' and cur_user=current_user;
-	else 
-		INSERT INTO config_param_user (parameter,value, cur_user) VALUES ('"edit_connect_force_automatic_connect2network"', FALSE, current_user);
-	END IF;
-	
+	--capture current value and temporary deactivate automatic link creation
+	SELECT value INTO v_connecautolink FROM config_param_user WHERE parameter='edit_connec_automatic_link' and cur_user=current_user;
+	SELECT value INTO v_gullyautolink FROM config_param_user WHERE parameter='edit_gully_automatic_link' and cur_user=current_user;
+
+	UPDATE config_param_user SET value=FALSE WHERE parameter='edit_connec_automatic_link' and cur_user=current_user;
+	UPDATE config_param_user SET value=FALSE WHERE parameter='edit_gully_automatic_link' and cur_user=current_user;
+;
 	--capture input values
  	v_old_psector_id = ((p_data ->>'data')::json->>'psector_id')::text;
 	v_new_psector_name = ((p_data ->>'data')::json->>'new_psector_name')::text;
@@ -94,12 +93,12 @@ BEGIN
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
 	VALUES (53, v_result_id, concat('Copy psector ',v_old_psector_id,' as ',v_new_psector_name,'.' ));
 
-	SELECT value INTO v_psector_vdefault FROM config_param_user where parameter = 'psector_vdefault' and cur_user=current_user;
+	SELECT value INTO v_psector_vdefault FROM config_param_user where parameter = 'plan_psector_vdefault' and cur_user=current_user;
 	
 	IF v_psector_vdefault IS NULL THEN
-		INSERT INTO config_param_user (parameter,value, cur_user) VALUES ('psector_vdefault', v_new_psector_id, current_user);
+		INSERT INTO config_param_user (parameter,value, cur_user) VALUES ('plan_psector_vdefault', v_new_psector_id, current_user);
 	ELSE 
-		UPDATE config_param_user SET value=v_new_psector_id, cur_user=current_user WHERE parameter='psector_vdefault';
+		UPDATE config_param_user SET value=v_new_psector_id, cur_user=current_user WHERE parameter='plan_psector_vdefault';
 	END IF;
 	
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
@@ -201,9 +200,9 @@ BEGIN
 	END LOOP;
 	
 	--activate the functions an set back the values of parameters
-	IF v_connect2network is not null then
-		update config_param_user SET value=v_connect2network WHERE parameter='edit_connect_force_automatic_connect2network' and cur_user=current_user;
-	END IF;
+	UPDATE config_param_user SET value=v_connecautolink WHERE parameter='edit_connec_automatic_link' and cur_user=current_user;
+	UPDATE config_param_user SET value=v_gullyautolink WHERE parameter='edit_gully_automatic_link' and cur_user=current_user;
+	
 	UPDATE config_param_system SET value = v_connec_proximity WHERE parameter='edit_connec_proximity';
 	UPDATE config_param_system SET value = v_gully_proximity WHERE parameter='edit_gully_proximity';
 	UPDATE config_param_system SET value ='FALSE' WHERE parameter='edit_topocontrol_disable_error';
@@ -219,7 +218,7 @@ BEGIN
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_version := COALESCE(v_version, '[]');
 
-RETURN ('{"status":"Accepted", "version":'||v_version||
+	RETURN ('{"status":"Accepted", "version":'||v_version||
             ',"message":{"priority":1, "text":""},"body":{"data": {"info":'||v_result_info||'}}}')::json;
 
 	EXCEPTION WHEN OTHERS THEN

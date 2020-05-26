@@ -82,7 +82,7 @@ BEGIN
 	v_the_geom:= ST_SetSRID(ST_MakePoint(p_x, p_y),(SELECT epsg FROM version limit 1));
 
 	-- Sector ID
-	v_sector_id := (SELECT "value"::integer FROM config_param_user WHERE "parameter"='sector_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+	v_sector_id := (SELECT "value"::integer FROM config_param_user WHERE "parameter"='edit_sector_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 
 	IF (v_sector_id IS NULL) THEN
 		SELECT count(*)into count_aux FROM sector WHERE ST_DWithin(v_the_geom, sector.the_geom,0.001);
@@ -95,7 +95,7 @@ BEGIN
 	END IF;
                
 	-- Dma ID
-	v_dma_id := (SELECT "value"::integer FROM config_param_user WHERE "parameter"='dma_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+	v_dma_id := (SELECT "value"::integer FROM config_param_user WHERE "parameter"='edit_dma_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 	IF (v_dma_id IS NULL) THEN
 		SELECT count(*)into count_aux FROM dma WHERE ST_DWithin(v_the_geom, dma.the_geom,0.001);
 		IF count_aux = 1 THEN
@@ -107,13 +107,13 @@ BEGIN
 	END IF; 
               	
 	-- Exploitation	
-	v_expl_id :=  (SELECT "value"::integer FROM config_param_user WHERE "parameter"='exploitation_vdefault' AND "cur_user"="current_user"() LIMIT 1);		
+	v_expl_id :=  (SELECT "value"::integer FROM config_param_user WHERE "parameter"='edit_exploitation_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 	IF (v_expl_id IS NULL) THEN
 		v_expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(v_the_geom, exploitation.the_geom,0.001) LIMIT 1);
 	END IF;
 
 	-- Municipality 
-	v_muni_id := (SELECT "value"::integer FROM config_param_user WHERE "parameter"='municipality_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+	v_muni_id := (SELECT "value"::integer FROM config_param_user WHERE "parameter"='edit_municipality_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 	IF (v_muni_id IS NULL) THEN
 		v_muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(v_the_geom, ext_municipality.the_geom,0.001) LIMIT 1);		
 	END IF;
@@ -196,7 +196,7 @@ BEGIN
 	END IF;
 
 	-- state
-	v_state := (SELECT "value"::integer FROM config_param_user WHERE "parameter"='state_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+	v_state := (SELECT "value"::integer FROM config_param_user WHERE "parameter"='edit_state_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 	IF v_state IS NULL THEN
 		v_state:= 1;
 	END IF;

@@ -83,7 +83,7 @@ BEGIN
 			IF v_customfeature IS NOT NULL THEN
 				NEW.connecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"=lower(concat(v_customfeature,'_vdefault')) AND "cur_user"="current_user"() LIMIT 1);
 			ELSE
-				NEW.connecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='connecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+				NEW.connecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='edit_connecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 
 				-- get first value (last chance)
 				IF (NEW.connecat_id IS NULL) THEN
@@ -108,7 +108,7 @@ BEGIN
 			
 			-- getting value default
 			IF (NEW.expl_id IS NULL) THEN
-				NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='exploitation_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+				NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_exploitation_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF;
 			
 			-- getting value from geometry of mapzone
@@ -140,7 +140,7 @@ BEGIN
 			
 			-- getting value default
 			IF (NEW.sector_id IS NULL) THEN
-				NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='sector_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+				NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_sector_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF;
 			
 			-- getting value from geometry of mapzone
@@ -171,7 +171,7 @@ BEGIN
 			
 			-- getting value default
 			IF (NEW.dma_id IS NULL) THEN
-				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='dma_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_dma_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF;
 			
 			-- getting value from geometry of mapzone
@@ -235,7 +235,7 @@ BEGIN
 			
 			-- getting value default
 			IF (NEW.muni_id IS NULL) THEN
-				NEW.muni_id := (SELECT "value" FROM config_param_user WHERE "parameter"='municipality_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+				NEW.muni_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_municipality_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF;
 			
 			-- getting value from geometry of mapzone
@@ -259,7 +259,7 @@ BEGIN
 			
 		    -- State
 			IF (NEW.state IS NULL) THEN
-		    NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='state_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		    NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_state_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;
 			
 			-- State_type
@@ -282,27 +282,27 @@ BEGIN
 		
 		-- Workcat_id
 		IF (NEW.workcat_id IS NULL) THEN
-			NEW.workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			NEW.workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_workcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;
 		
 		-- Ownercat_id
 		IF (NEW.ownercat_id IS NULL) THEN
-		    NEW.ownercat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='ownercat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		    NEW.ownercat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_ownercat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;
 			
 		-- Soilcat_id
 		IF (NEW.soilcat_id IS NULL) THEN
-		    NEW.soilcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='soilcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		    NEW.soilcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_soilcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;
 				
 		--Builtdate
 		IF (NEW.builtdate IS NULL) THEN
-			NEW.builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			NEW.builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='edit_builtdate_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;
 		
 		-- Verified
 		IF (NEW.verified IS NULL) THEN
-		    NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		    NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;
 
 		SELECT code_autofill INTO v_code_autofill_bool FROM connec_type join cat_connec on connec_type.id=cat_connec.connectype_id where cat_connec.id=NEW.connecat_id;
@@ -333,7 +333,7 @@ BEGIN
 		v_featurecat = (SELECT connectype_id FROM cat_connec WHERE id = NEW.connecat_id);
 
 		--Location type
-		IF NEW.location_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'feature_location_vdefault' AND cur_user = current_user)  = v_featurecat THEN
+		IF NEW.location_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'edit_feature_location_vdefault' AND cur_user = current_user)  = v_featurecat THEN
 			NEW.location_type = (SELECT value FROM config_param_user WHERE parameter = 'featureval_location_vdefault' AND cur_user = current_user);
 		END IF;
 
@@ -342,8 +342,8 @@ BEGIN
 		END IF;
 
 		--Fluid type
-		IF NEW.fluid_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'feature_fluid_vdefault' AND cur_user = current_user)  = v_featurecat THEN
-			NEW.fluid_type = (SELECT value FROM config_param_user WHERE parameter = 'featureval_fluid_vdefault' AND cur_user = current_user);
+		IF NEW.fluid_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'edit_feature_fluid_vdefault' AND cur_user = current_user)  = v_featurecat THEN
+			NEW.fluid_type = (SELECT value FROM config_param_user WHERE parameter = 'edit_featureval_fluid_vdefault' AND cur_user = current_user);
 		END IF;
 
 		IF NEW.fluid_type IS NULL THEN
@@ -351,8 +351,8 @@ BEGIN
 		END IF;
 
 		--Category type
-		IF NEW.category_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'feature_category_vdefault' AND cur_user = current_user)  = v_featurecat THEN
-			NEW.category_type = (SELECT value FROM config_param_user WHERE parameter = 'featureval_category_vdefault' AND cur_user = current_user);
+		IF NEW.category_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'edit_feature_category_vdefault' AND cur_user = current_user)  = v_featurecat THEN
+			NEW.category_type = (SELECT value FROM config_param_user WHERE parameter = 'edit_featureval_category_vdefault' AND cur_user = current_user);
 		END IF;
 
 		IF NEW.category_type IS NULL THEN
@@ -360,8 +360,8 @@ BEGIN
 		END IF;	
 
 		--Function type
-		IF NEW.function_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'feature_function_vdefault' AND cur_user = current_user)  = v_featurecat THEN
-			NEW.function_type = (SELECT value FROM config_param_user WHERE parameter = 'featureval_function_vdefault' AND cur_user = current_user);
+		IF NEW.function_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'edit_feature_function_vdefault' AND cur_user = current_user)  = v_featurecat THEN
+			NEW.function_type = (SELECT value FROM config_param_user WHERE parameter = 'edit_featureval_function_vdefault' AND cur_user = current_user);
 		END IF;
 
 		IF NEW.function_type IS NULL THEN
@@ -442,7 +442,7 @@ BEGIN
 		
 		IF NEW.state=1 THEN
 			-- Control of automatic insert of link and vnode
-			IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connect_force_automatic_connect2network' 
+			IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connec_automatic_link'
 			AND cur_user=current_user LIMIT 1) IS TRUE THEN
 
 				EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
@@ -458,7 +458,7 @@ BEGIN
 
 			-- for planned connects always must exits arc_id defined on the default psector because it is impossible to draw a new planned link. Unique option for user is modify the existing automatic link
 			SELECT arc_id INTO v_arc_id FROM connec WHERE connec_id=NEW.connec_id;
-			v_psector_vdefault=(SELECT value::integer FROM config_param_user WHERE config_param_user.parameter::text = 'psector_vdefault'::text AND config_param_user.cur_user::name = "current_user"());
+			v_psector_vdefault=(SELECT value::integer FROM config_param_user WHERE config_param_user.parameter::text = 'plan_psector_vdefault'::text AND config_param_user.cur_user::name = "current_user"());
 			INSERT INTO plan_psector_x_connec (connec_id, psector_id, state, doable, arc_id) VALUES (NEW.connec_id, v_psector_vdefault, 1, true, v_arc_id);
 		END IF;
 			
@@ -517,7 +517,7 @@ BEGIN
 				EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
 				"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';
 				
-			ELSIF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connect_force_automatic_connect2network' AND cur_user=current_user LIMIT 1) IS TRUE THEN
+			ELSIF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connec_automatic_link' AND cur_user=current_user LIMIT 1) IS TRUE THEN
 				
 				EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
 				"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';
@@ -532,7 +532,7 @@ BEGIN
 			IF NEW.state = 2 AND OLD.state=1 THEN
 				INSERT INTO plan_psector_x_connec (connec_id, psector_id, state, doable)
 				VALUES (NEW.connec_id, (SELECT config_param_user.value::integer AS value FROM config_param_user WHERE config_param_user.parameter::text
-				= 'psector_vdefault'::text AND config_param_user.cur_user::name = "current_user"() LIMIT 1), 1, true);
+				= 'plan_psector_vdefault'::text AND config_param_user.cur_user::name = "current_user"() LIMIT 1), 1, true);
 			END IF;
 			IF NEW.state = 1 AND OLD.state=2 THEN
 				DELETE FROM plan_psector_x_connec WHERE connec_id=NEW.connec_id;					
@@ -555,7 +555,7 @@ BEGIN
 			END IF;
 
 			-- Control of automatic downgrade of associated link/vnode
-			IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connect_force_downgrade_linkvnode' 
+			IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connect_downgrade_link'
 			AND cur_user=current_user LIMIT 1) IS TRUE THEN	
 				UPDATE link SET state=0 WHERE feature_id=OLD.connec_id;
 				UPDATE vnode SET state=0 WHERE vnode_id=(SELECT exit_id FROM link WHERE feature_id=OLD.connec_id LIMIT 1)::integer;

@@ -35,7 +35,7 @@ SELECT "SCHEMA_NAME".gw_fct_get_formfields( 'printGeneric', 'utils', 'data', nul
 
 PERFORM gw_fct_debug(concat('{"data":{"msg":"----> INPUT FOR gw_fct_get_formfields: ", "variables":"',v_debug,'"}}')::json);
 PERFORM gw_fct_debug(concat('{"data":{"msg":"<---- OUTPUT FOR gw_fct_get_formfields: ", "variables":"',v_debug,'"}}')::json);
-UPDATE config_param_user SET value =  'true' WHERE parameter = 'debug_mode' and cur_user = current_user;
+UPDATE config_param_user SET value =  'true' WHERE parameter = 'utils_debug_mode' and cur_user = current_user;
 */
 
 DECLARE
@@ -84,7 +84,7 @@ BEGIN
 	-- get project type
 	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
 	SELECT value INTO v_bmapsclient FROM config_param_system WHERE parameter = 'api_bmaps_client';
-	SELECT value::boolean INTO v_debug FROM config_param_user WHERE parameter='debug_mode';
+	SELECT value::boolean INTO v_debug FROM config_param_user WHERE parameter='utils_debug_mode';
 
 	IF v_debug = TRUE THEN
 		v_debug_var = (SELECT jsonb_build_object('formname',  p_formname,'formtype',   p_formtype, 'tabname', p_tabname,'tablename', p_tablename, 'idname', p_idname,
@@ -115,7 +115,7 @@ BEGIN
 	END IF;
 
 	-- get user variable to show label as column id or not
-	IF (SELECT value::boolean FROM config_param_user WHERE parameter = 'api_form_show_columname_on_label' AND cur_user =  current_user) THEN
+	IF (SELECT value::boolean FROM config_param_user WHERE parameter = 'utils_formlabel_show_columname' AND cur_user =  current_user) THEN
 		v_label = 'column_id AS label';
 	ELSE
 		v_label = 'label';
@@ -214,10 +214,10 @@ BEGIN
 		-- Get selected value from parent
 		IF p_tgop ='INSERT' THEN
 			IF (aux_json->>'parentId') = 'expl_id' THEN -- specific case for exploitation as parent mapzone
-				v_selected_id = (SELECT value FROM config_param_user WHERE parameter = 'exploitation_vdefault' AND cur_user = current_user);
+				v_selected_id = (SELECT value FROM config_param_user WHERE parameter = 'edit_exploitation_vdefault' AND cur_user = current_user);
 
 			ELSIF (aux_json->>'parentId') = 'muni_id' THEN -- specific case for exploitation as parent mapzone
-				v_selected_id = (SELECT value FROM config_param_user WHERE parameter = 'municipality_vdefault' AND cur_user = current_user);
+				v_selected_id = (SELECT value FROM config_param_user WHERE parameter = 'edit_municipality_vdefault' AND cur_user = current_user);
 
 			ELSE 
 				EXECUTE 'SELECT value::text FROM sys_param_user JOIN config_param_user ON sys_param_user.id=parameter 

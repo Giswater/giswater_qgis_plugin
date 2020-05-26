@@ -29,8 +29,8 @@ BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	
-	-- execute only if user has true the parameter edit_link_connecrotation_update
-	IF (SELECT value FROM config_param_user WHERE parameter='edit_link_connecrotation_update' AND cur_user=current_user)::boolean = TRUE THEN
+	-- execute only if user has true the parameter edit_link_update_connecrotation
+	IF (SELECT value FROM config_param_user WHERE parameter='edit_link_update_connecrotation' AND cur_user=current_user)::boolean = TRUE THEN
 
     
     IF TG_OP='INSERT' THEN

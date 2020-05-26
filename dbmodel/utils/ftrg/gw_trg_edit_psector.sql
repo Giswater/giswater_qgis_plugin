@@ -46,17 +46,17 @@ BEGIN
 			
 		-- Gexpenses_vdefault
 			IF (NEW.gexpenses IS NULL) THEN
-				NEW.gexpenses := (SELECT "value" FROM config_param_user WHERE "parameter"='psector_gexpenses_vdefault' AND "cur_user"="current_user"())::numeric(4,2);
+				NEW.gexpenses := (SELECT "value" FROM config_param_user WHERE "parameter"='plan_psector_gexpenses_vdefault' AND "cur_user"="current_user"())::numeric(4,2);
 			END IF;
 			
 		-- Vat_vdefault
 			IF (NEW.vat IS NULL) THEN
-				NEW.vat := (SELECT "value" FROM config_param_user WHERE "parameter"='psector_vat_vdefault' AND "cur_user"="current_user"())::numeric(4,2);
+				NEW.vat := (SELECT "value" FROM config_param_user WHERE "parameter"='plan_psector_vat_vdefault' AND "cur_user"="current_user"())::numeric(4,2);
 			END IF;
 			
 		-- Other_vdefault
 			IF (NEW.other IS NULL) THEN
-				NEW.other := (SELECT "value" FROM config_param_user WHERE "parameter"='psector_other_vdefault' AND "cur_user"="current_user"())::numeric(4,2);
+				NEW.other := (SELECT "value" FROM config_param_user WHERE "parameter"='plan_psector_other_vdefault' AND "cur_user"="current_user"())::numeric(4,2);
 			END IF;
 		
 		-- Type_vdefault
@@ -220,7 +220,7 @@ BEGIN
 
 		END LOOP;
 
-		DELETE FROM config_param_user WHERE parameter = 'psector_vdefault' and value = OLD.psector_id::text;
+		DELETE FROM config_param_user WHERE parameter = 'plan_psector_vdefault' and value = OLD.psector_id::text;
 
 		DELETE FROM plan_psector WHERE psector_id = OLD.psector_id;
 

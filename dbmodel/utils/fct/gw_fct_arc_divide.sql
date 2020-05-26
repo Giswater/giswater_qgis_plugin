@@ -116,7 +116,7 @@ BEGIN
 
     -- Get parameters from configs table
 	SELECT ((value::json)->>'value') INTO v_arc_searchnodes FROM config_param_system WHERE parameter='edit_arc_searchnodes';
-	SELECT value::smallint INTO v_psector FROM config_param_user WHERE "parameter"='psector_vdefault' AND cur_user=current_user;
+	SELECT value::smallint INTO v_psector FROM config_param_user WHERE "parameter"='plan_psector_vdefault' AND cur_user=current_user;
 	SELECT value::smallint INTO v_ficticius FROM config_param_system WHERE parameter='plan_statetype_ficticius';
 	SELECT value::boolean INTO v_hide_form FROM config_param_user where parameter='qgis_form_log_hidden' AND cur_user=current_user;
 
