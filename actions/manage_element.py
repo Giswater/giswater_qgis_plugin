@@ -5,9 +5,9 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from functools import partial
-
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView
+
+from functools import partial
 
 from .. import utils_giswater
 from ..ui_manager import ElementUi
@@ -149,7 +149,7 @@ class ManageElement(ParentManage):
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_add_element.workcat_id_end, rows, 1, add_empty=True)
 
-        sql = "SELECT DISTINCT(id), id FROM value_verified"
+        sql = "SELECT id, idval FROM edit_typevalue WHERE typevalue = 'value_verified'"
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_add_element.verified, rows, 1, add_empty=True)
         self.filter_elementcat_id()
@@ -188,7 +188,8 @@ class ManageElement(ParentManage):
         self.set_completer_feature_id(self.dlg_add_element.feature_id, "arc", "v_edit_arc")
 
         if feature:
-            self.dlg_add_element.tabWidget.currentChanged.connect(partial(self.fill_tbl_new_element, self.dlg_add_element, geom_type, feature[geom_type+"_id"]))
+            self.dlg_add_element.tabWidget.currentChanged.connect(partial(self.fill_tbl_new_element,
+                self.dlg_add_element, geom_type, feature[geom_type+"_id"]))
 
         # Set default tab 'arc'
         self.dlg_add_element.tab_feature.setCurrentIndex(0)
@@ -470,12 +471,15 @@ class ManageElement(ParentManage):
         self.fill_table_object(self.dlg_man.tbl_element, self.schema_name + "." + table_object)                
         self.set_table_columns(self.dlg_man, self.dlg_man.tbl_element, table_object)
         
-        # Set dignals
-        self.dlg_man.element_id.textChanged.connect(partial(self.filter_by_id,  self.dlg_man, self.dlg_man.tbl_element, self.dlg_man.element_id, table_object))
-        self.dlg_man.tbl_element.doubleClicked.connect(partial(self.open_selected_object, self.dlg_man, self.dlg_man.tbl_element, table_object))
+        # Set signals
+        self.dlg_man.element_id.textChanged.connect(partial(self.filter_by_id, self.dlg_man, self.dlg_man.tbl_element,
+            self.dlg_man.element_id, table_object))
+        self.dlg_man.tbl_element.doubleClicked.connect(partial(self.open_selected_object, self.dlg_man,
+            self.dlg_man.tbl_element, table_object))
         self.dlg_man.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_man))
         self.dlg_man.rejected.connect(partial(self.close_dialog, self.dlg_man))
-        self.dlg_man.btn_delete.clicked.connect(partial(self.delete_selected_object, self.dlg_man.tbl_element, table_object))
+        self.dlg_man.btn_delete.clicked.connect(partial(self.delete_selected_object, self.dlg_man.tbl_element,
+            table_object))
                                         
         # Open form
         self.open_dialog(self.dlg_man)             
