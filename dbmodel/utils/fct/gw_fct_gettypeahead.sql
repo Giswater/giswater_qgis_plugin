@@ -61,6 +61,9 @@ BEGIN
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
 		INTO v_version;
 
+	-- filter input data
+	p_data = replace (p_data::text, 'None', '');
+
 	-- getting input data 
 	v_querytext := ((p_data ->>'data')::json->>'queryText')::text;
 	v_parent :=  ((p_data ->>'data')::json->>'parentId')::text;
