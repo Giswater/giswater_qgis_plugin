@@ -294,13 +294,13 @@ UPDATE config_form_fields SET stylesheet ='{"label":"color:red; font-weight:bold
 -- drop constraints
 SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$);
 
-delete from cat_presszone;
-INSERT INTO cat_presszone VALUES ('1', 'pzone1-1s', 1, NULL, NULL,  '{"use":[{"nodeParent":"1097", "toArc":[2207]}], "ignore":[]}');
-INSERT INTO cat_presszone VALUES ('2', 'pzone1-2s', 2, NULL, NULL, '{"use":[{"nodeParent":"1101", "toArc":[2205]}], "ignore":[]}');
-INSERT INTO cat_presszone VALUES ('3', 'pzone1-1d', 1, NULL, NULL, '{"use":[{"nodeParent":"113766", "toArc":[113906]}], "ignore":[]}');
-INSERT INTO cat_presszone VALUES ('4', 'pzone1-2d', 1, NULL, NULL, '{"use":[{"nodeParent":"1083", "toArc":[2095]}], "ignore":[]}');
-INSERT INTO cat_presszone VALUES ('5', 'pzone2-1s', 2, NULL, NULL, '{"use":[{"nodeParent":"111111", "toArc":[114025]}], "ignore":[]}');
-INSERT INTO cat_presszone VALUES ('6', 'pzone2-2d', 2,  NULL, NULL, '{"use":[{"nodeParent":"113952", "toArc":[114146]}], "ignore":[]}');
+delete from presszone;
+INSERT INTO presszone VALUES ('1', 'pzone1-1s', 1, NULL, NULL,  '{"use":[{"nodeParent":"1097", "toArc":[2207]}], "ignore":[]}');
+INSERT INTO presszone VALUES ('2', 'pzone1-2s', 2, NULL, NULL, '{"use":[{"nodeParent":"1101", "toArc":[2205]}], "ignore":[]}');
+INSERT INTO presszone VALUES ('3', 'pzone1-1d', 1, NULL, NULL, '{"use":[{"nodeParent":"113766", "toArc":[113906]}], "ignore":[]}');
+INSERT INTO presszone VALUES ('4', 'pzone1-2d', 1, NULL, NULL, '{"use":[{"nodeParent":"1083", "toArc":[2095]}], "ignore":[]}');
+INSERT INTO presszone VALUES ('5', 'pzone2-1s', 2, NULL, NULL, '{"use":[{"nodeParent":"111111", "toArc":[114025]}], "ignore":[]}');
+INSERT INTO presszone VALUES ('6', 'pzone2-2d', 2,  NULL, NULL, '{"use":[{"nodeParent":"113952", "toArc":[114146]}], "ignore":[]}');
 
 
 delete from dma;
@@ -336,14 +336,14 @@ INSERT INTO inp_reservoir  VALUES ('111111', NULL);
 INSERT INTO inp_reservoir  VALUES ('1097', NULL);
 INSERT INTO inp_reservoir  VALUES ('1101', NULL);
 
-update arc set sector_id=0, dma_id=0, dqa_id=0, presszonecat_id=0;
-update node set sector_id=0, dma_id=0, dqa_id=0,  presszonecat_id=0;
-update connec set sector_id=0, dma_id=0, dqa_id=0, presszonecat_id=0;
+update arc set sector_id=0, dma_id=0, dqa_id=0, presszone_id=0;
+update node set sector_id=0, dma_id=0, dqa_id=0,  presszone_id=0;
+update connec set sector_id=0, dma_id=0, dqa_id=0, presszone_id=0;
 
 INSERT INTO dma VALUES (0, 'Undefined', 0);
 INSERT INTO dqa VALUES (0, 'Undefined', 0);
 INSERT INTO sector VALUES (0, 'Undefined', 0);
-INSERT INTO cat_presszone VALUES (0, 'Undefined',0);
+INSERT INTO presszone VALUES (0, 'Undefined',0);
 
 -- add constraints
 SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"ADD"}}$$);
@@ -430,7 +430,7 @@ WHERE node_id = '113766';
 UPDATE config_mincut_inlet SET config = '{"inletArc":["114145"]}'
 WHERE node_id = '113952';
 
-UPDATE config_form_fields SET label = 'Presszone' WHERE column_id = 'presszonecat_id';
+UPDATE config_form_fields SET label = 'Presszone' WHERE column_id = 'presszone_id';
 
 update config_form_fields SET layout_order = 3 where column_id='state' and formname like '%ve_connec_%';
 update config_form_fields SET layout_order = 4 where column_id='state_type' and formname like '%ve_connec_%';
@@ -465,7 +465,7 @@ UPDATE config_form_fields SET layoutname = 'lyt_data_1',layout_order = 997 where
 UPDATE config_form_fields SET layout_order = 2 where column_id ='dma_id';
 
 UPDATE config_form_fields SET layoutname = 'lyt_data_2', layout_order = 30 where column_id ='verified';
-UPDATE config_form_fields SET layoutname = 'lyt_data_2', layout_order = 31 where column_id ='presszonecat_id';
+UPDATE config_form_fields SET layoutname = 'lyt_data_2', layout_order = 31 where column_id ='presszone_id';
 UPDATE config_form_fields SET layoutname = 'lyt_data_2', layout_order = 32 where column_id ='dqa_id';
 UPDATE config_form_fields SET layoutname = 'lyt_data_2', layout_order = 33 where column_id ='expl_id';
 UPDATE config_form_fields SET layoutname = 'lyt_data_1', layout_order = 998 where column_id ='parent_id';

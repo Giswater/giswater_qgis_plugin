@@ -231,8 +231,8 @@ BEGIN
 
 		-- insert into minsector table
 		DELETE FROM minsector WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=current_user);
-		INSERT INTO minsector (minsector_id, dma_id, dqa_id, presszonecat_id, sector_id, expl_id) 
-		SELECT distinct ON (minsector_id) minsector_id, dma_id, dqa_id, presszonecat_id::integer, sector_id, expl_id FROM arc WHERE minsector_id is not null;
+		INSERT INTO minsector (minsector_id, dma_id, dqa_id, presszone_id, sector_id, expl_id)
+		SELECT distinct ON (minsector_id) minsector_id, dma_id, dqa_id, presszone_id::integer, sector_id, expl_id FROM arc WHERE minsector_id is not null;
 
 		-- update graf on minsector_graf
 		DELETE FROM minsector_graf;

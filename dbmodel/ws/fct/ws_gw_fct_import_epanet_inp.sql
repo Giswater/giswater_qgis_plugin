@@ -105,7 +105,7 @@ BEGIN
 		DELETE FROM sector;
 		DELETE FROM dma;
 		DELETE FROM dqa;
-		DELETE FROM cat_presszone;
+		DELETE FROM presszone;
 		DELETE FROM ext_municipality;
 		DELETE FROM selector_expl;
 		DELETE FROM selector_state;
@@ -221,7 +221,7 @@ BEGIN
 	INSERT INTO sector(sector_id,name) VALUES(0,'undefined') ON CONFLICT (sector_id) DO NOTHING;
 	INSERT INTO dma(dma_id,name,expl_id) VALUES(0,'undefined',0) ON CONFLICT (dma_id) DO NOTHING;
 	INSERT INTO dqa(dqa_id,name,expl_id) VALUES(0,'undefined',0) ON CONFLICT (dqa_id) DO NOTHING;
-	INSERT INTO cat_presszone(id,descript,expl_id) VALUES(0,'undefined',0) ON CONFLICT (id) DO NOTHING;
+	INSERT INTO presszone(id,descript,expl_id) VALUES(0,'undefined',0) ON CONFLICT (id) DO NOTHING;
 
 	
 	INSERT INTO macroexploitation(macroexpl_id,name) VALUES(1,'macroexploitation1') ON CONFLICT (macroexpl_id) DO NOTHING;
@@ -229,7 +229,7 @@ BEGIN
 	INSERT INTO sector(sector_id,name) VALUES(1,'sector1') ON CONFLICT (sector_id) DO NOTHING;
 	INSERT INTO dma(dma_id,name,expl_id) VALUES(1,'dma1',1) ON CONFLICT (dma_id) DO NOTHING;
 	INSERT INTO dqa(dqa_id,name,expl_id) VALUES(1,'dqa1',1) ON CONFLICT (dqa_id) DO NOTHING;
-	INSERT INTO cat_presszone(id,descript,expl_id) VALUES(1,'presszone1',1) ON CONFLICT (id) DO NOTHING;
+	INSERT INTO presszone(id,descript,expl_id) VALUES(1,'presszone1',1) ON CONFLICT (id) DO NOTHING;
 	INSERT INTO ext_municipality(muni_id,name) VALUES(1,'municipality1') ON CONFLICT (muni_id) DO NOTHING;
 
 	-- SELECTORS

@@ -29,9 +29,9 @@ UPDATE dma SET grafconfig='[{"nodeParent":"11", "toArc":[12,13,14]}, {"nodeParen
 UPDATE dqa SET grafconfig='[{"nodeParent":"21", "toArc":[22,23,24]}, {"nodeParent":"5", "toArc":[26,27,28]}]';
 UPDATE cat_preszone SET grafconfig='[{"nodeParent":"31", "toArc":[32,33,34]}, {"nodeParent":"35", "toArc":[36,37,38]}]';
 
-update arc set sector_id=0, dma_id=0, dqa_id=0, presszonecat_id=0;
-update node set sector_id=0, dma_id=0, dqa_id=0,  presszonecat_id=0;
-update connec set sector_id=0, dma_id=0, dqa_id=0, presszonecat_id=0
+update arc set sector_id=0, dma_id=0, dqa_id=0, presszone_id=0;
+update node set sector_id=0, dma_id=0, dqa_id=0,  presszone_id=0;
+update connec set sector_id=0, dma_id=0, dqa_id=0, presszone_id=0
 
 
 ----------
@@ -64,7 +64,7 @@ SELECT dqa_id, count(dma_id) from v_edit_arc  group by dqa_id order by 1;
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"PRESSZONE","exploitation":"[1,2]", "checkData": false, "updateFeature":"TRUE", "updateMapZone":2, "geomParamUpdate":15,"debug":"false"}}}');
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"PRESSZONE", "node":"113952", "updateFeature":TRUE}}}');
 SELECT count(*), log_message FROM audit_log_data WHERE fprocesscat_id=48 AND cur_user=current_user group by log_message order by 2 --PZONE
-SELECT presszonecat_id, count(presszonecat_id) from v_edit_arc  group by presszonecat_id order by 1;
+SELECT presszone_id, count(presszone_id) from v_edit_arc  group by presszone_id order by 1;
 
 
 ---------------------------------
@@ -200,8 +200,8 @@ BEGIN
 	-- set fprocesscat
 	IF v_class = 'PRESSZONE' THEN 
 		v_fprocesscat_id=46;
-		v_table = 'cat_presszone';
-		v_field = 'presszonecat_id';
+		v_table = 'presszone';
+		v_field = 'presszone_id';
 		v_fieldmp = 'id';
 		v_visible_layer ='v_edit_presszone';
 		v_mapzonename = 'descript';
@@ -358,12 +358,12 @@ BEGIN
 					ON to_arc::integer=arc_id::integer WHERE node_id::integer=node_1::integer);
 
 			ELSIF v_class = 'PRESSZONE' THEN
-				-- cat_presszone (cat_presszone.grafconfig)
+				-- presszone (presszone.grafconfig)
 				UPDATE temp_anlgraf SET flag=0 WHERE id IN (
 				SELECT id FROM temp_anlgraf JOIN (
 					SELECT (json_array_elements_text((grafconfig->>'use')::json))::json->>'nodeParent' as node_id, 
 					json_array_elements_text(((json_array_elements_text((grafconfig->>'use')::json))::json->>'toArc')::json) 
-					as to_arc from cat_presszone 
+					as to_arc from presszone
 					where grafconfig is not null order by 1,2) a
 					ON to_arc::integer=arc_id::integer WHERE node_id::integer=node_1::integer);		
 			END IF;

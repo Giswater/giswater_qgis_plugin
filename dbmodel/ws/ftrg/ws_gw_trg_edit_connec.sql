@@ -193,33 +193,33 @@ BEGIN
 			
 			
 		-- Presszone
-		IF (NEW.presszonecat_id IS NULL) THEN
+		IF (NEW.presszone_id IS NULL) THEN
 			
 			-- control error without any mapzones defined on the table of mapzone
-			IF ((SELECT COUNT(*) FROM cat_presszone) = 0) THEN
+			IF ((SELECT COUNT(*) FROM presszone) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
 			"data":{"message":"3106", "function":"1304","debug_msg":null}}$$);';
 			END IF;
 			
 			-- getting value default
-			IF (NEW.presszonecat_id IS NULL) THEN
-				NEW.presszonecat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='presszone_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			IF (NEW.presszone_id IS NULL) THEN
+				NEW.presszone_id := (SELECT "value" FROM config_param_user WHERE "parameter"='presszone_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF;
 			
 			-- getting value from geometry of mapzone
-			IF (NEW.presszonecat_id IS NULL) THEN
-				SELECT count(*)into v_count FROM cat_presszone WHERE ST_DWithin(NEW.the_geom, cat_presszone.the_geom,0.001);
+			IF (NEW.presszone_id IS NULL) THEN
+				SELECT count(*)into v_count FROM presszone WHERE ST_DWithin(NEW.the_geom, presszone.the_geom,0.001);
 				IF v_count = 1 THEN
-					NEW.presszonecat_id = (SELECT id FROM cat_presszone WHERE ST_DWithin(NEW.the_geom, cat_presszone.the_geom,0.001) LIMIT 1);
+					NEW.presszone_id = (SELECT id FROM presszone WHERE ST_DWithin(NEW.the_geom, presszone.the_geom,0.001) LIMIT 1);
 				ELSE
-					NEW.presszonecat_id =(SELECT presszonecat_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, v_promixity_buffer) 
+					NEW.presszone_id =(SELECT presszone_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, v_promixity_buffer)
 					order by ST_Distance (NEW.the_geom, v_edit_arc.the_geom) LIMIT 1);
 				END IF;	
 			END IF;
 			
 			-- control when no value
-			IF NEW.presszonecat_id IS NULL THEN
-				NEW.presszonecat_id = 0;
+			IF NEW.presszone_id IS NULL THEN
+				NEW.presszone_id = 0;
 			END IF;           
 		END IF;
 		
@@ -376,10 +376,10 @@ BEGIN
 		END IF; 	
 
 		-- FEATURE INSERT
-		INSERT INTO connec (connec_id, code, elevation, depth,connecat_id,  sector_id, customer_code,  state, state_type, annotation, observ, comment,dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type, 
+		INSERT INTO connec (connec_id, code, elevation, depth,connecat_id,  sector_id, customer_code,  state, state_type, annotation, observ, comment,dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type, location_type,
 		workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, streetaxis2_id, postnumber, postnumber2, muni_id, streetaxis_id, postcode, postcomplement, postcomplement2, descript, link, verified, rotation, 
 		the_geom, undelete, label_x,label_y,label_rotation, expl_id, publish, inventory,num_value, connec_length, arc_id, minsector_id, dqa_id, staticpressure) 
-		VALUES (NEW.connec_id, NEW.code, NEW.elevation, NEW.depth, NEW.connecat_id, NEW.sector_id, NEW.customer_code,  NEW.state, NEW.state_type, NEW.annotation,   NEW.observ, NEW.comment, NEW.dma_id, NEW.presszonecat_id, NEW.soilcat_id, 
+		VALUES (NEW.connec_id, NEW.code, NEW.elevation, NEW.depth, NEW.connecat_id, NEW.sector_id, NEW.customer_code,  NEW.state, NEW.state_type, NEW.annotation,   NEW.observ, NEW.comment, NEW.dma_id, NEW.presszone_id, NEW.soilcat_id,
 		NEW.function_type, NEW.category_type, NEW.fluid_type,  NEW.location_type, NEW.workcat_id, NEW.workcat_id_end,  NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, v_streetaxis, NEW.postnumber, NEW.postnumber2, 
 		NEW.muni_id, v_streetaxis, NEW.postcode, NEW.postcomplement, NEW.postcomplement2, NEW.descript, NEW.link, NEW.verified, NEW.rotation, NEW.the_geom,NEW.undelete,NEW.label_x,
 		NEW.label_y,NEW.label_rotation,  NEW.expl_id, NEW.publish, NEW.inventory, NEW.num_value, NEW.connec_length, NEW.arc_id, NEW.minsector_id, NEW.dqa_id, NEW.staticpressure);
@@ -604,7 +604,7 @@ BEGIN
 
 		UPDATE connec 
 			SET code=NEW.code, elevation=NEW.elevation, "depth"=NEW.depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, 
-			annotation=NEW.annotation, observ=NEW.observ, "comment"=NEW.comment, rotation=NEW.rotation,dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id,
+			annotation=NEW.annotation, observ=NEW.observ, "comment"=NEW.comment, rotation=NEW.rotation,dma_id=NEW.dma_id, presszone_id=NEW.presszone_id,
 			soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, 
 			workcat_id_end=NEW.workcat_id_end, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, streetaxis2_id=v_streetaxis2, 
 			postnumber=NEW.postnumber, postnumber2=NEW.postnumber2, muni_id=NEW.muni_id, streetaxis_id=v_streetaxis, postcode=NEW.postcode, descript=NEW.descript, verified=NEW.verified, 

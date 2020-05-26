@@ -151,7 +151,7 @@ BEGIN
 			END IF;
 			
 			v_presszone := (SELECT row_to_json(a) FROM (SELECT "descript"::text FROM config_param_user 
-							JOIN cat_presszone on cat_presszone.id=value WHERE "parameter"='presszone_vdefault' AND cur_user=current_user)a);
+							JOIN presszone on presszone.id=value WHERE "parameter"='presszone_vdefault' AND cur_user=current_user)a);
 			
 	ELSE 		
 			-- definition of variables

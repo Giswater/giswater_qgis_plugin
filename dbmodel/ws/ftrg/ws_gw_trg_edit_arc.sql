@@ -195,24 +195,24 @@ BEGIN
 			
 			
 		-- Presszone
-		IF (NEW.presszonecat_id IS NULL) THEN
+		IF (NEW.presszone_id IS NULL) THEN
 			
 			-- control error without any mapzones defined on the table of mapzone
-			IF ((SELECT COUNT(*) FROM cat_presszone) = 0) THEN
+			IF ((SELECT COUNT(*) FROM presszone) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
 		       	"data":{"message":"3106", "function":"1302","debug_msg":null}}$$);';
 			END IF;
 			
 			-- getting value default
-			IF (NEW.presszonecat_id IS NULL) THEN
-				NEW.presszonecat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='presszone_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			IF (NEW.presszone_id IS NULL) THEN
+				NEW.presszone_id := (SELECT "value" FROM config_param_user WHERE "parameter"='presszone_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF;
 			
 			-- getting value from geometry of mapzone
-			IF (NEW.presszonecat_id IS NULL) THEN
-				SELECT count(*)into v_count FROM cat_presszone WHERE ST_DWithin(NEW.the_geom, cat_presszone.the_geom,0.001);
+			IF (NEW.presszone_id IS NULL) THEN
+				SELECT count(*)into v_count FROM presszone WHERE ST_DWithin(NEW.the_geom, presszone.the_geom,0.001);
 				IF v_count = 1 THEN
-					NEW.presszonecat_id = (SELECT presszonecat_id FROM cat_presszone WHERE ST_DWithin(NEW.the_geom, cat_presszone.the_geom,0.001) LIMIT 1);
+					NEW.presszone_id = (SELECT presszonecat_id FROM presszone WHERE ST_DWithin(NEW.the_geom, presszone.the_geom,0.001) LIMIT 1);
 				ELSE
 					NEW.presszonecat_id =(SELECT presszonecat_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, v_promixity_buffer) 
 					order by ST_Distance (NEW.the_geom, v_edit_arc.the_geom) LIMIT 1);

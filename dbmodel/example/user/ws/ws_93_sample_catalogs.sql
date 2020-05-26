@@ -177,12 +177,12 @@ INSERT INTO cat_pavement VALUES ('Asphalt', NULL, NULL,'0.10','P_ASPHALT-10');
 INSERT INTO cat_pavement VALUES ('pavement1', NULL, NULL,'0.12','P_ASPHALT-10');
 INSERT INTO cat_pavement VALUES ('pavement2', NULL, NULL,'0.08','P_ASPHALT-10');
 
-INSERT INTO cat_presszone VALUES ('High-Expl_01', 'High-Expl_01', '1');
-INSERT INTO cat_presszone VALUES ('Medium-Expl_01', 'Medium-Expl_01', '1');
-INSERT INTO cat_presszone VALUES ('Low-Expl_01', 'Low-Expl_01', '1');
-INSERT INTO cat_presszone VALUES ('High-Expl_02', 'High-Expl_02', '2');
-INSERT INTO cat_presszone VALUES ('Medium-Expl_02', 'Medium-Expl_02', '2');
-INSERT INTO cat_presszone VALUES ('Low-Expl_02', 'Low-Expl_02', '2');
+INSERT INTO presszone VALUES ('High-Expl_01', 'High-Expl_01', '1');
+INSERT INTO presszone VALUES ('Medium-Expl_01', 'Medium-Expl_01', '1');
+INSERT INTO presszone VALUES ('Low-Expl_01', 'Low-Expl_01', '1');
+INSERT INTO presszone VALUES ('High-Expl_02', 'High-Expl_02', '2');
+INSERT INTO presszone VALUES ('Medium-Expl_02', 'Medium-Expl_02', '2');
+INSERT INTO presszone VALUES ('Low-Expl_02', 'Low-Expl_02', '2');
 
 
 INSERT INTO cat_soil VALUES ('soil1', 'soil 1', NULL, 7.00, 0.25, 0.60, 'S_EXC', 'S_REB', 'S_TRANS', 'S_TRENCH');

@@ -291,33 +291,33 @@ BEGIN
 	IF v_presszone IS TRUE AND (v_grafclass = 'PRESSZONE' OR v_grafclass = 'ALL') THEN
 
 		-- check presszone.grafconfig values
-		v_querytext = 	'SELECT * FROM cat_presszone WHERE grafconfig IS NULL and id > 0::text' ;
+		v_querytext = 	'SELECT * FROM presszone WHERE grafconfig IS NULL and id > 0::text' ;
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
 		IF v_count > 0 THEN
-			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) VALUES (111, 4, concat('ERROR: There is/are ',v_count, ' presszone on cat_presszone table with grafconfig not configured.'));
+			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) VALUES (111, 4, concat('ERROR: There is/are ',v_count, ' presszone on presszone table with grafconfig not configured.'));
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) VALUES (111, 1, 'INFO: All mapzones has grafconfig values not null.');
 		END IF;	
 
-		-- presszone : check coherence againts nodetype.grafdelimiter and nodeparent defined on cat_presszone.grafconfig (fprocesscat = 82)
+		-- presszone : check coherence againts nodetype.grafdelimiter and nodeparent defined on presszone.grafconfig (fprocesscat = 82)
 		v_querytext = 'SELECT node_id, nodecat_id, the_geom FROM '||v_edit||'node JOIN cat_node c ON id=nodecat_id JOIN node_type n ON n.id=c.nodetype_id
 				LEFT JOIN (SELECT node_id FROM '||v_edit||'node JOIN (SELECT (json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'' as node_id 
-				FROM cat_presszone WHERE grafconfig IS NOT NULL)a USING (node_id)) a USING (node_id) WHERE graf_delimiter=''PRESSZONE'' AND a.node_id IS NULL 
-				AND node_id NOT IN (SELECT (json_array_elements_text((grafconfig->>''ignore'')::json))::text FROM cat_presszone)';
+				FROM presszone WHERE grafconfig IS NOT NULL)a USING (node_id)) a USING (node_id) WHERE graf_delimiter=''PRESSZONE'' AND a.node_id IS NULL
+				AND node_id NOT IN (SELECT (json_array_elements_text((grafconfig->>''ignore'')::json))::text FROM presszone)';
 
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 		IF v_count > 0 THEN
 			EXECUTE concat 
-			('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) SELECT 82, node_id, nodecat_id, ''Node_type is PRESSZONE but node is not configured on cat_presszone.grafconfig'', the_geom FROM (', v_querytext,')a');
+			('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) SELECT 82, node_id, nodecat_id, ''Node_type is PRESSZONE but node is not configured on presszone.grafconfig'', the_geom FROM (', v_querytext,')a');
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 			VALUES (111, 2, concat('WARNING: There is/are ',v_count,
-			' node(s) with node_type.graf_delimiter=''PRESSZONE'' not configured on the cat_presszone table.'));
+			' node(s) with node_type.graf_delimiter=''PRESSZONE'' not configured on the presszone table.'));
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
 			VALUES (111, 2, concat('SELECT * FROM anl_node WHERE fprocesscat_id=82 AND cur_user=current_user'));
 		ELSE
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-			VALUES (111, 1, 'INFO: All nodes with node_type.grafdelimiter=''PRESSZONE'' are defined as nodeParent on cat_presszone.grafconfig');
+			VALUES (111, 1, 'INFO: All nodes with node_type.grafdelimiter=''PRESSZONE'' are defined as nodeParent on presszone.grafconfig');
 		END IF;
 
 		-- presszone, toArc (fprocesscat = 86)
