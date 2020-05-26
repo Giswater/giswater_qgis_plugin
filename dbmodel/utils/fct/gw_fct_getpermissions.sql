@@ -18,7 +18,7 @@ $BODY$
 DECLARE
 
 --	Variables
-	api_version json;
+	v_version json;
 	v_permissions json;
 	v_permissions_array json[];
 	schemas_array name[];
@@ -35,7 +35,7 @@ BEGIN
 
 --  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-		INTO api_version;
+		INTO v_version;
 
 --    Get schema name
     schemas_array := current_schemas(FALSE);
@@ -60,14 +60,14 @@ BEGIN
 
     v_permissions = array_to_json (v_permissions_array);
 
-    api_version := COALESCE(api_version, '{}');
+    v_version := COALESCE(v_version, '{}');
     v_permissions := COALESCE(v_permissions, '{}');
 
 
  
 -- Return
 	RETURN ('{"status":"Accepted"' ||
-		', "version":'|| api_version ||
+		', "version":'|| v_version ||
 		', "tableName":"'|| v_table ||'"'||
 		', "isEditable":' || v_iseditable ||
 		', "permissions":'|| v_permissions||
@@ -76,7 +76,7 @@ BEGIN
 
 -- Exception handling
 --	EXCEPTION WHEN OTHERS THEN 
-		--RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| api_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+		--RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;

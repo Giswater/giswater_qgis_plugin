@@ -21,7 +21,7 @@ SELECT SCHEMA_NAME.gw_fct_duplicate_psector($${
 
 $BODY$
 DECLARE
-v_api_version json;
+v_version json;
 v_arc_id TEXT;
 v_project_type text;
 v_version text;
@@ -55,7 +55,7 @@ BEGIN
 	SELECT wsoftware, giswater  INTO v_project_type, v_version FROM version order by 1 desc limit 1;
 
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-	INTO v_api_version;
+	INTO v_version;
 
 	-- manage log (fprocesscat = 51)
 	DELETE FROM audit_check_data WHERE fprocesscat_id=53 AND cur_user=current_user;
@@ -217,9 +217,9 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 	v_result_info := COALESCE(v_result_info, '{}'); 
-	v_api_version := COALESCE(v_api_version, '[]');
+	v_version := COALESCE(v_version, '[]');
 
-RETURN ('{"status":"Accepted", "version":'||v_api_version||
+RETURN ('{"status":"Accepted", "version":'||v_version||
             ',"message":{"priority":1, "text":""},"body":{"data": {"info":'||v_result_info||'}}}')::json;
 
 	EXCEPTION WHEN OTHERS THEN

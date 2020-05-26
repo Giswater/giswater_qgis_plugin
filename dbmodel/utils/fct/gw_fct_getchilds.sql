@@ -46,7 +46,7 @@ DECLARE
 	v_aux_json_child json;    
 	combo_json_child json;
 	schemas_array name[];
-	api_version json;
+	v_version json;
 	query_text text;
 	v_current_value text;
 	v_column_type varchar;
@@ -67,7 +67,7 @@ BEGIN
 
 	-- get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
-		INTO api_version;
+		INTO v_version;
 
 	-- get input parameters
 	--v_id :=  ((p_data ->>'feature')::json->>'id')::text;
@@ -202,11 +202,11 @@ BEGIN
 
 --    Control NULL's
 	v_message := COALESCE(v_message, '[]');
-	api_version := COALESCE(api_version, '[]');
+	v_version := COALESCE(v_version, '[]');
 	v_fields := COALESCE(v_fields, '[]');    
     
 --    Return
-    RETURN ('{"status":"Accepted"' || ', "message":'|| v_message || ', "apiVersion":'|| api_version ||
+    RETURN ('{"status":"Accepted"' || ', "message":'|| v_message || ', "apiVersion":'|| v_version ||
         ', "body": {"form":{}'||
 		 ', "feature":{}'||
 		 ', "data":' || v_fields ||
@@ -214,7 +214,7 @@ BEGIN
 
 --    Exception handling
  --   EXCEPTION WHEN OTHERS THEN 
-   --     RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+   --     RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

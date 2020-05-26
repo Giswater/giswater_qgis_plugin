@@ -40,7 +40,7 @@ DECLARE
     schemas_array text[];
     v_count int2=0;
     v_geometrytype text;
-    api_version text;
+    v_version text;
     v_the_geom text;
     v_config_layer text;
     xxx text;
@@ -68,7 +68,7 @@ BEGIN
 
 	--  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-        INTO api_version;
+        INTO v_version;
 
 	-- Get input parameters:
 	v_device := (p_data ->> 'client')::json->> 'device';
@@ -216,7 +216,7 @@ BEGIN
 	fields := COALESCE(fields, '[]');    
 
 --    Return
-    RETURN ('{"status":"Accepted", "version":'||api_version||
+    RETURN ('{"status":"Accepted", "version":'||v_version||
              ',"body":{"message":{"priority":1, "text":"This is a test message"}'||
 			',"form":{}'||
 			',"feature":{}'||

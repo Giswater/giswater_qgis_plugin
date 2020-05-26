@@ -47,7 +47,7 @@ v_element text;
 v_visit text;
 v_doc text;
 v_connect_arc text;
-v_api_version json;
+v_version json;
 v_result_id text= 'feature relations';
 v_result_info text;
 v_result text;
@@ -68,7 +68,7 @@ BEGIN
 
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-        INTO v_api_version;
+        INTO v_version;
     --get information about feature
 	v_feature_type = lower(((p_data ->>'feature')::json->>'type'))::text;
 	v_feature_id = ((p_data ->>'data')::json->>'feature_id')::text;
@@ -203,7 +203,7 @@ v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 raise notice 'v_result,%',v_result;
 raise notice 'v_result_info,%',v_result_info;
 
-RETURN ('{"status":"Accepted", "version":'||v_api_version||
+RETURN ('{"status":"Accepted", "version":'||v_version||
             ',"message":{"priority":1, "text":""},"body":{"data": {"info":'||v_result_info||'}}}')::json;
 
 

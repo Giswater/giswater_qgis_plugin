@@ -26,7 +26,7 @@ form_json json;
 v_formTabsAux  json;
 v_formTabs text;
 json_array json[];
-api_version json;
+v_version json;
 rec_tab record;
 v_active boolean=true;
 v_firsttab boolean=false;
@@ -55,7 +55,7 @@ BEGIN
 
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-		INTO api_version;
+		INTO v_version;
 
 	-- Get input parameters:
 	v_selector_type := (p_data ->> 'data')::json->> 'selector_type';
@@ -158,12 +158,12 @@ BEGIN
 	IF v_firsttab IS FALSE THEN
 		-- Return not implemented
 		RETURN ('{"status":"Accepted"' ||
-		', "version":'|| api_version ||
+		', "version":'|| v_version ||
 		', "message":"Not implemented"'||
 		'}')::json;
 	ELSE 
 		-- Return formtabs
-		RETURN ('{"status":"Accepted", "version":'||api_version||
+		RETURN ('{"status":"Accepted", "version":'||v_version||
 			',"body":{"message":{"priority":1, "text":"This is a test message"}'||
 			',"form":{"formName":"", "formLabel":"", "formText":""'|| 
 			',"formTabs":'||v_formTabs||
@@ -175,7 +175,7 @@ BEGIN
 
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN 
-	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| api_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;

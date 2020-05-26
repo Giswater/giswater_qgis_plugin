@@ -47,7 +47,7 @@ DECLARE
     id_column varchar;
     catid varchar;
     states varchar[];
-    api_version json;
+    v_version json;
     v_projecttype character varying;
     v_count integer;
     query_text text;
@@ -155,7 +155,7 @@ BEGIN
 
 --   Set api version
      EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-        INTO api_version;
+        INTO v_version;
 
 --   Get project type
      SELECT wsoftware INTO v_projecttype FROM version LIMIT 1;

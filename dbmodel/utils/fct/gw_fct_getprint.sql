@@ -34,7 +34,7 @@ SELECT "SCHEMA_NAME".gw_fct_getprint($${
     schemas_array name[];
     array_index integer DEFAULT 0;
     field_value character varying;
-    api_version json;
+    v_version json;
     v_value_vdef character varying;
     formTabs text;
     formTabs_inittab json;
@@ -56,7 +56,7 @@ BEGIN
 
     -- Get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
-        INTO api_version;
+        INTO v_version;
 
 	v_device = ((p_data ->>'client')::json->>'device')::integer;
 	v_activecomposer = ((p_data ->>'data')::json->>'composers');
@@ -102,13 +102,13 @@ BEGIN
       formInfo := json_build_object('formId','F41','formName','Impressio');
 
 --    Check null
-      api_version := COALESCE(api_version, '[]');    
+      v_version := COALESCE(v_version, '[]');
       formInfo := COALESCE(formInfo, '[]'); 
       formTabs := COALESCE(formTabs, '[]');      
 
 --    Return
     RETURN ('{"status":"Accepted"' ||
-        ', "apiVersion":'|| api_version || 
+        ', "apiVersion":'|| v_version ||
         ', "formInfo":'|| formInfo || 
         ', "formTabs":' || formTabs ||
         '}')::json;
@@ -116,7 +116,7 @@ BEGIN
 
 --    Exception handling
     --EXCEPTION WHEN OTHERS THEN 
-        --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+        --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;

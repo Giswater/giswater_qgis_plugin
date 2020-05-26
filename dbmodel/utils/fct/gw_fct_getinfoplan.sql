@@ -29,7 +29,7 @@ DECLARE
     fields_array json[];
     formTabs text;
     combo_json json;
-    api_version json;
+    v_version json;
     aux_json json;
     fields json;
     count integer := 1;
@@ -50,7 +50,7 @@ BEGIN
 
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-        INTO api_version;
+        INTO v_version;
 
 --  get system currency
     v_currency_symbol :=((SELECT value FROM config_param_system WHERE parameter='sys_currency')::json->>'symbol');
@@ -130,7 +130,7 @@ BEGIN
 
 
 --    Return
-    RETURN ('{"status":"Accepted", "version":'||api_version||
+    RETURN ('{"status":"Accepted", "version":'||v_version||
              ',"body":{"message":{}'||
 			',"form":'||(p_data ->>'form')||
 			',"feature":'||(p_data ->>'feature')||
@@ -140,7 +140,7 @@ BEGIN
       
 --    Exception handling
 --    EXCEPTION WHEN OTHERS THEN 
-        --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| api_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+        --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;

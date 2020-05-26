@@ -28,7 +28,7 @@ SELECT "SCHEMA_NAME".gw_fct_getconfig($${
     v_formtabs text;
     combo_json json;
     fieldsJson json;
-    api_version json;
+    v_version json;
     rec_tab record;
     v_firsttab boolean;
     v_active boolean;
@@ -72,7 +72,7 @@ BEGIN
 
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-        INTO api_version;
+        INTO v_version;
 
 -- get input parameters
 	v_formname := (p_data ->> 'form')::json->> 'formName';
@@ -337,12 +337,12 @@ BEGIN
 	v_formgroupbox_json := array_to_json(v_formgroupbox);
 
 --    Check null
-    api_version := COALESCE(api_version, '[]'); 
+    v_version := COALESCE(v_version, '[]');
     v_formtabs := COALESCE(v_formtabs, '[]'); 
     v_formgroupbox_json := COALESCE(v_formgroupbox_json, '[]'); 
 
 --    Return
-    RETURN ('{"status":"Accepted", "version":'||api_version||
+    RETURN ('{"status":"Accepted", "version":'||v_version||
              ',"body":{"message":{"priority":1, "text":"This is a test message"}'||
 			',"form":{"formName":"", "formLabel":"", "formText":""'|| 
 				',"formTabs":'||v_formtabs||
@@ -354,7 +354,7 @@ BEGIN
        
 --    Exception handling
 --    EXCEPTION WHEN OTHERS THEN 
-        --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| api_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+        --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;

@@ -21,7 +21,7 @@ SELECT SCHEMA_NAME.gw_fct_getcatalog($${
 
 
 DECLARE
-	api_version text;
+	v_version text;
 	v_schemaname text;
 	formTabs text;
 	v_device integer;
@@ -55,7 +55,7 @@ BEGIN
 
 --  	get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-		INTO api_version;
+		INTO v_version;
 
 --	getting input data 
 	v_device := ((p_data ->>'client')::json->>'device')::text;
@@ -161,10 +161,10 @@ BEGIN
 
 --     	Control nulls
 	fields := COALESCE(fields, '[]');
-	api_version := COALESCE(api_version, '[]');
+	v_version := COALESCE(v_version, '[]');
 
 --      Return
-	RETURN ('{"status":"Accepted", "version":'||api_version||
+	RETURN ('{"status":"Accepted", "version":'||v_version||
 	      ',"body":{"message":{"priority":1, "text":"This is a test message"}'||
 		      ',"form":'||(p_data->>'form')::json||
 		      ',"feature":'||(p_data->>'feature')::json||

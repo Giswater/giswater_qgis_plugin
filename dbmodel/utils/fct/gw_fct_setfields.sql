@@ -45,7 +45,7 @@ DECLARE
     v_querytext varchar;
     v_idname varchar;
     column_type_id character varying;
-    api_version json;
+    v_version json;
     v_text text[];
     text text;
     i integer=1;
@@ -68,7 +68,7 @@ BEGIN
 
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
-        INTO api_version;
+        INTO v_version;
 
 	-- fix diferent ways to say null on client
 	p_data = REPLACE (p_data::text, '"NULL"', 'null');
@@ -185,17 +185,17 @@ BEGIN
 	END IF;
 
 	--    Control NULL's
-	api_version := COALESCE(api_version, '[]');
+	v_version := COALESCE(v_version, '[]');
 	v_columnfromid := COALESCE(v_columnfromid, '{}');   
 
 --    Return
-    RETURN ('{"status":"Accepted", "apiVersion":' || api_version ||
+    RETURN ('{"status":"Accepted", "apiVersion":' || v_version ||
 	      ',"body":{"data":{"fields":' || v_columnfromid || '}'||
 	      '}'||'}')::json; 
 
 --    Exception handling
    -- EXCEPTION WHEN OTHERS THEN 
-    --    RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;    
+    --    RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ', "apiVersion":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;

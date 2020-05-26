@@ -30,7 +30,7 @@ SELECT SCHEMA_NAME.gw_fct_set_delete_feature($${
 
 $BODY$
 DECLARE
-v_api_version json;
+v_version json;
 v_feature_type text;
 v_feature_id text;
 v_arc_id TEXT;
@@ -54,7 +54,7 @@ BEGIN
 	
 		--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-        INTO v_api_version;
+        INTO v_version;
     raise notice '1';   
  	UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'edit_arc_downgrade_force' AND cur_user=current_user;
 
@@ -275,7 +275,7 @@ BEGIN
 	v_version := COALESCE(v_version, '{}'); 
 	v_result_info := COALESCE(v_result_info, '{}'); 
 
-    RETURN ('{"status":"Accepted", "version":'||v_api_version||
+    RETURN ('{"status":"Accepted", "version":'||v_version||
              ',"message":{"priority":1, "text":""},"body":{"data": {"info":'||v_result_info||'}}}')::json;
 
 

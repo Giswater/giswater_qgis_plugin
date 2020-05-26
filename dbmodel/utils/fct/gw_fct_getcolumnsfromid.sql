@@ -29,7 +29,7 @@ DECLARE
     v_field text;
     v_json_array json[];
     schemas_array name[];
-    api_version json;
+    v_version json;
     v_tablename text;
     v_feature_id integer;
     i integer = 0;
@@ -54,7 +54,7 @@ BEGIN
 
 	-- get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-		INTO api_version;
+		INTO v_version;
 
 	--  get parameters from input
 	v_tablename = ((p_data ->>'feature')::json->>'tableName')::text;
@@ -90,7 +90,7 @@ BEGIN
 	    v_fields := array_to_json(v_json_array);
 
 	--    Control NULL's
-	    api_version := COALESCE(api_version, '[]');
+	    v_version := COALESCE(v_version, '[]');
 	    v_fields := COALESCE(v_fields, '[]');   
 	    
 	--    Return
@@ -98,7 +98,7 @@ BEGIN
 
 --    Exception handling
  --   EXCEPTION WHEN OTHERS THEN 
-   --     RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+   --     RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;

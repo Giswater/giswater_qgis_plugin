@@ -21,7 +21,7 @@ SELECT SCHEMA_NAME.gw_fct_setgo2epa($${
 
 DECLARE
     schemas_array name[];
-    api_version json;
+    v_version json;
     v_text text[];
     json_field json;
     v_widget text;
@@ -42,7 +42,7 @@ BEGIN
 
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-        INTO api_version;
+        INTO v_version;
 
 --    Get schema name
     schemas_array := current_schemas(FALSE);
@@ -94,7 +94,7 @@ BEGIN
    */
 
 --    Return
-    RETURN ('{"status":"Accepted", "version":'||api_version||
+    RETURN ('{"status":"Accepted", "version":'||v_version||
              ',"body":{"message":{"priority":1, "text":"This is a test message"}'||
 			',"form":{}'||
 			',"feature":{}'||
@@ -104,7 +104,7 @@ BEGIN
       
 --    Exception handling
    -- EXCEPTION WHEN OTHERS THEN 
-    --    RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ', "version":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+    --    RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

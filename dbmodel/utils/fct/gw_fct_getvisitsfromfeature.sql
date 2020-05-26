@@ -14,7 +14,7 @@ DECLARE
 --    Variables
     query_result character varying;
     query_result_visits json;
-    api_version json;
+    v_version json;
 
 
 
@@ -26,7 +26,7 @@ BEGIN
     
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
-        INTO api_version;
+        INTO v_version;
 
 --  Harmonize element_type
     element_type := lower (element_type);
@@ -68,13 +68,13 @@ BEGIN
 
 --    Return
     RETURN ('{"status":"Accepted"' ||
-        ', "apiVersion":'|| api_version ||
+        ', "apiVersion":'|| v_version ||
         ', "visits":' || query_result_visits || 
         '}')::json;    
 
 --    Exception handling
     --EXCEPTION WHEN OTHERS THEN 
-        --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+        --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
         
 END;

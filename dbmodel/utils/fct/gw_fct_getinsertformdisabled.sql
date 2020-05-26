@@ -32,7 +32,7 @@ DECLARE
     array_index integer DEFAULT 0;
     field_value character varying;
     formtodisplay text;
-    api_version json;
+    v_version json;
     v_force_formrefresh text = 'FALSE';
     v_force_canvasrefresh text = 'FALSE';
     v_enable_editgeom text = 'TRUE';
@@ -52,7 +52,7 @@ BEGIN
 
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-        INTO api_version;
+        INTO v_version;
 	
 --  Control of null values
     IF id='NULL' or id='' THEN id=null;

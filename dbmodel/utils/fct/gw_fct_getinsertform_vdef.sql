@@ -40,7 +40,7 @@ DECLARE
 	v_dma_id text;
 	v_expl_id text;
 	v_muni_id text;
-	api_version text;
+	v_version text;
 	v_project_type varchar;
 	v_cat_id varchar;
 	v_type varchar;
@@ -66,7 +66,7 @@ BEGIN
 
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-        INTO api_version;
+        INTO v_version;
 
         -- get sys_feature_type
 	v_feature_type := (SELECT lower(type) FROM sys_feature_cat WHERE id=p_feature_cat);	
@@ -256,7 +256,7 @@ BEGIN
 
 --   Exception handling
   --  EXCEPTION WHEN OTHERS THEN 
-    --    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+    --    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

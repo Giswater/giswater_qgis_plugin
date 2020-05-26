@@ -33,7 +33,7 @@ aux_json json;
 schemas_array name[];
 array_index integer DEFAULT 0;
 field_value character varying;
-api_version json;
+v_version json;
 v_values_array json;
 v_formtype text;
 v_tabname text = 'data';
@@ -45,7 +45,7 @@ BEGIN
     
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-		INTO api_version;
+		INTO v_version;
 
 	--    Get schema name
 	schemas_array := current_schemas(FALSE);
@@ -133,7 +133,7 @@ BEGIN
 
 	-- Exception handling
 	-- EXCEPTION WHEN OTHERS THEN
-	-- RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	-- RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

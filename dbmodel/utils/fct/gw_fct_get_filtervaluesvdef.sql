@@ -18,7 +18,7 @@ SELECT gw_fct_get_filtervaluesvdef($${"client":{"device":9, "infoType":100, "lan
 DECLARE
 
 --    Variables
-	api_version text;
+	v_version text;
 	v_schemaname text;
 	v_device integer;
 	v_formname text;
@@ -38,7 +38,7 @@ BEGIN
 
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-        INTO api_version;
+        INTO v_version;
        
 	-- Get input parameters:
 	v_device := (p_data ->> 'client')::json->> 'device';
@@ -83,7 +83,7 @@ BEGIN
 
 --    Exception handling
    -- EXCEPTION WHEN OTHERS THEN 
-    --    RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ', "version":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+    --    RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;

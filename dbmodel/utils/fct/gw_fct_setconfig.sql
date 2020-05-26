@@ -29,7 +29,7 @@ SELECT SCHEMA_NAME.gw_fct_setconfig($${
 
 DECLARE
     schemas_array name[];
-    api_version json;
+    v_version json;
     v_text text[];
     json_field json;
     v_project_type text;
@@ -53,7 +53,7 @@ BEGIN
 
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-        INTO api_version;
+        INTO v_version;
 
 -- fix diferent ways to say null on client
     p_data = REPLACE (p_data::text, '"NULL"', 'null');
@@ -145,7 +145,7 @@ BEGIN
    END LOOP;
 
 --    Return
-    RETURN ('{"status":"Accepted", "version":'||api_version||
+    RETURN ('{"status":"Accepted", "version":'||v_version||
              ',"body":{"message":{"priority":1, "text":"This is a test message"}'||
 			',"form":{}'||
 			',"feature":{}'||
@@ -154,7 +154,7 @@ BEGIN
 	    
 --    Exception handling
    -- EXCEPTION WHEN OTHERS THEN 
-    --    RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ', "version":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+    --    RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

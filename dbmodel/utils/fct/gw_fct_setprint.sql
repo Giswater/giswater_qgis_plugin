@@ -36,7 +36,7 @@ DECLARE
     p01y float;
     dx float;
     dy float;
-    api_version text;
+    v_version text;
     v_text text[];
     json_field json;
     text text;
@@ -84,7 +84,7 @@ BEGIN
 
     --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
-        INTO api_version;
+        INTO v_version;
 
     -- get data from input
     v_composer := (p_data ->> 'data')::json->> 'composer';
@@ -156,7 +156,7 @@ BEGIN
 
   
 --    Control NULL's
-    api_version := COALESCE(api_version, '{}');
+    v_version := COALESCE(v_version, '{}');
     v_geometry := COALESCE(v_geometry, '{}');
     v_mapcomposer_name := COALESCE(v_mapcomposer_name, '{}');
     v_extent := COALESCE(v_extent, '{}');
@@ -164,7 +164,7 @@ BEGIN
 
   --Return
     RETURN ('{"status":"Accepted",'||
-     '"apiVersion":'|| api_version ||
+     '"apiVersion":'|| v_version ||
      ',"data":{'||
          '"geometry":'|| v_geometry ||
         ',"map":"' || v_mapcomposer_name || '"'
@@ -173,7 +173,7 @@ BEGIN
 
 --    Exception handling
     --EXCEPTION WHEN OTHERS THEN 
-        --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;    
+        --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 END;
 $BODY$
 LANGUAGE 'plpgsql' VOLATILE COST 100;

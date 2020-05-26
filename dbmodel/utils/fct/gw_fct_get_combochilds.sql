@@ -30,7 +30,7 @@ DECLARE
     v_aux_json_child json;    
     combo_json_child json;
     schemas_array name[];
-    api_version json;
+    v_version json;
     query_text text;
     v_current_value text;
     v_column_type varchar;
@@ -49,7 +49,7 @@ BEGIN
 
 	-- get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
-		INTO api_version;
+		INTO v_version;
 		
 	-- get column type of idname
         EXECUTE 'SELECT data_type FROM information_schema.columns  WHERE table_schema = $1 AND table_name = ' || quote_literal(p_table_id) || ' AND column_name = $2'
@@ -153,18 +153,18 @@ BEGIN
     v_fields := array_to_json(v_fields_array);
 
 --    Control NULL's
-	api_version := COALESCE(api_version, '[]');
+	v_version := COALESCE(v_version, '[]');
     v_fields := COALESCE(v_fields, '[]');    
     
 --    Return
     RETURN ('{"status":"Accepted"' ||
-       ', "apiVersion":'|| api_version ||
+       ', "apiVersion":'|| v_version ||
         ', "fields":' || v_fields ||
         '}')::json;
 
 --    Exception handling
  --   EXCEPTION WHEN OTHERS THEN 
-   --     RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+   --     RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;
