@@ -6,7 +6,6 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2114
 
-
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_arc_divide(character varying);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_arc_divide(p_data json)
   RETURNS json AS
@@ -309,7 +308,7 @@ BEGIN
 					-- Insert data into traceability table
 					select code INTO v_code FROM v_edit_arc  WHERE arc_id=v_arc_id;
 
-					INSERT INTO audit_log_arc_traceability ("type", arc_id, code,arc_id1, arc_id2, node_id, "tstamp", "cur_user") 
+					INSERT INTO audit_arc_traceability ("type", arc_id, code,arc_id1, arc_id2, node_id, tstamp, cur_user) 
 					VALUES ('DIVIDE ARC',  v_arc_id, v_code, rec_aux1.arc_id, rec_aux2.arc_id, v_node_id,CURRENT_TIMESTAMP,CURRENT_USER);
 
 					-- Update elements from old arc to new arcs
@@ -348,12 +347,12 @@ BEGIN
 							IF rec_visit.the_geom IS NULL THEN -- if visit does not has geometry, events may have. It's mandatory to distribute one by one
 
 								-- Get visit data into two new visits
-								INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, cur_user, webclient_id,expl_id,descript,is_done, lot_id, class_id, status, visit_type) 
-								SELECT visitcat_id, ext_code, startdate, enddate, cur_user, webclient_id, expl_id, descript, is_done, lot_id, class_id, status, visit_type 
+								INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, user_name, webclient_id,expl_id,descript,is_done, lot_id, class_id, status, visit_type) 
+								SELECT visitcat_id, ext_code, startdate, enddate, user_name, webclient_id, expl_id, descript, is_done, lot_id, class_id, status, visit_type 
 								FROM om_visit WHERE id=rec_visit.id RETURNING id INTO v_newvisit1;
 
-								INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, cur_user, webclient_id, expl_id, descript, is_done, lot_id, class_id, status, visit_type) 
-								SELECT visitcat_id, ext_code, startdate, enddate, cur_user, webclient_id, expl_id, descript, is_done, lot_id, class_id, status, visit_type 
+								INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, user_name, webclient_id, expl_id, descript, is_done, lot_id, class_id, status, visit_type) 
+								SELECT visitcat_id, ext_code, startdate, enddate, user_name, webclient_id, expl_id, descript, is_done, lot_id, class_id, status, visit_type 
 								FROM om_visit WHERE id=rec_visit.id RETURNING id INTO v_newvisit2;
 								
 								FOR rec_event IN SELECT * FROM om_visit_event WHERE visit_id=rec_visit.id LOOP
@@ -513,8 +512,8 @@ BEGIN
 					-- Insert data into traceability table
 					select code INTO v_code FROM v_edit_arc  WHERE arc_id=v_arc_id;
 
-					INSERT INTO audit_log_arc_traceability ("type", arc_id, code, arc_id1, arc_id2, node_id, "tstamp", "cur_user") 
-					VALUES ('DIVIDE WITH PLANIFIED NODE',  v_arc_id, v_code, rec_aux1.arc_id, rec_aux2.arc_id, v_node_id,CURRENT_TIMESTAMP,CURRENT_USER);
+					INSERT INTO audit_arc_traceability ("type", arc_id, code, arc_id1, arc_id2, node_id, tstamp, cur_user) 
+					VALUES ('DIVIDE WITH PLANIFIED NODE',  v_arc_id, v_code, rec_aux1.arc_id, rec_aux2.arc_id, v_node_id, now(), current_user);
 
 					-- Set addparam (parent/child)
 					UPDATE plan_psector_x_arc SET addparam='{"arcDivide":"parent"}' WHERE  psector_id=v_psector AND arc_id=v_arc_id;
@@ -627,8 +626,8 @@ BEGIN
 					-- Insert data into traceability table
 					select code INTO v_code FROM v_edit_arc  WHERE arc_id=v_arc_id;
 					
-					INSERT INTO audit_log_arc_traceability ("type", arc_id, code, arc_id1, arc_id2, node_id, "tstamp", "cur_user") 
-					VALUES ('DIVIDE PLANIFIED ARC',  v_arc_id, v_code, rec_aux1.arc_id, rec_aux2.arc_id, v_node_id,CURRENT_TIMESTAMP,CURRENT_USER);
+					INSERT INTO audit_arc_traceability ("type", arc_id, code, arc_id1, arc_id2, node_id, tstamp, cur_user) 
+					VALUES ('DIVIDE PLANIFIED ARC',  v_arc_id, v_code, rec_aux1.arc_id, rec_aux2.arc_id, v_node_id, CURRENT_TIMESTAMP, CURRENT_USER);
 				
 					-- Update elements from old arc to new arcs
 					SELECT count(id) into v_count FROM element_x_arc WHERE arc_id=v_arc_id;

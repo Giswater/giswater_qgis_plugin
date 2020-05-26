@@ -6,9 +6,6 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2736
 
---DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_set_delete_feature(json);
-
-
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_set_delete_feature(p_data json)
 RETURNS json AS
 /*
@@ -35,7 +32,6 @@ v_feature_type text;
 v_feature_id text;
 v_arc_id TEXT;
 v_project_type text;
-v_version text;
 v_result_id text= 'delete feature';
 v_result_info text;
 v_result text;
@@ -50,12 +46,12 @@ BEGIN
 
 	SET search_path = "SCHEMA_NAME", public;
 
-	SELECT wsoftware, giswater  INTO v_project_type, v_version FROM version order by 1 desc limit 1;
+	SELECT wsoftware INTO v_project_type FROM version order by 1 desc limit 1;
 	
 		--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
         INTO v_version;
-    raise notice '1';   
+
  	UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'edit_arc_downgrade_force' AND cur_user=current_user;
 
 	-- manage log (fprocesscat = 52)

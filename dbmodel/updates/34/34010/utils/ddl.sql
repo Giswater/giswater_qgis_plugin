@@ -15,3 +15,5 @@ ALTER TABLE exploitation_x_user DROP COLUMN id;
 ALTER TABLE exploitation_x_user RENAME to config_exploitation_x_user;
 
 ALTER TABLE sys_message DROP COLUMN message_type;
+
+ALTER TABLE audit_arc_traceability RENAME COLUMN "user" to cur_user;

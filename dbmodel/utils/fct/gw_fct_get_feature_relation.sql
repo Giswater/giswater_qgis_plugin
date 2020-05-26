@@ -39,7 +39,6 @@ v_workcat_id_end text;
 v_enddate text;
 v_descript text;
 v_project_type text;
-v_version text;
 v_connect_connec text;
 v_connect_gully text;
 v_connect_node text;
@@ -59,7 +58,7 @@ v_error_context text;
 BEGIN
 
 	SET search_path = "SCHEMA_NAME", public;
-	SELECT wsoftware, giswater  INTO v_project_type, v_version FROM version order by 1 desc limit 1;
+	SELECT wsoftware INTO v_project_type FROM version order by 1 desc limit 1;
 
 	-- manage log (fprocesscat = 51)
 	DELETE FROM audit_check_data WHERE fprocesscat_id=51 AND cur_user=current_user;
@@ -69,7 +68,8 @@ BEGIN
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
         INTO v_version;
-    --get information about feature
+        
+	--get information about feature
 	v_feature_type = lower(((p_data ->>'feature')::json->>'type'))::text;
 	v_feature_id = ((p_data ->>'data')::json->>'feature_id')::text;
 
@@ -80,7 +80,7 @@ BEGIN
 	INTO v_man_table;
 
 	IF v_feature_type='arc' THEN
-	--check connec& gully related to arc
+		--check connec& gully related to arc
 		SELECT string_agg(feature_id,',') INTO v_connect_connec FROM v_ui_arc_x_relations 
 		JOIN sys_feature_cat on sys_feature_cat.id=v_ui_arc_x_relations.sys_type WHERE type='CONNEC' AND  arc_id = v_feature_id;
 
@@ -97,8 +97,7 @@ BEGIN
 
 		END IF;
 		
-
-	--check final nodes related to arc
+		--check final nodes related to arc
 		SELECT concat(node_1,',',node_2) INTO v_connect_node FROM v_ui_arc_x_node WHERE arc_id = v_feature_id;
 		
 		IF v_connect_node IS NOT NULL THEN
@@ -106,7 +105,7 @@ BEGIN
 			END IF;
 
 	ELSIF v_feature_type='node' THEN
-	--check nodes childs related to node
+		--check nodes childs related to node
 
 		IF v_project_type = 'WS' THEN
 		 	SELECT string_agg(child_id,',') INTO v_connect_node FROM v_ui_node_x_relations WHERE node_id = v_feature_id;
@@ -115,7 +114,7 @@ BEGIN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Nodes connected with the feature: ',v_connect_node ));
 			END IF;
 		END IF;
-	--check arcs related to node
+		--check arcs related to node
 		SELECT string_agg(arc_id,',') INTO v_connect_arc FROM v_ui_arc_x_node WHERE (node_1 = v_feature_id OR node_2 = v_feature_id);
 		
 		IF v_connect_arc IS NOT NULL THEN
@@ -163,7 +162,6 @@ BEGIN
 
 	END IF;
 	
-	
 	--check elements related to feature
 	EXECUTE 'SELECT string_agg(element_id,'','') FROM element_x_'||v_feature_type||' where '||v_feature_type||'_id = '''||v_feature_id||'''::text'
 	INTO v_element;
@@ -187,23 +185,17 @@ BEGIN
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Documents connected with the feature: ',v_doc ));
 	END IF;
 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=51) row; 
 
-
-SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=51) row; 
-
-
-v_result := COALESCE(v_result, '{}'); 
-v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
 	-- Control nulls
 	v_version := COALESCE(v_version, '{}'); 
 	v_result_info := COALESCE(v_result_info, '{}'); 
 
-raise notice 'v_result,%',v_result;
-raise notice 'v_result_info,%',v_result_info;
-
-RETURN ('{"status":"Accepted", "version":'||v_version||
+	RETURN ('{"status":"Accepted", "version":'||v_version||
             ',"message":{"priority":1, "text":""},"body":{"data": {"info":'||v_result_info||'}}}')::json;
 
 

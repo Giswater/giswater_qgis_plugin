@@ -18,23 +18,23 @@ SELECT SCHEMA_NAME.gw_fct_check_delete($${
 "data":{}}$$)
 */
 DECLARE
-    rec_node record;
-    v_num_feature integer;
-    v_project_type text;
-	v_error text;
-	v_feature_type text;
-	v_feature_id text;
+rec_node record;
+v_num_feature integer;
+v_project_type text;
+v_error text;
+v_feature_type text;
+v_feature_id text;
 
-	v_result text;
-	v_result_info text;
-	v_result_point text;
-	v_result_line text;
-	v_result_polygon text;
-	v_error_context text;
-	v_level integer;
-    v_status text;
-    v_message text;
-    v_version text;
+v_result text;
+v_result_info text;
+v_result_point text;
+v_result_line text;
+v_result_polygon text;
+v_error_context text;
+v_level integer;
+v_status text;
+v_message text;
+v_version text;
 
 BEGIN
 
