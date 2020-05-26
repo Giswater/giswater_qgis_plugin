@@ -207,8 +207,8 @@ UPDATE sys_param_user SET id ='qgis_composers_folderpath' WHERE id = 'qgis_compo
 
 UPDATE sys_table set sys_sequence = null where id IN ('config_param_system', 'config_param_user');
 
-UPDATE sys_param_user SET dv_querytext = 'SELECT id, idval FROM edit_typevalue WHERE typevalue =''value_verified''' WHERE id = 'edit_verified_vdefault'
-UPDATE sys_param_user SET dv_querytext = 'SELECT presszone.id, presszone.descript AS idval FROM presszone WHERE presszone.id IS NOT NULL' WHERE id = 'presszone_vdefault'
+UPDATE sys_param_user SET dv_querytext = 'SELECT id, idval FROM edit_typevalue WHERE typevalue =''value_verified''' WHERE id = 'edit_verified_vdefault';
+UPDATE sys_param_user SET dv_querytext = 'SELECT presszone.id, presszone.descript AS idval FROM presszone WHERE presszone.id IS NOT NULL' WHERE id = 'presszone_vdefault';
 UPDATE config_param_system SET datatype = 'json', widgettype = 'linetext' WHERE parameter = 'edit_review_node_tolerance';
 UPDATE config_param_system SET datatype = 'json', widgettype = 'linetext' WHERE parameter = 'edit_review_arc_tolerance';
 UPDATE config_param_system SET datatype = 'json', widgettype = 'linetext' WHERE parameter = 'edit_review_connec_tolerance';
