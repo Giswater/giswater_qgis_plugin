@@ -564,7 +564,7 @@ class ApiCF(ApiParent, QObject):
 
         # Set title for toolbox
         toolbox_cf = self.dlg_cf.findChild(QWidget, 'toolBox')
-        row = self.controller.get_config('custom_form_param', 'value', 'config_param_system')
+        row = self.controller.get_config('admin_customform_param', 'value', 'config_param_system')
         if row:
             results = json.loads(row[0], object_pairs_hook=OrderedDict)
 

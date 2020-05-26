@@ -2113,7 +2113,7 @@ class UpdateSQL(ApiParent):
             result = None
         else:
             sql = ("SELECT value FROM " + schema_name + ".config_param_system "
-                   "WHERE parameter = 'schema_manager'")
+                   "WHERE parameter = 'admin_schema_info'")
             result = self.controller.get_row(sql, commit=False)
 
         if result is None:

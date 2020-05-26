@@ -191,7 +191,7 @@ class MincutParent(ParentAction):
         self.show_notified = action
 
         try:
-            row = self.controller.get_config('sys_mincutalerts_enable', 'value', 'config_param_system')
+            row = self.controller.get_config('om_mincut_enable_alerts', 'value', 'config_param_system')
             if row:
                 custom_action_sms = json.loads(row[0], object_pairs_hook=OrderedDict)
                 self.show_notified.setVisible(custom_action_sms['show_sms_info'])

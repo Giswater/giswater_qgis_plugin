@@ -957,9 +957,6 @@ class Giswater(QObject):
         # Set objects for map tools classes
         self.manage_map_tools()
 
-        # Initialize parameter 'node2arc'
-        self.controller.plugin_settings_set_value("node2arc", "0")
-
         # Check roles of this user to show or hide toolbars
         self.controller.check_user_roles()
 

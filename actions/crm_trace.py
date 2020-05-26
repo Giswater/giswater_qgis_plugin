@@ -73,7 +73,7 @@ class CrmTrace(ApiParent):
             return False
 
         # Get python synchronization script path
-        row = self.controller.get_config('crm_daily_script_folderpath', 'value', 'config_param_system')
+        row = self.controller.get_config('admin_crm_script_folderpath', 'value', 'config_param_system')
         if row:
             script_folder = row[0]
         else:
@@ -91,7 +91,7 @@ class CrmTrace(ApiParent):
 
         # Get python folder path
         python_path = 'python'
-        row = self.controller.get_config('python_folderpath', 'value', 'config_param_system')
+        row = self.controller.get_config('admin_python_folderpath', 'value', 'config_param_system')
         if row:
             python_folderpath = row[0]
         else:
