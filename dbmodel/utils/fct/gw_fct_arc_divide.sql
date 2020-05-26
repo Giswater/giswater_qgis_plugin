@@ -307,7 +307,7 @@ BEGIN
 					END IF;
 							
 					-- Insert data into traceability table
-					select code INTO v_code FROM arc  WHERE arc_id=v_arc_id;
+					select code INTO v_code FROM v_edit_arc  WHERE arc_id=v_arc_id;
 
 					INSERT INTO audit_log_arc_traceability ("type", arc_id, code,arc_id1, arc_id2, node_id, "tstamp", "cur_user") 
 					VALUES ('DIVIDE ARC',  v_arc_id, v_code, rec_aux1.arc_id, rec_aux2.arc_id, v_node_id,CURRENT_TIMESTAMP,CURRENT_USER);
@@ -511,7 +511,7 @@ BEGIN
 					VALUES (112, 1,concat('Insert arcs into current psector: ',v_psector,'.'));
 					
 					-- Insert data into traceability table
-					select code INTO v_code FROM arc  WHERE arc_id=v_arc_id;
+					select code INTO v_code FROM v_edit_arc  WHERE arc_id=v_arc_id;
 
 					INSERT INTO audit_log_arc_traceability ("type", arc_id, code, arc_id1, arc_id2, node_id, "tstamp", "cur_user") 
 					VALUES ('DIVIDE WITH PLANIFIED NODE',  v_arc_id, v_code, rec_aux1.arc_id, rec_aux2.arc_id, v_node_id,CURRENT_TIMESTAMP,CURRENT_USER);
@@ -625,7 +625,7 @@ BEGIN
 					END IF;
 								
 					-- Insert data into traceability table
-					select code INTO v_code FROM arc  WHERE arc_id=v_arc_id;
+					select code INTO v_code FROM v_edit_arc  WHERE arc_id=v_arc_id;
 					
 					INSERT INTO audit_log_arc_traceability ("type", arc_id, code, arc_id1, arc_id2, node_id, "tstamp", "cur_user") 
 					VALUES ('DIVIDE PLANIFIED ARC',  v_arc_id, v_code, rec_aux1.arc_id, rec_aux2.arc_id, v_node_id,CURRENT_TIMESTAMP,CURRENT_USER);
