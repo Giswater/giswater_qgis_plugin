@@ -10,7 +10,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 INSERT INTO config_param_user values ('plan_psector_vdefault', '1', current_user);
 
 
---SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$);
+SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$);
 
 -- insert mandatory values
 INSERT INTO config_param_user (parameter, value, cur_user)

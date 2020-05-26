@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: xxxx
+--FUNCTION CODE: 2924
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_dqa()  RETURNS trigger AS
 $BODY$
@@ -31,17 +31,17 @@ BEGIN
 				RETURN NULL; 
             END IF;
 			
-			
-		INSERT INTO dqa (dqa_id, name, expl_id, macrodqa_id, descript, undelete, the_geom, pattern_id, dqa_type, link, grafconfig)
-		VALUES (NEW.dqa_id, NEW.name, expl_id_int, NEW.macrodqa_id, NEW.descript, NEW.undelete, NEW.the_geom, NEW.pattern_id, NEW.dqa_type, NEW.link, NEW.grafconfig::json);
+		INSERT INTO dqa (dqa_id, name, expl_id, macrodqa_id, descript, undelete, the_geom, pattern_id, dqa_type, link, grafconfig, style)
+		VALUES (NEW.dqa_id, NEW.name, expl_id_int, NEW.macrodqa_id, NEW.descript, NEW.undelete, NEW.the_geom, NEW.pattern_id, NEW.dqa_type, 
+		NEW.link, NEW.grafconfig::json, NEW.style::json);
 
 		RETURN NEW;
 		
     ELSIF TG_OP = 'UPDATE' THEN
    	
 		UPDATE dqa 
-		SET dqa_id=NEW.dqa_id, name=NEW.name, expl_id=NEW.expl_id, macrodqa_id=NEW.macrodqa_id, descript=NEW.descript, undelete=NEW.undelete, the_geom=NEW.the_geom, pattern_id=NEW.pattern_id, 
-		dqa_type=NEW.dqa_type, link=NEW.link, grafconfig=NEW.grafconfig::json
+		SET dqa_id=NEW.dqa_id, name=NEW.name, expl_id=NEW.expl_id, macrodqa_id=NEW.macrodqa_id, descript=NEW.descript, undelete=NEW.undelete, 
+		the_geom=NEW.the_geom, pattern_id=NEW.pattern_id, dqa_type=NEW.dqa_type, link=NEW.link, grafconfig=NEW.grafconfig::json, style = NEW.style::json
 		WHERE dqa_id=NEW.dqa_id;
 		
 		RETURN NEW;

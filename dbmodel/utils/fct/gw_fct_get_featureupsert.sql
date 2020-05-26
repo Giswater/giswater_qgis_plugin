@@ -24,9 +24,9 @@ $BODY$
 
 /*EXAMPLE
 arc with no nodes
-SELECT SCHEMA_NAME.gw_fct_get_featureupsert('ve_arc_pipe', null, '0102000020E764000002000000000000A083198641000000669A33C041000000E829D880410000D0AE90F0F341', 9, 100,'INSERT', true)
+SELECT SCHEMA_NAME.gw_fct_get_featureupsert('ve_arc_pipe', null, '0102000020E764000002000000000000A083198641000000669A33C041000000E829D880410000D0AE90F0F341', 9, 100,'INSERT', true, 'arc_id', 'text')
 arc with nodes
-SELECT SCHEMA_NAME.gw_fct_get_featureupsert('ve_arc_pipe', null, '0102000020E764000002000000998B3C512F881941B28315AA7F76514105968D7D748819419FDF72D781765141', 9, 100,'INSERT', true)
+SELECT SCHEMA_NAME.gw_fct_get_featureupsert('ve_arc_pipe', null, '0102000020E764000002000000998B3C512F881941B28315AA7F76514105968D7D748819419FDF72D781765141', 9, 100,'INSERT', true, 'arc_id', 'text')
 SELECT SCHEMA_NAME.gw_fct_get_featureupsert('ve_arc_pipe', '2001', null, 9, 100,'UPDATE', true)
 
 PERFORM gw_fct_debug(concat('{"data":{"msg":"----> INPUT FOR gw_fct_get_featureupsert: ", "variables":"',v_debug,'"}}')::json);
@@ -107,6 +107,8 @@ v_use_fire_code_seq boolean;
 v_node1 text;
 v_node2 text;
 v_formtype text;
+v_querytext text;
+
 BEGIN
 
 	-- get basic parameters
@@ -280,9 +282,9 @@ BEGIN
 		IF upper(v_catfeature.feature_type) != 'ARC' THEN
 			SELECT value INTO v_sector_id FROM config_param_user WHERE parameter = 'edit_sector_vdefault' and cur_user = current_user;
 			SELECT value INTO v_dma_id FROM config_param_user WHERE parameter = 'edit_dma_vdefault' and cur_user = current_user;
-			SELECT value INTO v_expl_id FROM config_param_user WHERE parameter = 'expl_vdefault' and cur_user = current_user;
-			SELECT value INTO v_muni_id FROM config_param_user WHERE parameter = 'muni_vdefault' and cur_user = current_user;
-			SELECT value INTO v_presszone_id FROM config_param_user WHERE parameter = 'presszone_vdefault' and cur_user = current_user;
+			SELECT value INTO v_expl_id FROM config_param_user WHERE parameter = 'edit_explitation_vdefault' and cur_user = current_user;
+			SELECT value INTO v_muni_id FROM config_param_user WHERE parameter = 'edit_municipality_vdefault' and cur_user = current_user;
+			SELECT value INTO v_presszone_id FROM config_param_user WHERE parameter = 'edit_presszone_vdefault' and cur_user = current_user;
 		END IF;
 				
 		-- map zones controls setting values
@@ -538,6 +540,16 @@ BEGIN
 				WHEN 'state_type' THEN
 					-- getting parent value
 					SELECT (a->>'vdef') INTO v_state_value FROM json_array_elements(v_values_array) AS a WHERE (a->>'param') = 'state';
+
+					-- prevent possible null values for state vdefault
+					IF v_state_value IS NULL THEN 
+						v_state_value=1;
+					END IF;
+
+					v_querytext = 'SELECT value::text FROM sys_param_user JOIN config_param_user ON sys_param_user.id=parameter 
+					WHERE cur_user=current_user AND parameter = concat(''edit_statetype_'','||v_state_value||',''_vdefault'')';
+
+					raise notice 'v_querytext %', v_querytext;
 					
 					EXECUTE 'SELECT value::text FROM sys_param_user JOIN config_param_user ON sys_param_user.id=parameter 
 					WHERE cur_user=current_user AND parameter = concat(''edit_statetype_'','||v_state_value||',''_vdefault'')' INTO field_value;
@@ -609,8 +621,8 @@ BEGIN
 	END IF;
 		
 	-- Exception handling
-	-- EXCEPTION WHEN OTHERS THEN 
-	-- RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	EXCEPTION WHEN OTHERS THEN 
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;

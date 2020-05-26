@@ -25,28 +25,27 @@ BEGIN
 		NEW.sector_id=(SELECT nextval('SCHEMA_NAME.sector_sector_id_seq'::regclass));
 	END IF;
 					
-        -- FEATURE INSERT
-			INSERT INTO sector (sector_id, name, descript, macrosector_id, the_geom, undelete, grafconfig)
-			VALUES (NEW.sector_id, NEW.name, NEW.descript, NEW.macrosector_id, NEW.the_geom, NEW.undelete, NEW.grafconfig::json);
+			INSERT INTO sector (sector_id, name, descript, macrosector_id, the_geom, undelete, grafconfig, style)
+			VALUES (NEW.sector_id, NEW.name, NEW.descript, NEW.macrosector_id, NEW.the_geom, NEW.undelete, 
+			NEW.grafconfig::json, NEW.style::json);
 	
 			INSERT INTO inp_selector_sector (sector_id, cur_user) VALUES (NEW.sector_id, current_user);
 				
 		RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
-   -- FEATURE UPDATE		
+
 			UPDATE sector 
-			SET sector_id=NEW.sector_id, name=NEW.name, descript=NEW.descript, macrosector_id=NEW.macrosector_id, the_geom=NEW.the_geom, undelete=NEW.undelete, grafconfig=NEW.grafconfig::json
+			SET sector_id=NEW.sector_id, name=NEW.name, descript=NEW.descript, macrosector_id=NEW.macrosector_id, the_geom=NEW.the_geom, 
+			undelete=NEW.undelete, grafconfig=NEW.grafconfig::json, style = NEW.style::json
 			WHERE sector_id=NEW.sector_id;
 				
         RETURN NEW;
 
      ELSIF TG_OP = 'DELETE' THEN  
-	-- FEATURE DELETE 
+
 		DELETE FROM sector WHERE sector_id = OLD.sector_id;
-		
-				
-		
+			
 		RETURN NULL;
      
      END IF;

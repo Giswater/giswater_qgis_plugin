@@ -204,3 +204,15 @@ UPDATE sys_param_user SET id ='plan_psector_other_vdefault' WHERE id = 'psector_
 UPDATE sys_param_user SET id ='plan_psector_vat_vdefault' WHERE id = 'psector_vat_vdefault';
 UPDATE sys_param_user SET id ='plan_psector_vdefault' WHERE id = 'psector_vdefault';
 UPDATE sys_param_user SET id ='qgis_composers_folderpath' WHERE id = 'qgis_composers_path';
+
+UPDATE sys_table set sys_sequence = null where id IN ('config_param_system', 'config_param_user');
+
+UPDATE sys_param_user SET dv_querytext = 'SELECT id, idval FROM edit_typevalue WHERE typevalue =''value_verified''' WHERE id = 'edit_verified_vdefault'
+UPDATE sys_param_user SET dv_querytext = 'SELECT presszone.id, presszone.descript AS idval FROM presszone WHERE presszone.id IS NOT NULL' WHERE id = 'presszone_vdefault'
+UPDATE config_param_system SET datatype = 'json', widgettype = 'linetext' WHERE parameter = 'edit_review_node_tolerance';
+UPDATE config_param_system SET datatype = 'json', widgettype = 'linetext' WHERE parameter = 'edit_review_arc_tolerance';
+UPDATE config_param_system SET datatype = 'json', widgettype = 'linetext' WHERE parameter = 'edit_review_connec_tolerance';
+UPDATE config_param_system SET datatype = 'json', widgettype = 'linetext' WHERE parameter = 'edit_review_gully_tolerance';
+
+UPDATE sys_function SET function_type ='trigger function' WHERE function_type ='function trigger';
+

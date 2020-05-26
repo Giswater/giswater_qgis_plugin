@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: xxxx
+--FUNCTION CODE: 2926
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_presszone()  RETURNS trigger AS
 $BODY$
@@ -18,7 +18,6 @@ BEGIN
 	
     IF TG_OP = 'INSERT' THEN
 		
-		--Exploitation ID
         IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
              -- PERFORM gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
         	 -- "data":{"message":"1012", "function":"1112","debug_msg":null, "variables":null}}$$); 
@@ -31,16 +30,16 @@ BEGIN
 				RETURN NULL; 
             END IF;
 			
-			
-		INSERT INTO presszone (id, descript, expl_id, the_geom, grafconfig)
-		VALUES (NEW.id, NEW.descript, expl_id_int, NEW.the_geom, NEW.grafconfig::json);
+		INSERT INTO presszone (id, descript, expl_id, the_geom, grafconfig, head, style)
+		VALUES (NEW.id, NEW.descript, expl_id_int, NEW.the_geom, NEW.grafconfig::json, NEW.head, NEW.style::json);
 
 		RETURN NEW;
 		
     ELSIF TG_OP = 'UPDATE' THEN
    	
 		UPDATE presszone
-		SET id=NEW.id, descript=NEW.descript, expl_id=NEW.expl_id, the_geom=NEW.the_geom, grafconfig=NEW.grafconfig::json
+		SET id=NEW.id, descript=NEW.descript, expl_id=NEW.expl_id, the_geom=NEW.the_geom, grafconfig=NEW.grafconfig::json, 
+		head = NEW.head, grafconfig=NEW.grafconfig::json
 		WHERE id=NEW.id;
 		
 		RETURN NEW;
