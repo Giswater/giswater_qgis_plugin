@@ -7,7 +7,50 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-INSERT INTO config_param_user values ('plan_psector_vdefault', '1', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_gratecat_vdefault', 'N/I', current_user);
+
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('plan_psector_scale_vdefault', '2.00', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('plan_psector_rotation_vdefault', '0.0000', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('plan_psector_gexpenses_vdefault', '19.00', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('plan_psector_vat_vdefault', '21.00', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('plan_psector_type_vdefault', '1', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('plan_psector_other_vdefault', '4.00', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('plan_psector_vdefault', '1', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('plan_arc_vdivision_dsbl', 'FALSE', current_user);
+
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_arccat_vdefault', 'FC110-PN10', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_state_vdefault', '1', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_workcat_vdefault', 'work1', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_verified_vdefault', 'VERIFIED', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_connecat_vdefault', 'PVC25-PN16-DOM', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_nodecat_vdefault', 'AIR VALVE DN50', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_pavementcat_vdefault', 'Asphalt', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_elementcat_vdefault', 'COVER', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_soilcat_vdefault', 'soil1', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_statetype_vdefault', '2', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_ownercat_vdefault', 'owner1', current_user);
+
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('utils_dim_tooltip', 'false', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('qgis_composers_folderpath', NULL, current_user);
+
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_statetype_0_vdefault', 1, current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_statetype_1_vdefault', 2, current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_statetype_2_vdefault', 3, current_user);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 -- insert mandatory values
 INSERT INTO config_param_user (parameter, value, cur_user)
