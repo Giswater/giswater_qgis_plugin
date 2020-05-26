@@ -50,7 +50,7 @@ v_fields json;
 v_columntype character varying;
 v_querytext varchar;
 v_columntype_id character varying;
-v_apiversion json;
+v_version json;
 v_text text[];
 v_jsonfield json;
 text text;
@@ -78,7 +78,7 @@ BEGIN
 	EXECUTE 'SELECT epsg FROM version' INTO v_epsg;
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-		INTO v_apiversion;
+		INTO v_version;
 		
 	-- fix diferent ways to say null on client
 	p_data = REPLACE (p_data::text, '"NULL"', 'null');
@@ -202,7 +202,7 @@ BEGIN
 	RAISE NOTICE '--- Returning from (gw_fct_setinsert) with this message :: % ---', v_message;
 
 	-- Return
-    RETURN ('{"status":"Accepted", "message":'|| v_message ||', "version":'|| v_apiversion ||
+    RETURN ('{"status":"Accepted", "message":'|| v_message ||', "version":'|| v_version ||
 	    ', "body": {"feature":{"tableName":"'||v_tablename||'", "id":"'||v_newid||'"}}}')::json;    
 
 	-- Exception handling

@@ -526,13 +526,13 @@ ELSIF tab_arg = 'address' THEN
     response_json := COALESCE(response_json, '{}');
 
 --    Return
-    RETURN ('{"status":"Accepted"' || ', "version":'|| api_version ||
+    RETURN ('{"status":"Accepted"' || ', "version":'|| v_version ||
         ', "data":' || response_json ||      
         '}')::json;
 
 --    Exception handling
     --EXCEPTION WHEN OTHERS THEN 
-    --    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| api_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+    --    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;$BODY$

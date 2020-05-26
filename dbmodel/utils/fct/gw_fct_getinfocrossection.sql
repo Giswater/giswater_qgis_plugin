@@ -21,7 +21,7 @@ DECLARE
 
 --    Variables
     v_id character varying;
-    v_apiversion json;
+    v_version json;
     v_fields json;
     v_currency_symbol varchar;
     v_shape varchar;
@@ -33,8 +33,8 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	--  get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
-	INTO v_apiversion;
+	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
+	INTO v_version;
 
 	-- getting input data 
 	v_id :=  ((p_data ->>'feature')::json->>'id')::text;
@@ -77,7 +77,7 @@ BEGIN
        v_fields := COALESCE(v_fields, '[]'); 
 
 	-- Return
-	RETURN ('{"status":"Accepted", "message":{}, "apiVersion":'||v_apiversion||
+	RETURN ('{"status":"Accepted", "message":{}, "apiVersion":'||v_version||
              ',"body":{"form":{}'||
 		     ',"feature":{}'||
 		     ',"data":{"shapepng":"' || v_shape ||'"'||
@@ -86,7 +86,7 @@ BEGIN
 
 --    Exception handling
 --    EXCEPTION WHEN OTHERS THEN 
-        --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_apiversion || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+        --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

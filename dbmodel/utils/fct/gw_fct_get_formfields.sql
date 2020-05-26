@@ -46,7 +46,7 @@ combo_json json;
 schemas_array name[];
 array_index integer DEFAULT 0;
 field_value character varying;
-api_version json;
+v_version json;
 v_selected_id text;
 query_text text;
 v_vdefault text;
@@ -79,7 +79,7 @@ BEGIN
 
 	-- get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-	INTO api_version;
+	INTO v_version;
 
 	-- get project type
 	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;

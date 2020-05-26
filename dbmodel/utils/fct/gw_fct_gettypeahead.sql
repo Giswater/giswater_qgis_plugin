@@ -45,7 +45,7 @@ SELECT SCHEMA_NAME.gw_fct_gettypeahead($${"client":{"device":9, "infoType":100, 
 DECLARE
 	v_response json;
 	v_message text;
-	v_apiversion text;
+	v_version text;
 	v_querytext text;
 	v_querytextparent text; 
 	v_parent text; 
@@ -59,7 +59,7 @@ BEGIN
 	
 	-- get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-		INTO v_apiversion;
+		INTO v_version;
 
 	-- getting input data 
 	v_querytext := ((p_data ->>'data')::json->>'queryText')::text;
@@ -96,7 +96,7 @@ BEGIN
 	v_message := COALESCE(v_message, '{}');
 
 	-- Return
-	RETURN ('{"status":"Accepted", "message":'||v_message||', "version":'|| v_apiversion ||
+	RETURN ('{"status":"Accepted", "message":'||v_message||', "version":'|| v_version ||
     	    ', "body": {"data":'|| v_response || '}}')::json;      
 	 
 END;

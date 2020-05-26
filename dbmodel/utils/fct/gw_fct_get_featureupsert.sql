@@ -43,7 +43,7 @@ combo_json json;
 schemas_array name[];
 array_index integer DEFAULT 0;
 field_value character varying;
-v_apiversion json;
+v_version json;
 v_selected_id text;
 v_vdefault text;
 v_id int8;
@@ -118,8 +118,8 @@ BEGIN
 	schemas_array := current_schemas(FALSE);
 
 	--  get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
-	iNTO v_apiversion;
+	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
+	iNTO v_version;
 
 	--  get project type
 	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
@@ -290,9 +290,9 @@ BEGIN
 
 			-- presszone	 
 			IF v_presszone_id IS NULL THEN
-				SELECT count(*) into count_aux FROM cat_presszone WHERE ST_DWithin(p_reduced_geometry, cat_presszone.the_geom,0.001);
+				SELECT count(*) into count_aux FROM presszone WHERE ST_DWithin(p_reduced_geometry, presszone.the_geom,0.001);
 				IF count_aux = 1 THEN
-					v_presszone_id := (SELECT id FROM cat_presszone WHERE ST_DWithin(p_reduced_geometry, cat_presszone.the_geom,0.001) LIMIT 1);
+					v_presszone_id := (SELECT id FROM presszone WHERE ST_DWithin(p_reduced_geometry, presszone.the_geom,0.001) LIMIT 1);
 				ELSE
 					v_presszone_id =(SELECT presszone_id FROM v_edit_arc WHERE ST_DWithin(p_reduced_geometry, v_edit_arc.the_geom, v_promixity_buffer)
 					order by ST_Distance (p_reduced_geometry, v_edit_arc.the_geom) LIMIT 1);
@@ -588,7 +588,7 @@ BEGIN
 	v_fields := array_to_json(v_fields_array);
 
 	-- Control NULL's
-	v_apiversion := COALESCE(v_apiversion, '[]');
+	v_version := COALESCE(v_version, '[]');
 	v_fields := COALESCE(v_fields, '[]');    
 	v_message := COALESCE(v_message, '[]');    
 
@@ -599,7 +599,7 @@ BEGIN
 	ELSE 
 		RETURN ('{"status":"Failed" '||
 			',"message":{"priority":2, "text":"'||v_message||'"}'||
-			',"apiVersion":'||v_apiversion||
+			',"apiVersion":'||v_version||
 			',"body":{'||
 				'"form":{}'||
 				',"feature":{}'||
@@ -610,7 +610,7 @@ BEGIN
 		
 	-- Exception handling
 	-- EXCEPTION WHEN OTHERS THEN 
-	-- RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_apiversion ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	-- RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;

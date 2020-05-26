@@ -19,7 +19,7 @@ SELECT SCHEMA_NAME.gw_fct_gettoolbarbuttons($${
 
 
 DECLARE
-	v_apiversion text;
+	v_version text;
 	v_role text;
 	v_projectype text;
 	v_clientbuttons text;
@@ -32,7 +32,7 @@ BEGIN
   
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-        INTO v_apiversion;
+        INTO v_version;
 
 -- get input parameter
 	v_clientbuttons := (p_data ->> 'data')::json->> 'clientbuttons';
@@ -59,7 +59,7 @@ BEGIN
 	v_buttons := COALESCE(v_buttons, '{}');
 	
 --    Return
-    RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "version":'||v_apiversion||
+    RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "version":'||v_version||
              ',"body":{"form":{}'||
 		     ',"feature":{}'||
 		     ',"data":{"buttons":' || v_buttons ||

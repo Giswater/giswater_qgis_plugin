@@ -27,7 +27,7 @@ DECLARE
     v_searchtext varchar;
     v_tab varchar;
     v_editable varchar;
-    v_apiversion json;
+    v_version json;
     v_projecttype character varying;
      
     -- Street
@@ -54,7 +54,7 @@ BEGIN
 
 --      get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-        INTO v_apiversion;
+        INTO v_version;
 
 --     get project type
     SELECT wsoftware INTO v_projecttype FROM version LIMIT 1;
@@ -110,7 +110,7 @@ END IF;
 
 --    Return
     RETURN ('{"status":"Accepted"' ||
-        ', "version":'|| v_apiversion ||
+        ', "version":'|| v_version ||
         ', "data":' || v_response ||    
         '}')::json;
 

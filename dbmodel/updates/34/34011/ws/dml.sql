@@ -10,3 +10,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 -- 2020/05/25
 UPDATE config_form_fields set column_id = 'presszone_id' WHERE column_id ='presszonecat_id';
 UPDATE config_form_fields set formname = 'presszone' WHERE formname ='cat_presszone';
+UPDATE config_form_fields SET dv_querytext = replace (dv_querytext, 'cat_presszone', 'presszone') WHERE column_id like '%press%';
+UPDATE config_form_fields SET dv_querytext_filterc = replace (dv_querytext_filterc, 'cat_presszone', 'presszone') WHERE column_id like '%press%';
+

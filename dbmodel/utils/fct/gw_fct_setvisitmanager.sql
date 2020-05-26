@@ -22,7 +22,7 @@ SELECT "SCHEMA_NAME".gw_fct_setvisitmanager($${"client":{"device":3, "infoType":
 
 DECLARE
 v_tablename text;
-v_apiversion text;
+v_version text;
 v_id text;
 v_outputparameter json;
 v_insertresult json;
@@ -46,7 +46,7 @@ BEGIN
 
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-        INTO v_apiversion;
+        INTO v_version;
 		
 -- fix diferent ways to say null on client
 	p_data = REPLACE (p_data::text, '"NULL"', 'null');

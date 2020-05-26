@@ -92,7 +92,7 @@ SELECT SCHEMA_NAME.gw_fct_getlist($${
 
 
 DECLARE
-	v_apiversion text;
+	v_version text;
 	v_filter_fields  json[];
 	v_filter_fields_  json[];
 	v_footer_fields json[];
@@ -156,7 +156,7 @@ BEGIN
   
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-        INTO v_apiversion;
+        INTO v_version;
 
 	-- fix diferent ways to say null on client
 	p_data = REPLACE (p_data::text, '"NULL"', 'null');
@@ -530,7 +530,7 @@ BEGIN
 	v_fields_json_ = array_to_json (v_filter_fields_);
 
 --    Control NULL's
-	v_apiversion := COALESCE(v_apiversion, '{}');
+	v_version := COALESCE(v_version, '{}');
 	v_featuretype := COALESCE(v_featuretype, '');
 	v_tablename := COALESCE(v_tablename, '');
 	v_idname := COALESCE(v_idname, '');	
@@ -538,7 +538,7 @@ BEGIN
 	v_pageinfo := COALESCE(v_pageinfo, '{}');
 
 --    Return
-    RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "version":'||v_apiversion||
+    RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "version":'||v_version||
              ',"body":{"form":{}'||
 		     ',"feature":{"featureType":"' || v_featuretype || '","tableName":"' || v_tablename ||'","idName":"'|| v_idname ||'"}'||
 		     ',"data":{"fields":' || v_fields_json ||
@@ -549,7 +549,7 @@ BEGIN
        
 --    Exception handling
 --    EXCEPTION WHEN OTHERS THEN 
-        --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_apiversion || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+        --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

@@ -26,7 +26,7 @@ DECLARE
 	
 	v_status text ='Accepted';
 	v_message json;
-	v_apiversion json;
+	v_version json;
 	v_forminfo json;
 	v_featureinfo json;
 	v_linkpath json;
@@ -59,8 +59,8 @@ BEGIN
 	v_schemaname = 'SCHEMA_NAME';
 
 	--  get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
-		INTO v_apiversion;
+	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
+		INTO v_version;
        
 	-- Get input parameters:
 	v_device := (p_data ->> 'client')::json->> 'device';
@@ -144,12 +144,12 @@ BEGIN
 	EXECUTE v_querytext into v_newid;
 	
 --    Return
-    RETURN ('{"status":"Accepted", "message":'|| v_message ||', "apiVersion":'|| v_apiversion ||
+    RETURN ('{"status":"Accepted", "message":'|| v_message ||', "version":'|| v_version ||
 	    ', "body": {"feature":{"tableName":"'||v_tablename||'", "id":"'||v_newid||'"}}}')::json;    
 
 --    Exception handling
   --  EXCEPTION WHEN OTHERS THEN 
-    --    RETURN ('{"status":"Failed","message":' || (to_json(SQLERRM)) || ', "apiVersion":'|| v_apiversion ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;    
+    --    RETURN ('{"status":"Failed","message":' || (to_json(SQLERRM)) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

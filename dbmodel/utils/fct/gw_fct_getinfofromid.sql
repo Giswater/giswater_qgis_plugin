@@ -96,7 +96,7 @@ DECLARE
 	v_linkpath json;
 	column_type text;
 	schemas_array name[];
-	v_apiversion json;
+	v_version json;
 	v_geometry json;
 	v_the_geom text;
 	v_table_parent varchar;
@@ -155,8 +155,8 @@ BEGIN
 	END IF;
 	
 	-- Get values from config
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
-		INTO v_apiversion;
+	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
+		INTO v_version;
 		
 	-- get project type
 	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
@@ -562,7 +562,7 @@ BEGIN
 
 	--    Return
 	-----------------------
-	RETURN ('{"status":"'||v_status||'", "message":'||v_message||', "apiVersion":' || v_apiversion ||
+	RETURN ('{"status":"'||v_status||'", "message":'||v_message||', "apiVersion":' || v_version ||
 	      ',"body":{"form":' || v_forminfo ||
 		     ', "toggledition":'|| v_toggledition ||
 		     ', "feature":'|| v_featureinfo ||

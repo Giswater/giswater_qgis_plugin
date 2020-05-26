@@ -194,7 +194,7 @@ raise notice 'fields %', fields;
 
 --    Return
     RETURN ('{"status":"Accepted"' ||
-        ', "version":'|| api_version ||
+        ', "version":'|| v_version ||
         ', "formToDisplay":"' || formtodisplay || '"' ||
     ', "forceFormRefresh":"' || v_force_formrefresh || '"' ||
     ', "forceCanvasRefresh":"' || v_force_canvasrefresh || '"' ||
@@ -205,7 +205,7 @@ raise notice 'fields %', fields;
 
 --    Exception handling
     --EXCEPTION WHEN OTHERS THEN 
-        --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+        --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;

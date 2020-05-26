@@ -86,7 +86,7 @@ ACTIONS COULD BE DONE
 */
 
 DECLARE
-	v_apiversion text;
+	v_version text;
 	v_schemaname text;
 	v_featuretype text;
 	v_visitclass integer;
@@ -166,7 +166,7 @@ BEGIN
 
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-		INTO v_apiversion;
+		INTO v_version;
 
 	-- fix diferent ways to say null on client
 	p_data = REPLACE (p_data::text, '"NULL"', 'null');
@@ -738,7 +738,7 @@ BEGIN
 	
 
 	--  Control NULL's
-	v_apiversion := COALESCE(v_apiversion, '{}');
+	v_version := COALESCE(v_version, '{}');
 	v_id := COALESCE(v_id, '{}');
 	v_message := COALESCE(v_message, '{}');
 	v_forminfo := COALESCE(v_forminfo, '{}');
@@ -753,7 +753,7 @@ BEGIN
 
   
 	-- Return
-	RETURN ('{"status":"Accepted", "message":'||v_message||', "apiVersion":'||v_apiversion||
+	RETURN ('{"status":"Accepted", "message":'||v_message||', "apiVersion":'||v_version||
              ',"body":{"feature":{"featureType":"visit", "tableName":"'||v_tablename||'", "idName":"visit_id", "id":'||v_id||'}'||
 		    ', "form":'||v_forminfo||
 		    ', "data":{"layerManager":'||v_layermanager||

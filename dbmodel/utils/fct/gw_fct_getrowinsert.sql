@@ -28,7 +28,7 @@ SELECT SCHEMA_NAME.gw_fct_getrowinsert($${
 */
 
 DECLARE
-	v_apiversion text;
+	v_version text;
 	v_schemaname text;
 	v_tablename text;
 	v_id text;
@@ -47,8 +47,8 @@ BEGIN
 	v_schemaname = 'SCHEMA_NAME';
 
 	--  get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
-		INTO v_apiversion;
+	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
+		INTO v_version;
 
 	--  get parameters from input
 	v_tablename = ((p_data ->>'feature')::json->>'tableName')::text;
@@ -117,11 +117,11 @@ BEGIN
 
    --  Control NULL's
 	v_fields_json := COALESCE(v_fields_json, '{}');
-	v_apiversion := COALESCE(v_apiversion, '{}');
+	v_version := COALESCE(v_version, '{}');
 	v_formheader := COALESCE(v_formheader, '{}');
 	  
 --    Return
-    RETURN ('{"status":"Accepted", "message":{"priority":0, "text":"This is a test message"}, "apiVersion":'||v_apiversion||
+    RETURN ('{"status":"Accepted", "message":{"priority":0, "text":"This is a test message"}, "apiVersion":'||v_version||
              ',"body":{"form":{"headerText":"'||v_formheader||'"},"data":{"fields":' || v_fields_json || '}'||
 			'}'||
 	    '}')::json;

@@ -19,7 +19,7 @@ SELECT SCHEMA_NAME.gw_fct_setvehicleload($${"client":{"device":3,"infoType":0,"l
 
 DECLARE
 v_tablename text;
-v_apiversion text;
+v_version text;
 v_id integer;
 v_message json;
 v_feature json;
@@ -45,8 +45,8 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
 --  get api version
-    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
-        INTO v_apiversion;
+    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
+        INTO v_version;
 
     EXECUTE 'SELECT wsoftware FROM version'
 	INTO v_version;
@@ -79,12 +79,12 @@ BEGIN
 	"data":{"message":"3118", "function":"2912","debug_msg":""}}$$);'INTO v_message;		
 
 	--  Control NULL's
-	v_apiversion := COALESCE(v_apiversion, '{}');
+	v_version := COALESCE(v_version, '{}');
 	v_message := COALESCE(v_message, '{}');
 	v_geometry := COALESCE(v_geometry, '{}');
 
 	-- Return
-	RETURN ('{"status":"Accepted", "message":'||v_message||', "apiVersion":'|| v_apiversion ||', 
+	RETURN ('{"status":"Accepted", "message":'||v_message||', "apiVersion":'|| v_version ||',
 	"body": {}, "data":{}}')::json; 
 
 	-- Exception handling

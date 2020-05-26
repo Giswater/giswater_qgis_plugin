@@ -21,7 +21,7 @@ SELECT SCHEMA_NAME.gw_fct_setfileinsert($${"client":{"device":3, "infoType":100,
 DECLARE
 	-- variables
 	v_id int8;
-	v_apiversion json;
+	v_version json;
 	v_outputparameter json;
 	v_insertresult json;
 	v_message json;
@@ -40,7 +40,7 @@ BEGIN
     
 	-- get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-		INTO v_apiversion;
+		INTO v_version;
 
 
 	--get input parameter
@@ -90,12 +90,12 @@ BEGIN
 	RAISE NOTICE '--- RETURTING FROM gw_fct_setfileinsert WITH MESSAGE: % ---', v_message;
 
 	--    Return
-	RETURN ('{"status":"Accepted", "message":'||v_message||', "version":'|| v_apiversion ||
+	RETURN ('{"status":"Accepted", "message":'||v_message||', "version":'|| v_version ||
 		', "body": {"feature":{"id":"'||v_id||'"}}}')::json;    
 
 	--  Exception handling
 	--EXCEPTION WHEN OTHERS THEN 
---		RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_apiversion ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+--		RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

@@ -51,7 +51,7 @@ SELECT SCHEMA_NAME.gw_fct_getvisitmanager($${
 */
 
 DECLARE
-	v_apiversion text;
+	v_version text;
 	v_schemaname text;
 	v_featuretype text;
 	v_visitclass integer;
@@ -129,7 +129,7 @@ BEGIN
 
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-		INTO v_apiversion;
+		INTO v_version;
 
 	-- fix diferent ways to say null on client
 	p_data = REPLACE (p_data::text, '"NULL"', 'null');
@@ -534,14 +534,14 @@ BEGIN
 	
 
 	--  Control NULL's
-	v_apiversion := COALESCE(v_apiversion, '{}');
+	v_version := COALESCE(v_version, '{}');
 	v_message := COALESCE(v_message, '{}');
 	v_forminfo := COALESCE(v_forminfo, '{}');
 	v_tablename := COALESCE(v_tablename, '{}');
 	v_layermanager := COALESCE(v_layermanager, '{}');
   
 	-- Return
-	RETURN ('{"status":"Accepted", "message":'||v_message||', "version":'||v_apiversion||
+	RETURN ('{"status":"Accepted", "message":'||v_message||', "version":'||v_version||
              ',"body":{"feature":{"featureType":"visit", "tableName":"'||v_tablename||'", "idName":"user_id", "id":"'||current_user||'"}'||
 		    ', "form":'||v_forminfo||
 		    ', "data":{"layerManager":'||v_layermanager||'}}'||

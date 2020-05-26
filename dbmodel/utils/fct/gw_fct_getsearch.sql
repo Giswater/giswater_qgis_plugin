@@ -39,7 +39,7 @@ combo_json json;
 fieldsJson json;
 formSearch json;
 formPsector json;
-api_version json;
+v_version json;
 formAddress json;
 formVisit json;
 rec_tab record;
@@ -62,7 +62,7 @@ BEGIN
 
 --  get api values
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-        INTO api_version;
+        INTO v_version;
         
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''api_search_character_number'') row'
         INTO v_character_number;
@@ -436,10 +436,10 @@ BEGIN
 --     Return
     IF v_firsttab IS FALSE THEN
         -- Return not implemented
-        RETURN ('{"status":"Accepted"' || ', "version":'|| api_version || ', "enabled":false'|| '}')::json;
+        RETURN ('{"status":"Accepted"' || ', "version":'|| v_version || ', "enabled":false'|| '}')::json;
     ELSE 
         -- Return 
-        RETURN ('{"status":"Accepted", "version":'|| api_version ||', "enabled":true'||
+        RETURN ('{"status":"Accepted", "version":'|| v_version ||', "enabled":true'||
 		',"form":' || v_form ||
             '}')::json;
     END IF;
@@ -447,7 +447,7 @@ BEGIN
 
 --    Exception handling
 --    EXCEPTION WHEN OTHERS THEN 
-        --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| api_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+        --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;

@@ -20,7 +20,7 @@ SELECT SCHEMA_NAME.gw_fct_getprojectvisitforms($${
 */
 
 DECLARE
-	v_apiversion text;
+	v_version text;
 	v_schemaname text;
 	v_featuretype text;
 	v_featuretablename text;
@@ -75,7 +75,7 @@ BEGIN
 
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-		INTO v_apiversion;
+		INTO v_version;
 
 /*
 TODO

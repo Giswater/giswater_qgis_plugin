@@ -18,7 +18,7 @@ SELECT SCHEMA_NAME.gw_fct_getlot($${"client":{"device":3,"infoType":100,"lang":"
 */
 
 DECLARE
-	v_apiversion text;
+	v_version text;
 	v_schemaname text;
 	v_id text;
 	v_idname text;
@@ -55,7 +55,7 @@ BEGIN
 
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-		INTO v_apiversion;
+		INTO v_version;
 
 	-- fix diferent ways to say null on client
 	p_data = REPLACE (p_data::text, '"NULL"', 'null');
@@ -172,17 +172,17 @@ BEGIN
 	
 
 	--  Control NULL's
-	v_apiversion := COALESCE(v_apiversion, '{}');
+	v_version := COALESCE(v_version, '{}');
 	v_message := COALESCE(v_message, '{}');
 	v_forminfo := COALESCE(v_forminfo, '{}');
 	v_tablename := COALESCE(v_tablename, '{}');
 	v_layermanager := COALESCE(v_layermanager, '{}');
 	v_geometry := COALESCE(v_geometry, '{}');
 
-	raise notice' 1 % 2 % 3 % 4 % 5 % 6 % ', v_message, v_apiversion, v_tablename, v_id, v_layermanager, v_geometry;
+	raise notice' 1 % 2 % 3 % 4 % 5 % 6 % ', v_message, v_version, v_tablename, v_id, v_layermanager, v_geometry;
   
 	-- Return
-	RETURN ('{"status":"Accepted", "message":'||v_message||', "version":'||v_apiversion||
+	RETURN ('{"status":"Accepted", "message":'||v_message||', "version":'||v_version||
              ',"body":{"feature":{"featureType":"lot", "tableName":"'||v_tablename||'", "idName":"id", "id":"'||v_id||'"}'||
 		    ', "form":'||v_forminfo||
 		    ', "data":{"layerManager":'||v_layermanager||

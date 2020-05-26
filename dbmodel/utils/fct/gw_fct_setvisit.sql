@@ -41,7 +41,7 @@ SELECT SCHEMA_NAME.gw_fct_setvisit($${
 
 DECLARE
 v_tablename text;
-v_apiversion text;
+v_version text;
 v_id integer;
 v_outputparameter json;
 v_insertresult json;
@@ -80,8 +80,8 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
 --  get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
-	INTO v_apiversion;
+	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
+	INTO v_version;
 
 	EXECUTE 'SELECT wsoftware FROM version'
 	INTO v_version;
@@ -294,13 +294,13 @@ BEGIN
     END IF;
 
 	--  Control NULL's
-	v_apiversion := COALESCE(v_apiversion, '{}');
+	v_version := COALESCE(v_version, '{}');
 	v_message := COALESCE(v_message, '{}');
 	v_geometry := COALESCE(v_geometry, '{}');
 	return_event_manager_aux := COALESCE(return_event_manager_aux, '{}');
 				  
 	-- Return
-	RETURN ('{"status":"Accepted", "message":'||v_message||', "apiVersion":'|| v_apiversion ||', 
+	RETURN ('{"status":"Accepted", "message":'||v_message||', "apiVersion":'|| v_version ||',
 	"body": {"feature":{"id":"'||v_id||'"}, "data":{"geometry":'|| return_event_manager_aux ||'}}}')::json; 
 
 	-- Exception handling

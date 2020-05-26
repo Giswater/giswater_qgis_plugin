@@ -28,7 +28,7 @@ SELECT SCHEMA_NAME.gw_fct_gettoolbox($${
 */
 
 DECLARE
-v_apiversion text;
+v_version text;
 v_role text;
 v_projectype text;
 v_filter text;
@@ -49,8 +49,8 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
   
 	--  get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
-		INTO v_apiversion;
+	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
+		INTO v_version;
 
 	-- get input parameter
 	v_filter := (p_data ->> 'data')::json->> 'filterText';
@@ -149,7 +149,7 @@ BEGIN
 
 		
 	-- Return
-	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "apiVersion":'||v_apiversion||
+	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "apiVersion":'||v_version||
              ',"body":{"form":{}'||
 		     ',"feature":{}'||
 		     ',"data":{"fields":{'||
@@ -162,7 +162,7 @@ BEGIN
        
 	--Exception handling
 	EXCEPTION WHEN OTHERS THEN 
-	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_apiversion || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

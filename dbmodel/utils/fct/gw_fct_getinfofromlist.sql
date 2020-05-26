@@ -24,7 +24,7 @@ SELECT SCHEMA_NAME.gw_fct_getinfofromlist($${
 
 DECLARE
 	-- Variables
-	v_apiversion text;
+	v_version text;
 	v_featuretype text;
 	v_lotfeaturetype text;
 	v_projecttype text;
@@ -40,7 +40,7 @@ BEGIN
 
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-		INTO v_apiversion;
+		INTO v_version;
 
 	-- get project type
 	SELECT wsoftware INTO v_projecttype FROM version LIMIT 1;

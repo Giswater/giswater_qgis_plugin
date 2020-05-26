@@ -48,7 +48,7 @@ BEGIN
 	schemas_array := current_schemas(FALSE);
 
 	-- get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
+	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
 		INTO v_version;
 		
 	-- get column type of idname

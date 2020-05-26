@@ -26,7 +26,7 @@ SELECT SCHEMA_NAME.gw_fct_getinsertfeature($${
 */
 
 DECLARE
-v_apiversion text;
+v_version text;
 v_rows json;
 v_geometrytype text;
 v_errcontext text;
@@ -38,7 +38,7 @@ BEGIN
 
 	--  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-        INTO v_apiversion;
+        INTO v_version;
 
 
 	--  Creating the list elements
@@ -65,11 +65,11 @@ BEGIN
 	RAISE NOTICE 'v_rows %', v_rows;
 
 	-- Control NULL's	
-	v_apiversion := COALESCE(v_apiversion, '{}');
+	v_version := COALESCE(v_version, '{}');
 	v_rows := COALESCE(v_rows, '{}');
     
 	-- Return
-    RETURN ('{"status":"Accepted", "version":'||v_apiversion||
+    RETURN ('{"status":"Accepted", "version":'||v_version||
              ',"body":{"message":{"priority":1, "text":"This is a test message"}'||
 			',"form":{}'||
 			',"feature":{}'||

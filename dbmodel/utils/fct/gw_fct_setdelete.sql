@@ -31,7 +31,7 @@ DECLARE
 v_tablename text;
 v_id  character varying;
 v_querytext varchar;
-v_apiversion json;
+v_version json;
 v_schemaname text;
 v_featuretype text;
 v_idname text;
@@ -49,7 +49,7 @@ BEGIN
 	
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-		INTO v_apiversion;
+		INTO v_version;
        
 	-- Get input parameters:
 	v_feature := (p_data ->> 'feature');
@@ -90,12 +90,12 @@ BEGIN
 	END IF;
 
 	-- Return
-    RETURN ('{"status":"Accepted", "message":'||v_message||', "version":'|| v_apiversion ||
+    RETURN ('{"status":"Accepted", "message":'||v_message||', "version":'|| v_version ||
 	    ', "body": {"feature":{"tableName":"'||v_tablename||'", "id":"'||v_id||'"}}}')::json;    
 
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN 
-    RETURN ('{"status":"Failed","message":' || (to_json(SQLERRM)) || ', "version":'|| v_apiversion ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+    RETURN ('{"status":"Failed","message":' || (to_json(SQLERRM)) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
