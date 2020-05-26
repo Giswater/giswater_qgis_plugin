@@ -138,13 +138,13 @@ class MincutParent(ParentAction):
 
         # Fill ComboBox type
         sql = ("SELECT id, descript "
-               "FROM anl_mincut_cat_type "
+               "FROM om_mincut_cat_type "
                "ORDER BY id")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_mincut.type, rows, 1)
 
         # Fill ComboBox cause
-        sql = ("SELECT id, descript "
+        sql = ("SELECT id, idval "
                "FROM om_typevalue WHERE typevalue = 'mincut_cause' "
                "ORDER BY id")
         rows = self.controller.get_rows(sql)
