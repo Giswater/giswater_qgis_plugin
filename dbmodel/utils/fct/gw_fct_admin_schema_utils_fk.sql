@@ -25,7 +25,7 @@ BEGIN
     -- control of project type
     SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
 
-    ext_utils_schema_aux = (SELECT value FROM config_param_system WHERE parameter='ext_utils_schema');
+    ext_utils_schema_aux = 'utils';
 
     IF ext_utils_schema_aux IS NOT NULL THEN
     	EXECUTE 'SELECT EXISTS (select * from pg_catalog.pg_namespace where nspname = '''||ext_utils_schema_aux||''');'

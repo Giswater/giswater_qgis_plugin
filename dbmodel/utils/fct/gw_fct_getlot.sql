@@ -54,7 +54,7 @@ BEGIN
 	v_schemaname := '';
 
 	--  get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
+	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
 		INTO v_apiversion;
 
 	-- fix diferent ways to say null on client
@@ -182,7 +182,7 @@ BEGIN
 	raise notice' 1 % 2 % 3 % 4 % 5 % 6 % ', v_message, v_apiversion, v_tablename, v_id, v_layermanager, v_geometry;
   
 	-- Return
-	RETURN ('{"status":"Accepted", "message":'||v_message||', "apiVersion":'||v_apiversion||
+	RETURN ('{"status":"Accepted", "message":'||v_message||', "version":'||v_apiversion||
              ',"body":{"feature":{"featureType":"lot", "tableName":"'||v_tablename||'", "idName":"id", "id":"'||v_id||'"}'||
 		    ', "form":'||v_forminfo||
 		    ', "data":{"layerManager":'||v_layermanager||

@@ -28,10 +28,10 @@ BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 	-- getting tolerance parameters
-	v_rev_gully_top_elev_tol :=(SELECT "value" FROM config_param_system WHERE "parameter"='rev_gully_top_elev_tol');
-	v_rev_gully_ymax_tol :=(SELECT "value" FROM config_param_system WHERE "parameter"='rev_gully_ymax_tol');		
-	v_rev_gully_sandbox_tol :=(SELECT "value" FROM config_param_system WHERE "parameter"='rev_gully_sandbox_tol');	
-	v_rev_gully_units_tol :=(SELECT "value" FROM config_param_system WHERE "parameter"='rev_gully_units_tol');	
+	v_rev_gully_top_elev_tol :=(SELECT value::json->'topelev' FROM config_param_system WHERE "parameter"='edit_review_gully_tolerance');
+	v_rev_gully_ymax_tol :=(SELECT value::json->'ymax' FROM config_param_system WHERE "parameter"='edit_review_gully_tolerance');		
+	v_rev_gully_sandbox_tol :=(SELECT value::json->'sandbox' FROM config_param_system WHERE "parameter"='edit_review_gully_tolerance');	
+	v_rev_gully_units_tol :=(SELECT value::json->'units' FROM config_param_system WHERE "parameter"='edit_review_gully_tolerance');	
 
 	--getting original values
 	SELECT gully_id, top_elev, ymax, sandbox, gully.matcat_id, gully.gully_type, gratecat_id, units, groove, siphon, cat_arc.matcat_id as connec_matcat_id,

@@ -47,7 +47,7 @@ BEGIN
 
 	
 --      Get values from config
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
+	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
 		INTO v_apiversion;
 		
 --  	Get project type
@@ -82,7 +82,7 @@ BEGIN
 
 --    Return
 -----------------------
-     RETURN ('{"status":"'||v_status||'", "message":'||v_message||', "apiVersion":' || v_apiversion ||
+     RETURN ('{"status":"'||v_status||'", "message":'||v_message||', "version":' || v_apiversion ||
 	      ',"body":{"form":' || v_forminfo ||
 		     ', "feature":'|| v_featureinfo ||
 		      ',"data":{"linkPath":' || v_linkpath ||
@@ -94,7 +94,7 @@ BEGIN
 
 --    Exception handling
  --   EXCEPTION WHEN OTHERS THEN 
-   --     RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ', "apiVersion":'|| v_apiversion ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+   --     RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ', "version":'|| v_apiversion ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

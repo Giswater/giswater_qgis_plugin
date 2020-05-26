@@ -127,7 +127,7 @@ BEGIN
 			VALUES (107, null, 1, concat('INFO: User ',v_user_id,' inserted into cat_users of schema ',rec_schema,'.'));
 
 			EXECUTE 'SELECT value::boolean  
-			FROM '||rec_schema||'.config_param_system WHERE parameter = ''sys_exploitation_x_user'''
+			FROM '||rec_schema||'.config_param_system WHERE parameter = ''admin_exploitation_x_user'''
 			INTO v_sys_expl_x_user;
 
 			IF v_sys_expl_x_user THEN
@@ -220,7 +220,7 @@ BEGIN
 		FOREACH rec_schema IN ARRAY v_gw_schema_array LOOP
 
 			EXECUTE 'SELECT value::boolean 
-			FROM '||rec_schema||'.config_param_system WHERE parameter = ''sys_exploitation_x_user'''
+			FROM '||rec_schema||'.config_param_system WHERE parameter = ''admin_exploitation_x_user'''
 			INTO v_sys_expl_x_user;
 			--if managing exploitation for user is used (true)
 			IF v_sys_expl_x_user THEN
@@ -274,7 +274,7 @@ BEGIN
 			VALUES (107, null, 1, concat('INFO: User ',v_user_id,' deleted from selectors.'));
 
 			EXECUTE 'SELECT value::boolean  
-			FROM '||rec_schema||'.config_param_system WHERE parameter = ''sys_exploitation_x_user'''			
+			FROM '||rec_schema||'.config_param_system WHERE parameter = ''admin_exploitation_x_user'''
 			INTO v_sys_expl_x_user;
 
 			--if managing exploitation for user is used (true)

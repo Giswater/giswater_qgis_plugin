@@ -67,7 +67,7 @@ BEGIN
     schemas_array := current_schemas(FALSE);
 
 	--  get api version
-    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
+    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
         INTO api_version;
 
 	-- Get input parameters:
@@ -79,24 +79,23 @@ BEGIN
 	v_zoomScale := (p_data ->> 'data')::json->> 'zoomScale';
 	v_epsg := (SELECT epsg FROM version LIMIT 1);
 
-
 	-- Sensibility factor
 	IF v_device=1 OR v_device=2 THEN
-        EXECUTE 'SELECT value::float FROM config_param_system WHERE parameter=''api_sensibility_factor_web'''
+        EXECUTE 'SELECT value::float FROM config_param_system WHERE parameter=''basic_info_sensibility_factor''::json->''mobile'''
 		INTO v_sensibility_f;
 		-- 10 pixels of base sensibility
 		v_sensibility = (v_zoomScale * 10 * v_sensibility_f);
 		v_config_layer='config_web_layer';
 		
 	ELSIF  v_device=3 THEN
-        EXECUTE 'SELECT value::float FROM config_param_system WHERE parameter=''api_sensibility_factor_mobile'''
+        EXECUTE 'SELECT value::float FROM config_param_system WHERE parameter=''basic_info_sensibility_factor''::json->''web'''
 		INTO v_sensibility_f;     
 		-- 10 pixels of base sensibility
 		v_sensibility = (v_zoomScale * 10 * v_sensibility_f);
 		v_config_layer='config_web_layer';
 
     ELSIF  v_device=9 THEN
-	EXECUTE 'SELECT value::float FROM config_param_system WHERE parameter=''api_sensibility_factor_web'''
+	EXECUTE 'SELECT value::float FROM config_param_system WHERE parameter=''basic_info_sensibility_factor''::json->''desktop'''
 		INTO v_sensibility_f;
 		-- ESCALE 1:5000 as base sensibility
 		v_sensibility = ((v_zoomScale/5000) * 10 * v_sensibility_f);
@@ -217,7 +216,7 @@ BEGIN
 	fields := COALESCE(fields, '[]');    
 
 --    Return
-    RETURN ('{"status":"Accepted", "apiVersion":'||api_version||
+    RETURN ('{"status":"Accepted", "version":'||api_version||
              ',"body":{"message":{"priority":1, "text":"This is a test message"}'||
 			',"form":{}'||
 			',"feature":{}'||

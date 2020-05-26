@@ -8,4 +8,4 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
  
-UPDATE config_param_system SET value='TRUE' WHERE parameter='sys_utils_schema';
+UPDATE config_param_system SET value='TRUE' WHERE parameter='admin_utils_schema';

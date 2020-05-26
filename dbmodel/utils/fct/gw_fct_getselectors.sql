@@ -54,7 +54,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	--  get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
+	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
 		INTO api_version;
 
 	-- Get input parameters:
@@ -62,7 +62,7 @@ BEGIN
 	v_selectors_list := (((p_data ->> 'data')::json->>'selector_type')::json ->>'mincut')::json->>'ids';
 
 	-- get system variables:
-	v_expl_x_user = (SELECT value FROM config_param_system WHERE parameter = 'sys_exploitation_x_user');
+	v_expl_x_user = (SELECT value FROM config_param_system WHERE parameter = 'admin_exploitation_x_user');
 	
 	-- Manage list ids
 	v_selectors_list = replace(replace(v_selectors_list, '[', '('), ']', ')');
@@ -80,7 +80,7 @@ BEGIN
 	IF rec_tab.id IS NOT NULL THEN
 
 		-- get selector parameters
-		v_parameter_selector = (SELECT value::json FROM config_param_system WHERE parameter = concat('api_selector_', lower(v_aux_json->>'json_object_keys')::text));
+		v_parameter_selector = (SELECT value::json FROM config_param_system WHERE parameter = concat('basic_selector_', lower(v_aux_json->>'json_object_keys')::text));
 		
 		v_label = v_parameter_selector->>'label';
 		v_table = v_parameter_selector->>'table';
@@ -158,12 +158,12 @@ BEGIN
 	IF v_firsttab IS FALSE THEN
 		-- Return not implemented
 		RETURN ('{"status":"Accepted"' ||
-		', "apiVersion":'|| api_version ||
+		', "version":'|| api_version ||
 		', "message":"Not implemented"'||
 		'}')::json;
 	ELSE 
 		-- Return formtabs
-		RETURN ('{"status":"Accepted", "apiVersion":'||api_version||
+		RETURN ('{"status":"Accepted", "version":'||api_version||
 			',"body":{"message":{"priority":1, "text":"This is a test message"}'||
 			',"form":{"formName":"", "formLabel":"", "formText":""'|| 
 			',"formTabs":'||v_formTabs||
@@ -175,7 +175,7 @@ BEGIN
 
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN 
-	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| api_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;

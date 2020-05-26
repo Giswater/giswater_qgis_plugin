@@ -54,7 +54,7 @@ BEGIN
 
 	-- manage utils schema
 	IF v_isutils THEN
-		v_schemautils = (SELECT value::boolean FROM config_param_system WHERE parameter='sys_utils_schema');
+		v_schemautils = (SELECT value::boolean FROM config_param_system WHERE parameter='admin_utils_schema');
 		IF v_schemautils THEN 		
 			SET search_path = 'utils', public;
 			v_schemaname := 'utils';

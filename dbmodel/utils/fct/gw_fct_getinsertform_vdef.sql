@@ -65,7 +65,7 @@ BEGIN
 	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
 
 	--  get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
+	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
         INTO api_version;
 
         -- get sys_feature_type
@@ -256,7 +256,7 @@ BEGIN
 
 --   Exception handling
   --  EXCEPTION WHEN OTHERS THEN 
-    --    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+    --    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

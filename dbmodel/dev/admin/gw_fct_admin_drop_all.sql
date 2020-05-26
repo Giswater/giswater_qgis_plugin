@@ -27,8 +27,6 @@ DECLARE
 	v_function_name text;
 	v_apiservice boolean;	
 	v_rolepermissions boolean;
-	v_apipublishuser varchar;
-	
 
 BEGIN 
 

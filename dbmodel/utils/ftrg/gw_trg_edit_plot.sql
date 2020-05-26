@@ -24,8 +24,8 @@ BEGIN
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
     
     --check if schema utils is being used
-    SELECT value::boolean INTO v_isutils FROM config_param_system WHERE parameter = 'sys_utils_schema';
-    SELECT value INTO v_schema_utils FROM config_param_system WHERE parameter = 'ext_utils_schema';
+    SELECT value::boolean INTO v_isutils FROM config_param_system WHERE parameter = 'admin_utils_schema';
+    v_schema_utils = 'utils';
     
     --get the names of both ws and ud schema
     IF v_isutils is TRUE and v_schema_utils is not null THEN

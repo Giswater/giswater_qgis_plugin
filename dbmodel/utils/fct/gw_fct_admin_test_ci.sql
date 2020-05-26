@@ -51,7 +51,7 @@ BEGIN
 	SELECT wsoftware, giswater INTO v_project_type, v_version FROM version order by id desc limit 1;
 
 	--set permisions for each role
-	UPDATE config_param_system SET value = TRUE WHERE parameter = 'sys_role_permissions';
+	UPDATE config_param_system SET value = TRUE WHERE parameter = 'admin_role_permissions';
 	
 	PERFORM gw_fct_admin_role_permissions();
 	

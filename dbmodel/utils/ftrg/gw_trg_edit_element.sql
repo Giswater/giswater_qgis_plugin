@@ -81,7 +81,7 @@ BEGIN
 		END IF;
 
 		-- LINK
-	    IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_automatic_insert_link')::boolean=TRUE THEN
+	    IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_usefid_on_linkid')::boolean=TRUE THEN
 	       NEW.link=NEW.element_id;
 	    END IF;
 		

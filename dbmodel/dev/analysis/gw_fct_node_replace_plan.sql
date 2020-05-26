@@ -69,7 +69,7 @@ IF function_aux='editor' THEN
 		END LOOP;
 	
 		
-		-- Dissable config parameter arc_searchnodes
+		-- Dissable config parameter edit_arc_searchnodes
 		UPDATE config SET arc_searchnodes_control=FALSE;
 
 		-- reconnecting arcs (node_id=node_1)
@@ -88,7 +88,7 @@ IF function_aux='editor' THEN
 		UPDATE node SET state=0 WHERE node_id=old_node_id_aux;
 		UPDATE node SET state=1 WHERE node_id=new_node_id_aux;
 	
-		-- enable config parameter arc_searchnodes
+		-- enable config parameter edit_arc_searchnodes
 		UPDATE config SET arc_searchnodes_control=TRUE;
 		
 	END IF;

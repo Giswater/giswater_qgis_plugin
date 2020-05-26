@@ -40,7 +40,7 @@ BEGIN
 	v_id :=  ((p_data ->>'feature')::json->>'id')::text;
 	
 	--  get system currency
-	v_currency_symbol :=((SELECT value FROM config_param_system WHERE parameter='sys_currency')::json->>'symbol');
+	v_currency_symbol :=((SELECT value FROM config_param_system WHERE parameter='admin_currency')::json->>'symbol');
 
 	-- get image
    	SELECT image FROM cat_arc_shape JOIN cat_arc ON cat_arc.shape=cat_arc_shape.id	JOIN arc ON cat_arc.id=arccat_id WHERE arc_id=v_id

@@ -26,8 +26,8 @@ BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 	-- getting tolerance parameters
-	v_rev_connec_y1_tol :=(SELECT "value" FROM config_param_system WHERE "parameter"='rev_connec_y1_tol');
-	v_rev_connec_y2_tol :=(SELECT "value" FROM config_param_system WHERE "parameter"='rev_connec_y2_tol');		
+	v_rev_connec_y1_tol :=(SELECT value::json->'y1' FROM config_param_system WHERE "parameter"='edit_review_connec_tolerance');
+	v_rev_connec_y2_tol :=(SELECT value::json->'y2' FROM config_param_system WHERE "parameter"='edit_review_connec_tolerance');		
 
 	--getting original values
 	SELECT connec_id, y1, y2, connec.connec_type, connecat_id, connec.matcat_id, annotation, observ, expl_id, the_geom INTO rec_connec 

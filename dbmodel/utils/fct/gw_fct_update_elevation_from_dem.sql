@@ -60,8 +60,8 @@ BEGIN
 	v_exploitation := ((p_data ->>'data')::json->>'parameters')::json->>'exploitation';
 	
 
-	--Execute the process only if sys_raster_dem is true
-	IF (SELECT value FROM config_param_system WHERE parameter='sys_raster_dem') = 'TRUE' THEN
+	--Execute the process only if admin_raster_dem is true
+	IF (SELECT value FROM config_param_system WHERE parameter='admin_raster_dem') = 'TRUE' THEN
 
 		
 		DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=68;

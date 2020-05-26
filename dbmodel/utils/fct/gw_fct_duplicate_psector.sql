@@ -54,7 +54,7 @@ BEGIN
 
 	SELECT wsoftware, giswater  INTO v_project_type, v_version FROM version order by 1 desc limit 1;
 
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
+	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
 	INTO v_api_version;
 
 	-- manage log (fprocesscat = 51)
@@ -63,11 +63,11 @@ BEGIN
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (53, v_result_id, concat('------------------------------'));
 		
 	--capture current value and deactivate connec and gully proximity
-	SELECT value::json into v_connec_proximity FROM config_param_system WHERE parameter='connec_proximity';
-	SELECT value::json into v_gully_proximity FROM config_param_system WHERE parameter='gully_proximity';
+	SELECT value::json into v_connec_proximity FROM config_param_system WHERE parameter='edit_connec_proximity';
+	SELECT value::json into v_gully_proximity FROM config_param_system WHERE parameter='edit_gully_proximity';
 	
-	UPDATE  config_param_system SET value = gw_fct_json_object_set_key(v_connec_proximity::json, 'activated'::text, 'false'::text) WHERE parameter='connec_proximity';
-	UPDATE  config_param_system SET value = gw_fct_json_object_set_key(v_gully_proximity::json, 'activated'::text, 'false'::text) WHERE parameter='gully_proximity';
+	UPDATE  config_param_system SET value = gw_fct_json_object_set_key(v_connec_proximity::json, 'activated'::text, 'false'::text) WHERE parameter='edit_connec_proximity';
+	UPDATE  config_param_system SET value = gw_fct_json_object_set_key(v_gully_proximity::json, 'activated'::text, 'false'::text) WHERE parameter='edit_gully_proximity';
 	
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (53, v_result_id, concat('Deactivate topology control for connecs and gullies.' ));
 	
@@ -180,9 +180,9 @@ BEGIN
 
 			--activate topocontrol for arc, deactivate for other features 
 			if rec_type.id='arc' THEN
-				UPDATE config_param_system SET value ='FALSE' WHERE parameter='edit_topocontrol_dsbl_error';
+				UPDATE config_param_system SET value ='FALSE' WHERE parameter='edit_topocontrol_disable_error';
 			ELSE
-				UPDATE config_param_system SET value ='TRUE' WHERE parameter='edit_topocontrol_dsbl_error';
+				UPDATE config_param_system SET value ='TRUE' WHERE parameter='edit_topocontrol_disable_error';
 			END IF;
 			
 			EXECUTE 'INSERT INTO v_edit_'||lower(rec_type.id)||' ('||v_insert_fields||',state) SELECT '||v_insert_fields||',2 FROM '||lower(rec_type.id)||'
@@ -204,9 +204,9 @@ BEGIN
 	IF v_connect2network is not null then
 		update config_param_user SET value=v_connect2network WHERE parameter='edit_connect_force_automatic_connect2network' and cur_user=current_user;
 	END IF;
-	UPDATE config_param_system SET value = v_connec_proximity WHERE parameter='connec_proximity';     
-	UPDATE config_param_system SET value = v_gully_proximity WHERE parameter='gully_proximity';     
-	UPDATE config_param_system SET value ='FALSE' WHERE parameter='edit_topocontrol_dsbl_error';
+	UPDATE config_param_system SET value = v_connec_proximity WHERE parameter='edit_connec_proximity';
+	UPDATE config_param_system SET value = v_gully_proximity WHERE parameter='edit_gully_proximity';
+	UPDATE config_param_system SET value ='FALSE' WHERE parameter='edit_topocontrol_disable_error';
 
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (53, v_result_id, concat('Activate topology control.'));
 	
@@ -219,7 +219,7 @@ BEGIN
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_api_version := COALESCE(v_api_version, '[]');
 
-RETURN ('{"status":"Accepted", "apiVersion":'||v_api_version||
+RETURN ('{"status":"Accepted", "version":'||v_api_version||
             ',"message":{"priority":1, "text":""},"body":{"data": {"info":'||v_result_info||'}}}')::json;
 
 	EXCEPTION WHEN OTHERS THEN

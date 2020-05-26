@@ -174,8 +174,8 @@ BEGIN
 	
 	
 		-- reconnecting arcs
-		-- Dissable config parameter arc_searchnodes
-		UPDATE config SET arc_searchnodes_control=FALSE;
+		-- Dissable config parameter edit_arc_searchnodes
+		UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'activated', false) WHERE parameter = 'edit_arc_searchnodes';
 			
 		FOR rec_arc IN SELECT arc_id FROM arc WHERE node_1=old_node_id_aux
 		LOOP
@@ -191,8 +191,8 @@ BEGIN
 		UPDATE node SET state=0, workcat_id_end=workcat_id_end_aux, enddate=enddate_aux WHERE node_id=old_node_id_aux;
 		UPDATE node SET state=1, workcat_id=workcat_id_end_aux, builtdate=enddate_aux, enddate=NULL WHERE node_id=v_node_id::text;
 	
-		-- enable config parameter arc_searchnodes
-		UPDATE config SET arc_searchnodes_control=TRUE;
+		-- enable config parameter edit_arc_searchnodes
+		UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'activated', true) WHERE parameter = 'edit_arc_searchnodes';
 		
 	END IF;
 		

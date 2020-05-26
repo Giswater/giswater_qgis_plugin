@@ -114,14 +114,14 @@ BEGIN
 	SELECT wsoftware, giswater FROM version LIMIT 1 INTO v_project_type, v_version;
 
 	-- get systemvalues
-	SELECT value INTO v_guitarlegend FROM config_param_system WHERE parameter = 'profile_guitarlegend';
-	SELECT value INTO v_stylesheet FROM config_param_user WHERE parameter = 'profile_stylesheet' AND cur_user = current_user;
-	SELECT value::json->>'arc' INTO v_textarc FROM config_param_system WHERE parameter = 'profile_guitartext';
-	SELECT value INTO v_vdefault FROM config_param_system WHERE parameter = 'profile_vdefault';
-	SELECT value::json->>'vs' INTO v_vstext FROM config_param_system WHERE parameter = 'profile_guitarlegend';
-  	SELECT value::json->>'hs' INTO v_hstext FROM config_param_system WHERE parameter = 'profile_guitarlegend';
-  	SELECT (value::json->>'arc')::json->>'cat_geom1' INTO v_arc_geom1 FROM config_param_system WHERE parameter = 'profile_vdefault';
-  	SELECT (value::json->>'node')::json->>'cat_geom1' INTO v_node_geom1 FROM config_param_system WHERE parameter = 'profile_vdefault';
+	SELECT value INTO v_guitarlegend FROM config_param_system WHERE parameter = 'om_profile_guitarlegend';
+	SELECT value INTO v_stylesheet FROM config_param_user WHERE parameter = 'om_profile_stylesheet' AND cur_user = current_user;
+	SELECT value::json->>'arc' INTO v_textarc FROM config_param_system WHERE parameter = 'om_profile_guitartext';
+	SELECT value INTO v_vdefault FROM config_param_system WHERE parameter = 'om_profile_vdefault';
+	SELECT value::json->>'vs' INTO v_vstext FROM config_param_system WHERE parameter = 'om_profile_guitarlegend';
+  	SELECT value::json->>'hs' INTO v_hstext FROM config_param_system WHERE parameter = 'om_profile_guitarlegend';
+  	SELECT (value::json->>'arc')::json->>'cat_geom1' INTO v_arc_geom1 FROM config_param_system WHERE parameter = 'om_profile_vdefault';
+  	SELECT (value::json->>'node')::json->>'cat_geom1' INTO v_node_geom1 FROM config_param_system WHERE parameter = 'om_profile_vdefault';
 
 	-- define variables in function of the project type
 	IF v_project_type = 'UD' THEN

@@ -65,7 +65,7 @@ BEGIN
 	ON CONFLICT (hydrometer_id) DO NOTHING;
 
 	-- ext_rtc_hdydrometer
-	IF (SELECT value FROM config_param_system WHERE parameter='sys_crm_schema')::boolean THEN
+	IF (SELECT value FROM config_param_system WHERE parameter='admin_crm_schema')::boolean THEN
 		INSERT INTO crm.hydrometer (id, connec_id, state_id, expl_id, category_id)
 		SELECT a.feature_id , log_message::json->>'connec_id', 1, (log_message::json->>'expl_id')::integer, 1  FROM audit_log_data a
 		WHERE log_message::json->>'year' IS NOT NULL AND log_message::json->>'period' IS NOT NULL AND fprocesscat_id=74

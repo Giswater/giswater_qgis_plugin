@@ -58,7 +58,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 	
 	-- get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
+	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
 		INTO v_apiversion;
 
 	-- getting input data 
@@ -96,7 +96,7 @@ BEGIN
 	v_message := COALESCE(v_message, '{}');
 
 	-- Return
-	RETURN ('{"status":"Accepted", "message":'||v_message||', "apiVersion":'|| v_apiversion ||
+	RETURN ('{"status":"Accepted", "message":'||v_message||', "version":'|| v_apiversion ||
     	    ', "body": {"data":'|| v_response || '}}')::json;      
 	 
 END;

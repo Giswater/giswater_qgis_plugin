@@ -14,7 +14,7 @@ $BODY$
 PERFORM SCHEMA_NAME.gw_fct_debug(concat('{"data":{"msg":"Toolbar", "variables":"',v_point,'"}}')::json);
 SELECT SCHEMA_NAME.gw_fct_debug(concat('{"data":{"msg":"Toolbar", "variables":"a"}}')::json);
 
-UPDATE config_param_system SET value = '{"status":true}' WHERE parameter = 'sys_transaction_db'
+UPDATE config_param_system SET value = '{"status":true}' WHERE parameter = 'admin_transaction_db'
 UPDATE config_param_user SET value = 'true' WHERE parameter = 'debug_mode';
 
 */
@@ -41,7 +41,7 @@ BEGIN
 	v_variables = lower(((p_data ->>'data')::json->>'variables')::text);
 	
 	-- get system parameters
-	v_systranstaction_db = (SELECT value::json->>'status' FROM config_param_system WHERE parameter = 'sys_transaction_db')::boolean;
+	v_systranstaction_db = (SELECT value::json->>'status' FROM config_param_system WHERE parameter = 'admin_transaction_db')::boolean;
 	SELECT giswater, wsoftware INTO v_version, v_projectype FROM version order by 1 desc limit 1;
 	
 	-- get parameters from user

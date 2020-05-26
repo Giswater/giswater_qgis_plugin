@@ -21,7 +21,7 @@ DECLARE
 	v_function_name text;
 	v_apiservice boolean;	
 	v_rolepermissions boolean;
-	v_apipublishuser varchar;
+	v_publishuser varchar;
 	v_vpn_dbuser boolean;
 
 	rec_user record;
@@ -38,9 +38,9 @@ BEGIN
 	v_schema_array := current_schemas(FALSE);
 	v_schemaname :=v_schema_array[1];
 	
-	v_rolepermissions = (SELECT value::boolean FROM config_param_system WHERE parameter='sys_role_permissions');
+	v_rolepermissions = (SELECT value::boolean FROM config_param_system WHERE parameter='admin_role_permissions');
 	v_apiservice = (SELECT value::boolean FROM config_param_system WHERE parameter='sys_api_service');
-	v_vpn_dbuser = (SELECT value::boolean FROM config_param_system WHERE parameter='sys_vpn_permissions');
+	v_vpn_dbuser = (SELECT value::boolean FROM config_param_system WHERE parameter='admin_vpn_permissions');
 	
 	-- role permissions for schema
 	IF v_rolepermissions THEN 
@@ -138,19 +138,18 @@ BEGIN
 
 	END IF;
 
-	-- role permissions for api
-	IF v_apiservice THEN
+	-- role permissions for admin_publish_user
+	v_publishuser = (SELECT value FROM config_param_system WHERE parameter='admin_publish_user');
+	IF v_publishuser IS NOT NULL THEN
 	
-		v_apipublishuser = (SELECT value FROM config_param_system WHERE parameter='api_publish_user');
+        -- Grant generic permissions
+        v_query_text:= 'GRANT ALL ON DATABASE '||v_dbnname||' TO '||v_publishuser;
+        EXECUTE v_query_text;
 	
-		-- Grant generic permissions
-		v_query_text:= 'GRANT ALL ON DATABASE '||v_dbnname||' TO '||v_apipublishuser;
-		EXECUTE v_query_text;	
-	
-		v_query_text:= 'GRANT ALL ON SCHEMA '||v_schemaname||' TO '||v_apipublishuser;
+		v_query_text:= 'GRANT ALL ON SCHEMA '||v_schemaname||' TO '||v_publishuser;
 		EXECUTE v_query_text;
 	
-		v_query_text:= 'GRANT SELECT ON ALL TABLES IN SCHEMA '||v_schemaname||' TO '||v_apipublishuser;
+		v_query_text:= 'GRANT SELECT ON ALL TABLES IN SCHEMA '||v_schemaname||' TO '||v_publishuser;
 		EXECUTE v_query_text;	
 	
 	END IF;

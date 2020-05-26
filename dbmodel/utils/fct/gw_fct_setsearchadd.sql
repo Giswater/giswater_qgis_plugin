@@ -53,7 +53,7 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
 --      get api version
-    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
+    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
         INTO v_apiversion;
 
 --     get project type
@@ -68,18 +68,18 @@ BEGIN
 IF v_tab = 'address' THEN
 
 	-- Parameters of the street layer
-	SELECT ((value::json)->>'sys_table_id') INTO v_street_layer FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_street';
-	SELECT ((value::json)->>'sys_id_field') INTO v_street_id_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_street';
-	SELECT ((value::json)->>'sys_search_field') INTO v_street_display_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_street';
-	SELECT ((value::json)->>'sys_parent_field') INTO v_street_muni_id_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_street';
-	SELECT ((value::json)->>'sys_geom_field') INTO v_street_geom_id_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_street';
+	SELECT ((value::json)->>'sys_table_id') INTO v_street_layer FROM config_param_system WHERE parameter='basic_search_street';
+	SELECT ((value::json)->>'sys_id_field') INTO v_street_id_field FROM config_param_system WHERE parameter='basic_search_street';
+	SELECT ((value::json)->>'sys_search_field') INTO v_street_display_field FROM config_param_system WHERE parameter='basic_search_street';
+	SELECT ((value::json)->>'sys_parent_field') INTO v_street_muni_id_field FROM config_param_system WHERE parameter='basic_search_street';
+	SELECT ((value::json)->>'sys_geom_field') INTO v_street_geom_id_field FROM config_param_system WHERE parameter='basic_search_street';
 
 	-- Parameters of the postnumber layer
-	SELECT ((value::json)->>'sys_table_id') INTO v_address_layer FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_postnumber';
-	SELECT ((value::json)->>'sys_id_field') INTO v_address_id_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_postnumber';
-	SELECT ((value::json)->>'sys_search_field') INTO v_address_display_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_postnumber';
-	SELECT ((value::json)->>'sys_parent_field') INTO v_address_street_id_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_postnumber';
-	SELECT ((value::json)->>'sys_geom_field') INTO v_address_geom_id_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_postnumber';
+	SELECT ((value::json)->>'sys_table_id') INTO v_address_layer FROM config_param_system WHERE parameter='basic_search_postnumber';
+	SELECT ((value::json)->>'sys_id_field') INTO v_address_id_field FROM config_param_system WHERE parameter='basic_search_postnumber';
+	SELECT ((value::json)->>'sys_search_field') INTO v_address_display_field FROM config_param_system WHERE parameter='basic_search_postnumber';
+	SELECT ((value::json)->>'sys_parent_field') INTO v_address_street_id_field FROM config_param_system WHERE parameter='basic_search_postnumber';
+	SELECT ((value::json)->>'sys_geom_field') INTO v_address_geom_id_field FROM config_param_system WHERE parameter='basic_search_postnumber';
 
 
 	--Text to search
@@ -110,13 +110,13 @@ END IF;
 
 --    Return
     RETURN ('{"status":"Accepted"' ||
-        ', "apiVersion":'|| v_apiversion ||
+        ', "version":'|| v_apiversion ||
         ', "data":' || v_response ||    
         '}')::json;
 
 --    Exception handling
     --EXCEPTION WHEN OTHERS THEN 
-    --    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_apiversion || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+    --    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_apiversion || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;$BODY$

@@ -87,8 +87,8 @@ BEGIN
     INSERT INTO config_param_user (value, parameter, cur_user)
     VALUES (txid_current(),'cur_trans',current_user );
     
-	SELECT  value::json->>'value' as value INTO v_arc_searchnodes_value FROM config_param_system where parameter = 'arc_searchnodes';
-	SELECT  value::json->>'activated' INTO v_arc_searchnodes_active FROM config_param_system where parameter = 'arc_searchnodes';
+	SELECT  value::json->>'value' as value INTO v_arc_searchnodes_value FROM config_param_system where parameter = 'edit_arc_searchnodes';
+	SELECT  value::json->>'activated' INTO v_arc_searchnodes_active FROM config_param_system where parameter = 'edit_arc_searchnodes';
 
 		-- manage log (fprocesscat = 43)
 	DELETE FROM audit_check_data WHERE fprocesscat_id=43 AND cur_user=current_user;
@@ -105,9 +105,9 @@ BEGIN
 
 	--deactivate connec proximity control
 	IF v_feature_type='connec' THEN
-		SELECT  value::json->>'value' as value INTO v_connec_proximity_value FROM config_param_system where parameter = 'connec_proximity';
-		SELECT  value::json->>'activated' INTO v_connec_proximity_active FROM config_param_system where parameter = 'connec_proximity';
-		UPDATE config_param_system SET value ='{"activated":false,"value":0.1}' WHERE parameter='connec_proximity';
+		SELECT  value::json->>'value' as value INTO v_connec_proximity_value FROM config_param_system where parameter = 'edit_connec_proximity';
+		SELECT  value::json->>'activated' INTO v_connec_proximity_active FROM config_param_system where parameter = 'edit_connec_proximity';
+		UPDATE config_param_system SET value ='{"activated":false,"value":0.1}' WHERE parameter='edit_connec_proximity';
 	END IF;
 
 
@@ -346,10 +346,10 @@ BEGIN
 	
 	
 		-- reconnecting arcs 
-		-- Dissable config parameter arc_searchnodes
+		-- Dissable config parameter edit_arc_searchnodes
 		IF v_feature_type='node' THEN
 			UPDATE config_param_system SET value =concat('{"activated":','false',', "value":',v_arc_searchnodes_value,'}') 
-			WHERE parameter='arc_searchnodes';
+			WHERE parameter='edit_arc_searchnodes';
 
 		END IF;
 
@@ -402,11 +402,11 @@ BEGIN
 			END IF;
 		END IF;
 
-		-- enable config parameter arc_searchnodes AND connec proximity
-		UPDATE config_param_system SET value =concat('{"activated":',v_arc_searchnodes_active,', "value":',v_arc_searchnodes_value,'}') WHERE parameter='arc_searchnodes';
+		-- enable config parameter edit_arc_searchnodes AND connec proximity
+		UPDATE config_param_system SET value =concat('{"activated":',v_arc_searchnodes_active,', "value":',v_arc_searchnodes_value,'}') WHERE parameter='edit_arc_searchnodes';
 		IF v_feature_type='connec' THEN
 			UPDATE config_param_system SET value =concat('{"activated":',v_connec_proximity_active,', "value":',v_connec_proximity_value,'}') 
-			WHERE parameter='connec_proximity';
+			WHERE parameter='edit_connec_proximity';
 		END IF;
 
 -- get log (fprocesscat 43)

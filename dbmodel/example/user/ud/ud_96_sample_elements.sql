@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-UPDATE config_param_system SET value=FALSE WHERE parameter='state_topocontrol' ;
+UPDATE config_param_system SET value=FALSE WHERE parameter='edit_state_topocontrol' ;
 
 
 INSERT INTO node (node_id, code, top_elev, ymax, elev, custom_top_elev, custom_ymax, custom_elev, _sys_elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, observ, comment, dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, rotation, link, verified, the_geom, undelete, label_x, label_y, label_rotation, publish, inventory, xyz_date, uncertain, unconnected, expl_id, num_value, feature_type, tstamp) VALUES ('66', '66', 53.220, 2.230, 50.990, NULL, NULL, NULL, NULL, 'CIRC_MANHOLE', 'C_MANHOLE-CON100', 'JUNCTION', 1, 1, 2, NULL, NULL, NULL, 1, 'soil1', 'Standard Function', 'Standard Category', 'Standard Fluid', 'Standard Location', 'work1', NULL, 'builder1', '2017-12-05', NULL, 'owner1', 1, '08830', '1-9100C', 44, NULL, NULL, NULL, NULL, NULL, NULL, 'https://www.giswater.org', 'TO REVIEW', '0101000020E76400004C3789419D9119417B14AE572F755141', NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL, 1, NULL, 'NODE', NULL);
@@ -8997,7 +8997,7 @@ INSERT INTO man_wjump (node_id, length, width, sander_depth, prot_surface, acces
 
 INSERT INTO man_wwtp (node_id, pol_id, name) VALUES ('236', NULL, NULL);
 
-UPDATE config_param_system SET value=TRUE WHERE parameter='state_topocontrol' ;
+UPDATE config_param_system SET value=TRUE WHERE parameter='edit_state_topocontrol' ;
 
 
 

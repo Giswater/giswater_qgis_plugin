@@ -58,11 +58,11 @@ BEGIN
 	SELECT wsoftware, giswater INTO v_project_type, v_version FROM version order by id desc limit 1;
 
 	-- select config values
-	v_sector  := (SELECT (value::json->>'SECTOR')::boolean FROM config_param_system WHERE parameter='om_dynamicmapzones_status');
-	v_dma  := (SELECT (value::json->>'DMA')::boolean FROM config_param_system WHERE parameter='om_dynamicmapzones_status');
-	v_dqa  := (SELECT (value::json->>'DQA')::boolean FROM config_param_system WHERE parameter='om_dynamicmapzones_status');
-	v_presszone  := (SELECT (value::json->>'PRESSZONE')::boolean FROM config_param_system WHERE parameter='om_dynamicmapzones_status');
-	v_minsector  := (SELECT (value::json->>'MINSECTOR')::boolean FROM config_param_system WHERE parameter='om_dynamicmapzones_status');
+	v_sector  := (SELECT (value::json->>'SECTOR')::boolean FROM config_param_system WHERE parameter='utils_grafanalytics_status');
+	v_dma  := (SELECT (value::json->>'DMA')::boolean FROM config_param_system WHERE parameter='utils_grafanalytics_status');
+	v_dqa  := (SELECT (value::json->>'DQA')::boolean FROM config_param_system WHERE parameter='utils_grafanalytics_status');
+	v_presszone  := (SELECT (value::json->>'PRESSZONE')::boolean FROM config_param_system WHERE parameter='utils_grafanalytics_status');
+	v_minsector  := (SELECT (value::json->>'MINSECTOR')::boolean FROM config_param_system WHERE parameter='utils_grafanalytics_status');
 
 	-- init variables
 	v_count=0;

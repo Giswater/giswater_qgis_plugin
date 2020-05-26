@@ -43,7 +43,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- get system parameters
-	SELECT value INTO v_mode FROM config_param_system WHERE parameter = 'i18n_update_mode';
+	SELECT value INTO v_mode FROM config_param_system WHERE parameter = 'admin_i18n_update_mode';
 
 	-- get input parameters
 	v_table := (p_data ->> 'data')::json->> 'table';

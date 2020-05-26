@@ -559,7 +559,7 @@ BEGIN
 	IF v_arc2node_reverse THEN -- Reconnect those arcs connected to dissapeared nodarcs to the new node
 	
 		-- set nodearc variable as a max length/2+0.01 of arcs with state=0 (only are nod2arcs)
-		UPDATE config_param_system SET value = ((SELECT max(st_length(the_geom)) FROM arc WHERE state=0)/2+0.01) WHERE parameter='arc_searchnodes';
+		UPDATE config_param_system SET value = ((SELECT max(st_length(the_geom)) FROM arc WHERE state=0)/2+0.01) WHERE parameter='edit_arc_searchnodes';
 
 		-- delete old nodes
 		UPDATE arc SET node_1=null where node_1 IN (SELECT node_id FROM node WHERE state=0);
@@ -570,7 +570,7 @@ BEGIN
 		PERFORM gw_fct_repair_arc (arc_id, null, null) FROM arc;
 
 		-- restore default default values
-		UPDATE config_param_system SET value=0.1 where parameter = 'arc_searchnodes';
+		UPDATE config_param_system SET value=0.1 where parameter = 'edit_arc_searchnodes';
 
 
 	RAISE NOTICE 'step-7/7';

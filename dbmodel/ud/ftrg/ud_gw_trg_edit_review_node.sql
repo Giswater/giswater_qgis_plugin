@@ -24,8 +24,8 @@ BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 	-- getting tolerance parameters
-	v_rev_node_top_elev_tol :=(SELECT "value" FROM config_param_system WHERE "parameter"='rev_node_top_elev_tol');
-	v_rev_node_ymax_tol :=(SELECT "value" FROM config_param_system WHERE "parameter"='rev_node_ymax_tol');		
+	v_rev_node_top_elev_tol :=(SELECT value::json->'topelev' FROM config_param_system WHERE "parameter"='edit_review_node_tolerance');
+	v_rev_node_ymax_tol :=(SELECT value::json->'ymax' FROM config_param_system WHERE "parameter"='edit_review_node_tolerance');		
 
 	--getting original values
 	SELECT node_id, top_elev, ymax, node.node_type, nodecat_id, node.matcat_id, annotation, observ, expl_id, the_geom INTO rec_node 

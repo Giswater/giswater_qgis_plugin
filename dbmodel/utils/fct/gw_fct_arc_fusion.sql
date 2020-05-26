@@ -183,9 +183,9 @@ BEGIN
 
             -- temporary dissable the arc_searchnodes_control in order to use the node1 and node2 getted before
             -- to get values topocontrol arc needs to be before, but this is not possible
-            UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'activated', false) WHERE parameter = 'arc_searchnodes';
+            UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'activated', false) WHERE parameter = 'edit_arc_searchnodes';
             INSERT INTO v_edit_arc SELECT v_new_record.*;
-            UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'activated', true) WHERE parameter = 'arc_searchnodes';
+            UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'activated', true) WHERE parameter = 'edit_arc_searchnodes';
 
             UPDATE arc SET node_1=v_new_record.node_1, node_2=v_new_record.node_2 where arc_id=v_new_record.arc_id;
                     

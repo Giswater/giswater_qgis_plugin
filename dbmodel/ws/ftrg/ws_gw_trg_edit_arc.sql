@@ -40,8 +40,8 @@ BEGIN
 		v_man_table:=(SELECT man_table FROM arc_type WHERE id=v_man_table);
 	END IF;
 
-	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='proximity_buffer');
-	v_edit_enable_arc_nodes_update = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_enable_arc_nodes_update');
+	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_buffer_on_mapzone');
+	v_edit_enable_arc_nodes_update = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_arc_enable nodes_update');
 
 	-- transforming streetaxis name into id
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
@@ -317,7 +317,7 @@ BEGIN
         END IF;
 	
 		-- LINK
-	    IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_automatic_insert_link')::boolean=TRUE THEN
+	    IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_usefid_on_linkid')::boolean=TRUE THEN
 	       NEW.link=NEW.arc_id;
 	    END IF;
 		

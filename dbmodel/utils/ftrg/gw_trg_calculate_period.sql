@@ -28,7 +28,7 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||',public';
 		UPDATE ext_cat_period SET period_seconds = (EXTRACT(EPOCH FROM v_record.end_date) - EXTRACT(EPOCH FROM v_record.start_date))::integer WHERE ext_cat_period.id = NEW.id; 
 			
 	ELSE
-		NEW.period_seconds := (SELECT value FROM config_param_system WHERE  parameter = 'vdefault_rtc_period_seconds');
+		NEW.period_seconds := (SELECT value FROM config_param_system WHERE  parameter = 'admin_crm_periodseconds_vdefault');
 
 		UPDATE ext_cat_period SET period_seconds = NEW.period_seconds WHERE ext_cat_period.id = NEW.id; 
 

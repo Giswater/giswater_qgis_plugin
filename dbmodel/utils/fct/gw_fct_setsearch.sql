@@ -154,7 +154,7 @@ BEGIN
      SET search_path = "SCHEMA_NAME", public;
 
 --   Set api version
-     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
+     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
         INTO api_version;
 
 --   Get project type
@@ -169,44 +169,44 @@ BEGIN
 IF tab_arg = 'network' THEN
 
     -- Layers to search:
-    SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_arc FROM config_param_system WHERE parameter='api_search_arc';
-    SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_node FROM config_param_system WHERE parameter='api_search_node';
-    SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_connec FROM config_param_system WHERE parameter='api_search_connec';
-    SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_gully FROM config_param_system WHERE parameter='api_search_gully';
-    SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_element FROM config_param_system WHERE parameter='api_search_element';
-    SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_visit FROM config_param_system WHERE parameter='api_search_visit';
+    SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_arc FROM config_param_system WHERE parameter='basic_search_arc';
+    SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_node FROM config_param_system WHERE parameter='basic_search_node';
+    SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_connec FROM config_param_system WHERE parameter='basic_search_connec';
+    SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_gully FROM config_param_system WHERE parameter='basic_search_gully';
+    SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_element FROM config_param_system WHERE parameter='basic_search_element';
+    SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_visit FROM config_param_system WHERE parameter='basic_search_visit';
 
     -- Layer's primary key;
-    SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_arc_id FROM config_param_system WHERE parameter='api_search_arc';
-    SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_node_id FROM config_param_system WHERE parameter='api_search_node';
-    SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_connec_id FROM config_param_system WHERE parameter='api_search_connec';
-    SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_gully_id FROM config_param_system WHERE parameter='api_search_gully';
-    SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_element_id FROM config_param_system WHERE parameter='api_search_element';
-    SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_visit_id FROM config_param_system WHERE parameter='api_search_visit';
+    SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_arc_id FROM config_param_system WHERE parameter='basic_search_arc';
+    SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_node_id FROM config_param_system WHERE parameter='basic_search_node';
+    SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_connec_id FROM config_param_system WHERE parameter='basic_search_connec';
+    SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_gully_id FROM config_param_system WHERE parameter='basic_search_gully';
+    SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_element_id FROM config_param_system WHERE parameter='basic_search_element';
+    SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_visit_id FROM config_param_system WHERE parameter='basic_search_visit';
 
     -- Layer's field to search:
-    SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_arc FROM config_param_system WHERE parameter='api_search_arc';
-    SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_node FROM config_param_system WHERE parameter='api_search_node';
-    SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_connec FROM config_param_system WHERE parameter='api_search_connec';
-    SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_gully FROM config_param_system WHERE parameter='api_search_gully';
-    SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_element FROM config_param_system WHERE parameter='api_search_element';
-    SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_visit FROM config_param_system WHERE parameter='api_search_visit';
+    SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_arc FROM config_param_system WHERE parameter='basic_search_arc';
+    SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_node FROM config_param_system WHERE parameter='basic_search_node';
+    SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_connec FROM config_param_system WHERE parameter='basic_search_connec';
+    SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_gully FROM config_param_system WHERE parameter='basic_search_gully';
+    SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_element FROM config_param_system WHERE parameter='basic_search_element';
+    SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_visit FROM config_param_system WHERE parameter='basic_search_visit';
    
     -- Layer's catalog field;
-    SELECT ((value::json)->>'cat_field') INTO p_network_search_field_arc_cat FROM config_param_system WHERE parameter='api_search_arc';
-    SELECT ((value::json)->>'cat_field') INTO p_network_search_field_node_cat FROM config_param_system WHERE parameter='api_search_node';
-    SELECT ((value::json)->>'cat_field') INTO p_network_search_field_connec_cat FROM config_param_system WHERE parameter='api_search_connec';
-    SELECT ((value::json)->>'cat_field') INTO p_network_search_field_gully_cat FROM config_param_system WHERE parameter='api_search_gully';
-    SELECT ((value::json)->>'cat_field') INTO p_network_search_field_element_cat FROM config_param_system WHERE parameter='api_search_element';
-    SELECT ((value::json)->>'cat_field') INTO p_network_search_field_visit_cat FROM config_param_system WHERE parameter='api_search_visit';
+    SELECT ((value::json)->>'cat_field') INTO p_network_search_field_arc_cat FROM config_param_system WHERE parameter='basic_search_arc';
+    SELECT ((value::json)->>'cat_field') INTO p_network_search_field_node_cat FROM config_param_system WHERE parameter='basic_search_node';
+    SELECT ((value::json)->>'cat_field') INTO p_network_search_field_connec_cat FROM config_param_system WHERE parameter='basic_search_connec';
+    SELECT ((value::json)->>'cat_field') INTO p_network_search_field_gully_cat FROM config_param_system WHERE parameter='basic_search_gully';
+    SELECT ((value::json)->>'cat_field') INTO p_network_search_field_element_cat FROM config_param_system WHERE parameter='basic_search_element';
+    SELECT ((value::json)->>'cat_field') INTO p_network_search_field_visit_cat FROM config_param_system WHERE parameter='basic_search_visit';
 
     -- xxxxx:
-    SELECT ((value::json)->>'feature_type') INTO v_feature_type_arc FROM config_param_system WHERE parameter='api_search_arc';
-    SELECT ((value::json)->>'feature_type') INTO v_feature_type_node FROM config_param_system WHERE parameter='api_search_node';
-    SELECT ((value::json)->>'feature_type') INTO v_feature_type_connec FROM config_param_system WHERE parameter='api_search_connec';
-    SELECT ((value::json)->>'feature_type') INTO v_feature_type_gully FROM config_param_system WHERE parameter='api_search_gully';
-    SELECT ((value::json)->>'feature_type') INTO v_feature_type_element FROM config_param_system WHERE parameter='api_search_element';
-    SELECT ((value::json)->>'feature_type') INTO v_feature_type_visit FROM config_param_system WHERE parameter='api_search_visit';
+    SELECT ((value::json)->>'feature_type') INTO v_feature_type_arc FROM config_param_system WHERE parameter='basic_search_arc';
+    SELECT ((value::json)->>'feature_type') INTO v_feature_type_node FROM config_param_system WHERE parameter='basic_search_node';
+    SELECT ((value::json)->>'feature_type') INTO v_feature_type_connec FROM config_param_system WHERE parameter='basic_search_connec';
+    SELECT ((value::json)->>'feature_type') INTO v_feature_type_gully FROM config_param_system WHERE parameter='basic_search_gully';
+    SELECT ((value::json)->>'feature_type') INTO v_feature_type_element FROM config_param_system WHERE parameter='basic_search_element';
+    SELECT ((value::json)->>'feature_type') INTO v_feature_type_visit FROM config_param_system WHERE parameter='basic_search_visit';
     
 
     
@@ -324,17 +324,17 @@ IF tab_arg = 'network' THEN
 ELSIF tab_arg = 'address' THEN
 
     -- Parameters of the municipality layer
-    SELECT ((value::json)->>'sys_table_id') INTO v_muni_layer FROM config_param_system WHERE parameter='api_search_muni';
-    SELECT ((value::json)->>'sys_id_field') INTO v_muni_id_field FROM config_param_system WHERE parameter='api_search_muni';
-    SELECT ((value::json)->>'sys_search_field') INTO v_muni_display_field FROM config_param_system WHERE parameter='api_search_muni';
-    SELECT ((value::json)->>'sys_geom_field') INTO v_muni_geom_field FROM config_param_system WHERE parameter='api_search_muni';
+    SELECT ((value::json)->>'sys_table_id') INTO v_muni_layer FROM config_param_system WHERE parameter='basic_search_muni';
+    SELECT ((value::json)->>'sys_id_field') INTO v_muni_id_field FROM config_param_system WHERE parameter='basic_search_muni';
+    SELECT ((value::json)->>'sys_search_field') INTO v_muni_display_field FROM config_param_system WHERE parameter='basic_search_muni';
+    SELECT ((value::json)->>'sys_geom_field') INTO v_muni_geom_field FROM config_param_system WHERE parameter='basic_search_muni';
 
     -- Parameters of the street layer
-    SELECT ((value::json)->>'sys_table_id') INTO v_street_layer FROM config_param_system WHERE parameter='api_search_street';
-    SELECT ((value::json)->>'sys_id_field') INTO v_street_id_field FROM config_param_system WHERE parameter='api_search_street';
-    SELECT ((value::json)->>'sys_search_field') INTO v_street_display_field FROM config_param_system WHERE parameter='api_search_street';
-    SELECT ((value::json)->>'sys_parent_field') INTO v_street_muni_id_field FROM config_param_system WHERE parameter='api_search_street';
-    SELECT ((value::json)->>'sys_geom_field') INTO v_street_geom_field FROM config_param_system WHERE parameter='api_search_street';
+    SELECT ((value::json)->>'sys_table_id') INTO v_street_layer FROM config_param_system WHERE parameter='basic_search_street';
+    SELECT ((value::json)->>'sys_id_field') INTO v_street_id_field FROM config_param_system WHERE parameter='basic_search_street';
+    SELECT ((value::json)->>'sys_search_field') INTO v_street_display_field FROM config_param_system WHERE parameter='basic_search_street';
+    SELECT ((value::json)->>'sys_parent_field') INTO v_street_muni_id_field FROM config_param_system WHERE parameter='basic_search_street';
+    SELECT ((value::json)->>'sys_geom_field') INTO v_street_geom_field FROM config_param_system WHERE parameter='basic_search_street';
 
     --Text to search
     combo1 := ((p_data->>'data')::json)->>'add_muni';
@@ -526,13 +526,13 @@ ELSIF tab_arg = 'address' THEN
     response_json := COALESCE(response_json, '{}');
 
 --    Return
-    RETURN ('{"status":"Accepted"' || ', "apiVersion":'|| api_version ||
+    RETURN ('{"status":"Accepted"' || ', "version":'|| api_version ||
         ', "data":' || response_json ||      
         '}')::json;
 
 --    Exception handling
     --EXCEPTION WHEN OTHERS THEN 
-    --    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+    --    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| api_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;$BODY$

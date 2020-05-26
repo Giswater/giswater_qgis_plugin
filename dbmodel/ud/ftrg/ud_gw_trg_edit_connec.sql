@@ -36,7 +36,7 @@ BEGIN
 		v_customfeature:=NULL;
 	END IF;
 
-	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='proximity_buffer');
+	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_buffer_on_mapzone');
 	IF v_promixity_buffer IS NULL THEN v_promixity_buffer=0.5; END IF;
 
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
@@ -273,18 +273,18 @@ BEGIN
 		NEW.uncertain := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_uncertain_sysvdefault');		
 		
 	    -- LINK
-	    IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_automatic_insert_link')::boolean= TRUE THEN
+	    IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_usefid_on_linkid')::boolean= TRUE THEN
 	       NEW.link=NEW.connec_id;
 	    END IF;
 		
 	    -- Customer code  
-		IF NEW.customer_code IS NULL AND (SELECT (value::json->>'status')::boolean FROM config_param_system WHERE parameter = 'customer_code_autofill') IS TRUE
-		AND (SELECT (value::json->>'field')::text FROM config_param_system WHERE parameter = 'customer_code_autofill')='code'  THEN
+		IF NEW.customer_code IS NULL AND (SELECT (value::json->>'status')::boolean FROM config_param_system WHERE parameter = 'edit_connec_autofill_ccode') IS TRUE
+		AND (SELECT (value::json->>'field')::text FROM config_param_system WHERE parameter = 'edit_connec_autofill_ccode')='code'  THEN
 		
 			NEW.customer_code = NEW.code;
 			
-		ELSIF NEW.customer_code IS NULL AND (SELECT (value::json->>'status')::boolean FROM config_param_system WHERE parameter = 'customer_code_autofill') IS TRUE 
-		AND (SELECT (value::json->>'field')::text FROM config_param_system WHERE parameter = 'customer_code_autofill')='connec_id'  THEN
+		ELSIF NEW.customer_code IS NULL AND (SELECT (value::json->>'status')::boolean FROM config_param_system WHERE parameter = 'edit_connec_autofill_ccode') IS TRUE
+		AND (SELECT (value::json->>'field')::text FROM config_param_system WHERE parameter = 'edit_connec_autofill_ccode')='connec_id'  THEN
 
 			NEW.customer_code = NEW.connec_id;
 
@@ -329,7 +329,7 @@ BEGIN
 		END IF;
 
 		--elevation from raster
-		IF (SELECT upper(value) FROM config_param_system WHERE parameter='sys_raster_dem') = 'TRUE' AND (NEW.top_elev IS NULL) AND 
+		IF (SELECT upper(value) FROM config_param_system WHERE parameter='admin_raster_dem') = 'TRUE' AND (NEW.top_elev IS NULL) AND
 		(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_upsert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
 			NEW.top_elev = (SELECT ST_Value(rast,1,NEW.the_geom,false) FROM v_ext_raster_dem WHERE id =
 				(SELECT id FROM v_ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
@@ -406,7 +406,7 @@ BEGIN
 			UPDATE connec SET the_geom=NEW.the_geom WHERE connec_id = OLD.connec_id;	
 
 			--update elevation from raster
-			IF (SELECT upper(value) FROM config_param_system WHERE parameter='sys_raster_dem') = 'TRUE' AND (NEW.top_elev = OLD.top_elev) AND 
+			IF (SELECT upper(value) FROM config_param_system WHERE parameter='admin_raster_dem') = 'TRUE' AND (NEW.top_elev = OLD.top_elev) AND
 			(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_upsert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
 				NEW.top_elev = (SELECT ST_Value(rast,1,NEW.the_geom,false) FROM v_ext_raster_dem WHERE id =
 							(SELECT id FROM v_ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));

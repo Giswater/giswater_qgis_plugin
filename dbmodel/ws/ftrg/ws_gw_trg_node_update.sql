@@ -33,9 +33,9 @@ BEGIN
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 	-- Get parameters
-	SELECT ((value::json)->>'activated') INTO v_node_proximity_control FROM config_param_system WHERE parameter='node_proximity';
-	SELECT ((value::json)->>'value') INTO v_node_proximity FROM config_param_system WHERE parameter='node_proximity';
-   	SELECT value::boolean INTO v_dsbl_error FROM config_param_system WHERE parameter='edit_topocontrol_dsbl_error' ;
+	SELECT ((value::json)->>'activated') INTO v_node_proximity_control FROM config_param_system WHERE parameter='edit_node_proximity';
+	SELECT ((value::json)->>'value') INTO v_node_proximity FROM config_param_system WHERE parameter='edit_node_proximity';
+   	SELECT value::boolean INTO v_dsbl_error FROM config_param_system WHERE parameter='edit_topocontrol_disable_error' ;
 
 
     -- Lookig for state=0
@@ -98,8 +98,8 @@ BEGIN
 							END IF;
 						
 							-- Insert new records into arc table
-							-- downgrade temporary the state_topocontrol to prevent conflicts	
-							UPDATE config_param_system SET value='FALSE' where parameter='state_topocontrol';
+							-- downgrade temporary the edit_state_topocontrol to prevent conflicts
+							UPDATE config_param_system SET value='FALSE' where parameter='edit_state_topocontrol';
 														
 							INSERT INTO v_edit_arc SELECT v_arcrecord.*;
 
@@ -111,8 +111,8 @@ BEGIN
 							value_param
 							FROM man_addfields_value WHERE feature_id=v_arc.arc_id;
 																				
-							-- restore the state_topocontrol variable
-							UPDATE config_param_system SET value='TRUE' where parameter='state_topocontrol';
+							-- restore the edit_state_topocontrol variable
+							UPDATE config_param_system SET value='TRUE' where parameter='edit_state_topocontrol';
 	
 							-- Update doability for the new arc (false)
 							UPDATE plan_psector_x_arc SET doable=FALSE where arc_id=v_arcrecord.arc_id;

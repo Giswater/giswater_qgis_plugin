@@ -192,7 +192,7 @@ BEGIN
 		
 		-- inserting on config_param_system table
 		INSERT INTO config_param_system (parameter, value, datatype, context, descript, project_type, label, isdeprecated) 
-		VALUES ('schema_manager', v_schema_info,'json','system', 'Basic information about schema','utils', 'Schema manager:', false);
+		VALUES ('admin_schema_info', v_schema_info,'json','system', 'Basic information about schema','utils', 'Schema manager:', false);
 
 		-- fk from utils schema
 		PERFORM gw_fct_admin_schema_utils_fk();  -- this is the posiition to use it because of we need values on version table to workwith
@@ -245,6 +245,8 @@ BEGIN
 		END IF;
 		
 	END IF;
+	
+	UPDATE config_param_system SET value = v_gwversion WHERE parameter = 'admin_version';
 	
 	-- update permissions	
 	PERFORM gw_fct_admin_role_permissions();

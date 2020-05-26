@@ -49,7 +49,7 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
 --  get api version
-    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
+    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
         INTO api_version;
 
 --  get system currency
@@ -130,7 +130,7 @@ BEGIN
 
 
 --    Return
-    RETURN ('{"status":"Accepted", "apiVersion":'||api_version||
+    RETURN ('{"status":"Accepted", "version":'||api_version||
              ',"body":{"message":{}'||
 			',"form":'||(p_data ->>'form')||
 			',"feature":'||(p_data ->>'feature')||
@@ -140,7 +140,7 @@ BEGIN
       
 --    Exception handling
 --    EXCEPTION WHEN OTHERS THEN 
-        --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+        --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| api_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;

@@ -48,7 +48,7 @@ BEGIN
 	v_schemaname = 'SCHEMA_NAME';
 	
 	--  get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
+	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
 		INTO v_apiversion;
        
 	-- Get input parameters:
@@ -90,12 +90,12 @@ BEGIN
 	END IF;
 
 	-- Return
-    RETURN ('{"status":"Accepted", "message":'||v_message||', "apiVersion":'|| v_apiversion ||
+    RETURN ('{"status":"Accepted", "message":'||v_message||', "version":'|| v_apiversion ||
 	    ', "body": {"feature":{"tableName":"'||v_tablename||'", "id":"'||v_id||'"}}}')::json;    
 
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN 
-    RETURN ('{"status":"Failed","message":' || (to_json(SQLERRM)) || ', "apiVersion":'|| v_apiversion ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;    
+    RETURN ('{"status":"Failed","message":' || (to_json(SQLERRM)) || ', "version":'|| v_apiversion ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

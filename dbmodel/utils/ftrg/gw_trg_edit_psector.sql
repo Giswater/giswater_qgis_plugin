@@ -120,7 +120,7 @@ BEGIN
 			SELECT value::integer INTO v_plan_statetype_planned FROM config_param_system WHERE parameter = 'plan_statetype_planned';
 
 			--temporary remove topology control
-			UPDATE config_param_system set value = 'false' WHERE parameter='state_topocontrol';
+			UPDATE config_param_system set value = 'false' WHERE parameter='edit_state_topocontrol';
 
 			--loop over network feature types in order to get the data from each plan_psector_x_* table 
 			FOR rec_type IN (SELECT * FROM sys_feature_type WHERE net_category = 1 ORDER BY id asc) LOOP
@@ -170,7 +170,7 @@ BEGIN
 					
 				END LOOP;
 				--reestablish topology control
-				UPDATE config_param_system set value = 'true' WHERE parameter='state_topocontrol';	
+				UPDATE config_param_system set value = 'true' WHERE parameter='edit_state_topocontrol';
 				--show information about performed state update
 
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 

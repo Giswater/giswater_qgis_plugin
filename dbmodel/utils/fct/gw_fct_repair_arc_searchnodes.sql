@@ -24,7 +24,7 @@ BEGIN
 	DELETE FROM audit_log_data WHERE fprocesscat_id=4 AND cur_user=current_user;
     
 	-- Set config parameter
-	UPDATE config_param_system SET value=TRUE WHERE parameter='edit_topocontrol_dsbl_error' ;
+	UPDATE config_param_system SET value=TRUE WHERE parameter='edit_topocontrol_disable_error' ;
 	
 	-- init counter
 	SELECT COUNT(*) into v_count FROM v_edit_arc ;  
@@ -42,7 +42,7 @@ BEGIN
 	END LOOP;
 
 	-- Set config parameter
-	UPDATE config_param_system SET value=FALSE WHERE parameter='edit_topocontrol_dsbl_error' ;
+	UPDATE config_param_system SET value=FALSE WHERE parameter='edit_topocontrol_disable_error' ;
 	
 RETURN;
     

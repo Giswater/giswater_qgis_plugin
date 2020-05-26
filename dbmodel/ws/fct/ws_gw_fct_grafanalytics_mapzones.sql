@@ -169,7 +169,7 @@ BEGIN
 	v_checkdata = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'checkData');
 
 	-- select system variables
-	v_dynsymbolstatus = (SELECT value FROM config_param_system WHERE parameter = 'mapzones_dynamic_symbology');
+	v_dynsymbolstatus = (SELECT value FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
 
 	-- select config values
 	SELECT giswater, epsg INTO v_version, v_srid FROM version order by 1 desc limit 1;
@@ -274,10 +274,10 @@ BEGIN
 		PERFORM gw_fct_grafanalytics_check_data(v_input);
 
 		-- (1) check if mapzone process is enabled in order to continue or not
-		IF (SELECT (value::json->>quote_literal(v_class))::boolean FROM config_param_system WHERE parameter='om_dynamicmapzones_status') IS FALSE THEN
+		IF (SELECT (value::json->>quote_literal(v_class))::boolean FROM config_param_system WHERE parameter='utils_grafanalytics_status') IS FALSE THEN
 		
 			INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-			VALUES (v_fprocesscat_id, 3, concat('ERROR: Dynamic analysis for ',v_class,'''s is not configured on database. Please update system variable ''om_dynamicmapzones_status''
+			VALUES (v_fprocesscat_id, 3, concat('ERROR: Dynamic analysis for ',v_class,'''s is not configured on database. Please update system variable ''utils_grafanalytics_status''
 			 to enable it '));
 		
 		-- (2) check data quality in order to continue or not

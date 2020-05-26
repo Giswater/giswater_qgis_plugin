@@ -73,7 +73,7 @@ BEGIN
     -- Search path
     SET search_path = "SCHEMA_NAME", public;
 
-    SELECT ((value::json)->>'value') INTO v_node_proximity FROM config_param_system WHERE parameter='node_proximity';
+    SELECT ((value::json)->>'value') INTO v_node_proximity FROM config_param_system WHERE parameter='edit_node_proximity';
     IF v_node_proximity IS NULL THEN v_node_proximity=0.01; END IF;
 	SELECT value::boolean INTO v_hide_form FROM config_param_user where parameter='qgis_form_log_hidden' AND cur_user=current_user;
 

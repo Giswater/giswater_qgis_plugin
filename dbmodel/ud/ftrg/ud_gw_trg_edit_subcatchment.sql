@@ -36,7 +36,7 @@ BEGIN
 	
 		-- Subc ID
         IF (NEW.subc_id IS NULL) THEN
-            NEW.subc_id := concat((SELECT value FROM config_param_system WHERE parameter='inp_subc_seq_id_prefix'),(SELECT nextval('SCHEMA_NAME.inp_subcatchment_subc_id_seq'::regclass)));
+            NEW.subc_id := concat((SELECT value FROM config_param_system WHERE parameter='epa_subcatchment_concat_prefix_id'),(SELECT nextval('SCHEMA_NAME.inp_subcatchment_subc_id_seq'::regclass)));
         END IF;
 
        		

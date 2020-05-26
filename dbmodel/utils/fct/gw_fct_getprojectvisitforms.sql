@@ -74,7 +74,7 @@ BEGIN
 	v_schemaname := 'SCHEMA_NAME';
 
 	--  get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
+	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
 		INTO v_apiversion;
 
 /*
@@ -214,7 +214,7 @@ Generate one form for layer and one form for visitclass=incident
 
   */
 	-- Return
-	RETURN ('{"status":"Accepted", "message":'||v_message||', "apiVersion":'||v_apiversion||
+	RETURN ('{"status":"Accepted", "message":'||v_message||', "version":'||v_apiversion||
              ',"body":{"feature":{"featureType":"visit", "tableName":"'||v_tablename||'", "idName":"visit_id", "id":'||v_id||'}'||
 		    ', "form":'||v_forminfo||
 		    ', "data":{"layerManager":'||v_layermanager||'}}'||

@@ -67,7 +67,7 @@ BEGIN
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('------------------------------'));
 
 	--  get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
+	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
         INTO v_api_version;
     --get information about feature
 	v_feature_type = lower(((p_data ->>'feature')::json->>'type'))::text;
@@ -203,7 +203,7 @@ v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 raise notice 'v_result,%',v_result;
 raise notice 'v_result_info,%',v_result_info;
 
-RETURN ('{"status":"Accepted", "apiVersion":'||v_api_version||
+RETURN ('{"status":"Accepted", "version":'||v_api_version||
             ',"message":{"priority":1, "text":""},"body":{"data": {"info":'||v_result_info||'}}}')::json;
 
 

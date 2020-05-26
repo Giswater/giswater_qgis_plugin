@@ -20,8 +20,8 @@ BEGIN
 
     -- Get gully tolerance from config table
 
-    SELECT ((value::json)->>'value') INTO v_gully_proximity FROM config_param_system WHERE parameter='gully_proximity';
-    SELECT ((value::json)->>'activated') INTO v_gully_proximity_control FROM config_param_system WHERE parameter='gully_proximity';
+    SELECT ((value::json)->>'value') INTO v_gully_proximity FROM config_param_system WHERE parameter='edit_gully_proximity';
+    SELECT ((value::json)->>'activated') INTO v_gully_proximity_control FROM config_param_system WHERE parameter='edit_gully_proximity';
 
     IF TG_OP = 'INSERT' THEN
         -- Existing gullys  

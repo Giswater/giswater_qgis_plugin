@@ -77,7 +77,7 @@ BEGIN
 	-- Get paramters
 	EXECUTE 'SELECT epsg FROM version' INTO v_epsg;
 	--  get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
+	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
 		INTO v_apiversion;
 		
 	-- fix diferent ways to say null on client
@@ -202,7 +202,7 @@ BEGIN
 	RAISE NOTICE '--- Returning from (gw_fct_setinsert) with this message :: % ---', v_message;
 
 	-- Return
-    RETURN ('{"status":"Accepted", "message":'|| v_message ||', "apiVersion":'|| v_apiversion ||
+    RETURN ('{"status":"Accepted", "message":'|| v_message ||', "version":'|| v_apiversion ||
 	    ', "body": {"feature":{"tableName":"'||v_tablename||'", "id":"'||v_newid||'"}}}')::json;    
 
 	-- Exception handling

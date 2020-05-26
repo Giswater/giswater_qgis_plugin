@@ -38,7 +38,7 @@ BEGIN
 	SELECT wsoftware, giswater  INTO v_projecttype, v_version FROM version order by 1 desc limit 1;
     
 	-- Set config parameter
-	UPDATE config_param_system SET value=TRUE WHERE parameter='edit_topocontrol_dsbl_error' ;
+	UPDATE config_param_system SET value=TRUE WHERE parameter='edit_topocontrol_disable_error' ;
 	
 	-- init counter
 	SELECT COUNT(*) into v_count FROM v_edit_arc ;  
@@ -56,7 +56,7 @@ BEGIN
 	END LOOP;
 
 	-- Set config parameter
-	UPDATE config_param_system SET value=FALSE WHERE parameter='edit_topocontrol_dsbl_error' ;
+	UPDATE config_param_system SET value=FALSE WHERE parameter='edit_topocontrol_disable_error' ;
 	
 	-- get results
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result FROM (SELECT * FROM audit_check_data WHERE cur_user="current_user"() AND ( fprocesscat_id=3 OR fprocesscat_id=4)) row; 
@@ -114,7 +114,7 @@ BEGIN
 	  SET search_path='SCHEMA_NAME';
 
       -- Set config parameter
-      UPDATE config_param_system SET value = TRUE WHERE parameter = 'edit_topocontrol_dsbl_error' ;
+      UPDATE config_param_system SET value = TRUE WHERE parameter = 'edit_topocontrol_disable_error' ;
 
       -- execute
       UPDATE arc SET the_geom = the_geom WHERE arc_id = p_arc_id AND state=1;
@@ -130,7 +130,7 @@ BEGIN
              
 
       -- Set config parameter
-      UPDATE config_param_system SET value = FALSE WHERE parameter = 'edit_topocontrol_dsbl_error' ;
+      UPDATE config_param_system SET value = FALSE WHERE parameter = 'edit_topocontrol_disable_error' ;
 
     
 RETURN p_arc_id;

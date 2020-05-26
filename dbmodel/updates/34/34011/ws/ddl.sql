@@ -7,11 +7,11 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+-- 2020/05/25
+RENAME TABLE cat_presszone TO presszone;
 
--- 2020/02/06
-DROP VIEW v_minsector;
-ALTER TABLE minsector ALTER COLUMN the_geom TYPE geometry (multipolygon, SRID_VALUE) USING ST_Multi(the_geom);
-
-ALTER TABLE arc RENAME presszonecat_id TO presszone_id;
-ALTER TABLE node RENAME presszonecat_id TO presszone_id;
-ALTER TABLE connec RENAME presszonecat_id TO presspzone_id;
+ALTER TABLE sector ADD COLUMN style json;
+ALTER TABLE dma ADD COLUMN style json;
+ALTER TABLE presszone ADD COLUMN head numeric(12,2);
+ALTER TABLE presszone ADD COLUMN style json;
+ALTER TABLE dqa ADD COLUMN style json;
