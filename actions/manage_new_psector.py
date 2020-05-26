@@ -163,7 +163,8 @@ class ManageNewPsector(ParentManage):
         # tiene un valor distinto de 0, es que el sector ya existe y queremos hacer un update.
         if isinstance(psector_id, bool):
             psector_id = 0
-        self.delete_psector_selector(self.plan_om + '_psector_selector')
+        self.delete_psector_selector('selector_plan_psector')
+
         # tab 'Document'
         self.doc_id = self.dlg_plan_psector.findChild(QLineEdit, "doc_id")
         self.tbl_document = self.dlg_plan_psector.findChild(QTableView, "tbl_document")
@@ -811,14 +812,14 @@ class ManageNewPsector(ParentManage):
 
     def delete_psector_selector(self, tablename):
 
-        sql = (f"DELETE FROM selector_plan_psector"
+        sql = (f"DELETE FROM {tablename}"
                f" WHERE cur_user = current_user;")
         self.controller.execute_sql(sql)
 
 
     def insert_psector_selector(self, tablename, field, value):
 
-        sql = (f"INSERT INTO selector_plan_psector ({field}, cur_user) "
+        sql = (f"INSERT INTO {tablename} ({field}, cur_user) "
                f"VALUES ('{value}', current_user);")
         self.controller.execute_sql(sql)
 
@@ -1062,8 +1063,8 @@ class ManageNewPsector(ParentManage):
             self.controller.execute_sql(sql, log_sql=True)
             
         self.dlg_plan_psector.tabWidget.setTabEnabled(1, True)
-        self.delete_psector_selector(self.plan_om+'_psector_selector')
-        self.insert_psector_selector(self.plan_om+'_psector_selector', 'psector_id',
+        self.delete_psector_selector('selector_plan_psector')
+        self.insert_psector_selector('selector_plan_psector', 'psector_id',
             utils_giswater.getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id))
 
         if close_dlg:
