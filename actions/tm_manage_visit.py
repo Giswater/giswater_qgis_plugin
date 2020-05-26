@@ -483,7 +483,7 @@ class TmManageVisit(TmParentManage, QObject):
             utils_giswater.set_item_data(self.dlg_add_visit.visitcat_id, self.visitcat_ids, 1)
             # now get default value to be show in visitcat_id
             sql = ("SELECT value FROM config_param_user"
-                   " WHERE parameter = 'visitcat_vdefault' AND cur_user = current_user")
+                   " WHERE parameter = 'om_visit_cat_vdefault' AND cur_user = current_user")
             row = self.controller.get_row(sql, commit=self.autocommit)
             if row:
                 # if int then look for default row ans set it

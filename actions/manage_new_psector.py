@@ -1057,15 +1057,15 @@ class ManageNewPsector(ParentManage):
             new_psector_id = self.controller.execute_returning(sql, search_audit=False, log_sql=True)
             utils_giswater.setText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id, str(new_psector_id[0]))
             if new_psector_id and self.plan_om == 'plan':
-                row = self.controller.get_config('psector_vdefault')
+                row = self.controller.get_config('plan_psector_vdefault')
                 if row:
                     sql = (f"UPDATE config_param_user "
                            f" SET value = $${new_psector_id[0]}$$ "
-                           f" WHERE parameter = 'psector_vdefault'"
+                           f" WHERE parameter = 'plan_psector_vdefault'"
                            f" AND cur_user=current_user; ")
                 else:
                     sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) "
-                           f" VALUES ('psector_vdefault', '{new_psector_id[0]}', current_user);")
+                           f" VALUES ('plan_psector_vdefault', '{new_psector_id[0]}', current_user);")
                 self.controller.execute_sql(sql, log_sql=True)
         else:
             self.controller.execute_sql(sql, log_sql=True)

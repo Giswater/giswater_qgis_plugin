@@ -262,7 +262,7 @@ class ApiDimensioning(ApiParent):
     def create_map_tips(self):
         """ Create MapTips on the map """
 
-        row = self.controller.get_config('dim_tooltip')
+        row = self.controller.get_config('utils_dim_tooltip')
         if not row or row[0].lower() != 'true':
             return
 

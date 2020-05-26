@@ -3497,6 +3497,6 @@ class UpdateSQL(ApiParent):
             'templates' + os.sep + 'qgiscomposer' + os.sep + 'en'
         sql = (f"UPDATE {self.schema_name}.config_param_user "
                f"SET value = '{composers_path_vdef}' "
-               f"WHERE parameter = 'qgis_composers_path' AND cur_user = current_user")
+               f"WHERE parameter = 'qgis_composers_folderpath' AND cur_user = current_user")
         self.controller.execute_sql(sql)
 

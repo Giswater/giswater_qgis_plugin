@@ -457,7 +457,7 @@
    <Layer provider="postgres" name="Soil catalog" source="dbname='giswater3' host=localhost port=5432 sslmode=disable key='id' checkPrimaryKeyUnicity='1' table=&quot;ws_sample32&quot;.&quot;cat_soil&quot; sql=">cat_soil20151105202206837</Layer>
    <Layer provider="postgres" name="Pavement catalog" source="dbname='giswater3' host=localhost port=5432 sslmode=disable key='id' checkPrimaryKeyUnicity='1' table=&quot;ws_sample32&quot;.&quot;cat_pavement&quot; sql=">cat_pavement20170111155456255</Layer>
    <Layer provider="postgres" name="Work catalog" source="dbname='giswater3' host=localhost port=5432 sslmode=disable key='id' checkPrimaryKeyUnicity='1' table=&quot;ws_sample32&quot;.&quot;cat_work&quot; sql=">cat_work20160216122620842</Layer>
-   <Layer provider="postgres" name="Pressure zone catalog" source="dbname='giswater3' host=localhost port=5432 sslmode=disable key='id' checkPrimaryKeyUnicity='1' table=&quot;ws_sample32&quot;.&quot;cat_presszone&quot; sql=">cat_presszone20170823160927260</Layer>
+   <Layer provider="postgres" name="Pressure zone catalog" source="dbname='giswater3' host=localhost port=5432 sslmode=disable key='id' checkPrimaryKeyUnicity='1' table=&quot;ws_sample32&quot;.&quot;presszone&quot; sql=">cat_presszone20170823160927260</Layer>
    <Layer provider="postgres" name="Builder catalog" source="dbname='giswater3' host=localhost port=5432 sslmode=disable key='id' checkPrimaryKeyUnicity='1' table=&quot;ws_sample32&quot;.&quot;cat_builder&quot; sql=">cat_builder20160216122620733</Layer>
    <Layer provider="postgres" name="Brand model catalog" source="dbname='giswater3' host=localhost port=5432 sslmode=disable key='id' checkPrimaryKeyUnicity='1' table=&quot;ws_sample32&quot;.&quot;cat_brand_model&quot; sql=">cat_brand_model20180131084332427</Layer>
    <Layer provider="postgres" name="Brand catalog" source="dbname='giswater3' host=localhost port=5432 sslmode=disable key='id' checkPrimaryKeyUnicity='1' table=&quot;ws_sample32&quot;.&quot;cat_brand&quot; sql=">cat_brand20180131084235586</Layer>
@@ -1497,7 +1497,7 @@ def my_form_open(dialog, layer, feature):
      <layerGeometryType>4</layerGeometryType>
     </qgis>
    </LayerStyle>
-   <LayerStyle provider="postgres" name="Pressure zone catalog" source="dbname='giswater3' host=localhost port=5432 sslmode=disable key='id' checkPrimaryKeyUnicity='1' table=&quot;ws_sample32&quot;.&quot;cat_presszone&quot; sql=" layerid="cat_presszone20170823160927260">
+   <LayerStyle provider="postgres" name="Pressure zone catalog" source="dbname='giswater3' host=localhost port=5432 sslmode=disable key='id' checkPrimaryKeyUnicity='1' table=&quot;ws_sample32&quot;.&quot;presszone&quot; sql=" layerid="cat_presszone20170823160927260">
     <qgis maximumScale="1e+08" version="2.18.14" minimumScale="0" readOnly="0" hasScaleBasedVisibilityFlag="0">
      <edittypes>
       <edittype widgetv2type="TextEdit" name="id">

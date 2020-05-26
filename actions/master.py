@@ -85,7 +85,7 @@ class Master(ParentAction):
         psector_id = qtbl_psm.model().record(row).value("psector_id")
         aux_widget = QLineEdit()
         aux_widget.setText(str(psector_id))
-        self.upsert_config_param_user(dialog, aux_widget, "psector_vdefault")
+        self.upsert_config_param_user(dialog, aux_widget, "plan_psector_vdefault")
 
         message = "Values has been updated"
         self.controller.show_info(message)
@@ -111,16 +111,16 @@ class Master(ParentAction):
                         exist_param = True
                 if exist_param:
                     sql = f"UPDATE {tablename} SET value = "
-                    if widget.objectName() != 'state_vdefault':
+                    if widget.objectName() != 'edit_state_vdefault':
                         sql += (f"'{utils_giswater.getWidgetText(dialog, widget)}'"
                                 f" WHERE cur_user = current_user AND parameter = '{parameter}'")
                     else:
                         sql += (f"(SELECT id FROM value_state"
                                 f" WHERE name = '{utils_giswater.getWidgetText(dialog, widget)}')"
-                                f" WHERE cur_user = current_user AND parameter = 'state_vdefault'")
+                                f" WHERE cur_user = current_user AND parameter = 'edit_state_vdefault'")
                 else:
                     sql = f'INSERT INTO {tablename} (parameter, value, cur_user)'
-                    if widget.objectName() != 'state_vdefault':
+                    if widget.objectName() != 'edit_state_vdefault':
                         sql += f" VALUES ('{parameter}', '{utils_giswater.getWidgetText(dialog, widget)}', current_user)"
                     else:
                         sql += (f" VALUES ('{parameter}',"
@@ -197,10 +197,10 @@ class Master(ParentAction):
                    f" WHERE {column_id} IN ({list_id})")
             self.controller.execute_sql(sql)
             widget.model().select()
-            row = self.controller.get_config('psector_vdefault', sql_added=f" AND value IN ({list_id})")
+            row = self.controller.get_config('plan_psector_vdefault', sql_added=f" AND value IN ({list_id})")
             if row is not None:
                 sql = (f"DELETE FROM config_param_user "
-                       f" WHERE parameter = 'psector_vdefault' AND cur_user = current_user"
+                       f" WHERE parameter = 'plan_psector_vdefault' AND cur_user = current_user"
                        f" AND value = '{row[0]}'")
                 self.controller.execute_sql(sql)
                 utils_giswater.setWidgetText(dialog, 'lbl_vdefault_psector', '')

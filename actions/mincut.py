@@ -2403,7 +2403,7 @@ class MincutParent(ParentAction):
         """ Open Composer """
         # Check if path exist
         template_folder = ""
-        row = self.controller.get_config('qgis_composers_path')
+        row = self.controller.get_config('qgis_composers_folderpath')
         if row:
             template_folder = row[0]
 
@@ -2450,7 +2450,7 @@ class MincutParent(ParentAction):
 
         # Check if template file exists
         template_path = ""
-        row = self.controller.get_config('qgis_composers_path')
+        row = self.controller.get_config('qgis_composers_folderpath')
         if row:
             template_path = row[0]+ f'{os.sep}{self.template}.qpt'
 

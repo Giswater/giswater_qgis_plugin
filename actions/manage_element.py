@@ -156,31 +156,31 @@ class ManageElement(ParentManage):
 
         if self.new_element_id:
             # Set default values
-            elementtype_vdef = self.controller.get_config('elementcat_vdefault')[0]
+            elementtype_vdef = self.controller.get_config('edit_elementcat_vdefault')[0]
             utils_giswater.set_combo_itemData(self.dlg_add_element.element_type, elementtype_vdef, 0)
 
-            elementcat_vdef = self.controller.get_config('elementcat_vdefault')[0]
+            elementcat_vdef = self.controller.get_config('edit_elementcat_vdefault')[0]
             utils_giswater.set_combo_itemData(self.dlg_add_element.elementcat_id, elementcat_vdef, 0)
 
-            state_vdef = self.controller.get_config('state_vdefault')[0]
+            state_vdef = self.controller.get_config('edit_state_vdefault')[0]
             utils_giswater.set_combo_itemData(self.dlg_add_element.state, state_vdef, 0)
 
             statetype_vdef = self.controller.get_config('statetype_1_vdefault')[0]
             utils_giswater.set_combo_itemData(self.dlg_add_element.state_type, statetype_vdef, 0)
 
-            owner_vdef = self.controller.get_config('ownercat_vdefault')[0]
+            owner_vdef = self.controller.get_config('edit_ownercat_vdefault')[0]
             utils_giswater.set_combo_itemData(self.dlg_add_element.ownercat_id, owner_vdef, 0)
 
-            builtdate_vdef = self.controller.get_config('builtdate_vdefault')[0]
+            builtdate_vdef = self.controller.get_config('edit_builtdate_vdefault')[0]
             utils_giswater.setWidgetText(self.dlg_add_element, self.dlg_add_element.builtdate, builtdate_vdef)
 
-            workcat_vdef = self.controller.get_config('workcat_vdefault')[0]
+            workcat_vdef = self.controller.get_config('edit_workcat_vdefault')[0]
             utils_giswater.set_combo_itemData(self.dlg_add_element.workcat_id, workcat_vdef, 0)
 
-            workcatend_vdef = self.controller.get_config('workcat_id_end_vdefault')[0]
+            workcatend_vdef = self.controller.get_config('edit_workcat_end_vdefault')[0]
             utils_giswater.set_combo_itemData(self.dlg_add_element.workcat_id_end, workcatend_vdef, 0)
 
-            verified_vdef = self.controller.get_config('verified_vdefault')[0]
+            verified_vdef = self.controller.get_config('edit_verified_vdefault')[0]
             utils_giswater.set_combo_itemData(self.dlg_add_element.verified, verified_vdef, 0)
 
 

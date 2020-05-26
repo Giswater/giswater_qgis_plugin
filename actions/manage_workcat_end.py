@@ -120,7 +120,7 @@ class ManageWorkcatEnd(ParentManage):
 
         if row:
             utils_giswater.set_combo_itemData(self.dlg_work_end.cmb_statetype_end, row[0], 0)
-        row = self.controller.get_config('enddate_vdefault')
+        row = self.controller.get_config('edit_enddate_vdefault')
 
         if row:
             enddate = self.manage_dates(row[0]).date()
@@ -133,7 +133,7 @@ class ManageWorkcatEnd(ParentManage):
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows, allow_nulls=False)
         utils_giswater.set_autocompleter(self.dlg_work_end.workcat_id_end)
-        row = self.controller.get_config('workcat_id_end_vdefault')
+        row = self.controller.get_config('edit_workcat_end_vdefault')
         if row:
             utils_giswater.setWidgetText(self.dlg_work_end, self.dlg_work_end.workcat_id_end, row[0])
 

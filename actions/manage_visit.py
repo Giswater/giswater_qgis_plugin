@@ -826,7 +826,7 @@ class ManageVisit(ParentManage, QObject):
         if self.visitcat_ids:
             utils_giswater.set_item_data(self.dlg_add_visit.visitcat_id, self.visitcat_ids, 1)
             # now get default value to be show in visitcat_id
-            row = self.controller.get_config('visitcat_vdefault')
+            row = self.controller.get_config('om_visit_cat_vdefault')
             if row:
                 # if int then look for default row ans set it
                 try:

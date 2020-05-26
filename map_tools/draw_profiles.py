@@ -120,8 +120,8 @@ class DrawProfiles(ParentMapTool):
         # Plugin path
         plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
-        # Get qgis_composers_path
-        sql = "SELECT value FROM config_param_user WHERE parameter = 'qgis_composers_path'"
+        # Get qgis_composers_folderpath
+        sql = "SELECT value FROM config_param_user WHERE parameter = 'qgis_composers_folderpath'"
         row = self.controller.get_row(sql)
         utils_giswater.setWidgetText(self.dlg_draw_profile, self.composers_path, str(row[0]))
 
@@ -157,7 +157,7 @@ class DrawProfiles(ParentMapTool):
         template_path = utils_giswater.getWidgetText(self.dlg_draw_profile, self.composers_path)
         sql = (f"UPDATE config_param_user "
                f"SET value = '{template_path}' "
-               f"WHERE parameter = 'qgis_composers_path'")
+               f"WHERE parameter = 'qgis_composers_folderpath'")
         self.controller.execute_sql(sql)
         utils_giswater.setWidgetText(self.dlg_draw_profile, self.composers_path, str(template_path))
 
@@ -1501,7 +1501,7 @@ class DrawProfiles(ParentMapTool):
         # Check if template file exists
         plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
         template_path = ""
-        row = self.controller.get_config('qgis_composers_path')
+        row = self.controller.get_config('qgis_composers_folderpath')
         if row:
             template_path = f'{row[0]}{os.sep}{self.template}.qpt'
 
