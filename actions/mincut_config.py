@@ -18,7 +18,6 @@ from collections import OrderedDict
 from functools import partial
 
 from .. import utils_giswater
-
 from .api_parent import ApiParent
 from .parent import ParentAction
 from ..ui_manager import SelectorUi, Mincut_edit
@@ -46,7 +45,8 @@ class MincutConfig(ParentAction):
         # Create the dialog and signals
         self.dlg_min_edit = Mincut_edit()
         self.load_settings(self.dlg_min_edit)
-        self.set_dates_from_to(self.dlg_min_edit.date_from, self.dlg_min_edit.date_to, 'om_mincut', 'forecast_start, exec_start', 'forecast_end, exec_end')
+        self.set_dates_from_to(self.dlg_min_edit.date_from, self.dlg_min_edit.date_to, 'om_mincut',
+            'forecast_start, exec_start', 'forecast_end, exec_end')
         self.dlg_min_edit.date_from.setEnabled(False)
         self.dlg_min_edit.date_to.setEnabled(False)
         self.set_icon(self.dlg_min_edit.btn_selector_mincut, "191")
@@ -80,11 +80,14 @@ class MincutConfig(ParentAction):
         self.dlg_min_edit.tbl_mincut_edit.doubleClicked.connect(self.open_mincut)
         self.dlg_min_edit.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_min_edit))
         self.dlg_min_edit.rejected.connect(partial(self.close_dialog, self.dlg_min_edit))
-        self.dlg_min_edit.btn_delete.clicked.connect(partial(self.delete_mincut_management, self.tbl_mincut_edit, "om_mincut", "id"))
-        self.dlg_min_edit.btn_selector_mincut.clicked.connect(partial(self.mincut_selector, self.tbl_mincut_edit, 'id'))
+        self.dlg_min_edit.btn_delete.clicked.connect(partial(
+            self.delete_mincut_management, self.tbl_mincut_edit, "om_mincut", "id"))
+        self.dlg_min_edit.btn_selector_mincut.clicked.connect(partial(
+            self.mincut_selector, self.tbl_mincut_edit, 'id'))
         self.btn_notify = self.dlg_min_edit.findChild(QPushButton, "btn_notify")
         self.btn_notify.clicked.connect(partial(self.get_clients_codes, self.dlg_min_edit.tbl_mincut_edit))
         self.set_icon(self.btn_notify, "307")
+
         try:
             row = self.controller.get_config('om_mincut_enable_alerts', 'value', 'config_param_system')
             if row:
@@ -114,7 +117,6 @@ class MincutConfig(ParentAction):
             self.controller.show_warning(message)
             return
 
-
         field_code = self.custom_action_sms['field_code']
         inf_text = "Are you sure you want to send smd to this clients?"
         for i in range(0, len(selected_list)):
@@ -126,7 +128,6 @@ class MincutConfig(ParentAction):
                    f"JOIN ext_rtc_hydrometer AS t3 ON t1.hydrometer_id::bigint = t3.id::bigint "
                    f"JOIN om_mincut AS t2 ON t1.result_id = t2.id "
                    f"WHERE result_id = {id_}")
-
             rows = self.controller.get_rows(sql, log_sql=True)
             if not rows:
                 inf_text += "\nClients: None(No messages will be sent)"
@@ -149,6 +150,7 @@ class MincutConfig(ParentAction):
         if path is None or not os.path.exists(path):
             self.controller.show_warning("File not found", parameter=path)
             return
+
         selected_list = qtable.selectionModel().selectedRows()
         field_code = self.custom_action_sms['field_code']
 
@@ -160,7 +162,6 @@ class MincutConfig(ParentAction):
                    f"JOIN ext_rtc_hydrometer AS t3 ON t1.hydrometer_id::bigint = t3.id::bigint "
                    f"JOIN om_mincut AS t2 ON t1.result_id = t2.id "
                    f"WHERE result_id = {id_}")
-
             rows = self.controller.get_rows(sql, log_sql=True)
             if not rows:
                 continue
@@ -228,6 +229,7 @@ class MincutConfig(ParentAction):
 
     def mincut_selector(self, qtable, field_id):
         """ Manage mincut selector """
+
         model = qtable.model()
         selected_mincuts = []
         for x in range(0, model.rowCount()):
@@ -248,13 +250,15 @@ class MincutConfig(ParentAction):
     def populate_combos(self):
 
         # Fill ComboBox state
-        sql = ("SELECT id, name FROM anl_mincut_cat_state ORDER BY name")
-        rows = self.controller.get_rows(sql, log_sql=True, add_empty_row=True)
+        sql = ("SELECT id, idval "
+               "FROM om_typevalue WHERE typevalue = 'mincut_state' "
+               "ORDER BY id")
+        rows = self.controller.get_rows(sql, add_empty_row=True)
         utils_giswater.set_item_data(self.dlg_min_edit.state_edit, rows, 1)
 
         # Fill ComboBox exploitation
         sql = "SELECT expl_id, name FROM exploitation WHERE expl_id > 0 ORDER BY name"
-        rows = self.controller.get_rows(sql, log_sql=False, add_empty_row=True)
+        rows = self.controller.get_rows(sql, add_empty_row=True)
         utils_giswater.set_item_data(self.dlg_min_edit.cmb_expl, rows, 1)
 
 

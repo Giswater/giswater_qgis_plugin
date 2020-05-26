@@ -138,14 +138,14 @@ class MincutParent(ParentAction):
 
         # Fill ComboBox type
         sql = ("SELECT id, descript "
-               "FROM anl_mincut_cat_type "
+               "FROM om_mincut_cat_type "
                "ORDER BY id")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_mincut.type, rows, 1)
 
         # Fill ComboBox cause
-        sql = ("SELECT id, descript "
-               "FROM om_typevalue WHERE typevalue = 'mincut_cause "
+        sql = ("SELECT id, idval "
+               "FROM om_typevalue WHERE typevalue = 'mincut_cause' "
                "ORDER BY id")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_mincut.cause, rows, 1)
@@ -247,8 +247,10 @@ class MincutParent(ParentAction):
         :return:
         """
 
-        d_from = datetime(date_from.date().year(), date_from.date().month(), date_from.date().day(), time_from.time().hour(), time_from.time().minute())
-        d_to = datetime(date_to.date().year(), date_to.date().month(), date_to.date().day(), time_to.time().hour(), time_to.time().minute())
+        d_from = datetime(date_from.date().year(), date_from.date().month(), date_from.date().day(),
+            time_from.time().hour(), time_from.time().minute())
+        d_to = datetime(date_to.date().year(), date_to.date().month(), date_to.date().day(),
+            time_to.time().hour(), time_to.time().minute())
 
         if d_from > d_to:
             date_to.setDate(date_from.date())
@@ -274,9 +276,9 @@ class MincutParent(ParentAction):
     def set_id_val(self):
 
         # Show future id of mincut
-        sql = ("SELECT setval('om_mincut_seq', (SELECT max(id::integer) "
-               "FROM om_mincut), true)")
-        row = self.controller.get_row(sql, log_sql=True)
+        sql = "SELECT setval('om_mincut_seq', (SELECT max(id::integer) FROM om_mincut), true)"
+        row = self.controller.get_row(sql)
+        result_mincut_id = '1'
         if not row or row[0] is None or row[0] < 1:
             result_mincut_id = '1'
         elif row[0]:
@@ -695,7 +697,9 @@ class MincutParent(ParentAction):
 
 
     def mincut_ok(self, result):
-        result_layer = self.add_layer.add_temp_layer(self.dlg_mincut, result['body']['data'], None, True, tab_idx=2)
+
+        self.add_layer.add_temp_layer(self.dlg_mincut, result['body']['data'], None, True, tab_idx=2)
+
         # Set all widgets of the data tab enabled(False)
         widget_list = self.dlg_mincut.mainTab.widget(0).findChildren(QWidget)
         for widget in widget_list:
@@ -815,8 +819,7 @@ class MincutParent(ParentAction):
         self.dlg_connec.btn_snapping.clicked.connect(self.snapping_init_connec)
         self.dlg_connec.btn_accept.clicked.connect(partial(self.accept_connec, self.dlg_connec, "connec"))
         self.dlg_connec.rejected.connect(partial(self.close_dialog, self.dlg_connec))
-        # self.dlg_connec.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_connec))
-        
+
         # Set autocompleter for 'customer_code'
         self.set_completer_customer_code(self.dlg_connec.connec_id)
 
@@ -972,12 +975,10 @@ class MincutParent(ParentAction):
         # Set icons
         self.set_icon(self.dlg_hydro.btn_insert, "111")
         self.set_icon(self.dlg_hydro.btn_delete, "112")
-        #self.set_icon(self.dlg_hydro.btn_snapping, "129")
 
         # Set dignals
         self.dlg_hydro.btn_insert.clicked.connect(partial(self.insert_hydro))
         self.dlg_hydro.btn_delete.clicked.connect(partial(self.delete_records_hydro))
-        # self.dlg_hydro.btn_snapping.clicked.connect(self.snapping_init_hydro)
         self.dlg_hydro.btn_accept.clicked.connect(partial(self.accept_hydro, self.dlg_hydro, "hydrometer"))
 
         # Set autocompleter for 'customer_code'
@@ -1140,9 +1141,6 @@ class MincutParent(ParentAction):
             # Select features of the layers filtering by @expr
             self.select_features_group_layers(expr)
 
-
-        #self.hydro_list = []
-
         # Get list of 'hydrometer_id' belonging to current result_mincut
         result_mincut_id = utils_giswater.getWidgetText(self.dlg_hydro, self.result_mincut_id)
         sql = (f"SELECT hydrometer_id FROM om_mincut_hydrometer"
@@ -1174,9 +1172,6 @@ class MincutParent(ParentAction):
 
         self.disconnect_signal_selection_changed()   
         
-        # # Clear list of connec_list
-        # self.connec_list = []
-
         # Get 'connec_id' from selected 'customer_code'
         customer_code = utils_giswater.getWidgetText(self.dlg_connec, self.dlg_connec.connec_id)
         if customer_code == 'null':
@@ -1209,7 +1204,6 @@ class MincutParent(ParentAction):
         self.connec_list.append(connec_id)
 
         expr_filter = None
-        expr = None
         if len(self.connec_list) > 0:
             
             # Set expression filter with 'connec_list'
@@ -1260,8 +1254,8 @@ class MincutParent(ParentAction):
         if expr.hasParserError():
             message = "Expression Error"
             self.controller.log_warning(message, parameter=expr_filter)
-            return (False, expr)
-        return (True, expr)
+            return False, expr
+        return True, expr
                 
                 
     def select_features_by_expr(self, layer, expr):
@@ -1497,6 +1491,7 @@ class MincutParent(ParentAction):
         self.init_map_tool()
         self.dlg_mincut.closeMainWin = True
         self.dlg_mincut.canceled = False
+
         # Vertex marker
         self.vertex_marker = QgsVertexMarker(self.canvas)
         self.vertex_marker.setColor(QColor(255, 100, 255))
@@ -1513,11 +1508,10 @@ class MincutParent(ParentAction):
 
         # Disable snapping
         self.snapper_manager.enable_snapping()
+
         # Set snapping to 'arc' and 'node'
         self.snapper_manager.set_snapping_layers()
         self.snapper_manager.snap_to_arc()
-
-        #self.snapper_manager.snap_to_node()
 
         # Set signals
         self.canvas.xyCoordinates.connect(self.mouse_move_node_arc)        
@@ -1622,6 +1616,7 @@ class MincutParent(ParentAction):
         self.task1 = GwTask('Calculating mincut')
         QgsApplication.taskManager().addTask(self.task1)
         self.task1.setProgress(0)
+
         srid = self.controller.plugin_settings_value('srid')
         real_mincut_id = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
         if self.is_new:
@@ -1645,7 +1640,7 @@ class MincutParent(ParentAction):
         # feature_id: id of snapped arc/node
         # feature_type: type of snapped element (arc/node)
         # result_mincut_id: result_mincut_id from form
-        sql =f"SELECT gw_fct_mincut('{elem_id}', '{elem_type}', '{real_mincut_id}');"
+        sql = f"SELECT gw_fct_mincut('{elem_id}', '{elem_type}', '{real_mincut_id}');"
         row = self.controller.get_row(sql, log_sql=True)
         if not row or not row[0]:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
@@ -1808,7 +1803,7 @@ class MincutParent(ParentAction):
         cur_user = self.controller.get_project_user()               
         result_mincut_id = utils_giswater.getWidgetText(self.dlg_mincut, "result_mincut_id")
         if result_mincut_id != 'null':
-            sql = (f"SELECT gw_fct_mincut_valve_unaccess('{elem_id}', '{result_mincut_id}', '{cur_user}');")
+            sql = f"SELECT gw_fct_mincut_valve_unaccess('{elem_id}', '{result_mincut_id}', '{cur_user}');"
             status = self.controller.execute_sql(sql, log_sql=False)
             if status:
                 message = "Custom mincut executed successfully"
