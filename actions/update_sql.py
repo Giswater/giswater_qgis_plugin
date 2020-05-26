@@ -11,7 +11,7 @@ from qgis.utils import reloadPlugin
 
 from qgis.PyQt.QtCore import QSettings, Qt, QDate
 from qgis.PyQt.QtGui import QPixmap
-from qgis.PyQt.QtSql import QSqlTableModel
+from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel
 from qgis.PyQt.QtWidgets import QRadioButton, QPushButton, QAbstractItemView, QTextEdit, QFileDialog, \
     QLineEdit, QWidget, QComboBox, QLabel, QCheckBox, QScrollArea, QSpinBox, QAbstractButton, \
     QHeaderView, QListView, QFrame, QScrollBar, QDoubleSpinBox, QPlainTextEdit, QGroupBox, QTableView
@@ -2041,6 +2041,17 @@ class UpdateSQL(ApiParent):
         utils_giswater.set_item_data(self.dlg_readsql.project_schema_name, result_list, 1)
 
 
+    def manage_srid(self):
+        """ Manage SRID configuration """
+
+        self.filter_srid = self.dlg_readsql_create_project.findChild(QLineEdit, 'srid_id')
+        utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.filter_srid, '25831')
+        self.tbl_srid = self.dlg_readsql_create_project.findChild(QTableView, 'tbl_srid')
+        self.tbl_srid.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.model_srid = QSqlQueryModel()
+        self.tbl_srid.setModel(self.model_srid)
+
+
     def filter_srid_changed(self):
 
         filter_value = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.filter_srid)
@@ -2053,16 +2064,15 @@ class UpdateSQL(ApiParent):
         sql += "%' ORDER BY substr(srtext, 1, 6), srid"
 
         # Populate Table
-        self.fill_table_by_query(self.tbl_srid, sql)
+        self.model_srid = QSqlQueryModel()
+        self.model_srid.setQuery(sql)
+        self.tbl_srid.setModel(self.model_srid)
+        self.tbl_srid.show()
 
 
     def set_info_project(self):
 
-        # Set default lenaguage EN
         self.project_data_language = 'EN'
-
-        # Declare variables
-        self.is_sample = None
         self.filter_srid_value = ''
 
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
@@ -2076,10 +2086,10 @@ class UpdateSQL(ApiParent):
             sql = (f"SELECT column_name FROM information_schema.columns "
                    f"WHERE table_name = 'version' and column_name = 'sample' and table_schema = '{schema_name}';")
             result = self.controller.get_row(sql)
-
             if result is None:
                 sql = f"SELECT giswater, language, epsg FROM {schema_name}.version ORDER BY id DESC LIMIT 1;"
                 result = self.controller.get_row(sql)
+                self.is_sample = 'False'
             else:
                 sql = f"SELECT giswater, language, epsg, sample FROM {schema_name}.version ORDER BY id DESC LIMIT 1;"
                 result = self.controller.get_row(sql)
@@ -2087,9 +2097,6 @@ class UpdateSQL(ApiParent):
             self.project_data_schema_version = result[0]
             self.project_data_language = result[1]
             self.filter_srid_value = str(result[2])
-
-            if self.is_sample is None:
-                self.is_sample = 'False'
 
         # Set label schema name
         self.lbl_schema_name.setText(str(schema_name))
@@ -2238,19 +2245,8 @@ class UpdateSQL(ApiParent):
         if self.dev_user != 'TRUE':
             self.rdb_sample_dev.setVisible(False)
 
-        self.filter_srid = self.dlg_readsql_create_project.findChild(QLineEdit, 'srid_id')
-        utils_giswater.setWidgetText(self.dlg_readsql_create_project, 'srid_id', str(self.filter_srid_value))
-        self.tbl_srid = self.dlg_readsql_create_project.findChild(QTableView, 'tbl_srid')
-        self.tbl_srid.setSelectionBehavior(QAbstractItemView.SelectRows)
-        # return comentar
-        sql = ("SELECT substr(srtext, 1, 6) as " + '"Type"' + ", srid as " + '"SRID"' + ", "
-               "substr(split_part(srtext, ',', 1), 9) as " + '"Description"' + " "
-               "FROM public.spatial_ref_sys "
-               "WHERE CAST(srid AS TEXT) LIKE '" + str(self.filter_srid_value) + "%' "
-               "ORDER BY substr(srtext, 1, 6), srid")
-
-        # Populate Table
-        self.fill_table_by_query(self.tbl_srid, sql)
+        # Manage SRID
+        self.manage_srid()
 
         # Fill combo 'project_type'
         self.cmb_create_project_type = self.dlg_readsql_create_project.findChild(QComboBox, 'cmb_create_project_type')
@@ -2300,6 +2296,8 @@ class UpdateSQL(ApiParent):
         if self.dlg_readsql_create_project is None:
             self.controller.log_info("init_dialog_create_project")
             self.init_dialog_create_project()
+
+        self.filter_srid_changed()
 
         # Get project_type from previous dialog
         self.cmb_project_type = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
@@ -3005,18 +3003,21 @@ class UpdateSQL(ApiParent):
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
 
         # Populate widgettype combo
-        sql = ("SELECT DISTINCT(id), idval FROM " + schema_name + ".config_api_typevalue WHERE typevalue = 'widgettype_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
+        sql = ("SELECT DISTINCT(id), idval FROM " + schema_name + ".config_api_typevalue "
+               "WHERE typevalue = 'widgettype_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
         rows = self.controller.get_rows(sql, log_sql=True)
         utils_giswater.set_item_data(self.dlg_manage_fields.widgettype, rows, 1)
 
         # Populate datatype combo
-        sql = ("SELECT id, idval FROM " + schema_name + ".config_api_typevalue WHERE typevalue = 'datatype_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
+        sql = ("SELECT id, idval FROM " + schema_name + ".config_api_typevalue "
+               "WHERE typevalue = 'datatype_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
         rows = self.controller.get_rows(sql, log_sql=True)
         utils_giswater.set_item_data(self.dlg_manage_fields.datatype, rows, 1)
 
         # Populate widgetfunction combo
         sql = ("SELECT null as id, null as idval UNION ALL "
-               " SELECT id, idval FROM " + schema_name + ".config_api_typevalue WHERE typevalue = 'widgetfunction_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
+               "SELECT id, idval FROM " + schema_name + ".config_api_typevalue "
+               "WHERE typevalue = 'widgetfunction_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
         rows = self.controller.get_rows(sql, log_sql=True)
         utils_giswater.set_item_data(self.dlg_manage_fields.widgetfunction, rows, 1)
 
@@ -3135,7 +3136,9 @@ class UpdateSQL(ApiParent):
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
 
         # Execute manage add fields function
-        sql = ("SELECT param_name FROM man_addfields_parameter WHERE param_name = '" + utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.column_id) + "'")
+        param_name = utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.column_id)
+        sql = (f"SELECT param_name FROM man_addfields_parameter "
+               f"WHERE param_name = '{param_name}'")
         row = self.controller.get_row(sql, log_sql=True)
 
         if action == 'Create':
