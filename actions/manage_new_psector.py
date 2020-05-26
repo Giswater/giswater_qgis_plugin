@@ -102,7 +102,11 @@ class ManageNewPsector(ParentManage):
         atlas_id.setValidator(QIntValidator())
 
         self.populate_combos(self.dlg_plan_psector.psector_type, 'name', 'id', self.plan_om + '_psector_cat_type')
-        self.populate_combos(self.dlg_plan_psector.priority, 'id', 'id', 'value_priority')
+
+        # Populate combo status
+        sql = "SELECT id, idval FROM plan_typevalue WHERE typevalue = 'value_priority'"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.set_item_data(self.dlg_plan_psector.priority, rows, 1)
 
         # Set visible FALSE for cmb_sector
         self.populate_combos(self.cmb_sector_id, 'name', 'sector_id', 'sector')

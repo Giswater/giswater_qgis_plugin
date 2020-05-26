@@ -2516,7 +2516,7 @@ class ApiCF(ApiParent, QObject):
         body += '"form":{"formName":"new_workcat", "tabName":"data", "editable":"TRUE"}, '
         body += '"feature":{}, '
         body += '"data":{}}$$'
-        complet_list = [self.controller.get_json('gw_api_getcatalog', body)]
+        complet_list = [self.controller.get_json('gw_fct_getcatalog', body)]
         if not complet_list: return
 
         self.dlg_new_workcat = ApiBasicInfo()
