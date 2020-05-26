@@ -68,7 +68,7 @@ BEGIN
 				IF v_projectype = 'WS' THEN
 
 					-- update presszone
-					UPDATE v_edit_connec SET presszonecat_id=NEW.presszonecat_id, dqa_id=NEW.dqa_id, minsector_id=NEW.minsector_id WHERE connec_id=v_link.feature_id;
+					UPDATE v_edit_connec SET presszone_id=NEW.presszone_id, dqa_id=NEW.dqa_id, minsector_id=NEW.minsector_id WHERE connec_id=v_link.feature_id;
 				END IF;
 			
 			ELSIF v_link.feature_type='GULLY' THEN

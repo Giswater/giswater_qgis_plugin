@@ -34,14 +34,14 @@ DELETE FROM config_param_system WHERE parameter = 'rev_gully_connec_geom1_tol';
 DELETE FROM config_param_system WHERE parameter = 'rev_gully_connec_geom2_tol';
 DELETE FROM config_param_system WHERE parameter = 'rev_gully_units_tol';
 DELETE FROM config_param_system WHERE parameter = 'sys_api_service';
-DELETE FROM config_param_system WHERE parameter = 'sys_custom_view's;
+DELETE FROM config_param_system WHERE parameter = 'sys_custom_views';
 DELETE FROM config_param_system WHERE parameter = 'code_vd';
 DELETE FROM config_param_system WHERE parameter = 'audit_function_control';
 DELETE FROM config_param_system WHERE parameter = 'node2arc';
-DELETE FROM config_param_system WHERE parameter = 'api_sensibility_factor_web';
+DELETE FROM config_param_system WHERE parameter = 'api_sensibility_factor_mobile';
 DELETE FROM config_param_system WHERE parameter = 'api_sensibility_factor_desktop';
 DELETE FROM config_param_system WHERE parameter = 'inp_fast_buildup';
-DELETE FROM config_param_system WHERE parameter = 'api_selector_labe';
+DELETE FROM config_param_system WHERE parameter = 'api_selector_label';
 DELETE FROM config_param_system WHERE parameter = 'profile_stylesheet';
 
 UPDATE config_param_system SET parameter = 'basic_info_sensibility_factor', value ='{"mobile":2, "web":1, "desktop":1}'	WHERE parameter = 'api_sensibility_factor_web';
@@ -92,7 +92,7 @@ UPDATE config_param_system SET parameter = 'edit_gully_proximity' WHERE paramete
 UPDATE config_param_system SET parameter = 'edit_hydro_link_absolute_path' WHERE parameter = 'hydrometer_link_absolute_path';
 UPDATE config_param_system SET parameter = 'edit_arc_insert_automatic_endpoint' WHERE parameter = 'nodeinsert_arcendpoint';
 UPDATE config_param_system SET parameter = 'edit_node_proximity' WHERE parameter = 'node_proximity';
-UPDATE config_param_system SET parameter = 'edit_orphannode_delete' WHERE parameter = 'orphannode_delete';
+UPDATE config_param_system SET parameter = 'edit_arc_orphannode_delete' WHERE parameter = 'orphannode_delete';
 UPDATE config_param_system SET parameter = 'edit_slope_direction' WHERE parameter = 'geom_slp_direction';
 UPDATE config_param_system SET parameter = 'edit_state_topocontrol' WHERE parameter = 'state_topocontrol';
 UPDATE config_param_system SET parameter = 'edit_topocontrol_disable_error' WHERE parameter = 'edit_topocontrol_dsbl_error';
@@ -114,15 +114,17 @@ UPDATE config_param_system SET parameter = 'edit_node_doublegeom' WHERE paramete
 UPDATE config_param_system SET parameter = 'admin_version' WHERE parameter = 'ApiVersion';
 UPDATE config_param_system SET parameter = 'admin_transaction_db' WHERE parameter = 'sys_transaction_db';
 UPDATE config_param_system SET parameter = 'admin_customform_param' WHERE parameter = 'custom_form_param';
+UPDATE config_param_system SET parameter = 'admin_customform_param' WHERE parameter = 'custom_form_param';
+UPDATE config_param_system SET parameter = 'basic_selector_mincut' WHERE parameter = 'api_selector_mincut';
 
 
 -- user param updates
-DELETE FROM sys_param_user WHERE id = 	audit_project_epa_result		
-DELETE FROM sys_param_user WHERE id = 	audit_project_plan_result		
-DELETE FROM sys_param_user WHERE id = 	gullytype_vdefault		
-DELETE FROM sys_param_user WHERE id = 	qgistemplate_folder_path		
-DELETE FROM sys_param_user WHERE id = 	epaversion		
-DELETE FROM sys_param_user WHERE id = 	gully_vdefault		
+DELETE FROM sys_param_user WHERE id = 'audit_project_epa_result';	
+DELETE FROM sys_param_user WHERE id = 'audit_project_plan_result';
+DELETE FROM sys_param_user WHERE id = 'gullytype_vdefault';
+DELETE FROM sys_param_user WHERE id = 'qgistemplate_folder_path';
+DELETE FROM sys_param_user WHERE id = 'epaversion';
+DELETE FROM sys_param_user WHERE id = 'gully_vdefault';
 
 UPDATE sys_param_user SET id ='utils_checkproject_qgislayer' WHERE id = 'audit_project_layer_log';
 UPDATE sys_param_user SET id ='utils_checkproject_database' WHERE id = 'audit_project_user_control';

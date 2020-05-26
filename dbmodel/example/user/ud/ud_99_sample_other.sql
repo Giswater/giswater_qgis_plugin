@@ -363,7 +363,6 @@ UPDATE config_form_fields SET layoutname = 'lyt_data_1',layout_order = 997 where
 UPDATE config_form_fields SET layout_order = 2 where column_id ='dma_id';
 
 UPDATE config_form_fields SET layoutname = 'lyt_data_2', layout_order = 30 where column_id ='verified';
-UPDATE config_form_fields SET layoutname = 'lyt_data_2', layout_order = 31 where column_id ='presszonecat_id';
 UPDATE config_form_fields SET layoutname = 'lyt_data_2', layout_order = 32 where column_id ='dqa_id';
 UPDATE config_form_fields SET layoutname = 'lyt_data_2', layout_order = 33 where column_id ='expl_id';
 UPDATE config_form_fields SET layoutname = 'lyt_data_1', layout_order = 998 where column_id ='parent_id';
@@ -405,7 +404,7 @@ UPDATE config_form_fields set layoutname = 'lyt_data_1' WHERE column_id = 'width
 UPDATE config_form_fields set layoutname = 'lyt_data_1' WHERE column_id = 'width' AND formname ='ve_node_weir';
 
 UPDATE config_param_system SET value='TRUE' WHERE parameter='sys_raster_dem';
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_upser_elevation_from_dem', 'true', current_user)
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_upsert_elevation_from_dem', 'true', current_user)
 ON CONFLICT (parameter, cur_user) DO NOTHING;
 
 UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'qgis_form_docker' AND cur_user = current_user;

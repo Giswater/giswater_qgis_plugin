@@ -221,7 +221,7 @@ BEGIN
 				END IF;	
 				
 			ELSIF v_projectype='WS' THEN
-				UPDATE connec SET presszonecat_id = v_arc.presszonecat_id, dqa_id=v_arc.dqa_id, minsector_id=v_arc.minsector_id
+				UPDATE connec SET presszone_id = v_arc.presszone_id, dqa_id=v_arc.dqa_id, minsector_id=v_arc.minsector_id
 				WHERE connec_id=v_connec1.connec_id;
 				
 			END IF;
@@ -253,7 +253,7 @@ BEGIN
 				END IF;
 			
 			ELSIF v_projectype='WS' THEN
-				UPDATE connec SET presszonecat_id = v_node.presszonecat_id, dqa_id=v_node.dqa_id, minsector_id=v_node.minsector_id
+				UPDATE connec SET presszone_id = v_node.presszone_id, dqa_id=v_node.dqa_id, minsector_id=v_node.minsector_id
 				WHERE connec_id=v_connec1.connec_id;
 	
 			END IF;
@@ -276,7 +276,7 @@ BEGIN
 				WHERE gully_id=v_gully1.gully_id;
 	
 			ELSIF v_projectype='WS' THEN
-				UPDATE connec SET presszonecat_id = v_connec2.presszonecat_id, dqa_id=v_connec2.dqa_id, minsector_id=v_connec2.minsector_id
+				UPDATE connec SET presszone_id = v_connec2.presszone_id, dqa_id=v_connec2.dqa_id, minsector_id=v_connec2.minsector_id
 				WHERE connec_id=v_connec1.connec_id;
 					
 			END IF;

@@ -135,7 +135,7 @@ BEGIN
 	SELECT ((value::json)->>'value') INTO v_arc_searchnodes FROM config_param_system WHERE parameter='edit_arc_searchnodes';
 	SELECT value INTO v_samenode_init_end_control FROM config_param_system WHERE parameter = 'edit_arc_samenode_control';
 	SELECT value INTO v_promixity_buffer FROM config_param_system WHERE parameter='edit_feature_buffer_on_mapzone';
-	SELECT value INTO v_use_fire_code_seq FROM config_param_system WHERE parameter='use_fire_code_seq';
+	SELECT value INTO v_use_fire_code_seq FROM config_param_system WHERE parameter='edit_hydrant_use_firecode_seq';
 	SELECT ((value::json)->>'status') INTO v_automatic_ccode FROM config_param_system WHERE parameter='edit_connec_autofill_ccode';
 	SELECT ((value::json)->>'field') INTO v_automatic_ccode_field FROM config_param_system WHERE parameter='edit_connec_autofill_ccode';
 	SELECT (value)::boolean INTO v_sys_raster_dem FROM config_param_system WHERE parameter='admin_raster_dem';
@@ -214,12 +214,12 @@ BEGIN
 
 					-- getting mapzone by heritage from nodes
 					IF v_project_type = 'WS' THEN
-						IF v_noderecord1.presszonecat_id = v_noderecord2.presszonecat_id THEN
-							v_presszone_id = v_noderecord1.presszonecat_id;
-						ELSIF v_noderecord1.presszonecat_id = 0::text THEN
-							v_presszone_id = v_noderecord2.presszonecat_id;
-						ELSIF v_noderecord2.presszonecat_id = 0::text THEN
-							v_presszone_id = v_noderecord1.presszonecat_id;
+						IF v_noderecord1.presszone_id = v_noderecord2.presszone_id THEN
+							v_presszone_id = v_noderecord1.presszone_id;
+						ELSIF v_noderecord1.presszone_id = 0::text THEN
+							v_presszone_id = v_noderecord2.presszone_id;
+						ELSIF v_noderecord2.presszone_id = 0::text THEN
+							v_presszone_id = v_noderecord1.presszone_id;
 						END IF;
 					END IF;
 
@@ -294,7 +294,7 @@ BEGIN
 				IF count_aux = 1 THEN
 					v_presszone_id := (SELECT id FROM cat_presszone WHERE ST_DWithin(p_reduced_geometry, cat_presszone.the_geom,0.001) LIMIT 1);
 				ELSE
-					v_presszone_id =(SELECT presszonecat_id FROM v_edit_arc WHERE ST_DWithin(p_reduced_geometry, v_edit_arc.the_geom, v_promixity_buffer) 
+					v_presszone_id =(SELECT presszone_id FROM v_edit_arc WHERE ST_DWithin(p_reduced_geometry, v_edit_arc.the_geom, v_promixity_buffer)
 					order by ST_Distance (p_reduced_geometry, v_edit_arc.the_geom) LIMIT 1);
 				END IF;	
 			END IF;
@@ -488,7 +488,7 @@ BEGIN
 					END IF;
 
 				-- mapzones
-				WHEN 'presszonecat_id' THEN 
+				WHEN 'presszone_id' THEN
 					field_value = v_presszone_id;			
 				WHEN 'sector_id' THEN 
 					field_value = v_sector_id;

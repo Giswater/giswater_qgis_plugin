@@ -17,7 +17,7 @@ BEGIN
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
     
     -- Get snapping_tolerance from config table
-    SELECT value::boolean INTO v_orphannode_delete FROM config_param_system WHERE parameter='edit_orphannode_delete';
+    SELECT value::boolean INTO v_orphannode_delete FROM config_param_system WHERE parameter='edit_arc_orphannode_delete';
 
     -- Delete orphan nodes
     IF v_orphannode_delete THEN

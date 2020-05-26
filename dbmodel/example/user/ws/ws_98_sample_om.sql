@@ -59,6 +59,14 @@ INSERT INTO om_visit_class_x_parameter VALUES (14, 2, 'defect_connec');
 
 SELECT setval('SCHEMA_NAME.om_visit_class_x_parameter_id_seq', (SELECT max(id) FROM om_visit_class_x_parameter), true);
 
+
+--UPDATE plan_psector_x_arc SET psector_id = 1;
+--UPDATE plan_psector_x_node SET psector_id = 1;
+--UPDATE plan_psector_x_connec SET psector_id = 1;
+
+--SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"ADD"}}$$);
+
+
 CREATE OR REPLACE VIEW ve_visit_noinfra AS 
  SELECT om_visit.id AS visit_id,
     om_visit.visitcat_id,

@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2020/05/25
-RENAME TABLE cat_presszone TO presszone;
+ALTER TABLE cat_presszone RENAME TO presszone;
 
 ALTER TABLE sector ADD COLUMN style json;
 ALTER TABLE dma ADD COLUMN style json;

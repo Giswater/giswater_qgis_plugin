@@ -7,6 +7,8 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
+INSERT INTO config_param_user values ('plan_psector_vdefault', '1', current_user);
+
 -- insert mandatory values
 INSERT INTO config_param_user (parameter, value, cur_user)
 		SELECT sys_param_user.id, vdefault, current_user FROM config_param_user RIGHT JOIN sys_param_user ON sys_param_user.id=parameter 

@@ -17,6 +17,9 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_getsearch($${
 "client":{"device":3, "infoType":100, "lang":"ES"}
 }$$)
+
+SELECT gw_fct_getsearch($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}}}$$);
+
 */
 
 DECLARE
@@ -81,7 +84,7 @@ BEGIN
         
         -- Get Ids for type combo
         SELECT array_to_json(array_agg(id)) INTO combo_json FROM (SELECT ((value)::json->'sys_table_id') AS id FROM config_param_system WHERE parameter
-        IN ('api_search_node','api_search_node','api_search_arc','api_search_connec','api_search_network_null','api_search_element', 'api_search_gully')  ORDER BY ((value)::json->>'orderby'))a;
+        IN ('basic_search_node','basic_search_node','basic_search_arc','basic_search_connec','basic_search_network_null','basic_search_element', 'basic_search_gully')  ORDER BY ((value)::json->>'orderby'))a;
         comboType := gw_fct_json_object_set_key(comboType, 'comboIds', combo_json);
 
         -- Add default
@@ -93,7 +96,7 @@ BEGIN
     
         -- Get Names for type combo
         SELECT array_to_json(array_agg(id)) INTO combo_json FROM (SELECT ((value)::json->'alias') AS id FROM config_param_system WHERE parameter
-        IN ('api_search_node','api_search_node','api_search_arc','api_search_connec','api_search_network_null','api_search_element', 'api_search_gully') ORDER BY ((value)::json->>'orderby'))a;    
+        IN ('basic_search_node','basic_search_node','basic_search_arc','basic_search_connec','basic_search_network_null','basic_search_element', 'basic_search_gully') ORDER BY ((value)::json->>'orderby'))a;    
         comboType := gw_fct_json_object_set_key(comboType, 'comboNames', combo_json);
 
 
@@ -128,9 +131,7 @@ BEGIN
     
         -- Create search field
         SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND column_id='generic_search';
-        editCode := json_build_object('label',rec_fields.label,'column_id', rec_fields.column_id,'widgetname', concat('network_',rec_fields.column_id),'widgettype','typeahead', 'searchService', 
-        (SELECT value FROM config_param_system WHERE parameter='api_search_service' LIMIT 1),'datatype','string','placeholder','','disabled',false,'noresultsMsg',
-        'No results','loadingMsg','Searching...');
+        editCode := json_build_object('label',rec_fields.label,'column_id', rec_fields.column_id,'widgetname', concat('network_',rec_fields.column_id),'widgettype','typeahead', 'searchService', '...');
         
         fieldsJson := '[' ||  editCode || ']';
         fieldsJson := COALESCE(fieldsJson, '[]');
@@ -159,10 +160,10 @@ BEGIN
     IF rec_tab.id IS NOT NULL THEN
 
         -- Parameters of the municipality layer
-        SELECT ((value::json)->>'sys_table_id') INTO v_search_muni_table FROM config_param_system WHERE parameter='api_search_muni';
-        SELECT ((value::json)->>'sys_id_field') INTO v_search_muni_id_field FROM config_param_system WHERE parameter='api_search_muni';
-        SELECT ((value::json)->>'sys_search_field') INTO v_search_muni_search_field FROM config_param_system WHERE parameter='api_search_muni';
-        SELECT ((value::json)->>'sys_geom_field') INTO v_search_muni_geom_field FROM config_param_system WHERE parameter='api_search_muni';
+        SELECT ((value::json)->>'sys_table_id') INTO v_search_muni_table FROM config_param_system WHERE parameter='basic_search_muni';
+        SELECT ((value::json)->>'sys_id_field') INTO v_search_muni_id_field FROM config_param_system WHERE parameter='basic_search_muni';
+        SELECT ((value::json)->>'sys_search_field') INTO v_search_muni_search_field FROM config_param_system WHERE parameter='basic_search_muni';
+        SELECT ((value::json)->>'sys_geom_field') INTO v_search_muni_geom_field FROM config_param_system WHERE parameter='basic_search_muni';
         
         -- Get municipality vdefault
         SELECT value::integer INTO v_search_vdef FROM config_param_user WHERE parameter='basic_search_municipality_vdefault' AND cur_user=current_user;
@@ -172,9 +173,12 @@ BEGIN
         comboType := json_build_object('label',rec_fields.label,'column_id', rec_fields.column_id,'widgetname', concat('address_',rec_fields.column_id),
         'widgettype','combo','datatype','string','placeholder','','disabled',false);
 
+	raise notice ' % % %', v_search_muni_id_field,v_search_muni_table ,v_search_muni_search_field;
+
         -- Get Ids for type combo
         EXECUTE 'SELECT array_to_json(array_agg(id)) FROM (SELECT '||quote_ident(v_search_muni_id_field)||' AS id FROM '||quote_ident(v_search_muni_table) ||
         ' ORDER BY '||quote_ident(v_search_muni_search_field)||') a' INTO combo_json;
+        
         comboType := gw_fct_json_object_set_key(comboType, 'comboIds', combo_json);
 
         -- Add default

@@ -246,7 +246,7 @@ BEGIN
 
 				-- update specific fields for ws projects
 				IF v_projecttype = 'WS' THEN
-					UPDATE connec SET dqa_id=v_arc.dqa_id, minsector_id=v_arc.minsector_id,presszonecat_id=v_arc.presszonecat_id WHERE connec_id = v_connect_id;
+					UPDATE connec SET dqa_id=v_arc.dqa_id, minsector_id=v_arc.minsector_id,presszone_id=v_arc.presszone_id WHERE connec_id = v_connect_id;
 					INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 					VALUES (117, null, 4, concat('Update mapzone values.'));
 				END IF;
