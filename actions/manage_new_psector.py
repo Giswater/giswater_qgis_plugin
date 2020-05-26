@@ -105,7 +105,7 @@ class ManageNewPsector(ParentManage):
         atlas_id.setValidator(QIntValidator())
 
         self.populate_combos(self.dlg_plan_psector.psector_type, 'name', 'id', self.plan_om + '_psector_cat_type')
-        self.populate_combos(self.dlg_plan_psector.priority, 'id', 'id', 'plan_typevalue')
+        self.populate_combos(self.dlg_plan_psector.priority, 'id', 'id', 'value_priority')
 
         # Set visible FALSE for cmb_sector
         self.populate_combos(self.cmb_sector_id, 'name', 'sector_id', 'sector')
