@@ -11,6 +11,7 @@ from qgis.PyQt.QtCore import QObject, QPoint, QSettings, Qt
 from qgis.PyQt.QtWidgets import QAction, QActionGroup, QApplication, QDockWidget
 from qgis.PyQt.QtWidgets import QMenu, QToolBar, QToolButton
 from qgis.PyQt.QtGui import QIcon, QKeySequence, QCursor
+from qgis.core import *
 
 import configparser
 import json
@@ -990,10 +991,9 @@ class Giswater(QObject):
         # call dynamic mapzones repaint
         row = self.controller.get_config('mapzones_dynamic_symbology', 'value', 'config_param_system')
         if row and row[0].lower() == 'true':
-            if field_id_right == "expl_id":
-                self.set_layer_simbology_polcategorized('v_edit_dma', 'name', 0.5)
-                self.set_layer_simbology_polcategorized('v_edit_dqa', 'name', 0.5)
-                self.set_layer_simbology_polcategorized('v_edit_presszone', 'descript', 0.5)
+            self.set_layer_simbology_polcategorized('v_edit_dma', 'name', 0.5)
+            self.set_layer_simbology_polcategorized('v_edit_dqa', 'name', 0.5)
+            self.set_layer_simbology_polcategorized('v_edit_presszone', 'descript', 0.5)
 
         # Log it
         message = "Project read successfully"
@@ -1514,3 +1514,41 @@ class Giswater(QObject):
             self.layer_expl.triggerRepaint()
             self.iface.actionZoomIn().trigger()
 
+    def set_layer_simbology_polcategorized(self, layer, column, opacity):
+        """ Symbolyze dynamic polygon layers using categorized expression """
+
+        lyr = self.controller.get_layer_by_tablename(layer)
+        if lyr:
+            # get unique values
+            fni = lyr.fields().indexFromName(column)
+            unique_ids = lyr.dataProvider().uniqueValues(fni)
+            #get number of unique values
+            totalval = len(sorted(list(lyr.uniqueValues(fni))))
+
+            categories = []
+
+            for unique_id in unique_ids:
+                # initialize the default symbol for this geometry type
+                symbol = QgsSymbol.defaultSymbol(lyr.geometryType())
+                symbol.setOpacity(float(opacity))
+
+                R = random.randint(0, 255)
+                G = random.randint(0, 255)
+                B = random.randint(0, 255)
+
+                layer_style = {}
+                layer_style['color'] = '{}, {}, {}'.format(int(R), int(G), int(B))
+                layer_style['outline'] = 'black'
+                layer_style['opacity'] = '0.8'
+                symbolLayer = QgsSimpleFillSymbolLayer.create(layer_style)
+
+                if symbolLayer is not None:
+                    symbol.changeSymbolLayer(0, symbolLayer)
+                category = QgsRendererCategory(unique_id, symbol, str(unique_id))
+                categories.append(category)
+
+            # apply symbol to layer renderer
+            lyr.setRenderer(QgsCategorizedSymbolRenderer (column, categories))
+
+            # repaint layer
+            lyr.triggerRepaint()
