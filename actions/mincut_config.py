@@ -93,7 +93,7 @@ class MincutConfig(ParentAction):
             if row:
                 self.custom_action_sms = json.loads(row[0], object_pairs_hook=OrderedDict)
                 self.btn_notify.setVisible(self.custom_action_sms['show_mincut_sms'])
-        except KeyError as e:
+        except KeyError:
             self.btn_notify.setVisible(False)
 
         self.populate_combos()

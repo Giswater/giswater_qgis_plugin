@@ -64,6 +64,7 @@ class DuplicatePsector(ParentManage, QObject):
             return
 
         # Populate tab info
+        change_tab = False
         data = complet_result['body']['data']
         for k, v in list(data.items()):
             if str(k) == "info":

@@ -213,6 +213,7 @@ class ApiDimensioning(ApiParent):
             layer.select([feature_id])
 
             # Get depth of the feature
+            fieldname = None
             self.project_type = self.controller.get_project_type()
             if self.project_type == 'ws':
                 fieldname = "depth"
@@ -220,6 +221,9 @@ class ApiDimensioning(ApiParent):
                 fieldname = "ymax"
             elif self.project_type == 'ud' and feat_type == 'connec':
                 fieldname = "connec_depth"
+
+            if fieldname is None:
+                return
 
             sql = (f"SELECT {fieldname} "
                    f"FROM {feat_type} "
@@ -342,7 +346,7 @@ class ApiDimensioning(ApiParent):
             widget = self.add_button(dialog, field)
             widget = self.set_widget_size(widget, field)
         elif field['widgettype'] == 'hyperlink':
-            widget = self.add_hyperlink(dialog, field)
+            widget = self.add_hyperlink(field)
             widget = self.set_widget_size(widget, field)
         elif field['widgettype'] == 'hspacer':
             widget = self.add_horizontal_spacer()

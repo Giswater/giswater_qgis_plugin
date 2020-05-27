@@ -1027,6 +1027,7 @@ class ManageNewPsector(ParentManage):
                     if column_name != 'psector_id':
                         widget_type = utils_giswater.getWidgetType(self.dlg_plan_psector, column_name)
                         if widget_type is not None:
+                            value = None
                             if widget_type is QCheckBox:
                                 value = str(utils_giswater.isChecked(self.dlg_plan_psector, column_name)).upper()
                             elif widget_type is QDateEdit:
@@ -1037,6 +1038,7 @@ class ManageNewPsector(ParentManage):
                                 value = str(utils_giswater.get_item_data(self.dlg_plan_psector, combo))
                             else:
                                 value = utils_giswater.getWidgetText(self.dlg_plan_psector, column_name)
+
                             if value is None or value == 'null':
                                 sql += column_name + ", "
                                 values += "null, "

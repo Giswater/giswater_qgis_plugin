@@ -4,15 +4,15 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
 """
-
 # -*- coding: utf-8 -*-
-from functools import partial
-import webbrowser
-
 from qgis.PyQt.QtCore import QDate
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.core import QgsFeatureRequest
+
+from functools import partial
+import webbrowser
+
 from .parent import ParentAction
 from .tm_parent import TmParentAction
 from .tm_manage_visit import TmManageVisit
@@ -26,8 +26,6 @@ from ..ui.tm.tree_selector import TreeSelector
 from ..ui.tm.incident_manager import IncidentManager
 from ..ui_manager import IncidentPlanning
 from ..ui_manager import InfoIncident
-
-
 from .. import utils_giswater
 
 
@@ -565,7 +563,6 @@ class TmBasic(TmParentAction):
         self.select_all_rows(dialog.selected_rows, id_table_right)
         if utils_giswater.isChecked(dialog, dialog.chk_current):
             current_poda_type = utils_giswater.get_item_data(dialog, dialog.cmb_poda_type, 0)
-            # current_poda_name = utils_giswater.get_item_data(dialog, dialog.cmb_poda_type, 1)
             if current_poda_type is None:
                 message = "No heu seleccionat cap poda"
                 self.controller.show_warning(message)
@@ -578,6 +575,7 @@ class TmBasic(TmParentAction):
                        f" SET work_id = '{current_poda_type}'"
                        f" WHERE id = '{dialog.all_rows.model().record(row).value('mu_id')}'")
                 self.controller.execute_sql(sql)
+
         builder = utils_giswater.get_item_data(dialog, dialog.cmb_builder, 0)
         for i in range(0, len(left_selected_list)):
             row = left_selected_list[i].row()

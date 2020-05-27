@@ -5,7 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-
 from qgis.PyQt.QtWidgets import QCompleter
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel
 
@@ -362,7 +361,6 @@ class ReplaceFeatureMapTool(ParentMapTool):
 
 
 
-
     """ QgsMapTools inherited event functions """
 
     def keyPressEvent(self, event):
@@ -476,6 +474,4 @@ class ReplaceFeatureMapTool(ParentMapTool):
                    f"WHERE {self.feature_type_ws} = '{feature_type_new}'")
             rows = self.controller.get_rows(sql)
             utils_giswater.fillComboBox(self.dlg_replace, self.dlg_replace.featurecat_id, rows)
-
-
 

@@ -7,7 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from qgis.core import QgsCategorizedSymbolRenderer, QgsFillSymbol, QgsDataSourceUri, QgsFeature, QgsField, \
     QgsGeometry, QgsMarkerSymbol, QgsLayerTreeLayer, QgsLineSymbol, QgsProject, QgsRectangle, QgsRendererCategory, \
-    QgsSimpleFillSymbolLayer, QgsSymbol, QgsVectorLayer, QgsVectorLayerExporter
+    QgsSymbol, QgsVectorLayer, QgsVectorLayerExporter
 from qgis.PyQt.QtCore import QVariant
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QPushButton, QTabWidget
@@ -230,28 +230,12 @@ class AddLayer(object):
                 symbol.setSize(size)
 
             # configure a symbol layer
-            # layer_style = {}
-            # layer_style['color'] = '%d, %d, %d' % (randrange(0, 256), randrange(0, 256), randrange(0, 256))
-            # layer_style['color'] = '255,0,0'
-            # layer_style['outline'] = '#000000'
             try:
                 color = color_values.get(unique_value)
                 symbol.setColor(color)
-            except:
+            except Exception:
                 color = QColor(randrange(0, 256), randrange(0, 256), randrange(0, 256))
                 symbol.setColor(color)
-            # layer_style['horizontal_anchor_point'] = '6'
-            # layer_style['offset_map_unit_scale'] = '6'
-            # layer_style['outline_width'] = '6'
-            # layer_style['outline_width_map_unit_scale'] = '6'
-            # layer_style['size'] = '6'
-            # layer_style['size_map_unit_scale'] = '6'
-            # layer_style['vertical_anchor_point'] = '6'
-
-            # symbol_layer = QgsSimpleFillSymbolLayer.create(layer_style)
-            # # replace default symbol layer with the configured one
-            # if symbol_layer is not None:
-            #     symbol.changeSymbolLayer(0, symbol_layer)
 
             # create renderer object
             category = QgsRendererCategory(unique_value, symbol, str(unique_value))

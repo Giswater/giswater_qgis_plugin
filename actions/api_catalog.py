@@ -61,6 +61,7 @@ class ApiCatalog(ApiParent):
             label = QLabel()
             label.setObjectName('lbl_' + field['label'])
             label.setText(field['label'].capitalize())
+            widget = None
             if field['widgettype'] == 'combo':
                 widget = self.add_combobox(self.dlg_catalog, field)
             if field['layoutname'] == 'lyt_data_1':
@@ -74,6 +75,8 @@ class ApiCatalog(ApiParent):
 
         matcat_id = self.dlg_catalog.findChild(QComboBox, 'matcat_id')
 
+        pnom = None
+        dnom = None
         if self.controller.get_project_type() == 'ws':
             pnom = self.dlg_catalog.findChild(QComboBox, 'pnom')
             dnom = self.dlg_catalog.findChild(QComboBox, 'dnom')
@@ -104,6 +107,7 @@ class ApiCatalog(ApiParent):
         form_name = 'upsert_catalog_' + geom_type + ''
         form = f'"formName":"{form_name}", "tabName":"data", "editable":"TRUE"'
         feature = f'"feature_type":"{feature_type}"'
+        extras = None
         if self.controller.get_project_type() == 'ws':
             extras = f'"fields":{{"matcat_id":"{matcat_id_value}", "pnom":"{pn_value}", "dnom":"{dn_value}"}}'
         elif self.controller.get_project_type() == 'ud':

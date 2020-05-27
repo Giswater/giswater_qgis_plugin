@@ -125,6 +125,7 @@ class DeleteFeature(ApiParent):
             return
 
         # Populate tab info
+        change_tab = False
         data = complet_result['body']['data']
         for k, v in list(data.items()):
             if str(k) == "info":
@@ -165,12 +166,15 @@ class DeleteFeature(ApiParent):
 
         # Iterate over layer
         if layer.selectedFeatureCount() > 0:
+            selected_id = None
             # Get selected features of the layer
             features = layer.selectedFeatures()
             for feature in features:
                 # Append 'feature_id' into the list
                 selected_id = feature.attribute(field_id)
-            utils_giswater.setWidgetText(self.dlg_delete_feature, self.dlg_delete_feature.feature_id, str(selected_id))
+
+            if selected_id:
+                utils_giswater.setWidgetText(self.dlg_delete_feature, self.dlg_delete_feature.feature_id, str(selected_id))
 
 
     def set_active_layer(self):

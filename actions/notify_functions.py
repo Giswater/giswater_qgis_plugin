@@ -105,7 +105,7 @@ class NotifyFunctions(ParentAction):
                     try:
                         complet_result = json.loads(notify.payload, object_pairs_hook=OrderedDict)
                         self.execute_functions(complet_result)
-                    except Exception as e:
+                    except Exception:
                         pass
 
         except AttributeError:

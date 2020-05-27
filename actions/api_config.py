@@ -208,7 +208,6 @@ class ApiConfig(ApiParent):
 
         # Open form
         self.open_dialog(self.dlg_config, dlg_name='config')
-        
 
 
     def construct_form_param_user(self, row, pos):
@@ -545,17 +544,20 @@ class ApiConfig(ApiParent):
 
 
     def check_child_to_parent(self, widget_child, widget_parent):
+
         if widget_child.isChecked():
             widget_parent.setChecked(True)
 
 
     def check_parent_to_child(self, widget_parent, widget_child):
+
         if not widget_parent.isChecked():
             widget_child.setChecked(False)
 
 
     def set_layers_name(self):
         """ Insert the name of all the TOC layers, then populate the cad_combo_layers """
+
         layers = self.iface.mapCanvas().layers()
         if not layers:
             return
@@ -567,5 +569,6 @@ class ApiConfig(ApiParent):
 
         result = layers_name[:-2] + '}", ' + tables_name[:-2] + '}"}'
 
-        sql = (f'INSERT INTO temp_table (fprocesscat_id, text_column, cur_user) VALUES (63, $${result}$$, current_user);')
+        sql = f'INSERT INTO temp_table (fprocesscat_id, text_column, cur_user) VALUES (63, $${result}$$, current_user);'
         self.controller.execute_sql(sql, log_sql = True)
+

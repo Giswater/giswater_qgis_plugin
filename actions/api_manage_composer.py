@@ -227,7 +227,7 @@ class ApiManageComposer(ApiParent):
         # but python2 produces an error in the word 'print' at actual_printer.print(...),
         # then we need to create a fake to cheat python2
         print_ = getattr(actual_printer, 'print')
-        success = print_(self.printer, QgsLayoutExporter.PrintExportSettings())
+        print_(self.printer, QgsLayoutExporter.PrintExportSettings())
 
 
     def update_rectangle(self, dialog, my_json):

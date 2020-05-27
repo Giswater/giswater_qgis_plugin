@@ -92,7 +92,7 @@ class CadApiInfo(ParentMapTool):
         # For the first time, cf_info does not exist, therefore we cannot access it and reset rubberbands
         try:
             self.api_cf.resetRubberbands()
-        except AttributeError as e:
+        except AttributeError:
             pass
 
 

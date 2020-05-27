@@ -48,7 +48,6 @@ class ChangeElemType(ParentMapTool):
         """ Update current type of node and save changes in database """
         
         project_type = self.controller.get_project_type() 
-        old_node_type = utils_giswater.getWidgetText(self.dlg_chg_node_type, self.dlg_chg_node_type.node_node_type)
         node_node_type_new = utils_giswater.getWidgetText(self.dlg_chg_node_type, self.dlg_chg_node_type.node_node_type_new)
         node_nodecat_id = utils_giswater.getWidgetText(self.dlg_chg_node_type, self.dlg_chg_node_type.node_nodecat_id)
         layer = False
@@ -81,7 +80,6 @@ class ChangeElemType(ParentMapTool):
             message = "The node has not been updated because no catalog has been selected"
             self.controller.show_warning(message)
 
-
         # Close form
         self.close_dialog(self.dlg_chg_node_type)
 
@@ -105,7 +103,8 @@ class ChangeElemType(ParentMapTool):
         if features[0]:
             self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, tab_type='data')
             self.ApiCF.user_current_layer = self.current_layer
-            complet_result, dialog = self.ApiCF.open_form(table_name='v_edit_node', feature_id=features[0]["node_id"], tab_type='data')
+            complet_result, dialog = self.ApiCF.open_form(table_name='v_edit_node', feature_id=features[0]["node_id"],
+                                                          tab_type='data')
             if not complet_result:
                 return
 
@@ -119,6 +118,7 @@ class ChangeElemType(ParentMapTool):
         self.load_settings(self.dlg_chg_node_type)
 
         # Get nodetype_id from current node
+        node_type = ""
         project_type = self.controller.get_project_type()         
         if project_type == 'ws':
             node_type = feature.attribute('nodetype_id')

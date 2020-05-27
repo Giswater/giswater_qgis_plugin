@@ -1178,7 +1178,7 @@ class ParentAction(object):
         # For the first time, cf_info does not exist, therefore we cannot access it and reset rubberbands
         try:
             self.info_cf.resetRubberbands()
-        except AttributeError as e:
+        except AttributeError:
             pass
 
 
@@ -1259,8 +1259,8 @@ class ParentAction(object):
             # get unique values
             fni = lyr.fields().indexFromName(column)
             unique_ids = lyr.dataProvider().uniqueValues(fni)
-            #get number of unique values
-            totalval = len(sorted(list(lyr.uniqueValues(fni))))
+            # get number of unique values
+            #totalval = len(sorted(list(lyr.uniqueValues(fni))))
 
             categories = []
 

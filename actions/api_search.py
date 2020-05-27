@@ -86,6 +86,7 @@ class ApiSearch(ApiParent):
                 label = QLabel()
                 label.setObjectName('lbl_' + field['label'])
                 label.setText(field['label'].capitalize())
+                widget = None
                 if field['widgettype'] == 'typeahead':
                     completer = QCompleter()
                     widget = self.add_lineedit(field)
@@ -593,6 +594,7 @@ class ApiSearch(ApiParent):
         if folder_path is None or folder_path == 'null':
             path.setStyleSheet("border: 1px solid red")
             return
+
         path.setStyleSheet(None)
         if folder_path.find('.csv') == -1:
             folder_path += '.csv'
@@ -600,6 +602,8 @@ class ApiSearch(ApiParent):
             model_1 = qtable_1.model()
         else:
             return
+
+        model_2 = None
         if qtable_2:
             model_2 = qtable_2.model()
 

@@ -283,6 +283,8 @@ class SnappingConfigManager(object):
         """ Get point """
 
         event_point = None
+        x = None
+        y = None
         try:
             if event:
                 x = event.pos().x()

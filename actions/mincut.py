@@ -195,7 +195,7 @@ class MincutParent(ParentAction):
             if row:
                 custom_action_sms = json.loads(row[0], object_pairs_hook=OrderedDict)
                 self.show_notified.setVisible(custom_action_sms['show_sms_info'])
-        except KeyError as e:
+        except KeyError:
             self.show_notified.setVisible(False)
 
         # Show future id of mincut
@@ -620,7 +620,6 @@ class MincutParent(ParentAction):
             result_layer = self.add_layer.add_temp_layer(self.dlg_mincut, result['body']['data'], None, False, tab_idx=2)
             for layer in result_layer['temp_layers_added']:
 
-                layer_style = {}
                 symbol = QgsSymbol.defaultSymbol(layer.geometryType())
                 if type(symbol) == QgsLineSymbol:
                     props = {'capstyle': 'round', 'customdash': '5;2', 'customdash_map_unit_scale': '3x:0,0,0,0,0,0',
@@ -2497,9 +2496,8 @@ class MincutParent(ParentAction):
         title = self.dlg_comp.title.text()
         try:
             rotation = float(self.dlg_comp.rotation.text())
-        except ValueError as e:
+        except ValueError:
             rotation = 0
-
 
         # Show layout
         self.iface.openLayoutDesigner(layout)

@@ -93,10 +93,13 @@ class Utils(ParentAction):
         """ Populate combo with full list of codes """
 
         unicode_list = []
+        sorted_list = None
         for item in list(aliases.items()):
             unicode_list.append(str(item[0]))
             sorted_list = sorted(unicode_list, key=str.lower)
-        utils_giswater.set_autocompleter(combo, sorted_list)
+
+        if sorted_list:
+            utils_giswater.set_autocompleter(combo, sorted_list)
 
 
     def update_info(self, dialog):
@@ -140,7 +143,6 @@ class Utils(ParentAction):
     def validate_params(self, dialog):
         """ Validate if params are valids """
 
-        label_aux = utils_giswater.getWidgetText(dialog, dialog.txt_import)
         path = self.get_path(dialog)
         self.preview_csv(dialog)
         if path is None or path == 'null':
@@ -262,7 +264,8 @@ class Utils(ParentAction):
         dialog.progressBar.setVisible(True)
         dialog.progressBar.setValue(progress)
         # counts rows in csvfile, using var "row_count" to do progressbar
-        row_count = sum(1 for rows in csvfile)  # @UnusedVariable
+        # noinspection PyUnusedLocal
+        row_count = sum(1 for rows in csvfile)
         if row_count > 20:
             row_count -= 20
         dialog.progressBar.setMaximum(row_count)  # -20 for see 100% complete progress

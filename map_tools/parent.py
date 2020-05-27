@@ -17,7 +17,6 @@
 
 """
 # -*- coding: utf-8 -*-
-
 from qgis.core import QgsDataSourceUri, QgsExpression, QgsProject, QgsVectorLayer, QgsWkbTypes
 from qgis.gui import QgsMapTool, QgsVertexMarker, QgsRubberBand
 from qgis.PyQt.QtCore import Qt
@@ -28,9 +27,11 @@ import os
 import sys
 if 'nt' in sys.builtin_module_names:
     import ctypes
+
 from .. import utils_giswater
 from .snapping_utils_v3 import SnappingConfigManager
 from ..ui_manager import GwDialog, GwMainWindow
+
 
 class ParentMapTool(QgsMapTool):
 
@@ -120,7 +121,6 @@ class ParentMapTool(QgsMapTool):
 
         # Remove highlight
         self.vertex_marker.hide()
-
 
 
     def remove_vertex(self):
@@ -431,6 +431,4 @@ class ParentMapTool(QgsMapTool):
             qtabwidget.setCurrentIndex(tab_idx)
 
         return change_tab
-
-
 

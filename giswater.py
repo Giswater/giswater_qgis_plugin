@@ -111,7 +111,7 @@ class Giswater(QObject):
         try:
             self.iface.projectRead.connect(self.project_read)
             self.iface.newProjectCreated.connect(self.project_new)
-        except AttributeError as e:
+        except AttributeError:
             pass
 
 
@@ -631,7 +631,7 @@ class Giswater(QObject):
         self.project_read(False)
 
 
-    def init_plugin(self, enable_toolbars=True):
+    def init_plugin(self):
         """ Plugin main initialization function """
 
         # Set controller (no database connection yet)
@@ -639,8 +639,6 @@ class Giswater(QObject):
         self.controller.set_plugin_dir(self.plugin_dir)
         self.controller.set_qgis_settings(self.qgis_settings)
         self.controller.set_giswater(self)
-
-        #self.initialize_toolbars()
 
         # Set main information button (always visible)
         self.set_info_button()
@@ -751,7 +749,7 @@ class Giswater(QObject):
             else:
                 self.set_info_button_visible()
 
-        except Exception as e:
+        except Exception:
             pass
         finally:
             # Reset instance attributes
@@ -923,12 +921,12 @@ class Giswater(QObject):
 
         # Manage project read of type 'tm'
         if self.wsoftware == 'tm':
-            self.project_read_tm(show_warning)
+            self.project_read_tm()
             return
 
         # Manage project read of type 'pl'
         elif self.wsoftware == 'pl':
-            self.project_read_pl(show_warning)
+            self.project_read_pl()
             return
 
         # Set custom plugin toolbars (one action class per toolbar)
@@ -1011,9 +1009,9 @@ class Giswater(QObject):
             if not row: return
             json_list = json.loads(row[0], object_pairs_hook=OrderedDict)
             self.list_to_hide = [str(x) for x in json_list['action_index']]
-        except KeyError as e:
+        except KeyError:
             pass
-        except JSONDecodeError as e:
+        except JSONDecodeError:
             # Control if json have a correct format
             pass
         finally:
@@ -1207,6 +1205,7 @@ class Giswater(QObject):
         """ Manage project variable 'expl_id' """
 
         # Get project variable 'expl_id'
+        expl_id = None
         try:
             expl_id = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('expl_id')
         except:
@@ -1222,7 +1221,7 @@ class Giswater(QObject):
         self.controller.execute_sql(sql)
 
 
-    def project_read_pl(self, show_warning=True):
+    def project_read_pl(self):
         """ Function executed when a user opens a QGIS project of type 'pl' """
 
         # Manage actions of the different plugin_toolbars
@@ -1236,7 +1235,7 @@ class Giswater(QObject):
         self.controller.log_info(message)
 
 
-    def project_read_tm(self, show_warning=True):
+    def project_read_tm(self):
         """ Function executed when a user opens a QGIS project of type 'tm' """
 
         # Set actions classes (define one class per plugin toolbar)
@@ -1346,8 +1345,7 @@ class Giswater(QObject):
         try:
             # Set field editability
             config.setReadOnly(field_index, not field['iseditable'])
-        except KeyError as e:
-            # Control if key 'iseditable' not exist
+        except KeyError:
             pass
         finally:
             # Set layer config
@@ -1493,6 +1491,7 @@ class Giswater(QObject):
     def selection_changed(self):
         """ Get selected expl_id and execute function setselectors """
 
+        expl_id = None
         features = self.layer_expl.getSelectedFeatures()
         for feature in features:
             expl_id = feature["expl_id"]
@@ -1502,6 +1501,9 @@ class Giswater(QObject):
         self.iface.mapCanvas().selectionChanged.disconnect()
         self.iface.actionZoomToSelected().trigger()
         self.layer_expl.removeSelection()
+
+        if expl_id is None:
+            return
 
         extras = f'"selector_type":"exploitation", "check":true, "onlyone":true, "id":{expl_id}'
         body = self.create_body(extras=extras)

@@ -133,7 +133,7 @@ class ApiParent(ParentAction):
         try:
             self.save_settings(dlg)
             dlg.close()
-        except Exception as e:
+        except Exception:
             pass
 
             
@@ -242,6 +242,8 @@ class ApiParent(ParentAction):
             self.canvas.setMapTool(self.previous_map_tool)
             return
 
+        existing_point_x = None
+        existing_point_y = None
         viewname = self.controller.get_layer_source_table_name(self.layer)
         sql = (f"SELECT ST_X(the_geom), ST_Y(the_geom)"
                f" FROM {viewname}"
@@ -251,17 +253,18 @@ class ApiParent(ParentAction):
             existing_point_x = row[0]
             existing_point_y = row[1]
 
-        sql = (f"UPDATE node"
-               f" SET hemisphere = (SELECT degrees(ST_Azimuth(ST_Point({existing_point_x}, {existing_point_y}), "
-               f" ST_Point({point.x()}, {point.y()}))))"
-               f" WHERE node_id = '{self.feature_id}'")
-        status = self.controller.execute_sql(sql)
-        if not status:
-            self.canvas.setMapTool(self.previous_map_tool)
-            return
+        if existing_point_x:
+            sql = (f"UPDATE node"
+                   f" SET hemisphere = (SELECT degrees(ST_Azimuth(ST_Point({existing_point_x}, {existing_point_y}), "
+                   f" ST_Point({point.x()}, {point.y()}))))"
+                   f" WHERE node_id = '{self.feature_id}'")
+            status = self.controller.execute_sql(sql)
+            if not status:
+                self.canvas.setMapTool(self.previous_map_tool)
+                return
 
         sql = (f"SELECT rotation FROM node "
-               f" WHERE node_id='{self.feature_id}'")
+               f" WHERE node_id = '{self.feature_id}'")
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText(dialog, "rotation", str(row[0]))
@@ -361,7 +364,6 @@ class ApiParent(ParentAction):
 
         layer = self.iface.activeLayer()
         layername = layer.name()
-        is_valid = False
 
         # Get the point. Leave selection
         snapped_feature = self.snapper_manager.get_snapped_feature(result, True)
@@ -878,7 +880,7 @@ class ApiParent(ParentAction):
         widget.setEmpty()
 
         
-    def add_hyperlink(self, dialog, field):
+    def add_hyperlink(self, field):
     
         widget = HyperLinkLabel()
         widget.setObjectName(field['widgetname'])
@@ -904,6 +906,7 @@ class ApiParent(ParentAction):
         else:
             message = "Parameter not found"
             self.controller.show_message(message, 2, parameter='widgetfunction')
+
         # Call function (self, widget) or def no_function_associated(self, widget=None, message_level=1)
         widget.clicked.connect(partial(getattr(self, func_name), widget))
         return widget
@@ -1053,6 +1056,7 @@ class ApiParent(ParentAction):
             else:
                 label.setToolTip(field['label'].capitalize())
 
+            widget = None
             if field['widgettype'] in ('text', 'textline') or field['widgettype'] == 'typeahead':
                 completer = QCompleter()
                 widget = self.add_lineedit(field)
@@ -1066,7 +1070,7 @@ class ApiParent(ParentAction):
                 widget = self.add_calendar(dialog, field)
                 widget = self.set_auto_update_dateedit(field, dialog, widget)
             elif field['widgettype'] == 'hyperlink':
-                widget = self.add_hyperlink(dialog, field)
+                widget = self.add_hyperlink(field)
             elif field['widgettype'] == 'textarea':
                 widget = self.add_textarea(field)
             elif field['widgettype'] in ('combo', 'combobox'):
@@ -1320,6 +1324,7 @@ class ApiParent(ParentAction):
                 if 'tooltip' in field:
                     lbl.setToolTip(field['tooltip'])
 
+                widget = None
                 if field['widgettype'] == 'text' or field['widgettype'] == 'linetext':
                     widget = QLineEdit()
                     if 'isMandatory' in field:
@@ -1330,7 +1335,8 @@ class ApiParent(ParentAction):
                     if 'widgetcontrols' in field and field['widgetcontrols']:
                         if 'regexpControl' in field['widgetcontrols']:
                             if field['widgetcontrols']['regexpControl'] is not None:
-                                reg_exp = QRegExp(str(field['widgetcontrols']['regexpControl']))
+                                pass
+                                #reg_exp = QRegExp(str(field['widgetcontrols']['regexpControl']))
                                 #widget.setValidator(QRegExpValidator(reg_exp))
                     widget.editingFinished.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
@@ -1614,6 +1620,7 @@ class ApiParent(ParentAction):
         :param del_old_layers: look for a layer with the same name as the one to be inserted and delete it
         :return:
         """
+
         srid = self.controller.plugin_settings_value('srid')
         # Block the signals so that the window does not appear asking for crs / srid and / or alert message
         self.iface.mainWindow().blockSignals(True)
@@ -1672,6 +1679,7 @@ class ApiParent(ParentAction):
                 if dxf_layer.isValid():
                     self.add_layer.from_dxf_to_toc(dxf_layer, dxf_output_filename)
                     temp_layers_added.append(dxf_layer)
+
         # Unlock signals
         self.iface.mainWindow().blockSignals(False)
 
@@ -1717,7 +1725,8 @@ class ApiParent(ParentAction):
                 label.setText(field['label'])
                 widget = self.add_checkbox(field)
                 widget.setProperty('selector_type', form_tab['selectorType'])
-                widget.stateChanged.connect(partial(self.set_selector, widget, form_tab['tableName'], field['column_id'], form_tab['selectorType']))
+                widget.stateChanged.connect(partial(self.set_selector, widget, form_tab['tableName'],
+                    field['column_id'], form_tab['selectorType']))
                 widget.setLayoutDirection(Qt.RightToLeft)
                 field['layoutname'] = gridlayout.objectName()
                 field['layout_order'] = order
@@ -1726,12 +1735,11 @@ class ApiParent(ParentAction):
             gridlayout.addItem(vertical_spacer1)
 
 
-    def set_selector(self, widget, table_name, column_name, selector_type, state):
+    def set_selector(self, widget, table_name, column_name, selector_type):
         """ Send values to DB
         :param widget: QCheckBox that has changed status
         :param table_name: name of the table that we have to update
         :param column_name: name of the column that we have to update
-        :param state: sent by widget when stateChange
         """
 
         extras = f'"selector_type":"{widget.property("selector_type")}", '

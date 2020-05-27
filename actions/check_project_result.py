@@ -152,7 +152,7 @@ class CheckProjectResult(ApiParent):
                 else:
                     grl_others.addWidget(label, pos, 0)
                     grl_others.addWidget(widget, pos, 1)
-            except KeyError as e:
+            except KeyError:
                 description = "Key on returned json from ddbb is missed"
                 self.controller.manage_exception(None, description)
 
@@ -167,7 +167,7 @@ class CheckProjectResult(ApiParent):
             if check.isChecked():
                 try:
                     the_geom = check.property('field_the_geom')
-                except KeyError as e:
+                except KeyError:
                     sql = (f"SELECT attname FROM pg_attribute a "
                            f" JOIN pg_class t on a.attrelid = t.oid "
                            f" JOIN pg_namespace s on t.relnamespace = s.oid "

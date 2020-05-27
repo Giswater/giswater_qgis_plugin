@@ -9,7 +9,6 @@
  ***************************************************************************/
 """
 # -*- coding: utf-8 -*-
-
 from qgis.core import QgsFeatureRequest, QgsVectorLayer, QgsProject, QgsReadWriteContext, QgsPrintLayout
 from qgis.gui import QgsMapToolEmitPoint
 from qgis.PyQt.QtCore import Qt
@@ -30,7 +29,9 @@ from ..ui_manager import LoadProfiles
 
 
 class NodeData:
+
     def __init__(self):
+
         self.start_point = None
         self.top_elev = None
         self.ymax = None
@@ -114,17 +115,12 @@ class DrawProfiles(ParentMapTool):
         self.dlg_draw_profile.btn_clear_profile.clicked.connect(self.clear_profile)
         self.dlg_draw_profile.btn_export_pdf.clicked.connect(self.export_pdf)
         self.dlg_draw_profile.btn_export_pdf.clicked.connect(self.save_rotation_vdefault)
-
         self.dlg_draw_profile.btn_update_path.clicked.connect(self.set_composer_path)
-
-        # Plugin path
-        plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
         # Get qgis_composers_folderpath
         sql = "SELECT value FROM config_param_user WHERE parameter = 'qgis_composers_folderpath'"
         row = self.controller.get_row(sql)
         utils_giswater.setWidgetText(self.dlg_draw_profile, self.composers_path, str(row[0]))
-
 
         # Fill ComboBox cbx_template with templates *.qpt from ...giswater/templates
         template_path = utils_giswater.getWidgetText(self.dlg_draw_profile, self.composers_path)
@@ -144,7 +140,6 @@ class DrawProfiles(ParentMapTool):
 
         self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
         self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
-
         self.list_of_selected_nodes = []
 
         self.open_dialog(self.dlg_draw_profile)
@@ -618,6 +613,7 @@ class DrawProfiles(ParentMapTool):
                 # query for nodes
                 # SELECT elevation AS top_elev, depth AS ymax, top_elev-depth AS sys_elev, nodecat_id, code"
 
+            nodecat_id = ""
             row = self.controller.get_row(sql)
             columns = ['top_elev', 'ymax', 'sys_elev', 'nodecat_id', 'code']
             if row:
@@ -865,12 +861,17 @@ class DrawProfiles(ParentMapTool):
     def draw_nodes(self, node, prev_node, index):
         """ Draw nodes between first and last node """
 
+        reverse = True
+        z1 = None
+        z2 = None
+
         if node.node_id == prev_node.node_2:
             z1 = prev_node.z2
             reverse = False
         elif node.node_id == prev_node.node_1:
             z1 = prev_node.z1
             reverse = True
+
 
         if node.node_id == node.node_1:
             z2 = node.z1
@@ -1740,6 +1741,7 @@ class DrawProfiles(ParentMapTool):
             expr_filter = '"arc_id" IN ('
             for i in range(len(self.arc_id)):
                 expr_filter += f"'{self.arc_id[i]}', "
+
             expr_filter = expr_filter[:-2] + ")"
             (is_valid, expr) = self.check_expression(expr_filter, True)   #@UnusedVariable
             if not is_valid:

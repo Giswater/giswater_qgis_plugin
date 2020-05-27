@@ -1204,7 +1204,7 @@ class ParentManage(ParentAction, object):
             table_name = self.schema_name + "." + table_name
 
         # Set model
-        model = QSqlTableModel();
+        model = QSqlTableModel()
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)
         model.setFilter(expr_filter)

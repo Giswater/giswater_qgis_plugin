@@ -342,6 +342,7 @@ class ManageWorkcatEnd(ParentManage):
             self.controller.show_warning(message, parameter=expr.parserErrorString())
             return
 
+        id_list = None
         if layer_arc:
             # Get a featureIterator from this expression:
             it = layer_arc.getFeatures(QgsFeatureRequest(expr))
@@ -350,10 +351,11 @@ class ManageWorkcatEnd(ParentManage):
                 self.iface.openFeatureForm(layer_arc, id_list[0])
 
         # Zoom to object
-        canvas = self.iface.mapCanvas()
-        layer_arc.selectByIds([id_list[0].id()])
-        canvas.zoomToSelected(layer_arc)
-        canvas.zoomIn()
+        if id_list:
+            canvas = self.iface.mapCanvas()
+            layer_arc.selectByIds([id_list[0].id()])
+            canvas.zoomToSelected(layer_arc)
+            canvas.zoomIn()
 
 
     def exec_downgrade(self):

@@ -46,7 +46,7 @@ class PgDao(object):
         return status
 
 
-    def check_cursor(self, is_notify=False):
+    def check_cursor(self):
         """ Check if cursor is closed """
 
         if self.cursor.closed:

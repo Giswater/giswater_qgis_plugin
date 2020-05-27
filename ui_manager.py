@@ -244,6 +244,8 @@ class Credentials(GwDialog, FORM_CLASS):
 
     def show_pass(self):
 
+        icon_path = ""
+        text = ""
         if self.txt_pass.echoMode() == 0:
             self.txt_pass.setEchoMode(QLineEdit.Password)
             icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_open.png'
@@ -488,6 +490,8 @@ class QmGenerator(GwDialog, FORM_CLASS):
 
     def show_pass(self):
 
+        icon_path = ""
+        text = ""
         if self.txt_pass.echoMode() == 0:
             self.txt_pass.setEchoMode(QLineEdit.Password)
             icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_open.png'

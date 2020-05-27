@@ -205,6 +205,8 @@ class ApiCF(ApiParent, QObject):
         last_click = self.canvas.mouseLastXY()
         self.last_point = QgsMapToPixel.toMapCoordinates(
             self.canvas.getCoordinateTransform(), last_click.x(), last_click.y())
+
+        extras = ""
         if tab_type == 'inp':
             extras = '"toolBar":"epa"'
         elif tab_type == 'data':
@@ -212,8 +214,10 @@ class ApiCF(ApiParent, QObject):
 
         project_role = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('project_role')
         extras += f', "rolePermissions":"{project_role}"'
+        function_name = None
+        body = None
 
-        # IF insert new feature
+        # Insert new feature
         if point and feature_cat:
             self.feature_cat = feature_cat
             self.new_feature_id = new_feature_id
@@ -223,7 +227,7 @@ class ApiCF(ApiParent, QObject):
             extras += f', "coordinates":{{{point}}}'
             body = self.create_body(feature=feature, extras=extras)
             function_name = 'gw_fct_getfeatureinsert'
-        # IF click over canvas
+        # Click over canvas
         elif point:
             visible_layer = self.get_visible_layers(as_list=True)
             scale_zoom = self.iface.mapCanvas().scale()
@@ -235,14 +239,19 @@ class ApiCF(ApiParent, QObject):
             extras += f', "coordinates":{{"xcoord":{point.x()},"ycoord":{point.y()}, "zoomRatio":{scale_zoom}}}'
             body = self.create_body(extras=extras)
             function_name = 'gw_fct_getinfofromcoordinates'
-        # IF come from QPushButtons node1 or node2 from custom form or RightButton
+        # Come from QPushButtons node1 or node2 from custom form or RightButton
         elif feature_id:
             feature = f'"tableName":"{table_name}", "id":"{feature_id}"'
             body = self.create_body(feature=feature, extras=extras)
             function_name = 'gw_fct_getinfofromid'
 
+        if function_name is None:
+            return False, None
+
         row = [self.controller.get_json(function_name, body, log_sql=True)]
-        if not row or row[0] is False: return False, None
+        if not row or row[0] is False:
+            return False, None
+
         # When something is wrong
         if row[0]['message']:
             level = 1
@@ -628,16 +637,6 @@ class ApiCF(ApiParent, QObject):
         return self.feature
 
 
-    def api_action_zoom_in(self, canvas, layer):
-        """ Zoom in """
-
-        if not self.feature:
-            self.get_feature(self.tab_type)
-        layer.selectByIds([self.feature.id()])
-        canvas.zoomToSelected(layer)
-        canvas.zoomIn()
-
-
     def set_vdefault_edition(self):
 
         if 'toggledition' in self.complet_result[0]['body']:
@@ -832,7 +831,7 @@ class ApiCF(ApiParent, QObject):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
-        widget = self.add_hyperlink(dialog, field)
+        widget = self.add_hyperlink(field)
         widget = self.set_widget_size(widget, field)
         return widget
 
@@ -1073,7 +1072,7 @@ class ApiCF(ApiParent, QObject):
         value = utils_giswater.getWidgetText(dialog, widget, return_string_null=False)
         try:
             getattr(self, f"{widget.property('datatype')}_validator")( value, widget, btn)
-        except AttributeError as e:
+        except AttributeError:
             """If the function called by getattr don't exist raise this exception"""
             pass
 
@@ -1290,7 +1289,7 @@ class ApiCF(ApiParent, QObject):
             self.fill_tab_document()
             self.tab_document_loaded = True
         elif self.tab_main.widget(index_tab).objectName() == 'tab_rpt' and not self.tab_rpt_loaded:
-            result = self.fill_tab_rpt(self.complet_result)
+            self.fill_tab_rpt(self.complet_result)
             self.tab_rpt_loaded = True
         # Tab 'Plan'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_plan' and not self.tab_plan_loaded:
@@ -1345,6 +1344,7 @@ class ApiCF(ApiParent, QObject):
             self.controller.show_warning(message)
             return
 
+        element_id = ""
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             element_id = widget.model().record(row).value("element_id")
@@ -1623,7 +1623,6 @@ class ApiCF(ApiParent, QObject):
         row = index.row()
 
         table_name = 'v_ui_hydrometer'
-        column_index = 0
         column_index = utils_giswater.get_col_index_by_col_name(qtable, 'hydrometer_id')
         feature_id = index.sibling(row, column_index).data()
 
@@ -2193,7 +2192,6 @@ class ApiCF(ApiParent, QObject):
             self.get_feature(self.tab_type)
             
         # Get widgets
-        txt_doc_id = self.dlg_cf.findChild(QLineEdit, "txt_doc_id")
         doc_type = self.dlg_cf.findChild(QComboBox, "doc_type")
         self.date_document_to = self.dlg_cf.findChild(QDateEdit, "date_document_to")
         self.date_document_from = self.dlg_cf.findChild(QDateEdit, "date_document_from")
@@ -2366,22 +2364,24 @@ class ApiCF(ApiParent, QObject):
                 if 'isparent' in field:
                     if field['isparent']:
                         widget = dialog.findChild(QComboBox, field['widgetname'])
-                        widget.currentIndexChanged.connect(partial(self.fill_child, dialog, widget, self.feature_type, self.tablename, self.field_id))
+                        widget.currentIndexChanged.connect(partial(self.fill_child, dialog, widget, self.feature_type,
+                            self.tablename, self.field_id))
 
         return complet_list, widget_list
 
 
     def set_listeners(self, complet_result, dialog, widget_list):
 
+        model = None
         for widget in widget_list:
             if type(widget) is QTableView:
-                standar_model = widget.model()
+                model = widget.model()
         for widget in widget_list:
             if type(widget) is QLineEdit:
-                widget.editingFinished.connect(partial(self.filter_table, complet_result, standar_model, dialog, widget_list))
+                widget.editingFinished.connect(partial(self.filter_table, complet_result, model, dialog, widget_list))
             elif type(widget) is QComboBox:
                 widget.currentIndexChanged.connect(partial(
-                    self.filter_table, complet_result, standar_model, dialog, widget_list))
+                    self.filter_table, complet_result, model, dialog, widget_list))
 
 
     def get_list(self, complet_result, form_name='', tab_name='', filter_fields=''):
@@ -2485,6 +2485,7 @@ class ApiCF(ApiParent, QObject):
                 self.controller.show_message("No listValues for: " + complet_list['body']['data'], 2)
             else:
                 for field in complet_list['body']['data']['fields']:
+                    label = QLabel()
                     if field['widgettype'] == 'formDivider':
                         for x in range(0, 2):
                             line = self.add_frame(field, x)
@@ -2498,6 +2499,7 @@ class ApiCF(ApiParent, QObject):
                             label.setToolTip(field['tooltip'])
                         else:
                             label.setToolTip(field['label'].capitalize())
+
                     if field['widgettype'] == 'label':
                         widget = self.add_label(field)
                         widget.setAlignment(Qt.AlignRight)

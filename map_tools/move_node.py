@@ -56,7 +56,7 @@ class MoveNodeMapTool(ParentMapTool):
                 self.dlg_binfo = BasicInfoUi()
                 self.dlg_binfo.btn_accept.hide()
                 self.dlg_binfo.btn_close.clicked.connect(lambda: self.dlg_binfo.close())
-                text_result = self.populate_info_text(self.dlg_binfo, result['body']['data'], False, True, 1)
+                self.populate_info_text(self.dlg_binfo, result['body']['data'], False, True, 1)
                 self.dlg_binfo.exec()
 
         else:

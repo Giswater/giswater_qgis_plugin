@@ -265,6 +265,8 @@ class DaoController(object):
         sslmode = self.get_user_setting_value('sslmode', 'disable')
         self.log_info(f"sslmode user config file: {sslmode}")
 
+        credentials = None
+        not_version = True
         if layer:
             not_version = False
             credentials = self.get_layer_source(layer)
@@ -557,8 +559,9 @@ class DaoController(object):
         
         
     def show_info_box(self, text, title=None, inf_text=None, context_name=None, parameter=None):
-        """ Show information box to the user """   
+        """ Show information box to the user """
 
+        msg = ""
         if text:        
             msg = self.tr(text, context_name)
             if parameter:
@@ -854,6 +857,7 @@ class DaoController(object):
         if not widget:
             return
 
+        widget_name = ""
         try:
             if type(widget) is QTabWidget:
                 num_tabs = widget.count()
@@ -1629,7 +1633,7 @@ class DaoController(object):
             self.show_exceptions_msg(title, msg)
             self.log_warning(msg, stack_level_increase=2)
 
-        except Exception as e:
+        except Exception:
             self.manage_exception("Unhandled Error")
 
 
@@ -1703,7 +1707,7 @@ class DaoController(object):
                 self.show_exceptions_msg(title, msg)
                 self.log_warning(msg, stack_level_increase=2)
 
-        except Exception as e:
+        except Exception:
             self.manage_exception("Unhandled Error")
 
 
