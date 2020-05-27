@@ -8,4 +8,4 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2020/05/26
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_log_arc_traceability", "column":"code", "dataType":"varchar(30)", "isUtils":"True"}}$$)
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_log_arc_traceability", "column":"code", "dataType":"varchar(30)", "isUtils":"False"}}$$)
