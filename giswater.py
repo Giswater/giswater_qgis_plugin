@@ -896,9 +896,6 @@ class Giswater(QObject):
         # Set PostgreSQL parameter 'search_path'
         self.controller.set_search_path(layer_source['schema'])
 
-        # Cache error message with log_code = -1 (uncatched error)
-        self.controller.get_error_message(-1)
-
         # Check if schema exists
         self.schema_exists = self.controller.check_schema(self.schema_name)
         if not self.schema_exists:
