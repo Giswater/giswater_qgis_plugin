@@ -55,14 +55,14 @@ class MincutParent(ParentAction):
         self.deleted_list = []
         self.connec_list = []
 
-        # Serialize data of table 'anl_mincut_cat_state'
+        # Serialize data of mincut states
         self.set_states()
         self.current_state = None
         self.is_new = True
 
 
     def set_states(self):
-        """ Serialize data of table 'anl_mincut_cat_state' """
+        """ Serialize data of mincut states """
         
         self.states = {}
         sql = ("SELECT id, idval "
@@ -1441,10 +1441,10 @@ class MincutParent(ParentAction):
         if result_mincut_id == 'null':
             return
 
-        sql = (f"DELETE FROM anl_mincut_result_{element}"
+        sql = (f"DELETE FROM om_mincut_{element}"
                f" WHERE result_id = {result_mincut_id};\n")
         for element_id in self.connec_list:
-            sql += (f"INSERT INTO anl_mincut_result_{element}"
+            sql += (f"INSERT INTO om_mincut_{element}"
                     f" (result_id, {element}_id) "
                     f" VALUES ('{result_mincut_id}', '{element_id}');\n")
             # Get hydrometer_id of selected connec
@@ -1472,10 +1472,10 @@ class MincutParent(ParentAction):
         if result_mincut_id == 'null':
             return
 
-        sql = (f"DELETE FROM anl_mincut_result_{element}"
+        sql = (f"DELETE FROM om_mincut_{element}"
                f" WHERE result_id = {result_mincut_id};\n")
         for element_id in self.hydro_list:
-            sql += (f"INSERT INTO anl_mincut_result_{element}"
+            sql += (f"INSERT INTO om_mincut_{element}"
                     f" (result_id, {element}_id) "
                     f" VALUES ('{result_mincut_id}', '{element_id}');\n")
         
@@ -1682,6 +1682,7 @@ class MincutParent(ParentAction):
                 self.set_cursor_restore()
                 self.task1.setProgress(100)
                 return
+
             # Enable button CustomMincut and button Start
             self.dlg_mincut.btn_start.setDisabled(False)
             self.action_custom_mincut.setDisabled(False)
@@ -1842,22 +1843,24 @@ class MincutParent(ParentAction):
         # Force fill form mincut
         self.result_mincut_id.setText(str(result_mincut_id))
 
-        sql = (f"SELECT om_mincut.*, anl_mincut_cat_state.name AS state_name, cat_users.name AS assigned_to_name"
+        sql = (f"SELECT om_mincut.*, cat_users.name AS assigned_to_name"
                f" FROM om_mincut"
-               f" INNER JOIN anl_mincut_cat_state"
-               f" ON om_mincut.mincut_state = anl_mincut_cat_state.id"
                f" INNER JOIN cat_users"
                f" ON cat_users.id = om_mincut.assigned_to"
                f" WHERE om_mincut.id = '{result_mincut_id}'")
-
-        row = self.controller.get_row(sql, log_sql=False)
+        row = self.controller.get_row(sql, log_sql=True)
         if not row:
             return
-              
+
+        # Get mincut state name
+        mincut_state_name = ''
+        if row['mincut_state'] in self.states:
+            mincut_state_name = self.states[row['mincut_state']]
+
         utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.work_order, row['work_order'])
         utils_giswater.set_combo_itemData(self.dlg_mincut.type, row['mincut_type'], 0)
         utils_giswater.set_combo_itemData(self.dlg_mincut.cause, row['anl_cause'], 0)
-        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, row['state_name'])
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, mincut_state_name)
         utils_giswater.setWidgetText(self.dlg_mincut, "output_details", row['output'])
         
         # Manage location
