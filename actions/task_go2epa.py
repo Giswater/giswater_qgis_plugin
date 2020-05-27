@@ -196,13 +196,21 @@ class TaskGo2Epa(QgsTask):
             return
 
         # Set file to execute
+        opener = None
         if self.project_type in 'ws':
             opener = f"{self.plugin_dir}/epa/ws_epanet20012.exe"
         elif self.project_type in 'ud':
             opener = f"{self.plugin_dir}/epa/ud_swmm50022.exe"
 
-        subprocess.call([opener, self.file_inp, self.file_rpt], shell=False)
-        self.common_msg += "EPA model finished. "
+        if opener is None:
+            return
+
+        if os.path.exists(opener):
+            subprocess.call([opener, self.file_inp, self.file_rpt], shell=False)
+            self.common_msg += "EPA model finished. "
+        else:
+            msg = "File not found"
+            self.controller.show_warning(msg, parameter=opener)
 
 
     def import_rpt(self):
@@ -277,6 +285,7 @@ class TaskGo2Epa(QgsTask):
                                 aux = dirty_list[x][last_index:i]
                                 last_index = i
                                 sp_n.append(aux)
+
                         aux = dirty_list[x][last_index:i]
                         sp_n.append(aux)
 

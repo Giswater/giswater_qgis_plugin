@@ -681,41 +681,40 @@ class Go2Epa(ApiParent):
         # Get new values from widgets of type QComboBox
         rpt_selector_result_id = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id)
         rpt_selector_compare_id = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_compare_id)
+
+        if rpt_selector_result_id not in (None, -1, ''):
+            sql = (f"INSERT INTO selector_rpt_main (result_id, cur_user)"
+                   f" VALUES ('{rpt_selector_result_id}', '{user}');\n")
+            self.controller.execute_sql(sql)
+
+        if rpt_selector_compare_id not in (None, -1, ''):
+            sql = (f"INSERT INTO selector_rpt_compare (result_id, cur_user)"
+                   f" VALUES ('{rpt_selector_compare_id}', '{user}');\n")
+            self.controller.execute_sql(sql)
+
         if self.project_type == 'ws':
             time_to_show = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_time_to_show)
             time_to_compare = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_time_to_compare)
+            if time_to_show not in (None, -1, ''):
+                sql = (f"INSERT INTO rpt_selector_hourly (time, cur_user)"
+                       f" VALUES ('{time_to_show}', '{user}');\n")
+                self.controller.execute_sql(sql)
+            if time_to_compare not in (None, -1, ''):
+                sql = (f"INSERT INTO rpt_selector_hourly_compare (time, cur_user)"
+                       f" VALUES ('{time_to_compare}', '{user}');\n")
+                self.controller.execute_sql(sql)
 
         elif self.project_type == 'ud':
             date_to_show = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_sel_date)
             time_to_show = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_sel_time)
             date_to_compare = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_com_date)
             time_to_compare = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_com_time)
-
-        if rpt_selector_result_id not in (None, -1, ''):
-            sql = (f"INSERT INTO selector_rpt_main (result_id, cur_user)"
-                   f" VALUES ('{rpt_selector_result_id}', '{user}');\n")
-            self.controller.execute_sql(sql)
-        if rpt_selector_compare_id not in (None, -1, ''):
-            sql = (f"INSERT INTO selector_rpt_compare (result_id, cur_user)"
-                   f" VALUES ('{rpt_selector_compare_id}', '{user}');\n")
-            self.controller.execute_sql(sql)
-        if self.project_type == 'ws':
-            if time_to_show not in (None, -1, ''):
-                sql = (f"INSERT INTO rpt_selector_hourly(time, cur_user)"
-                       f" VALUES ('{time_to_show}', '{user}');\n")
-                self.controller.execute_sql(sql)
-            if time_to_compare not in (None, -1, ''):
-                sql = (f"INSERT INTO rpt_selector_hourly_compare(time, cur_user)"
-                       f" VALUES ('{time_to_compare}', '{user}');\n")
-                self.controller.execute_sql(sql)
-
-        if self.project_type == 'ud':
             if date_to_show not in (None, -1, ''):
-                sql = (f"INSERT INTO rpt_selector_timestep(resultdate, resulttime, cur_user)"
+                sql = (f"INSERT INTO rpt_selector_timestep (resultdate, resulttime, cur_user)"
                        f" VALUES ('{date_to_show}', '{time_to_show}', '{user}');\n")
                 self.controller.execute_sql(sql)
             if date_to_compare not in (None, -1, ''):
-                sql = (f"INSERT INTO rpt_selector_timestep_compare(resultdate, resulttime, cur_user)"
+                sql = (f"INSERT INTO rpt_selector_timestep_compare (resultdate, resulttime, cur_user)"
                        f" VALUES ('{date_to_compare}', '{time_to_compare}', '{user}');\n")
                 self.controller.execute_sql(sql)
 
