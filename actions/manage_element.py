@@ -294,7 +294,6 @@ class ManageElement(ParentManage):
                f" WHERE element_id = '{element_id}'")
         row = self.controller.get_row(sql, log_info=False)
 
-        
         if row is None:
             # If object not exist perform an INSERT
             if element_id == '':
@@ -353,7 +352,7 @@ class ManageElement(ParentManage):
                 sql_values += ", null"
             if element_id == '':
                 sql += sql_values + ") RETURNING element_id;"
-                new_elem_id = self.controller.execute_returning(sql, search_audit=False, log_sql=True)
+                new_elem_id = self.controller.execute_returning(sql, log_sql=True)
                 sql_values = ""
                 sql = ""
                 element_id = str(new_elem_id[0])
@@ -442,13 +441,13 @@ class ManageElement(ParentManage):
 
     def filter_elementcat_id(self):
         """ Filter QComboBox @elementcat_id according QComboBox @elementtype_id """
+
         element_type = utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.element_type, 1)
         sql = (f"SELECT DISTINCT(id), id FROM cat_element"
                f" WHERE elementtype_id = '{element_type}'"
                f" ORDER BY id")
         rows = self.controller.get_rows(sql, log_sql=True)
         utils_giswater.set_item_data(self.dlg_add_element.elementcat_id, rows, 1)
-
 
 
     def edit_element(self):

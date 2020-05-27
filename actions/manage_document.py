@@ -156,7 +156,7 @@ class ManageDocument(ParentManage):
             if doc_id == 'null':
                 sql = (f"INSERT INTO doc (doc_type, path, observ, date)"
                        f" VALUES ('{doc_type}', '{path}', '{observ}', '{date}') RETURNING id;")
-                new_doc_id = self.controller.execute_returning(sql, search_audit=False, log_sql=True)
+                new_doc_id = self.controller.execute_returning(sql, log_sql=True)
                 sql = ""
                 doc_id = str(new_doc_id[0])
             else:

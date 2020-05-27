@@ -1050,7 +1050,7 @@ class ManageNewPsector(ParentManage):
 
         if not self.update:
             sql += " RETURNING psector_id;"
-            new_psector_id = self.controller.execute_returning(sql, search_audit=False, log_sql=True)
+            new_psector_id = self.controller.execute_returning(sql, log_sql=True)
             utils_giswater.setText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id, str(new_psector_id[0]))
             if new_psector_id and self.plan_om == 'plan':
                 row = self.controller.get_config('plan_psector_vdefault')

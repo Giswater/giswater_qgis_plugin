@@ -158,7 +158,6 @@ class DaoController(object):
         # Initialize variables
         self.dao = None 
         self.last_error = None      
-        self.log_codes = {}
         self.logged = False
         
         self.layer_source, not_version = self.get_layer_source_from_credentials()
@@ -426,22 +425,6 @@ class DaoController(object):
             return opened
 
 
-    def get_error_message(self, log_code_id):    
-        """ Get error message from selected error code """
-        
-        if self.schema_name is None:
-            return       
-
-        sql = ("SELECT error_message "
-               "FROM sys_message "
-               "WHERE id = " + str(log_code_id))
-        result = self.dao.get_row(sql)  
-        if result:
-            self.log_codes[log_code_id] = result[0]    
-        else:
-            self.log_codes[log_code_id] = "Error message not found in the database: " + str(log_code_id)
-            
-            
     def get_postgresql_version(self):    
         """ Get PostgreSQL version (integer value) """    
 
@@ -648,7 +631,7 @@ class DaoController(object):
         return rows  
     
             
-    def execute_sql(self, sql, search_audit=False, log_sql=False, log_error=False, commit=True, filepath=None):
+    def execute_sql(self, sql, log_sql=False, log_error=False, commit=True, filepath=None):
         """ Execute SQL. Check its result in log tables, and show it to the user """
 
         if log_sql:
@@ -660,15 +643,11 @@ class DaoController(object):
                 self.log_info(sql, stack_level_increase=1)
             self.manage_exception_db(self.last_error, sql, filepath=filepath)
             return False
-        else:
-            if search_audit:
-                # Get last record from audit tables (searching for a possible error)
-                return self.get_error_from_audit(commit)
 
         return True
 
 
-    def execute_returning(self, sql, search_audit=False, log_sql=False, log_error=False, commit=True):
+    def execute_returning(self, sql, log_sql=False, log_error=False, commit=True):
         """ Execute SQL. Check its result in log tables, and show it to the user """
 
         if log_sql:
@@ -680,10 +659,6 @@ class DaoController(object):
                 self.log_info(sql, stack_level_increase=1)
             self.manage_exception_db(self.last_error, sql)
             return False
-        else:
-            if search_audit:
-                # Get last record from audit tables (searching for a possible error)
-                return self.get_error_from_audit(commit)
 
         return value
            
