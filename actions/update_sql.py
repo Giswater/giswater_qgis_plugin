@@ -2118,6 +2118,8 @@ class UpdateSQL(ApiParent):
 
         if schema_name == 'Nothing to select' or schema_name == '':
             result = None
+            self.is_sample = None
+
         else:
             sql = ("SELECT value FROM " + schema_name + ".config_param_system "
                    "WHERE parameter = 'admin_schema_info'")
