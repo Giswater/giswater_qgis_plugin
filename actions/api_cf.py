@@ -924,9 +924,9 @@ class ApiCF(ApiParent, QObject):
         """
         
         if _json == '' or str(_json) == '{}':
-            self.close_dialog(dialog)
             if docker is not None:
-                docker.close()
+                docker.setMinimumWidth(dialog.width())
+            self.close_dialog(dialog)
             return
 
         p_table_id = complet_result['body']['feature']['tableName']
@@ -964,10 +964,11 @@ class ApiCF(ApiParent, QObject):
 
             my_json = json.dumps(_json)
             if my_json == '' or str(my_json) == '{}':
-                self.close_dialog(dialog)
                 if docker is not None:
-                    docker.close()
+                    docker.setMinimumWidth(dialog.width())
+                self.close_dialog(dialog)
                 return
+
             feature = f'"id":"{self.new_feature.attribute(id_name)}", '
 
         # If we make an info
@@ -992,10 +993,11 @@ class ApiCF(ApiParent, QObject):
         elif "Failed" in result['status']:
             msg = "FAIL"
             self.controller.show_message(msg, message_level=2)
+
         if close_dialog:
-            self.close_dialog(dialog)
             if docker is not None:
-                docker.close()
+                docker.setMinimumWidth(dialog.width())
+            self.close_dialog(dialog)
 
 
     def get_scale_zoom(self):
