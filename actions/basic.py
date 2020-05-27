@@ -12,6 +12,8 @@ from .. import utils_giswater
 from ..ui_manager import Multirow_selector, SelectorUi
 from .api_search import ApiSearch
 from .api_parent import ApiParent
+from qgis.core import *
+import random
 
 
 class Basic(ApiParent):
@@ -41,20 +43,62 @@ class Basic(ApiParent):
         self.dlg_selector = SelectorUi()
         self.load_settings(self.dlg_selector)
         self.dlg_selector.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_selector))
+        self.dlg_selector.btn_close.clicked.connect(partial(self.close_dialog, self.set_mapzones_style()))
         self.dlg_selector.rejected.connect(partial(self.save_settings, self.dlg_selector))
         self.get_selector(self.dlg_selector, selector_values)
         self.open_dialog(self.dlg_selector, dlg_name='selector', maximize_button=False)
 		
-		# call dynamic mapzones repaint
-        row = self.controller.get_config('mapzones_dynamic_symbology', 'value', 'config_param_system')
-        if row and row[0].lower() == 'true':
-            if field_id_right == "expl_id":
-                self.set_layer_simbology_polcategorized('v_edit_dma', 'name', 0.5)
-                self.set_layer_simbology_polcategorized('v_edit_dqa', 'name', 0.5)
-                self.set_layer_simbology_polcategorized('v_edit_presszone', 'descript', 0.5)
-
+        # repaint mapzones and refresh canvas
+        self.set_mapzones_style()
         self.refresh_map_canvas()
 
+    def set_mapzones_style(self):
+
+        row = self.controller.get_config('utils_grafanalytics_dynamic_symbology', 'value', 'config_param_system')
+        if row and row[0].lower() == 'true':
+            extras = f'"mapzones":""'
+            body = self.create_body(extras=extras)
+            dbreturn = self.controller.get_json('gw_fct_getmapzonestyle', body, log_sql=True)
+            if not dbreturn: return False
+
+            for mapzone in dbreturn['body']['data']['mapzones']:
+
+                #loop for each mapzone returned on json
+                lyr = self.controller.get_layer_by_tablename(mapzone['layer'])
+                categories = []
+
+                if lyr:
+                    #loop for each id returned on json
+                    for id in mapzone['values']:
+                        # initialize the default symbol for this geometry type
+                        symbol = QgsSymbol.defaultSymbol(lyr.geometryType())
+                        symbol.setOpacity(float(mapzone['opacity']))
+
+                        #setting color
+                        try:
+                            R = id['style']['color'][0]
+                            G = id['style']['color'][1]
+                            B = id['style']['color'][2]
+                        except TypeError:
+                            R = random.randint(0, 255)
+                            G = random.randint(0, 255)
+                            B = random.randint(0, 255)
+
+                        #setting sytle
+                        layer_style = {}
+                        layer_style['color'] = '{}, {}, {}'.format(int(R), int(G), int(B))
+                        symbolLayer = QgsSimpleFillSymbolLayer.create(layer_style)
+
+                        if symbolLayer is not None:
+                            symbol.changeSymbolLayer(0, symbolLayer)
+                        category = QgsRendererCategory(id['id'], symbol, str(id['id']))
+                        categories.append(category)
+
+                        # apply symbol to layer renderer
+                        lyr.setRenderer(QgsCategorizedSymbolRenderer(mapzone['idname'], categories))
+
+                        # repaint layer
+                        lyr.triggerRepaint()
 
     def basic_state_selector(self):
         """ Button 48: State selector """
