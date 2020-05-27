@@ -219,3 +219,4 @@ UPDATE sys_function SET function_type ='trigger function' WHERE function_type ='
 UPDATE sys_param_user SET widgettype = 'check' where id = 'utils_debug_mode';
 UPDATE sys_param_user SET layout_order=6 where id = 'edit_builtdate_vdefault';
 
+INSERT INTO sys_function VALUES (2928, 'gw_fct_getmazonestyle','utils','function','json','json','Function to get style from mapzones','role_basic',false);
