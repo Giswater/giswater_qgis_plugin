@@ -576,24 +576,25 @@ class AddNewLot(ParentManage):
         ot_result = self.manage_widget_lot(lot_id)
 
         # Fill ComboBox cmb_visit_class
-        if ot_result:
-            sql = ("SELECT DISTINCT(om_visit_class.id), om_visit_class.idval, feature_type, tablename "
-                   " FROM om_visit_class"
-                   " INNER JOIN om_visit_class_x_wo "
-                   " ON om_visit_class_x_wo.visitclass_id = om_visit_class.id "
-                   " INNER JOIN config_api_visit "
-                   " ON config_api_visit.visitclass_id = om_visit_class_x_wo.visitclass_id "
-                   " WHERE ismultifeature is False AND feature_type IS NOT null")
-        else:
-            sql = ("SELECT DISTINCT(id), idval, feature_type, tablename FROM om_visit_class"
-                   " INNER JOIN config_api_visit ON config_api_visit.visitclass_id = om_visit_class.id")
+        visitclass_ids = []
+        exists = self.controller.check_table('config_api_visit')
+        if exists:
+            if ot_result:
+                sql = ("SELECT DISTINCT(om_visit_class.id), om_visit_class.idval, feature_type, tablename "
+                       " FROM om_visit_class"
+                       " INNER JOIN om_visit_class_x_wo "
+                       " ON om_visit_class_x_wo.visitclass_id = om_visit_class.id "
+                       " INNER JOIN config_api_visit "
+                       " ON config_api_visit.visitclass_id = om_visit_class_x_wo.visitclass_id "
+                       " WHERE ismultifeature is False AND feature_type IS NOT null")
+            else:
+                sql = ("SELECT DISTINCT(id), idval, feature_type, tablename FROM om_visit_class"
+                       " INNER JOIN config_api_visit ON config_api_visit.visitclass_id = om_visit_class.id")
+            rows = self.controller.get_rows(sql)
+            if rows:
+                visitclass_ids = rows
 
-        visitclass_ids = self.controller.get_rows(sql)
-        if visitclass_ids:
-            visitclass_ids.append(['', '', '', ''])
-        else:
-            visitclass_ids = []
-            visitclass_ids.append(['', '', '', ''])
+        visitclass_ids.append(['', '', '', ''])
         utils_giswater.set_item_data(self.dlg_lot.cmb_visit_class, visitclass_ids, 1)
 
         # Fill ComboBox cmb_assigned_to
