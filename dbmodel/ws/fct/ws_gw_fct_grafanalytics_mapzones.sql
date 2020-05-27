@@ -485,31 +485,31 @@ BEGIN
 					
 						DELETE FROM audit_log_data WHERE fprocesscat_id=47 AND cur_user=current_user;
 				
-						INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) SELECT 47, 'node', n.node_id, 
-						concat('{"staticpressure":',case when (a.elevation - n.elevation::float) is null then 0 ELSE (a.elevation - n.elevation::float) END, 
+						INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) 
+						SELECT 47, 'node', n.node_id, 
+						concat('{"staticpressure":',case when (pz.head - n.elevation::float) is null then 0 ELSE (pz.head - n.elevation::float) END, 
 						', "nodeparent":"',anl_node.descript,'"}')
 						FROM node n 
-						JOIN anl_node USING (node_id) 
-						JOIN node a ON a.node_id=anl_node.descript
+						JOIN anl_node USING (node_id)
+						JOIN 
+						(select head, json_array_elements_text((grafconfig->>'use')::json)::json->>'nodeParent' as node_id from presszone) pz ON pz.node_id = anl_node.descript
 						WHERE fprocesscat_id=30 AND cur_user=current_user;
 
-						-- update node table those elements connected on graf
+						-- update on node table those elements connected on graf
 						UPDATE node SET staticpressure=(log_message::json->>'staticpressure')::float FROM audit_log_data a WHERE a.feature_id=node_id 
 						AND fprocesscat_id=47 AND cur_user=current_user;
 						
-						-- update node table those elements disconnected from graf
+						-- update on node table those elements disconnected from graf
 						UPDATE node SET staticpressure=(staticpress1-(staticpress1-staticpress2)*st_linelocatepoint(v_edit_arc.the_geom, n.the_geom))::numeric(12,3)
 										FROM v_edit_arc,node n
 										WHERE st_dwithin(v_edit_arc.the_geom, n.the_geom, 0.05::double precision) AND v_edit_arc.state = 1 AND n.state = 1
 										and n.arc_id IS NOT NULL AND node.node_id=n.node_id;
 												
-						-- update connec table
-						UPDATE v_edit_connec SET staticpressure = (b.elevation-v_edit_connec.elevation) FROM 
-							(SELECT connec_id, a.elevation FROM connec JOIN (SELECT a.sector_id, node_id, elevation FROM 
-								(SELECT json_array_elements_text((grafconfig->>'use')::json)::json->>'nodeParent' as node_id, 
-								sector_id FROM sector)a JOIN node USING (node_id))a
-							USING (sector_id)) b
-							WHERE v_edit_connec.connec_id=b.connec_id;
+						-- updat connec table
+						UPDATE v_edit_connec SET staticpressure = (head - elevation) FROM 
+							(SELECT connec_id, head, elevation FROM connec 
+							JOIN presszone ON id = presszone_id) a
+							WHERE v_edit_connec.connec_id=a.connec_id;
 					END IF;
 
 					-- message

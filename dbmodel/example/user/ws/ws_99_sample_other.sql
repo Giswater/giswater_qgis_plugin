@@ -572,3 +572,32 @@ INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_upsert_
 ON CONFLICT (parameter, cur_user) DO NOTHING;
 
 UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'qgis_form_docker' AND cur_user = current_user;
+
+UPDATE presszone SET head=0, style='{}'  where id = '0';
+UPDATE presszone SET head=100, style='{"color":[100,100,100]}'  where id = '1';
+UPDATE presszone SET head=100, style='{"color":[100,100,100]}'  where id = '2';
+UPDATE presszone SET head=100, style='{"color":[100,100,100]}'  where id = '3';
+UPDATE presszone SET head=100, style='{"color":[100,100,100]}'  where id = '4';
+UPDATE presszone SET head=100, style='{"color":[100,100,100]}'  where id = '5';
+UPDATE presszone SET head=100, style='{"color":[100,100,100]}'  where id = '6';
+
+UPDATE dma SET style='{}'  where dma_id = 0;
+UPDATE dma SET style='{"color":[100,100,100]}'  where dma_id = 1;
+UPDATE dma SET style='{"color":[100,100,100]}'  where dma_id = 2;
+UPDATE dma SET style='{"color":[100,100,100]}'  where dma_id = 3;
+UPDATE dma SET style='{"color":[100,100,100]}'  where dma_id = 4;
+UPDATE dma SET style='{"color":[100,100,100]}'  where dma_id = 5;
+
+UPDATE dqa SET style='{}'  where dqa_id = 0;
+UPDATE dqa SET style='{"color":[100,100,100]}'  where dqa_id = 1;
+UPDATE dqa SET style='{"color":[100,100,100]}'  where dqa_id = 2;
+UPDATE dqa SET style='{"color":[100,100,100]}'  where dqa_id = 3;
+UPDATE dqa SET style='{"color":[100,100,100]}'  where dqa_id = 4;
+
+UPDATE sector SET style='{}'  where sector_id = 0;
+UPDATE sector SET style='{"color":[100,100,100]}'  where sector_id = 1;
+UPDATE sector SET style='{"color":[100,100,100]}'  where sector_id = 2;
+UPDATE sector SET style='{"color":[100,100,100]}'  where sector_id = 3;
+UPDATE sector SET style='{"color":[100,100,100]}'  where sector_id = 4;
+UPDATE sector SET style='{"color":[100,100,100]}'  where sector_id = 5;
+
