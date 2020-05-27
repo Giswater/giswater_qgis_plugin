@@ -2,4 +2,4 @@
 *************
 - Full refactor of profile tool (including to be used on WS projects)
 - Add variable to allow and manage labels on custom form Data tab
-- Get v_edit_link.fluid_type from connec/gully instead of arc 
+- Get v_edit_link.fluid_type from connec/gully instead of arc (UD)
