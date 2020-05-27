@@ -52,8 +52,6 @@ from .map_tools.open_visit import OpenVisit
 from .models.plugin_toolbar import PluginToolbar
 from .models.sys_feature_cat import SysFeatureCat
 from .ui_manager import AuditCheckProjectResult
-from .actions.parent import *
-
 
 class Giswater(QObject):  
     
