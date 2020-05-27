@@ -38,7 +38,7 @@ CREATE OR REPLACE VIEW v_edit_link AS
             link.exit_type,
             link.exit_id,
             link.vnode_topelev,
-			fluid_type,
+			c.fluid_type,
             arc.sector_id,
             arc.dma_id,
             arc.expl_id,
@@ -69,6 +69,7 @@ CREATE OR REPLACE VIEW v_edit_link AS
              JOIN sector ON sector.sector_id::text = arc.sector_id::text
              JOIN dma ON dma.dma_id::text = arc.dma_id::text
              LEFT JOIN plan_psector_x_connec USING (arc_id, connec_id)
+			 LEFT JOIN connec c ON link.feature_id::text = c.connec_id::text
           WHERE link.feature_id::text = v_state_connec.connec_id::text
         UNION
          SELECT link.link_id,
@@ -79,7 +80,7 @@ CREATE OR REPLACE VIEW v_edit_link AS
             link.exit_type,
             link.exit_id,
             link.vnode_topelev,
-			fluid_type,
+			g.fluid_type,
             arc.sector_id,
             arc.dma_id,
             arc.expl_id,
@@ -110,6 +111,7 @@ CREATE OR REPLACE VIEW v_edit_link AS
              JOIN sector ON sector.sector_id::text = arc.sector_id::text
              JOIN dma ON dma.dma_id::text = arc.dma_id::text
              LEFT JOIN plan_psector_x_gully USING (arc_id, gully_id)
+			 LEFT JOIN gully g ON link.feature_id::text = g.gully_id::text
           WHERE link.feature_id::text = v_state_gully.gully_id::text) a
   WHERE a.state < 2;
 

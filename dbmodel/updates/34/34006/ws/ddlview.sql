@@ -62,13 +62,14 @@ CREATE OR REPLACE VIEW v_edit_link AS
                     WHEN plan_psector_x_connec.link_geom IS NULL THEN NULL::integer
                     ELSE plan_psector_x_connec.id
                 END AS psector_rowid,
-            arc.fluid_type
+            c.fluid_type
            FROM link
              JOIN v_state_connec ON link.feature_id::text = v_state_connec.connec_id::text
              LEFT JOIN arc USING (arc_id)
              LEFT JOIN sector ON sector.sector_id::text = arc.sector_id::text
              LEFT JOIN dma ON dma.dma_id::text = arc.dma_id::text
-             LEFT JOIN plan_psector_x_connec USING (arc_id, connec_id)) a
+             LEFT JOIN plan_psector_x_connec USING (arc_id, connec_id)
+			 LEFT JOIN connec c ON link.feature_id::text = c.connec_id::text) a
   WHERE a.state < 2;
 
 DROP VIEW IF EXISTS v_arc_x_vnode;
