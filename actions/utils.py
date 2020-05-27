@@ -209,7 +209,7 @@ class Utils(ParentAction):
         """ Delete records from temp_csv2pg for current user and selected cat """
 
         sql = (f"DELETE FROM {temp_tablename} "
-               f"WHERE csv2pgcat_id = '{csv2pgcat_id_aux}' AND user_name = current_user")
+               f"WHERE csv2pgcat_id = '{csv2pgcat_id_aux}' AND cur_user = current_user")
         self.controller.execute_sql(sql, log_sql=True)
 
 

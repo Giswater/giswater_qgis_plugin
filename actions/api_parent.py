@@ -563,21 +563,16 @@ class ApiParent(ParentAction):
             else:
                 message = "Parameter button_function is null for button"
                 self.controller.show_message(message, 2, parameter=widget.objectName())
-        # Call def gw_api_open_node(self, dialog, widget) of the class ApiCf
-        # or def no_function_associated(self, widget=None, message_level=1)
-        """
-            functions called in -> partial(getattr(self, function_name), **kwargs)
-                def no_function_associated(self, **kwargs)
-                def gw_api_open_node(self, **kwargs) of the class ApiCf
-                def gw_function_dxf(self, **kwargs):
-        """
+
         kwargs = {'dialog': dialog, 'widget': widget, 'message_level':1, 'function_name':function_name}
         widget.clicked.connect(partial(getattr(self, function_name), **kwargs))
+
         return widget
 
 
     def add_textarea(self, field):
         """ Add widgets QTextEdit type """
+
         widget = QTextEdit()
         widget.setObjectName(field['widgetname'])
         if 'column_id' in field:
@@ -587,8 +582,8 @@ class ApiParent(ParentAction):
         if 'iseditable' in field:
             widget.setReadOnly(not field['iseditable'])
             if not field['iseditable']:
-                widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242);"
-                                     " color: rgb(100, 100, 100)}")
+                widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
+
         return widget
 
 
@@ -605,15 +600,18 @@ class ApiParent(ParentAction):
             widget.setReadOnly(not field['iseditable'])
             if not field['iseditable']:
                 widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
+
         return widget
 
 
     def set_data_type(self, field, widget):
+
         widget.setProperty('datatype', field['datatype'])
         return widget
 
 
     def manage_lineedit(self, field, dialog, widget, completer):
+
         if field['widgettype'] == 'typeahead':
             if 'queryText' not in field or 'queryTextFilter' not in field:
                 return widget
@@ -667,6 +665,7 @@ class ApiParent(ParentAction):
                     msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
                     self.controller.show_message(msg, 2)
                     return widget
+
         # Call def gw_api_open_rpt_result(self, widget, complet_result) of class ApiCf
         widget.doubleClicked.connect(partial(getattr(self, function_name), widget, complet_result))
 
@@ -909,15 +908,18 @@ class ApiParent(ParentAction):
 
         # Call function (self, widget) or def no_function_associated(self, widget=None, message_level=1)
         widget.clicked.connect(partial(getattr(self, func_name), widget))
+
         return widget
 
         
     def add_horizontal_spacer(self):
+
         widget = QSpacerItem(10, 10, QSizePolicy.Expanding, QSizePolicy.Minimum)
         return widget
 
         
     def add_verical_spacer(self):
+
         widget = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         return widget
 
@@ -941,8 +943,8 @@ class ApiParent(ParentAction):
         if 'iseditable' in field:
             widget.setReadOnly(not field['iseditable'])
             if not field['iseditable']:
-                widget.setStyleSheet("QDoubleSpinBox { background: rgb(0, 250, 0);"
-                                     " color: rgb(100, 100, 100)}")
+                widget.setStyleSheet("QDoubleSpinBox { background: rgb(0, 250, 0); color: rgb(100, 100, 100)}")
+
         return widget
 
 
@@ -1551,10 +1553,6 @@ class ApiParent(ParentAction):
 
 
     """ FUNCTIONS ASSOCIATED TO BUTTONS FROM POSTGRES"""
-
-    # def no_function_asociated(self, widget=None, message_level=1):
-    #     self.controller.show_message(str("no_function_asociated for button: ") + str(widget.objectName()), message_level)
-
 
     def action_open_url(self, dialog, result):
 

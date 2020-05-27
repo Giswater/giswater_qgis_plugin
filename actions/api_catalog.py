@@ -146,6 +146,7 @@ class ApiCatalog(ApiParent):
             elif field['column_id'] == 'geom1':
                 self.populate_combo(dnom,field)
 
+
     def get_event_combo_parent(self, fields, row, geom_type):
 
         if fields == 'fields':
@@ -181,9 +182,11 @@ class ApiCatalog(ApiParent):
         pn_value = utils_giswater.getWidgetText(self.dlg_catalog, widget_pn)
         dn_value = utils_giswater.getWidgetText(self.dlg_catalog, widget_dn)
 
-        sql = f"SELECT gw_api_get_catalog_id('{metcat_value}','{pn_value}','{dn_value}','{geom_type}',9)"
-        row = self.controller.get_row(sql, log_sql=True)
-        self.populate_combo(widget_id, row[0]['catalog_id'][0])
+        exists = self.controller.check_function('gw_api_get_catalog_id')
+        if exists:
+            sql = f"SELECT gw_api_get_catalog_id('{metcat_value}', '{pn_value}', '{dn_value}', '{geom_type}', 9)"
+            row = self.controller.get_row(sql, log_sql=True)
+            self.populate_combo(widget_id, row[0]['catalog_id'][0])
 
 
     def populate_child(self, combo_child, result):
