@@ -77,9 +77,9 @@ class Basic(ApiParent):
 
                         #setting color
                         try:
-                            R = id['style']['color'][0]
-                            G = id['style']['color'][1]
-                            B = id['style']['color'][2]
+                            R = id['stylesheet']['color'][0]
+                            G = id['stylesheet']['color'][1]
+                            B = id['stylesheet']['color'][2]
                         except TypeError:
                             R = random.randint(0, 255)
                             G = random.randint(0, 255)
