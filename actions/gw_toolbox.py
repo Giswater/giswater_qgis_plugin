@@ -102,7 +102,6 @@ class GwToolBox(ApiParent):
         if not complet_result: return False
 
         status = self.populate_functions_dlg(self.dlg_functions, complet_result['body']['data'])
-
         if not status:
             self.alias_function = index.sibling(index.row(), 1).data()
             message = "Function not found"
@@ -135,14 +134,13 @@ class GwToolBox(ApiParent):
             parentGroup = demRaster.parent()
             try:
                 QgsProject.instance().removeMapLayer(layer.id())
-            except Exception as e:
+            except Exception:
                 pass
 
             if len(parentGroup.findLayers())== 0:
                 root.removeChildNode(parentGroup)
 
         self.iface.mapCanvas().refresh()
-
 
 
     def set_selected_layer(self, dialog, combo):
@@ -245,6 +243,7 @@ class GwToolBox(ApiParent):
         # TODO Check if time functions is short or long, activate and set undetermined  if not short
 
         # Get function name
+        function = None
         function_name = None
         for group, function in list(result['fields'].items()):
             if len(function) != 0:
@@ -252,8 +251,10 @@ class GwToolBox(ApiParent):
                 self.save_parametric_values(dialog, function)
                 function_name = function[0]['functionname']
                 break
+
         if function_name is None:
             return
+
         # If function is not parametrized, call function(old) without json
         if self.is_paramtetric is False:
             self.execute_no_parametric(dialog, function_name)
@@ -264,6 +265,7 @@ class GwToolBox(ApiParent):
             return
 
         if function[0]['input_params']['featureType']:
+            layer = None
             layer_name = utils_giswater.get_item_data(dialog, combo, 1)
             if layer_name != -1:
                 layer = self.set_selected_layer(dialog, combo)
@@ -273,6 +275,7 @@ class GwToolBox(ApiParent):
                     dialog.progressBar.setMaximum(1)
                     dialog.progressBar.setValue(1)
                     return
+
             selection_mode = self.rbt_checked['widget']
             extras += f'"selectionMode":"{selection_mode}",'
             # Check selection mode and get (or not get) all feature id
@@ -339,7 +342,7 @@ class GwToolBox(ApiParent):
             dialog.progressBar.setValue(1)
             return
 
-        dialog.progressBar.setFormat("Running function: " + str(function_name))
+        dialog.progressBar.setFormat(f"Running function: {function_name}")
         dialog.progressBar.setAlignment(Qt.AlignCenter)
 
         if len(widget_list) > 0:
@@ -351,7 +354,7 @@ class GwToolBox(ApiParent):
         sql = f"SELECT {function_name}({body})::text"
         row = self.controller.get_row(sql, log_sql=True)
         if not row or row[0] is None:
-            self.controller.show_message(f"Function : {function_name} executed with no result ", 3)
+            dialog.progressBar.setFormat(f"Function: {function_name} executed with no result")
             dialog.progressBar.setVisible(False)
             dialog.progressBar.setMinimum(0)
             dialog.progressBar.setMaximum(1)
@@ -360,15 +363,19 @@ class GwToolBox(ApiParent):
 
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
 
-        self.add_layer.add_temp_layer(dialog, complet_result[0]['body']['data'], self.alias_function, True, True, 1, True)
-
-        dialog.progressBar.setFormat(f"Function {function_name} has finished.")
         dialog.progressBar.setAlignment(Qt.AlignCenter)
         dialog.progressBar.setMinimum(0)
         dialog.progressBar.setMaximum(1)
         dialog.progressBar.setValue(1)
 
+        if complet_result[0]['status'] != "Accepted":
+            dialog.progressBar.setFormat(f"Function: {function_name} failed. See log file for more details")
+            self.controller.log_warning(complet_result[0])
+            return False
+
         try:
+            dialog.progressBar.setFormat(f"Function {function_name} has finished")
+            self.add_layer.add_temp_layer(dialog, complet_result[0]['body']['data'], self.alias_function, True, True, 1, True)
             self.add_layer.set_layers_visible(complet_result[0]['body']['data']['setVisibleLayers'])
 
             # getting on the fly simbology capabilities
@@ -384,13 +391,13 @@ class GwToolBox(ApiParent):
                         self.set_layer_simbology_polcategorized(self.simb_layer, self.simb_column, self.simb_opacity)
 					
         except KeyError as e:
-
             msg = f"<b>Key: </b>{e}<br>"
             msg += f"<b>key container: </b>'body/data/ <br>"
             msg += f"<b>Python file: </b>{__name__} <br>"
             msg += f"<b>Python function:</b> {self.execute_function.__name__} <br>"
             msg += f"<b>DB call: </b>{sql}<br>"
             self.show_exceptions_msg("Key on returned json from ddbb is missed.", msg)
+
         self.remove_layers()
 
 
@@ -403,9 +410,8 @@ class GwToolBox(ApiParent):
 
         sql = f"SELECT {function_name}()::text"
         row = self.controller.get_row(sql, log_sql=True)
-
         if not row or row[0] is None:
-            self.controller.show_message(f"Function : {function_name} executed with no result ", 3)
+            self.controller.show_message(f"Function: {function_name} executed with no result ", 3)
             return True
 
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
@@ -471,10 +477,12 @@ class GwToolBox(ApiParent):
     def get_all_group_layers(self, geom_type):
 
         list_items = []
-        sql = ("SELECT tablename, type FROM "
-               "(SELECT DISTINCT(parent_layer) AS tablename, feature_type as type, 0 as c FROM cat_feature WHERE feature_type='" + geom_type.upper() + "'"
-               "UNION SELECT child_layer, feature_type, 2 as c FROM cat_feature WHERE feature_type = '" + geom_type.upper() + "') as t "
-               "ORDER BY c, tablename")
+        sql = (f"SELECT tablename, type FROM "
+               f"(SELECT DISTINCT(parent_layer) AS tablename, feature_type as type, 0 as c "
+               f"FROM cat_feature WHERE feature_type = '{geom_type.upper()}' "
+               f"UNION SELECT child_layer, feature_type, 2 as c "
+               f"FROM cat_feature WHERE feature_type = '{geom_type.upper()}') as t "
+               f"ORDER BY c, tablename")
         rows = self.controller.get_rows(sql)
         if rows:
             for row in rows:
