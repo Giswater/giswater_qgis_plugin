@@ -75,6 +75,9 @@ v_compwidth float;
 v_profheigtht float;
 v_profwidth float;
 v_error_context text;
+v_initv float;
+v_inith float;
+v_initpoint json;
 
 -- field variables to work with UD/WS
 v_fcatgeom text;
@@ -303,25 +306,44 @@ BEGIN
 		SELECT a->>'height' INTO v_compheight FROM json_array_elements( v_json ->'ComposerMap') AS a WHERE a->>'name' = v_mapcomposer_name;  
 		SELECT a->>'index' INTO v_index FROM json_array_elements( v_json ->'ComposerMap') AS a WHERE a->>'name' = v_mapcomposer_name; 
 
-		IF v_scaletofit THEN
-			v_vs = (v_compheight - v_legendfactor*50 - 10)/(1000*v_elevation);
-			v_hs = (v_compwidth - v_legendfactor*20 - 10)/(1000*v_distance);		
-		ELSE 
+		IF v_scaletofit IS FALSE THEN
 			IF v_compheight < v_profheigtht THEN
 				v_level = 2;
-				v_message = 'Profile too large. You need to modify the vertial scale or change the composer';
+				v_message = 'Profile too large. You need to modify the vertical scale or change the composer';
 				RETURN (concat('{"status":"accepted", "message":{"level":',v_level,', "text":"',v_message,'"}}')::json);
 			END IF;
 			IF v_compwidth < v_profwidth THEN
 				v_level = 2;
-				v_message = 'Profile too long. You need to modify the horitzontal scale or composer';
+				v_message = 'Profile too long. You need to modify the horitzontal scale or change the composer';
 				RETURN (concat('{"status":"accepted", "message":{"level":',v_level,', "text":"',v_message,'"}}')::json);
 			END IF;
 		END IF;
 	ELSE
-		-- extension value
-		v_extension = (concat('{"width":', v_profwidth,', "height":', v_profheigtht,'}'))::json;
+		-- set values for v_compheight & v_compwidth
+		v_compheight = v_profheigtht;
+		v_compwidth = v_profwidth;
 	END IF;
+
+	IF v_scaletofit THEN
+		-- calculate scale 
+		v_vs = (v_compheight - v_legendfactor*50 - 10)/(1000*v_elevation);
+		v_hs = (v_compwidth - v_legendfactor*20 - 10)/(1000*v_distance);
+
+		-- calculate the init point to start to draw profile
+		v_initv = v_legendfactor*50;
+		v_inith = v_legendfactor*20;
+
+	ELSE
+		-- calculate the init point to start to draw profile
+		v_initv = (v_compheight - v_profheigtht)/2;
+		v_inith = (v_compwidth < v_profwidth)/2;		
+	END IF;
+
+	-- extension as composer (redundant to fit the image as is)
+	v_extension = (concat('{"width":', v_compwidth,', "height":', v_compheight,'}'))::json;	
+
+	-- initpoint to start to draw profile
+	v_initpoint = (concat('{"initx":', v_inith,', "inity":', v_initv,'}'))::json;	
 
 	-- scale text
 	v_scale = concat('1:',v_hs, '(',v_hstext,') - 1:',v_vs,'(',v_vstext,')');
@@ -329,8 +351,6 @@ BEGIN
 	-- update values using scale factor
 	v_hs = 2000/v_hs;
 	v_vs = 500/v_vs;
-
-	raise notice '% %', v_hs, v_vs;
 	
 	UPDATE anl_arc SET cat_geom1 = cat_geom1*v_vs, length = length*v_hs WHERE fprocesscat_id=122 AND cur_user = current_user;
 	EXECUTE 'UPDATE anl_node SET cat_geom1 = cat_geom1*'||v_vs||', '||v_ftopelev||' = '||v_ftopelev||'*'||v_vs||', elev = elev*'||v_vs||', '||
@@ -373,6 +393,7 @@ BEGIN
                ',"data":{"legend":'||v_guitarlegend||','||
 			'"scale":"'||v_scale||'",'||
 			'"extension":'||v_extension||','||
+			'"initpoint":'||v_initpoint||','||
 			'"stylesheet":'||v_stylesheet||','||
 			'"node":'||v_node||','||
 			'"terrain":'||v_terrain||','||
