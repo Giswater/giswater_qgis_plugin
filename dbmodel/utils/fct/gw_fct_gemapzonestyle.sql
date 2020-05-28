@@ -31,12 +31,10 @@ BEGIN
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
         INTO v_version;
 
-	--SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT sector_id as id, style::json FROM v_edit_sector) row;
-
-	SELECT to_json(array_agg(row_to_json(row))) INTO v_sector FROM (SELECT sector_id as id, style::json FROM v_edit_sector) row;
-	SELECT to_json(array_agg(row_to_json(row))) INTO v_presszone FROM (SELECT id as id , style::json FROM v_edit_presszone) row;
-	SELECT to_json(array_agg(row_to_json(row))) INTO v_dma FROM (SELECT dma_id as id, style::json FROM v_edit_dma) row;
-	SELECT to_json(array_agg(row_to_json(row))) INTO v_dqa FROM (SELECT dqa_id as id, style::json FROM v_edit_dqa) row;
+	SELECT to_json(array_agg(row_to_json(row))) INTO v_sector FROM (SELECT sector_id as id, stylesheet::json FROM v_edit_sector) row;
+	SELECT to_json(array_agg(row_to_json(row))) INTO v_presszone FROM (SELECT id as id , stylesheet::json FROM v_edit_presszone) row;
+	SELECT to_json(array_agg(row_to_json(row))) INTO v_dma FROM (SELECT dma_id as id, stylesheet::json FROM v_edit_dma) row;
+	SELECT to_json(array_agg(row_to_json(row))) INTO v_dqa FROM (SELECT dqa_id as id, stylesheet::json FROM v_edit_dqa) row;
 	
 	--    Return
 	RETURN ('{"status":"Accepted", "version":'||v_version||

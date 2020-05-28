@@ -10,8 +10,8 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 -- 2020/05/25
 ALTER TABLE cat_presszone RENAME TO presszone;
 
-ALTER TABLE sector ADD COLUMN style json;
-ALTER TABLE dma ADD COLUMN style json;
+ALTER TABLE sector ADD COLUMN stylesheet json;
+ALTER TABLE dma ADD COLUMN stylesheet json;
 ALTER TABLE presszone ADD COLUMN head numeric(12,2);
-ALTER TABLE presszone ADD COLUMN style json;
-ALTER TABLE dqa ADD COLUMN style json;
+ALTER TABLE presszone ADD COLUMN stylesheet json;
+ALTER TABLE dqa ADD COLUMN stylesheet json;
