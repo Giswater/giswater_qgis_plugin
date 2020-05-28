@@ -61,6 +61,12 @@ DELETE FROM sys_function WHERE id = 2860;
 DELETE FROM sys_function WHERE id = 2858;
 DELETE FROM sys_function WHERE id = 2434;
 
+DELETE FROM sys_function WHERE function_name = 'gw_fct_repair_arc_searchnodes';
+DELETE FROM sys_function WHERE function_name = 'gw_fct_get_widgetjson';
+
+
+
+
 
 --2020/05/25
 UPDATE sys_table SET id ='config_csv_param' WHERE id ='sys_csv2pg_config';
@@ -479,6 +485,20 @@ UPDATE sys_function SET input_params = 'json' WHERE id = 2820;
 UPDATE sys_table SET sys_sequence = null where id = 'config_exploitation_x_user';
 
 
+
+UPDATE sys_function SET function_name = 'gw_fct_feature_delete' WHERE function_name = 'gw_fct_set_delete_feature';
+UPDATE sys_function SET function_name = 'gw_fct_link_repair' WHERE function_name = 'gw_fct_repair_link';
+UPDATE sys_function SET function_name = 'gw_fct_arc_repair' WHERE function_name = 'gw_fct_repair_arc';
+UPDATE sys_function SET function_name = 'gw_fct_psector_duplicate' WHERE function_name = 'gw_fct_duplicate_psector';
+UPDATE sys_function SET function_name = 'gw_fct_node_builtfromarc' WHERE function_name = 'gw_fct_built_nodefromarc';
+UPDATE sys_function SET function_name = 'gw_fct_getfeaturerelation' WHERE function_name = 'gw_fct_get_feature_relation';
+UPDATE sys_function SET function_name = 'gw_fct_getcombochilds' WHERE function_name = 'gw_fct_get_combochilds';
+UPDATE sys_function SET function_name = 'gw_fct_getfeatureinfo' WHERE function_name = 'gw_fct_get_featureinfo';
+UPDATE sys_function SET function_name = 'gw_fct_getfeatureupsert' WHERE function_name = 'gw_fct_get_featureupsert';
+UPDATE sys_function SET function_name = 'gw_fct_getfiltervaluesvdef' WHERE function_name =	'gw_fct_get_filtervaluesvdef';
+UPDATE sys_function SET function_name = 'gw_fct_getformfields' WHERE function_name = 'gw_fct_get_formfields';
+UPDATE sys_function SET function_name = 'gw_fct_getvisit_main' WHERE function_name = 'gw_fct_get_visit';
+UPDATE sys_function SET function_name = 'gw_fct_getwidgetvalues' WHERE function_name = 'gw_fct_get_widgetvalues';
 
 
 
