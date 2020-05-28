@@ -770,7 +770,7 @@ class DaoController(object):
         return result
 
 
-    def get_json(self, function_name, parameters=None, schema_name=None, commit=True, log_sql=False):
+    def get_json(self, function_name, parameters=None, schema_name=None, commit=True, log_sql=False, json_loads=False):
         """ Manage execution API function
         :param function_name: Name of function to call (text)
         :param body: Parameter for function (json)
@@ -784,21 +784,30 @@ class DaoController(object):
         if not row:
             self.show_warning("Function not found in database", parameter=function_name)
             return None
-        if schema_name: sql = f"SELECT {schema_name}.{function_name}("
-        else: sql = f"SELECT {function_name}("
-        if parameters: sql += f"{parameters}"
+
+        if schema_name:
+            sql = f"SELECT {schema_name}.{function_name}("
+        else:
+            sql = f"SELECT {function_name}("
+        if parameters:
+            sql += f"{parameters}"
         sql += f");"
 
         row = self.get_row(sql, commit=commit, log_sql=log_sql)
         if not row or not row[0]:
             return None
 
-        json_result = row[0]
+        if json_loads:
+            json_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+        else:
+            json_result = row[0]
+
         if 'status' in json_result and json_result['status'] == 'Failed':
             self.manage_exception_api(json_result, sql)
             return False
 
         return json_result
+
 
     def translate_tooltip(self, context_name, widget, idx=None):
         """ Translate tooltips widgets of the form to current language
@@ -1695,9 +1704,11 @@ class DaoController(object):
                 msg = ""
                 msg += f"File name: {file_name}\n"
                 msg += f"Function name: {function_name}\n"
-                msg += f"Line number:> {function_line}\n"
+                msg += f"Line number: {function_line}\n"
                 if 'SQLERR' in json_result:
                     msg += f"Detail: {json_result['SQLERR']}\n"
+                elif 'NOSQLERR' in json_result:
+                    msg += f"Detail: {json_result['NOSQLERR']}\n"
                 if 'SQLCONTEXT' in json_result:
                     msg += f"Context: {json_result['SQLCONTEXT']}\n"
                 if sql:

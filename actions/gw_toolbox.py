@@ -351,41 +351,32 @@ class GwToolBox(ApiParent):
             extras += '}'
 
         body = self.create_body(feature=feature_field, extras=extras)
-        sql = f"SELECT {function_name}({body})::text"
-        row = self.controller.get_row(sql, log_sql=True)
-        if not row or row[0] is None:
-            dialog.progressBar.setFormat(f"Function: {function_name} executed with no result")
-            dialog.progressBar.setVisible(False)
-            dialog.progressBar.setMinimum(0)
-            dialog.progressBar.setMaximum(1)
-            dialog.progressBar.setValue(1)
-            return True
-
-        complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-
+        json_result = self.controller.get_json(function_name, body)
         dialog.progressBar.setAlignment(Qt.AlignCenter)
         dialog.progressBar.setMinimum(0)
         dialog.progressBar.setMaximum(1)
         dialog.progressBar.setValue(1)
+        if json_result is None:
+            dialog.progressBar.setFormat(f"Function: {function_name} executed with no result")
+            return True
 
-        if complet_result[0]['status'] != "Accepted":
+        if not json_result:
             dialog.progressBar.setFormat(f"Function: {function_name} failed. See log file for more details")
-            self.controller.log_warning(complet_result[0])
             return False
 
         try:
             dialog.progressBar.setFormat(f"Function {function_name} has finished")
-            self.add_layer.add_temp_layer(dialog, complet_result[0]['body']['data'], self.alias_function, True, True, 1, True)
-            self.add_layer.set_layers_visible(complet_result[0]['body']['data']['setVisibleLayers'])
+            self.add_layer.add_temp_layer(dialog, json_result['body']['data'], self.alias_function, True, True, 1, True)
+            self.add_layer.set_layers_visible(json_result['body']['data']['setVisibleLayers'])
 
             # getting on the fly simbology capabilities
-            if 'setSimbology' in complet_result[0]['body']['data']:
-                simb_status = complet_result[0]['body']['data']['setSimbology']['status']
+            if 'setSimbology' in json_result['body']['data']:
+                simb_status = json_result['body']['data']['setSimbology']['status']
                 if simb_status == "true":
-                    self.simb_layer = complet_result[0]['body']['data']['setSimbology']['layer']
-                    self.simb_column = complet_result[0]['body']['data']['setSimbology']['column']
-                    self.simb_opacity = complet_result[0]['body']['data']['setSimbology']['opacity']
-                    simb_type = complet_result[0]['body']['data']['setSimbology']['type']
+                    self.simb_layer = json_result['body']['data']['setSimbology']['layer']
+                    self.simb_column = json_result['body']['data']['setSimbology']['column']
+                    self.simb_opacity = json_result['body']['data']['setSimbology']['opacity']
+                    simb_type = json_result['body']['data']['setSimbology']['type']
                     if simb_type == "polCategorized":
                         # call function to simbolize
                         self.set_layer_simbology_polcategorized(self.simb_layer, self.simb_column, self.simb_opacity)
@@ -395,7 +386,6 @@ class GwToolBox(ApiParent):
             msg += f"<b>key container: </b>'body/data/ <br>"
             msg += f"<b>Python file: </b>{__name__} <br>"
             msg += f"<b>Python function:</b> {self.execute_function.__name__} <br>"
-            msg += f"<b>DB call: </b>{sql}<br>"
             self.show_exceptions_msg("Key on returned json from ddbb is missed.", msg)
 
         self.remove_layers()
