@@ -248,8 +248,14 @@ class ApiCF(ApiParent, QObject):
         if function_name is None:
             return False, None
 
-        row = [self.controller.get_json(function_name, body, log_sql=True)]
+        json_result = self.controller.get_json(function_name, body, log_sql=True)
+        if json_result is None:
+            self.controller.log_warning(f"Function error: {function_name}")
+            return False, None
+
+        row = [json_result]
         if not row or row[0] is False:
+            self.controller.log_warning(f"Function error: {function_name}")
             return False, None
 
         # When something is wrong
@@ -2392,8 +2398,15 @@ class ApiCF(ApiParent, QObject):
         id_name = complet_result[0]['body']['feature']['idName']
         feature = f'"tableName":"{self.tablename}", "idName":"{id_name}", "id":"{self.feature_id}"'
         body = self.create_body(form, feature,  filter_fields)
-        complet_list = [self.controller.get_json('gw_fct_getlist', body)]
-        if not complet_list: return False
+        function_name = 'gw_fct_getlist'
+        json_result = self.controller.get_json(function_name, body)
+        if json_result is None:
+            self.controller.log_warning(f"Function error: {function_name}")
+            return False
+        complet_list = [json_result]
+        if not row:
+            return False
+
         return complet_list
 
 
@@ -2405,10 +2418,7 @@ class ApiCF(ApiParent, QObject):
         complet_list = self.get_list(complet_result, tab_name=tab_name, filter_fields=filter_fields)
         if complet_list is False:
             return False
-        # for item in complet_list[0]['body']['data']['listValues'][0]:
-        #     row = [QStandardItem(str(value)) for value in item.values() if filter in str(item['event_id'])]
-        #     if len(row) > 0:
-        #         standar_model.appendRow(row)
+
         for field in complet_list[0]['body']['data']['fields']:
             if field['widgettype'] == "tableView":
                 qtable = dialog.findChild(QTableView, field['widgetname'])
@@ -2520,8 +2530,14 @@ class ApiCF(ApiParent, QObject):
         body += '"form":{"formName":"new_workcat", "tabName":"data", "editable":"TRUE"}, '
         body += '"feature":{}, '
         body += '"data":{}}$$'
-        complet_list = [self.controller.get_json('gw_fct_getcatalog', body)]
-        if not complet_list: return
+        function_name = 'gw_fct_getcatalog'
+        json_result = self.controller.get_json(function_name, body)
+        if json_result is None:
+            self.controller.log_warning(f"Function error: {function_name}")
+            return
+        complet_list = [json_result]
+        if not row:
+            return
 
         self.dlg_new_workcat = ApiBasicInfo()
         self.load_settings(self.dlg_new_workcat)

@@ -386,8 +386,14 @@ class ApiSearch(ApiParent):
 
         feature = f'"tableName":"{table_name}", "id":"{feature_id}"'
         body = self.create_body(feature=feature)
-        result = [self.controller.get_json('gw_fct_getinfofromid', body, log_sql=True)]
-        if not result: return
+        function_name = 'gw_fct_getinfofromid'
+        json_result = self.controller.get_json(function_name, body, log_sql=True)
+        if json_result is None:
+            self.controller.log_warning(f"Function error: {function_name}")
+            return
+        result = [json_result]
+        if not row:
+            return
 
         self.hydro_info_dlg = ApiBasicInfo()
         self.load_settings(self.hydro_info_dlg)

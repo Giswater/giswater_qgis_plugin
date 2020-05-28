@@ -39,6 +39,7 @@ class ApiDimensioning(ApiParent):
 
 
     def open_form(self, new_feature=None, layer=None, new_feature_id=None):
+
         self.dlg_dim = DimensioningUi()
         self.load_settings(self.dlg_dim)
 
@@ -62,10 +63,17 @@ class ApiDimensioning(ApiParent):
         self.layer_connec = self.controller.get_layer_by_tablename("v_edit_connec")
 
         self.create_map_tips()
-        body = self.create_body()
+
         # Get layers under mouse clicked
-        complet_result = [self.controller.get_json('gw_fct_getdimensioning', body, log_sql=True)]
-        if not complet_result: return False
+        body = self.create_body()
+        function_name = 'gw_fct_getdimensioning'
+        json_result = self.controller.get_json(function_name, body)
+        if json_result is None:
+            self.controller.log_warning(f"Function error: {function_name}")
+            return False
+        complet_result = [json_result]
+        if not row:
+            return False
 
         layout_list = []
         for field in complet_result[0]['body']['data']['fields']:
@@ -101,6 +109,7 @@ class ApiDimensioning(ApiParent):
         self.iface.actionRollbackEdits().trigger()
         self.close_dialog(self.dlg_dim)
 
+
     def save_dimensioning(self, new_feature, layer):
 
         # Insert new feature into db
@@ -121,10 +130,9 @@ class ApiDimensioning(ApiParent):
         sql = f"SELECT ST_GeomFromText('{new_feature.geometry().asWkt()}', {srid})"
         the_geom = self.controller.get_row(sql, log_sql=True)
         fields += f'"the_geom":"{the_geom[0]}"'
-
         feature = '"tableName":"v_edit_dimensions"'
         body = self.create_body(feature=feature, filter_fields=fields)
-        row = self.controller.get_json('gw_fct_setdimensioning', body, log_sql=True)
+        self.controller.get_json('gw_fct_setdimensioning', body, log_sql=True)
 
         # Close dialog
         self.close_dialog(self.dlg_dim)
@@ -134,21 +142,23 @@ class ApiDimensioning(ApiParent):
         self.snapper_manager.remove_marker()
         try:
             self.canvas.xyCoordinates.disconnect()
-        except TypeError as e:
+        except TypeError:
             pass
 
         try:
             self.emit_point.canvasClicked.disconnect()
-        except TypeError as e:
+        except TypeError:
             pass
 
         if not action.isChecked():
             action.setChecked(False)
             return True
+
         return False
 
 
     def snapping(self, action):
+
         # Set active layer and set signals
         if self.deactivate_signals(action): return
 
@@ -239,7 +249,9 @@ class ApiDimensioning(ApiParent):
 
 
     def orientation(self, action):
-        if self.deactivate_signals(action): return
+
+        if self.deactivate_signals(action):
+            return
 
         self.dlg_dim.actionSnapping.setChecked(False)
         self.emit_point.canvasClicked.connect(partial(self.click_button_orientation, action))
@@ -289,6 +301,7 @@ class ApiDimensioning(ApiParent):
             self.map_tip_connec.clear(self.canvas)
             self.timer_map_tips.start(100)
 
+
     def show_map_tip(self):
         """ Show MapTips on the map """
 
@@ -301,6 +314,7 @@ class ApiDimensioning(ApiParent):
             if self.layer_connec:
                 self.map_tip_connec.showMapTip(self.layer_connec, point_qgs, point_qt, self.canvas)
             self.timer_map_tips_clear.start(1000)
+
 
     def clear_map_tip(self):
         """ Clear MapTips """
@@ -331,10 +345,6 @@ class ApiDimensioning(ApiParent):
             widget = self.set_data_type(field, widget)
             if field['widgettype'] == 'typeahead':
                 widget = self.manage_lineedit(field, dialog, widget, completer)
-            # if widget.property('column_id') == self.field_id:
-            #     self.feature_id = widget.text()
-            #     # Get selected feature
-            #     self.feature = self.get_feature_by_id(self.layer, self.feature_id, self.field_id)
         elif field['widgettype'] == 'combo':
             widget = self.add_combobox(field)
             widget = self.set_widget_size(widget, field)
@@ -364,3 +374,4 @@ class ApiDimensioning(ApiParent):
             utils_giswater.set_qtv_config(widget)
 
         return label, widget
+

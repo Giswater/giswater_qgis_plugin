@@ -116,11 +116,16 @@ class ApiCatalog(ApiParent):
         body = self.create_body(form=form, feature=feature, extras=extras)
         sql = f"SELECT gw_fct_getcatalog({body})::text"
         row = self.controller.get_row(sql, log_sql=True)
-        complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-        result = complet_list[0]['body']['data']
-        for field in result['fields']:
-            if field['column_id'] == 'id':
-                self.populate_combo(id,field)
+        complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+        if complet_result[0]['status'] == "Failed":
+            dialog.progressBar.setFormat(f"Function: {function_name} failed. See log file for more details")
+            self.controller.log_warning(complet_result[0])
+            return False
+        if complet_result[0]['status'] == "Accepted":
+            result = complet_result[0]['body']['data']
+            for field in result['fields']:
+                if field['column_id'] == 'id':
+                    self.populate_combo(id,field)
 
 
     def populate_pn_dn(self, matcat_id, pnom, dnom, feature_type, geom_type):
