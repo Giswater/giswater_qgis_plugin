@@ -19,6 +19,7 @@ from qgis.core import *
 import configparser
 import os.path
 import sys
+import random
 import webbrowser
 from collections import OrderedDict
 from functools import partial
