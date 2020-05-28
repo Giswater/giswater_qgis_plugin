@@ -421,9 +421,9 @@ class ApiConfig(ApiParent):
         combo_parent = widget.objectName()
         combo_id = utils_giswater.get_item_data(self.dlg_config, widget)
         # TODO cambiar por gw_fct_getchilds
-        sql = f"SELECT gw_fct_get_combochilds('config' ,'' ,'' ,'{combo_parent}', '{combo_id}','')"
+        sql = f"SELECT gw_fct_getcombochilds('config' ,'' ,'' ,'{combo_parent}', '{combo_id}','')"
         row = self.controller.get_row(sql, log_sql=True)
-        #TODO::Refactor input and output for function "gw_fct_get_combochilds" and refactor "row[0]['fields']"
+        #TODO::Refactor input and output for function "gw_fct_getcombochilds" and refactor "row[0]['fields']"
         for combo_child in row[0]['fields']:
             if combo_child is not None:
                 self.populate_child(combo_child)

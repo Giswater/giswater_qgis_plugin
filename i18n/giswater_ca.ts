@@ -761,8 +761,8 @@
 			<translation>Process finished with some errors</translation>
 		</message>
 		<message>
-			<source>Function gw_fct_duplicate_psector executed with no result</source>
-			<translation>Function gw_fct_duplicate_psector executed with no result</translation>
+			<source>Function gw_fct_psector_duplicate executed with no result</source>
+			<translation>Function gw_fct_psector_duplicate executed with no result</translation>
 		</message>
 		<message>
 			<source>This param is mandatory. Please, set a value</source>
@@ -997,11 +997,15 @@
 			<translation>Select a node and click on it, the downstream nodes are computed</translation>
 		</message>
 		<message>
-			<source>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
- Please ensure that features has no undelete value on true.\n
+			<source>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
+
+ Please ensure that features has no undelete value on true.\n
+
  On the other hand you must know that traceability table will storage precedent information.</source>
-			<translation>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
- Please ensure that features has no undelete value on true.\n
+			<translation>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
+
+ Please ensure that features has no undelete value on true.\n
+
  On the other hand you must know that traceability table will storage precedent information.</translation>
 		</message>
 		<message>

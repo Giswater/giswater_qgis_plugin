@@ -95,7 +95,7 @@ class DeleteFeature(ApiParent):
         feature = '"type":"' + feature_type + '"'
         extras = '"feature_id":"' + feature_id + '"'
         body = self.create_body(feature=feature, extras=extras)
-        result = self.controller.get_json('gw_fct_get_feature_relation', body, log_sql=True)
+        result = self.controller.get_json('gw_fct_getfeaturerelation', body, log_sql=True)
         if not result: return
 
         # Construct message result
@@ -119,9 +119,9 @@ class DeleteFeature(ApiParent):
         feature = '"type":"' + feature_type + '"'
         extras = '"feature_id":"' + feature_id + '"'
         body = self.create_body(feature=feature, extras=extras)
-        complet_result = self.controller.get_json('gw_fct_set_delete_feature', body, log_sql=True)
+        complet_result = self.controller.get_json('gw_fct_feature_delete', body, log_sql=True)
         if not complet_result:
-            self.controller.show_message("Function gw_fct_set_delete_feature executed with no result ", 3)
+            self.controller.show_message("Function gw_fct_feature_delete executed with no result ", 3)
             return
 
         # Populate tab info

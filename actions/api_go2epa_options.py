@@ -89,7 +89,7 @@ class Go2EpaOptions(ApiParent):
 
         combo_parent = widget.objectName()
         combo_id = utils_giswater.get_item_data(self.dlg_options, widget)
-        result = self.controller.get_json('gw_fct_get_combochilds', f"'epaoptions', '', '', '{combo_parent}', '{combo_id}', ''", log_sql=True)
+        result = self.controller.get_json('gw_fct_getcombochilds', f"'epaoptions', '', '', '{combo_parent}', '{combo_id}', ''", log_sql=True)
         if not result: return False
 
         for combo_child in result['fields']:
