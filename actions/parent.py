@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsGeometry, QgsPointXY, QgsProject, QgsRectangle, QgsSymbol, \
-    QgsRendererCategory, QgsCategorizedSymbolRenderer
+    QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsSimpleFillSymbolLayer
 from qgis.gui import QgsRubberBand
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTimer
 from qgis.PyQt.QtWidgets import QGroupBox, QAbstractItemView, QTableView, QFileDialog, QApplication, QCompleter, \

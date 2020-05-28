@@ -5,15 +5,16 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+from qgis.core import QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer
+
 import os
+import random
 from functools import partial
 
 from .. import utils_giswater
 from ..ui_manager import Multirow_selector, SelectorUi
 from .api_search import ApiSearch
 from .api_parent import ApiParent
-from qgis.core import *
-import random
 
 
 class Basic(ApiParent):
@@ -43,7 +44,6 @@ class Basic(ApiParent):
         self.dlg_selector = SelectorUi()
         self.load_settings(self.dlg_selector)
         self.dlg_selector.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_selector))
-        self.dlg_selector.btn_close.clicked.connect(partial(self.close_dialog, self.set_mapzones_style()))
         self.dlg_selector.rejected.connect(partial(self.save_settings, self.dlg_selector))
         self.get_selector(self.dlg_selector, selector_values)
         self.open_dialog(self.dlg_selector, dlg_name='selector', maximize_button=False)
@@ -51,6 +51,7 @@ class Basic(ApiParent):
         # repaint mapzones and refresh canvas
         self.set_mapzones_style()
         self.refresh_map_canvas()
+
 
     def set_mapzones_style(self):
 
@@ -100,6 +101,7 @@ class Basic(ApiParent):
                         # repaint layer
                         lyr.triggerRepaint()
 
+
     def basic_state_selector(self):
         """ Button 48: State selector """
             
@@ -110,8 +112,10 @@ class Basic(ApiParent):
         self.dlg_state.rejected.connect(partial(self.close_dialog, self.dlg_state))
         self.dlg_state.txt_name.setVisible(False)
         self.dlg_state.setWindowTitle("State selector")
-        utils_giswater.setWidgetText(self.dlg_state, self.dlg_state.lbl_unselected, self.controller.tr('Unselected states', context_name='labels'))
-        utils_giswater.setWidgetText(self.dlg_state, self.dlg_state.lbl_selected, self.controller.tr('Selected states', context_name='labels'))
+        utils_giswater.setWidgetText(self.dlg_state, self.dlg_state.lbl_unselected,
+            self.controller.tr('Unselected states', context_name='labels'))
+        utils_giswater.setWidgetText(self.dlg_state, self.dlg_state.lbl_selected,
+            self.controller.tr('Selected states', context_name='labels'))
         tableleft = "value_state"
         tableright = "selector_state"
         field_id_left = "id"
@@ -132,8 +136,10 @@ class Basic(ApiParent):
         self.dlg_hydro_state.rejected.connect(partial(self.close_dialog, self.dlg_hydro_state))
         self.dlg_hydro_state.txt_name.setVisible(False)
         self.dlg_hydro_state.setWindowTitle("Hydrometer selector")
-        utils_giswater.setWidgetText(self.dlg_hydro_state, self.dlg_hydro_state.lbl_unselected, self.controller.tr('Unselected hydrometers', context_name='labels'))
-        utils_giswater.setWidgetText(self.dlg_hydro_state, self.dlg_hydro_state.lbl_selected, self.controller.tr('Selected hydrometers', context_name='labels'))
+        utils_giswater.setWidgetText(self.dlg_hydro_state, self.dlg_hydro_state.lbl_unselected,
+            self.controller.tr('Unselected hydrometers', context_name='labels'))
+        utils_giswater.setWidgetText(self.dlg_hydro_state, self.dlg_hydro_state.lbl_selected,
+            self.controller.tr('Selected hydrometers', context_name='labels'))
         tableleft = "ext_rtc_hydrometer_state"
         tableright = "selector_hydrometer"
         field_id_left = "id"
