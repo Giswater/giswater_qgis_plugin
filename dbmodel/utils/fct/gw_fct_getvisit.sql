@@ -20,7 +20,7 @@ SELECT SCHEMA_NAME.gw_fct_getvisit($${"client":{"device":3,"infoType":100,"lang"
 
 BEGIN
 
-	RETURN SCHEMA_NAME.gw_fct_get_visit(1, p_data);	
+	RETURN SCHEMA_NAME.gw_fct_getvisit_main(1, p_data);
 
 END;
 $BODY$

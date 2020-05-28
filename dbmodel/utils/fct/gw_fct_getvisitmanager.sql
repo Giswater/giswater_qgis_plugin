@@ -240,7 +240,7 @@ BEGIN
 					v_disable_widget_name = '{data_endbutton}';
 				END IF;
 
-				SELECT gw_fct_get_formfields( 'visitManager', 'visit', 'data', null, null, null, null, 'INSERT', null, v_device, null) INTO v_fields;
+				SELECT gw_fct_getformfields( 'visitManager', 'visit', 'data', null, null, null, null, 'INSERT', null, v_device, null) INTO v_fields;
 
 				-- getting values from feature
 				EXECUTE FORMAT ('SELECT (row_to_json(a)) FROM 

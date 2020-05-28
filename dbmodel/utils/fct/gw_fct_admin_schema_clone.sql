@@ -180,7 +180,7 @@ BEGIN
 	
 		EXECUTE 'SELECT routine_name,concat(routine_name,''('',string_agg(parameters.data_type,'', ''),'')'') FROM information_schema.routines
 	   LEFT JOIN information_schema.parameters ON routines.specific_name=parameters.specific_name
-		WHERE routines.specific_schema='''||v_source_schema||''' and routine_name!=''audit_function'' and routine_name!=''gw_fct_repair_arc''
+		WHERE routines.specific_schema='''||v_source_schema||''' and routine_name!=''audit_function'' and routine_name!=''gw_fct_arc_repair''
 		group by routine_name'
 	LOOP
 		EXECUTE 'select * from pg_get_functiondef('''||v_source_schema||'.'|| rec_fct.routine_name||'''::regproc)'

@@ -7,12 +7,12 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2872
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_get_filtervaluesvdef(p_data json);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_get_filtervaluesvdef(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getfeatureupsert(p_data json)
   RETURNS json AS
 $BODY$
 
 /* example
-SELECT gw_fct_get_filtervaluesvdef($${"client":{"device":9, "infoType":100, "lang":"ES"},"data":{"formName": "om_visit_file"}}$$)
+SELECT gw_fct_getfeatureupsert($${"client":{"device":9, "infoType":100, "lang":"ES"},"data":{"formName": "om_visit_file"}}$$)
 */
 
 DECLARE

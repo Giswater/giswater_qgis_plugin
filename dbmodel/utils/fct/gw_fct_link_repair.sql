@@ -6,14 +6,14 @@ This version of Giswater is provided by Giswater Association
 
 
 --FUNCTION CODE: 2534
-
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_repair_link( p_link_id integer, counter bigint default 0, total bigint default 0)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_repair_link(integer, bigint , bigint);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_link_repair( p_link_id integer, counter bigint default 0, total bigint default 0)
 RETURNS character varying AS
 
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_repair_link(link_id, (row_number() over (order by link_id)), (select count(*) from SCHEMA_NAME.link)) FROM SCHEMA_NAME.link;
+SELECT SCHEMA_NAME.gw_fct_link_repair(link_id, (row_number() over (order by link_id)), (select count(*) from SCHEMA_NAME.link)) FROM SCHEMA_NAME.link;
 */
 
 

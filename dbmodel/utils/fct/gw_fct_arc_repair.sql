@@ -6,14 +6,15 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2496
 -- TWO FUNCTIONS ARE DEFINED:
--- gw_fct_repair_arc_searchnodes (json)
--- gw_fct_repair_arc_searchnodes (tex, bgint, bint):
+-- gw_fct_arc_repair_searchnodes (json)
+-- gw_fct_arc_repair_searchnodes (tex, bgint, bint):
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_repair_arc() RETURNS json AS
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_repair_arc();
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_arc_repair() RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_repair_arc()
+SELECT SCHEMA_NAME.gw_fct_arc_repair()
 */
 
 DECLARE 
@@ -94,14 +95,14 @@ $BODY$
 
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_repair_arc( p_arc_id text, counter bigint default 0, total bigint default 0)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_arc_repair( p_arc_id text, counter bigint default 0, total bigint default 0)
 RETURNS character varying AS
 
 $BODY$
 
 /*
 EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_repair_arc(arc_id, (row_number() over (order by arc_id)), (select count(*) from SCHEMA_NAME.arc)) FROM SCHEMA_NAME.arc
+SELECT SCHEMA_NAME.gw_fct_arc_repair(arc_id, (row_number() over (order by arc_id)), (select count(*) from SCHEMA_NAME.arc)) FROM SCHEMA_NAME.arc
 
 RESULTS:
 After process log result are stored on audit_log_data whith fprocesscat_i=3 and 4

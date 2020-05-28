@@ -567,7 +567,7 @@ BEGIN
 		DELETE FROM node WHERE state=0;
 			
 		-- repair arcs
-		PERFORM gw_fct_repair_arc (arc_id, null, null) FROM arc;
+		PERFORM gw_fct_arc_repair (arc_id, null, null) FROM arc;
 
 		-- restore default default values
 		UPDATE config_param_system SET value=0.1 where parameter = 'edit_arc_searchnodes';

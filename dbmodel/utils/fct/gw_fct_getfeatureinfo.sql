@@ -8,8 +8,7 @@ This version of Giswater is provided by Giswater Association
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_get_featureinfo(character varying, character varying, integer, integer, boolean);
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_get_featureinfo(character varying, character varying, integer, integer, boolean, text, text, text);
-
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_get_featureinfo(
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getfeatureinfo(
     p_table_id character varying,
     p_id character varying,
     p_device integer,
@@ -22,8 +21,8 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_get_featureinfo(
 $BODY$
 
 /*example
-SELECT SCHEMA_NAME.gw_fct_get_featureinfo('ve_arc_pipe', '2001', 3, 100, 'false')
-SELECT SCHEMA_NAME.gw_fct_get_featureinfo('ve_arc_conduit', '2001', 3, 100, 'true', 'arc_id', 'varchar(16)')
+SELECT SCHEMA_NAME.gw_fct_getfeatureinfo('ve_arc_pipe', '2001', 3, 100, 'false')
+SELECT SCHEMA_NAME.gw_fct_getfeatureinfo('ve_arc_conduit', '2001', 3, 100, 'true', 'arc_id', 'varchar(16)')
 */
 
 DECLARE
@@ -57,11 +56,11 @@ BEGIN
 
 	IF  p_configtable THEN 
 
-		raise notice 'Configuration fields are defined on config_info_layer_field, calling gw_fct_get_formfields with formname: % tablename: % id %', p_table_id, p_table_id, p_id;
+		raise notice 'Configuration fields are defined on config_info_layer_field, calling gw_fct_getformfields with formname: % tablename: % id %', p_table_id, p_table_id, p_id;
 		SELECT formtype INTO v_formtype FROM config_form_fields WHERE formname = p_table_id LIMIT 1;
 
 		-- Call the function of feature fields generation      	
-		SELECT gw_fct_get_formfields( p_table_id, v_formtype, 'data', p_table_id, p_idname, p_id, null, 'SELECT',null, p_device, v_values_array) INTO fields_array;
+		SELECT gw_fct_getformfields( p_table_id, v_formtype, 'data', p_table_id, p_idname, p_id, null, 'SELECT',null, p_device, v_values_array) INTO fields_array;
 	ELSE
 		raise notice 'Configuration fields are NOT defined on config_info_layer_field. System values will be used';
 		

@@ -6,21 +6,22 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2736
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_set_delete_feature(p_data json)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_set_delete_feature(json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_feature_delete(p_data json)
 RETURNS json AS
 /*
-SELECT SCHEMA_NAME.gw_fct_set_delete_feature($${
+SELECT SCHEMA_NAME.gw_fct_feature_delete($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},"feature":{"type":"NODE"},
 "data":{"feature_id":"42"}}$$);
 
-SELECT SCHEMA_NAME.gw_fct_set_delete_feature($${
+SELECT SCHEMA_NAME.gw_fct_feature_delete($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},"feature":{"type":"CONNEC"},
 "data":{"feature_id":"3244"}}$$);
 
 
-SELECT SCHEMA_NAME.gw_fct_set_delete_feature($${
+SELECT SCHEMA_NAME.gw_fct_feature_delete($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},"feature":{"type":"ARC"},"data":{"feature_id":"2002"}}$$);
 */

@@ -206,7 +206,7 @@ BEGIN
 	
 		v_data = '{"client":{"device":9, "infoType":100, "lang":"ES"},"data":{"formName": "'||v_tablename||'"}}';
 		
-		SELECT gw_fct_get_filtervaluesvdef(v_data) INTO v_filter_values;
+		SELECT gw_fct_getfeatureupsert(v_data) INTO v_filter_values;
 
 		RAISE NOTICE 'gw_fct_getlist - Init Values setted by default %', v_filter_values;
 
@@ -436,7 +436,7 @@ BEGIN
 	v_pageinfo := json_build_object('orderBy',v_orderby, 'orderType', v_ordertype, 'currentPage', v_currentpage, 'lastPage', v_lastpage);
 
 	-- getting filter fields
-	SELECT gw_fct_get_formfields(v_tablename, 'listHeader', v_tabname, null, null, null, null,'INSERT', null, v_device, null)
+	SELECT gw_fct_getformfields(v_tablename, 'listHeader', v_tabname, null, null, null, null,'INSERT', null, v_device, null)
 		INTO v_filter_fields;
 
 		--  setting values of filter fields
@@ -495,7 +495,7 @@ BEGIN
 	END IF;
 
 	-- getting footer buttons
-	SELECT gw_fct_get_formfields(v_tablename, 'listFooter', v_tabname, null, null, null, null,'INSERT', null, v_device, null)
+	SELECT gw_fct_getformfields(v_tablename, 'listFooter', v_tabname, null, null, null, null,'INSERT', null, v_device, null)
 		INTO v_footer_fields;
 
 	FOREACH aux_json IN ARRAY v_footer_fields
@@ -507,7 +507,7 @@ BEGIN
 
 
 	raise notice 'v_tablename -->> %',v_tablename;
-   	SELECT gw_fct_get_formfields(v_tablename, 'listfilter', v_tabname, null, null, null, null,'INSERT', null, v_device, null)
+   	SELECT gw_fct_getformfields(v_tablename, 'listfilter', v_tabname, null, null, null, null,'INSERT', null, v_device, null)
 		INTO v_filter_fields_;
 		
 		

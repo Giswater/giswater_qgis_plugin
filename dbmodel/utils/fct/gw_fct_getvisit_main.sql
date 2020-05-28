@@ -8,7 +8,8 @@ This version of Giswater is provided by Giswater Association
 
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_get_visit(text, p_data json);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_get_visit(
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_get_visit(p_data json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getvisit_main(
     p_visittype integer,
     p_data json)
   RETURNS json AS
@@ -19,15 +20,15 @@ $BODY$
 -- GET FORMS FOR WORK OFFLINE
 
 -- unexpected first call
-SELECT SCHEMA_NAME.gw_fct_get_visit('1', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
+SELECT SCHEMA_NAME.gw_fct_getvisit_main('1', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
 "data":{"isOffline":"true", "relatedFeature":{"type":"node", "tableName":"ve_node"},"fields":{},"pageInfo":null}}$$)
 
 -- planned first call
-SELECT SCHEMA_NAME.gw_fct_get_visit('planned', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
+SELECT SCHEMA_NAME.gw_fct_getvisit_main('planned', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
 "data":{"isOffline":"true","relatedFeature":{"type":"node", "tableName":"ve_node},"fields":{},"pageInfo":null}}$$)
 
 -- no infra first call
-SELECT SCHEMA_NAME.gw_fct_get_visit('2', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
+SELECT SCHEMA_NAME.gw_fct_getvisit_main('2', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
 "data":{"isOffline":"true","relatedFeature":{"type":""},"fields":{},"pageInfo":null}}$$)
 
 -- modificacions de codi (a totes online i offline)
@@ -49,15 +50,15 @@ SELECT SCHEMA_NAME.gw_fct_get_visit('2', $${"client":{"device":3,"infoType":100,
 GET ONLINE FORMS
 
 -- unexpected first call
-SELECT SCHEMA_NAME.gw_fct_get_visit('unexpected', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
+SELECT SCHEMA_NAME.gw_fct_getvisit_main('unexpected', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
 "data":{"isOffline":"false", "relatedFeature":{"type":"node", "id":"2074", "tableName":"ve_node"},"fields":{},"pageInfo":null}}$$)
 
 -- planned first call
-SELECT SCHEMA_NAME.gw_fct_get_visit('planned', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
+SELECT SCHEMA_NAME.gw_fct_getvisit_main('planned', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
 "data":{"isOffline":"false","relatedFeature":{"type":"node", "id":"2074", "tableName":"ve_node"},"fields":{},"pageInfo":null}}$$)
 
 -- no infra first call
-SELECT SCHEMA_NAME.gw_fct_get_visit('unexpected', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
+SELECT SCHEMA_NAME.gw_fct_getvisit_main('unexpected', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
 "data":{"isOffline":"false","relatedFeature":{"type":""},"fields":{},"pageInfo":null}}$$)
 
 	
@@ -465,7 +466,7 @@ BEGIN
 				END IF;
 				
 				RAISE NOTICE ' --- GETTING tabData DEFAULT VALUES ON NEW VISIT ---';
-				SELECT gw_fct_get_formfields( v_formname, 'visit', 'data', v_tablename, null, null, null, 'INSERT', null, v_device) INTO v_fields;
+				SELECT gw_fct_getformfields( v_formname, 'visit', 'data', v_tablename, null, null, null, 'INSERT', null, v_device) INTO v_fields;
 
 				FOREACH aux_json IN ARRAY v_fields
 				LOOP					
@@ -550,7 +551,7 @@ BEGIN
 					
 				END LOOP;
 			ELSE 
-				SELECT gw_fct_get_formfields( v_formname, 'visit', 'data', v_tablename, null, null, null, 'INSERT', null, v_device) INTO v_fields;
+				SELECT gw_fct_getformfields( v_formname, 'visit', 'data', v_tablename, null, null, null, 'INSERT', null, v_device) INTO v_fields;
 
 				RAISE NOTICE ' --- GETTING tabData VALUES ON VISIT  ---';
 

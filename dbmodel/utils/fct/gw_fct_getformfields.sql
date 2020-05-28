@@ -11,7 +11,7 @@ character varying, character varying, character varying, character varying, char
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_get_formfields(character varying, character varying, character varying, 
 character varying, character varying, character varying, character varying, character varying, character varying, integer, json);
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_get_formfields(
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getformfields(
     p_formname character varying,
     p_formtype character varying,
     p_tabname character varying,
@@ -27,14 +27,14 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_get_formfields(
 $BODY$
 
 /*EXAMPLE
-SELECT "SCHEMA_NAME".gw_fct_get_formfields('visit_arc_insp', 'visit', 'data', NULL, NULL, NULL, NULL, 'INSERT', null, 3)
-SELECT "SCHEMA_NAME".gw_fct_get_formfields('go2epa', 'form', 'data', null, null, null, null, null, null,null)
-SELECT "SCHEMA_NAME".gw_fct_get_formfields('ve_arc_conduit', 'feature', 'data', 've_arc_conduit', 'arc_id', '2001', NULL, 'SELECT', null, 9)
-SELECT "SCHEMA_NAME".gw_fct_get_formfields('ve_arc_pipe', 'feature', NULL, NULL, NULL, NULL, NULL, 'INSERT', null, 9)
-SELECT "SCHEMA_NAME".gw_fct_get_formfields( 'printGeneric', 'utils', 'data', null, null, null, null, 'SELECT', null, 3);
+SELECT "SCHEMA_NAME".gw_fct_getformfields('visit_arc_insp', 'visit', 'data', NULL, NULL, NULL, NULL, 'INSERT', null, 3)
+SELECT "SCHEMA_NAME".gw_fct_getformfields('go2epa', 'form', 'data', null, null, null, null, null, null,null)
+SELECT "SCHEMA_NAME".gw_fct_getformfields('ve_arc_conduit', 'feature', 'data', 've_arc_conduit', 'arc_id', '2001', NULL, 'SELECT', null, 9)
+SELECT "SCHEMA_NAME".gw_fct_getformfields('ve_arc_pipe', 'feature', NULL, NULL, NULL, NULL, NULL, 'INSERT', null, 9)
+SELECT "SCHEMA_NAME".gw_fct_getformfields( 'printGeneric', 'utils', 'data', null, null, null, null, 'SELECT', null, 3);
 
-PERFORM gw_fct_debug(concat('{"data":{"msg":"----> INPUT FOR gw_fct_get_formfields: ", "variables":"',v_debug,'"}}')::json);
-PERFORM gw_fct_debug(concat('{"data":{"msg":"<---- OUTPUT FOR gw_fct_get_formfields: ", "variables":"',v_debug,'"}}')::json);
+PERFORM gw_fct_debug(concat('{"data":{"msg":"----> INPUT FOR gw_fct_getformfields: ", "variables":"',v_debug,'"}}')::json);
+PERFORM gw_fct_debug(concat('{"data":{"msg":"<---- OUTPUT FOR gw_fct_getformfields: ", "variables":"',v_debug,'"}}')::json);
 UPDATE config_param_user SET value =  'true' WHERE parameter = 'utils_debug_mode' and cur_user = current_user;
 */
 
@@ -90,7 +90,7 @@ BEGIN
 		v_debug_var = (SELECT jsonb_build_object('formname',  p_formname,'formtype',   p_formtype, 'tabname', p_tabname,'tablename', p_tablename, 'idname', p_idname,
 		'id',p_id, 'columntype', p_columntype, 'tgop', p_tgop, 'filterfield', p_filterfield, 'device', p_device, 'values_array', p_values_array	));
 
-		PERFORM gw_fct_debug(concat('{"data":{"msg":"----> INPUT FOR gw_fct_get_formfields: ", "variables":',v_debug_var,'}}')::json);
+		PERFORM gw_fct_debug(concat('{"data":{"msg":"----> INPUT FOR gw_fct_getformfields: ", "variables":',v_debug_var,'}}')::json);
 	END IF;
 
 	-- setting tabname
@@ -298,7 +298,7 @@ BEGIN
 	-- Convert to json
 	fields := array_to_json(fields_array);
 	
-	PERFORM gw_fct_debug(concat('{"data":{"msg":"<---- OUTPUT FOR gw_fct_get_formfields: ", "variables":""}}')::json);
+	PERFORM gw_fct_debug(concat('{"data":{"msg":"<---- OUTPUT FOR gw_fct_getformfields: ", "variables":""}}')::json);
 	 
 	-- Return
 	RETURN fields_array;

@@ -496,7 +496,7 @@ BEGIN
 		IF v_editable THEN
 			RAISE NOTICE 'User has permissions to edit table and table';
 			-- call edit form function
-			EXECUTE 'SELECT gw_fct_get_featureupsert($1, $2, $3, $4, $5, $6, $7, $8, $9)'
+			EXECUTE 'SELECT gw_fct_getfeatureupsert($1, $2, $3, $4, $5, $6, $7, $8, $9)'
 			INTO v_fields
 			USING v_tablename, v_id, v_inputgeometry, v_device, v_infotype, v_tg_op, v_configtabledefined, v_idname, column_type;
 	
@@ -510,7 +510,7 @@ BEGIN
 		
 			RAISE NOTICE 'User has NOT permissions to edit table';
 			-- call info form function
-			EXECUTE 'SELECT gw_fct_get_featureinfo($1, $2, $3, $4, $5, $6, $7, $8)'
+			EXECUTE 'SELECT gw_fct_getfeatureinfo($1, $2, $3, $4, $5, $6, $7, $8)'
 			INTO v_fields
 			USING v_tablename, v_id, v_device, v_infotype, v_configtabledefined, v_idname, column_type, v_tg_op;
 		END IF;
@@ -523,7 +523,7 @@ BEGIN
 		END IF;
 		
 		-- call info form function for parent layer
-		EXECUTE 'SELECT gw_fct_get_featureinfo($1, $2, $3, $4, $5, $6, $7, $8)'
+		EXECUTE 'SELECT gw_fct_getfeatureinfo($1, $2, $3, $4, $5, $6, $7, $8)'
 		INTO v_fields
 		USING v_table_parent, v_id, v_device, v_infotype, v_configtabledefined, v_idname, column_type, v_tg_op;
 

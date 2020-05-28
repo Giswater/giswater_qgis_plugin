@@ -7,12 +7,12 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2788
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_get_widgetvalues(p_data json);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_get_widgetvalues(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getwidgetvalues(p_data json)
   RETURNS text AS
 $BODY$
 
 /*EXAMPLE
-SELECT gw_fct_get_widgetvalues
+SELECT gw_fct_getwidgetvalues
 */
 
 DECLARE

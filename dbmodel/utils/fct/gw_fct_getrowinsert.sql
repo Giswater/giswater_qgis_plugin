@@ -83,7 +83,7 @@ BEGIN
 		raise notice 'Configuration fields are defined on config_info_layer_field';
 		
 		-- Call the function of feature fields generation
-		SELECT gw_fct_get_formfields( v_tablename, 'listrow', null, null, null, null, null, 'INSERT', null, v_device, null) INTO v_fields; 
+		SELECT gw_fct_getformfields( v_tablename, 'listrow', null, null, null, null, null, 'INSERT', null, v_device, null) INTO v_fields;
 		
 	ELSE
 		raise notice 'Configuration fields are NOT defined on config_info_layer_field. System values will be used';

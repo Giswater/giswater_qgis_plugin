@@ -9,7 +9,7 @@ This version of Giswater is provided by Giswater Association
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_get_featureupsert(character varying, character varying, public.geometry, integer, integer, character varying, boolean);
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_get_featureupsert(character varying, character varying, public.geometry, integer, integer, character varying, boolean, text, text);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_get_featureupsert(
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getfeatureupsert(
     p_table_id character varying,
     p_id character varying,
     p_reduced_geometry public.geometry,
@@ -24,13 +24,13 @@ $BODY$
 
 /*EXAMPLE
 arc with no nodes
-SELECT SCHEMA_NAME.gw_fct_get_featureupsert('ve_arc_pipe', null, '0102000020E764000002000000000000A083198641000000669A33C041000000E829D880410000D0AE90F0F341', 9, 100,'INSERT', true, 'arc_id', 'text')
+SELECT SCHEMA_NAME.gw_fct_getfeatureupsert('ve_arc_pipe', null, '0102000020E764000002000000000000A083198641000000669A33C041000000E829D880410000D0AE90F0F341', 9, 100,'INSERT', true, 'arc_id', 'text')
 arc with nodes
-SELECT SCHEMA_NAME.gw_fct_get_featureupsert('ve_arc_pipe', null, '0102000020E764000002000000998B3C512F881941B28315AA7F76514105968D7D748819419FDF72D781765141', 9, 100,'INSERT', true, 'arc_id', 'text')
-SELECT SCHEMA_NAME.gw_fct_get_featureupsert('ve_arc_pipe', '2001', null, 9, 100,'UPDATE', true)
+SELECT SCHEMA_NAME.gw_fct_getfeatureupsert('ve_arc_pipe', null, '0102000020E764000002000000998B3C512F881941B28315AA7F76514105968D7D748819419FDF72D781765141', 9, 100,'INSERT', true, 'arc_id', 'text')
+SELECT SCHEMA_NAME.gw_fct_getfeatureupsert('ve_arc_pipe', '2001', null, 9, 100,'UPDATE', true)
 
-PERFORM gw_fct_debug(concat('{"data":{"msg":"----> INPUT FOR gw_fct_get_featureupsert: ", "variables":"',v_debug,'"}}')::json);
-PERFORM gw_fct_debug(concat('{"data":{"msg":"<---- OUTPUT FOR gw_fct_get_featureupsert: ", "variables":"',v_debug,'"}}')::json);
+PERFORM gw_fct_debug(concat('{"data":{"msg":"----> INPUT FOR gw_fct_getfeatureupsert: ", "variables":"',v_debug,'"}}')::json);
+PERFORM gw_fct_debug(concat('{"data":{"msg":"<---- OUTPUT FOR gw_fct_getfeatureupsert: ", "variables":"',v_debug,'"}}')::json);
 UPDATE config_param_user SET value =  'true' WHERE parameter = 'utils_debug_mode' and cur_user = current_user;
 */
 
@@ -373,7 +373,7 @@ BEGIN
 
 		-- Call the function of feature fields generation
 		SELECT formtype INTO v_formtype FROM config_form_fields WHERE formname = p_table_id LIMIT 1;
-		SELECT gw_fct_get_formfields( v_formname, v_formtype, v_tabname, v_tablename, p_idname, p_id, p_columntype, p_tg_op, null, p_device , v_values_array) INTO v_fields_array; 
+		SELECT gw_fct_getformfields( v_formname, v_formtype, v_tabname, v_tablename, p_idname, p_id, p_columntype, p_tg_op, null, p_device , v_values_array) INTO v_fields_array;
 
 	ELSE	
 		PERFORM gw_fct_debug(concat('{"data":{"msg":"--> Configuration fields are NOT defined on config_form_fields table. System values are used <--", "variables":""}}')::json);
@@ -452,7 +452,7 @@ BEGIN
 	IF v_project_type = 'UD' THEN
 
 		v_input = '{"client":{"device":3,"infoType":100,"lang":"es"}, "feature":{"featureType":"'||v_catfeature.feature_type||'", "id":"'||p_id||'"}, "data":{"tgOp":"'||p_tg_op||'", "node1":"'||v_node1||'", "node2":"'||v_node2||'"}}';	
-		SELECT gw_fct_get_widgetvalues (v_input) INTO v_widgetvalues;
+		SELECT gw_fct_getwidgetvalues (v_input) INTO v_widgetvalues;
 		
 	END IF;	
 

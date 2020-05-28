@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2866
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_get_combochilds(character varying, character varying, character varying, character varying, character varying, character varying);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_get_combochilds(
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getcombochilds(
     p_table_id character varying,
     p_id character varying,
     p_idname character varying,
@@ -18,7 +18,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_get_combochilds(
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_get_combochilds('ve_arc_pipe', '2001', 'arc_id', 'state' ,  '1', 'arc')
+SELECT SCHEMA_NAME.gw_fct_getcombochilds('ve_arc_pipe', '2001', 'arc_id', 'state' ,  '1', 'arc')
 */
 
 DECLARE

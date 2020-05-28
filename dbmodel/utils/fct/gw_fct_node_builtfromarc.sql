@@ -8,12 +8,13 @@ This version of Giswater is provided by Giswater Association
 
 
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_built_nodefromarc();
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_built_nodefromarc(p_data json) RETURNS json AS
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_built_nodefromarc(json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_node_builtfromarc(p_data json) RETURNS json AS
 $BODY$
 
 /*EXAMPLE
 
-SELECT SCHEMA_NAME.gw_fct_built_nodefromarc($${"client":{"device":9, "infoType":100, "lang":"ES"},
+SELECT SCHEMA_NAME.gw_fct_node_builtfromarc($${"client":{"device":9, "infoType":100, "lang":"ES"},
 "form":{}, "feature":{},
 "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
 "parameters":{"exploitation":"1", "inserIntoNode":"true", "nodeTolerance":"0.01", "saveOnDatabase":"true"}}}$$)::text
@@ -96,7 +97,7 @@ BEGIN
 		UPDATE node_type SET isarcdivide=FALSE WHERE id=v_nodetype_id;	
 	
 		-- execute function
-		PERFORM gw_fct_repair_arc(arc_id, 0,0) FROM arc WHERE expl_id=v_expl AND (node_1 IS NULL OR node_2 IS NULL);
+		PERFORM gw_fct_arc_repair(arc_id, 0,0) FROM arc WHERE expl_id=v_expl AND (node_1 IS NULL OR node_2 IS NULL);
 	
 		-- restore isarcdivide to previous value
 		UPDATE node_type SET isarcdivide=v_isarcdivide WHERE id=v_nodetype_id;	

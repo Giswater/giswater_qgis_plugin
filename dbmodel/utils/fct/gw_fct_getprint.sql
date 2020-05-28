@@ -70,7 +70,7 @@ BEGIN
 -- Create tabs array
     formTabs := '[';
        
-	SELECT gw_fct_get_formfields( 'printGeneric', 'form', 'data', null, null, null, null, 'SELECT', null, 9, null) INTO v_fields; -- 'SELECT' parameter used on line 190 of gw_fct_get_formfields
+	SELECT gw_fct_getformfields( 'printGeneric', 'form', 'data', null, null, null, null, 'SELECT', null, 9, null) INTO v_fields; -- 'SELECT' parameter used on line 190 of gw_fct_getformfields
 
 	-- setting values
 	FOREACH aux_json IN ARRAY v_fields 

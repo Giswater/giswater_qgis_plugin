@@ -9,10 +9,10 @@ This version of Giswater is provided by Giswater Association
 --DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_duplicate_psector(json);
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_duplicate_psector(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_psector_duplicate(p_data json)
 RETURNS json AS
 /*
-SELECT SCHEMA_NAME.gw_fct_duplicate_psector($${
+SELECT SCHEMA_NAME.gw_fct_psector_duplicate($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},"feature":{"type":"PSECTOR"},
 "data":{"psector_id":"1","new_psector_name":"new_psector"}}$$);

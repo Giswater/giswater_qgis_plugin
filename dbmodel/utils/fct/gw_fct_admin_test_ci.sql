@@ -209,12 +209,12 @@ BEGIN
 									
 								ELSE
 								raise notice 'DELETE';
-									EXECUTE 'SELECT gw_fct_set_delete_feature($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{"type":"NODE"}, 
+									EXECUTE 'SELECT gw_fct_feature_delete($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{"type":"NODE"},
 									"data":{"filterFields":{}, "pageInfo":{}, "feature_id":"'||v_feature_id||'"}}$$)::text;'
 									INTO v_query_result;
 										
 									INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, error_message) 
-									VALUES (115, 'gw_fct_set_delete_feature',rec_role.id,v_query_result);
+									VALUES (115, 'gw_fct_feature_delete',rec_role.id,v_query_result);
 
 								END IF;
 								

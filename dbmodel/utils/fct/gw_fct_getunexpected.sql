@@ -18,7 +18,7 @@ SELECT SCHEMA_NAME.gw_fct_getunexpected($${"client":{"device":3,"infoType":100,"
 
 BEGIN
 
-	RETURN SCHEMA_NAME.gw_fct_get_visit(2, p_data);	
+	RETURN SCHEMA_NAME.gw_fct_getvisit_main(2, p_data);
 
 END;
 $BODY$

@@ -7,24 +7,22 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2725
 
 
---DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_get_feature_relation(json);
-
-
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_get_feature_relation(p_data json)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_getfeaturerelation(json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getfeaturerelation(p_data json)
 RETURNS json AS
 
 /*
-SELECT SCHEMA_NAME.gw_fct_get_feature_relation($${
+SELECT SCHEMA_NAME.gw_fct_getfeaturerelation($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"type":"ARC"},
 "data":{"feature_id":"2098" }}$$);
 
-SELECT SCHEMA_NAME.gw_fct_get_feature_relation($${
+SELECT SCHEMA_NAME.gw_fct_getfeaturerelation($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"type":"NODE"},
 "data":{"feature_id":"1051"}}$$);
 
-SELECT SCHEMA_NAME.gw_fct_get_feature_relation($${
+SELECT SCHEMA_NAME.gw_fct_getfeaturerelation($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"type":"CONNEC"},
 "data":{"feature_id":"3254" }}$$);
