@@ -52,7 +52,7 @@ SET search_path = "SCHEMA_NAME", public;
 	string_agg(concat('(''''',config_visit_parameter.id,''''')'),',' order by config_visit_parameter.id) as id_param,
 	string_agg(concat(config_visit_parameter.id,' ', lower(config_visit_parameter.data_type)),', ' order by config_visit_parameter.id) as datatype
 	INTO v_new_parameters
-	FROM config_visit_parameter JOIN config_visit_parameter_x_parameter ON config_visit_parameter.id=config_visit_parameter_x_parameter.parameter_id
+	FROM config_visit_parameter JOIN config_visit_param_x_param ON config_visit_parameter.id=config_visit_param_x_param.parameter_id
 	WHERE class_id=v_class_id;
 raise notice 'v_new_parameters - a,%',v_new_parameters.a_param;
 raise notice 'v_old_a_param,%',v_old_a_param;
@@ -85,7 +85,7 @@ raise notice 'v_old_ct_param,%',v_old_ct_param;
 			    FROM '||v_schemaname||'.om_visit 
 			    LEFT JOIN '||v_schemaname||'.om_visit_event ON om_visit.id= om_visit_event.visit_id 
 			    LEFT JOIN '||v_schemaname||'.om_visit_class on om_visit_class.id=om_visit.class_id
-			    LEFT JOIN '||v_schemaname||'.config_visit_parameter_x_parameter on config_visit_parameter_x_parameter.parameter_id=om_visit_event.parameter_id
+			    LEFT JOIN '||v_schemaname||'.config_visit_param_x_param on config_visit_param_x_param.parameter_id=om_visit_event.parameter_id
 			    where om_visit_class.ismultievent = TRUE ORDER  BY 1,2''::text, '' VALUES '||v_new_parameters.id_param||'''::text) 
 			      ct(visit_id integer, '||v_new_parameters.datatype||')) a ON a.visit_id = om_visit.id
 				WHERE om_visit_class.ismultievent = true AND om_visit_class.id='||v_class_id||';';

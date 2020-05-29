@@ -581,7 +581,7 @@ BEGIN
 
 						-- setting parameter in case of singleevent visit
 						--IF v_ismultievent IS FALSE AND (aux_json->>'column_id') = 'parameter_id' THEN
-							--v_parameter := (SELECT parameter_id FROM config_visit_parameter_x_parameter WHERE class_id=v_visitclass LIMIT 1);
+							--v_parameter := (SELECT parameter_id FROM config_visit_param_x_param WHERE class_id=v_visitclass LIMIT 1);
 							--v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_parameter::text);
 						--END IF;
 					

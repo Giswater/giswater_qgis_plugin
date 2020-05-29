@@ -230,7 +230,7 @@ UPDATE config_form_fields SET formname = 'print' WHERE formname = 'printGeneric'
 
 
 UPDATE sys_table SET id = 'config_addfields_parameter' WHERE id = 'man_addfields_parameter';
-UPDATE sys_table SET id = 'config_visit_parameter_x_parameter' WHERE id = 'om_visit_parameter_x_parameter';
+UPDATE sys_table SET id = 'config_visit_param_x_param' WHERE id = 'om_visit_parameter_x_parameter';
 UPDATE sys_table SET id = 'config_visit_class_x_parameter' WHERE id = 'om_visit_class_x_parameter';
 UPDATE sys_table SET id = 'config_visit_class_x_workorder' WHERE id = 'om_visit_class_x_wo';
 UPDATE sys_table SET id = 'config_filetype_x_extension' WHERE id = 'om_visit_filetype_x_extension';

@@ -194,7 +194,7 @@ BEGIN
 	string_agg(concat('(''''',config_visit_parameter.id,''''')'),',' order by config_visit_parameter.id) as id_param,
 	string_agg(concat(config_visit_parameter.id,' ', lower(config_visit_parameter.data_type)),', ' order by config_visit_parameter.id) as datatype
 	INTO v_old_parameters
-	FROM config_visit_parameter JOIN config_visit_parameter_x_parameter ON config_visit_parameter.id=config_visit_parameter_x_parameter.parameter_id
+	FROM config_visit_parameter JOIN config_visit_param_x_param ON config_visit_parameter.id=config_visit_param_x_param.parameter_id
 	WHERE class_id=v_class_id;
 
 	raise notice 'v_old_parameters,%,%',v_old_parameters,v_class_id;
@@ -202,7 +202,7 @@ BEGIN
 	--reset the value of sequence for tables where data will be inserted
 	PERFORM setval('SCHEMA_NAME.config_form_fields_id_seq', (SELECT max(id) FROM config_form_fields), true);
 	PERFORM setval('SCHEMA_NAME.om_visit_class_id_seq', (SELECT max(id) FROM om_visit_class), true);
-	PERFORM setval('SCHEMA_NAME.config_visit_class_x_parameter_id_seq', (SELECT max(id) FROM config_visit_parameter_x_parameter), true);
+	PERFORM setval('SCHEMA_NAME.config_visit_class_x_parameter_id_seq', (SELECT max(id) FROM config_visit_param_x_param), true);
 
 IF v_action = 'CREATE' THEN
 	--insert new class and parameter
@@ -297,11 +297,11 @@ IF v_action = 'CREATE' THEN
 		v_ismultifeature, v_short_descript);
 
 		--relate new parameters with new class
-		INSERT INTO config_visit_parameter_x_parameter (class_id, parameter_id)
+		INSERT INTO config_visit_param_x_param (class_id, parameter_id)
 		VALUES (v_class_id, v_param_name);
 
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (119, null, 4, concat('Insert parameter ',v_param_name,' into config_visit_parameter and relate it with class ',v_class_id,' in config_visit_parameter_x_parameter.'));
+		VALUES (119, null, 4, concat('Insert parameter ',v_param_name,' into config_visit_parameter and relate it with class ',v_class_id,' in config_visit_param_x_param.'));
 
 	    --add configuration of new parameters to config_form_fields
 		IF v_ismultievent = TRUE THEN
@@ -391,7 +391,7 @@ IF (v_action = 'UPDATE' OR v_action = 'DELETE') AND v_action_type = 'parameter' 
 		string_agg(concat('(''''',config_visit_parameter.id,''''')'),',' order by config_visit_parameter.id) as id_param,
 		string_agg(concat(config_visit_parameter.id,' ', lower(config_visit_parameter.data_type)),', ' order by config_visit_parameter.id) as datatype
 		INTO v_old_parameters
-		FROM config_visit_parameter JOIN config_visit_parameter_x_parameter ON config_visit_parameter.id=config_visit_parameter_x_parameter.parameter_id
+		FROM config_visit_parameter JOIN config_visit_param_x_param ON config_visit_parameter.id=config_visit_param_x_param.parameter_id
 		WHERE class_id=v_class_id;
 
 END IF;
@@ -431,11 +431,11 @@ ELSIF v_action = 'DELETE' AND v_action_type = 'parameter' THEN
 	
 		IF (SELECT count(id) FROM om_visit_event WHERE parameter_id = v_param_name) = 0 THEN
 
-			DELETE FROM config_visit_parameter_x_parameter WHERE parameter_id = v_param_name;
+			DELETE FROM config_visit_param_x_param WHERE parameter_id = v_param_name;
 			DELETE FROM config_visit_parameter WHERE id = v_param_name;
 
 		 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (119, null, 4, concat('Delete parameter definition from config_visit_parameter_x_parameter and config_visit_parameter.'));
+			VALUES (119, null, 4, concat('Delete parameter definition from config_visit_param_x_param and config_visit_parameter.'));
 
 			IF v_ismultievent = TRUE THEN
 			raise notice 'multi_delete';
@@ -463,8 +463,8 @@ ELSIF v_action = 'DELETE' AND v_action_type = 'class' THEN
 			DELETE FROM config_visit_x_feature WHERE visitclass_id = v_class_id;
 			DELETE FROM config_form_fields WHERE formtype='visit' and formname IN (SELECT formname FROM config_api_visit WHERE visitclass_id = v_class_id);
 			DELETE FROM config_api_visit WHERE visitclass_id = v_class_id;
-			DELETE FROM config_visit_parameter_x_parameter WHERE class_id = v_class_id;
-			DELETE FROM config_visit_parameter WHERE id IN (SELECT parameter_id FROM config_visit_parameter_x_parameter WHERE class_id = v_class_id);
+			DELETE FROM config_visit_param_x_param WHERE class_id = v_class_id;
+			DELETE FROM config_visit_parameter WHERE id IN (SELECT parameter_id FROM config_visit_param_x_param WHERE class_id = v_class_id);
 			DELETE FROM om_visit_class WHERE id = v_class_id;
 			DELETE FROM sys_table WHERE id = v_viewname;			
 			
@@ -566,7 +566,7 @@ ELSIF v_action = 'CONFIGURATION' THEN
 		IF v_ismultievent = TRUE THEN
 
 			FOR rec IN 
-			(SELECT class_id, parameter_id, data_type  FROM config_visit_parameter_x_parameter JOIN config_visit_parameter ON config_visit_parameter.id = config_visit_parameter_x_parameter.parameter_id
+			(SELECT class_id, parameter_id, data_type  FROM config_visit_param_x_param JOIN config_visit_parameter ON config_visit_parameter.id = config_visit_param_x_param.parameter_id
 			WHERE class_id = v_class_id ) LOOP
 
 				EXECUTE 'SELECT max(layout_order) + 1 FROM config_form_fields WHERE formname='''||v_viewname||'''

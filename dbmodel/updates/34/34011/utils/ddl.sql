@@ -38,7 +38,7 @@ VALUES (new.arc_id,  (SELECT value FROM config_param_user WHERE parameter='edit_
 
 
 ALTER TABLE man_addfields_parameter RENAME TO config_addfields_parameter;
-ALTER TABLE om_visit_parameter_x_parameter RENAME TO config_visit_parameter_x_parameter;
+ALTER TABLE om_visit_parameter_x_parameter RENAME TO config_visit_param_x_param;
 ALTER TABLE om_visit_class_x_parameter RENAME TO config_visit_class_x_parameter;
 ALTER TABLE om_visit_class_x_wo RENAME TO config_visit_class_x_workorder;
 ALTER TABLE om_visit_filetype_x_extension RENAME TO	config_filetype_x_extension;
@@ -48,9 +48,9 @@ ALTER TABLE price_compost RENAME TO plan_price;
 ALTER TABLE price_compost_value RENAME TO plan_price_compost;
 
 
-ALTER TABLE config_visit_parameter_x_parameter DROP CONSTRAINT om_visit_parameter_x_parameter_pkey;
-ALTER TABLE config_visit_parameter_x_parameter ADD CONSTRAINT config_visit_parameter_x_parameter_pkey PRIMARY KEY(parameter_id1, parameter_id2, action_type);
-ALTER TABLE config_visit_parameter_x_parameter DROP COLUMN pxp_id;
+ALTER TABLE config_visit_param_x_param DROP CONSTRAINT om_visit_parameter_x_parameter_pkey;
+ALTER TABLE config_visit_param_x_param ADD CONSTRAINT config_visit_param_x_param_pkey PRIMARY KEY(parameter_id1, parameter_id2, action_type);
+ALTER TABLE config_visit_param_x_param DROP COLUMN pxp_id;
 
 ALTER TABLE config_visit_class_x_parameter DROP CONSTRAINT om_visit_class_x_parameter_pkey;
 ALTER TABLE config_visit_class_x_parameter ADD CONSTRAINT config_visit_class_x_parameter_pkey PRIMARY KEY(parameter_id, class_id);
