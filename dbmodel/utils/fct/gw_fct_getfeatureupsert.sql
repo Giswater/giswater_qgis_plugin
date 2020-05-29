@@ -369,18 +369,18 @@ BEGIN
 	----------------------------
 	IF  p_configtable is TRUE THEN 
 	
-		PERFORM gw_fct_debug(concat('{"data":{"msg":"--> Configuration fields are defined on config_form_fields table <--", "variables":""}}')::json);
+		PERFORM gw_fct_debug(concat('{"data":{"msg":"--> Configuration fields are defined on layoutorder table <--", "variables":""}}')::json);
 
 		-- Call the function of feature fields generation
-		SELECT formtype INTO v_formtype FROM config_form_fields WHERE formname = p_table_id LIMIT 1;
+		SELECT formtype INTO v_formtype FROM layoutorder WHERE formname = p_table_id LIMIT 1;
 		SELECT gw_fct_getformfields( v_formname, v_formtype, v_tabname, v_tablename, p_idname, p_id, p_columntype, p_tg_op, null, p_device , v_values_array) INTO v_fields_array;
 
 	ELSE	
-		PERFORM gw_fct_debug(concat('{"data":{"msg":"--> Configuration fields are NOT defined on config_form_fields table. System values are used <--", "variables":""}}')::json);
+		PERFORM gw_fct_debug(concat('{"data":{"msg":"--> Configuration fields are NOT defined on layoutorder table. System values are used <--", "variables":""}}')::json);
 	
 		-- Get fields
 		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM 
-			(SELECT a.attname as label, a.attname as column_id, 
+			(SELECT a.attname as label, a.attname as columnname, 
 			concat('||quote_literal(v_tabname)||',''_'',a.attname) AS widgetname,
 			(case when a.atttypid=16 then ''check'' else ''text'' end ) as widgettype, 
 			(case when a.atttypid=16 then ''boolean'' else ''string'' end ) as "datatype", 
@@ -389,7 +389,7 @@ BEGIN
 			false AS iseditable,
 			row_number()over() AS orderby, 
 			null as stylesheet, 
-			row_number()over() AS layout_order, 
+			row_number()over() AS layoutorder, 
 			FALSE AS isparent, 
 			null AS widgetfunction, 
 			null AS linkedaction, 
@@ -464,7 +464,7 @@ BEGIN
 
 			IF p_tg_op='INSERT' THEN 
 
-				CASE (aux_json->>'column_id')
+				CASE (aux_json->>'columnname')
 				
 				-- special values
 				WHEN quote_ident(p_idname) THEN
@@ -533,7 +533,7 @@ BEGIN
 				-- *_type
 				WHEN 'fluid_type','function_type','location_type','category_type' THEN
 					SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a 
-					WHERE ((a->>'param') = (aux_json->>'column_id') AND left(lower(a->>'parameter'),3) = left(lower(v_catfeature.feature_type),3));
+					WHERE ((a->>'param') = (aux_json->>'columnname') AND left(lower(a->>'parameter'),3) = left(lower(v_catfeature.feature_type),3));
 			    
 				-- state type
 				WHEN 'state_type' THEN
@@ -551,13 +551,13 @@ BEGIN
 					EXECUTE v_querytext INTO field_value;
 							
 				-- rest (including addfields)
-				ELSE SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a WHERE (a->>'param') = (aux_json->>'column_id'); 
+				ELSE SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a WHERE (a->>'param') = (aux_json->>'columnname'); 
 				END CASE;
 			
 				--specific values for ud
 				IF v_project_type = 'UD' THEN
 
-					CASE (aux_json->>'column_id')		
+					CASE (aux_json->>'columnname')		
 					WHEN 'sys_y1' THEN
 						field_value =v_noderecord1.sys_ymax;
 					WHEN 'sys_elev1' THEN
@@ -573,7 +573,7 @@ BEGIN
 				END IF;	
 				
 			ELSIF  p_tg_op ='UPDATE' THEN 
-				field_value := (v_values_array->>(aux_json->>'column_id'));
+				field_value := (v_values_array->>(aux_json->>'columnname'));
 			END IF;
 			
 			-- setting values
@@ -585,7 +585,7 @@ BEGIN
 			
 			-- setting widgetcontrols
 			IF (aux_json->>'datatype')='double' OR (aux_json->>'datatype')='integer' OR (aux_json->>'datatype')='numeric' THEN 
-				v_widgetcontrols = gw_fct_json_object_set_key ((aux_json->>'widgetcontrols')::json, 'maxMinValues' ,(v_widgetvalues->>(aux_json->>'column_id'))::json);
+				v_widgetcontrols = gw_fct_json_object_set_key ((aux_json->>'widgetcontrols')::json, 'maxMinValues' ,(v_widgetvalues->>(aux_json->>'columnname'))::json);
 				v_fields_array[array_index] := gw_fct_json_object_set_key (v_fields_array[array_index], 'widgetcontrols', v_widgetcontrols);
 			END IF;
 		END LOOP;  

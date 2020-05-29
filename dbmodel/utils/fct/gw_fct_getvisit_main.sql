@@ -471,72 +471,72 @@ BEGIN
 				FOREACH aux_json IN ARRAY v_fields
 				LOOP					
 					-- setting feature id value
-					IF (aux_json->>'column_id') = 'arc_id' OR (aux_json->>'column_id')='node_id' OR (aux_json->>'column_id')='connec_id' OR (aux_json->>'column_id') ='gully_id' 
-					OR (aux_json->>'column_id') ='pol_id' OR (aux_json->>'column_id') ='sys_pol_id' THEN
+					IF (aux_json->>'columnname') = 'arc_id' OR (aux_json->>'columnname')='node_id' OR (aux_json->>'columnname')='connec_id' OR (aux_json->>'columnname') ='gully_id' 
+					OR (aux_json->>'columnname') ='pol_id' OR (aux_json->>'columnname') ='sys_pol_id' THEN
 						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'value', v_featureid);
 						RAISE NOTICE ' --- SETTING feature id VALUE % ---',v_featureid ;
 
 					END IF;
 
 					-- setting code value
-					IF (aux_json->>'column_id') = 'code' THEN
+					IF (aux_json->>'columnname') = 'code' THEN
 						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'value', v_code);
 						RAISE NOTICE ' --- SETTING feature id VALUE % ---',v_featureid ;
 
 					END IF;
 					
 					-- setting visit id value
-					IF (aux_json->>'column_id') = 'visit_id' AND v_offline THEN
+					IF (aux_json->>'columnname') = 'visit_id' AND v_offline THEN
 						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'value', ''::text);
-					ELSIF (aux_json->>'column_id') = 'visit_id'THEN
+					ELSIF (aux_json->>'columnname') = 'visit_id'THEN
 						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'value', v_id);
 						RAISE NOTICE ' --- SETTING visit id VALUE % ---',v_id ;
 					END IF;
 
 					-- setting visitclass value
-					IF (aux_json->>'column_id') = 'class_id' THEN
+					IF (aux_json->>'columnname') = 'class_id' THEN
 						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_visitclass::text);
 						RAISE NOTICE ' --- SETTING visitclass VALUE % ---',v_visitclass ;
 					END IF;
 
 					-- setting visitextcode value
-					IF (aux_json->>'column_id') = 'ext_code' THEN
+					IF (aux_json->>'columnname') = 'ext_code' THEN
 						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_visitextcode::text);
 						RAISE NOTICE ' --- SETTING v_visitextcode VALUE % ---',v_visitextcode ;
 					END IF;
 
 					-- setting visitcat
-					IF (aux_json->>'column_id') = 'visitcat_id' THEN
+					IF (aux_json->>'columnname') = 'visitcat_id' THEN
 						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_visitcat::text);
 						RAISE NOTICE ' --- SETTING v_visitcat VALUE % ---',v_visitcat ;
 					END IF;
 
 					-- setting lot_id
-					IF (aux_json->>'column_id') = 'lot_id' THEN
+					IF (aux_json->>'columnname') = 'lot_id' THEN
 						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'value', v_lot::text);
 						RAISE NOTICE ' --- SETTING v_lot VALUE % ---',v_lot ;
 					END IF;
 									
 					-- setting startdate
-					IF (aux_json->>'column_id') = 'startdate' THEN		
+					IF (aux_json->>'columnname') = 'startdate' THEN		
 						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'value', v_startdate);	
 						RAISE NOTICE ' --- SETTING startdate VALUE --- now()';
 					END IF;
 
 					-- setting status
-					IF (aux_json->>'column_id') = 'status' THEN
+					IF (aux_json->>'columnname') = 'status' THEN
 						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', '4'::text);	
 						RAISE NOTICE ' --- SETTING status VALUE % ---', v_status;
 					END IF;
 
 					-- setting parameter in case of singleparameter visit
 					IF v_ismultievent IS FALSE THEN
-						IF (aux_json->>'column_id') = 'parameter_id' THEN
+						IF (aux_json->>'columnname') = 'parameter_id' THEN
 							v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_parameter::text);
 							RAISE NOTICE ' --- SETTING v_parameter VALUE % ---',v_parameter ;
 						END IF;
 
-						IF (aux_json->>'column_id') = 'value' THEN
+						IF (aux_json->>'columnname') = 'value' THEN
 							v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'value', v_value);
 							RAISE NOTICE ' --- SETTING v_parameter VALUE % ---',v_value ;
 						END IF;
@@ -545,7 +545,7 @@ BEGIN
 					END IF;
 					
 					-- disable visit type if project is offline
-					IF (aux_json->>'column_id') = 'class_id' AND v_offline = 'true' THEN
+					IF (aux_json->>'columnname') = 'class_id' AND v_offline = 'true' THEN
 						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'disabled', True);
 					END IF;
 					
@@ -569,7 +569,7 @@ BEGIN
 				LOOP          
 					array_index := array_index + 1;
 
-					v_fieldvalue := (v_values->>(aux_json->>'column_id'));	
+					v_fieldvalue := (v_values->>(aux_json->>'columnname'));	
 					
 					-- Disable widgets from visit form if user has no permisions
 					IF v_userrole LIKE '%role_basic%' THEN
@@ -580,7 +580,7 @@ BEGIN
 						v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'selectedId', COALESCE(v_fieldvalue, ''));
 
 						-- setting parameter in case of singleevent visit
-						--IF v_ismultievent IS FALSE AND (aux_json->>'column_id') = 'parameter_id' THEN
+						--IF v_ismultievent IS FALSE AND (aux_json->>'columnname') = 'parameter_id' THEN
 							--v_parameter := (SELECT parameter_id FROM config_visit_param_x_param WHERE class_id=v_visitclass LIMIT 1);
 							--v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_parameter::text);
 						--END IF;
@@ -596,19 +596,19 @@ BEGIN
 
 					-- dissable widgets if visit is status=0
 					IF v_status = 0 AND (v_fields[(aux_json->>'orderby')::INT]->>'layout_id')::integer < 9 THEN 
-						IF (v_fields[(aux_json->>'orderby')::INT]->>'column_id')!='status' THEN
+						IF (v_fields[(aux_json->>'orderby')::INT]->>'columnname')!='status' THEN
 							v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'iseditable', false);
 							v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'disabled', true);
 						END IF;
 					END IF;									
 					
 					-- Disable class_id
-					IF (aux_json->>'column_id') = 'class_id' THEN
+					IF (aux_json->>'columnname') = 'class_id' THEN
 						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'disabled', True);
 					END IF;	
 
 					-- disable visit type if project is offline
-					IF (aux_json->>'column_id') = 'class_id' AND v_offline = 'true' THEN
+					IF (aux_json->>'columnname') = 'class_id' AND v_offline = 'true' THEN
 						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'disabled', True);
 					END IF;
 									

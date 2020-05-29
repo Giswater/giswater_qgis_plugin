@@ -61,7 +61,7 @@ BEGIN
 	-- Set widget_name without tabname for widgets
 	FOREACH field IN ARRAY v_fields_array
 	LOOP
-		v_fields_array[(field->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields_array[(field->>'orderby')::INT], 'widgetname', field->>'column_id');
+		v_fields_array[(field->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields_array[(field->>'orderby')::INT], 'widgetname', field->>'columnname');
 	END LOOP;
 
 	v_fields := array_to_json(v_fields_array);

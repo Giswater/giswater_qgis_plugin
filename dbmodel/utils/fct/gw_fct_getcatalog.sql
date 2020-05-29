@@ -104,7 +104,7 @@ BEGIN
 	IF v_formname='upsert_catalog_arc' OR v_formname='upsert_catalog_node' OR v_formname='upsert_catalog_connec' THEN
 
 		--  get querytext
-		EXECUTE 'SELECT dv_querytext FROM config_form_fields WHERE formname = $1 and column_id=''id'''
+		EXECUTE 'SELECT dv_querytext FROM config_form_fields WHERE formname = $1 and columnname=''id'''
 			INTO v_query_result
 			USING v_formname;
 

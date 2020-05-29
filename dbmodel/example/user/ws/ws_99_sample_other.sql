@@ -102,101 +102,101 @@ SELECT gw_fct_audit_check_project($${"client":{"device":9, "infoType":100, "lang
 
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"OUTFALL_VALVE"},
-"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"outfallvalve_param_1", "datatype":"string", 
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"columnname":"outfallvalve_param_1", "datatype":"string", 
 "widgettype":"text", "label":"Outvalve param_1","ismandatory":"False",
 "fieldLength":"250", "numDecimals" :null,"addfield_active":"True", "iseditable":"True","isenabled":"True"}}}$$);
 
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"OUTFALL_VALVE"},
-"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"outfallvalve_param_2", "datatype":"boolean", 
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"columnname":"outfallvalve_param_2", "datatype":"boolean", 
 "widgettype":"check", "label":"Outvalve param_2","ismandatory":"False",
 "fieldLength":"250", "numDecimals" :null,"addfield_active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"SHUTOFF_VALVE"},
-"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"shtvalve_param_1", "datatype":"string", 
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"columnname":"shtvalve_param_1", "datatype":"string", 
 "widgettype":"combo", "label":"Shtvalve param_1","ismandatory":"False",
 "fieldLength":"250", "numDecimals" :null,"addfield_active":"True", "iseditable":"True", "dv_isnullvalue":"True",
 "isenabled":"True","dv_querytext":"SELECT id as id, idval as idval  FROM edit_typevalue WHERE typevalue='shtvalve_param_1'"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"SHUTOFF_VALVE"},
-"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"shtvalve_param_2", "datatype":"string", 
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"columnname":"shtvalve_param_2", "datatype":"string", 
 "widgettype":"text", "label":"Shtvalve param_2","ismandatory":"False",
 "fieldLength":"250", "numDecimals" :null,"addfield_active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"GREEN_VALVE"},
-"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"greenvalve_param_1", "datatype":"boolean", 
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"columnname":"greenvalve_param_1", "datatype":"boolean", 
 "widgettype":"check", "label":"Gvalve param_1","ismandatory":"False",
 "fieldLength":null, "numDecimals" :null,"addfield_active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"GREEN_VALVE"},
-"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"greenvalve_param_2", "datatype":"string", 
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"columnname":"greenvalve_param_2", "datatype":"string", 
 "widgettype":"text", "label":"Gvalve param_2","ismandatory":"False",
 "fieldLength":"250", "numDecimals" :null,"addfield_active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"AIR_VALVE"},
-"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"airvalve_param_1", "datatype":"string", 
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"columnname":"airvalve_param_1", "datatype":"string", 
 "widgettype":"text", "label":"Airvalve param_1","ismandatory":"False",
 "fieldLength":"250", "numDecimals" :null,"addfield_active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"AIR_VALVE"},
-"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"airvalve_param_2", "datatype":"integer", 
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"columnname":"airvalve_param_2", "datatype":"integer", 
 "widgettype":"text", "label":"Airvalve param_2","ismandatory":"False",
 "fieldLength":"250", "numDecimals" :null,"addfield_active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"CHECK_VALVE"},
-"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"checkvalve_param_1", "datatype":"integer", 
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"columnname":"checkvalve_param_1", "datatype":"integer", 
 "widgettype":"text", "label":"Check param_1","ismandatory":"False",
 "fieldLength":null, "numDecimals" :null,"addfield_active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"CHECK_VALVE"},
-"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"checkvalve_param_2", "datatype":"string", 
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"columnname":"checkvalve_param_2", "datatype":"string", 
 "widgettype":"text", "label":"Check param_2","ismandatory":"False",
 "fieldLength":"250", "numDecimals" :null,"addfield_active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"PIPE"},
-"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"pipe_param_1", "datatype":"string", 
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"columnname":"pipe_param_1", "datatype":"string", 
 "widgettype":"text", "label":"Pipe param_1","ismandatory":"False",
 "fieldLength":"150", "numDecimals" :null,"addfield_active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"PRESSURE_METER"},
-"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"pressmeter_param_1", "datatype":"string", 
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"columnname":"pressmeter_param_1", "datatype":"string", 
 "widgettype":"combo", "label":"Pressmeter param_1","ismandatory":"False",
 "fieldLength":"250", "numDecimals" :null,"addfield_active":"True", "iseditable":"True", "dv_isnullvalue":"True",
 "isenabled":"True","dv_querytext":"SELECT id as id, idval as idval  FROM edit_typevalue WHERE typevalue='pressmeter_param_1'"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"PRESSURE_METER"},
-"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"pressmeter_param_2", "datatype":"date", 
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"columnname":"pressmeter_param_2", "datatype":"date", 
 "widgettype":"datepickertime", "label":"Pressmeter param_2","ismandatory":"False",
 "fieldLength":null, "numDecimals" :null,"addfield_active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"FILTER"},
-"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"filter_param_1", "datatype":"integer", 
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"columnname":"filter_param_1", "datatype":"integer", 
 "widgettype":"text", "label":"Filter param_1","ismandatory":"False",
 "fieldLength":null, "numDecimals" :null,"addfield_active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"FILTER"},
-"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"filter_param_2", "datatype":"string", 
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"columnname":"filter_param_2", "datatype":"string", 
 "widgettype":"text", "label":"Filter param_2","ismandatory":"False",
 "fieldLength":"200", "numDecimals" :null,"addfield_active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"TANK"},
-"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"tank_param_1", "datatype":"integer", 
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"columnname":"tank_param_1", "datatype":"integer", 
 "widgettype":"text", "label":"Tank param_1","ismandatory":"False",
 "fieldLength":null, "numDecimals" :null,"addfield_active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"TANK"},
-"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"tank_param_2", "datatype":"date", 
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"columnname":"tank_param_2", "datatype":"date", 
 "widgettype":"datepickertime", "label":"Tank param_2","ismandatory":"False",
 "fieldLength":null, "numDecimals" :null,"addfield_active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"HYDRANT"},
-"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"hydrant_param_1", "datatype":"string", 
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"columnname":"hydrant_param_1", "datatype":"string", 
 "widgettype":"combo", "label":"Hydrant param_1","ismandatory":"False",
 "fieldLength":"250", "numDecimals" :null,"addfield_active":"True", "iseditable":"True", "dv_isnullvalue":"True",
 "isenabled":"True","dv_querytext":"SELECT id as id, idval as idval  FROM edit_typevalue WHERE typevalue='hydrant_param_1'"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"HYDRANT"},
-"data":{"action":"CREATE", "multi_create":"false", "parameters":{"column_id":"hydrant_param_2", "datatype":"integer", 
+"data":{"action":"CREATE", "multi_create":"false", "parameters":{"columnname":"hydrant_param_2", "datatype":"integer", 
 "widgettype":"text", "label":"Hydrant param_2","ismandatory":"False",
 "fieldLength":null, "numDecimals" :null,"addfield_active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
 
@@ -252,48 +252,48 @@ WHERE connec_id ='3024';
 UPDATE inp_valve SET diameter = 100;
 
 --move closed and broken to the top of lyt_data_2
-UPDATE config_form_fields SET layoutname='lyt_data_2', layout_order=0 WHERE column_id = 'closed' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layout_order=1 WHERE column_id = 'broken' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layout_order=2 WHERE column_id = 'arc_id' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layout_order=3 WHERE column_id = 'parent_id' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layout_order=4 WHERE column_id = 'soilcat_id' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layout_order=5 WHERE column_id = 'fluid_type' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layout_order=6 WHERE column_id = 'function_type' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layout_order=7 WHERE column_id = 'category_type' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layout_order=8 WHERE column_id = 'location_type' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layout_order=9 WHERE column_id = 'annotation' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layout_order=10 WHERE column_id = 'observ' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layout_order=11 WHERE column_id = 'descript' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layout_order=12 WHERE column_id = 'comment' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layout_order=13 WHERE column_id = 'num_value' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layout_order=14 WHERE column_id = 'svg' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layout_order=15 WHERE column_id = 'rotation' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layout_order=16 WHERE column_id = 'hemisphere' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layout_order=17 WHERE column_id = 'label' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layout_order=18 WHERE column_id = 'label_y' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layout_order=19 WHERE column_id = 'label_x' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layout_order=20 WHERE column_id = 'label_rotation' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layout_order=21 WHERE column_id = 'publish' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layout_order=22 WHERE column_id = 'undelete' AND formname like '%_valve';
-UPDATE config_form_fields SET layoutname='lyt_data_2', layout_order=23 WHERE column_id = 'inventory' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=0 WHERE columnname = 'closed' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=1 WHERE columnname = 'broken' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=2 WHERE columnname = 'arc_id' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=3 WHERE columnname = 'parent_id' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=4 WHERE columnname = 'soilcat_id' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=5 WHERE columnname = 'fluid_type' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=6 WHERE columnname = 'function_type' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=7 WHERE columnname = 'category_type' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=8 WHERE columnname = 'location_type' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=9 WHERE columnname = 'annotation' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=10 WHERE columnname = 'observ' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=11 WHERE columnname = 'descript' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=12 WHERE columnname = 'comment' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=13 WHERE columnname = 'num_value' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=14 WHERE columnname = 'svg' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=15 WHERE columnname = 'rotation' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=16 WHERE columnname = 'hemisphere' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=17 WHERE columnname = 'label' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=18 WHERE columnname = 'label_y' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=19 WHERE columnname = 'label_x' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=20 WHERE columnname = 'label_rotation' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=21 WHERE columnname = 'publish' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=22 WHERE columnname = 'undelete' AND formname like '%_valve';
+UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=23 WHERE columnname = 'inventory' AND formname like '%_valve';
 
 UPDATE ext_streetaxis SET muni_id = 2 WHERE expl_id  = 2;
 
 -- hidden
-UPDATE config_form_fields SET hidden = true WHERE column_id 
+UPDATE config_form_fields SET hidden = true WHERE columnname 
 IN ('undelete', 'publish', 'buildercat_id', 'comment', 'num_value', 'svg', 'macrodqa_id', 'macrosector_id',
 'macroexpl_id', 'custom_length', 'staticpressure1', 'staticpressure2', 'pipe_param_1');
 
-UPDATE config_form_fields SET hidden = true WHERE column_id IN ('label_x', 'label_y') AND formname LIKE 've_arc%';
+UPDATE config_form_fields SET hidden = true WHERE columnname IN ('label_x', 'label_y') AND formname LIKE 've_arc%';
 
 
 -- reorder sample
-UPDATE config_form_fields SET layout_order =90, layoutname = 'lyt_data_1' WHERE column_id ='link';
-UPDATE config_form_fields SET layout_order =2 , layoutname ='lyt_bot_2' WHERE column_id ='verified';
-UPDATE config_form_fields SET layout_order =1 , layoutname ='lyt_bot_2' WHERE column_id ='sector_id';
-UPDATE config_form_fields SET layout_order =4 , layoutname ='lyt_bot_1' , label = 'Dqa' WHERE column_id ='dqa_id';
-UPDATE config_form_fields SET layout_order =70 , layoutname ='lyt_data_1' WHERE column_id ='macrosector_id';
-UPDATE config_form_fields SET stylesheet ='{"label":"color:red; font-weight:bold"}' WHERE column_id IN ('expl_id', 'sector_id');
+UPDATE config_form_fields SET layoutorder =90, layoutname = 'lyt_data_1' WHERE columnname ='link';
+UPDATE config_form_fields SET layoutorder =2 , layoutname ='lyt_bot_2' WHERE columnname ='verified';
+UPDATE config_form_fields SET layoutorder =1 , layoutname ='lyt_bot_2' WHERE columnname ='sector_id';
+UPDATE config_form_fields SET layoutorder =4 , layoutname ='lyt_bot_1' , label = 'Dqa' WHERE columnname ='dqa_id';
+UPDATE config_form_fields SET layoutorder =70 , layoutname ='lyt_data_1' WHERE columnname ='macrosector_id';
+UPDATE config_form_fields SET stylesheet ='{"label":"color:red; font-weight:bold"}' WHERE columnname IN ('expl_id', 'sector_id');
 
 
 
@@ -436,45 +436,45 @@ WHERE node_id = '113766';
 UPDATE config_mincut_inlet SET config = '{"inletArc":["114145"]}'
 WHERE node_id = '113952';
 
-UPDATE config_form_fields SET label = 'Presszone' WHERE column_id = 'presszone_id';
+UPDATE config_form_fields SET label = 'Presszone' WHERE columnname = 'presszone_id';
 
-update config_form_fields SET layout_order = 3 where column_id='state' and formname like '%ve_connec_%';
-update config_form_fields SET layout_order = 4 where column_id='state_type' and formname like '%ve_connec_%';
+update config_form_fields SET layoutorder = 3 where columnname='state' and formname like '%ve_connec_%';
+update config_form_fields SET layoutorder = 4 where columnname='state_type' and formname like '%ve_connec_%';
 
 UPDATE node_type set isprofilesurface = true;
 
 --refactor of forms
-UPDATE config_form_fields SET layoutname = 'lyt_data_3', layout_order = 11 where column_id ='pjoint_id';
-UPDATE config_form_fields SET layoutname = 'lyt_data_3', layout_order = 12 where column_id ='pjoint_type';
-UPDATE config_form_fields SET layoutname = 'lyt_data_3', layout_order = 13 where column_id ='descript';
-UPDATE config_form_fields SET layoutname = 'lyt_data_3', layout_order = 14 where column_id = 'annotation';
-UPDATE config_form_fields SET layoutname = 'lyt_data_3', layout_order = 15 where column_id = 'observ';
-UPDATE config_form_fields SET layoutname = 'lyt_data_3', layout_order = 16 where column_id = 'lastupdate';
-UPDATE config_form_fields SET layoutname ='lyt_data_3' , layout_order = 17 where column_id = 'lastupdate_user';
-UPDATE config_form_fields SET layoutname = 'lyt_data_3', layout_order = 18 where column_id ='link';
+UPDATE config_form_fields SET layoutname = 'lyt_data_3', layoutorder = 11 where columnname ='pjoint_id';
+UPDATE config_form_fields SET layoutname = 'lyt_data_3', layoutorder = 12 where columnname ='pjoint_type';
+UPDATE config_form_fields SET layoutname = 'lyt_data_3', layoutorder = 13 where columnname ='descript';
+UPDATE config_form_fields SET layoutname = 'lyt_data_3', layoutorder = 14 where columnname = 'annotation';
+UPDATE config_form_fields SET layoutname = 'lyt_data_3', layoutorder = 15 where columnname = 'observ';
+UPDATE config_form_fields SET layoutname = 'lyt_data_3', layoutorder = 16 where columnname = 'lastupdate';
+UPDATE config_form_fields SET layoutname ='lyt_data_3' , layoutorder = 17 where columnname = 'lastupdate_user';
+UPDATE config_form_fields SET layoutname = 'lyt_data_3', layoutorder = 18 where columnname ='link';
 
-UPDATE config_form_fields SET  hidden = true where column_id = 'macrodma_id';
-UPDATE config_form_fields SET  hidden = true where column_id = 'inventory';
-UPDATE config_form_fields SET  hidden = true where column_id = 'feature_id';
-UPDATE config_form_fields SET  hidden = true where column_id = 'featurecat_id';
-UPDATE config_form_fields SET  hidden = true where column_id = 'connec_length';
+UPDATE config_form_fields SET  hidden = true where columnname = 'macrodma_id';
+UPDATE config_form_fields SET  hidden = true where columnname = 'inventory';
+UPDATE config_form_fields SET  hidden = true where columnname = 'feature_id';
+UPDATE config_form_fields SET  hidden = true where columnname = 'featurecat_id';
+UPDATE config_form_fields SET  hidden = true where columnname = 'connec_length';
 
-UPDATE config_form_fields SET  hidden = true where column_id = 'depth' AND formname LIKE '%_connec_%';
-UPDATE config_form_fields SET  hidden = true where column_id = 'function_type' AND formname LIKE '%_connec_%';
-UPDATE config_form_fields SET  hidden = true where column_id = 'descript' AND formname LIKE '%_connec_%';
-UPDATE config_form_fields SET  hidden = true where column_id = 'annotation' AND formname LIKE '%_connec_%';
+UPDATE config_form_fields SET  hidden = true where columnname = 'depth' AND formname LIKE '%_connec_%';
+UPDATE config_form_fields SET  hidden = true where columnname = 'function_type' AND formname LIKE '%_connec_%';
+UPDATE config_form_fields SET  hidden = true where columnname = 'descript' AND formname LIKE '%_connec_%';
+UPDATE config_form_fields SET  hidden = true where columnname = 'annotation' AND formname LIKE '%_connec_%';
 
-UPDATE config_form_fields SET layoutname = 'lyt_bot_1' where column_id ='state';
-UPDATE config_form_fields SET layoutname = 'lyt_bot_1' where column_id ='state_type';
-UPDATE config_form_fields SET layoutname = 'lyt_bot_1' where column_id ='sector_id';
-UPDATE config_form_fields SET layoutname = 'lyt_data_1',layout_order = 997 where column_id ='hemisphere';
-UPDATE config_form_fields SET layout_order = 2 where column_id ='dma_id';
+UPDATE config_form_fields SET layoutname = 'lyt_bot_1' where columnname ='state';
+UPDATE config_form_fields SET layoutname = 'lyt_bot_1' where columnname ='state_type';
+UPDATE config_form_fields SET layoutname = 'lyt_bot_1' where columnname ='sector_id';
+UPDATE config_form_fields SET layoutname = 'lyt_data_1',layoutorder = 997 where columnname ='hemisphere';
+UPDATE config_form_fields SET layoutorder = 2 where columnname ='dma_id';
 
-UPDATE config_form_fields SET layoutname = 'lyt_data_2', layout_order = 30 where column_id ='verified';
-UPDATE config_form_fields SET layoutname = 'lyt_data_2', layout_order = 31 where column_id ='presszone_id';
-UPDATE config_form_fields SET layoutname = 'lyt_data_2', layout_order = 32 where column_id ='dqa_id';
-UPDATE config_form_fields SET layoutname = 'lyt_data_2', layout_order = 33 where column_id ='expl_id';
-UPDATE config_form_fields SET layoutname = 'lyt_data_1', layout_order = 998 where column_id ='parent_id';
+UPDATE config_form_fields SET layoutname = 'lyt_data_2', layoutorder = 30 where columnname ='verified';
+UPDATE config_form_fields SET layoutname = 'lyt_data_2', layoutorder = 31 where columnname ='presszone_id';
+UPDATE config_form_fields SET layoutname = 'lyt_data_2', layoutorder = 32 where columnname ='dqa_id';
+UPDATE config_form_fields SET layoutname = 'lyt_data_2', layoutorder = 33 where columnname ='expl_id';
+UPDATE config_form_fields SET layoutname = 'lyt_data_1', layoutorder = 998 where columnname ='parent_id';
 
 
 -- refactor of type's
@@ -483,7 +483,7 @@ UPDATE man_type_category SET category_type = replace (category_type, 'Standard',
 UPDATE man_type_location SET location_type = replace (location_type, 'Standard', 'St.');
 UPDATE man_type_function SET function_type = replace (function_type, 'Standard', 'St.');
 
-update config_form_fields SET widgettype = 'text' WHERE column_id  = 'macrosector_id' AND dv_querytext = null AND placeholder  ='Ex.macrosector_id';
+update config_form_fields SET widgettype = 'text' WHERE columnname  = 'macrosector_id' AND dv_querytext = null AND placeholder  ='Ex.macrosector_id';
 
 UPDATE v_edit_node SET nodecat_id = 'CHK-VALVE100-PN16' WHERE node_id = '1092';
 
@@ -492,55 +492,55 @@ INSERT INTO config_mincut_checkvalve (node_id, to_arc) VALUES ('1092', '2104');
 UPDATE inp_connec SET demand  = 0.01;
 
 --add tooltips for specific fields
-UPDATE config_form_fields SET tooltip = 'broken - Para establecer si la válvula esta rota o no' WHERE column_id = 'broken' AND tooltip IS NULL;
-UPDATE config_form_fields SET tooltip = 'buried - Para establecer si la válvula esta enterrada o no' WHERE column_id = 'buried' AND tooltip IS NULL;
-UPDATE config_form_fields SET tooltip = 'cat_valve2 - Catálogo para una segunda válvula en el mismo elemento' WHERE column_id = 'cat_valve2' AND tooltip IS NULL;
-UPDATE config_form_fields SET tooltip = 'closed - Para establecer si la válvula se encuentra cerrada o no' WHERE column_id = 'closed' AND tooltip IS NULL;
-UPDATE config_form_fields SET tooltip = 'depth_valveshaft - Profundidad del eje de la válvula' WHERE column_id = 'depth_valveshaft' AND tooltip IS NULL;
-UPDATE config_form_fields SET tooltip = 'drive_type - Tipo de conducción para desague' WHERE column_id = 'drive_type' AND tooltip IS NULL;
-UPDATE config_form_fields SET tooltip = 'exit_code - Identificador del elemento dónde desagua' WHERE column_id = 'exit_code' AND tooltip IS NULL;
-UPDATE config_form_fields SET tooltip = 'exit_type - Tipo de salida para desague' WHERE column_id = 'exit_type' AND tooltip IS NULL;
-UPDATE config_form_fields SET tooltip = 'irrigation_indicator - Para establecer si tiene indicador de riego o no' WHERE column_id = 'irrigation_indicator' AND tooltip IS NULL;
-UPDATE config_form_fields SET tooltip = 'lin_meters - Longitud del desague en metros' WHERE column_id = 'lin_meters' AND tooltip IS NULL;
-UPDATE config_form_fields SET tooltip = 'pression_entry - Pressión de entrada (habitualmente en  kg/cm2)' WHERE column_id = 'pression_entry' AND tooltip IS NULL;
-UPDATE config_form_fields SET tooltip = 'pression_exit - Pressión de salida (habitualmente en  kg/cm2)' WHERE column_id = 'pression_exit' AND tooltip IS NULL;
-UPDATE config_form_fields SET tooltip = 'regulator_location - Localización concreta de la válvula de regulación' WHERE column_id = 'regulator_location' AND tooltip IS NULL;
-UPDATE config_form_fields SET tooltip = 'regulator_observ - Observaciones asociadas a la válvula de regulación' WHERE column_id = 'regulator_observ' AND tooltip IS NULL;
-UPDATE config_form_fields SET tooltip = 'regulator_situation - Calle dónde de situa la válvula de regulación' WHERE column_id = 'regulator_situation' AND tooltip IS NULL;
-UPDATE config_form_fields SET tooltip = 'arq_patrimony - Para establecer si la fuente es patrimonio arquitectónico o no' WHERE column_id = 'arq_patrimony' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'chlorinator - Para establecer si tiene clorador o no' WHERE column_id = 'chlorinator' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'container_number - Número de contenedores de agua de la fuente' WHERE column_id = 'container_number' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'linked_connec - Identificador de la acometida asociada' WHERE column_id = 'linked_connec' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'power - Potencia total' WHERE column_id = 'power' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'pump_number - Número de bombas' WHERE column_id = 'pump_number' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'regulation_tank - Para establecer la existencia o no de un depósito de regulación' WHERE column_id = 'regulation_tank' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'vmax - Volumen máximo' WHERE column_id = 'vmax' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'vtotal - Volumen total' WHERE column_id = 'vtotal' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'communication - Para establecer si se ha comunicado la información del hidrante' WHERE column_id = 'communication' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'fire_code - Código para bomberos' WHERE column_id = 'fire_code' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'valve - Válvula vinculada con el hidrante' WHERE column_id = 'valve' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'serial_number - Número de serie del elemento' WHERE column_id = 'serial_number' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'lab_code - Código para laboratorio' WHERE column_id = 'lab_code' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'elev_height - Altura de la bomba' WHERE column_id = 'elev_height' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'max_flow - Flujo máximo' WHERE column_id = 'max_flow' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'min_flow - Flujo mínimo' WHERE column_id = 'min_flow' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'nom_flow - Flujo óptimo' WHERE column_id = 'nom_flow' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'pressure - Pressión' WHERE column_id = 'pressure' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'diam1 - Diámetro inicial' WHERE column_id = 'diam1' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'diam2 - Diámetro final' WHERE column_id = 'diam2' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'area - Área del depósito en m2' WHERE column_id = 'area' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'chlorination - Para establecer si tiene clorador o no' WHERE column_id = 'chlorination' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'vutil - Volumen útil' WHERE column_id = 'vutil' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'cat_valve - Catálogo de la válvula asociada' WHERE column_id = 'cat_valve' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'com_state - Para establecer si se ha comunicado o no si el agua es potable' WHERE column_id = 'com_state' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'drain_diam - Diámetro del tubo de drenaje' WHERE column_id = 'drain_diam' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'drain_distance - Distancia del desague' WHERE column_id = 'drain_distance' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'drain_exit - Tipo de salida del desague' WHERE column_id = 'drain_exit' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'drain_gully - Identificador de la reja de desague' WHERE column_id = 'drain_gully' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'customer_code - Código comercial' WHERE column_id = 'customer_code' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'top_floor - Número máximo de plantas del edificio a abastecer' WHERE column_id = 'top_floor' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'pol_id - Identificador del polígono relacionado' WHERE column_id = 'pol_id' AND tooltip IS NULL AND formtype='feature';
-UPDATE config_form_fields SET tooltip = 'name - Nombre específico del elemento' WHERE column_id = 'name' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'broken - Para establecer si la válvula esta rota o no' WHERE columnname = 'broken' AND tooltip IS NULL;
+UPDATE config_form_fields SET tooltip = 'buried - Para establecer si la válvula esta enterrada o no' WHERE columnname = 'buried' AND tooltip IS NULL;
+UPDATE config_form_fields SET tooltip = 'cat_valve2 - Catálogo para una segunda válvula en el mismo elemento' WHERE columnname = 'cat_valve2' AND tooltip IS NULL;
+UPDATE config_form_fields SET tooltip = 'closed - Para establecer si la válvula se encuentra cerrada o no' WHERE columnname = 'closed' AND tooltip IS NULL;
+UPDATE config_form_fields SET tooltip = 'depth_valveshaft - Profundidad del eje de la válvula' WHERE columnname = 'depth_valveshaft' AND tooltip IS NULL;
+UPDATE config_form_fields SET tooltip = 'drive_type - Tipo de conducción para desague' WHERE columnname = 'drive_type' AND tooltip IS NULL;
+UPDATE config_form_fields SET tooltip = 'exit_code - Identificador del elemento dónde desagua' WHERE columnname = 'exit_code' AND tooltip IS NULL;
+UPDATE config_form_fields SET tooltip = 'exit_type - Tipo de salida para desague' WHERE columnname = 'exit_type' AND tooltip IS NULL;
+UPDATE config_form_fields SET tooltip = 'irrigation_indicator - Para establecer si tiene indicador de riego o no' WHERE columnname = 'irrigation_indicator' AND tooltip IS NULL;
+UPDATE config_form_fields SET tooltip = 'lin_meters - Longitud del desague en metros' WHERE columnname = 'lin_meters' AND tooltip IS NULL;
+UPDATE config_form_fields SET tooltip = 'pression_entry - Pressión de entrada (habitualmente en  kg/cm2)' WHERE columnname = 'pression_entry' AND tooltip IS NULL;
+UPDATE config_form_fields SET tooltip = 'pression_exit - Pressión de salida (habitualmente en  kg/cm2)' WHERE columnname = 'pression_exit' AND tooltip IS NULL;
+UPDATE config_form_fields SET tooltip = 'regulator_location - Localización concreta de la válvula de regulación' WHERE columnname = 'regulator_location' AND tooltip IS NULL;
+UPDATE config_form_fields SET tooltip = 'regulator_observ - Observaciones asociadas a la válvula de regulación' WHERE columnname = 'regulator_observ' AND tooltip IS NULL;
+UPDATE config_form_fields SET tooltip = 'regulator_situation - Calle dónde de situa la válvula de regulación' WHERE columnname = 'regulator_situation' AND tooltip IS NULL;
+UPDATE config_form_fields SET tooltip = 'arq_patrimony - Para establecer si la fuente es patrimonio arquitectónico o no' WHERE columnname = 'arq_patrimony' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'chlorinator - Para establecer si tiene clorador o no' WHERE columnname = 'chlorinator' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'container_number - Número de contenedores de agua de la fuente' WHERE columnname = 'container_number' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'linked_connec - Identificador de la acometida asociada' WHERE columnname = 'linked_connec' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'power - Potencia total' WHERE columnname = 'power' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'pump_number - Número de bombas' WHERE columnname = 'pump_number' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'regulation_tank - Para establecer la existencia o no de un depósito de regulación' WHERE columnname = 'regulation_tank' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'vmax - Volumen máximo' WHERE columnname = 'vmax' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'vtotal - Volumen total' WHERE columnname = 'vtotal' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'communication - Para establecer si se ha comunicado la información del hidrante' WHERE columnname = 'communication' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'fire_code - Código para bomberos' WHERE columnname = 'fire_code' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'valve - Válvula vinculada con el hidrante' WHERE columnname = 'valve' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'serial_number - Número de serie del elemento' WHERE columnname = 'serial_number' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'lab_code - Código para laboratorio' WHERE columnname = 'lab_code' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'elev_height - Altura de la bomba' WHERE columnname = 'elev_height' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'max_flow - Flujo máximo' WHERE columnname = 'max_flow' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'min_flow - Flujo mínimo' WHERE columnname = 'min_flow' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'nom_flow - Flujo óptimo' WHERE columnname = 'nom_flow' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'pressure - Pressión' WHERE columnname = 'pressure' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'diam1 - Diámetro inicial' WHERE columnname = 'diam1' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'diam2 - Diámetro final' WHERE columnname = 'diam2' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'area - Área del depósito en m2' WHERE columnname = 'area' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'chlorination - Para establecer si tiene clorador o no' WHERE columnname = 'chlorination' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'vutil - Volumen útil' WHERE columnname = 'vutil' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'cat_valve - Catálogo de la válvula asociada' WHERE columnname = 'cat_valve' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'com_state - Para establecer si se ha comunicado o no si el agua es potable' WHERE columnname = 'com_state' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'drain_diam - Diámetro del tubo de drenaje' WHERE columnname = 'drain_diam' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'drain_distance - Distancia del desague' WHERE columnname = 'drain_distance' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'drain_exit - Tipo de salida del desague' WHERE columnname = 'drain_exit' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'drain_gully - Identificador de la reja de desague' WHERE columnname = 'drain_gully' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'customer_code - Código comercial' WHERE columnname = 'customer_code' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'top_floor - Número máximo de plantas del edificio a abastecer' WHERE columnname = 'top_floor' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'pol_id - Identificador del polígono relacionado' WHERE columnname = 'pol_id' AND tooltip IS NULL AND formtype='feature';
+UPDATE config_form_fields SET tooltip = 'name - Nombre específico del elemento' WHERE columnname = 'name' AND tooltip IS NULL AND formtype='feature';
 
 
 UPDATE ext_rtc_dma_period SET minc = null, maxc = null, pattern_volume = 32;
@@ -568,7 +568,7 @@ DELETE FROM cat_arc  WHERE arctype_id = 'VARC' AND id !='VIRTUAL';
 
 
 UPDATE config_form_fields SET dv_querytext_filterc  = ' AND id ' 
-WHERE formname IN ('upsert_catalog_node', 'upsert_catalog_arc', 'upsert_catalog_connec') AND column_id ='matcat_id';
+WHERE formname IN ('upsert_catalog_node', 'upsert_catalog_arc', 'upsert_catalog_connec') AND columnname ='matcat_id';
 
 UPDATE inp_junction SET demand = 0 WHERE demand = 16.000000;
 UPDATE inp_junction SET demand = 0 , pattern_id  = 'pattern_02' WHERE pattern_id = 'pattern_hydrant';

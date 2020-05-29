@@ -74,7 +74,7 @@ BEGIN
 			EXECUTE 'DROP VIEW IF EXISTS '||v_childview||' CASCADE';
 
 			IF v_project_type IS NOT NULL THEN -- only for that existing projects (projecttype not null)
-				EXECUTE 'DELETE FROM config_form_fields WHERE formname = '||quote_literal(v_childview);
+				EXECUTE 'DELETE FROM columnname WHERE formname = '||quote_literal(v_childview);
 			END IF;
 
 			PERFORM gw_fct_debug(concat('{"data":{"msg":"Deleted layer: ", "variables":"',v_childview,'"}}')::json);

@@ -27,12 +27,12 @@ BEGIN
 		SET search_path=SCHEMA_NAME;
 
 		--iterate over fields defined for the selected form
-		FOR rec IN (SELECT * FROM config_form_fields where formname=p_formname AND formtype='feature' order by layout_order) LOOP
+		FOR rec IN (SELECT * FROM config_form_fields where formname=p_formname AND formtype='feature' order by layoutorder) LOOP
 
 		IF p_parent IS TRUE THEN
 			IF (SELECT param_name FROM config_addfields_parameter
 				JOIN cat_feature ON cat_feature.id=config_addfields_parameter.cat_feature_id
-				WHERE child_layer=p_formname AND config_addfields_parameter.param_name=rec.column_id) IS NOT NULL THEN
+				WHERE child_layer=p_formname AND config_addfields_parameter.param_name=rec.columnname) IS NOT NULL THEN
 
 				CONTINUE;
 							
@@ -62,15 +62,15 @@ BEGIN
 
 		--create xml elements for each field in the form
 		IF rec.widgettype='combo' THEN
-			EXECUTE 'SELECT xmlelement(name item, xmlattributes( '||rec.layout_order||' as row,0 as column), 
-			xmlelement(name widget, xmlattributes('''||v_widget_type||''' as class, '''||rec.column_id||''' as name ),
+			EXECUTE 'SELECT xmlelement(name item, xmlattributes( '||rec.layoutorder||' as row,0 as column),
+			xmlelement(name widget, xmlattributes('''||v_widget_type||''' as class, '''||rec.columnname||''' as name ),
 			xmlelement(name property,xmlattributes(''editable'' as name),xmlelement(name bool,''true'')),
 			xmlelement(name property,xmlattributes('''||v_label_name||''' as name), 
 			xmlelement(name string,'''||rec.label||'''))));'
 			INTO v_sql;
 		ELSE
-			EXECUTE 'SELECT xmlelement(name item, xmlattributes( '||rec.layout_order||' as row,0 as column), 
-			xmlelement(name widget, xmlattributes('''||v_widget_type||''' as class, '''||rec.column_id||''' as name ), 
+			EXECUTE 'SELECT xmlelement(name item, xmlattributes( '||rec.layoutorder||' as row,0 as column),
+			xmlelement(name widget, xmlattributes('''||v_widget_type||''' as class, '''||rec.columnname||''' as name ),
 			xmlelement(name property,xmlattributes('''||v_label_name||''' as name), 
 			xmlelement(name string,'''||rec.label||'''))));'
 			INTO v_sql;

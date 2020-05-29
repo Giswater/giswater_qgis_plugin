@@ -217,7 +217,7 @@ END IF;
 	--CHECK CONFIG API FORM FIELDS
 
 	--check if all the fields has defined datatype
-	SELECT count(*), string_agg(concat(formname,'.',column_id),',') INTO v_count, v_view_list FROM config_form_fields WHERE datatype IS NULL AND formtype='feature';
+	SELECT count(*), string_agg(concat(formname,'.',columnname),',') INTO v_count, v_view_list FROM config_form_fields WHERE datatype IS NULL AND formtype='feature';
 
 	IF v_count > 0 THEN
 		v_errortext =  concat('ERROR: There is/are ',v_count,' feature form fields in config_form_fields that don''t have data type. Fields: ',v_view_list,'.');
@@ -229,7 +229,7 @@ END IF;
 	END IF;
 
 	--check if all the fields has defined widgettype 
-	SELECT count(*), string_agg(concat(formname,'.',column_id),',') INTO v_count, v_view_list FROM config_form_fields WHERE widgettype IS NULL AND formtype='feature';
+	SELECT count(*), string_agg(concat(formname,'.',columnname),',') INTO v_count, v_view_list FROM config_form_fields WHERE widgettype IS NULL AND formtype='feature';
 
 	IF v_count > 0 THEN
 		v_errortext = concat('ERROR: There is/are ',v_count,' feature form fields in config_form_fields that don''t have widget type. Fields: ',v_view_list,'.');
@@ -241,7 +241,7 @@ END IF;
 	END IF;
 
 	--check if all the fields defined as combo or typeahead have dv_querytext defined
-	SELECT count(*), string_agg(concat(formname,'.',column_id),',') INTO v_count, v_view_list  FROM config_form_fields 
+	SELECT count(*), string_agg(concat(formname,'.',columnname),',') INTO v_count, v_view_list  FROM config_form_fields
 	WHERE (widgettype = 'combo' or widgettype ='typeahead') and dv_querytext is null;
 
 	IF v_count > 0 THEN
@@ -256,7 +256,7 @@ END IF;
 	--check if all addfields are defined in config_form_fields
 	SELECT count(*), string_agg(concat(child_layer,': ',param_name),',') INTO v_count, v_view_list FROM config_addfields_parameter 
 	JOIN cat_feature ON cat_feature.id=config_addfields_parameter.cat_feature_id
-	WHERE active IS TRUE AND param_name not IN (SELECT column_id FROM config_form_fields JOIN cat_feature ON cat_feature.child_layer=formname);
+	WHERE active IS TRUE AND param_name not IN (SELECT columnname FROM config_form_fields JOIN cat_feature ON cat_feature.child_layer=formname);
 
 	IF v_count > 0 THEN
 		v_errortext=concat('ERROR: There is/are ',v_count,'addfields that are not defined in config_form_fields. Addfields: ',v_view_list,'.');
@@ -267,9 +267,9 @@ END IF;
 		VALUES (95, 1, 'INFO: All addfields are defined in config_form_fields.');
 	END IF;
 
-	--check if definitions has duplicated layout_order for different layouts - 
-	SELECT array_agg(a.list::text) into v_field_array FROM (SELECT concat('Formname: ',formname, ', layoutname: ',layoutname, ', layout_order: ',layout_order) as list
-	FROM config_form_fields WHERE formtype = 'feature' AND hidden is false group by layout_order,formname,layoutname having count(id)>1)a;
+	--check if definitions has duplicated layoutorder for different layouts -
+	SELECT array_agg(a.list::text) into v_field_array FROM (SELECT concat('Formname: ',formname, ', layoutname: ',layoutname, ', layoutorder: ',layoutorder) as list
+	FROM config_form_fields WHERE formtype = 'feature' AND hidden is false group by layoutorder,formname,layoutname having count(id)>1)a;
 
 	IF v_field_array IS NOT NULL THEN
 		v_errortext=concat('ERROR: There is/are form names with duplicated layout order defined in config_form_fields: ');

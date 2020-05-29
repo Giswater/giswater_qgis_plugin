@@ -477,7 +477,7 @@ BEGIN
 					EXECUTE v_querytext;
 				
 					-- update config_api_form fields in order to set widget as disabled text
-					v_querytext = 'UPDATE config_form_fields SET iseditable = false WHERE formtype = ''feature'' and column_id ='||quote_literal(v_field);
+					v_querytext = 'UPDATE config_form_fields SET iseditable = false WHERE formtype = ''feature'' and columnname ='||quote_literal(v_field);
 					EXECUTE v_querytext;
 
 					-- recalculate staticpressure (fprocesscat_id=47)

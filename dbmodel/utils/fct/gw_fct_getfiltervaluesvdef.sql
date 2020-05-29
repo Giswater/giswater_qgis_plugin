@@ -45,9 +45,9 @@ BEGIN
 	v_formname := (p_data ->> 'data')::json->> 'formName';
 	v_formtype = 'listHeader';
 
-	IF (SELECT column_id FROM config_form_fields WHERE formname = v_formname AND formtype= v_formtype LIMIT 1) IS NOT NULL THEN
+	IF (SELECT columnname FROM config_form_fields WHERE formname = v_formname AND formtype= v_formtype LIMIT 1) IS NOT NULL THEN
 	
-		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT column_id, layout_order as orderby FROM config_form_fields WHERE formname = $1 AND formtype= $2 ORDER BY orderby) a'
+		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT columnname, layoutorder as orderby FROM config_form_fields WHERE formname = $1 AND formtype= $2 ORDER BY orderby) a'
 				INTO fields_array
 				USING v_formname, v_formtype;
 
@@ -57,8 +57,8 @@ BEGIN
 		-- v_fields (2 step)
 		FOREACH aux_json IN ARRAY fields_array
 		LOOP
-			v_key = fields_array[(aux_json->>'orderby')::INT]->>'column_id';
-			v_value = (SELECT listfilterparam->>'vdefault' FROM config_form_fields WHERE formname=v_formname AND column_id=v_key);
+			v_key = fields_array[(aux_json->>'orderby')::INT]->>'columnname';
+			v_value = (SELECT listfilterparam->>'vdefault' FROM config_form_fields WHERE formname=v_formname AND columnname=v_key);
 			
 			IF i>1 THEN 
 				v_fields = concat (v_fields,',');

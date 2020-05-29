@@ -61,6 +61,10 @@ ALTER TABLE config_visit_class_x_workorder ADD CONSTRAINT config_visit_class_x_w
 ALTER TABLE config_visit_class_x_workorder DROP COLUMN id;
 
 
+ALTER TABLE config_param_system RENAME layout_order TO layoutorder;
+ALTER TABLE sys_param_user RENAME layout_order TO layoutorder;
+
+
 -- config csv param
 ALTER TABLE config_csv_param DROP CONSTRAINT sys_csv2pg_config_pkey;
 ALTER TABLE config_csv_param ADD CONSTRAINT config_csv_param_pkey PRIMARY KEY(pg2csvcat_id,tablename);

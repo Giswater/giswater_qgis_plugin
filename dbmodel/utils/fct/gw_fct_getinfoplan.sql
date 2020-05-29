@@ -78,7 +78,7 @@ BEGIN
 --	Add resumen values
 	FOREACH aux_json IN ARRAY fields_array
 	LOOP
-		IF (aux_json->>'column_id')  = 'initial_cost' THEN 
+		IF (aux_json->>'columnname')  = 'initial_cost' THEN 
 
 			IF ((p_data ->>'feature')::json->>'featureType')::text='arc' THEN
 			      v_cost := (SELECT concat((sum(cost)::numeric(12,2)),' €/ml') FROM v_ui_plan_arc_cost WHERE arc_id = (p_data ->>'feature')::json->>'id');
@@ -88,7 +88,7 @@ BEGIN
 						
 			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'value', v_cost::TEXT);
 
-		ELSIF (aux_json->>'column_id')  = 'length' THEN 
+		ELSIF (aux_json->>'columnname')  = 'length' THEN 
 
 			IF ((p_data ->>'feature')::json->>'featureType')::text='arc' THEN
 			      v_dim := (SELECT concat(st_length(the_geom)::numeric(12,2),' ml') FROM arc WHERE arc_id = (p_data ->>'feature')::json->>'id');
@@ -99,7 +99,7 @@ BEGIN
 			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'label', 'Units'::TEXT);						
 			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'value', v_dim::TEXT);
 
-		ELSIF (aux_json->>'column_id')  = 'total_cost' THEN 
+		ELSIF (aux_json->>'columnname')  = 'total_cost' THEN 
 
 			IF ((p_data ->>'feature')::json->>'featureType')::text='arc' THEN
 			      v_totalcost := (SELECT concat((sum(cost*st_length(the_geom))::numeric(12,2)),' €') FROM v_ui_plan_arc_cost JOIN arc USING (arc_id) WHERE arc_id = (p_data ->>'feature')::json->>'id');

@@ -87,9 +87,9 @@ BEGIN
 
 	--  Combo rows child CONFIG
 		EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (
-		 SELECT label, sys_param_user.id as widgetname, datatype, widgettype, layout_order,layoutname,
+		 SELECT label, sys_param_user.id as widgetname, datatype, widgettype, layoutorder,layoutname,
 		(CASE WHEN iseditable IS NULL OR iseditable IS TRUE THEN ''True'' ELSE ''False'' END) AS iseditable,
-		 row_number()over(ORDER BY layoutname, layout_order) AS orderby, value, project_type, dv_querytext, dv_querytext_filterc, dv_parent_id, isparent, sys_role_id,
+		 row_number()over(ORDER BY layoutname, layoutorder) AS orderby, value, project_type, dv_querytext, dv_querytext_filterc, dv_parent_id, isparent, sys_role_id,
 		 placeholder,
 		 dv_orderby_id,feature_dv_parent_value, descript AS tooltip, dv_isnullvalue AS "isNullValue", widgetcontrols
 		 FROM sys_param_user LEFT JOIN (SELECT * FROM config_param_user WHERE cur_user=current_user) a ON a.parameter=sys_param_user.id 
@@ -108,17 +108,17 @@ BEGIN
 		v_parameter:= 'upsert_catalog_' || v_featuretype;
 
 		--  Combo rows child CATALOG
-		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT column_id, widgettype, column_id as widgetname,
-		dv_querytext, isparent, dv_parent_id, row_number()over(ORDER BY layoutname, layout_order) AS orderby , dv_querytext_filterc, isautoupdate, placeholder, dv_orderby_id, tooltip, dv_isnullvalue AS "isNullValue", widgetcontrols
-		FROM config_form_fields WHERE formname = '||quote_literal(v_parameter)||' AND dv_parent_id='||quote_literal(v_comboparent)||' ORDER BY orderby) a WHERE widgettype = ''combo'''
+		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT columnname, widgettype, columnname as widgetname,
+		dv_querytext, isparent, dv_parent_id, row_number()over(ORDER BY layoutname, layoutorder) AS orderby , dv_querytext_filterc, isautoupdate, placeholder, dv_orderby_id, tooltip, dv_isnullvalue AS "isNullValue", widgetcontrols
+		FROM columnname WHERE formname = '||quote_literal(v_parameter)||' AND dv_parent_id='||quote_literal(v_comboparent)||' ORDER BY orderby) a WHERE widgettype = ''combo'''
 		INTO v_combo_rows_child;
 		v_combo_rows_child := COALESCE(v_combo_rows_child, '{}');
 		v_formtype='catalog';
 
 	ELSE
 		--  Combo rows child
-		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT id, column_id, widgettype, datatype, concat(''data_'',column_id) as widgetname,
-		dv_querytext, isparent, dv_parent_id, row_number()over(ORDER BY layoutname, layout_order) AS orderby , dv_querytext_filterc, isautoupdate, placeholder, dv_orderby_id, tooltip, dv_isnullvalue AS "isNullValue", widgetcontrols
+		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT id, columnname, widgettype, datatype, concat(''data_'',columnname) as widgetname,
+		dv_querytext, isparent, dv_parent_id, row_number()over(ORDER BY layoutname, layoutorder) AS orderby , dv_querytext_filterc, isautoupdate, placeholder, dv_orderby_id, tooltip, dv_isnullvalue AS "isNullValue", widgetcontrols
 		FROM config_form_fields WHERE formname = $1 AND dv_parent_id='||quote_literal(v_comboparent)||' ORDER BY orderby) a WHERE widgettype = ''combo'''
 		INTO v_combo_rows_child
 		USING v_tablename;
@@ -174,17 +174,17 @@ BEGIN
 			v_combo_rows_child[(v_aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(v_combo_rows_child[(v_aux_json_child->>'orderby')::INT], 'selectedId', combo_json_child->0);
 		ELSE
 			--looping for the differents velues on sys_param_user that are coincident with the child parameter
-			FOR v_config_param_user IN SELECT * FROM sys_param_user WHERE feature_field_id = (v_aux_json_child->>'column_id')
+			FOR v_config_param_user IN SELECT * FROM sys_param_user WHERE feature_field_id = (v_aux_json_child->>'columnname')
 			LOOP
 				IF v_config_param_user.feature_dv_parent_value IS NULL THEN 
 					-- if there is only one because dv_parent_value is null then
 					v_current_value = (SELECT value FROM config_param_user JOIN sys_param_user ON sys_param_user.id=config_param_user.parameter 
-							WHERE feature_field_id = (v_aux_json_child->>'column_id')
+							WHERE feature_field_id = (v_aux_json_child->>'columnname')
 							AND cur_user=current_user LIMIT 1);			
 				ELSE
 					-- if there are more than one, taking that parameter with the same feature_dv_parent_value
 					v_current_value = (SELECT value FROM config_param_user JOIN sys_param_user ON sys_param_user.id=config_param_user.parameter 
-							WHERE feature_field_id = quote_ident(v_aux_json_child->>'column_id')
+							WHERE feature_field_id = quote_ident(v_aux_json_child->>'columnname')
 							AND feature_dv_parent_value = v_combovalue
 							AND cur_user=current_user LIMIT 1);
 				END IF;

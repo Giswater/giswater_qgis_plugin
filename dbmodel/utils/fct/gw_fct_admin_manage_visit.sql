@@ -200,9 +200,7 @@ BEGIN
 	raise notice 'v_old_parameters,%,%',v_old_parameters,v_class_id;
 
 	--reset the value of sequence for tables where data will be inserted
-	PERFORM setval('SCHEMA_NAME.config_form_fields_id_seq', (SELECT max(id) FROM config_form_fields), true);
 	PERFORM setval('SCHEMA_NAME.om_visit_class_id_seq', (SELECT max(id) FROM om_visit_class), true);
-	PERFORM setval('SCHEMA_NAME.config_visit_class_x_parameter_id_seq', (SELECT max(id) FROM config_visit_param_x_param), true);
 
 IF v_action = 'CREATE' THEN
 	--insert new class and parameter
@@ -239,7 +237,7 @@ IF v_action = 'CREATE' THEN
 			--capture common fields names that need to be copied for the specific visit form
 			EXECUTE 'SELECT DISTINCT string_agg(column_name::text,'' ,'')
 			FROM information_schema.columns WHERE table_name=''config_form_fields'' and table_schema='''||v_schemaname||'''
-			AND column_name!=''id'' AND column_name!=''formname'';'
+			AND column_name!=''formname'';'
 			INTO v_config_fields;
 			
 			RAISE NOTICE 'v_config_fields,%',v_config_fields;
@@ -249,18 +247,20 @@ IF v_action = 'CREATE' THEN
 				FOR rec IN (SELECT * FROM config_form_fields WHERE formname='visit_multievent')
 				LOOP
 					EXECUTE 'INSERT INTO config_form_fields(formname,'||v_config_fields||')
-					SELECT '''||v_viewname||''','||v_config_fields||' FROM config_form_fields WHERE id='''||rec.id||''';';
+					SELECT '''||v_viewname||''','||v_config_fields||' FROM config_form_fields
+					WHERE columnname='''||rec.columnname||''';';
 				END LOOP;
 			ELSE
 				FOR rec IN (SELECT * FROM config_form_fields WHERE formname='visit_singlevent')
 				LOOP
 					EXECUTE 'INSERT INTO config_form_fields(formname,'||v_config_fields||')
-					SELECT '''||v_viewname||''','||v_config_fields||' FROM config_form_fields WHERE id='''||rec.id||''';';
+					SELECT '''||v_viewname||''','||v_config_fields||' FROM config_form_fields
+					WHERE columnname='''||rec.columnname||''';';
 				END LOOP;
 			END IF;
 
-			UPDATE config_form_fields SET column_id = concat(v_feature_system_id,'_id'), label = concat(initcap(v_feature_system_id),'_id') 
-			WHERE column_id = 'feature_id' and formname = v_viewname;
+			UPDATE config_form_fields SET columnname = concat(v_feature_system_id,'_id'), label = concat(initcap(v_feature_system_id),'_id')
+			WHERE columnname = 'feature_id' and formname = v_viewname;
 
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (119, null, 4, concat('Insert definition of common visit fields into config_form_fields.'));
@@ -269,15 +269,15 @@ IF v_action = 'CREATE' THEN
 			IF v_feature_system_id = 'connec' THEN
 				UPDATE config_form_fields SET dv_querytext= 'SELECT id, idval FROM om_visit_class WHERE feature_type=''CONNEC'' AND 
 				active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))'
-				WHERE formname=v_viewname AND column_id='class_id';
+				WHERE formname=v_viewname AND columnname='class_id';
 			ELSIF v_feature_system_id = 'node' THEN
 				UPDATE config_form_fields SET dv_querytext= 'SELECT id, idval FROM om_visit_class WHERE feature_type=''NODE'' AND 
 				active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))'
-				WHERE formname=v_viewname AND column_id='class_id';
+				WHERE formname=v_viewname AND columnname='class_id';
 			ELSIF v_feature_system_id = 'gully' THEN
 				UPDATE config_form_fields SET dv_querytext= 'SELECT id, idval FROM om_visit_class WHERE feature_type=''GULLY'' AND 
 				active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))'
-				WHERE formname=v_viewname AND column_id='class_id';
+				WHERE formname=v_viewname AND columnname='class_id';
 			END IF;
 		END IF;
 		
@@ -305,13 +305,13 @@ IF v_action = 'CREATE' THEN
 
 	    --add configuration of new parameters to config_form_fields
 		IF v_ismultievent = TRUE THEN
-			EXECUTE 'SELECT max(layout_order) + 1 FROM config_form_fields WHERE formname='''||v_viewname||'''
+			EXECUTE 'SELECT max(layoutorder) + 1 FROM config_form_fields WHERE formname='''||v_viewname||'''
 			AND layout_name = ''data_1'';'
-			INTO v_layout_order;
+			INTO v_layoutorder;
 
-			INSERT INTO config_form_fields (formname, formtype, column_id, layout_id, layout_order, isenabled, datatype, widgettype, label, layout_name,
+			INSERT INTO config_form_fields (formname, formtype, columnname, layout_id, layoutorder, isenabled, datatype, widgettype, label, layout_name,
 			iseditable, ismandatory, dv_querytext)
-			VALUES (v_viewname, 'visit', v_param_name,1,v_layout_order, true, v_data_type, v_widgettype, v_param_name, 'data_1',
+			VALUES (v_viewname, 'visit', v_param_name,1,v_layoutorder, true, v_data_type, v_widgettype, v_param_name, 'data_1',
 			v_iseditable, v_ismandatory, v_dv_querytext);
 
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
@@ -418,10 +418,10 @@ IF v_action = 'UPDATE' AND v_action_type = 'parameter' THEN
 		
 		END IF;
 
-		UPDATE config_form_fields SET formname = v_viewname, layout_order = v_layout_order, isenabled = v_isenabled, 
+		UPDATE config_form_fields SET formname = v_viewname, layoutorder = v_layoutorder, isenabled = v_isenabled,
 		datatype = v_data_type, widgettype = v_widgettype, label = v_param_name, iseditable = v_iseditable, ismandatory = v_ismandatory,
 		dv_querytext = v_dv_querytext 
-		WHERE formname = v_viewname and formtype='visit' and column_id = v_param_name;
+		WHERE formname = v_viewname and formtype='visit' and columnname = v_param_name;
 
 	
 	 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
@@ -521,7 +521,7 @@ ELSIF v_action = 'CONFIGURATION' THEN
 			--capture common fields names that need to be copied for the specific visit form
 			EXECUTE 'SELECT DISTINCT string_agg(column_name::text,'' ,'')
 			FROM information_schema.columns WHERE table_name=''config_form_fields'' and table_schema='''||v_schemaname||'''
-			AND column_name!=''id'' AND column_name!=''formname'';'
+			AND column_name!=''formname'';'
 			INTO v_config_fields;
 
 			--insert common fields for the new formname (view)
@@ -529,33 +529,33 @@ ELSIF v_action = 'CONFIGURATION' THEN
 				FOR rec IN (SELECT * FROM config_form_fields WHERE formname='visit_multievent')
 				LOOP
 					EXECUTE 'INSERT INTO config_form_fields(formname,'||v_config_fields||')
-					SELECT '''||v_viewname||''','||v_config_fields||' FROM config_form_fields WHERE id='''||rec.id||''';';
+					SELECT '''||v_viewname||''','||v_config_fields||' FROM config_form_fields WHERE columnname='''||rec.columnname||''';';
 					raise notice 'multi -  config_form_fields';
 				END LOOP;
 			ELSE
 				FOR rec IN (SELECT * FROM config_form_fields WHERE formname='visit_singlevent')
 				LOOP
 					EXECUTE 'INSERT INTO config_form_fields(formname,'||v_config_fields||')
-					SELECT '''||v_viewname||''','||v_config_fields||' FROM config_form_fields WHERE id='''||rec.id||''';';
+					SELECT '''||v_viewname||''','||v_config_fields||' FROM config_form_fields WHERE columnname='''||rec.columnname||''';';
 				END LOOP;
 			END IF;
 
-			UPDATE config_form_fields SET column_id = concat(v_feature_system_id,'_id'), label = concat(initcap(v_feature_system_id),'_id') 
-			WHERE column_id = 'feature_id' and formname = v_viewname;
+			UPDATE config_form_fields SET columnname = concat(v_feature_system_id,'_id'), label = concat(initcap(v_feature_system_id),'_id')
+			WHERE columnname = 'feature_id' and formname = v_viewname;
 			
 			--rename dv_querytext for class_id in order to look for defined feature_type
 			IF v_feature_system_id = 'connec' THEN
 				UPDATE config_form_fields SET dv_querytext= 'SELECT id, idval FROM om_visit_class WHERE feature_type=''CONNEC'' AND 
 				active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))'
-				WHERE formname=v_viewname AND column_id='class_id';
+				WHERE formname=v_viewname AND columnname='class_id';
 			ELSIF v_feature_system_id = 'node' THEN
 				UPDATE config_form_fields SET dv_querytext= 'SELECT id, idval FROM om_visit_class WHERE feature_type=''NODE'' AND 
 				active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))'
-				WHERE formname=v_viewname AND column_id='class_id';
+				WHERE formname=v_viewname AND columnname='class_id';
 			ELSIF v_feature_system_id = 'gully' THEN
 				UPDATE config_form_fields SET dv_querytext= 'SELECT id, idval FROM om_visit_class WHERE feature_type=''GULLY'' AND 
 				active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))'
-				WHERE formname=v_viewname AND column_id='class_id';
+				WHERE formname=v_viewname AND columnname='class_id';
 			END IF;
 			
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
@@ -569,9 +569,9 @@ ELSIF v_action = 'CONFIGURATION' THEN
 			(SELECT class_id, parameter_id, data_type  FROM config_visit_param_x_param JOIN config_visit_parameter ON config_visit_parameter.id = config_visit_param_x_param.parameter_id
 			WHERE class_id = v_class_id ) LOOP
 
-				EXECUTE 'SELECT max(layout_order) + 1 FROM config_form_fields WHERE formname='''||v_viewname||'''
+				EXECUTE 'SELECT max(layoutorder) + 1 FROM config_form_fields WHERE formname='''||v_viewname||'''
 				AND layout_name = ''data_1'';'
-				INTO v_layout_order;
+				INTO v_layoutorder;
 				
 				IF lower(rec.data_type) = 'text' THEN
 					v_data_type = 'string';
@@ -583,9 +583,9 @@ ELSIF v_action = 'CONFIGURATION' THEN
 					v_widgettype = 'text';
 				END IF;
 				
-				INSERT INTO config_form_fields (formname, formtype, column_id, layout_id, layout_order, isenabled, datatype, widgettype, label, layout_name,
+				INSERT INTO config_form_fields (formname, formtype, columnname, layout_id, layoutorder, isenabled, datatype, widgettype, label, layout_name,
 				iseditable, ismandatory)
-				VALUES (v_viewname, 'visit', rec.parameter_id,1,v_layout_order, true, v_data_type, v_widgettype, rec.parameter_id, 'data_1',
+				VALUES (v_viewname, 'visit', rec.parameter_id,1,v_layoutorder, true, v_data_type, v_widgettype, rec.parameter_id, 'data_1',
 				true, false);
 			END LOOP;
 			

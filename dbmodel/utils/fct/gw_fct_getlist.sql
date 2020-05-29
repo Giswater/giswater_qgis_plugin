@@ -294,7 +294,7 @@ BEGIN
 			raise notice 'v_field % v_value %', v_field, v_value;
 	
 			-- Getting the sign of the filter
-			SELECT listfilterparam->>'sign' INTO v_sign FROM config_form_fields WHERE formname=v_tablename  AND column_id=v_field;
+			SELECT listfilterparam->>'sign' INTO v_sign FROM config_form_fields WHERE formname=v_tablename  AND columnname=v_field;
 
 			IF v_listtype = 'attributeTable' THEN
 				v_sign = 'ILIKE';
@@ -435,7 +435,7 @@ BEGIN
 
 	-- setting new element
 	IF v_device =9 THEN
-		v_filter_fields[v_i+1] := json_build_object('widgettype',v_listclass,'datatype','icon','column_id','fileList','orderby', v_i+3, 'position','body', 'value', SCHEMA_NAME);
+		v_filter_fields[v_i+1] := json_build_object('widgettype',v_listclass,'datatype','icon','columnname','fileList','orderby', v_i+3, 'position','body', 'value', SCHEMA_NAME);
 	ELSE
 		v_filter_fields[v_i+1] := json_build_object('type',v_listclass,'dataType','icon','name','fileList','orderby', v_i+3, 'position','body', 'value', v_result_list);
 	END IF;

@@ -12,10 +12,10 @@ $BODY$
 
 /*EXAMPLE
 set
-SELECT SCHEMA_NAME.gw_fct_admin_schema_i18n($${"data":{"table":"config_form_fields", "formname":"ve_arc", "clause":"WHERE formname = 've_arc' AND column_id = 'arc_id'", 
+SELECT SCHEMA_NAME.gw_fct_admin_schema_i18n($${"data":{"table":"config_form_fields", "formname":"ve_arc", "clause":"WHERE formname = 've_arc' AND columnname = 'arc_id'",
 "label":{"column":"label", "value":"test"}, "tooltip":{"column":"tooltip", "value":"test"}}}$$)
 check 
-SELECT * FROM SCHEMA_NAME.config_form_fields WHERE formname = 've_arc' AND column_id = 'arc_id'
+SELECT * FROM SCHEMA_NAME.config_form_fields WHERE formname = 've_arc' AND columnname = 'arc_id'
 */
 
 

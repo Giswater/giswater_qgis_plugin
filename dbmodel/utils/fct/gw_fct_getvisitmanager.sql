@@ -240,7 +240,7 @@ BEGIN
 					v_disable_widget_name = '{data_endbutton}';
 				END IF;
 
-				SELECT gw_fct_getformfields( 'visitManager', 'visit', 'data', null, null, null, null, 'INSERT', null, v_device, null) INTO v_fields;
+				SELECT gw_fct_getformfields( 'visit_manager', 'visit', 'data', null, null, null, null, 'INSERT', null, v_device, null) INTO v_fields;
 
 				-- getting values from feature
 				EXECUTE FORMAT ('SELECT (row_to_json(a)) FROM 
@@ -255,14 +255,14 @@ BEGIN
 				LOOP     
 
 					array_index := array_index + 1;
-					v_fieldvalue := (v_values->>(aux_json->>'column_id'));
+					v_fieldvalue := (v_values->>(aux_json->>'columnname'));
 					
 					IF (aux_json->>'widgetname') = v_disable_widget_name[1] OR (aux_json->>'widgetname') = v_disable_widget_name[2] OR (aux_json->>'widgetname') = v_disable_widget_name[3] THEN
 						v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'disabled', True);
 					END IF;
 
 					-- geting current user if exists
-					IF (aux_json->>'column_id')='user_id' AND v_team is NULL THEN
+					IF (aux_json->>'columnname')='user_id' AND v_team is NULL THEN
 						v_current_user = aux_json->>'selectedId';
 						IF v_current_user IS NOT NULL THEN
 							EXECUTE 'SELECT team_id FROM om_visit_lot_x_user WHERE user_id = ''' || v_current_user || ''' ORDER BY id DESC LIMIT 1' INTO v_team;
@@ -276,11 +276,11 @@ BEGIN
 							
 						END IF;
 						
-						IF (aux_json->>'column_id')='team_id' AND v_team IS NOT NULL THEN 
+						IF (aux_json->>'columnname')='team_id' AND v_team IS NOT NULL THEN 
 						
 							v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'selectedId', COALESCE(v_team, ''));
 							
-						ELSIF (aux_json->>'column_id')='lot_id' AND v_team IS NOT NULL THEN
+						ELSIF (aux_json->>'columnname')='lot_id' AND v_team IS NOT NULL THEN
 							
 							EXECUTE ('SELECT gw_fct_getchilds($${
 							"client":{"device":3, "infoType":100, "lang":"ES"},

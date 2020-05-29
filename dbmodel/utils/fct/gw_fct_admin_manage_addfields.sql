@@ -16,7 +16,7 @@ $BODY$
 
 
 SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"PUMP"},
-"data":{"action":"CREATE", "multi_create":"true", "parameters":{"column_id":"addfield_all", "datatype":"string", "widgettype":"text", "label":"addfield_all","ismandatory":"False",
+"data":{"action":"CREATE", "multi_create":"true", "parameters":{"columnname":"addfield_all", "datatype":"string", "widgettype":"text", "label":"addfield_all","ismandatory":"False",
 "fieldLength":"50", "numDecimals" :null,"active":"True", "iseditable":"True","v_isenabled":"True"}}}$$);
 
 SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${"client":{"device":9, "infoType":100, "lang":"ES"}, 
@@ -24,7 +24,7 @@ SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${"client":{"device":9, "infoT
 "feature":{"catFeature":"PUMP"}, 
 "data":{"filterFields":{}, "pageInfo":{}, "action":"CREATE", "multi_create":false, 
 "parameters":{"label": "pump1", "field_length": null, "addfield_active": true, "iseditable": true, "ismandatory": false, "formtype": "feature", 
-"datatype": "boolean", "num_decimals": null, "column_id": "pump1", "isenabled": true, "widgettype": "check", "dv_isnullvalue": false, 
+"datatype": "boolean", "num_decimals": null, "columnname": "pump1", "isenabled": true, "widgettype": "check", "dv_isnullvalue": false,
 "isautoupdate": false, "dv_parent_id": null, "tooltip": null, "dv_querytext": null, "widgetfunction": null, "placeholder": null, "reload_field": null, 
 "isparent": false,  "listfilterparam": null, "editability": null, "dv_querytext_filterc": null, "linkedaction": null, 
 "stylesheet": null, "widgetdim": null}}}$$)::text
@@ -34,7 +34,7 @@ SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${"client":{"device":9, "infoT
 	"feature":{"catFeature":"PUMP"}, 
 	"data":{"filterFields":{}, "pageInfo":{}, "action":"UPDATE", "multi_create":false, 
 	"parameters":{"label": "pump111", "field_length": null, "addfield_active": true, "iseditable": true, "ismandatory": false, "formtype": "feature", 
-	"datatype": "integer", "num_decimals": null, "column_id": "pump1", "isenabled": true, "widgettype": "text", "dv_isnullvalue": false, 
+	"datatype": "integer", "num_decimals": null, "columnname": "pump1", "isenabled": true, "widgettype": "text", "dv_isnullvalue": false,
 	"isautoupdate": false, "dv_parent_id": null, "tooltip": null, "dv_querytext": null, "widgetfunction": null, "placeholder": null, "reload_field": null, 
 	"isparent": false, "listfilterparam": null, "editability": null, "dv_querytext_filterc": null, "linkedaction": null, 
 	"stylesheet": null, "widgetdim": null}}}$$)::text
@@ -42,7 +42,7 @@ SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${"client":{"device":9, "infoT
 SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${
 "client":{"lang":"ES"}, 
 "feature":{"catFeature":"PUMP"},
-"data":{"action":"DELETE", "multi_create":"true", "parameters":{"column_id":"pump_test"}}}$$)
+"data":{"action":"DELETE", "multi_create":"true", "parameters":{"columnname":"pump_test"}}}$$)
 */
 
 
@@ -63,7 +63,7 @@ DECLARE
 	v_active boolean;
 	v_orderby integer;
 	v_action text;
-	v_layout_order integer;
+	v_layoutorder integer;
 	v_form_fields_id integer;
 	v_feature_system_id text;
 	v_man_fields text;
@@ -132,7 +132,7 @@ BEGIN
 	-- get input parameters -,man_addfields
 	v_id = (SELECT nextval('SCHEMA_NAME.config_addfields_parameter_id_seq') +1);
 
-	v_param_name = (((p_data ->>'data')::json->>'parameters')::json->>'column_id')::text; 
+	v_param_name = (((p_data ->>'data')::json->>'parameters')::json->>'columnname')::text;
 	v_cat_feature = ((p_data ->>'feature')::json->>'catFeature')::text;
 	v_ismandatory = (((p_data ->>'data')::json->>'parameters')::json->>'ismandatory')::text;
 	v_config_datatype = (((p_data ->>'data')::json->>'parameters')::json->>'datatype')::text;
@@ -198,9 +198,6 @@ BEGIN
 	ELSE
 		v_audit_widgettype = v_config_widgettype;
 	END IF;
-
-
-	PERFORM setval('config_form_fields_id_seq', (SELECT max(id) FROM config_form_fields), true);
 
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 	VALUES (118, null, 4, concat('Create addfield ',v_param_name,'.'));
@@ -315,14 +312,14 @@ BEGIN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 				VALUES (118, null, 4, 'Insert parameter definition into config_addfields_parameter.');
 
-				SELECT max(layout_order) + 1 INTO v_param_user_id FROM sys_param_user WHERE layoutname='lyt_addfields';
+				SELECT max(layoutorder) + 1 INTO v_param_user_id FROM sys_param_user WHERE layoutname='lyt_addfields';
 
 				IF v_param_user_id IS NULL THEN
 					v_param_user_id=1;
 				END IF;
 
 				IF concat('edit_addfield_p', v_idaddparam,'_vdefault') NOT IN (SELECT id FROM sys_param_user) THEN
-					INSERT INTO sys_param_user (id, formname, descript, sys_role_id, label,  layoutname, layout_order,
+					INSERT INTO sys_param_user (id, formname, descript, sys_role_id, label,  layoutname, layoutorder,
 					project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated, dv_querytext, dv_querytext_filterc,feature_field_id, isenabled)
 					VALUES (concat('edit_addfield_p', v_idaddparam,'_vdefault'),'config', concat('Default value of addfield ',v_param_name), 'role_edit', v_param_name,
 					'lyt_addfields', v_param_user_id, lower(v_project_type), false, false, v_audit_datatype, v_audit_widgettype, false, false,
@@ -350,7 +347,7 @@ BEGIN
 
 			ELSIF v_action = 'DELETE' THEN
 
-				DELETE FROM config_form_fields WHERE formname=v_viewname AND column_id=v_param_name;
+				DELETE FROM config_form_fields WHERE formname=v_viewname AND columnname=v_param_name;
 
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 				VALUES (118, null, 4, 'Delete values from config_form_fields related to parameter.');
@@ -364,19 +361,19 @@ BEGIN
 
 			IF v_action = 'CREATE' THEN
 
-				EXECUTE 'SELECT max(layout_order) + 1 FROM config_form_fields WHERE formname='''||v_viewname||'''
+				EXECUTE 'SELECT max(layoutorder) + 1 FROM config_form_fields WHERE formname='''||v_viewname||'''
 				AND layoutname = ''lyt_data_1'';'
-				INTO v_layout_order;
+				INTO v_layoutorder;
 
-				IF v_layout_order IS NULL THEN
-					v_layout_order = 1;
+				IF v_layoutorder IS NULL THEN
+					v_layoutorder = 1;
 				END IF;
 
-				INSERT INTO config_form_fields (formname, formtype, column_id, layout_order, datatype, widgettype, 
+				INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder, datatype, widgettype,
 				label, ismandatory, isparent, iseditable, isautoupdate, layoutname, 
 				placeholder, stylesheet, tooltip, widgetfunction, dv_isnullvalue, widgetdim,
 				dv_parent_id, dv_querytext_filterc, dv_querytext, listfilterparam, linkedaction, hidden)	
-				VALUES (v_viewname, v_formtype, v_param_name, v_layout_order, v_config_datatype, v_config_widgettype,
+				VALUES (v_viewname, v_formtype, v_param_name, v_layoutorder, v_config_datatype, v_config_widgettype,
 				v_label, v_ismandatory,v_isparent, v_iseditable, v_isautoupdate, 'lyt_data_1',
 				v_placeholder, v_stylesheet, v_tooltip, v_widgetfunction, v_dv_isnullvalue, v_widgetdim,
 				v_dv_parent_id, v_dv_querytext_filterc, v_dv_querytext, v_listfilterparam, v_linkedaction, v_hidden);
@@ -392,7 +389,7 @@ BEGIN
 				widgetfunction=v_widgetfunction, dv_isnullvalue=v_dv_isnullvalue, widgetdim=v_widgetdim,
 				dv_parent_id=v_dv_parent_id, dv_querytext_filterc=v_dv_querytext_filterc, 
 				dv_querytext=v_dv_querytext, listfilterparam=v_listfilterparam,linkedaction=v_linkedaction, hidden = v_hidden
-				WHERE column_id=v_param_name AND formname=v_viewname;
+				WHERE columnname=v_param_name AND formname=v_viewname;
 
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 				VALUES (118, null, 4, 'Update parameter in config_form_fields.');
@@ -534,7 +531,7 @@ BEGIN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (118, null, 4, 'Delete values from config_addfields_parameter related to parameter.');
 
-			EXECUTE 'DELETE FROM config_form_fields WHERE column_id='''||v_param_name||'''and formtype=''feature'';' ;
+			EXECUTE 'DELETE FROM config_form_fields WHERE columnname='''||v_param_name||'''and formtype=''feature'';' ;
 
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (118, null, 4, 'Delete values from config_form_fields related to parameter.');
@@ -612,22 +609,22 @@ BEGIN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (118, null, 4, 'Insert parameter definition into config_addfields_parameter.');
 
-			EXECUTE 'SELECT max(layout_order) + 1 FROM config_form_fields WHERE formname='''||v_viewname||'''
+			EXECUTE 'SELECT max(layoutorder) + 1 FROM config_form_fields WHERE formname='''||v_viewname||'''
 			AND layoutname = ''lyt_data_1'';'
-			INTO v_layout_order;
+			INTO v_layoutorder;
 
-			IF v_layout_order IS NULL THEN
-				v_layout_order = 1;
+			IF v_layoutorder IS NULL THEN
+				v_layoutorder = 1;
 			END IF;
 
 			EXECUTE 'SELECT max(id) + 1 FROM config_form_fields'
 			INTO v_form_fields_id;
 
-			INSERT INTO config_form_fields (id, formname, formtype, column_id, layout_order,  
+			INSERT INTO config_form_fields (id, formname, formtype, columnname, layoutorder,
 			datatype, widgettype, label, ismandatory, isparent, iseditable, 
 			layoutname, placeholder, stylesheet, tooltip, widgetfunction, dv_isnullvalue, widgetdim,
 			dv_parent_id, dv_querytext_filterc, dv_querytext, listfilterparam, linkedaction, hidden)
-			VALUES (v_form_fields_id,v_viewname, v_formtype, v_param_name, v_layout_order,v_config_datatype, v_config_widgettype,
+			VALUES (v_form_fields_id,v_viewname, v_formtype, v_param_name, v_layoutorder,v_config_datatype, v_config_widgettype,
 			v_label, v_ismandatory, v_isparent, v_iseditable, 'lyt_data_1',
 			v_placeholder, v_stylesheet, v_tooltip, v_widgetfunction, v_dv_isnullvalue, v_widgetdim,
 			v_dv_parent_id, v_dv_querytext_filterc, v_dv_querytext, v_listfilterparam, v_linkedaction, v_hidden);
@@ -636,13 +633,13 @@ BEGIN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (118, null, 4, 'Insert parameter definition into config_form_fields.');
 
-			SELECT max(layout_order) + 1 INTO v_param_user_id FROM sys_param_user WHERE layoutname='lyt_addfields';
+			SELECT max(layoutorder) + 1 INTO v_param_user_id FROM sys_param_user WHERE layoutname='lyt_addfields';
 			
 			IF v_param_user_id IS NULL THEN
 				v_param_user_id=1;
 			END IF;
 
-			INSERT INTO sys_param_user (id, formname, descript, sys_role_id, label,  layoutname, layout_order, 
+			INSERT INTO sys_param_user (id, formname, descript, sys_role_id, label,  layoutname, layoutorder,
 			project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated,dv_querytext, dv_querytext_filterc, feature_field_id, isenabled)
 			VALUES (concat('edit_addfield_p', v_idaddparam,,'_vdefault'),'config', 
 			concat('Default value of addfield ',v_param_name, ' for ', v_cat_feature), 
@@ -670,7 +667,7 @@ BEGIN
 				dv_parent_id=v_dv_parent_id, dv_querytext_filterc=v_dv_querytext_filterc, 
 				dv_querytext=v_dv_querytext, listfilterparam=v_listfilterparam,linkedaction=v_linkedaction,
 				hidden = v_hidden
-				WHERE column_id=v_param_name AND formname=v_viewname;
+				WHERE columnname=v_param_name AND formname=v_viewname;
 		
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 				VALUES (118, null, 4, 'Update parameter definition in config_form_fields.');
@@ -691,7 +688,7 @@ BEGIN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (118, null, 4, 'Delete values from config_form_fields related to parameter.');
 
-			DELETE FROM config_form_fields WHERE formname=v_viewname AND column_id=v_param_name;
+			DELETE FROM layoutorder WHERE formname=v_viewname AND columnname=v_param_name;
 
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (118, null, 4, concat('Delete definition of vdefault: ', concat('edit_addfield_p', v_idaddparam,'_vdefault')));

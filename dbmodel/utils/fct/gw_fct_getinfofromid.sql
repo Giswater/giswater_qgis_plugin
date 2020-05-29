@@ -170,8 +170,8 @@ BEGIN
 	END IF;
 
 	-- get tableparent fields
-	EXECUTE 'SELECT to_json(array_agg(column_id)) FROM 
-		(SELECT a.attname as column_id 	FROM pg_attribute a JOIN pg_class t on a.attrelid = t.oid JOIN pg_namespace s on t.relnamespace = s.oid
+	EXECUTE 'SELECT to_json(array_agg(columnname)) FROM 
+		(SELECT a.attname as columnname FROM pg_attribute a JOIN pg_class t on a.attrelid = t.oid JOIN pg_namespace s on t.relnamespace = s.oid
 		WHERE a.attnum > 0 AND NOT a.attisdropped AND t.relname = $1 AND s.nspname = $2	ORDER BY a.attnum) a'
 		INTO v_parentfields
 		USING v_table_parent, schemas_array[1]; 

@@ -79,7 +79,7 @@ BEGIN
 				false AS iseditable,
 				row_number()over() AS orderby, 
 				null as stylesheet, 
-				row_number()over() AS layout_order, 
+				row_number()over() AS layoutorder,
 				FALSE AS isparent, 
 				null AS widgetfunction, 
 				null AS linkedaction, 
@@ -108,7 +108,7 @@ BEGIN
 		FOREACH aux_json IN ARRAY fields_array
 		LOOP
 			array_index := array_index + 1;
-			field_value := (v_values_array->>(aux_json->>'column_id'));
+			field_value := (v_values_array->>(aux_json->>'columnname'));
 			field_value := COALESCE(field_value, '');
 		
 			-- Update array

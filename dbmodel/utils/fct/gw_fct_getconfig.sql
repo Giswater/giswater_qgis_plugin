@@ -98,9 +98,9 @@ BEGIN
 
 	-- Get all parameters from audit_cat param_user
 	EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (
-		SELECT label, sys_param_user.id as widgetname, value , datatype, widgettype, layout_order, layoutname, 
+		SELECT label, sys_param_user.id as widgetname, value , datatype, widgettype, layoutorder, layoutname,
 		(CASE WHEN iseditable IS NULL OR iseditable IS TRUE THEN ''True'' ELSE ''False'' END) AS iseditable,
-		row_number()over(ORDER BY layoutname, layout_order) AS orderby, isparent, sys_role_id, project_type, widgetcontrols,
+		row_number()over(ORDER BY layoutname, layoutorder) AS orderby, isparent, sys_role_id, project_type, widgetcontrols,
 		(CASE WHEN value IS NOT NULL AND value != ''false'' THEN ''True'' ELSE ''False'' END) AS checked, placeholder, descript AS tooltip, 
 		dv_parent_id, dv_querytext, dv_querytext_filterc, dv_orderby_id, dv_isnullvalue	
 		FROM sys_param_user LEFT JOIN (SELECT * FROM config_param_user WHERE cur_user=current_user) a ON a.parameter=sys_param_user.id 
@@ -293,7 +293,7 @@ BEGIN
 
 		-- Get fields for admin enabled
 		EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (SELECT label, parameter AS widgetname, parameter as widgetname, concat(''admin_'',parameter), value, 
-			widgettype, datatype, layoutname, layout_order, row_number() over (order by layoutname, layout_order) as orderby, descript as tooltip, 
+			widgettype, datatype, layoutname, layoutorder, row_number() over (order by layoutname, layoutorder) as orderby, descript as tooltip,
 			(CASE WHEN iseditable IS NULL OR iseditable IS TRUE THEN ''True'' ELSE ''False'' END) AS iseditable,
 			placeholder
 			FROM config_param_system WHERE isenabled=TRUE AND (project_type =''utils'' or project_type='||quote_literal(lower(v_project_type))||') ORDER BY orderby) a'
@@ -302,7 +302,7 @@ BEGIN
 	ELSE 
 		-- Get fields for admin disabled (only to show)
 		EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (SELECT label, parameter AS widgetname, parameter as widgetname, concat(''admin_'',parameter), value, 
-			widgettype, datatype, layoutname, layout_order, row_number() over (order by layoutname, layout_order) as orderby, tooltip, FALSE AS iseditable,
+			widgettype, datatype, layoutname, layoutorder, row_number() over (order by layoutname, layoutorder) as orderby, tooltip, FALSE AS iseditable,
 			placeholder
 			FROM config_param_system WHERE isenabled=TRUE AND (project_type =''utils'' or project_type='||quote_literal(lower(v_project_type))||') ORDER BY orderby) a'
 			INTO fields_array;

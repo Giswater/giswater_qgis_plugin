@@ -79,20 +79,18 @@ BEGIN
 	AND column_name!=''id'' AND column_name!=''formname'';'
 	INTO v_insert_fields;
 
-	PERFORM setval('SCHEMA_NAME.config_form_fields_id_seq', (SELECT max(id) FROM config_form_fields), true);
-	
 	--insert configuration copied from the parent view config
 	FOR rec IN (SELECT * FROM config_form_fields WHERE formname=concat('ve_',v_feature_type))
 	LOOP
 		EXECUTE 'INSERT INTO config_form_fields('||v_config_fields||')
-		SELECT '''||v_view_name||''','||v_insert_fields||' FROM config_form_fields WHERE id='''||rec.id||''';';
+		SELECT '''||v_view_name||''','||v_insert_fields||' FROM config_form_fields WHERE columnname='''||rec.id||''';';
 
 	END LOOP;
 
 	--update configuration of man_type fields setting featurecat related to the view
 	EXECUTE 'UPDATE config_form_fields SET dv_querytext = concat(dv_querytext, ''OR featurecat_id = '''||quote_literal(v_cat_feature)||''''')
 	WHERE formname = '''||v_view_name||'''
-	and (column_id =''location_type'' OR column_id =''fluid_type'' OR column_id =''function_type'' OR column_id =''category_type'')
+	and (columnname =''location_type'' OR columnname =''fluid_type'' OR columnname =''function_type'' OR columnname =''category_type'')
 	AND dv_querytext NOT ILIKE ''%OR%'';';
 
 	--select columns from man_* table without repeating the identifier
@@ -105,7 +103,7 @@ BEGIN
 	FOR rec IN  EXECUTE v_man_fields LOOP
 
 		--capture max layout_id for the view
-		EXECUTE 'SELECT max(layout_order::integer) + 1 FROM config_form_fields WHERE formname = '''||v_view_name||''' AND  layoutname=''lyt_data_1'';'
+		EXECUTE 'SELECT max(layoutorder::integer) + 1 FROM config_form_fields WHERE formname = '''||v_view_name||''' AND  layoutname=''lyt_data_1'';'
 		INTO v_orderby;
 
 		--transform data and widget types
@@ -130,7 +128,7 @@ BEGIN
 		END IF;
 
 		--insert into config_form_fields
-		INSERT INTO config_form_fields (formname,formtype,column_id,datatype,widgettype, layoutname, layout_order, 
+		INSERT INTO config_form_fields (formname,formtype,columnname,datatype,widgettype, layoutname, layoutorder,
 			label, ismandatory, isparent, iseditable, isautoupdate) 
 		VALUES (v_view_name,'feature', rec.column_name, v_datatype, v_widgettype, 'lyt_data_1',v_orderby, 
 			rec.column_name, false, false,true,false);
@@ -143,7 +141,7 @@ BEGIN
 	--insert configuration for the addfields of the feature type
 	FOR rec IN EXECUTE v_man_addfields LOOP
 		--capture max layout_id for the view
-		EXECUTE 'SELECT max(layout_order::integer) + 1 FROM config_form_fields WHERE formname = '''||v_view_name||''' AND  layoutname=''lyt_data_1'';'
+		EXECUTE 'SELECT max(layoutorder::integer) + 1 FROM config_form_fields WHERE formname = '''||v_view_name||''' AND  layoutname=''lyt_data_1'';'
 		INTO v_orderby;
 		
 		--transform data and widget types
@@ -162,7 +160,7 @@ BEGIN
 		END IF;
 		
 		--insert into config_form_fields
-		INSERT INTO config_form_fields (formname,formtype,column_id,datatype,widgettype, layoutname,layout_order, 
+		INSERT INTO config_form_fields (formname,formtype,columnname,datatype,widgettype, layoutname,layoutorder,
 			label, ismandatory,isparent,iseditable,isautoupdate) 
 		VALUES (v_view_name,'feature',rec.param_name, v_datatype,v_widgettype, 'lyt_data_1',v_orderby,
 			rec.param_name, rec.is_mandatory, false,rec.iseditable,false);

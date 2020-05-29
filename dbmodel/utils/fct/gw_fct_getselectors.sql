@@ -131,11 +131,11 @@ BEGIN
 		v_query_filteradd := COALESCE(v_query_filteradd, '');
 	
 		EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-		SELECT concat(' || v_label || ') AS label, ' || v_table_id || '::text as widgetname, ''' || v_selector_id || ''' as column_id, ''check'' as type, ''boolean'' as "dataType", true as "value" 
+		SELECT concat(' || v_label || ') AS label, ' || v_table_id || '::text as widgetname, ''' || v_selector_id || ''' as columnname, ''check'' as type, ''boolean'' as "dataType", true as "value" 
 		FROM '|| v_table ||' WHERE ' || v_table_id || ' IN (SELECT ' || v_selector_id || ' FROM '|| v_selector ||' WHERE cur_user=' || quote_literal(current_user) || ') '|| v_query_filter ||' '
 		||v_query_filteradd||' 
 		UNION 
-		SELECT concat(' || v_label || ') AS label, ' || v_table_id || '::text as widgetname, ''' || v_selector_id || ''' as column_id, ''check'' as type, ''boolean'' as "dataType", false as "value" 
+		SELECT concat(' || v_label || ') AS label, ' || v_table_id || '::text as widgetname, ''' || v_selector_id || ''' as columnname, ''check'' as type, ''boolean'' as "dataType", false as "value" 
 		FROM '|| v_table ||' WHERE ' || v_table_id || ' NOT IN (SELECT ' || v_selector_id || ' FROM '|| v_selector ||' WHERE cur_user=' || quote_literal(current_user) || ') '|| v_query_filter ||' '
 		||v_query_filteradd||'  ORDER BY label) a'
 		INTO v_formTabsAux;

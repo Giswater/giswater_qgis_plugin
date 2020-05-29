@@ -107,7 +107,7 @@ BEGIN
 
 	-- setting device
 	IF p_device < 9 THEN 
-		v_device = ' widgettype as type, column_id as name, datatype AS "dataType",widgetfunction as "widgetAction", widgetfunction as "updateAction",widgetfunction as "changeAction",
+		v_device = ' widgettype as type, columnname as name, datatype AS "dataType",widgetfunction as "widgetAction", widgetfunction as "updateAction",widgetfunction as "changeAction",
 		     (CASE WHEN layoutname=''0'' THEN ''header'' WHEN layoutname=''9'' THEN ''footer'' ELSE ''body'' END) AS "position",
 		     (CASE WHEN iseditable=true THEN false ELSE true END)  AS disabled,';
 	ELSE  
@@ -116,7 +116,7 @@ BEGIN
 
 	-- get user variable to show label as column id or not
 	IF (SELECT value::boolean FROM config_param_user WHERE parameter = 'utils_formlabel_show_columname' AND cur_user =  current_user) THEN
-		v_label = 'column_id AS label';
+		v_label = 'columnname AS label';
 	ELSE
 		v_label = 'label';
 	END IF;
@@ -125,9 +125,9 @@ BEGIN
 	IF p_formname!='infoplan' THEN 
 		SELECT formtype INTO v_formtype FROM config_form_fields WHERE formname = p_formname LIMIT 1;
 		
-		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT '||v_label||', column_id, concat('||quote_literal(p_tabname)||',''_'',column_id) AS widgetname, widgettype, 
-			widgetfunction, '||v_device||' hidden, widgetdim, datatype , tooltip, placeholder, iseditable, row_number()over(ORDER BY layoutname, layout_order) AS orderby, 
-			layoutname, layout_order, dv_parent_id AS "parentId", isparent, ismandatory, linkedaction, dv_querytext AS "queryText", dv_querytext_filterc AS "queryTextFilter", isautoupdate,
+		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT '||v_label||', columnname, concat('||quote_literal(p_tabname)||',''_'',columnname) AS widgetname, widgettype,
+			widgetfunction, '||v_device||' hidden, widgetdim, datatype , tooltip, placeholder, iseditable, row_number()over(ORDER BY layoutname, layoutorder) AS orderby,
+			layoutname, layoutorder, dv_parent_id AS "parentId", isparent, ismandatory, linkedaction, dv_querytext AS "queryText", dv_querytext_filterc AS "queryTextFilter", isautoupdate,
 			dv_orderby_id AS "orderById", dv_isnullvalue AS "isNullValue", stylesheet, widgetcontrols
 			FROM config_form_fields WHERE formname = $1 AND formtype= $2 '||v_clause||' ORDER BY orderby) a'
 				INTO fields_array
@@ -135,22 +135,22 @@ BEGIN
 
 	ELSE
 		EXECUTE 'SELECT array_agg(row_to_json(b)) FROM (
-			SELECT (row_number()over(ORDER BY 1)) AS layout_order, (row_number()over(ORDER BY 1)) AS orderby, * FROM 
-				(SELECT concat(unit, ''. '', descript) AS label, identif AS column_id, ''label'' AS widgettype, 
+			SELECT (row_number()over(ORDER BY 1)) AS layoutorder, (row_number()over(ORDER BY 1)) AS orderby, * FROM
+				(SELECT concat(unit, ''. '', descript) AS label, identif AS columnname, ''label'' AS widgettype,
 				concat ('||quote_literal(p_tabname)||',''_'',identif) AS widgetname, ''string'' AS datatype, 
-				NULL AS tooltip, NULL AS placeholder, FALSE AS iseditable, orderby as layout_order, ''lyt_plan_1'' AS layoutname,  NULL AS dv_parent_id, 
+				NULL AS tooltip, NULL AS placeholder, FALSE AS iseditable, orderby as layoutorder, ''lyt_plan_1'' AS layoutname,  NULL AS dv_parent_id,
 				NULL AS isparent, NULL as ismandatory, NULL AS button_function, NULL AS dv_querytext, 
 				NULL AS dv_querytext_filterc, NULL AS linkedaction, NULL AS isautoupdate, concat (measurement,'' '',unit,'' x '', cost , 
 				'' €/'',unit,'' = '', total_cost::numeric(12,2), '' €'') as value, null as stylesheet,
 				null as widgetcontrols, null as hidden
 				FROM ' ||p_tablename|| ' WHERE ' ||p_idname|| ' = $2
 			UNION
-				SELECT label, column_id, widgettype, 
-				concat ('||quote_literal(p_tabname)||',''_'',column_id) AS widgetname, datatype, 
-				tooltip, placeholder, iseditable, layout_order+100 as layout_order, ''lyt_plan_1'' as layoutname,  NULL AS dv_parent_id, NULL AS isparent, ismandatory,  
+				SELECT label, columnname, widgettype,
+				concat ('||quote_literal(p_tabname)||',''_'',columnname) AS widgetname, datatype,
+				tooltip, placeholder, iseditable, layoutorder+100 as layoutorder, ''lyt_plan_1'' as layoutname,  NULL AS dv_parent_id, NULL AS isparent, ismandatory,
 				NULL AS widgetfunction, NULL AS dv_querytext, 
 				NULL AS dv_querytext_filterc, NULL AS linkedaction, NULL AS isautoupdate, null as value, null as stylesheet, widgetcontrols::text, hidden
-				FROM config_form_fields WHERE formname  = ''infoplan'' ORDER BY layoutname, layout_order) a
+				FROM config_form_fields WHERE formname  = ''infoplan'' ORDER BY layoutname, layoutorder) a
 			ORDER BY 1) b'
 			INTO fields_array
 			USING p_formname, p_id ;

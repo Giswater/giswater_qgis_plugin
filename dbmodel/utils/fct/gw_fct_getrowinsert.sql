@@ -90,12 +90,12 @@ BEGIN
 	
 		-- Get fields
 		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM 
-			(SELECT a.attname as label, a.attname as column_id, a.attname as name, concat(''data'',''_'',a.attname) AS widgetname,
+			(SELECT a.attname as label, a.attname as columnname, a.attname as name, concat(''data'',''_'',a.attname) AS widgetname,
 			''text'' as widgettype, ''text'' as "type" , ''string'' as "datatype", ''string'' as "dataType", ''::TEXT AS tooltip, ''::TEXT as placeholder, 
 			true AS iseditable,
 			row_number()over() AS orderby, 
 			1 AS layout_id, 
-			row_number()over() AS layout_order, 
+			row_number()over() AS layoutorder, 
 			FALSE AS dv_parent_id, FALSE AS isparent, FALSE AS button_function, ''::TEXT AS dv_querytext, ''::TEXT AS dv_querytext_filterc, FALSE AS action_function, FALSE AS isautoupdate
 			FROM pg_attribute a
 			JOIN pg_class t on a.attrelid = t.oid

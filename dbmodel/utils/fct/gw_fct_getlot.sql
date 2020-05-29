@@ -96,10 +96,10 @@ BEGIN
 			FOREACH aux_json IN ARRAY v_fields 
 			LOOP          
 				array_index := array_index + 1;
-				v_fieldvalue := (v_values->>(aux_json->>'column_id'));
-				IF (aux_json->>'column_id') = 'lot_id' THEN
+				v_fieldvalue := (v_values->>(aux_json->>'columnname'));
+				IF (aux_json->>'columnname') = 'lot_id' THEN
 					v_fieldvalue = (v_values->>('idval'));
-				ELSIF (aux_json->>'column_id') IN ('team_id', 'visitclass_id', 'descript') THEN
+				ELSIF (aux_json->>'columnname') IN ('team_id', 'visitclass_id', 'descript') THEN
 					v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'disabled', TRUE);
 				END IF;
 				
@@ -128,9 +128,9 @@ BEGIN
 			FOREACH aux_json IN ARRAY v_fields 
 			LOOP          
 				array_index := array_index + 1;
-				IF (aux_json->>'column_id') = 'id' THEN
+				IF (aux_json->>'columnname') = 'id' THEN
 					v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'value', COALESCE(v_id, ''));
-				ELSIF (aux_json->>'column_id') = 'team_id' THEN
+				ELSIF (aux_json->>'columnname') = 'team_id' THEN
 					-- Get current user team id
 					EXECUTE 'SELECT team_id FROM om_visit_lot_x_user WHERE user_id = current_user ORDER BY starttime DESC' INTO v_fieldvalue;
 					v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'selectedId', COALESCE(v_fieldvalue, ''));

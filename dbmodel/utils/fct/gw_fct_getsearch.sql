@@ -77,9 +77,9 @@ BEGIN
     IF rec_tab.id IS NOT NULL THEN
 
         -- Init combo json
-        SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND column_id='net_type';
+        SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND columnname='net_type';
 
-        comboType := json_build_object('label',rec_fields.label,'column_id', rec_fields.column_id, 'widgetname', concat('network_',rec_fields.column_id),
+        comboType := json_build_object('label',rec_fields.label,'columnname', rec_fields.columnname, 'widgetname', concat('network_',rec_fields.columnname),
         'widgettype','combo','datatype','string','placeholder','','disabled',false);
         
         -- Get Ids for type combo
@@ -101,8 +101,8 @@ BEGIN
 
 
         -- Add edit box to introduce search text
-        SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND column_id='net_code';
-        editCode := json_build_object('label',rec_fields.label,'column_id', rec_fields.column_id, 'widgetname', concat('network_',rec_fields.column_id),'widgettype','typeahead','datatype',
+        SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND columnname='net_code';
+        editCode := json_build_object('label',rec_fields.label,'columnname', rec_fields.columnname, 'widgetname', concat('network_',rec_fields.columnname),'widgettype','typeahead','datatype',
         'string','placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
         
         -- Create array with network fields
@@ -130,8 +130,8 @@ BEGIN
     IF rec_tab.id IS NOT NULL THEN
     
         -- Create search field
-        SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND column_id='generic_search';
-        editCode := json_build_object('label',rec_fields.label,'column_id', rec_fields.column_id,'widgetname', concat('network_',rec_fields.column_id),'widgettype','typeahead', 'searchService', '...');
+        SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND columnname='generic_search';
+        editCode := json_build_object('label',rec_fields.label,'columnname', rec_fields.columnname,'widgetname', concat('network_',rec_fields.columnname),'widgettype','typeahead', 'searchService', '...');
         
         fieldsJson := '[' ||  editCode || ']';
         fieldsJson := COALESCE(fieldsJson, '[]');
@@ -169,8 +169,8 @@ BEGIN
         SELECT value::integer INTO v_search_vdef FROM config_param_user WHERE parameter='basic_search_municipality_vdefault' AND cur_user=current_user;
         
         -- Init combo json
-        SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND column_id='add_muni';
-        comboType := json_build_object('label',rec_fields.label,'column_id', rec_fields.column_id,'widgetname', concat('address_',rec_fields.column_id),
+        SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND columnname='add_muni';
+        comboType := json_build_object('label',rec_fields.label,'columnname', rec_fields.columnname,'widgetname', concat('address_',rec_fields.columnname),
         'widgettype','combo','datatype','string','placeholder','','disabled',false);
 
 	raise notice ' % % %', v_search_muni_id_field,v_search_muni_table ,v_search_muni_search_field;
@@ -201,14 +201,14 @@ BEGIN
 
 
         -- Create street search field
-        SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND column_id='add_street';
-        editCode1 := json_build_object('label',rec_fields.label,'column_id', rec_fields.column_id,'widgetname', concat('address_',rec_fields.column_id),
+        SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND columnname='add_street';
+        editCode1 := json_build_object('label',rec_fields.label,'columnname', rec_fields.columnname,'widgetname', concat('address_',rec_fields.columnname),
         'widgettype','typeahead','datatype','string','placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
                 
 
         -- Create postnumber search field
-        SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND column_id='add_postnumber';
-        editCode2 := json_build_object('label',rec_fields.label,'column_id', rec_fields.column_id,'widgetname', concat('address_',rec_fields.column_id),
+        SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND columnname='add_postnumber';
+        editCode2 := json_build_object('label',rec_fields.label,'columnname', rec_fields.columnname,'widgetname', concat('address_',rec_fields.columnname),
         'widgettype','typeahead','threshold', 
         (SELECT value::integer FROM config_param_system WHERE parameter='api_search_minimsearch' LIMIT 1),
         'datatype','integer','placeholder','','disabled',true,'noresultsMsg','No results','loadingMsg','Searching...');
@@ -243,8 +243,8 @@ BEGIN
     IF rec_tab.id IS NOT NULL THEN
 
         -- Init combo json
-        SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND column_id='hydro_expl';
-        comboType := json_build_object('label',rec_fields.label,'column_id', rec_fields.column_id,'widgetname', concat('hydro_',rec_fields.column_id),
+        SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND columnname='hydro_expl';
+        comboType := json_build_object('label',rec_fields.label,'columnname', rec_fields.columnname,'widgetname', concat('hydro_',rec_fields.columnname),
         'widgettype','combo','datatype','string','placeholder','','disabled',false);
 
         -- Get exploitation vdefault
@@ -277,8 +277,8 @@ BEGIN
     
     
         -- Add edit box to introduce search text
-        SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND column_id='hydro_search';
-        editCode := json_build_object('label',rec_fields.label,'column_id', rec_fields.column_id,'widgetname', concat('hydro_',rec_fields.column_id),
+        SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND columnname='hydro_search';
+        editCode := json_build_object('label',rec_fields.label,'columnname', rec_fields.columnname,'widgetname', concat('hydro_',rec_fields.columnname),
         'widgettype','typeahead','datatype','string','placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
     
         -- Create array with hydro fields
@@ -308,8 +308,8 @@ BEGIN
     IF rec_tab.id IS NOT NULL THEN
 
         -- Add edit box to introduce search text
-        SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND column_id='workcat_search';
-        editCode := json_build_object('label',rec_fields.label,'column_id', rec_fields.column_id,'widgetname', concat('workcat_',rec_fields.column_id),
+        SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND columnname='workcat_search';
+        editCode := json_build_object('label',rec_fields.label,'columnname', rec_fields.columnname,'widgetname', concat('workcat_',rec_fields.columnname),
         'widgettype','typeahead','datatype','string','placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
 
         -- Create array with workcat fields
@@ -340,8 +340,8 @@ BEGIN
     IF rec_tab.id IS NOT NULL THEN
 
         -- Init combo json
-        SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND column_id='psector_expl';
-        comboType := json_build_object('label',rec_fields.label,'column_id', rec_fields.column_id,'widgetname', concat('psector_',rec_fields.column_id),
+        SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND columnname='psector_expl';
+        comboType := json_build_object('label',rec_fields.label,'columnname', rec_fields.columnname,'widgetname', concat('psector_',rec_fields.columnname),
         'widgettype','combo','datatype','string','placeholder','','disabled',false);
 
         -- Get exploitation vdefault
@@ -373,8 +373,8 @@ BEGIN
         comboType := gw_fct_json_object_set_key(comboType, 'comboNames', combo_json);
     
         -- Add edit box to introduce search text
-        SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND column_id='psector_search';
-        editCode := json_build_object('label',rec_fields.label,'column_id', rec_fields.column_id,'widgetname', concat('psector_',rec_fields.column_id),
+        SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND columnname='psector_search';
+        editCode := json_build_object('label',rec_fields.label,'columnname', rec_fields.columnname,'widgetname', concat('psector_',rec_fields.columnname),
         'widgettype','typeahead','datatype','string','placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
     
         -- Create array with hydro fields
@@ -401,8 +401,8 @@ BEGIN
     IF rec_tab.id IS NOT NULL THEN
 
         -- Add edit box to introduce search text
-        SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND column_id='visit_search';
-        editCode := json_build_object('label',rec_fields.label,'column_id', rec_fields.column_id,'widgetname', concat('visit_',rec_fields.column_id),
+        SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND columnname='visit_search';
+        editCode := json_build_object('label',rec_fields.label,'columnname', rec_fields.columnname,'widgetname', concat('visit_',rec_fields.columnname),
         'widgettype','typeahead','datatype','string','placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
 
         -- Create array with workcat fields
