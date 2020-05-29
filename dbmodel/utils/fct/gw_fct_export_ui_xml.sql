@@ -30,9 +30,9 @@ BEGIN
 		FOR rec IN (SELECT * FROM config_form_fields where formname=p_formname AND formtype='feature' order by layout_order) LOOP
 
 		IF p_parent IS TRUE THEN
-			IF (SELECT param_name FROM man_addfields_parameter 
-				JOIN cat_feature ON cat_feature.id=man_addfields_parameter.cat_feature_id 
-				WHERE child_layer=p_formname AND man_addfields_parameter.param_name=rec.column_id) IS NOT NULL THEN
+			IF (SELECT param_name FROM config_addfields_parameter
+				JOIN cat_feature ON cat_feature.id=config_addfields_parameter.cat_feature_id
+				WHERE child_layer=p_formname AND config_addfields_parameter.param_name=rec.column_id) IS NOT NULL THEN
 
 				CONTINUE;
 							

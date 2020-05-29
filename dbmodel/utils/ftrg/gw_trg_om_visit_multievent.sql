@@ -42,9 +42,9 @@ BEGIN
 
 
 	-- Get related parameters(events) from visit_class
-	v_query_text='	SELECT * FROM om_visit_parameter 
-			JOIN om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_parameter.id
-			JOIN om_visit_class ON om_visit_class.id=om_visit_class_x_parameter.class_id
+	v_query_text='	SELECT * FROM config_visit_parameter
+			JOIN config_visit_parameter_x_parameter on config_visit_parameter_x_parameter.parameter_id=config_visit_parameter.id
+			JOIN om_visit_class ON om_visit_class.id=config_visit_parameter_x_parameter.class_id
 			WHERE om_visit_class.id='||visit_class||' AND om_visit_class.ismultievent is true';
 
 	FOR v_parameters IN EXECUTE v_query_text
@@ -83,9 +83,9 @@ BEGIN
 	lot_id=NEW.lot_id, status=NEW.status WHERE id=NEW.visit_id;
 
    	-- Get related parameters(events) from visit_class
-	v_query_text='	SELECT * FROM om_visit_parameter 
-			JOIN om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_parameter.id
-			JOIN om_visit_class ON om_visit_class.id=om_visit_class_x_parameter.class_id
+	v_query_text='	SELECT * FROM config_visit_parameter
+			JOIN config_visit_parameter_x_parameter on config_visit_parameter_x_parameter.parameter_id=config_visit_parameter.id
+			JOIN om_visit_class ON om_visit_class.id=config_visit_parameter_x_parameter.class_id
 			WHERE om_visit_class.id='||visit_class||' AND om_visit_class.ismultievent is true';
 
 	FOR v_parameters IN EXECUTE v_query_text 

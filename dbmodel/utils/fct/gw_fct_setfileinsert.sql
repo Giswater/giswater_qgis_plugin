@@ -55,7 +55,7 @@ BEGIN
 	
 	-- set output parameter
 	v_fextension = (((p_data)->>'data')::json->>'fields')::json->>'fextension';
-	v_filetype = (SELECT filetype FROM om_visit_filetype_x_extension WHERE fextension=v_fextension);
+	v_filetype = (SELECT filetype FROM config_filetype_x_extension WHERE fextension=v_fextension);
 
 	v_data = (p_data->>'data')::json;
 	v_fields = ((p_data->>'data')::json->>'fields')::json;

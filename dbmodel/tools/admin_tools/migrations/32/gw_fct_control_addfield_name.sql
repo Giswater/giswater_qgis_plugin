@@ -24,18 +24,18 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- get input parameters
-	FOR rec IN SELECT * FROM man_addfields_parameter LOOP
+	FOR rec IN SELECT * FROM config_addfields_parameter LOOP
 
 		v_unaccent_id = array_to_string(ts_lexize('unaccent',rec.param_name),',','*');
 
 		IF v_unaccent_id IS NOT NULL THEN
-			UPDATE man_addfields_parameter SET param_name = v_unaccent_id WHERE id=rec.id;
+			UPDATE config_addfields_parameter SET param_name = v_unaccent_id WHERE id=rec.id;
 		END IF;
 	END LOOP;
 
-	FOR rec IN SELECT * FROM man_addfields_parameter WHERE param_name ILIKE '%-%' OR param_name ilike '% %' OR param_name ilike '%.%' LOOP
+	FOR rec IN SELECT * FROM config_addfields_parameter WHERE param_name ILIKE '%-%' OR param_name ilike '% %' OR param_name ilike '%.%' LOOP
 		
-		UPDATE man_addfields_parameter SET param_name = replace(replace(replace(rec.param_name,'-','_'),' ','_'),'.','_') WHERE id=rec.id;
+		UPDATE config_addfields_parameter SET param_name = replace(replace(replace(rec.param_name,'-','_'),' ','_'),'.','_') WHERE id=rec.id;
 
 	END LOOP;	
 	

@@ -29,7 +29,7 @@ BEGIN
 
 	SET search_path = "SCHEMA_NAME", public;
  
-	FOR rec_parameter IN SELECT * FROM om_visit_event JOIN om_visit_parameter ON parameter_id=om_visit_parameter.id 
+	FOR rec_parameter IN SELECT * FROM om_visit_event JOIN config_visit_parameter ON parameter_id=config_visit_parameter.id
 	JOIN om_visit_parameter_type ON parameter_type=om_visit_parameter_type.id where go2plan IS TRUE and is_last IS TRUE
 	LOOP
 				

@@ -50,7 +50,7 @@ BEGIN
 	-- insert into result_cat table
 	INSERT INTO om_result_cat (name, result_type, network_price_coeff, tstamp, cur_user, descript, pricecat_id) 
 	VALUES ( v_result_id, v_result_type, v_coefficient, now(), 
-		current_user, v_descript, (SELECT id FROM price_cat_simple ORDER BY tstamp DESC LIMIT 1))  RETURNING result_id INTO id_last;
+		current_user, v_descript, (SELECT id FROM plan_price_cat ORDER BY tstamp DESC LIMIT 1))  RETURNING result_id INTO id_last;
 	
 	DELETE FROM selector_plan_result WHERE cur_user=current_user;
 	INSERT INTO selector_plan_result (result_id, cur_user) VALUES (id_last, current_user);

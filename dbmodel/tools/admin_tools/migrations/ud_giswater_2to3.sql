@@ -65,8 +65,8 @@ and the SCHEMA_NAME_V2 for the name of your database schema version 2. It's impo
 	-- COST
 -------------------------------------
 -- INSERT INTO SCHEMA_NAME_V3.price_simple SELECT * FROM SCHEMA_NAME_V2.price_simple;
--- ALTER TABLE SCHEMA_NAME_V3.price_compost ALTER COLUMN price DROP NOT NULL;
--- INSERT INTO SCHEMA_NAME_V3.price_compost SELECT * FROM SCHEMA_NAME_V2.price_compost;
+-- ALTER TABLE SCHEMA_NAME_V3.plan_price ALTER COLUMN price DROP NOT NULL;
+-- INSERT INTO SCHEMA_NAME_V3.plan_price SELECT * FROM SCHEMA_NAME_V2.plan_price;
 -- INSERT INTO SCHEMA_NAME_V3.price_compost_value SELECT * FROM SCHEMA_NAME_V2.price_compost_value;
 
 

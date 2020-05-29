@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-INSERT INTO price_cat_simple VALUES ('PRICES DB-2018');
+INSERT INTO plan_price_cat VALUES ('PRICES DB-2018');
 
 INSERT INTO price_compost VALUES ('A_PRE_PE_DN20', 'm', 'Polyethylene pipe designation PE 100, nominal diameter 200mm', 'Polyethylene pipe designation PE 100, nominal diameter 200mm, nominal pressure of 10 bar, SDR series 17, UNE-EN 12201-2, welded and placed at the bottom of the trench.', 63.4800);
 INSERT INTO price_compost VALUES ('S_NULL', 'm3', 'Filling conduit material', 'Filling conduit material', 0.0000);

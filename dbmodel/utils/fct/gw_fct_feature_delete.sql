@@ -256,7 +256,7 @@ BEGIN
 	END IF;
 
  	--delete addfields values
- 	EXECUTE 'DELETE FROM man_addfields_value WHERE feature_id ='''||v_feature_id||'''and parameter_id in (SELECT id FROM man_addfields_parameter 
+ 	EXECUTE 'DELETE FROM man_addfields_value WHERE feature_id ='''||v_feature_id||'''and parameter_id in (SELECT id FROM config_addfields_parameter
  	WHERE cat_feature_id IS NULL OR cat_feature_id = '''||v_featurecat||''' )';
 
  	UPDATE config_param_user SET value = 'FALSE' WHERE parameter = 'edit_arc_downgrade_force' AND cur_user=current_user;

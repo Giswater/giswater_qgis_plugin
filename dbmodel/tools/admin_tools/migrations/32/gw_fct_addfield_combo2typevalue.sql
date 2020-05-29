@@ -18,16 +18,16 @@ BEGIN
 	SELECT CASE WHEN cat_feature_id IS NOT NULL THEN lower(concat(param_name,'_',cat_feature_id))
 	ELSE lower(param_name) END,
 	man_addfields_cat_combo.value,man_addfields_cat_combo.value, man_addfields_cat_combo.descript
-	FROM man_addfields_parameter JOIN man_addfields_cat_combo ON man_addfields_parameter.id = man_addfields_cat_combo.parameter_id;
+	FROM config_addfields_parameter JOIN man_addfields_cat_combo ON config_addfields_parameter.id = man_addfields_cat_combo.parameter_id;
 	
 	--create fk config
 	INSERT INTO typevalue_fk( typevalue_table, typevalue_name, target_table, target_field, parameter_id)
 	SELECT DISTINCT 'edit_typevalue',CASE WHEN cat_feature_id IS NOT NULL THEN lower(concat(param_name,'_',cat_feature_id))
 	ELSE lower(param_name) END, 'man_addfields_value', 'value_param', parameter_id 
-	FROM man_addfields_parameter JOIN man_addfields_cat_combo ON man_addfields_parameter.id = man_addfields_cat_combo.parameter_id;
+	FROM config_addfields_parameter JOIN man_addfields_cat_combo ON config_addfields_parameter.id = man_addfields_cat_combo.parameter_id;
 
 	--modify querytext in config_api_form_fields and audit_cat_param_user
-	FOR rec IN SELECT * FROM man_addfields_parameter WHERE id IN (SELECT parameter_id FROM man_addfields_cat_combo) LOOP
+	FOR rec IN SELECT * FROM config_addfields_parameter WHERE id IN (SELECT parameter_id FROM man_addfields_cat_combo) LOOP
 		IF rec.cat_feature_id IS NOT NULL THEN
 			v_typevalue = lower(concat(rec.param_name,'_',rec.cat_feature_id));
 		ELSE

@@ -47,12 +47,12 @@ SET search_path = "SCHEMA_NAME", public;
 	v_old_ct_param = replace (v_old_ct_param,',',E',\n            ');
 
 	--capture new parameters related to the class
-	SELECT string_agg(concat('a.',om_visit_parameter.id),E',\n    ' order by om_visit_parameter.id) as a_param,
-	string_agg(concat('ct.',om_visit_parameter.id),E',\n            ' order by om_visit_parameter.id) as ct_param,
-	string_agg(concat('(''''',om_visit_parameter.id,''''')'),',' order by om_visit_parameter.id) as id_param,
-	string_agg(concat(om_visit_parameter.id,' ', lower(om_visit_parameter.data_type)),', ' order by om_visit_parameter.id) as datatype
+	SELECT string_agg(concat('a.',config_visit_parameter.id),E',\n    ' order by config_visit_parameter.id) as a_param,
+	string_agg(concat('ct.',config_visit_parameter.id),E',\n            ' order by config_visit_parameter.id) as ct_param,
+	string_agg(concat('(''''',config_visit_parameter.id,''''')'),',' order by config_visit_parameter.id) as id_param,
+	string_agg(concat(config_visit_parameter.id,' ', lower(config_visit_parameter.data_type)),', ' order by config_visit_parameter.id) as datatype
 	INTO v_new_parameters
-	FROM om_visit_parameter JOIN om_visit_class_x_parameter ON om_visit_parameter.id=om_visit_class_x_parameter.parameter_id
+	FROM config_visit_parameter JOIN config_visit_parameter_x_parameter ON config_visit_parameter.id=config_visit_parameter_x_parameter.parameter_id
 	WHERE class_id=v_class_id;
 raise notice 'v_new_parameters - a,%',v_new_parameters.a_param;
 raise notice 'v_old_a_param,%',v_old_a_param;
@@ -85,7 +85,7 @@ raise notice 'v_old_ct_param,%',v_old_ct_param;
 			    FROM '||v_schemaname||'.om_visit 
 			    LEFT JOIN '||v_schemaname||'.om_visit_event ON om_visit.id= om_visit_event.visit_id 
 			    LEFT JOIN '||v_schemaname||'.om_visit_class on om_visit_class.id=om_visit.class_id
-			    LEFT JOIN '||v_schemaname||'.om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_event.parameter_id 
+			    LEFT JOIN '||v_schemaname||'.config_visit_parameter_x_parameter on config_visit_parameter_x_parameter.parameter_id=om_visit_event.parameter_id
 			    where om_visit_class.ismultievent = TRUE ORDER  BY 1,2''::text, '' VALUES '||v_new_parameters.id_param||'''::text) 
 			      ct(visit_id integer, '||v_new_parameters.datatype||')) a ON a.visit_id = om_visit.id
 				WHERE om_visit_class.ismultievent = true AND om_visit_class.id='||v_class_id||';';

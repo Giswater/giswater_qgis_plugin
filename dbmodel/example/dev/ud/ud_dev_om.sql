@@ -570,7 +570,7 @@ widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
 VALUES ('visit_arc_leak', 'visit', 'parameter_id', 6, 'string', 'combo', 'Parameter:',
-NULL, NULL, NULL, false, false, true, NULL, 'SELECT id AS id, descript AS idval FROM om_visit_parameter WHERE feature_type=''ARC''',
+NULL, NULL, NULL, false, false, true, NULL, 'SELECT id AS id, descript AS idval FROM config_visit_parameter WHERE feature_type=''ARC''',
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
@@ -719,7 +719,7 @@ widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
 VALUES ('visit_connec_leak', 'visit', 'parameter_id', 6, 'string', 'combo', 'Parameter:',
-NULL, NULL, NULL, false, false, true, NULL, 'SELECT id AS id, descript AS idval FROM om_visit_parameter WHERE feature_type=''CONNEC''',
+NULL, NULL, NULL, false, false, true, NULL, 'SELECT id AS id, descript AS idval FROM config_visit_parameter WHERE feature_type=''CONNEC''',
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
@@ -812,7 +812,7 @@ widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
 VALUES ('visit_node_leak', 'visit', 'parameter_id', 6, 'string', 'text', 'Parameter:',
-NULL, NULL, NULL, false, false, true, NULL, 'SELECT id AS id, descript AS idval FROM om_visit_parameter WHERE feature_type=''NODE''',
+NULL, NULL, NULL, false, false, true, NULL, 'SELECT id AS id, descript AS idval FROM config_visit_parameter WHERE feature_type=''NODE''',
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 

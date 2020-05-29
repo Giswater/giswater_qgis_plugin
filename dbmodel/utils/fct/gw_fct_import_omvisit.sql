@@ -52,7 +52,7 @@ CSV file may have four type of column data:
 				key "feature"."tolerance": ["y1":">0.05", "y2":">0.05", "shape":"!=shape", "geom1":">0.05", "geom2":">0.05, "material":"!=shape"]
 		
 	Visit parameters: (csvn+1....csvn+m) - at least one mandatory
-		Parameters defined must exists on om_visit_parameter table: At least one parameter is mandatory
+		Parameters defined must exists on config_visit_parameter table: At least one parameter is mandatory
 		System must be configured 
 			To configure the parameters use utils_csv2pg_om_visit_parameters_*
 				key "visit"."firstCsvParameter" to define n+1 position

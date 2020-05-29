@@ -43,8 +43,8 @@ BEGIN
 	formname = NEW.formname
 	WHERE formname = OLD.formname AND column_id=OLD.column_id;
 
-	-- man_addfields_parameter table
-	UPDATE man_addfields_parameter SET 
+	-- config_addfields_parameter table
+	UPDATE config_addfields_parameter SET
 	num_decimals = NEW.num_decimals,
 	field_length = NEW.field_length,
 	orderby = NEW.addfield_order,

@@ -37,7 +37,7 @@ BEGIN
 	TRUNCATE doc_type;
 	TRUNCATE element_type;
 	TRUNCATE man_addfields_parameter;
-	TRUNCATE om_visit_parameter;
+	TRUNCATE config_visit_parameter;
 		
 	TRUNCATE inp_cat_mat_roughness;
 	TRUNCATE inp_report;
@@ -52,7 +52,7 @@ BEGIN
 	EXECUTE 'INSERT INTO doc_type SELECT * FROM '||p_source_schema||'.doc_type;';
 	EXECUTE 'INSERT INTO element_type SELECT * FROM '||p_source_schema||'.element_type;';
 	EXECUTE 'INSERT INTO man_addfields_parameter SELECT * FROM '||p_source_schema||'.man_addfields_parameter;';
-	EXECUTE 'INSERT INTO om_visit_parameter SELECT * FROM '||p_source_schema||'.om_visit_parameter;';
+	EXECUTE 'INSERT INTO config_visit_parameter SELECT * FROM '||p_source_schema||'.config_visit_parameter;';
 	
 	--loop over tables that are not assigned to role_admin
     FOR rec IN EXECUTE 

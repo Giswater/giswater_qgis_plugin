@@ -95,13 +95,13 @@ BEGIN
 			"data":{"message":"2092", "function":"2440","debug_msg":null}}$$);'INTO v_audit_result;
 		END IF;
 	
-		-- Insert into price_cat_simple table
-		IF v_label NOT IN (SELECT id FROM price_cat_simple) THEN
-			INSERT INTO price_cat_simple (id) VALUES (v_label);
+		-- Insert into plan_price_cat table
+		IF v_label NOT IN (SELECT id FROM plan_price_cat) THEN
+			INSERT INTO plan_price_cat (id) VALUES (v_label);
 		END IF;
 
-		-- Insert into price_compost table
-		INSERT INTO price_compost (id, pricecat_id, unit, descript, text, price)
+		-- Insert into plan_price table
+		INSERT INTO plan_price (id, pricecat_id, unit, descript, text, price)
 		SELECT csv1, v_label, csv2, csv3, csv4, csv5::numeric(12,4)
 		FROM temp_csv2pg WHERE cur_user=current_user AND csv2pgcat_id=1
 		ON CONFLICT (id) DO NOTHING;

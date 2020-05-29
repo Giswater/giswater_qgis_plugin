@@ -46,7 +46,7 @@ There are some tables that are already filled, it is not necessary to migrate th
 	-- COST
 -------------------------------------
 --INSERT INTO SCHEMA_NAME_V3.price_simple SELECT * FROM SCHEMA_NAME_V2.price_simple;
---INSERT INTO SCHEMA_NAME_V3.price_compost SELECT * FROM SCHEMA_NAME_V2.price_compost;
+--INSERT INTO SCHEMA_NAME_V3.plan_price SELECT * FROM SCHEMA_NAME_V2.plan_price;
 --INSERT INTO SCHEMA_NAME_V3.price_compost_value SELECT * FROM SCHEMA_NAME_V2.price_compost_value;
 
 

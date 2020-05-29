@@ -31,7 +31,7 @@ HINT: We can use a view to parse data from that pg2pg fields.....
 - visitcat_aux: 'id' of the catalog of visit that must exists before.
 HINT: In case of migration the field name for the row of the catalog must be 'Data migration ora2pg'
 
-3- We need the parameter created on the table om_visit_parameter
+3- We need the parameter created on the table config_visit_parameter
 - parameter_aux: id of the parameter on table that must exists before.
 HINT: In case of hydrant inspection, parameter should be: hydrant_inspection
 

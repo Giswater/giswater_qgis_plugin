@@ -211,11 +211,11 @@ INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('shtvalve_param_1','4','
 SELECT setval('SCHEMA_NAME.config_typevalue_fk_id_seq', (SELECT max(id) FROM config_typevalue_fk), true);
 
 INSERT INTO config_typevalue_fk(typevalue_table, typevalue_name, target_table, target_field, parameter_id) 
-SELECT 'edit_typevalue','hydrant_param_1','man_addfields_value','value_param',id FROM man_addfields_parameter WHERE param_name='hydrant_param_1';
+SELECT 'edit_typevalue','hydrant_param_1','man_addfields_value','value_param',id FROM config_addfields_parameter WHERE param_name='hydrant_param_1';
 INSERT INTO config_typevalue_fk(typevalue_table, typevalue_name, target_table, target_field, parameter_id) 
-SELECT 'edit_typevalue','shtvalve_param_1','man_addfields_value','value_param',id FROM man_addfields_parameter WHERE param_name='shtvalve_param_1';
+SELECT 'edit_typevalue','shtvalve_param_1','man_addfields_value','value_param',id FROM config_addfields_parameter WHERE param_name='shtvalve_param_1';
 INSERT INTO config_typevalue_fk(typevalue_table, typevalue_name, target_table, target_field, parameter_id) 
-SELECT 'edit_typevalue','pressmeter_param_1','man_addfields_value','value_param',id FROM man_addfields_parameter WHERE param_name='pressmeter_param_1';
+SELECT 'edit_typevalue','pressmeter_param_1','man_addfields_value','value_param',id FROM config_addfields_parameter WHERE param_name='pressmeter_param_1';
 
 -- rotate vnodes and connec labels
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_link_connecrotation_update', TRUE, current_user) ON CONFLICT (parameter, cur_user) DO NOTHING;
@@ -574,12 +574,12 @@ ON CONFLICT (parameter, cur_user) DO NOTHING;
 UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'qgis_form_docker' AND cur_user = current_user;
 
 UPDATE presszone SET head=0, stylesheet='{}'  where id = '0';
-UPDATE presszone SET head=103.85, stylesheet='{"color":[251,181,174]}'  where id = '1';
-UPDATE presszone SET head=75, stylesheet='{"color":[179,205,227]}'  where id = '2';
-UPDATE presszone SET head=68.25, stylesheet='{"color":[204,235,197]}'  where id = '3';
-UPDATE presszone SET head=30, stylesheet='{"color":[222,203,228]}'  where id = '4';
-UPDATE presszone SET head=119.69, stylesheet='{"color":[254,217,166]}'  where id = '5';
-UPDATE presszone SET head=81.5, stylesheet='{"color":[255,255,204]}'  where id = '6';
+UPDATE presszone SET head=100, stylesheet='{"color":[251,181,174]}'  where id = '1';
+UPDATE presszone SET head=100, stylesheet='{"color":[179,205,227]}'  where id = '2';
+UPDATE presszone SET head=100, stylesheet='{"color":[204,235,197]}'  where id = '3';
+UPDATE presszone SET head=100, stylesheet='{"color":[222,203,228]}'  where id = '4';
+UPDATE presszone SET head=100, stylesheet='{"color":[254,217,166]}'  where id = '5';
+UPDATE presszone SET head=100, stylesheet='{"color":[255,255,204]}'  where id = '6';
 
 UPDATE dma SET stylesheet='{}'  where dma_id = 0;
 UPDATE dma SET stylesheet='{"color":[251,181,174]}'  where dma_id = 1;
