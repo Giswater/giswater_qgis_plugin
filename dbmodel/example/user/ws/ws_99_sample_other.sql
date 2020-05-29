@@ -9,6 +9,9 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 INSERT INTO sys_function VALUES (2888, 'gw_fct_fill_om_tables','ws','function','void','void','Create example visits (used on sample creation)','role_admin',false);
 INSERT INTO sys_function VALUES (2918, 'gw_fct_fill_doc_tables','ws','function','void','void','Create example documents (used on sample creation)','role_admin',false);
+UPDATE sys_function SET input_params ='void', return_type ='void' WHERE id =2888;
+UPDATE sys_function SET input_params ='void', return_type ='void' WHERE id =2918;
+
 
 UPDATE inp_shortpipe SET to_arc=null WHERE node_id='114254';
 

@@ -10,6 +10,9 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 INSERT INTO sys_function VALUES (2916, 'gw_fct_fill_doc_tables','ud','function','void','void','Create example documents (used on sample creation)','role_admin',false);
 INSERT INTO sys_function VALUES (2886, 'gw_fct_fill_om_tables','ud','function','void','void','Create example visits (used on sample creation)','role_admin',false);
+UPDATE sys_function SET input_params ='void', return_type ='void' WHERE id =2916;
+UPDATE sys_function SET input_params ='void', return_type ='void' WHERE id =2886;
+
 
 INSERT INTO cat_dwf_scenario VALUES (1, 'scenario1', '2017-01-01', '2017-12-31');
 

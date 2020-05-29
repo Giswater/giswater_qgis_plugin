@@ -289,8 +289,6 @@ UPDATE sys_function SET input_params ='json', return_type ='json' WHERE id =2802
 UPDATE sys_function SET input_params ='json', return_type ='void' WHERE id =2804;
 UPDATE sys_function SET input_params ='json', return_type ='json' WHERE id =2850;
 UPDATE sys_function SET input_params ='json', return_type ='json' WHERE id =2862;
-UPDATE sys_function SET input_params ='void', return_type ='void' WHERE id =2886;
-UPDATE sys_function SET input_params ='void', return_type ='void' WHERE id =2888;
 UPDATE sys_function SET input_params ='json', return_type ='json' WHERE id =2102;
 UPDATE sys_function SET input_params ='json', return_type ='json' WHERE id =2104;
 UPDATE sys_function SET input_params ='json', return_type ='json' WHERE id =2106;
