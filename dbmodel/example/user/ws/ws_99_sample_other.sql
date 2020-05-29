@@ -574,12 +574,12 @@ ON CONFLICT (parameter, cur_user) DO NOTHING;
 UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'qgis_form_docker' AND cur_user = current_user;
 
 UPDATE presszone SET head=0, stylesheet='{}'  where id = '0';
-UPDATE presszone SET head=100, stylesheet='{"color":[251,181,174]}'  where id = '1';
-UPDATE presszone SET head=100, stylesheet='{"color":[179,205,227]}'  where id = '2';
-UPDATE presszone SET head=100, stylesheet='{"color":[204,235,197]}'  where id = '3';
-UPDATE presszone SET head=100, stylesheet='{"color":[222,203,228]}'  where id = '4';
-UPDATE presszone SET head=100, stylesheet='{"color":[254,217,166]}'  where id = '5';
-UPDATE presszone SET head=100, stylesheet='{"color":[255,255,204]}'  where id = '6';
+UPDATE presszone SET head=103.85, stylesheet='{"color":[251,181,174]}'  where id = '1';
+UPDATE presszone SET head=75, stylesheet='{"color":[179,205,227]}'  where id = '2';
+UPDATE presszone SET head=68.25, stylesheet='{"color":[204,235,197]}'  where id = '3';
+UPDATE presszone SET head=30, stylesheet='{"color":[222,203,228]}'  where id = '4';
+UPDATE presszone SET head=119.69, stylesheet='{"color":[254,217,166]}'  where id = '5';
+UPDATE presszone SET head=81.5, stylesheet='{"color":[255,255,204]}'  where id = '6';
 
 UPDATE dma SET stylesheet='{}'  where dma_id = 0;
 UPDATE dma SET stylesheet='{"color":[251,181,174]}'  where dma_id = 1;
