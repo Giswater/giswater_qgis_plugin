@@ -126,6 +126,8 @@ class MincutParent(ParentAction):
         utils_giswater.double_validator(self.distance, 0, 9999999, 3)
         utils_giswater.double_validator(self.depth, 0, 9999999, 3)
 
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.txt_exec_user, self.controller.get_project_user())
+
         # Manage address
         self.adress_init_config(self.dlg_mincut)
 
@@ -149,15 +151,6 @@ class MincutParent(ParentAction):
                "ORDER BY id")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_mincut.cause, rows, 1)
-
-        # Fill ComboBox assigned_to and exec_user
-        sql = ("SELECT id, name "
-               "FROM cat_users "
-               "ORDER BY name")
-        rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_mincut.assigned_to, rows, 1)
-        utils_giswater.fillComboBox(self.dlg_mincut, "exec_user", rows, False)
-        self.dlg_mincut.exec_user.setVisible(False)
 
         # Toolbar actions
         action = self.dlg_mincut.findChild(QAction, "actionMincut")
@@ -203,7 +196,8 @@ class MincutParent(ParentAction):
             self.set_id_val()
 
         # Set state name
-        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, str(self.states[0]))
+        if self.states != {}:
+            utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, str(self.states[0]))
         self.current_state = 0        
         
         self.sql_connec = ""
