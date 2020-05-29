@@ -153,10 +153,10 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 	
 	--set current process as users parameter
-	DELETE FROM config_param_user  WHERE  parameter = 'cur_trans' AND cur_user =current_user;
+	DELETE FROM config_param_user  WHERE  parameter = 'utils_cur_trans' AND cur_user =current_user;
 
 	INSERT INTO config_param_user (value, parameter, cur_user)
-	VALUES (txid_current(),'cur_trans',current_user );
+	VALUES (txid_current(),'utils_cur_trans',current_user );
 
 	-- get variables
 	v_class = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'grafClass');

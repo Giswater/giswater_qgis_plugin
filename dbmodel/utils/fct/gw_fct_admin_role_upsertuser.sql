@@ -75,10 +75,10 @@ BEGIN
 	SELECT  giswater INTO  v_version FROM version order by id desc limit 1;
 
 	--set current process as users parameter
-    DELETE FROM config_param_user  WHERE  parameter = 'cur_trans' AND cur_user =current_user;
+    DELETE FROM config_param_user  WHERE  parameter = 'utils_cur_trans' AND cur_user =current_user;
 
     INSERT INTO config_param_user (value, parameter, cur_user)
-    VALUES (txid_current(),'cur_trans',current_user );
+    VALUES (txid_current(),'utils_cur_trans',current_user );
 
 	v_user_name = ((p_data ->>'data')::json->>'user_name')::text;
 	v_user_id = lower(((p_data ->>'data')::json->>'user_id')::text);

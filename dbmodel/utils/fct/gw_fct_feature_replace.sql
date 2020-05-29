@@ -82,10 +82,10 @@ BEGIN
 	SELECT wsoftware, giswater  INTO v_project_type, v_version FROM version order by 1 desc limit 1;
 
     --set current process as users parameter
-    DELETE FROM config_param_user  WHERE  parameter = 'cur_trans' AND cur_user =current_user;
+    DELETE FROM config_param_user  WHERE  parameter = 'utils_cur_trans' AND cur_user =current_user;
 
     INSERT INTO config_param_user (value, parameter, cur_user)
-    VALUES (txid_current(),'cur_trans',current_user );
+    VALUES (txid_current(),'utils_cur_trans',current_user );
     
 	SELECT  value::json->>'value' as value INTO v_arc_searchnodes_value FROM config_param_system where parameter = 'edit_arc_searchnodes';
 	SELECT  value::json->>'activated' INTO v_arc_searchnodes_active FROM config_param_system where parameter = 'edit_arc_searchnodes';
