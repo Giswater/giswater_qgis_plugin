@@ -310,7 +310,7 @@ BEGIN
 				INSERT INTO man_addfields_parameter (param_name, cat_feature_id, is_mandatory, datatype_id, 
 				active, orderby, iseditable)
 				VALUES (v_param_name, NULL, v_ismandatory, v_add_datatype, v_active, v_orderby, v_iseditable)
-				RETURING id ON v_idaddparam;
+				RETURNING id INTO v_idaddparam;
 			
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 				VALUES (118, null, 4, 'Insert parameter definition into man_addfields_parameter.');
@@ -607,7 +607,7 @@ BEGIN
 			INSERT INTO man_addfields_parameter (param_name, cat_feature_id, is_mandatory, datatype_id,
 			active, orderby, iseditable)
 			VALUES (v_param_name, v_cat_feature, v_ismandatory, v_add_datatype,
-			v_active, v_orderby, v_iseditable) RETURNING id ON v_idaddparam;
+			v_active, v_orderby, v_iseditable) RETURNING id INTO v_idaddparam;
 			
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (118, null, 4, 'Insert parameter definition into man_addfields_parameter.');
