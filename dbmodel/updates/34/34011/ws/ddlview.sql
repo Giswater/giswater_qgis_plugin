@@ -23,7 +23,7 @@ CREATE OR REPLACE VIEW v_edit_dma AS
     dma.maxc,
     dma.effc,
     dma.grafconfig::text AS grafconfig,
-	dma.style::text AS style
+	dma.stylesheet::text AS stylesheet
    FROM selector_expl,dma
   WHERE dma.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
 
@@ -40,7 +40,7 @@ CREATE OR REPLACE VIEW v_edit_dqa AS
     dqa.dqa_type,
     dqa.link,
     dqa.grafconfig::text AS grafconfig,
-	dqa.style::text AS style
+	dqa.stylesheet::text AS stylesheet
    FROM selector_expl,dqa
   WHERE dqa.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
 
@@ -52,7 +52,7 @@ CREATE OR REPLACE VIEW v_edit_presszone AS
     presszone.the_geom,
     presszone.grafconfig::text AS grafconfig,
 	presszone.head,
-    presszone.style::text AS style
+    presszone.stylesheet::text AS stylesheet
    FROM selector_expl,presszone
   WHERE presszone.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
 
@@ -65,7 +65,7 @@ CREATE OR REPLACE VIEW v_edit_sector AS
     sector.the_geom,
     sector.undelete,
     sector.grafconfig::text AS grafconfig,
-    sector.style::text AS style
+    sector.stylesheet::text AS stylesheet
    FROM selector_sector, sector
   WHERE sector.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
 
