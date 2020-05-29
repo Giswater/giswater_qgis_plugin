@@ -6,8 +6,6 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2750
 
--- DROP FUNCTION gw_trg_typevalue_config_fk();
-
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_typevalue_config_fk()
   RETURNS trigger AS
 $BODY$
@@ -32,12 +30,8 @@ BEGIN
 	v_table:= TG_ARGV[0];
 
 	--on insert of a new typevalue create a trigger for the table
-	IF TG_OP = 'INSERT' AND v_table = 'typevalue_fk' THEN
-	
+	IF TG_OP = 'INSERT' AND v_table = 'sys_foreingkey' THEN
 		
-	
-	
-	
 		--check if there are values on the defined fileds that already have a value that is not present in a catalog
 		IF NEW.parameter_id IS NULL THEN
 			EXECUTE 'SELECT count('||NEW.target_field||') FROM '||NEW.target_table||' WHERE '||NEW.target_field||' is not null 
@@ -86,7 +80,7 @@ BEGIN
 			END IF;
 		END IF;
 		
-	ELSIF TG_OP = 'UPDATE' AND v_table = 'typevalue_fk' THEN
+	ELSIF TG_OP = 'UPDATE' AND v_table = 'sys_foreingkey' THEN
 
 		EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_typevalue_fk ON '||OLD.target_table||';';
 		

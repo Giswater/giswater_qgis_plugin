@@ -12,36 +12,9 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_config_addfields()
 $BODY$
 DECLARE 
 
-
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-
-	-- config_form_fields table
-	UPDATE config_form_fields SET 
-	datatype = NEW.datatype,
-	widgettype = NEW.widgettype,
-	widgetdim = NEW.widgetdim,
-	label = NEW.label,
-	layoutname = NEW.layoutname,
-	layout_order = NEW.layout_order,
-	tooltip = NEW.tooltip,
-	placeholder = NEW.placeholder,
-	ismandatory = NEW.ismandatory,
-	isparent = NEW.isparent,
-	iseditable = NEW.iseditable,
-	isautoupdate = NEW.isautoupdate,
-	dv_querytext = NEW.dv_querytext,
-	dv_orderby_id = NEW.dv_orderby_id,
-	dv_isnullvalue = NEW.dv_isnullvalue,
-	dv_parent_id = NEW.dv_parent_id,
-	dv_querytext_filterc = NEW.dv_querytext_filterc,
-	widgetfunction = NEW.widgetfunction,
-	linkedaction = NEW.linkedaction,
-	stylesheet = NEW.stylesheet,
-	widgetcontrols = NEW.widgetcontrols,
-	formname = NEW.formname
-	WHERE formname = OLD.formname AND column_id=OLD.column_id;
 
 	-- config_addfields_parameter table
 	UPDATE config_addfields_parameter SET

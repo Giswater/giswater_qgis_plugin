@@ -61,5 +61,131 @@ ALTER TABLE config_visit_class_x_workorder ADD CONSTRAINT config_visit_class_x_w
 ALTER TABLE config_visit_class_x_workorder DROP COLUMN id;
 
 
+-- config csv param
+ALTER TABLE config_csv_param DROP CONSTRAINT sys_csv2pg_config_pkey;
+ALTER TABLE config_csv_param ADD CONSTRAINT config_csv_param_pkey PRIMARY KEY(pg2csvcat_id,tablename);
+ALTER TABLE config_csv_param DROP COLUMN id;
+UPDATE sys_table SET sys_sequence = null, sys_sequence_field = null WHERE id = 'config_csv_param';
+
+-- config csv
+UPDATE config_csv SET functionname = replace (functionname, '_utils_csv2pg_', '_');
+UPDATE config_csv SET functionname = replace (functionname, '_utils_', '_');
+UPDATE config_csv SET alias = 'Export ui' WHERE functionname = 'gw_fct_export_ui_xml';
+UPDATE config_csv SET isdeprecated = false WHERE id IN(10,11,12)
+UPDATE config_csv SET formname='main' WHERE id IN(13,19,20)
+UPDATE config_csv SET isdeprecated=false;
+UPDATE config_csv SET csv_structure = 'Xml qt ui dialog' WHERE id IN (19,20);
+UPDATE config_csv SET readheader = NULL, orderby = null WHERE id IN (10,11,12,13,19,20);
+UPDATE config_csv SET formname = 'main' WHERE id IN (12);
+UPDATE config_csv SET orderby = 21 WHERE id IN (21);
+DELETE FROM config_csv WHERE isdeprecated = true;
+
+-- config form
+ALTER TABLE config_form DROP CONSTRAINT config_api_form_pkey;
+ALTER TABLE config_form DROP CONSTRAINT config_api_form_formname_unique;
+ALTER TABLE config_form ADD CONSTRAINT config_form_pkey PRIMARY KEY(formname);
+ALTER TABLE config_form DROP COLUMN id;
+UPDATE config_form SET formname = 'visit_manager' WHERE formname = 'visitManager';
+UPDATE sys_table SET sys_sequence = null, sys_sequence_field = null WHERE id = 'config_form';
+
+
+-- config form actions
+UPDATE config_form_actions SET actionname = 'actionVisitEnd' WHERE actionname = 'visit_end';
+UPDATE config_form_actions SET actionname = 'actionVisitStart' WHERE actionname = 'visit_start';
+
+-- config form_fields
+ALTER TABLE config_form_fields RENAME column_id TO columnname;
+ALTER TABLE config_form_fields RENAME layout_order TO layoutorder;
+ALTER TABLE config_form_fields DROP CONSTRAINT config_api_form_fields_pkey;
+ALTER TABLE config_form_fields DROP CONSTRAINT config_api_form_fields_pkey2;
+ALTER TABLE config_form_fields ADD CONSTRAINT config_form_fields_pkey PRIMARY KEY(formname, formtype, columnname);
+ALTER TABLE config_form_fields DROP COLUMN id;
+UPDATE sys_table SET sys_sequence = null, sys_sequence_field = null WHERE id = 'config_form_fields';
+
+
+-- config groupbox
+ALTER TABLE config_form_groupbox DROP CONSTRAINT config_api_form_groupbox_pkey;
+ALTER TABLE config_form_groupbox ADD CONSTRAINT config_groupbox_pkey PRIMARY KEY(formname,layoutname);
+ALTER TABLE config_form_groupbox DROP COLUMN id;
+UPDATE sys_table SET sys_sequence = null, sys_sequence_field = null WHERE id = 'config_form_groupbox';
+
+
+--config_form_images
+DELETE FROM config_form_images WHERE idval ='bmaps';
+UPDATE config_form_images SET id = 1 WHERE idval = 'ws_shape';
+
+
+-- config form list
+UPDATE config_form_list SET listtype = 'tab' WHERE listtype is null;
+UPDATE config_form_list SET listclass = 'list' WHERE listclass is null;
+ALTER TABLE config_form_list DROP CONSTRAINT config_api_list_pkey;
+ALTER TABLE config_form_list ADD CONSTRAINT config_form_list_pkey PRIMARY KEY(tablename, device, listtype);
+ALTER TABLE config_form_list DROP COLUMN id;
+UPDATE sys_table SET sys_sequence = null, sys_sequence_field = null WHERE id = 'config_form_list';
+
+
+-- config form tableview
+ALTER TABLE config_form_tableview DROP COLUMN dev1_status;
+ALTER TABLE config_form_tableview DROP COLUMN dev2_status;
+ALTER TABLE config_form_tableview DROP COLUMN dev3_status;
+ALTER TABLE config_form_tableview DROP COLUMN dev_alias;
+ALTER TABLE config_form_tableview DROP CONSTRAINT config_client_forms_pkey;
+ALTER TABLE config_form_tableview ADD CONSTRAINT config_form_tableview_pkey PRIMARY KEY(table_id, column_id);
+ALTER TABLE config_form_tableview DROP COLUMN id;
+UPDATE sys_table SET sys_sequence = null, sys_sequence_field = null WHERE id = 'config_form_tableview';
+
+-- config form tabs
+UPDATE config_form_tabs SET device = 9 WHERE device is null;
+DELETE FROM config_form_tabs WHERE formname = 'v_edit_connec' AND tabname = 'tab_elements' AND device = 9;
+INSERT INTO config_form_tabs VALUES (99999, 'v_edit_connec' , 'tab_elements', 'Elem', 'List of related elements', null, null, null, 9);
+UPDATE config_form_tabs c SET tabactions = a.tabactions FROM config_form_tabs a WHERE a.formname = c.formname 
+AND c.formname = 'v_edit_connec' AND c.tabname = 'tab_elements' AND c.device = 9;
+
+DELETE FROM config_form_tabs WHERE formname = 'v_edit_connec' AND tabname = 'tab_visit' AND device = 9;
+INSERT INTO config_form_tabs VALUES (99999, 'v_edit_connec' , 'tab_visit', 'Visit', 'List of related visits', null, null, null, 9);
+UPDATE config_form_tabs c SET tabactions = a.tabactions FROM config_form_tabs a WHERE a.formname = c.formname 
+AND c.formname = 'v_edit_connec' AND c.tabname = 'tab_visit' AND c.device = 9;
+
+DELETE FROM config_form_tabs WHERE formname = 'v_edit_connec' AND tabname = 'tab_documents' AND device = 9;
+INSERT INTO config_form_tabs VALUES (99999, 'v_edit_connec' , 'tab_documents', 'Docs', 'List of related documents', null, null, null, 9);
+UPDATE config_form_tabs c SET tabactions = a.tabactions FROM config_form_tabs a WHERE a.formname = c.formname 
+AND c.formname = 'v_edit_connec' AND c.tabname = 'tab_documents' AND c.device = 9;
+
+
+-- config_form_tabs
+ALTER TABLE config_form_tabs DROP CONSTRAINT config_api_form_tabs_pkey;
+ALTER TABLE config_form_tabs DROP CONSTRAINT config_api_form_tabs_formname_tabname_device_unique;
+ALTER TABLE config_form_tabs ADD CONSTRAINT config_form_tabs_pkey PRIMARY KEY(formname, tabname, device);
+ALTER TABLE config_form_tabs DROP COLUMN id;
+UPDATE sys_table SET sys_sequence = null, sys_sequence_field = null WHERE id = 'config_form_tabs';
+DELETE FROM config_form_tabs WHERE tooltip = 'Searcher API web';
+UPDATE config_form_tabs SET formname = 'visit_manager' WHERE formname = 'visitManager';
+UPDATE config_form_tabs SET sys_role = 'role_basic' WHERE sys_role IS NULL;
+
+
+-- config_info_table_x_type
+ALTER TABLE config_info_table_x_type DROP CONSTRAINT config_api_tableinfo_x_inforole_pkey;
+ALTER TABLE config_info_table_x_type ADD CONSTRAINT config_info_table_x_type_pkey PRIMARY KEY(tableinfo_id, infotype_id);
+ALTER TABLE config_info_table_x_type DROP COLUMN id;
+UPDATE sys_table SET sys_sequence = null, sys_sequence_field = null WHERE id = 'config_info_table_x_type';
+
+-- config_mincut_inlet
+ALTER TABLE config_mincut_inlet DROP CONSTRAINT anl_mincut_inlet_x_exploitation_pkey;
+ALTER TABLE config_mincut_inlet ADD CONSTRAINT config_mincut_inlet_pkey PRIMARY KEY(node_id, expl_id);
+ALTER TABLE config_mincut_inlet DROP COLUMN id;
+UPDATE sys_table SET sys_sequence = null, sys_sequence_field = null WHERE id = 'config_mincut_inlet';
+
+-- config_param_system
+ALTER TABLE config_param_system DROP COLUMN reg_exp;
+UPDATE config_param_system SET isenabled = true WHERE isenabled IS NULL;
+
+-- config_toolbox
+UPDATE config_toolbox SET inputparams = null WHERE inputparams::text = '[]';
+UPDATE config_toolbox SET observ = null;
+
+
+
+
+
 
 

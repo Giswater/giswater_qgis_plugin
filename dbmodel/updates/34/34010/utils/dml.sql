@@ -90,7 +90,7 @@ DELETE FROM sys_table WHERE id ='config_api_visit';
 UPDATE sys_table SET id ='config_mincut_inlet' WHERE id ='anl_mincut_inlet_x_exploitation';
 UPDATE sys_table SET id ='config_mincut_valve' WHERE id ='anl_mincut_selector_valve';
 UPDATE sys_table SET id ='config_mincut_checkvalve' WHERE id ='anl_mincut_checkvalve';
-UPDATE sys_table SET id ='config_typevalue_fk' WHERE id ='typevalue_fk';
+UPDATE sys_table SET id ='sys_foreingkey' WHERE id ='typevalue_fk';
 UPDATE sys_table SET id ='selector_mincut_result' WHERE id ='anl_mincut_result_selector';
 UPDATE sys_table SET id ='selector_inp_demand' WHERE id ='inp_selector_dscenario';
 UPDATE sys_table SET id ='selector_inp_hydrology' WHERE id ='inp_selector_hydrology';

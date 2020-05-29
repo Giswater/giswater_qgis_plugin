@@ -20,11 +20,11 @@ BEGIN
 	UPDATE config_form_fields SET
 	formname = NEW.formname,
 	formtype = NEW.formtype,
-	column_id = NEW.column_id,
+	columnname = NEW.columnname,
 	label = NEW.label,
 	hidden = NEW.hidden,
 	layoutname = NEW.layoutname,
-	layout_order = NEW.layout_order,
+	layoutorder = NEW.layoutorder,
 	iseditable = NEW.iseditable,
 	ismandatory = NEW.ismandatory,
 	tooltip = NEW.tooltip,
@@ -43,8 +43,8 @@ BEGIN
 	widgetcontrols = NEW.widgetcontrols::json,
 	widgetfunction = NEW.widgetfunction,
 	linkedaction = NEW.linkedaction,
-    listfilterparam = NEW.listfilterparam::json
-	WHERE formname = OLD.formname AND column_id=OLD.column_id;
+	listfilterparam = NEW.listfilterparam::json
+	WHERE formname = OLD.formname AND columnname=OLD.columnname AND formtype=OLD.formtype;
 
 	RETURN NEW;
 END;

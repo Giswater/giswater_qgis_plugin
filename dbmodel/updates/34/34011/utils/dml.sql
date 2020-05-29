@@ -116,6 +116,7 @@ UPDATE config_param_system SET parameter = 'admin_transaction_db' WHERE paramete
 UPDATE config_param_system SET parameter = 'admin_customform_param' WHERE parameter = 'custom_form_param';
 UPDATE config_param_system SET parameter = 'admin_customform_param' WHERE parameter = 'custom_form_param';
 UPDATE config_param_system SET parameter = 'basic_selector_mincut' WHERE parameter = 'api_selector_mincut';
+UPDATE config_param_system SET parameter = 'edit_hydrant_use_firecode_seq' WHERE parameter = 'use_fire_code_seq';
 
 
 -- user param updates
@@ -230,7 +231,7 @@ UPDATE config_form_fields SET formname = 'print' WHERE formname = 'printGeneric'
 
 
 UPDATE sys_table SET id = 'config_addfields_parameter' WHERE id = 'man_addfields_parameter';
-UPDATE sys_table SET id = 'config_visit_param_x_param' WHERE id = 'om_visit_parameter_x_parameter';
+UPDATE sys_table SET id = 'config_visit_param_x_param', sys_sequence = null, sys_sequence_field = null WHERE id = 'om_visit_parameter_x_parameter';
 UPDATE sys_table SET id = 'config_visit_class_x_parameter' WHERE id = 'om_visit_class_x_parameter';
 UPDATE sys_table SET id = 'config_visit_class_x_workorder' WHERE id = 'om_visit_class_x_wo';
 UPDATE sys_table SET id = 'config_filetype_x_extension' WHERE id = 'om_visit_filetype_x_extension';
@@ -245,3 +246,13 @@ DELETE FROM sys_function WHERE function_name = 'gw_fct_fill_doc_tables';
 
 UPDATE config_typevalue_fk SET target_table = 'config_visit_parameter' WHERE target_table = 'om_visit_parameter';
 UPDATE config_typevalue_fk SET target_table = 'config_addfields_parameter' WHERE target_table = 'man_addfields_parameter';
+
+
+UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'om_visit_parameter', 'config_visit_parameter') WHERE dv_querytext like '%om_visit_parameter%';
+UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'om_visit_filetype_x_extension', 'config_filetype_x_extension') WHERE dv_querytext like '%visit_fil%';
+UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'price_compost', 'plan_price') WHERE dv_querytext like '%price_compost%';
+UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'price_cat_simple', 'plan_price_cat') WHERE dv_querytext like '%price_cat_simple%';
+
+DELETE FROM config_form_images WHERE idval ='bmaps';
+UPDATE config_form_images SET id = 1 WHERE idval = 'ws_shape';
+
