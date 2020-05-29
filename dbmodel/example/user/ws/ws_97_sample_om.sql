@@ -44,20 +44,18 @@ INSERT INTO config_visit_parameter VALUES ('incident_comment', NULL, 'INSPECTION
 INSERT INTO config_visit_parameter VALUES ('incident_type', NULL, 'INSPECTION', NULL, 'TEXT', NULL, 'incident type', 'event_standard', NULL, FALSE, 'incident_type');
 
 
-INSERT INTO config_visit_parameter_x_parameter VALUES (1, 5	, 'sediments_node');
-INSERT INTO config_visit_parameter_x_parameter VALUES (2, 2, 'clean_connec');
-INSERT INTO config_visit_parameter_x_parameter VALUES (4, 6, 'clean_arc');
-INSERT INTO config_visit_parameter_x_parameter VALUES (5, 2, 'sediments_connec');
-INSERT INTO config_visit_parameter_x_parameter VALUES (6, 6, 'sediments_arc');
-INSERT INTO config_visit_parameter_x_parameter VALUES (7, 5, 'defect_node');
-INSERT INTO config_visit_parameter_x_parameter VALUES (8, 5, 'clean_node');
-INSERT INTO config_visit_parameter_x_parameter VALUES (9, 1, 'leak_arc');
-INSERT INTO config_visit_parameter_x_parameter VALUES (10, 3, 'leak_node');
-INSERT INTO config_visit_parameter_x_parameter VALUES (11, 4, 'leak_connec');;
-INSERT INTO config_visit_parameter_x_parameter VALUES (3, 6, 'defect_arc');
-INSERT INTO config_visit_parameter_x_parameter VALUES (14, 2, 'defect_connec');
-
-SELECT setval('SCHEMA_NAME.om_visit_class_x_parameter_id_seq', (SELECT max(id) FROM config_visit_parameter_x_parameter), true);
+INSERT INTO config_visit_class_x_parameter VALUES (5, 'sediments_node');
+INSERT INTO config_visit_class_x_parameter VALUES (2, 'clean_connec');
+INSERT INTO config_visit_class_x_parameter VALUES (6, 'clean_arc');
+INSERT INTO config_visit_class_x_parameter VALUES (2, 'sediments_connec');
+INSERT INTO config_visit_class_x_parameter VALUES (6, 'sediments_arc');
+INSERT INTO config_visit_class_x_parameter VALUES (5, 'defect_node');
+INSERT INTO config_visit_class_x_parameter VALUES (5, 'clean_node');
+INSERT INTO config_visit_class_x_parameter VALUES (1, 'leak_arc');
+INSERT INTO config_visit_class_x_parameter VALUES (3, 'leak_node');
+INSERT INTO config_visit_class_x_parameter VALUES (4, 'leak_connec');;
+INSERT INTO config_visit_class_x_parameter VALUES (6, 'defect_arc');
+INSERT INTO config_visit_class_x_parameter VALUES (2, 'defect_connec');
 
 
 CREATE OR REPLACE VIEW ve_visit_noinfra AS 
@@ -85,7 +83,7 @@ CREATE OR REPLACE VIEW ve_visit_noinfra AS
            FROM crosstab('SELECT visit_id, om_visit_event.parameter_id, value 
       FROM om_visit LEFT JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id 
       LEFT JOIN om_visit_class on om_visit_class.id=om_visit.class_id
-      LEFT JOIN config_visit_parameter_x_parameter on config_visit_parameter_x_parameter.parameter_id=om_visit_event.parameter_id
+      LEFT JOIN config_visit_class_x_parameter on config_visit_class_x_parameter.parameter_id=om_visit_event.parameter_id
       where om_visit_class.ismultievent = TRUE ORDER  BY 1,2'::text, ' VALUES (''incident_type''),(''incident_comment'')'::text) ct(visit_id integer, param_1 text, param_2 text)) a ON a.visit_id = om_visit.id
   WHERE om_visit_class.ismultievent = true;
 
@@ -122,7 +120,7 @@ CREATE OR REPLACE VIEW ve_visit_arc_insp AS
            FROM crosstab('SELECT visit_id, om_visit_event.parameter_id, value 
       FROM om_visit LEFT JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id 
       LEFT JOIN om_visit_class on om_visit_class.id=om_visit.class_id
-      LEFT JOIN config_visit_parameter_x_parameter on config_visit_parameter_x_parameter.parameter_id=om_visit_event.parameter_id
+      LEFT JOIN config_visit_class_x_parameter on config_visit_class_x_parameter.parameter_id=om_visit_event.parameter_id
       where om_visit_class.ismultievent = TRUE ORDER  BY 1,2'::text, ' VALUES (''sediments_arc''),(''defect_arc''),(''clean_arc'')'::text) ct(visit_id integer, param_1 text, param_2 text, param_3 text)) a ON a.visit_id = om_visit.id
   WHERE om_visit_class.ismultievent = true;
 
@@ -158,7 +156,7 @@ CREATE OR REPLACE VIEW ve_visit_node_insp AS
            FROM crosstab('SELECT visit_id, om_visit_event.parameter_id, value 
       FROM om_visit LEFT JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id 
       LEFT JOIN om_visit_class on om_visit_class.id=om_visit.class_id
-      LEFT JOIN config_visit_parameter_x_parameter on config_visit_parameter_x_parameter.parameter_id=om_visit_event.parameter_id
+      LEFT JOIN config_visit_class_x_parameter on config_visit_class_x_parameter.parameter_id=om_visit_event.parameter_id
       where om_visit_class.ismultievent = TRUE ORDER  BY 1,2'::text, ' VALUES (''sediments_node''),(''defect_node''),(''clean_node'')'::text) ct(visit_id integer, param_1 text, param_2 text, param_3 text)) a ON a.visit_id = om_visit.id
   WHERE om_visit_class.ismultievent = true;
 
@@ -194,7 +192,7 @@ CREATE OR REPLACE VIEW ve_visit_connec_insp AS
            FROM crosstab('SELECT visit_id, om_visit_event.parameter_id, value 
       FROM om_visit LEFT JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id 
       LEFT JOIN om_visit_class on om_visit_class.id=om_visit.class_id
-      LEFT JOIN config_visit_parameter_x_parameter on config_visit_parameter_x_parameter.parameter_id=om_visit_event.parameter_id
+      LEFT JOIN config_visit_class_x_parameter on config_visit_class_x_parameter.parameter_id=om_visit_event.parameter_id
       where om_visit_class.ismultievent = TRUE ORDER  BY 1,2'::text, ' VALUES (''sediments_connec''),(''defect_connec''),(''clean_connec'')'::text) ct(visit_id integer, param_1 text, param_2 text, param_3 text)) a ON a.visit_id = om_visit.id
   WHERE om_visit_class.ismultievent = true;
 

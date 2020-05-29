@@ -7,6 +7,9 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+INSERT INTO sys_function VALUES (2888, 'gw_fct_fill_om_tables','ws','function','void','void','Create example visits (used on sample creation)','role_admin',false);
+INSERT INTO sys_function VALUES (2918, 'gw_fct_fill_doc_tables','ws','function','void','void','Create example documents (used on sample creation)','role_admin',false);
+
 UPDATE inp_shortpipe SET to_arc=null WHERE node_id='114254';
 
 INSERT INTO cat_users VALUES ('user1','user1');
@@ -573,13 +576,13 @@ ON CONFLICT (parameter, cur_user) DO NOTHING;
 
 UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'qgis_form_docker' AND cur_user = current_user;
 
-UPDATE presszone SET head=0, stylesheet='{}'  where id = '0';
-UPDATE presszone SET head=100, stylesheet='{"color":[251,181,174]}'  where id = '1';
-UPDATE presszone SET head=100, stylesheet='{"color":[179,205,227]}'  where id = '2';
-UPDATE presszone SET head=100, stylesheet='{"color":[204,235,197]}'  where id = '3';
-UPDATE presszone SET head=100, stylesheet='{"color":[222,203,228]}'  where id = '4';
-UPDATE presszone SET head=100, stylesheet='{"color":[254,217,166]}'  where id = '5';
-UPDATE presszone SET head=100, stylesheet='{"color":[255,255,204]}'  where id = '6';
+UPDATE presszone SET head=0, stylesheet='{}'  where presszone_id = '0';
+UPDATE presszone SET head=100, stylesheet='{"color":[251,181,174]}'  where presszone_id = '1';
+UPDATE presszone SET head=100, stylesheet='{"color":[179,205,227]}'  where presszone_id = '2';
+UPDATE presszone SET head=100, stylesheet='{"color":[204,235,197]}'  where presszone_id = '3';
+UPDATE presszone SET head=100, stylesheet='{"color":[222,203,228]}'  where presszone_id = '4';
+UPDATE presszone SET head=100, stylesheet='{"color":[254,217,166]}'  where presszone_id = '5';
+UPDATE presszone SET head=100, stylesheet='{"color":[255,255,204]}'  where presszone_id = '6';
 
 UPDATE dma SET stylesheet='{}'  where dma_id = 0;
 UPDATE dma SET stylesheet='{"color":[251,181,174]}'  where dma_id = 1;

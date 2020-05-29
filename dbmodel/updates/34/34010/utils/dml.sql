@@ -271,8 +271,6 @@ INSERT INTO sys_function VALUES (2908, 'gw_fct_pg2epa_vdefault','ud','function',
 INSERT INTO sys_function VALUES (2910, 'gw_fct_pg2epa_manage_varc','ud','function','character varying','json','Function to manage with virtual arcs on go2epa process','role_epa',false);
 INSERT INTO sys_function VALUES (2912, 'gw_fct_setvehicleload','utils','function','json','json','Function to set loads of vehicles (vehicle management)','role_om',false);
 INSERT INTO sys_function VALUES (2914, 'gw_fct_anl_node_proximity','utils','function','json','json','Function to identify nodes within certain buffer tolerance','role_edit',false);
-INSERT INTO sys_function VALUES (2916, 'gw_fct_fill_doc_tables','ud','function','void','void','Create example documents (used on sample creation)','role_admin',false);
-INSERT INTO sys_function VALUES (2918, 'gw_fct_fill_doc_tables','ws','function','void','void','Create example documents (used on sample creation)','role_admin',false);
 INSERT INTO sys_function VALUES (2858, 'gw_fct_pg2epa_check_result','ud','function','json','json','Function to check result data before inp file creation (it depends for each result)','role_epa',false);
 INSERT INTO sys_function VALUES (2860, 'gw_fct_pg2epa_check_options','ud','function','json','json','Function to check options before inp file creation (it depends for each result)','role_epa',false);
 INSERT INTO sys_function VALUES (2920, 'gw_fct_rpt2pg_import_rpt','ud','function','json','json','Function to import results','role_epa',false);

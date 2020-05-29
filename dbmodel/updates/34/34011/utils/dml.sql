@@ -239,3 +239,9 @@ UPDATE sys_table SET id = 'plan_price_cat' WHERE id = 'price_cat_simple';
 UPDATE sys_table SET id = 'plan_price' WHERE id = 'price_compost';
 UPDATE sys_table SET id = 'plan_price_compost' WHERE id ='price_compost_value';
 
+DELETE FROM sys_function WHERE function_name = 'gw_fct_fill_om_tables';
+DELETE FROM sys_function WHERE function_name = 'gw_fct_fill_doc_tables';
+
+
+UPDATE config_typevalue_fk SET target_table = 'config_visit_parameter' WHERE target_table = 'om_visit_parameter';
+UPDATE config_typevalue_fk SET target_table = 'config_addfields_parameter' WHERE target_table = 'man_addfields_parameter';

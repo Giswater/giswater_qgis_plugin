@@ -19,7 +19,6 @@ ALTER TABLE config_param_user DROP CONSTRAINT config_param_user_parameter_cur_us
 ALTER TABLE config_param_user ADD CONSTRAINT config_param_user_pkey PRIMARY KEY(parameter, cur_user);
 ALTER TABLE config_param_user DROP COLUMN id;
 
-
 DROP RULE IF EXISTS insert_plan_psector_x_node ON node;
 CREATE OR REPLACE RULE insert_plan_psector_x_node AS ON INSERT TO node
 WHERE new.state = 2 DO  INSERT INTO plan_psector_x_node (node_id, psector_id, state, doable)
@@ -46,7 +45,20 @@ ALTER TABLE om_visit_filetype_x_extension RENAME TO	config_filetype_x_extension;
 ALTER TABLE om_visit_parameter RENAME TO config_visit_parameter;
 ALTER TABLE price_cat_simple RENAME TO plan_price_cat;
 ALTER TABLE price_compost RENAME TO plan_price;
-ALTER TABLE plan_price_compost RENAME TO plan_price_compost;
+ALTER TABLE price_compost_value RENAME TO plan_price_compost;
+
+
+ALTER TABLE config_visit_parameter_x_parameter DROP CONSTRAINT om_visit_parameter_x_parameter_pkey;
+ALTER TABLE config_visit_parameter_x_parameter ADD CONSTRAINT config_visit_parameter_x_parameter_pkey PRIMARY KEY(parameter_id1, parameter_id2, action_type);
+ALTER TABLE config_visit_parameter_x_parameter DROP COLUMN pxp_id;
+
+ALTER TABLE config_visit_class_x_parameter DROP CONSTRAINT om_visit_class_x_parameter_pkey;
+ALTER TABLE config_visit_class_x_parameter ADD CONSTRAINT config_visit_class_x_parameter_pkey PRIMARY KEY(parameter_id, class_id);
+ALTER TABLE config_visit_class_x_parameter DROP COLUMN id;
+
+ALTER TABLE config_visit_class_x_workorder DROP CONSTRAINT om_visit_class_x_wo_pkey;
+ALTER TABLE config_visit_class_x_workorder ADD CONSTRAINT config_visit_class_x_workorder_pkey PRIMARY KEY(visitclass_id, wotype_id);
+ALTER TABLE config_visit_class_x_workorder DROP COLUMN id;
 
 
 

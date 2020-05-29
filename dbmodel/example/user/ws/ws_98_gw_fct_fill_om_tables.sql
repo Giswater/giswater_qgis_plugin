@@ -50,7 +50,7 @@ BEGIN
             INSERT INTO om_visit_x_node (visit_id, node_id) VALUES(id_last, rec_node.node_id);
 
             --Insert event 'inspection'
-            FOR rec_parameter IN SELECT * FROM om_visit_parameter WHERE parameter_type='INSPECTION' AND (feature_type = 'NODE' or feature_type = 'ALL')
+            FOR rec_parameter IN SELECT * FROM config_visit_parameter WHERE parameter_type='INSPECTION' AND (feature_type = 'NODE' or feature_type = 'ALL')
             LOOP
                 INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, xcoord, ycoord, compass) VALUES(id_last, now(), rec_parameter.id,'demo value','demo text'
                 ,st_x(rec_node.the_geom)::numeric(12,3), st_y(rec_node.the_geom)::numeric(12,3), ROUND(RANDOM()*360)) RETURNING id INTO id_event_last;
@@ -75,7 +75,7 @@ BEGIN
             INSERT INTO om_visit_x_arc (visit_id, arc_id) VALUES(id_last::int8, rec_arc.arc_id);
 
             --Insert event 'inspection'
-            FOR rec_parameter IN SELECT * FROM om_visit_parameter WHERE parameter_type='INSPECTION' AND (feature_type = 'ARC' or feature_type = 'ALL')
+            FOR rec_parameter IN SELECT * FROM config_visit_parameter WHERE parameter_type='INSPECTION' AND (feature_type = 'ARC' or feature_type = 'ALL')
             LOOP
                 INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, xcoord, ycoord, compass) VALUES(id_last, now(), rec_parameter.id,'demo value','demo text'
                 ,st_x(rec_node.the_geom)::numeric(12,3), st_y(rec_node.the_geom)::numeric(12,3), ROUND(RANDOM()*360)) RETURNING id INTO id_event_last;
@@ -87,7 +87,7 @@ BEGIN
             END LOOP;
 
             --Insert event 'rehabit'
-            FOR rec_parameter IN SELECT * FROM om_visit_parameter WHERE parameter_type='REHABIT' AND (feature_type = 'ARC' or feature_type = 'ALL')
+            FOR rec_parameter IN SELECT * FROM config_visit_parameter WHERE parameter_type='REHABIT' AND (feature_type = 'ARC' or feature_type = 'ALL')
             LOOP
                 INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, xcoord, ycoord, compass) VALUES(id_last, now(), rec_parameter.id,'demo value','demo text'
                 ,st_x(rec_node.the_geom)::numeric(12,3), st_y(rec_node.the_geom)::numeric(12,3), ROUND(RANDOM()*360)) RETURNING id INTO id_event_last;
@@ -109,7 +109,7 @@ BEGIN
             INSERT INTO om_visit_x_connec (visit_id, connec_id) VALUES(id_last, rec_connec.connec_id);
 
             --Insert event 'inspection'
-            FOR rec_parameter IN SELECT * FROM om_visit_parameter WHERE parameter_type='INSPECTION' AND (feature_type = 'CONNEC' or feature_type = 'ALL')
+            FOR rec_parameter IN SELECT * FROM config_visit_parameter WHERE parameter_type='INSPECTION' AND (feature_type = 'CONNEC' or feature_type = 'ALL')
             LOOP
                 INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, xcoord, ycoord, compass) VALUES(id_last, now(), rec_parameter.id,'demo value','demo text'
                 ,st_x(rec_node.the_geom)::numeric(12,3), st_y(rec_node.the_geom)::numeric(12,3), ROUND(RANDOM()*360)) RETURNING id INTO id_event_last;
