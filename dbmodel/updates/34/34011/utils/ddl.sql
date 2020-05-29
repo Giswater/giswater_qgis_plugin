@@ -36,3 +36,18 @@ DROP RULE IF EXISTS insert_plan_arc_x_pavement ON arc;
 CREATE OR REPLACE RULE insert_plan_arc_x_pavement AS ON INSERT TO arc DO  
 INSERT INTO plan_arc_x_pavement (arc_id, pavcat_id, percent) 
 VALUES (new.arc_id,  (SELECT value FROM config_param_user WHERE parameter='edit_pavementcat_vdefault' and cur_user="current_user"()LIMIT 1), '1'::numeric);
+
+
+ALTER TABLE man_addfields_parameter RENAME TO config_addfields_parameter;
+ALTER TABLE om_visit_parameter_x_parameter RENAME TO config_visit_parameter_x_parameter;
+ALTER TABLE om_visit_class_x_parameter RENAME TO config_visit_class_x_parameter;
+ALTER TABLE om_visit_class_x_wo RENAME TO config_visit_class_x_workorder;
+ALTER TABLE om_visit_filetype_x_extension RENAME TO	config_filetype_x_extension;
+ALTER TABLE om_visit_parameter RENAME TO config_visit_parameter;
+ALTER TABLE price_cat_simple RENAME TO plan_price_cat;
+ALTER TABLE price_compost RENAME TO plan_price;
+ALTER TABLE plan_price_compost RENAME TO plan_price_compost;
+
+
+
+

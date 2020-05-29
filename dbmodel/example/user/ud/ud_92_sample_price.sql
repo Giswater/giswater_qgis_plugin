@@ -81,15 +81,15 @@ INSERT INTO price_compost VALUES ('VIRTUAL_M2', 'm2', 'Null price for m2 virtual
 INSERT INTO price_compost VALUES ('VIRTUAL_M3', 'm3', 'Null price for m3 virtual elements', 'Null price for m3 virtual elements', 0, NULL);
 
 
-INSERT INTO price_compost_value VALUES (1, 'P_ASPHALT-10', 'F931201F', 0.2500);
-INSERT INTO price_compost_value VALUES (2, 'P_ASPHALT-10', 'F9H118E1', 0.1440);
-INSERT INTO price_compost_value VALUES (3, 'P_ASPHALT-10', 'F9H11251', 0.0960);
-INSERT INTO price_compost_value VALUES (4, 'P_ASPHALT-10', 'F9J12X40', 1.0000);
-INSERT INTO price_compost_value VALUES (5, 'P_ASPHALT-10', 'F9J13Y40', 1.0000);
-INSERT INTO price_compost_value VALUES (6, 'P_CONCRETE-20', 'F931201F', 0.2000);
-INSERT INTO price_compost_value VALUES (7, 'P_CONCRETE-20', 'F9G1A732', 0.2000);
-INSERT INTO price_compost_value VALUES (8, 'P_SLAB-4P', 'F9E1311N', 1.0000);
-INSERT INTO price_compost_value VALUES (9, 'P_SLAB-4P', 'F9265C51', 0.1000);
+INSERT INTO plan_price_compost VALUES (1, 'P_ASPHALT-10', 'F931201F', 0.2500);
+INSERT INTO plan_price_compost VALUES (2, 'P_ASPHALT-10', 'F9H118E1', 0.1440);
+INSERT INTO plan_price_compost VALUES (3, 'P_ASPHALT-10', 'F9H11251', 0.0960);
+INSERT INTO plan_price_compost VALUES (4, 'P_ASPHALT-10', 'F9J12X40', 1.0000);
+INSERT INTO plan_price_compost VALUES (5, 'P_ASPHALT-10', 'F9J13Y40', 1.0000);
+INSERT INTO plan_price_compost VALUES (6, 'P_CONCRETE-20', 'F931201F', 0.2000);
+INSERT INTO plan_price_compost VALUES (7, 'P_CONCRETE-20', 'F9G1A732', 0.2000);
+INSERT INTO plan_price_compost VALUES (8, 'P_SLAB-4P', 'F9E1311N', 1.0000);
+INSERT INTO plan_price_compost VALUES (9, 'P_SLAB-4P', 'F9265C51', 0.1000);
 
 
 INSERT INTO plan_psector_x_other VALUES (1, 'PROTECT_SERVICES', 41426.44, 1, NULL);

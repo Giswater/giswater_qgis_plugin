@@ -135,20 +135,20 @@ BEGIN
 
 					raise notice '4/addfields=1,v_man_fields,%',v_man_fields;	
 					--check and select the addfields if are already created
-					IF (SELECT count(id) FROM man_addfields_parameter WHERE (cat_feature_id=rec.id OR cat_feature_id IS NULL) and active is true ) != 0 THEN
+					IF (SELECT count(id) FROM config_addfields_parameter WHERE (cat_feature_id=rec.id OR cat_feature_id IS NULL) and active is true ) != 0 THEN
 						
-							IF (SELECT orderby FROM man_addfields_parameter WHERE cat_feature_id=rec.id limit 1) IS NULL THEN
+							IF (SELECT orderby FROM config_addfields_parameter WHERE cat_feature_id=rec.id limit 1) IS NULL THEN
 								v_orderby = 1;
-								FOR rec_orderby IN (SELECT * FROM man_addfields_parameter WHERE cat_feature_id=rec.id ORDER BY id) LOOP
-									UPDATE man_addfields_parameter SET orderby =v_orderby where id=rec_orderby.id;
+								FOR rec_orderby IN (SELECT * FROM config_addfields_parameter WHERE cat_feature_id=rec.id ORDER BY id) LOOP
+									UPDATE config_addfields_parameter SET orderby =v_orderby where id=rec_orderby.id;
 									v_orderby = v_orderby+1;
 								END LOOP;
 							END IF;
 
-							IF (SELECT orderby FROM man_addfields_parameter WHERE cat_feature_id IS NULL limit 1) IS NULL THEN
+							IF (SELECT orderby FROM config_addfields_parameter WHERE cat_feature_id IS NULL limit 1) IS NULL THEN
 								v_orderby = 10000;
-								FOR rec_orderby IN (SELECT * FROM man_addfields_parameter WHERE cat_feature_id IS NULL ORDER BY id) LOOP
-									UPDATE man_addfields_parameter SET orderby =v_orderby where id=rec_orderby.id;
+								FOR rec_orderby IN (SELECT * FROM config_addfields_parameter WHERE cat_feature_id IS NULL ORDER BY id) LOOP
+									UPDATE config_addfields_parameter SET orderby =v_orderby where id=rec_orderby.id;
 									v_orderby = v_orderby+1;
 								END LOOP;
 							END IF;
@@ -159,7 +159,7 @@ BEGIN
 							string_agg(concat('(''''',id,''''')'),',' order by orderby) as id_param,
 							string_agg(concat(param_name,' ', datatype_id),', ' order by orderby) as datatype
 							INTO v_created_addfields
-							FROM man_addfields_parameter WHERE  (cat_feature_id=rec.id OR cat_feature_id IS NULL) AND active IS TRUE;		
+							FROM config_addfields_parameter WHERE  (cat_feature_id=rec.id OR cat_feature_id IS NULL) AND active IS TRUE;		
 						
 
 						--create views with fields from parent table,man table and addfields 	
@@ -268,21 +268,21 @@ BEGIN
 
 				RAISE NOTICE 'v_man_fields,%',v_man_fields;
 				--check and select the addfields if are already created
-				IF (SELECT count(id) FROM man_addfields_parameter WHERE (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) and active is true ) != 0 THEN
+				IF (SELECT count(id) FROM config_addfields_parameter WHERE (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) and active is true ) != 0 THEN
 				raise notice '4/addfields=1,v_man_fields,%',v_man_fields;		
 					
-						IF (SELECT orderby FROM man_addfields_parameter WHERE cat_feature_id=v_cat_feature LIMIT 1) IS NULL THEN
+						IF (SELECT orderby FROM config_addfields_parameter WHERE cat_feature_id=v_cat_feature LIMIT 1) IS NULL THEN
 							v_orderby = 1;
-							FOR rec_orderby IN (SELECT * FROM man_addfields_parameter WHERE cat_feature_id=v_cat_feature ORDER BY id) LOOP
-								UPDATE man_addfields_parameter SET orderby =v_orderby where id=rec_orderby.id;
+							FOR rec_orderby IN (SELECT * FROM config_addfields_parameter WHERE cat_feature_id=v_cat_feature ORDER BY id) LOOP
+								UPDATE config_addfields_parameter SET orderby =v_orderby where id=rec_orderby.id;
 								v_orderby = v_orderby+1;
 							END LOOP;
 						END IF;
 
-						IF (SELECT orderby FROM man_addfields_parameter WHERE cat_feature_id IS NULL limit 1) IS NULL THEN
+						IF (SELECT orderby FROM config_addfields_parameter WHERE cat_feature_id IS NULL limit 1) IS NULL THEN
 							v_orderby = 10000;
-							FOR rec_orderby IN (SELECT * FROM man_addfields_parameter WHERE cat_feature_id IS NULL ORDER BY id) LOOP
-								UPDATE man_addfields_parameter SET orderby =v_orderby where id=rec_orderby.id;
+							FOR rec_orderby IN (SELECT * FROM config_addfields_parameter WHERE cat_feature_id IS NULL ORDER BY id) LOOP
+								UPDATE config_addfields_parameter SET orderby =v_orderby where id=rec_orderby.id;
 								v_orderby = v_orderby+1;
 							END LOOP;
 							raise notice 'v_orderby,%',v_orderby;
@@ -293,7 +293,7 @@ BEGIN
 						string_agg(concat('(''''',id,''''')'),',' order by orderby) as id_param,
 						string_agg(concat(param_name,' ', datatype_id),', ' order by orderby) as datatype
 						INTO v_created_addfields
-						FROM man_addfields_parameter WHERE  (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) AND active IS TRUE;	
+						FROM config_addfields_parameter WHERE  (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) AND active IS TRUE;	
 
 					
 					--create views with fields from parent table,man table and addfields 	

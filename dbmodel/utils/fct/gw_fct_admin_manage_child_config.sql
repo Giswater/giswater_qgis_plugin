@@ -138,7 +138,7 @@ BEGIN
 	END LOOP;
 
 	--select all already created addfields
-	v_man_addfields = 'SELECT * FROM man_addfields_parameter WHERE active = TRUE AND (cat_feature_id IS NULL OR cat_feature_id='''||v_cat_feature||''');';
+	v_man_addfields = 'SELECT * FROM config_addfields_parameter WHERE active = TRUE AND (cat_feature_id IS NULL OR cat_feature_id='''||v_cat_feature||''');';
 
 	--insert configuration for the addfields of the feature type
 	FOR rec IN EXECUTE v_man_addfields LOOP

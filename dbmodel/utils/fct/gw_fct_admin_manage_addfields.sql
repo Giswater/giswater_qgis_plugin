@@ -130,7 +130,7 @@ BEGIN
 	SELECT value::boolean INTO v_hide_form FROM config_param_user where parameter='qgis_form_log_hidden' AND cur_user=current_user;
 
 	-- get input parameters -,man_addfields
-	v_id = (SELECT nextval('SCHEMA_NAME.man_addfields_parameter_id_seq') +1);
+	v_id = (SELECT nextval('SCHEMA_NAME.config_addfields_parameter_id_seq') +1);
 
 	v_param_name = (((p_data ->>'data')::json->>'parameters')::json->>'column_id')::text; 
 	v_cat_feature = ((p_data ->>'feature')::json->>'catFeature')::text;
@@ -227,7 +227,7 @@ BEGIN
 	IF v_multi_create IS TRUE THEN
 	
 		IF v_action='UPDATE' THEN
-			v_update_old_datatype = (SELECT datatype_id FROM man_addfields_parameter WHERE param_name=v_param_name);
+			v_update_old_datatype = (SELECT datatype_id FROM config_addfields_parameter WHERE param_name=v_param_name);
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (118, null, 4, 'Update old parameter name.');
 		END IF;
@@ -246,7 +246,7 @@ BEGIN
 		FOR rec IN EXECUTE v_active_feature LOOP
 
 			IF v_action='UPDATE' THEN
-				UPDATE man_addfields_parameter SET datatype_id=v_update_old_datatype where param_name=v_param_name AND cat_feature_id IS NULL;
+				UPDATE config_addfields_parameter SET datatype_id=v_update_old_datatype where param_name=v_param_name AND cat_feature_id IS NULL;
 			END IF;
 		
 			-- get view name
@@ -278,14 +278,14 @@ BEGIN
 			v_feature_system_id  = (SELECT lower(system_id) FROM cat_feature where id=rec.id);
 
 			--get old values of addfields
-			IF (SELECT count(id) FROM man_addfields_parameter WHERE (cat_feature_id=rec.id OR cat_feature_id IS NULL) AND active IS TRUE) != 0 THEN
+			IF (SELECT count(id) FROM config_addfields_parameter WHERE (cat_feature_id=rec.id OR cat_feature_id IS NULL) AND active IS TRUE) != 0 THEN
 				IF v_action='CREATE' THEN
 					SELECT lower(string_agg(concat('a.',param_name),E',\n    ' order by orderby)) as a_param,
 					lower(string_agg(concat('ct.',param_name),E',\n            ' order by orderby)) as ct_param,
 					lower(string_agg(concat('(''''',id,''''')'),',' order by orderby)) as id_param,
 					lower(string_agg(concat(param_name,' ', datatype_id),', ' order by orderby)) as datatype
 					INTO v_old_parameters
-					FROM man_addfields_parameter WHERE  (cat_feature_id=rec.id OR cat_feature_id IS NULL) AND active IS TRUE and param_name!=v_param_name ;
+					FROM config_addfields_parameter WHERE  (cat_feature_id=rec.id OR cat_feature_id IS NULL) AND active IS TRUE and param_name!=v_param_name ;
 	
 				ELSE
 					SELECT lower(string_agg(concat('a.',param_name),E',\n    ' order by orderby)) as a_param,
@@ -293,27 +293,27 @@ BEGIN
 					lower(string_agg(concat('(''''',id,''''')'),',' order by orderby)) as id_param,
 					lower(string_agg(concat(param_name,' ', datatype_id),', ' order by orderby)) as datatype
 					INTO v_old_parameters
-					FROM man_addfields_parameter WHERE  (cat_feature_id=rec.id OR cat_feature_id IS NULL) AND active IS TRUE;
+					FROM config_addfields_parameter WHERE  (cat_feature_id=rec.id OR cat_feature_id IS NULL) AND active IS TRUE;
 				END IF;
 			END IF;
 
 			--modify the configuration of the parameters and fields in config_form_fields
-			IF v_action = 'CREATE' AND v_param_name not in (select param_name FROM man_addfields_parameter WHERE cat_feature_id IS NULL) THEN
+			IF v_action = 'CREATE' AND v_param_name not in (select param_name FROM config_addfields_parameter WHERE cat_feature_id IS NULL) THEN
 
-				IF (SELECT count(id) FROM man_addfields_parameter WHERE cat_feature_id IS NULL AND active IS TRUE) = 0 THEN
+				IF (SELECT count(id) FROM config_addfields_parameter WHERE cat_feature_id IS NULL AND active IS TRUE) = 0 THEN
 					v_orderby = 10000;
 				ELSE 
-					EXECUTE 'SELECT max(orderby) + 1 FROM man_addfields_parameter'
+					EXECUTE 'SELECT max(orderby) + 1 FROM config_addfields_parameter'
 					INTO v_orderby;
 				END IF;
 			
-				INSERT INTO man_addfields_parameter (param_name, cat_feature_id, is_mandatory, datatype_id, 
+				INSERT INTO config_addfields_parameter (param_name, cat_feature_id, is_mandatory, datatype_id, 
 				active, orderby, iseditable)
 				VALUES (v_param_name, NULL, v_ismandatory, v_add_datatype, v_active, v_orderby, v_iseditable)
 				RETURNING id INTO v_idaddparam;
 			
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (118, null, 4, 'Insert parameter definition into man_addfields_parameter.');
+				VALUES (118, null, 4, 'Insert parameter definition into config_addfields_parameter.');
 
 				SELECT max(layout_order) + 1 INTO v_param_user_id FROM sys_param_user WHERE layoutname='lyt_addfields';
 
@@ -334,12 +334,12 @@ BEGIN
 				END IF;
 
 			ELSIF v_action = 'UPDATE' THEN
-				UPDATE man_addfields_parameter SET  is_mandatory=v_ismandatory, datatype_id=v_add_datatype,
+				UPDATE config_addfields_parameter SET  is_mandatory=v_ismandatory, datatype_id=v_add_datatype,
 				active=v_active, orderby=v_orderby, iseditable=v_iseditable 
 				WHERE param_name=v_param_name and cat_feature_id IS NULL;
 
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (118, null, 4, 'Update parameter definition in man_addfields_parameter.');
+				VALUES (118, null, 4, 'Update parameter definition in config_addfields_parameter.');
 
 				UPDATE sys_param_user SET datatype = v_audit_datatype, widgettype=v_audit_widgettype, dv_querytext = v_dv_querytext,
 				dv_querytext_filterc = v_dv_querytext_filterc WHERE id = concat('edit_addfield_p', v_idaddparam,'_vdefault');
@@ -405,14 +405,14 @@ BEGIN
 				lower(string_agg(concat('(''''',id,''''')'),',' order by orderby)) as id_param,
 				lower(string_agg(concat(param_name,' ', datatype_id),', ' order by orderby)) as datatype
 				INTO v_new_parameters
-				FROM man_addfields_parameter WHERE (cat_feature_id=rec.id OR cat_feature_id IS NULL) AND active IS TRUE AND param_name!=v_param_name;
+				FROM config_addfields_parameter WHERE (cat_feature_id=rec.id OR cat_feature_id IS NULL) AND active IS TRUE AND param_name!=v_param_name;
 			ELSE
 				SELECT lower(string_agg(concat('a.',param_name),E',\n    '  order by orderby)) as a_param,
 				lower(string_agg(concat('ct.',param_name),E',\n            ' order by orderby)) as ct_param,
 				lower(string_agg(concat('(''''',id,''''')'),',' order by orderby)) as id_param,
 				lower(string_agg(concat(param_name,' ', datatype_id),', ' order by orderby)) as datatype
 				INTO v_new_parameters
-				FROM man_addfields_parameter WHERE (cat_feature_id=rec.id OR cat_feature_id IS NULL) AND active IS TRUE;
+				FROM config_addfields_parameter WHERE (cat_feature_id=rec.id OR cat_feature_id IS NULL) AND active IS TRUE;
 				
 			END IF;
 
@@ -424,14 +424,14 @@ BEGIN
 				
 
 			--CREATE VIEW when the addfield is the 1st one for the  defined cat feature
-			IF (SELECT count(id) FROM man_addfields_parameter WHERE (cat_feature_id=rec.id OR cat_feature_id IS NULL) and active is true ) = 1 AND v_action = 'CREATE' THEN
+			IF (SELECT count(id) FROM config_addfields_parameter WHERE (cat_feature_id=rec.id OR cat_feature_id IS NULL) and active is true ) = 1 AND v_action = 'CREATE' THEN
 
 					SELECT lower(string_agg(concat('a.',param_name),',' order by orderby)) as a_param,
 						lower(string_agg(concat('ct.',param_name),',' order by orderby)) as ct_param,
 						lower(string_agg(concat('(''''',id,''''')'),',' order by orderby)) as id_param,
 						lower(string_agg(concat(param_name,' ', datatype_id),', ' order by orderby)) as datatype
 						INTO v_created_addfields
-						FROM man_addfields_parameter WHERE  (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) AND active IS TRUE;	
+						FROM config_addfields_parameter WHERE  (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) AND active IS TRUE;	
 						
 					IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND 
 						( v_feature_type='arc' OR v_feature_type='node')) THEN
@@ -529,10 +529,10 @@ BEGIN
 		END LOOP;
 
 		IF v_action='DELETE' THEN
-			EXECUTE 'DELETE FROM man_addfields_parameter WHERE param_name='''||v_param_name||''';';
+			EXECUTE 'DELETE FROM config_addfields_parameter WHERE param_name='''||v_param_name||''';';
 
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (118, null, 4, 'Delete values from man_addfields_parameter related to parameter.');
+			VALUES (118, null, 4, 'Delete values from config_addfields_parameter related to parameter.');
 
 			EXECUTE 'DELETE FROM config_form_fields WHERE column_id='''||v_param_name||'''and formtype=''feature'';' ;
 
@@ -540,17 +540,17 @@ BEGIN
 			VALUES (118, null, 4, 'Delete values from config_form_fields related to parameter.');
 
 		ELSIF v_action='UPDATE' THEN 
-			UPDATE man_addfields_parameter SET  is_mandatory=v_ismandatory, datatype_id=v_add_datatype,
+			UPDATE config_addfields_parameter SET  is_mandatory=v_ismandatory, datatype_id=v_add_datatype,
 			active=v_active, orderby=v_orderby WHERE param_name=v_param_name;		
 
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (118, null, 4, 'Update values of man_addfields_parameter related to parameter.');
+			VALUES (118, null, 4, 'Update values of config_addfields_parameter related to parameter.');
 		END IF;
 
 	--SIMPLE ADDFIELDS
 	ELSE
 	
-		SELECT max(orderby) INTO v_orderby FROM man_addfields_parameter WHERE cat_feature_id=v_cat_feature;
+		SELECT max(orderby) INTO v_orderby FROM config_addfields_parameter WHERE cat_feature_id=v_cat_feature;
 		IF v_orderby IS NULL THEN
 			v_orderby = 1;
 		ELSE
@@ -558,7 +558,7 @@ BEGIN
 		END IF;
 
 		--check if field order will overlap the existing field	
-		IF v_orderby IN (SELECT orderby FROM man_addfields_parameter WHERE cat_feature_id = v_cat_feature AND param_name!=v_param_name) THEN
+		IF v_orderby IN (SELECT orderby FROM config_addfields_parameter WHERE cat_feature_id = v_cat_feature AND param_name!=v_param_name) THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
 			"data":{"message":"3016", "function":"2690","debug_msg":null}}$$);' INTO v_audit_result;
 		END IF;
@@ -593,24 +593,24 @@ BEGIN
 		v_feature_system_id  = (SELECT lower(system_id) FROM cat_feature where id=v_cat_feature);
 
 		--get old values of addfields
-		IF (SELECT count(id) FROM man_addfields_parameter WHERE cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) != 0 THEN
+		IF (SELECT count(id) FROM config_addfields_parameter WHERE cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) != 0 THEN
 			SELECT lower(string_agg(concat('a.',param_name),E',\n    '  order by orderby)) as a_param,
 			lower(string_agg(concat('ct.',param_name),E',\n            ' order by orderby)) as ct_param,
 			lower(string_agg(concat('(''''',id,''''')'),',' order by orderby)) as id_param,
 			lower(string_agg(concat(param_name,' ', datatype_id),', ' order by orderby)) as datatype
 			INTO v_old_parameters
-			FROM man_addfields_parameter WHERE (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) AND active IS TRUE ;
+			FROM config_addfields_parameter WHERE (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) AND active IS TRUE ;
 		END IF;
 
 		--modify the configuration of the parameters and fields in config_form_fields
 		IF v_action = 'CREATE' THEN
-			INSERT INTO man_addfields_parameter (param_name, cat_feature_id, is_mandatory, datatype_id,
+			INSERT INTO config_addfields_parameter (param_name, cat_feature_id, is_mandatory, datatype_id,
 			active, orderby, iseditable)
 			VALUES (v_param_name, v_cat_feature, v_ismandatory, v_add_datatype,
 			v_active, v_orderby, v_iseditable) RETURNING id INTO v_idaddparam;
 			
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (118, null, 4, 'Insert parameter definition into man_addfields_parameter.');
+			VALUES (118, null, 4, 'Insert parameter definition into config_addfields_parameter.');
 
 			EXECUTE 'SELECT max(layout_order) + 1 FROM config_form_fields WHERE formname='''||v_viewname||'''
 			AND layoutname = ''lyt_data_1'';'
@@ -654,14 +654,14 @@ BEGIN
 			
 
 		ELSIF v_action = 'UPDATE' THEN
-			UPDATE man_addfields_parameter SET  is_mandatory=v_ismandatory, datatype_id=v_add_datatype,
+			UPDATE config_addfields_parameter SET  is_mandatory=v_ismandatory, datatype_id=v_add_datatype,
 			active=v_active, orderby=v_orderby,iseditable=v_iseditable 
 			WHERE param_name=v_param_name AND cat_feature_id=v_cat_feature;
 
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (118, null, 4, 'Update parameter definition in man_addfields_parameter.');
+			VALUES (118, null, 4, 'Update parameter definition in config_addfields_parameter.');
 			
-			IF (SELECT cat_feature_id FROM man_addfields_parameter WHERE param_name=v_param_name) IS NOT NULL THEN
+			IF (SELECT cat_feature_id FROM config_addfields_parameter WHERE param_name=v_param_name) IS NOT NULL THEN
 				UPDATE config_form_fields SET datatype=v_config_datatype,
 				widgettype=v_config_widgettype, label=v_label,
 				ismandatory=v_ismandatory, isparent=v_isparent, iseditable=v_iseditable, isautoupdate=v_isautoupdate, 
@@ -684,7 +684,7 @@ BEGIN
 			VALUES (118, null, 4, concat('Update definition of vdefault: ', concat('edit_addfield_p', v_idaddparam,'_vdefault'),'.'));
 
 		ELSIF v_action = 'DELETE' THEN
-			EXECUTE 'DELETE FROM man_addfields_parameter WHERE param_name='''||v_param_name||''' AND cat_feature_id='''||v_cat_feature||''';';
+			EXECUTE 'DELETE FROM config_addfields_parameter WHERE param_name='''||v_param_name||''' AND cat_feature_id='''||v_cat_feature||''';';
 
 			DELETE FROM sys_param_user WHERE id = concat('edit_addfield_p', v_idaddparam,'_vdefault');
 
@@ -704,7 +704,7 @@ BEGIN
 			lower(string_agg(concat('(''''',id,''''')'),',' order by orderby)) as id_param,
 			lower(string_agg(concat(param_name,' ', datatype_id),', ' order by orderby)) as datatype
 			INTO v_new_parameters
-			FROM man_addfields_parameter WHERE (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) AND active IS TRUE;
+			FROM config_addfields_parameter WHERE (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) AND active IS TRUE;
 			
 			--select columns from man_* table without repeating the identifier
 			EXECUTE 'SELECT DISTINCT string_agg(concat(''man_'||v_feature_system_id||'.'',column_name)::text,'', '')
@@ -713,7 +713,7 @@ BEGIN
 			INTO v_man_fields;
 
 			--CREATE VIEW when the addfield is the 1st one for the  defined cat feature
-		IF (SELECT count(id) FROM man_addfields_parameter WHERE (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) and active is true ) = 1 
+		IF (SELECT count(id) FROM config_addfields_parameter WHERE (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) and active is true ) = 1 
 		AND v_action = 'CREATE' THEN
 				
 				SELECT lower(string_agg(concat('a.',param_name),E',\n    ' order by orderby)) as a_param,
@@ -721,7 +721,7 @@ BEGIN
 					lower(string_agg(concat('(''''',id,''''')'),',' order by orderby)) as id_param,
 					lower(string_agg(concat(param_name,' ', datatype_id),', ' order by orderby)) as datatype
 					INTO v_created_addfields
-					FROM man_addfields_parameter WHERE  (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) AND active IS TRUE;	
+					FROM config_addfields_parameter WHERE  (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) AND active IS TRUE;	
 
 			IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND 
 				( v_feature_type='arc' OR v_feature_type='node')) THEN

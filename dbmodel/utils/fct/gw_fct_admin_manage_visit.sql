@@ -139,7 +139,7 @@ BEGIN
 
 	-- get input parameters -,man_addfields
 	v_schemaname = 'SCHEMA_NAME';
-	--v_id = (SELECT nextval('man_addfields_parameter_id_seq') +1);
+	--v_id = (SELECT nextval('config_addfields_parameter_id_seq') +1);
 
 	v_action = ((p_data ->>'data')::json->>'action')::text;
 	v_action_type = ((p_data ->>'data')::json->>'action_type')::text;
@@ -189,12 +189,12 @@ BEGIN
 	END IF;
 	
 	--capture current parameters related to the class
-	SELECT string_agg(concat('a.',config_visit_parameter.id),',' order by om_visit_parameter.id) as a_param,
-	string_agg(concat('ct.',om_visit_parameter.id),',' order by om_visit_parameter.id) as ct_param,
-	string_agg(concat('(''''',om_visit_parameter.id,''''')'),',' order by om_visit_parameter.id) as id_param,
-	string_agg(concat(om_visit_parameter.id,' ', lower(om_visit_parameter.data_type)),', ' order by om_visit_parameter.id) as datatype
+	SELECT string_agg(concat('a.',config_visit_parameter.id),',' order by config_visit_parameter.id) as a_param,
+	string_agg(concat('ct.',config_visit_parameter.id),',' order by config_visit_parameter.id) as ct_param,
+	string_agg(concat('(''''',config_visit_parameter.id,''''')'),',' order by config_visit_parameter.id) as id_param,
+	string_agg(concat(config_visit_parameter.id,' ', lower(config_visit_parameter.data_type)),', ' order by config_visit_parameter.id) as datatype
 	INTO v_old_parameters
-	FROM om_visit_parameter JOIN config_visit_parameter_x_parameter ON om_visit_parameter.id=config_visit_parameter_x_parameter.parameter_id
+	FROM config_visit_parameter JOIN config_visit_parameter_x_parameter ON config_visit_parameter.id=config_visit_parameter_x_parameter.parameter_id
 	WHERE class_id=v_class_id;
 
 	raise notice 'v_old_parameters,%,%',v_old_parameters,v_class_id;
@@ -202,8 +202,7 @@ BEGIN
 	--reset the value of sequence for tables where data will be inserted
 	PERFORM setval('SCHEMA_NAME.config_form_fields_id_seq', (SELECT max(id) FROM config_form_fields), true);
 	PERFORM setval('SCHEMA_NAME.om_visit_class_id_seq', (SELECT max(id) FROM om_visit_class), true);
---	PERFORM setval('SCHEMA_NAME.config_api_visit_id_seq', (SELECT max(id) FROM config_api_visit), true);
-	PERFORM setval('SCHEMA_NAME.om_visit_class_x_parameter_id_seq', (SELECT max(id) FROM config_visit_parameter_x_parameter), true);
+	PERFORM setval('SCHEMA_NAME.config_visit_class_x_parameter_id_seq', (SELECT max(id) FROM config_visit_parameter_x_parameter), true);
 
 IF v_action = 'CREATE' THEN
 	--insert new class and parameter
@@ -293,7 +292,7 @@ IF v_action = 'CREATE' THEN
 		END IF;
 
 		--insert new parameter
-		INSERT INTO om_visit_parameter(id, code, parameter_type, feature_type, data_type, descript, form_type, vdefault, ismultifeature, short_descript)
+		INSERT INTO config_visit_parameter(id, code, parameter_type, feature_type, data_type, descript, form_type, vdefault, ismultifeature, short_descript)
   	 	VALUES (v_param_name, v_code, v_parameter_type, upper(v_feature_system_id),v_data_type, v_descript, v_form_type, v_vdefault,
 		v_ismultifeature, v_short_descript);
 
@@ -302,7 +301,7 @@ IF v_action = 'CREATE' THEN
 		VALUES (v_class_id, v_param_name);
 
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (119, null, 4, concat('Insert parameter ',v_param_name,' into om_visit_parameter and relate it with class ',v_class_id,' in config_visit_parameter_x_parameter.'));
+		VALUES (119, null, 4, concat('Insert parameter ',v_param_name,' into config_visit_parameter and relate it with class ',v_class_id,' in config_visit_parameter_x_parameter.'));
 
 	    --add configuration of new parameters to config_form_fields
 		IF v_ismultievent = TRUE THEN
@@ -387,24 +386,24 @@ END IF;
 
 IF (v_action = 'UPDATE' OR v_action = 'DELETE') AND v_action_type = 'parameter' THEN
 		--capture old parameters related to the class
-		SELECT string_agg(concat('a.',om_visit_parameter.id),',' order by om_visit_parameter.id) as a_param,
-		string_agg(concat('ct.',om_visit_parameter.id),',' order by om_visit_parameter.id) as ct_param,
-		string_agg(concat('(''''',om_visit_parameter.id,''''')'),',' order by om_visit_parameter.id) as id_param,
-		string_agg(concat(om_visit_parameter.id,' ', lower(om_visit_parameter.data_type)),', ' order by om_visit_parameter.id) as datatype
+		SELECT string_agg(concat('a.',config_visit_parameter.id),',' order by config_visit_parameter.id) as a_param,
+		string_agg(concat('ct.',config_visit_parameter.id),',' order by config_visit_parameter.id) as ct_param,
+		string_agg(concat('(''''',config_visit_parameter.id,''''')'),',' order by config_visit_parameter.id) as id_param,
+		string_agg(concat(config_visit_parameter.id,' ', lower(config_visit_parameter.data_type)),', ' order by config_visit_parameter.id) as datatype
 		INTO v_old_parameters
-		FROM om_visit_parameter JOIN config_visit_parameter_x_parameter ON om_visit_parameter.id=config_visit_parameter_x_parameter.parameter_id
+		FROM config_visit_parameter JOIN config_visit_parameter_x_parameter ON config_visit_parameter.id=config_visit_parameter_x_parameter.parameter_id
 		WHERE class_id=v_class_id;
 
 END IF;
 
 IF v_action = 'UPDATE' AND v_action_type = 'parameter' THEN
 
-		UPDATE om_visit_parameter SET code = v_code, parameter_type = v_parameter_type, feature_type = upper(v_feature_system_id), data_type = v_data_type, 
+		UPDATE config_visit_parameter SET code = v_code, parameter_type = v_parameter_type, feature_type = upper(v_feature_system_id), data_type = v_data_type, 
   	 	descript = v_descript, form_type = v_form_type, vdefault = v_vdefault, short_descript = v_short_descript
   	 	WHERE id = v_param_name;
 	
 	 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (119, null, 4, concat('Update parameter definition in om_visit_parameter.'));
+		VALUES (119, null, 4, concat('Update parameter definition in config_visit_parameter.'));
  		
 		IF v_ismultievent = TRUE THEN
 			
@@ -433,10 +432,10 @@ ELSIF v_action = 'DELETE' AND v_action_type = 'parameter' THEN
 		IF (SELECT count(id) FROM om_visit_event WHERE parameter_id = v_param_name) = 0 THEN
 
 			DELETE FROM config_visit_parameter_x_parameter WHERE parameter_id = v_param_name;
-			DELETE FROM om_visit_parameter WHERE id = v_param_name;
+			DELETE FROM config_visit_parameter WHERE id = v_param_name;
 
 		 	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (119, null, 4, concat('Delete parameter definition from config_visit_parameter_x_parameter and om_visit_parameter.'));
+			VALUES (119, null, 4, concat('Delete parameter definition from config_visit_parameter_x_parameter and config_visit_parameter.'));
 
 			IF v_ismultievent = TRUE THEN
 			raise notice 'multi_delete';
@@ -465,7 +464,7 @@ ELSIF v_action = 'DELETE' AND v_action_type = 'class' THEN
 			DELETE FROM config_form_fields WHERE formtype='visit' and formname IN (SELECT formname FROM config_api_visit WHERE visitclass_id = v_class_id);
 			DELETE FROM config_api_visit WHERE visitclass_id = v_class_id;
 			DELETE FROM config_visit_parameter_x_parameter WHERE class_id = v_class_id;
-			DELETE FROM om_visit_parameter WHERE id IN (SELECT parameter_id FROM config_visit_parameter_x_parameter WHERE class_id = v_class_id);
+			DELETE FROM config_visit_parameter WHERE id IN (SELECT parameter_id FROM config_visit_parameter_x_parameter WHERE class_id = v_class_id);
 			DELETE FROM om_visit_class WHERE id = v_class_id;
 			DELETE FROM sys_table WHERE id = v_viewname;			
 			
@@ -567,7 +566,7 @@ ELSIF v_action = 'CONFIGURATION' THEN
 		IF v_ismultievent = TRUE THEN
 
 			FOR rec IN 
-			(SELECT class_id, parameter_id, data_type  FROM config_visit_parameter_x_parameter JOIN om_visit_parameter ON om_visit_parameter.id = config_visit_parameter_x_parameter.parameter_id
+			(SELECT class_id, parameter_id, data_type  FROM config_visit_parameter_x_parameter JOIN config_visit_parameter ON config_visit_parameter.id = config_visit_parameter_x_parameter.parameter_id
 			WHERE class_id = v_class_id ) LOOP
 
 				EXECUTE 'SELECT max(layout_order) + 1 FROM config_form_fields WHERE formname='''||v_viewname||'''

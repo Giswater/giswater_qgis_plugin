@@ -44,7 +44,7 @@ CREATE OR REPLACE VIEW v_edit_dqa AS
    FROM selector_expl,dqa
   WHERE dqa.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
 
-
+DROP VIEW IF EXISTS v_edit_presszone;
 CREATE OR REPLACE VIEW v_edit_presszone AS 
  SELECT presszone.presszone_id,
     presszone.name,

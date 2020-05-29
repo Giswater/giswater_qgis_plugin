@@ -69,7 +69,7 @@ BEGIN
 
 	-- check if exits multiplier parameter (action type=1)
 	v_parameter = (SELECT parameter_id2 FROM om_visit_event JOIN config_visit_parameter_x_parameter ON parameter_id=parameter_id1
-		   JOIN om_visit_parameter ON parameter_id=om_visit_parameter.id WHERE visit_id=visit_id_aux AND action_type=1 AND feature_type='NODE' limit 1);
+		   JOIN config_visit_parameter ON parameter_id=config_visit_parameter.id WHERE visit_id=visit_id_aux AND action_type=1 AND feature_type='NODE' limit 1);
 	
 	v_visit_type = (SELECT visit_type FROM om_visit_class JOIN om_visit ON om_visit.class_id = om_visit_class.id WHERE om_visit.id = visit_id_aux);
 	
@@ -96,7 +96,7 @@ BEGIN
 			
 			-- insert parameters
 			FOR rec_parameter IN SELECT * FROM om_visit_event JOIN config_visit_parameter_x_parameter ON parameter_id=parameter_id1
-			JOIN om_visit_parameter ON parameter_id=om_visit_parameter.id WHERE visit_id=visit_id_aux AND action_type=1 AND feature_type='NODE'
+			JOIN config_visit_parameter ON parameter_id=config_visit_parameter.id WHERE visit_id=visit_id_aux AND action_type=1 AND feature_type='NODE'
 			LOOP 
 
 				
@@ -178,10 +178,10 @@ BEGIN
 
 		 -- check if exits sql sentence parameter related to the query text parameter (action type=4)
 		 IF (SELECT count(*) FROM om_visit_event JOIN config_visit_parameter_x_parameter ON parameter_id=parameter_id1
-			JOIN om_visit_parameter ON parameter_id=om_visit_parameter.id WHERE visit_id=visit_id_aux AND action_type=4 AND feature_type='NODE')>0  THEN
+			JOIN config_visit_parameter ON parameter_id=config_visit_parameter.id WHERE visit_id=visit_id_aux AND action_type=4 AND feature_type='NODE')>0  THEN
 
 			FOR rec_parameter IN SELECT * FROM om_visit_event JOIN config_visit_parameter_x_parameter ON parameter_id=parameter_id1
-			JOIN om_visit_parameter ON parameter_id=om_visit_parameter.id WHERE visit_id=visit_id_aux AND action_type=4 AND feature_type='NODE'
+			JOIN config_visit_parameter ON parameter_id=config_visit_parameter.id WHERE visit_id=visit_id_aux AND action_type=4 AND feature_type='NODE'
 			LOOP 
 			v_querytext:= rec_parameter.action_value||' WHERE node_id= '||quote_literal(node_id_aux);
 			IF v_querytext IS NOT NULL THEN
@@ -195,10 +195,10 @@ BEGIN
 		-- check if exits price parameter related to the price parameter (action type=5)
 			-- check if exits price parameter related to the price parameter (action type=5)
 		 IF (SELECT count(*) FROM om_visit_event JOIN config_visit_parameter_x_parameter ON parameter_id=parameter_id1
-			JOIN om_visit_parameter ON parameter_id=om_visit_parameter.id WHERE visit_id=visit_id_aux AND (action_type=5 OR action_type=4) AND feature_type='NODE')>0  THEN
+			JOIN config_visit_parameter ON parameter_id=config_visit_parameter.id WHERE visit_id=visit_id_aux AND (action_type=5 OR action_type=4) AND feature_type='NODE')>0  THEN
 
 			FOR rec_parameter IN SELECT * FROM om_visit_event JOIN config_visit_parameter_x_parameter ON parameter_id=parameter_id1
-			JOIN om_visit_parameter ON parameter_id=om_visit_parameter.id WHERE visit_id=visit_id_aux AND (action_type=5 OR action_type=4) AND feature_type='NODE'
+			JOIN config_visit_parameter ON parameter_id=config_visit_parameter.id WHERE visit_id=visit_id_aux AND (action_type=5 OR action_type=4) AND feature_type='NODE'
 
 			LOOP
 				IF rec_parameter.action_type=4 then
