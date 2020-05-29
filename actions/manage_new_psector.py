@@ -211,8 +211,8 @@ class ManageNewPsector(ParentManage):
             self.psector_id.setText(str(row['psector_id']))
             if str(row['ext_code']) != 'None':
                 self.ext_code.setText(str(row['ext_code']))
-            sql = (f"SELECT name FROM plan_psector_cat_type "
-                   f"WHERE id = {row['psector_type']}")
+            sql = (f"SELECT id, idval FROM plan_typevalue WHERE typevalue = 'psector_type' AND "
+                   f"id = {row['psector_type']}")
             result = self.controller.get_row(sql)
             utils_giswater.set_combo_itemData(self.cmb_psector_type, str(result['name']), 1)
             sql = (f"SELECT name FROM exploitation "

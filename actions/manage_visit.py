@@ -533,7 +533,7 @@ class ManageVisit(ParentManage, QObject):
 
         dialog.parameter_id.clear()
         sql = (f"SELECT id, descript "
-               f"FROM om_visit_parameter "
+               f"FROM config_visit_parameter "
                f"WHERE UPPER(parameter_type) = '{self.parameter_type_id.currentText().upper()}' ")
         if self.feature_type.currentText() != '':
             sql += f"AND UPPER(feature_type) = '{self.feature_type.currentText().upper()}' "
@@ -547,7 +547,7 @@ class ManageVisit(ParentManage, QObject):
         """ Get feature type of selected parameter """
 
         sql = (f"SELECT feature_type "
-               f"FROM om_visit_parameter "
+               f"FROM config_visit_parameter "
                f"WHERE descript = '{self.parameter_id.currentText()}'")
         row = self.controller.get_row(sql)
         if row:
@@ -852,7 +852,7 @@ class ManageVisit(ParentManage, QObject):
                 utils_giswater.set_combo_itemData(self.dlg_add_visit.visitcat_id, str(row[1]), 1)
 
         # Fill ComboBox status
-        rows = self.get_values_from_catalog('om_typevalue', 'visit_cat_status')
+        rows = self.get_values_from_catalog('om_typevalue', 'visit_status')
         if rows:
             utils_giswater.set_item_data(self.dlg_add_visit.status, rows, 1, sort_combo=True)
             if visit_id is not None:
@@ -874,9 +874,7 @@ class ManageVisit(ParentManage, QObject):
 
         # Event tab
         # Fill ComboBox parameter_type_id
-        sql = ("SELECT id, id "
-               "FROM om_visit_parameter_type "
-               "ORDER BY id")
+        sql = ("SELECT id, idval FROM om_typevalue WHERE typevalue = 'visit_param_type' ORDER by idval")
         parameter_type_ids = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_add_visit.parameter_type_id, parameter_type_ids, 1)
 
@@ -890,7 +888,7 @@ class ManageVisit(ParentManage, QObject):
         """ Fill combo parameter_id depending geom_type """
 
         sql = (f"SELECT id, descript "
-               f"FROM om_visit_parameter ")
+               f"FROM config_visit_parameter ")
         where = None
         parameter_type_id = utils_giswater.getWidgetText(self.dlg_add_visit, "parameter_type_id")
         if parameter_type_id:
@@ -969,7 +967,7 @@ class ManageVisit(ParentManage, QObject):
 
         # get form associated
         sql = (f"SELECT form_type"
-               f" FROM om_visit_parameter"
+               f" FROM config_visit_parameter"
                f" WHERE id = '{parameter_id}'")
         row = self.controller.get_row(sql)
         form_type = str(row[0])
@@ -1111,7 +1109,7 @@ class ManageVisit(ParentManage, QObject):
         file_dialog = QFileDialog()
         file_dialog.setFileMode(QFileDialog.Directory)
         # Get file types from catalog and populate QFileDialog filter
-        sql = "SELECT filetype, fextension FROM  om_visit_filetype_x_extension"
+        sql = "SELECT filetype, fextension FROM  config_filetype_x_extension"
         rows = self.controller.get_rows(sql)
         f_types = rows
         file_types = ""
@@ -1153,7 +1151,7 @@ class ManageVisit(ParentManage, QObject):
         """ Save new files into DataBase """
 
         if self.files_added:
-            sql = "SELECT filetype, fextension FROM om_visit_filetype_x_extension"
+            sql = "SELECT filetype, fextension FROM config_filetype_x_extension"
             f_types = self.controller.get_rows(sql)
             sql = ""
             for path in self.files_added:
@@ -1547,7 +1545,7 @@ class ManageVisit(ParentManage, QObject):
         feature_type = None
         sql = (f"SELECT visit_id, parameter_id, feature_type "
                f"FROM om_visit_event "
-               f"INNER JOIN om_visit_parameter ON parameter_id = om_visit_parameter.id "
+               f"INNER JOIN config_visit_parameter ON parameter_id = config_visit_parameter.id "
                f"WHERE visit_id = {visit_id}")
         row = self.controller.get_row(sql, log_sql=True)
         if row:

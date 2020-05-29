@@ -272,9 +272,8 @@ class Master(ParentAction):
 
     def populate_cmb_result_type(self, combo, table_name, allow_nulls=True):
 
-        sql = (f"SELECT id, name"
-               f" FROM {table_name}"
-               f" ORDER BY name")
+        sql = (f"SELECT id, idval FROM plan_typevalue WHERE typevalue = 'result_type' "
+               f" ORDER BY idval")
         rows = self.controller.get_rows(sql)
         if not rows:
             return

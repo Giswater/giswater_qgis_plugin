@@ -18,7 +18,7 @@ from .table import Table, GenericDescriptor
 
 
 class OmVisitParameter(Table):
-    """ Class to serialize table 'om_visit_parameter' """
+    """ Class to serialize table 'config_visit_parameter' """
 
     id = GenericDescriptor(None)
     code = GenericDescriptor(None)
@@ -32,5 +32,5 @@ class OmVisitParameter(Table):
 
     def __init__(self, controller):
         """ Class constructor """          
-        Table.__init__(self, controller, 'om_visit_parameter', 'id')
+        Table.__init__(self, controller, 'config_visit_parameter', 'id')
         

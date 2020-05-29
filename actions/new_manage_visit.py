@@ -180,7 +180,7 @@ class ManageVisit(ParentManage, QObject):
                 utils_giswater.set_combo_itemData(self.dlg_add_visit.visitcat_id, str(row[1]), 1)
 
         # Fill ComboBox status
-        rows = self.get_values_from_catalog('om_typevalue', 'visit_cat_status')
+        rows = self.get_values_from_catalog('om_typevalue', 'visit_status')
         if rows:
             utils_giswater.set_item_data(self.dlg_add_visit.status, rows, 1, sort_combo=True)
             if visit_id is not None:
@@ -205,7 +205,7 @@ class ManageVisit(ParentManage, QObject):
         p_type_id = utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.parameter_type_id)
         self.dlg_add_visit.parameter_id.clear()
         sql = (f"SELECT id, parameter_type, feature_type, descript"
-               f" FROM om_visit_parameter"
+               f" FROM config_visit_parameter"
                f" WHERE UPPER (parameter_type) = '{p_type_id}'"   
                f" ORDER BY id;")
 

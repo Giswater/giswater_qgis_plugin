@@ -1878,7 +1878,7 @@ class UpdateSQL(ApiParent):
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         utils_giswater.set_item_data(self.dlg_manage_visit_class.feature_type, rows, 1)
 
-        sql = "SELECT id, id as idval FROM om_visit_type"
+        sql = "SELECT id, idval FROM om_typevalue WHERE typevalue ='visit_type'"
         rows = self.controller.get_rows(sql, log_sql=True)
         utils_giswater.set_item_data(self.dlg_manage_visit_class.visit_type, rows, 1)
 
@@ -1904,7 +1904,7 @@ class UpdateSQL(ApiParent):
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         utils_giswater.set_item_data(self.dlg_manage_visit_param.data_type, rows, 1)
 
-        sql = "SELECT id, id as idval FROM om_visit_parameter_form_type"
+        sql = "SELECT id, idval FROM om_typevalue WHERE typevalue = 'visit_form_type'"
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         utils_giswater.set_item_data(self.dlg_manage_visit_param.form_type, rows, 1)
 
@@ -3139,7 +3139,7 @@ class UpdateSQL(ApiParent):
 
         # Execute manage add fields function
         param_name = utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.column_id)
-        sql = (f"SELECT param_name FROM man_addfields_parameter "
+        sql = (f"SELECT param_name FROM config_addfields_parameter "
                f"WHERE param_name = '{param_name}'")
         row = self.controller.get_row(sql, log_sql=True)
 

@@ -582,10 +582,10 @@ class AddNewLot(ParentManage):
             if ot_result:
                 sql = ("SELECT DISTINCT(om_visit_class.id), om_visit_class.idval, feature_type, tablename "
                        " FROM om_visit_class"
-                       " INNER JOIN om_visit_class_x_wo "
-                       " ON om_visit_class_x_wo.visitclass_id = om_visit_class.id "
+                       " INNER JOIN om_visit_class_x_workorder "
+                       " ON om_visit_class_x_workorder.visitclass_id = om_visit_class.id "
                        " INNER JOIN config_api_visit "
-                       " ON config_api_visit.visitclass_id = om_visit_class_x_wo.visitclass_id "
+                       " ON config_api_visit.visitclass_id = om_visit_class_x_workorder.visitclass_id "
                        " WHERE ismultifeature is False AND feature_type IS NOT null")
             else:
                 sql = ("SELECT DISTINCT(id), idval, feature_type, tablename FROM om_visit_class"
@@ -1012,7 +1012,7 @@ class AddNewLot(ParentManage):
             if len(row) > 0:
                 standard_model.appendRow(item)
 
-        combo_values = self.get_values_from_catalog('om_typevalue', 'visit_cat_status')
+        combo_values = self.get_values_from_catalog('om_typevalue', 'visit_status')
         if combo_values is None:
             return
         self.put_combobox(self.dlg_lot.tbl_visit, rows, 'status', 15, combo_values)

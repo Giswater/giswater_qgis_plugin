@@ -397,7 +397,7 @@ class TmManageVisit(TmParentManage, QObject):
         """ Set parameter_id combo basing on current selections """
 
         sql = (f"SELECT id, descript"
-               f" FROM om_visit_parameter"
+               f" FROM config_visit_parameter"
                f" WHERE UPPER (parameter_type) = '{self.parameter_type_id.currentText().upper()}'"
                f" AND UPPER (feature_type) = '{self.feature_type.currentText().upper()}'"
                f" ORDER BY id")
@@ -562,7 +562,7 @@ class TmManageVisit(TmParentManage, QObject):
             return
 
         # get form associated
-        sql = (f"SELECT form_type FROM om_visit_parameter"
+        sql = (f"SELECT form_type FROM config_visit_parameter"
                f" WHERE id = '{parameter_id}'")
         row = self.controller.get_row(sql, commit=False)
         form_type = str(row[0])

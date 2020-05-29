@@ -1788,7 +1788,7 @@ class ApiCF(ApiParent, QObject):
         btn_open_visit_event.clicked.connect(self.open_visit_event)
 
         feature_type = {'arc_id': 'ARC', 'connec_id': 'CONNEC', 'gully_id': 'GULLY', 'node_id': 'NODE'}
-        table_name_event_id = "om_visit_parameter"
+        table_name_event_id = "config_visit_parameter"
 
         # Fill ComboBox event_id
         sql = (f"SELECT DISTINCT(id), id "
@@ -1967,7 +1967,7 @@ class ApiCF(ApiParent, QObject):
             return
 
         # Cascade filter
-        table_name_event_id = "om_visit_parameter"
+        table_name_event_id = "config_visit_parameter"
         event_type_value = utils_giswater.get_item_data(self.dlg_cf, self.dlg_cf.event_type, 0)
 
         feature_type = {'arc_id': 'ARC', 'connec_id': 'CONNEC', 'gully_id': 'GULLY', 'node_id': 'NODE'}
