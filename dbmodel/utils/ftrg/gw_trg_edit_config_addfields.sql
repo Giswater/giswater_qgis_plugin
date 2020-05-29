@@ -16,8 +16,8 @@ BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
-	-- config_addfields_parameter table
-	UPDATE config_addfields_parameter SET
+	-- sys_addfields table
+	UPDATE sys_addfields SET
 	num_decimals = NEW.num_decimals,
 	field_length = NEW.field_length,
 	orderby = NEW.addfield_order,

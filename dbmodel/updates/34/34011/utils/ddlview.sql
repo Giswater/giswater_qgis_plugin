@@ -94,8 +94,8 @@ CREATE OR REPLACE VIEW ve_config_sysfields AS
     cat_feature.id AS cat_feature_id
    FROM config_form_fields
      LEFT JOIN cat_feature ON cat_feature.child_layer::text = config_form_fields.formname::text
-  WHERE config_form_fields.formtype::text = 'feature'::text AND config_form_fields.formname::text <> 've_arc'::text AND config_form_fields.formname::text <> 've_node'::text AND config_form_fields.formname::text <> 've_connec'::text AND config_form_fields.formname::text <> 've_gully'::text AND NOT (config_form_fields.columnname::text IN ( SELECT config_addfields_parameter.param_name
-           FROM config_addfields_parameter));
+  WHERE config_form_fields.formtype::text = 'feature'::text AND config_form_fields.formname::text <> 've_arc'::text AND config_form_fields.formname::text <> 've_node'::text AND config_form_fields.formname::text <> 've_connec'::text AND config_form_fields.formname::text <> 've_gully'::text AND NOT (config_form_fields.columnname::text IN ( SELECT sys_addfields.param_name
+           FROM sys_addfields));
 
 
 CREATE TRIGGER gw_trg_edit_config_sysfields

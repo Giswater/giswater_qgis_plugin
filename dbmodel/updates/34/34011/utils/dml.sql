@@ -230,7 +230,7 @@ DELETE FROM config_form_fields WHERE formname IN ('exploitation', 'presszone');
 UPDATE config_form_fields SET formname = 'print' WHERE formname = 'printGeneric';
 
 
-UPDATE sys_table SET id = 'config_addfields_parameter' WHERE id = 'man_addfields_parameter';
+UPDATE sys_table SET id = 'sys_addfields' WHERE id = 'man_addfields_parameter';
 UPDATE sys_table SET id = 'config_visit_param_x_param', sys_sequence = null, sys_sequence_field = null WHERE id = 'om_visit_parameter_x_parameter';
 UPDATE sys_table SET id = 'config_visit_class_x_parameter' WHERE id = 'om_visit_class_x_parameter';
 UPDATE sys_table SET id = 'config_visit_class_x_workorder' WHERE id = 'om_visit_class_x_wo';
@@ -245,7 +245,7 @@ DELETE FROM sys_function WHERE function_name = 'gw_fct_fill_doc_tables';
 
 
 UPDATE config_typevalue_fk SET target_table = 'config_visit_parameter' WHERE target_table = 'om_visit_parameter';
-UPDATE config_typevalue_fk SET target_table = 'config_addfields_parameter' WHERE target_table = 'man_addfields_parameter';
+UPDATE config_typevalue_fk SET target_table = 'sys_addfields' WHERE target_table = 'man_addfields_parameter';
 
 
 UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'om_visit_parameter', 'config_visit_parameter') WHERE dv_querytext like '%om_visit_parameter%';

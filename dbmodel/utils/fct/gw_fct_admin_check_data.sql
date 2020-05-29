@@ -99,9 +99,9 @@ END IF;
 			END IF;
 
 			--check if all active addfields are present on the view
-			IF (SELECT count(param_name) FROM config_addfields_parameter WHERE cat_feature_id IS NULL OR cat_feature_id = rec.id) > 0 THEN
+			IF (SELECT count(param_name) FROM sys_addfields WHERE cat_feature_id IS NULL OR cat_feature_id = rec.id) > 0 THEN
 				
-				SELECT count(*), string_agg(param_name,',') INTO v_count, v_param_list FROM config_addfields_parameter 
+				SELECT count(*), string_agg(param_name,',') INTO v_count, v_param_list FROM sys_addfields 
 				WHERE active IS TRUE AND (cat_feature_id IS NULL OR cat_feature_id = rec.id)	
 				AND param_name NOT IN 
 				(SELECT column_name FROM information_schema.columns WHERE  table_schema = v_schemaname AND table_name = rec.child_layer);
@@ -254,8 +254,8 @@ END IF;
 	END IF;
 
 	--check if all addfields are defined in config_form_fields
-	SELECT count(*), string_agg(concat(child_layer,': ',param_name),',') INTO v_count, v_view_list FROM config_addfields_parameter 
-	JOIN cat_feature ON cat_feature.id=config_addfields_parameter.cat_feature_id
+	SELECT count(*), string_agg(concat(child_layer,': ',param_name),',') INTO v_count, v_view_list FROM sys_addfields 
+	JOIN cat_feature ON cat_feature.id=sys_addfields.cat_feature_id
 	WHERE active IS TRUE AND param_name not IN (SELECT columnname FROM config_form_fields JOIN cat_feature ON cat_feature.child_layer=formname);
 
 	IF v_count > 0 THEN

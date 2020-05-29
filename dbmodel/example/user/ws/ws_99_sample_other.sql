@@ -217,11 +217,11 @@ INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('shtvalve_param_1','4','
 SELECT setval('SCHEMA_NAME.config_typevalue_fk_id_seq', (SELECT max(id) FROM config_typevalue_fk), true);
 
 INSERT INTO config_typevalue_fk(typevalue_table, typevalue_name, target_table, target_field, parameter_id) 
-SELECT 'edit_typevalue','hydrant_param_1','man_addfields_value','value_param',id FROM config_addfields_parameter WHERE param_name='hydrant_param_1';
+SELECT 'edit_typevalue','hydrant_param_1','man_addfields_value','value_param',id FROM sys_addfields WHERE param_name='hydrant_param_1';
 INSERT INTO config_typevalue_fk(typevalue_table, typevalue_name, target_table, target_field, parameter_id) 
-SELECT 'edit_typevalue','shtvalve_param_1','man_addfields_value','value_param',id FROM config_addfields_parameter WHERE param_name='shtvalve_param_1';
+SELECT 'edit_typevalue','shtvalve_param_1','man_addfields_value','value_param',id FROM sys_addfields WHERE param_name='shtvalve_param_1';
 INSERT INTO config_typevalue_fk(typevalue_table, typevalue_name, target_table, target_field, parameter_id) 
-SELECT 'edit_typevalue','pressmeter_param_1','man_addfields_value','value_param',id FROM config_addfields_parameter WHERE param_name='pressmeter_param_1';
+SELECT 'edit_typevalue','pressmeter_param_1','man_addfields_value','value_param',id FROM sys_addfields WHERE param_name='pressmeter_param_1';
 
 -- rotate vnodes and connec labels
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_link_connecrotation_update', TRUE, current_user) ON CONFLICT (parameter, cur_user) DO NOTHING;

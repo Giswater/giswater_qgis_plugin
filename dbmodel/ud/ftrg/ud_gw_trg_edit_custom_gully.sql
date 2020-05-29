@@ -224,7 +224,7 @@ BEGIN
 		END IF;
 
 		-- man addfields insert
-		FOR v_addfields IN SELECT * FROM config_addfields_parameter WHERE cat_feature_id = v_customfeature OR cat_feature_id is null
+		FOR v_addfields IN SELECT * FROM sys_addfields WHERE cat_feature_id = v_customfeature OR cat_feature_id is null
 		LOOP
 			EXECUTE 'SELECT $1."' || v_addfields.param_name||'"'
 				USING NEW
@@ -315,7 +315,7 @@ BEGIN
         END IF;  
 
         	-- man addfields update
-		FOR v_addfields IN SELECT * FROM config_addfields_parameter WHERE cat_feature_id = v_customfeature OR cat_feature_id is null
+		FOR v_addfields IN SELECT * FROM sys_addfields WHERE cat_feature_id = v_customfeature OR cat_feature_id is null
 		LOOP
 		
 			EXECUTE 'SELECT $1."' || v_addfields.param_name||'"'

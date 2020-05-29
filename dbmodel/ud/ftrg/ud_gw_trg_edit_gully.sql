@@ -467,7 +467,7 @@ BEGIN
 
 		-- man addfields insert
 		IF v_customfeature IS NOT NULL THEN
-			FOR v_addfields IN SELECT * FROM config_addfields_parameter
+			FOR v_addfields IN SELECT * FROM sys_addfields
 			WHERE (cat_feature_id = v_customfeature OR cat_feature_id is null) AND active IS TRUE AND iseditable IS TRUE
 			LOOP
 				EXECUTE 'SELECT $1."' || v_addfields.param_name||'"'
@@ -661,7 +661,7 @@ BEGIN
 
 		-- man addfields update
 		IF v_customfeature IS NOT NULL THEN
-			FOR v_addfields IN SELECT * FROM config_addfields_parameter
+			FOR v_addfields IN SELECT * FROM sys_addfields
 			WHERE (cat_feature_id = v_customfeature OR cat_feature_id is null) AND active IS TRUE AND iseditable IS TRUE
 			LOOP
 
@@ -703,7 +703,7 @@ BEGIN
 
         --Delete addfields
   		DELETE FROM man_addfields_value WHERE feature_id = OLD.gully_id  and parameter_id in 
-  		(SELECT id FROM config_addfields_parameter WHERE cat_feature_id IS NULL OR cat_feature_id =OLD.gully_type);
+  		(SELECT id FROM sys_addfields WHERE cat_feature_id IS NULL OR cat_feature_id =OLD.gully_type);
 
 	-- delete links & vnode's
 	FOR v_record_link IN SELECT * FROM link WHERE feature_type='GULLY' AND feature_id=OLD.gully_id

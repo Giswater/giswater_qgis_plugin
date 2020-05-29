@@ -150,7 +150,7 @@ BEGIN
 
             --Compare addfields and assign them to new arc
             FOR rec_param IN SELECT DISTINCT parameter_id, param_name FROM man_addfields_value
-                JOIN config_addfields_parameter ON config_addfields_parameter.id = man_addfields_value.parameter_id WHERE feature_id=v_my_record1.arc_id
+                JOIN sys_addfields ON sys_addfields.id = man_addfields_value.parameter_id WHERE feature_id=v_my_record1.arc_id
                 OR feature_id=v_my_record2.arc_id
             LOOP
 

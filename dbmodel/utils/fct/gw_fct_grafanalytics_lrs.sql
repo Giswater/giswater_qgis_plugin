@@ -322,7 +322,7 @@ BEGIN
 	
 			
 	-- update fields for node layers (value and header)
-	FOR rec IN execute 'SELECT * FROM cat_feature JOIN config_addfields_parameter on cat_feature_id=cat_feature.id
+	FOR rec IN execute 'SELECT * FROM cat_feature JOIN sys_addfields on cat_feature_id=cat_feature.id
  	WHERE param_name ='''|| v_valuefield||''''
 	LOOP
 		v_querytext =  'UPDATE '||rec.child_layer||' SET '||v_valuefield||' = a.descript::json->>''value'', '||v_headerfield||

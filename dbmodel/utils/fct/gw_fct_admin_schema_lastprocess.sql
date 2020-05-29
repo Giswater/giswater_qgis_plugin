@@ -184,12 +184,12 @@ BEGIN
 			
 		END IF;
 
-		ALTER TABLE config_addfields_parameter DROP COLUMN if exists _default_value_;
-		ALTER TABLE config_addfields_parameter DROP COLUMN if exists _form_label_;
-		ALTER TABLE config_addfields_parameter DROP COLUMN if exists _widgettype_id_;
-		ALTER TABLE config_addfields_parameter DROP COLUMN if exists _dv_table_;
-		ALTER TABLE config_addfields_parameter DROP COLUMN if exists _dv_key_column_;
-		ALTER TABLE config_addfields_parameter DROP COLUMN if exists _sql_text_;
+		ALTER TABLE sys_addfields DROP COLUMN if exists _default_value_;
+		ALTER TABLE sys_addfields DROP COLUMN if exists _form_label_;
+		ALTER TABLE sys_addfields DROP COLUMN if exists _widgettype_id_;
+		ALTER TABLE sys_addfields DROP COLUMN if exists _dv_table_;
+		ALTER TABLE sys_addfields DROP COLUMN if exists _dv_key_column_;
+		ALTER TABLE sys_addfields DROP COLUMN if exists _sql_text_;
 		
 		
 		-- inserting on config_param_system table
