@@ -22,8 +22,8 @@ BEGIN
 	-- Delete orphan nodes
 	IF (TG_OP = 'INSERT' AND  NEW.username !='{}') THEN
 
-		--Upsert values on config_exploitation_x_user according config_exploitation_x_user info
-		INSERT INTO config_exploitation_x_user (expl_id, username, manager_id)
+		--Upsert values on config_user according config_user info
+		INSERT INTO config_user (expl_id, username, manager_id)
 		SELECT expl, usern, NEW.id  FROM (SELECT unnest(expl_id) expl FROM cat_manager WHERE id=NEW.id) p CROSS JOIN 
 		(SELECT unnest(username) usern FROM cat_manager WHERE id=NEW.id) q ON CONFLICT (expl_id,username) DO NOTHING;
 			
@@ -31,10 +31,10 @@ BEGIN
 		
 	ELSIF TG_OP = 'UPDATE'THEN
 		
-		--if username was empty insert config_exploitation_x_user or combinations for this manager 
+		--if username was empty insert config_user or combinations for this manager 
 		IF OLD.username ='{}' THEN
 
-			INSERT INTO config_exploitation_x_user (expl_id, username, manager_id)
+			INSERT INTO config_user (expl_id, username, manager_id)
 			SELECT expl, usern, NEW.id  FROM (SELECT unnest(expl_id) expl FROM cat_manager WHERE id=NEW.id) p CROSS JOIN 
 			(SELECT unnest(username) usern FROM cat_manager WHERE id=NEW.id) q ON CONFLICT (expl_id,username) DO NOTHING;
 		
@@ -51,18 +51,18 @@ BEGIN
 						
 						--if there is a different manager with the same expl assigned change the manager_id and maintain relation
 						--if not, remove it	
-						IF (SELECT count(*) FROM config_exploitation_x_user WHERE username=rec_user and expl_id=rec_expl) > 0 THEN
+						IF (SELECT count(*) FROM config_user WHERE username=rec_user and expl_id=rec_expl) > 0 THEN
 
-							UPDATE config_exploitation_x_user set manager_id = v_new_id WHERE username=rec_user and expl_id=rec_expl;
+							UPDATE config_user set manager_id = v_new_id WHERE username=rec_user and expl_id=rec_expl;
 						END IF;
 					ELSE
-						DELETE FROM config_exploitation_x_user WHERE rec_user=username and expl_id=rec_expl and manager_id=NEW.id;
+						DELETE FROM config_user WHERE rec_user=username and expl_id=rec_expl and manager_id=NEW.id;
 					END IF;
 				END LOOP;
 			END LOOP;
-		--if user was added insetr new relation into config_exploitation_x_user
+		--if user was added insetr new relation into config_user
 		ELSIF array_length(NEW.username,1) > array_length(OLD.username,1) then 
-			INSERT INTO config_exploitation_x_user (expl_id, username, manager_id)
+			INSERT INTO config_user (expl_id, username, manager_id)
 			SELECT expl, usern, NEW.id  FROM (SELECT unnest(expl_id) expl FROM cat_manager WHERE id=NEW.id) p CROSS JOIN 
 			(SELECT unnest(username) usern FROM cat_manager WHERE id=NEW.id) q ON CONFLICT (expl_id,username) DO NOTHING;
 		END IF;
@@ -78,19 +78,19 @@ BEGIN
 					
 						SELECT id INTO v_new_id FROM cat_manager WHERE rec_user = ANY(username) AND rec_expl::integer = ANY(expl_id);
 							
-						IF (SELECT count(*) FROM config_exploitation_x_user WHERE username=rec_user and expl_id=rec_expl) > 0 THEN
-							UPDATE config_exploitation_x_user set manager_id = v_new_id WHERE username=rec_user and expl_id=rec_expl;
+						IF (SELECT count(*) FROM config_user WHERE username=rec_user and expl_id=rec_expl) > 0 THEN
+							UPDATE config_user set manager_id = v_new_id WHERE username=rec_user and expl_id=rec_expl;
 						END IF;
 					ELSE
-						DELETE FROM config_exploitation_x_user WHERE rec_user=username and expl_id=rec_expl and manager_id=NEW.id;
+						DELETE FROM config_user WHERE rec_user=username and expl_id=rec_expl and manager_id=NEW.id;
 					END IF;
 				END LOOP;
 			END LOOP;
 
 		
-		--if exploitation was added insert new posible relations into config_exploitation_x_user
+		--if exploitation was added insert new posible relations into config_user
 		ELSIF array_length(NEW.expl_id,1) > array_length(OLD.expl_id,1) THEN 
-			INSERT INTO config_exploitation_x_user (expl_id, username, manager_id)
+			INSERT INTO config_user (expl_id, username, manager_id)
 			SELECT expl, usern, NEW.id  FROM (SELECT unnest(expl_id) expl FROM cat_manager WHERE id=NEW.id) p CROSS JOIN 
 			(SELECT unnest(username) usern FROM cat_manager WHERE id=NEW.id) q ON CONFLICT (expl_id,username) DO NOTHING;
 		END IF;
@@ -106,7 +106,7 @@ BEGIN
 					
 					SELECT id INTO v_new_id FROM cat_manager WHERE rec_user = ANY(username) AND rec_expl::integer = ANY(expl_id);
 							
-					INSERT INTO config_exploitation_x_user  (expl_id, username, manager_id)
+					INSERT INTO config_user  (expl_id, username, manager_id)
 					VALUES (rec_expl, rec_user, v_new_id) ON CONFLICT (expl_id, username) DO NOTHING;
 					
 					END IF;

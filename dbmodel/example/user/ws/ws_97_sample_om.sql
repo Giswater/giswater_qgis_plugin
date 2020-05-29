@@ -208,10 +208,10 @@ INSERT INTO om_typevalue VALUES ('incident_type', 3, 'Smells', NULL, NULL);
 INSERT INTO om_typevalue VALUES ('incident_type', 4, 'Noisy cover', NULL, NULL);
 INSERT INTO om_typevalue VALUES ('incident_type', 5, 'Others', NULL, NULL);
 
-truncate config_visit_x_feature;
-INSERT INTO config_visit_x_feature VALUES ('v_edit_arc', 1);
-INSERT INTO config_visit_x_feature VALUES ('v_edit_node', 5);
-INSERT INTO config_visit_x_feature VALUES ('v_edit_arc', 6);
-INSERT INTO config_visit_x_feature VALUES ('v_edit_node', 3);
-INSERT INTO config_visit_x_feature VALUES ('v_edit_connec', 4);
-INSERT INTO config_visit_x_feature VALUES ('v_edit_connec', 2);
+truncate config_visit_class_x_feature;
+INSERT INTO config_visit_class_x_feature VALUES ('v_edit_arc', 1);
+INSERT INTO config_visit_class_x_feature VALUES ('v_edit_node', 5);
+INSERT INTO config_visit_class_x_feature VALUES ('v_edit_arc', 6);
+INSERT INTO config_visit_class_x_feature VALUES ('v_edit_node', 3);
+INSERT INTO config_visit_class_x_feature VALUES ('v_edit_connec', 4);
+INSERT INTO config_visit_class_x_feature VALUES ('v_edit_connec', 2);

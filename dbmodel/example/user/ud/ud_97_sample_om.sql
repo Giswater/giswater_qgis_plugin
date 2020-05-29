@@ -71,15 +71,15 @@ INSERT INTO config_visit_class_x_parameter VALUES (7, 'clean_gully');
 INSERT INTO config_visit_class_x_parameter VALUES (7, 'smells_gully');
 
 
-truncate config_visit_x_feature;
-INSERT INTO config_visit_x_feature VALUES ('v_edit_arc', 1);
-INSERT INTO config_visit_x_feature VALUES ('v_edit_node', 5);
-INSERT INTO config_visit_x_feature VALUES ('v_edit_arc', 6);
-INSERT INTO config_visit_x_feature VALUES ('v_edit_node', 3);
-INSERT INTO config_visit_x_feature VALUES ('v_edit_connec', 4);
-INSERT INTO config_visit_x_feature VALUES ('v_edit_connec', 2);
-INSERT INTO config_visit_x_feature VALUES ('v_edit_gully', 8);
-INSERT INTO config_visit_x_feature VALUES ('v_edit_arc', 9);
+truncate config_visit_class_x_feature;
+INSERT INTO config_visit_class_x_feature VALUES ('v_edit_arc', 1);
+INSERT INTO config_visit_class_x_feature VALUES ('v_edit_node', 5);
+INSERT INTO config_visit_class_x_feature VALUES ('v_edit_arc', 6);
+INSERT INTO config_visit_class_x_feature VALUES ('v_edit_node', 3);
+INSERT INTO config_visit_class_x_feature VALUES ('v_edit_connec', 4);
+INSERT INTO config_visit_class_x_feature VALUES ('v_edit_connec', 2);
+INSERT INTO config_visit_class_x_feature VALUES ('v_edit_gully', 8);
+INSERT INTO config_visit_class_x_feature VALUES ('v_edit_arc', 9);
 
 
 CREATE OR REPLACE VIEW ve_visit_noinfra AS 

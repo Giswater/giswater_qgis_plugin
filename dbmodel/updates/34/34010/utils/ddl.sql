@@ -12,7 +12,7 @@ ALTER TABLE exploitation_x_user DROP CONSTRAINT exploitation_x_user_pkey;
 ALTER TABLE exploitation_x_user ADD CONSTRAINT exploitation_x_user_pkey PRIMARY KEY(expl_id, username);
 ALTER TABLE exploitation_x_user DROP CONSTRAINT exploitation_x_user_expl_username_unique;
 ALTER TABLE exploitation_x_user DROP COLUMN id;
-ALTER TABLE exploitation_x_user RENAME to config_exploitation_x_user;
+ALTER TABLE exploitation_x_user RENAME to config_user;
 
 ALTER TABLE sys_message DROP COLUMN message_type;
 

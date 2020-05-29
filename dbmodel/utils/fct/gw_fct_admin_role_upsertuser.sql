@@ -150,7 +150,7 @@ BEGIN
 				VALUES (1,'''||v_user_id||''') ON CONFLICT (state_id,cur_user) DO NOTHING';
 
 				EXECUTE 'INSERT INTO '||rec_schema||'.selector_expl (expl_id, cur_user) 
-				SELECT expl_id, '''||v_user_id||''' FROM '||rec_schema||'.config_exploitation_x_user 
+				SELECT expl_id, '''||v_user_id||''' FROM '||rec_schema||'.config_user 
 				WHERE username= '''||v_user_id||''' ON CONFLICT (expl_id,cur_user) DO NOTHING';
 	
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 

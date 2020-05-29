@@ -42,7 +42,7 @@ UPDATE config_csv SET functionname = 'gw_fct_utils_import_ui_xml' WHERE function
 UPDATE sys_function SET isdeprecated  = true WHERE id = 2502;
 
 INSERT INTO sys_table (id, context, descript, sys_role_id, sys_criticity, qgis_criticity,  isdeprecated)
-    VALUES ('config_visit_x_feature', 'visit', 'Table to configure visit class related to feature', 'role_om', 0, 0, false)
+    VALUES ('config_visit_class_x_feature', 'visit', 'Table to configure visit class related to feature', 'role_om', 0, 0, false)
     ON CONFLICT (id) DO NOTHING;
 
 UPDATE config_param_system SET value =

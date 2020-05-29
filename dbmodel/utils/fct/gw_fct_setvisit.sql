@@ -189,7 +189,7 @@ BEGIN
 		EXECUTE ('SELECT visit_id FROM ' || quote_ident(v_tablename) || ' WHERE visit_id = ' || quote_literal(v_id) || '') INTO v_ckeckchangeclass;
 		IF v_ckeckchangeclass IS NULL THEN
 			DELETE FROM om_visit_event WHERE visit_id = v_id;
-			INSERT INTO om_visit_event (parameter_id, visit_id) SELECT parameter_id, v_id FROM config_visit_param_x_param WHERE class_id=v_class;
+			INSERT INTO om_visit_event (parameter_id, visit_id) SELECT parameter_id, v_id FROM config_visit_parameter_action WHERE class_id=v_class;
 			UPDATE om_visit SET class_id=v_class WHERE id = v_id;
 		END IF;
 		

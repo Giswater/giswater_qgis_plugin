@@ -249,7 +249,7 @@ UPDATE config_form_fields SET formname = 'visit_manager' WHERE formname = 'visit
 
 UPDATE sys_table SET sys_sequence = null WHERE id like 'v_inp_vertice';
 
-UPDATE sys_table SET id = 'config_exploitation_x_user' WHERE id = 'exploitation_x_user';
+UPDATE sys_table SET id = 'config_user' WHERE id = 'exploitation_x_user';
 
 
 INSERT INTO sys_function VALUES (2116, 'gw_fct_audit_function','utils','function','void','void','Function to work with messages','role_basic',true);
@@ -478,7 +478,7 @@ UPDATE sys_message SET id = 3130 WHERE id = 100;
 DELETE FROM sys_function WHERE id = 2594;
 UPDATE sys_function SET input_params = 'json' WHERE id = 2820;
 
-UPDATE sys_table SET sys_sequence = null where id = 'config_exploitation_x_user';
+UPDATE sys_table SET sys_sequence = null where id = 'config_user';
 
 
 

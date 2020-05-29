@@ -231,10 +231,10 @@ UPDATE config_form_fields SET formname = 'print' WHERE formname = 'printGeneric'
 
 
 UPDATE sys_table SET id = 'sys_addfields' WHERE id = 'man_addfields_parameter';
-UPDATE sys_table SET id = 'config_visit_param_x_param', sys_sequence = null, sys_sequence_field = null WHERE id = 'om_visit_parameter_x_parameter';
+UPDATE sys_table SET id = 'config_visit_parameter_action', sys_sequence = null, sys_sequence_field = null WHERE id = 'om_visit_parameter_x_parameter';
 UPDATE sys_table SET id = 'config_visit_class_x_parameter' WHERE id = 'om_visit_class_x_parameter';
 UPDATE sys_table SET id = 'config_visit_class_x_workorder' WHERE id = 'om_visit_class_x_wo';
-UPDATE sys_table SET id = 'config_filetype_x_extension' WHERE id = 'om_visit_filetype_x_extension';
+UPDATE sys_table SET id = 'config_file' WHERE id = 'om_visit_filetype_x_extension';
 UPDATE sys_table SET id = 'config_visit_parameter' WHERE id = 'om_visit_parameter';
 UPDATE sys_table SET id = 'plan_price_cat' WHERE id = 'price_cat_simple';
 UPDATE sys_table SET id = 'plan_price' WHERE id = 'price_compost';
@@ -249,7 +249,7 @@ UPDATE config_typevalue_fk SET target_table = 'sys_addfields' WHERE target_table
 
 
 UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'om_visit_parameter', 'config_visit_parameter') WHERE dv_querytext like '%om_visit_parameter%';
-UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'om_visit_filetype_x_extension', 'config_filetype_x_extension') WHERE dv_querytext like '%visit_fil%';
+UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'om_visit_filetype_x_extension', 'config_file') WHERE dv_querytext like '%visit_fil%';
 UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'price_compost', 'plan_price') WHERE dv_querytext like '%price_compost%';
 UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'price_cat_simple', 'plan_price_cat') WHERE dv_querytext like '%price_cat_simple%';
 

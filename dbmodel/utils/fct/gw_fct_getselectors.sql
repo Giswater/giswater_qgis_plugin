@@ -94,7 +94,7 @@ BEGIN
 		v_typeaheadFilter = v_parameter_selector->>'typeaheadFilter';
 
 		IF v_selector = 'selector_expl' AND v_expl_x_user THEN
-			v_query_filteradd = concat (v_query_filteradd, ' AND expl_id IN (SELECT expl_id FROM config_exploitation_x_user WHERE username = current_user)');
+			v_query_filteradd = concat (v_query_filteradd, ' AND expl_id IN (SELECT expl_id FROM config_user WHERE username = current_user)');
 
 		END IF;
 

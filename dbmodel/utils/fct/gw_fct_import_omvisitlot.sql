@@ -43,8 +43,8 @@ BEGIN
 	-- get input parameter
 	v_featuretype = (SELECT csv2 FROM temp_csv2pg WHERE cur_user=current_user AND csv2pgcat_id=21 LIMIT 1);
 	v_featuretable = (SELECT tablename FROM config_api_visit WHERE visitclass_id=(SELECT csv3 FROM temp_csv2pg WHERE cur_user=current_user AND csv2pgcat_id=21 LIMIT 1)::integer);
-	v_parameter1 = (SELECT parameter_id FROM config_visit_param_x_param cxp JOIN config_api_visit cav ON cav.visitclass_id=cxp.class_id WHERE cav.tablename = v_featuretable LIMIT 1);
-	v_parameter2 = (SELECT parameter_id FROM config_visit_param_x_param cxp JOIN config_api_visit cav ON cav.visitclass_id=cxp.class_id WHERE cav.tablename = v_featuretable LIMIT 1 OFFSET 1);
+	v_parameter1 = (SELECT parameter_id FROM config_visit_parameter_action cxp JOIN config_api_visit cav ON cav.visitclass_id=cxp.class_id WHERE cav.tablename = v_featuretable LIMIT 1);
+	v_parameter2 = (SELECT parameter_id FROM config_visit_parameter_action cxp JOIN config_api_visit cav ON cav.visitclass_id=cxp.class_id WHERE cav.tablename = v_featuretable LIMIT 1 OFFSET 1);
 
 	-- manage log (fprocesscat 54)
 	DELETE FROM audit_check_data WHERE fprocesscat_id=54 AND cur_user=current_user;
