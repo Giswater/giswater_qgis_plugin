@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2736
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_set_delete_feature(json)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_set_delete_feature(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_feature_delete(p_data json)
 RETURNS json AS
 /*
