@@ -419,9 +419,8 @@ BEGIN
 		-- getting vdefault values
 		EXECUTE 'SELECT to_json(array_agg(row_to_json(a)))::text FROM (SELECT sys_param_user.id as parameter, feature_field_id as param, value::text AS vdef FROM sys_param_user 
 			JOIN config_param_user ON sys_param_user.id=parameter WHERE cur_user=current_user AND feature_field_id IS NOT NULL AND 
-			config_param_user.parameter NOT IN (''edit_enddate_vdefault'', ''statetype_plan_vdefault'', ''statetype_end_vdefault''))a'
+			config_param_user.parameter NOT IN (''edit_workcat_end_vdefault'', ''edit_enddate_vdefault''))a'
 			INTO v_values_array;
-
 
 		-- getting propierties from feature catalog value
 		SELECT (a->>'vdef'), (a->>'param') INTO v_catalog, v_catalogtype FROM json_array_elements(v_values_array) AS a 
@@ -548,11 +547,8 @@ BEGIN
 
 					v_querytext = 'SELECT value::text FROM sys_param_user JOIN config_param_user ON sys_param_user.id=parameter 
 					WHERE cur_user=current_user AND parameter = concat(''edit_statetype_'','||v_state_value||',''_vdefault'')';
-
-					raise notice 'v_querytext %', v_querytext;
 					
-					EXECUTE 'SELECT value::text FROM sys_param_user JOIN config_param_user ON sys_param_user.id=parameter 
-					WHERE cur_user=current_user AND parameter = concat(''edit_statetype_'','||v_state_value||',''_vdefault'')' INTO field_value;
+					EXECUTE v_querytext INTO field_value;
 							
 				-- rest (including addfields)
 				ELSE SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a WHERE (a->>'param') = (aux_json->>'column_id'); 

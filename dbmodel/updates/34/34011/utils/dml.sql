@@ -178,7 +178,7 @@ UPDATE sys_param_user SET id ='edit_nodecat_vdefault' WHERE id = 'nodecat_vdefau
 UPDATE sys_param_user SET id ='edit_noderotation_disable_update' WHERE id = 'edit_noderotation_update_dissbl';
 UPDATE sys_param_user SET id ='edit_nodetype_vdefault' WHERE id = 'nodetype_vdefault';
 UPDATE sys_param_user SET id ='edit_ownercat_vdefault' WHERE id = 'ownercat_vdefault';
-UPDATE sys_param_user SET id ='edit_pavement_vdefault' WHERE id = 'pavement_vdefault';
+UPDATE sys_param_user SET id ='edit_pavementcat_vdefault' WHERE id = 'pavementcat_vdefault';
 UPDATE sys_param_user SET id ='edit_sector_vdefault' WHERE id = 'sector_vdefault';
 UPDATE sys_param_user SET id ='edit_soilcat_vdefault' WHERE id = 'soilcat_vdefault';
 UPDATE sys_param_user SET id ='edit_state_vdefault' WHERE id = 'state_vdefault';

@@ -31,3 +31,8 @@ CREATE OR REPLACE RULE insert_plan_psector_x_arc AS ON INSERT TO arc
 WHERE new.state = 2 DO  INSERT INTO plan_psector_x_arc (arc_id, psector_id, state, doable)
 VALUES (new.arc_id, ( SELECT config_param_user.value::integer AS value FROM config_param_user
 WHERE config_param_user.parameter::text = 'plan_psector_vdefault'::text AND config_param_user.cur_user::name = "current_user"() LIMIT 1), 1, true);
+
+DROP RULE IF EXISTS insert_plan_arc_x_pavement ON arc;
+CREATE OR REPLACE RULE insert_plan_arc_x_pavement AS ON INSERT TO arc DO  
+INSERT INTO plan_arc_x_pavement (arc_id, pavcat_id, percent) 
+VALUES (new.arc_id,  (SELECT value FROM config_param_user WHERE parameter='edit_pavementcat_vdefault' and cur_user="current_user"()LIMIT 1), '1'::numeric);

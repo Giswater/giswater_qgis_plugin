@@ -109,7 +109,8 @@ DECLARE
 	v_status text;
 	v_message text;
 	v_hide_form boolean;	
-	v_version text;		
+	v_version text;	
+	v_idaddparam integer;
 
 BEGIN
 
@@ -308,7 +309,8 @@ BEGIN
 			
 				INSERT INTO man_addfields_parameter (param_name, cat_feature_id, is_mandatory, datatype_id, 
 				active, orderby, iseditable)
-				VALUES (v_param_name, NULL, v_ismandatory, v_add_datatype, v_active, v_orderby, v_iseditable);
+				VALUES (v_param_name, NULL, v_ismandatory, v_add_datatype, v_active, v_orderby, v_iseditable)
+				RETURING id ON v_idaddparam;
 			
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 				VALUES (118, null, 4, 'Insert parameter definition into man_addfields_parameter.');
@@ -319,15 +321,15 @@ BEGIN
 					v_param_user_id=1;
 				END IF;
 
-				IF concat(v_param_name,'_vdefault') NOT IN (SELECT id FROM sys_param_user) THEN
+				IF concat('edit_addfields_p', v_idaddparam,'_vdefault') NOT IN (SELECT id FROM sys_param_user) THEN
 					INSERT INTO sys_param_user (id, formname, descript, sys_role_id, label,  layoutname, layout_order,
 					project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated, dv_querytext, dv_querytext_filterc,feature_field_id, isenabled)
-					VALUES (concat(v_param_name,'_vdefault'),'config', concat('Default value of addfield ',v_param_name), 'role_edit', v_param_name,
+					VALUES (concat('edit_addfields_p', v_idaddparam,'_vdefault'),'config', concat('Default value of addfield ',v_param_name), 'role_edit', v_param_name,
 					'lyt_addfields', v_param_user_id, lower(v_project_type), false, false, v_audit_datatype, v_audit_widgettype, false, false,
 					v_dv_querytext, v_dv_querytext_filterc,v_param_name, true);
 		
 					INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-					VALUES (118, null, 4, concat('Create new vdefault: ', concat(v_param_name,'_vdefault')));
+					VALUES (118, null, 4, concat('Create new vdefault: ', concat('edit_addfields_p', v_idaddparam,'_vdefault')));
 			
 				END IF;
 
@@ -340,11 +342,11 @@ BEGIN
 				VALUES (118, null, 4, 'Update parameter definition in man_addfields_parameter.');
 
 				UPDATE sys_param_user SET datatype = v_audit_datatype, widgettype=v_audit_widgettype, dv_querytext = v_dv_querytext,
-				dv_querytext_filterc = v_dv_querytext_filterc WHERE id = concat(v_param_name,'_vdefault');
+				dv_querytext_filterc = v_dv_querytext_filterc WHERE id = concat('edit_addfields_p', v_idaddparam,'_vdefault');
 
 			
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (118, null, 4, concat('Update definition of vdefault: ', concat(v_param_name,'_vdefault')));
+				VALUES (118, null, 4, concat('Update definition of vdefault: ', concat('edit_addfields_p', v_idaddparam,'_vdefault')));
 
 			ELSIF v_action = 'DELETE' THEN
 
@@ -353,10 +355,10 @@ BEGIN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 				VALUES (118, null, 4, 'Delete values from config_form_fields related to parameter.');
 
-				DELETE FROM sys_param_user WHERE id = concat(v_param_name,'_vdefault');
+				DELETE FROM sys_param_user WHERE id = concat('edit_addfields_p', v_idaddparam,'_vdefault');
 
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-				VALUES (118, null, 4, concat('Delete definition of vdefault: ', concat(v_param_name,'_vdefault')));
+				VALUES (118, null, 4, concat('Delete definition of vdefault: ', concat('edit_addfields_p', v_idaddparam,'_vdefault')));
 
 			END IF;
 
@@ -396,7 +398,7 @@ BEGIN
 				VALUES (118, null, 4, 'Update parameter in config_form_fields.');
 			END IF;
 			
-				--get new values of addfields
+			--get new values of addfields
 			IF v_action='DELETE' THEN
 				SELECT lower(string_agg(concat('a.',param_name),E',\n    '  order by orderby)) as a_param,
 				lower(string_agg(concat('ct.',param_name),E',\n            ' order by orderby)) as ct_param,
@@ -421,7 +423,7 @@ BEGIN
 				INTO v_man_fields;
 				
 
-				--CREATE VIEW when the addfield is the 1st one for the  defined cat feature
+			--CREATE VIEW when the addfield is the 1st one for the  defined cat feature
 			IF (SELECT count(id) FROM man_addfields_parameter WHERE (cat_feature_id=rec.id OR cat_feature_id IS NULL) and active is true ) = 1 AND v_action = 'CREATE' THEN
 
 					SELECT lower(string_agg(concat('a.',param_name),',' order by orderby)) as a_param,
@@ -463,7 +465,6 @@ BEGIN
 				
 			--CREATE VIEW when the addfields don't exist (after delete)
 			ELSIF v_new_parameters is null THEN 
-
 
 				IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND 
 					( v_feature_type='arc' OR v_feature_type='node')) THEN
@@ -606,7 +607,7 @@ BEGIN
 			INSERT INTO man_addfields_parameter (param_name, cat_feature_id, is_mandatory, datatype_id,
 			active, orderby, iseditable)
 			VALUES (v_param_name, v_cat_feature, v_ismandatory, v_add_datatype,
-			v_active, v_orderby, v_iseditable);
+			v_active, v_orderby, v_iseditable) RETURNING id ON v_idaddparam;
 			
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (118, null, 4, 'Insert parameter definition into man_addfields_parameter.');
@@ -643,13 +644,13 @@ BEGIN
 
 			INSERT INTO sys_param_user (id, formname, descript, sys_role_id, label,  layoutname, layout_order, 
 			project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated,dv_querytext, dv_querytext_filterc, feature_field_id, isenabled)
-			VALUES (concat(v_param_name,'_',lower(v_cat_feature),'_vdefault'),'config', 
+			VALUES (concat('edit_addfields_p', v_idaddparam,,'_vdefault'),'config', 
 			concat('Default value of addfield ',v_param_name, ' for ', v_cat_feature), 
 			'role_edit', v_param_name, 'lyt_addfields', v_param_user_id, lower(v_project_type), false, false, v_audit_datatype, 
 			v_audit_widgettype, false, false, v_dv_querytext, v_dv_querytext_filterc, v_param_name, true);
 			
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (118, null, 4, concat('Create new vdefault: ', concat(v_param_name,'_',lower(v_cat_feature),'_vdefault'),'.'));
+			VALUES (118, null, 4, concat('Create new vdefault: ', concat('edit_addfields_p', v_idaddparam,,'_vdefault'),'.'));
 			
 
 		ELSIF v_action = 'UPDATE' THEN
@@ -677,15 +678,15 @@ BEGIN
 			END IF;
 
 			UPDATE sys_param_user SET datatype = v_audit_datatype, widgettype=v_audit_widgettype, dv_querytext = v_dv_querytext,
-			dv_querytext_filterc = v_dv_querytext_filterc WHERE id = concat(v_param_name,'_',lower(v_cat_feature),'_vdefault');
+			dv_querytext_filterc = v_dv_querytext_filterc WHERE id = concat('edit_addfields_p', v_idaddparam,,'_vdefault');
 
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (118, null, 4, concat('Update definition of vdefault: ', concat(v_param_name,'_',lower(v_cat_feature),'_vdefault'),'.'));
+			VALUES (118, null, 4, concat('Update definition of vdefault: ', concat('edit_addfields_p', v_idaddparam,'_vdefault'),'.'));
 
 		ELSIF v_action = 'DELETE' THEN
 			EXECUTE 'DELETE FROM man_addfields_parameter WHERE param_name='''||v_param_name||''' AND cat_feature_id='''||v_cat_feature||''';';
 
-			DELETE FROM sys_param_user WHERE id = concat(v_param_name,'_',lower(v_cat_feature),'_vdefault');
+			DELETE FROM sys_param_user WHERE id = concat('edit_addfields_p', v_idaddparam,'_vdefault');
 
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
 			VALUES (118, null, 4, 'Delete values from config_form_fields related to parameter.');
@@ -693,7 +694,7 @@ BEGIN
 			DELETE FROM config_form_fields WHERE formname=v_viewname AND column_id=v_param_name;
 
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (118, null, 4, concat('Delete definition of vdefault: ', concat(v_param_name,'_vdefault')));
+			VALUES (118, null, 4, concat('Delete definition of vdefault: ', concat('edit_addfields_p', v_idaddparam,'_vdefault')));
 
 		END IF;
 

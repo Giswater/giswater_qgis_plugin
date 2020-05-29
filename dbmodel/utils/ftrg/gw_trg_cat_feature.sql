@@ -98,12 +98,12 @@ BEGIN
 
 		-- insert parameter
 		IF TG_OP = 'UPDATE' THEN
-			DELETE FROM sys_param_user WHERE id = concat(lower(OLD.id),'_vdefault');        
+			DELETE FROM sys_param_user WHERE id = concat('feat_',lower(OLD.id),'_vdefault');        
 		END IF;
 
 		INSERT INTO sys_param_user(id, formname, descript, sys_role_id, label, isenabled, layoutname, layout_order, 
 		dv_querytext, feature_field_id, project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated, iseditable)
-		VALUES (concat(v_id,'_vdefault'),'config',concat ('Value default catalog for ',v_id,' cat_feature'), 'role_edit', concat ('Default catalog for ', v_id), true, v_layout ,v_layout_order,
+		VALUES (concat('feat_',v_id,'_vdefault'),'config',concat ('Value default catalog for ',v_id,' cat_feature'), 'role_edit', concat ('Default catalog for ', v_id), true, v_layout ,v_layout_order,
 		v_querytext, v_feature_field_id, lower(v_projecttype),false,false,'text', 'combo', true, false, true)
 		ON CONFLICT (id) DO NOTHING;
 	END IF;
@@ -206,7 +206,7 @@ BEGIN
 		DELETE FROM config_api_tableinfo_x_infotype where tableinfo_id=OLD.child_layer OR tableinfotype_id=OLD.child_layer;
 
 		-- delete sys_param_user parameters
-		DELETE FROM sys_param_user WHERE id = concat(lower(OLD.id),'_vdefault');
+		DELETE FROM sys_param_user WHERE id = concat('feat_',lower(OLD.id),'_vdefault');
 
 		RETURN NULL;
 
