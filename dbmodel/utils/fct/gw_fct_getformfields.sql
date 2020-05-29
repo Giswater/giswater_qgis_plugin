@@ -31,7 +31,7 @@ SELECT "SCHEMA_NAME".gw_fct_getformfields('visit_arc_insp', 'visit', 'data', NUL
 SELECT "SCHEMA_NAME".gw_fct_getformfields('go2epa', 'form', 'data', null, null, null, null, null, null,null)
 SELECT "SCHEMA_NAME".gw_fct_getformfields('ve_arc_conduit', 'feature', 'data', 've_arc_conduit', 'arc_id', '2001', NULL, 'SELECT', null, 9)
 SELECT "SCHEMA_NAME".gw_fct_getformfields('ve_arc_pipe', 'feature', NULL, NULL, NULL, NULL, NULL, 'INSERT', null, 9)
-SELECT "SCHEMA_NAME".gw_fct_getformfields( 'printGeneric', 'utils', 'data', null, null, null, null, 'SELECT', null, 3);
+SELECT "SCHEMA_NAME".gw_fct_getformfields( 'print', 'utils', 'data', null, null, null, null, 'SELECT', null, 3);
 
 PERFORM gw_fct_debug(concat('{"data":{"msg":"----> INPUT FOR gw_fct_getformfields: ", "variables":"',v_debug,'"}}')::json);
 PERFORM gw_fct_debug(concat('{"data":{"msg":"<---- OUTPUT FOR gw_fct_getformfields: ", "variables":"',v_debug,'"}}')::json);

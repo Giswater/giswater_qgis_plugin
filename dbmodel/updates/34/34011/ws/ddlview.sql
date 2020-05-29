@@ -46,8 +46,8 @@ CREATE OR REPLACE VIEW v_edit_dqa AS
 
 
 CREATE OR REPLACE VIEW v_edit_presszone AS 
- SELECT presszone.id,
-    presszone.descript,
+ SELECT presszone.presszone_id,
+    presszone.name,
     presszone.expl_id,
     presszone.the_geom,
     presszone.grafconfig::text AS grafconfig,

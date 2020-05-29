@@ -41,7 +41,7 @@ BEGIN
              ',"body":{"message":{}'||
 			',"data":{"mapzones":
 				[{"name":"sector", "idname": "sector_id", "layer":"v_edit_sector", "opacity":0.5, "values":' || v_sector ||'}'||
-				',{"name":"presszone", "idname": "id",  "layer":"v_edit_presszone", "opacity":0.5,  "values":' || v_presszone ||'}'||
+				',{"name":"presszone", "idname": "presszone_id",  "layer":"v_edit_presszone", "opacity":0.5,  "values":' || v_presszone ||'}'||
 				',{"name":"dma", "idname": "dma_id", "layer":"v_edit_dma", "opacity":0.5, "values":' || v_dma ||'}'||
 				',{"name":"dqa", "idname": "dqa_id", "layer":"v_edit_dqa", "opacity":0.5, "values":' || v_dqa ||'}'||
 				']}}'||

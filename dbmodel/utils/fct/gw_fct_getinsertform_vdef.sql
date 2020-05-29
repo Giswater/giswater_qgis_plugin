@@ -151,7 +151,7 @@ BEGIN
 			END IF;
 			
 			v_presszone := (SELECT row_to_json(a) FROM (SELECT "descript"::text FROM config_param_user 
-							JOIN presszone on presszone.id=value WHERE "parameter"='presszone_vdefault' AND cur_user=current_user)a);
+							JOIN presszone on presszone.presszone_id=value WHERE "parameter"='edit_presszone_vdefault' AND cur_user=current_user)a);
 			
 	ELSE 		
 			-- definition of variables
@@ -204,9 +204,9 @@ BEGIN
 
 	
 	-- state type
-	v_state_type := (SELECT "value"::integer FROM config_param_user WHERE "parameter"='statetype_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+	v_state_type := (SELECT "value"::integer FROM config_param_user WHERE "parameter"='edit_statetype_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 	IF v_state_type IS NULL THEN
-			v_state_type := (SELECT "value"::integer FROM config_param_user WHERE "parameter"='statetype_vdefault' LIMIT 1);
+			v_state_type := (SELECT "value"::integer FROM config_param_user WHERE "parameter"='edit_statetype_vdefault' LIMIT 1);
 			IF v_state_type IS NULL THEN 
 				v_state_type := (SELECT id FROM value_state_type WHERE state=1 LIMIT 1);
 			END IF;

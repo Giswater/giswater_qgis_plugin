@@ -30,15 +30,15 @@ BEGIN
 				RETURN NULL; 
             END IF;
 			
-		INSERT INTO presszone (id, descript, expl_id, the_geom, grafconfig, head, stylesheet)
-		VALUES (NEW.id, NEW.descript, expl_id_int, NEW.the_geom, NEW.grafconfig::json, NEW.head, NEW.stylesheet::json);
+		INSERT INTO presszone (presszone_id, name, expl_id, the_geom, grafconfig, head, stylesheet)
+		VALUES (NEW.presszone_id, NEW.name, expl_id_int, NEW.the_geom, NEW.grafconfig::json, NEW.head, NEW.stylesheet::json);
 
 		RETURN NEW;
 		
     ELSIF TG_OP = 'UPDATE' THEN
    	
 		UPDATE presszone
-		SET id=NEW.id, descript=NEW.descript, expl_id=NEW.expl_id, the_geom=NEW.the_geom, grafconfig=NEW.grafconfig::json, 
+		SET presszone_id=NEW.presszone_id, name=NEW.name, expl_id=NEW.expl_id, the_geom=NEW.the_geom, grafconfig=NEW.grafconfig::json,
 		head = NEW.head, stylesheet=NEW.stylesheet::json
 		WHERE id=NEW.id;
 		
@@ -46,7 +46,7 @@ BEGIN
 		
     ELSIF TG_OP = 'DELETE' THEN  
 	 
-		DELETE FROM presszone WHERE id = OLD.id;
+		DELETE FROM presszone WHERE presszone_id = OLD.presszone_id;
 		RETURN NULL;
      
 	END IF;

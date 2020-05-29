@@ -15,3 +15,6 @@ ALTER TABLE dma ADD COLUMN stylesheet json;
 ALTER TABLE presszone ADD COLUMN head numeric(12,2);
 ALTER TABLE presszone ADD COLUMN stylesheet json;
 ALTER TABLE dqa ADD COLUMN stylesheet json;
+
+ALTER TABLE presszone ALTER COLUMN id RENAME TO presszone_id;
+ALTER TABLE presszone ALTER COLUMN descrpit RENAME TO name;

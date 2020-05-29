@@ -202,7 +202,7 @@ BEGIN
 		v_fprocesscat_id=46;
 		v_table = 'presszone';
 		v_field = 'presszone_id';
-		v_fieldmp = 'id';
+		v_fieldmp = 'presszone_id';
 		v_visible_layer ='v_edit_presszone';
 		v_mapzonename = 'descript';
 			
@@ -507,8 +507,8 @@ BEGIN
 												
 						-- updat connec table
 						UPDATE v_edit_connec SET staticpressure = (head - elevation) FROM 
-							(SELECT connec_id, head, elevation FROM connec 
-							JOIN presszone ON id = presszone_id) a
+							(SELECT connec_id, head, elevation FROM connec
+							JOIN presszone USING (presszone_id)) a
 							WHERE v_edit_connec.connec_id=a.connec_id;
 					END IF;
 

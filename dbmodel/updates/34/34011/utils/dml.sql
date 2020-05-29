@@ -220,3 +220,10 @@ UPDATE sys_param_user SET widgettype = 'check' where id = 'utils_debug_mode';
 UPDATE sys_param_user SET layout_order=6 where id = 'edit_builtdate_vdefault';
 
 INSERT INTO sys_function VALUES (2928, 'gw_fct_getmazonestyle','utils','function','json','json','Function to get style from mapzones','role_basic',false);
+
+UPDATE config_form_fields SET dv_querytext = replace (dv_querytext, 'SELECT id, descript as idval FROM presszone', 
+'SELECT presszone_id as id , name as idval FROM presszone') where dv_querytext like '%FROM presszone%';
+UPDATE config_form_fields SET column_id = 'presszone_id' WHERE formname like '%presszone%' AND column_id ='id';
+DELETE FROM config_form_fields WHERE formname IN ('exploitation', 'presszone');
+UPDATE config_form_fields SET formname = 'print' WHERE formname = 'printGeneric';
+
