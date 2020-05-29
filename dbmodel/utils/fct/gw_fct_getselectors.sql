@@ -47,6 +47,8 @@ v_query_filteradd text;
 v_manageall boolean;
 v_typeaheadFilter text;
 v_expl_x_user boolean;
+v_filter text;
+v_filterstatus boolean;
 
 BEGIN
 
@@ -93,15 +95,30 @@ BEGIN
 
 		IF v_selector = 'selector_expl' AND v_expl_x_user THEN
 			v_query_filteradd = concat (v_query_filteradd, ' AND expl_id IN (SELECT expl_id FROM config_exploitation_x_user WHERE username = current_user)');
+
 		END IF;
 
-		-- Manage selectors list
-		IF v_selectors_list IS NULL THEN
+		-- Manage v_query_filter (using ids)
+		v_selectors_list := (((p_data ->> 'data')::json->>'selector_type')::json ->>(lower(v_aux_json->>'json_object_keys')))::json->>'ids';
+		v_selectors_list = replace(replace(v_selectors_list, '[', '('), ']', ')');
+		IF v_selectors_list IN (NULL, 'None') THEN
 			v_query_filter = '';
 		ELSIF v_selectors_list = '()' THEN
 			v_query_filter = ' AND ' || v_table_id || ' IN (-1) ';
 		ELSE
 			v_query_filter = ' AND ' || v_table_id || ' IN '|| v_selectors_list || ' ';
+		END IF;
+		
+		-- Manage v_queryfilter add (using filter)
+		IF query_filter is not NULL THEN
+			v_filterstatus = True;
+			-- amplify v_queryadd
+			v_filter := (((p_data ->> 'data')::json->>'selector_type')::json ->>(lower(v_aux_json->>'json_object_keys')))::json->>'filter';
+			v_filter := COALESCE(v_filter, '');
+			v_query_filteradd = concat (v_query_filteradd,' AND concat(',v_label ,') LIKE ''%', v_filter, '%''');
+			
+		ELSE
+			v_query_filteradd = '';
 		END IF;
 
 		IF v_query_filteradd IS NULL THEN v_query_filteradd ='' ; END IF;
@@ -109,6 +126,10 @@ BEGIN
 		RAISE NOTICE ' % % % % % % % % ', v_label, v_table_id, v_selector_id, v_table, v_selector_id, v_selector, v_query_filter, v_query_filteradd;
 
 		-- Get exploitations, selected and unselected with selectors list
+
+		v_query_filter := COALESCE(v_query_filter, '');
+		v_query_filteradd := COALESCE(v_query_filteradd, '');
+	
 		EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
 		SELECT concat(' || v_label || ') AS label, ' || v_table_id || '::text as widgetname, ''' || v_selector_id || ''' as column_id, ''check'' as type, ''boolean'' as "dataType", true as "value" 
 		FROM '|| v_table ||' WHERE ' || v_table_id || ' IN (SELECT ' || v_selector_id || ' FROM '|| v_selector ||' WHERE cur_user=' || quote_literal(current_user) || ') '|| v_query_filter ||' '
@@ -152,7 +173,8 @@ BEGIN
 	v_formTabs := v_formTabs ||']';
 
 	-- Check null
-	v_formTabs := COALESCE(v_formTabs, '[]');	
+	v_formTabs := COALESCE(v_formTabs, '[]');
+	v_manageall := COALESCE(v_manageall, FALSE);	
 
 	-- Return
 	IF v_firsttab IS FALSE THEN
@@ -162,10 +184,11 @@ BEGIN
 		', "message":"Not implemented"'||
 		'}')::json;
 	ELSE 
+
 		-- Return formtabs
 		RETURN ('{"status":"Accepted", "version":'||v_version||
 			',"body":{"message":{"priority":1, "text":"This is a test message"}'||
-			',"form":{"formName":"", "formLabel":"", "formText":""'|| 
+			',"form":{"formName":"", "formLabel":"", "formText":"", "formFilter":'||v_filterstatus||', "formCheckAll":'||v_manageall||''
 			',"formTabs":'||v_formTabs||
 			',"formActions":[]}'||
 			',"feature":{}'||
