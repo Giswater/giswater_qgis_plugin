@@ -87,11 +87,11 @@ class ApiDimensioning(ApiParent):
                 layout_list.append(layout)
 
             # Add widgets into layout
-                layout.addWidget(label, 0, field['layout_order'])
-                layout.addWidget(widget, 1, field['layout_order'])
+                layout.addWidget(label, 0, field['layoutorder'])
+                layout.addWidget(widget, 1, field['layoutorder'])
             if field['layoutname'] in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
-                layout.addWidget(label, 0, field['layout_order'])
-                layout.addWidget(widget, 1, field['layout_order'])
+                layout.addWidget(label, 0, field['layoutorder'])
+                layout.addWidget(widget, 1, field['layoutorder'])
             else:
                 self.put_widgets(self.dlg_dim, field, label, widget)
 

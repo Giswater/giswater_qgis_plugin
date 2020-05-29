@@ -1400,8 +1400,8 @@ class ApiParent(ParentAction):
         layout = dialog.findChild(QGridLayout, field['layoutname'])
         if layout is None:
             return
-        layout.addWidget(lbl, int(field['layout_order']), 0)
-        layout.addWidget(widget, int(field['layout_order']), 2)
+        layout.addWidget(lbl, int(field['layoutorder']), 0)
+        layout.addWidget(widget, int(field['layoutorder']), 2)
         layout.setColumnStretch(2, 1)
 
 
@@ -1727,7 +1727,7 @@ class ApiParent(ParentAction):
                     field['column_id'], form_tab['selectorType']))
                 widget.setLayoutDirection(Qt.RightToLeft)
                 field['layoutname'] = gridlayout.objectName()
-                field['layout_order'] = order
+                field['layoutorder'] = order
                 self.put_widgets(dialog, field, label, widget)
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
             gridlayout.addItem(vertical_spacer1)

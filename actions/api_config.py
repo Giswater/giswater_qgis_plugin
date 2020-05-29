@@ -438,23 +438,23 @@ class ApiConfig(ApiParent):
 
     def order_widgets(self, field, form, lbl, chk, widget):
 
-        form.addWidget(lbl, field['layout_order'], 0)
+        form.addWidget(lbl, field['layoutorder'], 0)
         if field['widgettype'] != 'check':
-            form.addWidget(chk, field['layout_order'], 1)
-            form.addWidget(widget, field['layout_order'], 2)
+            form.addWidget(chk, field['layoutorder'], 1)
+            form.addWidget(widget, field['layoutorder'], 2)
         else:
-            form.addWidget(chk, field['layout_order'], 1)
+            form.addWidget(chk, field['layoutorder'], 1)
 
 
     def order_widgets_system(self, field, form, lbl,  widget):
 
-        form.addWidget(lbl, field['layout_order'], 0)
+        form.addWidget(lbl, field['layoutorder'], 0)
         if field['widgettype'] == 'checkbox' or field['widgettype'] == 'check':
-            form.addWidget(widget, field['layout_order'], 2)
+            form.addWidget(widget, field['layoutorder'], 2)
         elif field['widgettype'] != 'checkbox' and field['widgettype'] != 'check':
-            form.addWidget(widget, field['layout_order'], 3)
+            form.addWidget(widget, field['layoutorder'], 3)
         else:
-            form.addWidget(widget, field['layout_order'], 1)
+            form.addWidget(widget, field['layoutorder'], 1)
 
 
     def get_values_checked_param_user(self, chk, widget, field, value=None):

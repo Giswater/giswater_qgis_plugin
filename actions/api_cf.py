@@ -488,11 +488,11 @@ class ApiCF(ApiParent, QObject):
                 if layout not in layout_list and layout.objectName() not in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
                     layout_list.append(layout)
                     # Add widgets into layout
-                    layout.addWidget(label, 0, field['layout_order'])
-                    layout.addWidget(widget, 1, field['layout_order'])
+                    layout.addWidget(label, 0, field['layoutorder'])
+                    layout.addWidget(widget, 1, field['layoutorder'])
                 if field['layoutname'] in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
-                    layout.addWidget(label, 0, field['layout_order'])
-                    layout.addWidget(widget, 1, field['layout_order'])
+                    layout.addWidget(label, 0, field['layoutorder'])
+                    layout.addWidget(widget, 1, field['layoutorder'])
                 else:
                     self.put_widgets(self.dlg_cf, field, label, widget)
 
@@ -2355,17 +2355,17 @@ class ApiCF(ApiParent, QObject):
             label, widget = self.set_widgets(dialog, complet_list, field)
             if widget is not None:
                 if (type(widget)) == QSpacerItem:
-                    rpt_layout1.addItem(widget, 1, field['layout_order'])
+                    rpt_layout1.addItem(widget, 1, field['layoutorder'])
                 elif (type(widget)) == QTableView:
                     gridLayout_7 = self.dlg_cf.findChild(QGridLayout, "gridLayout_7")
-                    gridLayout_7.addWidget(widget, 2, field['layout_order'])
+                    gridLayout_7.addWidget(widget, 2, field['layoutorder'])
                     widget_list.append(widget)
                 else:
                     widget.setMaximumWidth(150)
                     widget_list.append(widget)
                     if label:
-                        rpt_layout1.addWidget(label, 0, field['layout_order'])
-                    rpt_layout1.addWidget(widget, 1, field['layout_order'])
+                        rpt_layout1.addWidget(label, 0, field['layoutorder'])
+                    rpt_layout1.addWidget(widget, 1, field['layoutorder'])
 
             # Find combo parents:
             for field in complet_list[0]['body']['data']['fields'][0]:
@@ -2501,7 +2501,7 @@ class ApiCF(ApiParent, QObject):
                     if field['widgettype'] == 'formDivider':
                         for x in range(0, 2):
                             line = self.add_frame(field, x)
-                            plan_layout.addWidget(line, field['layout_order'], x)
+                            plan_layout.addWidget(line, field['layoutorder'], x)
                     else:
                         label = QLabel()
                         label.setTextInteractionFlags(Qt.TextSelectableByMouse)
@@ -2516,8 +2516,8 @@ class ApiCF(ApiParent, QObject):
                         widget = self.add_label(field)
                         widget.setAlignment(Qt.AlignRight)
                         label.setWordWrap(True)
-                        plan_layout.addWidget(label, field['layout_order'], 0)
-                        plan_layout.addWidget(widget, field['layout_order'], 1)
+                        plan_layout.addWidget(label, field['layoutorder'], 0)
+                        plan_layout.addWidget(widget, field['layoutorder'], 1)
 
                 plan_vertical_spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
                 plan_layout.addItem(plan_vertical_spacer)

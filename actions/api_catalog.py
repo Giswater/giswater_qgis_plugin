@@ -65,8 +65,8 @@ class ApiCatalog(ApiParent):
             if field['widgettype'] == 'combo':
                 widget = self.add_combobox(self.dlg_catalog, field)
             if field['layoutname'] == 'lyt_data_1':
-                self.filter_form.addWidget(label, field['layout_order'], 0)
-                self.filter_form.addWidget(widget, field['layout_order'], 1)
+                self.filter_form.addWidget(label, field['layoutorder'], 0)
+                self.filter_form.addWidget(widget, field['layoutorder'], 1)
 
         groupBox_1.setLayout(self.filter_form)
         main_layout.addWidget(groupBox_1)
