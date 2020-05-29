@@ -1109,7 +1109,7 @@ class ManageVisit(ParentManage, QObject):
         file_dialog = QFileDialog()
         file_dialog.setFileMode(QFileDialog.Directory)
         # Get file types from catalog and populate QFileDialog filter
-        sql = "SELECT filetype, fextension FROM  config_filetype_x_extension"
+        sql = "SELECT filetype, fextension FROM config_file"
         rows = self.controller.get_rows(sql)
         f_types = rows
         file_types = ""
@@ -1151,7 +1151,7 @@ class ManageVisit(ParentManage, QObject):
         """ Save new files into DataBase """
 
         if self.files_added:
-            sql = "SELECT filetype, fextension FROM config_filetype_x_extension"
+            sql = "SELECT filetype, fextension FROM config_file"
             f_types = self.controller.get_rows(sql)
             sql = ""
             for path in self.files_added:
