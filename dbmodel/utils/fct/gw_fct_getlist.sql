@@ -94,11 +94,9 @@ SELECT SCHEMA_NAME.gw_fct_getlist($${
 DECLARE
 	v_version text;
 	v_filter_fields  json[];
-	v_filter_fields_  json[];
 	v_footer_fields json[];
 	v_filter_feature json;
 	v_fields_json json;
-	v_fields_json_ json;
 	v_filter_values  json;
 	v_schemaname text;
 	aux_json json;
@@ -114,8 +112,6 @@ DECLARE
 	v_orderby varchar;
 	v_ordertype varchar;
 	v_limit integer;
-	v_filterlot integer;
-	v_filterteam integer;
 	v_offset integer;
 	v_currentpage integer;
 	v_lastpage integer;
@@ -144,9 +140,6 @@ DECLARE
 	v_sign text;
 	v_data json;
 	v_default json;
-	v_startdate text;
-	v_columntype text;
-
 	v_listtype text;
 BEGIN
 
@@ -162,7 +155,7 @@ BEGIN
 	p_data = REPLACE (p_data::text, '"NULL"', 'null');
 	p_data = REPLACE (p_data::text, '"null"', 'null');
 	p_data = REPLACE (p_data::text, '""', 'null');
-	p_data = REPLACE (p_data::text, '''''', 'null');
+    p_data = REPLACE (p_data::text, '''''', 'null');
 
 
     SELECT epsg INTO v_srid FROM version LIMIT 1;
@@ -180,18 +173,13 @@ BEGIN
 	v_filter_values := (p_data ->> 'data')::json->> 'filterFields';
 	v_ordertype := ((p_data ->> 'data')::json->> 'pageInfo')::json->>'orderType';
 	v_currentpage := ((p_data ->> 'data')::json->> 'pageInfo')::json->>'currentPage';
-	v_filter_feature := (p_data ->> 'data')::json->> 'filterFeatureField';
-	v_startdate = ((p_data ->>'data')::json->>'fields')::json->>'startdate'::text;
-	v_limit = ((p_data ->>'data')::json->>'fields')::json->>'limit'::text;
-	v_filterlot = ((p_data ->>'data')::json->>'fields')::json->>'lot_id'::text;
-	v_filterteam = ((p_data ->>'data')::json->>'fields')::json->>'team_id'::text;
 	v_offset := ((p_data ->> 'data')::json->> 'pageInfo')::json->>'offset';
+	v_filter_feature := (p_data ->> 'data')::json->> 'filterFeatureField';
 
-	
 	IF v_tabname IS NULL THEN
 		v_tabname = 'data';
 	END IF;
-
+	
 	-- control nulls
 	IF v_tablename IS NULL THEN
 		RAISE EXCEPTION 'The config table is bad configured. v_tablename is null';
@@ -309,49 +297,25 @@ BEGIN
 			SELECT listfilterparam->>'sign' INTO v_sign FROM config_form_fields WHERE formname=v_tablename  AND column_id=v_field;
 
 			IF v_listtype = 'attributeTable' THEN
-				v_sign = 'LIKE';
+				v_sign = 'ILIKE';
 			ELSIF v_sign IS NULL THEN
 				v_sign = '=';
 			END IF;
-
-		    
-		    -- Get column type
-		    
-		    EXECUTE FORMAT ('SELECT data_type FROM information_schema.columns  WHERE table_schema = $1 AND table_name = %s AND column_name = $2', quote_literal(v_tablename))
-			USING v_schemaname, v_field
-			INTO v_columntype;
 			
 			-- creating the query_text
-			
-			IF v_field='limit' THEN
-				IF v_limit IS NULL THEN
-					v_limit := v_value;
-				END IF;
-			ELSIF v_field='lot_id' THEN
-				IF v_filterlot IS NULL THEN
-					v_filterlot := v_value;
-				END IF;
-				v_query_result := v_query_result || ' AND '||v_field||'::text '||v_sign||' '||quote_literal(v_filterlot) ||'::text';
-			ELSIF v_field='team_id' and ((p_data ->>'feature')::json->>'tableName')::text != 'om_visit' THEN
-				IF v_filterteam IS NULL THEN
-					v_filterteam := v_value;
-				END IF;
-				IF v_filterteam IS NOT NULL THEN
-					v_query_result := v_query_result || ' AND '||v_field||'::text '||v_sign||' '||quote_literal(v_filterteam) ||'::text';
-				END IF;
-			ELSIF v_value IS NOT NULL  THEN
-				IF v_startdate IS NULL THEN
-					v_startdate := v_value;			
-				END IF;
-				v_query_result := v_query_result || ' AND '||v_field||'::'||COALESCE(v_columntype, 'text')||' '||v_sign||' '||quote_literal(v_startdate) ||'::'||COALESCE(v_columntype, 'text');
+			IF v_value IS NOT NULL AND v_field != 'limit' THEN
+				
+				v_query_result := v_query_result || ' AND '||v_field||'::text '||v_sign||' '||quote_literal(v_value) ||'::text';
+
+			ELSIF v_field='limit' THEN
+				v_query_result := v_query_result;
+				v_limit := v_value;
 			END IF;
 		END LOOP;
-		
 	END IF;
 	
 	-- add feature filter
 	SELECT array_agg(row_to_json(a)) into v_text from json_each(v_filter_feature) a;
-	
 	IF v_text IS NOT NULL THEN
 		FOREACH text IN ARRAY v_text
 		LOOP
@@ -380,36 +344,31 @@ BEGIN
 	END IF;
 	
 	-- add orderby
+	
 	IF v_orderby IS NULL THEN
-
 		v_orderby = v_default->>'orderBy';
 		v_ordertype = v_default->>'orderType';
 	END IF;
 
 
 	IF v_orderby IS NOT NULL THEN
-		v_query_result := v_query_result || ' ORDER BY '||v_orderby::integer;
+		v_query_result := v_query_result || ' ORDER BY '||v_orderby;
 	END IF;
 
 	-- adding ordertype
 	IF v_ordertype IS NOT NULL THEN
 		v_query_result := v_query_result ||' '||v_ordertype;
 	END IF;
-
-	raise notice 'query - %', v_query_result;
-
-	-- add limit
-	
+	-- calculating last page
 	IF v_limit IS NULL THEN
-		v_limit = 15;
+		v_limit = 10;
 	END IF;
-	
-	EXECUTE 'SELECT count(*)/'||v_limit||' FROM (' || v_query_result || ') a'
-        INTO v_lastpage;
-    
-	    -- add limit
-	    v_query_result := v_query_result || ' LIMIT '|| v_limit;
 
+	EXECUTE 'SELECT count(*)/'||v_limit||' FROM (' || v_query_result || ') a'
+		INTO v_lastpage;
+	
+	-- add limit
+	v_query_result := v_query_result || ' LIMIT '|| v_limit;
 
 	-- calculating current page
 	IF v_currentpage IS NULL THEN 
@@ -453,15 +412,7 @@ BEGIN
 				-- set value (from v_value)
 				IF v_filter_fields[i] IS NOT NULL THEN
 					
-					IF (v_filter_fields[i]->>'column_id')='limit' AND v_limit IS NOT NULL THEN
-						v_filter_fields[i] := gw_fct_json_object_set_key(v_filter_fields[i], 'value', COALESCE(v_limit));
-					ELSIF (v_filter_fields[i]->>'column_id')='startdate' AND v_startdate IS NOT NULL THEN
-						v_filter_fields[i] := gw_fct_json_object_set_key(v_filter_fields[i], 'value', COALESCE(v_startdate));
-					ELSIF (v_filter_fields[i]->>'column_id')='lot_id' AND v_filterlot IS NOT NULL THEN
-						v_filter_fields[i] := gw_fct_json_object_set_key(v_filter_fields[i], 'selectedId', v_filterlot::text);
-					ELSIF (v_filter_fields[i]->>'column_id')='team_id' AND v_filterteam IS NOT NULL THEN
-						v_filter_fields[i] := gw_fct_json_object_set_key(v_filter_fields[i], 'selectedId', v_filterteam::text);	
-					ELSIF (v_filter_fields[i]->>'widgettype')='combo' THEN
+					IF (v_filter_fields[i]->>'widgettype')='combo' THEN
 						v_filter_fields[i] := gw_fct_json_object_set_key(v_filter_fields[i], 'selectedId', v_value);
 					ELSE
 						v_filter_fields[i] := gw_fct_json_object_set_key(v_filter_fields[i], 'value', v_value);
@@ -469,11 +420,10 @@ BEGIN
 				END IF;
 				
 				--raise notice 'v_value % v_filter_fields %', v_value, v_filter_fields[i];
-				
+
 				i=i+1;			
-			
+		
 			END LOOP;
-			
 		END IF;
 
 	-- adding the widget of list
@@ -483,15 +433,11 @@ BEGIN
 		INTO v_listclass
 		USING v_tablename;
 
-	IF v_listclass IS NULL THEN
-		v_listclass = 'tableView';
-	END IF;
-	
-	-- setting new element	
+	-- setting new element
 	IF v_device =9 THEN
-		v_filter_fields[v_i+1] := json_build_object('widgettype',v_listclass,'widgetfunction','gw_api_open_rpt_result','label','','stylesheet','','layout_order',0,'layout_name','rpt_layout1','widgetname','tableview_rpt','datatype','tableView','column_id','fileList','orderby', v_i+3, 'position','body', 'value', v_result_list);
+		v_filter_fields[v_i+1] := json_build_object('widgettype',v_listclass,'datatype','icon','column_id','fileList','orderby', v_i+3, 'position','body', 'value', SCHEMA_NAME);
 	ELSE
-		v_filter_fields[v_i+1] := json_build_object('type',v_listclass,'dataType','list','name','list','orderby', v_i+3, 'position','body', 'value', v_result_list);
+		v_filter_fields[v_i+1] := json_build_object('type',v_listclass,'dataType','icon','name','fileList','orderby', v_i+3, 'position','body', 'value', v_result_list);
 	END IF;
 
 	-- getting footer buttons
@@ -505,29 +451,8 @@ BEGIN
 
 	END LOOP;
 
-
-	raise notice 'v_tablename -->> %',v_tablename;
-   	SELECT gw_fct_getformfields(v_tablename, 'listfilter', v_tabname, null, null, null, null,'INSERT', null, v_device, null)
-		INTO v_filter_fields_;
-		
-		
-	-- adding common widgets
-	FOREACH aux_json IN ARRAY v_filter_fields_
-	LOOP
-		--identifing the dimension of array
-		v_i = cardinality(v_filter_fields) ;
-
-		-- adding spacer
-		IF v_device=9 THEN
-			v_filter_fields[v_i+1] := aux_json;
-			v_i=v_i+1;
-		END IF;
-	END LOOP;
-
-
 -- converting to json
 	v_fields_json = array_to_json (v_filter_fields);
-	v_fields_json_ = array_to_json (v_filter_fields_);
 
 --    Control NULL's
 	v_version := COALESCE(v_version, '{}');
