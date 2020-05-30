@@ -12,7 +12,9 @@ $BODY$
 
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_pg2epa_check_options($${"data":{"parameters":{"resultId":"gw_check_project","fprocesscatId":127}}}$$) --when is called from go2epa_main from toolbox
+SELECT SCHEMA_NAME.gw_fct_pg2epa_check_options($${"data":{"parameters":{"resultId":"gw_check_project","fid":227}}}$$) --when is called from go2epa_main from toolbox
+
+-- fid:227 (passed by input parameters)
 */
 
 
@@ -36,7 +38,7 @@ BEGIN
 
 	-- getting input data 	
 	v_result_id := ((p_data ->>'data')::json->>'parameters')::json->>'resultId'::text;
-	v_fid := ((p_data ->>'data')::json->>'parameters')::json->>'fprocesscatId';
+	v_fid := ((p_data ->>'data')::json->>'parameters')::json->>'fid';
 
 	-- select system values
 	SELECT wsoftware, giswater  INTO v_project_type, v_version FROM version order by 1 desc limit 1 ;

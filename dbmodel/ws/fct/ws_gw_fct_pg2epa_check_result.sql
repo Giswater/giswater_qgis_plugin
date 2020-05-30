@@ -12,8 +12,10 @@ $BODY$
 
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"gw_check_project","fprocesscatId":127}}}$$) --when is called from go2epa_main from toolbox
+SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"gw_check_project","fid":227}}}$$) --when is called from go2epa_main from toolbox
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"r1"}}}$$) -- when is called from toolbox
+
+-- fid: 114, 159. Number 227 is passed by input parameters
 
 */
 
@@ -83,7 +85,7 @@ BEGIN
 
 	-- getting input data 	
 	v_result_id := ((p_data ->>'data')::json->>'parameters')::json->>'resultId'::text;
-	v_fid := ((p_data ->>'data')::json->>'parameters')::json->>'fprocesscatId';
+	v_fid := ((p_data ->>'data')::json->>'parameters')::json->>'fid';
 
 	-- select system values
 	SELECT wsoftware, giswater  INTO v_project_type, v_version FROM version order by 1 desc limit 1 ;
@@ -102,14 +104,13 @@ BEGIN
 	-- init variables
 	v_count=0;
 	IF v_fid is null THEN
-		v_fid = 14;
+		v_fid = 114;
 	END IF;
 	
 	-- delete old values on result table
-	DELETE FROM audit_check_data WHERE fid = 14 AND cur_user=current_user;
+	DELETE FROM audit_check_data WHERE fid = 114 AND cur_user=current_user;
 	DELETE FROM audit_check_data WHERE id < 0;
-	DELETE FROM anl_node WHERE fid IN (59) AND cur_user=current_user;
-	DELETE FROM anl_arc WHERE fid IN (3) AND cur_user=current_user;
+	DELETE FROM anl_node WHERE fid IN (159) AND cur_user=current_user;
 
 	-- get user parameters
 	SELECT row_to_json(row) FROM (SELECT inp_options_interval_from, inp_options_interval_to
@@ -287,10 +288,10 @@ BEGIN
 				VALUES (v_fid, v_result_id, 2, concat('WARNING: There is/are ',v_count,
 				' vnode(s) over node2arc. This is an important inconsistency. You need to reduce the nodarc length or check affected vnodes. For more info you can type'));
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 2, concat('SELECT * FROM anl_node WHERE fid = 59 AND cur_user=current_user'));
+				VALUES (v_fid, v_result_id, 2, concat('SELECT * FROM anl_node WHERE fid = 159 AND cur_user=current_user'));
 
 				INSERT INTO anl_node (fid, node_id, nodecat_id, state, expl_id, the_geom, result_id, descript)
-				SELECT 59, vnode_id, 'VNODE', 1, temp_arc.expl_id, vnode.the_geom, v_result_id, 'Vnode overlaping nodarcs'  
+				SELECT 159, vnode_id, 'VNODE', 1, temp_arc.expl_id, vnode.the_geom, v_result_id, 'Vnode overlaping nodarcs'  
 				FROM temp_arc , vnode JOIN v_edit_link a ON vnode_id=exit_id::integer
 				WHERE st_dwithin ( temp_arc.the_geom, vnode.the_geom, 0.01) AND vnode.state > 0 AND arc_type = 'NODE2ARC';
 				v_count=0;	
@@ -508,7 +509,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
 	) AS feature
 	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
-	FROM  anl_node WHERE cur_user="current_user"() AND fid = 59) row) features;
+	FROM  anl_node WHERE cur_user="current_user"() AND fid = 159) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "features":',v_result, '}'); 

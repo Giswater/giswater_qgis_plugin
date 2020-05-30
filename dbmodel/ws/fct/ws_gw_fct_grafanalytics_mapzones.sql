@@ -41,14 +41,14 @@ TO EXECUTE
 -- SECTOR
 SELECT SCHEMA_NAME.gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "exploitation": "[1,2]", "checkData": false, "updateFeature":"FALSE", "updateMapZone":2, "geomParamUpdate":15, "debug":"false"}}}');
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "node":"113952", "updateFeature":TRUE}}}');
-SELECT count(*), log_message FROM audit_log_data WHERE fid=30 AND cur_user=current_user group by log_message order by 2 --SECTOR
+SELECT count(*), log_message FROM audit_log_data WHERE fid=130 AND cur_user=current_user group by log_message order by 2 --SECTOR
 SELECT sector_id, count(sector_id) from v_edit_arc group by sector_id order by 1;
 
 
 -- DMA
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation": "[1]", "checkData": false,"updateFeature":"TRUE", "updateMapZone":2, "geomParamUpdate":15,"debug":"false"}}}');
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "node":"1046", "updateFeature":"TRUE", "updateMapZone":2,"concaveHullParam":0.85,"debug":"false"}}}');
-SELECT count(*), log_message FROM audit_log_data WHERE fid=45 AND cur_user=current_user group by log_message order by 2 --DMA
+SELECT count(*), log_message FROM audit_log_data WHERE fid=145 AND cur_user=current_user group by log_message order by 2 --DMA
 SELECT dma_id, count(dma_id) from v_edit_arc  group by dma_id order by 1;
 UPDATE arc SET dma_id=0
 
@@ -56,7 +56,7 @@ UPDATE arc SET dma_id=0
 -- DQA
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DQA", "exploitation": "[1,2]", "checkData": false,"updateFeature":"TRUE", "updateMapZone":2 , "geomParamUpdate":15, "debug":"false"}}}');
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DQA", "node":"113952", "updateFeature":TRUE}}}');
-SELECT count(*), log_message FROM audit_log_data WHERE fid=44 AND cur_user=current_user group by log_message order by 2 --DQA
+SELECT count(*), log_message FROM audit_log_data WHERE fid=144 AND cur_user=current_user group by log_message order by 2 --DQA
 SELECT dqa_id, count(dma_id) from v_edit_arc  group by dqa_id order by 1;
 
 
@@ -99,6 +99,7 @@ SELECT DISTINCT node_id::integer FROM node a JOIN cat_node b ON nodecat_id=b.id 
 Look for the graf stoppers (flag=1)
 SELECT arc_id, node_1 FROM temp_anlgraf where flag=1 order by node_1
 
+-- fid: 146, 145, 144, 130
 
 */
 
@@ -197,17 +198,17 @@ BEGIN
 		',"body":{"form":{}, "data":{ "info":'||v_result_info||'}}}')::json;	
 	END IF;
 
-	-- set fprocesscat
+	-- set fid:
 	IF v_class = 'PRESSZONE' THEN 
-		v_fid=46;
+		v_fid=146;
 		v_table = 'presszone';
 		v_field = 'presszone_id';
 		v_fieldmp = 'presszone_id';
 		v_visible_layer ='v_edit_presszone';
-		v_mapzonename = 'descript';
+		v_mapzonename = 'name';
 			
 	ELSIF v_class = 'DMA' THEN 
-		v_fid=45;
+		v_fid=145;
 		v_table = 'dma';
 		v_field = 'dma_id';
 		v_fieldmp = 'dma_id';
@@ -215,7 +216,7 @@ BEGIN
 		v_mapzonename = 'name';
 			
 	ELSIF v_class = 'DQA' THEN 
-		v_fid=44;
+		v_fid=144;
 		v_table = 'dqa';
 		v_field = 'dqa_id';
 		v_fieldmp = 'dqa_id';
@@ -223,7 +224,7 @@ BEGIN
 		v_mapzonename = 'name';
 			
 	ELSIF v_class = 'SECTOR' THEN 
-		v_fid=30;
+		v_fid=130;
 		v_table = 'sector';
 		v_field = 'sector_id';
 		v_fieldmp = 'sector_id';
@@ -284,7 +285,7 @@ BEGIN
 		ELSIF (SELECT count(*) FROM audit_check_data WHERE cur_user="current_user"() AND fid=111 AND criticity=3) > 3 THEN
 		
 			INSERT INTO audit_check_data (fid, criticity, error_message)
-			SELECT 44, criticity, error_message FROM audit_check_data WHERE cur_user=current_user AND fid=111 AND criticity=3 AND error_message LIKE('%ERROR:%');
+			SELECT 144, criticity, error_message FROM audit_check_data WHERE cur_user=current_user AND fid=111 AND criticity=3 AND error_message LIKE('%ERROR:%');
 		ELSE 
 			-- start build log message
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 2, 'WARNINGS');
@@ -481,7 +482,7 @@ BEGIN
 					EXECUTE v_querytext;
 
 					-- recalculate staticpressure (fid=47)
-					IF v_fid=30 THEN
+					IF v_fid=130 THEN
 					
 						DELETE FROM audit_log_data WHERE fid=47 AND cur_user=current_user;
 				
@@ -493,7 +494,7 @@ BEGIN
 						JOIN anl_node USING (node_id)
 						JOIN 
 						(select head, json_array_elements_text((grafconfig->>'use')::json)::json->>'nodeParent' as node_id from presszone) pz ON pz.node_id = anl_node.descript
-						WHERE fid=30 AND cur_user=current_user;
+						WHERE fid=130 AND cur_user=current_user;
 
 						-- update on node table those elements connected on graf
 						UPDATE node SET staticpressure=(log_message::json->>'staticpressure')::float FROM audit_log_data a WHERE a.feature_id=node_id 
@@ -533,7 +534,7 @@ BEGIN
 					VALUES (v_fid, 1, concat(
 					'INFO: Mapzone attribute on arc/node/connec features keeps same value previous function. Nothing have been updated by this process'));
 					INSERT INTO audit_check_data (fid, criticity, error_message)
-					VALUES (v_fid, 1, concat('INFO: To see results you can query using this values (XX): SECTOR:30, DQA:44, DMA:45, PRESSZONE:46, STATICPRESSURE:47 '));
+					VALUES (v_fid, 1, concat('INFO: To see results you can query using this values (XX): SECTOR:130, DQA:144, DMA:145, PRESSZONE:146, STATICPRESSURE:47 '));
 					INSERT INTO audit_check_data (fid, criticity, error_message)
 					VALUES (v_fid, 1, concat('SELECT * FROM anl_arc WHERE fid = (XX) AND cur_user=current_user;'));
 					INSERT INTO audit_check_data (fid ,criticity, error_message)

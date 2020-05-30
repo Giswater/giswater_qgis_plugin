@@ -4,27 +4,30 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-
 --FUNCTION CODE: 2446
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_psector()
   RETURNS trigger AS
 $BODY$
+
 DECLARE 
-	v_sql varchar;
-	om_aux text;
-	rec_type record;
-	v_plan_table text;
-	v_plan_table_id text;
-	rec record;
-	v_state_done_planified integer;
-	v_state_done_ficticious integer;
-	v_state_canceled_planified integer;
-	v_state_canceled_ficticious integer;
-	v_plan_statetype_ficticious integer;
-	v_plan_statetype_planned integer;
-	v_current_state_type integer;
-    v_id text;  
+v_sql varchar;
+om_aux text;
+rec_type record;
+v_plan_table text;
+v_plan_table_id text;
+
+rec record;
+
+v_state_done_planified integer;
+v_state_done_ficticious integer;
+v_state_canceled_planified integer;
+v_state_canceled_ficticious integer;
+v_plan_statetype_ficticious integer;
+v_plan_statetype_planned integer;
+v_current_state_type integer;
+v_id text;  
+
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -123,7 +126,7 @@ BEGIN
 			UPDATE config_param_system set value = 'false' WHERE parameter='edit_state_topocontrol';
 
 			--loop over network feature types in order to get the data from each plan_psector_x_* table 
-			FOR rec_type IN (SELECT * FROM sys_feature_type WHERE net_category = 1 ORDER BY id asc) LOOP
+			FOR rec_type IN (SELECT * FROM sys_feature_type WHERE classlevel = 1 OR classlevel = 2 ORDER BY id asc) LOOP
 
 				v_sql = 'SELECT '||rec_type.id||'_id as id FROM plan_psector_x_'||lower(rec_type.id)||' WHERE state = 1 AND psector_id = '||OLD.psector_id||';';
 
@@ -191,7 +194,7 @@ BEGIN
 
 	ELSIF om_aux='plan' THEN
 	
-		FOR rec_type IN (SELECT * FROM sys_feature_type WHERE net_category=1 ORDER BY CASE 
+		FOR rec_type IN (SELECT * FROM sys_feature_type WHERE classlevel = 1  OR classlevel = 2 ORDER BY CASE
 		WHEN id='CONNEC' THEN 1 
 		WHEN id='GULLY' THEN 2
 		WHEN id='ARC' THEN 3 

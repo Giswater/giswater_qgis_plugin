@@ -18,6 +18,8 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"data":{ "resultId":"z1", "useNetworkGe
 
 delete from SCHEMA_NAME.rpt_cat_result
 
+--fid: 227
+
 */
 
 DECLARE
@@ -42,7 +44,7 @@ v_checknetwork boolean;
 v_vdefault boolean;
 v_delnetwork boolean;
 v_removedemand boolean;
-v_fid integer = 127;
+v_fid integer = 227;
 	
 BEGIN
 
@@ -72,7 +74,7 @@ BEGIN
 	DELETE FROM audit_log_data WHERE fid = v_fid AND cur_user=current_user;
 	
 	-- setting variables
-	v_input = concat('{"data":{"parameters":{"resultId":"',v_result,'", "fprocesscatId":127}}}')::json;
+	v_input = concat('{"data":{"parameters":{"resultId":"',v_result,'", "fid":227}}}')::json;
 	
 	IF v_networkmode = 1 OR v_networkmode = 3 THEN 
 		v_onlymandatory_nodarc = TRUE;

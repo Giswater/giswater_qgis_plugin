@@ -22,16 +22,16 @@ TO EXECUTE
 -- for any exploitation you want
 SELECT SCHEMA_NAME.gw_fct_grafanalytics_mincutzones('{"data":{"parameters":{"exploitation": "[1]", "checkData":true}}}');
 
-29 & 49 fprocesscat are relationed
-29 it is one row for mincut to resume data for each minsector
-49 it is detailed data for each minsector
-
 TO SEE RESULTS ON LOG TABLE
-SELECT log_message FROM SCHEMA_NAME.audit_log_data WHERE fid=49 AND cur_user=current_user
-SELECT log_message FROM SCHEMA_NAME.audit_log_data WHERE fid=29 AND cur_user=current_user
-
+SELECT log_message FROM SCHEMA_NAME.audit_log_data WHERE fid=149 AND cur_user=current_user
+SELECT log_message FROM SCHEMA_NAME.audit_log_data WHERE fid=129 AND cur_user=current_user
 
 TO SEE RESULTS ON SYSTEM TABLES (IN CASE OF "upsertAttributes":"TRUE")
+
+--fid: 
+129 & 149 fid: are relationed
+129 it is one row for mincut to resume data for each minsector
+149 it is detailed data for each minsector
 
 */
 
@@ -47,7 +47,7 @@ v_result_polygon json;
 v_result text;
 v_count	integer;
 v_version text;
-v_fid integer = 29;
+v_fid integer = 129;
 v_input	json;
 v_count2 integer;
 v_error_context text;
@@ -89,11 +89,11 @@ BEGIN
 	END IF;
  
 	-- reset previous data
-	DELETE FROM audit_log_data WHERE cur_user=current_user AND fid IN (29,49);
+	DELETE FROM audit_log_data WHERE cur_user=current_user AND fid IN (129,149);
 	DELETE FROM audit_check_data WHERE cur_user=current_user AND fid =v_fid;
 
 	-- Starting process
-	INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('MASSIVE MINCUT ANALYSIS (fid 29 & 49)'));
+	INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('MASSIVE MINCUT ANALYSIS (fid 129 & 149)'));
 	INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('----------------------------------------------------------------------'));
 
 	
@@ -132,7 +132,7 @@ BEGIN
 		LOOP
 			v_count1 = v_count1 + 1;
 		
-			-- get arc_id represented minsector (fprocesscat = 34)			
+			-- get arc_id represented minsector (fid:  34)			
 			v_arc = (SELECT descript FROM anl_arc WHERE result_id IS NULL AND fid=34 AND cur_user=current_user LIMIT 1);
 
 			EXIT WHEN v_arc is null;
@@ -145,19 +145,19 @@ BEGIN
 		
 			-- insert results into audit table
 			INSERT INTO audit_log_data (fid, feature_id, log_message)
-			SELECT 49, v_arc, concat('"minsector_id":"',v_arc,'","node_id":"',node_id,'"') FROM om_mincut_node WHERE result_id=-1;
+			SELECT 149, v_arc, concat('"minsector_id":"',v_arc,'","node_id":"',node_id,'"') FROM om_mincut_node WHERE result_id=-1;
 
 			INSERT INTO audit_log_data (fid, feature_id, log_message)
-			SELECT 49, v_arc, concat('"minsector_id":"',v_arc,'","arc_id":"',arc_id,'"') FROM om_mincut_arc WHERE result_id=-1;
+			SELECT 149, v_arc, concat('"minsector_id":"',v_arc,'","arc_id":"',arc_id,'"') FROM om_mincut_arc WHERE result_id=-1;
 		
 			INSERT INTO audit_log_data (fid, feature_id, log_message)
-			SELECT 49, v_arc, concat('"minsector_id":"',v_arc,'","connec_id":"',connec_id,'"') FROM om_mincut_connec WHERE result_id=-1;
+			SELECT 149, v_arc, concat('"minsector_id":"',v_arc,'","connec_id":"',connec_id,'"') FROM om_mincut_connec WHERE result_id=-1;
 
 			INSERT INTO audit_log_data (fid, feature_id, log_message)
-			SELECT 49, v_arc, concat('"minsector_id":"',v_arc,'","valve_id":"',node_id,'"') FROM om_mincut_valve WHERE result_id=-1;
+			SELECT 149, v_arc, concat('"minsector_id":"',v_arc,'","valve_id":"',node_id,'"') FROM om_mincut_valve WHERE result_id=-1;
 		
 			INSERT INTO audit_log_data (fid, feature_id, log_message)
-			SELECT 49, v_arc, concat('"minsector_id":"',v_arc,'","hydrometer_id":"',hydrometer_id,'"') FROM om_mincut_hydrometer WHERE result_id=-1;
+			SELECT 149, v_arc, concat('"minsector_id":"',v_arc,'","hydrometer_id":"',hydrometer_id,'"') FROM om_mincut_hydrometer WHERE result_id=-1;
 
 		END LOOP;
 
@@ -165,19 +165,19 @@ BEGIN
 		INSERT INTO audit_check_data (fid, error_message)
 		VALUES (v_fid, concat('Massive analysis have been done. ',v_count1, ' mincut''s have been triggered (one by each minsector all of them using the mincut_id = -1). To check results you can query:'));
 		INSERT INTO audit_check_data (fid, error_message)
-		VALUES (v_fid, concat('RESUME (fid : 29)'));
+		VALUES (v_fid, concat('RESUME (fid : 129)'));
 		INSERT INTO audit_check_data (fid, error_message)
-		VALUES (v_fid, concat('SELECT log_message FROM SCHEMA_NAME.audit_log_data WHERE fid=29 AND cur_user=current_user'));
+		VALUES (v_fid, concat('SELECT log_message FROM SCHEMA_NAME.audit_log_data WHERE fid=129 AND cur_user=current_user'));
 		INSERT INTO audit_check_data (fid, error_message)
-		VALUES (v_fid, concat('DETAIL (fid : 49)'));
+		VALUES (v_fid, concat('DETAIL (fid : 149)'));
 		INSERT INTO audit_check_data (fid, error_message)
-		VALUES (v_fid, concat('SELECT log_message FROM SCHEMA_NAME.audit_log_data WHERE fid=49 AND cur_user=current_user'));
+		VALUES (v_fid, concat('SELECT log_message FROM SCHEMA_NAME.audit_log_data WHERE fid=149 AND cur_user=current_user'));
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, '');
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, 'RESUME');
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, '-------------------------------------------------');
 		INSERT INTO audit_check_data (fid, error_message)
-		SELECT 29, reverse(substring(reverse(substring(log_message,2,999)),2,999)) FROM audit_log_data 
-		WHERE fid=29 AND cur_user=current_user ORDER BY (((log_message::json->>'connecs')::json->>'hydrometers')::json->>'total')::integer desc;
+		SELECT 129, reverse(substring(reverse(substring(log_message,2,999)),2,999)) FROM audit_log_data 
+		WHERE fid=129 AND cur_user=current_user ORDER BY (((log_message::json->>'connecs')::json->>'hydrometers')::json->>'total')::integer desc;
 
 		
 	END IF;
