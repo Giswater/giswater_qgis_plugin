@@ -209,7 +209,7 @@ UPDATE sys_param_user SET id ='cur_trans' WHERE id = 'utils_cur_trans';
 UPDATE sys_param_user SET dv_querytext = 'SELECT id, idval FROM edit_typevalue WHERE typevalue =''value_verified''' WHERE id = 'edit_verified_vdefault';
 UPDATE sys_param_user SET dv_querytext = 'SELECT presszone.id, presszone.descript AS idval FROM presszone WHERE presszone.id IS NOT NULL' WHERE id = 'presszone_vdefault';
 UPDATE sys_param_user SET widgettype = 'check' where id = 'utils_debug_mode';
-UPDATE sys_param_user SET layout_order=6 where id = 'edit_builtdate_vdefault';
+UPDATE sys_param_user SET layoutorder=6 where id = 'edit_builtdate_vdefault';
 
 
 UPDATE sys_table set sys_sequence = null where id IN ('config_param_system', 'config_param_user');
@@ -225,7 +225,7 @@ INSERT INTO sys_function VALUES (2928, 'gw_fct_getmazonestyle','utils','function
 
 UPDATE config_form_fields SET dv_querytext = replace (dv_querytext, 'SELECT id, descript as idval FROM presszone', 
 'SELECT presszone_id as id , name as idval FROM presszone') where dv_querytext like '%FROM presszone%';
-UPDATE config_form_fields SET column_id = 'presszone_id' WHERE formname like '%presszone%' AND column_id ='id';
+UPDATE config_form_fields SET columnname = 'presszone_id' WHERE formname like '%presszone%' AND columnname ='id';
 DELETE FROM config_form_fields WHERE formname IN ('exploitation', 'presszone');
 UPDATE config_form_fields SET formname = 'print' WHERE formname = 'printGeneric';
 
@@ -244,8 +244,8 @@ DELETE FROM sys_function WHERE function_name = 'gw_fct_fill_om_tables';
 DELETE FROM sys_function WHERE function_name = 'gw_fct_fill_doc_tables';
 
 
-UPDATE config_typevalue_fk SET target_table = 'config_visit_parameter' WHERE target_table = 'om_visit_parameter';
-UPDATE config_typevalue_fk SET target_table = 'sys_addfields' WHERE target_table = 'man_addfields_parameter';
+UPDATE sys_foreingkey SET target_table = 'config_visit_parameter' WHERE target_table = 'om_visit_parameter';
+UPDATE sys_foreingkey SET target_table = 'sys_addfields' WHERE target_table = 'man_addfields_parameter';
 
 
 UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'om_visit_parameter', 'config_visit_parameter') WHERE dv_querytext like '%om_visit_parameter%';

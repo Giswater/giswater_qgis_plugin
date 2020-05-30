@@ -48,4 +48,8 @@ ALTER TABLE edit_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
 ALTER TABLE inp_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
 ALTER TABLE plan_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
 ALTER TABLE om_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
+ALTER TABLE typevalue_fk DISABLE TRIGGER gw_trg_typevalue_config_fk;
+ 
+
+
  

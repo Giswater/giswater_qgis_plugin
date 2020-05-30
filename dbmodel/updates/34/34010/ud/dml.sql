@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-INSERT INTO config_typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
+INSERT INTO sys_foreingkey(typevalue_table, typevalue_name, target_table, target_field)
 VALUES ('edit_typevalue','value_verified', 'gully', 'verified') ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;	
 
 UPDATE sys_table SET id ='subcatchment' WHERE id ='inp_subcatchment';

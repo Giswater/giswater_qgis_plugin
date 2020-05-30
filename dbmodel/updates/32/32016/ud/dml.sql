@@ -10,7 +10,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 INSERT INTO cat_mat_grate
 SELECT DISTINCT matcat_id FROM cat_grate WHERE matcat_id IS NOT NULL;
 
-
 UPDATE audit_cat_function SET isdeprecated=TRUE where id=1248;
 
 UPDATE audit_cat_param_user SET vdefault='NO' WHERE id='inp_report_input';

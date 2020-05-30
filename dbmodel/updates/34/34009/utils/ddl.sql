@@ -47,7 +47,7 @@ ALTER TABLE audit_log_feature RENAME to _audit_log_feature_ ;
 ALTER TABLE audit_log_project RENAME to _audit_log_project_ ;
 ALTER TABLE audit_log_csv2pg RENAME to _audit_log_csv2pg_ ;
 ALTER TABLE audit_log_arc_traceability RENAME to audit_arc_traceability;
-ALTER TABLE typevalue_fk RENAME to sys_foreingkey';
+ALTER TABLE typevalue_fk RENAME to sys_foreingkey;
 
 DROP TRIGGER gw_trg_typevalue_config_fk ON sys_foreingkey;
 CREATE TRIGGER gw_trg_typevalue_config_fk AFTER INSERT OR UPDATE ON sys_foreingkey
@@ -166,7 +166,7 @@ ALTER TABLE config_api_images RENAME TO config_form_images;
 ALTER TABLE config_api_layer RENAME TO config_info_layer;
 ALTER TABLE config_api_list RENAME TO config_form_list;
 ALTER TABLE config_api_tableinfo_x_infotype RENAME TO config_info_table_x_type;
-ALTER TABLE config_api_typevalue RENAME TO config_form_typevalue;
+ALTER TABLE config_api_typevalue RENAME TO config_typevalue;
 ALTER TABLE config_client_forms RENAME TO config_form_tableview;
 ALTER TABLE config_api_form RENAME TO config_form;
 ALTER TABLE config_api_visit_x_featuretable RENAME TO config_visit_class_x_feature;
@@ -191,7 +191,7 @@ ALTER SEQUENCE SCHEMA_NAME.sys_csv2pg_cat_id_seq RENAME TO config_csv_id_seq;
 ALTER SEQUENCE SCHEMA_NAME.sys_csv2pg_config_id_seq RENAME TO config_csv_param_id_seq;
 ALTER SEQUENCE SCHEMA_NAME.sample_id_seq RENAME TO samplepoint_id_seq;
 ALTER SEQUENCE SCHEMA_NAME.audit_log_arc_traceability_id_seq RENAME TO audit_arc_traceability_id_seq;
-ALTER SEQUENCE SCHEMA_NAME.typevalue_fk_id_seq RENAME TO config_typevalue_fk_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.typevalue_fk_id_seq RENAME TO sys_foreingkey_id_seq;
 
 DROP SEQUENCE IF EXISTS SCHEMA_NAME.config_api_visit_cat_multievent_id_seq;
 

@@ -48,7 +48,6 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 	v_schemaname = 'SCHEMA_NAME';
 
-
 	-- get input parameters
 	v_gwversion := (p_data ->> 'data')::json->> 'gwVersion';
 	v_language := (p_data ->> 'client')::json->> 'lang';
@@ -64,17 +63,30 @@ BEGIN
 	SELECT column_name INTO v_sample_exist  
 	FROM information_schema.columns 
 	WHERE table_name='version' and column_name='sample';
-
+	
+	-- enable triggers on typevalue tables
+	ALTER TABLE om_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
+	ALTER TABLE edit_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
+	ALTER TABLE inp_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
+	ALTER TABLE plan_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
+	ALTER TABLE sys_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
+	ALTER TABLE config_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
+	
+	-- create triggers for the oposite tables againts typevalues
+	PERFORM gw_fct_admin_manage_triggers('fk','ALL');
+	
+	-- create notifications triggers
+	PERFORM gw_fct_admin_manage_triggers('notify',null);
+	
+	-- update cat feature triggering default values and others
+	UPDATE cat_feature SET id=id;
+	
 	-- last proccess
 	IF v_isnew IS TRUE THEN
-	
-		--untill 3.2.004 is not possible
-		--PERFORM gw_fct_admin_schema_dropdeprecated_rel();	
-		
+			
 		INSERT INTO config_param_system (parameter, value, datatype, context, descript, project_type, label, isdeprecated) 
 		VALUES ('admin_superusers', v_superusers ,'json','system', 'Basic information about superusers for this schema','utils', 'Schema manager:', false);
-		
-		
+			
 		-- inserting version table
 		IF v_sample_exist != 'sample' THEN
 			SELECT sample INTO v_is_sample FROM version ORDER BY id LIMIT 1;

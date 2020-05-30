@@ -9,7 +9,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 --2020/05/18
-SELECT setval('SCHEMA_NAME.config_typevalue_fk_id_seq', (SELECT max(id) FROM config_typevalue_fk), true);
+SELECT setval('SCHEMA_NAME.sys_foreingkey_id_seq', (SELECT max(id) FROM sys_foreingkey), true);
 SELECT setval('SCHEMA_NAME.sys_typevalue_cat_id_seq', (SELECT max(id) FROM sys_typevalue), true);
 
 INSERT INTO sys_typevalue (typevalue_table,typevalue_name)
@@ -22,18 +22,18 @@ INSERT INTO sys_typevalue (typevalue_table,typevalue_name)
 VALUES ('edit_typevalue','value_review_validation') ON CONFLICT (typevalue_table,typevalue_name) DO NOTHING;
 
 
-INSERT INTO config_typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
+INSERT INTO sys_foreingkey(typevalue_table, typevalue_name, target_table, target_field)
 VALUES ('edit_typevalue','value_verified', 'arc', 'verified') ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;	
 
-INSERT INTO config_typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
+INSERT INTO sys_foreingkey(typevalue_table, typevalue_name, target_table, target_field)
 VALUES('edit_typevalue','value_verified', 'node', 'verified') ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;	
 
-INSERT INTO config_typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
+INSERT INTO sys_foreingkey(typevalue_table, typevalue_name, target_table, target_field)
 VALUES ('edit_typevalue','value_verified', 'connec', 'verified') ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;	
 
 UPDATE config_form_fields SET dv_querytext = 'SELECT id, id as idval FROM edit_typevalue WHERE typevalue = ''value_verified''' where column_id = 'verified';
 
-INSERT INTO config_typevalue_fk(typevalue_table, typevalue_name, target_table, target_field)
+INSERT INTO sys_foreingkey(typevalue_table, typevalue_name, target_table, target_field)
 VALUES ('plan_typevalue','value_priority', 'plan_psector', 'plan_psector') ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;	
 
 UPDATE config_form_fields SET dv_querytext = 'SELECT idval as id,idval FROM plan_typevalue WHERE typevalue=''value_priority''' WHERE formname = 'v_edit_plan_psector' 
@@ -109,7 +109,7 @@ UPDATE sys_table SET id ='config_form_images' WHERE id ='config_api_images';
 UPDATE sys_table SET id ='config_info_layer' WHERE id ='config_api_layer';
 UPDATE sys_table SET id ='config_form_list' WHERE id ='config_api_list';
 UPDATE sys_table SET id ='config_info_table_x_type' WHERE id ='config_api_tableinfo_x_infotype';
-UPDATE sys_table SET id ='config_form_typevalue' WHERE id ='config_api_typevalue';
+UPDATE sys_table SET id ='config_typevalue' WHERE id ='config_api_typevalue';
 UPDATE sys_table SET id ='config_form_tableview' WHERE id ='config_client_forms';
 UPDATE sys_table SET id ='om_mincut_cat_type' WHERE id ='anl_mincut_cat_type';
 UPDATE sys_table SET id ='om_mincut' WHERE id ='anl_mincut_result_cat';
@@ -163,7 +163,7 @@ UPDATE sys_table SET sys_sequence ='config_csv_id_seq' WHERE id ='config_csv';
 UPDATE sys_table SET sys_sequence ='config_csv_param_id_seq' WHERE id ='config_csv_param';
 UPDATE sys_table SET sys_sequence ='samplepoint_id_seq' WHERE id ='samplepoint';
 UPDATE sys_table SET sys_sequence ='audit_arc_traceability_id_seq' WHERE id ='audit_arc_traceability';
-UPDATE sys_table SET sys_sequence ='config_typevalue_fk_id_seq' WHERE id ='config_typevalue_fk';
+UPDATE sys_table SET sys_sequence ='sys_foreingkey_id_seq' WHERE id ='sys_foreingkey';
 UPDATE sys_table SET sys_sequence ='om_mincut_polygon_polygon_seq' WHERE id ='om_mincut_polygon';
 
 UPDATE sys_table SET sys_sequence ='om_mincut_polygon_polygon_seq' WHERE id ='om_mincut_polygon';
@@ -249,7 +249,7 @@ UPDATE config_form_fields SET formname = 'visit_manager' WHERE formname = 'visit
 
 UPDATE sys_table SET sys_sequence = null WHERE id like 'v_inp_vertice';
 
-UPDATE sys_table SET id = 'config_user' WHERE id = 'exploitation_x_user';
+UPDATE sys_table SET id = 'config_user_x_expl' WHERE id = 'exploitation_x_user';
 
 
 INSERT INTO sys_function VALUES (2116, 'gw_fct_audit_function','utils','function','void','void','Function to work with messages','role_basic',true);
@@ -478,7 +478,7 @@ UPDATE sys_message SET id = 3130 WHERE id = 100;
 DELETE FROM sys_function WHERE id = 2594;
 UPDATE sys_function SET input_params = 'json' WHERE id = 2820;
 
-UPDATE sys_table SET sys_sequence = null where id = 'config_user';
+UPDATE sys_table SET sys_sequence = null where id = 'config_user_x_expl';
 
 
 

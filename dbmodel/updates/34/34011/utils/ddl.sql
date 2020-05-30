@@ -66,8 +66,10 @@ ALTER TABLE sys_param_user RENAME layout_order TO layoutorder;
 
 
 -- config csv param
+ALTER TABLE config_csv_param ADD COLUMN orderby integer;
+UPDATE config_csv_param SET orderby = id;
 ALTER TABLE config_csv_param DROP CONSTRAINT sys_csv2pg_config_pkey;
-ALTER TABLE config_csv_param ADD CONSTRAINT config_csv_param_pkey PRIMARY KEY(pg2csvcat_id,tablename);
+ALTER TABLE config_csv_param ADD CONSTRAINT config_csv_param_pkey PRIMARY KEY(pg2csvcat_id,tablename, target);
 ALTER TABLE config_csv_param DROP COLUMN id;
 UPDATE sys_table SET sys_sequence = null, sys_sequence_field = null WHERE id = 'config_csv_param';
 
@@ -75,8 +77,8 @@ UPDATE sys_table SET sys_sequence = null, sys_sequence_field = null WHERE id = '
 UPDATE config_csv SET functionname = replace (functionname, '_utils_csv2pg_', '_');
 UPDATE config_csv SET functionname = replace (functionname, '_utils_', '_');
 UPDATE config_csv SET alias = 'Export ui' WHERE functionname = 'gw_fct_export_ui_xml';
-UPDATE config_csv SET isdeprecated = false WHERE id IN(10,11,12)
-UPDATE config_csv SET formname='main' WHERE id IN(13,19,20)
+UPDATE config_csv SET isdeprecated = false WHERE id IN(10,11,12);
+UPDATE config_csv SET formname='main' WHERE id IN(13,19,20);
 UPDATE config_csv SET isdeprecated=false;
 UPDATE config_csv SET csv_structure = 'Xml qt ui dialog' WHERE id IN (19,20);
 UPDATE config_csv SET readheader = NULL, orderby = null WHERE id IN (10,11,12,13,19,20);
@@ -98,12 +100,15 @@ UPDATE config_form_actions SET actionname = 'actionVisitEnd' WHERE actionname = 
 UPDATE config_form_actions SET actionname = 'actionVisitStart' WHERE actionname = 'visit_start';
 
 -- config form_fields
+DROP VIEW IF EXISTS ve_config_sysfields;
+DROP VIEW IF EXISTS ve_config_addfields;
 ALTER TABLE config_form_fields RENAME column_id TO columnname;
 ALTER TABLE config_form_fields RENAME layout_order TO layoutorder;
 ALTER TABLE config_form_fields DROP CONSTRAINT config_api_form_fields_pkey;
 ALTER TABLE config_form_fields DROP CONSTRAINT config_api_form_fields_pkey2;
 ALTER TABLE config_form_fields ADD CONSTRAINT config_form_fields_pkey PRIMARY KEY(formname, formtype, columnname);
 ALTER TABLE config_form_fields DROP COLUMN id;
+
 UPDATE sys_table SET sys_sequence = null, sys_sequence_field = null WHERE id = 'config_form_fields';
 
 
@@ -134,29 +139,11 @@ ALTER TABLE config_form_tableview DROP COLUMN dev2_status;
 ALTER TABLE config_form_tableview DROP COLUMN dev3_status;
 ALTER TABLE config_form_tableview DROP COLUMN dev_alias;
 ALTER TABLE config_form_tableview DROP CONSTRAINT config_client_forms_pkey;
-ALTER TABLE config_form_tableview ADD CONSTRAINT config_form_tableview_pkey PRIMARY KEY(table_id, column_id);
-ALTER TABLE config_form_tableview DROP COLUMN id;
-UPDATE sys_table SET sys_sequence = null, sys_sequence_field = null WHERE id = 'config_form_tableview';
-
--- config form tabs
-UPDATE config_form_tabs SET device = 9 WHERE device is null;
-DELETE FROM config_form_tabs WHERE formname = 'v_edit_connec' AND tabname = 'tab_elements' AND device = 9;
-INSERT INTO config_form_tabs VALUES (99999, 'v_edit_connec' , 'tab_elements', 'Elem', 'List of related elements', null, null, null, 9);
-UPDATE config_form_tabs c SET tabactions = a.tabactions FROM config_form_tabs a WHERE a.formname = c.formname 
-AND c.formname = 'v_edit_connec' AND c.tabname = 'tab_elements' AND c.device = 9;
-
-DELETE FROM config_form_tabs WHERE formname = 'v_edit_connec' AND tabname = 'tab_visit' AND device = 9;
-INSERT INTO config_form_tabs VALUES (99999, 'v_edit_connec' , 'tab_visit', 'Visit', 'List of related visits', null, null, null, 9);
-UPDATE config_form_tabs c SET tabactions = a.tabactions FROM config_form_tabs a WHERE a.formname = c.formname 
-AND c.formname = 'v_edit_connec' AND c.tabname = 'tab_visit' AND c.device = 9;
-
-DELETE FROM config_form_tabs WHERE formname = 'v_edit_connec' AND tabname = 'tab_documents' AND device = 9;
-INSERT INTO config_form_tabs VALUES (99999, 'v_edit_connec' , 'tab_documents', 'Docs', 'List of related documents', null, null, null, 9);
-UPDATE config_form_tabs c SET tabactions = a.tabactions FROM config_form_tabs a WHERE a.formname = c.formname 
-AND c.formname = 'v_edit_connec' AND c.tabname = 'tab_documents' AND c.device = 9;
 
 
 -- config_form_tabs
+UPDATE config_form_tabs SET device = 9 where device is null and id IN (SELECT DISTINCT ON (formname, tabname, device) id FROM config_form_tabs);
+DELETE FROM config_form_tabs WHERE device is null;
 ALTER TABLE config_form_tabs DROP CONSTRAINT config_api_form_tabs_pkey;
 ALTER TABLE config_form_tabs DROP CONSTRAINT config_api_form_tabs_formname_tabname_device_unique;
 ALTER TABLE config_form_tabs ADD CONSTRAINT config_form_tabs_pkey PRIMARY KEY(formname, tabname, device);
@@ -167,17 +154,18 @@ UPDATE config_form_tabs SET formname = 'visit_manager' WHERE formname = 'visitMa
 UPDATE config_form_tabs SET sys_role = 'role_basic' WHERE sys_role IS NULL;
 
 
+DELETE FROM config_form_tableview WHERE id NOT IN (select distinct on (table_id, column_id) id from config_form_tableview);
+ALTER TABLE config_form_tableview ADD CONSTRAINT config_form_tableview_pkey PRIMARY KEY(table_id, column_id);
+ALTER TABLE config_form_tableview DROP COLUMN id;
+UPDATE sys_table SET sys_sequence = null, sys_sequence_field = null WHERE id = 'config_form_tableview';
+
+
 -- config_info_table_x_type
 ALTER TABLE config_info_table_x_type DROP CONSTRAINT config_api_tableinfo_x_inforole_pkey;
 ALTER TABLE config_info_table_x_type ADD CONSTRAINT config_info_table_x_type_pkey PRIMARY KEY(tableinfo_id, infotype_id);
 ALTER TABLE config_info_table_x_type DROP COLUMN id;
 UPDATE sys_table SET sys_sequence = null, sys_sequence_field = null WHERE id = 'config_info_table_x_type';
 
--- config_mincut_inlet
-ALTER TABLE config_mincut_inlet DROP CONSTRAINT anl_mincut_inlet_x_exploitation_pkey;
-ALTER TABLE config_mincut_inlet ADD CONSTRAINT config_mincut_inlet_pkey PRIMARY KEY(node_id, expl_id);
-ALTER TABLE config_mincut_inlet DROP COLUMN id;
-UPDATE sys_table SET sys_sequence = null, sys_sequence_field = null WHERE id = 'config_mincut_inlet';
 
 -- config_param_system
 ALTER TABLE config_param_system DROP COLUMN reg_exp;
@@ -187,9 +175,10 @@ UPDATE config_param_system SET isenabled = true WHERE isenabled IS NULL;
 UPDATE config_toolbox SET inputparams = null WHERE inputparams::text = '[]';
 UPDATE config_toolbox SET observ = null;
 
+CREATE TRIGGER gw_trg_typevalue_config_fk AFTER INSERT OR UPDATE OR DELETE ON sys_typevalue FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_typevalue_config_fk('sys_typevalue');
 
-
-
-
+CREATE TRIGGER gw_trg_typevalue_config_fk AFTER INSERT OR UPDATE OR DELETE ON config_typevalue FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_typevalue_config_fk('config_typevalue');
 
 

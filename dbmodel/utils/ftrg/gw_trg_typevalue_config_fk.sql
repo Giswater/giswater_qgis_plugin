@@ -52,9 +52,9 @@ BEGIN
 		END IF;
 
 	--in case of update on one of the defined typevalue table
-	ELSIF TG_OP = 'UPDATE' and v_table IN (SELECT DISTINCT typevalue_table FROM config_typevalue_fk) THEN
+	ELSIF TG_OP = 'UPDATE' and v_table IN (SELECT DISTINCT typevalue_table FROM sys_foreingkey) THEN
 		
-		--select configuration from the config_typevalue_fk and related typevalue for the selected value
+		--select configuration from the sys_foreingkey and related typevalue for the selected value
 		IF OLD.typevalue IN (SELECT typevalue_name FROM sys_typevalue) THEN
 			IF NEW.typevalue != OLD.typevalue OR NEW.id != OLD.id THEN
 
@@ -62,7 +62,7 @@ BEGIN
        				"data":{"message":"3028", "function":"2750","debug_msg":"'||OLD.typevalue||'"}}$$);';
 			END IF;
 		ELSE
-			v_query =  'SELECT *  FROM config_typevalue_fk JOIN '||v_table||' ON '||v_table||'.typevalue = typevalue_name 
+			v_query =  'SELECT *  FROM sys_foreingkey JOIN '||v_table||' ON '||v_table||'.typevalue = typevalue_name 
 			and typevalue_name = '''||NEW.typevalue||''';';
 
 			IF NEW.id!= OLD.id THEN
@@ -86,7 +86,7 @@ BEGIN
 		
 		PERFORM gw_fct_admin_manage_triggers('fk', NEW.target_table);
 
-	ELSIF TG_OP = 'DELETE' then --and v_table IN (SELECT typevalue_table FROM config_typevalue_fk) THEN
+	ELSIF TG_OP = 'DELETE' then --and v_table IN (SELECT typevalue_table FROM sys_foreingkey) THEN
 
 		--select configuration from the related typevalue table
 		v_query = 'SELECT * FROM SCHEMA_NAME.'||v_table||' WHERE '||v_table||'.typevalue = '''|| OLD.typevalue||''' AND  '||v_table||'.id = '''||OLD.id||''';';
@@ -97,8 +97,8 @@ BEGIN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
        		"data":{"message":"3028", "function":"2750","debug_msg":"'||OLD.typevalue||'"}}$$);';
 		ELSE 
-			--select configuration from the config_typevalue_fk table
-			v_query = 'SELECT * FROM config_typevalue_fk WHERE typevalue_table = '''||v_table||''' AND typevalue_name = '''||OLD.typevalue||''';';
+			--select configuration from the sys_foreingkey table
+			v_query = 'SELECT * FROM sys_foreingkey WHERE typevalue_table = '''||v_table||''' AND typevalue_name = '''||OLD.typevalue||''';';
 	
 			EXECUTE v_query INTO v_typevalue_fk;
 
@@ -110,15 +110,15 @@ BEGIN
 
 				IF v_count > 0 THEN
 
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
        				"data":{"message":"3030", "function":"2750","debug_msg":"'||rec.typevalue_name||'"}}$$);';
 				END IF;
-				--check if the value is the last one defined for the typevalue, if so delete the configuration from config_typevalue_fk
+				--check if the value is the last one defined for the typevalue, if so delete the configuration from sys_foreingkey
 				EXECUTE 'SELECT count(typevalue) FROM '||v_typevalue_fk.typevalue_table||' WHERE typevalue = '''||v_typevalue_fk.typevalue_name||''''
 				INTO v_count;
 				
 				IF v_count = 0 THEN
-					EXECUTE 'DELETE FROM config_typevalue_fk WHERE typevalue_table = '''||v_typevalue_fk.typevalue_table||''' and typevalue_name = '''||v_typevalue_fk.typevalue_name||''';';
+					EXECUTE 'DELETE FROM sys_foreingkey WHERE typevalue_table = '''||v_typevalue_fk.typevalue_table||''' and typevalue_name = '''||v_typevalue_fk.typevalue_name||''';';
 				END IF;
 
 			END LOOP; 

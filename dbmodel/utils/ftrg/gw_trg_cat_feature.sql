@@ -21,7 +21,7 @@ DECLARE
 	v_sql text;
 	v_layout text;
 	v_projecttype text;
-	v_layout_order integer;
+	v_layoutorder integer;
 	v_partialquerytext text;
 	v_querytext text;
 	v_table text;
@@ -68,8 +68,8 @@ BEGIN
 		-- set layoutname
 		v_layout = concat('lyt_', lower(NEW.feature_type),'_vdef');
 		
-		-- set layout_order
-		SELECT max(layout_order)+1 INTO v_layout_order FROM sys_param_user WHERE formname='config' and layoutname=v_layout;
+		-- set layoutorder
+		SELECT max(layoutorder)+1 INTO v_layoutorder FROM sys_param_user WHERE formname='config' and layoutname=v_layout;
 
 		IF v_projecttype = 'WS' THEN
 			v_partialquerytext =  concat('JOIN ',lower(NEW.feature_type),'_type ON ',lower(NEW.feature_type),'_type.id = ',
@@ -101,9 +101,9 @@ BEGIN
 			DELETE FROM sys_param_user WHERE id = concat('feat_',lower(OLD.id),'_vdefault');        
 		END IF;
 
-		INSERT INTO sys_param_user(id, formname, descript, sys_role_id, label, isenabled, layoutname, layout_order, 
+		INSERT INTO sys_param_user(id, formname, descript, sys_role_id, label, isenabled, layoutname, layoutorder, 
 		dv_querytext, feature_field_id, project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated, iseditable)
-		VALUES (concat('feat_',v_id,'_vdefault'),'config',concat ('Value default catalog for ',v_id,' cat_feature'), 'role_edit', concat ('Default catalog for ', v_id), true, v_layout ,v_layout_order,
+		VALUES (concat('feat_',v_id,'_vdefault'),'config',concat ('Value default catalog for ',v_id,' cat_feature'), 'role_edit', concat ('Default catalog for ', v_id), true, v_layout ,v_layoutorder,
 		v_querytext, v_feature_field_id, lower(v_projecttype),false,false,'text', 'combo', true, false, true)
 		ON CONFLICT (id) DO NOTHING;
 	END IF;

@@ -6,8 +6,6 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2744
 
-
-
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_typevalue_fk()
   RETURNS trigger AS
 $BODY$
@@ -28,7 +26,7 @@ BEGIN
 	v_table:= TG_ARGV[0];
 
 	--select typevalue for the table
-	v_typevalue_fk = 'SELECT * FROM config_typevalue_fk WHERE target_table='''||v_table||''';';
+	v_typevalue_fk = 'SELECT * FROM sys_foreingkey WHERE target_table='''||v_table||''';';
 	
 	--insert new fields values into json
 	v_new_data := row_to_json(NEW.*);

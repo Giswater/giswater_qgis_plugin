@@ -18,3 +18,10 @@ ALTER TABLE dqa ADD COLUMN stylesheet json;
 
 ALTER TABLE presszone RENAME id TO presszone_id;
 ALTER TABLE presszone RENAME descript TO name;
+
+
+-- config_mincut_inlet
+ALTER TABLE config_mincut_inlet DROP CONSTRAINT anl_mincut_inlet_x_exploitation_pkey;
+ALTER TABLE config_mincut_inlet ADD CONSTRAINT config_mincut_inlet_pkey PRIMARY KEY(node_id, expl_id);
+ALTER TABLE config_mincut_inlet DROP COLUMN id;
+UPDATE sys_table SET sys_sequence = null, sys_sequence_field = null WHERE id = 'config_mincut_inlet';

@@ -23,8 +23,8 @@ INSERT INTO cat_users VALUES ('user4','user4');
 INSERT INTO cat_manager (idval, expl_id, username, active) VALUES ('general manager', '{1,2}', concat('{',current_user,'}')::text[], true);
 
 
-INSERT INTO config_mincut_inlet VALUES (2, 113766, 1, '{113906}');
-INSERT INTO config_mincut_inlet VALUES (3, 113952, 2, '{114146}');
+INSERT INTO config_mincut_inlet VALUES (113766, 1);
+INSERT INTO config_mincut_inlet VALUES (113952, 2);
 
 
 UPDATE plan_arc_x_pavement SET pavcat_id = 'Asphalt';
@@ -214,13 +214,13 @@ INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('shtvalve_param_1','2','
 INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('shtvalve_param_1','3','combo3');
 INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('shtvalve_param_1','4','combo4');
 
-SELECT setval('SCHEMA_NAME.config_typevalue_fk_id_seq', (SELECT max(id) FROM config_typevalue_fk), true);
+SELECT setval('SCHEMA_NAME.sys_foreingkey_id_seq', (SELECT max(id) FROM sys_foreingkey), true);
 
-INSERT INTO config_typevalue_fk(typevalue_table, typevalue_name, target_table, target_field, parameter_id) 
+INSERT INTO sys_foreingkey(typevalue_table, typevalue_name, target_table, target_field, parameter_id) 
 SELECT 'edit_typevalue','hydrant_param_1','man_addfields_value','value_param',id FROM sys_addfields WHERE param_name='hydrant_param_1';
-INSERT INTO config_typevalue_fk(typevalue_table, typevalue_name, target_table, target_field, parameter_id) 
+INSERT INTO sys_foreingkey(typevalue_table, typevalue_name, target_table, target_field, parameter_id) 
 SELECT 'edit_typevalue','shtvalve_param_1','man_addfields_value','value_param',id FROM sys_addfields WHERE param_name='shtvalve_param_1';
-INSERT INTO config_typevalue_fk(typevalue_table, typevalue_name, target_table, target_field, parameter_id) 
+INSERT INTO sys_foreingkey(typevalue_table, typevalue_name, target_table, target_field, parameter_id) 
 SELECT 'edit_typevalue','pressmeter_param_1','man_addfields_value','value_param',id FROM sys_addfields WHERE param_name='pressmeter_param_1';
 
 -- rotate vnodes and connec labels
@@ -296,7 +296,6 @@ UPDATE config_form_fields SET layoutorder =70 , layoutname ='lyt_data_1' WHERE c
 UPDATE config_form_fields SET stylesheet ='{"label":"color:red; font-weight:bold"}' WHERE columnname IN ('expl_id', 'sector_id');
 
 
-
 -- drop constraints
 SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$);
 
@@ -354,7 +353,6 @@ INSERT INTO presszone VALUES (0, 'Undefined',0);
 -- add constraints
 SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"ADD"}}$$);
 
-
 -- dynamic sectorization
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "exploitation": "[1,2]", 
 "updateFeature":"TRUE", "updateMapZone":"1","geomParamUpdate":0.85}}}');
@@ -389,13 +387,12 @@ ON CONFLICT (sector_id, cur_user) DO NOTHING;
 
 SELECT gw_fct_pg2epa_main($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"data":{"iterative":"off", "resultId":"gw_check_project", "useNetworkGeom":"false"}}$$);
+"data":{"resultId":"gw_check_project", "useNetworkGeom":"false"}}$$);
 
 UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'audit_project_user_control';
 
 --deprecated fields
 UPDATE arc SET _sys_length=NULL;
-UPDATE config_mincut_inlet SET _to_arc= NULL;
 
 
 -- adjustment of ischange

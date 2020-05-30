@@ -83,7 +83,8 @@ BEGIN
 	FOR rec IN (SELECT * FROM config_form_fields WHERE formname=concat('ve_',v_feature_type))
 	LOOP
 		EXECUTE 'INSERT INTO config_form_fields('||v_config_fields||')
-		SELECT '''||v_view_name||''','||v_insert_fields||' FROM config_form_fields WHERE columnname='''||rec.id||''';';
+		SELECT '''||v_view_name||''','||v_insert_fields||' FROM config_form_fields WHERE columnname='''||rec.columnname||'''
+		ON CONFLICT (formname, formtype, columnname) DO NOTHING';
 
 	END LOOP;
 

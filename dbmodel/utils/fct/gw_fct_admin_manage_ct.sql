@@ -200,7 +200,7 @@ BEGIN
 		END LOOP;
 
 
-		v_query_text =  'SELECT *  FROM config_typevalue_fk';
+		v_query_text =  'SELECT *  FROM sys_foreingkey';
 		FOR v_tablerecord IN EXECUTE v_query_text LOOP				
 			EXECUTE 'ALTER TABLE '||v_tablerecord.target_table||' DISABLE TRIGGER gw_trg_typevalue_fk';
 		END LOOP;
@@ -263,7 +263,7 @@ BEGIN
 
 		-- Enable custom foreing keys (to activate when bug solved)
 		
-		v_query_text =  'SELECT *  FROM config_typevalue_fk';
+		v_query_text =  'SELECT *  FROM sys_foreingkey';
 		FOR v_tablerecord IN EXECUTE v_query_text LOOP				
 			EXECUTE 'ALTER TABLE '||v_tablerecord.target_table||' ENABLE TRIGGER gw_trg_typevalue_fk';
 		END LOOP;
