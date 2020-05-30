@@ -121,11 +121,11 @@ BEGIN
 	SELECT value::boolean INTO v_hide_form FROM config_param_user where parameter='qgis_form_log_hidden' AND cur_user=current_user;
 
 	-- delete old values on result table
-	DELETE FROM audit_check_data WHERE fprocesscat_id=112 AND cur_user=current_user;
+	DELETE FROM audit_check_data WHERE fid=112 AND cur_user=current_user;
 	
 	-- Starting process
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (112, null, 4, 'ARC DIVIDE');
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (112, null, 4, '-------------------------------------------------------------');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (112, null, 4, 'ARC DIVIDE');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (112, null, 4, '-------------------------------------------------------------');
 
 	
 	-- State control
@@ -158,7 +158,7 @@ BEGIN
 
 		IF v_arc_id IS NOT NULL THEN 
 
-			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+			INSERT INTO audit_check_data (fid,  criticity, error_message)
 			VALUES (112, 1, concat('Divide arc ', v_arc_id,'.'));
 
 			--  Locate position of the nearest point
@@ -220,14 +220,14 @@ BEGIN
 					INSERT INTO arc SELECT rec_aux1.*;
 					INSERT INTO arc SELECT rec_aux2.*;
 
-					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+					INSERT INTO audit_check_data (fid,  criticity, error_message)
 					VALUES (112, 1,'Insert new arcs into arc table.');
 
-					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+					INSERT INTO audit_check_data (fid,  criticity, error_message)
 					VALUES (112, 1, concat('Arc1: arc_id:', rec_aux1.arc_id,', code:',rec_aux1.code,' length:',
 					round(st_length(rec_aux1.the_geom)::numeric,2),'.'));
 					
-					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+					INSERT INTO audit_check_data (fid,  criticity, error_message)
 					VALUES (112, 1, concat('Arc1: arc_id:', rec_aux2.arc_id,', code:',rec_aux2.code,' length:',
 					round(st_length(rec_aux2.the_geom)::numeric,2),'.'));
 
@@ -239,14 +239,14 @@ BEGIN
 					EXECUTE v_epaquerytext1||rec_aux1.arc_id::text||v_epaquerytext2;
 					EXECUTE v_epaquerytext1||rec_aux2.arc_id::text||v_epaquerytext2;
 
-					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+					INSERT INTO audit_check_data (fid,  criticity, error_message)
 					VALUES (112, 1, 'Insert new arcs into man and epa table.');
 
 					-- update node_1 and node_2 because it's not possible to pass using parameters
 					UPDATE arc SET node_1=rec_aux1.node_1,node_2=rec_aux1.node_2 where arc_id=rec_aux1.arc_id;
 					UPDATE arc SET node_1=rec_aux2.node_1,node_2=rec_aux2.node_2 where arc_id=rec_aux2.arc_id;
 					
-					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+					INSERT INTO audit_check_data (fid,  criticity, error_message)
 					VALUES (112, 1,'Update values of arcs node_1 and node_2.');
 
 					--Copy addfields from old arc to new arcs	
@@ -264,7 +264,7 @@ BEGIN
 					value_param
 					FROM man_addfields_value WHERE feature_id=v_arc_id;
 
-					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+					INSERT INTO audit_check_data (fid,  criticity, error_message)
 					VALUES (112, 1,'Copy addfields from old to new arcs.');
 
 					-- update arc_id of disconnected nodes linked to old arc
@@ -274,7 +274,7 @@ BEGIN
 						v_edit_arc.the_geom,0.001) AND arc_id != v_arc_id LIMIT 1) 
 						WHERE node_id=rec_node.node_id;
 						
-						INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (112, 1,concat('Update arc_id for disconnected node: ',rec_node.node_id,'.'));
 					END LOOP;
 
@@ -321,7 +321,7 @@ BEGIN
 							DELETE FROM element_x_arc WHERE arc_id=v_arc_id;
 						END LOOP;
 
-						INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (112, 1, concat('Copy ',v_count,' elements from old to new arcs.'));
 					END IF;
 				
@@ -334,7 +334,7 @@ BEGIN
 							DELETE FROM doc_x_arc WHERE arc_id=v_arc_id;
 						END LOOP;
 					
-						INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (112, 1, concat('Copy ',v_count,' documents from old to new arcs.'));
 					END IF;
 
@@ -405,7 +405,7 @@ BEGIN
 							END IF;
 						END LOOP;
 
-						INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (112, 1, concat('Copy ',v_count,' visits from old to new arcs.'));
 
 					END IF;
@@ -422,7 +422,7 @@ BEGIN
 							
 					END LOOP;
 
-					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+					INSERT INTO audit_check_data (fid,  criticity, error_message)
 					VALUES (112, 1, 'Update arc_id on node.');
 		
 					-- reconnect links
@@ -432,21 +432,21 @@ BEGIN
 						EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
 						"feature":{"id":'|| array_to_json(v_array_connec)||'},"data":{"feature_type":"CONNEC"}}$$)';
 
-						INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (112, 1, concat('Reconnect ',v_count_connec,' connecs with state 1.'));
 					END IF;
 					IF v_count_gully > 0 AND v_array_gully IS NOT NULL THEN
 						EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
 						"feature":{"id":'|| array_to_json(v_array_gully)||'},"data":{"feature_type":"GULLY"}}$$)';
 
-						INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (112, 1, concat('Reconnect ',v_count_gully,' gullies with state 1.'));
 					END IF;
 
 					-- delete old arc
 					DELETE FROM arc WHERE arc_id=v_arc_id;
 					
-					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+					INSERT INTO audit_check_data (fid,  criticity, error_message)
 					VALUES (112, 1, concat('Delete old arc: ',v_arc_id,'.'));	
 			
 				ELSIF (v_state=1 AND v_state_node=2) THEN
@@ -460,21 +460,21 @@ BEGIN
 					--it seems that does not recognize the new node inserted
 					UPDATE config_param_user SET value=TRUE WHERE parameter = 'edit_disable_statetopocontrol' AND cur_user=current_user;				
 
-					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+					INSERT INTO audit_check_data (fid,  criticity, error_message)
 					VALUES (112, 1, 'Arc with state =1, node with state = 2.');
 
 					-- Insert new records into arc table
 					INSERT INTO arc SELECT rec_aux1.*;
 					INSERT INTO arc SELECT rec_aux2.*;
 
-					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+					INSERT INTO audit_check_data (fid,  criticity, error_message)
 					VALUES (112, 1,'Insert new arcs into arc table.');
 
-					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+					INSERT INTO audit_check_data (fid,  criticity, error_message)
 					VALUES (112, 1, concat('Arc1: arc_id:', rec_aux1.arc_id,', code:',rec_aux1.code,' length:',
 					round(st_length(rec_aux1.the_geom)::numeric,2),'.'));
 					
-					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+					INSERT INTO audit_check_data (fid,  criticity, error_message)
 					VALUES (112, 1, concat('Arc1: arc_id:', rec_aux2.arc_id,', code:',rec_aux2.code,' length:',
 					round(st_length(rec_aux2.the_geom)::numeric,2),'.'));
 
@@ -486,7 +486,7 @@ BEGIN
 					EXECUTE v_epaquerytext1||rec_aux1.arc_id::text||v_epaquerytext2;
 					EXECUTE v_epaquerytext1||rec_aux2.arc_id::text||v_epaquerytext2;
 		
-					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+					INSERT INTO audit_check_data (fid,  criticity, error_message)
 					VALUES (112, 1,'Insert new arcs into man and epa table.');
 
 					-- restore temporary value for edit_disable_statetopocontrol variable
@@ -496,7 +496,7 @@ BEGIN
 					UPDATE arc SET node_1=rec_aux1.node_1,node_2=rec_aux1.node_2 where arc_id=rec_aux1.arc_id;
 					UPDATE arc SET node_1=rec_aux2.node_1,node_2=rec_aux2.node_2 where arc_id=rec_aux2.arc_id;
 
-					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+					INSERT INTO audit_check_data (fid,  criticity, error_message)
 					VALUES (112, 1,'Update values of arcs node_1 and node_2.');
 
 					-- Update doability for the new arcs
@@ -506,7 +506,7 @@ BEGIN
 					-- Insert existig arc (on service) to the current alternative
 					INSERT INTO plan_psector_x_arc (psector_id, arc_id, state, doable) VALUES (v_psector, v_arc_id, 0, FALSE);
 
-		   			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+		   			INSERT INTO audit_check_data (fid,  criticity, error_message)
 					VALUES (112, 1,concat('Insert arcs into current psector: ',v_psector,'.'));
 					
 					-- Insert data into traceability table
@@ -520,12 +520,12 @@ BEGIN
 					UPDATE plan_psector_x_arc SET addparam='{"arcDivide":"child"}' WHERE  psector_id=v_psector AND arc_id=rec_aux1.arc_id;
 					UPDATE plan_psector_x_arc SET addparam='{"arcDivide":"child"}' WHERE  psector_id=v_psector AND arc_id=rec_aux2.arc_id;
 
-					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+					INSERT INTO audit_check_data (fid,  criticity, error_message)
 					VALUES (112, 1,'Set values on plan_psector_x_arc addparam.');
 						
 				ELSIF (v_state=2 AND v_state_node=2) THEN 
 					
-					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+					INSERT INTO audit_check_data (fid,  criticity, error_message)
 					VALUES (112, 1, 'Arc and node have both state = 2.');
 
 					-- set temporary values for config variables in order to enable the insert of arc in spite of due a 'bug' of postgres
@@ -536,14 +536,14 @@ BEGIN
 					INSERT INTO arc SELECT rec_aux1.*;
 					INSERT INTO arc SELECT rec_aux2.*;
 
-					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+					INSERT INTO audit_check_data (fid,  criticity, error_message)
 					VALUES (112, 1,'Insert new arcs into arc table.');
 
-					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+					INSERT INTO audit_check_data (fid,  criticity, error_message)
 					VALUES (112, 1, concat('Arc1: arc_id:', rec_aux1.arc_id,', code:',rec_aux1.code,' length:',
 					round(st_length(rec_aux1.the_geom)::numeric,2),'.'));
 					
-					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+					INSERT INTO audit_check_data (fid,  criticity, error_message)
 					VALUES (112, 1, concat('Arc1: arc_id:', rec_aux2.arc_id,', code:',rec_aux2.code,' length:',
 					round(st_length(rec_aux2.the_geom)::numeric,2),'.'));
 
@@ -555,7 +555,7 @@ BEGIN
 					EXECUTE v_epaquerytext1||rec_aux1.arc_id::text||v_epaquerytext2;
 					EXECUTE v_epaquerytext1||rec_aux2.arc_id::text||v_epaquerytext2;
 
-					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+					INSERT INTO audit_check_data (fid,  criticity, error_message)
 					VALUES (112, 1,'Insert new arcs into man and epa table.');
 
 					-- restore temporary value for edit_disable_statetopocontrol variable
@@ -565,7 +565,7 @@ BEGIN
 					UPDATE arc SET node_1=rec_aux1.node_1,node_2=rec_aux1.node_2 where arc_id=rec_aux1.arc_id;
 					UPDATE arc SET node_1=rec_aux2.node_1,node_2=rec_aux2.node_2 where arc_id=rec_aux2.arc_id;
 
-					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+					INSERT INTO audit_check_data (fid,  criticity, error_message)
 					VALUES (112, 1,'Update values of arcs node_1 and node_2.');
 				
 					--Copy addfields from old arc to new arcs	
@@ -583,7 +583,7 @@ BEGIN
 					value_param
 					FROM man_addfields_value WHERE feature_id=v_arc_id;
 					
-					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+					INSERT INTO audit_check_data (fid,  criticity, error_message)
 					VALUES (112, 1,'Copy addfields from old to new arcs.');
 
 					-- update arc_id of disconnected nodes linked to old arc
@@ -593,7 +593,7 @@ BEGIN
 						v_edit_arc.the_geom,0.001) AND arc_id != v_arc_id LIMIT 1) 
 						WHERE node_id=rec_node.node_id;
 
-						INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (112, 1,concat('Update arc_id for disconnected node: ',rec_node.node_id,'.'));
 					END LOOP;
 
@@ -639,7 +639,7 @@ BEGIN
 							DELETE FROM element_x_arc WHERE arc_id=v_arc_id;
 						END LOOP;
 
-						INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (112, 1, concat('Copy ',v_count,' elements from old to new arcs.'));
 					END IF;
 
@@ -651,7 +651,7 @@ BEGIN
 							INSERT INTO doc_x_arc (id, doc_id, arc_id) VALUES (nextval('doc_x_arc_id_seq'),rec_aux.doc_id, rec_aux2.arc_id);
 							DELETE FROM doc_x_arc WHERE arc_id=v_arc_id;
 						END LOOP;
-						INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (112, 1, concat('Copy ',v_count,' documents from old to new arcs.'));
 					END IF;
 
@@ -669,7 +669,7 @@ BEGIN
 							
 					END LOOP;
 					
-					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+					INSERT INTO audit_check_data (fid,  criticity, error_message)
 					VALUES (112, 1, 'Update arc_id on node.');
 
 					-- in case of divide ficitius arc, new arcs will be ficticius, but we need to set doable false because they are inserted by default as true
@@ -677,7 +677,7 @@ BEGIN
 						UPDATE plan_psector_x_arc SET doable=FALSE where arc_id=rec_aux1.arc_id;
 						UPDATE plan_psector_x_arc SET doable=FALSE where arc_id=rec_aux2.arc_id;
 						
-						INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (112, 1, 'Update psector_x_arc as doable for fictitious arcs.');
 				
 					END IF;
@@ -690,7 +690,7 @@ BEGIN
 						EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
 						"feature":{"id":'|| array_to_json(v_array_connec)||'},"data":{"feature_type":"CONNEC"}}$$)';
 
-						INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (112, 1, concat('Reconnect ',v_count_connec,' connecs with state 1.'));
 					END IF;
 					IF v_count_gully > 0 AND v_count_gully IS NOT NULL THEN
@@ -698,7 +698,7 @@ BEGIN
 						EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
 						"feature":{"id":'|| array_to_json(v_array_gully)||'},"data":{"feature_type":"GULLY"}}$$)';
 
-						INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (112, 1, concat('Reconnect ',v_count_gully,' gullies with state 1.'));
 					END IF;
 	                
@@ -712,7 +712,7 @@ BEGIN
 					-- delete old arc
 					DELETE FROM arc WHERE arc_id=v_arc_id;		
 
-					INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+					INSERT INTO audit_check_data (fid,  criticity, error_message)
 					VALUES (112, 1, 'Delete old arc.');	
 					
 			ELSIF (v_state=2 AND v_state_node=1) THEN
@@ -748,7 +748,7 @@ END IF;
 
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data 
-	WHERE cur_user="current_user"() AND fprocesscat_id=112 ORDER BY criticity desc, id asc) row; 
+	WHERE cur_user="current_user"() AND fid=112 ORDER BY criticity desc, id asc) row;
 	
 	IF v_audit_result is null THEN
         v_status = 'Accepted';

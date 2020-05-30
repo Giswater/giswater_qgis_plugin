@@ -50,20 +50,20 @@ BEGIN
    	v_label = ((p_data ->>'data')::json->>'importParam')::text;
    	
 	-- manage log (fprocesscat = 42)
-	DELETE FROM audit_check_data WHERE fprocesscat_id=42 AND cur_user=current_user;
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('IMPORT DB PRICES FILE'));
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('------------------------------'));
+	DELETE FROM audit_check_data WHERE fid = 42 AND cur_user=current_user;
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('IMPORT DB PRICES FILE'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('------------------------------'));
 
 	
 	-- control of rows
-	SELECT count(*) INTO v_count FROM temp_csv2pg WHERE cur_user=current_user AND csv2pgcat_id=1;
+	SELECT count(*) INTO v_count FROM temp_csv2pg WHERE cur_user=current_user AND fid = 1;
 
 	IF v_count =0 THEN
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('Nothing to import'));
+		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Nothing to import'));
 	ELSE
 
 		-- control of price code (csv1)
-		SELECT csv1 INTO v_units FROM temp_csv2pg WHERE cur_user=current_user AND csv2pgcat_id=1;
+		SELECT csv1 INTO v_units FROM temp_csv2pg WHERE cur_user=current_user AND fid = 1;
 
 		IF v_units IS NULL THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
@@ -71,7 +71,7 @@ BEGIN
 		END IF;
 	
 		-- control of price units (csv2)
-		SELECT csv2 INTO v_units FROM temp_csv2pg WHERE cur_user=current_user AND csv2pgcat_id=1
+		SELECT csv2 INTO v_units FROM temp_csv2pg WHERE cur_user=current_user AND fid = 1
 		AND csv2 IS NOT NULL AND csv2 NOT IN (SELECT id FROM price_value_unit);
 
 		IF v_units IS NOT NULL THEN
@@ -80,7 +80,7 @@ BEGIN
 		END IF;
 
 		-- control of price descript (csv3)
-		SELECT csv3 INTO v_units FROM temp_csv2pg WHERE cur_user=current_user AND csv2pgcat_id=1;
+		SELECT csv3 INTO v_units FROM temp_csv2pg WHERE cur_user=current_user AND fid = 1;
 
 		IF v_units IS NULL THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
@@ -88,7 +88,7 @@ BEGIN
 		END IF;
 
 		-- control of null prices(csv5)
-		SELECT csv5 INTO v_units FROM temp_csv2pg WHERE cur_user=current_user AND csv2pgcat_id=1;
+		SELECT csv5 INTO v_units FROM temp_csv2pg WHERE cur_user=current_user AND fid = 1;
 
 		IF v_units IS NULL THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
@@ -103,26 +103,26 @@ BEGIN
 		-- Insert into plan_price table
 		INSERT INTO plan_price (id, pricecat_id, unit, descript, text, price)
 		SELECT csv1, v_label, csv2, csv3, csv4, csv5::numeric(12,4)
-		FROM temp_csv2pg WHERE cur_user=current_user AND csv2pgcat_id=1
+		FROM temp_csv2pg WHERE cur_user=current_user AND fid = 1
 		ON CONFLICT (id) DO NOTHING;
 	
 		-- update if price exists
-		UPDATE price_simple SET pricecat_id=v_label, price=csv5::numeric(12,4) FROM temp_csv2pg WHERE cur_user=current_user AND csv2pgcat_id=1 AND price_simple.id=csv1;
+		UPDATE price_simple SET pricecat_id=v_label, price=csv5::numeric(12,4) FROM temp_csv2pg WHERE cur_user=current_user AND fid = 1 AND price_simple.id=csv1;
 			
 		-- Delete values on temporal table
-		DELETE FROM temp_csv2pg WHERE cur_user=current_user AND csv2pgcat_id=1;	
+		DELETE FROM temp_csv2pg WHERE cur_user=current_user AND fid = 1;
 	
 		-- manage log (fprocesscat 42)
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('Reading values from temp_csv2pg table -> Done'));
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('Inserting values on price_simple table -> Done'));
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('Deleting values from temp_csv2pg -> Done'));
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('Process finished'));
+		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Reading values from temp_csv2pg table -> Done'));
+		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Inserting values on price_simple table -> Done'));
+		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Deleting values from temp_csv2pg -> Done'));
+		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Process finished'));
 
 	END IF;
 
 	-- get log (fprocesscat 42)
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=42) row; 
+	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fid = 42) row;
 
 	IF v_audit_result is null THEN
         v_status = 'Accepted';

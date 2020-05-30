@@ -59,7 +59,7 @@ BEGIN
 	GRANT ALL ON TABLE audit_check_data TO role_basic;
 
 	--remove previous results 
-	DELETE FROM audit_check_data where fprocesscat_id = 115;
+	DELETE FROM audit_check_data where fid = 115;
 	
 	--set configuration for gw_fct_pg2epa_main
 	IF v_project_type = 'WS'  THEN
@@ -192,7 +192,7 @@ BEGIN
 									v_query = 'SELECT '||v_schemaname||'.'||v_function||';';
 									EXECUTE v_query
 									INTO v_query_result;
-									INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, error_message) 
+									INSERT INTO audit_check_data (fid, result_id, table_id, error_message)
 									VALUES (115, rec_fct.function_name,rec_role.id,v_query_result);
 								END IF;					
 
@@ -204,7 +204,7 @@ BEGIN
 									"enddate":"2020-02-05"}}$$);'
 									INTO v_query_result;
 									
-									INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, error_message) 
+									INSERT INTO audit_check_data (fid, result_id, table_id, error_message)
 									VALUES (115, 'gw_fct_arc_fusion',rec_role.id,v_query_result);
 									
 								ELSE
@@ -213,7 +213,7 @@ BEGIN
 									"data":{"filterFields":{}, "pageInfo":{}, "feature_id":"'||v_feature_id||'"}}$$)::text;'
 									INTO v_query_result;
 										
-									INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, error_message) 
+									INSERT INTO audit_check_data (fid, result_id, table_id, error_message)
 									VALUES (115, 'gw_fct_feature_delete',rec_role.id,v_query_result);
 
 								END IF;
@@ -241,7 +241,7 @@ BEGIN
 					EXECUTE v_query
 					INTO v_query_result;
 
-					INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, error_message) 
+					INSERT INTO audit_check_data (fid, result_id, table_id, error_message)
 					VALUES (115, rec_fct.function_name,rec_role.id,v_query_result);
 				END IF;
 			ELSE
@@ -254,7 +254,7 @@ BEGIN
 					INTO v_query_result;
 				END IF;
 			
-				INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, error_message) 
+				INSERT INTO audit_check_data (fid, result_id, table_id, error_message)
 				VALUES (115, rec_fct.function_name,rec_role.id,v_query_result);
 				
 			END IF;
@@ -273,7 +273,7 @@ GRANT SELECT ON TABLE audit_check_data TO role_basic;
 	'function_result', json_agg(row)
   	) AS feature INTO v_result
   	FROM (SELECT result_id, table_id, criticity,error_message::json
-  	FROM  audit_check_data WHERE  fprocesscat_id=115) row;
+  	FROM  audit_check_data WHERE  fid = 115) row;
 
 
 	v_result_info := COALESCE(v_result, '{}'); 

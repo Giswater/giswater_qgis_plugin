@@ -21,7 +21,7 @@ BEGIN
 	-- Search path
     SET search_path = SCHEMA_NAME, public;
 
-    DELETE FROM anl_arc WHERE fprocesscat_id=30;
+    DELETE FROM anl_arc WHERE fid = 30;
     DELETE FROM temp_anl_mincut_analytics;
     DELETE FROM anl_mincut_analytics;
 
@@ -51,7 +51,7 @@ BEGIN
                 FOR v_arc_id, v_the_geom  IN EXECUTE v_query_text
                 LOOP
 				
-					IF v_arc_id NOT IN (SELECT arc_id FROM anl_arc WHERE arc_id=v_arc_id AND fprocesscat_id=30) THEN
+					IF v_arc_id NOT IN (SELECT arc_id FROM anl_arc WHERE arc_id=v_arc_id AND fid = 30) THEN
 					
 						--mincut areas
 						PERFORM gw_fct_mincut (v_arc_id, 'ARC', v_result_id, current_user);
@@ -68,7 +68,7 @@ BEGIN
 				FOR v_arc_id IN EXECUTE v_query_text
                 LOOP
 				
-					IF v_arc_id NOT IN (SELECT arc_id FROM anl_arc WHERE arc_id=v_arc_id AND fprocesscat_id=30) THEN
+					IF v_arc_id NOT IN (SELECT arc_id FROM anl_arc WHERE arc_id=v_arc_id AND fid = 30) THEN
 						PERFORM gw_fct_mincut (v_arc_id, 'ARC', v_result_id, current_user);
 						SELECT count (*) INTO v_num_connec FROM anl_mincut_result_connec  WHERE result_id=v_result_id;
 						SELECT count (*) INTO v_num_hydro FROM anl_mincut_result_hydrometer WHERE result_id=v_result_id;

@@ -43,7 +43,7 @@ BEGIN
 	SELECT giswater INTO v_version FROM version order by 1 desc limit 1;
 
 	-- Reset values
-	DELETE FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=13;
+	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=13;
 
 	-- getting input data 	
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
@@ -69,7 +69,7 @@ BEGIN
 	FOR rec_node IN  EXECUTE v_sql
 	LOOP
 		-- Insert in analytics table  (note: expl_id have been removed because not all tables node have exp_id defined)
-		INSERT INTO anl_node (node_id, num_arcs, fprocesscat_id, the_geom, nodecat_id, state) 
+		INSERT INTO anl_node (node_id, num_arcs, fid, the_geom, nodecat_id, state)
 		VALUES(rec_node.node_id, (SELECT COUNT(*) FROM arc WHERE state = 1 AND (node_1 = rec_node.node_id OR node_2 = rec_node.node_id)), 
 		13, rec_node.the_geom, rec_node.nodecat_id, rec_node.state);
 		
@@ -78,7 +78,7 @@ BEGIN
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=13 order by id) row; 
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=13 order by id) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
@@ -91,19 +91,19 @@ BEGIN
     'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
     'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
-  	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fprocesscat_id, the_geom 
-  	FROM  anl_node WHERE cur_user="current_user"() AND fprocesscat_id=13) row) features;
+  	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
+  	FROM  anl_node WHERE cur_user="current_user"() AND fid=13) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "features":',v_result, '}'); 
 
 	IF v_saveondatabase IS FALSE THEN 
 		-- delete previous results
-		DELETE FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=13;
+		DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=13;
 	ELSE
 		-- set selector
-		DELETE FROM selector_audit WHERE fprocesscat_id=13 AND cur_user=current_user;    
-		INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (13, current_user);
+		DELETE FROM selector_audit WHERE fid=13 AND cur_user=current_user;
+		INSERT INTO selector_audit (fid,cur_user) VALUES (13, current_user);
 	END IF;
 		
 	--    Control nulls

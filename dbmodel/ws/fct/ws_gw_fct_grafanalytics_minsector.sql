@@ -21,9 +21,9 @@ SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"arc":
 delete from SCHEMA_NAME.audit_log_data;
 delete from SCHEMA_NAME.temp_anlgraf
 
-SELECT * FROM SCHEMA_NAME.anl_arc WHERE fprocesscat_id=34 AND cur_user=current_user
-SELECT * FROM SCHEMA_NAME.anl_node WHERE fprocesscat_id=34 AND cur_user=current_user
-SELECT * FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=34 AND cur_user=current_user
+SELECT * FROM SCHEMA_NAME.anl_arc WHERE fid=34 AND cur_user=current_user
+SELECT * FROM SCHEMA_NAME.anl_node WHERE fid=34 AND cur_user=current_user
+SELECT * FROM SCHEMA_NAME.audit_log_data WHERE fid=34 AND cur_user=current_user
 
 
 */
@@ -35,7 +35,7 @@ v_class text = 'MINSECTOR';
 v_feature record;
 v_expl json;
 v_data json;
-v_fprocesscat_id integer;
+v_fid integer;
 v_addparam record;
 v_attribute text;
 v_arcid text;
@@ -82,21 +82,21 @@ BEGIN
 	v_visible_layer = 'v_minsector';
 
 	-- set variables
-	v_fprocesscat_id=34;  
+	v_fid=34;
 	v_featuretype='arc';
 
 	-- data quality analysis
 	IF v_checkdata THEN
 		v_input = '{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}'::json;
 		PERFORM gw_fct_om_check_data(v_input);
-		SELECT count(*) INTO v_count FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=25 AND criticity=3;
+		SELECT count(*) INTO v_count FROM audit_check_data WHERE cur_user="current_user"() AND fid=25 AND criticity=3;
 	END IF;
 
 	-- check criticity of data in order to continue or not
 	IF v_count > 3 THEN
 	
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-		FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=25 order by criticity desc, id asc) row;
+		FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=25 order by criticity desc, id asc) row;
 
 		v_result := COALESCE(v_result, '{}'); 
 		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
@@ -111,20 +111,20 @@ BEGIN
  
 	-- reset graf & audit_log tables
 	DELETE FROM temp_anlgraf;
-	DELETE FROM audit_log_data WHERE fprocesscat_id=v_fprocesscat_id AND cur_user=current_user;
-	DELETE FROM anl_node WHERE fprocesscat_id=34 AND cur_user=current_user;
-	DELETE FROM anl_arc WHERE fprocesscat_id=34 AND cur_user=current_user;
-	DELETE FROM audit_check_data WHERE fprocesscat_id=34 AND cur_user=current_user;
+	DELETE FROM audit_log_data WHERE fid=v_fid AND cur_user=current_user;
+	DELETE FROM anl_node WHERE fid=34 AND cur_user=current_user;
+	DELETE FROM anl_arc WHERE fid=34 AND cur_user=current_user;
+	DELETE FROM audit_check_data WHERE fid=34 AND cur_user=current_user;
 
 	-- Starting process
-	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, concat('MINSECTOR DYNAMIC SECTORITZATION'));
-	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, concat('---------------------------------------------------'));
+	INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('MINSECTOR DYNAMIC SECTORITZATION'));
+	INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('---------------------------------------------------'));
 	IF v_usepsectors THEN
 		SELECT count(*) INTO v_count FROM selector_psector WHERE cur_user = current_user;
-		INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, 
+		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid,
 		concat('INFO: Plan psector strategy is enabled. The number of psectors used on this analysis is ', v_count));
 	ELSE 
-		INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, 
+		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid,
 		concat('INFO: All psectors have been disabled to execute this analysis'));
 	END IF;
 		
@@ -191,19 +191,19 @@ BEGIN
 		----------------
 		
 		-- insert arc results into audit table
-		EXECUTE 'INSERT INTO anl_arc (fprocesscat_id, arccat_id, arc_id, the_geom, descript) 
-			SELECT DISTINCT ON (arc_id)'||v_fprocesscat_id||', arccat_id, a.arc_id, the_geom, '||(v_arc)||' 
+		EXECUTE 'INSERT INTO anl_arc (fid, arccat_id, arc_id, the_geom, descript)
+			SELECT DISTINCT ON (arc_id)'||v_fid||', arccat_id, a.arc_id, the_geom, '||(v_arc)||'
 			FROM (SELECT arc_id, max(water) as water FROM temp_anlgraf WHERE water=1 GROUP by arc_id) a JOIN v_edit_arc b ON a.arc_id=b.arc_id';
 	
 		-- insert node results into audit table
-		EXECUTE 'INSERT INTO anl_node (fprocesscat_id, nodecat_id, node_id, the_geom, descript) 
-			SELECT DISTINCT ON (node_id) '||v_fprocesscat_id||', nodecat_id, b.node_id, the_geom, '||(v_arc)||' FROM (SELECT node_1 as node_id FROM
+		EXECUTE 'INSERT INTO anl_node (fid, nodecat_id, node_id, the_geom, descript)
+			SELECT DISTINCT ON (node_id) '||v_fid||', nodecat_id, b.node_id, the_geom, '||(v_arc)||' FROM (SELECT node_1 as node_id FROM
 			(SELECT node_1,water FROM temp_anlgraf UNION SELECT node_2,water FROM temp_anlgraf)a
 			GROUP BY node_1, water HAVING water=1)b JOIN v_edit_node c ON c.node_id=b.node_id';
 
 		-- insert node delimiters into audit table
-		EXECUTE 'INSERT INTO anl_node (fprocesscat_id, nodecat_id, node_id, the_geom, descript) 
-			SELECT DISTINCT ON (node_id) '||v_fprocesscat_id||', nodecat_id, b.node_id, the_geom, 0 FROM 
+		EXECUTE 'INSERT INTO anl_node (fid, nodecat_id, node_id, the_geom, descript)
+			SELECT DISTINCT ON (node_id) '||v_fid||', nodecat_id, b.node_id, the_geom, 0 FROM
 			(SELECT node_1 as node_id FROM (SELECT node_1,water FROM temp_anlgraf UNION ALL SELECT node_2,water FROM temp_anlgraf)a
 			GROUP BY node_1, water HAVING water=1 AND count(node_1)=2)b JOIN v_edit_node c ON c.node_id=b.node_id';
 		-- NOTE: node delimiter are inserted two times in table, as node from minsector trace and as node delimiter
@@ -214,14 +214,14 @@ BEGIN
 	IF v_updatefeature THEN 
 	
 		-- due URN concept whe can update massively feature from anl_node without check if is arc/node/connec.....
-		UPDATE arc SET minsector_id = a.descript::integer FROM anl_arc a WHERE fprocesscat_id=34 AND a.arc_id=arc.arc_id AND cur_user=current_user;
+		UPDATE arc SET minsector_id = a.descript::integer FROM anl_arc a WHERE fid=34 AND a.arc_id=arc.arc_id AND cur_user=current_user;
 	
 		-- update graf nodes inside minsector
-		UPDATE node SET minsector_id = a.descript::integer FROM anl_node a WHERE fprocesscat_id=34 AND a.node_id=node.node_id AND a.descript::integer >0 AND cur_user=current_user;
+		UPDATE node SET minsector_id = a.descript::integer FROM anl_node a WHERE fid=34 AND a.node_id=node.node_id AND a.descript::integer >0 AND cur_user=current_user;
 	
 		-- update graf nodes on the border of minsectors
 		UPDATE node SET minsector_id = 0 FROM anl_node a JOIN v_edit_node USING (node_id) JOIN node_type c ON c.id=node_type 
-		WHERE fprocesscat_id=34 AND a.node_id=node.node_id AND a.descript::integer =0 AND graf_delimiter!='NONE' AND cur_user=current_user;
+		WHERE fid=34 AND a.node_id=node.node_id AND a.descript::integer =0 AND graf_delimiter!='NONE' AND cur_user=current_user;
 			
 		-- update non graf nodes (not connected) using arc_id parent on v_edit_node (not used node table because the exploitation filter).
 		UPDATE v_edit_node SET minsector_id = a.minsector_id FROM arc a WHERE a.arc_id=v_edit_node.arc_id;
@@ -241,16 +241,16 @@ BEGIN
 		FROM node join arc a on a.node_1=node_id join arc b on b.node_2=node_id WHERE node.minsector_id=0 order by 1;
 
 		-- message
-		INSERT INTO audit_check_data (fprocesscat_id, error_message) 
-		VALUES (v_fprocesscat_id, concat('WARNING: Minsector attribute (minsector_id) on arc/node/connec features have been updated by this process'));
+		INSERT INTO audit_check_data (fid, error_message)
+		VALUES (v_fid, concat('WARNING: Minsector attribute (minsector_id) on arc/node/connec features have been updated by this process'));
 		
 	ELSE
 		-- message
-		INSERT INTO audit_check_data (fprocesscat_id, error_message) 
-		VALUES (v_fprocesscat_id, concat('INFO: Minsector attribute (minsector_id) on arc/node/connec features keeps same value previous function. Nothing have been updated by this process'));
-		VALUES (v_fprocesscat_id, concat('INFO: To take a look on results you can do querys like this:'));
-		VALUES (v_fprocesscat_id, concat('SELECT * FROM anl_arc WHERE fprocesscat_id = 34  AND cur_user=current_user;'));
-		VALUES (v_fprocesscat_id, concat('SELECT * FROM anl_node WHERE fprocesscat_id = 34  AND cur_user=current_user;'));
+		INSERT INTO audit_check_data (fid, error_message)
+		VALUES (v_fid, concat('INFO: Minsector attribute (minsector_id) on arc/node/connec features keeps same value previous function. Nothing have been updated by this process'));
+		VALUES (v_fid, concat('INFO: To take a look on results you can do querys like this:'));
+		VALUES (v_fid, concat('SELECT * FROM anl_arc WHERE fid = 34  AND cur_user=current_user;'));
+		VALUES (v_fid, concat('SELECT * FROM anl_node WHERE fid = 34  AND cur_user=current_user;'));
 	
 	END IF;
 
@@ -311,18 +311,18 @@ BEGIN
 				
 	IF v_updatemapzgeom > 0 THEN
 		-- message
-		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-		VALUES (v_fprocesscat_id, 2, concat('WARNING: Geometry of mapzone ',v_class ,' have been modified by this process'));
+		INSERT INTO audit_check_data (fid, criticity, error_message)
+		VALUES (v_fid, 2, concat('WARNING: Geometry of mapzone ',v_class ,' have been modified by this process'));
 	END IF;
 	
 	-- set selector
 	DELETE FROM selector_audit WHERE cur_user=current_user;
-	INSERT INTO selector_audit (fprocesscat_id, cur_user) VALUES (v_fprocesscat_id, current_user);
+	INSERT INTO selector_audit (fid, cur_user) VALUES (v_fid, current_user);
 
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id order by id) row; 
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by id) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 	

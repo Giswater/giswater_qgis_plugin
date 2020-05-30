@@ -13,7 +13,7 @@ $BODY$
 /*
 INSTRUCTIONS
 ------------
-CREATE, create a backup for all data for related table into temp_table with fprocesscat_id = 111
+CREATE, create a backup for all data for related table into temp_table with fid = 111
 RESTORE, delete all rows from original table and restore all rows from backup name. To prevent damages into original table two strategies have been developed:
 	1 - It is mandatory to fill both keys (backupName and table) as as security check
 	2- Before restore the backup , a new backup from original table is created using the key newBackupName. 
@@ -67,7 +67,7 @@ BEGIN
 			RAISE EXCEPTION 'The backup name exists. Try with other name or delete it before';
 		END IF;
 
-		v_querytext = 'INSERT INTO temp_table (fprocesscat_id, text_column, addparam) SELECT 111, ''{"name":"'||v_backupname||'", "table":"'||v_tablename||'"}'', row_to_json(row) FROM (SELECT * FROM '||v_tablename||') row';
+		v_querytext = 'INSERT INTO temp_table (fid, text_column, addparam) SELECT 111, ''{"name":"'||v_backupname||'", "table":"'||v_tablename||'"}'', row_to_json(row) FROM (SELECT * FROM '||v_tablename||') row';
 
 		EXECUTE 'SELECT count(*) FROM '||v_tablename
 			INTO v_count;
@@ -87,7 +87,7 @@ BEGIN
 			RAISE EXCEPTION 'The name for the new backup you are trying to do already exists. Try with other name or delete it before';
 		END IF;
 
-		v_querytext = 'INSERT INTO temp_table (fprocesscat_id, text_column, addparam) SELECT 111, ''{"name":"'||v_newbackupname||'", "table":"'||v_tablename||'"}'', row_to_json(row) FROM (SELECT * FROM '||v_tablename||') row';
+		v_querytext = 'INSERT INTO temp_table (fid, text_column, addparam) SELECT 111, ''{"name":"'||v_newbackupname||'", "table":"'||v_tablename||'"}'', row_to_json(row) FROM (SELECT * FROM '||v_tablename||') row';
 
 		EXECUTE 'SELECT count(*) FROM '||v_tablename
 			INTO v_count;
@@ -96,7 +96,7 @@ BEGIN
 
 		-- restore		
 		-- get table from backup
-		SELECT text_column::json->>'table' INTO v_tablename_check FROM temp_table WHERE text_column::json->>'name' = v_backupname AND fprocesscat_id=111 LIMIT 1;
+		SELECT text_column::json->>'table' INTO v_tablename_check FROM temp_table WHERE text_column::json->>'name' = v_backupname AND fid=111 LIMIT 1;
 
 		-- delete table
 		v_querytext = 'DELETE FROM '||v_tablename;
@@ -104,7 +104,7 @@ BEGIN
 			
 		-- get fields from table
 		select array_agg(json_keys) into v_fields from ( select json_object_keys(addparam) as json_keys FROM 
-		(SELECT addparam FROM temp_table WHERE fprocesscat_id =111 AND text_column::json->>'name' = v_backupname limit 1)a)b;
+		(SELECT addparam FROM temp_table WHERE fid =111 AND text_column::json->>'name' = v_backupname limit 1)a)b;
 
 		-- build querytext (init)
 		v_querytext = 'INSERT INTO '||v_tablename||' SELECT';
@@ -127,9 +127,9 @@ BEGIN
 		v_querytext = reverse (v_querytext);
 
 		-- build querytext (end)
-		v_querytext = concat (v_querytext, ' FROM temp_table WHERE fprocesscat_id=111 AND text_column::json->>''name'' = ',quote_literal(v_backupname));
+		v_querytext = concat (v_querytext, ' FROM temp_table WHERE fid=111 AND text_column::json->>''name'' = ',quote_literal(v_backupname));
 
-		EXECUTE 'SELECT count(*) FROM temp_table WHERE fprocesscat_id=111 AND text_column::json->>''name'' = '||quote_literal(v_backupname)
+		EXECUTE 'SELECT count(*) FROM temp_table WHERE fid=111 AND text_column::json->>''name'' = '||quote_literal(v_backupname)
 			INTO v_count;
 	
 		EXECUTE v_querytext;
@@ -143,12 +143,12 @@ BEGIN
 	ELSIF v_action= 'DELETE' THEN
 
 		-- get table from backup
-		SELECT text_column::json->>'table' INTO v_tablename FROM temp_table WHERE text_column::json->>'name' = v_backupname AND fprocesscat_id=111 LIMIT 1;
+		SELECT text_column::json->>'table' INTO v_tablename FROM temp_table WHERE text_column::json->>'name' = v_backupname AND fid=111 LIMIT 1;
 
-		EXECUTE 'SELECT count(*) FROM temp_table WHERE text_column::json->>''name'' = '|| quote_literal(v_backupname) ||' AND fprocesscat_id=111'
+		EXECUTE 'SELECT count(*) FROM temp_table WHERE text_column::json->>''name'' = '|| quote_literal(v_backupname) ||' AND fid=111'
 		INTO v_count;
 
-		DELETE FROM temp_table WHERE text_column::json->>'name' = v_backupname AND fprocesscat_id=111;
+		DELETE FROM temp_table WHERE text_column::json->>'name' = v_backupname AND fid=111;
 
 	END IF;
 

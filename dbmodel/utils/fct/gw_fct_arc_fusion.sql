@@ -79,11 +79,11 @@ BEGIN
    v_enddate = ((p_data ->>'data')::json->>'enddate')::date;
 
     -- delete old values on result table
-    DELETE FROM audit_check_data WHERE fprocesscat_id=114 AND cur_user=current_user;
+    DELETE FROM audit_check_data WHERE fid=114 AND cur_user=current_user;
     
     -- Starting process
-    INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (114, null, 4, 'ARC FUSION');
-    INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (114, null, 4, '-------------------------------------------------------------');
+    INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, null, 4, 'ARC FUSION');
+    INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, null, 4, '-------------------------------------------------------------');
 
 
     -- Check if the node exists
@@ -95,7 +95,7 @@ BEGIN
     -- Compute proceed
     IF FOUND THEN
 
-        INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+        INSERT INTO audit_check_data (fid,  criticity, error_message)
         VALUES (114, 1, concat('Fusion arcs using node: ', v_exists_node_id,'.'));
 
         -- Find arcs sharing node
@@ -108,7 +108,7 @@ BEGIN
             SELECT * INTO v_my_record1 FROM v_edit_arc WHERE node_1 = v_node_id OR node_2 = v_node_id ORDER BY arc_id DESC LIMIT 1;
             SELECT * INTO v_my_record2 FROM v_edit_arc WHERE node_1 = v_node_id OR node_2 = v_node_id ORDER BY arc_id ASC LIMIT 1;
 
-            INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+            INSERT INTO audit_check_data (fid,  criticity, error_message)
             VALUES (114, 1, concat('Arcs related to selected node: ', v_my_record1.arc_id,', ',v_my_record2.arc_id,'.'));
 
             -- Compare arcs
@@ -177,7 +177,7 @@ BEGIN
             END LOOP;
 
             IF v_array_addfields is not null THEN
-                INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+                INSERT INTO audit_check_data (fid,  criticity, error_message)
                 VALUES (114, 1, concat('Copy values for addfields: ', array_to_string(v_array_addfields,','),'.'));
             END IF;
 
@@ -198,7 +198,7 @@ BEGIN
             IF v_count > 0 THEN
                 UPDATE element_x_arc SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
 
-                INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+                INSERT INTO audit_check_data (fid,  criticity, error_message)
                 VALUES (114, 1, concat('Copy ',v_count,' elements from old arcs to new one.'));
             END IF;
 
@@ -206,7 +206,7 @@ BEGIN
             IF v_count > 0 THEN
                 UPDATE doc_x_arc SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
 
-                INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+                INSERT INTO audit_check_data (fid,  criticity, error_message)
                 VALUES (114, 1, concat('Copy ',v_count,' documents from old arcs to new one.'));
             END IF;
 
@@ -214,7 +214,7 @@ BEGIN
             IF v_count > 0 THEN
                 UPDATE om_visit_x_arc SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
 
-                INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+                INSERT INTO audit_check_data (fid,  criticity, error_message)
                 VALUES (114, 1, concat('Copy ',v_count,' visits from old arcs to new one.'));
             END IF;
 
@@ -222,7 +222,7 @@ BEGIN
             IF v_count > 0 THEN
                UPDATE connec SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
 
-                INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+                INSERT INTO audit_check_data (fid,  criticity, error_message)
                 VALUES (114, 1, concat('Reconnect ',v_count,' connecs.'));
             END IF;
 
@@ -230,7 +230,7 @@ BEGIN
             IF v_count > 0 THEN
                 UPDATE node SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
 
-                INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+                INSERT INTO audit_check_data (fid,  criticity, error_message)
                 VALUES (114, 1, concat('Reconnect ',v_count,' nodes.'));
             END IF;
 
@@ -251,7 +251,7 @@ BEGIN
                 IF v_count > 0 THEN
                     UPDATE gully SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
 
-                    INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+                    INSERT INTO audit_check_data (fid,  criticity, error_message)
                     VALUES (114, 1, concat('Reconnect ',v_count,' gullies.'));
                 END IF;
                 
@@ -261,7 +261,7 @@ BEGIN
             DELETE FROM arc WHERE arc_id = v_my_record1.arc_id;
             DELETE FROM arc WHERE arc_id = v_my_record2.arc_id;
 
-            INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+            INSERT INTO audit_check_data (fid,  criticity, error_message)
             VALUES (114, 1, concat('Delete arcs: ',v_my_record1.arc_id,', ',v_my_record2.arc_id,'.'));
 
             -- create links that were related to deprecated node
@@ -269,7 +269,7 @@ BEGIN
             -- Moving to obsolete the previous node
             UPDATE node SET state=0, workcat_id_end=v_workcat_id_end, enddate=v_enddate WHERE node_id = v_node_id;
 
-            INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+            INSERT INTO audit_check_data (fid,  criticity, error_message)
             VALUES (114, 1, concat('Change state of node  ',v_node_id,' to obsolete.'));
 
             -- Arcs has different types
@@ -304,7 +304,7 @@ BEGIN
 
     SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
     FROM (SELECT id, error_message as message FROM audit_check_data 
-    WHERE cur_user="current_user"() AND fprocesscat_id=114 ORDER BY criticity desc, id asc) row; 
+    WHERE cur_user="current_user"() AND fid=114 ORDER BY criticity desc, id asc) row;
     
     IF v_audit_result is null THEN
         v_status = 'Accepted';

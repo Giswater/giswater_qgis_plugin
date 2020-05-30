@@ -42,7 +42,7 @@ v_checknetwork boolean;
 v_vdefault boolean;
 v_delnetwork boolean;
 v_removedemand boolean;
-v_fprocesscat_id integer = 127;
+v_fid integer = 127;
 	
 BEGIN
 
@@ -68,8 +68,8 @@ BEGIN
 	v_removedemand = (SELECT value::json->>'removeDemandOnDryNodes' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 
 	-- delete audit table
-	DELETE FROM audit_check_data WHERE fprocesscat_id = v_fprocesscat_id AND cur_user=current_user;
-	DELETE FROM audit_log_data WHERE fprocesscat_id = v_fprocesscat_id AND cur_user=current_user;
+	DELETE FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user;
+	DELETE FROM audit_log_data WHERE fid = v_fid AND cur_user=current_user;
 	
 	-- setting variables
 	v_input = concat('{"data":{"parameters":{"resultId":"',v_result,'", "fprocesscatId":127}}}')::json;
@@ -200,28 +200,28 @@ BEGIN
 		
 	IF v_delnetwork THEN
 		RAISE NOTICE '18 - Delete disconnected arcs with associated nodes';
-		INSERT INTO audit_log_data (fprocesscat_id, feature_id, feature_type, log_message) SELECT v_fprocesscat_id, arc_id, arc_type, '18 - Delete disconnected arcs with associated nodes' 
-		FROM temp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user);
-		DELETE FROM temp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=39 AND cur_user=current_user);
+		INSERT INTO audit_log_data (fid, feature_id, feature_type, log_message) SELECT v_fid, arc_id, arc_type, '18 - Delete disconnected arcs with associated nodes'
+		FROM temp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fid = 39 AND cur_user=current_user);
+		DELETE FROM temp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fid = 39 AND cur_user=current_user);
 		
-		INSERT INTO audit_log_data (fprocesscat_id, feature_id, feature_type, log_message) SELECT v_fprocesscat_id, node_id, node_type, '18 - Delete disconnected arcs with associated nodes' 
-		FROM temp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=39 AND cur_user=current_user);
-		DELETE FROM temp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=39 AND cur_user=current_user);
+		INSERT INTO audit_log_data (fid, feature_id, feature_type, log_message) SELECT v_fid, node_id, node_type, '18 - Delete disconnected arcs with associated nodes'
+		FROM temp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fid = 39 AND cur_user=current_user);
+		DELETE FROM temp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fid = 39 AND cur_user=current_user);
 			
 		RAISE NOTICE '19 - Delete orphan nodes';
-		INSERT INTO audit_log_data (fprocesscat_id, feature_id, feature_type, log_message) SELECT v_fprocesscat_id, node_id, node_type, '19 - Delete orphan nodes' 
-		FROM temp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=7 AND cur_user=current_user);
-		DELETE FROM temp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fprocesscat_id=7 AND cur_user=current_user);
+		INSERT INTO audit_log_data (fid, feature_id, feature_type, log_message) SELECT v_fid, node_id, node_type, '19 - Delete orphan nodes'
+		FROM temp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fid = 7 AND cur_user=current_user);
+		DELETE FROM temp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fid = 7 AND cur_user=current_user);
 
 		RAISE NOTICE '20 - Delete arcs without extremal nodes';
-		INSERT INTO audit_log_data (fprocesscat_id, feature_id, feature_type, log_message) SELECT v_fprocesscat_id, arc_id, arc_type, '20 - Delete arcs without extremal nodes' 
-		FROM temp_arc  WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=3 AND cur_user=current_user);
-		DELETE FROM temp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fprocesscat_id=3 AND cur_user=current_user);
+		INSERT INTO audit_log_data (fid, feature_id, feature_type, log_message) SELECT v_fid, arc_id, arc_type, '20 - Delete arcs without extremal nodes'
+		FROM temp_arc  WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fid = 3 AND cur_user=current_user);
+		DELETE FROM temp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fid = 3 AND cur_user=current_user);
 	END IF;
 
 	IF v_removedemand THEN
 		RAISE NOTICE '21 Set demand = 0 for dry nodes';
-		UPDATE temp_node n SET demand = 0 FROM anl_node a WHERE fprocesscat_id = 132 AND cur_user = current_user AND a.node_id = t.node_id;
+		UPDATE temp_node n SET demand = 0 FROM anl_node a WHERE fid = 132 AND cur_user = current_user AND a.node_id = t.node_id;
 	END IF;
 
 	RAISE NOTICE '22 - Check result previous exportation';
@@ -229,15 +229,15 @@ BEGIN
 
 	RAISE NOTICE '23 - Profilactic last control';
 	-- arcs without nodes
-	INSERT INTO audit_log_data (fprocesscat_id, feature_id, feature_type, log_message) SELECT v_fprocesscat_id, arc_id, arc_type, '23 - Profilactic last delete' 
+	INSERT INTO audit_log_data (fid, feature_id, feature_type, log_message) SELECT v_fid, arc_id, arc_type, '23 - Profilactic last delete'
 	FROM temp_arc WHERE node_1 NOT IN (SELECT node_id FROM temp_node);
-	INSERT INTO audit_log_data (fprocesscat_id, feature_id, feature_type, log_message) SELECT v_fprocesscat_id, arc_id, arc_type, '23 - Profilactic last delete' 
+	INSERT INTO audit_log_data (fid, feature_id, feature_type, log_message) SELECT v_fid, arc_id, arc_type, '23 - Profilactic last delete'
 	FROM temp_arc WHERE node_2 NOT IN (SELECT node_id FROM temp_node);
 	DELETE FROM temp_arc WHERE node_1 NOT IN (SELECT node_id FROM temp_node);
 	DELETE FROM temp_arc WHERE node_2 NOT IN (SELECT node_id FROM temp_node);
 
 	-- nodes without arcs
-	INSERT INTO audit_log_data (fprocesscat_id, feature_id, feature_type, log_message) SELECT v_fprocesscat_id, node_id, node_type, '23 - Profilactic last delete' 
+	INSERT INTO audit_log_data (fid, feature_id, feature_type, log_message) SELECT v_fid, node_id, node_type, '23 - Profilactic last delete'
 	FROM temp_node WHERE node_id NOT IN (SELECT node_1 FROM temp_arc UNION SELECT node_2 FROM temp_arc);
 	DELETE FROM temp_node WHERE node_id NOT IN (SELECT node_1 FROM temp_arc UNION SELECT node_2 FROM temp_arc);
 

@@ -47,7 +47,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- Reset values
-	DELETE FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=11;
+	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=11;
     
     	-- select version
 	SELECT giswater INTO v_version FROM version order by 1 desc limit 1;
@@ -106,7 +106,7 @@ BEGIN
 			END IF;
 			
 			IF v_sys_elev1 > v_sys_elev2 AND v_sys_elev1 IS NOT NULL AND v_sys_elev2 IS NOT NULL THEN
-				INSERT INTO anl_node (node_id, nodecat_id, expl_id, fprocesscat_id, the_geom, arc_distance, state) VALUES
+				INSERT INTO anl_node (node_id, nodecat_id, expl_id, fid, the_geom, arc_distance, state) VALUES
 				(rec_node.node_id,rec_node.nodecat_id, rec_node.expl_id, 11, rec_node.the_geom,v_sys_elev1 - v_sys_elev2,rec_node.state );
 				raise notice 'Node found % :[% / %] maxelevin % maxelevout %',rec_node.node_id, v_i, v_count, v_sys_elev2 , v_sys_elev1 ;
 			END IF;
@@ -116,7 +116,7 @@ BEGIN
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=11 order by id) row; 
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=11 order by id) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
@@ -129,19 +129,19 @@ BEGIN
     'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
     'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
-  	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fprocesscat_id, the_geom 
-  	FROM  anl_node WHERE cur_user="current_user"() AND fprocesscat_id=11) row) features;
+  	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
+  	FROM  anl_node WHERE cur_user="current_user"() AND fid=11) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "features":',v_result, '}'); 
 
 	IF v_saveondatabase IS FALSE THEN 
 		-- delete previous results
-		DELETE FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=11;
+		DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=11;
 	ELSE
 		-- set selector
-		DELETE FROM selector_audit WHERE fprocesscat_id=11 AND cur_user=current_user;    
-		INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (11, current_user);
+		DELETE FROM selector_audit WHERE fid=11 AND cur_user=current_user;
+		INSERT INTO selector_audit (fid,cur_user) VALUES (11, current_user);
 	END IF;
 		
 	--    Control nulls

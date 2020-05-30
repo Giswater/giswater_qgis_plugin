@@ -17,7 +17,7 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_check_options($${"data":{"parameters":{"resultI
 
 
 DECLARE
-v_fprocesscat_id integer;
+v_fid integer;
 v_version text;
 v_record record;
 v_project_type text;
@@ -34,7 +34,7 @@ BEGIN
 
 	-- getting input data 	
 	v_result_id := ((p_data ->>'data')::json->>'parameters')::json->>'resultId'::text;
-	v_fprocesscat_id := ((p_data ->>'data')::json->>'parameters')::json->>'fprocesscatId';
+	v_fid := ((p_data ->>'data')::json->>'parameters')::json->>'fprocesscatId';
 
 	-- select system values
 	SELECT wsoftware, giswater  INTO v_project_type, v_version FROM version order by 1 desc limit 1 ;

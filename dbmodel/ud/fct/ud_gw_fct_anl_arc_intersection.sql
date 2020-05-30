@@ -50,18 +50,18 @@ BEGIN
 	SELECT regexp_replace(row(value)::text, '["()"]', '', 'g') INTO v_qmllinepath FROM config_param_user WHERE parameter='qgis_qml_linelayer_path' AND cur_user=current_user;
 
 	-- Reset values
-	DELETE FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=9;
+	DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid=9;
 	    
 	-- Computing process
 	IF v_array != '()' THEN
-		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fprocesscat_id, arc_id_aux, the_geom_p, the_geom, arccat_id, state)
+		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, arc_id_aux, the_geom_p, the_geom, arccat_id, state)
 		SELECT a.arc_id AS arc_id_1, a.expl_id, 9, b.arc_id AS arc_id_2, 
 		(ST_Dumppoints(ST_Multi(ST_Intersection(a.the_geom, b.the_geom)))).geom AS the_geom_p,a.the_geom, a.arccat_id, a.state
 		FROM '||v_worklayer||' AS a, '||v_worklayer||' AS b 
 		WHERE a.state=1 AND b.state=1 AND ST_Intersects(a.the_geom, b.the_geom) AND a.arc_id != b.arc_id AND NOT ST_Touches(a.the_geom, b.the_geom)
 		AND a.the_geom is not null and b.the_geom is not null AND a.arc_id IN '||v_array||';';
 	ELSE
-		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fprocesscat_id, arc_id_aux, the_geom_p,the_geom, arccat_id, state)
+		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, arc_id_aux, the_geom_p,the_geom, arccat_id, state)
 		SELECT a.arc_id AS arc_id_1, a.expl_id, 9, b.arc_id AS arc_id_2, 
 		(ST_Dumppoints(ST_Multi(ST_Intersection(a.the_geom, b.the_geom)))).geom AS the_geom_p,a.the_geom, a.arccat_id, a.state
 		FROM '||v_worklayer||' AS a, '||v_worklayer||' AS b 
@@ -71,7 +71,7 @@ BEGIN
 
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=9 order by id) row; 
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=9 order by id) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
@@ -84,19 +84,19 @@ BEGIN
     'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
     'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
-  	FROM (SELECT DISTINCT ON (arc_id,arc_id_aux) id, arc_id, arccat_id,arc_id_aux, state, expl_id, descript, the_geom, fprocesscat_id
-  	FROM  anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=9) row) features;
+  	FROM (SELECT DISTINCT ON (arc_id,arc_id_aux) id, arc_id, arccat_id,arc_id_aux, state, expl_id, descript, the_geom, fid
+  	FROM  anl_arc WHERE cur_user="current_user"() AND fid=9) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "qmlPath":"',v_qmllinepath,'", "features":',v_result,'}'); 
 
 	IF v_saveondatabase IS FALSE THEN 
 		-- delete previous results
-		DELETE FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=9;
+		DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid=9;
 	ELSE
 		-- set selector
-		DELETE FROM selector_audit WHERE fprocesscat_id=9 AND cur_user=current_user;    
-		INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (9,current_user);
+		DELETE FROM selector_audit WHERE fid=9 AND cur_user=current_user;
+		INSERT INTO selector_audit (fid,cur_user) VALUES (9,current_user);
 	END IF;
 		
 	--    Control nulls

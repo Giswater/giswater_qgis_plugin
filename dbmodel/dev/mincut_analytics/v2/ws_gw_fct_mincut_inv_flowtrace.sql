@@ -110,7 +110,7 @@ BEGIN
 				IF (select value::boolean from config_param_system where parameter='om_mincut_valve2tank_traceability') IS TRUE THEN 
 					FOR rec_result IN EXECUTE query_text
 					LOOP 
-						INSERT INTO audit_log_data(fprocesscat_id, feature_id, log_message, user_name) VALUES (29, rec_result.edge, concat(result_id_arg, ':', rec_valve.node_id,'-',rec_tank.node_id), current_user);
+						INSERT INTO audit_log_data(fid, feature_id, log_message, user_name) VALUES (29, rec_result.edge, concat(result_id_arg, ':', rec_valve.node_id,'-',rec_tank.node_id), current_user);
 					END LOOP;			
 				END IF;
 	

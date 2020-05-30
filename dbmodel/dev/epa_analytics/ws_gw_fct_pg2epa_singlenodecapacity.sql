@@ -66,7 +66,7 @@ BEGIN
 	IF v_step=0 THEN
 	
 			-- Identifying x0 nodes (dint>73.6)
-			INSERT INTO anl_node (fprocesscat_id, node_id)
+			INSERT INTO anl_node (fid, node_id)
 			SELECT 90, node_1 FROM v_edit_inp_pipe JOIN cat_arc ON id=arccat_id WHERE dint>73.5
 			UNION 
 			SELECT 90, node_2 FROM v_edit_inp_pipe JOIN cat_arc ON id=arccat_id WHERE dint>73.5;
@@ -80,7 +80,7 @@ BEGIN
 	ELSIF v_step=1 THEN
 			
 			-- Identifying x1 nodes (single hydrant)
-			INSERT INTO anl_node (fprocesscat_id, node_id)
+			INSERT INTO anl_node (fid, node_id)
 			SELECT 91, node_id FROM result_node WHERE pressure>1,5 and result_id=v_result;
 						
 			SET demand=120 else 0 WHERE (91);
@@ -90,11 +90,11 @@ BEGIN
 	ELSIF v_step=2 THEN
 	
 			-- Identifying x2 nodes (double hydrant)
-			INSERT INTO anl_node (fprocesscat_id, node_id)
+			INSERT INTO anl_node (fid, node_id)
 			SELECT 92, node_id FROM result_node WHERE pressure>1,5 and result_id=v_result;
 			
 			-- Identifying x3 nodes (single but not double hydrant)
-			INSERT INTO anl_node (fprocesscat_id, node_id)
+			INSERT INTO anl_node (fid, node_id)
 			SELECT 93, node_id FROM result_node WHERE pressure<1,5 and result_id=v_result;
 			
 			SET demand=60 else 0 , pattern = same two/two WHERE (93)
@@ -104,7 +104,7 @@ BEGIN
 	ELSIF v_step=3 THEN
 	
 			-- Identifying x4 nodes (coupled hydrant)
-			INSERT INTO anl_node (fprocesscat_id, node_id)
+			INSERT INTO anl_node (fid, node_id)
 			SELECT 94, node_id FROM result_node WHERE pressure>1,5 and result_id=v_result;
 			
 			
@@ -113,17 +113,17 @@ BEGIN
 			-- upsert dattrib values (node)
 			INSERT INTO dattrib
 			SELECT 6, node_id, 'NODE', 'H1' FROM anl_node
-			WHERE fprocesscat_id=92
+			WHERE fid = 92
 			ON CONFLICT DO UPDATE set idval='H1';
 			
 			INSERT INTO dattrib
 			SELECT 6, node_id, 'NODE', 'H2' FROM anl_node
-			WHERE fprocesscat_id=94 AND NOT IN (SELECT feature_id FROM dattrib WHERE dattrib_type=6 AND feature_type='NODE')
+			WHERE fid = 94 AND NOT IN (SELECT feature_id FROM dattrib WHERE dattrib_type=6 AND feature_type='NODE')
 			ON CONFLICT DO UPDATE set idval='H2';
 			
 			INSERT INTO dattrib
 			SELECT 6, node_id, 'NODE', 'H3' FROM anl_node
-			WHERE fprocesscat_id=91 AND NOT IN (SELECT feature_id FROM dattrib WHERE dattrib_type=6 AND feature_type='NODE')
+			WHERE fid = 91 AND NOT IN (SELECT feature_id FROM dattrib WHERE dattrib_type=6 AND feature_type='NODE')
 			ON CONFLICT DO UPDATE set idval='H3';
 			
 			INSERT INTO dattrib

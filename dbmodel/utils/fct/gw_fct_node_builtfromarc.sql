@@ -55,18 +55,18 @@ BEGIN
 
 
 	--  Reset values
-	DELETE FROM temp_table WHERE cur_user=current_user AND fprocesscat_id=16;
-	DELETE FROM anl_node WHERE cur_user=current_user AND fprocesscat_id=16;
+	DELETE FROM temp_table WHERE cur_user=current_user AND fid = 16;
+	DELETE FROM anl_node WHERE cur_user=current_user AND fid = 16;
 
 	-- inserting all extrem nodes on temp_node
-	INSERT INTO temp_table (fprocesscat_id, geom_point)
+	INSERT INTO temp_table (fid, geom_point)
 	SELECT 	16, ST_StartPoint(the_geom) AS the_geom FROM arc WHERE expl_id=v_expl and (state=1 or state=2)
 	UNION 
 	SELECT 	16, ST_EndPoint(the_geom) AS the_geom FROM arc WHERE expl_id=v_expl and (state=1 or state=2);
 	
 	
 	-- inserting into node table
-	FOR rec_table IN SELECT * FROM temp_table WHERE cur_user=current_user AND fprocesscat_id=16
+	FOR rec_table IN SELECT * FROM temp_table WHERE cur_user=current_user AND fid = 16
 	LOOP
 	        -- Check existing nodes  
 	        numNodes:= 0;
@@ -75,7 +75,7 @@ BEGIN
 			IF v_insertnode THEN
 				INSERT INTO v_edit_node (the_geom) VALUES (rec_table.geom_point);
 			ELSE 
-				INSERT INTO anl_node (the_geom, state, fprocesscat_id) VALUES (rec_table.geom_point, 1, 16);
+				INSERT INTO anl_node (the_geom, state, fid) VALUES (rec_table.geom_point, 1, 16);
 			END IF;
 		ELSE
 
@@ -107,24 +107,24 @@ BEGIN
 	-- get log
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT * FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=16) row; 
+	FROM (SELECT * FROM audit_check_data WHERE cur_user="current_user"() AND fid = 16) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
 	--points
 	v_result = null;
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, node_id, nodecat_id, state, expl_id, the_geom FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=16) row; 
+	FROM (SELECT id, node_id, nodecat_id, state, expl_id, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid=16) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point", "values":',v_result, '}'); 
   
   	IF v_saveondatabase IS FALSE THEN 
 		-- delete previous results
-		DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=16;
+		DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=16;
 	ELSE
 		-- set selector
-		DELETE FROM selector_audit WHERE fprocesscat_id=16 AND cur_user=current_user;    
-		INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (16, current_user);
+		DELETE FROM selector_audit WHERE fid=16 AND cur_user=current_user;
+		INSERT INTO selector_audit (fid,cur_user) VALUES (16, current_user);
 	END IF;
 		
 	--    Control nulls

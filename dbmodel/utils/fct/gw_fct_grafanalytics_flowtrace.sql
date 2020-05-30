@@ -20,8 +20,8 @@ SELECT SCHEMA_NAME.gw_fct_grafanalytics_flowtrace('{"data":{"parameters":{"grafC
 
 
 --RESULTS
-SELECT * FROM anl_arc WHERE fprocesscat_id=93 AND cur_user=current_user
-SELECT * FROM anl_arc WHERE fprocesscat_id=94 AND cur_user=current_user
+SELECT * FROM anl_arc WHERE fid=93 AND cur_user=current_user
+SELECT * FROM anl_arc WHERE fid=94 AND cur_user=current_user
 */
 
 DECLARE
@@ -30,7 +30,7 @@ v_count integer default 0;
 v_nodeid text;
 v_sum integer = 0;
 v_class text;
-v_fprocesscat_id integer;
+v_fid integer;
 v_sign varchar(2);
 v_expl json;	
 v_text text;
@@ -58,16 +58,16 @@ BEGIN
 
 	-- set values
 	IF v_class = 'DISCONNECTEDARCS' THEN 
-		v_fprocesscat_id=93;
+		v_fid=93;
 		v_sign = '=';
 	ELSIF v_class = 'CONNECTEDARCS' THEN 
-		v_fprocesscat_id=94;
+		v_fid=94;
 		v_sign = '>';
 	END IF;
 
 	-- reset graf & audit tables
-	DELETE FROM anl_arc where cur_user=current_user AND fprocesscat_id=v_fprocesscat_id;
-	DELETE FROM audit_check_data WHERE fprocesscat_id=v_fprocesscat_id AND cur_user=current_user;
+	DELETE FROM anl_arc where cur_user=current_user AND fid=v_fid;
+	DELETE FROM audit_check_data WHERE fid=v_fid AND cur_user=current_user;
 	DELETE FROM temp_anlgraf;	
 
 	-- reset exploitation
@@ -78,10 +78,10 @@ BEGIN
 	END IF;	
 
 	-- Starting process
-	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, concat('FLOWTRACE ANALYTICS - ', upper(v_class)));
-	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, concat('----------------------------------------------------------'));	
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, NULL, 1, 'INFO');
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, NULL, 1, '-------');
+	INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('FLOWTRACE ANALYTICS - ', upper(v_class)));
+	INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('----------------------------------------------------------'));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 1, 'INFO');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 1, '-------');
 
 	-- fill the graf table
 	INSERT INTO temp_anlgraf (arc_id, node_1, node_2, water, flag, checkf)
@@ -135,22 +135,22 @@ BEGIN
 	END LOOP;
 	
 	-- insert into result table
-	EXECUTE 'INSERT INTO anl_arc (fprocesscat_id, arc_id, the_geom, descript)
-		SELECT DISTINCT ON (a.arc_id) '||v_fprocesscat_id||', a.arc_id, the_geom, '''||v_class||'''	FROM temp_anlgraf a
+	EXECUTE 'INSERT INTO anl_arc (fid, arc_id, the_geom, descript)
+		SELECT DISTINCT ON (a.arc_id) '||v_fid||', a.arc_id, the_geom, '''||v_class||'''	FROM temp_anlgraf a
 		JOIN arc b ON a.arc_id=b.arc_id GROUP BY a.arc_id, the_geom HAVING max(water) '||v_sign||' 0 ';
 
 	-- count arcs
 	EXECUTE 'SELECT count(*) FROM (SELECT DISTINCT ON (arc_id) count(*) FROM temp_anlgraf GROUP BY arc_id HAVING max(water)'||v_sign||' 0 )a'
 		INTO v_count;
 
-	INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) VALUES (v_fprocesscat_id,  3, '');	
-	INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) VALUES (v_fprocesscat_id,  1, concat('Number of arcs identifed on the process: ', v_count));
+	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  3, '');
+	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  1, concat('Number of arcs identifed on the process: ', v_count));
 
 
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id order by criticity desc, id asc) row; 
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by criticity desc, id asc) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
@@ -164,7 +164,7 @@ BEGIN
     'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
   	FROM (SELECT arc_id, arccat_id, state, expl_id, descript, the_geom FROM v_edit_arc WHERE arc_id IN 
-	(SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id)) row) features;
+	(SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "qmlPath":"", "features":',v_result,'}'); 

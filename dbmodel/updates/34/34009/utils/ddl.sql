@@ -58,10 +58,6 @@ ALTER TABLE audit_cat_column RENAME to _audit_cat_column_;
 ALTER TABLE audit_price_simple RENAME to _audit_price_simple_;
 
 
---create iscustom param
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_fprocess", "column":"iscustom", "dataType":"boolean"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_function", "column":"iscustom", "dataType":"boolean"}}$$);
-
 -- create fprocesstype
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_log_data", "column":"addparam", "dataType":"json"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_log_data", "column":"addparam", "dataType":"json"}}$$);

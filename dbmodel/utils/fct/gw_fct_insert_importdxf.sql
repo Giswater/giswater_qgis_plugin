@@ -62,21 +62,21 @@ BEGIN
 	SELECT wsoftware, giswater INTO v_project_type, v_version FROM version order by id desc limit 1;
 
 	-- delete old values on result table
-	DELETE FROM audit_check_data WHERE fprocesscat_id=106 AND cur_user=current_user;
-	--DELETE FROM anl_node WHERE fprocesscat_id=106 AND cur_user=current_user;
+	DELETE FROM audit_check_data WHERE fid=106 AND cur_user=current_user;
+	--DELETE FROM anl_node WHERE fid=106 AND cur_user=current_user;
 	
 	-- Starting process
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (106, null, 4, concat('IMPORT DXF'));
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (106, null, 4, '-------------------------------------------------------------');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (106, null, 4, concat('IMPORT DXF'));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (106, null, 4, '-------------------------------------------------------------');
 
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (106, null, 3, 'CRITICAL ERRORS');	
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (106, null, 3, '----------------------');	
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (106, null, 3, 'CRITICAL ERRORS');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (106, null, 3, '----------------------');
 
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (106, null, 2, 'WARNINGS');	
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (106, null, 2, '--------------');	
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (106, null, 2, 'WARNINGS');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (106, null, 2, '--------------');
 
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (106, null, 1, 'INFO');
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (106, null, 1, '-------');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (106, null, 1, 'INFO');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (106, null, 1, '-------');
 
 	--insert missing catalogs
 
@@ -84,30 +84,30 @@ BEGIN
 		--insert missing values of arc catalog 
 		INSERT INTO cat_arc (id,arctype_id)
 		SELECT DISTINCT (text_column::json)->>'Layer',v_arc_type FROM temp_table 
-		WHERE fprocesscat_id=106 and geom_line IS NOT NULL AND (text_column::json)->>'Layer' not in (SELECT id FROM cat_arc);
+		WHERE fid=106 and geom_line IS NOT NULL AND (text_column::json)->>'Layer' not in (SELECT id FROM cat_arc);
 
 		--insert missing values of node catalog 
 		INSERT INTO cat_node(id,nodetype_id)
 		SELECT DISTINCT (text_column::json)->>'Layer', v_node_type FROM temp_table 
-		WHERE fprocesscat_id=106 and geom_point IS NOT NULL AND 
+		WHERE fid=106 and geom_point IS NOT NULL AND
 		(text_column::json)->>'Layer' not in (SELECT id FROM cat_node);
 
 	ELSIF v_project_type = 'UD' THEN
 		INSERT INTO cat_arc (id)
 		SELECT DISTINCT (text_column::json)->>'Layer' FROM temp_table 
-		WHERE fprocesscat_id=106 and geom_line IS NOT NULL AND 
+		WHERE fid=106 and geom_line IS NOT NULL AND
 		(text_column::json)->>'Layer' not in (SELECT id FROM cat_arc);
 
 		INSERT INTO cat_node(id)
 		SELECT DISTINCT (text_column::json)->>'Layer' FROM temp_table 
-		WHERE fprocesscat_id=106 and geom_point IS NOT NULL AND 
+		WHERE fid=106 and geom_point IS NOT NULL AND
 		(text_column::json)->>'Layer' not in (SELECT id FROM cat_node);
 	END IF;
 
-	INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+	INSERT INTO audit_check_data (fid,  criticity, error_message)
 	VALUES (106, 2, concat('Insert missing values into cat_arc for arc_type ',v_arc_type,'.'));
 
-	INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+	INSERT INTO audit_check_data (fid,  criticity, error_message)
 	VALUES (106, 2, concat('Insert missing values into cat_node for node_type ',v_node_type,'.'));
 
 	--inform about psector if elements are planified
@@ -116,7 +116,7 @@ BEGIN
 		JOIN plan_psector on plan_psector.psector_id=config_param_user.value::integer
 		where parameter='plan_psector_vdefault' and cur_user=current_user;
 
-		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+		INSERT INTO audit_check_data (fid,  criticity, error_message)
 		VALUES (106, 2, concat('Features are assigned to psector: ',v_current_psector,'.'));
 	END IF;
 
@@ -127,46 +127,46 @@ BEGIN
 	IF v_project_type = 'WS' THEN	
 		INSERT INTO v_edit_node (nodecat_id,state,state_type,the_geom, workcat_id, builtdate)
 		SELECT (text_column::json)->>'Layer'::text, v_state, v_state_type, geom_point, v_workcat, v_builtdate
-		FROM temp_table WHERE fprocesscat_id=106 and geom_point IS NOT NULL
-		AND geom_point NOT IN (SELECT the_geom FROM anl_node WHERE fprocesscat_id=106 AND descript='DUPLICATED') ;
+		FROM temp_table WHERE fid=106 and geom_point IS NOT NULL
+		AND geom_point NOT IN (SELECT the_geom FROM anl_node WHERE fid=106 AND descript='DUPLICATED') ;
 
 	ELSIF v_project_type = 'UD' THEN
 		INSERT INTO v_edit_node (nodecat_id, node_type, state,state_type,the_geom, workcat_id, builtdate)
 		SELECT (text_column::json)->>'Layer'::text, v_node_type, v_state, v_state_type, geom_point, v_workcat, v_builtdate
-		FROM temp_table WHERE fprocesscat_id=106 and geom_point IS NOT NULL
-		AND geom_point NOT IN (SELECT the_geom FROM anl_node WHERE fprocesscat_id=106 AND descript='DUPLICATED') ;
+		FROM temp_table WHERE fid=106 and geom_point IS NOT NULL
+		AND geom_point NOT IN (SELECT the_geom FROM anl_node WHERE fid=106 AND descript='DUPLICATED') ;
 	END IF;
 
-	INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+	INSERT INTO audit_check_data (fid,  criticity, error_message)
 	VALUES (106, 1, 'INFO:Insert nodes from dxf.');
 
 	--insert missing final nodes
 	IF v_project_type = 'WS' THEN	
 		INSERT INTO v_edit_node (nodecat_id,state,state_type,the_geom)
 		SELECT nodecat_id, v_state, v_state_type, the_geom FROM anl_node 
-		WHERE fprocesscat_id=106 AND descript='NEW';
+		WHERE fid=106 AND descript='NEW';
 	ELSIF v_project_type = 'UD' THEN
 		INSERT INTO v_edit_node (nodecat_id,node_type,state,state_type,the_geom)
 		SELECT nodecat_id,'DXF_JUN', v_state, v_state_type, the_geom FROM anl_node 
-		WHERE fprocesscat_id=106 AND descript='NEW';
+		WHERE fid=106 AND descript='NEW';
 	END IF;
 
-	INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+	INSERT INTO audit_check_data (fid,  criticity, error_message)
 	VALUES (106, 1, 'INFO:Insert missing final nodes.');
 
 	--insert arcs from dxf
 	IF v_project_type = 'WS' THEN
 		INSERT INTO v_edit_arc (arccat_id,state,state_type,the_geom, workcat_id, builtdate)
 		SELECT DISTINCT ON (geom_line) (text_column::json)->>'Layer', v_state, v_state_type, geom_line, v_workcat, v_builtdate
-		FROM temp_table WHERE fprocesscat_id=106 and geom_line IS NOT NULL;
+		FROM temp_table WHERE fid=106 and geom_line IS NOT NULL;
 
 	ELSIF v_project_type = 'UD' THEN
 		INSERT INTO v_edit_arc (arccat_id,arc_type, state,state_type,the_geom, workcat_id, builtdate)
 		SELECT DISTINCT ON (geom_line) (text_column::json)->>'Layer',v_arc_type, v_state, v_state_type, geom_line, v_workcat, v_builtdate
-		FROM temp_table WHERE fprocesscat_id=106 and geom_line IS NOT NULL;
+		FROM temp_table WHERE fid=106 and geom_line IS NOT NULL;
 	END IF;
 
-	INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+	INSERT INTO audit_check_data (fid,  criticity, error_message)
 	VALUES (106, 1, 'INFO:Insert arcs from dxf.');
 
 	--activate topocontrol
@@ -174,20 +174,20 @@ BEGIN
 		ALTER TABLE arc ENABLE TRIGGER gw_trg_topocontrol_arc;
 	END IF;
 
-		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+		INSERT INTO audit_check_data (fid,  criticity, error_message)
 		VALUES (106, 2, 'Topocontrol is deactivated.');
 	
-		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+		INSERT INTO audit_check_data (fid,  criticity, error_message)
 		VALUES (106, 1, concat('INFO: Features inserted with state: ',v_state,' and state type: ',v_state_type,'.'));	
-		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+		INSERT INTO audit_check_data (fid,  criticity, error_message)
 		VALUES (106, 1, concat('INFO: Features inserted with workcat_id: ',v_workcat,'.'));	
-		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+		INSERT INTO audit_check_data (fid,  criticity, error_message)
 		VALUES (106, 1, concat('INFO: Features inserted with builtdate: ',v_builtdate,'.'));	
-		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+		INSERT INTO audit_check_data (fid,  criticity, error_message)
 		VALUES (106, 1, concat('INFO: Nodes from dxf inserted with node_type: ',v_node_type,'.'));	
-		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+		INSERT INTO audit_check_data (fid,  criticity, error_message)
 		VALUES (106, 1, 'INFO: New nodes inserted with nodecat_id: DXF_JUN_CAT, node_type: DXF_JUN.');	
-		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+		INSERT INTO audit_check_data (fid,  criticity, error_message)
 		VALUES (106, 1, concat('INFO: Arcs from dxf inserted with arc_type: ',v_arc_type,'.'));
 
 	-- get results
@@ -195,7 +195,7 @@ BEGIN
 
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data 
-	WHERE cur_user="current_user"() AND fprocesscat_id=106 ORDER BY criticity desc, id asc) row; 
+	WHERE cur_user="current_user"() AND fid=106 ORDER BY criticity desc, id asc) row;
 	
 	v_result_info := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');

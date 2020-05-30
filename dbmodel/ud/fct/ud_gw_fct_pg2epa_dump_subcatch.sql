@@ -20,7 +20,7 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
     --  Reset values
-    DELETE FROM temp_table WHERE cur_user=current_user AND fprocesscat_id=17;
+    DELETE FROM temp_table WHERE cur_user=current_user AND fid = 17;
 
     -- Dump node coordinates for every polygon
     FOR row_id IN SELECT subc_id FROM v_edit_inp_subcatchment
@@ -34,13 +34,13 @@ BEGIN
         FOR point_aux IN SELECT (ST_dumppoints(subcatchment_polygon)).geom
         LOOP
             -- Insert result into outfile table
-            INSERT INTO temp_table (fprocesscat_id, text_column) VALUES ( 17, format('%s       %s       %s       ', row_id, to_char(ST_X(point_aux),'99999999.999'), to_char(ST_Y(point_aux),'99999999.999')) );
+            INSERT INTO temp_table (fid, text_column) VALUES ( 17, format('%s       %s       %s       ', row_id, to_char(ST_X(point_aux),'99999999.999'), to_char(ST_Y(point_aux),'99999999.999')) );
         END LOOP;
 
     END LOOP;
 
     -- Return the temporal table
-    RETURN QUERY SELECT text_column::varchar FROM temp_table WHERE cur_user=current_user AND fprocesscat_id=17;
+    RETURN QUERY SELECT text_column::varchar FROM temp_table WHERE cur_user=current_user AND fid = 17;
 
 END
 $$;

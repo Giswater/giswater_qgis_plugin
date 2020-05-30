@@ -20,7 +20,7 @@ DECLARE
 v_hour text;
 v_type text;
 v_rpt record;
-v_csv2pgcat_id integer = 11;
+v_fid integer = 11;
 v_result json;
 v_result_info json;
 v_result_point json;
@@ -65,24 +65,24 @@ BEGIN
 	v_path := ((p_data ->>'data')::json->>'path')::text;
 
 	-- delete previous data on log table
-	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=40;
+	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid = 40;
 		
 	-- use the copy function of postgres to import from file in case of file must be provided as a parameter
 
 	-- Starting process
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (40, v_result_id, concat('IMPORT RPT FILE'));
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (40, v_result_id, concat('-----------------------------'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (40, v_result_id, concat('IMPORT RPT FILE'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (40, v_result_id, concat('-----------------------------'));
 	
 
 	IF v_path IS NOT NULL THEN
-		DELETE FROM temp_csv2pg WHERE cur_user=current_user AND csv2pgcat_id=v_csv2pgcat_id;
-		EXECUTE 'SELECT gw_fct_utils_csv2pg_import_temp_data('||quote_literal(v_csv2pgcat_id)||','||quote_literal(v_path)||' )';	
+		DELETE FROM temp_csv2pg WHERE cur_user=current_user AND fid = v_fid;
+		EXECUTE 'SELECT gw_fct_utils_csv2pg_import_temp_data('||quote_literal(v_fid)||','||quote_literal(v_path)||' )';
 	END IF;
 
-	UPDATE temp_csv2pg SET csv2pgcat_id=v_csv2pgcat_id WHERE csv2pgcat_id IS NULL AND cur_user=current_user;
+	UPDATE temp_csv2pg SET fid = v_fid WHERE fid IS NULL AND cur_user=current_user;
 	
 	--remove data from with the same result_id
-	FOR v_rpt IN SELECT tablename FROM config_csv_param WHERE pg2csvcat_id=v_csv2pgcat_id EXCEPT SELECT tablename FROM config_csv_param WHERE tablename='rpt_cat_result' LOOP
+	FOR v_rpt IN SELECT tablename FROM config_csv_param WHERE pg2csvcat_id=v_fid EXCEPT SELECT tablename FROM config_csv_param WHERE tablename='rpt_cat_result' LOOP
 		EXECUTE 'DELETE FROM '||v_rpt.tablename||' WHERE result_id='''||v_result_id||''';';
 	END LOOP;
 	
@@ -93,51 +93,51 @@ BEGIN
 	UPDATE temp_csv2pg SET csv6=null WHERE source='rpt_node' AND (csv6='Reservoir' OR csv6='Tank'); -- delete Reservoir AND tank word when quality is not enabled
 	INSERT INTO rpt_node (node_id, result_id, "time", elevation, demand, head, press, quality) 
 	SELECT csv1, v_result_id, csv40, csv2::numeric, csv3::numeric, csv4::numeric, csv5::numeric, csv6::numeric
-	FROM temp_csv2pg WHERE source='rpt_node' AND csv2pgcat_id=11 AND cur_user=current_user ORDER BY id;
+	FROM temp_csv2pg WHERE source='rpt_node' AND fid = 11 AND cur_user=current_user ORDER BY id;
 
 	-- rpt_arc
 	DELETE FROM temp_csv2pg WHERE source='rpt_arc' AND (csv1='Link' or csv1='Length' or csv1='Analysis' or csv1='MINIMUM' or csv1='MAXIMUM' or csv1='DIFFERENTIAL' or csv1='AVERAGE');
 	INSERT INTO rpt_arc(arc_id,result_id,"time",length, diameter, flow, vel, headloss,setting,reaction, ffactor,other)
 	SELECT csv1,v_result_id, csv40, csv2::numeric, csv3::numeric, csv4::numeric, csv5::numeric, csv6::numeric, csv7::numeric, csv8::numeric, csv9::numeric, csv10
-	FROM temp_csv2pg WHERE source='rpt_arc' AND csv2pgcat_id=11 AND cur_user=current_user ORDER BY id;
+	FROM temp_csv2pg WHERE source='rpt_arc' AND fid = 11 AND cur_user=current_user ORDER BY id;
 
 	-- energy_usage
 	INSERT INTO rpt_energy_usage(result_id, nodarc_id, usage_fact, avg_effic, kwhr_mgal, avg_kw, peak_kw, cost_day)
 	SELECT v_result_id, csv1, csv2::numeric, csv3::numeric, csv4::numeric, csv5::numeric, csv6::numeric, csv7::numeric
-	FROM temp_csv2pg WHERE source='rpt_energy_usage' AND csv2pgcat_id=11 AND cur_user=current_user AND csv1 NOT IN ('Energy', 'Pump', 'Demand', 'Total') ORDER BY id;
+	FROM temp_csv2pg WHERE source='rpt_energy_usage' AND fid = 11 AND cur_user=current_user AND csv1 NOT IN ('Energy', 'Pump', 'Demand', 'Total') ORDER BY id;
 
 	-- hydraulic_status
 	INSERT INTO rpt_hydraulic_status (result_id, time, text)
 	SELECT v_result_id, csv1, concat (csv2, ' ', csv3,' ', csv4, ' ',csv5, ' ',csv6, ' ',csv7, ' ',csv8, ' ',csv9, ' ',csv10, ' ',csv11,' ', csv12,' ', csv13, ' ',
 	csv14, ' ',csv15, ' ',csv16, ' ',csv17, ' ',csv18)
-	FROM temp_csv2pg WHERE source='rpt_hydraulic_status' AND csv2pgcat_id=11 AND cur_user=current_user AND csv1 = 'WARNING' ORDER BY id;
+	FROM temp_csv2pg WHERE source='rpt_hydraulic_status' AND fid = 11 AND cur_user=current_user AND csv1 = 'WARNING' ORDER BY id;
 
 	INSERT INTO rpt_hydraulic_status (result_id, time, text)
 	SELECT v_result_id, csv1, concat (csv2, ' ', csv3,' ', csv4, ' ',csv5, ' ',csv6, ' ',csv7, ' ',csv8, ' ',csv9, ' ',csv10, ' ',csv11,' ', csv12,' ', csv13, ' ',
 	csv14, ' ',csv15, ' ',csv16, ' ',csv17, ' ',csv18)
-	FROM temp_csv2pg WHERE source='rpt_hydraulic_status' AND csv2pgcat_id=11 AND cur_user=current_user ORDER BY id;
+	FROM temp_csv2pg WHERE source='rpt_hydraulic_status' AND fid = 11 AND cur_user=current_user ORDER BY id;
 
 
 	-- rpt_cat_result
-	v_njunction = (SELECT csv4 FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Number Junctions%' AND csv2pgcat_id=11 AND source='rpt_cat_result' AND cur_user=current_user);
-	v_nreservoir = (SELECT csv4 FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Number Reservoirs%' AND csv2pgcat_id=11 AND source='rpt_cat_result' AND cur_user=current_user);
-	v_ntanks = (SELECT csv5 FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Number Tanks%' AND csv2pgcat_id=11 AND source='rpt_cat_result' AND cur_user=current_user);
-	v_npipes = (SELECT csv5 FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Number Pipes%' AND csv2pgcat_id=11 AND source='rpt_cat_result' AND cur_user=current_user);
-	v_npumps = (SELECT csv5 FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Number Pumps%' AND csv2pgcat_id=11 AND source='rpt_cat_result' AND cur_user=current_user);
-	v_nvalves = (SELECT csv5 FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Number Valves%' AND csv2pgcat_id=11 AND source='rpt_cat_result' AND cur_user=current_user);
-	v_headloss = (SELECT csv4 FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Headloss%' AND csv2pgcat_id=11 AND source='rpt_cat_result' AND cur_user=current_user);
-	v_htstep= (SELECT concat(csv4,csv5) FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Hydraulic Timestep%' AND csv2pgcat_id=11 AND source='rpt_cat_result' AND cur_user=current_user);
-	v_haccuracy = (SELECT csv4 FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Hydraulic Accuracy%' AND csv2pgcat_id=11 AND source='rpt_cat_result' AND cur_user=current_user);
-	v_statuscheck = (SELECT csv5 FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Status Check%' AND csv2pgcat_id=11 AND source='rpt_cat_result' AND cur_user=current_user);
-	v_mcheck = (SELECT csv5 FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Maximum Check%' AND csv2pgcat_id=11 AND source='rpt_cat_result' AND cur_user=current_user);
-	v_dthreshold = (SELECT csv5 FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Damping Threshold%' AND csv2pgcat_id=11 AND source='rpt_cat_result' AND cur_user=current_user);
-	v_mtrials = (SELECT csv4 FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Maximum Trials ...................%' AND csv2pgcat_id=11 AND source='rpt_cat_result' AND cur_user=current_user);
-	v_qanalysis = (SELECT csv4 FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Quality Analysis%' AND csv2pgcat_id=11 AND source='rpt_cat_result' AND cur_user=current_user);
-	v_sgravity = (SELECT csv4 FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Specific Gravity%' AND csv2pgcat_id=11 AND source='rpt_cat_result' AND cur_user=current_user);
-	v_rkinematic = (SELECT csv5 FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Relative Kinematic%' AND csv2pgcat_id=11 AND source='rpt_cat_result' AND cur_user=current_user);
-	v_rchemical = (SELECT csv5 FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Relative Chemical%' AND csv2pgcat_id=11 AND source='rpt_cat_result' AND cur_user=current_user);
-	v_dmultiplier= (SELECT csv4 FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Demand Multiplier%' AND csv2pgcat_id=11 AND source='rpt_cat_result' AND cur_user=current_user);
-	v_tduration = (SELECT csv4 FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Total Duration%' AND csv2pgcat_id=11 AND source='rpt_cat_result' AND cur_user=current_user);
+	v_njunction = (SELECT csv4 FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Number Junctions%' AND fid = 11 AND source='rpt_cat_result' AND cur_user=current_user);
+	v_nreservoir = (SELECT csv4 FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Number Reservoirs%' AND fid = 11 AND source='rpt_cat_result' AND cur_user=current_user);
+	v_ntanks = (SELECT csv5 FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Number Tanks%' AND fid = 11 AND source='rpt_cat_result' AND cur_user=current_user);
+	v_npipes = (SELECT csv5 FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Number Pipes%' AND fid = 11 AND source='rpt_cat_result' AND cur_user=current_user);
+	v_npumps = (SELECT csv5 FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Number Pumps%' AND fid = 11 AND source='rpt_cat_result' AND cur_user=current_user);
+	v_nvalves = (SELECT csv5 FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Number Valves%' AND fid = 11 AND source='rpt_cat_result' AND cur_user=current_user);
+	v_headloss = (SELECT csv4 FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Headloss%' AND fid = 11 AND source='rpt_cat_result' AND cur_user=current_user);
+	v_htstep= (SELECT concat(csv4,csv5) FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Hydraulic Timestep%' AND fid = 11 AND source='rpt_cat_result' AND cur_user=current_user);
+	v_haccuracy = (SELECT csv4 FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Hydraulic Accuracy%' AND fid = 11 AND source='rpt_cat_result' AND cur_user=current_user);
+	v_statuscheck = (SELECT csv5 FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Status Check%' AND fid = 11 AND source='rpt_cat_result' AND cur_user=current_user);
+	v_mcheck = (SELECT csv5 FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Maximum Check%' AND fid = 11 AND source='rpt_cat_result' AND cur_user=current_user);
+	v_dthreshold = (SELECT csv5 FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Damping Threshold%' AND fid = 11 AND source='rpt_cat_result' AND cur_user=current_user);
+	v_mtrials = (SELECT csv4 FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Maximum Trials ...................%' AND fid = 11 AND source='rpt_cat_result' AND cur_user=current_user);
+	v_qanalysis = (SELECT csv4 FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Quality Analysis%' AND fid = 11 AND source='rpt_cat_result' AND cur_user=current_user);
+	v_sgravity = (SELECT csv4 FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Specific Gravity%' AND fid = 11 AND source='rpt_cat_result' AND cur_user=current_user);
+	v_rkinematic = (SELECT csv5 FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Relative Kinematic%' AND fid = 11 AND source='rpt_cat_result' AND cur_user=current_user);
+	v_rchemical = (SELECT csv5 FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Relative Chemical%' AND fid = 11 AND source='rpt_cat_result' AND cur_user=current_user);
+	v_dmultiplier= (SELECT csv4 FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Demand Multiplier%' AND fid = 11 AND source='rpt_cat_result' AND cur_user=current_user);
+	v_tduration = (SELECT csv4 FROM temp_csv2pg WHERE concat(csv1,' ',csv3) ilike 'Total Duration%' AND fid = 11 AND source='rpt_cat_result' AND cur_user=current_user);
 
 	-- to do:
 	--v_qtimestep text;
@@ -147,12 +147,12 @@ BEGIN
 				, hydra_acc=v_haccuracy, st_ch_freq=v_statuscheck, max_tr_ch=v_mcheck, dam_li_thr=v_dthreshold, max_trials=v_mtrials, q_analysis=v_qanalysis, spec_grav=v_sgravity
 				, r_kin_visc=v_rkinematic, r_che_diff=v_rchemical, dem_multi=v_dmultiplier, total_dura=v_tduration, q_timestep=v_qtimestep, q_tolerance=v_qtolerance;
 
-	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (40, 'Rpt file import process -> Finished. Check your data');
+	INSERT INTO audit_check_data (fid, error_message) VALUES (40, 'Rpt file import process -> Finished. Check your data');
 
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=40  order by id) row; 
+	FROM (SELECT error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid = 40  order by id) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 	
@@ -165,8 +165,8 @@ BEGIN
     'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
     'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
-  	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fprocesscat_id, the_geom 
-  	FROM  anl_node WHERE cur_user="current_user"() AND fprocesscat_id=40) row) features;
+  	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
+  	FROM  anl_node WHERE cur_user="current_user"() AND fid = 40) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
@@ -180,8 +180,8 @@ BEGIN
     'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
     'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
-  	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom, fprocesscat_id
-  	FROM  anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=40) row) features;
+  	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom, fid
+  	FROM  anl_arc WHERE cur_user="current_user"() AND fid = 40) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 

@@ -60,7 +60,7 @@ BEGIN
 					EXECUTE 'SELECT state_type FROM node WHERE node_id=$1'
 						INTO v_state_type
 						USING feature_id_aux;						
-					INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) VALUES (28,'NODE', feature_id_aux, concat(v_old_state,',',v_state_type));
+					INSERT INTO audit_log_data (fid, feature_type, feature_id, log_message) VALUES (28,'NODE', feature_id_aux, concat(v_old_state,',',v_state_type));
 				
 				END IF;
 
@@ -70,7 +70,7 @@ BEGIN
 					EXECUTE 'SELECT state_type FROM node WHERE node_id=$1'
 						INTO v_state_type
 						USING feature_id_aux;						
-					INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) VALUES (28,'NODE', feature_id_aux, concat(v_old_state,',',v_state_type));
+					INSERT INTO audit_log_data (fid, feature_type, feature_id, log_message) VALUES (28,'NODE', feature_id_aux, concat(v_old_state,',',v_state_type));
 
 				END IF;
 				
@@ -154,7 +154,7 @@ BEGIN
 					EXECUTE 'SELECT state_type FROM connec WHERE connec_id=$1'
 						INTO v_state_type
 						USING feature_id_aux;						
-					INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) VALUES (28,'CONNEC', feature_id_aux, concat(v_old_state,',',v_state_type));
+					INSERT INTO audit_log_data (fid, feature_type, feature_id, log_message) VALUES (28,'CONNEC', feature_id_aux, concat(v_old_state,',',v_state_type));
 				END IF;
 				
 			END IF;	
@@ -180,7 +180,7 @@ BEGIN
 					EXECUTE 'SELECT state_type FROM gully WHERE gully_id=$1'
 						INTO v_state_type
 						USING feature_id_aux;
-					INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) VALUES (28,'GULLY', feature_id_aux, concat(v_old_state,',',v_state_type));
+					INSERT INTO audit_log_data (fid, feature_type, feature_id, log_message) VALUES (28,'GULLY', feature_id_aux, concat(v_old_state,',',v_state_type));
 				END IF;
 				
 			END IF;	

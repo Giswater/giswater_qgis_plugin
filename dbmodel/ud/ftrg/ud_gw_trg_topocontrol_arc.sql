@@ -168,7 +168,7 @@ BEGIN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
 				"data":{"message":"1040", "function":"1244","debug_msg":"'||nodeRecord1.node_id||'"}}$$);';
 			ELSE
-				INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (3, NEW.arc_id, 'Node_1 and Node_2 are the same');
+				INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (3, NEW.arc_id, 'Node_1 and Node_2 are the same');
 			END IF;
 		ELSE
 			-- Calculate system parameters
@@ -323,7 +323,7 @@ BEGIN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
 				"data":{"message":"1042", "function":"1244","debug_msg":"'||NEW.arc_id||'"}}$$);';
 		ELSE
-			INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (4, NEW.arc_id, concat('Node_1 ', nodeRecord1.node_id, ' or Node_2 ', nodeRecord2.node_id, ' does not exists or does not has compatible state with arc'));
+			INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (4, NEW.arc_id, concat('Node_1 ', nodeRecord1.node_id, ' or Node_2 ', nodeRecord2.node_id, ' does not exists or does not has compatible state with arc'));
 		END IF;
 		
 	--Not existing nodes but accepted insertion
@@ -335,7 +335,7 @@ BEGIN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
 				"data":{"message":"1042", "function":"1244","debug_msg":"'||NEW.arc_id||'"}}$$);';
 		ELSE
-			INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (4, NEW.arc_id, concat('Node_1 ', nodeRecord1.node_id, ' or Node_2 ', nodeRecord2.node_id, ' does not exists or does not has compatible state with arc'));
+			INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (4, NEW.arc_id, concat('Node_1 ', nodeRecord1.node_id, ' or Node_2 ', nodeRecord2.node_id, ' does not exists or does not has compatible state with arc'));
 		END IF;
 		
 	END IF;

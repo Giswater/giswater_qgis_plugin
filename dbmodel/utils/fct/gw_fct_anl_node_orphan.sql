@@ -59,7 +59,7 @@ BEGIN
 	SELECT  regexp_replace(row(value)::text, '["()"]', '', 'g') INTO v_qmlpointpath FROM config_param_user WHERE parameter='qgis_qml_pointlayer_path' AND cur_user=current_user;
 
 	-- Reset values
-	DELETE FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=7;
+	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=7;
 
 	-- built partial query
 	IF v_projectype = 'WS' THEN
@@ -78,7 +78,7 @@ BEGIN
 			SELECT ST_Distance(arc.the_geom, rec_node.the_geom) as d, arc.arc_id INTO v_closest_arc_distance, v_closest_arc_id 
 			FROM arc ORDER BY arc.the_geom <-> rec_node.the_geom  LIMIT 1;
 		
-			INSERT INTO anl_node (node_id, state, expl_id, fprocesscat_id, the_geom, nodecat_id,arc_id,arc_distance) 
+			INSERT INTO anl_node (node_id, state, expl_id, fid, the_geom, nodecat_id,arc_id,arc_distance)
 			VALUES (rec_node.node_id, rec_node.state, rec_node.expl_id, 7, rec_node.the_geom, rec_node.nodecat_id,v_closest_arc_id,v_closest_arc_distance);
 		END LOOP;
 	ELSE
@@ -89,7 +89,7 @@ BEGIN
 			SELECT ST_Distance(arc.the_geom, rec_node.the_geom) as d, arc.arc_id INTO v_closest_arc_distance, v_closest_arc_id 
 			FROM arc ORDER BY arc.the_geom <-> rec_node.the_geom  LIMIT 1;
 		
-			INSERT INTO anl_node (node_id, state, expl_id, fprocesscat_id, the_geom, nodecat_id,arc_id,arc_distance) 
+			INSERT INTO anl_node (node_id, state, expl_id, fid, the_geom, nodecat_id,arc_id,arc_distance)
 			VALUES (rec_node.node_id, rec_node.state, rec_node.expl_id, 7, rec_node.the_geom, rec_node.nodecat_id,v_closest_arc_id,v_closest_arc_distance);
 		END LOOP;
 	END IF;
@@ -98,7 +98,7 @@ BEGIN
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=7 order by id) row; 
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=7 order by id) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
@@ -112,8 +112,8 @@ BEGIN
     'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
     'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
-  	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fprocesscat_id, the_geom 
-  	FROM  anl_node WHERE cur_user="current_user"() AND fprocesscat_id=7) row) features;
+  	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
+  	FROM  anl_node WHERE cur_user="current_user"() AND fid=7) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "features":',v_result, '}'); 
@@ -121,11 +121,11 @@ BEGIN
 
 	IF v_saveondatabase IS FALSE THEN 
 		-- delete previous results
-		DELETE FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=7;
+		DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=7;
 	ELSE
 		-- set selector
-		DELETE FROM selector_audit WHERE fprocesscat_id=7 AND cur_user=current_user;    
-		INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (7, current_user);
+		DELETE FROM selector_audit WHERE fid=7 AND cur_user=current_user;
+		INSERT INTO selector_audit (fid,cur_user) VALUES (7, current_user);
 	END IF;
 		
 	--    Control nulls

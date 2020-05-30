@@ -41,7 +41,7 @@ BEGIN
 	SELECT giswater INTO v_version FROM version order by 1 desc limit 1;
 
 	-- Reset values
-	DELETE FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=12;
+	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=12;
     
     -- getting input data 	
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
@@ -55,7 +55,7 @@ BEGIN
 
 	-- Computing process
 	IF v_array != '()' THEN
-		EXECUTE 'INSERT INTO anl_node (node_id, expl_id, fprocesscat_id, num_arcs, the_geom,nodecat_id, state)
+		EXECUTE 'INSERT INTO anl_node (node_id, expl_id, fid, num_arcs, the_geom,nodecat_id, state)
 				SELECT node_1 as node_id, '||v_worklayer||'.expl_id, 12, count(node_1) as num_arcs, '||v_worklayer||'.the_geom,nodecat_id,'||v_worklayer||'.state
 				FROM arc JOIN '||v_worklayer||' ON node_id=node_1 AND node_id IN '||v_array||'
 				WHERE arc.state=1 and '||v_worklayer||'.state=1
@@ -63,7 +63,7 @@ BEGIN
 				HAVING count(node_1)> 1 
 				ORDER BY 2 desc;';	
 	ELSE
-		EXECUTE 'INSERT INTO anl_node (node_id, expl_id, fprocesscat_id, num_arcs, the_geom,nodecat_id,state)
+		EXECUTE 'INSERT INTO anl_node (node_id, expl_id, fid, num_arcs, the_geom,nodecat_id,state)
 				SELECT node_1 as node_id, '||v_worklayer||'.expl_id, 12, count(node_1) as num_arcs, '||v_worklayer||'.the_geom, nodecat_id,'||v_worklayer||'.state
 				FROM arc JOIN '||v_worklayer||' ON node_id=node_1
 				WHERE arc.state=1 and '||v_worklayer||'.state=1
@@ -76,7 +76,7 @@ BEGIN
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=12 order by id) row; 
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=12 order by id) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
@@ -89,19 +89,19 @@ BEGIN
     'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
     'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
-  	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fprocesscat_id, the_geom 
-  	FROM  anl_node WHERE cur_user="current_user"() AND fprocesscat_id=12) row) features;
+  	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
+  	FROM  anl_node WHERE cur_user="current_user"() AND fid=12) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "features":',v_result, '}'); 
 
 	IF v_saveondatabase IS FALSE THEN 
 		-- delete previous results
-		DELETE FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=12;
+		DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=12;
 	ELSE
 		-- set selector
-		DELETE FROM selector_audit WHERE fprocesscat_id=12 AND cur_user=current_user;    
-		INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (12, current_user);
+		DELETE FROM selector_audit WHERE fid=12 AND cur_user=current_user;
+		INSERT INTO selector_audit (fid,cur_user) VALUES (12, current_user);
 	END IF;
 		
 	--    Control nulls

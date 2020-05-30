@@ -90,7 +90,7 @@ DECLARE
 	v_project_type text;
 	v_version text;
 	v_featuretable text;
-	v_csv2pgcat_id integer;
+	v_fid integer;
 	v_column text;
 	v_visittablename text;
 	v_visitcolumnname text;
@@ -107,13 +107,13 @@ BEGIN
 
 	-- get input parameter
 	v_visit_descript =  (p_data::json->>'data')::json->>'importParam';
-	v_csv2pgcat_id =  (p_data::json->>'data')::json->>'csv2pgCat';
+	v_fid =  (p_data::json->>'data')::json->>'csv2pgCat';
 
 	-- get config parameteres
-	v_isvisitexists = (SELECT (value::json->>'visit')::json->>'isVisitExists' FROM config_param_system WHERE parameter = concat('utils_csv2pg_om_visit_parameters_', v_csv2pgcat_id));
-	v_visittablename = (SELECT (value::json->>'visit')::json->>'tableName' FROM config_param_system WHERE parameter = concat('utils_csv2pg_om_visit_parameters_', v_csv2pgcat_id));
-	v_visitcolumnname = (SELECT (value::json->>'visit')::json->>'featureColumn' FROM config_param_system WHERE parameter = concat('utils_csv2pg_om_visit_parameters_', v_csv2pgcat_id));
-	v_featuretablename = (SELECT (value::json->>'feature')::json->>'tableName' FROM config_param_system WHERE parameter = concat('utils_csv2pg_om_visit_parameters_', v_csv2pgcat_id));
+	v_isvisitexists = (SELECT (value::json->>'visit')::json->>'isVisitExists' FROM config_param_system WHERE parameter = concat('utils_csv2pg_om_visit_parameters_', v_fid));
+	v_visittablename = (SELECT (value::json->>'visit')::json->>'tableName' FROM config_param_system WHERE parameter = concat('utils_csv2pg_om_visit_parameters_', v_fid));
+	v_visitcolumnname = (SELECT (value::json->>'visit')::json->>'featureColumn' FROM config_param_system WHERE parameter = concat('utils_csv2pg_om_visit_parameters_', v_fid));
+	v_featuretablename = (SELECT (value::json->>'feature')::json->>'tableName' FROM config_param_system WHERE parameter = concat('utils_csv2pg_om_visit_parameters_', v_fid));
 
 	-- hardcoded to test
 	----------------------------------------
@@ -123,12 +123,12 @@ BEGIN
 	RAISE NOTICE 'v_isvisitexists % v_visittablename % v_visitcolumnname  % v_featuretablename %', v_isvisitexists, v_visittablename, v_visitcolumnname, v_featuretablename;
 
 	-- manage log (fprocesscat 42)
-	DELETE FROM audit_check_data WHERE fprocesscat_id=42 AND cur_user=current_user;
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('LOG IMPORTACIO DE FITXER DE VISITES DE LA CONTRATA DE SANEJAMENT'));
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('--------------------------------------------------------------------------------------'));
+	DELETE FROM audit_check_data WHERE fid=42 AND cur_user=current_user;
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('LOG IMPORTACIO DE FITXER DE VISITES DE LA CONTRATA DE SANEJAMENT'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('--------------------------------------------------------------------------------------'));
    
  	-- starting process
-	FOR v_visit IN SELECT * FROM temp_csv2pg WHERE csv2pgcat_id=v_csv2pgcat_id AND cur_user=current_user
+	FOR v_visit IN SELECT * FROM temp_csv2pg WHERE fid = v_fid AND cur_user=current_user
 	LOOP
 		RAISE NOTICE 'v_visit %', v_visit;
 	
@@ -148,7 +148,7 @@ BEGIN
 		v_csv=10;
 			
 		FOR v_column IN SELECT json_array_elements(((value::json->>'feature')::json->>'columns')::json) 
-		FROM config_param_system WHERE parameter = concat('utils_csv2pg_om_visit_parameters_',v_csv2pgcat_id)
+		FROM config_param_system WHERE parameter = concat('utils_csv2pg_om_visit_parameters_',v_fid)
 		LOOP
 
 			IF v_csv = 10 THEN	
@@ -180,12 +180,12 @@ BEGIN
 		END LOOP;
 	
 		v_csv = (SELECT (value::json->>'visit')::json->>'firstCsvParameter' FROM config_param_system 
-		WHERE parameter = concat('utils_csv2pg_om_visit_parameters_', v_csv2pgcat_id))::integer;
+		WHERE parameter = concat('utils_csv2pg_om_visit_parameters_', v_fid))::integer;
 
 		raise notice 'v_csv %', v_csv;
 			
 		FOR v_parameters IN SELECT json_array_elements(((value::json->>'visit')::json->>'visitParameters')::json) 
-		FROM config_param_system WHERE parameter = concat('utils_csv2pg_om_visit_parameters_',v_csv2pgcat_id)
+		FROM config_param_system WHERE parameter = concat('utils_csv2pg_om_visit_parameters_',v_fid)
 		LOOP			
 			raise notice 'v_parameters %', v_parameters;
 			-- parameters are defined from row csv10 to row csv20
@@ -237,22 +237,22 @@ BEGIN
 	END LOOP;
 
 	-- Delete values on temporal table
-	DELETE FROM temp_csv2pg WHERE cur_user=current_user AND csv2pgcat_id=v_csv2pgcat_id;
+	DELETE FROM temp_csv2pg WHERE cur_user=current_user AND fid=v_fid;
 
 	
 
 	-- manage log (fprocesscat 42)
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('Reading values from temp_csv2pg table -> Done'));
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('Inserting values on om_visit table -> Done'));
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('Inserting values on ',v_featuretable,' table -> Done'));
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('Inserting values on om_visit_event table -> Done'));
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('Deleting values from temp_csv2pg -> Done'));
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('Process finished'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Reading values from temp_csv2pg table -> Done'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Inserting values on om_visit table -> Done'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Inserting values on ',v_featuretable,' table -> Done'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Inserting values on om_visit_event table -> Done'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Deleting values from temp_csv2pg -> Done'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Process finished'));
 
 
 	-- get log (fprocesscat 42)
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=42) row; 
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=42) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 			

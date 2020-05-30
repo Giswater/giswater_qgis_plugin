@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2660
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_edit_check_data(fprocesscat_id json) RETURNS json AS $$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_edit_check_data(fid json) RETURNS json AS $$
 DECLARE
 
 v_return json;
@@ -18,7 +18,7 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
 	
-	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND audit_check_data.fprocesscat_id=38;
+	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND audit_check_data.fid = 38;
 	
 	
     RETURN vjson;

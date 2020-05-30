@@ -24,7 +24,7 @@ hour_aux text;
 type_aux text;
 rpt_rec record;
 project_type_aux varchar;
-v_csv2pgcat_id integer =11;
+v_fid integer =11;
 v_target text;
 v_id text;
 v_result json;
@@ -49,31 +49,31 @@ BEGIN
 	v_path := ((p_data ->>'data')::json->>'path')::text;
 
 	-- delete previous data on log table
-	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=40;
+	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=40;
 
 	-- Starting process
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (40, v_result_id, concat('IMPORT RPT FILE'));
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (40, v_result_id, concat('-----------------------------'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (40, v_result_id, concat('IMPORT RPT FILE'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (40, v_result_id, concat('-----------------------------'));
 	
 	-- use the copy function of postgres to import from file in case of file must be provided as a parameter
 	IF v_path IS NOT NULL THEN
-		DELETE FROM temp_csv2pg WHERE cur_user=current_user AND csv2pgcat_id=v_csv2pgcat_id;
+		DELETE FROM temp_csv2pg WHERE cur_user=current_user AND fid = v_fid;
 		EXECUTE 'COPY temp_csv2pg (csv1, csv2, csv3, csv4, csv5, csv6, csv7, csv8, csv9, csv10, csv11, csv12) FROM '||quote_literal(v_path)||' WITH (NULL '''', FORMAT TEXT)';	
-		UPDATE temp_csv2pg SET csv2pgcat_id=v_csv2pgcat_id WHERE csv2pgcat_id IS NULL AND cur_user=current_user;
+		UPDATE temp_csv2pg SET fid = v_fid WHERE fid IS NULL AND cur_user=current_user;
 	END IF;
 	
 	--remove data from with the same result_id
-	FOR rpt_rec IN SELECT tablename FROM config_csv_param WHERE pg2csvcat_id=v_csv2pgcat_id EXCEPT SELECT tablename FROM config_csv_param WHERE tablename='rpt_cat_result' 
+	FOR rpt_rec IN SELECT tablename FROM config_csv_param WHERE pg2csvcat_id=v_fid EXCEPT SELECT tablename FROM config_csv_param WHERE tablename='rpt_cat_result'
 	LOOP
 		EXECUTE 'DELETE FROM '||rpt_rec.tablename||' WHERE result_id='''||v_result_id||''';';
 	END LOOP;
 
 
-	FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE cur_user=current_user AND csv2pgcat_id=v_csv2pgcat_id order by id
+	FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE cur_user=current_user AND fid = v_fid order by id
 	LOOP
 
-		IF (SELECT tablename FROM config_csv_param WHERE target=concat(rpt_rec.csv1,' ',rpt_rec.csv2) AND pg2csvcat_id=v_csv2pgcat_id) IS NOT NULL THEN
-			type_aux=(SELECT tablename FROM config_csv_param WHERE target=concat(rpt_rec.csv1,' ',rpt_rec.csv2) AND pg2csvcat_id=v_csv2pgcat_id);
+		IF (SELECT tablename FROM config_csv_param WHERE target=concat(rpt_rec.csv1,' ',rpt_rec.csv2) AND pg2csvcat_id=v_fid) IS NOT NULL THEN
+			type_aux=(SELECT tablename FROM config_csv_param WHERE target=concat(rpt_rec.csv1,' ',rpt_rec.csv2) AND pg2csvcat_id=v_fid);
 		ELSIF rpt_rec.csv1 = 'WARNING' THEN
 			type_aux = 'rpt_warning_summary';
 		END IF;	
@@ -257,12 +257,12 @@ BEGIN
 		END IF;
 	END LOOP;
 	
-	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (40, 'Rpt file import process -> Finished. Check your data');
+	INSERT INTO audit_check_data (fid, error_message) VALUES (40, 'Rpt file import process -> Finished. Check your data');
 
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=40  order by id) row; 
+	FROM (SELECT error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=40  order by id) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 	
@@ -276,7 +276,7 @@ BEGIN
     'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
   	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript, the_geom
-  	FROM  anl_node WHERE cur_user="current_user"() AND fprocesscat_id=40) row) features;
+  	FROM  anl_node WHERE cur_user="current_user"() AND fid=40) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
@@ -291,7 +291,7 @@ BEGIN
     'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
   	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom
-  	FROM  anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=40) row) features;
+  	FROM  anl_arc WHERE cur_user="current_user"() AND fid=40) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}'); 

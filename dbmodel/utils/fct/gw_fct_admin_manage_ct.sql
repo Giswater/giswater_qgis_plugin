@@ -61,10 +61,10 @@ BEGIN
 
 	IF v_action = 'DROP' THEN
 
-		DELETE FROM temp_table WHERE fprocesscat_id=36;
+		DELETE FROM temp_table WHERE fid=36;
 
 		-- fk
-		INSERT INTO temp_table (fprocesscat_id, text_column)
+		INSERT INTO temp_table (fid, text_column)
 		SELECT distinct on (conname)
 		36,
 		concat(
@@ -82,7 +82,7 @@ BEGIN
 		AND nspname ='SCHEMA_NAME';
 
 		-- ckeck
-		INSERT INTO temp_table (fprocesscat_id, text_column)
+		INSERT INTO temp_table (fid, text_column)
 		SELECT distinct on (conname)
 		36,
 		concat(
@@ -100,7 +100,7 @@ BEGIN
 		AND nspname ='SCHEMA_NAME';
 
 		-- unique
-		INSERT INTO temp_table (fprocesscat_id, text_column)
+		INSERT INTO temp_table (fid, text_column)
 		SELECT distinct on (conname)
 		36,
 		concat(
@@ -118,9 +118,9 @@ BEGIN
 		AND nspname ='SCHEMA_NAME';
 
 		-- Insert not null on temp_table
-		DELETE FROM temp_table WHERE fprocesscat_id=37;
+		DELETE FROM temp_table WHERE fid=37;
 
-		INSERT INTO temp_table (fprocesscat_id, text_column)
+		INSERT INTO temp_table (fid, text_column)
 		SELECT distinct
 				37,
 				concat(
@@ -141,9 +141,9 @@ BEGIN
 
 
 		-- Insert unique on temp_table
-		DELETE FROM temp_table WHERE fprocesscat_id=38;
+		DELETE FROM temp_table WHERE fid=38;
 		
-		INSERT INTO temp_table (fprocesscat_id, text_column)
+		INSERT INTO temp_table (fid, text_column)
 		SELECT distinct on (conname)
 		38,
 		concat(
@@ -162,9 +162,9 @@ BEGIN
 
 
 		-- Insert check on temp_table
-		DELETE FROM temp_table WHERE fprocesscat_id=39;
+		DELETE FROM temp_table WHERE fid=39;
 		
-		INSERT INTO temp_table (fprocesscat_id, text_column)
+		INSERT INTO temp_table (fid, text_column)
 		SELECT distinct on (conname)
 		39,
 		concat(
@@ -183,7 +183,7 @@ BEGIN
 
 
 		-- Drop fk
-		FOR v_tablerecord IN SELECT * FROM temp_table WHERE fprocesscat_id=36
+		FOR v_tablerecord IN SELECT * FROM temp_table WHERE fid=36
 		LOOP
 			v_query_text:= 'ALTER TABLE '||quote_ident((v_tablerecord.text_column)::json->>'tablename')||
 				       ' DROP CONSTRAINT IF EXISTS '||quote_ident((v_tablerecord.text_column)::json->>'constraintname')||' CASCADE;';
@@ -191,7 +191,7 @@ BEGIN
 			v_36=v_36+1;
 		END LOOP;
 
-		FOR v_tablerecord IN SELECT * FROM temp_table WHERE fprocesscat_id=37
+		FOR v_tablerecord IN SELECT * FROM temp_table WHERE fid=37
 		LOOP
 			v_query_text:= 'ALTER TABLE '||quote_ident((v_tablerecord.text_column)::json->>'tablename')||
 				       ' ALTER COLUMN '||quote_ident((v_tablerecord.text_column)::json->>'attributename')||' DROP NOT NULL;';
@@ -243,7 +243,7 @@ BEGIN
 	ELSIF v_action = 'ADD' THEN
 
 		-- Enable constraints 
-		FOR v_tablerecord IN SELECT * FROM temp_table WHERE fprocesscat_id=36 order by 1 desc
+		FOR v_tablerecord IN SELECT * FROM temp_table WHERE fid=36 order by 1 desc
 		LOOP
 			v_query_text:=  'ALTER TABLE '||quote_ident((v_tablerecord.text_column::json)->>'tablename')|| 
 							' ADD CONSTRAINT '||quote_ident((v_tablerecord.text_column::json)->>'constraintname')||
@@ -253,7 +253,7 @@ BEGIN
 		END LOOP;
 
 		
-		FOR v_tablerecord IN SELECT * FROM temp_table WHERE fprocesscat_id=37 order by 1 desc
+		FOR v_tablerecord IN SELECT * FROM temp_table WHERE fid=37 order by 1 desc
 		LOOP
 			v_query_text:=  'ALTER TABLE '||quote_ident((v_tablerecord.text_column::json)->>'tablename')|| 
 							' ALTER COLUMN '||quote_ident((v_tablerecord.text_column::json)->>'attributename')||' SET NOT NULL;' ;

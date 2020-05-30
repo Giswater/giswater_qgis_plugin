@@ -138,7 +138,7 @@ BEGIN
 			</ui>
 			');
 
-		INSERT INTO temp_csv2pg(source, csv1, csv2pgcat_id) VALUES (p_formname,v_xml,19);
+		INSERT INTO temp_csv2pg(source, csv1, fid) VALUES (p_formname,v_xml,19);
 
 		return null;
 END;

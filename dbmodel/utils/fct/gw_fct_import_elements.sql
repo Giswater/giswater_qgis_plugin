@@ -45,12 +45,12 @@ BEGIN
 	v_featuretable = concat ('element_x_',v_featuretype);
 
 	-- manage log (fprocesscat 42)
-	DELETE FROM audit_check_data WHERE fprocesscat_id=42 AND cur_user=current_user;
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('IMPORT ELEMENTS FILE'));
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('------------------------------'));
+	DELETE FROM audit_check_data WHERE  = 42 AND cur_user=current_user;
+	INSERT INTO audit_check_data (, result_id, error_message) VALUES (42, v_result_id, concat('IMPORT ELEMENTS FILE'));
+	INSERT INTO audit_check_data (, result_id, error_message) VALUES (42, v_result_id, concat('------------------------------'));
    
  	-- starting process
-	FOR v_element IN SELECT * FROM temp_csv2pg WHERE cur_user=current_user AND csv2pgcat_id=3
+	FOR v_element IN SELECT * FROM temp_csv2pg WHERE cur_user=current_user AND fid = 3
 	LOOP 
 		IF v_featuretype='node' THEN
 			INSERT INTO element (element_id, elementcat_id,observ, comment, num_elements, state_type) VALUES
@@ -75,18 +75,18 @@ BEGIN
 	END LOOP;
 
 	-- Delete values on temporal table
-	DELETE FROM temp_csv2pg WHERE cur_user=current_user AND csv2pgcat_id=3;
+	DELETE FROM temp_csv2pg WHERE cur_user=current_user AND fid = 3;
 
 	-- manage log (fprocesscat 42)
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('Reading values from temp_csv2pg table -> Done'));
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('Inserting values on element table -> Done'));
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('Inserting values on ',v_featuretable,' table -> Done'));
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('Deleting values from temp_csv2pg -> Done'));
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('Process finished'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Reading values from temp_csv2pg table -> Done'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Inserting values on element table -> Done'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Inserting values on ',v_featuretable,' table -> Done'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Deleting values from temp_csv2pg -> Done'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Process finished'));
 	
 	-- get log (fprocesscat 42)
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=42) row; 
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid = 42) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 			

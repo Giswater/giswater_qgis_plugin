@@ -25,14 +25,14 @@ BEGIN
 	PERFORM ws.gw_fct_utils_update_dma_hydroval();
 
 	-- Log
-	INSERT INTO utils.audit_log (fprocesscat_id, log_message) VALUES (999, 'Ok');
+	INSERT INTO utils.audit_log (fid, log_message) VALUES (999, 'Ok');
 
 	
 	RETURN 0;
 
 --  Exception handling
 	EXCEPTION WHEN OTHERS THEN         
-	INSERT INTO utils.audit_log (fprocesscat_id, log_message) VALUES (999, 'Ko. The process has not been executed');
+	INSERT INTO utils.audit_log (fid, log_message) VALUES (999, 'Ko. The process has not been executed');
 	RETURN 1;
 
 END;

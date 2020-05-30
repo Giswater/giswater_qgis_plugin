@@ -118,7 +118,7 @@ update connec set link='https://www.giswater.org';
 update gully set link='https://www.giswater.org';
 
 
-SELECT gw_fct_audit_check_project($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "version":"0", "fprocesscat_id":1}}$$)::text;
+SELECT gw_fct_audit_check_project($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "version":"0", "fid":1}}$$)::text;
 
 SELECT 	gw_fct_admin_manage_child_views($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{"catFeature":"CONDUIT"},
  "data":{"filterFields":{}, "pageInfo":{}, "multi_create":"TRUE" }}$$);

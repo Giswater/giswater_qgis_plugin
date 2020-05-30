@@ -253,7 +253,7 @@ BEGIN
 			v_message='Project sucessfully updated';
 		ELSIF v_priority=1 THEN
 			v_message=concat($$'Project updated but there are some warnings. Take a look on audit_log_project table: SELECT (log_message::json->>'message') 
-			FROM audit_log_project WHERE fprocesscat_id=33 and (log_message::json->>'version')='$$, v_gwversion, '''');
+			FROM audit_log_project WHERE fid = 33 and (log_message::json->>'version')='$$, v_gwversion, '''');
 		ELSIF v_priority=2 THEN
 			v_message='Project is not updated. There are one or more errors';
 		END IF;

@@ -19,10 +19,10 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_check_network('{"data":{"parameters":{"resultId
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_network('{"data":{"parameters":{"resultId":"r1"}}}')::json; -- when is called from toolbox
 
 --RESULTS
-SELECT node_id FROM anl_node WHERE fprocesscat_id=133 AND cur_user=current_user
-SELECT arc_id FROM anl_arc WHERE fprocesscat_id=132 AND cur_user=current_user
-SELECT node_id FROM anl_node WHERE fprocesscat_id=39 AND cur_user=current_user
-SELECT * FROM audit_check_data WHERE fprocesscat_id=127
+SELECT node_id FROM anl_node WHERE fid = 133 AND cur_user=current_user
+SELECT arc_id FROM anl_arc WHERE fid = 132 AND cur_user=current_user
+SELECT node_id FROM anl_node WHERE fid = 39 AND cur_user=current_user
+SELECT * FROM audit_check_data WHERE fid = 127
 SELECT * FROM temp_anlgraf;
 */
 
@@ -39,7 +39,7 @@ v_result_point json;
 v_result_line json;
 v_boundaryelem text;
 v_error_context text;
-v_fprocesscat_id integer;
+v_fid integer;
 v_querytext text;
 v_count integer = 0;
 v_min float;
@@ -54,7 +54,7 @@ BEGIN
 
 	--  Get input data
 	v_result_id = ((p_data->>'data')::json->>'parameters')::json->>'resultId';
-	v_fprocesscat_id := ((p_data ->>'data')::json->>'parameters')::json->>'fprocesscatId';
+	v_fid := ((p_data ->>'data')::json->>'parameters')::json->>'fprocesscatId';
 	
 	-- get project type
 	v_project_type = (SELECT wsoftware FROM version LIMIT 1);
@@ -80,29 +80,29 @@ BEGIN
 	END IF;
 	
 	DELETE FROM temp_anlgraf;
-	DELETE FROM anl_arc where cur_user=current_user AND fprocesscat_id IN (132,131,39);
-	DELETE FROM anl_node where cur_user=current_user AND fprocesscat_id IN (133,128,39);
-	DELETE FROM audit_check_data where cur_user=current_user AND fprocesscat_id = 39;
+	DELETE FROM anl_arc where cur_user=current_user AND fid IN (132,131,39);
+	DELETE FROM anl_node where cur_user=current_user AND fid IN (133,128,39);
+	DELETE FROM audit_check_data where cur_user=current_user AND fid = 39;
 		
-	IF v_fprocesscat_id is null THEN
-		v_fprocesscat_id = 39;
+	IF v_fid is null THEN
+		v_fid = 39;
 	END IF;
 	
 	-- Header
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (39, v_result_id, 4, 'CHECK RESULT NETWORK ACORDING EPA RULES');
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (39, v_result_id, 4, '-------------------------------------------------------');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (39, v_result_id, 4, 'CHECK RESULT NETWORK ACORDING EPA RULES');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (39, v_result_id, 4, '-------------------------------------------------------');
 
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (39, v_result_id, 3, 'CRITICAL ERRORS');	
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (39, v_result_id, 3, '----------------------');	
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (39, v_result_id, 3, 'CRITICAL ERRORS');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (39, v_result_id, 3, '----------------------');
 
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (39, v_result_id, 2, 'WARNINGS');	
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (39, v_result_id, 2, '--------------');	
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (39, v_result_id, 2, 'WARNINGS');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (39, v_result_id, 2, '--------------');
 
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (39, v_result_id, 1, 'INFO');
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (39, v_result_id, 1, '-------');	
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (39, v_result_id, 1, 'INFO');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (39, v_result_id, 1, '-------');
 	
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (39, v_result_id, 0, 'NETWORK ANALYTICS');
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (39, v_result_id, 0, '-------------------------');	
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (39, v_result_id, 0, 'NETWORK ANALYTICS');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (39, v_result_id, 0, '-------------------------');
 
 
 	RAISE NOTICE '1 - Check result orphan nodes on rpt tables (fprocesscat = 128)';
@@ -114,14 +114,14 @@ BEGIN
 	
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 	IF v_count > 0  THEN
-		EXECUTE concat ('INSERT INTO anl_node (fprocesscat_id, node_id, nodecat_id, descript, the_geom) 
+		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom)
 		SELECT 128, node_id, nodecat_id, ''Orphan node'', the_geom FROM ', v_querytext);
-		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-		VALUES (v_fprocesscat_id, 3, concat('ERROR: There is/are ',v_count,
+		INSERT INTO audit_check_data (fid, criticity, error_message)
+		VALUES (v_fid, 3, concat('ERROR: There is/are ',v_count,
 		' node''s orphan on this result. Some inconsistency may have been generated because state_type.'));
 	ELSE
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (v_fprocesscat_id, v_result_id, 1, 'INFO: No node(s) orphan found on this result.');
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+		VALUES (v_fid, v_result_id, 1, 'INFO: No node(s) orphan found on this result.');
 	END IF;
 
 	
@@ -138,13 +138,13 @@ BEGIN
 		INTO v_count;
 
 	IF v_count > 0 THEN
-		EXECUTE 'INSERT INTO anl_arc (fprocesscat_id, arc_id, arccat_id, state, expl_id, the_geom, result_id, descript)'||v_querytext;
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (v_fprocesscat_id, v_result_id, 3, concat('ERROR: There is/are ',v_count,
+		EXECUTE 'INSERT INTO anl_arc (fid, arc_id, arccat_id, state, expl_id, the_geom, result_id, descript)'||v_querytext;
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+		VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ',v_count,
 		' arc(s) without start/end nodes on this result. Some inconsistency may have been generated because state_type.'));
 	ELSE
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (v_fprocesscat_id, v_result_id, 1,'INFO: There is/are no arcs without start/end nodes on this result.');
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+		VALUES (v_fid, v_result_id, 1,'INFO: There is/are no arcs without start/end nodes on this result.');
 	END IF;
 	
 
@@ -189,38 +189,38 @@ BEGIN
 	END LOOP;
 
 	-- insert into result table disconnected arcs
-	INSERT INTO anl_arc (fprocesscat_id, result_id, arc_id, the_geom, descript)
+	INSERT INTO anl_arc (fid, result_id, arc_id, the_geom, descript)
 	SELECT DISTINCT ON (a.arc_id) 39, v_result, a.arc_id, the_geom, concat('Arc disconnected from any', v_boundaryelem)  
 		FROM temp_anlgraf a
 		JOIN temp_arc b ON a.arc_id=b.arc_id
 		GROUP BY a.arc_id,the_geom
 		having max(water) = 0;
 
-	INSERT INTO anl_node (fprocesscat_id, result_id, node_id, the_geom, descript)
+	INSERT INTO anl_node (fid, result_id, node_id, the_geom, descript)
 	SELECT DISTINCT ON (a.node_1) 39, v_result, a.node_1, the_geom, concat('Node disconnected from any', v_boundaryelem)  
 		FROM temp_anlgraf a
 		JOIN temp_node b ON a.node_1=b.node_id
 		GROUP BY a.node_1,the_geom
 		having max(water) = 0;
 
-	INSERT INTO anl_node (fprocesscat_id, result_id, node_id, the_geom, descript)
+	INSERT INTO anl_node (fid, result_id, node_id, the_geom, descript)
 	SELECT DISTINCT ON (a.node_2) 39, v_result, a.node_2, the_geom, concat('Node disconnected from any', v_boundaryelem)  
 		FROM temp_anlgraf a
 		JOIN temp_node b ON a.node_2=b.node_id
 		GROUP BY a.node_2,the_geom
 		having max(water) = 0;
 
-	SELECT count(*) FROM anl_arc INTO v_count WHERE fprocesscat_id=39 AND cur_user=current_user;
+	SELECT count(*) FROM anl_arc INTO v_count WHERE fid = 39 AND cur_user=current_user;
 
 	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (v_fprocesscat_id, v_result_id, 3, concat('ERROR: There is/are ',v_count,' arc(s) because topological disconnected from any ', v_boundaryelem
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+		VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ',v_count,' arc(s) because topological disconnected from any ', v_boundaryelem
 		,'. Main reasons may be: state_type, epa_type, sector_id or expl_id or some node not connected'));
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (v_fprocesscat_id, v_result_id, 3, concat('HINT: Use toolbox function ''Check network topology for specific result'' for more information'));
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+		VALUES (v_fid, v_result_id, 3, concat('HINT: Use toolbox function ''Check network topology for specific result'' for more information'));
 	ELSE
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-		VALUES (v_fprocesscat_id, v_result_id, 1, concat('INFO: No arcs topological disconnected found on this result from any ', v_boundaryelem));
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+		VALUES (v_fid, v_result_id, 1, concat('INFO: No arcs topological disconnected found on this result from any ', v_boundaryelem));
 	END IF;
 
 	IF v_project_type = 'WS' THEN
@@ -264,30 +264,30 @@ BEGIN
 		END LOOP;
 
 		-- insert into result table dry arcs (warning)
-		INSERT INTO anl_arc (fprocesscat_id, arc_id, the_geom, descript)
+		INSERT INTO anl_arc (fid, arc_id, the_geom, descript)
 		SELECT DISTINCT ON (a.arc_id) 132, a.arc_id, the_geom, concat('Arc without water from any inlet')  
 			FROM temp_anlgraf a
 			JOIN arc b ON a.arc_id=b.arc_id
 			GROUP BY a.arc_id,the_geom
 			having max(water) = 0
 		EXCEPT
-		SELECT 132, arc_id, the_geom, 'Arc from fproccesscat ' FROM anl_arc WHERE fprocesscat_id  = 39 AND cur_user = current_user;
+		SELECT 132, arc_id, the_geom, 'Arc from fproccesscat ' FROM anl_arc WHERE fid  = 39 AND cur_user = current_user;
 
-		SELECT count(*) FROM anl_arc INTO v_count WHERE fprocesscat_id=132 AND cur_user=current_user;
+		SELECT count(*) FROM anl_arc INTO v_count WHERE fid = 132 AND cur_user=current_user;
 
 		--raise exception 'count %', v_count;
 		IF v_count > 0 THEN
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (v_fprocesscat_id, v_result_id, 2, concat('WARNING: There is/are ',v_count,' Dry arc(s) because closed elements'));
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (v_fprocesscat_id, v_result_id, 2, concat('HINT: Use toolbox function ''Check network for specific result'' for more information'));
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result_id, 2, concat('WARNING: There is/are ',v_count,' Dry arc(s) because closed elements'));
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result_id, 2, concat('HINT: Use toolbox function ''Check network for specific result'' for more information'));
 		ELSE
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (v_fprocesscat_id, v_result_id, 1, concat('INFO: No dry arcs found'));
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result_id, 1, concat('INFO: No dry arcs found'));
 		END IF;
 
 		-- insert into result table dry nodes with demands (error)
-		INSERT INTO anl_node (fprocesscat_id, node_id, the_geom, descript)
+		INSERT INTO anl_node (fid, node_id, the_geom, descript)
 		SELECT DISTINCT ON (a.node_1) 133, a.node_1, the_geom, concat('Dry nodes with demands')  
 			FROM temp_anlgraf a
 			JOIN temp_node b ON a.node_1=b.node_id
@@ -295,18 +295,18 @@ BEGIN
 			GROUP BY a.node_1, the_geom
 			having max(water) = 0;
 
-		SELECT count(*) FROM anl_node INTO v_count WHERE fprocesscat_id=133 AND cur_user=current_user;
+		SELECT count(*) FROM anl_node INTO v_count WHERE fid = 133 AND cur_user=current_user;
 
 		--raise exception 'v_count %', v_count;
 
 		IF v_count > 0 THEN
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (v_fprocesscat_id, v_result_id, 3, concat('ERROR: There is/are ',v_count,' Dry nodes with demands'));
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (v_fprocesscat_id, v_result_id, 3, concat('HINT: Use toolbox function ''Check network for specific result'' for more information'));
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ',v_count,' Dry nodes with demands'));
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result_id, 3, concat('HINT: Use toolbox function ''Check network for specific result'' for more information'));
 		ELSE
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (v_fprocesscat_id, v_result_id, 1, concat('INFO: No dry nodes with demand found'));
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result_id, 1, concat('INFO: No dry nodes with demand found'));
 		END IF;
 	END IF;
 
@@ -315,59 +315,59 @@ BEGIN
 	
 	IF v_project_type =  'WS' THEN
 		SELECT min(elevation), max(elevation) INTO v_min, v_max FROM temp_node;
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 0, 
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 		concat('Data analysis for node elevation. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 		
 		SELECT min(length), max(length) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'PIPE';
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 0, 
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 		concat('Data analysis for pipe length. Minimun and maximum values are: (',v_min,' - ',v_max,' ).'));
 		
 		SELECT min(diameter), max(diameter) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'PIPE';
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 0, 
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 		concat('Data analysis for pipe diameter. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 
 		SELECT min(roughness), max(roughness) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'PIPE';
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 0, 
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 		concat('Data analysis for pipe roughness. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 		
 	ELSIF v_project_type  ='UD' THEN
 		
 		SELECT min(length), max(length) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'CONDUIT';
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 0, 
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 		concat('Data analysis for conduit length. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 
 		SELECT min(n), max(n) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'CONDUIT';
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 0, 
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 		concat('Data analysis for conduit manning roughness coeficient. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 
 		SELECT min(elevmax1), max(elevmax1) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'CONDUIT';
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 0, 
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 		concat('Data analysis for conduit z1. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 		
 		SELECT min(elevmax2), max(elevmax2) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'CONDUIT';
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 0, 
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 		concat('Data analysis for conduit z2. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 	
 		SELECT min(slope), max(slope) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'CONDUIT';
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 0, 
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 		concat('Data analysis for conduit slope. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 		
 		SELECT min(elev), max(elev) INTO v_min, v_max FROM temp_node;
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (v_fprocesscat_id, v_result_id, 0, 
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 		concat('Data analysis for node elevation. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));	
 	END IF;
 	
 
 	-- insert spacers on log	
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (39, v_result_id, 4, '');	
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (39, v_result_id, 3, '');	
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (39, v_result_id, 2, '');	
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (39, v_result_id, 1, '');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (39, v_result_id, 4, '');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (39, v_result_id, 3, '');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (39, v_result_id, 2, '');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (39, v_result_id, 1, '');
 
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id = v_fprocesscat_id order by criticity desc, id asc) row; 
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid = v_fid order by criticity desc, id asc) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
@@ -380,8 +380,8 @@ BEGIN
 		'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
 		'properties', to_jsonb(row) - 'the_geom_p'
 		) AS feature
-		FROM (SELECT id, node_id, node_id, state, expl_id, descript, fprocesscat_id, the_geom
-			  FROM  anl_node WHERE cur_user="current_user"() AND (fprocesscat_id=39 OR fprocesscat_id=127 OR fprocesscat_id=133)
+		FROM (SELECT id, node_id, node_id, state, expl_id, descript, fid, the_geom
+			  FROM  anl_node WHERE cur_user="current_user"() AND (fid = 39 OR fid = 127 OR fid = 133)
 		) row) features;
   	
 	v_result := COALESCE(v_result, '{}'); 
@@ -396,8 +396,8 @@ BEGIN
 		'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
 		'properties', to_jsonb(row) - 'the_geom'
 		) AS feature
-		FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript,fprocesscat_id, the_geom
-			  FROM  anl_arc WHERE cur_user="current_user"() AND  (fprocesscat_id=39 OR fprocesscat_id=127 OR fprocesscat_id=132)
+		FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript,fid, the_geom
+			  FROM  anl_arc WHERE cur_user="current_user"() AND  (fid = 39 OR fid = 127 OR fid = 132)
 			 ) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 

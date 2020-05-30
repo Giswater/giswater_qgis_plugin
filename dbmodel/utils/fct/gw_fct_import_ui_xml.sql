@@ -32,7 +32,7 @@ SET search_path=SCHEMA_NAME, public;
 
 --Loop in order to extract parts of xml related to layout_data_1,2,3
 FOR rec IN 1..3 LOOP
-	EXECUTE 'select unnest(xpath(''//layout[@name="lyt_datadata_'||rec||'"]'', csv1::xml)) from temp_csv2pg where csv2pgcat_id=20 AND cur_user=current_user
+	EXECUTE 'select unnest(xpath(''//layout[@name="lyt_datadata_'||rec||'"]'', csv1::xml)) from temp_csv2pg where fid = 20 AND cur_user=current_user
 	AND source='''||p_formname||''';'
 	INTO  layout_xml;
 	

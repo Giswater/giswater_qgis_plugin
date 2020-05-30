@@ -36,7 +36,7 @@ v_rec_table record;
 v_query_fields text;
 v_rec_view record;
 v_sql text;
-v_csv2pgcat_id integer =12;
+v_fid integer = 239;
 v_thegeom public.geometry;
 v_node_id text;
 v_node1 text;
@@ -72,7 +72,7 @@ BEGIN
 	v_path := ((p_data ->>'data')::json->>'parameters')::json->>'path'::text;
 
 	-- delete previous data on log table
-	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=41;
+	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid = 141;
 
 	v_delete_prev = true;
 
@@ -136,45 +136,45 @@ BEGIN
 	END IF;
 
 	RAISE NOTICE 'step 1/7';
-	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Constraints of schema temporary disabled -> Done');
+	INSERT INTO audit_check_data (fid, error_message) VALUES (141, 'Constraints of schema temporary disabled -> Done');
 	
 	-- use the copy function of postgres to import from file in case of file must be provided as a parameter
 	IF v_path IS NOT NULL THEN
-		EXECUTE 'SELECT gw_fct_utils_csv2pg_import_temp_data('||quote_literal(v_csv2pgcat_id)||','||quote_literal(v_path)||' ) ';
+		EXECUTE 'SELECT gw_fct_utils_csv2pg_import_temp_data('||quote_literal(v_fid)||','||quote_literal(v_path)||' ) ';
 	END IF;
 
 	RAISE NOTICE 'step 2/7';
-	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Inserting data from inp file to temp_csv2pg table -> Done');
+	INSERT INTO audit_check_data (fid, error_message) VALUES (141, 'Inserting data from inp file to temp_csv table -> Done');
 
-	UPDATE temp_csv2pg SET csv2=concat(csv2,' ',csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10,' ',csv11,' ',csv12,' ',csv13,' ',csv14,' ',csv15,' ',csv16 ),
+	UPDATE temp_csv SET csv2=concat(csv2,' ',csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10,' ',csv11,' ',csv12,' ',csv13,' ',csv14,' ',csv15,' ',csv16 ),
 	csv3=null, csv4=null,csv5=null,csv6=null,csv7=null, csv8=null, csv9=null,csv10=null,csv11=null,csv12=null, csv13=null, csv14=null,csv15=null,csv16=null WHERE source='[TEMPERATURE]' AND (csv1='TIMESERIES' OR csv1='FILE' OR csv1='SNOWMELT');
 
-	UPDATE temp_csv2pg SET csv1=concat(csv1,' ',csv2),csv2=concat(csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10,' ',csv11,' ',csv12,' ',csv13,' ',csv14,' ',csv15,' ',csv16 ),
+	UPDATE temp_csv SET csv1=concat(csv1,' ',csv2),csv2=concat(csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10,' ',csv11,' ',csv12,' ',csv13,' ',csv14,' ',csv15,' ',csv16 ),
 	csv3=null, csv4=null,csv5=null,csv6=null,csv7=null, csv8=null, csv9=null,csv10=null,csv11=null,csv12=null, csv13=null, csv14=null,csv15=null,csv16=null WHERE source='[TEMPERATURE]' AND csv1!='TIMESERIES' AND csv1!='FILE' AND csv1!='SNOWMELT';
 	
-	UPDATE temp_csv2pg SET csv1=(concat(csv1,' ',csv2,' ',csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10,' ',csv11,' ',csv12,' ',csv13)), 
+	UPDATE temp_csv SET csv1=(concat(csv1,' ',csv2,' ',csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10,' ',csv11,' ',csv12,' ',csv13)), 
 	csv2=null, csv3=null, csv4=null, csv5=null, csv6=null, csv7=null, csv8=null, csv9=null, csv10=null, csv11=null,csv12=null,csv13=null WHERE source='[CONTROLS]';
 
-	UPDATE temp_csv2pg SET csv3=(concat(csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10,' ',csv11,' ',csv12,' ',csv13)), 
+	UPDATE temp_csv SET csv3=(concat(csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10,' ',csv11,' ',csv12,' ',csv13)), 
 	csv4=null, csv5=null, csv6=null, csv7=null, csv8=null, csv9=null, csv10=null, csv11=null,csv12=null,csv13=null WHERE source='[TREATMENT]'; 
 
-	UPDATE temp_csv2pg SET csv1=(concat(csv1,' ',csv2,' ',csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10,' ',csv11,' ',csv12,' ',csv13)), 
+	UPDATE temp_csv SET csv1=(concat(csv1,' ',csv2,' ',csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10,' ',csv11,' ',csv12,' ',csv13)), 
 	csv2=null, csv3=null,csv4=null, csv5=null, csv6=null, csv7=null, csv8=null, csv9=null, csv10=null, csv11=null,csv12=null,csv13=null WHERE source='[HYDROGRAPHS]'; 
 
-	UPDATE temp_csv2pg SET csv4 = replace(csv4,'"',''), csv5 = replace(csv5,'"',''), csv6 = replace(csv6,'"',''), csv7 = replace(csv7,'"','') WHERE source='[DWF]';
+	UPDATE temp_csv SET csv4 = replace(csv4,'"',''), csv5 = replace(csv5,'"',''), csv6 = replace(csv6,'"',''), csv7 = replace(csv7,'"','') WHERE source='[DWF]';
 		
-	UPDATE temp_csv2pg SET csv2=concat(csv2,';',csv3,';',csv4,';',csv5),csv3=null,csv4=null,csv5=null WHERE source='[MAP]'; 
+	UPDATE temp_csv SET csv2=concat(csv2,';',csv3,';',csv4,';',csv5),csv3=null,csv4=null,csv5=null WHERE source='[MAP]'; 
 					
-	UPDATE temp_csv2pg SET csv2=concat(csv2,';',csv3),csv3=concat(csv4,';',csv5),csv4=null,csv5=null WHERE  source='[GWF]';
+	UPDATE temp_csv SET csv2=concat(csv2,';',csv3),csv3=concat(csv4,';',csv5),csv4=null,csv5=null WHERE  source='[GWF]';
 			
-	UPDATE temp_csv2pg SET csv1=concat(csv1,' ',csv2,' ',csv3,' ',csv4,' ',csv5,' ',csv6), csv2=null, csv3=null,csv4=null, csv5=null,csv6=null WHERE  source='[BACKDROP]';
+	UPDATE temp_csv SET csv1=concat(csv1,' ',csv2,' ',csv3,' ',csv4,' ',csv5,' ',csv6), csv2=null, csv3=null,csv4=null, csv5=null,csv6=null WHERE  source='[BACKDROP]';
 	
-	UPDATE temp_csv2pg SET csv2=concat(csv2,';',csv3,';',csv4,';',csv5,';',csv6,csv7,';',csv8,';',csv9,';',csv10,';',csv11,';',csv12,';',csv13),
+	UPDATE temp_csv SET csv2=concat(csv2,';',csv3,';',csv4,';',csv5,';',csv6,csv7,';',csv8,';',csv9,';',csv10,';',csv11,';',csv12,';',csv13),
 	csv3=null,csv4=null, csv5=null,csv6=null,csv7=null,csv8=null,csv9=null,csv10=null,csv11=null,csv12=null,csv13=null WHERE source='[EVAPORATION]';
 
 
 	RAISE NOTICE 'step 3/7';
-	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Creating map zones and catalogs -> Done');
+	INSERT INTO audit_check_data (fid, error_message) VALUES (141, 'Creating map zones and catalogs -> Done');
 
 	-- MAPZONES
 	INSERT INTO macroexploitation(macroexpl_id,name) VALUES(1,'macroexploitation1');
@@ -192,7 +192,7 @@ BEGIN
 	INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('inp_options_dwfscenario', '1', current_user);
 
 
-	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Setting selectors -> Done');
+	INSERT INTO audit_check_data (fid, error_message) VALUES (141, 'Setting selectors -> Done');
 
 
 	-- CATALOGS
@@ -253,23 +253,23 @@ BEGIN
 	-- improve velocity for junctions using directy tables in spite of vi_junctions view
 	INSERT INTO node (node_id, code, top_elev, ymax, node_type, nodecat_id, epa_type, sector_id, dma_id, expl_id, state, state_type) 
 	SELECT csv1, csv1, csv2::numeric(12,3), csv3::numeric(12,3), 'EPAMANH', 'EPAMANH-CAT', 'JUNCTION', 1, 1, 1, 1, 2 
-	FROM temp_csv2pg where source='[JUNCTIONS]' AND csv2pgcat_id=12  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user; 
+	FROM temp_csv where source='[JUNCTIONS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 	INSERT INTO inp_junction (node_id, y0, ysur, apond) 
-	SELECT csv1, csv4::numeric(12,3), csv5::numeric(12,3), csv6::numeric(12,3) FROM temp_csv2pg where source='[JUNCTIONS]' AND csv2pgcat_id=12  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user; 
+	SELECT csv1, csv4::numeric(12,3), csv5::numeric(12,3), csv6::numeric(12,3) FROM temp_csv where source='[JUNCTIONS]' AND fid =239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 	INSERT INTO man_manhole 
-	SELECT csv1 FROM temp_csv2pg where source='[JUNCTIONS]' AND csv2pgcat_id=12  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user; 
+	SELECT csv1 FROM temp_csv where source='[JUNCTIONS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 
 	-- improve velocity for conduits using directy tables in spite of vi_conduits view
 	INSERT INTO arc (arc_id, code, node_1,node_2, custom_length, sys_elev1, sys_elev2, arc_type, epa_type, arccat_id, matcat_id, sector_id, dma_id, expl_id, state, state_type) 
 	SELECT csv1, csv1, csv2, csv3, csv4::numeric(12,3), csv6::numeric(12,3), csv7::numeric(12,3), 'EPACOND', 'CONDUIT', csv5, csv5, 1, 1, 1, 1, 2 
-	FROM temp_csv2pg where source='[CONDUITS]' AND csv2pgcat_id=12  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
+	FROM temp_csv where source='[CONDUITS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 	INSERT INTO man_conduit(arc_id) SELECT csv1
-	FROM temp_csv2pg where source='[CONDUITS]' AND csv2pgcat_id=12  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
+	FROM temp_csv where source='[CONDUITS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 	INSERT INTO inp_conduit (arc_id, custom_n, q0, qmax) SELECT csv1, csv5::numeric(12,3), csv8::numeric(12,3), csv9::numeric(12,3)
-	FROM temp_csv2pg where source='[CONDUITS]' AND csv2pgcat_id=12  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
+	FROM temp_csv where source='[CONDUITS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 
 	-- LOOPING THE EDITABLE VIEWS TO INSERT DATA
-	FOR v_rec_table IN SELECT * FROM config_csv_param WHERE reverse_pg2csvcat_id=v_csv2pgcat_id AND tablename NOT IN ('vi_conduits', 'vi_junction') order by id
+	FOR v_rec_table IN SELECT * FROM config_fprocess WHERE fid2=v_fid AND tablename NOT IN ('vi_conduits', 'vi_junction') order by id
 	LOOP
 		--identifing the humber of fields of the editable view
 		FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns where table_name=v_rec_table.tablename AND table_schema='SCHEMA_NAME'
@@ -282,8 +282,8 @@ BEGIN
 		END LOOP;
 		
 		--inserting values on editable view
-		v_sql = 'INSERT INTO '||v_rec_table.tablename||' SELECT '||v_query_fields||' FROM temp_csv2pg where source like '||quote_literal(concat('%',v_rec_table.target,'%'))||' 
-		AND csv2pgcat_id='||v_csv2pgcat_id||' AND (csv1 NOT LIKE ''[%'' AND csv1 NOT LIKE '';%'') AND cur_user='||quote_literal(current_user)||' ORDER BY id';
+		v_sql = 'INSERT INTO '||v_rec_table.tablename||' SELECT '||v_query_fields||' FROM temp_csv where source like '||quote_literal(concat('%',v_rec_table.target,'%'))||' 
+		AND fid='||v_fid||' AND (csv1 NOT LIKE ''[%'' AND csv1 NOT LIKE '';%'') AND cur_user='||quote_literal(current_user)||' ORDER BY id';
 
 		--raise notice 'v_sql %', v_sql;
 		EXECUTE v_sql;
@@ -301,9 +301,9 @@ BEGIN
 	ALTER TABLE config_param_user DROP CONSTRAINT config_param_user_parameter_cur_user_unique;
 
 	RAISE NOTICE 'step 4/7';
-	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'WARNING: Values of options / times / report are not updated. Default values of Giswater are keeped');
-	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Inserting data into tables using vi_* views -> Done');
-	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'WARNING: Controls rules will be stored on inp_controls_inmortinp table. This is a temporary table. Data need to be moved to inp_controls_x_arc table to be used later');
+	INSERT INTO audit_check_data (fid, error_message) VALUES (141, 'WARNING: Values of options / times / report are not updated. Default values of Giswater are keeped');
+	INSERT INTO audit_check_data (fid, error_message) VALUES (141, 'Inserting data into tables using vi_* views -> Done');
+	INSERT INTO audit_check_data (fid, error_message) VALUES (141, 'WARNING: Controls rules will be stored on inp_controls_inmortinp table. This is a temporary table. Data need to be moved to inp_controls_x_arc table to be used later');
 
 	-- Create arc geom
 	v_querytext = 'SELECT * FROM arc ';
@@ -315,8 +315,8 @@ BEGIN
 		--Insert start point, add vertices if exist, add end point
 		SELECT array_agg(the_geom) INTO geom_array FROM node WHERE v_data.node_1=node_id;
 	
-		SELECT array_agg(ST_SetSrid(ST_MakePoint(csv2::numeric,csv3::numeric),v_epsg)order by id) INTO  geom_array_vertex FROM temp_csv2pg 
-		WHERE cur_user=current_user AND csv2pgcat_id=v_csv2pgcat_id and source='[VERTICES]' and csv1=v_data.arc_id;
+		SELECT array_agg(ST_SetSrid(ST_MakePoint(csv2::numeric,csv3::numeric),v_epsg)order by id) INTO  geom_array_vertex FROM temp_csv 
+		WHERE cur_user=current_user AND fid =v_fid and source='[VERTICES]' and csv1=v_data.arc_id;
 		
 		IF geom_array_vertex IS NOT NULL THEN
 			geom_array=array_cat(geom_array, geom_array_vertex);
@@ -329,8 +329,8 @@ BEGIN
 	END LOOP;
 
 	RAISE NOTICE 'step 5/7';
-	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Creating arc geometry from extremal nodes and intermediate vertex -> Done');
-	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'WARNING: Link geometries as ORIFICE, WEIRS, PUMPS AND OULETS will not transformed using reverse nod2arc strategy as nodes. It will keep as arc');
+	INSERT INTO audit_check_data (fid, error_message) VALUES (141, 'Creating arc geometry from extremal nodes and intermediate vertex -> Done');
+	INSERT INTO audit_check_data (fid, error_message) VALUES (141, 'WARNING: Link geometries as ORIFICE, WEIRS, PUMPS AND OULETS will not transformed using reverse nod2arc strategy as nodes. It will keep as arc');
 
 	
 	-- Subcatchments geometry
@@ -338,7 +338,7 @@ BEGIN
 		--Create points out of vertices defined in inp file create a line out all points and transform it into a polygon.
 		FOR v_data IN SELECT * FROM inp_subcatchment LOOP
 		
-			FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE cur_user=current_user AND csv2pgcat_id=v_csv2pgcat_id and source ilike '[Polygons]' AND csv1=v_data.subc_id order by id 
+			FOR rpt_rec IN SELECT * FROM temp_csv WHERE cur_user=current_user AND fid =v_fid and source ilike '[Polygons]' AND csv1=v_data.subc_id order by id
 			LOOP	
 			
 				v_point_geom=ST_SetSrid(ST_MakePoint(rpt_rec.csv2::numeric,rpt_rec.csv3::numeric),v_epsg);
@@ -376,7 +376,7 @@ BEGIN
 
 
 	RAISE NOTICE 'step-6/7';
-	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Creating subcathcment polygons -> Done');
+	INSERT INTO audit_check_data (fid, error_message) VALUES (141, 'Creating subcathcment polygons -> Done');
 			
 	-- Mapzones geometry
 	--Create the same geometry of all mapzones by making the Convex Hull over all the existing arcs
@@ -394,13 +394,13 @@ BEGIN
 	PERFORM gw_fct_admin_manage_ct($${"client":{"lang":"ES"},"data":{"action":"ADD"}}$$);
 
 	RAISE NOTICE 'step-7/7';
-	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Enabling constraints -> Done');
-	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Process finished');
+	INSERT INTO audit_check_data (fid, error_message) VALUES (141, 'Enabling constraints -> Done');
+	INSERT INTO audit_check_data (fid, error_message) VALUES (141, 'Process finished');
 
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=41  order by id) row; 
+	FROM (SELECT error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid = 141  order by id) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 	

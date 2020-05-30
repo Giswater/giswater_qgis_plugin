@@ -41,7 +41,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	--Delete previous
-	DELETE FROM temp_csv2pg WHERE cur_user=current_user AND csv2pgcat_id=v_pg2csvcat_id;
+	DELETE FROM temp_csv2pg WHERE cur_user=current_user AND fid = v_pg2csvcat_id;
 
 	-- get parameters to put on header
 	SELECT result_id INTO result_id_aux FROM selector_inp_result where cur_user=current_user;
@@ -56,31 +56,31 @@ BEGIN
 	SELECT idval INTO v_networkmodeval FROM inp_typevalue WHERE id=v_networkmode::text AND typevalue ='inp_options_networkmode';
 
 	--writing the header
-	INSERT INTO temp_csv2pg (source, csv1,csv2pgcat_id) VALUES ('header','[TITLE]',v_pg2csvcat_id);
-	INSERT INTO temp_csv2pg (source, csv1,csv2pgcat_id) VALUES ('header',';INP file created by Giswater, the water management open source tool',v_pg2csvcat_id);
-	INSERT INTO temp_csv2pg (source, csv1,csv2,csv2pgcat_id) VALUES ('header',';Project name: ',title_aux, v_pg2csvcat_id);
-	INSERT INTO temp_csv2pg (source, csv1,csv2,csv2pgcat_id) VALUES ('header',';Result name: ',p_result_id,v_pg2csvcat_id); 
-	INSERT INTO temp_csv2pg (source, csv1,csv2,csv2pgcat_id) VALUES ('header',';Export mode: ', v_networkmodeval, v_pg2csvcat_id ); 
-	INSERT INTO temp_csv2pg (source, csv1,csv2,csv2pgcat_id) VALUES ('header',';Demand type: ', v_demandtypeval, v_pg2csvcat_id); 
-	INSERT INTO temp_csv2pg (source, csv1,csv2,csv2pgcat_id) VALUES ('header',';Pattern method: ', v_patternmethodval, v_pg2csvcat_id); 
-	INSERT INTO temp_csv2pg (source, csv1,csv2,csv2pgcat_id) VALUES ('header',';Valve mode: ', v_valvemodeval, v_pg2csvcat_id); 
-	INSERT INTO temp_csv2pg (source, csv1,csv2,csv2pgcat_id) VALUES ('header',';Datetime: ',left((date_trunc('second'::text, now()))::text, 19),v_pg2csvcat_id); 
-	INSERT INTO temp_csv2pg (source, csv1,csv2,csv2pgcat_id) VALUES ('header',';User: ',current_user, v_pg2csvcat_id); 
-	INSERT INTO temp_csv2pg (csv1,csv2pgcat_id) VALUES (NULL,v_pg2csvcat_id); 
+	INSERT INTO temp_csv2pg (source, csv1,fid) VALUES ('header','[TITLE]',v_pg2csvcat_id);
+	INSERT INTO temp_csv2pg (source, csv1,fid) VALUES ('header',';INP file created by Giswater, the water management open source tool',v_pg2csvcat_id);
+	INSERT INTO temp_csv2pg (source, csv1,csv2,fid) VALUES ('header',';Project name: ',title_aux, v_pg2csvcat_id);
+	INSERT INTO temp_csv2pg (source, csv1,csv2,fid) VALUES ('header',';Result name: ',p_result_id,v_pg2csvcat_id);
+	INSERT INTO temp_csv2pg (source, csv1,csv2,fid) VALUES ('header',';Export mode: ', v_networkmodeval, v_pg2csvcat_id );
+	INSERT INTO temp_csv2pg (source, csv1,csv2,fid) VALUES ('header',';Demand type: ', v_demandtypeval, v_pg2csvcat_id);
+	INSERT INTO temp_csv2pg (source, csv1,csv2,fid) VALUES ('header',';Pattern method: ', v_patternmethodval, v_pg2csvcat_id);
+	INSERT INTO temp_csv2pg (source, csv1,csv2,fid) VALUES ('header',';Valve mode: ', v_valvemodeval, v_pg2csvcat_id);
+	INSERT INTO temp_csv2pg (source, csv1,csv2,fid) VALUES ('header',';Datetime: ',left((date_trunc('second'::text, now()))::text, 19),v_pg2csvcat_id);
+	INSERT INTO temp_csv2pg (source, csv1,csv2,fid) VALUES ('header',';User: ',current_user, v_pg2csvcat_id);
+	INSERT INTO temp_csv2pg (csv1,fid) VALUES (NULL,v_pg2csvcat_id);
 
 	--node
 	FOR rec_table IN SELECT * FROM config_csv_param WHERE pg2csvcat_id=v_pg2csvcat_id AND csvversion::json->>'from'='2.0.12' order by orderby
 	LOOP
 		-- insert header
-		INSERT INTO temp_csv2pg (csv1,csv2pgcat_id) VALUES (NULL,v_pg2csvcat_id); 
-		EXECUTE 'INSERT INTO temp_csv2pg(csv2pgcat_id,csv1) VALUES ('||v_pg2csvcat_id||','''|| rec_table.target||''');';
+		INSERT INTO temp_csv2pg (csv1,fid) VALUES (NULL,v_pg2csvcat_id);
+		EXECUTE 'INSERT INTO temp_csv2pg(fid,csv1) VALUES ('||v_pg2csvcat_id||','''|| rec_table.target||''');';
 
 		-- insert fieldnames
 		IF rec_table.tablename = 'vi_patterns' THEN
-			INSERT INTO temp_csv2pg (csv2pgcat_id,csv1,csv2) VALUES (10, ';ID', 'Multipliers');
+			INSERT INTO temp_csv2pg (fid,csv1,csv2) VALUES (10, ';ID', 'Multipliers');
 			num_column = 2;
 		ELSE 
-			INSERT INTO temp_csv2pg (csv2pgcat_id,csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12,csv13) 
+			INSERT INTO temp_csv2pg (fid,csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12,csv13)
 			SELECT v_pg2csvcat_id,rpad(concat(';',c1),20),rpad(c2,20),rpad(c3,20),rpad(c4,20),rpad(c5,20),rpad(c6,20),rpad(c7,20),rpad(c8,20),rpad(c9,20),rpad(c10,20),
 			rpad(c11,20),rpad(c12,20),rpad(c13,20)
 			FROM crosstab('SELECT table_name::text,  data_type::text, column_name::text FROM information_schema.columns WHERE table_schema =''SCHEMA_NAME'' and table_name='''||
@@ -90,7 +90,7 @@ BEGIN
 			SELECT count(*)::text INTO num_column from information_schema.columns where table_name=rec_table.tablename AND table_schema='SCHEMA_NAME';
 		END IF;
 	
-		INSERT INTO temp_csv2pg (csv2pgcat_id) VALUES (10) RETURNING id INTO id_last;
+		INSERT INTO temp_csv2pg (fid) VALUES (10) RETURNING id INTO id_last;
   
 		--add underlines    
 		FOR num_col_rec IN 1..num_column
@@ -125,23 +125,23 @@ BEGIN
 	-- use the copy function of postgres to export to file in case of file must be provided as a parameter
 	IF p_path IS NOT NULL THEN
 		EXECUTE 'COPY (SELECT csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12,csv13,csv14,csv15,csv16,csv17,csv18 ,csv19 
-		FROM temp_csv2pg WHERE csv2pgcat_id=10 and cur_user=current_user order by id) TO '''||p_path||''' WITH (DELIMITER E''\t'', FORMAT CSV);';
+		FROM temp_csv2pg WHERE fid = 10 and cur_user=current_user order by id) TO '''||p_path||''' WITH (DELIMITER E''\t'', FORMAT CSV);';
 	END IF;
 
 	-- build return
 	select (array_to_json(array_agg(row_to_json(row))))::json  -- spacer-19 it's used because a rare bug reading epanet when spacer=20 on target [PATTERNS]????
 	into v_return 
 		from ( select text from
-		(select id, concat(rpad(csv1,18), ' ', csv2)as text from temp_csv2pg where csv2pgcat_id  = 10 and cur_user = current_user and source is null
+		(select id, concat(rpad(csv1,18), ' ', csv2)as text from temp_csv2pg where fid  = 10 and cur_user = current_user and source is null
 		union
-		select id, concat(rpad(csv1,18), ' ', csv2)as text from temp_csv2pg where csv2pgcat_id  = 10 and cur_user = current_user and source in ('header')
+		select id, concat(rpad(csv1,18), ' ', csv2)as text from temp_csv2pg where fid  = 10 and cur_user = current_user and source in ('header')
 		union
-		select id, csv1 as text from temp_csv2pg where csv2pgcat_id  = 10 and cur_user = current_user and source in ('vi_controls','vi_rules', 'vi_backdrop')
+		select id, csv1 as text from temp_csv2pg where fid  = 10 and cur_user = current_user and source in ('vi_controls','vi_rules', 'vi_backdrop')
 		union
 		select id, concat(rpad(csv1,18),' ',rpad(csv2,18),' ', rpad(csv3,18),' ',rpad(csv4,18),' ',rpad(csv5,18),' ',rpad(csv6,18),' ',rpad(csv7,18),' ',
 		rpad(csv8,18),' ',rpad(csv9,18),' ',rpad(csv10,18),' ',rpad(csv11,18),' ',rpad(csv12,18),' ',rpad(csv13,18),' ',rpad(csv14,18),' ',rpad(csv15,18),' ',
 		rpad(csv15,18),' ',rpad(csv16,18),' ',rpad(csv17,18),' ', rpad(csv18,18), ' ', rpad(csv19,18),' ',rpad(csv20,18)) as text
-		from temp_csv2pg where csv2pgcat_id  = 10 and cur_user = current_user and source not in ('header','vi_controls','vi_rules', 'vi_backdrop')
+		from temp_csv2pg where fid  = 10 and cur_user = current_user and source not in ('header','vi_controls','vi_rules', 'vi_backdrop')
 		order by id)a )row;
 	
 RETURN v_return;

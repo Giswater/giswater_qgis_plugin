@@ -68,7 +68,7 @@ BEGIN
 		
 		IF v_count = 0 THEN -- it means there is no path to any reservoir for this arc
 			RAISE NOTICE 'v_node % has setted to_arc with %', v_node, v_arcs.arc_id;
-			INSERT INTO temp_table (fprocesscat_id, text_column) VALUES (100, concat('{"expl_id":"',v_arcs.expl_id,'", "node_id":"',v_node,'", "to_arc":"',v_arcs.arc_id,'"}'));
+			INSERT INTO temp_table (fid, text_column) VALUES (100, concat('{"expl_id":"',v_arcs.expl_id,'", "node_id":"',v_node,'", "to_arc":"',v_arcs.arc_id,'"}'));
 			EXIT;
 		END IF;
 		v_count = 0;

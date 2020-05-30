@@ -195,7 +195,7 @@ BEGIN
 		v_return = concat('{"minsector_id":"',element_id_arg,'","arcs":{"number":"',v_numarcs,'", "length":"',v_length,'", "volume":"', 
 		v_volume, '"}, "connecs":{"number":"',v_numconnecs,'","hydrometers":{"number":"',v_numhydrometer,'","priority":',v_priority,'}}}');
 			
-		INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) VALUES (29, 'arc', element_id_arg, v_return);
+		INSERT INTO audit_log_data (fid, feature_type, feature_id, log_message) VALUES (29, 'arc', element_id_arg, v_return);
 
 		-- calculate the boundary of mincut using arcs and valves
 		EXECUTE ' SELECT st_astext(st_envelope(st_extent(st_buffer(the_geom,20)))) FROM (SELECT the_geom FROM anl_mincut_result_arc WHERE result_id='||result_id_arg||

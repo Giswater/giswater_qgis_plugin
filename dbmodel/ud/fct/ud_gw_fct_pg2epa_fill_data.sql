@@ -86,7 +86,7 @@ BEGIN
 	PERFORM gw_fct_anl_node_sink($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{"tableName":"v_edit_inp_junction"},"data":{"parameters":{"saveOnDatabase":true}}}$$);
 
 	UPDATE temp_node SET epa_type='OUTFALL' FROM anl_node a JOIN inp_junction USING (node_id) 
-	WHERE outfallparam IS NOT NULL AND fprocesscat_id=13 AND cur_user=current_user
+	WHERE outfallparam IS NOT NULL AND fid = 13 AND cur_user=current_user
 	AND temp_node.node_id=a.node_id;
 
 	-- todo: UPDATE childparam for inp_outfall, inp_storage inp_divider, inp_junction

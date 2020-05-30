@@ -55,16 +55,16 @@ BEGIN
 
 
 	-- delete old values on result table
-	DELETE FROM audit_check_data WHERE fprocesscat_id=73 AND cur_user=current_user;
-	DELETE FROM anl_arc WHERE fprocesscat_id=90 and cur_user=current_user;
-	DELETE FROM anl_connec WHERE fprocesscat_id=92 and cur_user=current_user;
+	DELETE FROM audit_check_data WHERE fid = 73 AND cur_user=current_user;
+	DELETE FROM anl_arc WHERE fid = 90 and cur_user=current_user;
+	DELETE FROM anl_connec WHERE fid = 92 and cur_user=current_user;
 
 	
 	-- Starting process
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (73, NULL, 4, concat('DATA ANALYSIS ACORDING ODBC IMPORT-EXPORT RULES'));
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (73, NULL, 4, '--------------------------------------------------------------');
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (73, NULL, 2, 'WARNINGS');	
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (73, NULL, 2, '--------------');	
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (73, NULL, 4, concat('DATA ANALYSIS ACORDING ODBC IMPORT-EXPORT RULES'));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (73, NULL, 4, '--------------------------------------------------------------');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (73, NULL, 2, 'WARNINGS');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (73, NULL, 2, '--------------');
 
 
 	-- get results
@@ -74,14 +74,14 @@ BEGIN
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	IF v_count > 0 THEN
-		DELETE FROM anl_arc WHERE fprocesscat_id=90 and cur_user=current_user;
-		EXECUTE concat ('INSERT INTO anl_arc (fprocesscat_id, arc_id, arccat_id, descript, the_geom) SELECT 90, arc_id, arccat_id, ''arcs without DMA'', the_geom FROM (', v_querytext,')a');
-		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+		DELETE FROM anl_arc WHERE fid = 90 and cur_user=current_user;
+		EXECUTE concat ('INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom) SELECT 90, arc_id, arccat_id, ''arcs without DMA'', the_geom FROM (', v_querytext,')a');
+		INSERT INTO audit_check_data (fid,  criticity, error_message)
 		VALUES (73, 2, concat('WARNING: There is/are ',v_count,' arc(s) that have disconnected some part of network. Please check your data before continue'));
-		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-		VALUES (73, 2, concat('HINT: SELECT * FROM anl_arc WHERE fprocesscat_id=90 AND cur_user=current_user'));
+		INSERT INTO audit_check_data (fid, criticity, error_message)
+		VALUES (73, 2, concat('HINT: SELECT * FROM anl_arc WHERE fid = 90 AND cur_user=current_user'));
 	ELSE
-		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+		INSERT INTO audit_check_data (fid, criticity, error_message)
 		VALUES (73, 1, 'INFO: No arcs with dma_id=0 have been exported using the ODBC system');
 	END IF;
 
@@ -91,25 +91,25 @@ BEGIN
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	IF v_count > 0 THEN
-		EXECUTE concat ('INSERT INTO anl_connec (fprocesscat_id, connec_id, connecat_id, descript, the_geom) SELECT 92, connec_id, connecat_id, ''Connecs without DMA'', the_geom FROM (', v_querytext,')a');
-		INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) 
+		EXECUTE concat ('INSERT INTO anl_connec (fid, connec_id, connecat_id, descript, the_geom) SELECT 92, connec_id, connecat_id, ''Connecs without DMA'', the_geom FROM (', v_querytext,')a');
+		INSERT INTO audit_check_data (fid,  criticity, error_message)
 		VALUES (73, 2, concat('WARNING: There is/are ',v_count,' connec(s) NOT exported through the ODBC system. Please check your data before continue'));
-		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
-		VALUES (73, 2, concat('HINT: SELECT * FROM anl_connec WHERE fprocesscat_id=90 AND cur_user=current_user'));
+		INSERT INTO audit_check_data (fid, criticity, error_message)
+		VALUES (73, 2, concat('HINT: SELECT * FROM anl_connec WHERE fid = 90 AND cur_user=current_user'));
 	ELSE
-		INSERT INTO audit_check_data (fprocesscat_id, criticity, error_message) 
+		INSERT INTO audit_check_data (fid, criticity, error_message)
 		VALUES (73, 1, 'INFO: No connecs with dma_id=0 have been exported using the ODBC system');
 	END IF;
 
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (73, NULL, 4, '');	
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (73, NULL, 2, '');	
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (73, NULL, 4, '');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (73, NULL, 2, '');
 
 
 	-- get results (73 odbc process, 45 dma process)
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, message FROM (SELECT id, criticity, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=73 UNION
-	      SELECT id, criticity, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=45 AND criticity = 1 order by criticity desc, id asc)a )row; 
+	FROM (SELECT id, message FROM (SELECT id, criticity, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid = 73 UNION
+	      SELECT id, criticity, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid = 45 AND criticity = 1 order by criticity desc, id asc)a )row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
@@ -123,7 +123,7 @@ BEGIN
     'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
   	FROM (SELECT id, connec_id, connecat_id, state, expl_id, descript, the_geom
-  	FROM  anl_connec WHERE cur_user="current_user"() AND fprocesscat_id=92) row) features;
+  	FROM  anl_connec WHERE cur_user="current_user"() AND fid = 92) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "features":',v_result, '}'); 
@@ -137,7 +137,7 @@ BEGIN
     'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
   	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom
-  	FROM  anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=90) row) features;
+  	FROM  anl_arc WHERE cur_user="current_user"() AND fid = 90) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "qmlPath":"',v_qmllinepath,'", "features":',v_result,'}'); 

@@ -21,12 +21,12 @@ BEGIN
 	-- ARC
 	IF OLD.feature_type = 'ARC' THEN
 		IF TG_OP = 'DELETE' THEN
-			INSERT INTO audit_log_data (fprocesscat_id,feature_type,log_message,feature_id, addparam)
+			INSERT INTO audit_log_data (fid,feature_type,log_message,feature_id, addparam)
 			SELECT 17,OLD.feature_type,'DELETE',row_to_json(row) FROM arc WHERE arc_id=OLD.arc_id;
 			RETURN OLD;
 			
 		ELSIF TG_OP = 'UPDATE' THEN
-			INSERT INTO audit_log_data (fprocesscat_id,feature_type,log_message,feature_id, addparam)
+			INSERT INTO audit_log_data (fid,feature_type,log_message,feature_id, addparam)
 			SELECT 17,OLD.feature_type,'UPDATE',row_to_json(row) FROM arc WHERE arc_id=OLD.arc_id;
 			RETURN OLD;
 		END IF;
@@ -34,12 +34,12 @@ BEGIN
 	-- NODE
 	ELSIF OLD.feature_type = 'NODE' THEN
 		IF TG_OP = 'DELETE' THEN
-			INSERT INTO audit_log_data (fprocesscat_id,feature_type,log_message,feature_id, addparam)
+			INSERT INTO audit_log_data (fid,feature_type,log_message,feature_id, addparam)
 			SELECT 17,OLD.feature_type,'DELETE',row_to_json(row) FROM node WHERE node_id=OLD.node_id;
 			RETURN OLD;
 			
 		ELSIF TG_OP = 'UPDATE' THEN
-			INSERT INTO audit_log_data (fprocesscat_id,feature_type,log_message,feature_id, addparam)
+			INSERT INTO audit_log_data (fid,feature_type,log_message,feature_id, addparam)
 			SELECT 17,OLD.feature_type,'UPDATE',row_to_json(row) FROM node WHERE node_id=OLD.node_id;
 			RETURN OLD;
 		END IF;
@@ -47,12 +47,12 @@ BEGIN
 	-- CONNEC
 	ELSIF OLD.feature_type = 'CONNEC' THEN
 		IF TG_OP = 'DELETE' THEN
-			INSERT INTO audit_log_data (fprocesscat_id,feature_type,log_message,feature_id, addparam)
+			INSERT INTO audit_log_data (fid,feature_type,log_message,feature_id, addparam)
 			SELECT 17,OLD.feature_type,'DELETE',row_to_json(row) FROM connec WHERE connec_id=OLD.connec_id;
 			RETURN OLD;
 			
 		ELSIF TG_OP = 'UPDATE' THEN
-			INSERT INTO audit_log_data (fprocesscat_id,feature_type,log_message,feature_id, addparam)
+			INSERT INTO audit_log_data (fid,feature_type,log_message,feature_id, addparam)
 			SELECT 17,OLD.feature_type,'UPDATE',row_to_json(row) FROM connec WHERE connec_id=OLD.connec_id;
 			RETURN OLD;
 		END IF;
@@ -60,12 +60,12 @@ BEGIN
 	-- ELEMENT
 	ELSIF OLD.feature_type = 'ELEMENT' THEN
 		IF TG_OP = 'DELETE' THEN
-			INSERT INTO audit_log_data (fprocesscat_id,feature_type,log_message,feature_id, addparam)
+			INSERT INTO audit_log_data (fid,feature_type,log_message,feature_id, addparam)
 			SELECT 17,OLD.feature_type,'DELETE',row_to_json(row) FROM element WHERE element_id=OLD.element_id;
 			RETURN OLD;
 			
 		ELSIF TG_OP = 'UPDATE' THEN
-			INSERT INTO audit_log_data (fprocesscat_id,feature_type,log_message,feature_id, addparam)
+			INSERT INTO audit_log_data (fid,feature_type,log_message,feature_id, addparam)
 			SELECT 17,OLD.feature_type,'UPDATE',row_to_json(row) FROM element WHERE element_id=OLD.element_id;
 			RETURN OLD;
 		END IF;
@@ -73,12 +73,12 @@ BEGIN
 	
 	IF project_type_aux='UD' AND OLD.feature_type = 'GULLY' THEN
 			IF TG_OP = 'DELETE' THEN
-				INSERT INTO audit_log_data (fprocesscat_id,feature_type,log_message,feature_id, addparam)
+				INSERT INTO audit_log_data (fid,feature_type,log_message,feature_id, addparam)
 				SELECT 17,OLD.feature_type,'DELETE',row_to_json(row) FROM gully WHERE gully_id=OLD.gully_id;
 				RETURN OLD;
 			
 			ELSIF TG_OP = 'UPDATE' THEN
-				INSERT INTO audit_log_data (fprocesscat_id,feature_type,log_message,feature_id, addparam)
+				INSERT INTO audit_log_data (fid,feature_type,log_message,feature_id, addparam)
 				SELECT 17,OLD.feature_type,'UPDATE',row_to_json(row) FROM gully WHERE gully_id=OLD.gully_id;
 				RETURN OLD;
 			END IF;

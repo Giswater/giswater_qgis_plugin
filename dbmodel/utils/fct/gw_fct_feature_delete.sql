@@ -56,9 +56,9 @@ BEGIN
  	UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'edit_arc_downgrade_force' AND cur_user=current_user;
 
 	-- manage log (fprocesscat = 52)
-	DELETE FROM audit_check_data WHERE fprocesscat_id=52 AND cur_user=current_user;
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (52, v_result_id, concat('DELETE FEATURE'));
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (52, v_result_id, concat('------------------------------'));
+	DELETE FROM audit_check_data WHERE fid = 52 AND cur_user=current_user;
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (52, v_result_id, concat('DELETE FEATURE'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (52, v_result_id, concat('------------------------------'));
  	--get information about feature
 	v_feature_type = lower(((p_data ->>'feature')::json->>'type'))::text;
 	v_feature_id = ((p_data ->>'data')::json->>'feature_id')::text;
@@ -75,7 +75,7 @@ BEGIN
 
 	IF v_count > 0 THEN
 		EXECUTE 'DELETE FROM element_x_'||v_feature_type||' where '||v_feature_type||'_id = '''||v_feature_id||''';';
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (52, v_result_id, concat('Number of disconnected elements:',v_count));
+		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (52, v_result_id, concat('Number of disconnected elements:',v_count));
 	END IF;
 
 	--check and remove visits related to feature
@@ -84,7 +84,7 @@ BEGIN
 
 	IF v_count > 0 THEN
 		EXECUTE 'DELETE FROM om_visit_x_'||v_feature_type||' where '||v_feature_type||'_id = '''||v_feature_id||''';';
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (52, v_result_id, concat('Number of disconnected visits: ',v_count));
+		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (52, v_result_id, concat('Number of disconnected visits: ',v_count));
 	END IF;
 
 	--check and remove docs related to feature
@@ -93,7 +93,7 @@ BEGIN
 
 	IF v_count > 0 THEN
 		EXECUTE 'DELETE FROM doc_x_'||v_feature_type||' where '||v_feature_type||'_id = '''||v_feature_id||''';';
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (52, v_result_id, concat('Number of disconnected documents: ',v_count));
+		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (52, v_result_id, concat('Number of disconnected documents: ',v_count));
 	END IF;
 
 	IF v_feature_type='node' THEN 
@@ -104,7 +104,7 @@ BEGIN
 
 		IF v_count > 0 THEN
 			EXECUTE 'DELETE FROM rtc_scada_node where node_id = '''||v_feature_id||''';';
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (52, v_result_id, concat('Number of removed scada connections: ',v_count));
+			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (52, v_result_id, concat('Number of removed scada connections: ',v_count));
 		END IF;
 
 		--remove link related to node
@@ -113,7 +113,7 @@ BEGIN
 
 		IF v_count > 0 THEN
 			EXECUTE 'DELETE FROM v_edit_link WHERE exit_type=''NODE'' and exit_id = '''||v_feature_id||''';';
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (52, v_result_id, concat('Number of removed links:', v_count ));
+			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (52, v_result_id, concat('Number of removed links:', v_count ));
 		END IF;
 
 		--remove parent related to node 
@@ -123,7 +123,7 @@ BEGIN
 
 			IF v_related_id IS NOT NULL THEN
 				EXECUTE 'UPDATE node SET parent_id=NULL WHERE node_id = '''||v_feature_id||''';';
-				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (52, v_result_id, concat('Disconnected parent node:',v_related_id ));	
+				INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (52, v_result_id, concat('Disconnected parent node:',v_related_id ));
 			END IF;
 		END IF;
 
@@ -137,7 +137,7 @@ BEGIN
 			 	EXECUTE 'DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM '||v_man_table||' 
 				WHERE node_id = '''||v_feature_id||'''); ';
 
-				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
+				INSERT INTO audit_check_data (fid, result_id, error_message)
 				VALUES (52, v_result_id, concat('Removed polygon:', v_related_id ));
 			END IF;
 
@@ -150,7 +150,7 @@ BEGIN
 			--delete node
 			EXECUTE 'DELETE FROM v_edit_node WHERE node_id='''||v_feature_id||''';';
 			
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
+			INSERT INTO audit_check_data (fid, result_id, error_message)
 			VALUES (52, v_result_id, concat('Delete node: ', v_feature_id));	
 		ELSE 
 			--set final nodes to NULL and delete node
@@ -158,9 +158,9 @@ BEGIN
 			EXECUTE'UPDATE arc SET node_2=NULL WHERE node_2='''||v_feature_id||''';';
 			EXECUTE 'DELETE FROM node WHERE node_id='''||v_feature_id||''';';
 
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
+			INSERT INTO audit_check_data (fid, result_id, error_message)
 			VALUES (52, v_result_id, concat('Disconnected arcs: ',v_arc_id));	
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
+			INSERT INTO audit_check_data (fid, result_id, error_message)
 			VALUES (52, v_result_id, concat('Delete node: ', v_feature_id));
 		END IF;
 	
@@ -173,7 +173,7 @@ BEGIN
 
 		IF v_count > 0 THEN
 			EXECUTE 'DELETE FROM v_edit_link WHERE feature_type=''CONNEC'' AND feature_id IN (SELECT connec_id FROM connec  WHERE connec.arc_id='''||v_feature_id||''');';
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (52, v_result_id, concat('Number of removed links: ',v_count ));
+			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (52, v_result_id, concat('Number of removed links: ',v_count ));
 		END IF;
 		
 		--set arc_id to null if there are connecs related
@@ -182,7 +182,7 @@ BEGIN
 
 		IF v_related_id IS NOT NULL THEN
 			EXECUTE 'UPDATE connec SET arc_id=NULL WHERE arc_id='''||v_feature_id||''';';
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (52, v_result_id, concat('Disconnected connecs:',v_related_id ));
+			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (52, v_result_id, concat('Disconnected connecs:',v_related_id ));
 		END IF;
 
 		--set arc_id to null if there are nodes related
@@ -191,7 +191,7 @@ BEGIN
 
 		IF v_related_id IS NOT NULL THEN
 			EXECUTE 'UPDATE node SET arc_id=NULL WHERE arc_id='''||v_feature_id||''';';
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (52, v_result_id, concat('Disconnected nodes:',v_related_id ));
+			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (52, v_result_id, concat('Disconnected nodes:',v_related_id ));
 		END IF;
 
 		--set arc_id to null if there are gullies related
@@ -200,12 +200,12 @@ BEGIN
 			INTO v_related_id;
 
 			EXECUTE'UPDATE gully SET arc_id=NULL WHERE arc_id='''||v_feature_id||''';';
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (52, v_result_id, concat('Disconnected gullies: ', v_related_id ));
+			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (52, v_result_id, concat('Disconnected gullies: ', v_related_id ));
 		END IF;
 
 		--delete arc
 		EXECUTE 'DELETE FROM v_edit_arc WHERE arc_id='''||v_feature_id||''';';
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (52, v_result_id, concat('Delete arc: ',v_feature_id ));
+		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (52, v_result_id, concat('Delete arc: ',v_feature_id ));
 
 	ELSIF  v_feature_type='connec' OR v_feature_type='gully' THEN
 
@@ -217,7 +217,7 @@ BEGIN
 			IF v_related_id IS NOT NULL THEN
 		 		EXECUTE 'DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM '||v_man_table||' where 
 		 		connec_id= '''||v_feature_id||''');';
-		 		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (52, v_result_id, concat('Removed polygon: ',v_related_id ));
+		 		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (52, v_result_id, concat('Removed polygon: ',v_related_id ));
 		 	END IF;
 		ELSIF v_feature_type='gully' THEN
 			EXECUTE 'SELECT pol_id FROM gully where gully_id= '''||v_feature_id||''''
@@ -226,7 +226,7 @@ BEGIN
 			IF v_related_id IS NOT NULL THEN 
 				EXECUTE 'DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM gully where 
 		 		gully_id= '''||v_feature_id||''');';
-		 		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (52, v_result_id, concat('Removed polygon: ',v_related_id ));
+		 		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (52, v_result_id, concat('Removed polygon: ',v_related_id ));
 			END IF;
 		END IF;
 
@@ -245,13 +245,13 @@ BEGIN
 			EXECUTE 'DELETE FROM v_edit_link WHERE feature_type='''||UPPER(v_feature_type)||''' AND feature_id ='''||v_feature_id||''';';
 	  		EXECUTE 'DELETE FROM v_edit_link WHERE feature_type='''||UPPER(v_feature_type)||''' AND exit_id ='''||v_feature_id||''';';
 
-	  		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (52, v_result_id, concat('Removed link: ',v_related_id ));
+	  		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (52, v_result_id, concat('Removed link: ',v_related_id ));
 		END IF;
 
 		--delete feature
 	  	EXECUTE 'DELETE FROM v_edit_'||(v_feature_type)||'  WHERE '||(v_feature_type)||'_id='''||v_feature_id||''';';
 	  	
-	  	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (52, v_result_id, concat('Delete ',v_feature_type,': ',v_feature_id ));
+	  	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (52, v_result_id, concat('Delete ',v_feature_type,': ',v_feature_id ));
 	  	
 	END IF;
 
@@ -262,7 +262,7 @@ BEGIN
  	UPDATE config_param_user SET value = 'FALSE' WHERE parameter = 'edit_arc_downgrade_force' AND cur_user=current_user;
 
  	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=52) 
+	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fid = 52)
 	row; 
 
 	v_result := COALESCE(v_result, '{}'); 

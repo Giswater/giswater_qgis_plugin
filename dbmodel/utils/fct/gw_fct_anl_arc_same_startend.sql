@@ -50,22 +50,22 @@ BEGIN
 	SELECT regexp_replace(row(value)::text, '["()"]', '', 'g') INTO v_qmllinepath FROM config_param_user WHERE parameter='qgis_qml_linelayer_path' AND cur_user=current_user;
 
 	-- Reset values
-	DELETE FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=4;
+	DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid = 4;
 	
 	-- Computing process
 	IF v_array != '()' THEN
-		EXECUTE 'INSERT INTO anl_arc (arc_id, state, expl_id, fprocesscat_id, the_geom, arccat_id)
+		EXECUTE 'INSERT INTO anl_arc (arc_id, state, expl_id, fid, the_geom, arccat_id)
 				SELECT arc_id, state, expl_id, 4, the_geom, arccat_id
 				FROM '||v_worklayer||' WHERE node_1::text=node_2::text AND arc_id IN '||v_array||';';
 	ELSE
-		EXECUTE 'INSERT INTO anl_arc (arc_id, state, expl_id, fprocesscat_id, the_geom, arccat_id)
+		EXECUTE 'INSERT INTO anl_arc (arc_id, state, expl_id, fid, the_geom, arccat_id)
 				SELECT arc_id, state, expl_id, 4, the_geom, arccat_id
 				FROM '||v_worklayer||' WHERE node_1::text=node_2::text;';
 	END IF;
 
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=4 order by id) row; 
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid = 4 order by id) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
@@ -78,19 +78,19 @@ BEGIN
     'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
     'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
-  	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom, fprocesscat_id
-  	FROM  anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=4) row) features;
+  	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom, fid
+  	FROM  anl_arc WHERE cur_user="current_user"() AND fid = 4) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "qmlPath":"',v_qmllinepath,'", "features":',v_result, '}'); 
 
 	IF v_saveondatabase IS FALSE THEN 
 		-- delete previous results
-		DELETE FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=4;
+		DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid = 4;
 	ELSE
 		-- set selector
-		DELETE FROM selector_audit WHERE fprocesscat_id=4 AND cur_user=current_user;    
-		INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (4, current_user);
+		DELETE FROM selector_audit WHERE fid = 4 AND cur_user=current_user;
+		INSERT INTO selector_audit (fid,cur_user) VALUES (4, current_user);
 	END IF;
 		
 	--    Control nulls

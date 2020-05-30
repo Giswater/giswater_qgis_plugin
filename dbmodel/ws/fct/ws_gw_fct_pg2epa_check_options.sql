@@ -17,7 +17,7 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_check_options($${"data":{"parameters":{"resultI
 
 
 DECLARE
-v_fprocesscat_id integer;
+v_fid integer;
 v_version text;
 v_record record;
 v_project_type text;
@@ -36,7 +36,7 @@ BEGIN
 
 	-- getting input data 	
 	v_result_id := ((p_data ->>'data')::json->>'parameters')::json->>'resultId'::text;
-	v_fprocesscat_id := ((p_data ->>'data')::json->>'parameters')::json->>'fprocesscatId';
+	v_fid := ((p_data ->>'data')::json->>'parameters')::json->>'fprocesscatId';
 
 	-- select system values
 	SELECT wsoftware, giswater  INTO v_project_type, v_version FROM version order by 1 desc limit 1 ;
@@ -51,20 +51,20 @@ BEGIN
 	IF v_networkmode IN (1,2) THEN
 	
 		IF v_patternmethod IN (21,22,23,33,34,43,44,53,54) THEN 
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (v_fprocesscat_id, v_result_id, 3, concat('ERROR: The pattern method used, it is incompatible with the export network mode used')); 
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (v_fprocesscat_id, v_result_id, 3, 'Change the pattern method using some of the (PJOINT) method avaliable or change export network USING some of TRIMED ARCS method avaliable.');
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result_id, 3, concat('ERROR: The pattern method used, it is incompatible with the export network mode used'));
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result_id, 3, 'Change the pattern method using some of the (PJOINT) method avaliable or change export network USING some of TRIMED ARCS method avaliable.');
 			v_return = '{"status":"Failed", "message":{"priority":1, "text":"Pattern method and network mode are incompatibles. The process is aborted...."},"body":{"data":{}}}';
 		END IF;
 
 	ELSIF v_networkmode IN (3,4) THEN
 
 		IF v_patternmethod IN (11,12,13,31,32,41,42,51,52) THEN 
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (v_fprocesscat_id, v_result_id, 3, concat('ERROR: The pattern method used, it is incompatible with the export network mode used')); 
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
-			VALUES (v_fprocesscat_id, v_result_id, 3, 'Change the pattern method using some of the (NODE) method avaliable or change export network USING some of NOT TRIMED ARCS method avaliable.');
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result_id, 3, concat('ERROR: The pattern method used, it is incompatible with the export network mode used'));
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result_id, 3, 'Change the pattern method using some of the (NODE) method avaliable or change export network USING some of NOT TRIMED ARCS method avaliable.');
 			v_return = '{"status":"Failed", "message":{"priority":1, "text":"Pattern method and network mode are incompatibles. The process is aborted...."},"body":{"data":{}}}'; 
 		END IF;
 	END IF;

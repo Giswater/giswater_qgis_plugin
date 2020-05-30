@@ -92,11 +92,11 @@ BEGIN
     END IF;
 
 	-- delete old values on result table
-	DELETE FROM audit_check_data WHERE fprocesscat_id=117 AND cur_user=current_user;
+	DELETE FROM audit_check_data WHERE fid = 117 AND cur_user=current_user;
 	
 	-- Starting process
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (117, null, 4, 'CONNECT TO NETWORK');
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (117, null, 4, '-------------------------------------------------------------');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (117, null, 4, 'CONNECT TO NETWORK');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (117, null, 4, '-------------------------------------------------------------');
 	
 
     -- Main loop
@@ -105,7 +105,7 @@ BEGIN
 	FOREACH v_connect_id IN ARRAY v_feature_array
 	LOOP	
 
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (117, null, 4, concat('Connect ', lower(v_feature_type),' with id ',v_connect_id,'.'));
 	
 		-- get link information (if exits)
@@ -162,7 +162,7 @@ BEGIN
 		IF v_arc.the_geom IS NOT NULL THEN
 
 			IF v_link.userdefined_geom IS TRUE THEN	
-				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (117, null, 4, concat('Previous link geometry was created manually by user.'));
 
 				-- get endfeature geometry
@@ -186,7 +186,7 @@ BEGIN
 					point_aux := St_closestpoint(v_endfeature_geom, St_startpoint(v_link.the_geom));
 					v_link.the_geom = ST_SetPoint(v_link.the_geom, 0, point_aux) ; 
 
-					INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 					VALUES (117, null, 4, concat('Reverse the direction of drawn link.'));
 				ELSE
 					point_aux := St_closestpoint(v_endfeature_geom, St_endpoint(v_link.the_geom));
@@ -199,7 +199,7 @@ BEGIN
 				v_link.userdefined_geom = FALSE;
 				v_link.exit_type = 'VNODE';
 
-				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (117, null, 4, concat('Connect feature with the closest arc.'));
 			END IF;
 
@@ -220,7 +220,7 @@ BEGIN
 				v_link.exit_type = 'VNODE';
 				v_pjointid = v_link.exit_id;
 
-				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (117, null, 4, concat('Recreate final vnode'));
 			END IF;
 
@@ -230,7 +230,7 @@ BEGIN
 			VALUES ((SELECT nextval('link_link_id_seq')), v_link.the_geom, v_connect_id, v_feature_type, v_link.exit_type, v_link.exit_id, 
 			v_link.userdefined_geom, v_connect.state, v_arc.expl_id);
 				
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (117, null, 4, concat('Recreate link'));
 
 			IF v_pjointtype IS NULL THEN
@@ -247,7 +247,7 @@ BEGIN
 				-- update specific fields for ws projects
 				IF v_projecttype = 'WS' THEN
 					UPDATE connec SET dqa_id=v_arc.dqa_id, minsector_id=v_arc.minsector_id,presszone_id=v_arc.presszone_id WHERE connec_id = v_connect_id;
-					INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 					VALUES (117, null, 4, concat('Update mapzone values.'));
 				END IF;
 			
@@ -255,7 +255,7 @@ BEGIN
 				IF (SELECT ((value::json->>'connec')::json->>'status')::boolean FROM config_param_system WHERE parameter = 'edit_connect_update_statetype') IS TRUE THEN
 					UPDATE connec SET state_type = (SELECT ((value::json->>'connec')::json->>'state_type')::int2 
 					FROM config_param_system WHERE parameter = 'edit_connect_update_statetype') WHERE connec_id=v_connect_id;
-					INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 					VALUES (117, null, 4, concat('Update state type.'));
 				END IF;
 			
@@ -263,7 +263,7 @@ BEGIN
 				UPDATE gully SET arc_id=v_connect.arc_id, expl_id=v_arc.expl_id, dma_id=v_arc.dma_id, sector_id=v_arc.sector_id, pjoint_type=v_pjointtype, pjoint_id=v_pjointid
 				WHERE gully_id = v_connect_id;
 				
-				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (117, null, 4, concat('Update mapzone values.'));
 
 				-- Update state_type if edit_connect_update_statetype is TRUE
@@ -294,7 +294,7 @@ BEGIN
 
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data 
-	WHERE cur_user="current_user"() AND fprocesscat_id=117 ORDER BY criticity desc, id asc) row; 
+	WHERE cur_user="current_user"() AND fid = 117 ORDER BY criticity desc, id asc) row;
 	
 	IF v_audit_result is null THEN
         v_status = 'Accepted';

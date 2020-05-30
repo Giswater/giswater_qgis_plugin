@@ -32,8 +32,8 @@ BEGIN
 	SET search_path= 'SCHEMA_NAME','public';
 
 	-- Delete previous log results
-	DELETE FROM audit_log_data WHERE fprocesscat_id=3 AND cur_user=current_user;
-	DELETE FROM audit_log_data WHERE fprocesscat_id=4 AND cur_user=current_user;
+	DELETE FROM audit_log_data WHERE fid=3 AND cur_user=current_user;
+	DELETE FROM audit_log_data WHERE fid=4 AND cur_user=current_user;
 
 	-- select config values
 	SELECT wsoftware, giswater  INTO v_projecttype, v_version FROM version order by 1 desc limit 1;
@@ -60,21 +60,21 @@ BEGIN
 	UPDATE config_param_system SET value=FALSE WHERE parameter='edit_topocontrol_disable_error' ;
 	
 	-- get results
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result FROM (SELECT * FROM audit_check_data WHERE cur_user="current_user"() AND ( fprocesscat_id=3 OR fprocesscat_id=4)) row; 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result FROM (SELECT * FROM audit_check_data WHERE cur_user="current_user"() AND ( fid=3 OR fid=4)) row;
 
 	
 
 	IF v_saveondatabase IS FALSE THEN 
 		-- delete previous results
-		DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=3;
-		DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=4;
+		DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=3;
+		DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=4;
 	ELSE
 		-- set selector
-		DELETE FROM selector_audit WHERE fprocesscat_id=3 AND cur_user=current_user;  
-		DELETE FROM selector_audit WHERE fprocesscat_id=4 AND cur_user=current_user;    
+		DELETE FROM selector_audit WHERE fid=3 AND cur_user=current_user;
+		DELETE FROM selector_audit WHERE fid=4 AND cur_user=current_user;
   
-		INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (3, current_user);
-		INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (4, current_user);
+		INSERT INTO selector_audit (fid,cur_user) VALUES (3, current_user);
+		INSERT INTO selector_audit (fid,cur_user) VALUES (4, current_user);
 	END IF;
 
 	--    Control nulls
@@ -105,7 +105,7 @@ EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_arc_repair(arc_id, (row_number() over (order by arc_id)), (select count(*) from SCHEMA_NAME.arc)) FROM SCHEMA_NAME.arc
 
 RESULTS:
-After process log result are stored on audit_log_data whith fprocesscat_i=3 and 4
+After process log result are stored on audit_log_data whith fi=3 and 4
 */
 
 DECLARE

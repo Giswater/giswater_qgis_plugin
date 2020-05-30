@@ -25,10 +25,10 @@ BEGIN
     IF TG_OP = 'INSERT' THEN          
 	
 		IF geom_type='circle' THEN					   
-			INSERT INTO temp_table (fprocesscat_id, geom_polygon, user_name)
+			INSERT INTO temp_table (fid, geom_polygon, user_name)
 			VALUES  (28, NEW.geom_polygon, current_user);
 		ELSIF geom_type='point' THEN
-            INSERT INTO temp_table (fprocesscat_id, geom_point, user_name)
+            INSERT INTO temp_table (fid, geom_point, user_name)
             VALUES  (27, NEW.geom_point, current_user);
 		END IF;
 		

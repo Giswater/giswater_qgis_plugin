@@ -92,11 +92,11 @@ BEGIN
 	v_gw_schema_array = (SELECT array_agg(a.key) result FROM json_each(v_manager_x_schema) a);
 
 	-- delete old values on result table
-	DELETE FROM audit_check_data WHERE fprocesscat_id=107 AND cur_user=current_user;
+	DELETE FROM audit_check_data WHERE fid = 107 AND cur_user=current_user;
 	
 	-- Starting process
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (107, null, 4, 'ROLE MANAGEMENT');
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) VALUES (107, null, 4, '-------------------------------------------------------------');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (107, null, 4, 'ROLE MANAGEMENT');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (107, null, 4, '-------------------------------------------------------------');
     
 
 	IF v_action = 'insert' THEN
@@ -106,7 +106,7 @@ BEGIN
 		
 			EXECUTE 'CREATE USER '||v_user_id||' WITH ENCRYPTED PASSWORD '''||v_password||''';';
 
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (107, null, 1, concat('INFO: User ',v_user_id,' created in a database'));
 	
 		ELSE
@@ -115,7 +115,7 @@ BEGIN
 
 		EXECUTE 'GRANT '||v_role||' TO '||v_user_id||';';
 		
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (107, null, 1, concat('INFO: Role ',v_role,' granted.'));
 	
 		FOREACH rec_schema IN ARRAY v_gw_schema_array LOOP
@@ -123,7 +123,7 @@ BEGIN
 			EXECUTE 'INSERT INTO '||rec_schema||'.cat_users (id,name,sys_role) 
 			VALUES ('''||v_user_id||''','''||v_user_name||''','''||v_role||''') ON CONFLICT (id) DO NOTHING;';
 
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (107, null, 1, concat('INFO: User ',v_user_id,' inserted into cat_users of schema ',rec_schema,'.'));
 
 			EXECUTE 'SELECT value::boolean  
@@ -142,7 +142,7 @@ BEGIN
 					SET username = array_append(username,'''||v_user_id||''') WHERE id = '||rec_manager::integer||';';
 				END LOOP;
 				
-				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (107, null, 1, concat('INFO: User ',v_user_id,' inserted into cat_manager of schema ',rec_schema,'.'));
 
 				--insert values for the new user into basic selectors
@@ -153,7 +153,7 @@ BEGIN
 				SELECT expl_id, '''||v_user_id||''' FROM '||rec_schema||'.config_user_x_expl 
 				WHERE username= '''||v_user_id||''' ON CONFLICT (expl_id,cur_user) DO NOTHING';
 	
-				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (107, null, 1, concat('INFO: User ',v_user_id,' inserted into expl and state selectors of schema ',rec_schema,'.'));
 
 			ELSE
@@ -165,7 +165,7 @@ BEGIN
 				SELECT expl_id, '''||v_user_id||''' FROM '||rec_schema||'.exploitation 
 				ON CONFLICT (expl_id,cur_user) DO NOTHING';
 	
-				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (107, null, 1, concat('INFO: User ',v_user_id,' inserted into expl and state selectors of schema ',rec_schema,'.'));
 
 			END IF;
@@ -178,7 +178,7 @@ BEGIN
 
 			EXECUTE 'ALTER USER '||v_user_id||' WITH ENCRYPTED PASSWORD '''||v_password||''';';
 
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (107, null, 1, concat('INFO: Password changed for user ',v_user_id,'.'));
 		END IF;
 
@@ -194,7 +194,7 @@ BEGIN
 
 			EXECUTE ' GRANT '||v_role||' TO '||v_user_id||';';
 
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (107, null, 1, concat('INFO: Role changed to ',v_role,'.'));
 
 
@@ -249,7 +249,7 @@ BEGIN
 							EXECUTE 'UPDATE '||rec_schema||'.cat_manager 
 							SET username = array_append(username,'''||v_user_id||''') WHERE id = '||rec_manager::integer||';';
 
-							INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+							INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 							VALUES (107, null, 1, concat('INFO: User ',v_user_id,' assigned to new managers.'));
 						END LOOP;
 					END IF;
@@ -270,7 +270,7 @@ BEGIN
 				EXECUTE 'DELETE FROM '||rec_schema||'.'||rec.table_name||' WHERE cur_user = '''||v_user_id||''';';
 			END LOOP;
 
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (107, null, 1, concat('INFO: User ',v_user_id,' deleted from selectors.'));
 
 			EXECUTE 'SELECT value::boolean  
@@ -283,21 +283,21 @@ BEGIN
 				EXECUTE 'UPDATE '||rec_schema||'.cat_manager 
 				SET username = array_remove(username,'''||v_user_id||''') WHERE '''||v_user_id||''' = any(username);';
 
-				INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (107, null, 1, concat('INFO: User ',v_user_id,' deleted from cat_manager.'));
 			END IF;
 
 			--remove user from users catalog
 			EXECUTE 'DELETE FROM '||rec_schema||'.cat_users WHERE id = '''||v_user_id||''';';
 			
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (107, null, 1, concat('INFO: User ',v_user_id,' deleted from cat_users.'));
 
 		END LOOP;
 		--drop user from the database
 		EXECUTE 'DROP USER '||v_user_id||';';
 
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, criticity, error_message) 
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (107, null, 1, concat('INFO: User ',v_user_id,' deleted from database.'));
 
 	END IF;
@@ -306,7 +306,7 @@ BEGIN
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() 
-	AND fprocesscat_id=107 order by criticity desc, id asc) row; 
+	AND fid = 107 order by criticity desc, id asc) row;
 
 	IF v_audit_result is null THEN
         v_status = 'Accepted';

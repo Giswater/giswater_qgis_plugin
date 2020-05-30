@@ -59,9 +59,9 @@ BEGIN
 	SELECT wsoftware INTO v_project_type FROM version order by 1 desc limit 1;
 
 	-- manage log (fprocesscat = 51)
-	DELETE FROM audit_check_data WHERE fprocesscat_id=51 AND cur_user=current_user;
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('FEATURE RELATIONS'));
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('------------------------------'));
+	DELETE FROM audit_check_data WHERE fid = 51 AND cur_user=current_user;
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (51, v_result_id, concat('FEATURE RELATIONS'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (51, v_result_id, concat('------------------------------'));
 
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
@@ -83,7 +83,7 @@ BEGIN
 		JOIN sys_feature_cat on sys_feature_cat.id=v_ui_arc_x_relations.sys_type WHERE type='CONNEC' AND  arc_id = v_feature_id;
 
 		IF v_connect_connec IS NOT NULL THEN
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Connecs connected with the feature :',v_connect_connec ));
+			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (51, v_result_id, concat('Connecs connected with the feature :',v_connect_connec ));
 		END IF;
 
 		SELECT string_agg(feature_id,',') INTO v_connect_gully FROM v_ui_arc_x_relations 
@@ -91,7 +91,7 @@ BEGIN
 		
 		IF v_connect_gully IS NOT NULL THEN
 
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Gullies connected with the feature :',v_connect_gully ));
+			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (51, v_result_id, concat('Gullies connected with the feature :',v_connect_gully ));
 
 		END IF;
 		
@@ -99,7 +99,7 @@ BEGIN
 		SELECT concat(node_1,',',node_2) INTO v_connect_node FROM v_ui_arc_x_node WHERE arc_id = v_feature_id;
 		
 		IF v_connect_node IS NOT NULL THEN
-				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Nodes connected with the feature: ',v_connect_node ));
+				INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (51, v_result_id, concat('Nodes connected with the feature: ',v_connect_node ));
 			END IF;
 
 	ELSIF v_feature_type='node' THEN
@@ -109,14 +109,14 @@ BEGIN
 		 	SELECT string_agg(child_id,',') INTO v_connect_node FROM v_ui_node_x_relations WHERE node_id = v_feature_id;
 
 			IF v_connect_node IS NOT NULL THEN
-				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Nodes connected with the feature: ',v_connect_node ));
+				INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (51, v_result_id, concat('Nodes connected with the feature: ',v_connect_node ));
 			END IF;
 		END IF;
 		--check arcs related to node
 		SELECT string_agg(arc_id,',') INTO v_connect_arc FROM v_ui_arc_x_node WHERE (node_1 = v_feature_id OR node_2 = v_feature_id);
 		
 		IF v_connect_arc IS NOT NULL THEN
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Arcs connected with the feature: ',v_connect_arc ));
+			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (51, v_result_id, concat('Arcs connected with the feature: ',v_connect_arc ));
 		END IF;
 		--check related polygon
 		IF v_man_table IN ('man_tank', 'man_register', 'man_wwtp', 'man_storage','man_netgully','man_chamber') THEN
@@ -124,7 +124,7 @@ BEGIN
 		 	INTO v_connect_pol;
 
 		 	IF v_connect_pol IS NOT NULL THEN
-		 		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Polygon connected with the feature: ',v_connect_pol ));
+		 		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (51, v_result_id, concat('Polygon connected with the feature: ',v_connect_pol ));
 		 	END IF;
 		END IF;
 
@@ -134,7 +134,7 @@ BEGIN
 		INTO v_connect_connec;
 
 		IF v_connect_connec IS NOT NULL THEN
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Links connected with the feature :',v_connect_connec ));
+			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (51, v_result_id, concat('Links connected with the feature :',v_connect_connec ));
 		END IF;
 
 		EXECUTE 'SELECT string_agg(link_id::text,'','') FROM link where exit_type=''GULLY''  AND  exit_id = '''||v_feature_id||'''::text
@@ -142,7 +142,7 @@ BEGIN
 		INTO v_connect_gully;
 
 		IF v_connect_gully IS NOT NULL THEN
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Gullies connected with the feature :',v_connect_gully ));
+			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (51, v_result_id, concat('Gullies connected with the feature :',v_connect_gully ));
 		END IF;
 		
 		--check related polygon
@@ -155,7 +155,7 @@ BEGIN
 		END IF;
 
 		IF v_connect_pol IS NOT NULL THEN
-			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Polygon connected with the feature: ',v_connect_pol ));
+			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (51, v_result_id, concat('Polygon connected with the feature: ',v_connect_pol ));
 		END IF;
 
 	END IF;
@@ -165,14 +165,14 @@ BEGIN
 	INTO v_element;
 
 	IF v_element IS NOT NULL THEN
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Elements connected with the feature: ',v_element ));
+		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (51, v_result_id, concat('Elements connected with the feature: ',v_element ));
 	END IF;
 	--check visits related to feature
 	EXECUTE 'SELECT string_agg(visit_id::text,'','') FROM om_visit_x_'||v_feature_type||' where '||v_feature_type||'_id = '''||v_feature_id||'''::text'
 	INTO v_visit;
 
 	IF v_visit IS NOT NULL THEN
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Visits connected with the feature: ',v_visit ));
+		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (51, v_result_id, concat('Visits connected with the feature: ',v_visit ));
 	END IF;
 
 	--check visits related to feature
@@ -180,11 +180,11 @@ BEGIN
 	INTO v_doc;
 
 	IF v_doc IS NOT NULL THEN
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (51, v_result_id, concat('Documents connected with the feature: ',v_doc ));
+		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (51, v_result_id, concat('Documents connected with the feature: ',v_doc ));
 	END IF;
 
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=51) row; 
+	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fid = 51) row;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');

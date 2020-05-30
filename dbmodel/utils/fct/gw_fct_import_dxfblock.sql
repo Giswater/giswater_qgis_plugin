@@ -29,7 +29,7 @@ Only blocks must be on the dxf file
 example to work without csv2pg plugin button:
 delete from SCHEMA_NAME.temp_csv2pg ;
 copy SCHEMA_NAME.temp_csv2pg (csv1) FROM 'c:\data\file.dxf';
-update SCHEMA_NAME.temp_csv2pg set csv2pgcat_id=8;
+update SCHEMA_NAME.temp_csv2pg set fid = 8;
 select SCHEMA_NAME.gw_fct_utils_csv2pg_importdxfblock(8);
 */
 
@@ -59,15 +59,15 @@ BEGIN
 	SELECT wsoftware, giswater, epsg  INTO v_project_type, v_version, v_epsg FROM version order by 1 desc limit 1;
 
 	-- manage log (fprocesscat 42)
-	DELETE FROM audit_check_data WHERE fprocesscat_id=42 AND cur_user=current_user;
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('IMPORT DXF BLOCKS FILE'));
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('------------------------------'));
+	DELETE FROM audit_check_data WHERE fid = 42 AND cur_user=current_user;
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('IMPORT DXF BLOCKS FILE'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('------------------------------'));
    
  	-- starting process	
 	SELECT count(*)  INTO v_total FROM temp_csv2pg WHERE cur_user=current_user;
 
 
-	FOR v_record IN SELECT id, csv1 FROM temp_csv2pg WHERE cur_user=current_user AND csv2pgcat_id=8 order by id
+	FOR v_record IN SELECT id, csv1 FROM temp_csv2pg WHERE cur_user=current_user AND fid = 8 order by id
 	LOOP 
 		v_i=v_i+1;
 		-- massive refactor of source field (getting target)
@@ -89,7 +89,7 @@ BEGIN
 	v_i=0;
 	v_filter = 0;
 
-	FOR v_record IN SELECT id, csv1, source FROM temp_csv2pg WHERE cur_user=current_user AND csv2pgcat_id=8 order by id
+	FOR v_record IN SELECT id, csv1, source FROM temp_csv2pg WHERE cur_user=current_user AND fid = 8 order by id
 	LOOP 	
 		v_i=v_i+1;
 		-- xcoord
@@ -141,24 +141,24 @@ BEGIN
 	END LOOP;
 
 	-- deleting previous values on destination table
-	DELETE FROM temp_table WHERE fprocesscat_id=42 AND cur_user=current_user;
+	DELETE FROM temp_table WHERE fid = 42 AND cur_user=current_user;
 
 	-- inserting result on point temp_table
-	INSERT INTO temp_table (fprocesscat_id, text_column, geom_point) 
-	SELECT 42, concat('"value":"',csv4,'"rotation":"',csv5,'"layer":"',csv6), st_setsrid(st_makepoint(csv2::float, csv3::float),v_epsg) FROM temp_csv2pg WHERE cur_user=current_user AND csv2pgcat_id=8;
+	INSERT INTO temp_table (fid, text_column, geom_point)
+	SELECT 42, concat('"value":"',csv4,'"rotation":"',csv5,'"layer":"',csv6), st_setsrid(st_makepoint(csv2::float, csv3::float),v_epsg) FROM temp_csv2pg WHERE cur_user=current_user AND fid = 8;
 
 	-- Delete values from csv temporal table
-	DELETE FROM temp_csv2pg WHERE cur_user=current_user AND csv2pgcat_id=8;
+	DELETE FROM temp_csv2pg WHERE cur_user=current_user AND fid = 8;
 
 	-- manage log (fprocesscat 42)
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('Reading values from temp_csv2pg table -> Done'));
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('Inserting values on temp_table as point geometry -> Done'));
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('Deleting values from temp_csv2pg -> Done'));
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('Process finished'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Reading values from temp_csv2pg table -> Done'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Inserting values on temp_table as point geometry -> Done'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Deleting values from temp_csv2pg -> Done'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Process finished'));
 
 	-- get log (fprocesscat 42)
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=42) row; 
+	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fid = 42) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 			

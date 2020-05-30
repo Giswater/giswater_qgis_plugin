@@ -77,7 +77,7 @@ BEGIN
                     IF NOT FOUND THEN
 					
 			RAISE NOTICE ' Inserting into anl_arc; %', rec_table.arc_id;
-                      	INSERT INTO "anl_arc" (arc_id, arc_id_aux, the_geom, fprocesscat_id) VALUES(rec_table.arc_id, arc_id_arg, arc_aux, 30);
+                      	INSERT INTO "anl_arc" (arc_id, arc_id_aux, the_geom, fid) VALUES(rec_table.arc_id, arc_id_arg, arc_aux, 30);
 
                    	RAISE NOTICE ' Inserting into anl_mincut_result_arc; %', rec_table.arc_id;
 			INSERT INTO "anl_mincut_result_arc" (arc_id, the_geom, result_id) VALUES(rec_table.arc_id, rec_table.the_geom, result_id_arg);
@@ -99,7 +99,7 @@ BEGIN
 					-- Compute proceed
                     IF NOT FOUND THEN
 			RAISE NOTICE ' Inserting into anl_arc; %', rec_table.arc_id;
-                      	INSERT INTO "anl_arc" (arc_id, arc_id_aux, the_geom, fprocesscat_id) VALUES(rec_table.arc_id, arc_id_arg, arc_aux, 30);  
+                      	INSERT INTO "anl_arc" (arc_id, arc_id_aux, the_geom, fid) VALUES(rec_table.arc_id, arc_id_arg, arc_aux, 30);
 
 			RAISE NOTICE ' Inserting into anl_mincut_result_arc; %', rec_table.arc_id;
 			INSERT INTO "anl_mincut_result_arc" (arc_id, the_geom, result_id) VALUES(rec_table.arc_id, rec_table.the_geom, result_id_arg);   

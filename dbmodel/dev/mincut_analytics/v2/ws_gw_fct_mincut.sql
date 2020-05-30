@@ -315,14 +315,14 @@ BEGIN
 			
 			v_return = concat('{"arcs":',v_numarcs,', "length":',v_length, ', "connecs":',v_numconnecs,', "hydrometers":',v_numhydrometer,'}');
 			
-			INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) 
+			INSERT INTO audit_log_data (fid, feature_type, feature_id, log_message)
 			VALUES (29, 'arc', element_id_arg, v_return);
 		END IF;
 	ELSE
 		-- Insert values on audit_log_data table when case of study of mincut minimum sector analysis (om_mincut_analysis_dminsector=true)
-		INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) 
+		INSERT INTO audit_log_data (fid, feature_type, feature_id, log_message)
 		SELECT 34, element_id_arg, arc_id, concat('{"dminsector":',element_id_arg,'}') FROM anl_mincut_result_arc WHERE result_id=result_id_arg AND arc_id 
-		NOT IN (SELECT feature_id FROM audit_log_data WHERE fprocesscat_id=34 AND user_name=current_user);
+		NOT IN (SELECT feature_id FROM audit_log_data WHERE fid = 34 AND user_name=current_user);
 	END IF;
 
 	-- calculate the boundary of mincut using arcs and valves

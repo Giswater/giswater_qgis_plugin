@@ -36,13 +36,13 @@ BEGIN
     v_node_id = (SELECT json_array_elements_text(v_node_json)); 
     
     -- Check if the node is already computed
-    SELECT node_id INTO v_exists_id FROM anl_node WHERE node_id = v_node_id AND cur_user="current_user"() AND fprocesscat_id = 120; 
+    SELECT node_id INTO v_exists_id FROM anl_node WHERE node_id = v_node_id AND cur_user="current_user"() AND fid = 120;
 
     -- Compute proceed
     IF NOT FOUND THEN
     
         -- Update value
-        INSERT INTO anl_node (node_id, nodecat_id,state, expl_id, fprocesscat_id, the_geom) 
+        INSERT INTO anl_node (node_id, nodecat_id,state, expl_id, fid, the_geom)
         SELECT node_id, node_type, state, expl_id, 120, the_geom FROM v_edit_node WHERE node_id = v_node_id;
                    
         -- Loop for all the upstream arcs
@@ -50,7 +50,7 @@ BEGIN
         LOOP
     
             -- Insert into tables
-            INSERT INTO anl_arc (arc_id, arccat_id, expl_id, fprocesscat_id, the_geom) VALUES
+            INSERT INTO anl_arc (arc_id, arccat_id, expl_id, fid, the_geom) VALUES
             (rec_table.arc_id, rec_table.arc_type, rec_table.expl_id,120, rec_table.the_geom);
 
            -- Call recursive function weighting with the pipe capacity

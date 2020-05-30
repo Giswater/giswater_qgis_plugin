@@ -40,8 +40,8 @@ BEGIN
 
 
     -- Reset values
-    DELETE FROM anl_node WHERE cur_user="current_user"() AND (fprocesscat_id = 121 OR fprocesscat_id = 120); 
-    DELETE FROM anl_arc WHERE cur_user="current_user"() AND (fprocesscat_id = 121 OR fprocesscat_id = 120); 
+    DELETE FROM anl_node WHERE cur_user="current_user"() AND (fid = 121 OR fid = 120);
+    DELETE FROM anl_arc WHERE cur_user="current_user"() AND (fid = 121 OR fid = 120);
     
     -- select version
     SELECT giswater INTO v_version FROM version order by 1 desc limit 1;

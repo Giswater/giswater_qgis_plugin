@@ -22,9 +22,9 @@ SELECT SCHEMA_NAME.gw_fct_grafanalytics_lrs('{"data":{"parameters":{"exploitatio
 delete from SCHEMA_NAME.audit_log_data;
 delete from SCHEMA_NAME.temp_anlgraf
 
-SELECT * FROM SCHEMA_NAME.anl_arc WHERE fprocesscat_id=34 AND cur_user=current_user
-SELECT * FROM SCHEMA_NAME.anl_node WHERE fprocesscat_id=34 AND cur_user=current_user
-SELECT * FROM SCHEMA_NAME.audit_log_data WHERE fprocesscat_id=34 AND cur_user=current_user
+SELECT * FROM SCHEMA_NAME.anl_arc WHERE fid = 34 AND cur_user=current_user
+SELECT * FROM SCHEMA_NAME.anl_node WHERE fid = 34 AND cur_user=current_user
+SELECT * FROM SCHEMA_NAME.audit_log_data WHERE fid = 34 AND cur_user=current_user
 
 
 */
@@ -34,7 +34,7 @@ v_acc_value numeric;
 v_affectedrows numeric; 
 v_feature record;
 v_expl json;
-v_fprocesscat_id integer;
+v_fid integer;
 v_querytext text;
 v_input json;
 v_visible_layer text;
@@ -91,7 +91,7 @@ BEGIN
 	v_version = (SELECT giswater FROM version LIMIT 1);
 
 	-- set variables
-	v_fprocesscat_id=116;  
+	v_fid = 116;
 
 	-- data quality analysis
 	v_input = '{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}'::json;
@@ -101,26 +101,26 @@ BEGIN
 	
 
 	-- Starting process
-	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, concat('DYNAMIC LINEAR REFERENCING SYSTEM'));
-	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, concat('---------------------------------------------------'));
+	INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('DYNAMIC LINEAR REFERENCING SYSTEM'));
+	INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('---------------------------------------------------'));
 	
 	-- reset tables (graf & audit_log)
 	DELETE FROM temp_anlgraf;
-	DELETE FROM audit_log_data WHERE fprocesscat_id=v_fprocesscat_id AND cur_user=current_user;
-	--DELETE FROM anl_node WHERE fprocesscat_id=v_fprocesscat_id AND cur_user=current_user;
+	DELETE FROM audit_log_data WHERE fid = v_fid AND cur_user=current_user;
+	--DELETE FROM anl_node WHERE fid = v_fid AND cur_user=current_user;
 	--DELETE FROM anl_node;
-	DELETE FROM anl_arc WHERE fprocesscat_id=v_fprocesscat_id AND cur_user=current_user;
-	DELETE FROM audit_check_data WHERE fprocesscat_id=v_fprocesscat_id AND cur_user=current_user;
+	DELETE FROM anl_arc WHERE fid = v_fid AND cur_user=current_user;
+	DELETE FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user;
 
 	-- reset user's state
 	DELETE FROM selector_state WHERE cur_user=current_user;
 	INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
-	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, 
+	INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid,
 	concat('INFO: State have been forced to ''1'''));
 
 	-- reset user's psectors
 	DELETE FROM selector_psector WHERE cur_user=current_user;
-	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (v_fprocesscat_id, 
+	INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid,
 	concat('INFO: All psectors have been disabled to execute this analysis'));
 
 	-- reset user's exploitation
@@ -234,8 +234,8 @@ BEGIN
 			v_acc_value = v_acc_value + v_current_value;
 			
 			IF v_header_arc IS NOT NULL THEN
-				EXECUTE 'INSERT INTO anl_node (fprocesscat_id, nodecat_id, node_id, the_geom, descript) 
-				SELECT DISTINCT ON (node_id) '||v_fprocesscat_id||', nodecat_id, '||v_end_node::text||', the_geom, 
+				EXECUTE 'INSERT INTO anl_node (fid, nodecat_id, node_id, the_geom, descript)
+				SELECT DISTINCT ON (node_id) '||v_fid||', nodecat_id, '||v_end_node::text||', the_geom,
 				concat (''{"value":"'','||v_acc_value||',''", "header":"'||v_feature.node_1||'"}'')
 				FROM v_edit_node WHERE node_id= '''||v_end_node||''';';
 		
@@ -260,8 +260,8 @@ BEGIN
 					v_bif_header_arc = null;		
 					v_header_node = v_end_node::text;
 					v_bif_header_node = null;
-					INSERT INTO audit_check_data (fprocesscat_id, error_message) 
-					VALUES (v_fprocesscat_id, concat('INFO: Bifurcation on node',v_end_node,'. Arcs belong to different branches.'));
+					INSERT INTO audit_check_data (fid, error_message)
+					VALUES (v_fid, concat('INFO: Bifurcation on node',v_end_node,'. Arcs belong to different branches.'));
 				ELSE 
 				--case when bifurcation node and arcs belong to the same branch
 					v_bifurcation = 1;
@@ -272,8 +272,8 @@ BEGIN
 					v_bif_header_node = v_end_node::text;
 					v_bif_acc_value = v_acc_value;
 
-					INSERT INTO audit_check_data (fprocesscat_id, error_message) 
-					VALUES (v_fprocesscat_id, concat('INFO: Bifurcation on node',v_end_node,'. One arc is the continuation of a previous branch.'));
+					INSERT INTO audit_check_data (fid, error_message)
+					VALUES (v_fid, concat('INFO: Bifurcation on node',v_end_node,'. One arc is the continuation of a previous branch.'));
 				END IF;
 
 			ELSIF v_count_feature = 0 and v_bifurcation= 1 THEN
@@ -313,10 +313,10 @@ BEGIN
 	FROM config_param_system WHERE parameter=''grafanalytics_lrs_graf'')a'
 	into v_node_string;
 	
-	EXECUTE 'DELETE FROM anl_node WHERE fprocesscat_id = '||v_fprocesscat_id||' AND node_id::text IN ('||v_node_string||');';
+	EXECUTE 'DELETE FROM anl_node WHERE fid = '||v_fid||' AND node_id::text IN ('||v_node_string||');';
 	
-	EXECUTE 'INSERT INTO anl_node (fprocesscat_id, nodecat_id, node_id, the_geom, descript) 
-	SELECT DISTINCT ON (node_id) '||v_fprocesscat_id||', nodecat_id,node_id, the_geom, 
+	EXECUTE 'INSERT INTO anl_node (fid, nodecat_id, node_id, the_geom, descript)
+	SELECT DISTINCT ON (node_id) '||v_fid||', nodecat_id,node_id, the_geom,
 	concat (''{"value":"0", "header":"'',node_id,''"}'')
 	FROM v_edit_node WHERE v_edit_node.node_id::text IN ('||v_node_string||');';
 	
@@ -326,21 +326,21 @@ BEGIN
  	WHERE param_name ='''|| v_valuefield||''''
 	LOOP
 		v_querytext =  'UPDATE '||rec.child_layer||' SET '||v_valuefield||' = a.descript::json->>''value'', '||v_headerfield||
-		' = a.descript::json->>''header'' FROM anl_node a WHERE fprocesscat_id='||v_fprocesscat_id||' AND a.node_id='||rec.child_layer||'.node_id AND cur_user=current_user';
+		' = a.descript::json->>''header'' FROM anl_node a WHERE fid='||v_fid||' AND a.node_id='||rec.child_layer||'.node_id AND cur_user=current_user';
 		EXECUTE v_querytext;
 		
-		EXECUTE 'UPDATE anl_node SET result_id = '||v_fprocesscat_id||' WHERE fprocesscat_id='||v_fprocesscat_id||' 
+		EXECUTE 'UPDATE anl_node SET result_id = '||v_fid||' WHERE fid='||v_fid||'
 		AND node_id IN (SELECT node_id::text FROM '||rec.child_layer||')';
 
 	END LOOP;
 	
-	INSERT INTO audit_check_data (fprocesscat_id, error_message) 
-	VALUES (v_fprocesscat_id, concat('WARNING: LRS attributes on node features have been updated'));
+	INSERT INTO audit_check_data (fid, error_message)
+	VALUES (v_fid, concat('WARNING: LRS attributes on node features have been updated'));
 
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=v_fprocesscat_id order by id) row; 
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by id) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 	
@@ -354,8 +354,8 @@ BEGIN
     'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
     'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
-  	FROM (SELECT id, node_id, nodecat_id, state, node_id_aux,nodecat_id_aux, state_aux, expl_id, descript::json, fprocesscat_id, the_geom 
-  	FROM  anl_node WHERE cur_user="current_user"() AND fprocesscat_id=116 and result_id = '116') row) features;
+  	FROM (SELECT id, node_id, nodecat_id, state, node_id_aux,nodecat_id_aux, state_aux, expl_id, descript::json, fid, the_geom
+  	FROM  anl_node WHERE cur_user="current_user"() AND fid=116 and result_id = '116') row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
    	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');  
