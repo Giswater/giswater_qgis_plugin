@@ -15,7 +15,10 @@ $BODY$
 /*
 SELECT SCHEMA_NAME.gw_fct_import_elements($${
 "client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{},
-"data":{"filterFields":{}, "pageInfo":{}, "importParam":"node", "csv2pgCat":"3"}}$$)::text
+"data":{"filterFields":{}, "pageInfo":{}, "importParam":"node", "fid":"235"}}$$)::text
+
+--fid: 235
+
 */
 
 
@@ -44,13 +47,13 @@ BEGIN
 	v_featuretype =  (p_data::json->>'data')::json->>'importParam';
 	v_featuretable = concat ('element_x_',v_featuretype);
 
-	-- manage log (fprocesscat 42)
-	DELETE FROM audit_check_data WHERE  = 42 AND cur_user=current_user;
-	INSERT INTO audit_check_data (, result_id, error_message) VALUES (42, v_result_id, concat('IMPORT ELEMENTS FILE'));
-	INSERT INTO audit_check_data (, result_id, error_message) VALUES (42, v_result_id, concat('------------------------------'));
+	-- manage log (fid: 235)
+	DELETE FROM audit_check_data WHERE  = 235 AND cur_user=current_user;
+	INSERT INTO audit_check_data (, result_id, error_message) VALUES (235, v_result_id, concat('IMPORT ELEMENTS FILE'));
+	INSERT INTO audit_check_data (, result_id, error_message) VALUES (235, v_result_id, concat('------------------------------'));
    
  	-- starting process
-	FOR v_element IN SELECT * FROM temp_csv2pg WHERE cur_user=current_user AND fid = 3
+	FOR v_element IN SELECT * FROM temp_csv WHERE cur_user=current_user AND fid = 235
 	LOOP 
 		IF v_featuretype='node' THEN
 			INSERT INTO element (element_id, elementcat_id,observ, comment, num_elements, state_type) VALUES
@@ -75,18 +78,18 @@ BEGIN
 	END LOOP;
 
 	-- Delete values on temporal table
-	DELETE FROM temp_csv2pg WHERE cur_user=current_user AND fid = 3;
+	DELETE FROM temp_csv WHERE cur_user=current_user AND fid = 235;
 
-	-- manage log (fprocesscat 42)
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Reading values from temp_csv2pg table -> Done'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Inserting values on element table -> Done'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Inserting values on ',v_featuretable,' table -> Done'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Deleting values from temp_csv2pg -> Done'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Process finished'));
+	-- manage log (fid: 235)
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (235, v_result_id, concat('Reading values from temp_csv table -> Done'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (235, v_result_id, concat('Inserting values on element table -> Done'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (235, v_result_id, concat('Inserting values on ',v_featuretable,' table -> Done'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (235, v_result_id, concat('Deleting values from temp_csv -> Done'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (235, v_result_id, concat('Process finished'));
 	
-	-- get log (fprocesscat 42)
+	-- get log (fid: 235)
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid = 42) row;
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid = 235) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 			

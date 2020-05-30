@@ -38,7 +38,7 @@ BEGIN
 	-- get system parameters
 	SELECT wsoftware, giswater  INTO v_project_type, v_version FROM version order by 1 desc limit 1;
    
-	-- manage log (fprocesscat 236)
+	-- manage log (fid: 236)
 	DELETE FROM audit_check_data WHERE fid = 236 AND cur_user=current_user;
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (236, v_result_id, concat('IMPORT ADD FIELDS FILE'));
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (236, v_result_id, concat('------------------------------'));
@@ -53,13 +53,13 @@ BEGIN
 	-- Delete values on temporal table
 	DELETE FROM temp_csv WHERE cur_user=current_user AND fid = 236;
 
-	-- manage log (fprocesscat 236)
+	-- manage log (fid: 236)
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (236, v_result_id, concat('Reading values from temp_csv table -> Done'));
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (236, v_result_id, concat('Inserting values on man_addfields_value table -> Done'));
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (236, v_result_id, concat('Deleting values from temp_csv -> Done'));
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (236, v_result_id, concat('Process finished'));
 
-	-- get log (fprocesscat 236)
+	-- get log (fid: 236)
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
 	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fid = 236) row;
 	v_result := COALESCE(v_result, '{}'); 

@@ -22,19 +22,20 @@ SELECT SCHEMA_NAME.gw_fct_import_dbprices($${
 */
 
 DECLARE
-	v_units record;
-	v_result_id text= 'import db prices';
-	v_result json;
-	v_result_info json;
-	v_project_type text;
-	v_version text;
-	v_count integer;
-	v_label text;
-	v_error_context text;
-	v_level integer;
-	v_status text;
-	v_message text;
-	v_audit_result text;
+
+v_units record;
+v_result_id text= 'import db prices';
+v_result json;
+v_result_info json;
+v_project_type text;
+v_version text;
+v_count integer;
+v_label text;
+v_error_context text;
+v_level integer;
+v_status text;
+v_message text;
+v_audit_result text;
 
 BEGIN
 
@@ -52,7 +53,7 @@ BEGIN
     
    	v_label = ((p_data ->>'data')::json->>'importParam')::text;
    	
-	-- manage log (fprocesscat = 234)
+	-- manage log (fid:  234)
 	DELETE FROM audit_check_data WHERE fid = 234 AND cur_user=current_user;
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (234, v_result_id, concat('IMPORT DB PRICES FILE'));
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (234, v_result_id, concat('------------------------------'));
@@ -115,7 +116,7 @@ BEGIN
 		-- Delete values on temporal table
 		DELETE FROM temp_csv WHERE cur_user=current_user AND fid = 234;
 	
-		-- manage log (fprocesscat 234)
+		-- manage log (fid: 234)
 		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (234, v_result_id, concat('Reading values from temp_csv table -> Done'));
 		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (234, v_result_id, concat('Inserting values on price_simple table -> Done'));
 		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (234, v_result_id, concat('Deleting values from temp_csv -> Done'));
@@ -123,7 +124,7 @@ BEGIN
 
 	END IF;
 
-	-- get log (fprocesscat 234)
+	-- get log (fid: 234)
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
 	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fid = 234) row;
 

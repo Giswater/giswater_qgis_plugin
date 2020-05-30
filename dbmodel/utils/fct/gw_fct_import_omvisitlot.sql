@@ -15,6 +15,8 @@ $BODY$
 /*
 SELECT SCHEMA_NAME.gw_fct_import_omvisitlot($${
 "data":{"featureType":"arc", "tableName":"ve_visit_arc_neteja"}}$$)
+
+--fid: 154
 */
 
 
@@ -41,18 +43,18 @@ BEGIN
 	SELECT wsoftware, giswater, epsg  INTO v_project_type, v_version, v_epsg FROM version order by 1 desc limit 1;
 
 	-- get input parameter
-	v_featuretype = (SELECT csv2 FROM temp_csv2pg WHERE cur_user=current_user AND fid = 21 LIMIT 1);
-	v_featuretable = (SELECT tablename FROM config_api_visit WHERE visitclass_id=(SELECT csv3 FROM temp_csv2pg WHERE cur_user=current_user AND fid = 21 LIMIT 1)::integer);
+	v_featuretype = (SELECT csv2 FROM temp_csv WHERE cur_user=current_user AND fid = 154 LIMIT 1);
+	v_featuretable = (SELECT tablename FROM config_api_visit WHERE visitclass_id=(SELECT csv3 FROM temp_csv WHERE cur_user=current_user AND fid = 154 LIMIT 1)::integer);
 	v_parameter1 = (SELECT parameter_id FROM config_visit_parameter_action cxp JOIN config_api_visit cav ON cav.visitclass_id=cxp.class_id WHERE cav.tablename = v_featuretable LIMIT 1);
 	v_parameter2 = (SELECT parameter_id FROM config_visit_parameter_action cxp JOIN config_api_visit cav ON cav.visitclass_id=cxp.class_id WHERE cav.tablename = v_featuretable LIMIT 1 OFFSET 1);
 
-	-- manage log (fprocesscat 54)
-	DELETE FROM audit_check_data WHERE fid=54 AND cur_user=current_user;
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (54, v_result_id, concat('IMPORT LOT VISITS'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (54, v_result_id, concat('------------------------------'));
+	-- manage log (fid: 154)
+	DELETE FROM audit_check_data WHERE fid=154 AND cur_user=current_user;
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (154, v_result_id, concat('IMPORT LOT VISITS'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (154, v_result_id, concat('------------------------------'));
    
  	-- starting process
-	FOR v_visit IN SELECT * FROM temp_csv2pg WHERE cur_user=current_user AND fid = 21
+	FOR v_visit IN SELECT * FROM temp_csv WHERE cur_user=current_user AND fid = 154
 	LOOP 
 		v_visit.csv8 := COALESCE(v_visit.csv8, ''); -- control NULL from csv8 (optional parameter)		 
 		EXECUTE 'INSERT INTO ' ||v_featuretable||' (visit_id, ' ||v_featuretype|| '_id, class_id, lot_id, status, startdate, '||v_parameter1||', '||v_parameter2||') VALUES 
@@ -62,17 +64,17 @@ BEGIN
 	END LOOP;
 
 	-- Delete values on temporal table
-	DELETE FROM temp_csv2pg WHERE cur_user=current_user AND fid = 21;
+	DELETE FROM temp_csv WHERE cur_user=current_user AND fid = 154;
 
-	-- manage log (fprocesscat 54)
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (54, v_result_id, concat('Reading values from temp_csv2pg table -> Done'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (54, v_result_id, concat('Inserting values on ',v_featuretable,' table -> Done'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (54, v_result_id, concat('Deleting values from temp_csv2pg -> Done'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (54, v_result_id, concat('Process finished'));
+	-- manage log (fid: 154)
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (154, v_result_id, concat('Reading values from temp_csv table -> Done'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (154, v_result_id, concat('Inserting values on ',v_featuretable,' table -> Done'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (154, v_result_id, concat('Deleting values from temp_csv -> Done'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (154, v_result_id, concat('Process finished'));
 	
-	-- get log (fprocesscat 54)
+	-- get log (fid: 154)
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=54) row;
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=154) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 			
