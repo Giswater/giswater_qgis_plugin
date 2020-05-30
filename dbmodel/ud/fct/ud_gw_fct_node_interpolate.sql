@@ -15,49 +15,51 @@ $BODY$
 /*
 SELECT SCHEMA_NAME.gw_fct_node_interpolate ($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{},
  "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"x":419161.98499003565, "y":4576782.72778585, "node1":"117", "node2":"119"}}}$$);
+ 
+--fid: 213
+ 
 */
 
 DECLARE
 
---    Variables
-	v_srid integer;
-	v_geom0 public.geometry;
-	v_geom1 public.geometry;
-	v_geom2 public.geometry;
-	v_distance10 float;
-	v_distance02 float;
-	v_distance12 float;
-	v_distance102 float;
-	v_proportion1 float;
-	v_proportion2 float;
-	v_top0 float;
-	v_top1 float;
-	v_top2 float;
-	v_elev1 float;
-	v_elev2 float;
-	v_elev0 float;
-	v_top json;
-	v_elev json;
-	v_ang210 float;
-	v_ang120 float;
-	v_ymax json;
-	v_version text;
+v_srid integer;
+v_geom0 public.geometry;
+v_geom1 public.geometry;
+v_geom2 public.geometry;
+v_distance10 float;
+v_distance02 float;
+v_distance12 float;
+v_distance102 float;
+v_proportion1 float;
+v_proportion2 float;
+v_top0 float;
+v_top1 float;
+v_top2 float;
+v_elev1 float;
+v_elev2 float;
+v_elev0 float;
+v_top json;
+v_elev json;
+v_ang210 float;
+v_ang120 float;
+v_ymax json;
+v_version text;
 
-	p_x float;
-	p_y float;
-	p_node1 text;
-	p_node2 text;
+p_x float;
+p_y float;
+p_node1 text;
+p_node2 text;
 
-	v_result text;
-	v_result_info json;
-	v_result_point json;
-	v_result_polygon json;
-	v_result_line json;
-	v_result_fields text;
-	v_result_ymax text;
-	v_result_top text;
-	v_result_elev text;
-	v_error_context text;
+v_result text;
+v_result_info json;
+v_result_point json;
+v_result_polygon json;
+v_result_line json;
+v_result_fields text;
+v_result_ymax text;
+v_result_top text;
+v_result_elev text;
+v_error_context text;
 
 BEGIN
 
@@ -71,10 +73,10 @@ BEGIN
 	p_node1 = (((p_data ->>'data')::json->>'parameters')::json->>'node1')::text;
 	p_node2 = (((p_data ->>'data')::json->>'parameters')::json->>'node2')::text;
 
-	-- manage log (fprocesscat = 113)
-	DELETE FROM audit_check_data WHERE fid=113 AND cur_user=current_user;
-	INSERT INTO audit_check_data (fid, error_message) VALUES (113,  concat('NODE INTERPOLATE'));
-	INSERT INTO audit_check_data (fid, error_message) VALUES (113,  concat('------------------------------'));
+	-- manage log (fid: 213)
+	DELETE FROM audit_check_data WHERE fid=213 AND cur_user=current_user;
+	INSERT INTO audit_check_data (fid, error_message) VALUES (213,  concat('NODE INTERPOLATE'));
+	INSERT INTO audit_check_data (fid, error_message) VALUES (213,  concat('------------------------------'));
 
 	-- Get SRID
 	v_srid = (SELECT ST_srid (the_geom) FROM SCHEMA_NAME.sector limit 1);
@@ -88,7 +90,7 @@ BEGIN
 	v_elev1:= (SELECT sys_elev FROM v_edit_node WHERE node_id=p_node1);
 	
 	INSERT INTO audit_check_data (fid,  criticity, error_message)
-    VALUES (113, 4, concat('System values of node 1 - top elev:',v_top1 , ', elev:', v_elev1));
+    VALUES (213, 4, concat('System values of node 1 - top elev:',v_top1 , ', elev:', v_elev1));
 
 	-- Get node2 system values
 	v_geom2:= (SELECT the_geom FROM node WHERE node_id=p_node2);
@@ -96,7 +98,7 @@ BEGIN
 	v_elev2:= (SELECT sys_elev FROM v_edit_node WHERE node_id=p_node2);
 
 	INSERT INTO audit_check_data (fid,  criticity, error_message)
-    VALUES (113, 4, concat('System values of node 2 - top elev:',v_top2 , ', elev:', v_elev2));
+    VALUES (213, 4, concat('System values of node 2 - top elev:',v_top2 , ', elev:', v_elev2));
 
 	-- Calculate distances
 	v_distance10 = (SELECT ST_distance (v_geom0 , v_geom1));
@@ -135,24 +137,24 @@ BEGIN
 	v_elev:= (SELECT to_json(v_elev0::numeric(12,3)::text));
 
     INSERT INTO audit_check_data (fid,  criticity, error_message)
-    VALUES (113, 4, concat('------------------------------'));
+    VALUES (213, 4, concat('------------------------------'));
 
 	INSERT INTO audit_check_data (fid,  criticity, error_message)
-    VALUES (113, 4, concat('Final custom results for a selected node'));
+    VALUES (213, 4, concat('Final custom results for a selected node'));
 
     INSERT INTO audit_check_data (fid,  criticity, error_message)
-    VALUES (113, 4, concat('Top elev:',v_top0::numeric(12,3)::text));
+    VALUES (213, 4, concat('Top elev:',v_top0::numeric(12,3)::text));
 
     INSERT INTO audit_check_data (fid,  criticity, error_message)
-    VALUES (113, 4, concat('Ymax:',(v_top0-v_elev0)::numeric(12,3)::text));
+    VALUES (213, 4, concat('Ymax:',(v_top0-v_elev0)::numeric(12,3)::text));
 
     INSERT INTO audit_check_data (fid,  criticity, error_message)
-    VALUES (113, 4, concat('Elev:',v_elev0::numeric(12,3)::text));
+    VALUES (213, 4, concat('Elev:',v_elev0::numeric(12,3)::text));
 
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=113 order by
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=213 order by
 	criticity desc, id asc) row; 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result,'}');

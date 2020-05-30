@@ -13,6 +13,8 @@ $BODY$
 
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_pg2epa_export_inp('result_1', 'D:\dades\test_ud.inp')
+
+--fid:141
 */
 
 DECLARE
@@ -23,7 +25,7 @@ num_col_rec record;
 num_column text;
 result_id_aux varchar;
 title_aux varchar;
-v_pg2csvcat_id integer = 10;
+v_fid integer = 141;
 v_return json;
 
 BEGIN
@@ -32,31 +34,31 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	--Delete previous
-	DELETE FROM temp_csv2pg WHERE cur_user=current_user AND fid = v_pg2csvcat_id;
+	DELETE FROM temp_csv WHERE cur_user=current_user AND fid = v_fid;
       
 	SELECT result_id INTO result_id_aux FROM selector_inp_result where cur_user=current_user;
 	SELECT title INTO title_aux FROM inp_project_id where author=current_user;
 
-	INSERT INTO temp_csv2pg (source, csv1,fid) VALUES ('header','[TITLE]',v_pg2csvcat_id);
-	INSERT INTO temp_csv2pg (source, csv1,fid) VALUES ('header',';Created by Giswater, the water management open source tool',v_pg2csvcat_id);
-	INSERT INTO temp_csv2pg (source, csv1,csv2,fid) VALUES ('header',';Project name: ',title_aux, v_pg2csvcat_id);
-	INSERT INTO temp_csv2pg (source, csv1,csv2,fid) VALUES ('header',';Result name: ',p_result_id,v_pg2csvcat_id);
-	INSERT INTO temp_csv2pg (source, csv1,csv2,fid) VALUES ('header',';Datetime: ',left((date_trunc('second'::text, now()))::text, 19),v_pg2csvcat_id);
-	INSERT INTO temp_csv2pg (source, csv1,csv2,fid) VALUES ('header',';User: ',current_user, v_pg2csvcat_id);
+	INSERT INTO temp_csv (source, csv1,fid) VALUES ('header','[TITLE]',v_fid);
+	INSERT INTO temp_csv (source, csv1,fid) VALUES ('header',';Created by Giswater, the water management open source tool',v_fid);
+	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';Project name: ',title_aux, v_fid);
+	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';Result name: ',p_result_id,v_fid);
+	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';Datetime: ',left((date_trunc('second'::text, now()))::text, 19),v_fid);
+	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';User: ',current_user, v_fid);
 
 	--node
-	FOR rec_table IN SELECT * FROM config_csv_param WHERE pg2csvcat_id=v_pg2csvcat_id AND csvversion::json->>'from'='5.0.022' order by orderby
+	FOR rec_table IN SELECT * FROM config_fprocess WHERE fid=v_fid order by orderby
 	LOOP
 		-- insert header
-		INSERT INTO temp_csv2pg (csv1,fid) VALUES (NULL,v_pg2csvcat_id);
-		EXECUTE 'INSERT INTO temp_csv2pg(fid,csv1) VALUES ('||v_pg2csvcat_id||','''|| rec_table.target||''');';
+		INSERT INTO temp_csv (csv1,fid) VALUES (NULL,v_fid);
+		EXECUTE 'INSERT INTO temp_csv(fid,csv1) VALUES ('||v_fid||','''|| rec_table.target||''');';
 	
-		INSERT INTO temp_csv2pg (fid,csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12)
-		SELECT v_pg2csvcat_id,rpad(concat(';;',c1),20),rpad(c2,20),rpad(c3,20),rpad(c4,20),rpad(c5,20),rpad(c6,20),rpad(c7,20),rpad(c8,20),rpad(c9,20),rpad(c10,20),rpad(c11,20),rpad(c12,20)
+		INSERT INTO temp_csv (fid,csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12)
+		SELECT v_fid,rpad(concat(';;',c1),20),rpad(c2,20),rpad(c3,20),rpad(c4,20),rpad(c5,20),rpad(c6,20),rpad(c7,20),rpad(c8,20),rpad(c9,20),rpad(c10,20),rpad(c11,20),rpad(c12,20)
 		FROM crosstab('SELECT table_name::text,  data_type::text, column_name::text FROM information_schema.columns WHERE table_schema =''SCHEMA_NAME'' and table_name='''||rec_table.tablename||'''::text') 
 		AS rpt(table_name text, c1 text, c2 text, c3 text, c4 text, c5 text, c6 text, c7 text, c8 text, c9 text, c10 text, c11 text, c12 text);
 	
-		INSERT INTO temp_csv2pg (fid) VALUES (10) RETURNING id INTO id_last;
+		INSERT INTO temp_csv (fid) VALUES (141) RETURNING id INTO id_last;
 	
 		SELECT count(*)::text INTO num_column from information_schema.columns where table_name=rec_table.tablename AND table_schema='SCHEMA_NAME';
 	
@@ -64,17 +66,17 @@ BEGIN
 		FOR num_col_rec IN 1..num_column
 		LOOP
 			IF num_col_rec=1 then
-				EXECUTE 'UPDATE temp_csv2pg set csv1=rpad('';;-------'',20) WHERE id='||id_last||';';
+				EXECUTE 'UPDATE temp_csv set csv1=rpad('';;-------'',20) WHERE id='||id_last||';';
 			ELSE
-				EXECUTE 'UPDATE temp_csv2pg SET csv'||num_col_rec||'=rpad(''-------'',20) WHERE id='||id_last||';';
+				EXECUTE 'UPDATE temp_csv SET csv'||num_col_rec||'=rpad(''-------'',20) WHERE id='||id_last||';';
 			END IF;
 		END LOOP;
 	
 		-- insert values
 	--	CASE WHEN rec_table.tablename='vi_options' and (SELECT value FROM vi_options WHERE parameter='hydraulics') is null THEN
-			--EXECUTE 'INSERT INTO temp_csv2pg SELECT nextval(''temp_csv2pg_id_seq''::regclass),'||v_pg2csvcat_id||',current_user,'''||rec_table.tablename::text||''',*  FROM '||rec_table.tablename||' WHERE parameter!=''hydraulics'';';
+			--EXECUTE 'INSERT INTO temp_csv SELECT nextval(''temp_csv_id_seq''::regclass),'||v_fid||',current_user,'''||rec_table.tablename::text||''',*  FROM '||rec_table.tablename||' WHERE parameter!=''hydraulics'';';
 	--	ELSE
-			EXECUTE 'INSERT INTO temp_csv2pg SELECT nextval(''temp_csv2pg_id_seq''::regclass),'||v_pg2csvcat_id||',current_user,'''||rec_table.tablename::text||''',*  FROM '||rec_table.tablename||';';
+			EXECUTE 'INSERT INTO temp_csv SELECT nextval(''temp_csv_id_seq''::regclass),'||v_fid||',current_user,'''||rec_table.tablename::text||''',*  FROM '||rec_table.tablename||';';
 	--	END CASE;
 	
 
@@ -83,7 +85,7 @@ BEGIN
 			FOR num_col_rec IN 1..num_column::integer
 			LOOP
 				IF num_col_rec < num_column::integer THEN
-					EXECUTE 'UPDATE temp_csv2pg SET csv'||num_col_rec||'=rpad(csv'||num_col_rec||',20) WHERE source='''||rec_table.tablename||''';';
+					EXECUTE 'UPDATE temp_csv SET csv'||num_col_rec||'=rpad(csv'||num_col_rec||',20) WHERE source='''||rec_table.tablename||''';';
 				END IF;
 			END LOOP;
 		END IF;
@@ -92,7 +94,7 @@ BEGIN
 
 	-- use the copy function of postgres to export to file in case of file must be provided as a parameter
 	IF p_path IS NOT NULL THEN
-		EXECUTE 'COPY (SELECT csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12 FROM temp_csv2pg WHERE fid = 10 and cur_user=current_user order by id)
+		EXECUTE 'COPY (SELECT csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12 FROM temp_csv WHERE fid = 141 and cur_user=current_user order by id)
 		TO '''||p_path||''' WITH (DELIMITER E''\t'', FORMAT CSV);';
 	END IF;
 
@@ -100,18 +102,18 @@ BEGIN
 	select (array_to_json(array_agg(row_to_json(row))))::json
 	into v_return 
 		from ( select text from
-		(select id, concat(rpad(csv1,20), ' ', csv2)as text from temp_csv2pg where fid  = 10 and cur_user = current_user and source is null
+		(select id, concat(rpad(csv1,20), ' ', csv2)as text from temp_csv where fid = 141 and cur_user = current_user and source is null
 		union
-		select id, csv1 as text from temp_csv2pg where fid  = 10 and cur_user = current_user and source in ('vi_controls','vi_rules', 'vi_backdrop', 'vi_hydrographs','vi_polygons','vi_transects')
+		select id, csv1 as text from temp_csv where fid  = 141 and cur_user = current_user and source in ('vi_controls','vi_rules', 'vi_backdrop', 'vi_hydrographs','vi_polygons','vi_transects')
 		union
-		select id, concat(rpad(csv1,20), ' ', csv2)as text from temp_csv2pg where fid  = 10 and cur_user = current_user and source in ('header', 'vi_adjustments','vi_evaporation','vi_temperature')
+		select id, concat(rpad(csv1,20), ' ', csv2)as text from temp_csv where fid = 141 and cur_user = current_user and source in ('header', 'vi_adjustments','vi_evaporation','vi_temperature')
 		union
-		select id, concat(rpad(csv1,20), ' ', rpad(csv2,20), ' ', csv3)as text from temp_csv2pg where fid  = 10 and cur_user = current_user and source in ('vi_files')
+		select id, concat(rpad(csv1,20), ' ', rpad(csv2,20), ' ', csv3)as text from temp_csv where fid = 141 and cur_user = current_user and source in ('vi_files')
 		union
 		select id, concat(rpad(csv1,20),' ',rpad(csv2,20),' ', rpad(csv3,20),' ',rpad(csv4,20),' ',rpad(csv5,20),' ',rpad(csv6,20),' ',rpad(csv7,20),' ',
 		rpad(csv8,20),' ',rpad(csv9,20),' ',rpad(csv10,20),' ',rpad(csv11,20),' ',rpad(csv12,20),' ',rpad(csv13,20),' ',rpad(csv14,20),' ',rpad(csv15,20),' ',
 		rpad(csv15,20),' ',rpad(csv16,20),' ',rpad(csv17,20),' ', rpad(csv20,20), ' ', rpad(csv19,20),' ',rpad(csv20,20)) as text
-		from temp_csv2pg where fid  = 10 and cur_user = current_user and source not in
+		from temp_csv where fid  = 141 and cur_user = current_user and source not in
 		('header','vi_controls','vi_rules', 'vi_backdrop', 'vi_adjustments','vi_evaporation', 'vi_files','vi_hydrographs','vi_polygons','vi_temperature','vi_transects')
 		order by id)a )row;
 	

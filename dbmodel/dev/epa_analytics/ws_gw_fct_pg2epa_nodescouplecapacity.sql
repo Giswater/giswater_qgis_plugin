@@ -5,12 +5,6 @@ This version of Giswater is provided by Giswater Association
 */
 
 --FUNCTION CODE: 2698
---FPROCESSCAT = 55 (single demand)
---FPROCESSCAT = 56 (double demand)
---FPROCESSCAT = 57 (not double demand but single demand)
---FPROCESSCAT = 58 (coupled demand)
-
-
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_nodescouplecapacity(p_data json)  
 RETURNS json AS 
@@ -50,33 +44,39 @@ ars within x2 nodes are classified as DOUBLE HYDRANT (H1) arcs
 ars within x4 nodes and not within x2 nodes (x3 nodes) and x2 are classified as COUPLED HDYRANT (H2) arcs
 ars within x1 nodes and not withn x4 nodes are classified as SINGLE HYDRANT (H3) arcs
 Rest of arcs are clasified as NON HYDRANT (H4) arcs
+
+--fid: 155 (single demand)
+--fid: 156 (double demand)
+--fid: 157 (not double demand but single demand)
+--fid: 158 (coupled demand)
+
 */
 
 DECLARE
-	v_step	 	text;
-	v_text 		text;
-	v_return 	text;
-	v_result 	text;
-	v_totalnodes 	integer;
-	v_rownode 	int8;
-	v_rowtemp 	int8;
-	v_rid 		integer;
-	v_node 		text;
-	v_count 	integer = 0;
-	v_field 	text;
-	v_value 	double precision;
-	v_querytext 	text;
-	v_units 	text;
-	v_epaunits	double precision;
-	v_lpsdemand	double precision;
-	v_mcaminpress 	double precision;
-	v_mindiameter 	double precision;
-	v_tsepnumber 	integer;
-	v		integer[];
-	v_1		integer;
-	v_2		integer;
-	v_record	record;
-	v_steps 	text;
+v_step text;
+v_text text;
+v_return text;
+v_result text;
+v_totalnodes integer;
+v_rownode int8;
+v_rowtemp int8;
+v_rid integer;
+v_node text;
+v_count integer = 0;
+v_field text;
+v_value double precision;
+v_querytext text;
+v_units text;
+v_epaunits double precision;
+v_lpsdemand double precision;
+v_mcaminpress double precision;
+v_mindiameter double precision;
+v_tsepnumber integer;
+v integer[];
+v_1 integer;
+v_2	integer;
+v_record record;
+v_steps text;
 
 BEGIN
 	--  Search path
@@ -121,10 +121,10 @@ BEGIN
 	UPDATE config_param_user SET value='MINIMUM' WHERE parameter='inp_times_statistic' AND cur_user=current_user;
 
 	
-	IF v_step='1' THEN -- single hydrant (55)
+	IF v_step='1' THEN -- single hydrant (155)
 
-		DELETE FROM temp_table WHERE fid = 55 AND user_name=current_user;
-		DELETE FROM anl_node WHERE fid = 55 AND cur_user=current_user;
+		DELETE FROM temp_table WHERE fid = 155 AND user_name=current_user;
+		DELETE FROM anl_node WHERE fid = 155 AND cur_user=current_user;
 		DELETE FROM rpt_inp_pattern_value WHERE result_id=v_result AND user_name=current_user;
 
 		-- set inp_options_skipdemandpattern to TRUE
@@ -132,12 +132,12 @@ BEGIN
 	
 		-- Identifying x0 nodes (dint>73.6)
 		INSERT INTO anl_node (fid, node_id)
-		SELECT 55, node_1 FROM v_edit_inp_pipe JOIN cat_arc ON id=arccat_id WHERE dint>v_mindiameter
+		SELECT 155, node_1 FROM v_edit_inp_pipe JOIN cat_arc ON id=arccat_id WHERE dint>v_mindiameter
 		UNION 
-		SELECT 55, node_2 FROM v_edit_inp_pipe JOIN cat_arc ON id=arccat_id WHERE dint>v_mindiameter;
+		SELECT 155, node_2 FROM v_edit_inp_pipe JOIN cat_arc ON id=arccat_id WHERE dint>v_mindiameter;
 
 		-- set epa times
-		v_tsepnumber = (SELECT count(*) FROM anl_node WHERE fid = 55 AND  cur_user=current_user);
+		v_tsepnumber = (SELECT count(*) FROM anl_node WHERE fid = 155 AND  cur_user=current_user);
 		UPDATE config_param_user SET value=v_tsepnumber WHERE parameter='inp_times_duration' AND cur_user=current_user;
 
 		-- TODO: check connected graf
@@ -145,19 +145,19 @@ BEGIN
 		-- update demands
 		UPDATE rpt_inp_node SET demand=0 , pattern_id=null WHERE result_id=v_result;
 		UPDATE rpt_inp_node SET demand=v_lpsdemand*v_epaunits, pattern_id=node_id 
-		WHERE result_id=v_result AND node_id IN (SELECT node_id FROM anl_node WHERE fid = 55 and cur_user=current_user);
+		WHERE result_id=v_result AND node_id IN (SELECT node_id FROM anl_node WHERE fid = 155 and cur_user=current_user);
 
 		-- create patterns
-		v_totalnodes =  (SELECT count(*) FROM anl_node WHERE fid = 55 and cur_user= current_user);
-		v_rownode =  (SELECT id FROM anl_node WHERE fid = 55 and cur_user= current_user order by id LIMIT 1);
+		v_totalnodes =  (SELECT count(*) FROM anl_node WHERE fid = 155 and cur_user= current_user);
+		v_rownode =  (SELECT id FROM anl_node WHERE fid = 155 and cur_user= current_user order by id LIMIT 1);
 
 		-- loop to create the pattern (any patterns as any nodes)
 		FOR v_x IN v_rownode..(v_rownode+v_totalnodes) LOOP
 			INSERT INTO temp_table (fid, text_column)
-			SELECT 55, array_agg(CASE WHEN id=v_x THEN 1 ELSE 0 END) FROM anl_node WHERE fid = 55 AND cur_user=current_user;
+			SELECT 155, array_agg(CASE WHEN id=v_x THEN 1 ELSE 0 END) FROM anl_node WHERE fid = 155 AND cur_user=current_user;
 		END LOOP;
 
-		v_rowtemp = (SELECT id FROM temp_table WHERE fid = 55 and user_name= current_user order by id LIMIT 1);
+		v_rowtemp = (SELECT id FROM temp_table WHERE fid = 155 and user_name= current_user order by id LIMIT 1);
 
 		-- loop to insert patterns created into rpt_inp_pattern_value
 		FOR v_z IN v_rowtemp..(v_rowtemp+v_totalnodes) LOOP
@@ -165,7 +165,7 @@ BEGIN
 			v_count = 0;
 			
 			-- get node_id
-			v_node = (SELECT node_id FROM anl_node WHERE fid = 55 and cur_user= current_user AND id=v_rownode);
+			v_node = (SELECT node_id FROM anl_node WHERE fid = 155 and cur_user= current_user AND id=v_rownode);
 			v_rownode = v_rownode +1;
 	
 			EXIT WHEN v_node IS NULL;
@@ -173,7 +173,7 @@ BEGIN
 			FOR v_x IN 1..v_totalnodes/17 LOOP
 
 				SELECT array_agg(col) INTO v::integer[] FROM (SELECT unnest(text_column::integer[]) as col 
-				FROM temp_table WHERE user_name=current_user AND fid = 55 AND id=v_z LIMIT 18 offset v_count)a;
+				FROM temp_table WHERE user_name=current_user AND fid = 155 AND id=v_z LIMIT 18 offset v_count)a;
 				
 				-- inserting row
 				INSERT INTO rpt_inp_pattern_value (result_id, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6,
@@ -188,42 +188,42 @@ BEGIN
 			
 		END LOOP;
 		
-	ELSIF v_step='2' THEN-- Identifying x2 nodes (double hydrant - 56)
+	ELSIF v_step='2' THEN-- Identifying x2 nodes (double hydrant - 156)
 
 		-- insert into anl_node only that nodes with positive result
-		DELETE FROM anl_node WHERE fid = 56 AND cur_user=current_user;
+		DELETE FROM anl_node WHERE fid = 156 AND cur_user=current_user;
 		INSERT INTO anl_node (fid, node_id)
-		SELECT 56, log_message::json->>'node_id' FROM audit_log_data WHERE (log_message::json->>'press')::float > v_mcaminpress 
+		SELECT 156, log_message::json->>'node_id' FROM audit_log_data WHERE (log_message::json->>'press')::float > v_mcaminpress 
 		AND fid = 35 and feature_type='rpt_node' AND user_name=current_user
-		AND log_message::json->>'node_id' IN (SELECT node_id FROM anl_node WHERE fid = 55 and cur_user=currnt_user ) group by 2;
+		AND log_message::json->>'node_id' IN (SELECT node_id FROM anl_node WHERE fid = 155 and cur_user=currnt_user ) group by 2;
 
 		-- update demands
 		UPDATE rpt_inp_node SET demand=0 , pattern_id=null WHERE result_id=v_result;
 		UPDATE rpt_inp_node SET demand=2*v_lpsdemand*v_epaunits, pattern_id=node_id WHERE result_id=v_result AND node_id IN 
-		(SELECT node_id FROM anl_node WHERE fid = 56 and cur_user=current_user);
+		(SELECT node_id FROM anl_node WHERE fid = 156 and cur_user=current_user);
 
 		-- delete not used patterns
 		DELETE FROM rpt_inp_pattern_value WHERE pattern_id NOT IN (SELECT node_id FROM anl_node 
-		WHERE fid = 56 AND cur_user=current_user) AND user_name=current_user AND result_id=v_result;
+		WHERE fid = 156 AND cur_user=current_user) AND user_name=current_user AND result_id=v_result;
 
 		-- set epa times
-		v_tsepnumber = (SELECT count(*) FROM anl_node WHERE fid = 56 AND  cur_user=current_user);
+		v_tsepnumber = (SELECT count(*) FROM anl_node WHERE fid = 156 AND  cur_user=current_user);
 		UPDATE config_param_user SET value=v_tsepnumber WHERE parameter='inp_times_duration' AND cur_user=current_user;
 			
-	ELSIF v_step='3' THEN -- identify single but not double hydrant - 57
+	ELSIF v_step='3' THEN -- identify single but not double hydrant - 157
 
-		DELETE FROM anl_node WHERE fid = 57 AND cur_user=current_user;
+		DELETE FROM anl_node WHERE fid = 157 AND cur_user=current_user;
 		INSERT INTO anl_node (fid, node_id)
-		SELECT 57, log_message::json->>'node_id' FROM audit_log_data WHERE (log_message::json->>'press')::float < v_mcaminpress
+		SELECT 157, log_message::json->>'node_id' FROM audit_log_data WHERE (log_message::json->>'press')::float < v_mcaminpress
 		AND fid = 35 and feature_type='rpt_node' AND user_name=current_user
-		 AND log_message::json->>'node_id' IN (SELECT node_id FROM anl_node WHERE fid = 56 and cur_user=current_user ) group by 2;
+		 AND log_message::json->>'node_id' IN (SELECT node_id FROM anl_node WHERE fid = 156 and cur_user=current_user ) group by 2;
 
 		-- reset demands
 		UPDATE rpt_inp_node SET demand=0 , pattern_id=null WHERE result_id=v_result;
 
 		-- update demands
 		UPDATE rpt_inp_node SET demand=v_lpsdemand*v_epaunits, pattern_id=node_id WHERE result_id=v_result AND node_id IN 
-		(SELECT node_id FROM anl_node WHERE fid = 57 and cur_user=current_user);
+		(SELECT node_id FROM anl_node WHERE fid = 157 and cur_user=current_user);
 
 		-- delete patterns
 		DELETE FROM rpt_inp_pattern_value WHERE user_name=current_user AND result_id=v_result;
@@ -231,25 +231,25 @@ BEGIN
 		-- create pattern using the number of patterns according of nodes and the timestep of patterns according of arcs
 
 		-- getting timesteps
-		DELETE FROM anl_arc WHERE fid = 57 AND cur_user=current_user;
+		DELETE FROM anl_arc WHERE fid = 157 AND cur_user=current_user;
 		INSERT INTO anl_arc (fid, arc_id, descript)
-		SELECT 57, arc_id, concat ('{"tstep":',row_number() over (order by arc_id),', "node_1":"', node_1,'", "node_2":"',node_2,'"}') FROM (
+		SELECT 157, arc_id, concat ('{"tstep":',row_number() over (order by arc_id),', "node_1":"', node_1,'", "node_2":"',node_2,'"}') FROM (
 		SELECT DISTINCT ON (arc.arc_id) arc.arc_id, node_1, node_2 FROM arc JOIN anl_node ON node_id=node_1 or node_id=node_2 
-		WHERE fid = 57 AND cur_user=current_user AND node_id
-		IN (SELECT node_id FROM anl_node WHERE fid = 57 and cur_user=current_user))a;
+		WHERE fid = 157 AND cur_user=current_user AND node_id
+		IN (SELECT node_id FROM anl_node WHERE fid = 157 and cur_user=current_user))a;
 
 		-- getting patterns
-		DELETE FROM temp_table WHERE fid = 57 AND user_name=current_user;
+		DELETE FROM temp_table WHERE fid = 157 AND user_name=current_user;
 		INSERT INTO temp_table (fid, addparam, text_column)
-		SELECT DISTINCT ON (node_id) 57, concat('{"node_id":"',node_id,'"}')::json, val FROM (
-		SELECT array_agg(0)as val FROM anl_arc a WHERE a.fid = 57 AND a.cur_user=current_user
+		SELECT DISTINCT ON (node_id) 157, concat('{"node_id":"',node_id,'"}')::json, val FROM (
+		SELECT array_agg(0)as val FROM anl_arc a WHERE a.fid = 157 AND a.cur_user=current_user
 		) b, anl_node n JOIN arc ON node_id=node_1 OR node_id=node_2
-		WHERE n.fid = 57 AND n.cur_user=current_user;
+		WHERE n.fid = 157 AND n.cur_user=current_user;
 
-		v_totalnodes =  (SELECT count(*) FROM temp_table WHERE fid = 57 and user_name= current_user);
+		v_totalnodes =  (SELECT count(*) FROM temp_table WHERE fid = 157 and user_name= current_user);
 
 		--loop for the whole patterns
-		FOR v_record IN SELECT * FROM temp_table WHERE fid = 57 and user_name= current_user
+		FOR v_record IN SELECT * FROM temp_table WHERE fid = 157 and user_name= current_user
 		LOOP
 
 			v_count = 0;
@@ -259,10 +259,10 @@ BEGIN
 
 			-- getting pattern values
 			SELECT array_agg(col) INTO v::integer[] FROM (SELECT unnest(v_record.text_column::integer[]) as col FROM temp_table 
-			WHERE user_name=current_user AND fid = 57 AND id=v_record.id) a;
+			WHERE user_name=current_user AND fid = 157 AND id=v_record.id) a;
 
 			-- getting and setting tsteps with = 1
-			FOR v_steps IN SELECT (descript::json->'tstep') FROM anl_arc WHERE fid = 57 AND cur_user=current_user
+			FOR v_steps IN SELECT (descript::json->'tstep') FROM anl_arc WHERE fid = 157 AND cur_user=current_user
 			AND ((descript::json->'node_1')::text=concat('"',v_node,'"') OR (descript::json->'node_2')::text=concat('"',v_node,'"'))
 			LOOP
 				raise notice ' steps %', v_steps;
@@ -286,15 +286,15 @@ BEGIN
 		END LOOP;
 
 		-- set epa times
-		v_tsepnumber = (SELECT count(*) FROM anl_arc WHERE fid = 57 AND  cur_user=current_user);
+		v_tsepnumber = (SELECT count(*) FROM anl_arc WHERE fid = 157 AND  cur_user=current_user);
 		UPDATE config_param_user SET value=v_tsepnumber WHERE parameter='inp_times_duration' AND cur_user=current_user;
 								
-	ELSIF v_step='last' THEN -- positive results for (coupled hydrant - 58)
+	ELSIF v_step='last' THEN -- positive results for (coupled hydrant - 158)
 
 		-- insert into anl_node only that nodes with positive result
-		DELETE FROM anl_node WHERE fid = 58 AND cur_user=current_user;
+		DELETE FROM anl_node WHERE fid = 158 AND cur_user=current_user;
 		INSERT INTO anl_node (fid, node_id)
-		SELECT 58, log_message::json->>'node_id' FROM audit_log_data WHERE (log_message::json->>'press')::float > v_mcaminpress
+		SELECT 158, log_message::json->>'node_id' FROM audit_log_data WHERE (log_message::json->>'press')::float > v_mcaminpress
 		AND fid = 35 and feature_type='rpt_node' AND user_name=current_user;
 		
 		-- delete all patterns

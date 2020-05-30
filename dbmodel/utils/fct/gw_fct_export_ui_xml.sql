@@ -13,6 +13,8 @@ $BODY$
 
 --select SCHEMA_NAME.gw_fct_export_ui_xml('ve_node_x');
 
+--fid:246
+
 DECLARE
 rec record;
 v_sql TEXT;
@@ -138,7 +140,7 @@ BEGIN
 			</ui>
 			');
 
-		INSERT INTO temp_csv2pg(source, csv1, fid) VALUES (p_formname,v_xml,19);
+		INSERT INTO temp_csv(source, csv1, fid) VALUES (p_formname,v_xml,246);
 
 		return null;
 END;

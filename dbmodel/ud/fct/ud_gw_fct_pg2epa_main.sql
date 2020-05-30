@@ -59,7 +59,7 @@ BEGIN
 				FROM (SELECT parameter, value FROM config_param_user 
 				JOIN sys_param_user a ON a.id=parameter	WHERE cur_user=current_user AND formname='epaoptions')t);
 	-- setting variables
-	v_input = concat('{"data":{"parameters":{"resultId":"',v_result,'", "dumpSubcatch":"',v_dumpsubcatch,'", "fprocesscatId":127}}}')::json;
+	v_input = concat('{"data":{"parameters":{"resultId":"',v_result,'", "dumpSubcatch":"',v_dumpsubcatch,'", "fid":127}}}')::json;
 
 	-- only export
 	IF v_onlyexport THEN

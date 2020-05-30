@@ -11,7 +11,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_check_result(p_data json)
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"gw_check_project","fprocesscatId":127, "dumpSubcatch":true}}}$$) when is called from go2epa_main from toolbox
+SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"gw_check_project","fid":127, "dumpSubcatch":true}}}$$) when is called from go2epa_main from toolbox
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"r1"}}}$$) -- when is called from toolbox
 
 SELECT SCHEMA_NAME.gw_fct_pg2epa($${"client":{"device":3, "infoType":100, "lang":"ES"}, "data":{"resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true"}}$$)
@@ -77,7 +77,7 @@ BEGIN
 
 	-- getting input data 	
 	v_result_id := ((p_data ->>'data')::json->>'parameters')::json->>'resultId'::text;
-	v_fid := ((p_data ->>'data')::json->>'parameters')::json->>'fprocesscatId';
+	v_fid := ((p_data ->>'data')::json->>'parameters')::json->>'fid';
 	v_dumpsubc := ((p_data ->>'data')::json->>'parameters')::json->>'dumpSubcatch';
 
 	-- get system values
