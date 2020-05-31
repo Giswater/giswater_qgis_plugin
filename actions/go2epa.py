@@ -696,11 +696,11 @@ class Go2Epa(ApiParent):
             time_to_show = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_time_to_show)
             time_to_compare = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_time_to_compare)
             if time_to_show not in (None, -1, ''):
-                sql = (f"INSERT INTO rpt_selector_hourly (time, cur_user)"
+                sql = (f"INSERT INTO rpt_selector_hourly (timestep, cur_user)"
                        f" VALUES ('{time_to_show}', '{user}');\n")
                 self.controller.execute_sql(sql)
             if time_to_compare not in (None, -1, ''):
-                sql = (f"INSERT INTO rpt_selector_hourly_compare (time, cur_user)"
+                sql = (f"INSERT INTO selector_rpt_compare_tstep (timestep, cur_user)"
                        f" VALUES ('{time_to_compare}', '{user}');\n")
                 self.controller.execute_sql(sql)
 
@@ -710,11 +710,11 @@ class Go2Epa(ApiParent):
             date_to_compare = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_com_date)
             time_to_compare = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_com_time)
             if date_to_show not in (None, -1, ''):
-                sql = (f"INSERT INTO rpt_selector_timestep (resultdate, resulttime, cur_user)"
+                sql = (f"INSERT INTO selector_rpt_main_tstep (resultdate, resulttime, cur_user)"
                        f" VALUES ('{date_to_show}', '{time_to_show}', '{user}');\n")
                 self.controller.execute_sql(sql)
             if date_to_compare not in (None, -1, ''):
-                sql = (f"INSERT INTO rpt_selector_timestep_compare (resultdate, resulttime, cur_user)"
+                sql = (f"INSERT INTO selector_rpt_compare_tstep (resultdate, resulttime, cur_user)"
                        f" VALUES ('{date_to_compare}', '{time_to_compare}', '{user}');\n")
                 self.controller.execute_sql(sql)
 
