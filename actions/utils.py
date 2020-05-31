@@ -55,7 +55,7 @@ class Utils(ParentAction):
         roles = self.controller.get_rolenames()
         temp_tablename = 'temp_csv'
         self.populate_cmb_unicodes(self.dlg_csv.cmb_unicode_list)
-        self.populate_combos(self.dlg_csv.cmb_import_type, 'id', 'alias, descript, functionname, readheader', 'config_csv', roles)
+        self.populate_combos(self.dlg_csv.cmb_import_type, 'fid', 'alias, descript, functionname, readheader', 'config_csv', roles)
 
         self.dlg_csv.lbl_info.setWordWrap(True)
         utils_giswater.setWidgetText(self.dlg_csv, self.dlg_csv.cmb_unicode_list, 'utf8')
@@ -310,7 +310,7 @@ class Utils(ParentAction):
 
         sql = (f"SELECT DISTINCT({field_id}), {fields}"
                f" FROM {table_name}"
-               f" WHERE sys_role IN {roles} AND formname='importcsv' AND isdeprecated is not True")
+               f" WHERE sys_role IN {roles} AND active is True")
         rows = self.controller.get_rows(sql, log_sql=True)
         if not rows:
             message = "You do not have permission to execute this application"
