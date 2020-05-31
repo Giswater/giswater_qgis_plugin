@@ -14,7 +14,7 @@ $BODY$
 /*
 
 SELECT "SCHEMA_NAME".gw_fct_getprint($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{},
 "feature":{},
 "data":{"composers":"{A4-mincut, A3-mincut}"}}$$)

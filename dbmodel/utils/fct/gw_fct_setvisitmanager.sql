@@ -14,7 +14,7 @@ $BODY$
 /*EXAMPLE
 
 --ONLY UPDATE ARE POSSIBLE. 
-SELECT "SCHEMA_NAME".gw_fct_setvisitmanager($${"client":{"device":3, "infoType":100, "lang":"ES"}, 
+SELECT "SCHEMA_NAME".gw_fct_setvisitmanager($${"client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"featureType":"visit", "tableName":"ve_visit_user_manager", "idName":"id"}, 
 "data":{"fields":{"user_id":"geoadmin", "team_id":"4", "lot_id":"1"},
 "deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}}$$)
@@ -77,7 +77,7 @@ BEGIN
 		EXECUTE 'INSERT INTO selector_lot (lot_id, cur_user) VALUES ('|| v_lot ||', '''|| v_user ||''')';
 		
 		-- message
-		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		"data":{"message":"3124", "function":"2882","debug_msg":""}}$$);'INTO v_message;		
 		v_data = p_data->>'data';
 		v_data = gw_fct_json_object_set_key (v_data, 'message', v_message);
@@ -100,7 +100,7 @@ BEGIN
 			
 			
 			-- message
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"3124", "function":"2882","debug_msg":""}}$$);'INTO v_message;
 			v_data = p_data->>'data';
 			v_data = gw_fct_json_object_set_key (v_data, 'message', v_message);
@@ -113,7 +113,7 @@ BEGIN
 			EXECUTE 'DELETE FROM selector_lot WHERE cur_user='''|| v_user ||'''';
 			
 			-- message
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"3126", "function":"2882","debug_msg":""}}$$);'INTO v_message;
 			v_data = p_data->>'data';
 			v_data = gw_fct_json_object_set_key (v_data, 'message', v_message);

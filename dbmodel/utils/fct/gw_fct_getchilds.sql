@@ -13,19 +13,19 @@ $BODY$
 
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_getchilds($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{},
 "feature":{"featureType":"arc", "tableName":"ve_arc_pipe", "idName":"arc_id"},
 "data":{"comboParent":"state", "comboId":"1"}}$$)
 
 SELECT SCHEMA_NAME.gw_fct_getchilds($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{},
 "feature":{"featureType":"arc", "tableName":"ve_arc_pipe", "idName":"arc_id"},
 "data":{"comboParent":"expl_id", "comboId":"2"}}$$)
 
 SELECT SCHEMA_NAME.gw_fct_getchilds($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{},
 "feature":{"tableName":"config"},
 "data":{"comboParent":"inp_options_demandtype", "comboId":"1"}}$$)

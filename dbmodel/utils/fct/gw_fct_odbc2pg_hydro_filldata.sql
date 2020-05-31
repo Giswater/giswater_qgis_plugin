@@ -14,7 +14,7 @@ $BODY$
 /*EXAMPLE
 
 SELECT SCHEMA_NAME.gw_fct_odbc2pg_hydro_filldata($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{},"data":{"parameters":{"exploitation":"524", "period":"2T", "year":"2019"}}}$$)
 
 -- fid: 174

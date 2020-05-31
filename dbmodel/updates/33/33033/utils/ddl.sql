@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2020/03/10
-SELECT gw_fct_admin_manage_roles($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "data":{"action":"CREATE"}}$$);
+SELECT gw_fct_admin_manage_roles($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "data":{"action":"CREATE"}}$$);
 
 --2020/03/13
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_users", "column":"active", "dataType":"boolean"}}$$);

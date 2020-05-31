@@ -14,7 +14,7 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"gw_check_project","fid":227, "dumpSubcatch":true}}}$$) when is called from go2epa_main from toolbox
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"r1"}}}$$) -- when is called from toolbox
 
-SELECT SCHEMA_NAME.gw_fct_pg2epa($${"client":{"device":3, "infoType":100, "lang":"ES"}, "data":{"resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true"}}$$)
+SELECT SCHEMA_NAME.gw_fct_pg2epa($${"client":{"device":4, "infoType":1, "lang":"ES"}, "data":{"resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true"}}$$)
 
 SELECT * FROM SCHEMA_NAME.audit_check_data where fid::text  = 227::text
 

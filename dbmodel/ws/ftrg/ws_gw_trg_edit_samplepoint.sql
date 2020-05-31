@@ -29,21 +29,21 @@ BEGIN
     
 		--Exploitation ID
             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-                PERFORM gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
+                PERFORM gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
               "data":{"message":"1110", "function":"1122","debug_msg":null, "variables":null}}$$); 
 				RETURN NULL;				
             END IF;
             v_expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
             IF (v_expl_id_int IS NULL) THEN
 				v_expl_id_int := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_exploitation_vdefault' AND "cur_user"="current_user"());
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"2012", "function":"1122","debug_msg":"'||NEW.sample_id::text||'"}}$$);';
             END IF;
 			
         -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"2012", "function":"1122","debug_msg":null}}$$);';
             END IF;
             NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
@@ -51,7 +51,7 @@ BEGIN
 				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_dma_vdefault' AND "cur_user"="current_user"());
 			END IF; 
             IF (NEW.dma_id IS NULL) THEN
-                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"2014", "function":"1122","debug_msg":"'||NEW.sample_id::text||'"}}$$);';
             END IF;            
         END IF;

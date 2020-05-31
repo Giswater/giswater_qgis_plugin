@@ -22,7 +22,7 @@ BEGIN
         --IF NEW.hydrometer_id IN (SELECT id::varchar(16) from ext_rtc_hydrometer) THEN
             RETURN NEW;
         --ELSE
-            --PERFORM gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+            --PERFORM gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                 --"data":{"message":"1102", "function":"1342","debug_msg":null, "variables":null}}$$);
         --END IF;
 
@@ -35,7 +35,7 @@ BEGIN
         --IF OLD.hydrometer_id NOT IN (SELECT id::varchar(16) from ext_rtc_hydrometer) THEN
             RETURN OLD;
         --ELSE
-            --PERFORM gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+            --PERFORM gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                 --"data":{"message":"1106", "function":"1342","debug_msg":null, "variables":null}}$$);
         --END IF;
     

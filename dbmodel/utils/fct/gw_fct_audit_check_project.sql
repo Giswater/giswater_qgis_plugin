@@ -12,7 +12,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_audit_check_project(p_data json)
 $BODY$
 
 /*
-SELECT SCHEMA_NAME.gw_fct_audit_check_project($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, 
+SELECT SCHEMA_NAME.gw_fct_audit_check_project($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
 "feature":{}, "data":{"filterFields":{}, "qgisVersion":"3.10.003.1", "initProject":"false", "pageInfo":{}, "version":"3.3.019", "fid":1}}$$);
 
 	-- delete old values on result table
@@ -286,7 +286,7 @@ BEGIN
 		
 		IF'role_om' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
 			EXECUTE 'SELECT gw_fct_om_check_data($${
-			"client":{"device":3, "infoType":100, "lang":"ES"},
+			"client":{"device":4, "infoType":1, "lang":"ES"},
 			"feature":{},"data":{"parameters":{"selectionMode":"wholeSystem"}}}$$)';
 			-- insert results 
 			INSERT INTO audit_check_data  (fid, criticity, error_message)
@@ -296,7 +296,7 @@ BEGIN
 			IF v_project_type = 'WS' THEN
 
 				EXECUTE 'SELECT gw_fct_grafanalytics_check_data($${
-				"client":{"device":3, "infoType":100, "lang":"ES"},
+				"client":{"device":4, "infoType":1, "lang":"ES"},
 				"feature":{},"data":{"parameters":{"selectionMode":"wholeSystem", "grafClass":"ALL"}}}$$)';
 				-- insert results 
 				INSERT INTO audit_check_data  (fid, criticity, error_message)
@@ -308,7 +308,7 @@ BEGIN
 		IF 'role_epa' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
 
 				EXECUTE 'SELECT gw_fct_pg2epa_check_data($${
-				"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{}}$$)';
+				"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{}}$$)';
 				-- insert results 
 				INSERT INTO audit_check_data  (fid, criticity, error_message)
 				SELECT 201, criticity, replace(error_message,':', ' (DB EPA):') FROM audit_check_data 
@@ -318,7 +318,7 @@ BEGIN
 		IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
 
 				EXECUTE 'SELECT gw_fct_plan_check_data($${
-				"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{}}$$)';
+				"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{}}$$)';
 				-- insert results 
 				INSERT INTO audit_check_data  (fid, criticity, error_message)
 				SELECT 201, criticity, replace(error_message,':', ' (DB PLAN):') FROM audit_check_data 
@@ -327,7 +327,7 @@ BEGIN
 
 		IF 'role_admin' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
 			EXECUTE 'SELECT gw_fct_admin_check_data($${"client":
-			{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, 
+			{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
 			"data":{"filterFields":{}, "pageInfo":{}, "parameters":{}}}$$)::text';
 			-- insert results 
 			INSERT INTO audit_check_data  (fid, criticity, error_message)

@@ -43,7 +43,7 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 
 			IF NEW.new_nodecat_id IS NULL THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"3060", "function":"2472","debug_msg":"'||NEW.node_id||'"}}$$);';
 			END IF;
 			

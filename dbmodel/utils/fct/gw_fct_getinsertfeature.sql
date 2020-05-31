@@ -13,13 +13,13 @@ $BODY$
 
 /*EXAMPLE:
 SELECT SCHEMA_NAME.gw_fct_getinsertfeature($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{},
 "feature":{"geometryType":"line"},
 "data":{}}$$)
 
 SELECT SCHEMA_NAME.gw_fct_getinsertfeature($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{},
 "feature":{"geometryType":"point"},
 "data":{}}$$)

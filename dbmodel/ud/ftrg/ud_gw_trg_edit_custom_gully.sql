@@ -65,7 +65,7 @@ BEGIN
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"1008", "function":"1216","debug_msg":null}}$$);';
 			END IF;
 				SELECT count(*)into v_count FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001);
@@ -79,7 +79,7 @@ BEGIN
 				NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_sector_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF;
 			IF (NEW.sector_id IS NULL) THEN
-                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"1010", "function":"1216","debug_msg":"'||NEW.gully_id||'"}}$$);';
             END IF;            
         END IF;
@@ -87,7 +87,7 @@ BEGIN
 	-- Dma ID
         IF (NEW.dma_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"1012", "function":"1216","debug_msg":null}}$$);';
             END IF;
 				SELECT count(*)into v_count FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001);
@@ -101,7 +101,7 @@ BEGIN
 				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_dma_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF; 
             IF (NEW.dma_id IS NULL) THEN
-                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"1014", "function":"1216","debug_msg":"'||NEW.gully_id||'"}}$$);';
             END IF;            
         END IF;
@@ -156,7 +156,7 @@ BEGIN
 			IF (NEW.expl_id IS NULL) THEN
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"2012", "function":"1216","debug_msg":"'||NEW.gully_id||'"}}$$);';
 				END IF;		
 			END IF;
@@ -168,7 +168,7 @@ BEGIN
 			IF (NEW.muni_id IS NULL) THEN
 				NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) LIMIT 1);
 				IF (NEW.muni_id IS NULL) THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"2024", "function":"1216","debug_msg":"'||NEW.gully_id||'"}}$$);';
 				END IF;	
 			END IF;
@@ -219,7 +219,7 @@ BEGIN
 		IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_gully_automatic_link'
 		AND cur_user=current_user LIMIT 1) IS TRUE THEN
 			
-			EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
+			EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":4, "infoType":1, "lang":"ES"},
 			"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY"}}$$)';	
 		END IF;
 
@@ -253,11 +253,11 @@ BEGIN
 			IF (SELECT link_id FROM link WHERE feature_id=NEW.gully_id AND feature_type='GULLY' LIMIT 1) IS NOT NULL THEN
 				UPDATE vnode SET vnode_type='AUTO' WHERE vnode_id=(SELECT exit_id FROM link WHERE feature_id=NEW.gully_id AND exit_type='VNODE' LIMIT 1)::int8;
 
-				EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
+				EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":4, "infoType":1, "lang":"ES"},
 				"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY"}}$$)';	
 				
 			ELSIF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_gully_automatic_link' AND cur_user=current_user LIMIT 1) IS TRUE THEN
-				EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
+				EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":4, "infoType":1, "lang":"ES"},
 				"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY"}}$$)';	
 			END IF;
 		END IF;
@@ -269,7 +269,7 @@ BEGIN
 				IF NEW.state_type IS NULL THEN
 				NEW.state_type=(SELECT id from value_state_type WHERE state=0 LIMIT 1);
 					IF NEW.state_type IS NULL THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"2110", "function":"1318","debug_msg":null}}$$);';
 					END IF;
 				END IF;
@@ -346,7 +346,7 @@ BEGIN
 
     ELSIF TG_OP = 'DELETE' THEN
 	
-		EXECUTE 'SELECT gw_fct_check_delete($${"client":{"device":3, "infoType":100, "lang":"ES"},
+		EXECUTE 'SELECT gw_fct_check_delete($${"client":{"device":4, "infoType":1, "lang":"ES"},
 		"feature":{"id":"'||OLD.gully_id||'","featureType":"GULLY"}, "data":{}}$$)';
 
         DELETE FROM gully WHERE gully_id = OLD.gully_id;

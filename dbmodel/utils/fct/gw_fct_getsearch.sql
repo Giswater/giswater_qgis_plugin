@@ -15,10 +15,10 @@ $BODY$
 
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_getsearch($${
-"client":{"device":3, "infoType":100, "lang":"ES"}
+"client":{"device":4, "infoType":1, "lang":"ES"}
 }$$)
 
-SELECT gw_fct_getsearch($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}}}$$);
+SELECT gw_fct_getsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}}}$$);
 
 */
 

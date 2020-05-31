@@ -89,6 +89,8 @@ ALTER TABLE config_visit_class_x_workorder ADD column active boolean SET DEFAULT
 
 ALTER TABLE sys_foreingkey ADD column active boolean;
 
+UPDATE sys_fprocess set fid = fid*100;
+
 UPDATE config_csv SET fid =234	WHERE fid =1;
 UPDATE config_csv SET fid =235	WHERE fid =3;
 UPDATE config_csv SET fid =236	WHERE fid =4;
@@ -107,7 +109,7 @@ UPDATE config_csv SET fid =246	WHERE fid =19;
 UPDATE config_csv SET fid =247	WHERE fid =20;
 UPDATE config_csv SET fid =154	WHERE fid =21;
 
-DELETE FROM sys_fprocess WHERE fid = 42;
+DELETE FROM sys_fprocess WHERE fid = 142;
 
 INSERT INTO sys_fprocess (fid, fprocess_name , project_type) VALUES(234,'Import db prices','utils');
 INSERT INTO sys_fprocess (fid, fprocess_name , project_type) VALUES(235,'Import elements','utils');
@@ -124,5 +126,7 @@ INSERT INTO sys_fprocess (fid, fprocess_name , project_type) VALUES(245,'Import 
 INSERT INTO sys_fprocess (fid, fprocess_name , project_type) VALUES(246,'Export ui','utils');
 INSERT INTO sys_fprocess (fid, fprocess_name , project_type) VALUES(247,'Import ui','utils');
 
+UPDATE config_form_tabs SET device = 4 WHERE device = 9;
 
+UPDATE config_info_table_x_type SET infotype_id = 1 WHERE infotype_id = 100;
 

@@ -13,11 +13,11 @@ $BODY$
 
 /*
 SELECT SCHEMA_NAME.gw_fct_mincut_result_overlap($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{},"data":{"step":"check", "result":5}}$$)
 
 SELECT SCHEMA_NAME.gw_fct_mincut_result_overlap($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{}, "data":{"step":"continue", "result":333}}$$)
 
 -- fid: 131,216

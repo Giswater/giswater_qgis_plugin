@@ -215,7 +215,7 @@ BEGIN
 		PERFORM gw_fct_admin_schema_utils_fk();  -- this is the posiition to use it because of we need values on version table to workwith
 		
 		-- generate child views 
-		PERFORM gw_fct_admin_manage_child_views($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{},
+		PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
 		"data":{"filterFields":{}, "pageInfo":{}, "multi_create":true}}$$)::text;
 		
 		--change widgettype for matcat_id when new empty data project (UD)
@@ -237,7 +237,7 @@ BEGIN
 
         -- create child views for users from 3.2 to 3.3 updates
 		IF v_oldversion < '3.3.000' AND v_gwversion > '3.3.000' THEN
-			PERFORM gw_fct_admin_manage_child_views($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "multi_create":true}}$$)::text;
+			PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "multi_create":true}}$$)::text;
 		END IF;
 	
 		-- check project consistency

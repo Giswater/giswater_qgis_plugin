@@ -13,11 +13,11 @@ $BODY$
 
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_grafanalytics_check_data($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{},"data":{"parameters":{"selectionMode":"wholeSystem", "grafClass":"ALL"}}}$$)
 
 SELECT SCHEMA_NAME.gw_fct_grafanalytics_check_data($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{},"data":{"parameters":{"selectionMode":"userSelectors","grafClass":"SECTOR"}}}$$)
 
 -- fid: 211,176,179,180,181,192,208,209

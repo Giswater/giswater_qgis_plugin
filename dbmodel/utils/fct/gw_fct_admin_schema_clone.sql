@@ -15,7 +15,7 @@ $BODY$
 
 /*
 SELECT SCHEMA_NAME.gw_fct_admin_schema_clone($${
-"client":{"device":9, "infoType":100, "lang":"ES"}, 
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{}, 
 "data":{"parameters":{"source_schema":"SCHEMA_NAME","dest_schema":"SCHEMA_NAME_2"}}}$$);
 */

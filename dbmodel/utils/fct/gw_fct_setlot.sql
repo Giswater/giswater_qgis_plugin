@@ -14,7 +14,7 @@ $BODY$
 /*EXAMPLE:
 --new call
 SELECT SCHEMA_NAME.gw_fct_setlot($${
-"client":{"device":3,"infoType":100,"lang":"es"},
+"client":{"device":4,"infoType":1,"lang":"es"},
 "feature":{"featureType":"lot", "tableName":"om_visit_lot", "idName":"id", "id":"1"},
 "form":{},
 "data":{"fields":{}}}$$)
@@ -83,7 +83,7 @@ BEGIN
 		EXECUTE 'UPDATE ' || quote_ident(v_tablename) ||' SET descript = ' || quote_literal(v_descript) ||', status = ' || quote_literal(v_status) ||', visitclass_id = ' || quote_literal(v_visitclass_id) ||' WHERE id = ' || quote_literal(v_id) ||'' ;
 
 		-- message
-		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		"data":{"message":"3120", "function":"2862","debug_msg":""}}$$);'INTO v_message;
 		v_data = p_data->>'data';
 		v_data = gw_fct_json_object_set_key (v_data, 'message', v_message);
@@ -96,7 +96,7 @@ BEGIN
 		EXECUTE 'INSERT INTO selector_lot (lot_id, cur_user) VALUES ('|| v_id ||', ''qgisserver'')';
 		
 		-- message
-		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		"data":{"message":"3118", "function":"2862","debug_msg":""}}$$);'INTO v_message;
 		v_data = p_data->>'data';
 		v_data = gw_fct_json_object_set_key (v_data, 'message', v_message);

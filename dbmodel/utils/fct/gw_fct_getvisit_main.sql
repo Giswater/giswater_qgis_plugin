@@ -17,15 +17,15 @@ $BODY$
 -- GET FORMS FOR WORK OFFLINE
 
 -- unexpected first call
-SELECT SCHEMA_NAME.gw_fct_getvisit_main('1', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
+SELECT SCHEMA_NAME.gw_fct_getvisit_main('1', $${"client":{"device":4,"infoType":1,"lang":"es"},"form":{},
 "data":{"isOffline":"true", "relatedFeature":{"type":"node", "tableName":"ve_node"},"fields":{},"pageInfo":null}}$$)
 
 -- planned first call
-SELECT SCHEMA_NAME.gw_fct_getvisit_main('planned', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
+SELECT SCHEMA_NAME.gw_fct_getvisit_main('planned', $${"client":{"device":4,"infoType":1,"lang":"es"},"form":{},
 "data":{"isOffline":"true","relatedFeature":{"type":"node", "tableName":"ve_node},"fields":{},"pageInfo":null}}$$)
 
 -- no infra first call
-SELECT SCHEMA_NAME.gw_fct_getvisit_main('2', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
+SELECT SCHEMA_NAME.gw_fct_getvisit_main('2', $${"client":{"device":4,"infoType":1,"lang":"es"},"form":{},
 "data":{"isOffline":"true","relatedFeature":{"type":""},"fields":{},"pageInfo":null}}$$)
 
 -- modificacions de codi (a totes online i offline)
@@ -44,15 +44,15 @@ SELECT SCHEMA_NAME.gw_fct_getvisit_main('2', $${"client":{"device":3,"infoType":
 GET ONLINE FORMS
 
 -- unexpected first call
-SELECT SCHEMA_NAME.gw_fct_getvisit_main('unexpected', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
+SELECT SCHEMA_NAME.gw_fct_getvisit_main('unexpected', $${"client":{"device":4,"infoType":1,"lang":"es"},"form":{},
 "data":{"isOffline":"false", "relatedFeature":{"type":"node", "id":"2074", "tableName":"ve_node"},"fields":{},"pageInfo":null}}$$)
 
 -- planned first call
-SELECT SCHEMA_NAME.gw_fct_getvisit_main('planned', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
+SELECT SCHEMA_NAME.gw_fct_getvisit_main('planned', $${"client":{"device":4,"infoType":1,"lang":"es"},"form":{},
 "data":{"isOffline":"false","relatedFeature":{"type":"node", "id":"2074", "tableName":"ve_node"},"fields":{},"pageInfo":null}}$$)
 
 -- no infra first call
-SELECT SCHEMA_NAME.gw_fct_getvisit_main('unexpected', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
+SELECT SCHEMA_NAME.gw_fct_getvisit_main('unexpected', $${"client":{"device":4,"infoType":1,"lang":"es"},"form":{},
 "data":{"isOffline":"false","relatedFeature":{"type":""},"fields":{},"pageInfo":null}}$$)
 
 	

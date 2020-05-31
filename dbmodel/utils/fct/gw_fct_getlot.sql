@@ -14,7 +14,7 @@ $BODY$
 /*EXAMPLE:
 
 -- calling form
-SELECT SCHEMA_NAME.gw_fct_getlot($${"client":{"device":3,"infoType":100,"lang":"es"}, "feature":{"tableName":"om_visit_lot", "idName":"id", "id":"1"}}$$)
+SELECT SCHEMA_NAME.gw_fct_getlot($${"client":{"device":4,"infoType":1,"lang":"es"}, "feature":{"tableName":"om_visit_lot", "idName":"id", "id":"1"}}$$)
 */
 
 DECLARE

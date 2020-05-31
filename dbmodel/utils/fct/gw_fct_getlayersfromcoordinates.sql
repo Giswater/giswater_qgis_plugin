@@ -13,7 +13,7 @@ $BODY$
 
 /*EXAMPLE:
 SELECT SCHEMA_NAME.gw_fct_getlayersfromcoordinates($${
-"client":{"device":9, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{},
 "feature":{},
 "data":{"pointClickCoords":{"xcoord":419195.116315, "ycoord":4576615.43122},
@@ -78,21 +78,21 @@ BEGIN
 	v_epsg := (SELECT epsg FROM version LIMIT 1);
 
 	-- Sensibility factor
-	IF v_device=1 OR v_device=2 THEN
+	IF v_device = 1 OR v_device = 2 THEN
         EXECUTE 'SELECT value::float FROM config_param_system WHERE parameter=''basic_info_sensibility_factor''::json->''mobile'''
 		INTO v_sensibility_f;
 		-- 10 pixels of base sensibility
 		v_sensibility = (v_zoomScale * 10 * v_sensibility_f);
 		v_config_layer='config_web_layer';
 		
-	ELSIF  v_device=3 THEN
+	ELSIF  v_device = 3 THEN
         EXECUTE 'SELECT value::float FROM config_param_system WHERE parameter=''basic_info_sensibility_factor''::json->''web'''
 		INTO v_sensibility_f;     
 		-- 10 pixels of base sensibility
 		v_sensibility = (v_zoomScale * 10 * v_sensibility_f);
 		v_config_layer='config_web_layer';
 
-    ELSIF  v_device=9 THEN
+    ELSIF  v_device = 4 THEN
 	EXECUTE 'SELECT value::float FROM config_param_system WHERE parameter=''basic_info_sensibility_factor''::json->''desktop'''
 		INTO v_sensibility_f;
 		-- ESCALE 1:5000 as base sensibility

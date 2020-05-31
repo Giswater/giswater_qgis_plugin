@@ -88,7 +88,7 @@ BEGIN
 
 
 	-- node onfly transformation of junctions to outfalls (when outfallparam is fill and junction is node sink)
-	PERFORM gw_fct_anl_node_sink($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{"tableName":"v_edit_inp_junction"},"data":{"parameters":{"saveOnDatabase":true}}}$$);
+	PERFORM gw_fct_anl_node_sink($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"tableName":"v_edit_inp_junction"},"data":{"parameters":{"saveOnDatabase":true}}}$$);
 
 	UPDATE temp_node SET epa_type='OUTFALL' FROM anl_node a JOIN inp_junction USING (node_id) 
 	WHERE outfallparam IS NOT NULL AND fid = 113 AND cur_user=current_user

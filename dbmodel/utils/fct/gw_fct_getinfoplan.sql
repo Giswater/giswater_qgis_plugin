@@ -12,13 +12,13 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getinfoplan(p_data json)
 $BODY$
 /* EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_getinfoplan($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{"tabName":"plan"},
 "feature":{"featureType":"arc", "tableName":"ve_arc_pipe", "idName":"arc_id", "id":"113854"},
 "data":{}}$$)
 
 SELECT SCHEMA_NAME.gw_fct_getinfoplan($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{"formName":"", "tabName":"plan"},
 "feature":{"featureType":"node", "tableName":"ve_node_junction", "idName":"node_id", "id":"1001"},
 "data":{}}$$)

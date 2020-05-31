@@ -13,7 +13,7 @@ $BODY$
 
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_anl_arc_inverted($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"tableName":"v_edit_man_conduit", "id":["138","139"]},
 "data":{"selectionMode":"previousSelection", "parameters":{"saveOnDatabase":true}
 }}$$)

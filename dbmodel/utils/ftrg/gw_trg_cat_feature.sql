@@ -46,14 +46,14 @@ BEGIN
 		v_id = array_to_string(ts_lexize('unaccent',NEW.id),',','*');
 		
 		IF v_id IS NOT NULL OR NEW.id ilike '%.%' OR NEW.id ilike '%-%' THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"3038", "function":"2758","debug_msg":"'||NEW.id||'"}}$$);';
 		END IF;
 
 		v_id = array_to_string(ts_lexize('unaccent',NEW.child_layer),',','*');
 		
 		IF v_id IS NOT NULL OR NEW.child_layer ilike '%-%' OR NEW.child_layer ilike '%.%' THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"3038", "function":"2758","debug_msg":"'||NEW.child_layer||'"}}$$);';
 		END IF;	
 
@@ -128,7 +128,7 @@ BEGIN
 			||NEW.system_id||''', '''||v_feature.man_table||''', TRUE, TRUE)';
 		END IF;
 		--create child view
-		v_query='{"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{"catFeature":"'||NEW.id||'"}, "data":{"filterFields":{}, "pageInfo":{}, "multi_create":"False" }}';
+		v_query='{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"'||NEW.id||'"}, "data":{"filterFields":{}, "pageInfo":{}, "multi_create":"False" }}';
 		PERFORM gw_fct_admin_manage_child_views(v_query::json);
 			
 		--insert definition into config_api_tableinfo_x_infotype if its not present already

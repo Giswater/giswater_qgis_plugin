@@ -22,7 +22,7 @@ BEGIN
     v_epa_table:= TG_ARGV[0];
     
     IF TG_OP = 'INSERT' THEN
- 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+ 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		"data":{"message":"1026", "function":"1208","debug_msg":null}}$$);'; 
     ELSIF TG_OP = 'UPDATE' THEN
 	
@@ -100,7 +100,7 @@ BEGIN
 
 
     ELSIF TG_OP = 'DELETE' THEN
-    	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+    	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		"data":{"message":"1028", "function":"1208","debug_msg":null}}$$);'; 
 
     END IF;

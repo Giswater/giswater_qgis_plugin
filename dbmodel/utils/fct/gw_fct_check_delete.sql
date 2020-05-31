@@ -13,7 +13,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_check_delete(p_data json)
 $BODY$
 /*
 SELECT SCHEMA_NAME.gw_fct_check_delete($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"id":"1007","featureType":"NODE"},
 "data":{}}$$)
 */
@@ -55,7 +55,7 @@ BEGIN
 				select count(*) INTO v_num_feature from node join node a on node.parent_id=a.node_id where node.parent_id=v_feature_id;
 				IF v_num_feature > 0 THEN
 					v_error = concat(v_num_feature,',',v_feature_id);
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"2108", "function":"2120","debug_msg":"'||v_error||'"}}$$);';
 				END IF;
 		END IF;
@@ -63,35 +63,35 @@ BEGIN
 		SELECT count(arc_id) INTO v_num_feature FROM arc WHERE node_1=v_feature_id OR node_2=v_feature_id ;
 			IF v_num_feature > 0 THEN
 				v_error = concat(v_num_feature,',',v_feature_id);
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"1056", "function":"2120","debug_msg":"'||v_error||'"}}$$);';
 			END IF;
 
 		SELECT count(element_id) INTO v_num_feature FROM element_x_node WHERE node_id=v_feature_id ;
 			IF v_num_feature > 0 THEN
 				v_error = concat(v_num_feature,',',v_feature_id);
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"1058", "function":"2120","debug_msg":"'||v_error||'"}}$$);';
 			END IF;
 			
 		SELECT count(doc_id) INTO v_num_feature FROM doc_x_node WHERE node_id=v_feature_id ;
 			IF v_num_feature > 0 THEN
 				v_error = concat(v_num_feature,',',v_feature_id);
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"1060", "function":"2120","debug_msg":"'||v_error||'"}}$$);';
 			END IF;
 	
 		SELECT count(visit_id) INTO v_num_feature FROM om_visit_x_node WHERE node_id=v_feature_id ;
 			IF v_num_feature > 0 THEN
 				v_error = concat(v_num_feature,',',v_feature_id);
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"1062", "function":"2120","debug_msg":"'||v_error||'"}}$$);';
 			END IF;
 	
 		SELECT count(link_id) INTO v_num_feature FROM link WHERE exit_type='NODE' AND exit_id=v_feature_id;
 			IF v_num_feature > 0 THEN
 				v_error = concat(v_num_feature,',',v_feature_id);
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"1064", "function":"2120","debug_msg":"'||v_error||'"}}$$);';
 			END IF;	
 			
@@ -101,28 +101,28 @@ BEGIN
 		SELECT count(element_id) INTO v_num_feature FROM element_x_arc WHERE arc_id=v_feature_id ;
 		IF v_num_feature > 0 THEN
 			v_error = concat(v_num_feature,',',v_feature_id);
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"1058", "function":"2120","debug_msg":"'||v_error||'"}}$$);';
 		END IF;
 		
 		SELECT count(doc_id) INTO v_num_feature FROM doc_x_arc WHERE arc_id=v_feature_id ;
 		IF v_num_feature > 0 THEN
 			v_error = concat(v_num_feature,',',v_feature_id);
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"1060", "function":"2120","debug_msg":"'||v_error||'"}}$$);';
 		END IF;
 
 		SELECT count(visit_id) INTO v_num_feature FROM om_visit_x_arc WHERE arc_id=v_feature_id ;
 		IF v_num_feature > 0 THEN
 			v_error = concat(v_num_feature,',',v_feature_id);
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"1062", "function":"2120","debug_msg":"'||v_error||'"}}$$);';
 		END IF;
 
 		SELECT count(arc_id) INTO v_num_feature FROM connec WHERE arc_id=v_feature_id;
 		IF v_num_feature > 0 THEN
 			v_error = concat(v_num_feature,',',v_feature_id);
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"1066", "function":"2120","debug_msg":"'||v_error||'"}}$$);';
 		END IF;	
 	
@@ -131,14 +131,14 @@ BEGIN
 			SELECT count(arc_id) INTO v_num_feature FROM gully WHERE arc_id=v_feature_id;
 				IF v_num_feature > 0 THEN
 					v_error = concat(v_num_feature,',',v_feature_id);
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"1068", "function":"2120","debug_msg":"'||v_error||'"}}$$);';
 				END IF;	
 		ELSIF v_project_type='WS' THEN 
 				SELECT count(arc_id) INTO v_num_feature FROM node WHERE arc_id=v_feature_id;
 				IF v_num_feature > 0 THEN
 					v_error = concat(v_num_feature,',',v_feature_id);
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"2108", "function":"2120","debug_msg":"'||v_error||'"}}$$);';
 				END IF;
 		END IF;
@@ -149,28 +149,28 @@ BEGIN
 		SELECT count(element_id) INTO v_num_feature FROM element_x_connec WHERE connec_id=v_feature_id ;
 		IF v_num_feature > 0 THEN
 			v_error = concat(v_num_feature,',',v_feature_id);
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"1058", "function":"2120","debug_msg":"'||v_error||'"}}$$);';
 		END IF;
 		
 		SELECT count(doc_id) INTO v_num_feature FROM doc_x_connec WHERE connec_id=v_feature_id ;
 		IF v_num_feature > 0 THEN
 			v_error = concat(v_num_feature,',',v_feature_id);
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"1060", "function":"2120","debug_msg":"'||v_error||'"}}$$);';
 		END IF;
 
 		SELECT count(visit_id) INTO v_num_feature FROM om_visit_x_connec WHERE connec_id=v_feature_id ;
 		IF v_num_feature > 0 THEN
 			v_error = concat(v_num_feature,',',v_feature_id);
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"1062", "function":"2120","debug_msg":"'||v_error||'"}}$$);';
 		END IF;
 
 		SELECT count(link_id) INTO v_num_feature FROM link WHERE exit_type='CONNEC' AND exit_id=v_feature_id;
 		IF v_num_feature > 0 THEN
 			v_error = concat(v_num_feature,',',v_feature_id);
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"1064", "function":"2120","debug_msg":"'||v_error||'"}}$$);';
 		END IF;	
 
@@ -180,28 +180,28 @@ BEGIN
 		SELECT count(element_id) INTO v_num_feature FROM element_x_gully WHERE gully_id=v_feature_id ;
 		IF v_num_feature > 0 THEN
 			v_error = concat(v_num_feature,',',v_feature_id);
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"1058", "function":"2120","debug_msg":"'||v_error||'"}}$$);';
 		END IF;
 		
 		SELECT count(doc_id) INTO v_num_feature FROM doc_x_gully WHERE gully_id=v_feature_id ;
 		IF v_num_feature > 0 THEN
 			v_error = concat(v_num_feature,',',v_feature_id);
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"1060", "function":"2120","debug_msg":"'||v_error||'"}}$$);';
 		END IF;
 	
 		SELECT count(visit_id) INTO v_num_feature FROM om_visit_x_gully WHERE gully_id=v_feature_id ;
 		IF v_num_feature > 0 THEN
 			v_error = concat(v_num_feature,',',v_feature_id);
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"1062", "function":"2120","debug_msg":"'||v_error||'"}}$$);';
 		END IF;
 
 		SELECT count(link_id) INTO v_num_feature FROM link WHERE exit_type='GULLY' AND exit_id=v_feature_id;
 		IF v_num_feature > 0 THEN
 			v_error = concat(v_num_feature,',',v_feature_id);
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"1064", "function":"2120","debug_msg":"'||v_error||'"}}$$);';
 		END IF;	
 		

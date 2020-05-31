@@ -29,8 +29,8 @@ $BODY$
 /*EXAMPLE
 SELECT "SCHEMA_NAME".gw_fct_getformfields('visit_arc_insp', 'visit', 'data', NULL, NULL, NULL, NULL, 'INSERT', null, 3)
 SELECT "SCHEMA_NAME".gw_fct_getformfields('go2epa', 'form', 'data', null, null, null, null, null, null,null)
-SELECT "SCHEMA_NAME".gw_fct_getformfields('ve_arc_conduit', 'feature', 'data', 've_arc_conduit', 'arc_id', '2001', NULL, 'SELECT', null, 9)
-SELECT "SCHEMA_NAME".gw_fct_getformfields('ve_arc_pipe', 'feature', NULL, NULL, NULL, NULL, NULL, 'INSERT', null, 9)
+SELECT "SCHEMA_NAME".gw_fct_getformfields('ve_arc_conduit', 'feature', 'data', 've_arc_conduit', 'arc_id', '2001', NULL, 'SELECT', null, 4)
+SELECT "SCHEMA_NAME".gw_fct_getformfields('ve_arc_pipe', 'feature', NULL, NULL, NULL, NULL, NULL, 'INSERT', null, 4)
 SELECT "SCHEMA_NAME".gw_fct_getformfields( 'print', 'utils', 'data', null, null, null, null, 'SELECT', null, 3);
 
 PERFORM gw_fct_debug(concat('{"data":{"msg":"----> INPUT FOR gw_fct_getformfields: ", "variables":"',v_debug,'"}}')::json);
@@ -105,11 +105,11 @@ BEGIN
 	END IF;
 
 	-- setting device
-	IF p_device < 9 THEN 
+	IF p_device IN (1,2,3) THEN
 		v_device = ' widgettype as type, columnname as name, datatype AS "dataType",widgetfunction as "widgetAction", widgetfunction as "updateAction",widgetfunction as "changeAction",
 		     (CASE WHEN layoutname=''0'' THEN ''header'' WHEN layoutname=''9'' THEN ''footer'' ELSE ''body'' END) AS "position",
 		     (CASE WHEN iseditable=true THEN false ELSE true END)  AS disabled,';
-	ELSE  
+	ELSIF  p_device = 4
 		v_device = '';
 	END IF;
 

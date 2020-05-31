@@ -12,7 +12,7 @@ RETURNS pg_catalog.json AS
 $BODY$
 
 /*
-SELECT SCHEMA_NAME.gw_fct_setfileinsert($${"client":{"device":3, "infoType":100, "lang":"ES"}, 
+SELECT SCHEMA_NAME.gw_fct_setfileinsert($${"client":{"device":4, "infoType":1, "lang":"ES"},
 	"feature":{"featureType":"file", "tableName":"om_visit_file", "id":10004, "idName": "id"}, 
 	"data":{"fields":{"visit_id":10004, "hash":"testhash", "url":"urltest", "fextension":"png","idval":"file1"},
 		"deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}}$$)	

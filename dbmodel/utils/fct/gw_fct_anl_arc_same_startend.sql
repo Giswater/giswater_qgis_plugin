@@ -12,7 +12,7 @@ $BODY$
 
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_anl_arc_same_startend($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"tableName":"v_edit_man_pipe", "id":["1004","1005"]},
 "data":{"selectionMode":"previousSelection","parameters":{"saveOnDatabase":true}}}$$)
 

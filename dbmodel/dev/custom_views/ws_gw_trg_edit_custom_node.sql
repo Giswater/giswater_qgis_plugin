@@ -55,7 +55,7 @@ BEGIN
 
 		IF (NEW.nodecat_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
-	        	SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
+	        	SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
         		"data":{"message":"110", "function":"430","debug":null}}$$);		
 			END IF;
 			NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='edit_nodecat_vdefault' AND "cur_user"="current_user"());
@@ -76,12 +76,12 @@ BEGIN
      -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-          	    SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
+          	    SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
         		"data":{"message":"115", "function":"430","debug":null}}$$);	
             END IF;
             NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
             IF (NEW.sector_id IS NULL) THEN
-                SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
+                SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
         		"data":{"message":"120", "function":"430","debug":null}}$$);	   
             END IF;            
         END IF;
@@ -89,12 +89,12 @@ BEGIN
      -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
+                SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
         		"data":{"message":"125", "function":"430","debug":null}}$$);	 
             END IF;
             NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
             IF (NEW.dma_id IS NULL) THEN
-                SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
+                SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
         		"data":{"message":"130", "function":"430","debug":null}}$$);	
             END IF;            
         END IF;
@@ -122,13 +122,13 @@ BEGIN
 		
 	--Exploitation ID
             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-                /*SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
+                /*SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
         		"data":{"message":"125", "function":"430","debug":null}}$$);*/
 				RETURN NULL;				
             END IF;
             expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
             IF (expl_id_int IS NULL) THEN
-                /*SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
+                /*SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
         		"data":{"message":"130", "function":"430","debug":null}}$$);*/
 				RETURN NULL; 
             END IF;
@@ -794,7 +794,7 @@ BEGIN
             EXECUTE v_sql;
         END IF;	
 		*/
-        --PERFORM gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"message":"XXX", "function":"XXX","debug_msg":null, "variables":null}}$$) 
+        --PERFORM gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"message":"XXX", "function":"XXX","debug_msg":null, "variables":null}}$$)
         RETURN NEW;
 
 
@@ -851,7 +851,7 @@ BEGIN
             old_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id) = (cat_node.nodetype_id))) WHERE cat_node.id=OLD.nodecat_id);
             new_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id) = (cat_node.nodetype_id))) WHERE cat_node.id=NEW.nodecat_id);
             IF (quote_literal(old_nodetype) <> quote_literal(new_nodetype)) THEN
-                SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, "data":{"message":"135", "function":"430","debug":null}}$$);
+                SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{}, "data":{"message":"135", "function":"430","debug":null}}$$);
               
             END IF;
         END IF;
@@ -1320,7 +1320,7 @@ BEGIN
 	END IF;
 
             
-        --PERFORM gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, "data":{"message":"2", "function":"430","debug":null}}$$);
+        --PERFORM gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{}, "data":{"message":"2", "function":"430","debug":null}}$$);
         RETURN NEW;
     
 
@@ -1328,7 +1328,7 @@ BEGIN
 
     ELSIF TG_OP = 'DELETE' THEN
 
-	EXECUTE 'SELECT gw_fct_check_delete($${"client":{"device":3, "infoType":100, "lang":"ES"},
+	EXECUTE 'SELECT gw_fct_check_delete($${"client":{"device":4, "infoType":1, "lang":"ES"},
 	"feature":{"id":"'||OLD.node_id||'","featureType":"NODE"}, "data":{}}$$)';
 
    	
@@ -1346,7 +1346,7 @@ BEGIN
 		DELETE FROM node WHERE node_id = OLD.node_id;
 	END IF;
 	
-	--PERFORM gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, "data":{"message":"3", "function":"430","debug":null}}$$);
+	--PERFORM gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{}, "data":{"message":"3", "function":"430","debug":null}}$$);
         RETURN NULL;
    
     END IF;

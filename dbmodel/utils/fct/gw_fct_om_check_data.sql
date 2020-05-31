@@ -13,11 +13,11 @@ $BODY$
 
 /*EXAMPLE
 SELECT gw_fct_om_check_data($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}$$)
 
 SELECT gw_fct_om_check_data($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{},"data":{"parameters":{"selectionMode":"wholeSystem"}}}$$)
 
 --fid: 104,187,188,196,197,201,202,203,204,205,206,

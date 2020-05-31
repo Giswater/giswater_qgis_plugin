@@ -14,14 +14,14 @@ $BODY$
 /*
 --example for config button
 SELECT SCHEMA_NAME.gw_fct_setconfig($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{"formName":"config"},
 "feature":{},
 "data":{"fields":[{"widget":"", "value":"", "chk":"", "isChecked":"", "sysRoleId":""},{"widget":"", "value":"", "chk":"", "isChecked":"", "sysRoleId":""}]}}$$)
 
 --example for epaoptions button
 SELECT SCHEMA_NAME.gw_fct_setconfig($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{"formName":"epaoptions"},
 "feature":{},
 "data":{"fields":{"widget":"", "value":""}}}$$)

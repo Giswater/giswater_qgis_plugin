@@ -53,7 +53,7 @@ BEGIN
 			
 			IF (v_numNodes >1) AND (v_node_proximity_control IS TRUE) THEN
 				IF v_dsbl_error IS NOT TRUE THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
         			"data":{"message":"1096", "function":"1334","debug_msg":"'||NEW.node_id'"}}$$);';
 				ELSE
 					INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (4, NEW.node_id, 'Node is over another node with incompatible state (state 1 or 2)');
@@ -125,7 +125,7 @@ BEGIN
 				ELSIF (NEW.state=2 AND rec_node.state=2) THEN
 				
 					IF v_dsbl_error IS NOT TRUE THEN
-						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
         				"data":{"message":"1100", "function":"1334","debug_msg":"'||NEW.node_id'"}}$$);';
 					ELSE
 						INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (4, NEW.node_id, 'Node is over another node with incompatible state (state = 2)');

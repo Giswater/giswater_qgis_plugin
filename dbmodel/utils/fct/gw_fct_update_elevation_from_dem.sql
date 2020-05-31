@@ -10,11 +10,11 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_update_elevation_from_dem(p_data j
   RETURNS json AS
 $BODY$
 /*
-SELECT gw_fct_update_elevation_from_dem($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, 
+SELECT gw_fct_update_elevation_from_dem($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
 "feature":{"tableName":"v_edit_connec", "featureType":"CONNEC", "id":["3235", "3239", "3197"]}, 
 "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"exploitation":"1", "updateValues":"allValues"}}}$$)::text
 
-SELECT SCHEMA_NAME.gw_fct_update_elevation_from_dem($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, 
+SELECT SCHEMA_NAME.gw_fct_update_elevation_from_dem($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
 "feature":{"tableName":"node", "featureType":"NODE"}, 
 "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"exploitation":"524", "updateValues":"allValues"}}}$$)::text
 

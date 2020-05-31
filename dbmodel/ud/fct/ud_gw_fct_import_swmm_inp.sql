@@ -14,7 +14,7 @@ $BODY$
 
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_import_swmm_inp($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{},
 "data":{"parameters":{"createSubcGeom":false}}}$$)
 
@@ -248,7 +248,7 @@ BEGIN
 
 
 	--create child views 
-	PERFORM gw_fct_admin_manage_child_views($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{},
+	PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
  	"data":{"filterFields":{}, "pageInfo":{}, "multi_create":"True" }}$$);
 
 	-- enable temporary the constraint in order to use ON CONFLICT on insert

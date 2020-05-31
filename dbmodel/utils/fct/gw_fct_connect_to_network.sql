@@ -24,11 +24,11 @@ MAIN CHANGES
 - Connect_to_network works also with node/connec/gully as endpoints (deprecated)
 
 SELECT SCHEMA_NAME.gw_fct_connect_to_network($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"id":["3201","3200"]},
 "data":{"feature_type":"CONNEC"}}$$);
 
-SELECT SCHEMA_NAME.gw_fct_connect_to_network($${"client":{"device":3, "infoType":100,"lang":"ES"},"feature":{"id":
+SELECT SCHEMA_NAME.gw_fct_connect_to_network($${"client":{"device":4, "infoType":1,"lang":"ES"},"feature":{"id":
 "SELECT array_to_json(array_agg(connec_id::text)) FROM v_edit_connec WHERE connec_id IS NOT NULL AND state=1"},
 "data":{"feature_type":"CONNEC"}}$$);
 
@@ -122,12 +122,12 @@ BEGIN
 		-- exception control. It's no possible to create another link when already exists for the connect
 		IF v_connect.state=2 AND v_link.exit_id IS NOT NULL THEN
 			IF v_feature_type = 'CONNEC' THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"3052", "function":"2124","debug_msg":"'||v_connect_id||'"}}$$);' INTO v_audit_result;
 
 			ELSIF v_feature_type = 'GULLY' THEN
 		
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"3054", "function":"2124","debug_msg":"'||v_connect_id||'"}}$$);' INTO v_audit_result;
 			END IF;
 		END IF;
@@ -155,7 +155,7 @@ BEGIN
 
 		-- state control
 		IF v_arc.state=2 AND v_connect.state=1 THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"3050", "function":"2124","debug_msg":null}}$$);' INTO v_audit_result;
 		END IF;
 
@@ -287,7 +287,7 @@ BEGIN
 
     END IF;
    
-	--  EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+	--  EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 	--"data":{"message":"0", "function":"2124","debug_msg":null}}$$);' INTO v_audit_result;
 	-- get results
 	-- info

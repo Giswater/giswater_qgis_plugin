@@ -12,7 +12,7 @@ $BODY$
 
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_anl_arc_no_startend_node($${
-"client":{"device":9, "infoType":100, "lang":"ES"}, 
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{}, 
 "feature":{"tableName":"v_edit_arc", 
 "featureType":"ARC", "id":[]}, 

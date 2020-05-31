@@ -45,7 +45,7 @@ BEGIN
 		END IF;
 		--if there is a value - error message, if not create a trigger for the defined typevalue 
 		IF v_count > 0 THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
        		"data":{"message":"3032", "function":"2750","debug_msg":null}}$$);';
 		ELSE 
 			PERFORM gw_fct_admin_manage_triggers('fk', NEW.target_table);
@@ -58,7 +58,7 @@ BEGIN
 		IF OLD.typevalue IN (SELECT typevalue_name FROM sys_typevalue) THEN
 			IF NEW.typevalue != OLD.typevalue OR NEW.id != OLD.id THEN
 
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
        				"data":{"message":"3028", "function":"2750","debug_msg":"'||OLD.typevalue||'"}}$$);';
 			END IF;
 		ELSE
@@ -94,7 +94,7 @@ BEGIN
 		--if typevalue is a system typevalue - error, cant delete the value, else proceed with the delete process
 		IF OLD.typevalue IN (SELECT typevalue_name FROM sys_typevalue) THEN
 			
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
        		"data":{"message":"3028", "function":"2750","debug_msg":"'||OLD.typevalue||'"}}$$);';
 		ELSE 
 			--select configuration from the sys_foreingkey table
@@ -110,7 +110,7 @@ BEGIN
 
 				IF v_count > 0 THEN
 
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
        				"data":{"message":"3030", "function":"2750","debug_msg":"'||rec.typevalue_name||'"}}$$);';
 				END IF;
 				--check if the value is the last one defined for the typevalue, if so delete the configuration from sys_foreingkey

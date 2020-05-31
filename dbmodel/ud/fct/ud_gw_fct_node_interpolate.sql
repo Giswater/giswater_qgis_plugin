@@ -13,7 +13,7 @@ RETURNS json AS
 
 $BODY$
 /*
-SELECT SCHEMA_NAME.gw_fct_node_interpolate ($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{},
+SELECT SCHEMA_NAME.gw_fct_node_interpolate ($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
  "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"x":419161.98499003565, "y":4576782.72778585, "node1":"117", "node2":"119"}}}$$);
  
 --fid: 213

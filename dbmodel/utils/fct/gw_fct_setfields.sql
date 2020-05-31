@@ -15,7 +15,7 @@ $BODY$
 
 -- FEATURE
 SELECT SCHEMA_NAME.gw_fct_setfields($${
-"client":{"device":9, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{},
 "feature":{"featureType":"node", "tableName":"v_edit_man_junction", "id":"1251521"},
 "data":{"fields":{"macrosector_id": "1", "sector_id": "2", 
@@ -25,7 +25,7 @@ SELECT SCHEMA_NAME.gw_fct_setfields($${
 
 -- VISIT
 SELECT SCHEMA_NAME.gw_fct_setfields('
- {"client":{"device":3, "infoType":100, "lang":"ES"}, 
+ {"client":{"device":4, "infoType":1, "lang":"ES"},
  "feature":{"featureType":"arc", "tableName":"ve_visit_multievent_x_arc", "id":1135}, 
  "data":{"fields":{"class_id":6, "arc_id":"2001", "visitcat_id":1, "ext_code":"testcode", "sediments_arc":1000, "desperfectes_arc":1, "neteja_arc":3},
  "deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}}')
@@ -168,7 +168,7 @@ BEGIN
 		EXECUTE v_querytext;
 		IF v_fieldsreload IS NOT NULL THEN
 			EXECUTE 'SELECT gw_fct_getcolumnsfromid($${
-				"client":{"device":3, "infoType":100, "lang":"ES"},
+				"client":{"device":4, "infoType":1, "lang":"ES"},
 				"form":{},
 				"feature":{"tableName":"'|| v_tablename ||'", "id":"'|| v_id ||'", "fieldsReload":"'|| v_fieldsreload ||'", "parentField":"'||json_object_keys(v_fields)||'"},
 				"data":{}}$$)' INTO v_columnfromid;

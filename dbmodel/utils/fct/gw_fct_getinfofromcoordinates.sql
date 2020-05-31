@@ -13,7 +13,7 @@ $BODY$
 
 /*EXAMPLE:
 SELECT SCHEMA_NAME.gw_fct_getinfofromcoordinates($${
-		"client":{"device":9, "infoType":100, "lang":"ES"},
+		"client":{"device":4, "infoType":1, "lang":"ES"},
 		"form":{},
 		"feature":{},
 		"data":{"activeLayer":"ve_node",
@@ -24,7 +24,7 @@ SELECT SCHEMA_NAME.gw_fct_getinfofromcoordinates($${
 			"toolBar":"basic",
 			"coordinates":{"epsg":25831, "xcoord":419204.96, "ycoord":4576509.27, "zoomRatio":1000}}}$$)
 SELECT SCHEMA_NAME.gw_fct_getinfofromcoordinates($${
-		"client":{"device":9, "infoType":100, "lang":"ES"},
+		"client":{"device":4, "infoType":1, "lang":"ES"},
 		"form":{},
 		"feature":{},
 		"data":{"activeLayer":"ve_node",
@@ -32,9 +32,9 @@ SELECT SCHEMA_NAME.gw_fct_getinfofromcoordinates($${
 			"toolBar":"epa",
 			"coordinates":{"epsg":25831, "xcoord":419204.96, "ycoord":4576509.27, "zoomRatio":1000}}}$$)
 
- SELECT gw_fct_getinfofromcoordinates($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic", "rolePermissions":"None", "activeLayer":"", "visibleLayer":["v_edit_arc", "v_edit_dma", "v_edit_connec", "v_edit_element", "v_edit_node", "v_edit_link", "v_edit_sector", "v_edit_exploitation"], "addSchema":"None", "infoType":"None", "projecRole":"None", "coordinates":{"xcoord":418911.7807826943,"ycoord":4576796.706092382, "zoomRatio":5804.613871393841}}}$$);
+ SELECT gw_fct_getinfofromcoordinates($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic", "rolePermissions":"None", "activeLayer":"", "visibleLayer":["v_edit_arc", "v_edit_dma", "v_edit_connec", "v_edit_element", "v_edit_node", "v_edit_link", "v_edit_sector", "v_edit_exploitation"], "addSchema":"None", "infoType":"None", "projecRole":"None", "coordinates":{"xcoord":418911.7807826943,"ycoord":4576796.706092382, "zoomRatio":5804.613871393841}}}$$);
 
- SELECT gw_fct_getinfofromcoordinates($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic", "rolePermissions":"None", "activeLayer":"", "visibleLayer":["v_edit_arc", "v_edit_dma", "v_edit_connec", "v_edit_element", "v_edit_node", "v_edit_link", "v_edit_sector", "v_edit_exploitation"], "addSchema":"None", "infoType":"None", "projecRole":"None", "coordinates":{"xcoord":418894.6048028714,"ycoord":4576612.785781575, "zoomRatio":2105.7904524867854}}}$$);
+ SELECT gw_fct_getinfofromcoordinates($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic", "rolePermissions":"None", "activeLayer":"", "visibleLayer":["v_edit_arc", "v_edit_dma", "v_edit_connec", "v_edit_element", "v_edit_node", "v_edit_link", "v_edit_sector", "v_edit_exploitation"], "addSchema":"None", "infoType":"None", "projecRole":"None", "coordinates":{"xcoord":418894.6048028714,"ycoord":4576612.785781575, "zoomRatio":2105.7904524867854}}}$$);
 
 */
 
@@ -107,21 +107,21 @@ BEGIN
 	v_visiblelayer := reverse(v_visiblelayer);
 
 	-- Sensibility factor
-	IF v_device=1 OR v_device=2 THEN
+	IF v_device = 1 OR v_device = 2 THEN
 		EXECUTE 'SELECT (value::json->>''mobile'')::float FROM config_param_system WHERE parameter=''basic_info_sensibility_factor'''
 		INTO v_sensibility_f;
 		-- 10 pixels of base sensibility
 		v_sensibility = (v_zoomratio * 10 * v_sensibility_f);
 		v_config_layer='config_web_layer';
 		
-	ELSIF  v_device=3 THEN
+	ELSIF  v_device = 3 THEN
 		EXECUTE 'SELECT (value::json->>''web'')::float FROM config_param_system WHERE parameter=''basic_info_sensibility_factor'''
 		INTO v_sensibility_f;     
 		-- 10 pixels of base sensibility
 		v_sensibility = (v_zoomratio * 10 * v_sensibility_f);
 		v_config_layer='config_web_layer';
 
-	ELSIF  v_device=9 THEN
+	ELSIF  v_device = 4 THEN
 		EXECUTE 'SELECT (value::json->>''desktop'')::float FROM config_param_system WHERE parameter=''basic_info_sensibility_factor'''
 		INTO v_sensibility_f;
 

@@ -13,7 +13,7 @@ $BODY$
 
 /*
 SELECT SCHEMA_NAME.gw_fct_arc_fusion($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"id":["1004"]},"data":{"workcat_id_end":"work1","enddate":"2020-02-05"}}$$)
 
 -- fid: 214
@@ -157,7 +157,7 @@ BEGIN
             SELECT * INTO rec_addfield2 FROM man_addfields_value WHERE feature_id=v_my_record2.arc_id and parameter_id=rec_param.parameter_id;
 
                 IF rec_addfield1.value_param!=rec_addfield2.value_param  THEN
-                    EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
+                    EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                     "data":{"message":"3008", "function":"2112","debug_msg":null}}$$)' INTO v_audit_result;
 
                 ELSIF rec_addfield2.value_param IS NULL and rec_addfield1.value_param IS NOT NULL THEN
@@ -274,7 +274,7 @@ BEGIN
             -- Arcs has different types
             ELSE
 
-                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
+                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                 "data":{"message":"2004", "function":"2112","debug_msg":null}}$$)' INTO v_audit_result;
 
             END IF;
@@ -282,20 +282,20 @@ BEGIN
         -- Node has not 2 arcs
         ELSE
 
-            EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
+            EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
             "data":{"message":"2006", "function":"2112","debug_msg":null}}$$)' INTO v_audit_result;  
         END IF;
 
     -- Node not found
     ELSE 
 
-        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
+        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
         "data":{"message":"2002", "function":"2112","debug_msg":null}}$$)' INTO v_audit_result;  
 
     END IF;
 
 
-   -- EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+   -- EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
    -- "data":{"message":"0", "function":"2112","debug_msg":null}}$$)' INTO v_audit_result;  
 
 	-- get results

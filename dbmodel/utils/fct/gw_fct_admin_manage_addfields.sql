@@ -18,7 +18,7 @@ SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "fea
 "data":{"action":"CREATE", "multi_create":"true", "parameters":{"columnname":"addfield_all", "datatype":"string", "widgettype":"text", "label":"addfield_all","ismandatory":"False",
 "fieldLength":"50", "numDecimals" :null,"active":"True", "iseditable":"True","v_isenabled":"True"}}}$$);
 
-SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${"client":{"device":9, "infoType":100, "lang":"ES"}, 
+SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{}, 
 "feature":{"catFeature":"PUMP"}, 
 "data":{"filterFields":{}, "pageInfo":{}, "action":"CREATE", "multi_create":false, 
@@ -28,7 +28,7 @@ SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${"client":{"device":9, "infoT
 "isparent": false,  "listfilterparam": null, "editability": null, "dv_querytext_filterc": null, "linkedaction": null, 
 "stylesheet": null, "widgetdim": null}}}$$)::text
 
-	SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${"client":{"device":9, "infoType":100, "lang":"ES"}, 
+	SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${"client":{"device":4, "infoType":1, "lang":"ES"},
 	"form":{}, 
 	"feature":{"catFeature":"PUMP"}, 
 	"data":{"filterFields":{}, "pageInfo":{}, "action":"UPDATE", "multi_create":false, 
@@ -559,7 +559,7 @@ BEGIN
 
 		--check if field order will overlap the existing field	
 		IF v_orderby IN (SELECT orderby FROM sys_addfields WHERE cat_feature_id = v_cat_feature AND param_name!=v_param_name) THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"3016", "function":"2690","debug_msg":null}}$$);' INTO v_audit_result;
 		END IF;
 

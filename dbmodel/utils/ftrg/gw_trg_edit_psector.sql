@@ -176,7 +176,7 @@ BEGIN
 				UPDATE config_param_system set value = 'true' WHERE parameter='edit_state_topocontrol';
 				--show information about performed state update
 
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
        			"data":{"message":"3034", "function":"2446","debug_msg":null}}$$);';
 			END LOOP;
 			

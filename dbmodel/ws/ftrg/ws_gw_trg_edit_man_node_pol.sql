@@ -35,21 +35,21 @@ BEGIN
 			NEW.node_id:= (SELECT node_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom,0.001) 
 			ORDER BY ST_distance(ST_centroid(NEW.the_geom),v_edit_node.the_geom) ASC LIMIT 1);
 			IF (NEW.node_id IS NULL) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
         		"data":{"message":"2052", "function":"2462","debug_msg":null}}$$);';
 			END IF;
 		END IF;
 		
 		IF man_table='man_register_pol' THEN
 			IF (SELECT node_id FROM man_register WHERE node_id=NEW.node_id) IS NULL THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
         		"data":{"message":"2100", "function":"2462","debug_msg":null}}$$);';
 			END  IF;
 			sys_type_var='REGISTER';
 		
 		ELSIF man_table='man_tank_pol' THEN
 			IF (SELECT node_id FROM man_tank WHERE node_id=NEW.node_id) IS NULL THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
         		"data":{"message":"2102", "function":"2462","debug_msg":null}}$$);';
 			END  IF;
 			sys_type_var='TANK';
@@ -80,7 +80,7 @@ BEGIN
 		IF (NEW.node_id != OLD.node_id) THEN
 			IF man_table ='man_register_pol' THEN
 				IF (SELECT node_id FROM man_register WHERE node_id=NEW.node_id) IS NULL THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
         			"data":{"message":"2104", "function":"2462","debug_msg":null}}$$);';
 				END  IF;
 				UPDATE man_register SET pol_id=NULL WHERE node_id=OLD.node_id;
@@ -88,7 +88,7 @@ BEGIN
 			
 			ELSIF man_table ='man_tank_pol' THEN
 				IF (SELECT node_id FROM man_tank WHERE node_id=NEW.node_id) IS NULL THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
         			"data":{"message":"2106", "function":"2462","debug_msg":null}}$$);';
 				END  IF;
 				UPDATE man_tank SET pol_id=NULL WHERE node_id=OLD.node_id;

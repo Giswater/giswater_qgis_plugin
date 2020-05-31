@@ -31,7 +31,7 @@ BEGIN
 	--Exploitation ID
 		IF (NEW.expl_id IS NULL) THEN
 				IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
        				"data":{"message":"1110", "function":"1118","debug_msg":null}}$$);';
 				END IF;
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
@@ -39,7 +39,7 @@ BEGIN
 					NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_exploitation_vdefault' AND "cur_user"="current_user"());
 				END IF;
 				IF (NEW.expl_id IS NULL) THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
        				"data":{"message":"2012", "function":"1118","debug_msg":"'||NEW.id||'"}}$$);';
 				END IF;            
 			END IF;

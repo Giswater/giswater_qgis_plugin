@@ -68,7 +68,7 @@ BEGIN
 
 	-- data quality analysis
 	IF v_checkdata THEN
-		v_input = '{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}'::json;
+		v_input = '{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}'::json;
 		PERFORM gw_fct_om_check_data(v_input);
 	END IF;
 

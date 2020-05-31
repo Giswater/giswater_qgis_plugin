@@ -13,7 +13,7 @@ $BODY$
 
 /*EXAMPLE
 
-SELECT SCHEMA_NAME.gw_fct_node_builtfromarc($${"client":{"device":9, "infoType":100, "lang":"ES"},
+SELECT SCHEMA_NAME.gw_fct_node_builtfromarc($${"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{}, "feature":{},
 "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
 "parameters":{"exploitation":"1", "inserIntoNode":"true", "nodeTolerance":"0.01", "saveOnDatabase":"true"}}}$$)::text

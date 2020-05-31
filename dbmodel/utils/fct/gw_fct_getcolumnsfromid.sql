@@ -13,7 +13,7 @@ $BODY$
 
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_getcolumnsfrom_id($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{},
 "feature":{"tableName":"ve_arc_pipe", "columnId":"elevation1", "id":"114050"},
 "data":{}}$$)

@@ -13,7 +13,7 @@ $BODY$
 
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_setdimensioning($${
-		"client":{"device":9, "infoType":100, "lang":"ES"},
+		"client":{"device":4, "infoType":1, "lang":"ES"},
 		"form":{},
 		"feature":{"tableName":"dimensions"},
 		"data":{"filterFields":{"distance":"9.9974"}}}$$)

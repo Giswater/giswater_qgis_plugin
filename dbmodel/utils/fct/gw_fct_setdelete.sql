@@ -13,16 +13,16 @@ $BODY$
 
 /* example
 visit:
-SELECT SCHEMA_NAME.gw_fct_setdelete('{"client":{"device":3, "infoType":100, "lang":"ES"}, 
+SELECT SCHEMA_NAME.gw_fct_setdelete('{"client":{"device":4, "infoType":1, "lang":"ES"},
 		"feature":{"featureType":"visit", "tableName":"om_visit", "id":10465, "idName": "id"}}')
 connec:
-SELECT SCHEMA_NAME.gw_fct_setdelete('{"client":{"device":3, "infoType":100, "lang":"ES"}, 
+SELECT SCHEMA_NAME.gw_fct_setdelete('{"client":{"device":4, "infoType":1, "lang":"ES"},
 		"feature":{"featureType":"connec", "tableName":"v_edit_connec", "id":3008, "idName": "connec_id"}}')
 file:
-SELECT SCHEMA_NAME.gw_fct_setdelete('{"client":{"device":3, "infoType":100, "lang":"ES"}, 
+SELECT SCHEMA_NAME.gw_fct_setdelete('{"client":{"device":4, "infoType":1, "lang":"ES"},
 		"feature":{"featureType":"file", "tableName":"om_visit_file", "id":2, "idName": "id"}}')
 lot:
-SELECT SCHEMA_NAME.gw_fct_setdelete('{"client":{"device":3, "infoType":100, "lang":"ES"}, 
+SELECT SCHEMA_NAME.gw_fct_setdelete('{"client":{"device":4, "infoType":1, "lang":"ES"},
 		"feature":{"featureType":"lot", "tableName":"om_visit_lot", "id":44, "idName": "id"}}')
 
 */
@@ -80,12 +80,12 @@ BEGIN
 	IF v_result IS NOT NULL THEN
 		v_querytext := 'DELETE FROM ' || quote_ident(v_tablename) ||' WHERE '|| quote_ident(v_idname) ||' = '||quote_literal(v_id);
 		
-		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		"data":{"message":"3114", "function":"2608","debug_msg":""}}$$)'
 		INTO v_message;
 		EXECUTE v_querytext ;
 	ELSE
-		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		"data":{"message":"3116", "function":"2608","debug_msg":""}}$$)' 
 		INTO v_message;
 	END IF;

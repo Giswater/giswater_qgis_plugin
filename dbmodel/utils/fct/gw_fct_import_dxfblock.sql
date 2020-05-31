@@ -14,7 +14,7 @@ $BODY$
 
 /*
 SELECT SCHEMA_NAME.gw_fct_import_dxfblock($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{},"data":{}}$$)
 
 

@@ -15,7 +15,7 @@ $BODY$
 
 /*
 SELECT SCHEMA_NAME.gw_fct_import_epanet_inp($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{}, "data":{"parameters":{"useNod2arc":true}}}$$)
 
 -- fid: 239
@@ -337,7 +337,7 @@ BEGIN
 	INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('EPAPUMP-CATA2N', 'EPAPUMPA2N', 'EPAMAT', TRUE) ON CONFLICT (id) DO NOTHING;
 	
 	--create child views 
-	PERFORM gw_fct_admin_manage_child_views($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{},
+	PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
  	"data":{"filterFields":{}, "pageInfo":{}, "multi_create":"True" }}$$);
 
 	-- enable temporary the constraint in order to use ON CONFLICT on insert

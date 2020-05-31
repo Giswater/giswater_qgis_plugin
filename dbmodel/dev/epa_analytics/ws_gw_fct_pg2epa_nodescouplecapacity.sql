@@ -14,7 +14,7 @@ $BODY$
 /*
 EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_pg2epa_nodescouplecapacity($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{},
 "data":{"parameters":{"step":1, "resultId":"p2"}}}$$)
 

@@ -14,7 +14,7 @@ $BODY$
 /*EXAMPLE:
 -- getform for use offline
 SELECT SCHEMA_NAME.gw_fct_getprojectvisitforms($${
-"client":{"device":3,"infoType":100,"lang":"es"},
+"client":{"device":4,"infoType":1,"lang":"es"},
 "data":{"projectLayers":{"v_edit_arc","v_edit_node","v_edit_connec"}}}$$)
 */
 

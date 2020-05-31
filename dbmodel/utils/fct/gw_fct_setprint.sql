@@ -13,7 +13,7 @@ $BODY$
 
 /*
 SELECT SCHEMA_NAME.gw_fct_setprint($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{},
 "feature":{},
 "data":{"composer":"mincutA4","scale":"10000","rotation":"10",

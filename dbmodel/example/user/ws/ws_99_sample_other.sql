@@ -50,7 +50,7 @@ INSERT INTO doc VALUES ('Demo document 1', 'OTHER', 'https://github.com/Giswater
 INSERT INTO doc VALUES ('Demo document 3', 'OTHER', 'https://github.com/Giswater/giswater/blob/master-2.1/legal/Licensing.txt', NULL, '2018-03-14 17:09:59.762257', current_user, '2018-03-14 17:09:59.762257');
 INSERT INTO doc VALUES ('Demo document 2', 'OTHER', 'https://github.com/Giswater/giswater/blob/master-2.1/legal/Readme.txt', NULL, '2018-03-14 17:09:19.852804', current_user, '2018-03-14 17:09:19.852804');
 
-SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100,"lang":"ES"},"feature":{"id":
+SELECT gw_fct_connect_to_network($${"client":{"device":4, "infoType":1,"lang":"ES"},"feature":{"id":
 "SELECT array_to_json(array_agg(connec_id::text)) FROM v_edit_connec WHERE connec_id IS NOT NULL AND state=1"},
 "data":{"feature_type":"CONNEC"}}$$);
 
@@ -58,7 +58,7 @@ SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100,"lang":
 INSERT INTO vnode VALUES ((SELECT nextval('vnode_vnode_id_seq')), 'AUTO', NULL, 3, 2, 1, 1, '0101000020E7640000198F5EB77093194113A8AB6482755141');
 INSERT INTO link VALUES ((SELECT nextval('link_link_id_seq')), '3014', 'CONNEC', 483, 'VNODE', FALSE, 1, 1, '0102000020E7640000020000006CAAF3ACD4931941988F62837F755141198F5EB77093194113A8AB6482755141');
 
-SELECT gw_fct_plan_result($${"client":{"device":3, "infoType":100, "lang":"ES"},
+SELECT gw_fct_plan_result($${"client":{"device":4, "infoType":1, "lang":"ES"},
 							"feature":{},"data":{"parameters":{"coefficient":1, "description":"Demo prices for reconstruction", "resultType":1, "resultId":"Starting prices","saveOnDatabase":true}}}$$);
 
 SELECT gw_fct_fill_doc_tables();
@@ -98,7 +98,7 @@ join connec b on a.connec_id = b.connec_id
 where ext_rtc_hydrometer.id = a.hydrometer_id;
 
 
-SELECT gw_fct_audit_check_project($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "version":"0", "fid":1}}$$)::text;
+SELECT gw_fct_audit_check_project($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "version":"0", "fid":1}}$$)::text;
 
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"OUTFALL_VALVE"},
@@ -386,7 +386,7 @@ SELECT sector_id, current_user FROM sector
 ON CONFLICT (sector_id, cur_user) DO NOTHING;
 
 SELECT gw_fct_pg2epa_main($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "data":{"resultId":"gw_check_project", "useNetworkGeom":"false"}}$$);
 
 UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'audit_project_user_control';
@@ -547,7 +547,7 @@ UPDATE v_edit_node SET epa_type = 'NOT DEFINED' WHERE node_id = '1007';
 DELETE FROM selector_psector;
 
 -- deprecated on psector 1 and 2
-SELECT gw_fct_connect_to_network($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{"id":"[3104, 3103, 3076, 3177]"}, "data":{"filterFields":{}, "pageInfo":{}, "feature_type":"CONNEC"}}$$);
+SELECT gw_fct_connect_to_network($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"id":"[3104, 3103, 3076, 3177]"}, "data":{"filterFields":{}, "pageInfo":{}, "feature_type":"CONNEC"}}$$);
 
 
 -- update demands and patterns for connec

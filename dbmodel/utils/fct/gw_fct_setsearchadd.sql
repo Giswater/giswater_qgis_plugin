@@ -13,7 +13,7 @@ $BODY$
 
 /*EXAMPLE
 SELECT "SCHEMA_NAME".gw_fct_setsearchadd($${
-		"client":{"device":9, "infoType":100, "lang":"ES"}, 
+		"client":{"device":4, "infoType":1, "lang":"ES"},
 		"form":{"tabName":"address"}, "feature":{}, 
 		"data":{"filterFields":{}, "pageInfo":{}, "add_muni":{"id":"1", "name":"Sant Boi del Llobregat"}, 
 		"add_street":{"text":"Calle de Salvador Seguí"}, "add_postnumber":{"text":"3"}}}$$)

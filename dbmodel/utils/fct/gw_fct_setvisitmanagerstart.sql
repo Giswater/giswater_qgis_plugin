@@ -14,7 +14,7 @@ $BODY$
 /*EXAMPLE:
 --new call
 SELECT SCHEMA.gw_fct_setvisitmanagerstart($${
-"client":{"device":3,"infoType":100,"lang":"es"},
+"client":{"device":4,"infoType":1,"lang":"es"},
 "feature":{"featureType":"visit","tableName":"v_visit_lot_user","idName":"user_id","id":"efuste"},
 "data":{"fields":{"user_id":"geoadmin","date":"2020-01-20 11:38:27","team_id":"1","lot_id":"4"},"deviceTrace":{"xcoord":null,"ycoord":null,"compass":null}}}$$) AS result
 */
@@ -70,7 +70,7 @@ BEGIN
 	quote_literal(v_team)||', '||quote_literal(v_lot)||', '||quote_literal(v_thegeom::text) ||')';
 
 	-- message
-	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 	"data":{"message":"3126", "function":"2642","debug_msg":""}}$$);'INTO v_message;
 	
 	v_data = p_data->>'data';

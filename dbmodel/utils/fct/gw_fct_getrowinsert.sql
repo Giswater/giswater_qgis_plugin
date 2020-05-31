@@ -14,14 +14,14 @@ $BODY$
 /*EXAMPLE:
 --configured
 SELECT SCHEMA_NAME.gw_fct_getrowinsert($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{},
 "feature":{"tableName":"v_edit_man_pipe"},
 "data":{}}$$)
 
 --NOT configured
 SELECT SCHEMA_NAME.gw_fct_getrowinsert($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{},
 "feature":{"tableName":"arc"},
 "data":{}}$$)

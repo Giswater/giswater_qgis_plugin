@@ -124,7 +124,7 @@ BEGIN
 			
 			-- control error without any mapzones defined on the table of mapzone
 			IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		       	"data":{"message":"1110", "function":"1206","debug_msg":null}}$$);';
 			END IF;
 			
@@ -146,7 +146,7 @@ BEGIN
 			
 			-- control error when no value
 			IF (NEW.expl_id IS NULL) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"2012", "function":"1206","debug_msg":"'||NEW.gully_id::text||'"}}$$);';
 			END IF;            
 		END IF;
@@ -157,7 +157,7 @@ BEGIN
 			
 			-- control error without any mapzones defined on the table of mapzone
 			IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		       	"data":{"message":"1008", "function":"1206","debug_msg":null}}$$);';
 			END IF;
 			
@@ -179,7 +179,7 @@ BEGIN
 			
 			-- control error when no value
 			IF (NEW.sector_id IS NULL) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"1010", "function":"1206","debug_msg":"'||NEW.gully_id::text||'"}}$$);';
 			END IF;            
 		END IF;
@@ -190,7 +190,7 @@ BEGIN
 			
 			-- control error without any mapzones defined on the table of mapzone
 			IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		       	"data":{"message":"1012", "function":"1206","debug_msg":null}}$$);';
 			END IF;
 			
@@ -212,7 +212,7 @@ BEGIN
 			
 			-- control error when no value
 			IF (NEW.dma_id IS NULL) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"1014", "function":"1206","debug_msg":"'||NEW.gully_id::text||'"}}$$);';
 			END IF;            
 		END IF;
@@ -223,7 +223,7 @@ BEGIN
 			
 			-- control error without any mapzones defined on the table of mapzone
 			IF ((SELECT COUNT(*) FROM ext_municipality) = 0) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		       	"data":{"message":"3110", "function":"1206","debug_msg":null}}$$);';
 			END IF;
 			
@@ -245,7 +245,7 @@ BEGIN
 			
 			-- control error when no value
 			IF (NEW.muni_id IS NULL) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"2024", "function":"1206","debug_msg":"'||NEW.gully_id::text||'"}}$$);';
 			END IF;            
 		END IF;
@@ -268,7 +268,7 @@ BEGIN
 
 		--check relation state - state_type
 	    IF NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
-	      	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+	      	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"3036", "function":"1206","debug_msg":"'||NEW.state::text||'"}}$$);'; 
 	   	END IF;		
 
@@ -387,7 +387,7 @@ BEGIN
 
 
 			IF v_length*v_width IS NULL THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"3062", "function":"1206","debug_msg":"'||NEW.gratecat_id::text||'"}}$$);'; 
 				
 			ELSIF v_length*v_width != 0 THEN
@@ -449,7 +449,7 @@ BEGIN
 			IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_gully_automatic_link'
 			AND cur_user=current_user LIMIT 1) IS TRUE THEN
 
-				EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
+				EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":4, "infoType":1, "lang":"ES"},
 				"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY"}}$$)';
 
 				SELECT arc_id INTO v_arc_id FROM gully WHERE gully_id=NEW.gully_id;
@@ -457,7 +457,7 @@ BEGIN
 
 		ELSIF NEW.state=2 THEN
 			-- for planned connects always must exits link defined because alternatives will use parameters and rows of that defined link adding only geometry defined on plan_psector
-			EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
+			EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":4, "infoType":1, "lang":"ES"},
 			"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY"}}$$)';			
 			-- for planned connects always must exits arc_id defined on the default psector because it is impossible to draw a new planned link. Unique option for user is modify the existing automatic link
 			SELECT arc_id INTO v_arc_id FROM gully WHERE gully_id=NEW.gully_id;
@@ -509,11 +509,11 @@ BEGIN
 			IF (SELECT link_id FROM link WHERE feature_id=NEW.gully_id AND feature_type='GULLY' LIMIT 1) IS NOT NULL THEN
 				UPDATE vnode SET vnode_type='AUTO' WHERE vnode_id=(SELECT exit_id FROM link WHERE feature_id=NEW.gully_id AND exit_type='VNODE' LIMIT 1)::int8;
 
-				EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
+				EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":4, "infoType":1, "lang":"ES"},
 				"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY"}}$$)';	
 
 			ELSIF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_gully_automatic_link' AND cur_user=current_user LIMIT 1) IS TRUE THEN
-				EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
+				EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":4, "infoType":1, "lang":"ES"},
 				"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY"}}$$)';	
 			END IF;
 		ELSIF (OLD.arc_id != (SELECT arc_id FROM gully WHERE gully_id=NEW.gully_id)) THEN -- case when arc_id comes from plan psector tables
@@ -527,7 +527,7 @@ BEGIN
 				IF NEW.state_type IS NULL THEN
 				NEW.state_type=(SELECT id from value_state_type WHERE state=0 LIMIT 1);
 					IF NEW.state_type IS NULL THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"2110", "function":"1206","debug_msg":null}}$$);'; 
 					END IF;
 				END IF;
@@ -556,7 +556,7 @@ BEGIN
 
 		--check relation state - state_type
 	    IF (NEW.state_type != OLD.state_type) AND NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
-	      	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+	      	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"3036", "function":"1206","debug_msg":"'||NEW.state::text||'"}}$$);'; 
 	    END IF;		
 
@@ -595,7 +595,7 @@ BEGIN
 
 				IF v_length*v_width IS NULL THEN
 	
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"3062", "function":"1206","debug_msg":"'||NEW.gratecat_id::text||'"}}$$);'; 
 				
 				ELSIF v_length*v_width != 0 THEN
@@ -694,7 +694,7 @@ BEGIN
 
     ELSIF TG_OP = 'DELETE' THEN
 	
-		EXECUTE 'SELECT gw_fct_check_delete($${"client":{"device":3, "infoType":100, "lang":"ES"},
+		EXECUTE 'SELECT gw_fct_check_delete($${"client":{"device":4, "infoType":1, "lang":"ES"},
 		"feature":{"id":"'||OLD.gully_id||'","featureType":"GULLY"}, "data":{}}$$)';
 	-- delete from polygon table (before the deletion of gully)
 	DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM gully WHERE gully_id=OLD.gully_id);

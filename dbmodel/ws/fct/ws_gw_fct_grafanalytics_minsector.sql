@@ -88,7 +88,7 @@ BEGIN
 
 	-- data quality analysis
 	IF v_checkdata THEN
-		v_input = '{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}'::json;
+		v_input = '{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}'::json;
 		PERFORM gw_fct_om_check_data(v_input);
 		SELECT count(*) INTO v_count FROM audit_check_data WHERE cur_user="current_user"() AND fid=125 AND criticity=3;
 	END IF;

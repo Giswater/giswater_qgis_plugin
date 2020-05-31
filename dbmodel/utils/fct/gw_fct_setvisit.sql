@@ -14,14 +14,14 @@ $BODY$
 /*EXAMPLE
 
 -- INSERT WITH GEOMETRY (visit notinfra)
-  SELECT SCHEMA_NAME.gw_fct_setvisit($${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
+  SELECT SCHEMA_NAME.gw_fct_setvisit($${"client":{"device":4,"infoType":1,"lang":"es"},"form":{},
   "feature":{"featureType":"visit", "tableName":"ve_visit_noinfra_typea", "id":10373, "idName":"visit_id"},
    "data":{"fields":{"class_id":"8","visit_id":"10373","visitcat_id":"1","startdate":null,"enddate":null},
 	   "canvas":{"xcoord":343434, "ycoord":234235235}}}$$) AS result
 
 --INSERT
 SELECT SCHEMA_NAME.gw_fct_setvisit($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{},
 "feature":{"featureType":"visit", "tableName":"ve_visit_arc_insp", "id":null, "idName":"visit_id"},
 "data":{"fields":{"class_id":6, "arc_id":"2001", "visitcat_id":1, "ext_code":"testcode", "sediments_arc":10, "desperfectes_arc":1, "neteja_arc":3},
@@ -30,7 +30,7 @@ SELECT SCHEMA_NAME.gw_fct_setvisit($${
 
 --UPDATE
 SELECT SCHEMA_NAME.gw_fct_setvisit($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{},
 "feature":{"featureType":"visit", "tableName":"ve_visit_arc_insp", "id":1159,"idName":"visit_id"},
 "data":{"fields":{"class_id":6, "arc_id":"2001", "visitcat_id":1, "ext_code":"testcode", "sediments_arc":100, "desperfectes_arc":1, "neteja_arc":3},
@@ -174,7 +174,7 @@ BEGIN
 		UPDATE om_visit SET the_geom=v_thegeom WHERE id=v_id;
 
 		-- message
-		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		"data":{"message":"3118", "function":"2622","debug_msg":""}}$$);'INTO v_message;
 
 		RAISE NOTICE '--- INSERT NEW VISIT gw_fct_setinsert WITH MESSAGE: % ---', v_message;
@@ -193,7 +193,7 @@ BEGIN
 		PERFORM gw_fct_setfields (v_outputparameter);
 	
 		-- message
-		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		"data":{"message":"3120", "function":"2662","debug_msg":""}}$$);'INTO v_message;
 
 		RAISE NOTICE '--- UPDATE VISIT gw_fct_setfields USING v_id % WITH MESSAGE: % ---', v_id, v_message;
@@ -211,7 +211,7 @@ BEGIN
 			EXECUTE 'INSERT INTO om_visit_event_photo (visit_id, event_id, tstamp, value, text, hash) VALUES('''||v_id||''', '''||v_event_id||''', '''||NOW()||''', '''||CONCAT((v_addphotos->>'json_array_elements')::json->>'photo_url'::text, (v_addphotos->>'json_array_elements')::json->>'hash'::text)||''', ''demo image'', '''||((v_addphotos->>'json_array_elements')::json->>'hash'::text)::text||''')';
 			
 			-- message
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"3118", "function":"2622","debug_msg":""}}$$);'INTO v_message;
 			
 		END LOOP;

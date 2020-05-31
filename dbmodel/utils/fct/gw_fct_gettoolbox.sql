@@ -13,15 +13,15 @@ $BODY$
 	
 /*EXAMPLE:
 SELECT SCHEMA_NAME.gw_fct_gettoolbox($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "data":{"isToolbox":false, "filterText":"Import inp epanet file"}}$$)
 
 SELECT SCHEMA_NAME.gw_fct_gettoolbox($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "data":{"filterText":"Import inp epanet file"}}$$)
 
 SELECT SCHEMA_NAME.gw_fct_gettoolbox($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "data":{"filterText":""}}$$)
 
 */

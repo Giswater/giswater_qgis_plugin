@@ -14,10 +14,10 @@ $BODY$
 
 /*example
 CURRENT
-SELECT gw_fct_getselectors($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, 
+SELECT gw_fct_getselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
 "data":{"filterFields":{}, "pageInfo":{}, "selector_type":{"mincut": {"ids":[]}}}}$$);
 
-SELECT gw_fct_getselectors($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, 
+SELECT gw_fct_getselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
 "data":{"filterFields":{}, "pageInfo":{}, "selector_type":{"exploitation": {"ids":[]}}}}$$);
 */
 

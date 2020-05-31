@@ -14,7 +14,7 @@ $BODY$
 
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_import_dbprices($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{},"data":{}}$$)
 
 --fid:234
@@ -70,7 +70,7 @@ BEGIN
 		SELECT csv1 INTO v_units FROM temp_csv WHERE cur_user=current_user AND fid = 234;
 
 		IF v_units IS NULL THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"2086", "function":"2440","debug_msg":null}}$$);'INTO v_audit_result;
 		END IF;
 	
@@ -79,7 +79,7 @@ BEGIN
 		AND csv2 IS NOT NULL AND csv2 NOT IN (SELECT id FROM price_value_unit);
 
 		IF v_units IS NOT NULL THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"2088", "function":"2440","debug_msg":"'||v_units||'"}}$$);'INTO v_audit_result;
 		END IF;
 
@@ -87,7 +87,7 @@ BEGIN
 		SELECT csv3 INTO v_units FROM temp_csv WHERE cur_user=current_user AND fid = 234;
 
 		IF v_units IS NULL THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"2090", "function":"2440","debug_msg":null}}$$);'INTO v_audit_result;
 		END IF;
 
@@ -95,7 +95,7 @@ BEGIN
 		SELECT csv5 INTO v_units FROM temp_csv WHERE cur_user=current_user AND fid = 234;
 
 		IF v_units IS NULL THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"2092", "function":"2440","debug_msg":null}}$$);'INTO v_audit_result;
 		END IF;
 	

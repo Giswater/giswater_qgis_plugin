@@ -55,7 +55,7 @@ BEGIN
             (rec_table.arc_id, rec_table.arc_type, rec_table.expl_id, 221, rec_table.the_geom);
 
            -- Call recursive function weighting with the pipe capacity
-           EXECUTE 'SELECT gw_fct_flow_exit_recursive($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{"id":["'||rec_table.node_2||'"]},"data":{}}$$);';
+           EXECUTE 'SELECT gw_fct_flow_exit_recursive($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["'||rec_table.node_2||'"]},"data":{}}$$);';
  
         END LOOP;
 

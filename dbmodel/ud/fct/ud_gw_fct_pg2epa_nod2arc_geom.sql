@@ -68,7 +68,7 @@ BEGIN
 		ELSE
 
 			IF v_node_2=rec_flowreg.node_id THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"2038", "function":"2240","debug_msg":"'||v_arc||'"}}$$);';
 				
 			ELSE 
@@ -80,7 +80,7 @@ BEGIN
 				v_arc_reduced_geom := ST_LineSubstring(v_geom, (rec_flowreg.flwreg_length / ST_Length(v_geom)),1);
 				
 				IF ST_GeometryType(v_arc_reduced_geom) != 'ST_LineString' THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"2040", "function":"2240","debug_msg":"'||concat(rec_arc1.arc_id,',',ST_GeometryType(v_arc_reduced_geom))||'"}}$$);';
 				END IF;
   

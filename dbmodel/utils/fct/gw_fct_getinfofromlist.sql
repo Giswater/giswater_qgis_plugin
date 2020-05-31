@@ -15,7 +15,7 @@ $BODY$
 
 -- lot
 SELECT SCHEMA_NAME.gw_fct_getinfofromlist($${
-		"client":{"device":9, "infoType":100, "lang":"ES"},
+		"client":{"device":4, "infoType":1, "lang":"ES"},
 		"form":{},
 		"feature":{"featureType":"lot", "id":"1"},
 		"data":{}}$$)

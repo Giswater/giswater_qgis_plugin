@@ -13,7 +13,7 @@ $BODY$
 /*
 
 SELECT SCHEMA_NAME.gw_fct_arc_divide($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"id":["1007"]},
 "data":{}}$$)
 
@@ -132,10 +132,10 @@ BEGIN
 
 	-- State control
 	IF v_state=0 THEN
-		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		"data":{"message":"1050", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;
 	ELSIF v_state_node=0 THEN
-		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		"data":{"message":"1052", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;
 	ELSE
 
@@ -173,7 +173,7 @@ BEGIN
 				-- Check if any of the 'lines' are in fact a point
 				IF (ST_GeometryType(v_line1) = 'ST_Point') OR (ST_GeometryType(v_line2) = 'ST_Point') THEN
 
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"3094", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;
 				ELSE
 			
@@ -431,14 +431,14 @@ BEGIN
 						UPDATE arc SET state=0 WHERE arc_id=v_arc_id;
 
 						IF v_count_connec > 0  AND v_array_connec IS NOT NULL THEN
-							EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
+							EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":4, "infoType":1, "lang":"ES"},
 							"feature":{"id":'|| array_to_json(v_array_connec)||'},"data":{"feature_type":"CONNEC"}}$$)';
 
 							INSERT INTO audit_check_data (fid,  criticity, error_message)
 							VALUES (212, 1, concat('Reconnect ',v_count_connec,' connecs with state 1.'));
 						END IF;
 						IF v_count_gully > 0 AND v_array_gully IS NOT NULL THEN
-							EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
+							EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":4, "infoType":1, "lang":"ES"},
 							"feature":{"id":'|| array_to_json(v_array_gully)||'},"data":{"feature_type":"GULLY"}}$$)';
 
 							INSERT INTO audit_check_data (fid,  criticity, error_message)
@@ -689,7 +689,7 @@ BEGIN
 						
 						IF v_count_connec > 0 AND v_array_connec IS NOT NULL THEN
 
-							EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
+							EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":4, "infoType":1, "lang":"ES"},
 							"feature":{"id":'|| array_to_json(v_array_connec)||'},"data":{"feature_type":"CONNEC"}}$$)';
 
 							INSERT INTO audit_check_data (fid,  criticity, error_message)
@@ -697,7 +697,7 @@ BEGIN
 						END IF;
 						IF v_count_gully > 0 AND v_count_gully IS NOT NULL THEN
 
-							EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
+							EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":4, "infoType":1, "lang":"ES"},
 							"feature":{"id":'|| array_to_json(v_array_gully)||'},"data":{"feature_type":"GULLY"}}$$)';
 
 							INSERT INTO audit_check_data (fid,  criticity, error_message)
@@ -718,27 +718,27 @@ BEGIN
 						VALUES (212, 1, 'Delete old arc.');	
 						
 				ELSIF (v_state=2 AND v_state_node=1) THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"3042", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;
 
 				ELSE  
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"2120", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;
 
 				END IF;
 				END IF;
 			ELSE
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"3044", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;
 
 			END IF;
 		ELSE
 			IF v_node_type IS NOT NULL THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"3046", "function":"2114","debug_msg":"'||v_node_type||'"}}$$);' INTO v_audit_result;
 			ELSE 
 
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"3046", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;
 			END IF;
 

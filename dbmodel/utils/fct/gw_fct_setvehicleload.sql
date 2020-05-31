@@ -12,7 +12,7 @@ CREATE OR REPLACE FUNCTION gw_fct_setvehicleload(p_data json)
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_setvehicleload($${"client":{"device":3,"infoType":0,"lang":"es"},"form":{},"feature":{},
+SELECT SCHEMA_NAME.gw_fct_setvehicleload($${"client":{"device":4,"infoType":0,"lang":"es"},"form":{},"feature":{},
 "data":{"fields":{"vehicle_id":"2","load":"1234","hash":"5de7a2e92995b7455a7fe3c7",
 "photo_url":"https:\/\/bmaps.bgeo.es\/dev\/demo\/external.image.php?img="},"deviceTrace":{"xcoord":null,"ycoord":null,"compass":null},"pageInfo":null}}$$) AS result
 */
@@ -74,7 +74,7 @@ BEGIN
 	END IF;
 		
 	-- message
-	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 	"data":{"message":"3118", "function":"2912","debug_msg":""}}$$);'INTO v_message;		
 
 	--  Control NULL's

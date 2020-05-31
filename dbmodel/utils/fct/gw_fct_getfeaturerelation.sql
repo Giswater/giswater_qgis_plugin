@@ -13,17 +13,17 @@ $BODY$
 
 /*
 SELECT SCHEMA_NAME.gw_fct_getfeaturerelation($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"type":"ARC"},
 "data":{"feature_id":"2098" }}$$);
 
 SELECT SCHEMA_NAME.gw_fct_getfeaturerelation($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"type":"NODE"},
 "data":{"feature_id":"1051"}}$$);
 
 SELECT SCHEMA_NAME.gw_fct_getfeaturerelation($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"type":"CONNEC"},
 "data":{"feature_id":"3254" }}$$);
 

@@ -14,18 +14,18 @@ $BODY$
 
 /*
 SELECT SCHEMA_NAME.gw_fct_feature_delete($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{},"feature":{"type":"NODE"},
 "data":{"feature_id":"42"}}$$);
 
 SELECT SCHEMA_NAME.gw_fct_feature_delete($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{},"feature":{"type":"CONNEC"},
 "data":{"feature_id":"3244"}}$$);
 
 
 SELECT SCHEMA_NAME.gw_fct_feature_delete($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{},"feature":{"type":"ARC"},"data":{"feature_id":"2002"}}$$);
 
 -- fid: 152

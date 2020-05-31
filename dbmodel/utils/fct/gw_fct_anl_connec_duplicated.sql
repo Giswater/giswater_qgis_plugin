@@ -10,7 +10,7 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_connec_duplicated(p_data jso
 $BODY$
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_anl_connec_duplicated($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"tableName":"v_edit_man_wjoin", "id":["1004","1005"]},
 "data":{"selectionMode":"previousSelection",	"parameters":{"connecTolerance":1},	"parameters":{"saveOnDatabase":true}}}$$)
 	

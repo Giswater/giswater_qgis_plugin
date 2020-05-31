@@ -13,7 +13,7 @@ $BODY$
 
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_plan_result($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{},"data":{"parameters":{"coefficient":1.67, "description":"test descript", "resultType":1, "resultId":"test1","saveOnDatabase":true}}}$$)
 */
 

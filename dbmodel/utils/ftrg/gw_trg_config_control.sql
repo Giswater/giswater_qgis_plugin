@@ -48,7 +48,7 @@ BEGIN
 					IF NEW.dv_querytext_filterc IS NOT NULL THEN
 
 						IF NEW.dv_parent_id IS NULL THEN
-							v_message = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"message":"3102", "function":"2816", 
+							v_message = concat('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"message":"3102", "function":"2816",
 							"debug":null, "variables":"',v_variables,'"}}');
 							SELECT gw_fct_getmessage(v_message);
 						ELSE
@@ -57,7 +57,7 @@ BEGIN
 								INTO v_widgettype;
 
 							IF v_widgettype IS NULL THEN
-								v_message = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"message":"3104", 
+								v_message = concat('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"message":"3104",
 								function":"2816", "debug":null, "variables":"',v_variables,'"}}');
 								SELECT gw_fct_getmessage(v_message);					
 							END IF;	
@@ -70,7 +70,7 @@ BEGIN
 
 					-- isautoupdate is FALSE
 					IF NEW.isautoupdate = TRUE THEN
-						SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
+						SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 						"data":{"message":"3096", "function":"2816","debug":null}}$$);	
 					END IF;
 		
@@ -83,7 +83,7 @@ BEGIN
 							EXECUTE 'SELECT count(*) FROM( ' ||NEW.dv_querytext|| ')a WHERE id::text != idval::text' INTO v_count;
 
 							IF v_count > 0 THEN
-								v_message = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"message":"3100", 
+								v_message = concat('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"message":"3100",
 								"function":"2816", "debug":null, "variables":"',v_variables,'"}}');
 								SELECT gw_fct_getmessage(v_message);						
 							END IF;

@@ -32,7 +32,7 @@ BEGIN
    
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
-        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
         "data":{"message":"1030", "function":"1310","debug_msg":null}}$$);';
         RETURN NEW;
 
@@ -77,7 +77,7 @@ BEGIN
             v_old_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=OLD.nodecat_id)::text;
             v_new_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=NEW.nodecat_id)::text;
             IF (quote_literal(v_old_nodetype)::text <> quote_literal(v_new_nodetype)::text) THEN
-                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                  "data":{"message":"1016", "function":"1310","debug_msg":null}}$$);';
                 RETURN NULL;
             END IF;
@@ -107,12 +107,12 @@ BEGIN
             annotation=NEW.annotation, the_geom=NEW.the_geom 
         WHERE node_id=OLD.node_id;
 
-        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
         "data":{"message":"2", "function":"1310","debug_msg":null}}$$);';
         RETURN NEW;
         
     ELSIF TG_OP = 'DELETE' THEN
-        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
         "data":{"message":"1032", "function":"1310","debug_msg":null}}$$);';
         RETURN NEW;
     

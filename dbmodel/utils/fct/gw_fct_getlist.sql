@@ -17,14 +17,14 @@ TOC
 ----------
 -- attribute table using custom filters
 SELECT SCHEMA_NAME.gw_fct_getlist($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"tableName":"v_edit_man_pipe", "idName":"arc_id"},
 "data":{"filterFields":{"arccat_id":"PVC160-PN10", "limit":5},"filterFeatureField":{"arc_id":"2001},
         "pageInfo":{"orderBy":"arc_id", "orderType":"DESC", "currentPage":3}}}$$)
 
 -- attribute table using canvas filter
 SELECT SCHEMA_NAME.gw_fct_getlist($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"tableName":"ve_arc_pipe", "idName":"arc_id"},"filterFeatureField":{"arc_id":"2001},
 "data":{"canvasExtend":{"canvascheck":true, "x1coord":12131313,"y1coord":12131313,"x2coord":12131313,"y2coord":12131313},
         "pageInfo":{"orderBy":"arc_id", "orderType":"DESC", "currentPage":1}}}$$)
@@ -33,7 +33,7 @@ VISIT
 ----------
 -- Visit -> visites
 SELECT SCHEMA_NAME.gw_fct_getlist($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"tableName":"om_visit_x_arc" ,"idName":"id"},
 "data":{"filterFields":{"arc_id":2001, "limit":10},"filterFeatureField":{"arc_id":"2001},
     "pageInfo":{"orderBy":"visit_id", "orderType":"DESC", "offsset":"10", "currentPage":null}}}$$)
@@ -41,7 +41,7 @@ SELECT SCHEMA_NAME.gw_fct_getlist($${
 
 -- Visit -> events
 SELECT SCHEMA_NAME.gw_fct_getlist($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"tableName":"v_ui_om_event" ,"idName":"id"},
 "data":{"filterFields":{"visit_id":232, "limit":10},"filterFeatureField":{"arc_id":"2001},
     "pageInfo":{"orderBy":"tstamp", "orderType":"DESC", "currentPage":3}}}$$)
@@ -49,20 +49,20 @@ SELECT SCHEMA_NAME.gw_fct_getlist($${
 -- Visit -> files
 -- first call
 SELECT SCHEMA_NAME.gw_fct_getlist($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"tableName":"om_visit_file"},
 "data":{"filterFields":{},
 	"pageInfo":{}}}$$)
 	
 -- not first call
 SELECT SCHEMA_NAME.gw_fct_getlist($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"tableName":"om_visit_file"},
 "data":{"filterFields":{"filetype":"jpg","limit":15, "visit_id":1135},"filterFeatureField":{"arc_id":"2001},
 	"pageInfo":{"orderBy":"tstamp", "orderType":"DESC", "currentPage":3}}}$$)
 
 SELECT SCHEMA_NAME.gw_fct_getlist($$
-{"client":{"device":3, "infoType":100, "lang":"ES"},
+{"client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"featureType":"visit","tableName":"ve_visit_arc_insp","idname":"visit_id","id":10002},
 "form":{"tabData":{"active":false}, "tabFiles":{"active":true}},
 "data":{"relatedFeature":{"type":"arc"},
@@ -74,7 +74,7 @@ FEATURE FORMS
 -------------
 -- Arc -> elements
 SELECT SCHEMA_NAME.gw_fct_getlist($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"tableName":"v_ui_element_x_arc", "idName":"id"},
 "data":{"filterFields":{"arc_id":"2001"},
     "pageInfo":{"orderBy":"element_id", "orderType":"DESC", "currentPage":3}}}$$)
@@ -84,7 +84,7 @@ MANAGER FORMS
 -------------
 -- Lots
 SELECT SCHEMA_NAME.gw_fct_getlist($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"tableName":"om_visit_lot"},
 "data":{"filterFields":{"limit":10},
 	"pageInfo":{"currentPage":null}}}$$)
@@ -192,7 +192,7 @@ BEGIN
 	-- setting value default for filter fields
 	IF v_filter_values::text IS NULL OR v_filter_values::text = '{}' THEN 
 	
-		v_data = '{"client":{"device":9, "infoType":100, "lang":"ES"},"data":{"formName": "'||v_tablename||'"}}';
+		v_data = '{"client":{"device":4, "infoType":1, "lang":"ES"},"data":{"formName": "'||v_tablename||'"}}';
 		
 		SELECT gw_fct_getfeatureupsert(v_data) INTO v_filter_values;
 
@@ -431,7 +431,7 @@ BEGIN
 		USING v_tablename;
 
 	-- setting new element
-	IF v_device =9 THEN
+	IF v_device = 4 THEN
 		v_filter_fields[v_i+1] := json_build_object('widgettype',v_listclass,'datatype','icon','columnname','fileList','orderby', v_i+3, 'position','body', 'value', SCHEMA_NAME);
 	ELSE
 		v_filter_fields[v_i+1] := json_build_object('type',v_listclass,'dataType','icon','name','fileList','orderby', v_i+3, 'position','body', 'value', v_result_list);

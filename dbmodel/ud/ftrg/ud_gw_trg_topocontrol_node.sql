@@ -71,7 +71,7 @@ BEGIN
 				IF v_node.node_id IS NOT NULL THEN
 		
 					IF v_dsbl_error IS NOT TRUE THEN
-						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 						"data":{"message":"1097", "function":"1334","debug_msg":"'||NEW.node_id||'"}}$$);';	
 					ELSE
 						INSERT INTO audit_log_data (fid, feature_id, log_message)
@@ -89,7 +89,7 @@ BEGIN
 				IF v_node.node_id IS NOT NULL THEN
 			
 					IF v_dsbl_error IS NOT TRUE THEN
-						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 						"data":{"message":"1096", "function":"1334","debug_msg":"'||NEW.node_id||'"}}$$);';	
 					ELSE
 						INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (4,

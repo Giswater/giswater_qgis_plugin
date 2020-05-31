@@ -12,7 +12,7 @@ $BODY$
 
 /*
 SELECT SCHEMA_NAME.gw_fct_feature_replace($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"type":"NODE"},
 "data":{"old_feature_id":"129","workcat_id_end":"work1", "enddate":"2019-05-17","keep_elements":true }}$$)
 
@@ -165,7 +165,7 @@ BEGIN
 
 	-- Control of state(1)
 	IF (v_state=0 OR v_state=2 OR v_state IS NULL) THEN
-		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
         "data":{"message":"1070", "function":"2126","debug_msg":"'||v_state||'"}}$$);' INTO v_audit_result;
 	ELSE
 

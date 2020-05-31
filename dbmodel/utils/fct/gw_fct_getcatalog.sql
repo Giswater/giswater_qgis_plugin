@@ -13,7 +13,7 @@ $BODY$
 
 /*EXAMPLE:
 SELECT SCHEMA_NAME.gw_fct_getcatalog($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{"formName":"upsert_catalog_arc", "tabName":"data", "editable":"TRUE"},
 "feature":{"tableName":"ve_arc_pipe", "idName":"arc_id", "id":"2001", "feature_type":"PIPE"},
 "data":{"fields":{"matcat_id":"PVC", "pnom":"16", "dnom":"160"}}}$$)

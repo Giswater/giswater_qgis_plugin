@@ -51,7 +51,7 @@ BEGIN
 		IF arc_id_aux IS NOT NULL THEN
 			--PERFORM gw_fct_arc_divide(NEW.node_id);	
 
-			EXECUTE 'SELECT gw_fct_arc_divide($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{"id":["'||NEW.node_id||'"]},"data":{}}$$)';
+			EXECUTE 'SELECT gw_fct_arc_divide($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["'||NEW.node_id||'"]},"data":{}}$$)';
 		END IF;	
 
    	END IF;

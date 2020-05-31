@@ -13,7 +13,7 @@ $BODY$
 
 /*EXAMPLE:
 SELECT SCHEMA_NAME.gw_fct_getgo2epa($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{"formName":"go2epa"},
 "feature":{},"data":{}}$$)
 */

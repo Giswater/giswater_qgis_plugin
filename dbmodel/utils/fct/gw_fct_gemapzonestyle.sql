@@ -11,7 +11,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getmapzonestyle(p_data json)
 $BODY$
 
 /* EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_getmapzonestyle($${"client":{"device":3, "infoType":100, "lang":"ES"},"data":{}}$$)
+SELECT SCHEMA_NAME.gw_fct_getmapzonestyle($${"client":{"device":4, "infoType":1, "lang":"ES"},"data":{}}$$)
 */
 
 DECLARE

@@ -15,7 +15,7 @@ $BODY$
 
 -- with parent
 SELECT SCHEMA_NAME.gw_fct_gettypeahead($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{},
 "feature":{"tableName":"ve_arc_pipe"},
 "data":{"queryText":"SELECT id AS id, id AS idval FROM cat_arc WHERE id IS NOT NULL",
@@ -26,17 +26,17 @@ SELECT SCHEMA_NAME.gw_fct_gettypeahead($${
 
 -- without parent
 SELECT SCHEMA_NAME.gw_fct_gettypeahead($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{},
 "feature":{"tableName":"ve_arc_pipe"},
 "data":{"queryText":"SELECT id AS id, id AS idval FROM cat_arc WHERE id IS NOT NULL",
 	"textToSearch":"FC"}}$$)
 	
-SELECT SCHEMA_NAME.gw_fct_gettypeahead($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, 
+SELECT SCHEMA_NAME.gw_fct_gettypeahead($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{},
 "queryText":"SELECT id AS id, a.name AS idval FROM ext_streetaxis a JOIN ext_municipality m USING (muni_id) WHERE id IS NOT NULL", 
 "queryTextFilter":"AND m.name", "parentId":"muni_id", "parentValue":"", "textToSearch":"Ave"}}$$);
 
-SELECT SCHEMA_NAME.gw_fct_gettypeahead($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, 
+SELECT SCHEMA_NAME.gw_fct_gettypeahead($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{},
 "queryText":"SELECT a.postnumber AS id, a.postnumber AS idval FROM ext_address a JOIN ext_streetaxis m ON streetaxis_id=m.id WHERE a.id IS NOT NULL", 
 "queryTextFilter":"AND m.name", "parentId":"streetname", "parentValue":"Avenida de Aragó", "textToSearch":"1"}}$$);
 

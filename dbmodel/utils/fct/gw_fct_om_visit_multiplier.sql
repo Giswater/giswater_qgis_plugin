@@ -14,7 +14,7 @@ $BODY$
 /*
 
 SELECT SCHEMA_NAME.gw_fct_om_visit_multiplier($${
-"client":{"device":3, "infoType":100, "lang":"ES"}, "feature":{"id":2345}}$$)
+"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{"id":2345}}$$)
 
 */
 

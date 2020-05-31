@@ -13,7 +13,7 @@ $BODY$
 /*
 EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_inp($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{},
 "data":{"step":0, "resultId":"test1"}$$)
 

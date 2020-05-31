@@ -34,7 +34,7 @@ BEGIN
 		IF (NEW.gully_id IS NULL) THEN
 			NEW.gully_id:= (SELECT gully_id FROM v_edit_gully WHERE ST_DWithin(NEW.the_geom, v_edit_gully.the_geom,0.001) LIMIT 1);
 			IF (NEW.gully_id IS NULL) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
       		 	"data":{"message":"2048", "function":"2416","debug_msg":null}}$$);'; 
 			END IF;
 		END IF;
@@ -55,7 +55,7 @@ BEGIN
 		
 		IF (NEW.gully_id != OLD.gully_id) THEN
 			IF (SELECT gully_id FROM gully WHERE gully_id=NEW.gully_id) IS NULL THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
       		 	"data":{"message":"2050", "function":"2416","debug_msg":null}}$$);';
 			END IF;
 			UPDATE gully SET pol_id=NULL WHERE gully_id=OLD.gully_id;

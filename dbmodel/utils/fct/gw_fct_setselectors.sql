@@ -13,7 +13,7 @@ $BODY$
 
 /*example
 SELECT SCHEMA_NAME.gw_fct_setselectors($${
-"client":{"device":9, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{},
 "data":{"selector_type":"mincut", "tableName":"anl_mincut_result_selector", "column_id":"result_id", "result_name":"1", "result_value":"True"}}$$) AS result
 */

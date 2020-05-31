@@ -77,7 +77,7 @@ BEGIN
 		-- Node Catalog ID
 		IF (NEW.nodecat_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
         		"data":{"message":"1006", "function":"1320","debug_msg":null}}$$);';
 			END IF;
 			
@@ -93,7 +93,7 @@ BEGIN
 			END IF;
 			
 			IF (NEW.nodecat_id IS NULL) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
         		"data":{"message":"1090", "function":"1320","debug_msg":null}}$$);';
 			END IF;				
 		END IF;
@@ -110,7 +110,7 @@ BEGIN
 			
 			-- control error without any mapzones defined on the table of mapzone
 			IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		       	"data":{"message":"1110", "function":"1320","debug_msg":null}}$$);';
 			END IF;
 			
@@ -132,7 +132,7 @@ BEGIN
 			
 			-- control error when no value
 			IF (NEW.expl_id IS NULL) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"2012", "function":"1320","debug_msg":"'||NEW.node_id::text||'"}}$$);';
 			END IF;            
 		END IF;
@@ -143,7 +143,7 @@ BEGIN
 			
 			-- control error without any mapzones defined on the table of mapzone
 			IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		       	"data":{"message":"1008", "function":"1320","debug_msg":null}}$$);';
 			END IF;
 			
@@ -175,7 +175,7 @@ BEGIN
 			
 			-- control error without any mapzones defined on the table of mapzone
 			IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		       	"data":{"message":"1012", "function":"1320","debug_msg":null}}$$);';
 			END IF;
 			
@@ -207,7 +207,7 @@ BEGIN
 			
 			-- control error without any mapzones defined on the table of mapzone
 			IF ((SELECT COUNT(*) FROM presszone) = 0) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		       	"data":{"message":"3106", "function":"1320","debug_msg":null}}$$);';
 			END IF;
 			
@@ -238,7 +238,7 @@ BEGIN
 			
 			-- control error without any mapzones defined on the table of mapzone
 			IF ((SELECT COUNT(*) FROM ext_municipality) = 0) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		       	"data":{"message":"3110", "function":"1320","debug_msg":null}}$$);';
 			END IF;
 			
@@ -260,7 +260,7 @@ BEGIN
 			
 			-- control error when no value
 			IF (NEW.muni_id IS NULL) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"2024", "function":"1320","debug_msg":"'||NEW.node_id::text||'"}}$$);';
 			END IF;            
 		END IF;
@@ -279,7 +279,7 @@ BEGIN
 
 		--check relation state - state_type
 		IF NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"3036", "function":"1320","debug_msg":"'||NEW.state::text||'"}}$$);';
 		END IF;
 		
@@ -621,7 +621,7 @@ BEGIN
 				IF NEW.state_type IS NULL THEN
 				NEW.state_type=(SELECT id from value_state_type WHERE state=0 LIMIT 1);
 					IF NEW.state_type IS NULL THEN
-						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
         				"data":{"message":"2110", "function":"1320","debug_msg":null}}$$);';
 					END IF;
 				END IF;
@@ -630,7 +630,7 @@ BEGIN
 		
 		--check relation state - state_type
 		IF (NEW.state_type != OLD.state_type) AND NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"3036", "function":"1320","debug_msg":"'||NEW.state::text||'"}}$$);';
 		END IF;
 
@@ -836,7 +836,7 @@ BEGIN
    -- DELETE
    ELSIF TG_OP = 'DELETE' THEN
 
-		EXECUTE 'SELECT gw_fct_check_delete($${"client":{"device":3, "infoType":100, "lang":"ES"},
+		EXECUTE 'SELECT gw_fct_check_delete($${"client":{"device":4, "infoType":1, "lang":"ES"},
 		"feature":{"id":"'||OLD.node_id||'","featureType":"NODE"}, "data":{}}$$)';
 
 		-- delete from polygon table (before the deletion of node)

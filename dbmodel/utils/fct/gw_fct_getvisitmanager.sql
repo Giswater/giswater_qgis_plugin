@@ -15,7 +15,7 @@ $BODY$
 
 -- calling button from feature
 SELECT SCHEMA_NAME.gw_fct_getvisitmanager($${
-"client":{"device":3,"infoType":100,"lang":"es"},
+"client":{"device":4,"infoType":1,"lang":"es"},
 "form":{},
 "data":{"relatedFeature":{"type":"arc", "idName":"arc_id", "id":"2074"},"fields":{},"pageInfo":null}}$$)
 
@@ -23,25 +23,25 @@ SELECT SCHEMA_NAME.gw_fct_getvisitmanager($${
 -- calling without previous info
 --new call
 SELECT SCHEMA_NAME.gw_fct_getvisitmanager($${
-"client":{"device":3,"infoType":100,"lang":"es"},
+"client":{"device":4,"infoType":1,"lang":"es"},
 "form":{},
 "data":{}}$$)
 
-SELECT SCHEMA_NAME.gw_fct_getvisitmanager($${"client":{"device":3,"infoType":100,"lang":"es"},
+SELECT SCHEMA_NAME.gw_fct_getvisitmanager($${"client":{"device":4,"infoType":1,"lang":"es"},
      "feature":{"featureType":"visit","tableName":"v_visit_lot_user","idName":"user_id","id":"xtorret"},"form":{"tabData":{"active":false},"tabLots":{"active":true},"navigation":{"currentActiveTab":"tabData"}},
        "data":{"relatedFeature":{"type":"arc", "id":"2079"},"fields":{"user_id":"xtorret","date":"2019-01-28","team_id":"1","vehicle_id":"3"},"pageInfo":null}}$$) AS result
 
 
 -- change from tab data to tab files (upserting data on tabData)
 SELECT SCHEMA_NAME.gw_fct_getvisitmanager($${
-"client":{"device":3,"infoType":100,"lang":"es"},
+"client":{"device":4,"infoType":1,"lang":"es"},
 "feature":{"featureType":"visit","tableName":"v_visit_lot_user","idName":"user_id","id":"xtorret"},
 "form":{"tabData":{"active":false}, "tabLots":{"active":true},"navigation":{"currentActiveTab":"tabData"}},
 "data":{"fields":{"user_id":"xtorret","team_id":1,"vehicle_id":1,"date":"2019-01-01"}}}$$)
 
 --tab activelots
 SELECT SCHEMA_NAME.gw_fct_getvisitmanager($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{},
 "form":{"tabData":{"active":false}, "tabLots":{"active":true}}, "navigation":{"currentActiveTab":"tabLots"}, 
 "data":{"filterFields":{"limit":10},
@@ -281,7 +281,7 @@ BEGIN
 						ELSIF (aux_json->>'columnname')='lot_id' AND v_team IS NOT NULL THEN
 							
 							EXECUTE ('SELECT gw_fct_getchilds($${
-							"client":{"device":3, "infoType":100, "lang":"ES"},
+							"client":{"device":4, "infoType":1, "lang":"ES"},
 							"form":{},
 							"feature":{"tableName":"visitManager"},
 							"data":{"comboParent":"team_id", "comboId":' || v_team || '}}$$)') INTO v_child_result;

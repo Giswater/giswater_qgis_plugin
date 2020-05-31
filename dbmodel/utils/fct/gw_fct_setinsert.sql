@@ -14,13 +14,13 @@ $BODY$
 /* example
 -- Indirects
 visit: (query used on setvisit function, not direct from client)
-SELECT "SCHEMA_NAME".gw_fct_setinsert($${"client":{"device":3, "infoType":100, "lang":"ES"}, 
+SELECT "SCHEMA_NAME".gw_fct_setinsert($${"client":{"device":4, "infoType":1, "lang":"ES"},
 	"feature":{"featureType":"visit", "tableName":"ve_visit_arc_insp", "id":null, "idName": "visit_id"}, 
 	"data":{"fields":{"class_id":6, "arc_id":"2001", "visitcat_id":1, "ext_code":"testcode", "sediments_arc":10, "desperfectes_arc":1, "neteja_arc":3},
 		"deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}}$$)
 
 file: (query used on setfileinsert function, not direct from client)
-SELECT "SCHEMA_NAME".gw_fct_setinsert($${"client":{"device":3, "infoType":100, "lang":"ES"}, 
+SELECT "SCHEMA_NAME".gw_fct_setinsert($${"client":{"device":4, "infoType":1, "lang":"ES"},
 	"feature":{"featureType":"file","tableName":"om_visit_file", "id":null, "idName": "id"}, 
 	"data":{"fields":{"visit_id":1, "hash":"testhash", "url":"urltest", "filetype":"png"},
 		"deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}}$$)
@@ -28,7 +28,7 @@ SELECT "SCHEMA_NAME".gw_fct_setinsert($${"client":{"device":3, "infoType":100, "
 -- directs
 feature:
 SELECT "SCHEMA_NAME".gw_fct_setinsert($${
-"client":{"device":9, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{},
 "feature":{"featureType":"node", "tableName":"v_edit_node", "id":"1251521", "idName": "node_id"},
 	"data":{"fields":{"macrosector_id": "1", "sector_id": "2", "nodecat_id":"JUNCTION DN63", "dma_id":"2","undelete": "False", "inventory": "False", 
@@ -197,7 +197,7 @@ BEGIN
 	v_feature =  gw_fct_json_object_set_key (v_feature, 'id', v_newid);
 
 	-- set message
-	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 	"data":{"message":"3118", "function":"2616","debug_msg":""}}$$);'INTO v_message;
 	
 	RAISE NOTICE '--- Returning from (gw_fct_setinsert) with this message :: % ---', v_message;

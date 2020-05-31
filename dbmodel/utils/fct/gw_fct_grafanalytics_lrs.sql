@@ -94,7 +94,7 @@ BEGIN
 	v_fid = 216;
 
 	-- data quality analysis
-	v_input = '{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}'::json;
+	v_input = '{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}'::json;
 	PERFORM gw_fct_om_check_data(v_input);
 
 	-- todo: manage result of quality data in case of errors

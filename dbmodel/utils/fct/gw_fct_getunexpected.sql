@@ -13,7 +13,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getunexpected(p_data json)
 $BODY$
 /*
 -- unexpected first call
-SELECT SCHEMA_NAME.gw_fct_getunexpected($${"client":{"device":3,"infoType":100,"lang":"es"},
+SELECT SCHEMA_NAME.gw_fct_getunexpected($${"client":{"device":4,"infoType":1,"lang":"es"},
 "form":{},"data":{"relatedFeature":{"type":"arc", "id":"2074"},"fields":{},"pageInfo":null}}$$)
 */
 

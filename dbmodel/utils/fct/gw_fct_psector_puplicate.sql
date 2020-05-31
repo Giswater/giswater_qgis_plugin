@@ -12,7 +12,7 @@ $BODY$
 
 /*
 SELECT SCHEMA_NAME.gw_fct_psector_duplicate($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{},"feature":{"type":"PSECTOR"},
 "data":{"psector_id":"1","new_psector_name":"new_psector"}}$$);
 

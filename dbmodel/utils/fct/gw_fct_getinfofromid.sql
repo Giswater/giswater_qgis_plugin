@@ -15,34 +15,34 @@ $BODY$
 UPSERT FEATURE 
 arc no nodes extremals
 SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
-		"client":{"device":9, "infoType":100, "lang":"ES"},
+		"client":{"device":4, "infoType":1, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_arc_pipe", "inputGeometry":"0102000020E7640000020000000056560000A083198641000000669A33C041000000E829D880410000D0AE90F0F341" },
 		"data":{}}$$)
 arc with nodes extremals
 SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
-		"client":{"device":9, "infoType":100, "lang":"ES"},
+		"client":{"device":4, "infoType":1, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_arc_pipe", "inputGeometry":"0102000020E764000002000000998B3C512F881941B28315AA7F76514105968D7D748819419FDF72D781765141" },
 		"data":{}}$$)
 INFO BASIC
 SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
-		"client":{"device":9, "infoType":100, "lang":"ES"},
+		"client":{"device":4, "infoType":1, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_arc_pipe", "id":"2001"},
 		"data":{}}$$)
 SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
-		"client":{"device":9, "infoType":100, "lang":"ES"},
+		"client":{"device":4, "infoType":1, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_node_junction", "id":"1001"},
 		"data":{}}$$)
 SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
-		"client":{"device":9, "infoType":100, "lang":"ES"},
+		"client":{"device":4, "infoType":1, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_connec_wjoin", "id":"3001"},
 		"data":{}}$$)
 SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
-		"client":{"device":9, "infoType":100, "lang":"ES"},
+		"client":{"device":4, "infoType":1, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_element", "id":"125101"},
 		"data":{}}$$)
@@ -51,14 +51,14 @@ SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
 INFO EPA
 -- epa not defined
 SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
-		"client":{"device":9, "infoType":100, "lang":"ES"},
+		"client":{"device":4, "infoType":1, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_arc", "id":"2220"},
 		"data":{"toolBar":"epa"}}$$)
 
 -- epa defined
 SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
-		"client":{"device":9, "infoType":100, "lang":"ES"},
+		"client":{"device":4, "infoType":1, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_arc", "id":"2001"},
 		"data":{"toolBar":"epa"}}$$)

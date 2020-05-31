@@ -13,7 +13,7 @@ $BODY$
 
 /*EXAMPLE
 SELECT gw_fct_admin_check_data($${"client":
-{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, 
+{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
 "data":{"filterFields":{}, "pageInfo":{}, "parameters":{}}}$$)::text
 
 -- fid: 195

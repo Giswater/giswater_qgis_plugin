@@ -88,11 +88,11 @@ DELETE FROM selector_psector;
 UPDATE connec SET state=2, state_type=3 WHERE connec_id='3080';
 UPDATE gully SET state=2, state_type=3 WHERE gully_id IN ('30070','30072','30110');
 
-SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100,"lang":"ES"},"feature":{"id":
+SELECT gw_fct_connect_to_network($${"client":{"device":4, "infoType":1,"lang":"ES"},"feature":{"id":
 "SELECT array_to_json(array_agg(connec_id::text)) FROM v_edit_connec WHERE connec_id IS NOT NULL AND state=1"},
 "data":{"feature_type":"CONNEC"}}$$);
 
-SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100,"lang":"ES"},"feature":{"id":
+SELECT gw_fct_connect_to_network($${"client":{"device":4, "infoType":1,"lang":"ES"},"feature":{"id":
 "SELECT array_to_json(array_agg(gully_id::text)) FROM v_edit_gully WHERE gully_id IS NOT NULL AND state=1"},
 "data":{"feature_type":"GULLY"}}$$);
 
@@ -100,7 +100,7 @@ SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100,"lang":
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_link_connecrotation_update', TRUE, current_user);
 UPDATE link SET the_geom=the_geom;
 
-SELECT gw_fct_plan_result($${"client":{"device":3, "infoType":100, "lang":"ES"},
+SELECT gw_fct_plan_result($${"client":{"device":4, "infoType":1, "lang":"ES"},
 							"feature":{},"data":{"parameters":{"coefficient":1, "description":"Demo prices for reconstruction", "resultType":1, "resultId":"Starting prices","saveOnDatabase":true}}}$$);
 							
 SELECT gw_fct_fill_doc_tables();
@@ -118,9 +118,9 @@ update connec set link='https://www.giswater.org';
 update gully set link='https://www.giswater.org';
 
 
-SELECT gw_fct_audit_check_project($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "version":"0", "fid":1}}$$)::text;
+SELECT gw_fct_audit_check_project($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "version":"0", "fid":1}}$$)::text;
 
-SELECT 	gw_fct_admin_manage_child_views($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{"catFeature":"CONDUIT"},
+SELECT 	gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"CONDUIT"},
  "data":{"filterFields":{}, "pageInfo":{}, "multi_create":"TRUE" }}$$);
 
 
@@ -275,7 +275,7 @@ SELECT sector_id, current_user FROM sector
 ON CONFLICT (sector_id, cur_user) DO NOTHING;
 
 
-SELECT gw_fct_pg2epa_main($${"client":{"device":3, "infoType":100, "lang":"ES"}, 
+SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES"},
 "data":{"resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true"}}$$);
 
 UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'audit_project_user_control';

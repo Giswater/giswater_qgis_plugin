@@ -267,7 +267,7 @@ BEGIN
 			
 		END IF;
 	ELSIF v_visit_type = 2 AND  v_schema = 'TM'THEN
-		EXECUTE 'SELECT tm_fct_incident($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{},
+		EXECUTE 'SELECT tm_fct_incident($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
 		"data":{"action":"INSERT", "visit_id":'||visit_id_aux||'}}$$);';
 	END IF;
 

@@ -34,14 +34,14 @@ BEGIN
 	
 		-- control of the position_value againts arc length
 		IF NEW.position_value <0 OR NEW.position_value> ST_length(v_the_geom) THEN
-            EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+            EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
        		"data":{"message":"3012", "function":"2498","debug_msg":"'||v_arc_id::text||'"}}$$);';
 
 		END IF;
 
 		-- control of the position_id againsts arc's node_1 and node_2
 		IF NEW.position_id!=v_node_1 AND NEW.position_id!=v_node_2 THEN
-            EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+            EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
        		"data":{"message":"3014", "function":"2498","debug_msg":"'||v_arc_id::text||'"}}$$);';
 		ELSIF NEW.position_id=v_node_2 THEN
 			v_the_geom = ST_reverse(v_the_geom);

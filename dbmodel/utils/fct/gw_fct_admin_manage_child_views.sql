@@ -12,13 +12,13 @@ $BODY$
 
 /*EXAMPLE
 
-SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{"catFeature":"T"},
+SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"T"},
  "data":{"filterFields":{}, "pageInfo":{}, "multi_create":"False" }}$$);
 
-SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{},
+SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
  "data":{"filterFields":{}, "pageInfo":{}, "multi_create":"True" }}$$);
 
-SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{},
+SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
  "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-DELETE" }}$$);
 */
 
@@ -228,7 +228,7 @@ BEGIN
 				END IF;
 
 				IF 	v_viewname NOT IN (SELECT formname FROM config_form_fields) THEN
-					EXECUTE 'SELECT gw_fct_admin_manage_child_config($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, 
+					EXECUTE 'SELECT gw_fct_admin_manage_child_config($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
 					"feature":{"catFeature":"'||v_cat_feature||'"}, 
 					"data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'", "feature_type":"'||v_feature_type||'" }}$$);';
 				END IF;
@@ -354,7 +354,7 @@ BEGIN
 				END IF;
 
 			IF 	v_viewname NOT IN (SELECT formname FROM config_form_fields) THEN
-				EXECUTE 'SELECT gw_fct_admin_manage_child_config($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, 
+				EXECUTE 'SELECT gw_fct_admin_manage_child_config($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
 				"feature":{"catFeature":"'||v_cat_feature||'"}, 
 				"data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'", "feature_type":"'||v_feature_type||'" }}$$);';
 			END IF;

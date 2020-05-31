@@ -22,7 +22,7 @@ BEGIN
 
    -- ELSIF TG_OP = 'UPDATE' THEN
         
-            --PERFORM gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
+            --PERFORM gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
             -- "data":{"message":"2", "function":"XXX","debug_msg":null, "variables":null}}$$); 
         RETURN NEW;
 
@@ -31,7 +31,7 @@ BEGIN
             v_sql:= 'DELETE FROM '||event_table||' WHERE id = '||quote_literal(OLD.event_id)||';';
             EXECUTE v_sql;
    
-        --PERFORM gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
+        --PERFORM gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                  -- "data":{"message":"3", "function":"XXX","debug_msg":null, "variables":null}}$$); 
         RETURN NULL;
     

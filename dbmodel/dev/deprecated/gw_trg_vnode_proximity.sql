@@ -34,7 +34,7 @@ BEGIN
     -- If there is an existing vnode closer than 'rec.node_tolerance' meters --> error
     IF (numNodes > 0) AND (rec.node_proximity_control IS TRUE) THEN
 
-        PERFORM gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, "data":{"message":"2020", "function":"1142","debug":null}}$$);
+        PERFORM gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{}, "data":{"message":"2020", "function":"1142","debug":null}}$$);
         
     END IF;
 

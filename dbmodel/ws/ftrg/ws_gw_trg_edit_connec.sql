@@ -76,7 +76,7 @@ BEGIN
 		-- connec Catalog ID
 		IF (NEW.connecat_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM cat_connec) = 0) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			  "data":{"message":"1022", "function":"1304","debug_msg":null, "variables":null}}$$);';
 			END IF;
 
@@ -92,7 +92,7 @@ BEGIN
 			END IF;
 
 			IF (NEW.connecat_id IS NULL) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				 "data":{"message":"1086", "function":"1304","debug_msg":null, "variables":null}}$$);';
 			END IF;				
 		END IF;
@@ -102,7 +102,7 @@ BEGIN
 			
 			-- control error without any mapzones defined on the table of mapzone
 			IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"1110", "function":"1304","debug_msg":null}}$$);';
 			END IF;
 			
@@ -124,7 +124,7 @@ BEGIN
 			
 			-- control error when no value
 			IF (NEW.expl_id IS NULL) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"2012", "function":"1304","debug_msg":"'||NEW.connec_id::text||'"}}$$);';
 			END IF;            
 		END IF;
@@ -134,7 +134,7 @@ BEGIN
 			
 			-- control error without any mapzones defined on the table of mapzone
 			IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"1008", "function":"1304","debug_msg":null}}$$);';
 			END IF;
 			
@@ -165,7 +165,7 @@ BEGIN
 			
 			-- control error without any mapzones defined on the table of mapzone
 			IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"1012", "function":"1304","debug_msg":null}}$$);';
 			END IF;
 			
@@ -197,7 +197,7 @@ BEGIN
 			
 			-- control error without any mapzones defined on the table of mapzone
 			IF ((SELECT COUNT(*) FROM presszone) = 0) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"3106", "function":"1304","debug_msg":null}}$$);';
 			END IF;
 			
@@ -229,7 +229,7 @@ BEGIN
 			
 			-- control error without any mapzones defined on the table of mapzone
 			IF ((SELECT COUNT(*) FROM ext_municipality) = 0) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"3110", "function":"1304","debug_msg":null}}$$);';
 			END IF;
 			
@@ -251,7 +251,7 @@ BEGIN
 			
 			-- control error when no value
 			IF (NEW.muni_id IS NULL) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"2024", "function":"1304","debug_msg":"'||NEW.connec_id::text||'"}}$$);';
 			END IF;            
 		END IF;
@@ -269,7 +269,7 @@ BEGIN
 			
 			--check relation state - state_type
 		IF NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"3036", "function":"1318","debug_msg":"'||NEW.state::text||'"}}$$);';
 		END IF;
 
@@ -445,7 +445,7 @@ BEGIN
 			IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connec_automatic_link'
 			AND cur_user=current_user LIMIT 1) IS TRUE THEN
 
-				EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
+				EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":4, "infoType":1, "lang":"ES"},
 				"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';
 				SELECT arc_id INTO v_arc_id FROM connec WHERE connec_id=NEW.connec_id;
 			END IF;
@@ -453,7 +453,7 @@ BEGIN
 		ELSIF NEW.state=2 THEN
 			-- for planned connects always must exits link defined because alternatives will use parameters and rows of that defined link adding only geometry defined on plan_psector
 
-			EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
+			EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":4, "infoType":1, "lang":"ES"},
 			"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';
 
 			-- for planned connects always must exits arc_id defined on the default psector because it is impossible to draw a new planned link. Unique option for user is modify the existing automatic link
@@ -514,12 +514,12 @@ BEGIN
 			IF (SELECT link_id FROM link WHERE feature_id=NEW.connec_id AND feature_type='CONNEC' LIMIT 1) IS NOT NULL THEN
 				UPDATE vnode SET vnode_type='AUTO' WHERE vnode_id=(SELECT exit_id FROM link WHERE feature_id=NEW.connec_id AND exit_type='VNODE' LIMIT 1)::int8;
 
-				EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
+				EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":4, "infoType":1, "lang":"ES"},
 				"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';
 				
 			ELSIF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connec_automatic_link' AND cur_user=current_user LIMIT 1) IS TRUE THEN
 				
-				EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":3, "infoType":100, "lang":"ES"},
+				EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":4, "infoType":1, "lang":"ES"},
 				"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';
 			END IF;
 		ELSIF (OLD.arc_id != (SELECT arc_id FROM connec WHERE connec_id=NEW.connec_id)) THEN -- case when arc_id comes from plan psector tables
@@ -548,7 +548,7 @@ BEGIN
 				IF NEW.state_type IS NULL THEN
 					NEW.state_type=(SELECT id from value_state_type WHERE state=0 LIMIT 1);
 					IF NEW.state_type IS NULL THEN
-						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
       	 				 "data":{"message":"2110", "function":"1318","debug_msg":null}}$$);';
 					END IF;
 				END IF;
@@ -565,7 +565,7 @@ BEGIN
 		--check relation state - state_type
 		IF (NEW.state_type != OLD.state_type) THEN
 			IF NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"3036", "function":"1318","debug_msg":"'||NEW.state::text||'"}}$$);';
 			ELSE
 				UPDATE connec SET state_type=NEW.state_type WHERE connec_id = OLD.connec_id;
@@ -669,7 +669,7 @@ BEGIN
 
 	ELSIF TG_OP = 'DELETE' THEN
 	
-		EXECUTE 'SELECT gw_fct_check_delete($${"client":{"device":3, "infoType":100, "lang":"ES"},
+		EXECUTE 'SELECT gw_fct_check_delete($${"client":{"device":4, "infoType":1, "lang":"ES"},
 		"feature":{"id":"'||OLD.connec_id||'","featureType":"CONNEC"}, "data":{}}$$)';
 
 		IF v_man_table ='man_fountain'  THEN

@@ -13,7 +13,7 @@ $BODY$
 
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_anl_node_orphan($${
-"client":{"device":9, "infoType":100, "lang":"ES"}, 
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{}, "feature":{"tableName":"v_edit_node", "featureType":"NODE", "id":[]}, 
 "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
 "parameters":{"isArcDivide":"true", "saveOnDatabase":"true"}}}$$)::text

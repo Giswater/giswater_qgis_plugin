@@ -177,7 +177,7 @@ BEGIN
 
 	-- data quality analysis
 	IF v_checkdata THEN
-		v_input = '{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}'::json;
+		v_input = '{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}'::json;
 		PERFORM gw_fct_om_check_data(v_input);
 		SELECT count(*) INTO v_count FROM audit_check_data WHERE cur_user="current_user"() AND fid=125 AND criticity=3;
 	END IF;
@@ -232,7 +232,7 @@ BEGIN
 		v_mapzonename = 'name';
 	ELSE
 		
-		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		"data":{"message":"3090", "function":"2710","debug_msg":null}}$$);'  INTO v_audit_result;
 	END IF;
 	
@@ -271,7 +271,7 @@ BEGIN
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('----------------------------------------------------------'));
 
 		-- trigger data quality analysis
-		v_input = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors", "grafClass":',quote_ident(v_class),'}}}')::json;
+		v_input = concat('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors", "grafClass":',quote_ident(v_class),'}}}')::json;
 		PERFORM gw_fct_grafanalytics_check_data(v_input);
 
 		-- (1) check if mapzone process is enabled in order to continue or not

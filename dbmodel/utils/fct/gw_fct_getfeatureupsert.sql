@@ -449,7 +449,7 @@ BEGIN
 	-- gettingf minvalue & maxvalues for widgetcontrols
 	IF v_project_type = 'UD' THEN
 
-		v_input = '{"client":{"device":3,"infoType":100,"lang":"es"}, "feature":{"featureType":"'||v_catfeature.feature_type||'", "id":"'||p_id||'"}, "data":{"tgOp":"'||p_tg_op||'", "node1":"'||v_node1||'", "node2":"'||v_node2||'"}}';	
+		v_input = '{"client":{"device":4,"infoType":1,"lang":"es"}, "feature":{"featureType":"'||v_catfeature.feature_type||'", "id":"'||p_id||'"}, "data":{"tgOp":"'||p_tg_op||'", "node1":"'||v_node1||'", "node2":"'||v_node2||'"}}';
 		SELECT gw_fct_getwidgetvalues (v_input) INTO v_widgetvalues;
 		
 	END IF;	

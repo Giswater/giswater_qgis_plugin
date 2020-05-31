@@ -12,7 +12,7 @@ $BODY$
 
 /*
 SELECT SCHEMA_NAME.gw_fct_admin_manage_roles($${
-"client":{"device":9, "infoType":100, "lang":"ES"}, 
+"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{}, "data":{"action":"CREATE"}}$$);
 */
 

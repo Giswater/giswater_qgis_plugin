@@ -25,7 +25,7 @@ BEGIN
         				
 		--Exploitation ID
             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
         		"data":{"message":"1110", "function":"1312","debug_msg":null}}$$);';
 				RETURN NULL;				
             END IF;
@@ -50,7 +50,7 @@ BEGIN
 			WHERE macrodqa_id=NEW.macrodqa_id;
 			
 	
-        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
         		"data":{"message":"2", "function":"1312","debug_msg":null}}$$);';
         RETURN NEW;
 
@@ -59,7 +59,7 @@ BEGIN
 				DELETE FROM macrodqa WHERE macrodqa_id=OLD.macrodqa_id;
 		
 		
-        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
         "data":{"message":"3", "function":"1312","debug_msg":null}}$$);'; 
         RETURN NULL;
      

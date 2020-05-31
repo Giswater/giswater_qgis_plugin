@@ -17,7 +17,7 @@ BEGIN
    
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
-         -- PERFORM gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
+         -- PERFORM gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
              -- "data":{"message":"2", "function":"1310","debug_msg":null, "variables":null}}$$); 
         RETURN NEW;
 
@@ -26,14 +26,14 @@ BEGIN
         UPDATE ext_rtc_hydrometer_x_data 
         SET custom_sum=NEW.custom_sum
         WHERE id=OLD.id;
-         -- PERFORM gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
+         -- PERFORM gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
          -- "data":{"message":"2", "function":"1310","debug_msg":null, "variables":null}}$$); 
 
         RETURN NEW;
         
     ELSIF TG_OP = 'DELETE' THEN
 
-         -- PERFORM gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},
+         -- PERFORM gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
          -- "data":{"message":"1032", "function":"1310","debug_msg":null, "variables":null}}$$); 
         RETURN NEW;
     

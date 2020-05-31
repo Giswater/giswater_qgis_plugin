@@ -27,7 +27,7 @@ BEGIN
         			
 		--Exploitation ID
             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-                --PERFORM gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+                --PERFORM gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				--"data":{"message":"1110", "function":"1330","debug_msg":null, "variables":null}}$$);
 				RETURN NULL;				
             END IF;
@@ -48,7 +48,7 @@ BEGIN
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
 
-               --PERFORM gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+               --PERFORM gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				--"data":{"message":"1012", "function":"1330","debug_msg":null, "variables":null}}$$);
                 RETURN NULL;                         
             END IF;
@@ -57,7 +57,7 @@ BEGIN
 				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_dma_vdefault' AND "cur_user"="current_user"());
 			END IF; 
             IF (NEW.dma_id IS NULL) THEN
-             --PERFORM gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+             --PERFORM gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				--"data":{"message":"1014", "function":"1330","debug_msg":null, "variables":null}}$$);
                 RETURN NULL; 
             END IF;
@@ -111,7 +111,7 @@ BEGIN
 		
 		END IF;
 		
-        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"2", "function":"1302","debug_msg":null}}$$);';
         RETURN NEW;
 
@@ -126,7 +126,7 @@ BEGIN
 
 			END IF;
 		
-        PERFORM gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+        PERFORM gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		"data":{"message":"3", "function":"1302","debug_msg":null, "variables":null}}$$);
         RETURN NULL;
      

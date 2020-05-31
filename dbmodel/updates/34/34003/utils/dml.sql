@@ -118,8 +118,8 @@ UPDATE config_param_system SET layoutname = 'lyt_analysis' WHERE layout_id = 16;
 UPDATE config_param_system SET layoutname = 'lyt_system' WHERE layout_id = 17;
 
 UPDATE audit_cat_function set sample_query =
-'{"WS":{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{"type":"NODE"},"data":{"old_feature_id":"node_id","workcat_id_end":"work1", "enddate":"2019-05-17","keep_elements":true }},
-"UD":{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{"type":"NODE"},"data":{"old_feature_id":"node_id","workcat_id_end":"work1", "enddate":"2019-05-17","keep_elements":true }}}'
+'{"WS":{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"type":"NODE"},"data":{"old_feature_id":"node_id","workcat_id_end":"work1", "enddate":"2019-05-17","keep_elements":true }},
+"UD":{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"type":"NODE"},"data":{"old_feature_id":"node_id","workcat_id_end":"work1", "enddate":"2019-05-17","keep_elements":true }}}'
 where function_name = 'gw_fct_feature_replace';
 
 INSERT INTO audit_cat_function(id, function_name, project_type, function_type, input_params, return_type, context, descript, sys_role_id, 
