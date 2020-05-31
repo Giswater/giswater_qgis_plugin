@@ -74,7 +74,7 @@ BEGIN
 	-------------------------
     SELECT * INTO rec_tab FROM config_form_tabs WHERE formname='search' AND tabname='tab_network' ;
 
-    IF rec_tab.id IS NOT NULL THEN
+    IF rec_tab.formname IS NOT NULL THEN
 
         -- Init combo json
         SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND columnname='net_type';
@@ -127,7 +127,7 @@ BEGIN
 	-- Search tab
 	-------------
     SELECT * INTO rec_tab FROM config_form_tabs WHERE formname='search' AND tabname='tab_search' ;
-    IF rec_tab.id IS NOT NULL THEN
+    IF rec_tab.formname IS NOT NULL THEN
     
         -- Create search field
         SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND columnname='generic_search';
@@ -156,7 +156,7 @@ BEGIN
 	-- Address tab
 	-------------
     SELECT * INTO rec_tab FROM config_form_tabs WHERE formname='search' AND tabname='tab_address' ;
-    IF rec_tab.id IS NOT NULL THEN
+    IF rec_tab.formname IS NOT NULL THEN
 
         -- Parameters of the municipality layer
         SELECT ((value::json)->>'sys_table_id') INTO v_search_muni_table FROM config_param_system WHERE parameter='basic_search_muni';
@@ -238,7 +238,7 @@ BEGIN
 	-- Hydro tab
 	------------
     SELECT * INTO rec_tab FROM config_form_tabs WHERE formname='search' AND tabname='tab_hydro' ;
-    IF rec_tab.id IS NOT NULL THEN
+    IF rec_tab.formname IS NOT NULL THEN
 
         -- Init combo json
         SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND columnname='hydro_expl';
@@ -302,7 +302,7 @@ BEGIN
 	-- Workcat tab
 	--------------
     SELECT * INTO rec_tab FROM config_form_tabs WHERE formname='search' AND tabname='tab_workcat' ;
-    IF rec_tab.id IS NOT NULL THEN
+    IF rec_tab.formname IS NOT NULL THEN
 
         -- Add edit box to introduce search text
         SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND columnname='workcat_search';
@@ -333,7 +333,7 @@ BEGIN
 	-- Psector tab
 	--------------
     SELECT * INTO rec_tab FROM config_form_tabs WHERE formname='search' AND tabname='tab_psector' ;
-    IF rec_tab.id IS NOT NULL THEN
+    IF rec_tab.formname IS NOT NULL THEN
 
         -- Init combo json
         SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND columnname='psector_expl';
@@ -394,7 +394,7 @@ BEGIN
 	-- Visit tab
 	--------------
     SELECT * INTO rec_tab FROM config_form_tabs WHERE formname='search' AND tabname='tab_visit' ;
-    IF rec_tab.id IS NOT NULL THEN
+    IF rec_tab.formname IS NOT NULL THEN
 
         -- Add edit box to introduce search text
         SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND columnname='visit_search';

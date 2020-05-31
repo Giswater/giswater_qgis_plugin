@@ -35,7 +35,7 @@ ON CONFLICT (id) DO NOTHING;
 
 
 UPDATE config_param_system SET value =
-'{"table":"anl_mincut_result_cat", "table_id":"id", "selector":"anl_mincut_result_selector", "selector_id":"result_id", "label":"id, ''('', CASE WHEN work_order IS NULL THEN ''N/I'' ELSE work_order END, '') on '', forecast_start::date, '' at '', forecast_start::time, ''H-'', forecast_end::time,''H''", "query_filter":" AND id > 0 "}'
+'{"table":"om_mincut", "table_id":"id", "selector":"selector_mincut_result", "selector_id":"result_id", "label":"id, ''('', CASE WHEN work_order IS NULL THEN ''N/I'' ELSE work_order END, '') on '', forecast_start::date, '' at '', forecast_start::time, ''H-'', forecast_end::time,''H''", "query_filter":" AND id > 0 "}'
 WHERE parameter = 'api_selector_mincut';
 
 

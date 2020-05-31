@@ -271,7 +271,7 @@ BEGIN
 
 	--check if definitions has duplicated layoutorder for different layouts -
 	SELECT array_agg(a.list::text) into v_field_array FROM (SELECT concat('Formname: ',formname, ', layoutname: ',layoutname, ', layoutorder: ',layoutorder) as list
-	FROM config_form_fields WHERE formtype = 'feature' AND hidden is false group by layoutorder,formname,layoutname having count(id)>1)a;
+	FROM config_form_fields WHERE formtype = 'feature' AND hidden is false group by layoutorder,formname,layoutname having count(*)>1)a;
 
 	IF v_field_array IS NOT NULL THEN
 		v_errortext=concat('ERROR: There is/are form names with duplicated layout order defined in config_form_fields: ');

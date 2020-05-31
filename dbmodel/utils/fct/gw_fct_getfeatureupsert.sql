@@ -371,7 +371,7 @@ BEGIN
 		PERFORM gw_fct_debug(concat('{"data":{"msg":"--> Configuration fields are defined on layoutorder table <--", "variables":""}}')::json);
 
 		-- Call the function of feature fields generation
-		SELECT formtype INTO v_formtype FROM layoutorder WHERE formname = p_table_id LIMIT 1;
+		SELECT formtype INTO v_formtype FROM config_form_fields WHERE formname = p_table_id LIMIT 1;
 		SELECT gw_fct_getformfields( v_formname, v_formtype, v_tabname, v_tablename, p_idname, p_id, p_columntype, p_tg_op, null, p_device , v_values_array) INTO v_fields_array;
 
 	ELSE	
@@ -614,10 +614,6 @@ BEGIN
 			'}')::json;
 	END IF;
 		
-	-- Exception handling
-	EXCEPTION WHEN OTHERS THEN 
-	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
-
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

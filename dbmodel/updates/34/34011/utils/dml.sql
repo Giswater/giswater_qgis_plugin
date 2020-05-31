@@ -253,6 +253,6 @@ UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'om_visit_fil
 UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'price_compost', 'plan_price') WHERE dv_querytext like '%price_compost%';
 UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'price_cat_simple', 'plan_price_cat') WHERE dv_querytext like '%price_cat_simple%';
 
-DELETE FROM config_form_images WHERE idval ='bmaps';
-UPDATE config_form_images SET id = 1 WHERE idval = 'ws_shape';
+DELETE FROM sys_image WHERE idval ='bmaps';
+UPDATE sys_image SET id = 1 WHERE idval = 'ws_shape';
 

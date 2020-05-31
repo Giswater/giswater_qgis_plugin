@@ -119,9 +119,9 @@ ALTER TABLE config_form_groupbox DROP COLUMN id;
 UPDATE sys_table SET sys_sequence = null, sys_sequence_field = null WHERE id = 'config_form_groupbox';
 
 
---config_form_images
-DELETE FROM config_form_images WHERE idval ='bmaps';
-UPDATE config_form_images SET id = 1 WHERE idval = 'ws_shape';
+--sys_image
+DELETE FROM sys_image WHERE idval ='bmaps';
+UPDATE sys_image SET id = 1 WHERE idval = 'ws_shape';
 
 
 -- config form list

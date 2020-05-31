@@ -90,7 +90,7 @@ UPDATE config_form_fields SET widgetfunction = 'open_url' WHERE widgetfunction =
 UPDATE config_form_fields SET widgetfunction = 'info_node' WHERE widgetfunction = 'gw_api_open_node';
 UPDATE config_form_fields SET widgetfunction = NULL WHERE widgetfunction = 'get_catalog_id';
 
-UPDATE config_form_fields SET dv_querytext = replace (dv_querytext, 'config_api_images', 'config_form_images');
+UPDATE config_form_fields SET dv_querytext = replace (dv_querytext, 'config_api_images', 'sys_image');
 UPDATE config_form_fields SET dv_querytext = replace (dv_querytext, 'config_api_typevalue', 'config_typevalue');
 
 

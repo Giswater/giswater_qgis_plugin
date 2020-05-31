@@ -105,7 +105,7 @@ UPDATE sys_table SET id ='config_form' WHERE id ='config_api_form';
 UPDATE sys_table SET id ='config_form_fields' WHERE id ='config_api_form_fields';
 UPDATE sys_table SET id ='config_form_groupbox' WHERE id ='config_api_form_groupbox';
 UPDATE sys_table SET id ='config_form_tabs' WHERE id ='config_api_form_tabs';
-UPDATE sys_table SET id ='config_form_images' WHERE id ='config_api_images';
+UPDATE sys_table SET id ='sys_image' WHERE id ='config_api_images';
 UPDATE sys_table SET id ='config_info_layer' WHERE id ='config_api_layer';
 UPDATE sys_table SET id ='config_form_list' WHERE id ='config_api_list';
 UPDATE sys_table SET id ='config_info_table_x_type' WHERE id ='config_api_tableinfo_x_infotype';
@@ -156,7 +156,7 @@ UPDATE sys_table SET sys_sequence ='config_form_fields_id_seq' WHERE id ='config
 UPDATE sys_table SET sys_sequence ='config_form_groupbox_id_seq' WHERE id ='config_form_groupbox';
 UPDATE sys_table SET sys_sequence ='config_form_id_seq' WHERE id ='config_form';
 UPDATE sys_table SET sys_sequence ='config_form_layout_id_seq' WHERE id ='config_form_layout';
-UPDATE sys_table SET sys_sequence ='config_form_images_id_seq' WHERE id ='config_form_images';
+UPDATE sys_table SET sys_sequence ='sys_image_id_seq' WHERE id ='sys_image';
 UPDATE sys_table SET sys_sequence ='config_form_list_id_seq' WHERE id ='config_form_list';
 UPDATE sys_table SET sys_sequence ='config_info_table_x_type_id_seq' WHERE id ='config_info_table_x_type';
 UPDATE sys_table SET sys_sequence ='config_csv_id_seq' WHERE id ='config_csv';

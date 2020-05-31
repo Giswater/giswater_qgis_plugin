@@ -27,8 +27,8 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getformfields(
 $BODY$
 
 /*EXAMPLE
-SELECT "SCHEMA_NAME".gw_fct_getformfields('visit_arc_insp', 'visit', 'data', NULL, NULL, NULL, NULL, 'INSERT', null, 3)
-SELECT "SCHEMA_NAME".gw_fct_getformfields('go2epa', 'form', 'data', null, null, null, null, null, null,null)
+SELECT "SCHEMA_NAME".gw_fct_getformfields('visit_arc_insp', 'visit', 'data', NULL, NULL, NULL, NULL, 'INSERT', null, 3,null)
+SELECT "SCHEMA_NAME".gw_fct_getformfields('go2epa', 'form', 'data', null, null, null, null, null, null,null, '{}')
 SELECT "SCHEMA_NAME".gw_fct_getformfields('ve_arc_conduit', 'feature', 'data', 've_arc_conduit', 'arc_id', '2001', NULL, 'SELECT', null, 4)
 SELECT "SCHEMA_NAME".gw_fct_getformfields('ve_arc_pipe', 'feature', NULL, NULL, NULL, NULL, NULL, 'INSERT', null, 4)
 SELECT "SCHEMA_NAME".gw_fct_getformfields( 'print', 'utils', 'data', null, null, null, null, 'SELECT', null, 3);
@@ -56,7 +56,6 @@ v_return json;
 v_combo_id json;
 v_orderby text;
 v_image json;
-v_bmapsclient boolean;
 v_array text[];
 v_widgetvalue json;
 v_input json;
@@ -82,7 +81,6 @@ BEGIN
 
 	-- get project type
 	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
-	SELECT value INTO v_bmapsclient FROM config_param_system WHERE parameter = 'api_bmaps_client';
 	SELECT value::boolean INTO v_debug FROM config_param_user WHERE parameter='utils_debug_mode';
 
 	IF v_debug = TRUE THEN
@@ -108,8 +106,8 @@ BEGIN
 	IF p_device IN (1,2,3) THEN
 		v_device = ' widgettype as type, columnname as name, datatype AS "dataType",widgetfunction as "widgetAction", widgetfunction as "updateAction",widgetfunction as "changeAction",
 		     (CASE WHEN layoutname=''0'' THEN ''header'' WHEN layoutname=''9'' THEN ''footer'' ELSE ''body'' END) AS "position",
-		     (CASE WHEN iseditable=true THEN false ELSE true END)  AS disabled,';
-	ELSIF  p_device = 4
+		     (CASE WHEN iseditable=true THEN false ELSE true END)  AS disabled,';     
+	ELSE 
 		v_device = '';
 	END IF;
 
@@ -119,7 +117,7 @@ BEGIN
 	ELSE
 		v_label = 'label';
 	END IF;
-	
+
 	-- starting process - get fields	
 	IF p_formname!='infoplan' THEN 
 		SELECT formtype INTO v_formtype FROM config_form_fields WHERE formname = p_formname LIMIT 1;
@@ -165,6 +163,7 @@ BEGIN
       		'queryText', 'orderById', 'isNullValue', 'parentId', 'queryTextFilter');
 	END LOOP;
 
+
 	-- combo no childs	
 	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'widgettype' = 'combo' AND  a->>'parentId' IS NULL
 	LOOP
@@ -205,7 +204,6 @@ BEGIN
 		'queryText', 'orderById', 'isNullValue', 'parentId', 'queryTextFilter');
 
 	END LOOP;
-
 
 	-- combo childs
 	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'widgettype' = 'combo' AND  a->>'parentId' IS NOT NULL
@@ -287,6 +285,7 @@ BEGIN
 		'queryText', 'orderById', 'isNullValue', 'parentId', 'queryTextFilter');
 	END LOOP;
 
+
 	-- for the rest of widgets removing the not used keys
 	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'widgettype' NOT IN ('image', 'combo', 'typeahead')
 	LOOP
@@ -306,4 +305,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-

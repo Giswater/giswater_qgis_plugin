@@ -151,6 +151,8 @@ BEGIN
 		v_toolbar := 'basic';
 	END IF;
 
+	v_infotype = 1;
+
 	IF v_id = '' THEN
 		v_id = NULL;
 	END IF;
@@ -290,11 +292,11 @@ BEGIN
 			INTO v_linkpath;
 		END IF;
 	END IF;
-  
+
 	-- Get tabs for form
 	--------------------------------
         EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT tabname as "tabName", label as "tabLabel", tooltip as "tooltip", tabfunction as "tabFunction", tabactions as tabActions 
-		FROM config_form_tabs WHERE formname = $1 order by id desc) a'
+		FROM config_form_tabs WHERE formname = $1) a'
             INTO form_tabs
             USING v_tablename;
 
@@ -303,7 +305,7 @@ BEGIN
         
 		-- Get form_tabs
 		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT tabname as "tabName", label as "tabLabel", tooltip as "tooltip", tabfunction as "tabFunction", 
-		tabactions as tabActions FROM config_form_tabs WHERE formname = $1 order by id desc) a'
+		tabactions as tabActions FROM config_form_tabs WHERE formname = $1) a'
 			INTO form_tabs
 			USING v_table_parent;	
 	END IF;
@@ -442,8 +444,9 @@ BEGIN
 		IF v_mincanvasmargin IS NULL then v_mincanvasmargin=5; END IF;
 
 		-- Margin calulate
-		v_canvasmargin = (SELECT max(c) FROM (SELECT (v_maxcanvasmargin*2-(st_xmax(st_envelope((v_geometry->>'st_astext')::geometry))-st_xmin(st_envelope((v_geometry->>'st_astext')::geometry))))/2 AS c 
-			   UNION SELECT (v_maxcanvasmargin*2-(st_ymax(st_envelope((v_geometry->>'st_astext')::geometry))-st_ymin(st_envelope((v_geometry->>'st_astext')::geometry))))/2)a)::numeric(12,2);
+		v_canvasmargin = (SELECT max(c) FROM 
+		(SELECT (v_maxcanvasmargin*2-(st_xmax(st_envelope((v_geometry->>'st_astext')::geometry))-st_xmin(st_envelope((v_geometry->>'st_astext')::geometry))))/2 AS c 
+		UNION SELECT (v_maxcanvasmargin*2-(st_ymax(st_envelope((v_geometry->>'st_astext')::geometry))-st_ymin(st_envelope((v_geometry->>'st_astext')::geometry))))/2)a)::numeric(12,2);
 		IF v_canvasmargin <= v_mincanvasmargin THEN 
 			v_canvasmargin = v_mincanvasmargin;
 		END IF;
@@ -453,8 +456,6 @@ BEGIN
 			'featureType',v_featuretype, 'childType', v_childtype, 'tableParent',v_table_parent,
 			'geometry', v_geometry, 'zoomCanvasMargin',concat('{"mts":"',v_canvasmargin,'"}')::json, 'vdefaultValues',v_vdefault_array);
      
-
-
 		IF v_islayer THEN
 			v_tg_op = 'LAYER';
 		ELSIF  v_id IS NULL THEN
@@ -575,9 +576,9 @@ BEGIN
 		'}')::json;
 
 	-- Exception handling
-	 EXCEPTION WHEN OTHERS THEN
-	 GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;  
-	 RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_errcontext) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	-- EXCEPTION WHEN OTHERS THEN
+	-- GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;  
+	-- RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_errcontext) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

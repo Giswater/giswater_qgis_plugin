@@ -76,12 +76,12 @@ BEGIN
 	
 	SELECT array_agg(row_to_json(a)) FROM (SELECT * FROM json_object_keys(v_selector_type))a into fields_array;
 
-	
+
 	FOREACH v_aux_json IN ARRAY fields_array
 	LOOP		
 
 	SELECT * INTO rec_tab FROM config_form_tabs WHERE formname=v_aux_json->>'json_object_keys';
-	IF rec_tab.id IS NOT NULL THEN
+	IF rec_tab.formname IS NOT NULL THEN
 
 		-- get selector parameters
 		v_parameter_selector = (SELECT value::json FROM config_param_system WHERE parameter = concat('basic_selector_', lower(v_aux_json->>'json_object_keys')::text));
@@ -112,7 +112,7 @@ BEGIN
 		END IF;
 		
 		-- Manage v_queryfilter add (using filter)
-		IF query_filter is not NULL THEN
+		IF v_query_filter is not NULL THEN
 			v_filterstatus = True;
 			-- amplify v_queryadd
 			v_filter := (((p_data ->> 'data')::json->>'selector_type')::json ->>(lower(v_aux_json->>'json_object_keys')))::json->>'filter';
@@ -199,8 +199,8 @@ BEGIN
 	END IF;
 
 	-- Exception handling
-	EXCEPTION WHEN OTHERS THEN 
-	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	--EXCEPTION WHEN OTHERS THEN 
+	--RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$
