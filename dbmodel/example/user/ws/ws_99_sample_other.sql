@@ -214,8 +214,6 @@ INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('shtvalve_param_1','2','
 INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('shtvalve_param_1','3','combo3');
 INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('shtvalve_param_1','4','combo4');
 
-SELECT setval('SCHEMA_NAME.sys_foreingkey_id_seq', (SELECT max(id) FROM sys_foreingkey), true);
-
 INSERT INTO sys_foreingkey(typevalue_table, typevalue_name, target_table, target_field, parameter_id) 
 SELECT 'edit_typevalue','hydrant_param_1','man_addfields_value','value_param',id FROM sys_addfields WHERE param_name='hydrant_param_1';
 INSERT INTO sys_foreingkey(typevalue_table, typevalue_name, target_table, target_field, parameter_id) 
@@ -427,10 +425,10 @@ WHERE parameter = 'om_dynamicmapzones_status';
 
 UPDATE element SET code = concat ('E',element_id);
 
-UPDATE config_mincut_inlet SET config = '{"inletArc":["113907", "113905"]}'
+UPDATE config_mincut_inlet SET parameters = '{"inletArc":["113907", "113905"]}'
 WHERE node_id = '113766';
 
-UPDATE config_mincut_inlet SET config = '{"inletArc":["114145"]}'
+UPDATE config_mincut_inlet SET parameters = '{"inletArc":["114145"]}'
 WHERE node_id = '113952';
 
 UPDATE config_form_fields SET label = 'Presszone' WHERE columnname = 'presszone_id';

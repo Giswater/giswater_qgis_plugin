@@ -6,7 +6,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-
 -- 2020/05/25
 
 -- sys_fprocess
@@ -17,7 +16,8 @@ ALTER TABLE sys_fprocess DROP column context;
 -- config_csv
 DELETE FROM config_csv WHERE id IN(14,15,16);
 ALTER TABLE config_csv RENAME id TO fid;
-ALTER TABLE config_csv RENAME isdeprecated TO active SET DEFAULT true;
+ALTER TABLE config_csv RENAME isdeprecated TO active;
+ALTER TABLE config_csv ALTER COLUMN active set DEFAULT true;
 ALTER TABLE config_csv RENAME csv_structure TO descpript;
 ALTER TABLE config_csv DROP column formname;
 ALTER TABLE config_csv ADD COLUMN addparam JSON;
@@ -78,19 +78,35 @@ ALTER TABLE sys_typevalue DROP column id;
 
 
 -- active
-ALTER TABLE config_toolbox ADD column active boolean SET DEFAULT true;
-ALTER TABLE config_file ADD column active boolean SET DEFAULT true;
-ALTER TABLE config_visit_parameter_action ADD column active boolean SET DEFAULT true;
-ALTER TABLE config_visit_parameter ADD column active boolean SET DEFAULT true;
-ALTER TABLE config_user_x_expl ADD column active boolean SET DEFAULT true;
-ALTER TABLE config_visit_class_x_feature ADD column active boolean SET DEFAULT true;
-ALTER TABLE config_visit_class_x_parameter ADD column active boolean SET DEFAULT true;
-ALTER TABLE config_visit_class_x_workorder ADD column active boolean SET DEFAULT true;
+ALTER TABLE config_toolbox ADD column active boolean;
+ALTER TABLE config_file ADD column active boolean;
+ALTER TABLE config_visit_parameter_action ADD column active boolean;
+ALTER TABLE config_visit_parameter ADD column active boolean;
+ALTER TABLE config_user_x_expl ADD column active boolean;
+ALTER TABLE config_visit_class_x_feature ADD column active boolean;
+ALTER TABLE config_visit_class_x_parameter ADD column active boolean;
+ALTER TABLE config_visit_class_x_workorder ADD column active boolean;
+
+
+ALTER TABLE config_toolbox ALTER COLUMN active SET DEFAULT TRUE;
+ALTER TABLE config_file ALTER COLUMN active SET DEFAULT TRUE;
+ALTER TABLE config_visit_parameter_action ALTER COLUMN active SET DEFAULT TRUE;
+ALTER TABLE config_visit_parameter ALTER COLUMN active SET DEFAULT TRUE;;
+ALTER TABLE config_user_x_expl ALTER COLUMN active SET DEFAULT TRUE;
+ALTER TABLE config_visit_class_x_feature ALTER COLUMN active SET DEFAULT TRUE;
+ALTER TABLE config_visit_class_x_parameter ALTER COLUMN active SET DEFAULT TRUE;
+ALTER TABLE config_visit_class_x_workorder ALTER COLUMN active SET DEFAULT TRUE;
 
 ALTER TABLE sys_foreingkey ADD column active boolean;
+ALTER TABLE sys_foreingkey ALTER column active SET DEFAULT TRUE;
 
-UPDATE sys_fprocess set fid = fid*100;
+-- first rows over 99
+UPDATE  sys_fprocess set fid = fid+100 WHERE fid > 99;
 
+-- after rows under 99
+UPDATE sys_fprocess set fid = fid+100 WHERE fid < 100;
+
+-- specific rows
 UPDATE config_csv SET fid =234	WHERE fid =1;
 UPDATE config_csv SET fid =235	WHERE fid =3;
 UPDATE config_csv SET fid =236	WHERE fid =4;

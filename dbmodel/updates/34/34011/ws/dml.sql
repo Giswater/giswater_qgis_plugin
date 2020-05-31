@@ -13,7 +13,7 @@ UPDATE config_form_fields set formname = 'presszone' WHERE formname ='cat_pressz
 UPDATE config_form_fields SET dv_querytext = replace (dv_querytext, 'cat_presszone', 'presszone') WHERE columnname like '%press%';
 UPDATE config_form_fields SET dv_querytext_filterc = replace (dv_querytext_filterc, 'cat_presszone', 'presszone') WHERE columnname like '%press%';
 
-INSERT INTO sys_function VALUES (2924, 'gw_trg_edit_dqa', 'ws', 'trigger function',null, null, 'Function to manage dqa editable', 'role_edit', FALSE, null, TRUE);
-INSERT INTO sys_function VALUES (2926, 'gw_trg_edit_presszone', 'ws', 'trigger function',null, null, 'Function to manage presszone editable', 'role_edit', FALSE, null, TRUE);
+INSERT INTO sys_function VALUES (2924, 'gw_trg_edit_dqa', 'ws', 'trigger function',null, null, 'Function to manage dqa editable', 'role_edit', FALSE);
+INSERT INTO sys_function VALUES (2926, 'gw_trg_edit_presszone', 'ws', 'trigger function',null, null, 'Function to manage presszone editable', 'role_edit', FALSE);
 
 UPDATE sys_table SET id='presszone' ,notify_action = replace (notify_action::text, '"trg_fields":"id"', '"trg_fields":"presszone_id"')::json WHERE id='cat_presszone';

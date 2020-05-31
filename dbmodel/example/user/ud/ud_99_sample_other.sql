@@ -4,7 +4,6 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
@@ -41,8 +40,6 @@ INSERT INTO plan_psector_x_arc VALUES (10, '177', 1, 0, false, NULL);
 INSERT INTO plan_psector_x_arc VALUES (11, '178', 1, 0, false, NULL);
 INSERT INTO plan_psector_x_arc VALUES (13, '179', 1, 0, false, NULL);
 INSERT INTO plan_psector_x_arc VALUES (12, '339', 1, 0, false, NULL);
-
--- redo values
 
 
 TRUNCATE plan_psector_x_node;

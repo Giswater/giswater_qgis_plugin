@@ -9,3 +9,5 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2020/05/25
 UPDATE sys_table SET id='inp_subcatchment' WHERE id='subcatchment';
+
+UPDATE sys_foreingkey SET target_table = 'inp_subcatchment'  WHERE target_table = 'subcatchment';

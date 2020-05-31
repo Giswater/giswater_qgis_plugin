@@ -65,8 +65,7 @@ BEGIN
 		AND v_edit_node.the_geom IS NOT NULL AND v_edit_node.node_id NOT IN (select node_id FROM om_mincut_node WHERE result_id=result_id_arg)
 		ORDER BY 1
 		LOOP
-		
-			/* 
+			/*
 			The aim of this query_text is to draw (if exists) routing from valve to tank defineds on the loop using the pgrouting function ''pgr_dijkstra''
 			We need to create the network matrix (transfering the closed status of closed valves an proposed valves to the closests arcs) 
 			In order to transfer this propierty to the arc we need to identify
@@ -74,7 +73,6 @@ BEGIN
 				2) Arcs out of the proposed sector with node1 or node2 as (closed valves and not proposed valves)
 			*/
 
-		
 			query_text:= 'SELECT * FROM pgr_dijkstra( 
 				''			
 				SELECT
@@ -102,7 +100,7 @@ BEGIN
 						
 							OR (node_2 IN (SELECT node_id FROM om_mincut_valve WHERE closed=TRUE AND proposed IS NOT TRUE AND result_id='||result_id_arg||'))	
 							UNION
-							SELECT json_array_elements_text((config->>''''inletArc'''')::json) as arc_id, true as closed FROM config_mincut_inlet
+							SELECT json_array_elements_text((parameters->>''''inletArc'''')::json) as arc_id, true as closed FROM config_mincut_inlet
 						)a 
 						ON a.arc_id=v_edit_arc.arc_id
 					WHERE node_1 is not null and node_2 is not null
