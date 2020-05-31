@@ -27,7 +27,7 @@ class CheckProjectResult(ApiParent):
         """ Fill table 'audit_check_project' with layers data """
 
         sql = ("DELETE FROM audit_check_project "
-               "WHERE cur_user = current_user AND fprocesscat_id = 1")
+               "WHERE cur_user = current_user AND fid = 101")
         self.controller.execute_sql(sql)
         sql = ""
         for layer in layers:
@@ -47,9 +47,9 @@ class CheckProjectResult(ApiParent):
                 host_name = layer_source['host']
                 table_user = layer_source['user']
                 sql += ("\nINSERT INTO audit_check_project "
-                        "(table_schema, table_id, table_dbname, table_host, fprocesscat_id, table_user) "
+                        "(table_schema, table_id, table_dbname, table_host, fid, table_user) "
                         "VALUES ('" + str(schema_name) + "', '" + str(table_name) + "', '" + str(
-                    db_name) + "', '" + str(host_name) + "', 1, '" + str(table_user) + "');")
+                    db_name) + "', '" + str(host_name) + "', 101, '" + str(table_user) + "');")
 
         status = self.controller.execute_sql(sql)
         if not status:
@@ -66,7 +66,7 @@ class CheckProjectResult(ApiParent):
 
         version = self.get_plugin_version()
         extras = f'"version":"{version}"'
-        extras += f', "fprocesscat_id":1'
+        extras += f', "fid":101'
         extras += f', "initProject":{init_project}'
         extras += f', "qgisVersion":"{Qgis.QGIS_VERSION}"'
         extras += f', "osVersion":"{platform.system()} {platform.release()}"'

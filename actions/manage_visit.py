@@ -867,7 +867,7 @@ class ManageVisit(ParentManage, QObject):
         sql = ("SELECT 'ALL' as id "
                "UNION SELECT id "
                "FROM sys_feature_type "
-               "WHERE net_category = 1 "
+               "WHERE classlevel = 1 OR classlevel = 2"
                "ORDER BY id")
         rows = self.controller.get_rows(sql, commit=self.autocommit)
         utils_giswater.fillComboBox(self.dlg_add_visit, "feature_type", rows, False)

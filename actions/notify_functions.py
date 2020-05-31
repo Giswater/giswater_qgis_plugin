@@ -165,8 +165,12 @@ class NotifyFunctions(ParentAction):
                 self.controller.log_info(msg)
                 continue
 
+            # get sys variale
+            self.qgis_project_infotype = self.controller.plugin_settings_value('infoType')
+
             feature = '"tableName":"' + str(layer_name) + '", "id":""'
-            body = self.create_body(feature=feature)
+            extras = f'"infoType":"{self.qgis_project_infotype}"'
+            body = self.create_body(feature=feature, extras=extras)
             result = self.controller.get_json('gw_fct_getinfofromid', body)
             if not result: continue
             for field in result['body']['data']['fields']:

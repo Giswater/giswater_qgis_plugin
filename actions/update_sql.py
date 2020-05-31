@@ -1285,7 +1285,7 @@ class UpdateSQL(ApiParent):
             locale = utils_giswater.getWidgetText(self.dlg_readsql_create_project,
                                                   self.dlg_readsql_create_project.cmb_locale)
 
-        client = '"client":{"device":9, "lang":"' + str(locale) + '"}, '
+        client = '"client":{"device":4, "lang":"' + str(locale) + '"}, '
         data = '"data":{' + extras + '}'
         body = "$${" + client + data + "}$$"
         status = self.controller.get_json('gw_fct_admin_schema_lastprocess', body, schema_name=self.schema_name, commit=False)
@@ -1874,7 +1874,7 @@ class UpdateSQL(ApiParent):
         self.load_settings(self.dlg_manage_visit_class)
 
         # Manage widgets
-        sql = "SELECT id, id as idval FROM sys_feature_type WHERE net_category = 1"
+        sql = "SELECT id, id as idval FROM sys_feature_type WHERE classlevel = 1 OR classlevel = 2"
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         utils_giswater.set_item_data(self.dlg_manage_visit_class.feature_type, rows, 1)
 
@@ -2241,7 +2241,7 @@ class UpdateSQL(ApiParent):
         if str(self.controller.plugin_settings_value('inp_file_path')) != 'null':
             self.data_file.setText(str(self.controller.plugin_settings_value('inp_file_path')))
 
-        # TODO: do and call listener for buton + table -> temp_csv2pg
+        # TODO: do and call listener for buton + table -> temp_csv
         self.btn_push_file = self.dlg_readsql_create_project.findChild(QPushButton, 'btn_push_file')
 
         if self.dev_user != 'TRUE':
@@ -2646,8 +2646,8 @@ class UpdateSQL(ApiParent):
 
         with open(str(tpath)) as f:
             content = f.read()
-        sql = ("INSERT INTO " + schema_name + ".temp_csv2pg(source, csv1, csv2pgcat_id) VALUES('" +
-               str(form_name_ui) + "', '" + str(content) + "', 20);")
+        sql = ("INSERT INTO " + schema_name + ".temp_csv(source, csv1, fid) VALUES('" +
+               str(form_name_ui) + "', '" + str(content) + "', 247);")
         status = self.controller.execute_sql(sql, log_sql=True)
 
         # Import xml to database
@@ -2655,7 +2655,7 @@ class UpdateSQL(ApiParent):
         status = self.controller.execute_sql(sql, log_sql=True)
         self.manage_result_message(status, parameter="Import data into 'config_api_form_fields'")
 
-        # Clear temp_csv2pg
+        # Clear temp_csv
         self.clear_temp_table()
 
 
@@ -2682,7 +2682,7 @@ class UpdateSQL(ApiParent):
             return
 
         # Populate UI file
-        sql = ("SELECT csv1 FROM " + schema_name + ".temp_csv2pg "
+        sql = ("SELECT csv1 FROM " + schema_name + ".temp_csv "
                "WHERE cur_user = current_user AND source = '" + str(form_name_ui) + "' "
                "ORDER BY id DESC")
         row = self.controller.get_row(sql, log_sql=True)
@@ -2708,15 +2708,15 @@ class UpdateSQL(ApiParent):
             opener = "C:\OSGeo4W64/bin/designer.exe"
             subprocess.Popen([opener, tpath])
 
-        # Clear temp_csv2pg
+        # Clear temp_csv
         self.clear_temp_table()
 
 
     def clear_temp_table(self):
 
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
-        # Clear temp_csv2pg
-        sql = ("DELETE FROM " + schema_name + ".temp_csv2pg WHERE cur_user = current_user")
+        # Clear temp_csv
+        sql = ("DELETE FROM " + schema_name + ".temp_csv WHERE cur_user = current_user")
         status = self.controller.execute_sql(sql, log_sql=True)
 
 
@@ -3321,8 +3321,8 @@ class UpdateSQL(ApiParent):
                 sp_n = dirty_list
 
             if len(sp_n) > 0:
-                sql += "INSERT INTO temp_csv2pg (csv2pgcat_id, source, "
-                values = "VALUES(12, '" + target + "', "
+                sql += "INSERT INTO temp_csv (fid, source, "
+                values = "VALUES(239, '" + target + "', "
                 for x in range(0, len(sp_n)):
                     if "''" not in sp_n[x]:
                         sql += "csv" + str(x + 1) + ", "

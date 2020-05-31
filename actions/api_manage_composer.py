@@ -288,7 +288,7 @@ class ApiManageComposer(ApiParent):
         my_json['extent'] = ext
 
         my_json = json.dumps(my_json)
-        client = '"client":{"device":9, "infoType":100, "lang":"ES"}, '
+        client = '"client":{"device":4, "infoType":1, "lang":"ES"}, '
         form = '"form":{''}, '
         feature = '"feature":{''}, '
         data = '"data":' + str(my_json)

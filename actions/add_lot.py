@@ -609,10 +609,11 @@ class AddNewLot(ParentManage):
 
         # Relations tab
         # fill feature_type
-        sql = ("SELECT id, id"
-               " FROM sys_feature_type"
-               " WHERE net_category = 1"
-               " ORDER BY id")
+        sql = ("SELECT 'ALL' as id "
+               "UNION SELECT id "
+               "FROM sys_feature_type "
+               "WHERE classlevel = 1 OR classlevel = 2"
+               "ORDER BY id")
         feature_type = self.controller.get_rows(sql, commit=self.autocommit)
         if feature_type:
             utils_giswater.set_item_data(self.dlg_lot.feature_type, feature_type, 1)

@@ -1363,7 +1363,8 @@ class Giswater(QObject):
                 continue
 
             feature = '"tableName":"' + str(layer_name) + '", "id":"", "isLayer":true'
-            body = self.create_body(feature=feature)
+            extras = f'"infoType":"{self.qgis_project_infotype}"'
+            body = self.create_body(feature=feature, extras=extras)
             complet_result = self.controller.get_json('gw_fct_getinfofromid', body)
             if not complet_result: continue
             
@@ -1442,7 +1443,7 @@ class Giswater(QObject):
     def create_body(self, form='', feature='', filter_fields='', extras=None):
         """ Create and return parameters as body to functions"""
 
-        client = f'$${{"client":{{"device":9, "infoType":100, "lang":"ES"}}, '
+        client = f'$${{"client":{{"device":4, "infoType":1, "lang":"ES"}}, '
         form = '"form":{' + form + '}, '
         feature = '"feature":{' + feature + '}, '
         filter_fields = '"filterFields":{' + filter_fields + '}'

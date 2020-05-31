@@ -481,7 +481,7 @@ class Go2Epa(ApiParent):
                        "There are errors on your project. Review it!")
             sql_details = (f"SELECT table_id, column_id, error_message"
                            f" FROM audit_check_data"
-                           f" WHERE fprocesscat_id = 14 AND result_id = '{self.project_name}'")
+                           f" WHERE fid = 114 AND result_id = '{self.project_name}'")
             inf_text = "For more details execute query:\n" + sql_details
             title = "Execute epa model"
             self.controller.show_info_box(message, title, inf_text, parameter=row[0])
@@ -510,7 +510,7 @@ class Go2Epa(ApiParent):
             columns.append(str(column_name[0]))
         sql = (f"SELECT table_id, column_id, error_message"
                f" FROM {tablename}"
-               f" WHERE fprocesscat_id = 14 AND result_id = '{self.project_name}'")
+               f" WHERE fid = 114 AND result_id = '{self.project_name}'")
         rows = self.controller.get_rows(sql)
         if not rows:
             message = "No records found with selected 'result_id'"

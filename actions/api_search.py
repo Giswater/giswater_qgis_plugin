@@ -384,8 +384,12 @@ class ApiSearch(ApiParent):
 
     def open_hydrometer_dialog(self, table_name=None, feature_id=None):
 
+        # get sys variale
+        self.qgis_project_infotype = self.controller.plugin_settings_value('infoType')
+
         feature = f'"tableName":"{table_name}", "id":"{feature_id}"'
-        body = self.create_body(feature=feature)
+        extras = f'"infoType":"{self.qgis_project_infotype}"'
+        body = self.create_body(feature=feature, extras=extras)
         function_name = 'gw_fct_getinfofromid'
         json_result = self.controller.get_json(function_name, body, log_sql=True)
         if json_result is None:

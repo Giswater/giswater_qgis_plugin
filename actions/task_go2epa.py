@@ -220,8 +220,8 @@ class TaskGo2Epa(QgsTask):
         status = False
         try:
             # Delete previous values of user on temp table
-            sql = ("DELETE FROM temp_csv2pg "
-                   "WHERE cur_user = current_user AND csv2pgcat_id = 11")
+            sql = ("DELETE FROM temp_csv "
+                   "WHERE cur_user = current_user AND fid = 111")
             self.controller.execute_sql(sql)
             # Importing file to temporal table
             status = self.insert_rpt_into_db(self.file_rpt)
@@ -241,7 +241,7 @@ class TaskGo2Epa(QgsTask):
         progress = 0
 
         # Create dict with sources
-        sql = "SELECT tablename, target FROM config_csv_param WHERE pg2csvcat_id = '11';"
+        sql = "SELECT tablename, target FROM config_fprocess WHERE fid = 111;"
         rows = self.controller.get_rows(sql)
         sources = {}
         for row in rows:
@@ -315,8 +315,8 @@ class TaskGo2Epa(QgsTask):
                     self.controller.log_info(type(e).__name__)
 
             if len(sp_n) > 0:
-                sql += f"INSERT INTO temp_csv2pg (csv2pgcat_id, source, csv40, "
-                values = f"VALUES(11, {source}, {csv40}, "
+                sql += f"INSERT INTO temp_csv (fid, source, csv40, "
+                values = f"VALUES(111, {source}, {csv40}, "
                 for x in range(0, len(sp_n)):
                     if "''" not in sp_n[x]:
                         sql += f"csv{x + 1}, "
@@ -346,7 +346,7 @@ class TaskGo2Epa(QgsTask):
     def create_body(self, form='', feature='', filter_fields='', extras=None):
         """ Create and return parameters as body to functions"""
 
-        client = f'$${{"client":{{"device":9, "infoType":100, "lang":"ES"}}, '
+        client = f'$${{"client":{{"device":4, "infoType":1, "lang":"ES"}}, '
         form = f'"form":{{{form}}}, '
         feature = f'"feature":{{{feature}}}, '
         filter_fields = f'"filterFields":{{{filter_fields}}}'

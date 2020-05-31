@@ -242,6 +242,7 @@ class ApiCF(ApiParent, QObject):
         # Come from QPushButtons node1 or node2 from custom form or RightButton
         elif feature_id:
             feature = f'"tableName":"{table_name}", "id":"{feature_id}"'
+            extras = f'"infoType":"{self.qgis_project_infotype}"'
             body = self.create_body(feature=feature, extras=extras)
             function_name = 'gw_fct_getinfofromid'
 
@@ -2526,7 +2527,7 @@ class ApiCF(ApiParent, QObject):
     """ NEW WORKCAT"""
     def cf_new_workcat(self, tab_type):
 
-        body = '$${"client":{"device":3, "infoType":100, "lang":"ES"}, '
+        body = '$${"client":{"device":4, "infoType":1, "lang":"ES"}, '
         body += '"form":{"formName":"new_workcat", "tabName":"data", "editable":"TRUE"}, '
         body += '"feature":{}, '
         body += '"data":{}}$$'

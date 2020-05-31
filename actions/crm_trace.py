@@ -146,7 +146,7 @@ class CrmTrace(ApiParent):
         # Get expl_id, year and period from table 'audit_log'
         sql = ("SELECT to_json(log_message) as log_message "
                "FROM utils.audit_log "
-               "WHERE fprocesscat_id = 74 "
+               "WHERE fid = 174 "
                "ORDER BY id DESC LIMIT 1")
         row = self.controller.get_row(sql, log_sql=True)
         if not row:
@@ -165,7 +165,7 @@ class CrmTrace(ApiParent):
             period = result['period']
 
         # Set function parameters
-        client = '"client": {"device":3, "infoType":100, "lang":"ES"}, '
+        client = '"client": {"device":4, "infoType":1, "lang":"ES"}, '
         feature = '"feature": {}, '
         data = f'"data": {{"parameters": {{"exploitation":"{expl_id}", "period":"{period}", "year":"{year}"}}}}'
         body = client + feature + data

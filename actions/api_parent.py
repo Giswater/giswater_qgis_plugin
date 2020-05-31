@@ -1624,7 +1624,7 @@ class ApiParent(ParentAction):
         self.iface.mainWindow().blockSignals(True)
         dialog.txt_infolog.clear()
 
-        sql = "DELETE FROM temp_table WHERE fprocesscat_id=106;\n"
+        sql = "DELETE FROM temp_table WHERE fid=206;\n"
         self.controller.execute_sql(sql)
         temp_layers_added = []
         for type_ in ['LineString', 'Point', 'Polygon']:
@@ -1648,8 +1648,8 @@ class ApiParent(ParentAction):
             geom_types = {0:'geom_point', 1:'geom_line', 2:'geom_polygon'}
             for count, feature in enumerate(dxf_layer.getFeatures()):
                 geom_type = feature.geometry().type()
-                sql += (f"INSERT INTO temp_table (fprocesscat_id, text_column, {geom_types[int(geom_type)]})"
-                        f" VALUES (106, '{{")
+                sql += (f"INSERT INTO temp_table (fid, text_column, {geom_types[int(geom_type)]})"
+                        f" VALUES (206, '{{")
                 for att in field_names:
                     if feature[att] in (None, 'NULL', ''):
                         sql += f'"{att}":null , '
