@@ -69,7 +69,6 @@ v_debug_var text;
 v_formtype text;
        
 BEGIN
-
 	
 	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;

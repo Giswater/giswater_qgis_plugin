@@ -7,89 +7,83 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2868
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_getinsertformdisabled(varchar, varchar, varchar);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getinsertformdisabled(
-    table_id character varying,
-    lang character varying,
-    id character varying)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getinsertformdisabled(table_id character varying,lang character varying, id character varying)
   RETURNS json AS
 $BODY$
+
 DECLARE
 
---    Variables
-    column_type character varying;
-    query_result character varying;
-    position json;
-    fields json;
-    fields_array json[];
-    position_row integer;
-    combo_rows json[];
-    aux_json json;    
-    combo_json json;
-    project_type character varying;
-    formToDisplayName character varying;
-    table_pkey varchar;
-    schemas_array name[];
-    array_index integer DEFAULT 0;
-    field_value character varying;
-    formtodisplay text;
-    v_version json;
-    v_force_formrefresh text = 'FALSE';
-    v_force_canvasrefresh text = 'FALSE';
-    v_enable_editgeom text = 'TRUE';
-    v_enable_delfeaeture text = 'TRUE';
-    v_dv_querytext text;
-    v_array text[];
+column_type character varying;
+query_result character varying;
+position json;
+fields json;
+fields_array json[];
+position_row integer;
+combo_rows json[];
+aux_json json;
+combo_json json;
+project_type character varying;
+formToDisplayName character varying;
+table_pkey varchar;
+schemas_array name[];
+array_index integer DEFAULT 0;
+field_value character varying;
+formtodisplay text;
+v_version json;
+v_force_formrefresh text = 'FALSE';
+v_force_canvasrefresh text = 'FALSE';
+v_enable_editgeom text = 'TRUE';
+v_enable_delfeaeture text = 'TRUE';
+v_dv_querytext text;
+v_array text[];
     
-
 BEGIN
 
-
---    Set search path to local schema
+	-- Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
 
---    Get schema name
+	-- Get schema name
     schemas_array := current_schemas(FALSE);
 
---  get api version
+	--  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
         INTO v_version;
 	
---  Control of null values
+	--  Control of null values
     IF id='NULL' or id='' THEN id=null;
     END IF;
 
---  Take form_id 
+	--  Take form_id 
     EXECUTE 'SELECT formid FROM config_web_layer WHERE layer_id = $1 LIMIT 1'
         INTO formtodisplay
         USING table_id; 
 
---  force form refresh
+	--  force form refresh
     IF table_id = any((select value from config_param_system where parameter='api_edit_force_form_refresh')::text[]) THEN
     v_force_formrefresh := 'TRUE';
     END IF;
 
---  force canvas refresh
+	--  force canvas refresh
     IF table_id = any((select value from config_param_system where parameter='api_edit_force_canvas_refresh')::text[]) THEN
     v_force_canvasrefresh := 'TRUE';
     END IF;
 
---  dissable editgeom button
+	--  dissable editgeom button
     IF table_id = any((select value from config_param_system where parameter='api_edit_dsbl_geom_button')::text[]) THEN
     v_enable_editgeom := 'FALSE';
     END IF;
 
---  dissable delete button
+	--  dissable delete button
     IF table_id = any((select value from config_param_system where parameter='api_edit_dsbl_del_feature')::text[]) THEN
     v_enable_delfeaeture := 'FALSE';
     END IF;
     
---    Check generic
+	--    Check generic
     IF formtodisplay ISNULL THEN
         formtodisplay := 'F16';
     END IF;
 
-
- --    Get fields
+	--    Get fields
     EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT id, label, name, type, ''TRUE'' AS disabled, "dataType", placeholder, (ROW_NUMBER() OVER(ORDER BY orderby asc)) AS rownum, 
         dv_table, dv_id_column, dv_name_column, dv_querytext FROM config_web_fields WHERE table_id = $1 order by 8) a'
         INTO fields_array
@@ -97,7 +91,7 @@ BEGIN
 
     fields_array := COALESCE(fields_array, '{}');
 
---    Update combos
+	--    Update combos
     FOREACH aux_json IN ARRAY fields_array
     LOOP
     
@@ -122,47 +116,38 @@ BEGIN
 	
     END LOOP;
 
-
---    Get existing values for the element
+	--    Get existing values for the element
     IF id IS NOT NULL THEN
 
---        Get id column
+		-- Get id column
         EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
             INTO table_pkey
             USING table_id;
 
---        For views is the first column
+		-- For views is the first column
         IF table_pkey ISNULL THEN
             EXECUTE 'SELECT column_name FROM information_schema.columns WHERE table_schema = $1 AND table_name = ' || quote_literal(table_id) || ' AND ordinal_position = 1'
             INTO table_pkey
             USING schemas_array[1];
         END IF;
 
---        Get column type
+		-- Get column type
         EXECUTE 'SELECT data_type FROM information_schema.columns  WHERE table_schema = $1 AND table_name = ' || quote_literal(table_id) || ' AND column_name = $2'
             USING schemas_array[1], table_pkey
             INTO column_type;
 
-
-raise notice '----------------------------------';
-raise notice ' -------------------------------------';
-
---        Fill every value
+		-- Fill every value
         FOREACH aux_json IN ARRAY fields_array
         LOOP
-
-		raise notice 'aux_json %', aux_json;
-
---            Index
+			-- Index
             array_index := array_index + 1;
 
---            Get values
+			-- Get values
             EXECUTE 'SELECT ' || quote_ident(aux_json->>'name') || ' FROM ' || quote_ident(table_id) || ' WHERE ' || quote_ident(table_pkey) || ' = CAST(' || quote_literal(id) || ' AS ' || column_type || ')' 
                 INTO field_value; 
             field_value := COALESCE(field_value, '');
 
-
---            Update array
+			-- Update array
             IF aux_json->>'type' = 'combo' THEN
                 fields_array[array_index] := gw_fct_json_object_set_key(fields_array[array_index], 'selectedId', field_value);
             ELSE            
@@ -173,26 +158,20 @@ raise notice ' -------------------------------------';
 
     END IF;    
     
---    Convert to json
+	-- Convert to json
     fields := array_to_json(fields_array);
 
-raise notice 'fields %', fields;
-
-
---    Control NULL's
+	-- Control NULL's
     formtodisplay := COALESCE(formtodisplay, '');
     v_force_formrefresh := COALESCE(v_force_formrefresh, '');
     v_force_canvasrefresh := COALESCE(v_force_canvasrefresh, '');
     v_enable_editgeom := COALESCE(v_enable_editgeom, '');
     v_enable_delfeaeture := COALESCE(v_enable_delfeaeture, '');
 
-
-
-    
     fields := COALESCE(fields, '[]');    
     position := COALESCE(position, '[]');
 
---    Return
+	--  Return
     RETURN ('{"status":"Accepted"' ||
         ', "version":'|| v_version ||
         ', "formToDisplay":"' || formtodisplay || '"' ||
@@ -203,10 +182,9 @@ raise notice 'fields %', fields;
         ', "fields":' || fields ||
         '}')::json;
 
---    Exception handling
-    --EXCEPTION WHEN OTHERS THEN 
-        --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
-
+	-- Exception handling
+    EXCEPTION WHEN OTHERS THEN 
+    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

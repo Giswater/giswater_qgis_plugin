@@ -6,11 +6,9 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2752
 
-
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_manage_child_views_view(p_data json)
   RETURNS void AS
 $BODY$
-
 
 /*EXAMPLE
 
@@ -21,18 +19,18 @@ $BODY$
 
 DECLARE 
 
-	v_project_type text;
-	v_schemaname text;
-	v_viewname text;
-	v_feature_type text;
-	v_feature_system_id text;
-	v_feature_cat text;
-	v_man_fields text;
-	v_a_param text;
-	v_ct_param text;
-	v_id_param text;
-	v_datatype text;
-	v_view_type integer;
+v_project_type text;
+v_schemaname text;
+v_viewname text;
+v_feature_type text;
+v_feature_system_id text;
+v_feature_cat text;
+v_man_fields text;
+v_a_param text;
+v_ct_param text;
+v_id_param text;
+v_datatype text;
+v_view_type integer;
 
 BEGIN
 
@@ -122,6 +120,8 @@ BEGIN
 			ON a.feature_id::text=ve_'||v_feature_type||'.'||v_feature_type||'_id 
 			WHERE '||v_feature_type||'_type ='''||v_feature_cat||''' ;';
 	END IF;
+	
+	RETURN;
 
 END;
 $BODY$

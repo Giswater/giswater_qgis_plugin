@@ -63,7 +63,7 @@ BEGIN
 	-- update child param for inp_junction
 	UPDATE temp_node SET demand=inp_junction.demand, pattern_id=inp_junction.pattern_id FROM inp_junction WHERE temp_node.node_id=inp_junction.node_id;
 
---	-- update child param for inp_tank
+	-- update child param for inp_tank
 	UPDATE temp_node SET addparam=concat('{"initlevel":"',initlevel,'", "minlevel":"',minlevel,'", "maxlevel":"',maxlevel,'", "diameter":"'
 	,diameter,'", "minvol":"',minvol,'", "curve_id":"',curve_id,'"}')
 	FROM inp_tank WHERE temp_node.node_id=inp_tank.node_id;
@@ -140,7 +140,6 @@ BEGIN
 	FROM inp_shortpipe 
 	JOIN (SELECT node_2 as node_id, diameter, roughness FROM temp_arc) a USING (node_id)
 	WHERE temp_node.node_id=inp_shortpipe.node_id;
-	
 
     RETURN 1;
 		

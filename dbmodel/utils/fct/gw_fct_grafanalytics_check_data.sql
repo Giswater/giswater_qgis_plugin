@@ -24,8 +24,8 @@ SELECT SCHEMA_NAME.gw_fct_grafanalytics_check_data($${
 
 */
 
-
 DECLARE
+
 v_project_type text;
 v_count	integer;
 v_saveondatabase boolean;
@@ -379,7 +379,6 @@ BEGIN
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
 	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
-
    
 END;
 $BODY$

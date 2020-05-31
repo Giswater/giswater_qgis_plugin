@@ -17,32 +17,37 @@ SELECT SCHEMA_NAME.gw_fct_anl_node_topological_consistency($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"v_edit_node", "id":["18","1101"]},
 "data":{"selectionMode":"previousSelection", "parameters":{"saveOnDatabase":true}}}$$)
+
+--fid: 108
 */
 
 DECLARE
-	rec_node record;
-	rec record;
-	v_version text;
-	v_saveondatabase boolean;
-	v_result json;
-	v_id json;
-	v_result_info	json;
-	v_result_point	json;
-	v_selectionmode text;
-	v_worklayer text;
-	v_array text;
-	v_node_aux record;
-	v_qmlpointpath	text;
-	v_error_context text;
+
+rec_node record;
+rec record;
+
+v_version text;
+v_saveondatabase boolean;
+v_result json;
+v_id json;
+v_result_info json;
+v_result_point json;
+v_selectionmode text;
+v_worklayer text;
+v_array text;
+v_node_aux record;
+v_qmlpointpath text;
+v_error_context text;
 
 BEGIN
+
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- select version
 	SELECT giswater INTO v_version FROM version order by 1 desc limit 1;
 
 	-- Reset values
-	DELETE FROM anl_node WHERE cur_user="current_user"() AND anl_node.fid=8;
+	DELETE FROM anl_node WHERE cur_user="current_user"() AND anl_node.fid=108;
 
 	-- getting input data 	
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
@@ -57,7 +62,7 @@ BEGIN
 	-- Computing process
 	IF v_array != '()' THEN
 		EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, state, num_arcs, expl_id, fid, the_geom)
-				SELECT node_id, nodecat_id, '||v_worklayer||'.state, COUNT(*), '||v_worklayer||'.expl_id, 8, '||v_worklayer||'.the_geom 
+				SELECT node_id, nodecat_id, '||v_worklayer||'.state, COUNT(*), '||v_worklayer||'.expl_id, 108, '||v_worklayer||'.the_geom 
 				FROM '||v_worklayer||' 
 				JOIN v_edit_arc ON v_edit_arc.node_1 = '||v_worklayer||'.node_id OR v_edit_arc.node_2 = '||v_worklayer||'.node_id
 				JOIN node_type ON nodetype_id=id 
@@ -65,7 +70,7 @@ BEGIN
 				GROUP BY '||v_worklayer||'.node_id, nodecat_id, '||v_worklayer||'.state, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom 
 				HAVING COUNT(*) != 4
 				UNION
-				SELECT node_id, nodecat_id, '||v_worklayer||'.state, COUNT(*), '||v_worklayer||'.expl_id, 8, '||v_worklayer||'.the_geom 
+				SELECT node_id, nodecat_id, '||v_worklayer||'.state, COUNT(*), '||v_worklayer||'.expl_id, 108, '||v_worklayer||'.the_geom 
 				FROM '||v_worklayer||' 
 				JOIN v_edit_arc ON v_edit_arc.node_1 = '||v_worklayer||'.node_id OR v_edit_arc.node_2 = '||v_worklayer||'.node_id
 				JOIN node_type ON nodetype_id=id 
@@ -73,7 +78,7 @@ BEGIN
 				GROUP BY '||v_worklayer||'.node_id, nodecat_id, '||v_worklayer||'.state, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom 
 				HAVING COUNT(*) != 3
 				UNION
-				SELECT node_id, nodecat_id, '||v_worklayer||'.state, COUNT(*), '||v_worklayer||'.expl_id, 8, '||v_worklayer||'.the_geom 
+				SELECT node_id, nodecat_id, '||v_worklayer||'.state, COUNT(*), '||v_worklayer||'.expl_id, 108, '||v_worklayer||'.the_geom 
 				FROM '||v_worklayer||' 
 				JOIN v_edit_arc ON v_edit_arc.node_1 = '||v_worklayer||'.node_id OR v_edit_arc.node_2 = '||v_worklayer||'.node_id
 				JOIN node_type ON nodetype_id=id 
@@ -81,7 +86,7 @@ BEGIN
 				GROUP BY '||v_worklayer||'.node_id, nodecat_id, '||v_worklayer||'.state, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom 
 				HAVING COUNT(*) != 2
 				UNION
-				SELECT node_id, nodecat_id, '||v_worklayer||'.state, COUNT(*), '||v_worklayer||'.expl_id, 8, '||v_worklayer||'.the_geom 
+				SELECT node_id, nodecat_id, '||v_worklayer||'.state, COUNT(*), '||v_worklayer||'.expl_id, 108, '||v_worklayer||'.the_geom 
 				FROM '||v_worklayer||' 
 				JOIN v_edit_arc ON v_edit_arc.node_1 = '||v_worklayer||'.node_id OR v_edit_arc.node_2 = '||v_worklayer||'.node_id
 				JOIN node_type ON nodetype_id=id 
@@ -90,28 +95,28 @@ BEGIN
 				HAVING COUNT(*) != 1;';
 	ELSE
 		EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, state, num_arcs, expl_id, fid, the_geom)
-				SELECT node_id, nodecat_id, '||v_worklayer||'.state, COUNT(*), '||v_worklayer||'.expl_id, 8, '||v_worklayer||'.the_geom 
+				SELECT node_id, nodecat_id, '||v_worklayer||'.state, COUNT(*), '||v_worklayer||'.expl_id, 108, '||v_worklayer||'.the_geom 
 				FROM '||v_worklayer||' 
 				JOIN v_edit_arc ON v_edit_arc.node_1 = '||v_worklayer||'.node_id OR v_edit_arc.node_2 = '||v_worklayer||'.node_id
 				JOIN node_type ON nodetype_id=id WHERE num_arcs=4
 				GROUP BY '||v_worklayer||'.node_id, nodecat_id, '||v_worklayer||'.state, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom 
 				HAVING COUNT(*) != 4
 				UNION
-				SELECT node_id, nodecat_id, '||v_worklayer||'.state, COUNT(*), '||v_worklayer||'.expl_id, 8, '||v_worklayer||'.the_geom 
+				SELECT node_id, nodecat_id, '||v_worklayer||'.state, COUNT(*), '||v_worklayer||'.expl_id, 108, '||v_worklayer||'.the_geom 
 				FROM '||v_worklayer||' 
 				JOIN v_edit_arc ON v_edit_arc.node_1 = '||v_worklayer||'.node_id OR v_edit_arc.node_2 = '||v_worklayer||'.node_id
 				JOIN node_type ON nodetype_id=id WHERE num_arcs=3
 				GROUP BY '||v_worklayer||'.node_id, nodecat_id, '||v_worklayer||'.state, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom 
 				HAVING COUNT(*) != 3
 				UNION
-				SELECT node_id, nodecat_id, '||v_worklayer||'.state, COUNT(*), '||v_worklayer||'.expl_id, 8, '||v_worklayer||'.the_geom 
+				SELECT node_id, nodecat_id, '||v_worklayer||'.state, COUNT(*), '||v_worklayer||'.expl_id, 108, '||v_worklayer||'.the_geom 
 				FROM '||v_worklayer||' 
 				JOIN v_edit_arc ON v_edit_arc.node_1 = '||v_worklayer||'.node_id OR v_edit_arc.node_2 = '||v_worklayer||'.node_id
 				JOIN node_type ON nodetype_id=id WHERE num_arcs=2
 				GROUP BY '||v_worklayer||'.node_id, nodecat_id, '||v_worklayer||'.state, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom 
 				HAVING COUNT(*) != 2
 				UNION
-				SELECT node_id, nodecat_id, '||v_worklayer||'.state, COUNT(*), '||v_worklayer||'.expl_id, 8, '||v_worklayer||'.the_geom 
+				SELECT node_id, nodecat_id, '||v_worklayer||'.state, COUNT(*), '||v_worklayer||'.expl_id, 108, '||v_worklayer||'.the_geom 
 				FROM '||v_worklayer||' 
 				JOIN v_edit_arc ON v_edit_arc.node_1 = '||v_worklayer||'.node_id OR v_edit_arc.node_2 = '||v_worklayer||'.node_id
 				JOIN node_type ON nodetype_id=id WHERE num_arcs=1
@@ -120,13 +125,13 @@ BEGIN
 	END IF;
 
 	
-	DELETE FROM selector_audit WHERE fid=8 AND cur_user=current_user;
-	INSERT INTO selector_audit (fid,cur_user) VALUES (8, current_user);
+	DELETE FROM selector_audit WHERE fid=108 AND cur_user=current_user;
+	INSERT INTO selector_audit (fid,cur_user) VALUES (108, current_user);
 
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT * FROM audit_check_data WHERE cur_user="current_user"() AND fid=8) row;
+	FROM (SELECT * FROM audit_check_data WHERE cur_user="current_user"() AND fid=108) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
@@ -140,25 +145,25 @@ BEGIN
     'properties', to_jsonb(row) - 'the_geom'
     ) AS feature
     FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
-    FROM  anl_node WHERE cur_user="current_user"() AND fid=8) row) features;
+    FROM  anl_node WHERE cur_user="current_user"() AND fid=108) row) features;
 
   	v_result := COALESCE(v_result, '{}'); 
   	v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "features":',v_result, '}'); 
 
 	IF v_saveondatabase IS FALSE THEN 
 		-- delete previous results
-		DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=8;
+		DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=108;
 	ELSE
 		-- set selector
-		DELETE FROM selector_audit WHERE fid=8 AND cur_user=current_user;
-		INSERT INTO selector_audit (fid,cur_user) VALUES (8, current_user);
+		DELETE FROM selector_audit WHERE fid=108 AND cur_user=current_user;
+		INSERT INTO selector_audit (fid,cur_user) VALUES (108, current_user);
 	END IF;
 		
-	--    Control nulls
+	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_result_point := COALESCE(v_result_point, '{}'); 
 
-	--  Return
+	-- Return
 	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
@@ -167,9 +172,9 @@ BEGIN
 			'}}'||
 	    '}')::json;
 
-  EXCEPTION WHEN OTHERS THEN
-   GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-   RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$

@@ -21,38 +21,34 @@ SELECT SCHEMA_NAME.gw_fct_getdimensioning($${
 
 DECLARE
 
---    Variables
-	
-	v_status text ='Accepted';
-	v_message json;
-	v_apiversion json;
-	v_forminfo json;
-	v_featureinfo json;
-	v_linkpath json;
-	v_parentfields text;
-	v_fields_array json[];
-	schemas_array name[];
-	v_project_type text;
-	aux_json json;
-	v_fields json;
-	field json;
+v_status text ='Accepted';
+v_message json;
+v_apiversion json;
+v_forminfo json;
+v_featureinfo json;
+v_linkpath json;
+v_parentfields text;
+v_fields_array json[];
+schemas_array name[];
+v_project_type text;
+aux_json json;
+v_fields json;
+field json;
 
 BEGIN
 
---  Get,check and set parameteres
-----------------------------
---    	Set search path to local schema
+	-- Get,check and set parameteres
+	----------------------------
+	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
 	schemas_array := current_schemas(FALSE);
 
-	
---      Get values from config
+	-- Get values from config
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
 		INTO v_apiversion;
 		
---  	Get project type
+	-- Get project type
 	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
-
 
 	EXECUTE 'SELECT gw_fct_getformfields($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)'
 	INTO v_fields_array
@@ -66,11 +62,7 @@ BEGIN
 
 	v_fields := array_to_json(v_fields_array);
 
-	
-
---    Control NULL's
-----------------------
-
+	-- Control NULL's
 	v_status := COALESCE(v_status, '{}');    
 	v_message := COALESCE(v_message, '{}');    
 	v_apiversion := COALESCE(v_apiversion, '{}');
@@ -80,9 +72,8 @@ BEGIN
 	v_parentfields := COALESCE(v_parentfields, '{}');
 	v_fields := COALESCE(v_fields, '{}');
 
---    Return
------------------------
-     RETURN ('{"status":"'||v_status||'", "message":'||v_message||', "version":' || v_apiversion ||
+	-- Return
+    RETURN ('{"status":"'||v_status||'", "message":'||v_message||', "version":' || v_apiversion ||
 	      ',"body":{"form":' || v_forminfo ||
 		     ', "feature":'|| v_featureinfo ||
 		      ',"data":{"linkPath":' || v_linkpath ||
@@ -92,9 +83,9 @@ BEGIN
 			'}'||
 		'}')::json;
 
---    Exception handling
- --   EXCEPTION WHEN OTHERS THEN 
-   --     RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ', "version":'|| v_apiversion ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN 
+	RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ', "version":'|| v_apiversion ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

@@ -51,75 +51,75 @@ SELECT SCHEMA_NAME.gw_fct_getvisitmanager($${
 */
 
 DECLARE
-	v_version text;
-	v_schemaname text;
-	v_featuretype text;
-	v_visitclass integer;
-	v_id text;
-	v_idname text;
-	v_columntype text;
-	v_device integer;
-	v_formname text;
-	v_tablename text;
-	v_fields json [];
-	v_fields_text text [];
-	v_fields_json json;
-	v_forminfo json;
-	v_formheader text;
-	v_formactions text;
-	v_formtabs text;
-	v_tabaux json;
-	v_active boolean;
-	v_featureid varchar ;
-	aux_json json;
-	v_tab record;
-	v_projecttype varchar;
-	v_list json;
-	v_activedatatab boolean;
-	v_activelotstab boolean;
-	v_activetodotab boolean;
-	v_activedonetab boolean;
-	v_activeteamtab boolean;
-	v_client json;
-	v_pageinfo json;
-	v_layermanager json;
-	v_filterfields json;
-	v_data json;
-	isnewvisit boolean;
-	v_feature json;
-	v_addfile json;
-	v_deletefile json;
-	v_filefeature json;
-	v_fileid text;
-	v_message json;
-	v_message1 text;
-	v_message2 text;
-	v_return json;
-	v_currentactivetab text;
-	v_values json;
-	array_index integer DEFAULT 0;
-	v_fieldvalue text;
-	v_disabled boolean = true;
-	v_firstcall boolean = false;
-	v_team text;
-	v_lot text;
-	v_vehicle integer;
-	v_user_id text;
-	v_featureidname text;
-	v_filterfeature json;
-	v_isfeaturemanager boolean;
-	v_isusermanager boolean;
-	v_disable_widget_name text[];
-	v_record record;
-	v_child_result json;
-	v_combo_json json[];
-	v_result record;
-	v_result1 text;
-	combo_json json;
-	v_childs_result json;
-	v_current_user text;
-	v_text text[];
 
+v_version text;
+v_schemaname text;
+v_featuretype text;
+v_visitclass integer;
+v_id text;
+v_idname text;
+v_columntype text;
+v_device integer;
+v_formname text;
+v_tablename text;
+v_fields json [];
+v_fields_text text [];
+v_fields_json json;
+v_forminfo json;
+v_formheader text;
+v_formactions text;
+v_formtabs text;
+v_tabaux json;
+v_active boolean;
+v_featureid varchar ;
+aux_json json;
+v_tab record;
+v_projecttype varchar;
+v_list json;
+v_activedatatab boolean;
+v_activelotstab boolean;
+v_activetodotab boolean;
+v_activedonetab boolean;
+v_activeteamtab boolean;
+v_client json;
+v_pageinfo json;
+v_layermanager json;
+v_filterfields json;
+v_data json;
+isnewvisit boolean;
+v_feature json;
+v_addfile json;
+v_deletefile json;
+v_filefeature json;
+v_fileid text;
+v_message json;
+v_message1 text;
+v_message2 text;
+v_return json;
+v_currentactivetab text;
+v_values json;
+array_index integer DEFAULT 0;
+v_fieldvalue text;
+v_disabled boolean = true;
+v_firstcall boolean = false;
+v_team text;
+v_lot text;
+v_vehicle integer;
+v_user_id text;
+v_featureidname text;
+v_filterfeature json;
+v_isfeaturemanager boolean;
+v_isusermanager boolean;
+v_disable_widget_name text[];
+v_record record;
+v_child_result json;
+v_combo_json json[];
+v_result record;
+v_result1 text;
+combo_json json;
+v_childs_result json;
+v_current_user text;
+v_text text[];
 
 BEGIN
 
@@ -140,8 +140,7 @@ BEGIN
 	-- get project type
 	SELECT wsoftware INTO v_projecttype FROM version LIMIT 1;
 
-
-	--  get parameters from input
+	-- get parameters from input
 	v_client = (p_data ->>'client')::json;
 	v_device = ((p_data ->>'client')::json->>'device')::integer;
 	v_id = ((p_data ->>'feature')::json->>'id')::text;
@@ -209,8 +208,7 @@ BEGIN
 		
 	END IF;
 
-
-       raise notice 'v_isusermanager % v_isfeaturemanager % v_currentactivetab % ', v_isusermanager, v_isfeaturemanager, v_currentactivetab;
+    raise notice 'v_isusermanager % v_isfeaturemanager % v_currentactivetab % ', v_isusermanager, v_isfeaturemanager, v_currentactivetab;
 
 	-- Set calling visits from feature id
 
@@ -525,13 +523,11 @@ BEGIN
 			INTO v_formactions, v_layermanager;
 
 		v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formActions', v_formactions);
-
 		
 	-- Create new form
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formId', 'F11'::text);
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formName', v_formheader);
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formTabs', v_formtabs::json);
-	
 
 	--  Control NULL's
 	v_version := COALESCE(v_version, '{}');

@@ -166,7 +166,7 @@ BEGIN
 	
 	v_result_fields = concat('[{"data_custom_top_elev":',v_result_top, ',"data_custom_ymax":',v_result_ymax, ',"data_custom_elev":',v_result_elev,'}]');
 
---      Control NULL's
+	-- Control NULL's
 	v_version:=COALESCE(v_version,'{}');
 	v_result_info:=COALESCE(v_result_info,'{}');
 	v_result_point:=COALESCE(v_result_point,'{}');
@@ -185,10 +185,10 @@ BEGIN
 					'"fields":'||v_result_fields||'}'||
 			      '}}');
 
---  Exception handling
+	--  Exception handling
     EXCEPTION WHEN OTHERS THEN
-		GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;  
-		RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_error_context) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;  
+	RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_error_context) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 	  
 END;
 $BODY$

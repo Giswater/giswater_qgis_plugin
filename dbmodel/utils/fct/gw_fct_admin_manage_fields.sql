@@ -12,28 +12,25 @@ $BODY$
 
 /*
 SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"addvalue", "dataType":"varchar(16)", "isUtils":"True"}}$$)
-
 SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"addvalue", "dataType":"varchar(16)", "isUtils":"True"}}$$)
-
 SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"arc", "column":"addvalue", "newName":"_addvalue_"}}$$)
-
 SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"arc", "column":"addvalue"}}$$)
 
 */
 
-
 DECLARE 
-	v_schemaname varchar;
-	v_project_type text;
-	v_schemautils boolean;
-	v_action text;
-	v_table text;
-	v_column text;
-	v_datatype text;
-	v_isutils boolean;
-	v_newname text;
-	v_querytext text;
-	v_currentcolumn text;
+
+v_schemaname varchar;
+v_project_type text;
+v_schemautils boolean;
+v_action text;
+v_table text;
+v_column text;
+v_datatype text;
+v_isutils boolean;
+v_newname text;
+v_querytext text;
+v_currentcolumn text;
 
 BEGIN 
 
@@ -87,8 +84,7 @@ BEGIN
 	-- recover search_path in case utils = true in order to reset value fixed before
 	SET search_path = "SCHEMA_NAME", public;
 
-
-RETURN ;
+	RETURN ;
 
 END;
 $BODY$

@@ -17,33 +17,30 @@ SELECT SCHEMA_NAME.gw_fct_gettoolbarbuttons($${
 "data":{"clientbuttons":["lotManager", "visit"]}}$$)
 */
 
-
 DECLARE
-	v_version text;
-	v_role text;
-	v_projectype text;
-	v_clientbuttons text;
-	v_buttons json;
+
+v_version text;
+v_role text;
+v_projectype text;
+v_clientbuttons text;
+v_buttons json;
 		
 BEGIN
 
--- Set search path to local schema
+	-- Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
   
---  get api version
+	--  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
         INTO v_version;
 
--- get input parameter
+	-- get input parameter
 	v_clientbuttons := (p_data ->> 'data')::json->> 'clientbuttons';
 
--- get user's role
-	-- to do;
-	
--- get project type
-        SELECT wsoftware INTO v_projectype FROM version LIMIT 1;
-
--- enable buttons
+	-- get user's role
+		
+	-- get project type
+    SELECT wsoftware INTO v_projectype FROM version LIMIT 1;
 
 	--  Harmonize buttons
 	v_clientbuttons = concat('{',substring((v_clientbuttons) from 2 for LENGTH(v_clientbuttons)));
@@ -55,10 +52,10 @@ BEGIN
 		AND idval = any('||quote_literal(v_clientbuttons)||'::text[]) ) a'
 		INTO v_buttons;
 
---    Control NULL's
+	-- Control NULL's
 	v_buttons := COALESCE(v_buttons, '{}');
 	
---    Return
+	-- Return
     RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "version":'||v_version||
              ',"body":{"form":{}'||
 		     ',"feature":{}'||
@@ -66,9 +63,9 @@ BEGIN
 				'}}'||
 	    '}')::json;
        
---    Exception handling
---    EXCEPTION WHEN OTHERS THEN 
-        --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_apiversion || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN 
+    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_apiversion || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

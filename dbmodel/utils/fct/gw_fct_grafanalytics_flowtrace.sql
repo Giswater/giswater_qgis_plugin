@@ -18,10 +18,12 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_grafanalytics_flowtrace('{"data":{"parameters":{"grafClass":"DISCONNECTEDARCS", "exploitation": "[1]", "nodeId":"37"}}}');
 SELECT SCHEMA_NAME.gw_fct_grafanalytics_flowtrace('{"data":{"parameters":{"grafClass":"CONNECTEDARCS","exploitation": "[557]",  "nodeId":"5100"}}}');
 
-
 --RESULTS
-SELECT * FROM anl_arc WHERE fid=93 AND cur_user=current_user
-SELECT * FROM anl_arc WHERE fid=94 AND cur_user=current_user
+SELECT * FROM anl_arc WHERE fid=193 AND cur_user=current_user
+SELECT * FROM anl_arc WHERE fid=194 AND cur_user=current_user
+
+-- fid, 193, 194
+
 */
 
 DECLARE
@@ -58,10 +60,10 @@ BEGIN
 
 	-- set values
 	IF v_class = 'DISCONNECTEDARCS' THEN 
-		v_fid=93;
+		v_fid=193;
 		v_sign = '=';
 	ELSIF v_class = 'CONNECTEDARCS' THEN 
-		v_fid=94;
+		v_fid=194;
 		v_sign = '>';
 	END IF;
 

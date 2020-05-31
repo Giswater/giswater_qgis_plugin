@@ -7,13 +7,17 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2332
 
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_valve_status(varchar, boolean);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_valve_status(result_id_var varchar)  RETURNS integer AS $BODY$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_valve_status(result_id_var varchar) 
+RETURNS integer AS 
+$BODY$
+
 DECLARE
-	v_valverec record;
-	v_noderec record;
-	v_valvemode integer;
-	v_mincutresult integer;
-	v_networkmode integer;
+
+v_valverec record;
+v_noderec record;
+v_valvemode integer;
+v_mincutresult integer;
+v_networkmode integer;
     
 BEGIN
 
@@ -94,7 +98,6 @@ BEGIN
 
     -- all that not are closed are open
     UPDATE temp_arc SET status='OPEN' WHERE status IS NULL;
-
 
     RETURN 1;
 		

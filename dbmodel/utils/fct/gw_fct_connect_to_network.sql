@@ -7,10 +7,8 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2124
 
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_connect_to_network(character varying[], character varying);
-
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_connect_to_network(p_data json)
-
-  RETURNS json AS
+RETURNS json AS
 $BODY$
 
 /*
@@ -33,45 +31,48 @@ SELECT SCHEMA_NAME.gw_fct_connect_to_network($${
 SELECT SCHEMA_NAME.gw_fct_connect_to_network($${"client":{"device":3, "infoType":100,"lang":"ES"},"feature":{"id":
 "SELECT array_to_json(array_agg(connec_id::text)) FROM v_edit_connec WHERE connec_id IS NOT NULL AND state=1"},
 "data":{"feature_type":"CONNEC"}}$$);
+
+--fid: 217
+
 */
 
-
 DECLARE
-	v_connect record;
-	v_link record;
-	v_exit record;
-	v_arc record;
-	v_vnode record;
-	v_connect_id  varchar;
-	v_exit_id text;
-	point_aux public.geometry;
-	aux_geom public.geometry;
-	v_node_proximity double precision;
-	v_projecttype text;
-	v_endfeature_geom public.geometry;
-	v_pjointtype text;
-	v_pjointid text;
-	v_feature_text text;
-	v_feature_array text[];
-	v_feature_type text;
+
+v_connect record;
+v_link record;
+v_exit record;
+v_arc record;
+v_vnode record;
+v_connect_id  varchar;
+v_exit_id text;
+point_aux public.geometry;
+aux_geom public.geometry;
+v_node_proximity double precision;
+v_projecttype text;
+v_endfeature_geom public.geometry;
+v_pjointtype text;
+v_pjointid text;
+v_feature_text text;
+v_feature_array text[];
+v_feature_type text;
 	
-	v_result text;
-	v_result_info text;
-	v_result_point text;
-	v_result_line text;
-	v_result_polygon text;
-	v_error_context text;
-	v_audit_result text;
-	v_level integer;
-	v_status text;
-	v_message text;
-	v_hide_form boolean;
-	v_version text;
+v_result text;
+v_result_info text;
+v_result_point text;
+v_result_line text;
+v_result_polygon text;
+v_error_context text;
+v_audit_result text;
+v_level integer;
+v_status text;
+v_message text;
+v_hide_form boolean;
+v_version text;
 
 BEGIN
-
-    -- Search path
-    SET search_path = "SCHEMA_NAME", public;
+	
+	-- Search path
+	SET search_path = "SCHEMA_NAME", public;
 
     SELECT ((value::json)->>'value') INTO v_node_proximity FROM config_param_system WHERE parameter='edit_node_proximity';
     IF v_node_proximity IS NULL THEN v_node_proximity=0.01; END IF;
@@ -92,11 +93,11 @@ BEGIN
     END IF;
 
 	-- delete old values on result table
-	DELETE FROM audit_check_data WHERE fid = 117 AND cur_user=current_user;
+	DELETE FROM audit_check_data WHERE fid = 217 AND cur_user=current_user;
 	
 	-- Starting process
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (117, null, 4, 'CONNECT TO NETWORK');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (117, null, 4, '-------------------------------------------------------------');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (217, null, 4, 'CONNECT TO NETWORK');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (217, null, 4, '-------------------------------------------------------------');
 	
 
     -- Main loop
@@ -106,7 +107,7 @@ BEGIN
 	LOOP	
 
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (117, null, 4, concat('Connect ', lower(v_feature_type),' with id ',v_connect_id,'.'));
+		VALUES (217, null, 4, concat('Connect ', lower(v_feature_type),' with id ',v_connect_id,'.'));
 	
 		-- get link information (if exits)
 		SELECT * INTO v_link FROM link WHERE feature_id = v_connect_id AND feature_type=v_feature_type;
@@ -163,7 +164,7 @@ BEGIN
 
 			IF v_link.userdefined_geom IS TRUE THEN	
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (117, null, 4, concat('Previous link geometry was created manually by user.'));
+				VALUES (217, null, 4, concat('Previous link geometry was created manually by user.'));
 
 				-- get endfeature geometry
 				IF v_link.exit_type='NODE' THEN
@@ -187,7 +188,7 @@ BEGIN
 					v_link.the_geom = ST_SetPoint(v_link.the_geom, 0, point_aux) ; 
 
 					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-					VALUES (117, null, 4, concat('Reverse the direction of drawn link.'));
+					VALUES (217, null, 4, concat('Reverse the direction of drawn link.'));
 				ELSE
 					point_aux := St_closestpoint(v_endfeature_geom, St_endpoint(v_link.the_geom));
 					v_link.the_geom = ST_SetPoint(v_link.the_geom, (ST_NumPoints(v_link.the_geom) - 1),point_aux); 
@@ -200,7 +201,7 @@ BEGIN
 				v_link.exit_type = 'VNODE';
 
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (117, null, 4, concat('Connect feature with the closest arc.'));
+				VALUES (217, null, 4, concat('Connect feature with the closest arc.'));
 			END IF;
 
 			v_exit.the_geom = ST_EndPoint(v_link.the_geom);
@@ -221,7 +222,7 @@ BEGIN
 				v_pjointid = v_link.exit_id;
 
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (117, null, 4, concat('Recreate final vnode'));
+				VALUES (217, null, 4, concat('Recreate final vnode'));
 			END IF;
 
 			-- link for all links
@@ -231,7 +232,7 @@ BEGIN
 			v_link.userdefined_geom, v_connect.state, v_arc.expl_id);
 				
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (117, null, 4, concat('Recreate link'));
+			VALUES (217, null, 4, concat('Recreate link'));
 
 			IF v_pjointtype IS NULL THEN
 				v_pjointtype = 'VNODE';
@@ -248,7 +249,7 @@ BEGIN
 				IF v_projecttype = 'WS' THEN
 					UPDATE connec SET dqa_id=v_arc.dqa_id, minsector_id=v_arc.minsector_id,presszone_id=v_arc.presszone_id WHERE connec_id = v_connect_id;
 					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-					VALUES (117, null, 4, concat('Update mapzone values.'));
+					VALUES (217, null, 4, concat('Update mapzone values.'));
 				END IF;
 			
 				-- Update state_type if edit_connect_update_statetype is TRUE
@@ -256,7 +257,7 @@ BEGIN
 					UPDATE connec SET state_type = (SELECT ((value::json->>'connec')::json->>'state_type')::int2 
 					FROM config_param_system WHERE parameter = 'edit_connect_update_statetype') WHERE connec_id=v_connect_id;
 					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-					VALUES (117, null, 4, concat('Update state type.'));
+					VALUES (217, null, 4, concat('Update state type.'));
 				END IF;
 			
 			ELSIF v_feature_type ='GULLY' THEN 
@@ -264,7 +265,7 @@ BEGIN
 				WHERE gully_id = v_connect_id;
 				
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (117, null, 4, concat('Update mapzone values.'));
+				VALUES (217, null, 4, concat('Update mapzone values.'));
 
 				-- Update state_type if edit_connect_update_statetype is TRUE
 				IF (SELECT ((value::json->>'gully')::json->>'status')::boolean FROM config_param_system WHERE parameter = 'edit_connect_update_statetype') IS TRUE THEN
@@ -285,16 +286,15 @@ BEGIN
 	END LOOP;
 
     END IF;
-
    
-  --  EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
-  --"data":{"message":"0", "function":"2124","debug_msg":null}}$$);' INTO v_audit_result;
--- get results
+	--  EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
+	--"data":{"message":"0", "function":"2124","debug_msg":null}}$$);' INTO v_audit_result;
+	-- get results
 	-- info
 
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data 
-	WHERE cur_user="current_user"() AND fid = 117 ORDER BY criticity desc, id asc) row;
+	WHERE cur_user="current_user"() AND fid = 217 ORDER BY criticity desc, id asc) row;
 	
 	IF v_audit_result is null THEN
         v_status = 'Accepted';
@@ -315,7 +315,7 @@ BEGIN
 	v_result_line = '{"geometryType":"", "features":[]}';
 	v_result_polygon = '{"geometryType":"", "features":[]}';
 
---  Return
+	--  Return
      RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
@@ -328,9 +328,8 @@ BEGIN
 	    '}')::json;
 
 	EXCEPTION WHEN OTHERS THEN
-	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
-
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$

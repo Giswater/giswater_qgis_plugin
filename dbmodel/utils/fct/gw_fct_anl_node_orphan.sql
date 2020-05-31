@@ -17,27 +17,31 @@ SELECT SCHEMA_NAME.gw_fct_anl_node_orphan($${
 "form":{}, "feature":{"tableName":"v_edit_node", "featureType":"NODE", "id":[]}, 
 "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
 "parameters":{"isArcDivide":"true", "saveOnDatabase":"true"}}}$$)::text
+
+-- fid: 107
+
 */
 
 DECLARE
 
-	rec_node record;
-	v_closest_arc_id varchar;
-	v_closest_arc_distance numeric;
-	v_version text;
-	v_saveondatabase boolean = true;
-	v_result json;
-	v_id json;
-	v_result_info json;
-	v_result_point json;
-	v_array text;
-	v_selectionmode text;
-	v_worklayer text;
-	v_qmlpointpath	text;
-	v_projectype text;
-	v_partialquery text;
-	v_isarcdivide text;
-	v_error_context text;
+rec_node record;
+
+v_closest_arc_id varchar;
+v_closest_arc_distance numeric;
+v_version text;
+v_saveondatabase boolean = true;
+v_result json;
+v_id json;
+v_result_info json;
+v_result_point json;
+v_array text;
+v_selectionmode text;
+v_worklayer text;
+v_qmlpointpath	text;
+v_projectype text;
+v_partialquery text;
+v_isarcdivide text;
+v_error_context text;
 	
 BEGIN
 
@@ -59,7 +63,7 @@ BEGIN
 	SELECT  regexp_replace(row(value)::text, '["()"]', '', 'g') INTO v_qmlpointpath FROM config_param_user WHERE parameter='qgis_qml_pointlayer_path' AND cur_user=current_user;
 
 	-- Reset values
-	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=7;
+	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=107;
 
 	-- built partial query
 	IF v_projectype = 'WS' THEN
@@ -79,7 +83,7 @@ BEGIN
 			FROM arc ORDER BY arc.the_geom <-> rec_node.the_geom  LIMIT 1;
 		
 			INSERT INTO anl_node (node_id, state, expl_id, fid, the_geom, nodecat_id,arc_id,arc_distance)
-			VALUES (rec_node.node_id, rec_node.state, rec_node.expl_id, 7, rec_node.the_geom, rec_node.nodecat_id,v_closest_arc_id,v_closest_arc_distance);
+			VALUES (rec_node.node_id, rec_node.state, rec_node.expl_id, 107, rec_node.the_geom, rec_node.nodecat_id,v_closest_arc_id,v_closest_arc_distance);
 		END LOOP;
 	ELSE
 		FOR rec_node IN EXECUTE 'SELECT DISTINCT * FROM '||v_worklayer||' a '||v_partialquery||'  WHERE a.state>0 AND isarcdivide='||v_isarcdivide||' AND 
@@ -90,15 +94,14 @@ BEGIN
 			FROM arc ORDER BY arc.the_geom <-> rec_node.the_geom  LIMIT 1;
 		
 			INSERT INTO anl_node (node_id, state, expl_id, fid, the_geom, nodecat_id,arc_id,arc_distance)
-			VALUES (rec_node.node_id, rec_node.state, rec_node.expl_id, 7, rec_node.the_geom, rec_node.nodecat_id,v_closest_arc_id,v_closest_arc_distance);
+			VALUES (rec_node.node_id, rec_node.state, rec_node.expl_id, 107, rec_node.the_geom, rec_node.nodecat_id,v_closest_arc_id,v_closest_arc_distance);
 		END LOOP;
 	END IF;
-
 
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=7 order by id) row;
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=107 order by id) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
@@ -113,7 +116,7 @@ BEGIN
     'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
   	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
-  	FROM  anl_node WHERE cur_user="current_user"() AND fid=7) row) features;
+  	FROM  anl_node WHERE cur_user="current_user"() AND fid=107) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "features":',v_result, '}'); 
@@ -121,11 +124,11 @@ BEGIN
 
 	IF v_saveondatabase IS FALSE THEN 
 		-- delete previous results
-		DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=7;
+		DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=107;
 	ELSE
 		-- set selector
-		DELETE FROM selector_audit WHERE fid=7 AND cur_user=current_user;
-		INSERT INTO selector_audit (fid,cur_user) VALUES (7, current_user);
+		DELETE FROM selector_audit WHERE fid=107 AND cur_user=current_user;
+		INSERT INTO selector_audit (fid,cur_user) VALUES (107, current_user);
 	END IF;
 		
 	--    Control nulls
@@ -141,11 +144,9 @@ BEGIN
 			'}}'||
 	    '}')::json;
 
-
 	EXCEPTION WHEN OTHERS THEN
-	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
-
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$

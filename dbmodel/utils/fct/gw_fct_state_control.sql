@@ -6,23 +6,23 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2130
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_state_control(
-    feature_type_aux character varying,
-    feature_id_aux character varying,
-    state_aux integer,
-    tg_op_aux character varying)
-  RETURNS integer AS
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_state_control(feature_type_aux character varying,feature_id_aux character varying,
+state_aux integer, tg_op_aux character varying)
+RETURNS integer AS
 $BODY$
 
-DECLARE 
-	v_project_type text;
-	v_old_state integer;
-	v_psector_vdefault integer;
-	v_num_feature integer;
-	v_downgrade_force boolean;
-	v_state_type integer;
+-- fid: 128
 
-	rec_feature record;
+DECLARE 
+
+v_project_type text;
+v_old_state integer;
+v_psector_vdefault integer;
+v_num_feature integer;
+v_downgrade_force boolean;
+v_state_type integer;
+
+rec_feature record;
 
 BEGIN 
 
@@ -31,8 +31,7 @@ BEGIN
 	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
 	v_downgrade_force:= (SELECT "value" FROM config_param_user WHERE "parameter"='edit_arc_downgrade_force' AND cur_user=current_user)::boolean;
 	
-
-     -- control for downgrade features to state(0)
+    -- control for downgrade features to state(0)
     IF tg_op_aux = 'UPDATE' THEN
 		IF feature_type_aux='NODE' and state_aux=0 THEN
 			SELECT state INTO v_old_state FROM node WHERE node_id=feature_id_aux;
@@ -60,7 +59,7 @@ BEGIN
 					EXECUTE 'SELECT state_type FROM node WHERE node_id=$1'
 						INTO v_state_type
 						USING feature_id_aux;						
-					INSERT INTO audit_log_data (fid, feature_type, feature_id, log_message) VALUES (28,'NODE', feature_id_aux, concat(v_old_state,',',v_state_type));
+					INSERT INTO audit_log_data (fid, feature_type, feature_id, log_message) VALUES (128,'NODE', feature_id_aux, concat(v_old_state,',',v_state_type));
 				
 				END IF;
 
@@ -70,11 +69,8 @@ BEGIN
 					EXECUTE 'SELECT state_type FROM node WHERE node_id=$1'
 						INTO v_state_type
 						USING feature_id_aux;						
-					INSERT INTO audit_log_data (fid, feature_type, feature_id, log_message) VALUES (28,'NODE', feature_id_aux, concat(v_old_state,',',v_state_type));
-
+					INSERT INTO audit_log_data (fid, feature_type, feature_id, log_message) VALUES (128,'NODE', feature_id_aux, concat(v_old_state,',',v_state_type));
 				END IF;
-				
-				
 			END IF;
 
 		ELSIF feature_type_aux='ARC' and state_aux=0 THEN
@@ -104,7 +100,6 @@ BEGIN
 				END IF;
 			END IF;
 
-
 			IF state_aux!=v_old_state THEN
 
 				--connec's control
@@ -130,9 +125,7 @@ BEGIN
 						"data":{"message":"1074", "function":"2130","debug_msg":"'||feature_id_aux||'"}}$$);';
 					END IF;	
 				END IF;
-				
 			END IF;	
-
 
 		ELSIF feature_type_aux='CONNEC' and state_aux=0 THEN
 			SELECT state INTO v_old_state FROM connec WHERE connec_id=feature_id_aux;
@@ -154,11 +147,9 @@ BEGIN
 					EXECUTE 'SELECT state_type FROM connec WHERE connec_id=$1'
 						INTO v_state_type
 						USING feature_id_aux;						
-					INSERT INTO audit_log_data (fid, feature_type, feature_id, log_message) VALUES (28,'CONNEC', feature_id_aux, concat(v_old_state,',',v_state_type));
+					INSERT INTO audit_log_data (fid, feature_type, feature_id, log_message) VALUES (128,'CONNEC', feature_id_aux, concat(v_old_state,',',v_state_type));
 				END IF;
-				
 			END IF;	
-
 
 		ELSIF feature_type_aux='GULLY' and state_aux=0 THEN
 			SELECT state INTO v_old_state FROM gully WHERE gully_id=feature_id_aux;
@@ -180,17 +171,13 @@ BEGIN
 					EXECUTE 'SELECT state_type FROM gully WHERE gully_id=$1'
 						INTO v_state_type
 						USING feature_id_aux;
-					INSERT INTO audit_log_data (fid, feature_type, feature_id, log_message) VALUES (28,'GULLY', feature_id_aux, concat(v_old_state,',',v_state_type));
+					INSERT INTO audit_log_data (fid, feature_type, feature_id, log_message) VALUES (128,'GULLY', feature_id_aux, concat(v_old_state,',',v_state_type));
 				END IF;
-				
 			END IF;	
-					
 		END IF;
-	  
     END IF;
 
-
-   -- control of insert/update nodes with state(2)
+	-- control of insert/update nodes with state(2)
 	IF feature_type_aux='NODE' THEN
 		SELECT state INTO v_old_state FROM node WHERE node_id=feature_id_aux;
 	ELSIF feature_type_aux='ARC' THEN
@@ -249,11 +236,10 @@ BEGIN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
 				"data":{"message":"1080", "function":"2130","debug_msg":null}}$$);';
 			END IF;
-
 		END IF;	
 	END IF;
 
-RETURN 0;
+	RETURN 0;
 
 END;
 $BODY$

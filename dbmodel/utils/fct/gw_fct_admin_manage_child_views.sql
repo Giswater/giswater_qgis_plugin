@@ -6,11 +6,9 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2716
 
---drop function SCHEMA_NAME.gw_fct_admin_manage_child_views(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_manage_child_views(p_data json)
   RETURNS void AS
 $BODY$
-
 
 /*EXAMPLE
 
@@ -24,26 +22,28 @@ SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":9, "inf
  "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-DELETE" }}$$);
 */
 
-
 DECLARE 
-	v_schemaname text;
-	v_cat_feature text;
-	v_viewname text;
-	v_definition text;
-	v_feature_type text;
-	v_feature_system_id text;
-	v_man_fields text;
-	rec record;
-	v_multi_create boolean;
-	v_created_addfields record;
-	v_project_type text;
-	v_querytext text;
-	v_orderby integer;
-	rec_orderby record;
-	v_data_view json;
-	v_view_type text;
-	v_action text;
-	v_childview text;
+
+v_schemaname text;
+v_cat_feature text;
+v_viewname text;
+v_definition text;
+v_feature_type text;
+v_feature_system_id text;
+v_man_fields text;
+
+rec record;
+rec_orderby record;
+
+v_multi_create boolean;
+v_created_addfields record;
+v_project_type text;
+v_querytext text;
+v_orderby integer;
+v_data_view json;
+v_view_type text;
+v_action text;
+v_childview text;
 	
 BEGIN
 
@@ -323,9 +323,8 @@ BEGIN
 
 					PERFORM gw_fct_admin_manage_child_views_view(v_data_view);
 
-				ELSE
+				ELSE	
 				
-					
 					--create views with fields from parent table and man table
 					IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND 
 						( v_feature_type='arc' OR v_feature_type='node')) THEN
@@ -354,7 +353,6 @@ BEGIN
 
 				END IF;
 
-
 			IF 	v_viewname NOT IN (SELECT formname FROM config_form_fields) THEN
 				EXECUTE 'SELECT gw_fct_admin_manage_child_config($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, 
 				"feature":{"catFeature":"'||v_cat_feature||'"}, 
@@ -372,12 +370,6 @@ BEGIN
 		END IF;
 	END IF;
 
-	--    Control NULL's
-	--v_message := COALESCE(v_message, '');
-	
-	-- Return
-	--RETURN ('{"message":{"priority":"'||v_priority||'", "text":"'||v_message||'"}}');	
-	
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

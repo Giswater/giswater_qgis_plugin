@@ -19,6 +19,7 @@ SELECT SCHEMA_NAME.gw_fct_grafanalytics_mincut('{"data":{"arc":"2001", "step":2,
 */
 
 DECLARE
+
 v_class text = 'MINCUT';
 v_feature record;
 v_data json;

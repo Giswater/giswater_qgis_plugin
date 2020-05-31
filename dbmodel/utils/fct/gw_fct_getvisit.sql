@@ -14,9 +14,9 @@ $BODY$
 
 /*
 -- planned first call
-SELECT SCHEMA_NAME.gw_fct_getvisit($${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},"data":{"relatedFeature":{"type":"arc", "id":"2074"},"fields":{},"pageInfo":null}}$$)
+SELECT SCHEMA_NAME.gw_fct_getvisit($${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
+"data":{"relatedFeature":{"type":"arc", "id":"2074"},"fields":{},"pageInfo":null}}$$)
 */
-
 
 BEGIN
 

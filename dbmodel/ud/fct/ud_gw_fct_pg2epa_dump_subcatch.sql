@@ -6,41 +6,42 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2228
 
-
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_pg2epa_dump_subcatch() RETURNS SETOF character varying LANGUAGE plpgsql AS $$
+
 DECLARE
-    subcatchment_polygon public.geometry;
-    row_id varchar(16);
-    index_point integer;
-    point_aux public.geometry;
+subcatchment_polygon public.geometry;
+row_id varchar(16);
+index_point integer;
+point_aux public.geometry;
 
 BEGIN
 
-    --  Search path
-    SET search_path = "SCHEMA_NAME", public;
+	--  Search path
+	SET search_path = "SCHEMA_NAME", public;
 
-    --  Reset values
-    DELETE FROM temp_table WHERE cur_user=current_user AND fid = 17;
+	--  Reset values
+	DELETE FROM temp_table WHERE cur_user=current_user AND fid = 117;
 
-    -- Dump node coordinates for every polygon
-    FOR row_id IN SELECT subc_id FROM v_edit_inp_subcatchment
-    LOOP
+	-- Dump node coordinates for every polygon
+	FOR row_id IN SELECT subc_id FROM v_edit_inp_subcatchment
+	LOOP
 
-        -- Get the geom and remain fields
-        SELECT INTO subcatchment_polygon the_geom FROM inp_subcatchment WHERE subc_id = row_id;
+		-- Get the geom and remain fields
+		SELECT INTO subcatchment_polygon the_geom FROM inp_subcatchment WHERE subc_id = row_id;
 
-        -- Loop for nodes
-        index_point := 1;
-        FOR point_aux IN SELECT (ST_dumppoints(subcatchment_polygon)).geom
-        LOOP
-            -- Insert result into outfile table
-            INSERT INTO temp_table (fid, text_column) VALUES ( 17, format('%s       %s       %s       ', row_id, to_char(ST_X(point_aux),'99999999.999'), to_char(ST_Y(point_aux),'99999999.999')) );
-        END LOOP;
+		-- Loop for nodes
+		index_point := 1;
+		FOR point_aux IN SELECT (ST_dumppoints(subcatchment_polygon)).geom
+		LOOP
+			-- Insert result into outfile table
+			INSERT INTO temp_table (fid, text_column) VALUES ( 117, format('%s       %s       %s       ', row_id, 
+			to_char(ST_X(point_aux),'99999999.999'), to_char(ST_Y(point_aux),'99999999.999')) );
+		END LOOP;
 
-    END LOOP;
+	END LOOP;
 
-    -- Return the temporal table
-    RETURN QUERY SELECT text_column::varchar FROM temp_table WHERE cur_user=current_user AND fid = 17;
+	-- Return the temporal table
+	RETURN QUERY SELECT text_column::varchar FROM temp_table WHERE cur_user=current_user AND fid = 17;
 
 END
 $$;

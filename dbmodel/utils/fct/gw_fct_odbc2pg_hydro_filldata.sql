@@ -11,34 +11,35 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_odbc2pg_hydro_filldata(p_data json
   RETURNS json AS
 $BODY$
 
-
 /*EXAMPLE
 
 SELECT SCHEMA_NAME.gw_fct_odbc2pg_hydro_filldata($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{},"data":{"parameters":{"exploitation":"524", "period":"2T", "year":"2019"}}}$$)
+
+-- fid: 174
+
 */
 
-
 DECLARE
-	v_expl			integer;
-	v_period		text;
-	v_year			integer;
-	v_project_type		text;
-	v_version		text;
-	v_result 		json;
-	v_result_info		json;
-	v_result_point		json;
-	v_result_line		json;
-	v_querytext		text;
-	v_count			integer;
-	v_error_context text;
+	
+v_expl integer;
+v_period text;
+v_year integer;
+v_project_type text;
+v_version text;
+v_result  json;
+v_result_info json;
+v_result_point json;
+v_result_line json;
+v_querytext text;
+v_count integer;
+v_error_context text;
 	
 BEGIN
 
 	--  Search path	
 	SET search_path = "SCHEMA_NAME", public;
-
 
 	-- getting input data 	
 	v_expl := (((p_data ->>'data')::json->>'parameters')::json->>'exploitation')::integer;
@@ -56,24 +57,24 @@ BEGIN
 	INSERT INTO ext_cat_period (id, code, period_seconds, period_year, period_name, period_type) 
 	SELECT DISTINCT CONCAT(log_message::json->>'year', '-', log_message::json->>'period') , CONCAT(log_message::json->>'year', 0, log_message::json->>'period'), 2*30*24*3600, 
 	(log_message::json->>'year')::integer, (log_message::json->>'period')::integer, 1
-	FROM audit_log_data WHERE log_message::json->>'year' IS NOT NULL AND log_message::json->>'period' IS NOT NULL AND fid = 74
+	FROM audit_log_data WHERE log_message::json->>'year' IS NOT NULL AND log_message::json->>'period' IS NOT NULL AND fid = 174
 	ON CONFLICT (id) DO NOTHING;
 
 	-- rtc_hdyrometer
 	INSERT INTO rtc_hydrometer (hydrometer_id)
-	SELECT feature_id FROM audit_log_data WHERE log_message::json->>'year' IS NOT NULL AND log_message::json->>'period' IS NOT NULL AND fid = 74
+	SELECT feature_id FROM audit_log_data WHERE log_message::json->>'year' IS NOT NULL AND log_message::json->>'period' IS NOT NULL AND fid = 174
 	ON CONFLICT (hydrometer_id) DO NOTHING;
 
 	-- ext_rtc_hdydrometer
 	IF (SELECT value FROM config_param_system WHERE parameter='admin_crm_schema')::boolean THEN
 		INSERT INTO crm.hydrometer (id, connec_id, state_id, expl_id, category_id)
 		SELECT a.feature_id , log_message::json->>'connec_id', 1, (log_message::json->>'expl_id')::integer, 1  FROM audit_log_data a
-		WHERE log_message::json->>'year' IS NOT NULL AND log_message::json->>'period' IS NOT NULL AND fid = 74
+		WHERE log_message::json->>'year' IS NOT NULL AND log_message::json->>'period' IS NOT NULL AND fid = 174
 		ON CONFLICT (id) DO NOTHING;
 	ELSE
 		INSERT INTO ext_rtc_hydrometer (id, connec_id, state_id, expl_id, category_id)
 		SELECT a.feature_id , log_message::json->>'connec_id', 1, (log_message::json->>'expl_id')::integer, 1 FROM audit_log_data a
-		WHERE log_message::json->>'year' IS NOT NULL AND log_message::json->>'period' IS NOT NULL AND fid = 74
+		WHERE log_message::json->>'year' IS NOT NULL AND log_message::json->>'period' IS NOT NULL AND fid = 174
 		ON CONFLICT (id) DO NOTHING;
 	END IF;
 
@@ -81,7 +82,7 @@ BEGIN
 	INSERT INTO rtc_hydrometer_x_connec (hydrometer_id, connec_id)
 	SELECT a.feature_id , connec_id FROM audit_log_data a
 	JOIN connec ON code=concat(expl_id,log_message::json->>'connec_id')
-	WHERE log_message::json->>'year' IS NOT NULL AND log_message::json->>'period' IS NOT NULL AND fid = 74
+	WHERE log_message::json->>'year' IS NOT NULL AND log_message::json->>'period' IS NOT NULL AND fid = 174
 	ON CONFLICT (hydrometer_id) DO NOTHING;
 
 	-- ext_rtc_scada_dma_period
@@ -91,7 +92,7 @@ BEGIN
 	JOIN rtc_hydrometer_x_connec ON feature_id=hydrometer_id 
 	JOIN connec USING (connec_id)
 	JOIN dma USING (dma_id)
-	WHERE log_message::json->>'year' IS NOT NULL AND log_message::json->>'period' IS NOT NULL AND fid = 74
+	WHERE log_message::json->>'year' IS NOT NULL AND log_message::json->>'period' IS NOT NULL AND fid = 174
 	ON CONFLICT (dma_id, cat_period_id) DO NOTHING;
 
 	-- ext_rtc_hydrometer_category_x_pattern
@@ -101,7 +102,7 @@ BEGIN
 	JOIN ext_cat_period a ON CONCAT(log_message::json->>'year', 0, log_message::json->>'period') = a.id
 	JOIN ext_rtc_hydrometer b ON b.id=feature_id
 	JOIN ext_hydrometer_category c ON c.id::integer=b.category_id::integer	
-	WHERE log_message::json->>'year' IS NOT NULL AND log_message::json->>'period' IS NOT NULL AND fid = 74
+	WHERE log_message::json->>'year' IS NOT NULL AND log_message::json->>'period' IS NOT NULL AND fid = 174
 	ON CONFLICT (category_id, period_type) DO NOTHING;
 
 	--ext_rtc_hydrometer_x_data
@@ -111,28 +112,27 @@ BEGIN
 	LEFT JOIN ext_rtc_hydrometer a ON a.id=feature_id
 	LEFT JOIN ext_cat_period b ON CONCAT(log_message::json->>'year', 0, log_message::json->>'period') = a.id
 	LEFT JOIN ext_hydrometer_category_x_pattern c ON a.category_id=c.category_id::integer
-	WHERE log_message::json->>'year' IS NOT NULL AND log_message::json->>'period' IS NOT NULL AND fid = 74
+	WHERE log_message::json->>'year' IS NOT NULL AND log_message::json->>'period' IS NOT NULL AND fid = 174
 	ON CONFLICT (hydrometer_id, cat_period_id) DO NOTHING;
 
 	UPDATE connec SET num_value = m3value FROM (
 	WITH query AS (
 	SELECT log_message::json->>'periodSeconds' as ps, log_message::json->>'value' as value, log_message::json->>'connec_id'::text as connec_id, log_message::json->>'expl_id' as expl_id
-	FROM audit_log_data WHERE fid = 74 and user_name = current_user)
+	FROM audit_log_data WHERE fid = 174 and user_name = current_user)
 	SELECT sum(ps::integer*value::numeric(12,5)/1000)::numeric(12,2) as m3value, connec_id, expl_id::integer FROM query group by expl_id, connec_id) a WHERE connec.expl_id = a.expl_id and connec.code = a.connec_id;
 
 	-- delete audit_log_data
-	DELETE FROM audit_log_data WHERE fid = 74;
+	DELETE FROM audit_log_data WHERE fid = 174;
 	
---  Return
+	--  Return
     RETURN ('{"status":"Accepted", "message":{"level":1, "text":"ODBC hydro fill data done succesfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{}'||
 		     '}}')::json;
 
 	EXCEPTION WHEN OTHERS THEN
-	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
-
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$

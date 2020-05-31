@@ -57,21 +57,21 @@ v_search_muni_geom_field text;
 
 BEGIN
 
--- Set search path to local schema
+	-- Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
 
---  get api values
+	--  get api values
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
         INTO v_version;
         
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''api_search_character_number'') row'
         INTO v_character_number;
 
--- Create tabs array
+	-- Create tabs array
     v_form := '[';
 
--- Network Tab
--------------------------
+	-- Network Tab
+	-------------------------
     SELECT * INTO rec_tab FROM config_form_tabs WHERE formname='search' AND tabname='tab_network' ;
 
     IF rec_tab.id IS NOT NULL THEN
@@ -124,8 +124,8 @@ BEGIN
 
     END IF;
 
--- Search tab
--------------
+	-- Search tab
+	-------------
     SELECT * INTO rec_tab FROM config_form_tabs WHERE formname='search' AND tabname='tab_search' ;
     IF rec_tab.id IS NOT NULL THEN
     
@@ -153,9 +153,8 @@ BEGIN
 
     END IF;
 
-
--- Address tab
--------------
+	-- Address tab
+	-------------
     SELECT * INTO rec_tab FROM config_form_tabs WHERE formname='search' AND tabname='tab_address' ;
     IF rec_tab.id IS NOT NULL THEN
 
@@ -173,7 +172,7 @@ BEGIN
         comboType := json_build_object('label',rec_fields.label,'columnname', rec_fields.columnname,'widgetname', concat('address_',rec_fields.columnname),
         'widgettype','combo','datatype','string','placeholder','','disabled',false);
 
-	raise notice ' % % %', v_search_muni_id_field,v_search_muni_table ,v_search_muni_search_field;
+		raise notice ' % % %', v_search_muni_id_field,v_search_muni_table ,v_search_muni_search_field;
 
         -- Get Ids for type combo
         EXECUTE 'SELECT array_to_json(array_agg(id)) FROM (SELECT '||quote_ident(v_search_muni_id_field)||' AS id FROM '||quote_ident(v_search_muni_table) ||
@@ -236,9 +235,8 @@ BEGIN
 
     END IF;
 
-
--- Hydro tab
-------------
+	-- Hydro tab
+	------------
     SELECT * INTO rec_tab FROM config_form_tabs WHERE formname='search' AND tabname='tab_hydro' ;
     IF rec_tab.id IS NOT NULL THEN
 
@@ -301,9 +299,8 @@ BEGIN
 
     END IF;
     
-
--- Workcat tab
---------------
+	-- Workcat tab
+	--------------
     SELECT * INTO rec_tab FROM config_form_tabs WHERE formname='search' AND tabname='tab_workcat' ;
     IF rec_tab.id IS NOT NULL THEN
 
@@ -331,11 +328,10 @@ BEGIN
         v_active :=FALSE;  
           
     END IF;
-       
-
-
--- Psector tab
---------------
+    
+	
+	-- Psector tab
+	--------------
     SELECT * INTO rec_tab FROM config_form_tabs WHERE formname='search' AND tabname='tab_psector' ;
     IF rec_tab.id IS NOT NULL THEN
 
@@ -395,8 +391,8 @@ BEGIN
     END IF;
 
 
--- Visit tab
---------------
+	-- Visit tab
+	--------------
     SELECT * INTO rec_tab FROM config_form_tabs WHERE formname='search' AND tabname='tab_visit' ;
     IF rec_tab.id IS NOT NULL THEN
 
@@ -426,14 +422,14 @@ BEGIN
 
     END IF;
 
---    Finish the construction of v_form
+	-- Finish the construction of v_form
     v_form := v_form ||']';
 
---    Check null
+	-- Check null
     v_form := COALESCE(v_form, '[]');
     v_character_number := COALESCE(v_character_number, '[]');    
 
---     Return
+	-- Return
     IF v_firsttab IS FALSE THEN
         -- Return not implemented
         RETURN ('{"status":"Accepted"' || ', "version":'|| v_version || ', "enabled":false'|| '}')::json;
@@ -444,11 +440,9 @@ BEGIN
             '}')::json;
     END IF;
 
-
---    Exception handling
---    EXCEPTION WHEN OTHERS THEN 
-        --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
-
+	--Exception handling
+	EXCEPTION WHEN OTHERS THEN 
+    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

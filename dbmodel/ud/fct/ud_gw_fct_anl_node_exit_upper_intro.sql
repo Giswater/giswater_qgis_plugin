@@ -12,11 +12,14 @@ RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-	SELECT SCHEMA_NAME.gw_fct_anl_node_exit_upper_intro($${
-	"client":{"device":3, "infoType":100, "lang":"ES"},
-	"feature":{"tableName":"v_edit_man_manhole", "id":["60"]},
-	"data":{"parameters":{"saveOnDatabase":true}
-	}}$$)
+SELECT SCHEMA_NAME.gw_fct_anl_node_exit_upper_intro($${
+"client":{"device":3, "infoType":100, "lang":"ES"},
+"feature":{"tableName":"v_edit_man_manhole", "id":["60"]},
+"data":{"parameters":{"saveOnDatabase":true}
+}}$$)
+
+-- fid: 111
+
 */
 
 
@@ -47,7 +50,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- Reset values
-	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=11;
+	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=111;
     
     	-- select version
 	SELECT giswater INTO v_version FROM version order by 1 desc limit 1;
@@ -107,7 +110,7 @@ BEGIN
 			
 			IF v_sys_elev1 > v_sys_elev2 AND v_sys_elev1 IS NOT NULL AND v_sys_elev2 IS NOT NULL THEN
 				INSERT INTO anl_node (node_id, nodecat_id, expl_id, fid, the_geom, arc_distance, state) VALUES
-				(rec_node.node_id,rec_node.nodecat_id, rec_node.expl_id, 11, rec_node.the_geom,v_sys_elev1 - v_sys_elev2,rec_node.state );
+				(rec_node.node_id,rec_node.nodecat_id, rec_node.expl_id, 111, rec_node.the_geom,v_sys_elev1 - v_sys_elev2,rec_node.state );
 				raise notice 'Node found % :[% / %] maxelevin % maxelevout %',rec_node.node_id, v_i, v_count, v_sys_elev2 , v_sys_elev1 ;
 			END IF;
 		
@@ -116,7 +119,7 @@ BEGIN
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=11 order by id) row;
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=111 order by id) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
@@ -130,18 +133,18 @@ BEGIN
     'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
   	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
-  	FROM  anl_node WHERE cur_user="current_user"() AND fid=11) row) features;
+  	FROM  anl_node WHERE cur_user="current_user"() AND fid=111) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "features":',v_result, '}'); 
 
 	IF v_saveondatabase IS FALSE THEN 
 		-- delete previous results
-		DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=11;
+		DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=111;
 	ELSE
 		-- set selector
-		DELETE FROM selector_audit WHERE fid=11 AND cur_user=current_user;
-		INSERT INTO selector_audit (fid,cur_user) VALUES (11, current_user);
+		DELETE FROM selector_audit WHERE fid=111 AND cur_user=current_user;
+		INSERT INTO selector_audit (fid,cur_user) VALUES (111, current_user);
 	END IF;
 		
 	--    Control nulls
@@ -158,8 +161,8 @@ BEGIN
 	    '}')::json;
 
 	EXCEPTION WHEN OTHERS THEN
-	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$

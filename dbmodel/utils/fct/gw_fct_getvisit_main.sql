@@ -6,12 +6,9 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2740
 
-
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_get_visit(text, p_data json);
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_get_visit(p_data json);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getvisit_main(
-    p_visittype integer,
-    p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getvisit_main( p_visittype integer, p_data json)
   RETURNS json AS
 $BODY$
 
@@ -41,11 +38,8 @@ SELECT SCHEMA_NAME.gw_fct_getvisit_main('2', $${"client":{"device":3,"infoType":
 -- Cal setejar quan inserta
 -- Cal recuperar quan es peticiona una nova visita
 
-
 -- RETURNING OFFLINE:
 -- proposed visit_id = sempre NULL
-
-
 
 GET ONLINE FORMS
 
@@ -84,81 +78,82 @@ ACTIONS COULD BE DONE
 - change from tab data to tab files (upserting data on tabData)
 - tab files
 - deletefile action
+
 */
 
 DECLARE
-	v_version text;
-	v_schemaname text;
-	v_featuretype text;
-	v_visitclass integer;
-	v_id text;
-	v_idname text;
-	v_columntype text;
-	v_device integer;
-	v_formname text;
-	v_tablename text;
-	v_fields json [];
-	v_fields_text text [];
-	v_fields_json json;
-	v_forminfo json;
-	v_formheader text;
-	v_formactions text;
-	v_formtabs text;
-	v_tabaux json;
-	v_active boolean;
-	v_featureid varchar ;
-	aux_json json;
-	v_tab record;
-	v_projecttype varchar;
-	v_list json;
-	v_activedatatab boolean;
-	v_activefilestab boolean;
-	v_client json;
-	v_pageinfo json;
-	v_layermanager json;
-	v_filterfields json;
-	v_data json;
-	isnewvisit boolean default false;
-	v_feature json;
-	v_addfile json;
-	v_deletefile json;
-	v_filefeature json;
-	v_fileid text;
-	v_message json;
-	v_message1 text;
-	v_message2 text;
-	v_return json;
-	v_currentactivetab text;
-	v_values json;
-	array_index integer DEFAULT 0;
-	v_fieldvalue text;
-	v_geometry json;
-	v_noinfra boolean ;
-	v_queryinfra text ;
-	v_parameter text;
-	v_ismultievent boolean;
-	v_featuretablename text;
-	v_inputformname text;
-	v_isclasschanged boolean = true;  -- to identify if class of visit is changed. Important because in that case new form is reloaded with new widgets but nothing is upserted on database yet
-	v_visitduration text; 	-- to fix the duration of visit. Important because if visit is active on feature, existing visit is showed
-	v_status integer;  -- identifies the status of visit. Important because on status=0 visit is disabled
-	v_class integer;  -- identifies class of visit. Important because each class needs a diferent form
-	v_filterfeaturefield text;
-	v_visitcat integer;
-	v_visitextcode text;
-	v_startdate text;
-	v_enddate text;
-	v_extvisitclass integer;
-	v_existvisit_id integer;
-	v_value text;
-	v_tab_data boolean;
-	v_offline boolean;
-	v_lot integer;
-	v_userrole text;
-	v_code text;
-	v_check_code text;
-	
 
+v_version text;
+v_schemaname text;
+v_featuretype text;
+v_visitclass integer;
+v_id text;
+v_idname text;
+v_columntype text;
+v_device integer;
+v_formname text;
+v_tablename text;
+v_fields json [];
+v_fields_text text [];
+v_fields_json json;
+v_forminfo json;
+v_formheader text;
+v_formactions text;
+v_formtabs text;
+v_tabaux json;
+v_active boolean;
+v_featureid varchar ;
+aux_json json;
+v_tab record;
+v_projecttype varchar;
+v_list json;
+v_activedatatab boolean;
+v_activefilestab boolean;
+v_client json;
+v_pageinfo json;
+v_layermanager json;
+v_filterfields json;
+v_data json;
+isnewvisit boolean default false;
+v_feature json;
+v_addfile json;
+v_deletefile json;
+v_filefeature json;
+v_fileid text;
+v_message json;
+v_message1 text;
+v_message2 text;
+v_return json;
+v_currentactivetab text;
+v_values json;
+array_index integer DEFAULT 0;
+v_fieldvalue text;
+v_geometry json;
+v_noinfra boolean ;
+v_queryinfra text ;
+v_parameter text;
+v_ismultievent boolean;
+v_featuretablename text;
+v_inputformname text;
+v_isclasschanged boolean = true;  -- to identify if class of visit is changed. Important because in that case new form is reloaded with new widgets but nothing is upserted on database yet
+v_visitduration text; -- to fix the duration of visit. Important because if visit is active on feature, existing visit is showed
+v_status integer;  -- identifies the status of visit. Important because on status=0 visit is disabled
+v_class integer;  -- identifies class of visit. Important because each class needs a diferent form
+v_filterfeaturefield text;
+v_visitcat integer;
+v_visitextcode text;
+v_startdate text;
+v_enddate text;
+v_extvisitclass integer;
+v_existvisit_id integer;
+v_value text;
+v_tab_data boolean;
+v_offline boolean;
+v_lot integer;
+v_userrole text;
+v_code text;
+v_check_code text;
+	
 BEGIN
 	
 	-- Set search path to local schema
@@ -217,7 +212,7 @@ BEGIN
 		v_id = v_existvisit_id;
 	END IF;
 	
-	
+
 	--  get visitclass
 	IF v_visitclass IS NULL THEN
 		
@@ -268,7 +263,6 @@ BEGIN
 		v_visitclass := 0;
 	END IF;
 
-	
 	--  get formname and tablename
 	v_formname := (SELECT formname FROM om_visit_class WHERE id=v_visitclass);
 	v_tablename := (SELECT tablename FROM om_visit_class WHERE id=v_visitclass);
@@ -751,7 +745,6 @@ BEGIN
 	IF v_offline THEN
 		v_id = '""';
 	END IF;
-
   
 	-- Return
 	RETURN ('{"status":"Accepted", "message":'||v_message||', "apiVersion":'||v_version||

@@ -19,20 +19,20 @@ SELECT SCHEMA_NAME.gw_fct_getinfofromlist($${
 		"form":{},
 		"feature":{"featureType":"lot", "id":"1"},
 		"data":{}}$$)
-	
 */
 
 DECLARE
-	-- Variables
-	v_version text;
-	v_featuretype text;
-	v_lotfeaturetype text;
-	v_projecttype text;
-	v_activelayer json;
-	v_layermanager json;
-	v_rectgeometry text;
-	v_rectgeometry_json json;
-	v_id text;
+
+v_version text;
+v_featuretype text;
+v_lotfeaturetype text;
+v_projecttype text;
+v_activelayer json;
+v_layermanager json;
+v_rectgeometry text;
+v_rectgeometry_json json;
+v_id text;
+
 BEGIN
 
 	--  Set search path to local schema
@@ -106,8 +106,9 @@ BEGIN
 
 	RETURN v_rectgeometry;
 	
---    Exception handling
- --     RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN 
+    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;

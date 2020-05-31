@@ -7,17 +7,20 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION NUMBER: 2424
 
 --DROP FUNCTION IF EXISTS "SCHEMA_NAME". gw_fct_audit_schema_check(character varying);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_audit_schema_check(foreign_schema character varying) RETURNS void AS $BODY$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_audit_schema_check(foreign_schema character varying) 
+RETURNS void AS 
+$BODY$
+
 DECLARE
-   v_sql	varchar;
+
+v_sql varchar;
 
 BEGIN
 
--- Search path
+	-- Search path
     SET search_path = "SCHEMA_NAME", public;
-
  
--- DROP VIEWS
+	-- DROP VIEWS
 	DROP VIEW IF EXISTS "v_audit_schema_column" CASCADE;
 	DROP VIEW IF EXISTS "v_audit_schema_table" CASCADE;
    	DROP VIEW IF EXISTS "v_audit_schema_foreign_table" CASCADE;
@@ -26,8 +29,7 @@ BEGIN
 	DROP VIEW IF EXISTS "v_audit_schema_foreign_compare_table" CASCADE;
 	DROP VIEW IF EXISTS "v_audit_schema_foreign_compare_column" CASCADE;
 
-
--- AUDIT SCHEMA
+	-- AUDIT SCHEMA
 	CREATE OR REPLACE VIEW "v_audit_schema_column" AS 
 	select
 	table_name||'_'||column_name as id,
@@ -48,15 +50,12 @@ BEGIN
 	FROM information_schema.columns
 	where table_schema='SCHEMA_NAME';
 
+	-- COMPARE WITH FOREIGN SCHEMA
+	v_sql:= 'CREATE OR REPLACE VIEW v_audit_schema_foreign_table AS SELECT table_catalog,table_schema,table_name FROM information_schema.columns where table_schema ='||quote_literal(foreign_schema)||';';    
+	EXECUTE v_sql;
 
-
--- COMPARE WITH FOREIGN SCHEMA
-
-v_sql:= 'CREATE OR REPLACE VIEW v_audit_schema_foreign_table AS SELECT table_catalog,table_schema,table_name FROM information_schema.columns where table_schema ='||quote_literal(foreign_schema)||';';    
-EXECUTE v_sql;
-
-v_sql:=	'CREATE OR REPLACE VIEW v_audit_schema_foreign_column_aux AS SELECT table_name as tn, column_name as cn ,table_catalog,table_schema,table_name,column_name,udt_name as column_type,ordinal_position,udt_name FROM information_schema.columns WHERE table_schema = '||quote_literal(foreign_schema)||';'; 
-EXECUTE v_sql;
+	v_sql:=	'CREATE OR REPLACE VIEW v_audit_schema_foreign_column_aux AS SELECT table_name as tn, column_name as cn ,table_catalog,table_schema,table_name,column_name,udt_name as column_type,ordinal_position,udt_name FROM information_schema.columns WHERE table_schema = '||quote_literal(foreign_schema)||';'; 
+	EXECUTE v_sql;
 
 	CREATE VIEW v_audit_schema_foreign_column AS
 	SELECT
@@ -118,8 +117,8 @@ EXECUTE v_sql;
 		GROUP BY 2,3
 		ORDER BY 2,3;
 
-
-RETURN;   
+	RETURN;   
+	
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;

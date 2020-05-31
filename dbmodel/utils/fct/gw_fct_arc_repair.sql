@@ -5,35 +5,34 @@ This version of Giswater is provided by Giswater Association
 */
 
 --FUNCTION CODE: 2496
--- TWO FUNCTIONS ARE DEFINED:
--- gw_fct_arc_repair_searchnodes (json)
--- gw_fct_arc_repair_searchnodes (tex, bgint, bint):
-
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_repair_arc();
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_arc_repair() RETURNS json AS
 $BODY$
 
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_arc_repair()
+
+-- fid: 103, 104
+
 */
 
-DECLARE 
-	arcrec 			Record;
-	v_count 		integer;
-	v_count_partial 	integer=0;
-	v_result 		text;
-	v_version		text;
-	v_projecttype		text;
-	v_saveondatabase 	boolean;
-
+DECLARE
+ 
+arcrec Record;
+v_count integer;
+v_count_partial integer=0;
+v_result text;
+v_version text;
+v_projecttype text;
+v_saveondatabase boolean;
 
 BEGIN 
 
 	SET search_path= 'SCHEMA_NAME','public';
 
 	-- Delete previous log results
-	DELETE FROM audit_log_data WHERE fid=3 AND cur_user=current_user;
-	DELETE FROM audit_log_data WHERE fid=4 AND cur_user=current_user;
+	DELETE FROM audit_log_data WHERE fid=103 AND cur_user=current_user;
+	DELETE FROM audit_log_data WHERE fid=104 AND cur_user=current_user;
 
 	-- select config values
 	SELECT wsoftware, giswater  INTO v_projecttype, v_version FROM version order by 1 desc limit 1;
@@ -60,88 +59,33 @@ BEGIN
 	UPDATE config_param_system SET value=FALSE WHERE parameter='edit_topocontrol_disable_error' ;
 	
 	-- get results
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result FROM (SELECT * FROM audit_check_data WHERE cur_user="current_user"() AND ( fid=3 OR fid=4)) row;
-
-	
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result FROM (SELECT * FROM audit_check_data WHERE cur_user="current_user"() AND ( fid=103 OR fid=104)) row;
 
 	IF v_saveondatabase IS FALSE THEN 
 		-- delete previous results
-		DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=3;
-		DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=4;
+		DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=103;
+		DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=104;
 	ELSE
 		-- set selector
-		DELETE FROM selector_audit WHERE fid=3 AND cur_user=current_user;
-		DELETE FROM selector_audit WHERE fid=4 AND cur_user=current_user;
+		DELETE FROM selector_audit WHERE fid=103 AND cur_user=current_user;
+		DELETE FROM selector_audit WHERE fid=104 AND cur_user=current_user;
   
-		INSERT INTO selector_audit (fid,cur_user) VALUES (3, current_user);
-		INSERT INTO selector_audit (fid,cur_user) VALUES (4, current_user);
+		INSERT INTO selector_audit (fid,cur_user) VALUES (103, current_user);
+		INSERT INTO selector_audit (fid,cur_user) VALUES (104, current_user);
 	END IF;
 
 	--    Control nulls
 	v_result := COALESCE(v_result, '[]'); 
 
---  Return
+	--  Return
     RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{"result":' || v_result ||
 			     '}'||
 		       '}'||
-	    '}')::json;
+	'}')::json;
     
 END;  
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
-
-
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_arc_repair( p_arc_id text, counter bigint default 0, total bigint default 0)
-RETURNS character varying AS
-
-$BODY$
-
-/*
-EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_arc_repair(arc_id, (row_number() over (order by arc_id)), (select count(*) from SCHEMA_NAME.arc)) FROM SCHEMA_NAME.arc
-
-RESULTS:
-After process log result are stored on audit_log_data whith fi=3 and 4
-*/
-
-DECLARE
-
-BEGIN
-	  -- set search_path
-	  SET search_path='SCHEMA_NAME';
-
-      -- Set config parameter
-      UPDATE config_param_system SET value = TRUE WHERE parameter = 'edit_topocontrol_disable_error' ;
-
-      -- execute
-      UPDATE arc SET the_geom = the_geom WHERE arc_id = p_arc_id AND state=1;
-
-      -- raise notice
-      IF counter>0 AND total>0 THEN
-        RAISE NOTICE '[%/%] Arc id: %', counter, total, p_arc_id;
-      ELSIF counter>0 THEN
-        RAISE NOTICE '[%] Arc id: %', counter, p_arc_id;
-      ELSE
-        RAISE NOTICE 'Arc id: %', p_arc_id;
-      END IF;
-             
-
-      -- Set config parameter
-      UPDATE config_param_system SET value = FALSE WHERE parameter = 'edit_topocontrol_disable_error' ;
-
-    
-RETURN p_arc_id;
-
-   
-
-END; 
-
-$BODY$
-
-LANGUAGE plpgsql VOLATILE
-
-COST 100;

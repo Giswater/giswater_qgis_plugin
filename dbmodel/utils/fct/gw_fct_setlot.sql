@@ -21,6 +21,7 @@ SELECT SCHEMA_NAME.gw_fct_setlot($${
 */
 
 DECLARE
+
 v_message json;
 v_data json;
 v_version text;

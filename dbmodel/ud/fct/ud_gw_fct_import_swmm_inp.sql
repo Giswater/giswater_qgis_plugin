@@ -10,6 +10,7 @@ DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_csv2pg_import_swmm_inp(text);
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_csv2pg_import_swmm_inp(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_import_swmm_inp(p_data json)
   RETURNS json AS
+$BODY$
 
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_import_swmm_inp($${
@@ -21,8 +22,8 @@ SELECT SCHEMA_NAME.gw_fct_import_swmm_inp($${
 
 */
 
-$BODY$
 DECLARE
+
 rpt_rec record;
 v_epsg integer;
 v_point_geom public.geometry;

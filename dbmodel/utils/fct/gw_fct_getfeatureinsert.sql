@@ -23,15 +23,16 @@ SELECT SCHEMA_NAME.gw_fct_getfeatureinsert($${
 */
 
 DECLARE
-    v_input_geometry public.geometry;
-    v_device integer;
-    v_infotype integer;
-    v_tablename character varying;
-    v_x1 double precision;
-    v_y1 double precision;
-    v_x2 double precision;
-    v_y2 double precision;
-	v_epsg integer;
+
+v_input_geometry public.geometry;
+v_device integer;
+v_infotype integer;
+v_tablename character varying;
+v_x1 double precision;
+v_y1 double precision;
+v_x2 double precision;
+v_y2 double precision;
+v_epsg integer;
 
 BEGIN
 	-- Set search path to local schema
@@ -59,10 +60,9 @@ BEGIN
 	-- Call gw_fct_getinfofromid
 	RETURN gw_fct_getinfofromid(concat('{"client":',(p_data->>'client'),',"form":{"editable":"True"},"feature":{"tableName":"',v_tablename,'","inputGeometry":"',v_input_geometry,'"},"data":{}}')::json);
 
---    Exception handling
- --   EXCEPTION WHEN OTHERS THEN 
-   --     RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
-
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN 
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

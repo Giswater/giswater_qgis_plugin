@@ -21,23 +21,21 @@ SELECT SCHEMA_NAME.gw_fct_admin_role_resetuserprofile($${"user":"user1", "values
 SELECT SCHEMA_NAME.gw_fct_admin_role_resetuserprofile($${"user":"user1", "values":{"exploitation":{1,2,3}, "state":{1}}}$$)
 */
 
-
 DECLARE
 
---  Variables
-	v_copyfromuser text;
-	v_projecttype text;
-	v_user text;
+v_copyfromuser text;
+v_projecttype text;
+v_user text;
   
 BEGIN
 
---  Set search path to local schema
+	--  Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
 
---  Get project type
+	--  Get project type
 	SELECT wsoftware INTO v_projecttype FROM version LIMIT 1;
 
---  Get input parameters:
+	--  Get input parameters:
 	v_user := (p_data ->> 'user');
 	v_copyfromuser := (p_data ->> 'values')::json->> 'copyFromUserSameRole';
 
@@ -90,7 +88,6 @@ BEGIN
 		INSERT INTO config_param_user (parameter, value, cur_user)
 		SELECT sys_param_user.id, vdefault, v_user FROM SCHEMA_NAME.config_param_user RIGHT JOIN SCHEMA_NAME.sys_param_user ON sys_param_user.id=parameter 
 		WHERE ismandatory IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE pg_has_role(v_user, oid, 'member'));
-
 
 		-- selectors
 		DELETE FROM selector_expl WHERE cur_user=v_user;

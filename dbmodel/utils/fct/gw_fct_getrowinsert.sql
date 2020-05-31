@@ -28,17 +28,18 @@ SELECT SCHEMA_NAME.gw_fct_getrowinsert($${
 */
 
 DECLARE
-	v_version text;
-	v_schemaname text;
-	v_tablename text;
-	v_id text;
-	v_device integer;
-	v_formname text;
-	v_fields json [];
-	v_fields_json json;
-	v_formheader text;
-	v_configtabledefined boolean;
-	v_idname text;
+
+v_version text;
+v_schemaname text;
+v_tablename text;
+v_id text;
+v_device integer;
+v_formname text;
+v_fields json [];
+v_fields_json json;
+v_formheader text;
+v_configtabledefined boolean;
+v_idname text;
 
 BEGIN
 
@@ -120,11 +121,12 @@ BEGIN
 	v_version := COALESCE(v_version, '{}');
 	v_formheader := COALESCE(v_formheader, '{}');
 	  
---    Return
+	-- Return
     RETURN ('{"status":"Accepted", "message":{"priority":0, "text":"This is a test message"}, "apiVersion":'||v_version||
              ',"body":{"form":{"headerText":"'||v_formheader||'"},"data":{"fields":' || v_fields_json || '}'||
 			'}'||
 	    '}')::json;
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

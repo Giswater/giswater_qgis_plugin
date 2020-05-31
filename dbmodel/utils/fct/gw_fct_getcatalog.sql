@@ -21,43 +21,46 @@ SELECT SCHEMA_NAME.gw_fct_getcatalog($${
 
 
 DECLARE
-	v_version text;
-	v_schemaname text;
-	formTabs text;
-	v_device integer;
-	v_formname varchar;
-	v_tabname varchar;
-	fields_array json[];
-	fields json;   
-	field json;
-	query_result character varying;
-	query_result_ids json;
-	query_result_names json;
-	v_parameter text;
-	v_query_result text;
-	v_filter_values json;
-	v_text text[];
-	i integer;
-	v_json_field json;
-	v_field text;
-	v_value text;
-	text text;
-	v_matcat text;
-	v_feature_type text;
-	v_featurecat_id text;
-	v_project_type text;
+
+v_version text;
+v_schemaname text;
+formTabs text;
+v_device integer;
+v_formname varchar;
+v_tabname varchar;
+fields_array json[];
+fields json;   
+field json;
+query_result character varying;
+query_result_ids json;
+query_result_names json;
+v_parameter text;
+v_query_result text;
+v_filter_values json;
+v_text text[];
+i integer;
+v_json_field json;
+v_field text;
+v_value text;
+text text;
+v_matcat text;
+v_feature_type text;
+v_featurecat_id text;
+v_project_type text;
+v_errcontext text;
 
 BEGIN
--- 	Set search path to local schema
+
+	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
 
 	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
 
---  	get api version
+	-- get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
 		INTO v_version;
 
---	getting input data 
+	--	getting input data 
 	v_device := ((p_data ->>'client')::json->>'device')::text;
 	v_formname :=  ((p_data ->>'form')::json->>'formName')::text;
 	v_tabname :=  ((p_data ->>'form')::json->>'tabName')::text;
@@ -67,11 +70,11 @@ BEGIN
 	-- Set 1st parent field
 	fields_array[1] := gw_fct_json_object_set_key(fields_array[1], 'selectedId', v_matcat);
 
--- 	Calling function to build form fields
+	-- 	Calling function to build form fields
 	SELECT gw_fct_getformfields(v_formname, 'catalog', v_tabname, v_feature_type, null, null, null, 'INSERT',v_matcat, v_device, null)
 		INTO fields_array;
 
---	Remove selectedId form fields
+	--	Remove selectedId form fields
 	FOREACH field in ARRAY fields_array
 	LOOP
 		fields_array[(field->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(field->>'orderby')::INT], 'selectedId', ''::text);
@@ -100,7 +103,7 @@ BEGIN
 		
 	END IF;
 	
---	Setting the catalog 'id' value  (hard coded for catalogs, fixed objective field as id on 4th position
+	--	Setting the catalog 'id' value  (hard coded for catalogs, fixed objective field as id on 4th position
 	IF v_formname='upsert_catalog_arc' OR v_formname='upsert_catalog_node' OR v_formname='upsert_catalog_connec' THEN
 
 		--  get querytext
@@ -156,20 +159,26 @@ BEGIN
 		
 	END IF;
   
---     	Convert to json
+	-- Convert to json
 	fields := array_to_json(fields_array);
 
---     	Control nulls
+	-- Control nulls
 	fields := COALESCE(fields, '[]');
 	v_version := COALESCE(v_version, '[]');
 
---      Return
+	--  Return
 	RETURN ('{"status":"Accepted", "version":'||v_version||
 	      ',"body":{"message":{"priority":1, "text":"This is a test message"}'||
 		      ',"form":'||(p_data->>'form')::json||
 		      ',"feature":'||(p_data->>'feature')::json||
 		      ',"data":{"fields":' || fields ||'}}'||		     
 	       '}')::json;
+		   
+	-- Exception handling
+	 EXCEPTION WHEN OTHERS THEN
+	 GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;  
+	 RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_errcontext) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

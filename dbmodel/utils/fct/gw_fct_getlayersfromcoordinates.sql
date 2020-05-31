@@ -22,43 +22,41 @@ SELECT SCHEMA_NAME.gw_fct_getlayersfromcoordinates($${
     "zoomScale":500}}$$)
 */
 
-
 DECLARE
 
---    Variables
-    v_point geometry;
-    v_sensibility float;
-    v_sensibility_f float;
-    v_ids json[];
-    v_id varchar;
-    v_layer text;
-    v_sql text;
-    v_sql2 text;
-    v_iseditable boolean;
-    v_return json;
-    v_idname text;
-    schemas_array text[];
-    v_count int2=0;
-    v_geometrytype text;
-    v_version text;
-    v_the_geom text;
-    v_config_layer text;
-    xxx text;
-    x integer=0;
-    y integer=1;
-    fields_array json[];
-    fields json;
-    v_geometry json;
-    v_all_geom json;
-    
-    v_xcoord float;
-    v_ycoord float;
-    v_visibleLayers text;
-    v_zoomScale float;
-    v_device integer;
-    v_infotype integer;
-    v_epsg integer;
-    v_icon text;
+v_point geometry;
+v_sensibility float;
+v_sensibility_f float;
+v_ids json[];
+v_id varchar;
+v_layer text;
+v_sql text;
+v_sql2 text;
+v_iseditable boolean;
+v_return json;
+v_idname text;
+schemas_array text[];
+v_count int2=0;
+v_geometrytype text;
+v_version text;
+v_the_geom text;
+v_config_layer text;
+xxx text;
+x integer=0;
+y integer=1;
+fields_array json[];
+fields json;
+v_geometry json;
+v_all_geom json;
+
+v_xcoord float;
+v_ycoord float;
+v_visibleLayers text;
+v_zoomScale float;
+v_device integer;
+v_infotype integer;
+v_epsg integer;
+v_icon text;
   
 BEGIN
   
@@ -215,7 +213,7 @@ BEGIN
 	fields := array_to_json(fields_array);
 	fields := COALESCE(fields, '[]');    
 
---    Return
+	-- Return
     RETURN ('{"status":"Accepted", "version":'||v_version||
              ',"body":{"message":{"priority":1, "text":"This is a test message"}'||
 			',"form":{}'||
@@ -223,9 +221,9 @@ BEGIN
 			',"data":{"layersNames":' || fields ||'}}'||
 	    '}')::json;
 
---	Exception handling
-    RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
-
+	--	Exception handling
+	EXCEPTION WHEN OTHERS THEN 
+    RETURN ('{"status":"Failed","message":' || (to_json(SQLERRM)) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

@@ -42,6 +42,7 @@ any row, any element:
 */
 
 DECLARE
+
 v_device integer;
 v_infotype integer;
 v_tablename text;
@@ -68,9 +69,9 @@ v_message json;
 v_first boolean;
 v_error_context text;
 
-
 BEGIN
-	--    Set search path to local schema
+
+	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
 	v_schemaname = 'SCHEMA_NAME';
 	

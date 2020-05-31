@@ -15,6 +15,7 @@ $BODY$
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_rpt2pg_import_rpt($${"data":{"resultId":"r1"}}$$)
 
+-- fid: 140
 
 */
 
@@ -67,13 +68,13 @@ BEGIN
 	v_path := ((p_data ->>'data')::json->>'path')::text;
 
 	-- delete previous data on log table
-	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid = 40;
+	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid = 140;
 		
 	-- use the copy function of postgres to import from file in case of file must be provided as a parameter
 
 	-- Starting process
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (40, v_result_id, concat('IMPORT RPT FILE'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (40, v_result_id, concat('-----------------------------'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (140, v_result_id, concat('IMPORT RPT FILE'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (140, v_result_id, concat('-----------------------------'));
 	
 
 	IF v_path IS NOT NULL THEN
@@ -149,12 +150,12 @@ BEGIN
 				, hydra_acc=v_haccuracy, st_ch_freq=v_statuscheck, max_tr_ch=v_mcheck, dam_li_thr=v_dthreshold, max_trials=v_mtrials, q_analysis=v_qanalysis, spec_grav=v_sgravity
 				, r_kin_visc=v_rkinematic, r_che_diff=v_rchemical, dem_multi=v_dmultiplier, total_dura=v_tduration, q_timestep=v_qtimestep, q_tolerance=v_qtolerance;
 
-	INSERT INTO audit_check_data (fid, error_message) VALUES (40, 'Rpt file import process -> Finished. Check your data');
+	INSERT INTO audit_check_data (fid, error_message) VALUES (140, 'Rpt file import process -> Finished. Check your data');
 
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid = 40  order by id) row;
+	FROM (SELECT error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid = 140  order by id) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 	
@@ -168,7 +169,7 @@ BEGIN
     'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
   	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
-  	FROM  anl_node WHERE cur_user="current_user"() AND fid = 40) row) features;
+  	FROM  anl_node WHERE cur_user="current_user"() AND fid = 140) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
@@ -183,11 +184,10 @@ BEGIN
     'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
   	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom, fid
-  	FROM  anl_arc WHERE cur_user="current_user"() AND fid = 40) row) features;
+  	FROM  anl_arc WHERE cur_user="current_user"() AND fid = 140) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
-
 
 	--Control nulls
 	v_version := COALESCE(v_version, '{}'); 
@@ -195,7 +195,7 @@ BEGIN
 	v_result_point := COALESCE(v_result_point, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 	
 
--- 	Return
+	-- Return
 	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Import succesfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
@@ -204,10 +204,10 @@ BEGIN
 		       '}}'||
 	    '}')::json;		
 
---  Exception handling
+	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN
-	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$

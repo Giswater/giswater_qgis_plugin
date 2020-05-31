@@ -28,45 +28,45 @@ SELECT SCHEMA_NAME.gw_fct_setconfig($${
 */
 
 DECLARE
-    schemas_array name[];
-    v_version json;
-    v_text text[];
-    json_field json;
-    v_project_type text;
-    v_widget text;
-    v_chk text;
-    v_value text;
-    v_isChecked text;
-    v_json json;
-    result text;
-    v_table text;
-    v_fields json;
-    v_return text;
-    v_formname text;
-    text text;
-    v_widgettype text;
+
+schemas_array name[];
+v_version json;
+v_text text[];
+json_field json;
+v_project_type text;
+v_widget text;
+v_chk text;
+v_value text;
+v_isChecked text;
+v_json json;
+result text;
+v_table text;
+v_fields json;
+v_return text;
+v_formname text;
+text text;
+v_widgettype text;
 
 BEGIN
 
--- Set search path to local schema
+	-- Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
 
---  get api version
+	-- get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
         INTO v_version;
 
--- fix diferent ways to say null on client
+	-- fix diferent ways to say null on client
     p_data = REPLACE (p_data::text, '"NULL"', 'null');
     p_data = REPLACE (p_data::text, '"null"', 'null');
     p_data = REPLACE (p_data::text, '""', 'null');
     p_data = REPLACE (p_data::text, '''''', 'null');
     p_data = REPLACE (p_data::text, '''''', 'null');
 
-
---  Get project type
+	--  Get project type
     SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
 
---    Get schema name
+	--  Get schema name
     schemas_array := current_schemas(FALSE);
 
     v_fields = ((p_data::json->>'data')::json->>'fields')::json;
@@ -144,7 +144,7 @@ BEGIN
 
    END LOOP;
 
---    Return
+	-- Return
     RETURN ('{"status":"Accepted", "version":'||v_version||
              ',"body":{"message":{"priority":1, "text":"This is a test message"}'||
 			',"form":{}'||
@@ -152,9 +152,9 @@ BEGIN
 			',"data":{}}'||
 	    '}')::json;
 	    
---    Exception handling
-   -- EXCEPTION WHEN OTHERS THEN 
-    --    RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN 
+    RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

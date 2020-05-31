@@ -32,6 +32,7 @@ layout_xml xml;
 v_parent_layer text;
 
 BEGIN
+
 	SET search_path=SCHEMA_NAME, public;
 
 	--Loop in order to extract parts of xml related to layout_data_1,2,3
@@ -83,8 +84,7 @@ BEGIN
 		END IF;
 	END LOOP;
 
-	
-return null;
+	return null;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

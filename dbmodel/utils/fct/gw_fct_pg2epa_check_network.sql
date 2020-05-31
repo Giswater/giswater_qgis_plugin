@@ -29,8 +29,8 @@ SELECT * FROM temp_anlgraf;
 
 */
 
-
 DECLARE
+
 v_project_type text;
 v_affectedrows numeric;
 v_cont integer default 0;
@@ -422,9 +422,9 @@ BEGIN
 	    '}')::json;
 
 	--  Exception handling
-	--EXCEPTION WHEN OTHERS THEN
-	--GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	--RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

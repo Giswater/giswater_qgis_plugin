@@ -20,10 +20,11 @@ SELECT SCHEMA_NAME.gw_fct_admin_rename_fixviews($${
 */
 
 DECLARE 
-	v_viewname text; 
-	v_oldschemaname text;
-	v_newschemaname text;
-	v_definition text;
+
+v_viewname text; 
+v_oldschemaname text;
+v_newschemaname text;
+v_definition text;
 	
 BEGIN 
 
@@ -48,7 +49,8 @@ BEGIN
 
 		RAISE NOTICE 'v_definition %', v_definition;
 	END LOOP;
-RETURN;
+	
+	RETURN;
 		
 END;
 $BODY$

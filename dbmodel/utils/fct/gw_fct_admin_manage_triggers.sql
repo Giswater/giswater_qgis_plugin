@@ -10,6 +10,7 @@ DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_admin_schema_manage_triggers(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_manage_triggers(p_action text, p_table text)
  RETURNS void AS
 $BODY$
+
 /*
 EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_admin_manage_triggers('notify',null);
@@ -20,11 +21,12 @@ SELECT SCHEMA_NAME.gw_fct_admin_manage_triggers('fk','CHECK');
 
 DECLARE
 
-	rec record;
-	v_version text;
-	v_notify_action json;
-	rec_json record; 
-	v_table record;
+rec record;
+
+v_version text;
+v_notify_action json;
+rec_json record; 
+v_table record;
 
 BEGIN
 	
@@ -56,7 +58,6 @@ BEGIN
 					EXECUTE 'CREATE TRIGGER gw_trg_notify 
 							AFTER INSERT OR UPDATE OF '||rec_json.trg_fields||' OR DELETE ON '||rec.id||'
 							FOR EACH ROW EXECUTE PROCEDURE gw_trg_notify('''||rec.id||''');';
-					
 				END IF;
 			END LOOP;
 	 	END LOOP;
@@ -86,8 +87,10 @@ BEGIN
 		END LOOP;
 
 	END IF;
+	
+	RETURN;
+	
 END;
 $BODY$
- 
  LANGUAGE plpgsql VOLATILE
  COST 100;

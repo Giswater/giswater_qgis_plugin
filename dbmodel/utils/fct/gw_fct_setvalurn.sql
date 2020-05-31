@@ -12,13 +12,14 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setvalurn()
 $BODY$
 
 DECLARE 
+
 query_text 	text;
-sys_rows_aux 	text;
-parameter_aux   text;
-audit_rows_aux 	integer;
+sys_rows_aux text;
+parameter_aux text;
+audit_rows_aux integer;
 compare_sign_aux text;
-enabled_bool 	boolean;
-diference_aux 	integer;
+enabled_bool boolean;
+diference_aux integer;
 error_aux integer;
 count integer;
 table_host_aux text;

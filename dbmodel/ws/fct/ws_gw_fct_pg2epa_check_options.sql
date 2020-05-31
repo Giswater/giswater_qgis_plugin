@@ -10,15 +10,14 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_check_options(p_data json)
   RETURNS json AS
 $BODY$
 
-
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_options($${"data":{"parameters":{"resultId":"gw_check_project","fid":227}}}$$) --when is called from go2epa_main from toolbox
 
 -- fid:227 (passed by input parameters)
 */
 
-
 DECLARE
+
 v_fid integer;
 v_version text;
 v_record record;

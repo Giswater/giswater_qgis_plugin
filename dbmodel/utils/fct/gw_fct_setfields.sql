@@ -6,12 +6,10 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2610
 
-
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_setfields(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setfields(p_data json)
   RETURNS json AS
 $BODY$
-
 
 /* example
 
@@ -35,38 +33,36 @@ SELECT SCHEMA_NAME.gw_fct_setfields('
 
 DECLARE
 
---    Variables
-    v_device integer;
-    v_infotype integer;
-    v_tablename text;
-    v_id  character varying;
-    v_fields json;
-    v_columntype character varying;
-    v_querytext varchar;
-    v_idname varchar;
-    column_type_id character varying;
-    v_version json;
-    v_text text[];
-    text text;
-    i integer=1;
-    n integer=1;
-    v_field text;
-    v_value text;
-    v_return text;
-    v_schemaname text;
-    v_featuretype text;
-    v_jsonfield json;
-    v_fieldsreload text;
-    v_columnfromid json;
-
+v_device integer;
+v_infotype integer;
+v_tablename text;
+v_id  character varying;
+v_fields json;
+v_columntype character varying;
+v_querytext varchar;
+v_idname varchar;
+column_type_id character varying;
+v_version json;
+v_text text[];
+text text;
+i integer=1;
+n integer=1;
+v_field text;
+v_value text;
+v_return text;
+v_schemaname text;
+v_featuretype text;
+v_jsonfield json;
+v_fieldsreload text;
+v_columnfromid json;
 
 BEGIN
 
---    Set search path to local schema
+	-- Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
     v_schemaname = 'SCHEMA_NAME';
 
---  get api version
+	--  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
         INTO v_version;
 
@@ -87,8 +83,7 @@ BEGIN
 	
 	select array_agg(row_to_json(a)) into v_text from json_each(v_fields)a;
 
-
---    Get id column, for tables is the key column
+	--  Get id column, for tables is the key column
     EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
         INTO v_idname
         USING v_tablename;
@@ -104,8 +99,7 @@ BEGIN
         USING v_tablename, v_schemaname;
     END IF;
  
---   Get id column type
--------------------------
+	--   Get id column type
     EXECUTE 'SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a
 	    JOIN pg_class t on a.attrelid = t.oid
 	    JOIN pg_namespace s on t.relnamespace = s.oid
@@ -184,19 +178,18 @@ BEGIN
 		
 	END IF;
 
-	--    Control NULL's
+	-- Control NULL's
 	v_version := COALESCE(v_version, '[]');
 	v_columnfromid := COALESCE(v_columnfromid, '{}');   
 
---    Return
+	-- Return
     RETURN ('{"status":"Accepted", "apiVersion":' || v_version ||
 	      ',"body":{"data":{"fields":' || v_columnfromid || '}'||
 	      '}'||'}')::json; 
 
---    Exception handling
-   -- EXCEPTION WHEN OTHERS THEN 
-    --    RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ', "apiVersion":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
-
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN 
+    RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ', "apiVersion":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

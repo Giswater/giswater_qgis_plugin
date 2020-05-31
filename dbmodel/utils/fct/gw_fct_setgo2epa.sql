@@ -20,31 +20,31 @@ SELECT SCHEMA_NAME.gw_fct_setgo2epa($${
 */
 
 DECLARE
-    schemas_array name[];
-    v_version json;
-    v_text text[];
-    json_field json;
-    v_widget text;
-    v_value text;
-    v_json json;
-    v_table text;
-    v_fields json;
-    v_return text;
-    v_field text;
-    i integer=1;
-    text text;
-  
 
+schemas_array name[];
+v_version json;
+v_text text[];
+json_field json;
+v_widget text;
+v_value text;
+v_json json;
+v_table text;
+v_fields json;
+v_return text;
+v_field text;
+i integer=1;
+text text;
+ 
 BEGIN
 
--- set search path
+	-- set search path
     set search_path='SCHEMA_NAME';
 
---  get api version
+	--  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
         INTO v_version;
 
---    Get schema name
+	-- Get schema name
     schemas_array := current_schemas(FALSE);
     
     v_fields = ((p_data->>'data')::json->>'fields')::json;
@@ -74,8 +74,7 @@ BEGIN
 	
    END LOOP;
 
-/*
-
+	/*
     v_fields = ((p_data::json->>'data')::json->>'fields')::json;
     v_table:= 'config_param_user';
 
@@ -93,7 +92,7 @@ BEGIN
    END LOOP;
    */
 
---    Return
+	-- Return
     RETURN ('{"status":"Accepted", "version":'||v_version||
              ',"body":{"message":{"priority":1, "text":"This is a test message"}'||
 			',"form":{}'||
@@ -102,9 +101,9 @@ BEGIN
 	    '}}')::json;
 
       
---    Exception handling
-   -- EXCEPTION WHEN OTHERS THEN 
-    --    RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN 
+    RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

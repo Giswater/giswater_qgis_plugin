@@ -10,7 +10,6 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_check_result(p_data json)
   RETURNS json AS
 $BODY$
 
-
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"gw_check_project","fid":227}}}$$) --when is called from go2epa_main from toolbox
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"r1"}}}$$) -- when is called from toolbox
@@ -20,6 +19,7 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId
 */
 
 DECLARE
+
 v_fid integer;
 v_record record;
 v_project_type text;

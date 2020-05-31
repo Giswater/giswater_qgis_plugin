@@ -27,6 +27,7 @@ SELECT gw_fct_grafanalytics_mapzones_advanced('{"data":{"parameters":{"grafClass
 */
 
 DECLARE
+
 v_class text;
 v_expl integer;
 v_updatemapzone integer;
@@ -35,7 +36,7 @@ v_paramupdate float;
 
 BEGIN
 
-		-- Search path
+	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
 	
 	v_class = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'grafClass');

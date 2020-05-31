@@ -9,6 +9,9 @@ DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_mincut_inverted_flowtrace(integer);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut_inverted_flowtrace(result_id_arg integer)
   RETURNS integer AS
 $BODY$
+
+-- fid: 129
+
 DECLARE
 
 rec_valve record;
@@ -128,7 +131,8 @@ BEGIN
 				IF (select value::boolean from config_param_system where parameter='om_mincut_valve2tank_traceability') IS TRUE THEN 
 					FOR rec_result IN EXECUTE query_text
 					LOOP 
-						INSERT INTO audit_log_data(fid, feature_id, log_message, cur_user) VALUES (29, rec_result.edge, concat(result_id_arg, ':', rec_valve.node_id,'-',rec_tank.node_id), current_user);
+						INSERT INTO audit_log_data(fid, feature_id, log_message, cur_user) VALUES (129, rec_result.edge, concat(result_id_arg, ':', 
+						rec_valve.node_id,'-',rec_tank.node_id), current_user);
 					END LOOP;			
 				END IF;
 	
@@ -210,7 +214,7 @@ BEGIN
 	
 	END LOOP;
 	
-RETURN 1;
+	RETURN 1;
    
 END;
 $BODY$

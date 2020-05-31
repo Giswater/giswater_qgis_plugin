@@ -19,7 +19,9 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_export_inp('result_1', 'D:\dades\test.inp')
 */
 
 DECLARE
+
 rec_table record;
+
 column_number integer;
 id_last integer;
 num_col_rec record;
@@ -38,7 +40,6 @@ v_networkmodeval text;
 v_return json;
 
 BEGIN
-
 
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
@@ -147,8 +148,8 @@ BEGIN
 		from temp_csv where fid  = 141 and cur_user = current_user and source not in ('header','vi_controls','vi_rules', 'vi_backdrop')
 		order by id)a )row;
 	
-RETURN v_return;
-        
+	RETURN v_return;
+    
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;

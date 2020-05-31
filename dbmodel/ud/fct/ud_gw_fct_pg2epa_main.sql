@@ -15,6 +15,9 @@ $BODY$
 
 /*example
 SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":3, "infoType":100, "lang":"ES"}, "data":{"resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true"}}$$)
+
+-- fid: 227
+
 */
 
 DECLARE
@@ -53,13 +56,13 @@ BEGIN
 	v_checknetwork = (SELECT value::json->>'checkNetwork' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 
 	-- delete audit table
-	DELETE FROM audit_check_data WHERE fid = 127 AND cur_user=current_user;
+	DELETE FROM audit_check_data WHERE fid = 227 AND cur_user=current_user;
 
 	v_inpoptions = (SELECT (replace (replace (replace (array_to_json(array_agg(json_build_object((t.parameter),(t.value))))::text,'},{', ' , '),'[',''),']',''))::json 
 				FROM (SELECT parameter, value FROM config_param_user 
 				JOIN sys_param_user a ON a.id=parameter	WHERE cur_user=current_user AND formname='epaoptions')t);
 	-- setting variables
-	v_input = concat('{"data":{"parameters":{"resultId":"',v_result,'", "dumpSubcatch":"',v_dumpsubcatch,'", "fid":127}}}')::json;
+	v_input = concat('{"data":{"parameters":{"resultId":"',v_result,'", "dumpSubcatch":"',v_dumpsubcatch,'", "fid":227}}}')::json;
 
 	-- only export
 	IF v_onlyexport THEN
@@ -138,7 +141,8 @@ BEGIN
 	v_return = replace(v_return::text, '"message":{"priority":1, "text":"Data quality analysis done succesfully"}', '
 	"message":{"priority":1, "text":"Inp export done succesfully"}')::json;
 	
-	RETURN v_return;	
+	RETURN v_return;
+	
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

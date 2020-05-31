@@ -19,24 +19,24 @@ SELECT SCHEMA_NAME.gw_fct_setselectors($${
 */
 
 DECLARE
---	Variables
-	v_version json;
-	v_selector_type text;
-	v_tableName text;
-	v_column_id text;
-	v_result_name text;
-	v_result_value text;
+
+v_version json;
+v_selector_type text;
+v_tableName text;
+v_column_id text;
+v_result_name text;
+v_result_value text;
 	
 BEGIN
 
--- Set search path to local schema
+	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
 	
---  get api version
+	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
 		INTO v_version;
 		
--- Get input parameters:
+	-- Get input parameters:
 	v_selector_type := (p_data ->> 'data')::json->> 'selector_type';
 	v_tableName := (p_data ->> 'data')::json->> 'tableName';
 	v_column_id := (p_data ->> 'data')::json->> 'column_id';
@@ -58,9 +58,11 @@ BEGIN
 			',"data":{"indexingLayers": {	"mincut": ["anl_mincut_result_selector", "v_anl_mincut_result_valve", "v_anl_mincut_result_cat", "v_anl_mincut_result_connec", "v_anl_mincut_result_node", "v_anl_mincut_result_arc"],
 							"exploitation": ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element"]
 			}}}'||'}')::json;
--- Exception handling
---	EXCEPTION WHEN OTHERS THEN
-		--RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

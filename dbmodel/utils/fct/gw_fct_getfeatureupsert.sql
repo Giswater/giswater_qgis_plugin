@@ -35,6 +35,7 @@ UPDATE config_param_user SET value =  'true' WHERE parameter = 'utils_debug_mode
 */
 
 DECLARE
+
 v_state_value integer;
 v_fields json;
 v_fields_array json[];
@@ -145,7 +146,6 @@ BEGIN
 	-- get user parameters
 	SELECT (value)::boolean INTO v_edit_upsert_elevation_from_dem FROM config_param_user WHERE parameter='edit_upsert_elevation_from_dem' AND cur_user = current_user;
 
-	    
 	IF v_automatic_ccode IS TRUE AND v_automatic_ccode_field ='connec_id' THEN v_automatic_ccode = TRUE; ELSE v_automatic_ccode = FALSE; END IF;
 
 	-- get tablename and formname
@@ -156,7 +156,6 @@ BEGIN
 	-- Special case of visits
 	SELECT tablename INTO v_visit_tablename FROM om_visit_class WHERE formname=p_table_id;
 	IF v_visit_tablename IS NOT NULL THEN v_tablename = v_visit_tablename; v_formname = p_table_id;	END IF;
-
 
 	--  get feature propierties
 	---------------------------
@@ -599,7 +598,6 @@ BEGIN
 	v_version := COALESCE(v_version, '[]');
 	v_fields := COALESCE(v_fields, '[]');    
 	v_message := COALESCE(v_message, '[]');    
-
     
 	-- Return
 	IF v_status IS TRUE THEN
@@ -619,7 +617,6 @@ BEGIN
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN 
 	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
-
 
 END;
 $BODY$

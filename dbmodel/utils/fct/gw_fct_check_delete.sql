@@ -17,7 +17,9 @@ SELECT SCHEMA_NAME.gw_fct_check_delete($${
 "feature":{"id":"1007","featureType":"NODE"},
 "data":{}}$$)
 */
+
 DECLARE
+
 rec_node record;
 v_num_feature integer;
 v_project_type text;
@@ -47,9 +49,7 @@ BEGIN
 	v_feature_type = upper(((p_data ->>'feature')::json->>'featureType')::text);
 	
     -- Computing process
-
     IF v_feature_type='NODE' THEN
-	
 	
 		IF v_project_type='WS' THEN 
 				select count(*) INTO v_num_feature from node join node a on node.parent_id=a.node_id where node.parent_id=v_feature_id;
@@ -219,7 +219,7 @@ BEGIN
     v_level = 3;
     v_message = 'Process done successfully';
 
---  Return
+	--  Return
      RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
@@ -231,8 +231,8 @@ BEGIN
 	    '}')::json;
 
 	EXCEPTION WHEN OTHERS THEN
-	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 
 END;

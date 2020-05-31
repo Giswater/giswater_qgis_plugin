@@ -6,9 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2128
 
-
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_plan_result(text, integer, double precision, text);
-
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_plan_result( p_data json)
   RETURNS json AS
 $BODY$
@@ -20,6 +18,7 @@ SELECT SCHEMA_NAME.gw_fct_plan_result($${
 */
 
 DECLARE 
+
 project_type_aux text;
 v_project_type text;
 v_version text;
@@ -64,10 +63,7 @@ BEGIN
 		PERFORM gw_fct_plan_result_reh(id_last, v_coefficient, v_descript);
 	
 	END IF;
-		
-
 	
---  Return
     RETURN v_return;
 
 END;

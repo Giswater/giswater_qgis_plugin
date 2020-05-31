@@ -39,78 +39,78 @@ v_addparam json;
 
 BEGIN
 
---  Search path
+	--  Search path
     SET search_path = "SCHEMA_NAME", public; 
 
     SELECT * INTO rec FROM version LIMIT 1;
  
---  Start process	
+	--  Start process	
     RAISE NOTICE 'Starting additional pumps process.';
 	
---  Loop for pumping stations
+	--  Loop for pumping stations
     FOR node_id_aux IN (SELECT DISTINCT node_id FROM inp_pump_additional JOIN temp_arc ON concat(node_id,'_n2a')=arc_id)
     LOOP
 
-	SELECT * INTO arc_rec FROM temp_arc WHERE arc_id=concat(node_id_aux,'_n2a');
-	
---  	Loop for additional pumps
-	FOR pump_rec IN SELECT * FROM inp_pump_additional WHERE node_id=node_id_aux
-	LOOP
+		SELECT * INTO arc_rec FROM temp_arc WHERE arc_id=concat(node_id_aux,'_n2a');
+
+		-- Loop for additional pumps
+		FOR pump_rec IN SELECT * FROM inp_pump_additional WHERE node_id=node_id_aux
+		LOOP
+				
+			-- Id creation from pattern arc
+			v_old_arc_id = arc_rec.arc_id;
+			record_new_arc.arc_id=concat(arc_rec.arc_id,pump_rec.order_id);
+
+			-- Right or left hand
+			odd_var = pump_rec.order_id %2;
 			
+			if (odd_var)=0 then 
+				angle=(ST_Azimuth(ST_startpoint(arc_rec.the_geom), ST_endpoint(arc_rec.the_geom)))+1.57;
+			else 
+				angle=(ST_Azimuth(ST_startpoint(arc_rec.the_geom), ST_endpoint(arc_rec.the_geom)))-1.57;
+				pump_order = (pump_rec.order_id);
+			end if;
 
-		-- Id creation from pattern arc
-		v_old_arc_id = arc_rec.arc_id;
-		record_new_arc.arc_id=concat(arc_rec.arc_id,pump_rec.order_id);
+			-- Copiyng values from patter arc
+			record_new_arc.node_1 = arc_rec.node_1;
+			record_new_arc.node_2 = arc_rec.node_2;
+			record_new_arc.epa_type = arc_rec.epa_type;
+			record_new_arc.sector_id = arc_rec.sector_id;
+			record_new_arc.state = arc_rec.state;
+			record_new_arc.arccat_id = arc_rec.arccat_id;
+			
+			-- Geometry construction from pattern arc
+			-- intermediate variables
+			n1_geom = ST_LineInterpolatePoint(arc_rec.the_geom, 0.100000);
+			n2_geom = ST_LineInterpolatePoint(arc_rec.the_geom, 0.900000);
+			dist = (ST_Distance(ST_transform(ST_startpoint(arc_rec.the_geom),rec.epsg), ST_LineInterpolatePoint(arc_rec.the_geom, 0.2000000))); 
 
-		-- Right or left hand
-		odd_var = pump_rec.order_id %2;
-		
-		if (odd_var)=0 then 
-			angle=(ST_Azimuth(ST_startpoint(arc_rec.the_geom), ST_endpoint(arc_rec.the_geom)))+1.57;
-		else 
-			angle=(ST_Azimuth(ST_startpoint(arc_rec.the_geom), ST_endpoint(arc_rec.the_geom)))-1.57;
-			pump_order = (pump_rec.order_id);
-		end if;
+			--create point1
+			yp1 = ST_y(n1_geom)-(cos(angle))*dist*0.10000*(pump_order::float);
+			xp1 = ST_x(n1_geom)-(sin(angle))*dist*0.10000*(pump_order::float);
+			raise notice' % % %', cos(angle), dist, pump_order::float;
+			
+			--create point2
+			yp2 = ST_y(n2_geom)-cos(angle)*dist*0.100000*(pump_order::float);
+			xp2 = ST_x(n2_geom)-sin(angle)*dist*0.100000*(pump_order::float);
 
-		-- Copiyng values from patter arc
-		record_new_arc.node_1 = arc_rec.node_1;
-		record_new_arc.node_2 = arc_rec.node_2;
-		record_new_arc.epa_type = arc_rec.epa_type;
- 		record_new_arc.sector_id = arc_rec.sector_id;
- 		record_new_arc.state = arc_rec.state;
- 		record_new_arc.arccat_id = arc_rec.arccat_id;
- 		
-		-- Geometry construction from pattern arc
-		-- intermediate variables
-		n1_geom = ST_LineInterpolatePoint(arc_rec.the_geom, 0.100000);
-		n2_geom = ST_LineInterpolatePoint(arc_rec.the_geom, 0.900000);
-		dist = (ST_Distance(ST_transform(ST_startpoint(arc_rec.the_geom),rec.epsg), ST_LineInterpolatePoint(arc_rec.the_geom, 0.2000000))); 
+			p1_geom = ST_SetSRID(ST_MakePoint(xp1, yp1),rec.epsg);	
+			p2_geom = ST_SetSRID(ST_MakePoint(xp2, yp2),rec.epsg);	
 
-		--create point1
-		yp1 = ST_y(n1_geom)-(cos(angle))*dist*0.10000*(pump_order::float);
-		xp1 = ST_x(n1_geom)-(sin(angle))*dist*0.10000*(pump_order::float);
-		raise notice' % % %', cos(angle), dist, pump_order::float;
-		
-		--create point2
-		yp2 = ST_y(n2_geom)-cos(angle)*dist*0.100000*(pump_order::float);
-		xp2 = ST_x(n2_geom)-sin(angle)*dist*0.100000*(pump_order::float);
+			--create arc
+			record_new_arc.the_geom=ST_makeline(ARRAY[ST_startpoint(arc_rec.the_geom), p1_geom, p2_geom, ST_endpoint(arc_rec.the_geom)]);
 
-		p1_geom = ST_SetSRID(ST_MakePoint(xp1, yp1),rec.epsg);	
-		p2_geom = ST_SetSRID(ST_MakePoint(xp2, yp2),rec.epsg);	
+			--addparam
+			v_addparam = concat('{"power":"',pump_rec.power,'","curve_id":"',pump_rec.curve_id,'","speed":"',pump_rec.speed,'","pattern":"', pump_rec.pattern,'","to_arc":"',
+						 arc_rec.addparam::json->>'to_arc','", "energyparam":"',pump_rec.energyparam,'","energyvalue":"',pump_rec.energyvalue,'","pump_type":"',
+						 arc_rec.addparam::json->>'pump_type','"}');	
 
-		--create arc
-		record_new_arc.the_geom=ST_makeline(ARRAY[ST_startpoint(arc_rec.the_geom), p1_geom, p2_geom, ST_endpoint(arc_rec.the_geom)]);
-	
-		--addparam
-		v_addparam = concat('{"power":"',pump_rec.power,'","curve_id":"',pump_rec.curve_id,'","speed":"',pump_rec.speed,'","pattern":"', pump_rec.pattern,'","to_arc":"',
-				     arc_rec.addparam::json->>'to_arc','", "energyparam":"',pump_rec.energyparam,'","energyvalue":"',pump_rec.energyvalue,'","pump_type":"',
-				     arc_rec.addparam::json->>'pump_type','"}');	
+			-- Inserting into temp_arc
+			INSERT INTO temp_arc (arc_id, node_1, node_2, arc_type, epa_type, sector_id, arccat_id, state, state_type, status, the_geom, expl_id, flw_code, addparam, length, diameter, roughness) 
+			VALUES (record_new_arc.arc_id, record_new_arc.node_1, record_new_arc.node_2, 'NODE2ARC', record_new_arc.epa_type, record_new_arc.sector_id, 
+			record_new_arc.arccat_id, record_new_arc.state, arc_rec.state_type, pump_rec.status, record_new_arc.the_geom, arc_rec.expl_id, v_old_arc_id, v_addparam, arc_rec.length, arc_rec.diameter, arc_rec.roughness);			
 
-		-- Inserting into temp_arc
-		INSERT INTO temp_arc (arc_id, node_1, node_2, arc_type, epa_type, sector_id, arccat_id, state, state_type, status, the_geom, expl_id, flw_code, addparam, length, diameter, roughness) 
-		VALUES (record_new_arc.arc_id, record_new_arc.node_1, record_new_arc.node_2, 'NODE2ARC', record_new_arc.epa_type, record_new_arc.sector_id, 
-		record_new_arc.arccat_id, record_new_arc.state, arc_rec.state_type, pump_rec.status, record_new_arc.the_geom, arc_rec.expl_id, v_old_arc_id, v_addparam, arc_rec.length, arc_rec.diameter, arc_rec.roughness);			
-	END LOOP;
+		END LOOP;
 
     END LOOP;
      	

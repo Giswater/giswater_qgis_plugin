@@ -17,12 +17,14 @@ SELECT SCHEMA_NAME.gw_fct_anl_arc_no_startend_node($${
 "feature":{"tableName":"v_edit_arc", 
 "featureType":"ARC", "id":[]}, 
 "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
-"parameters":{"arcSearchNodes":"0.1", 
-"saveOnDatabase":"true"}}}$$)::text
+"parameters":{"arcSearchNodes":"0.1", "saveOnDatabase":"true"}}}$$)::text
+
+-- fid: 103
 
 */
 
 DECLARE
+
 arc_rec record;
 nodeRecord1 record;
 nodeRecord2 record;
@@ -33,10 +35,10 @@ v_selectionmode text;
 v_arcsearchnodes float;
 v_saveondatabase boolean;
 v_worklayer text;
-v_result 		json;
-v_result_info 		json;
-v_result_point		json;
-v_result_line 		json;
+v_result json;
+v_result_info json;
+v_result_point json;
+v_result_line json;
 v_array text;
 v_partcount integer = 0;
 v_totcount integer = 0;
@@ -65,7 +67,7 @@ BEGIN
 	SELECT regexp_replace(row(value)::text, '["()"]', '', 'g')  INTO v_qmllinepath FROM config_param_user WHERE parameter='qgis_qml_linelayer_path' AND cur_user=current_user;
 
 	-- Reset values
-    DELETE FROM anl_arc_x_node WHERE cur_user="current_user"() AND fid = 3;
+    DELETE FROM anl_arc_x_node WHERE cur_user="current_user"() AND fid = 103;
 	
 	-- Init counter
 	EXECUTE 'SELECT count(*) FROM '||v_worklayer
@@ -82,14 +84,14 @@ BEGIN
 		ORDER BY ST_Distance(node.the_geom, ST_startpoint(arc_rec.the_geom)) LIMIT 1;
 		IF nodeRecord1 IS NULL 	THEN
 			INSERT INTO anl_arc_x_node (arc_id, state, expl_id, fid, the_geom, the_geom_p, arccat_id)
-			SELECT arc_rec.arc_id, arc_rec.state, arc_rec.expl_id, 3, arc_rec.the_geom, st_startpoint(arc_rec.the_geom), arc_rec.arccat_id;
+			SELECT arc_rec.arc_id, arc_rec.state, arc_rec.expl_id, 103, arc_rec.the_geom, st_startpoint(arc_rec.the_geom), arc_rec.arccat_id;
 		END IF;
 	
 		SELECT * INTO nodeRecord2 FROM node WHERE ST_DWithin(ST_endpoint(arc_rec.the_geom), node.the_geom, v_arcsearchnodes) AND (node.state=1 OR node.state=2)
 		ORDER BY ST_Distance(node.the_geom, ST_endpoint(arc_rec.the_geom)) LIMIT 1;
 		IF nodeRecord2 IS NULL 	THEN
 			INSERT INTO anl_arc_x_node (arc_id, state, expl_id, fid, the_geom, the_geom_p, arccat_id)
-			SELECT arc_rec.arc_id, arc_rec.state, arc_rec.expl_id, 3, arc_rec.the_geom, st_endpoint(arc_rec.the_geom), arc_rec.arccat_id;
+			SELECT arc_rec.arc_id, arc_rec.state, arc_rec.expl_id, 103, arc_rec.the_geom, st_endpoint(arc_rec.the_geom), arc_rec.arccat_id;
 		END IF;
 		
 		RAISE NOTICE 'Progress %', (v_partcount::float*100/v_totcount::float)::numeric (5,2);
@@ -99,7 +101,7 @@ BEGIN
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid = 3 order by id) row;
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid = 103 order by id) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
@@ -114,7 +116,7 @@ BEGIN
     'properties', to_jsonb(row) - 'the_geom_p'
   	) AS feature
   	FROM (SELECT id, node_id, arccat_id, state, expl_id, descript,fid, the_geom_p
-  	FROM  anl_arc_x_node WHERE cur_user="current_user"() AND fid = 3) row) features;
+  	FROM  anl_arc_x_node WHERE cur_user="current_user"() AND fid = 103) row) features;
   	
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "features":',v_result, '}');
@@ -131,18 +133,18 @@ BEGIN
     'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
   	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript,fid, the_geom
-  	FROM  anl_arc_x_node WHERE cur_user="current_user"() AND fid = 3) row) features;
+  	FROM  anl_arc_x_node WHERE cur_user="current_user"() AND fid = 103) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "qmlPath":"',v_qmllinepath,'", "features":',v_result, '}'); 
 
 	IF v_saveondatabase IS FALSE THEN 
 		-- delete previous results
-		DELETE FROM anl_arc_x_node WHERE cur_user="current_user"() AND fid = 3;
+		DELETE FROM anl_arc_x_node WHERE cur_user="current_user"() AND fid = 103;
 	ELSE
 		-- set selector
-		DELETE FROM selector_audit WHERE fid = 3 AND cur_user=current_user;
-		INSERT INTO selector_audit (fid,cur_user) VALUES (3, current_user);
+		DELETE FROM selector_audit WHERE fid = 103 AND cur_user=current_user;
+		INSERT INTO selector_audit (fid,cur_user) VALUES (103, current_user);
 	END IF;
 	
 	--    Control nulls

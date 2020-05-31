@@ -20,6 +20,7 @@ SELECT SCHEMA.gw_fct_setvisitmanagerstart($${
 */
 
 DECLARE
+
 v_message json;
 v_data json;
 v_user text;
@@ -35,21 +36,20 @@ v_error_context text;
 
 BEGIN
 
--- 	Set search path to local schema
+	-- 	Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
 
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
         INTO v_version;
 		
--- 	fix diferent ways to say null on client
+	-- 	fix diferent ways to say null on client
 	p_data = REPLACE (p_data::text, '"NULL"', 'null');
 	p_data = REPLACE (p_data::text, '"null"', 'null');
 	p_data = REPLACE (p_data::text, '""', 'null');
 	p_data = REPLACE (p_data::text, '''''', 'null');
 	
 	-- setting values on table om_visit_lot_x_user 
-
 	v_user := (((p_data ->>'data')::json->>'fields')::json->>'user_id');
 	v_date := (((p_data ->>'data')::json->>'fields')::json->>'date');
 	v_team = (((p_data ->>'data')::json->>'fields')::json->>'team_id')::integer;
@@ -57,7 +57,6 @@ BEGIN
 	v_x = (((p_data ->>'data')::json->>'deviceTrace')::json->>'xcoord')::float;
 	v_y = (((p_data ->>'data')::json->>'deviceTrace')::json->>'ycoord')::float;
 	v_thegeom = ST_SetSRID(ST_MakePoint(v_x, v_y), (SELECT st_srid(the_geom) from arc limit 1));
-
 
 	-- Check if exist some other workday opened, and close
 	EXECUTE 'SELECT endtime FROM (SELECT * FROM SCHEMA_NAME.om_visit_lot_x_user WHERE user_id=''' || v_user ||''' ORDER BY id DESC) a LIMIT 1' INTO v_result;
@@ -89,8 +88,6 @@ BEGIN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
 	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 	
-
-
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

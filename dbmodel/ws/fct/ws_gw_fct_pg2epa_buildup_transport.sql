@@ -10,11 +10,8 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_buildup_transport(p_result 
 RETURNS integer 
 AS $BODY$
 
-/*example
-
-*/
-
 DECLARE
+
 rec_node record;
 v_count integer;
 
@@ -38,7 +35,6 @@ BEGIN
 			UPDATE temp_node SET epa_type  = 'TANK' WHERE node_id =  rec_node.node_id;
 		END IF;
 	END LOOP;
-
 	
 	RETURN 1;
 END;

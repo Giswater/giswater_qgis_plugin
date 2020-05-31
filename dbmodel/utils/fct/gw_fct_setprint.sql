@@ -4,7 +4,6 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-
 -- FUNCTION CODE: 2684
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_getprint(p_data json);
@@ -25,63 +24,60 @@ SELECT SCHEMA_NAME.gw_fct_setprint($${
 
 DECLARE
 
---    Variables
-    p21x float; 
-    p02x float;
-    p21y float; 
-    p02y float;
-    p22x float;
-    p22y float;
-    p01x float;
-    p01y float;
-    dx float;
-    dy float;
-    v_version text;
-    v_text text[];
-    json_field json;
-    text text;
-    v_field text;
-    v_value text;
-    i integer=1;
-    sql_query text;
-    v_publish_user text;
-    v_composer text;
-    v_width float;
-    v_height float;
-    v_scale integer;
-    v_x float;
-    v_x1 float;
-    v_x2 float;
-    v_y1 float;
-    v_y2 float;
-    v_y float;
-    v_json1 json;
-    v_json2 json;
-    v_json3 json;
-    v_extent json;
-    v_geometry text;
-    v_array_width float[];
-    v_mapcomposer_name text;
-    v_rotation float;
-    v_xmin float;
-    v_ymin float;
-    v_xmax float;
-    v_ymax float;
-    v_index integer;
+p21x float; 
+p02x float;
+p21y float; 
+p02y float;
+p22x float;
+p22y float;
+p01x float;
+p01y float;
+dx float;
+dy float;
+v_version text;
+v_text text[];
+json_field json;
+text text;
+v_field text;
+v_value text;
+i integer=1;
+sql_query text;
+v_publish_user text;
+v_composer text;
+v_width float;
+v_height float;
+v_scale integer;
+v_x float;
+v_x1 float;
+v_x2 float;
+v_y1 float;
+v_y2 float;
+v_y float;
+v_json1 json;
+v_json2 json;
+v_json3 json;
+v_extent json;
+v_geometry text;
+v_array_width float[];
+v_mapcomposer_name text;
+v_rotation float;
+v_xmin float;
+v_ymin float;
+v_xmax float;
+v_ymax float;
+v_index integer;
 
 BEGIN
 
-    --    Set search path to local schema
+    -- Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
 	
-
 	-- fix client null mistakes
 	p_data = REPLACE (p_data::text, '"NULL"', 'null');
 	p_data = REPLACE (p_data::text, '"null"', 'null');
 	p_data = REPLACE (p_data::text, '""', 'null');
     p_data = REPLACE (p_data::text, '''''', 'null');
 	
-
     --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
         INTO v_version;
@@ -148,21 +144,18 @@ BEGIN
     v_ymin =  (SELECT min(a) FROM (SELECT p01y AS a UNION SELECT p02y UNION SELECT p21y UNION SELECT p22y)b);
     v_xmax =  (SELECT max(a) FROM (SELECT p01x AS a UNION SELECT p02x UNION SELECT p21x UNION SELECT p22x)b);
     v_ymax =  (SELECT max(a) FROM (SELECT p01y AS a UNION SELECT p02y UNION SELECT p21y UNION SELECT p22y)b);
-
-   
+ 
    -- generating the geometry
    v_geometry = '{"st_astext":"POLYGON('  || p21x ||' '|| p21y || ',' || p22x ||' '|| p22y || ',' || p02x || ' ' || p02y || ','|| p01x ||' '|| p01y || ',' || p21x ||' '|| p21y || ')"}';
    v_extent = '"[' || v_xmin || ',' || v_ymin || ',' || v_xmax || ',' || v_ymax || ']"';
 
-  
---    Control NULL's
+	-- Control NULL's
     v_version := COALESCE(v_version, '{}');
     v_geometry := COALESCE(v_geometry, '{}');
     v_mapcomposer_name := COALESCE(v_mapcomposer_name, '{}');
     v_extent := COALESCE(v_extent, '{}');
     
-
-  --Return
+	--Return
     RETURN ('{"status":"Accepted",'||
      '"apiVersion":'|| v_version ||
      ',"data":{'||
@@ -171,9 +164,10 @@ BEGIN
         ',"mapIndex":' || v_index || 
         ',"extent":'||v_extent ||'}}')::json;
 
---    Exception handling
-    --EXCEPTION WHEN OTHERS THEN 
-        --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	-- Exception handling
+    EXCEPTION WHEN OTHERS THEN 
+    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+
 END;
 $BODY$
 LANGUAGE 'plpgsql' VOLATILE COST 100;

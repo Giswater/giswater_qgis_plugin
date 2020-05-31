@@ -20,13 +20,12 @@ SELECT gw_fct_om_check_data($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{},"data":{"parameters":{"selectionMode":"wholeSystem"}}}$$)
 
-
 --fid: 104,187,188,196,197,201,202,203,204,205,206,
 
 */
 
-
 DECLARE
+
 v_project_type text;
 v_count integer;
 v_saveondatabase boolean;
@@ -817,13 +816,13 @@ BEGIN
 	--polygons
 	v_result_polygon = '{"geometryType":"", "values":[]}';
 		
-	--    Control nulls
+	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_result_point := COALESCE(v_result_point, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 
 	v_result_polygon := COALESCE(v_result_polygon, '{}'); 
 	
---  Return
+	--  Return
     RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
@@ -834,7 +833,7 @@ BEGIN
 		       '}'||
 	    '}')::json;
 
---  Exception handling
+	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
 	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;

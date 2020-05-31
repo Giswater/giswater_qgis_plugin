@@ -29,6 +29,7 @@ SELECT log_message FROM SCHEMA_NAME.audit_log_data WHERE fid=129 AND cur_user=cu
 TO SEE RESULTS ON SYSTEM TABLES (IN CASE OF "upsertAttributes":"TRUE")
 
 --fid: 
+125, 134
 129 & 149 fid: are relationed
 129 it is one row for mincut to resume data for each minsector
 149 it is detailed data for each minsector
@@ -36,6 +37,7 @@ TO SEE RESULTS ON SYSTEM TABLES (IN CASE OF "upsertAttributes":"TRUE")
 */
 
 DECLARE
+
 v_count1 integer = 0;
 v_expl json;
 v_data json;
@@ -71,11 +73,11 @@ BEGIN
 	END IF;
 
 	-- check criticity of data in order to continue or not
-	SELECT count(*) INTO v_count FROM audit_check_data WHERE cur_user="current_user"() AND fid=25 AND criticity=3;
+	SELECT count(*) INTO v_count FROM audit_check_data WHERE cur_user="current_user"() AND fid=125 AND criticity=3;
 	IF v_count > 3 THEN
 	
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-		FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=25 order by criticity desc, id asc) row;
+		FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=125 order by criticity desc, id asc) row;
 
 		v_result := COALESCE(v_result, '{}'); 
 		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
@@ -111,7 +113,7 @@ BEGIN
 		(SELECT distinct(macroexpl_id) FROM SCHEMA_NAME.exploitation JOIN (SELECT (json_array_elements_text(v_expl))::integer AS expl)a  ON expl=expl_id);
 	END IF;
 
-	INSERT INTO anl_arc (fid, arc_id, descript)	SELECT 34, arc_id, minsector_id FROM arc WHERE state = 1;
+	INSERT INTO anl_arc (fid, arc_id, descript)	SELECT 134, arc_id, minsector_id FROM arc WHERE state = 1;
 
 	SELECT count(*) into v_count1 FROM arc WHERE state = 1 AND minsector_id IS NOT NULL;
 	SELECT count(*) into v_count2 FROM arc WHERE state = 1 AND minsector_id IS NULL;
@@ -132,13 +134,13 @@ BEGIN
 		LOOP
 			v_count1 = v_count1 + 1;
 		
-			-- get arc_id represented minsector (fid:  34)			
-			v_arc = (SELECT descript FROM anl_arc WHERE result_id IS NULL AND fid=34 AND cur_user=current_user LIMIT 1);
+			-- get arc_id represented minsector (fid: 134)			
+			v_arc = (SELECT descript FROM anl_arc WHERE result_id IS NULL AND fid=134 AND cur_user=current_user LIMIT 1);
 
 			EXIT WHEN v_arc is null;
 		
 			-- set flag not don't take it in next loop
-			UPDATE anl_arc SET result_id='flag' WHERE descript=v_arc AND fid=34 AND cur_user=current_user;
+			UPDATE anl_arc SET result_id='flag' WHERE descript=v_arc AND fid=134 AND cur_user=current_user;
 
 			--call engine function
 			PERFORM gw_fct_mincut(v_arc, 'arc', -1);
@@ -178,7 +180,6 @@ BEGIN
 		INSERT INTO audit_check_data (fid, error_message)
 		SELECT 129, reverse(substring(reverse(substring(log_message,2,999)),2,999)) FROM audit_log_data 
 		WHERE fid=129 AND cur_user=current_user ORDER BY (((log_message::json->>'connecs')::json->>'hydrometers')::json->>'total')::integer desc;
-
 		
 	END IF;
 	
@@ -195,9 +196,8 @@ BEGIN
 	v_result_line := COALESCE(v_result_line, '{}'); 
 	v_result_polygon := COALESCE(v_result_polygon, '{}');
 	
-
---  Return
-    RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Mincut massive process done succesfully"}, "version":"'||v_version||'"'||
+	--  Return
+	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Mincut massive process done succesfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 				'"point":'||v_result_point||','||
@@ -207,12 +207,12 @@ BEGIN
 		       '}'||
 	    '}')::json;
 	
-RETURN v_count1;
+	RETURN v_count1;
 
---  Exception handling
+	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN
-	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$

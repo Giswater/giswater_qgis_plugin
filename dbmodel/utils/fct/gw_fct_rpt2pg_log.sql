@@ -34,9 +34,9 @@ v_stats json;
 v_error_context text;
 
 BEGIN
+
 	--  Search path	
 	SET search_path = "SCHEMA_NAME", public;
-
 	
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fid=114 AND cur_user=current_user;
@@ -195,7 +195,7 @@ BEGIN
 	v_result_line := COALESCE(v_result_line, '{}'); 
 	v_result_polygon := COALESCE(v_result_polygon, '{}'); 
 	
---  Return
+	--  Return
     RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Rpt file have been imported"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
@@ -205,10 +205,10 @@ BEGIN
 		       '}'||
 	    '}')::json;
 
---  Exception handling
+	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN
-	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$

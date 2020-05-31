@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2914
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_anl_node_proximity(p_table json)
-  RETURNS json AS
+RETURNS json AS
 $BODY$
 
 /*EXAMPLE
@@ -16,20 +16,24 @@ SELECT SCHEMA_NAME.gw_fct_anl_node_duplicated($${
 "feature":{"tableName":"v_edit_man_junction", "id":["1004","1005"]},
 "data":{"selectionMode":"previousSelection",
   "parameters":{"nodeProximity":300, "saveOnDatabase":true}}}$$)
+
+-- fid: 132
+
 */
 
 DECLARE
-    v_id json;
-    v_selectionmode text;
-    v_nodeproximity	float;
-    v_saveondatabase boolean;
-    v_worklayer 	text;
-    v_result 		json;
-	  v_result_info	json;
-	  v_result_point 	json;
-    v_array text;
-    v_qmlpointpath text;
-    v_error_context text;
+    
+v_id json;
+v_selectionmode text;
+v_nodeproximity	float;
+v_saveondatabase boolean;
+v_worklayer text;
+v_result json;
+v_result_info json;
+v_result_point json;
+v_array text;
+v_qmlpointpath text;
+v_error_context text;
  
 BEGIN
 
@@ -45,7 +49,7 @@ BEGIN
     v_nodeproximity := ((p_data ->>'data')::json->>'parameters')::json->>'nodeProximity';
 
     -- Reset values
-    DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=32;
+    DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=132;
 		
     --select default geometry style
     SELECT regexp_replace(row(value)::text, '["()"]', '', 'g')  INTO v_qmlpointpath FROM config_param_user WHERE parameter='qgis_qml_pointlayer_path' AND cur_user=current_user;
@@ -69,7 +73,7 @@ BEGIN
   	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=32 order by id) row;
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=132 order by id) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
@@ -83,18 +87,18 @@ v_result = null;
     'properties', to_jsonb(row) - 'the_geom'
     ) AS feature
     FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
-    FROM  anl_node WHERE cur_user="current_user"() AND fid=32) row) features;
+    FROM  anl_node WHERE cur_user="current_user"() AND fid=132) row) features;
 
   v_result := COALESCE(v_result, '{}'); 
   v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "features":',v_result, '}'); 
 
 	IF v_saveondatabase IS FALSE THEN 
 		-- delete previous results
-		DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=32;
+		DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=132;
 	ELSE
 		-- set selector
-		DELETE FROM selector_audit WHERE fid=32 AND cur_user=current_user;
-		INSERT INTO selector_audit (fid,cur_user) VALUES (32, current_user);
+		DELETE FROM selector_audit WHERE fid=132 AND cur_user=current_user;
+		INSERT INTO selector_audit (fid,cur_user) VALUES (132, current_user);
 	END IF;
 
  

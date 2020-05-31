@@ -48,7 +48,6 @@ BEGIN
 
 	-- create log
 	RETURN gw_fct_rpt2pg_log (v_result);
-
 	
 END;
 $BODY$

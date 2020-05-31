@@ -19,16 +19,16 @@ SELECT SCHEMA_NAME.gw_fct_getinfocrossection($${
 
 DECLARE
 
---    Variables
-    v_id character varying;
-    v_version json;
-    v_fields json;
-    v_currency_symbol varchar;
-    v_shape varchar;
-    v_record record;
-    v_array json[];
+v_id character varying;
+v_version json;
+v_fields json;
+v_currency_symbol varchar;
+v_shape varchar;
+v_record record;
+v_array json[];
 
 BEGIN
+
 	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
 
@@ -47,7 +47,7 @@ BEGIN
 		INTO v_shape;
 
 	-- get values from arc
-        SELECT * INTO v_record FROM v_plan_arc WHERE arc_id = v_id;
+	SELECT * INTO v_record FROM v_plan_arc WHERE arc_id = v_id;
 
 	-- building the widgets array
     v_array[0] := json_build_object('label', 'm2mlpav', 'columnname', 'm2mlpav', 'widgettype', 'text', 'datatype', 'string', 'iseditable', FALSE, 'layoutorder', 1, 'value', v_record.m2mlpav);
@@ -73,8 +73,8 @@ BEGIN
 	v_fields = array_to_json(v_array[0:18]);
       
 	-- Check null
-       v_shape := COALESCE(v_shape, '[]'); 
-       v_fields := COALESCE(v_fields, '[]'); 
+	v_shape := COALESCE(v_shape, '[]'); 
+	v_fields := COALESCE(v_fields, '[]'); 
 
 	-- Return
 	RETURN ('{"status":"Accepted", "message":{}, "apiVersion":'||v_version||
@@ -84,9 +84,10 @@ BEGIN
 			     ',"fields":' || v_fields || '}}'||
 	    '}')::json;
 
---    Exception handling
---    EXCEPTION WHEN OTHERS THEN 
-        --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN 
+    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

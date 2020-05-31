@@ -11,20 +11,16 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_ui_visit()
 $BODY$
 DECLARE 
 
-
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-	      
-
 
     IF TG_OP = 'DELETE' THEN 
 	
-	 		DELETE FROM om_visit WHERE id=OLD.id;
-
+ 		DELETE FROM om_visit WHERE id=OLD.id;
         RETURN NULL;
      
-     END IF;
+    END IF;
 
 END;
 $BODY$

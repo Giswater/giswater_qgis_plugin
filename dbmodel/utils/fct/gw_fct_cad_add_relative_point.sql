@@ -4,24 +4,17 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-
 --FUNCTION CODE: 2242
-
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_cad_add_relative_point(geometry,float, float, integer, boolean);
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_cad_add_relative_point(
-    geom1_aux geometry,
-    geom2_aux geometry,
-    x_var double precision,
-    y_var double precision,
-    start_point integer,
-    del_previous_bool boolean)
-  RETURNS geometry AS
-
-  $BODY$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_cad_add_relative_point(geom1_aux geometry,geom2_aux geometry,x_var double precision,
+y_var double precision,start_point integer,del_previous_bool boolean)
+RETURNS geometry AS
+$BODY$
 
 DECLARE
+
 v_geom geometry;
 v_percent float;
 v_point geometry;
@@ -94,7 +87,6 @@ BEGIN
 		v_xcoord = v_x0coord+(sin(v_angle))*y_var::float;
 		v_ycoord = v_y0coord+(cos(v_angle))*y_var::float;
 
-    
     END IF;
 
     v_point_result = ST_SetSRID(ST_MakePoint(v_xcoord, v_ycoord),rec.epsg);
@@ -107,8 +99,7 @@ BEGIN
     -- Insert into temporal table the values
     INSERT INTO temp_table (fid, geom_point)  VALUES (27, v_point_result);
 
-
-RETURN v_point_result;
+	RETURN v_point_result;
         
 END;$BODY$
   LANGUAGE plpgsql VOLATILE

@@ -18,20 +18,20 @@ SELECT SCHEMA_NAME.gw_fct_getgeometry($${
 "feature":{"featureType":"arc", "tableName":"v_edit_arc", "id":"2001"},
 "data":{}}$$)
 
-
 */
 
 DECLARE
-	v_version text;
-	v_schemaname text;
-	v_projecttype varchar;
-	v_id text;
-	v_tablename text;
-	v_idname text;
-	v_feature json;
-	v_columntype text;
-	v_geometry text;
-	v_the_geom text;
+
+v_version text;
+v_schemaname text;
+v_projecttype varchar;
+v_id text;
+v_tablename text;
+v_idname text;
+v_feature json;
+v_columntype text;
+v_geometry text;
+v_the_geom text;
 
 BEGIN
 
@@ -111,6 +111,7 @@ BEGIN
              ',"body":{"feature":'||v_feature||
 					 ',"data":{"geometry":'||v_geometry||'}}'||
 	    '}')::json;
+		
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

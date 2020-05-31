@@ -6,18 +6,16 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2316
 
-
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_nod2arc(varchar);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_nod2arc(result_id_var varchar, p_only_mandatory_nodarc boolean)  RETURNS integer 
 AS $BODY$
 
 /*example
 SELECT SCHEMA_NAME.gw_fct_pg2epa($${"data":{"geometryLog":false, "resultId":"t1", "useNetworkGeom":"false"}}$$)
-
-
 */
 
 DECLARE
+
 v_nod2arc float;
 v_querytext text;
 v_arcsearchnodes float;
@@ -155,8 +153,6 @@ BEGIN
 		FROM temp_arc c LEFT JOIN querytext n ON node_2 = node_id
 		WHERE n.num_arcs = 1';
 
-
-
 	RAISE NOTICE 'new nodes when numarcs = 2 (1)';
 	EXECUTE 'INSERT INTO temp_node (result_id, node_id, elevation, elev, node_type, 
 		nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, 
@@ -185,7 +181,6 @@ BEGIN
 		2
 		FROM temp_arc c LEFT JOIN querytext n ON node_2 = node_id
 		WHERE n.num_arcs = 2 ';
-
 
 	RAISE NOTICE ' Fix all that nodarcs without to_arc informed, because extremal nodes may appear two times as node_1';
 	FOR v_node IN SELECT count(*), node_id FROM temp_node WHERE substring(reverse(node_id),0,2) = '1' group by node_id having count(*) > 1 order by 1 desc

@@ -15,6 +15,9 @@ $BODY$
 SELECT gw_fct_admin_check_data($${"client":
 {"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, 
 "data":{"filterFields":{}, "pageInfo":{}, "parameters":{}}}$$)::text
+
+-- fid: 195
+
 */
 
 DECLARE
@@ -50,35 +53,34 @@ BEGIN
 	v_count=0;
 
 	-- delete old values on result table
-	DELETE FROM audit_check_data WHERE fid=95 AND cur_user=current_user;
+	DELETE FROM audit_check_data WHERE fid=195 AND cur_user=current_user;
 	
 	-- Starting process
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (95, null, 4, concat('CHECK API CONFIGURATION'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (95, null, 4, '-------------------------------------------------------------');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (195, null, 4, concat('CHECK API CONFIGURATION'));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (195, null, 4, '-------------------------------------------------------------');
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (95, null, 3, 'CRITICAL ERRORS');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (95, null, 3, '----------------------');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (195, null, 3, 'CRITICAL ERRORS');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (195, null, 3, '----------------------');
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (95, null, 2, 'WARNINGS');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (95, null, 2, '--------------');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (195, null, 2, 'WARNINGS');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (195, null, 2, '--------------');
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (95, null, 1, 'INFO');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (95, null, 1, '-------');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (195, null, 1, 'INFO');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (195, null, 1, '-------');
 
 
---CHECK CHILD VIEWS FOR ACTIVE FEATURES
---list active cat_feature
-IF v_project_type ='WS' THEN
-	v_querytext = 'SELECT * FROM cat_feature JOIN (SELECT id,active FROM node_type 
-	UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type) a USING (id) WHERE a.active IS TRUE;';
+	--CHECK CHILD VIEWS FOR ACTIVE FEATURES
+	--list active cat_feature
+	IF v_project_type ='WS' THEN
+		v_querytext = 'SELECT * FROM cat_feature JOIN (SELECT id,active FROM node_type 
+		UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type) a USING (id) WHERE a.active IS TRUE;';
 
-ELSIF v_project_type ='UD' THEN
+	ELSIF v_project_type ='UD' THEN
 
-	v_querytext = 'SELECT * FROM cat_feature JOIN (SELECT id,active FROM node_type 
-	UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type UNION SELECT id,active FROM gully_type) a USING (id) WHERE a.active IS TRUE;';
+		v_querytext = 'SELECT * FROM cat_feature JOIN (SELECT id,active FROM node_type 
+		UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type UNION SELECT id,active FROM gully_type) a USING (id) WHERE a.active IS TRUE;';
 
-END IF;
-
+	END IF;
 
 	FOR rec IN EXECUTE v_querytext LOOP
 	--check if all the views defined in cat_feature exist:
@@ -94,7 +96,7 @@ END IF;
 					v_errortext=concat('ERROR: View ',rec.child_layer,' has wrongly defined man_table');
 
 					INSERT INTO audit_check_data (fid,  criticity, error_message)
-					VALUES (95, 3, v_errortext);
+					VALUES (195, 3, v_errortext);
 				END IF;
 			END IF;
 
@@ -110,7 +112,7 @@ END IF;
 					v_errortext=concat('WARNING: There is/are ',v_count,' active addfields that may not be present on the view ',rec.child_layer,'. Addfields: ',v_param_list::text,'.');
 
 					INSERT INTO audit_check_data (fid,  criticity, error_message)
-					VALUES (95, 2, v_errortext);
+					VALUES (195, 2, v_errortext);
 
 				END IF;
 		
@@ -121,7 +123,7 @@ END IF;
 				v_errortext=concat('ERROR: View ',rec.child_layer,' is defined in cat_feature table but is not created in a DB');
 
 				INSERT INTO audit_check_data (fid,  criticity, error_message)
-				VALUES (95, 3, v_errortext);
+				VALUES (195, 3, v_errortext);
 			END IF;
 		END IF;
 
@@ -143,10 +145,10 @@ END IF;
 		v_errortext=concat('ERROR: There is/are ',v_count,' active features which views names are not present in cat_feature table. Features - ',v_feature_list::text,'.');
 
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
-		VALUES (95, 3, v_errortext);
+		VALUES (195, 3, v_errortext);
 	ELSE
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
-		VALUES (95, 1, 'INFO: All active features have child view name in cat_feature table');
+		VALUES (195, 1, 'INFO: All active features have child view name in cat_feature table');
 	END IF;
 
 
@@ -169,10 +171,10 @@ END IF;
 		v_errortext=concat('ERROR: There is/are ',v_count,' active features which views are not defined in config_api_tableinfo_x_infotype. Undefined views: ',v_view_list::text,'.');
 
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
-		VALUES (95, 3, v_errortext);
+		VALUES (195, 3, v_errortext);
 	ELSE
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
-		VALUES (95, 1, 'INFO: All active features have child view defined in config_api_tableinfo_x_infotype');
+		VALUES (195, 1, 'INFO: All active features have child view defined in config_api_tableinfo_x_infotype');
 	END IF;
 
 
@@ -194,10 +196,10 @@ END IF;
 		v_errortext = concat('ERROR: There is/are ',v_count,' active features which views are not defined in config_form_fields. Undefined views: ',v_view_list,'.');
 		
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
-		VALUES (95, 3,v_errortext );
+		VALUES (195, 3,v_errortext );
 	ELSE
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
-		VALUES (95, 1, 'INFO: All active features have child view defined in config_form_fields');
+		VALUES (195, 1, 'INFO: All active features have child view defined in config_form_fields');
 	END IF;
 
 	--check if all ve_node_*,ve_arc_* etc views created in schema are related to any feature in cat_feature
@@ -210,7 +212,7 @@ END IF;
 		IF position(rec.table_name IN v_querytext) = 0 THEN
 			v_errortext=concat('WARNING: View ',rec.table_name,' is defined in a DB but is not related to any feature in cat_feature.');
 			INSERT INTO audit_check_data (fid,  criticity, error_message)
-			VALUES (95, 2, v_errortext);
+			VALUES (195, 2, v_errortext);
 		END IF;
 	END LOOP;
 
@@ -222,10 +224,10 @@ END IF;
 	IF v_count > 0 THEN
 		v_errortext =  concat('ERROR: There is/are ',v_count,' feature form fields in config_form_fields that don''t have data type. Fields: ',v_view_list,'.');
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
-		VALUES (95, 3,v_errortext);
+		VALUES (195, 3,v_errortext);
 	ELSE
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
-		VALUES (95, 1, 'INFO: All feature form fields have defined data type.');
+		VALUES (195, 1, 'INFO: All feature form fields have defined data type.');
 	END IF;
 
 	--check if all the fields has defined widgettype 
@@ -234,10 +236,10 @@ END IF;
 	IF v_count > 0 THEN
 		v_errortext = concat('ERROR: There is/are ',v_count,' feature form fields in config_form_fields that don''t have widget type. Fields: ',v_view_list,'.');
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
-		VALUES (95, 3,v_errortext);
+		VALUES (195, 3,v_errortext);
 	ELSE
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
-		VALUES (95, 1, 'INFO: All feature form fields have defined widget type.');
+		VALUES (195, 1, 'INFO: All feature form fields have defined widget type.');
 	END IF;
 
 	--check if all the fields defined as combo or typeahead have dv_querytext defined
@@ -247,10 +249,10 @@ END IF;
 	IF v_count > 0 THEN
 		v_errortext = concat('ERROR: There is/are ',v_count,' feature form fields in config_form_fields that are combo or typeahead but don''t have dv_querytext defined. Fields: ',v_view_list,'.');
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
-		VALUES (95, 3, v_errortext);
+		VALUES (195, 3, v_errortext);
 	ELSE
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
-		VALUES (95, 1, 'INFO: All feature form fields with widget type combo or typeahead have dv_querytext defined.');
+		VALUES (195, 1, 'INFO: All feature form fields with widget type combo or typeahead have dv_querytext defined.');
 	END IF;
 
 	--check if all addfields are defined in config_form_fields
@@ -261,10 +263,10 @@ END IF;
 	IF v_count > 0 THEN
 		v_errortext=concat('ERROR: There is/are ',v_count,'addfields that are not defined in config_form_fields. Addfields: ',v_view_list,'.');
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
-		VALUES (95, 3, v_errortext);
+		VALUES (195, 3, v_errortext);
 	ELSE
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
-		VALUES (95, 1, 'INFO: All addfields are defined in config_form_fields.');
+		VALUES (195, 1, 'INFO: All addfields are defined in config_form_fields.');
 	END IF;
 
 	--check if definitions has duplicated layoutorder for different layouts -
@@ -274,35 +276,34 @@ END IF;
 	IF v_field_array IS NOT NULL THEN
 		v_errortext=concat('ERROR: There is/are form names with duplicated layout order defined in config_form_fields: ');
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
-		VALUES (95, 3, v_errortext);
+		VALUES (195, 3, v_errortext);
 
 		FOREACH rec_fields IN ARRAY(v_field_array)
 		LOOP
 			INSERT INTO audit_check_data (fid,  criticity, error_message)
-			VALUES (95, 3, rec_fields); --replace(replace(rec_fields::text,'("',''),'")',''));
+			VALUES (195, 3, rec_fields); --replace(replace(rec_fields::text,'("',''),'")',''));
 		END LOOP;
 	ELSE
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
-		VALUES (95, 1, 'INFO: All fields defined in config_form_fields have unduplicated order.');
+		VALUES (195, 1, 'INFO: All fields defined in config_form_fields have unduplicated order.');
 	END IF;
 
--- get results
+	-- get results
 	-- info
-
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=95 order by criticity desc, id asc) row;
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=195 order by criticity desc, id asc) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 	
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (95, v_result_id, 4, '');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (95, v_result_id, 3, '');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (95, v_result_id, 2, '');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (95, v_result_id, 1, '');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (195, v_result_id, 4, '');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (195, v_result_id, 3, '');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (195, v_result_id, 2, '');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (195, v_result_id, 1, '');
 	
-	--    Control nulls
+	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
 
---  Return
+	-- Return
 	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
 			 ',"body":{"form":{}'||
 			 ',"data":{ "info":'||v_result_info||','||

@@ -10,7 +10,10 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_check_importdxf()
 RETURNS json AS
 $BODY$
 
+-- fid: 206
+
 DECLARE 
+
 v_incorrect_arc text[];
 v_count integer;
 v_errortext text;
@@ -33,7 +36,6 @@ v_error_context text;
  
 BEGIN 
 
-
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
 
@@ -41,21 +43,21 @@ BEGIN
 	SELECT wsoftware, giswater INTO v_project_type, v_version FROM version order by id desc limit 1;
 
 	-- delete old values on result table
-	DELETE FROM audit_check_data WHERE fid = 106 AND cur_user=current_user;
-	DELETE FROM anl_node WHERE fid = 106 AND cur_user=current_user;
+	DELETE FROM audit_check_data WHERE fid = 206 AND cur_user=current_user;
+	DELETE FROM anl_node WHERE fid = 206 AND cur_user=current_user;
 	
 	-- Starting process
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (106, null, 4, concat('CHECK IMPORT DXF'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (106, null, 4, '-------------------------------------------------------------');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (206, null, 4, concat('CHECK IMPORT DXF'));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (206, null, 4, '-------------------------------------------------------------');
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (106, null, 3, 'CRITICAL ERRORS');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (106, null, 3, '----------------------');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (206, null, 3, 'CRITICAL ERRORS');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (206, null, 3, '----------------------');
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (106, null, 2, 'WARNINGS');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (106, null, 2, '--------------');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (206, null, 2, 'WARNINGS');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (206, null, 2, '--------------');
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (106, null, 1, 'INFO');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (106, null, 1, '-------');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (206, null, 1, 'INFO');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (206, null, 1, '-------');
 
 	
 	IF 'DXF_JUN' NOT IN (SELECT id FROM cat_feature) OR 'DXF_JUN_CAT' NOT IN (SELECT id FROM cat_node) THEN
@@ -85,21 +87,21 @@ BEGIN
 
 		v_errortext=concat('INFO: Insert DXF_JUN into cat_feature, node_type and DXF_JUN_CAT into cat_node.');
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
-		VALUES (106, 1, v_errortext);
+		VALUES (206, 1, v_errortext);
 
 		v_errortext=concat('INFO: Create view for cat_feature DXF_JUN.');
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
-		VALUES (106, 1, v_errortext);
+		VALUES (206, 1, v_errortext);
 	END IF;
 
 	--check if there are nodes coming from dxf that overlap nodes existing in the network
 	v_count=0;
-	FOR rec IN SELECT * FROM temp_table WHERE temp_table.geom_point IS NOT NULL AND fid = 106 LOOP
+	FOR rec IN SELECT * FROM temp_table WHERE temp_table.geom_point IS NOT NULL AND fid = 206 LOOP
 		IF (SELECT node_id FROM node WHERE ST_DWithin(rec.geom_point,node.the_geom,0.01)) IS NOT NULL THEN
 			v_count=+1;
 			
 			INSERT INTO anl_node(nodecat_id, fid, the_geom, descript)
-			VALUES ('DXF_JUN_CAT'::text, 106,rec.geom_point,'DUPLICATED');
+			VALUES ('DXF_JUN_CAT'::text, 206,rec.geom_point,'DUPLICATED');
 		END IF;
 	END LOOP;
 
@@ -108,19 +110,19 @@ BEGIN
 		v_errortext=concat('WARNING: There are ', v_count, ' nodes from dxf that overlap nodes existing in the network.');
 
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
-		VALUES (106, 2, v_errortext);
+		VALUES (206, 2, v_errortext);
 	END IF;
 
 	--check if arcs have final nodes
 	select distinct array_agg(id) INTO v_incorrect_start from temp_table 
-	WHERE temp_table.geom_line is not null and fid = 106 AND id not IN
+	WHERE temp_table.geom_line is not null and fid = 206 AND id not IN
 	(SELECT a.id FROM temp_table a,temp_table b WHERE ST_DWithin(ST_startpoint(a.geom_line), b.geom_point, 0.01)
-	AND a.fid = 106 and b.fid = 106);
+	AND a.fid = 206 and b.fid = 206);
 
 	select distinct array_agg(id) INTO v_incorrect_end from temp_table 
-	WHERE temp_table.geom_line is not null and fid = 106 AND id not IN
+	WHERE temp_table.geom_line is not null and fid = 206 AND id not IN
 	(SELECT a.id FROM temp_table a,temp_table b WHERE ST_DWithin(ST_endpoint(a.geom_line), b.geom_point, 0.01)
-	AND a.fid = 106 and b.fid = 106);
+	AND a.fid = 206 and b.fid = 206);
 
 	v_incorrect_arc=ARRAY(SELECT DISTINCT UNNEST(array_cat(v_incorrect_start,v_incorrect_end)));
 
@@ -133,7 +135,7 @@ BEGIN
 		v_errortext=concat('WARNING: There are ', v_count, ' arcs without final nodes in dxf.');
 
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
-		VALUES (106, 2, v_errortext);
+		VALUES (206, 2, v_errortext);
 	END IF;
 
 	--check if there is a node located in the close distance from the missing end 
@@ -144,32 +146,32 @@ BEGIN
 		SELECT ST_startpoint(geom_line) into v_end_point FROM temp_table WHERE temp_table.geom_line IS NOT NULL AND id=rec.id;
 
 		IF (SELECT node_id FROM node WHERE ST_DWithin(the_geom,v_start_point,0.1) LIMIT 1) IS NULL THEN
-			IF NOT EXISTS (SELECT * FROM temp_table WHERE fid = 106 AND geom_point=v_start_point) THEN
-				IF NOT EXISTS (SELECT * FROM anl_node WHERE fid = 106 AND the_geom=v_start_point) THEN
+			IF NOT EXISTS (SELECT * FROM temp_table WHERE fid = 206 AND geom_point=v_start_point) THEN
+				IF NOT EXISTS (SELECT * FROM anl_node WHERE fid = 206 AND the_geom=v_start_point) THEN
 							
 					INSERT INTO anl_node(nodecat_id, fid, the_geom, descript)
-					VALUES ('DXF_JUN_CAT'::text, 106,v_start_point,'NEW');
+					VALUES ('DXF_JUN_CAT'::text, 206,v_start_point,'NEW');
 				END IF;
 			END IF;
 		ELSE
 			INSERT INTO anl_node(node_id, nodecat_id, state,expl_id, fid, the_geom,descript)
-			SELECT node_id, nodecat_id, state,expl_id,106,the_geom,'EXISTS'
+			SELECT node_id, nodecat_id, state,expl_id,206,the_geom,'EXISTS'
 			FROM node WHERE ST_DWithin(the_geom,v_start_point,0.1);
        
 		END IF;
 
 		IF (SELECT node_id FROM node WHERE ST_DWithin(the_geom,v_end_point,0.1) LIMIT 1) IS NULL THEN	
-			IF NOT EXISTS (SELECT * FROM temp_table WHERE fid = 106 AND geom_point=v_end_point) THEN
-				IF NOT EXISTS (SELECT * FROM anl_node WHERE fid = 106 AND the_geom=v_end_point) THEN
+			IF NOT EXISTS (SELECT * FROM temp_table WHERE fid = 206 AND geom_point=v_end_point) THEN
+				IF NOT EXISTS (SELECT * FROM anl_node WHERE fid = 206 AND the_geom=v_end_point) THEN
 					raise notice 'insert end';
 
 					INSERT INTO anl_node(nodecat_id, fid, the_geom, descript)
-					VALUES ('DXF_JUN_CAT'::text, 106,v_end_point,'NEW');
+					VALUES ('DXF_JUN_CAT'::text, 206,v_end_point,'NEW');
 				END IF;
 			END IF;
 		ELSE
 			INSERT INTO anl_node(node_id, nodecat_id, state,expl_id, fid, the_geom, descript)
-			SELECT node_id, nodecat_id, state,expl_id,106,the_geom, 'EXISTS'
+			SELECT node_id, nodecat_id, state,expl_id,206,the_geom, 'EXISTS'
 			FROM node WHERE ST_DWithin(the_geom,v_end_point,0.1); 
 		END IF;
 		
@@ -178,45 +180,44 @@ BEGIN
 	--check if there are catalogs from dxf are the same as those defined in giswater
 	select replace(replace(string_agg(a::text,', '),'(',''),')','') into v_missing_cat_node FROM 
 	(SELECT DISTINCT (text_column::json)->>'Layer' FROM temp_table 
-	WHERE fid = 106 and geom_point IS NOT NULL AND (text_column::json)->>'Layer' not in (SELECT id FROM cat_node) ) a;
+	WHERE fid = 206 and geom_point IS NOT NULL AND (text_column::json)->>'Layer' not in (SELECT id FROM cat_node) ) a;
 
 	IF v_missing_cat_node IS NOT NULL THEN
 		v_errortext=concat('WARNING: There are nodes which are not defined in cat_node: ',v_missing_cat_node,'.');
 
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
-		VALUES (106, 2, v_errortext);
+		VALUES (206, 2, v_errortext);
 	END IF;
 
 	select replace(replace(string_agg(a::text,', '),'(',''),')','') into v_missing_cat_arc FROM 
 	(SELECT DISTINCT (text_column::json)->>'Layer' FROM temp_table 
-	WHERE fid = 106 and geom_line IS NOT NULL AND (text_column::json)->>'Layer' not in (SELECT id FROM cat_arc) ) a;
+	WHERE fid = 206 and geom_line IS NOT NULL AND (text_column::json)->>'Layer' not in (SELECT id FROM cat_arc) ) a;
 
 	IF v_missing_cat_arc IS NOT NULL THEN
 		v_errortext=concat('WARNING: There are arcs which are not defined in cat_arc: ',v_missing_cat_arc,'.');
 
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
-		VALUES (106, 2, v_errortext);
+		VALUES (206, 2, v_errortext);
 	END IF;
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (106, null, 1, null);
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (106, null, 1, 'PRESS RUN TO EXECUTE INSERT');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (206, null, 1, null);
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (206, null, 1, 'PRESS RUN TO EXECUTE INSERT');
+
 	-- get results
 	-- info
-
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data 
-	WHERE cur_user="current_user"() AND fid = 106 ORDER BY criticity desc, id asc) row;
+	WHERE cur_user="current_user"() AND fid = 206 ORDER BY criticity desc, id asc) row;
 	
 	v_result_info := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
-
 
 	--points
 	v_result = null;
 
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
 	FROM (SELECT id, node_id as feature_id, nodecat_id as feature_catalog, state, expl_id, descript,fid, the_geom
-	FROM anl_node WHERE cur_user="current_user"() AND fid = 106) row;
+	FROM anl_node WHERE cur_user="current_user"() AND fid = 206) row;
 
 	v_result := COALESCE(v_result, '{}'); 
 	
@@ -230,7 +231,7 @@ BEGIN
     'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
   	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
-  	FROM  anl_node WHERE cur_user="current_user"() AND fid = 106) row) features;
+  	FROM  anl_node WHERE cur_user="current_user"() AND fid = 206) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	
@@ -243,7 +244,7 @@ BEGIN
 	v_result_line = '{"geometryType":"", "features":[],"category_field":""}';
 	v_result_polygon = '{"geometryType":"", "features":[],"category_field":""}';
 
---  Return
+	--  Return
     RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Check import dxf done succesfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
@@ -254,9 +255,8 @@ BEGIN
 	    '}')::json;
 
 	EXCEPTION WHEN OTHERS THEN
-		GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-		RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
-
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 

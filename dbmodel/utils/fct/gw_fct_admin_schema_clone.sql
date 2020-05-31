@@ -10,7 +10,9 @@ DROP FUNCTION IF EXISTS "SCHEMA_NAME".clone_schema(text, text);
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_clone_schema(json);
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_admin_schema_clone(p_data json)
 RETURNS json AS
+
 $BODY$
+
 /*
 SELECT SCHEMA_NAME.gw_fct_admin_schema_clone($${
 "client":{"device":9, "infoType":100, "lang":"ES"}, 
@@ -19,6 +21,7 @@ SELECT SCHEMA_NAME.gw_fct_admin_schema_clone($${
 */
 
 DECLARE
+
 rec_view record;
 rec_fk record;
 rec_table text;
@@ -45,6 +48,7 @@ v_result_line json;
 v_count integer;
 v_software text;
 v_project_type text;
+
 BEGIN
 
 	-- Search path
@@ -104,7 +108,7 @@ BEGIN
 		EXECUTE 'ALTER TABLE '|| v_dest_schema ||'.gully ALTER COLUMN gully_id SET DEFAULT nextval('''||v_dest_schema||'.urn_id_seq''::regclass);';
 	END IF;
 
--- fk,check
+	-- fk,check
 
 	FOR rec_fk IN
 		EXECUTE 'SELECT distinct on (conname) conrelid::regclass AS tablename, conname AS constraintname, pg_get_constraintdef(c.oid),
@@ -191,7 +195,6 @@ BEGIN
 		v_fct_definition = REPLACE (v_fct_definition,v_software, 'wsoftware');
 		END IF; 
 		EXECUTE v_fct_definition;
-
  
 	END LOOP;
 
@@ -230,7 +233,6 @@ BEGIN
 
 	END LOOP;
 
-
 	-- admin role permissions
 	PERFORM gw_fct_admin_role_permissions();
 
@@ -238,12 +240,11 @@ BEGIN
 	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
 
 	--geometry
-
 	v_result_line = '{"geometryType":"", "features":[]}';
 	v_result_polygon = '{"geometryType":"", "features":[]}';
 	v_result_point = '{"geometryType":"", "features":[]}';
 
---  Return
+	--  Return
 	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Copy schema done successfully"}, "version":"'||v_version||'"'||
 			 ',"body":{"form":{}'||
 			 ',"data":{ "info":'||v_result_info||','||
@@ -253,10 +254,10 @@ BEGIN
 				'"polygon":'||v_result_polygon||'}'||
 			   '}'||
 		'}')::json;
+		
 	EXCEPTION WHEN OTHERS THEN
-		GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-		RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
-
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
  
 END;
 $BODY$

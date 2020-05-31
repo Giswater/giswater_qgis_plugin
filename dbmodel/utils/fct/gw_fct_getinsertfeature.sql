@@ -26,6 +26,7 @@ SELECT SCHEMA_NAME.gw_fct_getinsertfeature($${
 */
 
 DECLARE
+
 v_version text;
 v_rows json;
 v_geometrytype text;
@@ -39,7 +40,6 @@ BEGIN
 	--  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
         INTO v_version;
-
 
 	--  Creating the list elements
 	----------------------------
@@ -59,7 +59,6 @@ BEGIN
 							 ORDER BY orderby) row'
 			INTO v_rows;
 				RAISE NOTICE 'v_rows 2 %', v_rows;
-
 	END IF;
 
 	RAISE NOTICE 'v_rows %', v_rows;

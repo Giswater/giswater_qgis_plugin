@@ -12,7 +12,6 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_grafanalytics_lrs(p_data json)
 RETURNS json AS
 $BODY$
 
-
 /*
 TO EXECUTE
 
@@ -26,6 +25,7 @@ SELECT * FROM SCHEMA_NAME.anl_arc WHERE fid = 34 AND cur_user=current_user
 SELECT * FROM SCHEMA_NAME.anl_node WHERE fid = 34 AND cur_user=current_user
 SELECT * FROM SCHEMA_NAME.audit_log_data WHERE fid = 34 AND cur_user=current_user
 
+--fid: 216
 
 */
 
@@ -91,7 +91,7 @@ BEGIN
 	v_version = (SELECT giswater FROM version LIMIT 1);
 
 	-- set variables
-	v_fid = 116;
+	v_fid = 216;
 
 	-- data quality analysis
 	v_input = '{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}'::json;
@@ -297,13 +297,11 @@ BEGIN
 				EXIT WHEN v_end_node = ANY(v_node_list);
 			END IF;
 		
-					
 			GET DIAGNOSTICS v_affectedrows =row_count;	
 			EXIT WHEN v_header_arc = NULL;
 			EXIT WHEN v_affectedrows = 0;
 
-		END LOOP;
-			
+		END LOOP;	
 
 	END LOOP;	
 
@@ -320,7 +318,6 @@ BEGIN
 	concat (''{"value":"0", "header":"'',node_id,''"}'')
 	FROM v_edit_node WHERE v_edit_node.node_id::text IN ('||v_node_string||');';
 	
-			
 	-- update fields for node layers (value and header)
 	FOR rec IN execute 'SELECT * FROM cat_feature JOIN sys_addfields on cat_feature_id=cat_feature.id
  	WHERE param_name ='''|| v_valuefield||''''
@@ -344,7 +341,6 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 	
-
    	--points
 	v_result = null;
 	SELECT jsonb_agg(features.feature) INTO v_result
@@ -355,12 +351,12 @@ BEGIN
     'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
   	FROM (SELECT id, node_id, nodecat_id, state, node_id_aux,nodecat_id_aux, state_aux, expl_id, descript::json, fid, the_geom
-  	FROM  anl_node WHERE cur_user="current_user"() AND fid=116 and result_id = '116') row) features;
+  	FROM  anl_node WHERE cur_user="current_user"() AND fid=216 and result_id = '216') row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
    	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');  
 
---      Control NULL's
+	-- Control NULL's
 	v_version:=COALESCE(v_version,'{}');
 	v_result_info:=COALESCE(v_result_info,'{}');
 	v_result_point:=COALESCE(v_result_point,'{}');
@@ -368,8 +364,7 @@ BEGIN
 	v_result_polygon:=COALESCE(v_result_polygon,'{}');
 	v_result_fields:=COALESCE(v_result_fields,'{}');
 
-
-	--return definition for v_audit_check_result
+	-- return definition for v_audit_check_result
 	RETURN  ('{"status":"Accepted", "message":{"level":3, "text":"LRS process done successfully"}, "version":"'||v_version||'"'||
 		     ',"body":{"form":{}'||
 			     ',"data":{ "info":'||v_result_info||','||
@@ -378,12 +373,12 @@ BEGIN
 					'"polygon":'||v_result_polygon||','||
 					'"fields":'||v_result_fields||'}'||
 			      '}}');
-return ('{"status":"Accepted"}')::json;
+	return ('{"status":"Accepted"}')::json;
 
- --Exception handling
- --EXCEPTION WHEN OTHERS THEN
---	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
---	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	--Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$

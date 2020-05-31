@@ -10,42 +10,40 @@ DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_getprint(p_data json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getprint(p_data json)
   RETURNS json AS
 $BODY$
-DECLARE
 
 /*
- 
+
 SELECT "SCHEMA_NAME".gw_fct_getprint($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{},
 "data":{"composers":"{A4-mincut, A3-mincut}"}}$$)
 */  
-    
-	
---    Variables
-    column_type character varying;
-    fields json;
-    fields_array json[];
-    combo_rows json[];
-    aux_json json;    
-    combo_json json;
-    project_type character varying;
-    table_pkey varchar;
-    schemas_array name[];
-    array_index integer DEFAULT 0;
-    field_value character varying;
-    v_version json;
-    v_value_vdef character varying;
-    formTabs text;
-    formTabs_inittab json;
-    query_text text;
-    formInfo json;
-    v_formname text;
-    v_fields json [];
-    v_device integer;
-    v_activecomposer text;
-    
 
+DECLARE    
+
+column_type character varying;
+fields json;
+fields_array json[];
+combo_rows json[];
+aux_json json;
+combo_json json;
+project_type character varying;
+table_pkey varchar;
+schemas_array name[];
+array_index integer DEFAULT 0;
+field_value character varying;
+v_version json;
+v_value_vdef character varying;
+formTabs text;
+formTabs_inittab json;
+query_text text;
+formInfo json;
+v_formname text;
+v_fields json [];
+v_device integer;
+v_activecomposer text;
+    
 BEGIN
 
     -- Set search path to local schema
@@ -67,7 +65,7 @@ BEGIN
 
         v_formname='print';
 
--- Create tabs array
+	-- Create tabs array
     formTabs := '[';
        
 	SELECT gw_fct_getformfields( 'print', 'form', 'data', null, null, null, null, 'SELECT', null, 9, null) INTO v_fields; -- 'SELECT' parameter used on line 190 of gw_fct_getformfields
@@ -83,41 +81,39 @@ BEGIN
 		END IF;		
 	END LOOP;			
 	
---    Inizialing the the tab
+	-- Inizialing the the tab
 	formTabs_inittab := gw_fct_json_object_set_key(formTabs_inittab, 'tabName', 'Menu print'::TEXT);
 	formTabs_inittab := gw_fct_json_object_set_key(formTabs_inittab, 'tabLabel', 'Menu de print'::TEXT);
 	formTabs_inittab := gw_fct_json_object_set_key(formTabs_inittab, 'tabIdName', 'print'::TEXT);
 	formTabs_inittab := gw_fct_json_object_set_key(formTabs_inittab, 'active', true);
 
---    Adding the fields array
+	-- adding the fields array
 	formTabs_inittab := gw_fct_json_object_set_key(formTabs_inittab, 'fields', array_to_json(v_fields));
 
---    Adding to the tabs structure
+	-- adding to the tabs structure
 	formTabs := formTabs || formTabs_inittab::text;
     
---    Finish the construction of formtabs
+	--  finish the construction of formtabs
       formTabs := formtabs ||']';
 
---    Create new form for mincut
+	-- create new form for mincut
       formInfo := json_build_object('formId','F41','formName','Impressio');
 
---    Check null
+	-- check null
       v_version := COALESCE(v_version, '[]');
       formInfo := COALESCE(formInfo, '[]'); 
       formTabs := COALESCE(formTabs, '[]');      
 
---    Return
+	-- Return
     RETURN ('{"status":"Accepted"' ||
         ', "apiVersion":'|| v_version ||
         ', "formInfo":'|| formInfo || 
         ', "formTabs":' || formTabs ||
         '}')::json;
 
-
---    Exception handling
-    --EXCEPTION WHEN OTHERS THEN 
-        --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
-
+	-- Exception handling
+    EXCEPTION WHEN OTHERS THEN 
+    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

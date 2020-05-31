@@ -12,28 +12,28 @@ $BODY$
 
 
 DECLARE 
-	v_schemaname text;
-	v_project_type text;
-	v_feature_system_id text;
-	v_class_id integer;
-	v_om_visit_x_feature_fields text;
-	v_om_visit_fields text;
-	v_new_parameters record;
-	v_viewname text;
-	v_definition text;
-	v_old_a_param text;
-	v_old_ct_param text;
-	v_old_id_param text;
-	v_old_datatype text;
+
+v_schemaname text;
+v_project_type text;
+v_feature_system_id text;
+v_class_id integer;
+v_om_visit_x_feature_fields text;
+v_om_visit_fields text;
+v_new_parameters record;
+v_viewname text;
+v_definition text;
+v_old_a_param text;
+v_old_ct_param text;
+v_old_id_param text;
+v_old_datatype text;
 
 BEGIN
 
-SET search_path = "SCHEMA_NAME", public;
-	--RAISE NOTICE 'p_data,%',p_data;
+	SET search_path = "SCHEMA_NAME", public;
+	
  	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
 
 	-- get input parameters
-
 	v_schemaname = (p_data ->> 'schema');
 	v_class_id = ((p_data ->> 'body')::json->>'class_id')::text;
 	v_old_a_param = ((p_data ->> 'body')::json->>'old_a_param')::text;
@@ -54,10 +54,11 @@ SET search_path = "SCHEMA_NAME", public;
 	INTO v_new_parameters
 	FROM config_visit_parameter JOIN config_visit_parameter_action ON config_visit_parameter.id=config_visit_parameter_action.parameter_id
 	WHERE class_id=v_class_id;
-raise notice 'v_new_parameters - a,%',v_new_parameters.a_param;
-raise notice 'v_old_a_param,%',v_old_a_param;
-raise notice 'v_new_parameters - ct,%',v_new_parameters.ct_param;
-raise notice 'v_old_ct_param,%',v_old_ct_param;
+	
+	raise notice 'v_new_parameters - a,%',v_new_parameters.a_param;
+	raise notice 'v_old_a_param,%',v_old_a_param;
+	raise notice 'v_new_parameters - ct,%',v_new_parameters.ct_param;
+	raise notice 'v_old_ct_param,%',v_old_ct_param;
 
 	IF (SELECT EXISTS ( SELECT 1 FROM   information_schema.tables WHERE  table_schema = v_schemaname AND table_name = v_viewname)) IS FALSE THEN
 		-- create a new view if doesn't exist
@@ -97,8 +98,6 @@ raise notice 'v_old_ct_param,%',v_old_ct_param;
 		EXECUTE'SELECT pg_get_viewdef('''||v_schemaname||'.'||v_viewname||''', true);'
 		INTO v_definition;
 
-
-
 		--replace old parameters in the view definition with the new ones
 		v_definition = replace(v_definition,v_old_ct_param,v_new_parameters.ct_param);
 		v_definition = replace(v_definition,v_old_a_param,v_new_parameters.a_param);
@@ -111,18 +110,18 @@ raise notice 'v_old_ct_param,%',v_old_ct_param;
 				
 		EXECUTE 'DROP VIEW '||v_schemaname||'.'||v_viewname||';';
 		EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS '||v_definition||';';
-
 		
-
 	END IF;
 
 	--create trigger on view 
-		EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_om_visit_multievent ON '||v_schemaname||'.'||v_viewname||';';
+	EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_om_visit_multievent ON '||v_schemaname||'.'||v_viewname||';';
 
-		EXECUTE 'CREATE TRIGGER gw_trg_om_visit_multievent
-		INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_schemaname||'.'||v_viewname||'
-		FOR EACH ROW EXECUTE PROCEDURE '||v_schemaname||'.gw_trg_om_visit_multievent('||v_class_id||');';
-		
+	EXECUTE 'CREATE TRIGGER gw_trg_om_visit_multievent
+	INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_schemaname||'.'||v_viewname||'
+	FOR EACH ROW EXECUTE PROCEDURE '||v_schemaname||'.gw_trg_om_visit_multievent('||v_class_id||');';		
+
+	RETURN;
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

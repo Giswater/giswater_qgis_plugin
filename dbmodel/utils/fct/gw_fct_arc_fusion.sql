@@ -6,55 +6,54 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2112
 
-
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_arc_fusion(character varying, character varying, date);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_arc_fusion(p_data json)
-
-  RETURNS json AS
+RETURNS json AS
 $BODY$
+
 /*
 SELECT SCHEMA_NAME.gw_fct_arc_fusion($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{"id":["1004"]},
-"data":{
-"workcat_id_end":"work1",
-"enddate":"2020-02-05"
-}}$$)
+"feature":{"id":["1004"]},"data":{"workcat_id_end":"work1","enddate":"2020-02-05"}}$$)
+
+-- fid: 214
+
 */
+
 DECLARE
 
-    v_point_array1 geometry[];
-    v_point_array2 geometry[];
-    v_count integer;
-    v_exists_node_id varchar;
-    v_new_record SCHEMA_NAME.v_edit_arc;
-    v_my_record1 SCHEMA_NAME.v_edit_arc;
-    v_my_record2 SCHEMA_NAME.v_edit_arc;
-    v_arc_geom geometry;
-    v_project_type text;
-    rec_addfield1 record;
-    rec_addfield2 record;
-    rec_param record;
-    v_vnode integer;
-    v_node_geom public.geometry;
-    v_version  text;
+v_point_array1 geometry[];
+v_point_array2 geometry[];
+v_count integer;
+v_exists_node_id varchar;
+v_new_record SCHEMA_NAME.v_edit_arc;
+v_my_record1 SCHEMA_NAME.v_edit_arc;
+v_my_record2 SCHEMA_NAME.v_edit_arc;
+v_arc_geom geometry;
+v_project_type text;
+rec_addfield1 record;
+rec_addfield2 record;
+rec_param record;
+v_vnode integer;
+v_node_geom public.geometry;
+v_version  text;
 
-    v_result text;
-    v_result_info text;
-    v_result_point text;
-    v_result_line text;
-    v_result_polygon text;
-    v_error_context text;
-    v_audit_result text;
-    v_level integer;
-    v_status text;
-    v_message text;
-    v_hide_form boolean;
-    v_array_addfields text[];
-    v_array_node_id json;
-    v_node_id text;
-    v_workcat_id_end text;
-    v_enddate date;
+v_result text;
+v_result_info text;
+v_result_point text;
+v_result_line text;
+v_result_polygon text;
+v_error_context text;
+v_audit_result text;
+v_level integer;
+v_status text;
+v_message text;
+v_hide_form boolean;
+v_array_addfields text[];
+v_array_node_id json;
+v_node_id text;
+v_workcat_id_end text;
+v_enddate date;
 
 BEGIN
 
@@ -79,11 +78,11 @@ BEGIN
    v_enddate = ((p_data ->>'data')::json->>'enddate')::date;
 
     -- delete old values on result table
-    DELETE FROM audit_check_data WHERE fid=114 AND cur_user=current_user;
+    DELETE FROM audit_check_data WHERE fid=214 AND cur_user=current_user;
     
     -- Starting process
-    INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, null, 4, 'ARC FUSION');
-    INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, null, 4, '-------------------------------------------------------------');
+    INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (214, null, 4, 'ARC FUSION');
+    INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (214, null, 4, '-------------------------------------------------------------');
 
 
     -- Check if the node exists
@@ -96,7 +95,7 @@ BEGIN
     IF FOUND THEN
 
         INSERT INTO audit_check_data (fid,  criticity, error_message)
-        VALUES (114, 1, concat('Fusion arcs using node: ', v_exists_node_id,'.'));
+        VALUES (214, 1, concat('Fusion arcs using node: ', v_exists_node_id,'.'));
 
         -- Find arcs sharing node
         SELECT COUNT(*) INTO v_count FROM v_edit_arc WHERE node_1 = v_node_id OR node_2 = v_node_id;
@@ -109,7 +108,7 @@ BEGIN
             SELECT * INTO v_my_record2 FROM v_edit_arc WHERE node_1 = v_node_id OR node_2 = v_node_id ORDER BY arc_id ASC LIMIT 1;
 
             INSERT INTO audit_check_data (fid,  criticity, error_message)
-            VALUES (114, 1, concat('Arcs related to selected node: ', v_my_record1.arc_id,', ',v_my_record2.arc_id,'.'));
+            VALUES (214, 1, concat('Arcs related to selected node: ', v_my_record1.arc_id,', ',v_my_record2.arc_id,'.'));
 
             -- Compare arcs
             IF  v_my_record1.arccat_id = v_my_record2.arccat_id AND
@@ -178,7 +177,7 @@ BEGIN
 
             IF v_array_addfields is not null THEN
                 INSERT INTO audit_check_data (fid,  criticity, error_message)
-                VALUES (114, 1, concat('Copy values for addfields: ', array_to_string(v_array_addfields,','),'.'));
+                VALUES (214, 1, concat('Copy values for addfields: ', array_to_string(v_array_addfields,','),'.'));
             END IF;
 
             -- temporary dissable the arc_searchnodes_control in order to use the node1 and node2 getted before
@@ -199,7 +198,7 @@ BEGIN
                 UPDATE element_x_arc SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
 
                 INSERT INTO audit_check_data (fid,  criticity, error_message)
-                VALUES (114, 1, concat('Copy ',v_count,' elements from old arcs to new one.'));
+                VALUES (214, 1, concat('Copy ',v_count,' elements from old arcs to new one.'));
             END IF;
 
             SELECT count(id) INTO v_count FROM doc_x_arc WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
@@ -207,7 +206,7 @@ BEGIN
                 UPDATE doc_x_arc SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
 
                 INSERT INTO audit_check_data (fid,  criticity, error_message)
-                VALUES (114, 1, concat('Copy ',v_count,' documents from old arcs to new one.'));
+                VALUES (214, 1, concat('Copy ',v_count,' documents from old arcs to new one.'));
             END IF;
 
             SELECT count(id) INTO v_count FROM om_visit_x_arc WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
@@ -215,7 +214,7 @@ BEGIN
                 UPDATE om_visit_x_arc SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
 
                 INSERT INTO audit_check_data (fid,  criticity, error_message)
-                VALUES (114, 1, concat('Copy ',v_count,' visits from old arcs to new one.'));
+                VALUES (214, 1, concat('Copy ',v_count,' visits from old arcs to new one.'));
             END IF;
 
             SELECT count(connec_id) INTO v_count FROM connec WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
@@ -223,7 +222,7 @@ BEGIN
                UPDATE connec SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
 
                 INSERT INTO audit_check_data (fid,  criticity, error_message)
-                VALUES (114, 1, concat('Reconnect ',v_count,' connecs.'));
+                VALUES (214, 1, concat('Reconnect ',v_count,' connecs.'));
             END IF;
 
             SELECT count(node_id) INTO v_count FROM node WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
@@ -231,7 +230,7 @@ BEGIN
                 UPDATE node SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
 
                 INSERT INTO audit_check_data (fid,  criticity, error_message)
-                VALUES (114, 1, concat('Reconnect ',v_count,' nodes.'));
+                VALUES (214, 1, concat('Reconnect ',v_count,' nodes.'));
             END IF;
 
             -- update links related to node
@@ -252,7 +251,7 @@ BEGIN
                     UPDATE gully SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
 
                     INSERT INTO audit_check_data (fid,  criticity, error_message)
-                    VALUES (114, 1, concat('Reconnect ',v_count,' gullies.'));
+                    VALUES (214, 1, concat('Reconnect ',v_count,' gullies.'));
                 END IF;
                 
             END IF;
@@ -262,7 +261,7 @@ BEGIN
             DELETE FROM arc WHERE arc_id = v_my_record2.arc_id;
 
             INSERT INTO audit_check_data (fid,  criticity, error_message)
-            VALUES (114, 1, concat('Delete arcs: ',v_my_record1.arc_id,', ',v_my_record2.arc_id,'.'));
+            VALUES (214, 1, concat('Delete arcs: ',v_my_record1.arc_id,', ',v_my_record2.arc_id,'.'));
 
             -- create links that were related to deprecated node
         
@@ -270,7 +269,7 @@ BEGIN
             UPDATE node SET state=0, workcat_id_end=v_workcat_id_end, enddate=v_enddate WHERE node_id = v_node_id;
 
             INSERT INTO audit_check_data (fid,  criticity, error_message)
-            VALUES (114, 1, concat('Change state of node  ',v_node_id,' to obsolete.'));
+            VALUES (214, 1, concat('Change state of node  ',v_node_id,' to obsolete.'));
 
             -- Arcs has different types
             ELSE
@@ -299,12 +298,12 @@ BEGIN
    -- EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
    -- "data":{"message":"0", "function":"2112","debug_msg":null}}$$)' INTO v_audit_result;  
 
--- get results
+	-- get results
     -- info
 
     SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
     FROM (SELECT id, error_message as message FROM audit_check_data 
-    WHERE cur_user="current_user"() AND fid=114 ORDER BY criticity desc, id asc) row;
+    WHERE cur_user="current_user"() AND fid=214 ORDER BY criticity desc, id asc) row;
     
     IF v_audit_result is null THEN
         v_status = 'Accepted';
@@ -330,7 +329,7 @@ BEGIN
     v_message := COALESCE(v_message, '{}'); 
     v_hide_form := COALESCE(v_hide_form, true); 
 
---  Return
+	--  Return
     RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
              ',"data":{ "info":'||v_result_info||','||
@@ -343,8 +342,8 @@ BEGIN
         '}')::json;
 
     EXCEPTION WHEN OTHERS THEN
-     GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-     RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+    GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+    RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
  
 END;

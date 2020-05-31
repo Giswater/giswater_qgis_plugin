@@ -7,24 +7,29 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2234
 
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_fill_data(varchar);
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_pg2epa_fill_data(result_id_var varchar)  RETURNS integer AS $BODY$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_pg2epa_fill_data(result_id_var varchar)
+RETURNS integer AS 
+$BODY$
+
+-- fid: 113
+
 DECLARE
-   
+
 v_rainfall text;
 v_isoperative boolean;
 v_statetype text;
 
 BEGIN
 
-    --  Search path
-    SET search_path = "SCHEMA_NAME", public;
+	-- Search path
+	SET search_path = "SCHEMA_NAME", public;
 
-   -- Delete previous results on temp_node & arc tables
-   DELETE FROM temp_node;
-   DELETE FROM temp_arc;
-   
-   -- set all timeseries of raingage using user's value
-   v_rainfall:= (SELECT value FROM config_param_user WHERE parameter='inp_options_setallraingages' AND cur_user=current_user);
+	-- Delete previous results on temp_node & arc tables
+	DELETE FROM temp_node;
+	DELETE FROM temp_arc;
+
+	-- set all timeseries of raingage using user's value
+	v_rainfall:= (SELECT value FROM config_param_user WHERE parameter='inp_options_setallraingages' AND cur_user=current_user);
 
 	v_isoperative = (SELECT value::json->>'onlyIsOperative' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 
@@ -41,7 +46,7 @@ BEGIN
 	END IF;
 
 	-- to do: implement isoperative strategy
-   
+
 	-- Insert on node rpt_inp table
 	-- the strategy of selector_sector is not used for nodes. The reason is to enable the posibility to export the sector=-1. In addition using this it's impossible to export orphan nodes
 	INSERT INTO temp_node (result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, expl_id, y0, ysur, apond, the_geom)
@@ -86,12 +91,12 @@ BEGIN
 	PERFORM gw_fct_anl_node_sink($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{"tableName":"v_edit_inp_junction"},"data":{"parameters":{"saveOnDatabase":true}}}$$);
 
 	UPDATE temp_node SET epa_type='OUTFALL' FROM anl_node a JOIN inp_junction USING (node_id) 
-	WHERE outfallparam IS NOT NULL AND fid = 13 AND cur_user=current_user
+	WHERE outfallparam IS NOT NULL AND fid = 113 AND cur_user=current_user
 	AND temp_node.node_id=a.node_id;
 
 	-- todo: UPDATE childparam for inp_outfall, inp_storage inp_divider, inp_junction
 
-         -- Insert on arc rpt_inp table
+	-- Insert on arc rpt_inp table
 	INSERT INTO temp_arc (result_id, arc_id, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, length, n, expl_id, the_geom, q0, qmax, barrels, slope)
 	SELECT
 	result_id_var,
@@ -121,7 +126,7 @@ BEGIN
 
 	-- todo: UPDATE childparam for inp_weir, inp_orifice, inp_outlet, inp_pump, inp_conduit
 
-    RETURN 1;
+	RETURN 1;
 		
 END;
 $BODY$

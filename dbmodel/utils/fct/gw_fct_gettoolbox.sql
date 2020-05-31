@@ -24,10 +24,10 @@ SELECT SCHEMA_NAME.gw_fct_gettoolbox($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "data":{"filterText":""}}$$)
 
-
 */
 
 DECLARE
+
 v_version text;
 v_role text;
 v_projectype text;
@@ -120,7 +120,6 @@ BEGIN
 		USING v_filter
 		INTO v_admin_fields;
 
-
 	-- refactor dvquerytext		
 	FOR v_querytext in select distinct querytext from (
 		
@@ -147,7 +146,6 @@ BEGIN
 	v_master_fields := COALESCE(v_master_fields, '[]');
 	v_admin_fields := COALESCE(v_admin_fields, '[]');
 
-		
 	-- Return
 	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "apiVersion":'||v_version||
              ',"body":{"form":{}'||

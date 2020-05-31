@@ -10,6 +10,7 @@ DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_nod2arc_data(text);
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_pg2epa_nod2arc_data(result_id_var text)
   RETURNS integer AS
 $BODY$
+
 DECLARE
     
 arc_rec record;
@@ -36,13 +37,12 @@ old_node_id text;
 old_to_arc text;
 epa_type_aux text;
 
-
 BEGIN
 
---  Search path
+	--  Search path
     SET search_path = "SCHEMA_NAME", public; 
  
---  Start process	
+	--  Start process	
     RAISE NOTICE 'Starting flowregulators process.';
 
     SELECT * INTO rec FROM version LIMIT 1;
@@ -141,7 +141,6 @@ BEGIN
 		IF rec_flowreg.flw_type='pump' THEN
 			UPDATE rpt_inp_node SET y0=0, ysur=9999 WHERE node_id=record_new_arc.node_2;
 		END IF;
-
 		
     END LOOP;
      	

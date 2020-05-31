@@ -7,12 +7,16 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2456
 
 --DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_dscenario(character varying );
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_dscenario (result_id_var character varying)  RETURNS integer AS $BODY$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_dscenario (result_id_var character varying)  
+RETURNS integer AS 
+$BODY$
 
 DECLARE
-    v_demandpriority integer; 
+   
+v_demandpriority integer; 
 
 BEGIN
+
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
 
@@ -20,7 +24,6 @@ BEGIN
 
 	v_demandpriority = (SELECT value::integer FROM config_param_user WHERE parameter='inp_options_demandpriority' AND cur_user=current_user);
 
-	-- 
 	IF v_demandpriority = 1 THEN -- Dscenario overwrites base demand
 		UPDATE temp_node SET demand=a.demand, pattern_id=a.pattern_id FROM vi_demands a WHERE a.node_id=temp_node.node_id;
 
@@ -35,7 +38,7 @@ BEGIN
 	-- set cero where null in orther to prevent user's null values on demand table
 	UPDATE temp_node SET demand=0 WHERE demand IS NULL;
 
-RETURN 1;
+	RETURN 1;
 	
 END;
 $BODY$

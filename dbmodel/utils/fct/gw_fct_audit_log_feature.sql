@@ -9,7 +9,9 @@ This version of Giswater is provided by Giswater Association
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_audit_log_feature(enabled_aux text)
   RETURNS void AS
 $BODY$ 
+
 DECLARE
+
 v_project_type varchar;
 
 BEGIN

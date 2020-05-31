@@ -19,29 +19,32 @@ SELECT SCHEMA_NAME.gw_fct_admin_schema_lastprocess($${
 SELECT SCHEMA_NAME.gw_fct_admin_schema_lastprocess($${
 "client":{"lang":"ES"},
 "data":{"isNewProject":"FALSE", "gwVersion":"3.3.031", "projectType":"UD", "epsg":25831}}$$)
+
+-- fid: 133
+
 */
 
-
 DECLARE 
-	v_dbnname varchar;
-	v_projecttype text;
-	v_priority integer = 0;
-	v_message text;
-	v_version record;
-	v_gwversion text;
-	v_language text;
-	v_epsg integer;
-	v_isnew boolean;
-	v_title text;
-	v_author text;
-	v_date text;
-	v_schema_info json;
-	v_superusers text;
-	v_tablename record;
-	v_schemaname text;
-    v_oldversion text;
-	v_is_sample boolean = FALSE;
-	v_sample_exist text = '';
+
+v_dbnname varchar;
+v_projecttype text;
+v_priority integer = 0;
+v_message text;
+v_version record;
+v_gwversion text;
+v_language text;
+v_epsg integer;
+v_isnew boolean;
+v_title text;
+v_author text;
+v_date text;
+v_schema_info json;
+v_superusers text;
+v_tablename record;
+v_schemaname text;
+v_oldversion text;
+v_is_sample boolean = FALSE;
+v_sample_exist text = '';
 	
 BEGIN 
 	-- search path
@@ -253,7 +256,7 @@ BEGIN
 			v_message='Project sucessfully updated';
 		ELSIF v_priority=1 THEN
 			v_message=concat($$'Project updated but there are some warnings. Take a look on audit_log_project table: SELECT (log_message::json->>'message') 
-			FROM audit_log_project WHERE fid = 33 and (log_message::json->>'version')='$$, v_gwversion, '''');
+			FROM audit_log_project WHERE fid = 133 and (log_message::json->>'version')='$$, v_gwversion, '''');
 		ELSIF v_priority=2 THEN
 			v_message='Project is not updated. There are one or more errors';
 		END IF;

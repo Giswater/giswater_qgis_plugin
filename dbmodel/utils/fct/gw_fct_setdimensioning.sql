@@ -4,7 +4,6 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-
 --FUNCTION CODE: 2880
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_setdimensioning(json);
@@ -21,40 +20,38 @@ SELECT SCHEMA_NAME.gw_fct_setdimensioning($${
 */
 
 DECLARE
-
---    Variables
 	
-	v_status text ='Accepted';
-	v_message json;
-	v_version json;
-	v_forminfo json;
-	v_featureinfo json;
-	v_linkpath json;
-	v_parentfields text;
-	v_fields_array json[];
-	schemas_array name[];
-	v_project_type text;
-	aux_json json;
-	v_fields json;
-	v_schemaname  text;
-	v_device integer;
-	v_infotype integer;
-	v_tablename text;
-	v_text text[];
-	v_querytext varchar;
-	i integer=1;
-	v_first boolean;
-	v_jsonfield json;
-	v_field text;
-	v_value text;
-	text text;
-	v_columntype character varying;
-	v_newid integer;
-	v_geometry geometry;
+v_status text ='Accepted';
+v_message json;
+v_version json;
+v_forminfo json;
+v_featureinfo json;
+v_linkpath json;
+v_parentfields text;
+v_fields_array json[];
+schemas_array name[];
+v_project_type text;
+aux_json json;
+v_fields json;
+v_schemaname  text;
+v_device integer;
+v_infotype integer;
+v_tablename text;
+v_text text[];
+v_querytext varchar;
+i integer=1;
+v_first boolean;
+v_jsonfield json;
+v_field text;
+v_value text;
+text text;
+v_columntype character varying;
+v_newid integer;
+v_geometry geometry;
 
 BEGIN
 
---    Set search path to local schema
+	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
 	v_schemaname = 'SCHEMA_NAME';
 
@@ -143,13 +140,13 @@ BEGIN
 	-- execute query text
 	EXECUTE v_querytext into v_newid;
 	
---    Return
+	-- Return
     RETURN ('{"status":"Accepted", "message":'|| v_message ||', "version":'|| v_version ||
 	    ', "body": {"feature":{"tableName":"'||v_tablename||'", "id":"'||v_newid||'"}}}')::json;    
 
---    Exception handling
-  --  EXCEPTION WHEN OTHERS THEN 
-    --    RETURN ('{"status":"Failed","message":' || (to_json(SQLERRM)) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN 
+    RETURN ('{"status":"Failed","message":' || (to_json(SQLERRM)) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

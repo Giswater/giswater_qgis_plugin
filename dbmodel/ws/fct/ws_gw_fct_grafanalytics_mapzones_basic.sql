@@ -24,6 +24,7 @@ SELECT gw_fct_grafanalytics_mapzones_basic('{"data":{"parameters":{"grafClass":"
 */
 
 DECLARE
+
 v_class	text;
 v_expl integer;
 v_updatetattributes boolean;
@@ -41,7 +42,6 @@ BEGIN
 
 	RETURN gw_fct_grafanalytics_mapzones(v_data);
 	
-
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

@@ -6,15 +6,13 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2128
 
-
-
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_plan_result_reh(integer, double precision, text);
-
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_plan_result_reh( result_id_var integer, coefficient_var double precision, descript_var text)
   RETURNS integer AS
 $BODY$
 
 DECLARE 
+
 rec_parameter record;
 rec_work record;
 work_id_aux text;
@@ -67,8 +65,7 @@ BEGIN
 
 	END LOOP;
 		
-	
-RETURN 1;
+	RETURN 1;
 
 END;
 $BODY$

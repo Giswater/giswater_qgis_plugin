@@ -16,7 +16,6 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_link_repair(link_id, (row_number() over (order by link_id)), (select count(*) from SCHEMA_NAME.link)) FROM SCHEMA_NAME.link;
 */
 
-
 DECLARE
 
 v_connec record;
@@ -68,7 +67,6 @@ BEGIN
 			-- reconnect to connec and reverse geometry (if exists)
 			SELECT connec.* INTO v_connec FROM connec WHERE ST_DWithin(ST_endpoint(v_link.the_geom), connec.the_geom, 0.5)
 			ORDER BY ST_Distance(connec.the_geom, ST_endpoint(v_link.the_geom)) LIMIT 1;
-
 
 			IF v_connec.connec_id IS NOT NULL THEN 
 
@@ -193,9 +191,8 @@ BEGIN
 	ELSE
 		RAISE NOTICE 'link id: %, status: %', p_link_id, v_status ;
 	END IF;
-            
-    
-RETURN p_link_id;
+
+	RETURN p_link_id;
 
 END; 
 

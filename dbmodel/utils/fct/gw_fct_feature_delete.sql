@@ -33,6 +33,7 @@ SELECT SCHEMA_NAME.gw_fct_feature_delete($${
 */
 
 DECLARE
+
 v_version json;
 v_feature_type text;
 v_feature_id text;
@@ -281,8 +282,8 @@ BEGIN
              ',"message":{"priority":1, "text":""},"body":{"data": {"info":'||v_result_info||'}}}')::json;
 
 	EXCEPTION WHEN OTHERS THEN
-	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$

@@ -8,11 +8,13 @@ This version of Giswater is provided by Giswater Association
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_demand(result_id_var character varying)  RETURNS integer AS 
 $BODY$
+
 /*
 SELECT SCHEMA_NAME.gw_fct_pg2epa_demand('v45')
 */
 
 DECLARE
+
 v_rec record;
 v_demand double precision;
 v_epaunits double precision;
@@ -32,7 +34,6 @@ BEGIN
 	RAISE NOTICE 'Starting pg2epa demand';
 
 	-- get user values
-
 	v_uniquepattern = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_pattern' and cur_user = current_user);
 	v_units =  (SELECT value FROM config_param_user WHERE parameter='inp_options_units' AND cur_user=current_user);
 	v_demandtype = (SELECT value FROM config_param_user WHERE parameter='inp_options_demandtype' AND cur_user=current_user);

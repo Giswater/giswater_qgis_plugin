@@ -13,9 +13,13 @@ $BODY$
 /*EXAMPLE
 INSERT INTO SCHEMA_NAME.om_mincut VALUES (1);
 SELECT SCHEMA_NAME.gw_fct_mincut('2001', 'arc', 1)
+
+--fid: 199
+
 */
 
 DECLARE
+
 node_1_aux text;
 node_2_aux text;
 controlValue integer;
@@ -59,6 +63,7 @@ v_message text;
 v_version text;
 
 BEGIN
+
     -- Search path
     SET search_path = SCHEMA_NAME, public;
 
@@ -109,9 +114,9 @@ BEGIN
     where macroexpl_id=macroexpl_id_arg and expl_id not in (select expl_id from selector_expl);
 
     -- save state selector 
-    DELETE FROM temp_table WHERE fid=99 AND cur_user=current_user;
+    DELETE FROM temp_table WHERE fid=199 AND cur_user=current_user;
     INSERT INTO temp_table (fid, text_column)
-    SELECT 99, (array_agg(state_id)) FROM selector_state WHERE cur_user=current_user;
+    SELECT 199, (array_agg(state_id)) FROM selector_state WHERE cur_user=current_user;
 
     -- set state selector
     DELETE FROM selector_state WHERE cur_user=current_user;
@@ -308,8 +313,6 @@ BEGIN
 
 	v_output = concat ('{', v_mincutdetails , '}');
 			
-	INSERT INTO audit_log_data (fid, feature_type, feature_id, log_message) VALUES (29, 'arc', element_id_arg, v_output);
-
 	--update output results
 	UPDATE om_mincut SET output = v_output WHERE id = result_id_arg;
 
@@ -322,7 +325,7 @@ BEGIN
 			
 	-- restore state selector
 	INSERT INTO selector_state (state_id, cur_user)
-	select unnest(text_column::integer[]), current_user from temp_table where fid=99 and cur_user=current_user
+	select unnest(text_column::integer[]), current_user from temp_table where fid=199 and cur_user=current_user
 	ON CONFLICT (state_id, cur_user) DO NOTHING;
 
 	-- returning
@@ -359,8 +362,8 @@ BEGIN
 	RETURN v_return;
 
 	EXCEPTION WHEN OTHERS THEN
-	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
  
 END;

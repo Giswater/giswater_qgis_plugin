@@ -21,29 +21,26 @@ SELECT SCHEMA_NAME.gw_fct_getcolumnsfrom_id($${
 
 DECLARE
 
---    Variables
-    v_fields json;
-    v_childs text;
-    v_json json;
-    v_fields_array text[];
-    v_field text;
-    v_json_array json[];
-    schemas_array name[];
-    v_version json;
-    v_tablename text;
-    v_feature_id integer;
-    i integer = 0;
-    v_fieldsreload text;
-    v_result text;
-    v_exists text;
-    v_message text;
-    v_parentname text;
-    v_parentid integer;
-    v_featureType text;
-    v_iseditable boolean;
+v_fields json;
+v_childs text;
+v_json json;
+v_fields_array text[];
+v_field text;
+v_json_array json[];
+schemas_array name[];
+v_version json;
+v_tablename text;
+v_feature_id integer;
+i integer = 0;
+v_fieldsreload text;
+v_result text;
+v_exists text;
+v_message text;
+v_parentname text;
+v_parentid integer;
+v_featureType text;
+v_iseditable boolean;
     
-
-
 BEGIN
 
 	-- Set search path to local schema
@@ -86,19 +83,19 @@ BEGIN
 		END IF;
 	END LOOP;
 	
-	--    Convert to json
-	    v_fields := array_to_json(v_json_array);
+	-- Convert to json
+	v_fields := array_to_json(v_json_array);
 
-	--    Control NULL's
-	    v_version := COALESCE(v_version, '[]');
-	    v_fields := COALESCE(v_fields, '[]');   
+	-- Control NULL's
+	v_version := COALESCE(v_version, '[]');
+	v_fields := COALESCE(v_fields, '[]');   
 	    
-	--    Return
-		RETURN v_fields::json;
+	-- Return
+	RETURN v_fields::json;
 
---    Exception handling
- --   EXCEPTION WHEN OTHERS THEN 
-   --     RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	--Exception handling
+	EXCEPTION WHEN OTHERS THEN 
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;

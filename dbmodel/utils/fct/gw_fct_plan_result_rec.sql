@@ -6,10 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2128
 
-
-
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_plan_result_rec(integer, double precision, text);
-
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_plan_result_rec( result_id_var integer, coefficient_var double precision, descript_var text)
   RETURNS integer AS
 $BODY$
@@ -22,7 +19,6 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
     -- reconstruction
-	
 	INSERT INTO om_rec_result_node (result_id, node_id, nodecat_id, node_type, top_elev, elev, epa_type, sector_id, state, annotation,
 	the_geom, cost_unit, descript, measurement, cost, budget, expl_id)
 
@@ -112,7 +108,7 @@ BEGIN
 	FROM v_plan_arc
 	WHERE state=1;
 	
-RETURN 1;
+	RETURN 1;
 
 END;
 $BODY$

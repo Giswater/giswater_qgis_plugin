@@ -22,6 +22,7 @@ SELECT gw_fct_pg2epa_check_data('{"parameters":{}}')-- when is called from toolb
 
 
 DECLARE
+
 v_record record;
 v_project_type text;
 v_count	integer;

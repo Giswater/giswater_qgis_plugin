@@ -10,7 +10,9 @@ This version of Giswater is provided by Giswater Association
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut_valve_unaccess(node_id_var character varying, result_id_var integer, cur_user_var text)
   RETURNS void AS
 $BODY$
+
 DECLARE 
+
 feature_id_aux text;
 feature_type_aux text;
 v_flag boolean = false;

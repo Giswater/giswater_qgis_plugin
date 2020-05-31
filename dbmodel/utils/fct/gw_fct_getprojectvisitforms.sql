@@ -6,7 +6,6 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2900
 
-
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_getprojectvisitforms(p_data json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getprojectvisitforms(p_data json)
   RETURNS json AS
@@ -20,52 +19,53 @@ SELECT SCHEMA_NAME.gw_fct_getprojectvisitforms($${
 */
 
 DECLARE
-	v_version text;
-	v_schemaname text;
-	v_featuretype text;
-	v_featuretablename text;
-	v_visitclass integer;
-	v_id text;
-	v_idname text;
-	v_columntype text;
-	v_device integer;
-	v_formname text;
-	v_tablename text;
-	v_fields json [];
-	v_fields_text text [];
-	v_fields_json json;
-	v_forminfo json;
-	v_formheader text;
-	v_formactions text;
-	v_formtabs text;
-	v_tabaux json;
-	v_active boolean;
-	v_featureid varchar ;
-	aux_json json;
-	v_tab record;
-	v_projecttype varchar;
-	v_list json;
-	v_activedatatab boolean;
-	v_activefilestab boolean;
-	v_client json;
-	v_pageinfo json;
-	v_layermanager json;
-	v_filterfields json;
-	v_data json;
-	isnewvisit boolean;
-	v_feature json;
-	v_addfile json;
-	v_deletefile json;
-	v_filefeature json;
-	v_fileid text;
-	v_message json;
-	v_message1 text;
-	v_message2 text;
-	v_return json;
-	v_currentactivetab text;
-	v_values json;
-	array_index integer DEFAULT 0;
-	v_fieldvalue text;
+
+v_version text;
+v_schemaname text;
+v_featuretype text;
+v_featuretablename text;
+v_visitclass integer;
+v_id text;
+v_idname text;
+v_columntype text;
+v_device integer;
+v_formname text;
+v_tablename text;
+v_fields json [];
+v_fields_text text [];
+v_fields_json json;
+v_forminfo json;
+v_formheader text;
+v_formactions text;
+v_formtabs text;
+v_tabaux json;
+v_active boolean;
+v_featureid varchar ;
+aux_json json;
+v_tab record;
+v_projecttype varchar;
+v_list json;
+v_activedatatab boolean;
+v_activefilestab boolean;
+v_client json;
+v_pageinfo json;
+v_layermanager json;
+v_filterfields json;
+v_data json;
+isnewvisit boolean;
+v_feature json;
+v_addfile json;
+v_deletefile json;
+v_filefeature json;
+v_fileid text;
+v_message json;
+v_message1 text;
+v_message2 text;
+v_return json;
+v_currentactivetab text;
+v_values json;
+array_index integer DEFAULT 0;
+v_fieldvalue text;
 
 BEGIN
 

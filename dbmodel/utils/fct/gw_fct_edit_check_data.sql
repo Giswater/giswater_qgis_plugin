@@ -16,10 +16,8 @@ BEGIN
 
     -- Search path
     SET search_path = "SCHEMA_NAME", public;
-
 	
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND audit_check_data.fid = 38;
-	
 	
     RETURN vjson;
         

@@ -11,20 +11,21 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_role_permissions() RETURNS v
 $BODY$
 
 DECLARE 
-	v_roleexists text;
-	v_dbnname varchar;
-	v_schema_array name[];
-	v_schemaname varchar;
-	v_tablerecord record;
-	v_project_type text;
-	v_query_text text;
-	v_function_name text;
-	v_apiservice boolean;	
-	v_rolepermissions boolean;
-	v_publishuser varchar;
-	v_vpn_dbuser boolean;
 
-	rec_user record;
+v_roleexists text;
+v_dbnname varchar;
+v_schema_array name[];
+v_schemaname varchar;
+v_tablerecord record;
+v_project_type text;
+v_query_text text;
+v_function_name text;
+v_apiservice boolean;	
+v_rolepermissions boolean;
+v_publishuser varchar;
+v_vpn_dbuser boolean;
+
+rec_user record;
 
 BEGIN 
 
@@ -153,9 +154,8 @@ BEGIN
 		EXECUTE v_query_text;	
 	
 	END IF;
-	
-			
-RETURN ;
+
+	RETURN ;
 
 END;
 $BODY$

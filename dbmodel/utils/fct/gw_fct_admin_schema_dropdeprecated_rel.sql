@@ -10,15 +10,19 @@ This version of Giswater is provided by Giswater Association
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_schema_dropdeprecated_rel()
   RETURNS void AS
 $BODY$
+
 /*
 select SCHEMA_NAME.gw_fct_admin_schema_dropdeprecated_rel()
 */
 
 DECLARE
-	v_schemaname text;
-	v_tablerecord record;
-	v_query_text text;
+
+v_schemaname text;
+v_tablerecord record;
+v_query_text text;
+
 BEGIN
+
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
 	v_schemaname = 'SCHEMA_NAME';

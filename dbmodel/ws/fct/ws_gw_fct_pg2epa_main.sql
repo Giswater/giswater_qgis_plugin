@@ -23,6 +23,7 @@ delete from SCHEMA_NAME.rpt_cat_result
 */
 
 DECLARE
+
 v_networkmode integer = 1;
 v_return json;
 v_input json;
@@ -263,7 +264,6 @@ BEGIN
 	v_return =  gw_fct_json_object_set_key (v_return, 'steps', 0);
 	v_return = replace(v_return::text, '"message":{"priority":1, "text":"Data quality analysis done succesfully"}', 
 	'"message":{"priority":1, "text":"Inp export done succesfully"}')::json;
-
 
 	RETURN v_return;
 END;

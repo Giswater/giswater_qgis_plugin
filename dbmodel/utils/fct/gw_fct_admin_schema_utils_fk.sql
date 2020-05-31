@@ -7,9 +7,9 @@ This version of Giswater is provided by Giswater Association
 
 -- FUNCTION CODE: 2556
 
-
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_schema_utils_fk() RETURNS void AS
 $BODY$
+
 DECLARE
 
 project_type_aux varchar;
@@ -19,6 +19,7 @@ ws_current_schema_aux text;
 ud_current_schema_aux text;
 
 BEGIN
+
     -- Search path
     SET search_path = "SCHEMA_NAME", public;
 
@@ -365,7 +366,7 @@ BEGIN
 		ALTER TABLE ext_district ALTER COLUMN muni_id SET NOT NULL;
 	END IF;
 
-
+	return;
 
 END;$BODY$
   LANGUAGE plpgsql VOLATILE

@@ -9,7 +9,8 @@ This version of Giswater is provided by Giswater Association
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_rpt2pg(character varying );
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_rpt2pg(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_rpt2pg_main(p_data json)  
-RETURNS json AS $BODY$
+RETURNS json AS 
+$BODY$
 
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_rpt2pg_main($${"data":{"resultId":"test1"}}$$) 
@@ -26,7 +27,7 @@ BEGIN
 	-- get parameters
 	v_result  = (p_data ->>'data')::json->>'resultId';
 
-	RAISE NOTICE 'Starting rpt2pg process. adsgfdasg sdg ';
+	RAISE NOTICE 'Starting rpt2pg process.';
 
 	-- reordening data
 	PERFORM gw_fct_rpt2pg_import_rpt(p_data);

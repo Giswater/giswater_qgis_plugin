@@ -16,29 +16,31 @@ SELECT SCHEMA_NAME.gw_fct_anl_arc_inverted($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"v_edit_man_conduit", "id":["138","139"]},
 "data":{"selectionMode":"previousSelection", "parameters":{"saveOnDatabase":true}
-	}}$$)
+}}$$)
+
+-- fid: 110
+
 */
 
-
 DECLARE
-	v_version text;
-	v_result json; 
-	v_result_info	json;
-	v_result_line 	json;
-	v_id json;
-	v_selectionmode text;
-	v_saveondatabase boolean;
-	v_worklayer text;
-	v_array text;
-	v_error_context text;
-	v_qmllinepath text;
+
+v_version text;
+v_result json; 
+v_result_info json;
+v_result_line json;
+v_id json;
+v_selectionmode text;
+v_saveondatabase boolean;
+v_worklayer text;
+v_array text;
+v_error_context text;
+v_qmllinepath text;
 
 BEGIN
-
 	
 	SET search_path = "SCHEMA_NAME", public;
 
-    	-- select version
+   	-- select version
 	SELECT giswater INTO v_version FROM version order by 1 desc limit 1;
 
 	-- getting input data 	
@@ -52,27 +54,21 @@ BEGIN
 	SELECT regexp_replace(row(value)::text, '["()"]', '', 'g') INTO v_qmllinepath FROM config_param_user WHERE parameter='qgis_qml_linelayer_path' AND cur_user=current_user;
 
 	-- Reset values
-	DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid=10;
+	DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid=110;
 	    
-	/*-- Computing process
-	 INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom)
-	 SELECT arc_id, expl_id, 10, the_geom 
-		FROM v_edit_arc
-		WHERE slope < 0;*/
-
 	-- Computing process
 	IF v_array != '()' THEN 
 		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state)
-	 			SELECT arc_id, expl_id, 10, the_geom, arccat_id, state FROM '||v_worklayer||' WHERE slope < 0 AND arc_id IN '||v_array||';';
+	 			SELECT arc_id, expl_id, 110, the_geom, arccat_id, state FROM '||v_worklayer||' WHERE slope < 0 AND arc_id IN '||v_array||';';
 	ELSE
 		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, the_geom, arccat_id, state)
-	 			SELECT arc_id, expl_id, 10, the_geom, arccat_id, state FROM '||v_worklayer||' WHERE slope < 0';
+	 			SELECT arc_id, expl_id, 110, the_geom, arccat_id, state FROM '||v_worklayer||' WHERE slope < 0';
 	END IF;
 
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=10 order by id) row;
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=110 order by id) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
@@ -86,18 +82,18 @@ BEGIN
     'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
   	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom, fid
-  	FROM  anl_arc WHERE cur_user="current_user"() AND fid=10) row) features;
+  	FROM  anl_arc WHERE cur_user="current_user"() AND fid=110) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "qmlPath":"',v_qmllinepath,'", "features":',v_result,'}'); 
 
 	IF v_saveondatabase IS FALSE THEN 
 		-- delete previous results
-		DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid=10;
+		DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid=110;
 	ELSE
 		-- set selector
-		DELETE FROM selector_audit WHERE fid=10 AND cur_user=current_user;
-		INSERT INTO selector_audit (fid,cur_user) VALUES (10, current_user);
+		DELETE FROM selector_audit WHERE fid=110 AND cur_user=current_user;
+		INSERT INTO selector_audit (fid,cur_user) VALUES (110, current_user);
 	END IF;
 		
 	--    Control nulls
@@ -114,8 +110,8 @@ BEGIN
 	    '}')::json; 
 
 	EXCEPTION WHEN OTHERS THEN
-	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
    
 END;
 $BODY$

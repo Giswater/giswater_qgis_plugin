@@ -11,7 +11,6 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_odbc2pg_main(p_data json)
   RETURNS json AS
 $BODY$
 
-
 /*EXAMPLE
 
 SELECT SCHEMA_NAME.gw_fct_odbc2pg_main($${
@@ -20,20 +19,20 @@ SELECT SCHEMA_NAME.gw_fct_odbc2pg_main($${
 
 */
 
-
 DECLARE
-	v_expl			integer;
-	v_period		text;
-	v_year			integer;
-	v_project_type		text;
-	v_version		text;
-	v_result 		json;
-	v_result_info		json;
-	v_result_point		json;
-	v_result_line		json;
-	v_querytext		text;
-	v_count			integer;
-	v_error_context text;
+
+v_expl integer;
+v_period text;
+v_year integer;
+v_project_type text;
+v_version text;
+v_result json;
+v_result_info json;
+v_result_point json;
+v_result_line json;
+v_querytext text;
+v_count integer;
+v_error_context text;
 
 BEGIN
 
@@ -58,11 +57,11 @@ BEGIN
 	v_result_info = (((v_result->>'body')::json->>'data')::json->>'info')::json;	
 	v_result_point = (((v_result->>'body')::json->>'data')::json->>'point')::json;	
 	v_result_line = (((v_result->>'body')::json->>'data')::json->>'line')::json;	
-			
-	--    Control nulls
+
+	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	
---  Return
+	--  Return
     RETURN ('{"status":"Accepted", "message":{"level":1, "text":"ODBC import/export process done succesfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
@@ -70,10 +69,10 @@ BEGIN
 				'"line":'||v_result_line||
 		     '}}}')::json;
 
---  Exception handling
+	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN
-	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$

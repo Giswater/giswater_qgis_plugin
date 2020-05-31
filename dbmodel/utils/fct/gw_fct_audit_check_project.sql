@@ -14,9 +14,18 @@ $BODY$
 /*
 SELECT SCHEMA_NAME.gw_fct_audit_check_project($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, 
 "feature":{}, "data":{"filterFields":{}, "qgisVersion":"3.10.003.1", "initProject":"false", "pageInfo":{}, "version":"3.3.019", "fid":1}}$$);
+
+	-- delete old values on result table
+	DELETE FROM audit_check_data WHERE fid=201 AND cur_user=current_user;
+	DELETE FROM audit_check_data WHERE fid IN (114,115,125,195) AND cur_user=current_user;
+
+-- fid: 
+
+
 */
 
 DECLARE 
+
 v_querytext text;
 v_sys_rows text;
 v_parameter text;
@@ -99,38 +108,38 @@ BEGIN
 	v_count=0;
 
 	-- delete old values on result table
-	DELETE FROM audit_check_data WHERE fid=101 AND cur_user=current_user;
-	DELETE FROM audit_check_data WHERE fid IN (14,15,25,95) AND cur_user=current_user;
+	DELETE FROM audit_check_data WHERE fid=201 AND cur_user=current_user;
+	DELETE FROM audit_check_data WHERE fid IN (114,115,125,195) AND cur_user=current_user;
 
 	
 	-- Starting process
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'AUDIT CHECK PROJECT');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '-------------------------------------------------------------');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (201, null, 4, 'AUDIT CHECK PROJECT');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (201, null, 4, '-------------------------------------------------------------');
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 3, 'CRITICAL ERRORS');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 3, '----------------------');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (201, null, 3, 'CRITICAL ERRORS');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (201, null, 3, '----------------------');
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 2, 'WARNINGS');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 2, '--------------');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (201, null, 2, 'WARNINGS');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (201, null, 2, '--------------');
 
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 1, 'INFO');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 1, '-------');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (201, null, 1, 'INFO');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (201, null, 1, '-------');
 
 
 	IF v_qgis_version = v_version THEN
 		v_errortext=concat('Giswater version: ',v_version,'.');
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
-		VALUES (101, 4, v_errortext);
+		VALUES (201, 4, v_errortext);
 	ELSE
 		v_errortext=concat('ERROR: Version of plugin is different than the database version. DB: ',v_version,', plugin: ',v_qgis_version,'.');
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
-		VALUES (101, 3, v_errortext);
+		VALUES (201, 3, v_errortext);
 	END IF;
 
-	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('PostgreSQL versión: ',(SELECT version())));
-	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('PostGIS versión: ',(SELECT postgis_version())));
-	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('QGIS versión: ', v_qgisversion));
-	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('O/S versión: ', v_osversion));
+	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (201, 4, concat ('PostgreSQL versión: ',(SELECT version())));
+	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (201, 4, concat ('PostGIS versión: ',(SELECT postgis_version())));
+	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (201, 4, concat ('QGIS versión: ', v_qgisversion));
+	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (201, 4, concat ('O/S versión: ', v_osversion));
 		
 	
 	-- Reset urn sequence
@@ -155,7 +164,7 @@ BEGIN
 
 	v_errortext=concat('Logged as ', current_user,' on ', now());
 	
-	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
+	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (201, 4, v_errortext);
 
 	IF v_max_seq_id IS NOT null THEN
 		EXECUTE 'SELECT setval(''SCHEMA_NAME.urn_id_seq'','||v_max_seq_id||', true)';
@@ -185,7 +194,7 @@ BEGIN
 	END LOOP;
 
 	v_errortext=concat('Reset all sequences on project data schema.');
-	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
+	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (201, 4, v_errortext);
 
 	-- set mandatory values of config_param_user in case of not exists (for new users or for updates)
 	FOR v_rectable IN SELECT * FROM sys_param_user WHERE ismandatory IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member'))
@@ -196,7 +205,7 @@ BEGIN
 
 			v_errortext=concat('Set value for new variable in config param user: ',v_rectable.id,'.');
 
-			INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
+			INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (201, 4, v_errortext);
 		END IF;
 	END LOOP;
 
@@ -223,7 +232,7 @@ BEGIN
 		WHERE active=false AND concat(lower(connec_type.id),'_vdefault') = sys_param_user.id);
 
 		v_errortext=concat('Inactive parameters have been deleted from sys_param_user.');
-		INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
+		INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (201, 4, v_errortext);
 		
 	END IF;
 
@@ -235,21 +244,21 @@ BEGIN
 	  	INSERT INTO selector_expl (expl_id, cur_user) 
 	  	SELECT expl_id, current_user FROM exploitation WHERE active IS NOT FALSE AND expl_id > 0 limit 1;
 		v_errortext=concat('Set visible exploitation for user ',(SELECT expl_id FROM exploitation WHERE active IS NOT FALSE AND expl_id > 0 limit 1));
-		INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
+		INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (201, 4, v_errortext);
 	END IF;
 
 	-- Force state selector in case of null values
 	IF (SELECT count(*) FROM selector_state WHERE cur_user=current_user) < 1 THEN 
 	  	INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
 		v_errortext=concat('Set feature state = 1 for user');
-		INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
+		INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (201, 4, v_errortext);
 	END IF;
 	
 	-- Force hydrometer selector in case of null values
 	IF (SELECT count(*) FROM selector_hydrometer WHERE cur_user=current_user) < 1 THEN 
 	  	INSERT INTO selector_hydrometer (state_id, cur_user) VALUES (1, current_user);
 		v_errortext=concat('Set hydrometer state = 1 for user');
-		INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
+		INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (201, 4, v_errortext);
 	END IF;
 	
 	-- Force psector vdefault visible to current_user (only to => role_master)
@@ -261,14 +270,14 @@ BEGIN
 			SELECT psector_id INTO v_psector_vdef FROM plan_psector WHERE status=2 LIMIT 1;
 			IF v_psector_vdef IS NULL THEN
 				v_errortext=concat('No current psector have been set. There are not psectors with status=2 on project');
-				INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
+				INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (201, 4, v_errortext);
 			END IF;
 		END IF;
 
 		IF v_psector_vdef IS NOT NULL THEN
 			INSERT INTO selector_psector (psector_id, cur_user) VALUES (v_psector_vdef, current_user) ON CONFLICT (psector_id, cur_user) DO NOTHING;
 			v_errortext=concat('Current psector: ',v_psector_vdef);
-			INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
+			INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (201, 4, v_errortext);
 		END IF;
 	END IF;
 
@@ -281,8 +290,8 @@ BEGIN
 			"feature":{},"data":{"parameters":{"selectionMode":"wholeSystem"}}}$$)';
 			-- insert results 
 			INSERT INTO audit_check_data  (fid, criticity, error_message)
-			SELECT 101, criticity, replace(error_message,':', ' (DB OM):') FROM audit_check_data 
-			WHERE fid=25 AND criticity < 4 AND error_message !='' AND cur_user=current_user OFFSET 6 ;
+			SELECT 201, criticity, replace(error_message,':', ' (DB OM):') FROM audit_check_data 
+			WHERE fid=125 AND criticity < 4 AND error_message !='' AND cur_user=current_user OFFSET 6 ;
 
 			IF v_project_type = 'WS' THEN
 
@@ -291,7 +300,7 @@ BEGIN
 				"feature":{},"data":{"parameters":{"selectionMode":"wholeSystem", "grafClass":"ALL"}}}$$)';
 				-- insert results 
 				INSERT INTO audit_check_data  (fid, criticity, error_message)
-				SELECT 101, criticity, replace(error_message,':', ' (DB OM):') FROM audit_check_data 
+				SELECT 201, criticity, replace(error_message,':', ' (DB OM):') FROM audit_check_data 
 				WHERE fid=111 AND criticity < 4 AND error_message !='' AND cur_user=current_user OFFSET 6 ;
 			END IF;
 		END IF;
@@ -302,8 +311,8 @@ BEGIN
 				"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{}}$$)';
 				-- insert results 
 				INSERT INTO audit_check_data  (fid, criticity, error_message)
-				SELECT 101, criticity, replace(error_message,':', ' (DB EPA):') FROM audit_check_data 
-				WHERE fid=125 AND criticity < 4 AND error_message !='' AND cur_user=current_user OFFSET 6;
+				SELECT 201, criticity, replace(error_message,':', ' (DB EPA):') FROM audit_check_data 
+				WHERE fid=1125 AND criticity < 4 AND error_message !='' AND cur_user=current_user OFFSET 6;
 		END IF;
 
 		IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
@@ -312,8 +321,8 @@ BEGIN
 				"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{}}$$)';
 				-- insert results 
 				INSERT INTO audit_check_data  (fid, criticity, error_message)
-				SELECT 101, criticity, replace(error_message,':', ' (DB PLAN):') FROM audit_check_data 
-				WHERE fid=15 AND criticity < 4 AND error_message !='' AND cur_user=current_user OFFSET 6;
+				SELECT 201, criticity, replace(error_message,':', ' (DB PLAN):') FROM audit_check_data 
+				WHERE fid=115 AND criticity < 4 AND error_message !='' AND cur_user=current_user OFFSET 6;
 		END IF;
 
 		IF 'role_admin' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
@@ -322,8 +331,8 @@ BEGIN
 			"data":{"filterFields":{}, "pageInfo":{}, "parameters":{}}}$$)::text';
 			-- insert results 
 			INSERT INTO audit_check_data  (fid, criticity, error_message)
-			SELECT 101, criticity, replace(error_message,':', ' (DB ADMIN):') FROM audit_check_data 
-			WHERE fid=95 AND criticity < 4 AND error_message !='' AND cur_user=current_user OFFSET 6;
+			SELECT 201, criticity, replace(error_message,':', ' (DB ADMIN):') FROM audit_check_data 
+			WHERE fid=195 AND criticity < 4 AND error_message !='' AND cur_user=current_user OFFSET 6;
 			
 		END IF;
 	END IF;
@@ -353,10 +362,10 @@ BEGIN
 				v_errortext = concat('ERROR( QGIS PROJ): There is/are ',v_count,' layers that come from differen host: ',v_layer_list,'.');
 			
 				INSERT INTO audit_check_data (fid,  criticity, error_message)
-				VALUES (101, 3,v_errortext );
+				VALUES (201, 3,v_errortext );
 			ELSE
 				INSERT INTO audit_check_data (fid,  criticity, error_message)
-				VALUES (101, 1, 'INFO (QGIS PROJ): All layers come from current host');
+				VALUES (201, 1, 'INFO (QGIS PROJ): All layers come from current host');
 			END IF;
 			
 			--check layers database
@@ -367,10 +376,10 @@ BEGIN
 				v_errortext = concat('ERROR (QGIS PROJ): There is/are ',v_count,' layers that come from different database: ',v_layer_list,'.');
 			
 				INSERT INTO audit_check_data (fid,  criticity, error_message)
-				VALUES (101, 3,v_errortext );
+				VALUES (201, 3,v_errortext );
 			ELSE
 				INSERT INTO audit_check_data (fid,  criticity, error_message)
-				VALUES (101, 1, 'INFO (QGIS PROJ): All layers come from current database');
+				VALUES (201, 1, 'INFO (QGIS PROJ): All layers come from current database');
 			END IF;
 
 			--check layers database
@@ -381,10 +390,10 @@ BEGIN
 				v_errortext = concat('ERROR (QGIS PROJ): There is/are ',v_count,' layers that come from different schema: ',v_layer_list,'.');
 			
 				INSERT INTO audit_check_data (fid,  criticity, error_message)
-				VALUES (101, 3,v_errortext );
+				VALUES (201, 3,v_errortext );
 			ELSE
 				INSERT INTO audit_check_data (fid,  criticity, error_message)
-				VALUES (101, 1, 'INFO (QGIS PROJ): All layers come from current schema');
+				VALUES (201, 1, 'INFO (QGIS PROJ): All layers come from current schema');
 			END IF;
 
 			--check layers user
@@ -395,10 +404,10 @@ BEGIN
 				v_errortext = concat('ERROR (QGIS PROJ): There is/are ',v_count,' layers that have been added by different user: ',v_layer_list,'.');
 			
 				INSERT INTO audit_check_data (fid,  criticity, error_message)
-				VALUES (101, 3,v_errortext );
+				VALUES (201, 3,v_errortext );
 			ELSE
 				INSERT INTO audit_check_data (fid,  criticity, error_message)
-				VALUES (101, 1, 'INFO (QGIS PROJ): All layers have been added by current user');
+				VALUES (201, 1, 'INFO (QGIS PROJ): All layers have been added by current user');
 			END IF;
 
 			-- start process
@@ -450,15 +459,15 @@ BEGIN
 
 		END IF;
 
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, v_result_id, 4, NULL);
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, v_result_id, 3, NULL);
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, v_result_id, 2, NULL);
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, v_result_id, 1, NULL);
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (201, v_result_id, 4, NULL);
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (201, v_result_id, 3, NULL);
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (201, v_result_id, 2, NULL);
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (201, v_result_id, 1, NULL);
 
 		-- get results
 		-- info
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
-		FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=101 order by criticity desc, id asc) row;
+		FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=201 order by criticity desc, id asc) row;
 		v_result := COALESCE(v_result, '{}'); 
 		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
@@ -473,11 +482,11 @@ BEGIN
 		    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
 		    'properties', to_jsonb(row) - 'the_geom'
 			) AS feature
-			FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript, fid, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid IN (7,14,64,66,70,71,98) -- epa
+			FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript, fid, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid IN (7,114,64,66,70,71,98) -- epa
 			UNION
 			SELECT id, node_id, nodecat_id, state, expl_id, descript, fid, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid IN (4,76,79,80,81,82,87,96,97,102,103)  -- om
 			UNION
-			SELECT id, connec_id, connecat_id, state, expl_id, descript,fid, the_geom FROM anl_connec WHERE cur_user="current_user"() AND fid IN (101,102,104,105,106) -- om
+			SELECT id, connec_id, connecat_id, state, expl_id, descript,fid, the_geom FROM anl_connec WHERE cur_user="current_user"() AND fid IN (201,102,104,105,106) -- om
 			) row) features;
 
 			v_result := COALESCE(v_result, '{}'); 
@@ -493,7 +502,7 @@ BEGIN
 		    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
 		    'properties', to_jsonb(row) - 'the_geom'
 			) AS feature
-			FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, fid, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fid IN (3, 14, 39)  -- epa
+			FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, fid, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fid IN (3, 114, 39)  -- epa
 			UNION
 			SELECT id, arc_id, arccat_id, state, expl_id, descript, fid, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fid IN (4, 88, 102) -- om
 			) row) features;

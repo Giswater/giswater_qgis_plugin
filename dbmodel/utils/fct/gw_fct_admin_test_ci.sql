@@ -6,44 +6,43 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2806
 
-
---DROP FUNCTION SCHEMA_NAME.gw_fct_admin_test_ci();
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_test_ci()
-  RETURNS json AS
+RETURNS json AS
 $BODY$
-
 
 /*
 SELECT SCHEMA_NAME.gw_fct_admin_test_ci()
+
+-- fid: 215
+
 */
 
 DECLARE 
 
-	rec_role record;
-	rec_table record;
-	rec_node_type record;
-	rec_state integer;
-	rec_fct record;
+rec_role record;
+rec_table record;
+rec_node_type record;
+rec_state integer;
+rec_fct record;
 
-	v_result text;
-	v_schemaname text;
-	v_query text;
-	v_query_result text;
-	v_function text;
-	v_feature_id text;
-	v_project_type text;
-	v_version text;
-	v_result_info json;
-	v_error_context text;
-	v_state_type integer;
-	v_nodecat text;
-	v_node_arcdivide text;
-	v_node_not_arcdivide text;
-	v_psector_id integer;
-
-DECLARE
+v_result text;
+v_schemaname text;
+v_query text;
+v_query_result text;
+v_function text;
+v_feature_id text;
+v_project_type text;
+v_version text;
+v_result_info json;
+v_error_context text;
+v_state_type integer;
+v_nodecat text;
+v_node_arcdivide text;
+v_node_not_arcdivide text;
+v_psector_id integer;
 
 BEGIN
+
 	SET search_path = SCHEMA_NAME, public;
 	
 	v_schemaname = 'SCHEMA_NAME';
@@ -59,7 +58,7 @@ BEGIN
 	GRANT ALL ON TABLE audit_check_data TO role_basic;
 
 	--remove previous results 
-	DELETE FROM audit_check_data where fid = 115;
+	DELETE FROM audit_check_data where fid = 215;
 	
 	--set configuration for gw_fct_pg2epa_main
 	IF v_project_type = 'WS'  THEN
@@ -193,7 +192,7 @@ BEGIN
 									EXECUTE v_query
 									INTO v_query_result;
 									INSERT INTO audit_check_data (fid, result_id, table_id, error_message)
-									VALUES (115, rec_fct.function_name,rec_role.id,v_query_result);
+									VALUES (215, rec_fct.function_name,rec_role.id,v_query_result);
 								END IF;					
 
 								--fusion arcs or delete node if it's not connected to arcs (not arc divide)
@@ -205,7 +204,7 @@ BEGIN
 									INTO v_query_result;
 									
 									INSERT INTO audit_check_data (fid, result_id, table_id, error_message)
-									VALUES (115, 'gw_fct_arc_fusion',rec_role.id,v_query_result);
+									VALUES (215, 'gw_fct_arc_fusion',rec_role.id,v_query_result);
 									
 								ELSE
 								raise notice 'DELETE';
@@ -214,7 +213,7 @@ BEGIN
 									INTO v_query_result;
 										
 									INSERT INTO audit_check_data (fid, result_id, table_id, error_message)
-									VALUES (115, 'gw_fct_feature_delete',rec_role.id,v_query_result);
+									VALUES (215, 'gw_fct_feature_delete',rec_role.id,v_query_result);
 
 								END IF;
 								
@@ -242,7 +241,7 @@ BEGIN
 					INTO v_query_result;
 
 					INSERT INTO audit_check_data (fid, result_id, table_id, error_message)
-					VALUES (115, rec_fct.function_name,rec_role.id,v_query_result);
+					VALUES (215, rec_fct.function_name,rec_role.id,v_query_result);
 				END IF;
 			ELSE
 				--concatenate fct with json input parameter
@@ -255,7 +254,7 @@ BEGIN
 				END IF;
 			
 				INSERT INTO audit_check_data (fid, result_id, table_id, error_message)
-				VALUES (115, rec_fct.function_name,rec_role.id,v_query_result);
+				VALUES (215, rec_fct.function_name,rec_role.id,v_query_result);
 				
 			END IF;
 
@@ -263,18 +262,17 @@ BEGIN
 		
 	END LOOP;
 
---set back role admin and grant basic permissions for role_basic
-SET ROLE role_admin;
-GRANT SELECT ON TABLE node_type TO role_basic;
-GRANT SELECT ON TABLE audit_check_data TO role_basic;
+	--set back role admin and grant basic permissions for role_basic
+	SET ROLE role_admin;
+	GRANT SELECT ON TABLE node_type TO role_basic;
+	GRANT SELECT ON TABLE audit_check_data TO role_basic;
 
---  Return
+	-- Return
   	SELECT jsonb_build_object(
 	'function_result', json_agg(row)
   	) AS feature INTO v_result
   	FROM (SELECT result_id, table_id, criticity,error_message::json
-  	FROM  audit_check_data WHERE  fid = 115) row;
-
+  	FROM  audit_check_data WHERE  fid = 215) row;
 
 	v_result_info := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');

@@ -43,15 +43,17 @@ SELECT SCHEMA_NAME.gw_fct_gettypeahead($${"client":{"device":9, "infoType":100, 
 */
 
 DECLARE
-	v_response json;
-	v_message text;
-	v_version text;
-	v_querytext text;
-	v_querytextparent text; 
-	v_parent text; 
-	v_parentvalue text; 
-	v_textosearch text;
-	v_fieldtosearch text; 
+
+v_response json;
+v_message text;
+v_version text;
+v_querytext text;
+v_querytextparent text; 
+v_parent text; 
+v_parentvalue text; 
+v_textosearch text;
+v_fieldtosearch text; 
+
 BEGIN
 
 	-- set search path to local schema

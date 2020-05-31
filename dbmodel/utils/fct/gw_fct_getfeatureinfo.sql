@@ -26,6 +26,7 @@ SELECT SCHEMA_NAME.gw_fct_getfeatureinfo('ve_arc_conduit', '2001', 3, 100, 'true
 */
 
 DECLARE
+
 fields json;
 fields_array json[];
 aux_json json;    

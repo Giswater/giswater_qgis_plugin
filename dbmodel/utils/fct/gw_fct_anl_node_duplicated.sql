@@ -13,23 +13,28 @@ SELECT gw_fct_anl_node_duplicated($${"client":{"device":9, "infoType":100, "lang
 "form":{},"feature":{"tableName":"v_edit_node", "featureType":"NODE", "id":[]}, 
 "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
 "parameters":{"nodeTolerance":"3.0", "saveOnDatabase":"true"}}}$$)::text
+
+-- fid: 106
+
 */
 
 DECLARE
-    v_id json;
-    v_selectionmode text;
-    v_nodetolerance float;
-    v_saveondatabase boolean;
-    v_worklayer text;
-    v_result json;
-    v_result_info json;
-    v_result_point json;
-    v_array text;
-    v_version text;
-    v_qmlpointpath	text;
-    v_error_context text;
+    
+v_id json;
+v_selectionmode text;
+v_nodetolerance float;
+v_saveondatabase boolean;
+v_worklayer text;
+v_result json;
+v_result_info json;
+v_result_point json;
+v_array text;
+v_version text;
+v_qmlpointpath	text;
+v_error_context text;
 
 BEGIN
+
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
 
@@ -48,19 +53,19 @@ BEGIN
 	SELECT regexp_replace(row(value)::text, '["()"]', '', 'g')  INTO v_qmlpointpath FROM config_param_user WHERE parameter='qgis_qml_pointlayer_path' AND cur_user=current_user;
 
 	-- Reset values
-    DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=6;
+	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=106;
 		
 	-- Computing process
 	IF v_array != '()' THEN
 		EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, state, node_id_aux, nodecat_id_aux, state_aux, expl_id, fid, the_geom)
 				SELECT * FROM (
-				SELECT DISTINCT t1.node_id, t1.nodecat_id, t1.state as state1, t2.node_id, t2.nodecat_id, t2.state as state2, t1.expl_id, 6, t1.the_geom
+				SELECT DISTINCT t1.node_id, t1.nodecat_id, t1.state as state1, t2.node_id, t2.nodecat_id, t2.state as state2, t1.expl_id, 106, t1.the_geom
 				FROM '||v_worklayer||' AS t1 JOIN '||v_worklayer||' AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom,('||v_nodetolerance||')) 
 				WHERE t1.node_id != t2.node_id AND t1.node_id IN '||v_array||' ORDER BY t1.node_id ) a where a.state1 > 0 AND a.state2 > 0';
 	ELSE
 		EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, state, node_id_aux, nodecat_id_aux, state_aux, expl_id, fid, the_geom)
 				SELECT * FROM (
-				SELECT DISTINCT t1.node_id, t1.nodecat_id, t1.state as state1, t2.node_id, t2.nodecat_id, t2.state as state2, t1.expl_id, 6, t1.the_geom
+				SELECT DISTINCT t1.node_id, t1.nodecat_id, t1.state as state1, t2.node_id, t2.nodecat_id, t2.state as state2, t1.expl_id, 106, t1.the_geom
 				FROM '||v_worklayer||' AS t1 JOIN '||v_worklayer||' AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom,('||v_nodetolerance||')) 
 				WHERE t1.node_id != t2.node_id ORDER BY t1.node_id ) a where a.state1 > 0 AND a.state2 > 0';
 	END IF;
@@ -68,7 +73,7 @@ BEGIN
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=6 order by id) row;
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=106 order by id) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
@@ -82,18 +87,18 @@ BEGIN
     'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
   	FROM (SELECT id, node_id, nodecat_id, state, node_id_aux,nodecat_id_aux, state_aux, expl_id, descript, fid, the_geom
-  	FROM  anl_node WHERE cur_user="current_user"() AND fid=6) row) features;
+  	FROM  anl_node WHERE cur_user="current_user"() AND fid=106) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "features":',v_result, '}'); 
 
 	IF v_saveondatabase IS FALSE THEN 
 		-- delete previous results
-		DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=6;
+		DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=106;
 	ELSE
 		-- set selector
-		DELETE FROM selector_audit WHERE fid=6 AND cur_user=current_user;
-		INSERT INTO selector_audit (fid,cur_user) VALUES (6, current_user);
+		DELETE FROM selector_audit WHERE fid=106 AND cur_user=current_user;
+		INSERT INTO selector_audit (fid,cur_user) VALUES (106, current_user);
 	END IF;
 
 	--    Control nulls
@@ -110,9 +115,8 @@ BEGIN
 	    '}')::json;
 
 	EXCEPTION WHEN OTHERS THEN
-	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
-
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$

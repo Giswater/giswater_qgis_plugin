@@ -25,42 +25,38 @@ SELECT SCHEMA_NAME.gw_fct_getinfoplan($${
 */
 
 DECLARE
---    Variables
-    fields_array json[];
-    formTabs text;
-    combo_json json;
-    v_version json;
-    aux_json json;
-    fields json;
-    count integer := 1;
-    v_cost text;
-    v_dim text;
-    v_currency_symbol varchar;
-    v_tabname varchar = 'plan';
-    v_tablename varchar;
-    v_device integer;
-    v_totalcost text;
 
+fields_array json[];
+formTabs text;
+combo_json json;
+v_version json;
+aux_json json;
+fields json;
+count integer := 1;
+v_cost text;
+v_dim text;
+v_currency_symbol varchar;
+v_tabname varchar = 'plan';
+v_tablename varchar;
+v_device integer;
+v_totalcost text;
 
 BEGIN
 
-
--- Set search path to local schema
+	-- Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
 
---  get api version
+	--  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
         INTO v_version;
 
---  get system currency
+	--  get system currency
     v_currency_symbol :=((SELECT value FROM config_param_system WHERE parameter='sys_currency')::json->>'symbol');
    
-
--- Create tabs array
+	-- Create tabs array
     formTabs := '[';
 
--- Info plan
---------------		   
+	-- Info plan
 	-- get tablename
 	IF ((p_data ->>'feature')::json->>'featureType')::text='arc' THEN
 	      v_tablename := 'v_ui_plan_arc_cost';
@@ -75,7 +71,7 @@ BEGIN
 	SELECT gw_fct_getformfields('infoplan', 'info', v_tabname, v_tablename, ((p_data ->>'feature')::json->>'idName'), ((p_data ->>'feature')::json->>'id'), null, null,null, v_device, null)
 		INTO fields_array;
 
---	Add resumen values
+	--	Add resumen values
 	FOREACH aux_json IN ARRAY fields_array
 	LOOP
 		IF (aux_json->>'columnname')  = 'initial_cost' THEN 
@@ -109,27 +105,23 @@ BEGIN
 						
 			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'value', v_totalcost::TEXT);
 
-
 		END IF;
 
 	END LOOP;  
 
-	RAISE NOTICE 'fields_array %', 	fields_array;
-
-
---     Convert to json
-       fields := array_to_json(fields_array);
-       --fields := ('{"fields":' || fields || '}')::json;
-       formTabs := formTabs || fields::text;
+	-- Convert to json
+	fields := array_to_json(fields_array);
+    
+	--fields := ('{"fields":' || fields || '}')::json;
+	formTabs := formTabs || fields::text;
        
+	-- Finish the construction of formtabs
+	formTabs := formtabs ||']';	
+	
+	--  Check null
+	formTabs := COALESCE(formTabs, '[]');    
 
---     Finish the construction of formtabs
-       formTabs := formtabs ||']';
---     Check null
-       formTabs := COALESCE(formTabs, '[]');    
-
-
---    Return
+	-- Return
     RETURN ('{"status":"Accepted", "version":'||v_version||
              ',"body":{"message":{}'||
 			',"form":'||(p_data ->>'form')||
@@ -138,9 +130,9 @@ BEGIN
 				'}}'||
 	    '}')::json;
       
---    Exception handling
---    EXCEPTION WHEN OTHERS THEN 
-        --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN 
+    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;

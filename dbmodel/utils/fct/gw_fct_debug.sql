@@ -20,6 +20,7 @@ UPDATE config_param_user SET value = 'true' WHERE parameter = 'debug_mode';
 */
 
 DECLARE
+
 v_result_info json;
 v_projectype text;
 v_version text;
@@ -81,6 +82,7 @@ BEGIN
        ',"body":{"form":{}'||
            ',"data":{"info":'||v_result_info||' }}'||
             '}')::json;
+			
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

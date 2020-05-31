@@ -12,28 +12,31 @@ RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-	SELECT SCHEMA_NAME.gw_fct_anl_node_sink($${
-	"client":{"device":3, "infoType":100, "lang":"ES"},
-	"feature":{"tableName":"v_edit_man_manhole", "id":["240"]},
-	"data":{"parameters":{"saveOnDatabase":true}}}$$)
+SELECT SCHEMA_NAME.gw_fct_anl_node_sink($${
+"client":{"device":3, "infoType":100, "lang":"ES"},
+"feature":{"tableName":"v_edit_man_manhole", "id":["240"]},
+"data":{"parameters":{"saveOnDatabase":true}}}$$)
+
+-- fid: 113
+
 */
 
 
 DECLARE
 
-	v_version text;
-	v_saveondatabase boolean;
-	v_result json;
-	v_result_info json;
-	v_result_point json;
-	v_sql text;
-	v_worklayer text;
-	v_array text;
-	v_id json;
-    v_qmlpointpath	text;
-    v_error_context text;
+v_version text;
+v_saveondatabase boolean;
+v_result json;
+v_result_info json;
+v_result_point json;
+v_sql text;
+v_worklayer text;
+v_array text;
+v_id json;
+v_qmlpointpath text;
+v_error_context text;
 
-	rec_node record;
+rec_node record;
 
 BEGIN
 
@@ -43,7 +46,7 @@ BEGIN
 	SELECT giswater INTO v_version FROM version order by 1 desc limit 1;
 
 	-- Reset values
-	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=13;
+	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=113;
 
 	-- getting input data 	
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
@@ -71,14 +74,14 @@ BEGIN
 		-- Insert in analytics table  (note: expl_id have been removed because not all tables node have exp_id defined)
 		INSERT INTO anl_node (node_id, num_arcs, fid, the_geom, nodecat_id, state)
 		VALUES(rec_node.node_id, (SELECT COUNT(*) FROM arc WHERE state = 1 AND (node_1 = rec_node.node_id OR node_2 = rec_node.node_id)), 
-		13, rec_node.the_geom, rec_node.nodecat_id, rec_node.state);
+		113, rec_node.the_geom, rec_node.nodecat_id, rec_node.state);
 		
 	END LOOP;
 	    
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=13 order by id) row;
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=113 order by id) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
@@ -92,25 +95,25 @@ BEGIN
     'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
   	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
-  	FROM  anl_node WHERE cur_user="current_user"() AND fid=13) row) features;
+  	FROM  anl_node WHERE cur_user="current_user"() AND fid=113) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "features":',v_result, '}'); 
 
 	IF v_saveondatabase IS FALSE THEN 
 		-- delete previous results
-		DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=13;
+		DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=113;
 	ELSE
 		-- set selector
-		DELETE FROM selector_audit WHERE fid=13 AND cur_user=current_user;
-		INSERT INTO selector_audit (fid,cur_user) VALUES (13, current_user);
+		DELETE FROM selector_audit WHERE fid=113 AND cur_user=current_user;
+		INSERT INTO selector_audit (fid,cur_user) VALUES (113, current_user);
 	END IF;
 		
-	--    Control nulls
+	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_result_point := COALESCE(v_result_point, '{}'); 
 
-	--  Return
+	-- Return
 	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
@@ -121,9 +124,8 @@ BEGIN
 
    
 	EXCEPTION WHEN OTHERS THEN
-	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
-
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$

@@ -99,7 +99,7 @@ SELECT DISTINCT node_id::integer FROM node a JOIN cat_node b ON nodecat_id=b.id 
 Look for the graf stoppers (flag=1)
 SELECT arc_id, node_1 FROM temp_anlgraf where flag=1 order by node_1
 
--- fid: 146, 145, 144, 130
+-- fid: 147, 125, 146, 145, 144, 130
 
 */
 
@@ -179,13 +179,13 @@ BEGIN
 	IF v_checkdata THEN
 		v_input = '{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}'::json;
 		PERFORM gw_fct_om_check_data(v_input);
-		SELECT count(*) INTO v_count FROM audit_check_data WHERE cur_user="current_user"() AND fid=25 AND criticity=3;
+		SELECT count(*) INTO v_count FROM audit_check_data WHERE cur_user="current_user"() AND fid=125 AND criticity=3;
 	END IF;
 
 	-- check criticity of data in order to continue or not
 	IF v_count > 3 THEN
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-		FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=25 order by criticity desc, id asc) row;
+		FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=125 order by criticity desc, id asc) row;
 
 		v_result := COALESCE(v_result, '{}'); 
 		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
@@ -282,10 +282,10 @@ BEGIN
 			 to enable it '));
 		
 		-- (2) check data quality in order to continue or not
-		ELSIF (SELECT count(*) FROM audit_check_data WHERE cur_user="current_user"() AND fid=111 AND criticity=3) > 3 THEN
+		ELSIF (SELECT count(*) FROM audit_check_data WHERE cur_user="current_user"() AND fid=125 AND criticity=3) > 3 THEN
 		
 			INSERT INTO audit_check_data (fid, criticity, error_message)
-			SELECT 144, criticity, error_message FROM audit_check_data WHERE cur_user=current_user AND fid=111 AND criticity=3 AND error_message LIKE('%ERROR:%');
+			SELECT 144, criticity, error_message FROM audit_check_data WHERE cur_user=current_user AND fid=125 AND criticity=3 AND error_message LIKE('%ERROR:%');
 		ELSE 
 			-- start build log message
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 2, 'WARNINGS');
@@ -481,13 +481,13 @@ BEGIN
 					v_querytext = 'UPDATE config_form_fields SET iseditable = false WHERE formtype = ''feature'' and columnname ='||quote_literal(v_field);
 					EXECUTE v_querytext;
 
-					-- recalculate staticpressure (fid=47)
+					-- recalculate staticpressure (fid=147)
 					IF v_fid=130 THEN
 					
-						DELETE FROM audit_log_data WHERE fid=47 AND cur_user=current_user;
+						DELETE FROM audit_log_data WHERE fid=147 AND cur_user=current_user;
 				
 						INSERT INTO audit_log_data (fid, feature_type, feature_id, log_message)
-						SELECT 47, 'node', n.node_id, 
+						SELECT 147, 'node', n.node_id, 
 						concat('{"staticpressure":',case when (pz.head - n.elevation::float) is null then 0 ELSE (pz.head - n.elevation::float) END, 
 						', "nodeparent":"',anl_node.descript,'"}')
 						FROM node n 
@@ -498,7 +498,7 @@ BEGIN
 
 						-- update on node table those elements connected on graf
 						UPDATE node SET staticpressure=(log_message::json->>'staticpressure')::float FROM audit_log_data a WHERE a.feature_id=node_id 
-						AND fid=47 AND cur_user=current_user;
+						AND fid=147 AND cur_user=current_user;
 						
 						-- update on node table those elements disconnected from graf
 						UPDATE node SET staticpressure=(staticpress1-(staticpress1-staticpress2)*st_linelocatepoint(v_edit_arc.the_geom, n.the_geom))::numeric(12,3)
@@ -534,7 +534,7 @@ BEGIN
 					VALUES (v_fid, 1, concat(
 					'INFO: Mapzone attribute on arc/node/connec features keeps same value previous function. Nothing have been updated by this process'));
 					INSERT INTO audit_check_data (fid, criticity, error_message)
-					VALUES (v_fid, 1, concat('INFO: To see results you can query using this values (XX): SECTOR:130, DQA:144, DMA:145, PRESSZONE:146, STATICPRESSURE:47 '));
+					VALUES (v_fid, 1, concat('INFO: To see results you can query using this values (XX): SECTOR:130, DQA:144, DMA:145, PRESSZONE:146, STATICPRESSURE:147 '));
 					INSERT INTO audit_check_data (fid, criticity, error_message)
 					VALUES (v_fid, 1, concat('SELECT * FROM anl_arc WHERE fid = (XX) AND cur_user=current_user;'));
 					INSERT INTO audit_check_data (fid ,criticity, error_message)

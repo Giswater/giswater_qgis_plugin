@@ -23,21 +23,19 @@ SELECT SCHEMA_NAME.gw_fct_getcombochilds('ve_arc_pipe', '2001', 'arc_id', 'state
 
 DECLARE
 
---    Variables
-    v_fields json;
-    v_fields_array json[];
-    v_combo_rows_child json[];
-    v_aux_json_child json;    
-    combo_json_child json;
-    schemas_array name[];
-    v_version json;
-    query_text text;
-    v_current_value text;
-    v_column_type varchar;
-    v_parameter text;
-    v_formtype varchar;
-    v_config_param_user record;
-
+v_fields json;
+v_fields_array json[];
+v_combo_rows_child json[];
+v_aux_json_child json;
+combo_json_child json;
+schemas_array name[];
+v_version json;
+query_text text;
+v_current_value text;
+v_column_type varchar;
+v_parameter text;
+v_formtype varchar;
+v_config_param_user record;
 
 BEGIN
 
@@ -52,14 +50,13 @@ BEGIN
 		INTO v_version;
 		
 	-- get column type of idname
-        EXECUTE 'SELECT data_type FROM information_schema.columns  WHERE table_schema = $1 AND table_name = ' || quote_literal(p_table_id) || ' AND column_name = $2'
+    EXECUTE 'SELECT data_type FROM information_schema.columns  WHERE table_schema = $1 AND table_name = ' || quote_literal(p_table_id) || ' AND column_name = $2'
             USING schemas_array[1], p_idname
             INTO v_column_type;
 
 	IF (p_table_id = 'config') OR (p_table_id = 'epaoptions') THEN
 
-	--  Combo rows child CONFIG
-		
+		--  Combo rows child CONFIG
 		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT id as columnname, widgettype, datatype, id as widgetname,
 		dv_querytext, isparent, dv_parent_id, row_number()over(ORDER BY layoutname, layoutorder) AS orderby , dv_querytext_filterc, isautoupdate, widgetcontrols
 		FROM sys_param_user WHERE dv_parent_id='||quote_literal(p_comboparent)||' ORDER BY orderby) a WHERE widgettype = ''combo'''
@@ -146,26 +143,24 @@ BEGIN
 			
 		END IF;
 
-
 	END LOOP;
 	
---    Convert to json
+	-- Convert to json
     v_fields := array_to_json(v_fields_array);
 
---    Control NULL's
+	-- Control NULL's
 	v_version := COALESCE(v_version, '[]');
     v_fields := COALESCE(v_fields, '[]');    
     
---    Return
+	-- Return
     RETURN ('{"status":"Accepted"' ||
        ', "apiVersion":'|| v_version ||
         ', "fields":' || v_fields ||
         '}')::json;
 
---    Exception handling
- --   EXCEPTION WHEN OTHERS THEN 
-   --     RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
-
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN 
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

@@ -18,6 +18,7 @@ SELECT SCHEMA_NAME.gw_fct_getmessage($${
 */
 
 DECLARE
+
 rec_function record;
 rec_cat_error record;
     
@@ -34,7 +35,6 @@ v_function_id integer;
 v_message text;
 v_variables text;
 v_schemaname text;
-
 
 BEGIN
     
@@ -123,14 +123,15 @@ BEGIN
 	'status', v_status,
 	'message', v_return_text) INTO v_result_info;
 
-	--    Control nulls
+	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
 
-	--  Return
+	-- Return
 	RETURN ('{"status":"Accepted", "message":{"level":3, "text":"Error message passed successfully"}, "version":"'||v_version||'"'||
        ',"body":{"form":{}'||
            ',"data":{"info":'||v_result_info||' }}'||
             '}')::json;
+			
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

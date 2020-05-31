@@ -7,36 +7,29 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2896
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_createwidgetjson(json);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_createwidgetjson(
-    label_arg text,
-    name_arg text,
-    type_arg text,
-    datatype_arg text,
-    placeholder_arg text,
-    disabled_arg boolean,
-    value_arg text)
-  RETURNS json AS
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_createwidgetjson(label_arg text,name_arg text,type_arg text, datatype_arg text,
+placeholder_arg text, disabled_arg boolean,  value_arg text)
+RETURNS json AS
 $BODY$
+
 DECLARE
 
---	Variables
-	widget_json json;
-	schemas_array name[];
-	value_type text;
+widget_json json;
+schemas_array name[];
+value_type text;
 
 BEGIN
 
---	Set search path to local schema
+	--	Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
 	schemas_array := current_schemas(FALSE);
 
+	RAISE NOTICE 'gw_fct_createwidgetjson() Args: %, %, %, %, %, %', label_arg, name_arg, type_arg, datatype_arg, placeholder_arg, disabled_arg;
 
-RAISE NOTICE 'gw_fct_createwidgetjson() Args: %, %, %, %, %, %', label_arg, name_arg, type_arg, datatype_arg, placeholder_arg, disabled_arg;
-
---	Create JSON
+	--	Create JSON
 	widget_json := json_build_object('label', label_arg, 'widgetname', name_arg, 'type', type_arg, 'dataType', datatype_arg, 'placeholder', placeholder_arg, 'disabled', disabled_arg);
 
---	Cast value
+	--	Cast value
 	IF datatype_arg = 'integer' THEN
 		value_type = 'INTEGER';
 	ELSIF datatype_arg = 'double' THEN
@@ -47,9 +40,9 @@ RAISE NOTICE 'gw_fct_createwidgetjson() Args: %, %, %, %, %, %', label_arg, name
 		value_type = 'TEXT';
 	END IF;
 
-RAISE NOTICE 'TYPE: %, %', datatype_arg, value_type;
+	RAISE NOTICE 'TYPE: %, %', datatype_arg, value_type;
 	
---	Add 'value' field
+	--	Add 'value' field
 	IF value_arg ISNULL THEN
 		widget_json := gw_fct_json_object_set_key(widget_json, 'value', 'NULL'::TEXT);
 	ELSE
@@ -59,7 +52,6 @@ RAISE NOTICE 'TYPE: %, %', datatype_arg, value_type;
 	END IF;
 	
 	RETURN widget_json;
-
 
 END;
 $BODY$

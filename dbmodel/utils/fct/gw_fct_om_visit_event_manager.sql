@@ -4,20 +4,20 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-
 --FUNCTION CODE: 2696
-
-
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_om_visit_event_manager(visit_id_aux integer)
   RETURNS text AS
 $BODY$
+
 /*
 SELECT SCHEMA_NAME.gw_fct_om_visit_event_manager(19702)
 */
 
 DECLARE
+
 rec_parameter record;
+
 id_last integer;
 id_event integer;
 mu_id_aux integer;
@@ -48,7 +48,7 @@ v_visit_type integer;
 
 BEGIN
 
---  Search path
+	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
 	
 	v_schema = (SELECT wsoftware FROM version ORDER BY id DESC LIMIT 1);
@@ -276,7 +276,7 @@ BEGIN
 	
 	raise notice '%', concat_agg;
    
-RETURN concat_agg;
+	RETURN concat_agg;
 
 END;
 

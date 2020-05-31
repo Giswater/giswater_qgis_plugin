@@ -34,28 +34,27 @@ SELECT SCHEMA_NAME.gw_fct_getchilds($${
 
 DECLARE
 
---    Variables
-	v_tablename character varying;
-	v_idname character varying;
-	v_comboparent character varying;
-	v_combovalue character varying;
-	v_featuretype character varying;
+v_tablename character varying;
+v_idname character varying;
+v_comboparent character varying;
+v_combovalue character varying;
+v_featuretype character varying;
 	
-	v_fields json;
-	v_combo_rows_child json[];
-	v_aux_json_child json;    
-	combo_json_child json;
-	schemas_array name[];
-	v_version json;
-	query_text text;
-	v_current_value text;
-	v_column_type varchar;
-	v_parameter text;
-	v_formtype varchar;
-	v_config_param_user record;
-	v_message json;
-	v_orderby text;
-	v_editability text;
+v_fields json;
+v_combo_rows_child json[];
+v_aux_json_child json;    
+combo_json_child json;
+schemas_array name[];
+v_version json;
+query_text text;
+v_current_value text;
+v_column_type varchar;
+v_parameter text;
+v_formtype varchar;
+v_config_param_user record;
+v_message json;
+v_orderby text;
+v_editability text;
 
 BEGIN
 
@@ -85,7 +84,7 @@ BEGIN
 
 	IF (v_tablename = 'config') THEN
 
-	--  Combo rows child CONFIG
+		--  Combo rows child CONFIG
 		EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (
 		 SELECT label, sys_param_user.id as widgetname, datatype, widgettype, layoutorder,layoutname,
 		(CASE WHEN iseditable IS NULL OR iseditable IS TRUE THEN ''True'' ELSE ''False'' END) AS iseditable,
@@ -195,26 +194,26 @@ BEGIN
 
 	END LOOP;
 	
---    Convert to json
+	-- Convert to json
     v_fields := array_to_json(v_combo_rows_child);
 
     v_message := '{"priority":"0", "text":"Childs update successfully"}';
 
---    Control NULL's
+	--  Control NULL's
 	v_message := COALESCE(v_message, '[]');
 	v_version := COALESCE(v_version, '[]');
 	v_fields := COALESCE(v_fields, '[]');    
     
---    Return
+	--  Return
     RETURN ('{"status":"Accepted"' || ', "message":'|| v_message || ', "apiVersion":'|| v_version ||
         ', "body": {"form":{}'||
 		 ', "feature":{}'||
 		 ', "data":' || v_fields ||
 		'}}')::json;
 
---    Exception handling
- --   EXCEPTION WHEN OTHERS THEN 
-   --     RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN 
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

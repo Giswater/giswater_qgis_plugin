@@ -6,7 +6,6 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2760
 
---drop function SCHEMA_NAME.gw_fct_update_elevation_from_dem(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_update_elevation_from_dem(p_data json)
   RETURNS json AS
 $BODY$
@@ -18,9 +17,13 @@ SELECT gw_fct_update_elevation_from_dem($${"client":{"device":9, "infoType":100,
 SELECT SCHEMA_NAME.gw_fct_update_elevation_from_dem($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, 
 "feature":{"tableName":"node", "featureType":"NODE"}, 
 "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"exploitation":"524", "updateValues":"allValues"}}}$$)::text
+
+-- fid: 168
+
 */
 
 DECLARE
+
 v_schemaname text;
 v_id json;
 v_array text;
@@ -42,7 +45,7 @@ v_result_point json;
 
 BEGIN
 	
-		-- search path
+	-- search path
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- select version
@@ -59,13 +62,11 @@ BEGIN
 	v_array :=  replace(replace(replace (v_id::text, ']', ')'),'"', ''''), '[', '(');
 	v_exploitation := ((p_data ->>'data')::json->>'parameters')::json->>'exploitation';
 	
-
 	--Execute the process only if admin_raster_dem is true
 	IF (SELECT value FROM config_param_system WHERE parameter='admin_raster_dem') = 'TRUE' THEN
-
 		
-		DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=68;
-		DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=68;
+		DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=168;
+		DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=168;
 				
 		--Select nodes on which the process will be executed - all values or only nulls from selected exploitation
 		IF v_updatevalues = 'allValues' THEN 
@@ -106,7 +107,7 @@ BEGIN
 
 			IF v_check_null_elevation IS NUll THEN
 				INSERT INTO audit_check_data(fid,result_id, error_message)
-				VALUES (68,'elevation from raster','THERE ARE NO FEATURES WITH ELEVATION NULL');
+				VALUES (168,'elevation from raster','THERE ARE NO FEATURES WITH ELEVATION NULL');
 			END IF;
 
 		END IF;
@@ -124,7 +125,7 @@ BEGIN
 			--if node is out of raster, add warning, if it's inside update value of node layer
 			IF v_elevation = -9999 OR v_elevation IS NULL THEN
 				INSERT INTO audit_check_data(fid,result_id, error_message)
-				VALUES (68,'elevation from raster',concat('WARNING: SELECTED FEATURE IS OUT OF RASTER: ', rec.feature_id));
+				VALUES (168,'elevation from raster',concat('WARNING: SELECTED FEATURE IS OUT OF RASTER: ', rec.feature_id));
 			ELSE
 				IF v_project_type = 'WS' AND v_feature_type='vnode' THEN 
 					EXECUTE 'UPDATE vnode SET elev = '||v_elevation||'::numeric WHERE vnode_id = '||rec.feature_id||';';
@@ -139,26 +140,25 @@ BEGIN
 
 				--temporal insert values into anl_node to create layer with all updated points
 				INSERT INTO anl_node (node_id, state,   expl_id, fid, the_geom, descript)
-				VALUES (rec.feature_id, rec.state::integer, v_exploitation, 68,rec.the_geom, upper(v_feature_type));
+				VALUES (rec.feature_id, rec.state::integer, v_exploitation, 168,rec.the_geom, upper(v_feature_type));
 
 				INSERT INTO audit_check_data(fid,result_id, error_message)
-				VALUES (68,'elevation from raster',concat('ELEVATION UPDATED - FEATURE TYPE:',upper(v_feature_type),', ID: ', rec.feature_id));
+				VALUES (168,'elevation from raster',concat('ELEVATION UPDATED - FEATURE TYPE:',upper(v_feature_type),', ID: ', rec.feature_id));
 			END IF;
-
 			
 		END LOOP;
 
 		-- get results
 		-- info
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-		FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=68 order by id) row;
+		FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=168 order by id) row;
 		v_result := COALESCE(v_result, '{}'); 
 		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
 		--points
 		v_result = null;
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-		FROM (SELECT id, node_id AS feature_id, state, expl_id, descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid=68) row;
+		FROM (SELECT id, node_id AS feature_id, state, expl_id, descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fid=168) row;
 		v_result := COALESCE(v_result, '{}'); 
 		v_result_point = concat ('{"geometryType":"Point", "values":',v_result, '}');
 

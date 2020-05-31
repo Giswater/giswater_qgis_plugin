@@ -12,44 +12,38 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_manage_ct(p_data json)
 $BODY$
 
 /*
-
 warning: it seems that NOT WORKS: 
 ALTER TABLE gully_type DROP CONSTRAINT gully_type_id_fkey;
 ALTER TABLE gully_type  ADD CONSTRAINT gully_type_id_fkey FOREIGN KEY (id) REFERENCES SCHEMA_NAME.cat_feature (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
-      
-SELECT gw_fct_admin_manage_ct($${
-"client":{"lang":"ES"}, 
+SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, 
 "data":{"action":"DROP"}}$$)
 
-SELECT gw_fct_admin_manage_ct($${
-"client":{"lang":"ES"}, 
+SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, 
 "data":{"action":"ADD"}}$$)
 
-
-SELECT SCHEMA_NAME.gw_fct_admin_manage_ct($${
-"client":{"lang":"ES"}, 
+SELECT SCHEMA_NAME.gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, 
 "data":{"action":"DISABLE TOPO-TRIGGERS"}}$$)
 
-
-SELECT SCHEMA_NAME.gw_fct_admin_manage_ct($${
-"client":{"lang":"ES"}, 
+SELECT SCHEMA_NAME.gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, 
 "data":{"action":"ENABLE TOPO-TRIGGERS"}}$$)
+
+-- fid: 136,137
+
 */
 
-
-
 DECLARE
-	v_schemaname text;
-	v_tablerecord record;
-	v_query_text text;
-	v_action text;
-	v_return json;
-	v_36 integer=0;
-	v_37 integer=0;
-	v_projectype text;
-BEGIN
 
+v_schemaname text;
+v_tablerecord record;
+v_query_text text;
+v_action text;
+v_return json;
+v_36 integer=0;
+v_37 integer=0;
+v_projectype text;
+
+BEGIN
 
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
@@ -61,12 +55,12 @@ BEGIN
 
 	IF v_action = 'DROP' THEN
 
-		DELETE FROM temp_table WHERE fid=36;
+		DELETE FROM temp_table WHERE fid=136;
 
 		-- fk
 		INSERT INTO temp_table (fid, text_column)
 		SELECT distinct on (conname)
-		36,
+		136,
 		concat(
 		'{"tablename":"',
 		conrelid::regclass,
@@ -84,7 +78,7 @@ BEGIN
 		-- ckeck
 		INSERT INTO temp_table (fid, text_column)
 		SELECT distinct on (conname)
-		36,
+		136,
 		concat(
 		'{"tablename":"',
 		conrelid::regclass,
@@ -102,7 +96,7 @@ BEGIN
 		-- unique
 		INSERT INTO temp_table (fid, text_column)
 		SELECT distinct on (conname)
-		36,
+		136,
 		concat(
 		'{"tablename":"',
 		conrelid::regclass,
@@ -118,11 +112,11 @@ BEGIN
 		AND nspname ='SCHEMA_NAME';
 
 		-- Insert not null on temp_table
-		DELETE FROM temp_table WHERE fid=37;
+		DELETE FROM temp_table WHERE fid=137;
 
 		INSERT INTO temp_table (fid, text_column)
 		SELECT distinct
-				37,
+				137,
 				concat(
 				'{"tablename":"',
 				table_name,
@@ -183,7 +177,7 @@ BEGIN
 
 
 		-- Drop fk
-		FOR v_tablerecord IN SELECT * FROM temp_table WHERE fid=36
+		FOR v_tablerecord IN SELECT * FROM temp_table WHERE fid=136
 		LOOP
 			v_query_text:= 'ALTER TABLE '||quote_ident((v_tablerecord.text_column)::json->>'tablename')||
 				       ' DROP CONSTRAINT IF EXISTS '||quote_ident((v_tablerecord.text_column)::json->>'constraintname')||' CASCADE;';
@@ -191,7 +185,7 @@ BEGIN
 			v_36=v_36+1;
 		END LOOP;
 
-		FOR v_tablerecord IN SELECT * FROM temp_table WHERE fid=37
+		FOR v_tablerecord IN SELECT * FROM temp_table WHERE fid=137
 		LOOP
 			v_query_text:= 'ALTER TABLE '||quote_ident((v_tablerecord.text_column)::json->>'tablename')||
 				       ' ALTER COLUMN '||quote_ident((v_tablerecord.text_column)::json->>'attributename')||' DROP NOT NULL;';
@@ -243,7 +237,7 @@ BEGIN
 	ELSIF v_action = 'ADD' THEN
 
 		-- Enable constraints 
-		FOR v_tablerecord IN SELECT * FROM temp_table WHERE fid=36 order by 1 desc
+		FOR v_tablerecord IN SELECT * FROM temp_table WHERE fid=136 order by 1 desc
 		LOOP
 			v_query_text:=  'ALTER TABLE '||quote_ident((v_tablerecord.text_column::json)->>'tablename')|| 
 							' ADD CONSTRAINT '||quote_ident((v_tablerecord.text_column::json)->>'constraintname')||
@@ -253,7 +247,7 @@ BEGIN
 		END LOOP;
 
 		
-		FOR v_tablerecord IN SELECT * FROM temp_table WHERE fid=37 order by 1 desc
+		FOR v_tablerecord IN SELECT * FROM temp_table WHERE fid=137 order by 1 desc
 		LOOP
 			v_query_text:=  'ALTER TABLE '||quote_ident((v_tablerecord.text_column::json)->>'tablename')|| 
 							' ALTER COLUMN '||quote_ident((v_tablerecord.text_column::json)->>'attributename')||' SET NOT NULL;' ;
@@ -287,9 +281,7 @@ BEGIN
 		
 	END IF;
 
-
-
-RETURN v_return;
+	RETURN v_return;
 	
 END;
 $BODY$

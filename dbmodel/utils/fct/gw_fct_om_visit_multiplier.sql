@@ -6,8 +6,6 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2802
 
-
-
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_om_visit_multiplier(integer, text);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_om_visit_multiplier(p_data json) 
 RETURNS json AS
@@ -21,6 +19,7 @@ SELECT SCHEMA_NAME.gw_fct_om_visit_multiplier($${
 */
 
 DECLARE 
+
 v_visit record;
 v_feature record;
 v_event record;
@@ -33,7 +32,6 @@ v_return json;
 v_visitid integer;
 
 BEGIN 
-
 
     SET search_path = "SCHEMA_NAME", public;
 
@@ -182,7 +180,7 @@ BEGIN
    -- delete original visit (and due foreign keys on database deleted also al events and pictures and documents associated with)
    DELETE FROM om_visit WHERE id=v_visitid;  
 	
-RETURN v_return;
+	RETURN v_return;
 
 END;
 $BODY$

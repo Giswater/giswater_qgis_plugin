@@ -92,62 +92,64 @@ SELECT SCHEMA_NAME.gw_fct_getlist($${
 
 
 DECLARE
-	v_version text;
-	v_filter_fields  json[];
-	v_footer_fields json[];
-	v_filter_feature json;
-	v_fields_json json;
-	v_filter_values  json;
-	v_schemaname text;
-	aux_json json;
-	v_result_list json;
-	v_query_result text;
-	v_id  varchar;
-	v_device integer;
-	v_infotype integer;
-	v_idname varchar;
-	v_column_type varchar;
-	v_field varchar;
-	v_value text;
-	v_orderby varchar;
-	v_ordertype varchar;
-	v_limit integer;
-	v_offset integer;
-	v_currentpage integer;
-	v_lastpage integer;
-	v_text text[];
-	v_json_field json;
-	text text;
-	i integer=1;
-	v_tabname text;
-	v_tablename text;
-	v_formactions json;
-	v_x1 float;
-	v_y1 float;
-	v_x2 float;
-	v_y2 float;
-	v_canvas public.geometry;
-	v_the_geom text;
-	v_canvasextend json;
-	v_canvascheck boolean;
-	v_srid integer;
-	v_i integer;
-	v_buttonname text;
-	v_featuretype text;
-	v_pageinfo json;
-	v_vdefault text;
-	v_listclass text;
-	v_sign text;
-	v_data json;
-	v_default json;
-	v_listtype text;
+
+v_version text;
+v_filter_fields  json[];
+v_footer_fields json[];
+v_filter_feature json;
+v_fields_json json;
+v_filter_values  json;
+v_schemaname text;
+aux_json json;
+v_result_list json;
+v_query_result text;
+v_id  varchar;
+v_device integer;
+v_infotype integer;
+v_idname varchar;
+v_column_type varchar;
+v_field varchar;
+v_value text;
+v_orderby varchar;
+v_ordertype varchar;
+v_limit integer;
+v_offset integer;
+v_currentpage integer;
+v_lastpage integer;
+v_text text[];
+v_json_field json;
+text text;
+i integer=1;
+v_tabname text;
+v_tablename text;
+v_formactions json;
+v_x1 float;
+v_y1 float;
+v_x2 float;
+v_y2 float;
+v_canvas public.geometry;
+v_the_geom text;
+v_canvasextend json;
+v_canvascheck boolean;
+v_srid integer;
+v_i integer;
+v_buttonname text;
+v_featuretype text;
+v_pageinfo json;
+v_vdefault text;
+v_listclass text;
+v_sign text;
+v_data json;
+v_default json;
+v_listtype text;
+
 BEGIN
 
--- Set search path to local schema
+	-- Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
     v_schemaname := 'SCHEMA_NAME';
   
---  get api version
+	--  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
         INTO v_version;
 
@@ -157,10 +159,9 @@ BEGIN
 	p_data = REPLACE (p_data::text, '""', 'null');
     p_data = REPLACE (p_data::text, '''''', 'null');
 
-
     SELECT epsg INTO v_srid FROM version LIMIT 1;
 
--- Get input parameters:
+	-- Get input parameters:
 	v_device := (p_data ->> 'client')::json->> 'device';
 	v_infotype := (p_data ->> 'client')::json->> 'infoType';
 	v_tabname := (p_data ->> 'form')::json->> 'tabName';
@@ -188,8 +189,7 @@ BEGIN
 	RAISE NOTICE 'gw_fct_getlist - Init Values: v_tablename %  v_filter_values  % v_filter_feature %', v_tablename, v_filter_values, v_filter_feature;
 
 
--- setting value default for filter fields
--------------------------------------
+	-- setting value default for filter fields
 	IF v_filter_values::text IS NULL OR v_filter_values::text = '{}' THEN 
 	
 		v_data = '{"client":{"device":9, "infoType":100, "lang":"ES"},"data":{"formName": "'||v_tablename||'"}}';
@@ -200,10 +200,7 @@ BEGIN
 
 	END IF;
 
-
-	
---  Creating the list fields
-----------------------------
+	--  Creating the list fields
 	-- control not existing table
 	IF v_tablename IN (SELECT table_name FROM information_schema.tables WHERE table_schema = v_schemaname) THEN
 
@@ -451,10 +448,10 @@ BEGIN
 
 	END LOOP;
 
--- converting to json
+	-- converting to json
 	v_fields_json = array_to_json (v_filter_fields);
-
---    Control NULL's
+	
+	-- Control NULL's
 	v_version := COALESCE(v_version, '{}');
 	v_featuretype := COALESCE(v_featuretype, '');
 	v_tablename := COALESCE(v_tablename, '');
@@ -462,7 +459,7 @@ BEGIN
 	v_fields_json := COALESCE(v_fields_json, '{}');
 	v_pageinfo := COALESCE(v_pageinfo, '{}');
 
---    Return
+	-- Return
     RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "version":'||v_version||
              ',"body":{"form":{}'||
 		     ',"feature":{"featureType":"' || v_featuretype || '","tableName":"' || v_tablename ||'","idName":"'|| v_idname ||'"}'||
@@ -472,9 +469,9 @@ BEGIN
 		       '}'||
 	    '}')::json;
        
---    Exception handling
---    EXCEPTION WHEN OTHERS THEN 
-        --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN 
+    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

@@ -19,7 +19,6 @@ $BODY$
    "data":{"fields":{"class_id":"8","visit_id":"10373","visitcat_id":"1","startdate":null,"enddate":null},
 	   "canvas":{"xcoord":343434, "ycoord":234235235}}}$$) AS result
 
-
 --INSERT
 SELECT SCHEMA_NAME.gw_fct_setvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
@@ -76,17 +75,17 @@ v_error_context text;
 
 BEGIN
 
--- Set search path to local schema
+	-- Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
 
---  get api version
+	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
 	INTO v_version;
 
 	EXECUTE 'SELECT wsoftware FROM version'
 	INTO v_version;
 	
---  get input values
+	--  get input values
 	v_client = (p_data ->>'client')::json;
 	v_id = ((p_data ->>'feature')::json->>'id');
 	v_feature = p_data ->>'feature';
@@ -103,7 +102,6 @@ BEGIN
 	v_node_id = ((p_data ->>'data')::json->>'fields')::json->>'node_id';
 	v_addphotos = (p_data ->>'data')::json->>'photos';
 
-
 	-- setting sequences of related visit tables
 	PERFORM setval('"SCHEMA_NAME".om_visit_event_id_seq', (SELECT max(id) FROM om_visit_event), true);
 	PERFORM setval('"SCHEMA_NAME".om_visit_x_arc_id_seq', (SELECT max(id) FROM om_visit_x_arc), true);
@@ -115,7 +113,6 @@ BEGIN
 	END IF;
 
 	PERFORM setval('"SCHEMA_NAME".doc_x_visit_id_seq', (SELECT max(id) FROM doc_x_visit), true);
-
 
 	-- Get new visit id if not exist
 	RAISE notice 'FIRST ID     -> %',v_id;
@@ -132,7 +129,6 @@ BEGIN
 	v_outputparameter := concat('{"client":',((p_data)->>'client'),', "feature":',((p_data)->>'feature'),', "data":',((p_data)->>'data'),'}')::json;
 
 	-- setting users value default
-	
 	-- om_visit_class_vdefault
 	IF (SELECT id FROM config_param_user WHERE parameter = 'om_visit_class_vdefault' AND cur_user=current_user) IS NOT NULL THEN
 		UPDATE config_param_user SET value = v_class WHERE parameter = 'om_visit_class_vdefault' AND cur_user=current_user;

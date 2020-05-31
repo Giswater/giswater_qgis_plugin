@@ -6,19 +6,16 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2804
 
---drop function SCHEMA_NAME.gw_fct_admin_manage_schema(json)
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_manage_schema(p_data json)
   RETURNS void AS
 $BODY$
 
-
 /*EXAMPLE
-
 SELECT gw_fct_admin_manage_schema($${"client":{"lang":"ES"}, "data":{"action":"REPAIRVIEWS","source":"SCHEMA_NAME", "target":"SCHEMA_NAME_2"}}$$);
-
 */
 
 DECLARE 
+
 v_action text;
 v_source text;
 v_target text;
@@ -28,15 +25,15 @@ v_version text;
 v_project_type text;
 
 BEGIN
-	
-	v_action = ((p_data ->>'data')::json->>'action')::text; 
-	v_source = ((p_data ->>'data')::json->>'source')::text; 
-	v_target = ((p_data ->>'data')::json->>'target')::text; 
 
 	-- search path
 	EXECUTE 'SET search_path = '||v_target||', public';
 
 	SELECT giswater, upper(wsoftware) INTO v_version, v_project_type FROM version order by id desc limit 1;
+	
+	v_action = ((p_data ->>'data')::json->>'action')::text; 
+	v_source = ((p_data ->>'data')::json->>'source')::text; 
+	v_target = ((p_data ->>'data')::json->>'target')::text; 
 
 	IF v_action = 'REPAIRVIEWS' THEN
 
@@ -94,11 +91,10 @@ BEGIN
 
 				EXECUTE 'CREATE OR REPLACE VIEW ' ||v_view.table_name || ' AS ' || v_view.definition;
 			END LOOP;
-		END IF;
-		
+		END IF;		
 	END IF;
 
-
+	RETURN;
 
 END;
 $BODY$

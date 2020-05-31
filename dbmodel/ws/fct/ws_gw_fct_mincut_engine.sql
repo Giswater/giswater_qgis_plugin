@@ -7,16 +7,18 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2306
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_mincut_engine(character varying, integer);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut_engine(    node_id_arg character varying,    result_id_arg integer)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut_engine(node_id_arg character varying, result_id_arg integer)
 RETURNS void AS
 $BODY$
+
 DECLARE
-    exists_id      character varying;
-    rec_table      record;
-    controlValue   integer;
-    node_aux       public.geometry;
-    stack          varchar[];
-    v_debug	   Boolean;
+
+exists_id character varying;
+rec_table record;
+controlValue integer;
+node_aux public.geometry;
+stack varchar[];
+v_debug Boolean;
 
 BEGIN
 
@@ -127,7 +129,6 @@ BEGIN
     END LOOP;
 
     RETURN;
-
         
 END;
 $BODY$

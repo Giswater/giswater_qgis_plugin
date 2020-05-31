@@ -10,6 +10,7 @@ DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_join_virtual(character varyi
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_pg2epa_manage_varc(result_id_var character varying)
   RETURNS integer AS
 $BODY$
+
 DECLARE
 
 rec_virtual record;
@@ -27,7 +28,7 @@ new_arc_geom public.geometry;
 
 BEGIN
 
---  Search path
+	--  Search path
     SET search_path = "SCHEMA_NAME", public;
 
 	-- Loop for the virtual arcs
@@ -94,7 +95,6 @@ BEGIN
 		END LOOP;
 
 	END LOOP;
-
 
     RETURN 1;
 		

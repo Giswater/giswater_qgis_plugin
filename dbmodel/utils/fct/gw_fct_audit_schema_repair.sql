@@ -10,29 +10,29 @@ DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_audit_schema_repair(schema_name_aux c
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_audit_schema_repair(p_schemaname character varying)
   RETURNS text AS
 $BODY$
+
 DECLARE
-    v_table_ddl   text;
-    v_pk_ddl	text;
-    v_tablename text;    
-    column_aux text;
-    v_table_dml text;
-    v_sequence text;
-    v_sql text;
-    column_ text;
-    v_default text;
-    
-    rec_table text;
-    rec_tablename record;
-    rec_column_record record;
-    rec_column record;
+
+v_table_ddl   text;
+v_pk_ddl	text;
+v_tablename text;
+column_aux text;
+v_table_dml text;
+v_sequence text;
+v_sql text;
+column_ text;
+v_default text;
+
+rec_table text;
+rec_tablename record;
+rec_column_record record;
+rec_column record;
 
 BEGIN
 
 	SET search_path='SCHEMA_NAME', public;
 
-
 	DELETE FROM audit_check_data WHERE fid=18 AND cur_user=current_user;
-
 
 	-- UPDATE COLUMNS
 	FOR rec_column IN SELECT * FROM information_schema.columns, information_schema.tables
@@ -42,7 +42,6 @@ BEGIN
 	AND concat(tables.table_name,column_name) not in (select concat(table_name,column_name) FROM information_schema.columns where table_schema=p_schemaname)
 	AND table_type = 'BASE TABLE'
 
-	
 	LOOP
 		v_sql = concat (concat ('ALTER TABLE ',p_schemaname,'.',rec_column.table_name,' ADD COLUMN ', rec_column.column_name,' '),
 		(CASE 
@@ -120,7 +119,6 @@ BEGIN
 
 	END LOOP;
 
-
 	-- CREATE NEW TABLES
 	FOR rec_table IN
 	SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE TABLE'
@@ -180,10 +178,8 @@ BEGIN
 		END IF;
 			
 	END LOOP;				
-	
-
-		
-RETURN 'OK' ;
+			
+	RETURN 'OK' ;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

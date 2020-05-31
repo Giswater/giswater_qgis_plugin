@@ -6,12 +6,9 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2722
 
-
 CREATE OR REPLACE FUNCTION gw_fct_admin_schema_copy(p_data json)
   RETURNS void AS
 $BODY$
-
-
 
 /*EXAMPLE
 
@@ -22,22 +19,23 @@ EXECUTE:
 SELECT SCHEMA_NAME.gw_fct_admin_schema_copy($${"client":{"lang":"CA"}, "data":{"fromSchema":"bgeo_treball", "toSchema":"ud"}}$$)
 WARNING: need to decide before what to do with configs: config_api_* AND config_param_system
 
-
 ENABLE CONSTRAINTS:
 SELECT SCHEMA_NAME.gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"ADD"}}$$)
+
 */
 
-
 DECLARE
-	v_fromschema text;
-	v_toschema text;
-	v_schemaname text;
-	v_tablerecord record;
-	v_query_text text;
-	v_result integer;
-	v_idname text;
+
+v_fromschema text;
+v_toschema text;
+v_schemaname text;
+v_tablerecord record;
+v_query_text text;
+v_result integer;
+v_idname text;
 
 BEGIN
+	
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
 
@@ -45,10 +43,8 @@ BEGIN
 	v_fromschema := (p_data ->> 'data')::json->> 'fromSchema';
 	v_toschema := (p_data ->> 'data')::json->> 'toSchema';
 
-
 	-- delete previous data
 	DELETE FROM config_param_user;
-
 
 	-- copy data using primary key
 	FOR v_tablerecord IN SELECT * FROM sys_table WHERE isdeprecated IS FALSE AND id NOT IN ('config_param_system')
@@ -71,9 +67,8 @@ BEGIN
 
 	-- copy data using others
 	EXECUTE 'INSERT INTO '||v_toschema||'.config_param_system SELECT * FROM '||v_fromschema||'.config_param_syste WHERE parameter NOT IN (SELECT parameter FROM '||v_toschema||'.config_param_system)';
-		
-		
-RETURN;
+
+	RETURN;
 	
 END;
 $BODY$

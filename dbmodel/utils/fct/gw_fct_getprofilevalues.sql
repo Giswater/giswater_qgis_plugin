@@ -10,7 +10,6 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_getprofilevalues(p_data json)
 RETURNS json AS 
 $BODY$
 
-
 /*example
 SELECT SCHEMA_NAME.gw_fct_getprofilevalues($${"client":{},
 	"data":{"initNode":"116", "endNode":"111", "composer":"mincutA4", "legendFactor":1, "linksDistance":1, "scale":{"scaleToFit":false, "eh":2000, "ev":500},	
@@ -25,8 +24,8 @@ SELECT SCHEMA_NAME.gw_fct_getprofilevalues($${"client":{},
 				     }}$$); 
 */
 
-
 DECLARE
+
 v_init  text;
 v_end text;
 v_hs float;

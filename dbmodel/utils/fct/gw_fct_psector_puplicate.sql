@@ -21,6 +21,7 @@ SELECT SCHEMA_NAME.gw_fct_psector_duplicate($${
 */
 
 DECLARE
+
 v_version json;
 v_arc_id TEXT;
 v_project_type text;
@@ -48,7 +49,6 @@ v_feature_list text;
 v_error_context text;
 v_connecautolink text;
 v_gullyautolink text;
-
 
 BEGIN
 
@@ -81,7 +81,7 @@ BEGIN
 
 	UPDATE config_param_user SET value=FALSE WHERE parameter='edit_connec_automatic_link' and cur_user=current_user;
 	UPDATE config_param_user SET value=FALSE WHERE parameter='edit_gully_automatic_link' and cur_user=current_user;
-;
+
 	--capture input values
  	v_old_psector_id = ((p_data ->>'data')::json->>'psector_id')::text;
 	v_new_psector_name = ((p_data ->>'data')::json->>'new_psector_name')::text;
@@ -221,12 +221,14 @@ BEGIN
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_version := COALESCE(v_version, '[]');
 
+	-- return
 	RETURN ('{"status":"Accepted", "version":'||v_version||
             ',"message":{"priority":1, "text":""},"body":{"data": {"info":'||v_result_info||'}}}')::json;
 
+	-- manage exceptions
 	EXCEPTION WHEN OTHERS THEN
-	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$

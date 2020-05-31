@@ -6,7 +6,6 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2725
 
-
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_getfeaturerelation(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getfeaturerelation(p_data json)
 RETURNS json AS
@@ -33,6 +32,7 @@ SELECT SCHEMA_NAME.gw_fct_getfeaturerelation($${
 */
  
 DECLARE
+
 v_feature_type text;
 v_feature_id text;
 v_workcat_id_end text;

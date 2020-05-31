@@ -28,6 +28,7 @@ SELECT SCHEMA_NAME.gw_fct_setdelete('{"client":{"device":3, "infoType":100, "lan
 */
 
 DECLARE
+
 v_tablename text;
 v_id  character varying;
 v_querytext varchar;
@@ -43,6 +44,7 @@ v_error_context text;
 
 
 BEGIN
+
 	--  Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
 	v_schemaname = 'SCHEMA_NAME';
@@ -69,8 +71,7 @@ BEGIN
 			v_featuretype ='visit';	
 	END IF;
 	*/
-	
-	
+		
 	-- check if feature exists
 	v_querytext := 'SELECT * FROM ' || quote_ident(v_tablename) ||' WHERE '|| quote_ident(v_idname) ||' = '||quote_literal(v_id);
 	EXECUTE v_querytext INTO v_result ;

@@ -11,12 +11,20 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_check_result(p_data json)
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"gw_check_project","fid":127, "dumpSubcatch":true}}}$$) when is called from go2epa_main from toolbox
+SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"gw_check_project","fid":227, "dumpSubcatch":true}}}$$) when is called from go2epa_main from toolbox
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId":"r1"}}}$$) -- when is called from toolbox
 
 SELECT SCHEMA_NAME.gw_fct_pg2epa($${"client":{"device":3, "infoType":100, "lang":"ES"}, "data":{"resultId":"test1", "useNetworkGeom":"false", "dumpSubcatch":"true"}}$$)
 
-SELECT * FROM SCHEMA_NAME.audit_check_data where fid::text  = 127::text
+SELECT * FROM SCHEMA_NAME.audit_check_data where fid::text  = 227::text
+
+	-- delete old values on result table
+	DELETE FROM audit_check_data WHERE fid = 114 AND cur_user=current_user;
+	DELETE FROM audit_check_data WHERE id < 0;
+	DELETE FROM anl_node WHERE fid IN (159) AND cur_user=current_user;
+	DELETE FROM anl_arc WHERE fid IN (103) AND cur_user=current_user;
+
+-- fid: 114,227
 
 */
 
@@ -97,14 +105,12 @@ BEGIN
 	-- init variables
 	v_count=0;
 	IF v_fid is null THEN
-		v_fid = 14;
+		v_fid = 114;
 	END IF;
 	
 	-- delete old values on result table
-	DELETE FROM audit_check_data WHERE fid = 14 AND cur_user=current_user;
+	DELETE FROM audit_check_data WHERE fid = 114 AND cur_user=current_user;
 	DELETE FROM audit_check_data WHERE id < 0;
-	DELETE FROM anl_node WHERE fid IN (59) AND cur_user=current_user;
-	DELETE FROM anl_arc WHERE fid IN (3) AND cur_user=current_user;
 
 	-- get user parameters
 	v_hydroscenario = (SELECT hydrology_id FROM selector_inp_hydrology WHERE cur_user = current_user);
@@ -372,43 +378,26 @@ BEGIN
 	v_options := COALESCE(v_options, '{}'); 
 	v_result_info := COALESCE(v_result_info, '{}'); 
 
-	--points
-	v_result = null;
-	
-	SELECT jsonb_agg(features.feature) INTO v_result
-	FROM (
-	SELECT jsonb_build_object(
-	 'type',       'Feature',
-	'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-	'properties', to_jsonb(row) - 'the_geom'
-	) AS feature
-	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
-	FROM  anl_node WHERE cur_user="current_user"() AND fid = 999) row) features;
-
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "features":',v_result, '}'); 
 
-	IF v_fid::text = 127::text THEN
+	IF v_fid::text = 227::text THEN
 		v_result_point = '{}';
 	END IF;
 	
-	-- Control nulls
-	v_result_point := COALESCE(v_result_point, '{}'); 
-
 	--  Return
 	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
 		',"body":{"form":{}'||
 			',"data":{"options":'||v_options||','||
 				'"info":'||v_result_info||','||
-				'"point":'||v_result_point||','||
 				'"setVisibleLayers":[] }'||
 			'}'||
 		'}')::json;
 
 	-- Exception handling
-	--EXCEPTION WHEN OTHERS THEN
-	--GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	--RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$

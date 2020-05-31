@@ -35,8 +35,8 @@ select SCHEMA_NAME.gw_fct_utils_csv2pg_importdxfblock(237);
 
 */
 
-
 DECLARE
+
 v_record record;
 v_target text;
 v_total integer;
@@ -175,8 +175,8 @@ BEGIN
 	    '}')::json;
 	    
 	--    Exception handling
-	--EXCEPTION WHEN OTHERS THEN 
-	--RETURN ('{"status":"Failed","message":{"priority":2, "text":' || to_json(SQLERRM) || '}, "version":"'|| v_version ||'","SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	EXCEPTION WHEN OTHERS THEN 
+	RETURN ('{"status":"Failed","message":{"priority":2, "text":' || to_json(SQLERRM) || '}, "version":"'|| v_version ||'","SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

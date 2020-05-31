@@ -10,14 +10,16 @@ DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_mincut_inverted_flowtrace_engine(char
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut_inverted_flowtrace_engine(node_id_arg character varying, result_id_arg integer)
 RETURNS void AS
 $BODY$
+
 DECLARE
-    exists_id      character varying;
-    rec_table      record;
-    controlValue   integer;
-    node_aux       public.geometry;
-    arc_aux        public.geometry;
-    stack          varchar[];
-    v_debug	   Boolean;
+
+exists_id character varying;
+rec_table record;
+controlValue integer;
+node_aux public.geometry;
+arc_aux public.geometry;
+stack varchar[];
+v_debug Boolean;
 
 BEGIN
 
@@ -110,9 +112,8 @@ BEGIN
 	
     END LOOP;
 	
-RETURN;
-
-        
+	RETURN;
+    
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

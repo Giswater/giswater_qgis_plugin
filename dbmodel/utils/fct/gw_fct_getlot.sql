@@ -18,34 +18,35 @@ SELECT SCHEMA_NAME.gw_fct_getlot($${"client":{"device":3,"infoType":100,"lang":"
 */
 
 DECLARE
-	v_version text;
-	v_schemaname text;
-	v_id text;
-	v_idname text;
-	v_columntype text;
-	v_device integer;
-	v_tablename text;
-	v_fields json [];
-	v_fields_json json;
-	v_forminfo json;
-	v_formheader text;
-	v_formactions text;
-	v_formtabs text;
-	v_tabaux json;
-	v_active boolean;
-	aux_json json;
-	v_tab record;
-	v_projecttype varchar;
-	v_activedatatab boolean;
-	v_client json;
-	v_layermanager json;
-	v_message json;
-	v_values json;
-	array_index integer DEFAULT 0;
-	v_fieldvalue text;
-	v_geometry json;
-	v_value text;
-	v_team text;
+
+v_version text;
+v_schemaname text;
+v_id text;
+v_idname text;
+v_columntype text;
+v_device integer;
+v_tablename text;
+v_fields json [];
+v_fields_json json;
+v_forminfo json;
+v_formheader text;
+v_formactions text;
+v_formtabs text;
+v_tabaux json;
+v_active boolean;
+aux_json json;
+v_tab record;
+v_projecttype varchar;
+v_activedatatab boolean;
+v_client json;
+v_layermanager json;
+v_message json;
+v_values json;
+array_index integer DEFAULT 0;
+v_fieldvalue text;
+v_geometry json;
+v_value text;
+v_team text;
 
 BEGIN
 
@@ -90,8 +91,6 @@ BEGIN
 				INTO v_values
 				USING v_id;
 				
-			
-
 			-- setting values
 			FOREACH aux_json IN ARRAY v_fields 
 			LOOP          
@@ -156,15 +155,12 @@ BEGIN
 	--closing tabs array
 	v_formtabs := (v_formtabs ||']');
 
-
 	-- actions and layermanager
 	EXECUTE 'SELECT actions, layermanager FROM config_form WHERE formname = ''lot'' AND (projecttype ='||quote_literal(LOWER(v_projecttype))||' OR projecttype = ''utils'')'
 		INTO v_formactions, v_layermanager;
 
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formActions', v_formactions);
            
-
-
 	-- Create new form
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formId', 'F11'::text);
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formName', v_formheader);

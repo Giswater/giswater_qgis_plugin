@@ -78,6 +78,7 @@ v_path text;
 v_error_context text;
 
 BEGIN
+
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
 
@@ -581,7 +582,6 @@ BEGIN
 		
 	END IF;
 	
-
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
@@ -589,14 +589,13 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 	
-	
-	--Control nulls
+	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_result_point := COALESCE(v_result_point, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 	
 	v_version := COALESCE(v_version, '{}'); 	
 
---  	Return
+	-- Return
 	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Import inp done successfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
@@ -606,8 +605,8 @@ BEGIN
 	
 	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN
-	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$

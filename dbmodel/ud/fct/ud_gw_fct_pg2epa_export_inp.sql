@@ -117,7 +117,7 @@ BEGIN
 		('header','vi_controls','vi_rules', 'vi_backdrop', 'vi_adjustments','vi_evaporation', 'vi_files','vi_hydrographs','vi_polygons','vi_temperature','vi_transects')
 		order by id)a )row;
 	
-RETURN v_return;
+	RETURN v_return;
         
 END;$BODY$
 LANGUAGE plpgsql VOLATILE

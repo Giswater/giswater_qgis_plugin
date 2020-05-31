@@ -10,6 +10,7 @@ DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_nod2arc_geom(character varyi
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_pg2epa_nod2arc_geom(result_id_var character varying)
   RETURNS integer AS
 $BODY$
+
 DECLARE
 	
 rec_node SCHEMA_NAME.temp_node%ROWTYPE;
@@ -32,10 +33,10 @@ v_node_yinit double precision;
 
 BEGIN
 
---  Search path
+	--  Search path
     SET search_path = "SCHEMA_NAME", public;
    
---  Move valves to arc
+	--  Move valves to arc
     RAISE NOTICE 'Starting process of nodarcs';
 
     FOR rec_flowreg IN 
@@ -128,8 +129,6 @@ BEGIN
 			END IF;
 		END IF;
     END LOOP;
-
-
 
     RETURN 1;
 		

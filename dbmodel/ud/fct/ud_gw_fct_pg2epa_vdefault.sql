@@ -18,6 +18,7 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa($${"client":{"device":3, "infoType":100, "lang"
 */
 
 DECLARE
+
 v_roughness float = 0;
 v_x float;
 v_y float;

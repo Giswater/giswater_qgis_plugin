@@ -19,33 +19,33 @@ SELECT SCHEMA_NAME.gw_fct_getgo2epa($${
 */
 
 DECLARE
---    Variables
-    v_version json;
-    v_formname text;
-    v_fields  json[];
-    v_fields_json json;
-    v_formgroupbox json[];
-    v_formgroupbox_json json;
+
+v_version json;
+v_formname text;
+v_fields  json[];
+v_fields_json json;
+v_formgroupbox json[];
+v_formgroupbox_json json;
    
 BEGIN
 
--- Set search path to local schema
+	-- Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
 
---  get api version
+	-- get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
         INTO v_version;
 
--- get input parameters
+	-- get input parameters
 	v_formname := (p_data ->> 'form')::json->> 'formName';
 
--- getting the form widgets
+	-- getting the form widgets
 	SELECT gw_fct_getformfields(v_formname, 'form', 'data', null, null, null, null, null,null, null, null)
 		INTO v_fields; 
 
 	v_fields_json = array_to_json (v_fields);
 
---  Construction of groupbox formlayouts
+	-- Construction of groupbox formlayouts
 	EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (SELECT layout_id AS "layout", label FROM config_form_groupbox 
 		WHERE formname=$1 ORDER BY layout_id) a'
 			INTO v_formgroupbox
@@ -53,12 +53,12 @@ BEGIN
 
 	v_formgroupbox_json := array_to_json(v_formgroupbox);
 
---    Control NULL's
+	-- Control NULL's
 	v_fields := COALESCE(v_fields, '{}');
 	v_version := COALESCE(v_version, '{}');
 	v_formgroupbox_json := COALESCE(v_formgroupbox_json, '{}');
 		
---    Return
+	-- Return
     RETURN ('{"status":"Accepted", "version":'||v_version||
              ',"body":{"message":{"priority":1, "text":"This is a test message"}'||
 			',"form":{"formName":"", "formLabel":"", "formText":""'||
@@ -68,9 +68,9 @@ BEGIN
 			'}'||
 	    '}')::json;
        
---    Exception handling
---    EXCEPTION WHEN OTHERS THEN 
-        --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN 
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;

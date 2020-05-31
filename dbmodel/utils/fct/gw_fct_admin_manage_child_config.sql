@@ -18,7 +18,9 @@ SELECT SCHEMA_NAME.gw_fct_admin_manage_child_config($${
 "feature":{"catFeature":"SHUTOFF_VALVE"},
 "data":{"filterFields":{}, "pageInfo":{}, "view_name":"ve_node_shutoffvalve", "feature_type":"node" }}$$);
 */
+
 DECLARE
+
 v_schemaname text;
 v_insert_fields text;
 v_view_name text;
@@ -26,7 +28,9 @@ v_feature_type text;
 v_project_type text;
 v_version text;
 v_config_fields text;
+
 rec record;
+
 v_cat_feature text;
 v_feature_system_id text;
 v_man_fields text;
@@ -37,17 +41,15 @@ v_widgettype text;
 
 BEGIN
 
-	-- dissable temporary trigger to manage control_config
-	UPDATE config_param_user SET value=FALSE WHERE cur_user = current_user AND parameter  = 'config_control';
-	
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
-
-	-- get input parameters
 	v_schemaname = 'SCHEMA_NAME';
 
 	SELECT wsoftware, giswater  INTO v_project_type, v_version FROM version order by 1 desc limit 1;
 	
+	-- dissable temporary trigger to manage control_config
+	UPDATE config_param_user SET value=FALSE WHERE cur_user = current_user AND parameter  = 'config_control';
+		
 	-- get input parameters
 	v_cat_feature = ((p_data ->>'feature')::json->>'catFeature')::text;
 	v_view_name = ((p_data ->>'data')::json->>'view_name')::text;

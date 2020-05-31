@@ -16,8 +16,8 @@ SELECT SCHEMA_NAME.gw_fct_admin_manage_roles($${
 "form":{}, "data":{"action":"CREATE"}}$$);
 */
 
-
 DECLARE
+
 v_action text;
 v_version text;
 v_return json;

@@ -19,19 +19,19 @@ SELECT SCHEMA_NAME.gw_fct_setfileinsert($${"client":{"device":3, "infoType":100,
 */
 
 DECLARE
-	-- variables
-	v_id int8;
-	v_version json;
-	v_outputparameter json;
-	v_insertresult json;
-	v_message json;
-	v_feature json;
-	v_data json;
-	v_filetype text;
-	v_fextension text;
-	v_value text;
-	v_text text;
-	v_fields json;
+
+v_id int8;
+v_version json;
+v_outputparameter json;
+v_insertresult json;
+v_message json;
+v_feature json;
+v_data json;
+v_filetype text;
+v_fextension text;
+v_value text;
+v_text text;
+v_fields json;
 
 BEGIN
 
@@ -94,8 +94,8 @@ BEGIN
 		', "body": {"feature":{"id":"'||v_id||'"}}}')::json;    
 
 	--  Exception handling
-	--EXCEPTION WHEN OTHERS THEN 
---		RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	EXCEPTION WHEN OTHERS THEN 
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

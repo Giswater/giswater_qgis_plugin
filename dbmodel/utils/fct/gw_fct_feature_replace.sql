@@ -6,9 +6,6 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2714
 
---DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_feature_replace(json);
-
-
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_feature_replace(p_data json)
 RETURNS json AS
 $BODY$

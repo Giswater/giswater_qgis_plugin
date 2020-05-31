@@ -14,14 +14,14 @@ select SCHEMA_NAME.gw_fct_pg2epa_nod2arc_double ('v41')
 
 DECLARE
 
-v_query_text	text;
-v_arc_id	text;
-v_node_1	text;
-v_geom		public.geometry;
-v_record	record;
+v_query_text text;
+v_arc_id text;
+v_node_1 text;
+v_geom	public.geometry;
+v_record record;
 v_record_a1	record;
 v_record_a2	record;
-v_curve		text;
+v_curve	text;
 
 BEGIN
 

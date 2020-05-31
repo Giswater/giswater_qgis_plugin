@@ -14,13 +14,15 @@ $BODY$
 
 /*example
 CURRENT
-SELECT gw_fct_getselectors($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selector_type":{"mincut": {"ids":[]}}}}$$);
-SELECT gw_fct_getselectors($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selector_type":{"exploitation": {"ids":[]}}}}$$);
+SELECT gw_fct_getselectors($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, 
+"data":{"filterFields":{}, "pageInfo":{}, "selector_type":{"mincut": {"ids":[]}}}}$$);
+
+SELECT gw_fct_getselectors($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{}, 
+"data":{"filterFields":{}, "pageInfo":{}, "selector_type":{"exploitation": {"ids":[]}}}}$$);
 */
 
 DECLARE
 
--- Variables
 selected_json json;	
 form_json json;
 v_formTabsAux  json;
@@ -199,7 +201,6 @@ BEGIN
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN 
 	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
-
 
 END;
 $BODY$

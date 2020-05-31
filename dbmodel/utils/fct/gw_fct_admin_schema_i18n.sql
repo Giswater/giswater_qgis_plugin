@@ -20,6 +20,7 @@ SELECT * FROM SCHEMA_NAME.config_form_fields WHERE formname = 've_arc' AND colum
 
 
 DECLARE 
+
 v_mode int2 = 0;  -- 0 alvays label and tooltips will be updated, 1 update only when null, 2 never will be updated
 v_table text;
 v_clause text;

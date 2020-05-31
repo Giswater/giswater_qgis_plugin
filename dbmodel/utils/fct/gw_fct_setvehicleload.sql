@@ -12,12 +12,13 @@ CREATE OR REPLACE FUNCTION gw_fct_setvehicleload(p_data json)
 $BODY$
 
 /*EXAMPLE
-
-SELECT SCHEMA_NAME.gw_fct_setvehicleload($${"client":{"device":3,"infoType":0,"lang":"es"},"form":{},"feature":{},"data":{"fields":{"vehicle_id":"2","load":"1234","hash":"5de7a2e92995b7455a7fe3c7","photo_url":"https:\/\/bmaps.bgeo.es\/dev\/demo\/external.image.php?img="},"deviceTrace":{"xcoord":null,"ycoord":null,"compass":null},"pageInfo":null}}$$) AS result
-
+SELECT SCHEMA_NAME.gw_fct_setvehicleload($${"client":{"device":3,"infoType":0,"lang":"es"},"form":{},"feature":{},
+"data":{"fields":{"vehicle_id":"2","load":"1234","hash":"5de7a2e92995b7455a7fe3c7",
+"photo_url":"https:\/\/bmaps.bgeo.es\/dev\/demo\/external.image.php?img="},"deviceTrace":{"xcoord":null,"ycoord":null,"compass":null},"pageInfo":null}}$$) AS result
 */
 
 DECLARE
+
 v_tablename text;
 v_version text;
 v_id integer;
@@ -41,24 +42,23 @@ v_error_context text;
 
 BEGIN
 
--- Set search path to local schema
+	-- Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
 
---  get api version
+	--  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
         INTO v_version;
 
     EXECUTE 'SELECT wsoftware FROM version'
 	INTO v_version;
 	
---  get input values
+	--  get input values
     v_client = (p_data ->>'client')::json;
     v_vehicle_name = ((p_data ->>'data')::json->>'fields')::json->>'vehicle_id';	
     v_load = ((p_data ->>'data')::json->>'fields')::json->>'load';	
     v_hash = ((p_data ->>'data')::json->>'fields')::json->>'hash';
     v_photo_url = ((p_data ->>'data')::json->>'fields')::json->>'photo_url';
-	
-	
+		
 	-- Get vehicle id
 	--EXECUTE 'SELECT id FROM ext_cat_vehicle WHERE idval = '''|| v_vehicle_name ||'''' INTO v_vehicle_id;
 
@@ -72,8 +72,7 @@ BEGIN
 		-- Inserting data (Without started lot)
 		EXECUTE 'INSERT INTO om_vehicle_x_parameters (vehicle_id, lot_id, team_id, image, load, cur_user, tstamp) VALUES('''||COALESCE(v_vehicle_name, '')||''','||v_record.lot_id||','||v_record.team_id::integer||', '''|| COALESCE(v_photo_url, '') ||COALESCE(v_hash, '') ||''','''||COALESCE(v_load, '0')||''', current_user,'''||NOW()||''')';
 	END IF;
-	
-	
+		
 	-- message
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{}, 
 	"data":{"message":"3118", "function":"2912","debug_msg":""}}$$);'INTO v_message;		
@@ -92,7 +91,6 @@ BEGIN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
 	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 	
-
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

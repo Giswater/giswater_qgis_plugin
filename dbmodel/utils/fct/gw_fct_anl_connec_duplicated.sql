@@ -4,7 +4,6 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-
 --FUNCTION CODE: 2106
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_connec_duplicated(p_data json) RETURNS json AS 
@@ -13,26 +12,29 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_anl_connec_duplicated($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"v_edit_man_wjoin", "id":["1004","1005"]},
-"data":{"selectionMode":"previousSelection",
-	"parameters":{"connecTolerance":1},
-	"parameters":{"saveOnDatabase":true}}}$$)
+"data":{"selectionMode":"previousSelection",	"parameters":{"connecTolerance":1},	"parameters":{"saveOnDatabase":true}}}$$)
+	
+-- fid: 105
+
 */
 
 DECLARE
-v_id 			json;
-v_selectionmode 	text;
-v_connectolerance 	float;
-v_saveondatabase 	boolean;
-v_worklayer 		text;
-v_result 		json;
-v_result_info 		json;
-v_result_point		json;
-v_array 		text;
-v_version 		text;
+
+v_id json;
+v_selectionmode text;
+v_connectolerance float;
+v_saveondatabase boolean;
+v_worklayer text;
+v_result json;
+v_result_info json;
+v_result_point json;
+v_array text;
+v_version text;
 v_qmlpointpath text;
 v_error_context text;
 
 BEGIN
+
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
 	
@@ -48,7 +50,7 @@ BEGIN
 	v_connectolerance := ((p_data ->>'data')::json->>'parameters')::json->>'connecTolerance';
 
 	-- Reset values
-    DELETE FROM anl_connec WHERE cur_user="current_user"() AND fid=5;
+    DELETE FROM anl_connec WHERE cur_user="current_user"() AND fid=105;
 
     --select default geometry style
 	SELECT regexp_replace(row(value)::text, '["()"]', '', 'g')  INTO v_qmlpointpath FROM config_param_user WHERE parameter='qgis_qml_pointlayer_path' AND cur_user=current_user;
@@ -57,13 +59,13 @@ BEGIN
 	IF v_array != '()' THEN
 		EXECUTE 'INSERT INTO anl_connec (connec_id, connecat_id, state, connec_id_aux, connecat_id_aux, state_aux, expl_id, fid, the_geom)
 				SELECT * FROM (
-				SELECT DISTINCT t1.connec_id, t1.connecat_id, t1.state as state1, t2.connec_id, t2.connecat_id, t2.state as state2, t1.expl_id, 5, t1.the_geom
+				SELECT DISTINCT t1.connec_id, t1.connecat_id, t1.state as state1, t2.connec_id, t2.connecat_id, t2.state as state2, t1.expl_id, 105, t1.the_geom
 				FROM '||v_worklayer||' AS t1 JOIN '||v_worklayer||' AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom,('||v_connectolerance||')) 
 				WHERE t1.connec_id != t2.connec_id AND t1.connec_id IN '||v_array||' ORDER BY t1.connec_id ) a where a.state1 > 0 AND a.state2 > 0';
 	ELSE
 		EXECUTE 'INSERT INTO anl_connec (connec_id, connecat_id, state, connec_id_aux, connecat_id_aux, state_aux, expl_id, fid, the_geom)
 				SELECT * FROM (
-				SELECT DISTINCT t1.connec_id, t1.connecat_id, t1.state as state1, t2.connec_id, t2.connecat_id, t2.state as state2, t1.expl_id, 5, t1.the_geom
+				SELECT DISTINCT t1.connec_id, t1.connecat_id, t1.state as state1, t2.connec_id, t2.connecat_id, t2.state as state2, t1.expl_id, 105, t1.the_geom
 				FROM '||v_worklayer||' AS t1 JOIN '||v_worklayer||' AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom,('||v_connectolerance||')) 
 				WHERE t1.connec_id != t2.connec_id ORDER BY t1.connec_id ) a where a.state1 > 0 AND a.state2 > 0';
 	END IF;
@@ -71,7 +73,7 @@ BEGIN
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT * FROM audit_check_data WHERE cur_user="current_user"() AND fid=5) row;
+	FROM (SELECT * FROM audit_check_data WHERE cur_user="current_user"() AND fid=105) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
@@ -85,18 +87,18 @@ BEGIN
     'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
   	FROM (SELECT id, connec_id, connecat_id, state, expl_id, descript, the_geom, fid
-  	FROM  anl_connec WHERE cur_user="current_user"() AND fid=5) row) features;
+  	FROM  anl_connec WHERE cur_user="current_user"() AND fid=105) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "features":',v_result, '}'); 
 
 	IF v_saveondatabase IS FALSE THEN 
 		-- delete previous results
-		DELETE FROM anl_connec WHERE cur_user="current_user"() AND fid=5;
+		DELETE FROM anl_connec WHERE cur_user="current_user"() AND fid=105;
 	ELSE
 		-- set selector
-		DELETE FROM selector_audit WHERE fid=5 AND cur_user=current_user;
-		INSERT INTO selector_audit (fid,cur_user) VALUES (5, current_user);
+		DELETE FROM selector_audit WHERE fid=105 AND cur_user=current_user;
+		INSERT INTO selector_audit (fid,cur_user) VALUES (105, current_user);
 	END IF;
 		
 	--    Control nulls
@@ -113,8 +115,8 @@ BEGIN
 	    '}')::json;
 
 	EXCEPTION WHEN OTHERS THEN
-	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	 RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$

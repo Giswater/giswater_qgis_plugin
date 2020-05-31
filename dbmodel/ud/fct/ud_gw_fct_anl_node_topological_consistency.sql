@@ -17,22 +17,26 @@ SELECT SCHEMA_NAME.gw_fct_anl_node_topological_consistency($${
 "feature":{"tableName":"v_edit_man_manhole", "id":["138","139"]},
 "data":{"selectionMode":"previousSelection", "parameters":{"saveOnDatabase":true}
 }}$$)
+
+-- fid: 108
 */
 
 DECLARE
-	rec_node record;
-	rec record;
-	v_version text;
-	v_saveondatabase boolean;
-	v_result json;
-	v_result_info json;
-	v_result_point json;
-	v_id json;
-	v_selectionmode text;
-	v_worklayer text;
-	v_array text;
-	v_qmlpointpath text;
-	v_error_context text;
+
+rec_node record;
+rec record;
+
+v_version text;
+v_saveondatabase boolean;
+v_result json;
+v_result_info json;
+v_result_point json;
+v_id json;
+v_selectionmode text;
+v_worklayer text;
+v_array text;
+v_qmlpointpath text;
+v_error_context text;
 	
 BEGIN
 
@@ -42,7 +46,7 @@ BEGIN
 	SELECT giswater INTO v_version FROM version order by 1 desc limit 1;
 
 	-- Reset values
-	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=8;
+	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=108;
 
     -- getting input data 	
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
@@ -57,7 +61,7 @@ BEGIN
 	-- Computing process
 	IF v_array != '()' THEN
 		EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, expl_id, num_arcs, fid, the_geom, state)
-				SELECT node_id, nodecat_id, '||v_worklayer||'.expl_id, COUNT(*), 8, '||v_worklayer||'.the_geom , '||v_worklayer||'.state
+				SELECT node_id, nodecat_id, '||v_worklayer||'.expl_id, COUNT(*), 108, '||v_worklayer||'.the_geom , '||v_worklayer||'.state
 				FROM '||v_worklayer||' 
 				INNER JOIN v_edit_arc ON v_edit_arc.node_1 = '||v_worklayer||'.node_id OR v_edit_arc.node_2 = '||v_worklayer||'.node_id 
 				WHERE '||v_worklayer||'.node_type != ''OUTFALL'' AND  node_id IN '||v_array||'
@@ -66,7 +70,7 @@ BEGIN
 				HAVING COUNT(*) = 1;';
 	ELSE
 		EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, expl_id, num_arcs, fid, the_geom, state)
-				SELECT node_id, nodecat_id, '||v_worklayer||'.expl_id, COUNT(*), 8, '||v_worklayer||'.the_geom,'||v_worklayer||'.state 
+				SELECT node_id, nodecat_id, '||v_worklayer||'.expl_id, COUNT(*), 108, '||v_worklayer||'.the_geom,'||v_worklayer||'.state 
 				FROM '||v_worklayer||'
 				INNER JOIN v_edit_arc ON v_edit_arc.node_1 = '||v_worklayer||'.node_id OR v_edit_arc.node_2 = '||v_worklayer||'.node_id 
 				WHERE '||v_worklayer||'.node_type != ''OUTFALL'' 
@@ -78,7 +82,7 @@ BEGIN
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=8 order by id) row;
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=108 order by id) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
@@ -92,18 +96,18 @@ BEGIN
     'properties', to_jsonb(row) - 'the_geom'
     ) AS feature
     FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
-    FROM  anl_node WHERE cur_user="current_user"() AND fid=8) row) features;
+    FROM  anl_node WHERE cur_user="current_user"() AND fid=108) row) features;
 
   	v_result := COALESCE(v_result, '{}'); 
   	v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "features":',v_result, '}'); 
 
 	IF v_saveondatabase IS FALSE THEN 
 		-- delete previous results
-		DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=8;
+		DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=108;
 	ELSE
 		-- set selector
-		DELETE FROM selector_audit WHERE fid=8 AND cur_user=current_user;
-		INSERT INTO selector_audit (fid,cur_user) VALUES (8, current_user);
+		DELETE FROM selector_audit WHERE fid=108 AND cur_user=current_user;
+		INSERT INTO selector_audit (fid,cur_user) VALUES (108, current_user);
 	END IF;
 		
 	--    Control nulls
@@ -119,9 +123,9 @@ BEGIN
 			'}}'||
 	    '}')::json;
 
-  EXCEPTION WHEN OTHERS THEN
-   GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-   RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 
 END;
