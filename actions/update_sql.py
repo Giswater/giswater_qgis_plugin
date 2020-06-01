@@ -3076,11 +3076,11 @@ class UpdateSQL(ApiParent):
 
         # Populate widgettype combo
         if self.chk_multi_insert:
-            sql = ("SELECT DISTINCT(column_id), column_id "
+            sql = ("SELECT DISTINCT(columnname), columnname "
                    "FROM " + schema_name + ".ve_config_addfields "
                    "WHERE cat_feature_id IS NULL ")
         else:
-            sql = ("SELECT DISTINCT(column_id), column_id "
+            sql = ("SELECT DISTINCT(columnname), columnname "
                    "FROM " + schema_name + ".ve_config_addfields "
                    "WHERE cat_feature_id = '" + form_name + "'")
 
@@ -3125,7 +3125,7 @@ class UpdateSQL(ApiParent):
                 sql += f" {widget.objectName()} = {value},"
 
         sql = sql[:-1]
-        sql += f" WHERE cat_feature_id = '{form_name}' and column_id = '{column_id}'"
+        sql += f" WHERE cat_feature_id = '{form_name}' and columname = '{column_id}'"
         self.controller.execute_sql(sql)
 
         # Close dialog

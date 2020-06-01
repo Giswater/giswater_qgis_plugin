@@ -112,11 +112,11 @@ class ApiManageComposer(ApiParent):
         selected_com = self.get_current_composer()
         widget_list = dialog.grb_option_values.findChildren(QLineEdit)
         for widget in widget_list:
-            item = selected_com.itemById(widget.property('column_id'))
+            item = selected_com.itemById(widget.property('columnname'))
             if type(item) != QgsLayoutItemLabel or item is None:
                 widget.clear()
                 widget.setStyleSheet("border: 1px solid red")
-                widget.setPlaceholderText(f"Widget '{widget.property('column_id')}' not found in the composer")
+                widget.setPlaceholderText(f"Widget '{widget.property('columnname')}' not found in the composer")
             elif type(item) == QgsLayoutItemLabel and item is not None:
                 widget.setStyleSheet(None)
 
@@ -129,7 +129,7 @@ class ApiManageComposer(ApiParent):
 
         if selected_com is not None:
             for widget in widget_list:
-                item = selected_com.itemById(widget.property('column_id'))
+                item = selected_com.itemById(widget.property('columnname'))
                 if type(item) == QgsLayoutItemLabel:
                     widget.setText(str(item.text()))
 
@@ -146,14 +146,14 @@ class ApiManageComposer(ApiParent):
 
     def preview(self, dialog, show):
         """ Export values from widgets(only QLineEdit) into dialog, to selected composer
-            if composer.widget.id == dialog.widget.property('column_id')
+            if composer.widget.id == dialog.widget.property('columnname')
         """
 
         selected_com = self.get_current_composer()
         widget_list = dialog.findChildren(QLineEdit)
 
         for widget in widget_list:
-            item = selected_com.itemById(widget.property('column_id'))
+            item = selected_com.itemById(widget.property('columnname'))
             if type(item) == QgsLayoutItemLabel:
                 item.setText(str(widget.text()))
                 item.refresh()

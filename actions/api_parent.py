@@ -470,10 +470,10 @@ class ApiParent(ParentAction):
 
         # Set width and alias of visible columns
         columns_to_delete = []
-        sql = (f"SELECT column_index, width, alias, status"
+        sql = (f"SELECT columnindex, width, alias, status"
                f" FROM config_form_tableview"
-               f" WHERE table_id = '{table_name}'"
-               f" ORDER BY column_index")
+               f" WHERE tablename = '{table_name}'"
+               f" ORDER BY columnindex")
         rows = self.controller.get_rows(sql, log_info=False)
         if not rows:
             return
@@ -505,17 +505,17 @@ class ApiParent(ParentAction):
 
         # Set width and alias of visible columns
         columns_to_show = ""
-        sql = (f"SELECT column_index, width, column_id, alias, status"
+        sql = (f"SELECT columnindex, width, columnname, alias, status"
                f" FROM config_form_tableview"
-               f" WHERE table_id = '{table_name}'"
-               f" ORDER BY column_index")
+               f" WHERE tablename = '{table_name}'"
+               f" ORDER BY columnindex")
         rows = self.controller.get_rows(sql, log_sql=False)
         if not rows:
             return
         for row in rows:
             if row['status']:
-                if row['column_id'] is not None:
-                    columns_to_show += str(row['column_id'])
+                if row['columnname'] is not None:
+                    columns_to_show += str(row['columnname'])
                     if row['alias'] is not None:
                         columns_to_show += " AS " + str(row['alias'])
                     columns_to_show += ", "
@@ -545,8 +545,8 @@ class ApiParent(ParentAction):
 
         widget = QPushButton()
         widget.setObjectName(field['widgetname'])
-        if 'column_id' in field:
-            widget.setProperty('column_id', field['column_id'])
+        if 'columnname' in field:
+            widget.setProperty('columnname', field['columnname'])
         if 'value' in field:
             widget.setText(field['value'])
         widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
@@ -575,8 +575,8 @@ class ApiParent(ParentAction):
 
         widget = QTextEdit()
         widget.setObjectName(field['widgetname'])
-        if 'column_id' in field:
-            widget.setProperty('column_id', field['column_id'])
+        if 'columnname' in field:
+            widget.setProperty('columnname', field['columnname'])
         if 'value' in field:
             widget.setText(field['value'])
         if 'iseditable' in field:
@@ -592,8 +592,8 @@ class ApiParent(ParentAction):
         
         widget = QLineEdit()
         widget.setObjectName(field['widgetname'])
-        if 'column_id' in field:
-            widget.setProperty('column_id', field['column_id'])
+        if 'columnname' in field:
+            widget.setProperty('columnname', field['columnname'])
         if 'value' in field:
             widget.setText(field['value'])
         if 'iseditable' in field:
@@ -653,8 +653,8 @@ class ApiParent(ParentAction):
 
         widget = QTableView()
         widget.setObjectName(field['widgetname'])
-        if 'column_id' in field:
-            widget.setProperty('column_id', field['column_id'])
+        if 'columnname' in field:
+            widget.setProperty('columnname', field['columnname'])
         function_name = 'no_function_asociated'
         real_name = widget.objectName()[5:len(widget.objectName())]
         if 'widgetfunction' in field:
@@ -717,10 +717,10 @@ class ApiParent(ParentAction):
 
         # Set width and alias of visible columns
         columns_to_delete = []
-        sql = (f"SELECT column_index, width, alias, status"
+        sql = (f"SELECT columnindex, width, alias, status"
                f" FROM config_form_tableview"
-               f" WHERE table_id = '{table_name}'"
-               f" ORDER BY column_index")
+               f" WHERE tablename = '{table_name}'"
+               f" ORDER BY columnindex")
         rows = self.controller.get_rows(sql, log_info=False)
         if not rows:
             return widget
@@ -753,7 +753,7 @@ class ApiParent(ParentAction):
 
         widget = QCheckBox()
         widget.setObjectName(field['widgetname'])
-        widget.setProperty('column_id', field['column_id'])
+        widget.setProperty('columnname', field['columnname'])
         if 'value' in field:
             if field['value'] in ("t", "true", True):
                 widget.setChecked(True)
@@ -766,8 +766,8 @@ class ApiParent(ParentAction):
     
         widget = QComboBox()
         widget.setObjectName(field['widgetname'])
-        if 'column_id' in field:
-            widget.setProperty('column_id', field['column_id'])
+        if 'columnname' in field:
+            widget.setProperty('columnname', field['columnname'])
         widget = self.populate_combo(widget, field)
         if 'selectedId' in field:
             utils_giswater.set_combo_itemData(widget, field['selectedId'], 0)
@@ -783,7 +783,7 @@ class ApiParent(ParentAction):
         :param field_id: Field id of tablename
         """
 
-        combo_parent = widget.property('column_id')
+        combo_parent = widget.property('columnname')
         combo_id = utils_giswater.get_item_data(dialog, widget)
 
         feature = f'"featureType":"{feature_type}", '
@@ -852,8 +852,8 @@ class ApiParent(ParentAction):
     
         widget = QFrame()
         widget.setObjectName(f"{field['widgetname']}_{x}")
-        if 'column_id' in field:
-            widget.setProperty('column_id', field['column_id'])
+        if 'columnname' in field:
+            widget.setProperty('columnname', field['columnname'])
         widget.setFrameShape(QFrame.HLine)
         widget.setFrameShadow(QFrame.Sunken)
 
@@ -866,8 +866,8 @@ class ApiParent(ParentAction):
         widget = QLabel()
         widget.setTextInteractionFlags(Qt.TextSelectableByMouse)
         widget.setObjectName(field['widgetname'])
-        if 'column_id' in field:
-            widget.setProperty('column_id', field['column_id'])
+        if 'columnname' in field:
+            widget.setProperty('columnname', field['columnname'])
         if 'value' in field:
             widget.setText(field['value'])
 
@@ -883,8 +883,8 @@ class ApiParent(ParentAction):
     
         widget = HyperLinkLabel()
         widget.setObjectName(field['widgetname'])
-        if 'column_id' in field:
-            widget.setProperty('column_id', field['column_id'])
+        if 'columnname' in field:
+            widget.setProperty('columnname', field['columnname'])
         if 'value' in field:
             widget.setText(field['value'])
         widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
@@ -933,8 +933,8 @@ class ApiParent(ParentAction):
             if field['widgettype'] == 'doubleSpinbox':
                 widget = QDoubleSpinBox()
         widget.setObjectName(field['widgetname'])
-        if 'column_id' in field:
-            widget.setProperty('column_id', field['column_id'])
+        if 'columnname' in field:
+            widget.setProperty('columnname', field['columnname'])
         if 'value' in field:
             if field['widgettype'] == 'spinbox' and field['value'] != "":
                 widget.setValue(int(field['value']))
@@ -1066,7 +1066,7 @@ class ApiParent(ParentAction):
                 widget = self.set_data_type(field, widget)
                 if field['widgettype'] == 'typeahead':
                     widget = self.manage_lineedit(field, dialog, widget, completer)
-                if widget.property('column_id') == field_id:
+                if widget.property('columnname') == field_id:
                     self.feature_id = widget.text()
             elif field['widgettype'] == 'datepickertime':
                 widget = self.add_calendar(dialog, field)
@@ -1108,8 +1108,8 @@ class ApiParent(ParentAction):
     
         widget = QgsDateTimeEdit()
         widget.setObjectName(field['widgetname'])
-        if 'column_id' in field:
-            widget.setProperty('column_id', field['column_id'])
+        if 'columnname' in field:
+            widget.setProperty('columnname', field['columnname'])
         widget.setAllowNull(True)
         widget.setCalendarPopup(True)
         widget.setDisplayFormat('dd/MM/yyyy')
@@ -1507,9 +1507,9 @@ class ApiParent(ParentAction):
         if not hasattr(self, 'layer') or self.layer.isEditable():
             # If widget.isEditable(False) return None, here control it.
             if str(value) == '' or value is None:
-                _json[str(widget.property('column_id'))] = None
+                _json[str(widget.property('columnname'))] = None
             else:
-                _json[str(widget.property('column_id'))] = str(value)
+                _json[str(widget.property('columnname'))] = str(value)
 
 
     def set_function_associated(self, dialog, widget, field):
@@ -1683,7 +1683,7 @@ class ApiParent(ParentAction):
 
         extras = "  "
         for widget in dialog.grb_parameters.findChildren(QWidget):
-            widget_name = widget.property('column_id')
+            widget_name = widget.property('columnname')
             value = utils_giswater.getWidgetText(dialog, widget, add_quote=False)
             extras += f'"{widget_name}":"{value}", '
         extras = extras[:-2]
@@ -1724,7 +1724,7 @@ class ApiParent(ParentAction):
                 widget = self.add_checkbox(field)
                 widget.setProperty('selector_type', form_tab['selectorType'])
                 widget.stateChanged.connect(partial(self.set_selector, widget, form_tab['tableName'],
-                    field['column_id'], form_tab['selectorType']))
+                    field['columnname'], form_tab['selectorType']))
                 widget.setLayoutDirection(Qt.RightToLeft)
                 field['layoutname'] = gridlayout.objectName()
                 field['layoutorder'] = order
@@ -1742,7 +1742,7 @@ class ApiParent(ParentAction):
 
         extras = f'"selector_type":"{widget.property("selector_type")}", '
         extras += f'"tableName":"{table_name}", '
-        extras += f'"column_id":"{column_name}", '
+        extras += f'"columnname":"{column_name}", '
         extras += f'"result_name":"{widget.objectName()}", '
         extras += f'"result_value":"{widget.isChecked()}"'
         body = self.create_body(extras=extras)

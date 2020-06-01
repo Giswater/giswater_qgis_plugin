@@ -348,7 +348,7 @@ class ApiSearch(ApiParent):
 
         widget = QComboBox()
         widget.setObjectName(field['widgetname'])
-        widget.setProperty('column_id', field['columnname'])
+        widget.setProperty('column_id', field['column_id'])
         self.populate_combo(widget, field)
         if 'selectedId' in field:
             utils_giswater.set_combo_itemData(widget, field['selectedId'], 0)

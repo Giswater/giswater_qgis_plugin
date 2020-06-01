@@ -176,11 +176,11 @@ class NotifyFunctions(ParentAction):
             for field in result['body']['data']['fields']:
                 _values = {}
                 # Get column index
-                fieldIndex = layer.fields().indexFromName(field['column_id'])
+                fieldIndex = layer.fields().indexFromName(field['columnname'])
 
                 # Hide selected fields according table config_api_form_fields.hidden
                 if 'hidden' in field:
-                    self.set_column_visibility(layer, field['column_id'], field['hidden'])
+                    self.set_column_visibility(layer, field['columnname'], field['hidden'])
                 # Set multiline fields according table config_api_form_fields.widgetcontrols['setQgisMultiline']
                 if field['widgetcontrols'] is not None and 'setQgisMultiline' in field['widgetcontrols']:
                     self.set_column_multiline(layer, field, fieldIndex)

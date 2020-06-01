@@ -184,9 +184,9 @@ class AddNewLot(ParentManage):
         # Get columns to ignore for tab_visit when export csv
         table_name = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 3)
         if table_name is not None:
-            sql = (f"SELECT column_id "
+            sql = (f"SELECT columnname "
                    f"FROM config_form_tableview "
-                   f"WHERE location_type = 'tbl_visit' AND status IS NOT TRUE AND table_id = '{table_name}'")
+                   f"WHERE location_type = 'tbl_visit' AND status IS NOT TRUE AND tablename = '{table_name}'")
             rows = self.controller.get_rows(sql)
             result_visit = []
             if rows is not None:
@@ -198,9 +198,9 @@ class AddNewLot(ParentManage):
             result_visit = ''
 
         # Get columns to ignore for tab_relations when export csv
-        sql = (f"SELECT column_id "
+        sql = (f"SELECT columnname "
                f"FROM config_form_tableview "
-               f"WHERE location_type = 'lot' AND status IS NOT TRUE AND table_id = 've_lot_x_{self.geom_type}'")
+               f"WHERE location_type = 'lot' AND status IS NOT TRUE AND tablename = 've_lot_x_{self.geom_type}'")
         rows = self.controller.get_rows(sql)
         result_relation = []
         if rows is not None:
@@ -1459,9 +1459,9 @@ class AddNewLot(ParentManage):
         self.dlg_user_manage.date_event_to.dateChanged.connect(partial(self.filter_user))
 
         # Get columns to ignore for tab_relations when export csv
-        sql = ("SELECT column_id "
+        sql = ("SELECT columnname "
                "FROM config_form_tableview "
-               "WHERE location_type = 'tbl_user' AND status IS NOT TRUE AND table_id = 'om_visit_lot_x_user'")
+               "WHERE location_type = 'tbl_user' AND status IS NOT TRUE AND tablename = 'om_visit_lot_x_user'")
         rows = self.controller.get_rows(sql)
         result_relation = []
         if rows is not None:
@@ -1785,10 +1785,10 @@ class AddNewLot(ParentManage):
 
         # Set width and alias of visible columns
         columns_to_delete = []
-        sql = (f"SELECT column_index, width, alias, status"
+        sql = (f"SELECT columnindex, width, alias, status"
                f" FROM config_form_tableview"
-               f" WHERE table_id = '{table_name}'"
-               f" ORDER BY column_index")
+               f" WHERE tablename = '{table_name}'"
+               f" ORDER BY columnindex")
         rows = self.controller.get_rows(sql, log_info=False)
         if not rows:
             return widget

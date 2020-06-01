@@ -124,7 +124,7 @@ class ApiCatalog(ApiParent):
         if complet_result[0]['status'] == "Accepted":
             result = complet_result[0]['body']['data']
             for field in result['fields']:
-                if field['column_id'] == 'id':
+                if field['columnname'] == 'id':
                     self.populate_combo(id,field)
 
 
@@ -142,13 +142,13 @@ class ApiCatalog(ApiParent):
         complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
         result = complet_list[0]['body']['data']
         for field in result['fields']:
-            if field['column_id'] == 'pnom':
+            if field['columnname'] == 'pnom':
                 self.populate_combo(pnom,field)
-            elif field['column_id'] == 'dnom':
+            elif field['columnname'] == 'dnom':
                 self.populate_combo(dnom,field)
-            elif field['column_id'] == 'shape':
+            elif field['columnname'] == 'shape':
                 self.populate_combo(pnom, field)
-            elif field['column_id'] == 'geom1':
+            elif field['columnname'] == 'geom1':
                 self.populate_combo(dnom,field)
 
 
@@ -157,7 +157,7 @@ class ApiCatalog(ApiParent):
         if fields == 'fields':
             for field in row["fields"]:
                 if field['isparent'] is True:
-                    widget = self.dlg_catalog.findChild(QComboBox, field['column_id'])
+                    widget = self.dlg_catalog.findChild(QComboBox, field['columnname'])
                     widget.currentIndexChanged.connect(partial(self.fill_child, widget, geom_type))
                     widget.currentIndexChanged.connect(partial(self.populate_catalog_id, geom_type))
 
@@ -214,7 +214,7 @@ class ApiCatalog(ApiParent):
     def add_combobox(self, dialog, field):
 
         widget = QComboBox()
-        widget.setObjectName(field['column_id'])
+        widget.setObjectName(field['columnname'])
         widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         self.populate_combo(widget, field)
         if 'selectedId' in field:

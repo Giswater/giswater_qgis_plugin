@@ -1447,10 +1447,10 @@ class ManageVisit(ParentManage, QObject):
 
         # Set width and alias of visible columns
         columns_to_delete = []
-        sql = (f"SELECT column_index, width, alias, status"
+        sql = (f"SELECT columnindex, width, alias, status"
                f" FROM config_form_tableview"
-               f" WHERE table_id = '{table_name}'"
-               f" ORDER BY column_index")
+               f" WHERE tablename = '{table_name}'"
+               f" ORDER BY columnindex")
         rows = self.controller.get_rows(sql, log_info=False, commit=self.autocommit)
         if not rows:
             return

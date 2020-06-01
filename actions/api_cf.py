@@ -320,11 +320,11 @@ class ApiCF(ApiParent, QObject):
                 value = utils_giswater.getCalendarDate(dialog, widget)
             else:
                 if widget is None:
-                    msg = f"Widget {field['column_id']} is not configured or have a bad config"
+                    msg = f"Widget {field['columnname']} is not configured or have a bad config"
                     self.controller.show_message(msg)
 
-            if str(value) not in ('', None, -1, "None") and widget.property('column_id'):
-                self.my_json[str(widget.property('column_id'))] = str(value)
+            if str(value) not in ('', None, -1, "None") and widget.property('columnname'):
+                self.my_json[str(widget.property('columnname'))] = str(value)
 
         self.controller.log_info(str(self.my_json))
 
@@ -657,8 +657,8 @@ class ApiCF(ApiParent, QObject):
         for widget in widgets:
             if widget.hasFocus():
                 value = utils_giswater.getWidgetText(self.dlg_cf, widget)
-                if str(value) not in ('', None, -1, "None") and widget.property('column_id'):
-                    self.my_json[str(widget.property('column_id'))] = str(value)
+                if str(value) not in ('', None, -1, "None") and widget.property('columnname'):
+                    self.my_json[str(widget.property('columnname'))] = str(value)
 
 
     def start_editing(self, layer):
@@ -719,7 +719,7 @@ class ApiCF(ApiParent, QObject):
 
         if 'widgettype' in field and not field['widgettype']:
             message = "The field widgettype is not configured for"
-            msg = f"formname:{self.tablename}, column_id:{field['column_id']}"
+            msg = f"formname:{self.tablename}, columnname:{field['columnname']}"
             self.controller.show_message(message, 2, parameter=msg)
             return label, widget
 
@@ -909,7 +909,7 @@ class ApiCF(ApiParent, QObject):
 
         # Set values into QLineEdits
         for field in section_result['body']['data']['fields']:
-            widget = dlg_sections.findChild(QLineEdit, field['column_id'])
+            widget = dlg_sections.findChild(QLineEdit, field['columnname'])
             if widget:
                 if 'value' in field:
                     utils_giswater.setWidgetText(dlg_sections, widget, field['value'])
@@ -946,7 +946,7 @@ class ApiCF(ApiParent, QObject):
                     fields_reload = field['widgetcontrols']['autoupdateReloadFields']
 
             if field['ismandatory']:
-                widget_name = 'data_' + field['column_id']
+                widget_name = 'data_' + field['columnname']
                 widget = self.dlg_cf.findChild(QWidget, widget_name)
                 widget.setStyleSheet(None)
                 value = utils_giswater.getWidgetText(self.dlg_cf, widget)
@@ -1118,7 +1118,7 @@ class ApiCF(ApiParent, QObject):
         """ Delete keys if exist, when widget is autoupdate """
 
         try:
-            self.my_json.pop(str(widget.property('column_id')), None)
+            self.my_json.pop(str(widget.property('columnname')), None)
         except KeyError:
             pass
 
@@ -2435,10 +2435,10 @@ class ApiCF(ApiParent, QObject):
         filter_fields = ""
         for widget in widget_list:
             if type(widget) != QTableView:
-                column_id = widget.property('column_id')
+                columnname = widget.property('columnname')
                 text = utils_giswater.getWidgetText(dialog, widget)
                 if text != "null":
-                    filter_fields += f'"{column_id}":"{text}", '
+                    filter_fields += f'"{columnname}":"{text}", '
 
         if filter_fields != "":
             filter_fields = filter_fields[:-2]
@@ -2616,7 +2616,7 @@ class ApiCF(ApiParent, QObject):
                         completer = QCompleter()
                         self.set_completer_object_api(completer, model, cmb_workcat_id, rows[0])
                         utils_giswater.setWidgetText(self.dlg_cf, cmb_workcat_id, cat_work_id)
-                        self.my_json[str(cmb_workcat_id.property('column_id'))] = str(cat_work_id)
+                        self.my_json[str(cmb_workcat_id.property('columnname'))] = str(cat_work_id)
                     self.close_dialog(self.dlg_new_workcat)
                 else:
                     msg = "This workcat already exists"

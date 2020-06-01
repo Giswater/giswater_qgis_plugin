@@ -353,11 +353,11 @@ class I18NGenerator(ParentAction):
 
             # Clause WHERE for each context
             if row['context'] == 'config_api_form_fields':
-                line += (f', "clause":"WHERE column_id = \'{source}\' '
+                line += (f', "clause":"WHERE columnname = \'{source}\' '
                          f'AND formname = \'{form_name}\' AND formtype = \'{form_type}\'"')
             elif row['context'] == 'config_api_form_tabs':
                 line += (f', "clause":"WHERE formname = \'{form_name}\' '
-                         f'AND column_id = \'{source}\' AND formtype = \'{form_type}\'"')
+                         f'AND columnname = \'{source}\' AND formtype = \'{form_type}\'"')
             elif row['context'] == 'config_api_form_groupbox':
                 line += (f', "clause":"WHERE formname = \'{form_name}\' '
                          f'AND layout_id  = \'{source}\'"')
