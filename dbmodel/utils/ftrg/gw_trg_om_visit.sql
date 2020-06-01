@@ -59,7 +59,7 @@ BEGIN
 			END IF;
             
             --set visit_type captured from class_id
-			UPDATE om_visit SET visit_type=(SELECT visit_type FROM om_visit_class WHERE id=NEW.class_id) WHERE id=NEW.id;
+			UPDATE om_visit SET visit_type=(SELECT visit_type FROM config_visit_class WHERE id=NEW.class_id) WHERE id=NEW.id;
 
 		ELSIF v_triggerfromtable ='om_visit_x_feature' THEN -- change feature_x_lot status (when function is triggered by om_visit_x_*
 

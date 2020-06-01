@@ -78,18 +78,18 @@ BEGIN
 			'||v_om_visit_fields||',
 			'||v_new_parameters.a_param||'
 			FROM om_visit
-			JOIN om_visit_class ON om_visit_class.id = om_visit.class_id
+			JOIN config_visit_class ON config_visit_class.id = om_visit.class_id
 			JOIN om_visit_x_'||v_feature_system_id||' ON om_visit.id = om_visit_x_'||v_feature_system_id||'.visit_id
 			LEFT JOIN ( SELECT ct.visit_id,
 		    '||v_new_parameters.ct_param||'
 			    FROM crosstab(''SELECT visit_id, om_visit_event.parameter_id, value 
 			    FROM '||v_schemaname||'.om_visit 
 			    LEFT JOIN '||v_schemaname||'.om_visit_event ON om_visit.id= om_visit_event.visit_id 
-			    LEFT JOIN '||v_schemaname||'.om_visit_class on om_visit_class.id=om_visit.class_id
+			    LEFT JOIN '||v_schemaname||'.config_visit_class on config_visit_class.id=om_visit.class_id
 			    LEFT JOIN '||v_schemaname||'.config_visit_parameter_action on config_visit_parameter_action.parameter_id=om_visit_event.parameter_id
-			    where om_visit_class.ismultievent = TRUE ORDER  BY 1,2''::text, '' VALUES '||v_new_parameters.id_param||'''::text) 
+			    where config_visit_class.ismultievent = TRUE ORDER  BY 1,2''::text, '' VALUES '||v_new_parameters.id_param||'''::text) 
 			      ct(visit_id integer, '||v_new_parameters.datatype||')) a ON a.visit_id = om_visit.id
-				WHERE om_visit_class.ismultievent = true AND om_visit_class.id='||v_class_id||';';
+				WHERE config_visit_class.ismultievent = true AND config_visit_class.id='||v_class_id||';';
 
 	ELSE 
 		-- replace values of an existing view

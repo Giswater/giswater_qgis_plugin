@@ -71,13 +71,13 @@ BEGIN
 	v_parameter = (SELECT parameter_id2 FROM om_visit_event JOIN config_visit_parameter_action ON parameter_id=parameter_id1
 		   JOIN config_visit_parameter ON parameter_id=config_visit_parameter.id WHERE visit_id=visit_id_aux AND action_type=1 AND feature_type='NODE' limit 1);
 	
-	v_visit_type = (SELECT visit_type FROM om_visit_class JOIN om_visit ON om_visit.class_id = om_visit_class.id WHERE om_visit.id = visit_id_aux);
+	v_visit_type = (SELECT visit_type FROM config_visit_class JOIN om_visit ON om_visit.class_id = config_visit_class.id WHERE om_visit.id = visit_id_aux);
 	
 	IF v_visit_type = 1 THEN
 		IF v_parameter IS NOT NULL THEN
 
 		-- select simpleClass id
-			SELECT ((param_options->>'paramDesmultiplier')::json->>'simpleClass')::integer INTO v_newclass FROM om_visit_class JOIN om_visit ON om_visit_class.id=class_id WHERE om_visit.id=visit_id_aux;
+			SELECT ((param_options->>'paramDesmultiplier')::json->>'simpleClass')::integer INTO v_newclass FROM config_visit_class JOIN om_visit ON config_visit_class.id=class_id WHERE om_visit.id=visit_id_aux;
 
 		-- loop for those nodes that has the same attribute
 		FOR rec_node IN SELECT node_id, startdate_aux as startdate, node.the_geom FROM node WHERE mu_id=mu_id_aux AND node.node_id!=node_id_aux 

@@ -222,9 +222,9 @@ BEGIN
 			-- get vdefault visitclass
 			IF v_offline THEN
 				-- getting visit class in function of visit type and tablename (when tablename IS NULL then noinfra)
-				v_visitclass := (SELECT id FROM om_visit_class WHERE visit_type=p_visittype AND tablename = v_featuretablename AND param_options->>'offlineDefault' = 'true' LIMIT 1)::integer;
+				v_visitclass := (SELECT id FROM config_visit_class WHERE visit_type=p_visittype AND tablename = v_featuretablename AND param_options->>'offlineDefault' = 'true' LIMIT 1)::integer;
 				IF v_visitclass IS NULL THEN
-					v_visitclass := (SELECT id FROM om_visit_class WHERE feature_type=upper(v_featuretype) AND visit_type=1 LIMIT 1);
+					v_visitclass := (SELECT id FROM config_visit_class WHERE feature_type=upper(v_featuretype) AND visit_type=1 LIMIT 1);
 				END IF;
 			ELSE
 				-- getting visit class in function of visit type and tablename (when tablename IS NULL then noinfra)
@@ -245,11 +245,11 @@ BEGIN
 
 				-- Set visitclass for unexpected generic
 				IF v_featuretype IS NULL THEN
-					v_visitclass := (SELECT id FROM om_visit_class WHERE feature_type IS NULL AND visit_type=p_visittype LIMIT 1);
+					v_visitclass := (SELECT id FROM config_visit_class WHERE feature_type IS NULL AND visit_type=p_visittype LIMIT 1);
 				END IF;
 
 				IF v_visitclass IS NULL THEN
-					v_visitclass := (SELECT id FROM om_visit_class WHERE feature_type=upper(v_featuretype) AND visit_type=p_visittype LIMIT 1);
+					v_visitclass := (SELECT id FROM config_visit_class WHERE feature_type=upper(v_featuretype) AND visit_type=p_visittype LIMIT 1);
 				END IF;
 			END IF;				
 							
@@ -264,9 +264,9 @@ BEGIN
 	END IF;
 
 	--  get formname and tablename
-	v_formname := (SELECT formname FROM om_visit_class WHERE id=v_visitclass);
-	v_tablename := (SELECT tablename FROM om_visit_class WHERE id=v_visitclass);
-	v_ismultievent := (SELECT ismultievent FROM om_visit_class WHERE id=v_visitclass);
+	v_formname := (SELECT formname FROM config_visit_class WHERE id=v_visitclass);
+	v_tablename := (SELECT tablename FROM config_visit_class WHERE id=v_visitclass);
+	v_ismultievent := (SELECT ismultievent FROM config_visit_class WHERE id=v_visitclass);
 	
 	-- getting provisional visit id if is new visit
 	IF (SELECT id FROM om_visit WHERE id=v_id::int8) IS NULL OR v_id IS NULL THEN
@@ -296,9 +296,9 @@ BEGIN
 	IF isnewvisit IS FALSE THEN
 
 		v_extvisitclass := (SELECT class_id FROM om_visit WHERE id=v_id::int8);
-		v_formname := (SELECT formname FROM om_visit_class WHERE visitclass_id=v_visitclass);
-		v_tablename := (SELECT tablename FROM om_visit_class WHERE visitclass_id=v_visitclass);
-		v_ismultievent := (SELECT ismultievent FROM om_visit_class WHERE id=v_visitclass);
+		v_formname := (SELECT formname FROM config_visit_class WHERE visitclass_id=v_visitclass);
+		v_tablename := (SELECT tablename FROM config_visit_class WHERE visitclass_id=v_visitclass);
+		v_ismultievent := (SELECT ismultievent FROM config_visit_class WHERE id=v_visitclass);
 	END IF;
 
 	-- get change class
@@ -321,7 +321,7 @@ BEGIN
 		--visitcat
 		v_visitcat = (SELECT value FROM config_param_user WHERE parameter = 'om_visit_cat_vdefault' AND cur_user=current_user)::integer;
 		--code
-		EXECUTE 'SELECT feature_type FROM om_visit_class WHERE id = '||v_visitclass INTO v_check_code;
+		EXECUTE 'SELECT feature_type FROM config_visit_class WHERE id = '||v_visitclass INTO v_check_code;
 		IF v_check_code IS NOT NULL THEN
 			EXECUTE 'SELECT code FROM '||v_featuretablename||' WHERE ' || (v_featuretype) || '_id = '||v_featureid||'::text' INTO v_code;
 		END IF;

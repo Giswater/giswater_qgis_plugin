@@ -12,18 +12,18 @@ INSERT INTO om_visit_cat VALUES (2, 'Test num.2','2017-4-1', '2017-7-31', NULL, 
 INSERT INTO om_visit_cat VALUES (3, 'Test num.3','2017-8-1', '2017-9-30', NULL, TRUE);
 INSERT INTO om_visit_cat VALUES (4, 'Test num.4','2017-10-1', '2017-12-31', NULL, TRUE);
 
-INSERT INTO om_visit_class VALUES (6, 'Inspection and clean arc', NULL, true, false, true, 'ARC', 'role_om', 1, null, 'visit_arc_insp', 've_visit_arc_insp');
-INSERT INTO om_visit_class VALUES (5, 'Inspection and clean node', NULL, true, false, true, 'NODE', 'role_om', 1, null, 'visit_node_insp', 've_visit_node_insp');
-INSERT INTO om_visit_class VALUES (7, 'Inspection and clean gully', NULL, true, false, true, 'GULLY', 'role_om', 1, null, 'visit_emb_insp', 'visit_emb_insp');
-INSERT INTO om_visit_class VALUES (1, 'Leak on pipe', NULL, true, false, false, 'ARC', 'role_om', 1, null, 'visit_arc_leak', 've_visit_arc_singlevent');
-INSERT INTO om_visit_class VALUES (0, 'Open visit', NULL, true, true, false, NULL, 'role_om',  null,  null, 'visit_class_0', 'om_visit');
-INSERT INTO om_visit_class VALUES (2, 'Inspection and clean connec', NULL, true, false, true, 'CONNEC', 'role_om', 1, null, 'visit_connec_insp', 've_visit_connec_insp');
-INSERT INTO om_visit_class VALUES (4, 'Leak on connec', NULL, true, false, false, 'CONNEC', 'role_om', 1, null, 'visit_connec_leak', 've_visit_connec_singlevent');
-INSERT INTO om_visit_class VALUES (3, 'Leak on node', NULL, true, false, false, 'NODE', 'role_om', 1, null, 'visit_node_leak', 've_visit_node_singlevent');
-INSERT INTO om_visit_class VALUES (8, 'Incident', NULL, true, false, true, null, 'role_om', 2, null, 'unspected_noinfra', 've_visit_noinfra');
-INSERT INTO om_visit_class VALUES (9, 'Rehabilitation arc', NULL, true, false, true, 'ARC', 'role_om', 1, null, 've_visit_arc_rehabit', 've_visit_arc_rehabit');
+INSERT INTO config_visit_class VALUES (6, 'Inspection and clean arc', NULL, true, false, true, 'ARC', 'role_om', 1, null, 'visit_arc_insp', 've_visit_arc_insp');
+INSERT INTO config_visit_class VALUES (5, 'Inspection and clean node', NULL, true, false, true, 'NODE', 'role_om', 1, null, 'visit_node_insp', 've_visit_node_insp');
+INSERT INTO config_visit_class VALUES (7, 'Inspection and clean gully', NULL, true, false, true, 'GULLY', 'role_om', 1, null, 'visit_emb_insp', 'visit_emb_insp');
+INSERT INTO config_visit_class VALUES (1, 'Leak on pipe', NULL, true, false, false, 'ARC', 'role_om', 1, null, 'visit_arc_leak', 've_visit_arc_singlevent');
+INSERT INTO config_visit_class VALUES (0, 'Open visit', NULL, true, true, false, NULL, 'role_om',  null,  null, 'visit_class_0', 'om_visit');
+INSERT INTO config_visit_class VALUES (2, 'Inspection and clean connec', NULL, true, false, true, 'CONNEC', 'role_om', 1, null, 'visit_connec_insp', 've_visit_connec_insp');
+INSERT INTO config_visit_class VALUES (4, 'Leak on connec', NULL, true, false, false, 'CONNEC', 'role_om', 1, null, 'visit_connec_leak', 've_visit_connec_singlevent');
+INSERT INTO config_visit_class VALUES (3, 'Leak on node', NULL, true, false, false, 'NODE', 'role_om', 1, null, 'visit_node_leak', 've_visit_node_singlevent');
+INSERT INTO config_visit_class VALUES (8, 'Incident', NULL, true, false, true, null, 'role_om', 2, null, 'unspected_noinfra', 've_visit_noinfra');
+INSERT INTO config_visit_class VALUES (9, 'Rehabilitation arc', NULL, true, false, true, 'ARC', 'role_om', 1, null, 've_visit_arc_rehabit', 've_visit_arc_rehabit');
 
-SELECT setval('SCHEMA_NAME.om_visit_class_id_seq', (SELECT max(id) FROM om_visit_class), true);
+SELECT setval('SCHEMA_NAME.om_visit_class_id_seq', (SELECT max(id) FROM config_visit_class), true);
 
 INSERT INTO config_visit_parameter VALUES ('arc_rehabit_1', NULL, 'REHABIT', 'ARC', 'TEXT', NULL, 'Rehabilitation arc parameter 1', 'event_ud_arc_rehabit', NULL, 'FALSE');
 INSERT INTO config_visit_parameter VALUES ('arc_rehabit_2', NULL, 'REHABIT', 'ARC', 'TEXT', NULL, 'Rehabilitation arc parameter 2', 'event_ud_arc_rehabit', NULL, 'FALSE');
@@ -100,16 +100,16 @@ CREATE OR REPLACE VIEW ve_visit_noinfra AS
     a.param_1 AS incident_type,
     a.param_2 AS incident_comment
    FROM om_visit
-     JOIN om_visit_class ON om_visit_class.id = om_visit.class_id
+     JOIN config_visit_class ON config_visit_class.id = om_visit.class_id
      LEFT JOIN ( SELECT ct.visit_id,
             ct.param_1,
             ct.param_2
            FROM crosstab('SELECT visit_id, om_visit_event.parameter_id, value 
       FROM om_visit LEFT JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id 
-      LEFT JOIN om_visit_class on om_visit_class.id=om_visit.class_id
+      LEFT JOIN config_visit_class on config_visit_class.id=om_visit.class_id
       LEFT JOIN config_visit_class_x_parameter on config_visit_class_x_parameter.parameter_id=om_visit_event.parameter_id
-      where om_visit_class.ismultievent = TRUE ORDER  BY 1,2'::text, ' VALUES (''incident_type''),(''incident_comment'')'::text) ct(visit_id integer, param_1 text, param_2 text)) a ON a.visit_id = om_visit.id
-  WHERE om_visit_class.ismultievent = true;
+      where config_visit_class.ismultievent = TRUE ORDER  BY 1,2'::text, ' VALUES (''incident_type''),(''incident_comment'')'::text) ct(visit_id integer, param_1 text, param_2 text)) a ON a.visit_id = om_visit.id
+  WHERE config_visit_class.ismultievent = true;
 
 
 
@@ -135,7 +135,7 @@ CREATE OR REPLACE VIEW ve_visit_arc_insp AS
     a.param_2 AS defect_arc,
     a.param_3 AS clean_arc
    FROM om_visit
-     JOIN om_visit_class ON om_visit_class.id = om_visit.class_id
+     JOIN config_visit_class ON config_visit_class.id = om_visit.class_id
      JOIN om_visit_x_arc ON om_visit.id = om_visit_x_arc.visit_id
      LEFT JOIN ( SELECT ct.visit_id,
             ct.param_1,
@@ -143,10 +143,10 @@ CREATE OR REPLACE VIEW ve_visit_arc_insp AS
             ct.param_3
            FROM crosstab('SELECT visit_id, om_visit_event.parameter_id, value 
       FROM om_visit LEFT JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id 
-      LEFT JOIN om_visit_class on om_visit_class.id=om_visit.class_id
+      LEFT JOIN config_visit_class on config_visit_class.id=om_visit.class_id
       LEFT JOIN config_visit_class_x_parameter on config_visit_class_x_parameter.parameter_id=om_visit_event.parameter_id
-      where om_visit_class.ismultievent = TRUE ORDER  BY 1,2'::text, ' VALUES (''sediments_arc''),(''defect_arc''),(''clean_arc'')'::text) ct(visit_id integer, param_1 text, param_2 text, param_3 text)) a ON a.visit_id = om_visit.id
-  WHERE om_visit_class.ismultievent = true;
+      where config_visit_class.ismultievent = TRUE ORDER  BY 1,2'::text, ' VALUES (''sediments_arc''),(''defect_arc''),(''clean_arc'')'::text) ct(visit_id integer, param_1 text, param_2 text, param_3 text)) a ON a.visit_id = om_visit.id
+  WHERE config_visit_class.ismultievent = true;
 
 
 DROP VIEW IF EXISTS ve_visit_arc_rehabit;
@@ -170,18 +170,18 @@ CREATE OR REPLACE VIEW ve_visit_arc_rehabit AS
     a.param_1 AS arc_rehabit_1,
     a.param_2 AS arc_rehabit_2
    FROM om_visit
-     JOIN om_visit_class ON om_visit_class.id = om_visit.class_id
+     JOIN config_visit_class ON config_visit_class.id = om_visit.class_id
      JOIN om_visit_x_arc ON om_visit.id = om_visit_x_arc.visit_id
      LEFT JOIN ( SELECT ct.visit_id,
             ct.param_1,
             ct.param_2
            FROM crosstab('SELECT visit_id, om_visit_event.parameter_id, value 
       FROM om_visit LEFT JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id 
-      LEFT JOIN om_visit_class on om_visit_class.id=om_visit.class_id
+      LEFT JOIN config_visit_class on config_visit_class.id=om_visit.class_id
       LEFT JOIN config_visit_class_x_parameter on config_visit_class_x_parameter.parameter_id=om_visit_event.parameter_id
-      where om_visit_class.ismultievent = TRUE ORDER  BY 1,2'::text, ' VALUES (''arc_rehabit_1''),(''arc_rehabit_2'')'::text) ct(visit_id integer, param_1 text, param_2 text)) a 
+      where config_visit_class.ismultievent = TRUE ORDER  BY 1,2'::text, ' VALUES (''arc_rehabit_1''),(''arc_rehabit_2'')'::text) ct(visit_id integer, param_1 text, param_2 text)) a 
      ON a.visit_id = om_visit.id
-  WHERE om_visit_class.ismultievent = true;
+  WHERE config_visit_class.ismultievent = true;
 
 DROP VIEW IF EXISTS ve_visit_node_insp;
 CREATE OR REPLACE VIEW ve_visit_node_insp AS 
@@ -205,7 +205,7 @@ CREATE OR REPLACE VIEW ve_visit_node_insp AS
     a.param_2 AS defect_node,
     a.param_3 AS clean_node
    FROM om_visit
-     JOIN om_visit_class ON om_visit_class.id = om_visit.class_id
+     JOIN config_visit_class ON config_visit_class.id = om_visit.class_id
      JOIN om_visit_x_node ON om_visit.id = om_visit_x_node.visit_id
      LEFT JOIN ( SELECT ct.visit_id,
             ct.param_1,
@@ -213,10 +213,10 @@ CREATE OR REPLACE VIEW ve_visit_node_insp AS
             ct.param_3
            FROM crosstab('SELECT visit_id, om_visit_event.parameter_id, value 
       FROM om_visit LEFT JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id 
-      LEFT JOIN om_visit_class on om_visit_class.id=om_visit.class_id
+      LEFT JOIN config_visit_class on config_visit_class.id=om_visit.class_id
       LEFT JOIN config_visit_class_x_parameter on config_visit_class_x_parameter.parameter_id=om_visit_event.parameter_id
-      where om_visit_class.ismultievent = TRUE ORDER  BY 1,2'::text, ' VALUES (''sediments_node''),(''defect_node''),(''clean_node'')'::text) ct(visit_id integer, param_1 text, param_2 text, param_3 text)) a ON a.visit_id = om_visit.id
-  WHERE om_visit_class.ismultievent = true;
+      where config_visit_class.ismultievent = TRUE ORDER  BY 1,2'::text, ' VALUES (''sediments_node''),(''defect_node''),(''clean_node'')'::text) ct(visit_id integer, param_1 text, param_2 text, param_3 text)) a ON a.visit_id = om_visit.id
+  WHERE config_visit_class.ismultievent = true;
 
 
 DROP VIEW IF EXISTS ve_visit_connec_insp;
@@ -241,7 +241,7 @@ CREATE OR REPLACE VIEW ve_visit_connec_insp AS
     a.param_2 AS defect_connec,
     a.param_3 AS clean_connec
    FROM om_visit
-     JOIN om_visit_class ON om_visit_class.id = om_visit.class_id
+     JOIN config_visit_class ON config_visit_class.id = om_visit.class_id
      JOIN om_visit_x_connec ON om_visit.id = om_visit_x_connec.visit_id
      LEFT JOIN ( SELECT ct.visit_id,
             ct.param_1,
@@ -249,10 +249,10 @@ CREATE OR REPLACE VIEW ve_visit_connec_insp AS
             ct.param_3
            FROM crosstab('SELECT visit_id, om_visit_event.parameter_id, value 
       FROM om_visit LEFT JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id 
-      LEFT JOIN om_visit_class on om_visit_class.id=om_visit.class_id
+      LEFT JOIN config_visit_class on config_visit_class.id=om_visit.class_id
       LEFT JOIN config_visit_class_x_parameter on config_visit_class_x_parameter.parameter_id=om_visit_event.parameter_id
-      where om_visit_class.ismultievent = TRUE ORDER  BY 1,2'::text, ' VALUES (''sediments_connec''),(''defect_connec''),(''clean_connec'')'::text) ct(visit_id integer, param_1 text, param_2 text, param_3 text)) a ON a.visit_id = om_visit.id
-  WHERE om_visit_class.ismultievent = true;
+      where config_visit_class.ismultievent = TRUE ORDER  BY 1,2'::text, ' VALUES (''sediments_connec''),(''defect_connec''),(''clean_connec'')'::text) ct(visit_id integer, param_1 text, param_2 text, param_3 text)) a ON a.visit_id = om_visit.id
+  WHERE config_visit_class.ismultievent = true;
 
 
 DROP VIEW IF EXISTS ve_visit_gully_insp;
@@ -276,18 +276,18 @@ CREATE OR REPLACE VIEW ve_visit_gully_insp AS
     a.param_1 AS clean_gully,
     a.param_2 AS smells_gully
    FROM om_visit
-     JOIN om_visit_class ON om_visit_class.id = om_visit.class_id
+     JOIN config_visit_class ON config_visit_class.id = om_visit.class_id
      JOIN om_visit_x_gully ON om_visit.id = om_visit_x_gully.visit_id
      LEFT JOIN ( SELECT ct.visit_id,
             ct.param_1,
             ct.param_2
            FROM crosstab('SELECT visit_id, om_visit_event.parameter_id, value 
       FROM om_visit LEFT JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id 
-      LEFT JOIN om_visit_class on om_visit_class.id=om_visit.class_id
+      LEFT JOIN config_visit_class on config_visit_class.id=om_visit.class_id
       LEFT JOIN config_visit_class_x_parameter on config_visit_class_x_parameter.parameter_id=om_visit_event.parameter_id
-      where om_visit_class.ismultievent = TRUE ORDER  BY 1,2'::text, ' VALUES (''clean_gully''),(''smells_gully'')'::text) ct(visit_id integer, param_1 text, param_2 text)) a 
+      where config_visit_class.ismultievent = TRUE ORDER  BY 1,2'::text, ' VALUES (''clean_gully''),(''smells_gully'')'::text) ct(visit_id integer, param_1 text, param_2 text)) a 
      ON a.visit_id = om_visit.id
-  WHERE om_visit_class.ismultievent = true;
+  WHERE config_visit_class.ismultievent = true;
 
 
 INSERT INTO om_typevalue VALUES ('visit_cleaned', 1, 'Yes', NULL, NULL);

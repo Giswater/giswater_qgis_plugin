@@ -21,7 +21,7 @@ BEGIN
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
     visit_class:= TG_ARGV[0];
 
-    visit_table=(SELECT lower(feature_type) FROM om_visit_class WHERE id=visit_class);
+    visit_table=(SELECT lower(feature_type) FROM config_visit_class WHERE id=visit_class);
 
 
     IF TG_OP = 'INSERT' THEN
@@ -44,8 +44,8 @@ BEGIN
 	-- Get related parameters(events) from visit_class
 	v_query_text='	SELECT * FROM config_visit_parameter
 			JOIN config_visit_parameter_action on config_visit_parameter_action.parameter_id=config_visit_parameter.id
-			JOIN om_visit_class ON om_visit_class.id=config_visit_parameter_action.class_id
-			WHERE om_visit_class.id='||visit_class||' AND om_visit_class.ismultievent is true';
+			JOIN config_visit_class ON config_visit_class.id=config_visit_parameter_action.class_id
+			WHERE config_visit_class.id='||visit_class||' AND config_visit_class.ismultievent is true';
 
 	FOR v_parameters IN EXECUTE v_query_text
         LOOP
@@ -85,8 +85,8 @@ BEGIN
    	-- Get related parameters(events) from visit_class
 	v_query_text='	SELECT * FROM config_visit_parameter
 			JOIN config_visit_parameter_action on config_visit_parameter_action.parameter_id=config_visit_parameter.id
-			JOIN om_visit_class ON om_visit_class.id=config_visit_parameter_action.class_id
-			WHERE om_visit_class.id='||visit_class||' AND om_visit_class.ismultievent is true';
+			JOIN config_visit_class ON config_visit_class.id=config_visit_parameter_action.class_id
+			WHERE config_visit_class.id='||visit_class||' AND config_visit_class.ismultievent is true';
 
 	FOR v_parameters IN EXECUTE v_query_text 
 	LOOP

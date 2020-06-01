@@ -104,13 +104,13 @@ Generate one form for layer and one form for visitclass=incident
 	--  get visitclass
 	v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('visitclass_vdefault_', v_featuretype) AND cur_user=current_user)::integer;		
 	IF v_visitclass IS NULL THEN
-		v_visitclass := (SELECT id FROM om_visit_class WHERE feature_type=upper(v_featuretype) LIMIT 1);
+		v_visitclass := (SELECT id FROM config_visit_class WHERE feature_type=upper(v_featuretype) LIMIT 1);
 	END IF;
 	
 	
 	--  get formname and tablename
-	v_formname := (SELECT formname FROM om_visit_class WHERE visitclass_id=v_visitclass);
-	v_tablename := (SELECT tablename FROM om_visit_class WHERE visitclass_id=v_visitclass);
+	v_formname := (SELECT formname FROM config_visit_class WHERE visitclass_id=v_visitclass);
+	v_tablename := (SELECT tablename FROM config_visit_class WHERE visitclass_id=v_visitclass);
 
 	RAISE NOTICE '--- VISIT PARAMETERS: newvisitform: % featuretype: %,  visitclass: %,  formname: %,  tablename: %,  device: % ---',isnewvisit, v_featuretype, v_visitclass, v_formname, v_tablename, v_device;
 

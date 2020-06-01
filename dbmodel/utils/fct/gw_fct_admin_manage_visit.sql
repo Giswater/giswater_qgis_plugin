@@ -183,7 +183,7 @@ BEGIN
 
 	--capture the id of the class
 	IF v_class_id IS NULL AND  v_action_type = 'parameter' THEN
-		SELECT id INTO v_class_id FROM om_visit_class WHERE idval = v_class_name;
+		SELECT id INTO v_class_id FROM config_visit_class WHERE idval = v_class_name;
 
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (219, null, 4, concat('Update class ', v_class_id,' - ',v_class_name,'.'));
@@ -201,12 +201,12 @@ BEGIN
 	raise notice 'v_old_parameters,%,%',v_old_parameters,v_class_id;
 
 	--reset the value of sequence for tables where data will be inserted
-	PERFORM setval('SCHEMA_NAME.om_visit_class_id_seq', (SELECT max(id) FROM om_visit_class), true);
+	PERFORM setval('SCHEMA_NAME.om_visit_class_id_seq', (SELECT max(id) FROM config_visit_class), true);
 
 	IF v_action = 'CREATE' THEN
 		--insert new class and parameter
 		IF v_action_type = 'class' THEN
-			INSERT INTO om_visit_class (idval, descript, active, ismultifeature, ismultievent, feature_type, sys_role_id, visit_type, param_options)
+			INSERT INTO config_visit_class (idval, descript, active, ismultifeature, ismultievent, feature_type, sys_role_id, visit_type, param_options)
 			VALUES (v_class_name, v_descript, v_active, v_ismultifeature, v_ismultievent,upper(v_feature_system_id), 'role_om', v_visit_type, v_param_options::json)
 			RETURNING id INTO v_class_id;
 
@@ -268,15 +268,15 @@ BEGIN
 
 				--rename dv_querytext for class_id in order to look for defined feature_type
 				IF v_feature_system_id = 'connec' THEN
-					UPDATE config_form_fields SET dv_querytext= 'SELECT id, idval FROM om_visit_class WHERE feature_type=''CONNEC'' AND 
+					UPDATE config_form_fields SET dv_querytext= 'SELECT id, idval FROM config_visit_class WHERE feature_type=''CONNEC'' AND 
 					active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))'
 					WHERE formname=v_viewname AND columnname='class_id';
 				ELSIF v_feature_system_id = 'node' THEN
-					UPDATE config_form_fields SET dv_querytext= 'SELECT id, idval FROM om_visit_class WHERE feature_type=''NODE'' AND 
+					UPDATE config_form_fields SET dv_querytext= 'SELECT id, idval FROM config_visit_class WHERE feature_type=''NODE'' AND 
 					active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))'
 					WHERE formname=v_viewname AND columnname='class_id';
 				ELSIF v_feature_system_id = 'gully' THEN
-					UPDATE config_form_fields SET dv_querytext= 'SELECT id, idval FROM om_visit_class WHERE feature_type=''GULLY'' AND 
+					UPDATE config_form_fields SET dv_querytext= 'SELECT id, idval FROM config_visit_class WHERE feature_type=''GULLY'' AND 
 					active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))'
 					WHERE formname=v_viewname AND columnname='class_id';
 				END IF;

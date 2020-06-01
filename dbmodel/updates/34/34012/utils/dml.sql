@@ -16,6 +16,7 @@ UPDATE config_csv SET active = TRUE;
 DELETE FROM config_csv WHERE fid IN(2,5,6,7, 140, 141, 239,240, 246,247);
 
 -- sys_table
+UPDATE sys_table SET id = 'config_visit_class'  where id ='om_visit_class';
 UPDATE sys_table SET sys_sequence = null, sys_sequence_field = null where id ='config_csv';
 UPDATE sys_table SET id = 'config_fprocess' WHERE id = 'config_csv_param';
 UPDATE sys_table SET id = 'temp_csv' WHERE id = 'temp_csv2pg';
@@ -85,7 +86,7 @@ UPDATE config_fprocess SET fid = 141 WHERE fid = 10;
 UPDATE config_fprocess SET fid = 140 WHERE fid = 11;
 UPDATE config_fprocess SET fid2 = 239 WHERE fid2 = 11;
 
-
+UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'om_visit_class', 'config_visit_class')  WHERE dv_querytext like '%om_visit_class%';
 
 
 

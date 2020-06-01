@@ -8,6 +8,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2020/05/25
 
+ALTER TABLE om_visit_class RENAME TO config_visit_class;
 
 ALTER TABLE audit_check_project RENAME fprocesscat_id TO fid;
 
@@ -94,6 +95,8 @@ ALTER TABLE sys_foreingkey ALTER column active SET DEFAULT TRUE;
 --DROP SEQUENCE config_info_table_x_type_id_seq;
 
 ALTER SEQUENCE man_addfields_parameter_id_seq RENAME TO sys_addfields_id_seq;
+
+ALTER SEQUENCE temp_csv2pg_id_seq RENAME TO temp_csv_id_seq;
 
 -- rename constraints (fid, audit_check_project)
 
