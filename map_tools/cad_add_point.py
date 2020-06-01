@@ -14,7 +14,7 @@ from functools import partial
 
 from .. import utils_giswater
 from .parent import ParentMapTool
-from ..ui_manager import Cad_add_point
+from ..ui_manager import AuxPoint
 
 
 class CadAddPoint(ParentMapTool):
@@ -35,7 +35,7 @@ class CadAddPoint(ParentMapTool):
     def init_create_point_form(self, point_1=None, point_2=None):
 
         # Create the dialog and signals
-        self.dlg_create_point = Cad_add_point()
+        self.dlg_create_point = AuxPoint()
         self.load_settings(self.dlg_create_point)
 
         validator = QDoubleValidator(-99999.99, 99999.999, 3)
@@ -53,7 +53,7 @@ class CadAddPoint(ParentMapTool):
         else:
             self.dlg_create_point.rb_right.setChecked(True)
 
-        self.open_dialog(self.dlg_create_point, maximize_button=False)
+        self.open_dialog(self.dlg_create_point, dlg_name='auxpoint' ,maximize_button=False)
 
 
     def get_values(self, point_1, point_2):

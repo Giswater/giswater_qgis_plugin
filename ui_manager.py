@@ -216,8 +216,8 @@ class AuxCircle(GwDialog, FORM_CLASS):
     pass
         
 
-FORM_CLASS = get_ui_class('cad_add_point.ui')
-class Cad_add_point(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('auxpoint.ui')
+class AuxPoint(GwDialog, FORM_CLASS):
     pass
 
 
