@@ -285,8 +285,8 @@ class DocManager(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('draw_profile.ui')
-class DrawProfile(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('profile.ui')
+class Profile(GwDialog, FORM_CLASS):
     pass
 
 

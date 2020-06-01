@@ -24,7 +24,7 @@ import json
 
 from .. import utils_giswater
 from .parent import ParentMapTool
-from ..ui_manager import DrawProfile
+from ..ui_manager import Profile
 from ..ui_manager import LoadProfiles
 
 
@@ -80,7 +80,7 @@ class DrawProfiles(ParentMapTool):
         self.version = str(row[0][:1])
 
         # Set dialog
-        self.dlg_draw_profile = DrawProfile()
+        self.dlg_draw_profile = Profile()
         self.load_settings(self.dlg_draw_profile)
         self.dlg_draw_profile.setWindowFlags(Qt.WindowStaysOnTopHint)
 
@@ -142,7 +142,7 @@ class DrawProfiles(ParentMapTool):
         self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
         self.list_of_selected_nodes = []
 
-        self.open_dialog(self.dlg_draw_profile)
+        self.open_dialog(self.dlg_draw_profile, dlg_name='profile')
 
 
     def set_composer_path(self):

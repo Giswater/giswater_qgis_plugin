@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>draw_profile</class>
- <widget class="QDialog" name="draw_profile">
+ <class>dlg_profile</class>
+ <widget class="QDialog" name="dlg_profile">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -107,7 +107,7 @@
            </widget>
           </item>
           <item row="0" column="0">
-           <widget class="QLabel" name="label_3">
+           <widget class="QLabel" name="lbl_profile_id">
             <property name="text">
              <string>Profile ID:</string>
             </property>
@@ -117,7 +117,7 @@
            <widget class="QLineEdit" name="profile_id"/>
           </item>
           <item row="1" column="0">
-           <widget class="QLabel" name="label">
+           <widget class="QLabel" name="lbl_start_point">
             <property name="text">
              <string>Start point:</string>
             </property>
@@ -151,7 +151,7 @@
            </widget>
           </item>
           <item row="2" column="0">
-           <widget class="QLabel" name="label_2">
+           <widget class="QLabel" name="lbl_end_point">
             <property name="text">
              <string>End point:</string>
             </property>
@@ -160,7 +160,7 @@
          </layout>
         </item>
         <item>
-         <widget class="QLabel" name="label_6">
+         <widget class="QLabel" name="lbl_additional_point">
           <property name="text">
            <string>Additional point:</string>
           </property>
@@ -236,7 +236,7 @@
       <item row="0" column="0">
        <layout class="QGridLayout" name="gridLayout_5">
         <item row="0" column="0">
-         <widget class="QLabel" name="label_10">
+         <widget class="QLabel" name="lbl_path">
           <property name="text">
            <string>Path:</string>
           </property>
@@ -250,7 +250,7 @@
          </widget>
         </item>
         <item row="3" column="0">
-         <widget class="QLabel" name="label_7">
+         <widget class="QLabel" name="lbl_rotation">
           <property name="text">
            <string>Rotation:</string>
           </property>
@@ -264,7 +264,7 @@
          </widget>
         </item>
         <item row="4" column="2">
-         <widget class="QLabel" name="label_9">
+         <widget class="QLabel" name="lbl_sh">
           <property name="enabled">
            <bool>true</bool>
           </property>
@@ -274,7 +274,7 @@
          </widget>
         </item>
         <item row="3" column="2">
-         <widget class="QLabel" name="label_8">
+         <widget class="QLabel" name="lbl_sv">
           <property name="text">
            <string>SV:</string>
           </property>
@@ -291,14 +291,14 @@
          </widget>
         </item>
         <item row="2" column="0">
-         <widget class="QLabel" name="label_4">
+         <widget class="QLabel" name="lbl_title">
           <property name="text">
            <string>Title:</string>
           </property>
          </widget>
         </item>
         <item row="1" column="0">
-         <widget class="QLabel" name="label_5">
+         <widget class="QLabel" name="lbl_template">
           <property name="minimumSize">
            <size>
             <width>0</width>
