@@ -212,8 +212,9 @@ BEGIN
 		VALUES ('admin_schema_info', v_schema_info,'json','system', 'Basic information about schema','utils', 'Schema manager:', false);
 
 		-- fk from utils schema
-		PERFORM gw_fct_admin_schema_utils_fk();  -- this is the posiition to use it because of we need values on version table to workwith
-		
+		IF (SELECT value FROM config_param_system WHERE parameter='admin_utils_schema') IS NOT NULL THEN
+			PERFORM gw_fct_admin_schema_utils_fk();  -- this is the position to use it because we need values on version table to work with
+		END IF;
 		-- generate child views 
 		PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
 		"data":{"filterFields":{}, "pageInfo":{}, "multi_create":true}}$$)::text;
