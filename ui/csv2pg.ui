@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>csv2pg</class>
- <widget class="QDialog" name="csv2pg">
+ <class>dlg_csv2pg</class>
+ <widget class="QDialog" name="dlg_csv2pg">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -49,7 +49,7 @@
         <item row="0" column="1">
          <widget class="QPushButton" name="btn_accept">
           <property name="text">
-           <string>Ok</string>
+           <string>Accept</string>
           </property>
          </widget>
         </item>
@@ -81,7 +81,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout">
             <item>
-             <widget class="QLabel" name="label_units_2">
+             <widget class="QLabel" name="lbl_import_type">
               <property name="text">
                <string>Import type:</string>
               </property>
@@ -126,7 +126,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="QLabel" name="label_units_3">
+             <widget class="QLabel" name="lbl_import_label">
               <property name="text">
                <string>Import label:</string>
               </property>
@@ -160,7 +160,7 @@
           <item>
            <layout class="QVBoxLayout" name="verticalLayout">
             <item>
-             <widget class="QLabel" name="label_checkfreq_2">
+             <widget class="QLabel" name="lbl_file">
               <property name="text">
                <string>File:</string>
               </property>
@@ -185,7 +185,7 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_3">
               <item>
-               <widget class="QLabel" name="label_units_4">
+               <widget class="QLabel" name="lbl_set_of_charac">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
                   <horstretch>0</horstretch>
@@ -236,7 +236,7 @@
                </spacer>
               </item>
               <item>
-               <widget class="QLabel" name="label_units_5">
+               <widget class="QLabel" name="lbl_delimiter">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
                   <horstretch>0</horstretch>

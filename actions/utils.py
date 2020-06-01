@@ -48,9 +48,10 @@ class Utils(ParentAction):
     def utils_import_csv(self):
         """ Button 83: Import CSV """
 
-        self.func_name  = None
+        self.func_name = None
         self.dlg_csv = Csv2Pg()
         self.load_settings(self.dlg_csv)
+
         # Get roles from BD
         roles = self.controller.get_rolenames()
         temp_tablename = 'temp_csv'
@@ -80,7 +81,7 @@ class Utils(ParentAction):
         self.dlg_csv.progressBar.setVisible(False)
 
         # Open dialog
-        self.open_dialog(self.dlg_csv)
+        self.open_dialog(self.dlg_csv, dlg_name='csv2pg')
 
 
     def get_function_name(self):
