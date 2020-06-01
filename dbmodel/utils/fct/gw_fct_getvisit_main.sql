@@ -460,7 +460,7 @@ BEGIN
 				END IF;
 				
 				RAISE NOTICE ' --- GETTING tabData DEFAULT VALUES ON NEW VISIT ---';
-				SELECT gw_fct_getformfields( v_formname, 'visit', 'data', v_tablename, null, null, null, 'INSERT', null, v_device) INTO v_fields;
+				SELECT gw_fct_getformfields( v_formname, 'form_visit', 'data', v_tablename, null, null, null, 'INSERT', null, v_device) INTO v_fields;
 
 				FOREACH aux_json IN ARRAY v_fields
 				LOOP					
@@ -545,7 +545,7 @@ BEGIN
 					
 				END LOOP;
 			ELSE 
-				SELECT gw_fct_getformfields( v_formname, 'visit', 'data', v_tablename, null, null, null, 'INSERT', null, v_device) INTO v_fields;
+				SELECT gw_fct_getformfields( v_formname, 'form_visit', 'data', v_tablename, null, null, null, 'INSERT', null, v_device) INTO v_fields;
 
 				RAISE NOTICE ' --- GETTING tabData VALUES ON VISIT  ---';
 

@@ -68,7 +68,7 @@ BEGIN
 	 v_device := ((p_data ->>'client')::json->>'device')::integer;
 
 	-- get fields
-	SELECT gw_fct_getformfields('infoplan', 'info', v_tabname, v_tablename, ((p_data ->>'feature')::json->>'idName'), ((p_data ->>'feature')::json->>'id'), null, null,null, v_device, null)
+	SELECT gw_fct_getformfields('infoplan', 'form_generic', v_tabname, v_tablename, ((p_data ->>'feature')::json->>'idName'), ((p_data ->>'feature')::json->>'id'), null, null,null, v_device, null)
 		INTO fields_array;
 
 	--	Add resumen values

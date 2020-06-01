@@ -58,9 +58,9 @@ BEGIN
 	IF  p_configtable THEN 
 
 		raise notice 'Configuration fields are defined on config_info_layer_field, calling gw_fct_getformfields with formname: % tablename: % id %', p_table_id, p_table_id, p_id;
-		SELECT formtype INTO v_formtype FROM config_form_fields WHERE formname = p_table_id LIMIT 1;
 
-		-- Call the function of feature fields generation      	
+		-- Call the function of feature fields generation
+        v_formtype = 'form_feature';
 		SELECT gw_fct_getformfields( p_table_id, v_formtype, 'data', p_table_id, p_idname, p_id, null, 'SELECT',null, p_device, v_values_array) INTO fields_array;
 	ELSE
 		raise notice 'Configuration fields are NOT defined on config_info_layer_field. System values will be used';

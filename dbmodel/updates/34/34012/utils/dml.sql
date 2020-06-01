@@ -101,4 +101,126 @@ DELETE FROM config_typevalue WHERE typevalue = 'widgetfunction_typevalue' AND id
 DELETE FROM config_typevalue WHERE typevalue = 'widgetfunction_typevalue' AND idval = 'gw_api_setprint';
 
 ALTER TABLE config_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
-ALTER TABLE config_form_tabs DISABLE TRIGGER gw_trg_typevalue_fk;
+
+UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'om_visit_class', 'config_visit_class')  WHERE dv_querytext like '%om_visit_class%';
+
+INSERT INTO config_form_tabs VALUES ('v_edit_node', 'tab_connection', 'Connections', 'Connections downstream and upstream', 'role_basic', NULL, '[
+{"actionName":"actionEdit", "actionTooltip":"Edit",  "disabled":false},
+{"actionName":"actionZoom", "actionTooltip":"Zoom In",  "disabled":false},
+{"actionName":"actionCentered", "actionTooltip":"Center",  "disabled":false},
+{"actionName":"actionZoomOut", "actionTooltip":"Zoom Out",  "disabled":false},
+{"actionName":"actionCatalog", "actionTooltip":"Change Catalog",  "disabled":false},
+{"actionName":"actionWorkcat", "actionTooltip":"Add Workcat",  "disabled":false},
+{"actionName":"actionCopyPaste", "actionTooltip":"Copy Paste",  "disabled":false},
+{"actionName":"actionSection", "actionTooltip":"Show Section",  "disabled":false},
+{"actionName":"actionLink", "actionTooltip":"Open Link",  "disabled":false},
+{"actionName":"actionHelp", "actionTooltip":"Help",  "disabled":false}]',4);
+
+
+
+UPDATE config_form_fields SET datatype = 'string' WHERE datatype = 'text';
+DELETE FROM config_typevalue WHERE id = 'text' AND typevalue = 'datatype_typevalue';
+DELETE FROM config_typevalue WHERE id = 'character varying' AND typevalue = 'datatype_typevalue';
+
+DELETE FROM sys_function WHERE function_name = 'gw_api_getrowinsert';
+
+UPDATE config_typevalue SET typevalue = 'linkedaction_typevalue' WHERE typevalue ='action_function_typevalue';
+UPDATE config_typevalue set typevalue = 'listlimit_typevalue' WHERE typevalue ='listlimit';
+
+UPDATE config_typevalue set id = 'template_generic', idval = 'template_generic', camelstyle = 'templateGeneric' WHERE id = 'GENERIC';
+UPDATE config_typevalue set id = 'template_feature', idval = 'template_feature', camelstyle = 'templateFeature' WHERE id = 'custom feature';
+
+UPDATE config_typevalue SET camelstyle = idval WHERE typevalue = 'datatype_typevalue';
+
+UPDATE config_typevalue set id = 'form_list_header', idval = 'form_list_header', camelstyle = 'formHeader' WHERE id = 'listHeader';
+UPDATE config_typevalue set id = 'form_list_footer', idval = 'form_list_footer',camelstyle = 'formHooter' WHERE id = 'listFooter';
+DELETE FROM config_typevalue WHERE id = 'listfilter';
+UPDATE config_typevalue set id = 'form_visit', idval = 'form_visit',camelstyle = 'formVisit' WHERE id = 'visit';
+UPDATE config_typevalue set id = 'form_lot', idval = 'form_lot',camelstyle = 'formLot' WHERE id = 'lot';
+UPDATE config_typevalue set id = 'form_generic', idval = 'form_generic',camelstyle = 'formGeneric' WHERE id = 'form';
+UPDATE config_typevalue set id = 'form_feature', idval = 'form_feature',camelstyle = 'formFeature' WHERE id = 'feature';
+UPDATE config_typevalue set id = 'form_catalog', idval = 'form_catalog',camelstyle = 'formCatalog' WHERE id = 'catalog';
+
+UPDATE config_typevalue set camelstyle = 'actionCatalog' WHERE id = 'action_catalog';
+UPDATE config_typevalue set camelstyle = 'actionLink' WHERE id = 'action_link';
+UPDATE config_typevalue set camelstyle = 'actionWorkcat' WHERE id = 'action_workcat';
+UPDATE config_typevalue set camelstyle = id WHERE typevalue ='listlimit_typevalue';
+UPDATE config_typevalue SET camelstyle = idval WHERE typevalue ='widgettype_typevalue';
+
+UPDATE config_typevalue set camelstyle = 'layoutBottom1' WHERE id = 'lyt_bot_1';
+UPDATE config_typevalue set camelstyle = 'layoutBottom2' WHERE id = 'lyt_bot_2';
+UPDATE config_typevalue set camelstyle = 'layoutData1' WHERE id = 'lyt_data_1';
+UPDATE config_typevalue set camelstyle = 'layoutData2' WHERE id = 'lyt_data_2';
+UPDATE config_typevalue set camelstyle = 'layoutData3' WHERE id = 'lyt_data_3';
+UPDATE config_typevalue set camelstyle = 'layoutDistance' WHERE id = 'lyt_distance';
+UPDATE config_typevalue set camelstyle = 'layoutOther' WHERE id = 'lyt_other';
+UPDATE config_typevalue set camelstyle = 'layoutDepth' WHERE id = 'lyt_depth';
+UPDATE config_typevalue set camelstyle = 'layoutSymbology' WHERE id = 'lyt_symbology';
+UPDATE config_typevalue set camelstyle = 'layoutTop1' WHERE id = 'lyt_top_1';
+
+UPDATE config_typevalue SET id = 'datetime', idval = 'datetime' WHERE id = 'datepickertime';
+
+UPDATE config_typevalue SET id = 'spinbox', idval = 'spinbox' WHERE id = 'doubleSpinbox';
+
+UPDATE config_typevalue SET id = 'divider', idval = 'divider' WHERE id = 'formDivider';
+UPDATE sys_param_user SET widgettype = 'divider' WHERE widgettype = 'formDivider';
+UPDATE config_param_system SET widgettype = 'divider' WHERE widgettype = 'formDivider';
+
+UPDATE config_typevalue set id = 'set_visit_manager_start', idval = 'set_visit_manager_start' WHERE id = 'gwSetVisitManagerStart';
+UPDATE config_typevalue set id = 'set_visit_manager_end', idval = 'set_visit_manager_end' WHERE id = 'gwSetVisitManagerEnd';
+UPDATE config_typevalue set id = 'get_visit_manager', idval = 'get_visit_manager' WHERE id = 'gwGetVisitManager';
+UPDATE config_typevalue set id = 'get_visit', idval = 'get_visit' WHERE id = 'gwGetVisit';
+UPDATE config_typevalue set id = 'set_visit_manager', idval = 'set_visit_manager' WHERE id = 'gwSetVisitManager';
+UPDATE config_typevalue set id = 'set_visit', idval = 'set_visit' WHERE id = 'gwSetVisit';
+UPDATE config_typevalue set id = 'get_lot', idval = 'get_lot' WHERE id = 'gwGetLot';
+UPDATE config_typevalue set id = 'set_previous_form_back', idval = 'set_previous_form_back' WHERE id = 'backButtonClicked';
+
+UPDATE config_typevalue set id = 'tab_user', idval = 'tab_user' WHERE id = 'tabUser';
+UPDATE config_typevalue set id = 'tab_network_state', idval = 'tab_network_state' WHERE id = 'tabNetworkState';
+UPDATE config_typevalue set id = 'tab_mincut', idval = 'tab_mincut' WHERE id = 'tabMincut';
+UPDATE config_typevalue set id = 'tab_lot', idval = 'tab_lot' WHERE id = 'tabLots';
+UPDATE config_typevalue set id = 'tab_hdyro_state', idval = 'tab_hdyro_state' WHERE id = 'tabHydroState';
+UPDATE config_typevalue set id = 'tab_file', idval = 'tab_file' WHERE id = 'tabFiles';
+UPDATE config_typevalue set id = 'tab_exploitation', idval = 'tab_exploitation' WHERE id = 'tabExploitation';
+UPDATE config_typevalue set id = 'tab_done', idval = 'tab_done' WHERE id = 'tabDone';
+UPDATE config_typevalue set id = 'tab_admin', idval = 'tab_admin' WHERE id = 'tabAdmin';
+
+UPDATE config_typevalue set camelstyle = 'gwGetCatalogId' WHERE id = 'get_catalog_id';
+UPDATE config_typevalue set camelstyle = 'tabWorkcat' WHERE id = 'tab_workcat';
+UPDATE config_typevalue set camelstyle = 'tabVisit' WHERE id = 'tab_visit';
+UPDATE config_typevalue set camelstyle = 'tabSearch' WHERE id = 'tab_search';
+UPDATE config_typevalue set camelstyle = 'tabPsector' WHERE id = 'tab_psector';
+UPDATE config_typevalue set camelstyle = 'tabRelations' WHERE id = 'tab_relations';
+UPDATE config_typevalue set camelstyle = 'tabOm' WHERE id = 'tab_om';
+UPDATE config_typevalue set camelstyle = 'tabNetwork' WHERE id = 'tab_network';
+UPDATE config_typevalue set id = 'tab_epa', idval = 'tab_epa', camelstyle = 'tabEpa' WHERE id = 'tab_inp';
+
+UPDATE config_typevalue set camelstyle = 'tabAddres' WHERE id = 'tab_address';
+UPDATE config_typevalue set camelstyle = 'tabHydro' WHERE id = 'tab_hydro';
+UPDATE config_typevalue set camelstyle = 'tabHydrometer' WHERE id = 'tab_hydrometer';
+UPDATE config_typevalue set camelstyle = 'tabHydrometerVal' WHERE id = 'tab_hydrometer_val';
+UPDATE config_typevalue set camelstyle = 'tabDocuments' WHERE id = 'tab_documents';
+UPDATE config_typevalue set camelstyle = 'tabConnections' WHERE id = 'tab_connections';
+UPDATE config_typevalue set camelstyle = 'tabData' WHERE id = 'tab_data';
+UPDATE config_typevalue set camelstyle = 'tabElements' WHERE id = 'tab_elements';
+UPDATE config_typevalue set id = 'get_info_node', idval ='get_info_node', camelstyle = 'gwGetInfoNode' WHERE id = 'info_node';
+UPDATE config_typevalue set id = 'set_open_url', idval ='set_open_url', camelstyle = 'gwOpenUrl' WHERE id = 'open_url';
+
+DELETE FROM config_typevalue WHERE id IN (select id FROM config_typevalue WHERE id = 'tabData' LIMIT 1);
+
+DELETE FROM config_typevalue WHERE id = 'gw_api_open_node';
+DELETE FROM config_typevalue WHERE id = 'gw_api_open_url';
+DELETE FROM config_typevalue WHERE id = 'gw_api_setprint';
+
+UPDATE sys_foreingkey SET target_field = 'layoutname' WHERE target_field = 'layout_name';
+UPDATE sys_foreingkey SET target_field = 'linkedaction', typevalue_name = 'linkedaction_typevalue' WHERE target_field = 'action_function';
+DELETE FROM sys_foreingkey WHERE target_field = 'message_type';
+
+ALTER TABLE config_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
+DELETE FROM config_typevalue WHERE id = 'get_catalog_id';
+DELETE FROM config_typevalue WHERE typevalue = 'mtype_typevalue';
+DELETE FROM config_typevalue WHERE id = 'data_1';
+DELETE FROM config_typevalue WHERE id = 'data_2';
+DELETE FROM config_typevalue WHERE id = 'data_9';
+ALTER TABLE config_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
+

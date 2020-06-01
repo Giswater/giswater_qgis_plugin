@@ -52,7 +52,7 @@ BEGIN
 
 	EXECUTE 'SELECT gw_fct_getformfields($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)'
 	INTO v_fields_array
-	USING 'dimensioning', 'catalog', '', NULL, NULL, NULL, NULL, 'SELECT', null, 3, null::json;
+	USING 'dimensioning', 'form_catalog', '', NULL, NULL, NULL, NULL, 'SELECT', null, 3, null::json;
 
 	-- Set widget_name without tabname for widgets
 	FOREACH field IN ARRAY v_fields_array

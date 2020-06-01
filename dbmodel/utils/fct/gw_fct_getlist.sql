@@ -392,7 +392,7 @@ BEGIN
 	v_pageinfo := json_build_object('orderBy',v_orderby, 'orderType', v_ordertype, 'currentPage', v_currentpage, 'lastPage', v_lastpage);
 
 	-- getting filter fields
-	SELECT gw_fct_getformfields(v_tablename, 'listHeader', v_tabname, null, null, null, null,'INSERT', null, v_device, null)
+	SELECT gw_fct_getformfields(v_tablename, 'form_list_header', v_tabname, null, null, null, null,'INSERT', null, v_device, null)
 		INTO v_filter_fields;
 
 		--  setting values of filter fields
@@ -438,7 +438,7 @@ BEGIN
 	END IF;
 
 	-- getting footer buttons
-	SELECT gw_fct_getformfields(v_tablename, 'listFooter', v_tabname, null, null, null, null,'INSERT', null, v_device, null)
+	SELECT gw_fct_getformfields(v_tablename, 'form_list_footer', v_tabname, null, null, null, null,'INSERT', null, v_device, null)
 		INTO v_footer_fields;
 
 	FOREACH aux_json IN ARRAY v_footer_fields

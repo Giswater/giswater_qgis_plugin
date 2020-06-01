@@ -8,6 +8,12 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2020/05/25
 
+
+
+ALTER TABLE config_typevalue RENAME COLUMN descript TO camelstyle;
+ALTER TABLE config_typevalue ADD CONSTRAINT config_typevalue_unique UNIQUE (id);
+
+
 ALTER TABLE om_visit_class RENAME TO config_visit_class;
 
 ALTER TABLE config_form_tableview RENAME column_id TO columnname;

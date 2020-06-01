@@ -83,7 +83,7 @@ BEGIN
        
 		-- Data tab
 		-----------
-		SELECT gw_fct_getformfields( 'lot', 'lot', 'data', null, null, null, null, 'INSERT', null, v_device, null) INTO v_fields;
+		SELECT gw_fct_getformfields( 'lot', 'form_lot', 'data', null, null, null, null, 'INSERT', null, v_device, null) INTO v_fields;
 		raise notice '-> %', v_idname;
 		-- getting values from feature
 		IF v_id IS NOT NULL THEN

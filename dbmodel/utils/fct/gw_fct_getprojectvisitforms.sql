@@ -122,7 +122,7 @@ Generate one form for layer and one form for visitclass=incident
 		-----------
 		RAISE NOTICE ' --- GETTING tabData DEFAULT VALUES ON NEW VISIT ---';
 
-		SELECT gw_fct_getformfields( v_formname, 'visit', 'data', null, null, null, null, 'INSERT', null, v_device, null) INTO v_fields;
+		SELECT gw_fct_getformfields( v_formname, 'form_visit', 'data', null, null, null, null, 'INSERT', null, v_device, null) INTO v_fields;
 		v_fields_json = array_to_json (v_fields);
 		v_fields_json := COALESCE(v_fields_json, '{}');	
 

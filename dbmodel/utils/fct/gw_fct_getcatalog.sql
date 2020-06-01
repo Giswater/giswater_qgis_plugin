@@ -71,7 +71,7 @@ BEGIN
 	fields_array[1] := gw_fct_json_object_set_key(fields_array[1], 'selectedId', v_matcat);
 
 	-- 	Calling function to build form fields
-	SELECT gw_fct_getformfields(v_formname, 'catalog', v_tabname, v_feature_type, null, null, null, 'INSERT',v_matcat, v_device, null)
+	SELECT gw_fct_getformfields(v_formname, 'form_catalog', v_tabname, v_feature_type, null, null, null, 'INSERT',v_matcat, v_device, null)
 		INTO fields_array;
 
 	--	Remove selectedId form fields
