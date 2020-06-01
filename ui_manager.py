@@ -211,8 +211,8 @@ class BasicTable(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('cad_add_circle.ui')
-class Cad_add_circle(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('auxcircle.ui')
+class AuxCircle(GwDialog, FORM_CLASS):
     pass
         
 

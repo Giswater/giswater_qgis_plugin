@@ -312,7 +312,7 @@ class AddNewLot(ParentManage):
         self.dlg_basic_table.btn_accept.clicked.connect(partial(self.save_basic_table, self.dlg_basic_table.tbl_basic, 'team'))
         self.dlg_basic_table.btn_add_row.clicked.connect(partial(self.add_row, self.dlg_basic_table.tbl_basic))
         self.dlg_basic_table.rejected.connect(partial(self.save_settings, self.dlg_basic_table))
-        self.open_dialog(self.dlg_basic_table)
+        self.open_dialog(self.dlg_basic_table, dlg_name='dialog_table')
 
 
     def populate_cmb_team(self):
@@ -1406,7 +1406,7 @@ class AddNewLot(ParentManage):
         self.dlg_basic_table.btn_accept.clicked.connect(partial(self.save_basic_table, self.dlg_basic_table.tbl_basic, 'vehicle'))
         self.dlg_basic_table.btn_add_row.clicked.connect(partial(self.add_row, self.dlg_basic_table.tbl_basic))
         self.dlg_basic_table.rejected.connect(partial(self.save_settings, self.dlg_basic_table))
-        self.open_dialog(self.dlg_basic_table)
+        self.open_dialog(self.dlg_basic_table, dlg_name='dialog_table')
 
         # Populate model visit
         sql = "SELECT * FROM v_om_team_x_vehicle ORDER BY id"

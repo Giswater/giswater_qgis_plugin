@@ -1154,7 +1154,7 @@ class ApiParent(ParentAction):
         self.dlg_dtext.rejected.connect(partial(self.save_settings, self.dlg_dtext))
         self.dlg_dtext.rejected.connect(partial(self.remove_interpolate_rb))
 
-        self.open_dialog(self.dlg_dtext)
+        self.open_dialog(self.dlg_dtext, dlg_name='dialog_text')
 
         # Set circle vertex marker
         color = QColor(255, 100, 255)

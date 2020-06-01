@@ -15,7 +15,7 @@ from functools import partial
 
 from .. import utils_giswater
 from .parent import ParentMapTool
-from ..ui_manager import Cad_add_circle
+from ..ui_manager import AuxCircle
 
 
 class CadAddCircle(ParentMapTool):
@@ -34,7 +34,7 @@ class CadAddCircle(ParentMapTool):
     def init_create_circle_form(self, point):
 
         # Create the dialog and signals
-        self.dlg_create_circle = Cad_add_circle()
+        self.dlg_create_circle = AuxCircle()
         self.load_settings(self.dlg_create_circle)
         self.cancel_circle = False
         validator = QDoubleValidator(0.00, 999.00, 3)
@@ -45,7 +45,7 @@ class CadAddCircle(ParentMapTool):
         self.dlg_create_circle.btn_cancel.clicked.connect(self.cancel)
         self.dlg_create_circle.radius.setFocus()
         
-        self.open_dialog(self.dlg_create_circle)
+        self.open_dialog(self.dlg_create_circle, dlg_name='auxcircle')
 
 
     def get_radius(self, point):

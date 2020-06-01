@@ -672,7 +672,7 @@ class MincutParent(ParentAction):
 
             self.add_layer.populate_info_text(self.dlg_dtext, result['body']['data'], False)
 
-            self.open_dialog(self.dlg_dtext)
+            self.open_dialog(self.dlg_dtext, dlg_name='dialog_text')
 
         elif result['body']['actions']['overlap'] == 'Ok':
             self.mincut_ok(result)

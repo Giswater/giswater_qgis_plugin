@@ -225,7 +225,7 @@ class ConnecMapTool(ParentMapTool):
                 self.dlg_dtext.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_dtext))
                 self.dlg_dtext.rejected.connect(partial(self.close_dialog, self.dlg_dtext))
                 self.populate_info_text(self.dlg_dtext, result['body']['data'], False)
-                self.open_dialog(self.dlg_dtext)
+                self.open_dialog(self.dlg_dtext, dlg_name='dialog_text')
 
             layer.removeSelection()
 
