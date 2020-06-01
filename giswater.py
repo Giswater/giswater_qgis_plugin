@@ -1365,7 +1365,7 @@ class Giswater(QObject):
             feature = '"tableName":"' + str(layer_name) + '", "id":"", "isLayer":true'
             extras = f'"infoType":"{self.qgis_project_infotype}"'
             body = self.create_body(feature=feature, extras=extras)
-            complet_result = self.controller.get_json('gw_fct_getinfofromid', body)
+            complet_result = self.controller.get_json('gw_fct_getinfofromid', body, log_sql=True)
             if not complet_result: continue
             
             for field in complet_result['body']['data']['fields']:

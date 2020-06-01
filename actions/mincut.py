@@ -27,7 +27,7 @@ from .parent import ParentAction
 from .mincut_config import MincutConfig
 from .multiple_selection import MultipleSelection
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
-from ..ui_manager import BasicInfoUi
+from ..ui_manager import DialogTextUi
 from ..ui_manager import Mincut
 from ..ui_manager import Mincut_fin
 from ..ui_manager import Mincut_add_hydrometer
@@ -661,18 +661,18 @@ class MincutParent(ParentAction):
                     self.add_layer.set_layer_symbology(layer, props)
                 layer.triggerRepaint()
                 self.iface.layerTreeView().refreshLayerSymbology(layer.id())
-            self.dlg_binfo = BasicInfoUi()
-            self.load_settings(self.dlg_binfo)
-            self.dlg_binfo.btn_close.setText('Cancel')
-            self.dlg_binfo.btn_accept.setText('Continue')
-            self.dlg_binfo.setWindowTitle('Mincut conflict')
-            self.dlg_binfo.btn_accept.clicked.connect(partial(self.force_mincut_overlap))
-            self.dlg_binfo.btn_accept.clicked.connect(partial(self.close_dialog, self.dlg_binfo))
-            self.dlg_binfo.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_binfo))
+            self.dlg_dtext = DialogTextUi()
+            self.load_settings(self.dlg_dtext)
+            self.dlg_dtext.btn_close.setText('Cancel')
+            self.dlg_dtext.btn_accept.setText('Continue')
+            self.dlg_dtext.setWindowTitle('Mincut conflict')
+            self.dlg_dtext.btn_accept.clicked.connect(partial(self.force_mincut_overlap))
+            self.dlg_dtext.btn_accept.clicked.connect(partial(self.close_dialog, self.dlg_dtext))
+            self.dlg_dtext.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_dtext))
 
-            self.add_layer.populate_info_text(self.dlg_binfo, result['body']['data'], False)
+            self.add_layer.populate_info_text(self.dlg_dtext, result['body']['data'], False)
 
-            self.open_dialog(self.dlg_binfo)
+            self.open_dialog(self.dlg_dtext)
 
         elif result['body']['actions']['overlap'] == 'Ok':
             self.mincut_ok(result)

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Info</class>
- <widget class="QDialog" name="Info">
+ <class>dlg_dialog_text</class>
+ <widget class="QDialog" name="dlg_dialog_text">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -14,7 +14,7 @@
    <string>Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="2" column="0">
+   <item row="1" column="0">
     <widget class="QTextEdit" name="txt_infolog">
      <property name="documentTitle">
       <string/>
@@ -24,7 +24,14 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="0">
+   <item row="0" column="0">
+    <widget class="QLabel" name="lbl_text">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <spacer name="horizontalSpacer">
@@ -54,13 +61,6 @@
       </widget>
      </item>
     </layout>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="lbl_title">
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
    </item>
   </layout>
  </widget>

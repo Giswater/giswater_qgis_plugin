@@ -25,7 +25,7 @@ from qgis.PyQt.QtWidgets import QApplication
 
 from functools import partial
 
-from ..ui_manager import  BasicInfoUi
+from ..ui_manager import  DialogTextUi
 from .parent import ParentMapTool
 
 
@@ -218,14 +218,14 @@ class ConnecMapTool(ParentMapTool):
             # Execute SQL function and show result to the user
             result = self.controller.get_json('gw_fct_connect_to_network', body, log_sql=True)
             if result:
-                self.dlg_binfo = BasicInfoUi()
-                self.load_settings(self.dlg_binfo)
-                self.dlg_binfo.btn_accept.hide()
-                self.dlg_binfo.setWindowTitle('Connect to network')
-                self.dlg_binfo.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_binfo))
-                self.dlg_binfo.rejected.connect(partial(self.close_dialog, self.dlg_binfo))
-                self.populate_info_text(self.dlg_binfo, result['body']['data'], False)
-                self.open_dialog(self.dlg_binfo)
+                self.dlg_dtext = DialogTextUi()
+                self.load_settings(self.dlg_dtext)
+                self.dlg_dtext.btn_accept.hide()
+                self.dlg_dtext.setWindowTitle('Connect to network')
+                self.dlg_dtext.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_dtext))
+                self.dlg_dtext.rejected.connect(partial(self.close_dialog, self.dlg_dtext))
+                self.populate_info_text(self.dlg_dtext, result['body']['data'], False)
+                self.open_dialog(self.dlg_dtext)
 
             layer.removeSelection()
 

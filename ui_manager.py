@@ -201,12 +201,12 @@ class ProjectCheckUi(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('basic_info.ui')
-class BasicInfoUi(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('dialog_text.ui')
+class DialogTextUi(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('basic_table.ui')
+FORM_CLASS = get_ui_class('dialog_table.ui')
 class BasicTable(GwDialog, FORM_CLASS):
     pass
 

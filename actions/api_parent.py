@@ -26,7 +26,7 @@ from .. import utils_giswater
 from .parent import ParentAction
 from .HyperLinkLabel import HyperLinkLabel
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
-from ..ui_manager import BasicInfoUi
+from ..ui_manager import DialogTextUi
 
 
 class ApiParent(ParentAction):
@@ -1133,7 +1133,7 @@ class ApiParent(ParentAction):
 
     def manage_close_interpolate(self):
 
-        self.save_settings(self.dlg_binfo)
+        self.save_settings(self.dlg_dtext)
         self.remove_interpolate_rb()
 
 
@@ -1142,19 +1142,19 @@ class ApiParent(ParentAction):
         self.rb_interpolate = []
         self.interpolate_result = None
         self.resetRubberbands()
-        self.dlg_binfo = BasicInfoUi()
-        self.load_settings(self.dlg_binfo)
+        self.dlg_dtext = DialogTextUi()
+        self.load_settings(self.dlg_dtext)
 
-        utils_giswater.setWidgetText(self.dlg_binfo, self.dlg_binfo.txt_infolog, 'Interpolate tool')
-        self.dlg_binfo.lbl_title.setText("Please, use the cursor to select two nodes to proceed with the "
+        utils_giswater.setWidgetText(self.dlg_dtext, self.dlg_dtext.txt_infolog, 'Interpolate tool')
+        self.dlg_dtext.lbl_text.setText("Please, use the cursor to select two nodes to proceed with the "
                                          "interpolation\nNode1: \nNode2:")
 
-        self.dlg_binfo.btn_accept.clicked.connect(partial(self.chek_for_existing_values))
-        self.dlg_binfo.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_binfo))
-        self.dlg_binfo.rejected.connect(partial(self.save_settings, self.dlg_binfo))
-        self.dlg_binfo.rejected.connect(partial(self.remove_interpolate_rb))
+        self.dlg_dtext.btn_accept.clicked.connect(partial(self.chek_for_existing_values))
+        self.dlg_dtext.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_dtext))
+        self.dlg_dtext.rejected.connect(partial(self.save_settings, self.dlg_dtext))
+        self.dlg_dtext.rejected.connect(partial(self.remove_interpolate_rb))
 
-        self.open_dialog(self.dlg_binfo)
+        self.open_dialog(self.dlg_dtext)
 
         # Set circle vertex marker
         color = QColor(255, 100, 255)
@@ -1228,13 +1228,13 @@ class ApiParent(ParentAction):
                     self.node1 = str(element_id)                    
                     rb = self.draw_point(QgsPointXY(result.point()),color=QColor(0, 150, 55, 100), width=10, is_new=True)
                     self.rb_interpolate.append(rb)
-                    self.dlg_binfo.lbl_title.setText(f"Node1: {self.node1}\nNode2:")
+                    self.dlg_dtext.lbl_text.setText(f"Node1: {self.node1}\nNode2:")
                     self.controller.show_message(message, message_level=0, parameter=self.node1)
                 elif self.node1 != str(element_id):
                     self.node2 = str(element_id)
                     rb = self.draw_point(QgsPointXY(result.point()),color=QColor(0, 150, 55, 100), width=10, is_new=True)
                     self.rb_interpolate.append(rb)
-                    self.dlg_binfo.lbl_title.setText(f"Node1: {self.node1}\nNode2: {self.node2}")
+                    self.dlg_dtext.lbl_text.setText(f"Node1: {self.node1}\nNode2: {self.node2}")
                     self.controller.show_message(message, message_level=0, parameter=self.node2)
 
         if self.node1 and self.node2:
@@ -1250,7 +1250,7 @@ class ApiParent(ParentAction):
             extras += f'"node2":"{self.node2}"}}'
             body = self.create_body(extras=extras)
             self.interpolate_result = self.controller.get_json('gw_fct_node_interpolate', body, log_sql=True)
-            self.add_layer.populate_info_text(self.dlg_binfo, self.interpolate_result['body']['data'])
+            self.add_layer.populate_info_text(self.dlg_dtext, self.interpolate_result['body']['data'])
 
 
     def chek_for_existing_values(self):
@@ -1279,7 +1279,7 @@ class ApiParent(ParentAction):
                 widget.setStyleSheet(None)
                 utils_giswater.setWidgetText(self.dlg_cf, widget, f'{v}')
                 widget.editingFinished.emit()
-        self.close_dialog(self.dlg_binfo)
+        self.close_dialog(self.dlg_dtext)
 
 
     def remove_interpolate_rb(self):

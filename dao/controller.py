@@ -25,7 +25,7 @@ from .pg_dao import PgDao
 from .logger import Logger
 from .. import utils_giswater
 from .. import sys_manager
-from ..ui_manager import BasicInfoUi
+from ..ui_manager import DialogTextUi
 
 
 class DaoController(object):
@@ -1725,11 +1725,11 @@ class DaoController(object):
     def show_exceptions_msg(self, title=None, msg="", window_title="Information about exception"):
         """ Show exception message in dialog """
 
-        self.dlg_info = BasicInfoUi()
+        self.dlg_info = DialogTextUi()
         self.dlg_info.btn_accept.setVisible(False)
         self.dlg_info.btn_close.clicked.connect(lambda: self.dlg_info.close())
         self.dlg_info.setWindowTitle(window_title)
-        if title: self.dlg_info.lbl_title.setText(title)
+        if title: self.dlg_info.lbl_text.setText(title)
         utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.txt_infolog, msg)
         self.dlg_info.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.set_text_bold(self.dlg_info.txt_infolog)
