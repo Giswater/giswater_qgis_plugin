@@ -11,7 +11,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 ALTER TABLE om_visit_class RENAME TO config_visit_class;
 
 ALTER TABLE config_form_tableview RENAME column_id TO columnname;
-ALTER TABLE config_form_tableview RENAME column_id TO columnindex;
+ALTER TABLE config_form_tableview RENAME column_index TO columnindex;
 ALTER TABLE config_form_tableview RENAME table_id TO tablename;
 
 
