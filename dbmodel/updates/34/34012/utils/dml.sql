@@ -86,17 +86,19 @@ UPDATE config_fprocess SET fid = 141 WHERE fid = 10;
 UPDATE config_fprocess SET fid = 140 WHERE fid = 11;
 UPDATE config_fprocess SET fid2 = 239 WHERE fid2 = 11;
 
+ALTER TABLE config_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
+
 DELETE FROM config_typevalue WHERE typevalue = 'mtype_typevalue';
 
-DELETE FROM config_typevalue WHERE typevalue = 'datatype_typevalue' AND ivdval = 'character varying';
+DELETE FROM config_typevalue WHERE typevalue = 'datatype_typevalue' AND idval = 'character varying';
 
-DELETE FROM config_typevalue WHERE typevalue = 'layout_name_typevalue' AND ivdval = 'data_1';
-DELETE FROM config_typevalue WHERE typevalue = 'layout_name_typevalue' AND ivdval = 'data_2';
-DELETE FROM config_typevalue WHERE typevalue = 'layout_name_typevalue' AND ivdval = 'data_9';
+DELETE FROM config_typevalue WHERE typevalue = 'layout_name_typevalue' AND idval = 'data_1';
+DELETE FROM config_typevalue WHERE typevalue = 'layout_name_typevalue' AND idval = 'data_2';
+DELETE FROM config_typevalue WHERE typevalue = 'layout_name_typevalue' AND idval = 'data_9';
 
-DELETE FROM config_typevalue WHERE typevalue = 'widgetfunction_typevalue' AND ivdval = 'gw_api_open_node';
-DELETE FROM config_typevalue WHERE typevalue = 'widgetfunction_typevalue' AND ivdval = 'gw_api_open_url';
-DELETE FROM config_typevalue WHERE typevalue = 'widgetfunction_typevalue' AND ivdval = 'gw_api_setprint';
+DELETE FROM config_typevalue WHERE typevalue = 'widgetfunction_typevalue' AND idval = 'gw_api_open_node';
+DELETE FROM config_typevalue WHERE typevalue = 'widgetfunction_typevalue' AND idval = 'gw_api_open_url';
+DELETE FROM config_typevalue WHERE typevalue = 'widgetfunction_typevalue' AND idval = 'gw_api_setprint';
 
-
+ALTER TABLE config_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
 ALTER TABLE config_form_tabs DISABLE TRIGGER gw_trg_typevalue_fk;
