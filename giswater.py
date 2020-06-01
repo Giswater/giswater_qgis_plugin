@@ -1372,11 +1372,11 @@ class Giswater(QObject):
                 _values = {}
 
                 # Get column index
-                fieldIndex = layer.fields().indexFromName(field['column_id'])
+                fieldIndex = layer.fields().indexFromName(field['columnname'])
 
                 # Hide selected fields according table config_api_form_fields.hidden
                 if 'hidden' in field:
-                    self.set_column_visibility(layer, field['column_id'], field['hidden'])
+                    self.set_column_visibility(layer, field['columnname'], field['hidden'])
 
                 # Set alias column
                 if field['label']:

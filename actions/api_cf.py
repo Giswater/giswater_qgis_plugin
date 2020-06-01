@@ -234,7 +234,6 @@ class ApiCF(ApiParent, QObject):
             extras += f', "activeLayer":"{active_layer}"'
             extras += f', "visibleLayer":{visible_layer}'
             extras += f', "addSchema":"{self.qgis_project_add_schema}"'
-            extras += f', "infoType":"{self.qgis_project_infotype}"'
             extras += f', "projecRole":"{self.qgis_project_role}"'
             extras += f', "coordinates":{{"xcoord":{point.x()},"ycoord":{point.y()}, "zoomRatio":{scale_zoom}}}'
             body = self.create_body(extras=extras)
