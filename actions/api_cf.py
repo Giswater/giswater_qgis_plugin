@@ -282,14 +282,14 @@ class ApiCF(ApiParent, QObject):
                 return False, None
 
         self.complet_result = row
-        if self.complet_result[0]['body']['form']['template'] == 'GENERIC':
+        if self.complet_result[0]['body']['form']['template'] == 'template_generic':
             result, dialog = self.open_generic_form(self.complet_result)
             # Fill self.my_json for new feature
             if feature_cat is not None:
                 self.manage_new_feature(self.complet_result, dialog)
             return result, dialog
 
-        elif self.complet_result[0]['body']['form']['template'] == 'custom feature':
+        elif self.complet_result[0]['body']['form']['template'] == 'template_feature':
             sub_tag = None
             if feature_cat:
                 if feature_cat.feature_type.lower() == 'arc':
@@ -2498,7 +2498,7 @@ class ApiCF(ApiParent, QObject):
             else:
                 for field in complet_list['body']['data']['fields']:
                     label = QLabel()
-                    if field['widgettype'] == 'formDivider':
+                    if field['widgettype'] == 'divider':
                         for x in range(0, 2):
                             line = self.add_frame(field, x)
                             plan_layout.addWidget(line, field['layoutorder'], x)
@@ -2778,7 +2778,7 @@ class ApiCF(ApiParent, QObject):
 
     """ FUNCTIONS ASSOCIATED TO BUTTONS FROM POSTGRES"""
 
-    def info_node(self, **kwargs):
+    def get_info_node(self, **kwargs):
         """ Function called in class ApiParent.add_button(...) -->
                 widget.clicked.connect(partial(getattr(self, function_name), **kwargs)) """
 

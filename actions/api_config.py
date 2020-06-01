@@ -249,7 +249,7 @@ class ApiConfig(ApiParent):
                     widget = chk
                     widget.stateChanged.connect(partial(self.get_values_changed_param_user, chk, chk, field))
                     widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-                elif field['widgettype'] == 'datepickertime':
+                elif field['widgettype'] == 'datetime':
                     widget = QgsDateTimeEdit()
                     widget.setAllowNull(True)
                     widget.setCalendarPopup(True)
@@ -265,7 +265,7 @@ class ApiConfig(ApiParent):
                     widget.dateChanged.connect(partial(self.get_values_changed_param_user, chk, widget, field))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'spinbox':
-                    widget = QDoubleSpinBox()
+                    widget = QSpinBox()
                     if 'value' in field and field['value'] is not None:
                         value = float(str(field['value']))
                         widget.setValue(value)
@@ -350,7 +350,7 @@ class ApiConfig(ApiParent):
                         widget.setChecked(False)
                     widget.stateChanged.connect(partial(self.get_values_changed_param_system, widget))
                     widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-                elif field['widgettype'] == 'datepickertime':
+                elif field['widgettype'] == 'datetime':
                     widget = QDateEdit()
                     widget.setCalendarPopup(True)
                     if field['value']: field['value'] = field['value'].replace('/', '-')
@@ -359,7 +359,7 @@ class ApiConfig(ApiParent):
                     widget.dateChanged.connect(partial(self.get_values_changed_param_system, widget))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'spinbox':
-                    widget = QDoubleSpinBox()
+                    widget = QSpinBox()
                     if 'value' in field and field['value'] is not None:
                         value = float(str(field['value']))
                         widget.setValue(value)
@@ -475,10 +475,10 @@ class ApiConfig(ApiParent):
             elem['widget_type'] = 'check'
         elif type(widget) is QDateEdit:
             value = utils_giswater.getCalendarDate(self.dlg_config, widget)
-            elem['widget_type'] = 'datepickertime'
+            elem['widget_type'] = 'datetime'
         elif type(widget) is QgsDateTimeEdit:
             value = utils_giswater.getCalendarDate(self.dlg_config, widget)
-            elem['widget_type'] = 'datepickertime'
+            elem['widget_type'] = 'datetime'
             
         elem['isChecked'] = str(utils_giswater.isChecked(self.dlg_config, chk))
         elem['value'] = value

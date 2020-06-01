@@ -930,16 +930,12 @@ class ApiParent(ParentAction):
         if 'value' in field:
             if field['widgettype'] == 'spinbox':
                 widget = QSpinBox()
-            if field['widgettype'] == 'doubleSpinbox':
-                widget = QDoubleSpinBox()
         widget.setObjectName(field['widgetname'])
         if 'columnname' in field:
             widget.setProperty('columnname', field['columnname'])
         if 'value' in field:
             if field['widgettype'] == 'spinbox' and field['value'] != "":
                 widget.setValue(int(field['value']))
-            elif field['widgettype'] == 'doubleSpinbox' and field['value'] != "":
-                widget.setValue(float(field['value']))
         if 'iseditable' in field:
             widget.setReadOnly(not field['iseditable'])
             if not field['iseditable']:
@@ -1068,7 +1064,7 @@ class ApiParent(ParentAction):
                     widget = self.manage_lineedit(field, dialog, widget, completer)
                 if widget.property('columnname') == field_id:
                     self.feature_id = widget.text()
-            elif field['widgettype'] == 'datepickertime':
+            elif field['widgettype'] == 'datetime':
                 widget = self.add_calendar(dialog, field)
                 widget = self.set_auto_update_dateedit(field, dialog, widget)
             elif field['widgettype'] == 'hyperlink':
@@ -1354,7 +1350,7 @@ class ApiParent(ParentAction):
                         widget.setChecked(False)
                     widget.stateChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-                elif field['widgettype'] == 'datepickertime':
+                elif field['widgettype'] == 'datetime':
                     widget = QgsDateTimeEdit()
                     widget.setAllowNull(True)
                     widget.setCalendarPopup(True)
@@ -1569,7 +1565,7 @@ class ApiParent(ParentAction):
             getattr(self, function_name)(widget)
 
 
-    def open_url(self, widget):
+    def set_open_url(self, widget):
 
         path = widget.text()
         # Check if file exist

@@ -350,7 +350,7 @@ class ApiDimensioning(ApiParent):
             widget = self.set_widget_size(widget, field)
         elif field['widgettype'] == 'check':
             widget = self.add_checkbox(field)
-        elif field['widgettype'] == 'datepickertime':
+        elif field['widgettype'] == 'datetime':
             widget = self.add_calendar(dialog, field)
         elif field['widgettype'] == 'button':
             widget = self.add_button(dialog, field)
@@ -364,7 +364,7 @@ class ApiDimensioning(ApiParent):
             widget = self.add_verical_spacer()
         elif field['widgettype'] == 'textarea':
             widget = self.add_textarea(field)
-        elif field['widgettype'] in ('spinbox', 'doubleSpinbox'):
+        elif field['widgettype'] in ('spinbox'):
             widget = self.add_spinbox(field)
         elif field['widgettype'] == 'tableView':
             widget = self.add_tableview(complet_result, field)
