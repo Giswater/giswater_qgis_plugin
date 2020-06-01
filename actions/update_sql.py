@@ -3491,7 +3491,7 @@ class UpdateSQL(ApiParent):
         self.dlg_credentials.btn_accept.clicked.connect(partial(self.set_credentials, self.dlg_credentials))
         self.dlg_credentials.cmb_connection.currentIndexChanged.connect(
             partial(self.set_credentials, self.dlg_credentials, new_connection=True))
-        self.dlg_credentials.open()
+        self.open_dialog(self.dlg_credentials, dlg_name='main_credentials', maximize_button=False)
 
 
     def manage_user_params(self):

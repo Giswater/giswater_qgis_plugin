@@ -226,7 +226,7 @@ class NodeTypeChange(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('credentials.ui')
+FORM_CLASS = get_ui_class('main_credentials.ui')
 class Credentials(GwDialog, FORM_CLASS):
 
     def __init__(self, subtag=None):
