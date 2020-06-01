@@ -81,6 +81,11 @@ UPDATE config_info_table_x_type SET infotype_id = 2 WHERE infotype_id = 0;
 
 UPDATE config_toolbox SET inputparams = (replace (inputparams::text, 'layout_order', 'layoutorder'))::json;
 
+UPDATE config_fprocess SET fid = 141 WHERE fid = 10;
+UPDATE config_fprocess SET fid = 140 WHERE fid = 11;
+UPDATE config_fprocess SET fid2 = 239 WHERE fid2 = 11;
+
+
 
 
 
