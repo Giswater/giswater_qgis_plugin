@@ -26,7 +26,7 @@ from .api_go2epa_options import Go2EpaOptions
 from .api_parent import ApiParent
 from .task_go2epa import TaskGo2Epa
 from .update_sql import UpdateSQL
-from ..ui_manager import EpaResultCompareSelector, EpaResultManager, FileManager, HydrologySelector, Multirow_selector
+from ..ui_manager import EpaCompare, EpaResultManager, FileManager, HydrologySelector, Multirow_selector
 
 
 class Go2Epa(ApiParent):
@@ -545,7 +545,7 @@ class Go2Epa(ApiParent):
         """ Button 29: Epa result selector """
 
         # Create the dialog and signals
-        self.dlg_go2epa_result = EpaResultCompareSelector()
+        self.dlg_go2epa_result = EpaCompare()
         self.load_settings(self.dlg_go2epa_result)
         if self.project_type == 'ud':
             utils_giswater.remove_tab_by_tabName(self.dlg_go2epa_result.tabWidget, "tab_time")
@@ -634,7 +634,7 @@ class Go2Epa(ApiParent):
             utils_giswater.set_combo_itemData(self.dlg_go2epa_result.rpt_selector_compare_id, row["result_id"], 0)
 
         # Open the dialog
-        self.open_dialog(self.dlg_go2epa_result)
+        self.open_dialog(self.dlg_go2epa_result, dlg_name='epa_compare')
 
 
     def populate_date_time(self, combo_date):

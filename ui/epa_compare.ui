@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>result_compare_selector</class>
- <widget class="QDialog" name="result_compare_selector">
+ <class>dlg_selector</class>
+ <widget class="QDialog" name="dlg_selector">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -25,7 +25,7 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
-        <widget class="QLabel" name="label_result_name_to_show">
+        <widget class="QLabel" name="lbl_result_name_to_show">
          <property name="minimumSize">
           <size>
            <width>140</width>
@@ -65,7 +65,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="label_result_name_to_compare">
+        <widget class="QLabel" name="lbl_result_name_to_compare">
          <property name="minimumSize">
           <size>
            <width>140</width>
@@ -125,7 +125,7 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_7">
        <item>
-        <widget class="QLabel" name="label_result_name_to_show_2">
+        <widget class="QLabel" name="lbl_time_to_show">
          <property name="minimumSize">
           <size>
            <width>120</width>
@@ -165,7 +165,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="label_result_name_to_compare_2">
+        <widget class="QLabel" name="lbl_time_to_compare">
          <property name="minimumSize">
           <size>
            <width>120</width>
@@ -231,7 +231,7 @@
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
-           <widget class="QLabel" name="label">
+           <widget class="QLabel" name="lbl_selector_date">
             <property name="text">
              <string>Selector date</string>
             </property>
@@ -241,7 +241,7 @@
            <widget class="QComboBox" name="cmb_sel_date"/>
           </item>
           <item>
-           <widget class="QLabel" name="label_3">
+           <widget class="QLabel" name="lbl_selector_time">
             <property name="text">
              <string>Selector time</string>
             </property>
@@ -273,7 +273,7 @@
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
-           <widget class="QLabel" name="label_2">
+           <widget class="QLabel" name="lbl_compare_date">
             <property name="text">
              <string>Compare date</string>
             </property>
@@ -283,7 +283,7 @@
            <widget class="QComboBox" name="cmb_com_date"/>
           </item>
           <item>
-           <widget class="QLabel" name="label_4">
+           <widget class="QLabel" name="lbl_compare_time">
             <property name="text">
              <string>Compare Time</string>
             </property>
@@ -317,7 +317,7 @@
      <item>
       <widget class="QPushButton" name="btn_accept">
        <property name="text">
-        <string>OK</string>
+        <string>Accept</string>
        </property>
       </widget>
      </item>

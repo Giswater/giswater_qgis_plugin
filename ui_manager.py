@@ -300,8 +300,8 @@ class ElementManager(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('epa_result_compare_selector.ui')
-class EpaResultCompareSelector(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('epa_compare.ui')
+class EpaCompare(GwDialog, FORM_CLASS):
     pass
 
 
