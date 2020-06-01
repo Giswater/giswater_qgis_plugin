@@ -46,7 +46,7 @@ class CrmTrace(ApiParent):
         utils_giswater.fillComboBox(self.dlg_trace, 'cbo_expl', rows, allow_nulls=False)
 
         # Open dialog
-        self.open_dialog(self.dlg_trace)
+        self.open_dialog(self.dlg_trace, dlg_name='crm_trace')
 
 
     def process(self):
