@@ -65,11 +65,11 @@ ALTER TABLE anl_connec RENAME fprocesscat_id TO fid;
 ALTER TABLE anl_node RENAME fprocesscat_id TO fid;
 ALTER TABLE temp_table RENAME fprocesscat_id TO fid;
 
--- sys_foreingkey
-ALTER TABLE sys_foreingkey DROP constraint typevalue_fk_pkey ;
-ALTER TABLE sys_foreingkey DROP constraint sys_foreingkey_unique; 
-ALTER TABLE sys_foreingkey ADD CONSTRAINT sys_foreingkey_pkey PRIMARY KEY (typevalue_table, typevalue_name, target_table, target_field);
-ALTER TABLE sys_foreingkey DROP column id;
+-- sys_foreignkey
+ALTER TABLE sys_foreignkey DROP constraint typevalue_fk_pkey ;
+ALTER TABLE sys_foreignkey DROP constraint sys_foreingkey_unique;
+ALTER TABLE sys_foreignkey ADD CONSTRAINT sys_foreingkey_pkey PRIMARY KEY (typevalue_table, typevalue_name, target_table, target_field);
+ALTER TABLE sys_foreignkey DROP column id;
 
 -- sys_typevalue
 ALTER TABLE sys_typevalue DROP constraint sys_typevalue_cat_pkey;
@@ -96,8 +96,8 @@ ALTER TABLE config_visit_class_x_feature ALTER COLUMN active SET DEFAULT TRUE;
 ALTER TABLE config_visit_class_x_parameter ALTER COLUMN active SET DEFAULT TRUE;
 ALTER TABLE config_visit_class_x_workorder ALTER COLUMN active SET DEFAULT TRUE;
 
-ALTER TABLE sys_foreingkey ADD column active boolean;
-ALTER TABLE sys_foreingkey ALTER column active SET DEFAULT TRUE;
+ALTER TABLE sys_foreignkey ADD column active boolean;
+ALTER TABLE sys_foreignkey ALTER column active SET DEFAULT TRUE;
 
 
 --DROP SEQUENCE config_csv_id_seq;

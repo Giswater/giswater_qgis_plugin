@@ -47,11 +47,11 @@ ALTER TABLE audit_log_feature RENAME to _audit_log_feature_ ;
 ALTER TABLE audit_log_project RENAME to _audit_log_project_ ;
 ALTER TABLE audit_log_csv2pg RENAME to _audit_log_csv2pg_ ;
 ALTER TABLE audit_log_arc_traceability RENAME to audit_arc_traceability;
-ALTER TABLE typevalue_fk RENAME to sys_foreingkey;
+ALTER TABLE typevalue_fk RENAME to sys_foreignkey;
 
-DROP TRIGGER gw_trg_typevalue_config_fk ON sys_foreingkey;
-CREATE TRIGGER gw_trg_typevalue_config_fk AFTER INSERT OR UPDATE ON sys_foreingkey
-FOR EACH ROW EXECUTE PROCEDURE gw_trg_typevalue_config_fk('sys_foreingkey');
+DROP TRIGGER gw_trg_typevalue_config_fk ON sys_foreignkey;
+CREATE TRIGGER gw_trg_typevalue_config_fk AFTER INSERT OR UPDATE ON sys_foreignkey
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_typevalue_config_fk('sys_foreignkey');
 
 
 ALTER TABLE audit_cat_column RENAME to _audit_cat_column_;

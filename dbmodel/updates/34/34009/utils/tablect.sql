@@ -10,5 +10,5 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 ALTER TABLE sys_typevalue DROP CONSTRAINT IF EXISTS sys_typevalue_unique;
 ALTER TABLE sys_typevalue ADD CONSTRAINT sys_typevalue_unique UNIQUE(typevalue_table, typevalue_name);
 
-ALTER TABLE sys_foreingkey DROP CONSTRAINT IF EXISTS sys_foreingkey_unique;
-ALTER TABLE sys_foreingkey  ADD CONSTRAINT sys_foreingkey_unique UNIQUE(typevalue_table, typevalue_name, target_table, target_field);
+ALTER TABLE sys_foreignkey DROP CONSTRAINT IF EXISTS sys_foreingkey_unique;
+ALTER TABLE sys_foreignkey  ADD CONSTRAINT sys_foreingkey_unique UNIQUE(typevalue_table, typevalue_name, target_table, target_field);

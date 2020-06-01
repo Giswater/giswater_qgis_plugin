@@ -214,11 +214,11 @@ INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('shtvalve_param_1','2','
 INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('shtvalve_param_1','3','combo3');
 INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('shtvalve_param_1','4','combo4');
 
-INSERT INTO sys_foreingkey(typevalue_table, typevalue_name, target_table, target_field, parameter_id) 
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, parameter_id)
 SELECT 'edit_typevalue','hydrant_param_1','man_addfields_value','value_param',id FROM sys_addfields WHERE param_name='hydrant_param_1';
-INSERT INTO sys_foreingkey(typevalue_table, typevalue_name, target_table, target_field, parameter_id) 
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, parameter_id)
 SELECT 'edit_typevalue','shtvalve_param_1','man_addfields_value','value_param',id FROM sys_addfields WHERE param_name='shtvalve_param_1';
-INSERT INTO sys_foreingkey(typevalue_table, typevalue_name, target_table, target_field, parameter_id) 
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field, parameter_id)
 SELECT 'edit_typevalue','pressmeter_param_1','man_addfields_value','value_param',id FROM sys_addfields WHERE param_name='pressmeter_param_1';
 
 -- rotate vnodes and connec labels

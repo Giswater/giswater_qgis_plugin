@@ -244,8 +244,8 @@ DELETE FROM sys_function WHERE function_name = 'gw_fct_fill_om_tables';
 DELETE FROM sys_function WHERE function_name = 'gw_fct_fill_doc_tables';
 
 
-UPDATE sys_foreingkey SET target_table = 'config_visit_parameter' WHERE target_table = 'om_visit_parameter';
-UPDATE sys_foreingkey SET target_table = 'sys_addfields' WHERE target_table = 'man_addfields_parameter';
+UPDATE sys_foreignkey SET target_table = 'config_visit_parameter' WHERE target_table = 'om_visit_parameter';
+UPDATE sys_foreignkey SET target_table = 'sys_addfields' WHERE target_table = 'man_addfields_parameter';
 
 
 UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'om_visit_parameter', 'config_visit_parameter') WHERE dv_querytext like '%om_visit_parameter%';

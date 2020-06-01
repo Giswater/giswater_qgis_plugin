@@ -26,7 +26,7 @@ BEGIN
 	v_table:= TG_ARGV[0];
 
 	--select typevalue for the table
-	v_typevalue_fk = 'SELECT * FROM sys_foreingkey WHERE target_table='''||v_table||''';';
+	v_typevalue_fk = 'SELECT * FROM sys_foreignkey WHERE target_table='''||v_table||''';';
 	
 	--insert new fields values into json
 	v_new_data := row_to_json(NEW.*);

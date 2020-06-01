@@ -9,7 +9,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 --2020/05/18
-SELECT setval('SCHEMA_NAME.sys_foreingkey_id_seq', (SELECT max(id) FROM sys_foreingkey), true);
+SELECT setval('SCHEMA_NAME.sys_foreingkey_id_seq', (SELECT max(id) FROM sys_foreignkey), true);
 SELECT setval('SCHEMA_NAME.sys_typevalue_cat_id_seq', (SELECT max(id) FROM sys_typevalue), true);
 
 INSERT INTO sys_typevalue (typevalue_table,typevalue_name)
@@ -22,18 +22,18 @@ INSERT INTO sys_typevalue (typevalue_table,typevalue_name)
 VALUES ('edit_typevalue','value_review_validation') ON CONFLICT (typevalue_table,typevalue_name) DO NOTHING;
 
 
-INSERT INTO sys_foreingkey(typevalue_table, typevalue_name, target_table, target_field)
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field)
 VALUES ('edit_typevalue','value_verified', 'arc', 'verified') ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;	
 
-INSERT INTO sys_foreingkey(typevalue_table, typevalue_name, target_table, target_field)
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field)
 VALUES('edit_typevalue','value_verified', 'node', 'verified') ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;	
 
-INSERT INTO sys_foreingkey(typevalue_table, typevalue_name, target_table, target_field)
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field)
 VALUES ('edit_typevalue','value_verified', 'connec', 'verified') ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;	
 
 UPDATE config_form_fields SET dv_querytext = 'SELECT id, id as idval FROM edit_typevalue WHERE typevalue = ''value_verified''' where column_id = 'verified';
 
-INSERT INTO sys_foreingkey(typevalue_table, typevalue_name, target_table, target_field)
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field)
 VALUES ('plan_typevalue','value_priority', 'plan_psector', 'plan_psector') ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;	
 
 UPDATE config_form_fields SET dv_querytext = 'SELECT idval as id,idval FROM plan_typevalue WHERE typevalue=''value_priority''' WHERE formname = 'v_edit_plan_psector' 
@@ -90,7 +90,7 @@ DELETE FROM sys_table WHERE id ='config_api_visit';
 UPDATE sys_table SET id ='config_mincut_inlet' WHERE id ='anl_mincut_inlet_x_exploitation';
 UPDATE sys_table SET id ='config_mincut_valve' WHERE id ='anl_mincut_selector_valve';
 UPDATE sys_table SET id ='config_mincut_checkvalve' WHERE id ='anl_mincut_checkvalve';
-UPDATE sys_table SET id ='sys_foreingkey' WHERE id ='typevalue_fk';
+UPDATE sys_table SET id ='sys_foreignkey' WHERE id ='typevalue_fk';
 UPDATE sys_table SET id ='selector_mincut_result' WHERE id ='anl_mincut_result_selector';
 UPDATE sys_table SET id ='selector_inp_demand' WHERE id ='inp_selector_dscenario';
 UPDATE sys_table SET id ='selector_inp_hydrology' WHERE id ='inp_selector_hydrology';
@@ -163,7 +163,7 @@ UPDATE sys_table SET sys_sequence ='config_csv_id_seq' WHERE id ='config_csv';
 UPDATE sys_table SET sys_sequence ='config_csv_param_id_seq' WHERE id ='config_csv_param';
 UPDATE sys_table SET sys_sequence ='samplepoint_id_seq' WHERE id ='samplepoint';
 UPDATE sys_table SET sys_sequence ='audit_arc_traceability_id_seq' WHERE id ='audit_arc_traceability';
-UPDATE sys_table SET sys_sequence ='sys_foreingkey_id_seq' WHERE id ='sys_foreingkey';
+UPDATE sys_table SET sys_sequence ='sys_foreingkey_id_seq' WHERE id ='sys_foreignkey';
 UPDATE sys_table SET sys_sequence ='om_mincut_polygon_polygon_seq' WHERE id ='om_mincut_polygon';
 
 UPDATE sys_table SET sys_sequence ='om_mincut_polygon_polygon_seq' WHERE id ='om_mincut_polygon';

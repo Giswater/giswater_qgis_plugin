@@ -10,7 +10,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 -- 13/11/2019
-UPDATE sys_foreingkey SET target_table='ext_cat_raster' WHERE target_table='cat_raster';
+UPDATE sys_foreignkey SET target_table='ext_cat_raster' WHERE target_table='cat_raster';
 
 UPDATE sys_function SET function_type = 'function' WHERE function_type IN ('api function','Function to manage messages');
 
@@ -68,13 +68,13 @@ VALUES ('sys_vpn_permissions', FALSE, 'system', 'Variable to check if vpn connex
 UPDATE om_visit_class SET formname = a.formname, tablename = a.tablename FROM _config_api_visit_ a WHERE om_visit_class.id = a.visitclass_id;
 
 
-UPDATE sys_foreingkey SET target_table = 'sys_message', target_field = 'message_type' WHERE typevalue_name = 'mtype_typevalue';
+UPDATE sys_foreignkey SET target_table = 'sys_message', target_field = 'message_type' WHERE typevalue_name = 'mtype_typevalue';
 
-ALTER TABLE sys_foreingkey DISABLE TRIGGER gw_trg_typevalue_config_fk;
+ALTER TABLE sys_foreignkey DISABLE TRIGGER gw_trg_typevalue_config_fk;
 
-UPDATE sys_foreingkey SET typevalue_table = 'config_typevalue' WHERE typevalue_table ='config_api_typevalue';
+UPDATE sys_foreignkey SET typevalue_table = 'config_typevalue' WHERE typevalue_table ='config_api_typevalue';
 
-ALTER TABLE sys_foreingkey ENABLE TRIGGER gw_trg_typevalue_config_fk;
+ALTER TABLE sys_foreignkey ENABLE TRIGGER gw_trg_typevalue_config_fk;
 
 
 INSERT INTO config_typevalue(typevalue, id, idval) VALUES ('widgetfunction_typevalue', 'open_url', 'open_url');
@@ -94,10 +94,10 @@ UPDATE config_form_fields SET dv_querytext = replace (dv_querytext, 'config_api_
 UPDATE config_form_fields SET dv_querytext = replace (dv_querytext, 'config_api_typevalue', 'config_typevalue');
 
 
-UPDATE sys_foreingkey SET target_table = 'config_form_fields' WHERE target_table = 'config_api_form_fields';
-UPDATE sys_foreingkey SET target_table = 'config_info_layer' WHERE target_table = 'config_api_layer';
-UPDATE sys_foreingkey SET target_table = 'config_form_tabs' WHERE target_table = 'config_api_form_tabs';
-UPDATE sys_foreingkey SET target_table = 'config_form_fields' WHERE target_table = 'config_api_form_fields';
+UPDATE sys_foreignkey SET target_table = 'config_form_fields' WHERE target_table = 'config_api_form_fields';
+UPDATE sys_foreignkey SET target_table = 'config_info_layer' WHERE target_table = 'config_api_layer';
+UPDATE sys_foreignkey SET target_table = 'config_form_tabs' WHERE target_table = 'config_api_form_tabs';
+UPDATE sys_foreignkey SET target_table = 'config_form_fields' WHERE target_table = 'config_api_form_fields';
 
 COMMENT ON TABLE sys_function
   IS 'INSTRUCTIONS TO WORK WITH THIS TABLE:
@@ -110,9 +110,9 @@ It is possible to create own process. Ids starting by 9 are reserved to work wit
 
 -- 2020/03/19
 
-UPDATE sys_foreingkey SET target_table = 'sys_message', target_field = 'message_type' WHERE typevalue_name = 'mtype_typevalue';
+UPDATE sys_foreignkey SET target_table = 'sys_message', target_field = 'message_type' WHERE typevalue_name = 'mtype_typevalue';
 
-UPDATE sys_foreingkey SET typevalue_table = 'config_typevalue' WHERE typevalue_table ='config_api_typevalue';
+UPDATE sys_foreignkey SET typevalue_table = 'config_typevalue' WHERE typevalue_table ='config_api_typevalue';
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
 VALUES (3098, 'If widgettype=typeahead and dv_querytext_filterc is not null dv_parent_id must be combo', NULL, 2, TRUE, 'utils', false) ON CONFLICT (id) DO NOTHING;

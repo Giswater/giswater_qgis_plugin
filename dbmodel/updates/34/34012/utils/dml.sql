@@ -20,7 +20,7 @@ UPDATE sys_table SET id = 'config_visit_class'  where id ='om_visit_class';
 UPDATE sys_table SET sys_sequence = null, sys_sequence_field = null where id ='config_csv';
 UPDATE sys_table SET id = 'config_fprocess' WHERE id = 'config_csv_param';
 UPDATE sys_table SET id = 'temp_csv' WHERE id = 'temp_csv2pg';
-UPDATE sys_table SET sys_sequence = null, sys_sequence_field = null where id ='sys_foreingkey';
+UPDATE sys_table SET sys_sequence = null, sys_sequence_field = null where id ='sys_foreignkey';
 UPDATE sys_table SET sys_sequence = 'sys_addfields_id_seq', sys_sequence_field = 'id' where id ='sys_addfields';
 INSERT INTO sys_table VALUES ('sys_typevalue', 'System', 'System typevalues', 'role_admin');
 UPDATE sys_table SET isdeprecated = false WHERE id = 'sys_typevalue';
@@ -212,9 +212,9 @@ DELETE FROM config_typevalue WHERE id = 'gw_api_open_node';
 DELETE FROM config_typevalue WHERE id = 'gw_api_open_url';
 DELETE FROM config_typevalue WHERE id = 'gw_api_setprint';
 
-UPDATE sys_foreingkey SET target_field = 'layoutname' WHERE target_field = 'layout_name';
-UPDATE sys_foreingkey SET target_field = 'linkedaction', typevalue_name = 'linkedaction_typevalue' WHERE target_field = 'action_function';
-DELETE FROM sys_foreingkey WHERE target_field = 'message_type';
+UPDATE sys_foreignkey SET target_field = 'layoutname' WHERE target_field = 'layout_name';
+UPDATE sys_foreignkey SET target_field = 'linkedaction', typevalue_name = 'linkedaction_typevalue' WHERE target_field = 'action_function';
+DELETE FROM sys_foreignkey WHERE target_field = 'message_type';
 
 ALTER TABLE config_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
 DELETE FROM config_typevalue WHERE id = 'get_catalog_id';
