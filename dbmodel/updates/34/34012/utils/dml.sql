@@ -86,38 +86,17 @@ UPDATE config_fprocess SET fid = 141 WHERE fid = 10;
 UPDATE config_fprocess SET fid = 140 WHERE fid = 11;
 UPDATE config_fprocess SET fid2 = 239 WHERE fid2 = 11;
 
+DELETE FROM config_typevalue WHERE typevalue = 'mtype_typevalue';
+
+DELETE FROM config_typevalue WHERE typevalue = 'datatype_typevalue' AND ivdval = 'character varying';
+
+DELETE FROM config_typevalue WHERE typevalue = 'layout_name_typevalue' AND ivdval = 'data_1';
+DELETE FROM config_typevalue WHERE typevalue = 'layout_name_typevalue' AND ivdval = 'data_2';
+DELETE FROM config_typevalue WHERE typevalue = 'layout_name_typevalue' AND ivdval = 'data_9';
+
+DELETE FROM config_typevalue WHERE typevalue = 'widgetfunction_typevalue' AND ivdval = 'gw_api_open_node';
+DELETE FROM config_typevalue WHERE typevalue = 'widgetfunction_typevalue' AND ivdval = 'gw_api_open_url';
+DELETE FROM config_typevalue WHERE typevalue = 'widgetfunction_typevalue' AND ivdval = 'gw_api_setprint';
+
 
 ALTER TABLE config_form_tabs DISABLE TRIGGER gw_trg_typevalue_fk;
-
-UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'om_visit_class', 'config_visit_class')  WHERE dv_querytext like '%om_visit_class%';
-
-UPDATE config_form_tabs SET tabname = 'tabAddress' WHERE tabname = 'tab_address';
-UPDATE config_form_tabs SET tabname = 'tabHydro' WHERE tabname = 'tab_hydro';
-UPDATE config_form_tabs SET tabname = 'tabNetwork' WHERE tabname = 'tab_network';
-UPDATE config_form_tabs SET tabname = 'tabPsector' WHERE tabname = 'tab_psector';
-UPDATE config_form_tabs SET tabname = 'tabVisit' WHERE tabname = 'tab_visit';
-UPDATE config_form_tabs SET tabname = 'tabWorkcat' WHERE tabname = 'tab_workcat';
-UPDATE config_form_tabs SET tabname = 'tabData' WHERE tabname = 'tab_data';
-UPDATE config_form_tabs SET tabname = 'tabDocument' WHERE tabname = 'tab_documents';
-UPDATE config_form_tabs SET tabname = 'tabElement' WHERE tabname = 'tab_elements';
-UPDATE config_form_tabs SET tabname = 'tabEpa' WHERE tabname = 'tab_inp';
-UPDATE config_form_tabs SET tabname = 'tabEvent' WHERE tabname = 'tab_om';
-UPDATE config_form_tabs SET tabname = 'tabPlan' WHERE tabname = 'tab_plan';
-UPDATE config_form_tabs SET tabname = 'tabRelation' WHERE tabname = 'tab_relations';
-UPDATE config_form_tabs SET tabname = 'tabHydrometer' WHERE tabname = 'tab_hydrometer';
-UPDATE config_form_tabs SET tabname = 'tabHidroVal' WHERE tabname = 'tab_hydrometer_val';
-UPDATE config_form_tabs SET tooltip = 'Admin tab' WHERE tabname = 'Admin';
-UPDATE config_form_tabs SET tooltip = 'User tab' WHERE tabname = 'User';
-UPDATE config_form_tabs SET tooltip = 'List of EPA data' WHERE tabname = 'tabEpa';
-
-INSERT INTO config_form_tabs VALUES ('v_edit_node', 'tabConnection', 'Connections', 'Connections downstream and upstream', 'role_basic', NULL, '[
-{"actionName":"actionEdit", "actionTooltip":"Edit",  "disabled":false},
-{"actionName":"actionZoom", "actionTooltip":"Zoom In",  "disabled":false},
-{"actionName":"actionCentered", "actionTooltip":"Center",  "disabled":false},
-{"actionName":"actionZoomOut", "actionTooltip":"Zoom Out",  "disabled":false},
-{"actionName":"actionCatalog", "actionTooltip":"Change Catalog",  "disabled":false},
-{"actionName":"actionWorkcat", "actionTooltip":"Add Workcat",  "disabled":false},
-{"actionName":"actionCopyPaste", "actionTooltip":"Copy Paste",  "disabled":false},
-{"actionName":"actionSection", "actionTooltip":"Show Section",  "disabled":false},
-{"actionName":"actionLink", "actionTooltip":"Open Link",  "disabled":false},
-{"actionName":"actionHelp", "actionTooltip":"Help",  "disabled":false}]',4);
