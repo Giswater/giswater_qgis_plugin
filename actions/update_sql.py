@@ -1857,7 +1857,7 @@ class UpdateSQL(ApiParent):
         return
         # Populate visit class
         # TODO:: Populate combo from visitclass manager and wip
-        # sql = ("SELECT id, idval FROM om_visit_class")
+        # sql = ("SELECT id, idval FROM config_visit_class")
         # rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         # utils_giswater.set_item_data(self.dlg_readsql.cmb_visit_class, rows, 1)
 

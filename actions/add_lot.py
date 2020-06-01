@@ -577,16 +577,16 @@ class AddNewLot(ParentManage):
 
         # Fill ComboBox cmb_visit_class
         visitclass_ids = []
-        exists = self.controller.check_table('om_visit_class')
+        exists = self.controller.check_table('config_visit_class')
         if exists:
             if ot_result:
-                sql = ("SELECT DISTINCT(om_visit_class.id), om_visit_class.idval, feature_type, tablename "
-                       " FROM om_visit_class"
-                       " INNER JOIN om_visit_class_x_workorder "
-                       " ON om_visit_class_x_workorder.visitclass_id = om_visit_class.id "
+                sql = ("SELECT DISTINCT(config_visit_class.id), config_visit_class.idval, feature_type, tablename "
+                       " FROM config_visit_class"
+                       " INNER JOIN config_visit_class_x_workorder "
+                       " ON config_visit_class_x_workorder.visitclass_id = config_visit_class.id "
                        " WHERE ismultifeature is False AND feature_type IS NOT null")
             else:
-                sql = ("SELECT DISTINCT(id), idval, feature_type, tablename FROM om_visit_class")
+                sql = ("SELECT DISTINCT(id), idval, feature_type, tablename FROM config_visit_class")
             rows = self.controller.get_rows(sql)
             if rows:
                 visitclass_ids = rows
