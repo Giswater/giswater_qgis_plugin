@@ -290,8 +290,8 @@ class Profile(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('duplicate_psector.ui')
-class DupPsector(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('psector_duplicate.ui')
+class PsectorDuplicate(GwDialog, FORM_CLASS):
     pass
 
 

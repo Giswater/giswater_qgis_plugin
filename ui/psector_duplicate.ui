@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>DuplicatePsector</class>
- <widget class="QDialog" name="DuplicatePsector">
+ <class>dlg_psector_duplicate</class>
+ <widget class="QDialog" name="dlg_psector_duplicate">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Duplicate Psector</string>
+   <string>Duplicate psector</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
    <item row="0" column="0" colspan="3">
@@ -19,7 +19,7 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="tab">
+     <widget class="QWidget" name="tab_duplicate_psector">
       <attribute name="title">
        <string>Duplicate psector</string>
       </attribute>
@@ -27,7 +27,7 @@
        <item row="0" column="0">
         <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
-          <widget class="QLabel" name="label_duplicate_psector">
+          <widget class="QLabel" name="lbl_duplicate_psector">
            <property name="font">
             <font>
              <pointsize>8</pointsize>
@@ -84,7 +84,7 @@
        <item row="1" column="0">
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
-          <widget class="QLabel" name="label_new_psector">
+          <widget class="QLabel" name="lbl_new_psector">
            <property name="font">
             <font>
              <pointsize>8</pointsize>
@@ -134,7 +134,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_2">
+     <widget class="QWidget" name="tab_info_log">
       <attribute name="title">
        <string>Info log</string>
       </attribute>
@@ -168,7 +168,7 @@
       </sizepolicy>
      </property>
      <property name="text">
-      <string>OK</string>
+      <string>Accept</string>
      </property>
     </widget>
    </item>
@@ -181,7 +181,7 @@
       </sizepolicy>
      </property>
      <property name="text">
-      <string>Close</string>
+      <string>Cancel</string>
      </property>
     </widget>
    </item>
