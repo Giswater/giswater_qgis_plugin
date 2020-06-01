@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>change_node_type</class>
- <widget class="QDialog" name="change_node_type">
+ <class>dlg_nodetype_change</class>
+ <widget class="QDialog" name="dlg_nodetype_change">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -52,14 +52,14 @@
       </sizepolicy>
      </property>
      <property name="text">
-      <string>OK</string>
+      <string>Accept</string>
      </property>
     </widget>
    </item>
    <item row="1" column="0" colspan="3">
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
-      <widget class="QLabel" name="label_custom_node_type">
+      <widget class="QLabel" name="lbl_custom_node_type">
        <property name="font">
         <font>
          <pointsize>8</pointsize>
@@ -116,7 +116,7 @@
    <item row="0" column="0" colspan="3">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QLabel" name="label_node_type">
+      <widget class="QLabel" name="lbl_node_type">
        <property name="font">
         <font>
          <pointsize>8</pointsize>
@@ -167,7 +167,7 @@
    <item row="2" column="0" colspan="3">
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
-      <widget class="QLabel" name="label_catalog_id">
+      <widget class="QLabel" name="lbl_catalog_id">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
          <horstretch>0</horstretch>

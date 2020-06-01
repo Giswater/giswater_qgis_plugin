@@ -221,8 +221,8 @@ class AuxPoint(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('change_node_type.ui')
-class ChangeNodeType(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('nodetype_change.ui')
+class NodeTypeChange(GwDialog, FORM_CLASS):
     pass
 
 

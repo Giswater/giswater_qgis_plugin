@@ -11,7 +11,7 @@ from qgis.PyQt.QtCore import Qt
 from functools import partial
 
 from .. import utils_giswater
-from ..ui_manager import ChangeNodeType
+from ..ui_manager import NodeTypeChange
 from ..actions.api_catalog import ApiCatalog
 from ..actions.api_cf import ApiCF
 from .parent import ParentMapTool
@@ -114,7 +114,7 @@ class ChangeElemType(ParentMapTool):
     def change_elem_type(self, feature):
                         
         # Create the dialog, fill node_type and define its signals
-        self.dlg_chg_node_type = ChangeNodeType()
+        self.dlg_chg_node_type = NodeTypeChange()
         self.load_settings(self.dlg_chg_node_type)
 
         # Get nodetype_id from current node
@@ -143,7 +143,7 @@ class ChangeElemType(ParentMapTool):
         utils_giswater.fillComboBox(self.dlg_chg_node_type, "node_node_type_new", rows)
 
         # Open dialog
-        self.open_dialog(self.dlg_chg_node_type, dlg_name='change_node_type', maximize_button=False)
+        self.open_dialog(self.dlg_chg_node_type, dlg_name='nodetype_change', maximize_button=False)
 
 
     def filter_catalog(self):
