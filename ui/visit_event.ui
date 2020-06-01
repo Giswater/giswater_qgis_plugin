@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>event_ud_arc_standard</class>
- <widget class="QDialog" name="event_ud_arc_standard">
+ <class>dlg_visit_event</class>
+ <widget class="QDialog" name="dlg_visit_event">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Event arc standard</string>
+   <string>Standard arc event</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -23,7 +23,7 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <widget class="QLabel" name="label_node_type">
+         <widget class="QLabel" name="lbl_parameter_id">
           <property name="font">
            <font>
             <pointsize>8</pointsize>
@@ -38,7 +38,7 @@
            <enum>QFrame::Plain</enum>
           </property>
           <property name="text">
-           <string>Parameter_id:      </string>
+           <string>Parameter id:      </string>
           </property>
           <property name="textFormat">
            <enum>Qt::AutoText</enum>
@@ -69,7 +69,7 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
-         <widget class="QLabel" name="label_node_type_2">
+         <widget class="QLabel" name="lbl_value">
           <property name="font">
            <font>
             <pointsize>8</pointsize>
@@ -112,7 +112,7 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_3">
         <item>
-         <widget class="QLabel" name="label_flexunion_code_2">
+         <widget class="QLabel" name="lbl_position_id">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
             <horstretch>0</horstretch>
@@ -131,7 +131,7 @@
            <enum>QFrame::Plain</enum>
           </property>
           <property name="text">
-           <string>Position_id:          </string>
+           <string>Position id:          </string>
           </property>
           <property name="textFormat">
            <enum>Qt::AutoText</enum>
@@ -155,7 +155,7 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_4">
         <item>
-         <widget class="QLabel" name="label_flexunion_code_3">
+         <widget class="QLabel" name="lbl_position_value">
           <property name="font">
            <font>
             <pointsize>8</pointsize>
@@ -168,7 +168,7 @@
            <enum>QFrame::Plain</enum>
           </property>
           <property name="text">
-           <string>Position_value:    </string>
+           <string>Position value:    </string>
           </property>
           <property name="textFormat">
            <enum>Qt::AutoText</enum>
@@ -194,7 +194,7 @@
        </layout>
       </item>
       <item>
-       <widget class="QLabel" name="label_flexunion_code_4">
+       <widget class="QLabel" name="lbl_text">
         <property name="font">
          <font>
           <pointsize>8</pointsize>
@@ -234,7 +234,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="lbl_files">
         <property name="text">
          <string>Files:</string>
         </property>
@@ -303,7 +303,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>event_ud_arc_standard</receiver>
+   <receiver>dlg_visit_event</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -319,7 +319,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>event_ud_arc_standard</receiver>
+   <receiver>dlg_visit_event</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

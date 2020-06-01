@@ -25,7 +25,7 @@ from ..dao.om_visit_x_gully import OmVisitXGully
 from ..dao.om_visit_parameter import OmVisitParameter
 from ..ui_manager import NewVisitUi
 from ..ui_manager import EventStandard
-from ..ui_manager import EventUDarcStandard
+from ..ui_manager import VisitEvent
 from ..ui_manager import VisitEventRehab
 from ..ui_manager import VisitManagement
 from .parent_manage import ParentManage

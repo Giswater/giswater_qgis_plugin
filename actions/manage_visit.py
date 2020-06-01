@@ -25,7 +25,7 @@ from ..dao.om_visit_x_gully import OmVisitXGully
 from ..dao.om_visit_parameter import OmVisitParameter
 from ..ui_manager import VisitUi, NewVisitUi
 from ..ui_manager import EventStandard
-from ..ui_manager import EventUDarcStandard
+from ..ui_manager import VisitEvent
 from ..ui_manager import VisitEventRehab
 from ..ui_manager import VisitManagement
 from .parent_manage import ParentManage
@@ -175,7 +175,7 @@ class ManageVisit(ParentManage, QObject):
         self.geom_type = 'arc'
 
         # Force tab_feature_changed
-        self.tab_feature_changed(self.dlg_add_visit, excluded_layers = ["v_edit_element"])
+        self.tab_feature_changed(self.dlg_add_visit, excluded_layers=["v_edit_element"])
 
         # Open the dialog
         if open_dialog:
@@ -973,11 +973,12 @@ class ManageVisit(ParentManage, QObject):
         form_type = str(row[0])
         dlg_name = None
         if form_type == 'event_ud_arc_standard':
-            self.dlg_event = EventUDarcStandard()
+            self.dlg_event = VisitEvent()
             self.load_settings(self.dlg_event)
 
             # disable position_x fields because not allowed in multiple view
             self.populate_position_id()
+            dlg_name = 'visit_event'
         elif form_type == 'event_ud_arc_rehabit':
             self.dlg_event = VisitEventRehab()
             self.load_settings(self.dlg_event)
@@ -1259,15 +1260,16 @@ class ManageVisit(ParentManage, QObject):
         om_event_parameter.id = event.parameter_id
         if not om_event_parameter.fetch(commit=self.autocommit):
             return
-
+        dlg_name = None
         if om_event_parameter.form_type == 'event_ud_arc_standard':
             _value = self.dlg_add_visit.tbl_event.model().record(0).value('value')
             position_value = self.dlg_add_visit.tbl_event.model().record(0).value('position_value')
             text = self.dlg_add_visit.tbl_event.model().record(0).value('text')
-            self.dlg_event = EventUDarcStandard()
+            self.dlg_event = VisitEvent()
             self.load_settings(self.dlg_event)
             # disable position_x fields because not allowed in multiple view
             self.populate_position_id()
+            dlg_name = 'visit_event'
             # set fixed values
             utils_giswater.setWidgetText(self.dlg_event, self.dlg_event.value, _value)
             utils_giswater.setWidgetText(self.dlg_event, self.dlg_event.position_value, position_value)
@@ -1286,6 +1288,7 @@ class ManageVisit(ParentManage, QObject):
             self.dlg_event = VisitEventRehab()
             self.load_settings(self.dlg_event)
             self.populate_position_id()
+            dlg_name = 'visit_event_rehab'
             self.dlg_event.position_value.setText(str(position_value))
             self.dlg_event.value1.setText(str(value1))
             self.dlg_event.value2.setText(str(value2))
@@ -1332,6 +1335,7 @@ class ManageVisit(ParentManage, QObject):
 
         self.dlg_event.setWindowFlags(Qt.WindowStaysOnTopHint)
         if self.dlg_event.exec_():
+            self.controller.manage_translation(dlg_name, self.dlg_event)
             # set record values basing on widget
             for field_name in event.field_names():
                 if not hasattr(self.dlg_event, field_name):

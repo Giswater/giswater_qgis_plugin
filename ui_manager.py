@@ -325,8 +325,8 @@ class VisitEventRehab(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('event_ud_arc_standard.ui')
-class EventUDarcStandard(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('visit_event.ui')
+class VisitEvent(GwDialog, FORM_CLASS):
     pass
 
 
