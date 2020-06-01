@@ -2404,7 +2404,7 @@ class ApiCF(ApiParent, QObject):
             self.controller.log_warning(f"Function error: {function_name}")
             return False
         complet_list = [json_result]
-        if not row:
+        if not complet_list:
             return False
 
         return complet_list
@@ -2536,7 +2536,7 @@ class ApiCF(ApiParent, QObject):
             self.controller.log_warning(f"Function error: {function_name}")
             return
         complet_list = [json_result]
-        if not row:
+        if not complet_list:
             return
 
         self.dlg_new_workcat = ApiBasicInfo()
