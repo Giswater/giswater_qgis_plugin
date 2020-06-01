@@ -1013,6 +1013,7 @@ class ManageVisit(ParentManage, QObject):
             partial(self.delete_files, self.dlg_event.tbl_docs_x_event, event.visit_id, event.id))
 
         self.dlg_event.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.controller.manage_translation(dlg_name, self.dlg_event)
         ret = self.dlg_event.exec_()
 
         # check return
@@ -1020,7 +1021,6 @@ class ManageVisit(ParentManage, QObject):
             # clicked cancel
             return
 
-        self.controller.manage_translation(dlg_name, self.dlg_event)
 
         for field_name in event.field_names():
             value = None
@@ -1334,8 +1334,9 @@ class ManageVisit(ParentManage, QObject):
         self.dlg_event.parameter_id.setText(parameter_id)
 
         self.dlg_event.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.controller.manage_translation(dlg_name, self.dlg_event)
         if self.dlg_event.exec_():
-            self.controller.manage_translation(dlg_name, self.dlg_event)
+
             # set record values basing on widget
             for field_name in event.field_names():
                 if not hasattr(self.dlg_event, field_name):
