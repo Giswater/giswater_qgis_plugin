@@ -295,8 +295,8 @@ class PsectorDuplicate(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('element_management.ui')
-class ElementManagement(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('element_manager.ui')
+class ElementManager(GwDialog, FORM_CLASS):
     pass
 
 

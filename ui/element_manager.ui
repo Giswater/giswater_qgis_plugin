@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>element_management</class>
- <widget class="QDialog" name="element_management">
+ <class>dlg_element_manager</class>
+ <widget class="QDialog" name="dlg_element_manager">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -74,7 +74,7 @@
        </widget>
       </item>
       <item row="0" column="0">
-       <widget class="QLabel" name="label_element_id">
+       <widget class="QLabel" name="lbl_element_id">
         <property name="text">
          <string>Filter by: Element id</string>
         </property>

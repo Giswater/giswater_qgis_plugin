@@ -11,7 +11,7 @@ from functools import partial
 
 from .. import utils_giswater
 from ..ui_manager import ElementUi
-from ..ui_manager import ElementManagement
+from ..ui_manager import ElementManager
 from .parent_manage import ParentManage
 
 
@@ -454,7 +454,7 @@ class ManageElement(ParentManage):
         """ Button 67: Edit element """          
         
         # Create the dialog
-        self.dlg_man = ElementManagement()
+        self.dlg_man = ElementManager()
         self.load_settings(self.dlg_man)
         self.dlg_man.tbl_element.setSelectionBehavior(QAbstractItemView.SelectRows)
                 
@@ -477,6 +477,6 @@ class ManageElement(ParentManage):
             table_object))
                                         
         # Open form
-        self.open_dialog(self.dlg_man)             
+        self.open_dialog(self.dlg_man, dlg_name='element_manager')
         
         
