@@ -418,7 +418,7 @@ class ApiCF(ApiParent, QObject):
         # action_switch_arc_id = self.dlg_cf.findChild(QAction, "actionSwicthArcid")
         action_section = self.dlg_cf.findChild(QAction, "actionSection")
 
-        self.show_actions('tabDocument')
+        self.show_actions('tab_data')
 
         # TODO action_edit.setEnabled(lo que venga del json segun permisos)
         # action_edit.setVisible(True)
@@ -1102,14 +1102,14 @@ class ApiCF(ApiParent, QObject):
 
 
     def check_tab_data(self, dialog):
-        """ Check if current tab name is tabData """
+        """ Check if current tab name is tab_data """
 
         tab_main = dialog.findChild(QTabWidget, "tab_main")
         if not tab_main:
             return
         index_tab = tab_main.currentIndex()
         tab_name = tab_main.widget(index_tab).objectName()
-        if tab_name == 'tabData':
+        if tab_name == 'tab_data':
             return True
         return False
 
@@ -1269,39 +1269,38 @@ class ApiCF(ApiParent, QObject):
         self.show_actions(tab_name)
 
         # Tab 'Elements'
-        if self.tab_main.widget(index_tab).objectName() == 'tabElement' and not self.tab_element_loaded:
+        if self.tab_main.widget(index_tab).objectName() == 'tab_elements' and not self.tab_element_loaded:
             self.fill_tab_element()
             self.tab_element_loaded = True
         # Tab 'Relations'
-        elif self.tab_main.widget(index_tab).objectName() == 'tabRelation' and not self.tab_relations_loaded:
+        elif self.tab_main.widget(index_tab).objectName() == 'tab_relations' and not self.tab_relations_loaded:
             self.fill_tab_relations()
             self.tab_relations_loaded = True
         # Tab 'Connections'
-        elif self.tab_main.widget(index_tab).objectName() == 'tabConnection' and not self.tab_connections_loaded:
+        elif self.tab_main.widget(index_tab).objectName() == 'tab_connections' and not self.tab_connections_loaded:
             self.fill_tab_connections()
             self.tab_connections_loaded = True
         # Tab 'Hydrometer'
-        elif self.tab_main.widget(index_tab).objectName() == 'tabHydrometer' and not self.tab_hydrometer_loaded:
+        elif self.tab_main.widget(index_tab).objectName() == 'tab_hydrometer' and not self.tab_hydrometer_loaded:
             self.fill_tab_hydrometer()
             self.tab_hydrometer_loaded = True
         # Tab 'Hydrometer values'
-        elif self.tab_main.widget(index_tab).objectName() == 'tabHydroVal' and not self.tab_hydrometer_val_loaded:
+        elif self.tab_main.widget(index_tab).objectName() == 'tab_hydrometer_val' and not self.tab_hydrometer_val_loaded:
             self.fill_tab_hydrometer_values()
             self.tab_hydrometer_val_loaded = True
         # Tab 'O&M'
-        elif self.tab_main.widget(index_tab).objectName() == 'tabEvent' and not self.tab_om_loaded:
+        elif self.tab_main.widget(index_tab).objectName() == 'tab_om' and not self.tab_om_loaded:
             self.fill_tab_om(self.geom_type)
             self.tab_om_loaded = True
         # Tab 'Documents'
-        elif self.tab_main.widget(index_tab).objectName() == 'tabDocument' and not self.tab_document_loaded:
+        elif self.tab_main.widget(index_tab).objectName() == 'tab_documents' and not self.tab_document_loaded:
             self.fill_tab_document()
             self.tab_document_loaded = True
-        # Tab for epa data'
-        elif self.tab_main.widget(index_tab).objectName() == 'tabEpa' and not self.tab_rpt_loaded:
+        elif self.tab_main.widget(index_tab).objectName() == 'tab_rpt' and not self.tab_rpt_loaded:
             self.fill_tab_rpt(self.complet_result)
             self.tab_rpt_loaded = True
         # Tab 'Plan'
-        elif self.tab_main.widget(index_tab).objectName() == 'tabPlan' and not self.tab_plan_loaded:
+        elif self.tab_main.widget(index_tab).objectName() == 'tab_plan' and not self.tab_plan_loaded:
             self.fill_tab_plan(self.complet_result)
             self.tab_plan_loaded = True
 

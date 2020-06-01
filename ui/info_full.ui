@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1159</width>
-    <height>720</height>
+    <width>676</width>
+    <height>601</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <layout class="QGridLayout" name="lyt_top_1"/>
     </item>
     <item>
-     <widget class="QTabWidget" name="main">
+     <widget class="QTabWidget" name="tab_main">
       <property name="font">
        <font>
         <pointsize>8</pointsize>
@@ -36,7 +36,7 @@
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="tabData">
+      <widget class="QWidget" name="tab_data">
        <attribute name="title">
         <string>Data</string>
        </attribute>
@@ -51,8 +51,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>1109</width>
-             <height>468</height>
+             <width>634</width>
+             <height>382</height>
             </rect>
            </property>
            <attribute name="label">
@@ -72,8 +72,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>1109</width>
-             <height>468</height>
+             <width>100</width>
+             <height>30</height>
             </rect>
            </property>
            <attribute name="label">
@@ -89,7 +89,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tabElement">
+      <widget class="QWidget" name="tab_elements">
        <attribute name="title">
         <string>Elements</string>
        </attribute>
@@ -231,7 +231,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tabRelation">
+      <widget class="QWidget" name="tab_relations">
        <attribute name="title">
         <string>Relations</string>
        </attribute>
@@ -249,7 +249,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tabConnection">
+      <widget class="QWidget" name="tab_connections">
        <attribute name="title">
         <string>Conections</string>
        </attribute>
@@ -288,7 +288,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tabHydrometer">
+      <widget class="QWidget" name="tab_hydrometer">
        <attribute name="title">
         <string>Hydrometer</string>
        </attribute>
@@ -342,7 +342,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tabHydroVal">
+      <widget class="QWidget" name="tab_hydrometer_val">
        <attribute name="title">
         <string>Hydrometer values</string>
        </attribute>
@@ -393,7 +393,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tabEvent">
+      <widget class="QWidget" name="tab_om">
        <attribute name="title">
         <string>O&amp;&amp;M</string>
        </attribute>
@@ -570,7 +570,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tabDocument">
+      <widget class="QWidget" name="tab_documents">
        <attribute name="title">
         <string>Document</string>
        </attribute>
@@ -768,7 +768,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tabEpa">
+      <widget class="QWidget" name="tab_rpt">
        <attribute name="title">
         <string>Rpt</string>
        </attribute>
@@ -781,7 +781,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tabPlan">
+      <widget class="QWidget" name="tab_plan">
        <attribute name="title">
         <string>Plan</string>
        </attribute>
@@ -1053,7 +1053,7 @@
   </action>
  </widget>
  <tabstops>
-  <tabstop>main</tabstop>
+  <tabstop>tab_main</tabstop>
  </tabstops>
  <resources/>
  <connections/>
