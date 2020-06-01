@@ -254,7 +254,8 @@ BEGIN
 					
 				--Error, no existing nodes
 				ELSIF ((v_noderecord1.node_id IS NULL) OR (v_noderecord2.node_id IS NULL)) AND (v_arc_searchnodes_control IS TRUE) THEN
-					v_message = (SELECT concat('Error[1042]:',error_message, '[node_1]:',v_noderecord1.node_id,'[node_2]:',v_noderecord2.node_id,'. ',hint_message) FROM sys_message WHERE id=1042);
+					v_message = (SELECT concat('Error[1042]:',error_message, '[node_1]:',v_noderecord1.node_id,'[node_2]:',v_noderecord2.node_id,'. ',hint_message) 
+					FROM sys_message WHERE id=1042);
 					v_status = false;
 				END IF;
 	
@@ -371,7 +372,7 @@ BEGIN
 		PERFORM gw_fct_debug(concat('{"data":{"msg":"--> Configuration fields are defined on layoutorder table <--", "variables":""}}')::json);
 
 		-- Call the function of feature fields generation
-		SELECT formtype INTO v_formtype FROM config_form_fields WHERE formname = p_table_id LIMIT 1;
+		v_formtype = 'feature';	
 		SELECT gw_fct_getformfields( v_formname, v_formtype, v_tabname, v_tablename, p_idname, p_id, p_columntype, p_tg_op, null, p_device , v_values_array) INTO v_fields_array;
 
 	ELSE	
@@ -449,7 +450,8 @@ BEGIN
 	-- gettingf minvalue & maxvalues for widgetcontrols
 	IF v_project_type = 'UD' THEN
 
-		v_input = '{"client":{"device":4,"infoType":1,"lang":"es"}, "feature":{"featureType":"'||v_catfeature.feature_type||'", "id":"'||p_id||'"}, "data":{"tgOp":"'||p_tg_op||'", "node1":"'||v_node1||'", "node2":"'||v_node2||'"}}';
+		v_input = '{"client":{"device":4,"infoType":1,"lang":"es"}, "feature":{"featureType":"'||v_catfeature.feature_type||'", "id":"'||p_id||'"}, "data":{"tgOp":"'||
+		p_tg_op||'", "node1":"'||v_node1||'", "node2":"'||v_node2||'"}}';
 		SELECT gw_fct_getwidgetvalues (v_input) INTO v_widgetvalues;
 		
 	END IF;	
