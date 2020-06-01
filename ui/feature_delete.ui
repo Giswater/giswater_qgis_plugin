@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>DeleteFeature</class>
- <widget class="QDialog" name="DeleteFeature">
+ <class>dlg_feature_delete</class>
+ <widget class="QDialog" name="dlg_feature_delete">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Delete Feature</string>
+   <string>Delete feature</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0" colspan="2">
@@ -19,13 +19,13 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="tab_3">
+     <widget class="QWidget" name="tab_del_feature">
       <attribute name="title">
        <string>Delete feature</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
        <item row="3" column="0">
-        <widget class="QTextEdit" name="txt_info_relation">
+        <widget class="QTextEdit" name="txt_feature_infolog">
          <property name="enabled">
           <bool>true</bool>
          </property>
@@ -44,7 +44,7 @@
        <item row="0" column="0">
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
-          <widget class="QLabel" name="label_feature_type">
+          <widget class="QLabel" name="lbl_feature_type">
            <property name="text">
             <string>Feature type:</string>
            </property>
@@ -88,7 +88,7 @@
        <item row="1" column="0">
         <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
-          <widget class="QLabel" name="label_feature_id">
+          <widget class="QLabel" name="lbl_feature_id">
            <property name="text">
             <string>Feature id:</string>
            </property>
@@ -128,7 +128,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_4">
+     <widget class="QWidget" name="tab_info_log">
       <attribute name="title">
        <string>Info log</string>
       </attribute>

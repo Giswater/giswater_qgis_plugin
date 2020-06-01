@@ -270,8 +270,8 @@ class Csv2Pg(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('delete_feature.ui')
-class DelFeature(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('feature_delete.ui')
+class FeatureDelete(GwDialog, FORM_CLASS):
     pass
 
 
