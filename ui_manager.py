@@ -310,8 +310,8 @@ class EpaResultManager(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('event_full.ui')
-class EventFull(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('visit_event_full.ui')
+class VisitEventFull(GwDialog, FORM_CLASS):
     pass
 
 

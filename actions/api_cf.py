@@ -26,7 +26,7 @@ from .manage_element import ManageElement
 from .manage_gallery import ManageGallery
 from .manage_visit import ManageVisit
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
-from ..ui_manager import ApiBasicInfo, InfoFullUi, EventFull, GwMainWindow, LoadDocuments, Sections
+from ..ui_manager import ApiBasicInfo, InfoFullUi, VisitEventFull, GwMainWindow, LoadDocuments, Sections
 
 
 class ApiCF(ApiParent, QObject):
@@ -1817,7 +1817,7 @@ class ApiCF(ApiParent, QObject):
         """ Open event of selected record of the table """
 
         # Open dialog event_standard
-        self.dlg_event_full = EventFull()
+        self.dlg_event_full = VisitEventFull()
         self.load_settings(self.dlg_event_full)
         self.dlg_event_full.rejected.connect(partial(self.close_dialog, self.dlg_event_full))
         # Get all data for one visit
