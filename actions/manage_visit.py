@@ -26,7 +26,7 @@ from ..dao.om_visit_parameter import OmVisitParameter
 from ..ui_manager import VisitUi, NewVisitUi
 from ..ui_manager import EventStandard
 from ..ui_manager import EventUDarcStandard
-from ..ui_manager import EventUDarcRehabit
+from ..ui_manager import VisitEventRehab
 from ..ui_manager import VisitManagement
 from .parent_manage import ParentManage
 from .manage_document import ManageDocument
@@ -971,17 +971,18 @@ class ManageVisit(ParentManage, QObject):
                f" WHERE id = '{parameter_id}'")
         row = self.controller.get_row(sql)
         form_type = str(row[0])
-
+        dlg_name = None
         if form_type == 'event_ud_arc_standard':
             self.dlg_event = EventUDarcStandard()
             self.load_settings(self.dlg_event)
+
             # disable position_x fields because not allowed in multiple view
             self.populate_position_id()
         elif form_type == 'event_ud_arc_rehabit':
-            self.dlg_event = EventUDarcRehabit()
+            self.dlg_event = VisitEventRehab()
             self.load_settings(self.dlg_event)
             self.populate_position_id()
-
+            dlg_name = 'visit_event_rehab'
             # disable position_x fields because not allowed in multiple view
             self.dlg_event.position_id.setEnabled(True)
             self.dlg_event.position_value.setEnabled(True)
@@ -1017,6 +1018,8 @@ class ManageVisit(ParentManage, QObject):
         if not ret:
             # clicked cancel
             return
+
+        self.controller.manage_translation(dlg_name, self.dlg_event)
 
         for field_name in event.field_names():
             value = None
@@ -1280,7 +1283,7 @@ class ManageVisit(ParentManage, QObject):
             geom2 = self.dlg_add_visit.tbl_event.model().record(0).value('geom2')
             geom3 = self.dlg_add_visit.tbl_event.model().record(0).value('geom3')
             text = self.dlg_add_visit.tbl_event.model().record(0).value('text')
-            self.dlg_event = EventUDarcRehabit()
+            self.dlg_event = VisitEventRehab()
             self.load_settings(self.dlg_event)
             self.populate_position_id()
             self.dlg_event.position_value.setText(str(position_value))
@@ -1344,6 +1347,7 @@ class ManageVisit(ParentManage, QObject):
 
             # update the record
             event.upsert(commit=self.autocommit)
+
         self.save_files_added(event.visit_id, event.id)
 
         # update Table

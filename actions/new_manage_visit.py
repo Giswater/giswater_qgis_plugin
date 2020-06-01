@@ -26,7 +26,7 @@ from ..dao.om_visit_parameter import OmVisitParameter
 from ..ui_manager import NewVisitUi
 from ..ui_manager import EventStandard
 from ..ui_manager import EventUDarcStandard
-from ..ui_manager import EventUDarcRehabit
+from ..ui_manager import VisitEventRehab
 from ..ui_manager import VisitManagement
 from .parent_manage import ParentManage
 from .manage_document import ManageDocument

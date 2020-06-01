@@ -1862,7 +1862,7 @@ class ApiCF(ApiParent, QObject):
         self.dlg_event_full.tbl_docs_x_event.doubleClicked.connect(self.open_file)
         utils_giswater.set_qtv_config(self.dlg_event_full.tbl_docs_x_event)
         
-        self.open_dialog(self.dlg_event_full)
+        self.open_dialog(self.dlg_event_full, 'visit_event_full')
 
 
     def populate_tbl_docs_x_event(self):

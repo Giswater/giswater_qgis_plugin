@@ -320,8 +320,8 @@ class EventStandard(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('event_ud_arc_rehabit.ui')
-class EventUDarcRehabit(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('visit_event_rehab.ui')
+class VisitEventRehab(GwDialog, FORM_CLASS):
     pass
 
 
