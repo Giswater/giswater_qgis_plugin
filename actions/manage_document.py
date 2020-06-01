@@ -10,7 +10,7 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView
 from functools import partial
 
 from .. import utils_giswater
-from ..ui_manager import DocUi, DocManagement
+from ..ui_manager import DocUi, DocManager
 from .parent_manage import ParentManage
 
 
@@ -220,7 +220,7 @@ class ManageDocument(ParentManage):
         """ Button 66: Edit document """ 
         
         # Create the dialog
-        self.dlg_man = DocManagement()
+        self.dlg_man = DocManager()
         self.load_settings(self.dlg_man)
         self.dlg_man.tbl_document.setSelectionBehavior(QAbstractItemView.SelectRows)
                 
@@ -240,6 +240,6 @@ class ManageDocument(ParentManage):
         self.dlg_man.btn_delete.clicked.connect(partial(self.delete_selected_object, self.dlg_man.tbl_document, table_object))
                                 
         # Open form
-        self.open_dialog(self.dlg_man)
+        self.open_dialog(self.dlg_man, dlg_name='doc_manager')
         
                     

@@ -280,8 +280,8 @@ class DocUi(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('doc_management.ui')
-class DocManagement(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('doc_manager.ui')
+class DocManager(GwDialog, FORM_CLASS):
     pass
 
 

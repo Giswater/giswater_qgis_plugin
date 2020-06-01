@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>document_management</class>
- <widget class="QDialog" name="document_management">
+ <class>dlg_doc_manager</class>
+ <widget class="QDialog" name="dlg_doc_manager">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -87,7 +87,7 @@
        </widget>
       </item>
       <item row="0" column="0">
-       <widget class="QLabel" name="label_doc_id">
+       <widget class="QLabel" name="lbl_doc_id">
         <property name="text">
          <string>Filter by: Doc id</string>
         </property>
