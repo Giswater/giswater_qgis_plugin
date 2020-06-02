@@ -110,7 +110,7 @@ BEGIN
 
 				IF v_count > 0 THEN
 
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
        				"data":{"message":"3030", "function":"2750","debug_msg":"'||rec.typevalue_name||'"}}$$);';
 				END IF;
 				--check if the value is the last one defined for the typevalue, if so delete the configuration from sys_foreignkey

@@ -206,7 +206,6 @@ BEGIN
 		ALTER TABLE sys_addfields DROP COLUMN if exists _dv_key_column_;
 		ALTER TABLE sys_addfields DROP COLUMN if exists _sql_text_;
 		
-		
 		-- inserting on config_param_system table
 		INSERT INTO config_param_system (parameter, value, datatype, context, descript, project_type, label, isdeprecated) 
 		VALUES ('admin_schema_info', v_schema_info,'json','system', 'Basic information about schema','utils', 'Schema manager:', false);
@@ -215,6 +214,7 @@ BEGIN
 		IF (SELECT value FROM config_param_system WHERE parameter='admin_utils_schema') IS NOT NULL THEN
 			PERFORM gw_fct_admin_schema_utils_fk();  -- this is the position to use it because we need values on version table to work with
 		END IF;
+		
 		-- generate child views 
 		PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
 		"data":{"filterFields":{}, "pageInfo":{}, "multi_create":true}}$$)::text;

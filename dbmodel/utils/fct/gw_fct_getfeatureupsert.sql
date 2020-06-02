@@ -22,7 +22,15 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getfeatureupsert(
   RETURNS json AS
 $BODY$
 
+
 /*EXAMPLE
+
+SELECT SCHEMA_NAME.gw_fct_getformfields('ve_arc_pipe',	'form_feature',	'data',	've_arc_pipe',	'arc_id',	'2088','character varying(16)',	'UPDATE',	'1',	4,	'{}'::json )
+
+SELECT SCHEMA_NAME.gw_fct_getconfig($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"formName":"config"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}}}$$);
+
+SELECT SCHEMA_NAME.gw_fct_getinfofromcoordinates($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic", "rolePermissions":"None", "activeLayer":"", "visibleLayer":["v_edit_dma", "v_edit_dqa", "v_edit_connec", "v_edit_arc", "v_edit_presszone", "v_edit_node"], "addSchema":"None", "projecRole":"None", "coordinates":{"xcoord":418845.1255354889,"ycoord":4576886.012737853, "zoomRatio":709.3707873874217}}}$$);
+
 arc with no nodes
 SELECT SCHEMA_NAME.gw_fct_getfeatureupsert('ve_arc_pipe', null, '0102000020E764000002000000000000A083198641000000669A33C041000000E829D880410000D0AE90F0F341', 9, 100,'INSERT', true, 'arc_id', 'text')
 arc with nodes
@@ -372,8 +380,12 @@ BEGIN
 		PERFORM gw_fct_debug(concat('{"data":{"msg":"--> Configuration fields are defined on layoutorder table <--", "variables":""}}')::json);
 
 		-- Call the function of feature fields generation
-		v_formtype = 'feature';	
-		SELECT gw_fct_getformfields( v_formname, v_formtype, v_tabname, v_tablename, p_idname, p_id, p_columntype, p_tg_op, null, p_device , v_values_array) INTO v_fields_array;
+		v_formtype = 'form_feature';	
+		v_querytext = 'SELECT gw_fct_getformfields( '||quote_literal(v_formname)||','||quote_literal(v_formtype)||','||quote_literal(v_tabname)||','||quote_literal(v_tablename)||','||quote_literal(p_idname)||','||
+		quote_literal(p_id)||','||quote_literal(p_columntype)||','||quote_literal(p_tg_op)||','||'''text'''||','||p_device||','||quote_literal(v_values_array)||' )'; 		
+		RAISE NOTICE 'v_querytext %', v_querytext;
+		SELECT gw_fct_getformfields(v_formname , v_formtype , v_tabname , v_tablename , p_idname , p_id , p_columntype, p_tg_op, NULL, p_device , v_values_array)
+		INTO v_fields_array;
 
 	ELSE	
 		PERFORM gw_fct_debug(concat('{"data":{"msg":"--> Configuration fields are NOT defined on layoutorder table. System values are used <--", "variables":""}}')::json);

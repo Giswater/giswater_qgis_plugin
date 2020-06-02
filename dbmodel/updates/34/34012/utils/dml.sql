@@ -17,6 +17,8 @@ DELETE FROM config_csv WHERE fid IN(2,5,6,7, 140, 141, 239,240, 246,247);
 
 -- sys_table
 UPDATE sys_table SET id = 'config_visit_class'  where id ='om_visit_class';
+
+update sys_table set sys_sequence ='temp_csv_id_seq' where id = 'temp_csv';
 UPDATE sys_table SET sys_sequence = null, sys_sequence_field = null where id ='config_csv';
 UPDATE sys_table SET id = 'config_fprocess' WHERE id = 'config_csv_param';
 UPDATE sys_table SET id = 'temp_csv' WHERE id = 'temp_csv2pg';
@@ -86,11 +88,16 @@ UPDATE config_fprocess SET fid = 141 WHERE fid = 10;
 UPDATE config_fprocess SET fid = 140 WHERE fid = 11;
 UPDATE config_fprocess SET fid2 = 239 WHERE fid2 = 11;
 
-ALTER TABLE config_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
 
-DELETE FROM config_typevalue WHERE typevalue = 'mtype_typevalue';
+DELETE FROM sys_foreignkey WHERE target_field = 'message_type';
+
+UPDATE sys_foreignkey SET target_field = 'layoutname' WHERE target_field = 'layout_name';
 
 DELETE FROM config_typevalue WHERE typevalue = 'datatype_typevalue' AND idval = 'character varying';
+
+UPDATE config_form_fields SET layoutname = concat('lyt_',layoutname) WHERE layoutname  = 'data_1';
+UPDATE config_form_fields SET layoutname = concat('lyt_',layoutname) WHERE layoutname  = 'data_2';
+UPDATE config_form_fields SET layoutname = concat('lyt_data_3') WHERE layoutname  = 'data_9';
 
 DELETE FROM config_typevalue WHERE typevalue = 'layout_name_typevalue' AND idval = 'data_1';
 DELETE FROM config_typevalue WHERE typevalue = 'layout_name_typevalue' AND idval = 'data_2';
@@ -100,26 +107,17 @@ DELETE FROM config_typevalue WHERE typevalue = 'widgetfunction_typevalue' AND id
 DELETE FROM config_typevalue WHERE typevalue = 'widgetfunction_typevalue' AND idval = 'gw_api_open_url';
 DELETE FROM config_typevalue WHERE typevalue = 'widgetfunction_typevalue' AND idval = 'gw_api_setprint';
 
-ALTER TABLE config_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
-
 UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'om_visit_class', 'config_visit_class')  WHERE dv_querytext like '%om_visit_class%';
 
-INSERT INTO config_form_tabs VALUES ('v_edit_node', 'tab_connection', 'Connections', 'Connections downstream and upstream', 'role_basic', NULL, '[
-{"actionName":"actionEdit", "actionTooltip":"Edit",  "disabled":false},
-{"actionName":"actionZoom", "actionTooltip":"Zoom In",  "disabled":false},
-{"actionName":"actionCentered", "actionTooltip":"Center",  "disabled":false},
-{"actionName":"actionZoomOut", "actionTooltip":"Zoom Out",  "disabled":false},
-{"actionName":"actionCatalog", "actionTooltip":"Change Catalog",  "disabled":false},
-{"actionName":"actionWorkcat", "actionTooltip":"Add Workcat",  "disabled":false},
-{"actionName":"actionCopyPaste", "actionTooltip":"Copy Paste",  "disabled":false},
-{"actionName":"actionSection", "actionTooltip":"Show Section",  "disabled":false},
-{"actionName":"actionLink", "actionTooltip":"Open Link",  "disabled":false},
-{"actionName":"actionHelp", "actionTooltip":"Help",  "disabled":false}]',4);
+DELETE FROM config_typevalue WHERE id = 'get_catalog_id';
 
-
+DELETE FROM config_typevalue WHERE typevalue = 'mtype_typevalue';
 
 UPDATE config_form_fields SET datatype = 'string' WHERE datatype = 'text';
+
+
 DELETE FROM config_typevalue WHERE id = 'text' AND typevalue = 'datatype_typevalue';
+
 DELETE FROM config_typevalue WHERE id = 'character varying' AND typevalue = 'datatype_typevalue';
 
 DELETE FROM sys_function WHERE function_name = 'gw_api_getrowinsert';
@@ -134,7 +132,8 @@ UPDATE config_typevalue SET camelstyle = idval WHERE typevalue = 'datatype_typev
 
 UPDATE config_typevalue set id = 'form_list_header', idval = 'form_list_header', camelstyle = 'formHeader' WHERE id = 'listHeader';
 UPDATE config_typevalue set id = 'form_list_footer', idval = 'form_list_footer',camelstyle = 'formHooter' WHERE id = 'listFooter';
-DELETE FROM config_typevalue WHERE id = 'listfilter';
+
+
 UPDATE config_typevalue set id = 'form_visit', idval = 'form_visit',camelstyle = 'formVisit' WHERE id = 'visit';
 UPDATE config_typevalue set id = 'form_lot', idval = 'form_lot',camelstyle = 'formLot' WHERE id = 'lot';
 UPDATE config_typevalue set id = 'form_generic', idval = 'form_generic',camelstyle = 'formGeneric' WHERE id = 'form';
@@ -144,8 +143,17 @@ UPDATE config_typevalue set id = 'form_catalog', idval = 'form_catalog',camelsty
 UPDATE config_typevalue set camelstyle = 'actionCatalog' WHERE id = 'action_catalog';
 UPDATE config_typevalue set camelstyle = 'actionLink' WHERE id = 'action_link';
 UPDATE config_typevalue set camelstyle = 'actionWorkcat' WHERE id = 'action_workcat';
-UPDATE config_typevalue set camelstyle = id WHERE typevalue ='listlimit_typevalue';
 UPDATE config_typevalue SET camelstyle = idval WHERE typevalue ='widgettype_typevalue';
+
+
+INSERT INTO config_typevalue VALUES ('infotype_typevalue','1','Complet info');
+INSERT INTO config_typevalue VALUES ('infotype_typevalue','2','Basic info');
+
+INSERT INTO config_typevalue VALUES ('device_typevalue','1','Mobile');
+INSERT INTO config_typevalue VALUES ('device_typevalue','2','Tablet');
+INSERT INTO config_typevalue VALUES ('device_typevalue','3','Web');
+INSERT INTO config_typevalue VALUES ('device_typevalue','4','Desktop');
+
 
 UPDATE config_typevalue set camelstyle = 'layoutBottom1' WHERE id = 'lyt_bot_1';
 UPDATE config_typevalue set camelstyle = 'layoutBottom2' WHERE id = 'lyt_bot_2';
@@ -159,10 +167,9 @@ UPDATE config_typevalue set camelstyle = 'layoutSymbology' WHERE id = 'lyt_symbo
 UPDATE config_typevalue set camelstyle = 'layoutTop1' WHERE id = 'lyt_top_1';
 
 UPDATE config_typevalue SET id = 'datetime', idval = 'datetime' WHERE id = 'datepickertime';
-
 UPDATE config_typevalue SET id = 'spinbox', idval = 'spinbox' WHERE id = 'doubleSpinbox';
-
 UPDATE config_typevalue SET id = 'divider', idval = 'divider' WHERE id = 'formDivider';
+
 UPDATE sys_param_user SET widgettype = 'divider' WHERE widgettype = 'formDivider';
 UPDATE config_param_system SET widgettype = 'divider' WHERE widgettype = 'formDivider';
 
@@ -206,21 +213,8 @@ UPDATE config_typevalue set camelstyle = 'tabElements' WHERE id = 'tab_elements'
 UPDATE config_typevalue set id = 'get_info_node', idval ='get_info_node', camelstyle = 'gwGetInfoNode' WHERE id = 'info_node';
 UPDATE config_typevalue set id = 'set_open_url', idval ='set_open_url', camelstyle = 'gwOpenUrl' WHERE id = 'open_url';
 
-DELETE FROM config_typevalue WHERE id IN (select id FROM config_typevalue WHERE id = 'tabData' LIMIT 1);
-
 DELETE FROM config_typevalue WHERE id = 'gw_api_open_node';
 DELETE FROM config_typevalue WHERE id = 'gw_api_open_url';
 DELETE FROM config_typevalue WHERE id = 'gw_api_setprint';
 
-UPDATE sys_foreignkey SET target_field = 'layoutname' WHERE target_field = 'layout_name';
 UPDATE sys_foreignkey SET target_field = 'linkedaction', typevalue_name = 'linkedaction_typevalue' WHERE target_field = 'action_function';
-DELETE FROM sys_foreignkey WHERE target_field = 'message_type';
-
-ALTER TABLE config_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
-DELETE FROM config_typevalue WHERE id = 'get_catalog_id';
-DELETE FROM config_typevalue WHERE typevalue = 'mtype_typevalue';
-DELETE FROM config_typevalue WHERE id = 'data_1';
-DELETE FROM config_typevalue WHERE id = 'data_2';
-DELETE FROM config_typevalue WHERE id = 'data_9';
-ALTER TABLE config_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
-

@@ -11,7 +11,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 ALTER TABLE config_typevalue RENAME COLUMN descript TO camelstyle;
-ALTER TABLE config_typevalue ADD CONSTRAINT config_typevalue_unique UNIQUE (id);
 
 
 ALTER TABLE om_visit_class RENAME TO config_visit_class;
@@ -33,7 +32,7 @@ DELETE FROM config_csv WHERE id IN(14,15,16);
 ALTER TABLE config_csv RENAME id TO fid;
 ALTER TABLE config_csv RENAME isdeprecated TO active;
 ALTER TABLE config_csv ALTER COLUMN active set DEFAULT true;
-ALTER TABLE config_csv RENAME csv_structure TO descpript;
+ALTER TABLE config_csv RENAME csv_structure TO descript;
 ALTER TABLE config_csv DROP column formname;
 ALTER TABLE config_csv ADD COLUMN addparam JSON;
 

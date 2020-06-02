@@ -26,11 +26,13 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getformfields(
   RETURNS text[] AS
 $BODY$
 
+
 /*EXAMPLE
-SELECT "SCHEMA_NAME".gw_fct_getformfields('visit_arc_insp', 'form_visit', 'data', NULL, NULL, NULL, NULL, 'INSERT', null, 3,null)
+SELECT SCHEMA_NAME.gw_fct_getformfields( 've_arc_pipe','form_feature','data','ve_arc_pipe','arc_id',	'2088','character varying(16)',	'UPDATE',	1,	'4',	'{}' )
+SELECT SCHEMA_NAME.gw_fct_getformfields('visit_arc_insp', 'form_visit', 'data', NULL,	 NULL, 		NULL, 	NULL, 			'INSERT', 	null, 	3,	null)
 SELECT "SCHEMA_NAME".gw_fct_getformfields('go2epa', 'form_generic', 'data', null, null, null, null, null, null,null, '{}')
-SELECT "SCHEMA_NAME".gw_fct_getformfields('ve_arc_conduit', 'form_feature', 'data', 've_arc_conduit', 'arc_id', '2001', NULL, 'SELECT', null, 4)
-SELECT "SCHEMA_NAME".gw_fct_getformfields('ve_arc_pipe', 'form_feature', NULL, NULL, NULL, NULL, NULL, 'INSERT', null, 4)
+SELECT "SCHEMA_NAME".gw_fct_getformfields('ve_arc_conduit', 'form_feature', 'data', 've_arc_conduit', 'arc_id', '2001', NULL, 'SELECT', null, 4, NULL)
+SELECT "SCHEMA_NAME".gw_fct_getformfields('ve_arc_pipe', 'form_feature', NULL, NULL, NULL, NULL, NULL, 'INSERT', null, 4, '{}')
 SELECT "SCHEMA_NAME".gw_fct_getformfields( 'print', 'form_generic', 'data', null, null, null, null, 'SELECT', null, 3);
 
 PERFORM gw_fct_debug(concat('{"data":{"msg":"----> INPUT FOR gw_fct_getformfields: ", "variables":"',v_debug,'"}}')::json);
@@ -65,7 +67,6 @@ v_clause text;
 v_device text;
 v_debug boolean;
 v_debug_var text;
-v_formtype text;
        
 BEGIN
 	
@@ -104,9 +105,9 @@ BEGIN
 
 	-- setting device
 	IF p_device IN (1,2,3) THEN
-		v_device = ' b.camelcase AS type, columnname AS name, datatype AS "dataType", a.camelcase AS "widgetAction", a.camelcase as "updateAction", a.camelcase as "changeAction",
+		v_device = ' b.camelstyle AS type, columnname AS name, datatype AS "dataType", a.camelstyle AS "widgetAction", a.camelstyle as "updateAction", a.camelstyle as "changeAction",
 		     (CASE WHEN layoutname=''0'' THEN ''header'' WHEN layoutname=''9'' THEN ''footer'' ELSE ''body'' END) AS "position",
-		     (CASE WHEN iseditable=true THEN false ELSE true END)  AS disabled';     
+		     (CASE WHEN iseditable=true THEN false ELSE true END)  AS disabled,';     
 	ELSE 
 		v_device = '';
 	END IF;
@@ -120,7 +121,6 @@ BEGIN
 
 	-- starting process - get fields	
 	IF p_formname!='infoplan' THEN 
-		SELECT formtype INTO v_formtype FROM config_form_fields WHERE formname = p_formname LIMIT 1;
 		
 		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (
 			
@@ -131,12 +131,12 @@ BEGIN
 			layoutname, layoutorder, dv_parent_id AS "parentId", isparent, ismandatory, linkedaction, dv_querytext AS "queryText", dv_querytext_filterc AS "queryTextFilter", isautoupdate,
 			dv_orderby_id AS "orderById", dv_isnullvalue AS "isNullValue", stylesheet, widgetcontrols
 			FROM config_form_fields 
-			JOIN typevalue a ON a.id = widgetfunction
-			JOIN typevalue b ON b.id = widgettype
+			LEFT JOIN typevalue a ON a.id = widgetfunction AND a.typevalue = ''widgetfunction_typevalue''
+			LEFT JOIN typevalue b ON b.id = widgettype AND a.typevalue = ''widgettype_typevalue''
 			
 			WHERE formname = $1 AND formtype= $2 '||v_clause||' ORDER BY orderby) a'
 				INTO fields_array
-				USING p_formname, v_formtype;
+				USING p_formname, p_formtype;
 
 	ELSE
 		EXECUTE 'SELECT array_agg(row_to_json(b)) FROM (

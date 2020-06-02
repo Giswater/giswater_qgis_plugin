@@ -61,7 +61,7 @@ BEGIN
 		INSERT INTO sys_table(id, context, descript, sys_role_id, sys_criticity, qgis_role_id, qgis_criticity, isdeprecated)
 	    VALUES (v_view_name, 'Editable view', concat('Custom editable view for ',v_cat_feature), 'role_edit', 0, null,0,false);
 
-	    PERFORM SCHEMA_NAME.gw_fct_admin_role_permissions();
+	    PERFORM gw_fct_admin_role_permissions();
 	
 	END IF;
 
@@ -124,7 +124,7 @@ BEGIN
 			v_widgettype='check';
 		ELSIF rec.data_type = 'date' THEN
 			v_datatype='date';
-			v_widgettype='datepickertime';
+			v_widgettype='datetime';
 		ELSE 
 			v_datatype='string';
 			v_widgettype='text';
@@ -133,7 +133,7 @@ BEGIN
 		--insert into config_form_fields
 		INSERT INTO config_form_fields (formname,formtype,columnname,datatype,widgettype, layoutname, layoutorder,
 			label, ismandatory, isparent, iseditable, isautoupdate) 
-		VALUES (v_view_name,'feature', rec.column_name, v_datatype, v_widgettype, 'lyt_data_1',v_orderby, 
+		VALUES (v_view_name,'form_feature', rec.column_name, v_datatype, v_widgettype, 'lyt_data_1',v_orderby, 
 			rec.column_name, false, false,true,false);
 
 	END LOOP;
@@ -157,7 +157,7 @@ BEGIN
 		IF  rec.datatype_id = 'boolean' THEN
 			v_widgettype='check';
 		ELSIF rec.datatype_id = 'date' THEN
-			v_widgettype='datepickertime';
+			v_widgettype='datetime';
 		ELSE 
 			v_widgettype='text';
 		END IF;
@@ -165,7 +165,7 @@ BEGIN
 		--insert into config_form_fields
 		INSERT INTO config_form_fields (formname,formtype,columnname,datatype,widgettype, layoutname,layoutorder,
 			label, ismandatory,isparent,iseditable,isautoupdate) 
-		VALUES (v_view_name,'feature',rec.param_name, v_datatype,v_widgettype, 'lyt_data_1',v_orderby,
+		VALUES (v_view_name,'form_feature',rec.param_name, v_datatype,v_widgettype, 'lyt_data_1',v_orderby,
 			rec.param_name, rec.is_mandatory, false,rec.iseditable,false);
 				
 	END LOOP;

@@ -92,7 +92,7 @@ BEGIN
 
 	-- basic_tab
 	-------------------------
-    SELECT * INTO rec_tab FROM config_form_tabs WHERE formname='config' AND tabname='tabUser';
+    SELECT * INTO rec_tab FROM config_form_tabs WHERE formname='config' AND tabname='tab_user';
     IF rec_tab.tabname IS NOT NULL THEN
 
 		-- Get all parameters from audit_cat param_user
@@ -282,7 +282,7 @@ BEGIN
 
 	-- Admin tab
 	--------------
-    SELECT * INTO rec_tab FROM config_form_tabs WHERE formname='config' AND tabname='tabAdmin' ;
+    SELECT * INTO rec_tab FROM config_form_tabs WHERE formname='config' AND tabname='tab_admin' ;
 
     -- only form config form (epaoptions not need admin tab)
     IF v_formname='config' THEN 
@@ -300,7 +300,7 @@ BEGIN
 		ELSE 
 			-- Get fields for admin disabled (only to show)
 			EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (SELECT label, parameter AS widgetname, parameter as widgetname, concat(''admin_'',parameter), value, 
-				widgettype, datatype, layoutname, layoutorder, row_number() over (order by layoutname, layoutorder) as orderby, tooltip, FALSE AS iseditable,
+				widgettype, datatype, layoutname, layoutorder, row_number() over (order by layoutname, layoutorder) as orderby, descript as tooltip, FALSE AS iseditable,
 				placeholder
 				FROM config_param_system WHERE isenabled=TRUE AND (project_type =''utils'' or project_type='||quote_literal(lower(v_project_type))||') ORDER BY orderby) a'
 				INTO fields_array;
@@ -350,8 +350,8 @@ BEGIN
 	    '}')::json;
        
 	-- Exception handling
-	EXCEPTION WHEN OTHERS THEN 
-    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+--EXCEPTION WHEN OTHERS THEN 
+    --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$
