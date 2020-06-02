@@ -360,8 +360,8 @@ class SearchWorkcat(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('load_documents.ui')
-class LoadDocuments(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('visit_documents.ui')
+class VisitDocuments(GwDialog, FORM_CLASS):
     pass
 
 

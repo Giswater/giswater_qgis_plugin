@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>load_profiles</class>
- <widget class="QDialog" name="load_profiles">
+ <class>dlg_visit_document</class>
+ <widget class="QDialog" name="dlg_visit_document">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>249</width>
+    <width>251</width>
     <height>413</height>
    </rect>
   </property>
@@ -62,7 +62,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QLabel" name="label">
+  <widget class="QLabel" name="lbl_visit_id">
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -72,7 +72,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Visit_id</string>
+    <string>Visit id</string>
    </property>
   </widget>
  </widget>
