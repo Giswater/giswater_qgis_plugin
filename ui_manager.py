@@ -405,8 +405,8 @@ class MincutConnec(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('mincut_add_hydrometer.ui')
-class Mincut_add_hydrometer(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('mincut_hydrometer.ui')
+class MincutHydrometer(GwDialog, FORM_CLASS):
     pass
 
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>visit_management</class>
- <widget class="QDialog" name="visit_management">
+ <class>dlg_mincut_hydrometer</class>
+ <widget class="QDialog" name="dlg_mincut_hydrometer">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Visit management</string>
+   <string>Mincut hydrometer</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_4">
    <item>

@@ -30,7 +30,7 @@ from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 from ..ui_manager import DialogTextUi
 from ..ui_manager import Mincut
 from ..ui_manager import Mincut_fin
-from ..ui_manager import Mincut_add_hydrometer
+from ..ui_manager import MincutHydrometer
 from ..ui_manager import MincutConnec
 from ..ui_manager import MincutComposer
 
@@ -958,8 +958,8 @@ class MincutParent(ParentAction):
         self.action_custom_mincut.setDisabled(True)
         self.action_add_connec.setDisabled(True)
 
-        # Set dialog Mincut_add_hydrometer
-        self.dlg_hydro = Mincut_add_hydrometer()
+        # Set dialog MincutHydrometer
+        self.dlg_hydro = MincutHydrometer()
         self.load_settings(self.dlg_hydro)
         self.dlg_hydro.setWindowTitle("Hydrometer management")
         self.dlg_hydro.tbl_hydro.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -982,7 +982,7 @@ class MincutParent(ParentAction):
             # Read selection and reload table
             self.select_features_hydro()
 
-        self.open_dialog(self.dlg_hydro)
+        self.open_dialog(self.dlg_hydro, dlg_name='mincut_hydrometer')
 
 
     def auto_fill_hydro_id(self):
