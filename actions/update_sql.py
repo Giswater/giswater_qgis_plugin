@@ -34,7 +34,7 @@ from .create_gis_project import CreateGisProject
 from .gw_task import GwTask
 from .i18n_generator import I18NGenerator
 from ..ui_manager import Readsql, InfoShowInfo, ReadsqlCreateProject, ReadsqlRenameCopy, ReadsqlShowInfo, \
-    ReadsqlCreateGisProject, ToolboxUi, MainFields, ManageVisitClass, ManageVisitParam, ManageSysFields, Credentials
+    ReadsqlCreateGisProject, ToolboxUi, MainFields, ManageVisitClass, ManageVisitParam, MainSysFields, Credentials
 
 
 class UpdateSQL(ApiParent):
@@ -2832,13 +2832,13 @@ class UpdateSQL(ApiParent):
     def update_sys_fields(self):
 
         # Create the dialog and signals
-        self.dlg_manage_sys_fields = ManageSysFields()
+        self.dlg_manage_sys_fields = MainSysFields()
         self.load_settings(self.dlg_manage_sys_fields)
         self.model_update_table = None
 
         # Remove unused tabs
         for x in range(self.dlg_manage_sys_fields.tab_sys_add_fields.count() - 1, -1, -1):
-            if str(self.dlg_manage_sys_fields.tab_sys_add_fields.widget(x).objectName()) != 'update':
+            if str(self.dlg_manage_sys_fields.tab_sys_add_fields.widget(x).objectName()) != 'tab_update':
                 utils_giswater.remove_tab_by_tabName(
                     self.dlg_manage_sys_fields.tab_sys_add_fields, self.dlg_manage_sys_fields.tab_sys_add_fields.widget(x).objectName())
 
@@ -2912,7 +2912,7 @@ class UpdateSQL(ApiParent):
 
         # Create the dialog and signals
         self.close_dialog(self.dlg_manage_sys_fields)
-        self.dlg_manage_sys_fields = ManageSysFields()
+        self.dlg_manage_sys_fields = MainSysFields()
         self.load_settings(self.dlg_manage_sys_fields)
         self.model_update_table = None
 
@@ -2925,7 +2925,7 @@ class UpdateSQL(ApiParent):
 
         # Remove unused tabs
         for x in range(self.dlg_manage_sys_fields.tab_sys_add_fields.count() - 1, -1, -1):
-            if str(self.dlg_manage_sys_fields.tab_sys_add_fields.widget(x).objectName()) != str('create'):
+            if str(self.dlg_manage_sys_fields.tab_sys_add_fields.widget(x).objectName()) != str('tab_create'):
                 utils_giswater.remove_tab_by_tabName(self.dlg_manage_sys_fields.tab_sys_add_fields,
                                                      self.dlg_manage_sys_fields.tab_sys_add_fields.widget(x).objectName())
 
@@ -2976,7 +2976,7 @@ class UpdateSQL(ApiParent):
 
         # Remove unused tabs
         for x in range(self.dlg_manage_fields.tab_add_fields.count() - 1, -1, -1):
-            if str(self.dlg_manage_fields.tab_add_fields.widget(x).objectName()) != str('create'):
+            if str(self.dlg_manage_fields.tab_add_fields.widget(x).objectName()) != str('tab_create'):
                 utils_giswater.remove_tab_by_tabName(self.dlg_manage_fields.tab_add_fields, self.dlg_manage_fields.tab_add_fields.widget(x).objectName())
 
         window_title = 'Update field on "' + str(form_name_fields) + '"'
