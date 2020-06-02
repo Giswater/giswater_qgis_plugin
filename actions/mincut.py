@@ -2427,7 +2427,7 @@ class MincutParent(ParentAction):
         self.dlg_comp.cbx_template.currentIndexChanged.connect(self.set_template)
         
         # Open dialog
-        self.open_dialog(self.dlg_comp)
+        self.open_dialog(self.dlg_comp, dlg_name='mincut_composer')
 
 
     def set_template(self):
