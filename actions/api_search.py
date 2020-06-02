@@ -27,7 +27,7 @@ from .manage_document import ManageDocument
 from .manage_new_psector import ManageNewPsector
 from .manage_visit import ManageVisit
 from .api_parent import ApiParent
-from ..ui_manager import SearchUi, ApiBasicInfo, ListItems, DockerUi
+from ..ui_manager import SearchUi, ApiBasicInfo, SearchWorkcat, DockerUi
 
 
 class ApiSearch(ApiParent):
@@ -425,7 +425,7 @@ class ApiSearch(ApiParent):
         # TODO ZOOM TO SELECTED WORKCAT
         #self.zoom_to_polygon(workcat_id, layer_name, field_id)
 
-        self.items_dialog = ListItems()
+        self.items_dialog = SearchWorkcat()
         self.items_dialog.setWindowTitle(f'Workcat: {display_name}')
         self.set_icon(self.items_dialog.btn_doc_insert, "111")
         self.set_icon(self.items_dialog.btn_doc_delete, "112")
@@ -438,8 +438,8 @@ class ApiSearch(ApiParent):
 
         search_csv_path = self.controller.plugin_settings_value('search_csv_path')
         utils_giswater.setWidgetText(self.items_dialog, self.items_dialog.txt_path, search_csv_path)
-        utils_giswater.setWidgetText(self.items_dialog, self.items_dialog.label_init, f"Filter by: {field_id}")
-        utils_giswater.setWidgetText(self.items_dialog, self.items_dialog.label_end, f"Filter by: {field_id}")
+        utils_giswater.setWidgetText(self.items_dialog, self.items_dialog.lbl_init, f"Filter by: {field_id}")
+        utils_giswater.setWidgetText(self.items_dialog, self.items_dialog.lbl_end, f"Filter by: {field_id}")
 
         self.items_dialog.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.items_dialog.tbl_psm.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
@@ -500,7 +500,7 @@ class ApiSearch(ApiParent):
         self.fill_label_data(workcat_id, table_name)
         self.fill_label_data(workcat_id, table_name_end, extension)
 
-        self.open_dialog(self.items_dialog)
+        self.open_dialog(self.items_dialog, dlg_name='search_workcat')
 
 
     def manage_document(self, qtable, item_id):

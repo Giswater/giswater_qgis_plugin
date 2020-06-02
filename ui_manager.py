@@ -355,8 +355,8 @@ class InfoShowInfo(GwDialog, FORM_CLASS):
     pass
 
 # TODO change file and class name to workcat_search
-FORM_CLASS = get_ui_class('list_items.ui')
-class ListItems(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('search_workcat.ui')
+class SearchWorkcat(GwDialog, FORM_CLASS):
     pass
 
 
