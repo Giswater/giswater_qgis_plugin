@@ -354,18 +354,17 @@ FORM_CLASS = get_ui_class('info_show_info.ui')
 class InfoShowInfo(GwDialog, FORM_CLASS):
     pass
 
-# TODO change file and class name to workcat_search
+
 FORM_CLASS = get_ui_class('search_workcat.ui')
 class SearchWorkcat(GwDialog, FORM_CLASS):
     pass
 
-
-FORM_CLASS = get_ui_class('visit_documents.ui')
-class VisitDocuments(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('visit_document.ui')
+class VisitDocument(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('profiles_list.ui')
+FORM_CLASS = get_ui_class('profile_list.ui')
 class ProfilesList(GwDialog, FORM_CLASS):
     pass
 

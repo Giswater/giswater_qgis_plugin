@@ -26,7 +26,7 @@ from .manage_element import ManageElement
 from .manage_gallery import ManageGallery
 from .manage_visit import ManageVisit
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
-from ..ui_manager import ApiBasicInfo, InfoFullUi, VisitEventFull, GwMainWindow, VisitDocuments, Sections
+from ..ui_manager import ApiBasicInfo, InfoFullUi, VisitEventFull, GwMainWindow, VisitDocument, Sections
 
 
 class ApiCF(ApiParent, QObject):
@@ -2131,7 +2131,7 @@ class ApiCF(ApiParent, QObject):
 
         else:
             # If more then one document is attached open dialog with list of documents
-            self.dlg_load_doc = VisitDocuments()
+            self.dlg_load_doc = VisitDocument()
             self.load_settings(self.dlg_load_doc)
             self.dlg_load_doc.rejected.connect(partial(self.close_dialog, self.dlg_load_doc))
             btn_open_doc = self.dlg_load_doc.findChild(QPushButton, "btn_open")
@@ -2146,7 +2146,7 @@ class ApiCF(ApiParent, QObject):
                 item_doc = QListWidgetItem(str(row[0]))
                 self.tbl_list_doc.addItem(item_doc)
 
-            self.open_dialog(self.dlg_load_doc, dlg_name='visit_documents')
+            self.open_dialog(self.dlg_load_doc, dlg_name='visit_document')
 
 
     def open_selected_doc(self):
