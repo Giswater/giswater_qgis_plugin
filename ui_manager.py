@@ -374,8 +374,8 @@ class LotManagement(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('manage_addfields.ui')
-class ManageFields(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('main_addfields.ui')
+class MainFields(GwDialog, FORM_CLASS):
     pass
 
 FORM_CLASS = get_ui_class('manage_sys_fields.ui')

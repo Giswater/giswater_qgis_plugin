@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>dlg_man_addfields</class>
- <widget class="QDialog" name="dlg_man_addfields">
+ <class>dlg_main_addfields</class>
+ <widget class="QDialog" name="dlg_main_addfields">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>638</width>
-    <height>743</height>
+    <height>883</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -32,7 +32,7 @@
      <item>
       <widget class="QPushButton" name="btn_accept">
        <property name="text">
-        <string>OK</string>
+        <string>Accept</string>
        </property>
       </widget>
      </item>
@@ -50,7 +50,7 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="Create">
+     <widget class="QWidget" name="tab_create">
       <attribute name="title">
        <string>Create</string>
       </attribute>
@@ -65,8 +65,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>565</width>
-            <height>978</height>
+            <width>577</width>
+            <height>1120</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout">
@@ -78,17 +78,83 @@
              <layout class="QVBoxLayout" name="verticalLayout_3">
               <item>
                <layout class="QGridLayout" name="gridLayout_6">
-                <item row="6" column="1">
+                <item row="2" column="0">
+                 <widget class="QLabel" name="lbl_label">
+                  <property name="text">
+                   <string>Label:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="1">
+                 <widget class="QLineEdit" name="label"/>
+                </item>
+                <item row="5" column="0">
+                 <widget class="QLabel" name="lbl_num_dec">
+                  <property name="text">
+                   <string>Num. decimals:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="1">
+                 <widget class="QSpinBox" name="field_length">
+                  <property name="maximum">
+                   <number>999999999</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="12" column="1">
+                 <widget class="QCheckBox" name="addfield_active">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="lbl_form_type">
+                  <property name="text">
+                   <string>Form type:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="12" column="0">
+                 <widget class="QLabel" name="lbl_active">
+                  <property name="text">
+                   <string>Active:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="10" column="1">
                  <widget class="QCheckBox" name="iseditable">
                   <property name="text">
                    <string/>
                   </property>
                  </widget>
                 </item>
-                <item row="5" column="1">
+                <item row="11" column="1">
                  <widget class="QCheckBox" name="ismandatory">
                   <property name="text">
                    <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item row="6" column="0">
+                 <widget class="QLabel" name="lbl_widget_type">
+                  <property name="text">
+                   <string>Widget type:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="9" column="0">
+                 <widget class="QLabel" name="lbl_enabled">
+                  <property name="text">
+                   <string>Enabled:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="0">
+                 <widget class="QLabel" name="lbl_data_type">
+                  <property name="text">
+                   <string>Data type:</string>
                   </property>
                  </widget>
                 </item>
@@ -102,11 +168,25 @@
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="0">
-                 <widget class="QLabel" name="lbl_2">
-                  <property name="toolTip">
-                   <string>column_id - Id of the column</string>
+                <item row="3" column="1">
+                 <widget class="QComboBox" name="datatype"/>
+                </item>
+                <item row="5" column="1">
+                 <widget class="QSpinBox" name="num_decimals">
+                  <property name="maximum">
+                   <number>999999999</number>
                   </property>
+                 </widget>
+                </item>
+                <item row="4" column="0">
+                 <widget class="QLabel" name="lbl_field_length">
+                  <property name="text">
+                   <string>Field length:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="lbl_column_id">
                   <property name="text">
                    <string>Column id:</string>
                   </property>
@@ -115,83 +195,27 @@
                 <item row="0" column="1">
                  <widget class="QLineEdit" name="column_id"/>
                 </item>
-                <item row="4" column="1">
+                <item row="9" column="1">
+                 <widget class="QCheckBox" name="isenabled">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item row="6" column="1">
                  <widget class="QComboBox" name="widgettype"/>
                 </item>
-                <item row="3" column="0">
-                 <widget class="QLabel" name="lbl_73">
-                  <property name="toolTip">
-                   <string>datatype - Data type of the field</string>
-                  </property>
-                  <property name="text">
-                   <string>Data type:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="0">
-                 <widget class="QLabel" name="lbl_72">
-                  <property name="toolTip">
-                   <string>label - Label shown on the item form</string>
-                  </property>
-                  <property name="text">
-                   <string>Label:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="4" column="0">
-                 <widget class="QLabel" name="lbl_71">
-                  <property name="toolTip">
-                   <string>widgettype - Widget of the field. Must match with the data type</string>
-                  </property>
-                  <property name="text">
-                   <string>Widget type:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="6" column="0">
-                 <widget class="QLabel" name="lbl_56">
-                  <property name="toolTip">
-                   <string>iseditable - Field is editable or not</string>
-                  </property>
+                <item row="10" column="0">
+                 <widget class="QLabel" name="lbl_editable">
                   <property name="text">
                    <string>Editable:</string>
                   </property>
                  </widget>
                 </item>
-                <item row="3" column="1">
-                 <widget class="QComboBox" name="datatype"/>
-                </item>
-                <item row="5" column="0">
-                 <widget class="QLabel" name="lbl_59">
-                  <property name="toolTip">
-                   <string>ismandatory - Field is mandatory or not</string>
-                  </property>
+                <item row="11" column="0">
+                 <widget class="QLabel" name="lbl_mandatory">
                   <property name="text">
                    <string>Mandatory:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="1">
-                 <widget class="QLineEdit" name="label"/>
-                </item>
-                <item row="1" column="0">
-                 <widget class="QLabel" name="lbl_70">
-                  <property name="text">
-                   <string>Form type:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="7" column="0">
-                 <widget class="QLabel" name="label_3">
-                  <property name="text">
-                   <string>Hidden:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="7" column="1">
-                 <widget class="QCheckBox" name="hidden">
-                  <property name="text">
-                   <string/>
                   </property>
                  </widget>
                 </item>
@@ -215,46 +239,6 @@
              <layout class="QVBoxLayout" name="verticalLayout_2">
               <item>
                <layout class="QGridLayout" name="gridLayout_7">
-                <item row="13" column="1">
-                 <widget class="QTextEdit" name="widgetcontrols">
-                  <property name="toolTip">
-                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;{&amp;quot;setQgisMultiline&amp;quot;:true, &amp;quot;minValue&amp;quot;:0.001, &amp;quot;maxValue&amp;quot;:100, &amp;quot;autoupdateReloadFields&amp;quot;:['a', 'b'], &amp;quot;comboEnableWhenParent&amp;quot;:['a', 'b'], &amp;quot;regexpControl&amp;quot;:&amp;quot;[]&amp;quot;}&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                  </property>
-                  <property name="whatsThis">
-                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="7" column="1">
-                 <widget class="QSpinBox" name="widgetdim">
-                  <property name="maximum">
-                   <number>999999999</number>
-                  </property>
-                 </widget>
-                </item>
-                <item row="7" column="0">
-                 <widget class="QLabel" name="lbl_61">
-                  <property name="toolTip">
-                   <string>widgetdim - Dimension of the widget (may affect all widgets on same layout)</string>
-                  </property>
-                  <property name="text">
-                   <string>Widget dim:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="0">
-                 <widget class="QLabel" name="lbl_63">
-                  <property name="toolTip">
-                   <string>isautoupdate - Force update of feature (not valid for typeahead widget)</string>
-                  </property>
-                  <property name="text">
-                   <string>Auto update:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="5" column="1">
-                 <widget class="QLineEdit" name="dv_parent_id"/>
-                </item>
                 <item row="3" column="1">
                  <widget class="QCheckBox" name="dv_isnullvalue">
                   <property name="text">
@@ -269,129 +253,199 @@
                   </property>
                  </widget>
                 </item>
-                <item row="4" column="0">
-                 <widget class="QLabel" name="lbl_62">
-                  <property name="toolTip">
-                   <string>isparent - Is parent of another field</string>
-                  </property>
+                <item row="2" column="0">
+                 <widget class="QLabel" name="lbl_auto_update">
                   <property name="text">
-                   <string>Parent:</string>
+                   <string>Auto update:</string>
                   </property>
                  </widget>
                 </item>
-                <item row="6" column="0">
-                 <widget class="QLabel" name="lbl_55">
-                  <property name="toolTip">
-                   <string>tooltip - Tooltip shown when mouse passes over the label</string>
+                <item row="7" column="1">
+                 <widget class="QLineEdit" name="dv_parent_id"/>
+                </item>
+                <item row="8" column="1">
+                 <widget class="QPlainTextEdit" name="tooltip"/>
+                </item>
+                <item row="11" column="1">
+                 <widget class="QPlainTextEdit" name="dv_querytext"/>
+                </item>
+                <item row="3" column="0">
+                 <widget class="QLabel" name="lbl_null_value">
+                  <property name="text">
+                   <string>Null value:</string>
                   </property>
+                 </widget>
+                </item>
+                <item row="10" column="0">
+                 <widget class="QLabel" name="lbl_placeholder">
+                  <property name="text">
+                   <string>Placeholder:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="8" column="0">
+                 <widget class="QLabel" name="lbl_tooltip">
                   <property name="text">
                    <string>Tooltip:</string>
                   </property>
                  </widget>
                 </item>
-                <item row="5" column="0">
-                 <widget class="QLabel" name="lbl_68">
-                  <property name="toolTip">
-                   <string>dv_parent_id - Id of the related parent table</string>
-                  </property>
+                <item row="4" column="0">
+                 <widget class="QLabel" name="lbl_reload_field">
                   <property name="text">
-                   <string>Parent id:</string>
+                   <string>Reload field:</string>
                   </property>
                  </widget>
                 </item>
-                <item row="8" column="1">
+                <item row="10" column="1">
                  <widget class="QLineEdit" name="placeholder"/>
                 </item>
-                <item row="4" column="1">
+                <item row="5" column="0">
+                 <widget class="QLabel" name="lbl_not_update">
+                  <property name="text">
+                   <string>Not update:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="14" column="0">
+                 <widget class="QLabel" name="lbl_action_function">
+                  <property name="text">
+                   <string>Action function:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="5" column="1">
+                 <widget class="QCheckBox" name="isnotupdate">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item row="11" column="0">
+                 <widget class="QLabel" name="lbl_query_text">
+                  <property name="text">
+                   <string>Query text:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="6" column="0">
+                 <widget class="QLabel" name="lbl_parent">
+                  <property name="text">
+                   <string>Parent:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="6" column="1">
                  <widget class="QCheckBox" name="isparent">
                   <property name="text">
                    <string/>
                   </property>
                  </widget>
                 </item>
-                <item row="10" column="0">
-                 <widget class="QLabel" name="lbl_64">
-                  <property name="toolTip">
-                   <string>dv_querytext_filterc - Filter related to the parent table</string>
+                <item row="17" column="0">
+                 <widget class="QLabel" name="lbl_list_filter">
+                  <property name="text">
+                   <string>List filter param:</string>
                   </property>
+                 </widget>
+                </item>
+                <item row="18" column="0">
+                 <widget class="QLabel" name="lbl_editability">
+                  <property name="text">
+                   <string>Editability:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="15" column="0">
+                 <widget class="QLabel" name="lbl_stylesheet">
+                  <property name="text">
+                   <string>Stylesheet:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="12" column="0">
+                 <widget class="QLabel" name="lbl_query_filter">
                   <property name="text">
                    <string>Querytext filter:</string>
                   </property>
                  </widget>
                 </item>
-                <item row="8" column="0">
-                 <widget class="QLabel" name="lbl_57">
-                  <property name="toolTip">
-                   <string>placeholder - Sample value for textedit widgets</string>
-                  </property>
+                <item row="7" column="0">
+                 <widget class="QLabel" name="lbl_parent_id">
                   <property name="text">
-                   <string>Placeholder:</string>
+                   <string>Parent id:</string>
                   </property>
                  </widget>
                 </item>
-                <item row="6" column="1">
-                 <widget class="QPlainTextEdit" name="tooltip"/>
-                </item>
-                <item row="9" column="0">
-                 <widget class="QLabel" name="lbl_65">
-                  <property name="toolTip">
-                   <string>dv_querytext - For combos, query which fill the values of the combo. Must have id, idval column structure</string>
-                  </property>
+                <item row="16" column="0">
+                 <widget class="QLabel" name="lbl_typeahead">
                   <property name="text">
-                   <string>Query text:</string>
+                   <string>Typeahead:</string>
                   </property>
                  </widget>
                 </item>
-                <item row="9" column="1">
-                 <widget class="QPlainTextEdit" name="dv_querytext"/>
+                <item row="16" column="1">
+                 <widget class="QPlainTextEdit" name="typeahead">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;{&amp;quot;fieldToSearch&amp;quot;: &amp;quot;arc_id&amp;quot;, &amp;quot;threshold&amp;quot;: 3, &amp;quot;noresultsMsg&amp;quot;: &amp;quot;No results&amp;quot;, &amp;quot;loadingMsg&amp;quot;: &amp;quot;Searching&amp;quot;}&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                 </widget>
                 </item>
-                <item row="11" column="1">
-                 <widget class="QComboBox" name="widgetfunction"/>
+                <item row="17" column="1">
+                 <widget class="QPlainTextEdit" name="listfilterparam">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;{&amp;quot;sign&amp;quot;:&amp;quot;&amp;gt;&amp;quot;,&amp;quot;vdefault&amp;quot;:&amp;quot;01-01-2014&amp;quot; }&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                 </widget>
                 </item>
-                <item row="13" column="0">
-                 <widget class="QLabel" name="label_2">
-                  <property name="text">
-                   <string>Widgetcontrols:</string>
+                <item row="18" column="1">
+                 <widget class="QPlainTextEdit" name="editability">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;{&amp;quot;trueWhenParentIn&amp;quot;:[3]}&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                   </property>
                  </widget>
                 </item>
                 <item row="12" column="1">
+                 <widget class="QPlainTextEdit" name="dv_querytext_filterc"/>
+                </item>
+                <item row="13" column="0">
+                 <widget class="QLabel" name="lbl_widget_function">
+                  <property name="text">
+                   <string>Widget function:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="15" column="1">
                  <widget class="QPlainTextEdit" name="stylesheet">
                   <property name="toolTip">
                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;{&amp;quot;label&amp;quot;:&amp;quot;color:green; font-weight:bold;&amp;quot;,&amp;quot;widget&amp;quot;:{&amp;quot;enabled&amp;quot;:&amp;quot;color:black; font-weight:bold;&amp;quot;,&amp;quot;disabled&amp;quot;:&amp;quot;color:black; font-weight:bold;&amp;quot;}}&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                   </property>
                  </widget>
                 </item>
-                <item row="3" column="0">
-                 <widget class="QLabel" name="lbl_69">
-                  <property name="toolTip">
-                   <string>dv_isnullvalue - For combos, allow null value</string>
-                  </property>
+                <item row="9" column="0">
+                 <widget class="QLabel" name="lbl_widget_dim">
                   <property name="text">
-                   <string>Null value:</string>
+                   <string>Widget dim:</string>
                   </property>
                  </widget>
                 </item>
-                <item row="11" column="0">
-                 <widget class="QLabel" name="lbl_67">
-                  <property name="toolTip">
-                   <string>widgetfunction - Python action triggered by users click on widget</string>
-                  </property>
-                  <property name="text">
-                   <string>Widget function:</string>
+                <item row="9" column="1">
+                 <widget class="QSpinBox" name="widgetdim">
+                  <property name="maximum">
+                   <number>999999999</number>
                   </property>
                  </widget>
                 </item>
-                <item row="10" column="1">
-                 <widget class="QPlainTextEdit" name="dv_querytext_filterc"/>
+                <item row="13" column="1">
+                 <widget class="QComboBox" name="widgetfunction"/>
                 </item>
-                <item row="12" column="0">
-                 <widget class="QLabel" name="lbl_78">
+                <item row="14" column="1">
+                 <widget class="QComboBox" name="action_function"/>
+                </item>
+                <item row="4" column="1">
+                 <widget class="QLineEdit" name="reload_field">
                   <property name="toolTip">
-                   <string>stylesheet - Style of the label in the form. CSS styles are allowed</string>
-                  </property>
-                  <property name="text">
-                   <string>Stylesheet:</string>
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;{&amp;quot;reload&amp;quot;:[&amp;quot;cat_pnom&amp;quot;, &amp;quot;cat_matcat_id&amp;quot;]}&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                   </property>
                  </widget>
                 </item>
@@ -406,7 +460,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="Update">
+     <widget class="QWidget" name="tab_update">
       <attribute name="title">
        <string>Update</string>
       </attribute>
@@ -447,7 +501,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="Delete">
+     <widget class="QWidget" name="tab_delete">
       <attribute name="title">
        <string>Delete</string>
       </attribute>
@@ -455,7 +509,7 @@
        <item row="0" column="0">
         <layout class="QHBoxLayout" name="horizontalLayout_17">
          <item>
-          <widget class="QLabel" name="lbl_4">
+          <widget class="QLabel" name="lbl_field_name">
            <property name="text">
             <string>Field name:</string>
            </property>
@@ -508,31 +562,6 @@
    </item>
   </layout>
  </widget>
- <tabstops>
-  <tabstop>column_id</tabstop>
-  <tabstop>formtype</tabstop>
-  <tabstop>label</tabstop>
-  <tabstop>datatype</tabstop>
-  <tabstop>widgettype</tabstop>
-  <tabstop>isautoupdate</tabstop>
-  <tabstop>dv_isnullvalue</tabstop>
-  <tabstop>isparent</tabstop>
-  <tabstop>dv_parent_id</tabstop>
-  <tabstop>tooltip</tabstop>
-  <tabstop>widgetdim</tabstop>
-  <tabstop>placeholder</tabstop>
-  <tabstop>dv_querytext</tabstop>
-  <tabstop>dv_querytext_filterc</tabstop>
-  <tabstop>widgetfunction</tabstop>
-  <tabstop>stylesheet</tabstop>
-  <tabstop>btn_accept</tabstop>
-  <tabstop>btn_cancel</tabstop>
-  <tabstop>tab_add_fields</tabstop>
-  <tabstop>scrollArea_2</tabstop>
-  <tabstop>btn_open</tabstop>
-  <tabstop>tbl_update</tabstop>
-  <tabstop>cmb_fields</tabstop>
- </tabstops>
  <resources/>
  <connections/>
 </ui>

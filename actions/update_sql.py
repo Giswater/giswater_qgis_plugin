@@ -34,7 +34,7 @@ from .create_gis_project import CreateGisProject
 from .gw_task import GwTask
 from .i18n_generator import I18NGenerator
 from ..ui_manager import Readsql, InfoShowInfo, ReadsqlCreateProject, ReadsqlRenameCopy, ReadsqlShowInfo, \
-    ReadsqlCreateGisProject, ToolboxUi, ManageFields, ManageVisitClass, ManageVisitParam, ManageSysFields, Credentials
+    ReadsqlCreateGisProject, ToolboxUi, MainFields, ManageVisitClass, ManageVisitParam, ManageSysFields, Credentials
 
 
 class UpdateSQL(ApiParent):
@@ -2860,7 +2860,7 @@ class UpdateSQL(ApiParent):
     def open_manage_field(self, action):
 
         # Create the dialog and signals
-        self.dlg_manage_fields = ManageFields()
+        self.dlg_manage_fields = MainFields()
         self.load_settings(self.dlg_manage_fields)
         self.model_update_table = None
 
@@ -2895,7 +2895,7 @@ class UpdateSQL(ApiParent):
         self.dlg_manage_fields.btn_open.clicked.connect(
             partial(self.update_selected_addfild, self.dlg_manage_fields.tbl_update))
 
-        self.open_dialog(self.dlg_manage_fields)
+        self.open_dialog(self.dlg_manage_fields, dlg_name='main_addfields')
 
 
     # TODO:: Enhance this function and use parametric parameters
@@ -2959,7 +2959,7 @@ class UpdateSQL(ApiParent):
 
         # Create the dialog and signals
         self.close_dialog(self.dlg_manage_fields)
-        self.dlg_manage_fields = ManageFields()
+        self.dlg_manage_fields = MainFields()
         self.load_settings(self.dlg_manage_fields)
         self.model_update_table = None
 
@@ -2997,7 +2997,7 @@ class UpdateSQL(ApiParent):
                 value = None
             utils_giswater.setWidgetText(self.dlg_manage_fields, result, value)
 
-        self.open_dialog(self.dlg_manage_fields)
+        self.open_dialog(self.dlg_manage_fields, dlg_name='main_addfields')
 
 
     def manage_create_field(self, form_name):
@@ -3099,7 +3099,7 @@ class UpdateSQL(ApiParent):
 
     def manage_sys_update(self, form_name):
 
-        list_widgets = self.dlg_manage_sys_fields.Create.findChildren(QWidget)
+        list_widgets = self.dlg_manage_sys_fields.tab_create.findChildren(QWidget)
         column_id = utils_giswater.getWidgetText(self.dlg_manage_sys_fields, self.dlg_manage_sys_fields.column_id)
         sql = f"UPDATE ve_config_sys_fields SET "
         for widget in list_widgets:
@@ -3163,7 +3163,7 @@ class UpdateSQL(ApiParent):
                 self.controller.show_info_box(msg, "Info")
                 return
 
-            list_widgets = self.dlg_manage_fields.Create.findChildren(QWidget)
+            list_widgets = self.dlg_manage_fields.tab_create.findChildren(QWidget)
 
             _json = {}
             for widget in list_widgets:
@@ -3199,7 +3199,7 @@ class UpdateSQL(ApiParent):
 
         elif action == 'Update':
 
-            list_widgets = self.dlg_manage_fields.Create.findChildren(QWidget)
+            list_widgets = self.dlg_manage_fields.tab_create.findChildren(QWidget)
 
             _json = {}
             for widget in list_widgets:
