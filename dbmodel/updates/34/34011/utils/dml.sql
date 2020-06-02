@@ -141,7 +141,7 @@ DELETE FROM sys_param_user WHERE id = 'gully_vdefault';
 UPDATE sys_param_user SET id ='utils_checkproject_qgislayer' WHERE id = 'audit_project_layer_log';
 UPDATE sys_param_user SET id ='utils_checkproject_database' WHERE id = 'audit_project_user_control';
 UPDATE sys_param_user SET id ='utils_debug_mode' WHERE id = 'debug_mode';
-UPDATE sys_param_user SET id ='utils_dim_tooltip' WHERE id = 'dim_tooltip';
+UPDATE sys_param_user SET id ='qgis_dim_tooltip' WHERE id = 'dim_tooltip';
 UPDATE sys_param_user SET id ='basic_search_exploitation_vdefaut' WHERE id = 'search_exploitation_vdefault';
 UPDATE sys_param_user SET id ='basic_search_municipality_vdefaut' WHERE id = 'search_municipality_vdefault';
 UPDATE sys_param_user SET id ='utils_formlabel_show_columname' WHERE id = 'api_form_show_columname_on_label';
