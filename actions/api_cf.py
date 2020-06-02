@@ -568,6 +568,7 @@ class ApiCF(ApiParent, QObject):
             self.dock_dialog(docker, self.dlg_cf)
             docker.dlg_closed.connect(partial(self.manage_docker_close))
             btn_cancel.clicked.connect(partial(self.close_docker, docker))
+            docker.setWindowTitle(f"{complet_result[0]['body']['feature']['childType']}")
 
         else:
             self.dlg_cf.dlg_closed.connect(self.roll_back)
@@ -588,7 +589,8 @@ class ApiCF(ApiParent, QObject):
 
         # Open dialog
         self.open_dialog(self.dlg_cf, dlg_name='info_full')
-
+        
+        self.dlg_cf.setWindowTitle(f"{complet_result[0]['body']['feature']['childType']}")
         return self.complet_result, self.dlg_cf
 
 
@@ -693,7 +695,7 @@ class ApiCF(ApiParent, QObject):
             def manage_typeahead(self, dialog, complet_result, field)
             def manage_combo(self, dialog, complet_result, field)
             def manage_check(self, dialog, complet_result, field)
-            def manage_datepickertime(self, dialog, complet_result, field)
+            def manage_datetime(self, dialog, complet_result, field)
             def manage_button(self, dialog, complet_result, field)
             def manage_hyperlink(self, dialog, complet_result, field)
             def manage_hspacer(self, dialog, complet_result, field)
@@ -815,7 +817,7 @@ class ApiCF(ApiParent, QObject):
         return widget
 
 
-    def manage_datepickertime(self, dialog, complet_result, field):
+    def manage_datetime(self, dialog, complet_result, field):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
