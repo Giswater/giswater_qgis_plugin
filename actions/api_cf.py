@@ -284,11 +284,11 @@ class ApiCF(ApiParent, QObject):
         self.complet_result = row
         try:
             template = self.complet_result[0]['body']['form']['template']
-        except Excetion as e:
+        except Exception as e:
             self.controller.log_info(str(e))
             return False, None
 
-        if template in 'template_generic':
+        if template in ('template_generic', 'GENERIC'):
             result, dialog = self.open_generic_form(self.complet_result)
             # Fill self.my_json for new feature
             if feature_cat is not None:
