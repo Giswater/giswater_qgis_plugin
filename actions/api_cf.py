@@ -2422,7 +2422,7 @@ class ApiCF(ApiParent, QObject):
             return False
 
         for field in complet_list[0]['body']['data']['fields']:
-            if field['widgettype'] == "tableView":
+            if field['widgettype'] == "tableview":
                 qtable = dialog.findChild(QTableView, field['widgetname'])
                 if qtable:
                     self.set_headers(qtable, field)

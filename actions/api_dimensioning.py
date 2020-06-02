@@ -366,7 +366,7 @@ class ApiDimensioning(ApiParent):
             widget = self.add_textarea(field)
         elif field['widgettype'] in ('spinbox'):
             widget = self.add_spinbox(field)
-        elif field['widgettype'] == 'tableView':
+        elif field['widgettype'] == 'tableview':
             widget = self.add_tableview(complet_result, field)
             widget = self.set_headers(widget, field)
             widget = self.populate_table(widget, field)
