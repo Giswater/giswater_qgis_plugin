@@ -335,13 +335,12 @@ class Master(ParentAction):
         self.populate_combo(self.dlg_estimate_result_selector.rpt_selector_result_id, 'selector_plan_result')
 
         # Set current value
-        table_name = "om_result_cat"
-        sql = (f"SELECT name FROM {table_name} "
-               f" WHERE cur_user = current_user AND result_type = 1 AND result_id = (SELECT result_id FROM selector_plan_result)")
+        sql = (f"SELECT name FROM plan_result_cat WHERE result_id IN (SELECT result_id FROM selector_plan_result "
+               f"WHERE cur_user = current_user AND result_type = 1)")
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText(self.dlg_estimate_result_selector, self.dlg_estimate_result_selector.rpt_selector_result_id, str(row[0]))
-            
+
         # Set signals
         self.dlg_estimate_result_selector.btn_accept.clicked.connect(partial(self.master_estimate_result_selector_accept))
         self.dlg_estimate_result_selector.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_estimate_result_selector))
@@ -353,7 +352,7 @@ class Master(ParentAction):
 
     def populate_combo(self, combo, table_result):
 
-        table_name = "om_result_cat"
+        table_name = "plan_result_cat"
         sql = (f"SELECT name, result_id"
                f" FROM {table_name} "
                f" WHERE cur_user = current_user"
@@ -406,9 +405,9 @@ class Master(ParentAction):
         
 
     def master_estimate_result_selector_accept(self):
-        """ Update value of table 'plan_result_selector' """
+        """ Update value of table 'selector_plan_result' """
         
-        self.upsert(self.dlg_estimate_result_selector.rpt_selector_result_id, 'plan_result_selector')
+        self.upsert(self.dlg_estimate_result_selector.rpt_selector_result_id, 'selector_plan_result')
 
 
     def master_estimate_result_manager(self):
@@ -422,7 +421,7 @@ class Master(ParentAction):
         self.dlg_merm.btn_delete.setVisible(False)
 
         # Tables
-        tablename = 'om_result_cat'
+        tablename = 'plan_result_cat'
         self.tbl_om_result_cat = self.dlg_merm.findChild(QTableView, "tbl_om_result_cat")
         self.tbl_om_result_cat.setSelectionBehavior(QAbstractItemView.SelectRows)
 
@@ -454,7 +453,7 @@ class Master(ParentAction):
         row = selected_list[0].row()
         result_id = dialog.tbl_om_result_cat.model().record(row).value("result_id")
         self.close_dialog(dialog)
-        self.master_estimate_result_new('om_result_cat', result_id, 0)
+        self.master_estimate_result_new('plan_result_cat', result_id, 0)
 
 
     def delete_merm(self, dialog):
