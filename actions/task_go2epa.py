@@ -78,20 +78,20 @@ class TaskGo2Epa(QgsTask):
         if result:
 
             if self.export_inp:
-                if self.complet_result['status'] == "Accepted":
+                if self.complet_result and self.complet_result['status'] == "Accepted":
                     if 'body' in self.complet_result:
                         if 'data' in self.complet_result['body']:
                             self.add_layer.add_temp_layer(self.dlg_go2epa, self.complet_result['body']['data'],
                                 'INP results', True, True, 1, False)
 
             if self.import_result:
-                if 'status' in self.rpt_result[0]:
-                    if self.rpt_result[0]['status'] == "Accepted":
-                        if 'body' in self.rpt_result[0]:
-                            if 'data' in self.rpt_result[0]['body']:
-                                self.add_layer.add_temp_layer(self.dlg_go2epa, self.rpt_result[0]['body']['data'],
+                if self.rpt_result and 'status' in self.rpt_result[0]:
+                    if self.rpt_result['status'] == "Accepted":
+                        if 'body' in self.rpt_result:
+                            if 'data' in self.rpt_result['body']:
+                                self.add_layer.add_temp_layer(self.dlg_go2epa, self.rpt_result['body']['data'],
                                     'RPT results', True, True, 1, False)
-                self.message = self.rpt_result[0]['message']['text']
+                        self.message = self.rpt_result['message']['text']
 
             if self.common_msg != "":
                 self.controller.show_info(self.common_msg)
@@ -145,11 +145,14 @@ class TaskGo2Epa(QgsTask):
         extras += f', "useNetworkGeom":"{self.net_geom}"'
         extras += f', "dumpSubcatch":"{self.export_subcatch}"'
         body = self.create_body(extras=extras)
-        self.complet_result = self.controller.get_json('gw_fct_pg2epa_main', body, log_sql=True, commit=True)
+        function_name = 'gw_fct_pg2epa_main'
+        json_result = self.controller.get_json(function_name, body, log_sql=True, log_result=False)
+        if json_result is None:
+            self.controller.log_warning(f"Function error: {function_name}")
+            return False
+
+        self.complet_result = json_result
         if not self.complet_result:
-            self.controller.show_warning(str(self.controller.last_error))
-            message = "Export failed"
-            self.controller.show_info_box(message)
             return False
 
         return True
@@ -363,21 +366,21 @@ class TaskGo2Epa(QgsTask):
     def exec_function_rpt2pg(self):
         """ Call function gw_fct_rpt2pg_main """
 
-        function_name = 'gw_fct_rpt2pg_main'
+        self.rpt_result = None
         extras = '"iterative":"disabled"'
         extras += f', "resultId":"{self.result_name}"'
         extras += f', "currentStep":"1"'
         extras += f', "continue":"False"'
         body = self.create_body(extras=extras)
-        sql = f"SELECT {function_name}({body})::text"
-        row = self.controller.get_row(sql)
-        if not row or row[0] is None:
-            self.controller.show_warning(self.controller.last_error)
-            message = "Import failed"
-            self.controller.show_info_box(message)
+        function_name = 'gw_fct_rpt2pg_main'
+        json_result = self.controller.get_json(function_name, body, log_sql=True)
+        if json_result is None:
+            self.controller.log_warning(f"Function error: {function_name}")
             return False
-        else:
-            self.rpt_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+
+        self.rpt_result = json_result
+        if not self.rpt_result:
+            return False
 
         # final message
         self.common_msg += "Import RPT finished."
