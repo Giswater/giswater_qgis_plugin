@@ -221,7 +221,7 @@ class TaskGo2Epa(QgsTask):
         try:
             # Delete previous values of user on temp table
             sql = ("DELETE FROM temp_csv "
-                   "WHERE cur_user = current_user AND fid = 111")
+                   "WHERE cur_user = current_user AND fid = 141")
             self.controller.execute_sql(sql)
             # Importing file to temporal table
             status = self.insert_rpt_into_db(self.file_rpt)
@@ -241,14 +241,14 @@ class TaskGo2Epa(QgsTask):
         progress = 0
 
         # Create dict with sources
-        sql = "SELECT tablename, target FROM config_fprocess WHERE fid = 111;"
+        sql = "SELECT tablename, target FROM config_fprocess WHERE fid = 141;"
         rows = self.controller.get_rows(sql)
         sources = {}
         for row in rows:
             aux = row[1].replace('{','').replace('}', '')
             item = aux.split(',')
             for i in item:
-                sources[i.strip()]=row[0].strip()
+                sources[i.strip()] = row[0].strip()
 
         # While we don't find a match with the source, source and csv40 must be null
         source = "null"
@@ -316,7 +316,7 @@ class TaskGo2Epa(QgsTask):
 
             if len(sp_n) > 0:
                 sql += f"INSERT INTO temp_csv (fid, source, csv40, "
-                values = f"VALUES(111, {source}, {csv40}, "
+                values = f"VALUES(141, {source}, {csv40}, "
                 for x in range(0, len(sp_n)):
                     if "''" not in sp_n[x]:
                         sql += f"csv{x + 1}, "
