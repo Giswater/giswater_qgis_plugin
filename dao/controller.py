@@ -818,18 +818,20 @@ class DaoController(object):
         if type(widget) is QTabWidget:
             widget_name = widget.widget(idx).objectName()
             tooltip = self.tr(f'tooltip_{widget_name}', context_name)
-            if tooltip != f'tooltip_{widget_name}':
+            if tooltip not in (f'tooltip_{widget_name}', None, 'None'):
                 widget.setTabToolTip(idx, tooltip)
-            elif widget.toolTip() == "":
+            elif widget.toolTip() in ("", None):
                 widget.setTabToolTip(idx, widget.tabText(idx))
         else:
             widget_name = widget.objectName()
             tooltip = self.tr(f'tooltip_{widget_name}', context_name)
-            if tooltip != f'tooltip_{widget_name}':
+            if tooltip not in (f'tooltip_{widget_name}', None, 'None'):
                 widget.setToolTip(tooltip)
-            elif widget.toolTip() == "":
-                if type(widget) is QGroupBox: widget.setToolTip(widget.title())
-                else: widget.setToolTip(widget.text())
+            elif widget.toolTip() in ("", None):
+                if type(widget) is QGroupBox:
+                    widget.setToolTip(widget.title())
+                else:
+                    widget.setToolTip(widget.text())
 
 
     def translate_form(self, dialog, context_name):
@@ -873,7 +875,7 @@ class DaoController(object):
                 for i in range(0, num_tabs):
                     widget_name = widget.widget(i).objectName()
                     text = self.tr(widget_name, context_name)
-                    if text != widget_name:
+                    if text not in (widget_name, None, 'None'):
                         widget.setTabText(i, text)
                     else:
                         widget_text = widget.tabText(i)
@@ -886,7 +888,7 @@ class DaoController(object):
                 for i in range(0, num_tabs):
                     widget_name = widget.widget(i).objectName()
                     text = self.tr(widget_name, context_name)
-                    if text != widget_name:
+                    if text not in (widget_name, None, 'None'):
                         widget.setItemText(i, text)
                     else:
                         widget_text = widget.itemText(i)
@@ -894,10 +896,10 @@ class DaoController(object):
                         if text != widget_text:
                             widget.setItemText(i, text)
                     self.translate_tooltip(context_name, widget.widget(i))
-            elif  type(widget) is QGroupBox:
+            elif type(widget) is QGroupBox:
                 widget_name = widget.objectName()
                 text = self.tr(widget_name, context_name)
-                if text != widget_name:
+                if text not in (widget_name, None, 'None'):
                     widget.setTitle(text)
                 else:
                     widget_title = widget.title()
@@ -908,7 +910,7 @@ class DaoController(object):
             else:
                 widget_name = widget.objectName()
                 text = self.tr(widget_name, context_name)
-                if text != widget_name:
+                if text not in (widget_name, None, 'None'):
                     widget.setText(text)
                 else:
                     widget_text = widget.text()
