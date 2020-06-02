@@ -34,7 +34,7 @@ from .create_gis_project import CreateGisProject
 from .gw_task import GwTask
 from .i18n_generator import I18NGenerator
 from ..ui_manager import Readsql, InfoShowInfo, ReadsqlCreateProject, ReadsqlRenameCopy, ReadsqlShowInfo, \
-    ReadsqlCreateGisProject, ToolboxUi, MainFields, ManageVisitClass, ManageVisitParam, MainSysFields, Credentials
+    ReadsqlCreateGisProject, ToolboxUi, MainFields, MainVisitClass, ManageVisitParam, MainSysFields, Credentials
 
 
 class UpdateSQL(ApiParent):
@@ -1873,7 +1873,7 @@ class UpdateSQL(ApiParent):
     def create_visit_class(self):
 
         # Create the dialog and signals
-        self.dlg_manage_visit_class = ManageVisitClass()
+        self.dlg_manage_visit_class = MainVisitClass()
         self.load_settings(self.dlg_manage_visit_class)
 
         # Manage widgets
@@ -1888,7 +1888,7 @@ class UpdateSQL(ApiParent):
         # Set listeners
 
         # Open dialog
-        self.open_dialog(self.dlg_manage_visit_class)
+        self.open_dialog(self.dlg_manage_visit_class, dlg_name='main_visitclass')
         return
 
 

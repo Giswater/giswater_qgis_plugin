@@ -382,8 +382,8 @@ FORM_CLASS = get_ui_class('main_sysfields.ui')
 class MainSysFields(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('manage_visit_class.ui')
-class ManageVisitClass(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('main_visitclass.ui')
+class MainVisitClass(GwDialog, FORM_CLASS):
     pass
 
 FORM_CLASS = get_ui_class('manage_visit_param.ui')

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Dialog</class>
- <widget class="QDialog" name="Dialog">
+ <class>dlg_main_visitclass</class>
+ <widget class="QDialog" name="dlg_main_visitclass">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Manag visit class</string>
+   <string>Manage visit class</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
    <item row="2" column="5">
@@ -30,7 +30,7 @@
       <item row="1" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <widget class="QLabel" name="label_idval">
+         <widget class="QLabel" name="lbl_class_name">
           <property name="text">
            <string>Class name:</string>
           </property>
@@ -60,7 +60,7 @@
       <item row="6" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
-         <widget class="QLabel" name="label_2">
+         <widget class="QLabel" name="lbl_feat_type">
           <property name="text">
            <string>Feature type:</string>
           </property>
@@ -97,7 +97,7 @@
       <item row="7" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_6">
         <item>
-         <widget class="QLabel" name="label_3">
+         <widget class="QLabel" name="lbl_visit_type">
           <property name="text">
            <string>Visit type:</string>
           </property>
@@ -134,7 +134,7 @@
       <item row="10" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_7">
         <item>
-         <widget class="QLabel" name="label_6">
+         <widget class="QLabel" name="lbl_param_opt">
           <property name="text">
            <string>Param options:</string>
           </property>
@@ -166,7 +166,7 @@
         <item>
          <widget class="QPushButton" name="btn_class_ok">
           <property name="text">
-           <string>OK</string>
+           <string>Accept</string>
           </property>
          </widget>
         </item>
@@ -182,7 +182,7 @@
       <item row="11" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_8">
         <item>
-         <widget class="QLabel" name="label_7">
+         <widget class="QLabel" name="lbl_descript">
           <property name="text">
            <string>Descript:</string>
           </property>
@@ -212,7 +212,7 @@
       <item row="4" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_4">
         <item>
-         <widget class="QLabel" name="label_4">
+         <widget class="QLabel" name="lbl_multi_event">
           <property name="text">
            <string>Multi event:</string>
           </property>
@@ -252,7 +252,7 @@
       <item row="5" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_5">
         <item>
-         <widget class="QLabel" name="label_5">
+         <widget class="QLabel" name="lbl_multi_feat">
           <property name="text">
            <string>Multi feature:</string>
           </property>
@@ -292,7 +292,7 @@
       <item row="13" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_11">
         <item>
-         <widget class="QLabel" name="label_viewname">
+         <widget class="QLabel" name="lbl_viewname">
           <property name="text">
            <string>View name:</string>
           </property>
@@ -322,7 +322,7 @@
       <item row="2" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_12">
         <item>
-         <widget class="QLabel" name="label_active">
+         <widget class="QLabel" name="lbl_active">
           <property name="text">
            <string>Active:</string>
           </property>
@@ -362,7 +362,7 @@
       <item row="0" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_13">
         <item>
-         <widget class="QLabel" name="label_id">
+         <widget class="QLabel" name="lbl_class_id">
           <property name="text">
            <string>Class id:</string>
           </property>
@@ -457,7 +457,7 @@
    <item row="2" column="4">
     <widget class="QPushButton" name="btn_ok">
      <property name="text">
-      <string>OK</string>
+      <string>Accept</string>
      </property>
     </widget>
    </item>
