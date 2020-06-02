@@ -238,15 +238,12 @@ DELETE FROM config_typevalue WHERE id = 'gw_api_setprint';
 
 UPDATE sys_foreignkey SET target_field = 'linkedaction', typevalue_name = 'linkedaction_typevalue' WHERE target_field = 'action_function';
 
- -- 2020/06/02
---SELECT setval('config_param_system_id_seq', (SELECT max(id) FROM config_param_system), true);
-
 INSERT INTO config_param_system (parameter, value, context,  descript, label, project_type, datatype, isdeprecated) 
 VALUES ('basic_selector_state', '{"table":"value_state", "selector":"selector_state", "table_id":"id",  "selector_id":"state_id",  "label":"id, '' - '', name", 
- "manageAll":true, "query_filter":""}', 'system', 'Select which label to display for selectors', 'Selector labels:', 'utils', 'json', FALSE);
+"manageAll":true, "query_filter":""}', 'system', 'Select which label to display for selectors', 'Selector labels:', 'utils', 'json', FALSE);
  
-  INSERT INTO config_typevalue (typevalue, id, idval) 
-VALUES ('tabname_typevalue', 'tabState', 'tabState');
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle) 
+VALUES ('tabname_typevalue', 'tab_state', 'tabState', 'tabState');
 
 INSERT INTO config_form_tabs (formname,tabname, label, tooltip, sys_role, device) 
 VALUES ('state', 'tabState', 'State', 'State Selector', 'role_basic', 4);
