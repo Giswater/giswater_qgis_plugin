@@ -770,7 +770,8 @@ class DaoController(object):
         return result
 
 
-    def get_json(self, function_name, parameters=None, schema_name=None, commit=True, log_sql=False, json_loads=False):
+    def get_json(self, function_name, parameters=None, schema_name=None, commit=True, log_sql=False,
+                 log_result=False, json_loads=False):
         """ Manage execution API function
         :param function_name: Name of function to call (text)
         :param body: Parameter for function (json)
@@ -801,6 +802,9 @@ class DaoController(object):
             json_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
         else:
             json_result = row[0]
+
+        if log_result:
+            self.log_info(json_result, stack_level_increase=1)
 
         if 'status' in json_result and json_result['status'] == 'Failed':
             self.manage_exception_api(json_result, sql)
