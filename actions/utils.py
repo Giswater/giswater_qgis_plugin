@@ -214,7 +214,7 @@ class Utils(ParentAction):
 
 
     def write_csv(self, dialog, temp_tablename):
-        """ Write csv in postgre and call gw_fct_utils_csv2pg function """
+        """ Write csv in postgres and call gw_fct_utils_csv2pg function """
 
         insert_status = True
         if not self.validate_params(dialog):
@@ -240,7 +240,7 @@ class Utils(ParentAction):
             return
 
         extras = f'"importParam":"{label_aux}"'
-        extras += f', "csv2pgCat":"{fid_aux}"'
+        extras += f', "fid":"{fid_aux}"'
         body = self.create_body(extras=extras)
         sql = ("SELECT " + str(self.func_name) + "($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True)
@@ -311,7 +311,7 @@ class Utils(ParentAction):
 
         sql = (f"SELECT DISTINCT({field_id}), {fields}"
                f" FROM {table_name}"
-               f" WHERE sys_role IN {roles} AND active is True")
+               f" WHERE sys_role IN {roles} AND active is True ORDER BY orderby")
         rows = self.controller.get_rows(sql, log_sql=True)
         if not rows:
             message = "You do not have permission to execute this application"
