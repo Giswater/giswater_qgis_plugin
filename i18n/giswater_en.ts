@@ -13,19 +13,11 @@
 			<translation>Giswater - OM</translation>
 		</message>
 		<message>
-			<source>86_text</source>
-			<translation>Hydrometer selector</translation>
+			<source>142_text</source>
+			<translation>Selectors</translation>
 		</message>
 		<message>
-			<source>41_text</source>
-			<translation>Exploitation selector</translation>
-		</message>
-		<message>
-			<source>48_text</source>
-			<translation>State selector</translation>
-		</message>
-		<message>
-			<source>32_text</source>
+			<source>143_text</source>
 			<translation>Search plus</translation>
 		</message>
 		<message>
