@@ -26,7 +26,7 @@ from .api_go2epa_options import Go2EpaOptions
 from .api_parent import ApiParent
 from .task_go2epa import TaskGo2Epa
 from .update_sql import UpdateSQL
-from ..ui_manager import EpaCompare, EpaResultManager, FileManager, HydrologySelector, Multirow_selector
+from ..ui_manager import EpaCompare, EpaResultManager, Go2EpaUI, HydrologySelector, Multirow_selector
 
 
 class Go2Epa(ApiParent):
@@ -50,7 +50,7 @@ class Go2Epa(ApiParent):
         docker = self.init_docker('qgis_form_docker')
 
         # Create dialog
-        self.dlg_go2epa = FileManager()
+        self.dlg_go2epa = Go2EpaUI()
         self.load_settings(self.dlg_go2epa)
         self.load_user_values()
         if self.project_type in 'ws':
@@ -81,11 +81,12 @@ class Go2Epa(ApiParent):
         self.set_completer_result(self.dlg_go2epa.txt_result_name, 'v_ui_rpt_cat_result', 'result_id')
 
         if docker:
+            self.controller.manage_translation('go2epa', self.dlg_go2epa)
             self.dock_dialog(docker, self.dlg_go2epa)
             self.dlg_go2epa.btn_cancel.clicked.disconnect()
             self.dlg_go2epa.btn_cancel.clicked.connect(partial(self.close_docker, docker, self.dlg_go2epa))
         else:
-            self.open_dialog(self.dlg_go2epa)
+            self.open_dialog(self.dlg_go2epa, dlg_name='go2epa')
 
 
     def set_signals(self):

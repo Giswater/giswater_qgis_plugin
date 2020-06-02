@@ -330,9 +330,8 @@ class VisitEvent(GwDialog, FORM_CLASS):
     pass
 
 
-# TODO change file and class name to go2epa
-FORM_CLASS = get_ui_class('file_manager.ui')
-class FileManager(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('go2epa.ui')
+class Go2EpaUI(GwDialog, FORM_CLASS):
     pass
 
 
