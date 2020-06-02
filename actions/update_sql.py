@@ -2341,13 +2341,15 @@ class UpdateSQL(ApiParent):
         self.open_dialog(self.dlg_readsql_rename)
 
 
-    def executeFiles(self, filedir, i18n=False, no_ct=False):
+    def executeFiles(self, filedir, i18n=False, no_ct=False, log_folder=True, log_files=False):
 
         if not os.path.exists(filedir):
             self.controller.log_info("Folder not found", parameter=filedir)
             return True
 
-        self.controller.log_info("Processing folder", parameter=filedir)
+        if log_folder:
+            self.controller.log_info("Processing folder", parameter=filedir)
+
         filelist = sorted(os.listdir(filedir))
         status = True
         if self.schema is None:
@@ -2359,19 +2361,23 @@ class UpdateSQL(ApiParent):
         filter_srid_value = str(self.filter_srid_value).replace('"', '')
         if i18n:
             for file in filelist:
-                if "utils.sql" in file :
-                    self.controller.log_info(str(filedir + os.sep + 'utils.sql'))
+                if "utils.sql" in file:
+                    if log_files:
+                        self.controller.log_info(str(filedir + os.sep + 'utils.sql'))
                     status = self.read_execute_file(filedir, os.sep + 'utils.sql', schema_name, filter_srid_value)
                 elif str(self.project_type_selected) + ".sql" in file:
-                    self.controller.log_info(str(filedir + os.sep + str(self.project_type_selected) + '.sql'))
-                    status = self.read_execute_file(filedir, os.sep + str(self.project_type_selected) + '.sql', schema_name, filter_srid_value)
+                    if log_files:
+                        self.controller.log_info(str(filedir + os.sep + str(self.project_type_selected) + '.sql'))
+                    status = self.read_execute_file(filedir, os.sep + str(self.project_type_selected) + '.sql',
+                        schema_name, filter_srid_value)
                 if not status and self.dev_commit == 'FALSE':
                     return False
         else:
             for file in filelist:
                 if ".sql" in file:
                     if (no_ct is True and "tablect.sql" not in file) or no_ct is False:
-                        self.controller.log_info(str(filedir + os.sep + file))
+                        if log_files:
+                            self.controller.log_info(str(filedir + os.sep + file))
                         status = self.read_execute_file(filedir, file, schema_name, filter_srid_value)
                         if not status and self.dev_commit == 'FALSE':
                             return False
