@@ -340,7 +340,7 @@ class Gallery(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('gallery_zoom.ui')
+FORM_CLASS = get_ui_class('visit_gallery_zoom.ui')
 class GalleryZoom(GwDialog, FORM_CLASS):
     pass
 

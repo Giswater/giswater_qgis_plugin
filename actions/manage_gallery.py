@@ -243,7 +243,7 @@ class ManageGallery(ParentManage):
         self.btn_slideNext.clicked.connect(self.slide_next)
     
         # Open dialog
-        self.open_dialog(self.dlg_gallery_zoom, maximize_button=False)      
+        self.open_dialog(self.dlg_gallery_zoom, dlg_name='visit_gallery_zoom', maximize_button=False)
 
         # Controling start index
         if handeler_index != i:

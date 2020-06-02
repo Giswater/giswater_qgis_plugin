@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>gallery_zoom</class>
- <widget class="QDialog" name="gallery_zoom">
+ <class>dlg_visit_gallery_zoom</class>
+ <widget class="QDialog" name="dlg_visit_gallery_zoom">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -32,7 +32,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QLabel" name="label_2">
+  <widget class="QLabel" name="lbl_event_id">
    <property name="geometry">
     <rect>
      <x>192</x>
@@ -42,7 +42,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Event_id: </string>
+    <string>Event id: </string>
    </property>
   </widget>
   <widget class="QLineEdit" name="event_id">
@@ -71,7 +71,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QLabel" name="label">
+  <widget class="QLabel" name="lbl_visit_id">
    <property name="geometry">
     <rect>
      <x>9</x>
@@ -81,7 +81,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Visit_id: </string>
+    <string>Visit id: </string>
    </property>
   </widget>
   <widget class="QPushButton" name="btn_slidePrevious">
