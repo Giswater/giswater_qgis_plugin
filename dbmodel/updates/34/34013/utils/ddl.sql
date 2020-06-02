@@ -36,7 +36,6 @@ UPDATE sys_table SET id = 'plan_reh_result_node', sys_sequence = null, sys_seque
 
 UPDATE config_toolbox set active = true;
 
-
 update config_toolbox SET inputparams = replace(inputparams::text, 'layout_order', 'layoutorder')::json;
 update config_toolbox SET inputparams = replace(inputparams::text, 'datepickertime', 'datetime')::json;
 update config_toolbox SET inputparams = replace(inputparams::text, 'is_mandatory', 'ismandatory')::json;
@@ -57,5 +56,6 @@ INSERT INTO config_toolbox VALUES (2890,'Calculate cost of reconstruction',TRUE,
 '[{"widgetname":"resultName", "label":"Result name:", "widgettype":"text","datatype":"string","layoutname":"grl_option_parameters","layoutorder":1, "placeholder":"result name" ,"value":""},
 {"widgetname":"coefficient", "label":"Coefficient:", "widgettype":"text","datatype":"float","layoutname":"grl_option_parameters","layoutorder":2, "placeholder":"1", "value":""},
 {"widgetname":"descript", "label":"Description:", "widgettype":"text","datatype":"string","layoutname":"grl_option_parameters","layoutorder":3, "placeholder":"description" ,"ismandatory":false, "value":""}]
-  
-  
+   
+ 
+ALTER TABLE anl_polygon RENAME fprocesscat_id TO fid;
