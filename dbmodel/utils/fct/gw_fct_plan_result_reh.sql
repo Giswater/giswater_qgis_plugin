@@ -4,12 +4,16 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 2128
+--FUNCTION CODE: 2892
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_plan_result_reh(integer, double precision, text);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_plan_result_reh( result_id_var integer, coefficient_var double precision, descript_var text)
   RETURNS integer AS
 $BODY$
+
+/*
+SELECT SCHEMA_NAME.gw_fct_plan_result_reh(10,1,'test')
+*/
 
 DECLARE 
 

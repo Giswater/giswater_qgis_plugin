@@ -23,7 +23,7 @@ BEGIN
         RETURN NEW;
 
     ELSIF TG_OP = 'DELETE' THEN
-        v_sql:= 'DELETE FROM om_result_cat WHERE id = '||quote_literal(OLD.result_id);
+        v_sql:= 'DELETE FROM plan_result_cat WHERE result_id = '||quote_literal(OLD.result_id);
         EXECUTE v_sql;
         RETURN NULL;
     

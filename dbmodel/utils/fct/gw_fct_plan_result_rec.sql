@@ -7,23 +7,63 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2128
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_plan_result_rec(integer, double precision, text);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_plan_result_rec( result_id_var integer, coefficient_var double precision, descript_var text)
-  RETURNS integer AS
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_plan_result_rec(p_data json)
+  RETURNS json AS
 $BODY$
+
+/*EXAMPLE
+SELECT SCHEMA_NAME.gw_fct_plan_result_rec($${"client":{"device":4, "infoType":1, "lang":"ES"}, "data":{"parameters":{"resultName":"test", "coefficient":1, "descript":"test text"}}}$$)
+
+--fid: 249
+*/
 
 DECLARE 
 
+v_result_id integer;
+v_result_name text;
+v_coeff float;
+v_descript text;
+v_fid integer = 249;
+v_version text;
+v_result text;
+v_result_info json;
+v_error_context text;
+v_pricecat text = 'DEFAULT';
 
 BEGIN 
 
-    SET search_path = "SCHEMA_NAME", public;
+	-- set search_path
+	SET search_path = "SCHEMA_NAME", public;
 
-    -- reconstruction
-	INSERT INTO om_rec_result_node (result_id, node_id, nodecat_id, node_type, top_elev, elev, epa_type, sector_id, state, annotation,
+	-- select version
+	SELECT giswater INTO v_version FROM version order by 1 desc limit 1;
+
+	-- Reset values
+	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;
+
+	-- getting input data 	
+	v_result_name :=  (((p_data ->>'data')::json->>'parameters')::json->>'resultName');
+	v_coeff :=  (((p_data ->>'data')::json->>'parameters')::json->>'coefficient');
+	v_descript :=  (((p_data ->>'data')::json->>'parameters')::json->>'descript');
+
+	-- getting other data
+	v_pricecat = (SELECT id FROM plan_price_cat LIMIT 1);
+
+	-- inserting result on table plan_result_cat
+	INSERT INTO plan_result_cat (name, result_type, coefficient, tstamp, cur_user, descript, pricecat_id) VALUES
+	(v_result_name, 1, v_coeff, now(), current_user, v_descript, v_pricecat) RETURNING result_id INTO v_result_id;
+	
+	-- start build log message
+	INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('CALCULATE COST OF RECONSTRUCTION'));
+	INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('----------------------------------------------------------'));
+
+	
+	-- starting process
+	INSERT INTO plan_rec_result_node (result_id, node_id, nodecat_id, node_type, top_elev, elev, epa_type, sector_id, state, annotation,
 	the_geom, cost_unit, descript, measurement, cost, budget, expl_id)
 
 	SELECT
-	result_id_var,
+	v_result_id,
 	node_id,
 	nodecat_id,
 	node_type,
@@ -37,18 +77,18 @@ BEGIN
 	cost_unit,
 	descript,
 	measurement,
-	cost*coefficient_var,
-	budget*coefficient_var,
+	cost*v_coeff,
+	budget*v_coeff,
 	expl_id
 	FROM v_plan_node
-	WHERE state=1;
+	WHERE state=1
+	ON CONFLICT (result_id, node_id) DO NOTHING;
 	
 	
 	-- insert into arc table
-	INSERT INTO om_rec_result_arc
+	INSERT INTO plan_rec_result_arc
 	SELECT
-	nextval('SCHEMA_NAME.om_rec_result_arc_id_seq'::regclass),
-	result_id_var,
+	v_result_id,
 	arc_id,
 	node_1,
 	node_2,
@@ -83,33 +123,62 @@ BEGIN
 	m3mlfill,
 	m3mlexcess,
 	m3exc_cost,
-	m2trenchl_cost*coefficient_var,
-	m2bottom_cost*coefficient_var,
-	m2pav_cost*coefficient_var,
-	m3protec_cost*coefficient_var,
-	m3fill_cost*coefficient_var,
-	m3excess_cost*coefficient_var,
+	m2trenchl_cost*v_coeff,
+	m2bottom_cost*v_coeff,
+	m2pav_cost*v_coeff,
+	m3protec_cost*v_coeff,
+	m3fill_cost*v_coeff,
+	m3excess_cost*v_coeff,
 	cost_unit,
-	pav_cost*coefficient_var,
-	exc_cost*coefficient_var,
-	trenchl_cost*coefficient_var,
-	base_cost*coefficient_var,
-	protec_cost*coefficient_var,
-	fill_cost*coefficient_var,
-	excess_cost*coefficient_var,
-	arc_cost*coefficient_var,
-	cost*coefficient_var,
+	pav_cost*v_coeff,
+	exc_cost*v_coeff,
+	trenchl_cost*v_coeff,
+	base_cost*v_coeff,
+	protec_cost*v_coeff,
+	fill_cost*v_coeff,
+	excess_cost*v_coeff,
+	arc_cost*v_coeff,
+	cost*v_coeff,
 	length,
-	budget*coefficient_var,
-	other_budget*coefficient_var,
-	total_budget*coefficient_var,
+	budget*v_coeff,
+	other_budget*v_coeff,
+	total_budget*v_coeff,
 	the_geom,
 	expl_id
 	FROM v_plan_arc
-	WHERE state=1;
+	WHERE state=1
+	ON CONFLICT (result_id, arc_id) DO NOTHING;
 	
-	RETURN 1;
+	-- force selector
+	INSERT INTO selector_plan_result (cur_user, result_id) VALUES (current_user, v_result_id) ON CONFLICT (cur_user, result_id) DO NOTHING;
+	
+	-- inserting log
+	INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, 'Process -> Done');
+	
+	-- get results
+	-- info
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT * FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid) row;
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
+	-- Control nulls
+	v_result_info := COALESCE(v_result_info, '{}'); 
+
+	raise notice 'v_result_info %', v_result_info;
+
+	-- Return
+	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
+             ',"body":{"form":{}'||
+		     ',"data":{ "info":'||v_result_info||',"setVisibleLayers":[]}'||
+		     '}'||
+	    '}')::json;
+
+	--EXCEPTION WHEN OTHERS THEN
+	--GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	--RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+
+	
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

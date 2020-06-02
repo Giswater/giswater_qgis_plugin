@@ -60,7 +60,7 @@ BEGIN
         SELECT lower(wsoftware) INTO v_projectype FROM version LIMIT 1;
 
 	-- get epa results
-	IF (SELECT id FROM rpt_cat_result LIMIT 1) IS NOT NULL THEN
+	IF (SELECT result_id FROM rpt_cat_result LIMIT 1) IS NOT NULL THEN
 		v_isepa = true;
 		v_epa_user = (SELECT result_id FROM rpt_cat_result WHERE cur_user=current_user LIMIT 1);
 		IF v_epa_user IS NULL THEN
@@ -159,8 +159,8 @@ BEGIN
 	    '}')::json;
        
 	--Exception handling
-	EXCEPTION WHEN OTHERS THEN 
-	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	--EXCEPTION WHEN OTHERS THEN 
+	--RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$
