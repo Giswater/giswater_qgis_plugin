@@ -52,7 +52,7 @@ INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder, dat
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
-VALUES ('visit_class_0', 'visit', 'startdate', 5, 'date', 'datepickertime', 'Start date:',
+VALUES ('visit_class_0', 'visit', 'startdate', 5, 'date', 'datetime', 'Start date:',
 NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
@@ -61,7 +61,7 @@ INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder, dat
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
-VALUES ('visit_class_0', 'visit', 'enddate', 6, 'date', 'datepickertime', 'End date:',
+VALUES ('visit_class_0', 'visit', 'enddate', 6, 'date', 'datetime', 'End date:',
 NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
@@ -132,7 +132,7 @@ INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder, dat
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
-VALUES ('unexpected_noinfra', 'visit', 'startdate', 5, 'date', 'datepickertime', 'Start date:',
+VALUES ('unexpected_noinfra', 'visit', 'startdate', 5, 'date', 'datetime', 'Start date:',
 NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
@@ -141,7 +141,7 @@ INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder, dat
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
-VALUES ('unexpected_noinfra', 'visit', 'enddate', 6, 'date', 'datepickertime', 'End date:',
+VALUES ('unexpected_noinfra', 'visit', 'enddate', 6, 'date', 'datetime', 'End date:',
 NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
@@ -271,7 +271,7 @@ INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder, dat
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
-VALUES ('visit_arc_insp', 'visit', 'startdate', 10, 'date', 'datepickertime', 'Start date:',
+VALUES ('visit_arc_insp', 'visit', 'startdate', 10, 'date', 'datetime', 'Start date:',
 NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
@@ -280,7 +280,7 @@ INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder, dat
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
-VALUES ('visit_arc_insp', 'visit', 'enddate', 11, 'date', 'datepickertime', 'End date:',
+VALUES ('visit_arc_insp', 'visit', 'enddate', 11, 'date', 'datetime', 'End date:',
 NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL,NULL, NULL, NULL, 'data_1', NULL, FALSE);
@@ -626,7 +626,7 @@ INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder, dat
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
-VALUES ('visit_arc_leak', 'visit', 'startdate', 11, 'date', 'datepickertime', 'Start date:',
+VALUES ('visit_arc_leak', 'visit', 'startdate', 11, 'date', 'datetime', 'Start date:',
 NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL,NULL, NULL, NULL, 'data_1', NULL, FALSE);
@@ -635,7 +635,7 @@ INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder, dat
 widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
-VALUES ('visit_arc_leak', 'visit', 'enddate', 12, 'date', 'datepickertime', 'End date:',
+VALUES ('visit_arc_leak', 'visit', 'enddate', 12, 'date', 'datetime', 'End date:',
 NULL, NULL, NULL, false, false, true, NULL, NULL,
 NULL, NULL, NULL, NULL, 
 NULL,NULL, NULL, NULL, 'data_1', NULL, FALSE);

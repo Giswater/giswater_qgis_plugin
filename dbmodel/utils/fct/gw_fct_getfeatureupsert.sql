@@ -302,7 +302,7 @@ BEGIN
 			IF v_presszone_id IS NULL THEN
 				SELECT count(*) into count_aux FROM presszone WHERE ST_DWithin(p_reduced_geometry, presszone.the_geom,0.001);
 				IF count_aux = 1 THEN
-					v_presszone_id := (SELECT id FROM presszone WHERE ST_DWithin(p_reduced_geometry, presszone.the_geom,0.001) LIMIT 1);
+					v_presszone_id := (SELECT presszone_id FROM presszone WHERE ST_DWithin(p_reduced_geometry, presszone.the_geom,0.001) LIMIT 1);
 				ELSE
 					v_presszone_id =(SELECT presszone_id FROM v_edit_arc WHERE ST_DWithin(p_reduced_geometry, v_edit_arc.the_geom, v_promixity_buffer)
 					order by ST_Distance (p_reduced_geometry, v_edit_arc.the_geom) LIMIT 1);
