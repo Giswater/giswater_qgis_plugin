@@ -202,6 +202,9 @@ class UpdateSQL(ApiParent):
         # Set Listeners
         self.set_signals()
 
+        # Set default project type
+        utils_giswater.setWidgetText(self.dlg_readsql, self.cmb_project_type, 'ws')
+
 
     def set_signals(self):
         """ Set signals. Function has to be executed only once (during form initialization) """
