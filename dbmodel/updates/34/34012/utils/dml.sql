@@ -18,7 +18,6 @@ DELETE FROM config_csv WHERE fid IN(2,5,6,7, 140, 141, 239,240, 246,247);
 -- sys_table
 UPDATE sys_table SET id = 'config_visit_class'  where id ='om_visit_class';
 
-update sys_table set sys_sequence ='temp_csv_id_seq' where id = 'temp_csv';
 UPDATE sys_table SET sys_sequence = null, sys_sequence_field = null where id ='config_csv';
 UPDATE sys_table SET id = 'config_fprocess' WHERE id = 'config_csv_param';
 UPDATE sys_table SET id = 'temp_csv' WHERE id = 'temp_csv2pg';
@@ -26,6 +25,8 @@ UPDATE sys_table SET sys_sequence = null, sys_sequence_field = null where id ='s
 UPDATE sys_table SET sys_sequence = 'sys_addfields_id_seq', sys_sequence_field = 'id' where id ='sys_addfields';
 INSERT INTO sys_table VALUES ('sys_typevalue', 'System', 'System typevalues', 'role_admin');
 UPDATE sys_table SET isdeprecated = false WHERE id = 'sys_typevalue';
+update sys_table set sys_sequence ='temp_csv_id_seq' where id = 'temp_csv';
+
 
 -- sys_feature_type
 ALTER TABLE sys_feature_type RENAME net_category TO classlevel;
