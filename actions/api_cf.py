@@ -568,6 +568,7 @@ class ApiCF(ApiParent, QObject):
             self.dock_dialog(docker, self.dlg_cf)
             docker.dlg_closed.connect(partial(self.manage_docker_close))
             btn_cancel.clicked.connect(partial(self.close_docker, docker))
+            docker.setWindowTitle(f"{complet_result[0]['body']['feature']['childType']}")
 
         else:
             self.dlg_cf.dlg_closed.connect(self.roll_back)
@@ -588,7 +589,8 @@ class ApiCF(ApiParent, QObject):
 
         # Open dialog
         self.open_dialog(self.dlg_cf, dlg_name='info_full')
-
+        
+        self.dlg_cf.setWindowTitle(f"{complet_result[0]['body']['feature']['childType']}")
         return self.complet_result, self.dlg_cf
 
 
