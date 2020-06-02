@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>load_profiles</class>
- <widget class="QDialog" name="load_profiles">
+ <class>dlg_profile_list</class>
+ <widget class="QDialog" name="dlg_profile_list">
   <property name="geometry">
    <rect>
     <x>0</x>

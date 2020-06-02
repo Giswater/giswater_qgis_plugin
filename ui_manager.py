@@ -365,8 +365,8 @@ class VisitDocuments(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('load_profiles.ui')
-class LoadProfiles(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('profiles_list.ui')
+class ProfilesList(GwDialog, FORM_CLASS):
     pass
 
 

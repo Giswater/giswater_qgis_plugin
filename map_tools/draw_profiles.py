@@ -25,7 +25,7 @@ import json
 from .. import utils_giswater
 from .parent import ParentMapTool
 from ..ui_manager import Profile
-from ..ui_manager import LoadProfiles
+from ..ui_manager import ProfilesList
 
 
 class NodeData:
@@ -218,7 +218,7 @@ class DrawProfiles(ParentMapTool):
     def load_profile(self):
         """ Open dialog load_profiles.ui """
 
-        self.dlg_load = LoadProfiles()
+        self.dlg_load = ProfilesList()
         self.load_settings(self.dlg_load)
 
         self.dlg_load.rejected.connect(partial(self.close_dialog, self.dlg_load.rejected))
@@ -232,7 +232,7 @@ class DrawProfiles(ParentMapTool):
                 item_arc = QListWidgetItem(str(row[0]))
                 self.dlg_load.tbl_profiles.addItem(item_arc)
 
-        self.open_dialog(self.dlg_load)
+        self.open_dialog(self.dlg_load, dlg_name='profile_list')
         self.deactivate()
 
 
