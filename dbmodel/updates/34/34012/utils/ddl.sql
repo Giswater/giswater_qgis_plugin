@@ -13,8 +13,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 ALTER TABLE config_typevalue RENAME COLUMN descript TO camelstyle;
 
 
-ALTER TABLE om_visit_class RENAME TO config_visit_class;
-
 ALTER TABLE config_form_tableview RENAME column_id TO columnname;
 ALTER TABLE config_form_tableview RENAME column_index TO columnindex;
 ALTER TABLE config_form_tableview RENAME table_id TO tablename;
@@ -110,4 +108,12 @@ ALTER SEQUENCE temp_csv2pg_id_seq RENAME TO temp_csv_id_seq;
 
 -- rename constraints (fid, audit_check_project)
 
-
+--2020/06/02
+ALTER TABLE om_visit_type RENAME TO _om_visit_type_;
+ALTER TABLE om_visit_cat_status RENAME TO _om_visit_cat_status_;
+ALTER TABLE om_visit_parameter_cat_action RENAME TO _om_visit_parameter_cat_action_;
+ALTER TABLE om_visit_parameter_form_type RENAME TO _om_visit_parameter_form_type_;
+ALTER TABLE om_visit_parameter_type RENAME TO _om_visit_parameter_type_;
+ALTER TABLE plan_psector_cat_type RENAME TO _plan_psector_cat_type_;
+ALTER TABLE plan_result_type RENAME TO _plan_result_type_;
+ALTER TABLE price_value_unit RENAME TO _price_value_unit_;

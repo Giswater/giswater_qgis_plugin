@@ -183,3 +183,4 @@ CREATE TRIGGER gw_trg_typevalue_config_fk AFTER INSERT OR UPDATE OR DELETE ON co
   EXECUTE PROCEDURE gw_trg_typevalue_config_fk('config_typevalue');
 
 
+ALTER TABLE om_visit_class RENAME TO config_visit_class;

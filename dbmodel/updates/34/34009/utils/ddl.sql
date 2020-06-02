@@ -203,3 +203,14 @@ ALTER TABLE value_review_status RENAME TO _value_review_status_;
 ALTER TABLE value_review_validation RENAME TO _value_review_validation_;
 ALTER TABLE value_yesno RENAME TO _value_yesno_;
 ALTER TABLE value_priority RENAME TO _value_priority_;
+
+--2020/06/02
+
+DROP VIEW IF EXISTS v_ui_om_visit_lot;
+DROP VIEW IF EXISTS ve_lot_x_node;
+DROP VIEW IF EXISTS ve_lot_x_connec;
+DROP VIEW IF EXISTS ve_lot_x_arc;
+DROP VIEW IF EXISTS ve_lot_x_gully;
+
+ALTER TABLE om_typevalue ALTER COLUMN id TYPE character varying(30);
+ALTER TABLE plan_typevalue ALTER COLUMN id TYPE character varying(30);

@@ -267,3 +267,63 @@ UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'price_cat_si
 DELETE FROM sys_image WHERE idval ='bmaps';
 UPDATE sys_image SET id = 1 WHERE idval = 'ws_shape';
 
+--2020/06/02
+INSERT INTO om_typevalue (typevalue, id, idval)
+SELECT 'visit_type', id, idval FROM om_visit_type;
+
+INSERT INTO om_typevalue (typevalue, id, idval)
+SELECT 'visit_status', id, idval FROM om_visit_cat_status;
+
+INSERT INTO om_typevalue (typevalue, id, idval)
+SELECT 'visit_param_action', id, action_name FROM om_visit_parameter_cat_action;
+
+INSERT INTO om_typevalue (typevalue, id, idval)
+SELECT 'visit_form_type', id, id FROM om_visit_parameter_form_type;
+
+INSERT INTO om_typevalue (typevalue, id, idval)
+SELECT 'visit_param_type', id, id FROM om_visit_parameter_type;
+
+INSERT INTO plan_typevalue (typevalue, id, idval)
+SELECT 'psector_type', id, name FROM plan_psector_cat_type;
+
+INSERT INTO plan_typevalue (typevalue, id, idval)
+SELECT 'result_type', id, name FROM plan_result_type;
+
+INSERT INTO plan_typevalue (typevalue, id, idval)
+SELECT 'price_units', id, id FROM price_value_unit;
+
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field)
+VALUES ('om_typevalue', 'visit_type', 'config_visit_class', 'visit_type');
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field)
+VALUES ('om_typevalue', 'visit_status', 'om_visit', 'status');
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field)
+VALUES ('om_typevalue', 'visit_param_action', 'config_visit_parameter_action', 'action_type');
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field)
+VALUES ('om_typevalue', 'visit_form_type', 'config_visit_parameter', 'form_type');
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field)
+VALUES ('om_typevalue', 'visit_param_type', 'config_visit_parameter', 'parameter_type');
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field)
+VALUES ('plan_typevalue', 'psector_type', 'plan_psector', 'psector_type');
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field)
+VALUES ('plan_typevalue', 'result_type', 'om_result_cat', 'result_type');
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field)
+VALUES ('plan_typevalue', 'price_units', 'plan_price', 'unit');
+
+
+
+UPDATE sys_table SET isdeprecated=true WHERE id='om_visit_type';
+UPDATE sys_table SET isdeprecated=true WHERE id='om_visit_cat_status';
+UPDATE sys_table SET isdeprecated=true WHERE id='om_visit_parameter_cat_action';
+UPDATE sys_table SET isdeprecated=true WHERE id='om_visit_parameter_form_type';
+UPDATE sys_table SET isdeprecated=true WHERE id='om_visit_parameter_type';
+UPDATE sys_table SET isdeprecated=true WHERE id='plan_psector_cat_type';
+UPDATE sys_table SET isdeprecated=true WHERE id='plan_result_type';
+UPDATE sys_table SET isdeprecated=true WHERE id='price_value_unit';

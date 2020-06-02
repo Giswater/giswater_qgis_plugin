@@ -47,9 +47,9 @@ CREATE OR REPLACE VIEW v_om_mincut_initpoint AS
     om_mincut.notified,
 	om_mincut.output
    FROM selector_mincut_result, om_mincut
-	 LEFT JOIN om_typevalue a ON a.id = mincut_state AND a.typevalue ='mincut_state'
-     LEFT JOIN om_typevalue b ON b.id = mincut_class AND b.typevalue ='mincut_class' 
-     LEFT JOIN om_typevalue c ON c.id = anl_cause::integer AND c.typevalue ='mincut_cause'
+	 LEFT JOIN om_typevalue a ON a.id::integer = mincut_state AND a.typevalue ='mincut_state'
+     LEFT JOIN om_typevalue b ON b.id::integer = mincut_class AND b.typevalue ='mincut_class' 
+     LEFT JOIN om_typevalue c ON c.id::integer = anl_cause::integer AND c.typevalue ='mincut_cause'
      LEFT JOIN exploitation ON om_mincut.expl_id = exploitation.expl_id
      LEFT JOIN ext_streetaxis ON om_mincut.streetaxis_id::text = ext_streetaxis.id::text
      LEFT JOIN macroexploitation ON om_mincut.macroexpl_id = macroexploitation.macroexpl_id
@@ -149,9 +149,9 @@ CREATE OR REPLACE VIEW v_om_mincut AS
     om_mincut.notified,
 	om_mincut.output
    FROM selector_mincut_result, om_mincut
-	 LEFT JOIN om_typevalue a ON a.id = mincut_state AND a.typevalue ='mincut_state'
-     LEFT JOIN om_typevalue b ON b.id = mincut_class AND b.typevalue ='mincut_class' 
-     LEFT JOIN om_typevalue c ON c.id = anl_cause::integer AND c.typevalue ='mincut_cause'
+	 LEFT JOIN om_typevalue a ON a.id::integer = mincut_state AND a.typevalue ='mincut_state'
+     LEFT JOIN om_typevalue b ON b.id::integer = mincut_class AND b.typevalue ='mincut_class' 
+     LEFT JOIN om_typevalue c ON c.id::integer = anl_cause::integer AND c.typevalue ='mincut_cause'
      LEFT JOIN exploitation ON om_mincut.expl_id = exploitation.expl_id
      LEFT JOIN ext_streetaxis ON om_mincut.streetaxis_id::text = ext_streetaxis.id::text
      LEFT JOIN macroexploitation ON om_mincut.macroexpl_id = macroexploitation.macroexpl_id
@@ -302,9 +302,9 @@ CREATE OR REPLACE VIEW v_ui_mincut AS
     om_mincut.notified,
     om_mincut.output
    FROM om_mincut
-	 LEFT JOIN om_typevalue a ON a.id = mincut_state AND a.typevalue ='mincut_state'
-     LEFT JOIN om_typevalue b ON b.id = mincut_class AND b.typevalue ='mincut_class' 
-     LEFT JOIN om_typevalue c ON c.id = anl_cause::integer AND c.typevalue ='mincut_cause'
+	 LEFT JOIN om_typevalue a ON a.id::integer = mincut_state AND a.typevalue ='mincut_state'
+     LEFT JOIN om_typevalue b ON b.id::integer = mincut_class AND b.typevalue ='mincut_class' 
+     LEFT JOIN om_typevalue c ON c.id::integer = anl_cause::integer AND c.typevalue ='mincut_cause'
      LEFT JOIN exploitation ON exploitation.expl_id = om_mincut.expl_id
      LEFT JOIN macroexploitation ON macroexploitation.macroexpl_id = om_mincut.macroexpl_id
      LEFT JOIN ext_municipality ON ext_municipality.muni_id = om_mincut.muni_id
