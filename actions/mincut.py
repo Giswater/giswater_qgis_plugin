@@ -219,7 +219,7 @@ class MincutParent(ParentAction):
 
         self.refresh_tab_hydro()
 
-        self.open_dialog(self.dlg_mincut)
+        self.open_dialog(self.dlg_mincut, dlg_name='mincut')
 
 
     def refresh_tab_hydro(self):
