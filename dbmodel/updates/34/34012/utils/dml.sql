@@ -255,8 +255,6 @@ INSERT INTO config_param_system (parameter, value, context,  descript, label, pr
 VALUES ('basic_selector_state', '{"table":"value_state", "selector":"selector_state", "table_id":"id",  "selector_id":"state_id",  "label":"id, '' - '', name", 
 "manageAll":true, "query_filter":""}', 'system', 'Select which label to display for selectors', 'Selector labels:', 'utils', 'json', FALSE);
  
+
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle) 
 VALUES ('tabname_typevalue', 'tab_state', 'tabState', 'tabState');
-
-INSERT INTO config_form_tabs (formname,tabname, label, tooltip, sys_role, device) 
-VALUES ('state', 'tabState', 'State', 'State Selector', 'role_basic', 4);

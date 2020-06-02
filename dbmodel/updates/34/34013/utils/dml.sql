@@ -10,3 +10,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 -- 2020/05/25
 
 DELETE FROM sys_function WHERE id = 2128;
+
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field)
+VALUES ('plan_typevalue', 'result_type', 'plan_result_cat', 'result_type');

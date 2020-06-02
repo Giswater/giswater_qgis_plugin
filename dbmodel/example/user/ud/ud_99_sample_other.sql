@@ -97,8 +97,8 @@ SELECT gw_fct_connect_to_network($${"client":{"device":4, "infoType":1,"lang":"E
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_link_connecrotation_update', TRUE, current_user);
 UPDATE link SET the_geom=the_geom;
 
-SELECT gw_fct_plan_result($${"client":{"device":4, "infoType":1, "lang":"ES"},
-							"feature":{},"data":{"parameters":{"coefficient":1, "description":"Demo prices for reconstruction", "resultType":1, "resultId":"Starting prices","saveOnDatabase":true}}}$$);
+--SELECT gw_fct_plan_result($${"client":{"device":4, "infoType":1, "lang":"ES"},
+--"feature":{},"data":{"parameters":{"coefficient":1, "description":"Demo prices for reconstruction", "resultType":1, "resultId":"Starting prices","saveOnDatabase":true}}}$$);
 							
 SELECT gw_fct_fill_doc_tables();
 SELECT gw_fct_fill_om_tables();

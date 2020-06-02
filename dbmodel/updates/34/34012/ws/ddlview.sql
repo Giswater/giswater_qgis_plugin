@@ -15,62 +15,96 @@ SELECT distinct on (node_id) * FROM (
     rpt_inp_node.elev as elevation,
     rpt_inp_node.demand,
     rpt_inp_node.pattern_id
-   FROM inp_selector_result,
+   FROM selector_inp_result,
     rpt_inp_node
      JOIN inp_junction ON inp_junction.node_id::text = rpt_inp_node.node_id::text
-  WHERE rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text AND epa_type='JUNCTION'
+  WHERE rpt_inp_node.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND epa_type='JUNCTION'
 UNION
  SELECT rpt_inp_node.node_id,
     rpt_inp_node.elevation,
     rpt_inp_node.demand,
     rpt_inp_node.pattern_id
-   FROM inp_selector_result,
+   FROM selector_inp_result,
     rpt_inp_node
      JOIN inp_valve ON inp_valve.node_id::text = rpt_inp_node.node_id::text
-  WHERE rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text AND epa_type='JUNCTION'
+  WHERE rpt_inp_node.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND epa_type='JUNCTION'
 UNION
  SELECT rpt_inp_node.node_id,
     rpt_inp_node.elevation,
     rpt_inp_node.demand,
     rpt_inp_node.pattern_id
-   FROM inp_selector_result,
+   FROM selector_inp_result,
     rpt_inp_node
      JOIN inp_pump ON inp_pump.node_id::text = rpt_inp_node.node_id::text
-  WHERE rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text AND epa_type='JUNCTION'
+  WHERE rpt_inp_node.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND epa_type='JUNCTION'
 UNION
  SELECT rpt_inp_node.node_id,
     rpt_inp_node.elevation,
     rpt_inp_node.demand,
     rpt_inp_node.pattern_id
-   FROM inp_selector_result,
+   FROM selector_inp_result,
     rpt_inp_node
      JOIN inp_tank ON inp_tank.node_id::text = rpt_inp_node.node_id::text
-  WHERE rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text AND epa_type='JUNCTION'
+  WHERE rpt_inp_node.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND epa_type='JUNCTION'
 UNION
  SELECT rpt_inp_node.node_id,
     rpt_inp_node.elevation,
     rpt_inp_node.demand,
     rpt_inp_node.pattern_id
-   FROM inp_selector_result,
+   FROM selector_inp_result,
     rpt_inp_node
      JOIN inp_inlet ON inp_inlet.node_id::text = rpt_inp_node.node_id::text
-  WHERE rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text AND epa_type='JUNCTION' 
+  WHERE rpt_inp_node.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND epa_type='JUNCTION' 
 UNION
  SELECT rpt_inp_node.node_id,
     rpt_inp_node.elevation,
     rpt_inp_node.demand,
     rpt_inp_node.pattern_id
-   FROM inp_selector_result,
+   FROM selector_inp_result,
     rpt_inp_node
      JOIN inp_shortpipe ON inp_shortpipe.node_id::text = rpt_inp_node.node_id::text
-  WHERE rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text AND epa_type='JUNCTION'
+  WHERE rpt_inp_node.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND epa_type='JUNCTION'
 UNION
  SELECT rpt_inp_node.node_id,
     rpt_inp_node.elevation,
     rpt_inp_node.demand,
     rpt_inp_node.pattern_id
-   FROM inp_selector_result,
+   FROM selector_inp_result,
     rpt_inp_node
-  WHERE (rpt_inp_node.epa_type::text = ANY (ARRAY['JUNCTION'::character varying::text, 'SHORTPIPE'::character varying::text])) AND rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
+  WHERE (rpt_inp_node.epa_type::text = ANY (ARRAY['JUNCTION'::character varying::text, 'SHORTPIPE'::character varying::text])) 
+  AND rpt_inp_node.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text
   ) a 
   ORDER BY 1;
+
+
+
+DROP VIEW IF EXISTS v_ui_rpt_cat_result;
+CREATE OR REPLACE VIEW v_ui_rpt_cat_result AS 
+ SELECT rpt_cat_result.result_id,
+    rpt_cat_result.n_junction,
+    rpt_cat_result.n_reservoir,
+    rpt_cat_result.n_tank,
+    rpt_cat_result.n_pipe,
+    rpt_cat_result.n_pump,
+    rpt_cat_result.n_valve,
+    rpt_cat_result.head_form,
+    rpt_cat_result.hydra_time,
+    rpt_cat_result.hydra_acc,
+    rpt_cat_result.st_ch_freq,
+    rpt_cat_result.max_tr_ch,
+    rpt_cat_result.dam_li_thr,
+    rpt_cat_result.max_trials,
+    rpt_cat_result.q_analysis,
+    rpt_cat_result.spec_grav,
+    rpt_cat_result.r_kin_visc,
+    rpt_cat_result.r_che_diff,
+    rpt_cat_result.dem_multi,
+    rpt_cat_result.total_dura,
+    rpt_cat_result.exec_date,
+    rpt_cat_result.q_timestep,
+    rpt_cat_result.q_tolerance
+   FROM SCHEMA_NAME.rpt_cat_result;
+
+
+CREATE TRIGGER gw_trg_ui_rpt_cat_result  INSTEAD OF INSERT OR UPDATE OR DELETE
+ON v_ui_rpt_cat_result  FOR EACH ROW  EXECUTE PROCEDURE gw_trg_ui_rpt_cat_result();

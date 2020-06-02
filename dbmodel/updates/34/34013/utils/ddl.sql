@@ -42,7 +42,7 @@ update config_toolbox SET inputparams = replace(inputparams::text, 'is_mandatory
 
 
 ALTER TABLE om_result_cat RENAME TO plan_result_cat;
-ALTER TABLE plan_result_cat ADD CONSTRAINT plan_result_cat_unique (name);
+ALTER TABLE plan_result_cat ADD CONSTRAINT plan_result_cat_unique UNIQUE (name);
 
 UPDATE sys_table SET id = 'plan_result_cat', sys_sequence = null, sys_sequence_field = null WHERE id = 'om_result_cat';
 
@@ -55,7 +55,7 @@ ALTER TABLE rpt_cat_result DROP COLUMN id;
 INSERT INTO config_toolbox VALUES (2890,'Calculate cost of reconstruction',TRUE,'{"featureType":[]}',
 '[{"widgetname":"resultName", "label":"Result name:", "widgettype":"text","datatype":"string","layoutname":"grl_option_parameters","layoutorder":1, "placeholder":"result name" ,"value":""},
 {"widgetname":"coefficient", "label":"Coefficient:", "widgettype":"text","datatype":"float","layoutname":"grl_option_parameters","layoutorder":2, "placeholder":"1", "value":""},
-{"widgetname":"descript", "label":"Description:", "widgettype":"text","datatype":"string","layoutname":"grl_option_parameters","layoutorder":3, "placeholder":"description" ,"ismandatory":false, "value":""}]
+{"widgetname":"descript", "label":"Description:", "widgettype":"text","datatype":"string","layoutname":"grl_option_parameters","layoutorder":3, "placeholder":"description" ,"ismandatory":false, "value":""}]');
    
  
 ALTER TABLE anl_polygon RENAME fprocesscat_id TO fid;

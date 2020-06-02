@@ -58,8 +58,8 @@ SELECT gw_fct_connect_to_network($${"client":{"device":4, "infoType":1,"lang":"E
 INSERT INTO vnode VALUES ((SELECT nextval('vnode_vnode_id_seq')), 'AUTO', NULL, 3, 2, 1, 1, '0101000020E7640000198F5EB77093194113A8AB6482755141');
 INSERT INTO link VALUES ((SELECT nextval('link_link_id_seq')), '3014', 'CONNEC', 483, 'VNODE', FALSE, 1, 1, '0102000020E7640000020000006CAAF3ACD4931941988F62837F755141198F5EB77093194113A8AB6482755141');
 
-SELECT gw_fct_plan_result($${"client":{"device":4, "infoType":1, "lang":"ES"},
-							"feature":{},"data":{"parameters":{"coefficient":1, "description":"Demo prices for reconstruction", "resultType":1, "resultId":"Starting prices","saveOnDatabase":true}}}$$);
+--SELECT gw_fct_plan_result($${"client":{"device":4, "infoType":1, "lang":"ES"},
+--"feature":{},"data":{"parameters":{"coefficient":1, "description":"Demo prices for reconstruction", "resultType":1, "resultId":"Starting prices","saveOnDatabase":true}}}$$);
 
 SELECT gw_fct_fill_doc_tables();
 SELECT gw_fct_fill_om_tables();

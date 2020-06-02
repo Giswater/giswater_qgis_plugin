@@ -312,9 +312,6 @@ INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target
 VALUES ('plan_typevalue', 'psector_type', 'plan_psector', 'psector_type');
 
 INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field)
-VALUES ('plan_typevalue', 'result_type', 'om_result_cat', 'result_type');
-
-INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field)
 VALUES ('plan_typevalue', 'price_units', 'plan_price', 'unit');
 
 

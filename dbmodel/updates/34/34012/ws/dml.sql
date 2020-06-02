@@ -15,13 +15,11 @@ WHERE id = 'presszone_vdefault';
  WHERE columnname = 'presszone_id';
  
  -- 2020/06/02
- --SELECT setval('config_param_system_id_seq', (SELECT max(id) FROM config_param_system), true);
 INSERT INTO config_param_system (parameter, value, context,  descript, label, project_type, datatype, isdeprecated) 
 VALUES ('basic_selector_hydrometer', '{"table":"ext_rtc_hydrometer_state", "selector":"selector_hydrometer", "table_id":"id",  "selector_id":"state_id",  "label":"id, '' - '', name", 
- "manageAll":true, "query_filter":""}', 'system', 'Select which label to display for selectors', 'Selector labels:', 'ws', 'json', FALSE);
+"manageAll":true, "query_filter":""}', 'system', 'Select which label to display for selectors', 'Selector labels:', 'ws', 'json', FALSE);
  
-  INSERT INTO config_typevalue (typevalue, id, idval, camelstyle) 
-VALUES ('tabname_typevalue', 'tab_hydrometer', 'tabHydrometer', 'tabHydrometer');
 
- INSERT INTO config_form_tabs (formname,tabname, label, tooltip, sys_role, device) 
+INSERT INTO config_form_tabs (formname,tabname, label, tooltip, sys_role, device) 
 VALUES ('hydrometer', 'tab_hydrometer', 'Hydrometer', 'Hydrometer Selector', 'role_basic', 4);
+
