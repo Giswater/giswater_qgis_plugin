@@ -63,13 +63,11 @@ BEGIN
 
 	-- Get input parameters:
 	v_selector_type := (p_data ->> 'data')::json->> 'selector_type';
-	v_selectors_list := (((p_data ->> 'data')::json->>'selector_type')::json ->>'mincut')::json->>'ids';
 
 	-- get system variables:
 	v_expl_x_user = (SELECT value FROM config_param_system WHERE parameter = 'admin_exploitation_x_user');
 	
-	-- Manage list ids
-	v_selectors_list = replace(replace(v_selectors_list, '[', '('), ']', ')');
+
 
 	-- Start the construction of the tabs array
 	v_formTabs := '[';
@@ -105,12 +103,15 @@ BEGIN
 		v_selectors_list = replace(replace(v_selectors_list, '[', '('), ']', ')');
 		IF v_selectors_list IN (NULL, 'None') THEN
 			v_query_filter = '';
-		ELSIF v_selectors_list = '()' THEN
+		ELSIF v_selectors_list = '()' AND v_selector IN ('selector_mincut_result') THEN
 			v_query_filter = ' AND ' || v_table_id || ' IN (-1) ';
+			--v_query_filter = '';
+		ELSIF v_selectors_list = '()' THEN
+			v_query_filter = '';
 		ELSE
 			v_query_filter = ' AND ' || v_table_id || ' IN '|| v_selectors_list || ' ';
 		END IF;
-		
+		raise notice 'AA -> %',v_query_filteradd;
 		-- Manage v_queryfilter add (using filter)
 		IF v_query_filter is not NULL THEN
 			v_filterstatus = True;
@@ -141,7 +142,7 @@ BEGIN
 		FROM '|| v_table ||' WHERE ' || v_table_id || ' NOT IN (SELECT ' || v_selector_id || ' FROM '|| v_selector ||' WHERE cur_user=' || quote_literal(current_user) || ') '|| v_query_filter ||' '
 		||v_query_filteradd||'  ORDER BY label) a'
 		INTO v_formTabsAux;
-		
+
 		-- Add tab name to json
 		IF v_formTabsAux IS NULL THEN
 			v_formTabsAux := ('{"fields":[]}')::json;

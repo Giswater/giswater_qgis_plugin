@@ -23,7 +23,7 @@ DECLARE
 v_version json;
 v_selector_type text;
 v_tableName text;
-v_column_id text;
+v_columnname text;
 v_result_name text;
 v_result_value text;
 	
@@ -39,14 +39,15 @@ BEGIN
 	-- Get input parameters:
 	v_selector_type := (p_data ->> 'data')::json->> 'selector_type';
 	v_tableName := (p_data ->> 'data')::json->> 'tableName';
-	v_column_id := (p_data ->> 'data')::json->> 'column_id';
+	v_columnname := (p_data ->> 'data')::json->> 'columnname';
 	v_result_name := (p_data ->> 'data')::json->> 'result_name';
 	v_result_value := (p_data ->> 'data')::json->> 'result_value';
 	
 	IF v_result_value = 'True' THEN
-		EXECUTE 'INSERT INTO ' || v_tableName || ' ('|| v_column_id ||', cur_user) VALUES('|| v_result_name ||', '''|| current_user ||''')';
+		EXECUTE 'INSERT INTO ' || v_tableName || ' ('|| v_columnname ||', cur_user) VALUES('|| v_result_name ||', '''|| current_user ||''')';
 	ELSE
-		EXECUTE 'DELETE FROM ' || v_tableName || ' WHERE ' || v_column_id || ' = '|| v_result_name ||'';
+		EXECUTE 'DELETE FROM ' || v_tableName || ' WHERE ' || v_columnname || ' = '|| v_result_name ||'';
+		
 	END IF;
 	
 	-- Return
@@ -60,8 +61,8 @@ BEGIN
 			}}}'||'}')::json;
 
 	-- Exception handling
-	EXCEPTION WHEN OTHERS THEN
-	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	/*EXCEPTION WHEN OTHERS THEN
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;*/
 	
 END;
 $BODY$
