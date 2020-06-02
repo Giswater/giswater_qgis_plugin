@@ -53,6 +53,7 @@ class UpdateSQL(ApiParent):
         self.dlg_readsql = None
         self.dlg_info = None
         self.dlg_readsql_create_project = None
+        self.project_type_selected = None
 
 
     def init_sql(self, set_database_connection=False, username=None, show_dialog=True):
@@ -1574,7 +1575,6 @@ class UpdateSQL(ApiParent):
 
         sql = "SELECT schema_name, schema_name FROM information_schema.schemata"
         rows = self.controller.get_rows(sql)
-
         for row in rows:
             if str(self.schema) == str(row[0]):
                 msg = "This project name alredy exist."
@@ -1586,7 +1586,7 @@ class UpdateSQL(ApiParent):
         self.task1 = GwTask('Manage schema')
         QgsApplication.taskManager().addTask(self.task1)
         self.task1.setProgress(0)
-        sql = 'ALTER SCHEMA ' + str(schema) + ' RENAME TO ' + str(self.schema) + ''
+        sql = f'ALTER SCHEMA {schema} RENAME TO {self.schema}'
         status = self.controller.execute_sql(sql, commit=False)
         if status:
             self.reload_fct_ftrg(project_type=self.project_type_selected)
@@ -1595,8 +1595,9 @@ class UpdateSQL(ApiParent):
             self.task1.setProgress(40)
             self.api(False)
             self.task1.setProgress(60)
-            sql = ('SELECT ' + str(self.schema) + '.gw_fct_admin_rename_fixviews($${"data":{"currentSchemaName":"' + self.schema + '","oldSchemaName":"' + str(schema) + '"}}$$)::text')
-            status = self.controller.execute_sql(sql, commit=False)
+            sql = ('SELECT {' + str(self.schema) + '.gw_fct_admin_rename_fixviews($${"data":{"currentSchemaName":"'
+                   + self.schema + '","oldSchemaName":"' + str(schema) + '"}}$$)::text')
+            self.controller.execute_sql(sql, commit=False)
             self.execute_last_process(schema_name=self.schema, locale=True)
         self.task1.setProgress(100)
 
@@ -2029,12 +2030,12 @@ class UpdateSQL(ApiParent):
             return
 
         for row in rows:
-            sql = ("SELECT EXISTS(SELECT * FROM information_schema.tables "
-                   "WHERE table_schema = '" + str(row[0]) + "' "
-                   "AND table_name = 'version')")
+            sql = (f"SELECT EXISTS(SELECT * FROM information_schema.tables "
+                   f"WHERE table_schema = '{row[0]}' "
+                   f"AND table_name = 'version')")
             exists = self.controller.get_row(sql)
             if exists and str(exists[0]) == 'True':
-                sql = ("SELECT wsoftware FROM " + str(row[0]) + ".version")
+                sql = f"SELECT wsoftware FROM {row[0]}.version"
                 result = self.controller.get_row(sql)
                 if result is not None and result[0] == filter_.upper():
                     elem = [row[0], row[0]]
@@ -2082,7 +2083,6 @@ class UpdateSQL(ApiParent):
         self.filter_srid_value = ''
 
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
-        project_type = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
         if schema_name is None:
             schema_name = 'Nothing to select'
             self.project_data_schema_version = "Version not found"
@@ -2127,8 +2127,8 @@ class UpdateSQL(ApiParent):
             self.is_sample = None
 
         else:
-            sql = ("SELECT value FROM " + schema_name + ".config_param_system "
-                   "WHERE parameter = 'admin_schema_info'")
+            sql = (f"SELECT value FROM {schema_name}.config_param_system "
+                   f"WHERE parameter = 'admin_schema_info'")
             result = self.controller.get_row(sql, commit=False)
 
         if result is None:
@@ -2150,14 +2150,15 @@ class UpdateSQL(ApiParent):
 
         # Update windowTitle
         connection = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_connection)
-        window_title = 'Giswater (' + str(connection) + ' - ' + str(self.plugin_version) + ')'
+        window_title = f'Giswater ({connection} - {self.plugin_version})'
         self.dlg_readsql.setWindowTitle(window_title)
 
         if schema_name == 'Nothing to select' or schema_name == '':
             utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
         elif str(self.version_metadata) > str(self.project_data_schema_version):
             self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
-            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '(Schema version is lower than plugin version, please update schema)')
+            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
+                                         '(Schema version is lower than plugin version, please update schema)')
             self.dlg_readsql.btn_info.setEnabled(True)
         elif str(self.version_metadata) < str(self.project_data_schema_version):
             self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
@@ -2302,7 +2303,6 @@ class UpdateSQL(ApiParent):
 
         # Create dialog and signals
         if self.dlg_readsql_create_project is None:
-            self.controller.log_info("init_dialog_create_project")
             self.init_dialog_create_project()
 
         self.filter_srid_changed()
@@ -2493,10 +2493,10 @@ class UpdateSQL(ApiParent):
             self.controller.show_info_box(msg, "Info")
             return
 
-        msg = "Are you sure you want delete schema '" + str(project_name) + "' ?"
+        msg = f"Are you sure you want delete schema '{project_name}' ?"
         result = self.controller.ask_question(msg, "Info")
         if result:
-            sql = ('DROP SCHEMA ' + str(project_name) + ' CASCADE;')
+            sql = f'DROP SCHEMA {project_name} CASCADE;'
             status = self.controller.execute_sql(sql)
             if status:
                 msg = "Process finished successfully"
@@ -2722,7 +2722,7 @@ class UpdateSQL(ApiParent):
 
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
         # Clear temp_csv
-        sql = ("DELETE FROM " + schema_name + ".temp_csv WHERE cur_user = current_user")
+        sql = f"DELETE FROM {schema_name}.temp_csv WHERE cur_user = current_user"
         status = self.controller.execute_sql(sql, log_sql=True)
 
 
@@ -2778,37 +2778,36 @@ class UpdateSQL(ApiParent):
             wsoftware = self.controller.get_row(sql, commit=False)
 
             if wsoftware[0].upper() == 'WS':
-                sql = ("SELECT cat_feature.child_layer, cat_feature.child_layer FROM " + schema_name + ".cat_feature JOIN "
-                       " (SELECT id,active FROM " + schema_name + ".node_type "
-                       " UNION SELECT id,active FROM " + schema_name + ".arc_type"
-                       " UNION SELECT id,active FROM " + schema_name + ".connec_type) a USING (id) WHERE a.active IS TRUE ORDER BY id")
+                sql = (f"SELECT cat_feature.child_layer, cat_feature.child_layer FROM {schema_name}.cat_feature JOIN "
+                       f" (SELECT id,active FROM {schema_name}.node_type "
+                       f" UNION SELECT id,active FROM {schema_name}.arc_type"
+                       f" UNION SELECT id,active FROM {schema_name}.connec_type) a USING (id) WHERE a.active IS TRUE ORDER BY id")
             elif wsoftware[0].upper() == 'UD':
-                sql = ("SELECT cat_feature.child_layer, cat_feature.child_layer FROM " + schema_name + ".cat_feature JOIN "
-                       " (SELECT id,active FROM " + schema_name + ".node_type "
-                       " UNION SELECT id,active FROM " + schema_name + ".arc_type "
-                       " UNION SELECT id,active FROM " + schema_name + ".connec_type "
-                       " UNION SELECT id,active FROM " + schema_name + ".gully_type) a USING (id) WHERE a.active IS TRUE ORDER BY id")
+                sql = (f"SELECT cat_feature.child_layer, cat_feature.child_layer FROM {schema_name}.cat_feature JOIN "
+                       f" (SELECT id,active FROM {schema_name}.node_type "
+                       f" UNION SELECT id,active FROM {schema_name}.arc_type "
+                       f" UNION SELECT id,active FROM {schema_name}.connec_type "
+                       f" UNION SELECT id,active FROM {schema_name}.gully_type) a USING (id) WHERE a.active IS TRUE ORDER BY id")
             else:
                 return
 
-            rows = self.controller.get_rows(sql, log_sql=True)
+            rows = self.controller.get_rows(sql)
             utils_giswater.set_item_data(self.dlg_readsql.cmb_formname_ui, rows, 1)
-
             if wsoftware[0].upper() == 'WS':
-                sql = ("SELECT cat_feature.id, cat_feature.id FROM " + schema_name + ".cat_feature JOIN "
-                       " (SELECT id,active FROM " + schema_name + ".node_type "
-                       " UNION SELECT id,active FROM " + schema_name + ".arc_type "
-                       " UNION SELECT id,active FROM " + schema_name + ".connec_type) a USING (id) WHERE a.active IS TRUE ORDER BY id")
+                sql = (f"SELECT cat_feature.id, cat_feature.id FROM {schema_name}.cat_feature JOIN "
+                       f" (SELECT id,active FROM {schema_name}.node_type "
+                       f" UNION SELECT id,active FROM {schema_name}.arc_type "
+                       f" UNION SELECT id,active FROM {schema_name}.connec_type) a USING (id) WHERE a.active IS TRUE ORDER BY id")
             elif wsoftware[0].upper() == 'UD':
-                sql = ("SELECT cat_feature.id, cat_feature.id FROM " + schema_name + ".cat_feature JOIN "
-                       " (SELECT id,active FROM " + schema_name + ".node_type "
-                       " UNION SELECT id,active FROM " + schema_name + ".arc_type "
-                       " UNION SELECT id,active FROM " + schema_name + ".connec_type "
-                       " UNION SELECT id,active FROM " + schema_name + ".gully_type) a USING (id) WHERE a.active IS TRUE ORDER BY id")
+                sql = (f"SELECT cat_feature.id, cat_feature.id FROM {schema_name}.cat_feature JOIN "
+                       f" (SELECT id,active FROM {schema_name}.node_type "
+                       f" UNION SELECT id,active FROM {schema_name}.arc_type "
+                       f" UNION SELECT id,active FROM {schema_name}.connec_type "
+                       f" UNION SELECT id,active FROM {schema_name}.gully_type) a USING (id) WHERE a.active IS TRUE ORDER BY id")
             else:
                 return
 
-            rows = self.controller.get_rows(sql, log_sql=True)
+            rows = self.controller.get_rows(sql)
             utils_giswater.set_item_data(self.dlg_readsql.cmb_formname_fields, rows, 1)
             utils_giswater.set_item_data(self.dlg_readsql.cmb_feature_name_view, rows, 1)
             utils_giswater.set_item_data(self.dlg_readsql.cmb_feature_sys_fields, rows, 1)
@@ -3010,21 +3009,21 @@ class UpdateSQL(ApiParent):
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
 
         # Populate widgettype combo
-        sql = ("SELECT DISTINCT(id), idval FROM " + schema_name + ".config_api_typevalue "
-               "WHERE typevalue = 'widgettype_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
+        sql = (f"SELECT DISTINCT(id), idval FROM {schema_name}.config_api_typevalue "
+               f"WHERE typevalue = 'widgettype_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
         rows = self.controller.get_rows(sql, log_sql=True)
         utils_giswater.set_item_data(self.dlg_manage_fields.widgettype, rows, 1)
 
         # Populate datatype combo
-        sql = ("SELECT id, idval FROM " + schema_name + ".config_api_typevalue "
-               "WHERE typevalue = 'datatype_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
+        sql = (f"SELECT id, idval FROM {schema_name}.config_api_typevalue "
+               f"WHERE typevalue = 'datatype_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
         rows = self.controller.get_rows(sql, log_sql=True)
         utils_giswater.set_item_data(self.dlg_manage_fields.datatype, rows, 1)
 
         # Populate widgetfunction combo
-        sql = ("SELECT null as id, null as idval UNION ALL "
-               "SELECT id, idval FROM " + schema_name + ".config_api_typevalue "
-               "WHERE typevalue = 'widgetfunction_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
+        sql = (f"SELECT null as id, null as idval UNION ALL "
+               f"SELECT id, idval FROM {schema_name}.config_api_typevalue "
+               f"WHERE typevalue = 'widgetfunction_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
         rows = self.controller.get_rows(sql, log_sql=True)
         utils_giswater.set_item_data(self.dlg_manage_fields.widgetfunction, rows, 1)
 
@@ -3081,13 +3080,13 @@ class UpdateSQL(ApiParent):
 
         # Populate widgettype combo
         if self.chk_multi_insert:
-            sql = ("SELECT DISTINCT(columnname), columnname "
-                   "FROM " + schema_name + ".ve_config_addfields "
-                   "WHERE cat_feature_id IS NULL ")
+            sql = (f"SELECT DISTINCT(columnname), columnname "
+                   f"FROM {schema_name}.ve_config_addfields "
+                   f"WHERE cat_feature_id IS NULL ")
         else:
-            sql = ("SELECT DISTINCT(columnname), columnname "
-                   "FROM " + schema_name + ".ve_config_addfields "
-                   "WHERE cat_feature_id = '" + form_name + "'")
+            sql = (f"SELECT DISTINCT(columnname), columnname "
+                   f"FROM {schema_name}.ve_config_addfields "
+                   f"WHERE cat_feature_id = '" + form_name + "'")
 
         rows = self.controller.get_rows(sql, log_sql=True)
         utils_giswater.set_item_data(self.dlg_manage_fields.cmb_fields, rows, 1)
