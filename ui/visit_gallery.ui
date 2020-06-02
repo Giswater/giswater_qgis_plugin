@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>gallery</class>
- <widget class="QDialog" name="gallery">
+ <class>dlg_visit_gallery</class>
+ <widget class="QDialog" name="dlg_visit_gallery">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -281,7 +281,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QLabel" name="label">
+  <widget class="QLabel" name="lbl_visit_id">
    <property name="geometry">
     <rect>
      <x>18</x>
@@ -291,7 +291,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Visit_id: </string>
+    <string>Visit id: </string>
    </property>
   </widget>
   <widget class="QPushButton" name="btn_close">
@@ -320,7 +320,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QLabel" name="label_2">
+  <widget class="QLabel" name="lbl_event_id">
    <property name="geometry">
     <rect>
      <x>200</x>
@@ -330,7 +330,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Event_id: </string>
+    <string>Event id: </string>
    </property>
   </widget>
  </widget>

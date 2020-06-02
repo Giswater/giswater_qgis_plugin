@@ -127,7 +127,7 @@ class ManageGallery(ParentManage):
             self.btn_next.setDisabled(True)        
 
         # Open dialog
-        self.open_dialog(self.dlg_gallery, maximize_button=False)        
+        self.open_dialog(self.dlg_gallery, dlg_name='visit_gallery', maximize_button=False)
 
 
     def next_gallery(self):

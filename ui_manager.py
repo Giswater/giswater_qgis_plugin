@@ -335,7 +335,7 @@ class Go2EpaUI(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('gallery.ui')
+FORM_CLASS = get_ui_class('visit_gallery.ui')
 class Gallery(GwDialog, FORM_CLASS):
     pass
 
