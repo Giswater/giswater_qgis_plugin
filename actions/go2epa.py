@@ -26,7 +26,7 @@ from .api_go2epa_options import Go2EpaOptions
 from .api_parent import ApiParent
 from .task_go2epa import TaskGo2Epa
 from .update_sql import UpdateSQL
-from ..ui_manager import EpaCompare, EpaResultManager, Go2EpaUI, HydrologySelector, Multirow_selector
+from ..ui_manager import EpaCompare, EpaManager, Go2EpaUI, HydrologySelector, Multirow_selector
 
 
 class Go2Epa(ApiParent):
@@ -773,7 +773,7 @@ class Go2Epa(ApiParent):
         """ Button 25: Epa result manager """
 
         # Create the dialog
-        self.dlg_manager = EpaResultManager()
+        self.dlg_manager = EpaManager()
         self.load_settings(self.dlg_manager)
 
         # Manage widgets
@@ -794,7 +794,7 @@ class Go2Epa(ApiParent):
         self.dlg_manager.txt_result_id.editTextChanged.connect(self.filter_by_result_id)
 
         # Open form
-        self.open_dialog(self.dlg_manager)
+        self.open_dialog(self.dlg_manager, dlg_name='go2epa_manager')
 
 
     def fill_combo_result_id(self):

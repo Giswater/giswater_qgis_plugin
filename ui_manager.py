@@ -305,8 +305,8 @@ class EpaCompare(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('epa_result_manager.ui')
-class EpaResultManager(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('go2epa_manager.ui')
+class EpaManager(GwDialog, FORM_CLASS):
     pass
 
 

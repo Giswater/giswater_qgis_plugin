@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>epa_result_management</class>
- <widget class="QDialog" name="epa_result_management">
+ <class>dlg_go2epa_manager</class>
+ <widget class="QDialog" name="dlg_go2epa_manager">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -61,7 +61,7 @@
        </spacer>
       </item>
       <item row="0" column="0">
-       <widget class="QLabel" name="label_result_id">
+       <widget class="QLabel" name="lbl_result_id">
         <property name="text">
          <string>Filter by: Result id</string>
         </property>
