@@ -354,18 +354,17 @@ FORM_CLASS = get_ui_class('info_show_info.ui')
 class InfoShowInfo(GwDialog, FORM_CLASS):
     pass
 
-# TODO change file and class name to workcat_search
+
 FORM_CLASS = get_ui_class('search_workcat.ui')
 class SearchWorkcat(GwDialog, FORM_CLASS):
     pass
 
-
-FORM_CLASS = get_ui_class('visit_documents.ui')
-class VisitDocuments(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('visit_document.ui')
+class VisitDocument(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('profiles_list.ui')
+FORM_CLASS = get_ui_class('profile_list.ui')
 class ProfilesList(GwDialog, FORM_CLASS):
     pass
 
@@ -375,20 +374,20 @@ class LotManagement(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('manage_addfields.ui')
-class ManageFields(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('main_addfields.ui')
+class MainFields(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('manage_sys_fields.ui')
-class ManageSysFields(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('main_sysfields.ui')
+class MainSysFields(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('manage_visit_class.ui')
-class ManageVisitClass(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('main_visitclass.ui')
+class MainVisitClass(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('manage_visit_param.ui')
-class ManageVisitParam(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('main_visitparam.ui')
+class MainVisitParam(GwDialog, FORM_CLASS):
     pass
 
 
@@ -401,13 +400,13 @@ class Mincut(GwMainWindow, FORM_CLASS):
         super().__init__()
 
 
-FORM_CLASS = get_ui_class('mincut_add_connec.ui')
-class Mincut_add_connec(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('mincut_connec.ui')
+class MincutConnec(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('mincut_add_hydrometer.ui')
-class Mincut_add_hydrometer(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('mincut_hydrometer.ui')
+class MincutHydrometer(GwDialog, FORM_CLASS):
     pass
 
 

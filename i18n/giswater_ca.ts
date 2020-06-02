@@ -13,15 +13,11 @@
 			<translation>Giswater - OM</translation>
 		</message>
 		<message>
-			<source>41_text</source>
-			<translation>Selector d'explotació</translation>
+			<source>142_text</source>
+			<translation>Selectors</translation>
 		</message>
 		<message>
-			<source>48_text</source>
-			<translation>Selector d'estat</translation>
-		</message>
-		<message>
-			<source>32_text</source>
+			<source>143_text</source>
 			<translation>Cercador</translation>
 		</message>
 		<message>
@@ -87,10 +83,6 @@
 		<message>
 			<source>20_text</source>
 			<translation>Conectar a la xarxa</translation>
-		</message>
-		<message>
-			<source>86_text</source>
-			<translation>Selector de comptadors</translation>
 		</message>
 		<message>
 			<source>64_text</source>
@@ -989,11 +981,15 @@
 			<translation>Select a node and click on it, the downstream nodes are computed</translation>
 		</message>
 		<message>
-			<source>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
- Please ensure that features has no undelete value on true.\n
+			<source>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
+
+ Please ensure that features has no undelete value on true.\n
+
  On the other hand you must know that traceability table will storage precedent information.</source>
-			<translation>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
- Please ensure that features has no undelete value on true.\n
+			<translation>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
+
+ Please ensure that features has no undelete value on true.\n
+
  On the other hand you must know that traceability table will storage precedent information.</translation>
 		</message>
 		<message>

@@ -34,7 +34,7 @@ from .create_gis_project import CreateGisProject
 from .gw_task import GwTask
 from .i18n_generator import I18NGenerator
 from ..ui_manager import Readsql, InfoShowInfo, ReadsqlCreateProject, ReadsqlRenameCopy, ReadsqlShowInfo, \
-    ReadsqlCreateGisProject, ToolboxUi, ManageFields, ManageVisitClass, ManageVisitParam, ManageSysFields, Credentials
+    ReadsqlCreateGisProject, ToolboxUi, MainFields, MainVisitClass, MainVisitParam, MainSysFields, Credentials
 
 
 class UpdateSQL(ApiParent):
@@ -202,6 +202,9 @@ class UpdateSQL(ApiParent):
         # Set Listeners
         self.set_signals()
 
+        # Set default project type
+        utils_giswater.setWidgetText(self.dlg_readsql, self.cmb_project_type, 'ws')
+
 
     def set_signals(self):
         """ Set signals. Function has to be executed only once (during form initialization) """
@@ -239,9 +242,9 @@ class UpdateSQL(ApiParent):
         self.dlg_readsql.btn_export_ui.clicked.connect(partial(self.execute_export_ui))
         self.dlg_readsql.dlg_closed.connect(partial(self.save_selection))
 
-        self.dlg_readsql.btn_create_field.clicked.connect(partial(self.open_manage_field, 'Create'))
-        self.dlg_readsql.btn_update_field.clicked.connect(partial(self.open_manage_field, 'Update'))
-        self.dlg_readsql.btn_delete_field.clicked.connect(partial(self.open_manage_field, 'Delete'))
+        self.dlg_readsql.btn_create_field.clicked.connect(partial(self.open_manage_field, 'create'))
+        self.dlg_readsql.btn_update_field.clicked.connect(partial(self.open_manage_field, 'update'))
+        self.dlg_readsql.btn_delete_field.clicked.connect(partial(self.open_manage_field, 'delete'))
         self.dlg_readsql.btn_create_view.clicked.connect(partial(self.create_child_view))
         self.dlg_readsql.btn_update_sys_field.clicked.connect(partial(self.update_sys_fields))
 
@@ -1870,7 +1873,7 @@ class UpdateSQL(ApiParent):
     def create_visit_class(self):
 
         # Create the dialog and signals
-        self.dlg_manage_visit_class = ManageVisitClass()
+        self.dlg_manage_visit_class = MainVisitClass()
         self.load_settings(self.dlg_manage_visit_class)
 
         # Manage widgets
@@ -1885,14 +1888,14 @@ class UpdateSQL(ApiParent):
         # Set listeners
 
         # Open dialog
-        self.open_dialog(self.dlg_manage_visit_class)
+        self.open_dialog(self.dlg_manage_visit_class, dlg_name='main_visitclass')
         return
 
 
     def create_visit_param(self):
         return
         # Create the dialog and signals
-        self.dlg_manage_visit_param = ManageVisitParam()
+        self.dlg_manage_visit_param = MainVisitParam()
         self.load_settings(self.dlg_manage_visit_param)
 
         # Manage widgets
@@ -1915,7 +1918,7 @@ class UpdateSQL(ApiParent):
         # Set listeners
 
         # Open dialog
-        self.open_dialog(self.dlg_manage_visit_param)
+        self.open_dialog(self.dlg_manage_visit_param, dlg_name='main_visitparam')
         return
 
 
@@ -2829,13 +2832,13 @@ class UpdateSQL(ApiParent):
     def update_sys_fields(self):
 
         # Create the dialog and signals
-        self.dlg_manage_sys_fields = ManageSysFields()
+        self.dlg_manage_sys_fields = MainSysFields()
         self.load_settings(self.dlg_manage_sys_fields)
         self.model_update_table = None
 
         # Remove unused tabs
         for x in range(self.dlg_manage_sys_fields.tab_sys_add_fields.count() - 1, -1, -1):
-            if str(self.dlg_manage_sys_fields.tab_sys_add_fields.widget(x).objectName()) != 'Update':
+            if str(self.dlg_manage_sys_fields.tab_sys_add_fields.widget(x).objectName()) != 'tab_update':
                 utils_giswater.remove_tab_by_tabName(
                     self.dlg_manage_sys_fields.tab_sys_add_fields, self.dlg_manage_sys_fields.tab_sys_add_fields.widget(x).objectName())
 
@@ -2860,30 +2863,27 @@ class UpdateSQL(ApiParent):
     def open_manage_field(self, action):
 
         # Create the dialog and signals
-        self.dlg_manage_fields = ManageFields()
+        self.dlg_manage_fields = MainFields()
         self.load_settings(self.dlg_manage_fields)
         self.model_update_table = None
 
         # Remove unused tabs
         for x in range(self.dlg_manage_fields.tab_add_fields.count() - 1, -1, -1):
-            if str(self.dlg_manage_fields.tab_add_fields.widget(x).objectName()) != str(action):
+            if str(self.dlg_manage_fields.tab_add_fields.widget(x).objectName()) != f'tab_{action}':
                 utils_giswater.remove_tab_by_tabName(
                     self.dlg_manage_fields.tab_add_fields, self.dlg_manage_fields.tab_add_fields.widget(x).objectName())
 
         form_name_fields = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_formname_fields)
         self.chk_multi_insert = utils_giswater.isChecked(self.dlg_readsql, self.dlg_readsql.chk_multi_insert)
 
-        if action == 'Create':
+        if action == 'create':
             window_title = 'Create field on "' + str(form_name_fields) + '"'
-            self.dlg_manage_fields.setWindowTitle(window_title)
             self.manage_create_field(form_name_fields)
-        elif action == 'Update':
+        elif action == 'update':
             window_title = 'Update field on "' + str(form_name_fields) + '"'
-            self.dlg_manage_fields.setWindowTitle(window_title)
             self.manage_update_field(form_name_fields)
-        elif action == 'Delete':
+        elif action == 'delete':
             window_title = 'Delete field on "' + str(form_name_fields) + '"'
-            self.dlg_manage_fields.setWindowTitle(window_title)
             self.manage_delete_field(form_name_fields)
 
         # Set listeners
@@ -2895,7 +2895,9 @@ class UpdateSQL(ApiParent):
         self.dlg_manage_fields.btn_open.clicked.connect(
             partial(self.update_selected_addfild, self.dlg_manage_fields.tbl_update))
 
-        self.open_dialog(self.dlg_manage_fields)
+        self.open_dialog(self.dlg_manage_fields, dlg_name='main_addfields')
+        self.dlg_manage_fields.setWindowTitle(window_title)
+
 
 
     # TODO:: Enhance this function and use parametric parameters
@@ -2910,7 +2912,7 @@ class UpdateSQL(ApiParent):
 
         # Create the dialog and signals
         self.close_dialog(self.dlg_manage_sys_fields)
-        self.dlg_manage_sys_fields = ManageSysFields()
+        self.dlg_manage_sys_fields = MainSysFields()
         self.load_settings(self.dlg_manage_sys_fields)
         self.model_update_table = None
 
@@ -2923,7 +2925,7 @@ class UpdateSQL(ApiParent):
 
         # Remove unused tabs
         for x in range(self.dlg_manage_sys_fields.tab_sys_add_fields.count() - 1, -1, -1):
-            if str(self.dlg_manage_sys_fields.tab_sys_add_fields.widget(x).objectName()) != str('Create'):
+            if str(self.dlg_manage_sys_fields.tab_sys_add_fields.widget(x).objectName()) != str('tab_create'):
                 utils_giswater.remove_tab_by_tabName(self.dlg_manage_sys_fields.tab_sys_add_fields,
                                                      self.dlg_manage_sys_fields.tab_sys_add_fields.widget(x).objectName())
 
@@ -2959,7 +2961,7 @@ class UpdateSQL(ApiParent):
 
         # Create the dialog and signals
         self.close_dialog(self.dlg_manage_fields)
-        self.dlg_manage_fields = ManageFields()
+        self.dlg_manage_fields = MainFields()
         self.load_settings(self.dlg_manage_fields)
         self.model_update_table = None
 
@@ -2969,12 +2971,12 @@ class UpdateSQL(ApiParent):
 
         # Set listeners
         self.dlg_manage_fields.btn_accept.clicked.connect(
-            partial(self.manage_accept, 'Update', form_name_fields, self.model_update_table))
+            partial(self.manage_accept, 'update', form_name_fields, self.model_update_table))
         self.dlg_manage_fields.btn_cancel.clicked.connect(partial(self.manage_close_dlg, self.dlg_manage_fields))
 
         # Remove unused tabs
         for x in range(self.dlg_manage_fields.tab_add_fields.count() - 1, -1, -1):
-            if str(self.dlg_manage_fields.tab_add_fields.widget(x).objectName()) != str('Create'):
+            if str(self.dlg_manage_fields.tab_add_fields.widget(x).objectName()) != str('tab_create'):
                 utils_giswater.remove_tab_by_tabName(self.dlg_manage_fields.tab_add_fields, self.dlg_manage_fields.tab_add_fields.widget(x).objectName())
 
         window_title = 'Update field on "' + str(form_name_fields) + '"'
@@ -2997,7 +2999,7 @@ class UpdateSQL(ApiParent):
                 value = None
             utils_giswater.setWidgetText(self.dlg_manage_fields, result, value)
 
-        self.open_dialog(self.dlg_manage_fields)
+        self.open_dialog(self.dlg_manage_fields, dlg_name='main_addfields')
 
 
     def manage_create_field(self, form_name):
@@ -3094,12 +3096,12 @@ class UpdateSQL(ApiParent):
         if dlg_to_close.objectName() == 'dlg_man_sys_fields':
             self.update_sys_fields()
         elif dlg_to_close.objectName() == 'dlg_man_addfields':
-            self.open_manage_field('Update')
+            self.open_manage_field('update')
 
 
     def manage_sys_update(self, form_name):
 
-        list_widgets = self.dlg_manage_sys_fields.Create.findChildren(QWidget)
+        list_widgets = self.dlg_manage_sys_fields.tab_create.findChildren(QWidget)
         column_id = utils_giswater.getWidgetText(self.dlg_manage_sys_fields, self.dlg_manage_sys_fields.column_id)
         sql = f"UPDATE ve_config_sys_fields SET "
         for widget in list_widgets:
@@ -3143,7 +3145,7 @@ class UpdateSQL(ApiParent):
                f"WHERE param_name = '{param_name}'")
         row = self.controller.get_row(sql, log_sql=True)
 
-        if action == 'Create':
+        if action == 'create':
 
             # Control mandatory widgets
             if utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.column_id) is 'null' or \
@@ -3163,7 +3165,7 @@ class UpdateSQL(ApiParent):
                 self.controller.show_info_box(msg, "Info")
                 return
 
-            list_widgets = self.dlg_manage_fields.Create.findChildren(QWidget)
+            list_widgets = self.dlg_manage_fields.tab_create.findChildren(QWidget)
 
             _json = {}
             for widget in list_widgets:
@@ -3197,9 +3199,9 @@ class UpdateSQL(ApiParent):
             if not status:
                 return
 
-        elif action == 'Update':
+        elif action == 'update':
 
-            list_widgets = self.dlg_manage_fields.Create.findChildren(QWidget)
+            list_widgets = self.dlg_manage_fields.tab_create.findChildren(QWidget)
 
             _json = {}
             for widget in list_widgets:
@@ -3235,7 +3237,7 @@ class UpdateSQL(ApiParent):
             if not status:
                 return
 
-        elif action == 'Delete':
+        elif action == 'delete':
 
             field_value = utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.cmb_fields)
 
@@ -3252,8 +3254,8 @@ class UpdateSQL(ApiParent):
         # Close dialog
         self.close_dialog(self.dlg_manage_fields)
 
-        if action == 'Update':
-            self.open_manage_field('Update')
+        if action == 'update':
+            self.open_manage_field('update')
 
 
     def fill_table(self, qtable, table_name, model, expr_filter, set_edit_strategy=QSqlTableModel.OnManualSubmit):

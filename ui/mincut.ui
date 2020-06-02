@@ -70,7 +70,7 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
-         <widget class="QGroupBox" name="groupBox">
+         <widget class="QGroupBox" name="grb_plan_location">
           <property name="title">
            <string>Location</string>
           </property>
@@ -78,21 +78,21 @@
            <item row="0" column="0">
             <layout class="QGridLayout" name="gridLayout_7">
              <item row="0" column="1">
-              <widget class="QLabel" name="label_connec_7">
+              <widget class="QLabel" name="lbl_post_code">
                <property name="text">
                 <string>Post code:</string>
                </property>
               </widget>
              </item>
              <item row="2" column="0">
-              <widget class="QLabel" name="label_connec_8">
+              <widget class="QLabel" name="lbl_street">
                <property name="text">
                 <string>Street:</string>
                </property>
               </widget>
              </item>
              <item row="0" column="0">
-              <widget class="QLabel" name="label_connec_6">
+              <widget class="QLabel" name="lbl_municipality">
                <property name="text">
                 <string>Municipality:</string>
                </property>
@@ -129,7 +129,7 @@
               </widget>
              </item>
              <item row="2" column="1">
-              <widget class="QLabel" name="label_connec_9">
+              <widget class="QLabel" name="lbl_number">
                <property name="text">
                 <string>Number:</string>
                </property>
@@ -151,7 +151,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QGroupBox" name="groupBox_2">
+         <widget class="QGroupBox" name="grb_plan_details">
           <property name="title">
            <string>Details</string>
           </property>
@@ -159,7 +159,7 @@
            <item row="2" column="0">
             <layout class="QGridLayout" name="gridLayout_9">
              <item row="3" column="0">
-              <widget class="QLabel" name="label_label_x_10">
+              <widget class="QLabel" name="lbl_received_date">
                <property name="font">
                 <font>
                  <pointsize>8</pointsize>
@@ -189,7 +189,7 @@
               </widget>
              </item>
              <item row="8" column="0">
-              <widget class="QLabel" name="label_builtdate_5">
+              <widget class="QLabel" name="lbl_descript_pd">
                <property name="font">
                 <font>
                  <pointsize>8</pointsize>
@@ -243,7 +243,7 @@
               </widget>
              </item>
              <item row="5" column="0">
-              <widget class="QLabel" name="label_2">
+              <widget class="QLabel" name="lbl_output_details">
                <property name="text">
                 <string>Output details:</string>
                </property>
@@ -270,7 +270,7 @@
            <item row="0" column="0">
             <layout class="QGridLayout" name="gridLayout_5">
              <item row="0" column="2">
-              <widget class="QLabel" name="label_label_x_8">
+              <widget class="QLabel" name="lbl_cause">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                  <horstretch>0</horstretch>
@@ -306,7 +306,7 @@
               </widget>
              </item>
              <item row="0" column="0">
-              <widget class="QLabel" name="label_label_x_7">
+              <widget class="QLabel" name="lbl_type">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                  <horstretch>0</horstretch>
@@ -367,7 +367,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QGroupBox" name="groupBox_3">
+         <widget class="QGroupBox" name="grb_plan_forecasted_dates">
           <property name="title">
            <string>Forecasted dates</string>
           </property>
@@ -375,7 +375,7 @@
            <item row="0" column="0">
             <layout class="QGridLayout" name="gridLayout_11">
              <item row="0" column="0">
-              <widget class="QLabel" name="label_builtdate_3">
+              <widget class="QLabel" name="lbl_start">
                <property name="font">
                 <font>
                  <pointsize>8</pointsize>
@@ -402,7 +402,7 @@
               </widget>
              </item>
              <item row="4" column="0">
-              <widget class="QLabel" name="label_assigned_to">
+              <widget class="QLabel" name="lbl_assigned_to">
                <property name="font">
                 <font>
                  <pointsize>8</pointsize>
@@ -432,7 +432,7 @@
               </widget>
              </item>
              <item row="2" column="0">
-              <widget class="QLabel" name="label_builtdate_4">
+              <widget class="QLabel" name="lbl_end">
                <property name="font">
                 <font>
                  <pointsize>8</pointsize>
@@ -512,7 +512,7 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout_6">
         <item row="0" column="0">
-         <widget class="QGroupBox" name="groupBox_4">
+         <widget class="QGroupBox" name="grb_exec_realdates">
           <property name="title">
            <string>Real dates</string>
           </property>
@@ -536,21 +536,21 @@
               </widget>
              </item>
              <item row="6" column="0">
-              <widget class="QLabel" name="label_4">
+              <widget class="QLabel" name="lbl_exec_appropriate">
                <property name="text">
                 <string>Appropriate:</string>
                </property>
               </widget>
              </item>
              <item row="1" column="0">
-              <widget class="QLabel" name="label_3">
+              <widget class="QLabel" name="lbl_exec_startdate">
                <property name="text">
                 <string>Start date:</string>
                </property>
               </widget>
              </item>
              <item row="2" column="0">
-              <widget class="QLabel" name="label_builtdate_6">
+              <widget class="QLabel" name="lbl_descript_rd">
                <property name="font">
                 <font>
                  <pointsize>8</pointsize>
@@ -594,7 +594,7 @@
               </widget>
              </item>
              <item row="7" column="0">
-              <widget class="QLabel" name="label_5">
+              <widget class="QLabel" name="lbl_exec_enddate">
                <property name="text">
                 <string>End date:</string>
                </property>
@@ -636,7 +636,7 @@
               </widget>
              </item>
              <item row="4" column="0">
-              <widget class="QLabel" name="label">
+              <widget class="QLabel" name="lbl_dist_from_plot">
                <property name="text">
                 <string>Distance from plot:</string>
                </property>
@@ -675,7 +675,7 @@
               </widget>
              </item>
              <item row="5" column="0">
-              <widget class="QLabel" name="label_label_x_5">
+              <widget class="QLabel" name="lbl_depth">
                <property name="font">
                 <font>
                  <pointsize>8</pointsize>
@@ -793,7 +793,7 @@
        <enum>QLayout::SetDefaultConstraint</enum>
       </property>
       <item>
-       <widget class="QLabel" name="label_label_x_9">
+       <widget class="QLabel" name="lbl_id">
         <property name="font">
          <font>
           <pointsize>8</pointsize>
@@ -833,7 +833,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label_label_x_11">
+       <widget class="QLabel" name="lbl_state">
         <property name="font">
          <font>
           <pointsize>8</pointsize>
@@ -873,7 +873,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label_label_x_12">
+       <widget class="QLabel" name="lbl_work_order">
         <property name="font">
          <font>
           <pointsize>8</pointsize>

@@ -26,7 +26,7 @@ from .manage_element import ManageElement
 from .manage_gallery import ManageGallery
 from .manage_visit import ManageVisit
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
-from ..ui_manager import ApiBasicInfo, InfoFullUi, VisitEventFull, GwMainWindow, VisitDocuments, Sections
+from ..ui_manager import ApiBasicInfo, InfoFullUi, VisitEventFull, GwMainWindow, VisitDocument, Sections
 
 
 class ApiCF(ApiParent, QObject):
@@ -282,14 +282,20 @@ class ApiCF(ApiParent, QObject):
                 return False, None
 
         self.complet_result = row
-        if self.complet_result[0]['body']['form']['template'] == 'template_generic':
+        try:
+            template = self.complet_result[0]['body']['form']['template']
+        except Exception as e:
+            self.controller.log_info(str(e))
+            return False, None
+
+        if template in ('template_generic', 'GENERIC'):
             result, dialog = self.open_generic_form(self.complet_result)
             # Fill self.my_json for new feature
             if feature_cat is not None:
                 self.manage_new_feature(self.complet_result, dialog)
             return result, dialog
 
-        elif self.complet_result[0]['body']['form']['template'] == 'template_feature':
+        elif template in 'template_feature':
             sub_tag = None
             if feature_cat:
                 if feature_cat.feature_type.lower() == 'arc':
@@ -299,8 +305,11 @@ class ApiCF(ApiParent, QObject):
             result, dialog = self.open_custom_form(feature_id, self.complet_result, tab_type, sub_tag, docker=docker)
             if feature_cat is not None:
                 self.manage_new_feature(self.complet_result, dialog)
-
             return result, dialog
+
+        else:
+            self.controller.log_warning(f"template not managed: {template}")
+            return False, None
 
 
     def manage_new_feature(self, complet_result, dialog):
@@ -393,9 +402,10 @@ class ApiCF(ApiParent, QObject):
 
         # Remove unused tabs
         tabs_to_show = []
-        # tabs_to_show = [tab['tabname'] for tab in complet_result[0]['form']['visibleTabs']]
-        for tab in complet_result[0]['body']['form']['visibleTabs']:
-            tabs_to_show.append(tab['tabName'])
+
+        if 'visibleTabs' in complet_result[0]['body']['form']:
+            for tab in complet_result[0]['body']['form']['visibleTabs']:
+                tabs_to_show.append(tab['tabName'])
 
         for x in range(self.tab_main.count() - 1, 0, -1):
             if self.tab_main.widget(x).objectName() not in tabs_to_show:
@@ -468,9 +478,10 @@ class ApiCF(ApiParent, QObject):
                 parent_layer = self.feature_cat.parent_layer
             else:
                 parent_layer = str(complet_result[0]['body']['feature']['tableParent'])
-            sql = "SELECT lower(feature_type) FROM cat_feature WHERE  parent_layer = '" + str(parent_layer) + "' LIMIT 1"
+            sql = f"SELECT lower(feature_type) FROM cat_feature WHERE parent_layer = '{parent_layer}' LIMIT 1"
             result = self.controller.get_row(sql)
-            self.geom_type = result[0]
+            if result:
+                self.geom_type = result[0]
 
         # Get field id name
         self.field_id = str(complet_result[0]['body']['feature']['idName'])
@@ -512,7 +523,8 @@ class ApiCF(ApiParent, QObject):
                 if field['widgettype'] == 'combo':
                     widget = self.dlg_cf.findChild(QComboBox, field['widgetname'])
                     if widget is not None:
-                        widget.currentIndexChanged.connect(partial(self.fill_child, self.dlg_cf, widget, self.feature_type, self.tablename, self.field_id))
+                        widget.currentIndexChanged.connect(partial(self.fill_child, self.dlg_cf, widget,
+                            self.feature_type, self.tablename, self.field_id))
 
         # Set variables
         self.filter = str(complet_result[0]['body']['feature']['idName']) + " = '" + str(self.feature_id) + "'"
@@ -576,7 +588,6 @@ class ApiCF(ApiParent, QObject):
             self.dlg_cf.dlg_closed.connect(partial(self.save_settings, self.dlg_cf))
             self.dlg_cf.dlg_closed.connect(partial(self.set_vdefault_edition))
             self.dlg_cf.key_pressed.connect(partial(self.close_dialog, self.dlg_cf))
-
 
         # Set title for toolbox
         toolbox_cf = self.dlg_cf.findChild(QWidget, 'toolBox')
@@ -1249,6 +1260,10 @@ class ApiCF(ApiParent, QObject):
         actions_list = self.dlg_cf.findChildren(QAction)
         for action in actions_list:
             action.setVisible(False)
+
+        if not 'visibleTabs' in self.complet_result[0]['body']['form']:
+            return
+
         for tab in self.complet_result[0]['body']['form']['visibleTabs']:
             if tab['tabName'] == tab_name:
                 if tab['tabactions'] is not None:
@@ -2131,7 +2146,7 @@ class ApiCF(ApiParent, QObject):
 
         else:
             # If more then one document is attached open dialog with list of documents
-            self.dlg_load_doc = VisitDocuments()
+            self.dlg_load_doc = VisitDocument()
             self.load_settings(self.dlg_load_doc)
             self.dlg_load_doc.rejected.connect(partial(self.close_dialog, self.dlg_load_doc))
             btn_open_doc = self.dlg_load_doc.findChild(QPushButton, "btn_open")
@@ -2146,7 +2161,7 @@ class ApiCF(ApiParent, QObject):
                 item_doc = QListWidgetItem(str(row[0]))
                 self.tbl_list_doc.addItem(item_doc)
 
-            self.open_dialog(self.dlg_load_doc, dlg_name='visit_documents')
+            self.open_dialog(self.dlg_load_doc, dlg_name='visit_document')
 
 
     def open_selected_doc(self):

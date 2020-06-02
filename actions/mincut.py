@@ -30,8 +30,8 @@ from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 from ..ui_manager import DialogTextUi
 from ..ui_manager import Mincut
 from ..ui_manager import Mincut_fin
-from ..ui_manager import Mincut_add_hydrometer
-from ..ui_manager import Mincut_add_connec
+from ..ui_manager import MincutHydrometer
+from ..ui_manager import MincutConnec
 from ..ui_manager import MincutComposer
 
 
@@ -219,7 +219,7 @@ class MincutParent(ParentAction):
 
         self.refresh_tab_hydro()
 
-        self.open_dialog(self.dlg_mincut)
+        self.open_dialog(self.dlg_mincut, dlg_name='mincut')
 
 
     def refresh_tab_hydro(self):
@@ -797,7 +797,7 @@ class MincutParent(ParentAction):
         self.action_add_hydrometer.setDisabled(True)
 
         # Set dialog add_connec
-        self.dlg_connec = Mincut_add_connec()
+        self.dlg_connec = MincutConnec()
         self.dlg_connec.setWindowTitle("Connec management")
         self.load_settings(self.dlg_connec)
         self.dlg_connec.tbl_mincut_connec.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -823,7 +823,7 @@ class MincutParent(ParentAction):
             self.select_features_connec()
         self.snapping_selection_connec()
         
-        self.open_dialog(self.dlg_connec)
+        self.open_dialog(self.dlg_connec, dlg_name='mincut_connec')
 
         
     def set_completer_customer_code(self, widget, set_signal=False):
@@ -958,8 +958,8 @@ class MincutParent(ParentAction):
         self.action_custom_mincut.setDisabled(True)
         self.action_add_connec.setDisabled(True)
 
-        # Set dialog Mincut_add_hydrometer
-        self.dlg_hydro = Mincut_add_hydrometer()
+        # Set dialog MincutHydrometer
+        self.dlg_hydro = MincutHydrometer()
         self.load_settings(self.dlg_hydro)
         self.dlg_hydro.setWindowTitle("Hydrometer management")
         self.dlg_hydro.tbl_hydro.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -982,7 +982,7 @@ class MincutParent(ParentAction):
             # Read selection and reload table
             self.select_features_hydro()
 
-        self.open_dialog(self.dlg_hydro)
+        self.open_dialog(self.dlg_hydro, dlg_name='mincut_hydrometer')
 
 
     def auto_fill_hydro_id(self):
@@ -2427,7 +2427,7 @@ class MincutParent(ParentAction):
         self.dlg_comp.cbx_template.currentIndexChanged.connect(self.set_template)
         
         # Open dialog
-        self.open_dialog(self.dlg_comp)
+        self.open_dialog(self.dlg_comp, dlg_name='mincut_composer')
 
 
     def set_template(self):
