@@ -213,12 +213,12 @@ class TmParentAction(object):
 
         for row in rows:
             if not row['status']:
-                columns_to_delete.append(row['column_index'] - 1)
+                columns_to_delete.append(row['columnindex'] - 1)
             else:
                 width = row['width']
                 if width is not None:
-                    widget.setColumnWidth(row['column_index'] - 1, width)
-                widget.model().setHeaderData(row['column_index'] - 1, Qt.Horizontal, row['alias'])
+                    widget.setColumnWidth(row['columnindex'] - 1, width)
+                widget.model().setHeaderData(row['columnindex'] - 1, Qt.Horizontal, row['alias'])
 
         widget.model().select()
 

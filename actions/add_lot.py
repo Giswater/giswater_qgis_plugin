@@ -1795,14 +1795,14 @@ class AddNewLot(ParentManage):
 
         for row in rows:
             if not row['status']:
-                columns_to_delete.append(row['column_index'] - 1)
+                columns_to_delete.append(row['columnindex'] - 1)
             else:
                 width = row['width']
                 if width is None:
                     width = 100
-                widget.setColumnWidth(row['column_index'] - 1, width)
+                widget.setColumnWidth(row['columnindex'] - 1, width)
                 if row['alias'] is not None:
-                    widget.model().setHeaderData(row['column_index'] - 1, Qt.Horizontal, row['alias'])
+                    widget.model().setHeaderData(row['columnindex'] - 1, Qt.Horizontal, row['alias'])
 
         # Set order
         if isQStandardItemModel:

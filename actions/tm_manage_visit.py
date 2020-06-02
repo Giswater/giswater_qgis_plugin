@@ -748,13 +748,13 @@ class TmManageVisit(TmParentManage, QObject):
 
         for row in rows:
             if not row['status']:
-                columns_to_delete.append(row['column_index'] - 1)
+                columns_to_delete.append(row['columnindex'] - 1)
             else:
                 width = row['width']
                 if width is None:
                     width = 100
-                qtable.setColumnWidth(row['column_index'] - 1, width)
-                qtable.model().setHeaderData(row['column_index'] - 1, Qt.Horizontal, row['alias'])
+                qtable.setColumnWidth(row['columnindex'] - 1, width)
+                qtable.model().setHeaderData(row['columnindex'] - 1, Qt.Horizontal, row['alias'])
 
         # Set order
         qtable.model().setSort(0, Qt.AscendingOrder)

@@ -275,9 +275,8 @@ class ApiSearch(ApiParent):
             combo = combo_list[0]
             id = utils_giswater.get_item_data(self.dlg_search, combo, 0)
             name = utils_giswater.get_item_data(self.dlg_search, combo, 1)
-            extras_search += f'"{combo.property("column_id")}":{{"id":"{id}", "name":"{name}"}}, '
-            # extras_search += '"'+combo.property('column_id')+'":{"id":"' + str(id) + '", "name":"' + name + '"}, '
-            extras_search_add += f'"{combo.property("column_id")}":{{"id":"{id}", "name":"{name}"}}, '
+            extras_search += f'"{combo.property("columnname")}":{{"id":"{id}", "name":"{name}"}}, '
+            extras_search_add += f'"{combo.property("columnname")}":{{"id":"{id}", "name":"{name}"}}, '
         if line_list:
             line_edit = line_list[0]
             # If current tab have more than one QLineEdit, clear second QLineEdit
@@ -288,8 +287,8 @@ class ApiSearch(ApiParent):
             if str(value) == '':
                 return
 
-            extras_search += f'"{line_edit.property("column_id")}":{{"text":"{value}"}}'
-            extras_search_add += f'"{line_edit.property("column_id")}":{{"text":"{value}"}}'
+            extras_search += f'"{line_edit.property("columnname")}":{{"text":"{value}"}}'
+            extras_search_add += f'"{line_edit.property("columnname")}":{{"text":"{value}"}}'
             body = self.create_body(form=form_search, extras=extras_search)
             result = self.controller.get_json('gw_fct_setsearch', body, log_sql=True)
             if not result: return False
@@ -321,7 +320,7 @@ class ApiSearch(ApiParent):
             if str(value) == 'null':
                 return
 
-            extras_search_add += f', "{line_edit_add.property("column_id")}":{{"text":"{value}"}}'
+            extras_search_add += f', "{line_edit_add.property("columnname")}":{{"text":"{value}"}}'
             body = self.create_body(form=form_search_add, extras=extras_search_add)
             result = self.controller.get_json('gw_fct_setsearchadd', body, log_sql=True)
             if not result: return False
@@ -348,7 +347,7 @@ class ApiSearch(ApiParent):
 
         widget = QComboBox()
         widget.setObjectName(field['widgetname'])
-        widget.setProperty('column_id', field['column_id'])
+        widget.setProperty('columnname', field['columnname'])
         self.populate_combo(widget, field)
         if 'selectedId' in field:
             utils_giswater.set_combo_itemData(widget, field['selectedId'], 0)

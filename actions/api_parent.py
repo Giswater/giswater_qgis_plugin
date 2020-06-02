@@ -480,13 +480,13 @@ class ApiParent(ParentAction):
 
         for row in rows:
             if not row['status']:
-                columns_to_delete.append(row['column_index'] - 1)
+                columns_to_delete.append(row['columnindex'] - 1)
             else:
                 width = row['width']
                 if width is None:
                     width = 100
-                widget.setColumnWidth(row['column_index'] - 1, width)
-                widget.model().setHeaderData(row['column_index'] - 1, Qt.Horizontal, row['alias'])
+                widget.setColumnWidth(row['columnindex'] - 1, width)
+                widget.model().setHeaderData(row['columnindex'] - 1, Qt.Horizontal, row['alias'])
 
         # Set order
         # widget.model().setSort(0, Qt.AscendingOrder)
@@ -522,7 +522,7 @@ class ApiParent(ParentAction):
                     width = row['width']
                     if width is None:
                         width = 100
-                    widget.setColumnWidth(row['column_index'] - 1, width)
+                    widget.setColumnWidth(row['columnindex'] - 1, width)
 
         if len(columns_to_show) > 1:
             columns_to_show = columns_to_show[:-2]
@@ -727,14 +727,14 @@ class ApiParent(ParentAction):
 
         for row in rows:
             if not row['status']:
-                columns_to_delete.append(row['column_index'] - 1)
+                columns_to_delete.append(row['columnindex'] - 1)
             else:
                 width = row['width']
                 if width is None:
                     width = 100
-                widget.setColumnWidth(row['column_index'] - 1, width)
+                widget.setColumnWidth(row['columnindex'] - 1, width)
                 if row['alias'] is not None:
-                    widget.model().setHeaderData(row['column_index'] - 1, Qt.Horizontal, row['alias'])
+                    widget.model().setHeaderData(row['columnindex'] - 1, Qt.Horizontal, row['alias'])
 
         # Set order
         if isQStandardItemModel:
