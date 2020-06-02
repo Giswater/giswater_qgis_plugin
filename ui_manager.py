@@ -386,8 +386,8 @@ FORM_CLASS = get_ui_class('main_visitclass.ui')
 class MainVisitClass(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('manage_visit_param.ui')
-class ManageVisitParam(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('main_visitparam.ui')
+class MainVisitParam(GwDialog, FORM_CLASS):
     pass
 
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Dialog</class>
- <widget class="QDialog" name="Dialog">
+ <class>dlg_main_visitparam</class>
+ <widget class="QDialog" name="dlg_main_visitparam">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Manag visit parameter</string>
+   <string>Manage visit parameter</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="2" column="0">
@@ -37,12 +37,12 @@
    <item row="2" column="1">
     <widget class="QPushButton" name="btn_ok">
      <property name="text">
-      <string>OK</string>
+      <string>Accept</string>
      </property>
     </widget>
    </item>
    <item row="0" column="0" colspan="3">
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="grb_params">
      <property name="title">
       <string>Parameter</string>
      </property>
@@ -50,7 +50,7 @@
       <item row="11" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_9">
         <item>
-         <widget class="QLabel" name="label_isenabled">
+         <widget class="QLabel" name="lbl_enabled">
           <property name="text">
            <string>Enabled:</string>
           </property>
@@ -90,7 +90,7 @@
       <item row="13" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_11">
         <item>
-         <widget class="QLabel" name="label_ismandatory">
+         <widget class="QLabel" name="lbl_mandatory">
           <property name="text">
            <string>Mandatory:</string>
           </property>
@@ -130,7 +130,7 @@
       <item row="0" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <widget class="QLabel" name="label_id">
+         <widget class="QLabel" name="lbl_parameter_name">
           <property name="text">
            <string>Parameter name:</string>
           </property>
@@ -160,7 +160,7 @@
       <item row="7" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_5">
         <item>
-         <widget class="QLabel" name="label_descript">
+         <widget class="QLabel" name="lbl_descript">
           <property name="text">
            <string>Descript:</string>
           </property>
@@ -190,7 +190,7 @@
       <item row="4" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_4">
         <item>
-         <widget class="QLabel" name="label_data_type">
+         <widget class="QLabel" name="lbl_data_type">
           <property name="text">
            <string>Data type:</string>
           </property>
@@ -227,7 +227,7 @@
       <item row="2" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
-         <widget class="QLabel" name="label_code">
+         <widget class="QLabel" name="lbl_code">
           <property name="text">
            <string>Code:</string>
           </property>
@@ -257,7 +257,7 @@
       <item row="5" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_7">
         <item>
-         <widget class="QLabel" name="label_vdefault">
+         <widget class="QLabel" name="lbl_default_value">
           <property name="text">
            <string>Default value:</string>
           </property>
@@ -287,7 +287,7 @@
       <item row="1" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_3">
         <item>
-         <widget class="QLabel" name="label_parameter_type">
+         <widget class="QLabel" name="lbl_parameter_type">
           <property name="text">
            <string>Parameter type:</string>
           </property>
@@ -324,7 +324,7 @@
       <item row="8" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_8">
         <item>
-         <widget class="QLabel" name="label_short_descript">
+         <widget class="QLabel" name="lbl_short_descript">
           <property name="text">
            <string>Short descript:</string>
           </property>
@@ -354,7 +354,7 @@
       <item row="6" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_6">
         <item>
-         <widget class="QLabel" name="label_form_type">
+         <widget class="QLabel" name="lbl_form_type">
           <property name="text">
            <string>Form type:</string>
           </property>
@@ -391,7 +391,7 @@
       <item row="10" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_10">
         <item>
-         <widget class="QLabel" name="label_widgettype">
+         <widget class="QLabel" name="lbl_widgettype">
           <property name="text">
            <string>Widget type:</string>
           </property>
@@ -428,7 +428,7 @@
       <item row="12" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_12">
         <item>
-         <widget class="QLabel" name="label_iseditable">
+         <widget class="QLabel" name="lbl_editable">
           <property name="text">
            <string>Editable:</string>
           </property>
@@ -468,7 +468,7 @@
       <item row="14" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_13">
         <item>
-         <widget class="QLabel" name="label">
+         <widget class="QLabel" name="lbl_query_text">
           <property name="text">
            <string>Query text:</string>
           </property>
