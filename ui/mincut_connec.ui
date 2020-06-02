@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>mincut_add_connec</class>
- <widget class="QDialog" name="mincut_add_connec">
+ <class>dlg_mincut_connec</class>
+ <widget class="QDialog" name="dlg_mincut_connec">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Visit management</string>
+   <string>Mincut connec</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_4">
    <item>
@@ -21,7 +21,7 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="lbl_search">
         <property name="text">
          <string>Search by customer code:</string>
         </property>

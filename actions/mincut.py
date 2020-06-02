@@ -31,7 +31,7 @@ from ..ui_manager import DialogTextUi
 from ..ui_manager import Mincut
 from ..ui_manager import Mincut_fin
 from ..ui_manager import Mincut_add_hydrometer
-from ..ui_manager import Mincut_add_connec
+from ..ui_manager import MincutConnec
 from ..ui_manager import MincutComposer
 
 
@@ -797,7 +797,7 @@ class MincutParent(ParentAction):
         self.action_add_hydrometer.setDisabled(True)
 
         # Set dialog add_connec
-        self.dlg_connec = Mincut_add_connec()
+        self.dlg_connec = MincutConnec()
         self.dlg_connec.setWindowTitle("Connec management")
         self.load_settings(self.dlg_connec)
         self.dlg_connec.tbl_mincut_connec.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -823,7 +823,7 @@ class MincutParent(ParentAction):
             self.select_features_connec()
         self.snapping_selection_connec()
         
-        self.open_dialog(self.dlg_connec)
+        self.open_dialog(self.dlg_connec, dlg_name='mincut_connec')
 
         
     def set_completer_customer_code(self, widget, set_signal=False):

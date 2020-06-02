@@ -400,8 +400,8 @@ class Mincut(GwMainWindow, FORM_CLASS):
         super().__init__()
 
 
-FORM_CLASS = get_ui_class('mincut_add_connec.ui')
-class Mincut_add_connec(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('mincut_connec.ui')
+class MincutConnec(GwDialog, FORM_CLASS):
     pass
 
 
