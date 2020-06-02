@@ -37,8 +37,8 @@ class Basic(ApiParent):
         self.project_type = project_type
 
 
-    def basic_exploitation_selector(self):
-        """ Button 41: Explotation selector """
+    def basic_filter_selectors(self):
+        """ Button 142: Filter selector """
 
         selector_values = f'{{"exploitation": {{"ids":[]}}}}'
         self.dlg_selector = SelectorUi()
@@ -151,7 +151,7 @@ class Basic(ApiParent):
 
 
     def basic_api_search(self):
-        """ Button 32: ApiSearch """
+        """ Button 143: ApiSearch """
 
         if self.api_search is None:
             self.api_search = ApiSearch(self.iface, self.settings, self.controller, self.plugin_dir)
