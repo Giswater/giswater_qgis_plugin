@@ -695,7 +695,7 @@ class ApiCF(ApiParent, QObject):
             def manage_typeahead(self, dialog, complet_result, field)
             def manage_combo(self, dialog, complet_result, field)
             def manage_check(self, dialog, complet_result, field)
-            def manage_datepickertime(self, dialog, complet_result, field)
+            def manage_datetime(self, dialog, complet_result, field)
             def manage_button(self, dialog, complet_result, field)
             def manage_hyperlink(self, dialog, complet_result, field)
             def manage_hspacer(self, dialog, complet_result, field)
@@ -817,7 +817,7 @@ class ApiCF(ApiParent, QObject):
         return widget
 
 
-    def manage_datepickertime(self, dialog, complet_result, field):
+    def manage_datetime(self, dialog, complet_result, field):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
