@@ -44,8 +44,8 @@ INSERT INTO config_visit_parameter VALUES ('sediments_node', NULL, 'INSPECTION',
 INSERT INTO config_visit_parameter VALUES ('clean_node', NULL, 'INSPECTION', 'NODE', 'TEXT', NULL, 'Clean of node', 'event_standard', 'defaultvalue',FALSE, 'node_cln_exec');
 INSERT INTO config_visit_parameter VALUES ('defect_node', NULL, 'INSPECTION', 'NODE', 'TEXT', NULL, 'Defects of node', 'event_standard', 'defaultvalue', FALSE, 'node_defect');
 
-INSERT INTO config_visit_parameter VALUES ('incident_comment', NULL, 'INSPECTION', NULL, 'TEXT', NULL, 'incident_comment', 'event_standard', NULL, FALSE, 'incident_comment');
-INSERT INTO config_visit_parameter VALUES ('incident_type', NULL, 'INSPECTION', NULL, 'TEXT', NULL, 'incident type', 'event_standard', NULL, FALSE, 'incident_type');
+INSERT INTO config_visit_parameter VALUES ('incident_comment', NULL, 'INSPECTION', 'ALL', 'TEXT', NULL, 'incident_comment', 'event_standard', 'defaultvalue', FALSE, 'incident_comment');
+INSERT INTO config_visit_parameter VALUES ('incident_type', NULL, 'INSPECTION', 'ALL', 'TEXT', NULL, 'incident type', 'event_standard', 'defaultvalue', FALSE, 'incident_type');
 
 INSERT INTO config_visit_parameter VALUES ('clean_gully', NULL, 'INSPECTION', 'GULLY', 'TEXT', NULL, 'Clean of gully', 'event_standard', 'defaultvalue',FALSE, 'gully_cln_exec');
 INSERT INTO config_visit_parameter VALUES ('smells_gully', NULL, 'INSPECTION', 'GULLY', 'TEXT', NULL, 'Smells of gully', 'event_standard', 'defaultvalue', FALSE, 'smells_gully');

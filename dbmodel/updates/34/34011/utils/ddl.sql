@@ -127,6 +127,7 @@ UPDATE sys_image SET id = 1 WHERE idval = 'ws_shape';
 -- config form list
 UPDATE config_form_list SET listtype = 'tab' WHERE listtype is null;
 UPDATE config_form_list SET listclass = 'list' WHERE listclass is null;
+UPDATE config_form_list SET vdefault = '{"orderBy":"1", "orderType": "DESC"}' WHERE vdefault IS NULL;
 ALTER TABLE config_form_list DROP CONSTRAINT config_api_list_pkey;
 ALTER TABLE config_form_list ADD CONSTRAINT config_form_list_pkey PRIMARY KEY(tablename, device, listtype);
 ALTER TABLE config_form_list DROP COLUMN id;

@@ -13,7 +13,17 @@ UPDATE sys_param_user SET dv_querytext = replace(dv_querytext, 'om_visit_paramet
 
 -- config_csv
 UPDATE config_csv SET active = TRUE;
-DELETE FROM config_csv WHERE fid IN(2,5,6,7, 140, 141, 239,240, 246,247);
+UPDATE config_csv SET readheader = FALSE WHERE readheader IS NULL;
+
+-- config_file
+UPDATE config_file SET active = TRUE;
+
+-- config_form_tableview
+DELETE FROM config_form_tableview WHERE tablename IN ('om_psector', 'v_ui_scada_x_node', 'v_ui_scada_x_node_values');
+UPDATE config_form_tableview SET tablename='config_form_fields' WHERE tablename='config_api_form_fields';
+UPDATE config_form_tableview SET tablename='v_om_mincut_hydrometer' WHERE tablename='v_anl_mincut_result_hydrometer';
+UPDATE config_form_tableview SET tablename='v_ui_mincut' WHERE tablename='v_ui_anl_mincut_result_cat';
+UPDATE config_form_tableview SET tablename='v_ui_mincut' WHERE tablename='v_ui_anl_mincut_result_cat';
 
 -- sys_table
 UPDATE sys_table SET id = 'config_visit_class'  where id ='om_visit_class';
@@ -53,12 +63,13 @@ UPDATE config_csv SET fid =240	WHERE fid =13;
 UPDATE config_csv SET fid =241	WHERE fid =14;
 UPDATE config_csv SET fid =242	WHERE fid =15;
 UPDATE config_csv SET fid =243	WHERE fid =16;
-UPDATE config_csv SET fid =244	WHERE fid =17;
-UPDATE config_csv SET fid =245	WHERE fid =18;
+UPDATE config_csv SET fid =244, orderby=6	WHERE fid =17;
+UPDATE config_csv SET fid =245, orderby=7	WHERE fid =18;
 UPDATE config_csv SET fid =246	WHERE fid =19;
 UPDATE config_csv SET fid =247	WHERE fid =20;
-UPDATE config_csv SET fid =154	WHERE fid =21;
+UPDATE config_csv SET fid =154, orderby=8	WHERE fid =21;
 
+DELETE FROM config_csv WHERE fid IN(2,5,6,7,140,141,239,240,246,247);
 DELETE FROM sys_fprocess WHERE fid = 142;
 
 INSERT INTO sys_fprocess (fid, fprocess_name , project_type) VALUES (234,'Import db prices','utils');
@@ -84,6 +95,7 @@ UPDATE config_info_table_x_type SET infotype_id = 1 WHERE infotype_id = 100;
 UPDATE config_info_table_x_type SET infotype_id = 2 WHERE infotype_id = 0;
 
 UPDATE config_toolbox SET inputparams = (replace (inputparams::text, 'layout_order', 'layoutorder'))::json;
+UPDATE config_toolbox SET active=TRUE;
 
 UPDATE config_fprocess SET fid = 141 WHERE fid = 10;
 UPDATE config_fprocess SET fid = 140 WHERE fid = 11;

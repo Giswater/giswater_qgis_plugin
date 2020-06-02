@@ -40,8 +40,8 @@ INSERT INTO config_visit_parameter VALUES ('sediments_node', NULL, 'INSPECTION',
 INSERT INTO config_visit_parameter VALUES ('clean_node', NULL, 'INSPECTION', 'NODE', 'TEXT', NULL, 'Clean of node', 'event_standard', 'defaultvalue',FALSE, 'node_cln_exec');
 INSERT INTO config_visit_parameter VALUES ('defect_node', NULL, 'INSPECTION', 'NODE', 'TEXT', NULL, 'Defects of node', 'event_standard', 'defaultvalue', FALSE, 'node_defect');
 
-INSERT INTO config_visit_parameter VALUES ('incident_comment', NULL, 'INSPECTION', NULL, 'TEXT', NULL, 'incident_comment', 'event_standard', NULL, FALSE, 'incident_comment');
-INSERT INTO config_visit_parameter VALUES ('incident_type', NULL, 'INSPECTION', NULL, 'TEXT', NULL, 'incident type', 'event_standard', NULL, FALSE, 'incident_type');
+INSERT INTO config_visit_parameter VALUES ('incident_comment', NULL, 'INSPECTION', 'ALL', 'TEXT', NULL, 'incident_comment', 'event_standard', 'defaultvalue', FALSE, 'incident_comment');
+INSERT INTO config_visit_parameter VALUES ('incident_type', NULL, 'INSPECTION', 'ALL', 'TEXT', NULL, 'incident type', 'event_standard', 'defaultvalue', FALSE, 'incident_type');
 
 
 INSERT INTO config_visit_class_x_parameter VALUES (5, 'sediments_node');
@@ -215,3 +215,12 @@ INSERT INTO config_visit_class_x_feature VALUES ('v_edit_arc', 6);
 INSERT INTO config_visit_class_x_feature VALUES ('v_edit_node', 3);
 INSERT INTO config_visit_class_x_feature VALUES ('v_edit_connec', 4);
 INSERT INTO config_visit_class_x_feature VALUES ('v_edit_connec', 2);
+
+ -- config_mincut_checkvalve
+UPDATE config_mincut_checkvalve SET active = TRUE;
+
+ -- config_mincut_inlet
+UPDATE config_mincut_inlet SET active = TRUE;
+
+ -- config_mincut_valve
+UPDATE config_mincut_valve SET active = TRUE;
