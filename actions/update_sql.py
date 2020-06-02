@@ -1443,6 +1443,8 @@ class UpdateSQL(ApiParent):
         if not self.check_project_name(project_name_schema, project_title_schema):
             return
 
+        self.controller.log_info(f"Create schema of type '{project_type}': '{project_name_schema}'")
+
         if not is_test:
             self.task1 = GwTask('Manage schema')
             QgsApplication.taskManager().addTask(self.task1)
@@ -1547,11 +1549,10 @@ class UpdateSQL(ApiParent):
             self.controller.dao.commit()
             self.close_dialog(self.dlg_readsql_create_project)
             if not is_test:
-                # Refresh data main dialog
-                self.event_change_connection()
-            if schema_name is not None:
-                utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name, schema_name)
-            self.set_info_project()
+                self.populate_data_schema_name(self.cmb_project_type)
+                if schema_name is not None:
+                    utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name, schema_name)
+                    self.set_info_project()
         else:
             self.controller.dao.rollback()
             # Reset count error variable to 0
@@ -2016,7 +2017,9 @@ class UpdateSQL(ApiParent):
     def populate_data_schema_name(self, widget):
 
         # Get filter
-        filter_ = str(utils_giswater.getWidgetText(self.dlg_readsql, widget))
+        filter_ = utils_giswater.getWidgetText(self.dlg_readsql, widget)
+        if filter_ is None:
+            filter_ = self.schema_type
         result_list = []
 
         # Populate Project data schema Name
