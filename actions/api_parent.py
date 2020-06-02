@@ -20,6 +20,8 @@ import re
 import subprocess
 import sys
 import webbrowser
+import json
+from collections import OrderedDict
 from functools import partial
 
 from .. import utils_giswater
@@ -1689,30 +1691,79 @@ class ApiParent(ParentAction):
 
         return {"path": dxf_path, "result":result, "temp_layers_added":temp_layers_added}
 
+    def manageAll(self, dialog):
+        status = utils_giswater.isChecked(dialog, "chk_all")
+        widget_list = dialog.main_tab.widget(0).findChildren(QCheckBox)
+        if status is True:
+            for widget in widget_list:
+                utils_giswater.setChecked(dialog, widget, True)
+            return
+        elif status is False:
+            for widget in widget_list:
+                utils_giswater.setChecked(dialog, widget, False)
 
-    def get_selector(self, dialog, selector_type):
+
+    def get_selector(self, dialog, selector_type, filter=False):
         """ Ask to DB for selectors and make dialog
         :param dialog: Is a standard dialog, from file api_selectors.ui, where put widgets
         :param selector_type: list of selectors to ask DB ['exploitation', 'state', ...]
         """
 
         main_tab = dialog.findChild(QTabWidget, 'main_tab')
+
+        # Set filter
+        if filter is not False:
+
+            main_tab = dialog.findChild(QTabWidget, 'main_tab')
+            filter = utils_giswater.getWidgetText(dialog, dialog.txt_filter)
+            if filter in ('null', None):
+                filter = ''
+            selector_type = selector_type.replace('"filter":""', '"filter":"' + filter + '"')
+
         extras = f'"selector_type":{selector_type}'
         body = self.create_body(extras=extras)
         complet_result = self.controller.get_json('gw_fct_getselectors', body, log_sql=True)
         if not complet_result: return False
 
+        if complet_result['body']['form']['formFilter'] is not True:
+            dialog.txt_filter.setVisible(False)
+        if complet_result['body']['form']['formCheckAll'] is not True:
+            dialog.chk_all.setVisible(False)
+
         for form_tab in complet_result['body']['form']['formTabs']:
+
+            #TODO:: QGIS Crash when use typeahead filter
+            # if form_tab['typeaheadFilter']:
+            #     completer = QCompleter()
+            #     filter_widget = utils_giswater.getWidget(dialog, 'txt_filter')
+            #     model = QStringListModel()
+            #     if filter_widget:
+            #         parent_id = ""
+            #         query_aux = json.loads(form_tab['typeaheadFilter'], object_pairs_hook=OrderedDict)
+            #         query = query_aux['queryText']
+            #         extras = f'"queryText":"{query}"'
+            #         extras += f', "queryTextFilter":""'
+            #         extras += f', "parentId":"{parent_id}"'
+            #         extras += f', "parentValue":""'
+            #         extras += f', "textToSearch":"{filter}"'
+            #         body = self.create_body(extras=extras)
+            #         complet_list = self.controller.get_json('gw_fct_gettypeahead', body)
+            #         if not complet_list: return False
+            #
+            #         list_items = []
+            #         self.controller.log_info(str(complet_list['body']['data']))
+            #         for field in complet_list['body']['data']:
+            #             list_items.append(field['idval'])
+            #         self.set_completer_object_api(completer, model, filter_widget, list_items)
+
             # Create one tab for each form_tab and add to QTabWidget
             tab_widget = QWidget(main_tab)
             tab_widget.setObjectName(form_tab['tabName'])
             main_tab.addTab(tab_widget, form_tab['tabLabel'])
-
             # Create a new QGridLayout and put it into tab
             gridlayout = QGridLayout()
             gridlayout.setObjectName("grl_" + form_tab['tabName'])
             tab_widget.setLayout(gridlayout)
-
             for order, field in enumerate(form_tab['fields']):
                 label = QLabel()
                 label.setObjectName('lbl_' + field['label'])
@@ -1727,6 +1778,8 @@ class ApiParent(ParentAction):
                 self.put_widgets(dialog, field, label, widget)
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
             gridlayout.addItem(vertical_spacer1)
+            if filter is not False:
+                main_tab.removeTab(0)
 
 
     def set_selector(self, widget, table_name, column_name, selector_type):

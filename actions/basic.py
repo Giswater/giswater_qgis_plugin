@@ -40,11 +40,13 @@ class Basic(ApiParent):
     def basic_filter_selectors(self):
         """ Button 142: Filter selector """
 
-        selector_values = f'{{"exploitation": {{"ids":[]}}}}'
+        selector_values = f'{{"exploitation": {{"ids":"None", "filter":""}}, "state":{{"ids":"None", "filter":""}}, "hydrometer":{{"ids":"None", "filter":""}}}}'
         self.dlg_selector = SelectorUi()
         self.load_settings(self.dlg_selector)
         self.dlg_selector.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_selector))
         self.dlg_selector.rejected.connect(partial(self.save_settings, self.dlg_selector))
+        self.dlg_selector.txt_filter.textChanged.connect(partial(self.get_selector, self.dlg_selector, selector_values, filter=True))
+        self.dlg_selector.chk_all.stateChanged.connect(partial(self.manageAll, self.dlg_selector))
         self.get_selector(self.dlg_selector, selector_values)
         self.open_dialog(self.dlg_selector, dlg_name='selector', maximize_button=False)
 		
