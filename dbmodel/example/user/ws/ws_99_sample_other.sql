@@ -166,7 +166,7 @@ SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catF
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"PRESSURE_METER"},
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"columnname":"pressmeter_param_2", "datatype":"date", 
-"widgettype":"datepickertime", "label":"Pressmeter param_2","ismandatory":"False",
+"widgettype":"datetime", "label":"Pressmeter param_2","ismandatory":"False",
 "fieldLength":null, "numDecimals" :null,"addfield_active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"FILTER"},
@@ -186,7 +186,7 @@ SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catF
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"TANK"},
 "data":{"action":"CREATE", "multi_create":"false", "parameters":{"columnname":"tank_param_2", "datatype":"date", 
-"widgettype":"datepickertime", "label":"Tank param_2","ismandatory":"False",
+"widgettype":"datetime", "label":"Tank param_2","ismandatory":"False",
 "fieldLength":null, "numDecimals" :null,"addfield_active":"True", "iseditable":"True", "isenabled":"True"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"HYDRANT"},

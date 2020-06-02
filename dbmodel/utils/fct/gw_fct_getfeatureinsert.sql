@@ -33,6 +33,7 @@ v_y1 double precision;
 v_x2 double precision;
 v_y2 double precision;
 v_epsg integer;
+v_version json;
 
 BEGIN
 	-- Set search path to local schema
@@ -40,6 +41,10 @@ BEGIN
 	
 	-- Get srid
 	v_epsg = (SELECT epsg FROM version LIMIT 1);
+
+	--  get version
+	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
+	iNTO v_version;
 	
 	-- getting input data 
 	v_device := ((p_data ->>'client')::json->>'device')::integer;
