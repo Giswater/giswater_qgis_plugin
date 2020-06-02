@@ -46,7 +46,6 @@ rec_tab record;
 v_firsttab boolean := FALSE;
 v_active boolean;
 rec_fields record;
-v_character_number json;
 
 --Address
 v_search_vdef text;
@@ -64,9 +63,6 @@ BEGIN
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
         INTO v_version;
         
-    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''api_search_character_number'') row'
-        INTO v_character_number;
-
 	-- Create tabs array
     v_form := '[';
 
@@ -427,8 +423,7 @@ BEGIN
 
 	-- Check null
     v_form := COALESCE(v_form, '[]');
-    v_character_number := COALESCE(v_character_number, '[]');    
-
+    
 	-- Return
     IF v_firsttab IS FALSE THEN
         -- Return not implemented
