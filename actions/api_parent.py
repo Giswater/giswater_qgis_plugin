@@ -1727,6 +1727,7 @@ class ApiParent(ParentAction):
 
         if complet_result['body']['form']['formFilter'] is not True:
             dialog.txt_filter.setVisible(False)
+            dialog.lbl_filter.setVisible(False)
         if complet_result['body']['form']['formCheckAll'] is not True:
             dialog.chk_all.setVisible(False)
 
