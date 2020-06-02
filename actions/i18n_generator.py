@@ -105,6 +105,9 @@ class I18NGenerator(ParentAction):
 
     def create_files_py_message(self):
         """ Read the values of the database and generate the ts and qm files """
+        # In the database, the dialog_name column must match the name of the ui file (no extension).
+        # Also, open_dialog function must be called, passed as parameter dlg_name = 'ui_file_name_without_extension'
+
         py_language = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 1)
         xml_language = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 2)
         py_file = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 3)
