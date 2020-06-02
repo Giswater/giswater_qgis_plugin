@@ -465,6 +465,7 @@ UPDATE config_form_fields SET layoutname = 'lyt_bot_1' where columnname ='sector
 UPDATE config_form_fields SET layoutname = 'lyt_data_1',layoutorder = 997 where columnname ='hemisphere';
 UPDATE config_form_fields SET layoutorder = 2 where columnname ='dma_id';
 
+
 UPDATE config_form_fields SET layoutname = 'lyt_data_2', layoutorder = 30 where columnname ='verified';
 UPDATE config_form_fields SET layoutname = 'lyt_data_2', layoutorder = 31 where columnname ='presszone_id';
 UPDATE config_form_fields SET layoutname = 'lyt_data_2', layoutorder = 32 where columnname ='dqa_id';
@@ -602,3 +603,12 @@ UPDATE sector SET stylesheet='{"color":[204,235,197]}'  where sector_id = 3;
 UPDATE sector SET stylesheet='{"color":[222,203,228]}'  where sector_id = 4;
 UPDATE sector SET stylesheet='{"color":[255,255,204]}'  where sector_id = 5;
 
+UPDATE config_form_fields SET  layoutname = 'lyt_data_1' where columnname = 'arc_id'AND formname LIKE '%_arc_%';
+
+UPDATE config_form_fields SET layoutorder = 20 where columnname ='minsector_id' and formname like '%_node_%';
+UPDATE config_form_fields SET layoutorder = 23 where columnname ='rotation' and formname like '%_node_%';
+UPDATE config_form_fields SET layoutorder = 24 where columnname ='svg' and formname like '%_node_%';
+
+UPDATE config_form_fields SET layoutorder = 20 where columnname ='minsector_id'and formname like '%_connec_%';
+UPDATE config_form_fields SET layoutorder = 23 where columnname ='rotation'and formname like '%_connec_%';
+UPDATE config_form_fields SET layoutorder = 24 where columnname ='svg' and formname like '%_connec_%';

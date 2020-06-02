@@ -156,6 +156,12 @@ INSERT INTO config_typevalue VALUES ('device_typevalue','3','Web');
 INSERT INTO config_typevalue VALUES ('device_typevalue','4','Desktop');
 
 
+INSERT INTO config_typevalue VALUES ('widgettype_typevalue','textarea','Text area', 'textArea');
+INSERT INTO config_typevalue VALUES ('device_typevalue','vspacer','vspacer','vspacer');
+INSERT INTO config_typevalue VALUES ('device_typevalue','hspacer','hspacer','hspacer');
+INSERT INTO config_typevalue VALUES ('device_typevalue','tableview','tableview', 'tableView');
+
+
 UPDATE config_typevalue set camelstyle = 'layoutBottom1' WHERE id = 'lyt_bot_1';
 UPDATE config_typevalue set camelstyle = 'layoutBottom2' WHERE id = 'lyt_bot_2';
 UPDATE config_typevalue set camelstyle = 'layoutData1' WHERE id = 'lyt_data_1';
