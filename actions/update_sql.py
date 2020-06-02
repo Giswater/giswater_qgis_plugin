@@ -54,6 +54,7 @@ class UpdateSQL(ApiParent):
         self.dlg_info = None
         self.dlg_readsql_create_project = None
         self.project_type_selected = None
+        self.schema_type = None
 
 
     def init_sql(self, set_database_connection=False, username=None, show_dialog=True):
@@ -1595,7 +1596,7 @@ class UpdateSQL(ApiParent):
             self.task1.setProgress(40)
             self.api(False)
             self.task1.setProgress(60)
-            sql = ('SELECT {' + str(self.schema) + '.gw_fct_admin_rename_fixviews($${"data":{"currentSchemaName":"'
+            sql = ('SELECT ' + str(self.schema) + '.gw_fct_admin_rename_fixviews($${"data":{"currentSchemaName":"'
                    + self.schema + '","oldSchemaName":"' + str(schema) + '"}}$$)::text')
             self.controller.execute_sql(sql, commit=False)
             self.execute_last_process(schema_name=self.schema, locale=True)
@@ -2019,9 +2020,10 @@ class UpdateSQL(ApiParent):
 
         # Get filter
         filter_ = utils_giswater.getWidgetText(self.dlg_readsql, widget)
-        if filter_ is None:
+        if filter_ is None and self.schema_type:
             filter_ = self.schema_type
-        result_list = []
+        if filter_ is None:
+            return
 
         # Populate Project data schema Name
         sql = "SELECT schema_name FROM information_schema.schemata"
@@ -2029,6 +2031,7 @@ class UpdateSQL(ApiParent):
         if rows is None:
             return
 
+        result_list = []
         for row in rows:
             sql = (f"SELECT EXISTS(SELECT * FROM information_schema.tables "
                    f"WHERE table_schema = '{row[0]}' "
@@ -2337,7 +2340,7 @@ class UpdateSQL(ApiParent):
         self.dlg_readsql_rename.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_readsql_rename))
 
         # Open dialog
-        self.dlg_readsql_rename.setWindowTitle('Rename project - ' + schema)
+        self.dlg_readsql_rename.setWindowTitle(f'Rename project - {schema}')
         self.open_dialog(self.dlg_readsql_rename)
 
 
