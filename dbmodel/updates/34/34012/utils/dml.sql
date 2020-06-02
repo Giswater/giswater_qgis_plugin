@@ -87,6 +87,18 @@ INSERT INTO sys_fprocess (fid, fprocess_name , project_type) VALUES (245,'Import
 INSERT INTO sys_fprocess (fid, fprocess_name , project_type) VALUES (246,'Export ui','utils');
 INSERT INTO sys_fprocess (fid, fprocess_name , project_type) VALUES (247,'Import ui','utils');
 
+UPDATE sys_fprocess SET project_type='utils' WHERE fid=225;
+UPDATE sys_fprocess SET project_type='utils' WHERE fid=227;
+UPDATE sys_fprocess SET project_type='utils' WHERE fid=229;
+UPDATE sys_fprocess SET project_type='utils' WHERE fid=230;
+UPDATE sys_fprocess SET project_type='utils' WHERE fid=231;
+UPDATE sys_fprocess SET project_type='ws' WHERE fid=224;
+UPDATE sys_fprocess SET project_type='ws' WHERE fid=226;
+UPDATE sys_fprocess SET project_type='ws' WHERE fid=228;
+UPDATE sys_fprocess SET project_type='ws' WHERE fid=232;
+UPDATE sys_fprocess SET project_type='ws' WHERE fid=233;
+
+
 -- 
 UPDATE config_form_tabs SET device = 4 WHERE device = 9;
 
@@ -237,6 +249,7 @@ DELETE FROM config_typevalue WHERE id = 'gw_api_open_url';
 DELETE FROM config_typevalue WHERE id = 'gw_api_setprint';
 
 UPDATE sys_foreignkey SET target_field = 'linkedaction', typevalue_name = 'linkedaction_typevalue' WHERE target_field = 'action_function';
+UPDATE sys_foreignkey SET active=TRUE;
 
 INSERT INTO config_param_system (parameter, value, context,  descript, label, project_type, datatype, isdeprecated) 
 VALUES ('basic_selector_state', '{"table":"value_state", "selector":"selector_state", "table_id":"id",  "selector_id":"state_id",  "label":"id, '' - '', name", 
