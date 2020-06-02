@@ -184,7 +184,7 @@ class Giswater(QObject):
             action = self.actions[index_action]
 
             # Basic toolbar actions
-            if int(index_action) in (143, 142, 48, 86):
+            if int(index_action) in (143, 142):
                 callback_function = getattr(self.basic, function_name)
                 action.triggered.connect(callback_function)
             # Mincut toolbar actions
@@ -325,7 +325,7 @@ class Giswater(QObject):
             return None
 
         # Buttons NOT checkable (normally because they open a form)
-        list_actions = (18, 23, 25, 26, 27, 29, 33, 34, 38, 45, 46, 47, 48, 49, 50, 58, 59, 86, 64, 65, 66,
+        list_actions = (18, 23, 25, 26, 27, 29, 33, 34, 38, 45, 46, 47, 49, 50, 58, 59, 86, 64, 65, 66,
                         67, 68, 69, 74, 75, 76, 81, 82, 83, 84, 98, 99, 142, 143, 196, 206, 301, 302, 303, 304, 305, 309)
 
         if int(index_action) in list_actions:
@@ -398,11 +398,11 @@ class Giswater(QObject):
 
         list_actions = None
         if self.controller.get_project_type() == 'ws':
-            list_actions = ['37', '142', '48', '86', '143']
+            list_actions = ['37', '142', '143']
         elif self.controller.get_project_type() == 'ud':
-            list_actions = ['37', '142', '48', '143']
+            list_actions = ['37', '142', '143']
         elif self.controller.get_project_type() in ('tm', 'pl'):
-            list_actions = ['37', '142', '48', '143']
+            list_actions = ['37', '142', '143']
         self.manage_toolbar(toolbar_id, list_actions)
         if x and y:
             self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)

@@ -104,54 +104,6 @@ class Basic(ApiParent):
                         lyr.triggerRepaint()
 
 
-    def basic_state_selector(self):
-        """ Button 48: State selector """
-            
-        # Create the dialog and signals
-        self.dlg_state = Multirow_selector('state')
-        self.load_settings(self.dlg_state)
-        self.dlg_state.btn_ok.clicked.connect(partial(self.close_dialog, self.dlg_state))
-        self.dlg_state.rejected.connect(partial(self.close_dialog, self.dlg_state))
-        self.dlg_state.txt_name.setVisible(False)
-        self.dlg_state.setWindowTitle("State selector")
-        utils_giswater.setWidgetText(self.dlg_state, self.dlg_state.lbl_unselected,
-            self.controller.tr('Unselected states', context_name='labels'))
-        utils_giswater.setWidgetText(self.dlg_state, self.dlg_state.lbl_selected,
-            self.controller.tr('Selected states', context_name='labels'))
-        tableleft = "value_state"
-        tableright = "selector_state"
-        field_id_left = "id"
-        field_id_right = "state_id"
-        self.multi_row_selector(self.dlg_state, tableleft, tableright, field_id_left, field_id_right)
-        
-        # Open dialog
-        self.open_dialog(self.dlg_state, maximize_button=False)
-
-
-    def basic_hydrometer_state_selector(self):
-        """ Button 86: Hydrometer selector """
-
-        # Create the dialog and signals
-        self.dlg_hydro_state = Multirow_selector('hydrometer')
-        self.load_settings(self.dlg_hydro_state)
-        self.dlg_hydro_state.btn_ok.clicked.connect(partial(self.close_dialog, self.dlg_hydro_state))
-        self.dlg_hydro_state.rejected.connect(partial(self.close_dialog, self.dlg_hydro_state))
-        self.dlg_hydro_state.txt_name.setVisible(False)
-        self.dlg_hydro_state.setWindowTitle("Hydrometer selector")
-        utils_giswater.setWidgetText(self.dlg_hydro_state, self.dlg_hydro_state.lbl_unselected,
-            self.controller.tr('Unselected hydrometers', context_name='labels'))
-        utils_giswater.setWidgetText(self.dlg_hydro_state, self.dlg_hydro_state.lbl_selected,
-            self.controller.tr('Selected hydrometers', context_name='labels'))
-        tableleft = "ext_rtc_hydrometer_state"
-        tableright = "selector_hydrometer"
-        field_id_left = "id"
-        field_id_right = "state_id"
-        self.multi_row_selector(self.dlg_hydro_state, tableleft, tableright, field_id_left, field_id_right)
-
-        # Open dialog
-        self.open_dialog(self.dlg_hydro_state, maximize_button=False)
-
-
     def basic_api_search(self):
         """ Button 143: ApiSearch """
 
