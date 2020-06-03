@@ -440,8 +440,8 @@ class FeatureReplace(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('plan_estimate_result_manager.ui')
-class EstimateResultManager(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('price_manager.ui')
+class PriceManagerUi(GwDialog, FORM_CLASS):
     pass
 
 

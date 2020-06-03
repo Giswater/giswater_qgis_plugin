@@ -18,7 +18,7 @@ from .manage_new_psector import ManageNewPsector
 from ..ui_manager import Psector_management
 from ..ui_manager import EstimateResultNew
 from ..ui_manager import EstimateResultSelector
-from ..ui_manager import EstimateResultManager
+from ..ui_manager import PriceManagerUi
 from ..ui_manager import Multirow_selector
 from .parent import ParentAction
 from .duplicate_psector import DuplicatePsector
@@ -414,7 +414,7 @@ class Master(ParentAction):
         """ Button 50: Plan estimate result manager """
 
         # Create the dialog and signals
-        self.dlg_merm = EstimateResultManager()
+        self.dlg_merm = PriceManagerUi()
         self.load_settings(self.dlg_merm)
 
         # Tables
@@ -435,7 +435,7 @@ class Master(ParentAction):
 
         # Open form
         self.dlg_merm.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.open_dialog(self.dlg_merm, dlg_name="plan_estimate_result_manager")
+        self.open_dialog(self.dlg_merm, dlg_name="price_manager")
 
 
     def charge_plan_estimate_result(self, dialog):
