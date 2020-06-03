@@ -18,7 +18,7 @@ from .manage_visit import ManageVisit
 from .manage_new_psector import ManageNewPsector
 from .parent import ParentAction
 from .crm_trace import CrmTrace
-from ..ui_manager import Psector_management
+from ..ui_manager import PsectorManagerUi
 from ..ui_manager import SelectorDate
 
 
@@ -56,7 +56,7 @@ class Om(ParentAction):
     def om_psector_management(self):
         """ Button 82: Psector management """
 
-        self.dlg_psector_mng = Psector_management()
+        self.dlg_psector_mng = PsectorManagerUi()
         self.load_settings(self.dlg_psector_mng)
         table_name = "om_psector"
         column_id = "psector_id"
@@ -79,7 +79,7 @@ class Om(ParentAction):
 
         # Open form
         self.dlg_psector_mng.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.open_dialog(self.dlg_psector_mng, dlg_name="psector_management")
+        self.open_dialog(self.dlg_psector_mng, dlg_name="psector_manager")
 
 
     def charge_psector(self, qtbl_psm):

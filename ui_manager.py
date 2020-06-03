@@ -460,8 +460,8 @@ class Plan_psector(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('psector_management.ui')
-class Psector_management(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('psector_manager.ui')
+class PsectorManagerUi(GwDialog, FORM_CLASS):
     pass
 
 

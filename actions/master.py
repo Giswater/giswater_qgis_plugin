@@ -15,7 +15,7 @@ from functools import partial
 
 from .. import utils_giswater
 from .manage_new_psector import ManageNewPsector
-from ..ui_manager import Psector_management
+from ..ui_manager import PsectorManagerUi
 from ..ui_manager import PriceUi
 from ..ui_manager import EstimateResultSelector
 from ..ui_manager import PriceManagerUi
@@ -47,7 +47,7 @@ class Master(ParentAction):
         """ Button 46: Psector management """
 
         # Create the dialog and signals
-        self.dlg_psector_mng = Psector_management()
+        self.dlg_psector_mng = PsectorManagerUi()
 
         self.load_settings(self.dlg_psector_mng)
         table_name = "v_edit_plan_psector"
@@ -71,7 +71,7 @@ class Master(ParentAction):
 
         # Open form
         self.dlg_psector_mng.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.open_dialog(self.dlg_psector_mng, dlg_name="psector_management")
+        self.open_dialog(self.dlg_psector_mng, dlg_name="psector_manager")
 
 
     def update_current_psector(self, dialog, qtbl_psm):
