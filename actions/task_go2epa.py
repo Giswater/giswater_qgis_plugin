@@ -250,7 +250,7 @@ class TaskGo2Epa(QgsTask):
         progress = 0
 
         # Create dict with sources
-        sql = "SELECT tablename, target FROM config_fprocess WHERE fid = 141;"
+        sql = f"SELECT tablename, target FROM config_fprocess WHERE fid = {self.fid};"
         rows = self.controller.get_rows(sql)
         sources = {}
         for row in rows:
