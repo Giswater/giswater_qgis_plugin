@@ -227,6 +227,7 @@ class ApiCF(ApiParent, QObject):
             extras += f', "coordinates":{{{point}}}'
             body = self.create_body(feature=feature, extras=extras)
             function_name = 'gw_fct_getfeatureinsert'
+
         # Click over canvas
         elif point:
             visible_layer = self.get_visible_layers(as_list=True)
@@ -238,6 +239,7 @@ class ApiCF(ApiParent, QObject):
             extras += f', "coordinates":{{"xcoord":{point.x()},"ycoord":{point.y()}, "zoomRatio":{scale_zoom}}}'
             body = self.create_body(extras=extras)
             function_name = 'gw_fct_getinfofromcoordinates'
+
         # Come from QPushButtons node1 or node2 from custom form or RightButton
         elif feature_id:
             feature = f'"tableName":"{table_name}", "id":"{feature_id}"'
@@ -306,12 +308,14 @@ class ApiCF(ApiParent, QObject):
             if feature_cat is not None:
                 self.manage_new_feature(self.complet_result, dialog)
             return result, dialog
+
         elif template in 'template_visit_event':
             visit_id = self.complet_result[0]['body']['feature']['id']
             layers_visibility = self.get_layers_visibility()
             manage_visit = ManageVisit(self.iface, self.settings, self.controller, self.plugin_dir)
             manage_visit.manage_visit(visit_id=visit_id, tag='info')
             manage_visit.dlg_add_visit.rejected.connect(partial(self.restore_layers_visibility, layers_visibility))
+
         else:
             self.controller.log_warning(f"template not managed: {template}")
             return False, None
@@ -585,12 +589,9 @@ class ApiCF(ApiParent, QObject):
         self.ep = QgsMapToolEmitPoint(self.canvas)
         action_interpolate.triggered.connect(partial(self.activate_snapping, complet_result, self.ep))
 
-        # Buttons
         btn_cancel = self.dlg_cf.findChild(QPushButton, 'btn_cancel')
         btn_accept = self.dlg_cf.findChild(QPushButton, 'btn_accept')
-        btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_cf))
-        btn_cancel.clicked.connect(self.roll_back)
-        btn_accept.clicked.connect(partial(self.accept, self.dlg_cf, self.complet_result[0], self.my_json, docker=docker))
+
         if docker:
             # Delete last form from memory
             last_info = docker.findChild(GwMainWindow, 'api_cf')
@@ -600,10 +601,15 @@ class ApiCF(ApiParent, QObject):
 
             self.dock_dialog(docker, self.dlg_cf)
             docker.dlg_closed.connect(partial(self.manage_docker_close))
-            btn_cancel.clicked.connect(partial(self.close_docker, docker))
             docker.setWindowTitle(f"{complet_result[0]['body']['feature']['childType']}")
+            btn_accept.setVisible(False)
+            btn_cancel.setVisible(False)
 
         else:
+            btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_cf))
+            btn_cancel.clicked.connect(self.roll_back)
+            btn_accept.clicked.connect(partial(
+                self.accept, self.dlg_cf, self.complet_result[0], self.my_json, docker=docker))
             self.dlg_cf.dlg_closed.connect(self.roll_back)
             self.dlg_cf.dlg_closed.connect(partial(self.resetRubberbands))
             self.dlg_cf.dlg_closed.connect(partial(self.save_settings, self.dlg_cf))

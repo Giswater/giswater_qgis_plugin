@@ -197,7 +197,10 @@ class ApiParent(ParentAction):
 
     def check_actions(self, action, enabled):
 
-        action.setChecked(enabled)
+        try:
+            action.setChecked(enabled)
+        except RuntimeError:
+            pass
 
 
     def api_action_help(self, geom_type):
