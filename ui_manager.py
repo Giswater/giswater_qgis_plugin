@@ -504,8 +504,8 @@ class QmGenerator(GwDialog, FORM_CLASS):
             self.action.setText(text)
 
 
-FORM_CLASS = get_ui_class('readsql.ui')
-class Readsql(GwMainWindow, FORM_CLASS):
+FORM_CLASS = get_ui_class('main_ui.ui')
+class MainUi(GwMainWindow, FORM_CLASS):
     dlg_closed = QtCore.pyqtSignal()
     pass
 

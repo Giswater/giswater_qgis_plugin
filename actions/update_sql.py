@@ -33,7 +33,7 @@ from .api_parent import ApiParent
 from .create_gis_project import CreateGisProject
 from .gw_task import GwTask
 from .i18n_generator import I18NGenerator
-from ..ui_manager import Readsql, InfoShowInfo, ReadsqlCreateProject, ReadsqlRenameCopy, ReadsqlShowInfo, \
+from ..ui_manager import MainUi, InfoShowInfo, ReadsqlCreateProject, ReadsqlRenameCopy, ReadsqlShowInfo, \
     ReadsqlCreateGisProject, ToolboxUi, MainFields, MainVisitClass, MainVisitParam, MainSysFields, Credentials
 
 
@@ -170,7 +170,7 @@ class UpdateSQL(ApiParent):
         self.dev_commit = self.settings.value('system_variables/dev_commit').upper()
 
         # Create dialog object
-        self.dlg_readsql = Readsql()
+        self.dlg_readsql = MainUi()
         self.load_settings(self.dlg_readsql)
         self.cmb_project_type = self.dlg_readsql.findChild(QComboBox, 'cmb_project_type')
 
@@ -295,7 +295,7 @@ class UpdateSQL(ApiParent):
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
             utils_giswater.setWidgetText(self.dlg_readsql, 'lbl_status_text', msg)
             utils_giswater.setWidgetText(self.dlg_readsql, 'lbl_schema_name', '')
-            self.open_dialog(self.dlg_readsql)
+            self.open_dialog(self.dlg_readsql, dlg_name='main_ui')
             return
 
         # Create extension postgis if not exist
@@ -346,7 +346,7 @@ class UpdateSQL(ApiParent):
                 str(self.controller.plugin_settings_value('last_schema_name_selected')))
 
         if show_dialog:
-            self.open_dialog(self.dlg_readsql)
+            self.open_dialog(self.dlg_readsql, dlg_name='main_ui')
 
 
     def set_credentials(self, dialog, new_connection=False):

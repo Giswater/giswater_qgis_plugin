@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>mw_readsql</class>
- <widget class="QMainWindow" name="mw_readsql">
+ <class>dlg_main</class>
+ <widget class="QMainWindow" name="dlg_main">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>437</width>
-    <height>754</height>
+    <height>747</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -62,21 +62,21 @@
        <bool>true</bool>
       </property>
       <property name="currentIndex">
-       <number>4</number>
+       <number>0</number>
       </property>
-      <widget class="QWidget" name="general">
+      <widget class="QWidget" name="tab_general">
        <attribute name="title">
         <string>General</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout">
         <item row="2" column="1">
-         <widget class="QGroupBox" name="groupBox_3">
+         <widget class="QGroupBox" name="grb_project_scin">
           <property name="title">
            <string>Project schema information</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_7">
            <item row="2" column="1">
-            <widget class="QLabel" name="label_custom_node_type">
+            <widget class="QLabel" name="lbl_name">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
                <horstretch>0</horstretch>
@@ -175,7 +175,7 @@
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="QLabel" name="label">
+            <widget class="QLabel" name="lbl_project_type">
              <property name="layoutDirection">
               <enum>Qt::LeftToRight</enum>
              </property>
@@ -244,7 +244,7 @@
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="QGroupBox" name="groupBox_4">
+         <widget class="QGroupBox" name="grb_conection">
           <property name="title">
            <string>Connection</string>
           </property>
@@ -273,7 +273,7 @@
          </widget>
         </item>
         <item row="3" column="1">
-         <widget class="QGroupBox" name="groupBox_6">
+         <widget class="QGroupBox" name="grb_schema_manager">
           <property name="title">
            <string>Schema management</string>
           </property>
@@ -313,9 +313,9 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="schema_manager">
+      <widget class="QWidget" name="tab_schema_manager">
        <attribute name="title">
-        <string>Schema Manager</string>
+        <string>Schema manager</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_8">
         <item row="5" column="3">
@@ -345,13 +345,13 @@
          </widget>
         </item>
         <item row="2" column="0" colspan="4">
-         <widget class="QGroupBox" name="groupBox_10">
+         <widget class="QGroupBox" name="grb_schema_reload">
           <property name="title">
            <string>Reload</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_9">
            <item row="0" column="0">
-            <widget class="QLabel" name="label_30">
+            <widget class="QLabel" name="lbl_reload_func">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                <horstretch>0</horstretch>
@@ -389,7 +389,7 @@
          </widget>
         </item>
         <item row="0" column="0" colspan="4">
-         <widget class="QGroupBox" name="groupBox_2">
+         <widget class="QGroupBox" name="grb_schema_update">
           <property name="title">
            <string>Update</string>
           </property>
@@ -411,7 +411,7 @@
             </widget>
            </item>
            <item row="0" column="0">
-            <widget class="QLabel" name="label_5">
+            <widget class="QLabel" name="lbl_update_all">
              <property name="font">
               <font>
                <weight>50</weight>
@@ -427,7 +427,7 @@
          </widget>
         </item>
         <item row="3" column="0">
-         <widget class="QLabel" name="label_3">
+         <widget class="QLabel" name="lbl_use_constrains">
           <property name="text">
            <string>Use constrains:</string>
           </property>
@@ -452,9 +452,9 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="api_manager">
+      <widget class="QWidget" name="tab_api_manager">
        <attribute name="title">
-        <string>Api Manager</string>
+        <string>Api manager</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_11">
         <item row="3" column="1">
@@ -484,13 +484,13 @@
          </widget>
         </item>
         <item row="1" column="0" colspan="2">
-         <widget class="QGroupBox" name="groupBox_11">
+         <widget class="QGroupBox" name="grb_api_reload">
           <property name="title">
            <string>Reload</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_12">
            <item row="0" column="0">
-            <widget class="QLabel" name="label_34">
+            <widget class="QLabel" name="lbl_reload_func_api">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                <horstretch>0</horstretch>
@@ -541,7 +541,7 @@
          </spacer>
         </item>
         <item row="0" column="0" colspan="2">
-         <widget class="QGroupBox" name="groupBox_5">
+         <widget class="QGroupBox" name="grb_api_update">
           <property name="title">
            <string>Update</string>
           </property>
@@ -560,7 +560,7 @@
             </widget>
            </item>
            <item row="0" column="0">
-            <widget class="QLabel" name="label_2">
+            <widget class="QLabel" name="lbl_update_all_api">
              <property name="font">
               <font>
                <weight>50</weight>
@@ -577,7 +577,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab">
+      <widget class="QWidget" name="tab_fields_manager">
        <attribute name="title">
         <string>Fields manager</string>
        </attribute>
@@ -591,7 +591,7 @@
            <item row="0" column="0">
             <layout class="QGridLayout" name="gridLayout_25">
              <item row="0" column="0">
-              <widget class="QLabel" name="label_child_feature">
+              <widget class="QLabel" name="lbl_child_feature">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
                  <horstretch>0</horstretch>
@@ -663,7 +663,7 @@
               </widget>
              </item>
              <item row="0" column="0">
-              <widget class="QLabel" name="label_8">
+              <widget class="QLabel" name="lbl_system_feature">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
                  <horstretch>0</horstretch>
@@ -702,7 +702,7 @@
            <item>
             <layout class="QGridLayout" name="gridLayout_20">
              <item row="0" column="0">
-              <widget class="QLabel" name="label_7">
+              <widget class="QLabel" name="lbl_add_fields_feature">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
                  <horstretch>0</horstretch>
@@ -768,7 +768,7 @@
            <item row="0" column="0" colspan="2">
             <layout class="QGridLayout" name="gridLayout_16">
              <item row="0" column="0">
-              <widget class="QLabel" name="label_4">
+              <widget class="QLabel" name="lbl_ui_form_name">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
                  <horstretch>0</horstretch>
@@ -787,7 +787,7 @@
               </widget>
              </item>
              <item row="2" column="0">
-              <widget class="QLabel" name="label_6">
+              <widget class="QLabel" name="lbl_ui_path">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
                  <horstretch>0</horstretch>
@@ -891,13 +891,13 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="others">
+      <widget class="QWidget" name="tab_advanced">
        <attribute name="title">
         <string>Advanced</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_3">
         <item row="2" column="0">
-         <widget class="QGroupBox" name="groupBox_8">
+         <widget class="QGroupBox" name="grb_visit">
           <property name="title">
            <string>Visit</string>
           </property>
@@ -938,7 +938,7 @@
          </widget>
         </item>
         <item row="1" column="0">
-         <widget class="QGroupBox" name="groupBox">
+         <widget class="QGroupBox" name="grb_files_generator">
           <property name="title">
            <string>Plugin files generator</string>
           </property>
@@ -961,7 +961,7 @@
          </widget>
         </item>
         <item row="0" column="0">
-         <widget class="QGroupBox" name="groupBox_7">
+         <widget class="QGroupBox" name="grb_load_cf">
           <property name="title">
            <string>Load custom file</string>
           </property>
