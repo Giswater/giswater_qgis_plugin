@@ -330,8 +330,6 @@ class ApiCF(ApiParent, QObject):
     def restore_layers_visibility(self, layers):
 
         for layer, visibility in layers.items():
-            if layer:
-                print(layer.name())
             self.controller.set_layer_visible(layer, visibility)
 
 
