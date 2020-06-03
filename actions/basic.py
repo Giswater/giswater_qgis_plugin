@@ -11,8 +11,7 @@ import os
 import random
 from functools import partial
 
-from .. import utils_giswater
-from ..ui_manager import Multirow_selector, SelectorUi
+from ..ui_manager import SelectorUi
 from .api_search import ApiSearch
 from .api_parent import ApiParent
 
