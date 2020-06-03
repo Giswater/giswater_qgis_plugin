@@ -31,6 +31,7 @@ class TaskGo2Epa(QgsTask):
         self.message = None
         self.common_msg = ""
         self._file = None
+        self.fid = 140
         self.set_variables_from_go2epa()
         self.add_layer = AddLayer(self.controller.iface, None, controller, None)
         #self.progressChanged.connect(self.progress_changed)
@@ -77,15 +78,16 @@ class TaskGo2Epa(QgsTask):
 
         if result:
 
-            if self.export_inp:
-                if self.complet_result and self.complet_result['status'] == "Accepted":
-                    if 'body' in self.complet_result:
-                        if 'data' in self.complet_result['body']:
-                            self.add_layer.add_temp_layer(self.dlg_go2epa, self.complet_result['body']['data'],
-                                'INP results', True, True, 1, False)
+            if self.export_inp and self.complet_result:
+                if 'status' in self.complet_result:
+                    if self.complet_result['status'] == "Accepted":
+                        if 'body' in self.complet_result:
+                            if 'data' in self.complet_result['body']:
+                                self.add_layer.add_temp_layer(self.dlg_go2epa, self.complet_result['body']['data'],
+                                    'INP results', True, True, 1, False)
 
-            if self.import_result:
-                if self.rpt_result and 'status' in self.rpt_result[0]:
+            if self.import_result and self.rpt_result:
+                if 'status' in self.rpt_result:
                     if self.rpt_result['status'] == "Accepted":
                         if 'body' in self.rpt_result:
                             if 'data' in self.rpt_result['body']:
@@ -160,6 +162,8 @@ class TaskGo2Epa(QgsTask):
 
     def export_to_inp(self):
 
+        self.complet_result = None
+
         # Get values from complet_result['body']['file'] and insert into INP file
         if 'file' not in self.complet_result['body']:
             return False
@@ -220,11 +224,13 @@ class TaskGo2Epa(QgsTask):
 
         self.controller.log_info(f"import_rpt: {self.file_rpt}")
 
+        self.rpt_result = None
+        self.json_rpt = None
         status = False
         try:
             # Delete previous values of user on temp table
-            sql = ("DELETE FROM temp_csv "
-                   "WHERE cur_user = current_user AND fid = 141")
+            sql = (f"DELETE FROM temp_csv "
+                   f"WHERE cur_user = current_user AND fid = {self.fid}")
             self.controller.execute_sql(sql)
             # Importing file to temporal table
             status = self.insert_rpt_into_db(self.file_rpt)
@@ -319,7 +325,7 @@ class TaskGo2Epa(QgsTask):
 
             if len(sp_n) > 0:
                 sql += f"INSERT INTO temp_csv (fid, source, csv40, "
-                values = f"VALUES(141, {source}, {csv40}, "
+                values = f"VALUES({self.fid}, {source}, {csv40}, "
                 for x in range(0, len(sp_n)):
                     if "''" not in sp_n[x]:
                         sql += f"csv{x + 1}, "
