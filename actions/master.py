@@ -16,7 +16,7 @@ from functools import partial
 from .. import utils_giswater
 from .manage_new_psector import ManageNewPsector
 from ..ui_manager import Psector_management
-from ..ui_manager import EstimateResultNew
+from ..ui_manager import PriceUi
 from ..ui_manager import EstimateResultSelector
 from ..ui_manager import PriceManagerUi
 from ..ui_manager import Multirow_selector
@@ -233,7 +233,7 @@ class Master(ParentAction):
         """ Button 38: New estimate result """
 
         # Create dialog 
-        dlg_estimate_result_new = EstimateResultNew()
+        dlg_estimate_result_new = PriceUi()
         self.load_settings(dlg_estimate_result_new)
 
         # Set signals
@@ -263,11 +263,8 @@ class Master(ParentAction):
             dlg_estimate_result_new.btn_calculate.clicked.connect(partial(self.close_dialog))
         else:
             dlg_estimate_result_new.btn_calculate.clicked.connect(partial(self.master_estimate_result_new_calculate, dlg_estimate_result_new))            
-        # TODO pending translation
-        # Manage i18n of the form and open it
-        # self.controller.translate_form(dlg_estimate_result_new, 'estimate_result_new')
 
-        self.open_dialog(dlg_estimate_result_new, dlg_name="plan_estimate_result_new", maximize_button=False)
+        self.open_dialog(dlg_estimate_result_new, dlg_name="price", maximize_button=False)
 
 
     def populate_cmb_result_type(self, combo, table_name, allow_nulls=True):

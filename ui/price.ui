@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>plan_estimate_result_new</class>
- <widget class="QDialog" name="plan_estimate_result_new">
+ <class>dlg_price</class>
+ <widget class="QDialog" name="dlg_price">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -25,13 +25,13 @@
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
        <item row="0" column="0" colspan="2">
-        <widget class="QGroupBox" name="groupBox">
+        <widget class="QGroupBox" name="grb_result_values">
          <property name="title">
           <string>Result values</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_4">
           <item row="0" column="0">
-           <widget class="QLabel" name="label_result_name">
+           <widget class="QLabel" name="lbl_result_name">
             <property name="font">
              <font>
               <family>MS Shell Dlg 2</family>
@@ -65,7 +65,7 @@
            </widget>
           </item>
           <item row="1" column="0">
-           <widget class="QLabel" name="label_result_type">
+           <widget class="QLabel" name="lbl_result_type">
             <property name="font">
              <font>
               <family>MS Shell Dlg 2</family>
@@ -80,7 +80,7 @@
            </widget>
           </item>
           <item row="2" column="0">
-           <widget class="QLabel" name="label_prices_coefficient">
+           <widget class="QLabel" name="lbl_prices_coefficient">
             <property name="font">
              <font>
               <family>MS Shell Dlg 2</family>
@@ -117,7 +117,7 @@
            </widget>
           </item>
           <item row="3" column="0">
-           <widget class="QLabel" name="label_observ">
+           <widget class="QLabel" name="lbl_observ">
             <property name="font">
              <font>
               <family>MS Shell Dlg 2</family>
@@ -173,16 +173,6 @@
         </widget>
        </item>
       </layout>
-      <zorder>label_observ</zorder>
-      <zorder>result_name</zorder>
-      <zorder>prices_coefficient</zorder>
-      <zorder>label_prices_coefficient</zorder>
-      <zorder>label_result_type</zorder>
-      <zorder>observ</zorder>
-      <zorder>cmb_result_type</zorder>
-      <zorder>label_result_name</zorder>
-      <zorder>groupBox</zorder>
-      <zorder>chk_save</zorder>
      </widget>
      <widget class="QWidget" name="tab_loginfo">
       <attribute name="title">
