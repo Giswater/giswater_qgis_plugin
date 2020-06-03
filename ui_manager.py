@@ -550,8 +550,8 @@ class VisitManagement(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('workcat_end.ui')
-class WorkcatEnd(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('feature_end.ui')
+class FeatureEndUi(GwDialog, FORM_CLASS):
     pass
 
 

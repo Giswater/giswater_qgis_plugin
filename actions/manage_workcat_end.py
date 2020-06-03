@@ -15,7 +15,7 @@ from datetime import datetime
 
 from .. import utils_giswater
 from .parent_manage import ParentManage
-from ..ui_manager import WorkcatEnd, InfoWorkcatUi
+from ..ui_manager import FeatureEndUi, InfoWorkcatUi
 from ..ui_manager import WorkcatEndList
 
 
@@ -31,7 +31,7 @@ class ManageWorkcatEnd(ParentManage):
         self.remove_selection(True)
         
         # Create the dialog and signals
-        self.dlg_work_end = WorkcatEnd()
+        self.dlg_work_end = FeatureEndUi()
         self.load_settings(self.dlg_work_end)
         self.set_edit_arc_downgrade_force('True')
         
@@ -92,7 +92,7 @@ class ManageWorkcatEnd(ParentManage):
         self.tab_feature_changed(self.dlg_work_end, self.table_object, excluded_layers=["v_edit_element"])
 
         # Open dialog
-        self.open_dialog(self.dlg_work_end, maximize_button=False)
+        self.open_dialog(self.dlg_work_end, dlg_name='feature_end',maximize_button=False)
 
 
     def set_edit_arc_downgrade_force(self, value):
