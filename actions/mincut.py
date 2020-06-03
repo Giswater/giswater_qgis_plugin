@@ -73,7 +73,7 @@ class MincutParent(ParentAction):
             return
         
         for row in rows:
-            self.states[row['id']] = row['idval']
+            self.states[int(row['id'])] = row['idval']
 
 
     def init_map_tool(self):
@@ -151,6 +151,13 @@ class MincutParent(ParentAction):
                "ORDER BY id")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_mincut.cause, rows, 1)
+
+        # Fill ComboBox assigned_to
+        sql = ("SELECT id, name "
+               "FROM cat_users "
+               "ORDER BY name")
+        rows = self.controller.get_rows(sql)
+        utils_giswater.set_item_data(self.dlg_mincut.assigned_to, rows, 1)
 
         # Toolbar actions
         action = self.dlg_mincut.findChild(QAction, "actionMincut")
