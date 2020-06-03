@@ -420,8 +420,8 @@ class MincutManagerUi(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('mincut_fin.ui')
-class Mincut_fin(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('mincut_end.ui')
+class MincutEndUi(GwDialog, FORM_CLASS):
     pass
 
 

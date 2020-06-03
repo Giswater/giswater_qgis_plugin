@@ -29,7 +29,7 @@ from .multiple_selection import MultipleSelection
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 from ..ui_manager import DialogTextUi
 from ..ui_manager import Mincut
-from ..ui_manager import Mincut_fin
+from ..ui_manager import MincutEndUi
 from ..ui_manager import MincutHydrometer
 from ..ui_manager import MincutConnec
 from ..ui_manager import MincutComposer
@@ -394,7 +394,7 @@ class MincutParent(ParentAction):
     def real_end(self):
 
         # Create the dialog and signals
-        self.dlg_fin = Mincut_fin()
+        self.dlg_fin = MincutEndUi()
         self.load_settings(self.dlg_fin)
 
         mincut = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
@@ -445,7 +445,7 @@ class MincutParent(ParentAction):
         self.dlg_fin.btn_set_real_location.clicked.connect(self.set_real_location)        
 
         # Open the dialog
-        self.open_dialog(self.dlg_fin)
+        self.open_dialog(self.dlg_fin, dlg_name='mincut_end')
 
 
     def set_real_location(self):
@@ -748,7 +748,7 @@ class MincutParent(ParentAction):
 
     def real_end_accept(self):
 
-        # Get end_date and end_hour from mincut_fin dialog
+        # Get end_date and end_hour from mincut_end dialog
         exec_start_day = self.dlg_fin.cbx_date_start_fin.date()
         exec_start_time = self.dlg_fin.cbx_hours_start_fin.time()
         exec_end_day = self.dlg_fin.cbx_date_end_fin.date()

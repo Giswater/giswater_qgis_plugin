@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>mincut_fin</class>
- <widget class="QDialog" name="mincut_fin">
+ <class>dlg_mincut_end</class>
+ <widget class="QDialog" name="dlg_mincut_end">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -15,7 +15,7 @@
   </property>
   <layout class="QGridLayout" name="gridLayout_3">
    <item row="0" column="0" colspan="3">
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="grb_close_mincut">
      <property name="title">
       <string>Close mincut</string>
      </property>
@@ -23,7 +23,7 @@
       <item row="3" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_4">
         <item>
-         <widget class="QLabel" name="label_connec_3">
+         <widget class="QLabel" name="lbl_post_code">
           <property name="text">
            <string>Post code:</string>
           </property>
@@ -66,7 +66,7 @@
       <item row="0" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <widget class="QLabel" name="label_label_x">
+         <widget class="QLabel" name="lbl_mincut">
           <property name="font">
            <font>
             <pointsize>8</pointsize>
@@ -137,7 +137,7 @@
       <item row="1" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
-         <widget class="QLabel" name="label_label_x_8">
+         <widget class="QLabel" name="lbl_work_order">
           <property name="font">
            <font>
             <pointsize>8</pointsize>
@@ -203,7 +203,7 @@
       <item row="7" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_8">
         <item>
-         <widget class="QLabel" name="label_label_x_4">
+         <widget class="QLabel" name="lbl_start_hour">
           <property name="font">
            <font>
             <pointsize>8</pointsize>
@@ -290,7 +290,7 @@
       <item row="2" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_3">
         <item>
-         <widget class="QLabel" name="label_label_x_10">
+         <widget class="QLabel" name="lbl_municipality">
           <property name="font">
            <font>
             <pointsize>8</pointsize>
@@ -356,7 +356,7 @@
       <item row="4" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_5">
         <item>
-         <widget class="QLabel" name="label_label_x_2">
+         <widget class="QLabel" name="lbl_street">
           <property name="font">
            <font>
             <pointsize>8</pointsize>
@@ -422,7 +422,7 @@
       <item row="5" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_6">
         <item>
-         <widget class="QLabel" name="label_label_x_7">
+         <widget class="QLabel" name="lbl_number">
           <property name="font">
            <font>
             <pointsize>8</pointsize>
@@ -488,7 +488,7 @@
       <item row="6" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_7">
         <item>
-         <widget class="QLabel" name="label_label_x_3">
+         <widget class="QLabel" name="lbl_start_date">
           <property name="font">
            <font>
             <pointsize>8</pointsize>
@@ -501,7 +501,7 @@
            <enum>QFrame::Plain</enum>
           </property>
           <property name="text">
-           <string>Start date:</string>
+           <string>From:</string>
           </property>
           <property name="textFormat">
            <enum>Qt::AutoText</enum>
@@ -557,7 +557,7 @@
       <item row="8" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_9">
         <item>
-         <widget class="QLabel" name="label_label_x_6">
+         <widget class="QLabel" name="lbl_end_date">
           <property name="font">
            <font>
             <pointsize>8</pointsize>
@@ -570,7 +570,7 @@
            <enum>QFrame::Plain</enum>
           </property>
           <property name="text">
-           <string>End date:</string>
+           <string>To:</string>
           </property>
           <property name="textFormat">
            <enum>Qt::AutoText</enum>
@@ -623,7 +623,7 @@
       <item row="9" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_10">
         <item>
-         <widget class="QLabel" name="label_label_x_5">
+         <widget class="QLabel" name="lbl_end_hour">
           <property name="font">
            <font>
             <pointsize>8</pointsize>
@@ -700,7 +700,7 @@
       <item row="11" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_11">
         <item>
-         <widget class="QLabel" name="label_label_x_9">
+         <widget class="QLabel" name="lbl_executed">
           <property name="font">
            <font>
             <pointsize>8</pointsize>
@@ -782,7 +782,7 @@
       </sizepolicy>
      </property>
      <property name="text">
-      <string>OK</string>
+      <string>Accept</string>
      </property>
     </widget>
    </item>
