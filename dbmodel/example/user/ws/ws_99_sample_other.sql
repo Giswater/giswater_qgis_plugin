@@ -603,7 +603,7 @@ UPDATE sector SET stylesheet='{"color":[204,235,197]}'  where sector_id = 3;
 UPDATE sector SET stylesheet='{"color":[222,203,228]}'  where sector_id = 4;
 UPDATE sector SET stylesheet='{"color":[255,255,204]}'  where sector_id = 5;
 
-UPDATE config_form_fields SET  layoutname = 'lyt_data_1' where columnname = 'arc_id'AND formname LIKE '%_arc_%';
+UPDATE config_form_fields SET  layoutname = 'lyt_top_1' where columnname = 'arc_id'AND formname LIKE '%_arc_%';
 
 UPDATE config_form_fields SET layoutorder = 20 where columnname ='minsector_id' and formname like '%_node_%';
 UPDATE config_form_fields SET layoutorder = 23 where columnname ='rotation' and formname like '%_node_%';

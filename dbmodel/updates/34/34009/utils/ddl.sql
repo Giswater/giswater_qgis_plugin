@@ -161,7 +161,7 @@ ALTER TABLE config_api_form_tabs RENAME TO config_form_tabs;
 ALTER TABLE config_api_images RENAME TO sys_image;
 ALTER TABLE config_api_layer RENAME TO config_info_layer;
 ALTER TABLE config_api_list RENAME TO config_form_list;
-ALTER TABLE config_api_tableinfo_x_infotype RENAME TO config_info_table_x_type;
+ALTER TABLE config_api_tableinfo_x_infotype RENAME TO config_info_layer_x_type;
 ALTER TABLE config_api_typevalue RENAME TO config_typevalue;
 ALTER TABLE config_client_forms RENAME TO config_form_tableview;
 ALTER TABLE config_api_form RENAME TO config_form;
@@ -179,7 +179,7 @@ ALTER SEQUENCE SCHEMA_NAME.config_api_form_id_seq RENAME TO config_form_id_seq;
 ALTER SEQUENCE SCHEMA_NAME.config_api_form_layout_id_seq RENAME TO config_form_layout_id_seq;
 ALTER SEQUENCE SCHEMA_NAME.config_api_images_id_seq RENAME TO sys_image_id_seq;
 ALTER SEQUENCE SCHEMA_NAME.config_api_list_id_seq RENAME TO config_form_list_id_seq;
-ALTER SEQUENCE SCHEMA_NAME.config_api_tableinfo_x_inforole_id_seq RENAME TO config_info_table_x_type_id_seq;
+ALTER SEQUENCE SCHEMA_NAME.config_api_tableinfo_x_inforole_id_seq RENAME TO config_info_layer_x_type_id_seq;
 ALTER SEQUENCE SCHEMA_NAME.config_client_forms_id_seq RENAME TO config_form_tableview_id_seq;
 
 

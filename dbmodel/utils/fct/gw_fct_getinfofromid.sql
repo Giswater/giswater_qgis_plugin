@@ -338,7 +338,7 @@ BEGIN
 
 		-- Identify tableinfotype_id		
 		EXECUTE' SELECT tableinfotype_id FROM cat_feature
-			JOIN config_info_table_x_type ON child_layer=tableinfo_id 
+			JOIN config_info_layer_x_type ON child_layer=tableinfo_id
 			WHERE cat_feature.id= (SELECT custom_type FROM '||quote_ident(tableparent_id_arg)||' WHERE nid::text=$1) 
 			AND infotype_id=$2'
 			INTO v_tablename
@@ -377,7 +377,7 @@ BEGIN
 
 			-- Identify tableinfotype_id		
 			EXECUTE' SELECT tableinfotype_id FROM cat_feature
-				JOIN config_info_table_x_type ON child_layer.tableinfo_id 
+				JOIN config_info_layer_x_type ON child_layer.tableinfo_id
 				WHERE cat_feature.id= (SELECT custom_type FROM '||quote_ident(tableparent_id_arg)||' WHERE nid::text=$1) 
 				AND infotype_id=$2'
 				INTO v_tablename
@@ -389,7 +389,7 @@ BEGIN
 
 		-- Identify tableinfotype_id 
 		EXECUTE 'SELECT tableinfotype_id FROM config_info_layer
-		JOIN config_info_table_x_type ON config_info_layer.tableinfo_id=config_info_table_x_type.tableinfo_id 
+		JOIN config_info_layer_x_type ON config_info_layer.tableinfo_id=config_info_layer_x_type.tableinfo_id
 		WHERE layer_id=$1 AND infotype_id=$2'
 			INTO v_tablename
 		USING v_tablename, v_infotype;
@@ -411,7 +411,7 @@ BEGIN
 	------------------------------
 	IF v_tablename IS NULL THEN 
 
-		v_message='{"priority":2, "text":"The API is bad configured. Please take a look on table config layers (config_info_table_x_type or config_info_layer)", "results":0}';
+		v_message='{"priority":2, "text":"The API is bad configured. Please take a look on table config layers (config_info_layer_x_type or config_info_layer)", "results":0}';
 	
 	ELSIF v_tablename IS NOT NULL THEN 
 

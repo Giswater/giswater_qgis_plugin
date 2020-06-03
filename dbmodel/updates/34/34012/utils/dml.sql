@@ -103,8 +103,8 @@ UPDATE sys_fprocess SET project_type='ws' WHERE fid=233;
 UPDATE config_form_tabs SET device = 4 WHERE device = 9;
 
 --
-UPDATE config_info_table_x_type SET infotype_id = 1 WHERE infotype_id = 100;
-UPDATE config_info_table_x_type SET infotype_id = 2 WHERE infotype_id = 0;
+UPDATE config_info_layer_x_type SET infotype_id = 1 WHERE infotype_id = 100;
+UPDATE config_info_layer_x_type SET infotype_id = 2 WHERE infotype_id = 0;
 
 UPDATE config_toolbox SET inputparams = (replace (inputparams::text, 'layout_order', 'layoutorder'))::json;
 UPDATE config_toolbox SET active=TRUE;

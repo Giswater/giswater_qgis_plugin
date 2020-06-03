@@ -100,7 +100,7 @@ ALTER TABLE sys_foreignkey ALTER column active SET DEFAULT TRUE;
 --DROP SEQUENCE config_csv_id_seq;
 --DROP SEQUENCE sys_images_id_seq;
 --DROP SEQUENCE config_form_layout_id_seq;
---DROP SEQUENCE config_info_table_x_type_id_seq;
+--DROP SEQUENCE config_info_layer_x_type_id_seq;
 
 ALTER SEQUENCE man_addfields_parameter_id_seq RENAME TO sys_addfields_id_seq;
 

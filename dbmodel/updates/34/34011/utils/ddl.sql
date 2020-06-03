@@ -161,11 +161,11 @@ ALTER TABLE config_form_tableview DROP COLUMN id;
 UPDATE sys_table SET sys_sequence = null, sys_sequence_field = null WHERE id = 'config_form_tableview';
 
 
--- config_info_table_x_type
-ALTER TABLE config_info_table_x_type DROP CONSTRAINT config_api_tableinfo_x_inforole_pkey;
-ALTER TABLE config_info_table_x_type ADD CONSTRAINT config_info_table_x_type_pkey PRIMARY KEY(tableinfo_id, infotype_id);
-ALTER TABLE config_info_table_x_type DROP COLUMN id;
-UPDATE sys_table SET sys_sequence = null, sys_sequence_field = null WHERE id = 'config_info_table_x_type';
+-- config_info_layer_x_type
+ALTER TABLE config_info_layer_x_type DROP CONSTRAINT config_api_tableinfo_x_inforole_pkey;
+ALTER TABLE config_info_layer_x_type ADD CONSTRAINT config_info_layer_x_type_pkey PRIMARY KEY(tableinfo_id, infotype_id);
+ALTER TABLE config_info_layer_x_type DROP COLUMN id;
+UPDATE sys_table SET sys_sequence = null, sys_sequence_field = null WHERE id = 'config_info_layer_x_type';
 
 
 -- config_param_system

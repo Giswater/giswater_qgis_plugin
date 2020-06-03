@@ -157,13 +157,13 @@ BEGIN
 	IF v_project_type ='WS' THEN
 	   SELECT count(id), string_agg(child_layer,',')  INTO v_count,v_view_list FROM cat_feature JOIN (SELECT id,active FROM node_type 
 	   UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type) a USING (id) WHERE a.active IS TRUE AND 
-	   child_layer not in (select tableinfo_id FROM config_info_table_x_type);
+	   child_layer not in (select tableinfo_id FROM config_info_layer_x_type);
 
 	ELSIF v_project_type ='UD' THEN
 
 		SELECT count(id), string_agg(child_layer,',')  INTO v_count, v_view_list FROM cat_feature JOIN (SELECT id,active FROM node_type 
 		UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type UNION SELECT id,active FROM gully_type) a USING (id) WHERE a.active IS TRUE AND 
-		child_layer not in (select tableinfo_id FROM config_info_table_x_type);
+		child_layer not in (select tableinfo_id FROM config_info_layer_x_type);
 
 	END IF;
 
