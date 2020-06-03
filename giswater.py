@@ -45,7 +45,6 @@ from .map_tools.draw_profiles import DrawProfiles
 from .map_tools.flow_trace_flow_exit import FlowTraceFlowExitMapTool
 from .map_tools.move_node import MoveNodeMapTool
 from .map_tools.replace_feature import ReplaceFeatureMapTool
-from .map_tools.open_visit import OpenVisit
 from .models.plugin_toolbar import PluginToolbar
 from .models.sys_feature_cat import SysFeatureCat
 
@@ -372,8 +371,6 @@ class Giswater(QObject):
             map_tool = FlowTraceFlowExitMapTool(self.iface, self.settings, action, index_action)
         elif int(index_action) == 57:
             map_tool = FlowTraceFlowExitMapTool(self.iface, self.settings, action, index_action)
-        elif int(index_action) == 61:
-            map_tool = OpenVisit(self.iface, self.settings, action, index_action)
         elif int(index_action) == 71:
             map_tool = CadAddCircle(self.iface, self.settings, action, index_action)
         elif int(index_action) == 72:
@@ -433,7 +430,7 @@ class Giswater(QObject):
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
 
-        list_actions = ['26', '27', '74', '75', '76', '61', '64', '65', '84', '18']
+        list_actions = ['26', '27', '74', '75', '76', '64', '65', '84', '18']
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
 
@@ -443,7 +440,7 @@ class Giswater(QObject):
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
 
-        list_actions = ['43', '56', '57', '74', '75', '76', '61', '64', '65', '84']
+        list_actions = ['43', '56', '57', '74', '75', '76', '64', '65', '84']
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
 
@@ -1171,7 +1168,6 @@ class Giswater(QObject):
             self.set_map_tool('map_tool_dimensioning')
             self.set_map_tool('cad_add_circle')
             self.set_map_tool('cad_add_point')
-            self.set_map_tool('map_tool_open_visit')
 
 
     def set_map_tool(self, map_tool_name):
