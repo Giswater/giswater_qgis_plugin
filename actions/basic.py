@@ -39,13 +39,22 @@ class Basic(ApiParent):
     def basic_filter_selectors(self):
         """ Button 142: Filter selector """
 
-        selector_values = f'{{"exploitation": {{"ids":"None", "filter":""}}, "state":{{"ids":"None", "filter":""}}, "hydrometer":{{"ids":"None", "filter":""}}}}'
+        selector_values = (f'{{"exploitation": {{"ids":"None", "filter":""}}, "state":{{"ids":"None", "filter":""}}, '
+                           f'"hydrometer":{{"ids":"None", "filter":""}}}}')
+
+        # Show form in docker?
+        docker = self.init_docker('qgis_form_docker')
+
         self.dlg_selector = SelectorUi()
         self.load_settings(self.dlg_selector)
-        self.dlg_selector.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_selector))
-        self.dlg_selector.rejected.connect(partial(self.save_settings, self.dlg_selector))
         self.get_selector(self.dlg_selector, selector_values)
-        self.open_dialog(self.dlg_selector, dlg_name='selector', maximize_button=False)
+        if docker:
+            self.dock_dialog(docker, self.dlg_selector)
+            self.dlg_selector.btn_close.clicked.connect(partial(self.close_docker, docker, self.dlg_selector))
+        else:
+            self.dlg_selector.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_selector))
+            self.dlg_selector.rejected.connect(partial(self.save_settings, self.dlg_selector))
+            self.open_dialog(self.dlg_selector, dlg_name='selector', maximize_button=False)
 		
         # repaint mapzones and refresh canvas
         self.set_mapzones_style()

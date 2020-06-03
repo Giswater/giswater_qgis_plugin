@@ -1625,15 +1625,17 @@ class ApiParent(ParentAction):
         self.iface.mainWindow().blockSignals(True)
         dialog.txt_infolog.clear()
 
-        sql = "DELETE FROM temp_table WHERE fid=206;\n"
+        sql = "DELETE FROM temp_table WHERE fid = 206;\n"
         self.controller.execute_sql(sql)
         temp_layers_added = []
         for type_ in ['LineString', 'Point', 'Polygon']:
-            sql = ""
+
             # Get file name without extension
             dxf_output_filename = os.path.splitext(os.path.basename(dxf_path))[0]
+
             # Create layer
-            dxf_layer = QgsVectorLayer(f"{dxf_path}|layername=entities|geometrytype={type_}", f"{dxf_output_filename}_{type_}", 'ogr')
+            uri = f"{dxf_path}|layername=entities|geometrytype={type_}"
+            dxf_layer = QgsVectorLayer(uri, f"{dxf_output_filename}_{type_}", 'ogr')
 
             # Set crs to layer
             crs = dxf_layer.crs()
@@ -1646,6 +1648,7 @@ class ApiParent(ParentAction):
             # Get the name of the columns
             field_names = [field.name() for field in dxf_layer.fields()]
 
+            sql = ""
             geom_types = {0:'geom_point', 1:'geom_line', 2:'geom_polygon'}
             for count, feature in enumerate(dxf_layer.getFeatures()):
                 geom_type = feature.geometry().type()
@@ -1663,6 +1666,7 @@ class ApiParent(ParentAction):
                     if not status:
                         return False
                     sql = ""
+
             if sql != "":
                 status = self.controller.execute_sql(sql)
                 if not status:
@@ -1694,7 +1698,9 @@ class ApiParent(ParentAction):
 
         return {"path": dxf_path, "result":result, "temp_layers_added":temp_layers_added}
 
-    def manageAll(self, dialog, widget):
+
+    def manage_all(self, dialog, widget):
+
         status = utils_giswater.isChecked(dialog, widget)
         index = dialog.main_tab.currentIndex()
         widget_list = dialog.main_tab.widget(index).findChildren(QCheckBox)
@@ -1728,6 +1734,7 @@ class ApiParent(ParentAction):
 
         else:
             aux_selector_type = selector_type
+
         extras = f'"selector_type":{aux_selector_type}'
         body = self.create_body(extras=extras)
         json_result = self.controller.get_json('gw_fct_getselectors', body)
@@ -1740,6 +1747,7 @@ class ApiParent(ParentAction):
             tab_widget = QWidget(main_tab)
             tab_widget.setObjectName(form_tab['tabName'])
             main_tab.addTab(tab_widget, form_tab['tabLabel'])
+
             # Create a new QGridLayout and put it into tab
             gridlayout = QGridLayout()
             gridlayout.setObjectName("grl_" + form_tab['tabName'])
@@ -1772,7 +1780,7 @@ class ApiParent(ParentAction):
                 label.setText('Check all')
                 widget = QCheckBox()
                 widget.setObjectName('chk_all_' + str(form_tab['selectorType']))
-                widget.stateChanged.connect(partial(self.manageAll, dialog, widget))
+                widget.stateChanged.connect(partial(self.manage_all, dialog, widget))
                 widget.setLayoutDirection(Qt.RightToLeft)
                 field['layoutname'] = gridlayout.objectName()
                 field['layoutorder'] = i
@@ -1792,6 +1800,7 @@ class ApiParent(ParentAction):
                 field['layoutname'] = gridlayout.objectName()
                 field['layoutorder'] = order + i
                 self.put_widgets(dialog, field, label, widget)
+
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
             gridlayout.addItem(vertical_spacer1)
             if filter is not False:
