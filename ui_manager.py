@@ -466,7 +466,7 @@ class PsectorManagerUi(GwDialog, FORM_CLASS):
 
 
 FORM_CLASS = get_ui_class('psector_rapport.ui')
-class Psector_rapport(GwDialog, FORM_CLASS):
+class PsectorRapportUi(GwDialog, FORM_CLASS):
     pass
 
 

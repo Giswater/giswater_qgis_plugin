@@ -24,7 +24,7 @@ from functools import partial
 
 from .. import utils_giswater
 from ..ui_manager import Plan_psector
-from ..ui_manager import Psector_rapport
+from ..ui_manager import PsectorRapportUi
 from .parent_manage import ParentManage
 from .multiple_selection import MultipleSelection
 from .manage_document import ManageDocument
@@ -470,7 +470,7 @@ class ManageNewPsector(ParentManage):
 
         default_file_name = utils_giswater.getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.name)
 
-        self.dlg_psector_rapport = Psector_rapport()
+        self.dlg_psector_rapport = PsectorRapportUi()
         self.load_settings(self.dlg_psector_rapport)
 
         utils_giswater.setWidgetText(self.dlg_psector_rapport, 'txt_composer_path', default_file_name + " comp.pdf")
@@ -499,7 +499,7 @@ class ManageNewPsector(ParentManage):
         self.populate_cmb_templates()
         
         # Open dialog
-        self.open_dialog(self.dlg_psector_rapport, maximize_button=False)     
+        self.open_dialog(self.dlg_psector_rapport, dlg_name='psector_rapport', maximize_button=False)
 
 
     def populate_cmb_templates(self):
