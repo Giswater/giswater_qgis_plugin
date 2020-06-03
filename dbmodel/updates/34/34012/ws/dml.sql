@@ -23,3 +23,13 @@ VALUES ('basic_selector_hydrometer', '{"table":"ext_rtc_hydrometer_state", "sele
 INSERT INTO config_form_tabs (formname,tabname, label, tooltip, sys_role, device) 
 VALUES ('hydrometer', 'tab_hydrometer', 'Hydrometer', 'Hydrometer Selector', 'role_basic', 4);
 
+
+--2020/06/03
+INSERT INTO config_form_fields(formname, formtype, columnname,datatype, widgettype, label, ismandatory, isparent,  iseditable, isautoupdate, hidden)
+VALUES ('v_edit_presszone','form_generic', 'head','string', 'text', 'Head',false, false, true, false, false);
+
+INSERT INTO config_form_fields(formname, formtype, columnname,datatype, widgettype, label, ismandatory, isparent,  iseditable, isautoupdate, hidden)
+VALUES ('v_edit_presszone','form_generic', 'stylesheet','string', 'text', 'Stylesheet',false, false, true, false, false);
+
+INSERT INTO config_form_fields(formname, formtype, columnname, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, hidden)
+VALUES ('v_edit_dqa','form_generic', 'stylesheet', 'string', 'text', 'stylesheet',false, false, true, false, false);

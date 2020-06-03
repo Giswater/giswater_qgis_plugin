@@ -258,3 +258,11 @@ VALUES ('basic_selector_state', '{"table":"value_state", "selector":"selector_st
 
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle) 
 VALUES ('tabname_typevalue', 'tab_state', 'tabState', 'tabState');
+
+
+--2020/06/03
+INSERT INTO config_form_fields(formname, formtype, columnname, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, hidden)
+VALUES ('v_edit_dma','form_generic', 'stylesheet', 'string', 'text', 'stylesheet',false, false, true, false, false);
+
+INSERT INTO config_form_fields(formname, formtype, columnname, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, hidden)
+VALUES ('v_edit_sector','form_generic', 'stylesheet', 'string', 'text', 'stylesheet',false, false, true, false, false);
