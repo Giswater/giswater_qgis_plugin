@@ -1730,10 +1730,11 @@ class ApiParent(ParentAction):
             aux_selector_type = selector_type
         extras = f'"selector_type":{aux_selector_type}'
         body = self.create_body(extras=extras)
-        complet_result = self.controller.get_json('gw_fct_getselectors', body, log_sql=True)
-        if not complet_result: return False
+        json_result = self.controller.get_json('gw_fct_getselectors', body)
+        if not json_result:
+            return False
 
-        for form_tab in complet_result['body']['form']['formTabs']:
+        for form_tab in json_result['body']['form']['formTabs']:
 
             # Create one tab for each form_tab and add to QTabWidget
             tab_widget = QWidget(main_tab)
@@ -1810,8 +1811,11 @@ class ApiParent(ParentAction):
         extras += f'"result_name":"{widget.objectName()}", '
         extras += f'"result_value":"{widget.isChecked()}"'
         body = self.create_body(extras=extras)
-        complet_result = self.controller.get_json('gw_fct_setselectors', body, log_sql=True)
-        if not complet_result: return False
-        if selector_type in complet_result['body']['data']['indexingLayers']:
-            for layer_name in complet_result['body']['data']['indexingLayers'][selector_type]:
+        json_result = self.controller.get_json('gw_fct_setselectors', body)
+        if not json_result:
+            return False
+
+        if selector_type in json_result['body']['data']['indexingLayers']:
+            for layer_name in json_result['body']['data']['indexingLayers'][selector_type]:
                 self.controller.indexing_spatial_layer(layer_name)
+

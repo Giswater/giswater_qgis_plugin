@@ -40,10 +40,11 @@ class Go2EpaOptions(ApiParent):
 
         form = '"formName":"epaoptions"'
         body = self.create_body(form=form)
-        complet_result = self.controller.get_json('gw_fct_getconfig', body, log_sql=True)
-        if not complet_result: return False
+        json_result = self.controller.get_json('gw_fct_getconfig', body)
+        if not json_result:
+            return False
 
-        self.construct_form_param_user(self.dlg_options, complet_result['body']['form']['formTabs'], 0, self.epa_options_list)
+        self.construct_form_param_user(self.dlg_options, json_result['body']['form']['formTabs'], 0, self.epa_options_list)
         grbox_list = self.dlg_options.findChildren(QGroupBox)
         for grbox in grbox_list:
             widget_list = grbox.findChildren(QWidget)
@@ -56,7 +57,7 @@ class Go2EpaOptions(ApiParent):
                     grl.addItem(spacer)
 
         # Event on change from combo parent
-        self.get_event_combo_parent(complet_result)
+        self.get_event_combo_parent(json_result)
         self.dlg_options.btn_accept.clicked.connect(partial(self.update_values, self.epa_options_list))
         self.dlg_options.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_options))
 
@@ -69,8 +70,9 @@ class Go2EpaOptions(ApiParent):
         form = '"formName":"epaoptions"'
         extras = f'"fields":{my_json}'
         body = self.create_body(form=form, extras=extras)
-        result = self.controller.get_json('gw_fct_setconfig', body, log_sql=True)
-        if not result: return False
+        json_result = self.controller.get_json('gw_fct_setconfig', body)
+        if not json_result:
+            return False
 
         message = "Values has been updated"
         self.controller.show_info(message)
@@ -89,10 +91,11 @@ class Go2EpaOptions(ApiParent):
 
         combo_parent = widget.objectName()
         combo_id = utils_giswater.get_item_data(self.dlg_options, widget)
-        result = self.controller.get_json('gw_fct_getcombochilds', f"'epaoptions', '', '', '{combo_parent}', '{combo_id}', ''", log_sql=True)
-        if not result: return False
+        json_result = self.controller.get_json('gw_fct_getcombochilds', f"'epaoptions', '', '', '{combo_parent}', '{combo_id}', ''")
+        if not json_result:
+            return False
 
-        for combo_child in result['fields']:
+        for combo_child in json_result['fields']:
             if combo_child is not None:
                 self.manage_child(dialog, widget, combo_child)
 

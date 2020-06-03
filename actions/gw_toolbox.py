@@ -54,11 +54,11 @@ class GwToolBox(ApiParent):
         self.dlg_toolbox_doc.trv.setHeaderHidden(True)
         extras = '"isToolbox":true'
         body = self.create_body(extras=extras)
-        complet_result = self.controller.get_json('gw_fct_gettoolbox', body)
-        if not complet_result:
+        json_result = self.controller.get_json('gw_fct_gettoolbox', body)
+        if not json_result:
             return False
 
-        self.populate_trv(self.dlg_toolbox_doc.trv, complet_result['body']['data'])
+        self.populate_trv(self.dlg_toolbox_doc.trv, json_result['body']['data'])
         self.dlg_toolbox_doc.txt_filter.textChanged.connect(partial(self.filter_functions))
         self.dlg_toolbox_doc.trv.doubleClicked.connect(partial(self.open_function))
         self.controller.manage_translation('toolbox_docker', self.dlg_toolbox_doc)
@@ -68,11 +68,11 @@ class GwToolBox(ApiParent):
 
         extras = f'"filterText":"{text}"'
         body = self.create_body(extras=extras)
-        complet_result = self.controller.get_json('gw_fct_gettoolbox', body)
-        if not complet_result :
+        json_result = self.controller.get_json('gw_fct_gettoolbox', body)
+        if not json_result :
             return False
 
-        self.populate_trv(self.dlg_toolbox_doc.trv, complet_result['body']['data'], expand=True)
+        self.populate_trv(self.dlg_toolbox_doc.trv, json_result['body']['data'], expand=True)
 
 
     def open_function(self, index):
@@ -98,10 +98,11 @@ class GwToolBox(ApiParent):
         extras = f'"filterText":"{self.alias_function}"'
         extras += ', "isToolbox":true'
         body = self.create_body(extras=extras)
-        complet_result = self.controller.get_json('gw_fct_gettoolbox', body, log_sql=True)
-        if not complet_result: return False
+        json_result = self.controller.get_json('gw_fct_gettoolbox', body)
+        if not json_result:
+            return False
 
-        status = self.populate_functions_dlg(self.dlg_functions, complet_result['body']['data'])
+        status = self.populate_functions_dlg(self.dlg_functions, json_result['body']['data'])
         if not status:
             self.alias_function = index.sibling(index.row(), 1).data()
             message = "Function not found"
@@ -109,7 +110,7 @@ class GwToolBox(ApiParent):
             return
 
         self.dlg_functions.btn_run.clicked.connect(partial(self.execute_function, self.dlg_functions,
-                                                   self.dlg_functions.cmb_layers, complet_result['body']['data']))
+                                                   self.dlg_functions.cmb_layers, json_result['body']['data']))
         self.dlg_functions.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_functions))
         self.dlg_functions.btn_cancel.clicked.connect(partial(self.remove_layers))
         self.dlg_functions.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_functions))

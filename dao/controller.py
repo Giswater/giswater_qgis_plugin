@@ -786,6 +786,7 @@ class DaoController(object):
             self.show_warning("Function not found in database", parameter=function_name)
             return None
 
+        # Execute function. If failed, always log it
         if schema_name:
             sql = f"SELECT {schema_name}.{function_name}("
         else:
@@ -796,16 +797,21 @@ class DaoController(object):
 
         row = self.get_row(sql, commit=commit, log_sql=log_sql)
         if not row or not row[0]:
+            self.log_warning(f"Function error: {function_name}")
+            self.log_warning(sql)
             return None
 
+        # Get json result
         if json_loads:
             json_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
         else:
             json_result = row[0]
 
+        # Log result
         if log_result:
             self.log_info(json_result, stack_level_increase=1)
 
+        # If failed, manage exception
         if 'status' in json_result and json_result['status'] == 'Failed':
             self.manage_exception_api(json_result, sql)
             return False

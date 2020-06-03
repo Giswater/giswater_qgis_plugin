@@ -148,9 +148,8 @@ class TaskGo2Epa(QgsTask):
         extras += f', "dumpSubcatch":"{self.export_subcatch}"'
         body = self.create_body(extras=extras)
         function_name = 'gw_fct_pg2epa_main'
-        json_result = self.controller.get_json(function_name, body, log_sql=True, log_result=False)
+        json_result = self.controller.get_json(function_name, body)
         if json_result is None:
-            self.controller.log_warning(f"Function error: {function_name}")
             return False
 
         self.complet_result = json_result
@@ -490,7 +489,6 @@ class TaskGo2Epa(QgsTask):
         function_name = 'gw_fct_rpt2pg_main'
         json_result = self.controller.get_json(function_name, body, log_sql=True)
         if json_result is None:
-            self.controller.log_warning(f"Function error: {function_name}")
             return False
 
         self.rpt_result = json_result

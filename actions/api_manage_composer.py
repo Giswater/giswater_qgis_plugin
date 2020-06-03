@@ -46,11 +46,12 @@ class ApiManageComposer(ApiParent):
         # Create and populate dialog
         extras = '"composers":' + str(composers_list)
         body = self.create_body(extras=extras)
-        complet_result = self.controller.get_json('gw_fct_getprint', body, log_sql=True)
-        if not complet_result: return False
+        json_result = self.controller.get_json('gw_fct_getprint', body)
+        if not json_result:
+            return False
 
-        if complet_result['formTabs']:
-            fields = complet_result['formTabs'][0]
+        if json_result['formTabs']:
+            fields = json_result['formTabs'][0]
             # This dialog is created from config_api_form_fieds
             # where formname == 'print' and formtype == 'utils'
             # At the moment, u can set column widgetfunction with 'gw_fct_setprint' or open_composer
@@ -293,12 +294,13 @@ class ApiManageComposer(ApiParent):
         feature = '"feature":{''}, '
         data = '"data":' + str(my_json)
         body = "$${" + client + form + feature + data + "}$$"
-        complet_result = self.controller.get_json('gw_fct_setprint', body, log_sql=True)
-        if not complet_result: return False
+        json_result = self.controller.get_json('gw_fct_setprint', body, log_sql=True)
+        if not json_result:
+            return False
 
-        result = complet_result['data']
+        result = json_result['data']
         self.draw_rectangle(result)
-        map_index = complet_result['data']['mapIndex']
+        map_index = json_result['data']['mapIndex']
 
         maps = []
         active_composers = self.get_composers_list()

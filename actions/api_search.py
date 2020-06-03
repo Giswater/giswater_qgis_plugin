@@ -392,8 +392,8 @@ class ApiSearch(ApiParent):
         function_name = 'gw_fct_getinfofromid'
         json_result = self.controller.get_json(function_name, body, log_sql=True)
         if json_result is None:
-            self.controller.log_warning(f"Function error: {function_name}")
             return
+
         result = [json_result]
         if not row:
             return

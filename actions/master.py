@@ -309,14 +309,16 @@ class Master(ParentAction):
                   f'", "resultType":"{result_type}", "resultId":"{result_id}"}}')
         extras += ', "saveOnDatabase":' + str(utils_giswater.isChecked(dialog, dialog.chk_save)).lower()
         body = self.create_body(extras=extras)
-        result = self.controller.get_json('gw_fct_plan_result', body, log_sql=True)
-        if not result: return False
+        json_result = self.controller.get_json('gw_fct_plan_result', body)
+        if not json_result:
+            return False
 
-        if result['status'] == "Accepted":
+        if json_result['status'] == "Accepted":
             self.add_layer.populate_info_text(dialog, result['body']['data'])
-        message = result['message']['text']
+        message = json_result['message']['text']
         if message is not None:
             self.controller.show_info_box(message)
+
         # Refresh canvas and close dialog
         self.iface.mapCanvas().refreshAllLayers()
 

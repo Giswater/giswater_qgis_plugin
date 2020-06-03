@@ -36,6 +36,7 @@ class ApiConfig(ApiParent):
         # Remove layers name from temp_table
         sql = "DELETE FROM temp_table WHERE fid = 163 AND cur_user = current_user;"
         self.controller.execute_sql(sql)
+
         # Set layers name in temp_table
         self.set_layers_name()
 
@@ -45,8 +46,9 @@ class ApiConfig(ApiParent):
 
         self.list_update = []
         body = self.create_body(form='"formName":"config"')
-        complet_list = self.controller.get_json('gw_fct_getconfig', body, log_sql=True)
-        if not complet_list: return False
+        json_result = self.controller.get_json('gw_fct_getconfig', body)
+        if not json_result:
+            return False
 
         self.dlg_config = ConfigUi()
         self.load_settings(self.dlg_config)
@@ -122,8 +124,8 @@ class ApiConfig(ApiParent):
         self.addfields_form = QGridLayout()
 
         # Construct form for config and admin
-        self.construct_form_param_user(complet_list['body']['form']['formTabs'], 0)
-        self.construct_form_param_system(complet_list['body']['form']['formTabs'], 1)
+        self.construct_form_param_user(json_result['body']['form']['formTabs'], 0)
+        self.construct_form_param_system(json_result['body']['form']['formTabs'], 1)
 
         groupBox_1.setLayout(self.basic_form)
         groupBox_2.setLayout(self.om_form)
@@ -192,7 +194,7 @@ class ApiConfig(ApiParent):
         addfields_layout1.addItem(verticalSpacer1)
 
         # Event on change from combo parent
-        self.get_event_combo_parent(complet_list['body']['form']['formTabs'])
+        self.get_event_combo_parent(json_result['body']['form']['formTabs'])
 
         # Set signals Combo parent/child
         chk_expl = self.dlg_config.tab_main.findChild(QWidget, 'chk_exploitation_vdefault')
@@ -534,8 +536,9 @@ class ApiConfig(ApiParent):
         my_json = json.dumps(self.list_update)
         extras = f'"fields":{my_json}'
         body = self.create_body(form='"formName":"config"', extras=extras)
-        result = self.controller.get_json('gw_fct_setconfig', body, log_sql=True)
-        if not result: return False
+        json_result = self.controller.get_json('gw_fct_setconfig', body, log_sql=True)
+        if not json_result:
+            return False
 
         message = "Values has been updated"
         self.controller.show_info(message)

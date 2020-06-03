@@ -63,11 +63,12 @@ class ApiCF(ApiParent, QObject):
         extras += f'"visibleLayers":{visible_layers}, '
         extras += f'"zoomScale":{scale_zoom} '
         body = self.create_body(extras=extras)
-        complet_list = self.controller.get_json('gw_fct_getlayersfromcoordinates', body, log_sql=True)
-        if not complet_list: return False
+        json_result = self.controller.get_json('gw_fct_getlayersfromcoordinates', body)
+        if not json_result:
+            return False
 
         # hide QMenu identify if no feature under mouse
-        len_layers = len(complet_list['body']['data']['layersNames'])
+        len_layers = len(json_result['body']['data']['layersNames'])
         if len_layers == 0: return False
 
         self.icon_folder = self.plugin_dir + '/icons/'
@@ -76,7 +77,7 @@ class ApiCF(ApiParent, QObject):
         main_menu = QMenu()
 
         # Create one menu for each layer
-        for layer in complet_list['body']['data']['layersNames']:
+        for layer in json_result['body']['data']['layersNames']:
             layer_name = self.controller.get_layer_by_tablename(layer['layerName'])
             icon = None
             icon_path = self.icon_folder + layer['icon'] + '.png'
@@ -95,10 +96,10 @@ class ApiCF(ApiParent, QObject):
         main_menu.addSeparator()
         # Identify all
         cont = 0
-        for layer in complet_list['body']['data']['layersNames']:
+        for layer in json_result['body']['data']['layersNames']:
             cont += len(layer['ids'])
         action = QAction(f'Identify all ({cont})', None)
-        action.hovered.connect(partial(self.identify_all, complet_list, rb_list))
+        action.hovered.connect(partial(self.identify_all, json_result, rb_list))
         main_menu.addAction(action)
         main_menu.addSeparator()
         main_menu.exec_(click_point)
@@ -250,14 +251,12 @@ class ApiCF(ApiParent, QObject):
         if function_name is None:
             return False, None
 
-        json_result = self.controller.get_json(function_name, body, log_sql=True)
+        json_result = self.controller.get_json(function_name, body)
         if json_result is None:
-            self.controller.log_warning(f"Function error: {function_name}")
             return False, None
 
         row = [json_result]
         if not row or row[0] is False:
-            self.controller.log_warning(f"Function error: {function_name}")
             return False, None
 
         # When something is wrong
@@ -941,14 +940,16 @@ class ApiCF(ApiParent, QObject):
         self.load_settings(dlg_sections)
         feature = '"id":"'+self.feature_id+'"'
         body = self.create_body(feature=feature)
-        section_result = self.controller.get_json('gw_fct_getinfocrossection', body)
-        if not section_result: return False
+        json_result = self.controller.get_json('gw_fct_getinfocrossection', body)
+        if not json_result:
+            return False
+
         # Set image
-        img = section_result['body']['data']['shapepng']
+        img = json_result['body']['data']['shapepng']
         utils_giswater.setImage(dlg_sections, 'lbl_section_image', img)
 
         # Set values into QLineEdits
-        for field in section_result['body']['data']['fields']:
+        for field in json_result['body']['data']['fields']:
             widget = dlg_sections.findChild(QLineEdit, field['columnname'])
             if widget:
                 if 'value' in field:
@@ -1025,18 +1026,18 @@ class ApiCF(ApiParent, QObject):
         feature += f'"tableName":"{p_table_id}"'
         extras = f'"fields":{my_json}, "reload":"{fields_reload}"'
         body = self.create_body(feature=feature, extras=extras)
-        result = self.controller.get_json('gw_fct_setfields', body, log_sql=True)
-        if not result:
+        json_result = self.controller.get_json('gw_fct_setfields', body)
+        if not json_result:
             return
 
         if clear_json:
             _json = {}
 
-        if "Accepted" in result['status']:
+        if "Accepted" in json_result['status']:
             msg = "OK"
             self.controller.show_message(msg, message_level=3)
-            self.reload_fields(dialog, result, p_widget)
-        elif "Failed" in result['status']:
+            self.reload_fields(dialog, json_result, p_widget)
+        elif "Failed" in json_result['status']:
             msg = "FAIL"
             self.controller.show_message(msg, message_level=2)
 
@@ -2445,7 +2446,6 @@ class ApiCF(ApiParent, QObject):
         function_name = 'gw_fct_getlist'
         json_result = self.controller.get_json(function_name, body)
         if json_result is None:
-            self.controller.log_warning(f"Function error: {function_name}")
             return False
         complet_list = [json_result]
         if not complet_list:
@@ -2534,13 +2534,15 @@ class ApiCF(ApiParent, QObject):
             feature += f'"idName":"{self.field_id}", '
             feature += f'"id":"{self.feature_id}"'
             body = self.create_body(form, feature, filter_fields='')
-            complet_list = self.controller.get_json('gw_fct_getinfoplan', body)
-            if not complet_list: return False
-            result = complet_list['body']['data']
+            json_result = self.controller.get_json('gw_fct_getinfoplan', body)
+            if not json_result:
+                return False
+
+            result = json_result['body']['data']
             if 'fields' not in result:
-                self.controller.show_message("No listValues for: " + complet_list['body']['data'], 2)
+                self.controller.show_message("No listValues for: " + json_result['body']['data'], 2)
             else:
-                for field in complet_list['body']['data']['fields']:
+                for field in json_result['body']['data']['fields']:
                     label = QLabel()
                     if field['widgettype'] == 'divider':
                         for x in range(0, 2):
@@ -2577,7 +2579,6 @@ class ApiCF(ApiParent, QObject):
         function_name = 'gw_fct_getcatalog'
         json_result = self.controller.get_json(function_name, body)
         if json_result is None:
-            self.controller.log_warning(f"Function error: {function_name}")
             return
         complet_list = [json_result]
         if not complet_list:

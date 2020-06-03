@@ -58,10 +58,11 @@ class Basic(ApiParent):
         if row and row[0].lower() == 'true':
             extras = f'"mapzones":""'
             body = self.create_body(extras=extras)
-            dbreturn = self.controller.get_json('gw_fct_getmapzonestyle', body, log_sql=True)
-            if not dbreturn: return False
+            json_return = self.controller.get_json('gw_fct_getmapzonestyle', body)
+            if not json_return:
+                return False
 
-            for mapzone in dbreturn['body']['data']['mapzones']:
+            for mapzone in json_return['body']['data']['mapzones']:
 
                 #loop for each mapzone returned on json
                 lyr = self.controller.get_layer_by_tablename(mapzone['layer'])

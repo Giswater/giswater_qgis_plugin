@@ -69,7 +69,6 @@ class ApiDimensioning(ApiParent):
         function_name = 'gw_fct_getdimensioning'
         json_result = self.controller.get_json(function_name, body)
         if json_result is None:
-            self.controller.log_warning(f"Function error: {function_name}")
             return False
         complet_result = [json_result]
         if not row:
@@ -132,7 +131,7 @@ class ApiDimensioning(ApiParent):
         fields += f'"the_geom":"{the_geom[0]}"'
         feature = '"tableName":"v_edit_dimensions"'
         body = self.create_body(feature=feature, filter_fields=fields)
-        self.controller.get_json('gw_fct_setdimensioning', body, log_sql=True)
+        self.controller.get_json('gw_fct_setdimensioning', body)
 
         # Close dialog
         self.close_dialog(self.dlg_dim)
