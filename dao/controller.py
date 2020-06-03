@@ -863,7 +863,8 @@ class DaoController(object):
 
         # Translate title of the form   
         text = self.tr('title', context_name)
-        dialog.setWindowTitle(text)
+        if text != 'title':
+            dialog.setWindowTitle(text)
             
             
     def translate_widget(self, context_name, widget):
