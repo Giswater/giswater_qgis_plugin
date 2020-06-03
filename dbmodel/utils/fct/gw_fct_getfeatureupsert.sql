@@ -40,6 +40,10 @@ SELECT SCHEMA_NAME.gw_fct_getfeatureupsert('ve_arc_pipe', '2001', null, 9, 100,'
 PERFORM gw_fct_debug(concat('{"data":{"msg":"----> INPUT FOR gw_fct_getfeatureupsert: ", "variables":"',v_debug,'"}}')::json);
 PERFORM gw_fct_debug(concat('{"data":{"msg":"<---- OUTPUT FOR gw_fct_getfeatureupsert: ", "variables":"',v_debug,'"}}')::json);
 UPDATE config_param_user SET value =  'true' WHERE parameter = 'utils_debug_mode' and cur_user = current_user;
+
+-- visit
+SELECT SCHEMA_NAME.gw_fct_getfeatureupsert('v_edit_om_visit', '39', null, 4, 1, 'SELECT', false, 'id', 'integer')
+
 */
 
 DECLARE
@@ -180,8 +184,11 @@ BEGIN
 	END IF;
 
 	EXECUTE v_active_feature INTO v_catfeature;
-    
-	IF v_catfeature.feature_type IS NOT NULL THEN
+
+	-- profilactic control when is not feature
+	IF v_catfeature.feature_type IS NULL THEN
+		v_catfeature.feature_type = p_table_id;
+	END IF;
 
 	--  Starting control process
 	----------------------------
@@ -372,6 +379,8 @@ BEGIN
 			v_node1 := (v_values_array->>'node_1');
 			v_node2 := (v_values_array->>'node_2');	
 	END IF;
+
+	RAISE NOTICE 'v_values_array %',v_values_array;
 	
 	-- building the form widgets
 	----------------------------
@@ -585,7 +594,7 @@ BEGIN
 					END CASE;
 				END IF;	
 				
-			ELSIF  p_tg_op ='UPDATE' THEN 
+			ELSIF  p_tg_op ='UPDATE' OR p_tg_op ='SELECT' THEN 
 				field_value := (v_values_array->>(aux_json->>'columnname'));
 			END IF;
 			
@@ -603,10 +612,11 @@ BEGIN
 			END IF;
 		END LOOP;  
 	END IF;
-    END IF;
 	
 	-- Convert to json
 	v_fields := array_to_json(v_fields_array);
+
+	raise notice 'v_fields %', v_fields;
 
 	-- Control NULL's
 	v_version := COALESCE(v_version, '[]');

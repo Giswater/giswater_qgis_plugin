@@ -6,42 +6,42 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2582
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_getinfofromid(p_data json);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getinfofromid(p_data json)
+DROP FUNCTION IF EXISTS ws_sample.gw_api_getinfofromid(p_data json);
+CREATE OR REPLACE FUNCTION ws_sample.gw_fct_getinfofromid(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE
 UPSERT FEATURE 
 arc no nodes extremals
-SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
+SELECT ws_sample.gw_fct_getinfofromid($${
 		"client":{"device":4, "infoType":1, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_arc_pipe", "inputGeometry":"0102000020E7640000020000000056560000A083198641000000669A33C041000000E829D880410000D0AE90F0F341" },
 		"data":{}}$$)
 arc with nodes extremals
-SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
+SELECT ws_sample.gw_fct_getinfofromid($${
 		"client":{"device":4, "infoType":1, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_arc_pipe", "inputGeometry":"0102000020E764000002000000998B3C512F881941B28315AA7F76514105968D7D748819419FDF72D781765141" },
 		"data":{}}$$)
 INFO BASIC
-SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
+SELECT ws_sample.gw_fct_getinfofromid($${
 		"client":{"device":4, "infoType":1, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_arc_pipe", "id":"2001"},
 		"data":{}}$$)
-SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
+SELECT ws_sample.gw_fct_getinfofromid($${
 		"client":{"device":4, "infoType":1, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_node_junction", "id":"1001"},
 		"data":{}}$$)
-SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
+SELECT ws_sample.gw_fct_getinfofromid($${
 		"client":{"device":4, "infoType":1, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_connec_wjoin", "id":"3001"},
 		"data":{}}$$)
-SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
+SELECT ws_sample.gw_fct_getinfofromid($${
 		"client":{"device":4, "infoType":1, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_element", "id":"125101"},
@@ -50,14 +50,14 @@ SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
 
 INFO EPA
 -- epa not defined
-SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
+SELECT ws_sample.gw_fct_getinfofromid($${
 		"client":{"device":4, "infoType":1, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_arc", "id":"2220"},
 		"data":{"toolBar":"epa"}}$$)
 
 -- epa defined
-SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
+SELECT ws_sample.gw_fct_getinfofromid($${
 		"client":{"device":4, "infoType":1, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_arc", "id":"2001"},
@@ -135,7 +135,7 @@ BEGIN
 	----------------------------
 	
 	-- Set search path to local schema
-	SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "ws_sample", public;
 	schemas_array := current_schemas(FALSE);
 
 	-- fet input parameters
@@ -497,7 +497,7 @@ BEGIN
 		-------------------
 		IF v_editable THEN
 
-			RAISE NOTICE 'User has permissions to edit table and table % using id %', v_tablename, v_id;
+			RAISE NOTICE 'User has permissions to edit table % using id %', v_tablename, v_id;
 			-- call edit form function
 			EXECUTE 'SELECT gw_fct_getfeatureupsert($1, $2, $3, $4, $5, $6, $7, $8, $9)'
 			INTO v_fields
@@ -511,7 +511,7 @@ BEGIN
 						
 		ELSIF v_editable = FALSE OR v_id IS NULL THEN 
 		
-			RAISE NOTICE 'User has NOT permissions to edit table';
+			RAISE NOTICE 'User has NOT permissions to edit table % using id %', v_tablename, v_id;
 			-- call info form function
 			EXECUTE 'SELECT gw_fct_getfeatureinfo($1, $2, $3, $4, $5, $6, $7, $8)'
 			INTO v_fields
