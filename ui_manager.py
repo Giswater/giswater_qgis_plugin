@@ -430,8 +430,8 @@ class Multirow_selector(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('new_workcat.ui')
-class NewWorkcat(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('info_workcat.ui')
+class InfoWorkcatUi(GwDialog, FORM_CLASS):
     pass
 
 

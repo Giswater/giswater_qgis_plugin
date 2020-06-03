@@ -15,7 +15,7 @@ from datetime import datetime
 
 from .. import utils_giswater
 from .parent_manage import ParentManage
-from ..ui_manager import WorkcatEnd, NewWorkcat
+from ..ui_manager import WorkcatEnd, InfoWorkcatUi
 from ..ui_manager import WorkcatEndList
 
 
@@ -481,7 +481,7 @@ class ManageWorkcatEnd(ParentManage):
 
     def new_workcat(self):
 
-        self.dlg_new_workcat = NewWorkcat()
+        self.dlg_new_workcat = InfoWorkcatUi()
         self.load_settings(self.dlg_new_workcat)
 
         utils_giswater.setCalendarDate(self.dlg_new_workcat, self.dlg_new_workcat.builtdate, None, True)
@@ -493,7 +493,7 @@ class ManageWorkcatEnd(ParentManage):
         self.dlg_new_workcat.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_new_workcat))
 
         # Open dialog
-        self.open_dialog(self.dlg_new_workcat)
+        self.open_dialog(self.dlg_new_workcat, dlg_name='info_workcat')
 
 
     def manage_new_workcat_accept(self, table_object):

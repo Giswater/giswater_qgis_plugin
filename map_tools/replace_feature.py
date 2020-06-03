@@ -16,7 +16,7 @@ from datetime import datetime
 from .. import utils_giswater
 from .parent import ParentMapTool
 from ..ui_manager import FeatureReplace
-from ..ui_manager import NewWorkcat
+from ..ui_manager import InfoWorkcatUi
 from ..actions.api_catalog import ApiCatalog
 
 
@@ -161,7 +161,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
 
     def new_workcat(self):
 
-        self.dlg_new_workcat = NewWorkcat()
+        self.dlg_new_workcat = InfoWorkcatUi()
         self.load_settings(self.dlg_new_workcat)
         utils_giswater.setCalendarDate(self.dlg_new_workcat, self.dlg_new_workcat.builtdate, None, True)
 
@@ -173,7 +173,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
         self.dlg_new_workcat.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_new_workcat))
 
         # Open dialog
-        self.open_dialog(self.dlg_new_workcat)
+        self.open_dialog(self.dlg_new_workcat, dlg_name='info_workcat')
 
 
     def manage_new_workcat_accept(self, table_object):
