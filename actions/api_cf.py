@@ -306,10 +306,33 @@ class ApiCF(ApiParent, QObject):
             if feature_cat is not None:
                 self.manage_new_feature(self.complet_result, dialog)
             return result, dialog
-
+        elif template in 'template_visit_event':
+            visit_id = self.complet_result[0]['body']['feature']['id']
+            layers_visibility = self.get_layers_visibility()
+            manage_visit = ManageVisit(self.iface, self.settings, self.controller, self.plugin_dir)
+            manage_visit.manage_visit(visit_id=visit_id, tag='info')
+            manage_visit.dlg_add_visit.rejected.connect(partial(self.restore_layers_visibility, layers_visibility))
         else:
             self.controller.log_warning(f"template not managed: {template}")
             return False, None
+
+
+    def get_layers_visibility(self):
+
+        layers = self.controller.get_layers()
+        layers_visibility = {}
+        for layer in layers:
+
+            layers_visibility[layer] = self.controller.is_layer_visible(layer)
+        return layers_visibility
+
+
+    def restore_layers_visibility(self, layers):
+
+        for layer, visibility in layers.items():
+            if layer:
+                print(layer.name())
+            self.controller.set_layer_visible(layer, visibility)
 
 
     def manage_new_feature(self, complet_result, dialog):
