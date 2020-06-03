@@ -417,9 +417,6 @@ class Master(ParentAction):
         self.dlg_merm = EstimateResultManager()
         self.load_settings(self.dlg_merm)
 
-        #TODO activar este boton cuando sea necesario
-        self.dlg_merm.btn_delete.setVisible(False)
-
         # Tables
         tablename = 'plan_result_cat'
         self.tbl_om_result_cat = self.dlg_merm.findChild(QTableView, "tbl_om_result_cat")
@@ -434,7 +431,7 @@ class Master(ParentAction):
 
         set_edit_strategy = QSqlTableModel.OnManualSubmit
         self.fill_table(self.tbl_om_result_cat, tablename, set_edit_strategy)
-        #self.set_table_columns(self.tbl_om_result_cat, tablename)
+        self.set_table_columns(self.tbl_om_result_cat, self.dlg_merm.tbl_om_result_cat, tablename)
 
         # Open form
         self.dlg_merm.setWindowFlags(Qt.WindowStaysOnTopHint)
