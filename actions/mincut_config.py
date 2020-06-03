@@ -20,7 +20,7 @@ from functools import partial
 from .. import utils_giswater
 from .api_parent import ApiParent
 from .parent import ParentAction
-from ..ui_manager import SelectorUi, Mincut_edit
+from ..ui_manager import SelectorUi, MincutManagerUi
 
 
 class MincutConfig(ParentAction):
@@ -43,7 +43,7 @@ class MincutConfig(ParentAction):
         self.action = "mg_mincut_management"
 
         # Create the dialog and signals
-        self.dlg_min_edit = Mincut_edit()
+        self.dlg_min_edit = MincutManagerUi()
         self.load_settings(self.dlg_min_edit)
         self.set_dates_from_to(self.dlg_min_edit.date_from, self.dlg_min_edit.date_to, 'om_mincut',
             'forecast_start, exec_start', 'forecast_end, exec_end')
@@ -106,7 +106,7 @@ class MincutConfig(ParentAction):
         #self.mincut.set_table_columns(self.tbl_mincut_edit, "v_ui_mincut")
 
         # Open the dialog
-        self.open_dialog(self.dlg_min_edit)
+        self.open_dialog(self.dlg_min_edit, dlg_name='mincut_manager')
 
 
     def get_clients_codes(self, qtable):

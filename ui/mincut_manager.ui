@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>mincut_edit</class>
- <widget class="QDialog" name="mincut_edit">
+ <class>dlg_mincut_manager</class>
+ <widget class="QDialog" name="dlg_mincut_manager">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -106,7 +106,7 @@
       <item row="1" column="4">
        <widget class="QLabel" name="lbl_date_to">
         <property name="text">
-         <string>Date to:</string>
+         <string>To:</string>
         </property>
        </widget>
       </item>
@@ -131,7 +131,7 @@
        </spacer>
       </item>
       <item row="1" column="2">
-       <widget class="QLabel" name="label_2">
+       <widget class="QLabel" name="lbl_state">
         <property name="text">
          <string>State:</string>
         </property>
@@ -140,7 +140,7 @@
       <item row="1" column="3">
        <widget class="QLabel" name="lbl_date_from">
         <property name="text">
-         <string>Date from:</string>
+         <string>From:</string>
         </property>
        </widget>
       </item>
@@ -162,7 +162,7 @@
        </widget>
       </item>
       <item row="1" column="0">
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="lbl_filter">
         <property name="text">
          <string>Filter by: id OR work_order</string>
         </property>

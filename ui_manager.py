@@ -415,8 +415,8 @@ class MincutComposer(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('mincut_edit.ui')
-class Mincut_edit(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('mincut_manager.ui')
+class MincutManagerUi(GwDialog, FORM_CLASS):
     pass
 
 
