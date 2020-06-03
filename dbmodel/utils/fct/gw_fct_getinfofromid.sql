@@ -452,7 +452,7 @@ BEGIN
 		END IF;
 	
 		-- Feature info
-		v_featureinfo := json_build_object('permissions',v_permissions,'tableName',v_tablename,'idName',v_idname,'id',null,
+		v_featureinfo := json_build_object('permissions',v_permissions,'tableName',v_tablename,'idName',v_idname,'id',v_id,
 			'featureType',v_featuretype, 'childType', v_childtype, 'tableParent',v_table_parent,
 			'geometry', v_geometry, 'zoomCanvasMargin',concat('{"mts":"',v_canvasmargin,'"}')::json, 'vdefaultValues',v_vdefault_array);
      
@@ -496,7 +496,8 @@ BEGIN
 		-- call fields function
 		-------------------
 		IF v_editable THEN
-			RAISE NOTICE 'User has permissions to edit table and table';
+
+			RAISE NOTICE 'User has permissions to edit table and table % using id %', v_tablename, v_id;
 			-- call edit form function
 			EXECUTE 'SELECT gw_fct_getfeatureupsert($1, $2, $3, $4, $5, $6, $7, $8, $9)'
 			INTO v_fields
