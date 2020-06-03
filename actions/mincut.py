@@ -125,18 +125,10 @@ class MincutParent(ParentAction):
         
         utils_giswater.double_validator(self.distance, 0, 9999999, 3)
         utils_giswater.double_validator(self.depth, 0, 9999999, 3)
-
         utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.txt_exec_user, self.controller.get_project_user())
 
         # Manage address
         self.adress_init_config(self.dlg_mincut)
-
-        # Set signals
-        self.dlg_mincut.btn_accept.clicked.connect(self.accept_save_data)        
-        self.dlg_mincut.btn_cancel.clicked.connect(self.mincut_close)
-        self.dlg_mincut.dlg_closed.connect(self.mincut_close)
-        self.dlg_mincut.btn_start.clicked.connect(self.real_start)
-        self.dlg_mincut.btn_end.clicked.connect(self.real_end)
 
         # Fill ComboBox type
         sql = ("SELECT id, descript "
@@ -187,7 +179,6 @@ class MincutParent(ParentAction):
 
         action = self.dlg_mincut.findChild(QAction, "actionShowNotified")
         action.triggered.connect(self.show_notified_list)
-        # self.set_icon(action, "308")
         self.show_notified = action
 
         try:
@@ -210,6 +201,21 @@ class MincutParent(ParentAction):
         self.sql_connec = ""
         self.sql_hydro = ""
 
+        self.refresh_tab_hydro()
+
+
+    def set_signals(self, docker=None):
+
+        if docker:
+            self.dlg_mincut.btn_cancel.clicked.connect(partial(self.close_docker, docker, self.dlg_mincut))
+
+        self.dlg_mincut.btn_accept.clicked.connect(self.accept_save_data)
+        self.dlg_mincut.btn_cancel.clicked.connect(self.mincut_close)
+        self.dlg_mincut.dlg_closed.connect(self.mincut_close)
+
+        self.dlg_mincut.btn_start.clicked.connect(self.real_start)
+        self.dlg_mincut.btn_end.clicked.connect(self.real_end)
+
         self.dlg_mincut.cbx_date_start_predict.dateChanged.connect(partial(
             self.check_dates_coherence, self.dlg_mincut.cbx_date_start_predict, self.dlg_mincut.cbx_date_end_predict,
         self.dlg_mincut.cbx_hours_start_predict, self.dlg_mincut.cbx_hours_end_predict))
@@ -223,10 +229,6 @@ class MincutParent(ParentAction):
         self.dlg_mincut.cbx_date_end.dateChanged.connect(partial(
             self.check_dates_coherence, self.dlg_mincut.cbx_date_start, self.dlg_mincut.cbx_date_end,
             self.dlg_mincut.cbx_hours_start, self.dlg_mincut.cbx_hours_end))
-
-        self.refresh_tab_hydro()
-
-        self.open_dialog(self.dlg_mincut, dlg_name='mincut')
 
 
     def refresh_tab_hydro(self):
@@ -310,7 +312,19 @@ class MincutParent(ParentAction):
         # Enable/Disable widget depending state
         self.enable_widgets('0')
 
-        self.open_dialog(self.dlg_mincut)
+        # Show form in docker?
+        self.manage_docker()
+
+
+    def manage_docker(self):
+
+        docker = self.init_docker('qgis_form_docker')
+        if docker:
+            self.dock_dialog(docker, self.dlg_mincut)
+        else:
+            self.open_dialog(self.dlg_mincut, dlg_name='mincut')
+
+        self.set_signals(docker)
 
 
     def mincut_close(self):
@@ -318,6 +332,7 @@ class MincutParent(ParentAction):
         self.restore_user_layer()
         self.remove_selection()
         self.resetRubberbands()
+
         # If client don't touch nothing just rejected dialog or press cancel
         if not self.dlg_mincut.closeMainWin and self.dlg_mincut.mincutCanceled:
             self.close_dialog(self.dlg_mincut)
