@@ -1691,9 +1691,10 @@ class ApiParent(ParentAction):
 
         return {"path": dxf_path, "result":result, "temp_layers_added":temp_layers_added}
 
-    def manageAll(self, dialog):
-        status = utils_giswater.isChecked(dialog, "chk_all")
-        widget_list = dialog.main_tab.widget(0).findChildren(QCheckBox)
+    def manageAll(self, dialog, widget):
+        status = utils_giswater.isChecked(dialog, widget)
+        index = dialog.main_tab.currentIndex()
+        widget_list = dialog.main_tab.widget(index).findChildren(QCheckBox)
         if status is True:
             for widget in widget_list:
                 utils_giswater.setChecked(dialog, widget, True)
@@ -1703,7 +1704,7 @@ class ApiParent(ParentAction):
                 utils_giswater.setChecked(dialog, widget, False)
 
 
-    def get_selector(self, dialog, selector_type, filter=False):
+    def get_selector(self, dialog, selector_type, filter=False, widget=None, type=None):
         """ Ask to DB for selectors and make dialog
         :param dialog: Is a standard dialog, from file api_selectors.ui, where put widgets
         :param selector_type: list of selectors to ask DB ['exploitation', 'state', ...]
@@ -1715,47 +1716,21 @@ class ApiParent(ParentAction):
         if filter is not False:
 
             main_tab = dialog.findChild(QTabWidget, 'main_tab')
-            filter = utils_giswater.getWidgetText(dialog, dialog.txt_filter)
+            filter = utils_giswater.getWidgetText(dialog, widget)
             if filter in ('null', None):
                 filter = ''
-            selector_type = selector_type.replace('"filter":""', '"filter":"' + filter + '"')
+            aux_selector_type = json.loads(selector_type)
+            aux_selector_type[type]['filter'] = filter
+            aux_selector_type = json.dumps(aux_selector_type)
 
-        extras = f'"selector_type":{selector_type}'
+        else:
+            aux_selector_type = selector_type
+        extras = f'"selector_type":{aux_selector_type}'
         body = self.create_body(extras=extras)
         complet_result = self.controller.get_json('gw_fct_getselectors', body, log_sql=True)
         if not complet_result: return False
 
-        if complet_result['body']['form']['formFilter'] is not True:
-            dialog.txt_filter.setVisible(False)
-            dialog.lbl_filter.setVisible(False)
-        if complet_result['body']['form']['formCheckAll'] is not True:
-            dialog.chk_all.setVisible(False)
-
         for form_tab in complet_result['body']['form']['formTabs']:
-
-            #TODO:: QGIS Crash when use typeahead filter
-            # if form_tab['typeaheadFilter']:
-            #     completer = QCompleter()
-            #     filter_widget = utils_giswater.getWidget(dialog, 'txt_filter')
-            #     model = QStringListModel()
-            #     if filter_widget:
-            #         parent_id = ""
-            #         query_aux = json.loads(form_tab['typeaheadFilter'], object_pairs_hook=OrderedDict)
-            #         query = query_aux['queryText']
-            #         extras = f'"queryText":"{query}"'
-            #         extras += f', "queryTextFilter":""'
-            #         extras += f', "parentId":"{parent_id}"'
-            #         extras += f', "parentValue":""'
-            #         extras += f', "textToSearch":"{filter}"'
-            #         body = self.create_body(extras=extras)
-            #         complet_list = self.controller.get_json('gw_fct_gettypeahead', body)
-            #         if not complet_list: return False
-            #
-            #         list_items = []
-            #         self.controller.log_info(str(complet_list['body']['data']))
-            #         for field in complet_list['body']['data']:
-            #             list_items.append(field['idval'])
-            #         self.set_completer_object_api(completer, model, filter_widget, list_items)
 
             # Create one tab for each form_tab and add to QTabWidget
             tab_widget = QWidget(main_tab)
@@ -1765,6 +1740,42 @@ class ApiParent(ParentAction):
             gridlayout = QGridLayout()
             gridlayout.setObjectName("grl_" + form_tab['tabName'])
             tab_widget.setLayout(gridlayout)
+            field = {}
+            i = 0
+
+            if 'typeaheadFilter' in form_tab:
+                label = QLabel()
+                label.setObjectName('lbl_filter')
+                label.setText('Filter:')
+                widget = QLineEdit()
+                widget.setObjectName('txt_filter_' + str(form_tab['selectorType']))
+                if filter is not False:
+                    utils_giswater.setWidgetText(dialog,widget,filter)
+
+                widget.textChanged.connect(partial(self.get_selector, self.dlg_selector, selector_type, filter=True,
+                                                   widget=widget, type=form_tab['selectorType']))
+                widget.setLayoutDirection(Qt.RightToLeft)
+                field['layoutname'] = gridlayout.objectName()
+                field['layoutorder'] = i
+                i = i + 1
+                self.txt_filter = widget
+                self.put_widgets(dialog, field, label, widget)
+                widget.setFocus()
+
+            if form_tab['manageAll']:
+                label = QLabel()
+                label.setObjectName('lbl_manage_all')
+                label.setText('Check all')
+                widget = QCheckBox()
+                widget.setObjectName('chk_all_' + str(form_tab['selectorType']))
+                widget.stateChanged.connect(partial(self.manageAll, dialog, widget))
+                widget.setLayoutDirection(Qt.RightToLeft)
+                field['layoutname'] = gridlayout.objectName()
+                field['layoutorder'] = i
+                i = i + 1
+                self.chk_all = widget
+                self.put_widgets(dialog, field, label, widget)
+
             for order, field in enumerate(form_tab['fields']):
                 label = QLabel()
                 label.setObjectName('lbl_' + field['label'])
@@ -1775,7 +1786,7 @@ class ApiParent(ParentAction):
                     field['columnname'], form_tab['selectorType']))
                 widget.setLayoutDirection(Qt.RightToLeft)
                 field['layoutname'] = gridlayout.objectName()
-                field['layoutorder'] = order
+                field['layoutorder'] = order + i
                 self.put_widgets(dialog, field, label, widget)
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
             gridlayout.addItem(vertical_spacer1)
