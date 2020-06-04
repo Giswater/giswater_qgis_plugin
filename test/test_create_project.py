@@ -1,9 +1,15 @@
+"""
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
+"""
+# -*- coding: utf-8 -*-
 from qgis.core import QgsApplication, QgsProviderRegistry
 from qgis.PyQt.QtWidgets import QDialog
+
 from test_giswater import TestGiswater
 from actions.create_gis_project import CreateGisProject
-#from actions.check_project_result import CheckProjectResult
-#from ui_manager import MainGisProjectUi, ApiEpaOptions
 
 
 # dummy instance to replace qgis.utils.iface
@@ -11,13 +17,14 @@ class QgisInterfaceDummy(object):
 
     def __getattr__(self, name):
         # return an function that accepts any arguments and does nothing
+        # noinspection PyUnusedLocal
         def dummy(*args, **kwargs):
             return None
 
         return dummy
 
 
-class TestQgis():
+class TestQgis:
 
     def __init__(self):
 
@@ -158,39 +165,13 @@ class TestQgis():
             return False
 
         self.test_giswater.controller.set_search_path(project_name)
-
         self.test_giswater.manage_visit.manage_visit(open_dialog=False)
-
         dlg = self.test_giswater.manage_visit.dlg_add_visit
-        print(type(dlg))
         res = dlg.exec()
         if res == QDialog.Accepted:
             print('Accepted')
-        else:
-            print('Rejected')
 
         return
-
-
-    def check_project_result(self, project_type='ws'):
-
-        print("\nStart check_project_result")
-
-        # Load main plugin class
-        if not self.load_plugin():
-            return False
-
-        # Connect to a database providing a service_name set in .pg_service.conf
-        if not self.connect_to_database(self.service_name):
-            return False
-
-        #cpr = CheckProjectResult(self.iface, self.test_giswater.settings, self.test_giswater.controller,
-        #    self.test_giswater.plugin_dir)
-        #layers = self.test_giswater.controller.get_layers()
-
-        print("Finish check_project_result")
-
-        return True
 
 
 def test_create_project():
