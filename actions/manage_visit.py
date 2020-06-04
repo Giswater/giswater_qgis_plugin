@@ -23,7 +23,7 @@ from ..dao.om_visit_x_connec import OmVisitXConnec
 from ..dao.om_visit_x_node import OmVisitXNode
 from ..dao.om_visit_x_gully import OmVisitXGully
 from ..dao.om_visit_parameter import OmVisitParameter
-from ..ui_manager import VisitUi, NewVisitUi
+from ..ui_manager import VisitUi
 from ..ui_manager import EventStandard
 from ..ui_manager import VisitEvent
 from ..ui_manager import VisitEventRehab
