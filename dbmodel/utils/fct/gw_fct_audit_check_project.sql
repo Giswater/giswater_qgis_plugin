@@ -207,11 +207,6 @@ BEGIN
 		END IF;
 	END LOOP;
 
-	-- set all exploitations when v_qgis_init_guide_map is true
-	IF v_qgis_init_guide_map THEN
-		INSERT INTO selector_expl (expl_id, cur_user) SELECT expl_id, current_user FROM exploitation
-		ON CONFLICT (expl_id, cur_user) DO NOTHING;
-	END IF;
 
 	-- arrange vnode
 	UPDATE vnode set state=0 FROM link WHERE link.exit_type ='VNODE' and exit_id = vnode_id::text AND link.state=0;
