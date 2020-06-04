@@ -47,6 +47,7 @@ from .map_tools.move_node import MoveNodeMapTool
 from .map_tools.replace_feature import ReplaceFeatureMapTool
 from .models.plugin_toolbar import PluginToolbar
 from .models.sys_feature_cat import SysFeatureCat
+from .ui_manager import DialogTextUi
 
 
 class Giswater(QObject):
@@ -821,6 +822,31 @@ class Giswater(QObject):
 
         return True
 
+    def check_layers_from_distinct_schema(self):
+        layers = self.controller.get_layers()
+        repeated_layers = {}
+        for layer in layers:
+            layer_toc_name = self.controller.get_layer_source_table_name(layer)
+            if layer_toc_name == 'v_edit_node':
+                layer_source = self.controller.get_layer_source(layer)
+                repeated_layers[layer_source['schema'].replace('"', '')] = 'v_edit_node'
+        if len(repeated_layers) > 1:
+            main_schema = self.controller.get_config('gwMainSchema')
+            add_schema = self.controller.get_config('gwAddSchema')
+            if main_schema is None or add_schema is None:
+                self.dlg_dtext = DialogTextUi()
+                self.dlg_dtext.btn_accept.hide()
+                self.dlg_dtext.btn_close.clicked.connect(lambda: self.dlg_dtext.close())
+                msg = "QGIS project has more than one layer v_edit_node comming from differents schemas. " \
+                      "If you are looking for manage two schemas, it is mandatory to define wich is the master and " \
+                      "wich is the other one. To do this yo need to configure the  QGIS project setting this project " \
+                      "variables: gwMainSchema and gwAddSchema."
+
+                self.dlg_dtext.txt_infolog.setText(msg)
+                self.dlg_dtext.open()
+                return False
+        return True
+
 
     def manage_controller(self, show_warning, force_commit=False):
         """ Set new database connection. If force_commit=True then force commit before opening project """
@@ -898,6 +924,10 @@ class Giswater(QObject):
         # Get SRID from table node
         self.srid = self.controller.get_srid('v_edit_node', self.schema_name)
         self.controller.plugin_settings_set_value("srid", self.srid)
+
+        # Check that there are no layers (v_edit_node) with the same view name, coming from different schemes
+        status = self.check_layers_from_distinct_schema()
+        if status is False: return
 
         self.parent = ParentAction(self.iface, self.settings, self.controller, self.plugin_dir)
         self.add_layer = AddLayer(self.iface, self.settings, self.controller, self.plugin_dir)
