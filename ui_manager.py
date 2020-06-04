@@ -540,8 +540,8 @@ class SelectorDate(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('user_management.ui')
-class UserManagement(GwMainWindow, FORM_CLASS):
+FORM_CLASS = get_ui_class('lot_usermanager.ui')
+class LotUserManager(GwMainWindow, FORM_CLASS):
     pass
 
 

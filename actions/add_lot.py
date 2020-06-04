@@ -28,7 +28,7 @@ from ..ui_manager import LotUi
 from ..ui_manager import BasicTable
 from ..ui_manager import LotManagement
 from ..ui_manager import Multirow_selector
-from ..ui_manager import UserManagement
+from ..ui_manager import LotUserManager
 
 
 class AddNewLot(ParentManage):
@@ -1439,7 +1439,7 @@ class AddNewLot(ParentManage):
 
     def open_user_manage(self):
 
-        self.dlg_user_manage = UserManagement()
+        self.dlg_user_manage = LotUserManager()
         self.load_settings(self.dlg_user_manage)
 
         table_object = 'om_visit_lot_x_user'
@@ -1486,7 +1486,7 @@ class AddNewLot(ParentManage):
         self.dlg_user_manage.btn_export_user.clicked.connect(partial(self.export_model_to_csv, self.dlg_user_manage, self.dlg_user_manage.tbl_user, result_relation, 'yyyy-MM-dd hh:mm:ss'))
 
         # Open form
-        self.open_dialog(self.dlg_user_manage)
+        self.open_dialog(self.dlg_user_manage, dlg_name='lot_usermanager')
 
 
     def manage_accept(self, widget):

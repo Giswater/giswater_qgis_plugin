@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>user_manager</class>
- <widget class="QMainWindow" name="user_manager">
+ <class>dlg_lot_usermanager</class>
+ <widget class="QMainWindow" name="dlg_lot_usermanager">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>User Management</string>
+   <string>User management</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_4">
@@ -57,7 +57,7 @@
       <item>
        <widget class="QPushButton" name="btn_export_user">
         <property name="text">
-         <string>Exportar a csv</string>
+         <string>Export to csv</string>
         </property>
        </widget>
       </item>
@@ -89,7 +89,7 @@
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_9">
         <item>
-         <widget class="QLabel" name="label_data_event_from">
+         <widget class="QLabel" name="lbl_data_event_from">
           <property name="text">
            <string>From:</string>
           </property>
@@ -107,7 +107,7 @@
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_10">
         <item>
-         <widget class="QLabel" name="label_data_event_to">
+         <widget class="QLabel" name="lbl_data_event_to">
           <property name="text">
            <string>To:</string>
           </property>
@@ -115,15 +115,15 @@
         </item>
         <item>
          <widget class="QDateEdit" name="date_event_to">
+          <property name="calendarPopup">
+           <bool>true</bool>
+          </property>
           <property name="date">
            <date>
             <year>3000</year>
             <month>1</month>
             <day>1</day>
            </date>
-          </property>
-          <property name="calendarPopup">
-           <bool>true</bool>
           </property>
          </widget>
         </item>
