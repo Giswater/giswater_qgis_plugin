@@ -710,7 +710,7 @@ class ParentManage(ParentAction, object):
         # Update model of the widget with selected expr_filter
         if query:
             self.delete_feature_at_plan(dialog, self.geom_type, list_id)
-            self.reload_qtable(dialog, self.geom_type, self.plan_om)
+            self.reload_qtable(dialog, self.geom_type)
         else:
             self.reload_table(dialog, table_object, self.geom_type, expr_filter)
             self.apply_lazy_init(table_object)
@@ -822,7 +822,7 @@ class ParentManage(ParentAction, object):
             self.insert_feature_to_plan(dialog, geom_type)
             if self.plan_om == 'plan':
                 self.remove_selection()
-            self.reload_qtable(dialog, geom_type, self.plan_om)
+            self.reload_qtable(dialog, geom_type)
         else:
             self.controller.log_info("selection_changed: reload_table")
             self.reload_table(dialog, table_object, geom_type, expr_filter)
@@ -839,7 +839,7 @@ class ParentManage(ParentAction, object):
         """ Delete features_id to table plan_@geom_type_x_psector"""
 
         value = utils_giswater.getWidgetText(dialog, dialog.psector_id)
-        sql = (f"DELETE FROM {self.plan_om}_psector_x_{geom_type} "
+        sql = (f"DELETE FROM plan_psector_x_{geom_type} "
                f"WHERE {geom_type}_id IN ({list_id}) AND psector_id = '{value}'")
         self.controller.execute_sql(sql)
 
@@ -941,24 +941,24 @@ class ParentManage(ParentAction, object):
         value = utils_giswater.getWidgetText(dialog, dialog.psector_id)
         for i in range(len(self.ids)):
             sql = (f"SELECT {geom_type}_id "
-                   f"FROM {self.plan_om}_psector_x_{geom_type} "
+                   f"FROM plan_psector_x_{geom_type} "
                    f"WHERE {geom_type}_id = '{self.ids[i]}' AND psector_id = '{value}'")
             row = self.controller.get_row(sql)
             if not row:
-                sql = (f"INSERT INTO {self.plan_om}_psector_x_{geom_type}"
+                sql = (f"INSERT INTO plan_psector_x_{geom_type}"
                        f"({geom_type}_id, psector_id) VALUES('{self.ids[i]}', '{value}')")
                 self.controller.execute_sql(sql)
-            self.reload_qtable(dialog, geom_type, self.plan_om)
+            self.reload_qtable(dialog, geom_type)
 
 
-    def reload_qtable(self, dialog, geom_type, plan_om):
+    def reload_qtable(self, dialog, geom_type):
         """ Reload QtableView """
         
         value = utils_giswater.getWidgetText(dialog, dialog.psector_id)
         expr = f"psector_id = '{value}'"
         qtable = utils_giswater.getWidget(dialog, f'tbl_psector_x_{geom_type}')
-        self.fill_table_by_expr(qtable, f"{plan_om}_psector_x_{geom_type}", expr)
-        self.set_table_columns(dialog, qtable, f"{plan_om}_psector_x_{geom_type}")
+        self.fill_table_by_expr(qtable, f"plan_psector_x_{geom_type}", expr)
+        self.set_table_columns(dialog, qtable, f"plan_psector_x_{geom_type}")
         self.refresh_map_canvas()
 
 
