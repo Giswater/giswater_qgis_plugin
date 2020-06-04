@@ -831,9 +831,7 @@ class Giswater(QObject):
                 layer_source = self.controller.get_layer_source(layer)
                 repeated_layers[layer_source['schema'].replace('"', '')] = 'v_edit_node'
         if len(repeated_layers) > 1:
-            main_schema = self.controller.get_config('gwMainSchema')
-            add_schema = self.controller.get_config('gwAddSchema')
-            if main_schema is None or add_schema is None:
+            if self.qgis_project_main_schema is None or self.qgis_project_add_schema is None:
                 self.dlg_dtext = DialogTextUi()
                 self.dlg_dtext.btn_accept.hide()
                 self.dlg_dtext.btn_close.clicked.connect(lambda: self.dlg_dtext.close())
@@ -1488,12 +1486,12 @@ class Giswater(QObject):
 
         self.qgis_project_infotype = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('gwInfoType')
         self.qgis_project_add_schema = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('gwAddSchema')
-        self.qgis_project_type = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('gwProjectType')
+        self.qgis_project_main_schema = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('gwMainSchema')
         self.qgis_project_role = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('gwProjectRole')
-        self.controller.plugin_settings_set_value("infoType", self.qgis_project_infotype)
-        self.controller.plugin_settings_set_value("addSchema", self.qgis_project_add_schema)
-        self.controller.plugin_settings_set_value("projecType", self.qgis_project_type)
-        self.controller.plugin_settings_set_value("projectRole", self.qgis_project_role)
+        self.controller.plugin_settings_set_value("gwInfoType", self.qgis_project_infotype)
+        self.controller.plugin_settings_set_value("gwAddSchema", self.qgis_project_add_schema)
+        self.controller.plugin_settings_set_value("gwMainSchema", self.qgis_project_main_schema)
+        self.controller.plugin_settings_set_value("gwProjectRole", self.qgis_project_role)
 
 
     def manage_guided_map(self):
