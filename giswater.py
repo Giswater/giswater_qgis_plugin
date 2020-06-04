@@ -1055,8 +1055,6 @@ class Giswater(QObject):
             status, result = self.populate_audit_check_project(layers)
             try:
                 guided_map = result['body']['actions']['useGuideMap']
-                # TODO delete next line after test (guided_map = True)
-                guided_map = True
                 if guided_map:
                     self.controller.log_info("manage_guided_map")
                     self.manage_guided_map()
