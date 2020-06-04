@@ -1055,11 +1055,13 @@ class Giswater(QObject):
             status, result = self.populate_audit_check_project(layers)
             try:
                 guided_map = result['body']['actions']['useGuideMap']
+                # TODO delete next line after test (guided_map = True)
+                guided_map = True
                 if guided_map:
                     self.controller.log_info("manage_guided_map")
                     self.manage_guided_map()
             except Exception as e:
-                self.controller.log_info(str(e))
+                self.controller.log_info(f"EXCEPTION: {type(e).__name__} --> {e}")
             finally:
                 QApplication.restoreOverrideCursor()
                 return status
@@ -1276,7 +1278,7 @@ class Giswater(QObject):
     def manage_guided_map(self):
         """ Guide map works using v_edit_exploitation """
 
-        self.layer_expl = self.controller.get_layer_by_tablename('v_edit_exploitation')
+        self.layer_expl = self.controller.get_layer_by_tablename('ext_municipality')
         if self.layer_expl is None:
             return
 
@@ -1293,15 +1295,15 @@ class Giswater(QObject):
 
         features = self.layer_expl.getSelectedFeatures()
         for feature in features:
-            expl_id = feature["expl_id"]
-            self.controller.log_info(f"Selected expl_id: {expl_id}")
+            muni_id = feature["muni_id"]
+            self.controller.log_info(f"Selected muni_id: {muni_id}")
             break
 
         self.iface.mapCanvas().selectionChanged.disconnect()
         self.iface.actionZoomToSelected().trigger()
         self.layer_expl.removeSelection()
 
-        extras = f'"selector_type":"exploitation", "check":true, "mode":"expl_from_muni", "id":{expl_id}'
+        extras = f'"selector_type":"exploitation", "check":true, "mode":"expl_from_muni", "id":{muni_id}'
         body = self.create_body(extras=extras)
         sql = f"SELECT gw_fct_setselectors($${{{body}}}$$)::text"
         row = self.controller.get_row(sql, commit=True, log_sql=True)
