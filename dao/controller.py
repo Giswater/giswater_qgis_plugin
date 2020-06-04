@@ -9,7 +9,7 @@ from qgis.core import QgsMessageLog, QgsCredentials, QgsExpressionContextUtils, 
 from qgis.PyQt.QtCore import QCoreApplication, QRegExp, QSettings, Qt, QTranslator
 from qgis.PyQt.QtGui import QTextCharFormat, QFont
 from qgis.PyQt.QtSql import QSqlDatabase
-from qgis.PyQt.QtWidgets import QCheckBox, QGroupBox, QLabel, QMessageBox, QPushButton, QTabWidget, QToolBox
+from qgis.PyQt.QtWidgets import QCheckBox, QGroupBox, QLabel, QMessageBox, QPushButton, QRadioButton, QTabWidget, QToolBox
 
 import configparser
 import json
@@ -846,26 +846,11 @@ class DaoController(object):
 
     def translate_form(self, dialog, context_name):
         """ Translate widgets of the form to current language """
-        
-        # Get objects of type: QLabel
-        widget_list = dialog.findChildren(QLabel)
-        for widget in widget_list:
-            self.translate_widget(context_name, widget)
-            
-        # Get objects of type: QCheckBox
-        widget_list = dialog.findChildren(QCheckBox)
-        for widget in widget_list:
-            self.translate_widget(context_name, widget)
-             
-        # Get objects of type: QTabWidget            
-        widget_list = dialog.findChildren(QTabWidget)
-        for widget in widget_list:
-            self.translate_widget(context_name, widget)
-
-        # Get objects of type: QTabWidget
-        widget_list = dialog.findChildren(QGroupBox)
-        for widget in widget_list:
-            self.translate_widget(context_name, widget)
+        type_widget_list = [QLabel, QCheckBox, QRadioButton, QGroupBox, QTabWidget]
+        for widget_type in type_widget_list:
+            widget_list = dialog.findChildren(widget_type)
+            for widget in widget_list:
+                self.translate_widget(context_name, widget)
 
         # Translate title of the form   
         text = self.tr('title', context_name)
