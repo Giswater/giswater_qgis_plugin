@@ -16,7 +16,7 @@ from datetime import datetime
 from .. import utils_giswater
 from .parent_manage import ParentManage
 from ..ui_manager import FeatureEndUi, InfoWorkcatUi
-from ..ui_manager import WorkcatEndList
+from ..ui_manager import FeatureEndConnecUi
 
 
 class ManageWorkcatEnd(ParentManage):
@@ -211,7 +211,7 @@ class ManageWorkcatEnd(ParentManage):
             ids_list = None
 
         if row:
-            self.dlg_work = WorkcatEndList()
+            self.dlg_work = FeatureEndConnecUi()
             self.load_settings(self.dlg_work)
 
             self.dlg_work.btn_cancel.clicked.connect(partial(self.close_dialog_workcat_list, self.dlg_work))
@@ -235,7 +235,7 @@ class ManageWorkcatEnd(ParentManage):
             self.tbl_arc_x_relations.doubleClicked.connect(
                 partial(self.open_selected_object, self.tbl_arc_x_relations))
             
-            self.open_dialog(self.dlg_work)
+            self.open_dialog(self.dlg_work, dlg_name='feature_end_connec')
 
         # TODO: Function update_geom_type() don't use parameter ids_list
         else:
