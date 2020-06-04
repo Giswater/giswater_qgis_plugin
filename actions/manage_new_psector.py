@@ -340,7 +340,7 @@ class ManageNewPsector(ParentManage):
         self.dlg_plan_psector.tabWidget.currentChanged.connect(partial(self.check_tab_position))
         self.dlg_plan_psector.btn_cancel.clicked.connect(partial(self.close_psector, cur_active_layer))
         self.dlg_plan_psector.psector_type.currentIndexChanged.connect(partial(self.populate_result_id,
-            self.dlg_plan_psector.result_id, self.plan_om + '_result_cat'))
+            self.dlg_plan_psector.result_id, 'plan_result_cat'))
         self.dlg_plan_psector.rejected.connect(partial(self.close_psector, cur_active_layer))
         self.dlg_plan_psector.chk_enable_all.stateChanged.connect(partial(self.enable_all))
 
@@ -531,7 +531,7 @@ class ManageNewPsector(ParentManage):
             self.dlg_psector_rapport.lbl_composer_disabled.setText('')
             utils_giswater.set_item_data(self.dlg_psector_rapport.cmb_templates, records, 1)
 
-        row = self.controller.get_config(f'composer_{self.plan_om}_vdefault')
+        row = self.controller.get_config(f'composer_plan_vdefault')
         if row:
             utils_giswater.set_combo_itemData(self.dlg_psector_rapport.cmb_templates, row[0], 1)
 
