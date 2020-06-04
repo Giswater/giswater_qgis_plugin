@@ -289,14 +289,14 @@ class ApiCF(ApiParent, QObject):
             self.controller.log_info(str(e))
             return False, None
 
-        if template in ('template_generic', 'GENERIC'):
+        if template == 'info_generic':
             result, dialog = self.open_generic_form(self.complet_result)
             # Fill self.my_json for new feature
             if feature_cat is not None:
                 self.manage_new_feature(self.complet_result, dialog)
             return result, dialog
 
-        elif template in 'template_feature':
+        elif template == 'info_feature':
             sub_tag = None
             if feature_cat:
                 if feature_cat.feature_type.lower() == 'arc':
@@ -308,7 +308,7 @@ class ApiCF(ApiParent, QObject):
                 self.manage_new_feature(self.complet_result, dialog)
             return result, dialog
 
-        elif template in 'template_visit_event':
+        elif template == 'visit':
             visit_id = self.complet_result[0]['body']['feature']['id']
             layers_visibility = self.get_layers_visibility()
             manage_visit = ManageVisit(self.iface, self.settings, self.controller, self.plugin_dir)
