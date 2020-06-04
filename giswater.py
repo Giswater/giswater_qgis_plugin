@@ -1301,7 +1301,7 @@ class Giswater(QObject):
         self.iface.actionZoomToSelected().trigger()
         self.layer_expl.removeSelection()
 
-        extras = f'"selector_type":"exploitation", "check":true, "onlyone":true, "id":{expl_id}'
+        extras = f'"selector_type":"exploitation", "check":true, "mode":"expl_from_muni", "id":{expl_id}'
         body = self.create_body(extras=extras)
         sql = f"SELECT gw_fct_setselectors($${{{body}}}$$)::text"
         row = self.controller.get_row(sql, commit=True, log_sql=True)
