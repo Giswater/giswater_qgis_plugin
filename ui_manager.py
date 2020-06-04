@@ -510,8 +510,8 @@ class MainUi(GwMainWindow, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('readsql_create_project.ui')
-class ReadsqlCreateProject(GwMainWindow, FORM_CLASS):
+FORM_CLASS = get_ui_class('main_dbproject.ui')
+class MainDbProjectUi(GwMainWindow, FORM_CLASS):
     pass
 
 

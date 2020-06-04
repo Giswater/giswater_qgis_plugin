@@ -33,7 +33,7 @@ from .api_parent import ApiParent
 from .create_gis_project import CreateGisProject
 from .gw_task import GwTask
 from .i18n_generator import I18NGenerator
-from ..ui_manager import MainUi, InfoShowInfo, ReadsqlCreateProject, ReadsqlRenameCopy, ReadsqlShowInfo, \
+from ..ui_manager import MainUi, InfoShowInfo, MainDbProjectUi, ReadsqlRenameCopy, ReadsqlShowInfo, \
     MainGisProjectUi, ToolboxUi, MainFields, MainVisitClass, MainVisitParam, MainSysFields, Credentials
 
 
@@ -2229,7 +2229,7 @@ class UpdateSQL(ApiParent):
     def init_dialog_create_project(self, project_type=None):
         """ Initialize dialog (only once) """
 
-        self.dlg_readsql_create_project = ReadsqlCreateProject()
+        self.dlg_readsql_create_project = MainDbProjectUi()
         self.load_settings(self.dlg_readsql_create_project)
 
         # Find Widgets in form
@@ -2318,7 +2318,7 @@ class UpdateSQL(ApiParent):
 
         # Open dialog
         self.dlg_readsql_create_project.setWindowTitle(f"Create Project - {self.connection_name}")
-        self.open_dialog(self.dlg_readsql_create_project)
+        self.open_dialog(self.dlg_readsql_create_project, dlg_name='main_dbproject')
 
 
     def open_rename(self):

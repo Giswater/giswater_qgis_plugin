@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>readsql_create_project</class>
- <widget class="QMainWindow" name="readsql_create_project">
+ <class>dlg_main_dbproject</class>
+ <widget class="QMainWindow" name="dlg_main_dbproject">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>481</width>
-    <height>614</height>
+    <height>796</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Create Project</string>
+   <string>Create project</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
@@ -36,7 +36,7 @@
      </spacer>
     </item>
     <item row="0" column="0" colspan="4">
-     <widget class="QGroupBox" name="groupBox">
+     <widget class="QGroupBox" name="grb_projectschema">
       <property name="title">
        <string>Project schema Settings</string>
       </property>
@@ -146,7 +146,7 @@
         </layout>
        </item>
        <item row="0" column="0">
-        <widget class="QLabel" name="label">
+        <widget class="QLabel" name="lbl_project_type">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
            <horstretch>0</horstretch>
@@ -165,7 +165,7 @@
         <widget class="QLineEdit" name="project_name"/>
        </item>
        <item row="2" column="0">
-        <widget class="QLabel" name="label_2">
+        <widget class="QLabel" name="lbl_locale">
          <property name="layoutDirection">
           <enum>Qt::LeftToRight</enum>
          </property>
@@ -229,11 +229,11 @@
       <zorder>cmb_locale</zorder>
       <zorder>lbl_project_title</zorder>
       <zorder>srid_id</zorder>
-      <zorder>label_2</zorder>
+      <zorder>lbl_locale</zorder>
       <zorder>lbl_project_name</zorder>
       <zorder>project_title</zorder>
       <zorder>lbl_filter</zorder>
-      <zorder>label</zorder>
+      <zorder>lbl_project_type</zorder>
       <zorder>cmb_create_project_type</zorder>
      </widget>
     </item>
