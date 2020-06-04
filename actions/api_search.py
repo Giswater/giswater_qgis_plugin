@@ -27,7 +27,7 @@ from .manage_document import ManageDocument
 from .manage_new_psector import ManageNewPsector
 from .manage_visit import ManageVisit
 from .api_parent import ApiParent
-from ..ui_manager import SearchUi, ApiBasicInfo, SearchWorkcat, DockerUi
+from ..ui_manager import SearchUi, ApiBasicInfo, SearchWorkcat
 
 
 class ApiSearch(ApiParent):
@@ -155,7 +155,7 @@ class ApiSearch(ApiParent):
                 break
 
         # Show info in docker?
-        self.init_docker()
+        self.controller.init_docker()
 
         # Get selected tab name
         tab_selected = self.dlg_search.main_tab.widget(index).objectName()
@@ -165,7 +165,7 @@ class ApiSearch(ApiParent):
             self.controller.log_info("network")
             self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, tab_type='data')
             complet_result, dialog = self.ApiCF.open_form(table_name=item['sys_table_id'], feature_id=item['sys_id'],
-                tab_type='data', docker=self.dlg_docker)
+                tab_type='data')
             if not complet_result:
                 return
             self.draw(complet_result)
@@ -792,18 +792,4 @@ class ApiSearch(ApiParent):
 
                 # Add data to workcat search form
                 widget.setText(f"Total arcs length: {length}")
-
-
-    def close_docker(self):
-        """ Save QDockWidget position (1=Left, 2=right, 8=bottom, 4=top),
-            remove from iface and del class
-        """
-
-        if hasattr(self, 'dlg_docker') and type(self.dlg_docker) is DockerUi:
-            if not self.dlg_docker.isFloating():
-                cur_user = self.controller.get_current_user()
-                docker_pos = self.iface.mainWindow().dockWidgetArea(self.dlg_docker)
-                self.controller.plugin_settings_set_value(f"docker_info_{cur_user}", docker_pos)
-                self.iface.removeDockWidget(self.dlg_docker)
-                del self.dlg_docker
 

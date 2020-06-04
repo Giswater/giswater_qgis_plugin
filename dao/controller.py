@@ -25,7 +25,7 @@ from .pg_dao import PgDao
 from .logger import Logger
 from .. import utils_giswater
 from .. import sys_manager
-from ..ui_manager import DialogTextUi
+from ..ui_manager import DialogTextUi, DockerUi
 
 
 class DaoController(object):
@@ -52,6 +52,7 @@ class DaoController(object):
         self.user = None
         self.user_settings = None
         self.user_settings_path = None
+        self.dlg_docker = None
 
         if create_logger:
             self.set_logger(logger_name)
@@ -1732,4 +1733,78 @@ class DaoController(object):
         self.dlg_info.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.set_text_bold(self.dlg_info.txt_infolog)
         self.dlg_info.show()
+
+
+    def dock_dialog(self, dialog):
+
+        positions = {8:Qt.BottomDockWidgetArea, 4:Qt.TopDockWidgetArea,
+                     2:Qt.RightDockWidgetArea, 1:Qt.LeftDockWidgetArea}
+        try:
+            self.dlg_docker.setWindowTitle(dialog.windowTitle())
+            self.dlg_docker.setWidget(dialog)
+            self.dlg_docker.setWindowFlags(Qt.WindowContextHelpButtonHint)
+            self.iface.addDockWidget(positions[self.dlg_docker.position], self.dlg_docker)
+        except RuntimeError as e:
+            self.log_warning(f"{type(e).__name__} --> {e}")
+
+
+    def init_docker(self, docker_param='qgis_info_docker'):
+        """ Get user config parameter @docker_param """
+
+        # Show info or form in docker?
+        row = self.get_config(docker_param)
+        if row:
+            if row[0].lower() == 'true':
+                self.close_docker()
+                self.dlg_docker = DockerUi()
+                self.dlg_docker.dlg_closed.connect(self.close_docker)
+                self.manage_docker_options()
+            else:
+                self.dlg_docker = None
+        else:
+            self.dlg_docker = None
+
+        return self.dlg_docker
+
+
+    def close_docker(self):
+        """ Save QDockWidget position (1=Left, 2=Right, 4=Top, 8=Bottom),
+            remove from iface and del class
+        """
+
+        if self.dlg_docker:
+            if not self.dlg_docker.isFloating():
+                cur_user = self.get_current_user()
+                docker_pos = self.iface.mainWindow().dockWidgetArea(self.dlg_docker)
+                self.plugin_settings_set_value(f"docker_info_{cur_user}", docker_pos)
+                widget = self.dlg_docker.widget()
+                if widget:
+                    widget.close()
+                    del widget
+                    self.dlg_docker.setWidget(None)
+                self.iface.removeDockWidget(self.dlg_docker)
+            else:
+                self.log_info("docker is floating")
+        else:
+            self.log_info("docker is None")
+
+
+    def manage_docker_options(self):
+        """ Check if user want dock the dialog or not """
+
+        # Load last docker position
+        cur_user = self.get_current_user()
+        pos = self.plugin_settings_value(f"docker_info_{cur_user}")
+
+        # Docker positions: 1=Left, 2=Right, 4=Top, 8=Bottom
+        self.dlg_docker.position = 2
+        if type(pos) is int and pos in (1, 2, 4, 8):
+            self.dlg_docker.position = pos
+
+        # If user want to dock the dialog, we reset rubberbands for each info
+        # For the first time, cf_info does not exist, therefore we cannot access it and reset rubberbands
+        try:
+            self.info_cf.resetRubberbands()
+        except AttributeError:
+            pass
 

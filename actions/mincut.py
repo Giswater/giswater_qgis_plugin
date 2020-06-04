@@ -204,10 +204,10 @@ class MincutParent(ParentAction):
         self.refresh_tab_hydro()
 
 
-    def set_signals(self, docker=None):
+    def set_signals(self):
 
-        if docker:
-            self.dlg_mincut.btn_cancel.clicked.connect(partial(self.close_docker, docker, self.dlg_mincut))
+        if self.controller.dlg_docker:
+            self.dlg_mincut.btn_cancel.clicked.connect(self.controller.close_docker)
 
         self.dlg_mincut.btn_accept.clicked.connect(self.accept_save_data)
         self.dlg_mincut.btn_cancel.clicked.connect(self.mincut_close)
@@ -318,13 +318,13 @@ class MincutParent(ParentAction):
 
     def manage_docker(self):
 
-        docker = self.init_docker('qgis_form_docker')
-        if docker:
-            self.dock_dialog(docker, self.dlg_mincut)
+        self.controller.init_docker('qgis_form_docker')
+        if self.controller.dlg_docker:
+            self.controller.dock_dialog(self.dlg_mincut)
         else:
             self.open_dialog(self.dlg_mincut, dlg_name='mincut')
 
-        self.set_signals(docker)
+        self.set_signals()
 
 
     def mincut_close(self):

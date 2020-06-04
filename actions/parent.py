@@ -23,7 +23,7 @@ from functools import partial
 
 from .. import utils_giswater
 from .add_layer import AddLayer
-from ..ui_manager import DialogTextUi, GwDialog, GwMainWindow, DockerUi
+from ..ui_manager import DialogTextUi, GwDialog, GwMainWindow
 
 
 class ParentAction(object):
@@ -1107,79 +1107,6 @@ class ParentAction(object):
                 message = "Document deleted"
                 self.controller.show_info(message)
                 qtable.model().select()
-
-
-    def dock_dialog(self, docker, dialog):
-
-        positions = {8:Qt.BottomDockWidgetArea, 4:Qt.TopDockWidgetArea,
-                     2:Qt.RightDockWidgetArea, 1:Qt.LeftDockWidgetArea}
-        try:
-            docker.setWindowTitle(dialog.windowTitle())
-            docker.setWidget(dialog)
-            docker.setWindowFlags(Qt.WindowContextHelpButtonHint)
-            self.iface.addDockWidget(positions[docker.position], docker)
-        except RuntimeError as e:
-            self.controller.log_warning(f"{type(e).__name__} --> {e}")
-            pass
-
-
-    def init_docker(self, docker_param='qgis_info_docker'):
-        """ Get user config parameter @docker_param """
-
-        # Show info or form in docker?
-        row = self.controller.get_config(docker_param)
-        if row:
-            if row[0].lower() == 'true':
-                self.close_docker()
-                self.dlg_docker = DockerUi()
-                self.dlg_docker.dlg_closed.connect(self.close_docker)
-                self.manage_docker_options()
-            else:
-                self.dlg_docker = None
-        else:
-            self.dlg_docker = None
-
-        return self.dlg_docker
-
-
-    def close_docker(self, docker=None, dialog=None):
-        """ Save QDockWidget position (1=Left, 2=Right, 4=Top, 8=Bottom),
-            remove from iface and del class
-        """
-
-        if docker is None:
-            if hasattr(self, 'dlg_docker') and type(self.dlg_docker) is DockerUi:
-                if not self.dlg_docker.isFloating():
-                    cur_user = self.controller.get_current_user()
-                    docker_pos = self.iface.mainWindow().dockWidgetArea(self.dlg_docker)
-                    self.controller.plugin_settings_set_value(f"docker_info_{cur_user}", docker_pos)
-                    self.iface.removeDockWidget(self.dlg_docker)
-                    del self.dlg_docker
-        else:
-            if not docker.isFloating():
-                self.iface.removeDockWidget(docker)
-            elif docker.isFloating() and dialog:
-                dialog.close()
-
-
-    def manage_docker_options(self):
-        """ Check if user want dock the dialog or not """
-
-        # Load last docker position
-        cur_user = self.controller.get_current_user()
-        pos = self.controller.plugin_settings_value(f"docker_info_{cur_user}")
-
-        # Docker positions: 1=Left, 2=Right, 4=Top, 8=Bottom
-        self.dlg_docker.position = 2
-        if type(pos) is int and pos in (1, 2, 4, 8):
-            self.dlg_docker.position = pos
-
-        # If user want to dock the dialog, we reset rubberbands for each info
-        # For the first time, cf_info does not exist, therefore we cannot access it and reset rubberbands
-        try:
-            self.info_cf.resetRubberbands()
-        except AttributeError:
-            pass
 
 
     def get_all_actions(self):

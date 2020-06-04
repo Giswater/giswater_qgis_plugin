@@ -35,6 +35,7 @@ class Go2Epa(ApiParent):
         """ Class to control toolbar 'go2epa' """
 
         ApiParent.__init__(self, iface, settings, controller, plugin_dir)
+
         self.g2epa_opt = Go2EpaOptions(iface, settings, controller, plugin_dir)
         self.iterations = 0
 
@@ -47,7 +48,7 @@ class Go2Epa(ApiParent):
         """ Button 23: Open form to set INP, RPT and project """
 
         # Show form in docker?
-        docker = self.init_docker('qgis_form_docker')
+        self.controller.init_docker('qgis_form_docker')
 
         # Create dialog
         self.dlg_go2epa = Go2EpaUI()
@@ -80,11 +81,11 @@ class Go2Epa(ApiParent):
 
         self.set_completer_result(self.dlg_go2epa.txt_result_name, 'v_ui_rpt_cat_result', 'result_id')
 
-        if docker:
+        if self.controller.dlg_docker:
             self.controller.manage_translation('go2epa', self.dlg_go2epa)
-            self.dock_dialog(docker, self.dlg_go2epa)
+            self.controller.dock_dialog(self.dlg_go2epa)
             self.dlg_go2epa.btn_cancel.clicked.disconnect()
-            self.dlg_go2epa.btn_cancel.clicked.connect(partial(self.close_docker, docker, self.dlg_go2epa))
+            self.dlg_go2epa.btn_cancel.clicked.connect(self.controller.close_docker)
         else:
             self.open_dialog(self.dlg_go2epa, dlg_name='go2epa')
 

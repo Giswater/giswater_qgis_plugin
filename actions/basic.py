@@ -43,14 +43,14 @@ class Basic(ApiParent):
                            f'"hydrometer":{{"ids":"None", "filter":""}}}}')
 
         # Show form in docker?
-        docker = self.init_docker('qgis_form_docker')
+        self.controller.init_docker('qgis_form_docker')
 
         self.dlg_selector = SelectorUi()
         self.load_settings(self.dlg_selector)
         self.get_selector(self.dlg_selector, selector_values)
-        if docker:
-            self.dock_dialog(docker, self.dlg_selector)
-            self.dlg_selector.btn_close.clicked.connect(partial(self.close_docker, docker, self.dlg_selector))
+        if self.controller.dlg_docker:
+            self.controller.dock_dialog(self.dlg_selector)
+            self.dlg_selector.btn_close.clicked.connect(self.controller.close_docker)
         else:
             self.dlg_selector.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_selector))
             self.dlg_selector.rejected.connect(partial(self.save_settings, self.dlg_selector))

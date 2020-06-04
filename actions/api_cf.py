@@ -48,7 +48,7 @@ class ApiCF(ApiParent, QObject):
         self.tab_type = tab_type
 
 
-    def hilight_feature(self, point, rb_list, tab_type=None, docker=None):
+    def hilight_feature(self, point, rb_list, tab_type=None):
 
         cursor = QCursor()
         x = cursor.pos().x()
@@ -90,7 +90,7 @@ class ApiCF(ApiParent, QObject):
             for feature in layer['ids']:
                 action = QAction(str(feature['id']), None)
                 sub_menu.addAction(action)
-                action.triggered.connect(partial(self.set_active_layer, action, tab_type, docker))
+                action.triggered.connect(partial(self.set_active_layer, action, tab_type))
                 action.hovered.connect(partial(self.draw_by_action, feature, rb_list))
 
         main_menu.addSeparator()
@@ -149,7 +149,7 @@ class ApiCF(ApiParent, QObject):
             self.draw_polyline(points)
 
 
-    def set_active_layer(self, action, tab_type, docker=None):
+    def set_active_layer(self, action, tab_type):
         """ Set active selected layer """
 
         parent_menu = action.associatedWidgets()[0]
@@ -158,12 +158,12 @@ class ApiCF(ApiParent, QObject):
             layer_source = self.controller.get_layer_source(layer)
             self.iface.setActiveLayer(layer)
             complet_result, dialog = self.open_form(
-                table_name=layer_source['table'], feature_id=action.text(), tab_type=tab_type, docker=docker)
+                table_name=layer_source['table'], feature_id=action.text(), tab_type=tab_type)
             self.draw(complet_result)
 
 
     def open_form(self, point=None, table_name=None, feature_id=None, feature_cat=None, new_feature_id=None,
-                  layer_new_feature=None, tab_type=None, new_feature=None, docker=None):
+                  layer_new_feature=None, tab_type=None, new_feature=None, is_docker=True):
         """
         :param point: point where use clicked
         :param table_name: table where do sql query
@@ -303,7 +303,7 @@ class ApiCF(ApiParent, QObject):
                     sub_tag = 'arc'
                 else:
                     sub_tag = 'node'
-            result, dialog = self.open_custom_form(feature_id, self.complet_result, tab_type, sub_tag, docker=docker)
+            result, dialog = self.open_custom_form(feature_id, self.complet_result, tab_type, sub_tag, is_docker)
             if feature_cat is not None:
                 self.manage_new_feature(self.complet_result, dialog)
             return result, dialog
@@ -380,7 +380,7 @@ class ApiCF(ApiParent, QObject):
         return result, self.hydro_info_dlg
 
 
-    def open_custom_form(self, feature_id, complet_result, tab_type=None, sub_tag=None, docker=None):
+    def open_custom_form(self, feature_id, complet_result, tab_type=None, sub_tag=None, is_docker=True):
 
         # Dialog
         self.dlg_cf = InfoFullUi(sub_tag)
@@ -591,16 +591,16 @@ class ApiCF(ApiParent, QObject):
         btn_cancel = self.dlg_cf.findChild(QPushButton, 'btn_cancel')
         btn_accept = self.dlg_cf.findChild(QPushButton, 'btn_accept')
 
-        if docker:
+        if self.controller.dlg_docker and is_docker:
             # Delete last form from memory
-            last_info = docker.findChild(GwMainWindow, 'api_cf')
+            last_info = self.controller.dlg_docker.findChild(GwMainWindow, 'api_cf')
             if last_info:
                 last_info.setParent(None)
                 del last_info
 
-            self.dock_dialog(docker, self.dlg_cf)
-            docker.dlg_closed.connect(partial(self.manage_docker_close))
-            docker.setWindowTitle(f"{complet_result[0]['body']['feature']['childType']}")
+            self.controller.dock_dialog(self.dlg_cf)
+            self.controller.dlg_docker.dlg_closed.connect(partial(self.manage_docker_close))
+            self.controller.dlg_docker.setWindowTitle(f"{complet_result[0]['body']['feature']['childType']}")
             btn_accept.setVisible(False)
             btn_cancel.setVisible(False)
 
@@ -608,7 +608,7 @@ class ApiCF(ApiParent, QObject):
             btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_cf))
             btn_cancel.clicked.connect(self.roll_back)
             btn_accept.clicked.connect(partial(
-                self.accept, self.dlg_cf, self.complet_result[0], self.my_json, docker=docker))
+                self.accept, self.dlg_cf, self.complet_result[0], self.my_json))
             self.dlg_cf.dlg_closed.connect(self.roll_back)
             self.dlg_cf.dlg_closed.connect(partial(self.resetRubberbands))
             self.dlg_cf.dlg_closed.connect(partial(self.save_settings, self.dlg_cf))
@@ -620,7 +620,6 @@ class ApiCF(ApiParent, QObject):
         row = self.controller.get_config('admin_customform_param', 'value', 'config_param_system')
         if row:
             results = json.loads(row[0], object_pairs_hook=OrderedDict)
-
             for result in results['custom_form_tab_labels']:
                 toolbox_cf.setItemText(int(result['index']), result['text'])
 
@@ -638,10 +637,6 @@ class ApiCF(ApiParent, QObject):
         self.set_vdefault_edition()
 
 
-    def close_docker(self, docker):
-        docker.close()
-
-        
     def get_feature(self, tab_type):
         """ Get current QgsFeature """
 
@@ -959,7 +954,7 @@ class ApiCF(ApiParent, QObject):
         self.open_dialog(dlg_sections, dlg_name='info_crossect', maximize_button=False)
 
 
-    def accept(self, dialog, complet_result, _json, p_widget=None, clear_json=False, close_dialog=True, docker=None):
+    def accept(self, dialog, complet_result, _json, p_widget=None, clear_json=False, close_dialog=True):
         """
         :param dialog:
         :param complet_result:
@@ -971,8 +966,8 @@ class ApiCF(ApiParent, QObject):
         """
         
         if _json == '' or str(_json) == '{}':
-            if docker is not None:
-                docker.setMinimumWidth(dialog.width())
+            if self.controller.dlg_docker:
+                self.controller.dlg_docker.setMinimumWidth(dialog.width())
             self.close_dialog(dialog)
             return
 
@@ -1011,8 +1006,8 @@ class ApiCF(ApiParent, QObject):
 
             my_json = json.dumps(_json)
             if my_json == '' or str(my_json) == '{}':
-                if docker is not None:
-                    docker.setMinimumWidth(dialog.width())
+                if self.controller.dlg_docker:
+                    self.controller.dlg_docker.setMinimumWidth(dialog.width())
                 self.close_dialog(dialog)
                 return
 
@@ -1042,8 +1037,8 @@ class ApiCF(ApiParent, QObject):
             self.controller.show_message(msg, message_level=2)
 
         if close_dialog:
-            if docker is not None:
-                docker.setMinimumWidth(dialog.width())
+            if self.controller.dlg_docker:
+                self.controller.dlg_docker.setMinimumWidth(dialog.width())
             self.close_dialog(dialog)
 
 
@@ -2832,7 +2827,8 @@ class ApiCF(ApiParent, QObject):
 
         feature_id = utils_giswater.getWidgetText(dialog, widget)
         self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, self.tab_type)
-        complet_result, dialog = self.ApiCF.open_form(table_name='v_edit_node', feature_id=feature_id, tab_type=self.tab_type)
+        complet_result, dialog = self.ApiCF.open_form(table_name='v_edit_node', feature_id=feature_id,
+            tab_type=self.tab_type, is_docker=False)
         if not complet_result:
             self.controller.log_info("FAIL open_node")
             return
