@@ -3,7 +3,7 @@ from qgis.PyQt.QtWidgets import QDialog
 from test_giswater import TestGiswater
 from actions.create_gis_project import CreateGisProject
 #from actions.check_project_result import CheckProjectResult
-#from ui_manager import ReadsqlCreateGisProject, ApiEpaOptions
+#from ui_manager import MainGisProjectUi, ApiEpaOptions
 
 
 # dummy instance to replace qgis.utils.iface

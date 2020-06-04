@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Create Gis Project</string>
+   <string>Create GIS project</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
@@ -33,7 +33,7 @@
      </widget>
     </item>
     <item row="0" column="0">
-     <widget class="QLabel" name="label_4">
+     <widget class="QLabel" name="lbl_role">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
         <horstretch>0</horstretch>
@@ -53,7 +53,7 @@
      </widget>
     </item>
     <item row="1" column="0">
-     <widget class="QLabel" name="label">
+     <widget class="QLabel" name="lbl_gis_file">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
         <horstretch>0</horstretch>
@@ -61,7 +61,7 @@
        </sizepolicy>
       </property>
       <property name="text">
-       <string>Gis file name:</string>
+       <string>GIS file name:</string>
       </property>
      </widget>
     </item>
@@ -100,7 +100,7 @@
      <widget class="QLineEdit" name="txt_gis_folder"/>
     </item>
     <item row="3" column="0">
-     <widget class="QLabel" name="label_3">
+     <widget class="QLabel" name="lbl_export_user_pass">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
         <horstretch>0</horstretch>
@@ -113,7 +113,7 @@
      </widget>
     </item>
     <item row="2" column="0">
-     <widget class="QLabel" name="label_2">
+     <widget class="QLabel" name="lbl_gis_folder">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
         <horstretch>0</horstretch>

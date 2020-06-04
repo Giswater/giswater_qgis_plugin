@@ -515,8 +515,8 @@ class ReadsqlCreateProject(GwMainWindow, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('readsql_create_gis_project.ui')
-class ReadsqlCreateGisProject(GwMainWindow, FORM_CLASS):
+FORM_CLASS = get_ui_class('main_gisproject.ui')
+class MainGisProjectUi(GwMainWindow, FORM_CLASS):
     pass
 
 

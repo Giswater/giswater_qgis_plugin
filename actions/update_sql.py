@@ -34,7 +34,7 @@ from .create_gis_project import CreateGisProject
 from .gw_task import GwTask
 from .i18n_generator import I18NGenerator
 from ..ui_manager import MainUi, InfoShowInfo, ReadsqlCreateProject, ReadsqlRenameCopy, ReadsqlShowInfo, \
-    ReadsqlCreateGisProject, ToolboxUi, MainFields, MainVisitClass, MainVisitParam, MainSysFields, Credentials
+    MainGisProjectUi, ToolboxUi, MainFields, MainVisitClass, MainVisitParam, MainSysFields, Credentials
 
 
 class UpdateSQL(ApiParent):
@@ -426,7 +426,7 @@ class UpdateSQL(ApiParent):
     def open_form_create_gis_project(self):
 
         # Create GIS project dialog
-        self.dlg_create_gis_project = ReadsqlCreateGisProject()
+        self.dlg_create_gis_project = MainGisProjectUi()
         self.load_settings(self.dlg_create_gis_project)
 
         # Set default values
@@ -451,7 +451,7 @@ class UpdateSQL(ApiParent):
         self.dlg_create_gis_project.chk_is_sample.stateChanged.connect(partial(self.sample_state_changed))
 
         # Open MainWindow
-        self.open_dialog(self.dlg_create_gis_project)
+        self.open_dialog(self.dlg_create_gis_project, dlg_name='main_gisproject')
 
 
     def sample_state_changed(self):
