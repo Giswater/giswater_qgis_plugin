@@ -545,8 +545,8 @@ class LotUserManager(GwMainWindow, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('visit_management.ui')
-class VisitManagement(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('lot_visitmanager.ui')
+class LotVisitManagerUi(GwDialog, FORM_CLASS):
     pass
 
 

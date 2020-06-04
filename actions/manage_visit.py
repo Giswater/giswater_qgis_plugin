@@ -27,7 +27,7 @@ from ..ui_manager import VisitUi, NewVisitUi
 from ..ui_manager import EventStandard
 from ..ui_manager import VisitEvent
 from ..ui_manager import VisitEventRehab
-from ..ui_manager import VisitManagement
+from ..ui_manager import LotVisitManagerUi
 from .parent_manage import ParentManage
 from .manage_document import ManageDocument
 
@@ -729,7 +729,7 @@ class ManageVisit(ParentManage, QObject):
         """ Button 65: Edit visit """
 
         # Create the dialog
-        self.dlg_man = VisitManagement()
+        self.dlg_man = LotVisitManagerUi()
         self.load_settings(self.dlg_man)
         # save previous dialog and set new one.
         # previous dialog will be set exiting the current one
@@ -778,7 +778,7 @@ class ManageVisit(ParentManage, QObject):
             self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object, expr_filter, filed_to_filter))
 
         # Open form
-        self.open_dialog(self.dlg_man, dlg_name="visit_management")
+        self.open_dialog(self.dlg_man, dlg_name="lot_visitmanager")
 
 
     def filter_visit(self, dialog, widget_table, widget_txt, table_object, expr_filter, filed_to_filter):

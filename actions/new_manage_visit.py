@@ -27,7 +27,7 @@ from ..ui_manager import NewVisitUi
 from ..ui_manager import EventStandard
 from ..ui_manager import VisitEvent
 from ..ui_manager import VisitEventRehab
-from ..ui_manager import VisitManagement
+from ..ui_manager import LotVisitManagerUi
 from .parent_manage import ParentManage
 from .manage_document import ManageDocument
 

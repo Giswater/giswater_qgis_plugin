@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>visit_management</class>
- <widget class="QDialog" name="visit_management">
+ <class>dlg_lot_visitmanager</class>
+ <widget class="QDialog" name="dlg_lot_visitmanager">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -59,7 +59,7 @@
         <item>
          <layout class="QVBoxLayout" name="verticalLayout">
           <item>
-           <widget class="QLabel" name="label_data_event_from">
+           <widget class="QLabel" name="lbl_data_event_from">
             <property name="font">
              <font>
               <pointsize>8</pointsize>
@@ -90,15 +90,15 @@
           </item>
           <item>
            <widget class="QDateEdit" name="date_event_from">
+            <property name="calendarPopup">
+             <bool>true</bool>
+            </property>
             <property name="date">
              <date>
               <year>2016</year>
               <month>1</month>
               <day>1</day>
              </date>
-            </property>
-            <property name="calendarPopup">
-             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -107,7 +107,7 @@
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
-           <widget class="QLabel" name="label_data_event_to">
+           <widget class="QLabel" name="lbl_data_event_to">
             <property name="font">
              <font>
               <pointsize>8</pointsize>
@@ -135,15 +135,15 @@
           </item>
           <item>
            <widget class="QDateEdit" name="date_event_to">
+            <property name="calendarPopup">
+             <bool>true</bool>
+            </property>
             <property name="date">
              <date>
               <year>2017</year>
               <month>1</month>
               <day>1</day>
              </date>
-            </property>
-            <property name="calendarPopup">
-             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -230,7 +230,7 @@
   <connection>
    <sender>btn_box</sender>
    <signal>accepted()</signal>
-   <receiver>visit_management</receiver>
+   <receiver>dlg_lot_visitmanager</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -246,7 +246,7 @@
   <connection>
    <sender>btn_box</sender>
    <signal>rejected()</signal>
-   <receiver>visit_management</receiver>
+   <receiver>dlg_lot_visitmanager</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
