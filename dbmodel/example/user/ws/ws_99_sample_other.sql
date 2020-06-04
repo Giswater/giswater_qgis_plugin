@@ -612,3 +612,15 @@ UPDATE config_form_fields SET layoutorder = 24 where columnname ='svg' and formn
 UPDATE config_form_fields SET layoutorder = 20 where columnname ='minsector_id'and formname like '%_connec_%';
 UPDATE config_form_fields SET layoutorder = 23 where columnname ='rotation'and formname like '%_connec_%';
 UPDATE config_form_fields SET layoutorder = 24 where columnname ='svg' and formname like '%_connec_%';
+
+
+
+UPDATE config_form_fields set layoutorder = layoutorder+1 WHERE formname in ('ve_arc', 've_node', 've_connec')
+AND columnname in ('streetname','streetname2', 'postnumber','postnumber2','postcomplement','postcomplement2');
+
+UPDATE config_form_fields set hidden = false  WHERE formname in ('ve_arc', 've_node', 've_connec')
+AND columnname = 'district_id';
+
+UPDATE config_form_fields set layoutorder = 2 WHERE formname = 've_node' AND columnname = 'district_id';
+
+UPDATE config_form_fields set layoutorder = 3 WHERE formname in ('ve_arc', 've_connec') AND columnname = 'district_id';

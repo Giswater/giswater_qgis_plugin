@@ -266,3 +266,29 @@ VALUES ('v_edit_dma','form_generic', 'stylesheet', 'string', 'text', 'stylesheet
 
 INSERT INTO config_form_fields(formname, formtype, columnname, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, hidden)
 VALUES ('v_edit_sector','form_generic', 'stylesheet', 'string', 'text', 'stylesheet',false, false, true, false, false);
+
+
+--2020/06/03 
+
+INSERT INTO config_form_fields(formname, formtype, columnname, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, 
+dv_querytext, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, layoutname, tooltip, hidden)
+VALUES ('ve_node','form_feature', 'district_id', 'integer', 'text', 'district',false, false, true, false, 
+'SELECT id AS id, a.name AS idval FROM  a JOIN ext_municipality m USING (muni_id) WHERE id IS NOT NULL ', true, 'muni_id', 'AND m.name',
+'lyt_data_3','district_id - Identificador del barrio con el que se vincula el elemento. A escoger entre los disponibles en el desplegable (se filtra en función del municipio seleccionado)',
+true) ON CONFLICT (formname, formtype, columnname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, columnname, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, 
+dv_querytext, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, layoutname, tooltip, hidden)
+VALUES ('ve_arc','form_feature', 'district_id', 'integer', 'text', 'district',false, false, true, false, 
+'SELECT id AS id, a.name AS idval FROM  a JOIN ext_municipality m USING (muni_id) WHERE id IS NOT NULL ', true, 'muni_id', 'AND m.name',
+'lyt_data_3','district_id - Identificador del barrio con el que se vincula el elemento. A escoger entre los disponibles en el desplegable (se filtra en función del municipio seleccionado)',
+true) ON CONFLICT (formname, formtype, columnname) DO NOTHING;
+
+INSERT INTO config_form_fields(formname, formtype, columnname, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, 
+dv_querytext, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, layoutname, tooltip, hidden)
+VALUES ('ve_connec','form_feature', 'district_id', 'integer', 'text', 'district',false, false, true, false, 
+'SELECT id AS id, a.name AS idval FROM  a JOIN ext_municipality m USING (muni_id) WHERE id IS NOT NULL ', true, 'muni_id', 'AND m.name',
+'lyt_data_3','district_id - Identificador del barrio con el que se vincula el elemento. A escoger entre los disponibles en el desplegable (se filtra en función del municipio seleccionado)',
+true) ON CONFLICT (formname, formtype, columnname) DO NOTHING;
+
+

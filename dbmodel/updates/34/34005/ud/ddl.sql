@@ -18,3 +18,6 @@ CREATE INDEX gully_street2 ON gully USING btree (streetaxis2_id);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"matcat_id", "dataType":"varchar(30)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"matcat_id", "dataType":"varchar(30)"}}$$);
+
+--2020/06/04
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "column":"district_id", "dataType":"integer", "isUtils":"False"}}$$);
