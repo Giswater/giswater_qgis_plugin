@@ -73,15 +73,15 @@ UPDATE config_param_system SET parameter = 'admin_vpn_permissions', datatype='bo
 UPDATE config_param_system SET parameter = 'admin_publish_user' WHERE parameter = 'api_publish_user';
 UPDATE config_param_system SET parameter = 'basic_info_canvasmargin', context='system', descript='Canvas margin', label='Canvas margin:'
 WHERE parameter = 'api_canvasmargin';
-UPDATE config_param_system SET parameter = 'basic_search_arc', label='Search arc:' WHERE parameter = 'api_search_arc';
-UPDATE config_param_system SET parameter = 'basic_search_connec', label='Search connec:' WHERE parameter = 'api_search_connec';
-UPDATE config_param_system SET parameter = 'basic_search_element', label='Search element:' WHERE parameter = 'api_search_element';
+UPDATE config_param_system SET parameter = 'basic_search_network_arc', label='Search arc:' WHERE parameter = 'api_search_arc';
+UPDATE config_param_system SET parameter = 'basic_search_network_connec', label='Search connec:' WHERE parameter = 'api_search_connec';
+UPDATE config_param_system SET parameter = 'basic_search_network_element', label='Search element:' WHERE parameter = 'api_search_element';
 UPDATE config_param_system SET parameter = 'basic_search_exploitation', label='Search exploitation:' WHERE parameter = 'api_search_exploitation';
-UPDATE config_param_system SET parameter = 'basic_search_gully', label='Search gully:' WHERE parameter = 'api_search_gully';
+UPDATE config_param_system SET parameter = 'basic_search_network_gully', label='Search gully:' WHERE parameter = 'api_search_gully';
 UPDATE config_param_system SET parameter = 'basic_search_hydrometer', label='Search hydrometer:' WHERE parameter = 'api_search_hydrometer';
 UPDATE config_param_system SET parameter = 'basic_search_muni', label='Search municipality:' WHERE parameter = 'api_search_muni';
 UPDATE config_param_system SET parameter = 'basic_search_network_null', label='Search network null:' WHERE parameter = 'api_search_network_null';
-UPDATE config_param_system SET parameter = 'basic_search_node', label='Search node:' WHERE parameter = 'api_search_node';
+UPDATE config_param_system SET parameter = 'basic_search_network_node', label='Search node:' WHERE parameter = 'api_search_node';
 UPDATE config_param_system SET parameter = 'basic_search_postnumber', label='Search postnumber:' WHERE parameter = 'api_search_postnumber';
 UPDATE config_param_system SET parameter = 'basic_search_psector', label='Search psector:' WHERE parameter = 'api_search_psector';
 UPDATE config_param_system SET parameter = 'basic_search_street', label='Search street:' WHERE parameter = 'api_search_street';

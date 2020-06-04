@@ -79,8 +79,8 @@ BEGIN
         'widgettype','combo','datatype','string','placeholder','','disabled',false);
         
         -- Get Ids for type combo
-        SELECT array_to_json(array_agg(id)) INTO combo_json FROM (SELECT ((value)::json->'sys_table_id') AS id FROM config_param_system WHERE parameter
-        IN ('basic_search_node','basic_search_node','basic_search_arc','basic_search_connec','basic_search_network_null','basic_search_element', 'basic_search_gully')  ORDER BY ((value)::json->>'orderby'))a;
+        SELECT array_to_json(array_agg(id)) INTO combo_json FROM (SELECT ((value)::json->'sys_table_id') AS id FROM config_param_system 
+		WHERE parameter like '%basic_search_network%'ORDER BY ((value)::json->>'orderby'))a;
         comboType := gw_fct_json_object_set_key(comboType, 'comboIds', combo_json);
 
         -- Add default
@@ -91,8 +91,8 @@ BEGIN
         END IF;
     
         -- Get Names for type combo
-        SELECT array_to_json(array_agg(id)) INTO combo_json FROM (SELECT ((value)::json->'alias') AS id FROM config_param_system WHERE parameter
-        IN ('basic_search_node','basic_search_node','basic_search_arc','basic_search_connec','basic_search_network_null','basic_search_element', 'basic_search_gully') ORDER BY ((value)::json->>'orderby'))a;    
+        SELECT array_to_json(array_agg(id)) INTO combo_json FROM (SELECT ((value)::json->'alias') AS id FROM config_param_system 
+		WHERE parameter like '%basic_search_network%' ORDER BY ((value)::json->>'orderby'))a;    
         comboType := gw_fct_json_object_set_key(comboType, 'comboNames', combo_json);
 
 
@@ -204,9 +204,7 @@ BEGIN
         -- Create postnumber search field
         SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND columnname='add_postnumber';
         editCode2 := json_build_object('label',rec_fields.label,'columnname', rec_fields.columnname,'widgetname', concat('address_',rec_fields.columnname),
-        'widgettype','typeahead','threshold', 
-        (SELECT value::integer FROM config_param_system WHERE parameter='api_search_minimsearch' LIMIT 1),
-        'datatype','integer','placeholder','','disabled',true,'noresultsMsg','No results','loadingMsg','Searching...');
+        'widgettype','typeahead','threshold', 1 'datatype','integer','placeholder','','disabled',true,'noresultsMsg','No results','loadingMsg','Searching...');
 
     
         -- Create array with network fields
