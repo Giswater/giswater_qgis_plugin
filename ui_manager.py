@@ -525,8 +525,8 @@ class ReadsqlRenameCopy(GwMainWindow, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('readsql_show_info.ui')
-class ReadsqlShowInfo(GwMainWindow, FORM_CLASS):
+FORM_CLASS = get_ui_class('main_projectinfo.ui')
+class MainProjectInfoUi(GwMainWindow, FORM_CLASS):
     pass
 
 

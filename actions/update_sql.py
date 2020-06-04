@@ -33,7 +33,7 @@ from .api_parent import ApiParent
 from .create_gis_project import CreateGisProject
 from .gw_task import GwTask
 from .i18n_generator import I18NGenerator
-from ..ui_manager import MainUi, InfoShowInfo, MainDbProjectUi, ReadsqlRenameCopy, ReadsqlShowInfo, \
+from ..ui_manager import MainUi, InfoShowInfo, MainDbProjectUi, ReadsqlRenameCopy, MainProjectInfoUi, \
     MainGisProjectUi, ToolboxUi, MainFields, MainVisitClass, MainVisitParam, MainSysFields, Credentials
 
 
@@ -1937,7 +1937,7 @@ class UpdateSQL(ApiParent):
     def show_info(self):
 
         # Create dialog
-        self.dlg_readsql_show_info = ReadsqlShowInfo()
+        self.dlg_readsql_show_info = MainProjectInfoUi()
         self.load_settings(self.dlg_readsql_show_info)
 
         info_updates = self.dlg_readsql_show_info.findChild(QTextEdit, 'info_updates')
@@ -1955,7 +1955,7 @@ class UpdateSQL(ApiParent):
         self.dlg_readsql_show_info.btn_update.clicked.connect(partial(self.update, self.project_type_selected))
 
         # Open dialog
-        self.open_dialog(self.dlg_readsql_show_info)
+        self.open_dialog(self.dlg_readsql_show_info, dlg_name='main_projectinfo')
 
 
     def read_info_version(self):

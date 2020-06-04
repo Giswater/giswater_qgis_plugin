@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>readsql_show_info</class>
- <widget class="QMainWindow" name="readsql_show_info">
+ <class>dlg_main_projectinfo</class>
+ <widget class="QMainWindow" name="dlg_main_projectinfo">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -21,7 +21,7 @@
     <item row="0" column="0" colspan="3">
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="lbl_info">
         <property name="font">
          <font>
           <pointsize>10</pointsize>
