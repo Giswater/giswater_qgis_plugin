@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>sections</class>
- <widget class="QDialog" name="sections">
+ <class>dlg_info_crossect</class>
+ <widget class="QDialog" name="dlg_info_crossect">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -88,7 +88,7 @@
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <widget class="QLabel" name="label_cost_excav">
+  <widget class="QLabel" name="lbl_cost_excav">
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -125,7 +125,7 @@
     <number>3</number>
    </property>
   </widget>
-  <widget class="QLabel" name="label_cost_width">
+  <widget class="QLabel" name="lbl_cost_width">
    <property name="geometry">
     <rect>
      <x>315</x>
@@ -239,7 +239,7 @@
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <widget class="QLabel" name="label_cost_y_param">
+  <widget class="QLabel" name="lbl_cost_y_param">
    <property name="geometry">
     <rect>
      <x>35</x>
@@ -275,7 +275,7 @@
     <number>3</number>
    </property>
   </widget>
-  <widget class="QLabel" name="label_cost_b_left">
+  <widget class="QLabel" name="lbl_cost_b_left">
    <property name="geometry">
     <rect>
      <x>210</x>
@@ -308,7 +308,7 @@
     <number>3</number>
    </property>
   </widget>
-  <widget class="QLabel" name="label_cost_trench">
+  <widget class="QLabel" name="lbl_cost_trench">
    <property name="geometry">
     <rect>
      <x>11</x>
@@ -425,7 +425,7 @@
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <widget class="QLabel" name="label_cost_exc">
+  <widget class="QLabel" name="lbl_cost_exc">
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -744,7 +744,7 @@
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <widget class="QLabel" name="label_cost_area">
+  <widget class="QLabel" name="lbl_cost_area">
    <property name="geometry">
     <rect>
      <x>24</x>
@@ -780,7 +780,7 @@
     <number>3</number>
    </property>
   </widget>
-  <widget class="QLabel" name="label_cost_fill">
+  <widget class="QLabel" name="lbl_cost_fill">
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -817,7 +817,7 @@
     <number>3</number>
    </property>
   </widget>
-  <widget class="QLabel" name="label_cost_b_right">
+  <widget class="QLabel" name="lbl_cost_b_right">
    <property name="geometry">
     <rect>
      <x>445</x>
@@ -1051,7 +1051,7 @@
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <widget class="QLabel" name="label_cost_bulk">
+  <widget class="QLabel" name="lbl_cost_bulk">
    <property name="geometry">
     <rect>
      <x>35</x>

@@ -26,7 +26,7 @@ from .manage_element import ManageElement
 from .manage_gallery import ManageGallery
 from .manage_visit import ManageVisit
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
-from ..ui_manager import ApiBasicInfo, InfoFullUi, VisitEventFull, GwMainWindow, VisitDocument, Sections
+from ..ui_manager import ApiBasicInfo, InfoFullUi, VisitEventFull, GwMainWindow, VisitDocument, InfoCrossectUi
 
 
 class ApiCF(ApiParent, QObject):
@@ -936,7 +936,7 @@ class ApiCF(ApiParent, QObject):
 
     def open_section_form(self):
 
-        dlg_sections = Sections()
+        dlg_sections = InfoCrossectUi()
         self.load_settings(dlg_sections)
         feature = '"id":"'+self.feature_id+'"'
         body = self.create_body(feature=feature)
@@ -956,7 +956,7 @@ class ApiCF(ApiParent, QObject):
                     utils_giswater.setWidgetText(dlg_sections, widget, field['value'])
 
         dlg_sections.btn_close.clicked.connect(partial(self.close_dialog, dlg_sections))
-        self.open_dialog(dlg_sections, maximize_button=False)
+        self.open_dialog(dlg_sections, dlg_name='info_crossect', maximize_button=False)
 
 
     def accept(self, dialog, complet_result, _json, p_widget=None, clear_json=False, close_dialog=True, docker=None):

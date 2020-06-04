@@ -530,8 +530,8 @@ class MainProjectInfoUi(GwMainWindow, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('sections.ui')
-class Sections(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('info_crossect.ui')
+class InfoCrossectUi(GwDialog, FORM_CLASS):
     pass
 
 
