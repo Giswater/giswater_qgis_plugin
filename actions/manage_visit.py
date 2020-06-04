@@ -442,8 +442,6 @@ class ManageVisit(ParentManage, QObject):
         if geom_type == '' or geom_type.lower() == 'all':
             return
 
-        # TODO: the next "if" code can be substituded with something like:
-        # exec("db_record = OmVisitX{}{}(self.controller)".format(geometry_type[0].upper(), geometry_type[1:]))"
         db_record = None
         if geom_type == 'arc':
             db_record = OmVisitXArc(self.controller)

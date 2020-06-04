@@ -343,9 +343,7 @@ class Master(ParentAction):
         # Set signals
         self.dlg_estimate_result_selector.btn_accept.clicked.connect(partial(self.master_estimate_result_selector_accept))
         self.dlg_estimate_result_selector.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_estimate_result_selector))
-        # TODO pending translation
-        # Manage i18n of the form and open it
-        # self.controller.translate_form(self.dlg_estimate_result_selector, 'estimate_result_selector')
+
         self.open_dialog(self.dlg_estimate_result_selector, dlg_name="plan_estimate_result_selector",  maximize_button=False)
 
 

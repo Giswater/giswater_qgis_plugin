@@ -83,7 +83,7 @@ class Dimensioning(ParentMapTool):
             self.layer.startEditing()
             # Implement the Add Feature button
             self.iface.actionAddFeature().trigger()
-            # TODO uncomment nex line to manage new api tool
+            # Manage new api tool
             self.layer.featureAdded.connect(self.open_new_dimensioning)
 
 

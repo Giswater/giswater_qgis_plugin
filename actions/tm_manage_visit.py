@@ -95,7 +95,7 @@ class TmManageVisit(TmParentManage, QObject):
         self.feature_id = self.dlg_add_visit.findChild(QLineEdit, "feature_id")
         self.tbl_relation = self.dlg_add_visit.findChild(QTableView, "tbl_relation")
         self.tbl_relation.setSelectionBehavior(QAbstractItemView.SelectRows)
-        # TODO controlar este combo
+
         self.feature_type.setVisible(False)
 
         # tab 'Event'
@@ -318,9 +318,6 @@ class TmManageVisit(TmParentManage, QObject):
             # allows basing on project type
             geometry_type = self.feature_type.itemText(index).lower()
 
-            # TODO: the next "if" code can be substituded with something like:
-            # exec("db_record = OmVisitX{}{}(self.controller)".format(geometry_type[0].upper(), geometry_type[1:]))"
-
             if geometry_type == 'node':
                 db_record = OmVisitXNode(self.controller)
 
@@ -332,10 +329,8 @@ class TmManageVisit(TmParentManage, QObject):
         if not self.tbl_relation.model() or not self.tbl_relation.model().rowCount():
             return
 
-        # set the current db_record tyope to do insert of new records
+        # set the current db_record type to do insert of new records
         # all the new records belong to the same geom_type
-        # TODO: the next "if" code can be substituded with something like:
-        # exec("db_record = OmVisitX{}{}(self.controller)".format(geometry_type[0].upper(), geometry_type[1:]))"
         if self.geom_type == 'node':
             db_record = OmVisitXNode(self.controller)
 
@@ -629,8 +624,6 @@ class TmManageVisit(TmParentManage, QObject):
             return
 
         # Get selected rows
-        # TODO: use tbl_event.model().fieldIndex(event.pk()) to be pk name independent
-        # 0 is the column of the pk 0 'id'
         selected_list = self.tbl_event.selectionModel().selectedRows(0)
         if selected_list == 0:
             message = "Any record selected"
@@ -701,8 +694,6 @@ class TmManageVisit(TmParentManage, QObject):
         event = OmVisitEvent(self.controller)
 
         # Get selected rows
-        # TODO: use tbl_event.model().fieldIndex(event.pk()) to be pk name independent
-        # 0 is the column of the pk 0 'id'
         selected_list = self.tbl_event.selectionModel().selectedRows(0)
         selected_id = []
         for index in selected_list:

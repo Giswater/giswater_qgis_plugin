@@ -612,8 +612,6 @@ class ParentManage(ParentAction, object):
         This is necessary to allow a lazy setup of the events because set_table_events
         can create a table with a None model loosing any event connection."""
 
-        # TODO: create a dictionary with key:widged.objectName value:initFuction
-        # to allow multiple lazy initialization
         self.lazy_widget = widget
         self.lazy_init_function = init_function
 

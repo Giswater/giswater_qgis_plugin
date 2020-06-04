@@ -63,9 +63,6 @@ class ManageElement(ParentManage):
         if feature:
             layer = self.iface.activeLayer()
             layer.selectByIds([feature.id()])
-        # TODO pending translation
-        # Manage i18n of the form
-        # self.controller.translate_form(self.dlg, 'element')
 
         utils_giswater.set_regexp_date_validator(self.dlg_add_element.builtdate, self.dlg_add_element.btn_accept, 1)
 
@@ -433,10 +430,6 @@ class ManageElement(ParentManage):
         if status:
             self.element_id = element_id
             self.manage_close(self.dlg_add_element, table_object, excluded_layers=[])
-            # TODO Reload table tbl_element
-            # filter_ = "node_id = '" + str(feature_id) + "'"
-            # table_element = "v_ui_element_x_node"
-            # self.set_model_to_table(self.tbl_element, table_element, filter_)
 
 
     def filter_elementcat_id(self):

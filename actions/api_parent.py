@@ -373,14 +373,6 @@ class ApiParent(ParentAction):
         # Get the point. Leave selection
         snapped_feature = self.snapper_manager.get_snapped_feature(result, True)
         snapped_feature_attr = snapped_feature.attributes()
-        is_valid = True
-
-        # TODO: Remove this?
-        if not is_valid:
-            message = "Any of the snapped features belong to selected layer"
-            self.controller.show_info(message, parameter=layername, duration=10)
-            self.api_disable_copy_paste(dialog)
-            return
 
         aux = f'"{self.geom_type}_id" = '
         aux += f"'{self.feature_id}'"
