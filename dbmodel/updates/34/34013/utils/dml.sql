@@ -15,8 +15,8 @@ DELETE FROM sys_function WHERE id = 2128;
 INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field)
 VALUES ('plan_typevalue', 'result_type', 'plan_result_cat', 'result_type');
 
-INSERT INTO config_typevalue VALUES ('formtemplate_typevalue','template_visit_event','template_visit_event','formVisitEvent');
-INSERT INTO config_typevalue VALUES ('formtemplate_typevalue','template_visit_class','template_visit_event','formVisitClass');
+INSERT INTO config_typevalue VALUES ('formtemplate_typevalue','visit','visit','visit');
+INSERT INTO config_typevalue VALUES ('formtemplate_typevalue','visit_class','visit_class','visitClass');
 
 INSERT INTO config_info_layer VALUES ('v_edit_om_visit',FALSE,NULL,TRUE,'v_edit_om_visit','template_visit_event','Visit',10);
 

@@ -150,8 +150,8 @@ DELETE FROM sys_function WHERE function_name = 'gw_api_getrowinsert';
 UPDATE config_typevalue SET typevalue = 'linkedaction_typevalue' WHERE typevalue ='action_function_typevalue';
 UPDATE config_typevalue set typevalue = 'listlimit_typevalue' WHERE typevalue ='listlimit';
 
-UPDATE config_typevalue set id = 'template_generic', idval = 'template_generic', camelstyle = 'templateGeneric' WHERE id = 'GENERIC';
-UPDATE config_typevalue set id = 'template_feature', idval = 'template_feature', camelstyle = 'templateFeature' WHERE id = 'custom feature';
+UPDATE config_typevalue set id = 'info_generic', idval = 'info generic', camelstyle = 'infoGeneric' WHERE id = 'GENERIC';
+UPDATE config_typevalue set id = 'info_feature', idval = 'info_feature', camelstyle = 'infoFeature' WHERE id = 'custom feature';
 
 UPDATE config_typevalue SET camelstyle = idval WHERE typevalue = 'datatype_typevalue';
 

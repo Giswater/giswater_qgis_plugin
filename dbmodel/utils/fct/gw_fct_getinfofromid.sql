@@ -418,7 +418,7 @@ BEGIN
 		-- Check generic
 		-------------------
 		IF v_forminfo ISNULL THEN
-			v_forminfo := json_build_object('formName','F16','template','GENERIC');
+			v_forminfo := json_build_object('formName','Generic','template','info_generic');
 			formid_arg := 'F16';
 		END IF;
 
