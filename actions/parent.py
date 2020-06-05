@@ -253,7 +253,9 @@ class ParentAction(object):
         query_right += f" FROM {schema_name}.{tableleft}"
         query_right += f" JOIN {schema_name}.{tableright} ON {tableleft}.{field_id_left} = {tableright}.{field_id_right}"
 
-        query_right += " WHERE cur_user = current_user and active IS NOT FALSE"
+        query_right += " WHERE cur_user = current_user "
+        if aql != '':
+            query_right += f" AND active IS NOT FALSE"
 
         self.fill_table_by_query(tbl_selected_rows, query_right)
         self.hide_colums(tbl_selected_rows, hide_right)
@@ -463,15 +465,15 @@ class ParentAction(object):
             self.controller.show_warning(model.lastError().text())  
             
 
-    def query_like_widget_text(self, dialog, text_line, qtable, tableleft, tableright, field_id_r, field_id_l, name='name'):
+    def query_like_widget_text(self, dialog, text_line, qtable, tableleft, tableright, field_id_r, field_id_l, name='name', aql=''):
         """ Fill the QTableView by filtering through the QLineEdit"""
-
         query = utils_giswater.getWidgetText(dialog, text_line, return_string_null=False).lower()
         sql = (f"SELECT * FROM {self.schema_name}.{tableleft} WHERE {name} NOT IN "
                f"(SELECT {tableleft}.{name} FROM {self.schema_name}.{tableleft}"
                f" RIGHT JOIN {self.schema_name}.{tableright}"
                f" ON {tableleft}.{field_id_l} = {tableright}.{field_id_r}"
-               f" WHERE cur_user = current_user) AND LOWER({name}::text) LIKE '%{query}%' and expl_id != 0 AND active IS NOT FALSE")
+               f" WHERE cur_user = current_user) AND LOWER({name}::text) LIKE '%{query}%' and expl_id != 0")
+        sql += aql
         self.fill_table_by_query(qtable, sql)
         
         
