@@ -1317,7 +1317,6 @@ class Giswater(QObject):
         if row:
             self.iface.mapCanvas().refreshAllLayers()
             self.layer_expl.triggerRepaint()
-            self.iface.actionZoomIn().trigger()
             self.iface.actionPan().trigger()
             self.iface.actionZoomIn().trigger()
 
