@@ -1296,7 +1296,8 @@ class Giswater(QObject):
 
     def selection_changed(self):
         """ Get selected expl_id and execute function setselectors """
-
+        
+        muni_id = None
         features = self.layer_expl.getSelectedFeatures()
         for feature in features:
             muni_id = feature["muni_id"]
