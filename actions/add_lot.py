@@ -218,7 +218,7 @@ class AddNewLot(ParentManage):
         self.dlg_lot.btn_path_rel.clicked.connect(partial(self.select_path, self.dlg_lot, 'txt_path_rel'))
 
         # Open the dialog
-        self.open_dialog(self.dlg_lot, dlg_name="add_lot")
+        self.open_dialog(self.dlg_lot, dlg_name="lot")
 
 
     def manage_cmb_status(self):

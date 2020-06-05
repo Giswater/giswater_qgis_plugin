@@ -33,7 +33,7 @@ from .api_parent import ApiParent
 from .create_gis_project import CreateGisProject
 from .gw_task import GwTask
 from .i18n_generator import I18NGenerator
-from ..ui_manager import MainUi, InfoShowInfo, MainDbProjectUi, ReadsqlRenameCopy, MainProjectInfoUi, \
+from ..ui_manager import MainUi, InfoShowInfo, MainDbProjectUi, MainRenameProjUi, MainProjectInfoUi, \
     MainGisProjectUi, ToolboxUi, MainFields, MainVisitClass, MainVisitParam, MainSysFields, Credentials
 
 
@@ -2330,7 +2330,7 @@ class UpdateSQL(ApiParent):
             return
 
         # Create dialog
-        self.dlg_readsql_rename = ReadsqlRenameCopy()
+        self.dlg_readsql_rename = MainRenameProjUi()
         self.load_settings(self.dlg_readsql_rename)
 
         schema = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
@@ -2341,7 +2341,7 @@ class UpdateSQL(ApiParent):
 
         # Open dialog
         self.dlg_readsql_rename.setWindowTitle(f'Rename project - {schema}')
-        self.open_dialog(self.dlg_readsql_rename)
+        self.open_dialog(self.dlg_readsql_rename, dlg_name='main_renameproj')
 
 
     def executeFiles(self, filedir, i18n=False, no_ct=False, log_folder=True, log_files=False):
@@ -2441,7 +2441,7 @@ class UpdateSQL(ApiParent):
     def copy_schema(self):
 
         # Create dialog
-        self.dlg_readsql_copy = ReadsqlRenameCopy()
+        self.dlg_readsql_copy = MainRenameProjUi()
         self.load_settings(self.dlg_readsql_copy)
 
         schema = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
@@ -2452,7 +2452,7 @@ class UpdateSQL(ApiParent):
 
         # Open dialog
         self.dlg_readsql_copy.setWindowTitle('Copy project - ' + schema)
-        self.open_dialog(self.dlg_readsql_copy)
+        self.open_dialog(self.dlg_readsql_copy, dlg_name='main_renameproj')
 
 
     def copy_project_data_schema(self, schema):

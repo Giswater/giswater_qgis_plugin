@@ -22,7 +22,7 @@ from .check_project_result import CheckProjectResult
 from .gw_toolbox import GwToolBox
 from .parent import ParentAction
 from .manage_visit import ManageVisit
-from ..ui_manager import Csv2Pg
+from ..ui_manager import CsvUi
 
 
 class Utils(ParentAction):
@@ -49,7 +49,7 @@ class Utils(ParentAction):
         """ Button 83: Import CSV """
 
         self.func_name = None
-        self.dlg_csv = Csv2Pg()
+        self.dlg_csv = CsvUi()
         self.load_settings(self.dlg_csv)
 
         # Get roles from BD
@@ -81,7 +81,7 @@ class Utils(ParentAction):
         self.dlg_csv.progressBar.setVisible(False)
 
         # Open dialog
-        self.open_dialog(self.dlg_csv, dlg_name='csv2pg')
+        self.open_dialog(self.dlg_csv, dlg_name='csv')
 
 
     def get_function_name(self):

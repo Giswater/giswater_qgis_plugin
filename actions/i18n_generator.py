@@ -11,7 +11,7 @@ from functools import partial
 
 from .. import utils_giswater
 from .parent import ParentAction
-from ..ui_manager import QmGenerator
+from ..ui_manager import MainQtDialogUi
 
 
 class I18NGenerator(ParentAction):
@@ -22,7 +22,7 @@ class I18NGenerator(ParentAction):
 
 
     def init_dialog(self):
-        self.dlg_qm = QmGenerator()
+        self.dlg_qm = MainQtDialogUi()
         self.load_settings(self.dlg_qm)
         self.load_user_values()
 
@@ -33,7 +33,7 @@ class I18NGenerator(ParentAction):
         self.dlg_qm.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_qm))
         self.dlg_qm.rejected.connect(self.save_user_values)
         self.dlg_qm.rejected.connect(self.close_db)
-        self.open_dialog(self.dlg_qm)
+        self.open_dialog(self.dlg_qm, dlg_name='main_qtdialog')
 
 
     def check_connection(self):

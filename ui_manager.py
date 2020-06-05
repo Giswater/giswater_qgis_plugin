@@ -117,7 +117,7 @@ class ElementUi(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('add_lot.ui')
+FORM_CLASS = get_ui_class('lot.ui')
 class LotUi(GwDialog, FORM_CLASS):
     pass
 
@@ -261,8 +261,8 @@ class DlgTrace(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('csv2pg.ui')
-class Csv2Pg(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('csv.ui')
+class CsvUi(GwDialog, FORM_CLASS):
     pass
 
 
@@ -296,8 +296,8 @@ class ElementManager(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('epa_compare.ui')
-class EpaCompare(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('go2epa_selector.ui.ui')
+class Go2EpaSelectorUi(GwDialog, FORM_CLASS):
     pass
 
 
@@ -466,8 +466,8 @@ class PsectorRapportUi(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('qm_generator.ui')
-class QmGenerator(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('main_qtdialog.ui.ui')
+class MainQtDialogUi(GwDialog, FORM_CLASS):
 
     def __init__(self, subtag=None):
 
@@ -516,8 +516,8 @@ class MainGisProjectUi(GwMainWindow, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('readsql_rename_copy.ui')
-class ReadsqlRenameCopy(GwMainWindow, FORM_CLASS):
+FORM_CLASS = get_ui_class('main_renameproj.ui')
+class MainRenameProjUi(GwMainWindow, FORM_CLASS):
     pass
 
 
