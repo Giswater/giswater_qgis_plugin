@@ -127,8 +127,8 @@ class VisitUi(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('info_basic.ui')
-class ApiBasicInfo(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('info_generic.ui')
+class InfoGenericUi(GwDialog, FORM_CLASS):
     pass
 
 
@@ -137,14 +137,14 @@ class InfoCatalogUi(GwMainWindow, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('info_full.ui')
-class InfoFullUi(GwMainWindow, FORM_CLASS):
+FORM_CLASS = get_ui_class('info_feature.ui')
+class InfoFeatureUi(GwMainWindow, FORM_CLASS):
     key_pressed = QtCore.pyqtSignal()
 
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key_Escape:
             self.key_pressed.emit()
-            return super(InfoFullUi, self).keyPressEvent(event)
+            return super(InfoFeatureUi, self).keyPressEvent(event)
 
 
 FORM_CLASS = get_ui_class('fastprint.ui')

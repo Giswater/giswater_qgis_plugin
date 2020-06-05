@@ -26,7 +26,7 @@ from .manage_element import ManageElement
 from .manage_gallery import ManageGallery
 from .manage_visit import ManageVisit
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
-from ..ui_manager import ApiBasicInfo, InfoFullUi, VisitEventFull, GwMainWindow, VisitDocument, InfoCrossectUi
+from ..ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFull, GwMainWindow, VisitDocument, InfoCrossectUi
 
 
 class ApiCF(ApiParent, QObject):
@@ -293,14 +293,14 @@ class ApiCF(ApiParent, QObject):
             self.controller.log_info(str(e))
             return False, None
 
-        if template == 'info_generic':
+        if template == 'template_generic':
             result, dialog = self.open_generic_form(self.complet_result)
             # Fill self.my_json for new feature
             if feature_cat is not None:
                 self.manage_new_feature(self.complet_result, dialog)
             return result, dialog
 
-        elif template == 'info_feature':
+        elif template == 'template_feature':
             sub_tag = None
             if feature_cat:
                 if feature_cat.feature_type.lower() == 'arc':
@@ -368,7 +368,7 @@ class ApiCF(ApiParent, QObject):
 
     def open_generic_form(self, complet_result):
         self.draw(complet_result, zoom=False)
-        self.hydro_info_dlg = ApiBasicInfo()
+        self.hydro_info_dlg = InfoGenericUi()
         self.load_settings(self.hydro_info_dlg)
         self.hydro_info_dlg.btn_close.clicked.connect(partial(self.close_dialog, self.hydro_info_dlg))
         self.hydro_info_dlg.rejected.connect(partial(self.close_dialog, self.hydro_info_dlg))
@@ -379,7 +379,7 @@ class ApiCF(ApiParent, QObject):
         self.hydro_info_dlg.btn_accept.setEnabled(False)
         self.hydro_info_dlg.rejected.connect(partial(self.resetRubberbands))
         # Open dialog
-        self.open_dialog(self.hydro_info_dlg, dlg_name='info_basic')
+        self.open_dialog(self.hydro_info_dlg, dlg_name='info_generic')
         
         return result, self.hydro_info_dlg
 
@@ -387,7 +387,7 @@ class ApiCF(ApiParent, QObject):
     def open_custom_form(self, feature_id, complet_result, tab_type=None, sub_tag=None, is_docker=True):
 
         # Dialog
-        self.dlg_cf = InfoFullUi(sub_tag)
+        self.dlg_cf = InfoFeatureUi(sub_tag)
         self.load_settings(self.dlg_cf)
         self.draw(complet_result, zoom=False)
 
@@ -628,7 +628,7 @@ class ApiCF(ApiParent, QObject):
                 toolbox_cf.setItemText(int(result['index']), result['text'])
 
         # Open dialog
-        self.open_dialog(self.dlg_cf, dlg_name='info_full')
+        self.open_dialog(self.dlg_cf, dlg_name='info_feature')
         
         self.dlg_cf.setWindowTitle(f"{complet_result[0]['body']['feature']['childType']}")
         return self.complet_result, self.dlg_cf
@@ -2595,7 +2595,7 @@ class ApiCF(ApiParent, QObject):
 
         # Open dialog
         self.dlg_new_workcat.setWindowTitle("Create workcat")
-        self.open_dialog(self.dlg_new_workcat, dlg_name='info_basic')
+        self.open_dialog(self.dlg_new_workcat, dlg_name='info_generic')
 
 
     def cf_manage_new_workcat_accept(self, table_object, tab_type):

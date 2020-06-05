@@ -27,7 +27,7 @@ from .manage_document import ManageDocument
 from .manage_new_psector import ManageNewPsector
 from .manage_visit import ManageVisit
 from .api_parent import ApiParent
-from ..ui_manager import SearchUi, ApiBasicInfo, SearchWorkcat
+from ..ui_manager import SearchUi, InfoGenericUi, SearchWorkcat
 
 
 class ApiSearch(ApiParent):
@@ -395,10 +395,10 @@ class ApiSearch(ApiParent):
             return
 
         result = [json_result]
-        if not row:
+        if not result:
             return
 
-        self.hydro_info_dlg = ApiBasicInfo()
+        self.hydro_info_dlg = InfoGenericUi()
         self.load_settings(self.hydro_info_dlg)
 
         self.hydro_info_dlg.btn_close.clicked.connect(partial(self.close_dialog, self.hydro_info_dlg))
@@ -407,7 +407,7 @@ class ApiSearch(ApiParent):
         field_id = str(result[0]['body']['feature']['idName'])
         self.populate_basic_info(self.hydro_info_dlg, result, field_id)
 
-        self.open_dialog(self.hydro_info_dlg, dlg_name='info_basic')
+        self.open_dialog(self.hydro_info_dlg, dlg_name='info_generic')
 
 
     def workcat_open_table_items(self, item):
