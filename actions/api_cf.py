@@ -293,14 +293,14 @@ class ApiCF(ApiParent, QObject):
             self.controller.log_info(str(e))
             return False, None
 
-        if template == 'template_generic':
+        if template == 'info_generic':
             result, dialog = self.open_generic_form(self.complet_result)
             # Fill self.my_json for new feature
             if feature_cat is not None:
                 self.manage_new_feature(self.complet_result, dialog)
             return result, dialog
 
-        elif template == 'template_feature':
+        elif template == 'info_feature':
             sub_tag = None
             if feature_cat:
                 if feature_cat.feature_type.lower() == 'arc':
