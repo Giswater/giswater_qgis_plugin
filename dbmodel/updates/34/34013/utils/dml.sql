@@ -49,3 +49,7 @@ UPDATE sys_foreignkey SET target_table = 'inp_curve_value' WHERE target_table = 
 UPDATE sys_foreignkey SET target_table = 'inp_curve' WHERE target_table = 'inp_curve_id';
 
 UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'sys_role_id', 'sys_role') where dv_querytext like '%sys_role_id%';
+
+DELETE FROM sys_message WHERE id IN (0,1,2,3,999);
+
+INSERT INTO sys_process VALUES (248, 'Daily update', 'utils');
