@@ -162,8 +162,8 @@ class DimensioningUi(GwMainWindow, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('options.ui')
-class OptionsUi(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('go2epa_options.ui')
+class Go2EpaOptionsUi(GwDialog, FORM_CLASS):
     pass
 
 
