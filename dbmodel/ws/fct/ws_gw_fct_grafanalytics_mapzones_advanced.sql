@@ -13,17 +13,14 @@ $BODY$
 
 /*
 SELECT gw_fct_grafanalytics_mapzones_advanced('{"data":{"parameters":{"grafClass":"SECTOR", "exploitation": "15", 
-"updateFeature":"TRUE", "updateMapZone":1,"geomParamUpdate":0.85, "debug":"FALSE"}}}');
+"updateFeature":"TRUE", "updateMapZone":1, "debug":"FALSE"}}}');
 
 SELECT gw_fct_grafanalytics_mapzones_advanced('{"data":{"parameters":{"grafClass":"DMA", "exploitation": "1", 
-"updateFeature":"TRUE", "updateMapZone":3,"geomParamUpdate":10}}}');
-ELECT dma_id, count(dma_id) from v_edit_arc  group by dma_id order by 1;
+"updateFeature":"TRUE", "updateMapZone":3}}}');
 
 SELECT gw_fct_grafanalytics_mapzones_advanced('{"data":{"parameters":{"grafClass":"DQA", "exploitation": "2", 
 "updateFeature":"TRUE", "updateMapZone":0}}}');
 
-SELECT gw_fct_grafanalytics_mapzones_advanced('{"data":{"parameters":{"grafClass":"PRESSZONE","exploitation":"1",
-"updateFeature":"TRUE","updateMapZone":2","geomParamUpdate":10}}}');
 */
 
 DECLARE
@@ -43,12 +40,14 @@ BEGIN
 	v_updatemapzone = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
 	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 	v_paramupdate = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'geomParamUpdate');
+
+	IF v_paramupdate IS NULL THEN v_paramupdate = 5; END IF;
 	
 	IF v_updatemapzone IS NULL THEN
 		v_updatemapzone = 1;
 	END IF;
 
-	v_data = concat ('{"data":{"parameters":{"grafClass":"',v_class,'", "exploitation": "[',v_expl,']", "updateFeature":"TRUE",
+	v_data = concat ('{"data":{"parameters":{"grafClass":"',v_class,'", "exploitation": [',v_expl,'], "updateFeature":"TRUE",
 	"updateMapZone":'||v_updatemapzone||', "geomParamUpdate":'||v_paramupdate||', "debug":"FALSE", "setVisibleLayers":[]}}}');
 
 	RETURN gw_fct_grafanalytics_mapzones(v_data);
