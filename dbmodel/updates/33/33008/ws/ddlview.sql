@@ -28,7 +28,6 @@ CREATE OR REPLACE VIEW v_edit_samplepoint AS
     samplepoint.streetaxis_id,
     samplepoint.postnumber,
     samplepoint.postcode,
-    samplepoint.district_id,
     samplepoint.streetaxis2_id,
     samplepoint.postnumber2,
     samplepoint.postcomplement,
