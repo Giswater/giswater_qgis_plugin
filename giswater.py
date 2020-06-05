@@ -52,7 +52,7 @@ from .map_tools.replace_feature import ReplaceFeatureMapTool
 from .map_tools.open_visit import OpenVisit
 from .models.plugin_toolbar import PluginToolbar
 from .models.sys_feature_cat import SysFeatureCat
-from .ui_manager import AuditCheckProjectResult
+from .ui_manager import AuditCheckProjectResult, BasicInfo
 
 class Giswater(QObject):  
     
@@ -1689,25 +1689,25 @@ class Giswater(QObject):
             # repaint layer
             lyr.triggerRepaint()
 
-def check_layers_from_distinct_schema(self):
-        layers = self.controller.get_layers()
-        repeated_layers = {}
-        for layer in layers:
-            layer_toc_name = self.controller.get_layer_source_table_name(layer)
-            if layer_toc_name == 'v_edit_node':
-                layer_source = self.controller.get_layer_source(layer)
-                repeated_layers[layer_source['schema'].replace('"', '')] = 'v_edit_node'
-        if len(repeated_layers) > 1:
-            if self.qgis_project_main_schema is None or self.qgis_project_add_schema is None:
-                self.dlg_dtext = DialogTextUi()
-                self.dlg_dtext.btn_accept.hide()
-                self.dlg_dtext.btn_close.clicked.connect(lambda: self.dlg_dtext.close())
-                msg = "QGIS project has more than one layer v_edit_node comming from differents schemas. " \
-                      "If you are looking for manage two schemas, it is mandatory to define wich is the master and " \
-                      "wich is the other one. To do this you need to configure the QGIS project setting this project " \
-                      "variables: gwMainSchema and gwAddSchema."
+    def check_layers_from_distinct_schema(self):
+            layers = self.controller.get_layers()
+            repeated_layers = {}
+            for layer in layers:
+                layer_toc_name = self.controller.get_layer_source_table_name(layer)
+                if layer_toc_name == 'v_edit_node':
+                    layer_source = self.controller.get_layer_source(layer)
+                    repeated_layers[layer_source['schema'].replace('"', '')] = 'v_edit_node'
+            if len(repeated_layers) > 1:
+                if self.qgis_project_main_schema is None or self.qgis_project_add_schema is None:
+                    self.dlg_dtext = BasicInfo()
+                    self.dlg_dtext.btn_accept.hide()
+                    self.dlg_dtext.btn_close.clicked.connect(lambda: self.dlg_dtext.close())
+                    msg = "QGIS project has more than one layer v_edit_node comming from differents schemas. " \
+                          "If you are looking for manage two schemas, it is mandatory to define wich is the master and " \
+                          "wich is the other one. To do this you need to configure the QGIS project setting this project " \
+                          "variables: gwMainSchema and gwAddSchema."
 
-                self.dlg_dtext.txt_infolog.setText(msg)
-                self.dlg_dtext.open()
-                return False
-        return True
+                    self.dlg_dtext.txt_infolog.setText(msg)
+                    self.dlg_dtext.open()
+                    return False
+            return True
