@@ -5,7 +5,10 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = "SCHEMA_NAME", public, pg_catalog;
+SET search_path = "utils", public, pg_catalog;
 
- 
-UPDATE config_param_system SET value='TRUE' WHERE parameter='admin_utils_schema';
+
+UPDATE sys_table SET notify_action = null WHERE id IN ('ext_municipality','ext_streetaxis','ext_plot','ext_type_street','ext_address', 'ext_district');
+
+
+

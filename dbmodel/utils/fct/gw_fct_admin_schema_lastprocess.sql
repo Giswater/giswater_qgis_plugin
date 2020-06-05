@@ -87,8 +87,8 @@ BEGIN
 	-- last proccess
 	IF v_isnew IS TRUE THEN
 			
-		INSERT INTO config_param_system (parameter, value, datatype, context, descript, project_type, label, isdeprecated) 
-		VALUES ('admin_superusers', v_superusers ,'json','system', 'Basic information about superusers for this schema','utils', 'Schema manager:', false);
+		INSERT INTO config_param_system (parameter, value, datatype, descript, project_type, label, isdeprecated)
+		VALUES ('admin_superusers', v_superusers ,'json', 'Basic information about superusers for this schema','utils', 'Schema manager:', false);
 			
 		-- inserting version table
 		IF v_sample_exist != 'sample' THEN
@@ -207,8 +207,8 @@ BEGIN
 		ALTER TABLE sys_addfields DROP COLUMN if exists _sql_text_;
 		
 		-- inserting on config_param_system table
-		INSERT INTO config_param_system (parameter, value, datatype, context, descript, project_type, label, isdeprecated) 
-		VALUES ('admin_schema_info', v_schema_info,'json','system', 'Basic information about schema','utils', 'Schema manager:', false);
+		INSERT INTO config_param_system (parameter, value, datatype, descript, project_type, label, isdeprecated)
+		VALUES ('admin_schema_info', v_schema_info,'json', 'Basic information about schema','utils', 'Schema manager:', false);
 
 		-- fk from utils schema
 		IF (SELECT value FROM config_param_system WHERE parameter='admin_utils_schema') IS NOT NULL THEN

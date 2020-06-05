@@ -59,3 +59,10 @@ INSERT INTO config_toolbox VALUES (2890,'Calculate cost of reconstruction',TRUE,
    
  
 ALTER TABLE anl_polygon RENAME fprocesscat_id TO fid;
+
+ALTER TABLE config_param_system DROP COLUMN context;
+
+ALTER TABLE sys_table DROP COLUMN context;
+ALTER TABLE sys_table DROP COLUMN sys_rows;
+
+

@@ -36,7 +36,7 @@ BEGIN
 	PERFORM gw_fct_rpt2pg_import_rpt(p_data);
 	
 	-- Reset sequences of rpt_* tables
-	FOR rec_table IN SELECT * FROM sys_table WHERE context='Hydraulic result data' AND sys_sequence IS NOT NULL
+	FOR rec_table IN SELECT * FROM sys_table WHERE sys_sequence IS NOT NULL
 	LOOP
 		-- EXECUTE 'SELECT max(id) FROM '||quote_ident(rec_table.id) INTO v_val;
 		-- EXECUTE 'SELECT setval(SCHEMA_NAME.'||rec_table.sys_sequence||', '||v_val||', true);';

@@ -26,7 +26,6 @@ SELECT SCHEMA_NAME.gw_fct_audit_check_project($${"client":{"device":4, "infoType
 DECLARE 
 
 v_querytext text;
-v_sys_rows text;
 v_parameter text;
 v_audit_rows integer;
 v_compare_sign text;

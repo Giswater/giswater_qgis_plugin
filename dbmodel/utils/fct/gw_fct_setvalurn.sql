@@ -13,24 +13,7 @@ $BODY$
 
 DECLARE 
 
-query_text 	text;
-sys_rows_aux text;
-parameter_aux text;
-audit_rows_aux integer;
-compare_sign_aux text;
-enabled_bool boolean;
-diference_aux integer;
-error_aux integer;
-count integer;
-table_host_aux text;
-table_dbname_aux text;
-table_schema_aux text;
-table_record record;
-query_string text;
-max_aux int8;
-project_type_aux text;
-rolec_rec record;
-psector_vdef_aux text;
+v_max int8;
 
 BEGIN 
 
@@ -46,7 +29,7 @@ BEGIN
 		(SELECT max(connec_id::int8) FROM connec WHERE connec_id ~ '^\d+$'),
 		(SELECT max(element_id::int8) FROM element WHERE element_id ~ '^\d+$'),
 		(SELECT max(pol_id::int8) FROM polygon WHERE pol_id ~ '^\d+$')
-		) INTO max_aux;
+		) INTO v_max;
 	ELSIF project_type_aux='UD' THEN
 		SELECT GREATEST (
 		(SELECT max(node_id::int8) FROM node WHERE node_id ~ '^\d+$'),
@@ -55,10 +38,10 @@ BEGIN
 		(SELECT max(gully_id::int8) FROM gully WHERE gully_id ~ '^\d+$'),
 		(SELECT max(element_id::int8) FROM element WHERE element_id ~ '^\d+$'),
 		(SELECT max(pol_id::int8) FROM polygon WHERE pol_id ~ '^\d+$')
-		) INTO max_aux;
+		) INTO v_max;
 	END IF;	
 	
-return max_aux;
+return v_max;
 END;
 
 $BODY$
