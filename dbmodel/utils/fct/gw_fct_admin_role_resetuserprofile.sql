@@ -87,7 +87,7 @@ BEGIN
 		DELETE FROM config_param_user WHERE cur_user=v_user;
 		INSERT INTO config_param_user (parameter, value, cur_user)
 		SELECT sys_param_user.id, vdefault, v_user FROM SCHEMA_NAME.config_param_user RIGHT JOIN SCHEMA_NAME.sys_param_user ON sys_param_user.id=parameter 
-		WHERE ismandatory IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE pg_has_role(v_user, oid, 'member'));
+		WHERE ismandatory IS TRUE AND sys_role IN (SELECT rolname FROM pg_roles WHERE pg_has_role(v_user, oid, 'member'));
 
 		-- selectors
 		DELETE FROM selector_expl WHERE cur_user=v_user;

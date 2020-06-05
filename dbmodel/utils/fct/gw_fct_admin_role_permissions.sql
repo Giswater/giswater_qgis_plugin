@@ -121,9 +121,9 @@ BEGIN
 		EXECUTE v_query_text;
 
 		-- Grant specificic permissions for tables
-		FOR v_tablerecord IN SELECT * FROM sys_table WHERE sys_role_id IS NOT NULL AND isdeprecated != TRUE
+		FOR v_tablerecord IN SELECT * FROM sys_table WHERE sys_role IS NOT NULL AND isdeprecated != TRUE
 		LOOP
-			v_query_text:= 'GRANT ALL ON TABLE '||v_tablerecord.id||' TO '||v_tablerecord.sys_role_id||';';
+			v_query_text:= 'GRANT ALL ON TABLE '||v_tablerecord.id||' TO '||v_tablerecord.sys_role||';';
 			EXECUTE v_query_text;
 		END LOOP;
 	
@@ -132,7 +132,7 @@ BEGIN
 		FOR v_tablerecord IN SELECT * FROM audit_cat_function WHERE project_type=v_project_type
 		LOOP
 			v_function_name=concat(v_tablerecord.function_name,'(',v_tablerecord.input_params,')');
-			v_query_text:= 'GRANT ALL ON FUNCTION '||v_tablerecord.id||' TO '||v_tablerecord.sys_role_id||';';
+			v_query_text:= 'GRANT ALL ON FUNCTION '||v_tablerecord.id||' TO '||v_tablerecord.sys_role||';';
 			EXECUTE v_query_text;
 		END LOOP;
 		*/

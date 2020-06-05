@@ -49,7 +49,7 @@ BEGIN
 		END LOOP;
 
 		-- Delete tables
-		FOR v_tablerecord IN SELECT * FROM audit_cat_table WHERE sys_role_id IS NOT NULL 
+		FOR v_tablerecord IN SELECT * FROM audit_cat_table WHERE sys_role IS NOT NULL
 		AND id NOT LIKE 'v_%' AND id NOT LIKE 'audit_cat_table' AND id NOT LIKE 'audit_cat_function' 
 		AND isdeprecated IS FALSE
 		LOOP

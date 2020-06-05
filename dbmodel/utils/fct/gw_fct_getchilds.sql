@@ -88,11 +88,11 @@ BEGIN
 		EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (
 		 SELECT label, sys_param_user.id as widgetname, datatype, widgettype, layoutorder,layoutname,
 		(CASE WHEN iseditable IS NULL OR iseditable IS TRUE THEN ''True'' ELSE ''False'' END) AS iseditable,
-		 row_number()over(ORDER BY layoutname, layoutorder) AS orderby, value, project_type, dv_querytext, dv_querytext_filterc, dv_parent_id, isparent, sys_role_id,
+		 row_number()over(ORDER BY layoutname, layoutorder) AS orderby, value, project_type, dv_querytext, dv_querytext_filterc, dv_parent_id, isparent, sys_role,
 		 placeholder,
 		 dv_orderby_id,feature_dv_parent_value, descript AS tooltip, dv_isnullvalue AS "isNullValue", widgetcontrols
 		 FROM sys_param_user LEFT JOIN (SELECT * FROM config_param_user WHERE cur_user=current_user) a ON a.parameter=sys_param_user.id 
-		 WHERE sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
+		 WHERE sys_role IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
 		 AND dv_parent_id='||quote_literal(v_comboparent)||'
 		 AND isenabled IS TRUE
 		 ORDER BY orderby) a WHERE widgettype = ''combo'''

@@ -322,7 +322,7 @@ BEGIN
 				END IF;
 
 				IF concat('edit_addfield_p', v_idaddparam,'_vdefault') NOT IN (SELECT id FROM sys_param_user) THEN
-					INSERT INTO sys_param_user (id, formname, descript, sys_role_id, label,  layoutname, layoutorder,
+					INSERT INTO sys_param_user (id, formname, descript, sys_role, label,  layoutname, layoutorder,
 					project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated, dv_querytext, dv_querytext_filterc,feature_field_id, isenabled)
 					VALUES (concat('edit_addfield_p', v_idaddparam,'_vdefault'),'config', concat('Default value of addfield ',v_param_name), 'role_edit', v_param_name,
 					'lyt_addfields', v_param_user_id, lower(v_project_type), false, false, v_audit_datatype, v_audit_widgettype, false, false,
@@ -642,7 +642,7 @@ BEGIN
 				v_param_user_id=1;
 			END IF;
 
-			INSERT INTO sys_param_user (id, formname, descript, sys_role_id, label,  layoutname, layoutorder,
+			INSERT INTO sys_param_user (id, formname, descript, sys_role, label,  layoutname, layoutorder,
 			project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated,dv_querytext, dv_querytext_filterc, feature_field_id, isenabled)
 			VALUES (concat('edit_addfield_p', v_idaddparam,,'_vdefault'),'config', 
 			concat('Default value of addfield ',v_param_name, ' for ', v_cat_feature), 

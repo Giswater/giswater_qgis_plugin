@@ -60,9 +60,19 @@ INSERT INTO config_toolbox VALUES (2890,'Calculate cost of reconstruction',TRUE,
  
 ALTER TABLE anl_polygon RENAME fprocesscat_id TO fid;
 
-ALTER TABLE config_param_system DROP COLUMN context;
+-- drop id field for inp_curve_id
+ALTER TABLE inp_curve_id DROP CONSTRAINT inp_curve_pkey;
+ALTER TABLE inp_curve_id ADD CONSTRAINT inp_curve_pkey PRIMARY KEY (curve_id, x_value);
+ALTER TABLE inp_curve_id DROP COLUMN id;
 
+-- drop context
+ALTER TABLE config_param_system DROP COLUMN context;
 ALTER TABLE sys_table DROP COLUMN context;
+
+-- drop sys_rows
 ALTER TABLE sys_table DROP COLUMN sys_rows;
 
-
+-- rename sys_role_id to sys_role
+ALTER TABLE sys_function RENAME sys_role_id TO sys_role;
+ALTER TABLE sys_param_user RENAME sys_role_id TO sys_role;
+ALTER TABLE sys_table RENAME sys_role_id TO sys_role;

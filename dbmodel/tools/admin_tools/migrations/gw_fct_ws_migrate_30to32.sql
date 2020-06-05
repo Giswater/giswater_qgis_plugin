@@ -56,7 +56,7 @@ BEGIN
 	
 	--loop over tables that are not assigned to role_admin
     FOR rec IN EXECUTE 
-    'SELECT id FROM '||p_source_schema||'.audit_cat_table WHERE sys_role_id!=''role_admin'' 
+    'SELECT id FROM '||p_source_schema||'.audit_cat_table WHERE sys_role!=''role_admin''
     and (id not ilike ''v_%'' and id not ilike ''%selector%'' and id  not ilike ''config%'' and id not ilike ''ext_rtc_hydrometer_state'') order by id' 
     LOOP
 		--direct insert from one schema to another. Special ELSIF for the tables which need transformation

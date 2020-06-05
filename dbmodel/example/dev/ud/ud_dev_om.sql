@@ -16,7 +16,7 @@ widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
 VALUES ('visit_class_0', 'visit', 'class_id', 1, 'integer', 'text', 'Visit type:',
-NULL, NULL, NULL, false, false, true, NULL, 'SELECT id, idval FROM config_visit_class WHERE feature_type IS NULL AND active IS TRUE AND id > 0 AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))',
+NULL, NULL, NULL, false, false, true, NULL, 'SELECT id, idval FROM config_visit_class WHERE feature_type IS NULL AND active IS TRUE AND id > 0 AND sys_role IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))',
 NULL, NULL, NULL, NULL, 
 NULL ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
@@ -96,7 +96,7 @@ widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
 VALUES ('unexpected_noinfra', 'visit', 'class_id', 1, 'integer', 'combo', 'Visit type:',
-NULL, NULL, NULL, false, false, true, NULL, 'SELECT id, idval FROM config_visit_class WHERE feature_type IS NULL AND active IS TRUE AND id > 0 AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))',
+NULL, NULL, NULL, false, false, true, NULL, 'SELECT id, idval FROM config_visit_class WHERE feature_type IS NULL AND active IS TRUE AND id > 0 AND sys_role IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))',
 NULL, NULL, NULL, NULL, 
 'gwGetVisit' ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
@@ -190,7 +190,7 @@ widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
 VALUES ('visit_arc_insp', 'visit', 'class_id', 1, 'integer', 'combo', 'Visit type:',
-NULL, NULL, NULL, false, false, true, NULL, 'SELECT id, idval FROM config_visit_class WHERE feature_type=''ARC'' AND  active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))',
+NULL, NULL, NULL, false, false, true, NULL, 'SELECT id, idval FROM config_visit_class WHERE feature_type=''ARC'' AND  active IS TRUE AND sys_role IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))',
 NULL, NULL, NULL, NULL, 
 'gwGetVisit',NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
@@ -316,7 +316,7 @@ widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
 VALUES ('visit_arc_insp', 'visit', 'backbutton', 2, NULL, 'button', 'Back',
-NULL, NULL, NULL, false, false, true, NULL, 'SELECT id, idval FROM config_visit_class WHERE feature_type=''ARC'' AND  active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))',
+NULL, NULL, NULL, false, false, true, NULL, 'SELECT id, idval FROM config_visit_class WHERE feature_type=''ARC'' AND  active IS TRUE AND sys_role IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))',
 NULL, NULL, NULL, NULL, 
 'backButtonClicked',NULL, NULL, NULL, 'data_9', NULL, FALSE);
 
@@ -329,7 +329,7 @@ widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
 VALUES ('visit_connec_insp', 'visit', 'class_id', 1, 'integer', 'combo', 'Visit type:',
-NULL, NULL, NULL, false, false, true, NULL, 'SELECT id, idval FROM config_visit_class WHERE feature_type=''CONNEC'' AND  active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))',
+NULL, NULL, NULL, false, false, true, NULL, 'SELECT id, idval FROM config_visit_class WHERE feature_type=''CONNEC'' AND  active IS TRUE AND sys_role IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))',
 NULL, NULL, NULL, NULL, 
 'gwGetVisit' ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
@@ -422,7 +422,7 @@ widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
 VALUES ('visit_node_insp', 'visit', 'class_id', 1, 'integer', 'combo', 'Visit type:',
-NULL, NULL, NULL, false, false, true, NULL, 'SELECT id, idval FROM config_visit_class WHERE feature_type=''NODE'' AND  active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))',
+NULL, NULL, NULL, false, false, true, NULL, 'SELECT id, idval FROM config_visit_class WHERE feature_type=''NODE'' AND  active IS TRUE AND sys_role IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))',
 NULL, NULL, NULL, NULL, 
 'gwGetVisit', NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
@@ -525,7 +525,7 @@ widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
 VALUES ('visit_arc_leak', 'visit', 'class_id', 1, 'integer', 'combo', 'Visit type:',
-NULL, NULL, NULL, false, false, true, NULL, 'SELECT id, idval FROM config_visit_class WHERE feature_type=''ARC'' AND  active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))',
+NULL, NULL, NULL, false, false, true, NULL, 'SELECT id, idval FROM config_visit_class WHERE feature_type=''ARC'' AND  active IS TRUE AND sys_role IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))',
 NULL, NULL, NULL, NULL, 
 'gwGetVisit' ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
@@ -674,7 +674,7 @@ widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
 VALUES ('visit_connec_leak', 'visit', 'class_id', 1, 'integer', 'combo', 'Visit type:',
-NULL, NULL, NULL, false, false, true, NULL, 'SELECT id, idval FROM config_visit_class WHERE feature_type=''CONNEC'' AND  active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))',
+NULL, NULL, NULL, false, false, true, NULL, 'SELECT id, idval FROM config_visit_class WHERE feature_type=''CONNEC'' AND  active IS TRUE AND sys_role IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))',
 NULL, NULL, NULL, NULL, 
 'gwGetVisit',NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
@@ -767,7 +767,7 @@ widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
 VALUES ('visit_node_leak', 'visit', 'class_id', 1, 'integer', 'combo', 'Visit type:',
-NULL, NULL, NULL, false, false, true, NULL, 'SELECT id, idval FROM config_visit_class WHERE feature_type=''NODE'' AND  active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))',
+NULL, NULL, NULL, false, false, true, NULL, 'SELECT id, idval FROM config_visit_class WHERE feature_type=''NODE'' AND  active IS TRUE AND sys_role IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))',
 NULL, NULL, NULL, NULL, 
 'gwGetVisit' ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
@@ -861,7 +861,7 @@ widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
 VALUES ('ve_visit_arc_rehabit', 'visit', 'class_id', 1, 'integer', 'combo', 'Visit type:',
-NULL, NULL, NULL, false, false, true, NULL, 'SELECT id, idval FROM config_visit_class WHERE feature_type=''ARC'' AND  active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))',
+NULL, NULL, NULL, false, false, true, NULL, 'SELECT id, idval FROM config_visit_class WHERE feature_type=''ARC'' AND  active IS TRUE AND sys_role IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))',
 NULL, NULL, NULL, NULL, 
 'gwGetVisit' ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 
@@ -992,7 +992,7 @@ widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
 widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
 VALUES ('visit_gully_insp', 'visit', 'class_id', 1, 'integer', 'combo', 'Visit type:',
-NULL, NULL, NULL, false, false, true, NULL, 'SELECT id, idval FROM config_visit_class WHERE feature_type=''GULLY'' AND  active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))',
+NULL, NULL, NULL, false, false, true, NULL, 'SELECT id, idval FROM config_visit_class WHERE feature_type=''GULLY'' AND  active IS TRUE AND sys_role IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))',
 NULL, NULL, NULL, NULL, 
 'gwGetVisit' ,NULL, NULL, NULL, 'data_1', NULL, FALSE);
 

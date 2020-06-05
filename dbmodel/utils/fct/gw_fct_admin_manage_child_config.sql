@@ -58,7 +58,7 @@ BEGIN
 	v_feature_system_id  = (SELECT lower(system_id) FROM cat_feature where id=v_cat_feature);
 
 	IF v_view_name NOT IN (SELECT tableinfo_id FROM config_info_layer_x_type) THEN
-		INSERT INTO sys_table(id, descript, sys_role_id, sys_criticity, qgis_role_id, qgis_criticity, isdeprecated)
+		INSERT INTO sys_table(id, descript, sys_role, sys_criticity, qgis_role_id, qgis_criticity, isdeprecated)
 	    VALUES (v_view_name, concat('Custom editable view for ',v_cat_feature), 'role_edit', 0, null,0,false);
 
 	    PERFORM gw_fct_admin_role_permissions();

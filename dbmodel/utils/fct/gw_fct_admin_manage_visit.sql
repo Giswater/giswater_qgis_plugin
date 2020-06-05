@@ -206,7 +206,7 @@ BEGIN
 	IF v_action = 'CREATE' THEN
 		--insert new class and parameter
 		IF v_action_type = 'class' THEN
-			INSERT INTO config_visit_class (idval, descript, active, ismultifeature, ismultievent, feature_type, sys_role_id, visit_type, param_options)
+			INSERT INTO config_visit_class (idval, descript, active, ismultifeature, ismultievent, feature_type, sys_role, visit_type, param_options)
 			VALUES (v_class_name, v_descript, v_active, v_ismultifeature, v_ismultievent,upper(v_feature_system_id), 'role_om', v_visit_type, v_param_options::json)
 			RETURNING id INTO v_class_id;
 
@@ -269,15 +269,15 @@ BEGIN
 				--rename dv_querytext for class_id in order to look for defined feature_type
 				IF v_feature_system_id = 'connec' THEN
 					UPDATE config_form_fields SET dv_querytext= 'SELECT id, idval FROM config_visit_class WHERE feature_type=''CONNEC'' AND 
-					active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))'
+					active IS TRUE AND sys_role IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))'
 					WHERE formname=v_viewname AND columnname='class_id';
 				ELSIF v_feature_system_id = 'node' THEN
 					UPDATE config_form_fields SET dv_querytext= 'SELECT id, idval FROM config_visit_class WHERE feature_type=''NODE'' AND 
-					active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))'
+					active IS TRUE AND sys_role IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))'
 					WHERE formname=v_viewname AND columnname='class_id';
 				ELSIF v_feature_system_id = 'gully' THEN
 					UPDATE config_form_fields SET dv_querytext= 'SELECT id, idval FROM config_visit_class WHERE feature_type=''GULLY'' AND 
-					active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))'
+					active IS TRUE AND sys_role IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))'
 					WHERE formname=v_viewname AND columnname='class_id';
 				END IF;
 			END IF;
@@ -285,7 +285,7 @@ BEGIN
 		ELSIF v_action_type = 'parameter' THEN
 			
 			IF v_viewname NOT IN (SELECT id FROM sys_table) AND v_ismultievent iS TRUE THEN
-				INSERT INTO sys_table (id, description, sys_role_id, sys_criticity, qgis_criticity, isdeprecated)
+				INSERT INTO sys_table (id, description, sys_role, sys_criticity, qgis_criticity, isdeprecated)
 				VALUES (v_viewname, 'Editable view that saves visits', 'role_om', 0, 0, false);
 
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
