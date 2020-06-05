@@ -830,6 +830,7 @@ class Giswater(QObject):
             if layer_toc_name == 'v_edit_node':
                 layer_source = self.controller.get_layer_source(layer)
                 repeated_layers[layer_source['schema'].replace('"', '')] = 'v_edit_node'
+
         if len(repeated_layers) > 1:
             if self.qgis_project_main_schema is None or self.qgis_project_add_schema is None:
                 self.dlg_dtext = DialogTextUi()
@@ -843,6 +844,11 @@ class Giswater(QObject):
                 self.dlg_dtext.txt_infolog.setText(msg)
                 self.dlg_dtext.open()
                 return False
+
+            # If there are layers with a different scheme, the one that the user has in the project variable
+            # self.qgis_project_main_schema is taken as the schema_name.
+            self.schema_name = self.qgis_project_main_schema
+            self.controller.set_schema_name(self.qgis_project_main_schema)
         return True
 
 
@@ -923,6 +929,9 @@ class Giswater(QObject):
         self.srid = self.controller.get_srid('v_edit_node', self.schema_name)
         self.controller.plugin_settings_set_value("srid", self.srid)
 
+        # Get variables from qgis project
+        self.get_qgis_project_variables()
+
         # Check that there are no layers (v_edit_node) with the same view name, coming from different schemes
         status = self.check_layers_from_distinct_schema()
         if status is False: return
@@ -940,8 +949,7 @@ class Giswater(QObject):
 
         self.get_buttons_to_hide()
 
-        # get variables from qgis project
-        self.get_qgis_project_variables()
+
 
         # Manage project read of type 'tm'
         if self.wsoftware == 'tm':
@@ -1528,8 +1536,9 @@ class Giswater(QObject):
 
         extras = f'"selector_type":"exploitation", "check":true, "onlyone":true, "id":{expl_id}'
         body = self.create_body(extras=extras)
-        sql = f"SELECT gw_fct_setselectors($${{{body}}}$$)::text"
-        row = self.controller.get_row(sql, commit=True, log_sql=True)
+        # sql = f"SELECT gw_fct_setselectors($${{{body}}}$$)::text"
+        # row = self.controller.get_row(sql, commit=True, log_sql=True)
+        row = self.controller.get_json('gw_fct_setselectors', body, log_sql=True)
         if row:
             self.iface.mapCanvas().refreshAllLayers()
             self.layer_expl.triggerRepaint()
