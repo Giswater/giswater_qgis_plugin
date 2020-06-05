@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>readsq_rename</class>
- <widget class="QMainWindow" name="readsq_rename">
+ <class>dlg_readsq_rename</class>
+ <widget class="QMainWindow" name="dlg_readsq_rename">
   <property name="geometry">
    <rect>
     <x>0</x>

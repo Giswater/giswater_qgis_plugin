@@ -2654,7 +2654,7 @@ class UpdateSQL(ApiParent):
         status_update_childs = self.dlg_readsql.chk_multi_update.isChecked()
 
         # Control if ui path is invalid or null
-        if tpath is None:
+        if tpath in (None, 'null'):
             msg = "Please, select a valid UI Path."
             self.controller.show_info_box(msg, "Info")
             return
