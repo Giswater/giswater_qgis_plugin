@@ -115,6 +115,17 @@ update connec set link='https://www.giswater.org';
 update gully set link='https://www.giswater.org';
 
 
+UPDATE config_form_fields set layoutorder = layoutorder+1 WHERE formname in ('ve_arc', 've_node', 've_connec','ve_gully')
+AND columnname in ('streetname','streetname2', 'postnumber','postnumber2','postcomplement','postcomplement2');
+
+UPDATE config_form_fields set hidden = false  WHERE formname in ('ve_arc', 've_node', 've_connec')
+AND columnname = 'district_id';
+
+UPDATE config_form_fields set layoutorder = 2 WHERE formname in ('ve_arc', 've_node') AND columnname = 'district_id';
+
+UPDATE config_form_fields set layoutorder = 3 WHERE formname in ('ve_connec', 've_gully') AND columnname = 'district_id';
+
+
 SELECT gw_fct_audit_check_project($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "version":"0", "fid":1}}$$)::text;
 
 SELECT 	gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"CONDUIT"},
@@ -478,13 +489,3 @@ UPDATE connec SET connecat_id='CC020_D', matcat_id='Concret' WHERE connecat_id='
 UPDATE connec SET connecat_id='CC030_D', matcat_id='Concret' WHERE connecat_id='CON-CC030_D';
 UPDATE connec SET matcat_id='Virtual' WHERE connecat_id='VIRTUAL';
 
-
-UPDATE config_form_fields set layoutorder = layoutorder+1 WHERE formname in ('ve_arc', 've_node', 've_connec')
-AND columnname in ('streetname','streetname2', 'postnumber','postnumber2','postcomplement','postcomplement2');
-
-UPDATE config_form_fields set hidden = false  WHERE formname in ('ve_arc', 've_node', 've_connec')
-AND columnname = 'district_id';
-
-UPDATE config_form_fields set layoutorder = 2 WHERE formname = 've_node' AND columnname = 'district_id';
-
-UPDATE config_form_fields set layoutorder = 3 WHERE formname in ('ve_arc', 've_connec', 've_gully') AND columnname = 'district_id';
