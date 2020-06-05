@@ -811,6 +811,13 @@ class Giswater(QObject):
         self.srid = self.controller.get_srid('v_edit_node', self.schema_name)
         self.controller.plugin_settings_set_value("srid", self.srid)
 
+        # get variables from qgis project
+        self.get_qgis_project_variables()
+
+        # Check that there are no layers (v_edit_node) with the same view name, coming from different schemes
+        status = self.check_layers_from_distinct_schema()
+        if status is False: return
+
         self.parent = ParentAction(self.iface, self.settings, self.controller, self.plugin_dir)
         self.add_layer = AddLayer(self.iface, self.settings, self.controller, self.plugin_dir)
 
@@ -822,8 +829,7 @@ class Giswater(QObject):
         # Get water software from table 'version'
         self.wsoftware = self.controller.get_project_type()
 
-        # get variables from qgis project
-        self.get_qgis_project_variables()
+
 
         # Manage project read of type 'tm'
         if self.wsoftware == 'tm':
@@ -886,10 +892,6 @@ class Giswater(QObject):
         # Check roles of this user to show or hide toolbars 
         self.controller.check_user_roles()
 
-        # Check that there are no layers (v_edit_node) with the same view name, coming from different schemes
-        status = self.check_layers_from_distinct_schema()
-        if status is False: return
-        
         # Manage project variable 'expl_id'
         self.manage_expl_id()
 
@@ -1697,6 +1699,7 @@ class Giswater(QObject):
                 if layer_toc_name == 'v_edit_node':
                     layer_source = self.controller.get_layer_source(layer)
                     repeated_layers[layer_source['schema'].replace('"', '')] = 'v_edit_node'
+
             if len(repeated_layers) > 1:
                 if self.qgis_project_main_schema is None or self.qgis_project_add_schema is None:
                     self.dlg_dtext = BasicInfo()
@@ -1710,4 +1713,9 @@ class Giswater(QObject):
                     self.dlg_dtext.txt_infolog.setText(msg)
                     self.dlg_dtext.open()
                     return False
+
+                # If there are layers with a different scheme, the one that the user has in the project variable
+                # self.qgis_project_main_schema is taken as the schema_name.
+                self.schema_name = self.qgis_project_main_schema
+                self.controller.set_schema_name(self.qgis_project_main_schema)
             return True
