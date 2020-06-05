@@ -30,7 +30,7 @@ BEGIN
 
 	v_query_text = 'SELECT temp_arc.arc_id, temp_arc.node_1, the_geom, curve_id FROM temp_arc
 			JOIN inp_pump a ON concat(node_id,''_n2a'')=arc_id
-			JOIN inp_curve_id b ON b.id=a.curve_id
+			JOIN inp_curve b ON b.id=a.curve_id
 			WHERE epa_type=''PUMP'' AND isdoublen2a IS TRUE';			
 
 	FOR v_arc_id, v_node_1, v_geom, v_curve IN EXECUTE v_query_text

@@ -505,8 +505,8 @@ FROM SCHEMA_NAME_V2.element
 ----------------------------------------
 -- INSERT INTO SCHEMA_NAME_V3.inp_backdrop SELECT * FROM SCHEMA_NAME_V2.inp_backdrop;
 -- INSERT INTO SCHEMA_NAME_V3.inp_conduit SELECT * FROM SCHEMA_NAME_V2.inp_conduit;
--- INSERT INTO SCHEMA_NAME_V3.inp_curve_id SELECT * FROM SCHEMA_NAME_V2.inp_curve_id;
--- INSERT INTO SCHEMA_NAME_V3.inp_curve SELECT * FROM SCHEMA_NAME_V2.inp_curve;
+-- INSERT INTO SCHEMA_NAME_V3.inp_curve SELECT * FROM SCHEMA_NAME_V2.inp_curve_id;
+-- INSERT INTO SCHEMA_NAME_V3.inp_curve_value SELECT * FROM SCHEMA_NAME_V2.inp_curve_value;
 -- INSERT INTO SCHEMA_NAME_V3.inp_pattern SELECT pattern_id, null as observ FROM SCHEMA_NAME_V2.inp_pattern;
 -- INSERT INTO SCHEMA_NAME_V3.inp_junction SELECT * FROM SCHEMA_NAME_V2.inp_junction;
 -- INSERT INTO SCHEMA_NAME_V3.inp_weir SELECT * FROM SCHEMA_NAME_V2.inp_weir;

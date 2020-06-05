@@ -319,10 +319,10 @@ BEGIN
 			
 		ELSIF v_view='vi_curves' THEN
 			IF upper(NEW.curve_type) IN ('CONTROL', 'TIDAL', 'DIVERSION', 'PUMP1', 'PUMP2', 'PUMP3', 'PUMP4', 'RATING', 'SHAPE', 'STORAGE') THEN
-				INSERT INTO inp_curve_id(id, curve_type) SELECT NEW.curve_id, inp_typevalue.id FROM inp_typevalue WHERE upper(NEW.curve_type)=idval AND typevalue='inp_value_curve';
-				INSERT INTO inp_curve (curve_id,x_value,y_value) VALUES (NEW.curve_id,NEW.x_value,NEW.y_value);
+				INSERT INTO inp_curve(id, curve_type) SELECT NEW.curve_id, inp_typevalue.id FROM inp_typevalue WHERE upper(NEW.curve_type)=idval AND typevalue='inp_value_curve';
+				INSERT INTO inp_curve_value (curve_id,x_value,y_value) VALUES (NEW.curve_id,NEW.x_value,NEW.y_value);
 			ELSE
-				INSERT INTO inp_curve (curve_id,x_value,y_value) VALUES (NEW.curve_id,NEW.curve_type::numeric,NEW.x_value);
+				INSERT INTO inp_curve_value (curve_id,x_value,y_value) VALUES (NEW.curve_id,NEW.curve_type::numeric,NEW.x_value);
 			END IF;
 			
 		ELSIF v_view='vi_timeseries' THEN 

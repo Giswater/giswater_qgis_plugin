@@ -370,24 +370,24 @@ INSERT INTO inp_conduit (arc_id, barrels, culvert, kentry, kexit, kavg, flap, q0
 INSERT INTO inp_conduit (arc_id, barrels, culvert, kentry, kexit, kavg, flap, q0, qmax, seepage, custom_n) VALUES ('340', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 
-INSERT INTO inp_curve_id VALUES ('PUMP-01', 'PUMP2');
-INSERT INTO inp_curve_id VALUES ('EBAR-01', 'STORAGE');
-INSERT INTO inp_curve_id VALUES ('EBAR-02', 'STORAGE');
-INSERT INTO inp_curve_id VALUES ('PUMP-02', 'PUMP2');
+INSERT INTO inp_curve VALUES ('PUMP-01', 'PUMP2');
+INSERT INTO inp_curve VALUES ('EBAR-01', 'STORAGE');
+INSERT INTO inp_curve VALUES ('EBAR-02', 'STORAGE');
+INSERT INTO inp_curve VALUES ('PUMP-02', 'PUMP2');
 
 
-INSERT INTO inp_curve VALUES (8, 'EBAR-01', 0.000000, 17.500000);
-INSERT INTO inp_curve VALUES (9, 'EBAR-01', 10.000000, 17.500000);
-INSERT INTO inp_curve VALUES (1, 'PUMP-01', 10.000000, 0.016000);
-INSERT INTO inp_curve VALUES (2, 'PUMP-01', 20.000000, 0.015000);
-INSERT INTO inp_curve VALUES (3, 'PUMP-01', 30.000000, 0.013000);
-INSERT INTO inp_curve VALUES (4, 'PUMP-01', 40.000000, 0.008000);
-INSERT INTO inp_curve VALUES (14, 'EBAR-02', 0.000000, 15.000000);
-INSERT INTO inp_curve VALUES (15, 'EBAR-02', 10.000000, 15.000000);
-INSERT INTO inp_curve VALUES (10, 'PUMP-02', 10.000000, 0.045000);
-INSERT INTO inp_curve VALUES (11, 'PUMP-02', 20.000000, 0.038000);
-INSERT INTO inp_curve VALUES (12, 'PUMP-02', 30.000000, 0.035000);
-INSERT INTO inp_curve VALUES (13, 'PUMP-02', 40.000000, 0.033000);
+INSERT INTO inp_curve_value VALUES (8, 'EBAR-01', 0.000000, 17.500000);
+INSERT INTO inp_curve_value VALUES (9, 'EBAR-01', 10.000000, 17.500000);
+INSERT INTO inp_curve_value VALUES (1, 'PUMP-01', 10.000000, 0.016000);
+INSERT INTO inp_curve_value VALUES (2, 'PUMP-01', 20.000000, 0.015000);
+INSERT INTO inp_curve_value VALUES (3, 'PUMP-01', 30.000000, 0.013000);
+INSERT INTO inp_curve_value VALUES (4, 'PUMP-01', 40.000000, 0.008000);
+INSERT INTO inp_curve_value VALUES (14, 'EBAR-02', 0.000000, 15.000000);
+INSERT INTO inp_curve_value VALUES (15, 'EBAR-02', 10.000000, 15.000000);
+INSERT INTO inp_curve_value VALUES (10, 'PUMP-02', 10.000000, 0.045000);
+INSERT INTO inp_curve_value VALUES (11, 'PUMP-02', 20.000000, 0.038000);
+INSERT INTO inp_curve_value VALUES (12, 'PUMP-02', 30.000000, 0.035000);
+INSERT INTO inp_curve_value VALUES (13, 'PUMP-02', 40.000000, 0.033000);
 
 
 INSERT INTO inp_flwreg_pump (id, node_id, to_arc, flwreg_id, flwreg_length, curve_id, status, startup, shutoff) VALUES (2, '18828', '18964', 1, 1, 'PUMP-02', 'ON', 2.0000, 0.4000);

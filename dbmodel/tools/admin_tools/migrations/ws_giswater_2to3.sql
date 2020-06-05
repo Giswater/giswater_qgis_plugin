@@ -419,8 +419,8 @@ FROM SCHEMA_NAME_V2.element;
 	-- INP TABLES
 ----------------------------------------
 -- INSERT INTO SCHEMA_NAME_V3.inp_backdrop SELECT * FROM SCHEMA_NAME_V2.inp_backdrop;
--- INSERT INTO SCHEMA_NAME_V3.inp_curve_id SELECT * FROM SCHEMA_NAME_V2.inp_curve_id;
--- INSERT INTO SCHEMA_NAME_V3.inp_curve SELECT * FROM SCHEMA_NAME_V2.inp_curve;
+-- INSERT INTO SCHEMA_NAME_V3.inp_curve SELECT * FROM SCHEMA_NAME_V2.inp_curve_id;
+-- INSERT INTO SCHEMA_NAME_V3.inp_curve_value SELECT * FROM SCHEMA_NAME_V2.inp_curve;
 -- INSERT INTO SCHEMA_NAME_V3.inp_pattern SELECT pattern_id, null as observ FROM SCHEMA_NAME_V2.inp_pattern;
 -- INSERT INTO SCHEMA_NAME_V3.inp_pattern_value SELECT * FROM SCHEMA_NAME_V2.inp_pattern;
 -- INSERT INTO SCHEMA_NAME_V3.inp_junction SELECT * FROM SCHEMA_NAME_V2.inp_junction;

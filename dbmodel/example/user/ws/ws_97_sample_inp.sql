@@ -10,11 +10,11 @@ INSERT INTO inp_connec SELECT connec_id FROM connec;
 
 UPDATE inp_cat_mat_roughness SET roughness=0.014;
 
-INSERT INTO inp_curve_id VALUES ('PUMP_01', 'PUMP');
-INSERT INTO inp_curve_id VALUES ('PUMP_02', 'PUMP');
+INSERT INTO inp_curve VALUES ('PUMP_01', 'PUMP');
+INSERT INTO inp_curve VALUES ('PUMP_02', 'PUMP');
 
-INSERT INTO inp_curve VALUES (1, 'PUMP_02', 10, 50.0000);
-INSERT INTO inp_curve VALUES (2, 'PUMP_01', 5, 100.0000);
+INSERT INTO inp_curve_value VALUES (1, 'PUMP_02', 10, 50.0000);
+INSERT INTO inp_curve_value VALUES (2, 'PUMP_01', 5, 100.0000);
 
 INSERT INTO inp_pattern VALUES ('pattern_01', 'Estimated pattern for hydrometer using values from technical information');
 INSERT INTO inp_pattern VALUES ('pattern_02', 'Estimated pattern for hydrometer using values from technical information');

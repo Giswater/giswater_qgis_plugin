@@ -111,10 +111,10 @@ BEGIN
 	  
 	  ELSIF v_view='vi_curves' THEN
 
-	    IF NEW.curve_id NOT IN (SELECT id FROM inp_curve_id) then
-	      INSERT INTO inp_curve_id (id,curve_type,descript)  VALUES (NEW.curve_id, split_part(NEW.other,' ',1), split_part(NEW.other,' ',2));
+	    IF NEW.curve_id NOT IN (SELECT id FROM inp_curve) then
+	      INSERT INTO inp_curve (id,curve_type,descript)  VALUES (NEW.curve_id, split_part(NEW.other,' ',1), split_part(NEW.other,' ',2));
 	    END IF;
-	    INSERT INTO inp_curve(curve_id, x_value, y_value) VALUES (NEW.curve_id, NEW.x_value, NEW.y_value);
+	    INSERT INTO inp_curve_value(curve_id, x_value, y_value) VALUES (NEW.curve_id, NEW.x_value, NEW.y_value);
 	    
 	  ELSIF v_view='vi_controls' THEN 
 	    INSERT INTO inp_controls_x_arc (arc_id, text) VALUES (split_part(NEW.text,' ',2),NEW.text);

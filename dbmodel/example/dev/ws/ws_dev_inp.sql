@@ -50,7 +50,7 @@ INSERT INTO inp_reactions (descript) VALUES ('ROUGHNESS CORRELATION 1.8');
 
 UPDATE inp_pipe SET reactionparam='WALL', reactionvalue='0.3';
 
-UPDATE inp_curve_id SET descript ='curve demo for pumps';
+UPDATE inp_curve SET descript ='curve demo for pumps';
 
 
 

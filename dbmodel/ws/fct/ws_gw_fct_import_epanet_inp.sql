@@ -150,8 +150,8 @@ BEGIN
 		DELETE FROM inp_demand;
 		DELETE FROM inp_pattern;
 		DELETE FROM inp_pattern_value;
-		DELETE FROM inp_curve_id;
 		DELETE FROM inp_curve;
+		DELETE FROM inp_curve_value;
 		DELETE FROM inp_controls_x_arc;
 		DELETE FROM inp_rules_x_arc;
 		DELETE FROM inp_rules_x_node;

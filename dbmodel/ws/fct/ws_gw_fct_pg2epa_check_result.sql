@@ -120,7 +120,7 @@ BEGIN
 	INTO v_options;		
 			
 	SELECT  count(*) INTO v_doublen2a FROM inp_pump JOIN temp_arc ON concat(node_id, '_n2a_4') = arc_id 
-	JOIN inp_curve_id c ON c.id=curve_id;
+	JOIN inp_curve c ON c.id=curve_id;
 	
 	SELECT value INTO v_demandtype FROM config_param_user WHERE parameter = 'inp_options_demandtype' AND cur_user=current_user;
 	SELECT value INTO v_patternmethod FROM config_param_user WHERE parameter = 'inp_options_patternmethod' AND cur_user=current_user;
@@ -201,7 +201,7 @@ BEGIN
 
 
 		RAISE NOTICE '2 - Check pumps with 3-point curves (because of bug of EPANET this kind of curves are forbidden on the exportation)';
-		SELECT count(*) INTO v_count FROM (select curve_id, count(*) as ct from (select * from inp_curve join (select distinct curve_id FROM vi_curves JOIN v_edit_inp_pump 
+		SELECT count(*) INTO v_count FROM (select curve_id, count(*) as ct from (select * from inp_curve_value join (select distinct curve_id FROM vi_curves JOIN v_edit_inp_pump
 				USING (curve_id))a using (curve_id)) b group by curve_id having count(*)=3)c;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)

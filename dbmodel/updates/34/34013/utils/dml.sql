@@ -33,3 +33,24 @@ INSERT INTO om_typevalue VALUES ('profile_papersize','5','DIN A1 - 840x594',null
 
 INSERT INTO config_param_system VALUES ('basic_selector_explfrommuni', '{"selector":"selector_expl", "selector_id":"expl_id"}', NULL, 'Select which label to display for selectors', 
 'Selector labels:',null,  null, TRUE, null, 'utils', NULL, FALSE, 'json', null, null, null, null, null, null, null, null, null, null, false);
+
+-- drop id field for inp_curve_id
+ALTER TABLE inp_curve_id DROP CONSTRAINT inp_curve_pkey;
+ALTER TABLE inp_curve_id ADD CONSTRAINT inp_curve_pkey PRIMARY KEY (curve_id, x_value);
+ALTER TABLE inp_curve_id DROP COLUMN id;
+
+-- rename tables
+ALTER TABLE inp_curve RENAME TO inp_curve_value;
+ALTER TABLE inp_curve_id RENAME TO inp_curve;
+
+-- update data metatables
+UPDATE sys_table set id = 'inp_curve_value' where 'inp_curve', sys_sequence = null, sys_sequence_field = null;
+UPDATE sys_table set id = 'inp_curve' where 'inp_curve_id';
+
+UPDATE config_form_fields SET formname = 'inp_curve_value' WHERE formname = 'inp_curve';
+UPDATE config_form_fields SET formname = 'inp_curve' WHERE formname = 'inp_curve_id';
+
+UPDATE sys_foreignkey SET target_table = 'inp_curve_value' WHERE target_table = 'inp_curve';
+UPDATE sys_foreignkey SET target_table = 'inp_curve' WHERE target_table = 'inp_curve_id';
+
+
