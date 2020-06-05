@@ -1505,7 +1505,7 @@ class Giswater(QObject):
     def manage_guided_map(self):
         """ Guide map works using v_edit_exploitation """
 
-        self.layer_expl = self.controller.get_layer_by_tablename('v_edit_exploitation')
+        self.layer_expl = self.controller.get_layer_by_tablename('ext_municipality')
         if self.layer_expl is None:
             return
 
@@ -1520,21 +1520,21 @@ class Giswater(QObject):
     def selection_changed(self):
         """ Get selected expl_id and execute function setselectors """
 
-        expl_id = None
+        muni_id = None
         features = self.layer_expl.getSelectedFeatures()
         for feature in features:
-            expl_id = feature["expl_id"]
-            self.controller.log_info(f"Selected expl_id: {expl_id}")
+            muni_id = feature["expl_id"]
+            self.controller.log_info(f"Selected expl_id: {muni_id}")
             break
 
         self.iface.mapCanvas().selectionChanged.disconnect()
         self.iface.actionZoomToSelected().trigger()
         self.layer_expl.removeSelection()
 
-        if expl_id is None:
+        if muni_id is None:
             return
 
-        extras = f'"selector_type":"exploitation", "check":true, "onlyone":true, "id":{expl_id}'
+        extras = f'"selector_type":"exploitation", "check":true, "onlyone":true, "id":{muni_id}'
         body = self.create_body(extras=extras)
         # sql = f"SELECT gw_fct_setselectors($${{{body}}}$$)::text"
         # row = self.controller.get_row(sql, commit=True, log_sql=True)
