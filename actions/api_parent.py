@@ -1802,15 +1802,13 @@ class ApiParent(ParentAction):
     def set_selector(self, widget, table_name, column_name, selector_type):
         """ Send values to DB
         :param widget: QCheckBox that has changed status
-        :param table_name: name of the table that we have to update
-        :param column_name: name of the column that we have to update
+        :param table_name: name of the table that we have to update (deprecated)
+        :param column_name: name of the column that we have to update (deprecated)
         """
 
-        extras = f'"selector_type":"{widget.property("selector_type")}", '
-        extras += f'"tableName":"{table_name}", '
-        extras += f'"columnname":"{column_name}", '
-        extras += f'"result_name":"{widget.objectName()}", '
-        extras += f'"result_value":"{widget.isChecked()}"'
+        extras = f'"selectorType":"{widget.property("selector_type")}", '
+        extras += f'"id":"{widget.objectName()}", '
+        extras += f'"value":"{widget.isChecked()}"'
         body = self.create_body(extras=extras)
         json_result = self.controller.get_json('gw_fct_setselectors', body)
         if not json_result:
