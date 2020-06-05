@@ -1148,7 +1148,6 @@ class Giswater(QObject):
                 if 'actions' in result['body']:
                     if 'useGuideMap' in result['body']['actions']:
                         guided_map = result['body']['actions']['useGuideMap']
-                        guided_map = True
                         if guided_map:
                             self.controller.log_info("manage_guided_map")
                             self.manage_guided_map()
