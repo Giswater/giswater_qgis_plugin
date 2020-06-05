@@ -29,3 +29,7 @@ INSERT INTO om_typevalue VALUES ('profile_papersize','2','DIN A4 - 297x210',null
 INSERT INTO om_typevalue VALUES ('profile_papersize','3','DIN A3 - 420x297',null,'{"xdim":420, "ydim":297}');
 INSERT INTO om_typevalue VALUES ('profile_papersize','4','DIN A2 - 594x420',null,'{"xdim":594, "ydim":420}');
 INSERT INTO om_typevalue VALUES ('profile_papersize','5','DIN A1 - 840x594',null,'{"xdim":840, "ydim":594}');
+
+
+INSERT INTO config_param_system VALUES ('basic_selector_explfrommuni', '{"selector":"selector_expl", "selector_id":"expl_id"}', NULL, 'Select which label to display for selectors', 
+'Selector labels:',null,  null, TRUE, null, 'utils', NULL, FALSE, 'json', null, null, null, null, null, null, null, null, null, null, false);

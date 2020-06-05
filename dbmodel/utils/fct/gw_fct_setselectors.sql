@@ -12,20 +12,21 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setselectors(p_data json)
 $BODY$
 
 /*example
-SELECT SCHEMA_NAME.gw_fct_setselectors($${
-"client":{"device":4, "infoType":1, "lang":"ES"},
-"feature":{},
-"data":{"selector_type":"mincut", "tableName":"anl_mincut_result_selector", "column_id":"result_id", "result_name":"1", "result_value":"True"}}$$) AS result
+SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{}, "data":{"selectorType":"explfrommuni", "id":2, "value":true, "isAlone":true}}$$);
+SELECT * FROM selector_expl
 */
 
 DECLARE
 
 v_version json;
-v_selector_type text;
-v_tableName text;
+v_selectortype text;
+v_tablename text;
 v_columnname text;
-v_result_name text;
-v_result_value text;
+v_id text;
+v_value text;
+v_muni integer;
+v_isalone boolean;
+v_parameter_selector json;
 	
 BEGIN
 
@@ -35,20 +36,32 @@ BEGIN
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
 		INTO v_version;
-		
-	-- Get input parameters:
-	v_selector_type := (p_data ->> 'data')::json->> 'selector_type';
-	v_tableName := (p_data ->> 'data')::json->> 'tableName';
-	v_columnname := (p_data ->> 'data')::json->> 'columnname';
-	v_result_name := (p_data ->> 'data')::json->> 'result_name';
-	v_result_value := (p_data ->> 'data')::json->> 'result_value';
 	
-	IF v_result_value = 'True' THEN
-		EXECUTE 'INSERT INTO ' || v_tableName || ' ('|| v_columnname ||', cur_user) VALUES('|| v_result_name ||', '''|| current_user ||''')';
-	ELSE
-		EXECUTE 'DELETE FROM ' || v_tableName || ' WHERE ' || v_columnname || ' = '|| v_result_name ||'';
-		
+	-- Get input parameters:
+	v_selectortype := (p_data ->> 'data')::json->> 'selectorType';
+	v_id := (p_data ->> 'data')::json->> 'id';
+	v_value := (p_data ->> 'data')::json->> 'value';
+	v_isalone := (p_data ->> 'data')::json->> 'isAlone';
+
+	-- Get system parameters
+	v_parameter_selector = (SELECT value::json FROM config_param_system WHERE parameter = concat('basic_selector_', v_selectortype));
+		v_tablename = v_parameter_selector->>'selector';
+		v_columnname = v_parameter_selector->>'selector_id'; 
+
+		RAISE NOTICE ' % %', v_tablename, v_columnname;
+	
+	-- managing is alone
+	IF v_isalone THEN
+		EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user';
 	END IF;
+
+	-- managing value
+	IF v_value THEN
+		EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) VALUES('|| v_id ||', '''|| current_user ||''')';
+	ELSE
+		EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE ' || v_columnname || ' = '|| v_id ||'';
+	END IF;
+		
 	
 	-- Return
 	RETURN ('{"status":"Accepted", "version":'||v_version||
@@ -61,8 +74,8 @@ BEGIN
 			}}}'||'}')::json;
 
 	-- Exception handling
-	/*EXCEPTION WHEN OTHERS THEN
-	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;*/
+	EXCEPTION WHEN OTHERS THEN
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 	
 END;
 $BODY$
