@@ -847,7 +847,7 @@ class DaoController(object):
 
     def translate_form(self, dialog, context_name):
         """ Translate widgets of the form to current language """
-        type_widget_list = [QLabel, QCheckBox, QRadioButton, QGroupBox, QTabWidget]
+        type_widget_list = [QCheckBox, QGroupBox, QLabel, QPushButton, QRadioButton, QTabWidget]
         for widget_type in type_widget_list:
             widget_list = dialog.findChildren(widget_type)
             for widget in widget_list:
