@@ -62,8 +62,13 @@ class ApiSearch(ApiParent):
         if self.dlg_search is None:
             self.init_dialog()
 
+        qgis_project_add_schema = self.controller.plugin_settings_value('gwAddSchema')
         self.controller.set_user_settings_value('open_search', 'true')
-        body = self.create_body()
+        if qgis_project_add_schema is None:
+            body = self.create_body()
+        else:
+            extras = (f'"addSchema":"{qgis_project_add_schema}"')
+            body = self.create_body(extras=extras)
         function_name = "gw_fct_getsearch"
         complet_list = self.controller.get_json(function_name, body)
         if not complet_list:
