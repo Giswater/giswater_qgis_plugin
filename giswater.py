@@ -9,7 +9,7 @@ from qgis.core import QgsEditorWidgetSetup, QgsExpressionContextUtils, QgsFieldC
     QgsProject, QgsSnappingUtils, QgsTolerance
 from qgis.PyQt.QtCore import QObject, QPoint, QSettings, Qt
 from qgis.PyQt.QtWidgets import QAction, QActionGroup, QApplication, QDockWidget, QMenu, QToolBar, QToolButton
-from qgis.PyQt.QtGui import QIcon, QKeySequence, QCursor
+from qgis.PyQt.QtGui import QCursor, QIcon, QKeySequence, QPixmap
 
 import configparser
 import json
@@ -1148,6 +1148,7 @@ class Giswater(QObject):
                 if 'actions' in result['body']:
                     if 'useGuideMap' in result['body']['actions']:
                         guided_map = result['body']['actions']['useGuideMap']
+                        guided_map = True
                         if guided_map:
                             self.controller.log_info("manage_guided_map")
                             self.manage_guided_map()
@@ -1493,6 +1494,9 @@ class Giswater(QObject):
         self.layer_expl.removeSelection()
         self.iface.actionSelect().trigger()
         self.iface.mapCanvas().selectionChanged.connect(self.selection_changed)
+        cursor = self.get_cursor_multiple_selection()
+        if cursor:
+            self.iface.mapCanvas().setCursor(cursor)
 
 
     def selection_changed(self):
@@ -1520,4 +1524,19 @@ class Giswater(QObject):
             self.iface.mapCanvas().refreshAllLayers()
             self.layer_expl.triggerRepaint()
             self.iface.actionZoomIn().trigger()
+            self.iface.actionPan().trigger()
+            self.iface.actionZoomIn().trigger()
 
+
+    def get_cursor_multiple_selection(self):
+        """ Set cursor for multiple selection """
+
+        path_folder = os.path.dirname(__file__)
+        path_cursor = path_folder + '\icons\\'+'201.png'
+
+        if os.path.exists(path_cursor):
+            cursor = QCursor(QPixmap(path_cursor))
+        else:
+            cursor = None
+
+        return cursor
