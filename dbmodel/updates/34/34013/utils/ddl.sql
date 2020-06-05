@@ -7,7 +7,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-delete from om_rec_result_node;
 
 -- 2020/06/02
 ALTER TABLE om_rec_result_arc DROP CONSTRAINT om_rec_result_arc_pkey;
@@ -76,3 +75,5 @@ ALTER TABLE sys_table DROP COLUMN sys_rows;
 ALTER TABLE sys_function RENAME sys_role_id TO sys_role;
 ALTER TABLE sys_param_user RENAME sys_role_id TO sys_role;
 ALTER TABLE sys_table RENAME sys_role_id TO sys_role;
+
+ALTER TABLE selector_audit RENAME fprocesscat_id TO fid;
