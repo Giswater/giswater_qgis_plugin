@@ -296,7 +296,7 @@ class ElementManager(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('go2epa_selector.ui.ui')
+FORM_CLASS = get_ui_class('go2epa_selector.ui')
 class Go2EpaSelectorUi(GwDialog, FORM_CLASS):
     pass
 
@@ -466,7 +466,7 @@ class PsectorRapportUi(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('main_qtdialog.ui.ui')
+FORM_CLASS = get_ui_class('main_qtdialog.ui')
 class MainQtDialogUi(GwDialog, FORM_CLASS):
 
     def __init__(self, subtag=None):
