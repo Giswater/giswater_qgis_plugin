@@ -621,6 +621,6 @@ AND columnname in ('streetname','streetname2', 'postnumber','postnumber2','postc
 UPDATE config_form_fields set hidden = false  WHERE formname in ('ve_arc', 've_node', 've_connec')
 AND columnname = 'district_id';
 
-UPDATE config_form_fields set layoutorder = 2 WHERE formname = 've_node' AND columnname = 'district_id';
+UPDATE config_form_fields set layoutorder = 2 WHERE formname in ('ve_node', 've_connec') AND columnname = 'district_id';
 
-UPDATE config_form_fields set layoutorder = 3 WHERE formname in ('ve_arc', 've_connec') AND columnname = 'district_id';
+UPDATE config_form_fields set layoutorder = 3 WHERE formname in ('ve_arc') AND columnname = 'district_id';

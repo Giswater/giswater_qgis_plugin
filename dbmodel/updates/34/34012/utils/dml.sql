@@ -291,4 +291,11 @@ VALUES ('ve_connec','form_feature', 'district_id', 'integer', 'text', 'district'
 'lyt_data_3','district_id - Identificador del barrio con el que se vincula el elemento. A escoger entre los disponibles en el desplegable (se filtra en función del municipio seleccionado)',
 true) ON CONFLICT (formname, formtype, columnname) DO NOTHING;
 
+INSERT INTO config_form_fields(formname, formtype, columnname, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, 
+dv_querytext, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, tooltip, hidden)
+VALUES ('v_edit_samplepoint','form_feature', 'district_id', 'integer', 'text', 'district',false, false, true, false, 
+'SELECT id AS id, a.name AS idval FROM  a JOIN ext_municipality m USING (muni_id) WHERE id IS NOT NULL ', true, 'muni_id', 'AND m.name',
+'district_id - Identificador del barrio con el que se vincula el elemento. A escoger entre los disponibles en el desplegable (se filtra en función del municipio seleccionado)',
+true) ON CONFLICT (formname, formtype, columnname) DO NOTHING;
+
 
