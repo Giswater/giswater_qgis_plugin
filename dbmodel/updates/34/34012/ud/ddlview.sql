@@ -37,3 +37,41 @@ CREATE OR REPLACE VIEW v_ui_rpt_cat_result AS
 
 CREATE TRIGGER gw_trg_ui_rpt_cat_result  INSTEAD OF INSERT OR UPDATE OR DELETE
   ON v_ui_rpt_cat_result  FOR EACH ROW  EXECUTE PROCEDURE gw_trg_ui_rpt_cat_result();
+
+
+DROP VIEW IF EXISTS v_edit_samplepoint;
+CREATE OR REPLACE VIEW v_edit_samplepoint AS 
+SELECT samplepoint.sample_id,
+    samplepoint.code,
+    samplepoint.lab_code,
+    samplepoint.feature_id,
+    samplepoint.featurecat_id,
+    samplepoint.dma_id,
+    dma.macrodma_id,
+    samplepoint.state,
+    samplepoint.builtdate,
+    samplepoint.enddate,
+    samplepoint.workcat_id,
+    samplepoint.workcat_id_end,
+    samplepoint.rotation,
+    samplepoint.muni_id,
+    samplepoint.postcode,
+    samplepoint.district_id,
+    samplepoint.streetaxis_id,
+    samplepoint.postnumber,
+    samplepoint.postcomplement,
+    samplepoint.streetaxis2_id,
+    samplepoint.postnumber2,
+    samplepoint.postcomplement2,
+    samplepoint.place_name,
+    samplepoint.cabinet,
+    samplepoint.observations,
+    samplepoint.verified,
+    samplepoint.the_geom,
+    samplepoint.expl_id,
+    samplepoint.link
+   FROM selector_expl,
+    samplepoint
+     JOIN v_state_samplepoint ON samplepoint.sample_id::text = v_state_samplepoint.sample_id::text
+     LEFT JOIN dma ON dma.dma_id = samplepoint.dma_id
+  WHERE samplepoint.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
