@@ -1523,8 +1523,8 @@ class Giswater(QObject):
         muni_id = None
         features = self.layer_expl.getSelectedFeatures()
         for feature in features:
-            muni_id = feature["expl_id"]
-            self.controller.log_info(f"Selected expl_id: {muni_id}")
+            muni_id = feature["muni_id"]
+            self.controller.log_info(f"Selected muni_id: {muni_id}")
             break
 
         self.iface.mapCanvas().selectionChanged.disconnect()
