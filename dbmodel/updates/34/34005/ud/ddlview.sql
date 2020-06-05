@@ -293,7 +293,7 @@ WITH vu_node as (
 		ELSE (vu_node.sys_top_elev - vu_node.sys_ymax)::numeric(12,3) END AS sys_elev,
 		node_type,sys_type,nodecat_id,matcat_id,epa_type,expl_id,macroexpl_id,sector_id,macrosector_id,state,state_type,annotation,
 		observ,comment,dma_id,macrodma_id,soilcat_id,function_type,category_type,fluid_type,location_type,workcat_id,workcat_id_end,
-		buildercat_id,builtdate,enddate,ownercat_id,muni_id,postcode,streetname,postnumber,postcomplement,streetname2,postnumber2,
+		buildercat_id,builtdate,enddate,ownercat_id,muni_id,postcode,district_id,streetname,postnumber,postcomplement,streetname2,postnumber2,
 		postcomplement2,descript,svg,rotation,link,verified,the_geom,undelete,label,label_x,label_y,label_rotation,publish,inventory,
 		uncertain,xyz_date,unconnected,num_value,tstamp,insert_user,lastupdate,lastupdate_user
 		FROM vu_node;
@@ -3700,7 +3700,7 @@ CREATE OR REPLACE VIEW v_edit_man_siphon AS
 	v_arc.ownercat_id,
 	v_arc.muni_id,
 	v_arc.postcode,
-	v_node.district_id,
+	v_arc.district_id,
 	v_arc.streetname,
 	v_arc.postnumber,
 	v_arc.postcomplement,
