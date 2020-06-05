@@ -204,7 +204,7 @@ BEGIN
         -- Create postnumber search field
         SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND columnname='add_postnumber';
         editCode2 := json_build_object('label',rec_fields.label,'columnname', rec_fields.columnname,'widgetname', concat('address_',rec_fields.columnname),
-        'widgettype','typeahead','threshold', 1 'datatype','integer','placeholder','','disabled',true,'noresultsMsg','No results','loadingMsg','Searching...');
+        'widgettype','typeahead','threshold', 1, 'datatype','integer','placeholder','','disabled',true,'noresultsMsg','No results','loadingMsg','Searching...');
 
     
         -- Create array with network fields
