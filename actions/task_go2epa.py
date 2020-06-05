@@ -484,7 +484,7 @@ class TaskGo2Epa(QgsTask):
         extras += f', "currentStep":"1"'
         extras += f', "continue":"False"'
         if self.json_rpt:
-            extras += f', "json_rpt": {self.json_rpt}'
+            extras += f', "file": {self.json_rpt}'
         body = self.create_body(extras=extras)
         function_name = 'gw_fct_rpt2pg_main'
         json_result = self.controller.get_json(function_name, body, log_sql=True)
