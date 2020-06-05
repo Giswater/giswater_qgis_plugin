@@ -13,7 +13,7 @@ from qgis.core import QgsPointLocator, QgsProject, QgsSnappingUtils, QgsToleranc
 from qgis.PyQt.QtCore import QObject, QPoint, QSettings, Qt
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QActionGroup, QApplication, QCheckBox, QDockWidget
 from qgis.PyQt.QtWidgets import QGridLayout, QGroupBox, QMenu, QLabel, QSizePolicy, QToolBar, QToolButton
-from qgis.PyQt.QtGui import QIcon, QKeySequence, QCursor
+from qgis.PyQt.QtGui import QIcon, QKeySequence, QCursor, QPixmap
 from qgis.core import *
 
 import configparser
@@ -1292,7 +1292,9 @@ class Giswater(QObject):
         self.layer_expl.removeSelection()
         self.iface.actionSelect().trigger()
         self.iface.mapCanvas().selectionChanged.connect(self.selection_changed)
-
+        cursor = self.get_cursor_multiple_selection()
+        if cursor:
+            self.iface.mapCanvas().setCursor(cursor)
 
     def selection_changed(self):
         """ Get selected expl_id and execute function setselectors """
@@ -1316,6 +1318,23 @@ class Giswater(QObject):
             self.iface.mapCanvas().refreshAllLayers()
             self.layer_expl.triggerRepaint()
             self.iface.actionZoomIn().trigger()
+            self.iface.actionPan().trigger()
+            self.iface.actionZoomIn().trigger()
+
+
+    def get_cursor_multiple_selection(self):
+        """ Set cursor for multiple selection """
+
+        path_folder = os.path.dirname(__file__)
+        path_cursor = path_folder + '\icons\\'+'201.png'
+
+        if os.path.exists(path_cursor):
+            cursor = QCursor(QPixmap(path_cursor))
+        else:
+            cursor = None
+
+        return cursor
+
 
     def update_config(self, state):
         """ Set qgis_form_initproject_hidden True or False into config_param_user """
