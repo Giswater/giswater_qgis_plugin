@@ -12,74 +12,37 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setsearch(p_data json)
 $BODY$
 
 /*example
-SELECT SCHEMA_NAME.gw_fct_setsearch($${
-		"client":{"device":4, "infoType":1, "lang":"ES"},
-		"form":{"tabName": "network"},
-		"feature":{},
-		"data":{"net_type": {"id": "ve_arc", "name": "Arcs"}, "network_net_code": {"text": "2"}}}$$)
+SELECT gw_fct_setsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"tabName":"addNetwork"}, "feature":{},
+"data":{"filterFields":{}, "pageInfo":{}, "net_type":{"id":"v_edit_arc", "name":"Arcs"}, "featureType":"arc", "addSchema":"ud_sample", "net_code":{"text":"3"}}}$$);
 
-
-SELECT SCHEMA_NAME.gw_fct_setsearch($${
-		"client":{"device":4, "infoType":1, "lang":"ES"},
-		"form":{"tabName": "address"},
-		"feature":{},
-		"data":{"add_muni": {"id": 1, "name": "Sant Boi del Llobregat"}, "add_street": {"text": "Calle de Francesc Layret"}}}$$)
-
-
-SELECT SCHEMA_NAME.gw_fct_setsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"tabName":"workcat"},
-		"feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "workcat_search":{"text":"work2 - descript"}}}$$)
+MAIN ISSUES
+-----------
+- basic_search_network is key issue to define variables on config_param_system to searh anything you want
 
 */
 
 DECLARE
 
-response_json json;
-response_json2 json;
-name_arg varchar;
-id_arg varchar;
-text_arg varchar;
-search_json json;
-tab_arg varchar;
-combo1 json;
-edit1 json;
-edit2 json;
-id_column varchar;
-catid varchar;
-states varchar[];
+v_response json;
+v_name varchar;
+v_idarg varchar;
+v_textarg varchar;
+v_tab varchar;
+v_combo json;
+v_edittext json;
 v_version json;
 v_projecttype character varying;
 v_count integer;
-query_text text;
+v_querytext text;
+v_featuretype text;
 
--- network
-p_network_layer_arc varchar;
-p_network_layer_node varchar;
-p_network_layer_connec varchar;
-p_network_layer_gully varchar;
-p_network_layer_element varchar;
-p_network_layer_visit varchar;
+--network
+v_network_layername text;
+v_network_idname text;
+v_network_code text;
+v_network_catalog text;
+v_value json;
 
-p_network_search_field_arc_id varchar;
-p_network_search_field_node_id varchar;
-p_network_search_field_connec_id varchar;
-p_network_search_field_gully_id varchar;
-p_network_search_field_element_id varchar;
-p_network_search_field_visit_id varchar;
-
-p_network_search_field_arc_cat varchar; 
-p_network_search_field_node_cat varchar;
-p_network_search_field_connec_cat varchar;
-p_network_search_field_gully_cat varchar;
-p_network_search_field_element_cat varchar;
-p_network_search_field_visit_cat varchar;
-
-p_network_search_field_arc varchar;
-p_network_search_field_node varchar;
-p_network_search_field_connec varchar;
-p_network_search_field_gully varchar;
-p_network_search_field_element varchar;
-p_network_search_field_visit varchar;
-  
 --muni
 v_muni_layer varchar;
 v_muni_id_field varchar;
@@ -135,161 +98,119 @@ v_exploitation_id_field varchar;
 v_exploitation_display_field varchar;
 v_exploitation_geom_field varchar;
 
--- feature_type
-v_feature_type_arc varchar;
-v_feature_type_node varchar;
-v_feature_type_connec varchar;
-v_feature_type_gully varchar;
-v_feature_type_element varchar;
-v_feature_type_visit varchar;  
-qt2 text;
-v_querytext text;
+v_schemaname text;
+v_addschema text;
 
 BEGIN
 
 	-- Set search path to local schema
-    SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "SCHEMA_NAME", public;
+	v_schemaname = 'SCHEMA_NAME';
 
 	-- Set api version
-    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
+	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
         INTO v_version;
 
 	-- Get project type
-    SELECT wsoftware INTO v_projecttype FROM version LIMIT 1;
+	SELECT wsoftware INTO v_projecttype FROM version LIMIT 1;
 
 	-- Get tab
-    tab_arg := ((p_data->>'form')::json)->>'tabName';
+	v_tab := ((p_data->>'form')::json)->>'tabName';
+	v_featuretype := (p_data->>'data')::json->>'featureType';
+	v_addschema := (p_data->>'data')::json->>'addSchema';
+
+	-- control nulls
+	if v_featuretype is null then v_featuretype = 'arc'; end if;
 
 	-- Network tab
 	--------------
-	IF tab_arg = 'network' THEN
+	IF v_tab = 'network' THEN
 
-		-- Layers to search:
-		SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_arc FROM config_param_system WHERE parameter='basic_search_arc';
-		SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_node FROM config_param_system WHERE parameter='basic_search_node';
-		SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_connec FROM config_param_system WHERE parameter='basic_search_connec';
-		SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_gully FROM config_param_system WHERE parameter='basic_search_gully';
-		SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_element FROM config_param_system WHERE parameter='basic_search_element';
-		SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_visit FROM config_param_system WHERE parameter='basic_search_visit';
+		if v_featuretype is null then v_featuretype = 'arc'; end if;
 
-		-- Layer's primary key;
-		SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_arc_id FROM config_param_system WHERE parameter='basic_search_arc';
-		SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_node_id FROM config_param_system WHERE parameter='basic_search_node';
-		SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_connec_id FROM config_param_system WHERE parameter='basic_search_connec';
-		SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_gully_id FROM config_param_system WHERE parameter='basic_search_gully';
-		SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_element_id FROM config_param_system WHERE parameter='basic_search_element';
-		SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_visit_id FROM config_param_system WHERE parameter='basic_search_visit';
-
-		-- Layer's field to search:
-		SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_arc FROM config_param_system WHERE parameter='basic_search_arc';
-		SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_node FROM config_param_system WHERE parameter='basic_search_node';
-		SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_connec FROM config_param_system WHERE parameter='basic_search_connec';
-		SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_gully FROM config_param_system WHERE parameter='basic_search_gully';
-		SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_element FROM config_param_system WHERE parameter='basic_search_element';
-		SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_visit FROM config_param_system WHERE parameter='basic_search_visit';
-	   
-		-- Layer's catalog field;
-		SELECT ((value::json)->>'cat_field') INTO p_network_search_field_arc_cat FROM config_param_system WHERE parameter='basic_search_arc';
-		SELECT ((value::json)->>'cat_field') INTO p_network_search_field_node_cat FROM config_param_system WHERE parameter='basic_search_node';
-		SELECT ((value::json)->>'cat_field') INTO p_network_search_field_connec_cat FROM config_param_system WHERE parameter='basic_search_connec';
-		SELECT ((value::json)->>'cat_field') INTO p_network_search_field_gully_cat FROM config_param_system WHERE parameter='basic_search_gully';
-		SELECT ((value::json)->>'cat_field') INTO p_network_search_field_element_cat FROM config_param_system WHERE parameter='basic_search_element';
-		SELECT ((value::json)->>'cat_field') INTO p_network_search_field_visit_cat FROM config_param_system WHERE parameter='basic_search_visit';
-
-		-- xxxxx:
-		SELECT ((value::json)->>'feature_type') INTO v_feature_type_arc FROM config_param_system WHERE parameter='basic_search_arc';
-		SELECT ((value::json)->>'feature_type') INTO v_feature_type_node FROM config_param_system WHERE parameter='basic_search_node';
-		SELECT ((value::json)->>'feature_type') INTO v_feature_type_connec FROM config_param_system WHERE parameter='basic_search_connec';
-		SELECT ((value::json)->>'feature_type') INTO v_feature_type_gully FROM config_param_system WHERE parameter='basic_search_gully';
-		SELECT ((value::json)->>'feature_type') INTO v_feature_type_element FROM config_param_system WHERE parameter='basic_search_element';
-		SELECT ((value::json)->>'feature_type') INTO v_feature_type_visit FROM config_param_system WHERE parameter='basic_search_visit';
-	
+		v_value = (SELECT value FROM config_param_system WHERE parameter  = concat('basic_search_network_',v_featuretype));
+			v_network_layername = v_value->>'sys_table_id';
+			v_network_idname = v_value->>'sys_id_field';
+			v_network_code = v_value->>'sys_search_field';
+			v_network_catalog = v_value->>'cat_field';
+				
 		-- Text to search
-		combo1 := ((p_data->>'data')::json)->>'net_type';
-		id_arg := combo1->>'id';
-		name_arg := combo1->>'name';
-		edit1 := ((p_data->>'data')::json)->>'net_code';
-		text_arg := concat('%',edit1->>'text' ,'%');
+		v_combo := ((p_data->>'data')::json)->>'net_type';
+		v_idarg := v_combo->>'id';
+		v_name := v_combo->>'name';
+		v_edittext := ((p_data->>'data')::json)->>'net_code';
+		v_textarg := concat('%',v_edittext->>'text' ,'%');
 
-		IF p_network_layer_arc IS NOT NULL THEN
-			query_text=concat ('SELECT ',p_network_search_field_arc_id,' AS sys_id, ',
-					 p_network_search_field_arc,' AS search_field, ', 
-					 p_network_search_field_arc_cat,' AS cat_id, 
-					 ''arc_id'' AS sys_idname,''',
-					 v_feature_type_arc,''' AS feature_type, ',
-					 quote_literal(p_network_layer_arc), '::text AS sys_table_id FROM ', p_network_layer_arc);
-					 raise notice'query_text %', query_text;
-		END IF;
-	   
-		IF p_network_layer_node IS NOT NULL THEN
-			IF query_text IS NOT NULL THEN query_text=concat(query_text,' UNION '); END IF;
-			query_text=concat (query_text, 'SELECT ',p_network_search_field_node_id,' AS sys_id, ',
-					 p_network_search_field_node,' AS search_field, ', 
-					 p_network_search_field_node_cat,' AS cat_id,
-					 ''node_id'' AS sys_idname,''',
-					 v_feature_type_node,''' AS feature_type, ',
-					quote_literal(p_network_layer_node), '::text AS sys_table_id FROM ', p_network_layer_node);
-
-		END IF;
-	   
-		IF p_network_layer_connec IS NOT NULL THEN
-			   IF query_text IS NOT NULL THEN query_text=concat(query_text,' UNION '); END IF;
-			query_text=concat (query_text, 'SELECT ',p_network_search_field_connec_id,' AS sys_id, ',
-					 p_network_search_field_connec,' AS search_field, ', 
-					 p_network_search_field_connec_cat,' AS cat_id,
-					 ''connec_id'' AS sys_idname,''',
-					 v_feature_type_connec,''' AS feature_type, ',
-					 quote_literal(p_network_layer_connec), '::text AS sys_table_id FROM ', p_network_layer_connec);
-		END IF;
-
-		IF p_network_layer_gully IS NOT NULL THEN
-			   IF query_text IS NOT NULL THEN query_text=concat(query_text,' UNION '); END IF;
-			query_text=concat (query_text, 'SELECT ',p_network_search_field_gully_id,' AS sys_id, ',
-					 p_network_search_field_gully,' AS search_field, ', 
-					 p_network_search_field_gully_cat,' AS cat_id,
-					 ''gully_id'' AS sys_idname,''',
-					 v_feature_type_gully,''' AS feature_type, ',
-					 quote_literal(p_network_layer_gully), '::text AS sys_table_id FROM ', p_network_layer_gully);
-		END IF;
-	  
-		IF p_network_layer_element IS NOT NULL THEN 
-			   IF query_text IS NOT NULL THEN query_text=concat(query_text,' UNION '); END IF;
-			query_text=concat (query_text, 'SELECT ',p_network_search_field_element_id,' AS sys_id, ',
-					 p_network_search_field_element,' AS search_field, ', 
-					 p_network_search_field_element_cat,' AS cat_id,
-					 ''element_id'' AS sys_idname,''',
-					 v_feature_type_element,''' AS feature_type, ',
-					 quote_literal(p_network_layer_element), '::text AS sys_table_id FROM ', p_network_layer_element);
-		END IF;
-
-		IF p_network_layer_visit IS NOT NULL THEN 
-			   IF query_text IS NOT NULL THEN query_text=concat(query_text,' UNION '); END IF;
-			query_text=concat (query_text, 'SELECT ',p_network_search_field_visit_id,'::varchar AS sys_id, ',
-					 p_network_search_field_visit,'::varchar AS search_field, ', 
-					 p_network_search_field_visit_cat,'::varchar AS cat_id,
-					 ''visit_id'' AS sys_idname,''',
-					 v_feature_type_visit,''' AS feature_type, ',
-					 quote_literal(p_network_layer_visit), '::text AS sys_table_id FROM ', p_network_layer_visit);
-		END IF;
-
-		IF id_arg = '' THEN 
+		-- buid querytext
+		v_querytext= concat('SELECT ',v_network_idname,' AS sys_id, ', v_network_code,' AS search_field, ', v_network_catalog,' AS cat_id,', 
+				quote_literal(v_network_idname)::text,' AS sys_idname,',quote_literal(v_featuretype)::text,' AS feature_type, ',
+				quote_literal(v_network_layername)::text,'::text AS sys_table_id 
+				FROM ', v_network_layername);
+				 
+		raise notice'v_querytext % %', v_querytext, v_value;
+		
+		IF v_idarg = '' THEN 
 			-- Get Ids for type combo
 			EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT sys_id, sys_table_id, 
-						CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname, feature_type FROM ('||(query_text)||')b
-						WHERE CONCAT (search_field, '' : '', cat_id) ILIKE ' || quote_literal(text_arg) || ' 
+						CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname, feature_type FROM ('||(v_querytext)||')b
+						WHERE CONCAT (search_field, '' : '', cat_id) ILIKE ' || quote_literal(v_textarg) || ' 
 						ORDER BY search_field LIMIT 10) a'
-						INTO response_json;
+						INTO v_response;
 		ELSE 
 			-- Get Ids for type combo    
 			EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT sys_id, sys_table_id, 
-						CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname, feature_type FROM ('||(query_text)||')b
-						WHERE CONCAT (search_field, '' : '', cat_id) ILIKE ' || quote_literal(text_arg) || ' AND sys_table_id = '||quote_literal(id_arg)||'
+						CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname, feature_type FROM ('||(v_querytext)||')b
+						WHERE CONCAT (search_field, '' : '', cat_id) ILIKE ' || quote_literal(v_textarg) || ' AND sys_table_id = '||quote_literal(v_idarg)||'
 						ORDER BY search_field LIMIT 10) a'
-						INTO response_json;
+						INTO v_response;
 		END IF;
+
+	ELSIF v_tab = 'addNetwork' THEN
+
+		EXECUTE 'SET search_path = public, '||v_addschema;
+
+		v_value = (SELECT value FROM config_param_system WHERE parameter  = concat('basic_search_network_',v_featuretype));
+			v_network_layername = v_value->>'sys_table_id';
+			v_network_idname = v_value->>'sys_id_field';
+			v_network_code = v_value->>'sys_search_field';
+			v_network_catalog = v_value->>'cat_field';
+				
+		-- Text to search
+		v_combo := ((p_data->>'data')::json)->>'net_type';
+		v_idarg := v_combo->>'id';
+		v_name := v_combo->>'name';
+		v_edittext := ((p_data->>'data')::json)->>'net_code';
+		v_textarg := concat('%',v_edittext->>'text' ,'%');
+
+		-- buid querytext
+		v_querytext= concat('SELECT ',v_network_idname,' AS sys_id, ', v_network_code,' AS search_field, ', v_network_catalog,' AS cat_id,', 
+				quote_literal(v_network_idname)::text,' AS sys_idname,',quote_literal(v_featuretype)::text,' AS feature_type, ',
+				quote_literal(v_network_layername)::text,'::text AS sys_table_id 
+				FROM ', v_network_layername);
+				 
+		raise notice'v_querytext % %', v_querytext, v_value;
 		
+		IF v_idarg = '' THEN 
+			-- Get Ids for type combo
+			EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT sys_id, sys_table_id, 
+						CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname, feature_type FROM ('||(v_querytext)||')b
+						WHERE CONCAT (search_field, '' : '', cat_id) ILIKE ' || quote_literal(v_textarg) || ' 
+						ORDER BY search_field LIMIT 10) a'
+						INTO v_response;
+		ELSE 
+			-- Get Ids for type combo    
+			EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT sys_id, sys_table_id, 
+						CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname, feature_type FROM ('||(v_querytext)||')b
+						WHERE CONCAT (search_field, '' : '', cat_id) ILIKE ' || quote_literal(v_textarg) || ' AND sys_table_id = '||quote_literal(v_idarg)||'
+						ORDER BY search_field LIMIT 10) a'
+						INTO v_response;
+		END IF;
+
+		EXECUTE 'SET search_path = '||v_schemaname;
+	
+	
 	-- address
-	ELSIF tab_arg = 'address' THEN
+	ELSIF v_tab = 'address' THEN
 
 		-- Parameters of the municipality layer
 		SELECT ((value::json)->>'sys_table_id') INTO v_muni_layer FROM config_param_system WHERE parameter='basic_search_muni';
@@ -305,17 +226,15 @@ BEGIN
 		SELECT ((value::json)->>'sys_geom_field') INTO v_street_geom_field FROM config_param_system WHERE parameter='basic_search_street';
 
 		--Text to search
-		combo1 := ((p_data->>'data')::json)->>'add_muni';
-		id_arg := combo1->>'id';
-		name_arg := combo1->>'name';
-		edit1 := ((p_data->>'data')::json)->>'add_street';
-		text_arg := concat('%', edit1->>'text' ,'%');
-
-		raise notice'text_arg %', text_arg;
+		v_combo := ((p_data->>'data')::json)->>'add_muni';
+		v_idarg := v_combo->>'id';
+		v_name := v_combo->>'name';
+		v_edittext := ((p_data->>'data')::json)->>'add_street';
+		v_textarg := concat('%', v_edittext->>'text' ,'%');
 
 		-- Fix municipality vdefault
 		DELETE FROM config_param_user WHERE parameter='basic_search_municipality_vdefault' AND cur_user=current_user;
-		INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('basic_search_municipality_vdefault',id_arg, current_user);
+		INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('basic_search_municipality_vdefault',v_idarg, current_user);
 
 		-- Get street
 		EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) 
@@ -323,13 +242,13 @@ BEGIN
 			st_astext(st_envelope('||quote_ident(v_street_layer)||'.'||quote_ident(v_street_geom_field)||'))
 			FROM '||quote_ident(v_street_layer)||'
 			JOIN '||quote_ident(v_muni_layer)||' ON '||quote_ident(v_muni_layer)||'.'||quote_ident(v_muni_id_field)||' = '||quote_ident(v_street_layer)||'.'||quote_ident(v_street_muni_id_field) ||'
-			WHERE lower(unaccent('||quote_ident(v_muni_layer)||'.'||quote_ident(v_muni_display_field)||')) = lower(unaccent('||quote_literal(name_arg)||'))
-			AND lower(unaccent('||quote_ident(v_street_layer)||'.'||quote_ident(v_street_display_field)||')) ILIKE lower(unaccent('||quote_literal(text_arg)||')) ORDER BY
+			WHERE lower(unaccent('||quote_ident(v_muni_layer)||'.'||quote_ident(v_muni_display_field)||')) = lower(unaccent('||quote_literal(v_name)||'))
+			AND lower(unaccent('||quote_ident(v_street_layer)||'.'||quote_ident(v_street_display_field)||')) ILIKE lower(unaccent('||quote_literal(v_textarg)||')) ORDER BY
 			'||quote_ident(v_street_layer)||'.'||quote_ident(v_street_display_field)||' LIMIT 10 )a'
-			INTO response_json;
+			INTO v_response;
 
 	-- Hydro tab
-	ELSIF tab_arg = 'hydro' THEN
+	ELSIF v_tab = 'hydro' THEN
 
 		-- Parameters of the hydro layer
 		SELECT ((value::json)->>'sys_table_id') INTO v_hydro_layer FROM config_param_system WHERE parameter='api_search_hydrometer';
@@ -341,15 +260,15 @@ BEGIN
 		SELECT ((value::json)->>'sys_parent_field') INTO v_exploitation_display_field FROM config_param_system WHERE parameter='api_search_hydrometer';
 
 		-- Text to search
-		combo1 := ((p_data->>'data')::json)->>'hydro_expl';
-		id_arg := combo1->>'id';
-		name_arg := combo1->>'name';
-		edit1 := ((p_data->>'data')::json)->>'hydro_search';
-		text_arg := concat('%', edit1->>'text' ,'%');
+		v_combo := ((p_data->>'data')::json)->>'hydro_expl';
+		v_idarg := v_combo->>'id';
+		v_name := v_combo->>'name';
+		v_edittext := ((p_data->>'data')::json)->>'hydro_search';
+		v_textarg := concat('%', v_edittext->>'text' ,'%');
 
 		-- Fix exploitation vdefault
 		DELETE FROM config_param_user WHERE parameter='basic_search_exploitation_vdefault' AND cur_user=current_user;
-		INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('basic_search_exploitation_vdefault',id_arg, current_user);
+		INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('basic_search_exploitation_vdefault',v_idarg, current_user);
 		
 		-- Get hydrometer 
 		EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
@@ -358,14 +277,14 @@ BEGIN
 			 AS display_name, '||quote_literal(v_hydro_layer)||' AS sys_table_id, '||quote_literal(v_hydro_id_field)||' AS sys_idname
 			FROM '||quote_ident(v_hydro_layer)||'
 			JOIN connec ON (connec.connec_id = '||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_connec_field)||')
-			WHERE '||quote_ident(v_hydro_layer)||'.'||quote_ident(v_exploitation_display_field)||' = '||quote_literal(name_arg)||'
+			WHERE '||quote_ident(v_hydro_layer)||'.'||quote_ident(v_exploitation_display_field)||' = '||quote_literal(v_name)||'
 					AND concat ('||quote_ident(v_hydro_search_field_1)||','' - '','||quote_ident(v_hydro_search_field_2)||','' - '','||quote_ident(v_hydro_search_field_3)||')
-					ILIKE '||quote_literal(text_arg)||'
+					ILIKE '||quote_literal(v_textarg)||'
 					LIMIT 10) a'
-			INTO response_json; 
+			INTO v_response; 
 
 	-- Workcat tab
-	ELSIF tab_arg = 'workcat' THEN
+	ELSIF v_tab = 'workcat' THEN
 
 		-- Parameters of the workcat layer
 		SELECT ((value::json)->>'sys_table_id') INTO v_workcat_layer FROM config_param_system WHERE parameter='api_search_workcat';
@@ -375,8 +294,8 @@ BEGIN
 		SELECT ((value::json)->>'filter_text') INTO v_filter_text FROM config_param_system WHERE parameter='api_search_workcat';
 		
 			-- Text to search
-		edit1 := ((p_data->>'data')::json)->>'workcat_search';
-		text_arg := concat('%', edit1->>'text' ,'%');
+		v_edittext := ((p_data->>'data')::json)->>'workcat_search';
+		v_textarg := concat('%', v_edittext->>'text' ,'%');
 
 		v_querytext = ' SELECT node.workcat_id, node.the_geom FROM SCHEMA_NAME.node WHERE node.state = 1
 					UNION
@@ -415,11 +334,11 @@ BEGIN
 
 			JOIN '||quote_ident(v_workcat_layer)||' AS b ON d.workcat_id = b.'||quote_ident(v_workcat_id_field)||
 
-			' WHERE b.'||quote_ident(v_workcat_display_field)||'::text ILIKE '||quote_literal(text_arg)||' LIMIT 10 ) c'
-			INTO response_json;
+			' WHERE b.'||quote_ident(v_workcat_display_field)||'::text ILIKE '||quote_literal(v_textarg)||' LIMIT 10 ) c'
+			INTO v_response;
 			
 	-- Visit tab
-	ELSIF tab_arg = 'visit' THEN
+	ELSIF v_tab = 'visit' THEN
 
 		-- Parameters of the workcat layer
 		SELECT ((value::json)->>'sys_table_id') INTO v_visit_layer FROM config_param_system WHERE parameter='api_search_visit';
@@ -428,19 +347,19 @@ BEGIN
 		SELECT ((value::json)->>'sys_geom_field') INTO v_visit_geom_field FROM config_param_system WHERE parameter='api_search_visit';
 		
 		-- Text to search
-		edit1 := ((p_data->>'data')::json)->>'visit_search';
-		text_arg := concat('%', edit1->>'text' ,'%');
+		v_edittext := ((p_data->>'data')::json)->>'visit_search';
+		v_textarg := concat('%', v_edittext->>'text' ,'%');
 
 		--  Search in the visit
 		EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) 
 			FROM (SELECT '||quote_ident(v_visit_display_field)||'::text as display_name, '||quote_literal(v_visit_layer)||' AS sys_table_id , 
 			'||quote_ident((v_visit_id_field))||' AS sys_id, '||quote_literal(v_visit_layer)||' AS sys_idname, st_astext(the_geom) as sys_geometry
 			FROM '||v_visit_layer||'  
-			WHERE '||quote_ident(v_visit_display_field)||'::text ILIKE '||quote_literal(text_arg)||' LIMIT 10 )a'
-			INTO response_json;
+			WHERE '||quote_ident(v_visit_display_field)||'::text ILIKE '||quote_literal(v_textarg)||' LIMIT 10 )a'
+			INTO v_response;
 			
 	-- Psector tab
-	ELSIF tab_arg = 'psector' THEN
+	ELSIF v_tab = 'psector' THEN
 
 			-- Parameters of the exploitation layer
 		SELECT ((value::json)->>'sys_table_id') INTO v_exploitation_layer FROM config_param_system WHERE parameter='api_search_exploitation';
@@ -456,15 +375,15 @@ BEGIN
 		SELECT ((value::json)->>'sys_geom_field') INTO v_psector_geom_field FROM config_param_system WHERE parameter='api_search_psector';
 		
 		--Text to search
-		combo1 := ((p_data->>'data')::json)->>'psector_expl';
-		id_arg := combo1->>'id';
-		name_arg := combo1->>'name';
-		edit1 := ((p_data->>'data')::json)->>'psector_search';
-		text_arg := concat('%', edit1->>'text' ,'%');
+		v_combo := ((p_data->>'data')::json)->>'psector_expl';
+		v_idarg := v_combo->>'id';
+		v_name := v_combo->>'name';
+		v_edittext := ((p_data->>'data')::json)->>'psector_search';
+		v_textarg := concat('%', v_edittext->>'text' ,'%');
 
 		-- Fix exploitation vdefault
 		DELETE FROM config_param_user WHERE parameter='basic_search_exploitation_vdefault' AND cur_user=current_user;
-		INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('basic_search_exploitation_vdefault',id_arg, current_user);
+		INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('basic_search_exploitation_vdefault',v_idarg, current_user);
 
 		-- Get psector (improved version)
 		EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) 
@@ -472,23 +391,22 @@ BEGIN
 			'||quote_ident(v_psector_layer)||'.'||quote_ident((v_psector_id_field))||' AS sys_id, '||quote_literal(v_psector_layer)||' AS sys_idname , st_astext(st_envelope('||quote_ident(v_psector_layer)||'.the_geom)) AS sys_geometry
 			FROM '||quote_ident(v_psector_layer)||'  
 			JOIN '||quote_ident(v_exploitation_layer)||' ON '||quote_ident(v_exploitation_layer)||'.'||quote_ident(v_exploitation_id_field)||' = '||quote_ident(v_psector_layer)||'.'||quote_ident(v_psector_parent_field)||'
-			WHERE '||quote_ident(v_exploitation_layer)||'.'||quote_ident(v_exploitation_display_field)||' = '||quote_literal(name_arg)||'
-			AND '||quote_ident(v_psector_layer)||'.'||quote_ident(v_psector_display_field)||' ILIKE '||quote_literal(text_arg)||' LIMIT 10 )a'
-			INTO response_json;
-			
+			WHERE '||quote_ident(v_exploitation_layer)||'.'||quote_ident(v_exploitation_display_field)||' = '||quote_literal(v_name)||'
+			AND '||quote_ident(v_psector_layer)||'.'||quote_ident(v_psector_display_field)||' ILIKE '||quote_literal(v_textarg)||' LIMIT 10 )a'
+			INTO v_response;	
 	END IF;
 
 	-- Control NULL's
-    response_json := COALESCE(response_json, '{}');
+	v_response := COALESCE(v_response, '{}');
 
 	-- Return
-    RETURN ('{"status":"Accepted"' || ', "version":'|| v_version ||
-        ', "data":' || response_json ||      
+	RETURN ('{"status":"Accepted"' || ', "version":'|| v_version ||
+        ', "data":' || v_response ||      
         '}')::json;
 
 	-- exception handling
-    EXCEPTION WHEN OTHERS THEN 
-    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	EXCEPTION WHEN OTHERS THEN 
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;$BODY$
   LANGUAGE plpgsql VOLATILE

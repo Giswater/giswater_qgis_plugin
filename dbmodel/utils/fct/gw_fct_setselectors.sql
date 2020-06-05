@@ -12,7 +12,8 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setselectors(p_data json)
 $BODY$
 
 /*example
-SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{}, "data":{"selectorType":"explfrommuni", "id":2, "value":true, "isAlone":true}}$$);
+SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{}, 
+"data":{"addSchema":"ud_sample", "selectorType":"explfrommuni", "id":2, "value":true, "isAlone":true}}$$);
 SELECT * FROM selector_expl
 */
 
@@ -27,7 +28,8 @@ v_value text;
 v_muni integer;
 v_isalone boolean;
 v_parameter_selector json;
-	
+
+
 BEGIN
 
 	-- Set search path to local schema
@@ -42,26 +44,55 @@ BEGIN
 	v_id := (p_data ->> 'data')::json->> 'id';
 	v_value := (p_data ->> 'data')::json->> 'value';
 	v_isalone := (p_data ->> 'data')::json->> 'isAlone';
+	v_data = p_data->>'data';
 
 	-- Get system parameters
 	v_parameter_selector = (SELECT value::json FROM config_param_system WHERE parameter = concat('basic_selector_', v_selectortype));
 		v_tablename = v_parameter_selector->>'selector';
 		v_columnname = v_parameter_selector->>'selector_id'; 
-
-		RAISE NOTICE ' % %', v_tablename, v_columnname;
 	
-	-- managing is alone
+	-- get expl from muni
+	IF v_selectortype = 'explfrommuni' THEN
+		v_expl = (SELECT expl_id FROM exploitation e, ext_municipality m WHERE st_dwithin(st_centroid(e.the_geom), m.the_geom, 0) AND muni_id = v_id);
+		EXECUTE 'DELETE FROM selector_expl WHERE cur_user = current_user';
+		EXECUTE 'INSERT INTO selector_expl (expl_id, cur_user) VALUES('|| v_expl ||', '''|| current_user ||''')';	
+	END IF;
+	
+	-- manage isalone
 	IF v_isalone THEN
 		EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user';
 	END IF;
 
-	-- managing value
+	-- manage value
 	IF v_value THEN
 		EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) VALUES('|| v_id ||', '''|| current_user ||''')';
 	ELSE
 		EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE ' || v_columnname || ' = '|| v_id ||'';
 	END IF;
+
+	-- manage add schema
+	IF v_addschema IS NOT NULL THEN
+
+		--force search path to the additional schema
+		EXECUTE 'SET search_path = public, '||v_addschema;
 		
+		-- get municipality from exploitation (as mapping relation againts the add schema)
+		v_muni = (SELECT muni_id FROM exploitation e, ext_municipality m WHERE st_dwithin(st_centroid(e.the_geom), m.the_geom, 0) AND expl_id = v_id);
+		EXECUTE 'DELETE FROM selector_expl WHERE cur_user = current_user';
+		EXECUTE 'INSERT INTO selector_expl (expl_id, cur_user) VALUES('|| v_expl ||', '''|| current_user ||''')';	
+		
+		-- modify json to call again on the add schema
+		v_data = gw_fct_object_set_key(p_data , 'id', v_muni_id);
+		v_data = gw_fct_object_set_key(p_data ,' selectorType', 'explfrommuni');
+		v_data = gw_fct_object_delete_key(p_data ,id, 'addSchema');
+				
+		-- trigger selector of additional schema		
+		PERFORM gw_fct_setselectors(v_data);
+		
+		-- restore set search_path
+		SET search_path = SCHEMA_NAME, public;
+
+	END IF;
 	
 	-- Return
 	RETURN ('{"status":"Accepted", "version":'||v_version||
@@ -69,8 +100,8 @@ BEGIN
 			',"form":{"formName":"", "formLabel":"", "formText":""'||
 			',"formActions":[]}'||
 			',"feature":{}'||
-			',"data":{"indexingLayers": {	"mincut": ["anl_mincut_result_selector", "v_anl_mincut_result_valve", "v_anl_mincut_result_cat", "v_anl_mincut_result_connec", "v_anl_mincut_result_node", "v_anl_mincut_result_arc"],
-							"exploitation": ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element"]
+			',"data":{"indexingLayers": {"mincut": ["v_om_mincut", "v_om_mincut_arc", "v_om_mincut_node", "v_om_mincut_connec", "v_om_mincut_valve"],
+										 "exploitation": ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_gully", "v_edit_element"]
 			}}}'||'}')::json;
 
 	-- Exception handling
