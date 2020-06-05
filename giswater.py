@@ -987,9 +987,6 @@ class Giswater(QObject):
         # Check roles of this user to show or hide toolbars
         self.controller.check_user_roles()
 
-        # Manage project variable 'expl_id'
-        self.manage_expl_id()
-
         # Manage layer fields
         self.get_layers_to_config()
         self.set_layer_config(self.available_layers)
@@ -1230,25 +1227,6 @@ class Giswater(QObject):
         except KeyError as e:
             self.controller.show_warning("KeyError: "+str(e))
 
-
-    def manage_expl_id(self):
-        """ Manage project variable 'expl_id' """
-
-        # Get project variable 'expl_id'
-        expl_id = None
-        try:
-            expl_id = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('expl_id')
-        except:
-            pass
-
-        if expl_id is None:
-            return
-
-        # Update table 'selector_expl' of current user (delete and insert)
-        sql = (f"DELETE FROM selector_expl WHERE current_user = cur_user;"
-               f"\nINSERT INTO selector_expl (expl_id, cur_user) "
-               f"VALUES({expl_id}, current_user);")
-        self.controller.execute_sql(sql)
 
 
     def project_read_pl(self):
@@ -1503,9 +1481,9 @@ class Giswater(QObject):
 
 
     def manage_guided_map(self):
-        """ Guide map works using v_edit_exploitation """
+        """ Guide map works using ext_municipality """
 
-        self.layer_expl = self.controller.get_layer_by_tablename('v_edit_exploitation')
+        self.layer_expl = self.controller.get_layer_by_tablename('ext_municipality')
         if self.layer_expl is None:
             return
 
@@ -1518,27 +1496,26 @@ class Giswater(QObject):
 
 
     def selection_changed(self):
-        """ Get selected expl_id and execute function setselectors """
+        """ Get selected muni_id and execute function setselectors """
 
-        expl_id = None
+        muni_id = None
         features = self.layer_expl.getSelectedFeatures()
         for feature in features:
-            expl_id = feature["expl_id"]
-            self.controller.log_info(f"Selected expl_id: {expl_id}")
+            muni_id = feature["muni_id"]
+            self.controller.log_info(f"Selected muni_id: {muni_id}")
             break
 
         self.iface.mapCanvas().selectionChanged.disconnect()
         self.iface.actionZoomToSelected().trigger()
         self.layer_expl.removeSelection()
 
-        if expl_id is None:
+        if muni_id is None:
             return
 
-        extras = f'"selector_type":"exploitation", "check":true, "onlyone":true, "id":{expl_id}'
+        extras = f'"selectorType":"explfrommuni", "id":{muni_id}, "value":true, "isAlone":true'
         body = self.create_body(extras=extras)
-        # sql = f"SELECT gw_fct_setselectors($${{{body}}}$$)::text"
-        # row = self.controller.get_row(sql, commit=True, log_sql=True)
-        row = self.controller.get_json('gw_fct_setselectors', body, log_sql=True)
+        sql = f"SELECT gw_fct_setselectors({body})::text"
+        row = self.controller.get_row(sql, commit=True, log_sql=True)
         if row:
             self.iface.mapCanvas().refreshAllLayers()
             self.layer_expl.triggerRepaint()
