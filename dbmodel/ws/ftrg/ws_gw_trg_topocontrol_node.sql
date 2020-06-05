@@ -183,10 +183,12 @@ BEGIN
 						FROM man_addfields_value WHERE feature_id=v_arc.arc_id;
 																			
 						-- Update doability for the new arc (false)
-						UPDATE plan_psector_x_arc SET doable=FALSE where arc_id=v_arcrecordtb.arc_id;
+						UPDATE plan_psector_x_arc SET doable=FALSE, addparam='{"nodeReplace":"generated"}' 
+						WHERE arc_id=v_arcrecordtb.arc_id AND psector_id=v_psector_id;
 
 						-- insert old arc on the alternative							
-						INSERT INTO plan_psector_x_arc (psector_id, arc_id, state, doable) VALUES (v_psector_id, v_arc.arc_id, 0, FALSE);
+						INSERT INTO plan_psector_x_arc (psector_id, arc_id, state, doable,addparam)
+						VALUES (v_psector_id, v_arc.arc_id, 0, FALSE, '{"nodeReplace":"deprecated"}');
 		
 					END IF;
 				END LOOP;			
