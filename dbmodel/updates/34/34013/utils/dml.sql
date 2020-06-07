@@ -53,3 +53,5 @@ UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'sys_role_id'
 DELETE FROM sys_message WHERE id IN (0,1,2,3,999);
 
 INSERT INTO sys_process VALUES (248, 'Daily update', 'utils');
+
+DELETE FROM sys_function WHERE function_name = 'gw_fct_admin_schema_dropdreprecated_rel';
