@@ -30,11 +30,14 @@ BEGIN
 	v_file  = (p_data ->>'data')::json->>'file';
 
 	RAISE NOTICE 'Starting rpt2pg process.';
+	
+	DELETE FROM temp_csv WHERE fid = 140 AND cur_user = current_user;
 
 	-- inserting file into temp table
-	INSERT INTO temp_csv (source, csv1, csv2, csv3, csv4, csv5, csv6, csv7, csv8, csv9, csv10, csv11, csv12, csv13, csv14, csv15, csv16, csv17, csv18, csv19, csv20)
-	SELECT a::json->>'source', a::json->>'csv1', a::json->>'csv2',a::json->>'csv3',a::json->>'csv4',a::json->>'csv5',a::json->>'csv6',a::json->>'csv7',a::json->>'csv8',a::json->>'csv9',a::json->>'csv10',
-	a::json->>'csv11',a::json->>'csv12',a::json->>'csv13',a::json->>'csv14',a::json->>'csv15',a::json->>'csv16',a::json->>'csv17',a::json->>'csv18',a::json->>'csv19',a::json->>'csv20'
+	INSERT INTO temp_csv (fid, cur_user, source, csv1, csv2, csv3, csv4, csv5, csv6, csv7, csv8, csv9, csv10, csv11, csv12, csv13, csv14, csv15, csv16, csv17, csv18, csv19, csv20)
+	SELECT 140 , current_user, a::json->>'source', a::json->>'csv1', a::json->>'csv2',a::json->>'csv3',a::json->>'csv4',a::json->>'csv5',a::json->>'csv6',a::json->>'csv7',a::json->>'csv8',
+	a::json->>'csv9',a::json->>'csv10',	a::json->>'csv11',a::json->>'csv12',a::json->>'csv13',a::json->>'csv14',a::json->>'csv15',a::json->>'csv16',a::json->>'csv17',a::json->>'csv18'
+	,a::json->>'csv19',a::json->>'csv20'
 	FROM json_array_elements(v_file) AS a;
 
 	-- reordening data from temp table to rpt tables
