@@ -311,6 +311,7 @@ class Utils(ParentAction):
 
         sql = (f"SELECT DISTINCT({field_id}), {fields}"
                f" FROM {table_name}"
+               f" JOIN sys_function ON function_name =  functionname"
                f" WHERE sys_role IN {roles} AND active is True ORDER BY orderby")
         rows = self.controller.get_rows(sql, log_sql=True)
         if not rows:
