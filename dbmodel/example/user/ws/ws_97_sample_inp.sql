@@ -8,7 +8,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 INSERT INTO inp_connec SELECT connec_id FROM connec;
 
-UPDATE inp_cat_mat_roughness SET roughness=0.014;
+UPDATE cat_mat_roughness SET roughness=0.014;
 
 INSERT INTO inp_curve VALUES ('PUMP_01', 'PUMP');
 INSERT INTO inp_curve VALUES ('PUMP_02', 'PUMP');

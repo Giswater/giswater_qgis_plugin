@@ -10,3 +10,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2020/06/05
 ALTER TABLE minsector RENAME presszonecat_id TO presszone_id;
+
+
+ALTER TABLE inp_cat_mat_roughness RENAME TO cat_mat_roughness;

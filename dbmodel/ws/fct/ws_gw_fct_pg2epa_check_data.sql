@@ -447,7 +447,7 @@ BEGIN
 	
 	
 	RAISE NOTICE '18 - Check roughness catalog for pipes';
-	SELECT count(*) INTO v_count FROM v_edit_inp_pipe JOIN cat_arc ON id = arccat_id JOIN inp_cat_mat_roughness USING  (matcat_id)
+	SELECT count(*) INTO v_count FROM v_edit_inp_pipe JOIN cat_arc ON id = arccat_id JOIN cat_mat_roughness USING  (matcat_id)
 	WHERE init_age IS NULL OR end_age IS NULL OR roughness IS NULL;
 
 	IF v_count > 0 THEN

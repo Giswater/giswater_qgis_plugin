@@ -227,8 +227,8 @@ BEGIN
 
 
 		RAISE NOTICE '3 - Check roughness inconsistency in function of headloss formula used';
-		v_min = (SELECT min(roughness) FROM inp_cat_mat_roughness);
-		v_max = (SELECT max(roughness) FROM inp_cat_mat_roughness);
+		v_min = (SELECT min(roughness) FROM cat_mat_roughness);
+		v_max = (SELECT max(roughness) FROM cat_mat_roughness);
 		v_headloss = (SELECT value FROM config_param_user WHERE cur_user=current_user AND parameter='inp_options_headloss.');
 			
 		IF v_headloss = 'D-W' AND (v_min < 0.0025 AND v_max > 0.15) THEN

@@ -119,7 +119,7 @@ BEGIN
 		DELETE FROM cat_feature;
 		DELETE FROM cat_mat_arc;
 		DELETE FROM cat_mat_node;
-		DELETE FROM inp_cat_mat_roughness;
+		DELETE FROM cat_mat_roughness;
 		DELETE FROM cat_arc;
 		DELETE FROM cat_node;
  
@@ -301,12 +301,12 @@ BEGIN
 	--Materials
 	INSERT INTO cat_mat_arc 
 	SELECT DISTINCT csv6 FROM temp_csv WHERE source='[PIPES]' AND csv6 IS NOT NULL;
-	DELETE FROM inp_cat_mat_roughness; -- forcing delete because when new material is inserted on cat_mat_arc automaticly this table is filled
+	DELETE FROM cat_mat_roughness; -- forcing delete because when new material is inserted on cat_mat_arc automaticly this table is filled
 	INSERT INTO cat_mat_node VALUES ('EPAMAT') ON CONFLICT (id) DO NOTHING;
 	INSERT INTO cat_mat_arc VALUES ('EPAMAT');
 	
 	--Roughness
-	INSERT INTO inp_cat_mat_roughness (matcat_id, period_id, init_age, end_age, roughness)
+	INSERT INTO cat_mat_roughness (matcat_id, period_id, init_age, end_age, roughness)
 	SELECT id, 'default period',  0, 999, id::float FROM cat_mat_arc WHERE id !='EPAMAT';
 	
 	--cat_arc

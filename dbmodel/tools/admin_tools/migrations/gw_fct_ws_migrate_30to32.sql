@@ -39,7 +39,7 @@ BEGIN
 	TRUNCATE man_addfields_parameter;
 	TRUNCATE config_visit_parameter;
 		
-	TRUNCATE inp_cat_mat_roughness;
+	TRUNCATE cat_mat_roughness;
 	TRUNCATE inp_report;
 	TRUNCATE inp_times;
 	
@@ -60,7 +60,7 @@ BEGIN
     and (id not ilike ''v_%'' and id not ilike ''%selector%'' and id  not ilike ''config%'' and id not ilike ''ext_rtc_hydrometer_state'') order by id' 
     LOOP
 		--direct insert from one schema to another. Special ELSIF for the tables which need transformation
-		IF rec.id!='ext_streetaxis' AND rec.id!='inp_cat_mat_roughness'  AND rec.id!='inp_pump' AND rec.id!='inp_pipe' AND rec.id!='inp_shortpipe' 
+		IF rec.id!='ext_streetaxis' AND rec.id!='cat_mat_roughness'  AND rec.id!='inp_pump' AND rec.id!='inp_pipe' AND rec.id!='inp_shortpipe'
 		AND rec.id!='inp_valve' AND rec.id!='plan_psector_x_node' AND rec.id!='plan_psector_x_arc' AND rec.id!='plan_arc_x_pavement' THEN
 			
 		EXECUTE 'INSERT INTO '||rec.id||' SELECT * FROM '||p_source_schema||'.'||rec.id||';';

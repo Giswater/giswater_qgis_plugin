@@ -101,9 +101,9 @@ BEGIN
 			LEFT JOIN cat_arc ON v_arc.arccat_id = cat_arc.id
 			LEFT JOIN cat_mat_arc ON cat_arc.matcat_id = cat_mat_arc.id
 			LEFT JOIN inp_pipe ON v_arc.arc_id = inp_pipe.arc_id
-			LEFT JOIN inp_cat_mat_roughness ON inp_cat_mat_roughness.matcat_id = cat_mat_arc.id 
-			WHERE (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 >= inp_cat_mat_roughness.init_age 
-			AND (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 < inp_cat_mat_roughness.end_age '
+			LEFT JOIN cat_mat_roughness ON cat_mat_roughness.matcat_id = cat_mat_arc.id
+			WHERE (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 >= cat_mat_roughness.init_age
+			AND (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 < cat_mat_roughness.end_age '
 			||v_statetype||' AND v_arc.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user
 			AND epa_type != ''NOT DEFINED''';
 
