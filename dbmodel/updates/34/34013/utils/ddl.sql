@@ -84,3 +84,4 @@ ALTER TABLE sys_message DROP column isdeprecated;
 ALTER TABLE sys_function DROP column isdeprecated;
 ALTER TABLE config_param_system DROP column isdeprecated;
 
+ALTER TABLE config_csv DROP column sys_role;
