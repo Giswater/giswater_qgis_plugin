@@ -285,8 +285,8 @@ BEGIN
 		ELSIF v_action_type = 'parameter' THEN
 			
 			IF v_viewname NOT IN (SELECT id FROM sys_table) AND v_ismultievent iS TRUE THEN
-				INSERT INTO sys_table (id, description, sys_role, sys_criticity, qgis_criticity, isdeprecated)
-				VALUES (v_viewname, 'Editable view that saves visits', 'role_om', 0, 0, false);
+				INSERT INTO sys_table (id, description, sys_role, sys_criticity, qgis_criticity)
+				VALUES (v_viewname, 'Editable view that saves visits', 'role_om', 0, 0);
 
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (219, null, 4, concat('Insert view name into sys_table.'));

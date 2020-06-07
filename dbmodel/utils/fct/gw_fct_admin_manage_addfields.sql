@@ -323,9 +323,9 @@ BEGIN
 
 				IF concat('edit_addfield_p', v_idaddparam,'_vdefault') NOT IN (SELECT id FROM sys_param_user) THEN
 					INSERT INTO sys_param_user (id, formname, descript, sys_role, label,  layoutname, layoutorder,
-					project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated, dv_querytext, dv_querytext_filterc,feature_field_id, isenabled)
+					project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, dv_querytext, dv_querytext_filterc,feature_field_id, isenabled)
 					VALUES (concat('edit_addfield_p', v_idaddparam,'_vdefault'),'config', concat('Default value of addfield ',v_param_name), 'role_edit', v_param_name,
-					'lyt_addfields', v_param_user_id, lower(v_project_type), false, false, v_audit_datatype, v_audit_widgettype, false, false,
+					'lyt_addfields', v_param_user_id, lower(v_project_type), false, false, v_audit_datatype, v_audit_widgettype, false,
 					v_dv_querytext, v_dv_querytext_filterc,v_param_name, true);
 		
 					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -643,11 +643,11 @@ BEGIN
 			END IF;
 
 			INSERT INTO sys_param_user (id, formname, descript, sys_role, label,  layoutname, layoutorder,
-			project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated,dv_querytext, dv_querytext_filterc, feature_field_id, isenabled)
+			project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, dv_querytext, dv_querytext_filterc, feature_field_id, isenabled)
 			VALUES (concat('edit_addfield_p', v_idaddparam,,'_vdefault'),'config', 
 			concat('Default value of addfield ',v_param_name, ' for ', v_cat_feature), 
 			'role_edit', v_param_name, 'lyt_addfields', v_param_user_id, lower(v_project_type), false, false, v_audit_datatype, 
-			v_audit_widgettype, false, false, v_dv_querytext, v_dv_querytext_filterc, v_param_name, true);
+			v_audit_widgettype, false, v_dv_querytext, v_dv_querytext_filterc, v_param_name, true);
 			
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (218, null, 4, concat('Create new vdefault: ', concat('edit_addfield_p', v_idaddparam,,'_vdefault'),'.'));

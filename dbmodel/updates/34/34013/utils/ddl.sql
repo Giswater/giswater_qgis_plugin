@@ -77,3 +77,10 @@ ALTER TABLE sys_param_user RENAME sys_role_id TO sys_role;
 ALTER TABLE sys_table RENAME sys_role_id TO sys_role;
 
 ALTER TABLE selector_audit RENAME fprocesscat_id TO fid;
+
+ALTER TABLE sys_table DROP column isdeprecated;
+ALTER TABLE sys_function DROP column isdeprecated;
+ALTER TABLE sys_message DROP column isdeprecated;
+ALTER TABLE sys_function DROP column isdeprecated;
+ALTER TABLE config_param_system DROP column isdeprecated;
+

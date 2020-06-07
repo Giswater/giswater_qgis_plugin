@@ -180,7 +180,7 @@ BEGIN
 	END IF;
 
 	--Reset the rest of sequences
-	FOR v_rectable IN SELECT * FROM sys_table WHERE sys_sequence IS NOT NULL AND sys_sequence_field IS NOT NULL AND sys_sequence!='urn_id_seq' AND sys_sequence!='doc_seq' AND isdeprecated IS NOT TRUE
+	FOR v_rectable IN SELECT * FROM sys_table WHERE sys_sequence IS NOT NULL AND sys_sequence_field IS NOT NULL AND sys_sequence!='urn_id_seq' AND sys_sequence!='doc_seq'
 	LOOP 
 		raise notice ' %', v_rectable;
 		v_query_string:= 'SELECT max('||v_rectable.sys_sequence_field||') FROM '||v_rectable.id||';' ;
@@ -404,7 +404,7 @@ BEGIN
 
 			-- start process
 			FOR v_rectable IN SELECT * FROM sys_table WHERE qgis_role_id IN 
-			(SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member') AND isdeprecated IS FALSE)
+			(SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member') )
 			LOOP
 			
 				--RAISE NOTICE 'v_count % id % ', v_count, v_rectable.id;

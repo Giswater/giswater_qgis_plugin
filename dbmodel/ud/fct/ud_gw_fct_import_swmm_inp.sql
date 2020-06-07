@@ -121,14 +121,14 @@ BEGIN
 		DELETE FROM config_param_user WHERE parameter ILIKE 'inp_options%' AND cur_user = current_user;
 		DELETE FROM config_param_user WHERE parameter ILIKE 'inp_report%' AND cur_user = current_user;
 
-		FOR v_id IN SELECT id FROM sys_table WHERE (sys_role ='role_edit' AND id NOT LIKE 'v%') AND isdeprecated = FALSE
+		FOR v_id IN SELECT id FROM sys_table WHERE (sys_role ='role_edit' AND id NOT LIKE 'v%')
 		LOOP 
 			--RAISE NOTICE 'v_id %', v_id;
 			EXECUTE 'DELETE FROM '||quote_ident(v_id);
 		END LOOP;
 
 		
-		FOR v_id IN SELECT id FROM sys_table WHERE (sys_role ='role_epa' AND id NOT LIKE 'v%') AND isdeprecated = FALSE
+		FOR v_id IN SELECT id FROM sys_table WHERE (sys_role ='role_epa' AND id NOT LIKE 'v%')
 		LOOP 
 			--RAISE NOTICE 'v_id %', v_id;
 			EXECUTE 'DELETE FROM '||quote_ident(v_id);

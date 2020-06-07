@@ -7,11 +7,11 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-INSERT INTO sys_table(id, context, description, sys_role_id, sys_criticity, qgis_criticity,  isdeprecated)
+INSERT INTO sys_table(id, context, description, sys_role_id, sys_criticity, qgis_criticity)
     VALUES ('ext_cat_raster', 'external catalog', 'Catalog of rasters', 'role_edit', 0, 0, false)
     ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO sys_table(id, context, description, sys_role_id, sys_criticity, qgis_criticity,  isdeprecated)
+INSERT INTO sys_table(id, context, description, sys_role_id, sys_criticity, qgis_criticity)
     VALUES ('ext_raster_dem', 'external table', 'Table to store raster DEM', 'role_edit', 0, 0, false)
     ON CONFLICT (id) DO NOTHING;
  

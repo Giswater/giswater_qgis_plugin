@@ -121,7 +121,7 @@ BEGIN
 		EXECUTE v_query_text;
 
 		-- Grant specificic permissions for tables
-		FOR v_tablerecord IN SELECT * FROM sys_table WHERE sys_role IS NOT NULL AND isdeprecated != TRUE
+		FOR v_tablerecord IN SELECT * FROM sys_table WHERE sys_role IS NOT NULL
 		LOOP
 			v_query_text:= 'GRANT ALL ON TABLE '||v_tablerecord.id||' TO '||v_tablerecord.sys_role||';';
 			EXECUTE v_query_text;

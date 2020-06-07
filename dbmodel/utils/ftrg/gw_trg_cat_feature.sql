@@ -102,9 +102,9 @@ BEGIN
 		END IF;
 
 		INSERT INTO sys_param_user(id, formname, descript, sys_role, label, isenabled, layoutname, layoutorder,
-		dv_querytext, feature_field_id, project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, isdeprecated, iseditable)
+		dv_querytext, feature_field_id, project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, iseditable)
 		VALUES (concat('feat_',v_id,'_vdefault'),'config',concat ('Value default catalog for ',v_id,' cat_feature'), 'role_edit', concat ('Default catalog for ', v_id), true, v_layout ,v_layoutorder,
-		v_querytext, v_feature_field_id, lower(v_projecttype),false,false,'text', 'combo', true, false, true)
+		v_querytext, v_feature_field_id, lower(v_projecttype),false,false,'text', 'combo', true, true)
 		ON CONFLICT (id) DO NOTHING;
 	END IF;
 
