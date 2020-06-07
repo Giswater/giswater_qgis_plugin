@@ -227,12 +227,8 @@ class TaskGo2Epa(QgsTask):
         self.json_rpt = None
         status = False
         try:
-            # Delete previous values of user on temp table
-            sql = (f"DELETE FROM temp_csv "
-                   f"WHERE cur_user = current_user AND fid = {self.fid}")
-            self.controller.execute_sql(sql)
-            # Importing file to temporal table
-            status = self.insert_rpt_into_db_2(self.file_rpt)
+            # Call import function
+            status = self.insert_rpt_into_db(self.file_rpt)
             if not status:
                 return False
             status = self.exec_function_rpt2pg()
@@ -253,123 +249,14 @@ class TaskGo2Epa(QgsTask):
         rows = self.controller.get_rows(sql)
         sources = {}
         for row in rows:
-            aux = row[1].replace('{','').replace('}', '')
-            item = aux.split(',')
-            for i in item:
-                sources[i.strip()] = row[0].strip()
-
-        # While we don't find a match with the source, source and csv40 must be null
-        source = "null"
-        csv40 = "null"
-        sql = ""
-        row_count = sum(1 for rows in full_file)  # @UnusedVariable
-
-        self.controller.log_info(f"'{self.description()}'. Row count: {row_count}")
-
-        for line_number, row in enumerate(full_file):
-
-            if self.isCanceled():
-                return False
-
-            progress += 1
-            if '**' in row or '--' in row:
-                continue
-
-            row = row.rstrip()
-            dirty_list = row.split(' ')
-
-            # Clean unused items
-            for x in range(len(dirty_list) - 1, -1, -1):
-                if dirty_list[x] == '':
-                    dirty_list.pop(x)
-
-            sp_n = []
-            if len(dirty_list) > 0:
-                for x in range(0, len(dirty_list)):
-                    if bool(re.search('[0-9][-]\d{1,2}[.]]*', str(dirty_list[x]))):
-                        last_index = 0
-                        for i, c in enumerate(dirty_list[x]):
-                            if "-" == c:
-                                aux = dirty_list[x][last_index:i]
-                                last_index = i
-                                sp_n.append(aux)
-
-                        aux = dirty_list[x][last_index:i]
-                        sp_n.append(aux)
-
-                    elif bool(re.search('(\d\..*\.\d)', str(dirty_list[x]))):
-                        if 'Version' not in dirty_list and 'VERSION' not in dirty_list:
-                            self.controller.log_info(f"Error near line {line_number+1} -> {dirty_list}")
-                            message = ("The rpt file has a heavy inconsistency. "
-                                       "As a result it's not posible to import it. " 
-                                       "Columns are overlaped one againts other, this is a not valid simulation. " 
-                                       "Please ckeck and fix it before continue")
-                            self.controller.show_message(message, 1)
-                            return False
-                    else:
-                        sp_n.append(dirty_list[x])
-
-            # Find strings into dict and set source column
-            for k, v in sources.items():
-                try:
-                    if k in (f'{sp_n[0]} {sp_n[1]}', f'{sp_n[0]}'):
-                        source = "'" + v + "'"
-                        _time = re.compile('^([012]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$')
-                        if _time.search(sp_n[3]):
-                            csv40 = "'" + sp_n[3] + "'"
-                except IndexError:
-                    pass
-                except Exception as e:
-                    self.controller.log_info(type(e).__name__)
-
-            if len(sp_n) > 0:
-                sql += f"INSERT INTO temp_csv (fid, source, csv40, "
-                values = f"VALUES({self.fid}, {source}, {csv40}, "
-                for x in range(0, len(sp_n)):
-                    if "''" not in sp_n[x]:
-                        sql += f"csv{x + 1}, "
-                        value = "'" + sp_n[x].strip().replace("\n", "") + "', "
-                        values += value.replace("''", "null")
-                    else:
-                        sql += f"csv{x + 1}, "
-                        values = "VALUES(null, "
-                sql = sql[:-2] + ") "
-                values = values[:-2] + ");\n"
-                sql += values
-
-            # Execute SQL every in batches of N records
-            if progress % 1000 == 0:
-                self.setProgress((line_number * 100) / row_count)
-                self.controller.execute_sql(sql)
-                sql = ""
-
-        if sql != "":
-            self.controller.execute_sql(sql)
-
-        self.close_file()
-
-        return True
-
-
-    def insert_rpt_into_db_2(self, folder_path=None):
-
-        self._file = open(folder_path, "r+")
-        full_file = self._file.readlines()
-        progress = 0
-
-        # Create dict with sources
-        sql = f"SELECT tablename, target FROM config_fprocess WHERE fid = {self.fid};"
-        rows = self.controller.get_rows(sql)
-        sources = {}
-        for row in rows:
             json_elem = row[1].replace('{','').replace('}', '')
             item = json_elem.split(',')
             for i in item:
                 sources[i.strip()] = row[0].strip()
 
-        # While we don't find a match with the source, source and csv40 must be null
-        source = "null"
-        csv40 = "null"
+        # While we don't find a match with the target, target and col40 must be null
+        target = "null"
+        col40 = "null"
         json_rpt = ""
         row_count = sum(1 for rows in full_file)  # @UnusedVariable
 
@@ -418,23 +305,23 @@ class TaskGo2Epa(QgsTask):
                     else:
                         sp_n.append(dirty_list[x])
 
-            # Find strings into dict and set source column
+            # Find strings into dict and set target column
             for k, v in sources.items():
                 try:
                     if k in (f'{sp_n[0]} {sp_n[1]}', f'{sp_n[0]}'):
-                        source = "'" + v + "'"
+                        target = "'" + v + "'"
                         _time = re.compile('^([012]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$')
                         if _time.search(sp_n[3]):
-                            csv40 = "'" + sp_n[3] + "'"
+                            col40 = "'" + sp_n[3] + "'"
                 except IndexError:
                     pass
                 except Exception as e:
                     self.controller.log_info(type(e).__name__)
 
             if len(sp_n) > 0:
-                json_elem = f'"source": "{source}", "csv40": "{csv40}", '
+                json_elem = f'"target": "{target}", "col40": "{col40}", '
                 for x in range(0, len(sp_n)):
-                    json_elem += f'"csv{x + 1}":'
+                    json_elem += f'"col{x + 1}":'
                     if "''" not in sp_n[x]:
                         value = '"' + sp_n[x].strip().replace("\n", "") + '", '
                         value = value.replace("''", "null")
