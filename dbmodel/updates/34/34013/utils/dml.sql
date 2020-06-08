@@ -53,3 +53,11 @@ DELETE FROM sys_function WHERE function_name = 'gw_fct_admin_schema_dropdrepreca
 DELETE FROM sys_table WHERE id IN('om_psector','om_psector_cat_type','om_psector_selector', 'om_psector_x_arc', 'om_psector_x_node', 'om_psector_x_other');
 
 DELETE FROM sys_table WHERE id IN('inp_controls_x_node');
+
+
+UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json,'feature_type','arc'::text) where parameter = 'basic_search_network_arc';
+UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json,'feature_type','node'::text) where parameter = 'basic_search_network_node';
+UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json,'feature_type','connec'::text) where parameter = 'basic_search_network_connec';
+UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json,'feature_type','gully'::text) where parameter = 'basic_search_network_gully';
+UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json,'feature_type','visit'::text) where parameter = 'basic_search_network_visit';
+UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json,'feature_type','element'::text) where parameter = 'basic_search_network_element';

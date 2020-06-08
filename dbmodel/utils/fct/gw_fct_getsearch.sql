@@ -104,6 +104,11 @@ BEGIN
 		WHERE parameter like '%basic_search_network%' ORDER BY ((value)::json->>'orderby'))a;    
 		comboType := gw_fct_json_object_set_key(comboType, 'comboNames', combo_json);
 
+		-- Get feature type
+		SELECT array_to_json(array_agg(id)) INTO combo_json FROM (SELECT ((value)::json->'feature_type') AS id FROM config_param_system 
+		WHERE parameter like '%basic_search_network%' ORDER BY ((value)::json->>'orderby'))a;    
+		comboType := gw_fct_json_object_set_key(comboType, 'comboFeature', combo_json);
+
 		-- Add edit box to introduce search text
 		SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND columnname='net_code';
 		editCode := json_build_object('label',rec_fields.label,'columnname', rec_fields.columnname, 'widgetname', concat('network_',rec_fields.columnname),'widgettype','typeahead','datatype',
