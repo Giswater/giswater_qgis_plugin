@@ -949,8 +949,6 @@ class Giswater(QObject):
 
         self.get_buttons_to_hide()
 
-
-
         # Manage project read of type 'tm'
         if self.wsoftware == 'tm':
             self.project_read_tm()
@@ -1515,7 +1513,8 @@ class Giswater(QObject):
         if muni_id is None:
             return
 
-        extras = f'"selectorType":"explfrommuni", "id":{muni_id}, "value":true, "isAlone":true'
+        extras = f'"selectorType":"explfrommuni", "id":{muni_id}, "value":true, "isAlone":true, '
+        extras += f'"addSchema":"{self.qgis_project_add_schema}"'
         body = self.create_body(extras=extras)
         sql = f"SELECT gw_fct_setselectors({body})::text"
         row = self.controller.get_row(sql, commit=True, log_sql=True)
