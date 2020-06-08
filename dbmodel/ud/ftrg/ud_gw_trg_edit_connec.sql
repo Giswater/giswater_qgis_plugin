@@ -487,7 +487,7 @@ BEGIN
 		END IF;
 
 		-- customer_code
-		IF NEW.customer_code != OLD.customer_code THEN
+		IF (NEW.customer_code != OLD.customer_code) OR (OLD.customer_code IS NULL AND NEW.customer_code IS NOT NULL) THEN
 			UPDATE connec SET customer_code=NEW.customer_code WHERE connec_id = OLD.connec_id;
 		END IF;
 		
