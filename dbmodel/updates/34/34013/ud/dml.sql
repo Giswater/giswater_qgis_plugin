@@ -10,3 +10,5 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 -- 2020/05/25
 
 DELETE FROM sys_table WHERE id IN ('cat_arc_class', 'cat_arc_class_cat', 'cat_arc_class_type');
+
+DELETE FROM sys_table WHERE id IN ('anl_flow_arc','anl_flow_node','anl_flow_connec', 'anl_flow_gully', 'anl_arc_profile_value');

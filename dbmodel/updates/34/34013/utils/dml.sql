@@ -7,10 +7,8 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
--- 2020/05/25
-
+-- 2020/06/08
 DELETE FROM sys_function WHERE id = 2128;
-
 
 INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field)
 VALUES ('plan_typevalue', 'result_type', 'plan_result_cat', 'result_type');
@@ -31,16 +29,12 @@ INSERT INTO om_typevalue VALUES ('profile_papersize','4','DIN A2 - 594x420',null
 INSERT INTO om_typevalue VALUES ('profile_papersize','5','DIN A1 - 840x594',null,'{"xdim":840, "ydim":594}');
 
 
-INSERT INTO config_param_system VALUES ('basic_selector_explfrommuni', '{"selector":"selector_expl", "selector_id":"expl_id"}', NULL, 'Select which label to display for selectors', 
-'Selector labels:',null,  null, TRUE, null, 'utils', NULL, FALSE, 'json', null, null, null, null, null, null, null, null, null, null, false);
-
--- rename tables
-ALTER TABLE inp_curve RENAME TO inp_curve_value;
-ALTER TABLE inp_curve_id RENAME TO inp_curve;
+INSERT INTO config_param_system VALUES ('basic_selector_explfrommuni', '{"selector":"selector_expl", "selector_id":"expl_id"}', 'Select which label to display for selectors', 
+'Selector labels:',null,  null, TRUE, null, 'utils', NULL, FALSE, 'json', null, null, null, null, null, null, null, null, null, false);
 
 -- update data metatables
-UPDATE sys_table set id = 'inp_curve_value' where 'inp_curve', sys_sequence = null, sys_sequence_field = null;
-UPDATE sys_table set id = 'inp_curve' where 'inp_curve_id';
+UPDATE sys_table set id = 'inp_curve_value' where id ='inp_curve';
+UPDATE sys_table set id = 'inp_curve' where id ='inp_curve_id';
 
 UPDATE config_form_fields SET formname = 'inp_curve_value' WHERE formname = 'inp_curve';
 UPDATE config_form_fields SET formname = 'inp_curve' WHERE formname = 'inp_curve_id';
@@ -52,6 +46,10 @@ UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'sys_role_id'
 
 DELETE FROM sys_message WHERE id IN (0,1,2,3,999);
 
-INSERT INTO sys_process VALUES (248, 'Daily update', 'utils');
+INSERT INTO sys_fprocess VALUES (248, 'Daily update', 'utils');
 
 DELETE FROM sys_function WHERE function_name = 'gw_fct_admin_schema_dropdreprecated_rel';
+
+DELETE FROM sys_table WHERE id IN('om_psector','om_psector_cat_type','om_psector_selector', 'om_psector_x_arc', 'om_psector_x_node', 'om_psector_x_other');
+
+DELETE FROM sys_table WHERE id IN('inp_controls_x_node');

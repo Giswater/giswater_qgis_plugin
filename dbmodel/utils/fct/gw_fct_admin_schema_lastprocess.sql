@@ -87,8 +87,8 @@ BEGIN
 	-- last proccess
 	IF v_isnew IS TRUE THEN
 			
-		INSERT INTO config_param_system (parameter, value, datatype, descript, project_type, label, isdeprecated)
-		VALUES ('admin_superusers', v_superusers ,'json', 'Basic information about superusers for this schema','utils', 'Schema manager:', false);
+		INSERT INTO config_param_system (parameter, value, datatype, descript, project_type, label)
+		VALUES ('admin_superusers', v_superusers ,'json', 'Basic information about superusers for this schema','utils', 'Schema manager:');
 			
 		-- inserting version table
 		IF v_sample_exist != 'sample' THEN
@@ -114,10 +114,6 @@ BEGIN
 		LOOP
 			EXECUTE 'DROP TABLE IF EXISTS '||v_tablename.table_name||' CASCADE';
 		END LOOP;
-		
-		-- drop deprecated variables
-		DELETE FROM config_param_system WHERE isdeprecated = 'true';
-		DELETE FROM sys_param_user WHERE isdeprecated is true;
 		
 		-- drop deprecated views
 		IF v_projecttype = 'WS' THEN 
@@ -207,8 +203,8 @@ BEGIN
 		ALTER TABLE sys_addfields DROP COLUMN if exists _sql_text_;
 		
 		-- inserting on config_param_system table
-		INSERT INTO config_param_system (parameter, value, datatype, descript, project_type, label, isdeprecated)
-		VALUES ('admin_schema_info', v_schema_info,'json', 'Basic information about schema','utils', 'Schema manager:', false);
+		INSERT INTO config_param_system (parameter, value, datatype, descript, project_type, label)
+		VALUES ('admin_schema_info', v_schema_info,'json', 'Basic information about schema','utils', 'Schema manager:');
 
 		-- fk from utils schema
 		IF (SELECT value FROM config_param_system WHERE parameter='admin_utils_schema') IS NOT NULL THEN
