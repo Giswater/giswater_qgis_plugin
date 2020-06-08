@@ -67,7 +67,7 @@ class ApiSearch(ApiParent):
         if qgis_project_add_schema is None:
             body = self.create_body()
         else:
-            extras = (f'"addSchema":"{qgis_project_add_schema}"')
+            extras = f'"addSchema":"{qgis_project_add_schema}"'
             body = self.create_body(extras=extras)
         function_name = "gw_fct_getsearch"
         complet_list = self.controller.get_json(function_name, body)
@@ -276,6 +276,7 @@ class ApiSearch(ApiParent):
         line_list = self.dlg_search.main_tab.widget(index).findChildren(QLineEdit)
         form_search += f'"tabName":"{self.dlg_search.main_tab.widget(index).objectName()}"'
         form_search_add += f'"tabName":"{self.dlg_search.main_tab.widget(index).objectName()}"'
+
         if combo_list:
             combo = combo_list[0]
             id = utils_giswater.get_item_data(self.dlg_search, combo, 0)
@@ -291,8 +292,10 @@ class ApiSearch(ApiParent):
             value = utils_giswater.getWidgetText(self.dlg_search, line_edit, return_string_null=False)
             if str(value) == '':
                 return
-
-            extras_search += f'"{line_edit.property("columnname")}":{{"text":"{value}"}}'
+            
+            qgis_project_add_schema = self.controller.plugin_settings_value('gwAddSchema')
+            extras_search += f'"{line_edit.property("columnname")}":{{"text":"{value}"}}, '
+            extras_search += f'"addSchema":"{qgis_project_add_schema}", "featureType":"arc"'
             extras_search_add += f'"{line_edit.property("columnname")}":{{"text":"{value}"}}'
             body = self.create_body(form=form_search, extras=extras_search)
             result = self.controller.get_json('gw_fct_setsearch', body, log_sql=True)
