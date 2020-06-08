@@ -174,7 +174,7 @@ CREATE OR REPLACE VIEW vu_node AS
 	node.elevation,
 	node.depth,
 	cat_node.nodetype_id AS node_type,
-	node_type.type AS sys_type,
+	cat_feature.system_id AS sys_type,
 	node.nodecat_id,
 	cat_node.matcat_id AS cat_matcat_id,
 	cat_node.pnom AS cat_pnom,
@@ -221,7 +221,7 @@ CREATE OR REPLACE VIEW vu_node AS
 	node.descript,
 	cat_node.svg,
 	node.rotation,
-	concat(node_type.link_path, node.link) AS link,
+	concat(cat_feature.link_path, node.link) AS link,
 	node.verified,
 	node.undelete,
 	cat_node.label,
@@ -240,7 +240,7 @@ CREATE OR REPLACE VIEW vu_node AS
 	node.the_geom
 	FROM node
 	 LEFT JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
-	 JOIN node_type ON node_type.id::text = cat_node.nodetype_id::text
+	 JOIN cat_feature ON cat_feature.id::text = cat_node.nodetype_id::text
 	 LEFT JOIN dma ON node.dma_id = dma.dma_id
 	 LEFT JOIN sector ON node.sector_id = sector.sector_id
 	 LEFT JOIN exploitation ON node.expl_id = exploitation.expl_id
@@ -260,7 +260,7 @@ CREATE OR REPLACE VIEW vu_arc AS
 	b.depth AS depth2,
 	arc.arccat_id,
 	cat_arc.arctype_id AS arc_type,
-	arc_type.type AS sys_type,
+	cat_feature.system_id AS sys_type,
 	cat_arc.matcat_id as cat_matcat_id,
 	cat_arc.pnom as cat_pnom,
 	cat_arc.dnom as cat_dnom,
@@ -303,7 +303,7 @@ CREATE OR REPLACE VIEW vu_arc AS
 	arc.postnumber2,
 	arc.postcomplement2,
 	arc.descript,
-	concat(arc_type.link_path, arc.link) AS link,
+	concat(cat_feature.link_path, arc.link) AS link,
 	arc.verified,
 	arc.undelete,
 	cat_arc.label,
@@ -327,7 +327,7 @@ CREATE OR REPLACE VIEW vu_arc AS
 	 LEFT JOIN sector ON arc.sector_id = sector.sector_id
 	 LEFT JOIN exploitation ON arc.expl_id = exploitation.expl_id
 	 LEFT JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
-	 JOIN arc_type ON arc_type.id::text = cat_arc.arctype_id::text
+	 JOIN cat_feature ON cat_feature.id::text = cat_arc.arctype_id::text
 	 LEFT JOIN dma ON arc.dma_id = dma.dma_id
 	 LEFT JOIN vu_node a ON a.node_id::text = arc.node_1::text
 	 LEFT JOIN vu_node b ON b.node_id::text = arc.node_2::text
@@ -343,7 +343,7 @@ CREATE OR REPLACE VIEW vu_connec AS
 	connec.elevation,
 	connec.depth,
 	cat_connec.connectype_id AS connec_type,
-	connec_type.type AS sys_type,
+	cat_feature.system_id AS sys_type,
 	connec.connecat_id,
 	connec.expl_id,
 	exploitation.macroexpl_id,
@@ -391,7 +391,7 @@ CREATE OR REPLACE VIEW vu_connec AS
 	connec.descript,
 	cat_connec.svg,
 	connec.rotation,
-	concat(connec_type.link_path, connec.link) AS link,
+	concat(cat_feature.link_path, connec.link) AS link,
 	connec.verified,
 	connec.undelete,
 	cat_connec.label,
@@ -418,7 +418,7 @@ CREATE OR REPLACE VIEW vu_connec AS
 			 JOIN connec connec_1 ON ext_rtc_hydrometer.connec_id::text = connec_1.customer_code::text
 		  GROUP BY connec_1.connec_id) a USING (connec_id)
 	 JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
-	 JOIN connec_type ON connec_type.id::text = cat_connec.connectype_id::text
+	 JOIN cat_feature ON cat_feature.id::text = cat_connec.connectype_id::text
 	 LEFT JOIN dma ON connec.dma_id = dma.dma_id
 	 LEFT JOIN sector ON connec.sector_id = sector.sector_id
 	 LEFT JOIN exploitation ON connec.expl_id = exploitation.expl_id
@@ -3550,7 +3550,7 @@ CREATE OR REPLACE VIEW v_edit_man_fountain AS
 	connec.label_x,
 	connec.label_y,
 	connec.label_rotation,
-	concat(connec_type.link_path, connec.link) AS link,
+	concat(cat_feature.link_path, connec.link) AS link,
 	connec.connec_length,
 	connec.verified,
 	connec.undelete,
@@ -3578,7 +3578,7 @@ CREATE OR REPLACE VIEW v_edit_man_fountain AS
 			 JOIN connec connec_1 ON ext_rtc_hydrometer.connec_id::text = connec_1.customer_code::text
 		  GROUP BY connec_1.connec_id) a USING (connec_id)
 	 LEFT JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
-	 JOIN connec_type ON connec_type.id::text = cat_connec.connectype_id::text
+	 JOIN cat_feature ON cat_feature.id::text = cat_connec.connectype_id::text
 	 JOIN v_state_connec ON v_state_connec.connec_id::text = connec.connec_id::text
 	 JOIN dma ON connec.dma_id = dma.dma_id
 	 LEFT JOIN sector ON connec.sector_id = sector.sector_id
@@ -3634,7 +3634,7 @@ CREATE OR REPLACE VIEW v_edit_man_greentap AS
 	connec.label_x,
 	connec.label_y,
 	connec.label_rotation,
-	concat(connec_type.link_path, connec.link) AS link,
+	concat(cat_feature.link_path, connec.link) AS link,
 	connec.connec_length,
 	connec.verified,
 	connec.undelete,
@@ -3652,7 +3652,7 @@ CREATE OR REPLACE VIEW v_edit_man_greentap AS
 			 JOIN connec connec_1 ON ext_rtc_hydrometer.connec_id::text = connec_1.customer_code::text
 		  GROUP BY connec_1.connec_id) a USING (connec_id)
 	 JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
-	 JOIN connec_type ON connec_type.id::text = cat_connec.connectype_id::text
+	 JOIN cat_feature ON cat_feature.id::text = cat_connec.connectype_id::text
 	 JOIN v_state_connec ON v_state_connec.connec_id::text = connec.connec_id::text
 	 LEFT JOIN dma ON connec.dma_id = dma.dma_id
 	 LEFT JOIN sector ON connec.sector_id = sector.sector_id
@@ -4487,7 +4487,7 @@ CREATE OR REPLACE VIEW v_edit_man_tap AS
 	connec.label_x,
 	connec.label_y,
 	connec.label_rotation,
-	concat(connec_type.link_path, connec.link) AS link,
+	concat(cat_feature.link_path, connec.link) AS link,
 	connec.connec_length,
 	connec.verified,
 	connec.undelete,
@@ -4512,7 +4512,7 @@ CREATE OR REPLACE VIEW v_edit_man_tap AS
 			 JOIN connec connec_1 ON ext_rtc_hydrometer.connec_id::text = connec_1.customer_code::text
 		  GROUP BY connec_1.connec_id) a USING (connec_id)
 	 JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
-	 JOIN connec_type ON connec_type.id::text = cat_connec.connectype_id::text
+	 JOIN cat_feature ON cat_feature.id::text = cat_connec.connectype_id::text
 	 JOIN v_state_connec ON v_state_connec.connec_id::text = connec.connec_id::text
 	 LEFT JOIN dma ON connec.dma_id = dma.dma_id
 	 LEFT JOIN sector ON connec.sector_id = sector.sector_id

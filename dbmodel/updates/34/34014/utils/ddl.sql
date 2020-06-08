@@ -34,4 +34,17 @@ FROM node_type c WHERE f.id=c.id;
 
 ALTER TABLE node_type RENAME to cat_feature_node;
 
+ALTER TABLE cat_feature_arc DROP COLUMN active;
+ALTER TABLE cat_feature_arc DROP COLUMN code_autofill;
+ALTER TABLE cat_feature_arc DROP COLUMN descript;
+ALTER TABLE cat_feature_arc DROP COLUMN link_path;
 
+ALTER TABLE cat_feature_node DROP COLUMN active;
+ALTER TABLE cat_feature_node DROP COLUMN code_autofill;
+ALTER TABLE cat_feature_node DROP COLUMN descript;
+ALTER TABLE cat_feature_node DROP COLUMN link_path;
+
+ALTER TABLE cat_feature_connec DROP COLUMN active;
+ALTER TABLE cat_feature_connec DROP COLUMN code_autofill;
+ALTER TABLE cat_feature_connec DROP COLUMN descript;
+ALTER TABLE cat_feature_connec DROP COLUMN link_path;

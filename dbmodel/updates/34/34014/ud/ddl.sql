@@ -14,3 +14,9 @@ UPDATE cat_feature f SET code_autofill = c.code_autofill, descript = c.descript,
 FROM gully_type c WHERE f.id=c.id;
 
 ALTER TABLE gully_type RENAME to cat_feature_gully;
+
+
+ALTER TABLE cat_feature_gully DROP COLUMN active;
+ALTER TABLE cat_feature_gully DROP COLUMN code_autofill;
+ALTER TABLE cat_feature_gully DROP COLUMN descript;
+ALTER TABLE cat_feature_gully DROP COLUMN link_path;

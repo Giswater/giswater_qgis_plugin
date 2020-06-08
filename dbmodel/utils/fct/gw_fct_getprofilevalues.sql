@@ -295,10 +295,10 @@ BEGIN
 		WHERE fid=222 AND cur_user = current_user AND '||v_fymax||' IS NULL';
 
 	-- update node table setting those nodes without manhole on surface (isprofilesurface IS FALSE)
-	UPDATE anl_node SET sys_type = 'BOTTOM' FROM node_type WHERE id = sys_type AND isprofilesurface IS FALSE AND fid=222 AND cur_user = current_user;
-	UPDATE anl_node SET sys_type = 'TOP-REAL' FROM node_type WHERE sys_type !='LINK' AND fid=222 AND cur_user = current_user;
-	UPDATE anl_node SET sys_type = 'TOP-ESTIM' FROM node_type WHERE sys_type ='TOP-REAL' AND result_id = 'estimated' AND fid=222 AND cur_user = current_user;
-	UPDATE anl_node SET sys_type = 'LINK' WHERE sys_type ='LINK' AND fid=222 AND cur_user = current_user;
+	UPDATE anl_node SET sys_type = 'BOTTOM' FROM cat_feature_node WHERE id = sys_type AND isprofilesurface IS FALSE AND fid=222 AND cur_user = current_user;
+	UPDATE anl_node SET sys_type = 'TOP-REAL' WHERE sys_type NOT IN ('BOTTOM', 'LINK') AND fid=222 AND cur_user = current_user;
+	UPDATE anl_node SET sys_type = 'TOP-ESTIM' WHERE sys_type ='TOP-REAL' AND result_id = 'estimated' AND fid=222 AND cur_user = current_user;
+	
 	UPDATE anl_node SET result_id = null where result_id is not null AND fid=222 AND cur_user = current_user;
 
 	-- get profile dimensions

@@ -36,10 +36,15 @@ CREATE INDEX connec_street1 ON connec USING btree (streetaxis_id);
 CREATE INDEX connec_street2 ON connec USING btree (streetaxis2_id);
 
 
-
 --2020/06/04
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"district_id", "dataType":"integer", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"district_id", "dataType":"integer", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"district_id", "dataType":"integer", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"samplepoint", "column":"district_id", "dataType":"integer", "isUtils":"False"}}$$);
+
+--2020/06/08
+ALTER TABLE cat_feature ADD COLUMN descript text;
+ALTER TABLE cat_feature ADD COLUMN link_path text;
+ALTER TABLE cat_feature ADD COLUMN code_autofill boolean;
+ALTER TABLE cat_feature ADD COLUMN active boolean;
 

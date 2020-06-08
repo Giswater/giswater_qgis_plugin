@@ -222,7 +222,7 @@ WITH vu_node as (
 			ELSE NULL::numeric(12,3)
 		END AS sys_elev,
 	node.node_type,
-	node_type.type AS sys_type,
+	cat_feature.system_id AS sys_type,
 	node.nodecat_id,
 	CASE
 	WHEN node.matcat_id IS NULL THEN cat_node.matcat_id
@@ -262,7 +262,7 @@ WITH vu_node as (
 	node.descript,
 	cat_node.svg,
 	node.rotation,
-	concat(node_type.link_path, node.link) AS link,
+	concat(cat_feature.link_path, node.link) AS link,
 	node.verified,
 	node.undelete,
 	cat_node.label,
@@ -282,7 +282,7 @@ WITH vu_node as (
 	node.the_geom
 	FROM node
 	LEFT JOIN cat_node ON node.nodecat_id::text = cat_node.id::text
-	LEFT JOIN node_type ON node_type.id::text = node.node_type::text
+	LEFT JOIN cat_feature ON cat_feature.id::text = node.node_type::text
 	LEFT JOIN dma ON node.dma_id = dma.dma_id
 	LEFT JOIN sector ON node.sector_id = sector.sector_id
 	LEFT JOIN exploitation ON node.expl_id = exploitation.expl_id
@@ -330,7 +330,7 @@ ELSE (arc.sys_elev2 - (b.sys_top_elev - b.sys_ymax))::numeric(12,3)
 END AS z2,
 arc.sys_slope AS slope,
 arc.arc_type,
-arc_type.type AS sys_type,
+cat_feature.system_id AS sys_type,
 arc.arccat_id,
 CASE
 WHEN arc.matcat_id IS NULL THEN cat_arc.matcat_id
@@ -375,7 +375,7 @@ b.streetname2,
 arc.postnumber2,
 arc.postcomplement2,
 arc.descript,
-concat(arc_type.link_path, arc.link) AS link,
+concat(cat_feature.link_path, arc.link) AS link,
 arc.verified,
 arc.undelete,
 cat_arc.label,
@@ -396,7 +396,7 @@ FROM arc
 	LEFT JOIN vu_node a ON a.node_id::text = arc.node_1::text
 	LEFT JOIN vu_node b ON b.node_id::text = arc.node_2::text
 	JOIN sector ON sector.sector_id = arc.sector_id
-	JOIN arc_type ON arc.arc_type::text = arc_type.id::text
+	JOIN cat_feature ON arc.arc_type::text = cat_feature.id::text
 	JOIN dma ON arc.dma_id = dma.dma_id
 	LEFT JOIN ext_streetaxis c ON c.id = arc.streetaxis_id
 	LEFT JOIN ext_streetaxis d ON d.id = arc.streetaxis2_id;
@@ -412,7 +412,7 @@ connec.y1,
 connec.y2,
 connec.connecat_id,
 connec.connec_type,
-connec_type.type AS sys_type,
+cat_feature.system_id AS sys_type,
 connec.private_connecat_id,
 CASE
 WHEN connec.matcat_id IS NULL THEN cat_connec.matcat_id
@@ -455,7 +455,7 @@ connec.postcomplement2,
 connec.descript,
 cat_connec.svg,
 connec.rotation,
-concat(connec_type.link_path, connec.link) AS link,
+concat(cat_feature.link_path, connec.link) AS link,
 connec.verified,
 connec.undelete,
 cat_connec.label,
@@ -483,7 +483,7 @@ FROM connec
  LEFT JOIN dma ON connec.dma_id = dma.dma_id
  LEFT JOIN exploitation ON connec.expl_id = exploitation.expl_id
  LEFT JOIN sector ON connec.sector_id = sector.sector_id
- LEFT JOIN connec_type ON connec.connec_type::text = connec_type.id::text
+ LEFT JOIN cat_feature ON connec.connec_type::text = cat_feature.id::text
  LEFT JOIN ext_streetaxis c ON c.id = connec.streetaxis_id
  LEFT JOIN ext_streetaxis d ON d.id = connec.streetaxis2_id;
 
@@ -497,7 +497,7 @@ gully.ymax,
 gully.sandbox,
 gully.matcat_id,
 gully.gully_type,
-gully_type.type AS sys_type,
+cat_feature.system_id AS sys_type,
 gully.gratecat_id,
 cat_grate.matcat_id AS cat_grate_matcat,
 gully.units,
@@ -541,7 +541,7 @@ gully.postcomplement2,
 gully.descript,
 cat_grate.svg,
 gully.rotation,
-concat(gully_type.link_path, gully.link) AS link,
+concat(cat_feature.link_path, gully.link) AS link,
 gully.verified,
 gully.undelete,
 cat_grate.label,
@@ -567,7 +567,7 @@ gully.the_geom
  LEFT JOIN dma ON gully.dma_id = dma.dma_id
  LEFT JOIN sector ON gully.sector_id = sector.sector_id
  LEFT JOIN exploitation ON gully.expl_id = exploitation.expl_id
- LEFT JOIN gully_type ON gully.gully_type::text = gully_type.id::text
+ LEFT JOIN cat_feature ON gully.gully_type::text = cat_feature.id::text
  LEFT JOIN ext_streetaxis c ON c.id = gully.streetaxis_id
  LEFT JOIN ext_streetaxis d ON d.id = gully.streetaxis2_id;
 
@@ -1133,7 +1133,7 @@ CREATE OR REPLACE VIEW v_ui_node_x_connection_downstream AS
 	v_arc.node_1 AS node_id,
 	v_arc.arc_id AS feature_id,
 	v_arc.code AS feature_code,
-	v_arc.arc_type AS featurecat_id,
+	v_arc.cat_feature AS featurecat_id,
 	v_arc.arccat_id,
 	v_arc.y2 AS depth,
 	st_length2d(v_arc.the_geom)::numeric(12,2) AS length,
@@ -1149,7 +1149,7 @@ CREATE OR REPLACE VIEW v_ui_node_x_connection_downstream AS
 	'v_arc'::text AS sys_table_id
    FROM v_arc
 	 JOIN node ON v_arc.node_2::text = node.node_id::text
-	 JOIN arc_type ON arc_type.id::text = v_arc.arc_type::text
+	 JOIN cat_feature ON cat_feature.id::text = v_arc.arc_type::text
 	 LEFT JOIN cat_arc ON v_arc.arccat_id::text = cat_arc.id::text
 	 JOIN value_state ON v_arc.state = value_state.id;
 
@@ -1178,7 +1178,7 @@ CREATE OR REPLACE VIEW v_ui_node_x_connection_upstream AS
 	'v_arc'::text AS sys_table_id
    FROM v_arc
 	 JOIN node ON v_arc.node_1::text = node.node_id::text
-	 JOIN arc_type ON arc_type.id::text = v_arc.arc_type::text
+	 JOIN cat_feature ON cat_feature.id::text = v_arc.arc_type::text
 	 LEFT JOIN cat_arc ON v_arc.arccat_id::text = cat_arc.id::text
 	 JOIN value_state ON v_arc.state = value_state.id
 UNION
@@ -1203,7 +1203,7 @@ UNION
    FROM v_connec
 	 JOIN link ON link.feature_id::text = v_connec.connec_id::text AND link.feature_type::text = 'CONNEC'::text
 	 JOIN node ON v_connec.pjoint_id::text = node.node_id::text AND v_connec.pjoint_type::text = 'NODE'::text
-	 JOIN connec_type ON connec_type.id::text = v_connec.connec_type::text
+	 JOIN cat_feature ON cat_feature.id::text = v_connec.connec_type::text
 	 LEFT JOIN cat_connec ON v_connec.connecat_id::text = cat_connec.id::text
 	 JOIN value_state ON v_connec.state = value_state.id
 UNION
@@ -1228,7 +1228,7 @@ UNION
    FROM v_gully
 	 JOIN link ON link.feature_id::text = v_gully.gully_id::text AND link.feature_type::text = 'GULLY'::text
 	 JOIN node ON v_gully.pjoint_id::text = node.node_id::text AND v_gully.pjoint_type::text = 'NODE'::text
-	 JOIN gully_type ON gully_type.id::text = v_gully.gully_type::text
+	 JOIN cat_feature ON cat_feature.id::text = v_gully.gully_type::text
 	 LEFT JOIN cat_connec ON v_gully.connec_arccat_id::text = cat_connec.id::text
 	 JOIN value_state ON v_gully.state = value_state.id;
 
