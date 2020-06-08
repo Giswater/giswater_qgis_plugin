@@ -1,4 +1,4 @@
-<Layout units="mm" worldFileMap="" printResolution="300" name="mincuta3">
+<Layout units="mm" worldFileMap="" printResolution="300" name="mincut_A3">
  <Snapper snapToGrid="0" snapToGuides="1" snapToItems="1" tolerance="5"/>
  <Grid resUnits="mm" offsetY="0" offsetUnits="mm" resolution="10" offsetX="0"/>
  <PageCollection>
