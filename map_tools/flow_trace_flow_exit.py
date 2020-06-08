@@ -101,46 +101,6 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
             self.set_action_pan()
 
 
-    def select_features(self, elem_type):
- 
-        if self.index_action == '56':
-            tablename = f"anl_flow_{elem_type}"
-            where = " WHERE context = 'Flow trace'"
-        else:
-            tablename = f"anl_flow_{elem_type}"
-            where = " WHERE context = 'Flow exit'"
-            
-        sql = f"SELECT * FROM {tablename}"
-        sql = sql + where
-        sql += f" ORDER BY {elem_type}_id"
-        rows = self.controller.get_rows(sql)
-        if not rows:
-            return
-            
-        # Build an expression to select them
-        aux = f'"{elem_type}_id" IN ('
-        for row in rows:
-            aux += f"'{row[1]}', "
-        aux = aux[:-2] + ")"
-
-        # Get a featureIterator from this expression
-        expr = QgsExpression(aux)
-        if expr.hasParserError():
-            message = "Expression Error"
-            self.controller.show_warning(message, parameter=expr.parserErrorString())
-            return
-
-        # Select features with these id's
-        tablename = f'v_edit_{elem_type}'
-        layer = self.controller.get_layer_by_tablename(tablename)
-        if layer:
-            it = layer.getFeatures(QgsFeatureRequest(expr))
-            # Build a list of feature id's from the previous result
-            id_list = [i.id() for i in it]
-            # Select features with these id's
-            layer.selectByIds(id_list)
-
-
     def activate(self):
 
         # Check button
