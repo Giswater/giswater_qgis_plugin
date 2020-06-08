@@ -18,9 +18,9 @@ from .parent import ParentMapTool
 
 
 class ChangeElemType(ParentMapTool):
-    """ Button 28: User select one node. A form is opened showing current cat_feature.system_id
-        Combo to select new cat_feature.system_id
-        Combo to select new cat_feature.id
+    """ Button 28: User select one node. A form is opened showing current node_type.type
+        Combo to select new node_type.type
+        Combo to select new node_type.id
         Combo to select new cat_node.id
     """    
 
@@ -136,7 +136,9 @@ class ChangeElemType(ParentMapTool):
 
 
         # Fill 1st combo boxes-new system node type
-        sql = ("SELECT id FROM cat_feature WHERE active is True AND feature_type ='NODE' ORDER BY id")
+        sql = ("SELECT DISTINCT(id) FROM node_type "
+               "WHERE active is True "
+               "ORDER BY id")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_chg_node_type, "node_node_type_new", rows)
 

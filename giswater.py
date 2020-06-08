@@ -650,7 +650,19 @@ class Giswater(QObject):
 
         sql = None
         self.feature_cat = {}
-        sql = ("SELECT cat_feature.* FROM cat_feature WHERE active IS TRUE ORDER BY id")
+        if self.wsoftware.upper() == 'WS':
+            sql = ("SELECT cat_feature.* FROM cat_feature JOIN "
+                   "(SELECT id, active FROM node_type UNION "
+                   "SELECT id, active FROM arc_type UNION "
+                   "SELECT id, active FROM connec_type) a USING (id) "
+                   "WHERE a.active IS TRUE ORDER BY id")
+        elif self.wsoftware.upper() == 'UD':
+            sql = ("SELECT cat_feature.* FROM cat_feature JOIN "
+                   "(SELECT id, active FROM node_type UNION "
+                   "SELECT id, active FROM arc_type UNION "
+                   "SELECT id, active FROM connec_type UNION "
+                   "SELECT id, active FROM gully_type) a USING (id) "
+                   "WHERE a.active IS TRUE ORDER BY id")
         rows = self.controller.get_rows(sql)
         if not rows:
             return False
