@@ -97,10 +97,10 @@ BEGIN
 		DELETE FROM selector_expl;
 		DELETE FROM selector_state;
 
-		DELETE FROM arc_type ;
-		DELETE FROM node_type ;
-		DELETE FROM connec_type ;
-		DELETE FROM gully_type ;
+		DELETE FROM cat_feature_arc ;
+		DELETE FROM cat_feature_node ;
+		DELETE FROM cat_feature_connec ;
+		DELETE FROM cat_feature_gully ;
 		DELETE FROM cat_feature;
 		DELETE FROM cat_mat_arc;
 		DELETE FROM cat_mat_node;

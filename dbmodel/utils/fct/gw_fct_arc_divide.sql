@@ -194,8 +194,8 @@ BEGIN
 					rec_aux2.the_geom := v_line2;
 
 					-- getting table child information (man_table)
-					v_mantable = (SELECT man_table FROM arc_type JOIN v_edit_arc ON id=arc_type WHERE arc_id=v_arc_id);
-					v_epatable = (SELECT epa_table FROM arc_type JOIN v_edit_arc ON id=arc_type WHERE arc_id=v_arc_id);
+					v_mantable = (SELECT man_table FROM cat_feature_arc JOIN v_edit_arc ON id=arc_type WHERE arc_id=v_arc_id);
+					v_epatable = (SELECT epa_table FROM cat_feature_arc JOIN v_edit_arc ON id=arc_type WHERE arc_id=v_arc_id);
 
 					-- building querytext for man_table
 					v_manquerytext:= (SELECT replace (replace (array_agg(column_name::text)::text,'{',','),'}','') FROM (SELECT column_name FROM information_schema.columns 

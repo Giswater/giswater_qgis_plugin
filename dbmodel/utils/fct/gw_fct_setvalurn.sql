@@ -14,15 +14,16 @@ $BODY$
 DECLARE 
 
 v_max int8;
+v_projecttype text;
 
 BEGIN 
 
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
-	SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
+	SELECT wsoftware INTO v_projecttype FROM version LIMIT 1;
 	
 	--urn
-	IF project_type_aux='WS' THEN
+	IF v_projecttype='WS' THEN
 		SELECT GREATEST (
 		(SELECT max(node_id::int8) FROM node WHERE node_id ~ '^\d+$'),
 		(SELECT max(arc_id::int8) FROM arc WHERE arc_id ~ '^\d+$'),
@@ -30,7 +31,7 @@ BEGIN
 		(SELECT max(element_id::int8) FROM element WHERE element_id ~ '^\d+$'),
 		(SELECT max(pol_id::int8) FROM polygon WHERE pol_id ~ '^\d+$')
 		) INTO v_max;
-	ELSIF project_type_aux='UD' THEN
+	ELSIF v_projecttype='UD' THEN
 		SELECT GREATEST (
 		(SELECT max(node_id::int8) FROM node WHERE node_id ~ '^\d+$'),
 		(SELECT max(arc_id::int8) FROM arc WHERE arc_id ~ '^\d+$'),

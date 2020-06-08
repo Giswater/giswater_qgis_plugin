@@ -26,10 +26,10 @@ BEGIN
 
 	-- get node type arc division config
 	IF v_project_type = 'UD' THEN
-		SELECT isarcdivide INTO v_isarcdivide FROM node_type WHERE NEW.node_type=id;   
+		SELECT isarcdivide INTO v_isarcdivide FROM cat_feature_node WHERE NEW.node_type=id;   
 	ELSE
 		SELECT isarcdivide INTO v_isarcdivide FROM cat_node
-			JOIN node_type ON cat_node.nodetype_id=node_type.id
+			JOIN cat_feature_node ON cat_node.nodetype_id=cat_feature_node.id
 			WHERE NEW.nodecat_id=cat_node.id;
 	END IF;
 

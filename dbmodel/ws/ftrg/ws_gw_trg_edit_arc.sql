@@ -35,9 +35,9 @@ BEGIN
 	        v_man_table:= TG_ARGV[0];
 
 	--modify values for custom view inserts	
-	IF v_man_table IN (SELECT id FROM arc_type) THEN
+	IF v_man_table IN (SELECT id FROM cat_feature) THEN
 		v_customfeature:=v_man_table;
-		v_man_table:=(SELECT man_table FROM arc_type WHERE id=v_man_table);
+		v_man_table:=(SELECT man_table FROM cat_feature WHERE id=v_man_table);
 	END IF;
 
 	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_buffer_on_mapzone');
@@ -283,7 +283,7 @@ BEGIN
 		NEW.publish := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_publish_sysvdefault');	
 			
 
-		SELECT code_autofill INTO v_code_autofill_bool FROM arc_type JOIN cat_arc ON arc_type.id=cat_arc.arctype_id WHERE cat_arc.id=NEW.arccat_id;
+		SELECT code_autofill INTO v_code_autofill_bool FROM cat_feature JOIN cat_arc ON cat_feature.id=cat_arc.arctype_id WHERE cat_arc.id=NEW.arccat_id;
 	
 		--Copy id to code field	
 		IF (NEW.code IS NULL AND v_code_autofill_bool IS TRUE) THEN 
@@ -387,7 +387,7 @@ BEGIN
 				INSERT INTO man_varc (arc_id) VALUES (NEW.arc_id);
 
 		ELSIF v_man_table='parent' THEN
-			v_man_table := (SELECT arc_type.man_table FROM arc_type JOIN cat_arc ON (((arc_type.id)::text = (cat_arc.arctype_id)::text)) WHERE cat_arc.id=NEW.arccat_id);
+			v_man_table := (SELECT cat_feature.man_table FROM cat_feature JOIN cat_arc ON (((cat_feature.id)::text = (cat_arc.arctype_id)::text)) WHERE cat_arc.id=NEW.arccat_id);
         	IF v_man_table IS NOT NULL THEN
             	v_sql:= 'INSERT INTO '||v_man_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';    
            		EXECUTE v_sql;
@@ -477,7 +477,7 @@ BEGIN
 		END IF;
 
 		--link_path
-		SELECT link_path INTO v_link_path FROM arc_type JOIN cat_arc ON cat_arc.arctype_id=arc_type.id WHERE cat_arc.id=NEW.arccat_id;
+		SELECT link_path INTO v_link_path FROM cat_feature JOIN cat_arc ON cat_arc.arctype_id=cat_feature.id WHERE cat_arc.id=NEW.arccat_id;
 		
 		IF v_link_path IS NOT NULL THEN
 			NEW.link = replace(NEW.link, v_link_path,'');
@@ -486,8 +486,8 @@ BEGIN
 		 -- Arc type for parent view
     	IF v_man_table='parent' THEN
 	    	IF (NEW.arccat_id != OLD.arccat_id) THEN
-				v_new_arc_type= (SELECT type FROM arc_type JOIN cat_arc ON arc_type.id=arctype_id where cat_arc.id=NEW.arccat_id);
-				v_old_arc_type= (SELECT type FROM arc_type JOIN cat_arc ON arc_type.id=arctype_id where cat_arc.id=OLD.arccat_id);
+				v_new_arc_type= (SELECT system_id FROM cat_feature JOIN cat_arc ON cat_feature.id=arctype_id where cat_arc.id=NEW.arccat_id);
+				v_old_arc_type= (SELECT system_id FROM cat_feature JOIN cat_arc ON cat_feature.id=arctype_id where cat_arc.id=OLD.arccat_id);
 				IF v_new_arc_type != v_old_arc_type THEN
 					v_sql='INSERT INTO man_'||lower(v_new_arc_type)||' (arc_id) VALUES ('||NEW.arc_id||')';
 					EXECUTE v_sql;

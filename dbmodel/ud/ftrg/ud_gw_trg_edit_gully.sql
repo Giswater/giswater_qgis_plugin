@@ -7,7 +7,6 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 1206
 
 
-
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_gully()  RETURNS trigger AS $BODY$
 DECLARE 
 v_sql varchar;
@@ -95,12 +94,12 @@ BEGIN
 		ELSIF (NEW.gully_type IS NULL and v_customfeature IS NULL) THEN
 			NEW.gully_type:= (SELECT "value" FROM config_param_user WHERE "parameter"='gullycat_vdefault' AND "cur_user"="current_user"() LIMIT 1);		
 			IF (NEW.gully_type IS NULL) THEN
-				NEW.gully_type:=(SELECT id FROM gully_type LIMIT 1);
+				NEW.gully_type:=(SELECT id FROM cat_feature WHERE feature_type = 'GULLY' LIMIT 1);
 			END IF;
 		END IF;
 
 		--Copy id to code field
-		v_codeautofill = (SELECT code_autofill FROM gully_type WHERE id=NEW.gully_type);
+		v_codeautofill = (SELECT code_autofill FROM cat_feature WHERE id=NEW.gully_type);
 		IF (NEW.code IS NULL AND v_codeautofill) THEN 
 			NEW.code=NEW.gully_id;
 		END IF;
@@ -292,7 +291,7 @@ BEGIN
 			NEW.builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='edit_builtdate_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;  
 
-		SELECT code_autofill INTO v_code_autofill_bool FROM gully_type WHERE id=NEW.gully_type;
+		SELECT code_autofill INTO v_code_autofill_bool FROM cat_feature WHERE id=NEW.gully_type;
 
 		--Inventory	
 		NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
@@ -570,7 +569,7 @@ BEGIN
 		END IF;		
 		
 		--link_path
-		SELECT link_path INTO v_link_path FROM gully_type WHERE id=NEW.gully_type;
+		SELECT link_path INTO v_link_path FROM cat_feature WHERE id=NEW.gully_type;
 		IF v_link_path IS NOT NULL THEN
 			NEW.link = replace(NEW.link, v_link_path,'');
 		END IF;

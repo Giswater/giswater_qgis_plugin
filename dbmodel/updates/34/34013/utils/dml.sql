@@ -8,6 +8,8 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2020/06/08
+DELETE FROM sys_table WHERE id IN ('cat_arc_class', 'cat_arc_class_cat', 'cat_arc_class_type');
+
 DELETE FROM sys_function WHERE id = 2128;
 
 INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field)

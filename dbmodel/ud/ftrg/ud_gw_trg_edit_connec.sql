@@ -66,7 +66,7 @@ BEGIN
 		ELSIF (NEW.connec_type IS NULL) THEN
 			  NEW.connec_type:= (SELECT "value" FROM config_param_user WHERE "parameter"='edit_connectype_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			IF (NEW.connec_type IS NULL) THEN
-				NEW.connec_type:=(SELECT id FROM connec_type LIMIT 1);
+				NEW.connec_type:=(SELECT id FROM cat_feature_connec LIMIT 1);
 			END IF;
 		END IF;
         
@@ -256,7 +256,7 @@ BEGIN
 			NEW.builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='edit_builtdate_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;
 
-		SELECT code_autofill INTO v_code_autofill_bool FROM connec_type WHERE id=NEW.connec_type;
+		SELECT code_autofill INTO v_code_autofill_bool FROM cat_feature WHERE id=NEW.connec_type;
 
 		--Copy id to code field
 		IF (NEW.code IS NULL AND v_code_autofill_bool IS TRUE) THEN 
@@ -492,7 +492,7 @@ BEGIN
 		END IF;
 		
 		--link_path
-		SELECT link_path INTO v_link_path FROM connec_type WHERE id=NEW.connec_type;
+		SELECT link_path INTO v_link_path FROM cat_feature WHERE id=NEW.connec_type;
 		IF v_link_path IS NOT NULL THEN
 			NEW.link = replace(NEW.link, v_link_path,'');
 		END IF;

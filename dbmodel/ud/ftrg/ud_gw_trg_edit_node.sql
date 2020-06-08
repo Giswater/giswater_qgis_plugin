@@ -42,9 +42,9 @@ BEGIN
 	v_man_table:= TG_ARGV[0];
 
 	--modify values for custom view inserts
-	IF v_man_table IN (SELECT id FROM node_type) THEN
+	IF v_man_table IN (SELECT id FROM cat_feature_node) THEN
 		v_customfeature:=v_man_table;
-		v_man_table:=(SELECT man_table FROM node_type WHERE id=v_man_table);
+		v_man_table:=(SELECT man_table FROM cat_feature_node WHERE id=v_man_table);
 	END IF;
 
 	v_type_v_man_table:=v_man_table;
@@ -77,7 +77,7 @@ BEGIN
 
 		-- Node type
 		IF (NEW.node_type IS NULL) THEN
-			IF ((SELECT COUNT(*) FROM node_type) = 0) THEN
+			IF ((SELECT COUNT(*) FROM cat_feature_node) = 0 ) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"1004", "function":"1220","debug_msg":null}}$$);';
 			END IF;
@@ -89,16 +89,16 @@ BEGIN
 			END IF;
 
 			IF (NEW.node_type IS NULL) AND v_man_table='parent' THEN
-				NEW.node_type:= (SELECT id FROM node_type LIMIT 1);
+				NEW.node_type:= (SELECT id FROM cat_feature_node LIMIT 1);
 
 			ELSIF (NEW.node_type IS NULL) AND v_man_table !='parent' THEN
-				NEW.node_type:= (SELECT id FROM node_type WHERE node_type.man_table=v_type_v_man_table LIMIT 1);
+				NEW.node_type:= (SELECT id FROM cat_feature_node WHERE man_table=v_type_v_man_table LIMIT 1);
 			END IF;
 		END IF;
 
 		-- Epa type
 		IF (NEW.epa_type IS NULL) THEN
-			NEW.epa_type:= (SELECT epa_default FROM node_type WHERE node_type.id=NEW.node_type LIMIT 1)::text;   
+			NEW.epa_type:= (SELECT epa_default FROM cat_feature_node WHERE id=NEW.node_type LIMIT 1)::text;   
 		END IF;
 
 		-- Node Catalog ID
@@ -273,7 +273,7 @@ BEGIN
 		NEW.uncertain := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_uncertain_sysvdefault');		
 		
 		-- code autofill
-		SELECT code_autofill INTO v_code_autofill_bool FROM node_type WHERE id=NEW.node_type;
+		SELECT code_autofill INTO v_code_autofill_bool FROM cat_feature WHERE id=NEW.node_type;
 		
 		--Copy id to code field
 			IF (NEW.code IS NULL AND v_code_autofill_bool IS TRUE) THEN 
@@ -475,7 +475,7 @@ BEGIN
 		
 		ELSIF v_man_table='parent' THEN
 
-			v_man_table:= (SELECT node_type.man_table FROM node_type WHERE node_type.id=NEW.node_type);
+			v_man_table:= (SELECT man_table FROM cat_feature_node WHERE id=NEW.node_type);
         	v_sql:= 'INSERT INTO '||v_man_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
         	EXECUTE v_sql;
 
@@ -565,8 +565,8 @@ BEGIN
 
 		-- node type
 		IF (NEW.node_type <> OLD.node_type) THEN 
-			v_new_v_man_table:= (SELECT node_type.man_table FROM node_type WHERE node_type.id = NEW.node_type);
-			v_old_v_man_table:= (SELECT node_type.man_table FROM node_type WHERE node_type.id = OLD.node_type);
+			v_new_v_man_table:= (SELECT man_table FROM cat_feature_node WHERE id = NEW.node_type);
+			v_old_v_man_table:= (SELECT man_table FROM cat_feature_node WHERE id = OLD.node_type);
 			IF v_new_v_man_table IS NOT NULL THEN
 				v_sql:= 'DELETE FROM '||v_old_v_man_table||' WHERE node_id= '||quote_literal(OLD.node_id);
 				EXECUTE v_sql;
@@ -633,7 +633,7 @@ BEGIN
 		END IF;
 			
 		--link_path
-		SELECT link_path INTO v_link_path FROM node_type WHERE id=NEW.node_type;
+		SELECT link_path INTO v_link_path FROM cat_feature WHERE id=NEW.node_type;
 		IF v_link_path IS NOT NULL THEN
 			NEW.link = replace(NEW.link, v_link_path,'');
 		END IF;

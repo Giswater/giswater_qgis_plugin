@@ -9,6 +9,8 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 -- 2020/06/05
-DROP TABLE cat_arc_class;
-DROP TABLE cat_arc_class_cat;
-DROP TABLE cat_arc_class_type;
+-- moving data from gully_type
+UPDATE cat_feature f SET code_autofill = c.code_autofill, descript = c.descript, link_path = c.link_path, active = c.active
+FROM gully_type c WHERE f.id=c.id;
+
+ALTER TABLE gully_type RENAME to cat_feature_gully;

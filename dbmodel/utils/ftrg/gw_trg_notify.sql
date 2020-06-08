@@ -67,24 +67,10 @@ BEGIN
 				--loop over input featureType in order to capture the layers related to feature type
 				FOR rec_layers IN SELECT * FROM json_array_elements_text(v_featuretype::json) LOOP
 					--select only child and parent layers of active features
-					IF v_project_type ='WS' THEN
-						EXECUTE 'SELECT json_agg(child_layer) FROM cat_feature where id IN (SELECT id FROM node_type WHERE active IS TRUE
-										UNION SELECT id FROM arc_type  WHERE active IS TRUE
-										UNION SELECT id FROM connec_type  WHERE active IS TRUE
-										)
-										AND lower(feature_type) = '''||(rec_layers)||''''
-						INTO v_child_layer;
+					EXECUTE 'SELECT json_agg(child_layer) FROM cat_feature where active IS TRUE
+					AND lower(feature_type) = '''||(rec_layers)||''''
+					INTO v_child_layer;
 						
-					ELSIF v_project_type ='UD' THEN
-						EXECUTE 'SELECT json_agg(child_layer) FROM cat_feature where id IN (SELECT id FROM node_type WHERE active IS TRUE
-										UNION SELECT id FROM arc_type  WHERE active IS TRUE
-										UNION SELECT id FROM connec_type  WHERE active IS TRUE
-										UNION SELECT id FROM gully_type  WHERE active IS TRUE
-										)
-										AND lower(feature_type) = '''||(rec_layers)||''''
-						INTO v_child_layer;
-					END IF;
-
 					EXECUTE ' SELECT  json_agg(DISTINCT parent_layer) FROM cat_feature WHERE lower(feature_type) = '''||(rec_layers)||''''
 					INTO v_parent_layer;
 

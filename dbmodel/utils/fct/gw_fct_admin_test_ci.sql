@@ -21,7 +21,7 @@ DECLARE
 
 rec_role record;
 rec_table record;
-rec_node_type record;
+rec_feature_node record;
 rec_state integer;
 rec_fct record;
 
@@ -54,7 +54,7 @@ BEGIN
 	
 	PERFORM gw_fct_admin_role_permissions();
 	
-	GRANT ALL ON TABLE node_type TO role_basic;
+	GRANT ALL ON TABLE cat_feature_node TO role_basic;
 	GRANT ALL ON TABLE audit_check_data TO role_basic;
 
 	--remove previous results 
@@ -71,15 +71,17 @@ BEGIN
 					
 	END IF;
 
-	FOR rec_role IN (SELECT * FROM sys_role WHERE id !='role_crm') LOOP
+	FOR rec_role IN (SELECT * FROM sys_role WHERE id ='role_admin') LOOP
 
 		--set role and insert values into exploitation selector
 		EXECUTE 'SET ROLE '||rec_role.id||';';
 
+		raise notice '%',rec_role.id;
+
 		INSERT INTO selector_expl (expl_id,cur_user) SELECT DISTINCT expl_id, current_user FROM exploitation ON CONFLICT (expl_id, cur_user) DO NOTHING;
 		
 
-		FOR rec_fct IN (SELECT function_name, sample_query FROM audit_cat_function WHERE sample_query IS NOT NULL
+		FOR rec_fct IN (SELECT function_name, sample_query FROM sys_function WHERE sample_query IS NOT NULL
 		ORDER BY id) LOOP
 
 			IF rec_fct.function_name = 'gw_fct_arc_divide' THEN
@@ -102,24 +104,23 @@ BEGIN
 						UPDATE SET value = v_state_type;
 
 						--select 2 node types - one that divides arc and one that doesnt
-						SELECT id INTO v_node_arcdivide FROM node_type WHERE active IS TRUE AND isarcdivide IS TRUE LIMIT 1;
+						SELECT id INTO v_node_arcdivide FROM cat_feature_node WHERE isarcdivide IS TRUE LIMIT 1;
 						
-						SELECT id INTO v_node_not_arcdivide FROM node_type WHERE active IS TRUE AND isarcdivide IS FALSE LIMIT 1;
+						SELECT id INTO v_node_not_arcdivide FROM cat_feature_node WHERE isarcdivide IS FALSE LIMIT 1;
 
 						IF v_node_not_arcdivide IS NULL THEN
-							UPDATE node_type  SET isarcdivide = FALSE WHERE id =(SELECT id FROM node_type ORDER BY ID LIMIT 1 );
-							SELECT id INTO v_node_not_arcdivide FROM node_type WHERE active IS TRUE AND isarcdivide IS FALSE LIMIT 1;
+							UPDATE cat_feature_node  SET isarcdivide = FALSE WHERE id =(SELECT id FROM cat_feature_node ORDER BY ID LIMIT 1 );
+							SELECT id INTO v_node_not_arcdivide FROM cat_feature_node WHERE isarcdivide IS FALSE LIMIT 1;
 						END IF;
 						
-						FOR rec_node_type IN (SELECT * FROM node_type JOIN cat_feature ON node_type.id= cat_feature.id 
-							WHERE node_type.id IN (v_node_arcdivide, v_node_not_arcdivide)) LOOP
+						FOR rec_feature_node IN (SELECT * FROM cat_feature_node JOIN cat_feature USING (id) WHERE id IN (v_node_arcdivide, v_node_not_arcdivide)) LOOP
 							
 				
 							--set default values of node catalog
 							IF v_project_type = 'WS' THEN
-								SELECT id INTO v_nodecat FROM cat_node WHERE nodetype_id = rec_node_type.id LIMIT 1;
+								SELECT id INTO v_nodecat FROM cat_node WHERE nodetype_id = rec_feature_node.id LIMIT 1;
 								INSERT INTO  config_param_user (parameter, value, cur_user)
-								VALUES (concat(lower(rec_node_type.id), '_vdefault'), v_nodecat, current_user) 
+								VALUES (concat(lower(rec_feature_node.id), '_vdefault'), v_nodecat, current_user) 
 								ON CONFLICT (parameter, cur_user) DO
 								UPDATE SET value = v_nodecat;
 							ELSIF v_project_type = 'UD' THEN
@@ -132,31 +133,31 @@ BEGIN
 
 
 							IF (v_project_type = 'WS' and (SELECT value FROM config_param_user WHERE cur_user = current_user 
-								AND parameter = concat(lower(rec_node_type.id), '_vdefault')) is not null) OR
+								AND parameter = concat(lower(rec_feature_node.id), '_vdefault')) is not null) OR
 								(v_project_type = 'UD' AND 
 								(SELECT value FROM config_param_user WHERE cur_user = current_user 
 								AND parameter = 'edit_nodecat_vdefault') is not null) THEN
 								
 								IF rec_state=1 THEN
 									--insert new nodes with state 1
-									IF rec_node_type.isarcdivide IS TRUE THEN	
-										UPDATE node_type SET isarcdivide=FALSE WHERE id=rec_node_type.id;
+									IF rec_feature_node.isarcdivide IS TRUE THEN	
+										UPDATE cat_feature_node SET isarcdivide=FALSE WHERE id=rec_feature_node.id;
 									END IF;
 											
 									IF v_project_type = 'WS' THEN
-										EXECUTE 'INSERT INTO '||rec_node_type.child_layer||'(the_geom) 
+										EXECUTE 'INSERT INTO '||rec_feature_node.child_layer||'(the_geom) 
 										VALUES (st_setsrid(st_point(419049.60815202154,4576503.991683105),25831)) RETURNING node_id ;'
 										INTO v_feature_id;
 
 									ELSIF v_project_type = 'UD' THEN
-										EXECUTE 'INSERT INTO '||rec_node_type.child_layer||'(the_geom) 
+										EXECUTE 'INSERT INTO '||rec_feature_node.child_layer||'(the_geom) 
 										VALUES (st_setsrid(st_point(419041.021099364, 4576512.66540741),25831)) RETURNING node_id ;'
 										INTO v_feature_id;
 										
 									END IF;
 									
-									IF rec_node_type.isarcdivide IS TRUE THEN
-										UPDATE node_type SET isarcdivide=true WHERE id=rec_node_type.id;
+									IF rec_feature_node.isarcdivide IS TRUE THEN
+										UPDATE cat_feature_node SET isarcdivide=true WHERE id=rec_feature_node.id;
 									END IF;	
 										
 
@@ -172,11 +173,11 @@ BEGIN
 
 									--insert new nodes with state 2
 									IF v_project_type = 'WS' THEN
-										EXECUTE 'INSERT INTO '||rec_node_type.child_layer||'(the_geom) 
+										EXECUTE 'INSERT INTO '||rec_feature_node.child_layer||'(the_geom) 
 										VALUES (st_setsrid(st_point(419205.716051442,4576517.416978596),25831)) RETURNING node_id;'
 										INTO v_feature_id;
 									ELSIF v_project_type = 'UD' THEN
-										EXECUTE 'INSERT INTO '||rec_node_type.child_layer||'(the_geom) 
+										EXECUTE 'INSERT INTO '||rec_feature_node.child_layer||'(the_geom) 
 										VALUES (st_setsrid(st_point(419124.612373783, 4576271.60134376),25831)) RETURNING node_id;'
 										INTO v_feature_id;
 									END IF;
@@ -196,7 +197,7 @@ BEGIN
 								END IF;					
 
 								--fusion arcs or delete node if it's not connected to arcs (not arc divide)
-								IF rec_node_type.isarcdivide is true AND rec_state = 1 then
+								IF rec_feature_node.isarcdivide is true AND rec_state = 1 then
 									raise notice 'FUSION';
 									EXECUTE 'SELECT gw_fct_arc_fusion ($${"client":{"device":4, "infoType":1, "lang":"ES"},
 									"feature":{"id":["'||v_feature_id||'"]},"data":{"workcat_id_end":"work1",
@@ -264,7 +265,7 @@ BEGIN
 
 	--set back role admin and grant basic permissions for role_basic
 	SET ROLE role_admin;
-	GRANT SELECT ON TABLE node_type TO role_basic;
+	GRANT SELECT ON TABLE cat_feature_node TO role_basic;
 	GRANT SELECT ON TABLE audit_check_data TO role_basic;
 
 	-- Return
@@ -283,9 +284,9 @@ BEGIN
 		       '}}'||
 	    '}')::json;
 
-	EXCEPTION WHEN OTHERS THEN
-	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	--EXCEPTION WHEN OTHERS THEN
+	--GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	--RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$

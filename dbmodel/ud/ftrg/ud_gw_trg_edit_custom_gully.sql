@@ -38,7 +38,7 @@ BEGIN
 		   IF (NEW.gully_type IS NULL) THEN
 			   NEW.gully_type:= (SELECT "value" FROM config_param_user WHERE "parameter"='gullycat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			IF (NEW.gully_type IS NULL) THEN
-				NEW.gully_type:=(SELECT id FROM gully_type LIMIT 1);
+				NEW.gully_type:=(SELECT id FROM cat_feature_gully LIMIT 1);
 			END IF;
         END IF;
 		

@@ -13,7 +13,7 @@ $BODY$
 
 /*example
 SELECT gw_fct_setsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"tabName":"addNetwork"}, "feature":{},
-"data":{"filterFields":{}, "pageInfo":{}, "net_type":{"id":"v_edit_arc", "name":"Arcs"}, "featureType":"arc", "addSchema":"ud_sample", "net_code":{"text":"3"}}}$$);
+"data":{"filterFields":{}, "pageInfo":{}, "net_type":{"id":"v_edit_arc", "name":"Arcs"}, "featureType":"arc", "addSchema":"SCHEMA_NAME", "net_code":{"text":"3"}}}$$);
 
 MAIN ISSUES
 -----------

@@ -98,7 +98,6 @@ BEGIN
 				END IF;		
 			END IF;
 
-
 			-- check for existing node (1)
 			SELECT * INTO v_node FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom, v_node_proximity) AND node.node_id != NEW.node_id AND node.state=1;
 
@@ -151,8 +150,8 @@ BEGIN
 						UPDATE config_param_user SET value=FALSE WHERE parameter = 'edit_disable_statetopocontrol' AND cur_user=current_user;
 
 						-- getting table child information (man_table)
-						v_mantable = (SELECT man_table FROM arc_type JOIN v_edit_arc ON id=arc_type WHERE arc_id=v_arc.arc_id);
-						v_epatable = (SELECT epa_table FROM arc_type JOIN v_edit_arc ON id=arc_type WHERE arc_id=v_arc.arc_id);
+						v_mantable = (SELECT man_table FROM cat_feature_arc JOIN v_edit_arc ON id=arc_type WHERE arc_id=v_arc.arc_id);
+						v_epatable = (SELECT epa_table FROM cat_feature_arc JOIN v_edit_arc ON id=arc_type WHERE arc_id=v_arc.arc_id);
 
 						-- building querytext for man_table
 						v_querytext:= (SELECT replace (replace (array_agg(column_name::text)::text,'{',','),'}','') 

@@ -133,7 +133,7 @@ BEGIN
 	SELECT value::boolean INTO v_hide_form FROM config_param_user where parameter='qgis_form_log_hidden' AND cur_user=current_user;
 
 	-- get input parameters -,man_addfields
-	v_id = (SELECT nextval('SCHEMA_NAME.config_addfields_parameter_id_seq') +1);
+	v_id = (SELECT nextval('SCHEMA_NAME.sys_addfields_id_seq') +1);
 
 	v_param_name = (((p_data ->>'data')::json->>'parameters')::json->>'columnname')::text;
 	v_cat_feature = ((p_data ->>'feature')::json->>'catFeature')::text;
@@ -232,17 +232,8 @@ BEGIN
 			VALUES (218, null, 4, 'Update old parameter name.');
 		END IF;
 
-		IF  v_project_type='WS' THEN
-			v_active_feature = 'SELECT cat_feature.* FROM cat_feature JOIN (SELECT id,active FROM node_type 
-															UNION SELECT id,active FROM arc_type 
-															UNION SELECT id,active FROM connec_type) a USING (id) WHERE a.active IS TRUE ORDER BY id';
-		ELSE 
-			v_active_feature = 'SELECT cat_feature.* FROM cat_feature JOIN (SELECT id,active FROM node_type 
-															UNION SELECT id,active FROM arc_type 
-															UNION SELECT id,active FROM connec_type 
-															UNION SELECT id,active FROM gully_type) a USING (id) WHERE a.active IS TRUE ORDER BY id';
-		END IF;
-	
+		v_active_feature = 'SELECT cat_feature.* FROM cat_feature WHERE active IS TRUE ORDER BY id';
+
 		FOR rec IN EXECUTE v_active_feature LOOP
 
 			IF v_action='UPDATE' THEN
@@ -644,13 +635,13 @@ BEGIN
 
 			INSERT INTO sys_param_user (id, formname, descript, sys_role, label,  layoutname, layoutorder,
 			project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, dv_querytext, dv_querytext_filterc, feature_field_id, isenabled)
-			VALUES (concat('edit_addfield_p', v_idaddparam,,'_vdefault'),'config', 
+			VALUES (concat('edit_addfield_p', v_idaddparam,'_vdefault'),'config', 
 			concat('Default value of addfield ',v_param_name, ' for ', v_cat_feature), 
 			'role_edit', v_param_name, 'lyt_addfields', v_param_user_id, lower(v_project_type), false, false, v_audit_datatype, 
 			v_audit_widgettype, false, v_dv_querytext, v_dv_querytext_filterc, v_param_name, true);
 			
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (218, null, 4, concat('Create new vdefault: ', concat('edit_addfield_p', v_idaddparam,,'_vdefault'),'.'));
+			VALUES (218, null, 4, concat('Create new vdefault: ', concat('edit_addfield_p', v_idaddparam,'_vdefault'),'.'));
 			
 
 		ELSIF v_action = 'UPDATE' THEN
@@ -678,7 +669,7 @@ BEGIN
 			END IF;
 
 			UPDATE sys_param_user SET datatype = v_audit_datatype, widgettype=v_audit_widgettype, dv_querytext = v_dv_querytext,
-			dv_querytext_filterc = v_dv_querytext_filterc WHERE id = concat('edit_addfield_p', v_idaddparam,,'_vdefault');
+			dv_querytext_filterc = v_dv_querytext_filterc WHERE id = concat('edit_addfield_p', v_idaddparam,'_vdefault');
 
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (218, null, 4, concat('Update definition of vdefault: ', concat('edit_addfield_p', v_idaddparam,'_vdefault'),'.'));
@@ -848,7 +839,7 @@ BEGIN
 	v_result_polygon = '{"geometryType":"", "features":[]}';
 
 	--  Return
-     RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
+	RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 		     	'"setVisibleLayers":[]'||','||

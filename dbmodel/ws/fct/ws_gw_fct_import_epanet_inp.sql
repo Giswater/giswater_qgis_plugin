@@ -113,9 +113,9 @@ BEGIN
 		DELETE FROM selector_expl;
 		DELETE FROM selector_state;
 		
-		DELETE FROM arc_type ;
-		DELETE FROM node_type ;
-		DELETE FROM connec_type ;
+		DELETE FROM cat_feature_arc ;
+		DELETE FROM cat_feature_node ;
+		DELETE FROM cat_feature_connec ;
 		DELETE FROM cat_feature;
 		DELETE FROM cat_mat_arc;
 		DELETE FROM cat_mat_node;
@@ -419,7 +419,7 @@ BEGIN
 		 
 		LOOP
 			-- getting man_table to work with
-			SELECT man_table, epa_table INTO v_mantablename, v_epatablename FROM node_type WHERE epa_default=v_data.epa_type;
+			SELECT man_table, epa_table INTO v_mantablename, v_epatablename FROM cat_feature JOIN node_type USING(id) WHERE epa_default=v_data.epa_type;
 
 			-- defining new node parameters
 			v_node_id = replace(v_data.arc_id, '_n2a', '');

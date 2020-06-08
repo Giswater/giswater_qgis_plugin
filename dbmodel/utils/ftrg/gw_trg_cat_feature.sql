@@ -116,16 +116,11 @@ BEGIN
 		INTO v_feature;
 
 		IF lower(NEW.feature_type)='arc' THEN
-			EXECUTE 'INSERT INTO arc_type (id, type, epa_default, man_table, epa_table, active, code_autofill) 
-			VALUES ('''||NEW.id||''', '''||NEW.system_id||''', '''||v_feature.epa_default||''', '''||v_feature.man_table||''', 
-			'''||v_feature.epa_table||''', TRUE, TRUE)';
+			EXECUTE 'INSERT INTO arc_type (id, epa_default)
+			VALUES ('''||NEW.id||''', '''||v_feature.epa_default||''')';
 		ELSIF lower(NEW.feature_type)='node' THEN
-			EXECUTE 'INSERT INTO node_type (id, type, epa_default, man_table, epa_table, active, code_autofill, choose_hemisphere, isarcdivide, num_arcs) 
-			VALUES ('''||NEW.id||''', '''||NEW.system_id||''', '''||v_feature.epa_default||''', '''||v_feature.man_table||''', 
-			'''||v_feature.epa_table||''', TRUE, TRUE, TRUE, TRUE, 2)';
-		ELSE
-			EXECUTE 'INSERT INTO ' || concat(lower(NEW.feature_type),'_type')||' (id, type, man_table, active, code_autofill) VALUES ('''||NEW.id||''', '''
-			||NEW.system_id||''', '''||v_feature.man_table||''', TRUE, TRUE)';
+			EXECUTE 'INSERT INTO node_type (id, epa_default, epa_table, choose_hemisphere, isarcdivide, num_arcs)
+			VALUES ('''||NEW.id||''', '''||v_feature.epa_default||''', '''||v_feature.epa_table||''', TRUE, TRUE, TRUE, TRUE, 2)';
 		END IF;
 		--create child view
 		v_query='{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"'||NEW.id||'"}, "data":{"filterFields":{}, "pageInfo":{}, "multi_create":"False" }}';

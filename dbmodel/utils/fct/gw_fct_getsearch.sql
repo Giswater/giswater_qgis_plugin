@@ -18,7 +18,7 @@ SELECT SCHEMA_NAME.gw_fct_getsearch($${
 "client":{"device":4, "infoType":1, "lang":"ES"}
 }$$)
 
-SELECT gw_fct_getsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"addSchema":"ud_sample", "filterFields":{}, "pageInfo":{}}}$$);
+SELECT gw_fct_getsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"addSchema":"SCHEMA_NAME", "filterFields":{}, "pageInfo":{}}}$$);
 
 MAIN ISSUES
 -----------

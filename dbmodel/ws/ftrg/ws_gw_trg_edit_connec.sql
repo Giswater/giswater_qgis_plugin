@@ -42,9 +42,9 @@ BEGIN
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
     v_man_table:= TG_ARGV[0];
 	
-	IF v_man_table IN (SELECT id FROM connec_type) THEN
+	IF v_man_table IN (SELECT id FROM cat_feature WHERE feature_type = 'CONNEC') THEN
 		v_customfeature:=v_man_table;
-		v_man_table:=(SELECT man_table FROM connec_type WHERE id=v_man_table);
+		v_man_table:=(SELECT man_table FROM cat_feature_connec WHERE id=v_man_table);
 	END IF;
 	
 	v_type_man_table:=v_man_table;
@@ -305,7 +305,7 @@ BEGIN
 		    NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;
 
-		SELECT code_autofill INTO v_code_autofill_bool FROM connec_type join cat_connec on connec_type.id=cat_connec.connectype_id where cat_connec.id=NEW.connecat_id;
+		SELECT code_autofill INTO v_code_autofill_bool FROM cat_feature join cat_connec on cat_feature.id=cat_connec.connectype_id where cat_connec.id=NEW.connecat_id;
 		
 		--Copy id to code field
 		IF (NEW.code IS NULL AND v_code_autofill_bool IS TRUE) THEN 
@@ -417,8 +417,8 @@ BEGIN
 		END IF;	
 
 		IF v_man_table='parent' THEN
-		    v_man_table:= (SELECT connec_type.man_table FROM connec_type JOIN cat_connec ON cat_connec.id=NEW.connecat_id 
-		    	WHERE connec_type.id = cat_connec.connectype_id LIMIT 1)::text;
+		    v_man_table:= (SELECT man_table FROM cat_feature_connec JOIN cat_connec ON cat_connec.id=NEW.connecat_id
+		    	WHERE cat_feature.id = cat_connec.connectype_id LIMIT 1)::text;
 	         
 	        IF v_man_table IS NOT NULL THEN
 	            v_sql:= 'INSERT INTO '||v_man_table||' (connec_id) VALUES ('||quote_literal(NEW.connec_id)||')';
@@ -578,7 +578,7 @@ BEGIN
 		END IF;
 
 		--link_path
-		SELECT link_path INTO v_link_path FROM connec_type JOIN cat_connec ON cat_connec.connectype_id=connec_type.id WHERE cat_connec.id=NEW.connecat_id;
+		SELECT link_path INTO v_link_path FROM cat_feature JOIN cat_connec ON cat_connec.connectype_id=cat_feature.id WHERE cat_connec.id=NEW.connecat_id;
 		IF v_link_path IS NOT NULL THEN
 			NEW.link = replace(NEW.link, v_link_path,'');
 		END IF;
@@ -586,8 +586,8 @@ BEGIN
 		-- Connec type for parent tables
 		IF v_man_table='parent' THEN
 	    	IF (NEW.connecat_id != OLD.connecat_id) THEN
-				v_new_connec_type= (SELECT type FROM connec_type JOIN cat_connec ON connec_type.id=connectype_id where cat_connec.id=NEW.connecat_id);
-				v_old_connec_type= (SELECT type FROM connec_type JOIN cat_connec ON connec_type.id=connectype_id where cat_connec.id=OLD.connecat_id);
+				v_new_connec_type= (SELECT system_id FROM cat_feature JOIN cat_connec ON cat_feature.id=connectype_id where cat_connec.id=NEW.connecat_id);
+				v_old_connec_type= (SELECT system_id FROM cat_feature JOIN cat_connec ON cat_feature.id=connectype_id where cat_connec.id=OLD.connecat_id);
 				IF v_new_connec_type != v_old_connec_type THEN
 					v_sql='INSERT INTO man_'||lower(v_new_connec_type)||' (connec_id) VALUES ('||NEW.connec_id||')';
 					EXECUTE v_sql;

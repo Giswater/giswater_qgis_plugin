@@ -70,19 +70,11 @@ BEGIN
 
 
 	--CHECK CHILD VIEWS FOR ACTIVE FEATURES
+
 	--list active cat_feature
-	IF v_project_type ='WS' THEN
-		v_querytext = 'SELECT * FROM cat_feature JOIN (SELECT id,active FROM node_type 
-		UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type) a USING (id) WHERE a.active IS TRUE;';
-
-	ELSIF v_project_type ='UD' THEN
-
-		v_querytext = 'SELECT * FROM cat_feature JOIN (SELECT id,active FROM node_type 
-		UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type UNION SELECT id,active FROM gully_type) a USING (id) WHERE a.active IS TRUE;';
-
-	END IF;
-
+	v_querytext = 'SELECT * FROM cat_feature WHERE active IS TRUE;';
 	FOR rec IN EXECUTE v_querytext LOOP
+
 	--check if all the views defined in cat_feature exist:
 		IF (SELECT EXISTS ( SELECT 1 FROM   information_schema.tables WHERE  table_schema = v_schemaname AND table_name = rec.child_layer)) IS TRUE THEN
 			EXECUTE'SELECT pg_get_viewdef('''||v_schemaname||'.'||rec.child_layer||''', true);'
@@ -130,16 +122,7 @@ BEGIN
 	END LOOP;
 
 	--check if all active features have child view name in cat_feature table
-	IF v_project_type ='WS' THEN
-		SELECT count(*),string_agg(id,',')  INTO v_count,v_feature_list FROM cat_feature JOIN (SELECT id,active FROM node_type 
-		UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type) a USING (id) WHERE a.active IS TRUE AND child_layer IS NULL;
-
-	ELSIF v_project_type ='UD' THEN
-
-		SELECT count(*),string_agg(id,',')  INTO v_count,v_feature_list FROM cat_feature JOIN (SELECT id,active FROM node_type 
-		UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type UNION SELECT id,active FROM gully_type) a USING (id) WHERE a.active IS TRUE AND child_layer IS NULL;
-
-	END IF;
+	SELECT count(*),string_agg(id,',')  INTO v_count,v_feature_list FROM cat_feature WHERE active IS TRUE AND child_layer IS NULL;
 
 	IF v_count > 0 THEN
 		v_errortext=concat('ERROR: There is/are ',v_count,' active features which views names are not present in cat_feature table. Features - ',v_feature_list::text,'.');
@@ -151,21 +134,9 @@ BEGIN
 		VALUES (195, 1, 'INFO: All active features have child view name in cat_feature table');
 	END IF;
 
-
 	--check if all views with active cat_feature have a definition in config_api_tableinfo_x_infotype
-
-	IF v_project_type ='WS' THEN
-	   SELECT count(id), string_agg(child_layer,',')  INTO v_count,v_view_list FROM cat_feature JOIN (SELECT id,active FROM node_type 
-	   UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type) a USING (id) WHERE a.active IS TRUE AND 
-	   child_layer not in (select tableinfo_id FROM config_info_layer_x_type);
-
-	ELSIF v_project_type ='UD' THEN
-
-		SELECT count(id), string_agg(child_layer,',')  INTO v_count, v_view_list FROM cat_feature JOIN (SELECT id,active FROM node_type 
-		UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type UNION SELECT id,active FROM gully_type) a USING (id) WHERE a.active IS TRUE AND 
-		child_layer not in (select tableinfo_id FROM config_info_layer_x_type);
-
-	END IF;
+	SELECT count(id), string_agg(child_layer,',')  INTO v_count,v_view_list FROM cat_feature WHERE active IS TRUE AND
+	child_layer not in (select tableinfo_id FROM config_info_layer_x_type);
 
 	IF v_count > 0 THEN
 		v_errortext=concat('ERROR: There is/are ',v_count,' active features which views are not defined in config_api_tableinfo_x_infotype. Undefined views: ',v_view_list::text,'.');
@@ -179,18 +150,8 @@ BEGIN
 
 
 	--check if all views with active cat_feature have a definition in config_form_fields
-	IF v_project_type ='WS' THEN
-	   SELECT count(id), string_agg(child_layer,',')  INTO v_count,v_view_list FROM cat_feature JOIN (SELECT id,active FROM node_type 
-	   UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type) a USING (id) WHERE a.active IS TRUE AND 
-	   child_layer not in (select formname FROM config_form_fields);
-
-	ELSIF v_project_type ='UD' THEN
-
-		SELECT count(id), string_agg(child_layer,',')  INTO v_count, v_view_list FROM cat_feature JOIN (SELECT id,active FROM node_type 
-		UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type UNION SELECT id,active FROM gully_type) a USING (id) WHERE a.active IS TRUE AND 
-		child_layer not in (select formname FROM config_form_fields);
-
-	END IF;
+    SELECT count(id), string_agg(child_layer,',')  INTO v_count,v_view_list FROM cat_feature WHERE active IS TRUE AND
+    child_layer not in (select formname FROM config_form_fields);
 
 	IF v_count > 0 THEN
 		v_errortext = concat('ERROR: There is/are ',v_count,' active features which views are not defined in config_form_fields. Undefined views: ',v_view_list,'.');
@@ -258,7 +219,7 @@ BEGIN
 	--check if all addfields are defined in config_form_fields
 	SELECT count(*), string_agg(concat(child_layer,': ',param_name),',') INTO v_count, v_view_list FROM sys_addfields 
 	JOIN cat_feature ON cat_feature.id=sys_addfields.cat_feature_id
-	WHERE active IS TRUE AND param_name not IN (SELECT columnname FROM config_form_fields JOIN cat_feature ON cat_feature.child_layer=formname);
+	WHERE sys_addfields.active IS TRUE AND param_name not IN (SELECT columnname FROM config_form_fields JOIN cat_feature ON cat_feature.child_layer=formname);
 
 	IF v_count > 0 THEN
 		v_errortext=concat('ERROR: There is/are ',v_count,'addfields that are not defined in config_form_fields. Addfields: ',v_view_list,'.');

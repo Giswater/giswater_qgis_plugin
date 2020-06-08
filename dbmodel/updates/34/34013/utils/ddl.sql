@@ -8,6 +8,11 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
+-- 2020/06/05
+DROP TABLE cat_arc_class;
+DROP TABLE cat_arc_class_cat;
+DROP TABLE cat_arc_class_type;
+
 -- 2020/06/02
 ALTER TABLE om_rec_result_arc DROP CONSTRAINT om_rec_result_arc_pkey;
 ALTER TABLE om_rec_result_arc ADD CONSTRAINT plan_rec_result_arc_pkey PRIMARY KEY (arc_id, result_id);

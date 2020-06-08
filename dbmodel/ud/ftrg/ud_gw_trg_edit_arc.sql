@@ -36,9 +36,9 @@ BEGIN
 	v_man_table:= TG_ARGV[0];
 
 	--modify values for custom view inserts
-	IF v_man_table IN (SELECT id FROM arc_type) THEN
+	IF v_man_table IN (SELECT id FROM cat_feature_arc) THEN
 		v_customfeature:=v_man_table;
-		v_man_table:=(SELECT man_table FROM arc_type WHERE id=v_man_table);
+		v_man_table:=(SELECT man_table FROM cat_feature_arc WHERE id=v_man_table);
 	END IF;
 
 	v_type_v_man_table:=v_man_table;
@@ -68,7 +68,7 @@ BEGIN
 
 		 -- Arc type
 		IF (NEW.arc_type IS NULL) THEN
-			IF ((SELECT COUNT(*) FROM arc_type) = 0) THEN
+			IF ((SELECT COUNT(*) FROM cat_feature_arc) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"1018", "function":"1202","debug_msg":null}}$$);';
 			END IF;
@@ -85,12 +85,12 @@ BEGIN
 			END IF;
 			
 		ELSIF (NEW.arc_type IS NULL) AND v_man_table !='parent' THEN
-			NEW.arc_type:= (SELECT id FROM arc_type WHERE arc_type.man_table=v_type_v_man_table LIMIT 1);
+			NEW.arc_type:= (SELECT id FROM cat_feature_arc WHERE man_table=v_type_v_man_table LIMIT 1);
 		END IF;
 
 		 -- Epa type
 		IF (NEW.epa_type IS NULL) THEN
-			NEW.epa_type:= (SELECT epa_default FROM arc_type WHERE arc_type.id=NEW.arc_type)::text;   
+			NEW.epa_type:= (SELECT epa_default FROM cat_feature.arc WHERE arc_type.id=NEW.arc_type)::text;   
 		END IF;
 		
 		-- Arc catalog ID
@@ -294,7 +294,7 @@ BEGIN
 
 		
 		--Copy id to code field
-		SELECT code_autofill INTO v_code_autofill_bool FROM arc_type WHERE id=NEW.arc_type;
+		SELECT code_autofill INTO v_code_autofill_bool FROM cat_feature WHERE id=NEW.arc_type;
 		
 		IF (NEW.code IS NULL AND v_code_autofill_bool IS TRUE) THEN 
 			NEW.code=NEW.arc_id;
@@ -398,7 +398,7 @@ BEGIN
 			INSERT INTO man_varc (arc_id) VALUES (NEW.arc_id);
 		
 		ELSIF v_man_table='parent' THEN
-		v_man_table := (SELECT arc_type.man_table FROM arc_type WHERE arc_type.id=NEW.arc_type);
+		v_man_table := (SELECT man_table FROM cat_feature_arc WHERE id=NEW.arc_type);
 		v_sql:= 'INSERT INTO '||v_man_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';    
 		EXECUTE v_sql;				
 		
@@ -530,8 +530,8 @@ BEGIN
 
 		 -- UPDATE management values
 		IF (NEW.arc_type <> OLD.arc_type) THEN 
-			v_new_man_table:= (SELECT arc_type.man_table FROM arc_type WHERE arc_type.id = NEW.arc_type);
-			v_old_man_table:= (SELECT arc_type.man_table FROM arc_type WHERE arc_type.id = OLD.arc_type);
+			v_new_man_table:= (SELECT man_table FROM cat_feature_arc WHERE id = NEW.arc_type);
+			v_old_man_table:= (SELECT man_table FROM cat_feature_arc WHERE id = OLD.arc_type);
 			IF v_new_man_table IS NOT NULL THEN
 				v_sql:= 'DELETE FROM '||v_old_man_table||' WHERE arc_id= '||quote_literal(OLD.arc_id);
 				EXECUTE v_sql;
@@ -541,7 +541,7 @@ BEGIN
 		END IF;
 	
 		--link_path
-		SELECT link_path INTO v_link_path FROM arc_type WHERE id=NEW.arc_type;
+		SELECT link_path INTO v_link_path FROM cat_feature WHERE id=NEW.arc_type;
 		IF v_link_path IS NOT NULL THEN
 			NEW.link = replace(NEW.link, v_link_path,'');
 		END IF;

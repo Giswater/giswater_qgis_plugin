@@ -13,7 +13,7 @@ $BODY$
 
 /*example
 SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{}, 
-"data":{"addSchema":"ud_sample", "selectorType":"explfrommuni", "id":2, "value":true, "isAlone":true}}$$);
+"data":{"addSchema":"SCHEMA_NAME", "selectorType":"explfrommuni", "id":2, "value":true, "isAlone":true}}$$);
 SELECT * FROM selector_expl
 */
 

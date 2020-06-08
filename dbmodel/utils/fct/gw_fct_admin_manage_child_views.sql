@@ -85,17 +85,8 @@ BEGIN
 		--if the view should be created for all the features loop over the cat_features
 		IF v_multi_create IS TRUE AND v_project_type IS NOT NULL THEN -- only for that existing projects (projecttype not null)
 				
-			IF v_project_type ='WS' THEN
-				v_querytext = 'SELECT cat_feature.* FROM cat_feature JOIN (SELECT id,active FROM node_type 
-							UNION SELECT id,active FROM arc_type UNION SELECT id,active FROM connec_type) a USING (id) WHERE a.active IS TRUE ORDER BY id';
-		
-			ELSIF v_project_type ='UD' THEN
-				v_querytext = 'SELECT cat_feature.* FROM cat_feature JOIN (SELECT id,active FROM node_type 
-							UNION SELECT id,active FROM arc_type 
-							UNION SELECT id,active FROM connec_type 
-							UNION SELECT id,active FROM gully_type) a USING (id) WHERE a.active IS TRUE ORDER BY id';
-			END IF;
-	
+    		v_querytext = 'SELECT cat_feature.* FROM cat_feature WHERE active IS TRUE ORDER BY id';
+
 			FOR rec IN EXECUTE v_querytext LOOP
 						
 				--set view definition to null
@@ -259,7 +250,7 @@ BEGIN
 			END IF;
 			
 			IF v_definition IS NULL THEN
-			
+		
 				--select columns from man_* table without repeating the identifier
 				EXECUTE 'SELECT DISTINCT string_agg(concat(''man_'||v_feature_system_id||'.'',column_name)::text,'', '')
 				FROM information_schema.columns where table_name=''man_'||v_feature_system_id||''' and table_schema='''||v_schemaname||''' 

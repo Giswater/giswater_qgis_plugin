@@ -7,5 +7,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
--- 2020/05/25
-DELETE FROM sys_table WHERE id IN ('anl_flow_arc','anl_flow_node','anl_flow_connec', 'anl_flow_gully', 'anl_arc_profile_value');
+
+-- 2020/06/02
+UPDATE sys_table SET id='cat_feature_gully' WHERE id = 'gully_type';
