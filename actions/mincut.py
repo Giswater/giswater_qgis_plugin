@@ -34,6 +34,9 @@ from ..ui_manager import MincutHydrometer
 from ..ui_manager import MincutConnec
 from ..ui_manager import MincutComposer
 
+from qgis.gui import QgsMapCanvas
+from qgis.core import QgsPointLocator, QgsPointXY, QgsSnappingConfig, QgsSnappingUtils, QgsTolerance
+
 
 class MincutParent(ParentAction):
 
@@ -97,9 +100,9 @@ class MincutParent(ParentAction):
         self.layers_connec = self.controller.get_group_layers('connec')
         self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
 
-        # Control current layer (due to QGIS bug in snapping system)
-        if self.canvas.currentLayer() is None:
-            self.iface.setActiveLayer(self.layer_arc)
+		#set active and current layer
+        self.iface.setActiveLayer(self.layer_arc)
+        self.current_layer = self.layer_arc
 
 
     def init_mincut_form(self):
@@ -127,8 +130,8 @@ class MincutParent(ParentAction):
         utils_giswater.double_validator(self.depth, 0, 9999999, 3)
         utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.txt_exec_user, self.controller.get_project_user())
 
-        # Manage address
-        self.adress_init_config(self.dlg_mincut)
+        # Fill address : todo
+		
 
         # Fill ComboBox type
         sql = ("SELECT id, descript "
@@ -1521,13 +1524,6 @@ class MincutParent(ParentAction):
         # Store user snapping configuration
         self.snapper_manager.store_snapping_options()
 
-        # Disable snapping
-        self.snapper_manager.enable_snapping()
-
-        # Set snapping to 'arc' and 'node'
-        self.snapper_manager.set_snapping_layers()
-        self.snapper_manager.snap_to_arc()
-
         # Set signals
         self.canvas.xyCoordinates.connect(self.mouse_move_node_arc)        
         self.emit_point.canvasClicked.connect(self.auto_mincut_snapping)
@@ -1535,18 +1531,26 @@ class MincutParent(ParentAction):
 
     def auto_mincut_snapping(self, point, btn):  #@UnusedVariable
         """ Automatic mincut: Snapping to 'node' and 'arc' layers """
-
+		
         # Get coordinates
         event_point = self.snapper_manager.get_event_point(point=point)
-
+		
+		#set active and current layer
+        self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
+        self.iface.setActiveLayer(self.layer_arc)
+        self.current_layer = self.layer_arc
+  
         # Snapping
-        result = self.snapper_manager.snap_to_background_layers(event_point)
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+        print (result);  		
         if not self.snapper_manager.result_is_valid():
             return
 
         # Check feature
         elem_type = None
         layer = self.snapper_manager.get_snapped_layer(result)
+        print (layer);  		
+		
         if layer == self.layer_arc:
             elem_type = 'arc'
 
@@ -2093,7 +2097,7 @@ class MincutParent(ParentAction):
 
         self.params = {}
         sql = ("SELECT parameter, value FROM config_param_system"
-               " WHERE parameter in ('basic_search_postnumber', 'basic_search_street', 'basic_search_muni' ORDER BY parameter")
+               " WHERE parameter in ('basic_search_postnumber', 'basic_search_street', 'basic_search_muni', 'basic_search_exploitation') ORDER BY parameter")
         rows = self.controller.get_rows(sql)
         if rows:
             for row in rows:
@@ -2312,20 +2316,6 @@ class MincutParent(ParentAction):
         if len(layers) == 0:
             return
 
-        # Iterate over all layers to get the ones specified parameters '*_layer'
-        self.layers = {}
-
-        for cur_layer in layers:
-            layer_source = self.controller.get_layer_source(cur_layer)
-            uri_table = layer_source['table']
-            if uri_table is not None:
-                if self.params['expl_layer'] == uri_table:
-                    self.layers['expl_layer'] = cur_layer
-                elif self.params['street_layer'] == uri_table:
-                    self.layers['street_layer'] = cur_layer
-                elif self.params['portal_layer'] == uri_table:
-                    self.layers['portal_layer'] = cur_layer
-
 
     def adress_init_config(self, dialog):
         """ Populate the interface with values get from layers """
@@ -2334,36 +2324,7 @@ class MincutParent(ParentAction):
         if not self.searchplus_get_parameters():
             return 
             
-        # Get layers and full extent
-        self.adress_get_layers()
-
-        # Tab 'Address'
-        status = self.address_populate(dialog, dialog.address_exploitation, 'expl_layer', 'expl_field_code', 'expl_field_name')
-        if not status:
-            return
-
-        self.street_field_expl = self.controller.get_config('street_field_expl', 'value', 'config_param_system')
-        if not self.street_field_expl:
-            message = "Parameter not found"
-            self.controller.show_warning(message, parameter='street_field_expl')
-            return
-        portal_field_postal = self.controller.get_config('portal_field_postal', 'value', 'config_param_system')
-        if not portal_field_postal:
-            message = "Param not found"
-            self.controller.show_warning(message, parameter='portal_field_postal')
-            return
-
-        # Get project variable 'expl_id'
-        expl_id = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable(str(self.street_field_expl[0]))
-        if expl_id:
-            # Set SQL to get 'expl_name'
-            sql = (f"SELECT {self.params['expl_field_name']}"
-                   f" FROM {self.params['expl_layer']}"
-                   f" WHERE {self.params['expl_field_code']} = {expl_id}")
-            row = self.controller.get_row(sql)
-            if row:
-                utils_giswater.setSelectedItem(dialog, dialog.address_exploitation, row[0])
-
+       
         # Set signals
         dialog.address_exploitation.currentIndexChanged.connect(
             partial(self.address_fill_postal_code, dialog, dialog.address_postal_code))
