@@ -535,73 +535,57 @@
              <attribute name="title">
               <string>Arc</string>
              </attribute>
-             <widget class="QTableView" name="tbl_visit_x_arc">
-              <property name="geometry">
-               <rect>
-                <x>10</x>
-                <y>10</y>
-                <width>461</width>
-                <height>381</height>
-               </rect>
-              </property>
-              <property name="sortingEnabled">
-               <bool>true</bool>
-              </property>
-             </widget>
+             <layout class="QGridLayout" name="gridLayout_2">
+              <item row="0" column="0">
+               <widget class="QTableView" name="tbl_visit_x_arc">
+                <property name="sortingEnabled">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </widget>
             <widget class="QWidget" name="tab_node">
              <attribute name="title">
               <string>Node</string>
              </attribute>
-             <widget class="QTableView" name="tbl_visit_x_node">
-              <property name="geometry">
-               <rect>
-                <x>10</x>
-                <y>10</y>
-                <width>461</width>
-                <height>381</height>
-               </rect>
-              </property>
-              <property name="sortingEnabled">
-               <bool>true</bool>
-              </property>
-             </widget>
+             <layout class="QGridLayout" name="gridLayout_3">
+              <item row="0" column="0">
+               <widget class="QTableView" name="tbl_visit_x_node">
+                <property name="sortingEnabled">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </widget>
             <widget class="QWidget" name="tab_connec">
              <attribute name="title">
               <string>Connec</string>
              </attribute>
-             <widget class="QTableView" name="tbl_visit_x_connec">
-              <property name="geometry">
-               <rect>
-                <x>10</x>
-                <y>10</y>
-                <width>461</width>
-                <height>381</height>
-               </rect>
-              </property>
-              <property name="sortingEnabled">
-               <bool>true</bool>
-              </property>
-             </widget>
+             <layout class="QGridLayout" name="gridLayout_4">
+              <item row="0" column="0">
+               <widget class="QTableView" name="tbl_visit_x_connec">
+                <property name="sortingEnabled">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </widget>
             <widget class="QWidget" name="tab_gully">
              <attribute name="title">
               <string>Gully</string>
              </attribute>
-             <widget class="QTableView" name="tbl_visit_x_gully">
-              <property name="geometry">
-               <rect>
-                <x>10</x>
-                <y>10</y>
-                <width>461</width>
-                <height>381</height>
-               </rect>
-              </property>
-              <property name="sortingEnabled">
-               <bool>true</bool>
-              </property>
-             </widget>
+             <layout class="QGridLayout" name="gridLayout_5">
+              <item row="0" column="0">
+               <widget class="QTableView" name="tbl_visit_x_gully">
+                <property name="sortingEnabled">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </widget>
            </widget>
           </item>

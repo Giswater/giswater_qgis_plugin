@@ -311,11 +311,6 @@ class VisitEventFull(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('event_standard.ui')
-class EventStandard(GwDialog, FORM_CLASS):
-    pass
-
-
 FORM_CLASS = get_ui_class('visit_event_rehab.ui')
 class VisitEventRehab(GwDialog, FORM_CLASS):
     pass

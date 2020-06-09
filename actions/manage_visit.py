@@ -24,7 +24,6 @@ from ..dao.om_visit_x_node import OmVisitXNode
 from ..dao.om_visit_x_gully import OmVisitXGully
 from ..dao.om_visit_parameter import OmVisitParameter
 from ..ui_manager import VisitUi
-from ..ui_manager import EventStandard
 from ..ui_manager import VisitEvent
 from ..ui_manager import VisitEventRehab
 from ..ui_manager import LotVisitManagerUi
@@ -970,11 +969,9 @@ class ManageVisit(ParentManage, QObject):
         row = self.controller.get_row(sql)
         form_type = str(row[0])
         dlg_name = None
-        if form_type == 'event_ud_arc_standard':
+        if form_type in ('event_ud_arc_standard', 'event_standard'):
             self.dlg_event = VisitEvent()
             self.load_settings(self.dlg_event)
-
-            # disable position_x fields because not allowed in multiple view
             self.populate_position_id()
             dlg_name = 'visit_event'
         elif form_type == 'event_ud_arc_rehabit':
@@ -982,12 +979,8 @@ class ManageVisit(ParentManage, QObject):
             self.load_settings(self.dlg_event)
             self.populate_position_id()
             dlg_name = 'visit_event_rehab'
-            # disable position_x fields because not allowed in multiple view
             self.dlg_event.position_id.setEnabled(True)
             self.dlg_event.position_value.setEnabled(True)
-        elif form_type == 'event_standard':
-            self.dlg_event = EventStandard()
-            self.load_settings(self.dlg_event)
         else:
             message = "Unrecognised form type"
             self.controller.show_info_box(message, parameter=form_type)
@@ -1301,7 +1294,7 @@ class ManageVisit(ParentManage, QObject):
         elif om_event_parameter.form_type == 'event_standard':
             _value = self.dlg_add_visit.tbl_event.model().record(0).value('value')
             text = self.dlg_add_visit.tbl_event.model().record(0).value('text')
-            self.dlg_event = EventStandard()
+            self.dlg_event = VisitEvent()
             self.load_settings(self.dlg_event)
             if _value not in ('NULL', None):
                 utils_giswater.setWidgetText(self.dlg_event, self.dlg_event.value, _value)
