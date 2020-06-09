@@ -1133,7 +1133,7 @@ CREATE OR REPLACE VIEW v_ui_node_x_connection_downstream AS
 	v_arc.node_1 AS node_id,
 	v_arc.arc_id AS feature_id,
 	v_arc.code AS feature_code,
-	v_arc.cat_feature AS featurecat_id,
+	v_arc.arc_type AS featurecat_id,
 	v_arc.arccat_id,
 	v_arc.y2 AS depth,
 	st_length2d(v_arc.the_geom)::numeric(12,2) AS length,
@@ -1149,7 +1149,6 @@ CREATE OR REPLACE VIEW v_ui_node_x_connection_downstream AS
 	'v_arc'::text AS sys_table_id
    FROM v_arc
 	 JOIN node ON v_arc.node_2::text = node.node_id::text
-	 JOIN cat_feature ON cat_feature.id::text = v_arc.arc_type::text
 	 LEFT JOIN cat_arc ON v_arc.arccat_id::text = cat_arc.id::text
 	 JOIN value_state ON v_arc.state = value_state.id;
 
@@ -1178,7 +1177,6 @@ CREATE OR REPLACE VIEW v_ui_node_x_connection_upstream AS
 	'v_arc'::text AS sys_table_id
    FROM v_arc
 	 JOIN node ON v_arc.node_1::text = node.node_id::text
-	 JOIN cat_feature ON cat_feature.id::text = v_arc.arc_type::text
 	 LEFT JOIN cat_arc ON v_arc.arccat_id::text = cat_arc.id::text
 	 JOIN value_state ON v_arc.state = value_state.id
 UNION
@@ -1203,7 +1201,6 @@ UNION
    FROM v_connec
 	 JOIN link ON link.feature_id::text = v_connec.connec_id::text AND link.feature_type::text = 'CONNEC'::text
 	 JOIN node ON v_connec.pjoint_id::text = node.node_id::text AND v_connec.pjoint_type::text = 'NODE'::text
-	 JOIN cat_feature ON cat_feature.id::text = v_connec.connec_type::text
 	 LEFT JOIN cat_connec ON v_connec.connecat_id::text = cat_connec.id::text
 	 JOIN value_state ON v_connec.state = value_state.id
 UNION
@@ -1228,7 +1225,6 @@ UNION
    FROM v_gully
 	 JOIN link ON link.feature_id::text = v_gully.gully_id::text AND link.feature_type::text = 'GULLY'::text
 	 JOIN node ON v_gully.pjoint_id::text = node.node_id::text AND v_gully.pjoint_type::text = 'NODE'::text
-	 JOIN cat_feature ON cat_feature.id::text = v_gully.gully_type::text
 	 LEFT JOIN cat_connec ON v_gully.connec_arccat_id::text = cat_connec.id::text
 	 JOIN value_state ON v_gully.state = value_state.id;
 

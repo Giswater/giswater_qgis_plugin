@@ -9,11 +9,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 -- 2020/06/02
-ALTER TABLE cat_feature ADD COLUMN descript text;
-ALTER TABLE cat_feature ADD COLUMN link_path text;
-ALTER TABLE cat_feature ADD COLUMN code_autofill boolean;
-ALTER TABLE cat_feature ADD COLUMN active boolean;
-
 -- moving data from connec_type
 UPDATE cat_feature f SET code_autofill = c.code_autofill, descript = c.descript, link_path = c.link_path, active = c.active
 FROM connec_type c WHERE f.id=c.id;

@@ -327,7 +327,7 @@ UPDATE config_form_fields SET stylesheet ='{"label":"color:red; font-weight:bold
 update config_form_fields SET layoutorder = 3 where columnname='state' and formname like '%ve_connec_%';
 update config_form_fields SET layoutorder = 4 where columnname='state_type' and formname like '%ve_connec_%';
 
-UPDATE node_type set isprofilesurface = true;
+UPDATE cat_feature_node set isprofilesurface = true;
 
 --refactor of forms
 UPDATE config_form_fields SET layoutname = 'lyt_data_3', layoutorder = 11 where columnname ='pjoint_id';
@@ -411,7 +411,7 @@ UPDATE config_form_fields SET tooltip = 'custom_area - Area útil del depósito'
 UPDATE config_form_fields SET tooltip = 'groove - Para establecer si hay ranura en el encintado' WHERE columnname = 'groove' AND tooltip = 'groove' AND formtype='feature';
 UPDATE config_form_fields SET tooltip = 'inlet - Elemento con aportaciones' WHERE columnname = 'inlet' AND tooltip IS NULL;
 
-UPDATE node_type SET isexitupperintro = 2 WHERE id = 'VIRTUAL_NODE';
+UPDATE cat_feature_node SET isexitupperintro = 2 WHERE id = 'VIRTUAL_NODE';
 
 UPDATE config_form_fields set layoutname = 'lyt_data_1' WHERE columnname = 'width' AND formname ='ve_node_chamber';
 UPDATE config_form_fields set layoutname = 'lyt_data_1' WHERE columnname = 'width' AND formname ='ve_node_pump_station';

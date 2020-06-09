@@ -212,16 +212,10 @@ BEGIN
 	UPDATE vnode set state=1 FROM link WHERE link.exit_type ='VNODE' and exit_id = vnode_id::text AND link.state=1;
 
 	-- manage mandatory values of config_param_user where feature is deprecated
-	IF 'role_admin' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) AND v_project_type='WS' THEN
+	IF 'role_admin' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
 	
-		DELETE FROM sys_param_user WHERE id IN (SELECT sys_param_user.id FROM sys_param_user, node_type 
-		WHERE active=false AND concat(lower(node_type.id),'_vdefault') = sys_param_user.id);
-
-		DELETE FROM sys_param_user WHERE id IN (SELECT sys_param_user.id FROM sys_param_user, arc_type 
-		WHERE active=false AND concat(lower(arc_type.id),'_vdefault') = sys_param_user.id);
-
-		DELETE FROM sys_param_user WHERE id IN (SELECT sys_param_user.id FROM sys_param_user, connec_type 
-		WHERE active=false AND concat(lower(connec_type.id),'_vdefault') = sys_param_user.id);
+		DELETE FROM sys_param_user WHERE id IN (SELECT sys_param_user.id FROM sys_param_user, cat_feature 
+		WHERE active=false AND concat(lower(cat_feature.id),'_vdefault') = sys_param_user.id);
 
 		v_errortext=concat('Inactive parameters have been deleted from sys_param_user.');
 		INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);

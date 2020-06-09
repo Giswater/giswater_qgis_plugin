@@ -75,13 +75,13 @@ update arc set link='https://www.giswater.org';
 update connec set link='https://www.giswater.org';
 update rtc_hydrometer set link='https://www.giswater.org';
 
-update node_type SET isarcdivide=FALSE, num_arcs=0 WHERE id='AIR_VALVE';
-UPDATE node_type SET graf_delimiter='NONE';
-UPDATE node_type SET graf_delimiter='MINSECTOR' WHERE id IN('CHECK_VALVE', 'FL_CONTR_VALVE', 'GEN_PURP_VALVE', 'SHUTOFF_VALVE', 'THROTTLE_VALVE');
-UPDATE node_type SET graf_delimiter='PRESSZONE' WHERE id IN('PR_BREAK_VALVE', 'PR_REDUC_VALVE', 'PR_SUSTA_VALVE');
-UPDATE node_type SET graf_delimiter='DQA' WHERE id IN('CLORINATHOR');
-UPDATE node_type SET graf_delimiter='DMA' WHERE id IN('FLOWMETER');
-UPDATE node_type SET graf_delimiter='SECTOR' WHERE id IN('SOURCE','TANK','WATERWELL','WTP');
+update cat_feature_node SET isarcdivide=FALSE, num_arcs=0 WHERE id='AIR_VALVE';
+UPDATE cat_feature_node SET graf_delimiter='NONE';
+UPDATE cat_feature_node SET graf_delimiter='MINSECTOR' WHERE id IN('CHECK_VALVE', 'FL_CONTR_VALVE', 'GEN_PURP_VALVE', 'SHUTOFF_VALVE', 'THROTTLE_VALVE');
+UPDATE cat_feature_node SET graf_delimiter='PRESSZONE' WHERE id IN('PR_BREAK_VALVE', 'PR_REDUC_VALVE', 'PR_SUSTA_VALVE');
+UPDATE cat_feature_node SET graf_delimiter='DQA' WHERE id IN('CLORINATHOR');
+UPDATE cat_feature_node SET graf_delimiter='DMA' WHERE id IN('FLOWMETER');
+UPDATE cat_feature_node SET graf_delimiter='SECTOR' WHERE id IN('SOURCE','TANK','WATERWELL','WTP');
 
 INSERT INTO config_mincut_valve VALUES('CHECK_VALVE');
 INSERT INTO config_mincut_valve VALUES('FL_CONTR_VALVE');
@@ -436,7 +436,7 @@ UPDATE config_form_fields SET label = 'Presszone' WHERE columnname = 'presszone_
 update config_form_fields SET layoutorder = 3 where columnname='state' and formname like '%ve_connec_%';
 update config_form_fields SET layoutorder = 4 where columnname='state_type' and formname like '%ve_connec_%';
 
-UPDATE node_type set isprofilesurface = true;
+UPDATE cat_feature_node set isprofilesurface = true;
 
 --refactor of forms
 UPDATE config_form_fields SET layoutname = 'lyt_data_3', layoutorder = 11 where columnname ='pjoint_id';

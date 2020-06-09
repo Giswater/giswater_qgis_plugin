@@ -64,7 +64,7 @@ INSERT INTO cat_builder VALUES ('builder1');
 INSERT INTO cat_builder VALUES ('builder2');
 INSERT INTO cat_builder VALUES ('builder3');
 
-UPDATE connec_type SET active = false WHERE id = 'VCONNEC';
+UPDATE cat_feature SET active = false WHERE id = 'VCONNEC';
 
 INSERT INTO cat_connec VALUES ('PVC25-PN16-DOM', 'WJOIN', 'PVC', '16', '25', NULL, NULL, 'PVC connec', NULL, NULL, NULL, NULL, 'N_WATER-CONNECT', 'A_PVC25_PN10', 'S_EXC', true);
 INSERT INTO cat_connec VALUES ('PVC32-PN16-DOM', 'WJOIN', 'PVC', '16', '32', NULL, NULL, 'PVC connec', NULL, NULL, NULL, NULL, 'N_WATER-CONNECT', 'A_PVC32_PN10', 'S_EXC', true);
@@ -85,7 +85,7 @@ INSERT INTO cat_element VALUES ('REGISTER40X40', 'REGISTER', 'CONCRET', '40x40 c
 INSERT INTO cat_element VALUES ('REGISTER60X60', 'REGISTER', 'CONCRET', '60x60 cm', 'Register concret 60x60', 'c:\\users\users\catalog.pdf', NULL, NULL, NULL, 'register_60x60.svg', true);
 INSERT INTO cat_element VALUES ('VREGISTER200X200', 'REGISTER', 'BRICK+IRON', '200x200 cm', 'Vertical register concret/Iron', 'c:\\users\users\catalog.pdf', NULL, NULL, NULL, 'v_register.svg', true);
 
-UPDATE node_type SET active = false WHERE id = 'CLORINATHOR' OR id = 'FL_CONTR_VALVE' OR id = 'GEN_PURP_VALVE' OR id = 'PR_SUSTA.VALVE' OR id = 'PR_BREAK.VALVE' 
+UPDATE cat_feature SET active = false WHERE id = 'CLORINATHOR' OR id = 'FL_CONTR_VALVE' OR id = 'GEN_PURP_VALVE' OR id = 'PR_SUSTA.VALVE' OR id = 'PR_BREAK.VALVE' 
 OR id = 'VALVE_REGISTER' OR id = 'TAP' OR id = 'ADAPTATION' OR id = 'BYPASS_REGISTER' OR id = 'CONTROLREGISTER' OR id = 'THROTTLE_VALVE';
 
 
