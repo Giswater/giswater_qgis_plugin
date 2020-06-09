@@ -160,9 +160,9 @@ class I18NGenerator(ParentAction):
             line += f"\t\t\t<translation>{py_tlb[py_language]}</translation>\n"
             line += f"\t\t</message>\n"
             ts_file.write(line)
-        line = '\t</context>\n\n'
-        line += '\t<!-- PYTHON MESSAGES -->\n'
-        line += '\t<context>\n'
+        ts_file.write(line)
+
+        line = '\t<!-- PYTHON MESSAGES -->\n'
         ts_file.write(line)
 
         # Create children for message
