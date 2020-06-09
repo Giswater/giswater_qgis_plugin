@@ -17,6 +17,9 @@ SELECT SCHEMA_NAME.gw_fct_getprofilevalues($${"client":{},
 				     {"ComposerTemplate":"mincutA3","ComposerMap":[{"width":"53.44","height":"55.9066","index":0, "name":"map7"},{"width":"337.865","height":"275.914","index":1, "name":"map6"}]}]
 				     }}$$);
 
+SELECT SCHEMA_NAME.gw_fct_getprofilevalues($${"client":{},"data":{"initNode":"116", "endNode":"111"}}$$);
+
+
 SELECT SCHEMA_NAME.gw_fct_getprofilevalues($${"client":{},
 	"data":{"initNode":"116", "endNode":"111", "composer":"mincutA4", "legendFactor":1, "linksDistance":1, "scale":{"scaleToFit":false, "eh":2000, "ev":500},"papersize":{"id":2, "customDim":{}},
 		"ComposerTemplates":[{"ComposerTemplate":"mincutA4", "ComposerMap":[{"width":"179.0","height":"140.826","index":0, "name":"map0"},{"width":"77.729","height":"55.9066","index":1, "name":"map7"}]},
@@ -295,7 +298,7 @@ BEGIN
 		WHERE fid=222 AND cur_user = current_user AND '||v_fymax||' IS NULL';
 
 	-- update node table setting those nodes without manhole on surface (isprofilesurface IS FALSE)
-	UPDATE anl_node SET sys_type = 'BOTTOM' FROM cat_feature_node WHERE id = sys_type AND isprofilesurface IS FALSE AND fid=222 AND cur_user = current_user;
+	UPDATE anl_node SET sys_type = 'BOTTOM' FROM cat_feature_node n WHERE n.id = sys_type AND isprofilesurface IS FALSE AND fid=222 AND cur_user = current_user;
 	UPDATE anl_node SET sys_type = 'TOP-REAL' WHERE sys_type NOT IN ('BOTTOM', 'LINK') AND fid=222 AND cur_user = current_user;
 	UPDATE anl_node SET sys_type = 'TOP-ESTIM' WHERE sys_type ='TOP-REAL' AND result_id = 'estimated' AND fid=222 AND cur_user = current_user;
 	
@@ -376,18 +379,25 @@ BEGIN
 		v_inith = v_legendfactor*20;
 	END IF;
 
-	-- extension as composer (redundant to fit the image as is)
-	v_extension = (concat('{"width":', v_compwidth,', "height":', v_compheight,'}'))::json;	
+	IF v_compwidth IS NOT NULL  and v_compheight IS NOT NULL AND v_inith IS NOT NULL  and v_initv IS NOT NULL 
+		AND v_hs IS NOT NULL  AND v_hstext IS NOT NULL  AND v_vs IS NOT NULL AND v_vstext IS NOT NULL THEN
 
-	-- initpoint to start to draw profile
-	v_initpoint = (concat('{"initx":', v_inith,', "inity":', v_initv,'}'))::json;	
+		-- extension as composer (redundant to fit the image as is)
+		v_extension = (concat('{"width":', v_compwidth,', "height":', v_compheight,'}'))::json;	
 
-	-- scale text
-	v_scale = concat('1:',v_hs, '(',v_hstext,') - 1:',v_vs,'(',v_vstext,')');
-	
-	-- update values using scale factor
-	v_hs = 2000/v_hs;
-	v_vs = 500/v_vs;
+		-- initpoint to start to draw profile
+		v_initpoint = (concat('{"initx":', v_inith,', "inity":', v_initv,'}'))::json;	
+
+		-- scale text
+		v_scale = concat('1:',v_hs, '(',v_hstext,') - 1:',v_vs,'(',v_vstext,')');
+		
+		-- update values using scale factor
+		v_hs = 2000/v_hs;
+		v_vs = 500/v_vs;
+	ELSE
+		v_vs = 1;
+		v_hs= 1;
+	END IF;
 	
 	UPDATE anl_arc SET cat_geom1 = cat_geom1*v_vs, length = length*v_hs WHERE fid=222 AND cur_user = current_user;
 	EXECUTE 'UPDATE anl_node SET cat_geom1 = cat_geom1*'||v_vs||', '||v_ftopelev||' = '||v_ftopelev||'*'||v_vs||', elev = elev*'||v_vs||', '||
@@ -413,11 +423,13 @@ BEGIN
 	IF v_guitarlegend IS NULL THEN v_guitarlegend='{}'; END IF;
 	IF v_stylesheet IS NULL THEN v_stylesheet='{}'; END IF;
 
-	v_extension := COALESCE(v_extension, '{}'); 
 	v_scale := COALESCE(v_scale, '{}'); 
-	
+	v_extension := COALESCE(v_extension, '{}'); 
+	v_initpoint := COALESCE(v_initpoint, '{}'); 	
 	v_arc := COALESCE(v_arc, '{}'); 
 	v_node := COALESCE(v_node, '{}'); 
+	v_terrain := COALESCE(v_terrain, '{}'); 
+
 
 	-- default values
 	v_status = 'Accepted';	
