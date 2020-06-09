@@ -1067,8 +1067,7 @@ class Giswater(QObject):
         parent_layers = self.controller.get_rows(sql)
 
         for parent_layer in parent_layers:
-            # Create sub menu
-            sub_menu = main_menu.addMenu(str(parent_layer[0]))
+
 
             # Get child layers
             sql = (f"SELECT DISTINCT(child_layer), lower(feature_type), id as alias FROM cat_feature "
@@ -1079,6 +1078,10 @@ class Giswater(QObject):
                    f" ORDER BY child_layer")
 
             child_layers = self.controller.get_rows(sql)
+            if not child_layers: continue
+
+            # Create sub menu
+            sub_menu = main_menu.addMenu(str(parent_layer[0]))
             child_layers.insert(0, ['Load all', 'Load all', 'Load all'])
             for child_layer in child_layers:
                 # Create actions
