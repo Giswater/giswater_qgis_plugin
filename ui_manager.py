@@ -441,11 +441,6 @@ class PriceManagerUi(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('price.ui')
-class PriceUi(GwDialog, FORM_CLASS):
-    pass
-
-
 FORM_CLASS = get_ui_class('plan_estimate_result_selector.ui')
 class EstimateResultSelector(GwDialog, FORM_CLASS):
     pass

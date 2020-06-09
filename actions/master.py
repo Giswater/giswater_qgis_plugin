@@ -16,7 +16,6 @@ from functools import partial
 from .. import utils_giswater
 from .manage_new_psector import ManageNewPsector
 from ..ui_manager import PsectorManagerUi
-from ..ui_manager import PriceUi
 from ..ui_manager import EstimateResultSelector
 from ..ui_manager import PriceManagerUi
 from ..ui_manager import Multirow_selector
@@ -228,100 +227,6 @@ class Master(ParentAction):
         self.multi_row_selector(self.dlg_psector_selector, tableleft, tableright, field_id_left, field_id_right)
         self.open_dialog(self.dlg_psector_selector, dlg_name="multirow_selector", maximize_button=False)
 
-        
-    def master_estimate_result_new(self, tablename=None, result_id=None, index=0):
-        """ Button 38: New estimate result """
-
-        # Create dialog 
-        dlg_estimate_result_new = PriceUi()
-        self.load_settings(dlg_estimate_result_new)
-
-        # Set signals
-        dlg_estimate_result_new.btn_close.clicked.connect(partial(self.close_dialog, dlg_estimate_result_new))
-        dlg_estimate_result_new.prices_coefficient.setValidator(QDoubleValidator())
-
-        self.populate_cmb_result_type(dlg_estimate_result_new.cmb_result_type, 'plan_result_type', False)
-
-        if result_id != 0 and result_id:         
-            sql = (f"SELECT * FROM {tablename} "
-                   f" WHERE result_id = '{result_id}' AND current_user = cur_user")
-            row = self.controller.get_row(sql)
-            if row is None:
-                message = "Any record found for current user in table"
-                self.controller.show_warning(message, parameter='plan_result_cat')
-                return
-
-            utils_giswater.setWidgetText(dlg_estimate_result_new, dlg_estimate_result_new.result_id, row['result_id'])
-            dlg_estimate_result_new.cmb_result_type.setCurrentIndex(index)
-            utils_giswater.setWidgetText(dlg_estimate_result_new, dlg_estimate_result_new.prices_coefficient, row['network_price_coeff'])
-            utils_giswater.setWidgetText(dlg_estimate_result_new, dlg_estimate_result_new.observ, row['descript'])
-            dlg_estimate_result_new.result_id.setEnabled(False)
-            dlg_estimate_result_new.cmb_result_type.setEnabled(False)
-            dlg_estimate_result_new.prices_coefficient.setEnabled(False)
-            dlg_estimate_result_new.observ.setEnabled(False)
-            dlg_estimate_result_new.btn_calculate.setText("Close")
-            dlg_estimate_result_new.btn_calculate.clicked.connect(partial(self.close_dialog))
-        else:
-            dlg_estimate_result_new.btn_calculate.clicked.connect(partial(self.master_estimate_result_new_calculate, dlg_estimate_result_new))            
-
-        self.open_dialog(dlg_estimate_result_new, dlg_name="price", maximize_button=False)
-
-
-    def populate_cmb_result_type(self, combo, table_name, allow_nulls=True):
-
-        sql = (f"SELECT id, idval FROM plan_typevalue WHERE typevalue = 'result_type' "
-               f" ORDER BY idval")
-        rows = self.controller.get_rows(sql)
-        if not rows:
-            return
-        
-        combo.blockSignals(True)
-        combo.clear()
-        if allow_nulls:
-            combo.addItem("", "")
-        records_sorted = sorted(rows, key=operator.itemgetter(1))
-        for record in records_sorted:
-            combo.addItem(record[1], record)
-        combo.blockSignals(False)
-
-
-    def master_estimate_result_new_calculate(self, dialog):
-        """ Execute function 'gw_fct_plan_estimate_result' """
-
-        # Get values from form
-        result_id = utils_giswater.getWidgetText(dialog, "result_id")
-        combo = utils_giswater.getWidget(dialog, "cmb_result_type")
-        elem = combo.itemData(combo.currentIndex())
-        result_type = str(elem[0])
-        coefficient = utils_giswater.getWidgetText(dialog, "prices_coefficient")
-        observ = utils_giswater.getWidgetText(dialog, "observ")
-
-        if result_id == 'null':
-            message = "Please, introduce a result name"
-            self.controller.show_warning(message)
-            return
-        if coefficient == 'null':
-            message = "Please, introduce a coefficient value"
-            self.controller.show_warning(message)  
-            return          
-
-        extras = (f'"parameters":{{"coefficient":{coefficient}, "description":"{observ}"'
-                  f'", "resultType":"{result_type}", "resultId":"{result_id}"}}')
-        extras += ', "saveOnDatabase":' + str(utils_giswater.isChecked(dialog, dialog.chk_save)).lower()
-        body = self.create_body(extras=extras)
-        json_result = self.controller.get_json('gw_fct_plan_result', body)
-        if not json_result:
-            return False
-
-        if json_result['status'] == "Accepted":
-            self.add_layer.populate_info_text(dialog, result['body']['data'])
-        message = json_result['message']['text']
-        if message is not None:
-            self.controller.show_info_box(message)
-
-        # Refresh canvas and close dialog
-        self.iface.mapCanvas().refreshAllLayers()
-
 
     def master_estimate_result_selector(self):
         """ Button 49: Estimate result selector """
@@ -420,7 +325,6 @@ class Master(ParentAction):
         self.tbl_om_result_cat.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         # Set signals
-        self.dlg_merm.tbl_om_result_cat.doubleClicked.connect(partial(self.charge_plan_estimate_result, self.dlg_merm))
         self.dlg_merm.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_merm))
         self.dlg_merm.rejected.connect(partial(self.close_dialog, self.dlg_merm))
         self.dlg_merm.btn_delete.clicked.connect(partial(self.delete_merm, self.dlg_merm))
@@ -433,21 +337,6 @@ class Master(ParentAction):
         # Open form
         self.dlg_merm.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.open_dialog(self.dlg_merm, dlg_name="price_manager")
-
-
-    def charge_plan_estimate_result(self, dialog):
-        """ Send selected plan to 'plan_estimate_result_new.ui' """
-
-        selected_list = dialog.tbl_om_result_cat.selectionModel().selectedRows()
-        if len(selected_list) == 0:
-            message = "Any record selected"
-            self.controller.show_warning(message)
-            return
-        
-        row = selected_list[0].row()
-        result_id = dialog.tbl_om_result_cat.model().record(row).value("result_id")
-        self.close_dialog(dialog)
-        self.master_estimate_result_new('plan_result_cat', result_id, 0)
 
 
     def delete_merm(self, dialog):
