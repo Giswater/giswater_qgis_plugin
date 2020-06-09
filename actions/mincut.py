@@ -2093,7 +2093,7 @@ class MincutParent(ParentAction):
 
         self.params = {}
         sql = ("SELECT parameter, value FROM config_param_system"
-               " WHERE context = 'searchplus' ORDER BY parameter")
+               " WHERE parameter in ('basic_search_postnumber', 'basic_search_street', 'basic_search_muni' ORDER BY parameter")
         rows = self.controller.get_rows(sql)
         if rows:
             for row in rows:

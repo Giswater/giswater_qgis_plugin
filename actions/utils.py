@@ -56,7 +56,7 @@ class Utils(ParentAction):
         roles = self.controller.get_rolenames()
         temp_tablename = 'temp_csv'
         self.populate_cmb_unicodes(self.dlg_csv.cmb_unicode_list)
-        self.populate_combos(self.dlg_csv.cmb_import_type, 'fid', 'alias, descript, functionname, readheader, orderby', 'config_csv', roles)
+        self.populate_combos(self.dlg_csv.cmb_import_type, 'fid', 'alias, config_csv.descript, functionname, readheader, orderby', 'config_csv', roles)
 
         self.dlg_csv.lbl_info.setWordWrap(True)
         utils_giswater.setWidgetText(self.dlg_csv, self.dlg_csv.cmb_unicode_list, 'utf8')

@@ -134,11 +134,9 @@ class ChangeElemType(ParentMapTool):
         self.dlg_chg_node_type.btn_accept.clicked.connect(self.edit_change_elem_type_accept)
         self.dlg_chg_node_type.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_chg_node_type))
 
-
         # Fill 1st combo boxes-new system node type
-        sql = ("SELECT DISTINCT(id) FROM node_type "
-               "WHERE active is True "
-               "ORDER BY id")
+        sql = ("SELECT DISTINCT(id) FROM cat_feature WHERE active is True "
+               "AND feature_type = 'NODE' ORDER BY id")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_chg_node_type, "node_node_type_new", rows)
 
