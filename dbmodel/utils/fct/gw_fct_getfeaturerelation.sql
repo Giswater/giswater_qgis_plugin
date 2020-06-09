@@ -12,6 +12,9 @@ RETURNS json AS
 $BODY$
 
 /*
+
+SELECT SCHEMA_NAME.gw_fct_getfeaturerelation($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"type":"ARC"}, "data":{"filterFields":{}, "pageInfo":{}, "feature_id":"2076562"}}$$);
+
 SELECT SCHEMA_NAME.gw_fct_getfeaturerelation($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"type":"ARC"},
@@ -76,7 +79,7 @@ BEGIN
 	EXECUTE 'SELECT '||v_feature_type||'_type FROM v_edit_'||v_feature_type||' WHERE '||v_feature_type||'_id = '''||v_feature_id||''''
 	INTO v_featurecat;
 
-	EXECUTE 'SELECT man_table FROM '||v_feature_type||'_type WHERE id = '''||v_featurecat||''';'
+	EXECUTE 'SELECT man_table FROM cat_feature_'||v_feature_type||' WHERE id = '''||v_featurecat||''';'
 	INTO v_man_table;
 
 	IF v_feature_type='arc' THEN

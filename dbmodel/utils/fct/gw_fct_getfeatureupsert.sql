@@ -495,7 +495,7 @@ BEGIN
 				WHEN 'gis_length' THEN 
 					field_value = v_gislength;
 				WHEN 'epa_type' THEN 
-					EXECUTE 'SELECT epa_default FROM '||(v_catfeature.feature_type)||'_type WHERE id = $1'INTO field_value USING v_catfeature.id;
+					EXECUTE 'SELECT epa_default FROM cat_feature_'||(v_catfeature.feature_type)||' WHERE id = $1'INTO field_value USING v_catfeature.id;
 				WHEN 'fire_code' THEN
 					IF v_use_fire_code_seq THEN	
 						field_value = nextval ('man_hydrant_fire_code_seq'::regclass);

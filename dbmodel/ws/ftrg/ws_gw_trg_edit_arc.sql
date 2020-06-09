@@ -387,7 +387,7 @@ BEGIN
 				INSERT INTO man_varc (arc_id) VALUES (NEW.arc_id);
 
 		ELSIF v_man_table='parent' THEN
-			v_man_table := (SELECT cat_feature.man_table FROM cat_feature JOIN cat_arc ON (((cat_feature.id)::text = (cat_arc.arctype_id)::text)) WHERE cat_arc.id=NEW.arccat_id);
+			v_man_table := (SELECT cat_feature_arc.man_table FROM cat_feature_arc JOIN cat_arc ON (((cat_feature_arc.id)::text = (cat_arc.arctype_id)::text)) WHERE cat_arc.id=NEW.arccat_id);
         	IF v_man_table IS NOT NULL THEN
             	v_sql:= 'INSERT INTO '||v_man_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';    
            		EXECUTE v_sql;
