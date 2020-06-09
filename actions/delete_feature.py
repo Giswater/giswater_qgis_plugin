@@ -92,7 +92,10 @@ class DeleteFeature(ApiParent):
         # Get feature_type and feature_id
         feature_type = utils_giswater.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_type)
         feature_id = utils_giswater.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_id)
-
+        if feature_id in (None, "null"):
+            message = f"Select one"
+            self.controller.show_warning(message, parameter=feature_type)
+            return
         feature = '"type":"' + feature_type + '"'
         extras = '"feature_id":"' + feature_id + '"'
         body = self.create_body(feature=feature, extras=extras)
@@ -104,7 +107,7 @@ class DeleteFeature(ApiParent):
         for value in result['body']['data']['info']['values']:
             result_msg += value['message'] + '\n\n'
 
-        utils_giswater.setWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.txt_info_relation, result_msg)
+        utils_giswater.setWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.txt_feature_infolog, result_msg)
 
         # Enable button delete feature
         if result_msg != '':
