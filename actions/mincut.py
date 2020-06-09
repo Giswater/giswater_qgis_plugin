@@ -2470,7 +2470,7 @@ class MincutParent(ParentAction):
         template_path = ""
         row = self.controller.get_config('qgis_composers_folderpath')
         if row:
-            template_path = row[0]+ f'{os.sep}{self.template}.qpt'
+            template_path = row[0] + f'{os.sep}{self.template}.qpt'
 
         if not os.path.exists(template_path):
             message = "File not found"

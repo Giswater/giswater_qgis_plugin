@@ -234,7 +234,7 @@ class MincutConfig(ParentAction):
         selected_mincuts = []
         for x in range(0, model.rowCount()):
             i = int(model.fieldIndex(field_id))
-            value=model.data(model.index(x, i))
+            value = model.data(model.index(x, i))
             selected_mincuts.append(value)
         selector_values = f'{{"mincut": {{"ids":{selected_mincuts}, "filter":""}}}}'
         self.dlg_selector = SelectorUi()

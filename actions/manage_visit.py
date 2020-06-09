@@ -235,7 +235,7 @@ class ManageVisit(ParentManage, QObject):
 
             # do selection allowing @table_name to be linked to canvas selectionChanged
             widget_name = f'tbl_visit_x_{self.geom_type}'
-            widget_table = utils_giswater.getWidget(dialog, widget_name)
+            widget_table = utils_giswater.getWidget(self.dlg_add_visit, widget_name)
             self.disconnect_signal_selection_changed()
             self.connect_signal_selection_changed(self.dlg_add_visit, widget_table)
             self.select_features_by_ids(self.geom_type, expr)
@@ -472,7 +472,7 @@ class ManageVisit(ParentManage, QObject):
         widget = utils_giswater.getWidget(self.dlg_add_visit, f"tbl_visit_x_{geom_type}")
         if not widget:
             message = "Widget not found"
-            self.controller.log_info(message, parameter=widget_name)
+            self.controller.log_info(message, parameter=f"tbl_visit_x_{geom_type}")
             return None
 
         # do nothing if model is None or no element is present
