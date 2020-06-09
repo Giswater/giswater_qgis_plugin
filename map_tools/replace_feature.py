@@ -105,8 +105,8 @@ class ReplaceFeatureMapTool(ParentMapTool):
         self.dlg_replace.workcat_id_end.currentIndexChanged.connect(self.update_date)
 
         # Fill 1st combo boxes-new system node type
-        sql = (f"SELECT DISTINCT(id) FROM {self.geom_type}_type "
-               f"WHERE active is True "
+        sql = (f"SELECT DISTINCT(id) FROM cat_feature WHERE lower(feature_type) = '{self.geom_type}' "
+               f"AND active is True "
                f"ORDER BY id")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_replace, "feature_type_new", rows)
@@ -403,6 +403,14 @@ class ReplaceFeatureMapTool(ParentMapTool):
         if snapped_feat:
             layer = self.snapper_manager.get_snapped_layer(result)
             tablename = self.controller.get_layer_source_table_name(layer)
+			
+            if 'arc' in tablename:
+                result = self.snapper_manager.snap_to_current_layer(event_point)
+                snapped_feat = self.snapper_manager.get_snapped_feature(result)
+                if snapped_feat:
+                    layer = self.snapper_manager.get_snapped_layer(result)
+                    tablename = self.controller.get_layer_source_table_name(layer)
+			
             if tablename and 'v_edit' in tablename:
                 if tablename == 'v_edit_node':
                     self.geom_type = 'node'
@@ -420,6 +428,11 @@ class ReplaceFeatureMapTool(ParentMapTool):
 
 
     def activate(self):
+	
+		#set active and current layer
+        self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
+        self.iface.setActiveLayer(self.layer_node)
+        self.current_layer = self.layer_node
 
         # Check button
         self.action().setChecked(True)
