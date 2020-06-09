@@ -32,6 +32,7 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
                               "v_anl_flow_connec":{"field_cat":"context", "field_id":"connec_id", "size":2,"color_values":{'Flow exit': QColor(235, 74, 117), 'Flow trace': QColor(235, 167, 48)}},
                               "v_anl_flow_arc":{"field_cat":"context", "field_id":"id", "size":0.86, "color_values":{'Flow exit': QColor(235, 74, 117), 'Flow trace': QColor(235, 167, 48)}}}
 
+
         self.add_layer = AddLayer(self.iface, self.settings, self.controller, self.plugin_dir)
         for layer_name, values in self.needed_layers.items():
             layer = self.controller.get_layer_by_tablename(layer_name)
@@ -43,28 +44,22 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
                 self.controller.set_layer_visible(layer, False)
 
 
-
     """ QgsMapTools inherited event functions """
 
     def canvasMoveEvent(self, event):
-
+	
         # Hide marker and get coordinates
         self.vertex_marker.hide()
         event_point = self.snapper_manager.get_event_point(event)
 
-        # Snapping
-        self.current_layer = None
-        result = self.snapper_manager.snap_to_background_layers(event_point)
+        # Snapping	
+        result = self.snapper_manager.snap_to_current_layer(event_point)		
         if self.snapper_manager.result_is_valid():
-            layer = self.snapper_manager.get_snapped_layer(result)
-            # Check if feature belongs to 'node' group
-            exist = self.snapper_manager.check_node_group(layer)
-
-            if exist:
-                self.snapper_manager.add_marker(result, self.vertex_marker)
-                # Data for function
-                self.current_layer = layer
-                self.snapped_feat = self.snapper_manager.get_snapped_feature(result)
+            		
+            self.snapper_manager.add_marker(result, self.vertex_marker)
+            
+			# Data for function
+            self.snapped_feat = self.snapper_manager.get_snapped_feature(result)
 
 
     def canvasReleaseEvent(self, event):
@@ -102,6 +97,11 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
 
 
     def activate(self):
+	
+		#set active and current layer
+        self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
+        self.iface.setActiveLayer(self.layer_node)
+        self.current_layer = self.layer_node
 
         # Check button
         self.action().setChecked(True)
@@ -129,6 +129,7 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
                 message = "Select a node and click on it, the downstream nodes are computed"
             self.controller.show_info(message)
         self.check_for_layers()
+		
         # Control current layer (due to QGIS bug in snapping system)
         if self.canvas.currentLayer() is None:
             layer = self.controller.get_layer_by_tablename('v_edit_node')
