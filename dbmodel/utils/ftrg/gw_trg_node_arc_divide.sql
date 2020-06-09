@@ -13,6 +13,7 @@ DECLARE
 
 rec record;
 arc_id_aux varchar;
+node_id_aux varchar;
 edit_arc_division_dsbl_aux boolean;
 v_project_type varchar;
 v_isarcdivide boolean;
@@ -47,12 +48,16 @@ BEGIN
 
 		SELECT ((value::json)->>'value') INTO v_node_proximity FROM config_param_system WHERE parameter='edit_node_proximity';
 
-		SELECT arc_id INTO arc_id_aux FROM v_edit_arc WHERE ST_intersects((NEW.the_geom), St_buffer(v_edit_arc.the_geom,v_node_proximity)) AND NEW.state>0 LIMIT 1;
-		IF arc_id_aux IS NOT NULL THEN
-			--PERFORM gw_fct_arc_divide(NEW.node_id);	
+		SELECT node_id INTO node_id_aux FROM v_edit_node WHERE ST_intersects((NEW.the_geom), St_buffer(v_edit_node.the_geom,v_node_proximity)) AND NEW.state>0 LIMIT 1;
+		IF node_id_aux IS NULL THEN
+		
+			SELECT arc_id INTO arc_id_aux FROM v_edit_arc WHERE ST_intersects((NEW.the_geom), St_buffer(v_edit_arc.the_geom,v_node_proximity)) AND NEW.state>0 LIMIT 1;
+			IF arc_id_aux IS NOT NULL THEN
+				--PERFORM gw_fct_arc_divide(NEW.node_id);	
 
-			EXECUTE 'SELECT gw_fct_arc_divide($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["'||NEW.node_id||'"]},"data":{}}$$)';
-		END IF;	
+				EXECUTE 'SELECT gw_fct_arc_divide($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["'||NEW.node_id||'"]},"data":{}}$$)';
+			END IF;	
+		END IF;
 
    	END IF;
 
