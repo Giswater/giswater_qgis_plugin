@@ -147,12 +147,6 @@ class ManageVisit(ParentManage, QObject):
         self.current_tab_index = self.tab_index('tab_visit')
         self.tabs.setCurrentIndex(self.current_tab_index)
 
-        self.event_feature_type_selected(self.dlg_add_visit, "arc")
-        self.event_feature_type_selected(self.dlg_add_visit, "node")
-        self.event_feature_type_selected(self.dlg_add_visit, "connec")
-        if self.controller.get_project_type() == 'ud':
-            self.event_feature_type_selected(self.dlg_add_visit, "gully")
-
         # Set signals
         self.set_signals()
 
@@ -175,6 +169,12 @@ class ManageVisit(ParentManage, QObject):
 
         # Force tab_feature_changed
         self.tab_feature_changed(self.dlg_add_visit, excluded_layers=["v_edit_element"])
+
+        self.event_feature_type_selected(self.dlg_add_visit, "arc")
+        self.event_feature_type_selected(self.dlg_add_visit, "node")
+        self.event_feature_type_selected(self.dlg_add_visit, "connec")
+        if self.controller.get_project_type() == 'ud':
+            self.event_feature_type_selected(self.dlg_add_visit, "gully")
 
         # Open the dialog
         if open_dialog:
