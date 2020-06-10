@@ -15,6 +15,9 @@ $BODY$
 SELECT gw_fct_setsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"tabName":"addNetwork"}, "feature":{},
 "data":{"filterFields":{}, "pageInfo":{}, "net_type":{"id":"v_edit_arc", "name":"Arcs"}, "featureType":"arc", "addSchema":"SCHEMA_NAME", "net_code":{"text":"3"}}}$$);
 
+
+SELECT gw_fct_setsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"tabName":"workcat"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "workcat_search":{"text":"w"}, "addSchema":"None"}}$$);
+
 MAIN ISSUES
 -----------
 - basic_search_network is key issue to define variables on config_param_system to searh anything you want
@@ -101,6 +104,8 @@ v_exploitation_geom_field varchar;
 v_schemaname text;
 v_addschema text;
 
+v_srid integer;
+
 BEGIN
 
 	-- Set search path to local schema
@@ -113,6 +118,8 @@ BEGIN
 
 	-- Get project type
 	SELECT wsoftware INTO v_projecttype FROM version LIMIT 1;
+	SELECT epsg INTO v_srid FROM version LIMIT 1;
+
 
 	-- Get tab
 	v_tab := ((p_data->>'form')::json)->>'tabName';
@@ -287,11 +294,11 @@ BEGIN
 	ELSIF v_tab = 'workcat' THEN
 
 		-- Parameters of the workcat layer
-		SELECT ((value::json)->>'sys_table_id') INTO v_workcat_layer FROM config_param_system WHERE parameter='api_search_workcat';
-		SELECT ((value::json)->>'sys_id_field') INTO v_workcat_id_field FROM config_param_system WHERE parameter='api_search_workcat';
-		SELECT ((value::json)->>'sys_search_field') INTO v_workcat_display_field FROM config_param_system WHERE parameter='api_search_workcat';
-		SELECT ((value::json)->>'sys_geom_field') INTO v_workcat_geom_field FROM config_param_system WHERE parameter='api_search_workcat';
-		SELECT ((value::json)->>'filter_text') INTO v_filter_text FROM config_param_system WHERE parameter='api_search_workcat';
+		SELECT ((value::json)->>'sys_table_id') INTO v_workcat_layer FROM config_param_system WHERE parameter='basic_search_workcat';
+		SELECT ((value::json)->>'sys_id_field') INTO v_workcat_id_field FROM config_param_system WHERE parameter='basic_search_workcat';
+		SELECT ((value::json)->>'sys_search_field') INTO v_workcat_display_field FROM config_param_system WHERE parameter='basic_search_workcat';
+		SELECT ((value::json)->>'sys_geom_field') INTO v_workcat_geom_field FROM config_param_system WHERE parameter='basic_search_workcat';
+		SELECT ((value::json)->>'filter_text') INTO v_filter_text FROM config_param_system WHERE parameter='basic_search_workcat';
 		
 			-- Text to search
 		v_edittext := ((p_data->>'data')::json)->>'workcat_search';
@@ -319,6 +326,9 @@ BEGIN
 			END IF;
 
 		--  Search in the workcat
+		RAISE NOTICE '% % % % %', v_workcat_display_field, v_workcat_layer, v_workcat_id_field, v_workcat_layer, v_filter_text;
+
+		
 		EXECUTE 'SELECT array_to_json(array_agg(row_to_json(c))) 
 			FROM (SELECT b.'||quote_ident(v_workcat_display_field)||' as display_name, '
 			||quote_literal(v_workcat_layer)||' AS sys_table_id ,'
@@ -326,8 +336,8 @@ BEGIN
 			||quote_literal(v_workcat_layer)||' AS sys_idname,'
 			||quote_literal(v_filter_text)||' AS filter_text,
 			CASE
-			WHEN st_geometrytype(st_concavehull(d.the_geom, 0.99::double precision)) = ''ST_Polygon''::text THEN st_astext(st_buffer(st_concavehull(d.the_geom, 0.99::double precision), 10::double precision)::geometry(Polygon,25831))
-			ELSE st_astext(st_expand(st_buffer(d.the_geom, 10::double precision), 1::double precision)::geometry(Polygon,25831))
+			WHEN st_geometrytype(st_concavehull(d.the_geom, 0.99::double precision)) = ''ST_Polygon''::text THEN st_astext(st_buffer(st_concavehull(d.the_geom, 0.99::double precision), 10::double precision)::geometry(Polygon, '||v_srid||'))
+			ELSE st_astext(st_expand(st_buffer(d.the_geom, 10::double precision), 1::double precision)::geometry(Polygon, '||v_srid||'))
 			END AS sys_geometry
 
 			FROM (SELECT st_collect(a.the_geom) AS the_geom, a.workcat_id FROM ( '||v_querytext||') a GROUP BY a.workcat_id ) d 
@@ -341,10 +351,10 @@ BEGIN
 	ELSIF v_tab = 'visit' THEN
 
 		-- Parameters of the workcat layer
-		SELECT ((value::json)->>'sys_table_id') INTO v_visit_layer FROM config_param_system WHERE parameter='api_search_visit';
-		SELECT ((value::json)->>'sys_id_field') INTO v_visit_id_field FROM config_param_system WHERE parameter='api_search_visit';
-		SELECT ((value::json)->>'sys_search_field') INTO v_visit_display_field FROM config_param_system WHERE parameter='api_search_visit';
-		SELECT ((value::json)->>'sys_geom_field') INTO v_visit_geom_field FROM config_param_system WHERE parameter='api_search_visit';
+		SELECT ((value::json)->>'sys_table_id') INTO v_visit_layer FROM config_param_system WHERE parameter='basic_search_visit';
+		SELECT ((value::json)->>'sys_id_field') INTO v_visit_id_field FROM config_param_system WHERE parameter='basic_search_visit';
+		SELECT ((value::json)->>'sys_search_field') INTO v_visit_display_field FROM config_param_system WHERE parameter='basic_search_visit';
+		SELECT ((value::json)->>'sys_geom_field') INTO v_visit_geom_field FROM config_param_system WHERE parameter='basic_search_visit';
 		
 		-- Text to search
 		v_edittext := ((p_data->>'data')::json)->>'visit_search';
@@ -362,17 +372,17 @@ BEGIN
 	ELSIF v_tab = 'psector' THEN
 
 			-- Parameters of the exploitation layer
-		SELECT ((value::json)->>'sys_table_id') INTO v_exploitation_layer FROM config_param_system WHERE parameter='api_search_exploitation';
-		SELECT ((value::json)->>'sys_id_field') INTO v_exploitation_id_field FROM config_param_system WHERE parameter='api_search_exploitation';
-		SELECT ((value::json)->>'sys_search_field') INTO v_exploitation_display_field FROM config_param_system WHERE parameter='api_search_exploitation';
-		SELECT ((value::json)->>'sys_geom_field') INTO v_exploitation_geom_field FROM config_param_system WHERE parameter='api_search_exploitation';
+		SELECT ((value::json)->>'sys_table_id') INTO v_exploitation_layer FROM config_param_system WHERE parameter='basic_search_exploitation';
+		SELECT ((value::json)->>'sys_id_field') INTO v_exploitation_id_field FROM config_param_system WHERE parameter='basic_search_exploitation';
+		SELECT ((value::json)->>'sys_search_field') INTO v_exploitation_display_field FROM config_param_system WHERE parameter='basic_search_exploitation';
+		SELECT ((value::json)->>'sys_geom_field') INTO v_exploitation_geom_field FROM config_param_system WHERE parameter='basic_search_exploitation';
 	 
 			-- Parameters of the psector layer
-		SELECT ((value::json)->>'sys_table_id') INTO v_psector_layer FROM config_param_system WHERE parameter='api_search_psector';
-		SELECT ((value::json)->>'sys_id_field') INTO v_psector_id_field FROM config_param_system WHERE parameter='api_search_psector';
-		SELECT ((value::json)->>'sys_search_field') INTO v_psector_display_field FROM config_param_system WHERE parameter='api_search_psector';
-		SELECT ((value::json)->>'sys_parent_field') INTO v_psector_parent_field FROM config_param_system WHERE parameter='api_search_psector';
-		SELECT ((value::json)->>'sys_geom_field') INTO v_psector_geom_field FROM config_param_system WHERE parameter='api_search_psector';
+		SELECT ((value::json)->>'sys_table_id') INTO v_psector_layer FROM config_param_system WHERE parameter='basic_search_psector';
+		SELECT ((value::json)->>'sys_id_field') INTO v_psector_id_field FROM config_param_system WHERE parameter='basic_search_psector';
+		SELECT ((value::json)->>'sys_search_field') INTO v_psector_display_field FROM config_param_system WHERE parameter='basic_search_psector';
+		SELECT ((value::json)->>'sys_parent_field') INTO v_psector_parent_field FROM config_param_system WHERE parameter='basic_search_psector';
+		SELECT ((value::json)->>'sys_geom_field') INTO v_psector_geom_field FROM config_param_system WHERE parameter='basic_search_psector';
 		
 		--Text to search
 		v_combo := ((p_data->>'data')::json)->>'psector_expl';
@@ -405,8 +415,8 @@ BEGIN
         '}')::json;
 
 	-- exception handling
-	EXCEPTION WHEN OTHERS THEN 
-	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	--EXCEPTION WHEN OTHERS THEN 
+	--RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
