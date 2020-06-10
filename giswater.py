@@ -1473,14 +1473,15 @@ class Giswater(QObject):
     def manage_guided_map(self):
         """ Guide map works using ext_municipality """
 
-        self.layer_expl = self.controller.get_layer_by_tablename('ext_municipality')
-        if self.layer_expl is None:
+        self.layer_muni = self.controller.get_layer_by_tablename('ext_municipality')
+        if self.layer_muni is None:
             return
 
-        self.iface.setActiveLayer(self.layer_expl)
-        self.layer_expl.selectAll()
+        self.iface.setActiveLayer(self.layer_muni)
+        self.controller.set_layer_visible(self.layer_muni)
+        self.layer_muni.selectAll()
         self.iface.actionZoomToSelected().trigger()
-        self.layer_expl.removeSelection()
+        self.layer_muni.removeSelection()
         self.iface.actionSelect().trigger()
         self.iface.mapCanvas().selectionChanged.connect(self.selection_changed)
         cursor = self.get_cursor_multiple_selection()
@@ -1492,7 +1493,7 @@ class Giswater(QObject):
         """ Get selected muni_id and execute function setselectors """
 
         muni_id = None
-        features = self.layer_expl.getSelectedFeatures()
+        features = self.layer_muni.getSelectedFeatures()
         for feature in features:
             muni_id = feature["muni_id"]
             self.controller.log_info(f"Selected muni_id: {muni_id}")
@@ -1500,7 +1501,7 @@ class Giswater(QObject):
 
         self.iface.mapCanvas().selectionChanged.disconnect()
         self.iface.actionZoomToSelected().trigger()
-        self.layer_expl.removeSelection()
+        self.layer_muni.removeSelection()
 
         if muni_id is None:
             return
@@ -1512,7 +1513,7 @@ class Giswater(QObject):
         row = self.controller.get_row(sql, commit=True, log_sql=True)
         if row:
             self.iface.mapCanvas().refreshAllLayers()
-            self.layer_expl.triggerRepaint()
+            self.layer_muni.triggerRepaint()
             self.iface.actionPan().trigger()
             self.iface.actionZoomIn().trigger()
 
