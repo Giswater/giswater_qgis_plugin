@@ -20,8 +20,11 @@ class NotifyFunctions(ParentAction):
     # :var conn_failed: some times, when user click so fast 2 actions, LISTEN channel is stopped, and we need to
     #                   re-LISTEN all channels
 
+    # Notify cannot use 'iface', directly or indirectly or open dialogs
+
     conn_failed = False
     list_channels = None
+
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control notify from PostgresSql """
 
@@ -171,7 +174,7 @@ class NotifyFunctions(ParentAction):
             feature = '"tableName":"' + str(layer_name) + '", "id":""'
             extras = f'"infoType":"{self.qgis_project_infotype}"'
             body = self.create_body(feature=feature, extras=extras)
-            result = self.controller.get_json('gw_fct_getinfofromid', body)
+            result = self.controller.get_json('gw_fct_getinfofromid', body, is_notify=True)
             if not result: continue
             for field in result['body']['data']['fields']:
                 _values = {}

@@ -772,7 +772,7 @@ class DaoController(object):
 
 
     def get_json(self, function_name, parameters=None, schema_name=None, commit=True, log_sql=False,
-                 log_result=False, json_loads=False):
+                 log_result=False, json_loads=False, is_notify=False):
         """ Manage execution API function
         :param function_name: Name of function to call (text)
         :param body: Parameter for function (json)
@@ -804,7 +804,8 @@ class DaoController(object):
 
         # Get json result
         if json_loads:
-            json_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+            # If content of row[0] is not a to json, cast it
+            json_result = json.loads(row[0], object_pairs_hook=OrderedDict)
         else:
             json_result = row[0]
 
@@ -814,7 +815,7 @@ class DaoController(object):
 
         # If failed, manage exception
         if 'status' in json_result and json_result['status'] == 'Failed':
-            self.manage_exception_api(json_result, sql)
+            self.manage_exception_api(json_result, sql, is_notify=is_notify)
             return False
 
         return json_result
@@ -1108,10 +1109,10 @@ class DaoController(object):
 
 
     def log_info(self, text=None, context_name=None, parameter=None, logger_file=True,
-                 stack_level_increase=0, tab_name=None):
+                 stack_level_increase=0, tab_name=None, level=0):
         """ Write information message into QGIS Log Messages Panel """
 
-        msg = self.qgis_log_message(text, 0, context_name, parameter, tab_name)
+        msg = self.qgis_log_message(text, level, context_name, parameter, tab_name)
         if self.logger and logger_file:        
             self.logger.info(msg, stack_level_increase=stack_level_increase)
 
@@ -1672,7 +1673,7 @@ class DaoController(object):
             index = regex.indexIn(widget.toPlainText(), pos)
 
 
-    def manage_exception_api(self, json_result, sql=None, stack_level=2, stack_level_increase=0):
+    def manage_exception_api(self, json_result, sql=None, stack_level=2, stack_level_increase=0, is_notify=False):
         """ Manage exception in JSON database queries and show information to the user """
 
         try:
@@ -1688,7 +1689,10 @@ class DaoController(object):
                 else:
                     parameter = 'text'
                     msg = "Key on returned json from ddbb is missed"
-                self.show_message(msg, level, parameter=parameter)
+                if is_notify is True:
+                    self.log_info(msg, parameter=parameter, level=level)
+                else:
+                    self.show_message(msg, level, parameter=parameter)
 
             else:
 
