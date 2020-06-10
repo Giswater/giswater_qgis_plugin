@@ -251,13 +251,13 @@ BEGIN
 	ELSIF v_tab = 'hydro' THEN
 
 		-- Parameters of the hydro layer
-		SELECT ((value::json)->>'sys_table_id') INTO v_hydro_layer FROM config_param_system WHERE parameter='api_search_hydrometer';
-		SELECT ((value::json)->>'sys_id_field') INTO v_hydro_id_field FROM config_param_system WHERE parameter='api_search_hydrometer';
-		SELECT ((value::json)->>'sys_connec_id') INTO v_hydro_connec_field FROM config_param_system WHERE parameter='api_search_hydrometer';
-		SELECT ((value::json)->>'sys_search_field_1') INTO v_hydro_search_field_1 FROM config_param_system WHERE parameter='api_search_hydrometer';
-		SELECT ((value::json)->>'sys_search_field_2') INTO v_hydro_search_field_2 FROM config_param_system WHERE parameter='api_search_hydrometer';
-		SELECT ((value::json)->>'sys_search_field_3') INTO v_hydro_search_field_3 FROM config_param_system WHERE parameter='api_search_hydrometer';
-		SELECT ((value::json)->>'sys_parent_field') INTO v_exploitation_display_field FROM config_param_system WHERE parameter='api_search_hydrometer';
+		SELECT ((value::json)->>'sys_table_id') INTO v_hydro_layer FROM config_param_system WHERE parameter='basic_search_hydrometer';
+		SELECT ((value::json)->>'sys_id_field') INTO v_hydro_id_field FROM config_param_system WHERE parameter='basic_search_hydrometer';
+		SELECT ((value::json)->>'sys_connec_id') INTO v_hydro_connec_field FROM config_param_system WHERE parameter='basic_search_hydrometer';
+		SELECT ((value::json)->>'sys_search_field_1') INTO v_hydro_search_field_1 FROM config_param_system WHERE parameter='basic_search_hydrometer';
+		SELECT ((value::json)->>'sys_search_field_2') INTO v_hydro_search_field_2 FROM config_param_system WHERE parameter='basic_search_hydrometer';
+		SELECT ((value::json)->>'sys_search_field_3') INTO v_hydro_search_field_3 FROM config_param_system WHERE parameter='basic_search_hydrometer';
+		SELECT ((value::json)->>'sys_parent_field') INTO v_exploitation_display_field FROM config_param_system WHERE parameter='basic_search_hydrometer';
 
 		-- Text to search
 		v_combo := ((p_data->>'data')::json)->>'hydro_expl';
