@@ -6,14 +6,14 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2870
 
-DROP FUNCTION IF EXISTS ws_sample.gw_api_setselectors (json);
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_setselectors(p_data json)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_setselectors (json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setselectors(p_data json)
   RETURNS json AS
 $BODY$
 
 /*example
-SELECT ws_sample.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{}, 
-"data":{"addSchema":"ws_sample", "selectorType":"explfrommuni", "id":2, "value":true, "isAlone":true}}$$);
+SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{}, 
+"data":{"addSchema":"SCHEMA_NAME", "selectorType":"explfrommuni", "id":2, "value":true, "isAlone":true}}$$);
 */
 
 DECLARE
@@ -34,7 +34,7 @@ v_addschema text;
 BEGIN
 
 	-- Set search path to local schema
-	SET search_path = "ws_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 	
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
@@ -94,7 +94,7 @@ BEGIN
 		PERFORM gw_fct_setselectors(v_data);
 		
 		-- restore set search_path
-		SET search_path = ws_sample, public;
+		SET search_path = SCHEMA_NAME, public;
 
 	END IF;
 
