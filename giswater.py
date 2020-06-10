@@ -4,29 +4,26 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
 """
-# -*- coding: utf-8 -*-
-import json
-from json import JSONDecodeError
 
-from qgis.core import Qgis, QgsDataSourceUri, QgsEditorWidgetSetup, QgsExpressionContextUtils, QgsFieldConstraints
-from qgis.core import QgsPointLocator, QgsProject, QgsSnappingUtils, QgsTolerance, QgsVectorLayer
+# -*- coding: utf-8 -*-
+from qgis.core import QgsEditorWidgetSetup, QgsExpressionContextUtils, QgsFieldConstraints, QgsPointLocator, \
+    QgsProject, QgsSnappingUtils, QgsTolerance
 from qgis.PyQt.QtCore import QObject, QPoint, QSettings, Qt
-from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QActionGroup, QApplication, QCheckBox, QDockWidget
-from qgis.PyQt.QtWidgets import QGridLayout, QGroupBox, QMenu, QLabel, QSizePolicy, QToolBar, QToolButton
-from qgis.PyQt.QtGui import QIcon, QKeySequence, QCursor, QPixmap
-from qgis.core import *
+from qgis.PyQt.QtWidgets import QAction, QActionGroup, QApplication, QDockWidget, QMenu, QToolBar, QToolButton
+from qgis.PyQt.QtGui import QCursor, QIcon, QKeySequence, QPixmap
 
 import configparser
+import json
 import os.path
 import sys
-import random
 import webbrowser
 from collections import OrderedDict
 from functools import partial
+from json import JSONDecodeError
 
-from . import utils_giswater
 from .actions.add_layer import AddLayer
 from .actions.basic import Basic
+from .actions.check_project_result import CheckProjectResult
 from .actions.edit import Edit
 from .actions.go2epa import Go2Epa
 from .actions.master import Master
@@ -882,10 +879,7 @@ class Giswater(QObject):
             
         # Set objects for map tools classes
         self.manage_map_tools()
-
-        # Set layer custom UI forms and init function for layers 'arc', 'node', and 'connec' and 'gully'  
-        self.manage_custom_forms()
-        
+       
         # Initialize parameter 'node2arc'
         self.controller.plugin_settings_set_value("node2arc", "0")        
         
@@ -1021,51 +1015,25 @@ class Giswater(QObject):
     def manage_layers(self):
         """ Get references to project main layers """
 
-        # Initialize variables
-        self.layer_arc = None
-        self.layer_connec = None
-        self.layer_dimensions = None
-        self.layer_gully = None
-        self.layer_node = None
-
         # Check if we have any layer loaded
         layers = self.controller.get_layers()
-
         if len(layers) == 0:
             return False
 
-        # Iterate over all layers
-        for cur_layer in layers:
-
-            uri_table = self.controller.get_layer_source_table_name(cur_layer)   #@UnusedVariable
-            if uri_table:
-
-                if 'v_edit_arc' == uri_table:
-                    self.layer_arc = cur_layer
-
-                elif 'v_edit_connec' == uri_table:
-                    self.layer_connec = cur_layer
-
-                elif 'v_edit_dimensions' == uri_table:
-                    self.layer_dimensions = cur_layer
-
-                elif 'v_edit_gully' == uri_table:
-                    self.layer_gully = cur_layer
-
-                elif 'v_edit_node' == uri_table:
-                    self.layer_node = cur_layer
-
         if self.wsoftware in ('ws', 'ud'):
             QApplication.setOverrideCursor(Qt.ArrowCursor)
-            layers = self.controller.get_layers()
-            status, result = self.populate_audit_check_project(layers)
+            self.check_project_result = CheckProjectResult(self.iface, self.settings, self.controller, self.plugin_dir)
+            self.check_project_result.set_controller(self.controller)
+            status, result = self.check_project_result.populate_audit_check_project(layers, "true")
             try:
-                guided_map = result['body']['actions']['useGuideMap']
-                if guided_map:
-                    self.controller.log_info("manage_guided_map")
-                    self.manage_guided_map()
+                if 'actions' in result['body']:
+                    if 'useGuideMap' in result['body']['actions']:
+                        guided_map = result['body']['actions']['useGuideMap']
+                        if guided_map:
+                            self.controller.log_info("manage_guided_map")
+                            self.manage_guided_map()
             except Exception as e:
-                self.controller.log_info(f"EXCEPTION: {type(e).__name__} --> {e}")
+                self.controller.log_info(str(e))
             finally:
                 QApplication.restoreOverrideCursor()
                 return status
@@ -1097,46 +1065,6 @@ class Giswater(QObject):
         QgsSnappingUtils.LayerConfig(layer, snapping_type, tolerance, QgsTolerance.Pixels)
 
 
-    def manage_custom_forms(self):
-        """ Set layer custom UI form and init function """
-
-        # Set custom for layer dimensions
-        self.set_layer_custom_form_dimensions(self.layer_dimensions)                     
-
-        
-    def set_layer_custom_form_dimensions(self, layer):
- 
-        if layer is None:
-            return
-        
-        name_ui = 'dimensions.ui'
-        name_init = 'dimensions.py'
-        name_function = 'formOpen'
-        file_ui = os.path.join(self.plugin_dir, 'ui', name_ui)
-        file_init = os.path.join(self.plugin_dir, 'init', name_init)                     
-        layer.editFormConfig().setUiForm(file_ui) 
-        layer.editFormConfig().setInitCodeSource(1)
-        layer.editFormConfig().setInitFilePath(file_init)           
-        layer.editFormConfig().setInitFunction(name_function)
-        
-        if self.wsoftware == 'ws':
-            fieldname_node = "depth"
-            fieldname_connec = "depth"
-        elif self.wsoftware == 'ud':
-            fieldname_node = "ymax"
-            fieldname_connec = "connec_depth"
-
-        if self.layer_node:
-            display_field = 'depth : [% "' + fieldname_node + '" %]'
-            self.layer_node.setMapTipTemplate(display_field)
-            self.layer_node.setDisplayExpression(display_field)
-
-        if self.layer_connec:
-            display_field = 'depth : [% "' + fieldname_connec + '" %]'
-            self.layer_connec.setMapTipTemplate(display_field)
-            self.layer_connec.setDisplayExpression(display_field)
-
-    
     def manage_map_tools(self):
         """ Manage map tools """
 

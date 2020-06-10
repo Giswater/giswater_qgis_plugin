@@ -193,6 +193,11 @@ class ApiSelector(GwDialog, FORM_CLASS):
     pass
 
 
+FORM_CLASS = get_ui_class('project_check.ui')
+class ProjectCheckUi(GwDialog, FORM_CLASS):
+    pass
+
+
 FORM_CLASS = get_ui_class('api_toolbox.ui')
 class ApiDlgToolbox(GwDockWidget, FORM_CLASS):
     pass

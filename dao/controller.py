@@ -840,7 +840,55 @@ class DaoController(object):
         text = self.tr('title', context_name)
         dialog.setWindowTitle(text)
             
-            
+
+    def get_json(self, function_name, parameters=None, schema_name=None, commit=True, log_sql=False,
+                 log_result=False, json_loads=False):
+        """ Manage execution API function
+        :param function_name: Name of function to call (text)
+        :param body: Parameter for function (json)
+        :param commit: Commit sql (bool)
+        :param log_sql: Show query in qgis log (bool)
+        :return: Response of the function executed (json)
+        """
+
+        # Check if function exists
+        row = self.check_function(function_name, schema_name, commit)
+        if not row:
+            self.show_warning("Function not found in database", parameter=function_name)
+            return None
+
+        # Execute function. If failed, always log it
+        if schema_name:
+            sql = f"SELECT {schema_name}.{function_name}("
+        else:
+            sql = f"SELECT {function_name}("
+        if parameters:
+            sql += f"{parameters}"
+        sql += f");"
+
+        row = self.get_row(sql, commit=commit, log_sql=log_sql)
+        if not row or not row[0]:
+            self.log_warning(f"Function error: {function_name}")
+            self.log_warning(sql)
+            return None
+
+        # Get json result
+        if json_loads:
+            json_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+        else:
+            json_result = row[0]
+
+        # Log result
+        if log_result:
+            self.log_info(json_result, stack_level_increase=1)
+
+        # If failed, manage exception
+        if 'status' in json_result and json_result['status'] == 'Failed':
+            self.manage_exception_api(json_result, sql)
+            return False
+
+        return json_result 
+ 
     def translate_widget(self, context_name, widget):
         """ Translate widget text """
         
@@ -1211,18 +1259,18 @@ class DaoController(object):
         return row
     
     
-    def check_function(self, functionname, schemaname=None):
+    def check_function(self, function_name, schema_name=None, commit=True):
         """ Check if @function_name exists in selected schema """
 
-        if schemaname is None:
-            schemaname = self.schema_name
+        if schema_name is None:
+            schema_name = self.schema_name
 
-        schemaname = schemaname.replace('"', '')
+        schema_name = schema_name.replace('"', '')
         sql = ("SELECT routine_name FROM information_schema.routines "
                "WHERE lower(routine_schema) = %s "
                "AND lower(routine_name) = %s ")
-        params = [schemaname, functionname]
-        row = self.get_row(sql, commit=True, params=params)
+        params = [schema_name, function_name]
+        row = self.get_row(sql, params=params, commit=commit)
         return row
     
     
