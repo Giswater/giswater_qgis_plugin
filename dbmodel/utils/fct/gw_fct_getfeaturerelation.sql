@@ -199,7 +199,7 @@ BEGIN
 	v_result_info := COALESCE(v_result_info, '{}'); 
 
 	RETURN ('{"status":"Accepted", "version":'||v_version||
-            ',"message":{"priority":1, "text":""},"body":{"data": {"info":'||v_result_info||'}}}')::json;
+            ',"message":{"level":1, "text":""},"body":{"data": {"info":'||v_result_info||'}}}')::json;
 
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;

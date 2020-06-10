@@ -93,8 +93,8 @@ BEGIN
 		v_return = gw_fct_json_object_set_key(v_return, 'body', v_body);
 		v_return =  gw_fct_json_object_set_key (v_return, 'continue', false);                                
 		v_return =  gw_fct_json_object_set_key (v_return, 'steps', 0);
-		v_return = replace(v_return::text, '"message":{"priority":1, "text":"Data quality analysis done succesfully"}', 
-		'"message":{"priority":1, "text":"Inp export done succesfully"}')::json;
+		v_return = replace(v_return::text, '"message":{"level":1, "text":"Data quality analysis done succesfully"}', 
+		'"message":{"level":1, "text":"Inp export done succesfully"}')::json;
 		RETURN v_return;
 	END IF;
 
@@ -262,8 +262,8 @@ BEGIN
 	v_return = gw_fct_json_object_set_key(v_return, 'body', v_body);
 	v_return =  gw_fct_json_object_set_key (v_return, 'continue', false);                                
 	v_return =  gw_fct_json_object_set_key (v_return, 'steps', 0);
-	v_return = replace(v_return::text, '"message":{"priority":1, "text":"Data quality analysis done succesfully"}', 
-	'"message":{"priority":1, "text":"Inp export done succesfully"}')::json;
+	v_return = replace(v_return::text, '"message":{"level":1, "text":"Data quality analysis done succesfully"}', 
+	'"message":{"level":1, "text":"Inp export done succesfully"}')::json;
 
 	RETURN v_return;
 END;

@@ -162,7 +162,7 @@ BEGIN
 	v_message := COALESCE(v_message, '');
 	
 	-- Return
-	RETURN ('{"message":{"priority":"'||v_priority||'", "text":"'||v_message||'"}}');	
+	RETURN ('{"message":{"level":"'||v_priority||'", "text":"'||v_message||'"}}');	
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

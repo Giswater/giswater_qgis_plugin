@@ -94,7 +94,7 @@ BEGIN
 	EXECUTE v_querytext INTO v_response;
 
 	-- message
-	v_message := '{"priority":"0", "text":"typeahead upserted sucessfully"}';
+	v_message := '{"level":"0", "text":"typeahead upserted sucessfully"}';
 
 	-- Control NULL's
 	v_response := COALESCE(v_response, '{}');

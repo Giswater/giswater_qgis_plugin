@@ -137,7 +137,7 @@ BEGIN
 			
 	END IF;
 	
-	v_return = replace(v_return::text, '"message":{"priority":1, "text":"Data quality analysis done succesfully"}', '"message":{"priority":1, "text":"Hydrant analysis done succesfully"}')::json;
+	v_return = replace(v_return::text, '"message":{"level":1, "text":"Data quality analysis done succesfully"}', '"message":{"level":1, "text":"Hydrant analysis done succesfully"}')::json;
 	*/
 RETURN v_return;
 	

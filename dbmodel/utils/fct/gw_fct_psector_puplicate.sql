@@ -223,7 +223,7 @@ BEGIN
 
 	-- return
 	RETURN ('{"status":"Accepted", "version":'||v_version||
-            ',"message":{"priority":1, "text":""},"body":{"data": {"info":'||v_result_info||'}}}')::json;
+            ',"message":{"level":1, "text":""},"body":{"data": {"info":'||v_result_info||'}}}')::json;
 
 	-- manage exceptions
 	EXCEPTION WHEN OTHERS THEN

@@ -108,7 +108,7 @@ BEGIN
 	v_result_line := COALESCE(v_result_line, '{}'); 
 
 	--  Return
-	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
+	RETURN ('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 				'"line":'||v_result_line||','||

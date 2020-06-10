@@ -86,7 +86,7 @@ BEGIN
 		v_result_info := COALESCE(v_result_info, '{}'); 
 		
 		--  Return
-		RETURN ('{"status":"Accepted", "message":{"priority":3, "text":"Mapzones dynamic analysis canceled. Data is not ready to work with"}, "version":"'||v_version||'"'||
+		RETURN ('{"status":"Accepted", "message":{"level":3, "text":"Mapzones dynamic analysis canceled. Data is not ready to work with"}, "version":"'||v_version||'"'||
 		',"body":{"form":{}, "data":{ "info":'||v_result_info||'}}}')::json;	
 	END IF;
  
@@ -197,7 +197,7 @@ BEGIN
 	v_result_polygon := COALESCE(v_result_polygon, '{}');
 	
 	--  Return
-	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Mincut massive process done succesfully"}, "version":"'||v_version||'"'||
+	RETURN ('{"status":"Accepted", "message":{"level":1, "text":"Mincut massive process done succesfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 				'"point":'||v_result_point||','||

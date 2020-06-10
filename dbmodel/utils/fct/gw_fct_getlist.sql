@@ -460,7 +460,7 @@ BEGIN
 	v_pageinfo := COALESCE(v_pageinfo, '{}');
 
 	-- Return
-    RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "version":'||v_version||
+    RETURN ('{"status":"Accepted", "message":{"level":1, "text":"This is a test message"}, "version":'||v_version||
              ',"body":{"form":{}'||
 		     ',"feature":{"featureType":"' || v_featuretype || '","tableName":"' || v_tablename ||'","idName":"'|| v_idname ||'"}'||
 		     ',"data":{"fields":' || v_fields_json ||

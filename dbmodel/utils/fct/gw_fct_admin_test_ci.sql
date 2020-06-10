@@ -278,7 +278,7 @@ BEGIN
 	v_result_info := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
 	
-    RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Test fct done successfully"}, "version":"'||v_version||'"'||
+    RETURN ('{"status":"Accepted", "message":{"level":1, "text":"Test fct done successfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||
 		       '}}'||

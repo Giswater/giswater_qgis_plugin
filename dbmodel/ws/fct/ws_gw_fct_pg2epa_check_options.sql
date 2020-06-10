@@ -56,7 +56,7 @@ BEGIN
 			VALUES (v_fid, v_result_id, 3, concat('ERROR: The pattern method used, it is incompatible with the export network mode used'));
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, v_result_id, 3, 'Change the pattern method using some of the (PJOINT) method avaliable or change export network USING some of TRIMED ARCS method avaliable.');
-			v_return = '{"status":"Failed", "message":{"priority":1, "text":"Pattern method and network mode are incompatibles. The process is aborted...."},"body":{"data":{}}}';
+			v_return = '{"status":"Failed", "message":{"level":1, "text":"Pattern method and network mode are incompatibles. The process is aborted...."},"body":{"data":{}}}';
 		END IF;
 
 	ELSIF v_networkmode IN (3,4) THEN
@@ -66,7 +66,7 @@ BEGIN
 			VALUES (v_fid, v_result_id, 3, concat('ERROR: The pattern method used, it is incompatible with the export network mode used'));
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, v_result_id, 3, 'Change the pattern method using some of the (NODE) method avaliable or change export network USING some of NOT TRIMED ARCS method avaliable.');
-			v_return = '{"status":"Failed", "message":{"priority":1, "text":"Pattern method and network mode are incompatibles. The process is aborted...."},"body":{"data":{}}}'; 
+			v_return = '{"status":"Failed", "message":{"level":1, "text":"Pattern method and network mode are incompatibles. The process is aborted...."},"body":{"data":{}}}'; 
 		END IF;
 	END IF;
 

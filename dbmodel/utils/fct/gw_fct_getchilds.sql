@@ -197,7 +197,7 @@ BEGIN
 	-- Convert to json
     v_fields := array_to_json(v_combo_rows_child);
 
-    v_message := '{"priority":"0", "text":"Childs update successfully"}';
+    v_message := '{"level":"0", "text":"Childs update successfully"}';
 
 	--  Control NULL's
 	v_message := COALESCE(v_message, '[]');

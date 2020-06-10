@@ -411,7 +411,7 @@ BEGIN
 	------------------------------
 	IF v_tablename IS NULL THEN 
 
-		v_message='{"priority":2, "text":"The API is bad configured. Please take a look on table config layers (config_info_layer_x_type or config_info_layer)", "results":0}';
+		v_message='{"level":2, "text":"The API is bad configured. Please take a look on table config layers (config_info_layer_x_type or config_info_layer)", "results":0}';
 	
 	ELSIF v_tablename IS NOT NULL THEN 
 

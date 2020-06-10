@@ -194,7 +194,7 @@ BEGIN
 		v_result_info := COALESCE(v_result_info, '{}'); 
 		
 		--  Return
-		RETURN ('{"status":"Accepted", "message":{"priority":3, "text":"Mapzones dynamic analysis canceled. Data is not ready to work with"}, "version":"'||v_version||'"'||
+		RETURN ('{"status":"Accepted", "message":{"level":3, "text":"Mapzones dynamic analysis canceled. Data is not ready to work with"}, "version":"'||v_version||'"'||
 		',"body":{"form":{}, "data":{ "info":'||v_result_info||'}}}')::json;	
 	END IF;
 

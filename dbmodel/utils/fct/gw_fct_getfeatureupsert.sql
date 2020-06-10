@@ -619,7 +619,7 @@ BEGIN
 		RETURN v_fields;
 	ELSE 
 		RETURN ('{"status":"Failed" '||
-			',"message":{"priority":2, "text":"'||v_message||'"}'||
+			',"message":{"level":2, "text":"'||v_message||'"}'||
 			',"apiVersion":'||v_version||
 			',"body":{'||
 				'"form":{}'||

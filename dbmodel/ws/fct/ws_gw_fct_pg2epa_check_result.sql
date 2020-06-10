@@ -97,7 +97,7 @@ BEGIN
 	IF (SELECT result_id FROM rpt_cat_result WHERE result_id=v_result_id) IS NULL THEN
 		v_result  = (SELECT array_to_json(array_agg(row_to_json(row))) FROM (SELECT 1::integer as id, 'No result found whith this name....' as  message)row);
 		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-		RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"No result found"}, "version":"'||v_version||'"'||
+		RETURN ('{"status":"Accepted", "message":{"level":1, "text":"No result found"}, "version":"'||v_version||'"'||
 			',"body":{"form":{}, "data":{"info":'||v_result_info||',"setVisibleLayers":[] }}}')::json;		
 	END IF; 
 			
@@ -522,7 +522,7 @@ BEGIN
 	v_result_point := COALESCE(v_result_point, '{}'); 
 
 	--  Return
-	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
+	RETURN ('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
 		',"body":{"form":{}'||
 			',"data":{"options":'||v_options||','||
 				'"info":'||v_result_info||','||

@@ -204,7 +204,7 @@ BEGIN
 	v_result_point = '{"geometryType":"", "features":[]}';
 
 	-- Return
-    RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Insert import dxf done succesfully"}, "version":"'||v_version||'"'||
+    RETURN ('{"status":"Accepted", "message":{"level":1, "text":"Insert import dxf done succesfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 		     	'"setVisibleLayers":[]'||','||
