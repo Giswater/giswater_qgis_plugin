@@ -281,6 +281,12 @@ class ApiSearch(ApiParent):
             combo = combo_list[0]
             id = utils_giswater.get_item_data(self.dlg_search, combo, 0)
             name = utils_giswater.get_item_data(self.dlg_search, combo, 1)
+            try:
+                feature_type = utils_giswater.get_item_data(self.dlg_search, combo, 2)
+                print(feature_type)
+                extras_search += f'"featureType":"{feature_type}", '
+            except:
+                pass
             extras_search += f'"{combo.property("columnname")}":{{"id":"{id}", "name":"{name}"}}, '
             extras_search_add += f'"{combo.property("columnname")}":{{"id":"{id}", "name":"{name}"}}, '
         if line_list:
@@ -295,7 +301,7 @@ class ApiSearch(ApiParent):
             
             qgis_project_add_schema = self.controller.plugin_settings_value('gwAddSchema')
             extras_search += f'"{line_edit.property("columnname")}":{{"text":"{value}"}}, '
-            extras_search += f'"addSchema":"{qgis_project_add_schema}", "featureType":"arc"'
+            extras_search += f'"addSchema":"{qgis_project_add_schema}"'
             extras_search_add += f'"{line_edit.property("columnname")}":{{"text":"{value}"}}'
             body = self.create_body(form=form_search, extras=extras_search)
             result = self.controller.get_json('gw_fct_setsearch', body, log_sql=True)
@@ -380,7 +386,10 @@ class ApiSearch(ApiParent):
         combolist = []
         if 'comboIds' in field:
             for i in range(0, len(field['comboIds'])):
-                elem = [field['comboIds'][i], field['comboNames'][i]]
+                if 'comboFeature' in field:
+                    elem = [field['comboIds'][i], field['comboNames'][i], field['comboFeature'][i]]
+                else:
+                    elem = [field['comboIds'][i], field['comboNames'][i]]
                 combolist.append(elem)
         records_sorted = sorted(combolist, key=operator.itemgetter(1))
 
