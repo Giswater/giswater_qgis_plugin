@@ -404,7 +404,9 @@ class ReplaceFeatureMapTool(ParentMapTool):
             layer = self.snapper_manager.get_snapped_layer(result)
             tablename = self.controller.get_layer_source_table_name(layer)
 			
-            if 'arc' in tablename:
+            strings =('_node', '_connec', '_gully')
+			
+            if tablename in strings:
                 result = self.snapper_manager.snap_to_current_layer(event_point)
                 snapped_feat = self.snapper_manager.get_snapped_feature(result)
                 if snapped_feat:
