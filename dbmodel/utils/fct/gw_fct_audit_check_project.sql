@@ -225,12 +225,17 @@ BEGIN
 	-- delete on config_param_user fron updated values on sys_param_user
 	DELETE FROM config_param_user WHERE parameter NOT IN (SELECT id FROM sys_param_user) AND cur_user = current_user;
 
-	-- Force exploitation selector in case of null values
-	IF (SELECT count(*) FROM selector_expl WHERE cur_user=current_user) < 1 THEN 
-	  	INSERT INTO selector_expl (expl_id, cur_user) 
-	  	SELECT expl_id, current_user FROM exploitation WHERE active IS NOT FALSE AND expl_id > 0 limit 1;
-		v_errortext=concat('Set visible exploitation for user ',(SELECT expl_id FROM exploitation WHERE active IS NOT FALSE AND expl_id > 0 limit 1));
-		INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
+	-- reset all exploitations
+	IF v_qgis_init_guide_map THEN
+		DELETE FROM selector_expl WHERE cur_user = current_user;
+	ELSE
+		-- Force exploitation selector in case of null values
+		IF (SELECT count(*) FROM selector_expl WHERE cur_user=current_user) < 1 THEN 
+			INSERT INTO selector_expl (expl_id, cur_user) 
+			SELECT expl_id, current_user FROM exploitation WHERE active IS NOT FALSE AND expl_id > 0 limit 1;
+			v_errortext=concat('Set visible exploitation for user ',(SELECT expl_id FROM exploitation WHERE active IS NOT FALSE AND expl_id > 0 limit 1));
+			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) VALUES (101, 4, v_errortext);
+		END IF;
 	END IF;
 
 	-- Force state selector in case of null values
