@@ -692,7 +692,7 @@ class ApiSearch(ApiParent):
         self.set_table_columns(dialog, qtable, table_name)
 
 
-    def workcat_fill_table(self, widget, table_name, hidde=False, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
+    def workcat_fill_table(self, widget, table_name, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
         """ Fill table @widget filtering query by @workcat_id
         Set a model with selected filter.
         Attach that model to selected table
@@ -722,9 +722,6 @@ class ApiSearch(ApiParent):
             widget.model().setFilter(expr)
         else:
             widget.setModel(model)
-
-        if hidde:
-            self.refresh_table(widget)
 
 
     def open_feature_form(self, qtable):
