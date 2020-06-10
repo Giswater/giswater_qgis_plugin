@@ -210,7 +210,7 @@ class MincutParent(ParentAction):
     def set_signals(self):
 
         if self.controller.dlg_docker:
-            self.dlg_mincut.btn_cancel.clicked.connect(self.controller.close_docker)
+            self.dlg_mincut.dlg_closed.connect(self.controller.close_docker)
 
         self.dlg_mincut.btn_accept.clicked.connect(self.accept_save_data)
         self.dlg_mincut.btn_cancel.clicked.connect(self.mincut_close)
