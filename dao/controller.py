@@ -12,8 +12,11 @@ from qgis.PyQt.QtWidgets import QCheckBox, QLabel, QMessageBox, QPushButton, QTa
 from qgis.PyQt.QtSql import QSqlDatabase
 
 import configparser
+import inspect
 import json
 import os
+import sys
+import traceback
 
 from collections import OrderedDict
 from functools import partial
