@@ -55,7 +55,7 @@ BEGIN
 	
 	-- get expl from muni
 	IF v_selectortype = 'explfrommuni' THEN
-		v_expl = (SELECT expl_id FROM exploitation e, ext_municipality m WHERE st_dwithin(st_centroid(e.the_geom), m.the_geom, 0) AND muni_id = v_id);
+		v_expl = (SELECT expl_id FROM exploitation e, ext_municipality m WHERE st_dwithin(st_centroid(e.the_geom), m.the_geom, 0) AND muni_id::text = v_id::text);
 		EXECUTE 'DELETE FROM selector_expl WHERE cur_user = current_user';
 		EXECUTE 'INSERT INTO selector_expl (expl_id, cur_user) VALUES('|| v_expl ||', '''|| current_user ||''')';	
 	END IF;
@@ -72,8 +72,6 @@ BEGIN
 		EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE ' || v_columnname || ' = '|| v_id ||'';
 	END IF;
 
-/*
-	-- todo: implement multi selection and manage additional schema
 	-- manage add schema
 	IF v_addschema IS NOT NULL THEN
 
@@ -97,8 +95,7 @@ BEGIN
 		SET search_path = SCHEMA_NAME, public;
 
 	END IF;
-
-*/
+	
 	-- Return
 	RETURN ('{"status":"Accepted", "version":'||v_version||
 			',"body":{"message":{"priority":1, "text":"This is a test message"}'||
@@ -110,8 +107,8 @@ BEGIN
 			}}}'||'}')::json;
 
 	-- Exception handling
-	--EXCEPTION WHEN OTHERS THEN
-	--RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	EXCEPTION WHEN OTHERS THEN
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 	
 END;
 $BODY$
