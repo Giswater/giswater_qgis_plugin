@@ -6,15 +6,18 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsEditorWidgetSetup, QgsExpressionContextUtils, QgsFieldConstraints, QgsPointLocator, \
-    QgsProject, QgsSnappingUtils, QgsTolerance
+from qgis.core import QgsCategorizedSymbolRenderer, QgsEditorWidgetSetup, QgsExpressionContextUtils, \
+    QgsFieldConstraints, QgsPointLocator, QgsProject, QgsRendererCategory, QgsSimpleFillSymbolLayer, QgsSnappingUtils, \
+    QgsSymbol, QgsTolerance
 from qgis.PyQt.QtCore import QObject, QPoint, QSettings, Qt
-from qgis.PyQt.QtWidgets import QAction, QActionGroup, QApplication, QDockWidget, QMenu, QToolBar, QToolButton
+from qgis.PyQt.QtWidgets import QAction, QActionGroup, QApplication, QCheckBox, QDockWidget, QGridLayout, QLabel,\
+    QMenu, QSizePolicy, QToolBar, QToolButton
 from qgis.PyQt.QtGui import QCursor, QIcon, QKeySequence, QPixmap
 
 import configparser
 import json
 import os.path
+import random
 import sys
 import webbrowser
 from collections import OrderedDict
@@ -50,6 +53,7 @@ from .map_tools.open_visit import OpenVisit
 from .models.plugin_toolbar import PluginToolbar
 from .models.sys_feature_cat import SysFeatureCat
 from .ui_manager import AuditCheckProjectResult, BasicInfo
+
 
 class Giswater(QObject):  
     
@@ -242,7 +246,8 @@ class Giswater(QObject):
         self.manage_map_tool(index_action, function_name)        
             
         return action
-      
+
+
     def manage_dropdown_menu(self, action, index_action):
         """ Create dropdown menu for insert management of nodes and arcs """
 
@@ -368,6 +373,7 @@ class Giswater(QObject):
         """ Manage actions of the common plugin toolbars """
         self.toolbar_basic()
         self.toolbar_utils()
+
 
     def toolbar_basic(self, x=None, y=None):
         """ Function called in def manage_toolbars(...)
@@ -911,7 +917,7 @@ class Giswater(QObject):
 
         # Put add layers button into toc
         self.add_layers_button()
-		
+
         # call dynamic mapzones repaint
         row = self.controller.get_config('mapzones_dynamic_symbology', 'value', 'config_param_system')
         if row and row[0].lower() == 'true':
@@ -1165,7 +1171,7 @@ class Giswater(QObject):
         body = self.create_body(extras=extras)
         sql = f"SELECT gw_fct_audit_check_project($${{{body}}}$$)::text"
         row = self.controller.get_row(sql, commit=True, log_sql=True)
-		
+
         if not row:
             return False, None
 
@@ -1223,6 +1229,7 @@ class Giswater(QObject):
         cursor = self.get_cursor_multiple_selection()
         if cursor:
             self.iface.mapCanvas().setCursor(cursor)
+
 
     def selection_changed(self):
         """ Get selected expl_id and execute function setselectors """
@@ -1604,10 +1611,11 @@ class Giswater(QObject):
 
         lyr = self.controller.get_layer_by_tablename(layer)
         if lyr:
-            # get unique values
+            # Get unique values
             fni = lyr.fields().indexFromName(column)
             unique_ids = lyr.dataProvider().uniqueValues(fni)
-            #get number of unique values
+
+            # Get number of unique values
             totalval = len(sorted(list(lyr.uniqueValues(fni))))
 
             categories = []
@@ -1638,31 +1646,33 @@ class Giswater(QObject):
             # repaint layer
             lyr.triggerRepaint()
 
+
     def check_layers_from_distinct_schema(self):
-            layers = self.controller.get_layers()
-            repeated_layers = {}
-            for layer in layers:
-                layer_toc_name = self.controller.get_layer_source_table_name(layer)
-                if layer_toc_name == 'v_edit_node':
-                    layer_source = self.controller.get_layer_source(layer)
-                    repeated_layers[layer_source['schema'].replace('"', '')] = 'v_edit_node'
 
-            if len(repeated_layers) > 1:
-                if self.qgis_project_main_schema is None or self.qgis_project_add_schema is None:
-                    self.dlg_dtext = BasicInfo()
-                    self.dlg_dtext.btn_accept.hide()
-                    self.dlg_dtext.btn_close.clicked.connect(lambda: self.dlg_dtext.close())
-                    msg = "QGIS project has more than one layer v_edit_node comming from differents schemas. " \
-                          "If you are looking for manage two schemas, it is mandatory to define wich is the master and " \
-                          "wich is the other one. To do this you need to configure the QGIS project setting this project " \
-                          "variables: gwMainSchema and gwAddSchema."
+        layers = self.controller.get_layers()
+        repeated_layers = {}
+        for layer in layers:
+            layer_toc_name = self.controller.get_layer_source_table_name(layer)
+            if layer_toc_name == 'v_edit_node':
+                layer_source = self.controller.get_layer_source(layer)
+                repeated_layers[layer_source['schema'].replace('"', '')] = 'v_edit_node'
 
-                    self.dlg_dtext.txt_infolog.setText(msg)
-                    self.dlg_dtext.open()
-                    return False
+        if len(repeated_layers) > 1:
+            if self.qgis_project_main_schema is None or self.qgis_project_add_schema is None:
+                self.dlg_dtext = BasicInfo()
+                self.dlg_dtext.btn_accept.hide()
+                self.dlg_dtext.btn_close.clicked.connect(lambda: self.dlg_dtext.close())
+                msg = "QGIS project has more than one layer v_edit_node comming from differents schemas. " \
+                      "If you are looking for manage two schemas, it is mandatory to define wich is the master and " \
+                      "wich is the other one. To do this you need to configure the QGIS project setting this project " \
+                      "variables: gwMainSchema and gwAddSchema."
 
-                # If there are layers with a different scheme, the one that the user has in the project variable
-                # self.qgis_project_main_schema is taken as the schema_name.
-                self.schema_name = self.qgis_project_main_schema
-                self.controller.set_schema_name(self.qgis_project_main_schema)
-            return True
+                self.dlg_dtext.txt_infolog.setText(msg)
+                self.dlg_dtext.open()
+                return False
+
+            # If there are layers with a different scheme, the one that the user has in the project variable
+            # self.qgis_project_main_schema is taken as the schema_name.
+            self.schema_name = self.qgis_project_main_schema
+            self.controller.set_schema_name(self.qgis_project_main_schema)
+        return True
