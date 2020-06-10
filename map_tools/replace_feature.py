@@ -446,6 +446,8 @@ class ReplaceFeatureMapTool(ParentMapTool):
         self.snapper_manager.snap_to_node()
         self.snapper_manager.snap_to_connec_gully()
 
+        self.snapper_manager.set_snapping_mode()
+
         # Change cursor
         self.canvas.setCursor(self.cursor)
 
