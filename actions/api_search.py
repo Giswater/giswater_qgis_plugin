@@ -170,7 +170,7 @@ class ApiSearch(ApiParent):
             self.controller.log_info("network")
             self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, tab_type='data')
             complet_result, dialog = self.ApiCF.open_form(table_name=item['sys_table_id'], feature_id=item['sys_id'],
-                tab_type='data')
+                                                          tab_type='data')
             if not complet_result:
                 return
             self.draw(complet_result)
@@ -283,9 +283,8 @@ class ApiSearch(ApiParent):
             name = utils_giswater.get_item_data(self.dlg_search, combo, 1)
             try:
                 feature_type = utils_giswater.get_item_data(self.dlg_search, combo, 2)
-                print(feature_type)
                 extras_search += f'"featureType":"{feature_type}", '
-            except:
+            except IndexError:
                 pass
             extras_search += f'"{combo.property("columnname")}":{{"id":"{id}", "name":"{name}"}}, '
             extras_search_add += f'"{combo.property("columnname")}":{{"id":"{id}", "name":"{name}"}}, '
@@ -432,7 +431,7 @@ class ApiSearch(ApiParent):
 
         workcat_id = item['sys_id']
         field_id = item['filter_text']
-        display_name = item ['display_name']
+        display_name = item['display_name']
 
         if workcat_id is None:
             return False
@@ -476,7 +475,7 @@ class ApiSearch(ApiParent):
         table_name = "v_ui_workcat_x_feature"
         table_name_end = "v_ui_workcat_x_feature_end"
         table_doc = "v_ui_doc_x_workcat"
-        self.items_dialog.btn_doc_insert.clicked.connect(partial(self.document_insert, self.items_dialog, 'doc_x_workcat', 'workcat_id' ,item ['sys_id']))
+        self.items_dialog.btn_doc_insert.clicked.connect(partial(self.document_insert, self.items_dialog, 'doc_x_workcat', 'workcat_id' ,item['sys_id']))
         self.items_dialog.btn_doc_delete.clicked.connect(partial(self.document_delete, self.items_dialog.tbl_document, 'doc_x_workcat'))
         self.items_dialog.btn_doc_new.clicked.connect(partial(self.manage_document, self.items_dialog.tbl_document, item ['sys_id']))
         self.items_dialog.btn_open_doc.clicked.connect(partial(self.document_open, self.items_dialog.tbl_document))
@@ -800,13 +799,12 @@ class ApiSearch(ApiParent):
                         length = length + row[0]
                     else:
                         message = "Some data is missing. Check gis_length for arc"
-                        self.controller.show_warning(message, parameter = arc_id)
+                        self.controller.show_warning(message, parameter=arc_id)
                         return
-                if extension is not  None:
+                if extension is not None:
                     widget = self.items_dialog.findChild(QLabel, f"lbl_length{extension}")
                 else:
                     widget = self.items_dialog.findChild(QLabel, "lbl_length")
 
                 # Add data to workcat search form
                 widget.setText(f"Total arcs length: {length}")
-
