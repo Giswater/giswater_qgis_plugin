@@ -1221,6 +1221,7 @@ class Giswater(QObject):
             return
 
         self.iface.setActiveLayer(self.layer_expl)
+        self.controller.set_layer_visible(self.layer_expl)
         self.layer_expl.selectAll()
         self.iface.actionZoomToSelected().trigger()
         self.layer_expl.removeSelection()
