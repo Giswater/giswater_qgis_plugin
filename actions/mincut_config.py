@@ -241,8 +241,6 @@ class MincutConfig(ParentAction):
         self.load_settings(self.dlg_selector)
         self.dlg_selector.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_selector))
         self.dlg_selector.rejected.connect(partial(self.save_settings, self.dlg_selector))
-        self.dlg_selector.txt_filter.textChanged.connect(
-            partial(self.api_parent.get_selector, self.dlg_selector, selector_values, filter=True))
 
         self.api_parent.get_selector(self.dlg_selector, selector_values)
 
