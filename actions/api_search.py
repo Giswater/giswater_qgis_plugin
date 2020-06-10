@@ -487,7 +487,7 @@ class ApiSearch(ApiParent):
         self.items_dialog.rejected.connect(partial(self.resetRubberbands))
         self.items_dialog.btn_state1.clicked.connect(partial(self.force_state, self.items_dialog.btn_state1, 1, self.items_dialog.tbl_psm))
         self.items_dialog.btn_state0.clicked.connect(partial(self.force_state, self.items_dialog.btn_state0, 0, self.items_dialog.tbl_psm_end))
-        self.items_dialog.export_to_csv.clicked.connect(
+        self.items_dialog.btn_export_to_csv.clicked.connect(
             partial(self.export_to_csv, self.items_dialog, self.items_dialog.tbl_psm, self.items_dialog.tbl_psm_end,
                     self.items_dialog.txt_path))
 
