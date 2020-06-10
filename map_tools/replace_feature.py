@@ -403,16 +403,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
         if snapped_feat:
             layer = self.snapper_manager.get_snapped_layer(result)
             tablename = self.controller.get_layer_source_table_name(layer)
-			
-            strings =('_node', '_connec', '_gully')
-			
-            if tablename in strings:
-                result = self.snapper_manager.snap_to_current_layer(event_point)
-                snapped_feat = self.snapper_manager.get_snapped_feature(result)
-                if snapped_feat:
-                    layer = self.snapper_manager.get_snapped_layer(result)
-                    tablename = self.controller.get_layer_source_table_name(layer)
-			
+
             if tablename and 'v_edit' in tablename:
                 if tablename == 'v_edit_node':
                     self.geom_type = 'node'
@@ -430,8 +421,8 @@ class ReplaceFeatureMapTool(ParentMapTool):
 
 
     def activate(self):
-	
-		#set active and current layer
+
+        # Set active and current layer
         self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
         self.iface.setActiveLayer(self.layer_node)
         self.current_layer = self.layer_node
@@ -451,6 +442,8 @@ class ReplaceFeatureMapTool(ParentMapTool):
         # Set snapping to 'node', 'connec' and 'gully'
         self.snapper_manager.snap_to_node()
         self.snapper_manager.snap_to_connec_gully()
+
+        self.snapper_manager.set_snapping_mode()
 
         # Change cursor
         self.canvas.setCursor(self.cursor)

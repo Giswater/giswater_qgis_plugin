@@ -98,6 +98,20 @@ class SnappingConfigManager(object):
         QgsProject.instance().snappingConfigChanged.emit(self.snapping_config)
 
 
+    def set_snapping_mode(self, mode=3):
+        """ Defines on which layer the snapping is performed
+        :param mode: 1 = ActiveLayer, 2=AllLayers, 3=AdvancedConfiguration (SnappingMode)
+        """
+
+        snapping_options = self.get_snapping_options()
+        if snapping_options:
+            QgsProject.instance().blockSignals(True)
+            snapping_options.setMode(mode)
+            QgsProject.instance().setSnappingConfig(snapping_options)
+            QgsProject.instance().blockSignals(False)
+            QgsProject.instance().snappingConfigChanged.emit(snapping_options)
+
+
     def snap_to_arc(self):
         """ Set snapping to 'arc' """
 
