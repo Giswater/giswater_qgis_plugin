@@ -5,7 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer
+from qgis.core import QgsCategorizedSymbolRenderer, QgsRendererCategory, QgsSimpleFillSymbolLayer, QgsSymbol
 
 import os
 import random
@@ -55,8 +55,8 @@ class Basic(ApiParent):
             self.dlg_selector.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_selector))
             self.dlg_selector.rejected.connect(partial(self.save_settings, self.dlg_selector))
             self.open_dialog(self.dlg_selector, dlg_name='selector', maximize_button=False)
-		
-        # repaint mapzones and refresh canvas
+
+        # Repaint mapzones and refresh canvas
         self.set_mapzones_style()
         self.refresh_map_canvas()
 
@@ -73,18 +73,18 @@ class Basic(ApiParent):
 
             for mapzone in json_return['body']['data']['mapzones']:
 
-                #loop for each mapzone returned on json
+                # Loop for each mapzone returned on json
                 lyr = self.controller.get_layer_by_tablename(mapzone['layer'])
                 categories = []
 
                 if lyr:
-                    #loop for each id returned on json
+                    # Loop for each id returned on json
                     for id in mapzone['values']:
                         # initialize the default symbol for this geometry type
                         symbol = QgsSymbol.defaultSymbol(lyr.geometryType())
                         symbol.setOpacity(float(mapzone['opacity']))
 
-                        #setting color
+                        # Setting color
                         try:
                             R = id['stylesheet']['color'][0]
                             G = id['stylesheet']['color'][1]
@@ -94,13 +94,12 @@ class Basic(ApiParent):
                             G = random.randint(0, 255)
                             B = random.randint(0, 255)
 
-                        #setting sytle
-                        layer_style = {}
-                        layer_style['color'] = '{}, {}, {}'.format(int(R), int(G), int(B))
-                        symbolLayer = QgsSimpleFillSymbolLayer.create(layer_style)
+                        # Setting sytle
+                        layer_style = {'color': '{}, {}, {}'.format(int(R), int(G), int(B))}
+                        symbol_layer = QgsSimpleFillSymbolLayer.create(layer_style)
 
-                        if symbolLayer is not None:
-                            symbol.changeSymbolLayer(0, symbolLayer)
+                        if symbol_layer is not None:
+                            symbol.changeSymbolLayer(0, symbol_layer)
                         category = QgsRendererCategory(id['id'], symbol, str(id['id']))
                         categories.append(category)
 
