@@ -14,17 +14,14 @@ $BODY$
 -- TODO: Implementar el threshold per a tots els widgets igual que està en la 3.1
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_getsearch($${
-"client":{"device":4, "infoType":1, "lang":"ES"}
-}$$)
-
+SELECT gw_fct_getsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}}$$)
 SELECT gw_fct_getsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"addSchema":"SCHEMA_NAME", "filterFields":{}, "pageInfo":{}}}$$);
+SELECT gw_fct_getsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"singleTab":"tab_address"}, "feature":{}, "data":{"addSchema":"SCHEMA_NAME", "filterFields":{}, "pageInfo":{}}}$$);
 
 MAIN ISSUES
 -----------
 - basic_search_network is key issue to define variables on config_param_system to searh anything you want
-
-
+- it is possible to get only one tab. values are: singleTab: (tab_network, tab_address, tab_search, tab_hydro, tab_workcat, tab_visit, tab_psector)
 */
 
 DECLARE
@@ -59,6 +56,7 @@ v_search_muni_id_field text;
 v_search_muni_search_field text;
 v_search_muni_geom_field text; 
 v_addschema text;
+v_singletab text;
 
 BEGIN
 
@@ -71,6 +69,12 @@ BEGIN
 
         -- get values from input
         v_addschema = (p_data ->>'data')::json->>'addSchema';
+        v_singletab = (p_data ->>'form')::json->>'singleTab';
+
+	-- profilactic control for singletab
+        IF v_singletab = '' then v_singletab = null; end if;
+
+        raise notice 'v_singletab %',v_singletab;
         
 	-- Create tabs array
 	v_form := '[';
@@ -78,8 +82,7 @@ BEGIN
 	-- Network Tab
 	-------------------------
 	SELECT * INTO rec_tab FROM config_form_tabs WHERE formname='search' AND tabname='tab_network' ;
-	
-	IF rec_tab.formname IS NOT NULL THEN
+	IF (rec_tab.formname IS NOT NULL AND v_singletab IS NULL) OR v_singletab = 'tab_network' THEN
 
 		-- Init combo json
 		SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND columnname='net_type';
@@ -132,7 +135,7 @@ BEGIN
 		v_active :=FALSE;
 	END IF;
 
-	IF v_addschema IS NOT NULL THEN
+	IF v_addschema IS NOT NULL AND v_singletab IS NULL THEN
 
 		-- Init combo json
 		EXECUTE 'SELECT * FROM '||v_addschema||'.config_form_fields WHERE formname=''search'' AND columnname=''net_type'''
@@ -189,7 +192,7 @@ BEGIN
 	-- Search tab
 	-------------
 	SELECT * INTO rec_tab FROM config_form_tabs WHERE formname='search' AND tabname='tab_search' ;
-	IF rec_tab.formname IS NOT NULL THEN
+	IF (rec_tab.formname IS NOT NULL AND v_singletab IS NULL) OR v_singletab = 'tab_search' THEN
     
 		-- Create search field
 		SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND columnname='generic_search';
@@ -218,7 +221,7 @@ BEGIN
 	-- Address tab
 	-------------
 	SELECT * INTO rec_tab FROM config_form_tabs WHERE formname='search' AND tabname='tab_address' ;
-	IF rec_tab.formname IS NOT NULL THEN
+	IF (rec_tab.formname IS NOT NULL AND v_singletab IS NULL) OR v_singletab = 'tab_address' THEN
 
 		-- Parameters of the municipality layer
 		SELECT ((value::json)->>'sys_table_id') INTO v_search_muni_table FROM config_param_system WHERE parameter='basic_search_muni';
@@ -294,7 +297,7 @@ BEGIN
 	-- Hydro tab
 	------------
 	SELECT * INTO rec_tab FROM config_form_tabs WHERE formname='search' AND tabname='tab_hydro' ;
-	IF rec_tab.formname IS NOT NULL THEN
+	IF (rec_tab.formname IS NOT NULL AND v_singletab IS NULL) OR v_singletab = 'tab_hydro' THEN
 
 		-- Init combo json
 		SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND columnname='hydro_expl';
@@ -358,7 +361,7 @@ BEGIN
 	-- Workcat tab
 	--------------
 	SELECT * INTO rec_tab FROM config_form_tabs WHERE formname='search' AND tabname='tab_workcat' ;
-	IF rec_tab.formname IS NOT NULL THEN
+	IF (rec_tab.formname IS NOT NULL AND v_singletab IS NULL) OR v_singletab = 'tab_workcat' THEN
 
 		-- Add edit box to introduce search text
 		SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND columnname='workcat_search';
@@ -389,7 +392,7 @@ BEGIN
 	-- Psector tab
 	--------------
 	SELECT * INTO rec_tab FROM config_form_tabs WHERE formname='search' AND tabname='tab_psector' ;
-	IF rec_tab.formname IS NOT NULL THEN
+	IF (rec_tab.formname IS NOT NULL AND v_singletab IS NULL) OR v_singletab = 'tab_psector' THEN
 
 		-- Init combo json
 		SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND columnname='psector_expl';
@@ -443,14 +446,12 @@ BEGIN
 			formPsector := gw_fct_json_object_set_key(formPsector, 'fields', fieldsJson);
 			v_form := v_form || formPsector::text;
 		END IF;
-
 	END IF;
-
 
 	-- Visit tab
 	--------------
 	SELECT * INTO rec_tab FROM config_form_tabs WHERE formname='search' AND tabname='tab_visit' ;
-	IF rec_tab.formname IS NOT NULL THEN
+	IF (rec_tab.formname IS NOT NULL AND v_singletab IS NULL) OR v_singletab = 'tab_visit' THEN
 
 		-- Add edit box to introduce search text
 		SELECT * INTO rec_fields FROM config_form_fields WHERE formname='search' AND columnname='visit_search';
