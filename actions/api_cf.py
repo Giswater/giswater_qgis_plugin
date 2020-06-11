@@ -29,6 +29,7 @@ from .manage_gallery import ManageGallery
 from .manage_visit import ManageVisit
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 from ..ui_manager import ApiBasicInfo, ApiCfUi, EventFull, LoadDocuments, Sections
+from ..actions.api_dimensioning import ApiDimensioning
 
 
 class ApiCF(ApiParent, QObject):
@@ -292,6 +293,15 @@ class ApiCF(ApiParent, QObject):
 
         if self.complet_result[0]['body']['form']['template'] == 'GENERIC':
             result, dialog = self.open_generic_form(self.complet_result)
+            # Fill self.my_json for new feature
+            if feature_cat is not None:
+                self.manage_new_feature(self.complet_result, dialog)
+            return result, dialog
+
+
+        elif self.complet_result[0]['body']['form']['template'] == 'dimensioning':
+            self.api_dim = ApiDimensioning(self.iface, self.settings, self.controller, self.plugin_dir)
+            result, dialog = self.api_dim.open_form('5', 'v_edit_dimensions', '3')
             # Fill self.my_json for new feature
             if feature_cat is not None:
                 self.manage_new_feature(self.complet_result, dialog)
