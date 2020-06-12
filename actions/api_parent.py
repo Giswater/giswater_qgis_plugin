@@ -191,17 +191,6 @@ class ApiParent(ParentAction):
                 layer.removeSelection()
 
 
-
-    def get_feature_by_id(self, layer, id, field_id):
-
-        features = layer.getFeatures()
-        for feature in features:
-            if feature[field_id] == id:
-                return feature
-
-        return False
-
-
     def get_feature_by_expr(self, layer, expr_filter):
         # Check filter and existence of fields
         expr = QgsExpression(expr_filter)

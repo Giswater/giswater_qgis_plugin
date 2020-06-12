@@ -298,14 +298,14 @@ class ApiCF(ApiParent, QObject):
                 self.manage_new_feature(self.complet_result, dialog)
             return result, dialog
 
-
         elif self.complet_result[0]['body']['form']['template'] == 'dimensioning':
-            self.api_dim = ApiDimensioning(self.iface, self.settings, self.controller, self.plugin_dir)
-            result, dialog = self.api_dim.open_form('5', 'v_edit_dimensions', '3')
-            # Fill self.my_json for new feature
-            if feature_cat is not None:
-                self.manage_new_feature(self.complet_result, dialog)
-            return result, dialog
+            self.lyr_dim = self.controller.get_layer_by_tablename("v_edit_dimensions", show_warning=True)
+            if self.lyr_dim:
+                self.api_dim = ApiDimensioning(self.iface, self.settings, self.controller, self.plugin_dir)
+                feature_id = self.complet_result[0]['body']['feature']['id']
+                feature = self.get_feature_by_id(self.lyr_dim, feature_id, 'id')
+                result, dialog = self.api_dim.open_form(feature, self.lyr_dim, feature_id, self.complet_result)
+                return result, dialog
 
         elif self.complet_result[0]['body']['form']['template'] == 'custom feature':
             sub_tag = None

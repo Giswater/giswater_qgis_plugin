@@ -1066,7 +1066,7 @@ class ParentAction(object):
             # get unique values
             fni = lyr.fields().indexFromName(column)
             unique_ids = lyr.dataProvider().uniqueValues(fni)
-            #get number of unique values
+            # Get number of unique values
             totalval = len(sorted(list(lyr.uniqueValues(fni))))
 
             categories = []
@@ -1096,3 +1096,13 @@ class ParentAction(object):
 
             # repaint layer
             lyr.triggerRepaint()
+
+
+    def get_feature_by_id(self, layer, id_, field_id):
+
+        expr = "" + str(field_id) + "= '" + str(id_) + "'"
+        features = layer.getFeatures(QgsFeatureRequest().setFilterExpression(expr))
+        for feature in features:
+            if str(feature[field_id]) == str(id_):
+                return feature
+        return False

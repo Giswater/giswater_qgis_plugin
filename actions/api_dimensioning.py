@@ -10,7 +10,7 @@ from qgis.core import Qgis, QgsPointXY
 from qgis.gui import QgsMapToolEmitPoint, QgsMapTip
 
 from qgis.PyQt.QtCore import Qt, QTimer
-from qgis.PyQt.QtWidgets import QAction, QCompleter, QGridLayout, QLabel, QLineEdit, QPushButton, QSizePolicy,\
+from qgis.PyQt.QtWidgets import QAction, QCheckBox, QCompleter, QGridLayout, QLabel, QLineEdit, QPushButton, QSizePolicy,\
     QSpacerItem, QWidget
 
 import json
@@ -43,7 +43,7 @@ class ApiDimensioning(ApiParent):
         self.snapper = self.snapper_manager.get_snapper()
 
 
-    def open_form(self, new_feature=None, layer=None, new_feature_id=None):
+    def open_form(self, new_feature=None, layer=None, new_feature_id=None, info_json=None):
         self.dlg_dim = ApiDimensioningUi()
         self.load_settings(self.dlg_dim)
 
@@ -67,25 +67,25 @@ class ApiDimensioning(ApiParent):
         self.layer_connec = self.controller.get_layer_by_tablename("v_edit_connec")
 
         self.create_map_tips()
-        body = self.create_body()
-        # Get layers under mouse clicked
-        sql = f"SELECT gw_api_getdimensioning($${{{body}}}$$)::text"
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
-
-        if row is None or row[0] is None:
-            self.controller.show_message("NOT ROW FOR: " + sql, 2)
-            return False
-        # Parse string to order dict into List
-        complet_result = [json.loads(row[0],  object_pairs_hook=OrderedDict)]
+        if info_json is None:
+            body = self.create_body()
+            # Get layers under mouse clicked
+            sql = f"SELECT gw_api_getdimensioning($${{{body}}}$$)::text"
+            row = self.controller.get_row(sql, log_sql=True, commit=True)
+            if row is None or row[0] is None:
+                self.controller.show_message("NOT ROW FOR: " + sql, 2)
+                return False
+            # Parse string to order dict into List
+            complet_result = json.loads(row[0],  object_pairs_hook=OrderedDict)
+        else:
+            complet_result = info_json[0]
 
         layout_list = []
-        for field in complet_result[0]['body']['data']['fields']:
+        for field in complet_result['body']['data']['fields']:
             label, widget = self.set_widgets(self.dlg_dim, complet_result, field)
-
-            if widget.objectName() == 'id':
-                utils_giswater.setWidgetText(self.dlg_dim, widget, new_feature_id)
             layout = self.dlg_dim.findChild(QGridLayout, field['layoutname'])
-           # Take the QGridLayout with the intention of adding a QSpacerItem later
+
+            # Take the QGridLayout with the intention of adding a QSpacerItem later
             if layout not in layout_list and layout.objectName() not in ('top_layout', 'bot_layout_1', 'bot_layout_2'):
                 layout_list.append(layout)
 
@@ -120,19 +120,26 @@ class ApiDimensioning(ApiParent):
         fields = ''
         list_widgets = self.dlg_dim.findChildren(QLineEdit)
         for widget in list_widgets:
-            widget_name = widget.objectName()
+            widget_name = widget.property('column_id')
             widget_value = utils_giswater.getWidgetText(self.dlg_dim, widget)
             if widget_value == 'null':
                 continue
-            fields += f'"{widget_name}":"{widget_value}",'
-
+            fields += f'"{widget_name}":"{widget_value}", '
+        list_widgets = self.dlg_dim.findChildren(QCheckBox)
+        for widget in list_widgets:
+            widget_name = widget.property('column_id')
+            widget_value = f'"{utils_giswater.isChecked(self.dlg_dim, widget)}"'
+            if widget_value == 'null':
+                continue
+            fields += f'"{widget_name}":{widget_value},'
         srid = self.controller.plugin_settings_value('srid')
         sql = f"SELECT ST_GeomFromText('{new_feature.geometry().asWkt()}', {srid})"
         the_geom = self.controller.get_row(sql, commit=True, log_sql=True)
         fields += f'"the_geom":"{the_geom[0]}"'
-
-        feature = '"tableName":"v_edit_dimensions"'
-        body = self.create_body(feature=feature, filter_fields=fields)
+        feature = '"tableName":"v_edit_dimensions", '
+        feature += f'"id":"{new_feature.id()}"'
+        extras = f'"fields":{{{fields}}}'
+        body = self.create_body(feature=feature, extras=extras)
 
         # Execute query
         sql = f"SELECT gw_api_setdimensioning($${{{body}}}$$)::text"
