@@ -141,7 +141,7 @@ BEGIN
 	EXECUTE v_querytext into v_newid;
 	
 	-- Return
-    RETURN ('{"status":"Accepted", "message":'|| v_message ||', "version":'|| v_version ||
+    RETURN ('{"status":"Accepted", "message":"Dimensioning update succesfully", "version":'|| v_version ||
 	    ', "body": {"feature":{"tableName":"'||v_tablename||'", "id":"'||v_newid||'"}}}')::json;    
 
 	-- Exception handling
