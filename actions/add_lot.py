@@ -2247,6 +2247,8 @@ class AddNewLot(ParentManage):
         # Set signals
         self.dlg_team_man.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_team_man))
         self.dlg_team_man.rejected.connect(partial(self.save_settings, self.dlg_team_man))
+        self.dlg_team_man.btn_close.clicked.connect(partial(self.populate_team_views))
+        self.dlg_team_man.rejected.connect(partial(self.populate_team_views))
 
         # Tab Users
         self.populate_team_selectors(self.dlg_team_man, "cat_users", "v_om_user_x_team", "id", "user_id", "Usuaris",
