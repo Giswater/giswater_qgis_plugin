@@ -44,6 +44,10 @@ UPDATE config_param_user SET value =  'true' WHERE parameter = 'utils_debug_mode
 -- visit
 SELECT SCHEMA_NAME.gw_fct_getfeatureupsert('v_edit_om_visit', '39', null, 4, 1, 'SELECT', false, 'id', 'integer')
 
+-- dimensions
+SELECT SCHEMA_NAME.gw_fct_getfeatureupsert('v_edit_dimensions', '39', null, 4, 1, 'UPDATE', false, 'id', 'integer')
+
+
 */
 
 DECLARE
