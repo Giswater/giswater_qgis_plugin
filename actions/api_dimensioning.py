@@ -71,8 +71,6 @@ class ApiDimensioning(ApiParent):
         if json_result is None:
             return False
         complet_result = [json_result]
-        if not row:
-            return False
 
         layout_list = []
         for field in complet_result[0]['body']['data']['fields']:
