@@ -12,11 +12,11 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setdimensioning(p_data json)
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_setdimensioning($${
-		"client":{"device":4, "infoType":1, "lang":"ES"},
+SELECT SCHEMA_NAME.gw_api_setdimensioning($${
+		"client":{"device":9, "infoType":100, "lang":"ES"},
 		"form":{},
-		"feature":{"tableName":"dimensions"},
-		"data":{"filterFields":{"distance":"9.9974"}}}$$)
+		"feature":{"tableName":"dimensions", "id":1},
+		"data":{"fields":{"distance":"9.9974"}}}$$)
 */
 
 DECLARE
@@ -48,6 +48,7 @@ text text;
 v_columntype character varying;
 v_newid integer;
 v_geometry geometry;
+v_id integer;
 
 BEGIN
 
@@ -63,7 +64,8 @@ BEGIN
 	v_device := (p_data ->> 'client')::json->> 'device';
 	v_infotype := (p_data ->> 'client')::json->> 'infoType';
 	v_tablename := (p_data ->> 'feature')::json->> 'tableName';
-	v_fields := ((p_data ->> 'data')::json->> 'filterFields')::json;
+	v_id := (p_data ->> 'feature')::json->> 'id';
+	v_fields := ((p_data ->> 'data')::json->> 'fields')::json;
 
 	select array_agg(row_to_json(a)) into v_text from json_each(v_fields)a;
 
@@ -135,7 +137,7 @@ BEGIN
 	END LOOP;
 
 	-- query text, final step
-	v_querytext := concat ((v_querytext),' )WHERE id = ' || (((p_data ->> 'data')::json->> 'filterFields')::json->>'id') || ' RETURNING id');
+	v_querytext := concat ((v_querytext),' )WHERE id = ' || v_id || ' RETURNING id');
 
 	-- execute query text
 	EXECUTE v_querytext into v_newid;
