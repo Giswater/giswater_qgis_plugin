@@ -27,6 +27,7 @@ from .manage_gallery import ManageGallery
 from .manage_visit import ManageVisit
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 from ..ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFull, GwMainWindow, VisitDocument, InfoCrossectUi
+from ..actions.api_dimensioning import ApiDimensioning
 
 
 class ApiCF(ApiParent, QObject):
@@ -300,6 +301,15 @@ class ApiCF(ApiParent, QObject):
                 self.manage_new_feature(self.complet_result, dialog)
             return result, dialog
 
+        elif template == 'dimensioning':
+            self.lyr_dim = self.controller.get_layer_by_tablename("v_edit_dimensions", show_warning=True)
+            if self.lyr_dim:
+                self.api_dim = ApiDimensioning(self.iface, self.settings, self.controller, self.plugin_dir)
+                feature_id = self.complet_result[0]['body']['feature']['id']
+                feature = self.get_feature_by_id(self.lyr_dim, feature_id, 'id')
+                result, dialog = self.api_dim.open_form(feature, self.lyr_dim, feature_id, self.complet_result)
+                return result, dialog
+
         elif template == 'info_feature':
             sub_tag = None
             if feature_cat:
@@ -430,6 +440,8 @@ class ApiCF(ApiParent, QObject):
 
         # Remove unused tabs
         tabs_to_show = []
+
+        self.fid = complet_result[0]['body']['feature']['id']
 
         if 'visibleTabs' in complet_result[0]['body']['form']:
             for tab in complet_result[0]['body']['form']['visibleTabs']:
@@ -604,7 +616,7 @@ class ApiCF(ApiParent, QObject):
 
             self.controller.dock_dialog(self.dlg_cf)
             self.controller.dlg_docker.dlg_closed.connect(partial(self.manage_docker_close))
-            self.controller.dlg_docker.setWindowTitle(f"{complet_result[0]['body']['feature']['childType']}")
+            self.controller.dlg_docker.setWindowTitle(f"{complet_result[0]['body']['feature']['childType']} - {self.fid}")
             btn_accept.setVisible(False)
             btn_cancel.setVisible(False)
 
@@ -619,7 +631,7 @@ class ApiCF(ApiParent, QObject):
             self.dlg_cf.dlg_closed.connect(partial(self.set_vdefault_edition))
             self.dlg_cf.key_pressed.connect(partial(self.close_dialog, self.dlg_cf))
 
-        # Set title for toolbox
+        # Set title
         toolbox_cf = self.dlg_cf.findChild(QWidget, 'toolBox')
         row = self.controller.get_config('admin_customform_param', 'value', 'config_param_system')
         if row:
@@ -629,8 +641,8 @@ class ApiCF(ApiParent, QObject):
 
         # Open dialog
         self.open_dialog(self.dlg_cf, dlg_name='info_feature')
-        
-        self.dlg_cf.setWindowTitle(f"{complet_result[0]['body']['feature']['childType']}")
+        self.dlg_cf.setWindowTitle(f"{complet_result[0]['body']['feature']['childType']} - {self.fid}")
+
         return self.complet_result, self.dlg_cf
 
 
@@ -1020,7 +1032,7 @@ class ApiCF(ApiParent, QObject):
         # If we make an info
         else:
             my_json = json.dumps(_json)
-            feature = f'"id":"{self.feature_id}", '
+            feature = f'"id":"{self.fid}", '
         feature += f'"featureType":"{self.feature_type}", '
         feature += f'"tableName":"{p_table_id}"'
         extras = f'"fields":{my_json}, "reload":"{fields_reload}"'

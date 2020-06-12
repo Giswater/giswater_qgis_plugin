@@ -8,7 +8,11 @@ or (at your option) any later version.
 from qgis.core import QgsPointXY
 from qgis.gui import QgsMapToolEmitPoint, QgsMapTip
 from qgis.PyQt.QtCore import Qt, QTimer
-from qgis.PyQt.QtWidgets import QAction, QCompleter, QGridLayout, QLabel, QLineEdit, QSizePolicy, QSpacerItem
+from qgis.PyQt.QtWidgets import QAction, QCheckBox, QCompleter, QGridLayout, QLabel, QLineEdit, QPushButton, QSizePolicy, \
+    QSpacerItem, QWidget
+
+import json
+from collections import OrderedDict
 
 from functools import partial
 
@@ -38,7 +42,7 @@ class ApiDimensioning(ApiParent):
         self.snapper = self.snapper_manager.get_snapper()
 
 
-    def open_form(self, new_feature=None, layer=None, new_feature_id=None):
+    def open_form(self, new_feature=None, layer=None, complet_result=None):
 
         self.dlg_dim = DimensioningUi()
         self.load_settings(self.dlg_dim)
@@ -63,6 +67,15 @@ class ApiDimensioning(ApiParent):
         self.layer_connec = self.controller.get_layer_by_tablename("v_edit_connec")
 
         self.create_map_tips()
+        if complet_result is None:
+            body = self.create_body()
+            # Get layers under mouse clicked
+            sql = f"SELECT gw_fct_getdimensioning({body})::text"
+            row = self.controller.get_row(sql, log_sql=True, commit=True)
+            if row is None or row[0] is None:
+                self.controller.show_message("NOT ROW FOR: " + sql, 2)
+                return False
+            complet_result = row[0]
 
         # Get layers under mouse clicked
         body = self.create_body()
@@ -72,32 +85,40 @@ class ApiDimensioning(ApiParent):
             return False
         complet_result = [json_result]
 
+        # get id from db response
+        self.fid = complet_result[0]['body']['feature']['id']
+
         layout_list = []
         for field in complet_result[0]['body']['data']['fields']:
             label, widget = self.set_widgets(self.dlg_dim, complet_result, field)
 
             if widget.objectName() == 'id':
-                utils_giswater.setWidgetText(self.dlg_dim, widget, new_feature_id)
+                utils_giswater.setWidgetText(self.dlg_dim, widget, self.fid)
             layout = self.dlg_dim.findChild(QGridLayout, field['layoutname'])
-            # Take the QGridLayout with the intention of adding a QSpacerItem later
-            if layout not in layout_list and layout.objectName() not in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
-                layout_list.append(layout)
 
-            # Add widgets into layout
-                layout.addWidget(label, 0, field['layoutorder'])
-                layout.addWidget(widget, 1, field['layoutorder'])
-            if field['layoutname'] in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
-                layout.addWidget(label, 0, field['layoutorder'])
-                layout.addWidget(widget, 1, field['layoutorder'])
-            else:
-                self.put_widgets(self.dlg_dim, field, label, widget)
+            # profilactic issue to prevent missed layouts againts db response and form
+            if layout is not None:
+
+                # Take the QGridLayout with the intention of adding a QSpacerItem later
+                if layout not in layout_list and layout.objectName() not in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
+                    layout_list.append(layout)
+                    # Add widgets into layout
+                    layout.addWidget(label, 0, field['layoutorder'])
+                    layout.addWidget(widget, 1, field['layoutorder'])
+
+                # If field is on top or bottom layout the position is horitzontal no vertical
+                if field['layoutname'] in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
+                    layout.addWidget(label, 0, field['layoutorder'])
+                    layout.addWidget(widget, 1, field['layoutorder'])
+                else:
+                    self.put_widgets(self.dlg_dim, field, label, widget)
 
         # Add a QSpacerItem into each QGridLayout of the list
         for layout in layout_list:
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
             layout.addItem(vertical_spacer1)
 
-        self.open_dialog(self.dlg_dim, dlg_name='dimensioning')
+        self.open_dialog(self.dlg_dim, dlg_name='Dimensioning', fid = self.fid)
         return False, False
 
 
@@ -117,19 +138,40 @@ class ApiDimensioning(ApiParent):
         fields = ''
         list_widgets = self.dlg_dim.findChildren(QLineEdit)
         for widget in list_widgets:
-            widget_name = widget.objectName()
+            widget_name = widget.property('columnname')
             widget_value = utils_giswater.getWidgetText(self.dlg_dim, widget)
             if widget_value == 'null':
                 continue
-            fields += f'"{widget_name}":"{widget_value}",'
+            fields += f'"{widget_name}":"{widget_value}", '
+        """
+        # todo: enable combobox 
+        list_widgets = self.dlg_dim.findChildren(QComboBox)
+        for widget in list_widgets:
+            widget_name = widget.property('columnname')
+            widget_value = utils_giswater.get_item_data(self.dlg_dim, combo, 0)
+            if widget_value == 'null':
+                continue
+            fields += f'"{widget_name}":"{widget_value}", '
+        """
+        list_widgets = self.dlg_dim.findChildren(QCheckBox)
+        for widget in list_widgets:
+            widget_name = widget.property('columnname')
+            widget_value = f'"{utils_giswater.isChecked(self.dlg_dim, widget)}"'
+            if widget_value == 'null':
+                continue
+            fields += f'"{widget_name}":{widget_value},'
 
-        srid = self.controller.plugin_settings_value('srid')
-        sql = f"SELECT ST_GeomFromText('{new_feature.geometry().asWkt()}', {srid})"
-        the_geom = self.controller.get_row(sql, log_sql=True)
-        fields += f'"the_geom":"{the_geom[0]}"'
-        feature = '"tableName":"v_edit_dimensions"'
-        body = self.create_body(feature=feature, filter_fields=fields)
-        self.controller.get_json('gw_fct_setdimensioning', body)
+        # remove last character (,) from fields
+        fields = fields[:-1]
+
+        feature = '"tableName":"v_edit_dimensions", '
+        feature += f'"id":"{self.fid}"'
+        extras = f'"fields":{{{fields}}}'
+        body = self.create_body(feature=feature, extras=extras)
+
+        # Execute query
+        sql = f"SELECT gw_fct_setdimensioning({body})::text"
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
 
         # Close dialog
         self.close_dialog(self.dlg_dim)

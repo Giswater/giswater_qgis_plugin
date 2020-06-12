@@ -177,7 +177,7 @@ class ParentAction(object):
         self.controller.plugin_settings_set_value(dialog.objectName() + "_y", dialog.pos().y()+31)
 
 
-    def open_dialog(self, dlg=None, dlg_name=None, info=True, maximize_button=True, stay_on_top=True):
+    def open_dialog(self, dlg=None, dlg_name=None, info=True, maximize_button=True, stay_on_top=True, fid=None):
         """ Open dialog """
 
         # Check database connection before opening dialog
@@ -186,10 +186,11 @@ class ParentAction(object):
 
         if dlg is None or type(dlg) is bool:
             dlg = self.dlg
-            
-        # Manage i18n of the dialog                  
-        if dlg_name:
-            self.controller.manage_translation(dlg_name, dlg)
+
+        dlg.setWindowTitle(f"DIMENSIONS - {fid}")
+        # todo Manage i18n of the dialog
+        #if dlg_name:
+            3self.controller.manage_translation(dlg_name, dlg)
 
         # Manage stay on top, maximize/minimize button and information button
         # if info is True maximize flag will be ignored
@@ -1013,6 +1014,16 @@ class ParentAction(object):
         qtable.model().setData(i, elem[0])
         i = qtable.model().index(pos_x, widget_pos+1)
         qtable.model().setData(i, elem[1])
+
+
+    def get_feature_by_id(self, layer, id_, field_id):
+
+        expr = "" + str(field_id) + "= '" + str(id_) + "'"
+        features = layer.getFeatures(QgsFeatureRequest().setFilterExpression(expr))
+        for feature in features:
+            if str(feature[field_id]) == str(id_):
+                return feature
+        return False
 
 
     def document_insert(self, dialog, tablename, field, field_value):
