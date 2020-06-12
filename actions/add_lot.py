@@ -2285,12 +2285,13 @@ class AddNewLot(ParentManage):
         tbl_all_rows = dialog.findChild(QTableView, table_all)
         tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        query_left = "SELECT " + str(parameters_left) + " FROM " + tableleft + " WHERE id NOT IN "
-        query_left += "(SELECT " + tableleft + ".id FROM " + tableleft + ""
-        query_left += " RIGHT JOIN " + tableright + " ON " + tableleft + "." + field_id_left + "::text = " + tableright + "." + field_id_right + "::text"
+        query_left = "SELECT " + str(parameters_left) + " FROM " + self.schema_name + "." + tableleft + " WHERE id NOT IN "
+        query_left += "(SELECT " + tableleft + ".id FROM " + self.schema_name + "." + tableleft + ""
+        query_left += " RIGHT JOIN " + self.schema_name + "." + tableright + " ON " + tableleft + "." + field_id_left + "::text = " + tableright + "." + field_id_right + "::text"
         query_left += " WHERE team = '" + str(filter_team) + "')"
         if tableleft == 'om_visit_class':
             query_left += " AND visit_type = 1"
+
         self.fill_table_by_query(tbl_all_rows, query_left)
         self.hide_colums(tbl_all_rows, hide_left)
         tbl_all_rows.setColumnWidth(1, 200)
@@ -2299,8 +2300,8 @@ class AddNewLot(ParentManage):
         tbl_selected_rows = dialog.findChild(QTableView, table_selected)
         tbl_selected_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        query_right = "SELECT " + str(parameters_right) + " FROM " + tableleft + ""
-        query_right += " JOIN " + tableright + " ON " + tableleft + "." + field_id_left + "::text = " + tableright + "." + field_id_right + "::text"
+        query_right = "SELECT " + str(parameters_right) + " FROM " + self.schema_name + "." + tableleft + ""
+        query_right += " JOIN " + self.schema_name + "." + tableright + " ON " + tableleft + "." + field_id_left + "::text = " + tableright + "." + field_id_right + "::text"
         query_right += " WHERE team = '" + str(filter_team) + "'"
 
         self.fill_table_by_query(tbl_selected_rows, query_right)
