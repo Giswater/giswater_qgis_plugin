@@ -190,7 +190,6 @@ class UpdateSQL(ApiParent):
         # Get widgets form
         self.cmb_connection = self.dlg_readsql.findChild(QComboBox, 'cmb_connection')
         self.btn_update_schema = self.dlg_readsql.findChild(QPushButton, 'btn_update_schema')
-        self.btn_update_api = self.dlg_readsql.findChild(QPushButton, 'btn_update_api')
         self.lbl_schema_name = self.dlg_readsql.findChild(QLabel, 'lbl_schema_name')
         self.btn_constrains = self.dlg_readsql.findChild(QPushButton, 'btn_constrains')
 
@@ -198,7 +197,6 @@ class UpdateSQL(ApiParent):
         self.chk_schema_view = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_view')
         self.chk_schema_funcion = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_funcion')
         self.chk_api_view = self.dlg_readsql.findChild(QCheckBox, 'chk_api_view')
-        self.chk_api_funcion = self.dlg_readsql.findChild(QCheckBox, 'chk_api_funcion')
         self.software_version_info = self.dlg_readsql.findChild(QTextEdit, 'software_version_info')
 
         # Set Listeners
@@ -213,13 +211,10 @@ class UpdateSQL(ApiParent):
 
         self.dlg_readsql.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_readsql))
         self.dlg_readsql.btn_schema_create.clicked.connect(partial(self.open_create_project))
-        self.dlg_readsql.btn_api_create.clicked.connect(partial(self.implement_api))
         self.dlg_readsql.btn_custom_load_file.clicked.connect(
             partial(self.load_custom_sql_files, self.dlg_readsql, "custom_path_folder"))
         self.dlg_readsql.btn_update_schema.clicked.connect(partial(self.load_updates, None))
-        self.dlg_readsql.btn_update_api.clicked.connect(partial(self.update_api))
         self.dlg_readsql.btn_schema_file_to_db.clicked.connect(partial(self.schema_file_to_db))
-        self.dlg_readsql.btn_api_file_to_db.clicked.connect(partial(self.api_file_to_db))
         self.dlg_readsql.btn_info.clicked.connect(partial(self.show_info))
         self.dlg_readsql.project_schema_name.currentIndexChanged.connect(partial(self.set_info_project))
         self.dlg_readsql.project_schema_name.currentIndexChanged.connect(partial(self.update_manage_ui))
@@ -1618,41 +1613,6 @@ class UpdateSQL(ApiParent):
         self.error_count = 0
 
 
-    def update_api(self):
-
-        self.task1 = GwTask('Manage schema')
-        QgsApplication.taskManager().addTask(self.task1)
-        self.task1.setProgress(50)
-        self.api(False)
-        self.task1.setProgress(100)
-
-        status = (self.error_count == 0)
-        self.manage_result_message(status, parameter="Update API")
-        if status:
-            self.controller.dao.commit()
-        else:
-            self.controller.dao.rollback()
-
-        # Reset count error variable to 0
-        self.error_count = 0
-
-
-    def implement_api(self):
-        self.task1 = GwTask('Manage schema')
-        QgsApplication.taskManager().addTask(self.task1)
-        self.task1.setProgress(50)
-        status = self.api(True)
-        self.task1.setProgress(100)
-        self.manage_result_message(status, parameter="Implement api")
-        if status:
-            self.controller.dao.commit()
-        else:
-            self.controller.dao.rollback()
-
-        # Reset count error variable to 0
-        self.error_count = 0
-
-
     def load_custom_sql_files(self, dialog, widget):
 
         folder_path = utils_giswater.getWidgetText(dialog, widget)
@@ -2198,29 +2158,6 @@ class UpdateSQL(ApiParent):
             self.controller.dao.commit()
         else:
             self.controller.dao.rollback()
-
-        # Reset count error variable to 0
-        self.error_count = 0
-
-
-    def api_file_to_db(self):
-
-        if self.chk_api_funcion.isChecked():
-            self.task1 = GwTask('Manage schema')
-            QgsApplication.taskManager().addTask(self.task1)
-            self.task1.setProgress(50)
-            self.reload_fct_ftrg('api')
-            self.task1.setProgress(100)
-
-        # Show message
-        if self.error_count == 0:
-            self.controller.dao.commit()
-            msg = "Process has been executed correctly"
-            self.controller.show_info_box(msg, "Info", parameter="Reload")
-        else:
-            self.controller.dao.rollback()
-            msg = "Some error has occurred executing process"
-            self.controller.show_info_box(msg, "Warning", parameter="Reload")
 
         # Reset count error variable to 0
         self.error_count = 0
