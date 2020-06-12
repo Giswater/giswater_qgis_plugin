@@ -8,5 +8,4 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2020/03/07
-CREATE INDEX node_nodetype_index
-ON node USING btree  (node_type);
+CREATE INDEX IF NOT EXISTS node_nodetype_index ON node USING btree  (node_type);
