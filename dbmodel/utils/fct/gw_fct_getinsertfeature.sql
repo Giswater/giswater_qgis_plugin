@@ -58,7 +58,6 @@ BEGIN
 							 SELECT id, system_id, shortcut_key, parent_layer, child_layer, orderby FROM cat_feature WHERE type=''NODE'' AND active IS TRUE
 							 ORDER BY orderby) row'
 			INTO v_rows;
-				RAISE NOTICE 'v_rows 2 %', v_rows;
 	END IF;
 
 	RAISE NOTICE 'v_rows %', v_rows;

@@ -450,12 +450,7 @@ BEGIN
 		IF v_canvasmargin <= v_mincanvasmargin THEN 
 			v_canvasmargin = v_mincanvasmargin;
 		END IF;
-	
-		-- Feature info
-		v_featureinfo := json_build_object('permissions',v_permissions,'tableName',v_tablename,'idName',v_idname,'id',v_id,
-			'featureType',v_featuretype, 'childType', v_childtype, 'tableParent',v_table_parent,
-			'geometry', v_geometry, 'zoomCanvasMargin',concat('{"mts":"',v_canvasmargin,'"}')::json, 'vdefaultValues',v_vdefault_array);
-     
+	     
 		IF v_islayer THEN
 			v_tg_op = 'LAYER';
 		ELSIF  v_id IS NULL THEN
@@ -518,6 +513,11 @@ BEGIN
 			USING v_tablename, v_id, v_device, v_infotype, v_configtabledefined, v_idname, column_type, v_tg_op;
 		END IF;
 
+		-- getting id from URN
+		IF v_id IS NULL THEN
+			v_id = (SELECT currval('SCHEMA_NAME.urn_id_seq'));
+		END IF;
+
 	ELSE
 		IF (SELECT distinct formname from config_form_fields WHERE formname=v_table_parent) IS NOT NULL THEN 
 			v_configtabledefined  = TRUE;
@@ -535,6 +535,11 @@ BEGIN
 		END IF;
         
 	END IF;
+
+	-- Feature info
+	v_featureinfo := json_build_object('permissions',v_permissions,'tableName',v_tablename,'idName',v_idname,'id',v_id,
+		'featureType',v_featuretype, 'childType', v_childtype, 'tableParent',v_table_parent,
+		'geometry', v_geometry, 'zoomCanvasMargin',concat('{"mts":"',v_canvasmargin,'"}')::json, 'vdefaultValues',v_vdefault_array);
 
 	-- Get toggledition parameter
 	EXECUTE 'SELECT value::boolean FROM config_param_user WHERE parameter = ''qgis_toggledition_forceopen''' INTO v_toggledition;

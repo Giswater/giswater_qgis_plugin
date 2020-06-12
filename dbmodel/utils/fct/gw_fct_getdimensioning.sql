@@ -34,6 +34,7 @@ v_project_type text;
 aux_json json;
 v_fields json;
 field json;
+v_id int8;
 
 BEGIN
 
@@ -61,6 +62,13 @@ BEGIN
 	END LOOP;
 
 	v_fields := array_to_json(v_fields_array);
+
+	-- mantantory set due complex interaction againts QGIS and database when on qgis is feature interted value is updated, transaction is opened....
+	PERFORM setval('SCHEMA_NAME.dimensions_id_seq', (SELECT max(id) FROM dimensions), true);
+
+	v_id = (SELECT nextval('SCHEMA_NAME.dimensions_id_seq'::regclass));
+
+	v_featureinfo = '{"tableName":"v_edit_dimensions", "idName":"id", "id":'||v_id||'}';
 
 	-- Control NULL's
 	v_status := COALESCE(v_status, '{}');    

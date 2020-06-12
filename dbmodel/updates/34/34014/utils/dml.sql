@@ -26,3 +26,33 @@ UPDATE sys_param_user SET dv_querytext = replace (dv_querytext, ' arc_type', ' c
 UPDATE sys_param_user SET dv_querytext = replace (dv_querytext, ' node_type', ' cat_feature_node') WHERE dv_querytext like'% node_type%';
 UPDATE sys_param_user SET dv_querytext = replace (dv_querytext, ' connec_type', ' cat_feature_connec') WHERE dv_querytext like'% connec_type%';
 UPDATE sys_param_user SET dv_querytext = replace (dv_querytext, ' gully_type', ' cat_feature_gully') WHERE dv_querytext like'% gully_type%';
+
+
+
+INSERT INTO config_typevalue VALUES ('formtemplate_typevalue', 'dimensioning', 'dimensioning')
+ON CONFLICT (typevalue, id) DO NOTHING;
+
+UPDATE config_form_fields SET formname  ='v_edit_dimensions', formtype = 'form_feature' WHERE formname = 'dimensioning';
+
+INSERT INTO config_info_layer VALUES ('v_edit_dimensions', false, null, true, null, 'dimensioning', 'Dimensions', 9)
+ON CONFLICT (layer_id) DO NOTHING;
+
+update config_form_fields a SET layoutorder = b.layoutorder, layoutname = b.layoutname 
+FROM config_form_fields b WHERE a.formname='v_edit_dimensions' AND a.formtype = 'form_generic' AND a.columnname = b.columnname
+AND b.formname = 'v_edit_dimensions' AND b.formtype = 'form_feature';
+
+update config_form_fields set layoutname = 'lyt_symbology', layoutorder =  11 where formname = 'v_edit_dimensions' AND columnname = 'direction_arrow';
+update config_form_fields set layoutname = 'lyt_symbology', layoutorder =  12 where formname = 'v_edit_dimensions' AND columnname = 'offset_label';
+update config_form_fields set layoutname = 'lyt_symbology', layoutorder =  14 where formname = 'v_edit_dimensions' AND columnname = 'x_label';
+update config_form_fields set layoutname = 'lyt_symbology', layoutorder =  15 where formname = 'v_edit_dimensions' AND columnname = 'y_label';
+update config_form_fields set layoutname = 'lyt_symbology', layoutorder =  16 WHERE formname = 'v_edit_dimensions' AND columnname = 'rotation_label';
+
+update config_form_fields set layoutname = 'lyt_other', layoutorder =  11 where formname = 'v_edit_dimensions' AND columnname = 'expl_id';
+update config_form_fields set layoutname = 'lyt_other', layoutorder =  12 where formname = 'v_edit_dimensions' AND columnname = 'state';
+
+DELETE FROM config_form_fields where formname = 'v_edit_dimensions'  and formtype  = 'form_feature';
+
+update config_form_fields set formtype  = 'form_feature' WHERE formname = 'v_edit_dimensions';
+
+update config_form_fields set layoutname  = 'lyt_top_1' WHERE formname = 'v_edit_dimensions' and columnname IN ('id');
+update config_form_fields set layoutname  = 'lyt_other' WHERE formname = 'v_edit_dimensions' and columnname IN ('observ', 'expl_id', 'state');
