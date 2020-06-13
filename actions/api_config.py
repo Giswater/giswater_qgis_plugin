@@ -407,8 +407,10 @@ class ApiConfig(ApiParent):
         combolist = []
         if 'comboIds' in field:
             for i in range(0, len(field['comboIds'])):
-                elem = [field['comboIds'][i], field['comboNames'][i]]
-                combolist.append(elem)
+                if field['comboIds'][i] is not None and field['comboNames'][i] is not None:
+                    elem = [field['comboIds'][i], field['comboNames'][i]]
+                    combolist.append(elem)
+                    
             records_sorted = sorted(combolist, key=operator.itemgetter(1))
             # Populate combo
             for record in records_sorted:
