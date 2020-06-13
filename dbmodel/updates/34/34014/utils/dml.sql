@@ -51,15 +51,15 @@ update config_form_fields set layoutname = 'lyt_other', layoutorder =  12 where 
 DELETE FROM config_form_fields where formname = 'v_edit_dimensions'  and formtype  = 'form_feature';
 
 update config_form_fields set formtype  = 'form_feature' WHERE formname = 'v_edit_dimensions';
-select * from config_typevalue
 
 INSERT INTO config_typevalue VALUES ('layout_name_typevalue', 'lyt_none', 'lyt_none')
 ON CONFLICT (typevalue, id) DO NOTHING;
 
 UPDATE config_typevalue SET id = 'lyt_measurements', idval = 'lyt_measurements' WHERE id  ='lyt_depth';
 
-DELETE FROM config_typevalue WHERE typevalue = 'layout_name_typevalue' and id = 'lyt_distance';
 update config_form_fields set layoutname  = 'lyt_none' WHERE formname = 'v_edit_dimensions' and columnname IN ('id','expl_id');
 update config_form_fields set layoutname  = 'lyt_other' WHERE formname = 'v_edit_dimensions' and columnname IN ('observ', 'expl_id', 'state');
 
-update config_form_fields set layoutname  = 'lyt_depth', layoutorder = 0 WHERE formname = 'v_edit_dimensions' and columnname = 'distance';
+update config_form_fields set layoutname  = 'lyt_measurements', layoutorder = 0 WHERE formname = 'v_edit_dimensions' and columnname = 'distance';
+
+DELETE FROM config_typevalue WHERE typevalue = 'layout_name_typevalue' and id = 'lyt_distance';
