@@ -72,12 +72,12 @@ BEGIN
 		SELECT max(layoutorder)+1 INTO v_layoutorder FROM sys_param_user WHERE formname='config' and layoutname=v_layout;
 
 		IF v_projecttype = 'WS' THEN
-			v_partialquerytext =  concat('JOIN ',lower(NEW.feature_type),'_type ON ',lower(NEW.feature_type),'_type.id = ',
-			lower(NEW.feature_type),'type_id WHERE ',lower(NEW.feature_type),'_type.id = ',quote_literal(NEW.id));
+			v_partialquerytext =  concat('JOIN cat_feature ON cat_feature.id = ',
+			lower(NEW.feature_type),'type_id WHERE cat_feature.id = ',quote_literal(NEW.id));
 			
 		ELSIF  v_projecttype = 'UD' THEN
-			v_partialquerytext =  concat('LEFT JOIN ',lower(NEW.feature_type),'_type ON ',lower(NEW.feature_type),'_type.id = ',
-			lower(NEW.feature_type),'_type WHERE ',lower(NEW.feature_type),'_type.id = ',quote_literal(NEW.id),' OR ',lower(NEW.feature_type),'_type.id IS NULL');
+			v_partialquerytext =  concat('LEFT JOIN cat_feature ON cat_feature.id = ',
+			lower(NEW.feature_type),'_type WHERE cat_feature.id = ',quote_literal(NEW.id),' OR ',lower(NEW.feature_type),'_type.id IS NULL');
 		END IF;
 				
 		v_table = concat ('cat_',lower(NEW.feature_type));

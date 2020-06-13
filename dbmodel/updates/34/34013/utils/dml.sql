@@ -63,3 +63,32 @@ UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json,'f
 UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json,'feature_type','gully'::text) where parameter = 'basic_search_network_gully';
 UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json,'feature_type','visit'::text) where parameter = 'basic_search_network_visit';
 UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json,'feature_type','element'::text) where parameter = 'basic_search_network_element';
+
+
+DELETE FROM config_param_system WHERE parameter IN('cat_geom1_vd','expl_field_code','expl_field_name','expl_layer','geom1_vd','portal_field_code','portal_field_number',
+'portal_field_postal','portal_layer','scale_zoom','slope_vd','street_field_code','street_field_expl', 'street_field_name', 'street_layer', 'sys_elev_vd','sys_elev1_vd',
+'sys_elev2_vd','top_elev_vd','y1_vd','y2_vd','ymax_vd','z1_vd','z2_vd');
+
+
+DELETE FROM sys_param_user WHERE id IN('parameter_vdefault');
+
+UPDATE sys_param_user SET id ='edit_connec_category_vdefault' WHERE id = 'connec_category_vdefault';
+UPDATE sys_param_user SET id ='edit_connec_fluid_vdefault' WHERE id = 'connec_fluid_vdefault';
+UPDATE sys_param_user SET id ='edit_connec_function_vdefault' WHERE id = 'connec_function_vdefault';
+UPDATE sys_param_user SET id ='edit_connec_location_vdefault' WHERE id = 'connec_location_vdefault';
+UPDATE sys_param_user SET id ='edit_presszone_vdefault' WHERE id = 'presszone_vdefault';
+UPDATE sys_param_user SET id ='edit_pavement_vdefault' WHERE id = 'pavement_vdefault';
+UPDATE sys_param_user SET id ='edit_connec_location_vdefault' WHERE id = 'connec_location_vdefault';
+UPDATE sys_param_user SET id ='edit_connecarccat_vdefault' WHERE id = 'connecarccat_vdefault';
+
+
+UPDATE config_param_user SET parameter ='edit_connec_category_vdefault' WHERE parameter = 'connec_category_vdefault';
+UPDATE config_param_user SET parameter ='edit_connec_fluparameter_vdefault' WHERE parameter = 'connec_fluparameter_vdefault';
+UPDATE config_param_user SET parameter ='edit_connec_function_vdefault' WHERE parameter = 'connec_function_vdefault';
+UPDATE config_param_user SET parameter ='edit_connec_location_vdefault' WHERE parameter = 'connec_location_vdefault';
+UPDATE config_param_user SET parameter ='edit_presszone_vdefault' WHERE parameter = 'presszone_vdefault';
+UPDATE config_param_user SET parameter ='edit_pavement_vdefault' WHERE parameter = 'pavement_vdefault';
+UPDATE config_param_user SET parameter ='edit_connec_location_vdefault' WHERE parameter = 'connec_location_vdefault';
+UPDATE config_param_user SET parameter ='edit_connecarccat_vdefault' WHERE parameter = 'connecarccat_vdefault;
+
+

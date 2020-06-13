@@ -66,7 +66,6 @@ v_active boolean;
 v_orderby integer;
 v_action text;
 v_layoutorder integer;
-v_form_fields_id integer;
 v_feature_system_id text;
 v_man_fields text;
 
@@ -611,14 +610,11 @@ BEGIN
 				v_layoutorder = 1;
 			END IF;
 
-			EXECUTE 'SELECT max(id) + 1 FROM config_form_fields'
-			INTO v_form_fields_id;
-
-			INSERT INTO config_form_fields (id, formname, formtype, columnname, layoutorder,
+			INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder,
 			datatype, widgettype, label, ismandatory, isparent, iseditable, 
 			layoutname, placeholder, stylesheet, tooltip, widgetfunction, dv_isnullvalue, widgetdim,
 			dv_parent_id, dv_querytext_filterc, dv_querytext, listfilterparam, linkedaction, hidden)
-			VALUES (v_form_fields_id,v_viewname, v_formtype, v_param_name, v_layoutorder,v_config_datatype, v_config_widgettype,
+			VALUES (v_viewname, v_formtype, v_param_name, v_layoutorder,v_config_datatype, v_config_widgettype,
 			v_label, v_ismandatory, v_isparent, v_iseditable, 'lyt_data_1',
 			v_placeholder, v_stylesheet, v_tooltip, v_widgetfunction, v_dv_isnullvalue, v_widgetdim,
 			v_dv_parent_id, v_dv_querytext_filterc, v_dv_querytext, v_listfilterparam, v_linkedaction, v_hidden);
