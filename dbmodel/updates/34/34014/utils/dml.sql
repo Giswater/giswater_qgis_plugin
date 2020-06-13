@@ -16,7 +16,6 @@ UPDATE sys_table SET id='cat_feature_connec' WHERE id = 'connec_type';
 UPDATE sys_table SET sys_sequence = 'om_mincut_seq' WHERE id  ='om_mincut';
 UPDATE sys_table SET sys_sequence = null, sys_sequence_field =  null WHERE id  ='v_om_mincut';
 
-
 UPDATE config_form_fields SET dv_querytext = replace (dv_querytext, ' arc_type', ' cat_feature_arc') WHERE dv_querytext like'% arc_type%';
 UPDATE config_form_fields SET dv_querytext = replace (dv_querytext, ' node_type', ' cat_feature_node') WHERE dv_querytext like'% node_type%';
 UPDATE config_form_fields SET dv_querytext = replace (dv_querytext, ' connec_type', ' cat_feature_connec') WHERE dv_querytext like'% connec_type%';
@@ -26,7 +25,6 @@ UPDATE sys_param_user SET dv_querytext = replace (dv_querytext, ' arc_type', ' c
 UPDATE sys_param_user SET dv_querytext = replace (dv_querytext, ' node_type', ' cat_feature_node') WHERE dv_querytext like'% node_type%';
 UPDATE sys_param_user SET dv_querytext = replace (dv_querytext, ' connec_type', ' cat_feature_connec') WHERE dv_querytext like'% connec_type%';
 UPDATE sys_param_user SET dv_querytext = replace (dv_querytext, ' gully_type', ' cat_feature_gully') WHERE dv_querytext like'% gully_type%';
-
 
 
 INSERT INTO config_typevalue VALUES ('formtemplate_typevalue', 'dimensioning', 'dimensioning')
@@ -53,6 +51,15 @@ update config_form_fields set layoutname = 'lyt_other', layoutorder =  12 where 
 DELETE FROM config_form_fields where formname = 'v_edit_dimensions'  and formtype  = 'form_feature';
 
 update config_form_fields set formtype  = 'form_feature' WHERE formname = 'v_edit_dimensions';
+select * from config_typevalue
 
-update config_form_fields set layoutname  = 'lyt_top_1' WHERE formname = 'v_edit_dimensions' and columnname IN ('id');
+INSERT INTO config_typevalue VALUES ('layout_name_typevalue', 'lyt_none', 'lyt_none')
+ON CONFLICT (typevalue, id) DO NOTHING;
+
+UPDATE config_typevalue SET id = 'lyt_measurements', idval = 'lyt_measurements' WHERE id  ='lyt_depth';
+
+DELETE FROM config_typevalue WHERE typevalue = 'layout_name_typevalue' and id = 'lyt_distance';
+update config_form_fields set layoutname  = 'lyt_none' WHERE formname = 'v_edit_dimensions' and columnname IN ('id','expl_id');
 update config_form_fields set layoutname  = 'lyt_other' WHERE formname = 'v_edit_dimensions' and columnname IN ('observ', 'expl_id', 'state');
+
+update config_form_fields set layoutname  = 'lyt_depth', layoutorder = 0 WHERE formname = 'v_edit_dimensions' and columnname = 'distance';
