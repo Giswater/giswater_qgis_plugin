@@ -896,8 +896,9 @@ class Giswater(QObject):
         self.manage_expl_id()
 
         # Manage layer fields
-        self.get_layers_to_config()
-        self.set_layer_config(self.available_layers)
+        if self.hide_form is False:
+            self.get_layers_to_config()
+            self.set_layer_config(self.available_layers)
 
         # Disable info button
         self.enable_info_button(False)
@@ -1035,6 +1036,7 @@ class Giswater(QObject):
                 if 'actions' in result['body']:
                     if 'useGuideMap' in result['body']['actions']:
                         guided_map = result['body']['actions']['useGuideMap']
+                        self.hide_form = result['body']['actions']['hideForm']
                         if guided_map:
                             self.controller.log_info("manage_guided_map")
                             self.manage_guided_map()
@@ -1509,7 +1511,7 @@ class Giswater(QObject):
                 continue
 
             for field in complet_result['body']['data']['fields']:
-                _values = {}
+                valuemap_values = {}
 
                 # Get column index
                 fieldIndex = layer.fields().indexFromName(field['column_id'])
@@ -1538,14 +1540,18 @@ class Giswater(QObject):
                 # Manage editability
                 self.set_read_only(layer, field, fieldIndex)
 
-                # Manage fields
+                # Remove old values on ValueMap
+                editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': valuemap_values})
+                layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+
+                # Manage new values on ValueMap
                 if field['widgettype'] == 'combo':
                     if 'comboIds' in field:
                         # Set values
                         for i in range(0, len(field['comboIds'])):
-                            _values[field['comboNames'][i]] = field['comboIds'][i]
+                            valuemap_values[field['comboNames'][i]] = field['comboIds'][i]
                     # Set values into valueMap
-                    editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': _values})
+                    editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': valuemap_values})
                     layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
 
         if msg_failed != "":
