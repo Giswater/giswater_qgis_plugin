@@ -76,7 +76,9 @@ class Basic(ApiParent):
                 # Loop for each mapzone returned on json
                 lyr = self.controller.get_layer_by_tablename(mapzone['layer'])
                 categories = []
-
+                status = mapzone['status']
+                if status = 'Disable':
+                    pass
                 if lyr:
                     # Loop for each id returned on json
                     for id in mapzone['values']:
@@ -85,11 +87,16 @@ class Basic(ApiParent):
                         symbol.setOpacity(float(mapzone['opacity']))
 
                         # Setting color
-                        try:
-                            R = id['stylesheet']['color'][0]
-                            G = id['stylesheet']['color'][1]
-                            B = id['stylesheet']['color'][2]
-                        except TypeError:
+                        if status=='Stylesheet':
+                            try:
+                                R = id['stylesheet']['color'][0]
+                                G = id['stylesheet']['color'][1]
+                                B = id['stylesheet']['color'][2]
+                            except TypeError:
+                                R = random.randint(0, 255)
+                                G = random.randint(0, 255)
+                                B = random.randint(0, 255)
+                        elif status=='Random':
                             R = random.randint(0, 255)
                             G = random.randint(0, 255)
                             B = random.randint(0, 255)

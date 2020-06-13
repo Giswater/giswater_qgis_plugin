@@ -370,18 +370,13 @@ class GwToolBox(ApiParent):
             self.add_layer.add_temp_layer(dialog, json_result['body']['data'], self.alias_function, True, True, 1, True)
             self.add_layer.set_layers_visible(json_result['body']['data']['setVisibleLayers'])
 
-            # getting on the fly simbology capabilities
-            if 'setSimbology' in json_result['body']['data']:
-                simb_status = json_result['body']['data']['setSimbology']['status']
-                if simb_status == "true":
-                    self.simb_layer = json_result['body']['data']['setSimbology']['layer']
-                    self.simb_column = json_result['body']['data']['setSimbology']['column']
-                    self.simb_opacity = json_result['body']['data']['setSimbology']['opacity']
-                    simb_type = json_result['body']['data']['setSimbology']['type']
-                    if simb_type == "polCategorized":
-                        # call function to simbolize
-                        self.set_layer_simbology_polcategorized(self.simb_layer, self.simb_column, self.simb_opacity)
-					
+            # getting simbology capabilities
+            if 'setSymbologySytle' in json_result['body']['data']:
+                set_simbology_sytle = json_result['body']['data']['setSymbologySytle']
+                if set_simbology_sytle == "Mapzones":
+                    # call function to simbolize mapzones
+                    self.set_mapzones_style()
+
         except KeyError as e:
             msg = f"<b>Key: </b>{e}<br>"
             msg += f"<b>key container: </b>'body/data/ <br>"

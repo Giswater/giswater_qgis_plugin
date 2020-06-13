@@ -1004,11 +1004,7 @@ class Giswater(QObject):
             self.basic.basic_api_search()
 
         # call dynamic mapzones repaint
-        row = self.controller.get_config('mapzones_dynamic_symbology', 'value', 'config_param_system')
-        if row and row[0].lower() == 'true':
-            self.parent.set_layer_simbology_polcategorized('v_edit_dma', 'name', 0.5)
-            self.parent.set_layer_simbology_polcategorized('v_edit_dqa', 'name', 0.5)
-            self.parent.set_layer_simbology_polcategorized('v_edit_presszone', 'descript', 0.5)
+        self. parent.set_mapzones_style()
 
         # Log it
         message = "Project read successfully"

@@ -1190,42 +1190,57 @@ class ParentAction(object):
             layer = self.controller.get_layer_by_tablename('v_edit_node')
             if layer: self.iface.setActiveLayer(layer)
 
+    def set_mapzones_style(self):
 
-    def set_layer_simbology_polcategorized(self, layer, column, opacity):
-        """ Symbolyze dynamic polygon layers using categorized expression """
+        row = self.controller.get_config('utils_grafanalytics_dynamic_symbology', 'value', 'config_param_system')
+        if row and row[0].lower() == 'true':
+            extras = f'"mapzones":""'
+            body = self.create_body(extras=extras)
+            json_return = self.controller.get_json('gw_fct_getmapzonestyle', body)
+            if not json_return:
+                return False
 
-        lyr = self.controller.get_layer_by_tablename(layer)
-        if lyr:
-            # get unique values
-            fni = lyr.fields().indexFromName(column)
-            unique_ids = lyr.dataProvider().uniqueValues(fni)
-            # get number of unique values
-            #totalval = len(sorted(list(lyr.uniqueValues(fni))))
+            for mapzone in json_return['body']['data']['mapzones']:
 
-            categories = []
+                # Loop for each mapzone returned on json
+                lyr = self.controller.get_layer_by_tablename(mapzone['layer'])
+                categories = []
+                status = mapzone['status']
+                if status = 'Disable':
+                    pass
+                if lyr:
+                    # Loop for each id returned on json
+                    for id in mapzone['values']:
+                        # initialize the default symbol for this geometry type
+                        symbol = QgsSymbol.defaultSymbol(lyr.geometryType())
+                        symbol.setOpacity(float(mapzone['opacity']))
 
-            for unique_id in unique_ids:
-                # initialize the default symbol for this geometry type
-                symbol = QgsSymbol.defaultSymbol(lyr.geometryType())
-                symbol.setOpacity(float(opacity))
+                        # Setting color
+                        if status == 'Stylesheet':
+                            try:
+                                R = id['stylesheet']['color'][0]
+                                G = id['stylesheet']['color'][1]
+                                B = id['stylesheet']['color'][2]
+                            except TypeError:
+                                R = random.randint(0, 255)
+                                G = random.randint(0, 255)
+                                B = random.randint(0, 255)
+                        elif status == 'Random':
+                            R = random.randint(0, 255)
+                            G = random.randint(0, 255)
+                            B = random.randint(0, 255)
 
-                R = random.randint(0, 255)
-                G = random.randint(0, 255)
-                B = random.randint(0, 255)
+                        # Setting sytle
+                        layer_style = {'color': '{}, {}, {}'.format(int(R), int(G), int(B))}
+                        symbol_layer = QgsSimpleFillSymbolLayer.create(layer_style)
 
-                layer_style = {}
-                layer_style['color'] = '{}, {}, {}'.format(int(R), int(G), int(B))
-                layer_style['outline'] = 'black'
-                layer_style['opacity'] = '0.8'
-                symbolLayer = QgsSimpleFillSymbolLayer.create(layer_style)
+                        if symbol_layer is not None:
+                            symbol.changeSymbolLayer(0, symbol_layer)
+                        category = QgsRendererCategory(id['id'], symbol, str(id['id']))
+                        categories.append(category)
 
-                if symbolLayer is not None:
-                    symbol.changeSymbolLayer(0, symbolLayer)
-                category = QgsRendererCategory(unique_id, symbol, str(unique_id))
-                categories.append(category)
+                        # apply symbol to layer renderer
+                        lyr.setRenderer(QgsCategorizedSymbolRenderer(mapzone['idname'], categories))
 
-            # apply symbol to layer renderer
-            lyr.setRenderer(QgsCategorizedSymbolRenderer (column, categories))
-
-            # repaint layer
-            lyr.triggerRepaint()
+                        # repaint layer
+                        lyr.triggerRepaint()
