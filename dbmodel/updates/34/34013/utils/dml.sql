@@ -70,7 +70,7 @@ DELETE FROM config_param_system WHERE parameter IN('cat_geom1_vd','expl_field_co
 'sys_elev2_vd','top_elev_vd','y1_vd','y2_vd','ymax_vd','z1_vd','z2_vd');
 
 
-DELETE FROM sys_param_user WHERE id IN('parameter_vdefault');
+DELETE FROM sys_param_user WHERE id IN('parameter_vdefault', 'om_param_type_vdefault');
 
 UPDATE sys_param_user SET id ='edit_connec_category_vdefault' WHERE id = 'connec_category_vdefault';
 UPDATE sys_param_user SET id ='edit_connec_fluid_vdefault' WHERE id = 'connec_fluid_vdefault';
@@ -91,4 +91,8 @@ UPDATE config_param_user SET parameter ='edit_pavement_vdefault' WHERE parameter
 UPDATE config_param_user SET parameter ='edit_connec_location_vdefault' WHERE parameter = 'connec_location_vdefault';
 UPDATE config_param_user SET parameter ='edit_connecarccat_vdefault' WHERE parameter = 'connecarccat_vdefault;
 
+UPDATE sys_param_user SET formname ='dynamic' WHERE formname = 'dynamic_param';
+UPDATE sys_param_user SET formname ='hidden' WHERE formname = 'hidden_param';
 
+UPDATE config_param_system SET value= '{"SECTOR":"Disable", "DMA":"Stylesheet", "PRESSZONE":"Random", "DQA":"Random", "MINSECTOR":"Random"}'
+WHERE parameter = 'utils_grafanalytics_dynamic_symbology';

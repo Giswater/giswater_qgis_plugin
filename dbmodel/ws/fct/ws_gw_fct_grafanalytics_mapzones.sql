@@ -146,8 +146,6 @@ v_status text;
 v_message text;
 v_checkdata boolean;
 v_mapzonename text;
-v_dynsymbolstatus boolean;
-
 
 BEGIN
 	-- Search path
@@ -168,9 +166,6 @@ BEGIN
 	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 	v_debug = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'debug');
 	v_checkdata = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'checkData');
-
-	-- select system variables
-	v_dynsymbolstatus = (SELECT value FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
 
 	-- select config values
 	SELECT giswater, epsg INTO v_version, v_srid FROM version order by 1 desc limit 1;
@@ -739,8 +734,7 @@ BEGIN
 	RETURN  ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}, "data":{ "info":'||v_result_info||','||
 					  '"setVisibleLayers":["'||v_visible_layer||'"],'||
-  					  '"setSimbology":{"status":"'||v_dynsymbolstatus||'", "type":"polCategorized", "layer":"'||v_visible_layer||
-						'", "column":"'||v_mapzonename||'", "opacity":"0.5"},'||
+  					  '"getMapZonesSytle":True,'||
 					  '"point":'||v_result_point||','||
 					  '"line":'||v_result_line||
 					  '}}}')::json;

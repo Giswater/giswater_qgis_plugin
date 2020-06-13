@@ -13,7 +13,11 @@ $BODY$
 
 /*example
 SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{}, 
-"data":{"addSchema":"SCHEMA_NAME", "selectorType":"explfrommuni", "id":2, "value":true, "isAlone":true}}$$);
+"data":{"addSchema":"", "selectorType":"exploitation", "id":2, "value":true, "isAlone":true}}$$);
+
+SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"exploitation", "id":"2", "value":"False", "addSchema":"None"}}$$);
+
+
 */
 
 DECLARE
@@ -48,6 +52,11 @@ BEGIN
 	v_addschema := (p_data ->> 'data')::json->> 'addSchema';
 	v_data = p_data->>'data';
 
+	-- control nulls of addschema
+	IF v_addschema = 'None' OR v_addschema = '' THEN
+		v_addschema = NULL;
+	END IF;
+
 	-- Get system parameters
 	v_parameter_selector = (SELECT value::json FROM config_param_system WHERE parameter = concat('basic_selector_', v_selectortype));
 		v_tablename = v_parameter_selector->>'selector';
@@ -73,7 +82,7 @@ BEGIN
 	END IF;
 
 	-- manage add schema
-	IF v_addschema IS NOT NULL THEN
+	IF v_addschema IS NOT NULL AND v_addschema !='' THEN
 
 		--force search path to the additional schema
 		EXECUTE 'SET search_path = public, '||v_addschema;
@@ -107,8 +116,8 @@ BEGIN
 			}}}'||'}')::json;
 
 	-- Exception handling
-	EXCEPTION WHEN OTHERS THEN
-	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	--EXCEPTION WHEN OTHERS THEN
+	--RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 	
 END;
 $BODY$
