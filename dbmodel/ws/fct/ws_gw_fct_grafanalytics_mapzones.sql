@@ -72,7 +72,7 @@ TO CHECK PROBLEMS, RUN MODE DEBUG
 ---------------------------------
 
 1) CONTEXT 
-SET search_path='SCHEMA_NAME';
+SET search_path='SCHEMA_NAME', public;
 UPDATE arc SET dma_id=0 where expl_id IN (1,2)
 
 
@@ -257,7 +257,7 @@ BEGIN
 		-- reset selectors
 		DELETE FROM selector_state WHERE cur_user=current_user;
 		INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
-		DELETE FROM selector_psector WHERE cur_user=current_user;
+		--DELETE FROM selector_psector WHERE cur_user=current_user;
 			
 		-- reset exploitation
 		IF v_expl IS NOT NULL THEN
@@ -548,24 +548,33 @@ BEGIN
 				
 					-- concave polygon
 					v_querytext = '	UPDATE '||quote_ident(v_table)||' set the_geom = st_multi(a.the_geom) 
-							FROM (with polygon AS (SELECT st_collect (the_geom) as g, '||quote_ident(v_field)||' FROM arc group by '||quote_ident(v_field)||') 
+							FROM (with polygon AS (SELECT st_collect (the_geom) as g, '||quote_ident(v_field)||' FROM v_edit_arc group by '||quote_ident(v_field)||') 
 							SELECT '||quote_ident(v_field)||
 							', CASE WHEN st_geometrytype(st_concavehull(g, '||v_concavehull||')) = ''ST_Polygon''::text THEN st_buffer(st_concavehull(g, '||
 							v_concavehull||'), 3)::geometry(Polygon,'||(v_srid)||')
 							ELSE st_expand(st_buffer(g, 3::double precision), 1::double precision)::geometry(Polygon,'||(v_srid)||') END AS the_geom FROM polygon
 							)a WHERE a.'||quote_ident(v_field)||'='||quote_ident(v_table)||'.'||quote_ident(v_fieldmp)||' AND '||quote_ident(v_table)||'.'||
 							quote_ident(v_fieldmp)||'::text != 0::text';
+							
 					EXECUTE v_querytext;
 
 				ELSIF  v_updatemapzgeom = 2 THEN
 				
 					-- pipe buffer
 					v_querytext = '	UPDATE '||quote_ident(v_table)||' set the_geom = geom FROM
-							(SELECT '||quote_ident(v_field)||', st_multi(st_buffer(st_collect(the_geom),'||v_geomparamupdate||')) as geom from arc where '||
-							quote_ident(v_field)||'::integer > 0 AND arc.'||quote_ident(v_field)||' IN
-							(SELECT DISTINCT '||quote_ident(v_field)||' FROM arc JOIN anl_arc USING (arc_id) WHERE fid = '||v_fid||' and cur_user = current_user)
+							(SELECT '||quote_ident(v_field)||', st_multi(st_buffer(st_collect(the_geom),'||v_geomparamupdate||')) as geom from v_edit_arc where '||
+							quote_ident(v_field)||'::integer > 0 AND v_edit_arc.'||quote_ident(v_field)||' IN
+							(SELECT DISTINCT '||quote_ident(v_field)||' FROM v_edit_arc JOIN anl_arc USING (arc_id) WHERE fid = '||v_fid||' and cur_user = current_user)
 							group by '||quote_ident(v_field)||')a 
 							WHERE a.'||quote_ident(v_field)||'='||quote_ident(v_table)||'.'||quote_ident(v_fieldmp);
+
+							/*
+							UPDATE arc set the_geom = geom FROM (
+								SELECT dma_id, st_multi(st_buffer(st_collect(the_geom),10)) as geom from v_edit_arc where dma_id::integer > 0 AND v_edit_arc.dma_id IN
+								(SELECT DISTINCT dma_id FROM v_edit_arc JOIN anl_arc USING (arc_id) WHERE fid = 145 and cur_user = current_user)
+								GROUP BY dma_id
+							)a WHERE a.dma_id=dma.dma_id;
+							*/
 
 					EXECUTE v_querytext;
 
@@ -574,24 +583,41 @@ BEGIN
 					-- use plot and pipe buffer
 					v_querytext = '	UPDATE '||quote_ident(v_table)||' set the_geom = geom FROM
 								(SELECT '||quote_ident(v_field)||', st_multi(st_buffer(st_collect(geom),0.01)) as geom FROM
-								(SELECT '||quote_ident(v_field)||', st_buffer(st_collect(the_geom), '||v_geomparamupdate||') as geom from arc 
-								where '||quote_ident(v_field)||'::integer > 0 AND arc.'||quote_ident(v_field)||' IN
-								(SELECT DISTINCT '||quote_ident(v_field)||' FROM arc JOIN anl_arc USING (arc_id) WHERE fid = '||v_fid||' and cur_user = current_user)
+								(SELECT '||quote_ident(v_field)||', st_buffer(st_collect(the_geom), '||v_geomparamupdate||') as geom from v_edit_arc 
+								where '||quote_ident(v_field)||'::integer > 0 AND v_edit_arc.'||quote_ident(v_field)||' IN
+								(SELECT DISTINCT '||quote_ident(v_field)||' FROM v_edit_arc JOIN anl_arc USING (arc_id) WHERE fid = '||v_fid||' and cur_user = current_user)
 								group by '||quote_ident(v_field)||'
 								UNION
 								SELECT '||quote_ident(v_field)||', st_collect(ext_plot.the_geom) as geom FROM v_edit_connec, ext_plot
 								WHERE '||quote_ident(v_field)||'::integer > 0 
 								AND v_edit_connec.'||quote_ident(v_field)||' IN
-								(SELECT DISTINCT '||quote_ident(v_field)||' FROM arc JOIN anl_arc USING (arc_id) WHERE fid = '||v_fid||' and cur_user = current_user)
+								(SELECT DISTINCT '||quote_ident(v_field)||' FROM v_edit_arc JOIN anl_arc USING (arc_id) WHERE fid = '||v_fid||' and cur_user = current_user)
 								AND st_dwithin(v_edit_connec.the_geom, ext_plot.the_geom, 0.001)
 								group by '||quote_ident(v_field)||'	
 								)a group by '||quote_ident(v_field)||')b 
 							WHERE b.'||quote_ident(v_field)||'='||quote_ident(v_table)||'.'||quote_ident(v_fieldmp);
 
+							/*
+							UPDATE arc set the_geom = geom FROM(
+								SELECT dma_id, st_multi(st_buffer(st_collect(geom),0.01)) as geom FROM
+								(SELECT dma_id, st_buffer(st_collect(the_geom), 10) as geom from v_edit_arc 
+								where dma_id::integer > 0 AND v_edit_arc.dma_id IN
+								(SELECT DISTINCT dma_id FROM v_edit_arc JOIN anl_arc USING (arc_id) WHERE fid = 145 and cur_user = current_user)
+								group by dma_id
+								UNION
+								SELECT dma_id, st_collect(ext_plot.the_geom) as geom FROM v_edit_connec, ext_plot
+								WHERE dma_id::integer > 0 
+								AND v_edit_connec.dma_id IN
+								(SELECT DISTINCT dma_id FROM v_edit_arc JOIN anl_arc USING (arc_id) WHERE fid = 145 and cur_user = current_user)
+								AND st_dwithin(v_edit_connec.the_geom, ext_plot.the_geom, 0.001)
+								group by dma_id	
+								)a group by dma_id
+							)b WHERE b.dma_id=dma.dma_id;
+							*/
+
 					EXECUTE v_querytext;
 				END IF;
 					
-						
 				IF v_updatemapzgeom > 0 THEN
 					-- message
 					INSERT INTO audit_check_data (fid, criticity, error_message)
@@ -601,9 +627,7 @@ BEGIN
 				-- insert spacer for warning and info
 				INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  2, '');
 				INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  1, '');
-		
 			END IF;
-
 		END IF;
 	END IF;
 	-- insert spacers on log
