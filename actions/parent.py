@@ -177,7 +177,7 @@ class ParentAction(object):
         self.controller.plugin_settings_set_value(dialog.objectName() + "_y", dialog.pos().y()+31)
 
 
-    def open_dialog(self, dlg=None, dlg_name=None, info=True, maximize_button=True, stay_on_top=True, fid=None):
+    def open_dialog(self, dlg=None, dlg_name=None, info=True, maximize_button=True, stay_on_top=True, title=None):
         """ Open dialog """
 
         # Check database connection before opening dialog
@@ -187,10 +187,12 @@ class ParentAction(object):
         if dlg is None or type(dlg) is bool:
             dlg = self.dlg
 
-        dlg.setWindowTitle(f"DIMENSIONS - {fid}")
-        # todo Manage i18n of the dialog
-        #if dlg_name:
-            3self.controller.manage_translation(dlg_name, dlg)
+        # set window title
+        if title is not None:
+            dlg.setWindowTitle(title)
+        else:
+            if dlg_name:
+                self.controller.manage_translation(dlg_name, dlg)
 
         # Manage stay on top, maximize/minimize button and information button
         # if info is True maximize flag will be ignored

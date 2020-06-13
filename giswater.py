@@ -935,7 +935,6 @@ class Giswater(QObject):
 
         # Initialize toolbars
         self.initialize_toolbars()
-
         self.get_buttons_to_hide()
 
         # Manage project read of type 'tm'
@@ -952,7 +951,7 @@ class Giswater(QObject):
         if self.wsoftware == 'ws':
             self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)
 
-        # Manage layers
+        # Manage layers and check project
         if not self.manage_layers():
             return
 
@@ -974,9 +973,10 @@ class Giswater(QObject):
         # Check roles of this user to show or hide toolbars
         self.controller.check_user_roles()
 
-        # Manage layer fields
-        self.get_layers_to_config()
-        self.set_layer_config(self.available_layers)
+        # Set project layers with gw_fct_getinfofromid: This process takes time for user
+        if self.hide_form is False:
+            self.get_layers_to_config()
+            self.set_layer_config(self.available_layers)
 
         # Create a thread to listen selected database channels
         if self.settings.value('system_variables/use_notify').upper() == 'TRUE':
@@ -1133,11 +1133,14 @@ class Giswater(QObject):
             QApplication.setOverrideCursor(Qt.ArrowCursor)
             self.check_project_result = CheckProjectResult(self.iface, self.settings, self.controller, self.plugin_dir)
             self.check_project_result.set_controller(self.controller)
+
+            # check project
             status, result = self.check_project_result.populate_audit_check_project(layers, "true")
             try:
                 if 'actions' in result['body']:
                     if 'useGuideMap' in result['body']['actions']:
                         guided_map = result['body']['actions']['useGuideMap']
+                        self.hide_form = result['body']['actions']['hideForm']
                         if guided_map:
                             self.controller.log_info("manage_guided_map")
                             self.manage_guided_map()
@@ -1353,7 +1356,7 @@ class Giswater(QObject):
     def set_layer_config(self, layers):
         """ Set layer fields configured according to client configuration.
             At the moment manage:
-                Column names as alias, combos and typeahead as ValueMap"""
+                Column names as alias, combos as ValueMap, typeahead as textedit"""
 
         msg_failed = ""
         msg_key = ""
@@ -1369,7 +1372,7 @@ class Giswater(QObject):
             if not complet_result: continue
             
             for field in complet_result['body']['data']['fields']:
-                _values = {}
+                valuemap_values = {}
 
                 # Get column index
                 fieldIndex = layer.fields().indexFromName(field['columnname'])
@@ -1401,15 +1404,20 @@ class Giswater(QObject):
                 # Manage editability
                 self.set_read_only(layer, field, fieldIndex)
 
-                # Manage fields
+                # delete old values on ValueMap
+                editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': valuemap_values})
+                layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+
+                # Manage new values in ValueMap
                 if field['widgettype'] == 'combo':
                     if 'comboIds' in field:
                         # Set values
                         for i in range(0, len(field['comboIds'])):
-                            _values[field['comboNames'][i]] = field['comboIds'][i]
+                            valuemap_values[field['comboNames'][i]] = field['comboIds'][i]
                     # Set values into valueMap
-                    editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': _values})
+                    editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': valuemap_values})
                     layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+
 
         if msg_failed != "":
             self.controller.show_exceptions_msg("Execute failed.", msg_failed)

@@ -14,7 +14,7 @@
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <layout class="QGridLayout" name="lyt_main">
-      <item row="5" column="0">
+      <item row="4" column="0">
        <widget class="QGroupBox" name="grb_other">
         <property name="title">
          <string>Other</string>
@@ -27,13 +27,13 @@
        </widget>
       </item>
       <item row="3" column="0">
-       <widget class="QGroupBox" name="grb_depth">
+       <widget class="QGroupBox" name="grb_symbology">
         <property name="title">
-         <string>Depth</string>
+         <string>Circle symbology</string>
         </property>
-        <layout class="QGridLayout" name="gridLayout_4">
+        <layout class="QGridLayout" name="gridLayout_6">
          <item row="0" column="0">
-          <layout class="QGridLayout" name="lyt_depth"/>
+          <layout class="QGridLayout" name="lyt_symbology"/>
          </item>
         </layout>
        </widget>
@@ -42,25 +42,13 @@
        <layout class="QGridLayout" name="lyt_top_1"/>
       </item>
       <item row="2" column="0">
-       <widget class="QGroupBox" name="grb_distance">
+       <widget class="QGroupBox" name="grb_depth">
         <property name="title">
-         <string>Distance</string>
+         <string>Measurements</string>
         </property>
-        <layout class="QGridLayout" name="gridLayout_2">
+        <layout class="QGridLayout" name="gridLayout_4">
          <item row="0" column="0">
-          <layout class="QGridLayout" name="lyt_distance"/>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item row="4" column="0">
-       <widget class="QGroupBox" name="grb_symbology">
-        <property name="title">
-         <string>Circle symbology</string>
-        </property>
-        <layout class="QGridLayout" name="gridLayout_6">
-         <item row="0" column="0">
-          <layout class="QGridLayout" name="lyt_symbology"/>
+          <layout class="QGridLayout" name="lyt_measurements"/>
          </item>
         </layout>
        </widget>

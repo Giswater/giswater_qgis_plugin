@@ -296,7 +296,7 @@ class ApiCF(ApiParent, QObject):
 
         if template == 'info_generic':
             result, dialog = self.open_generic_form(self.complet_result)
-            # Fill self.my_json for new feature
+            # Fill self.my_json for new qgis_feature
             if feature_cat is not None:
                 self.manage_new_feature(self.complet_result, dialog)
             return result, dialog
@@ -306,8 +306,7 @@ class ApiCF(ApiParent, QObject):
             if self.lyr_dim:
                 self.api_dim = ApiDimensioning(self.iface, self.settings, self.controller, self.plugin_dir)
                 feature_id = self.complet_result[0]['body']['feature']['id']
-                feature = self.get_feature_by_id(self.lyr_dim, feature_id, 'id')
-                result, dialog = self.api_dim.open_form(feature, self.lyr_dim, feature_id, self.complet_result)
+                result, dialog = self.api_dim.open_form(None, self.lyr_dim, self.complet_result, feature_id)
                 return result, dialog
 
         elif template == 'info_feature':

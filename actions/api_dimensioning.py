@@ -42,7 +42,7 @@ class ApiDimensioning(ApiParent):
         self.snapper = self.snapper_manager.get_snapper()
 
 
-    def open_form(self, new_feature=None, layer=None, complet_result=None):
+    def open_form(self, qgis_feature=None, layer=None, db_return=None, fid=None):
 
         self.dlg_dim = DimensioningUi()
         self.load_settings(self.dlg_dim)
@@ -56,41 +56,43 @@ class ApiDimensioning(ApiParent):
         actionOrientation.triggered.connect(partial(self.orientation, actionOrientation))
         self.set_icon(actionOrientation, "133")
 
-        self.dlg_dim.btn_accept.clicked.connect(partial(self.save_dimensioning, new_feature, layer))
-        self.dlg_dim.btn_cancel.clicked.connect(partial(self.cancel_dimensioning))
-        self.dlg_dim.dlg_closed.connect(partial(self.cancel_dimensioning))
-        self.dlg_dim.dlg_closed.connect(partial(self.save_settings, self.dlg_dim))
-
         # Set layers dimensions, node and connec
         self.layer_dimensions = self.controller.get_layer_by_tablename("v_edit_dimensions")
         self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
         self.layer_connec = self.controller.get_layer_by_tablename("v_edit_connec")
 
-        self.create_map_tips()
-        if complet_result is None:
-            body = self.create_body()
-            # Get layers under mouse clicked
-            sql = f"SELECT gw_fct_getdimensioning({body})::text"
-            row = self.controller.get_row(sql, log_sql=True, commit=True)
-            if row is None or row[0] is None:
-                self.controller.show_message("NOT ROW FOR: " + sql, 2)
-                return False
-            complet_result = row[0]
+        if qgis_feature is None:
+            features = self.layer_dimensions.getFeatures()
+            for feature in features:
+                if feature['id'] == fid:
+                     return feature
+            qgis_feature = feature
 
-        # Get layers under mouse clicked
-        body = self.create_body()
-        function_name = 'gw_fct_getdimensioning'
-        json_result = self.controller.get_json(function_name, body)
-        if json_result is None:
-            return False
-        complet_result = [json_result]
+        #qgis_feature = self.get_feature_by_id(self.layer_dimensions, fid, 'id')
+
+        self.dlg_dim.btn_accept.clicked.connect(partial(self.save_dimensioning, qgis_feature, layer))
+        self.dlg_dim.btn_cancel.clicked.connect(partial(self.cancel_dimensioning))
+        self.dlg_dim.dlg_closed.connect(partial(self.cancel_dimensioning))
+        self.dlg_dim.dlg_closed.connect(partial(self.save_settings, self.dlg_dim))
+
+        self.create_map_tips()
+
+        # when funcion is called from new feature
+        if db_return is None:
+            print('2')
+            body = self.create_body()
+            function_name = 'gw_fct_getdimensioning'
+            json_result = self.controller.get_json(function_name, body)
+            if json_result is None:
+                return False
+            db_return = [json_result]
 
         # get id from db response
-        self.fid = complet_result[0]['body']['feature']['id']
+        self.fid = db_return[0]['body']['feature']['id']
 
         layout_list = []
-        for field in complet_result[0]['body']['data']['fields']:
-            label, widget = self.set_widgets(self.dlg_dim, complet_result, field)
+        for field in db_return[0]['body']['data']['fields']:
+            label, widget = self.set_widgets(self.dlg_dim, db_return, field)
 
             if widget.objectName() == 'id':
                 utils_giswater.setWidgetText(self.dlg_dim, widget, self.fid)
@@ -118,7 +120,8 @@ class ApiDimensioning(ApiParent):
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
             layout.addItem(vertical_spacer1)
 
-        self.open_dialog(self.dlg_dim, dlg_name='Dimensioning', fid = self.fid)
+        title = f"DIMENSIONING - {self.fid}"
+        self.open_dialog(self.dlg_dim, dlg_name='Dimensioning', title=title)
         return False, False
 
 
@@ -128,10 +131,11 @@ class ApiDimensioning(ApiParent):
         self.close_dialog(self.dlg_dim)
 
 
-    def save_dimensioning(self, new_feature, layer):
+    def save_dimensioning(self, qgis_feature, layer):
 
-        # Insert new feature into db
-        layer.updateFeature(new_feature)
+        # Upsert feature into db
+        print(qgis_feature)
+        layer.updateFeature(qgis_feature)
         layer.commitChanges()
 
         # Create body
@@ -363,7 +367,7 @@ class ApiDimensioning(ApiParent):
         self.map_tip_connec.clear(self.canvas)
 
 
-    def set_widgets(self, dialog, complet_result, field):
+    def set_widgets(self, dialog, db_return, field):
 
         widget = None
         label = None
@@ -406,7 +410,7 @@ class ApiDimensioning(ApiParent):
         elif field['widgettype'] in ('spinbox'):
             widget = self.add_spinbox(field)
         elif field['widgettype'] == 'tableview':
-            widget = self.add_tableview(complet_result, field)
+            widget = self.add_tableview(db_return, field)
             widget = self.set_headers(widget, field)
             widget = self.populate_table(widget, field)
             widget = self.set_columns_config(widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)
