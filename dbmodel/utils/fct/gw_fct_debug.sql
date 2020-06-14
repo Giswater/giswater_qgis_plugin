@@ -28,23 +28,27 @@ v_error_id integer;
 v_message text;
 v_variables text;
 v_debug boolean;
-v_schemaname text;
+v_schemaname text = 'SCHEMA_NAME';
 v_fullmessage text;
 v_systranstaction_db boolean;
-
-BEGIN
-    
-	SET search_path = "SCHEMA_NAME", public; 
+v_tableversion text = 'sys_version';
+v_columntype text = 'project_type';
 	
-	v_schemaname = 'SCHEMA_NAME';
+BEGIN
+
+	-- search path
+	SET search_path = "SCHEMA_NAME", public;
+
+	-- get info from version table
+	IF (SELECT tablename FROM pg_tables WHERE schemaname = v_schemaname AND tablename = 'version') IS NOT NULL THEN v_tableversion = 'version'; v_columntype = 'wsoftware'; END IF;
+ 	EXECUTE 'SELECT '||quote_ident(v_columntype)||', giswater FROM '||quote_ident(v_tableversion)||' LIMIT 1' INTO v_projectype, v_version;
 
 	v_message = lower(((p_data ->>'data')::json->>'msg')::text);
 	v_variables = lower(((p_data ->>'data')::json->>'variables')::text);
 	
 	-- get system parameters
 	v_systranstaction_db = (SELECT value::json->>'status' FROM config_param_system WHERE parameter = 'admin_transaction_db')::boolean;
-	SELECT giswater, project_type INTO v_version, v_projectype FROM sys_version order by 1 desc limit 1;
-	
+
 	-- get parameters from user
 	v_debug = (SELECT value::boolean FROM config_param_user WHERE parameter = 'debug_mode' AND cur_user=current_user);
 

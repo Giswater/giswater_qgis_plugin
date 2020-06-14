@@ -20,7 +20,7 @@ $BODY$
 DECLARE 
 
 v_project_type text;
-v_schemaname text;
+v_schemaname text = 'SCHEMA_NAME';
 v_viewname text;
 v_feature_type text;
 v_feature_system_id text;
@@ -31,13 +31,18 @@ v_ct_param text;
 v_id_param text;
 v_datatype text;
 v_view_type integer;
-
+v_tableversion text = 'sys_version';
+v_columntype text = 'project_type';
+	
 BEGIN
 
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
 
-	SELECT project_type INTO v_project_type FROM sys_version LIMIT 1;
+	-- get info from version table
+	IF (SELECT tablename FROM pg_tables WHERE schemaname = v_schemaname AND tablename = 'version') IS NOT NULL THEN v_tableversion = 'version'; v_columntype = 'wsoftware'; END IF;
+ 	EXECUTE 'SELECT '||quote_ident(v_columntype)||' FROM '||quote_ident(v_tableversion)||' LIMIT 1' INTO v_project_type;
+
 
 	v_schemaname = (p_data ->> 'schema');
 	v_viewname = ((p_data ->> 'body')::json->>'viewname')::text;

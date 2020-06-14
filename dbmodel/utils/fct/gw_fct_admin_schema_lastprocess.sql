@@ -13,7 +13,7 @@ $BODY$
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_admin_schema_lastprocess($${
 "client":{"lang":"ES"}, 
-"data":{"isNewProject":"TRUE", "gwVersion":"3.1.105", "projectType":"WS", 
+"data":{"isNewProject":"TRUE", "gwVersion":"3.1.105", "projectType":"WS", "isSample":true
 		"epsg":"25831", "title":"test project", "author":"test", "date":"01/01/2000", "superUsers":["postgres", "giswater"]}}$$)
 
 SELECT SCHEMA_NAME.gw_fct_admin_schema_lastprocess($${
@@ -43,7 +43,7 @@ v_superusers text;
 v_tablename record;
 v_schemaname text;
 v_oldversion text;
-v_is_sample boolean = FALSE;
+v_issample boolean = FALSE;
 v_sample_exist text = '';
 	
 BEGIN 
@@ -57,15 +57,11 @@ BEGIN
 	v_projecttype := (p_data ->> 'data')::json->> 'projectType';
 	v_epsg := (p_data ->> 'data')::json->> 'epsg';
 	v_isnew := (p_data ->> 'data')::json->> 'isNewProject';
+	v_issample := (p_data ->> 'data')::json->> 'isSample';
 	v_title := (p_data ->> 'data')::json->> 'title';
 	v_author := (p_data ->> 'data')::json->> 'author';
 	v_date := (p_data ->> 'data')::json->> 'date';
 	v_superusers := (p_data ->> 'data')::json->> 'superUsers';
-	
-	-- Check if exist sample column on version table
-	SELECT column_name INTO v_sample_exist  
-	FROM information_schema.columns 
-	WHERE table_name='version' and column_name='sample';
 	
 	-- enable triggers on typevalue tables
 	ALTER TABLE om_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
@@ -91,14 +87,8 @@ BEGIN
 		VALUES ('admin_superusers', v_superusers ,'json', 'Basic information about superusers for this schema','utils', 'Schema manager:');
 			
 		-- inserting version table
-		IF v_sample_exist != 'sample' THEN
-			SELECT sample INTO v_is_sample FROM sys_version ORDER BY id LIMIT 1;
-			INSERT INTO version (giswater, project_type, postgres, postgis, language, epsg, sample) VALUES (v_gwversion, upper(v_projecttype), (select version()),
-			(select postgis_version()), v_language, v_epsg, v_is_sample);
-		ELSE
-			INSERT INTO version (giswater, project_type, postgres, postgis, language, epsg) VALUES (v_gwversion, upper(v_projecttype), (select version()),
-			(select postgis_version()), v_language, v_epsg);
-		END IF;
+		INSERT INTO sys_version (giswater, project_type, postgres, postgis, language, epsg, sample) VALUES (v_gwversion, upper(v_projecttype), (select version()),
+		(select postgis_version()), v_language, v_epsg, v_issample);
 		
 		v_message='Project sucessfully created';
 		
@@ -246,7 +236,7 @@ BEGIN
 		-- inserting version table
 		SELECT * INTO v_version FROM sys_version LIMIT 1;
 		INSERT INTO version (giswater, project_type, postgres, postgis, language, epsg, sample)
-		VALUES (v_gwversion, v_version.project_type, (select version()), (select postgis_version()), v_version.language, v_version.epsg, v_is_sample);
+		VALUES (v_gwversion, v_version.project_type, (select version()), (select postgis_version()), v_version.language, v_version.epsg, v_version.sample);
 
 		-- get return message
 		IF v_priority=0 THEN

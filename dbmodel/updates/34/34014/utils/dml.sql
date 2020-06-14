@@ -7,6 +7,10 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+-- 2020/06/15
+ALTER SEQUENCE version_id_seq RENAME TO sys_version_id_seq;
+UPDATE sys_table SET id = 'sys_version', sys_sequence = 'sys_version_id_seq' WHERE id = 'version';
+
 
 -- 2020/06/02
 UPDATE sys_table SET id='cat_feature_arc' WHERE id = 'arc_type';

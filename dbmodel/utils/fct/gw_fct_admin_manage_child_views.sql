@@ -24,7 +24,7 @@ SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "inf
 
 DECLARE 
 
-v_schemaname text;
+v_schemaname text = 'SCHEMA_NAME';
 v_cat_feature text;
 v_viewname text;
 v_definition text;
@@ -44,16 +44,17 @@ v_data_view json;
 v_view_type text;
 v_action text;
 v_childview text;
+v_tableversion text = 'sys_version';
+v_columntype text = 'project_type';
 	
 BEGIN
 
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
 
-	-- get input parameters
-	v_schemaname = 'SCHEMA_NAME';
-
-	SELECT project_type INTO v_project_type FROM sys_version LIMIT 1;
+	-- get info from version table
+	IF (SELECT tablename FROM pg_tables WHERE schemaname = v_schemaname AND tablename = 'version') IS NOT NULL THEN v_tableversion = 'version'; v_columntype = 'wsoftware'; END IF;
+ 	EXECUTE 'SELECT '||quote_ident(v_columntype)||' FROM '||quote_ident(v_tableversion)||' LIMIT 1' INTO v_project_type;
 
 	v_cat_feature = ((p_data ->>'feature')::json->>'catFeature')::text;
 	v_multi_create = ((p_data ->>'data')::json->>'multi_create')::text;

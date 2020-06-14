@@ -43,6 +43,3 @@ ALTER TABLE cat_feature_connec DROP COLUMN active;
 ALTER TABLE cat_feature_connec DROP COLUMN code_autofill;
 ALTER TABLE cat_feature_connec DROP COLUMN descript;
 ALTER TABLE cat_feature_connec DROP COLUMN link_path;
-
-ALTER TABLE version RENAME to sys_version;
-ALTER TABLE sys_version RENAME wsoftware to project_type;

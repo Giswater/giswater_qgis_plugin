@@ -8,6 +8,10 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
+-- 2020/06/15
+ALTER TABLE version RENAME to sys_version;
+ALTER TABLE sys_version RENAME wsoftware to project_type;
+
 -- 2020/01/30
 CREATE TABLE IF NOT EXISTS doc_x_workcat
 (

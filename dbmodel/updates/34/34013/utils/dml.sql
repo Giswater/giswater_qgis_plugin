@@ -56,7 +56,6 @@ DELETE FROM sys_table WHERE id IN('om_psector','om_psector_cat_type','om_psector
 
 DELETE FROM sys_table WHERE id IN('inp_controls_x_node');
 
-
 UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json,'feature_type','arc'::text) where parameter = 'basic_search_network_arc';
 UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json,'feature_type','node'::text) where parameter = 'basic_search_network_node';
 UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json,'feature_type','connec'::text) where parameter = 'basic_search_network_connec';
@@ -89,7 +88,7 @@ UPDATE config_param_user SET parameter ='edit_connec_location_vdefault' WHERE pa
 UPDATE config_param_user SET parameter ='edit_presszone_vdefault' WHERE parameter = 'presszone_vdefault';
 UPDATE config_param_user SET parameter ='edit_pavement_vdefault' WHERE parameter = 'pavement_vdefault';
 UPDATE config_param_user SET parameter ='edit_connec_location_vdefault' WHERE parameter = 'connec_location_vdefault';
-UPDATE config_param_user SET parameter ='edit_connecarccat_vdefault' WHERE parameter = 'connecarccat_vdefault;
+UPDATE config_param_user SET parameter ='edit_connecarccat_vdefault' WHERE parameter = 'connecarccat_vdefault';
 
 UPDATE sys_param_user SET formname ='dynamic' WHERE formname = 'dynamic_param';
 UPDATE sys_param_user SET formname ='hidden' WHERE formname = 'hidden_param';

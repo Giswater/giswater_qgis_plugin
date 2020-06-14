@@ -27,14 +27,17 @@ v_version text;
 v_notify_action json;
 rec_json record; 
 v_table record;
+v_tableversion text = 'sys_version';
+v_schemaname text = 'SCHEMA_NAME';
 
 BEGIN
 	
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
 	
-	-- select version
-	SELECT giswater INTO v_version FROM sys_version order by 1 desc limit 1;
+	-- get info from version table
+	IF (SELECT tablename FROM pg_tables WHERE schemaname = v_schemaname AND tablename = 'version') IS NOT NULL THEN v_tableversion = 'version'; END IF;
+ 	EXECUTE 'SELECT giswater FROM '||quote_ident(v_tableversion)||' LIMIT 1' INTO v_version;
 
 	IF p_action = 'notify' THEN
 

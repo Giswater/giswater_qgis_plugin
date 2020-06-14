@@ -26,29 +26,40 @@ v_statussector text;
 v_statuspresszone text;
 v_statusdma text;
 v_statusdqa text;
+v_project_type text;
 
 BEGIN
 
 	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
 
+	SELECT project_type INTO v_project_type FROM sys_version LIMIT 1;
+
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
         INTO v_version;
 
-	-- get status	
-	v_statussector := (SELECT value::json->>'SECTOR' FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
-	v_statuspresszone := (SELECT value::json->>'PRESSZONE' FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
-	v_statusdma := (SELECT value::json->>'DMA' FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
-	v_statusdqa := (SELECT value::json->>'DQA' FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
+        IF v_project_type = 'WS' THEN
 
-	-- get values
-	SELECT to_json(array_agg(row_to_json(row))) INTO v_sector FROM (SELECT sector_id as id, stylesheet::json FROM v_edit_sector) row;
-	SELECT to_json(array_agg(row_to_json(row))) INTO v_presszone FROM (SELECT presszone_id as id , stylesheet::json FROM v_edit_presszone) row;
-	SELECT to_json(array_agg(row_to_json(row))) INTO v_dma FROM (SELECT dma_id as id, stylesheet::json FROM v_edit_dma) row;
-	SELECT to_json(array_agg(row_to_json(row))) INTO v_dqa FROM (SELECT dqa_id as id, stylesheet::json FROM v_edit_dqa) row;
+		-- get status	
+		v_statussector := (SELECT value::json->>'SECTOR' FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
+		v_statuspresszone := (SELECT value::json->>'PRESSZONE' FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
+		v_statusdma := (SELECT value::json->>'DMA' FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
+		v_statusdqa := (SELECT value::json->>'DQA' FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
+
+		-- get values
+		SELECT to_json(array_agg(row_to_json(row))) INTO v_sector FROM (SELECT sector_id as id, stylesheet::json FROM v_edit_sector) row;
+		SELECT to_json(array_agg(row_to_json(row))) INTO v_presszone FROM (SELECT presszone_id as id , stylesheet::json FROM v_edit_presszone) row;
+		SELECT to_json(array_agg(row_to_json(row))) INTO v_dma FROM (SELECT dma_id as id, stylesheet::json FROM v_edit_dma) row;
+		SELECT to_json(array_agg(row_to_json(row))) INTO v_dqa FROM (SELECT dqa_id as id, stylesheet::json FROM v_edit_dqa) row;
+
+	END IF;
 
 	-- control nulls
+	v_statussector := COALESCE(v_sector, '{}');
+	v_statuspresszone := COALESCE(v_sector, '{}');
+	v_statusdma := COALESCE(v_sector, '{}');
+	v_statusdqa := COALESCE(v_sector, '{}');	
 	v_sector := COALESCE(v_sector, '{}');
 	v_dma  := COALESCE(v_dma, '{}');
 	v_presszone := COALESCE(v_presszone, '{}');
@@ -66,8 +77,8 @@ BEGIN
 	    '}')::json;
       
 	-- Exception handling
-	--EXCEPTION WHEN OTHERS THEN 
-	--RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	EXCEPTION WHEN OTHERS THEN 
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;
