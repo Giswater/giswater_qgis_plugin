@@ -371,11 +371,13 @@ class GwToolBox(ApiParent):
             self.add_layer.set_layers_visible(json_result['body']['data']['setVisibleLayers'])
 
             # getting simbology capabilities
-            if 'setSymbologySytle' in json_result['body']['data']:
-                set_simbology_sytle = json_result['body']['data']['setSymbologySytle']
-                if set_simbology_sytle == "Mapzones":
+            print('1')
+            if 'setStyle' in json_result['body']['data']:
+                set_sytle = json_result['body']['data']['setStyle']
+                print(set_sytle)
+                if set_sytle == "Mapzones":
                     # call function to simbolize mapzones
-                    self.set_mapzones_style()
+                    self.set_style_mapzones()
 
         except KeyError as e:
             msg = f"<b>Key: </b>{e}<br>"
