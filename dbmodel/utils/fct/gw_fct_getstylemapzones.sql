@@ -53,13 +53,15 @@ BEGIN
 		SELECT to_json(array_agg(row_to_json(row))) INTO v_dma FROM (SELECT dma_id as id, stylesheet::json FROM v_edit_dma) row;
 		SELECT to_json(array_agg(row_to_json(row))) INTO v_dqa FROM (SELECT dqa_id as id, stylesheet::json FROM v_edit_dqa) row;
 
+	ELSE
+		-- control nulls
+		v_statussector := COALESCE(v_sector, '{}');
+		v_statuspresszone := COALESCE(v_sector, '{}');
+		v_statusdma := COALESCE(v_sector, '{}');
+		v_statusdqa := COALESCE(v_sector, '{}');	
+
 	END IF;
 
-	-- control nulls
-	v_statussector := COALESCE(v_sector, '{}');
-	v_statuspresszone := COALESCE(v_sector, '{}');
-	v_statusdma := COALESCE(v_sector, '{}');
-	v_statusdqa := COALESCE(v_sector, '{}');	
 	v_sector := COALESCE(v_sector, '{}');
 	v_dma  := COALESCE(v_dma, '{}');
 	v_presszone := COALESCE(v_presszone, '{}');

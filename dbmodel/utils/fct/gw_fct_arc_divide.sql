@@ -22,7 +22,7 @@ SELECT SCHEMA_NAME.gw_fct_arc_divide($${
 */
 
 DECLARE
-v_node_geom	geometry;
+v_node_geom geometry;
 v_arc_id varchar;
 v_code varchar;
 v_arc_geom geometry;
@@ -109,12 +109,12 @@ BEGIN
 	SELECT state INTO v_state_node FROM node WHERE node_id=v_node_id;
 	
 	IF v_project_type = 'WS' THEN
-		SELECT isarcdivide, node_type.id INTO v_isarcdivide, v_node_type 
-		FROM node_type JOIN cat_node ON cat_node.nodetype_id=node_type.id 
+		SELECT isarcdivide, cat_feature_node.id INTO v_isarcdivide, v_node_type 
+		FROM cat_feature_node JOIN cat_node ON cat_node.nodetype_id=cat_feature_node.id 
 		JOIN node ON node.nodecat_id = cat_node.id WHERE node.node_id=v_node_id;
 	ELSE
-		SELECT isarcdivide, node_type.id INTO v_isarcdivide, v_node_type 
-		FROM node_type JOIN node ON node.node_type = node_type.id WHERE node.node_id=v_node_id;
+		SELECT isarcdivide, cat_feature_node.id INTO v_isarcdivide, v_node_type 
+		FROM cat_feature_node JOIN node ON node.node_type = cat_feature_node.id WHERE node.node_id=v_node_id;
 	END IF;
 
     -- Get parameters from configs table
