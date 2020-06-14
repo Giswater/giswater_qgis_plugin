@@ -85,12 +85,7 @@ class UpdateSQL(ApiParent):
             self.init_show_database()
 
         # Check if we have any layer loaded
-        self.project_type = self.controller.get_project_type()
-        layers = self.controller.get_layers()
-        if self.project_type is not None and len(layers) != 0:
-            self.info_show_info()
-        else:
-            self.info_show_database(username=username, show_dialog=show_dialog)
+        self.info_show_database(username=username, show_dialog=show_dialog)
 
 
     def populate_combo_connections(self):
@@ -118,10 +113,7 @@ class UpdateSQL(ApiParent):
             self.controller.show_message("SQL folder not found", parameter=self.sql_dir)
             return
 
-        # Get plugin version from metadata.txt file
-        self.plugin_version = self.get_plugin_version()
-        self.version_metadata = self.get_plugin_version()
-        self.project_data_schema_version = '0'
+        self.project_version = '0'
 
         # Manage super users
         self.super_users = []
@@ -315,12 +307,12 @@ class UpdateSQL(ApiParent):
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
             utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
         else:
-            if str(self.version_metadata) > str(self.project_data_schema_version):
+            if str(self.plugin_version) > str(self.project_version):
                 self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
                 utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
                     '(Schema version is lower than plugin version, please update schema)')
                 self.dlg_readsql.btn_info.setEnabled(True)
-            elif str(self.version_metadata) < str(self.project_data_schema_version):
+            elif str(self.plugin_version) < str(self.project_version):
                 self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
                 utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
                     '(Schema version is higher than plugin version, please update plugin)')
@@ -431,7 +423,7 @@ class UpdateSQL(ApiParent):
         utils_giswater.setWidgetText(self.dlg_create_gis_project, 'txt_gis_folder', users_home)
 
         # Manage widgets
-        if str(self.is_sample) == 'True':
+        if str(self.project_issample) == 'True':
             self.dlg_create_gis_project.lbl_is_sample.setVisible(True)
             self.dlg_create_gis_project.chk_is_sample.setVisible(True)
         else:
@@ -639,7 +631,7 @@ class UpdateSQL(ApiParent):
                                         return False
 
                         else:
-                            if str(sub_folder) > '31100' and str(sub_folder) <= str(self.version_metadata).replace('.', ''):
+                            if str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder,  os.sep + 'utils' + os.sep):
                                     status = self.load_sql(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep, no_ct=no_ct)
                                     if status is False:
@@ -659,7 +651,7 @@ class UpdateSQL(ApiParent):
 
                     else:
                         if self.read_all_updates == 'TRUE':
-                            if str(sub_folder) > str(self.project_data_schema_version).replace('.', '') and str(sub_folder) > '31100':
+                            if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100':
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
                                     status = self.load_sql(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep)
                                     if status is False:
@@ -685,7 +677,7 @@ class UpdateSQL(ApiParent):
                                         return False
 
                         else:
-                            if str(sub_folder) > str(self.project_data_schema_version).replace('.', '') and str(sub_folder) > '31100' and str(sub_folder) <= str(self.version_metadata).replace('.', ''):
+                            if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
                                     status = self.load_sql(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep)
                                     if status is False:
@@ -727,7 +719,7 @@ class UpdateSQL(ApiParent):
                                         return False
 
                         else:
-                            if str(sub_folder) > '31100' and str(sub_folder) <= str(self.version_metadata).replace('.',''):
+                            if str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.',''):
                                 if self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder,
                                                        '') is True:
                                     status = self.load_sql(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder)
@@ -745,7 +737,7 @@ class UpdateSQL(ApiParent):
 
                     else:
                         if self.read_all_updates == 'TRUE':
-                            if str(sub_folder) > str(self.project_data_schema_version).replace('.', '') and str(sub_folder) > '31100':
+                            if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100':
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
                                     status = self.load_sql(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep)
                                     if status is False:
@@ -769,7 +761,7 @@ class UpdateSQL(ApiParent):
                                         return False
 
                         else:
-                            if str(sub_folder) > str(self.project_data_schema_version).replace('.', '') and str(sub_folder) > '31100' and str(sub_folder) <= str(self.version_metadata).replace('.', ''):
+                            if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
                                     status = self.load_sql(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep)
                                     if status is False:
@@ -855,7 +847,7 @@ class UpdateSQL(ApiParent):
                                 if status is False:
                                     return False
                     else:
-                        if str(sub_folder) > str(self.project_data_schema_version).replace('.', '') and str(sub_folder) <= '31100':
+                        if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) <= '31100':
                             if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
                                 status = self.load_sql(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep)
                                 if status is False:
@@ -909,7 +901,7 @@ class UpdateSQL(ApiParent):
                                     return False
 
                     else:
-                        if str(sub_folder) > str(self.project_data_schema_version).replace('.', '') and str(sub_folder) <= '31100':
+                        if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) <= '31100':
                             if self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder, '') is True:
                                 status = self.load_sql(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + '')
                                 if status is False:
@@ -932,8 +924,7 @@ class UpdateSQL(ApiParent):
 
     def load_sample_data(self, project_type=False):
 
-        sql = (f"UPDATE {self.schema}.version SET sample=True "
-               f"WHERE id = (SELECT id FROM {self.schema}.version ORDER BY id DESC LIMIT 1)")
+        sql = (f"UPDATE {self.schema}.sys_version SET sample=True ")
         self.controller.execute_sql(sql, commit=False)
 
         if str(project_type) == 'ws' or str(project_type) == 'ud':
@@ -1113,7 +1104,7 @@ class UpdateSQL(ApiParent):
                             if status is False:
                                 return False
                     else:
-                        if str(sub_folder) <= str(self.version_metadata).replace('.', ''):
+                        if str(sub_folder) <= str(self.plugin_version).replace('.', ''):
                             if self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep,
                                                    '') is True:
                                 status = self.executeFiles(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep + '')
@@ -1150,7 +1141,7 @@ class UpdateSQL(ApiParent):
 
                 else:
                     if self.read_all_updates == 'TRUE':
-                        if str(sub_folder) > str(self.project_data_schema_version).replace('.', ''):
+                        if str(sub_folder) > str(self.project_version).replace('.', ''):
                             if self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep, '') is True:
                                 status = self.executeFiles(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep + '')
                                 if status is False:
@@ -1183,7 +1174,7 @@ class UpdateSQL(ApiParent):
                                 if status is False:
                                     return False
                     else:
-                        if str(sub_folder) > str(self.project_data_schema_version).replace('.', '') and str(sub_folder) <= str(self.version_metadata).replace('.',''):
+                        if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) <= str(self.plugin_version).replace('.',''):
                             if self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep,
                                                    '') is True:
                                 status = self.executeFiles(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep + '')
@@ -1262,12 +1253,13 @@ class UpdateSQL(ApiParent):
 
         if new_project is True:
             extras = '"isNewProject":"' + str('TRUE') + '", '
+            extras += '"isSample":"' + str(self.project_issample) + '", '
         else:
             extras = '"isNewProject":"' + str('FALSE') + '", '
-        extras += '"gwVersion":"' + str(self.version_metadata) + '", '
+        extras += '"gwVersion":"' + str(self.plugin_version) + '", '
         extras += '"projectType":"' + str(schema_type).upper() + '", '
         if srid is None:
-            srid = self.filter_srid_value
+            srid = self.project_epsg
         extras += '"epsg":' + str(srid).replace('"', '')
         if new_project is True:
             if str(self.title) != 'null':
@@ -1427,8 +1419,9 @@ class UpdateSQL(ApiParent):
         self.schema = project_name_schema
         self.title = project_title_schema
         self.schema_type = project_type
-        self.filter_srid_value = project_srid
+        self.project_epsg = project_srid
         self.locale = project_locale
+        self.project_issample = example_data
 
         # Save in settings
         self.controller.plugin_settings_set_value('project_name_schema', project_name_schema)
@@ -1455,14 +1448,14 @@ class UpdateSQL(ApiParent):
                 return
 
         elif self.rdb_sample.isChecked() or self.rdb_sample_dev.isChecked():
-            if self.locale != 'EN' or self.filter_srid_value != '25831':
+            if self.locale != 'EN' or self.project_epsg != '25831':
                 msg = ("This functionality is only allowed with the locality 'EN' and SRID 25831."
                        "\nDo you want change it and continue?")
                 result = self.controller.ask_question(msg, "Info Message")
                 if result:
-                    self.filter_srid_value = '25831'
+                    self.project_epsg = '25831'
                     self.locale = 'EN'
-                    utils_giswater.setWidgetText(self.dlg_readsql_create_project, 'srid_id', self.filter_srid_value)
+                    utils_giswater.setWidgetText(self.dlg_readsql_create_project, 'srid_id', self.project_epsg)
                     utils_giswater.setWidgetText(self.dlg_readsql_create_project, 'cmb_locale', self.locale)
                 else:
                     return
@@ -1673,7 +1666,7 @@ class UpdateSQL(ApiParent):
             schema_name = self.get_schema_name()
 
         self.schema = schema_name
-        self.locale = self.project_data_language
+        self.locale = self.project_language
 
         self.task1 = GwTask('Manage schema')
         QgsApplication.taskManager().addTask(self.task1)
@@ -1756,15 +1749,15 @@ class UpdateSQL(ApiParent):
             self.close_dialog(self.dlg_readsql)
             self.create_credentials_form(set_connection=connection_name)
         else:
-            if str(self.version_metadata) > str(self.project_data_schema_version):
+            if str(self.plugin_version) > str(self.project_version):
                 self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
                 utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
-                                             '(Schema version is lower than plugin version, please update schema)')
+                '(Schema version is lower than plugin version, please update schema)')
                 self.dlg_readsql.btn_info.setEnabled(True)
-            elif str(self.version_metadata) < str(self.project_data_schema_version):
+            elif str(self.plugin_version) < str(self.project_version):
                 self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
                 utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
-                                             '(Schema version is higher than plugin version, please update plugin)')
+                '(Schema version is higher than plugin version, please update plugin)')
                 self.dlg_readsql.btn_info.setEnabled(True)
             else:
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
@@ -1928,7 +1921,7 @@ class UpdateSQL(ApiParent):
         for folder in folders:
             sub_folders = sorted(os.listdir(self.folderUpdates + folder))
             for sub_folder in sub_folders:
-                if str(sub_folder) > str(self.project_data_schema_version).replace('.',''):
+                if str(sub_folder) > str(self.project_version).replace('.',''):
                     folder_aux = self.folderUpdates + folder + os.sep + sub_folder
                     if self.process_folder(folder_aux, ''):
                         status = self.readFiles(sorted(os.listdir(folder_aux + '')), folder_aux + '')
@@ -1993,7 +1986,8 @@ class UpdateSQL(ApiParent):
 
         result_list = []
         for row in rows:
-            sql = (f"SELECT EXISTS(SELECT * FROM information_schema.tables "
+            # projects below 3.4
+            sql = (f"SELECT EXISTS (SELECT * FROM information_schema.tables "
                    f"WHERE table_schema = '{row[0]}' "
                    f"AND table_name = 'version')")
             exists = self.controller.get_row(sql)
@@ -2003,13 +1997,22 @@ class UpdateSQL(ApiParent):
                 if result is not None and result[0] == filter_.upper():
                     elem = [row[0], row[0]]
                     result_list.append(elem)
-
+            # projects upper 3.3
+            sql = (f"SELECT EXISTS (SELECT * FROM information_schema.tables "
+                   f"WHERE table_schema = '{row[0]}' "
+                   f"AND table_name = 'sys_version')")
+            exists = self.controller.get_row(sql)
+            if exists and str(exists[0]) == 'True':
+                sql = f"SELECT project_type FROM {row[0]}.sys_version"
+                result = self.controller.get_row(sql)
+                if result is not None and result[0] == filter_.upper():
+                    elem = [row[0], row[0]]
+                    result_list.append(elem)
         if not result_list:
             self.dlg_readsql.project_schema_name.clear()
             return
 
         utils_giswater.set_item_data(self.dlg_readsql.project_schema_name, result_list, 1)
-
 
     def manage_srid(self):
         """ Manage SRID configuration """
@@ -2042,74 +2045,37 @@ class UpdateSQL(ApiParent):
 
     def set_info_project(self):
 
-        self.project_data_language = 'EN'
-        self.filter_srid_value = ''
-
+        # set variables from table version
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        self.project_type = self.controller.get_project_type(schemaname=schema_name)
+        self.project_epsg = self.controller.get_project_epsg(schemaname=schema_name)
+        self.project_version = self.controller.get_project_version(schemaname=schema_name)
+        self.project_language = self.controller.get_project_language(schemaname=schema_name)
+        self.postgresql_version = self.controller.get_postgresql_version()
+        self.postgis_version = self.controller.get_postgis_version()
+
         if schema_name is None:
             schema_name = 'Nothing to select'
-            self.project_data_schema_version = "Version not found"
+            self.project_version = "Version not found"
             utils_giswater.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", False)
-        else:
-            # Check if exist column sample in table version
-            sql = (f"SELECT column_name FROM information_schema.columns "
-                   f"WHERE table_name = 'version' and column_name = 'sample' and table_schema = '{schema_name}';")
-            result = self.controller.get_row(sql)
-            if result is None:
-                sql = f"SELECT giswater, language, epsg FROM {schema_name}.version ORDER BY id DESC LIMIT 1;"
-                result = self.controller.get_row(sql)
-                self.is_sample = 'False'
-            else:
-                sql = f"SELECT giswater, language, epsg, sample FROM {schema_name}.version ORDER BY id DESC LIMIT 1;"
-                result = self.controller.get_row(sql)
-                self.is_sample = result[3]
-            self.project_data_schema_version = result[0]
-            self.project_data_language = result[1]
-            self.filter_srid_value = str(result[2])
 
         # Set label schema name
         self.lbl_schema_name.setText(str(schema_name))
 
-        # Get parameters
-        sql = "SELECT version();"
-        result = self.controller.get_row(sql, commit=False)
-        if result:
-            database_version = result[0].split(',')
-        else:
-            database_version = ['']
-
-        sql = "SELECT PostGIS_FULL_VERSION();"
-        result = self.controller.get_row(sql, commit=False)
-        if result:
-            postgis_version = result[0].split('GEOS=')
-        else:
-            postgis_version = ['']
-
         if schema_name == 'Nothing to select' or schema_name == '':
             result = None
-            self.is_sample = None
+            self.project_issample = None
 
-        else:
-            sql = (f"SELECT value FROM {schema_name}.config_param_system "
-                   f"WHERE parameter = 'admin_schema_info'")
-            result = self.controller.get_row(sql, commit=False)
+        if self.project_type is not None:
 
-        if result is None:
-            result = ['{"title":"","author":"","date":""}']
-        result = [json.loads(result[0])]
+            msg = ('Database version: ' + str(self.postgresql_version) + '\n' + ''
+                   'PostGis version:' + str(self.postgis_version) + ' \n \n' + ''
+                   'Schema name: ' + schema_name + '\n' + ''
+                   'Version: ' + self.project_version + ' \n' + ''
+                   'EPSG: ' + str(self.project_epsg) + ' \n' + ''
+                   'Language: ' + str(self.project_epsg) + ' \n' + '')
 
-        msg = ('Database version: ' + str(database_version[0]) + '\n' + ''
-               + str(postgis_version[0]) + ' \n \n' + ''
-               'Name: ' + schema_name + '\n' + ''
-               'Version: ' + self.project_data_schema_version + ' \n' + ''
-               'EPSG: ' + self.filter_srid_value + ' \n' + ''
-               'Language: ' + self.project_data_language + ' \n' + ''
-               'Title: ' + str(result[0]['title']) + '\n' + ''
-               'Author: ' + str(result[0]['author']) + '\n' + ''
-               'Date: ' + str(result[0]['date']) + '\n' + ''
-               'Is sample: ' + str(self.is_sample))
-
-        self.software_version_info.setText(msg)
+            self.software_version_info.setText(msg)
 
         # Update windowTitle
         connection = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_connection)
@@ -2118,12 +2084,12 @@ class UpdateSQL(ApiParent):
 
         if schema_name == 'Nothing to select' or schema_name == '':
             utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
-        elif str(self.version_metadata) > str(self.project_data_schema_version):
+        elif str(self.plugin_version) > str(self.project_version):
             self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
             utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
                                          '(Schema version is lower than plugin version, please update schema)')
             self.dlg_readsql.btn_info.setEnabled(True)
-        elif str(self.version_metadata) < str(self.project_data_schema_version):
+        elif str(self.plugin_version) < str(self.project_version):
             self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
             utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
                                          '(Schema version is higher than plugin version, please update plugin)')
@@ -2261,7 +2227,7 @@ class UpdateSQL(ApiParent):
     def open_rename(self):
 
         # Open rename if schema is updated
-        if str(self.version_metadata) != str(self.project_data_schema_version):
+        if str(self.plugin_version) != str(self.project_version):
             msg = "The schema version has to be updated to make rename"
             self.controller.show_info_box(msg, "Info")
             return
@@ -2298,18 +2264,18 @@ class UpdateSQL(ApiParent):
         else:
             schema_name = self.schema.replace('"', '')
 
-        filter_srid_value = str(self.filter_srid_value).replace('"', '')
+        self.project_epsg = str(self.project_epsg).replace('"', '')
         if i18n:
             for file in filelist:
                 if "utils.sql" in file:
                     if log_files:
                         self.controller.log_info(str(filedir + os.sep + 'utils.sql'))
-                    status = self.read_execute_file(filedir, os.sep + 'utils.sql', schema_name, filter_srid_value)
+                    status = self.read_execute_file(filedir, os.sep + 'utils.sql', schema_name, self.project_epsg)
                 elif str(self.project_type_selected) + ".sql" in file:
                     if log_files:
                         self.controller.log_info(str(filedir + os.sep + str(self.project_type_selected) + '.sql'))
                     status = self.read_execute_file(filedir, os.sep + str(self.project_type_selected) + '.sql',
-                        schema_name, filter_srid_value)
+                        schema_name, self.project_epsg)
                 if not status and self.dev_commit == 'FALSE':
                     return False
         else:
@@ -2318,21 +2284,21 @@ class UpdateSQL(ApiParent):
                     if (no_ct is True and "tablect.sql" not in file) or no_ct is False:
                         if log_files:
                             self.controller.log_info(str(filedir + os.sep + file))
-                        status = self.read_execute_file(filedir, file, schema_name, filter_srid_value)
+                        status = self.read_execute_file(filedir, file, schema_name, self.project_epsg)
                         if not status and self.dev_commit == 'FALSE':
                             return False
 
         return status
 
 
-    def read_execute_file(self, filedir, file, schema_name, filter_srid_value):
+    def read_execute_file(self, filedir, file, schema_name, project_epsg):
 
         status = False
         try:
             filepath = filedir + os.sep + file
             f = open(filepath, 'r', encoding="utf8")
             if f:
-                f_to_read = str(f.read().replace("SCHEMA_NAME", schema_name).replace("SRID_VALUE", filter_srid_value))
+                f_to_read = str(f.read().replace("SCHEMA_NAME", schema_name).replace("SRID_VALUE", project_epsg))
                 if self.dev_commit == 'TRUE':
                     status = self.controller.execute_sql(str(f_to_read), filepath=filepath)
                 else:
@@ -2700,7 +2666,7 @@ class UpdateSQL(ApiParent):
             utils_giswater.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", True)
 
         # Control if schema_version is updated to 3.2
-        if str(self.project_data_schema_version).replace('.','') < str(self.version_metadata).replace('.', ''):
+        if str(self.project_version).replace('.','') < str(self.plugin_version).replace('.', ''):
 
             utils_giswater.getWidget(self.dlg_readsql,self.dlg_readsql.grb_manage_addfields).setEnabled(False)
             utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_ui).setEnabled(False)
@@ -2721,13 +2687,13 @@ class UpdateSQL(ApiParent):
             utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_sys_fields).setEnabled(True)
 
             sql = (f"SELECT cat_feature.child_layer, cat_feature.child_layer FROM {schema_name}.cat_feature "
-                        f" WHERE active IS TRUE ORDER BY id") 
+                        f" ORDER BY id")
 
             rows = self.controller.get_rows(sql)
             utils_giswater.set_item_data(self.dlg_readsql.cmb_formname_ui, rows, 1)
             
             sql = (f"SELECT cat_feature.id, cat_feature.id FROM {schema_name}.cat_feature "
-                       f" WHERE active IS TRUE ORDER BY id")
+                       f" ORDER BY id")
 
             rows = self.controller.get_rows(sql)
             utils_giswater.set_item_data(self.dlg_readsql.cmb_formname_fields, rows, 1)
@@ -3337,74 +3303,6 @@ class UpdateSQL(ApiParent):
         self.controller.plugin_settings_set_value('last_schema_name_selected', schema_name)
 
 
-    def info_show_info(self):
-        """ Button 36: Info show info, open giswater and visit web page """
-
-        if self.dlg_info is None:
-            # Create form
-            self.dlg_info = InfoShowInfo()
-            self.load_settings(self.dlg_info)
-
-        # Get Plugin, Giswater, PostgreSQL and Postgis version
-        postgresql_version = self.controller.get_postgresql_version()
-        postgis_version = self.controller.get_postgis_version()
-        plugin_version = self.get_plugin_version()
-        project_version = 0
-
-        # Make sure we have schema name
-        if self.schema_name is None:
-            self.schema_name = self.controller.schema_name
-
-        sql = f"SELECT giswater FROM {self.schema_name}.version ORDER BY id DESC LIMIT 1"
-        row = self.controller.get_row(sql, commit=False)
-        if row:
-            project_version = row[0]
-
-        msg = ("Plugin version:          " + str(plugin_version) + "\n"
-               "Project version:         " + str(project_version) + "\n"
-               "PostgreSQL version:  " + str(postgresql_version) + "\n"
-               "Postgis version:         " + str(postgis_version))
-        utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.txt_info, msg)
-
-        # Set signals
-        self.dlg_info.btn_open_web.clicked.connect(partial(self.open_web_browser, self.dlg_info, None))
-        self.dlg_info.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_info))
-
-        self.version_metadata = self.get_plugin_version()
-
-        # Check if exist column sample in table version
-        sql = (f"SELECT column_name FROM information_schema.columns "
-               f"WHERE table_name = 'version' and column_name='sample' and table_schema = '{self.schema_name}';")
-        result = self.controller.get_row(sql, log_sql=True)
-        if result is None:
-            sql = f"SELECT giswater, language FROM {self.schema_name}.version ORDER BY id DESC LIMIT 1;"
-            result = self.controller.get_row(sql)
-        else:
-            sql = f"SELECT giswater, language, sample FROM {self.schema_name}.version ORDER BY id DESC LIMIT 1;"
-            result = self.controller.get_row(sql)
-            self.is_sample = result[2]
-
-        self.project_data_schema_version = result[0]
-        self.project_data_language = result[1]
-
-        if str(self.version_metadata) > str(self.project_data_schema_version):
-            self.dlg_info.lbl_status.setPixmap(self.status_no_update)
-            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
-                                         '(Schema version is lower than plugin version, please update schema)')
-        elif str(self.version_metadata) < str(self.project_data_schema_version):
-            self.dlg_info.lbl_status.setPixmap(self.status_no_update)
-            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
-                                         '(Schema version is higher than plugin version, please update plugin)')
-        else:
-            self.dlg_info.lbl_status.setPixmap(self.status_ok)
-            utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.lbl_status_text, '')
-
-        utils_giswater.dis_enable_dialog(self.dlg_info, True)
-
-        # Open dialog
-        self.open_dialog(self.dlg_info, maximize_button=False)
-
-
     def create_credentials_form(self, set_connection):
 
         self.dlg_credentials = Credentials()
@@ -3430,4 +3328,3 @@ class UpdateSQL(ApiParent):
                f"SET value = '{composers_path_vdef}' "
                f"WHERE parameter = 'qgis_composers_folderpath' AND cur_user = current_user")
         self.controller.execute_sql(sql)
-

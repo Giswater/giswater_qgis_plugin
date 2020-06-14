@@ -440,7 +440,7 @@ class DaoController(object):
         return self.postgresql_version           
             
             
-    def get_postgis_version(self):    
+    def get_postgis_version(self):
         """ Get Postgis version (integer value) """    
 
         self.postgis_version = None
@@ -1188,53 +1188,138 @@ class DaoController(object):
 
 
     def get_project_type(self, schemaname=None):
-        """ Get water software from table 'version' """
+        """ Get project type from table 'version' """
 
+        # init variables
+        project_type = None
         if schemaname is None:
             schemaname = self.schema_name
-            if schemaname is None:
-                self.get_layer_source_from_credentials()
-                schemaname = self.schema_name
-                if schemaname is None:
-                    return None
 
-        schemaname = schemaname.replace('"', '')
-        project_type = None
-        tablename = "version"
-        exists = self.check_table(tablename)
-        if exists:
-            sql = ("SELECT lower(wsoftware) "
-                   "FROM " + schemaname + "." + tablename + " "
-                   "ORDER BY id ASC LIMIT 1")
+        # start process
+        tablename = "sys_version"
+        exists = self.check_table(tablename, schemaname)
+        if exists:       		
+            sql = ("SELECT lower(project_type) FROM " + schemaname + "." + tablename + " ORDER BY id ASC LIMIT 1")
             row = self.get_row(sql)
             if row:
                 project_type = row[0]
         else:
-            tablename = "version_tm"
-            exists = self.check_table(tablename)
+            tablename = "version"
+            exists = self.check_table(tablename, schemaname)
             if exists:
-                project_type = "tm"
+                sql = ("SELECT lower(wsoftware) FROM " + schemaname + "." + tablename + " ORDER BY id ASC LIMIT 1")
+                row = self.get_row(sql)
+                if row:
+                    project_type = row[0]
+            else:
+                tablename = "version_tm"
+                exists = self.check_table(tablename, schemaname)
+                if exists:
+                    project_type = "tm"
 
         return project_type
     
       
-    def get_project_version(self):
+    def get_project_version(self, schemaname=None):
         """ Get project version from table 'version' """
-        
+
+        if schemaname is None:
+            schemaname = self.schema_name
+
         project_version = None
-        tablename = "version"
-        exists = self.check_table(tablename)
+        tablename = "sys_version"
+        exists = self.check_table(tablename, schemaname)
         if exists:
-            sql = ("SELECT giswater "
-                   "FROM " + tablename + " "
-                   "ORDER BY id DESC LIMIT 1")
+            sql = ("SELECT giswater FROM " + schemaname + "." + tablename + " ORDER BY id DESC LIMIT 1")
             row = self.get_row(sql)
             if row:
                 project_version = row[0]
-            
-        return project_version    
-    
-    
+        else:
+             tablename = "version"
+             exists = self.check_table(tablename, schemaname)
+             if exists:
+                sql = ("SELECT giswater FROM " + schemaname + "." + tablename + " ORDER BY id DESC LIMIT 1")
+                row = self.get_row(sql)
+                if row:
+                    project_version = row[0]
+
+        return project_version
+
+    def get_project_language(self, schemaname=None):
+        """ Get project langugage from table 'version' """
+
+        if schemaname is None:
+            schemaname = self.schema_name
+
+        project_language = None
+        tablename = "sys_version"
+        exists = self.check_table(tablename, schemaname)
+        if exists:
+            sql = ("SELECT language FROM " + schemaname + "." + tablename + " ORDER BY id DESC LIMIT 1")
+            row = self.get_row(sql)
+            if row:
+                project_language = row[0]
+        else:
+            tablename = "version"
+            exists = self.check_table(tablename, schemaname)
+            if exists:
+                sql = ("SELECT language FROM " + schemaname + "." + tablename + " ORDER BY id DESC LIMIT 1")
+                row = self.get_row(sql)
+                if row:
+                    project_language = row[0]
+
+        return project_language
+
+    def get_project_epsg(self, schemaname=None):
+        """ Get project epsg from table 'version' """
+
+        if schemaname is None:
+            schemaname = self.schema_name
+
+        project_epsg = None
+        tablename = "sys_version"
+        exists = self.check_table(tablename, schemaname)
+        if exists:
+            sql = ("SELECT epsg FROM " + schemaname + "." + tablename + " ORDER BY id DESC LIMIT 1")
+            row = self.get_row(sql)
+            if row:
+                project_epsg = row[0]
+        else:
+            tablename = "version"
+            exists = self.check_table(tablename, schemaname)
+            if exists:
+                sql = ("SELECT epsg FROM " + schemaname + "." + tablename + " ORDER BY id DESC LIMIT 1")
+                row = self.get_row(sql)
+                if row:
+                    project_epsg = row[0]
+
+        return project_epsg
+
+    def get_project_sample(self, schemaname=None):
+        """ Get if project is sample from table 'version' """
+
+        if schemaname is None:
+            schemaname = self.schema_name
+
+        project_sample = None
+        tablename = "sys_version"
+        exists = self.check_table(tablename, schemaname)
+        if exists:
+            sql = ("SELECT sample FROM " + schemaname + "." + tablename + " ORDER BY id DESC LIMIT 1")
+            row = self.get_row(sql)
+            if row:
+                project_sample = row[0]
+        else:
+            tablename = "version"
+            exists = self.check_table(tablename, schemaname)
+            if exists:
+                sql = ("SELECT language FROM " + schemaname + "." + tablename + " ORDER BY id DESC LIMIT 1")
+                row = self.get_row(sql)
+                if row:
+                    project_sample = row[0]
+
+        return project_sample
+
     def check_schema(self, schemaname=None):
         """ Check if selected schema exists """
 
@@ -1268,10 +1353,14 @@ class DaoController(object):
 
         if schemaname is None:
             schemaname = self.schema_name
+            if schemaname is None:
+                self.get_layer_source_from_credentials()
+                schemaname = self.schema_name
+                if schemaname is None:
+                    return None
 
         schemaname = schemaname.replace('"', '')
-        sql = ("SELECT * FROM pg_tables "
-               "WHERE schemaname = %s AND tablename = %s ")
+        sql = ("SELECT * FROM pg_tables WHERE schemaname = %s AND tablename = %s ")
         params = [schemaname, tablename]
         row = self.get_row(sql, log_info=False, params=params)
         return row
@@ -1396,21 +1485,21 @@ class DaoController(object):
         if restriction == 'role_basic':
             pass
         elif restriction == 'role_om':
-            if self.giswater.wsoftware == 'ws':
+            if self.giswater.project_type == 'ws':
                 self.giswater.enable_toolbar("om_ws")
-            elif self.giswater.wsoftware == 'ud':
+            elif self.giswater.project_type == 'ud':
                 self.giswater.enable_toolbar("om_ud")
         elif restriction == 'role_edit':
-            if self.giswater.wsoftware == 'ws':
+            if self.giswater.project_type == 'ws':
                 self.giswater.enable_toolbar("om_ws")
-            elif self.giswater.wsoftware == 'ud':
+            elif self.giswater.project_type == 'ud':
                 self.giswater.enable_toolbar("om_ud")
             self.giswater.enable_toolbar("edit")
             self.giswater.enable_toolbar("cad")
         elif restriction == 'role_epa':
-            if self.giswater.wsoftware == 'ws':
+            if self.giswater.project_type == 'ws':
                 self.giswater.enable_toolbar("om_ws")
-            elif self.giswater.wsoftware == 'ud':
+            elif self.giswater.project_type == 'ud':
                 self.giswater.enable_toolbar("om_ud")
             self.giswater.enable_toolbar("edit")
             self.giswater.enable_toolbar("cad")
@@ -1425,9 +1514,9 @@ class DaoController(object):
             self.giswater.enable_toolbar("epa")
             self.giswater.enable_toolbar("edit")
             self.giswater.enable_toolbar("cad")
-            if self.giswater.wsoftware == 'ws':
+            if self.giswater.project_type == 'ws':
                 self.giswater.enable_toolbar("om_ws")
-            elif self.giswater.wsoftware == 'ud':
+            elif self.giswater.project_type == 'ud':
                 self.giswater.enable_toolbar("om_ud")
 
 

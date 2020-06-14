@@ -188,7 +188,7 @@ class Giswater(QObject):
                 callback_function = getattr(self.basic, function_name)
                 action.triggered.connect(callback_function)
             # Mincut toolbar actions
-            elif int(index_action) in (26, 27) and self.wsoftware == 'ws':
+            elif int(index_action) in (26, 27) and self.project_type == 'ws':
                 callback_function = getattr(self.mincut, function_name)
                 action.triggered.connect(callback_function)
             # OM toolbar actions
@@ -297,7 +297,7 @@ class Giswater(QObject):
 
         list_feature_cat = self.controller.get_values_from_dictionary(self.feature_cat)
         for feature_cat in list_feature_cat:
-            if index_action == '01' and feature_cat.feature_type.upper() == 'GULLY' and self.wsoftware == 'ud':
+            if index_action == '01' and feature_cat.feature_type.upper() == 'GULLY' and self.project_type == 'ud':
                 obj_action = QAction(str(feature_cat.id), self)
                 obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
                 try:
@@ -422,8 +422,8 @@ class Giswater(QObject):
 
         self.basic.set_controller(self.controller)
         self.utils.set_controller(self.controller)
-        self.basic.set_project_type(self.wsoftware)
-        self.utils.set_project_type(self.wsoftware)
+        self.basic.set_project_type(self.project_type)
+        self.utils.set_project_type(self.project_type)
 
 
     def toolbar_om_ws(self, toolbar_id, x=0, y=0):
@@ -588,14 +588,14 @@ class Giswater(QObject):
         self.edit.set_controller(self.controller)
         self.go2epa.set_controller(self.controller)
         self.master.set_controller(self.controller)
-        if self.wsoftware == 'ws':
+        if self.project_type == 'ws':
             self.mincut.set_controller(self.controller)
         self.om.set_controller(self.controller)
 
-        self.edit.set_project_type(self.wsoftware)
-        self.go2epa.set_project_type(self.wsoftware)
-        self.master.set_project_type(self.wsoftware)
-        self.om.set_project_type(self.wsoftware)
+        self.edit.set_project_type(self.project_type)
+        self.go2epa.set_project_type(self.project_type)
+        self.master.set_project_type(self.project_type)
+        self.om.set_project_type(self.project_type)
 
         # Enable toolbar 'basic' and 'utils'
         self.enable_toolbar("basic")
@@ -929,8 +929,8 @@ class Giswater(QObject):
         self.add_layer = AddLayer(self.iface, self.settings, self.controller, self.plugin_dir)
 
         # Get water software from table 'version'
-        self.wsoftware = self.controller.get_project_type()
-        if self.wsoftware is None:
+        self.project_type = self.controller.get_project_type()
+        if self.project_type is None:
             return
 
         # Initialize toolbars
@@ -938,17 +938,17 @@ class Giswater(QObject):
         self.get_buttons_to_hide()
 
         # Manage project read of type 'tm'
-        if self.wsoftware == 'tm':
+        if self.project_type == 'tm':
             self.project_read_tm()
             return
 
         # Manage project read of type 'pl'
-        elif self.wsoftware == 'pl':
+        elif self.project_type == 'pl':
             self.project_read_pl()
             return
 
         # Set custom plugin toolbars (one action class per toolbar)
-        if self.wsoftware == 'ws':
+        if self.project_type == 'ws':
             self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)
 
         # Manage layers and check project
@@ -1125,7 +1125,7 @@ class Giswater(QObject):
         if len(layers) == 0:
             return False
 
-        if self.wsoftware in ('ws', 'ud'):
+        if self.project_type in ('ws', 'ud'):
             QApplication.setOverrideCursor(Qt.ArrowCursor)
             self.check_project_result = CheckProjectResult(self.iface, self.settings, self.controller, self.plugin_dir)
             self.check_project_result.set_controller(self.controller)
