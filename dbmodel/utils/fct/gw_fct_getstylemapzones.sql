@@ -6,12 +6,12 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2928
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getmapzonestyle(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getstylemapzones(p_data json)
   RETURNS json AS
 $BODY$
 
 /* EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_getmapzonestyle($${"client":{"device":4, "infoType":1, "lang":"ES"},"data":{}}$$)
+SELECT SCHEMA_NAME.gw_fct_getstylemapzones($${"client":{"device":4, "infoType":1, "lang":"ES"},"data":{}}$$)
 
 */
 
@@ -66,8 +66,8 @@ BEGIN
 	    '}')::json;
       
 	-- Exception handling
-	EXCEPTION WHEN OTHERS THEN 
-	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	--EXCEPTION WHEN OTHERS THEN 
+	--RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;

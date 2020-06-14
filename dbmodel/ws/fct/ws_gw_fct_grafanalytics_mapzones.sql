@@ -734,7 +734,7 @@ BEGIN
 	RETURN  ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}, "data":{ "info":'||v_result_info||','||
 					  '"setVisibleLayers":["'||v_visible_layer||'"],'||
-  					  '"setSimbologyStyle":"Mapzones",'||
+  					  '"setStyle":"Mapzones",'||
 					  '"point":'||v_result_point||','||
 					  '"line":'||v_result_line||
 					  '}}}')::json;

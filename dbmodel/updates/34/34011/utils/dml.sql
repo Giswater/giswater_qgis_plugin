@@ -232,7 +232,7 @@ UPDATE config_param_system SET datatype = 'json', widgettype = 'linetext' WHERE 
 
 UPDATE sys_function SET function_type ='trigger function' WHERE function_type ='function trigger';
 
-INSERT INTO sys_function VALUES (2928, 'gw_fct_getmazonestyle','utils','function','json','json','Function to get style from mapzones','role_basic',false);
+INSERT INTO sys_function VALUES (2928, 'gw_fct_getstylemapzones','utils','function','json','json','Function to get style from mapzones','role_basic',false);
 
 UPDATE config_form_fields SET dv_querytext = replace (dv_querytext, 'SELECT id, descript as idval FROM presszone', 
 'SELECT presszone_id as id , name as idval FROM presszone') where dv_querytext like '%FROM presszone%';
