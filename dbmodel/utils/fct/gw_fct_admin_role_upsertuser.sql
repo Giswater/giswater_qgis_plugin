@@ -75,7 +75,7 @@ BEGIN
 
 	SET search_path = 'SCHEMA_NAME' , public;
 
-	SELECT  giswater INTO  v_version FROM version order by id desc limit 1;
+	SELECT  giswater INTO  v_version FROM sys_version order by id desc limit 1;
 
 	--set current process as users parameter
     DELETE FROM config_param_user  WHERE  parameter = 'utils_cur_trans' AND cur_user =current_user;

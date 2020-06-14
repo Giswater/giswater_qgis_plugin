@@ -33,7 +33,7 @@ BEGIN
 
 	v_move_polgeom = (SELECT value FROM config_param_user WHERE parameter='edit_gully_autoupdate_polgeom' AND cur_user=current_user);
 
-	v_projectype = (SELECT wsoftware FROM version LIMIT 1);
+	v_projectype = (SELECT project_type FROM sys_version LIMIT 1);
 	
 	
 	IF v_featuretype='connec' THEN

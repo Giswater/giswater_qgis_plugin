@@ -38,7 +38,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 	
 	-- Looking for project type
-	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
+	SELECT project_type INTO v_project_type FROM sys_version LIMIT 1;
 	
 	v_schemaname := 'SCHEMA_NAME';
 	

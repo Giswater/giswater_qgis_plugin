@@ -38,7 +38,7 @@ BEGIN
 	v_link_searchbuffer=0.01; 	
 
 	-- control of project type
-	SELECT wsoftware INTO v_projectype FROM version LIMIT 1;
+	SELECT project_type INTO v_projectype FROM sys_version LIMIT 1;
 	
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN

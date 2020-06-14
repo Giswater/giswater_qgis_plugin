@@ -37,7 +37,7 @@ BEGIN
 
 	-- get system variables
     SELECT * INTO v_visit FROM om_visit WHERE id=v_visitid;
-    SELECT wsoftware INTO v_project_type FROM version;
+    SELECT project_type INTO v_project_type FROM sys_version;
 
 	-- get input data
 	v_visitid :=  ((p_data ->>'feature')::json->>'id')::integer;

@@ -102,7 +102,7 @@ BEGIN
 
     v_node_id = (SELECT json_array_elements_text(v_array_node_id)); 
 	-- Get project type
-	SELECT wsoftware, epsg, giswater INTO v_project_type, v_srid,v_version FROM version LIMIT 1;
+	SELECT project_type, epsg, giswater INTO v_project_type, v_srid,v_version FROM sys_version LIMIT 1;
 
     -- Get node values
     SELECT the_geom INTO v_node_geom FROM node WHERE node_id = v_node_id;

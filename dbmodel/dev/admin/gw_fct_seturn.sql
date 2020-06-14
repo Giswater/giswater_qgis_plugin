@@ -21,7 +21,7 @@ BEGIN
 
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
-	SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
+	SELECT project_type INTO project_type_aux FROM sys_version LIMIT 1;
 	
 	--urn
 	IF project_type_aux='WS' THEN

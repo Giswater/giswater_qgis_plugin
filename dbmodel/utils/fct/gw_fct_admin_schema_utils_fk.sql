@@ -24,7 +24,7 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
     -- control of project type
-    SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
+    SELECT project_type INTO project_type_aux FROM sys_version LIMIT 1;
 
     ext_utils_schema_aux = 'utils';
 

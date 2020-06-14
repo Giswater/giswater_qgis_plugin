@@ -35,7 +35,7 @@ BEGIN
 	DELETE FROM audit_log_data WHERE fid=104 AND cur_user=current_user;
 
 	-- select config values
-	SELECT wsoftware, giswater  INTO v_projecttype, v_version FROM version order by 1 desc limit 1;
+	SELECT project_type, giswater  INTO v_projecttype, v_version FROM sys_version order by 1 desc limit 1;
     
 	-- Set config parameter
 	UPDATE config_param_system SET value=TRUE WHERE parameter='edit_topocontrol_disable_error' ;

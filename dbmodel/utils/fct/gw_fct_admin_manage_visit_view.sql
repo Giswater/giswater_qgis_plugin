@@ -31,7 +31,7 @@ BEGIN
 
 	SET search_path = "SCHEMA_NAME", public;
 	
- 	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
+ 	SELECT project_type INTO v_project_type FROM sys_version LIMIT 1;
 
 	-- get input parameters
 	v_schemaname = (p_data ->> 'schema');

@@ -36,7 +36,7 @@ BEGIN
       INTO v_ud_schema;
     END IF;
 	
-	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;	
+	SELECT project_type INTO v_project_type FROM sys_version LIMIT 1;
 
     IF TG_OP = 'INSERT' THEN
        	

@@ -54,7 +54,7 @@ BEGIN
         INTO v_version;
 
 	--  get project type
-    SELECT wsoftware INTO v_projecttype FROM version LIMIT 1;
+    SELECT project_type INTO v_projecttype FROM sys_version LIMIT 1;
 
 	--  Get tab
     v_tab := ((p_data->>'form')::json)->>'tabName';
@@ -88,7 +88,7 @@ BEGIN
 		EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) 
 			FROM (SELECT '||quote_ident(v_address_layer)||'.'||quote_ident(v_address_display_field)||' as display_name, st_x ('||quote_ident(v_address_layer)||'.
 			'||quote_ident(v_address_geom_id_field)||') as sys_x
-			,st_y ('||quote_ident(v_address_layer)||'.'||quote_ident(v_address_geom_id_field)||') as sys_y, (SELECT concat(''EPSG:'',epsg) FROM version LIMIT 1) AS srid
+			,st_y ('||quote_ident(v_address_layer)||'.'||quote_ident(v_address_geom_id_field)||') as sys_y, (SELECT concat(''EPSG:'',epsg) FROM sys_version LIMIT 1) AS srid
 			FROM '||quote_ident(v_address_layer)||'
 			JOIN '||quote_ident(v_street_layer)||' ON '||quote_ident(v_street_layer)||'.'||quote_ident(v_street_id_field)||' = 
 			'||quote_ident(v_address_layer)||'.'||quote_ident(v_address_street_id_field) ||'

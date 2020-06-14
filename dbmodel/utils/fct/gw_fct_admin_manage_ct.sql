@@ -49,7 +49,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 	v_schemaname = 'SCHEMA_NAME';
 
-	SELECT wsoftware INTO v_projectype FROM version LIMIT 1;
+	SELECT project_type INTO v_projectype FROM sys_version LIMIT 1;
 	
 	v_action = (p_data->>'data')::json->>'action';
 

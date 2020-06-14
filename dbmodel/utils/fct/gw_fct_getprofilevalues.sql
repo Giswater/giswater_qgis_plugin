@@ -132,7 +132,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- get projectytpe
-	SELECT wsoftware, giswater FROM version LIMIT 1 INTO v_project_type, v_version;
+	SELECT project_type, giswater FROM sys_version LIMIT 1 INTO v_project_type, v_version;
 
 	-- get systemvalues
 	SELECT value INTO v_guitarlegend FROM config_param_system WHERE parameter = 'om_profile_guitarlegend';

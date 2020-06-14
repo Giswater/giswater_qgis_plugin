@@ -29,7 +29,7 @@ BEGIN
 	-- search path
 	EXECUTE 'SET search_path = '||v_target||', public';
 
-	SELECT giswater, upper(wsoftware) INTO v_version, v_project_type FROM version order by id desc limit 1;
+	SELECT giswater, upper(project_type) INTO v_version, v_project_type FROM sys_version order by id desc limit 1;
 	
 	v_action = ((p_data ->>'data')::json->>'action')::text; 
 	v_source = ((p_data ->>'data')::json->>'source')::text; 

@@ -43,7 +43,7 @@ BEGIN
 	
 	-- get system parameters
 	v_systranstaction_db = (SELECT value::json->>'status' FROM config_param_system WHERE parameter = 'admin_transaction_db')::boolean;
-	SELECT giswater, wsoftware INTO v_version, v_projectype FROM version order by 1 desc limit 1;
+	SELECT giswater, project_type INTO v_version, v_projectype FROM sys_version order by 1 desc limit 1;
 	
 	-- get parameters from user
 	v_debug = (SELECT value::boolean FROM config_param_user WHERE parameter = 'debug_mode' AND cur_user=current_user);

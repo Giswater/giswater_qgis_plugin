@@ -171,7 +171,7 @@ BEGIN
 	p_data = REPLACE (p_data::text, '''''', 'null');
 
 	-- get project type
-	SELECT wsoftware INTO v_projecttype FROM version LIMIT 1;
+	SELECT project_type INTO v_projecttype FROM sys_version LIMIT 1;
 
 	--  get parameters from input
 	v_client = (p_data ->>'client')::json;

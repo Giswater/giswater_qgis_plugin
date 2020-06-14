@@ -22,7 +22,7 @@ BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	
-	SELECT wsoftware INTO v_projectype FROM version LIMIT 1;
+	SELECT project_type INTO v_projectype FROM sys_version LIMIT 1;
 
 	-- Insert
 	IF TG_OP = 'INSERT' THEN

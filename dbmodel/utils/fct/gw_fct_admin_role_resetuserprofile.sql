@@ -33,7 +33,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	--  Get project type
-	SELECT wsoftware INTO v_projecttype FROM version LIMIT 1;
+	SELECT project_type INTO v_projecttype FROM sys_version LIMIT 1;
 
 	--  Get input parameters:
 	v_user := (p_data ->> 'user');

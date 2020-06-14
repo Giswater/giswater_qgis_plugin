@@ -81,7 +81,7 @@ BEGIN
 	INTO v_version;
 
 	-- get project type
-	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
+	SELECT project_type INTO v_project_type FROM sys_version LIMIT 1;
 	SELECT value::boolean INTO v_debug FROM config_param_user WHERE parameter='utils_debug_mode';
 
 	IF v_debug = TRUE THEN

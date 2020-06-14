@@ -76,7 +76,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 	v_schema = 'SCHEMA_NAME';
 
-	SELECT wsoftware, giswater, epsg INTO v_project_type, v_version, v_srid FROM version order by id desc limit 1;
+	SELECT project_type, giswater, epsg INTO v_project_type, v_version, v_srid FROM sys_version order by id desc limit 1;
 	
 	-- Get input parameters
 	v_fid_aux := (p_data ->> 'data')::json->> 'fid';

@@ -103,7 +103,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- get system parameters
-	SELECT wsoftware, giswater  INTO v_project_type, v_version FROM version order by 1 desc limit 1;
+	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version order by 1 desc limit 1;
 
 	-- get input parameter
 	v_visit_descript =  (p_data::json->>'data')::json->>'importParam';

@@ -552,4 +552,4 @@ INSERT INTO config_client_forms VALUES (19064, 'connec form', 'utils', 'v_rtc_hy
 
 
 --delete temporal version information needed for fk function;
-DELETE FROM version;
+DELETE FROM sys_version;

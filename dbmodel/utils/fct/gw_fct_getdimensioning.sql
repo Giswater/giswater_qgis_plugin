@@ -49,7 +49,7 @@ BEGIN
 		INTO v_apiversion;
 		
 	-- Get project type
-	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
+	SELECT project_type INTO v_project_type FROM sys_version LIMIT 1;
 
 	EXECUTE 'SELECT gw_fct_getformfields($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)'
 	INTO v_fields_array

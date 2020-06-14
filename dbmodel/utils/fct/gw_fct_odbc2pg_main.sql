@@ -45,7 +45,7 @@ BEGIN
 	v_period := (((p_data ->>'data')::json->>'parameters')::json->>'period')::text;
 	
 	-- select config values
-	SELECT wsoftware, giswater INTO v_project_type, v_version FROM version order by id desc limit 1;
+	SELECT project_type, giswater INTO v_project_type, v_version FROM sys_version order by id desc limit 1;
 	
 	-- data2gis
 	PERFORM gw_fct_odbc2pg_hydro_filldata(p_data);

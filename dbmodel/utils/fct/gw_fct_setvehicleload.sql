@@ -49,7 +49,7 @@ BEGIN
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
         INTO v_version;
 
-    EXECUTE 'SELECT wsoftware FROM version'
+    EXECUTE 'SELECT project_type FROM sys_version'
 	INTO v_version;
 	
 	--  get input values

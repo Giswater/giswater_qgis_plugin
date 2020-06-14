@@ -47,7 +47,7 @@ BEGIN
 	
 	v_schemaname = 'SCHEMA_NAME';
 	
-	SELECT wsoftware, giswater INTO v_project_type, v_version FROM version order by id desc limit 1;
+	SELECT project_type, giswater INTO v_project_type, v_version FROM sys_version order by id desc limit 1;
 
 	--set permisions for each role
 	UPDATE config_param_system SET value = TRUE WHERE parameter = 'admin_role_permissions';

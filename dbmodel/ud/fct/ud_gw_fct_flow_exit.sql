@@ -48,7 +48,7 @@ BEGIN
 	DELETE FROM anl_arc WHERE cur_user="current_user"() AND (fid = 221 OR fid = 220);
 
 	-- select version
-	SELECT giswater INTO v_version FROM version order by 1 desc limit 1;
+	SELECT giswater INTO v_version FROM sys_version order by 1 desc limit 1;
 
 	-- Compute the tributary area using recursive function
 	EXECUTE 'SELECT gw_fct_flow_exit_recursive($$'||p_data||'$$);'

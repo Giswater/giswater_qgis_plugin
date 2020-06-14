@@ -79,7 +79,7 @@ BEGIN
 	SELECT value::boolean INTO v_hide_form FROM config_param_user where parameter='qgis_form_log_hidden' AND cur_user=current_user;
 
     -- select project type
-    SELECT wsoftware, giswater INTO v_projecttype, v_version FROM version LIMIT 1;
+    SELECT project_type, giswater INTO v_projecttype, v_version FROM sys_version LIMIT 1;
 
     -- Get parameters from input json
     v_feature_type =  ((p_data ->>'data')::json->>'feature_type'::text);

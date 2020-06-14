@@ -162,7 +162,7 @@ BEGIN
 		INTO v_version;
 		
 	-- get project type
-	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
+	SELECT project_type INTO v_project_type FROM sys_version LIMIT 1;
 
 	-- check layer if it's child layer 
         IF (SELECT child_layer FROM cat_feature WHERE child_layer=v_tablename)IS NOT NULL THEN

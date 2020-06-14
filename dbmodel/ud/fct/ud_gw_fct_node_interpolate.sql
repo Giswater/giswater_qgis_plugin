@@ -66,7 +66,7 @@ BEGIN
 	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
 
-	SELECT  giswater INTO v_version FROM version order by id desc limit 1;
+	SELECT  giswater INTO v_version FROM sys_version order by id desc limit 1;
 
 	p_x = (((p_data ->>'data')::json->>'parameters')::json->>'x')::float;
 	p_y = (((p_data ->>'data')::json->>'parameters')::json->>'y')::float;

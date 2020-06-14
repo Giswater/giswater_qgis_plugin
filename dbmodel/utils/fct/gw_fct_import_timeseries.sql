@@ -109,7 +109,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- project type
-	v_projecttype = (SELECT wsoftware FROM version LIMIT 1);
+	v_projecttype = (SELECT project_type FROM sys_version LIMIT 1);
 
 	-- Insert into audit table
 	INSERT INTO audit_log_csv2pg 

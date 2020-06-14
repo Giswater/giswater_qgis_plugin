@@ -21,7 +21,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	SELECT * INTO rec_element FROM element WHERE element_id=element_id_aux;
-	SELECT wsoftware INTO project_type_aux FROM version;
+	SELECT project_type INTO project_type_aux FROM sys_version;
 
 
 	IF project_type_aux='UD' THEN
@@ -52,7 +52,8 @@ BEGIN
 			UPDATE element_x_gully SET element_id=id_last WHERE element_id=element_id_aux AND gully_id=rec_feature.feature_id;
 
 		END LOOP;
-			ELSIF project_type_aux='WS' THEN
+		
+	ELSIF project_type_aux='WS' THEN
 
 		-- looking for all features relateds to element
 		FOR rec_feature IN 

@@ -49,7 +49,7 @@ BEGIN
 	v_period := (((p_data ->>'data')::json->>'parameters')::json->>'period')::text;
 	
 	-- select config values
-	SELECT wsoftware, giswater INTO v_project_type, v_version FROM version order by id desc limit 1;
+	SELECT project_type, giswater INTO v_project_type, v_version FROM sys_version order by id desc limit 1;
 
 	SELECT value INTO v_qmlpointpath FROM config_param_user WHERE parameter='qgis_qml_pointlayer_path' AND cur_user=current_user;
 	SELECT value INTO v_qmllinepath FROM config_param_user WHERE parameter='qgis_qml_linelayer_path' AND cur_user=current_user;

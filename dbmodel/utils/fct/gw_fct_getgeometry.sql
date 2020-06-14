@@ -44,7 +44,7 @@ BEGIN
 		INTO v_version;
 
 	-- get project type
-	SELECT wsoftware INTO v_projecttype FROM version LIMIT 1;
+	SELECT project_type INTO v_projecttype FROM sys_version LIMIT 1;
 
 	--  get parameters from input
 	v_id = ((p_data ->>'feature')::json->>'id')::integer;

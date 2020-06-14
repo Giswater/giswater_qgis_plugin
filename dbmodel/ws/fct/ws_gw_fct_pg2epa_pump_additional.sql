@@ -42,7 +42,7 @@ BEGIN
 	--  Search path
     SET search_path = "SCHEMA_NAME", public; 
 
-    SELECT * INTO rec FROM version LIMIT 1;
+    SELECT * INTO rec FROM sys_version LIMIT 1;
  
 	--  Start process	
     RAISE NOTICE 'Starting additional pumps process.';

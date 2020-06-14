@@ -35,7 +35,7 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
     -- Initialize variables	
-    SELECT * into rec FROM version;
+    SELECT * into rec FROM sys_version;
 
     v_geom= st_makeline(geom1_aux, geom2_aux);
 	

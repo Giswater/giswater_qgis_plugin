@@ -53,7 +53,7 @@ BEGIN
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=111;
     
     	-- select version
-	SELECT giswater INTO v_version FROM version order by 1 desc limit 1;
+	SELECT giswater INTO v_version FROM sys_version order by 1 desc limit 1;
 
 	-- getting input data 	
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;

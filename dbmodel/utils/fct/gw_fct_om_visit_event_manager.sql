@@ -51,7 +51,7 @@ BEGIN
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
 	
-	v_schema = (SELECT wsoftware FROM version ORDER BY id DESC LIMIT 1);
+	v_schema = (SELECT project_type FROM sys_version ORDER BY id DESC LIMIT 1);
 
 	-- select main values (stardate, node_id, mu_id)
 	-- getting start date using event value (legacy)

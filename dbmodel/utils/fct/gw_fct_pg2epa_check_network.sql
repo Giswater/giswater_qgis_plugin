@@ -60,8 +60,8 @@ BEGIN
 	v_fid := ((p_data ->>'data')::json->>'parameters')::json->>'fid';
 	
 	-- get project type
-	v_project_type = (SELECT wsoftware FROM version LIMIT 1);
-	v_version = (SELECT giswater FROM version LIMIT 1);
+	v_project_type = (SELECT project_type FROM sys_version LIMIT 1);
+	v_version = (SELECT giswater FROM sys_version LIMIT 1);
 	
 	-- get user variables
 	SELECT value INTO v_qmllinepath FROM config_param_user WHERE parameter='qgis_qml_linelayer_path' AND cur_user=current_user;

@@ -57,7 +57,7 @@ BEGIN
 	v_filter := COALESCE(v_filter, '');
 
 	-- get project type
-        SELECT lower(wsoftware) INTO v_projectype FROM version LIMIT 1;
+        SELECT lower(project_type) INTO v_projectype FROM sys_version LIMIT 1;
 
 	-- get epa results
 	IF (SELECT result_id FROM rpt_cat_result LIMIT 1) IS NOT NULL THEN

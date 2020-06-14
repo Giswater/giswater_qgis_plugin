@@ -54,7 +54,7 @@ BEGIN
 	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
 
-	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
+	SELECT project_type INTO v_project_type FROM sys_version LIMIT 1;
 
 	-- get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'

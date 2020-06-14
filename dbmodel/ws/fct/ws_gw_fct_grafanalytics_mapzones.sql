@@ -168,7 +168,7 @@ BEGIN
 	v_checkdata = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'checkData');
 
 	-- select config values
-	SELECT giswater, epsg INTO v_version, v_srid FROM version order by 1 desc limit 1;
+	SELECT giswater, epsg INTO v_version, v_srid FROM sys_version order by 1 desc limit 1;
 
 	-- data quality analysis
 	IF v_checkdata THEN

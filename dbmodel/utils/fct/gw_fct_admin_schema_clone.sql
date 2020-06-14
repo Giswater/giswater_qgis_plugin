@@ -54,7 +54,7 @@ BEGIN
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
 
-	SELECT giswater, upper(wsoftware) INTO v_version, v_project_type FROM version order by id desc limit 1;
+	SELECT giswater, upper(project_type) INTO v_version, v_project_type FROM sys_version order by id desc limit 1;
 
 	-- get input data   
 	v_source_schema := ((p_data ->>'data')::json->>'parameters')::json->>'source_schema'::text;
@@ -177,7 +177,7 @@ BEGIN
 	"data":{"action":"RENAMESCHEMA","source":"'||v_source_schema||'", "target":"'||v_dest_schema||'"}}$$);';
 
 	--Functions
-	EXECUTE 'SELECT replace(''wsoftware'', '''||v_source_schema||''','''||v_dest_schema||''')'
+	EXECUTE 'SELECT replace(''project_type'', '''||v_source_schema||''','''||v_dest_schema||''')'
 	into v_software;
 
 	FOR rec_fct IN 
@@ -192,7 +192,7 @@ BEGIN
 		v_fct_definition = REPLACE (v_fct_definition,concat(v_source_schema,'.'), concat(v_dest_schema,'.'));
 		
 		IF v_fct_definition ~* v_software THEN
-		v_fct_definition = REPLACE (v_fct_definition,v_software, 'wsoftware');
+		v_fct_definition = REPLACE (v_fct_definition,v_software, 'project_type');
 		END IF; 
 		EXECUTE v_fct_definition;
  

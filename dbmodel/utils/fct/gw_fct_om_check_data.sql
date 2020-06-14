@@ -55,7 +55,7 @@ BEGIN
 	v_features := ((p_data ->>'data')::json->>'parameters')::json->>'selectionMode'::text;
 	
 	-- select config values
-	SELECT wsoftware, giswater INTO v_project_type, v_version FROM version order by id desc limit 1;
+	SELECT project_type, giswater INTO v_project_type, v_version FROM sys_version order by id desc limit 1;
 
 	-- init variables
 	v_count=0;

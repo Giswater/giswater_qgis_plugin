@@ -44,7 +44,7 @@ BEGIN
 
 	v_schemaname = 'SCHEMA_NAME';
 
-	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
+	SELECT project_type INTO v_project_type FROM sys_version LIMIT 1;
 
 	v_table = TG_ARGV[0];
 

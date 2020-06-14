@@ -40,7 +40,7 @@ BEGIN
 	v_schemaname = 'SCHEMA_NAME';
 
 	--  Get project type
-	SELECT wsoftware INTO v_projecttype FROM version LIMIT 1;
+	SELECT project_type INTO v_projecttype FROM sys_version LIMIT 1;
 	IF (TG_OP = 'INSERT' OR  TG_OP = 'UPDATE') THEN
 		--Controls on update or insert of cat_feature.id check if the new id or child layer has accents, dots or dashes. If so, give an error.
 		v_id = array_to_string(ts_lexize('unaccent',NEW.id),',','*');

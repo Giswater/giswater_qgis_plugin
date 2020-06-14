@@ -53,7 +53,7 @@ BEGIN
 	-- get input parameters
 	v_schemaname = 'SCHEMA_NAME';
 
-	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
+	SELECT project_type INTO v_project_type FROM sys_version LIMIT 1;
 
 	v_cat_feature = ((p_data ->>'feature')::json->>'catFeature')::text;
 	v_multi_create = ((p_data ->>'data')::json->>'multi_create')::text;

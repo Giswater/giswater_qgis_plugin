@@ -92,11 +92,11 @@ BEGIN
 			
 		-- inserting version table
 		IF v_sample_exist != 'sample' THEN
-			SELECT sample INTO v_is_sample FROM version ORDER BY id LIMIT 1;
-			INSERT INTO version (giswater, wsoftware, postgres, postgis, language, epsg, sample) VALUES (v_gwversion, upper(v_projecttype), (select version()),
+			SELECT sample INTO v_is_sample FROM sys_version ORDER BY id LIMIT 1;
+			INSERT INTO version (giswater, project_type, postgres, postgis, language, epsg, sample) VALUES (v_gwversion, upper(v_projecttype), (select version()),
 			(select postgis_version()), v_language, v_epsg, v_is_sample);
 		ELSE
-			INSERT INTO version (giswater, wsoftware, postgres, postgis, language, epsg) VALUES (v_gwversion, upper(v_projecttype), (select version()),
+			INSERT INTO version (giswater, project_type, postgres, postgis, language, epsg) VALUES (v_gwversion, upper(v_projecttype), (select version()),
 			(select postgis_version()), v_language, v_epsg);
 		END IF;
 		
@@ -229,7 +229,7 @@ BEGIN
 		
 	ELSIF v_isnew IS FALSE THEN
 		
-        v_oldversion = (SELECT giswater FROM version ORDER BY id DESC LIMIT 1);
+        v_oldversion = (SELECT giswater FROM sys_version ORDER BY id DESC LIMIT 1);
         
 
         -- create child views for users from 3.2 to 3.3 updates
@@ -244,9 +244,9 @@ BEGIN
 
 		END IF;
 		-- inserting version table
-		SELECT * INTO v_version FROM version LIMIT 1;	
-		INSERT INTO version (giswater, wsoftware, postgres, postgis, language, epsg, sample) 
-		VALUES (v_gwversion, v_version.wsoftware, (select version()), (select postgis_version()), v_version.language, v_version.epsg, v_is_sample);
+		SELECT * INTO v_version FROM sys_version LIMIT 1;
+		INSERT INTO version (giswater, project_type, postgres, postgis, language, epsg, sample)
+		VALUES (v_gwversion, v_version.project_type, (select version()), (select postgis_version()), v_version.language, v_version.epsg, v_is_sample);
 
 		-- get return message
 		IF v_priority=0 THEN

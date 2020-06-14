@@ -44,7 +44,7 @@ BEGIN
 	v_return:=0;
 	v_global_count:=0;
 
-	SELECT wsoftware, giswater  INTO v_project_type, v_version FROM version order by 1 desc limit 1;
+	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version order by 1 desc limit 1;
 
 	-- getting input data 	
 	

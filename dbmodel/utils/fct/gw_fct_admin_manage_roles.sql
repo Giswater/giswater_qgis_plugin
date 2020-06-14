@@ -26,7 +26,7 @@ BEGIN
 
 	SET search_path = 'SCHEMA_NAME' , public;
 
-	SELECT  giswater INTO  v_version FROM version order by id desc limit 1;
+	SELECT  giswater INTO  v_version FROM sys_version order by id desc limit 1;
 
 	v_action = ((p_data ->>'data')::json->>'action')::text;
 

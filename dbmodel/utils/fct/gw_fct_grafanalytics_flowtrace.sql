@@ -56,7 +56,7 @@ BEGIN
 	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 
 	-- select config values
-	SELECT giswater, epsg, wsoftware INTO v_version, v_srid, v_projectype FROM version order by 1 desc limit 1;
+	SELECT giswater, epsg, project_type INTO v_version, v_srid, v_projectype FROM sys_version order by 1 desc limit 1;
 
 	-- set values
 	IF v_class = 'DISCONNECTEDARCS' THEN 

@@ -40,7 +40,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- select config values
-	SELECT wsoftware, giswater INTO v_project_type, v_version FROM version order by id desc limit 1;
+	SELECT project_type, giswater INTO v_project_type, v_version FROM sys_version order by id desc limit 1;
 
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fid = 206 AND cur_user=current_user;

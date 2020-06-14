@@ -40,7 +40,7 @@ BEGIN
 	v_fid := ((p_data ->>'data')::json->>'parameters')::json->>'fid';
 
 	-- select system values
-	SELECT wsoftware, giswater  INTO v_project_type, v_version FROM version order by 1 desc limit 1 ;
+	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version order by 1 desc limit 1 ;
 	
 	-- get user values
 	SELECT value INTO v_networkmode FROM config_param_user WHERE parameter = 'inp_options_networkmode' AND cur_user=current_user;

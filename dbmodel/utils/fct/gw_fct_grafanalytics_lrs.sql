@@ -88,7 +88,7 @@ BEGIN
 		v_costfield =  '1::float';
 	END IF;
 
-	v_version = (SELECT giswater FROM version LIMIT 1);
+	v_version = (SELECT giswater FROM sys_version LIMIT 1);
 
 	-- set variables
 	v_fid = 216;

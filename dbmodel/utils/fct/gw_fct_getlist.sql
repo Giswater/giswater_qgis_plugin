@@ -159,7 +159,7 @@ BEGIN
 	p_data = REPLACE (p_data::text, '""', 'null');
     p_data = REPLACE (p_data::text, '''''', 'null');
 
-    SELECT epsg INTO v_srid FROM version LIMIT 1;
+    SELECT epsg INTO v_srid FROM sys_version LIMIT 1;
 
 	-- Get input parameters:
 	v_device := (p_data ->> 'client')::json->> 'device';

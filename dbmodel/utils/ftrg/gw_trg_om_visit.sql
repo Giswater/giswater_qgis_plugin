@@ -27,7 +27,7 @@ BEGIN
 
    EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
    v_featuretype:= TG_ARGV[0];
-   v_version = (SELECT giswater FROM version ORDER by 1 desc LIMIT 1);
+   v_version = (SELECT giswater FROM sys_version ORDER by 1 desc LIMIT 1);
    v_lot = (SELECT lot_id FROM om_visit_lot_x_user WHERE endtime IS NULL AND user_id=current_user);
 
 

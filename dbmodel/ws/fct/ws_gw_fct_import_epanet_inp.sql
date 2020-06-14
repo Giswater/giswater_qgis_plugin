@@ -83,7 +83,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- get project type
-	SELECT wsoftware, epsg INTO v_projecttype, v_epsg FROM version LIMIT 1;
+	SELECT project_type, epsg INTO v_projecttype, v_epsg FROM sys_version LIMIT 1;
 
 	-- get input data
 	v_arc2node_reverse := (((p_data ->>'data')::json->>'parameters')::json->>'useNod2arc')::boolean;
