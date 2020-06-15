@@ -282,7 +282,7 @@ class DocManager(GwDialog, FORM_CLASS):
 
 
 FORM_CLASS = get_ui_class('profile.ui')
-class Profile(GwDialog, FORM_CLASS):
+class Profile(GwMainWindow, FORM_CLASS):
     pass
 
 

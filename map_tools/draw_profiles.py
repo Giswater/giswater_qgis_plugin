@@ -12,7 +12,7 @@
 
 from qgis.core import QgsFeatureRequest, QgsVectorLayer, QgsProject, QgsReadWriteContext, QgsPrintLayout
 from qgis.gui import QgsMapToolEmitPoint
-from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtCore import Qt, QDate
 from qgis.PyQt.QtWidgets import QListWidget, QListWidgetItem, QLineEdit, QFileDialog, QAction
 from qgis.PyQt.QtXml import QDomDocument
 
@@ -103,7 +103,7 @@ class DrawProfiles(ParentMapTool):
         self.dlg_draw_profile.btn_save_profile.clicked.connect(self.save_profile)
         self.dlg_draw_profile.chk_scalte_to_fit.stateChanged.connect(partial(self.manage_scale))
         self.dlg_draw_profile.cmb_papersize.currentIndexChanged.connect(partial(self.manage_papersize))
-        self.dlg_draw_profile.btn_load_profile.clicked.connect(self.load_profile)
+        self.dlg_draw_profile.btn_load_profile.clicked.connect(self.open_profile)
         self.dlg_draw_profile.btn_clear_profile.clicked.connect(self.clear_profile)
 
         # Populate cmb_papersize
@@ -173,56 +173,38 @@ class DrawProfiles(ParentMapTool):
     def save_profile(self):
         """ Save profile """
 
-        profile_id = self.dlg_draw_profile.txt_profile_id.text()
-        # start_point = self.widget_start_point.text()
-        # end_point = self.widget_end_point.text()
-        tbl_list_arc = self.dlg_draw_profile.tbl_list_arc.text()
+        profile_id = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_profile_id)
+        links_distance = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance)
+        legend_factor = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_legend_factor)
+        scale_to_fit = utils_giswater.isChecked(self.dlg_draw_profile, "chk_scalte_to_fit")
+        eh = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_horizontal)
+        ev = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_vertical)
 
-        # Check if all data are entered
-        if profile_id == '' or tbl_list_arc == '':
-            message = "Some data is missing"
-            self.controller.show_info_box(message, "Info")
-            return
+        papersize_id = utils_giswater.get_item_data(self.dlg_draw_profile, self.dlg_draw_profile.cmb_papersize, 0)
+        x_dim = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_x_dim)
+        y_dim = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_y_dim)
+        if int(papersize_id) != 0:
+            custom_dim = f'{{}}'
+        else:
+            custom_dim = f'{{"xdim":{x_dim}, "ydim":{y_dim}}}'
+        title = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_title)
+        date = utils_giswater.getCalendarDate(self.dlg_draw_profile, self.dlg_draw_profile.date, date_format='dd/MM/yyyy')
 
-        # Check if id of profile already exists in DB
-        sql = (f"SELECT DISTINCT(profile_id) "
-               f"FROM anl_arc_profile_value "
-               f"WHERE profile_id = '{profile_id}'")
-        row = self.controller.get_row(sql)
-        if row:
-            message = "Selected 'profile_id' already exist in database"
-            self.controller.show_warning(message, parameter=profile_id)
-            return
-
-        list_arc = []
-        n = self.dlg_draw_profile.tbl_list_arc.count()
-        for i in range(n):
-            list_arc.append(str(self.dlg_draw_profile.tbl_list_arc.item(i).text()))
-
-        sql = ""
-        for i in range(n):
-            sql += (f"INSERT INTO anl_arc_profile_value (profile_id, arc_id, start_point, end_point) "
-                    f" VALUES ('{profile_id}', '{list_arc[i]}', '{start_point}', '{end_point}');\n")
-        status = self.controller.execute_sql(sql)
-        if not status:
-            message = "Error inserting profile table, you need to review data"
-            self.controller.show_warning(message)
-            return
-
-        # Show message to user
-        message = "Values has been updated"
+        extras = f'"profile_id":"{profile_id}", "initNode":"{self.initNode}", "endNode":"{self.endNode}", "composer":"mincutA4", "legendFactor":{legend_factor}, "linksDistance":{links_distance}, "scale":{{"scaleToFit":"{scale_to_fit}", "eh":{eh}, "ev":{ev}}}, "title":"{title}", "date":"{date}", "papersize":{{"id":{int(papersize_id)}, "customDim":{custom_dim}}}'
+        body = self.create_body(extras=extras)
+        result = self.controller.get_json('gw_fct_saveprofile', body, log_sql=True)
+        message = f"{result['message']}"
         self.controller.show_info(message)
-        self.deactivate()
 
 
-    def load_profile(self):
+    def open_profile(self):
         """ Open dialog load_profiles.ui """
 
         self.dlg_load = ProfilesList()
         self.load_settings(self.dlg_load)
 
         self.dlg_load.rejected.connect(partial(self.close_dialog, self.dlg_load.rejected))
-        self.dlg_load.btn_open.clicked.connect(self.open_profile)
+        self.dlg_load.btn_open.clicked.connect(self.load_profile)
         self.dlg_load.btn_delete_profile.clicked.connect(self.delete_profile)
 
         sql = "SELECT DISTINCT(profile_id) FROM om_profile"
@@ -236,169 +218,40 @@ class DrawProfiles(ParentMapTool):
         self.deactivate()
 
 
-    def open_profile(self):
+    def load_profile(self):
         """ Open selected profile from dialog load_profiles.ui """
-        return
-        selected_list = self.dlg_load.tbl_profiles.selectionModel().selectedRows()
-        if len(selected_list) == 0:
-            message = "Any record selected"
-            self.controller.show_warning(message)
-            return
         # Selected item from list
-        selected_profile = self.dlg_load.tbl_profiles.currentItem().text()
+        profile_id = self.dlg_load.tbl_profiles.currentItem().text()
 
-        # Get data from DB for selected item| profile_id, start_point, end_point
-        sql = ("SELECT start_point, end_point"
-               " FROM anl_arc_profile_value"
-               " WHERE profile_id = '" + selected_profile + "'")
-        row = self.controller.get_row(sql)
-        if not row:
-            return
-
-        start_point = row['start_point']
-        end_point = row['end_point']
-
-        # Fill widgets of form draw_profile | profile_id, start_point, end_point
-        self.widget_start_point.setText(str(start_point))
-        self.widget_end_point.setText(str(end_point))
-        self.dlg_draw_profile.profile_id.setText(str(selected_profile))
-
-        # Get all arcs from selected profile
-        sql = ("SELECT arc_id"
-               " FROM anl_arc_profile_value"
-               " WHERE profile_id = '" + selected_profile + "'")
-        rows = self.controller.get_rows(sql)
-        if not rows:
-            return
-
-        arc_id = []
-        for row in rows:
-            arc_id.append(str(row[0]))
-
-        # Select arcs of the shortest path
-        for element_id in arc_id:
-            sql = ("SELECT sys_type"
-                   " FROM v_edit_arc"
-                   " WHERE arc_id = '" + str(element_id) + "'")
-            row = self.controller.get_row(sql)
-            if not row:
-                return
-
-            # Select feature from v_edit_man_@sys_type
-            sys_type = str(row[0].lower())
-            sql = "SELECT parent_layer FROM cat_feature WHERE system_id = '" + sys_type.upper() + "' LIMIT 1"
-            row = self.controller.get_row(sql, log_sql=True)
-            self.layer_feature = self.controller.get_layer_by_tablename(row[0])
-            aux = ""
-            for row in arc_id:
-                aux += "arc_id = '" + str(row) + "' OR "
-            aux = aux[:-3] + ""
-
-            # Select snapped features
-            selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
-            self.layer_feature.selectByIds([a.id() for a in selection])
-
-        node_id = []
-        for element_id in arc_id:
-            sql = ("SELECT node_1, node_2"
-                   " FROM arc"
-                   " WHERE arc_id = '" + str(element_id) + "'")
-            row = self.controller.get_row(sql)
-            node_id.append(row[0])
-            node_id.append(row[1])
-            if not row:
-                return
-
-        # Remove duplicated nodes
-        singles_list = []
-        for element in node_id:
-            if element not in singles_list:
-                singles_list.append(element)
-        node_id = singles_list
-
-        # Select nodes of shortest path on layers v_edit_man_|feature
-        for element_id in node_id:
-            sql = ("SELECT sys_type"
-                   " FROM v_edit_node"
-                   " WHERE node_id = '" + str(element_id) + "'")
-            row = self.controller.get_row(sql)
-            if not row:
-                return
-
-            # Select feature from v_edit_man_@sys_type
-            sys_type = str(row[0].lower())
-            sql = "SELECT parent_layer FROM cat_feature WHERE system_id = '" + sys_type.upper() + "' LIMIT 1"
-            row = self.controller.get_row(sql, log_sql=True,)
-            self.layer_feature = self.controller.get_layer_by_tablename(row[0])
-            aux = ""
-            for row in node_id:
-                aux += "node_id = '" + str(row) + "' OR "
-            aux = aux[:-3] + ""
-
-            # Select snapped features
-            selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
-            self.layer_feature.selectByIds([a.id() for a in selection])
-
-        # Select arcs of shortest path on v_edit_arc for ZOOM SELECTION
-        expr_filter = "\"arc_id\" IN ("
-        for i in range(len(arc_id)):
-            expr_filter += "'" + str(arc_id[i]) + "', "
-        expr_filter = expr_filter[:-2] + ")"
-        (is_valid, expr) = self.check_expression(expr_filter, True)   #@UnusedVariable
-        if not is_valid:
-            return
-
-        # Build a list of feature id's from the previous result
-        # Select features with these id's
-        it = self.layer_arc.getFeatures(QgsFeatureRequest(expr))
-        self.id_list = [i.id() for i in it]
-        self.layer_arc.selectByIds(self.id_list)
-
-        # Center shortest path in canvas - ZOOM SELECTION
-        self.canvas.zoomToSelected(self.layer_arc)
-
-        # After executing of profile enable btn_draw
-        self.dlg_draw_profile.btn_draw.setDisabled(False)
-
-        # Clear list
-        list_arc = []
-        self.dlg_draw_profile.tbl_list_arc.clear()
-
-        # Load list of arcs
-        for i in range(len(arc_id)):
-            item_arc = QListWidgetItem(arc_id[i])
-            self.dlg_draw_profile.tbl_list_arc.addItem(item_arc)
-            list_arc.append(arc_id[i])
-
-        self.node_id = node_id
-        self.arc_id = arc_id
-
-        # Draw profile
-        # self.paint_event(self.arc_id, self.node_id)
-        extras = f'"initNode":"116", "endNode":"111", "composer":"mincutA4", "legendFactor":1, "linksDistance":1, "scale":{{"scaleToFit":false, "eh":2000, "ev":500}}, "ComposerTemplates":[{{"ComposerTemplate":"mincutA4", "ComposerMap":[{{"width":"179.0","height":"140.826","index":0, "name":"map0"}},{{"width":"77.729","height":"55.9066","index":1, "name":"map7"}}]}},{{"ComposerTemplate":"mincutA3","ComposerMap":[{{"width":"53.44","height":"55.9066","index":0, "name":"map7"}},{{"width":"337.865","height":"275.914","index":1, "name":"map6"}}]}}]'
+        extras = f'"profile_id":"{profile_id}", "action":"load"'
         body = self.create_body(extras=extras)
-        self.profile_json = self.controller.get_json('gw_fct_getprofilevalues', body, log_sql=True)
-        if not self.profile_json: return
-        self.paint_event(self.profile_json['body']['data']['arc'], self.profile_json['body']['data']['node'],
-                         self.profile_json['body']['data']['terrain'])
-
-        self.dlg_draw_profile.cbx_template.setDisabled(False)
-        self.dlg_draw_profile.btn_export_pdf.setDisabled(False)
-        self.dlg_draw_profile.title.setDisabled(False)
-        self.dlg_draw_profile.rotation.setDisabled(False)
-        self.dlg_draw_profile.scale_vertical.setDisabled(False)
-        self.dlg_draw_profile.scale_horizontal.setDisabled(False)
-        self.dlg_draw_profile.btn_update_path.setDisabled(False)
+        result = self.controller.get_json('gw_fct_loadprofile', body, log_sql=True)
+        if not result: return
+        message = f"{result['message']}"
+        self.controller.show_info(message)
         self.close_dialog(self.dlg_load)
-        self.rotation_vd_exist = True
 
+        # Setting parameters on profile form
+        self.dlg_draw_profile.btn_draw_profile.setEnabled(True)
+        self.dlg_draw_profile.btn_save_profile.setEnabled(True)
+        self.initNode = result['body']['data']['initNode']
+        self.endNode = result['body']['data']['endNode']
 
-    # def activate_snapping(self, emit_point):
-    #
-    #     self.canvas.setMapTool(emit_point)
-    #     snapper = self.snapper_manager.get_snapper()
-    #     self.canvas.xyCoordinates.connect(self.mouse_move)
-    #     emit_point.canvasClicked.connect(partial(self.snapping_node, snapper))
+        self.dlg_draw_profile.txt_profile_id.setText(str(profile_id))
+        # self.dlg_draw_profile.tbl_list_arc.setText(str(result['body']['data']['listArcs']))
+        self.dlg_draw_profile.txt_min_distance.setText(str(result['body']['data']['linksDistance']))
+        self.dlg_draw_profile.txt_legend_factor.setText(str(result['body']['data']['legendFactor']))
+
+        utils_giswater.set_combo_itemData(self.dlg_draw_profile.cmb_papersize, result['body']['data']['papersize']['id'], 0)
+        if 'customDim' in result['body']['data']['papersize']:
+            self.dlg_draw_profile.txt_x_dim.setText(str(result['body']['data']['papersize']['customDim']['xdim']))
+            self.dlg_draw_profile.txt_y_dim.setText(str(result['body']['data']['papersize']['customDim']['ydim']))
+        self.dlg_draw_profile.txt_title.setText(str(result['body']['data']['title']))
+        date = QDate.fromString(result['body']['data']['date'], 'dd-MM-yyyy')
+        utils_giswater.setCalendarDate(self.dlg_draw_profile, self.dlg_draw_profile.date, date)
+        self.dlg_draw_profile.chk_scalte_to_fit.setChecked(result['body']['data']['scale']['scaleToFit'])
+        self.dlg_draw_profile.txt_horizontal.setText(str(result['body']['data']['scale']['eh']))
+        self.dlg_draw_profile.txt_vertical.setText(str(result['body']['data']['scale']['ev']))
 
 
     def activate_snapping_node(self):
@@ -455,6 +308,7 @@ class DrawProfiles(ParentMapTool):
                     self.action_profile.setDisabled(True)
                     self.disconnect_snapping()
                     self.dlg_draw_profile.btn_draw_profile.setEnabled(True)
+                    self.dlg_draw_profile.btn_save_profile.setEnabled(True)
 
 
     def disconnect_snapping(self, action_pan=True):
@@ -692,14 +546,6 @@ class DrawProfiles(ParentMapTool):
                 self.nodes[n].slope = 1
                 self.nodes[n].node_1 = arc['node_1']
                 self.nodes[n].node_2 = arc['node_2']
-
-                print(f"SELF.NODES[N].node_id -> {self.nodes[n].node_id}")
-                print(f"SELF.NODES[N].z1 -> {arc['z1']}")
-                print(f"SELF.NODES[N].z2 -> {arc['z2']}")
-                print(f"SELF.NODES[N].node_1 -> {arc['node_1']}")
-                print(f"SELF.NODES[N].node_2 -> {arc['node_2']}")
-                print(f"============================================================")
-
                 n += 1
 
 
@@ -868,12 +714,7 @@ class DrawProfiles(ParentMapTool):
 
     def draw_nodes(self, node, prev_node, index):
         """ Draw nodes between first and last node """
-        print(f"node.node_id -> {node.node_id}")
-        print(f"node.node_id -> {prev_node.node_2}")
 
-        print(f"node.node_id -> {node.node_id}")
-        print(f"node.node_id -> {prev_node.node_1}")
-        print(f"===============")
         if node.node_id == prev_node.node_2:
             z1 = prev_node.z2
             self.reverse = False
@@ -1548,6 +1389,7 @@ class DrawProfiles(ParentMapTool):
         self.dlg_draw_profile.chk_scalte_to_fit.setChecked(False)
         self.action_profile.setDisabled(False)
         self.dlg_draw_profile.btn_draw_profile.setEnabled(False)
+        self.dlg_draw_profile.btn_save_profile.setEnabled(False)
 
         # Clear selection
         self.remove_selection()
@@ -1768,26 +1610,16 @@ class DrawProfiles(ParentMapTool):
             return
 
         # Selected item from list
-        selected_profile = self.dlg_load.tbl_profiles.currentItem().text()
+        profile_id = self.dlg_load.tbl_profiles.currentItem().text()
 
-        message = "Are you sure you want to delete these profile?"
-        answer = self.controller.ask_question(message, "Delete profile", selected_profile)
-        if answer:
-            # Delete selected profile
-            sql = (f"DELETE FROM anl_arc_profile_value "
-                   f"WHERE profile_id = '{selected_profile}'")
-            status = self.controller.execute_sql(sql)
-            if not status:
-                message = "Error deleting profile"
-                self.controller.show_warning(message)
-                return
-            else:
-                message = "Profile deleted"
-                self.controller.show_info(message)
+        extras = f'"profile_id":"{profile_id}", "action":"delete"'
+        body = self.create_body(extras=extras)
+        result = self.controller.get_json('gw_fct_loadprofile', body, log_sql=True)
+        message = f"{result['message']}"
+        self.controller.show_info(message)
 
-        # Refresh list of arcs
         self.dlg_load.tbl_profiles.clear()
-        sql = "SELECT DISTINCT(profile_id) FROM anl_arc_profile_value"
+        sql = "SELECT DISTINCT(profile_id) FROM om_profile"
         rows = self.controller.get_rows(sql)
         if rows:
             for row in rows:
