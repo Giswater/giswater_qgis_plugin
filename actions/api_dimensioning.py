@@ -10,8 +10,8 @@ from qgis.core import Qgis, QgsPointXY
 from qgis.gui import QgsMapToolEmitPoint, QgsMapTip
 
 from qgis.PyQt.QtCore import Qt, QTimer
-from qgis.PyQt.QtWidgets import QAction, QCheckBox, QCompleter, QGridLayout, QLabel, QLineEdit, QPushButton, QSizePolicy,\
-    QSpacerItem, QWidget
+from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QGridLayout, QLabel, QLineEdit, QPushButton,\
+    QSizePolicy, QSpacerItem, QWidget
 
 import json
 from collections import OrderedDict
@@ -125,6 +125,7 @@ class ApiDimensioning(ApiParent):
             if widget_value == 'null':
                 continue
             fields += f'"{widget_name}":"{widget_value}", '
+
         list_widgets = self.dlg_dim.findChildren(QCheckBox)
         for widget in list_widgets:
             widget_name = widget.property('column_id')
@@ -132,6 +133,15 @@ class ApiDimensioning(ApiParent):
             if widget_value == 'null':
                 continue
             fields += f'"{widget_name}":{widget_value},'
+
+        list_widgets = self.dlg_dim.findChildren(QComboBox)
+        for widget in list_widgets:
+            widget_name = widget.property('column_id')
+            widget_value = f'"{utils_giswater.get_item_data(self.dlg_dim, widget)}"'
+            if widget_value == 'null':
+                continue
+            fields += f'"{widget_name}":{widget_value},'
+
         srid = self.controller.plugin_settings_value('srid')
         sql = f"SELECT ST_GeomFromText('{new_feature.geometry().asWkt()}', {srid})"
         the_geom = self.controller.get_row(sql, commit=True, log_sql=True)
