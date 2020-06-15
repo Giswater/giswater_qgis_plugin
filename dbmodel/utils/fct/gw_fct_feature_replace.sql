@@ -112,7 +112,7 @@ BEGIN
 
 	--define columns used for feature_cat
 	v_feature_layer = concat('v_edit_',v_feature_type);
-	v_feature_type_table = concat(v_feature_type,'_type');
+	v_feature_type_table = concat('cat_feature_',v_feature_type);
 	v_id_column:=concat(v_feature_type,'_id');
 	
 	IF v_project_type='WS' THEN
@@ -173,7 +173,7 @@ BEGIN
 		v_id := (SELECT nextval('SCHEMA_NAME.urn_id_seq'));
 
 		-- code
-		EXECUTE 'SELECT code_autofill  FROM '|| v_feature_type_table ||' WHERE id='''||v_old_featuretype||''';'
+		EXECUTE 'SELECT code_autofill  FROM cat_feature WHERE id='''||v_old_featuretype||''';'
 		INTO v_code_autofill;
 		
 		IF v_code_autofill IS TRUE THEN
@@ -235,7 +235,7 @@ BEGIN
 		
 		-- inserting new feature on table epa_table
 		IF v_feature_type='node' THEN
-			SELECT epa_table INTO v_epa_table FROM node_type WHERE id=v_old_featuretype;		
+			SELECT epa_table INTO v_epa_table FROM cat_feature_node WHERE id=v_old_featuretype;		
 			v_query_string_insert='INSERT INTO '||v_epa_table||' VALUES ('||v_id||');';
 			execute v_query_string_insert;
 
@@ -384,7 +384,7 @@ BEGIN
 		
 		--reconect existing link to the new feature
 		IF v_feature_type='connec' OR v_feature_type='gully' THEN
-			SELECT count(link_id) INTO v_count FROM link WHERE (eature_id = v_old_feature_id and feature_type = upper(v_feature_type) and state=1) OR
+			SELECT count(link_id) INTO v_count FROM link WHERE (feature_id = v_old_feature_id and feature_type = upper(v_feature_type) and state=1) OR
 			(exit_id = v_old_feature_id and exit_type = upper(v_feature_type) and state=1);
 			IF v_count > 0 THEN
 				UPDATE link SET feature_id = v_id WHERE feature_id = v_old_feature_id and feature_type = upper(v_feature_type) and state=1;
