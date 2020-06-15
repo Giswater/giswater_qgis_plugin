@@ -81,7 +81,7 @@ BEGIN
             FOR rec_parameter IN SELECT * FROM config_visit_parameter WHERE parameter_type='INSPECTION' AND (feature_type = 'ARC' or feature_type = 'ALL')
             LOOP
                 INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, xcoord, ycoord, compass) VALUES(id_last, now(), rec_parameter.id,'demo value','demo text'
-                ,(st_x(st_line_interpolate_point(rec_arc.the_geom, 0.8*RANDOM())))::numeric(12,3), (st_Y(st_line_interpolate_point(rec_arc.the_geom, 0.8*RANDOM())))::numeric(12,3), ROUND(RANDOM()*360)) RETURNING id INTO id_event_last;
+                ,(st_x(ST_LineInterpolatePoint(rec_arc.the_geom, 0.8*RANDOM())))::numeric(12,3), (st_Y(ST_LineInterpolatePoint(rec_arc.the_geom, 0.8*RANDOM())))::numeric(12,3), ROUND(RANDOM()*360)) RETURNING id INTO id_event_last;
 
                 INSERT INTO om_visit_event_photo (visit_id, event_id, tstamp, value, text, compass) VALUES(id_last, id_event_last, now(), 'https://www.giswater.org/wp-content/uploads/2016/10/GW-logo.png','demo image', ROUND(RANDOM()*360));
                 INSERT INTO om_visit_event_photo (visit_id, event_id, tstamp, value, text, compass) VALUES(id_last, id_event_last, now(), 'http://www.bgeo.es/wp-content/uploads/2015/06/10414886_1538811266370453_9195211735246399786_n.png','demo image', ROUND(RANDOM()*360));
