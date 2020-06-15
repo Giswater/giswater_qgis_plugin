@@ -120,7 +120,7 @@ class ApiDimensioning(ApiParent):
             layout.addItem(vertical_spacer1)
 
         title = f"DIMENSIONING - {self.fid}"
-        self.open_dialog(self.dlg_dim, dlg_name='Dimensioning', title=title)
+        self.open_dialog(self.dlg_dim, dlg_name='dimensioning', title=title)
         return False, False
 
 
