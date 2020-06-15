@@ -1,0 +1,111 @@
+/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+--FUNCTION CODE:2776
+
+-- DROP FUNCTION api_ud_sample.gw_fct_setprofile(json);
+
+CREATE OR REPLACE FUNCTION api_ud_sample.gw_fct_setprofile(p_data json)
+  RETURNS json AS
+$BODY$
+DECLARE
+
+/*
+ 
+SELECT "api_ud_sample".gw_fct_setprofile($${
+"client":{"device":3, "infoType":100, "lang":"ES"},
+"form":{},
+"feature":{},
+"data":{"profile_id":"1", "initNode":116, "endNode":111, "listArcs":"{133,134,135,136,137}", "linksDistance":1, "legendFactor":1, "papersize":{"id":0, "customDim":{"xdim":300, "ydim":100}}, "title":"Title", "date":"15/6/20", "scale":{"scaleToFit":"False", "eh":2000, "ev":500}}}$$)
+*/  
+    
+	
+--    Variables
+    schemas_array name[];
+    v_apiversion json;
+    v_fields json [];
+    v_device integer;
+    v_profile text;
+    v_profile_id text;
+    v_init_node integer;
+    v_end_node integer;
+    v_message text;
+    v_list_arcs text;
+    v_arc_id text;
+    v_linksDistance integer;
+    v_legendFactor integer;
+    v_papersize_id integer;
+    v_papersize_xdim integer;
+    v_papersize_ydim integer;
+    v_title text;
+    v_date date;
+    v_scaletofit boolean;
+    v_scale_eh integer;
+    v_scale_ev integer;
+    v_values text;
+    
+
+BEGIN
+
+	-- Set search path to local schema
+	SET search_path = "api_ud_sample", public;
+
+	-- Get schema name
+	schemas_array := current_schemas(FALSE);
+
+	-- Get json parameters
+	v_device := ((p_data ->>'client')::json->>'device')::text;
+	v_profile_id := ((p_data ->>'data')::json->>'profile_id')::text;
+	v_init_node := ((p_data ->>'data')::json->>'initNode')::text;
+	v_end_node := ((p_data ->>'data')::json->>'endNode')::text;
+	v_list_arcs := ((p_data ->>'data')::json->>'listArcs')::text;
+	v_linksDistance := ((p_data ->>'data')::json->>'linksDistance')::integer;
+	v_legendFactor := ((p_data ->>'data')::json->>'legendFactor')::integer;
+	v_papersize_id := (((p_data ->>'data')::json->>'papersize')::json->>'id')::integer;
+	v_papersize_xdim := ((((p_data ->>'data')::json->>'papersize')::json->>'customDim')::json->>'xdim')::integer;
+	v_papersize_ydim := ((((p_data ->>'data')::json->>'papersize')::json->>'customDim')::json->>'ydim')::integer;
+	v_title := ((p_data ->>'data')::json->>'title')::text;
+	v_date := ((p_data ->>'data')::json->>'date')::text;
+	v_scaletofit := (((p_data ->>'data')::json->>'scale')::json->>'scaleToFit')::boolean;
+	v_scale_eh := (((p_data ->>'data')::json->>'scale')::json->>'eh')::integer;
+	v_scale_ev := (((p_data ->>'data')::json->>'scale')::json->>'ev')::integer;
+	
+
+	-- Get api version
+	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
+	INTO v_apiversion;
+
+	-- Check if id of profile already exists in DB
+	EXECUTE 'SELECT DISTINCT(profile_id) FROM om_profile WHERE profile_id = ''' || v_profile_id || '''::text' INTO v_profile;
+	IF v_profile IS NULL THEN
+		-- Populate values
+		v_values = '{"initNode":'||v_init_node||', "endNode":'||v_end_node||', "listArcs":"'||COALESCE(v_list_arcs, '[]')||'", "linksDistance":'||v_linksDistance||', "legendFactor":'||v_legendFactor||', "papersize":{"id":'||v_papersize_id||', "customDim":{"xdim":'||v_papersize_xdim||', "ydim":'||v_papersize_ydim||'}}, "title":"'||v_title||'", "date":"'||v_date||'", "scale":{"scaleToFit":'||v_scaletofit||', "eh":'||v_scale_eh||', "ev":'||v_scale_ev||'}}';
+		EXECUTE 'INSERT INTO om_profile (profile_id, values) VALUES ('''||v_profile_id||''', '''||v_values||''')';
+		
+		v_message := 'Values has been updated';
+	ELSE
+		v_message := 'Selected ''profile_id'' already exist in database';
+	END IF;
+
+	-- Check null
+	v_apiversion := COALESCE(v_apiversion, '[]');    
+	v_fields := COALESCE(v_fields, '{}'); 
+
+	--    Return
+	RETURN ('{"status":"Accepted", "message":"'||v_message||'", "apiVersion":' || v_apiversion ||
+	      ',"body":{"data":{}'||
+			'}'||
+		'}')::json;
+
+	--    Exception handling
+	--EXCEPTION WHEN OTHERS THEN 
+	--RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+
+
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
