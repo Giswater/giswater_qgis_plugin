@@ -33,6 +33,8 @@ class Dimensioning(ParentMapTool):
         # Restore user value (Settings/Options/Digitizing/Suppress attribute from pop-up after feature creation)
         QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", self.suppres_form)
 
+        self.recover_previus_maptool()
+
 
     def get_feature_by_id(self, layer, id_):
 
