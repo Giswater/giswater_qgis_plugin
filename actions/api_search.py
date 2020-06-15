@@ -43,6 +43,7 @@ class ApiSearch(ApiParent):
         self.json_search = {}
         self.lbl_visible = False
         self.dlg_search = None
+        self.is_mincut = False
 
 
     def init_dialog(self):
@@ -50,31 +51,42 @@ class ApiSearch(ApiParent):
 
         self.dlg_search = SearchUi()
         self.load_settings(self.dlg_search)
-        self.dlg_search.lbl_msg.setStyleSheet("QLabel{color:red;}")
-        self.dlg_search.lbl_msg.setVisible(False)
         self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dlg_search)
         self.dlg_search.dlg_closed.connect(self.reset_rubber_polygon)
         self.dlg_search.dlg_closed.connect(self.close_search)
 
 
-    def api_search(self):
-
-        if self.dlg_search is None:
+    def api_search(self, dlg_mincut=None):
+        form = ""
+        if self.dlg_search is None and dlg_mincut is None:
             self.init_dialog()
+        if dlg_mincut:
+            self.dlg_search = dlg_mincut
+            self.is_mincut = True
+            form = f'"singleTab":"tab_address"'
 
+        self.dlg_search.lbl_msg.setStyleSheet("QLabel{color:red;}")
+        self.dlg_search.lbl_msg.setVisible(False)
         qgis_project_add_schema = self.controller.plugin_settings_value('gwAddSchema')
         self.controller.set_user_settings_value('open_search', 'true')
+
         if qgis_project_add_schema is None:
-            body = self.create_body()
+            body = self.create_body(form=form)
         else:
             extras = f'"addSchema":"{qgis_project_add_schema}"'
-            body = self.create_body(extras=extras)
+            body = self.create_body(form=form, extras=extras)
         function_name = "gw_fct_getsearch"
         complet_list = self.controller.get_json(function_name, body)
         if not complet_list:
             return False
 
         main_tab = self.dlg_search.findChild(QTabWidget, 'main_tab')
+        if dlg_mincut:
+            main_tab = self.dlg_search.findChild(QTabWidget, 'main_tab')
+            main_tab.setStyleSheet("background-color: #f0f0f0;")
+            main_tab.setStyleSheet("QTabBar::tab { background-color: transparent; text-align:left;"
+                                   "border: 1px solid transparent;}")
+
         first_tab = None
         self.lineedit_list = []
         for tab in complet_list["form"]:
@@ -99,15 +111,14 @@ class ApiSearch(ApiParent):
                     self.lineedit_list.append(widget)
                 elif field['widgettype'] == 'combo':
                     widget = self.add_combobox(field)
-
                 gridlayout.addWidget(label, x, 0)
                 gridlayout.addWidget(widget, x, 1)
                 x += 1
 
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
             gridlayout.addItem(vertical_spacer1)
-
-        self.controller.manage_translation('search', self.dlg_search)
+        if self.is_mincut is False:
+            self.controller.manage_translation('search', self.dlg_search)
 
 
     def reset_rubber_polygon(self):
@@ -160,7 +171,8 @@ class ApiSearch(ApiParent):
                 break
 
         # Show info in docker?
-        self.controller.init_docker()
+        if self.is_mincut is False:
+            self.controller.init_docker()
 
         # Get selected tab name
         tab_selected = self.dlg_search.main_tab.widget(index).objectName()
