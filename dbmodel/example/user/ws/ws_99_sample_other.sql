@@ -615,15 +615,18 @@ UPDATE config_form_fields SET layoutorder = 24 where columnname ='svg' and formn
 
 
 
-UPDATE config_form_fields set layoutorder = layoutorder+1 WHERE formname in ('ve_arc', 've_node', 've_connec')
+UPDATE config_form_fields set layoutorder = layoutorder+1 WHERE (formname ilike 've_arc_%' or 
+ formname ilike 've_node_%' or  formname ilike  've_connec_%')
 AND columnname in ('streetname','streetname2', 'postnumber','postnumber2','postcomplement','postcomplement2');
 
-UPDATE config_form_fields set hidden = false  WHERE formname in ('ve_arc', 've_node', 've_connec')
+UPDATE config_form_fields set hidden = false  WHERE (formname in ('ve_arc', 've_node', 've_connec')
+or (formname ilike 've_arc_%' or  formname ilike 've_node_%' or  formname ilike  've_connec_%'))
 AND columnname = 'district_id';
 
-UPDATE config_form_fields set layoutorder = 2 WHERE formname in ('ve_node', 've_connec') AND columnname = 'district_id';
+UPDATE config_form_fields set layoutorder = 2 WHERE (formname in ('ve_node', 've_connec') 
+or  (formname ilike 've_node_%' or  formname ilike  've_connec_%')) AND columnname = 'district_id';
 
-UPDATE config_form_fields set layoutorder = 3 WHERE formname in ('ve_arc') AND columnname = 'district_id';
+UPDATE config_form_fields set layoutorder = 3 WHERE (formname in ('ve_arc') or (formname ilike 've_arc_%')) AND columnname = 'district_id';
 
 UPDATE config_form_fields SET dv_querytext = replace (dv_querytext, ' arc_type', ' cat_feature_arc') WHERE dv_querytext like'% arc_type%';
 UPDATE config_form_fields SET dv_querytext = replace (dv_querytext, ' node_type', ' cat_feature_node') WHERE dv_querytext like'% node_type%';
@@ -634,3 +637,19 @@ UPDATE sys_param_user SET dv_querytext = replace (dv_querytext, ' arc_type', ' c
 UPDATE sys_param_user SET dv_querytext = replace (dv_querytext, ' node_type', ' cat_feature_node') WHERE dv_querytext like'% node_type%';
 UPDATE sys_param_user SET dv_querytext = replace (dv_querytext, ' connec_type', ' cat_feature_connec') WHERE dv_querytext like'% connec_type%';
 UPDATE sys_param_user SET dv_querytext = replace (dv_querytext, ' gully_type', ' cat_feature_gully') WHERE dv_querytext like'% gully_type%';
+
+
+
+INSERT INTO ext_district (district_id,name, muni_id,active)
+values(1,'Camps Blancs',1, true);
+INSERT INTO ext_district (district_id,name, muni_id,active)
+values(2,'Marianao',1, true);
+
+UPDATE node SET district_id =1 WHERE expl_id=1;
+UPDATE node SET district_id =2 WHERE expl_id=2;
+
+UPDATE arc SET district_id =1 WHERE expl_id=1;
+UPDATE arc SET district_id =2 WHERE expl_id=2;
+
+UPDATE connec SET district_id =1 WHERE expl_id=1;
+UPDATE connec SET district_id =2 WHERE expl_id=2;

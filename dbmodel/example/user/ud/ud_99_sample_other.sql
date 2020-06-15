@@ -129,6 +129,9 @@ UPDATE config_form_fields set layoutorder = 3 WHERE formname in ('ve_connec', 'v
 SELECT gw_fct_audit_check_project($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "version":"0", "fid":1}}$$)::text;
 
 SELECT 	gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"CONDUIT"},
+ "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-DELETE"  }}$$);
+
+SELECT 	gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"CONDUIT"},
  "data":{"filterFields":{}, "pageInfo":{}, "multi_create":"TRUE" }}$$);
 
 
@@ -499,3 +502,20 @@ UPDATE sys_param_user SET dv_querytext = replace (dv_querytext, ' arc_type', ' c
 UPDATE sys_param_user SET dv_querytext = replace (dv_querytext, ' node_type', ' cat_feature_node') WHERE dv_querytext like'% node_type%';
 UPDATE sys_param_user SET dv_querytext = replace (dv_querytext, ' connec_type', ' cat_feature_connec') WHERE dv_querytext like'% connec_type%';
 UPDATE sys_param_user SET dv_querytext = replace (dv_querytext, ' gully_type', ' cat_feature_gully') WHERE dv_querytext like'% gully_type%';
+
+INSERT INTO ext_district (district_id,name, muni_id,active)
+values(1,'Camps Blancs',1, true);
+INSERT INTO ext_district (district_id,name, muni_id,active)
+values(2,'Marianao',1, true);
+
+UPDATE node SET district_id =1 WHERE expl_id=1;
+UPDATE node SET district_id =2 WHERE expl_id=2;
+
+UPDATE arc SET district_id =1 WHERE expl_id=1;
+UPDATE arc SET district_id =2 WHERE expl_id=2;
+
+UPDATE connec SET district_id =1 WHERE expl_id=1;
+UPDATE connec SET district_id =2 WHERE expl_id=2;
+
+UPDATE gully SET district_id =1 WHERE expl_id=1;
+UPDATE gully SET district_id =2 WHERE expl_id=2;
