@@ -264,7 +264,7 @@ BEGIN
 				EXECUTE v_query_string_update; 
 	
 				INSERT INTO audit_check_data (fid, result_id, error_message)
-				VALUES (143, v_result_id, concat('Copy value of ',v_column,' from old feature into new one: ',v_value,'.'));
+				VALUES (143, v_result_id, concat('Copy value of ',v_column,': ',v_value,'.'));
 			END IF;
 		END LOOP;
 
@@ -286,7 +286,7 @@ BEGIN
 					EXECUTE v_query_string_update; 
 
 					INSERT INTO audit_check_data (fid, result_id, error_message)
-					VALUES (143, v_result_id, concat('Copy value of ',v_column,' from old feature into new one: ',v_value,'.'));
+					VALUES (143, v_result_id, concat('Copy value of ',v_column,': ',v_value,'.'));
 				END IF;
 				
 			END LOOP;
@@ -309,7 +309,7 @@ BEGIN
 					EXECUTE v_query_string_update; 
 
 					INSERT INTO audit_check_data (fid, result_id, error_message)
-					VALUES (143, v_result_id, concat('Copy value of ', v_column,' from old feature into new one: ',v_value,'.'));
+					VALUES (143, v_result_id, concat('Copy value of ', v_column,': ',v_value,'.'));
 				END IF;
 			END LOOP;
 		END IF;
@@ -374,12 +374,12 @@ BEGIN
 		WHERE '||v_id_column||'='''||v_old_feature_id||''';';
 
 		INSERT INTO audit_check_data (fid, result_id, error_message)
-		VALUES (143, v_result_id, concat('Downgrade old feature, set state: 0, workcat_id_end:  ',v_workcat_id_end,', v_enddate: ',v_enddate,'.'));
+		VALUES (143, v_result_id, concat('Downgrade old feature, set state: 0, workcat_id_end: ',v_workcat_id_end,', enddate: ',v_enddate,'.'));
 
 		IF v_id IS NOT NULL THEN
 			EXECUTE 'UPDATE '||v_feature_type||' SET state=1, workcat_id='''||v_workcat_id_end||''', builtdate='''||v_enddate||''', enddate=NULL WHERE '||v_id_column||'='''||v_id||''';';
 			INSERT INTO audit_check_data (fid, result_id, error_message)
-			VALUES (143, v_result_id, concat('Update new feature, set state: 1, workcat_id:  ',v_workcat_id_end,', builtdate: ',v_enddate,'.'));
+			VALUES (143, v_result_id, concat('Update new feature, set state: 1, workcat_id: ',v_workcat_id_end,', builtdate: ',v_enddate,'.'));
 		END IF;
 		
 		--reconect existing link to the new feature
@@ -410,7 +410,7 @@ BEGIN
 
 -- get log (fid: 143)
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fid = 43) row;
+	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fid = 143) row;
 
 	IF v_audit_result is null THEN
         v_status = 'Accepted';
