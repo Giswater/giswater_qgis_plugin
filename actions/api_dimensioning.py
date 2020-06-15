@@ -8,8 +8,8 @@ or (at your option) any later version.
 from qgis.core import QgsPointXY
 from qgis.gui import QgsMapToolEmitPoint, QgsMapTip
 from qgis.PyQt.QtCore import Qt, QTimer
-from qgis.PyQt.QtWidgets import QAction, QCheckBox, QCompleter, QGridLayout, QLabel, QLineEdit, QPushButton, QSizePolicy, \
-    QSpacerItem, QWidget
+from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QGridLayout, QLabel, QLineEdit, QPushButton,\
+    QSizePolicy, QSpacerItem, QWidget
 
 import json
 from collections import OrderedDict
@@ -79,7 +79,6 @@ class ApiDimensioning(ApiParent):
 
         # when funcion is called from new feature
         if db_return is None:
-            print('2')
             body = self.create_body()
             function_name = 'gw_fct_getdimensioning'
             json_result = self.controller.get_json(function_name, body)
@@ -134,7 +133,6 @@ class ApiDimensioning(ApiParent):
     def save_dimensioning(self, qgis_feature, layer):
 
         # Upsert feature into db
-        print(qgis_feature)
         layer.updateFeature(qgis_feature)
         layer.commitChanges()
 
@@ -147,20 +145,20 @@ class ApiDimensioning(ApiParent):
             if widget_value == 'null':
                 continue
             fields += f'"{widget_name}":"{widget_value}", '
-        """
-        # todo: enable combobox 
-        list_widgets = self.dlg_dim.findChildren(QComboBox)
-        for widget in list_widgets:
-            widget_name = widget.property('columnname')
-            widget_value = utils_giswater.get_item_data(self.dlg_dim, combo, 0)
-            if widget_value == 'null':
-                continue
-            fields += f'"{widget_name}":"{widget_value}", '
-        """
+
         list_widgets = self.dlg_dim.findChildren(QCheckBox)
         for widget in list_widgets:
             widget_name = widget.property('columnname')
             widget_value = f'"{utils_giswater.isChecked(self.dlg_dim, widget)}"'
+            if widget_value == 'null':
+                continue
+            fields += f'"{widget_name}":{widget_value},'
+
+
+        list_widgets = self.dlg_dim.findChildren(QComboBox)
+        for widget in list_widgets:
+            widget_name = widget.property('column_id')
+            widget_value = f'"{utils_giswater.get_item_data(self.dlg_dim, widget)}"'
             if widget_value == 'null':
                 continue
             fields += f'"{widget_name}":{widget_value},'
