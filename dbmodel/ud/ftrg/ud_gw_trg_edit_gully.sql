@@ -77,7 +77,7 @@ BEGIN
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
 		v_streetaxis = (SELECT id FROM ext_streetaxis WHERE muni_id = NEW.muni_id AND name = NEW.streetname LIMIT 1);
 		v_streetaxis2 = (SELECT id FROM ext_streetaxis WHERE muni_id = NEW.muni_id AND name = NEW.streetname2 LIMIT 1);
-	END IF;;
+	END IF;
 	
 	-- Control insertions ID
 	IF TG_OP = 'INSERT' THEN
