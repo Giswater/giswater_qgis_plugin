@@ -1246,6 +1246,7 @@ class DaoController(object):
 
         return project_version
 
+
     def get_project_language(self, schemaname=None):
         """ Get project langugage from table 'version' """
 
@@ -1270,6 +1271,7 @@ class DaoController(object):
                     project_language = row[0]
 
         return project_language
+
 
     def get_project_epsg(self, schemaname=None):
         """ Get project epsg from table 'version' """
@@ -1296,6 +1298,7 @@ class DaoController(object):
 
         return project_epsg
 
+
     def get_project_sample(self, schemaname=None):
         """ Get if project is sample from table 'version' """
 
@@ -1320,6 +1323,7 @@ class DaoController(object):
                     project_sample = row[0]
 
         return project_sample
+
 
     def check_schema(self, schemaname=None):
         """ Check if selected schema exists """
@@ -1845,16 +1849,23 @@ class DaoController(object):
     def init_docker(self, docker_param='qgis_info_docker'):
         """ Get user config parameter @docker_param """
 
-        # Show info or form in docker?
-        row = self.get_config(docker_param)
-        if row:
-            if row[0].lower() == 'true':
-                self.close_docker()
-                self.dlg_docker = DockerUi()
-                self.dlg_docker.dlg_closed.connect(self.close_docker)
-                self.manage_docker_options()
-            else:
+        if docker_param == 'qgis_main_docker':
+            # Show 'main dialog' in docker depending its value in user settings
+            self.qgis_main_docker = self.get_user_setting_value(docker_param, 'true')
+            value = self.qgis_main_docker.lower()
+        else:
+            # Show info or form in docker?
+            row = self.get_config(docker_param)
+            if not row:
                 self.dlg_docker = None
+                return
+            value = row[0].lower()
+
+        if value == 'true':
+            self.close_docker()
+            self.dlg_docker = DockerUi()
+            self.dlg_docker.dlg_closed.connect(self.close_docker)
+            self.manage_docker_options()
         else:
             self.dlg_docker = None
 
@@ -1877,10 +1888,6 @@ class DaoController(object):
                     del widget
                     self.dlg_docker.setWidget(None)
                 self.iface.removeDockWidget(self.dlg_docker)
-            else:
-                self.log_info("docker is floating")
-        else:
-            self.log_info("docker is None")
 
 
     def manage_docker_options(self):

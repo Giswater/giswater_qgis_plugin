@@ -8,7 +8,6 @@ or (at your option) any later version.
 from qgis.core import QgsProject, QgsTask, QgsApplication
 from qgis.gui import QgsDateTimeEdit
 from qgis.utils import reloadPlugin
-
 from qgis.PyQt.QtCore import QSettings, Qt, QDate
 from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel
@@ -23,7 +22,6 @@ import re
 import json
 import subprocess
 import xml.etree.cElementTree as ET
-
 from collections import OrderedDict
 from functools import partial
 from time import sleep
@@ -81,8 +79,7 @@ class UpdateSQL(ApiParent):
         self.status_no_update = QPixmap(self.icon_folder + 'status_not_updated.png')
 
         # Create the dialog and signals
-        if self.dlg_readsql is None:
-            self.init_show_database()
+        self.init_show_database()
 
         # Check if we have any layer loaded
         self.info_show_database(username=username, show_dialog=show_dialog)
@@ -333,7 +330,20 @@ class UpdateSQL(ApiParent):
                 str(self.controller.plugin_settings_value('last_schema_name_selected')))
 
         if show_dialog:
-            self.open_dialog(self.dlg_readsql, dlg_name='main_ui')
+            self.manage_docker()
+
+
+    def manage_docker(self):
+
+        try:
+            self.controller.init_docker('qgis_main_docker')
+            if self.controller.dlg_docker:
+                self.controller.dock_dialog(self.dlg_readsql)
+                self.dlg_readsql.dlg_closed.connect(self.controller.close_docker)
+            else:
+                self.open_dialog(self.dlg_readsql, dlg_name='main_ui')
+        except RuntimeError as e:
+            self.controller.log_info(str(e))
 
 
     def set_credentials(self, dialog, new_connection=False):
@@ -1934,7 +1944,6 @@ class UpdateSQL(ApiParent):
 
 
     def close_dialog(self, dlg=None):
-
         """ Close dialog """
 
         if dlg is None or type(dlg) is bool:
@@ -2718,7 +2727,6 @@ class UpdateSQL(ApiParent):
         self.manage_result_message(status, parameter="Created child view")
 
 
-
     def update_sys_fields(self):
 
         # Create the dialog and signals
@@ -2733,7 +2741,6 @@ class UpdateSQL(ApiParent):
                     self.dlg_manage_sys_fields.tab_sys_add_fields, self.dlg_manage_sys_fields.tab_sys_add_fields.widget(x).objectName())
 
         form_name_fields = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_feature_sys_fields)
-
 
         # Set listeners
         self.dlg_manage_sys_fields.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_manage_sys_fields))
@@ -2787,7 +2794,6 @@ class UpdateSQL(ApiParent):
 
         self.open_dialog(self.dlg_manage_fields, dlg_name='main_addfields')
         self.dlg_manage_fields.setWindowTitle(window_title)
-
 
 
     # TODO:: Enhance this function and use parametric parameters

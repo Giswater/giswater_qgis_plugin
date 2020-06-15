@@ -1004,7 +1004,7 @@ class Giswater(QObject):
             self.basic.basic_api_search()
 
         # call dynamic mapzones repaint
-        self. parent.set_style_mapzones()
+        self.parent.set_style_mapzones()
 
         # Log it
         message = "Project read successfully"
