@@ -42,7 +42,8 @@ and column_id = 'priority';
 --2020/05/23
 UPDATE sys_function SET isdeprecated = true WHERE id = 2224;
 UPDATE sys_function SET isdeprecated = true WHERE id = 2226;
-UPDATE sys_function SET function_name = 'gw_fct_rpt2pg_main' WHERE id = 2232;
+UPDATE sys_function SET function_name = 'gw_fct_rpt2pg_main', project_type='ws' WHERE id = 2322;
+UPDATE sys_function SET function_name = 'gw_fct_rpt2pg_main', project_type='ud' WHERE id = 2726;
 UPDATE sys_function SET isdeprecated = true WHERE id = 2308;
 UPDATE sys_function SET isdeprecated = true WHERE id = 2310;
 UPDATE sys_function SET isdeprecated = false WHERE id = 2322;
@@ -618,8 +619,34 @@ UPDATE sys_function SET function_name = 'gw_fct_getformfields' WHERE function_na
 UPDATE sys_function SET function_name = 'gw_fct_getvisit_main' WHERE function_name = 'gw_fct_get_visit';
 UPDATE sys_function SET function_name = 'gw_fct_getwidgetvalues' WHERE function_name = 'gw_fct_get_widgetvalues';
 
-
-
+DELETE FROM sys_function WHERE function_name IN ('gw_trg_edit_man_arc', 'gw_trg_edit_man_node', 'gw_trg_edit_man_connec', 'gw_trg_edit_man_gully');
+INSERT INTO sys_function VALUES ('1314', 'gw_trg_ui_visitman');
+INSERT INTO sys_function VALUES ('1328', 'gw_trg_ui_hydroval_connec');
+INSERT INTO sys_function VALUES ('1130', 'gw_trg_plan_psector_x_node');
+INSERT INTO sys_function VALUES ('1118', 'gw_trg_edit_om_visit');
+INSERT INTO sys_function VALUES ('2742', 'gw_trg_edit_config_sysfields');
+INSERT INTO sys_function VALUES ('2646', 'gw_trg_calculate_period');
+DELETE FROM sys_function WHERE id = 1102;
+INSERT INTO sys_function VALUES ('2862', 'gw_fct_setlot');
+UPDATE sys_function SET project_type='ws' WHERE id=2846;
+INSERT INTO sys_function VALUES ('2332', 'gw_fct_pg2epa_valve_status');
+UPDATE sys_function SET project_type='ws' WHERE id=2854;
+UPDATE sys_function SET project_type='ws' WHERE id=2646;
+UPDATE sys_function SET project_type='ws' WHERE id=2848;
+UPDATE sys_function SET project_type='ws' WHERE id=2850;
+UPDATE sys_function SET project_type='ws' WHERE id=2430;
+INSERT INTO sys_function VALUES ('2774', 'gw_fct_pg2epa_buildup_supply');
+UPDATE sys_function SET project_type='ws' WHERE id=2798;
+INSERT INTO sys_function VALUES ('2802', 'gw_fct_om_visit_multiplier');
+INSERT INTO sys_function VALUES ('2324', 'gw_fct_mincut_inverted_flowtrace_engine');
+INSERT INTO sys_function VALUES ('2320', 'gw_fct_mincut_inverted_flowtrace');
+INSERT INTO sys_function VALUES ('2504', 'gw_fct_import_dxfblock');
+INSERT INTO sys_function VALUES ('2636', 'gw_fct_admin_rename_fixviews');
+INSERT INTO sys_function VALUES ('2690', 'gw_fct_admin_manage_addfields');
+UPDATE sys_function SET project_type='utils' WHERE id=2788;
+DELETE FROM sys_function WHERE id = 2828;
+UPDATE sys_function SET project_type='utils' WHERE id=2740;
+UPDATE sys_function SET project_type='utils' WHERE id=2796;
 
 
 

@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
---FUNCTION CODE: XXXX
+--FUNCTION CODE: 2956
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_cad_aux()
   RETURNS trigger AS

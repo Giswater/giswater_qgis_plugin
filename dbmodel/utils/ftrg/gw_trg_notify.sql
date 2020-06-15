@@ -4,9 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 
-
--- DROP FUNCTION gw_trg_notify();
+--FUNCTION CODE:2946
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_notify()
   RETURNS trigger AS
