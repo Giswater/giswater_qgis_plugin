@@ -482,6 +482,7 @@ class DrawProfiles(ParentMapTool):
         # Set axes
         x_min = round(self.nodes[0].start_point - self.fix_x - self.fix_x * Decimal(0.15))
         x_max = round(self.nodes[self.n - 1].start_point + self.fix_x * Decimal(0.15))
+        # x_min = self.profile_json['body']['data']['extension']['height']
         # x_max = self.profile_json['body']['data']['extension']['width']
         self.axes.set_xlim([x_min, x_max])
 
