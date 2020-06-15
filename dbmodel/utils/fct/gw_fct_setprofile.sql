@@ -6,16 +6,16 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2776
 
--- DROP FUNCTION api_ud_sample.gw_fct_setprofile(json);
+-- DROP FUNCTION SCHEMA_NAME.gw_fct_setprofile(json);
 
-CREATE OR REPLACE FUNCTION api_ud_sample.gw_fct_setprofile(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setprofile(p_data json)
   RETURNS json AS
 $BODY$
 DECLARE
 
 /*
  
-SELECT "api_ud_sample".gw_fct_setprofile($${
+SELECT "SCHEMA_NAME".gw_fct_setprofile($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{},
@@ -51,7 +51,7 @@ SELECT "api_ud_sample".gw_fct_setprofile($${
 BEGIN
 
 	-- Set search path to local schema
-	SET search_path = "api_ud_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- Get schema name
 	schemas_array := current_schemas(FALSE);
