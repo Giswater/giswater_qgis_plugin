@@ -85,6 +85,7 @@ BEGIN
 		-----------
 		SELECT gw_fct_getformfields( 'lot', 'form_lot', 'data', null, null, null, null, 'INSERT', null, v_device, null) INTO v_fields;
 		raise notice '-> %', v_idname;
+		v_activedatatab = TRUE;
 		-- getting values from feature
 		IF v_id IS NOT NULL THEN
 			EXECUTE FORMAT ('SELECT (row_to_json(a)) FROM (SELECT * FROM %s WHERE %s = CAST($1 AS %s))a', v_tablename, v_idname, v_columntype)
@@ -114,14 +115,14 @@ BEGIN
 				INTO v_geometry;
 
 			-- building header
-			v_formheader :=concat('ORDRE TREBALL - ',v_id);		
+			v_formheader :=concat('LOT - ',v_id);
 
 		ELSE
 			-- getting new id from sequence of lots
-			v_id= (SELECT nextval('SCHEMA_NAME.om_visit_lot_id_seq'::regclass));
+			v_id= (select MAX(id)+1 from om_visit_lot);
 
 			-- building header
-			v_formheader :=concat('NOVA ORDRE TREBALL - ', v_id);							
+			v_formheader :=concat('NOU LOT - ', v_id);							
 
 			-- setting values
 			FOREACH aux_json IN ARRAY v_fields 

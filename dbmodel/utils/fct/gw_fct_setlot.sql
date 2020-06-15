@@ -115,6 +115,10 @@ BEGIN
 	-- IF new status is executed, set real_enddate with current date
 	IF v_status = '5' THEN
 		UPDATE om_visit_lot SET real_enddate = NOW() WHERE id=v_id::INTEGER;
+		--Add geometry to unexpected lots
+		IF (SELECT the_geom FROM om_visit_lot WHERE id=v_id::INTEGER) IS NULL THEN
+			PERFORM gw_fct_lot_psector_geom(v_id::INTEGER);
+		END IF; 
 	END IF;
 	
 
