@@ -6,9 +6,10 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.core import QgsApplication, QgsExpression, QgsExpressionContextUtils,  QgsFeatureRequest, QgsFillSymbol, \
-    QgsLineSymbol, QgsMarkerSymbol, QgsPrintLayout, QgsProject, QgsReadWriteContext, QgsSymbol, QgsVectorLayer
+    QgsLineSymbol, QgsMarkerSymbol, QgsPrintLayout, QgsProject, QgsReadWriteContext, QgsSymbol, QgsVectorLayer, \
+    QgsPointLocator, QgsPointXY, QgsSnappingConfig, QgsSnappingUtils, QgsTolerance
 
-from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
+from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker, QgsMapCanvas
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTime
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QCompleter, QDateEdit, QLineEdit, \
     QTableView, QTextEdit, QTimeEdit, QWidget
@@ -17,18 +18,16 @@ from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtXml import QDomDocument
 
 import json, operator, os, re
-
 from datetime import datetime
 from collections import OrderedDict
 from functools import partial
+
 from .gw_task import GwTask
 from .. import utils_giswater
-
 from .api_search import ApiSearch
 from .mincut_config import MincutConfig
 from .multiple_selection import MultipleSelection
 from .parent import ParentAction
-
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 from ..ui_manager import DialogTextUi
 from ..ui_manager import Mincut
@@ -36,9 +35,6 @@ from ..ui_manager import MincutEndUi
 from ..ui_manager import MincutHydrometer
 from ..ui_manager import MincutConnec
 from ..ui_manager import MincutComposer
-
-from qgis.gui import QgsMapCanvas
-from qgis.core import QgsPointLocator, QgsPointXY, QgsSnappingConfig, QgsSnappingUtils, QgsTolerance
 
 
 class MincutParent(ParentAction):
@@ -1846,6 +1842,7 @@ class MincutParent(ParentAction):
                 a.trigger()
                 break
 
+
     def mg_mincut_management(self):
         """ Button 27: Mincut management """
 
@@ -2040,6 +2037,7 @@ class MincutParent(ParentAction):
         self.action_mincut_composer.setDisabled(False)
         return row
 
+
     def open_mincut_manage_dates(self, row):
         """ Management of null values in fields of type date """
         
@@ -2066,6 +2064,7 @@ class MincutParent(ParentAction):
 
     def mincut_composer(self):
         """ Open Composer """
+
         # Check if path exist
         template_folder = ""
         row = self.controller.get_config('qgis_composers_folderpath')
@@ -2078,6 +2077,7 @@ class MincutParent(ParentAction):
             message = "Your composer's path is bad configured. Please, modify it and try again."
             self.controller.show_message(message, 1)
             return
+
         # Set dialog add_connec
         self.dlg_comp = MincutComposer()
         self.load_settings(self.dlg_comp)
