@@ -1106,7 +1106,8 @@ class Giswater(QObject):
         
         try:   
             if function_name in self.map_tools:          
-                self.controller.check_actions(False)                        
+                self.controller.check_actions(False)
+                self.controller.prev_maptool = self.iface.mapCanvas().mapTool()
                 map_tool = self.map_tools[function_name]
                 if not (map_tool == self.iface.mapCanvas().mapTool()):
                     self.iface.mapCanvas().setMapTool(map_tool)

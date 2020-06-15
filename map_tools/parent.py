@@ -122,6 +122,11 @@ class ParentMapTool(QgsMapTool):
         self.vertex_marker.hide()
 
 
+    def recover_previus_maptool(self):
+        if self.controller.prev_maptool:
+            self.iface.mapCanvas().setMapTool(self.controller.prev_maptool)
+            self.controller.prev_maptool = None
+
 
     def remove_vertex(self):
         """ Remove vertex_marker from canvas"""

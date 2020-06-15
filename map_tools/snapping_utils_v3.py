@@ -99,7 +99,7 @@ class SnappingConfigManager(object):
 
     def set_snapping_mode(self, mode=3):
         """ Defines on which layer the snapping is performed
-        :param mode: 1 = ActiveLayer, 2=AllLayers, 3=AdvancedConfiguration (SnappingMode)
+        :param mode: 1 = ActiveLayer, 2=AllLayers, 3=AdvancedConfiguration (int or SnappingMode)
         """
 
         snapping_options = self.get_snapping_options()

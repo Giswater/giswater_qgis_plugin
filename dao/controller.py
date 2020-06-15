@@ -50,6 +50,7 @@ class DaoController(object):
         self.min_message_level = 0
         self.user_settings = None
         self.user_settings_path = None
+        self.prev_maptool = None
 
         if create_logger:
             self.set_logger(logger_name)
