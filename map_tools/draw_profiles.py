@@ -126,6 +126,7 @@ class DrawProfiles(ParentMapTool):
         # utils_giswater.set_item_data(self.dlg_draw_profile.cmb_composer, self.list_composers, 0)
 
         # Set parameters vdefault
+        utils_giswater.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance, '1')
         utils_giswater.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_legend_factor, '1')
         utils_giswater.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_x_dim, '300')
         utils_giswater.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_y_dim, '100')
@@ -212,7 +213,7 @@ class DrawProfiles(ParentMapTool):
         self.dlg_load.btn_open.clicked.connect(self.load_profile)
         self.dlg_load.btn_delete_profile.clicked.connect(self.delete_profile)
 
-        sql = "SELECT DISTINCT(profile_id) FROM om_profile"
+        sql = "SELECT DISTINCT(profile_id) FROM om_profile ORDER BY profile_id"
         rows = self.controller.get_rows(sql)
         if rows:
             for row in rows:
@@ -1680,7 +1681,7 @@ class DrawProfiles(ParentMapTool):
         self.controller.show_info(message)
 
         self.dlg_load.tbl_profiles.clear()
-        sql = "SELECT DISTINCT(profile_id) FROM om_profile"
+        sql = "SELECT DISTINCT(profile_id) FROM om_profile ORDER BY profile_id"
         rows = self.controller.get_rows(sql)
         if rows:
             for row in rows:
