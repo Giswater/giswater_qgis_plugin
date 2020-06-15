@@ -65,6 +65,8 @@ class DrawProfiles(ParentMapTool):
 
     def activate(self):
 
+        self.action().setChecked(True)
+
         # Remove all selections on canvas
         self.remove_selection()
 
@@ -75,6 +77,7 @@ class DrawProfiles(ParentMapTool):
             message = "Error getting pgRouting version"
             self.controller.show_warning(message)
             return
+
         self.version = str(row[0][:1])
 
         # Set dialog
@@ -118,7 +121,20 @@ class DrawProfiles(ParentMapTool):
         utils_giswater.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_horizontal, '2000')
         utils_giswater.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_vertical, '500')
         utils_giswater.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_title, 'Test title')
-        self.open_dialog(self.dlg_draw_profile)
+
+        # Show form in docker?
+        self.controller.init_docker('qgis_form_docker')
+        if self.controller.dlg_docker:
+            # self.controller.manage_translation('draw_profile', self.dlg_draw_profile)
+            self.controller.dock_dialog(self.dlg_draw_profile)
+        else:
+            self.open_dialog(self.dlg_draw_profile)
+
+
+    def deactivate(self):
+
+        self.controller.close_docker()
+        ParentMapTool.deactivate(self)
 
 
     def get_profile(self):

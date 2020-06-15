@@ -5,7 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-
 from qgis.core import QgsFeature, QgsGeometry, QgsMapToPixel
 from qgis.gui import QgsVertexMarker
 from qgis.PyQt.QtCore import Qt
@@ -152,6 +151,7 @@ class CadAddCircle(ParentMapTool):
 
 
     def activate(self):
+
         self.snap_to_selected_layer = False
         # Check button
         self.action().setChecked(True)
@@ -191,9 +191,6 @@ class CadAddCircle(ParentMapTool):
 
         if self.vdefault_layer is None:
             self.vdefault_layer = self.iface.activeLayer()
-
-        # Set snapping
-        #self.snapper_manager.snap_to_layer(self.vdefault_layer)
 
 
     def deactivate(self):

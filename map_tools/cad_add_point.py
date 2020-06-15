@@ -174,6 +174,7 @@ class CadAddPoint(ParentMapTool):
 
 
     def activate(self):
+
         self.snap_to_selected_layer = False
         # Get SRID
         self.srid = self.controller.plugin_settings_value('srid')
@@ -213,9 +214,6 @@ class CadAddPoint(ParentMapTool):
 
         if self.vdefault_layer is None:
             self.vdefault_layer = self.iface.activeLayer()
-
-        # Set snapping
-        #self.snapper_manager.snap_to_layer(self.vdefault_layer)
 
 
     def deactivate(self):

@@ -25,13 +25,14 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
         super(FlowTraceFlowExitMapTool, self).__init__(iface, settings, action, index_action)
 
         self.layers_added = []
-        
+
+
     def check_for_layers(self):
+
         self.needed_layers = {"v_anl_flow_node":{"field_cat":"context", "field_id":"id", "size":2, "color_values":{'Flow exit': QColor(235, 74, 117), 'Flow trace': QColor(235, 167, 48)}},
                               "v_anl_flow_gully":{"field_cat":"context", "field_id":"gully_id", "size":2, "color_values":{'Flow exit': QColor(235, 74, 117), 'Flow trace': QColor(235, 167, 48)}},
                               "v_anl_flow_connec":{"field_cat":"context", "field_id":"connec_id", "size":2,"color_values":{'Flow exit': QColor(235, 74, 117), 'Flow trace': QColor(235, 167, 48)}},
                               "v_anl_flow_arc":{"field_cat":"context", "field_id":"id", "size":0.86, "color_values":{'Flow exit': QColor(235, 74, 117), 'Flow trace': QColor(235, 167, 48)}}}
-
 
         self.add_layer = AddLayer(self.iface, self.settings, self.controller, self.plugin_dir)
         for layer_name, values in self.needed_layers.items():
@@ -55,10 +56,8 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
         # Snapping	
         result = self.snapper_manager.snap_to_current_layer(event_point)		
         if self.snapper_manager.result_is_valid():
-            		
             self.snapper_manager.add_marker(result, self.vertex_marker)
-            
-			# Data for function
+            # Data for function
             self.snapped_feat = self.snapper_manager.get_snapped_feature(result)
 
 
@@ -98,7 +97,7 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
 
     def activate(self):
 	
-		#set active and current layer
+        # set active and current layer
         self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
         self.iface.setActiveLayer(self.layer_node)
         self.current_layer = self.layer_node
