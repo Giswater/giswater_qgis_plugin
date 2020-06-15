@@ -2003,14 +2003,23 @@ WHERE cat_soil.m2trenchl_cost::text = price_m2trenchl.id::text OR cat_soil.m2tre
 
  
 CREATE OR REPLACE VIEW v_plan_node AS 
+SELECT *, 
+concat ((1/acoeff)::numeric(6,1), ' years') as aperiod,
+(budget * acoeff)::numeric(12,2) AS arate,
+CASE WHEN (age::float * budget * acoeff) < budget THEN (age * budget * acoeff)::numeric(12,2) 
+ELSE budget::numeric(12,2) END AS amortized,
+CASE WHEN (age * budget * acoeff)< budget THEN (budget - age * budget * acoeff)::numeric(12,2) 
+ELSE 0::numeric(12,2) END AS pending
+FROM (
  SELECT v_node.node_id,
 	v_node.nodecat_id,
 	v_node.sys_type AS node_type,
 	v_node.elevation AS top_elev,
 	v_node.elevation - v_node.depth AS elev,
 	v_node.epa_type,
-	v_node.sector_id,
 	v_node.state,
+	v_node.sector_id,
+	v_node.expl_id,		
 	v_node.annotation,
 	v_price_x_catnode.cost_unit,
 	v_price_compost.descript,
@@ -2061,14 +2070,16 @@ CREATE OR REPLACE VIEW v_plan_node AS
 			END * v_price_x_catnode.cost
 			ELSE NULL::numeric
 		END::numeric(12,2) AS budget,
-	v_node.expl_id,
-	v_node.the_geom
+	v_node.the_geom,
+	cat_node.acoeff,
+	((date_part('days',(now()-v_node.builtdate)::interval))/365)::numeric(12,2) as age
    FROM v_node
 	 LEFT JOIN v_price_x_catnode ON v_node.nodecat_id::text = v_price_x_catnode.id::text
 	 LEFT JOIN man_tank ON man_tank.node_id::text = v_node.node_id::text
 	 LEFT JOIN man_pump ON man_pump.node_id::text = v_node.node_id::text
 	 JOIN cat_node ON cat_node.id::text = v_node.nodecat_id::text
-	 LEFT JOIN v_price_compost ON v_price_compost.id::text = cat_node.cost::text;
+	 LEFT JOIN v_price_compost ON v_price_compost.id::text = cat_node.cost::text)a;
+
 
 
 
@@ -2101,15 +2112,21 @@ CREATE OR REPLACE VIEW v_plan_result_node AS
 	om_rec_result_node.top_elev,
 	om_rec_result_node.elev,
 	om_rec_result_node.epa_type,
+	om_rec_result_node.state,
 	om_rec_result_node.sector_id,
+	om_rec_result_node.expl_id,
 	om_rec_result_node.cost_unit,
 	om_rec_result_node.descript,
 	om_rec_result_node.measurement,
 	om_rec_result_node.cost,
 	om_rec_result_node.budget,
-	om_rec_result_node.state,
-	om_rec_result_node.expl_id,
-	om_rec_result_node.the_geom
+	om_rec_result_node.the_geom,
+	om_rec_result_node.age,
+	om_rec_result_node.acoeff,
+	om_rec_result_node.aperiod,
+	om_rec_result_node.arate,
+	om_rec_result_node.amortized,
+	om_rec_result_node.pending
    FROM selector_expl,
 	plan_result_selector,
 	om_rec_result_node
@@ -2121,15 +2138,21 @@ UNION
 	v_plan_node.top_elev,
 	v_plan_node.elev,
 	v_plan_node.epa_type,
+	v_plan_node.state,
 	v_plan_node.sector_id,
+	v_plan_node.expl_id,
 	v_plan_node.cost_unit,
 	v_plan_node.descript,
 	v_plan_node.measurement,
 	v_plan_node.cost,
 	v_plan_node.budget,
-	v_plan_node.state,
-	v_plan_node.expl_id,
-	v_plan_node.the_geom
+	v_plan_node.the_geom,
+	v_plan_node.age,
+	v_plan_node.acoeff,
+	v_plan_node.aperiod,
+	v_plan_node.arate,
+	v_plan_node.amortized,
+	v_plan_node.pending
    FROM v_plan_node
   WHERE v_plan_node.state = 2;
 
@@ -2275,7 +2298,16 @@ CREATE OR REPLACE VIEW v_edit_man_pipe AS
 	 JOIN man_pipe ON man_pipe.arc_id::text = v_arc.arc_id::text;
 
 
-CREATE OR REPLACE VIEW v_plan_arc AS 
+CREATE VIEW v_plan_arc AS 
+SELECT *,
+concat ((1/acoeff)::numeric(6,1), ' years') as aperiod,
+(budget * acoeff)::numeric(12,2) AS arate,
+CASE WHEN (age::float * budget * acoeff) < budget THEN (age * budget * acoeff)::numeric(12,2) 
+ELSE budget::numeric(12,2) END AS amortized,
+CASE WHEN (age * budget * acoeff)< budget THEN (budget - age * budget * acoeff)::numeric(12,2) 
+ELSE 0::numeric(12,2) END AS pending
+
+ FROM (
 WITH v_plan_aux_arc_cost AS 
 	(WITH v_plan_aux_arc_ml AS
 		(SELECT v_arc.arc_id,
@@ -2370,8 +2402,9 @@ WITH v_plan_aux_arc_cost AS
 	v_plan_aux_arc_cost.arccat_id AS arc_type,
 	v_plan_aux_arc_cost.arccat_id,
 	arc.epa_type,
-	arc.sector_id,
 	v_plan_aux_arc_cost.state,
+	arc.sector_id,
+	v_plan_aux_arc_cost.expl_id,
 	arc.annotation,
 	v_plan_aux_arc_cost.soilcat_id,
 	v_plan_aux_arc_cost.depth1 AS y1,
@@ -2459,17 +2492,20 @@ WITH v_plan_aux_arc_cost AS
 				ELSE v_plan_aux_arc_connec.connec_total_cost
 			END
 		END::numeric(14,2) AS total_budget,
-	v_plan_aux_arc_cost.expl_id,
-	v_plan_aux_arc_cost.the_geom
+	v_plan_aux_arc_cost.the_geom,
+	((date_part('days',(now()-arc.builtdate)::interval))/365)::numeric(12,2) as age,
+	acoeff
    FROM v_plan_aux_arc_cost
 	 JOIN arc ON arc.arc_id::text = v_plan_aux_arc_cost.arc_id::text
+ 	 JOIN cat_arc c ON arc.arccat_id::text = c.id::text
 	 LEFT JOIN (
 		SELECT DISTINCT ON (connec.arc_id) connec.arc_id,
 		sum(connec.connec_length * (v_price_x_catconnec.cost_mlconnec + v_price_x_catconnec.cost_m3trench * connec.depth * 0.333) + v_price_x_catconnec.cost_ut)::numeric(12,2) AS connec_total_cost
 		FROM connec
 		JOIN v_price_x_catconnec ON v_price_x_catconnec.id::text = connec.connecat_id::text
 		GROUP BY connec.arc_id
-		 ) v_plan_aux_arc_connec ON v_plan_aux_arc_connec.arc_id::text = v_plan_aux_arc_cost.arc_id::text;
+		 ) v_plan_aux_arc_connec ON v_plan_aux_arc_connec.arc_id::text = v_plan_aux_arc_cost.arc_id::text)d;
+
 
 
 CREATE OR REPLACE VIEW v_plan_result_arc AS 
@@ -2480,6 +2516,7 @@ CREATE OR REPLACE VIEW v_plan_result_arc AS
 	om_rec_result_arc.arccat_id,
 	om_rec_result_arc.epa_type,
 	om_rec_result_arc.sector_id,
+	om_rec_result_arc.expl_id,
 	om_rec_result_arc.state,
 	om_rec_result_arc.annotation,
 	om_rec_result_arc.soilcat_id,
@@ -2527,8 +2564,13 @@ CREATE OR REPLACE VIEW v_plan_result_arc AS
 	om_rec_result_arc.budget,
 	om_rec_result_arc.other_budget,
 	om_rec_result_arc.total_budget,
-	om_rec_result_arc.expl_id,
-	om_rec_result_arc.the_geom
+	om_rec_result_arc.the_geom,
+	om_rec_result_arc.age,
+	om_rec_result_arc.acoeff,
+	om_rec_result_arc.aperiod,
+	om_rec_result_arc.arate,
+	om_rec_result_arc.amortized,
+	om_rec_result_arc.pending
    FROM plan_result_selector,
 	om_rec_result_arc
   WHERE om_rec_result_arc.result_id::text = plan_result_selector.result_id::text AND plan_result_selector.cur_user = "current_user"()::text AND om_rec_result_arc.state = 1
@@ -2540,6 +2582,7 @@ UNION
 	v_plan_arc.arccat_id,
 	v_plan_arc.epa_type,
 	v_plan_arc.sector_id,
+	v_plan_arc.expl_id,
 	v_plan_arc.state,
 	v_plan_arc.annotation,
 	v_plan_arc.soilcat_id,
@@ -2587,8 +2630,13 @@ UNION
 	v_plan_arc.budget,
 	v_plan_arc.other_budget,
 	v_plan_arc.total_budget,
-	v_plan_arc.expl_id,
-	v_plan_arc.the_geom
+	v_plan_arc.the_geom,
+	v_plan_arc.age,
+	v_plan_arc.acoeff,
+	v_plan_arc.aperiod,
+	v_plan_arc.arate,
+	v_plan_arc.amortized,
+	v_plan_arc.pending	
    FROM v_plan_arc
   WHERE v_plan_arc.state = 2;
 

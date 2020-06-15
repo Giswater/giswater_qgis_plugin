@@ -10,6 +10,24 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 ALTER TABLE ext_rtc_scada_dma_period RENAME TO ext_rtc_dma_period;
 
+--2020/06/15
+ALTER TABLE cat_arc ADD COLUMN acoeff float;
+ALTER TABLE cat_node ADD COLUMN acoeff float;
+
+ALTER TABLE om_rec_result_arc ADD COLUMN age float;
+ALTER TABLE om_rec_result_arc ADD COLUMN acoeff float;
+ALTER TABLE om_rec_result_arc ADD COLUMN aperiod text;
+ALTER TABLE om_rec_result_arc ADD COLUMN arate float;
+ALTER TABLE om_rec_result_arc ADD COLUMN amortized float;
+ALTER TABLE om_rec_result_arc ADD COLUMN pending float;
+
+ALTER TABLE om_rec_result_node ADD COLUMN age float;
+ALTER TABLE om_rec_result_node ADD COLUMN acoeff float;
+ALTER TABLE om_rec_result_node ADD COLUMN aperiod text;
+ALTER TABLE om_rec_result_node ADD COLUMN arate float;
+ALTER TABLE om_rec_result_node ADD COLUMN amortized float;
+ALTER TABLE om_rec_result_node ADD COLUMN pending float;
+
 
 --2020/03/13
 CREATE INDEX node_sector ON node USING btree (sector_id);

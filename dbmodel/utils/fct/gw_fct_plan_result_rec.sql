@@ -60,7 +60,7 @@ BEGIN
 	
 	-- starting process
 	INSERT INTO plan_rec_result_node (result_id, node_id, nodecat_id, node_type, top_elev, elev, epa_type, sector_id, state, annotation,
-	the_geom, cost_unit, descript, measurement, cost, budget, expl_id)
+	the_geom, cost_unit, descript, measurement, cost, budget, expl_id, age, acoeff, aperiod, arate, amortized, pending)
 
 	SELECT
 	v_result_id,
@@ -79,7 +79,8 @@ BEGIN
 	measurement,
 	cost*v_coeff,
 	budget*v_coeff,
-	expl_id
+	expl_id,
+	age, acoeff, aperiod, arate, amortized, pending	
 	FROM v_plan_node
 	WHERE state=1
 	ON CONFLICT (result_id, node_id) DO NOTHING;
@@ -144,7 +145,8 @@ BEGIN
 	other_budget*v_coeff,
 	total_budget*v_coeff,
 	the_geom,
-	expl_id
+	expl_id,
+	age, acoeff, aperiod, arate, amortized, pending	
 	FROM v_plan_arc
 	WHERE state=1
 	ON CONFLICT (result_id, arc_id) DO NOTHING;
@@ -175,8 +177,8 @@ BEGIN
 	    '}')::json;
 
 	--EXCEPTION WHEN OTHERS THEN
-	--GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	--RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 	
 END;
