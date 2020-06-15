@@ -10,7 +10,7 @@
 """
 # -*- coding: utf-8 -*-
 
-from qgis.core import QgsFeatureRequest, QgsVectorLayer, QgsProject, QgsReadWriteContext, QgsPrintLayout
+from qgis.core import QgsFeatureRequest, QgsVectorLayer, QgsProject, QgsReadWriteContext, QgsPrintLayout, QgsExpression
 from qgis.gui import QgsMapToolEmitPoint
 from qgis.PyQt.QtCore import Qt, QDate
 from qgis.PyQt.QtWidgets import QListWidget, QListWidgetItem, QLineEdit, QFileDialog, QAction
@@ -169,11 +169,16 @@ class DrawProfiles(ParentMapTool):
         mng.window.showMaximized()
 
 
-
     def save_profile(self):
         """ Save profile """
 
         profile_id = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_profile_id)
+
+        list_arc = []
+        n = self.dlg_draw_profile.tbl_list_arc.count()
+        for i in range(n):
+            list_arc.append(int(self.dlg_draw_profile.tbl_list_arc.item(i).text()))
+
         links_distance = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance)
         legend_factor = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_legend_factor)
         scale_to_fit = utils_giswater.isChecked(self.dlg_draw_profile, "chk_scalte_to_fit")
@@ -190,9 +195,9 @@ class DrawProfiles(ParentMapTool):
         title = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_title)
         date = utils_giswater.getCalendarDate(self.dlg_draw_profile, self.dlg_draw_profile.date, date_format='dd/MM/yyyy')
 
-        extras = f'"profile_id":"{profile_id}", "initNode":"{self.initNode}", "endNode":"{self.endNode}", "composer":"mincutA4", "legendFactor":{legend_factor}, "linksDistance":{links_distance}, "scale":{{"scaleToFit":"{scale_to_fit}", "eh":{eh}, "ev":{ev}}}, "title":"{title}", "date":"{date}", "papersize":{{"id":{int(papersize_id)}, "customDim":{custom_dim}}}'
+        extras = f'"profile_id":"{profile_id}", "listArcs":"{list_arc}","initNode":"{self.initNode}", "endNode":"{self.endNode}", "composer":"mincutA4", "legendFactor":{legend_factor}, "linksDistance":{links_distance}, "scale":{{"scaleToFit":"{scale_to_fit}", "eh":{eh}, "ev":{ev}}}, "title":"{title}", "date":"{date}", "papersize":{{"id":{int(papersize_id)}, "customDim":{custom_dim}}}'
         body = self.create_body(extras=extras)
-        result = self.controller.get_json('gw_fct_saveprofile', body, log_sql=True)
+        result = self.controller.get_json('gw_fct_setprofile', body, log_sql=True)
         message = f"{result['message']}"
         self.controller.show_info(message)
 
@@ -220,12 +225,19 @@ class DrawProfiles(ParentMapTool):
 
     def load_profile(self):
         """ Open selected profile from dialog load_profiles.ui """
+
+        selected_list = self.dlg_load.tbl_profiles.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+
         # Selected item from list
         profile_id = self.dlg_load.tbl_profiles.currentItem().text()
 
         extras = f'"profile_id":"{profile_id}", "action":"load"'
         body = self.create_body(extras=extras)
-        result = self.controller.get_json('gw_fct_loadprofile', body, log_sql=True)
+        result = self.controller.get_json('gw_fct_getprofile', body, log_sql=True)
         if not result: return
         message = f"{result['message']}"
         self.controller.show_info(message)
@@ -238,7 +250,11 @@ class DrawProfiles(ParentMapTool):
         self.endNode = result['body']['data']['endNode']
 
         self.dlg_draw_profile.txt_profile_id.setText(str(profile_id))
-        # self.dlg_draw_profile.tbl_list_arc.setText(str(result['body']['data']['listArcs']))
+        list_arcs = json.loads(result['body']['data']['listArcs'])
+        self.dlg_draw_profile.tbl_list_arc.clear()
+        for arc in list_arcs:
+            item_arc = QListWidgetItem(str(arc))
+            self.dlg_draw_profile.tbl_list_arc.addItem(item_arc)
         self.dlg_draw_profile.txt_min_distance.setText(str(result['body']['data']['linksDistance']))
         self.dlg_draw_profile.txt_legend_factor.setText(str(result['body']['data']['legendFactor']))
 
@@ -252,6 +268,23 @@ class DrawProfiles(ParentMapTool):
         self.dlg_draw_profile.chk_scalte_to_fit.setChecked(result['body']['data']['scale']['scaleToFit'])
         self.dlg_draw_profile.txt_horizontal.setText(str(result['body']['data']['scale']['eh']))
         self.dlg_draw_profile.txt_vertical.setText(str(result['body']['data']['scale']['ev']))
+
+        self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
+        self.remove_selection()
+        list_arcs = json.loads(result['body']['data']['listArcs'])
+        expr_filter = "\"arc_id\" IN ("
+        for arc in list_arcs:
+            expr_filter += f"'{arc}', "
+        expr_filter = expr_filter[:-2] + ")"
+        expr = QgsExpression(expr_filter)
+        # Get a featureIterator from this expression:
+        it = self.layer_arc.getFeatures(QgsFeatureRequest(expr))
+
+        self.id_list = [i.id() for i in it]
+        self.layer_arc.selectByIds(self.id_list)
+
+        # Center shortest path in canvas - ZOOM SELECTION
+        self.canvas.zoomToSelected(self.layer_arc)
 
 
     def activate_snapping_node(self):
@@ -309,6 +342,34 @@ class DrawProfiles(ParentMapTool):
                     self.disconnect_snapping()
                     self.dlg_draw_profile.btn_draw_profile.setEnabled(True)
                     self.dlg_draw_profile.btn_save_profile.setEnabled(True)
+
+                    # Populate list arcs
+                    extras = f'"initNode":"{self.initNode}", "endNode":"{self.endNode}"'
+                    body = self.create_body(extras=extras)
+                    result = self.controller.get_json('gw_fct_getprofilevalues', body, log_sql=True)
+
+                    self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
+                    self.remove_selection()
+                    list_arcs = []
+                    for arc in result['body']['data']['arc']:
+                        item_arc = QListWidgetItem(str(arc['arc_id']))
+                        self.dlg_draw_profile.tbl_list_arc.addItem(item_arc)
+                        list_arcs.append(arc['arc_id'])
+
+
+                    expr_filter = "\"arc_id\" IN ("
+                    for arc in result['body']['data']['arc']:
+                        expr_filter += f"'{arc['arc_id']}', "
+                    expr_filter = expr_filter[:-2] + ")"
+                    expr = QgsExpression(expr_filter)
+                    # Get a featureIterator from this expression:
+                    it = self.layer_arc.getFeatures(QgsFeatureRequest(expr))
+
+                    self.id_list = [i.id() for i in it]
+                    self.layer_arc.selectByIds(self.id_list)
+
+                    # Center shortest path in canvas - ZOOM SELECTION
+                    self.canvas.zoomToSelected(self.layer_arc)
 
 
     def disconnect_snapping(self, action_pan=True):
