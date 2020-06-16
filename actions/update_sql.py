@@ -53,6 +53,7 @@ class UpdateSQL(ApiParent):
         self.dlg_readsql_create_project = None
         self.project_type_selected = None
         self.schema_type = None
+        self.project_issample = True
 
 
     def init_sql(self, set_database_connection=False, username=None, show_dialog=True):
@@ -433,7 +434,7 @@ class UpdateSQL(ApiParent):
         utils_giswater.setWidgetText(self.dlg_create_gis_project, 'txt_gis_folder', users_home)
 
         # Manage widgets
-        if str(self.project_issample) == 'True':
+        if self.project_issample:
             self.dlg_create_gis_project.lbl_is_sample.setVisible(True)
             self.dlg_create_gis_project.chk_is_sample.setVisible(True)
         else:
@@ -2076,7 +2077,6 @@ class UpdateSQL(ApiParent):
             self.project_issample = None
 
         if self.project_type is not None:
-
             msg = ('Database version: ' + str(self.postgresql_version) + '\n' + ''
                    'PostGis version:' + str(self.postgis_version) + ' \n \n' + ''
                    'Schema name: ' + schema_name + '\n' + ''

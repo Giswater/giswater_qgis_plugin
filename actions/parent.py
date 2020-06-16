@@ -1206,6 +1206,7 @@ class ParentAction(object):
             status = mapzone['status']
             if status == 'Disable':
                 pass
+
             if lyr:
                 # Loop for each id returned on json
                 for id in mapzone['values']:
@@ -1214,6 +1215,9 @@ class ParentAction(object):
                     symbol.setOpacity(float(mapzone['opacity']))
 
                     # Setting simp
+                    R = random.randint(0, 255)
+                    G = random.randint(0, 255)
+                    B = random.randint(0, 255)
                     if status == 'Stylesheet':
                         try:
                             R = id['stylesheet']['color'][0]

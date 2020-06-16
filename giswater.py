@@ -525,7 +525,8 @@ class Giswater(QObject):
     def set_toolbar_position(self, tb_name, x, y):
 
         toolbar = self.iface.mainWindow().findChild(QToolBar, tb_name)
-        toolbar.move(int(x), int(y))
+        if toolbar:
+            toolbar.move(int(x), int(y))
 
 
     def init_ui_config_file(self, path, toolbar_names):
