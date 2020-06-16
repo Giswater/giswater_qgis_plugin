@@ -249,16 +249,9 @@ class ApiDimensioning(ApiParent):
                 fieldname = "ymax"
             elif self.project_type == 'ud' and feat_type == 'connec':
                 fieldname = "connec_depth"
-
-            sql = (f"SELECT {fieldname} "
-                   f"FROM {feat_type} "
-                   f"WHERE {feat_type}_id = '{element_id}'")
-            row = self.controller.get_row(sql)
-
-            if not row:
-                return
-
-            utils_giswater.setText(self.dlg_dim, "depth", row[0])
+            depth = snapped_feat.attribute(fieldname)
+            if depth:
+                utils_giswater.setText(self.dlg_dim, "depth", depth)
             utils_giswater.setText(self.dlg_dim, "feature_id", element_id)
             utils_giswater.setText(self.dlg_dim, "feature_type", feat_type.upper())
 
