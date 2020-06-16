@@ -637,6 +637,7 @@ UPDATE sys_function SET function_name = 'gw_fct_import_dxfblock' WHERE id=2504;
 UPDATE sys_function SET function_name = 'gw_fct_admin_rename_fixviews' WHERE id=2636;
 UPDATE sys_function SET function_name = 'gw_fct_admin_manage_addfields' WHERE id=2690;
 UPDATE sys_function SET function_name = 'gw_trg_arc_noderotation_update' WHERE id=1346;
+UPDATE sys_function SET function_name = 'gw_fct_node_interpolate' WHERE id=2720;
 UPDATE sys_function SET project_type='ws' WHERE id=2854;
 UPDATE sys_function SET project_type='ws' WHERE id=2646;
 UPDATE sys_function SET project_type='ws' WHERE id=2848;
@@ -671,7 +672,7 @@ INSERT INTO sys_function VALUES ('2962', 'gw_trg_ui_mincut_result_cat', 'ws', 't
 INSERT INTO sys_function VALUES ('1348', 'gw_trg_node_rotation_update', 'utils', 'trigger function', NULL, NULL, NULL, 'role_edit');
 INSERT INTO sys_function VALUES ('2964', 'gw_fct_getprofile', 'utils', 'trigger function', NULL, NULL, NULL, 'role_om');
 INSERT INTO sys_function VALUES ('2966', 'gw_fct_setprofile', 'utils', 'trigger function', NULL, NULL, NULL, 'role_om');
-
+INSERT INTO sys_function VALUES ('2968', 'gw_trg_plan_psector_x_gully', 'ud', 'trigger function', NULL, NULL, NULL, 'role_master');
 
 
 
