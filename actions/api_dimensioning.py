@@ -89,6 +89,8 @@ class ApiDimensioning(ApiParent):
 
         layout_list = []
         for field in db_return[0]['body']['data']['fields']:
+            if 'hidden' in field and field['hidden']: continue
+
             label, widget = self.set_widgets(self.dlg_dim, db_return, field)
 
             if widget.objectName() == 'id':
