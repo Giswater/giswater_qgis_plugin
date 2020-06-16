@@ -90,8 +90,8 @@ class QgisTools:
         """ Get database connection paramaters of @layer """
 
         # Initialize variables
-        layer_source = {'db': None, 'schema': None, 'table': None,
-                        'host': None, 'port': None, 'user': None, 'password': None}
+        layer_source = {'db': None, 'schema': None, 'table': None, 'service': None,
+                        'host': None, 'port': None, 'user': None, 'password': None, 'sslmode': None}
 
         if layer is None:
             return layer_source

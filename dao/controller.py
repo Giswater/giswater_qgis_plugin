@@ -259,7 +259,7 @@ class DaoController(object):
         # Get sslmode from user config file
         self.manage_user_config_file()
         sslmode = self.get_user_setting_value('sslmode', 'disable')
-        self.log_info(f"sslmode user config file: {sslmode}")
+        # self.log_info(f"sslmode user config file: {sslmode}")
 
         credentials = None
         not_version = True
@@ -315,7 +315,7 @@ class DaoController(object):
         """ Connect to database with selected database @credentials """
 
         # Check if credential parameter 'service' is set
-        if credentials['service']:
+        if 'service' in credentials and credentials['service']:
             logged = self.connect_to_database_service(credentials['service'], credentials['sslmode'])
             return logged, credentials
 

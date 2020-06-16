@@ -552,11 +552,11 @@ class Giswater(QObject):
         self.om.set_controller(self.controller)
         self.custom.set_controller(self.controller)
 
-        self.edit.set_project_type(self.wsoftware)
-        self.go2epa.set_project_type(self.wsoftware)
-        self.master.set_project_type(self.wsoftware)
-        self.om.set_project_type(self.wsoftware)
-        self.custom.set_project_type(self.wsoftware)
+        self.edit.set_project_type(self.project_type)
+        self.go2epa.set_project_type(self.project_type)
+        self.master.set_project_type(self.project_type)
+        self.om.set_project_type(self.project_type)
+        self.custom.set_project_type(self.project_type)
 
         # Enable toolbar 'basic' and 'utils'
         self.enable_toolbar("basic")
@@ -946,8 +946,8 @@ class Giswater(QObject):
         status = self.check_layers_from_distinct_schema()
         if status is False: return
 
-        self.parent = ParentAction(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.add_layer = AddLayer(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.parent = ParentAction(self.iface, global_vars.settings, self.controller, self.plugin_dir)
+        self.add_layer = AddLayer(self.iface, global_vars.settings, self.controller, self.plugin_dir)
 
         # Get water software from table 'version'
         self.project_type = self.controller.get_project_type()
@@ -969,7 +969,7 @@ class Giswater(QObject):
             return
 
         # Set custom plugin toolbars (one action class per toolbar)
-        if self.wsoftware == 'ws':
+        if self.project_type == 'ws':
             self.mincut = MincutParent(self.iface, global_vars.settings, self.controller, self.plugin_dir)
 
         # Manage layers and check project
@@ -1041,18 +1041,18 @@ class Giswater(QObject):
             pass
 
         elif restriction == 'role_om':
-            if self.wsoftware in ('ws', 'ud'):
-                self.enable_toolbar(f"om_{self.wsoftware}")
+            if self.project_type in ('ws', 'ud'):
+                self.enable_toolbar(f"om_{self.project_type}")
 
         elif restriction == 'role_edit':
-            if self.wsoftware in ('ws', 'ud'):
-                self.enable_toolbar(f"om_{self.wsoftware}")
+            if self.project_type in ('ws', 'ud'):
+                self.enable_toolbar(f"om_{self.project_type}")
             self.enable_toolbar("edit")
             self.enable_toolbar("cad")
 
         elif restriction == 'role_epa':
-            if self.wsoftware in ('ws', 'ud'):
-                self.enable_toolbar(f"om_{self.wsoftware}")
+            if self.project_type in ('ws', 'ud'):
+                self.enable_toolbar(f"om_{self.project_type}")
             self.enable_toolbar("edit")
             self.enable_toolbar("cad")
             self.enable_toolbar("epa")
@@ -1063,8 +1063,8 @@ class Giswater(QObject):
             self.hide_action(False, 50)
 
         elif restriction == 'role_master':
-            if self.wsoftware in ('ws', 'ud'):
-                self.enable_toolbar(f"om_{self.wsoftware}")
+            if self.project_type in ('ws', 'ud'):
+                self.enable_toolbar(f"om_{self.project_type}")
             self.enable_toolbar("edit")
             self.enable_toolbar("cad")
             self.enable_toolbar("epa")
