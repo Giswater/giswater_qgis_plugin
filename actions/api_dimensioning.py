@@ -413,6 +413,7 @@ class ApiDimensioning(ApiParent):
             widget = self.populate_table(widget, field)
             widget = self.set_columns_config(widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)
             utils_giswater.set_qtv_config(widget)
+        widget.setObjectName(widget.property('column_id'))
 
         return label, widget
 
