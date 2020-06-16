@@ -19,6 +19,11 @@ SELECT gw_fct_getselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
 
 SELECT gw_fct_getselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
 "data":{"filterFields":{}, "pageInfo":{}, "selector_type":{"exploitation": {"ids":[]}}}}$$);
+
+variable example:
+{"table":"exploitation", "selector":"selector_expl", "table_id":"expl_id",  "selector_id":"expl_id",  "label":"expl_id, ' - ', name, '', CASE WHEN descript IS NULL THEN '' ELSE concat(' - ', descript) END", 
+ "manageAll":true, "selectionMode":"keepPreviousUsingShift", "zoomToSelected":true, "query_filter":"AND expl_id > 0", "typeaheadFilter":{"queryText":"SELECT expl_id as id, name AS idval FROM v_edit_exploitation WHERE expl_id > 0"}}
+
 */
 
 DECLARE
@@ -51,6 +56,8 @@ v_typeaheadFilter text;
 v_expl_x_user boolean;
 v_filter text;
 v_filterstatus boolean;
+v_selectionMode text;
+v_zoomToSelected boolean;
 
 BEGIN
 
@@ -67,13 +74,10 @@ BEGIN
 	-- get system variables:
 	v_expl_x_user = (SELECT value FROM config_param_system WHERE parameter = 'admin_exploitation_x_user');
 	
-
-
 	-- Start the construction of the tabs array
 	v_formTabs := '[';
 	
 	SELECT array_agg(row_to_json(a)) FROM (SELECT * FROM json_object_keys(v_selector_type))a into fields_array;
-
 
 	FOREACH v_aux_json IN ARRAY fields_array
 	LOOP		
@@ -83,7 +87,7 @@ BEGIN
 
 		-- get selector parameters
 		v_parameter_selector = (SELECT value::json FROM config_param_system WHERE parameter = concat('basic_selector_', lower(v_aux_json->>'json_object_keys')::text));
-		
+
 		v_label = v_parameter_selector->>'label';
 		v_table = v_parameter_selector->>'table';
 		v_selector = v_parameter_selector->>'selector';
@@ -92,6 +96,12 @@ BEGIN
 		v_query_filteradd = v_parameter_selector->>'query_filter';
 		v_manageall = v_parameter_selector->>'manageAll';
 		v_typeaheadFilter = v_parameter_selector->>'typeaheadFilter';
+		v_selectionMode = v_parameter_selector->>'selectionMode';
+		v_zoomToSelected = v_parameter_selector->>'zoomToSelected';
+
+		IF v_selectionMode = '' OR v_selectionMode is null then
+			v_selectionMode = 'keepPrevious';
+		END IF;
 
 		IF v_selector = 'selector_expl' AND v_expl_x_user THEN
 			v_query_filteradd = concat (v_query_filteradd, ' AND expl_id IN (SELECT expl_id FROM config_user_x_expl WHERE username = current_user)');
@@ -178,6 +188,8 @@ BEGIN
 	-- Check null
 	v_formTabs := COALESCE(v_formTabs, '[]');
 	v_manageall := COALESCE(v_manageall, FALSE);	
+	v_zoomToSelected = COALESCE(v_zoomToSelected, FALSE);
+	v_selectionMode = COALESCE(v_selectionMode, '');
 
 	-- Return
 	IF v_firsttab IS FALSE THEN
@@ -191,7 +203,7 @@ BEGIN
 		-- Return formtabs
 		RETURN ('{"status":"Accepted", "version":'||v_version||
 			',"body":{"message":{"level":1, "text":"This is a test message"}'||
-			',"form":{"formName":"", "formLabel":"", "formText":"", "formFilter":'||v_filterstatus||', "formCheckAll":'||v_manageall||''
+			',"form":{"formName":"", "formLabel":"", "formText":"", "formFilter":'||v_filterstatus||', "formCheckAll":'||v_manageall||', "selectionMode":"'||v_selectionMode||'", "zoomToSelected":'||v_zoomToSelected||''
 			',"formTabs":'||v_formTabs||
 			',"formActions":[]}'||
 			',"feature":{}'||
@@ -200,8 +212,8 @@ BEGIN
 	END IF;
 
 	-- Exception handling
-	--EXCEPTION WHEN OTHERS THEN 
-	--RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	EXCEPTION WHEN OTHERS THEN 
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$
