@@ -35,11 +35,10 @@ class ApiDimensioning(ApiParent):
         self.plugin_dir = plugin_dir
 
         self.canvas = self.iface.mapCanvas()
-        self.emit_point = QgsMapToolEmitPoint(self.canvas)
-        self.canvas.setMapTool(self.emit_point)
 
         # Snapper
         self.snapper_manager = SnappingConfigManager(self.iface)
+        self.snapper_manager.set_controller(self.controller)
         self.snapper = self.snapper_manager.get_snapper()
 
 
@@ -56,7 +55,7 @@ class ApiDimensioning(ApiParent):
         actionOrientation.triggered.connect(partial(self.orientation, actionOrientation))
         self.set_icon(actionOrientation, "133")
 
-        self.dlg_dim.btn_accept.clicked.connect(partial(self.save_dimensioning, new_feature, layer))
+        self.dlg_dim.btn_accept.clicked.connect(partial(self.save_dimensioning, new_feature_id, new_feature, layer))
         self.dlg_dim.btn_cancel.clicked.connect(partial(self.cancel_dimensioning))
         self.dlg_dim.dlg_closed.connect(partial(self.cancel_dimensioning))
         self.dlg_dim.dlg_closed.connect(partial(self.save_settings, self.dlg_dim))
@@ -179,7 +178,17 @@ class ApiDimensioning(ApiParent):
 
     def snapping(self, action):
         # Set active layer and set signals
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
         if self.deactivate_signals(action): return
+
+        self.snapper_manager.set_snapping_layers()
+        self.snapper_manager.remove_marker()
+        self.snapper_manager.store_snapping_options()
+        self.snapper_manager.enable_snapping()
+        self.snapper_manager.snap_to_node()
+        self.snapper_manager.snap_to_connec_gully()
+        self.snapper_manager.set_snapping_mode()
 
         self.dlg_dim.actionOrientation.setChecked(False)
         self.iface.setActiveLayer(self.layer_node)
@@ -254,10 +263,24 @@ class ApiDimensioning(ApiParent):
                 utils_giswater.setText(self.dlg_dim, "depth", depth)
             utils_giswater.setText(self.dlg_dim, "feature_id", element_id)
             utils_giswater.setText(self.dlg_dim, "feature_type", feat_type.upper())
+            self.snapper_manager.recover_snapping_options()
+            self.deactivate_signals(action)
+            action.setChecked(False)
 
 
     def orientation(self, action):
+
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
         if self.deactivate_signals(action): return
+
+        self.snapper_manager.set_snapping_layers()
+        self.snapper_manager.remove_marker()
+        self.snapper_manager.store_snapping_options()
+        self.snapper_manager.enable_snapping()
+        self.snapper_manager.snap_to_node()
+        self.snapper_manager.snap_to_connec_gully()
+        self.snapper_manager.set_snapping_mode()
 
         self.dlg_dim.actionSnapping.setChecked(False)
         self.emit_point.canvasClicked.connect(partial(self.click_button_orientation, action))
@@ -280,6 +303,9 @@ class ApiDimensioning(ApiParent):
         self.y_symbol = self.dlg_dim.findChild(QLineEdit, "y_symbol")
         self.y_symbol.setText(str(int(point.y())))
 
+        self.snapper_manager.recover_snapping_options()
+        self.deactivate_signals(action)
+        action.setChecked(False)
 
     def create_map_tips(self):
         """ Create MapTips on the map """
