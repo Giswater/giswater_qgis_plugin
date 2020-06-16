@@ -11,7 +11,7 @@ from functools import partial
 
 from .. import utils_giswater
 from .parent import ParentAction
-from ..ui_manager import QmGenerator
+from ..ui_manager import MainQtDialogUi
 
 
 class I18NGenerator(ParentAction):
@@ -22,7 +22,7 @@ class I18NGenerator(ParentAction):
 
 
     def init_dialog(self):
-        self.dlg_qm = QmGenerator()
+        self.dlg_qm = MainQtDialogUi()
         self.load_settings(self.dlg_qm)
         self.load_user_values()
 
@@ -33,7 +33,7 @@ class I18NGenerator(ParentAction):
         self.dlg_qm.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_qm))
         self.dlg_qm.rejected.connect(self.save_user_values)
         self.dlg_qm.rejected.connect(self.close_db)
-        self.open_dialog(self.dlg_qm)
+        self.open_dialog(self.dlg_qm, dlg_name='main_qtdialog')
 
 
     def check_connection(self):
@@ -105,6 +105,9 @@ class I18NGenerator(ParentAction):
 
     def create_files_py_message(self):
         """ Read the values of the database and generate the ts and qm files """
+        # In the database, the dialog_name column must match the name of the ui file (no extension).
+        # Also, open_dialog function must be called, passed as parameter dlg_name = 'ui_file_name_without_extension'
+
         py_language = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 1)
         xml_language = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 2)
         py_file = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 3)
@@ -157,9 +160,9 @@ class I18NGenerator(ParentAction):
             line += f"\t\t\t<translation>{py_tlb[py_language]}</translation>\n"
             line += f"\t\t</message>\n"
             ts_file.write(line)
-        line = '\t</context>\n\n'
-        line += '\t<!-- PYTHON MESSAGES -->\n'
-        line += '\t<context>\n'
+        ts_file.write(line)
+
+        line = '\t<!-- PYTHON MESSAGES -->\n'
         ts_file.write(line)
 
         # Create children for message
@@ -187,7 +190,7 @@ class I18NGenerator(ParentAction):
                 name = py_dlg['dialog_name']
                 line = '\t<context>\n'
                 line += f'\t\t<name>{name}</name>\n'
-                title =  self.get_title(py_dialogs, name, key_lbl)
+                title = self.get_title(py_dialogs, name, key_lbl)
                 if title:
                     line += f'\t\t<message>\n'
                     line += f'\t\t\t<source>title</source>\n'
@@ -250,7 +253,7 @@ class I18NGenerator(ParentAction):
         # Get db messages values
         sql = (f"SELECT source, project_type, context, formname, formtype, lb_enen, lb_{db_lang}, tt_enen, tt_{db_lang} "
                f" FROM i18n.dbdialog "
-               f" WHERE context in ('config_param_system', 'audit_cat_param_user')"
+               f" WHERE context in ('config_param_system', 'sys_param_user')"
                f" ORDER BY formname;")
         rows = self.get_rows(sql)
         if not rows: return False
@@ -284,7 +287,7 @@ class I18NGenerator(ParentAction):
         # Get db messages values
         sql = (f"SELECT source, project_type, context, formname, formtype, lb_enen, lb_{db_lang}, tt_enen, tt_{db_lang} "
                f" FROM i18n.dbdialog "
-               f" WHERE context not in ('config_param_system', 'audit_cat_param_user')"
+               f" WHERE context not in ('config_param_system', 'sys_param_user')"
                f" ORDER BY formname;")
         rows = self.get_rows(sql)
         if not rows: return
@@ -338,30 +341,32 @@ class I18NGenerator(ParentAction):
                 tt_value = row['lb_enen']
 
             line = f'SELECT gw_fct_admin_schema_i18n($$'
-            if row['context'] in ('config_param_system', 'audit_cat_param_user'):
+            if row['context'] in ('config_param_system', 'sys_param_user'):
                 line +=(f'{{"data":'
                             f'{{"table":"{table}", '                                
+                                f'"formname":"{form_name}", '
                                 f'"label":{{"column":"label", "value":"{lbl_value}"}}, '
                                 f'"tooltip":{{"column":"descript", "value":"{tt_value}"}}')
-            elif row['context'] not in ('config_param_system', 'audit_cat_param_user'):
+            elif row['context'] not in ('config_param_system', 'sys_param_user'):
                 line += (f'{{"data":'
                          f'{{"table":"{table}", '                         
+                         f'"formname":"{form_name}", '
                          f'"label":{{"column":"label", "value":"{lbl_value}"}}, '
                          f'"tooltip":{{"column":"tooltip", "value":"{tt_value}"}}')
 
             # Clause WHERE for each context
             if row['context'] == 'config_api_form_fields':
-                line += (f', "clause":"WHERE column_id = \'{source}\' '
+                line += (f', "clause":"WHERE columnname = \'{source}\' '
                          f'AND formname = \'{form_name}\' AND formtype = \'{form_type}\'"')
             elif row['context'] == 'config_api_form_tabs':
                 line += (f', "clause":"WHERE formname = \'{form_name}\' '
-                         f'AND column_id = \'{source}\' AND formtype = \'{form_type}\'"')
+                         f'AND columnname = \'{source}\' AND formtype = \'{form_type}\'"')
             elif row['context'] == 'config_api_form_groupbox':
                 line += (f', "clause":"WHERE formname = \'{form_name}\' '
                          f'AND layout_id  = \'{source}\'"')
             elif row['context'] == 'config_api_form_actions':
                 line += f', "clause":"WHERE actioname  = \'{source}\''
-            elif row['context'] in ('config_param_system', 'audit_cat_param_user'):
+            elif row['context'] in ('config_param_system', 'sys_param_user'):
                 line += f', "clause":"WHERE parameter = \'{source}\'"'
 
             line += f'}}}}$$);\n'
@@ -419,7 +424,6 @@ class I18NGenerator(ParentAction):
             self.cursor = self.conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
             status = True
         except psycopg2.DatabaseError as e:
-            print(f'Connection error: {e}')
             self.last_error = e
             status = False
         return status

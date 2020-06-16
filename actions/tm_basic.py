@@ -4,13 +4,15 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
 """
-
 # -*- coding: utf-8 -*-
-from functools import partial
-
 from qgis.PyQt.QtCore import QDate
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView
 from qgis.PyQt.QtSql import QSqlTableModel
+from qgis.core import QgsFeatureRequest
+
+from functools import partial
+import webbrowser
+
 from .parent import ParentAction
 from .tm_parent import TmParentAction
 from .tm_manage_visit import TmManageVisit
@@ -21,6 +23,9 @@ from ..ui.tm.new_prices import NewPrices
 from ..ui.tm.price_management import PriceManagement
 from ..ui.tm.tree_manage import TreeManage
 from ..ui.tm.tree_selector import TreeSelector
+from ..ui.tm.incident_manager import IncidentManager
+from ..ui_manager import IncidentPlanning
+from ..ui_manager import InfoIncident
 from .. import utils_giswater
 
 
@@ -410,7 +415,6 @@ class TmBasic(TmParentAction):
                 f" OR (campaign_id IS null AND mu_id NOT IN ({ids}))")
         (is_valid, exp) = self.check_expression(expr)
         if not is_valid:
-            print("IS NOT VALID")
             return
         model.setFilter(expr)
         
@@ -559,7 +563,6 @@ class TmBasic(TmParentAction):
         self.select_all_rows(dialog.selected_rows, id_table_right)
         if utils_giswater.isChecked(dialog, dialog.chk_current):
             current_poda_type = utils_giswater.get_item_data(dialog, dialog.cmb_poda_type, 0)
-            # current_poda_name = utils_giswater.get_item_data(dialog, dialog.cmb_poda_type, 1)
             if current_poda_type is None:
                 message = "No heu seleccionat cap poda"
                 self.controller.show_warning(message)
@@ -572,6 +575,7 @@ class TmBasic(TmParentAction):
                        f" SET work_id = '{current_poda_type}'"
                        f" WHERE id = '{dialog.all_rows.model().record(row).value('mu_id')}'")
                 self.controller.execute_sql(sql)
+
         builder = utils_giswater.get_item_data(dialog, dialog.cmb_builder, 0)
         for i in range(0, len(left_selected_list)):
             row = left_selected_list[i].row()
@@ -931,4 +935,341 @@ class TmBasic(TmParentAction):
 
         plan_unit = TmPlanningUnit(self.iface, self.settings, self.controller, self.plugin_dir)
         plan_unit.open_form()
+
+
+    def open_incident_manager(self):
+        """ Button 309: Incident Manager """
+
+        self.dlg_incident_manager = IncidentManager()
+        self.load_settings(self.dlg_incident_manager)
+
+        sql = "SELECT id, idval FROM om_visit_typevalue WHERE typevalue = 'incident_status'"
+        rows = self.controller.get_rows(sql, log_sql=True)
+        utils_giswater.set_item_data(self.dlg_incident_manager.cmb_status, rows, 1, add_empty=True)
+
+        self.set_dates_from_to(self.dlg_incident_manager.date_from, self.dlg_incident_manager.date_to,
+                               'v_ui_om_visit_incident', 'incident_date', 'incident_date')
+
+        # Poulate TableView
+        utils_giswater.set_qtv_config(self.dlg_incident_manager.tbl_incident, edit_triggers=QTableView.NoEditTriggers)
+        table_name = "v_ui_om_visit_incident"
+        self.update_table(self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name)
+
+        # Signals
+        self.dlg_incident_manager.txt_visit_id.textChanged.connect(partial(self.update_table, self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name))
+        self.dlg_incident_manager.cmb_status.currentIndexChanged.connect(partial(self.update_table, self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name))
+        self.dlg_incident_manager.btn_process.clicked.connect(partial(self.open_incident_planning, 'PROCESS'))
+        self.dlg_incident_manager.btn_discard.clicked.connect(partial(self.open_incident_planning, 'DISCARD'))
+        self.dlg_incident_manager.btn_zoom.clicked.connect(partial(self.zoom_to_element))
+        self.dlg_incident_manager.btn_image.clicked.connect(partial(self.open_image, self.dlg_incident_manager.tbl_incident))
+        self.dlg_incident_manager.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_incident_manager))
+        self.dlg_incident_manager.date_from.dateChanged.connect(partial(self.update_table, self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name))
+        self.dlg_incident_manager.date_to.dateChanged.connect(partial(self.update_table, self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name))
+        self.dlg_incident_manager.tbl_incident.selectionModel().selectionChanged.connect(
+            partial(self.enable_widget_x_qtable, self.dlg_incident_manager.tbl_incident,
+                    self.dlg_incident_manager.btn_image, 'incident_foto'))
+
+        # Open form
+        self.dlg_incident_manager.setWindowTitle("Incident Manager")
+        self.dlg_incident_manager.exec_()
+
+
+    def update_table(self, dialog, qtable, table_name):
+
+        visit_id = utils_giswater.getWidgetText(dialog, dialog.txt_visit_id)
+        status_id = utils_giswater.get_item_data(dialog, dialog.cmb_status, 1)
+        visit_start = dialog.date_from.date()
+        visit_end = dialog.date_to.date()
+
+        date_from = visit_start.toString('ddMMyyyy')
+        date_to = visit_end.toString('ddMMyyyy')
+
+        if date_from > date_to:
+            message = "Selected date interval is not valid"
+            self.controller.show_warning(message)
+            return
+
+        expr_filter = f"1=1 "
+
+        format_low = 'dd-MM-yyyy' + ' 00:00:00.000'
+        format_high = 'dd-MM-yyyy' + ' 23:59:59.999'
+        interval = "'" + str(visit_start.toString(format_low)) + "'::timestamp AND '" + str(
+            visit_end.toString(format_high)) + "'::timestamp"
+
+        # expr_filter = " AND (incident_date BETWEEN " + str(interval) + ")"
+
+        # if visit_id not in (None, '', 'null'): expr_filter += f" AND visit_id::text LIKE '%{visit_id}%'"
+        if status_id: expr_filter += f" AND status ='{status_id}'"
+
+        self.fill_table_incident(qtable, table_name, expr_filter=expr_filter)
+
+        self.get_id_list()
+
+        # Set selection model
+        self.dlg_incident_manager.tbl_incident.selectionModel().selectionChanged.connect(
+            partial(self.enable_widget_x_qtable, self.dlg_incident_manager.tbl_incident,
+                    self.dlg_incident_manager.btn_image, 'incident_foto'))
+
+
+    def fill_table_incident(self, qtable, table_name,  expr_filter=None):
+
+        expr = None
+        if expr_filter:
+            # Check expression
+            (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
+            if not is_valid:
+                return expr
+
+        # Set a model with selected filter expression
+        if self.schema_name not in table_name:
+            table_name = self.schema_name + "." + table_name
+
+        # Set model
+        model = QSqlTableModel()
+        model.setTable(table_name)
+        model.setEditStrategy(QSqlTableModel.OnFieldChange)
+        model.setSort(0, 0)
+        model.select()
+
+        # Check for errors
+        if model.lastError().isValid():
+            self.controller.show_warning(model.lastError().text())
+        # Attach model to table view
+        if expr:
+            qtable.setModel(model)
+            qtable.model().setFilter(expr_filter)
+        else:
+            qtable.setModel(model)
+
+        return expr
+
+
+    def get_id_list(self):
+
+        self.ids = []
+        column_index = utils_giswater.get_col_index_by_col_name(self.dlg_incident_manager.tbl_incident, 'node_id')
+        for x in range(0, self.dlg_incident_manager.tbl_incident.model().rowCount()):
+            _id = self.dlg_incident_manager.tbl_incident.model().data(self.dlg_incident_manager.tbl_incident.model().index(x, column_index))
+            self.ids.append(_id)
+
+
+    def open_incident_planning(self, action):
+
+        self.dlg_incident_planning = IncidentPlanning()
+        self.load_settings(self.dlg_incident_planning)
+
+
+        #Hide widgets
+        if action == 'DISCARD':
+            self.dlg_incident_planning.lbl_campaign_id.setVisible(False)
+            self.dlg_incident_planning.lbl_work_id.setVisible(False)
+            self.dlg_incident_planning.lbl_builder_id.setVisible(False)
+            self.dlg_incident_planning.lbl_priority_id.setVisible(False)
+            self.dlg_incident_planning.campaign_id.setVisible(False)
+            self.dlg_incident_planning.work_id.setVisible(False)
+            self.dlg_incident_planning.builder_id.setVisible(False)
+            self.dlg_incident_planning.priority_id.setVisible(False)
+        else:
+            sql = "SELECT id, name FROM cat_campaign"
+            rows = self.controller.get_rows(sql, log_sql=True)
+            utils_giswater.set_item_data(self.dlg_incident_planning.campaign_id, rows, 1)
+            sql = "SELECT id, name FROM cat_work"
+            rows = self.controller.get_rows(sql, add_empty_row=True)
+            utils_giswater.set_item_data(self.dlg_incident_planning.work_id, rows, 1)
+            sql = "SELECT id, name FROM cat_builder"
+            rows = self.controller.get_rows(sql, add_empty_row=True)
+            utils_giswater.set_item_data(self.dlg_incident_planning.builder_id, rows, 1)
+            sql = "SELECT id, name FROM cat_priority"
+            rows = self.controller.get_rows(sql, add_empty_row=True)
+            utils_giswater.set_item_data(self.dlg_incident_planning.priority_id, rows, 1)
+
+        # Get record selected
+        selected_list = self.dlg_incident_manager.tbl_incident.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+        elif len(selected_list) > 1:
+            message = "More than one record selected"
+            self.controller.show_warning(message)
+            return
+
+        row = selected_list[0].row()
+
+        # Get object_id from selected row
+        self.visit_id = self.dlg_incident_manager.tbl_incident.model().record(row).value("visit_id")
+        self.node_id = self.dlg_incident_manager.tbl_incident.model().record(row).value("node_id")
+        self.incident_date = self.dlg_incident_manager.tbl_incident.model().record(row).value("incident_date")
+        self.incident_user = self.dlg_incident_manager.tbl_incident.model().record(row).value("incident_user")
+        self.parameter_id = self.dlg_incident_manager.tbl_incident.model().record(row).value("parameter_id")
+        self.incident_comment = self.dlg_incident_manager.tbl_incident.model().record(row).value("incident_comment")
+        if self.incident_comment in (None, 'null', 'NULL'):
+            self.incident_comment = ''
+        utils_giswater.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.visit_id, self.visit_id)
+        utils_giswater.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.node_id, self.node_id)
+        utils_giswater.setCalendarDate(self.dlg_incident_planning, self.dlg_incident_planning.incident_date, self.incident_date)
+        utils_giswater.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.incident_user, self.incident_user)
+        utils_giswater.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.parameter_id, self.parameter_id)
+        utils_giswater.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.incident_comment, self.incident_comment)
+        utils_giswater.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.process_user, self.controller.get_current_user())
+
+        utils_giswater.setCalendarDate(self.dlg_incident_planning, self.dlg_incident_planning.process_date, None)
+
+        # Set signals
+        self.dlg_incident_planning.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_incident_planning))
+        self.dlg_incident_planning.btn_accept.clicked.connect(partial(self.manage_incident_planning, action))
+
+        self.open_dialog(self.dlg_incident_planning)
+
+
+    def manage_incident_planning(self, action):
+
+        if action == 'PROCESS':
+
+            campaign_id = utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.campaign_id, 0)
+            work_id =utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.work_id, 0)
+            priority_id = utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.priority_id, 0)
+            builder_id = utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.builder_id, 0)
+
+            if self.visit_id in ('', None, 'null') or campaign_id in ('', None, 'null') or work_id in ('', None, 'null')\
+                    or priority_id in ('', None, 'null') or builder_id in ('', None, 'null'):
+                message = "Some parameters are missing."
+                self.controller.show_info(message)
+                return
+
+            extras = f'"visit_id":{self.visit_id}'
+            extras += f', "campaign_id":{campaign_id}'
+            extras += f', "work_id":{work_id}'
+            body = self.create_body(extras=extras)
+            result = self.controller.get_json('tm_fct_incident_check_plan', body, log_sql=True)
+
+            if result['message']['level'] == 1:
+                message = str(result['body']['data'] ['info'])
+
+                self.dlg_incident_info = InfoIncident()
+                self.load_settings(self.dlg_incident_info)
+
+                self.dlg_incident_info.txt_infolog.setText(message)
+
+                self.dlg_incident_info.btn_duplicate.clicked.connect(partial(self.manage_process_planning, action, True))
+                self.dlg_incident_info.btn_overwrite.clicked.connect(partial(self.manage_process_planning, 'OVERWRITE', True))
+                self.dlg_incident_info.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_incident_info))
+
+                self.open_dialog(self.dlg_incident_info)
+            else:
+                self.manage_process_planning(action)
+
+        elif action == 'DISCARD':
+            extras = f'"action":"{action}"'
+            extras += f', "visit_id":{self.visit_id}'
+            extras += f', "process_date":"{utils_giswater.getCalendarDate(self.dlg_incident_planning, self.dlg_incident_planning.process_date)}"'
+            extras += f', "incident_comment":"{utils_giswater.getWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.incident_comment)}"'
+            body = self.create_body(extras=extras)
+
+            result = self.controller.get_json('tm_fct_incident', body, log_sql=True)
+
+            if result['status'] == "Accepted":
+                self.close_dialog(self.dlg_incident_planning)
+                self.update_table(self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident,"v_ui_om_visit_incident")
+
+
+    def manage_process_planning(self, action, close_dlg_aux=False):
+
+        if close_dlg_aux:
+            self.close_dialog(self.dlg_incident_info)
+
+        extras = f'"action":"{action}"'
+        extras += f', "visit_id":{self.visit_id}'
+        extras += f', "process_date":"{utils_giswater.getCalendarDate(self.dlg_incident_planning, self.dlg_incident_planning.process_date)}"'
+        extras += f', "campaign_id":{utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.campaign_id, 0)}'
+        extras += f', "builder_id":{utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.builder_id, 0)}'
+        extras += f', "priority_id":{utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.priority_id, 0)}'
+        extras += f', "work_id":{utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.work_id, 0)}'
+        extras += f', "incident_comment":"{utils_giswater.getWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.incident_comment)}"'
+        body = self.create_body(extras=extras)
+
+        result = self.controller.get_json('tm_fct_incident', body, log_sql=True)
+
+        if result['status'] == "Accepted":
+            self.close_dialog(self.dlg_incident_planning)
+            self.update_table(self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident,
+                              "v_ui_om_visit_incident")
+
+
+    def zoom_to_element(self):
+
+        # Get record selected
+        selected_list = self.dlg_incident_manager.tbl_incident.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+        elif len(selected_list) > 1:
+            message = "More than one record selected"
+            self.controller.show_warning(message)
+            return
+
+        row = selected_list[0].row()
+
+        # Get object_id from selected row
+        node_id = self.dlg_incident_manager.tbl_incident.model().record(row).value("node_id")
+
+        # Select node of shortest path on v_edit_node for ZOOM SELECTION
+        expr_filter = f"node_id IN ({node_id})"
+        (is_valid, expr) = self.check_expression(expr_filter, True)  # @UnusedVariable
+
+        if not is_valid:
+            return
+
+        self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
+        it = self.layer_node.getFeatures(QgsFeatureRequest(expr))
+        self.id_list = [i.id() for i in it]
+        self.layer_node.selectByIds(self.id_list)
+
+        # Center shortest path in canvas - ZOOM SELECTION
+        self.canvas.zoomToSelected(self.layer_node)
+
+
+    def open_image(self, qtable):
+
+        selected_list = qtable.selectionModel().selectedRows()
+
+        if selected_list == 0 or str(selected_list) == '[]':
+            message = "Any load selected"
+            self.controller.show_info_box(message)
+            return
+
+        elif len(selected_list) > 1:
+            message = "More then one event selected. Select just one"
+            self.controller.show_warning(message)
+            return
+
+        index = selected_list[0]
+        row = index.row()
+        column_index = utils_giswater.get_col_index_by_col_name(qtable, 'visit_id')
+        visit_id = index.sibling(row, column_index).data()
+
+        sql = ("SELECT value FROM om_visit_event_photo WHERE visit_id = " + str(visit_id))
+        rows = self.controller.get_rows(sql, commit=True)
+        # TODO:: Open manage photos when visit have more than one
+        if rows:
+            for row in rows:
+                webbrowser.open(row[0])
+        else:
+            message = "This incident has no linked image"
+            self.controller.show_info(message)
+
+
+    def enable_widget_x_qtable(self, qtable, widget, column_name):
+
+        selected_list = qtable.selectionModel().selectedRows()
+        if selected_list:
+            row = selected_list[0].row()
+
+            # Get object_id from selected row
+            result = self.dlg_incident_manager.tbl_incident.model().record(row).value(column_name)
+            # Set enabled
+            utils_giswater.setWidgetEnabled(self.dlg_incident_manager, widget, result)
+
+
 

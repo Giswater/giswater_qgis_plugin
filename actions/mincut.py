@@ -6,9 +6,10 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.core import QgsApplication, QgsExpression, QgsExpressionContextUtils,  QgsFeatureRequest, QgsFillSymbol, \
-    QgsLineSymbol, QgsMarkerSymbol, QgsPrintLayout, QgsProject, QgsReadWriteContext, QgsSymbol, QgsVectorLayer
+    QgsLineSymbol, QgsMarkerSymbol, QgsPrintLayout, QgsProject, QgsReadWriteContext, QgsSymbol, QgsVectorLayer, \
+    QgsPointLocator, QgsPointXY, QgsSnappingConfig, QgsSnappingUtils, QgsTolerance
 
-from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
+from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker, QgsMapCanvas
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTime
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QCompleter, QDateEdit, QLineEdit, \
     QTableView, QTextEdit, QTimeEdit, QWidget
@@ -17,21 +18,22 @@ from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtXml import QDomDocument
 
 import json, operator, os, re
-
 from datetime import datetime
 from collections import OrderedDict
 from functools import partial
+
 from .gw_task import GwTask
 from .. import utils_giswater
-from .parent import ParentAction
+from .api_search import ApiSearch
 from .mincut_config import MincutConfig
 from .multiple_selection import MultipleSelection
+from .parent import ParentAction
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
-from ..ui_manager import BasicInfoUi
+from ..ui_manager import DialogTextUi
 from ..ui_manager import Mincut
-from ..ui_manager import Mincut_fin
-from ..ui_manager import Mincut_add_hydrometer
-from ..ui_manager import Mincut_add_connec
+from ..ui_manager import MincutEndUi
+from ..ui_manager import MincutHydrometer
+from ..ui_manager import MincutConnec
 from ..ui_manager import MincutComposer
 
 
@@ -55,25 +57,25 @@ class MincutParent(ParentAction):
         self.deleted_list = []
         self.connec_list = []
 
-        # Serialize data of table 'anl_mincut_cat_state'
+        # Serialize data of mincut states
         self.set_states()
         self.current_state = None
         self.is_new = True
 
 
     def set_states(self):
-        """ Serialize data of table 'anl_mincut_cat_state' """
+        """ Serialize data of mincut states """
         
         self.states = {}
-        sql = ("SELECT id, name "
-               "FROM anl_mincut_cat_state "
+        sql = ("SELECT id, idval "
+               "FROM om_typevalue WHERE typevalue = 'mincut_state' "
                "ORDER BY id")
         rows = self.controller.get_rows(sql)
         if not rows:
             return
         
         for row in rows:
-            self.states[row['id']] = row['name']
+            self.states[int(row['id'])] = row['idval']
 
 
     def init_map_tool(self):
@@ -97,9 +99,9 @@ class MincutParent(ParentAction):
         self.layers_connec = self.controller.get_group_layers('connec')
         self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
 
-        # Control current layer (due to QGIS bug in snapping system)
-        if self.canvas.currentLayer() is None:
-            self.iface.setActiveLayer(self.layer_arc)
+        # Set active and current layer
+        self.iface.setActiveLayer(self.layer_arc)
+        self.current_layer = self.layer_arc
 
 
     def init_mincut_form(self):
@@ -115,6 +117,16 @@ class MincutParent(ParentAction):
         self.load_settings(self.dlg_mincut)
         self.dlg_mincut.setWindowFlags(Qt.WindowStaysOnTopHint)
 
+        self.api_search = ApiSearch(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.api_search.api_search(self.dlg_mincut)
+
+        # These widgets are put from the api, mysteriously if we do something like:
+        # self.dlg_mincut.address_add_muni.text() or self.dlg_mincut.address_add_muni.setDiabled(True) etc...
+        # it doesn't count them, and that's why we have to force them
+        self.dlg_mincut.address_add_muni = utils_giswater.getWidget(self.dlg_mincut, 'address_add_muni')
+        self.dlg_mincut.address_add_street = utils_giswater.getWidget(self.dlg_mincut, 'address_add_street')
+        self.dlg_mincut.address_add_postnumber = utils_giswater.getWidget(self.dlg_mincut, 'address_add_postnumber')
+
         self.result_mincut_id = self.dlg_mincut.findChild(QLineEdit, "result_mincut_id")
         self.customer_state = self.dlg_mincut.findChild(QLineEdit, "customer_state")
         self.work_order = self.dlg_mincut.findChild(QLineEdit, "work_order")
@@ -125,39 +137,30 @@ class MincutParent(ParentAction):
         
         utils_giswater.double_validator(self.distance, 0, 9999999, 3)
         utils_giswater.double_validator(self.depth, 0, 9999999, 3)
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.txt_exec_user, self.controller.get_project_user())
 
-        # Manage address
-        self.adress_init_config(self.dlg_mincut)
-
-        # Set signals
-        self.dlg_mincut.btn_accept.clicked.connect(self.accept_save_data)        
-        self.dlg_mincut.btn_cancel.clicked.connect(self.mincut_close)
-        self.dlg_mincut.dlg_closed.connect(self.mincut_close)
-        self.dlg_mincut.btn_start.clicked.connect(self.real_start)
-        self.dlg_mincut.btn_end.clicked.connect(self.real_end)
+        # Fill address : todo
 
         # Fill ComboBox type
         sql = ("SELECT id, descript "
-               "FROM anl_mincut_cat_type "
+               "FROM om_mincut_cat_type "
                "ORDER BY id")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_mincut.type, rows, 1)
 
         # Fill ComboBox cause
-        sql = ("SELECT id, descript "
-               "FROM anl_mincut_cat_cause "
+        sql = ("SELECT id, idval "
+               "FROM om_typevalue WHERE typevalue = 'mincut_cause' "
                "ORDER BY id")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_mincut.cause, rows, 1)
 
-        # Fill ComboBox assigned_to and exec_user
+        # Fill ComboBox assigned_to
         sql = ("SELECT id, name "
                "FROM cat_users "
                "ORDER BY name")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_mincut.assigned_to, rows, 1)
-        utils_giswater.fillComboBox(self.dlg_mincut, "exec_user", rows, False)
-        self.dlg_mincut.exec_user.setVisible(False)
 
         # Toolbar actions
         action = self.dlg_mincut.findChild(QAction, "actionMincut")
@@ -187,15 +190,14 @@ class MincutParent(ParentAction):
 
         action = self.dlg_mincut.findChild(QAction, "actionShowNotified")
         action.triggered.connect(self.show_notified_list)
-        # self.set_icon(action, "308")
         self.show_notified = action
 
         try:
-            row = self.controller.get_config('sys_mincutalerts_enable', 'value', 'config_param_system')
+            row = self.controller.get_config('om_mincut_enable_alerts', 'value', 'config_param_system')
             if row:
                 custom_action_sms = json.loads(row[0], object_pairs_hook=OrderedDict)
                 self.show_notified.setVisible(custom_action_sms['show_sms_info'])
-        except KeyError as e:
+        except KeyError:
             self.show_notified.setVisible(False)
 
         # Show future id of mincut
@@ -203,11 +205,27 @@ class MincutParent(ParentAction):
             self.set_id_val()
 
         # Set state name
-        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, str(self.states[0]))
+        if self.states != {}:
+            utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, str(self.states[0]))
         self.current_state = 0        
         
         self.sql_connec = ""
         self.sql_hydro = ""
+
+        self.refresh_tab_hydro()
+
+
+    def set_signals(self):
+
+        if self.controller.dlg_docker:
+            self.dlg_mincut.dlg_closed.connect(self.controller.close_docker)
+
+        self.dlg_mincut.btn_accept.clicked.connect(self.accept_save_data)
+        self.dlg_mincut.btn_cancel.clicked.connect(self.mincut_close)
+        self.dlg_mincut.dlg_closed.connect(self.mincut_close)
+
+        self.dlg_mincut.btn_start.clicked.connect(self.real_start)
+        self.dlg_mincut.btn_end.clicked.connect(self.real_end)
 
         self.dlg_mincut.cbx_date_start_predict.dateChanged.connect(partial(
             self.check_dates_coherence, self.dlg_mincut.cbx_date_start_predict, self.dlg_mincut.cbx_date_end_predict,
@@ -223,18 +241,14 @@ class MincutParent(ParentAction):
             self.check_dates_coherence, self.dlg_mincut.cbx_date_start, self.dlg_mincut.cbx_date_end,
             self.dlg_mincut.cbx_hours_start, self.dlg_mincut.cbx_hours_end))
 
-        self.refresh_tab_hydro()
-
-        self.open_dialog(self.dlg_mincut)
-
 
     def refresh_tab_hydro(self):
 
         result_mincut_id = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
         expr_filter = f"result_id={result_mincut_id}"
         utils_giswater.set_qtv_config(self.dlg_mincut.tbl_hydro, edit_triggers=QTableView.DoubleClicked)
-        self.fill_table(self.dlg_mincut.tbl_hydro, 'v_anl_mincut_result_hydrometer', expr_filter=expr_filter)
-        self.set_table_columns(self.dlg_mincut, self.dlg_mincut.tbl_hydro, 'v_anl_mincut_result_hydrometer')
+        self.fill_table(self.dlg_mincut.tbl_hydro, 'v_om_mincut_hydrometer', expr_filter=expr_filter)
+        self.set_table_columns(self.dlg_mincut, self.dlg_mincut.tbl_hydro, 'v_om_mincut_hydrometer')
 
 
     def check_dates_coherence(self, date_from, date_to, time_from, time_to):
@@ -247,8 +261,10 @@ class MincutParent(ParentAction):
         :return:
         """
 
-        d_from = datetime(date_from.date().year(), date_from.date().month(), date_from.date().day(), time_from.time().hour(), time_from.time().minute())
-        d_to = datetime(date_to.date().year(), date_to.date().month(), date_to.date().day(), time_to.time().hour(), time_to.time().minute())
+        d_from = datetime(date_from.date().year(), date_from.date().month(), date_from.date().day(),
+            time_from.time().hour(), time_from.time().minute())
+        d_to = datetime(date_to.date().year(), date_to.date().month(), date_to.date().day(),
+            time_to.time().hour(), time_to.time().minute())
 
         if d_from > d_to:
             date_to.setDate(date_from.date())
@@ -258,7 +274,7 @@ class MincutParent(ParentAction):
     def show_notified_list(self):
 
         mincut_id = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
-        sql = (f"SELECT notified FROM anl_mincut_result_cat "
+        sql = (f"SELECT notified FROM om_mincut "
                f"WHERE id = '{mincut_id}'")
         row = self.controller.get_row(sql, log_sql=True)
         if not row or row[0] is None:
@@ -274,9 +290,9 @@ class MincutParent(ParentAction):
     def set_id_val(self):
 
         # Show future id of mincut
-        sql = ("SELECT setval('anl_mincut_result_cat_seq', (SELECT max(id::integer) "
-               "FROM anl_mincut_result_cat), true)")
-        row = self.controller.get_row(sql, log_sql=True)
+        sql = "SELECT setval('om_mincut_seq', (SELECT max(id::integer) FROM om_mincut), true)"
+        row = self.controller.get_row(sql)
+        result_mincut_id = '1'
         if not row or row[0] is None or row[0] < 1:
             result_mincut_id = '1'
         elif row[0]:
@@ -302,12 +318,25 @@ class MincutParent(ParentAction):
         
         # Get current time
         current_time = QTime.currentTime()
-        self.dlg_mincut.cbx_recieved_time.setTime(current_time)     
+        self.dlg_mincut.cbx_recieved_time.setTime(current_time)
 
         # Enable/Disable widget depending state
         self.enable_widgets('0')
 
-        self.open_dialog(self.dlg_mincut)
+        # Show form in docker?
+        self.manage_docker()
+        self.controller.manage_translation('mincut', self.dlg_mincut)
+
+
+    def manage_docker(self):
+
+        self.controller.init_docker('qgis_form_docker')
+        if self.controller.dlg_docker:
+            self.controller.dock_dialog(self.dlg_mincut)
+        else:
+            self.open_dialog(self.dlg_mincut, dlg_name='mincut')
+
+        self.set_signals()
 
 
     def mincut_close(self):
@@ -315,6 +344,7 @@ class MincutParent(ParentAction):
         self.restore_user_layer()
         self.remove_selection()
         self.resetRubberbands()
+
         # If client don't touch nothing just rejected dialog or press cancel
         if not self.dlg_mincut.closeMainWin and self.dlg_mincut.mincutCanceled:
             self.close_dialog(self.dlg_mincut)
@@ -326,11 +356,11 @@ class MincutParent(ParentAction):
         # If id exists in data base on btn_cancel delete
         if self.action == "mg_mincut":
             result_mincut_id = self.dlg_mincut.result_mincut_id.text()
-            sql = (f"SELECT id FROM anl_mincut_result_cat"
+            sql = (f"SELECT id FROM om_mincut"
                    f" WHERE id = {result_mincut_id}")
             row = self.controller.get_row(sql)
             if row:
-                sql = (f"DELETE FROM anl_mincut_result_cat"
+                sql = (f"DELETE FROM om_mincut"
                        f" WHERE id = {result_mincut_id}")
                 self.controller.execute_sql(sql)
                 self.controller.show_info("Mincut canceled!")                   
@@ -352,19 +382,19 @@ class MincutParent(ParentAction):
         try:
             self.canvas.xyCoordinates.disconnect()
         except TypeError as e:
-            print(f"{type(e).__name__} --> {e}")
+            self.controller.log_info(f"{type(e).__name__} --> {e}")
 
         try:
             self.emit_point.canvasClicked.disconnect()
         except TypeError as e:
-            print(f"{type(e).__name__} --> {e}")
+            self.controller.log_info(f"{type(e).__name__} --> {e}")
 
         if action_pan:
             self.iface.actionPan().trigger()
         try:
             self.vertex_marker.hide()
         except AttributeError as e:
-            print(f"{type(e).__name__} --> {e}")
+            self.controller.log_info(f"{type(e).__name__} --> {e}")
 
 
     def real_start(self):
@@ -391,8 +421,18 @@ class MincutParent(ParentAction):
     def real_end(self):
 
         # Create the dialog and signals
-        self.dlg_fin = Mincut_fin()
+        self.dlg_fin = MincutEndUi()
         self.load_settings(self.dlg_fin)
+
+        api_search = ApiSearch(self.iface, self.settings, self.controller, self.plugin_dir)
+        api_search.api_search(self.dlg_fin)
+
+        # These widgets are put from the api, mysteriously if we do something like:
+        # self.dlg_mincut.address_add_muni.text() or self.dlg_mincut.address_add_muni.setDiabled(True) etc...
+        # it doesn't count them, and that's why we have to force them
+        self.dlg_fin.address_add_muni = utils_giswater.getWidget(self.dlg_fin, 'address_add_muni')
+        self.dlg_fin.address_add_street = utils_giswater.getWidget(self.dlg_fin, 'address_add_street')
+        self.dlg_fin.address_add_postnumber = utils_giswater.getWidget(self.dlg_fin, 'address_add_postnumber')
 
         mincut = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
         utils_giswater.setWidgetText(self.dlg_fin, self.dlg_fin.mincut, mincut)
@@ -401,15 +441,12 @@ class MincutParent(ParentAction):
             utils_giswater.setWidgetText(self.dlg_fin, self.dlg_fin.work_order, work_order)
 
         # Manage address
-        self.adress_init_config(self.dlg_fin)
-        municipality_current = str(self.dlg_mincut.address_exploitation.currentText())
-        utils_giswater.setWidgetText(self.dlg_fin, self.dlg_fin.address_exploitation, municipality_current)
-        address_postal_code_current = str(self.dlg_mincut.address_postal_code.currentText())
-        utils_giswater.setWidgetText(self.dlg_fin, self.dlg_fin.address_postal_code, address_postal_code_current)
-        address_street_current = str(self.dlg_mincut.address_street.currentText())
-        utils_giswater.setWidgetText(self.dlg_fin, self.dlg_fin.address_street, address_street_current)
-        address_number_current = str(self.dlg_mincut.address_number.currentText())
-        utils_giswater.setWidgetText(self.dlg_fin, self.dlg_fin.address_number, address_number_current)
+        municipality_current = utils_giswater.get_item_data(self.dlg_mincut, self.dlg_mincut.address_add_muni, 1)
+        utils_giswater.set_combo_itemData(self.dlg_fin.address_add_muni, municipality_current, 1)
+        address_street_current = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_street, False, False)
+        utils_giswater.setWidgetText(self.dlg_fin, self.dlg_fin.address_add_street, address_street_current)
+        address_number_current = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_postnumber, False, False)
+        utils_giswater.setWidgetText(self.dlg_fin, self.dlg_fin.address_add_postnumber, address_number_current)
 
         # Fill ComboBox exec_user
         sql = ("SELECT name "
@@ -427,22 +464,22 @@ class MincutParent(ParentAction):
         date_end = self.dlg_mincut.cbx_date_end.date()
         time_end = self.dlg_mincut.cbx_hours_end.time()
         self.dlg_fin.cbx_date_end_fin.setDate(date_end)
-        self.dlg_fin.cbx_hours_end_fin.setTime(time_end) 
+        self.dlg_fin.cbx_hours_end_fin.setTime(time_end)
 
         # Set state to 'Finished'
         utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, str(self.states[2]))
-        self.current_state = 2                 
+        self.current_state = 2
 
         # Enable/Disable widget depending state
         self.enable_widgets('2')
-        
+
         # Set signals
         self.dlg_fin.btn_accept.clicked.connect(self.real_end_accept)
         self.dlg_fin.btn_cancel.clicked.connect(self.real_end_cancel)
-        self.dlg_fin.btn_set_real_location.clicked.connect(self.set_real_location)        
+        self.dlg_fin.btn_set_real_location.clicked.connect(self.set_real_location)
 
         # Open the dialog
-        self.open_dialog(self.dlg_fin)
+        self.open_dialog(self.dlg_fin, dlg_name='mincut_end')
 
 
     def set_real_location(self):
@@ -466,10 +503,9 @@ class MincutParent(ParentAction):
         mincut_result_state = self.current_state
 
         # Manage 'address'
-        address_exploitation_id = utils_giswater.get_item_data(self.dlg_mincut, self.dlg_mincut.address_exploitation)
-        address_postal_code = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.address_postal_code, return_string_null=False)
-        address_street = utils_giswater.get_item_data(self.dlg_mincut, self.dlg_mincut.address_street)
-        address_number = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.address_number)
+        address_exploitation_id = utils_giswater.get_item_data(self.dlg_mincut, self.dlg_mincut.address_add_muni)
+        address_street = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_street, False, False)
+        address_number = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_postnumber, False, False)
 
         mincut_result_type = utils_giswater.get_item_data(self.dlg_mincut, self.dlg_mincut.type, 0)
         anl_cause = utils_giswater.get_item_data(self.dlg_mincut, self.dlg_mincut.cause, 0)
@@ -522,20 +558,20 @@ class MincutParent(ParentAction):
             self.set_id_val()
             self.is_new = False
 
-        # Check if id exist in table 'anl_mincut_result_cat'
+        # Check if id exist in table 'om_mincut'
         result_mincut_id = self.dlg_mincut.result_mincut_id.text()
-        sql = (f"SELECT id FROM anl_mincut_result_cat "
+        sql = (f"SELECT id FROM om_mincut "
                f"WHERE id = '{result_mincut_id}';")
         rows = self.controller.get_rows(sql)
         
         # If not found Insert just its 'id'
         sql = ""
         if not rows:
-            sql = (f"INSERT INTO anl_mincut_result_cat (id) "
+            sql = (f"INSERT INTO om_mincut (id) "
                    f"VALUES ('{result_mincut_id}');\n")
 
         # Update all the fields
-        sql += (f"UPDATE anl_mincut_result_cat"
+        sql += (f"UPDATE om_mincut"
                 f" SET mincut_state = '{mincut_result_state}',"
                 f" mincut_type = '{mincut_result_type}', anl_cause = '{anl_cause}',"
                 f" anl_tstamp = '{received_date}', received_date = '{received_date}',"
@@ -547,14 +583,12 @@ class MincutParent(ParentAction):
             sql += f", work_order = $${work_order}$$"
         if anl_descript != "":        
             sql += f", anl_descript = $${anl_descript}$$ "
-        
+
         # Manage address
         if address_exploitation_id != -1:        
             sql += f", muni_id = '{address_exploitation_id}'"
-        if address_street != -1:
+        if address_street:
             sql += f", streetaxis_id = '{address_street}'"
-        if address_postal_code:
-            sql += f", postcode = '{address_postal_code}'"
         if address_number:
             sql += f", postnumber = '{address_number}'"
 
@@ -573,19 +607,19 @@ class MincutParent(ParentAction):
                 sql += f", exec_user = '{cur_user}'"
                 
         sql += f" WHERE id = '{result_mincut_id}';\n"
-        
-        # Update table 'anl_mincut_result_selector'
-        sql += (f"DELETE FROM anl_mincut_result_selector WHERE cur_user = current_user;\n"
-                f"INSERT INTO anl_mincut_result_selector (cur_user, result_id) VALUES "
+
+        # Update table 'selector_mincut_result'
+        sql += (f"DELETE FROM selector_mincut_result WHERE cur_user = current_user;\n"
+                f"INSERT INTO selector_mincut_result (cur_user, result_id) VALUES "
                 f"(current_user, {result_mincut_id});")
-        
+
         # Check if any 'connec' or 'hydro' associated
         if self.sql_connec != "":
             sql += self.sql_connec
                 
         if self.sql_hydro != "":
             sql += self.sql_hydro
-                            
+
         status = self.controller.execute_sql(sql, log_error=True)
         if status:                                  
             message = "Values has been updated"
@@ -597,7 +631,7 @@ class MincutParent(ParentAction):
         
         # Close dialog and disconnect snapping
         self.disconnect_snapping()
-        sql = (f"SELECT mincut_state, mincut_class FROM anl_mincut_result_cat "
+        sql = (f"SELECT mincut_state, mincut_class FROM om_mincut "
                f" WHERE id = '{result_mincut_id}'")
         row = self.controller.get_row(sql, log_sql=True)
         if not row or (str(row[0]) != '0' or str(row[1]) != '1'):
@@ -618,7 +652,6 @@ class MincutParent(ParentAction):
             result_layer = self.add_layer.add_temp_layer(self.dlg_mincut, result['body']['data'], None, False, tab_idx=2)
             for layer in result_layer['temp_layers_added']:
 
-                layer_style = {}
                 symbol = QgsSymbol.defaultSymbol(layer.geometryType())
                 if type(symbol) == QgsLineSymbol:
                     props = {'capstyle': 'round', 'customdash': '5;2', 'customdash_map_unit_scale': '3x:0,0,0,0,0,0',
@@ -666,18 +699,18 @@ class MincutParent(ParentAction):
                     self.add_layer.set_layer_symbology(layer, props)
                 layer.triggerRepaint()
                 self.iface.layerTreeView().refreshLayerSymbology(layer.id())
-            self.dlg_binfo = BasicInfoUi()
-            self.load_settings(self.dlg_binfo)
-            self.dlg_binfo.btn_close.setText('Cancel')
-            self.dlg_binfo.btn_accept.setText('Continue')
-            self.dlg_binfo.setWindowTitle('Mincut conflict')
-            self.dlg_binfo.btn_accept.clicked.connect(partial(self.force_mincut_overlap))
-            self.dlg_binfo.btn_accept.clicked.connect(partial(self.close_dialog, self.dlg_binfo))
-            self.dlg_binfo.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_binfo))
+            self.dlg_dtext = DialogTextUi()
+            self.load_settings(self.dlg_dtext)
+            self.dlg_dtext.btn_close.setText('Cancel')
+            self.dlg_dtext.btn_accept.setText('Continue')
+            self.dlg_dtext.setWindowTitle('Mincut conflict')
+            self.dlg_dtext.btn_accept.clicked.connect(partial(self.force_mincut_overlap))
+            self.dlg_dtext.btn_accept.clicked.connect(partial(self.close_dialog, self.dlg_dtext))
+            self.dlg_dtext.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_dtext))
 
-            self.add_layer.populate_info_text(self.dlg_binfo, result['body']['data'], False)
+            self.add_layer.populate_info_text(self.dlg_dtext, result['body']['data'], False)
 
-            self.open_dialog(self.dlg_binfo)
+            self.open_dialog(self.dlg_dtext, dlg_name='dialog_text')
 
         elif result['body']['actions']['overlap'] == 'Ok':
             self.mincut_ok(result)
@@ -695,7 +728,9 @@ class MincutParent(ParentAction):
 
 
     def mincut_ok(self, result):
-        result_layer = self.add_layer.add_temp_layer(self.dlg_mincut, result['body']['data'], None, True, tab_idx=2)
+
+        self.add_layer.add_temp_layer(self.dlg_mincut, result['body']['data'], None, True, tab_idx=2)
+
         # Set all widgets of the data tab enabled(False)
         widget_list = self.dlg_mincut.mainTab.widget(0).findChildren(QWidget)
         for widget in widget_list:
@@ -731,20 +766,20 @@ class MincutParent(ParentAction):
 
 
     def update_result_selector(self, result_mincut_id, commit=True):    
-        """ Update table 'anl_mincut_result_selector' """    
+        """ Update table 'selector_mincut_result' """
             
-        sql = (f"DELETE FROM anl_mincut_result_selector WHERE cur_user = current_user;"
-               f"\nINSERT INTO anl_mincut_result_selector (cur_user, result_id) VALUES"
+        sql = (f"DELETE FROM selector_mincut_result WHERE cur_user = current_user;"
+               f"\nINSERT INTO selector_mincut_result (cur_user, result_id) VALUES"
                f" (current_user, {result_mincut_id});")
         status = self.controller.execute_sql(sql, commit)    
         if not status:    
             message = "Error updating table"    
-            self.controller.show_warning(message, parameter='anl_mincut_result_selector')   
+            self.controller.show_warning(message, parameter='selector_mincut_result')
                 
 
     def real_end_accept(self):
 
-        # Get end_date and end_hour from mincut_fin dialog
+        # Get end_date and end_hour from mincut_end dialog
         exec_start_day = self.dlg_fin.cbx_date_start_fin.date()
         exec_start_time = self.dlg_fin.cbx_hours_start_fin.time()
         exec_end_day = self.dlg_fin.cbx_date_end_fin.date()
@@ -756,16 +791,14 @@ class MincutParent(ParentAction):
         self.dlg_mincut.cbx_date_end.setDate(exec_end_day)
         self.dlg_mincut.cbx_hours_end.setTime(exec_end_time)
         utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.work_order, str(self.dlg_fin.work_order.text()))
-        municipality = self.dlg_fin.address_exploitation.currentText()
-        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_exploitation, municipality)
-        street = self.dlg_fin.address_street.currentText()
-        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_street, street)
-        number = self.dlg_fin.address_number.currentText()
-        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_number, number)
-        postal_code = self.dlg_fin.address_postal_code.currentText()
-        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_postal_code, postal_code)
+        municipality = self.dlg_fin.address_add_muni.currentText()
+        utils_giswater.set_combo_itemData(self.dlg_mincut.address_add_muni, municipality, 1)
+        street = utils_giswater.getWidgetText(self.dlg_fin, self.dlg_fin.address_add_street)
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_street, street)
+        number = utils_giswater.getWidgetText(self.dlg_fin, self.dlg_fin.address_add_postnumber)
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_postnumber, number)
         exec_user = utils_giswater.getWidgetText(self.dlg_fin, self.dlg_fin.exec_user)
-        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.exec_user, exec_user)
+        utils_giswater.set_combo_itemData(self.dlg_mincut.assigned_to, exec_user, 1)
 
         self.dlg_fin.close()
 
@@ -784,12 +817,12 @@ class MincutParent(ParentAction):
 
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
 
-        # Check if id exist in anl_mincut_result_cat
-        sql = (f"SELECT id FROM anl_mincut_result_cat"
+        # Check if id exist in om_mincut
+        sql = (f"SELECT id FROM om_mincut"
                f" WHERE id = '{result_mincut_id_text}';")
         exist_id = self.controller.get_row(sql)
         if not exist_id:
-            sql = (f"INSERT INTO anl_mincut_result_cat (id, mincut_class) "
+            sql = (f"INSERT INTO om_mincut (id, mincut_class) "
                    f" VALUES ('{result_mincut_id_text}', 2);")
             self.controller.execute_sql(sql)
             self.is_new = False
@@ -800,14 +833,14 @@ class MincutParent(ParentAction):
         self.action_add_hydrometer.setDisabled(True)
 
         # Set dialog add_connec
-        self.dlg_connec = Mincut_add_connec()
+        self.dlg_connec = MincutConnec()
         self.dlg_connec.setWindowTitle("Connec management")
         self.load_settings(self.dlg_connec)
         self.dlg_connec.tbl_mincut_connec.setSelectionBehavior(QAbstractItemView.SelectRows)
         # Set icons
         self.set_icon(self.dlg_connec.btn_insert, "111")
         self.set_icon(self.dlg_connec.btn_delete, "112")
-        self.set_icon(self.dlg_connec.btn_snapping, "129")
+        self.set_icon(self.dlg_connec.btn_snapping, "137")
 
         # Set signals
         self.dlg_connec.btn_insert.clicked.connect(partial(self.insert_connec))
@@ -815,19 +848,18 @@ class MincutParent(ParentAction):
         self.dlg_connec.btn_snapping.clicked.connect(self.snapping_init_connec)
         self.dlg_connec.btn_accept.clicked.connect(partial(self.accept_connec, self.dlg_connec, "connec"))
         self.dlg_connec.rejected.connect(partial(self.close_dialog, self.dlg_connec))
-        # self.dlg_connec.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_connec))
-        
+
         # Set autocompleter for 'customer_code'
         self.set_completer_customer_code(self.dlg_connec.connec_id)
 
-        # On opening form check if result_id already exist in anl_mincut_result_connec
+        # On opening form check if result_id already exist in om_mincut_connec
         # if exist show data in form / show selection!!!
         if exist_id:
             # Read selection and reload table
             self.select_features_connec()
         self.snapping_selection_connec()
         
-        self.open_dialog(self.dlg_connec)
+        self.open_dialog(self.dlg_connec, dlg_name='mincut_connec')
 
         
     def set_completer_customer_code(self, widget, set_signal=False):
@@ -947,12 +979,12 @@ class MincutParent(ParentAction):
         self.connec_list = []
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
 
-        # Check if id exist in table 'anl_mincut_result_cat'
-        sql = (f"SELECT id FROM anl_mincut_result_cat"
+        # Check if id exist in table 'om_mincut'
+        sql = (f"SELECT id FROM om_mincut"
                f" WHERE id = '{result_mincut_id_text}';")
         exist_id = self.controller.get_row(sql)
         if not exist_id:
-            sql = (f"INSERT INTO anl_mincut_result_cat (id, mincut_class)"
+            sql = (f"INSERT INTO om_mincut (id, mincut_class)"
                    f" VALUES ('{result_mincut_id_text}', 3);")
             self.controller.execute_sql(sql)
             self.is_new = False
@@ -962,8 +994,8 @@ class MincutParent(ParentAction):
         self.action_custom_mincut.setDisabled(True)
         self.action_add_connec.setDisabled(True)
 
-        # Set dialog Mincut_add_hydrometer
-        self.dlg_hydro = Mincut_add_hydrometer()
+        # Set dialog MincutHydrometer
+        self.dlg_hydro = MincutHydrometer()
         self.load_settings(self.dlg_hydro)
         self.dlg_hydro.setWindowTitle("Hydrometer management")
         self.dlg_hydro.tbl_hydro.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -972,12 +1004,10 @@ class MincutParent(ParentAction):
         # Set icons
         self.set_icon(self.dlg_hydro.btn_insert, "111")
         self.set_icon(self.dlg_hydro.btn_delete, "112")
-        #self.set_icon(self.dlg_hydro.btn_snapping, "129")
 
         # Set dignals
         self.dlg_hydro.btn_insert.clicked.connect(partial(self.insert_hydro))
         self.dlg_hydro.btn_delete.clicked.connect(partial(self.delete_records_hydro))
-        # self.dlg_hydro.btn_snapping.clicked.connect(self.snapping_init_hydro)
         self.dlg_hydro.btn_accept.clicked.connect(partial(self.accept_hydro, self.dlg_hydro, "hydrometer"))
 
         # Set autocompleter for 'customer_code'
@@ -988,7 +1018,7 @@ class MincutParent(ParentAction):
             # Read selection and reload table
             self.select_features_hydro()
 
-        self.open_dialog(self.dlg_hydro)
+        self.open_dialog(self.dlg_hydro, dlg_name='mincut_hydrometer')
 
 
     def auto_fill_hydro_id(self):
@@ -1089,7 +1119,7 @@ class MincutParent(ParentAction):
                     
         # Set 'expr_filter' of connecs related with current mincut
         result_mincut_id = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
-        sql = (f"SELECT connec_id FROM anl_mincut_result_connec"
+        sql = (f"SELECT connec_id FROM om_mincut_connec"
                f" WHERE result_id = {result_mincut_id}")
         rows = self.controller.get_rows(sql)
         if rows:
@@ -1121,7 +1151,7 @@ class MincutParent(ParentAction):
         # Set 'expr_filter' of connecs related with current mincut
         result_mincut_id = utils_giswater.getWidgetText(self.dlg_hydro, self.result_mincut_id)
         sql = (f"SELECT DISTINCT(connec_id) FROM rtc_hydrometer_x_connec AS rtc"
-               f" INNER JOIN anl_mincut_result_hydrometer AS anl"
+               f" INNER JOIN om_mincut_hydrometer AS anl"
                f" ON anl.hydrometer_id = rtc.hydrometer_id"
                f" WHERE result_id = {result_mincut_id}")
         rows = self.controller.get_rows(sql)
@@ -1140,12 +1170,9 @@ class MincutParent(ParentAction):
             # Select features of the layers filtering by @expr
             self.select_features_group_layers(expr)
 
-
-        #self.hydro_list = []
-
         # Get list of 'hydrometer_id' belonging to current result_mincut
         result_mincut_id = utils_giswater.getWidgetText(self.dlg_hydro, self.result_mincut_id)
-        sql = (f"SELECT hydrometer_id FROM anl_mincut_result_hydrometer"
+        sql = (f"SELECT hydrometer_id FROM om_mincut_hydrometer"
                f" WHERE result_id = {result_mincut_id}")
         rows = self.controller.get_rows(sql)
 
@@ -1174,9 +1201,6 @@ class MincutParent(ParentAction):
 
         self.disconnect_signal_selection_changed()   
         
-        # # Clear list of connec_list
-        # self.connec_list = []
-
         # Get 'connec_id' from selected 'customer_code'
         customer_code = utils_giswater.getWidgetText(self.dlg_connec, self.dlg_connec.connec_id)
         if customer_code == 'null':
@@ -1209,7 +1233,6 @@ class MincutParent(ParentAction):
         self.connec_list.append(connec_id)
 
         expr_filter = None
-        expr = None
         if len(self.connec_list) > 0:
             
             # Set expression filter with 'connec_list'
@@ -1260,25 +1283,10 @@ class MincutParent(ParentAction):
         if expr.hasParserError():
             message = "Expression Error"
             self.controller.log_warning(message, parameter=expr_filter)
-            return (False, expr)
-        return (True, expr)
-                
-                
-    def select_features_by_expr(self, layer, expr):
-        """ Select features of @layer applying @expr """
+            return False, expr
+        return True, expr
 
-        if expr is None:
-            layer.removeSelection()  
-        else:                
-            it = layer.getFeatures(QgsFeatureRequest(expr))
-            # Build a list of feature id's from the previous result and select them            
-            id_list = [i.id() for i in it]
-            if len(id_list) > 0:
-                layer.selectByIds(id_list)   
-            else:
-                layer.removeSelection()  
-                                
-                
+
     def set_table_model(self, widget, table_name, expr_filter):
         """ Sets a TableModel to @widget attached to @table_name and filter @expr_filter """
         
@@ -1441,17 +1449,17 @@ class MincutParent(ParentAction):
 
     def accept_connec(self, dlg, element):
         """ Slot function widget 'btn_accept' of 'connec' dialog 
-            Insert into table 'anl_mincut_result_connec' values of current mincut 
+            Insert into table 'om_mincut_connec' values of current mincut
         """
         
         result_mincut_id = utils_giswater.getWidgetText(dlg, self.dlg_mincut.result_mincut_id)
         if result_mincut_id == 'null':
             return
 
-        sql = (f"DELETE FROM anl_mincut_result_{element}"
+        sql = (f"DELETE FROM om_mincut_{element}"
                f" WHERE result_id = {result_mincut_id};\n")
         for element_id in self.connec_list:
-            sql += (f"INSERT INTO anl_mincut_result_{element}"
+            sql += (f"INSERT INTO om_mincut_{element}"
                     f" (result_id, {element}_id) "
                     f" VALUES ('{result_mincut_id}', '{element_id}');\n")
             # Get hydrometer_id of selected connec
@@ -1460,8 +1468,8 @@ class MincutParent(ParentAction):
             rows = self.controller.get_rows(sql2)
             if rows:
                 for row in rows:
-                    # Hydrometers associated to selected connec inserted to the table anl_mincut_result_hydrometer
-                    sql += (f"INSERT INTO anl_mincut_result_hydrometer"
+                    # Hydrometers associated to selected connec inserted to the table om_mincut_hydrometer
+                    sql += (f"INSERT INTO om_mincut_hydrometer"
                             f" (result_id, hydrometer_id) "
                             f" VALUES ('{result_mincut_id}', '{row[0]}');\n")
 
@@ -1472,17 +1480,17 @@ class MincutParent(ParentAction):
 
     def accept_hydro(self, dlg, element):
         """ Slot function widget 'btn_accept' of 'hydrometer' dialog 
-            Insert into table 'anl_mincut_result_hydrometer' values of current mincut 
+            Insert into table 'om_mincut_hydrometer' values of current mincut
         """
 
         result_mincut_id = utils_giswater.getWidgetText(dlg, self.dlg_mincut.result_mincut_id)
         if result_mincut_id == 'null':
             return
 
-        sql = (f"DELETE FROM anl_mincut_result_{element}"
+        sql = (f"DELETE FROM om_mincut_{element}"
                f" WHERE result_id = {result_mincut_id};\n")
         for element_id in self.hydro_list:
-            sql += (f"INSERT INTO anl_mincut_result_{element}"
+            sql += (f"INSERT INTO om_mincut_{element}"
                     f" (result_id, {element}_id) "
                     f" VALUES ('{result_mincut_id}', '{element_id}');\n")
         
@@ -1497,6 +1505,7 @@ class MincutParent(ParentAction):
         self.init_map_tool()
         self.dlg_mincut.closeMainWin = True
         self.dlg_mincut.canceled = False
+
         # Vertex marker
         self.vertex_marker = QgsVertexMarker(self.canvas)
         self.vertex_marker.setColor(QColor(255, 100, 255))
@@ -1511,14 +1520,6 @@ class MincutParent(ParentAction):
         # Store user snapping configuration
         self.snapper_manager.store_snapping_options()
 
-        # Disable snapping
-        self.snapper_manager.enable_snapping()
-        # Set snapping to 'arc' and 'node'
-        self.snapper_manager.set_snapping_layers()
-        self.snapper_manager.snap_to_arc()
-
-        #self.snapper_manager.snap_to_node()
-
         # Set signals
         self.canvas.xyCoordinates.connect(self.mouse_move_node_arc)        
         self.emit_point.canvasClicked.connect(self.auto_mincut_snapping)
@@ -1530,8 +1531,13 @@ class MincutParent(ParentAction):
         # Get coordinates
         event_point = self.snapper_manager.get_event_point(point=point)
 
+        # Set active and current layer
+        self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
+        self.iface.setActiveLayer(self.layer_arc)
+        self.current_layer = self.layer_arc
+  
         # Snapping
-        result = self.snapper_manager.snap_to_background_layers(event_point)
+        result = self.snapper_manager.snap_to_current_layer(event_point)
         if not self.snapper_manager.result_is_valid():
             return
 
@@ -1557,20 +1563,20 @@ class MincutParent(ParentAction):
     def set_visible_mincut_layers(self, zoom=False):
         """ Set visible mincut result layers """
         
-        layer = self.controller.get_layer_by_tablename("v_anl_mincut_result_valve") 
+        layer = self.controller.get_layer_by_tablename("v_om_mincut_valve")
         if layer:
             self.controller.set_layer_visible(layer)
                     
-        layer = self.controller.get_layer_by_tablename("v_anl_mincut_result_arc") 
+        layer = self.controller.get_layer_by_tablename("v_om_mincut_arc")
         if layer:
             self.controller.set_layer_visible(layer)
             
-        layer = self.controller.get_layer_by_tablename("v_anl_mincut_result_connec") 
+        layer = self.controller.get_layer_by_tablename("v_om_mincut_connec")
         if layer:            
             self.controller.set_layer_visible(layer)
 
         # Refresh extension of layer
-        layer = self.controller.get_layer_by_tablename("v_anl_mincut_result_node")
+        layer = self.controller.get_layer_by_tablename("v_om_mincut_node")
         if layer:
             self.controller.set_layer_visible(layer)
             if zoom:
@@ -1589,7 +1595,7 @@ class MincutParent(ParentAction):
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
         srid = self.controller.plugin_settings_value('srid')
 
-        sql = (f"UPDATE anl_mincut_result_cat"
+        sql = (f"UPDATE om_mincut"
                f" SET exec_the_geom = ST_SetSRID(ST_Point({point.x()}, {point.y()}), {srid})"
                f" WHERE id = '{result_mincut_id_text}'")
         status = self.controller.execute_sql(sql)
@@ -1622,18 +1628,19 @@ class MincutParent(ParentAction):
         self.task1 = GwTask('Calculating mincut')
         QgsApplication.taskManager().addTask(self.task1)
         self.task1.setProgress(0)
+
         srid = self.controller.plugin_settings_value('srid')
         real_mincut_id = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
         if self.is_new:
             self.set_id_val()
             self.is_new = False
 
-            sql = ("INSERT INTO anl_mincut_result_cat (mincut_state)"
+            sql = ("INSERT INTO om_mincut (mincut_state)"
                    " VALUES (0) RETURNING id;")
             new_mincut_id = self.controller.execute_returning(sql, log_sql=True)
             if new_mincut_id[0] < 1:
                 real_mincut_id = 1
-                sql = (f"UPDATE anl_mincut_result_cat SET(id) = (1) "
+                sql = (f"UPDATE om_mincut SET(id) = (1) "
                        f"WHERE id = {new_mincut_id[0]};")
                 self.controller.execute_sql(sql, log_sql=True)
             else:
@@ -1645,8 +1652,8 @@ class MincutParent(ParentAction):
         # feature_id: id of snapped arc/node
         # feature_type: type of snapped element (arc/node)
         # result_mincut_id: result_mincut_id from form
-        sql =f"SELECT gw_fct_mincut('{elem_id}', '{elem_type}', '{real_mincut_id}');"
-        row = self.controller.get_row(sql, log_sql=True)
+        sql = f"SELECT gw_fct_mincut('{elem_id}', '{elem_type}', '{real_mincut_id}');"
+        row = self.controller.get_row(sql)
         if not row or not row[0]:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return False
@@ -1673,7 +1680,7 @@ class MincutParent(ParentAction):
             x1, y1 = polygon[0].split(' ')
             x2, y2 = polygon[2].split(' ')
             self.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
-            sql = (f"UPDATE anl_mincut_result_cat"
+            sql = (f"UPDATE om_mincut"
                    f" SET mincut_class = 1, "
                    f" anl_the_geom = ST_SetSRID(ST_Point({snapping_x}, "
                    f"{snapping_y}), {srid}),"
@@ -1688,6 +1695,7 @@ class MincutParent(ParentAction):
                 self.set_cursor_restore()
                 self.task1.setProgress(100)
                 return
+
             # Enable button CustomMincut and button Start
             self.dlg_mincut.btn_start.setDisabled(False)
             self.action_custom_mincut.setDisabled(False)
@@ -1695,9 +1703,9 @@ class MincutParent(ParentAction):
             self.action_add_connec.setDisabled(True)
             self.action_add_hydrometer.setDisabled(True)
             self.action_mincut_composer.setDisabled(False)
-            # Update table 'anl_mincut_result_selector'
-            sql = (f"DELETE FROM anl_mincut_result_selector WHERE cur_user = current_user;\n"
-                   f"INSERT INTO anl_mincut_result_selector (cur_user, result_id) VALUES"
+            # Update table 'selector_mincut_result'
+            sql = (f"DELETE FROM selector_mincut_result WHERE cur_user = current_user;\n"
+                   f"INSERT INTO selector_mincut_result (cur_user, result_id) VALUES"
                    f" (current_user, {real_mincut_id});")
             self.controller.execute_sql(sql, log_error=True, log_sql=True)
             self.task1.setProgress(75)
@@ -1732,7 +1740,7 @@ class MincutParent(ParentAction):
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
 
         # Set active layer
-        viewname = 'v_anl_mincut_result_valve'
+        viewname = 'v_om_mincut_valve'
         layer = self.controller.get_layer_by_tablename(viewname, log_info=True)
         if layer:
             self.iface.setActiveLayer(layer)
@@ -1753,7 +1761,7 @@ class MincutParent(ParentAction):
             layer = self.snapper_manager.get_snapped_layer(result)
             # Check feature
             viewname = self.controller.get_layer_source_table_name(layer)
-            if viewname == 'v_anl_mincut_result_valve':
+            if viewname == 'v_om_mincut_valve':
                 self.snapper_manager.add_marker(result, self.vertex_marker)
 
 
@@ -1779,7 +1787,7 @@ class MincutParent(ParentAction):
                 self.snapper_manager.add_marker(result, self.vertex_marker)
 
 
-    def custom_mincut_snapping(self, point, btn): # @UnusedVariable
+    def custom_mincut_snapping(self, point, btn):
         """ Custom mincut snapping function """
 
         # Get clicked point
@@ -1791,7 +1799,7 @@ class MincutParent(ParentAction):
             # Check feature
             layer = self.snapper_manager.get_snapped_layer(result)
             viewname = self.controller.get_layer_source_table_name(layer)
-            if viewname == 'v_anl_mincut_result_valve':
+            if viewname == 'v_om_mincut_valve':
                 # Get the point. Leave selection
                 snapped_feat = self.snapper_manager.get_snapped_feature(result, True)
                 element_id = snapped_feat.attribute('node_id')
@@ -1808,7 +1816,7 @@ class MincutParent(ParentAction):
         cur_user = self.controller.get_project_user()               
         result_mincut_id = utils_giswater.getWidgetText(self.dlg_mincut, "result_mincut_id")
         if result_mincut_id != 'null':
-            sql = (f"SELECT gw_fct_mincut_valve_unaccess('{elem_id}', '{result_mincut_id}', '{cur_user}');")
+            sql = f"SELECT gw_fct_mincut_valve_unaccess('{elem_id}', '{result_mincut_id}', '{cur_user}');"
             status = self.controller.execute_sql(sql, log_sql=False)
             if status:
                 message = "Custom mincut executed successfully"
@@ -1834,6 +1842,7 @@ class MincutParent(ParentAction):
                 a.trigger()
                 break
 
+
     def mg_mincut_management(self):
         """ Button 27: Mincut management """
 
@@ -1848,26 +1857,30 @@ class MincutParent(ParentAction):
         # Force fill form mincut
         self.result_mincut_id.setText(str(result_mincut_id))
 
-        sql = (f"SELECT anl_mincut_result_cat.*, anl_mincut_cat_state.name AS state_name, cat_users.name AS assigned_to_name"
-               f" FROM anl_mincut_result_cat"
-               f" INNER JOIN anl_mincut_cat_state"
-               f" ON anl_mincut_result_cat.mincut_state = anl_mincut_cat_state.id"
+        sql = (f"SELECT om_mincut.*, cat_users.name AS assigned_to_name"
+               f" FROM om_mincut"
                f" INNER JOIN cat_users"
-               f" ON cat_users.id = anl_mincut_result_cat.assigned_to"
-               f" WHERE anl_mincut_result_cat.id = '{result_mincut_id}'")
-
-        row = self.controller.get_row(sql, log_sql=False)
+               f" ON cat_users.id = om_mincut.assigned_to"
+               f" WHERE om_mincut.id = '{result_mincut_id}'")
+        row = self.controller.get_row(sql, log_sql=True)
         if not row:
             return
-              
+
+        # Get mincut state name
+        mincut_state_name = ''
+        if row['mincut_state'] in self.states:
+            mincut_state_name = self.states[row['mincut_state']]
+
         utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.work_order, row['work_order'])
         utils_giswater.set_combo_itemData(self.dlg_mincut.type, row['mincut_type'], 0)
         utils_giswater.set_combo_itemData(self.dlg_mincut.cause, row['anl_cause'], 0)
-        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, row['state_name'])
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, mincut_state_name)
         utils_giswater.setWidgetText(self.dlg_mincut, "output_details", row['output'])
-        
+
         # Manage location
-        self.open_mincut_manage_location(row)
+        utils_giswater.set_combo_itemData(self.dlg_mincut.address_add_muni, str(row['muni_id']), 0)
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_street, str(row['streetaxis_id']))
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_postnumber, str(row['postnumber']))
 
         # Manage dates
         self.open_mincut_manage_dates(row)
@@ -1878,11 +1891,11 @@ class MincutParent(ParentAction):
         utils_giswater.setWidgetText(self.dlg_mincut, "depth", row['exec_depth'])
         utils_giswater.setWidgetText(self.dlg_mincut, "assigned_to", row['assigned_to_name'])
 
-        # Update table 'anl_mincut_result_selector'
+        # Update table 'selector_mincut_result'
         self.update_result_selector(result_mincut_id)
         self.refresh_map_canvas()
         self.current_state = str(row['mincut_state'])
-        sql = (f"SELECT mincut_class FROM anl_mincut_result_cat"
+        sql = (f"SELECT mincut_class FROM om_mincut"
                f" WHERE id = '{result_mincut_id}'")
         row = self.controller.get_row(sql)
         mincut_class_status = None
@@ -1893,17 +1906,16 @@ class MincutParent(ParentAction):
 
         expr_filter = f"result_id={result_mincut_id}"
         utils_giswater.set_qtv_config(self.dlg_mincut.tbl_hydro)
-        self.fill_table(self.dlg_mincut.tbl_hydro, 'v_anl_mincut_result_hydrometer',  expr_filter=expr_filter)
+        self.fill_table(self.dlg_mincut.tbl_hydro, 'v_om_mincut_hydrometer',  expr_filter=expr_filter)
 
         # Depend of mincut_state and mincut_clase desable/enable widgets
         # Current_state == '0': Planified
         if self.current_state == '0':
             self.dlg_mincut.work_order.setDisabled(False)
             # Group Location
-            self.dlg_mincut.address_exploitation.setDisabled(False)
-            self.dlg_mincut.address_postal_code.setDisabled(False)
-            self.dlg_mincut.address_street.setDisabled(False)
-            self.dlg_mincut.address_number.setDisabled(False)
+            self.dlg_mincut.address_add_muni.setDisabled(False)
+            self.dlg_mincut.address_add_street.setDisabled(False)
+            self.dlg_mincut.address_add_postnumber.setDisabled(False)
             # Group Details
             self.dlg_mincut.type.setDisabled(False)
             self.dlg_mincut.cause.setDisabled(False)
@@ -1953,10 +1965,9 @@ class MincutParent(ParentAction):
 
             self.dlg_mincut.work_order.setDisabled(True)
             # Group Location
-            self.dlg_mincut.address_exploitation.setDisabled(True)
-            self.dlg_mincut.address_postal_code.setDisabled(True)
-            self.dlg_mincut.address_street.setDisabled(True)
-            self.dlg_mincut.address_number.setDisabled(True)
+            self.dlg_mincut.address_add_muni.setDisabled(True)
+            self.dlg_mincut.address_add_street.setDisabled(True)
+            self.dlg_mincut.address_add_postnumber.setDisabled(True)
             # Group Details
             self.dlg_mincut.type.setDisabled(True)
             self.dlg_mincut.cause.setDisabled(True)
@@ -1990,10 +2001,9 @@ class MincutParent(ParentAction):
         elif self.current_state in ('2', '3'):
             self.dlg_mincut.work_order.setDisabled(True)
             # Group Location
-            self.dlg_mincut.address_exploitation.setDisabled(True)
-            self.dlg_mincut.address_postal_code.setDisabled(True)
-            self.dlg_mincut.address_street.setDisabled(True)
-            self.dlg_mincut.address_number.setDisabled(True)
+            self.dlg_mincut.address_add_muni.setDisabled(True)
+            self.dlg_mincut.address_add_street.setDisabled(True)
+            self.dlg_mincut.address_add_postnumber.setDisabled(True)
             # Group Details
             self.dlg_mincut.type.setDisabled(True)
             self.dlg_mincut.cause.setDisabled(True)
@@ -2025,32 +2035,9 @@ class MincutParent(ParentAction):
 
         # Common Actions
         self.action_mincut_composer.setDisabled(False)
+        return row
 
 
-    def open_mincut_manage_location(self, row):
-        """ Management of location parameters: muni, postcode, street, postnumber """
-        
-        # Get 'muni_name' from 'muni_id'  
-        if row['muni_id'] and row['muni_id'] != -1:
-            sql = (f"SELECT name FROM ext_municipality"
-                   f" WHERE muni_id = '{row['muni_id']}'")
-            row_aux = self.controller.get_row(sql)
-            if row_aux:                
-                utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_exploitation, row_aux['name'])
-                    
-        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_postal_code, str(row['postcode']))
-        
-        # Get 'street_name' from 'streetaxis_id'  
-        if row['streetaxis_id'] and row['streetaxis_id'] != -1:
-            sql = (f"SELECT name FROM ext_streetaxis"
-                   f" WHERE id = '{row['streetaxis_id']}'")
-            row_aux = self.controller.get_row(sql)
-            if row_aux:
-                utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_street, row_aux['name'])
-                         
-        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_number, str(row['postnumber']))
-        
-        
     def open_mincut_manage_dates(self, row):
         """ Management of null values in fields of type date """
         
@@ -2075,340 +2062,12 @@ class MincutParent(ParentAction):
             utils_giswater.setTimeEdit(self.dlg_mincut, widget_time, qt_time)
 
 
-    def searchplus_get_parameters(self):
-        """ Get parameters of 'searchplus' from table 'config_param_system' """
-
-        self.params = {}
-        sql = ("SELECT parameter, value FROM config_param_system"
-               " WHERE context = 'searchplus' ORDER BY parameter")
-        rows = self.controller.get_rows(sql)
-        if rows:
-            for row in rows:
-                self.params[row['parameter']] = str(row['value'])
-        else:
-            message = "Parameters related with 'searchplus' not set in table 'config_param_system'"
-            self.controller.log_warning(message)
-            return False
-
-        # Get scale zoom
-        self.scale_zoom = 2500
-        row = self.controller.get_config('scale_zoom', 'value', 'config_param_system')
-        if row and row[0]:
-            self.scale_zoom = row['value']
-
-        return True            
-
-
-    def address_fill_postal_code(self, dialog, combo):
-        """ Fill @combo """
-
-        # Get exploitation code: 'expl_id'
-        expl_id = utils_giswater.get_item_data(dialog, dialog.address_exploitation)
-
-        # Get postcodes related with selected 'expl_id'
-        sql = "SELECT DISTINCT(postcode) FROM ext_address"
-        if expl_id != -1:
-            sql += f" WHERE {self.street_field_expl[0]} = '{expl_id}' AND postcode IS NOT NULL"
-        sql += " ORDER BY postcode;"
-        rows = self.controller.get_rows(sql)
-        if not rows:
-            return False
-
-        records = [(-1, '', '')]
-        for row in rows:
-            field_code = row[0]
-            elem = [field_code, field_code, None]
-            records.append(elem)
-
-        # Fill combo
-        combo.blockSignals(True)
-        combo.clear()
-        records_sorted = sorted(records, key=operator.itemgetter(1))
-        for i in range(len(records_sorted)):
-            record = records_sorted[i]
-            combo.addItem(record[1], record)
-            combo.blockSignals(False)
-
-        return True
-
-
-    def address_populate(self, dialog, combo, layername, field_code, field_name):
-        """ Populate @combo """
-
-        # Check if we have this search option available
-        if layername not in self.layers:
-            return False
-
-        # Get features
-        layer = self.layers[layername]
-        records = [(-1, '', '')]
-        idx_field_code = layer.fields().indexFromName(self.params[field_code])
-        idx_field_name = layer.fields().indexFromName(self.params[field_name])
-
-        if idx_field_code < 0:
-            message = "Adress configuration. Field not found"
-            self.controller.show_warning(message, parameter=self.params[field_code])
-            return
-        if idx_field_name < 0:
-            message = "Adress configuration. Field not found"
-            self.controller.show_warning(message, parameter=self.params[field_name])
-            return    
-            
-        it = layer.getFeatures()
-
-        if layername == 'street_layer':
-
-            # Get 'expl_id'
-            elem = dialog.address_exploitation.itemData(dialog.address_exploitation.currentIndex())
-            expl_id = elem[0]
-            records = [[-1, '']]
-
-            # Set filter expression
-            expr_filter = f"{self.street_field_expl[0]} = '{expl_id}'"
-
-            # Check filter and existence of fields
-            expr = QgsExpression(expr_filter)
-            if expr.hasParserError():
-                message = f"{expr.parserErrorString()}: {expr_filter}"
-                self.controller.show_warning(message)
-                return
-
-            it = layer.getFeatures(QgsFeatureRequest(expr))
-
-        # Iterate over features
-        for feature in it:
-            geom = feature.geometry()
-            attrs = feature.attributes()
-            value_code = attrs[idx_field_code]
-            value_name = attrs[idx_field_name]
-            if value_code is not None and geom is not None:
-                elem = [value_code, value_name, geom.asWkt()]
-            else:
-                elem = [value_code, value_name, None]
-            records.append(elem)
-
-        # Fill combo
-        combo.blockSignals(True)
-        combo.clear()
-        records_sorted = sorted(records, key=operator.itemgetter(1))
-        for record in records_sorted:
-            combo.addItem(record[1], record)
-        combo.blockSignals(False)
-
-        return True
-
-
-    def address_get_numbers(self, dialog, combo, field_code, fill_combo=False, zoom=True):
-        """ Populate civic numbers depending on value of selected @combo. 
-            Build an expression with @field_code
-        """      
-
-        # Get selected street
-        selected = utils_giswater.getWidgetText(dialog, combo)
-        if selected == 'null':
-            return
-
-        # Get street code
-        elem = combo.itemData(combo.currentIndex())
-        code = elem[0]
-        records = [[-1, '']]  
-        
-        # Get 'portal' layer
-        if 'portal_layer' not in list(self.layers.keys()):
-            message = "Layer not found"
-            self.controller.show_warning(message, parameter='portal_layer')
-            return
-        
-        # Set filter expression
-        layer = self.layers['portal_layer']
-        idx_field_code = layer.fields().indexFromName(field_code)
-        idx_field_number = layer.fields().indexFromName(self.params['portal_field_number'])
-        expr_filter = f"{field_code} = '{code}'"
-        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
-        if not is_valid:
-            return     
-              
-        if idx_field_code == -1:
-            message = "Field not found"
-            self.controller.show_warning(message, parameter=field_code)
-            return            
-        if idx_field_number == -1:
-            message = "Field not found"
-            self.controller.show_warning(message, parameter=self.params['portal_field_number'])
-            return
-        
-        dialog.address_number.blockSignals(True)
-        dialog.address_number.clear()
-        if fill_combo:
-            it = layer.getFeatures(QgsFeatureRequest(expr))
-            for feature in it:
-                attrs = feature.attributes()
-                field_number = attrs[idx_field_number]
-                if field_number is not None:
-                    elem = [code, field_number]
-                    records.append(elem)
-        
-            # Fill numbers combo
-            records_sorted = sorted(records, key=operator.itemgetter(1))
-            for record in records_sorted:
-                dialog.address_number.addItem(record[1], record)
-            dialog.address_number.blockSignals(False)
-
-        if zoom:
-            # Select features of @layer applying @expr
-            self.select_features_by_expr(layer, expr)
-    
-            # Zoom to selected feature of the layer
-            self.zoom_to_selected_features(layer, 'arc')
-
-
-    def zoom_to_selected_features(self, layer, geom_type=None, zoom=None):
-        """ Zoom to selected features of the @layer with @geom_type """
-        
-        if not layer:
-            return
-        
-        self.iface.setActiveLayer(layer)
-        self.iface.actionZoomToSelected().trigger()
-        
-        if geom_type:
-            
-            # Set scale = scale_zoom
-            if geom_type in ('node', 'connec', 'gully'):
-                scale = self.scale_zoom
-            
-            # Set scale = max(current_scale, scale_zoom)
-            elif geom_type == 'arc':
-                scale = self.iface.mapCanvas().scale()
-                if int(scale) < int(self.scale_zoom):
-                    scale = self.scale_zoom
-            else:
-                scale = 5000
-
-            if zoom is not None:
-                scale = zoom
-            
-            self.iface.mapCanvas().zoomScale(float(scale))
-
-
-    def adress_get_layers(self):
-        """ Iterate over all layers to get the ones set in table 'config_param_system' """
-
-        # Check if we have any layer loaded
-        layers = self.controller.get_layers()
-        if len(layers) == 0:
-            return
-
-        # Iterate over all layers to get the ones specified parameters '*_layer'
-        self.layers = {}
-
-        for cur_layer in layers:
-            layer_source = self.controller.get_layer_source(cur_layer)
-            uri_table = layer_source['table']
-            if uri_table is not None:
-                if self.params['expl_layer'] == uri_table:
-                    self.layers['expl_layer'] = cur_layer
-                elif self.params['street_layer'] == uri_table:
-                    self.layers['street_layer'] = cur_layer
-                elif self.params['portal_layer'] == uri_table:
-                    self.layers['portal_layer'] = cur_layer
-
-
-    def adress_init_config(self, dialog):
-        """ Populate the interface with values get from layers """
-
-        # Get parameters of 'searchplus' from table 'config_param_system' 
-        if not self.searchplus_get_parameters():
-            return 
-            
-        # Get layers and full extent
-        self.adress_get_layers()
-
-        # Tab 'Address'
-        status = self.address_populate(dialog, dialog.address_exploitation, 'expl_layer', 'expl_field_code', 'expl_field_name')
-        if not status:
-            return
-
-        self.street_field_expl = self.controller.get_config('street_field_expl', 'value', 'config_param_system')
-        if not self.street_field_expl:
-            message = "Parameter not found"
-            self.controller.show_warning(message, parameter='street_field_expl')
-            return
-        portal_field_postal = self.controller.get_config('portal_field_postal', 'value', 'config_param_system')
-        if not portal_field_postal:
-            message = "Param not found"
-            self.controller.show_warning(message, parameter='portal_field_postal')
-            return
-
-        # Get project variable 'expl_id'
-        expl_id = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable(str(self.street_field_expl[0]))
-        if expl_id:
-            # Set SQL to get 'expl_name'
-            sql = (f"SELECT {self.params['expl_field_name']}"
-                   f" FROM {self.params['expl_layer']}"
-                   f" WHERE {self.params['expl_field_code']} = {expl_id}")
-            row = self.controller.get_row(sql)
-            if row:
-                utils_giswater.setSelectedItem(dialog, dialog.address_exploitation, row[0])
-
-        # Set signals
-        dialog.address_exploitation.currentIndexChanged.connect(
-            partial(self.address_fill_postal_code, dialog, dialog.address_postal_code))
-        dialog.address_exploitation.currentIndexChanged.connect(
-            partial(self.address_populate, dialog, dialog.address_street, 'street_layer', 'street_field_code', 'street_field_name'))
-        dialog.address_exploitation.currentIndexChanged.connect(
-            partial(self.address_get_numbers, dialog, dialog.address_exploitation, self.street_field_expl[0], False, False))
-        dialog.address_postal_code.currentIndexChanged.connect(
-            partial(self.address_get_numbers, dialog, dialog.address_postal_code, portal_field_postal[0], False, False))
-        dialog.address_street.currentIndexChanged.connect(
-            partial(self.address_get_numbers, dialog, dialog.address_street, self.params['portal_field_code'], True))
-        dialog.address_number.activated.connect(partial(self.address_zoom_portal, dialog))
-
-
-    def address_zoom_portal(self, dialog):
-        """ Show street data on the canvas when selected street and number in street tab """
-
-        # Get selected street
-        street = utils_giswater.getWidgetText(dialog, dialog.address_street)
-        civic = utils_giswater.getWidgetText(dialog, dialog.address_number)
-        if street == 'null' or civic == 'null':
-            return
-
-            # Get selected portal
-        elem = dialog.address_number.itemData(dialog.address_number.currentIndex())
-        if not elem:
-            # that means that user has edited manually the combo but the element
-            # does not correspond to any combo element
-            message = "Element does not exist"
-            self.controller.show_warning(message, parameter=civic)
-            return
-
-        # select this feature in order to copy to memory layer
-        aux = (f"{self.params['portal_field_code']} = '{elem[0]}'"
-               f" AND {self.params['portal_field_number']} = '{elem[1]}'")
-        expr = QgsExpression(aux)
-        if expr.hasParserError():
-            message = expr.parserErrorString()
-            self.controller.show_warning(message, parameter=aux)
-            return
-
-            # Get a featureIterator from an expression
-        # Build a list of feature Ids from the previous result
-        # Select featureswith the ids obtained
-        layer = self.layers['portal_layer']
-        it = self.layers['portal_layer'].getFeatures(QgsFeatureRequest(expr))
-        ids = [i.id() for i in it]
-        layer.selectByIds(ids)
-
-        # Zoom to selected feature of the layer
-        self.zoom_to_selected_features(self.layers['portal_layer'], 'node')
-
-
     def mincut_composer(self):
         """ Open Composer """
+
         # Check if path exist
         template_folder = ""
-        row = self.controller.get_config('qgis_composers_path')
+        row = self.controller.get_config('qgis_composers_folderpath')
         if row:
             template_folder = row[0]
 
@@ -2418,6 +2077,7 @@ class MincutParent(ParentAction):
             message = "Your composer's path is bad configured. Please, modify it and try again."
             self.controller.show_message(message, 1)
             return
+
         # Set dialog add_connec
         self.dlg_comp = MincutComposer()
         self.load_settings(self.dlg_comp)
@@ -2436,7 +2096,7 @@ class MincutParent(ParentAction):
         self.dlg_comp.cbx_template.currentIndexChanged.connect(self.set_template)
         
         # Open dialog
-        self.open_dialog(self.dlg_comp)
+        self.open_dialog(self.dlg_comp, dlg_name='mincut_composer')
 
 
     def set_template(self):
@@ -2455,9 +2115,9 @@ class MincutParent(ParentAction):
 
         # Check if template file exists
         template_path = ""
-        row = self.controller.get_config('qgis_composers_path')
+        row = self.controller.get_config('qgis_composers_folderpath')
         if row:
-            template_path = row[0]+ f'{os.sep}{self.template}.qpt'
+            template_path = row[0] + f'{os.sep}{self.template}.qpt'
 
         if not os.path.exists(template_path):
             message = "File not found"
@@ -2502,9 +2162,8 @@ class MincutParent(ParentAction):
         title = self.dlg_comp.title.text()
         try:
             rotation = float(self.dlg_comp.rotation.text())
-        except ValueError as e:
+        except ValueError:
             rotation = 0
-
 
         # Show layout
         self.iface.openLayoutDesigner(layout)
@@ -2529,11 +2188,11 @@ class MincutParent(ParentAction):
         if state == '0':
             
             self.dlg_mincut.work_order.setDisabled(False)
-            # Group Location
-            self.dlg_mincut.address_exploitation.setDisabled(False)
-            self.dlg_mincut.address_postal_code.setDisabled(False)
-            self.dlg_mincut.address_street.setDisabled(False)
-            self.dlg_mincut.address_number.setDisabled(False)
+            # Group
+
+            self.dlg_mincut.address_add_muni.setDisabled(False)
+            self.dlg_mincut.address_add_street.setDisabled(False)
+            self.dlg_mincut.address_add_postnumber.setDisabled(False)
             # Group Details
             self.dlg_mincut.type.setDisabled(False)
             self.dlg_mincut.cause.setDisabled(False)
@@ -2568,10 +2227,9 @@ class MincutParent(ParentAction):
             
             self.dlg_mincut.work_order.setDisabled(True)
             # Group Location            
-            self.dlg_mincut.address_exploitation.setDisabled(True)
-            self.dlg_mincut.address_postal_code.setDisabled(True)
-            self.dlg_mincut.address_street.setDisabled(True)
-            self.dlg_mincut.address_number.setDisabled(True)
+            self.dlg_mincut.address_add_muni.setDisabled(True)
+            self.dlg_mincut.address_add_street.setDisabled(True)
+            self.dlg_mincut.address_add_postnumber.setDisabled(True)
             # Group Details
             self.dlg_mincut.type.setDisabled(True)
             self.dlg_mincut.cause.setDisabled(True)
@@ -2606,10 +2264,9 @@ class MincutParent(ParentAction):
             
             self.dlg_mincut.work_order.setDisabled(True)
             # Group Location  
-            self.dlg_mincut.address_exploitation.setDisabled(True)
-            self.dlg_mincut.address_postal_code.setDisabled(True)
-            self.dlg_mincut.address_street.setDisabled(True)
-            self.dlg_mincut.address_number.setDisabled(True)
+            self.dlg_mincut.address_add_muni.setDisabled(True)
+            self.dlg_mincut.address_add_street.setDisabled(True)
+            self.dlg_mincut.address_add_postnumber.setDisabled(True)
             # Group Details
             self.dlg_mincut.type.setDisabled(True)
             self.dlg_mincut.cause.setDisabled(True)

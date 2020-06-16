@@ -7,7 +7,7 @@ or (at your option) any later version.
 # -*- coding: latin-1 -*-
 from qgis.gui import QgsDateTimeEdit
 from qgis.PyQt.QtCore import QDate
-from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QDateEdit, QDoubleSpinBox, QGroupBox, QSpacerItem, QSizePolicy
+from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QDateEdit, QDoubleSpinBox, QSpinBox, QGroupBox, QSpacerItem, QSizePolicy
 from qgis.PyQt.QtWidgets import QGridLayout, QWidget, QLabel, QTextEdit, QLineEdit
 
 import json
@@ -34,8 +34,9 @@ class ApiConfig(ApiParent):
         """ Button 99: Dynamic config form """
 
         # Remove layers name from temp_table
-        sql = "DELETE FROM temp_table WHERE fprocesscat_id = '63' AND user_name = current_user;"
+        sql = "DELETE FROM temp_table WHERE fid = 163 AND cur_user = current_user;"
         self.controller.execute_sql(sql)
+
         # Set layers name in temp_table
         self.set_layers_name()
 
@@ -45,8 +46,9 @@ class ApiConfig(ApiParent):
 
         self.list_update = []
         body = self.create_body(form='"formName":"config"')
-        complet_list = self.controller.get_json('gw_api_getconfig', body, log_sql=True)
-        if not complet_list: return False
+        json_result = self.controller.get_json('gw_fct_getconfig', body)
+        if not json_result:
+            return False
 
         self.dlg_config = ConfigUi()
         self.load_settings(self.dlg_config)
@@ -122,8 +124,8 @@ class ApiConfig(ApiParent):
         self.addfields_form = QGridLayout()
 
         # Construct form for config and admin
-        self.construct_form_param_user(complet_list['body']['form']['formTabs'], 0)
-        self.construct_form_param_system(complet_list['body']['form']['formTabs'], 1)
+        self.construct_form_param_user(json_result['body']['form']['formTabs'], 0)
+        self.construct_form_param_system(json_result['body']['form']['formTabs'], 1)
 
         groupBox_1.setLayout(self.basic_form)
         groupBox_2.setLayout(self.om_form)
@@ -192,7 +194,7 @@ class ApiConfig(ApiParent):
         addfields_layout1.addItem(verticalSpacer1)
 
         # Event on change from combo parent
-        self.get_event_combo_parent(complet_list['body']['form']['formTabs'])
+        self.get_event_combo_parent(json_result['body']['form']['formTabs'])
 
         # Set signals Combo parent/child
         chk_expl = self.dlg_config.tab_main.findChild(QWidget, 'chk_exploitation_vdefault')
@@ -208,7 +210,6 @@ class ApiConfig(ApiParent):
 
         # Open form
         self.open_dialog(self.dlg_config, dlg_name='config')
-        
 
 
     def construct_form_param_user(self, row, pos):
@@ -250,7 +251,7 @@ class ApiConfig(ApiParent):
                     widget = chk
                     widget.stateChanged.connect(partial(self.get_values_changed_param_user, chk, chk, field))
                     widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-                elif field['widgettype'] == 'datepickertime':
+                elif field['widgettype'] == 'datetime':
                     widget = QgsDateTimeEdit()
                     widget.setAllowNull(True)
                     widget.setCalendarPopup(True)
@@ -351,7 +352,7 @@ class ApiConfig(ApiParent):
                         widget.setChecked(False)
                     widget.stateChanged.connect(partial(self.get_values_changed_param_system, widget))
                     widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-                elif field['widgettype'] == 'datepickertime':
+                elif field['widgettype'] == 'datetime':
                     widget = QDateEdit()
                     widget.setCalendarPopup(True)
                     if field['value']: field['value'] = field['value'].replace('/', '-')
@@ -360,7 +361,7 @@ class ApiConfig(ApiParent):
                     widget.dateChanged.connect(partial(self.get_values_changed_param_system, widget))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'spinbox':
-                    widget = QDoubleSpinBox()
+                    widget = QSpinBox()
                     if 'value' in field and field['value'] is not None:
                         value = float(str(field['value']))
                         widget.setValue(value)
@@ -406,8 +407,10 @@ class ApiConfig(ApiParent):
         combolist = []
         if 'comboIds' in field:
             for i in range(0, len(field['comboIds'])):
-                elem = [field['comboIds'][i], field['comboNames'][i]]
-                combolist.append(elem)
+                if field['comboIds'][i] is not None and field['comboNames'][i] is not None:
+                    elem = [field['comboIds'][i], field['comboNames'][i]]
+                    combolist.append(elem)
+                    
             records_sorted = sorted(combolist, key=operator.itemgetter(1))
             # Populate combo
             for record in records_sorted:
@@ -421,10 +424,10 @@ class ApiConfig(ApiParent):
 
         combo_parent = widget.objectName()
         combo_id = utils_giswater.get_item_data(self.dlg_config, widget)
-        # TODO cambiar por gw_api_getchilds
-        sql = f"SELECT gw_api_get_combochilds('config' ,'' ,'' ,'{combo_parent}', '{combo_id}','')"
+        # TODO cambiar por gw_fct_getchilds
+        sql = f"SELECT gw_fct_getcombochilds('config' ,'' ,'' ,'{combo_parent}', '{combo_id}','')"
         row = self.controller.get_row(sql, log_sql=True)
-        #TODO::Refactor input and output for function "gw_api_get_combochilds" and refactor "row[0]['fields']"
+        #TODO::Refactor input and output for function "gw_fct_getcombochilds" and refactor "row[0]['fields']"
         for combo_child in row[0]['fields']:
             if combo_child is not None:
                 self.populate_child(combo_child)
@@ -439,23 +442,23 @@ class ApiConfig(ApiParent):
 
     def order_widgets(self, field, form, lbl, chk, widget):
 
-        form.addWidget(lbl, field['layout_order'], 0)
+        form.addWidget(lbl, field['layoutorder'], 0)
         if field['widgettype'] != 'check':
-            form.addWidget(chk, field['layout_order'], 1)
-            form.addWidget(widget, field['layout_order'], 2)
+            form.addWidget(chk, field['layoutorder'], 1)
+            form.addWidget(widget, field['layoutorder'], 2)
         else:
-            form.addWidget(chk, field['layout_order'], 1)
+            form.addWidget(chk, field['layoutorder'], 1)
 
 
     def order_widgets_system(self, field, form, lbl,  widget):
 
-        form.addWidget(lbl, field['layout_order'], 0)
+        form.addWidget(lbl, field['layoutorder'], 0)
         if field['widgettype'] == 'checkbox' or field['widgettype'] == 'check':
-            form.addWidget(widget, field['layout_order'], 2)
+            form.addWidget(widget, field['layoutorder'], 2)
         elif field['widgettype'] != 'checkbox' and field['widgettype'] != 'check':
-            form.addWidget(widget, field['layout_order'], 3)
+            form.addWidget(widget, field['layoutorder'], 3)
         else:
-            form.addWidget(widget, field['layout_order'], 1)
+            form.addWidget(widget, field['layoutorder'], 1)
 
 
     def get_values_checked_param_user(self, chk, widget, field, value=None):
@@ -476,10 +479,10 @@ class ApiConfig(ApiParent):
             elem['widget_type'] = 'check'
         elif type(widget) is QDateEdit:
             value = utils_giswater.getCalendarDate(self.dlg_config, widget)
-            elem['widget_type'] = 'datepickertime'
+            elem['widget_type'] = 'datetime'
         elif type(widget) is QgsDateTimeEdit:
             value = utils_giswater.getCalendarDate(self.dlg_config, widget)
-            elem['widget_type'] = 'datepickertime'
+            elem['widget_type'] = 'datetime'
             
         elem['isChecked'] = str(utils_giswater.isChecked(self.dlg_config, chk))
         elem['value'] = value
@@ -535,8 +538,9 @@ class ApiConfig(ApiParent):
         my_json = json.dumps(self.list_update)
         extras = f'"fields":{my_json}'
         body = self.create_body(form='"formName":"config"', extras=extras)
-        result = self.controller.get_json('gw_api_setconfig', body, log_sql=True)
-        if not result: return False
+        json_result = self.controller.get_json('gw_fct_setconfig', body, log_sql=True)
+        if not json_result:
+            return False
 
         message = "Values has been updated"
         self.controller.show_info(message)
@@ -545,17 +549,20 @@ class ApiConfig(ApiParent):
 
 
     def check_child_to_parent(self, widget_child, widget_parent):
+
         if widget_child.isChecked():
             widget_parent.setChecked(True)
 
 
     def check_parent_to_child(self, widget_parent, widget_child):
+
         if not widget_parent.isChecked():
             widget_child.setChecked(False)
 
 
     def set_layers_name(self):
         """ Insert the name of all the TOC layers, then populate the cad_combo_layers """
+
         layers = self.iface.mapCanvas().layers()
         if not layers:
             return
@@ -567,5 +574,6 @@ class ApiConfig(ApiParent):
 
         result = layers_name[:-2] + '}", ' + tables_name[:-2] + '}"}'
 
-        sql = (f'INSERT INTO temp_table (fprocesscat_id, text_column, user_name) VALUES (63, $${result}$$, current_user);')
+        sql = f'INSERT INTO temp_table (fid, text_column, cur_user) VALUES (163, $${result}$$, current_user);'
         self.controller.execute_sql(sql, log_sql = True)
+

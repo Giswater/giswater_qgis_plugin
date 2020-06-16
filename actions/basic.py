@@ -5,104 +5,64 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+from qgis.core import QgsCategorizedSymbolRenderer, QgsRendererCategory, QgsSimpleFillSymbolLayer, QgsSymbol
+
 import os
+import random
 from functools import partial
 
-from .. import utils_giswater
-from ..ui_manager import Multirow_selector
+from ..ui_manager import SelectorUi
 from .api_search import ApiSearch
-from .parent import ParentAction
+from .api_parent import ApiParent
 
 
-class Basic(ParentAction):
+class Basic(ApiParent):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'basic' """
-        ParentAction.__init__(self, iface, settings, controller, plugin_dir)
+
+        ApiParent.__init__(self, iface, settings, controller, plugin_dir)
+        self.api_search = None
+
+
+    def set_giswater(self, giswater):
+        self.giswater = giswater
 
 
     def set_project_type(self, project_type):
         self.project_type = project_type
 
 
-    def basic_exploitation_selector(self):
-        """ Button 41: Explotation selector """
-                
-        self.dlg_expoitation = Multirow_selector('exploitation')
-        self.load_settings(self.dlg_expoitation)
+    def basic_filter_selectors(self):
+        """ Button 142: Filter selector """
 
-        self.dlg_expoitation.btn_ok.clicked.connect(partial(self.close_dialog, self.dlg_expoitation))
-        self.dlg_expoitation.rejected.connect(partial(self.close_dialog, self.dlg_expoitation))
-        self.dlg_expoitation.setWindowTitle("Explotation selector")
-        utils_giswater.setWidgetText(self.dlg_expoitation, self.dlg_expoitation.lbl_filter, self.controller.tr('Filter by: Exploitation name', context_name='labels'))
-        utils_giswater.setWidgetText(self.dlg_expoitation, self.dlg_expoitation.lbl_unselected, self.controller.tr('Unselected exploitations', context_name='labels'))
-        utils_giswater.setWidgetText(self.dlg_expoitation, self.dlg_expoitation.lbl_selected, self.controller.tr('Selected exploitations', context_name='labels'))
+        selector_values = (f'{{"exploitation": {{"ids":"None", "filter":""}}, "state":{{"ids":"None", "filter":""}}, '
+                           f'"hydrometer":{{"ids":"None", "filter":""}}}}')
 
-        tableleft = "exploitation"
-        tableright = "selector_expl"
-        field_id_left = "expl_id"
-        field_id_right = "expl_id"
-        schema_name = self.schema_name.replace('"', '')
-        query = ""
-        row = self.controller.get_config('sys_exploitation_x_user', 'value', 'config_param_system')
-        if row and row[0].lower() == 'true':
-            query = f" AND expl_id IN (SELECT expl_id FROM {schema_name}.exploitation_x_user WHERE username = current_user)"
-        query += f" AND expl_id != 0 AND active IS NOT FALSE"
+        # Show form in docker?
+        self.controller.init_docker('qgis_form_docker')
 
-        self.multi_row_selector(self.dlg_expoitation, tableleft, tableright, field_id_left, field_id_right, aql=query)
+        self.dlg_selector = SelectorUi()
+        self.load_settings(self.dlg_selector)
+        self.get_selector(self.dlg_selector, selector_values)
+        if self.controller.dlg_docker:
+            self.controller.dock_dialog(self.dlg_selector)
+            self.dlg_selector.btn_close.clicked.connect(self.controller.close_docker)
+        else:
+            self.dlg_selector.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_selector))
+            self.dlg_selector.rejected.connect(partial(self.save_settings, self.dlg_selector))
+            self.open_dialog(self.dlg_selector, dlg_name='selector', maximize_button=False)
 
-        # Open dialog
-        self.open_dialog(self.dlg_expoitation, maximize_button=False)
-
-
-    def basic_state_selector(self):
-        """ Button 48: State selector """
-            
-        # Create the dialog and signals
-        self.dlg_state = Multirow_selector('state')
-        self.load_settings(self.dlg_state)
-        self.dlg_state.btn_ok.clicked.connect(partial(self.close_dialog, self.dlg_state))
-        self.dlg_state.rejected.connect(partial(self.close_dialog, self.dlg_state))
-        self.dlg_state.txt_name.setVisible(False)
-        self.dlg_state.setWindowTitle("State selector")
-        utils_giswater.setWidgetText(self.dlg_state, self.dlg_state.lbl_unselected, self.controller.tr('Unselected states', context_name='labels'))
-        utils_giswater.setWidgetText(self.dlg_state, self.dlg_state.lbl_selected, self.controller.tr('Selected states', context_name='labels'))
-        tableleft = "value_state"
-        tableright = "selector_state"
-        field_id_left = "id"
-        field_id_right = "state_id"
-        self.multi_row_selector(self.dlg_state, tableleft, tableright, field_id_left, field_id_right)
-        
-        # Open dialog
-        self.open_dialog(self.dlg_state, maximize_button=False)
-
-
-    def basic_hydrometer_state_selector(self):
-        """ Button 86: Hydrometer selector """
-
-        # Create the dialog and signals
-        self.dlg_hydro_state = Multirow_selector('hydrometer')
-        self.load_settings(self.dlg_hydro_state)
-        self.dlg_hydro_state.btn_ok.clicked.connect(partial(self.close_dialog, self.dlg_hydro_state))
-        self.dlg_hydro_state.rejected.connect(partial(self.close_dialog, self.dlg_hydro_state))
-        self.dlg_hydro_state.txt_name.setVisible(False)
-        self.dlg_hydro_state.setWindowTitle("Hydrometer selector")
-        utils_giswater.setWidgetText(self.dlg_hydro_state, self.dlg_hydro_state.lbl_unselected, self.controller.tr('Unselected hydrometers', context_name='labels'))
-        utils_giswater.setWidgetText(self.dlg_hydro_state, self.dlg_hydro_state.lbl_selected, self.controller.tr('Selected hydrometers', context_name='labels'))
-        tableleft = "ext_rtc_hydrometer_state"
-        tableright = "selector_hydrometer"
-        field_id_left = "id"
-        field_id_right = "state_id"
-        self.multi_row_selector(self.dlg_hydro_state, tableleft, tableright, field_id_left, field_id_right)
-
-        # Open dialog
-        self.open_dialog(self.dlg_hydro_state, maximize_button=False)
+        # Repaint mapzones and refresh canvas
+        self.set_style_mapzones()
+        self.refresh_map_canvas()
 
 
     def basic_api_search(self):
-        """ Button 32: ApiSearch """
-        self.api_search = ApiSearch(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.api_search.api_search()
-     
+        """ Button 143: ApiSearch """
 
+        if self.api_search is None:
+            self.api_search = ApiSearch(self.iface, self.settings, self.controller, self.plugin_dir)
+
+        self.api_search.api_search()
 

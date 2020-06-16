@@ -19,8 +19,12 @@ from .parent import ParentAction
 class NotifyFunctions(ParentAction):
     # :var conn_failed: some times, when user click so fast 2 actions, LISTEN channel is stopped, and we need to
     #                   re-LISTEN all channels
+
+    # Notify cannot use 'iface', directly or indirectly or open dialogs
+
     conn_failed = False
     list_channels = None
+
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control notify from PostgresSql """
 
@@ -80,6 +84,7 @@ class NotifyFunctions(ParentAction):
 
 
     def wait_notifications(self):
+
         try:
             if self.conn_failed:
                 for channel_name in self.list_channels:
@@ -92,10 +97,10 @@ class NotifyFunctions(ParentAction):
             thread.start()
 
             # Check if any notification to process
-            conn = self.controller.dao.conn
-            conn.poll()
-            while conn.notifies:
-                notify = conn.notifies.pop()
+            dao = self.controller.dao
+            dao.get_poll()
+            while dao.conn.notifies:
+                notify = dao.conn.notifies.pop()
                 msg = f'<font color="blue"><bold>Got NOTIFY: </font>'
                 msg += f'<font color="black"><bold>{notify.pid}, {notify.channel}, {notify.payload} </font>'
                 self.controller.log_info(msg)
@@ -103,7 +108,7 @@ class NotifyFunctions(ParentAction):
                     try:
                         complet_result = json.loads(notify.payload, object_pairs_hook=OrderedDict)
                         self.execute_functions(complet_result)
-                    except Exception as e:
+                    except Exception:
                         pass
 
         except AttributeError:
@@ -133,6 +138,7 @@ class NotifyFunctions(ParentAction):
     def indexing_spatial_layer(self, **kwargs):
         """ Force reload dataProvider of layer """
         """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params) """
+
         # Get list of layer names
         layers_name_list = kwargs['tableName']
         if not layers_name_list:
@@ -162,18 +168,22 @@ class NotifyFunctions(ParentAction):
                 self.controller.log_info(msg)
                 continue
 
+            # get sys variale
+            self.qgis_project_infotype = self.controller.plugin_settings_value('infoType')
+
             feature = '"tableName":"' + str(layer_name) + '", "id":""'
-            body = self.create_body(feature=feature)
-            result = self.controller.get_json('gw_api_getinfofromid', body)
+            extras = f'"infoType":"{self.qgis_project_infotype}"'
+            body = self.create_body(feature=feature, extras=extras)
+            result = self.controller.get_json('gw_fct_getinfofromid', body, is_notify=True)
             if not result: continue
             for field in result['body']['data']['fields']:
                 _values = {}
                 # Get column index
-                fieldIndex = layer.fields().indexFromName(field['column_id'])
+                fieldIndex = layer.fields().indexFromName(field['columnname'])
 
                 # Hide selected fields according table config_api_form_fields.hidden
                 if 'hidden' in field:
-                    self.set_column_visibility(layer, field['column_id'], field['hidden'])
+                    self.set_column_visibility(layer, field['columnname'], field['hidden'])
                 # Set multiline fields according table config_api_form_fields.widgetcontrols['setQgisMultiline']
                 if field['widgetcontrols'] is not None and 'setQgisMultiline' in field['widgetcontrols']:
                     self.set_column_multiline(layer, field, fieldIndex)

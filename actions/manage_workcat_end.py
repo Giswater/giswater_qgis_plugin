@@ -15,8 +15,8 @@ from datetime import datetime
 
 from .. import utils_giswater
 from .parent_manage import ParentManage
-from ..ui_manager import WorkcatEnd, NewWorkcat
-from ..ui_manager import WorkcatEndList
+from ..ui_manager import FeatureEndUi, InfoWorkcatUi
+from ..ui_manager import FeatureEndConnecUi
 
 
 class ManageWorkcatEnd(ParentManage):
@@ -31,7 +31,7 @@ class ManageWorkcatEnd(ParentManage):
         self.remove_selection(True)
         
         # Create the dialog and signals
-        self.dlg_work_end = WorkcatEnd()
+        self.dlg_work_end = FeatureEndUi()
         self.load_settings(self.dlg_work_end)
         self.set_edit_arc_downgrade_force('True')
         
@@ -92,7 +92,7 @@ class ManageWorkcatEnd(ParentManage):
         self.tab_feature_changed(self.dlg_work_end, self.table_object, excluded_layers=["v_edit_element"])
 
         # Open dialog
-        self.open_dialog(self.dlg_work_end, maximize_button=False)
+        self.open_dialog(self.dlg_work_end, dlg_name='feature_end',maximize_button=False)
 
 
     def set_edit_arc_downgrade_force(self, value):
@@ -120,7 +120,7 @@ class ManageWorkcatEnd(ParentManage):
 
         if row:
             utils_giswater.set_combo_itemData(self.dlg_work_end.cmb_statetype_end, row[0], 0)
-        row = self.controller.get_config('enddate_vdefault')
+        row = self.controller.get_config('edit_enddate_vdefault')
 
         if row:
             enddate = self.manage_dates(row[0]).date()
@@ -133,7 +133,7 @@ class ManageWorkcatEnd(ParentManage):
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows, allow_nulls=False)
         utils_giswater.set_autocompleter(self.dlg_work_end.workcat_id_end)
-        row = self.controller.get_config('workcat_id_end_vdefault')
+        row = self.controller.get_config('edit_workcat_end_vdefault')
         if row:
             utils_giswater.setWidgetText(self.dlg_work_end, self.dlg_work_end.workcat_id_end, row[0])
 
@@ -211,7 +211,7 @@ class ManageWorkcatEnd(ParentManage):
             ids_list = None
 
         if row:
-            self.dlg_work = WorkcatEndList()
+            self.dlg_work = FeatureEndConnecUi()
             self.load_settings(self.dlg_work)
 
             self.dlg_work.btn_cancel.clicked.connect(partial(self.close_dialog_workcat_list, self.dlg_work))
@@ -235,7 +235,7 @@ class ManageWorkcatEnd(ParentManage):
             self.tbl_arc_x_relations.doubleClicked.connect(
                 partial(self.open_selected_object, self.tbl_arc_x_relations))
             
-            self.open_dialog(self.dlg_work)
+            self.open_dialog(self.dlg_work, dlg_name='feature_end_connec')
 
         # TODO: Function update_geom_type() don't use parameter ids_list
         else:
@@ -342,6 +342,7 @@ class ManageWorkcatEnd(ParentManage):
             self.controller.show_warning(message, parameter=expr.parserErrorString())
             return
 
+        id_list = None
         if layer_arc:
             # Get a featureIterator from this expression:
             it = layer_arc.getFeatures(QgsFeatureRequest(expr))
@@ -350,10 +351,11 @@ class ManageWorkcatEnd(ParentManage):
                 self.iface.openFeatureForm(layer_arc, id_list[0])
 
         # Zoom to object
-        canvas = self.iface.mapCanvas()
-        layer_arc.selectByIds([id_list[0].id()])
-        canvas.zoomToSelected(layer_arc)
-        canvas.zoomIn()
+        if id_list:
+            canvas = self.iface.mapCanvas()
+            layer_arc.selectByIds([id_list[0].id()])
+            canvas.zoomToSelected(layer_arc)
+            canvas.zoomIn()
 
 
     def exec_downgrade(self):
@@ -453,7 +455,7 @@ class ManageWorkcatEnd(ParentManage):
         if force_downgrade:
             sql = ("SELECT feature_type, feature_id, log_message "
                    "FROM audit_log_data "
-                   "WHERE  fprocesscat_id = '28' AND user_name = current_user")
+                   "WHERE  fid = 128 AND cur_user = current_user")
             rows = self.controller.get_rows(sql, log_sql=False)
             ids_ = ""
             if rows:
@@ -471,7 +473,7 @@ class ManageWorkcatEnd(ParentManage):
                     msg = 'These items could not be downgrade to state 0'
                     self.controller.show_info_box(msg, title="Warning", inf_text=str(ids_))
                 sql = ("DELETE FROM audit_log_data "
-                       "WHERE fprocesscat_id ='28' AND user_name = current_user")
+                       "WHERE fid = 128 AND cur_user = current_user")
                 self.controller.execute_sql(sql)
 
         self.canvas.refresh()
@@ -479,7 +481,7 @@ class ManageWorkcatEnd(ParentManage):
 
     def new_workcat(self):
 
-        self.dlg_new_workcat = NewWorkcat()
+        self.dlg_new_workcat = InfoWorkcatUi()
         self.load_settings(self.dlg_new_workcat)
 
         utils_giswater.setCalendarDate(self.dlg_new_workcat, self.dlg_new_workcat.builtdate, None, True)
@@ -491,7 +493,7 @@ class ManageWorkcatEnd(ParentManage):
         self.dlg_new_workcat.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_new_workcat))
 
         # Open dialog
-        self.open_dialog(self.dlg_new_workcat)
+        self.open_dialog(self.dlg_new_workcat, dlg_name='info_workcat')
 
 
     def manage_new_workcat_accept(self, table_object):

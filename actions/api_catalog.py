@@ -40,7 +40,7 @@ class ApiCatalog(ApiParent):
         form = f'"formName":"{form_name}", "tabName":"data", "editable":"TRUE"'
         feature = f'"feature_type":"{feature_type}"'
         body = self.create_body(form, feature)
-        sql = f"SELECT gw_api_getcatalog({body})::text"
+        sql = f"SELECT gw_fct_getcatalog({body})::text"
         row = self.controller.get_row(sql, log_sql=True)
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
@@ -61,11 +61,12 @@ class ApiCatalog(ApiParent):
             label = QLabel()
             label.setObjectName('lbl_' + field['label'])
             label.setText(field['label'].capitalize())
+            widget = None
             if field['widgettype'] == 'combo':
                 widget = self.add_combobox(self.dlg_catalog, field)
             if field['layoutname'] == 'lyt_data_1':
-                self.filter_form.addWidget(label, field['layout_order'], 0)
-                self.filter_form.addWidget(widget, field['layout_order'], 1)
+                self.filter_form.addWidget(label, field['layoutorder'], 0)
+                self.filter_form.addWidget(widget, field['layoutorder'], 1)
 
         groupBox_1.setLayout(self.filter_form)
         main_layout.addWidget(groupBox_1)
@@ -74,6 +75,8 @@ class ApiCatalog(ApiParent):
 
         matcat_id = self.dlg_catalog.findChild(QComboBox, 'matcat_id')
 
+        pnom = None
+        dnom = None
         if self.controller.get_project_type() == 'ws':
             pnom = self.dlg_catalog.findChild(QComboBox, 'pnom')
             dnom = self.dlg_catalog.findChild(QComboBox, 'dnom')
@@ -104,19 +107,25 @@ class ApiCatalog(ApiParent):
         form_name = 'upsert_catalog_' + geom_type + ''
         form = f'"formName":"{form_name}", "tabName":"data", "editable":"TRUE"'
         feature = f'"feature_type":"{feature_type}"'
+        extras = None
         if self.controller.get_project_type() == 'ws':
             extras = f'"fields":{{"matcat_id":"{matcat_id_value}", "pnom":"{pn_value}", "dnom":"{dn_value}"}}'
         elif self.controller.get_project_type() == 'ud':
             extras = f'"fields":{{"matcat_id":"{matcat_id_value}", "shape":"{pn_value}", "geom1":"{dn_value}"}}'
 
         body = self.create_body(form=form, feature=feature, extras=extras)
-        sql = f"SELECT gw_api_getcatalog({body})::text"
+        sql = f"SELECT gw_fct_getcatalog({body})::text"
         row = self.controller.get_row(sql, log_sql=True)
-        complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-        result = complet_list[0]['body']['data']
-        for field in result['fields']:
-            if field['column_id'] == 'id':
-                self.populate_combo(id,field)
+        complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+        if complet_result[0]['status'] == "Failed":
+            dialog.progressBar.setFormat(f"Function: {function_name} failed. See log file for more details")
+            self.controller.log_warning(complet_result[0])
+            return False
+        if complet_result[0]['status'] == "Accepted":
+            result = complet_result[0]['body']['data']
+            for field in result['fields']:
+                if field['columnname'] == 'id':
+                    self.populate_combo(id,field)
 
 
     def populate_pn_dn(self, matcat_id, pnom, dnom, feature_type, geom_type):
@@ -128,26 +137,27 @@ class ApiCatalog(ApiParent):
         feature = f'"feature_type":"{feature_type}"'
         extras = f'"fields":{{"matcat_id":"{matcat_id_value}"}}'
         body = self.create_body(form=form, feature=feature, extras=extras)
-        sql = f"SELECT gw_api_getcatalog({body})::text"
+        sql = f"SELECT gw_fct_getcatalog({body})::text"
         row = self.controller.get_row(sql, log_sql=True)
         complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
         result = complet_list[0]['body']['data']
         for field in result['fields']:
-            if field['column_id'] == 'pnom':
+            if field['columnname'] == 'pnom':
                 self.populate_combo(pnom,field)
-            elif field['column_id'] == 'dnom':
+            elif field['columnname'] == 'dnom':
                 self.populate_combo(dnom,field)
-            elif field['column_id'] == 'shape':
+            elif field['columnname'] == 'shape':
                 self.populate_combo(pnom, field)
-            elif field['column_id'] == 'geom1':
+            elif field['columnname'] == 'geom1':
                 self.populate_combo(dnom,field)
+
 
     def get_event_combo_parent(self, fields, row, geom_type):
 
         if fields == 'fields':
             for field in row["fields"]:
                 if field['isparent'] is True:
-                    widget = self.dlg_catalog.findChild(QComboBox, field['column_id'])
+                    widget = self.dlg_catalog.findChild(QComboBox, field['columnname'])
                     widget.currentIndexChanged.connect(partial(self.fill_child, widget, geom_type))
                     widget.currentIndexChanged.connect(partial(self.populate_catalog_id, geom_type))
 
@@ -156,8 +166,8 @@ class ApiCatalog(ApiParent):
 
         combo_parent = widget.objectName()
         combo_id = utils_giswater.get_item_data(self.dlg_catalog, widget)
-        # TODO cambiar por gw_api_getchilds
-        sql = f"SELECT gw_api_get_combochilds('catalog' ,'' ,'' ,'{combo_parent}', '{combo_id}','{geom_type}')"
+        # TODO cambiar por gw_fct_getchilds
+        sql = f"SELECT gw_fct_getcombochilds('catalog' ,'' ,'' ,'{combo_parent}', '{combo_id}','{geom_type}')"
         row = self.controller.get_row(sql, log_sql=True)
         for combo_child in row[0]['fields']:
             if combo_child is not None:
@@ -177,9 +187,11 @@ class ApiCatalog(ApiParent):
         pn_value = utils_giswater.getWidgetText(self.dlg_catalog, widget_pn)
         dn_value = utils_giswater.getWidgetText(self.dlg_catalog, widget_dn)
 
-        sql = f"SELECT gw_api_get_catalog_id('{metcat_value}','{pn_value}','{dn_value}','{geom_type}',9)"
-        row = self.controller.get_row(sql, log_sql=True)
-        self.populate_combo(widget_id, row[0]['catalog_id'][0])
+        exists = self.controller.check_function('gw_api_get_catalog_id')
+        if exists:
+            sql = f"SELECT gw_api_get_catalog_id('{metcat_value}', '{pn_value}', '{dn_value}', '{geom_type}', 9)"
+            row = self.controller.get_row(sql, log_sql=True)
+            self.populate_combo(widget_id, row[0]['catalog_id'][0])
 
 
     def populate_child(self, combo_child, result):
@@ -202,7 +214,7 @@ class ApiCatalog(ApiParent):
     def add_combobox(self, dialog, field):
 
         widget = QComboBox()
-        widget.setObjectName(field['column_id'])
+        widget.setObjectName(field['columnname'])
         widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         self.populate_combo(widget, field)
         if 'selectedId' in field:

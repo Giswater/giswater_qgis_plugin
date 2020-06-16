@@ -14,11 +14,10 @@ from functools import partial
 from .. import utils_giswater
 from .add_lot import AddNewLot
 from .manage_visit import ManageVisit
-# from .new_manage_visit import ManageVisit
 from .manage_new_psector import ManageNewPsector
 from .parent import ParentAction
 from .crm_trace import CrmTrace
-from ..ui_manager import Psector_management
+from ..ui_manager import PsectorManagerUi
 from ..ui_manager import SelectorDate
 
 
@@ -56,7 +55,7 @@ class Om(ParentAction):
     def om_psector_management(self):
         """ Button 82: Psector management """
 
-        self.dlg_psector_mng = Psector_management()
+        self.dlg_psector_mng = PsectorManagerUi()
         self.load_settings(self.dlg_psector_mng)
         table_name = "om_psector"
         column_id = "psector_id"
@@ -79,7 +78,7 @@ class Om(ParentAction):
 
         # Open form
         self.dlg_psector_mng.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.open_dialog(self.dlg_psector_mng, dlg_name="psector_management")
+        self.open_dialog(self.dlg_psector_mng, dlg_name="psector_manager")
 
 
     def charge_psector(self, qtbl_psm):
@@ -150,7 +149,7 @@ class Om(ParentAction):
 
         aux_widget = QLineEdit()
         aux_widget.setText(str(psector_id))
-        self.insert_or_update_config_param_curuser(dialog, aux_widget, "psector_vdefault", "config_param_user")
+        self.insert_or_update_config_param_curuser(dialog, aux_widget, "plan_psector_vdefault", "config_param_user")
         self.controller.execute_sql(sql)
         message = "Values has been updated"
         self.controller.show_info(message)
@@ -175,15 +174,15 @@ class Om(ParentAction):
                         exist_param = True
                 if exist_param:
                     sql = f"UPDATE {tablename} SET value="
-                    if widget.objectName() != 'state_vdefault':
+                    if widget.objectName() != 'edit_state_vdefault':
                         sql += f"'{utils_giswater.getWidgetText(dialog, widget)}' WHERE parameter='{parameter}'"
                     else:
                         sql += (f"(SELECT id FROM value_state"
                                 f" WHERE name = '{utils_giswater.getWidgetText(dialog, widget)}')"
-                                f" WHERE parameter = 'state_vdefault'")
+                                f" WHERE parameter = 'edit_state_vdefault'")
                 else:
                     sql = f"INSERT INTO {tablename} (parameter, value, cur_user)"
-                    if widget.objectName() != 'state_vdefault':
+                    if widget.objectName() != 'edit_state_vdefault':
                         sql += f" VALUES ('{parameter}', '{utils_giswater.getWidgetText(dialog, widget)}', current_user)"
                     else:
                         sql += (f" VALUES ('{parameter}',"

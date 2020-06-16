@@ -1,20 +1,8 @@
 """
-/***************************************************************************
-        begin                : 2016-01-05
-        copyright            : (C) 2016 by BGEO SL
-        email                : vicente.medina@gits.ws
-        git sha              : $Format:%H$
- ***************************************************************************/
-
-/***************************************************************************
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- ***************************************************************************/
-
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsProject
@@ -37,8 +25,10 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
         super(FlowTraceFlowExitMapTool, self).__init__(iface, settings, action, index_action)
 
         self.layers_added = []
-        
+
+
     def check_for_layers(self):
+
         self.needed_layers = {"v_anl_flow_node":{"field_cat":"context", "field_id":"id", "size":2, "color_values":{'Flow exit': QColor(235, 74, 117), 'Flow trace': QColor(235, 167, 48)}},
                               "v_anl_flow_gully":{"field_cat":"context", "field_id":"gully_id", "size":2, "color_values":{'Flow exit': QColor(235, 74, 117), 'Flow trace': QColor(235, 167, 48)}},
                               "v_anl_flow_connec":{"field_cat":"context", "field_id":"connec_id", "size":2,"color_values":{'Flow exit': QColor(235, 74, 117), 'Flow trace': QColor(235, 167, 48)}},
@@ -55,28 +45,20 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
                 self.controller.set_layer_visible(layer, False)
 
 
-
     """ QgsMapTools inherited event functions """
 
     def canvasMoveEvent(self, event):
-
+	
         # Hide marker and get coordinates
         self.vertex_marker.hide()
         event_point = self.snapper_manager.get_event_point(event)
 
-        # Snapping
-        self.current_layer = None
-        result = self.snapper_manager.snap_to_background_layers(event_point)
+        # Snapping	
+        result = self.snapper_manager.snap_to_current_layer(event_point)		
         if self.snapper_manager.result_is_valid():
-            layer = self.snapper_manager.get_snapped_layer(result)
-            # Check if feature belongs to 'node' group
-            exist = self.snapper_manager.check_node_group(layer)
-
-            if exist:
-                self.snapper_manager.add_marker(result, self.vertex_marker)
-                # Data for function
-                self.current_layer = layer
-                self.snapped_feat = self.snapper_manager.get_snapped_feature(result)
+            self.snapper_manager.add_marker(result, self.vertex_marker)
+            # Data for function
+            self.snapped_feat = self.snapper_manager.get_snapped_feature(result)
 
 
     def canvasReleaseEvent(self, event):
@@ -113,47 +95,12 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
             self.set_action_pan()
 
 
-    def select_features(self, elem_type):
- 
-        if self.index_action == '56':
-            tablename = f"anl_flow_{elem_type}"
-            where = " WHERE context = 'Flow trace'"
-        else:
-            tablename = f"anl_flow_{elem_type}"
-            where = " WHERE context = 'Flow exit'"
-            
-        sql = f"SELECT * FROM {tablename}"
-        sql = sql + where
-        sql += f" ORDER BY {elem_type}_id"
-        rows = self.controller.get_rows(sql)
-        if not rows:
-            return
-            
-        # Build an expression to select them
-        aux = f'"{elem_type}_id" IN ('
-        for row in rows:
-            aux += f"'{row[1]}', "
-        aux = aux[:-2] + ")"
-
-        # Get a featureIterator from this expression
-        expr = QgsExpression(aux)
-        if expr.hasParserError():
-            message = "Expression Error"
-            self.controller.show_warning(message, parameter=expr.parserErrorString())
-            return
-
-        # Select features with these id's
-        tablename = f'v_edit_{elem_type}'
-        layer = self.controller.get_layer_by_tablename(tablename)
-        if layer:
-            it = layer.getFeatures(QgsFeatureRequest(expr))
-            # Build a list of feature id's from the previous result
-            id_list = [i.id() for i in it]
-            # Select features with these id's
-            layer.selectByIds(id_list)
-
-
     def activate(self):
+	
+        # set active and current layer
+        self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
+        self.iface.setActiveLayer(self.layer_node)
+        self.current_layer = self.layer_node
 
         # Check button
         self.action().setChecked(True)
@@ -181,6 +128,7 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
                 message = "Select a node and click on it, the downstream nodes are computed"
             self.controller.show_info(message)
         self.check_for_layers()
+		
         # Control current layer (due to QGIS bug in snapping system)
         if self.canvas.currentLayer() is None:
             layer = self.controller.get_layer_by_tablename('v_edit_node')

@@ -17,7 +17,6 @@
 
 """
 # -*- coding: utf-8 -*-
-
 from qgis.core import QgsDataSourceUri, QgsExpression, QgsProject, QgsVectorLayer, QgsWkbTypes
 from qgis.gui import QgsMapTool, QgsVertexMarker, QgsRubberBand
 from qgis.PyQt.QtCore import Qt
@@ -28,9 +27,11 @@ import os
 import sys
 if 'nt' in sys.builtin_module_names:
     import ctypes
+
 from .. import utils_giswater
 from .snapping_utils_v3 import SnappingConfigManager
 from ..ui_manager import GwDialog, GwMainWindow
+
 
 class ParentMapTool(QgsMapTool):
 
@@ -122,6 +123,11 @@ class ParentMapTool(QgsMapTool):
         self.vertex_marker.hide()
 
 
+    def recover_previus_maptool(self):
+        if self.controller.prev_maptool:
+            self.iface.mapCanvas().setMapTool(self.controller.prev_maptool)
+            self.controller.prev_maptool = None
+
 
     def remove_vertex(self):
         """ Remove vertex_marker from canvas"""
@@ -198,8 +204,13 @@ class ParentMapTool(QgsMapTool):
         for layer_refresh in self.canvas.layers():
             layer_refresh.triggerRepaint()
 
+
     def open_dialog(self, dlg=None, dlg_name=None, info=True, maximize_button=True, stay_on_top=True):
         """ Open dialog """
+
+        # Check database connection before opening dialog
+        if not self.controller.check_db_connection():
+            return
 
         if dlg is None or type(dlg) is bool:
             dlg = self.dlg
@@ -229,7 +240,6 @@ class ParentMapTool(QgsMapTool):
         elif issubclass(type(dlg), GwMainWindow):
             dlg.show()
         else:
-            print(f"WARNING: dialog type {type(dlg)} is not handled!")
             dlg.show()
                     
 
@@ -347,7 +357,7 @@ class ParentMapTool(QgsMapTool):
     def create_body(self, form='', feature='', filter_fields='', extras=None):
         """ Create and return parameters as body to functions"""
 
-        client = f'$${{"client":{{"device":9, "infoType":100, "lang":"ES"}}, '
+        client = f'$${{"client":{{"device":4, "infoType":1, "lang":"ES"}}, '
         form = f'"form":{{{form}}}, '
         feature = '"feature":{' + feature + '}, '
         filter_fields = '"filterFields":{' + filter_fields + '}'
@@ -427,6 +437,4 @@ class ParentMapTool(QgsMapTool):
             qtabwidget.setCurrentIndex(tab_idx)
 
         return change_tab
-
-
 

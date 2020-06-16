@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>dlg_visit_event_full</class>
+ <widget class="QDialog" name="dlg_visit_event_full">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>393</width>
+    <height>631</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Event</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0" colspan="2">
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="tab_info">
+      <attribute name="title">
+       <string>Info</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="0" column="0">
+        <widget class="QLabel" name="lbl_id">
+         <property name="text">
+          <string>Id:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="id"/>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="lbl_event_code">
+         <property name="text">
+          <string>Event code:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLineEdit" name="event_code"/>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="lbl_visit_id">
+         <property name="text">
+          <string>Visit id:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QLineEdit" name="visit_id"/>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="lbl_position_id">
+         <property name="text">
+          <string>Position id:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QLineEdit" name="position_id"/>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="lbl_position_value">
+         <property name="text">
+          <string>Position value:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QLineEdit" name="position_value"/>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="lbl_parameter_id">
+         <property name="text">
+          <string>Parameter id:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="QLineEdit" name="parameter_id"/>
+       </item>
+       <item row="6" column="0">
+        <widget class="QLabel" name="lbl_value">
+         <property name="text">
+          <string>Value:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1">
+        <widget class="QLineEdit" name="value"/>
+       </item>
+       <item row="7" column="0">
+        <widget class="QLabel" name="lbl_value1">
+         <property name="text">
+          <string>Value1:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="1">
+        <widget class="QLineEdit" name="value1"/>
+       </item>
+       <item row="8" column="0">
+        <widget class="QLabel" name="lbl_value2">
+         <property name="text">
+          <string>Value2:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="1">
+        <widget class="QLineEdit" name="value2"/>
+       </item>
+       <item row="9" column="0">
+        <widget class="QLabel" name="lbl_geom1">
+         <property name="text">
+          <string>Geom1:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="1">
+        <widget class="QLineEdit" name="geom1"/>
+       </item>
+       <item row="10" column="0">
+        <widget class="QLabel" name="lbl_geom2">
+         <property name="text">
+          <string>Geom2:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="1">
+        <widget class="QLineEdit" name="geom2"/>
+       </item>
+       <item row="11" column="0">
+        <widget class="QLabel" name="lbl_geom3">
+         <property name="text">
+          <string>Geom3:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="1">
+        <widget class="QLineEdit" name="geom3"/>
+       </item>
+       <item row="12" column="0">
+        <widget class="QLabel" name="lbl_xcoord">
+         <property name="text">
+          <string>Xcoord:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="12" column="1">
+        <widget class="QLineEdit" name="xcoord"/>
+       </item>
+       <item row="13" column="0">
+        <widget class="QLabel" name="lbl_ycoord">
+         <property name="text">
+          <string>Ycoord:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="13" column="1">
+        <widget class="QLineEdit" name="ycoord"/>
+       </item>
+       <item row="14" column="0">
+        <widget class="QLabel" name="lbl_compass">
+         <property name="text">
+          <string>Compass:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="14" column="1">
+        <widget class="QLineEdit" name="compass"/>
+       </item>
+       <item row="15" column="0">
+        <widget class="QLabel" name="lbl_tstamp">
+         <property name="text">
+          <string>Tstamp:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="15" column="1">
+        <widget class="QLineEdit" name="tstamp"/>
+       </item>
+       <item row="16" column="0">
+        <widget class="QLabel" name="lbl_text">
+         <property name="text">
+          <string>Text:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="16" column="1">
+        <widget class="QTextEdit" name="text"/>
+       </item>
+       <item row="17" column="0">
+        <widget class="QLabel" name="lbl_index_val">
+         <property name="text">
+          <string>Index val:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="17" column="1">
+        <widget class="QLineEdit" name="index_val"/>
+       </item>
+       <item row="18" column="0">
+        <widget class="QLabel" name="lbl_is_last">
+         <property name="text">
+          <string>Is last:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="18" column="1">
+        <widget class="QLineEdit" name="is_last"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_files">
+      <attribute name="title">
+       <string>Files</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_3">
+       <item row="0" column="0">
+        <widget class="QLabel" name="lbl_files">
+         <property name="text">
+          <string>Files:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QTableView" name="tbl_docs_x_event">
+         <property name="sortingEnabled">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QPushButton" name="btn_close">
+     <property name="text">
+      <string>Close</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

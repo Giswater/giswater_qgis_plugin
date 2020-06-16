@@ -7,7 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 
 from qgis.core import QgsExpression
-from qgis.PyQt.QtCore import QStringListModel, Qt
+from qgis.PyQt.QtCore import QStringListModel, Qt,QDate
 from qgis.PyQt.QtGui import QCursor, QIcon, QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QApplication, QComboBox, QCompleter, QTableView
@@ -111,6 +111,10 @@ class TmParentAction(object):
     def open_dialog(self, dlg=None, dlg_name=None, info=True, maximize_button=True, stay_on_top=True):
         """ Open dialog """
 
+        # Check database connection before opening dialog
+        if not self.controller.check_db_connection():
+            return
+
         if dlg is None or type(dlg) is bool:
             dlg = self.dlg
 
@@ -139,7 +143,6 @@ class TmParentAction(object):
         elif issubclass(type(dlg), GwMainWindow):
             dlg.show()
         else:
-            print(f"WARNING: dialog type {type(dlg)} is not handled!")
             dlg.show()
 
 
@@ -197,9 +200,9 @@ class TmParentAction(object):
 
         # Set width and alias of visible columns
         columns_to_delete = []
-        sql = (f"SELECT column_index, width, alias, status"
-               f" FROM config_client_forms"
-               f" WHERE table_id = '{table_name}'")
+        sql = (f"SELECT columnindex, width, alias, status"
+               f" FROM config_form_tableview"
+               f" WHERE tablename = '{table_name}'")
         if project_type is not None:
             sql += f" AND project_type = '{project_type}' "
         sql += " ORDER BY column_index"
@@ -210,12 +213,12 @@ class TmParentAction(object):
 
         for row in rows:
             if not row['status']:
-                columns_to_delete.append(row['column_index'] - 1)
+                columns_to_delete.append(row['columnindex'] - 1)
             else:
                 width = row['width']
                 if width is not None:
-                    widget.setColumnWidth(row['column_index'] - 1, width)
-                widget.model().setHeaderData(row['column_index'] - 1, Qt.Horizontal, row['alias'])
+                    widget.setColumnWidth(row['columnindex'] - 1, width)
+                widget.model().setHeaderData(row['columnindex'] - 1, Qt.Horizontal, row['alias'])
 
         widget.model().select()
 
@@ -376,3 +379,38 @@ class TmParentAction(object):
         qtable.model().setData(i, elem[0])
         i = qtable.model().index(pos_x, col_update)
         qtable.model().setData(i, elem[0])
+
+
+    def create_body(self, form='', feature='', filter_fields='', extras=None):
+        """ Create and return parameters as body to functions"""
+
+        client = f'$${{"client":{{"device":4, "infoType":1, "lang":"ES"}}, '
+        form = '"form":{' + form + '}, '
+        feature = '"feature":{' + feature + '}, '
+        filter_fields = '"filterFields":{' + filter_fields + '}'
+        page_info = '"pageInfo":{}'
+        data = '"data":{' + filter_fields + ', ' + page_info
+        if extras is not None:
+            data += ', ' + extras
+        data += f'}}}}$$'
+        body = "" + client + form + feature + data
+
+        return body
+
+
+    def set_dates_from_to(self, widget_from, widget_to, table_name, field_from, field_to):
+
+        sql = ("SELECT MIN(LEAST("+field_from+", "+field_to+")),"
+               " MAX(GREATEST("+field_from+", "+field_to+"))"
+               " FROM "+table_name+"")
+        row = self.controller.get_row(sql, log_sql=False)
+        current_date = QDate.currentDate()
+        if row:
+            if row[0]:
+                widget_from.setDate(row[0])
+            else:
+                widget_from.setDate(current_date)
+            if row[1]:
+                widget_to.setDate(row[1])
+            else:
+                widget_to.setDate(current_date)

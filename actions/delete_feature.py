@@ -12,7 +12,7 @@ from functools import partial
 
 from .. import utils_giswater
 from .api_parent import ApiParent
-from ..ui_manager import DelFeature
+from ..ui_manager import FeatureDelete
 
 
 class DeleteFeature(ApiParent):
@@ -25,57 +25,58 @@ class DeleteFeature(ApiParent):
     def manage_delete_feature(self):
 
         # Create the dialog and signals
-        self.dlg_delete_feature = DelFeature()
-        self.load_settings(self.dlg_delete_feature)
+        self.dlg_feature_delete = FeatureDelete()
+        self.load_settings(self.dlg_feature_delete)
 
         # Populate combo feature type
         sql = 'SELECT DISTINCT(feature_type) AS id, feature_type AS idval FROM cat_feature'
         rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_delete_feature.feature_type, rows, 1)
+        utils_giswater.set_item_data(self.dlg_feature_delete.feature_type, rows, 1)
 
         # Set active layer
-        layer_name = 'v_edit_' + utils_giswater.getWidgetText(self.dlg_delete_feature,self.dlg_delete_feature.feature_type).lower()
+        layer_name = 'v_edit_' + utils_giswater.getWidgetText(self.dlg_feature_delete,self.dlg_feature_delete.feature_type).lower()
         layer = self.controller.get_layer_by_tablename(layer_name)
         self.iface.setActiveLayer(layer)
         self.controller.set_layer_visible(layer)
 
         # Disable button delete feature
-        self.dlg_delete_feature.btn_delete.setEnabled(False)
+        self.dlg_feature_delete.btn_delete.setEnabled(False)
 
         # Configure feature_id as typeahead
         completer = QCompleter()
         model = QStringListModel()
-        self.filter_typeahead(self.dlg_delete_feature.feature_id, completer, model)
+        self.filter_typeahead(self.dlg_feature_delete.feature_id, completer, model)
 
         # Set listeners
-        self.dlg_delete_feature.feature_id.textChanged.connect(partial(self.filter_typeahead, self.dlg_delete_feature.feature_id, completer, model))
+        self.dlg_feature_delete.feature_id.textChanged.connect(partial(self.filter_typeahead, self.dlg_feature_delete.feature_id, completer, model))
 
         # Set button snapping
-        self.dlg_delete_feature.btn_snapping.clicked.connect(partial(self.set_active_layer))
-        self.dlg_delete_feature.btn_snapping.clicked.connect(partial(self.selection_init, self.dlg_delete_feature))
-        self.set_icon(self.dlg_delete_feature.btn_snapping, "137")
+        self.dlg_feature_delete.btn_snapping.clicked.connect(partial(self.set_active_layer))
+        self.dlg_feature_delete.btn_snapping.clicked.connect(partial(self.selection_init, self.dlg_feature_delete))
+        self.set_icon(self.dlg_feature_delete.btn_snapping, "137")
 
         # Set listeners
-        self.dlg_delete_feature.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_delete_feature))
-        self.dlg_delete_feature.rejected.connect(self.disconnect_signal_selection_changed)
-        self.dlg_delete_feature.rejected.connect(partial(self.save_settings, self.dlg_delete_feature))
+        self.dlg_feature_delete.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_feature_delete))
+        self.dlg_feature_delete.rejected.connect(self.disconnect_signal_selection_changed)
+        self.dlg_feature_delete.rejected.connect(partial(self.save_settings, self.dlg_feature_delete))
 
-        self.dlg_delete_feature.btn_relations.clicked.connect(partial(self.show_feature_relation))
-        self.dlg_delete_feature.btn_delete.clicked.connect(partial(self.delete_feature_relation))
-        self.dlg_delete_feature.feature_type.currentIndexChanged.connect(partial(self.set_active_layer))
+        self.dlg_feature_delete.btn_relations.clicked.connect(partial(self.show_feature_relation))
+        self.dlg_feature_delete.btn_delete.clicked.connect(partial(self.delete_feature_relation))
+        self.dlg_feature_delete.feature_type.currentIndexChanged.connect(partial(self.set_active_layer))
 
         # Open dialog
-        self.open_dialog(self.dlg_delete_feature)
+        self.open_dialog(self.dlg_feature_delete, dlg_name='feature_delete')
 
 
     def filter_typeahead(self, widget, completer, model):
 
         # Get feature_type and feature_id
-        feature_type = utils_giswater.getWidgetText(self.dlg_delete_feature, self.dlg_delete_feature.feature_type)
-        feature_id = utils_giswater.getWidgetText(self.dlg_delete_feature, self.dlg_delete_feature.feature_id)
+        feature_type = utils_giswater.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_type)
+        feature_id = utils_giswater.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_id)
 
         # Get child layer
-        sql = f"SELECT array_agg({feature_type}_id) FROM {feature_type} WHERE {feature_type}_id LIKE '%{feature_id}%' LIMIT 10"
+        sql = (f"SELECT array_agg({feature_type}_id) FROM {feature_type} "
+               f"WHERE {feature_type}_id LIKE '%{feature_id}%' LIMIT 10")
         self.rows_typeahead = self.controller.get_rows(sql, log_sql=True)
         self.rows_typeahead = self.rows_typeahead[0][0]
 
@@ -89,13 +90,16 @@ class DeleteFeature(ApiParent):
     def show_feature_relation(self):
 
         # Get feature_type and feature_id
-        feature_type = utils_giswater.getWidgetText(self.dlg_delete_feature, self.dlg_delete_feature.feature_type)
-        feature_id = utils_giswater.getWidgetText(self.dlg_delete_feature, self.dlg_delete_feature.feature_id)
-
+        feature_type = utils_giswater.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_type)
+        feature_id = utils_giswater.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_id)
+        if feature_id in (None, "null"):
+            message = f"Select one"
+            self.controller.show_warning(message, parameter=feature_type)
+            return
         feature = '"type":"' + feature_type + '"'
         extras = '"feature_id":"' + feature_id + '"'
         body = self.create_body(feature=feature, extras=extras)
-        result = self.controller.get_json('gw_fct_get_feature_relation', body, log_sql=True)
+        result = self.controller.get_json('gw_fct_getfeaturerelation', body, log_sql=True)
         if not result: return
 
         # Construct message result
@@ -103,38 +107,39 @@ class DeleteFeature(ApiParent):
         for value in result['body']['data']['info']['values']:
             result_msg += value['message'] + '\n\n'
 
-        utils_giswater.setWidgetText(self.dlg_delete_feature, self.dlg_delete_feature.txt_info_relation, result_msg)
+        utils_giswater.setWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.txt_feature_infolog, result_msg)
 
         # Enable button delete feature
         if result_msg != '':
-            self.dlg_delete_feature.btn_delete.setEnabled(True)
+            self.dlg_feature_delete.btn_delete.setEnabled(True)
 
 
     def delete_feature_relation(self):
 
         # Get feature_type and feature_id
-        feature_type = utils_giswater.getWidgetText(self.dlg_delete_feature, self.dlg_delete_feature.feature_type)
-        feature_id = utils_giswater.getWidgetText(self.dlg_delete_feature, self.dlg_delete_feature.feature_id)
+        feature_type = utils_giswater.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_type)
+        feature_id = utils_giswater.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_id)
 
         feature = '"type":"' + feature_type + '"'
         extras = '"feature_id":"' + feature_id + '"'
         body = self.create_body(feature=feature, extras=extras)
-        complet_result = self.controller.get_json('gw_fct_set_delete_feature', body, log_sql=True)
+        complet_result = self.controller.get_json('gw_fct_feature_delete', body, log_sql=True)
         if not complet_result:
-            self.controller.show_message("Function gw_fct_set_delete_feature executed with no result ", 3)
+            self.controller.show_message("Function gw_fct_feature_delete executed with no result ", 3)
             return
 
         # Populate tab info
+        change_tab = False
         data = complet_result['body']['data']
         for k, v in list(data.items()):
             if str(k) == "info":
-                change_tab = self.add_layer.populate_info_text(self.dlg_delete_feature, data)
+                change_tab = self.add_layer.populate_info_text(self.dlg_feature_delete, data)
 
-        self.dlg_delete_feature.btn_cancel.setText('Accept')
+        self.dlg_feature_delete.btn_cancel.setText('Accept')
 
         # Close dialog
         if not change_tab:
-            self.close_dialog(self.dlg_delete_feature)
+            self.close_dialog(self.dlg_feature_delete)
 
 
     def selection_init(self, dialog):
@@ -158,19 +163,22 @@ class DeleteFeature(ApiParent):
         """ Slot function for signal 'canvas.selectionChanged' """
 
         # Get feature_type and feature_id
-        feature_type = utils_giswater.getWidgetText(self.dlg_delete_feature, self.dlg_delete_feature.feature_type).lower()
+        feature_type = utils_giswater.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
         layer_name = 'v_edit_' + feature_type
         layer = self.controller.get_layer_by_tablename(layer_name)
         field_id = feature_type + "_id"
 
         # Iterate over layer
         if layer.selectedFeatureCount() > 0:
+            selected_id = None
             # Get selected features of the layer
             features = layer.selectedFeatures()
             for feature in features:
                 # Append 'feature_id' into the list
                 selected_id = feature.attribute(field_id)
-            utils_giswater.setWidgetText(self.dlg_delete_feature, self.dlg_delete_feature.feature_id, str(selected_id))
+
+            if selected_id:
+                utils_giswater.setWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_id, str(selected_id))
 
 
     def set_active_layer(self):
@@ -180,11 +188,11 @@ class DeleteFeature(ApiParent):
         self.current_layer.removeSelection()
 
         # Set active layer
-        layer_name = 'v_edit_' + utils_giswater.getWidgetText(self.dlg_delete_feature,self.dlg_delete_feature.feature_type).lower()
+        layer_name = 'v_edit_' + utils_giswater.getWidgetText(self.dlg_feature_delete,self.dlg_feature_delete.feature_type).lower()
         layer = self.controller.get_layer_by_tablename(layer_name)
         self.iface.setActiveLayer(layer)
         self.controller.set_layer_visible(layer)
 
         # Clear feature id field
-        utils_giswater.setWidgetText(self.dlg_delete_feature, self.dlg_delete_feature.feature_id, '')
+        utils_giswater.setWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_id, '')
 

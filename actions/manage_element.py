@@ -5,13 +5,13 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from functools import partial
-
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView
+
+from functools import partial
 
 from .. import utils_giswater
 from ..ui_manager import ElementUi
-from ..ui_manager import ElementManagement
+from ..ui_manager import ElementManager
 from .parent_manage import ParentManage
 
 
@@ -63,9 +63,6 @@ class ManageElement(ParentManage):
         if feature:
             layer = self.iface.activeLayer()
             layer.selectByIds([feature.id()])
-        # TODO pending translation
-        # Manage i18n of the form
-        # self.controller.translate_form(self.dlg, 'element')
 
         utils_giswater.set_regexp_date_validator(self.dlg_add_element.builtdate, self.dlg_add_element.btn_accept, 1)
 
@@ -132,7 +129,6 @@ class ManageElement(ParentManage):
         if rows:
             utils_giswater.set_combo_itemData(self.dlg_add_element.location_type, rows[0][0], 0)
 
-
         sql = "SELECT DISTINCT(id), id FROM cat_owner"
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_add_element.ownercat_id, rows, 1, add_empty=True)
@@ -149,46 +145,22 @@ class ManageElement(ParentManage):
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_add_element.workcat_id_end, rows, 1, add_empty=True)
 
-        sql = "SELECT DISTINCT(id), id FROM value_verified"
+        sql = "SELECT id, idval FROM edit_typevalue WHERE typevalue = 'value_verified'"
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_add_element.verified, rows, 1, add_empty=True)
         self.filter_elementcat_id()
 
         if self.new_element_id:
+
             # Set default values
-            elementtype_vdef = self.controller.get_config('elementcat_vdefault')[0]
-            utils_giswater.set_combo_itemData(self.dlg_add_element.element_type, elementtype_vdef, 0)
-
-            elementcat_vdef = self.controller.get_config('elementcat_vdefault')[0]
-            utils_giswater.set_combo_itemData(self.dlg_add_element.elementcat_id, elementcat_vdef, 0)
-
-            state_vdef = self.controller.get_config('state_vdefault')[0]
-            utils_giswater.set_combo_itemData(self.dlg_add_element.state, state_vdef, 0)
-
-            statetype_vdef = self.controller.get_config('statetype_1_vdefault')[0]
-            utils_giswater.set_combo_itemData(self.dlg_add_element.state_type, statetype_vdef, 0)
-
-            owner_vdef = self.controller.get_config('ownercat_vdefault')[0]
-            utils_giswater.set_combo_itemData(self.dlg_add_element.ownercat_id, owner_vdef, 0)
-
-            builtdate_vdef = self.controller.get_config('builtdate_vdefault')[0]
-            utils_giswater.setWidgetText(self.dlg_add_element, self.dlg_add_element.builtdate, builtdate_vdef)
-
-            workcat_vdef = self.controller.get_config('workcat_vdefault')[0]
-            utils_giswater.set_combo_itemData(self.dlg_add_element.workcat_id, workcat_vdef, 0)
-
-            workcatend_vdef = self.controller.get_config('workcat_id_end_vdefault')[0]
-            utils_giswater.set_combo_itemData(self.dlg_add_element.workcat_id_end, workcatend_vdef, 0)
-
-            verified_vdef = self.controller.get_config('verified_vdefault')[0]
-            utils_giswater.set_combo_itemData(self.dlg_add_element.verified, verified_vdef, 0)
-
+            self.set_default_values()
 
         # Adding auto-completion to a QLineEdit for default feature
         self.set_completer_feature_id(self.dlg_add_element.feature_id, "arc", "v_edit_arc")
 
         if feature:
-            self.dlg_add_element.tabWidget.currentChanged.connect(partial(self.fill_tbl_new_element, self.dlg_add_element, geom_type, feature[geom_type+"_id"]))
+            self.dlg_add_element.tabWidget.currentChanged.connect(partial(self.fill_tbl_new_element,
+                self.dlg_add_element, geom_type, feature[geom_type+"_id"]))
 
         # Set default tab 'arc'
         self.dlg_add_element.tab_feature.setCurrentIndex(0)
@@ -212,7 +184,29 @@ class ManageElement(ParentManage):
         return self.dlg_add_element
 
 
+    def set_default_values(self):
+        """ Set default values """
+
+        self.manage_combo(self.dlg_add_element.element_type, 'elementcat_vdefault')
+        self.manage_combo(self.dlg_add_element.elementcat_id, 'elementcat_vdefault')
+        self.manage_combo(self.dlg_add_element.state, 'state_vdefault')
+        self.manage_combo(self.dlg_add_element.state_type, 'statetype_1_vdefault')
+        self.manage_combo(self.dlg_add_element.ownercat_id, 'ownercat_vdefault')
+        self.manage_combo(self.dlg_add_element.builtdate, 'builtdate_vdefault')
+        self.manage_combo(self.dlg_add_element.workcat_id, 'workcat_vdefault')
+        self.manage_combo(self.dlg_add_element.workcat_id_end, 'workcat_id_end_vdefault')
+        self.manage_combo(self.dlg_add_element.verified, 'verified_vdefault')
+
+
+    def manage_combo(self, combo, parameter):
+
+        row = self.controller.get_config(parameter)
+        if row:
+            utils_giswater.set_combo_itemData(combo, row[0], 0)
+
+
     def filter_state_type(self):
+
         state = utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.state, 0)
         sql = (f"SELECT DISTINCT(id), name FROM value_state_type "
                f"WHERE state = {state}")
@@ -297,7 +291,6 @@ class ManageElement(ParentManage):
                f" WHERE element_id = '{element_id}'")
         row = self.controller.get_row(sql, log_info=False)
 
-        
         if row is None:
             # If object not exist perform an INSERT
             if element_id == '':
@@ -356,7 +349,7 @@ class ManageElement(ParentManage):
                 sql_values += ", null"
             if element_id == '':
                 sql += sql_values + ") RETURNING element_id;"
-                new_elem_id = self.controller.execute_returning(sql, search_audit=False, log_sql=True)
+                new_elem_id = self.controller.execute_returning(sql, log_sql=True)
                 sql_values = ""
                 sql = ""
                 element_id = str(new_elem_id[0])
@@ -437,14 +430,11 @@ class ManageElement(ParentManage):
         if status:
             self.element_id = element_id
             self.manage_close(self.dlg_add_element, table_object, excluded_layers=[])
-            # TODO Reload table tbl_element
-            # filter_ = "node_id = '" + str(feature_id) + "'"
-            # table_element = "v_ui_element_x_node"
-            # self.set_model_to_table(self.tbl_element, table_element, filter_)
 
 
     def filter_elementcat_id(self):
         """ Filter QComboBox @elementcat_id according QComboBox @elementtype_id """
+
         element_type = utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.element_type, 1)
         sql = (f"SELECT DISTINCT(id), id FROM cat_element"
                f" WHERE elementtype_id = '{element_type}'"
@@ -453,12 +443,11 @@ class ManageElement(ParentManage):
         utils_giswater.set_item_data(self.dlg_add_element.elementcat_id, rows, 1)
 
 
-
     def edit_element(self):
         """ Button 67: Edit element """          
         
         # Create the dialog
-        self.dlg_man = ElementManagement()
+        self.dlg_man = ElementManager()
         self.load_settings(self.dlg_man)
         self.dlg_man.tbl_element.setSelectionBehavior(QAbstractItemView.SelectRows)
                 
@@ -470,14 +459,17 @@ class ManageElement(ParentManage):
         self.fill_table_object(self.dlg_man.tbl_element, self.schema_name + "." + table_object)                
         self.set_table_columns(self.dlg_man, self.dlg_man.tbl_element, table_object)
         
-        # Set dignals
-        self.dlg_man.element_id.textChanged.connect(partial(self.filter_by_id,  self.dlg_man, self.dlg_man.tbl_element, self.dlg_man.element_id, table_object))
-        self.dlg_man.tbl_element.doubleClicked.connect(partial(self.open_selected_object, self.dlg_man, self.dlg_man.tbl_element, table_object))
+        # Set signals
+        self.dlg_man.element_id.textChanged.connect(partial(self.filter_by_id, self.dlg_man, self.dlg_man.tbl_element,
+            self.dlg_man.element_id, table_object))
+        self.dlg_man.tbl_element.doubleClicked.connect(partial(self.open_selected_object, self.dlg_man,
+            self.dlg_man.tbl_element, table_object))
         self.dlg_man.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_man))
         self.dlg_man.rejected.connect(partial(self.close_dialog, self.dlg_man))
-        self.dlg_man.btn_delete.clicked.connect(partial(self.delete_selected_object, self.dlg_man.tbl_element, table_object))
+        self.dlg_man.btn_delete.clicked.connect(partial(self.delete_selected_object, self.dlg_man.tbl_element,
+            table_object))
                                         
         # Open form
-        self.open_dialog(self.dlg_man)             
+        self.open_dialog(self.dlg_man, dlg_name='element_manager')
         
         

@@ -6,13 +6,11 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.core import QgsPointXY
-from qgis.PyQt.QtCore import QStringListModel
-
-from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtCore import QStringListModel, Qt
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtWidgets import QAbstractItemView, QComboBox, QCompleter, QFileDialog, QGridLayout, QHeaderView, QLabel, QLineEdit
-from qgis.PyQt.QtWidgets import QSizePolicy, QSpacerItem, QTableView, QTabWidget, QWidget
+from qgis.PyQt.QtWidgets import QAbstractItemView, QComboBox, QCompleter, QFileDialog, QGridLayout, QHeaderView, \
+    QLabel, QLineEdit, QSizePolicy, QSpacerItem, QTableView, QTabWidget, QWidget
 
 import csv
 import json
@@ -29,7 +27,7 @@ from .manage_document import ManageDocument
 from .manage_new_psector import ManageNewPsector
 from .manage_visit import ManageVisit
 from .api_parent import ApiParent
-from ..ui_manager import SearchUi, ApiBasicInfo, ListItems
+from ..ui_manager import SearchUi, InfoGenericUi, SearchWorkcat
 
 
 class ApiSearch(ApiParent):
@@ -44,26 +42,51 @@ class ApiSearch(ApiParent):
         self.project_type = controller.get_project_type()
         self.json_search = {}
         self.lbl_visible = False
+        self.dlg_search = None
+        self.is_mincut = False
 
 
-    def api_search(self):
-        
-        # Dialog
+    def init_dialog(self):
+        """ Initialize dialog. Make it dockable in left dock widget area """
+
         self.dlg_search = SearchUi()
         self.load_settings(self.dlg_search)
+        self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dlg_search)
+        self.dlg_search.dlg_closed.connect(self.reset_rubber_polygon)
+        self.dlg_search.dlg_closed.connect(self.close_search)
+
+
+    def api_search(self, dlg_mincut=None):
+        form = ""
+        if self.dlg_search is None and dlg_mincut is None:
+            self.init_dialog()
+        if dlg_mincut:
+            self.dlg_search = dlg_mincut
+            self.is_mincut = True
+            form = f'"singleTab":"tab_address"'
+
         self.dlg_search.lbl_msg.setStyleSheet("QLabel{color:red;}")
         self.dlg_search.lbl_msg.setVisible(False)
+        qgis_project_add_schema = self.controller.plugin_settings_value('gwAddSchema')
+        self.controller.set_user_settings_value('open_search', 'true')
 
-        # Make it dockable in left dock widget area
-        self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dlg_search)
-
-        body = self.create_body()
-        function_name = "gw_api_getsearch"
+        if qgis_project_add_schema is None:
+            body = self.create_body(form=form)
+        else:
+            extras = f'"addSchema":"{qgis_project_add_schema}"'
+            body = self.create_body(form=form, extras=extras)
+        function_name = "gw_fct_getsearch"
         complet_list = self.controller.get_json(function_name, body)
         if not complet_list:
             return False
 
         main_tab = self.dlg_search.findChild(QTabWidget, 'main_tab')
+        if dlg_mincut:
+            main_tab = self.dlg_search.findChild(QTabWidget, 'main_tab')
+            main_tab.setStyleSheet("background-color: #f0f0f0;")
+            main_tab.setStyleSheet("QTabBar::tab { background-color: transparent; text-align:left;"
+                                   "border: 1px solid transparent;}")
+
         first_tab = None
         self.lineedit_list = []
         for tab in complet_list["form"]:
@@ -80,6 +103,7 @@ class ApiSearch(ApiParent):
                 label = QLabel()
                 label.setObjectName('lbl_' + field['label'])
                 label.setText(field['label'].capitalize())
+                widget = None
                 if field['widgettype'] == 'typeahead':
                     completer = QCompleter()
                     widget = self.add_lineedit(field)
@@ -87,16 +111,26 @@ class ApiSearch(ApiParent):
                     self.lineedit_list.append(widget)
                 elif field['widgettype'] == 'combo':
                     widget = self.add_combobox(field)
-
                 gridlayout.addWidget(label, x, 0)
                 gridlayout.addWidget(widget, x, 1)
                 x += 1
 
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
             gridlayout.addItem(vertical_spacer1)
+        if self.is_mincut is False:
+            self.controller.manage_translation('search', self.dlg_search)
 
-        self.dlg_search.dlg_closed.connect(self.rubber_polygon.reset)
-        self.controller.manage_translation('search', self.dlg_search)
+
+    def reset_rubber_polygon(self):
+
+        if self.rubber_polygon:
+            self.rubber_polygon.reset()
+
+
+    def close_search(self):
+
+        self.dlg_search = None
+        self.controller.set_user_settings_value('open_search', 'false')
 
 
     def set_typeahead_completer(self, widget, completer=None):
@@ -115,6 +149,7 @@ class ApiSearch(ApiParent):
 
         # We look for the index of current tab so we can search by name
         index = self.dlg_search.main_tab.currentIndex()
+
         # Get all QLineEdit for activate or we cant write when tab have more than 1 QLineEdit
         line_list = self.dlg_search.main_tab.widget(index).findChildren(QLineEdit)
         for line_edit in line_list:
@@ -128,37 +163,38 @@ class ApiSearch(ApiParent):
 
         # Get text from selected row
         _key = completer.completionModel().index(row, 0).data()
-        # Search text into self.result_data
-        # (this variable contains all the matching objects in the function "make_list())"
+        # Search text into self.result_data: this variable contains all matching objects in the function "make_list()"
         item = None
         for data in self.result_data['data']:
             if _key == data['display_name']:
                 item = data
                 break
 
-        # IF for zoom to tab network
-        if self.dlg_search.main_tab.widget(index).objectName() == 'network':
-            # layer = self.controller.get_layer_by_tablename(item['sys_table_id'])
-            # if layer is None:
-            #     msg = "Layer not found"
-            #     self.controller.show_message(msg, message_level=2, duration=3)
-            #     return
-            #
-            # self.iface.setActiveLayer(layer)
+        # Show info in docker?
+        if self.is_mincut is False:
+            self.controller.init_docker()
+
+        # Get selected tab name
+        tab_selected = self.dlg_search.main_tab.widget(index).objectName()
+
+        # Tab 'network'
+        if tab_selected == 'network':
+            self.controller.log_info("network")
             self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, tab_type='data')
-            complet_result, dialog = self.ApiCF.open_form(table_name=item['sys_table_id'], feature_id=item['sys_id'], tab_type='data')
+            complet_result, dialog = self.ApiCF.open_form(table_name=item['sys_table_id'], feature_id=item['sys_id'],
+                                                          tab_type='data')
             if not complet_result:
-                print("FAIL")
                 return
             self.draw(complet_result)
             self.resetRubberbands()
 
-        elif self.dlg_search.main_tab.widget(index).objectName() == 'search':
+        # Tab 'search'
+        elif tab_selected == 'search':
             # TODO
             return
 
-        # IF for zoom to tab address (streets)
-        elif self.dlg_search.main_tab.widget(index).objectName() == 'address' and 'id' in item and 'sys_id' not in item:
+        # Tab 'address' (streets)
+        elif tab_selected == 'address' and 'id' in item and 'sys_id' not in item:
             polygon = item['st_astext']
             if polygon:
                 polygon = polygon[9:len(polygon)-2]
@@ -170,28 +206,17 @@ class ApiSearch(ApiParent):
                 message = f"Zoom unavailable. Doesn't exist the geometry for the street"
                 self.controller.show_info(message, parameter=item['display_name'])
                 
-        # IF for zoom to tab address (postnumbers)
-        elif self.dlg_search.main_tab.widget(index).objectName() == 'address' and 'sys_x' in item and 'sys_y' in item:
+        # Tab 'address' (postnumbers)
+        elif tab_selected == 'address' and 'sys_x' in item and 'sys_y' in item:
             x1 = item['sys_x']
             y1 = item['sys_y']
             point = QgsPointXY(float(x1), float(y1))
-
             self.draw_point(point, duration_time=5000)
             self.zoom_to_rectangle(x1, y1, x1, y1)
-
-            # textItem = QgsTextAnnotationItem(self.iface.mapCanvas())
-            # document = QTextDocument()
-            # #document.setHtml("<strong>" + str("TEST") + "</strong></br><p>hola<p/>")
-            # document.setPlainText("HOLA")
-            # textItem.setDocument(document)
-            # # symbol = QgsMarkerSymbolV2()
-            # # symbol.setSize(9)
-            # # textItem.setMarkerSymbol(symbol)
-            # textItem.setMapPosition(point)
-
             self.canvas.refresh()
 
-        elif self.dlg_search.main_tab.widget(index).objectName() == 'hydro':
+        # Tab 'hydro'
+        elif tab_selected == 'hydro':
             x1 = item['sys_x']
             y1 = item['sys_y']
             point = QgsPointXY(float(x1), float(y1))
@@ -199,7 +224,8 @@ class ApiSearch(ApiParent):
             self.zoom_to_rectangle(x1, y1, x1, y1)
             self.open_hydrometer_dialog(table_name=item['sys_table_id'], feature_id=item['sys_id'])
 
-        elif self.dlg_search.main_tab.widget(index).objectName() == 'workcat':
+        # Tab 'workcat'
+        elif tab_selected == 'workcat':
             list_coord = re.search('\(\((.*)\)\)', str(item['sys_geometry']))
             if not list_coord:
                 msg = "Empty coordinate list"
@@ -213,9 +239,9 @@ class ApiSearch(ApiParent):
             self.workcat_open_table_items(item)
             return
 
-        elif self.dlg_search.main_tab.widget(index).objectName() == 'psector':
+        # Tab 'psector'
+        elif tab_selected == 'psector':
             list_coord = re.search('\(\((.*)\)\)', str(item['sys_geometry']))
-
             self.manage_new_psector.new_psector(item['sys_id'], 'plan', is_api=True)
             self.manage_new_psector.dlg_plan_psector.rejected.connect(self.resetRubberbands)
             if not list_coord:
@@ -228,8 +254,8 @@ class ApiSearch(ApiParent):
             max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
             self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
 
-
-        elif self.dlg_search.main_tab.widget(index).objectName() == 'visit':
+        # Tab 'visit'
+        elif tab_selected == 'visit':
             list_coord = re.search('\((.*)\)', str(item['sys_geometry']))
             if not list_coord:
                 msg = "Empty coordinate list"
@@ -240,7 +266,6 @@ class ApiSearch(ApiParent):
             point = QgsPointXY(float(max_x), float(max_y))
             self.draw_point(point)
             self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
-
             self.manage_visit.manage_visit(visit_id=item['sys_id'])
             self.manage_visit.dlg_add_visit.rejected.connect(self.resetRubberbands)
             return
@@ -263,13 +288,18 @@ class ApiSearch(ApiParent):
         line_list = self.dlg_search.main_tab.widget(index).findChildren(QLineEdit)
         form_search += f'"tabName":"{self.dlg_search.main_tab.widget(index).objectName()}"'
         form_search_add += f'"tabName":"{self.dlg_search.main_tab.widget(index).objectName()}"'
+
         if combo_list:
             combo = combo_list[0]
             id = utils_giswater.get_item_data(self.dlg_search, combo, 0)
             name = utils_giswater.get_item_data(self.dlg_search, combo, 1)
-            extras_search += f'"{combo.property("column_id")}":{{"id":"{id}", "name":"{name}"}}, '
-            # extras_search += '"'+combo.property('column_id')+'":{"id":"' + str(id) + '", "name":"' + name + '"}, '
-            extras_search_add += f'"{combo.property("column_id")}":{{"id":"{id}", "name":"{name}"}}, '
+            try:
+                feature_type = utils_giswater.get_item_data(self.dlg_search, combo, 2)
+                extras_search += f'"featureType":"{feature_type}", '
+            except IndexError:
+                pass
+            extras_search += f'"{combo.property("columnname")}":{{"id":"{id}", "name":"{name}"}}, '
+            extras_search_add += f'"{combo.property("columnname")}":{{"id":"{id}", "name":"{name}"}}, '
         if line_list:
             line_edit = line_list[0]
             # If current tab have more than one QLineEdit, clear second QLineEdit
@@ -279,11 +309,13 @@ class ApiSearch(ApiParent):
             value = utils_giswater.getWidgetText(self.dlg_search, line_edit, return_string_null=False)
             if str(value) == '':
                 return
-
-            extras_search += f'"{line_edit.property("column_id")}":{{"text":"{value}"}}'
-            extras_search_add += f'"{line_edit.property("column_id")}":{{"text":"{value}"}}'
+            
+            qgis_project_add_schema = self.controller.plugin_settings_value('gwAddSchema')
+            extras_search += f'"{line_edit.property("columnname")}":{{"text":"{value}"}}, '
+            extras_search += f'"addSchema":"{qgis_project_add_schema}"'
+            extras_search_add += f'"{line_edit.property("columnname")}":{{"text":"{value}"}}'
             body = self.create_body(form=form_search, extras=extras_search)
-            result = self.controller.get_json('gw_api_setsearch', body, log_sql=True)
+            result = self.controller.get_json('gw_fct_setsearch', body, log_sql=True)
             if not result: return False
 
             if result:
@@ -313,9 +345,9 @@ class ApiSearch(ApiParent):
             if str(value) == 'null':
                 return
 
-            extras_search_add += f', "{line_edit_add.property("column_id")}":{{"text":"{value}"}}'
+            extras_search_add += f', "{line_edit_add.property("columnname")}":{{"text":"{value}"}}'
             body = self.create_body(form=form_search_add, extras=extras_search_add)
-            result = self.controller.get_json('gw_api_setsearch_add', body, log_sql=True)
+            result = self.controller.get_json('gw_fct_setsearchadd', body, log_sql=True)
             if not result: return False
 
             if result:
@@ -335,17 +367,19 @@ class ApiSearch(ApiParent):
         line_edit_add.setText('')
         line_edit_add.blockSignals(False)
 
+
     def add_combobox(self, field):
 
         widget = QComboBox()
         widget.setObjectName(field['widgetname'])
-        widget.setProperty('column_id', field['column_id'])
+        widget.setProperty('columnname', field['columnname'])
         self.populate_combo(widget, field)
         if 'selectedId' in field:
             utils_giswater.set_combo_itemData(widget, field['selectedId'], 0)
         widget.currentIndexChanged.connect(partial(self.clear_lineedits))
 
         return widget
+
 
     def clear_lineedits(self):
 
@@ -363,7 +397,10 @@ class ApiSearch(ApiParent):
         combolist = []
         if 'comboIds' in field:
             for i in range(0, len(field['comboIds'])):
-                elem = [field['comboIds'][i], field['comboNames'][i]]
+                if 'comboFeature' in field:
+                    elem = [field['comboIds'][i], field['comboNames'][i], field['comboFeature'][i]]
+                else:
+                    elem = [field['comboIds'][i], field['comboNames'][i]]
                 combolist.append(elem)
         records_sorted = sorted(combolist, key=operator.itemgetter(1))
 
@@ -374,12 +411,22 @@ class ApiSearch(ApiParent):
 
     def open_hydrometer_dialog(self, table_name=None, feature_id=None):
 
-        feature = f'"tableName":"{table_name}", "id":"{feature_id}"'
-        body = self.create_body(feature=feature)
-        result = [self.controller.get_json('gw_api_getinfofromid', body, log_sql=True)]
-        if not result: return
+        # get sys variale
+        self.qgis_project_infotype = self.controller.plugin_settings_value('infoType')
 
-        self.hydro_info_dlg = ApiBasicInfo()
+        feature = f'"tableName":"{table_name}", "id":"{feature_id}"'
+        extras = f'"infoType":"{self.qgis_project_infotype}"'
+        body = self.create_body(feature=feature, extras=extras)
+        function_name = 'gw_fct_getinfofromid'
+        json_result = self.controller.get_json(function_name, body, log_sql=True)
+        if json_result is None:
+            return
+
+        result = [json_result]
+        if not result:
+            return
+
+        self.hydro_info_dlg = InfoGenericUi()
         self.load_settings(self.hydro_info_dlg)
 
         self.hydro_info_dlg.btn_close.clicked.connect(partial(self.close_dialog, self.hydro_info_dlg))
@@ -388,7 +435,7 @@ class ApiSearch(ApiParent):
         field_id = str(result[0]['body']['feature']['idName'])
         self.populate_basic_info(self.hydro_info_dlg, result, field_id)
 
-        self.open_dialog(self.hydro_info_dlg, dlg_name='info_basic')
+        self.open_dialog(self.hydro_info_dlg, dlg_name='info_generic')
 
 
     def workcat_open_table_items(self, item):
@@ -396,7 +443,7 @@ class ApiSearch(ApiParent):
 
         workcat_id = item['sys_id']
         field_id = item['filter_text']
-        display_name = item ['display_name']
+        display_name = item['display_name']
 
         if workcat_id is None:
             return False
@@ -406,8 +453,7 @@ class ApiSearch(ApiParent):
         # TODO ZOOM TO SELECTED WORKCAT
         #self.zoom_to_polygon(workcat_id, layer_name, field_id)
 
-        self.items_dialog = ListItems()
-
+        self.items_dialog = SearchWorkcat()
         self.items_dialog.setWindowTitle(f'Workcat: {display_name}')
         self.set_icon(self.items_dialog.btn_doc_insert, "111")
         self.set_icon(self.items_dialog.btn_doc_delete, "112")
@@ -417,12 +463,12 @@ class ApiSearch(ApiParent):
         self.load_settings(self.items_dialog)
         self.items_dialog.btn_state1.setEnabled(False)
         self.items_dialog.btn_state0.setEnabled(False)
-        utils_giswater.setWidgetText(self.items_dialog, self.items_dialog.txt_path, self.controller.plugin_settings_value('search_csv_path'))
 
-        utils_giswater.setWidgetText(self.items_dialog, self.items_dialog.label_init, "Filter by: "+str(field_id))
-        utils_giswater.setWidgetText(self.items_dialog, self.items_dialog.label_end, "Filter by: "+str(field_id))
+        search_csv_path = self.controller.plugin_settings_value('search_csv_path')
+        utils_giswater.setWidgetText(self.items_dialog, self.items_dialog.txt_path, search_csv_path)
+        utils_giswater.setWidgetText(self.items_dialog, self.items_dialog.lbl_init, f"Filter by: {field_id}")
+        utils_giswater.setWidgetText(self.items_dialog, self.items_dialog.lbl_end, f"Filter by: {field_id}")
 
-        #
         self.items_dialog.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.items_dialog.tbl_psm.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.items_dialog.tbl_psm_end.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -441,7 +487,7 @@ class ApiSearch(ApiParent):
         table_name = "v_ui_workcat_x_feature"
         table_name_end = "v_ui_workcat_x_feature_end"
         table_doc = "v_ui_doc_x_workcat"
-        self.items_dialog.btn_doc_insert.clicked.connect(partial(self.document_insert, self.items_dialog, 'doc_x_workcat', 'workcat_id' ,item ['sys_id']))
+        self.items_dialog.btn_doc_insert.clicked.connect(partial(self.document_insert, self.items_dialog, 'doc_x_workcat', 'workcat_id' ,item['sys_id']))
         self.items_dialog.btn_doc_delete.clicked.connect(partial(self.document_delete, self.items_dialog.tbl_document, 'doc_x_workcat'))
         self.items_dialog.btn_doc_new.clicked.connect(partial(self.manage_document, self.items_dialog.tbl_document, item ['sys_id']))
         self.items_dialog.btn_open_doc.clicked.connect(partial(self.document_open, self.items_dialog.tbl_document))
@@ -453,7 +499,7 @@ class ApiSearch(ApiParent):
         self.items_dialog.rejected.connect(partial(self.resetRubberbands))
         self.items_dialog.btn_state1.clicked.connect(partial(self.force_state, self.items_dialog.btn_state1, 1, self.items_dialog.tbl_psm))
         self.items_dialog.btn_state0.clicked.connect(partial(self.force_state, self.items_dialog.btn_state0, 0, self.items_dialog.tbl_psm_end))
-        self.items_dialog.export_to_csv.clicked.connect(
+        self.items_dialog.btn_export_to_csv.clicked.connect(
             partial(self.export_to_csv, self.items_dialog, self.items_dialog.tbl_psm, self.items_dialog.tbl_psm_end,
                     self.items_dialog.txt_path))
 
@@ -482,7 +528,7 @@ class ApiSearch(ApiParent):
         self.fill_label_data(workcat_id, table_name)
         self.fill_label_data(workcat_id, table_name_end, extension)
 
-        self.open_dialog(self.items_dialog)
+        self.open_dialog(self.items_dialog, dlg_name='search_workcat')
 
 
     def manage_document(self, qtable, item_id):
@@ -542,6 +588,7 @@ class ApiSearch(ApiParent):
 
     def get_folder_dialog(self, dialog, widget):
         """ Get folder dialog """
+
         widget.setStyleSheet(None)
         if 'nt' in sys.builtin_module_names:
             folder_path = os.path.expanduser("~\Documents")
@@ -584,6 +631,7 @@ class ApiSearch(ApiParent):
         if folder_path is None or folder_path == 'null':
             path.setStyleSheet("border: 1px solid red")
             return
+
         path.setStyleSheet(None)
         if folder_path.find('.csv') == -1:
             folder_path += '.csv'
@@ -591,6 +639,8 @@ class ApiSearch(ApiParent):
             model_1 = qtable_1.model()
         else:
             return
+
+        model_2 = None
         if qtable_2:
             model_2 = qtable_2.model()
 
@@ -654,7 +704,7 @@ class ApiSearch(ApiParent):
         self.set_table_columns(dialog, qtable, table_name)
 
 
-    def workcat_fill_table(self, widget, table_name, hidde=False, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
+    def workcat_fill_table(self, widget, table_name, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
         """ Fill table @widget filtering query by @workcat_id
         Set a model with selected filter.
         Attach that model to selected table
@@ -685,9 +735,6 @@ class ApiSearch(ApiParent):
         else:
             widget.setModel(model)
 
-        if hidde:
-            self.refresh_table(widget)
-
 
     def open_feature_form(self, qtable):
         """ Zoom feature with the code set in 'network_code' of the layer set in 'network_geom_type' """
@@ -712,7 +759,7 @@ class ApiSearch(ApiParent):
         list_coord = re.search('\((.*)\)', str(complet_result[0]['body']['feature']['geometry']['st_astext']))
 
         points = self.get_points(list_coord)
-        self.rubber_polygon.reset()
+        self.reset_rubber_polygon()
         self.draw_polyline(points)
 
         max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
@@ -730,27 +777,25 @@ class ApiSearch(ApiParent):
                    f" FROM {table_name}")
             sql += f" WHERE workcat_id = '{workcat_id}' AND feature_type = '{feature}'"
             rows = self.controller.get_rows(sql)
-
-
             if extension is not None:
                 widget_name = f"lbl_total_{feature.lower()}{extension}"
             else:
                 widget_name = f"lbl_total_{feature.lower()}"
 
             widget = self.items_dialog.findChild(QLabel, str(widget_name))
-
             if not rows:
                 total = 0
             else:
                 total = len(rows)
-            # Add data to workcat search form
 
+            # Add data to workcat search form
             widget.setText(str(feature.lower().title()) + "s: " + str(total))
             if self.project_type == 'ws' and feature == 'GULLY':
                 widget.setVisible(False)
             
             if not rows:
                 continue
+
             length = 0
             if feature == 'ARC':
                 for row in rows:
@@ -763,13 +808,12 @@ class ApiSearch(ApiParent):
                         length = length + row[0]
                     else:
                         message = "Some data is missing. Check gis_length for arc"
-                        self.controller.show_warning(message, parameter = arc_id)
+                        self.controller.show_warning(message, parameter=arc_id)
                         return
-                if extension is not  None:
-                    widget = self.items_dialog.findChild(QLabel, "lbl_length" + str(extension))
+                if extension is not None:
+                    widget = self.items_dialog.findChild(QLabel, f"lbl_length{extension}")
                 else:
                     widget = self.items_dialog.findChild(QLabel, "lbl_length")
 
                 # Add data to workcat search form
-                widget.setText("Total arcs length: " + str(length))
-
+                widget.setText(f"Total arcs length: {length}")

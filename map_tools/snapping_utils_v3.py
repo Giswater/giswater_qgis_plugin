@@ -35,6 +35,7 @@ class SnappingConfigManager(object):
 
         # Snapper
         self.snapping_config = self.get_snapping_options()
+        self.snapping_config.setEnabled(True)
         self.snapper = self.get_snapper()
         proj = QgsProject.instance()
         proj.writeEntry('Digitizing', 'SnappingMode', 'advanced')
@@ -95,6 +96,20 @@ class SnappingConfigManager(object):
 
         QgsProject.instance().blockSignals(False)
         QgsProject.instance().snappingConfigChanged.emit(self.snapping_config)
+
+
+    def set_snapping_mode(self, mode=3):
+        """ Defines on which layer the snapping is performed
+        :param mode: 1 = ActiveLayer, 2=AllLayers, 3=AdvancedConfiguration (int or SnappingMode)
+        """
+
+        snapping_options = self.get_snapping_options()
+        if snapping_options:
+            QgsProject.instance().blockSignals(True)
+            snapping_options.setMode(mode)
+            QgsProject.instance().setSnappingConfig(snapping_options)
+            QgsProject.instance().blockSignals(False)
+            QgsProject.instance().snappingConfigChanged.emit(snapping_options)
 
 
     def snap_to_arc(self):
@@ -282,6 +297,8 @@ class SnappingConfigManager(object):
         """ Get point """
 
         event_point = None
+        x = None
+        y = None
         try:
             if event:
                 x = event.pos().x()

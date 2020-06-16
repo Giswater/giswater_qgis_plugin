@@ -5,7 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-
 from qgis.core import QgsLayoutExporter, QgsPointXY, QgsProject, QgsRectangle
 from qgis.PyQt.QtCore import QStringListModel, Qt
 from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence
@@ -20,13 +19,12 @@ import operator
 import subprocess
 import sys
 import webbrowser
-
 from collections import OrderedDict
 from functools import partial
 
 from .. import utils_giswater
 from ..ui_manager import Plan_psector
-from ..ui_manager import Psector_rapport
+from ..ui_manager import PsectorRapportUi
 from .parent_manage import ParentManage
 from .multiple_selection import MultipleSelection
 from .manage_document import ManageDocument
@@ -42,13 +40,12 @@ class ManageNewPsector(ParentManage):
     def new_psector(self, psector_id=None, plan_om=None, is_api=False):
         """ Buttons 45 and 81: New psector """
 
-        row = self.controller.get_config(parameter='sys_currency', columns='value::text', table='config_param_system')
+        row = self.controller.get_config(parameter='admin_currency', columns='value::text', table='config_param_system')
         if row:
             self.sys_currency = json.loads(row[0], object_pairs_hook=OrderedDict)
 
         # Create the dialog and signals
         self.dlg_plan_psector = Plan_psector()
-
         self.load_settings(self.dlg_plan_psector)
         self.plan_om = str(plan_om)
         # self.dlg_plan_psector.setWindowTitle(self.plan_om + " psector")
@@ -103,9 +100,13 @@ class ManageNewPsector(ParentManage):
         rotation.setValidator(QDoubleValidator())
         atlas_id = self.dlg_plan_psector.findChild(QLineEdit, "atlas_id")
         atlas_id.setValidator(QIntValidator())
+        where = " WHERE typevalue = 'psector_type' "
+        self.populate_combos(self.dlg_plan_psector.psector_type, 'idval', 'id', 'plan_typevalue', where)
 
-        self.populate_combos(self.dlg_plan_psector.psector_type, 'name', 'id', self.plan_om + '_psector_cat_type')
-        self.populate_combos(self.dlg_plan_psector.priority, 'id', 'id', 'value_priority')
+        # Populate combo status
+        sql = "SELECT id, idval FROM plan_typevalue WHERE typevalue = 'value_priority'"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.set_item_data(self.dlg_plan_psector.priority, rows, 1)
 
         # Set visible FALSE for cmb_sector
         self.populate_combos(self.cmb_sector_id, 'name', 'sector_id', 'sector')
@@ -125,7 +126,7 @@ class ManageNewPsector(ParentManage):
         utils_giswater.set_item_data(self.cmb_status, rows, 1)
 
         if self.plan_om == 'om':
-            self.populate_result_id(self.dlg_plan_psector.result_id, self.plan_om + '_result_cat')
+            self.populate_result_id(self.dlg_plan_psector.result_id, 'om_result_cat')
             utils_giswater.remove_tab_by_tabName(self.dlg_plan_psector.tabWidget, 'tab_document')
             self.dlg_plan_psector.chk_enable_all.setVisible(False)
         elif self.plan_om == 'plan':
@@ -133,23 +134,7 @@ class ManageNewPsector(ParentManage):
             self.cmb_result_id.setVisible(False)
             self.dlg_plan_psector.chk_enable_all.setEnabled(False)
 
-        # # tab Bugdet
-        # total_arc = self.dlg_plan_psector.findChild(QLabel, "total_arc")
-        # self.double_validator(total_arc)
-        # total_node = self.dlg_plan_psector.findChild(QLabel, "total_node")
-        # self.double_validator(total_node)
-        # total_other = self.dlg_plan_psector.findChild(QLabel, "total_other")
-        # self.double_validator(total_other)
-        # pem = self.dlg_plan_psector.findChild(QLabel, "pem")
-        # self.double_validator(pem)
-        # pec_pem = self.dlg_plan_psector.findChild(QLabel, "pec_pem")
-        # self.double_validator(pec_pem)
-        # pec = self.dlg_plan_psector.findChild(QLabel, "pec")
-        # self.double_validator(pec)
-        # pec_vat = self.dlg_plan_psector.findChild(QLabel, "pec_vat")
-        # self.double_validator(pec_vat)
-        # pca = self.dlg_plan_psector.findChild(QLabel, "pca")
-        # self.double_validator(pca)
+        # tab Bugdet
         gexpenses = self.dlg_plan_psector.findChild(QLineEdit, "gexpenses")
         self.double_validator(gexpenses)
         vat = self.dlg_plan_psector.findChild(QLineEdit, "vat")
@@ -182,7 +167,8 @@ class ManageNewPsector(ParentManage):
         # tiene un valor distinto de 0, es que el sector ya existe y queremos hacer un update.
         if isinstance(psector_id, bool):
             psector_id = 0
-        self.delete_psector_selector(self.plan_om + '_psector_selector')
+        self.delete_psector_selector('selector_plan_psector')
+
         # tab 'Document'
         self.doc_id = self.dlg_plan_psector.findChild(QLineEdit, "doc_id")
         self.tbl_document = self.dlg_plan_psector.findChild(QTableView, "tbl_document")
@@ -194,24 +180,27 @@ class ManageNewPsector(ParentManage):
             self.dlg_plan_psector.name.setEnabled(True)
             self.dlg_plan_psector.chk_enable_all.setDisabled(False)
             sql = (f"SELECT enable_all "
-                   f"FROM {self.plan_om}_psector "
+                   f"FROM plan_psector "
                    f"WHERE psector_id = '{psector_id}'")
             row = self.controller.get_row(sql)
             if row:
                 self.dlg_plan_psector.chk_enable_all.setChecked(row[0])
-            self.fill_table(self.dlg_plan_psector, self.qtbl_arc, self.plan_om + "_psector_x_arc",set_edit_triggers=QTableView.DoubleClicked)
-            self.set_table_columns(self.dlg_plan_psector, self.qtbl_arc, self.plan_om + "_psector_x_arc")
-            self.fill_table(self.dlg_plan_psector, self.qtbl_node, self.plan_om + "_psector_x_node",set_edit_triggers=QTableView.DoubleClicked)
-            self.set_table_columns(self.dlg_plan_psector, self.qtbl_node, self.plan_om + "_psector_x_node")
-            self.fill_table(self.dlg_plan_psector, self.qtbl_connec, self.plan_om + "_psector_x_connec",set_edit_triggers=QTableView.DoubleClicked)
-            self.set_table_columns(self.dlg_plan_psector, self.qtbl_connec, self.plan_om + "_psector_x_connec")
+            self.fill_table(self.dlg_plan_psector, self.qtbl_arc, "plan_psector_x_arc",
+                set_edit_triggers=QTableView.DoubleClicked)
+            self.set_table_columns(self.dlg_plan_psector, self.qtbl_arc, "plan_psector_x_arc")
+            self.fill_table(self.dlg_plan_psector, self.qtbl_node, "plan_psector_x_node",
+                set_edit_triggers=QTableView.DoubleClicked)
+            self.set_table_columns(self.dlg_plan_psector, self.qtbl_node, "plan_psector_x_node")
+            self.fill_table(self.dlg_plan_psector, self.qtbl_connec, "plan_psector_x_connec",
+                set_edit_triggers=QTableView.DoubleClicked)
+            self.set_table_columns(self.dlg_plan_psector, self.qtbl_connec, "plan_psector_x_connec")
             if self.project_type.upper() == 'UD':
-                self.fill_table(self.dlg_plan_psector, self.qtbl_gully, self.plan_om + "_psector_x_gully",
+                self.fill_table(self.dlg_plan_psector, self.qtbl_gully, "plan_psector_x_gully",
                                 set_edit_triggers=QTableView.DoubleClicked)
-                self.set_table_columns(self.dlg_plan_psector, self.qtbl_gully, self.plan_om + "_psector_x_gully")
+                self.set_table_columns(self.dlg_plan_psector, self.qtbl_gully, "plan_psector_x_gully")
             sql = (f"SELECT psector_id, name, psector_type, expl_id, sector_id, priority, descript, text1, text2, "
                    f"observ, atlas_id, scale, rotation, active, ext_code, status "
-                   f"FROM {self.plan_om}_psector "
+                   f"FROM plan_psector "
                    f"WHERE psector_id = {psector_id}")
             row = self.controller.get_row(sql, log_sql=True)
 
@@ -222,23 +211,24 @@ class ManageNewPsector(ParentManage):
             self.psector_id.setText(str(row['psector_id']))
             if str(row['ext_code']) != 'None':
                 self.ext_code.setText(str(row['ext_code']))
-            sql = (f"SELECT name FROM plan_psector_cat_type "
-                   f"WHERE id = {row['psector_type']}")
+            sql = (f"SELECT id, idval FROM plan_typevalue WHERE typevalue = 'psector_type' AND "
+                   f"id = '{row['psector_type']}'")
             result = self.controller.get_row(sql)
-            utils_giswater.set_combo_itemData(self.cmb_psector_type, str(result['name']), 1)
+            utils_giswater.set_combo_itemData(self.cmb_psector_type, str(result['idval']), 1)
             sql = (f"SELECT name FROM exploitation "
                    f"WHERE expl_id = {row['expl_id']}")
             result = self.controller.get_row(sql)
             utils_giswater.set_combo_itemData(self.cmb_expl_id, str(result['name']), 1)
 
             # Check if expl_id already exists in expl_selector
-            sql = ("SELECT DISTINCT(id, cur_user)"
+            sql = ("SELECT DISTINCT(expl_id, cur_user)"
                    " FROM selector_expl"
                    f" WHERE expl_id = '{row['expl_id']}' AND cur_user = current_user")
             exist = self.controller.get_row(sql)
             if exist is None:
                 sql = ("INSERT INTO selector_expl (expl_id, cur_user) "
-                       f" VALUES ({str(row['expl_id'])}, current_user)")
+                       f" VALUES ({str(row['expl_id'])}, current_user)"
+                       f" ON CONFLICT DO NOTHING;")
                 self.controller.execute_sql(sql)
                 msg = "Your exploitation selector has been updated"
                 self.controller.show_warning(msg, 1)
@@ -281,10 +271,10 @@ class ManageNewPsector(ParentManage):
             self.update = True
             psector_id_aux = utils_giswater.getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id)
             if psector_id_aux != 'null':
-                sql = (f"DELETE FROM {self.plan_om}_psector_selector "
-                       f"WHERE cur_user= current_user")
+                sql = (f"DELETE FROM selector_plan_psector "
+                       f"WHERE cur_user = current_user")
                 self.controller.execute_sql(sql)
-                self.insert_psector_selector(self.plan_om + '_psector_selector', 'psector_id', psector_id_aux)
+                self.insert_psector_selector('selector_plan_psector', 'psector_id', psector_id_aux)
             if self.plan_om == 'plan':
                 sql = (f"DELETE FROM selector_psector "
                        f"WHERE cur_user = current_user AND psector_id = '{psector_id_aux}'")
@@ -292,8 +282,9 @@ class ManageNewPsector(ParentManage):
                 self.insert_psector_selector('selector_psector', 'psector_id', psector_id_aux)
             layer = None
             if not is_api:
-                layername = f'v_edit_{self.plan_om}_psector'
+                layername = f'v_edit_plan_psector'
                 layer = self.controller.get_layer_by_tablename(layername, show_warning=False)
+
             if layer:
 
                 expr_filter = f"psector_id = '{psector_id}'"
@@ -333,7 +324,7 @@ class ManageNewPsector(ParentManage):
         else:
 
             # Set psector_status vdefault
-            sql = ("SELECT id, idval FROM plan_typevalue WHERE typevalue = 'psector_status' and id = 2")
+            sql = "SELECT id, idval FROM plan_typevalue WHERE typevalue = 'psector_status' and id = '2'"
             result = self.controller.get_row(sql)
             utils_giswater.set_combo_itemData(self.cmb_status, str(result[1]), 1)
 
@@ -345,11 +336,11 @@ class ManageNewPsector(ParentManage):
 
         # Set signals
         self.dlg_plan_psector.btn_accept.clicked.connect(partial(self.insert_or_update_new_psector,
-            "v_edit_" + self.plan_om + '_psector', True))
+                                                                 'v_edit_plan_psector', True))
         self.dlg_plan_psector.tabWidget.currentChanged.connect(partial(self.check_tab_position))
         self.dlg_plan_psector.btn_cancel.clicked.connect(partial(self.close_psector, cur_active_layer))
         self.dlg_plan_psector.psector_type.currentIndexChanged.connect(partial(self.populate_result_id,
-            self.dlg_plan_psector.result_id, self.plan_om + '_result_cat'))
+            self.dlg_plan_psector.result_id, 'plan_result_cat'))
         self.dlg_plan_psector.rejected.connect(partial(self.close_psector, cur_active_layer))
         self.dlg_plan_psector.chk_enable_all.stateChanged.connect(partial(self.enable_all))
 
@@ -370,17 +361,17 @@ class ManageNewPsector(ParentManage):
         self.dlg_plan_psector.btn_rapports.clicked.connect(partial(self.open_dlg_rapports))
         self.dlg_plan_psector.tab_feature.currentChanged.connect(partial(self.tab_feature_changed,
             self.dlg_plan_psector, table_object, excluded_layers=["v_edit_element"]))
-        self.dlg_plan_psector.name.textChanged.connect(partial(self.enable_relation_tab, self.plan_om + '_psector'))
-        viewname = 'v_edit_' + self.plan_om + '_psector_x_other'
+        self.dlg_plan_psector.name.textChanged.connect(partial(self.enable_relation_tab, 'plan_psector'))
+        viewname = 'v_edit_plan_psector_x_other'
         self.dlg_plan_psector.txt_name.textChanged.connect(partial(self.query_like_widget_text, self.dlg_plan_psector,
             self.dlg_plan_psector.txt_name, self.dlg_plan_psector.all_rows, 'v_price_compost', viewname, "id"))
 
         self.dlg_plan_psector.gexpenses.returnPressed.connect(partial(self.calulate_percents,
-            self.plan_om + '_psector', psector_id, 'gexpenses'))
+            'plan_psector', psector_id, 'gexpenses'))
         self.dlg_plan_psector.vat.returnPressed.connect(partial(self.calulate_percents,
-            self.plan_om + '_psector', psector_id, 'vat'))
+            'plan_psector', psector_id, 'vat'))
         self.dlg_plan_psector.other.returnPressed.connect(partial(self.calulate_percents,
-            self.plan_om + '_psector', psector_id, 'other'))
+            'plan_psector', psector_id, 'other'))
 
         self.dlg_plan_psector.btn_doc_insert.clicked.connect(self.document_insert)
         self.dlg_plan_psector.btn_doc_delete.clicked.connect(partial(self.document_delete, self.tbl_document, 'doc_x_psector'))
@@ -394,7 +385,7 @@ class ManageNewPsector(ParentManage):
         self.set_completer_lineedit(self.dlg_plan_psector.doc_id, list_items)
 
         sql = (f"SELECT other, gexpenses, vat "
-               f"FROM {self.plan_om}_psector "
+               f"FROM plan_psector "
                f"WHERE psector_id = '{psector_id}'")
         row = self.controller.get_row(sql)
 
@@ -444,11 +435,11 @@ class ManageNewPsector(ParentManage):
         psector_id = utils_giswater.getWidgetText(self.dlg_plan_psector, "psector_id")
         sql = f"SELECT gw_fct_plan_psector_enableall({value}, '{psector_id}')"
         self.controller.execute_sql(sql)
-        self.reload_qtable(self.dlg_plan_psector, 'arc', self.plan_om)
-        self.reload_qtable(self.dlg_plan_psector, 'node', self.plan_om)
-        self.reload_qtable(self.dlg_plan_psector, 'connec', self.plan_om)
+        self.reload_qtable(self.dlg_plan_psector, 'arc')
+        self.reload_qtable(self.dlg_plan_psector, 'node')
+        self.reload_qtable(self.dlg_plan_psector, 'connec')
         if self.project_type.upper() == 'UD':
-            self.reload_qtable(self.dlg_plan_psector, 'gully', self.plan_om)
+            self.reload_qtable(self.dlg_plan_psector, 'gully')
 
         sql = (f"UPDATE plan_psector "
                f"SET enable_all = '{value}' "
@@ -480,7 +471,7 @@ class ManageNewPsector(ParentManage):
 
         default_file_name = utils_giswater.getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.name)
 
-        self.dlg_psector_rapport = Psector_rapport()
+        self.dlg_psector_rapport = PsectorRapportUi()
         self.load_settings(self.dlg_psector_rapport)
 
         utils_giswater.setWidgetText(self.dlg_psector_rapport, 'txt_composer_path', default_file_name + " comp.pdf")
@@ -489,7 +480,8 @@ class ManageNewPsector(ParentManage):
 
         self.dlg_psector_rapport.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_psector_rapport))
         self.dlg_psector_rapport.btn_ok.clicked.connect(partial(self.generate_rapports))
-        self.dlg_psector_rapport.btn_path.clicked.connect(partial(self.get_folder_dialog, self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path))
+        self.dlg_psector_rapport.btn_path.clicked.connect(partial(self.get_folder_dialog, self.dlg_psector_rapport,
+            self.dlg_psector_rapport.txt_path))
 
         utils_giswater.setWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path,
             self.controller.plugin_settings_value('psector_rapport_path'))
@@ -508,7 +500,7 @@ class ManageNewPsector(ParentManage):
         self.populate_cmb_templates()
         
         # Open dialog
-        self.open_dialog(self.dlg_psector_rapport, maximize_button=False)     
+        self.open_dialog(self.dlg_psector_rapport, dlg_name='psector_rapport', maximize_button=False)
 
 
     def populate_cmb_templates(self):
@@ -539,7 +531,7 @@ class ManageNewPsector(ParentManage):
             self.dlg_psector_rapport.lbl_composer_disabled.setText('')
             utils_giswater.set_item_data(self.dlg_psector_rapport.cmb_templates, records, 1)
 
-        row = self.controller.get_config(f'composer_{self.plan_om}_vdefault')
+        row = self.controller.get_config(f'composer_plan_vdefault')
         if row:
             utils_giswater.set_combo_itemData(self.dlg_psector_rapport.cmb_templates, row[0], 1)
 
@@ -574,7 +566,7 @@ class ManageNewPsector(ParentManage):
         # Generate csv detail
         if utils_giswater.isChecked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv_detail):
             file_name = utils_giswater.getWidgetText(self.dlg_psector_rapport, 'txt_csv_path')
-            viewname = f"v_{self.plan_om}_current_psector_budget_detail"
+            viewname = f"v_plan_current_psector_budget_detail"
             if self.plan_om == 'om' and self.dlg_plan_psector.psector_type.currentIndex() == 0:
                 viewname = 'v_om_current_psector_budget_detail_rec'
             elif self.plan_om == 'om' and self.dlg_plan_psector.psector_type.currentIndex() == 1:
@@ -590,7 +582,7 @@ class ManageNewPsector(ParentManage):
         # Generate csv
         if utils_giswater.isChecked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv):
             file_name = utils_giswater.getWidgetText(self.dlg_psector_rapport, 'txt_csv_detail_path')
-            viewname = f"v_{self.plan_om}_current_psector_budget"
+            viewname = f"v_plan_current_psector_budget"
             if file_name is None or file_name == 'null':
                 message = "Price list csv file name is required"
                 self.controller.show_warning(message)
@@ -677,7 +669,7 @@ class ManageNewPsector(ParentManage):
     def populate_budget(self, dialog, psector_id):
         
         sql = (f"SELECT DISTINCT(column_name) FROM information_schema.columns"
-               f" WHERE table_name = 'v_{self.plan_om}_current_psector'")
+               f" WHERE table_name = 'v_plan_current_psector'")
         rows = self.controller.get_rows(sql)
         columns = []
         for i in range(0, len(rows)):
@@ -685,7 +677,7 @@ class ManageNewPsector(ParentManage):
             columns.append(str(column_name[0]))
 
         sql = (f"SELECT total_arc, total_node, total_other, pem, pec, pec_vat, gexpenses, vat, other, pca"
-               f" FROM v_{self.plan_om}_current_psector"
+               f" FROM v_plan_current_psector"
                f" WHERE psector_id = '{psector_id}'")
         row = self.controller.get_row(sql)
         if row:
@@ -824,12 +816,14 @@ class ManageNewPsector(ParentManage):
 
 
     def delete_psector_selector(self, tablename):
+
         sql = (f"DELETE FROM {tablename}"
                f" WHERE cur_user = current_user;")
         self.controller.execute_sql(sql)
 
 
     def insert_psector_selector(self, tablename, field, value):
+
         sql = (f"INSERT INTO {tablename} ({field}, cur_user) "
                f"VALUES ('{value}', current_user);")
         self.controller.execute_sql(sql)
@@ -838,11 +832,11 @@ class ManageNewPsector(ParentManage):
     def check_tab_position(self):
         
         self.dlg_plan_psector.name.setEnabled(False)
-        self.insert_or_update_new_psector(tablename=f'v_edit_{self.plan_om}_psector', close_dlg=False)
+        self.insert_or_update_new_psector(tablename=f'v_edit_plan_psector', close_dlg=False)
         self.update = True
         if self.dlg_plan_psector.tabWidget.currentIndex() == 2:
             tableleft = "v_price_compost"
-            tableright = f"v_edit_{self.plan_om}_psector_x_other"
+            tableright = f"v_edit_plan_psector_x_other"
             field_id_right = "price_id"
             self.price_selector(self.dlg_plan_psector, tableleft, tableright, field_id_right)
             self.update_total(self.dlg_plan_psector, self.dlg_plan_psector.selected_rows)
@@ -854,7 +848,7 @@ class ManageNewPsector(ParentManage):
             self.fill_table_object(self.tbl_document, self.schema_name + ".v_ui_doc_x_psector", expr_filter=expr)
 
         sql = (f"SELECT other, gexpenses, vat"
-               f" FROM {self.plan_om}_psector "
+               f" FROM plan_psector "
                f" WHERE psector_id = '{utils_giswater.getWidgetText(self.dlg_plan_psector, 'psector_id')}'")
         row = self.controller.get_row(sql)
         if row:
@@ -893,14 +887,15 @@ class ManageNewPsector(ParentManage):
 
 
     def populate_combos(self, combo, field_name, field_id, table_name, where=None):
-        
-        sql = f"SELECT DISTINCT({field_id}), {field_name}  FROM {table_name} "
+
+        sql = f"SELECT DISTINCT({field_id}), {field_name} FROM {table_name} "
         if where:
             sql += where
         sql += f" ORDER BY {field_name}"
         rows = self.controller.get_rows(sql)
         if not rows:
             return
+
         combo.blockSignals(True)
         combo.clear()
 
@@ -911,6 +906,7 @@ class ManageNewPsector(ParentManage):
 
 
     def reload_states_selector(self):
+
         self.delete_psector_selector('selector_state')
         try :
             for x in range(0, len(self.all_states)):
@@ -954,7 +950,7 @@ class ManageNewPsector(ParentManage):
     def check_name(self, psector_name):
         """ Check if name of new psector exist or not """
 
-        sql = (f"SELECT name FROM {self.plan_om}_psector"
+        sql = (f"SELECT name FROM plan_psector"
                f" WHERE name = '{psector_name}'")
         row = self.controller.get_row(sql)
         if row is None:
@@ -963,6 +959,7 @@ class ManageNewPsector(ParentManage):
 
 
     def insert_or_update_new_psector(self, tablename, close_dlg=False):
+
         psector_name = utils_giswater.getWidgetText(self.dlg_plan_psector, "name", return_string_null=False)
         if psector_name == "":
             message = "Mandatory field is missing. Please, set a value"
@@ -982,7 +979,7 @@ class ManageNewPsector(ParentManage):
             self.enable_tabs(True)
             self.enable_buttons(True)
 
-        viewname = f"'v_edit_{self.plan_om}_psector'"
+        viewname = f"'v_edit_plan_psector'"
         sql = (f"SELECT column_name FROM information_schema.columns "
                f"WHERE table_name = {viewname} "
                f"AND table_schema = '" + self.schema_name.replace('"', '') + "' "
@@ -1031,6 +1028,7 @@ class ManageNewPsector(ParentManage):
                     if column_name != 'psector_id':
                         widget_type = utils_giswater.getWidgetType(self.dlg_plan_psector, column_name)
                         if widget_type is not None:
+                            value = None
                             if widget_type is QCheckBox:
                                 value = str(utils_giswater.isChecked(self.dlg_plan_psector, column_name)).upper()
                             elif widget_type is QDateEdit:
@@ -1041,6 +1039,7 @@ class ManageNewPsector(ParentManage):
                                 value = str(utils_giswater.get_item_data(self.dlg_plan_psector, combo))
                             else:
                                 value = utils_giswater.getWidgetText(self.dlg_plan_psector, column_name)
+
                             if value is None or value == 'null':
                                 sql += column_name + ", "
                                 values += "null, "
@@ -1054,25 +1053,26 @@ class ManageNewPsector(ParentManage):
 
         if not self.update:
             sql += " RETURNING psector_id;"
-            new_psector_id = self.controller.execute_returning(sql, search_audit=False, log_sql=True)
+            new_psector_id = self.controller.execute_returning(sql, log_sql=True)
             utils_giswater.setText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id, str(new_psector_id[0]))
             if new_psector_id and self.plan_om == 'plan':
-                row = self.controller.get_config('psector_vdefault')
+                row = self.controller.get_config('plan_psector_vdefault')
                 if row:
                     sql = (f"UPDATE config_param_user "
                            f" SET value = $${new_psector_id[0]}$$ "
-                           f" WHERE parameter = 'psector_vdefault'"
+                           f" WHERE parameter = 'plan_psector_vdefault'"
                            f" AND cur_user=current_user; ")
                 else:
                     sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) "
-                           f" VALUES ('psector_vdefault', '{new_psector_id[0]}', current_user);")
+                           f" VALUES ('plan_psector_vdefault', '{new_psector_id[0]}', current_user);")
                 self.controller.execute_sql(sql, log_sql=True)
         else:
             self.controller.execute_sql(sql, log_sql=True)
             
         self.dlg_plan_psector.tabWidget.setTabEnabled(1, True)
-        self.delete_psector_selector(self.plan_om+'_psector_selector')
-        self.insert_psector_selector(self.plan_om+'_psector_selector', 'psector_id', utils_giswater.getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id))
+        self.delete_psector_selector('selector_plan_psector')
+        self.insert_psector_selector('selector_plan_psector', 'psector_id',
+            utils_giswater.getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id))
 
         if close_dlg:
             self.reload_states_selector()
@@ -1096,11 +1096,14 @@ class ManageNewPsector(ParentManage):
         self.set_table_columns(dialog, tbl_selected_rows, tableright)
 
         # Button select
-        dialog.btn_select.clicked.connect(partial(self.rows_selector, dialog, tbl_all_rows, tbl_selected_rows, 'id', tableright, "price_id", 'id'))
-        tbl_all_rows.doubleClicked.connect(partial(self.rows_selector, dialog, tbl_all_rows, tbl_selected_rows, 'id', tableright, "price_id", 'id'))
+        dialog.btn_select.clicked.connect(partial(self.rows_selector, dialog, tbl_all_rows, tbl_selected_rows, 'id',
+            tableright, "price_id", 'id'))
+        tbl_all_rows.doubleClicked.connect(partial(self.rows_selector, dialog, tbl_all_rows, tbl_selected_rows, 'id',
+            tableright, "price_id", 'id'))
 
         # Button unselect
-        dialog.btn_unselect.clicked.connect(partial(self.rows_unselector, dialog, tbl_selected_rows, tableright, field_id_right))
+        dialog.btn_unselect.clicked.connect(partial(self.rows_unselector, dialog, tbl_selected_rows,
+            tableright, field_id_right))
 
 
     def rows_selector(self, dialog, tbl_all_rows, tbl_selected_rows, id_ori, tableright, id_des, field_id):
@@ -1114,8 +1117,8 @@ class ManageNewPsector(ParentManage):
             :param query_left:
             :param field_id:
         """
-        selected_list = tbl_all_rows.selectionModel().selectedRows()
 
+        selected_list = tbl_all_rows.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
             self.controller.show_warning(message)
@@ -1280,6 +1283,7 @@ class ManageNewPsector(ParentManage):
 
     def document_insert(self):
         """ Insert a document related to the current visit """
+
         doc_id = self.doc_id.text()
         psector_id = self.psector_id.text()
         if not doc_id:
@@ -1316,7 +1320,6 @@ class ManageNewPsector(ParentManage):
         """ Access GUI to manage documents e.g Execute action of button 34 """
         
         psector_id = utils_giswater.getText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id)
-
         manage_document = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir, single_tool=False)
         dlg_docman = manage_document.manage_document(tablename='psector', qtable=qtable, item_id=psector_id)
         dlg_docman.btn_accept.clicked.connect(partial(self.set_completer_object, dlg_docman, 'doc'))
@@ -1324,8 +1327,9 @@ class ManageNewPsector(ParentManage):
 
 
     def show_status_warning(self):
+
         msg = "WARNING: You have updated the status value. If you click 'Accept' on the main dialog, " \
               "a process that updates the state & state_type values of all that features that belong to the psector, " \
               "according to the system variables plan_psector_statetype, " \
               "plan_statetype_planned and plan_statetype_ficticious, will be triggered."
-        result = self.controller.show_details(msg, 'Message warning')
+        self.controller.show_details(msg, 'Message warning')

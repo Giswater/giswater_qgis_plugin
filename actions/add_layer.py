@@ -5,22 +5,23 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsCategorizedSymbolRenderer, QgsFillSymbol, QgsDataSourceUri, QgsFeature, QgsField, QgsGeometry, QgsMarkerSymbol,\
-    QgsLayerTreeLayer, QgsLineSymbol, QgsProject, QgsRectangle, QgsRendererCategory, QgsSimpleFillSymbolLayer, QgsSymbol,\
-    QgsVectorLayer, QgsVectorLayerExporter
-
+from qgis.core import QgsCategorizedSymbolRenderer, QgsFillSymbol, QgsDataSourceUri, QgsFeature, QgsField, \
+    QgsGeometry, QgsMarkerSymbol, QgsLayerTreeLayer, QgsLineSymbol, QgsProject, QgsRectangle, QgsRendererCategory, \
+    QgsSymbol, QgsVectorLayer, QgsVectorLayerExporter
 from qgis.PyQt.QtCore import QVariant
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QPushButton, QTabWidget
 
 import os
 from random import randrange
+
 from .. import utils_giswater
 
 
 class AddLayer(object):
 
     def __init__(self, iface, settings, controller, plugin_dir):
+
         # Initialize instance attributes
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
@@ -45,7 +46,7 @@ class AddLayer(object):
     def manage_geometry(self, geometry):
         """ Get QgsGeometry and return as text
          :param geometry: (QgsGeometry)
-         """
+        """
         geometry = geometry.asWkt().replace('Z (', ' (')
         geometry = geometry.replace(' 0)', ')')
         return geometry
@@ -73,6 +74,7 @@ class AddLayer(object):
         :param layer: (QgsVectorLayer)
         :param crs: QgsVectorLayer.crs() (crs)
         """
+
         sql = f'DROP TABLE "{layer.name()}";'
         self.controller.execute_sql(sql, log_sql=True)
 
@@ -81,12 +83,12 @@ class AddLayer(object):
         self.uri.setDataSource(schema_name, layer.name(), None, "", layer.name())
 
         error = QgsVectorLayerExporter.exportLayer(layer, self.uri.uri(), self.controller.credentials['user'], crs, False)
-
         if error[0] != 0:
             self.controller.log_info(F"ERROR --> {error[1]}")
 
 
-    def from_postgres_to_toc(self, tablename=None, the_geom="the_geom", field_id="id",  child_layers=None, group="GW Layers"):
+    def from_postgres_to_toc(self, tablename=None, the_geom="the_geom", field_id="id",  child_layers=None,
+        group="GW Layers"):
         """ Put selected layer into TOC
         :param tablename: Postgres table name (string)
         :param the_geom: Geometry field of the table (string)
@@ -94,6 +96,7 @@ class AddLayer(object):
         :param child_layers: List of layers (stringList)
         :param group: Name of the group that will be created in the toc (string)
         """
+
         self.set_uri()
         schema_name = self.controller.credentials['schema'].replace('"', '')
         if child_layers is not None:
@@ -126,7 +129,8 @@ class AddLayer(object):
             my_group.insertLayer(0, layer)
 
 
-    def add_temp_layer(self, dialog, data, layer_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True, group='GW Temporal Layers', disable_tabs=True):
+    def add_temp_layer(self, dialog, data, layer_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True,
+        group='GW Temporal Layers', disable_tabs=True):
         """ Add QgsVectorLayer into TOC
         :param dialog:
         :param data:
@@ -139,7 +143,7 @@ class AddLayer(object):
         :param disable_tabs: set all tabs, except the last, enabled or disabled (boolean)
         :return:
         """
-        colors = {'rnd': QColor(randrange(0, 256), randrange(0, 256), randrange(0, 256))}
+
         text_result = None
         temp_layers_added = []
         srid = self.controller.plugin_settings_value('srid')
@@ -182,13 +186,21 @@ class AddLayer(object):
                         color_values = {'NEW': QColor(0, 255, 0), 'DUPLICATED': QColor(255, 0, 0),
                                         'EXISTS': QColor(240, 150, 0)}
                         self.categoryze_layer(v_layer, cat_field, size, color_values)
+                    else:
+                        if geometry_type == 'Point':
+                            v_layer.renderer().symbol().setSize(3.5)
+                            v_layer.renderer().symbol().setColor(QColor("red"))
+                        elif geometry_type == 'LineString':
+                            v_layer.renderer().symbol().setWidth(1.5)
+                            v_layer.renderer().symbol().setColor(QColor("red"))
+                        v_layer.renderer().symbol().setOpacity(0.7)
                     temp_layers_added.append(v_layer)
-                    v_layer.setOpacity(0.7)
-                    self.iface.setActiveLayer(v_layer)
+                    self.iface.layerTreeView().refreshLayerSymbology(v_layer.id())
         return {'text_result': text_result, 'temp_layers_added': temp_layers_added}
 
 
     def set_layers_visible(self, layers):
+
         for layer in layers:
             lyr = self.controller.get_layer_by_tablename(layer)
             if lyr:
@@ -218,29 +230,12 @@ class AddLayer(object):
                 symbol.setSize(size)
 
             # configure a symbol layer
-            # layer_style = {}
-            # layer_style['color'] = '%d, %d, %d' % (randrange(0, 256), randrange(0, 256), randrange(0, 256))
-            # layer_style['color'] = '255,0,0'
-            # layer_style['outline'] = '#000000'
             try:
                 color = color_values.get(unique_value)
                 symbol.setColor(color)
-            except:
+            except Exception:
                 color = QColor(randrange(0, 256), randrange(0, 256), randrange(0, 256))
                 symbol.setColor(color)
-            # layer_style['horizontal_anchor_point'] = '6'
-            # layer_style['offset_map_unit_scale'] = '6'
-            # layer_style['outline_width'] = '6'
-            # layer_style['outline_width_map_unit_scale'] = '6'
-            # layer_style['size'] = '6'
-            # layer_style['size_map_unit_scale'] = '6'
-            # layer_style['vertical_anchor_point'] = '6'
-
-            # symbol_layer = QgsSimpleFillSymbolLayer.create(layer_style)
-            # print(f"Symbollaye --> {symbol_layer}")
-            # # replace default symbol layer with the configured one
-            # if symbol_layer is not None:
-            #     symbol.changeSymbolLayer(0, symbol_layer)
 
             # create renderer object
             category = QgsRendererCategory(unique_value, symbol, str(unique_value))
@@ -259,6 +254,7 @@ class AddLayer(object):
 
 
     def set_layer_symbology(self, layer, properties=None):
+
         renderer = layer.renderer()
         symbol = renderer.symbol()
 
@@ -282,6 +278,7 @@ class AddLayer(object):
         :param disable_tabs: set all tabs, except the last, enabled or disabled (boolean)
         :return:
         """
+
         change_tab = False
         text = utils_giswater.getWidgetText(dialog, dialog.txt_infolog, return_string_null=False)
 
@@ -298,10 +295,11 @@ class AddLayer(object):
 
         utils_giswater.setWidgetText(dialog, 'txt_infolog', text+"\n")
         qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
-        if change_tab and qtabwidget is not None:
-            qtabwidget.setCurrentIndex(tab_idx)
-        if disable_tabs:
-            self.disable_tabs(dialog)
+        if qtabwidget is not None:
+            if change_tab and qtabwidget is not None:
+                qtabwidget.setCurrentIndex(tab_idx)
+            if disable_tabs:
+                self.disable_tabs(dialog)
 
         return text
 
@@ -311,6 +309,7 @@ class AddLayer(object):
         :param dialog: Dialog where tabs are disabled (QDialog)
         :return:
         """
+
         qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
         for x in range(0, qtabwidget.count()-1):
             qtabwidget.widget(x).setEnabled(False)
@@ -333,6 +332,7 @@ class AddLayer(object):
         :param group: group to which we want to add the layer (string)
         :return:
         """
+
         prov = virtual_layer.dataProvider()
         # Enter editing mode
         virtual_layer.startEditing()
@@ -377,13 +377,14 @@ class AddLayer(object):
             get_polygon(self, feature)
             get_multipolygon(self, feature)
         """
+
         try:
             coordinates = getattr(self, f"get_{feature['geometry']['type'].lower()}")(feature)
             type_ = feature['geometry']['type']
             geometry = f"{type_}{coordinates}"
             return QgsGeometry.fromWkt(geometry)
         except AttributeError as e:
-            print(f"{type(e).__name__} --> {e}")
+            self.controller.log_info(f"{type(e).__name__} --> {e}")
             return None
 
 
@@ -433,7 +434,8 @@ class AddLayer(object):
         :return: Coordinates of the feature (String)
         This function is called in def get_geometry(self, feature)
               geometry = getattr(self, f"get_{feature['geometry']['type'].lower()}")(feature)
-          """
+        """
+
         coordinates = "("
         for coords in feature['geometry']['coordinates']:
             coordinates += "("
@@ -448,6 +450,7 @@ class AddLayer(object):
 
 
     def get_coordinates(self, feature):
+
         coordinates = "("
         for coords in feature['geometry']['coordinates']:
             coordinates += f"{coords[0]} {coords[1]}, "
@@ -476,6 +479,7 @@ class AddLayer(object):
         :param group: group to which we want to add the layer (string)
         :return:
         """
+
         prov = virtual_layer.dataProvider()
 
         # Enter editing mode
@@ -517,7 +521,7 @@ class AddLayer(object):
     def delete_layer_from_toc(self, layer_name):
         """ Delete layer from toc if exist
          :param layer_name: Name's layer (string)
-         """
+        """
 
         layer = None
         for lyr in list(QgsProject.instance().mapLayers().values()):
@@ -564,6 +568,7 @@ class AddLayer(object):
 
 
     def zoom_to_group(self, group_name, buffer=10):
+
         extent = QgsRectangle()
         extent.setMinimal()
 
@@ -582,3 +587,4 @@ class AddLayer(object):
         extent.set(xmin, ymin, xmax, ymax)
         self.iface.mapCanvas().setExtent(extent)
         self.iface.mapCanvas().refresh()
+

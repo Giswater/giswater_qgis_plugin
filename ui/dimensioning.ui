@@ -10,60 +10,45 @@
     <height>549</height>
    </rect>
   </property>
-  <property name="windowTitle">
-   <string>Dimensioning</string>
-  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <layout class="QGridLayout" name="main_layout">
-      <item row="5" column="0">
+     <layout class="QGridLayout" name="lyt_main">
+      <item row="4" column="0">
        <widget class="QGroupBox" name="grb_other">
         <property name="title">
          <string>Other</string>
         </property>
         <layout class="QGridLayout" name="gridLayout_3">
          <item row="0" column="0">
-          <layout class="QGridLayout" name="other_layout"/>
+          <layout class="QGridLayout" name="lyt_other"/>
          </item>
         </layout>
        </widget>
       </item>
       <item row="3" column="0">
-       <widget class="QGroupBox" name="grb_depth">
-        <property name="title">
-         <string>Depth</string>
-        </property>
-        <layout class="QGridLayout" name="gridLayout_4">
-         <item row="0" column="0">
-          <layout class="QGridLayout" name="depth_layout"/>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <layout class="QGridLayout" name="top_layout"/>
-      </item>
-      <item row="2" column="0">
-       <widget class="QGroupBox" name="grb_distance">
-        <property name="title">
-         <string>Distance</string>
-        </property>
-        <layout class="QGridLayout" name="gridLayout_2">
-         <item row="0" column="0">
-          <layout class="QGridLayout" name="distance_layout"/>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item row="4" column="0">
        <widget class="QGroupBox" name="grb_symbology">
         <property name="title">
          <string>Circle symbology</string>
         </property>
         <layout class="QGridLayout" name="gridLayout_6">
          <item row="0" column="0">
-          <layout class="QGridLayout" name="symbology_layout"/>
+          <layout class="QGridLayout" name="lyt_symbology"/>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <layout class="QGridLayout" name="lyt_top_1"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QGroupBox" name="grb_depth">
+        <property name="title">
+         <string>Measurements</string>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_4">
+         <item row="0" column="0">
+          <layout class="QGridLayout" name="lyt_measurements"/>
          </item>
         </layout>
        </widget>

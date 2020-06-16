@@ -6,6 +6,9 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import QSettings
+from qgis.PyQt.QtWidgets import QDockWidget
+
+from functools import partial
 
 from .api_cf import ApiCF
 from .manage_element import ManageElement
@@ -38,11 +41,8 @@ class Edit(ParentAction):
         self.feature_cat = feature_cat
         self.layer = self.controller.get_layer_by_tablename(feature_cat.parent_layer)
         if self.layer:
-            # Get user values (Settings/Options/Digitizing/Suppress attribute from pop-up after feature creation)
-            # and set True
             self.suppres_form = QSettings().value("/Qgis/digitizing/disable_enter_attribute_values_dialog")
             QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", True)
-
             self.iface.setActiveLayer(self.layer)
             self.layer.startEditing()
             self.iface.actionAddFeature().trigger()
@@ -62,7 +62,7 @@ class Edit(ParentAction):
         if self.layer.geometryType() == 0:
             points = geom.asPoint()
             list_points = f'"x1":{points.x()}, "y1":{points.y()}'
-        elif self.layer.geometryType() in(1, 2):
+        elif self.layer.geometryType() in (1, 2):
             points = geom.asPolyline()
             init_point = points[0]
             last_point = points[-1]
@@ -70,6 +70,8 @@ class Edit(ParentAction):
             list_points += f', "x2":{last_point.x()}, "y2":{last_point.y()}'
         else:
             self.controller.log_info(str(type("NO FEATURE TYPE DEFINED")))
+
+        self.controller.init_docker()
 
         self.api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, 'data')
         result, dialog = self.api_cf.open_form(point=list_points, feature_cat=self.feature_cat,
@@ -82,8 +84,6 @@ class Edit(ParentAction):
         if not result:
             self.layer.deleteFeature(feature.id())
             self.iface.actionRollbackEdits().trigger()
-
-        #self.iface.actionPan().trigger()
 
 
     def get_feature_by_id(self, layer, id_):

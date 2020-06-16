@@ -27,7 +27,7 @@ class CheckProjectResult(ApiParent):
         """ Fill table 'audit_check_project' with layers data """
 
         sql = ("DELETE FROM audit_check_project "
-               "WHERE user_name = current_user AND fprocesscat_id = 1")
+               "WHERE cur_user = current_user AND fid = 101")
         self.controller.execute_sql(sql)
         sql = ""
         for layer in layers:
@@ -47,18 +47,18 @@ class CheckProjectResult(ApiParent):
                 host_name = layer_source['host']
                 table_user = layer_source['user']
                 sql += ("\nINSERT INTO audit_check_project "
-                        "(table_schema, table_id, table_dbname, table_host, fprocesscat_id, table_user) "
+                        "(table_schema, table_id, table_dbname, table_host, fid, table_user) "
                         "VALUES ('" + str(schema_name) + "', '" + str(table_name) + "', '" + str(
-                    db_name) + "', '" + str(host_name) + "', 1, '" + str(table_user) + "');")
+                    db_name) + "', '" + str(host_name) + "', 101, '" + str(table_user) + "');")
 
         status = self.controller.execute_sql(sql)
         if not status:
-            return False
+            return False, None
 
         # Execute function 'gw_fct_audit_check_project'
-        self.execute_audit_check_project(init_project)
+        result = self.execute_audit_check_project(init_project)
 
-        return True
+        return True, result
 
 
     def execute_audit_check_project(self, init_project):
@@ -66,22 +66,23 @@ class CheckProjectResult(ApiParent):
 
         version = self.get_plugin_version()
         extras = f'"version":"{version}"'
-        extras += f', "fprocesscat_id":1'
+        extras += f', "fid":101'
         extras += f', "initProject":{init_project}'
         extras += f', "qgisVersion":"{Qgis.QGIS_VERSION}"'
         extras += f', "osVersion":"{platform.system()} {platform.release()}"'
         body = self.create_body(extras=extras)
         result = self.controller.get_json('gw_fct_audit_check_project', body, log_sql=True)
         try:
-            if not result or (result['body']['actions']['hideForm'] == True): return True
+            if not result or (result['body']['actions']['hideForm'] == True):
+                return result
         except KeyError as e:
             self.controller.log_warning(f"EXCEPTION: {type(e).__name__}, {e}")
-            return True
+            return result
 
         # Show dialog with audit check project result
         self.show_check_project_result(result)
 
-        return True
+        return result
 
 
     def show_check_project_result(self, result):
@@ -151,7 +152,7 @@ class CheckProjectResult(ApiParent):
                 else:
                     grl_others.addWidget(label, pos, 0)
                     grl_others.addWidget(widget, pos, 1)
-            except KeyError as e:
+            except KeyError:
                 description = "Key on returned json from ddbb is missed"
                 self.controller.manage_exception(None, description)
 
@@ -166,7 +167,7 @@ class CheckProjectResult(ApiParent):
             if check.isChecked():
                 try:
                     the_geom = check.property('field_the_geom')
-                except KeyError as e:
+                except KeyError:
                     sql = (f"SELECT attname FROM pg_attribute a "
                            f" JOIN pg_class t on a.attrelid = t.oid "
                            f" JOIN pg_namespace s on t.relnamespace = s.oid "

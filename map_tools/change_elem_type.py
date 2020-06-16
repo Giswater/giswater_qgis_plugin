@@ -11,7 +11,7 @@ from qgis.PyQt.QtCore import Qt
 from functools import partial
 
 from .. import utils_giswater
-from ..ui_manager import ChangeNodeType
+from ..ui_manager import NodeTypeChange
 from ..actions.api_catalog import ApiCatalog
 from ..actions.api_cf import ApiCF
 from .parent import ParentMapTool
@@ -48,7 +48,6 @@ class ChangeElemType(ParentMapTool):
         """ Update current type of node and save changes in database """
         
         project_type = self.controller.get_project_type() 
-        old_node_type = utils_giswater.getWidgetText(self.dlg_chg_node_type, self.dlg_chg_node_type.node_node_type)
         node_node_type_new = utils_giswater.getWidgetText(self.dlg_chg_node_type, self.dlg_chg_node_type.node_node_type_new)
         node_nodecat_id = utils_giswater.getWidgetText(self.dlg_chg_node_type, self.dlg_chg_node_type.node_nodecat_id)
         layer = False
@@ -81,7 +80,6 @@ class ChangeElemType(ParentMapTool):
             message = "The node has not been updated because no catalog has been selected"
             self.controller.show_warning(message)
 
-
         # Close form
         self.close_dialog(self.dlg_chg_node_type)
 
@@ -105,9 +103,9 @@ class ChangeElemType(ParentMapTool):
         if features[0]:
             self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, tab_type='data')
             self.ApiCF.user_current_layer = self.current_layer
-            complet_result, dialog = self.ApiCF.open_form(table_name='v_edit_node', feature_id=features[0]["node_id"], tab_type='data')
+            complet_result, dialog = self.ApiCF.open_form(table_name='v_edit_node', feature_id=features[0]["node_id"],
+                                                          tab_type='data')
             if not complet_result:
-                print("FAIL")
                 return
 
             dialog.dlg_closed.connect(self.ApiCF.restore_user_layer)
@@ -116,10 +114,11 @@ class ChangeElemType(ParentMapTool):
     def change_elem_type(self, feature):
                         
         # Create the dialog, fill node_type and define its signals
-        self.dlg_chg_node_type = ChangeNodeType()
+        self.dlg_chg_node_type = NodeTypeChange()
         self.load_settings(self.dlg_chg_node_type)
 
         # Get nodetype_id from current node
+        node_type = ""
         project_type = self.controller.get_project_type()         
         if project_type == 'ws':
             node_type = feature.attribute('nodetype_id')
@@ -135,16 +134,14 @@ class ChangeElemType(ParentMapTool):
         self.dlg_chg_node_type.btn_accept.clicked.connect(self.edit_change_elem_type_accept)
         self.dlg_chg_node_type.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_chg_node_type))
 
-
         # Fill 1st combo boxes-new system node type
-        sql = ("SELECT DISTINCT(id) FROM node_type "
-               "WHERE active is True "
-               "ORDER BY id")
+        sql = ("SELECT DISTINCT(id) FROM cat_feature WHERE active is True "
+               "AND feature_type = 'NODE' ORDER BY id")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_chg_node_type, "node_node_type_new", rows)
 
         # Open dialog
-        self.open_dialog(self.dlg_chg_node_type, dlg_name='change_node_type', maximize_button=False)
+        self.open_dialog(self.dlg_chg_node_type, dlg_name='nodetype_change', maximize_button=False)
 
 
     def filter_catalog(self):

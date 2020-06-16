@@ -39,7 +39,7 @@ class Logger(object):
         filepath+= ".log"
         
         self.log_folder = log_folder
-        self.controller.log_info(filepath, logger_file=False)          
+        self.controller.log_info(f"Log file: {filepath}", logger_file=False)
         if remove_previous and os.path.exists(filepath):
             os.remove(filepath)
         

@@ -11,7 +11,7 @@ from functools import partial
 
 from .. import utils_giswater
 from .parent_manage import ParentManage
-from ..ui_manager import DupPsector
+from ..ui_manager import PsectorDuplicate
 
 
 class DuplicatePsector(ParentManage, QObject):
@@ -27,7 +27,7 @@ class DuplicatePsector(ParentManage, QObject):
     def manage_duplicate_psector(self, psector_id=None):
 
         # Create the dialog and signals
-        self.dlg_duplicate_psector = DupPsector()
+        self.dlg_duplicate_psector = PsectorDuplicate()
         self.load_settings(self.dlg_duplicate_psector)
 
         # Populate combo duplicate psector
@@ -43,7 +43,7 @@ class DuplicatePsector(ParentManage, QObject):
         self.dlg_duplicate_psector.btn_accept.clicked.connect(partial(self.duplicate_psector))
 
         # Open dialog
-        self.open_dialog(self.dlg_duplicate_psector)
+        self.open_dialog(self.dlg_duplicate_psector, dlg_name='psector_duplicate')
 
 
     def duplicate_psector(self):
@@ -57,13 +57,14 @@ class DuplicatePsector(ParentManage, QObject):
         extras = f'"psector_id":"{id_psector}", "new_psector_name":"{new_psector_name}"'
         body = self.create_body(feature=feature, extras=extras)
         body = body.replace('""', 'null')
-        complet_result = self.controller.get_json('gw_fct_duplicate_psector', body)
+        complet_result = self.controller.get_json('gw_fct_psector_duplicate', body)
         if not complet_result:
-            message = 'Function gw_fct_duplicate_psector executed with no result'
+            message = 'Function gw_fct_psector_duplicate executed with no result'
             self.controller.show_message(message, 3)
             return
 
         # Populate tab info
+        change_tab = False
         data = complet_result['body']['data']
         for k, v in list(data.items()):
             if str(k) == "info":

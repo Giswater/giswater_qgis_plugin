@@ -14,7 +14,7 @@ from functools import partial
 
 from .. import utils_giswater
 from .parent import ParentMapTool
-from ..ui_manager import Cad_add_point
+from ..ui_manager import AuxPoint
 
 
 class CadAddPoint(ParentMapTool):
@@ -35,7 +35,7 @@ class CadAddPoint(ParentMapTool):
     def init_create_point_form(self, point_1=None, point_2=None):
 
         # Create the dialog and signals
-        self.dlg_create_point = Cad_add_point()
+        self.dlg_create_point = AuxPoint()
         self.load_settings(self.dlg_create_point)
 
         validator = QDoubleValidator(-99999.99, 99999.999, 3)
@@ -53,7 +53,7 @@ class CadAddPoint(ParentMapTool):
         else:
             self.dlg_create_point.rb_right.setChecked(True)
 
-        self.open_dialog(self.dlg_create_point, maximize_button=False)
+        self.open_dialog(self.dlg_create_point, dlg_name='auxpoint' ,maximize_button=False)
 
 
     def get_values(self, point_1, point_2):
@@ -174,6 +174,7 @@ class CadAddPoint(ParentMapTool):
 
 
     def activate(self):
+
         self.snap_to_selected_layer = False
         # Get SRID
         self.srid = self.controller.plugin_settings_value('srid')
@@ -204,7 +205,7 @@ class CadAddPoint(ParentMapTool):
 
         # Check for default base layer
         self.vdefault_layer = None
-        row = self.controller.get_config('cad_tools_base_layer_vdefault')
+        row = self.controller.get_config('edit_cadtools_baselayer_vdefault')
         if row:
             self.snap_to_selected_layer = True
             self.vdefault_layer = self.controller.get_layer_by_tablename(row[0], True)
@@ -213,9 +214,6 @@ class CadAddPoint(ParentMapTool):
 
         if self.vdefault_layer is None:
             self.vdefault_layer = self.iface.activeLayer()
-
-        # Set snapping
-        #self.snapper_manager.snap_to_layer(self.vdefault_layer)
 
 
     def deactivate(self):

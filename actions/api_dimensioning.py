@@ -8,7 +8,11 @@ or (at your option) any later version.
 from qgis.core import QgsPointXY
 from qgis.gui import QgsMapToolEmitPoint, QgsMapTip
 from qgis.PyQt.QtCore import Qt, QTimer
-from qgis.PyQt.QtWidgets import QAction, QCompleter, QGridLayout, QLabel, QLineEdit, QSizePolicy, QSpacerItem
+from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QGridLayout, QLabel, QLineEdit, QPushButton,\
+    QSizePolicy, QSpacerItem, QWidget
+
+import json
+from collections import OrderedDict
 
 from functools import partial
 
@@ -38,7 +42,8 @@ class ApiDimensioning(ApiParent):
         self.snapper = self.snapper_manager.get_snapper()
 
 
-    def open_form(self, new_feature=None, layer=None, new_feature_id=None):
+    def open_form(self, qgis_feature=None, layer=None, db_return=None, fid=None):
+
         self.dlg_dim = DimensioningUi()
         self.load_settings(self.dlg_dim)
 
@@ -51,48 +56,71 @@ class ApiDimensioning(ApiParent):
         actionOrientation.triggered.connect(partial(self.orientation, actionOrientation))
         self.set_icon(actionOrientation, "133")
 
-        self.dlg_dim.btn_accept.clicked.connect(partial(self.save_dimensioning, new_feature, layer))
-        self.dlg_dim.btn_cancel.clicked.connect(partial(self.cancel_dimensioning))
-        self.dlg_dim.dlg_closed.connect(partial(self.cancel_dimensioning))
-        self.dlg_dim.dlg_closed.connect(partial(self.save_settings, self.dlg_dim))
-
         # Set layers dimensions, node and connec
         self.layer_dimensions = self.controller.get_layer_by_tablename("v_edit_dimensions")
         self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
         self.layer_connec = self.controller.get_layer_by_tablename("v_edit_connec")
 
+        if qgis_feature is None:
+            features = self.layer_dimensions.getFeatures()
+            for feature in features:
+                if feature['id'] == fid:
+                     return feature
+            qgis_feature = feature
+
+        #qgis_feature = self.get_feature_by_id(self.layer_dimensions, fid, 'id')
+
+        self.dlg_dim.btn_accept.clicked.connect(partial(self.save_dimensioning, qgis_feature, layer))
+        self.dlg_dim.btn_cancel.clicked.connect(partial(self.cancel_dimensioning))
+        self.dlg_dim.dlg_closed.connect(partial(self.cancel_dimensioning))
+        self.dlg_dim.dlg_closed.connect(partial(self.save_settings, self.dlg_dim))
+
         self.create_map_tips()
-        body = self.create_body()
-        # Get layers under mouse clicked
-        complet_result = [self.controller.get_json('gw_api_getdimensioning', body, log_sql=True)]
-        if not complet_result: return False
+
+        # when funcion is called from new feature
+        if db_return is None:
+            body = self.create_body()
+            function_name = 'gw_fct_getdimensioning'
+            json_result = self.controller.get_json(function_name, body)
+            if json_result is None:
+                return False
+            db_return = [json_result]
+
+        # get id from db response
+        self.fid = db_return[0]['body']['feature']['id']
 
         layout_list = []
-        for field in complet_result[0]['body']['data']['fields']:
-            label, widget = self.set_widgets(self.dlg_dim, complet_result, field)
+        for field in db_return[0]['body']['data']['fields']:
+            label, widget = self.set_widgets(self.dlg_dim, db_return, field)
 
             if widget.objectName() == 'id':
-                utils_giswater.setWidgetText(self.dlg_dim, widget, new_feature_id)
+                utils_giswater.setWidgetText(self.dlg_dim, widget, self.fid)
             layout = self.dlg_dim.findChild(QGridLayout, field['layoutname'])
-            # Take the QGridLayout with the intention of adding a QSpacerItem later
-            if layout not in layout_list and layout.objectName() not in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
-                layout_list.append(layout)
 
-            # Add widgets into layout
-                layout.addWidget(label, 0, field['layout_order'])
-                layout.addWidget(widget, 1, field['layout_order'])
-            if field['layoutname'] in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
-                layout.addWidget(label, 0, field['layout_order'])
-                layout.addWidget(widget, 1, field['layout_order'])
-            else:
-                self.put_widgets(self.dlg_dim, field, label, widget)
+            # profilactic issue to prevent missed layouts againts db response and form
+            if layout is not None:
+
+                # Take the QGridLayout with the intention of adding a QSpacerItem later
+                if layout not in layout_list and layout.objectName() not in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
+                    layout_list.append(layout)
+                    # Add widgets into layout
+                    layout.addWidget(label, 0, field['layoutorder'])
+                    layout.addWidget(widget, 1, field['layoutorder'])
+
+                # If field is on top or bottom layout the position is horitzontal no vertical
+                if field['layoutname'] in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
+                    layout.addWidget(label, 0, field['layoutorder'])
+                    layout.addWidget(widget, 1, field['layoutorder'])
+                else:
+                    self.put_widgets(self.dlg_dim, field, label, widget)
 
         # Add a QSpacerItem into each QGridLayout of the list
         for layout in layout_list:
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
             layout.addItem(vertical_spacer1)
 
-        self.open_dialog(self.dlg_dim, dlg_name='dimensioning')
+        title = f"DIMENSIONING - {self.fid}"
+        self.open_dialog(self.dlg_dim, dlg_name='dimensioning', title=title)
         return False, False
 
 
@@ -101,30 +129,51 @@ class ApiDimensioning(ApiParent):
         self.iface.actionRollbackEdits().trigger()
         self.close_dialog(self.dlg_dim)
 
-    def save_dimensioning(self, new_feature, layer):
 
-        # Insert new feature into db
-        layer.updateFeature(new_feature)
+    def save_dimensioning(self, qgis_feature, layer):
+
+        # Upsert feature into db
+        layer.updateFeature(qgis_feature)
         layer.commitChanges()
 
         # Create body
         fields = ''
         list_widgets = self.dlg_dim.findChildren(QLineEdit)
         for widget in list_widgets:
-            widget_name = widget.objectName()
+            widget_name = widget.property('columnname')
             widget_value = utils_giswater.getWidgetText(self.dlg_dim, widget)
             if widget_value == 'null':
                 continue
-            fields += f'"{widget_name}":"{widget_value}",'
+            fields += f'"{widget_name}":"{widget_value}", '
 
-        srid = self.controller.plugin_settings_value('srid')
-        sql = f"SELECT ST_GeomFromText('{new_feature.geometry().asWkt()}', {srid})"
-        the_geom = self.controller.get_row(sql, log_sql=True)
-        fields += f'"the_geom":"{the_geom[0]}"'
+        list_widgets = self.dlg_dim.findChildren(QCheckBox)
+        for widget in list_widgets:
+            widget_name = widget.property('columnname')
+            widget_value = f'"{utils_giswater.isChecked(self.dlg_dim, widget)}"'
+            if widget_value == 'null':
+                continue
+            fields += f'"{widget_name}":{widget_value},'
 
-        feature = '"tableName":"v_edit_dimensions"'
-        body = self.create_body(feature=feature, filter_fields=fields)
-        row = self.controller.get_json('gw_api_setdimensioning', body, log_sql=True)
+
+        list_widgets = self.dlg_dim.findChildren(QComboBox)
+        for widget in list_widgets:
+            widget_name = widget.property('column_id')
+            widget_value = f'"{utils_giswater.get_item_data(self.dlg_dim, widget)}"'
+            if widget_value == 'null':
+                continue
+            fields += f'"{widget_name}":{widget_value},'
+
+        # remove last character (,) from fields
+        fields = fields[:-1]
+
+        feature = '"tableName":"v_edit_dimensions", '
+        feature += f'"id":"{self.fid}"'
+        extras = f'"fields":{{{fields}}}'
+        body = self.create_body(feature=feature, extras=extras)
+
+        # Execute query
+        sql = f"SELECT gw_fct_setdimensioning({body})::text"
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
 
         # Close dialog
         self.close_dialog(self.dlg_dim)
@@ -134,21 +183,23 @@ class ApiDimensioning(ApiParent):
         self.snapper_manager.remove_marker()
         try:
             self.canvas.xyCoordinates.disconnect()
-        except TypeError as e:
+        except TypeError:
             pass
 
         try:
             self.emit_point.canvasClicked.disconnect()
-        except TypeError as e:
+        except TypeError:
             pass
 
         if not action.isChecked():
             action.setChecked(False)
             return True
+
         return False
 
 
     def snapping(self, action):
+
         # Set active layer and set signals
         if self.deactivate_signals(action): return
 
@@ -213,6 +264,7 @@ class ApiDimensioning(ApiParent):
             layer.select([feature_id])
 
             # Get depth of the feature
+            fieldname = None
             self.project_type = self.controller.get_project_type()
             if self.project_type == 'ws':
                 fieldname = "depth"
@@ -220,6 +272,9 @@ class ApiDimensioning(ApiParent):
                 fieldname = "ymax"
             elif self.project_type == 'ud' and feat_type == 'connec':
                 fieldname = "connec_depth"
+
+            if fieldname is None:
+                return
 
             sql = (f"SELECT {fieldname} "
                    f"FROM {feat_type} "
@@ -235,7 +290,9 @@ class ApiDimensioning(ApiParent):
 
 
     def orientation(self, action):
-        if self.deactivate_signals(action): return
+
+        if self.deactivate_signals(action):
+            return
 
         self.dlg_dim.actionSnapping.setChecked(False)
         self.emit_point.canvasClicked.connect(partial(self.click_button_orientation, action))
@@ -262,7 +319,7 @@ class ApiDimensioning(ApiParent):
     def create_map_tips(self):
         """ Create MapTips on the map """
 
-        row = self.controller.get_config('dim_tooltip')
+        row = self.controller.get_config('qgis_dim_tooltip')
         if not row or row[0].lower() != 'true':
             return
 
@@ -285,6 +342,7 @@ class ApiDimensioning(ApiParent):
             self.map_tip_connec.clear(self.canvas)
             self.timer_map_tips.start(100)
 
+
     def show_map_tip(self):
         """ Show MapTips on the map """
 
@@ -298,6 +356,7 @@ class ApiDimensioning(ApiParent):
                 self.map_tip_connec.showMapTip(self.layer_connec, point_qgs, point_qt, self.canvas)
             self.timer_map_tips_clear.start(1000)
 
+
     def clear_map_tip(self):
         """ Clear MapTips """
 
@@ -306,7 +365,7 @@ class ApiDimensioning(ApiParent):
         self.map_tip_connec.clear(self.canvas)
 
 
-    def set_widgets(self, dialog, complet_result, field):
+    def set_widgets(self, dialog, db_return, field):
 
         widget = None
         label = None
@@ -327,22 +386,18 @@ class ApiDimensioning(ApiParent):
             widget = self.set_data_type(field, widget)
             if field['widgettype'] == 'typeahead':
                 widget = self.manage_lineedit(field, dialog, widget, completer)
-            # if widget.property('column_id') == self.field_id:
-            #     self.feature_id = widget.text()
-            #     # Get selected feature
-            #     self.feature = self.get_feature_by_id(self.layer, self.feature_id, self.field_id)
         elif field['widgettype'] == 'combo':
             widget = self.add_combobox(field)
             widget = self.set_widget_size(widget, field)
         elif field['widgettype'] == 'check':
             widget = self.add_checkbox(field)
-        elif field['widgettype'] == 'datepickertime':
+        elif field['widgettype'] == 'datetime':
             widget = self.add_calendar(dialog, field)
         elif field['widgettype'] == 'button':
             widget = self.add_button(dialog, field)
             widget = self.set_widget_size(widget, field)
         elif field['widgettype'] == 'hyperlink':
-            widget = self.add_hyperlink(dialog, field)
+            widget = self.add_hyperlink(field)
             widget = self.set_widget_size(widget, field)
         elif field['widgettype'] == 'hspacer':
             widget = self.add_horizontal_spacer()
@@ -350,13 +405,15 @@ class ApiDimensioning(ApiParent):
             widget = self.add_verical_spacer()
         elif field['widgettype'] == 'textarea':
             widget = self.add_textarea(field)
-        elif field['widgettype'] in ('spinbox', 'doubleSpinbox'):
+        elif field['widgettype'] in ('spinbox'):
             widget = self.add_spinbox(field)
-        elif field['widgettype'] == 'tableView':
-            widget = self.add_tableview(complet_result, field)
+        elif field['widgettype'] == 'tableview':
+            widget = self.add_tableview(db_return, field)
             widget = self.set_headers(widget, field)
             widget = self.populate_table(widget, field)
             widget = self.set_columns_config(widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)
             utils_giswater.set_qtv_config(widget)
+        widget.setObjectName(widget.property('column_id'))
 
         return label, widget
+

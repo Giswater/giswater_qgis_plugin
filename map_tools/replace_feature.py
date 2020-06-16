@@ -5,7 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-
 from qgis.PyQt.QtWidgets import QCompleter
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel
 
@@ -17,7 +16,7 @@ from datetime import datetime
 from .. import utils_giswater
 from .parent import ParentMapTool
 from ..ui_manager import FeatureReplace
-from ..ui_manager import NewWorkcat
+from ..ui_manager import InfoWorkcatUi
 from ..actions.api_catalog import ApiCatalog
 
 
@@ -63,13 +62,13 @@ class ReplaceFeatureMapTool(ParentMapTool):
             utils_giswater.fillComboBox(self.dlg_replace, self.dlg_replace.workcat_id_end, rows)
             utils_giswater.set_autocompleter(self.dlg_replace.workcat_id_end)
 
-        row = self.controller.get_config('workcat_id_end_vdefault')
+        row = self.controller.get_config('edit_workcat_end_vdefault')
         if row:
-            workcat_vdefault = self.dlg_replace.workcat_id_end.findText(row[0])
-            self.dlg_replace.workcat_id_end.setCurrentIndex(workcat_vdefault)
+            edit_workcat_vdefault = self.dlg_replace.workcat_id_end.findText(row[0])
+            self.dlg_replace.workcat_id_end.setCurrentIndex(edit_workcat_vdefault)
 
 
-        row = self.controller.get_config('enddate_vdefault')
+        row = self.controller.get_config('edit_enddate_vdefault')
         if row:
             self.enddate_aux = self.manage_dates(row[0]).date()
         else:
@@ -106,8 +105,8 @@ class ReplaceFeatureMapTool(ParentMapTool):
         self.dlg_replace.workcat_id_end.currentIndexChanged.connect(self.update_date)
 
         # Fill 1st combo boxes-new system node type
-        sql = (f"SELECT DISTINCT(id) FROM {self.geom_type}_type "
-               f"WHERE active is True "
+        sql = (f"SELECT DISTINCT(id) FROM cat_feature WHERE lower(feature_type) = '{self.geom_type}' "
+               f"AND active is True "
                f"ORDER BY id")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_replace, "feature_type_new", rows)
@@ -139,7 +138,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
 
     def update_date(self):
 
-        row = self.controller.get_config('enddate_vdefault')
+        row = self.controller.get_config('edit_enddate_vdefault')
         if row:
             self.enddate_aux = self.manage_dates(row[0]).date()
         else:
@@ -162,7 +161,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
 
     def new_workcat(self):
 
-        self.dlg_new_workcat = NewWorkcat()
+        self.dlg_new_workcat = InfoWorkcatUi()
         self.load_settings(self.dlg_new_workcat)
         utils_giswater.setCalendarDate(self.dlg_new_workcat, self.dlg_new_workcat.builtdate, None, True)
 
@@ -174,7 +173,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
         self.dlg_new_workcat.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_new_workcat))
 
         # Open dialog
-        self.open_dialog(self.dlg_new_workcat)
+        self.open_dialog(self.dlg_new_workcat, dlg_name='info_workcat')
 
 
     def manage_new_workcat_accept(self, table_object):
@@ -362,7 +361,6 @@ class ReplaceFeatureMapTool(ParentMapTool):
 
 
 
-
     """ QgsMapTools inherited event functions """
 
     def keyPressEvent(self, event):
@@ -405,6 +403,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
         if snapped_feat:
             layer = self.snapper_manager.get_snapped_layer(result)
             tablename = self.controller.get_layer_source_table_name(layer)
+
             if tablename and 'v_edit' in tablename:
                 if tablename == 'v_edit_node':
                     self.geom_type = 'node'
@@ -423,6 +422,11 @@ class ReplaceFeatureMapTool(ParentMapTool):
 
     def activate(self):
 
+        # Set active and current layer
+        self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
+        self.iface.setActiveLayer(self.layer_node)
+        self.current_layer = self.layer_node
+
         # Check button
         self.action().setChecked(True)
 
@@ -438,6 +442,8 @@ class ReplaceFeatureMapTool(ParentMapTool):
         # Set snapping to 'node', 'connec' and 'gully'
         self.snapper_manager.snap_to_node()
         self.snapper_manager.snap_to_connec_gully()
+
+        self.snapper_manager.set_snapping_mode()
 
         # Change cursor
         self.canvas.setCursor(self.cursor)
@@ -476,6 +482,4 @@ class ReplaceFeatureMapTool(ParentMapTool):
                    f"WHERE {self.feature_type_ws} = '{feature_type_new}'")
             rows = self.controller.get_rows(sql)
             utils_giswater.fillComboBox(self.dlg_replace, self.dlg_replace.featurecat_id, rows)
-
-
 

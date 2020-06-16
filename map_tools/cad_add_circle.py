@@ -5,7 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-
 from qgis.core import QgsFeature, QgsGeometry, QgsMapToPixel
 from qgis.gui import QgsVertexMarker
 from qgis.PyQt.QtCore import Qt
@@ -15,7 +14,7 @@ from functools import partial
 
 from .. import utils_giswater
 from .parent import ParentMapTool
-from ..ui_manager import Cad_add_circle
+from ..ui_manager import AuxCircle
 
 
 class CadAddCircle(ParentMapTool):
@@ -34,7 +33,7 @@ class CadAddCircle(ParentMapTool):
     def init_create_circle_form(self, point):
 
         # Create the dialog and signals
-        self.dlg_create_circle = Cad_add_circle()
+        self.dlg_create_circle = AuxCircle()
         self.load_settings(self.dlg_create_circle)
         self.cancel_circle = False
         validator = QDoubleValidator(0.00, 999.00, 3)
@@ -45,7 +44,7 @@ class CadAddCircle(ParentMapTool):
         self.dlg_create_circle.btn_cancel.clicked.connect(self.cancel)
         self.dlg_create_circle.radius.setFocus()
         
-        self.open_dialog(self.dlg_create_circle)
+        self.open_dialog(self.dlg_create_circle, dlg_name='auxcircle')
 
 
     def get_radius(self, point):
@@ -152,6 +151,7 @@ class CadAddCircle(ParentMapTool):
 
 
     def activate(self):
+
         self.snap_to_selected_layer = False
         # Check button
         self.action().setChecked(True)
@@ -182,7 +182,7 @@ class CadAddCircle(ParentMapTool):
         # Check for default base layer
         self.vdefault_layer = None
 
-        row = self.controller.get_config('cad_tools_base_layer_vdefault')
+        row = self.controller.get_config('edit_cadtools_baselayer_vdefault')
         if row:
             self.snap_to_selected_layer = True
             self.vdefault_layer = self.controller.get_layer_by_tablename(row[0], True)
@@ -191,9 +191,6 @@ class CadAddCircle(ParentMapTool):
 
         if self.vdefault_layer is None:
             self.vdefault_layer = self.iface.activeLayer()
-
-        # Set snapping
-        #self.snapper_manager.snap_to_layer(self.vdefault_layer)
 
 
     def deactivate(self):

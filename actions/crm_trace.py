@@ -43,7 +43,7 @@ class CrmTrace(ApiParent):
         utils_giswater.fillComboBox(self.dlg_trace, 'cbo_expl', rows, allow_nulls=False)
 
         # Open dialog
-        self.open_dialog(self.dlg_trace)
+        self.open_dialog(self.dlg_trace, dlg_name='crm_trace')
 
 
     def process(self):
@@ -70,7 +70,7 @@ class CrmTrace(ApiParent):
             return False
 
         # Get python synchronization script path
-        row = self.controller.get_config('crm_daily_script_folderpath', 'value', 'config_param_system')
+        row = self.controller.get_config('admin_crm_script_folderpath', 'value', 'config_param_system')
         if row:
             script_folder = row[0]
         else:
@@ -88,7 +88,7 @@ class CrmTrace(ApiParent):
 
         # Get python folder path
         python_path = 'python'
-        row = self.controller.get_config('python_folderpath', 'value', 'config_param_system')
+        row = self.controller.get_config('admin_python_folderpath', 'value', 'config_param_system')
         if row:
             python_folderpath = row[0]
         else:
@@ -143,7 +143,7 @@ class CrmTrace(ApiParent):
         # Get expl_id, year and period from table 'audit_log'
         sql = ("SELECT to_json(log_message) as log_message "
                "FROM utils.audit_log "
-               "WHERE fprocesscat_id = 74 "
+               "WHERE fid = 174 "
                "ORDER BY id DESC LIMIT 1")
         row = self.controller.get_row(sql, log_sql=True)
         if not row:
@@ -162,7 +162,7 @@ class CrmTrace(ApiParent):
             period = result['period']
 
         # Set function parameters
-        client = '"client": {"device":3, "infoType":100, "lang":"ES"}, '
+        client = '"client": {"device":4, "infoType":1, "lang":"ES"}, '
         feature = '"feature": {}, '
         data = f'"data": {{"parameters": {{"exploitation":"{expl_id}", "period":"{period}", "year":"{year}"}}}}'
         body = client + feature + data

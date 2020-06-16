@@ -25,13 +25,13 @@ def open_file(file_path):
                 subprocess.call([opener, file_path])
         else:
             webbrowser.open(file_path)
-    except Exception as e:
+    except Exception:
         return False
     finally:
         return True
 
 
-def manage_tstamp(prefix_name='log', tstamp_format='%Y%m%d', extension='.log'):
+def manage_tstamp(prefix_name='log', tstamp_format='%Y%m%d'):
 
     tstamp = str(time.strftime(tstamp_format))
     name = prefix_name + "_" + tstamp + ".log"

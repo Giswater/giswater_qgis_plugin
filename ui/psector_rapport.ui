@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ud_catalog</class>
- <widget class="QDialog" name="ud_catalog">
+ <class>dlg_psector_rapport</class>
+ <widget class="QDialog" name="dlg_psector_rapport">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -15,7 +15,7 @@
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
    <item row="0" column="0" colspan="3">
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="grb_rapport">
      <property name="title">
       <string>Rapport</string>
      </property>
@@ -91,7 +91,7 @@
             </spacer>
            </item>
            <item>
-            <widget class="QLabel" name="label_shape_2">
+            <widget class="QLabel" name="lbl_template">
              <property name="font">
               <font>
                <pointsize>8</pointsize>
@@ -194,7 +194,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label_shape">
+         <widget class="QLabel" name="lbl_detail_csv">
           <property name="font">
            <font>
             <pointsize>8</pointsize>
@@ -264,7 +264,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label_geom1">
+         <widget class="QLabel" name="lbl_prices_list">
           <property name="font">
            <font>
             <pointsize>8</pointsize>

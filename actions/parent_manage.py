@@ -67,8 +67,8 @@ class ParentManage(ParentAction, object):
     def reset_model(self, dialog, table_object, geom_type):
         """ Reset model of the widget """ 
 
-        table_relation = table_object + "_x_" + geom_type
-        widget_name = "tbl_" + table_relation
+        table_relation = f"{table_object}_x_{geom_type}"
+        widget_name = f"tbl_{table_relation}"
         widget = utils_giswater.getWidget(dialog, widget_name)
         if widget:              
             widget.setModel(None)
@@ -237,10 +237,10 @@ class ParentManage(ParentAction, object):
         if not row:    
             self.reset_widgets(dialog, table_object)
             if table_object == 'element':
-                self.set_combo(dialog, 'state', 'value_state', 'state_vdefault', field_name='name')
-                self.set_combo(dialog, 'expl_id', 'exploitation', 'exploitation_vdefault', field_id='expl_id',field_name='name')
-                self.set_calendars(dialog, 'builtdate', 'config_param_user', 'value', 'builtdate_vdefault')
-                self.set_combo(dialog, 'workcat_id', 'cat_work', 'workcat_vdefault', field_id='id', field_name='id')
+                self.set_combo(dialog, 'state', 'value_state', 'edit_state_vdefault', field_name='name')
+                self.set_combo(dialog, 'expl_id', 'exploitation', 'edit_exploitation_vdefault', field_id='expl_id',field_name='name')
+                self.set_calendars(dialog, 'builtdate', 'config_param_user', 'value', 'edit_builtdate_vdefault')
+                self.set_combo(dialog, 'workcat_id', 'cat_work', 'edit_workcat_vdefault', field_id='id', field_name='id')
             if hasattr(self, 'single_tool_mode'):
                 # some tools can work differently if standalone or integrated in
                 # another tool
@@ -399,8 +399,6 @@ class ParentManage(ParentAction, object):
         elif tab_position == 2:
             self.geom_type = "connec"
         elif tab_position == 3:
-            self.geom_type = "element"
-        elif tab_position == 4:
             self.geom_type = "gully"
 
         self.hide_generic_layers(excluded_layers=excluded_layers)
@@ -476,7 +474,10 @@ class ParentManage(ParentAction, object):
         """ Set autocomplete of widget 'feature_id' 
             getting id's from selected @viewname 
         """
-             
+
+        if geom_type == '':
+            return
+
         # Adding auto-completion to a QLineEdit
         self.completer = QCompleter()
         self.completer.setCaseSensitivity(Qt.CaseInsensitive)
@@ -528,12 +529,10 @@ class ParentManage(ParentAction, object):
         if type(table_object) is str:
             widget_name = f"tbl_{table_object}_x_{geom_type}"
             widget = utils_giswater.getWidget(dialog, widget_name)
-
             if not widget:
                 message = "Widget not found"
                 self.controller.log_info(message, parameter=widget_name)
                 return None
-
         elif type(table_object) is QTableView:
             widget = table_object
         else:
@@ -558,7 +557,7 @@ class ParentManage(ParentAction, object):
                 return expr
 
         # Set a model with selected filter expression
-        table_name = "v_edit_" + geom_type
+        table_name = f"v_edit_{geom_type}"
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
 
@@ -573,12 +572,14 @@ class ParentManage(ParentAction, object):
 
         # Attach model to selected widget
         if type(table_object) is str:
+            self.controller.log_info(f"set_table_model (str): {table_object}")
             widget = utils_giswater.getWidget(dialog, table_object)
             if not widget:
                 message = "Widget not found"
                 self.controller.log_info(message, parameter=table_object)
                 return expr
         elif type(table_object) is QTableView:
+            self.controller.log_info(f"set_table_model: {table_object.objectName()}")
             widget = table_object
         else:
             msg = "Table_object is not a table name or QTableView"
@@ -611,8 +612,6 @@ class ParentManage(ParentAction, object):
         This is necessary to allow a lazy setup of the events because set_table_events
         can create a table with a None model loosing any event connection."""
 
-        # TODO: create a dictionary with key:widged.objectName value:initFuction
-        # to allow multiple lazy initialization
         self.lazy_widget = widget
         self.lazy_init_function = init_function
 
@@ -658,7 +657,6 @@ class ParentManage(ParentAction, object):
             selected_list = widget.selectionModel().selectedRows()
         except AttributeError as e:
             selected_list = []
-
 
         if len(selected_list) == 0:
             message = "Any record selected"
@@ -712,7 +710,7 @@ class ParentManage(ParentAction, object):
         # Update model of the widget with selected expr_filter
         if query:
             self.delete_feature_at_plan(dialog, self.geom_type, list_id)
-            self.reload_qtable(dialog, self.geom_type, self.plan_om)
+            self.reload_qtable(dialog, self.geom_type)
         else:
             self.reload_table(dialog, table_object, self.geom_type, expr_filter)
             self.apply_lazy_init(table_object)
@@ -723,9 +721,10 @@ class ParentManage(ParentAction, object):
 
         if query:
             self.remove_selection()
+
         # Update list
         self.list_ids[self.geom_type] = self.ids
-        self.enable_feature_type(dialog)
+        self.enable_feature_type(dialog, table_object)
         self.connect_signal_selection_changed(dialog, table_object)
 
 
@@ -741,6 +740,7 @@ class ParentManage(ParentAction, object):
                 self.remove_selection(True)
         else:
             self.remove_selection(True)
+
         self.reset_model(dialog, table_object, "arc")
         self.reset_model(dialog, table_object, "node")
         self.reset_model(dialog, table_object, "connec")
@@ -756,6 +756,9 @@ class ParentManage(ParentAction, object):
     def selection_init(self, dialog, table_object, query=False):
         """ Set canvas map tool to an instance of class 'MultipleSelection' """
 
+        if self.geom_type == 'all':
+            self.geom_type = 'arc'
+
         multiple_selection = MultipleSelection(self.iface, self.controller, self.layers[self.geom_type], 
             parent_manage=self, table_object=table_object, dialog=dialog)
         self.disconnect_signal_selection_changed()
@@ -768,14 +771,17 @@ class ParentManage(ParentAction, object):
 
     def selection_changed(self, dialog, table_object, geom_type, query=False):
         """ Slot function for signal 'canvas.selectionChanged' """
+
+        self.controller.log_info(f"selection_changed: {geom_type}")
+
         self.disconnect_signal_selection_changed()
-        field_id = geom_type + "_id"
+        field_id = f"{geom_type}_id"
 
         if self.remove_ids:
             self.ids = []
 
         # Iterate over all layers of the group
-        for layer in self.layers[self.geom_type]:
+        for layer in self.layers[geom_type]:
             if layer.selectedFeatureCount() > 0:
                 # Get selected features of the layer
                 features = layer.selectedFeatures()
@@ -805,26 +811,27 @@ class ParentManage(ParentAction, object):
             expr_filter = expr_filter[:-2] + ")"
 
             # Check expression
-            (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+            (is_valid, expr) = self.check_expression(expr_filter, log_info=True)   #@UnusedVariable
             if not is_valid:
                 return                                           
                           
             self.select_features_by_ids(geom_type, expr)
-                        
+
         # Reload contents of table 'tbl_@table_object_x_@geom_type'
         if query:
-            self.insert_feature_to_plan(dialog, self.geom_type)
+            self.insert_feature_to_plan(dialog, geom_type)
             if self.plan_om == 'plan':
                 self.remove_selection()
-            self.reload_qtable(dialog, geom_type, self.plan_om)
+            self.reload_qtable(dialog, geom_type)
         else:
-            self.reload_table(dialog, table_object, self.geom_type, expr_filter)
+            self.controller.log_info("selection_changed: reload_table")
+            self.reload_table(dialog, table_object, geom_type, expr_filter)
             self.apply_lazy_init(table_object)
 
         # Remove selection in generic 'v_edit' layers
         if self.plan_om == 'plan':
             self.remove_selection(False)
-        self.enable_feature_type(dialog)
+        self.enable_feature_type(dialog, table_object)
         self.connect_signal_selection_changed(dialog, table_object)
 
 
@@ -832,20 +839,24 @@ class ParentManage(ParentAction, object):
         """ Delete features_id to table plan_@geom_type_x_psector"""
 
         value = utils_giswater.getWidgetText(dialog, dialog.psector_id)
-        sql = (f"DELETE FROM {self.plan_om}_psector_x_{geom_type} "
+        sql = (f"DELETE FROM plan_psector_x_{geom_type} "
                f"WHERE {geom_type}_id IN ({list_id}) AND psector_id = '{value}'")
         self.controller.execute_sql(sql)
 
 
-    def enable_feature_type(self, dialog):
+    def enable_feature_type(self, dialog, widget_name='tbl_relation'):
 
-        feature_type = dialog.findChild(QComboBox, 'feature_type')
-        table = dialog.findChild(QTableView, 'tbl_relation')
-        if feature_type is not None and table is not None:
+        feature_type = utils_giswater.getWidget(dialog, 'feature_type')
+        widget_table = utils_giswater.getWidget(dialog, widget_name)
+        if feature_type is not None and widget_table is not None:
             if len(self.ids) > 0:
+                self.controller.log_info("enable_feature_type: False")
                 feature_type.setEnabled(False)
             else:
+                self.controller.log_info("enable_feature_type: True")
                 feature_type.setEnabled(True)
+        else:
+            self.controller.log_info("enable_feature_type: else")
 
 
     def insert_feature(self, dialog, table_object, query=False, remove_ids=True):
@@ -858,7 +869,7 @@ class ParentManage(ParentAction, object):
         # Clear list of ids
         if remove_ids:
             self.ids = []
-        field_id = self.geom_type + "_id"
+        field_id = f"{self.geom_type}_id"
 
         feature_id = utils_giswater.getWidgetText(dialog, "feature_id")
         expr_filter = f"{field_id} = '{feature_id}'"
@@ -914,12 +925,14 @@ class ParentManage(ParentAction, object):
             self.remove_selection()
         else:
             self.reload_table(dialog, table_object, self.geom_type, expr_filter)
-            self.apply_lazy_init(table_object)            
+            self.apply_lazy_init(table_object)
 
         # Update list
         self.list_ids[self.geom_type] = self.ids
-        self.enable_feature_type(dialog)
+        self.enable_feature_type(dialog, table_object)
         self.connect_signal_selection_changed(dialog, table_object)
+
+        self.controller.log_info(self.list_ids[self.geom_type])
 
 
     def insert_feature_to_plan(self, dialog, geom_type):
@@ -928,24 +941,24 @@ class ParentManage(ParentAction, object):
         value = utils_giswater.getWidgetText(dialog, dialog.psector_id)
         for i in range(len(self.ids)):
             sql = (f"SELECT {geom_type}_id "
-                   f"FROM {self.plan_om}_psector_x_{geom_type} "
+                   f"FROM plan_psector_x_{geom_type} "
                    f"WHERE {geom_type}_id = '{self.ids[i]}' AND psector_id = '{value}'")
             row = self.controller.get_row(sql)
             if not row:
-                sql = (f"INSERT INTO {self.plan_om}_psector_x_{geom_type}"
+                sql = (f"INSERT INTO plan_psector_x_{geom_type}"
                        f"({geom_type}_id, psector_id) VALUES('{self.ids[i]}', '{value}')")
                 self.controller.execute_sql(sql)
-            self.reload_qtable(dialog, geom_type, self.plan_om)
+            self.reload_qtable(dialog, geom_type)
 
 
-    def reload_qtable(self, dialog, geom_type, plan_om):
+    def reload_qtable(self, dialog, geom_type):
         """ Reload QtableView """
         
         value = utils_giswater.getWidgetText(dialog, dialog.psector_id)
         expr = f"psector_id = '{value}'"
         qtable = utils_giswater.getWidget(dialog, f'tbl_psector_x_{geom_type}')
-        self.fill_table_by_expr(qtable, f"{plan_om}_psector_x_{geom_type}", expr)
-        self.set_table_columns(dialog, qtable, f"{plan_om}_psector_x_{geom_type}")
+        self.fill_table_by_expr(qtable, f"plan_psector_x_{geom_type}", expr)
+        self.set_table_columns(dialog, qtable, f"plan_psector_x_{geom_type}")
         self.refresh_map_canvas()
 
 
@@ -1122,14 +1135,15 @@ class ParentManage(ParentAction, object):
             if layer and "v_edit_gully" not in excluded_layers:
                 self.controller.set_layer_visible(layer)
         
-    
+
     def connect_signal_selection_changed(self, dialog, table_object, query=False):
         """ Connect signal selectionChanged """
         
         try:
-            self.canvas.selectionChanged.connect(partial(self.selection_changed, dialog,  table_object, self.geom_type, query))
-        except Exception:    
-            pass
+            self.controller.log_info(f"connect_signal_selection_changed: {self.geom_type}")
+            self.canvas.selectionChanged.connect(partial(self.selection_changed, dialog, table_object, self.geom_type, query))
+        except Exception as e:
+            self.controller.log_info(f"connect_signal_selection_changed: {e}")
     
     
     def disconnect_signal_selection_changed(self):
@@ -1156,7 +1170,6 @@ class ParentManage(ParentAction, object):
                 widget.setDate(value if value else QDate.currentDate())
             elif type(widget) == QDateTimeEdit:
                 widget.setDateTime(value if value else QDateTime.currentDateTime())
-
 
             if type(widget) in [QLineEdit, QTextEdit]:
                 if value:
@@ -1187,7 +1200,7 @@ class ParentManage(ParentAction, object):
             table_name = self.schema_name + "." + table_name
 
         # Set model
-        model = QSqlTableModel();
+        model = QSqlTableModel()
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)
         model.setFilter(expr_filter)

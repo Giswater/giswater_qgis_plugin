@@ -6,31 +6,27 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import pyqtSignal, QObject
-from time import sleep
 from qgis.core import QgsTask, QgsMessageLog, Qgis
+from time import sleep
 
 
-MESSAGE_CATEGORY = 'giswater'
 class GwTask(QgsTask, QObject):
-    """This shows how to subclass QgsTask"""
+    """ This shows how to subclass QgsTask """
 
     fake_progress = pyqtSignal()
-    def __init__(self, description, duration=0):
+    def __init__(self, description, duration=0, controller=None):
+
         QObject.__init__(self)
         super().__init__(description, QgsTask.CanCancel)
         self.exception = None
         self.duration = duration
+        self.controller = controller
 
 
     def run(self):
-        """Here you implement your heavy lifting. This method should
-        periodically test for isCancelled() to gracefully abort.
-        This method MUST return True or False
-        raising exceptions will crash QGIS so we handle them internally and
-        raise them in self.finished
-        """
 
-        QgsMessageLog.logMessage(f'Started task {self.description()}', MESSAGE_CATEGORY, Qgis.Info)
+        self.manage_message(f"Started task {self.description()}")
+
         if self.duration is 0:
             if self.isCanceled():
                 return False
@@ -42,46 +38,33 @@ class GwTask(QgsTask, QObject):
             sleep(wait_time)
             for i in range(100):
                 sleep(wait_time)
-                # use setProgress to report progress
                 self.setProgress(i)
-
-                # check isCanceled() to handle cancellation
                 if self.isCanceled():
                     return False
-                # simulate exceptions to show how to abort task
-                # if random.randint(0, 500) == 42:
-                #     # DO NOT raise Exception('bad value!')
-                #     # this would crash QGIS
-                #     self.exception = Exception('bad value!')
-                #     return False
 
             return True
 
 
     def finished(self, result):
-        """This method is automatically called when self.run returns. result
-        is the return value from self.run.
-        This function is automatically called when the task has completed (
-        successfully or otherwise). You just implement finished() to do whatever
-        follow up stuff should happen after the task is complete. finished is
-        always called from the main thread, so it's safe to do GUI
-        operations and raise Python exceptions here.
-        """
 
         if result:
-            QgsMessageLog.logMessage(f'Task {self.description()} completed', MESSAGE_CATEGORY, Qgis.Success)
+            self.manage_message(f"Task {self.description()} completed")
         else:
             if self.exception is None:
-                QgsMessageLog.logMessage(f'Task {self.description()} not successful but without exception ',
-                                         MESSAGE_CATEGORY, Qgis.Warning)
+                self.manage_message(f"Task {self.description()} not successful but without exception")
             else:
-                QgsMessageLog.logMessage(f'Task {self.description()} Exception: {self.exception}',
-                                         MESSAGE_CATEGORY, Qgis.Critical)
+                self.manage_message(f"Task {self.description()} Exception: {self.exception}")
                 raise self.exception
 
 
     def cancel(self):
 
-        QgsMessageLog.logMessage(f'Task {self.description()} was cancelled', MESSAGE_CATEGORY, Qgis.Info)
+        self.manage_message(f"Task {self.description()} was cancelled")
         super().cancel()
+
+
+    def manage_message(self, msg):
+
+        if self.controller:
+            self.controller.log_info(msg)
 

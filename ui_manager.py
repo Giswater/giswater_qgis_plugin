@@ -13,11 +13,9 @@ class GwDockWidget(QDockWidget):
     dlg_closed = QtCore.pyqtSignal()
     
     def __init__(self, subtag=None):
-
         super().__init__()
         self.setupUi(self)
         self.subtag = subtag
-        print(f'{type(self)}: {self.objectName()}')
 
 
     def closeEvent(self, event):
@@ -28,13 +26,11 @@ class GwDockWidget(QDockWidget):
 class GwDialog(QDialog):
 
     def __init__(self, subtag=None):
-
         super().__init__()
         self.setupUi(self)
         self.subtag = subtag
         # Enable event filter
         self.installEventFilter(self)
-        print(f'{type(self)}: {self.objectName()}')
 
 
     def eventFilter(self, object, event):
@@ -53,12 +49,15 @@ class GwDialog(QDialog):
                 tag = f'{self.objectName()}_{self.subtag}'
             else:
                 tag = str(self.objectName())
+
             try:
                 web_tag = parser.get('web_tag', tag)
                 webbrowser.open_new_tab(f'https://giswater.org/giswater-manual/#{web_tag}')
             except Exception as e:
                 webbrowser.open_new_tab('https://giswater.org/giswater-manual')
-            return True
+            finally:
+                return True
+
         return False
 
 
@@ -67,17 +66,14 @@ class GwMainWindow(QMainWindow):
     dlg_closed = QtCore.pyqtSignal()
     
     def __init__(self, subtag=None):
-
         super().__init__()
         self.setupUi(self)
         self.subtag = subtag
         # Enable event filter
         self.installEventFilter(self)
-        print(f'{type(self)}: {self.objectName()}')
 
 
     def closeEvent(self, event):
-
         self.dlg_closed.emit()
         return super().closeEvent(event)
 
@@ -118,12 +114,17 @@ def get_ui_class(ui_file_name, subfolder=None):
     return uic.loadUiType(ui_file_path)[0]
 
 
+FORM_CLASS = get_ui_class('docker.ui')
+class DockerUi(GwDockWidget, FORM_CLASS):
+    pass
+
+
 FORM_CLASS = get_ui_class('element.ui')
 class ElementUi(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('add_lot.ui')
+FORM_CLASS = get_ui_class('lot.ui')
 class LotUi(GwDialog, FORM_CLASS):
     pass
 
@@ -132,12 +133,9 @@ FORM_CLASS = get_ui_class('visit.ui')
 class VisitUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('new_visit.ui')
-class NewVisitUi(GwDialog, FORM_CLASS):
-    pass
 
-FORM_CLASS = get_ui_class('info_basic.ui')
-class ApiBasicInfo(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('info_generic.ui')
+class InfoGenericUi(GwDialog, FORM_CLASS):
     pass
 
 
@@ -146,14 +144,14 @@ class InfoCatalogUi(GwMainWindow, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('info_full.ui')
-class InfoFullUi(GwMainWindow, FORM_CLASS):
+FORM_CLASS = get_ui_class('info_feature.ui')
+class InfoFeatureUi(GwMainWindow, FORM_CLASS):
     key_pressed = QtCore.pyqtSignal()
 
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key_Escape:
             self.key_pressed.emit()
-            return super(InfoFullUi, self).keyPressEvent(event)
+            return super(InfoFeatureUi, self).keyPressEvent(event)
 
 
 FORM_CLASS = get_ui_class('fastprint.ui')
@@ -171,8 +169,8 @@ class DimensioningUi(GwMainWindow, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('options.ui')
-class OptionsUi(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('go2epa_options.ui')
+class Go2EpaOptionsUi(GwDialog, FORM_CLASS):
     pass
 
 
@@ -206,34 +204,36 @@ class ProjectCheckUi(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('basic_info.ui')
-class BasicInfoUi(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('dialog_text.ui')
+class DialogTextUi(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('basic_table.ui')
+FORM_CLASS = get_ui_class('dialog_table.ui')
 class BasicTable(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('cad_add_circle.ui')
-class Cad_add_circle(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('auxcircle.ui')
+class AuxCircle(GwDialog, FORM_CLASS):
     pass
         
 
-FORM_CLASS = get_ui_class('cad_add_point.ui')
-class Cad_add_point(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('auxpoint.ui')
+class AuxPoint(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('change_node_type.ui')
-class ChangeNodeType(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('nodetype_change.ui')
+class NodeTypeChange(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('credentials.ui')
+FORM_CLASS = get_ui_class('main_credentials.ui')
 class Credentials(GwDialog, FORM_CLASS):
+
     def __init__(self, subtag=None):
+
         super().__init__()
         self.txt_pass.setClearButtonEnabled(True)
         icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_open.png'
@@ -246,6 +246,9 @@ class Credentials(GwDialog, FORM_CLASS):
 
 
     def show_pass(self):
+
+        icon_path = ""
+        text = ""
         if self.txt_pass.echoMode() == 0:
             self.txt_pass.setEchoMode(QLineEdit.Password)
             icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_open.png'
@@ -265,13 +268,13 @@ class DlgTrace(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('csv2pg.ui')
-class Csv2Pg(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('csv.ui')
+class CsvUi(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('delete_feature.ui')
-class DelFeature(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('feature_delete.ui')
+class FeatureDelete(GwDialog, FORM_CLASS):
     pass
 
 
@@ -280,68 +283,62 @@ class DocUi(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('doc_management.ui')
-class DocManagement(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('doc_manager.ui')
+class DocManager(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('draw_profile.ui')
-class DrawProfile(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('profile.ui')
+class Profile(GwMainWindow, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('duplicate_psector.ui')
-class DupPsector(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('psector_duplicate.ui')
+class PsectorDuplicate(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('element_management.ui')
-class ElementManagement(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('element_manager.ui')
+class ElementManager(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('epa_result_compare_selector.ui')
-class EpaResultCompareSelector(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('go2epa_selector.ui')
+class Go2EpaSelectorUi(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('epa_result_manager.ui')
-class EpaResultManager(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('go2epa_manager.ui')
+class EpaManager(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('event_full.ui')
-class EventFull(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('visit_event_full.ui')
+class VisitEventFull(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('event_standard.ui')
-class EventStandard(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('visit_event_rehab.ui')
+class VisitEventRehab(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('event_ud_arc_rehabit.ui')
-class EventUDarcRehabit(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('visit_event.ui')
+class VisitEvent(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('event_ud_arc_standard.ui')
-class EventUDarcStandard(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('go2epa.ui')
+class Go2EpaUI(GwDialog, FORM_CLASS):
     pass
 
 
-# TODO change file and class name to go2epa
-FORM_CLASS = get_ui_class('file_manager.ui')
-class FileManager(GwDialog, FORM_CLASS):
-    pass
-
-
-FORM_CLASS = get_ui_class('gallery.ui')
+FORM_CLASS = get_ui_class('visit_gallery.ui')
 class Gallery(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('gallery_zoom.ui')
+FORM_CLASS = get_ui_class('visit_gallery_zoom.ui')
 class GalleryZoom(GwDialog, FORM_CLASS):
     pass
 
@@ -355,19 +352,18 @@ FORM_CLASS = get_ui_class('info_show_info.ui')
 class InfoShowInfo(GwDialog, FORM_CLASS):
     pass
 
-# TODO change file and class name to workcat_search
-FORM_CLASS = get_ui_class('list_items.ui')
-class ListItems(GwDialog, FORM_CLASS):
+
+FORM_CLASS = get_ui_class('search_workcat.ui')
+class SearchWorkcat(GwDialog, FORM_CLASS):
+    pass
+
+FORM_CLASS = get_ui_class('visit_document.ui')
+class VisitDocument(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('load_documents.ui')
-class LoadDocuments(GwDialog, FORM_CLASS):
-    pass
-
-
-FORM_CLASS = get_ui_class('load_profiles.ui')
-class LoadProfiles(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('profile_list.ui')
+class ProfilesList(GwDialog, FORM_CLASS):
     pass
 
 
@@ -376,20 +372,20 @@ class LotManagement(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('manage_addfields.ui')
-class ManageFields(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('main_addfields.ui')
+class MainFields(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('manage_sys_fields.ui')
-class ManageSysFields(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('main_sysfields.ui')
+class MainSysFields(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('manage_visit_class.ui')
-class ManageVisitClass(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('main_visitclass.ui')
+class MainVisitClass(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('manage_visit_param.ui')
-class ManageVisitParam(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('main_visitparam.ui')
+class MainVisitParam(GwDialog, FORM_CLASS):
     pass
 
 
@@ -402,13 +398,13 @@ class Mincut(GwMainWindow, FORM_CLASS):
         super().__init__()
 
 
-FORM_CLASS = get_ui_class('mincut_add_connec.ui')
-class Mincut_add_connec(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('mincut_connec.ui')
+class MincutConnec(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('mincut_add_hydrometer.ui')
-class Mincut_add_hydrometer(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('mincut_hydrometer.ui')
+class MincutHydrometer(GwDialog, FORM_CLASS):
     pass
 
 
@@ -417,13 +413,13 @@ class MincutComposer(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('mincut_edit.ui')
-class Mincut_edit(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('mincut_manager.ui')
+class MincutManagerUi(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('mincut_fin.ui')
-class Mincut_fin(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('mincut_end.ui')
+class MincutEndUi(GwDialog, FORM_CLASS):
     pass
 
 
@@ -432,8 +428,8 @@ class Multirow_selector(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('new_workcat.ui')
-class NewWorkcat(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('info_workcat.ui')
+class InfoWorkcatUi(GwDialog, FORM_CLASS):
     pass
 
 
@@ -442,13 +438,8 @@ class FeatureReplace(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('plan_estimate_result_manager.ui')
-class EstimateResultManager(GwDialog, FORM_CLASS):
-    pass
-
-
-FORM_CLASS = get_ui_class('plan_estimate_result_new.ui')
-class EstimateResultNew(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('price_manager.ui')
+class PriceManagerUi(GwDialog, FORM_CLASS):
     pass
 
 
@@ -462,19 +453,21 @@ class Plan_psector(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('psector_management.ui')
-class Psector_management(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('psector_manager.ui')
+class PsectorManagerUi(GwDialog, FORM_CLASS):
     pass
 
 
 FORM_CLASS = get_ui_class('psector_rapport.ui')
-class Psector_rapport(GwDialog, FORM_CLASS):
+class PsectorRapportUi(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('qm_generator.ui')
-class QmGenerator(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('main_qtdialog.ui')
+class MainQtDialogUi(GwDialog, FORM_CLASS):
+
     def __init__(self, subtag=None):
+
         super().__init__()
         self.txt_pass.setClearButtonEnabled(True)
         icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_open.png'
@@ -487,6 +480,9 @@ class QmGenerator(GwDialog, FORM_CLASS):
 
 
     def show_pass(self):
+
+        icon_path = ""
+        text = ""
         if self.txt_pass.echoMode() == 0:
             self.txt_pass.setEchoMode(QLineEdit.Password)
             icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_open.png'
@@ -501,34 +497,34 @@ class QmGenerator(GwDialog, FORM_CLASS):
             self.action.setText(text)
 
 
-FORM_CLASS = get_ui_class('readsql.ui')
-class Readsql(GwMainWindow, FORM_CLASS):
+FORM_CLASS = get_ui_class('main_ui.ui')
+class MainUi(GwMainWindow, FORM_CLASS):
     dlg_closed = QtCore.pyqtSignal()
     pass
 
 
-FORM_CLASS = get_ui_class('readsql_create_project.ui')
-class ReadsqlCreateProject(GwMainWindow, FORM_CLASS):
+FORM_CLASS = get_ui_class('main_dbproject.ui')
+class MainDbProjectUi(GwMainWindow, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('readsql_create_gis_project.ui')
-class ReadsqlCreateGisProject(GwMainWindow, FORM_CLASS):
+FORM_CLASS = get_ui_class('main_gisproject.ui')
+class MainGisProjectUi(GwMainWindow, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('readsql_rename_copy.ui')
-class ReadsqlRenameCopy(GwMainWindow, FORM_CLASS):
+FORM_CLASS = get_ui_class('main_renameproj.ui')
+class MainRenameProjUi(GwMainWindow, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('readsql_show_info.ui')
-class ReadsqlShowInfo(GwMainWindow, FORM_CLASS):
+FORM_CLASS = get_ui_class('main_projectinfo.ui')
+class MainProjectInfoUi(GwMainWindow, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('sections.ui')
-class Sections(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('info_crossect.ui')
+class InfoCrossectUi(GwDialog, FORM_CLASS):
     pass
 
 
@@ -537,23 +533,23 @@ class SelectorDate(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('user_management.ui')
-class UserManagement(GwMainWindow, FORM_CLASS):
+FORM_CLASS = get_ui_class('lot_usermanager.ui')
+class LotUserManager(GwMainWindow, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('visit_management.ui')
-class VisitManagement(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('lot_visitmanager.ui')
+class LotVisitManagerUi(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('workcat_end.ui')
-class WorkcatEnd(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('feature_end.ui')
+class FeatureEndUi(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('workcat_end_list.ui')
-class WorkcatEndList(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('feature_end_connec.ui')
+class FeatureEndConnecUi(GwDialog, FORM_CLASS):
     pass
 
 
@@ -565,6 +561,20 @@ class AddVisitTm(GwDialog, FORM_CLASS):
 
 FORM_CLASS = get_ui_class('event_standard.ui', 'tm')
 class EventStandardTm(GwDialog, FORM_CLASS):
+    pass
+
+FORM_CLASS = get_ui_class('incident_planning.ui', 'tm')
+class IncidentPlanning(GwDialog, FORM_CLASS):
+    pass
+
+
+FORM_CLASS = get_ui_class('incident_manager.ui', 'tm')
+class IncidentManager(GwDialog, FORM_CLASS):
+    pass
+
+
+FORM_CLASS = get_ui_class('info_incident.ui', 'tm')
+class InfoIncident(GwDialog, FORM_CLASS):
     pass
 
 

@@ -42,7 +42,7 @@ class GwToolBox(ApiParent):
 
     def open_toolbox(self):
 
-        function_name = "gw_api_gettoolbox"
+        function_name = "gw_fct_gettoolbox"
         row = self.controller.check_function(function_name)
         if not row:
             self.controller.show_warning("Function not found in database", parameter=function_name)
@@ -54,11 +54,11 @@ class GwToolBox(ApiParent):
         self.dlg_toolbox_doc.trv.setHeaderHidden(True)
         extras = '"isToolbox":true'
         body = self.create_body(extras=extras)
-        complet_result = self.controller.get_json('gw_api_gettoolbox', body)
-        if not complet_result:
+        json_result = self.controller.get_json('gw_fct_gettoolbox', body)
+        if not json_result:
             return False
 
-        self.populate_trv(self.dlg_toolbox_doc.trv, complet_result['body']['data'])
+        self.populate_trv(self.dlg_toolbox_doc.trv, json_result['body']['data'])
         self.dlg_toolbox_doc.txt_filter.textChanged.connect(partial(self.filter_functions))
         self.dlg_toolbox_doc.trv.doubleClicked.connect(partial(self.open_function))
         self.controller.manage_translation('toolbox_docker', self.dlg_toolbox_doc)
@@ -68,11 +68,11 @@ class GwToolBox(ApiParent):
 
         extras = f'"filterText":"{text}"'
         body = self.create_body(extras=extras)
-        complet_result = self.controller.get_json('gw_api_gettoolbox', body)
-        if not complet_result :
+        json_result = self.controller.get_json('gw_fct_gettoolbox', body)
+        if not json_result :
             return False
 
-        self.populate_trv(self.dlg_toolbox_doc.trv, complet_result['body']['data'], expand=True)
+        self.populate_trv(self.dlg_toolbox_doc.trv, json_result['body']['data'], expand=True)
 
 
     def open_function(self, index):
@@ -98,11 +98,11 @@ class GwToolBox(ApiParent):
         extras = f'"filterText":"{self.alias_function}"'
         extras += ', "isToolbox":true'
         body = self.create_body(extras=extras)
-        complet_result = self.controller.get_json('gw_api_gettoolbox', body, log_sql=True)
-        if not complet_result: return False
+        json_result = self.controller.get_json('gw_fct_gettoolbox', body)
+        if not json_result:
+            return False
 
-        status = self.populate_functions_dlg(self.dlg_functions, complet_result['body']['data'])
-
+        status = self.populate_functions_dlg(self.dlg_functions, json_result['body']['data'])
         if not status:
             self.alias_function = index.sibling(index.row(), 1).data()
             message = "Function not found"
@@ -110,7 +110,7 @@ class GwToolBox(ApiParent):
             return
 
         self.dlg_functions.btn_run.clicked.connect(partial(self.execute_function, self.dlg_functions,
-                                                   self.dlg_functions.cmb_layers, complet_result['body']['data']))
+                                                   self.dlg_functions.cmb_layers, json_result['body']['data']))
         self.dlg_functions.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_functions))
         self.dlg_functions.btn_cancel.clicked.connect(partial(self.remove_layers))
         self.dlg_functions.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_functions))
@@ -135,14 +135,13 @@ class GwToolBox(ApiParent):
             parentGroup = demRaster.parent()
             try:
                 QgsProject.instance().removeMapLayer(layer.id())
-            except Exception as e:
+            except Exception:
                 pass
 
             if len(parentGroup.findLayers())== 0:
                 root.removeChildNode(parentGroup)
 
         self.iface.mapCanvas().refresh()
-
 
 
     def set_selected_layer(self, dialog, combo):
@@ -245,6 +244,7 @@ class GwToolBox(ApiParent):
         # TODO Check if time functions is short or long, activate and set undetermined  if not short
 
         # Get function name
+        function = None
         function_name = None
         for group, function in list(result['fields'].items()):
             if len(function) != 0:
@@ -252,8 +252,10 @@ class GwToolBox(ApiParent):
                 self.save_parametric_values(dialog, function)
                 function_name = function[0]['functionname']
                 break
+
         if function_name is None:
             return
+
         # If function is not parametrized, call function(old) without json
         if self.is_paramtetric is False:
             self.execute_no_parametric(dialog, function_name)
@@ -264,6 +266,7 @@ class GwToolBox(ApiParent):
             return
 
         if function[0]['input_params']['featureType']:
+            layer = None
             layer_name = utils_giswater.get_item_data(dialog, combo, 1)
             if layer_name != -1:
                 layer = self.set_selected_layer(dialog, combo)
@@ -273,6 +276,7 @@ class GwToolBox(ApiParent):
                     dialog.progressBar.setMaximum(1)
                     dialog.progressBar.setValue(1)
                     return
+
             selection_mode = self.rbt_checked['widget']
             extras += f'"selectionMode":"{selection_mode}",'
             # Check selection mode and get (or not get) all feature id
@@ -308,8 +312,8 @@ class GwToolBox(ApiParent):
                         if type(widget) in ('', QLineEdit):
                             widget.setStyleSheet(None)
                             value = utils_giswater.getWidgetText(dialog, widget, False, False)
-                            extras += f'"{param_name}":"{value}", '.replace('""','null')
-                            if value is '' and widget.property('is_mandatory'):
+                            extras += f'"{param_name}":"{value}", '.replace('""', 'null')
+                            if value is '' and widget.property('ismandatory'):
                                 widget_is_void = True
                                 widget.setStyleSheet("border: 1px solid red")
                         elif type(widget) in ('', QSpinBox, QDoubleSpinBox):
@@ -339,7 +343,7 @@ class GwToolBox(ApiParent):
             dialog.progressBar.setValue(1)
             return
 
-        dialog.progressBar.setFormat("Running function: " + str(function_name))
+        dialog.progressBar.setFormat(f"Running function: {function_name}")
         dialog.progressBar.setAlignment(Qt.AlignCenter)
 
         if len(widget_list) > 0:
@@ -348,36 +352,40 @@ class GwToolBox(ApiParent):
             extras += '}'
 
         body = self.create_body(feature=feature_field, extras=extras)
-        sql = f"SELECT {function_name}({body})::text"
-        row = self.controller.get_row(sql, log_sql=True)
-        if not row or row[0] is None:
-            self.controller.show_message(f"Function : {function_name} executed with no result ", 3)
-            dialog.progressBar.setVisible(False)
-            dialog.progressBar.setMinimum(0)
-            dialog.progressBar.setMaximum(1)
-            dialog.progressBar.setValue(1)
-            return True
-
-        complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-
-        self.add_layer.add_temp_layer(dialog, complet_result[0]['body']['data'], self.alias_function, True, True, 1, True)
-
-        dialog.progressBar.setFormat(f"Function {function_name} has finished.")
+        json_result = self.controller.get_json(function_name, body)
         dialog.progressBar.setAlignment(Qt.AlignCenter)
         dialog.progressBar.setMinimum(0)
         dialog.progressBar.setMaximum(1)
         dialog.progressBar.setValue(1)
+        if json_result is None:
+            dialog.progressBar.setFormat(f"Function: {function_name} executed with no result")
+            return True
+
+        if not json_result:
+            dialog.progressBar.setFormat(f"Function: {function_name} failed. See log file for more details")
+            return False
 
         try:
-            self.add_layer.set_layers_visible(complet_result[0]['body']['data']['setVisibleLayers'])
-        except KeyError as e:
+            dialog.progressBar.setFormat(f"Function {function_name} has finished")
+            self.add_layer.add_temp_layer(dialog, json_result['body']['data'], self.alias_function, True, True, 1, True)
+            self.add_layer.set_layers_visible(json_result['body']['data']['setVisibleLayers'])
 
+            # getting simbology capabilities
+            print('1')
+            if 'setStyle' in json_result['body']['data']:
+                set_sytle = json_result['body']['data']['setStyle']
+                print(set_sytle)
+                if set_sytle == "Mapzones":
+                    # call function to simbolize mapzones
+                    self.set_style_mapzones()
+
+        except KeyError as e:
             msg = f"<b>Key: </b>{e}<br>"
             msg += f"<b>key container: </b>'body/data/ <br>"
             msg += f"<b>Python file: </b>{__name__} <br>"
             msg += f"<b>Python function:</b> {self.execute_function.__name__} <br>"
-            msg += f"<b>DB call: </b>{sql}<br>"
             self.show_exceptions_msg("Key on returned json from ddbb is missed.", msg)
+
         self.remove_layers()
 
 
@@ -390,9 +398,8 @@ class GwToolBox(ApiParent):
 
         sql = f"SELECT {function_name}()::text"
         row = self.controller.get_row(sql, log_sql=True)
-
         if not row or row[0] is None:
-            self.controller.show_message(f"Function : {function_name} executed with no result ", 3)
+            self.controller.show_message(f"Function: {function_name} executed with no result ", 3)
             return True
 
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
@@ -458,12 +465,12 @@ class GwToolBox(ApiParent):
     def get_all_group_layers(self, geom_type):
 
         list_items = []
-        sql = ("SELECT tablename, type FROM "
-               "(SELECT tablename, type, 1 as c FROM sys_feature_cat"
-               " WHERE type = '" + geom_type.upper() + "'"
-               " UNION SELECT DISTINCT(parent_layer), feature_type, 0 FROM cat_feature WHERE feature_type='" + geom_type.upper() + "'"
-               " UNION SELECT child_layer, feature_type, 2 as c FROM cat_feature WHERE feature_type = '" + geom_type.upper() + "') as t "
-               " ORDER BY c, tablename")
+        sql = (f"SELECT tablename, type FROM "
+               f"(SELECT DISTINCT(parent_layer) AS tablename, feature_type as type, 0 as c "
+               f"FROM cat_feature WHERE feature_type = '{geom_type.upper()}' "
+               f"UNION SELECT child_layer, feature_type, 2 as c "
+               f"FROM cat_feature WHERE feature_type = '{geom_type.upper()}') as t "
+               f"ORDER BY c, tablename")
         rows = self.controller.get_rows(sql)
         if rows:
             for row in rows:
@@ -557,7 +564,7 @@ class GwToolBox(ApiParent):
                         icon = QIcon(path_icon_red)
                         label.setIcon(icon)
                         label.setForeground(QColor(255, 0, 0))
-                        msg = f"Function {function['functionname']} configured on the table audit_cat_function, but not found in the database"
+                        msg = f"Function {function['functionname']} configured on the table config_toolbox, but not found in the database"
                         label.setToolTip(msg)
                         self.no_clickable_items.append(str(function['alias']))
                 else:

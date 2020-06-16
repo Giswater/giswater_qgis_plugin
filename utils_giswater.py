@@ -66,6 +66,7 @@ def fillComboBoxList(dialog, widget, list_object, allow_nulls=True, clear_combo=
 
 def getText(dialog, widget, return_string_null=True):
 
+    text = ""
     if type(widget) is str or type(widget) is str:
         widget = dialog.findChild(QWidget, widget)
     if widget:
@@ -87,6 +88,7 @@ def getText(dialog, widget, return_string_null=True):
             elem_text = "null"
         else:
             elem_text = ""
+
     return elem_text
 
 
@@ -275,7 +277,7 @@ def setCurrentIndex(dialog, widget, index):
     if widget:
         if index == -1:
             index = 0
-        widget.setCurrentIndex(index);
+        widget.setCurrentIndex(index)
 
 
 def setWidgetVisible(dialog, widget, visible=True):
@@ -541,6 +543,8 @@ def set_regexp_date_validator(widget, button=None, regex_type=1):
     Also allow to enable or disable a QPushButton(button), like typical accept button
     @Type=1 (yyy-mm-dd), @Type=2 (dd-mm-yyyy)
     """
+
+    reg_exp = ""
     placeholder = "yyyy-mm-dd"
     if regex_type == 1:
         widget.setPlaceholderText("yyyy-mm-dd")

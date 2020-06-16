@@ -5,11 +5,11 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsPointLocator, QgsProject, QgsSnappingUtils, \
-    QgsTolerance
+from qgis.core import QgsEditorWidgetSetup, QgsExpressionContextUtils, QgsFieldConstraints, QgsPointLocator, \
+    QgsProject, QgsSnappingUtils, QgsTolerance
 from qgis.PyQt.QtCore import QObject, QPoint, QSettings, Qt
 from qgis.PyQt.QtWidgets import QAction, QActionGroup, QApplication, QDockWidget, QMenu, QToolBar, QToolButton
-from qgis.PyQt.QtGui import QIcon, QKeySequence, QCursor
+from qgis.PyQt.QtGui import QCursor, QIcon, QKeySequence, QPixmap
 
 import configparser
 import json
@@ -47,9 +47,9 @@ from .map_tools.draw_profiles import DrawProfiles
 from .map_tools.flow_trace_flow_exit import FlowTraceFlowExitMapTool
 from .map_tools.move_node import MoveNodeMapTool
 from .map_tools.replace_feature import ReplaceFeatureMapTool
-from .map_tools.open_visit import OpenVisit
 from .models.plugin_toolbar import PluginToolbar
 from .models.sys_feature_cat import SysFeatureCat
+from .ui_manager import DialogTextUi
 
 
 class Giswater(QObject):
@@ -111,8 +111,8 @@ class Giswater(QObject):
         try:
             self.iface.projectRead.connect(self.project_read)
             self.iface.newProjectCreated.connect(self.project_new)
-        except AttributeError as e:
-            print(f"set_signals: {e}")
+        except AttributeError:
+            pass
 
 
     def set_info_button(self):
@@ -283,7 +283,7 @@ class Giswater(QObject):
 
         list_feature_cat = self.controller.get_values_from_dictionary(self.feature_cat)
         for feature_cat in list_feature_cat:
-            if index_action == '01' and feature_cat.feature_type.upper() == 'GULLY' and self.wsoftware == 'ud':
+            if index_action == '01' and feature_cat.feature_type.upper() == 'GULLY' and self.project_type == 'ud':
                 obj_action = QAction(str(feature_cat.id), self)
                 obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
                 try:
@@ -349,8 +349,6 @@ class Giswater(QObject):
             map_tool = FlowTraceFlowExitMapTool(self.iface, global_vars.settings, action, index_action)
         elif int(index_action) == 57:
             map_tool = FlowTraceFlowExitMapTool(self.iface, global_vars.settings, action, index_action)
-        elif int(index_action) == 61:
-            map_tool = OpenVisit(self.iface, global_vars.settings, action, index_action)
         elif int(index_action) == 71:
             map_tool = CadAddCircle(self.iface, global_vars.settings, action, index_action)
         elif int(index_action) == 72:
@@ -399,8 +397,8 @@ class Giswater(QObject):
 
         self.basic.set_controller(self.controller)
         self.utils.set_controller(self.controller)
-        self.basic.set_project_type(self.wsoftware)
-        self.utils.set_project_type(self.wsoftware)
+        self.basic.set_project_type(self.project_type)
+        self.utils.set_project_type(self.project_type)
 
 
     def toolbar_common(self, toolbar_id, x=0, y=0):
@@ -456,7 +454,26 @@ class Giswater(QObject):
     def set_toolbar_position(self, tb_name, x, y):
 
         toolbar = self.iface.mainWindow().findChild(QToolBar, tb_name)
-        toolbar.move(int(x), int(y))
+        if toolbar:
+            toolbar.move(int(x), int(y))
+
+
+    def init_ui_config_file(self, path, toolbar_names):
+        """ Initialize UI config file with default values """
+
+        # Create file and configure section 'toolbars_position'
+        parser = configparser.RawConfigParser()
+        parser.add_section('toolbars_position')
+        for pos, tb in enumerate(toolbar_names):
+            parser.set('toolbars_position', f'pos_{pos}', f'{tb}, {pos * 10}, 98')
+
+        # Writing our configuration file to 'ui_config.config'
+        with open(path, 'w') as configfile:
+            parser.write(configfile)
+            configfile.close()
+            del configfile
+
+        return parser
 
 
     def init_user_config_file(self, path, toolbar_names):
@@ -530,7 +547,7 @@ class Giswater(QObject):
         self.edit.set_controller(self.controller)
         self.go2epa.set_controller(self.controller)
         self.master.set_controller(self.controller)
-        if self.wsoftware == 'ws':
+        if self.project_type == 'ws':
             self.mincut.set_controller(self.controller)
         self.om.set_controller(self.controller)
         self.custom.set_controller(self.controller)
@@ -571,7 +588,7 @@ class Giswater(QObject):
         self.project_read(False)
 
 
-    def init_plugin(self, enable_toolbars=True):
+    def init_plugin(self):
         """ Plugin main initialization function """
 
         # Set controller (no database connection yet)
@@ -651,19 +668,8 @@ class Giswater(QObject):
 
         sql = None
         self.feature_cat = {}
-        if self.wsoftware.upper() == 'WS':
-            sql = ("SELECT cat_feature.* FROM cat_feature JOIN "
-                   "(SELECT id, active FROM node_type UNION "
-                   "SELECT id, active FROM arc_type UNION "
-                   "SELECT id, active FROM connec_type) a USING (id) "
-                   "WHERE a.active IS TRUE ORDER BY id")
-        elif self.wsoftware.upper() == 'UD':
-            sql = ("SELECT cat_feature.* FROM cat_feature JOIN "
-                   "(SELECT id, active FROM node_type UNION "
-                   "SELECT id, active FROM arc_type UNION "
-                   "SELECT id, active FROM connec_type UNION "
-                   "SELECT id, active FROM gully_type) a USING (id) "
-                   "WHERE a.active IS TRUE ORDER BY id")
+        sql = ("SELECT cat_feature.* FROM cat_feature "
+                   "WHERE active IS TRUE ORDER BY id")
         rows = self.controller.get_rows(sql)
         if not rows:
             return False
@@ -686,10 +692,16 @@ class Giswater(QObject):
         return True
 
 
-    def unload(self, remove_modules=True):
-        """ Removes plugin menu items and icons from QGIS GUI
-            :param @remove_modules is True when plugin is disabled or reloaded
-        """
+    def remove_dockers(self):
+        """ Remove Giswater dockers """
+
+        docker_search = self.iface.mainWindow().findChild(QDockWidget, 'dlg_search')
+        if docker_search:
+            self.iface.removeDockWidget(docker_search)
+
+        docker_info = self.iface.mainWindow().findChild(QDockWidget, 'docker')
+        if docker_info:
+            self.iface.removeDockWidget(docker_info)
 
         if self.btn_add_layers:
             dockwidget = self.iface.mainWindow().findChild(QDockWidget, 'Layers')
@@ -697,6 +709,15 @@ class Giswater(QObject):
             # TODO improve this, now remove last action
             toolbar.removeAction(toolbar.actions()[len(toolbar.actions()) - 1])
             self.btn_add_layers = None
+
+
+    def unload(self, remove_modules=True):
+        """ Removes plugin menu items and icons from QGIS GUI
+            :param @remove_modules is True when plugin is disabled or reloaded
+        """
+
+        # Remove Giswater dockers
+        self.remove_dockers()
 
         # Save toolbar position after unload plugin
         try:
@@ -732,8 +753,8 @@ class Giswater(QObject):
             else:
                 self.set_info_button_visible()
 
-        except Exception as e:
-            print(str(e))
+        except Exception:
+            pass
         finally:
             # Reset instance attributes
             self.actions = {}
@@ -809,6 +830,38 @@ class Giswater(QObject):
         return True
 
 
+    def check_layers_from_distinct_schema(self):
+
+        layers = self.controller.get_layers()
+        repeated_layers = {}
+        for layer in layers:
+            layer_toc_name = self.controller.get_layer_source_table_name(layer)
+            if layer_toc_name == 'v_edit_node':
+                layer_source = self.controller.get_layer_source(layer)
+                repeated_layers[layer_source['schema'].replace('"', '')] = 'v_edit_node'
+
+        if len(repeated_layers) > 1:
+            if self.qgis_project_main_schema is None or self.qgis_project_add_schema is None:
+                self.dlg_dtext = DialogTextUi()
+                self.dlg_dtext.btn_accept.hide()
+                self.dlg_dtext.btn_close.clicked.connect(lambda: self.dlg_dtext.close())
+                msg = "QGIS project has more than one layer v_edit_node comming from differents schemas. " \
+                      "If you are looking for manage two schemas, it is mandatory to define wich is the master and " \
+                      "wich is the other one. To do this yo need to configure the  QGIS project setting this project " \
+                      "variables: gwMainSchema and gwAddSchema."
+
+                self.dlg_dtext.txt_infolog.setText(msg)
+                self.dlg_dtext.open()
+                return False
+
+            # If there are layers with a different scheme, the one that the user has in the project variable
+            # self.qgis_project_main_schema is taken as the schema_name.
+            self.schema_name = self.qgis_project_main_schema
+            self.controller.set_schema_name(self.qgis_project_main_schema)
+
+        return True
+
+
     def manage_controller(self, show_warning, force_commit=False):
         """ Set new database connection. If force_commit=True then force commit before opening project """
 
@@ -875,10 +928,7 @@ class Giswater(QObject):
         self.controller.manage_translation(self.plugin_name)
 
         # Set PostgreSQL parameter 'search_path'
-        self.controller.set_search_path(layer_source['db'], layer_source['schema'])
-
-        # Cache error message with log_code = -1 (uncatched error)
-        self.controller.get_error_message(-1)
+        self.controller.set_search_path(layer_source['schema'])
 
         # Check if schema exists
         self.schema_exists = self.controller.check_schema(self.schema_name)
@@ -889,35 +939,40 @@ class Giswater(QObject):
         self.srid = self.controller.get_srid('v_edit_node', self.schema_name)
         self.controller.plugin_settings_set_value("srid", self.srid)
 
-        self.parent = ParentAction(self.iface, global_vars.settings, self.controller, self.plugin_dir)
-        self.add_layer = AddLayer(self.iface, global_vars.settings, self.controller, self.plugin_dir)
+        # Get variables from qgis project
+        self.get_qgis_project_variables()
+
+        # Check that there are no layers (v_edit_node) with the same view name, coming from different schemes
+        status = self.check_layers_from_distinct_schema()
+        if status is False: return
+
+        self.parent = ParentAction(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.add_layer = AddLayer(self.iface, self.settings, self.controller, self.plugin_dir)
 
         # Get water software from table 'version'
-        self.wsoftware = self.controller.get_project_type()
-        if self.wsoftware is None:
+        self.project_type = self.controller.get_project_type()
+        if self.project_type is None:
             return
 
         # Initialize toolbars
-        self.controller.log_info("Initialize toolbars")
         self.initialize_toolbars()
-
         self.get_buttons_to_hide()
 
         # Manage project read of type 'tm'
-        if self.wsoftware == 'tm':
-            self.project_read_tm(show_warning)
+        if self.project_type == 'tm':
+            self.project_read_tm()
             return
 
         # Manage project read of type 'pl'
-        elif self.wsoftware == 'pl':
-            self.project_read_pl(show_warning)
+        elif self.project_type == 'pl':
+            self.project_read_pl()
             return
 
         # Set custom plugin toolbars (one action class per toolbar)
         if self.wsoftware == 'ws':
             self.mincut = MincutParent(self.iface, global_vars.settings, self.controller, self.plugin_dir)
 
-        # Manage layers
+        # Manage layers and check project
         if not self.manage_layers():
             return
 
@@ -936,18 +991,13 @@ class Giswater(QObject):
         # Set objects for map tools classes
         self.manage_map_tools()
 
-        # Initialize parameter 'node2arc'
-        self.controller.plugin_settings_set_value("node2arc", "0")
-
         # Check roles of this user to show or hide toolbars
         self.check_user_roles()
 
-        # Manage project variable 'expl_id'
-        self.manage_expl_id()
-
-        # Manage layer fields
-        self.get_layers_to_config()
-        self.set_layer_config(self.available_layers)
+        # Set project layers with gw_fct_getinfofromid: This process takes time for user
+        if self.hide_form is False:
+            self.get_layers_to_config()
+            self.set_layer_config(self.available_layers)
 
         # Create a thread to listen selected database channels
         if global_vars.settings.value('system_variables/use_notify').upper() == 'TRUE':
@@ -968,6 +1018,14 @@ class Giswater(QObject):
         # Hide info button if giswater project is loaded
         if show_warning:
             self.set_info_button_visible(False)
+
+        # Open automatically 'search docker' depending its value in user settings
+        open_search = self.controller.get_user_setting_value('open_search', 'true')
+        if open_search == 'true':
+            self.basic.basic_api_search()
+
+        # call dynamic mapzones repaint
+        self.parent.set_style_mapzones()
 
         # Log it
         message = "Project read successfully"
@@ -1023,9 +1081,9 @@ class Giswater(QObject):
             if not row: return
             json_list = json.loads(row[0], object_pairs_hook=OrderedDict)
             self.list_to_hide = [str(x) for x in json_list['action_index']]
-        except KeyError as e:
+        except KeyError:
             pass
-        except JSONDecodeError as e:
+        except JSONDecodeError:
             # Control if json have a correct format
             pass
         finally:
@@ -1063,11 +1121,10 @@ class Giswater(QObject):
                "WHEN 'v_edit_arc' THEN 'Arc' WHEN 'v_edit_connec' THEN 'Connec' "
                "WHEN 'v_edit_gully' THEN 'Gully' END ), parent_layer FROM cat_feature"
                " ORDER BY parent_layer")
-        parent_layers = self.controller.get_rows(sql, log_sql=True)
+        parent_layers = self.controller.get_rows(sql)
 
         for parent_layer in parent_layers:
-            # Create sub menu
-            sub_menu = main_menu.addMenu(str(parent_layer[0]))
+
 
             # Get child layers
             sql = (f"SELECT DISTINCT(child_layer), lower(feature_type), id as alias FROM cat_feature "
@@ -1077,7 +1134,11 @@ class Giswater(QObject):
                    f"   WHERE table_schema = '{schema_name}')"
                    f" ORDER BY child_layer")
 
-            child_layers = self.controller.get_rows(sql, log_sql=True)
+            child_layers = self.controller.get_rows(sql)
+            if not child_layers: continue
+
+            # Create sub menu
+            sub_menu = main_menu.addMenu(str(parent_layer[0]))
             child_layers.insert(0, ['Load all', 'Load all', 'Load all'])
             for child_layer in child_layers:
                 # Create actions
@@ -1109,8 +1170,10 @@ class Giswater(QObject):
         for layer in layers_list:
             layer_source = self.qgis_tools.qgis_get_layer_source(layer)
             # Collect only the layers of the work scheme
-            if 'schema' in layer_source and layer_source['schema'].replace('"', '') == self.schema_name:
-                layers_name.append(layer.name())
+            if 'schema' in layer_source:
+                schema = layer_source['schema']
+                if schema and schema.replace('"', '') == self.schema_name:
+                    layers_name.append(layer.name())
 
         self.set_layer_config(layers_name)
 
@@ -1123,15 +1186,27 @@ class Giswater(QObject):
         if len(layers) == 0:
             return False
 
-        if self.wsoftware in ('ws', 'ud'):
+        if self.project_type in ('ws', 'ud'):
             QApplication.setOverrideCursor(Qt.ArrowCursor)
-            self.controller.log_info("CheckProjectResult")
             self.check_project_result = CheckProjectResult(self.iface, global_vars.settings, self.controller, self.plugin_dir)
             self.check_project_result.set_controller(self.controller)
-            status = self.check_project_result.populate_audit_check_project(layers, "true")
-            QApplication.restoreOverrideCursor()
-            if not status:
-                return False
+
+            # check project
+            status, result = self.check_project_result.populate_audit_check_project(layers, "true")
+            self.hide_form = True
+            try:
+                if 'actions' in result['body']:
+                    if 'useGuideMap' in result['body']['actions']:
+                        guided_map = result['body']['actions']['useGuideMap']
+                        self.hide_form = result['body']['actions']['hideForm']
+                        if guided_map:
+                            self.controller.log_info("manage_guided_map")
+                            self.manage_guided_map()
+            except Exception as e:
+                self.controller.log_info(str(e))
+            finally:
+                QApplication.restoreOverrideCursor()
+                return status
 
         return True
 
@@ -1177,7 +1252,6 @@ class Giswater(QObject):
             self.set_map_tool('map_tool_dimensioning')
             self.set_map_tool('cad_add_circle')
             self.set_map_tool('cad_add_point')
-            self.set_map_tool('map_tool_open_visit')
 
 
     def set_map_tool(self, map_tool_name):
@@ -1194,6 +1268,7 @@ class Giswater(QObject):
         try:
             if function_name in self.map_tools:
                 self.controller.check_actions(False)
+                self.controller.prev_maptool = self.iface.mapCanvas().mapTool()
                 map_tool = self.map_tools[function_name]
                 if not (map_tool == self.iface.mapCanvas().mapTool()):
                     self.iface.mapCanvas().setMapTool(map_tool)
@@ -1205,22 +1280,7 @@ class Giswater(QObject):
             self.controller.show_warning("KeyError: " + str(e))
 
 
-    def manage_expl_id(self):
-        """ Manage project variable 'expl_id' """
-
-        # Get project variable 'expl_id'
-        expl_id = self.qgis_tools.get_project_variable('expl_id')
-        if expl_id is None:
-            return
-
-        # Update table 'selector_expl' of current user (delete and insert)
-        sql = (f"DELETE FROM selector_expl WHERE current_user = cur_user;"
-               f"\nINSERT INTO selector_expl (expl_id, cur_user) "
-               f"VALUES({expl_id}, current_user);")
-        self.controller.execute_sql(sql)
-
-
-    def project_read_pl(self, show_warning=True):
+    def project_read_pl(self):
         """ Function executed when a user opens a QGIS project of type 'pl' """
 
         # Manage actions of the different plugin_toolbars
@@ -1234,7 +1294,7 @@ class Giswater(QObject):
         self.controller.log_info(message)
 
 
-    def project_read_tm(self, show_warning=True):
+    def project_read_tm(self):
         """ Function executed when a user opens a QGIS project of type 'tm' """
 
         # Set actions classes (define one class per plugin toolbar)
@@ -1260,7 +1320,7 @@ class Giswater(QObject):
         """ Manage actions of the different plugin toolbars """
 
         toolbar_id = "tm_basic"
-        list_actions = ['303', '301', '302', '304', '305']
+        list_actions = ['303', '301', '302', '304', '305', '309']
         self.manage_toolbar(toolbar_id, list_actions)
 
         # Manage action group of every toolbar
@@ -1319,8 +1379,7 @@ class Giswater(QObject):
         try:
             # Set field editability
             config.setReadOnly(field_index, not field['iseditable'])
-        except KeyError as e:
-            # Control if key 'iseditable' not exist
+        except KeyError:
             pass
         finally:
             # Set layer config
@@ -1330,7 +1389,7 @@ class Giswater(QObject):
     def set_layer_config(self, layers):
         """ Set layer fields configured according to client configuration.
             At the moment manage:
-                Column names as alias, combos and typeahead as ValueMap"""
+                Column names as alias, combos as ValueMap, typeahead as textedit"""
 
         msg_failed = ""
         msg_key = ""
@@ -1340,19 +1399,20 @@ class Giswater(QObject):
                 continue
 
             feature = '"tableName":"' + str(layer_name) + '", "id":"", "isLayer":true'
-            body = self.create_body(feature=feature)
-            complet_result = self.controller.get_json('gw_api_getinfofromid', body, log_sql=False)
+            extras = f'"infoType":"{self.qgis_project_infotype}"'
+            body = self.create_body(feature=feature, extras=extras)
+            complet_result = self.controller.get_json('gw_fct_getinfofromid', body)
             if not complet_result: continue
 
             for field in complet_result['body']['data']['fields']:
-                _values = {}
+                valuemap_values = {}
 
                 # Get column index
-                fieldIndex = layer.fields().indexFromName(field['column_id'])
+                fieldIndex = layer.fields().indexFromName(field['columnname'])
 
                 # Hide selected fields according table config_api_form_fields.hidden
                 if 'hidden' in field:
-                    self.set_column_visibility(layer, field['column_id'], field['hidden'])
+                    self.set_column_visibility(layer, field['columnname'], field['hidden'])
 
                 # Set alias column
                 if field['label']:
@@ -1377,15 +1437,20 @@ class Giswater(QObject):
                 # Manage editability
                 self.set_read_only(layer, field, fieldIndex)
 
-                # Manage fields
+                # delete old values on ValueMap
+                editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': valuemap_values})
+                layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+
+                # Manage new values in ValueMap
                 if field['widgettype'] == 'combo':
                     if 'comboIds' in field:
                         # Set values
                         for i in range(0, len(field['comboIds'])):
-                            _values[field['comboNames'][i]] = field['comboIds'][i]
+                            valuemap_values[field['comboNames'][i]] = field['comboIds'][i]
                     # Set values into valueMap
-                    editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': _values})
+                    editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': valuemap_values})
                     layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+
 
         if msg_failed != "":
             self.controller.show_exceptions_msg("Execute failed.", msg_failed)
@@ -1419,7 +1484,7 @@ class Giswater(QObject):
     def create_body(self, form='', feature='', filter_fields='', extras=None):
         """ Create and return parameters as body to functions"""
 
-        client = f'$${{"client":{{"device":9, "infoType":100, "lang":"ES"}}, '
+        client = f'$${{"client":{{"device":4, "infoType":1, "lang":"ES"}}, '
         form = '"form":{' + form + '}, '
         feature = '"feature":{' + feature + '}, '
         filter_fields = '"filterFields":{' + filter_fields + '}'
@@ -1432,3 +1497,77 @@ class Giswater(QObject):
 
         return body
 
+
+    def get_qgis_project_variables(self):
+        """ Manage qgis project variables """
+
+        self.qgis_project_infotype = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('gwInfoType')
+        self.qgis_project_add_schema = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('gwAddSchema')
+        self.qgis_project_main_schema = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('gwMainSchema')
+        self.qgis_project_role = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('gwProjectRole')
+        self.controller.plugin_settings_set_value("gwInfoType", self.qgis_project_infotype)
+        self.controller.plugin_settings_set_value("gwAddSchema", self.qgis_project_add_schema)
+        self.controller.plugin_settings_set_value("gwMainSchema", self.qgis_project_main_schema)
+        self.controller.plugin_settings_set_value("gwProjectRole", self.qgis_project_role)
+
+
+    def manage_guided_map(self):
+        """ Guide map works using ext_municipality """
+
+        self.layer_muni = self.controller.get_layer_by_tablename('ext_municipality')
+        if self.layer_muni is None:
+            return
+
+        self.iface.setActiveLayer(self.layer_muni)
+        self.controller.set_layer_visible(self.layer_muni)
+        self.layer_muni.selectAll()
+        self.iface.actionZoomToSelected().trigger()
+        self.layer_muni.removeSelection()
+        self.iface.actionSelect().trigger()
+        self.iface.mapCanvas().selectionChanged.connect(self.selection_changed)
+        cursor = self.get_cursor_multiple_selection()
+        if cursor:
+            self.iface.mapCanvas().setCursor(cursor)
+
+
+    def selection_changed(self):
+        """ Get selected muni_id and execute function setselectors """
+
+        muni_id = None
+        features = self.layer_muni.getSelectedFeatures()
+        for feature in features:
+            muni_id = feature["muni_id"]
+            self.controller.log_info(f"Selected muni_id: {muni_id}")
+            break
+
+        self.iface.mapCanvas().selectionChanged.disconnect()
+        self.iface.actionZoomToSelected().trigger()
+        self.layer_muni.removeSelection()
+
+        if muni_id is None:
+            return
+
+        extras = f'"selectorType":"explfrommuni", "id":{muni_id}, "value":true, "isAlone":true, '
+        extras += f'"addSchema":"{self.qgis_project_add_schema}"'
+        body = self.create_body(extras=extras)
+        sql = f"SELECT gw_fct_setselectors({body})::text"
+        row = self.controller.get_row(sql, commit=True, log_sql=True)
+        if row:
+            self.iface.mapCanvas().refreshAllLayers()
+            self.layer_muni.triggerRepaint()
+            self.iface.actionPan().trigger()
+            self.iface.actionZoomIn().trigger()
+
+
+    def get_cursor_multiple_selection(self):
+        """ Set cursor for multiple selection """
+
+        path_folder = os.path.dirname(__file__)
+        path_cursor = path_folder + '\icons\\'+'211.png'
+
+        if os.path.exists(path_cursor):
+            cursor = QCursor(QPixmap(path_cursor))
+        else:
+            cursor = None
+
+        return cursor

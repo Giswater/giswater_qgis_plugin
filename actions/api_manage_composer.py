@@ -46,14 +46,15 @@ class ApiManageComposer(ApiParent):
         # Create and populate dialog
         extras = '"composers":' + str(composers_list)
         body = self.create_body(extras=extras)
-        complet_result = self.controller.get_json('gw_api_getprint', body, log_sql=True)
-        if not complet_result: return False
+        json_result = self.controller.get_json('gw_fct_getprint', body)
+        if not json_result:
+            return False
 
-        if complet_result['formTabs']:
-            fields = complet_result['formTabs'][0]
+        if json_result['formTabs']:
+            fields = json_result['formTabs'][0]
             # This dialog is created from config_api_form_fieds
-            # where formname == 'printGeneric' and formtype == 'utils'
-            # At the moment, u can set column widgetfunction with 'gw_api_setprint' or open_composer
+            # where formname == 'print' and formtype == 'utils'
+            # At the moment, u can set column widgetfunction with 'gw_fct_setprint' or open_composer
             self.create_dialog(self.dlg_composer, fields)
         self.hide_void_groupbox(self.dlg_composer)
 
@@ -112,11 +113,11 @@ class ApiManageComposer(ApiParent):
         selected_com = self.get_current_composer()
         widget_list = dialog.grb_option_values.findChildren(QLineEdit)
         for widget in widget_list:
-            item = selected_com.itemById(widget.property('column_id'))
+            item = selected_com.itemById(widget.property('columnname'))
             if type(item) != QgsLayoutItemLabel or item is None:
                 widget.clear()
                 widget.setStyleSheet("border: 1px solid red")
-                widget.setPlaceholderText(f"Widget '{widget.property('column_id')}' not found in the composer")
+                widget.setPlaceholderText(f"Widget '{widget.property('columnname')}' not found in the composer")
             elif type(item) == QgsLayoutItemLabel and item is not None:
                 widget.setStyleSheet(None)
 
@@ -129,7 +130,7 @@ class ApiManageComposer(ApiParent):
 
         if selected_com is not None:
             for widget in widget_list:
-                item = selected_com.itemById(widget.property('column_id'))
+                item = selected_com.itemById(widget.property('columnname'))
                 if type(item) == QgsLayoutItemLabel:
                     widget.setText(str(item.text()))
 
@@ -146,14 +147,14 @@ class ApiManageComposer(ApiParent):
 
     def preview(self, dialog, show):
         """ Export values from widgets(only QLineEdit) into dialog, to selected composer
-            if composer.widget.id == dialog.widget.property('column_id')
+            if composer.widget.id == dialog.widget.property('columnname')
         """
 
         selected_com = self.get_current_composer()
         widget_list = dialog.findChildren(QLineEdit)
 
         for widget in widget_list:
-            item = selected_com.itemById(widget.property('column_id'))
+            item = selected_com.itemById(widget.property('columnname'))
             if type(item) == QgsLayoutItemLabel:
                 item.setText(str(widget.text()))
                 item.refresh()
@@ -227,14 +228,14 @@ class ApiManageComposer(ApiParent):
         # but python2 produces an error in the word 'print' at actual_printer.print(...),
         # then we need to create a fake to cheat python2
         print_ = getattr(actual_printer, 'print')
-        success = print_(self.printer, QgsLayoutExporter.PrintExportSettings())
+        print_(self.printer, QgsLayoutExporter.PrintExportSettings())
 
 
     def update_rectangle(self, dialog, my_json):
         pass
 
 
-    def gw_api_setprint(self, dialog, my_json):
+    def set_print(self, dialog, my_json):
 
         if my_json['composer'] != '-1':
             self.check_whidget_exist(self.dlg_composer)
@@ -242,7 +243,7 @@ class ApiManageComposer(ApiParent):
             self.accept(dialog, my_json)
 
 
-    def gw_api_set_composer(self, dialog, my_json):
+    def set_composer(self, dialog, my_json):
 
         if my_json['composer'] != '-1':
             self.preview(dialog, False)
@@ -288,17 +289,18 @@ class ApiManageComposer(ApiParent):
         my_json['extent'] = ext
 
         my_json = json.dumps(my_json)
-        client = '"client":{"device":9, "infoType":100, "lang":"ES"}, '
+        client = '"client":{"device":4, "infoType":1, "lang":"ES"}, '
         form = '"form":{''}, '
         feature = '"feature":{''}, '
         data = '"data":' + str(my_json)
         body = "$${" + client + form + feature + data + "}$$"
-        complet_result = self.controller.get_json('gw_api_setprint', body, log_sql=True)
-        if not complet_result: return False
+        json_result = self.controller.get_json('gw_fct_setprint', body, log_sql=True)
+        if not json_result:
+            return False
 
-        result = complet_result['data']
+        result = json_result['data']
         self.draw_rectangle(result)
-        map_index = complet_result['data']['mapIndex']
+        map_index = json_result['data']['mapIndex']
 
         maps = []
         active_composers = self.get_composers_list()

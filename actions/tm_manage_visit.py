@@ -95,7 +95,7 @@ class TmManageVisit(TmParentManage, QObject):
         self.feature_id = self.dlg_add_visit.findChild(QLineEdit, "feature_id")
         self.tbl_relation = self.dlg_add_visit.findChild(QTableView, "tbl_relation")
         self.tbl_relation.setSelectionBehavior(QAbstractItemView.SelectRows)
-        # TODO controlar este combo
+
         self.feature_type.setVisible(False)
 
         # tab 'Event'
@@ -318,9 +318,6 @@ class TmManageVisit(TmParentManage, QObject):
             # allows basing on project type
             geometry_type = self.feature_type.itemText(index).lower()
 
-            # TODO: the next "if" code can be substituded with something like:
-            # exec("db_record = OmVisitX{}{}(self.controller)".format(geometry_type[0].upper(), geometry_type[1:]))"
-
             if geometry_type == 'node':
                 db_record = OmVisitXNode(self.controller)
 
@@ -332,10 +329,8 @@ class TmManageVisit(TmParentManage, QObject):
         if not self.tbl_relation.model() or not self.tbl_relation.model().rowCount():
             return
 
-        # set the current db_record tyope to do insert of new records
+        # set the current db_record type to do insert of new records
         # all the new records belong to the same geom_type
-        # TODO: the next "if" code can be substituded with something like:
-        # exec("db_record = OmVisitX{}{}(self.controller)".format(geometry_type[0].upper(), geometry_type[1:]))"
         if self.geom_type == 'node':
             db_record = OmVisitXNode(self.controller)
 
@@ -397,7 +392,7 @@ class TmManageVisit(TmParentManage, QObject):
         """ Set parameter_id combo basing on current selections """
 
         sql = (f"SELECT id, descript"
-               f" FROM om_visit_parameter"
+               f" FROM config_visit_parameter"
                f" WHERE UPPER (parameter_type) = '{self.parameter_type_id.currentText().upper()}'"
                f" AND UPPER (feature_type) = '{self.feature_type.currentText().upper()}'"
                f" ORDER BY id")
@@ -483,7 +478,7 @@ class TmManageVisit(TmParentManage, QObject):
             utils_giswater.set_item_data(self.dlg_add_visit.visitcat_id, self.visitcat_ids, 1)
             # now get default value to be show in visitcat_id
             sql = ("SELECT value FROM config_param_user"
-                   " WHERE parameter = 'visitcat_vdefault' AND cur_user = current_user")
+                   " WHERE parameter = 'om_visit_cat_vdefault' AND cur_user = current_user")
             row = self.controller.get_row(sql, commit=self.autocommit)
             if row:
                 # if int then look for default row ans set it
@@ -562,7 +557,7 @@ class TmManageVisit(TmParentManage, QObject):
             return
 
         # get form associated
-        sql = (f"SELECT form_type FROM om_visit_parameter"
+        sql = (f"SELECT form_type FROM config_visit_parameter"
                f" WHERE id = '{parameter_id}'")
         row = self.controller.get_row(sql, commit=False)
         form_type = str(row[0])
@@ -629,8 +624,6 @@ class TmManageVisit(TmParentManage, QObject):
             return
 
         # Get selected rows
-        # TODO: use tbl_event.model().fieldIndex(event.pk()) to be pk name independent
-        # 0 is the column of the pk 0 'id'
         selected_list = self.tbl_event.selectionModel().selectedRows(0)
         if selected_list == 0:
             message = "Any record selected"
@@ -701,8 +694,6 @@ class TmManageVisit(TmParentManage, QObject):
         event = OmVisitEvent(self.controller)
 
         # Get selected rows
-        # TODO: use tbl_event.model().fieldIndex(event.pk()) to be pk name independent
-        # 0 is the column of the pk 0 'id'
         selected_list = self.tbl_event.selectionModel().selectedRows(0)
         selected_id = []
         for index in selected_list:
@@ -738,23 +729,23 @@ class TmManageVisit(TmParentManage, QObject):
 
         # Set width and alias of visible columns
         columns_to_delete = []
-        sql = (f"SELECT column_index, width, alias, status"
-               f" FROM config_client_forms"
-               f" WHERE table_id = '{table_name}'"
-               f" ORDER BY column_index")
+        sql = (f"SELECT columnindex, width, alias, status"
+               f" FROM config_form_tableview"
+               f" WHERE tablename = '{table_name}'"
+               f" ORDER BY columnindex")
         rows = self.controller.get_rows(sql, log_info=False, commit=self.autocommit)
         if not rows:
             return
 
         for row in rows:
             if not row['status']:
-                columns_to_delete.append(row['column_index'] - 1)
+                columns_to_delete.append(row['columnindex'] - 1)
             else:
                 width = row['width']
                 if width is None:
                     width = 100
-                qtable.setColumnWidth(row['column_index'] - 1, width)
-                qtable.model().setHeaderData(row['column_index'] - 1, Qt.Horizontal, row['alias'])
+                qtable.setColumnWidth(row['columnindex'] - 1, width)
+                qtable.model().setHeaderData(row['columnindex'] - 1, Qt.Horizontal, row['alias'])
 
         # Set order
         qtable.model().setSort(0, Qt.AscendingOrder)

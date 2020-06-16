@@ -1,20 +1,3 @@
-#################
-## Project
-#################
-
-*.qgs~
-*.bat
-*.db
-test
-data/
-log/*.*
-templates/profile.png
-
-
-#############
-## Python
-#############
-
 *.pydevproject
 .project
 .metadata
@@ -28,4 +11,5 @@ build/
 .idea/vcs.xml
 .idea/workspace.xml
 .idea/
-
+test/log/
+__pycache__

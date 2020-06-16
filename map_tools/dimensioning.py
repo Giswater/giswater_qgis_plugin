@@ -4,9 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
 """
-
 # -*- coding: utf-8 -*-
-
 from qgis.PyQt.QtCore import QSettings, Qt
 
 from ..actions.api_dimensioning import ApiDimensioning
@@ -23,22 +21,19 @@ class Dimensioning(ParentMapTool):
         super(Dimensioning, self).__init__(iface, settings, action, index_action)
         self.suppres_form = None
 
+
     def open_new_dimensioning(self, feature_id):
+
         self.layer.featureAdded.disconnect(self.open_new_dimensioning)
         feature = self.get_feature_by_id(self.layer, feature_id)
-        idx = self.layer.fields().indexFromName("id")
-        new_feature_id = self.layer.maximumValue(idx)
-        
-        # Control when layer haven't rows
-        if not new_feature_id:
-            new_feature_id = 0
-        new_feature_id = int(new_feature_id) + 1
-        
+
         self.api_dim = ApiDimensioning(self.iface, self.settings, self.controller, self.plugin_dir)
-        result, dialog = self.api_dim.open_form(new_feature=feature, layer=self.layer, new_feature_id=new_feature_id)
+        self.api_dim.open_form(qgis_feature=feature, layer=self.layer)
 
         # Restore user value (Settings/Options/Digitizing/Suppress attribute from pop-up after feature creation)
         QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", self.suppres_form)
+
+        self.recover_previus_maptool()
 
 
     def get_feature_by_id(self, layer, id_):
@@ -48,8 +43,9 @@ class Dimensioning(ParentMapTool):
             if feature.id() == id_:
                 return feature
         return False
+
+
     """ QgsMapTools inherited event functions """
-          
           
     def canvasMoveEvent(self, event):
         pass
@@ -58,10 +54,13 @@ class Dimensioning(ParentMapTool):
     def canvasReleaseEvent(self, event):
         pass
 
+
     def keyPressEvent(self, event):
+
         if event.key() == Qt.Key_Escape:
             self.action().trigger()
             return
+
 
     def activate(self):
 
@@ -79,11 +78,11 @@ class Dimensioning(ParentMapTool):
             self.layer.startEditing()
             # Implement the Add Feature button
             self.iface.actionAddFeature().trigger()
-            # TODO uncomment nex line to manage new api tool
+            # Manage new api tool
             self.layer.featureAdded.connect(self.open_new_dimensioning)
+
 
     def deactivate(self):
 
         # Call parent method     
         ParentMapTool.deactivate(self)
-    
