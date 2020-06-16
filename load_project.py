@@ -5,7 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsProject
+from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsProject, QgsApplication
 from qgis.PyQt.QtCore import QPoint, Qt
 from qgis.PyQt.QtWidgets import QAction, QApplication, QDockWidget, QMenu, QToolBar, QToolButton
 from qgis.PyQt.QtGui import QCursor, QIcon, QPixmap
@@ -15,6 +15,7 @@ from functools import partial
 from . import utils_giswater
 from .actions.add_layer import AddLayer
 from .actions.check_project_result import CheckProjectResult
+from .actions.task_config_layer_fields import TaskConfigLayerFields
 
 
 class LoadProject:
@@ -57,8 +58,13 @@ class LoadProject:
 
         # Set project layers with gw_fct_getinfofromid: This process takes time for user
         if self.hide_form is False:
-            self.get_layers_to_config()
-            self.set_layer_config(self.available_layers)
+            # self.get_layers_to_config()
+            # self.set_layer_config(self.available_layers)
+            # Set background task 'ConfigLayerFields'
+            description = f"ConfigLayerFields"
+            self.task_get_layers = TaskConfigLayerFields(description, self.controller)
+            QgsApplication.taskManager().addTask(self.task_get_layers)
+            QgsApplication.taskManager().triggerTask(self.task_get_layers)
         else:
             self.controller.log_info(f"hideForm is True")
 
