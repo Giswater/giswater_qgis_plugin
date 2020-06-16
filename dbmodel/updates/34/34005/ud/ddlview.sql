@@ -1613,12 +1613,9 @@ WITH v_plan_aux_arc_cost AS
 				ELSE v_plan_aux_arc_connec.connec_total_cost
 			END
 		END::numeric(14,2) AS total_budget,
-	v_plan_aux_arc_cost.the_geom,
-	((date_part('days',(now()-arc.builtdate)::interval))/365)::numeric(12,2) as age,
-	acoeff
+	v_plan_aux_arc_cost.the_geom
    FROM v_plan_aux_arc_cost
 	 JOIN arc ON v_plan_aux_arc_cost.arc_id::text = arc.arc_id::text
-	 JOIN cat_arc c ON c.id::text = arc.arccat_id::text
 	 LEFT JOIN 
 		(SELECT DISTINCT ON (connec.arc_id) connec.arc_id,
 		sum(connec.connec_length * (v_price_x_catconnec.cost_mlconnec + v_price_x_catconnec.cost_m3trench * connec.connec_depth * 0.333) + v_price_x_catconnec.cost_ut)::numeric(12,2) AS connec_total_cost
@@ -1847,9 +1844,10 @@ CREATE OR REPLACE VIEW v_plan_result_arc AS
 	om_rec_result_arc.other_budget,
 	om_rec_result_arc.total_budget,
 	om_rec_result_arc.the_geom,
+	om_rec_result_arc.builtcost,
+	om_rec_result_arc.builtdate,
 	om_rec_result_arc.age,
 	om_rec_result_arc.acoeff,
-	om_rec_result_arc.initcost,
 	om_rec_result_arc.aperiod,
 	om_rec_result_arc.arate,
 	om_rec_result_arc.amortized,
@@ -1914,9 +1912,10 @@ UNION
 	v_plan_arc.other_budget,
 	v_plan_arc.total_budget,
 	v_plan_arc.the_geom,
+	null as builtcost,
+	null as builtdate,
 	null as age,
 	null as acoeff,
-	null as initcost,
 	null as aperiod,
 	null as arate,
 	null as amortized,
@@ -1973,14 +1972,12 @@ FROM (
 			END
 			ELSE NULL::numeric
 		END::numeric(12,2) AS budget,
-	v_node.the_geom,
-	cat_node.acoeff,
-	((date_part('days',(now()-v_node.builtdate)::interval))/365)::numeric(12,2) as age
+	v_node.the_geom
    FROM v_node
    	 LEFT JOIN v_price_x_catnode ON v_node.nodecat_id::text = v_price_x_catnode.id::text
 	 LEFT JOIN man_chamber ON man_chamber.node_id::text = v_node.node_id::text
 	 LEFT JOIN man_storage ON man_storage.node_id::text = v_node.node_id::text
-	 JOIN cat_node ON cat_node.id::text = v_node.nodecat_id::text
+	 LEFT JOIN cat_node ON cat_node.id = v_node.nodecat_id
 	 LEFT JOIN v_price_compost ON v_price_compost.id::text = cat_node.cost::text)a;
 
   
@@ -2581,9 +2578,10 @@ CREATE OR REPLACE VIEW v_plan_result_node AS
 	om_rec_result_node.cost,
 	om_rec_result_node.budget,
 	om_rec_result_node.the_geom,
+	om_rec_result_node.builtcost,
+	om_rec_result_node.builtdate,
 	om_rec_result_node.age,
 	om_rec_result_node.acoeff,
-	om_rec_result_node.initcost,
 	om_rec_result_node.aperiod,
 	om_rec_result_node.arate,
 	om_rec_result_node.amortized,
@@ -2608,9 +2606,10 @@ UNION
 	v_plan_node.cost,
 	v_plan_node.budget,
 	v_plan_node.the_geom,
+	null as builtcost,
+	null as builtdate,
 	null as age,
 	null as acoeff,
-	null as initcost,
 	null as aperiod,
 	null as arate,
 	null as amortized,

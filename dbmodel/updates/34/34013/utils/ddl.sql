@@ -58,8 +58,10 @@ ALTER TABLE rpt_cat_result DROP COLUMN id;
 
 INSERT INTO config_toolbox VALUES (2890,'Calculate cost of reconstruction',TRUE,'{"featureType":[]}',
 '[{"widgetname":"resultName", "label":"Result name:", "widgettype":"text","datatype":"string","layoutname":"grl_option_parameters","layoutorder":1, "placeholder":"result name" ,"value":""},
-{"widgetname":"coefficient", "label":"Coefficient:", "widgettype":"text","datatype":"float","layoutname":"grl_option_parameters","layoutorder":2, "placeholder":"1", "value":""},
-{"widgetname":"descript", "label":"Description:", "widgettype":"text","datatype":"string","layoutname":"grl_option_parameters","layoutorder":3, "placeholder":"description" ,"ismandatory":false, "value":""}]');
+{"widgetname":"step", "label":"Step:", "widgettype":"combo", "datatype":"text", "layoutname":"grl_option_parameters","layoutorder":2,"comboIds":["1","2"],
+"comboNames":["STEP-1: Create result prices", "STEP-2: Update result using acoeff & initcost)"], "selectedId":"1"}, 
+{"widgetname":"coefficient", "label":"Coefficient:", "widgettype":"text","datatype":"float","layoutname":"grl_option_parameters","layoutorder":3, "placeholder":"1", "value":""},
+{"widgetname":"descript", "label":"Description:", "widgettype":"text","datatype":"string","layoutname":"grl_option_parameters","layoutorder":4, "placeholder":"description" ,"ismandatory":false, "value":""}]');
    
  
 ALTER TABLE anl_polygon RENAME fprocesscat_id TO fid;

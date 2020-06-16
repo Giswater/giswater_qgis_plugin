@@ -14,17 +14,21 @@ ALTER TABLE ext_rtc_scada_dma_period RENAME TO ext_rtc_dma_period;
 ALTER TABLE cat_arc ADD COLUMN acoeff float;
 ALTER TABLE cat_node ADD COLUMN acoeff float;
 
+ALTER TABLE cat_work ADD COLUMN workcost float;
+
+ALTER TABLE om_rec_result_arc ADD COLUMN builtcost float;
+ALTER TABLE om_rec_result_arc ADD COLUMN builtdate timestamp;
 ALTER TABLE om_rec_result_arc ADD COLUMN age float;
 ALTER TABLE om_rec_result_arc ADD COLUMN acoeff float;
-ALTER TABLE om_rec_result_arc ADD COLUMN initcost float;
 ALTER TABLE om_rec_result_arc ADD COLUMN aperiod text;
 ALTER TABLE om_rec_result_arc ADD COLUMN arate float;
 ALTER TABLE om_rec_result_arc ADD COLUMN amortized float;
 ALTER TABLE om_rec_result_arc ADD COLUMN pending float;
 
+ALTER TABLE om_rec_result_node ADD COLUMN builtcost float;
+ALTER TABLE om_rec_result_node ADD COLUMN builtdate timestamp;
 ALTER TABLE om_rec_result_node ADD COLUMN age float;
 ALTER TABLE om_rec_result_node ADD COLUMN acoeff float;
-ALTER TABLE om_rec_result_node ADD COLUMN initcost float;
 ALTER TABLE om_rec_result_node ADD COLUMN aperiod text;
 ALTER TABLE om_rec_result_node ADD COLUMN arate float;
 ALTER TABLE om_rec_result_node ADD COLUMN amortized float;
