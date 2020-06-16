@@ -110,7 +110,7 @@ class ApiDimensioning(ApiParent):
         self.iface.actionRollbackEdits().trigger()
         self.close_dialog(self.dlg_dim)
 
-    def save_dimensioning(self, new_feature, layer):
+    def save_dimensioning(self, new_feature_id, new_feature, layer):
 
         # Insert new feature into db
         layer.updateFeature(new_feature)
@@ -147,7 +147,7 @@ class ApiDimensioning(ApiParent):
         the_geom = self.controller.get_row(sql, commit=True, log_sql=True)
         fields += f'"the_geom":"{the_geom[0]}"'
         feature = '"tableName":"v_edit_dimensions", '
-        feature += f'"id":"{new_feature.id()}"'
+        feature += f'"id":"{new_feature_id}"'
         extras = f'"fields":{{{fields}}}'
         body = self.create_body(feature=feature, extras=extras)
 
