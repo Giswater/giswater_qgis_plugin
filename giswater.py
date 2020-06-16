@@ -174,7 +174,7 @@ class Giswater(QObject):
                 callback_function = getattr(self.basic, function_name)
             # Mincut toolbar actions
             elif 'mincut' in self.dict_actions and index_action in self.dict_actions['mincut']:
-                if self.wsoftware == 'ws':
+                if self.project_type == 'ws':
                     callback_function = getattr(self.mincut, function_name)
             # OM toolbar actions
             elif 'om' in self.dict_actions and index_action in self.dict_actions['om']:
