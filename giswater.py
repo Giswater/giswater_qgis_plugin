@@ -950,15 +950,6 @@ class Giswater(QObject):
         if self.project_type == 'ws':
             self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)
 
-        # Manage layers and check project
-        self.load_project = LoadProject(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.load_project.set_params(self.project_type, self.schema_name, self.qgis_project_infotype)
-        self.controller.log_info("Start load_project")
-        if not self.load_project.config_layers():
-            return
-
-        self.controller.log_info("Finish load_project")
-
         # Manage records from table 'cat_feature'
         self.manage_feature_cat()
 
@@ -998,6 +989,14 @@ class Giswater(QObject):
 
         # call dynamic mapzones repaint
         self.parent.set_style_mapzones()
+
+        # Manage layers and check project
+        self.load_project = LoadProject(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.load_project.set_params(self.project_type, self.schema_name, self.qgis_project_infotype)
+        self.controller.log_info("Start load_project")
+        if not self.load_project.config_layers():
+            self.controller.log_info("False load_project")
+            return
 
         # Log it
         message = "Project read successfully"
