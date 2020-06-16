@@ -137,10 +137,6 @@ DROP TRIGGER IF EXISTS gw_trg_ui_rpt_cat_result ON "SCHEMA_NAME".v_ui_rpt_cat_re
 CREATE TRIGGER gw_trg_ui_rpt_cat_result INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_ui_rpt_cat_result 
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_ui_rpt_cat_result();
 
-DROP TRIGGER IF EXISTS gw_trg_ui_om_result_cat ON "SCHEMA_NAME".v_ui_om_result_cat;
-CREATE TRIGGER gw_trg_ui_om_result_cat INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_ui_om_result_cat 
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_ui_om_result_cat();
-
 DROP TRIGGER IF EXISTS gw_trg_visit_expl ON "SCHEMA_NAME".om_visit;
 CREATE TRIGGER gw_trg_visit_expl BEFORE INSERT OR UPDATE OF the_geom ON "SCHEMA_NAME".om_visit 
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_visit_expl();

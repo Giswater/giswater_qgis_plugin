@@ -619,34 +619,62 @@ UPDATE sys_function SET function_name = 'gw_fct_getformfields' WHERE function_na
 UPDATE sys_function SET function_name = 'gw_fct_getvisit_main' WHERE function_name = 'gw_fct_get_visit';
 UPDATE sys_function SET function_name = 'gw_fct_getwidgetvalues' WHERE function_name = 'gw_fct_get_widgetvalues';
 
+
 DELETE FROM sys_function WHERE function_name IN ('gw_trg_edit_man_arc', 'gw_trg_edit_man_node', 'gw_trg_edit_man_connec', 'gw_trg_edit_man_gully');
-INSERT INTO sys_function VALUES ('1314', 'gw_trg_ui_visitman');
-INSERT INTO sys_function VALUES ('1328', 'gw_trg_ui_hydroval_connec');
-INSERT INTO sys_function VALUES ('1130', 'gw_trg_plan_psector_x_node');
-INSERT INTO sys_function VALUES ('1118', 'gw_trg_edit_om_visit');
-INSERT INTO sys_function VALUES ('2742', 'gw_trg_edit_config_sysfields');
-INSERT INTO sys_function VALUES ('2646', 'gw_trg_calculate_period');
+INSERT INTO sys_function VALUES ('1314', 'gw_trg_ui_visitman', 'utils', 'trigger function', NULL, NULL, NULL, 'role_om');
+INSERT INTO sys_function VALUES ('1132', 'gw_trg_plan_psector_x_node', 'utils', 'trigger function', NULL, NULL, NULL, 'role_master');
+UPDATE sys_function SET function_name = 'gw_trg_edit_om_visit' WHERE id=1118;
+UPDATE sys_function SET function_name = 'gw_trg_edit_config_sysfields' WHERE id=2742;
+UPDATE sys_function SET function_name = 'gw_fct_setlot' WHERE id=2862;
+INSERT INTO sys_function VALUES ('2648', 'gw_trg_calculate_period', 'utils', 'trigger function', NULL, NULL, NULL, 'role_epa');
 DELETE FROM sys_function WHERE id = 1102;
-INSERT INTO sys_function VALUES ('2862', 'gw_fct_setlot');
 UPDATE sys_function SET project_type='ws' WHERE id=2846;
-INSERT INTO sys_function VALUES ('2332', 'gw_fct_pg2epa_valve_status');
+UPDATE sys_function SET function_name = 'gw_fct_pg2epa_valve_status' WHERE id=2332;
+UPDATE sys_function SET function_name = 'gw_fct_pg2epa_buildup_supply' WHERE id=2774;
+UPDATE sys_function SET function_name = 'gw_fct_om_visit_multiplier' WHERE id=2802;
+UPDATE sys_function SET function_name = 'gw_fct_mincut_inverted_flowtrace_engine' WHERE id=2324;
+UPDATE sys_function SET function_name = 'gw_fct_import_dxfblock' WHERE id=2504;
+UPDATE sys_function SET function_name = 'gw_fct_admin_rename_fixviews' WHERE id=2636;
+UPDATE sys_function SET function_name = 'gw_fct_admin_manage_addfields' WHERE id=2690;
+UPDATE sys_function SET function_name = 'gw_trg_arc_noderotation_update' WHERE id=1346;
 UPDATE sys_function SET project_type='ws' WHERE id=2854;
 UPDATE sys_function SET project_type='ws' WHERE id=2646;
 UPDATE sys_function SET project_type='ws' WHERE id=2848;
 UPDATE sys_function SET project_type='ws' WHERE id=2850;
 UPDATE sys_function SET project_type='ws' WHERE id=2430;
-INSERT INTO sys_function VALUES ('2774', 'gw_fct_pg2epa_buildup_supply');
 UPDATE sys_function SET project_type='ws' WHERE id=2798;
-INSERT INTO sys_function VALUES ('2802', 'gw_fct_om_visit_multiplier');
-INSERT INTO sys_function VALUES ('2324', 'gw_fct_mincut_inverted_flowtrace_engine');
-INSERT INTO sys_function VALUES ('2320', 'gw_fct_mincut_inverted_flowtrace');
-INSERT INTO sys_function VALUES ('2504', 'gw_fct_import_dxfblock');
-INSERT INTO sys_function VALUES ('2636', 'gw_fct_admin_rename_fixviews');
-INSERT INTO sys_function VALUES ('2690', 'gw_fct_admin_manage_addfields');
+INSERT INTO sys_function VALUES ('2320', 'gw_fct_mincut_inverted_flowtrace', 'utils', 'trigger function', NULL, NULL, NULL, 'role_om');
 UPDATE sys_function SET project_type='utils' WHERE id=2788;
 DELETE FROM sys_function WHERE id = 2828;
 UPDATE sys_function SET project_type='utils' WHERE id=2740;
 UPDATE sys_function SET project_type='utils' WHERE id=2796;
+
+INSERT INTO sys_function VALUES ('2930', 'gw_trg_visit_expl', 'utils', 'trigger function', NULL, NULL, NULL, 'role_basic');
+INSERT INTO sys_function VALUES ('2932', 'gw_trg_ui_rpt_cat_result', 'utils', 'trigger function', NULL, NULL, NULL, 'role_epa');
+INSERT INTO sys_function VALUES ('2934', 'gw_trg_ui_event', 'utils', 'trigger function', NULL, NULL, NULL, 'role_om');
+INSERT INTO sys_function VALUES ('2936', 'gw_trg_plan_psector_x_connec', 'utils', 'trigger function', NULL, NULL, NULL, 'role_master');
+INSERT INTO sys_function VALUES ('2938', 'gw_trg_plan_psector_link', 'utils', 'trigger function', NULL, NULL, NULL, 'role_master');
+INSERT INTO sys_function VALUES ('2940', 'gw_trg_plan_psector_geom', 'utils', 'trigger function', NULL, NULL, NULL, 'role_master');
+INSERT INTO sys_function VALUES ('2942', 'gw_trg_om_visit_singlevent', 'utils', 'trigger function', NULL, NULL, NULL, 'role_om');
+INSERT INTO sys_function VALUES ('2944', 'gw_trg_om_visit_multievent' ,'utils', 'trigger function', NULL, NULL, NULL, 'role_om');
+INSERT INTO sys_function VALUES ('2946', 'gw_trg_notify', 'utils', 'trigger function', NULL, NULL, NULL, 'role_basic');
+INSERT INTO sys_function VALUES ('2948', 'gw_trg_node_statecontrol', 'utils', 'trigger function', NULL, NULL, NULL, 'role_basic');
+INSERT INTO sys_function VALUES ('1146', 'gw_trg_node_arc_divide', 'utils', 'trigger function', NULL, NULL, NULL, 'role_basic');
+INSERT INTO sys_function VALUES ('2950', 'gw_trg_edit_streetaxis', 'utils', 'trigger function', NULL, NULL, NULL, 'role_basic');
+INSERT INTO sys_function VALUES ('2952', 'gw_trg_edit_plot', 'utils', 'trigger function', NULL, NULL, NULL, 'role_basic');
+INSERT INTO sys_function VALUES ('2954', 'gw_trg_edit_macrodqa', 'ws', 'trigger function', NULL, NULL, NULL, 'role_basic');
+INSERT INTO sys_function VALUES ('2956', 'gw_trg_edit_cad_aux', 'utils', 'trigger function', NULL, NULL, NULL, 'role_basic');
+INSERT INTO sys_function VALUES ('2958', 'gw_trg_edit_address', 'utils', 'trigger function', NULL, NULL, NULL, 'role_basic');
+INSERT INTO sys_function VALUES ('2960', 'gw_trg_ui_hydroval_connec', 'ws', 'trigger function', NULL, NULL, NULL, 'role_basic');
+INSERT INTO sys_function VALUES ('1316', 'gw_trg_ui_visit', 'utils', 'trigger function', NULL, NULL, NULL, 'role_basic');
+INSERT INTO sys_function VALUES ('2962', 'gw_trg_ui_mincut_result_cat', 'ws', 'trigger function', NULL, NULL, NULL, 'role_om');
+INSERT INTO sys_function VALUES ('1348', 'gw_trg_node_rotation_update', 'utils', 'trigger function', NULL, NULL, NULL, 'role_edit');
+INSERT INTO sys_function VALUES ('2964', 'gw_fct_getprofile', 'utils', 'trigger function', NULL, NULL, NULL, 'role_om');
+INSERT INTO sys_function VALUES ('2966', 'gw_fct_setprofile', 'utils', 'trigger function', NULL, NULL, NULL, 'role_om');
+
+
+
+
 
 
 

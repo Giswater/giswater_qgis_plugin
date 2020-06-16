@@ -4,9 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE:2776
-
--- DROP FUNCTION SCHEMA_NAME.gw_fct_getprofile(json);
+--FUNCTION CODE:2964
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getprofile(p_data json)
   RETURNS json AS
