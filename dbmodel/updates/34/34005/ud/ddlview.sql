@@ -1439,13 +1439,7 @@ WHERE cat_soil.m2trenchl_cost::text = price_m2trenchl.id::text OR cat_soil.m2tre
 
 
 CREATE OR REPLACE VIEW v_plan_arc AS 
-SELECT *,
-concat ((1/acoeff)::numeric(6,1), ' years') as aperiod,
-(budget * acoeff)::numeric(12,2) AS arate,
-CASE WHEN (age::float * budget * acoeff) < budget THEN (age * budget * acoeff)::numeric(12,2) 
-ELSE budget::numeric(12,2) END AS amortized,
-CASE WHEN (age * budget * acoeff)< budget THEN (budget - age * budget * acoeff)::numeric(12,2) 
-ELSE 0::numeric(12,2) END AS pending
+SELECT *
 FROM (
 WITH v_plan_aux_arc_cost AS 
 	(WITH v_plan_aux_arc_ml AS
@@ -1855,6 +1849,7 @@ CREATE OR REPLACE VIEW v_plan_result_arc AS
 	om_rec_result_arc.the_geom,
 	om_rec_result_arc.age,
 	om_rec_result_arc.acoeff,
+	om_rec_result_arc.initcost,
 	om_rec_result_arc.aperiod,
 	om_rec_result_arc.arate,
 	om_rec_result_arc.amortized,
@@ -1919,24 +1914,19 @@ UNION
 	v_plan_arc.other_budget,
 	v_plan_arc.total_budget,
 	v_plan_arc.the_geom,
-	v_plan_arc.age,
-	v_plan_arc.acoeff,
-	v_plan_arc.aperiod,
-	v_plan_arc.arate,
-	v_plan_arc.amortized,
-	v_plan_arc.pending
+	null as age,
+	null as acoeff,
+	null as initcost,
+	null as aperiod,
+	null as arate,
+	null as amortized,
+	null as pending
    FROM v_plan_arc
   WHERE v_plan_arc.state = 2;
 
 
 CREATE OR REPLACE VIEW v_plan_node AS 
-SELECT *, 
-concat ((1/acoeff)::numeric(6,1), ' years') as aperiod,
-(budget * acoeff)::numeric(12,2) AS arate,
-CASE WHEN (age::float * budget * acoeff) < budget THEN (age * budget * acoeff)::numeric(12,2) 
-ELSE budget::numeric(12,2) END AS amortized,
-CASE WHEN (age * budget * acoeff)< budget THEN (budget - age * budget * acoeff)::numeric(12,2) 
-ELSE 0::numeric(12,2) END AS pending
+SELECT *
 FROM (
  SELECT v_node.node_id,
 	v_node.nodecat_id,
@@ -2593,6 +2583,7 @@ CREATE OR REPLACE VIEW v_plan_result_node AS
 	om_rec_result_node.the_geom,
 	om_rec_result_node.age,
 	om_rec_result_node.acoeff,
+	om_rec_result_node.initcost,
 	om_rec_result_node.aperiod,
 	om_rec_result_node.arate,
 	om_rec_result_node.amortized,
@@ -2617,12 +2608,13 @@ UNION
 	v_plan_node.cost,
 	v_plan_node.budget,
 	v_plan_node.the_geom,
-	v_plan_node.age,
-	v_plan_node.acoeff,
-	v_plan_node.aperiod,
-	v_plan_node.arate,
-	v_plan_node.amortized,
-	v_plan_node.pending
+	null as age,
+	null as acoeff,
+	null as initcost,
+	null as aperiod,
+	null as arate,
+	null as amortized,
+	null as pending
    FROM v_plan_node
   WHERE v_plan_node.state = 2;
 

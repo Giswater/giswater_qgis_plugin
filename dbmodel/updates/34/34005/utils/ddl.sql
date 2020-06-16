@@ -16,6 +16,7 @@ ALTER TABLE cat_node ADD COLUMN acoeff float;
 
 ALTER TABLE om_rec_result_arc ADD COLUMN age float;
 ALTER TABLE om_rec_result_arc ADD COLUMN acoeff float;
+ALTER TABLE om_rec_result_arc ADD COLUMN initcost float;
 ALTER TABLE om_rec_result_arc ADD COLUMN aperiod text;
 ALTER TABLE om_rec_result_arc ADD COLUMN arate float;
 ALTER TABLE om_rec_result_arc ADD COLUMN amortized float;
@@ -23,6 +24,7 @@ ALTER TABLE om_rec_result_arc ADD COLUMN pending float;
 
 ALTER TABLE om_rec_result_node ADD COLUMN age float;
 ALTER TABLE om_rec_result_node ADD COLUMN acoeff float;
+ALTER TABLE om_rec_result_node ADD COLUMN initcost float;
 ALTER TABLE om_rec_result_node ADD COLUMN aperiod text;
 ALTER TABLE om_rec_result_node ADD COLUMN arate float;
 ALTER TABLE om_rec_result_node ADD COLUMN amortized float;
