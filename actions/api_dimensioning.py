@@ -81,6 +81,7 @@ class ApiDimensioning(ApiParent):
 
         layout_list = []
         for field in complet_result['body']['data']['fields']:
+            if 'hidden' in field and field['hidden']: continue
             label, widget = self.set_widgets(self.dlg_dim, complet_result, field)
             layout = self.dlg_dim.findChild(QGridLayout, field['layoutname'])
 
