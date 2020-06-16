@@ -1260,6 +1260,7 @@ class AddNewLot(ParentManage):
             keys = "lot_id, "
             values = "$$"+str(lot_id)+"$$, "
             for key, value in list(item.items()):
+                column_name = None
                 valid = False
                 # if key in (lot['feature_type'] + '_id', 'code', 'status', 'observ', 'validate'):
                 # if str(key) in ('Id embornal', 'Codi', 'Estat', 'observ', 'validate'):
