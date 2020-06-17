@@ -20,9 +20,11 @@ SELECT gw_fct_getselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
 SELECT gw_fct_getselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
 "data":{"filterFields":{}, "pageInfo":{}, "selector_type":{"exploitation": {"ids":[]}}}}$$);
 
-variable example:
  '{"table":"exploitation", "selector":"selector_expl", "table_id":"expl_id",  "selector_id":"expl_id",  "label":"expl_id, '' - '', name, '''', CASE WHEN descript IS NULL THEN '''' ELSE concat('' - '', descript) END", 
- "manageAll":true, "selectionMode":"keepPreviousUsingShift", "layerManager":"{"active":[], "visible":["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_gully"], "zoomTo":["v_edit_arc"]}, "query_filter":"AND expl_id > 0", "typeaheadFilter":{"queryText":"SELECT expl_id as id, name AS idval FROM v_edit_exploitation WHERE expl_id > 0"}}'
+ "manageAll":true, "selectionMode":"keepPreviousUsingShift", 
+ "layerManager":{"active":[], "visible":["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_gully"], "zoom":["v_edit_arc"], "index":["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_gully"]}, 
+ "query_filter":"AND expl_id > 0", "typeaheadFilter":{"queryText":"SELECT expl_id as id, name AS idval FROM v_edit_exploitation WHERE expl_id > 0"}}'
+ WHERE parameter = 'basic_selector_exploitation';
 
 */
 
@@ -52,12 +54,11 @@ v_selector_id text;
 v_query_filter text;
 v_query_filteradd text;
 v_manageall boolean;
-v_typeaheadFilter text;
+v_typeahead json;
 v_expl_x_user boolean;
 v_filter text;
 v_filterstatus boolean;
 v_selectionMode text;
-v_layermanager json;
 v_error_context text;
 
 BEGIN
@@ -96,9 +97,8 @@ BEGIN
 		v_selector_id = v_parameter_selector->>'selector_id';
 		v_query_filteradd = v_parameter_selector->>'query_filter';
 		v_manageall = v_parameter_selector->>'manageAll';
-		v_typeaheadFilter = v_parameter_selector->>'typeaheadFilter';
+		v_typeahead = v_parameter_selector->>'typeaheadFilter';
 		v_selectionMode = v_parameter_selector->>'selectionMode';
-		v_layermanager = v_parameter_selector->>'layerManager';
 
 		IF v_selectionMode = '' OR v_selectionMode is null then
 			v_selectionMode = 'keepPrevious';
@@ -123,6 +123,7 @@ BEGIN
 			v_query_filter = ' AND ' || v_table_id || ' IN '|| v_selectors_list || ' ';
 		END IF;
 		raise notice 'AA -> %',v_query_filteradd;
+		
 		-- Manage v_queryfilter add (using filter)
 		IF v_query_filter is not NULL THEN
 			v_filterstatus = True;
@@ -137,10 +138,7 @@ BEGIN
 
 		IF v_query_filteradd IS NULL THEN v_query_filteradd ='' ; END IF;
 
-		RAISE NOTICE ' % % % % % % % % ', v_label, v_table_id, v_selector_id, v_table, v_selector_id, v_selector, v_query_filter, v_query_filteradd;
-
 		-- Get exploitations, selected and unselected with selectors list
-
 		v_query_filter := COALESCE(v_query_filter, '');
 		v_query_filteradd := COALESCE(v_query_filteradd, '');
 	
@@ -167,7 +165,7 @@ BEGIN
 		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'tooltip', rec_tab.tooltip::TEXT);
 		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'selectorType', rec_tab.formname::TEXT);
 		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'manageAll', v_manageall::TEXT);
-		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'typeaheadFilter', v_typeaheadFilter::TEXT);
+		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'typeaheadFilter', v_typeahead::TEXT);
 
 
 		-- Create tabs array
@@ -189,8 +187,9 @@ BEGIN
 	-- Check null
 	v_formTabs := COALESCE(v_formTabs, '[]');
 	v_manageall := COALESCE(v_manageall, FALSE);	
-	v_layermanager = COALESCE(v_layermanager, '{}');
 	v_selectionMode = COALESCE(v_selectionMode, '');
+
+	raise notice 'v_formTabs %', v_formTabs;
 
 	-- Return
 	IF v_firsttab IS FALSE THEN
@@ -205,9 +204,8 @@ BEGIN
 		RETURN ('{"status":"Accepted", "version":'||v_version||
 			',"body":{"message":{"level":1, "text":"This is a test message"}'||
 			',"form":{"formName":"", "formLabel":"", "formText":"", "formFilter":'||v_filterstatus||
-				',"formCheckAll":'||v_manageall||', "selectionMode":"'||v_selectionMode||'", "layerManager":'||v_layermanager||
-				',"formTabs":'||v_formTabs||
-				',"formActions":[]}'||
+				',"formCheckAll":'||v_manageall||', "selectionMode":"'||v_selectionMode||'"'||
+				',"formTabs":'||v_formTabs||'}'||
 			',"feature":{}'||
 			',"data":{}}'||
 		    '}')::json;

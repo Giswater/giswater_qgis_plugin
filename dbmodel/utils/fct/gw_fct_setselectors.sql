@@ -34,6 +34,8 @@ v_parameter_selector json;
 v_data json;
 v_expl integer;
 v_addschema text;
+v_layermanager json;
+v_error_context text;
 
 BEGIN
 
@@ -59,8 +61,10 @@ BEGIN
 
 	-- Get system parameters
 	v_parameter_selector = (SELECT value::json FROM config_param_system WHERE parameter = concat('basic_selector_', v_selectortype));
-		v_tablename = v_parameter_selector->>'selector';
-		v_columnname = v_parameter_selector->>'selector_id'; 
+	v_tablename = v_parameter_selector->>'selector';
+	v_columnname = v_parameter_selector->>'selector_id'; 
+	v_layermanager = v_parameter_selector->>'layerManager';
+
 	
 	-- get expl from muni
 	IF v_selectortype = 'explfrommuni' THEN
@@ -108,17 +112,18 @@ BEGIN
 	-- Return
 	RETURN ('{"status":"Accepted", "version":'||v_version||
 			',"body":{"message":{"level":1, "text":"This is a test message"}'||
-			',"form":{"formName":"", "formLabel":"", "formText":""'||
-			',"formActions":[]}'||
-			',"feature":{}'||
-			',"data":{"indexingLayers": {"mincut": ["v_om_mincut", "v_om_mincut_arc", "v_om_mincut_node", "v_om_mincut_connec", "v_om_mincut_valve"],
-										 "exploitation": ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_gully", "v_edit_element"]
-			}}}'||'}')::json;
+				',"form":{"formName":"", "formLabel":"", "formText":""'||
+				',"feature":{}'||
+				',"actions":{}'||
+				',"layerManager":'||v_layermanager||'}'||
+				',"data":{}}'||
+			'}')::json;
 
 	-- Exception handling
-	--EXCEPTION WHEN OTHERS THEN
-	--RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
-	
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
