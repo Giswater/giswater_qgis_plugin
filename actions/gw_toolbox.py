@@ -355,7 +355,7 @@ class GwToolBox(ApiParent):
         body = self.create_body(feature=feature_field, extras=extras)
         sql = f"SELECT {function_name}($${{{body}}}$$)::text"
         row = self.controller.get_row(sql, log_sql=True, commit=True)
-        if not row or row[0] is None:
+        if not row or row[0] in (None, ''):
             self.controller.show_message(f"Function : {function_name} executed with no result ", 3)
             dialog.progressBar.setVisible(False)
             dialog.progressBar.setMinimum(0)
@@ -375,7 +375,6 @@ class GwToolBox(ApiParent):
 
         try:
             self.set_layers_visible(complet_result[0]['body']['data']['setVisibleLayers'])
-            self.controller.log_info('test1')
 
             #getting on the fly simbology capabilities
             if 'setSimbology' in complet_result[0]['body']['data']:
