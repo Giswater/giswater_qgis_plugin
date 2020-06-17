@@ -109,6 +109,9 @@ BEGIN
 
 	END IF;
 	
+	-- Check null
+	v_layermanager := COALESCE(v_layermanager, '{}');    
+	
 	-- Return
 	RETURN ('{"status":"Accepted", "version":'||v_version||
 			',"body":{"message":{"level":1, "text":"This is a test message"}'||
