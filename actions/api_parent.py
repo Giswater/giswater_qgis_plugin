@@ -1743,9 +1743,9 @@ class ApiParent(ParentAction):
         if not json_result:
             return False
 
-        selection_mode = json_result['body']['form']['selectionMode']
-
         for form_tab in json_result['body']['form']['formTabs']:
+
+            selection_mode = form_tab['selectionMode']
 
             # Create one tab for each form_tab and add to QTabWidget
             tab_widget = QWidget(main_tab)
