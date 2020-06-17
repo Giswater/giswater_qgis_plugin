@@ -1811,6 +1811,3 @@ class ApiParent(ParentAction):
         json_result = self.controller.get_json('gw_fct_setselectors', body)
         if not json_result:
             return False
-
-        # manage layer manager
-        self.controller.layer_manager(json_result['body']['layerManager'])

@@ -819,6 +819,9 @@ class DaoController(object):
             self.manage_exception_api(json_result, sql, is_notify=is_notify)
             return False
 
+        # Manage options for layers (active, visible, zoom and indexing)
+        self.layer_manager(json_result)
+
         return json_result
 
 
@@ -1909,22 +1912,47 @@ class DaoController(object):
         except AttributeError:
             pass
 
-    def layer_manager(self, layermanager):
 
+    def layer_manager(self, json_result, sql):
+        """
+        Manage options for layers (active, visible, zoom and indexing)
+        :param json_result: Json result of a query (Json)
+        :param sql: Query executed from where the json comes, it is only used to show it in case of exception (String)
+        :return: None
+        """
+
+        try:
+            layermanager = json_result['body']['form']['layerManager']
+        except KeyError as e:
+            self.log_warning(f"EXCEPTION: {type(e).__name__}, {e}. SQL:{sql}")
+            return
+
+        # Get a list of layers names, but obviously it will stay active the last one
         if 'active' in layermanager:
             for layer_name in layermanager['active']:
-                #self.controller.set_layer_active(layer_name)
+                layer = self.get_layer_by_tablename(layer_name)
+                if layer:
+                    self.iface.setActiveLayer(layer)
 
+        # Get a list of layers names and set visible
         if 'visible' in layermanager:
             for layer_name in layermanager['visible']:
-                self.controller.set_layer_visible(layer_name)
+                layer = self.get_layer_by_tablename(layer_name)
+                if layer:
+                    self.set_layer_visible(layer)
 
+        # Get a list of layers names, but obviously remain zoomed to the last
         if 'zoom' in layermanager:
             for layer_name in layermanager['zoom']:
-                #self.controller.zoom_to_layer(layer_name)
+                layer = self.get_layer_by_tablename(layer_name)
+                if layer:
+                    prev_layer = self.iface.activeLayer()
+                    self.iface.setActiveLayer(layer)
+                    self.iface.zoomToActiveLayer()
+                    if prev_layer:
+                        self.iface.setActiveLayer(prev_layer)
 
+        # Get a list of layers names force reload dataProvider of layer
         if 'index' in layermanager:
             for layer_name in layermanager['index']:
-                self.controller.set_layer_index(layer_name)
-        #refresh legend
-        #refresh canvas
+                self.set_layer_index(layer_name)
