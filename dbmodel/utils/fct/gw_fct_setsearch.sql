@@ -15,12 +15,14 @@ $BODY$
 SELECT gw_fct_setsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"tabName":"addNetwork"}, "feature":{},
 "data":{"filterFields":{}, "pageInfo":{}, "net_type":{"id":"v_edit_arc", "name":"Arcs"}, "featureType":"arc", "addSchema":"SCHEMA_NAME", "net_code":{"text":"3"}}}$$);
 
+ SELECT gw_fct_setsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"tabName":"network"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "featureType":"None", "net_type":{"id":"", "name":""}, "net_code":{"text":"e"}, "addSchema":"None"}}$$);
 
 SELECT gw_fct_setsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"tabName":"workcat"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "workcat_search":{"text":"w"}, "addSchema":"None"}}$$);
 
 MAIN ISSUES
 -----------
 - basic_search_network is key issue to define variables on config_param_system to searh anything you want
+- Second schema is avaliable to search
 
 */
 
@@ -38,6 +40,7 @@ v_projecttype character varying;
 v_count integer;
 v_querytext text;
 v_featuretype text;
+v_partial text;
 
 --network
 v_network_layername text;
@@ -45,6 +48,7 @@ v_network_idname text;
 v_network_code text;
 v_network_catalog text;
 v_value json;
+v_network_all json;
 
 --muni
 v_muni_layer varchar;
@@ -101,6 +105,7 @@ v_exploitation_id_field varchar;
 v_exploitation_display_field varchar;
 v_exploitation_geom_field varchar;
 
+v_searchschema text;
 v_schemaname text;
 v_addschema text;
 
@@ -126,95 +131,81 @@ BEGIN
 	v_featuretype := (p_data->>'data')::json->>'featureType';
 	v_addschema := (p_data->>'data')::json->>'addSchema';
 
-	-- control nulls
-	if v_featuretype is null then v_featuretype = 'arc'; end if;
 
 	-- Network tab
 	--------------
-	IF v_tab = 'network' THEN
+	IF v_tab = 'network' OR v_tab = 'addNetwork' THEN
 
-		if v_featuretype is null then v_featuretype = 'arc'; end if;
-
-		v_value = (SELECT value FROM config_param_system WHERE parameter  = concat('basic_search_network_',v_featuretype));
-			v_network_layername = v_value->>'sys_table_id';
-			v_network_idname = v_value->>'sys_id_field';
-			v_network_code = v_value->>'sys_search_field';
-			v_network_catalog = v_value->>'cat_field';
-				
-		-- Text to search
-		v_combo := ((p_data->>'data')::json)->>'net_type';
-		v_idarg := v_combo->>'id';
-		v_name := v_combo->>'name';
-		v_edittext := ((p_data->>'data')::json)->>'net_code';
-		v_textarg := concat('%',v_edittext->>'text' ,'%');
-
-		-- buid querytext
-		v_querytext= concat('SELECT ',v_network_idname,' AS sys_id, ', v_network_code,' AS search_field, ', v_network_catalog,' AS cat_id,', 
-				quote_literal(v_network_idname)::text,' AS sys_idname,',quote_literal(v_featuretype)::text,' AS feature_type, ',
-				quote_literal(v_network_layername)::text,'::text AS sys_table_id 
-				FROM ', v_network_layername);
-				 
-		raise notice'v_querytext % %', v_querytext, v_value;
-		
-		IF v_idarg = '' THEN 
-			-- Get Ids for type combo
-			EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT sys_id, sys_table_id, 
-						CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname, feature_type FROM ('||(v_querytext)||')b
-						WHERE CONCAT (search_field, '' : '', cat_id) ILIKE ' || quote_literal(v_textarg) || ' 
-						ORDER BY search_field LIMIT 10) a'
-						INTO v_response;
-		ELSE 
-			-- Get Ids for type combo    
-			EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT sys_id, sys_table_id, 
-						CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname, feature_type FROM ('||(v_querytext)||')b
-						WHERE CONCAT (search_field, '' : '', cat_id) ILIKE ' || quote_literal(v_textarg) || ' AND sys_table_id = '||quote_literal(v_idarg)||'
-						ORDER BY search_field LIMIT 10) a'
-						INTO v_response;
+		-- set the schema where search is looking for
+		IF v_tab =  'addNetwork'  THEN
+			v_searchschema = v_addschema;
+		ELSE
+			v_searchschema = v_schemaname;
 		END IF;
 
-	ELSIF v_tab = 'addNetwork' THEN
+		-- profilactic control of nulls
+		IF v_featuretype is null OR v_featuretype = 'None' THEN v_featuretype = 'all'; end if;
 
-		EXECUTE 'SET search_path = public, '||v_addschema;
-
+		-- get values from database config variable
 		v_value = (SELECT value FROM config_param_system WHERE parameter  = concat('basic_search_network_',v_featuretype));
 			v_network_layername = v_value->>'sys_table_id';
 			v_network_idname = v_value->>'sys_id_field';
 			v_network_code = v_value->>'sys_search_field';
 			v_network_catalog = v_value->>'cat_field';
 				
-		-- Text to search
+		-- get values from init json
 		v_combo := ((p_data->>'data')::json)->>'net_type';
 		v_idarg := v_combo->>'id';
 		v_name := v_combo->>'name';
 		v_edittext := ((p_data->>'data')::json)->>'net_code';
 		v_textarg := concat('%',v_edittext->>'text' ,'%');
 
-		-- buid querytext
-		v_querytext= concat('SELECT ',v_network_idname,' AS sys_id, ', v_network_code,' AS search_field, ', v_network_catalog,' AS cat_id,', 
-				quote_literal(v_network_idname)::text,' AS sys_idname,',quote_literal(v_featuretype)::text,' AS feature_type, ',
-				quote_literal(v_network_layername)::text,'::text AS sys_table_id 
-				FROM ', v_network_layername);
-				 
-		raise notice'v_querytext % %', v_querytext, v_value;
-		
+		-- built first part of query
+		IF v_featuretype = 'all' THEN -- feature search is for the whole system
+			FOR v_network_all IN SELECT value FROM config_param_system WHERE parameter like '%basic_search_network_%' 
+			LOOP
+				IF  v_network_all->>'feature_type' IS NOT NULL THEN
+					v_partial = concat('SELECT ',v_network_all->>'sys_id_field',' AS sys_id, ', v_network_all->>'sys_search_field',' AS search_field, ', v_network_all->>'sys_search_field',' AS cat_id,', 
+						quote_literal(v_network_all->>'sys_id_field')::text,' AS sys_idname,',quote_literal(v_network_all->>'feature_type')::text,' AS feature_type, ',
+						quote_literal(v_network_all->>'sys_table_id')::text,'::text AS sys_table_id 
+						FROM ', v_network_all->>'sys_table_id');
+						
+					-- concat different querytext
+					v_querytext = concat(v_partial, ' UNION ' , v_querytext);
+				END IF;
+			END LOOP;
+
+			-- remove last 'UNION' when there is no next loop to union nothing...
+			v_querytext = reverse(substring(reverse (v_querytext),7,9999));
+		ELSE
+			-- buid querytext
+			v_querytext= concat('SELECT ',v_network_idname,' AS sys_id, ', v_network_code,' AS search_field, ', v_network_catalog,' AS cat_id,', 
+					quote_literal(v_network_idname)::text,' AS sys_idname,',quote_literal(v_featuretype)::text,' AS feature_type, ',
+					quote_literal(v_network_layername)::text,'::text AS sys_table_id 
+					FROM ', v_network_layername);
+		END IF;			 
+
+		-- built second part of query
+		EXECUTE 'SET search_path = '||v_searchschema;
+
 		IF v_idarg = '' THEN 
+
 			-- Get Ids for type combo
 			EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT sys_id, sys_table_id, 
-						CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname, feature_type FROM ('||(v_querytext)||')b
-						WHERE CONCAT (search_field, '' : '', cat_id) ILIKE ' || quote_literal(v_textarg) || ' 
-						ORDER BY search_field LIMIT 10) a'
-						INTO v_response;
+					CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname, feature_type FROM ('||(v_querytext)||')b
+					WHERE CONCAT (search_field, '' : '', cat_id) ILIKE ' || quote_literal(v_textarg) || ' 
+					ORDER BY search_field LIMIT 10) a'
+					INTO v_response;
 		ELSE 
-			-- Get Ids for type combo    
+			-- Get values for type combo    
 			EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT sys_id, sys_table_id, 
-						CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname, feature_type FROM ('||(v_querytext)||')b
-						WHERE CONCAT (search_field, '' : '', cat_id) ILIKE ' || quote_literal(v_textarg) || ' AND sys_table_id = '||quote_literal(v_idarg)||'
-						ORDER BY search_field LIMIT 10) a'
-						INTO v_response;
+					CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname, feature_type FROM ('||(v_querytext)||')b
+					WHERE CONCAT (search_field, '' : '', cat_id) ILIKE ' || quote_literal(v_textarg) || ' AND sys_table_id = '||quote_literal(v_idarg)||'
+					ORDER BY search_field LIMIT 10) a'
+					INTO v_response;
 		END IF;
 
 		EXECUTE 'SET search_path = '||v_schemaname;
-	
 	
 	-- address
 	ELSIF v_tab = 'address' THEN
