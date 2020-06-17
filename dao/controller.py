@@ -1675,7 +1675,7 @@ class DaoController(object):
         return row
 
 
-    def indexing_spatial_layer(self, layer_name):
+    def set_layer_index(self, layer_name):
         """ Force reload dataProvider of layer """
 
         layer = self.get_layer_by_tablename(layer_name)
@@ -1909,3 +1909,22 @@ class DaoController(object):
         except AttributeError:
             pass
 
+    def layer_manager(self, layermanager):
+
+        if 'active' in layermanager:
+            for layer_name in json_result['body']['data']['layerManager']['active']:
+                #self.controller.set_layer_active(layer_name)
+
+        if 'visible' in json_result['body']['layerManager']:
+            for layer_name in json_result['body']['data']['layerManager']['visible']:
+                self.controller.set_layer_visible(layer_name)
+
+        if 'zoom' in json_result['body']['layerManager']:
+            for layer_name in json_result['body']['data']['layerManager']['zoom']:
+                #self.controller.zoom_to_layer(layer_name)
+
+        if 'index' in json_result['body']['layerManager']:
+            for layer_name in json_result['body']['data']['layerManager']['index']:
+                self.controller.set_layer_index(layer_name)
+        #refresh legend
+        #refresh canvas

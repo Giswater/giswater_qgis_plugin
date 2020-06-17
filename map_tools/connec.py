@@ -152,8 +152,8 @@ class ConnecMapTool(ParentMapTool):
                         self.cancel_map_tool()
 
         # Force reload dataProvider of layer
-        self.controller.indexing_spatial_layer('v_edit_link')
-        self.controller.indexing_spatial_layer('v_edit_vnode')
+        self.controller.set_layer_index('v_edit_link')
+        self.controller.set_layer_index('v_edit_vnode')
 
 
     def activate(self):
