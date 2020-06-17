@@ -1,3 +1,0 @@
-[submodule "sql"]
-	path = sql
-	url = https://github.com/Giswater/giswater_dbmodel
