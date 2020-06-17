@@ -12,6 +12,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getselectors(p_data json)
   RETURNS json AS
 $BODY$
 
+
 /*example
 CURRENT
 SELECT gw_fct_getselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
@@ -20,11 +21,14 @@ SELECT gw_fct_getselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
 SELECT gw_fct_getselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
 "data":{"filterFields":{}, "pageInfo":{}, "selector_type":{"exploitation": {"ids":[]}}}}$$);
 
- '{"table":"exploitation", "selector":"selector_expl", "table_id":"expl_id",  "selector_id":"expl_id",  "label":"expl_id, '' - '', name, '''', CASE WHEN descript IS NULL THEN '''' ELSE concat('' - '', descript) END", 
+UPDATE config_param_system SET value =
+'{"table":"exploitation", "selector":"selector_expl", "table_id":"expl_id",  "selector_id":"expl_id",  "label":"expl_id, '' - '', name, '''', CASE WHEN descript IS NULL THEN '''' ELSE concat('' - '', descript) END", 
  "manageAll":true, "selectionMode":"keepPreviousUsingShift", 
  "layerManager":{"active":[], "visible":["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_gully"], "zoom":["v_edit_arc"], "index":["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_gully"]}, 
  "query_filter":"AND expl_id > 0", "typeaheadFilter":{"queryText":"SELECT expl_id as id, name AS idval FROM v_edit_exploitation WHERE expl_id > 0"}}'
  WHERE parameter = 'basic_selector_exploitation';
+ 
+
 
 */
 
@@ -84,100 +88,105 @@ BEGIN
 	FOREACH v_aux_json IN ARRAY fields_array
 	LOOP		
 
-	SELECT * INTO rec_tab FROM config_form_tabs WHERE formname=v_aux_json->>'json_object_keys';
-	IF rec_tab.formname IS NOT NULL THEN
+		SELECT * INTO rec_tab FROM config_form_tabs WHERE formname=v_aux_json->>'json_object_keys';
+		IF rec_tab.formname IS NOT NULL THEN
 
-		-- get selector parameters
-		v_parameter_selector = (SELECT value::json FROM config_param_system WHERE parameter = concat('basic_selector_', lower(v_aux_json->>'json_object_keys')::text));
+			-- get selector parameters
+			v_parameter_selector = (SELECT value::json FROM config_param_system WHERE parameter = concat('basic_selector_', lower(v_aux_json->>'json_object_keys')::text));
 
-		v_label = v_parameter_selector->>'label';
-		v_table = v_parameter_selector->>'table';
-		v_selector = v_parameter_selector->>'selector';
-		v_table_id = v_parameter_selector->>'table_id';
-		v_selector_id = v_parameter_selector->>'selector_id';
-		v_query_filteradd = v_parameter_selector->>'query_filter';
-		v_manageall = v_parameter_selector->>'manageAll';
-		v_typeahead = v_parameter_selector->>'typeaheadFilter';
-		v_selectionMode = v_parameter_selector->>'selectionMode';
+			v_label = v_parameter_selector->>'label';
+			v_table = v_parameter_selector->>'table';
+			v_selector = v_parameter_selector->>'selector';
+			v_table_id = v_parameter_selector->>'table_id';
+			v_selector_id = v_parameter_selector->>'selector_id';
+			v_query_filteradd = v_parameter_selector->>'query_filter';
+			v_manageall = v_parameter_selector->>'manageAll';
+			v_typeahead = v_parameter_selector->>'typeaheadFilter';
+			v_selectionMode = v_parameter_selector->>'selectionMode';
 
-		IF v_selectionMode = '' OR v_selectionMode is null then
-			v_selectionMode = 'keepPrevious';
-		END IF;
+			-- profilactic control
+			IF v_selectionMode = '' OR v_selectionMode is null then
+				v_selectionMode = 'keepPrevious';
+			END IF;
 
-		IF v_selector = 'selector_expl' AND v_expl_x_user THEN
-			v_query_filteradd = concat (v_query_filteradd, ' AND expl_id IN (SELECT expl_id FROM config_user_x_expl WHERE username = current_user)');
+				raise notice 'v_selectionMode %', v_selectionMode;
 
-		END IF;
 
-		-- Manage v_query_filter (using ids)
-		v_selectors_list := (((p_data ->> 'data')::json->>'selector_type')::json ->>(lower(v_aux_json->>'json_object_keys')))::json->>'ids';
-		v_selectors_list = replace(replace(v_selectors_list, '[', '('), ']', ')');
-		IF v_selectors_list IN (NULL, 'None') THEN
-			v_query_filter = '';
-		ELSIF v_selectors_list = '()' AND v_selector IN ('selector_mincut_result') THEN
-			v_query_filter = ' AND ' || v_table_id || ' IN (-1) ';
-			--v_query_filter = '';
-		ELSIF v_selectors_list = '()' THEN
-			v_query_filter = '';
-		ELSE
-			v_query_filter = ' AND ' || v_table_id || ' IN '|| v_selectors_list || ' ';
-		END IF;
-		raise notice 'AA -> %',v_query_filteradd;
-		
-		-- Manage v_queryfilter add (using filter)
-		IF v_query_filter is not NULL THEN
-			v_filterstatus = True;
-			-- amplify v_queryadd
-			v_filter := (((p_data ->> 'data')::json->>'selector_type')::json ->>(lower(v_aux_json->>'json_object_keys')))::json->>'filter';
-			v_filter := COALESCE(v_filter, '');
-			v_query_filteradd = concat (v_query_filteradd,' AND concat(',v_label ,') LIKE ''%', v_filter, '%''');
+			IF v_selector = 'selector_expl' AND v_expl_x_user THEN
+				v_query_filteradd = concat (v_query_filteradd, ' AND expl_id IN (SELECT expl_id FROM config_user_x_expl WHERE username = current_user)');
+
+			END IF;
+
+			-- Manage v_query_filter (using ids)
+			v_selectors_list := (((p_data ->> 'data')::json->>'selector_type')::json ->>(lower(v_aux_json->>'json_object_keys')))::json->>'ids';
+			v_selectors_list = replace(replace(v_selectors_list, '[', '('), ']', ')');
+			IF v_selectors_list IN (NULL, 'None') THEN
+				v_query_filter = '';
+			ELSIF v_selectors_list = '()' AND v_selector IN ('selector_mincut_result') THEN
+				v_query_filter = ' AND ' || v_table_id || ' IN (-1) ';
+				--v_query_filter = '';
+			ELSIF v_selectors_list = '()' THEN
+				v_query_filter = '';
+			ELSE
+				v_query_filter = ' AND ' || v_table_id || ' IN '|| v_selectors_list || ' ';
+			END IF;
+			raise notice 'AA -> %',v_query_filteradd;
 			
-		ELSE
-			v_query_filteradd = '';
+			-- Manage v_queryfilter add (using filter)
+			IF v_query_filter is not NULL THEN
+				v_filterstatus = True;
+				-- amplify v_queryadd
+				v_filter := (((p_data ->> 'data')::json->>'selector_type')::json ->>(lower(v_aux_json->>'json_object_keys')))::json->>'filter';
+				v_filter := COALESCE(v_filter, '');
+				v_query_filteradd = concat (v_query_filteradd,' AND concat(',v_label ,') LIKE ''%', v_filter, '%''');
+				
+			ELSE
+				v_query_filteradd = '';
+			END IF;
+
+			IF v_query_filteradd IS NULL THEN v_query_filteradd ='' ; END IF;
+
+			-- Get exploitations, selected and unselected with selectors list
+			v_query_filter := COALESCE(v_query_filter, '');
+			v_query_filteradd := COALESCE(v_query_filteradd, '');
+		
+			EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+			SELECT concat(' || v_label || ') AS label, ' || v_table_id || '::text as widgetname, ''' || v_selector_id || ''' as columnname, ''check'' as type, ''boolean'' as "dataType", true as "value" 
+			FROM '|| v_table ||' WHERE ' || v_table_id || ' IN (SELECT ' || v_selector_id || ' FROM '|| v_selector ||' WHERE cur_user=' || quote_literal(current_user) || ') '|| v_query_filter ||' '
+			||v_query_filteradd||' 
+			UNION 
+			SELECT concat(' || v_label || ') AS label, ' || v_table_id || '::text as widgetname, ''' || v_selector_id || ''' as columnname, ''check'' as type, ''boolean'' as "dataType", false as "value" 
+			FROM '|| v_table ||' WHERE ' || v_table_id || ' NOT IN (SELECT ' || v_selector_id || ' FROM '|| v_selector ||' WHERE cur_user=' || quote_literal(current_user) || ') '|| v_query_filter ||' '
+			||v_query_filteradd||'  ORDER BY label) a'
+			INTO v_formTabsAux;
+
+			-- Add tab name to json
+			IF v_formTabsAux IS NULL THEN
+				v_formTabsAux := ('{"fields":[]}')::json;
+			ELSE
+				v_formTabsAux := ('{"fields":' || v_formTabsAux || '}')::json;
+			END IF;
+
+			v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'tabName', rec_tab.tabname::TEXT);
+			v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'tableName', v_selector);
+			v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'tabLabel', rec_tab.label::TEXT);
+			v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'tooltip', rec_tab.tooltip::TEXT);
+			v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'selectorType', rec_tab.formname::TEXT);
+			v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'manageAll', v_manageall::TEXT);
+			v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'typeaheadFilter', v_typeahead::TEXT);
+			v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'selectionMode', v_selectionMode::TEXT);
+
+
+			-- Create tabs array
+			IF v_firsttab THEN 
+				v_formTabs := v_formTabs || ',' || v_formTabsAux::text;
+			ELSE 
+				v_formTabs := v_formTabs || v_formTabsAux::text;
+			END IF;
+
+			v_firsttab := TRUE;
+			v_active :=FALSE;
 		END IF;
-
-		IF v_query_filteradd IS NULL THEN v_query_filteradd ='' ; END IF;
-
-		-- Get exploitations, selected and unselected with selectors list
-		v_query_filter := COALESCE(v_query_filter, '');
-		v_query_filteradd := COALESCE(v_query_filteradd, '');
-	
-		EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-		SELECT concat(' || v_label || ') AS label, ' || v_table_id || '::text as widgetname, ''' || v_selector_id || ''' as columnname, ''check'' as type, ''boolean'' as "dataType", true as "value" 
-		FROM '|| v_table ||' WHERE ' || v_table_id || ' IN (SELECT ' || v_selector_id || ' FROM '|| v_selector ||' WHERE cur_user=' || quote_literal(current_user) || ') '|| v_query_filter ||' '
-		||v_query_filteradd||' 
-		UNION 
-		SELECT concat(' || v_label || ') AS label, ' || v_table_id || '::text as widgetname, ''' || v_selector_id || ''' as columnname, ''check'' as type, ''boolean'' as "dataType", false as "value" 
-		FROM '|| v_table ||' WHERE ' || v_table_id || ' NOT IN (SELECT ' || v_selector_id || ' FROM '|| v_selector ||' WHERE cur_user=' || quote_literal(current_user) || ') '|| v_query_filter ||' '
-		||v_query_filteradd||'  ORDER BY label) a'
-		INTO v_formTabsAux;
-
-		-- Add tab name to json
-		IF v_formTabsAux IS NULL THEN
-			v_formTabsAux := ('{"fields":[]}')::json;
-		ELSE
-			v_formTabsAux := ('{"fields":' || v_formTabsAux || '}')::json;
-		END IF;
-
-		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'tabName', rec_tab.tabname::TEXT);
-		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'tableName', v_selector);
-		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'tabLabel', rec_tab.label::TEXT);
-		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'tooltip', rec_tab.tooltip::TEXT);
-		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'selectorType', rec_tab.formname::TEXT);
-		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'manageAll', v_manageall::TEXT);
-		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'typeaheadFilter', v_typeahead::TEXT);
-
-
-		-- Create tabs array
-		IF v_firsttab THEN 
-			v_formTabs := v_formTabs || ',' || v_formTabsAux::text;
-		ELSE 
-			v_formTabs := v_formTabs || v_formTabsAux::text;
-		END IF;
-
-		v_firsttab := TRUE;
-		v_active :=FALSE;
-	END IF;
 	
 	END LOOP;
 
@@ -188,8 +197,6 @@ BEGIN
 	v_formTabs := COALESCE(v_formTabs, '[]');
 	v_manageall := COALESCE(v_manageall, FALSE);	
 	v_selectionMode = COALESCE(v_selectionMode, '');
-
-	raise notice 'v_formTabs %', v_formTabs;
 
 	-- Return
 	IF v_firsttab IS FALSE THEN
@@ -204,7 +211,7 @@ BEGIN
 		RETURN ('{"status":"Accepted", "version":'||v_version||
 			',"body":{"message":{"level":1, "text":"This is a test message"}'||
 			',"form":{"formName":"", "formLabel":"", "formText":"", "formFilter":'||v_filterstatus||
-				',"formCheckAll":'||v_manageall||', "selectionMode":"'||v_selectionMode||'"'||
+				',"formCheckAll":'||v_manageall||
 				',"formTabs":'||v_formTabs||'}'||
 			',"feature":{}'||
 			',"data":{}}'||
