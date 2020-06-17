@@ -820,7 +820,7 @@ class DaoController(object):
             return False
 
         # Manage options for layers (active, visible, zoom and indexing)
-        self.layer_manager(json_result, sql)
+        self.layer_manager(json_result)
 
         return json_result
 
@@ -1914,18 +1914,22 @@ class DaoController(object):
             pass
 
 
-    def layer_manager(self, json_result, sql):
+    def layer_manager(self, json_result):
         """
         Manage options for layers (active, visible, zoom and indexing)
         :param json_result: Json result of a query (Json)
-        :param sql: Query executed from where the json comes, it is only used to show it in case of exception (String)
         :return: None
         """
 
         try:
             layermanager = json_result['body']['form']['layerManager']
-        except KeyError as e:
+        except KeyError:
             return
+        # Get a list of layers names force reload dataProvider of layer
+        if 'index' in layermanager:
+            for layer_name in layermanager['index']:
+                self.set_layer_index(layer_name)
+                layer = self.get_layer_by_tablename(layer_name)
 
         # Get a list of layers names, but obviously it will stay active the last one
         if 'active' in layermanager:
@@ -1952,7 +1956,4 @@ class DaoController(object):
                     if prev_layer:
                         self.iface.setActiveLayer(prev_layer)
 
-        # Get a list of layers names force reload dataProvider of layer
-        if 'index' in layermanager:
-            for layer_name in layermanager['index']:
-                self.set_layer_index(layer_name)
+
