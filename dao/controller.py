@@ -1924,7 +1924,6 @@ class DaoController(object):
         try:
             layermanager = json_result['body']['form']['layerManager']
         except KeyError as e:
-            self.log_warning(f"EXCEPTION: {type(e).__name__}, {e}. SQL:{sql}")
             return
 
         # Get a list of layers names, but obviously it will stay active the last one
