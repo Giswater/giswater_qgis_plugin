@@ -210,9 +210,7 @@ BEGIN
 		-- Return formtabs
 		RETURN ('{"status":"Accepted", "version":'||v_version||
 			',"body":{"message":{"level":1, "text":"This is a test message"}'||
-			',"form":{"formName":"", "formLabel":"", "formText":"", "formFilter":'||v_filterstatus||
-				',"formCheckAll":'||v_manageall||
-				',"formTabs":'||v_formTabs||'}'||
+			',"form":{"formName":"", "formLabel":"", "formText":"", "formTabs":'||v_formTabs||'}'||
 			',"feature":{}'||
 			',"data":{}}'||
 		    '}')::json;
