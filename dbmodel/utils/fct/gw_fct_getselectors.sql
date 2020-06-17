@@ -15,7 +15,7 @@ $BODY$
 
 /*example
 CURRENT
-SELECT gw_fct_getselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
+SELECT gw_fct_getselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"currentTab":"tab_exploitation"}, "feature":{},
 "data":{"filterFields":{}, "pageInfo":{}, "selector_type":{"mincut": {"ids":[]}}}}$$);
 
 SELECT gw_fct_getselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
@@ -41,7 +41,7 @@ v_formTabs text;
 json_array json[];
 v_version json;
 rec_tab record;
-v_active boolean=true;
+v_active boolean=false;
 v_firsttab boolean=false;
 v_selectors_list text;
 v_selector_type json;
@@ -64,6 +64,7 @@ v_filter text;
 v_filterstatus boolean;
 v_selectionMode text;
 v_error_context text;
+v_currenttab text;
 
 BEGIN
 
@@ -76,6 +77,8 @@ BEGIN
 
 	-- Get input parameters:
 	v_selector_type := (p_data ->> 'data')::json->> 'selector_type';
+	v_currenttab := (p_data ->> 'form')::json->> 'currentTab';
+
 
 	-- get system variables:
 	v_expl_x_user = (SELECT value FROM config_param_system WHERE parameter = 'admin_exploitation_x_user');
@@ -109,9 +112,7 @@ BEGIN
 				v_selectionMode = 'keepPrevious';
 			END IF;
 
-				raise notice 'v_selectionMode %', v_selectionMode;
-
-
+			-- getting from v_expl_x_user variable
 			IF v_selector = 'selector_expl' AND v_expl_x_user THEN
 				v_query_filteradd = concat (v_query_filteradd, ' AND expl_id IN (SELECT expl_id FROM config_user_x_expl WHERE username = current_user)');
 
@@ -130,7 +131,6 @@ BEGIN
 			ELSE
 				v_query_filter = ' AND ' || v_table_id || ' IN '|| v_selectors_list || ' ';
 			END IF;
-			raise notice 'AA -> %',v_query_filteradd;
 			
 			-- Manage v_queryfilter add (using filter)
 			IF v_query_filter is not NULL THEN
@@ -167,6 +167,14 @@ BEGIN
 				v_formTabsAux := ('{"fields":' || v_formTabsAux || '}')::json;
 			END IF;
 
+			-- setting active tab
+			IF v_currenttab = rec_tab.tabname THEN
+				v_active = true;
+			ELSIF v_currenttab IS NULL OR v_currenttab = '' OR v_currenttab ='None' OR v_firsttab is false THEN
+				v_active = true;
+			END IF;
+
+			-- setting other variables of tab
 			v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'tabName', rec_tab.tabname::TEXT);
 			v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'tableName', v_selector);
 			v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'tabLabel', rec_tab.label::TEXT);
@@ -175,17 +183,15 @@ BEGIN
 			v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'manageAll', v_manageall::TEXT);
 			v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'typeaheadFilter', v_typeahead::TEXT);
 			v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'selectionMode', v_selectionMode::TEXT);
-
+			v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'active', v_active::TEXT);
 
 			-- Create tabs array
-			IF v_firsttab THEN 
+			IF v_firsttab THEN
 				v_formTabs := v_formTabs || ',' || v_formTabsAux::text;
 			ELSE 
 				v_formTabs := v_formTabs || v_formTabsAux::text;
 			END IF;
-
 			v_firsttab := TRUE;
-			v_active :=FALSE;
 		END IF;
 	
 	END LOOP;
