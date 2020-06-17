@@ -18,6 +18,12 @@ SELECT "SCHEMA_NAME".gw_fct_setprofile($${
 "form":{},
 "feature":{},
 "data":{"profile_id":"1", "initNode":116, "endNode":111, "listArcs":"{133,134,135,136,137}", "linksDistance":1, "legendFactor":1, "papersize":{"id":0, "customDim":{"xdim":300, "ydim":100}}, "title":"Title", "date":"15/6/20", "scale":{"scaleToFit":"False", "eh":2000, "ev":500}}}$$)
+
+SELECT "SCHEMA_NAME".gw_fct_setprofile($${
+"client":{"device":3, "infoType":100, "lang":"ES"},
+"form":{},
+"feature":{},
+"data":{"profile_id":"1",} "action":"delete"}$$)
 */  
     
 	
@@ -44,6 +50,7 @@ SELECT "SCHEMA_NAME".gw_fct_setprofile($${
     v_scale_eh integer;
     v_scale_ev integer;
     v_values text;
+    v_action text;
     
 
 BEGIN
@@ -70,28 +77,34 @@ BEGIN
 	v_scaletofit := (((p_data ->>'data')::json->>'scale')::json->>'scaleToFit')::boolean;
 	v_scale_eh := (((p_data ->>'data')::json->>'scale')::json->>'eh')::integer;
 	v_scale_ev := (((p_data ->>'data')::json->>'scale')::json->>'ev')::integer;
+	v_action := ((p_data ->>'data')::json->>'action')::text;
 	
 
 	-- Get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
 	INTO v_apiversion;
 
-	-- Check if id of profile already exists in DB
-	EXECUTE 'SELECT DISTINCT(profile_id) FROM om_profile WHERE profile_id = ''' || v_profile_id || '''::text' INTO v_profile;
-	IF v_profile IS NULL THEN
-		-- Populate values
-		v_values = '{"initNode":'||v_init_node||', "endNode":'||v_end_node||', "listArcs":"'||COALESCE(v_list_arcs, '[]')||'", "linksDistance":'||v_linksDistance||', "legendFactor":'||v_legendFactor||', "papersize":{"id":'||v_papersize_id||', "customDim":{"xdim":'||v_papersize_xdim||', "ydim":'||v_papersize_ydim||'}}, "title":"'||v_title||'", "date":"'||v_date||'", "scale":{"scaleToFit":'||v_scaletofit||', "eh":'||v_scale_eh||', "ev":'||v_scale_ev||'}}';
-		EXECUTE 'INSERT INTO om_profile (profile_id, values) VALUES ('''||v_profile_id||''', '''||v_values||''')';
-		
-		v_message := 'Values has been updated';
+	IF v_action = 'delete' THEN
+		EXECUTE 'DELETE FROM om_profile WHERE profile_id = ''' || v_profile_id ||'''';
+		v_message := 'Profile deleted';
 	ELSE
-		v_message := 'Selected ''profile_id'' already exist in database';
+		-- Check if id of profile already exists in DB
+		EXECUTE 'SELECT DISTINCT(profile_id) FROM om_profile WHERE profile_id = ''' || v_profile_id || '''::text' INTO v_profile;
+		IF v_profile IS NULL THEN
+			-- Populate values
+			v_values = '{"initNode":'||v_init_node||', "endNode":'||v_end_node||', "listArcs":"'||COALESCE(v_list_arcs, '[]')||'", "linksDistance":'||v_linksDistance||', "legendFactor":'||v_legendFactor||', "papersize":{"id":'||v_papersize_id||', "customDim":{"xdim":'||v_papersize_xdim||', "ydim":'||v_papersize_ydim||'}}, "title":"'||v_title||'", "date":"'||v_date||'", "scale":{"scaleToFit":'||v_scaletofit||', "eh":'||v_scale_eh||', "ev":'||v_scale_ev||'}}';
+			EXECUTE 'INSERT INTO om_profile (profile_id, values) VALUES ('''||v_profile_id||''', '''||v_values||''')';
+			
+			v_message := 'Values has been updated';
+		ELSE
+			v_message := 'Selected ''profile_id'' already exist in database';
+		END IF;
 	END IF;
 
 	-- Check null
 	v_apiversion := COALESCE(v_apiversion, '[]');    
 	v_fields := COALESCE(v_fields, '{}'); 
-
+		
 	--    Return
 	RETURN ('{"status":"Accepted", "message":"'||v_message||'", "apiVersion":' || v_apiversion ||
 	      ',"body":{"data":{}'||

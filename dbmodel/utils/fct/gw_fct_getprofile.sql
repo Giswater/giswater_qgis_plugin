@@ -17,14 +17,8 @@ SELECT "SCHEMA_NAME".gw_fct_getprofile($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{},
-"data":{"profile_id":"1", "action":"load"}}$$)
+"data":{}}$$)
 
-
-SELECT "SCHEMA_NAME".gw_fct_getprofile($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
-"form":{},
-"feature":{},
-"data":{"profile_id":"1", "action":"delete"}}$$)
 */  
     
 	
@@ -33,10 +27,10 @@ SELECT "SCHEMA_NAME".gw_fct_getprofile($${
     v_apiversion json;
     v_device integer;
     v_profile integer;
-    v_profile_id text;
     v_message text;
     v_action text;
     v_load_result json;
+    v_load_result_array json[];
 
     
 
@@ -49,27 +43,20 @@ BEGIN
 	schemas_array := current_schemas(FALSE);
 
 	-- Get json parameters
-	v_device := ((p_data ->>'client')::json->>'device')::text;
-	v_profile_id := ((p_data ->>'data')::json->>'profile_id')::text;
-	v_action := ((p_data ->>'data')::json->>'action')::text;
-	
-	
+	v_device := ((p_data ->>'client')::json->>'device')::text;	
 
 	-- Get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
 	INTO v_apiversion;
 
-	IF v_action = 'delete' THEN
-		EXECUTE 'DELETE FROM om_profile WHERE profile_id = ''' || v_profile_id ||'''';
-		v_message := 'Profile deleted';
-	ELSE
-		EXECUTE 'SELECT values FROM om_profile WHERE profile_id = ''' || v_profile_id || '''' INTO v_load_result;
-		v_message := 'Load profile successfully';
-	END IF;
-
+	EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT profile_id ,values FROM om_profile ORDER BY profile_id)a' INTO v_load_result_array;
+	v_message := 'Load profiles successfully';
+	
 	-- Check null
 	v_apiversion := COALESCE(v_apiversion, '[]');    
-	v_load_result := COALESCE(v_load_result, '{}'); 
+	v_load_result_array := COALESCE(v_load_result_array, '{}'); 
+	v_load_result := array_to_json(v_load_result_array);
+	
 
 	--    Return
 	RETURN ('{"status":"Accepted", "message":"'||v_message||'", "apiVersion":' || v_apiversion ||
