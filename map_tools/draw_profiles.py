@@ -207,22 +207,27 @@ class DrawProfiles(ParentMapTool):
         self.dlg_load = ProfilesList()
         self.load_settings(self.dlg_load)
 
-        self.dlg_load.rejected.connect(partial(self.close_dialog, self.dlg_load.rejected))
-        self.dlg_load.btn_open.clicked.connect(self.load_profile)
-        self.dlg_load.btn_delete_profile.clicked.connect(self.delete_profile)
+        # Get profils on database
+        body = self.create_body()
+        result_profile = self.controller.get_json('gw_fct_getprofile', body, log_sql=True)
+        if not result_profile: return
+        message = f"{result_profile['message']}"
+        self.controller.show_info(message)
 
-        sql = "SELECT DISTINCT(profile_id) FROM om_profile ORDER BY profile_id"
-        rows = self.controller.get_rows(sql)
-        if rows:
-            for row in rows:
-                item_arc = QListWidgetItem(str(row[0]))
-                self.dlg_load.tbl_profiles.addItem(item_arc)
+        self.dlg_load.rejected.connect(partial(self.close_dialog, self.dlg_load.rejected))
+        self.dlg_load.btn_open.clicked.connect(partial(self.load_profile, result_profile))
+        self.dlg_load.btn_delete_profile.clicked.connect(partial(self.delete_profile))
+
+        # Populate profile list
+        for profile in result_profile['body']['data']:
+            item_arc = QListWidgetItem(str(profile['profile_id']))
+            self.dlg_load.tbl_profiles.addItem(item_arc)
 
         self.open_dialog(self.dlg_load)
         self.deactivate()
 
 
-    def load_profile(self):
+    def load_profile(self, parameters):
         """ Open selected profile from dialog load_profiles.ui """
 
         selected_list = self.dlg_load.tbl_profiles.selectionModel().selectedRows()
@@ -231,59 +236,54 @@ class DrawProfiles(ParentMapTool):
             self.controller.show_warning(message)
             return
 
-        # Selected item from list
-        profile_id = self.dlg_load.tbl_profiles.currentItem().text()
-
-        extras = f'"profile_id":"{profile_id}", "action":"load"'
-        body = self.create_body(extras=extras)
-        result = self.controller.get_json('gw_fct_getprofile', body, log_sql=True)
-        if not result: return
-        message = f"{result['message']}"
-        self.controller.show_info(message)
         self.close_dialog(self.dlg_load)
+
+        profile_id = self.dlg_load.tbl_profiles.currentItem().text()
 
         # Setting parameters on profile form
         self.dlg_draw_profile.btn_draw_profile.setEnabled(True)
         self.dlg_draw_profile.btn_save_profile.setEnabled(True)
-        self.initNode = result['body']['data']['initNode']
-        self.endNode = result['body']['data']['endNode']
+        for profile in parameters['body']['data']:
+            if profile['profile_id'] == profile_id:
+                self.initNode = profile['values']['initNode']
+                self.endNode = profile['values']['endNode']
 
-        self.dlg_draw_profile.txt_profile_id.setText(str(profile_id))
-        list_arcs = json.loads(result['body']['data']['listArcs'])
-        self.dlg_draw_profile.tbl_list_arc.clear()
-        for arc in list_arcs:
-            item_arc = QListWidgetItem(str(arc))
-            self.dlg_draw_profile.tbl_list_arc.addItem(item_arc)
-        self.dlg_draw_profile.txt_min_distance.setText(str(result['body']['data']['linksDistance']))
-        self.dlg_draw_profile.txt_legend_factor.setText(str(result['body']['data']['legendFactor']))
+                self.dlg_draw_profile.txt_profile_id.setText(str(profile_id))
+                list_arcs = json.loads(profile['values']['listArcs'])
+                self.dlg_draw_profile.tbl_list_arc.clear()
+                for arc in list_arcs:
+                    item_arc = QListWidgetItem(str(arc))
+                    self.dlg_draw_profile.tbl_list_arc.addItem(item_arc)
+                self.dlg_draw_profile.txt_min_distance.setText(str(profile['values']['linksDistance']))
+                self.dlg_draw_profile.txt_legend_factor.setText(str(profile['values']['legendFactor']))
 
-        utils_giswater.set_combo_itemData(self.dlg_draw_profile.cmb_papersize, result['body']['data']['papersize']['id'], 0)
-        if 'customDim' in result['body']['data']['papersize']:
-            self.dlg_draw_profile.txt_x_dim.setText(str(result['body']['data']['papersize']['customDim']['xdim']))
-            self.dlg_draw_profile.txt_y_dim.setText(str(result['body']['data']['papersize']['customDim']['ydim']))
-        self.dlg_draw_profile.txt_title.setText(str(result['body']['data']['title']))
-        date = QDate.fromString(result['body']['data']['date'], 'dd-MM-yyyy')
-        utils_giswater.setCalendarDate(self.dlg_draw_profile, self.dlg_draw_profile.date, date)
-        self.dlg_draw_profile.chk_scalte_to_fit.setChecked(result['body']['data']['scale']['scaleToFit'])
-        self.dlg_draw_profile.txt_horizontal.setText(str(result['body']['data']['scale']['eh']))
-        self.dlg_draw_profile.txt_vertical.setText(str(result['body']['data']['scale']['ev']))
+                utils_giswater.set_combo_itemData(self.dlg_draw_profile.cmb_papersize, profile['values']['papersize']['id'], 0)
+                if 'customDim' in profile['values']['papersize']:
+                    self.dlg_draw_profile.txt_x_dim.setText(str(profile['values']['papersize']['customDim']['xdim']))
+                    self.dlg_draw_profile.txt_y_dim.setText(str(profile['values']['papersize']['customDim']['ydim']))
+                self.dlg_draw_profile.txt_title.setText(str(profile['values']['title']))
+                date = QDate.fromString(profile['values']['date'], 'dd-MM-yyyy')
+                utils_giswater.setCalendarDate(self.dlg_draw_profile, self.dlg_draw_profile.date, date)
+                self.dlg_draw_profile.chk_scalte_to_fit.setChecked(profile['values']['scale']['scaleToFit'])
+                self.dlg_draw_profile.txt_horizontal.setText(str(profile['values']['scale']['eh']))
+                self.dlg_draw_profile.txt_vertical.setText(str(profile['values']['scale']['ev']))
 
-        self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
-        self.remove_selection()
-        list_arcs = json.loads(result['body']['data']['listArcs'])
-        expr_filter = "\"arc_id\" IN ("
-        for arc in list_arcs:
-            expr_filter += f"'{arc}', "
-        expr_filter = expr_filter[:-2] + ")"
-        expr = QgsExpression(expr_filter)
-        # Get a featureIterator from this expression:
-        it = self.layer_arc.getFeatures(QgsFeatureRequest(expr))
+                self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
+                self.remove_selection()
+                list_arcs = json.loads(profile['values']['listArcs'])
+                expr_filter = "\"arc_id\" IN ("
+                for arc in list_arcs:
+                    expr_filter += f"'{arc}', "
+                expr_filter = expr_filter[:-2] + ")"
+                expr = QgsExpression(expr_filter)
+                # Get a featureIterator from this expression:
+                it = self.layer_arc.getFeatures(QgsFeatureRequest(expr))
 
-        self.id_list = [i.id() for i in it]
-        self.layer_arc.selectByIds(self.id_list)
+                self.id_list = [i.id() for i in it]
+                self.layer_arc.selectByIds(self.id_list)
 
-        # Center shortest path in canvas - ZOOM SELECTION
-        self.canvas.zoomToSelected(self.layer_arc)
+                # Center shortest path in canvas - ZOOM SELECTION
+                self.canvas.zoomToSelected(self.layer_arc)
 
 
     def activate_snapping_node(self):
@@ -1325,17 +1325,12 @@ class DrawProfiles(ParentMapTool):
 
         extras = f'"profile_id":"{profile_id}", "action":"delete"'
         body = self.create_body(extras=extras)
-        result = self.controller.get_json('gw_fct_loadprofile', body, log_sql=True)
+        result = self.controller.get_json('gw_fct_setprofile', body, log_sql=True)
         message = f"{result['message']}"
         self.controller.show_info(message)
 
-        self.dlg_load.tbl_profiles.clear()
-        sql = "SELECT DISTINCT(profile_id) FROM om_profile ORDER BY profile_id"
-        rows = self.controller.get_rows(sql)
-        if rows:
-            for row in rows:
-                item_arc = QListWidgetItem(str(row[0]))
-                self.dlg_load.tbl_profiles.addItem(item_arc)
+        # Remove profile from list
+        self.dlg_load.tbl_profiles.takeItem(self.dlg_load.tbl_profiles.row(self.dlg_load.tbl_profiles.currentItem()))
 
 
     def remove_selection(self):
