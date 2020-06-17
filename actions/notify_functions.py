@@ -118,7 +118,7 @@ class NotifyFunctions(ParentAction):
     def execute_functions(self, complet_result):
         """
         functions called in -> getattr(self, function_name)(**params):
-            def set_layer_index(self, **kwargs)
+            def indexing_spatial_layer(self, **kwargs)
             def refresh_attribute_table(self, **kwargs)
             def refresh_canvas(self, **kwargs)
             def show_message(self, **kwargs)
@@ -135,7 +135,7 @@ class NotifyFunctions(ParentAction):
 
 
     # Functions called by def wait_notifications(...)
-    def set_layer_index(self, **kwargs):
+    def indexing_spatial_layer(self, **kwargs):
         """ Force reload dataProvider of layer """
         """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params) """
 
@@ -144,10 +144,10 @@ class NotifyFunctions(ParentAction):
         if not layers_name_list:
             return
         if type(layers_name_list) == str:
-            self.controller.set_layer_index(layers_name_list)
+            self.controller.indexing_spatial_layer(layers_name_list)
         if type(layers_name_list) == list:
             for layer_name in layers_name_list:
-                self.controller.set_layer_index(layer_name)
+                self.controller.indexing_spatial_layer(layer_name)
 
 
     def refresh_attribute_table(self, **kwargs):
