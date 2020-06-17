@@ -1786,7 +1786,7 @@ class ApiParent(ParentAction):
                 label.setText(field['label'])
                 widget = self.add_checkbox(field)
                 widget.setProperty('selector_type', form_tab['selectorType'])
-                widget.stateChanged.connect(partial(self.set_selector, widget, form_tab['selectorType']))
+                widget.stateChanged.connect(partial(self.set_selector, widget))
                 widget.setLayoutDirection(Qt.RightToLeft)
                 field['layoutname'] = gridlayout.objectName()
                 field['layoutorder'] = order + i
@@ -1798,7 +1798,7 @@ class ApiParent(ParentAction):
                 main_tab.removeTab(0)
 
 
-    def set_selector(self, widget, selector_type):
+    def set_selector(self, widget):
         """ Send values to DB
         :param widget: QCheckBox that has changed status
         :param table_name: name of the table that we have to update (deprecated)
@@ -1812,7 +1812,5 @@ class ApiParent(ParentAction):
         if not json_result:
             return False
 
-        if selector_type in json_result['body']['data']['indexingLayers']:
-            for layer_name in json_result['body']['data']['indexingLayers'][selector_type]:
-                self.controller.indexing_spatial_layer(layer_name)
-
+        # manage layer manager
+        self.controller.layer_manager(json_result['body']['data']['layerManager'])
