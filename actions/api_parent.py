@@ -1813,4 +1813,4 @@ class ApiParent(ParentAction):
             return False
 
         # manage layer manager
-        self.controller.layer_manager(json_result['body']['data']['layerManager'])
+        self.controller.layer_manager(json_result['body']['layerManager'])
