@@ -45,7 +45,7 @@ INSERT INTO sys_table (id, context, descript, sys_role_id, sys_criticity, qgis_c
 
 UPDATE config_param_system SET value =
  '{"table":"exploitation", "selector":"selector_expl", "table_id":"expl_id",  "selector_id":"expl_id",  "label":"expl_id, '' - '', name, '''', CASE WHEN descript IS NULL THEN '''' ELSE concat('' - '', descript) END", 
- "manageAll":true, "selectionMode":"keepPreviousUsingShift", "zoomToSelected":true, "query_filter":"AND expl_id > 0", "typeaheadFilter":{"queryText":"SELECT expl_id as id, name AS idval FROM v_edit_exploitation WHERE expl_id > 0"}}'
+ "manageAll":true, "selectionMode":"keepPreviousUsingShift", "layerManager":"{"active":[], "visible":["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_gully"], "zoomTo":["v_edit_arc"]}, "query_filter":"AND expl_id > 0", "typeaheadFilter":{"queryText":"SELECT expl_id as id, name AS idval FROM v_edit_exploitation WHERE expl_id > 0"}}'
  WHERE parameter = 'api_selector_exploitation';
  
   

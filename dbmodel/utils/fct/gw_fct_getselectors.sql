@@ -21,8 +21,8 @@ SELECT gw_fct_getselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
 "data":{"filterFields":{}, "pageInfo":{}, "selector_type":{"exploitation": {"ids":[]}}}}$$);
 
 variable example:
-{"table":"exploitation", "selector":"selector_expl", "table_id":"expl_id",  "selector_id":"expl_id",  "label":"expl_id, ' - ', name, '', CASE WHEN descript IS NULL THEN '' ELSE concat(' - ', descript) END", 
- "manageAll":true, "selectionMode":"keepPreviousUsingShift", "zoomToSelected":true, "query_filter":"AND expl_id > 0", "typeaheadFilter":{"queryText":"SELECT expl_id as id, name AS idval FROM v_edit_exploitation WHERE expl_id > 0"}}
+ '{"table":"exploitation", "selector":"selector_expl", "table_id":"expl_id",  "selector_id":"expl_id",  "label":"expl_id, '' - '', name, '''', CASE WHEN descript IS NULL THEN '''' ELSE concat('' - '', descript) END", 
+ "manageAll":true, "selectionMode":"keepPreviousUsingShift", "layerManager":"{"active":[], "visible":["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_gully"], "zoomTo":["v_edit_arc"]}, "query_filter":"AND expl_id > 0", "typeaheadFilter":{"queryText":"SELECT expl_id as id, name AS idval FROM v_edit_exploitation WHERE expl_id > 0"}}'
 
 */
 
@@ -57,7 +57,8 @@ v_expl_x_user boolean;
 v_filter text;
 v_filterstatus boolean;
 v_selectionMode text;
-v_zoomToSelected boolean;
+v_layermanager json;
+v_error_context text;
 
 BEGIN
 
@@ -97,7 +98,7 @@ BEGIN
 		v_manageall = v_parameter_selector->>'manageAll';
 		v_typeaheadFilter = v_parameter_selector->>'typeaheadFilter';
 		v_selectionMode = v_parameter_selector->>'selectionMode';
-		v_zoomToSelected = v_parameter_selector->>'zoomToSelected';
+		v_layermanager = v_parameter_selector->>'layerManager';
 
 		IF v_selectionMode = '' OR v_selectionMode is null then
 			v_selectionMode = 'keepPrevious';
@@ -188,7 +189,7 @@ BEGIN
 	-- Check null
 	v_formTabs := COALESCE(v_formTabs, '[]');
 	v_manageall := COALESCE(v_manageall, FALSE);	
-	v_zoomToSelected = COALESCE(v_zoomToSelected, FALSE);
+	v_layermanager = COALESCE(v_layermanager, '{}');
 	v_selectionMode = COALESCE(v_selectionMode, '');
 
 	-- Return
@@ -203,17 +204,19 @@ BEGIN
 		-- Return formtabs
 		RETURN ('{"status":"Accepted", "version":'||v_version||
 			',"body":{"message":{"level":1, "text":"This is a test message"}'||
-			',"form":{"formName":"", "formLabel":"", "formText":"", "formFilter":'||v_filterstatus||', "formCheckAll":'||v_manageall||', "selectionMode":"'||v_selectionMode||'", "zoomToSelected":'||v_zoomToSelected||''
-			',"formTabs":'||v_formTabs||
-			',"formActions":[]}'||
+			',"form":{"formName":"", "formLabel":"", "formText":"", "formFilter":'||v_filterstatus||
+				',"formCheckAll":'||v_manageall||', "selectionMode":"'||v_selectionMode||'", "layerManager":'||v_layermanager||
+				',"formTabs":'||v_formTabs||
+				',"formActions":[]}'||
 			',"feature":{}'||
 			',"data":{}}'||
 		    '}')::json;
 	END IF;
 
 	-- Exception handling
-	EXCEPTION WHEN OTHERS THEN 
-	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$
