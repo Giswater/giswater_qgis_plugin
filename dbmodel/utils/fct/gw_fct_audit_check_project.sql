@@ -234,7 +234,7 @@ BEGIN
 			INSERT INTO selector_expl (expl_id, cur_user) 
 			SELECT expl_id, current_user FROM exploitation WHERE active IS NOT FALSE AND expl_id > 0 limit 1;
 			v_errortext=concat('Set visible exploitation for user ',(SELECT expl_id FROM exploitation WHERE active IS NOT FALSE AND expl_id > 0 limit 1));
-			INSERT INTO audit_check_data (fprocesscat_id,  criticity, error_message) VALUES (101, 4, v_errortext);
+			INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
 		END IF;
 	END IF;
 
