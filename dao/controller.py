@@ -1912,19 +1912,19 @@ class DaoController(object):
     def layer_manager(self, layermanager):
 
         if 'active' in layermanager:
-            for layer_name in json_result['body']['data']['layerManager']['active']:
+            for layer_name in layermanager['active']:
                 #self.controller.set_layer_active(layer_name)
 
-        if 'visible' in json_result['body']['layerManager']:
-            for layer_name in json_result['body']['data']['layerManager']['visible']:
+        if 'visible' in layermanager:
+            for layer_name in layermanager['visible']:
                 self.controller.set_layer_visible(layer_name)
 
-        if 'zoom' in json_result['body']['layerManager']:
-            for layer_name in json_result['body']['data']['layerManager']['zoom']:
+        if 'zoom' in layermanager:
+            for layer_name in layermanager['zoom']:
                 #self.controller.zoom_to_layer(layer_name)
 
-        if 'index' in json_result['body']['layerManager']:
-            for layer_name in json_result['body']['data']['layerManager']['index']:
+        if 'index' in layermanager:
+            for layer_name in layermanager['index']:
                 self.controller.set_layer_index(layer_name)
         #refresh legend
         #refresh canvas
