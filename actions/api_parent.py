@@ -12,7 +12,7 @@ from qgis.PyQt.QtCore import Qt, QSettings, QTimer, QDate, QRegExp, QStringListM
 from qgis.PyQt.QtGui import QColor, QIntValidator, QDoubleValidator, QRegExpValidator, QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QLineEdit, QSizePolicy, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel, QCheckBox
 from qgis.PyQt.QtWidgets import QCompleter, QToolButton, QFrame, QSpinBox, QDoubleSpinBox, QDateEdit, QGroupBox, QAction
-from qgis.PyQt.QtWidgets import QTableView, QTabWidget, QPushButton, QTextEdit, QFileDialog
+from qgis.PyQt.QtWidgets import QTableView, QTabWidget, QPushButton, QTextEdit, QFileDialog, QApplication
 from qgis.PyQt.QtSql import QSqlTableModel
 
 import os
@@ -1692,17 +1692,27 @@ class ApiParent(ParentAction):
 
 
     def manage_all(self, dialog, widget):
-
+        key_modifier = QApplication.keyboardModifiers()
         status = utils_giswater.isChecked(dialog, widget)
         index = dialog.main_tab.currentIndex()
         widget_list = dialog.main_tab.widget(index).findChildren(QCheckBox)
+        selector_type = dialog.main_tab.widget(index).property('selector_type')
+        widget_all = dialog.findChild(QCheckBox, f'chk_all_{selector_type}')
+        if key_modifier == Qt.ShiftModifier: return
         if status is True:
             for widget in widget_list:
+                if widget == widget_all or widget.objectName() == widget_all.objectName(): continue
+                widget.blockSignals(True)
                 utils_giswater.setChecked(dialog, widget, True)
-            return
+                self.reload_selectors(widget)
+                widget.blockSignals(False)
         elif status is False:
             for widget in widget_list:
+                if widget == widget_all or widget.objectName() == widget_all.objectName(): continue
+                widget.blockSignals(True)
                 utils_giswater.setChecked(dialog, widget, False)
+                self.reload_selectors(widget)
+                widget.blockSignals(False)
 
 
     def get_selector(self, dialog, selector_type, filter=False, widget=None, type=None):
@@ -1733,11 +1743,14 @@ class ApiParent(ParentAction):
         if not json_result:
             return False
 
+        selection_mode = json_result['body']['form']['selectionMode']
+
         for form_tab in json_result['body']['form']['formTabs']:
 
             # Create one tab for each form_tab and add to QTabWidget
             tab_widget = QWidget(main_tab)
             tab_widget.setObjectName(form_tab['tabName'])
+            tab_widget.setProperty('selector_type', form_tab['selectorType'])
             main_tab.addTab(tab_widget, form_tab['tabLabel'])
 
             # Create a new QGridLayout and put it into tab
@@ -1766,7 +1779,6 @@ class ApiParent(ParentAction):
                 self.put_widgets(dialog, field, label, widget)
                 widget.setFocus()
             if 'manageAll' in form_tab:
-                # if form_tab['manageAll']:
                 label = QLabel()
                 label.setObjectName('lbl_manage_all')
                 label.setText('Check all')
@@ -1786,7 +1798,7 @@ class ApiParent(ParentAction):
                 label.setText(field['label'])
                 widget = self.add_checkbox(field)
                 widget.setProperty('selector_type', form_tab['selectorType'])
-                widget.stateChanged.connect(partial(self.set_selector, widget))
+                widget.stateChanged.connect(partial(self.set_selector, dialog, widget, selection_mode))
                 widget.setLayoutDirection(Qt.RightToLeft)
                 field['layoutname'] = gridlayout.objectName()
                 field['layoutorder'] = order + i
@@ -1798,16 +1810,59 @@ class ApiParent(ParentAction):
                 main_tab.removeTab(0)
 
 
-    def set_selector(self, widget):
-        """ Send values to DB
-        :param widget: QCheckBox that has changed status
-        :param table_name: name of the table that we have to update (deprecated)
-        :param column_name: name of the column that we have to update (deprecated)
+    def set_selector(self, dialog, widget, selection_mode):
+        """ Manage selection mode
+        :param dialog: QDialog where search all checkbox
+        :param widget: QCheckBox that has changed status (QCheckBox)
+        :param selection_mode: "keepPrevious", "keepPreviousUsingShift", "removePrevious" (String)
+        """
+        # Get QCheckBox check all
+        index = dialog.main_tab.currentIndex()
+        widget_list = dialog.main_tab.widget(index).findChildren(QCheckBox)
+        selector_type = dialog.main_tab.widget(index).property('selector_type')
+        widget_all = dialog.findChild(QCheckBox, f'chk_all_{selector_type}')
+
+        key_modifier = QApplication.keyboardModifiers()
+
+        if selection_mode == 'removePrevious':
+            if utils_giswater.isChecked(dialog, widget_all):
+                utils_giswater.setChecked(dialog, widget_all, False)
+            else:
+                self.remove_previuos(dialog, widget, widget_all, widget_list)
+                
+        elif selection_mode == 'keepPreviousUsingShift' and key_modifier != Qt.ShiftModifier:
+            if utils_giswater.isChecked(dialog, widget_all):
+                utils_giswater.setChecked(dialog, widget_all, False)
+            else:
+                self.remove_previuos(dialog, widget, widget_all, widget_list)
+
+        self.reload_selectors(widget)
+
+
+    def remove_previuos(self, dialog, widget, widget_all, widget_list):
+        """ Remove checks of not selected QCheckBox
+        :param dialog: QDialog
+        :param widget: QCheckBox that has changed status (QCheckBox)
+        :param widget_all: QCheckBox that handles global selection (QCheckBox)
+        :param widget_list: List of all QCheckBox in the current tab ([QCheckBox,QCheckBox,...])
+        """
+        for checkbox in widget_list:
+            if checkbox == widget_all or checkbox.objectName() == widget_all.objectName(): continue
+            elif checkbox.objectName() != widget.objectName():
+                checkbox.blockSignals(True)
+                utils_giswater.setChecked(dialog, checkbox, False)
+                self.reload_selectors(checkbox)
+                checkbox.blockSignals(False)
+
+
+    def reload_selectors(self, widget):
+        """  Send values to DB and reload selectors
+        :param widget: QCheckBox that contains the information to generate the json (QCheckBox)
         """
         qgis_project_add_schema = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('gwAddSchema')
         extras = f'"selectorType":"{widget.property("selector_type")}", "id":"{widget.objectName()}", '
         extras += f'"value":"{widget.isChecked()}", "addSchema":"{qgis_project_add_schema}"'
         body = self.create_body(extras=extras)
-        json_result = self.controller.get_json('gw_fct_setselectors', body)
-        if not json_result:
-            return False
+        self.controller.get_json('gw_fct_setselectors', body)
+
+
