@@ -174,7 +174,7 @@ class AddLayer(object):
                         elif geometry_type == 'LineString':
                             self.v_layer.renderer().symbol().setWidth(1.5)
                             self.v_layer.renderer().symbol().setColor(QColor("red"))
-                    self.v_layer.renderer().symbol().setOpacity(0.7)
+                    #self.v_layer.renderer().symbol().setOpacity(0.7)
                     self.iface.layerTreeView().refreshLayerSymbology(self.v_layer.id())
                     temp_layers_added.append(self.v_layer)
 
