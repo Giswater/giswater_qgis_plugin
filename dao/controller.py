@@ -820,7 +820,7 @@ class DaoController(object):
             return False
 
         # Manage options for layers (active, visible, zoom and indexing)
-        self.layer_manager(json_result)
+        self.layer_manager(json_result, sql)
 
         return json_result
 
