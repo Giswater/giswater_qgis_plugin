@@ -47,7 +47,11 @@ class Basic(ApiParent):
 
         self.dlg_selector = SelectorUi()
         self.load_settings(self.dlg_selector)
-        self.get_selector(self.dlg_selector, selector_values)
+
+        # Get the name of the last tab used by the user
+        last_tab_name = self.get_last_tab_name(self.dlg_selector, 'basic')
+        self.get_selector(self.dlg_selector, selector_values, last_tab_name=last_tab_name)
+
         if self.controller.dlg_docker:
             self.controller.dock_dialog(self.dlg_selector)
             self.dlg_selector.btn_close.clicked.connect(self.controller.close_docker)
@@ -55,6 +59,10 @@ class Basic(ApiParent):
             self.dlg_selector.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_selector))
             self.dlg_selector.rejected.connect(partial(self.save_settings, self.dlg_selector))
             self.open_dialog(self.dlg_selector, dlg_name='selector', maximize_button=False)
+
+        # Save the name of current tab used by the user
+        self.dlg_selector.rejected.connect(partial(
+            self.save_current_tab, self.dlg_selector, self.dlg_selector.main_tab, 'basic'))
 
         # Repaint mapzones and refresh canvas
         self.set_style_mapzones()

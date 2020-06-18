@@ -1715,7 +1715,7 @@ class ApiParent(ParentAction):
                 widget.blockSignals(False)
 
 
-    def get_selector(self, dialog, selector_type, filter=False, widget=None, type=None):
+    def get_selector(self, dialog, selector_type, filter=False, widget=None, type=None, last_tab_name=None):
         """ Ask to DB for selectors and make dialog
         :param dialog: Is a standard dialog, from file api_selectors.ui, where put widgets
         :param selector_type: list of selectors to ask DB ['exploitation', 'state', ...]
@@ -1736,10 +1736,10 @@ class ApiParent(ParentAction):
 
         else:
             aux_selector_type = selector_type
-
+        form = f'"currentTab":"{last_tab_name}"'
         extras = f'"selector_type":{aux_selector_type}'
-        body = self.create_body(extras=extras)
-        json_result = self.controller.get_json('gw_fct_getselectors', body)
+        body = self.create_body(form=form, extras=extras)
+        json_result = self.controller.get_json('gw_fct_getselectors', body, log_sql=True)
         if not json_result:
             return False
 
@@ -1767,7 +1767,7 @@ class ApiParent(ParentAction):
                 widget = QLineEdit()
                 widget.setObjectName('txt_filter_' + str(form_tab['selectorType']))
                 if filter is not False:
-                    utils_giswater.setWidgetText(dialog,widget,filter)
+                    utils_giswater.setWidgetText(dialog, widget, filter)
 
                 widget.textChanged.connect(partial(self.get_selector, self.dlg_selector, selector_type, filter=True,
                                                    widget=widget, type=form_tab['selectorType']))
@@ -1808,6 +1808,12 @@ class ApiParent(ParentAction):
             gridlayout.addItem(vertical_spacer1)
             if filter is not False:
                 main_tab.removeTab(0)
+
+            # Set last tab used by user as current tab
+            tabname = json_result['body']['form']['currentTab']
+            tab = main_tab.findChild(QWidget, tabname)
+            if tab:
+                main_tab.setCurrentWidget(tab)
 
 
     def set_selector(self, dialog, widget, selection_mode):
@@ -1863,6 +1869,6 @@ class ApiParent(ParentAction):
         extras = f'"selectorType":"{widget.property("selector_type")}", "id":"{widget.objectName()}", '
         extras += f'"value":"{widget.isChecked()}", "addSchema":"{qgis_project_add_schema}"'
         body = self.create_body(extras=extras)
-        self.controller.get_json('gw_fct_setselectors', body)
+        json_result = self.controller.get_json('gw_fct_setselectors', body, log_sql=True)
 
 

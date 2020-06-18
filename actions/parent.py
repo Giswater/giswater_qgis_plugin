@@ -177,6 +177,28 @@ class ParentAction(object):
         self.controller.plugin_settings_set_value(dialog.objectName() + "_y", dialog.pos().y()+31)
 
 
+    def get_last_tab_name(self, dialog, selector_name):
+        """ Get the name of the last tab used by the user from QSettings()
+        :param dialog: QDialog
+        :param selector_name: Name of the selector (String)
+        :return: Name of the last tab used by the user (string)
+        """
+        tab_name = self.controller.plugin_settings_value(f"{ dialog.objectName()}_{selector_name}")
+        return tab_name
+
+
+    def save_current_tab(self, dialog, tab_widget, selector_name):
+        """ Save the name of current tab used by the user into QSettings()
+        :param dialog: QDialog
+        :param tab_widget:  QTabWidget
+        :param selector_name: Name of the selector (String)
+        """
+        index = tab_widget.currentIndex()
+        tab_name = tab_widget.widget(index).objectName()
+        dlg_name = dialog.objectName()
+        self.controller.plugin_settings_set_value(f"{dlg_name}_{selector_name}", tab_name)
+
+
     def open_dialog(self, dlg=None, dlg_name=None, info=True, maximize_button=True, stay_on_top=True, title=None):
         """ Open dialog """
 
