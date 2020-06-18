@@ -258,12 +258,12 @@ class Master(ParentAction):
         tablename = 'plan_result_cat'
         self.tbl_om_result_cat = self.dlg_merm.findChild(QTableView, "tbl_om_result_cat")
         utils_giswater.set_qtv_config(self.tbl_om_result_cat)
-        
+
         # Set signals
         self.dlg_merm.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_merm))
         self.dlg_merm.rejected.connect(partial(self.close_dialog, self.dlg_merm))
         self.dlg_merm.btn_delete.clicked.connect(partial(self.delete_merm, self.dlg_merm))
-        self.dlg_merm.btn_update_price.clicked.connect(partial(self.update_price_vdefault))
+        self.dlg_merm.btn_update_result.clicked.connect(partial(self.update_price_vdefault))
         self.dlg_merm.txt_name.textChanged.connect(partial(self.filter_merm, self.dlg_merm, tablename))
 
         set_edit_strategy = QSqlTableModel.OnManualSubmit

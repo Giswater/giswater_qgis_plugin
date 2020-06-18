@@ -90,9 +90,9 @@
        </widget>
       </item>
       <item row="1" column="5">
-       <widget class="QPushButton" name="btn_update_price">
+       <widget class="QPushButton" name="btn_update_result">
         <property name="text">
-         <string>Current price</string>
+         <string>Current result</string>
         </property>
        </widget>
       </item>
