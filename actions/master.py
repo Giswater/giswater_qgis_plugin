@@ -106,7 +106,7 @@ class Master(ParentAction):
         if type(widget) != QDateEdit:
             if utils_giswater.getWidgetText(dialog, widget) != "":
                 for row in rows:
-                    if row[1] == parameter:
+                    if row[0] == parameter:
                         exist_param = True
                 if exist_param:
                     sql = f"UPDATE {tablename} SET value = "
@@ -127,7 +127,7 @@ class Master(ParentAction):
                                 f" WHERE name = '{utils_giswater.getWidgetText(dialog, widget)}'), current_user)")
         else:
             for row in rows:
-                if row[1] == parameter:
+                if row[0] == parameter:
                     exist_param = True
             _date = widget.dateTime().toString('yyyy-MM-dd')
             if exist_param:
