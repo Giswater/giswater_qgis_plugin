@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2660
 
-
+drop function if exists SCHEMA_NAME.gw_fct_edit_check_data(json);
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_edit_check_data(fid json) RETURNS json AS $$
 DECLARE
 

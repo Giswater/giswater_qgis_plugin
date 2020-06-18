@@ -22,10 +22,9 @@ SELECT SCHEMA_NAME.gw_fct_psector_duplicate($${
 
 DECLARE
 
-v_version json;
+v_version text;
 v_arc_id TEXT;
 v_project_type text;
-v_version text;
 v_result_id text= 'duplicate psector';
 v_result_info text;
 v_result text;

@@ -48,9 +48,9 @@ BEGIN
 	v_featuretable = concat ('element_x_',v_featuretype);
 
 	-- manage log (fid: 235)
-	DELETE FROM audit_check_data WHERE  = 235 AND cur_user=current_user;
-	INSERT INTO audit_check_data (, result_id, error_message) VALUES (235, v_result_id, concat('IMPORT ELEMENTS FILE'));
-	INSERT INTO audit_check_data (, result_id, error_message) VALUES (235, v_result_id, concat('------------------------------'));
+	DELETE FROM audit_check_data WHERE  fid = 235 AND cur_user=current_user;
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (235, v_result_id, concat('IMPORT ELEMENTS FILE'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (235, v_result_id, concat('------------------------------'));
    
  	-- starting process
 	FOR v_element IN SELECT * FROM temp_csv WHERE cur_user=current_user AND fid = 235

@@ -26,7 +26,6 @@ v_message json;
 v_feature json;
 v_geometry json;
 v_thegeom public.geometry;
-v_version varchar;
 v_client json;
 v_user_id text;
 v_team_id text;

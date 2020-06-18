@@ -58,7 +58,6 @@ v_status int2;
 return_event_manager_aux json;
 v_event_manager json;
 v_node_id integer;
-v_version varchar;
 v_addfile json;
 v_deletefile json;
 v_fields_json json;

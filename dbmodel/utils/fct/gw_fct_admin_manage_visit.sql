@@ -122,6 +122,7 @@ v_status text;
 v_message text;
 v_hide_form boolean;	
 v_version text;		
+v_layoutorder integer;
 
 BEGIN
 	
