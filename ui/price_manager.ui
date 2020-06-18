@@ -20,7 +20,7 @@
       <string/>
      </property>
      <layout class="QGridLayout" name="verticalLayout_3">
-      <item row="1" column="4">
+      <item row="1" column="6">
        <widget class="QPushButton" name="btn_delete">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -30,13 +30,6 @@
         </property>
         <property name="text">
          <string>Delete</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="4">
-       <widget class="QPushButton" name="btn_cancel">
-        <property name="text">
-         <string>Close</string>
         </property>
        </widget>
       </item>
@@ -53,8 +46,35 @@
         </property>
        </spacer>
       </item>
-      <item row="2" column="0" colspan="5">
+      <item row="3" column="6">
+       <widget class="QPushButton" name="btn_cancel">
+        <property name="text">
+         <string>Close</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="7">
        <widget class="QTableView" name="tbl_om_result_cat"/>
+      </item>
+      <item row="3" column="0" colspan="4">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="lbl_result_id">
+        <property name="text">
+         <string>Filter by: Result id</string>
+        </property>
+       </widget>
       </item>
       <item row="1" column="0">
        <widget class="QLineEdit" name="txt_name">
@@ -69,25 +89,25 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="lbl_result_id">
+      <item row="1" column="5">
+       <widget class="QPushButton" name="btn_update_price">
         <property name="text">
-         <string>Filter by: Result id</string>
+         <string>Current price</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="0" colspan="4">
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+      <item row="1" column="4">
+       <widget class="QLabel" name="lbl_vdefault_price">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
+        <property name="text">
+         <string/>
         </property>
-       </spacer>
+       </widget>
       </item>
      </layout>
     </widget>

@@ -16,7 +16,6 @@ from functools import partial
 from .. import utils_giswater
 from .manage_new_psector import ManageNewPsector
 from ..ui_manager import PsectorManagerUi
-from ..ui_manager import EstimateResultSelector
 from ..ui_manager import PriceManagerUi
 from ..ui_manager import Multirow_selector
 from .parent import ParentAction
@@ -56,10 +55,13 @@ class Master(ParentAction):
         self.qtbl_psm = self.dlg_psector_mng.findChild(QTableView, "tbl_psm")
         self.qtbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
 
+
         # Set signals
         self.dlg_psector_mng.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_psector_mng))
         self.dlg_psector_mng.rejected.connect(partial(self.close_dialog, self.dlg_psector_mng))
-        self.dlg_psector_mng.btn_delete.clicked.connect(partial(self.multi_rows_delete, self.dlg_psector_mng, self.qtbl_psm, table_name, column_id))
+        self.dlg_psector_mng.btn_delete.clicked.connect(partial(
+            self.multi_rows_delete, self.dlg_psector_mng, self.qtbl_psm, table_name, column_id, 'lbl_vdefault_psector',
+            'plan_psector_vdefault'))
         self.dlg_psector_mng.btn_update_psector.clicked.connect(partial(self.update_current_psector, self.dlg_psector_mng, self.qtbl_psm))
         self.dlg_psector_mng.btn_duplicate.clicked.connect(self.psector_duplicate)
         self.dlg_psector_mng.txt_name.textChanged.connect(partial(self.filter_by_text, self.dlg_psector_mng, self.qtbl_psm, self.dlg_psector_mng.txt_name, table_name))
@@ -165,7 +167,7 @@ class Master(ParentAction):
         self.master_new_psector(psector_id)
 
 
-    def multi_rows_delete(self, dialog, widget, table_name, column_id):
+    def multi_rows_delete(self, dialog, widget, table_name, column_id, label, config_param, is_price=False):
         """ Delete selected elements of the table
         :param QTableView widget: origin
         :param table_name: table origin
@@ -192,17 +194,27 @@ class Master(ParentAction):
         answer = self.controller.ask_question(message, "Delete records", inf_text)
 
         if answer:
+            if is_price is True:
+                sql = "DELETE FROM selector_plan_result WHERE result_id in ("
+                if list_id != '':
+                    sql += f"{list_id}) AND cur_user = current_user;"
+                    self.controller.execute_sql(sql, log_sql=True)
+                    utils_giswater.setWidgetText(dialog, label, '')
             sql = (f"DELETE FROM {table_name}"
-                   f" WHERE {column_id} IN ({list_id})")
+                   f" WHERE {column_id} IN ({list_id});")
             self.controller.execute_sql(sql)
             widget.model().select()
-            row = self.controller.get_config('plan_psector_vdefault', sql_added=f" AND value IN ({list_id})")
-            if row is not None:
-                sql = (f"DELETE FROM config_param_user "
-                       f" WHERE parameter = 'plan_psector_vdefault' AND cur_user = current_user"
-                       f" AND value = '{row[0]}'")
-                self.controller.execute_sql(sql)
-                utils_giswater.setWidgetText(dialog, 'lbl_vdefault_psector', '')
+            self.clean_label(dialog, label, list_id, config_param)
+
+
+    def clean_label(self, dialog, label, list_id, config_param):
+        row = self.controller.get_config(config_param, sql_added=f" AND value IN ({list_id})")
+        if row is not None:
+            sql = (f"DELETE FROM config_param_user "
+                   f" WHERE parameter = '{config_param}' AND cur_user = current_user"
+                   f" AND value = '{row[0]}'")
+            self.controller.execute_sql(sql)
+            utils_giswater.setWidgetText(dialog, label, '')
 
 
     def master_psector_selector(self):
@@ -228,90 +240,6 @@ class Master(ParentAction):
         self.open_dialog(self.dlg_psector_selector, dlg_name="multirow_selector", maximize_button=False)
 
 
-    def master_estimate_result_selector(self):
-        """ Button 49: Estimate result selector """
-
-        # Create dialog 
-        self.dlg_estimate_result_selector = EstimateResultSelector()
-        self.load_settings(self.dlg_estimate_result_selector)
-        
-        # Populate combo
-        self.populate_combo(self.dlg_estimate_result_selector.rpt_selector_result_id, 'selector_plan_result')
-
-        # Set current value
-        sql = (f"SELECT name FROM plan_result_cat WHERE result_id IN (SELECT result_id FROM selector_plan_result "
-               f"WHERE cur_user = current_user AND result_type = 1)")
-        row = self.controller.get_row(sql)
-        if row:
-            utils_giswater.setWidgetText(self.dlg_estimate_result_selector, self.dlg_estimate_result_selector.rpt_selector_result_id, str(row[0]))
-
-        # Set signals
-        self.dlg_estimate_result_selector.btn_accept.clicked.connect(partial(self.master_estimate_result_selector_accept))
-        self.dlg_estimate_result_selector.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_estimate_result_selector))
-
-        self.open_dialog(self.dlg_estimate_result_selector, dlg_name="plan_estimate_result_selector",  maximize_button=False)
-
-
-    def populate_combo(self, combo, table_result):
-
-        table_name = "plan_result_cat"
-        sql = (f"SELECT name, result_id"
-               f" FROM {table_name} "
-               f" WHERE cur_user = current_user"
-               f" AND result_type = 1"
-               f" ORDER BY name")
-        rows = self.controller.get_rows(sql)
-        if not rows:
-            return
-
-        combo.blockSignals(True)
-        combo.clear()
-        records_sorted = sorted(rows, key=operator.itemgetter(1))
-        for record in records_sorted:
-            combo.addItem(record[0], record)
-        combo.blockSignals(False)
-        
-        # Check if table exists
-        if not self.controller.check_table(table_result):
-            message = "Table not found"
-            self.controller.show_warning(message, parameter=table_result)
-            return
-        
-        sql = (f"SELECT result_id FROM {table_result} "
-               f" WHERE cur_user = current_user")
-        row = self.controller.get_row(sql)
-        if row:
-            utils_giswater.setSelectedItem(self.dlg_estimate_result_selector, combo, str(row[0]))
-
-
-    def upsert(self, combo, tablename):
-        
-        # Check if table exists
-        if not self.controller.check_table(tablename):
-            message = "Table not found"
-            self.controller.show_warning(message, parameter=tablename)
-            return
-                
-        result_id = utils_giswater.get_item_data(self.dlg_estimate_result_selector, combo, 1)
-        sql = (f"DELETE FROM {tablename} WHERE current_user = cur_user;"
-               f"\nINSERT INTO {tablename} (result_id, cur_user)"
-               f" VALUES({result_id}, current_user);")
-        status = self.controller.execute_sql(sql)
-        if status:
-            message = "Values has been updated"
-            self.controller.show_info(message)
-
-        # Refresh canvas
-        self.iface.mapCanvas().refreshAllLayers()
-        self.close_dialog(self.dlg_estimate_result_selector)
-        
-
-    def master_estimate_result_selector_accept(self):
-        """ Update value of table 'selector_plan_result' """
-        
-        self.upsert(self.dlg_estimate_result_selector.rpt_selector_result_id, 'selector_plan_result')
-
-
     def master_estimate_result_manager(self):
         """ Button 50: Plan estimate result manager """
 
@@ -319,15 +247,23 @@ class Master(ParentAction):
         self.dlg_merm = PriceManagerUi()
         self.load_settings(self.dlg_merm)
 
+        # Set current value
+        sql = (f"SELECT name FROM plan_result_cat WHERE result_id IN (SELECT result_id FROM selector_plan_result "
+               f"WHERE cur_user = current_user)")
+        row = self.controller.get_row(sql, log_sql=True)
+        if row:
+            utils_giswater.setWidgetText(self.dlg_merm, 'lbl_vdefault_price', str(row[0]))
+
         # Tables
         tablename = 'plan_result_cat'
         self.tbl_om_result_cat = self.dlg_merm.findChild(QTableView, "tbl_om_result_cat")
-        self.tbl_om_result_cat.setSelectionBehavior(QAbstractItemView.SelectRows)
-
+        utils_giswater.set_qtv_config(self.tbl_om_result_cat)
+        
         # Set signals
         self.dlg_merm.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_merm))
         self.dlg_merm.rejected.connect(partial(self.close_dialog, self.dlg_merm))
         self.dlg_merm.btn_delete.clicked.connect(partial(self.delete_merm, self.dlg_merm))
+        self.dlg_merm.btn_update_price.clicked.connect(partial(self.update_price_vdefault))
         self.dlg_merm.txt_name.textChanged.connect(partial(self.filter_merm, self.dlg_merm, tablename))
 
         set_edit_strategy = QSqlTableModel.OnManualSubmit
@@ -339,15 +275,37 @@ class Master(ParentAction):
         self.open_dialog(self.dlg_merm, dlg_name="price_manager")
 
 
+    def update_price_vdefault(self):
+        selected_list = self.dlg_merm.tbl_om_result_cat.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+        row = selected_list[0].row()
+        price_name = self.dlg_merm.tbl_om_result_cat.model().record(row).value("name")
+        result_id = self.dlg_merm.tbl_om_result_cat.model().record(row).value("result_id")
+        utils_giswater.setWidgetText(self.dlg_merm, 'lbl_vdefault_price', price_name)
+        sql = (f"DELETE FROM selector_plan_result WHERE current_user = cur_user;"
+               f"\nINSERT INTO selector_plan_result (result_id, cur_user)"
+               f" VALUES({result_id}, current_user);")
+        status = self.controller.execute_sql(sql)
+        if status:
+            message = "Values has been updated"
+            self.controller.show_info(message)
+
+        # Refresh canvas
+        self.iface.mapCanvas().refreshAllLayers()
+
+
     def delete_merm(self, dialog):
         """ Delete selected row from 'master_estimate_result_manager' dialog from selected tab """
-        
-        self.multi_rows_delete(dialog, dialog.tbl_om_result_cat, 'plan_result_cat', 'result_id')
+
+        self.multi_rows_delete(dialog, dialog.tbl_om_result_cat, 'plan_result_cat', 'result_id', 'lbl_vdefault_price', '', is_price=True)
 
 
     def filter_merm(self, dialog, tablename):
         """ Filter rows from 'master_estimate_result_manager' dialog from selected tab """
-        
+
         self.filter_by_text(dialog, dialog.tbl_om_result_cat, dialog.txt_name, tablename)
 
 
