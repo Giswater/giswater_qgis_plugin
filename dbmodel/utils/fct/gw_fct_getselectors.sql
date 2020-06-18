@@ -171,7 +171,7 @@ BEGIN
 			IF v_currenttab = rec_tab.tabname THEN
 				v_active = true;
 			ELSIF v_currenttab IS NULL OR v_currenttab = '' OR v_currenttab ='None' OR v_firsttab is false THEN
-				v_active = true;
+				v_active = false;
 			END IF;
 
 			-- setting other variables of tab
@@ -203,6 +203,7 @@ BEGIN
 	v_formTabs := COALESCE(v_formTabs, '[]');
 	v_manageall := COALESCE(v_manageall, FALSE);	
 	v_selectionMode = COALESCE(v_selectionMode, '');
+    v_currenttab = COALESCE(v_currenttab, '');
 
 	-- Return
 	IF v_firsttab IS FALSE THEN
@@ -216,7 +217,7 @@ BEGIN
 		-- Return formtabs
 		RETURN ('{"status":"Accepted", "version":'||v_version||
 			',"body":{"message":{"level":1, "text":"This is a test message"}'||
-			',"form":{"formName":"", "formLabel":"", "formText":"", "formTabs":'||v_formTabs||'}'||
+			',"form":{"formName":"", "formLabel":"", "currentTab":"'||v_currenttab||'", "formText":"", "formTabs":'||v_formTabs||'}'||
 			',"feature":{}'||
 			',"data":{}}'||
 		    '}')::json;
