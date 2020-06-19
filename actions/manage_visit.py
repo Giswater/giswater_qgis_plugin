@@ -160,10 +160,6 @@ class ManageVisit(ParentManage, QObject):
 
         self.visit_id.setText(str(visit_id))
 
-        # manage relation locking
-        if self.locked_geom_type:
-            self.set_locked_relation()
-
         # Force tab_feature_changed
         self.tab_feature_changed(self.dlg_add_visit, excluded_layers=["v_edit_element"])
 
@@ -172,6 +168,11 @@ class ManageVisit(ParentManage, QObject):
         self.event_feature_type_selected(self.dlg_add_visit, "node")
         self.event_feature_type_selected(self.dlg_add_visit, "connec")
         self.event_feature_type_selected(self.dlg_add_visit, "arc")
+
+        # Manage relation locking
+        if self.locked_geom_type:
+            self.set_locked_relation()
+
         # Open the dialog
         if open_dialog:
             self.open_dialog(self.dlg_add_visit, dlg_name="visit")
@@ -231,10 +232,9 @@ class ManageVisit(ParentManage, QObject):
             # do selection allowing @table_name to be linked to canvas selectionChanged
             widget_name = f'tbl_visit_x_{self.geom_type}'
             widget_table = utils_giswater.getWidget(self.dlg_add_visit, widget_name)
-            self.disconnect_signal_selection_changed()
-            self.connect_signal_selection_changed(self.dlg_add_visit, widget_table)
-            self.select_features_by_ids(self.geom_type, expr)
-            self.disconnect_signal_selection_changed()
+            utils_giswater.setWidgetText(self.dlg_add_visit, 'feature_id', self.locked_feature_id)
+            self.insert_feature(self.dlg_add_visit, widget_table, False, False)
+            utils_giswater.setWidgetText(self.dlg_add_visit, 'feature_id', '')
 
 
     def manage_accepted(self):

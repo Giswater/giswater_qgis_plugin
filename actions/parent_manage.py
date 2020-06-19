@@ -758,9 +758,8 @@ class ParentManage(ParentAction, object):
 
         if self.geom_type == 'all':
             self.geom_type = 'arc'
-
-        multiple_selection = MultipleSelection(self.iface, self.controller, self.layers[self.geom_type], 
-            parent_manage=self, table_object=table_object, dialog=dialog)
+        multiple_selection = MultipleSelection(self.iface, self.controller, self.layers[self.geom_type],
+                                               parent_manage=self, table_object=table_object, dialog=dialog)
         self.disconnect_signal_selection_changed()
         self.previous_map_tool = self.canvas.mapTool()        
         self.canvas.setMapTool(multiple_selection)              
