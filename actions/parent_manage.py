@@ -618,6 +618,9 @@ class ParentManage(ParentAction, object):
     def select_features_by_ids(self, geom_type, expr):
         """ Select features of layers of group @geom_type applying @expr """
 
+        if not geom_type in self.layers:
+            return
+
         # Build a list of feature id's and select them
         for layer in self.layers[geom_type]:
             if expr is None:
@@ -864,13 +867,17 @@ class ParentManage(ParentAction, object):
 
         self.disconnect_signal_selection_changed()
 
+        if self.geom_type == 'all':
+            self.tab_feature_changed(dialog, table_object)
+
         # Clear list of ids
         if remove_ids:
             self.ids = []
-        field_id = f"{self.geom_type}_id"
 
+        field_id = f"{self.geom_type}_id"
         feature_id = utils_giswater.getWidgetText(dialog, "feature_id")
         expr_filter = f"{field_id} = '{feature_id}'"
+
         # Check expression
         (is_valid, expr) = self.check_expression(expr_filter)
         if not is_valid:

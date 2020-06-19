@@ -1478,7 +1478,7 @@ class ManageVisit(ParentManage, QObject):
             self.dlg_event.position_value.setEnabled(False)
 
 
-    def tab_feature_changed(self, dialog, excluded_layers=[]):
+    def tab_feature_changed(self, dialog, table_object='visit', excluded_layers=[]):
         """ Set geom_type and layer depending selected tab """
 
         # Get selected tab to set geometry type
@@ -1497,6 +1497,7 @@ class ManageVisit(ParentManage, QObject):
 
         self.hide_generic_layers(excluded_layers=excluded_layers)
         widget_name = f"tbl_visit_x_{self.geom_type}"
+        widget_name = f"tbl_{table_object}_x_{self.geom_type}"
         viewname = f"v_edit_{self.geom_type}"
         widget_table = utils_giswater.getWidget(dialog, widget_name)
 
