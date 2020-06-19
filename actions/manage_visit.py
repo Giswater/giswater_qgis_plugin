@@ -164,18 +164,14 @@ class ManageVisit(ParentManage, QObject):
         if self.locked_geom_type:
             self.set_locked_relation()
 
-        # Initialize geom_type to 'arc'
-        self.geom_type = 'arc'
-
         # Force tab_feature_changed
         self.tab_feature_changed(self.dlg_add_visit, excluded_layers=["v_edit_element"])
 
-        self.event_feature_type_selected(self.dlg_add_visit, "arc")
-        self.event_feature_type_selected(self.dlg_add_visit, "node")
-        self.event_feature_type_selected(self.dlg_add_visit, "connec")
         if self.controller.get_project_type() == 'ud':
             self.event_feature_type_selected(self.dlg_add_visit, "gully")
-
+        self.event_feature_type_selected(self.dlg_add_visit, "node")
+        self.event_feature_type_selected(self.dlg_add_visit, "connec")
+        self.event_feature_type_selected(self.dlg_add_visit, "arc")
         # Open the dialog
         if open_dialog:
             self.open_dialog(self.dlg_add_visit, dlg_name="visit")
