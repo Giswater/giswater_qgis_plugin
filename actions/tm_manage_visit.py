@@ -44,8 +44,6 @@ class TmManageVisit(TmParentManage, QObject):
         # parameter to set if the dialog is working as single tool or integrated in another tool
         self.single_tool_mode = single_tool
 
-        # turnoff autocommit of this and base class. Commit will be done at dialog button box level management
-        self.autocommit = True
         # bool to distinguish if we entered to edit an existing Visit or creating a new one
         self.it_is_new_visit = (not visit_id)
 
@@ -149,7 +147,7 @@ class TmManageVisit(TmParentManage, QObject):
 
         # Show id of visit. If not set, infer a new value
         if not visit_id:
-            visit_id = self.current_visit.max_pk(commit=self.autocommit) + 1
+            visit_id = self.current_visit.max_pk() + 1
         self.visit_id.setText(str(visit_id))
 
         # manage relation locking
@@ -265,7 +263,7 @@ class TmManageVisit(TmParentManage, QObject):
             geometry_type = self.feature_type.itemText(index).lower()
             table_name = 'om_visit_x_' + geometry_type
             sql = f"SELECT id FROM {table_name} WHERE visit_id = '{self.current_visit.id}'"
-            rows = self.controller.get_rows(sql, commit=self.autocommit)
+            rows = self.controller.get_rows(sql)
             if not rows or not rows[0]:
                 continue
 
@@ -301,8 +299,8 @@ class TmManageVisit(TmParentManage, QObject):
         if self.expl_id:
             self.current_visit.expl_id = self.expl_id
 
-        # update or insert but without closing the transaction: autocommit=False
-        self.current_visit.upsert(commit=self.autocommit)
+        # update or insert but without closing the transaction
+        self.current_visit.upsert()
 
 
     def update_relations(self):
@@ -323,7 +321,7 @@ class TmManageVisit(TmParentManage, QObject):
 
             # remove all actual saved records related with visit_id
             where_clause = "visit_id = '{}'".format(self.visit_id.text())
-            db_record.delete(where_clause=where_clause, commit=self.autocommit)
+            db_record.delete(where_clause=where_clause)
 
         # do nothing if model is None or no element is present
         if not self.tbl_relation.model() or not self.tbl_relation.model().rowCount():
@@ -348,7 +346,7 @@ class TmManageVisit(TmParentManage, QObject):
             setattr(db_record, column_name, index.data())
 
             # than save the showed records
-            db_record.upsert(commit=self.autocommit)
+            db_record.upsert()
 
 
     def manage_tab_changed(self, index):
@@ -396,7 +394,7 @@ class TmManageVisit(TmParentManage, QObject):
                f" WHERE UPPER (parameter_type) = '{self.parameter_type_id.currentText().upper()}'"
                f" AND UPPER (feature_type) = '{self.feature_type.currentText().upper()}'"
                f" ORDER BY id")
-        rows = self.controller.get_rows(sql, commit=self.autocommit)
+        rows = self.controller.get_rows(sql)
 
         if rows:
             utils_giswater.set_item_data(self.dlg_add_visit.parameter_id, rows, 1)
@@ -442,7 +440,7 @@ class TmManageVisit(TmParentManage, QObject):
 
         table_name = 'om_visit_x_' + self.geom_type
         sql = f"SELECT {self.geom_type}_id FROM {table_name} WHERE visit_id = '{int(self.visit_id.text())}'"
-        rows = self.controller.get_rows(sql, commit=self.autocommit)
+        rows = self.controller.get_rows(sql)
         if not rows or not rows[0]:
             return
         ids = [x[0] for x in rows]
@@ -472,14 +470,14 @@ class TmManageVisit(TmParentManage, QObject):
         sql = ("SELECT id, name FROM om_visit_cat"
                # " WHERE active is true"
                " ORDER BY name")
-        self.visitcat_ids = self.controller.get_rows(sql, commit=self.autocommit)
+        self.visitcat_ids = self.controller.get_rows(sql)
 
         if self.visitcat_ids:
             utils_giswater.set_item_data(self.dlg_add_visit.visitcat_id, self.visitcat_ids, 1)
             # now get default value to be show in visitcat_id
             sql = ("SELECT value FROM config_param_user"
                    " WHERE parameter = 'om_visit_cat_vdefault' AND cur_user = current_user")
-            row = self.controller.get_row(sql, commit=self.autocommit)
+            row = self.controller.get_row(sql)
             if row:
                 # if int then look for default row ans set it
                 try:
@@ -501,7 +499,7 @@ class TmManageVisit(TmParentManage, QObject):
         # Fill ComboBox parameter_type_id
         sql = ("SELECT id FROM om_visit_parameter_type"
                " ORDER BY id")
-        parameter_type_ids = self.controller.get_rows(sql, commit=self.autocommit)
+        parameter_type_ids = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_add_visit, self.dlg_add_visit.parameter_type_id, parameter_type_ids, allow_nulls=False)
 
 
@@ -514,7 +512,7 @@ class TmManageVisit(TmParentManage, QObject):
         model = QStringListModel()
 
         sql = f"SELECT DISTINCT(id) FROM {table_name}"
-        rows = self.controller.get_rows(sql, commit=self.autocommit)
+        rows = self.controller.get_rows(sql)
         values = []
         if rows:
             for row in rows:
@@ -638,13 +636,13 @@ class TmManageVisit(TmParentManage, QObject):
         # fetch the record
         event = OmVisitEvent(self.controller)
         event.id = selected_list[0].data()
-        if not event.fetch(commit=self.autocommit):
+        if not event.fetch():
             return
 
         # get parameter_id code to select the widget useful to edit the event
         om_event_parameter = OmVisitParameter(self.controller)
         om_event_parameter.id = event.parameter_id
-        if not om_event_parameter.fetch(commit=self.autocommit):
+        if not om_event_parameter.fetch():
             return
 
         if om_event_parameter.form_type == 'event_standard':
@@ -674,7 +672,7 @@ class TmManageVisit(TmParentManage, QObject):
                     setattr(event, field_name, str(value))
 
             # update the record
-            event.upsert(commit=self.autocommit)
+            event.upsert()
 
         # update Table
         self.tbl_event.model().select()
@@ -708,7 +706,7 @@ class TmManageVisit(TmParentManage, QObject):
             return
 
         # do the action
-        if not event.delete(pks=selected_id, commit=self.autocommit):
+        if not event.delete(pks=selected_id):
             message = "Error deleting records"
             self.controller.show_warning(message)
             return
@@ -733,7 +731,7 @@ class TmManageVisit(TmParentManage, QObject):
                f" FROM config_form_tableview"
                f" WHERE tablename = '{table_name}'"
                f" ORDER BY columnindex")
-        rows = self.controller.get_rows(sql, log_info=False, commit=self.autocommit)
+        rows = self.controller.get_rows(sql, log_info=False)
         if not rows:
             return
 

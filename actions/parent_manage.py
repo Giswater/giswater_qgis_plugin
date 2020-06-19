@@ -33,7 +33,6 @@ class ParentManage(ParentAction, object):
         self.canvas = self.iface.mapCanvas()
         self.plan_om = None
         self.previous_map_tool = None
-        self.autocommit = True
         self.lazy_widget = None
         self.workcat_id_end = None
         self.xyCoordinates_conected = False
@@ -152,7 +151,7 @@ class ParentManage(ParentAction, object):
             if row['state']:          
                 sql = (f"SELECT name FROM value_state"
                        f" WHERE id = '{row['state']}'")
-                row_aux = self.controller.get_row(sql, commit=self.autocommit)
+                row_aux = self.controller.get_row(sql)
                 if row_aux:
                     state = row_aux[0]
     
@@ -160,7 +159,7 @@ class ParentManage(ParentAction, object):
             if row['expl_id']:
                 sql = (f"SELECT name FROM exploitation"
                        f" WHERE expl_id = '{row['expl_id']}'")
-                row_aux = self.controller.get_row(sql, commit=self.autocommit)
+                row_aux = self.controller.get_row(sql)
                 if row_aux:
                     expl_id = row_aux[0]
 
@@ -283,7 +282,7 @@ class ParentManage(ParentAction, object):
         sql = (f"SELECT {field_name}"
                f" FROM {table_name}"
                f" ORDER BY {field_name}")
-        rows = self.controller.get_rows(sql, commit=self.autocommit)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(dialog, widget, rows)
         if rows:
             utils_giswater.setCurrentIndex(dialog, widget, 0)
@@ -427,7 +426,7 @@ class ParentManage(ParentAction, object):
             field_object_id = table_object + "_id"
         sql = (f"SELECT DISTINCT({field_object_id})"
                f" FROM {table_object}")
-        rows = self.controller.get_rows(sql, commit=self.autocommit)
+        rows = self.controller.get_rows(sql)
         if rows is None:
             return
 
@@ -486,7 +485,7 @@ class ParentManage(ParentAction, object):
 
         sql = (f"SELECT {geom_type}_id"
                f" FROM {viewname}")
-        row = self.controller.get_rows(sql, commit=self.autocommit)
+        row = self.controller.get_rows(sql)
         if row:
             for i in range(0, len(row)):
                 aux = row[i]
@@ -572,14 +571,14 @@ class ParentManage(ParentAction, object):
 
         # Attach model to selected widget
         if type(table_object) is str:
-            self.controller.log_info(f"set_table_model (str): {table_object}")
+            #self.controller.log_debug(f"set_table_model (str): {table_object}")
             widget = utils_giswater.getWidget(dialog, table_object)
             if not widget:
                 message = "Widget not found"
                 self.controller.log_info(message, parameter=table_object)
                 return expr
         elif type(table_object) is QTableView:
-            self.controller.log_info(f"set_table_model: {table_object.objectName()}")
+            #self.controller.log_debug(f"set_table_model: {table_object.objectName()}")
             widget = table_object
         else:
             msg = "Table_object is not a table name or QTableView"
@@ -1064,7 +1063,7 @@ class ParentManage(ParentAction, object):
         if answer:
             sql = (f"DELETE FROM {table_object} "
                    f"WHERE {field_object_id} IN ({list_id})")
-            self.controller.execute_sql(sql, commit=self.autocommit)
+            self.controller.execute_sql(sql)
             widget.model().select()
 
     

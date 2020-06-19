@@ -123,7 +123,7 @@ class ManageElement(ParentManage):
         sql = ("SELECT location_type, location_type FROM man_type_location"
                " WHERE feature_type = 'ELEMENT' "
                " ORDER BY location_type")
-        rows = self.controller.get_rows(sql, commit=self.autocommit)
+        rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_add_element.location_type, rows, 1)
 
         if rows:
@@ -221,7 +221,7 @@ class ManageElement(ParentManage):
                f" WHERE feature_type = 'ELEMENT' "
                f" AND (featurecat_id = '{element_type}' OR featurecat_id is null)"
                f" ORDER BY location_type")
-        rows = self.controller.get_rows(sql, log_sql=True, commit=self.autocommit)
+        rows = self.controller.get_rows(sql, log_sql=True)
         utils_giswater.set_item_data(self.dlg_add_element.location_type, rows, add_empty=True)
         if rows:
             utils_giswater.set_combo_itemData(self.dlg_add_element.location_type, rows[0][0], 0)

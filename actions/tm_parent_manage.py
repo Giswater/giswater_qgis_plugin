@@ -31,7 +31,6 @@ class TmParentManage(TmParentAction, object):
         self.canvas = self.iface.mapCanvas()
         self.plan_om = None
         self.previous_map_tool = None
-        self.autocommit = True
         self.lazy_widget = None
         self.workcat_id_end = None
 
@@ -100,7 +99,7 @@ class TmParentManage(TmParentAction, object):
 
         sql = (f"SELECT {geom_type}_id"
                f" FROM {viewname}")
-        row = self.controller.get_rows(sql, commit=self.autocommit)
+        row = self.controller.get_rows(sql)
         if row:
             for i in range(0, len(row)):
                 aux = row[i]

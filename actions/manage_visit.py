@@ -54,9 +54,6 @@ class ManageVisit(ParentManage, QObject):
         # parameter to set if the dialog is working as single tool or integrated in another tool
         self.single_tool_mode = single_tool
 
-        # turnoff autocommit of this and base class. Commit will be done at dialog button box level management
-        self.autocommit = True
-
         # bool to distinguish if we entered to edit an exisiting Visit or creating a new one
         self.it_is_new_visit = (not visit_id)
         self.visit_id_value = visit_id
@@ -156,7 +153,7 @@ class ManageVisit(ParentManage, QObject):
         # Show id of visit. If not set, infer a new value
         self.fill_combos(visit_id=visit_id)
         if not visit_id:
-            visit_id = self.current_visit.nextval(commit=self.autocommit)
+            visit_id = self.current_visit.nextval()
 
         self.visit_id.setText(str(visit_id))
 
@@ -367,7 +364,7 @@ class ManageVisit(ParentManage, QObject):
             if geom_type != '' and geom_type != 'all':
                 table_name = f'om_visit_x_{geom_type}'
                 sql = f"SELECT id FROM {table_name} WHERE visit_id = '{self.current_visit.id}'"
-                rows = self.controller.get_rows(sql, commit=self.autocommit)
+                rows = self.controller.get_rows(sql)
                 if not rows or not rows[0]:
                     continue
 
@@ -404,7 +401,7 @@ class ManageVisit(ParentManage, QObject):
             self.current_visit.expl_id = self.expl_id
             
         # update or insert but without closing the transaction: autocommit=False
-        self.current_visit.upsert(commit=self.autocommit)
+        self.current_visit.upsert()
 
 
     def update_relations(self, dialog, delete_old_relations=True):
@@ -452,7 +449,7 @@ class ManageVisit(ParentManage, QObject):
         where_clause = f"visit_id = '{self.visit_id.text()}'"
 
         if db_record:
-            db_record.delete(where_clause=where_clause, commit=self.autocommit)
+            db_record.delete(where_clause=where_clause)
 
 
     def update_relations_geom_type(self, geom_type):
@@ -500,7 +497,7 @@ class ManageVisit(ParentManage, QObject):
                 setattr(db_record, column_name, index.data())
 
                 # than save the showed records
-                db_record.upsert(commit=self.autocommit)
+                db_record.upsert()
 
 
     def manage_tab_changed(self, dialog, index):
@@ -695,7 +692,7 @@ class ManageVisit(ParentManage, QObject):
 
         table_name = f'om_visit_x_{geom_type}'
         sql = f"SELECT {geom_type}_id FROM {table_name} WHERE visit_id = '{visit_id}'"
-        rows = self.controller.get_rows(sql, commit=self.autocommit)
+        rows = self.controller.get_rows(sql, log_info=False)
         if not rows or not rows[0]:
             return
 
@@ -815,7 +812,7 @@ class ManageVisit(ParentManage, QObject):
                " FROM om_visit_cat"
                " WHERE active is true"
                " ORDER BY name")
-        self.visitcat_ids = self.controller.get_rows(sql, commit=self.autocommit)
+        self.visitcat_ids = self.controller.get_rows(sql)
         
         if self.visitcat_ids:
             utils_giswater.set_item_data(self.dlg_add_visit.visitcat_id, self.visitcat_ids, 1)
@@ -863,12 +860,12 @@ class ManageVisit(ParentManage, QObject):
                "FROM sys_feature_type "
                "WHERE classlevel = 1 OR classlevel = 2"
                "ORDER BY id")
-        rows = self.controller.get_rows(sql, commit=self.autocommit)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_add_visit, "feature_type", rows, False)
 
         # Event tab
         # Fill ComboBox parameter_type_id
-        sql = ("SELECT id, idval FROM om_typevalue WHERE typevalue = 'visit_param_type' ORDER by idval")
+        sql = "SELECT id, idval FROM om_typevalue WHERE typevalue = 'visit_param_type' ORDER by idval"
         parameter_type_ids = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_add_visit.parameter_type_id, parameter_type_ids, 1)
 
@@ -908,7 +905,7 @@ class ManageVisit(ParentManage, QObject):
         model = QStringListModel()
 
         sql = "SELECT DISTINCT(id) FROM om_visit"
-        rows = self.controller.get_rows(sql, commit=self.autocommit)
+        rows = self.controller.get_rows(sql)
         values = []
         if rows:
             for row in rows:
@@ -923,7 +920,7 @@ class ManageVisit(ParentManage, QObject):
         model = QStringListModel()
 
         sql = "SELECT DISTINCT(id) FROM v_ui_document"
-        rows = self.controller.get_rows(sql, commit=self.autocommit)
+        rows = self.controller.get_rows(sql)
         values = []
         if rows:
             for row in rows:
@@ -1240,13 +1237,13 @@ class ManageVisit(ParentManage, QObject):
         # fetch the record
         event = OmVisitEvent(self.controller)
         event.id = selected_list[0].data()
-        if not event.fetch(commit=self.autocommit):
+        if not event.fetch():
             return
 
         # get parameter_id code to select the widget useful to edit the event
         om_event_parameter = OmVisitParameter(self.controller)
         om_event_parameter.id = event.parameter_id
-        if not om_event_parameter.fetch(commit=self.autocommit):
+        if not om_event_parameter.fetch():
             return
         dlg_name = None
         if om_event_parameter.form_type == 'event_ud_arc_standard':
@@ -1339,7 +1336,7 @@ class ManageVisit(ParentManage, QObject):
                     setattr(event, field_name, value)
 
             # update the record
-            event.upsert(commit=self.autocommit)
+            event.upsert()
 
         self.save_files_added(event.visit_id, event.id)
 
@@ -1388,7 +1385,7 @@ class ManageVisit(ParentManage, QObject):
             return
 
         # do the action
-        if not event.delete(pks=selected_id, commit=self.autocommit):
+        if not event.delete(pks=selected_id):
             message = "Error deleting records"
             self.controller.show_warning(message)
             return
@@ -1418,7 +1415,7 @@ class ManageVisit(ParentManage, QObject):
         # Insert into new table
         sql = (f"INSERT INTO doc_x_visit (doc_id, visit_id)"
                f" VALUES ('{doc_id}', {visit_id})")
-        status = self.controller.execute_sql(sql, commit=self.autocommit)
+        status = self.controller.execute_sql(sql)
         if status:
             message = "Document inserted successfully"
             self.controller.show_info(message)
@@ -1439,7 +1436,7 @@ class ManageVisit(ParentManage, QObject):
                f" FROM config_form_tableview"
                f" WHERE tablename = '{table_name}'"
                f" ORDER BY columnindex")
-        rows = self.controller.get_rows(sql, log_info=False, commit=self.autocommit)
+        rows = self.controller.get_rows(sql, log_info=False)
         if not rows:
             return
 
@@ -1465,14 +1462,20 @@ class ManageVisit(ParentManage, QObject):
 
     def populate_position_id(self):
 
-        node_list = []
-        widget_name = f"tbl_visit_x_{self.geom_type}"
-        widget_table = utils_giswater.getWidget(self.dlg_add_visit, widget_name)
-        node_1 = widget_table.model().record(0).value('node_1')
-        node_2 = widget_table.model().record(0).value('node_2')
-        node_list.append([node_1, f"node 1: {node_1}"])
-        node_list.append([node_2, f"node 2: {node_2}"])
-        utils_giswater.set_item_data(self.dlg_event.position_id, node_list, 1, True, False)
+        if self.geom_type == 'arc':
+            self.dlg_event.position_id.setEnabled(True)
+            self.dlg_event.position_value.setEnabled(True)
+            node_list = []
+            widget_name = f"tbl_visit_x_{self.geom_type}"
+            widget_table = utils_giswater.getWidget(self.dlg_add_visit, widget_name)
+            node_1 = widget_table.model().record(0).value('node_1')
+            node_2 = widget_table.model().record(0).value('node_2')
+            node_list.append([node_1, f"node 1: {node_1}"])
+            node_list.append([node_2, f"node 2: {node_2}"])
+            utils_giswater.set_item_data(self.dlg_event.position_id, node_list, 1, True, False)
+        else:
+            self.dlg_event.position_id.setEnabled(False)
+            self.dlg_event.position_value.setEnabled(False)
 
 
     def tab_feature_changed(self, dialog, excluded_layers=[]):

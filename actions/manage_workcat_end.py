@@ -107,7 +107,7 @@ class ManageWorkcatEnd(ParentManage):
         else:
             sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) "
                    f"VALUES ('edit_arc_downgrade_force', '{value}', current_user)")
-            self.controller.execute_sql(sql, commit=self.autocommit)
+            self.controller.execute_sql(sql)
 
 
     def fill_fields(self):
