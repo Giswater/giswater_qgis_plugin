@@ -232,9 +232,10 @@ class ManageVisit(ParentManage, QObject):
             # do selection allowing @table_name to be linked to canvas selectionChanged
             widget_name = f'tbl_visit_x_{self.geom_type}'
             widget_table = utils_giswater.getWidget(self.dlg_add_visit, widget_name)
-            utils_giswater.setWidgetText(self.dlg_add_visit, 'feature_id', self.locked_feature_id)
-            self.insert_feature(self.dlg_add_visit, widget_table, False, False)
-            utils_giswater.setWidgetText(self.dlg_add_visit, 'feature_id', '')
+            self.disconnect_signal_selection_changed()
+            self.connect_signal_selection_changed(self.dlg_add_visit, widget_table)
+            self.select_features_by_ids(self.geom_type, expr)
+            self.disconnect_signal_selection_changed()
 
 
     def manage_accepted(self):
