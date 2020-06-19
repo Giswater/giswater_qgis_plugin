@@ -70,6 +70,9 @@ rec_event record;
 rec_aux	 record;
 rec_aux1 "SCHEMA_NAME".arc;
 rec_aux2 "SCHEMA_NAME".arc;
+rec_table	record;
+v_query_string  text;
+v_max_seq_id	int8;
 
 v_result text;
 v_result_info text;
@@ -103,6 +106,16 @@ BEGIN
     v_node_id = (SELECT json_array_elements_text(v_array_node_id)); 
 	-- Get project type
 	SELECT project_type, epsg, giswater INTO v_project_type, v_srid,v_version FROM sys_version LIMIT 1;
+	
+	-- set sequences
+	FOR rec_table IN SELECT * FROM sys_table WHERE sys_sequence IS NOT NULL AND sys_sequence_field IS NOT NULL AND sys_sequence LIKE '%visit%'
+	LOOP 
+		v_query_string:= 'SELECT max('||rec_table.sys_sequence_field||') FROM '||rec_table.id||';' ;
+		EXECUTE v_query_string INTO v_max_seq_id;	
+		IF v_max_seq_id IS NOT NULL AND v_max_seq_id > 0 THEN 
+			EXECUTE 'SELECT setval(''SCHEMA_NAME.'||rec_table.sys_sequence||' '','||v_max_seq_id||', true)';			
+		END IF;
+	END LOOP;
 
     -- Get node values
     SELECT the_geom INTO v_node_geom FROM node WHERE node_id = v_node_id;
@@ -346,16 +359,18 @@ BEGIN
 						IF v_count > 0 THEN
 							FOR rec_visit IN SELECT om_visit.* FROM om_visit_x_arc JOIN om_visit ON om_visit.id=visit_id WHERE arc_id=v_arc_id LOOP
 
-								IF rec_visit.the_geom IS NULL THEN -- if visit does not has geometry, events may have. It's mandatory to distribute one by one
+								IF rec_visit.the_geom IS NULL AND rec_visit.id IS NOT NULL THEN -- if visit does not has geometry, events may have. It's mandatory to distribute one by one
 
 									-- Get visit data into two new visits
-									INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, user_name, webclient_id,expl_id,descript,is_done, lot_id, class_id, status, visit_type) 
-									SELECT visitcat_id, ext_code, startdate, enddate, user_name, webclient_id, expl_id, descript, is_done, lot_id, class_id, status, visit_type 
-									FROM om_visit WHERE id=rec_visit.id RETURNING id INTO v_newvisit1;
+									INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, user_name, webclient_id,expl_id,descript,is_done, lot_id, class_id, status, visit_type)
+									VALUES (rec_visit.visitcat_id, rec_visit.ext_code, rec_visit.startdate, rec_visit.enddate, rec_visit.user_name, rec_visit.webclient_id, rec_visit.expl_id,
+									rec_visit.descript, rec_visit.is_done, rec_visit.lot_id, rec_visit.class_id, rec_visit.status, rec_visit.visit_type)
+									RETURNING id INTO v_newvisit1;
 
-									INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, user_name, webclient_id, expl_id, descript, is_done, lot_id, class_id, status, visit_type) 
-									SELECT visitcat_id, ext_code, startdate, enddate, user_name, webclient_id, expl_id, descript, is_done, lot_id, class_id, status, visit_type 
-									FROM om_visit WHERE id=rec_visit.id RETURNING id INTO v_newvisit2;
+									INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, user_name, webclient_id,expl_id,descript,is_done, lot_id, class_id, status, visit_type)
+									VALUES (rec_visit.visitcat_id, rec_visit.ext_code, rec_visit.startdate, rec_visit.enddate, rec_visit.user_name, rec_visit.webclient_id, rec_visit.expl_id,
+									rec_visit.descript, rec_visit.is_done, rec_visit.lot_id, rec_visit.class_id, rec_visit.status, rec_visit.visit_type)
+									RETURNING id INTO v_newvisit2;
 									
 									FOR rec_event IN SELECT * FROM om_visit_event WHERE visit_id=rec_visit.id LOOP
 					
@@ -371,8 +386,11 @@ BEGIN
 											END IF;
 										ELSE 	-- event must be related on both new visits. As a result, new event must be created
 										
-											-- upate event to visit1
-											UPDATE om_visit_event SET visit_id=v_newvisit1 WHERE id=rec_event.id;
+											-- insert new event related to new visit1
+											INSERT INTO om_visit_event (event_code, visit_id, position_id, position_value, parameter_id,value, value1, value2,geom1, geom2, 
+											geom3,xcoord,ycoord,compass,text, index_val,is_last) 
+											SELECT event_code, v_newvisit1, position_id, position_value, parameter_id,value, value1, value2,geom1, geom2, 
+											geom3,xcoord,ycoord,compass,text, index_val,is_last FROM om_visit_event WHERE id=rec_event.id;	
 											
 											-- insert new event related to new visit2
 											INSERT INTO om_visit_event (event_code, visit_id, position_id, position_value, parameter_id,value, value1, value2,geom1, geom2, 
@@ -384,8 +402,8 @@ BEGIN
 					
 									END LOOP;
 																
-									INSERT INTO om_visit_x_arc (id, visit_id, arc_id) VALUES (nextval('om_visit_x_arc_id_seq'),v_newvisit1, rec_aux1.arc_id);
-									INSERT INTO om_visit_x_arc (id, visit_id, arc_id) VALUES (nextval('om_visit_x_arc_id_seq'),v_newvisit2, rec_aux2.arc_id);
+									INSERT INTO om_visit_x_arc (visit_id, arc_id) VALUES (v_newvisit1, rec_aux1.arc_id);
+									INSERT INTO om_visit_x_arc (visit_id, arc_id) VALUES (v_newvisit2, rec_aux2.arc_id);
 								
 									-- delete old visit
 									DELETE FROM om_visit WHERE id=rec_visit.id;
@@ -402,7 +420,7 @@ BEGIN
 									END IF;
 								
 									-- distribute visit to new arc
-									INSERT INTO om_visit_x_arc (id, visit_id, arc_id) VALUES (nextval('om_visit_x_arc_id_seq'),rec_visit.id, v_newarc);
+									INSERT INTO om_visit_x_arc (visit_id, arc_id) VALUES (rec_visit.id, v_newarc);
 									DELETE FROM om_visit_x_arc WHERE arc_id=v_arc_id;
 								END IF;
 							END LOOP;
