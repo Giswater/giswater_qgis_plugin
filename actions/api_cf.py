@@ -730,7 +730,6 @@ class ApiCF(ApiParent, QObject):
 
         try:
             self.iface.actionRollbackEdits().trigger()
-            self.layer.disconnect()
         except TypeError:
             pass
 
