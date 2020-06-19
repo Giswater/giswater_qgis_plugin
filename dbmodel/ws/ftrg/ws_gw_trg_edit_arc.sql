@@ -37,7 +37,7 @@ BEGIN
 	--modify values for custom view inserts	
 	IF v_man_table IN (SELECT id FROM cat_feature) THEN
 		v_customfeature:=v_man_table;
-		v_man_table:=(SELECT man_table FROM cat_feature WHERE id=v_man_table);
+		v_man_table:=(SELECT man_table FROM cat_feature_arc WHERE id=v_man_table);
 	END IF;
 
 	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_buffer_on_mapzone');
