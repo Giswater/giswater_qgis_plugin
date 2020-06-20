@@ -41,6 +41,7 @@ class ManageVisit(ParentManage, QObject):
 
         QObject.__init__(self)
         ParentManage.__init__(self, iface, settings, controller, plugin_dir)
+        self.geom_type = None
 
 
     def manage_visit(self, visit_id=None, geom_type=None, feature_id=None, single_tool=True, expl_id=None, tag=None,
@@ -158,7 +159,7 @@ class ManageVisit(ParentManage, QObject):
         self.visit_id.setText(str(visit_id))
 
         # Force tab_feature_changed
-        self.tab_feature_changed(self.dlg_add_visit, excluded_layers=["v_edit_element"])
+        self.tab_feature_changed(self.dlg_add_visit, 'visit', excluded_layers=["v_edit_element"])
 
         if self.controller.get_project_type() == 'ud':
             self.event_feature_type_selected(self.dlg_add_visit, "gully")
@@ -172,6 +173,7 @@ class ManageVisit(ParentManage, QObject):
 
         # Open the dialog
         if open_dialog:
+            self.feature_type.activated.emit(0)
             self.open_dialog(self.dlg_add_visit, dlg_name="visit")
 
 
@@ -194,10 +196,10 @@ class ManageVisit(ParentManage, QObject):
         self.dlg_add_visit.btn_add_geom.clicked.connect(self.add_point)
 
         # Fill combo boxes of the form and related events
-        self.parameter_type_id.currentTextChanged.connect(partial(self.set_parameter_id_combo, self.dlg_add_visit))
-        self.feature_type.currentTextChanged.connect(partial(self.event_feature_type_selected, self.dlg_add_visit, None))
-        self.feature_type.currentTextChanged.connect(partial(self.manage_tabs_enabled, True))
-        self.parameter_id.currentTextChanged.connect(self.get_feature_type_of_parameter)
+        self.parameter_type_id.activated.connect(partial(self.set_parameter_id_combo, self.dlg_add_visit))
+        self.feature_type.activated.connect(partial(self.event_feature_type_selected, self.dlg_add_visit, None))
+        self.feature_type.activated.connect(partial(self.manage_tabs_enabled, True))
+        self.parameter_id.activated.connect(self.get_feature_type_of_parameter)
 
 
     def set_locked_relation(self):
@@ -364,7 +366,7 @@ class ManageVisit(ParentManage, QObject):
             if geom_type != '' and geom_type != 'all':
                 table_name = f'om_visit_x_{geom_type}'
                 sql = f"SELECT id FROM {table_name} WHERE visit_id = '{self.current_visit.id}'"
-                rows = self.controller.get_rows(sql)
+                rows = self.controller.get_rows(sql, log_info=False)
                 if not rows or not rows[0]:
                     continue
 
@@ -400,7 +402,7 @@ class ManageVisit(ParentManage, QObject):
         if self.expl_id:
             self.current_visit.expl_id = self.expl_id
             
-        # update or insert but without closing the transaction: autocommit=False
+        # update or insert but without closing the transaction
         self.current_visit.upsert()
 
 
@@ -544,7 +546,6 @@ class ManageVisit(ParentManage, QObject):
         if row:
             self.feature_type_parameter = row[0]
             self.geom_type = self.feature_type_parameter.lower()
-            self.controller.log_info(f"get_feature_type_of_parameter: {self.geom_type}")
             self.manage_tabs_enabled(True)
 
 
@@ -552,10 +553,9 @@ class ManageVisit(ParentManage, QObject):
 
         try:
             widget_name = f"tbl_visit_x_{self.geom_type}"
-            self.controller.log_info(f"connect_signal_tab_feature_signal: {widget_name}")
             if connect:
                 self.dlg_add_visit.tab_feature.currentChanged.connect(partial(
-                    self.tab_feature_changed, self.dlg_add_visit, excluded_layers=["v_edit_element"]))
+                    self.tab_feature_changed, self.dlg_add_visit, 'visit', excluded_layers=["v_edit_element"]))
             else:
                 self.dlg_add_visit.tab_feature.currentChanged.disconnect()
         except Exception as e:
@@ -565,7 +565,9 @@ class ManageVisit(ParentManage, QObject):
     def manage_tabs_enabled(self, disable_tabs=False):
         """ Enable/Disable tabs depending geom_type """
 
-        self.controller.log_info(f"manage_tabs_enabled: {self.geom_type}")
+        if self.geom_type is None:
+            return
+
         self.connect_signal_tab_feature_signal(False)
 
         # If geom_type = 'all': enable all tabs
@@ -584,8 +586,6 @@ class ManageVisit(ParentManage, QObject):
 
 
     def manage_geom_type_selected(self):
-
-        self.controller.log_info(f"manage_geom_type_selected: {self.geom_type}")
 
         tab_index = 0
         if self.geom_type == 'arc':
@@ -623,7 +623,6 @@ class ManageVisit(ParentManage, QObject):
                 partial(self.selection_init, self.dlg_add_visit, widget_table))
 
         # Adding auto-completion to a QLineEdit
-        self.controller.log_info(f"manage_geom_type_selected_2: {self.geom_type}")
         self.set_completer_feature_id(self.dlg_add_visit.feature_id, self.geom_type, viewname)
 
 

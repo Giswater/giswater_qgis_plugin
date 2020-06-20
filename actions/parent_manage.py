@@ -773,8 +773,6 @@ class ParentManage(ParentAction, object):
     def selection_changed(self, dialog, table_object, geom_type, query=False):
         """ Slot function for signal 'canvas.selectionChanged' """
 
-        self.controller.log_info(f"selection_changed: {geom_type}")
-
         self.disconnect_signal_selection_changed()
         field_id = f"{geom_type}_id"
 
@@ -825,7 +823,6 @@ class ParentManage(ParentAction, object):
                 self.remove_selection()
             self.reload_qtable(dialog, geom_type)
         else:
-            self.controller.log_info("selection_changed: reload_table")
             self.reload_table(dialog, table_object, geom_type, expr_filter)
             self.apply_lazy_init(table_object)
 
@@ -851,13 +848,9 @@ class ParentManage(ParentAction, object):
         widget_table = utils_giswater.getWidget(dialog, widget_name)
         if feature_type is not None and widget_table is not None:
             if len(self.ids) > 0:
-                self.controller.log_info("enable_feature_type: False")
                 feature_type.setEnabled(False)
             else:
-                self.controller.log_info("enable_feature_type: True")
                 feature_type.setEnabled(True)
-        else:
-            self.controller.log_info("enable_feature_type: else")
 
 
     def insert_feature(self, dialog, table_object, query=False, remove_ids=True):
@@ -1145,7 +1138,6 @@ class ParentManage(ParentAction, object):
         """ Connect signal selectionChanged """
         
         try:
-            self.controller.log_info(f"connect_signal_selection_changed: {self.geom_type}")
             self.canvas.selectionChanged.connect(partial(self.selection_changed, dialog, table_object, self.geom_type, query))
         except Exception as e:
             self.controller.log_info(f"connect_signal_selection_changed: {e}")
