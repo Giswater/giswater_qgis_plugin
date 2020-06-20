@@ -159,14 +159,10 @@ BEGIN
 
 	-- looking for additional schema 
 	IF v_addschema IS NOT NULL AND v_addschema != v_schemaname AND v_flag IS FALSE THEN
-
-		RAISE NOTICE 'v_addschema %', v_addschema;
-		
+	
 		EXECUTE 'SET search_path = '||v_addschema||', public';
 		SELECT gw_fct_getinfofromid(p_data) INTO v_return;
 		SET search_path = 'SCHEMA_NAME', public;
-		
-		RAISE NOTICE 'returned';
 		RETURN v_return;
 	END IF;
 	

@@ -575,7 +575,7 @@ ON CONFLICT (parameter, cur_user) DO NOTHING;
 
 UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'qgis_form_docker' AND cur_user = current_user;
 
-UPDATE presszone SET head=0, stylesheet='{}'  where presszone_id = '0';
+UPDATE presszone SET head=0, stylesheet='{"color":[100,100,100]}'  where presszone_id = '0';
 UPDATE presszone SET head=100, stylesheet='{"color":[251,181,174]}'  where presszone_id = '1';
 UPDATE presszone SET head=100, stylesheet='{"color":[179,205,227]}'  where presszone_id = '2';
 UPDATE presszone SET head=100, stylesheet='{"color":[204,235,197]}'  where presszone_id = '3';
@@ -583,20 +583,20 @@ UPDATE presszone SET head=100, stylesheet='{"color":[222,203,228]}'  where press
 UPDATE presszone SET head=100, stylesheet='{"color":[254,217,166]}'  where presszone_id = '5';
 UPDATE presszone SET head=100, stylesheet='{"color":[255,255,204]}'  where presszone_id = '6';
 
-UPDATE dma SET stylesheet='{}'  where dma_id = 0;
+UPDATE dma SET stylesheet='{"color":[100,100,100]}'  where dma_id = 0;
 UPDATE dma SET stylesheet='{"color":[251,181,174]}'  where dma_id = 1;
 UPDATE dma SET stylesheet='{"color":[179,205,227]}'  where dma_id = 2;
 UPDATE dma SET stylesheet='{"color":[204,235,197]}'  where dma_id = 3;
 UPDATE dma SET stylesheet='{"color":[222,203,228]}'  where dma_id = 4;
 UPDATE dma SET stylesheet='{"color":[255,255,204]}'  where dma_id = 5;
 
-UPDATE dqa SET stylesheet='{}'  where dqa_id = 0;
+UPDATE dqa SET stylesheet='{"color":[100,100,100]}'  where dqa_id = 0;
 UPDATE dqa SET stylesheet='{"color":[251,181,174]}'  where dqa_id = 1;
 UPDATE dqa SET stylesheet='{"color":[179,205,227]}'  where dqa_id = 2;
 UPDATE dqa SET stylesheet='{"color":[204,235,197]}'  where dqa_id = 3;
 UPDATE dqa SET stylesheet='{"color":[222,203,228]}'  where dqa_id = 4;
 
-UPDATE sector SET stylesheet='{}'  where sector_id = 0;
+UPDATE sector SET stylesheet='{"color":[100,100,100]}'  where sector_id = 0;
 UPDATE sector SET stylesheet='{"color":[251,181,174]}'  where sector_id = 1;
 UPDATE sector SET stylesheet='{"color":[179,205,227]}'  where sector_id = 2;
 UPDATE sector SET stylesheet='{"color":[204,235,197]}'  where sector_id = 3;
@@ -638,6 +638,8 @@ UPDATE sys_param_user SET dv_querytext = replace (dv_querytext, ' node_type', ' 
 UPDATE sys_param_user SET dv_querytext = replace (dv_querytext, ' connec_type', ' cat_feature_connec') WHERE dv_querytext like'% connec_type%';
 UPDATE sys_param_user SET dv_querytext = replace (dv_querytext, ' gully_type', ' cat_feature_gully') WHERE dv_querytext like'% gully_type%';
 
+
+UPDATE man_hydrant SET fire_code = concat('fcod-',node_id);
 
 
 INSERT INTO ext_district (district_id,name, muni_id,active)

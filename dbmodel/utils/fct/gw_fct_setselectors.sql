@@ -15,7 +15,8 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{}, 
 "data":{"addSchema":"", "selectorType":"exploitation", "id":2, "value":true, "isAlone":true}}$$);
 
-SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"selectorType":"exploitation", "id":"2", "value":"False", "addSchema":"None"}}$$);
+SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"selectorType":"selector_basic", "tabName":"tab_exploitation", "id":"2", "value":"False", "addSchema":"None"}}$$);
+SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"selectorType":"selector_basic", "tabName":"tab_psector", "id":"2", "value":"False", "addSchema":"None"}}$$);
 
 SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"explfrommuni", "id":1, "value":true, "isAlone":true, "addSchema":"None"}}$$)::text;
 
@@ -37,6 +38,7 @@ v_expl integer;
 v_addschema text;
 v_error_context text;
 v_selectortype text;
+v_layermanager json;
 
 BEGIN
 
@@ -65,6 +67,7 @@ BEGIN
 	v_parameter_selector = (SELECT value::json FROM config_param_system WHERE parameter = concat('basic_selector_', v_tabname));
 	v_tablename = v_parameter_selector->>'selector';
 	v_columnname = v_parameter_selector->>'selector_id'; 
+	v_layermanager = v_parameter_selector->>'layermanager'; 
 
 	-- get expl from muni
 	IF v_selectortype = 'explfrommuni' THEN
@@ -90,18 +93,17 @@ BEGIN
 	ELSE
 		EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE ' || v_columnname || ' = '|| v_id ||'';
 	END IF;
-		raise notice ' % % ', v_tablename, v_columnname;
 
-	
-			raise notice ' rweeeeeeeeeeeeeeeeeeeee % % ', v_tablename, v_columnname;
+	-- control nulls
+	v_layermanager = COALESCE (v_layermanager, '{}');
 	
 	-- Return
-	RETURN ('{"status":"Accepted", "version":"","body":{"message":{"level":1, "text":"This is a test message"} ,"form":{},"feature":{},"data":{}}}')::json;
+	RETURN ('{"status":"Accepted", "version":"","body":{"message":{"level":1, "text":"This is a test message"} ,"form":{},"feature":{},"layermanager":'||v_layermanager||', "data":{}}}')::json;
 
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN
-	--GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	--RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$

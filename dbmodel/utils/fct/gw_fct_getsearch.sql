@@ -14,12 +14,12 @@ $BODY$
 -- TODO: Implementar el threshold per a tots els widgets igual que està en la 3.1
 
 
-SELECT gw_fct_setsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"tabName":"add_network"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "net_type":{"id":"", "name":""}, "net_code":{"text":"3"}, "addSchema":"ud_sample"}}$$);
-
 /*EXAMPLE
 SELECT gw_fct_getsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}}$$)
 SELECT gw_fct_getsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"addSchema":"SCHEMA_NAME", "filterFields":{}, "pageInfo":{}}}$$);
-SELECT gw_fct_getsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"singleTab":"tab_address"}, "feature":{}, "data":{"addSchema":"SCHEMA_NAME", "filterFields":{}, "pageInfo":{}}}$$);
+SELECT gw_fct_getsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"singleTab":"tab_address"}, "feature":{}, "data":{"addSchema":"ud_sample", "filterFields":{}, "pageInfo":{}}}$$);
+
+ SELECT gw_fct_getsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "addSchema":"ud_sample"}}$$);
 
 MAIN ISSUES
 -----------
@@ -76,8 +76,6 @@ BEGIN
 
 	-- profilactic control for singletab
         IF v_singletab = '' then v_singletab = null; end if;
-
-        raise notice 'v_singletab %',v_singletab;
         
 	-- Create tabs array
 	v_form := '[';
@@ -111,7 +109,7 @@ BEGIN
 		comboType := gw_fct_json_object_set_key(comboType, 'comboNames', combo_json);
 
 		-- Get feature type
-		SELECT array_to_json(array_agg(id)) INTO combo_json FROM (SELECT ((value)::json->'feature_type') AS id FROM config_param_system 
+		SELECT array_to_json(array_agg(id)) INTO combo_json FROM (SELECT ((value)::json->'search_type') AS id FROM config_param_system 
 		WHERE parameter like '%basic_search_network%' ORDER BY ((value)::json->>'orderby'))a;    
 		comboType := gw_fct_json_object_set_key(comboType, 'comboFeature', combo_json);
 
@@ -126,9 +124,9 @@ BEGIN
 		
 		-- Create network tab form
 		IF v_firsttab THEN
-			formNetwork := json_build_object('tabName','network','tabLabel',rec_tab.label, 'tooltip', rec_tab.tooltip,'active' , v_active);
+			formNetwork := json_build_object('tabName','network', 'tabLabel',rec_tab.label, 'tooltip', rec_tab.tooltip,'active' , v_active);
 		ELSE
-			formNetwork := json_build_object('tabName','network','tabLabel',rec_tab.label, 'tooltip', rec_tab.tooltip,'active' , true);
+			formNetwork := json_build_object('tabName','network', 'tabLabel',rec_tab.label, 'tooltip', rec_tab.tooltip,'active' , true);
 			formNetwork := gw_fct_json_object_set_key(formNetwork, 'fields', fieldsJson);
 		END IF;
 		-- Create tabs array
@@ -139,6 +137,8 @@ BEGIN
 	END IF;
 
 	IF v_addschema IS NOT NULL AND v_singletab IS NULL THEN
+
+		SELECT * INTO rec_tab FROM config_form_tabs WHERE formname='search' AND tabname='tab_add_network' ;
 
 		-- Init combo json
 		EXECUTE 'SELECT * FROM '||v_addschema||'.config_form_fields WHERE formname=''search'' AND columnname=''net_type'''
@@ -179,16 +179,18 @@ BEGIN
 		
 		-- Create network tab form
 		IF v_firsttab THEN
-			formNetwork := json_build_object('tabName','add_network','tabLabel','Add Network', 'tooltip', rec_tab.tooltip,'active' , v_active);
+			formNetwork := json_build_object('tabName','add_network','tabLabel',rec_tab.label, 'tooltip', rec_tab.tooltip,'active' , v_active);
 			formNetwork := gw_fct_json_object_set_key(formNetwork, 'fields', fieldsJson);
 			v_form := v_form || ',' || formNetwork::text;
 		ELSE
-			formNetwork := json_build_object('tabName','add_network','tabLabel','Add Network', 'tooltip', rec_tab.tooltip,'active' , true);
+			formNetwork := json_build_object('tabName','add_network','tabLabel',rec_tab.label, 'tooltip', rec_tab.tooltip,'active' , true);
 			v_form := v_form || formNetwork::text;
 		END IF;
 		
 		v_firsttab := TRUE;
 		v_active :=FALSE;
+
+		SET search_path = 'SCHEMA_NAME', public;
 
 	END IF;
 
