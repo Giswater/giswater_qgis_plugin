@@ -50,11 +50,9 @@ UPDATE config_param_system set value =
 "manageAll":false, "query_filter":""}'
 WHERE parameter = 'basic_selector_tab_network_state';
 
-
 INSERT INTO config_param_system VALUES ('basic_selector_tab_sector', 
 '{"table":"sector", "selector":"selector_sector", "table_id":"sector_id",  "selector_id":"sector_id",  "label":"sector_id, '' - '', name", 
 "manageAll":true, "query_filter":" AND expl_id > 0"}');
-
 
 INSERT INTO config_param_system VALUES ('basic_selector_tab_psector',
 '{"table":"plan_psector", "selector":"selector_psector", "table_id":"psector_id",  "selector_id":"psector_id",  "label":"psector_id, '' - '', name", 
@@ -62,6 +60,9 @@ INSERT INTO config_param_system VALUES ('basic_selector_tab_psector',
 "layermanager":{"active":"v_edit_psector", "visible":["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_gully"], "addToc":["v_edit_psector"]},
 "typeaheadFilter":{"queryText":"SELECT psector_id as id, name AS idval FROM v_edit_psector"}}');
 
-
 UPDATE config_param_system set descript = 'Variable to configura all options related to search for the specificic tab' , label = 'Selector variables' ,
 isenabled  = true, project_type = 'utils', datatype = 'json' where parameter like '%basic_selector%';
+
+UPDATE sys_table SET notify_action = (replace (notify_action::text, 'indexing_spatial_layer', 'set_layer_index'))::json WHERE notify_action::text like '%indexing_spatial_layer%';
+
+DELETE FROM config_param_system WHERE parameter = 'admin_role_permisions';

@@ -49,9 +49,6 @@ BEGIN
 	
 	SELECT project_type, giswater INTO v_project_type, v_version FROM sys_version order by id desc limit 1;
 
-	--set permisions for each role
-	UPDATE config_param_system SET value = TRUE WHERE parameter = 'admin_role_permissions';
-	
 	PERFORM gw_fct_admin_role_permissions();
 	
 	GRANT ALL ON TABLE cat_feature_node TO role_basic;
