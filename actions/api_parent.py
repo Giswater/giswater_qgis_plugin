@@ -1859,12 +1859,11 @@ class ApiParent(ParentAction):
                 self.set_selector(checkbox)
                 checkbox.blockSignals(False)
 
-
     def set_selector(self, widget):
         """  Send values to DB and reload selectors
         :param widget: QCheckBox that contains the information to generate the json (QCheckBox)
         """
-        qgis_project_add_schema = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('gwAddSchema')
+        qgis_project_add_schema = self.controller.plugin_settings_value('gwAddSchema')
         extras = f'"selectorType":"{widget.property("selector_type")}", "tabName":"{self.current_tab}", ' \
                  f'"id":"{widget.objectName()}", '
         extras += f'"value":"{widget.isChecked()}", "addSchema":"{qgis_project_add_schema}"'
@@ -1873,13 +1872,11 @@ class ApiParent(ParentAction):
 
         if str(self.current_tab) == 'tab_exploitation':
 
-            # zoom to layer, repaint mapzones and refresh canvas
-            layer = self.controller.get_layer_by_tablename('v_edit_node')
+            #reload layer, zoom to layer, style mapzones and refresh canvas
+            layer = self.controller.get_layer_by_tablename('v_edit_arc')
             if layer:
+                layer.dataProvider().forceReload()
                 self.iface.setActiveLayer(layer)
                 self.iface.zoomToActiveLayer()
             self.set_style_mapzones()
             self.refresh_map_canvas()
-
-
-

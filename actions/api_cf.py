@@ -164,7 +164,7 @@ class ApiCF(ApiParent, QObject):
 
 
     def open_form(self, point=None, table_name=None, feature_id=None, feature_cat=None, new_feature_id=None,
-                  layer_new_feature=None, tab_type=None, new_feature=None, is_docker=True):
+                  layer_new_feature=None, tab_type=None, new_feature=None, is_docker=True, is_add_schema=False):
         """
         :param point: point where use clicked
         :param table_name: table where do sql query
@@ -190,10 +190,10 @@ class ApiCF(ApiParent, QObject):
         self.tab_type = tab_type
 
         # Get values
-        self.qgis_project_add_schema = self.controller.plugin_settings_value('gwAddSchema')
-        self.qgis_project_main_schema = self.controller.plugin_settings_value('gwMainSchema')
-        self.qgis_project_infotype = self.controller.plugin_settings_value('gwInfoType')
-        self.qgis_project_role = self.controller.plugin_settings_value('gwProjectRole')
+        qgis_project_add_schema = self.controller.plugin_settings_value('gwAddSchema')
+        qgis_project_main_schema = self.controller.plugin_settings_value('gwMainSchema')
+        qgis_project_infotype = self.controller.plugin_settings_value('gwInfoType')
+        qgis_project_role = self.controller.plugin_settings_value('gwProjectRole')
 
         self.new_feature = new_feature
 
@@ -216,8 +216,8 @@ class ApiCF(ApiParent, QObject):
         elif tab_type == 'data':
             extras = '"toolBar":"basic"'
 
-        project_role = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('project_role')
-        extras += f', "rolePermissions":"{project_role}"'
+        extras += f', "rolePermissions":"{qgis_project_infotype}"'
+
         function_name = None
         body = None
 
@@ -238,18 +238,22 @@ class ApiCF(ApiParent, QObject):
             scale_zoom = self.iface.mapCanvas().scale()
             extras += f', "activeLayer":"{active_layer}"'
             extras += f', "visibleLayer":{visible_layer}'
-            extras += f', "mainSchema":"{self.qgis_project_main_schema}"'
-            extras += f', "addSchema":"{self.qgis_project_add_schema}"'
-            extras += f', "infoType":"{self.qgis_project_infotype}"'
-            extras += f', "projecRole":"{self.qgis_project_role}"'
+            extras += f', "mainSchema":"{qgis_project_main_schema}"'
+            extras += f', "addSchema":"{qgis_project_add_schema}"'
+            extras += f', "infoType":"{qgis_project_infotype}"'
+            extras += f', "projecRole":"{qgis_project_role}"'
             extras += f', "coordinates":{{"xcoord":{point.x()},"ycoord":{point.y()}, "zoomRatio":{scale_zoom}}}'
             body = self.create_body(extras=extras)
             function_name = 'gw_fct_getinfofromcoordinates'
 
-        # Come from QPushButtons node1 or node2 from custom form or RightButton
+        # Comes from QPushButtons node1 or node2 from custom form or RightButton
         elif feature_id:
+            if is_add_schema is True:
+                add_schema = self.controller.plugin_settings_value('gwAddSchema')
+                extras = f'"addSchema":"{add_schema}"'
+            else:
+                extras = '"addSchema":""'
             feature = f'"tableName":"{table_name}", "id":"{feature_id}"'
-            extras = f'"infoType":"{self.qgis_project_infotype}"'
             body = self.create_body(feature=feature, extras=extras)
             function_name = 'gw_fct_getinfofromid'
 
