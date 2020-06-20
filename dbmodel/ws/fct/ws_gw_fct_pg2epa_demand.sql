@@ -31,8 +31,6 @@ BEGIN
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
 
-	RAISE NOTICE 'Starting pg2epa demand';
-
 	-- get user values
 	v_uniquepattern = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_pattern' and cur_user = current_user);
 	v_units =  (SELECT value FROM config_param_user WHERE parameter='inp_options_units' AND cur_user=current_user);
@@ -51,6 +49,16 @@ BEGIN
 	-- delete previous results on rpt_inp_pattern_value
 	DELETE FROM rpt_inp_pattern_value WHERE result_id=result_id_var;	
 
+	-- save previous values to set hydrometer selector
+	DELETE FROM temp_table WHERE fid=199 AND cur_user=current_user;
+	INSERT INTO temp_table (fid, text_column)
+	SELECT 199, (array_agg(state_id)) FROM selector_state WHERE cur_user=current_user;
+
+	-- reset selector
+	INSERT INTO selector_hydrometer SELECT id, current_user FROM ext_rtc_hydrometer_state
+	ON CONFLICT (state_id, cur_user) DO NOTHING;
+
+	
 	IF v_demandtype = 1 THEN -- NODE ESTIMATED
 
 		IF v_patternmethod = 11 THEN -- UNIQUE ESTIMATED (NODE)
@@ -363,6 +371,11 @@ BEGIN
 			factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18
 			FROM inp_pattern_value WHERE pattern_id IN (SELECT pattern_id FROM temp_node);
 	END IF;
+
+	-- restore state selector
+	INSERT INTO selector_state (state_id, cur_user)
+	select unnest(text_column::integer[]), current_user from temp_table where fid=199 and cur_user=current_user
+	ON CONFLICT (state_id, cur_user) DO NOTHING;
 
 	UPDATE rpt_inp_node SET pattern_id = null WHERE demand = 0;
 
