@@ -13,6 +13,9 @@ $BODY$
 
 -- TODO: Implementar el threshold per a tots els widgets igual que està en la 3.1
 
+
+SELECT gw_fct_setsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"tabName":"add_network"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "net_type":{"id":"", "name":""}, "net_code":{"text":"3"}, "addSchema":"ud_sample"}}$$);
+
 /*EXAMPLE
 SELECT gw_fct_getsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}}$$)
 SELECT gw_fct_getsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"addSchema":"SCHEMA_NAME", "filterFields":{}, "pageInfo":{}}}$$);
@@ -176,11 +179,11 @@ BEGIN
 		
 		-- Create network tab form
 		IF v_firsttab THEN
-			formNetwork := json_build_object('tabName','addNetwork','tabLabel',rec_tab.label, 'tooltip', rec_tab.tooltip,'active' , v_active);
+			formNetwork := json_build_object('tabName','add_network','tabLabel','Add Network', 'tooltip', rec_tab.tooltip,'active' , v_active);
 			formNetwork := gw_fct_json_object_set_key(formNetwork, 'fields', fieldsJson);
 			v_form := v_form || ',' || formNetwork::text;
 		ELSE
-			formNetwork := json_build_object('tabName','addNnetwork','tabLabel',rec_tab.label, 'tooltip', rec_tab.tooltip,'active' , true);
+			formNetwork := json_build_object('tabName','add_network','tabLabel','Add Network', 'tooltip', rec_tab.tooltip,'active' , true);
 			v_form := v_form || formNetwork::text;
 		END IF;
 		

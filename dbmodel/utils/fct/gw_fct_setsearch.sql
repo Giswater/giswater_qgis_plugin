@@ -19,6 +19,11 @@ SELECT gw_fct_setsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "fo
 
 SELECT gw_fct_setsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"tabName":"workcat"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "workcat_search":{"text":"w"}, "addSchema":"None"}}$$);
 
+SELECT gw_fct_setsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"tabName":"addNetwork"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "net_type":{"id":"", "name":""}, "net_code":{"text":"3"}, "addSchema":"ud_sample"}}$$);
+
+
+SELECT gw_fct_setsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"tabName":"add_network"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "net_type":{"id":"", "name":""}, "net_code":{"text":"3"}, "addSchema":"ud_sample"}}$$);
+
 MAIN ISSUES
 -----------
 - basic_search_network is key issue to define variables on config_param_system to searh anything you want
@@ -134,10 +139,10 @@ BEGIN
 
 	-- Network tab
 	--------------
-	IF v_tab = 'network' OR v_tab = 'addNetwork' THEN
+	IF v_tab = 'network' OR v_tab = 'add_network' THEN
 
 		-- set the schema where search is looking for
-		IF v_tab =  'addNetwork'  THEN
+		IF v_tab =  'add_network'  THEN
 			v_searchschema = v_addschema;
 		ELSE
 			v_searchschema = v_schemaname;

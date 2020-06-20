@@ -24,7 +24,7 @@ SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
 		"client":{"device":4, "infoType":1, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_arc_pipe", "inputGeometry":"0102000020E764000002000000998B3C512F881941B28315AA7F76514105968D7D748819419FDF72D781765141" },
-		"data":{}}$$)
+		"data":{"addSchema":"ud_sample"}}$$)
 INFO BASIC
 SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
 		"client":{"device":4, "infoType":1, "lang":"ES"},
@@ -95,7 +95,7 @@ v_idname text;
 v_featuretype text;
 v_linkpath json;
 column_type text;
-schemas_array name[];
+v_schemaname text;
 v_version json;
 v_geometry json;
 v_the_geom text;
@@ -128,6 +128,9 @@ v_childtype text;
 v_errcontext text;
 v_toggledition boolean;
 v_islayer boolean;
+v_addschema text;
+v_return json;
+v_flag boolean = false;
 
 BEGIN
 
@@ -136,9 +139,10 @@ BEGIN
 	
 	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
-	schemas_array := current_schemas(FALSE);
+	v_schemaname := 'SCHEMA_NAME';
 
-	-- fet input parameters
+
+	-- input parameters
 	v_device := (p_data ->> 'client')::json->> 'device';
 	v_infotype := (p_data ->> 'client')::json->> 'infoType';
 	v_tablename := (p_data ->> 'feature')::json->> 'tableName';
@@ -146,6 +150,25 @@ BEGIN
 	v_inputgeometry := (p_data ->> 'feature')::json->> 'inputGeometry';
 	v_toolbar := (p_data ->> 'data')::json->> 'toolBar';
 	v_islayer := (p_data ->> 'feature')::json->> 'isLayer';
+	v_addschema := (p_data ->> 'data')::json->> 'addSchema';
+
+	-- control strange null
+	IF lower(v_addschema) = 'none' or v_addschema = '' THEN 
+		v_addschema = null;
+	END IF;
+
+	-- looking for additional schema 
+	IF v_addschema IS NOT NULL AND v_addschema != v_schemaname AND v_flag IS FALSE THEN
+
+		RAISE NOTICE 'v_addschema %', v_addschema;
+		
+		EXECUTE 'SET search_path = '||v_addschema||', public';
+		SELECT gw_fct_getinfofromid(p_data) INTO v_return;
+		SET search_path = 'SCHEMA_NAME', public;
+		
+		RAISE NOTICE 'returned';
+		RETURN v_return;
+	END IF;
 	
 	if v_toolbar is NULL THEN
 		v_toolbar := 'basic';
@@ -177,7 +200,7 @@ BEGIN
 		(SELECT a.attname as columnname FROM pg_attribute a JOIN pg_class t on a.attrelid = t.oid JOIN pg_namespace s on t.relnamespace = s.oid
 		WHERE a.attnum > 0 AND NOT a.attisdropped AND t.relname = $1 AND s.nspname = $2	ORDER BY a.attnum) a'
 		INTO v_parentfields
-		USING v_table_parent, schemas_array[1]; 
+		USING v_table_parent, v_schemaname; 
 
 	raise notice 'v_parentfields %', v_parentfields;
 	v_parentfields = replace (v_parentfields::text, '{', '[');
@@ -237,7 +260,7 @@ BEGIN
 		AND s.nspname = $2
 		ORDER BY a.attnum LIMIT 1'
 		INTO v_idname
-		USING v_tablename, schemas_array[1];
+		USING v_tablename, v_schemaname;
 	END IF;
 
 	-- Get id column type
@@ -250,7 +273,7 @@ BEGIN
 		AND t.relname = $2 
 		AND s.nspname = $1
 		ORDER BY a.attnum'
-			USING schemas_array[1], v_tablename, v_idname
+			USING v_schemaname, v_tablename, v_idname
 			INTO column_type;
 
 	-- Get geometry_column
@@ -266,7 +289,7 @@ BEGIN
             ORDER BY a.attnum
 			LIMIT 1'
             INTO v_the_geom
-            USING v_tablename, schemas_array[1];
+            USING v_tablename, v_schemaname;
            
 	-- Get geometry (to feature response)
 	------------------------------------------
