@@ -173,7 +173,7 @@ class ManageVisit(ParentManage, QObject):
 
         # Open the dialog
         if open_dialog:
-            self.feature_type.activated.emit(0)
+            self.feature_type.currentIndexChanged.emit(0)
             self.open_dialog(self.dlg_add_visit, dlg_name="visit")
 
 
@@ -196,10 +196,10 @@ class ManageVisit(ParentManage, QObject):
         self.dlg_add_visit.btn_add_geom.clicked.connect(self.add_point)
 
         # Fill combo boxes of the form and related events
-        self.parameter_type_id.activated.connect(partial(self.set_parameter_id_combo, self.dlg_add_visit))
-        self.feature_type.activated.connect(partial(self.event_feature_type_selected, self.dlg_add_visit, None))
-        self.feature_type.activated.connect(partial(self.manage_tabs_enabled, True))
-        self.parameter_id.activated.connect(self.get_feature_type_of_parameter)
+        self.parameter_type_id.currentIndexChanged.connect(partial(self.set_parameter_id_combo, self.dlg_add_visit))
+        self.feature_type.currentIndexChanged.connect(partial(self.event_feature_type_selected, self.dlg_add_visit, None))
+        self.feature_type.currentIndexChanged.connect(partial(self.manage_tabs_enabled, True))
+        self.parameter_id.currentIndexChanged.connect(self.get_feature_type_of_parameter)
 
 
     def set_locked_relation(self):
@@ -457,8 +457,6 @@ class ManageVisit(ParentManage, QObject):
     def update_relations_geom_type(self, geom_type):
         """ Update relations of specific @geom_type """
 
-        self.controller.log_info(f"update_relations_geom_type: {geom_type}")
-
         if geom_type == '' or geom_type.lower() == 'all':
             return
 
@@ -521,8 +519,6 @@ class ManageVisit(ParentManage, QObject):
 
     def set_parameter_id_combo(self, dialog):
         """ Set parameter_id combo basing on current selections """
-
-        self.controller.log_info("set_parameter_id_combo")
 
         dialog.parameter_id.clear()
         sql = (f"SELECT id, descript "
@@ -1516,8 +1512,8 @@ class ManageVisit(ParentManage, QObject):
                 partial(self.selection_init, self.dlg_add_visit, widget_table))
 
         # Adding auto-completion to a QLineEdit
-        self.controller.log_info(f"tab_feature_changed: {self.geom_type}")
         self.set_completer_feature_id(dialog.feature_id, self.geom_type, viewname)
+        #utils_giswater.setWidgetText(dialog, dialog.feature_id, "")
 
         self.selection_changed(dialog, widget_table, self.geom_type, False)
 
@@ -1529,8 +1525,6 @@ class ManageVisit(ParentManage, QObject):
 
     def manage_visit_multifeature(self):
         """ Manage existing visit with feature_type = 'all' """
-
-        self.controller.log_info(f"manage_visit_multifeature")
 
         self.geom_type = 'arc'
         self.get_features_visit_geom_type(self.current_visit.id, 'arc')
