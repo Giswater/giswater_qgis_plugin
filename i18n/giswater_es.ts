@@ -7165,7 +7165,7 @@
 		<name>visit_event</name>
 		<message>
 			<source>title</source>
-			<translation>Evento estándar de arco</translation>
+			<translation>Evento estándar</translation>
 		</message>
 		<message>
 			<source>btn_delete_file</source>
@@ -7177,7 +7177,7 @@
 		</message>
 		<message>
 			<source>dlg_visit_event</source>
-			<translation>Evento estándar de arco</translation>
+			<translation>Evento estándar</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_visit_event</source>

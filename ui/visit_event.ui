@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Standard arc event</string>
+   <string>Standard event</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>

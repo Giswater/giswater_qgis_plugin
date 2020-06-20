@@ -6845,7 +6845,7 @@
 		<name>visit_event</name>
 		<message>
 			<source>title</source>
-			<translation>Standard arc event</translation>
+			<translation>Standard event</translation>
 		</message>
 		<message>
 			<source>lbl_files</source>
@@ -6865,7 +6865,7 @@
 		</message>
 		<message>
 			<source>dlg_visit_event</source>
-			<translation>Standard arc event</translation>
+			<translation>Standard event</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_visit_event</source>
