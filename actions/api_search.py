@@ -299,7 +299,7 @@ class ApiSearch(ApiParent):
             name = utils_giswater.get_item_data(self.dlg_search, combo, 1)
             try:
                 feature_type = utils_giswater.get_item_data(self.dlg_search, combo, 2)
-                extras_search += f'"featureType":"{feature_type}", '
+                extras_search += f'"searchType":"{feature_type}", '
             except IndexError:
                 pass
             extras_search += f'"{combo.property("columnname")}":{{"id":"{id}", "name":"{name}"}}, '
