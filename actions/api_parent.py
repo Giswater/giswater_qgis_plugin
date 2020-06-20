@@ -1777,7 +1777,8 @@ class ApiParent(ParentAction):
                 self.txt_filter = widget
                 self.put_widgets(dialog, field, label, widget)
                 widget.setFocus()
-            if 'manageAll' in form_tab:
+
+            if (form_tab['manageAll']).lower() == 'true':
                 label = QLabel()
                 label.setObjectName('lbl_manage_all')
                 label.setText('Check all')
