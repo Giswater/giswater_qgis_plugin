@@ -42,6 +42,8 @@ class ManageVisit(ParentManage, QObject):
         QObject.__init__(self)
         ParentManage.__init__(self, iface, settings, controller, plugin_dir)
         self.geom_type = None
+        self.event_parameter_id = None
+        self.event_feature_type = None
 
 
     def manage_visit(self, visit_id=None, geom_type=None, feature_id=None, single_tool=True, expl_id=None, tag=None,
@@ -60,7 +62,6 @@ class ManageVisit(ParentManage, QObject):
         self.visit_id_value = visit_id
 
         # set vars to manage if GUI have to lock the relation
-        self.controller.log_info(f"manage_visit (new visit): {self.it_is_new_visit}")
         self.locked_geom_type = geom_type
         self.locked_feature_id = feature_id
 
@@ -251,7 +252,6 @@ class ManageVisit(ParentManage, QObject):
         self.visit_added.emit(self.current_visit.id)
 
         # Remove all previous selections
-        self.controller.log_info("remove_selection accepted")
         self.disconnect_signal_selection_changed()
         self.remove_selection()
         
@@ -323,16 +323,19 @@ class ManageVisit(ParentManage, QObject):
         C) load all related events in the relative table
         D) load all related documents in the relative table."""
 
+        self.event_parameter_id = None
+        self.event_feature_type = None
+        utils_giswater.setWidgetEnabled(self.dlg_add_visit, 'parameter_id', True)
+
         # A) Update current Visit record
         self.current_visit.id = int(text)
         exist = self.current_visit.fetch()
         if exist:
-            self.controller.log_info(f"manage_visit_id_change - exist")
             # B) Fill the GUI values of the current visit
             self.fill_widget_with_fields(self.dlg_add_visit, self.current_visit, self.current_visit.field_names())
             # Get parameter_id and feature_type from his event
             self.event_parameter_id, self.event_feature_type = self.get_data_from_event(self.visit_id_value)
-            utils_giswater.setWidgetText(self.dlg_add_visit, 'parameter_id', self.event_parameter_id)
+            utils_giswater.set_combo_itemData(self.dlg_add_visit.parameter_id, self.event_parameter_id, 0)
             utils_giswater.setWidgetEnabled(self.dlg_add_visit, 'parameter_id', False)
 
         # C) load all related events in the relative table
@@ -418,7 +421,6 @@ class ManageVisit(ParentManage, QObject):
         feature_type = utils_giswater.getWidgetText(self.dlg_add_visit, self.feature_type).lower()
         # Save new relations listed in every table of geom_type
         if feature_type == 'all':
-            self.controller.log_info(f"update_relations - ALL")
             self.update_relations_geom_type("arc")
             self.update_relations_geom_type("node")
             self.update_relations_geom_type("connec")
@@ -510,7 +512,6 @@ class ManageVisit(ParentManage, QObject):
             # need to create the relation record that is done only
             # changing tab
             if self.locked_geom_type:
-                self.controller.log_info(f"manage_tab_changed: self.locked_geom_type")
                 self.update_relations(dialog)
 
         # manage arriving tab
@@ -655,6 +656,10 @@ class ManageVisit(ParentManage, QObject):
 
         # Fill combo parameter_id depending geom_type
         self.fill_combo_parameter_id()
+
+        if self.event_parameter_id:
+            utils_giswater.set_combo_itemData(self.dlg_add_visit.parameter_id, self.event_parameter_id, 0)
+            utils_giswater.setWidgetEnabled(self.dlg_add_visit, 'parameter_id', False)
 
         if geom_type.lower() == 'all':
             return
@@ -1546,8 +1551,6 @@ class ManageVisit(ParentManage, QObject):
         if row:
             parameter_id = row["parameter_id"]
             feature_type = row["feature_type"].lower()
-            self.controller.log_info(f"get_feature_type_of_event: {parameter_id}")
-            self.controller.log_info(f"get_feature_type_of_event: {feature_type}")
 
         return parameter_id, feature_type
 
