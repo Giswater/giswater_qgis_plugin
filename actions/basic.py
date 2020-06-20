@@ -39,8 +39,7 @@ class Basic(ApiParent):
     def basic_filter_selectors(self):
         """ Button 142: Filter selector """
 
-        selector_values = (f'{{"exploitation": {{"ids":"None", "filter":""}}, "state":{{"ids":"None", "filter":""}}, '
-                           f'"hydrometer":{{"ids":"None", "filter":""}}}}')
+        selector_values = '"selector_basic"'
 
         # Show form in docker?
         self.controller.init_docker('qgis_form_docker')
@@ -49,8 +48,8 @@ class Basic(ApiParent):
         self.load_settings(self.dlg_selector)
 
         # Get the name of the last tab used by the user
-        last_tab_name = self.get_last_tab_name(self.dlg_selector, 'basic')
-        self.get_selector(self.dlg_selector, selector_values, last_tab_name=last_tab_name)
+        self.current_tab = self.get_last_tab(self.dlg_selector, 'basic')
+        self.get_selector(self.dlg_selector, selector_values, current_tab=self.current_tab)
 
         if self.controller.dlg_docker:
             self.controller.dock_dialog(self.dlg_selector)
@@ -63,11 +62,6 @@ class Basic(ApiParent):
         # Save the name of current tab used by the user
         self.dlg_selector.rejected.connect(partial(
             self.save_current_tab, self.dlg_selector, self.dlg_selector.main_tab, 'basic'))
-
-        # Repaint mapzones and refresh canvas
-        self.set_style_mapzones()
-        self.refresh_map_canvas()
-
 
     def basic_api_search(self):
         """ Button 143: ApiSearch """

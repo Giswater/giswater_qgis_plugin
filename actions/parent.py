@@ -177,8 +177,17 @@ class ParentAction(object):
         self.controller.plugin_settings_set_value(dialog.objectName() + "_y", dialog.pos().y()+31)
 
 
-    def get_last_tab_name(self, dialog, selector_name):
+    def get_last_tab(self, dialog, selector_name):
         """ Get the name of the last tab used by the user from QSettings()
+        :param dialog: QDialog
+        :param selector_name: Name of the selector (String)
+        :return: Name of the last tab used by the user (string)
+        """
+        tab_name = self.controller.plugin_settings_value(f"{ dialog.objectName()}_{selector_name}")
+        return tab_name
+
+    def get_current_tab(self, dialog, selector_name):
+        """ Get the name of the current tab used by the user from QSettings()
         :param dialog: QDialog
         :param selector_name: Name of the selector (String)
         :return: Name of the last tab used by the user (string)
@@ -1216,12 +1225,15 @@ class ParentAction(object):
 
         extras = f'"mapzones":""'
         body = self.create_body(extras=extras)
+
+        self.controller.log_info(f"SELECT gw_fct_getstylemapzones ({body})")
         json_return = self.controller.get_json('gw_fct_getstylemapzones', body)
         if not json_return:
             return False
 
         for mapzone in json_return['body']['data']['mapzones']:
 
+            self.controller.log_info(f"Mapzone: ({mapzone})")
             # Loop for each mapzone returned on json
             lyr = self.controller.get_layer_by_tablename(mapzone['layer'])
             categories = []
