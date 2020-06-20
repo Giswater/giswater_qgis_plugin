@@ -15,15 +15,16 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{}, 
 "data":{"addSchema":"", "selectorType":"exploitation", "id":2, "value":true, "isAlone":true}}$$);
 
-SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"exploitation", "id":"2", "value":"False", "addSchema":"None"}}$$);
+SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"selectorType":"exploitation", "id":"2", "value":"False", "addSchema":"None"}}$$);
 
+SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"explfrommuni", "id":1, "value":true, "isAlone":true, "addSchema":"None"}}$$)::text;
 
 */
 
 DECLARE
 
 v_version json;
-v_selectortype text;
+v_tabname text;
 v_tablename text;
 v_columnname text;
 v_id integer;
@@ -34,8 +35,8 @@ v_parameter_selector json;
 v_data json;
 v_expl integer;
 v_addschema text;
-v_layermanager json;
 v_error_context text;
+v_selectortype text;
 
 BEGIN
 
@@ -47,6 +48,7 @@ BEGIN
 		INTO v_version;
 	
 	-- Get input parameters:
+	v_tabname := (p_data ->> 'data')::json->> 'tabName';
 	v_selectortype := (p_data ->> 'data')::json->> 'selectorType';
 	v_id := (p_data ->> 'data')::json->> 'id';
 	v_value := (p_data ->> 'data')::json->> 'value';
@@ -60,19 +62,23 @@ BEGIN
 	END IF;
 
 	-- Get system parameters
-	v_parameter_selector = (SELECT value::json FROM config_param_system WHERE parameter = concat('basic_selector_', v_selectortype));
+	v_parameter_selector = (SELECT value::json FROM config_param_system WHERE parameter = concat('basic_selector_', v_tabname));
 	v_tablename = v_parameter_selector->>'selector';
 	v_columnname = v_parameter_selector->>'selector_id'; 
-	v_layermanager = v_parameter_selector->>'layerManager';
 
-	
 	-- get expl from muni
 	IF v_selectortype = 'explfrommuni' THEN
+
+		-- getting specifics parameters
+		v_parameter_selector = (SELECT value::json FROM config_param_system WHERE parameter = 'basic_selector_explfrommuni');
+		v_tablename = v_parameter_selector->>'selector';
+		v_columnname = v_parameter_selector->>'selector_id'; 
+
 		v_expl = (SELECT expl_id FROM exploitation e, ext_municipality m WHERE st_dwithin(st_centroid(e.the_geom), m.the_geom, 0) AND muni_id::text = v_id::text limit 1);
 		EXECUTE 'DELETE FROM selector_expl WHERE cur_user = current_user';
 		EXECUTE 'INSERT INTO selector_expl (expl_id, cur_user) VALUES('|| v_expl ||', '''|| current_user ||''')';	
 	END IF;
-	
+
 	-- manage isalone
 	IF v_isalone THEN
 		EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user';
@@ -84,48 +90,18 @@ BEGIN
 	ELSE
 		EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE ' || v_columnname || ' = '|| v_id ||'';
 	END IF;
+		raise notice ' % % ', v_tablename, v_columnname;
 
-	-- manage add schema
-	IF v_addschema IS NOT NULL AND v_addschema !='' THEN
-
-		--force search path to the additional schema
-		EXECUTE 'SET search_path = public, '||v_addschema;
-		
-		-- get municipality from exploitation (as mapping relation againts the add schema)
-		v_muni = (SELECT muni_id FROM exploitation e, ext_municipality m WHERE st_dwithin(st_centroid(e.the_geom), m.the_geom, 0) AND expl_id = v_id);
-		EXECUTE 'DELETE FROM selector_expl WHERE cur_user = current_user';
-		EXECUTE 'INSERT INTO selector_expl (expl_id, cur_user) VALUES('|| v_expl ||', '''|| current_user ||''')';	
-		
-		-- modify json to call again on the add schema
-		v_data = gw_fct_json_object_set_key(p_data , 'id', v_muni::text);
-		v_data = gw_fct_json_object_set_key(p_data ,' selectorType', 'explfrommuni'::text);
-		v_data = gw_fct_json_object_delete_keys(p_data ,'id', 'addSchema'::text);
-				
-		-- trigger selector of additional schema		
-		PERFORM gw_fct_setselectors(v_data);
-		
-		-- restore set search_path
-		SET search_path = SCHEMA_NAME, public;
-
-	END IF;
 	
-	-- Check null
-	v_layermanager := COALESCE(v_layermanager, '{}');    
+			raise notice ' rweeeeeeeeeeeeeeeeeeeee % % ', v_tablename, v_columnname;
 	
 	-- Return
-	RETURN ('{"status":"Accepted", "version":'||v_version||
-			',"body":{"message":{"level":1, "text":"This is a test message"}'||
-				',"form":{"formName":"", "formLabel":"", "formText":""'||
-				',"feature":{}'||
-				',"actions":{}'||
-				',"layerManager":'||v_layermanager||'}'||
-				',"data":{}}'||
-			'}')::json;
+	RETURN ('{"status":"Accepted", "version":"","body":{"message":{"level":1, "text":"This is a test message"} ,"form":{},"feature":{},"data":{}}}')::json;
 
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN
-	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	--GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	--RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$
