@@ -1462,20 +1462,21 @@ class ManageVisit(ParentManage, QObject):
 
     def populate_position_id(self):
 
-        if self.geom_type == 'arc':
-            self.dlg_event.position_id.setEnabled(True)
-            self.dlg_event.position_value.setEnabled(True)
-            node_list = []
+        self.dlg_event.position_id.setEnabled(self.geom_type == 'arc')
+        self.dlg_event.position_value.setEnabled(self.geom_type == 'arc')
+        node_list = []
+        if self.geom_type != 'all':
             widget_name = f"tbl_visit_x_{self.geom_type}"
             widget_table = utils_giswater.getWidget(self.dlg_add_visit, widget_name)
             node_1 = widget_table.model().record(0).value('node_1')
             node_2 = widget_table.model().record(0).value('node_2')
-            node_list.append([node_1, f"node 1: {node_1}"])
-            node_list.append([node_2, f"node 2: {node_2}"])
-            utils_giswater.set_item_data(self.dlg_event.position_id, node_list, 1, True, False)
         else:
-            self.dlg_event.position_id.setEnabled(False)
-            self.dlg_event.position_value.setEnabled(False)
+            node_1 = None
+            node_2 = None
+
+        node_list.append([node_1, f"node 1: {node_1}"])
+        node_list.append([node_2, f"node 2: {node_2}"])
+        utils_giswater.set_item_data(self.dlg_event.position_id, node_list, 1, True, False)
 
 
     def tab_feature_changed(self, dialog, table_object='visit', excluded_layers=[]):
