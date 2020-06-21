@@ -210,13 +210,13 @@ class ApiSearch(ApiParent):
                 message = f"Zoom unavailable. Doesn't exist the geometry for the street"
                 self.controller.show_info(message, parameter=item['display_name'])
                 
-        # Tab 'address' (postnumbers)
+        # Tab 'address'
         elif tab_selected == 'address' and 'sys_x' in item and 'sys_y' in item:
             x1 = item['sys_x']
             y1 = item['sys_y']
             point = QgsPointXY(float(x1), float(y1))
             self.draw_point(point, duration_time=5000)
-            self.zoom_to_rectangle(x1, y1, x1, y1)
+            self.zoom_to_rectangle(x1, y1, x1, y1, margin=100)
             self.canvas.refresh()
 
         # Tab 'hydro'
@@ -225,7 +225,7 @@ class ApiSearch(ApiParent):
             y1 = item['sys_y']
             point = QgsPointXY(float(x1), float(y1))
             self.draw_point(point)
-            self.zoom_to_rectangle(x1, y1, x1, y1)
+            self.zoom_to_rectangle(x1, y1, x1, y1, margin=100)
             self.open_hydrometer_dialog(table_name=item['sys_table_id'], feature_id=item['sys_id'])
 
         # Tab 'workcat'
@@ -256,7 +256,7 @@ class ApiSearch(ApiParent):
             self.resetRubberbands()
             self.draw_polygon(points, fill_color=QColor(255, 0, 255, 50))
             max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
-            self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
+            self.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin=50)
 
         # Tab 'visit'
         elif tab_selected == 'visit':
@@ -269,7 +269,7 @@ class ApiSearch(ApiParent):
             self.resetRubberbands()
             point = QgsPointXY(float(max_x), float(max_y))
             self.draw_point(point)
-            self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
+            self.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin=100)
             self.manage_visit.manage_visit(visit_id=item['sys_id'])
             self.manage_visit.dlg_add_visit.rejected.connect(self.resetRubberbands)
             return
