@@ -714,11 +714,9 @@ class ApiParent(ParentAction):
 
         # Set width and alias of visible columns
         columns_to_delete = []
-        sql = (f"SELECT columnindex, width, alias, status"
-               f" FROM config_form_tableview"
-               f" WHERE tablename = '{table_name}'"
-               f" ORDER BY columnindex")
-        rows = self.controller.get_rows(sql, log_info=False)
+        sql = (f"SELECT columnindex, width, alias, status FROM config_form_tableview"
+               f" WHERE tablename = '{table_name}' ORDER BY columnindex")
+        rows = self.controller.get_rows(sql, log_info=True)
         if not rows:
             return widget
 

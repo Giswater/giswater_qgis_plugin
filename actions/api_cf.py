@@ -320,6 +320,7 @@ class ApiCF(ApiParent, QObject):
                     sub_tag = 'arc'
                 else:
                     sub_tag = 'node'
+            feature_id = self.complet_result[0]['body']['feature']['id']
             result, dialog = self.open_custom_form(feature_id, self.complet_result, tab_type, sub_tag, is_docker)
             if feature_cat is not None:
                 self.manage_new_feature(self.complet_result, dialog)
@@ -444,7 +445,9 @@ class ApiCF(ApiParent, QObject):
         # Remove unused tabs
         tabs_to_show = []
 
-        self.fid = complet_result[0]['body']['feature']['id']
+        # Get field id name and feature id
+        self.field_id = str(complet_result[0]['body']['feature']['idName'])
+        self.feature_id = complet_result[0]['body']['feature']['id']
 
         if 'visibleTabs' in complet_result[0]['body']['form']:
             for tab in complet_result[0]['body']['form']['visibleTabs']:
@@ -526,10 +529,6 @@ class ApiCF(ApiParent, QObject):
             if result:
                 self.geom_type = result[0]
 
-        # Get field id name
-        self.field_id = str(complet_result[0]['body']['feature']['idName'])
-
-        self.feature_id = None
         result = complet_result[0]['body']['data']
         layout_list = []
         for field in complet_result[0]['body']['data']['fields']:
@@ -549,11 +548,6 @@ class ApiCF(ApiParent, QObject):
                     layout.addWidget(widget, 1, field['layoutorder'])
                 else:
                     self.put_widgets(self.dlg_cf, field, label, widget)
-
-        # Get current feature id
-        widget_field_id = self.dlg_cf.findChild(QLineEdit, f'{tab_type}_{self.field_id}')
-        if widget_field_id is not None:
-            self.feature_id = widget_field_id.text()
 
         # Add a QSpacerItem into each QGridLayout of the list
         for layout in layout_list:
@@ -619,7 +613,7 @@ class ApiCF(ApiParent, QObject):
 
             self.controller.dock_dialog(self.dlg_cf)
             self.controller.dlg_docker.dlg_closed.connect(partial(self.manage_docker_close))
-            self.controller.dlg_docker.setWindowTitle(f"{complet_result[0]['body']['feature']['childType']} - {self.fid}")
+            self.controller.dlg_docker.setWindowTitle(f"{complet_result[0]['body']['feature']['childType']} - {self.feature_id}")
             btn_accept.setVisible(False)
             btn_cancel.setVisible(False)
 
@@ -644,7 +638,7 @@ class ApiCF(ApiParent, QObject):
 
         # Open dialog
         self.open_dialog(self.dlg_cf, dlg_name='info_feature')
-        self.dlg_cf.setWindowTitle(f"{complet_result[0]['body']['feature']['childType']} - {self.fid}")
+        self.dlg_cf.setWindowTitle(f"{complet_result[0]['body']['feature']['childType']} - {self.feature_id}")
 
         return self.complet_result, self.dlg_cf
 
@@ -1034,7 +1028,7 @@ class ApiCF(ApiParent, QObject):
         # If we make an info
         else:
             my_json = json.dumps(_json)
-            feature = f'"id":"{self.fid}", '
+            feature = f'"id":"{self.feature_id}", '
         feature += f'"featureType":"{self.feature_type}", '
         feature += f'"tableName":"{p_table_id}"'
         extras = f'"fields":{my_json}, "reload":"{fields_reload}"'
@@ -1363,7 +1357,6 @@ class ApiCF(ApiParent, QObject):
             self.tab_plan_loaded = True
 
 
-    """ FUNCTIONS RELATED TAB ELEMENT"""
     def fill_tab_element(self):
         """ Fill tab 'Element' """
 
@@ -1374,10 +1367,10 @@ class ApiCF(ApiParent, QObject):
 
     def fill_tbl_element_man(self, dialog, widget, table_name, expr_filter):
         """ Fill the table control to show elements """
-        
+
         if not self.feature:
             self.get_feature(self.tab_type)
-            
+
         # Get widgets
         self.element_id = self.dlg_cf.findChild(QLineEdit, "element_id")
         btn_open_element = self.dlg_cf.findChild(QPushButton, "btn_open_element")
@@ -1502,7 +1495,7 @@ class ApiCF(ApiParent, QObject):
             self.controller.execute_sql(sql, log_sql=False)
             widget.model().select()
 
-
+    """ FUNCTIONS RELATED WITH TAB ELEMENT"""
     def manage_element(self, dialog, element_id=None, feature=None):
         """ Execute action of button 33 """
 
