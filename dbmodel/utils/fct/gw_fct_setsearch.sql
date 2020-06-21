@@ -159,7 +159,7 @@ BEGIN
 		IF v_featuretype is null OR v_featuretype = 'None' THEN v_featuretype = 'all'; end if;
 
 		-- get values from database config variable
-		v_value = (SELECT value FROM config_param_system WHERE parameter  = concat('basic_search_network_',v_featuretype));
+		v_value = (SELECT value FROM config_param_system WHERE value::json->>'search_type' = v_featuretype and parameter like '%basic_search_network%');
 			v_network_layername = v_value->>'sys_table_id';
 			v_network_idname = v_value->>'sys_id_field';
 			v_network_code = v_value->>'sys_search_field';
