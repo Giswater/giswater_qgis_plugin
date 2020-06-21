@@ -66,3 +66,7 @@ isenabled  = true, project_type = 'utils', datatype = 'json' where parameter lik
 UPDATE sys_table SET notify_action = (replace (notify_action::text, 'indexing_spatial_layer', 'set_layer_index'))::json WHERE notify_action::text like '%indexing_spatial_layer%';
 
 DELETE FROM config_param_system WHERE parameter = 'admin_role_permisions';
+
+INSERT INTO sys_table (id, descript, sys_role_id, sys_criticity, qgis_criticity)
+    VALUES ('sys_style', 'Table to store styles to be used on client passed by json response of bbdd', 'role_basic', 0, 0)
+    ON CONFLICT (id) DO NOTHING;
