@@ -56,14 +56,18 @@ ALTER TABLE plan_result_cat RENAME network_price_coeff  TO coefficient;
 DROP VIEW IF EXISTS v_ui_rpt_cat_result;
 ALTER TABLE rpt_cat_result DROP COLUMN id;
 
-INSERT INTO config_toolbox VALUES (2890,'Calculate cost of reconstruction',TRUE,'{"featureType":[]}',
+INSERT INTO config_toolbox VALUES (2890,'Reconstruction cost & amortization values',TRUE,'{"featureType":[]}',
 '[{"widgetname":"resultName", "label":"Result name:", "widgettype":"text","datatype":"string","layoutname":"grl_option_parameters","layoutorder":1, "placeholder":"result name" ,"value":""},
 {"widgetname":"step", "label":"Step:", "widgettype":"combo", "datatype":"text", "layoutname":"grl_option_parameters","layoutorder":2,"comboIds":["1","2"],
-"comboNames":["STEP-1: Create result prices", "STEP-2: Update result using acoeff & initcost)"], "selectedId":"1"}, 
+"comboNames":["STEP-1:RECONSTRUCTION COST", "STEP-2:AMORTIZATION VALUES"], "selectedId":"1"}, 
 {"widgetname":"coefficient", "label":"Coefficient:", "widgettype":"text","datatype":"float","layoutname":"grl_option_parameters","layoutorder":3, "placeholder":"1", "value":""},
 {"widgetname":"descript", "label":"Description:", "widgettype":"text","datatype":"string","layoutname":"grl_option_parameters","layoutorder":4, "placeholder":"description" ,"ismandatory":false, "value":""}]');
    
- 
+UPDATE sys_function SET descpript = 'Function to calculate reconstruction cost and amortization values. Process need to be executed in two steps. 
+First step calculates reconstruction cost based on prices tables, lengths and crossection values.
+With reconstruction cost calculated,it is mandatory before to execute second step to fill builtcost and acoeff columns on plan_rec_result_* tables for specific result. 
+After that, second step may be executed wich will calculate amortization values like aperiod, arate, amortized and pending amounts.', input_params='json', return_type = 'json' WHERE id = 2890;
+
 ALTER TABLE anl_polygon RENAME fprocesscat_id TO fid;
 
 -- rename tables
