@@ -21,13 +21,11 @@ INSERT INTO config_form_tabs VALUES ('search', 'tab_add_network', 'Add Network',
 
 UPDATE config_param_system SET value = replace (value, 'feature_type', 'search_type') where parameter like '%basic_search_network%';
 
-INSERT INTO config_form_tabs VALUES ('search', 'tab_add_network', 'Add Network', 'Additional Network', 'role_basic', null, null, 4);
-
 
 -- reorder config_form_tabs
 DELETE FROM config_form_tabs where formname in ('exploitation' , 'hydrometer');
-UPDATE config_form_tabs SET formname = 'selector_basic'  WHERE formname = 'selector'
-UPDATE config_form_tabs SET formname = 'selector_mincut'  WHERE formname = 'mincut'
+UPDATE config_form_tabs SET formname = 'selector_basic'  WHERE formname = 'selector';
+UPDATE config_form_tabs SET formname = 'selector_mincut'  WHERE formname = 'mincut';
 
 UPDATE config_form_tabs SET label = 'Expl' WHERE tabname = 'tab_exploitation';
 UPDATE config_form_tabs SET label = 'State' WHERE tabname = 'tab_network_state';
@@ -41,7 +39,7 @@ UPDATE config_param_system set parameter = 'basic_selector_tab_exploitation' whe
 UPDATE config_param_system set parameter = 'basic_selector_tab_mincut' where parameter = 'basic_selector_mincut';
 
 UPDATE config_param_system set value =
-'{"table":"exploitation", "selector":"selector_expl", "table_id":"expl_id",  "selector_id":"expl_id",  "label":"expl_id, ' - ', name, '', CASE WHEN descript IS NULL THEN '' ELSE concat(' - ', descript) END", 
+'{"table":"exploitation", "selector":"selector_expl", "table_id":"expl_id",  "selector_id":"expl_id",  "label":"expl_id, '' - '', name, '', CASE WHEN descript IS NULL THEN '' ELSE concat('' - '', descript) END", 
 "manageAll":true, "selectionMode":"keepPreviousUsingShift" ,  "query_filter":"AND expl_id > 0", "typeaheadFilter":{"queryText":"SELECT expl_id as id, name AS idval FROM v_edit_exploitation WHERE expl_id > 0"}}'
 WHERE parameter = 'basic_selector_tab_exploitation';
 
@@ -67,6 +65,6 @@ UPDATE sys_table SET notify_action = (replace (notify_action::text, 'indexing_sp
 
 DELETE FROM config_param_system WHERE parameter = 'admin_role_permisions';
 
-INSERT INTO sys_table (id, descript, sys_role_id, sys_criticity, qgis_criticity)
+INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_criticity)
     VALUES ('sys_style', 'Table to store styles to be used on client passed by json response of bbdd', 'role_basic', 0, 0)
     ON CONFLICT (id) DO NOTHING;

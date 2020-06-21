@@ -121,7 +121,7 @@ BEGIN
 	EXECUTE v_query_text;
 
 	-- Grant specificic permissions for tables
-	FOR v_tablerecord IN SELECT * FROM aSCHEMA_NAMEit_cat_table WHERE sys_role_id IS NOT NULL AND isdeprecated != TRUE AND id IN 
+	FOR v_tablerecord IN SELECT * FROM sys_table WHERE sys_role IS NOT NULL AND id IN 
 	(SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname = 'SCHEMA_NAME' 
 	UNION
 	SELECT viewname FROM pg_catalog.pg_views WHERE schemaname != 'pg_catalog' AND schemaname = 'SCHEMA_NAME')
