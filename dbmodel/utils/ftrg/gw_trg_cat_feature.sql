@@ -32,7 +32,6 @@ DECLARE
 
 BEGIN	
 
-	
 	-- search path
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
@@ -76,8 +75,13 @@ BEGIN
 			lower(NEW.feature_type),'type_id WHERE cat_feature.id = ',quote_literal(NEW.id));
 			
 		ELSIF  v_projecttype = 'UD' THEN
-			v_partialquerytext =  concat('LEFT JOIN cat_feature ON cat_feature.id = ',
-			lower(NEW.feature_type),'_type WHERE cat_feature.id = ',quote_literal(NEW.id),' OR ',lower(NEW.feature_type),'_type.id IS NULL');
+			v_partialquerytext =  concat('LEFT JOIN cat_feature ON cat_feature.id = cat_',lower(NEW.feature_type),'.',lower(NEW.feature_type),'_type ',
+			' WHERE cat_feature.id = ',quote_literal(NEW.id));
+
+			-- special case for gully
+			IF lower(NEW.feature_type) = 'gully' THEN
+				v_partialquerytext = concat('LEFT JOIN cat_feature ON cat_feature.id = cat_grate.gully_type WHERE cat_feature.id = ', quote_literal(NEW.id));
+			END IF;
 		END IF;
 				
 		v_table = concat ('cat_',lower(NEW.feature_type));
