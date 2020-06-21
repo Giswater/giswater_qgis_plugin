@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-SET search_path = ws_sample, public, pg_catalog;
+SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2020/06/21
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_function", "column":"layermanager", "dataType":"json"}}$$);

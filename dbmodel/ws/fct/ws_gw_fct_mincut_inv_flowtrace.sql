@@ -59,7 +59,6 @@ BEGIN
 		SELECT v_edit_node.node_id, v_edit_node.the_geom FROM config_mincut_inlet
 		JOIN v_edit_node ON v_edit_node.node_id=config_mincut_inlet.node_id
 		JOIN value_state_type ON state_type=value_state_type.id 
-		JOIN node_type ON node_type.id=nodetype_id
 		JOIN exploitation ON exploitation.expl_id=config_mincut_inlet.expl_id
 		WHERE (is_operative IS TRUE) AND (exploitation.macroexpl_id=v_macroexpl) 
 		AND v_edit_node.the_geom IS NOT NULL AND v_edit_node.node_id NOT IN (select node_id FROM om_mincut_node WHERE result_id=result_id_arg)
