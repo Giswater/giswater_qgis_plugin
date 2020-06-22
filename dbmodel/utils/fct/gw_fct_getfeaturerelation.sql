@@ -101,7 +101,10 @@ BEGIN
 		END IF;
 		
 		--check final nodes related to arc
-		SELECT concat(node_1,',',node_2) INTO v_connect_node FROM v_ui_arc_x_node WHERE arc_id = v_feature_id;
+		SELECT concat(node_1,',',node_2) INTO v_connect_node FROM v_arc 
+		LEFT JOIN node a ON a.node_id::text = v_arc.node_1::text
+     	LEFT JOIN node b ON b.node_id::text = v_arc.node_2::text 
+     	WHERE v_arc.arc_id = v_feature_id;
 		
 		IF v_connect_node IS NOT NULL THEN
 				INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (151, v_result_id, concat('Nodes connected with the feature: ',v_connect_node ));
@@ -117,9 +120,13 @@ BEGIN
 				INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (151, v_result_id, concat('Nodes connected with the feature: ',v_connect_node ));
 			END IF;
 		END IF;
+
 		--check arcs related to node
-		SELECT string_agg(arc_id,',') INTO v_connect_arc FROM v_ui_arc_x_node WHERE (node_1 = v_feature_id OR node_2 = v_feature_id);
-		
+		SELECT string_agg(v_arc.arc_id,',')  INTO v_connect_arc FROM v_arc 
+		LEFT JOIN node a ON a.node_id::text = v_arc.node_1::text
+     	LEFT JOIN node b ON b.node_id::text = v_arc.node_2::text 
+     	WHERE  (node_1 = v_feature_id OR node_2 = v_feature_id);
+
 		IF v_connect_arc IS NOT NULL THEN
 			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (151, v_result_id, concat('Arcs connected with the feature: ',v_connect_arc ));
 		END IF;
