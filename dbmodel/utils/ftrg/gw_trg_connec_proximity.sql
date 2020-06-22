@@ -35,7 +35,7 @@ BEGIN
     -- If there is an existing connec closer than 'rec.connec_tolerance' meters --> error
     IF (v_numConnecs > 0) AND (v_connec_proximity_control IS TRUE) THEN
 
-       EXECUTE 'EXECUTE gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+       EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
         "data":{"message":"1044", "function":"1106","debug_msg":"'||NEW.connec_id||'"}}$$);';
 
     END IF;
