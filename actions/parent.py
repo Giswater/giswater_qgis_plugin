@@ -45,6 +45,7 @@ class ParentAction(object):
         self.user_current_layer = None
         self.rubber_point = None
         self.rubber_polygon = None
+        self.current_tab = None
 
 
     def init_rubber(self):
@@ -183,16 +184,8 @@ class ParentAction(object):
         :param selector_name: Name of the selector (String)
         :return: Name of the last tab used by the user (string)
         """
-        tab_name = self.controller.plugin_settings_value(f"{ dialog.objectName()}_{selector_name}")
-        return tab_name
-
-    def get_current_tab(self, dialog, selector_name):
-        """ Get the name of the current tab used by the user from QSettings()
-        :param dialog: QDialog
-        :param selector_name: Name of the selector (String)
-        :return: Name of the last tab used by the user (string)
-        """
-        tab_name = self.controller.plugin_settings_value(f"{ dialog.objectName()}_{selector_name}")
+        tab_name = self.controller.plugin_settings_value(f"{dialog.objectName()}_{selector_name}")
+        print(f"get-> {tab_name}-->{selector_name}")
         return tab_name
 
 
@@ -218,7 +211,7 @@ class ParentAction(object):
         if dlg is None or type(dlg) is bool:
             dlg = self.dlg
 
-        # set window title
+        # Set window title
         if title is not None:
             dlg.setWindowTitle(title)
         else:

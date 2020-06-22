@@ -1776,19 +1776,20 @@ class ApiParent(ParentAction):
                 self.put_widgets(dialog, field, label, widget)
                 widget.setFocus()
 
-            if (form_tab['manageAll']).lower() == 'true':
-                label = QLabel()
-                label.setObjectName('lbl_manage_all')
-                label.setText('Check all')
-                widget = QCheckBox()
-                widget.setObjectName('chk_all_' + str(form_tab['selectorType']))
-                widget.stateChanged.connect(partial(self.manage_all, dialog, widget))
-                widget.setLayoutDirection(Qt.RightToLeft)
-                field['layoutname'] = gridlayout.objectName()
-                field['layoutorder'] = i
-                i = i + 1
-                self.chk_all = widget
-                self.put_widgets(dialog, field, label, widget)
+            if 'manageAll' in form_tab:
+                if (form_tab['manageAll']).lower() == 'true':
+                    label = QLabel()
+                    label.setObjectName('lbl_manage_all')
+                    label.setText('Check all')
+                    widget = QCheckBox()
+                    widget.setObjectName('chk_all_' + str(form_tab['selectorType']))
+                    widget.stateChanged.connect(partial(self.manage_all, dialog, widget))
+                    widget.setLayoutDirection(Qt.RightToLeft)
+                    field['layoutname'] = gridlayout.objectName()
+                    field['layoutorder'] = i
+                    i = i + 1
+                    self.chk_all = widget
+                    self.put_widgets(dialog, field, label, widget)
 
             for order, field in enumerate(form_tab['fields']):
                 label = QLabel()
