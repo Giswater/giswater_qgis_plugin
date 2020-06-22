@@ -82,7 +82,7 @@ class ApiSearch(ApiParent):
             return False
 
         main_tab = self.dlg_search.findChild(QTabWidget, 'main_tab')
-        if dlg_mincut:
+        if dlg_mincut and len(complet_list["form"]) == 1:
             main_tab = self.dlg_search.findChild(QTabWidget, 'main_tab')
             main_tab.setStyleSheet("background-color: #f0f0f0;")
             main_tab.setStyleSheet("QTabBar::tab { background-color: transparent; text-align:left;"
