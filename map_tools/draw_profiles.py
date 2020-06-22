@@ -123,8 +123,13 @@ class DrawProfiles(ParentMapTool):
 
     def deactivate(self):
 
-        self.controller.close_docker()
-        ParentMapTool.deactivate(self)
+        try:
+            self.canvas.xyCoordinates.disconnect()
+            self.emit_point.canvasClicked.disconnect()
+        except Exception as e:
+            pass
+        finally:
+            ParentMapTool.deactivate(self)
 
 
     def get_profile(self):
