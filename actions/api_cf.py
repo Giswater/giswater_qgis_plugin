@@ -2819,13 +2819,6 @@ class ApiCF(ApiParent, QObject):
         utils_giswater.setImage(dialog, widget, "ws_shape.png")
 
 
-    def check_column_exist(self, table_name, column_name):
-
-        sql = (f"SELECT DISTINCT column_name FROM information_schema.columns"
-               f" WHERE table_name = '{table_name}' AND column_name = '{column_name}'")
-        row = self.controller.get_row(sql, log_sql=False)
-        return row
-
 
     """ FUNCTIONS ASSOCIATED TO BUTTONS FROM POSTGRES"""
 

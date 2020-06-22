@@ -481,14 +481,6 @@
 			<translation>Parameters related with 'searchplus' not set in table 'config_param_system'</translation>
 		</message>
 		<message>
-			<source>Error getting pgRouting version</source>
-			<translation>Error getting pgRouting version</translation>
-		</message>
-		<message>
-			<source>You need to upgrade your version of pgRouting</source>
-			<translation>You need to upgrade your version of pgRouting</translation>
-		</message>
-		<message>
 			<source>Some data is missing</source>
 			<translation>Some data is missing</translation>
 		</message>

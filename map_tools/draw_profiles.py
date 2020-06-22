@@ -70,16 +70,6 @@ class DrawProfiles(ParentMapTool):
         # Remove all selections on canvas
         self.remove_selection()
 
-        # Get version of pgRouting
-        sql = "SELECT version FROM pgr_version()"
-        row = self.controller.get_row(sql)
-        if not row:
-            message = "Error getting pgRouting version"
-            self.controller.show_warning(message)
-            return
-
-        self.version = str(row[0][:1])
-
         # Set dialog
         self.dlg_draw_profile = Profile()
         self.load_settings(self.dlg_draw_profile)
