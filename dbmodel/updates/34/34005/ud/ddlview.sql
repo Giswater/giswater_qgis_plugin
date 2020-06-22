@@ -2137,9 +2137,6 @@ CREATE OR REPLACE VIEW v_plan_current_psector AS
 			WHEN c.suma IS NULL THEN 0::numeric
 			ELSE c.suma
 		END)::numeric(14,2) AS pca,
-	d.suma AS affec_length,
-	e.suma AS plan_length,
-	f.suma AS current_length,
 	plan_psector.the_geom
    FROM plan_psector
 	 JOIN plan_psector_selector ON plan_psector.psector_id = plan_psector_selector.psector_id
@@ -2155,26 +2152,6 @@ CREATE OR REPLACE VIEW v_plan_current_psector AS
 			v_plan_psector_x_other.psector_id
 		   FROM v_plan_psector_x_other
 		  GROUP BY v_plan_psector_x_other.psector_id) c ON c.psector_id = plan_psector.psector_id
-	 LEFT JOIN ( SELECT sum(st_length2d(arc.the_geom)::numeric(12,2)) AS suma,
-			pa.psector_id
-		   FROM arc
-			 JOIN plan_psector_x_arc pa USING (arc_id)
-		  WHERE pa.state = 0 AND pa.doable = false AND ((pa.addparam ->> 'arcDivide'::text) <> 'parent'::text OR (pa.addparam ->> 'arcDivide'::text) IS NULL) OR arc.state_type = ((( SELECT config_param_system.value
-				   FROM config_param_system
-				  WHERE config_param_system.parameter::text = 'plan_statetype_reconstruct'::text))::smallint)
-		  GROUP BY pa.psector_id) d ON d.psector_id = plan_psector.psector_id
-	 LEFT JOIN ( SELECT sum(st_length2d(arc.the_geom)::numeric(12,2)) AS suma,
-			pa.psector_id
-		   FROM arc
-			 JOIN plan_psector_x_arc pa USING (arc_id)
-		  WHERE pa.state = 1 AND pa.doable = true
-		  GROUP BY pa.psector_id) e ON e.psector_id = plan_psector.psector_id
-	 LEFT JOIN ( SELECT sum(st_length2d(arc.the_geom)::numeric(12,2)) AS suma,
-			pa.psector_id
-		   FROM arc
-			 JOIN plan_psector_x_arc pa USING (arc_id)
-		  WHERE pa.state = 1 AND pa.doable = false
-		  GROUP BY pa.psector_id) f ON f.psector_id = plan_psector.psector_id
   WHERE plan_psector_selector.cur_user = "current_user"()::text;
 
 
