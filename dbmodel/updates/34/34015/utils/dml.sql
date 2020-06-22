@@ -39,7 +39,7 @@ UPDATE config_param_system set parameter = 'basic_selector_tab_exploitation' whe
 UPDATE config_param_system set parameter = 'basic_selector_tab_mincut' where parameter = 'basic_selector_mincut';
 
 UPDATE config_param_system set value =
-'{"table":"exploitation", "selector":"selector_expl", "table_id":"expl_id",  "selector_id":"expl_id",  "label":"expl_id, ' - ', name", 
+'{"table":"exploitation", "selector":"selector_expl", "table_id":"expl_id",  "selector_id":"expl_id",  "label":"expl_id, '' - '', name", 
 "manageAll":true, "selectionMode":"keepPreviousUsingShift" ,  "query_filter":"AND expl_id > 0", "typeaheadFilter":{"queryText":"SELECT expl_id as id, name AS idval FROM v_edit_exploitation WHERE expl_id > 0"}}'
 WHERE parameter = 'basic_selector_tab_exploitation';
 
