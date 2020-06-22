@@ -68,3 +68,5 @@ DELETE FROM config_param_system WHERE parameter = 'admin_role_permisions';
 INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_criticity)
     VALUES ('sys_style', 'Table to store styles to be used on client passed by json response of bbdd', 'role_basic', 0, 0)
     ON CONFLICT (id) DO NOTHING;
+
+UPDATE config_form_tabs SET formname = 'selector_basic' where formname  = 'filters';
