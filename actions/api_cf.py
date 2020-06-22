@@ -603,6 +603,7 @@ class ApiCF(ApiParent, QObject):
 
         btn_cancel = self.dlg_cf.findChild(QPushButton, 'btn_cancel')
         btn_accept = self.dlg_cf.findChild(QPushButton, 'btn_accept')
+        title = f"{complet_result[0]['body']['feature']['childType']} - {self.feature_id}"
 
         if self.controller.dlg_docker and is_docker:
             # Delete last form from memory
@@ -613,8 +614,9 @@ class ApiCF(ApiParent, QObject):
 
             self.controller.dock_dialog(self.dlg_cf)
             self.controller.dlg_docker.dlg_closed.connect(partial(self.manage_docker_close))
-            self.controller.dlg_docker.setWindowTitle(f"{complet_result[0]['body']['feature']['childType']} - {self.feature_id}")
-            btn_accept.setVisible(False)
+            self.controller.dlg_docker.setWindowTitle(title)
+            btn_accept.clicked.connect(partial(
+                self.accept, self.dlg_cf, self.complet_result[0], self.my_json))
             btn_cancel.setVisible(False)
 
         else:
@@ -638,7 +640,7 @@ class ApiCF(ApiParent, QObject):
 
         # Open dialog
         self.open_dialog(self.dlg_cf, dlg_name='info_feature')
-        self.dlg_cf.setWindowTitle(f"{complet_result[0]['body']['feature']['childType']} - {self.feature_id}")
+        self.dlg_cf.setWindowTitle(title)
 
         return self.complet_result, self.dlg_cf
 
@@ -980,6 +982,7 @@ class ApiCF(ApiParent, QObject):
         if _json == '' or str(_json) == '{}':
             if self.controller.dlg_docker:
                 self.controller.dlg_docker.setMinimumWidth(dialog.width())
+                self.controller.close_docker()
             self.close_dialog(dialog)
             return
 
@@ -1020,6 +1023,7 @@ class ApiCF(ApiParent, QObject):
             if my_json == '' or str(my_json) == '{}':
                 if self.controller.dlg_docker:
                     self.controller.dlg_docker.setMinimumWidth(dialog.width())
+                    self.controller.close_docker()
                 self.close_dialog(dialog)
                 return
 
@@ -1029,6 +1033,7 @@ class ApiCF(ApiParent, QObject):
         else:
             my_json = json.dumps(_json)
             feature = f'"id":"{self.feature_id}", '
+
         feature += f'"featureType":"{self.feature_type}", '
         feature += f'"tableName":"{p_table_id}"'
         extras = f'"fields":{my_json}, "reload":"{fields_reload}"'
@@ -1051,6 +1056,7 @@ class ApiCF(ApiParent, QObject):
         if close_dialog:
             if self.controller.dlg_docker:
                 self.controller.dlg_docker.setMinimumWidth(dialog.width())
+                self.controller.close_docker()
             self.close_dialog(dialog)
 
 
@@ -1062,45 +1068,51 @@ class ApiCF(ApiParent, QObject):
 
     def disable_all(self, dialog, result, enable):
 
-        widget_list = dialog.findChildren(QWidget)
-        for widget in widget_list:
-            for field in result['fields']:
-                if widget.objectName() == field['widgetname']:
-                    if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit):
-                        widget.setReadOnly(not enable)
-                        widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
-                    elif type(widget) in (QComboBox, QCheckBox, QgsDateTimeEdit):
-                        widget.setEnabled(enable)
-                    elif type(widget) is QPushButton:
-                        # Manage the clickability of the buttons according to the configuration
-                        # in the table config_api_form_fields simultaneously with the edition,
-                        # but giving preference to the configuration when iseditable is True
-                        if not field['iseditable']:
-                            widget.setEnabled(field['iseditable'])
-
-        self.new_feature_id = None
+        try:
+            widget_list = dialog.findChildren(QWidget)
+            for widget in widget_list:
+                for field in result['fields']:
+                    if widget.objectName() == field['widgetname']:
+                        if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit):
+                            widget.setReadOnly(not enable)
+                            widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
+                        elif type(widget) in (QComboBox, QCheckBox, QgsDateTimeEdit):
+                            widget.setEnabled(enable)
+                        elif type(widget) is QPushButton:
+                            # Manage the clickability of the buttons according to the configuration
+                            # in the table config_api_form_fields simultaneously with the edition,
+                            # but giving preference to the configuration when iseditable is True
+                            if not field['iseditable']:
+                                widget.setEnabled(field['iseditable'])
+        except RuntimeError:
+            pass
+        finally:
+            self.new_feature_id = None
 
 
     def enable_all(self, dialog, result):
 
-        widget_list = dialog.findChildren(QWidget)
-        for widget in widget_list:
-            if widget.property('keepDisbled'):
-                continue
-            for field in result['fields']:
-                if widget.objectName() == field['widgetname']:
-                    if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit):
-                        widget.setReadOnly(not field['iseditable'])
-                        if not field['iseditable']:
-                            widget.setFocusPolicy(Qt.NoFocus)
-                            widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
-                        else:
-                            widget.setFocusPolicy(Qt.StrongFocus)
-                            widget.setStyleSheet(None)
-                    elif type(widget) in(QComboBox, QCheckBox, QPushButton, QgsDateTimeEdit):
-                        widget.setEnabled(field['iseditable'])
-                        widget.focusPolicy(Qt.StrongFocus) if widget.setEnabled(
-                            field['iseditable']) else widget.setFocusPolicy(Qt.NoFocus)
+        try:
+            widget_list = dialog.findChildren(QWidget)
+            for widget in widget_list:
+                if widget.property('keepDisbled'):
+                    continue
+                for field in result['fields']:
+                    if widget.objectName() == field['widgetname']:
+                        if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit):
+                            widget.setReadOnly(not field['iseditable'])
+                            if not field['iseditable']:
+                                widget.setFocusPolicy(Qt.NoFocus)
+                                widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
+                            else:
+                                widget.setFocusPolicy(Qt.StrongFocus)
+                                widget.setStyleSheet(None)
+                        elif type(widget) in(QComboBox, QCheckBox, QPushButton, QgsDateTimeEdit):
+                            widget.setEnabled(field['iseditable'])
+                            widget.focusPolicy(Qt.StrongFocus) if widget.setEnabled(
+                                field['iseditable']) else widget.setFocusPolicy(Qt.NoFocus)
+        except RuntimeError:
+            pass
 
 
     def enable_actions(self, enabled):
