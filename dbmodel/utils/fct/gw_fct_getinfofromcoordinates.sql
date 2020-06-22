@@ -206,7 +206,7 @@ BEGIN
 	IF v_addschema IS NOT NULL AND v_addschema != v_schemaname AND v_flag IS FALSE THEN
 		
 		EXECUTE 'SET search_path = '||v_addschema||', public';
-		SELECT gw_api_getinfofromcoordinates(p_data) INTO v_return;
+		SELECT gw_fct_getinfofromcoordinates(p_data) INTO v_return;
 		SET search_path = 'SCHEMA_NAME', public;
 		RAISE NOTICE 'returned';
 		RETURN v_return;

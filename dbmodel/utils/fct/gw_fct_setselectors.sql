@@ -39,11 +39,13 @@ v_addschema text;
 v_error_context text;
 v_selectortype text;
 v_layermanager json;
+v_schemaname text;
 
 BEGIN
 
 	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
+	v_schemaname = 'SCHEMA_NAME';
 	
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
@@ -61,6 +63,13 @@ BEGIN
 	-- control nulls of addschema
 	IF v_addschema = 'None' OR v_addschema = '' THEN
 		v_addschema = NULL;
+	END IF;
+
+	-- looking for additional schema 
+	IF v_addschema IS NOT NULL AND v_addschema != v_schemaname THEN
+		EXECUTE 'SET search_path = '||v_addschema||', public';
+		PERFORM gw_fct_setselectors(p_data);
+		SET search_path = 'SCHEMA_NAME', public;
 	END IF;
 
 	-- Get system parameters

@@ -12,12 +12,9 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getselectors(p_data json)
   RETURNS json AS
 $BODY$
 
-
-
 /*example
 
 SELECT gw_fct_getselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"currentTab":"tab_exploitation"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic" ,"filterText":""}}$$);
-
 SELECT gw_fct_getselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"currentTab":"tab_exploitation"}, "feature":{}, "data":{"filterText":"", "selectorType":"selector_basic"}}$$);
 
 */
@@ -54,12 +51,11 @@ v_filterfromids text;
 v_fullfilter text;
 v_finalquery text;
 
-
 BEGIN
 
 	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
-/
+
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
 		INTO v_version;
@@ -73,7 +69,7 @@ BEGIN
 	
 	-- Start the construction of the tabs array
 	v_formTabs := '[';
-		
+
 	FOR v_tab IN SELECT config_form_tabs.*, value FROM config_form_tabs, config_param_system WHERE formname=v_selector_type AND concat('basic_selector_', tabname) = parameter 
 	LOOP		
 
@@ -113,8 +109,6 @@ BEGIN
 
 		-- built full filter 
 		v_fullfilter = concat(v_filterfromids, v_filterfromconfig, v_filterfrominput);
-
-		raise notice ' % % %', v_filterfromids, v_filterfromconfig, v_filterfrominput;
 				
 		-- profilactic null control
 		v_fullfilter := COALESCE(v_fullfilter, '');
@@ -125,8 +119,6 @@ BEGIN
 			SELECT concat(' || v_label || ') AS label, ' || v_table_id || '::text as widgetname, ''' || v_selector_id || ''' as columnname, ''check'' as type, ''boolean'' as "dataType", false as "value" 
 			FROM '|| v_table ||' WHERE ' || v_table_id || ' NOT IN (SELECT ' || v_selector_id || ' FROM '|| v_selector ||' WHERE cur_user=' || quote_literal(current_user) || ') '||
 			 v_fullfilter ||' ORDER BY label) a';
-
-		RAISE NOTICE '-----++++++--------  % ', v_finalquery; 
 
 		EXECUTE  v_finalquery INTO v_formTabsAux;
 		
