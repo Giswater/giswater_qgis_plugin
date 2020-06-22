@@ -17,7 +17,6 @@ from .. import utils_giswater
 from .manage_new_psector import ManageNewPsector
 from ..ui_manager import PsectorManagerUi
 from ..ui_manager import PriceManagerUi
-from ..ui_manager import Multirow_selector
 from .parent import ParentAction
 from .duplicate_psector import DuplicatePsector
 
@@ -215,29 +214,6 @@ class Master(ParentAction):
                    f" AND value = '{row[0]}'")
             self.controller.execute_sql(sql)
             utils_giswater.setWidgetText(dialog, label, '')
-
-
-    def master_psector_selector(self):
-        """ Button 47: Psector selector """
-
-        # Create the dialog and signals
-        self.dlg_psector_selector = Multirow_selector('psector')
-        self.load_settings(self.dlg_psector_selector)
-        self.dlg_psector_selector.btn_ok.clicked.connect(partial(self.close_dialog, self.dlg_psector_selector))
-        self.dlg_psector_selector.setWindowTitle("Psector selector")
-        utils_giswater.setWidgetText(self.dlg_psector_selector, self.dlg_psector_selector.lbl_filter, 
-            self.controller.tr('Filter by: Psector name', context_name='labels'))
-        utils_giswater.setWidgetText(self.dlg_psector_selector, self.dlg_psector_selector.lbl_unselected, 
-            self.controller.tr('Unselected psectors', context_name='labels'))
-        utils_giswater.setWidgetText(self.dlg_psector_selector, self.dlg_psector_selector.lbl_selected, 
-            self.controller.tr('Selected psectors', context_name='labels'))
-
-        tableleft = "plan_psector"
-        tableright = "selector_psector"
-        field_id_left = "psector_id"
-        field_id_right = "psector_id"
-        self.multi_row_selector(self.dlg_psector_selector, tableleft, tableright, field_id_left, field_id_right)
-        self.open_dialog(self.dlg_psector_selector, dlg_name="multirow_selector", maximize_button=False)
 
 
     def master_estimate_result_manager(self):
