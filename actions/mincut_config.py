@@ -236,7 +236,7 @@ class MincutConfig(ParentAction):
             i = int(model.fieldIndex(field_id))
             value = model.data(model.index(x, i))
             selected_mincuts.append(value)
-        selector_values = f'{{"selectorType":"selector_mincut", "ids":{selected_mincuts}, "filter":""}}}}'
+        selector_values = f'"selector_mincut", "ids":{selected_mincuts}'
         self.dlg_selector = SelectorUi()
         self.load_settings(self.dlg_selector)
         self.current_tab = self.get_last_tab(self.dlg_selector, 'mincut')
