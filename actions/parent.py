@@ -185,7 +185,6 @@ class ParentAction(object):
         :return: Name of the last tab used by the user (string)
         """
         tab_name = self.controller.plugin_settings_value(f"{dialog.objectName()}_{selector_name}")
-        print(f"get-> {tab_name}-->{selector_name}")
         return tab_name
 
 
