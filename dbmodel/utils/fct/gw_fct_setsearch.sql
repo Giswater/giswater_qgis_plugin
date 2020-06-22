@@ -143,7 +143,7 @@ BEGIN
 	v_addschema := (p_data->>'data')::json->>'addSchema';
 
 	-- looking for additional schema 
-	IF v_addschema IS NOT NULL AND v_addschema != v_schemaname AND v_flag IS FALSE AND v_tab = 'add_network' THEN
+	IF v_addschema IS NOT NULL AND v_addschema != v_schemaname AND v_tab = 'add_network' THEN
 	
 		EXECUTE 'SET search_path = '||v_addschema||', public';
 		SELECT gw_fct_getinfofromid(p_data) INTO v_return;
@@ -151,9 +151,11 @@ BEGIN
 		RETURN v_return;
 	END IF;
 
+	RAISE NOTICE 'getsearch on SCHEMA_NAME';
+
 	-- Network tab
 	--------------
-	IF v_tab = 'network'  THEN
+	IF v_tab = 'network' OR v_tab = 'add_network' THEN
 
 		-- profilactic control of nulls
 		IF v_featuretype is null OR v_featuretype = 'None' THEN v_featuretype = 'all'; end if;
