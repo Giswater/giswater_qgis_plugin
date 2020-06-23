@@ -1521,8 +1521,10 @@ class Giswater(QObject):
         if row:
             self.iface.mapCanvas().refreshAllLayers()
             self.layer_muni.triggerRepaint()
-            self.iface.actionPan().trigger()
-            self.iface.actionZoomIn().trigger()
+
+            # For trigger Giswater info
+            action_info = self.iface.mainWindow().findChild(QAction, 'map_tool_api_info_data')
+            action_info.trigger()
 
 
     def get_cursor_multiple_selection(self):
