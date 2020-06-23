@@ -467,7 +467,6 @@ class ManageWorkcatEnd(ParentManage):
                            f"WHERE {row[0]}_id = '{row[1]}';")
                     self.controller.execute_sql(sql)
 
-                self.set_edit_arc_downgrade_force('False')
                 ids_ = ids_[:-2]
                 if show_warning and len(ids_) != 0:
                     msg = 'These items could not be downgrade to state 0'
@@ -475,7 +474,7 @@ class ManageWorkcatEnd(ParentManage):
                 sql = ("DELETE FROM audit_log_data "
                        "WHERE fid = 128 AND cur_user = current_user")
                 self.controller.execute_sql(sql)
-
+        self.set_edit_arc_downgrade_force('False')
         self.canvas.refresh()
 
 
