@@ -6,9 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 """ Module with utility functions to interact with dialog and its widgets """
-
 from qgis.gui import QgsDateTimeEdit
-
 from qgis.PyQt.QtCore import QDate, QDateTime, QSortFilterProxyModel, QStringListModel, QTime, Qt, QRegExp
 from qgis.PyQt.QtGui import QPixmap, QDoubleValidator, QRegExpValidator
 from qgis.PyQt.QtWidgets import QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit

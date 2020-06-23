@@ -5,16 +5,16 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-
 from qgis.core import QgsPointXY, QgsRectangle
 from qgis.gui import QgsMapTool, QgsRubberBand
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QApplication
 from qgis.PyQt.QtGui import QColor
+
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 
-class MultipleSelection(QgsMapTool):
 
+class MultipleSelection(QgsMapTool):
 
     def __init__(self, iface, controller, layers, 
                  mincut=None, parent_manage=None, manage_new_psector=None, table_object=None, dialog=None):

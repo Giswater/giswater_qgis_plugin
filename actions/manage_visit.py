@@ -7,8 +7,9 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import Qt, QDate, QObject, QStringListModel, pyqtSignal
 from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
-from qgis.PyQt.QtWidgets import QAbstractItemView, QDialogButtonBox, QCompleter, QLineEdit, QFileDialog, QTableView
-from qgis.PyQt.QtWidgets import QTextEdit, QPushButton, QComboBox, QTabWidget
+from qgis.PyQt.QtWidgets import QAbstractItemView, QDialogButtonBox, QCompleter, QLineEdit, QFileDialog, QTableView, \
+    QTextEdit, QPushButton, QComboBox, QTabWidget
+
 import os
 import sys
 import subprocess

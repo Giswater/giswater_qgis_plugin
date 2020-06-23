@@ -12,7 +12,7 @@ import shutil
 import sqlite3
 
 
-class CreateGisProject():
+class CreateGisProject:
 
     def __init__(self, controller, plugin_dir):
 

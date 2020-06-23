@@ -1,3 +1,9 @@
+"""
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
+"""
 # -*- coding: utf-8 -*-
 from qgis.PyQt import uic, QtCore
 from qgis.PyQt.QtGui import QIcon
@@ -5,7 +11,6 @@ from qgis.PyQt.QtWidgets import QAction, QMainWindow, QDialog, QDockWidget, QWha
 import configparser
 import os
 import webbrowser
-from functools import partial
 
 
 class GwDockWidget(QDockWidget):

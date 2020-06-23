@@ -5,7 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-
 from qgis.core import QgsExpression
 from qgis.PyQt.QtCore import QStringListModel, Qt,QDate
 from qgis.PyQt.QtGui import QCursor, QIcon, QPixmap

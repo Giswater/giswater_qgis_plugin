@@ -5,20 +5,16 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import Qgis, QgsApplication
+from qgis.core import QgsApplication
 from qgis.PyQt.QtCore import QDate, QStringListModel, QTime,  Qt, QRegExp
 from qgis.PyQt.QtWidgets import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QComboBox, QCompleter, \
-    QFileDialog, QMessageBox
+    QFileDialog
 from qgis.PyQt.QtGui import QRegExpValidator
 
 import csv
-import json
 import os
-import re
-import subprocess
 import sys
 
-from collections import OrderedDict
 from functools import partial
 
 from .. import utils_giswater

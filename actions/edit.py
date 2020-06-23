@@ -6,9 +6,6 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import QSettings
-from qgis.PyQt.QtWidgets import QDockWidget
-
-from functools import partial
 
 from .api_cf import ApiCF
 from .manage_element import ManageElement

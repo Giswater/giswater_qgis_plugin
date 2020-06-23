@@ -13,13 +13,11 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QComboBox, QCompleter, QFileD
     QLabel, QLineEdit, QSizePolicy, QSpacerItem, QTableView, QTabWidget, QWidget
 
 import csv
-import json
 import operator
 import os
 import re
 import sys
 from functools import partial
-from collections import OrderedDict
 
 from .. import utils_giswater
 from .api_cf import ApiCF

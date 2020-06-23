@@ -6,19 +6,17 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.core import QgsLayoutExporter, QgsPointXY, QgsProject, QgsRectangle
-from qgis.PyQt.QtCore import QStringListModel, Qt
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence
 from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel
-from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QCompleter, QDateEdit, QLabel
-from qgis.PyQt.QtWidgets import QLineEdit, QTableView
+from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QDateEdit, QLabel, \
+    QLineEdit, QTableView
 
 import csv
 import json
 import os
 import operator
-import subprocess
 import sys
-import webbrowser
 from collections import OrderedDict
 from functools import partial
 

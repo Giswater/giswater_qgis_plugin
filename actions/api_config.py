@@ -7,8 +7,8 @@ or (at your option) any later version.
 # -*- coding: latin-1 -*-
 from qgis.gui import QgsDateTimeEdit
 from qgis.PyQt.QtCore import QDate
-from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QDateEdit, QDoubleSpinBox, QSpinBox, QGroupBox, QSpacerItem, QSizePolicy
-from qgis.PyQt.QtWidgets import QGridLayout, QWidget, QLabel, QTextEdit, QLineEdit
+from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QDateEdit, QDoubleSpinBox, QSpinBox, QGroupBox, QSpacerItem, \
+    QSizePolicy, QGridLayout, QWidget, QLabel, QTextEdit, QLineEdit
 
 import json
 import operator
