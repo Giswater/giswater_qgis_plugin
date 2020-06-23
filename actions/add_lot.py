@@ -843,11 +843,9 @@ class AddNewLot(ParentManage):
             for feature in features:
                 # Append 'feature_id' into the list
                 selected_id = feature.attribute(field_id)
+                state = feature.attribute('state')
 
-                sql = "SELECT state FROM " + str(layer.name()) + " WHERE " + field_id + "::text = " + str(selected_id) + "::text"
-                result = self.controller.get_row(sql, commit=True, log_sql=True)
-
-                if str(result[0]) != "1":
+                if str(state) != "1":
                     continue
 
                 if sys_type and (feature.attribute('sys_type') == sys_type and selected_id not in self.ids):
@@ -916,13 +914,11 @@ class AddNewLot(ParentManage):
         field_id = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.feature_type, 0).lower() + str('_id')
         layer = self.controller.get_layer_by_tablename(layer_name)
         feature = self.get_feature_by_id(layer, feature_id, field_id)
-
-        sql = "SELECT state FROM " + layer_name + " WHERE " + field_id + "::text = " + feature_id + "::text"
-        result = self.controller.get_row(sql, commit=True, log_sql=True)
+        state = feature.attribute('state')
 
         if feature is False:
             return
-        if str(result[0]) != "1":
+        if str(state) != "1":
             return
 
         if feature_id not in self.ids:
