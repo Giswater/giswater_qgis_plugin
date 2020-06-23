@@ -763,6 +763,7 @@ class MincutParent(ParentAction):
         self.refresh_tab_hydro()
 
         self.action_mincut.setEnabled(False)
+        self.action_custom_mincut.setEnabled(False)
 
 
     def update_result_selector(self, result_mincut_id, commit=True):    
