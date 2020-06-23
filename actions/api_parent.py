@@ -635,7 +635,8 @@ class ApiParent(ParentAction):
         extras += f', "textToSearch":"{utils_giswater.getWidgetText(dialog, widget)}"'
         body = self.create_body(extras=extras)
         complet_list = self.controller.get_json('gw_fct_gettypeahead', body)
-        if not complet_list: return False
+        if not complet_list:
+            return False
 
         list_items = []
         for field in complet_list['body']['data']:
@@ -785,7 +786,8 @@ class ApiParent(ParentAction):
         extras = f'"comboParent":"{combo_parent}", "comboId":"{combo_id}"'
         body = self.create_body(feature=feature, extras=extras)
         result = self.controller.get_json('gw_fct_getchilds', body)
-        if not result: return False
+        if not result:
+            return False
 
         for combo_child in result['body']['data']:
             if combo_child is not None:
@@ -946,7 +948,8 @@ class ApiParent(ParentAction):
         list_coord = re.search('\((.*)\)', str(complet_result[0]['body']['feature']['geometry']['st_astext']))
         max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
 
-        if reset_rb: self.resetRubberbands()
+        if reset_rb:
+            self.resetRubberbands()
         if str(max_x) == str(min_x) and str(max_y) == str(min_y):
             point = QgsPointXY(float(max_x), float(max_y))
             self.draw_point(point)
@@ -1204,7 +1207,8 @@ class ApiParent(ParentAction):
 
         # Get coordinates
         event_point = self.snapper_manager.get_event_point(point=point)
-        if not event_point: return
+        if not event_point:
+            return
         # Snapping
         result = self.snapper_manager.snap_to_current_layer(event_point)
         if self.snapper_manager.result_is_valid():
@@ -1584,7 +1588,8 @@ class ApiParent(ParentAction):
                 widget.clicked.connect(partial(getattr(self, function_name), dialog, widget)) """
 
         path, filter_ = self.open_file_path(filter_="DXF Files (*.dxf)")
-        if not path: return
+        if not path:
+            return
 
         dialog = kwargs['dialog']
         widget = kwargs['widget']
@@ -1688,7 +1693,8 @@ class ApiParent(ParentAction):
         extras = extras[:-2]
         body = self.create_body(extras)
         result = self.controller.get_json('gw_fct_check_importdxf', None, log_sql=True)
-        if not result: return False
+        if not result:
+            return False
 
         return {"path": dxf_path, "result": result, "temp_layers_added": temp_layers_added}
 
@@ -1700,17 +1706,20 @@ class ApiParent(ParentAction):
         widget_list = dialog.main_tab.widget(index).findChildren(QCheckBox)
         selector_type = dialog.main_tab.widget(index).property('selector_type')
         widget_all = dialog.findChild(QCheckBox, f'chk_all_{selector_type}')
-        if key_modifier == Qt.ShiftModifier: return
+        if key_modifier == Qt.ShiftModifier:
+            return
         if status is True:
             for widget in widget_list:
-                if widget == widget_all or widget.objectName() == widget_all.objectName(): continue
+                if widget == widget_all or widget.objectName() == widget_all.objectName():
+                    continue
                 widget.blockSignals(True)
                 utils_giswater.setChecked(dialog, widget, True)
                 self.set_selector(widget)
                 widget.blockSignals(False)
         elif status is False:
             for widget in widget_list:
-                if widget == widget_all or widget.objectName() == widget_all.objectName(): continue
+                if widget == widget_all or widget.objectName() == widget_all.objectName():
+                    continue
                 widget.blockSignals(True)
                 utils_giswater.setChecked(dialog, widget, False)
                 self.set_selector(widget)
@@ -1868,7 +1877,8 @@ class ApiParent(ParentAction):
         for checkbox in widget_list:
             # Some selectors.ui dont have widget_all
             if widget_all is not None:
-                if checkbox == widget_all or checkbox.objectName() == widget_all.objectName(): continue
+                if checkbox == widget_all or checkbox.objectName() == widget_all.objectName():
+                    continue
                 elif checkbox.objectName() != widget.objectName():
                     checkbox.blockSignals(True)
                     utils_giswater.setChecked(dialog, checkbox, False)

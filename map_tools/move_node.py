@@ -51,7 +51,8 @@ class MoveNodeMapTool(ParentMapTool):
             feature_id = f'"id":["{node_id}"]'
             body = self.create_body(feature=feature_id)
             result = self.controller.get_json('gw_fct_arc_divide', body)
-            if not result: return
+            if not result:
+                return
             if 'hideForm' not in result['body']['actions'] or not result['body']['actions']['hideForm']:
                 self.dlg_dtext = DialogTextUi()
                 self.dlg_dtext.btn_accept.hide()

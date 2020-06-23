@@ -76,7 +76,8 @@ class ApiCF(ApiParent, QObject):
 
         # hide QMenu identify if no feature under mouse
         len_layers = len(json_result['body']['data']['layersNames'])
-        if len_layers == 0: return False
+        if len_layers == 0:
+            return False
 
         self.icon_folder = self.plugin_dir + '/icons/'
 
@@ -364,7 +365,8 @@ class ApiCF(ApiParent, QObject):
 
         result = complet_result[0]['body']['data']
         for field in result['fields']:
-            if 'hidden' in field and field['hidden']: continue
+            if 'hidden' in field and field['hidden']:
+                continue
             widget = dialog.findChild(QWidget, field['widgetname'])
             value = None
             if type(widget) in(QLineEdit, QPushButton, QSpinBox, QDoubleSpinBox):
@@ -539,9 +541,11 @@ class ApiCF(ApiParent, QObject):
         result = complet_result[0]['body']['data']
         layout_list = []
         for field in complet_result[0]['body']['data']['fields']:
-            if 'hidden' in field and field['hidden']: continue
+            if 'hidden' in field and field['hidden']:
+                continue
             label, widget = self.set_widgets(self.dlg_cf, complet_result, field)
-            if widget is None: continue
+            if widget is None:
+                continue
             layout = self.dlg_cf.findChild(QGridLayout, field['layoutname'])
             if layout is not None:
                 # Take the QGridLayout with the intention of adding a QSpacerItem later
@@ -1220,7 +1224,8 @@ class ApiCF(ApiParent, QObject):
         :param p_widget: Widget that has changed
         """
 
-        if not p_widget: return
+        if not p_widget:
+            return
 
         for field in result['body']['data']['fields']:
             widget = dialog.findChild(QLineEdit, f'{field["widgetname"]}')

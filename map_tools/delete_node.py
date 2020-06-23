@@ -91,11 +91,13 @@ class DeleteNodeMapTool(ParentMapTool):
         body = self.create_body(feature=feature_id, extras=extras)
         # Execute SQL function and show result to the user
         result = self.controller.get_json('gw_fct_arc_fusion', body)
-        if not result: return
+        if not result:
+            return
 
         text_result = self.populate_info_text(self.dlg_fusion, result['body']['data'], True, True, 1)
 
-        if not text_result: self.dlg_fusion.close()
+        if not text_result:
+            self.dlg_fusion.close()
         # Refresh map canvas
         self.refresh_map_canvas()
 

@@ -161,7 +161,8 @@ class AddLayer(object):
                     key = 'values'
                 elif 'features' in data[k]:
                     key = 'features'
-                else: continue
+                else:
+                    continue
                 counter = len(data[k][key])
                 if counter > 0:
                     counter = len(data[k][key])
@@ -358,17 +359,20 @@ class AddLayer(object):
         # Add headers to layer
         if counter > 0:
             for key, value in list(data[layer_type]['features'][0]['properties'].items()):
-                if key == 'the_geom': continue
+                if key == 'the_geom':
+                    continue
                 prov.addAttributes([QgsField(str(key), QVariant.String)])
 
         for feature in data[layer_type]['features']:
             geometry = self.get_geometry(feature)
-            if not geometry: continue
+            if not geometry:
+                continue
             attributes = []
             fet = QgsFeature()
             fet.setGeometry(geometry)
             for key, value in feature['properties'].items():
-                if key == 'the_geom': continue
+                if key == 'the_geom':
+                    continue
                 attributes.append(value)
 
             fet.setAttributes(attributes)
@@ -605,7 +609,8 @@ class AddLayer(object):
         # Iterate through layers from certain group and combine their extent
         root = QgsProject.instance().layerTreeRoot()
         group = root.findGroup(group_name)  # Adjust this to fit your group's name
-        if not group: return False
+        if not group:
+            return False
         for child in group.children():
             if isinstance(child, QgsLayerTreeLayer):
                 extent.combineExtentWith(child.layer().extent())

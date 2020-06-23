@@ -1221,7 +1221,8 @@ class ParentAction(object):
             self.iface.setActiveLayer(self.user_current_layer)
         else:
             layer = self.controller.get_layer_by_tablename('v_edit_node')
-            if layer: self.iface.setActiveLayer(layer)
+            if layer:
+                self.iface.setActiveLayer(layer)
 
 
     def set_style_mapzones(self):

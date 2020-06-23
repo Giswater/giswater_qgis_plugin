@@ -402,7 +402,7 @@ class UpdateSQL(ApiParent):
 
 
     def generate_qgis_project(self, gis_folder, gis_file, project_type, schema_name, export_passwd, roletype, sample,
-        get_database_parameters=True):
+            get_database_parameters=True):
         """ Generate QGIS project """
 
         gis = CreateGisProject(self.controller, self.plugin_dir)
@@ -1310,7 +1310,8 @@ class UpdateSQL(ApiParent):
         extras += ', "isToolbox":false'
         body = self.create_body(extras=extras)
         complet_result = self.controller.get_json('gw_fct_gettoolbox', body, schema_name=self.schema, commit=False)
-        if not complet_result: return False
+        if not complet_result:
+            return False
         self.populate_functions_dlg(self.dlg_import_inp, complet_result['body']['data'])
 
         # Set listeners
@@ -1541,32 +1542,38 @@ class UpdateSQL(ApiParent):
             self.manage_process_result(is_test=is_test)
             return
 
-        if not is_test: self.task1.setProgress(10)
+        if not is_test:
+            self.task1.setProgress(10)
         status = self.update_30to31(new_project=True, project_type=project_type)
         if not status and self.dev_commit == 'FALSE':
             self.manage_process_result(is_test=is_test)
             return
-        if not is_test: self.task1.setProgress(20)
+        if not is_test:
+            self.task1.setProgress(20)
         status = self.load_views(project_type=project_type)
         if not status and self.dev_commit == 'FALSE':
             self.manage_process_result(is_test=is_test)
             return
-        if not is_test: self.task1.setProgress(30)
+        if not is_test:
+            self.task1.setProgress(30)
         status = self.load_trg(project_type=project_type)
         if not status and self.dev_commit == 'FALSE':
             self.manage_process_result(is_test=is_test)
             return
-        if not is_test: self.task1.setProgress(40)
+        if not is_test:
+            self.task1.setProgress(40)
         status = self.update_31to39(new_project=True, project_type=project_type)
         if not status and self.dev_commit == 'FALSE':
             self.manage_process_result(is_test=is_test)
             return
-        if not is_test: self.task1.setProgress(50)
+        if not is_test:
+            self.task1.setProgress(50)
         status = self.api(new_api=True, project_type=project_type)
         if not status and self.dev_commit == 'FALSE':
             self.manage_process_result(is_test=is_test)
             return
-        if not is_test: self.task1.setProgress(60)
+        if not is_test:
+            self.task1.setProgress(60)
 
         status = True
         if exec_last_process:
@@ -1580,7 +1587,8 @@ class UpdateSQL(ApiParent):
         # Custom execution
         if self.rdb_import_data.isChecked():
             # TODO:
-            if not is_test: self.task1.setProgress(100)
+            if not is_test:
+                self.task1.setProgress(100)
             self.controller.plugin_settings_set_value('create_schema_type', 'rdb_import_data')
             msg = ("The sql files have been correctly executed."
                    "\nNow, a form will be opened to manage the import inp.")
@@ -1590,12 +1598,14 @@ class UpdateSQL(ApiParent):
         elif self.rdb_sample.isChecked() and example_data:
             self.controller.plugin_settings_set_value('create_schema_type', 'rdb_sample')
             self.load_sample_data(project_type=project_type)
-            if not is_test: self.task1.setProgress(80)
+            if not is_test:
+                self.task1.setProgress(80)
         elif self.rdb_sample_dev.isChecked():
             self.controller.plugin_settings_set_value('create_schema_type', 'rdb_sample_dev')
             self.load_sample_data(project_type=project_type)
             self.load_dev_data(project_type=project_type)
-            if not is_test: self.task1.setProgress(80)
+            if not is_test:
+                self.task1.setProgress(80)
         elif self.rdb_data.isChecked():
             self.controller.plugin_settings_set_value('create_schema_type', 'rdb_data')
 
@@ -1607,7 +1617,8 @@ class UpdateSQL(ApiParent):
 
     def manage_process_result(self, schema_name=None, is_test=False):
 
-        if not is_test: self.task1.setProgress(100)
+        if not is_test:
+            self.task1.setProgress(100)
         status = (self.error_count == 0)
         self.manage_result_message(status, parameter="Create project")
         if status:
@@ -2457,7 +2468,8 @@ class UpdateSQL(ApiParent):
         self.task1.setProgress(50)
         result = self.controller.get_json('gw_fct_admin_schema_clone', body,
                                           schema_name=schema, log_sql=True, commit=False)
-        if not result: return
+        if not result:
+            return
         self.task1.setProgress(100)
 
         # Show message
@@ -3179,8 +3191,8 @@ class UpdateSQL(ApiParent):
             _json = {}
             for widget in list_widgets:
                 if type(widget) not in (
-                    QScrollArea, QFrame, QWidget, QScrollBar, QLabel, QAbstractButton, QHeaderView, QListView, QGroupBox,
-                    QTableView) and widget.objectName() not in ('qt_spinbox_lineedit', 'chk_multi_insert'):
+                        QScrollArea, QFrame, QWidget, QScrollBar, QLabel, QAbstractButton, QHeaderView, QListView, QGroupBox,
+                        QTableView) and widget.objectName() not in ('qt_spinbox_lineedit', 'chk_multi_insert'):
 
                     if type(widget) in (QLineEdit, QSpinBox, QDoubleSpinBox):
                         value = utils_giswater.getWidgetText(self.dlg_manage_fields, widget, return_string_null=False)

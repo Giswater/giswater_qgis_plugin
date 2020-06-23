@@ -181,7 +181,8 @@ class DrawProfiles(ParentMapTool):
             if self.profile_json['message']['level'] != 3:
                 return
 
-        if not self.profile_json: return
+        if not self.profile_json:
+            return
 
         # Execute draw profile
         self.paint_event(self.profile_json['body']['data']['arc'], self.profile_json['body']['data']['node'],
@@ -250,7 +251,8 @@ class DrawProfiles(ParentMapTool):
         # Get profils on database
         body = self.create_body()
         result_profile = self.controller.get_json('gw_fct_getprofile', body, log_sql=True)
-        if not result_profile: return
+        if not result_profile:
+            return
         message = f"{result_profile['message']}"
         self.controller.show_info(message)
 

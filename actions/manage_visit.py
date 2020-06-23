@@ -48,7 +48,7 @@ class ManageVisit(ParentManage, QObject):
 
 
     def manage_visit(self, visit_id=None, geom_type=None, feature_id=None, single_tool=True, expl_id=None, tag=None,
-        open_dialog=True):
+            open_dialog=True):
         """ Button 64. Add visit.
         if visit_id => load record related to the visit_id
         if geom_type => lock geom_type in relations tab

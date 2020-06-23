@@ -649,7 +649,8 @@ class MincutParent(ParentAction):
         extras += f'"result":"{result_mincut_id_text}"'
         body = self.create_body(extras=extras)
         result = self.controller.get_json('gw_fct_mincut_result_overlap', body, log_sql=True)
-        if not result: return
+        if not result:
+            return
 
         if result['body']['actions']['overlap'] == 'Conflict':
             result_layer = self.add_layer.add_temp_layer(
@@ -2060,7 +2061,8 @@ class MincutParent(ParentAction):
             date_time = (str(date_value))
             date = str(date_time.split()[0])
             time = str(date_time.split()[1])
-            if date: date = date.replace('/', '-')
+            if date:
+                date = date.replace('/', '-')
             qt_date = QDate.fromString(date, 'yyyy-MM-dd')
             qt_time = QTime.fromString(time, 'h:mm:ss')
             utils_giswater.setCalendarDate(self.dlg_mincut, widget_date, qt_date)

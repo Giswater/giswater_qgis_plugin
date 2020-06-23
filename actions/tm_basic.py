@@ -279,7 +279,8 @@ class TmBasic(TmParentAction):
 
         if dialog.txt_campaign.text() != '':
             status = self.get_campaing_id(dialog)
-            if not status: return None
+            if not status:
+                return None
             sql = f"DELETE FROM selector_planning WHERE cur_user=current_user;"
             sql += f"INSERT INTO selector_planning VALUES ('{status}', current_user);"
             self.controller.execute_sql(sql, log_sql=True)
@@ -1013,7 +1014,8 @@ class TmBasic(TmParentAction):
         # expr_filter = " AND (incident_date BETWEEN " + str(interval) + ")"
 
         # if visit_id not in (None, '', 'null'): expr_filter += f" AND visit_id::text LIKE '%{visit_id}%'"
-        if status_id: expr_filter += f" AND status ='{status_id}'"
+        if status_id:
+            expr_filter += f" AND status ='{status_id}'"
 
         self.fill_table_incident(qtable, table_name, expr_filter=expr_filter)
 

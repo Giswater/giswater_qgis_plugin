@@ -168,8 +168,8 @@ class DaoController(object):
         self.layer_source, not_version = self.get_layer_source_from_credentials()
         if self.layer_source:
             if self.layer_source['service'] is None and (self.layer_source['db'] is None
-                or self.layer_source['host'] is None or self.layer_source['user'] is None
-                or self.layer_source['password'] is None or self.layer_source['port'] is None):
+                    or self.layer_source['host'] is None or self.layer_source['user'] is None
+                    or self.layer_source['password'] is None or self.layer_source['port'] is None):
                 return False, not_version
         else:
             return False, not_version
@@ -1832,7 +1832,8 @@ class DaoController(object):
         self.dlg_info.btn_accept.setVisible(False)
         self.dlg_info.btn_close.clicked.connect(lambda: self.dlg_info.close())
         self.dlg_info.setWindowTitle(window_title)
-        if title: self.dlg_info.lbl_text.setText(title)
+        if title:
+            self.dlg_info.lbl_text.setText(title)
         utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.txt_infolog, msg)
         self.dlg_info.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.set_text_bold(self.dlg_info.txt_infolog)

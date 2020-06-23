@@ -76,7 +76,8 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
             feature_id = f'"id":["{elem_id}"]'
             body = self.create_body(feature=feature_id)
             result = self.controller.get_json(function_name, body, log_sql=True)
-            if not result: return
+            if not result:
+                return
 
             for layer_name in result['body']['data']['setVisibleLayers']:
                 layer = self.controller.get_layer_by_tablename(layer_name)

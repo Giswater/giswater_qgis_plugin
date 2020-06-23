@@ -102,7 +102,8 @@ class DeleteFeature(ApiParent):
         extras = '"feature_id":"' + feature_id + '"'
         body = self.create_body(feature=feature, extras=extras)
         result = self.controller.get_json('gw_fct_getfeaturerelation', body, log_sql=True)
-        if not result: return
+        if not result:
+            return
 
         # Construct message result
         result_msg = ''

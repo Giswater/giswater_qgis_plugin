@@ -318,7 +318,8 @@ class ApiSearch(ApiParent):
             extras_search_add += f'"{line_edit.property("columnname")}":{{"text":"{value}"}}'
             body = self.create_body(form=form_search, extras=extras_search)
             result = self.controller.get_json('gw_fct_setsearch', body, log_sql=True)
-            if not result: return False
+            if not result:
+                return False
 
             if result:
                 self.result_data = result
@@ -350,7 +351,8 @@ class ApiSearch(ApiParent):
             extras_search_add += f', "{line_edit_add.property("columnname")}":{{"text":"{value}"}}'
             body = self.create_body(form=form_search_add, extras=extras_search_add)
             result = self.controller.get_json('gw_fct_setsearchadd', body, log_sql=True)
-            if not result: return False
+            if not result:
+                return False
 
             if result:
                 self.result_data = result

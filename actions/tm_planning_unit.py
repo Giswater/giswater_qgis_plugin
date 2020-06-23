@@ -303,9 +303,12 @@ class TmPlanningUnit(TmParentAction):
             self.dlg_unit.btn_snapping.setEnabled(True)
         expr_filter = f"campaign_id ='{campaign_id}'"
 
-        if work_id: expr_filter += f" AND work_id ='{work_id}'"
-        if builder: expr_filter += f" AND builder_id ='{builder}'"
-        if priority: expr_filter += f" AND priority_id ='{priority}'"
+        if work_id:
+            expr_filter += f" AND work_id ='{work_id}'"
+        if builder:
+            expr_filter += f" AND builder_id ='{builder}'"
+        if priority:
+            expr_filter += f" AND priority_id ='{priority}'"
         self.fill_table_unit(qtable, table_name, expr_filter=expr_filter)
 
         # self.manage_combos(qtable, table_name, expr_filter)

@@ -355,7 +355,8 @@ class ApiConfig(ApiParent):
                 elif field['widgettype'] == 'datetime':
                     widget = QDateEdit()
                     widget.setCalendarPopup(True)
-                    if field['value']: field['value'] = field['value'].replace('/', '-')
+                    if field['value']:
+                        field['value'] = field['value'].replace('/', '-')
                     date = QDate.fromString(field['value'], 'yyyy-MM-dd')
                     widget.setDate(date)
                     widget.dateChanged.connect(partial(self.get_values_changed_param_system, widget))

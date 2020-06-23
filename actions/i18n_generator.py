@@ -259,7 +259,8 @@ class I18NGenerator(ParentAction):
                f" WHERE context in ('config_param_system', 'sys_param_user')"
                f" ORDER BY formname;")
         rows = self.get_rows(sql)
-        if not rows: return False
+        if not rows:
+            return False
         cfg_path = (self.plugin_dir + os.sep + 'sql' + os.sep + 'updates' + os.sep + f'{plugin_version}' + ''
                     + os.sep + f"{plugin_release}" + os.sep + 'i18n' + os.sep + f'{file_lng}' + os.sep + '')
         file_name = f'dml.sql'
@@ -293,7 +294,8 @@ class I18NGenerator(ParentAction):
                f" WHERE context not in ('config_param_system', 'sys_param_user')"
                f" ORDER BY formname;")
         rows = self.get_rows(sql)
-        if not rows: return
+        if not rows:
+            return
 
         db_path = (self.plugin_dir + os.sep + 'sql' + os.sep + 'api' + os.sep + 'updates' + os.sep + f'{plugin_version}' + ''
                 + os.sep + f"{plugin_release}" + os.sep + 'i18n' + os.sep + f'{file_lng}' + os.sep + '')

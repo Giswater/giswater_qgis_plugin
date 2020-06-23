@@ -86,7 +86,8 @@ class ApiDimensioning(ApiParent):
 
         layout_list = []
         for field in db_return[0]['body']['data']['fields']:
-            if 'hidden' in field and field['hidden']: continue
+            if 'hidden' in field and field['hidden']:
+                continue
 
             label, widget = self.set_widgets(self.dlg_dim, db_return, field)
 
@@ -200,7 +201,8 @@ class ApiDimensioning(ApiParent):
         # Set active layer and set signals
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
-        if self.deactivate_signals(action): return
+        if self.deactivate_signals(action):
+            return
 
         self.snapper_manager.set_snapping_layers()
         self.snapper_manager.remove_marker()
@@ -297,7 +299,8 @@ class ApiDimensioning(ApiParent):
 
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
-        if self.deactivate_signals(action): return
+        if self.deactivate_signals(action):
+            return
 
         self.snapper_manager.set_snapping_layers()
         self.snapper_manager.remove_marker()

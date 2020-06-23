@@ -271,7 +271,7 @@ class Giswater(QObject):
         list_feature_cat = self.controller.get_values_from_dictionary(self.feature_cat)
         for feature_cat in list_feature_cat:
             if (index_action == '01' and feature_cat.feature_type.upper() == 'NODE') or (
-                index_action == '02' and feature_cat.feature_type.upper() == 'ARC'):
+                    index_action == '02' and feature_cat.feature_type.upper() == 'ARC'):
                 obj_action = QAction(str(feature_cat.id), self)
                 obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
                 try:
@@ -924,7 +924,8 @@ class Giswater(QObject):
 
         # Check that there are no layers (v_edit_node) with the same view name, coming from different schemes
         status = self.check_layers_from_distinct_schema()
-        if status is False: return
+        if status is False:
+            return
 
         self.parent = ParentAction(self.iface, self.settings, self.controller, self.plugin_dir)
         self.add_layer = AddLayer(self.iface, self.settings, self.controller, self.plugin_dir)
@@ -1018,7 +1019,8 @@ class Giswater(QObject):
         try:
             # db format of value for parameter qgis_toolbar_hidebuttons -> {"index_action":[199, 74,75]}
             row = self.controller.get_config('qgis_toolbar_hidebuttons')
-            if not row: return
+            if not row:
+                return
             json_list = json.loads(row[0], object_pairs_hook=OrderedDict)
             self.list_to_hide = [str(x) for x in json_list['action_index']]
         except KeyError:
@@ -1075,7 +1077,8 @@ class Giswater(QObject):
                    f" ORDER BY child_layer")
 
             child_layers = self.controller.get_rows(sql)
-            if not child_layers: continue
+            if not child_layers:
+                continue
 
             # Create sub menu
             sub_menu = main_menu.addMenu(str(parent_layer[0]))
@@ -1331,7 +1334,8 @@ class Giswater(QObject):
 
         for layer_name in layers_list:
             layer = self.controller.get_layer_by_tablename(layer_name)
-            if layer is None: continue
+            if layer is None:
+                continue
             config = layer.editFormConfig()
             config.setSuppress(0)
             layer.setEditFormConfig(config)
@@ -1368,7 +1372,8 @@ class Giswater(QObject):
             extras = f'"infoType":"{self.qgis_project_infotype}"'
             body = self.create_body(feature=feature, extras=extras)
             complet_result = self.controller.get_json('gw_fct_getinfofromid', body)
-            if not complet_result: continue
+            if not complet_result:
+                continue
 
             for field in complet_result['body']['data']['fields']:
                 valuemap_values = {}
