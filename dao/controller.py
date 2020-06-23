@@ -53,6 +53,8 @@ class DaoController(object):
         self.user_settings = None
         self.user_settings_path = None
         self.dlg_docker = None
+        self.docker_type = None
+        self.show_docker = None
         self.prev_maptool = None
 
         if create_logger:
@@ -1852,6 +1854,7 @@ class DaoController(object):
     def init_docker(self, docker_param='qgis_info_docker'):
         """ Get user config parameter @docker_param """
 
+        self.show_docker = True
         if docker_param == 'qgis_main_docker':
             # Show 'main dialog' in docker depending its value in user settings
             self.qgis_main_docker = self.get_user_setting_value(docker_param, 'true')
@@ -1861,16 +1864,27 @@ class DaoController(object):
             row = self.get_config(docker_param)
             if not row:
                 self.dlg_docker = None
-                return
+                self.docker_type = None
+                return None
             value = row[0].lower()
+
+        # Check if docker has dialog of type 'form' or 'main'
+        if docker_param == 'qgis_info_docker':
+            if self.dlg_docker:
+                if self.docker_type:
+                    if self.docker_type != 'qgis_info_docker':
+                        self.show_docker = False
+                        return None
 
         if value == 'true':
             self.close_docker()
+            self.docker_type = docker_param
             self.dlg_docker = DockerUi()
             self.dlg_docker.dlg_closed.connect(self.close_docker)
             self.manage_docker_options()
         else:
             self.dlg_docker = None
+            self.docker_type = None
 
         return self.dlg_docker
 
@@ -1890,6 +1904,7 @@ class DaoController(object):
                     widget.close()
                     del widget
                     self.dlg_docker.setWidget(None)
+                    self.docker_type = None
                 self.iface.removeDockWidget(self.dlg_docker)
 
 

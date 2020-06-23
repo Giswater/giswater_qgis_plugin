@@ -605,7 +605,7 @@ class ApiCF(ApiParent, QObject):
         btn_accept = self.dlg_cf.findChild(QPushButton, 'btn_accept')
         title = f"{complet_result[0]['body']['feature']['childType']} - {self.feature_id}"
 
-        if self.controller.dlg_docker and is_docker:
+        if self.controller.dlg_docker and is_docker and self.controller.show_docker:
             # Delete last form from memory
             last_info = self.controller.dlg_docker.findChild(GwMainWindow, 'api_cf')
             if last_info:
