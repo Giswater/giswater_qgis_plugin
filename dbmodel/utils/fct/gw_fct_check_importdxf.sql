@@ -61,31 +61,30 @@ BEGIN
 
 	
 	IF 'DXF_JUN' NOT IN (SELECT id FROM cat_feature) OR 'DXF_JUN_CAT' NOT IN (SELECT id FROM cat_node) THEN
-		INSERT INTO cat_feature(id, system_id, feature_type, parent_layer)
-		VALUES ('DXF_JUN', 'JUNCTION', 'NODE','v_edit_node') ON CONFLICT DO NOTHING;
+		INSERT INTO cat_feature(id, system_id, feature_type, parent_layer, active)
+		VALUES ('DXF_JUN', 'JUNCTION', 'NODE','v_edit_node', TRUE) ON CONFLICT DO NOTHING;
 		--create child view
 		PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
 		"feature":{"catFeature":"DXF_JUN"}, "data":{"filterFields":{}, "pageInfo":{}, "multi_create":"False" }}$$);
 
 		IF v_project_type = 'WS' THEN
-			INSERT INTO node_type(id, type, epa_default, man_table, epa_table, active, code_autofill, choose_hemisphere,
+			INSERT INTO cat_feature_node(id, type, epa_default, man_table, epa_table, choose_hemisphere,
 		            isarcdivide, graf_delimiter)
-			VALUES ('DXF_JUN', 'JUNCTION','JUNCTION','man_junction', 'inp_junction', true, true,false, true ,'NONE') 
+			VALUES ('DXF_JUN', 'JUNCTION','JUNCTION','man_junction', 'inp_junction',  false, true ,'NONE') 
 			ON CONFLICT DO NOTHING;
 
 			INSERT INTO cat_node(id, nodetype_id, active)
 			VALUES ('DXF_JUN_CAT', 'DXF_JUN', true) ON CONFLICT DO NOTHING;
 		ELSIF v_project_type = 'UD' THEN
-			INSERT INTO node_type(id, type, epa_default, man_table, epa_table, active, code_autofill, 
-		            isarcdivide)
-			VALUES ('DXF_JUN', 'JUNCTION','JUNCTION','man_junction', 'inp_junction', true, true,true) 
+			INSERT INTO cat_feature_node(id, type, epa_default, man_table, epa_table, isarcdivide)
+			VALUES ('DXF_JUN', 'JUNCTION','JUNCTION','man_junction', 'inp_junction', true) 
 			ON CONFLICT DO NOTHING;
 
 			INSERT INTO cat_node(id, active)
 			VALUES ('DXF_JUN_CAT', true) ON CONFLICT DO NOTHING;
 		END IF;
 
-		v_errortext=concat('INFO: Insert DXF_JUN into cat_feature, node_type and DXF_JUN_CAT into cat_node.');
+		v_errortext=concat('INFO: Insert DXF_JUN into cat_feature, cat_feature_node and DXF_JUN_CAT into cat_node.');
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
 		VALUES (206, 1, v_errortext);
 
