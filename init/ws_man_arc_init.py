@@ -65,6 +65,7 @@ class ManArcDialog(ParentDialog):
         self.tbl_relations = self.dialog.findChild(QTableView, "tbl_relations")           
         self.btn_node_class1 = self.dialog.findChild(QPushButton, "btn_node_class1")
         self.btn_node_class2 = self.dialog.findChild(QPushButton, "btn_node_class2")
+        self.tbl_visit = self.dialog.findChild(QTableView, "tbl_visit_arc")
         state_type = self.dialog.findChild(QComboBox, 'state_type')
         dma_id = self.dialog.findChild(QComboBox, 'dma_id')
         presszonecat_id = self.dialog.findChild(QComboBox, 'presszonecat_id')
