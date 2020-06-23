@@ -1213,19 +1213,17 @@ class ParentAction(object):
             layer = self.controller.get_layer_by_tablename('v_edit_node')
             if layer: self.iface.setActiveLayer(layer)
 
+
     def set_style_mapzones(self):
 
         extras = f'"mapzones":""'
         body = self.create_body(extras=extras)
-
-        self.controller.log_info(f"SELECT gw_fct_getstylemapzones ({body})")
         json_return = self.controller.get_json('gw_fct_getstylemapzones', body)
         if not json_return:
             return False
 
         for mapzone in json_return['body']['data']['mapzones']:
 
-            self.controller.log_info(f"Mapzone: ({mapzone})")
             # Loop for each mapzone returned on json
             lyr = self.controller.get_layer_by_tablename(mapzone['layer'])
             categories = []

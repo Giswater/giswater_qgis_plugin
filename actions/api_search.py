@@ -595,7 +595,7 @@ class ApiSearch(ApiParent):
 
         widget.setStyleSheet(None)
         if 'nt' in sys.builtin_module_names:
-            folder_path = os.path.expanduser("~\Documents")
+            folder_path = os.path.expanduser("~/Documents")
         else:
             folder_path = os.path.expanduser("~")
 

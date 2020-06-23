@@ -1528,11 +1528,9 @@ class Giswater(QObject):
     def get_cursor_multiple_selection(self):
         """ Set cursor for multiple selection """
 
-        path_folder = os.path.dirname(__file__)
-        path_cursor = path_folder + '\icons\\'+'211.png'
-
-        if os.path.exists(path_cursor):
-            cursor = QCursor(QPixmap(path_cursor))
+        icon_path = self.plugin_dir + '/icons/211.png'
+        if os.path.exists(icon_path):
+            cursor = QCursor(QPixmap(icon_path))
         else:
             cursor = None
 

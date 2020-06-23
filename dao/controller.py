@@ -1682,7 +1682,7 @@ class DaoController(object):
 
         layer = self.get_layer_by_tablename(layer_name)
         if layer:
-            layer.dataProvider().forceReload()
+            layer.dataProvider().reloadData()
             layer.triggerRepaint()
 
 
