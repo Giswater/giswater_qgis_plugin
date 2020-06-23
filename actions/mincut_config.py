@@ -236,6 +236,11 @@ class MincutConfig(ParentAction):
             i = int(model.fieldIndex(field_id))
             value = model.data(model.index(x, i))
             selected_mincuts.append(value)
+
+        if len(selected_mincuts) == 0:
+            msg = "There are no visible mincuts in the table. Try a different filter or make one"
+            self.controller.show_message(msg)
+            return
         selector_values = f'"selector_mincut", "ids":{selected_mincuts}'
         self.dlg_selector = SelectorUi()
         self.load_settings(self.dlg_selector)
