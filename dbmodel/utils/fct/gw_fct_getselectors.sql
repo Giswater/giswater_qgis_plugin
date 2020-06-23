@@ -160,8 +160,6 @@ BEGIN
 	-- Finish the construction of the tabs array
 	v_formTabs := v_formTabs ||']';
 
-	v_currenttab = 'tab_exploitation';
-
 	-- Check null
 	v_formTabs := COALESCE(v_formTabs, '[]');
 	v_manageall := COALESCE(v_manageall, FALSE);	
