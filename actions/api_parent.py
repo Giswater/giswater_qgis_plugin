@@ -1728,7 +1728,7 @@ class ApiParent(ParentAction):
             if text_filter in ('null', None):
                 text_filter = ''
 
-        #profilactic control of nones
+        # Profilactic control of nones
         if text_filter is None:
                 text_filter=''
 
@@ -1834,7 +1834,7 @@ class ApiParent(ParentAction):
                 utils_giswater.setChecked(dialog, widget_all, False)
             else:
                 self.remove_previuos(dialog, widget, widget_all, widget_list)
-                
+
         elif selection_mode == 'keepPreviousUsingShift' and key_modifier != Qt.ShiftModifier:
             if utils_giswater.isChecked(dialog, widget_all):
                 utils_giswater.setChecked(dialog, widget_all, False)
@@ -1849,15 +1849,25 @@ class ApiParent(ParentAction):
         :param dialog: QDialog
         :param widget: QCheckBox that has changed status (QCheckBox)
         :param widget_all: QCheckBox that handles global selection (QCheckBox)
-        :param widget_list: List of all QCheckBox in the current tab ([QCheckBox,QCheckBox,...])
+        :param widget_list: List of all QCheckBox in the current tab ([QCheckBox, QCheckBox, ...])
         """
+
         for checkbox in widget_list:
-            if checkbox == widget_all or checkbox.objectName() == widget_all.objectName(): continue
+            # Some selectors.ui dont have widget_all
+            if widget_all is not None:
+                if checkbox == widget_all or checkbox.objectName() == widget_all.objectName(): continue
+                elif checkbox.objectName() != widget.objectName():
+                    checkbox.blockSignals(True)
+                    utils_giswater.setChecked(dialog, checkbox, False)
+                    self.set_selector(checkbox)
+                    checkbox.blockSignals(False)
+
             elif checkbox.objectName() != widget.objectName():
                 checkbox.blockSignals(True)
                 utils_giswater.setChecked(dialog, checkbox, False)
                 self.set_selector(checkbox)
                 checkbox.blockSignals(False)
+
 
     def set_selector(self, widget):
         """  Send values to DB and reload selectors
