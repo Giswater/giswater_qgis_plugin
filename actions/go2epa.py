@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.core import QgsApplication
-from qgis.PyQt.QtCore import QDate, QStringListModel, QTime,  Qt, QRegExp
+from qgis.PyQt.QtCore import QDate, QStringListModel, QTime, Qt, QRegExp
 from qgis.PyQt.QtWidgets import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QComboBox, QCompleter, \
     QFileDialog
 from qgis.PyQt.QtGui import QRegExpValidator
@@ -236,7 +236,7 @@ class Go2Epa(ApiParent):
             utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec))
         self.controller.plugin_settings_set_value('go2epa_chk_RPT' + cur_user,
             utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result))
-        
+
 
     def sector_selection(self, tableleft, tableright, field_id_left, field_id_right, aql=""):
         """ Load the tables in the selection form """
@@ -262,7 +262,7 @@ class Go2Epa(ApiParent):
                                          self.controller.tr('Selected dscenarios', context_name='labels'))
 
         self.multi_row_selector(dlg_psector_sel, tableleft, tableright, field_id_left, field_id_right, aql=aql)
-        
+
         self.open_dialog(dlg_psector_sel)
 
 
@@ -392,7 +392,7 @@ class Go2Epa(ApiParent):
 
         # Save user values
         self.save_user_values()
-        
+
         self.dlg_go2epa.txt_infolog.clear()
         self.dlg_go2epa.txt_file_rpt.setStyleSheet(None)
         status = self.check_fields()
@@ -637,7 +637,7 @@ class Go2Epa(ApiParent):
 
     def populate_date_time(self, combo_date):
 
-        result_id = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id,0)
+        result_id = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id, 0)
         sql = (f"SELECT DISTINCT(resultdate), resultdate FROM rpt_arc "
                f"WHERE result_id = '{result_id}' "
                f"ORDER BY resultdate")

@@ -237,7 +237,7 @@ class UpdateSQL(ApiParent):
 
 
     def manage_translations(self):
-      
+
         qm_gen = I18NGenerator(self.iface, self.settings, self.controller, self.plugin_dir)
         qm_gen.init_dialog()
 
@@ -646,7 +646,7 @@ class UpdateSQL(ApiParent):
 
                         else:
                             if str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
-                                if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder,  os.sep + 'utils' + os.sep):
+                                if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep):
                                     status = self.load_sql(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep, no_ct=no_ct)
                                     if status is False:
                                         return False
@@ -703,7 +703,7 @@ class UpdateSQL(ApiParent):
                                         self.folderUpdates + folder + os.sep + sub_folder + os.sep + self.project_type_selected + os.sep)
                                     if status is False:
                                         return False
-                                if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep),'') is True:
+                                if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), '') is True:
                                     status = self.executeFiles(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), True)
                                     if status is False:
                                         return False
@@ -733,7 +733,7 @@ class UpdateSQL(ApiParent):
                                         return False
 
                         else:
-                            if str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.',''):
+                            if str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
                                 if self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder,
                                                        '') is True:
                                     status = self.load_sql(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder)
@@ -763,7 +763,7 @@ class UpdateSQL(ApiParent):
                                         self.folderUpdates + folder + os.sep + sub_folder + os.sep + self.project_type + os.sep)
                                     if status is False:
                                         return False
-                                if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep),'') is True:
+                                if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), '') is True:
                                     status = self.executeFiles(
                                         self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
                                             self.locale + os.sep), True)
@@ -942,7 +942,7 @@ class UpdateSQL(ApiParent):
         self.controller.execute_sql(sql, commit=False)
 
         if str(project_type) == 'ws' or str(project_type) == 'ud':
-            folder = self.folderExemple + 'user' + os.sep+project_type
+            folder = self.folderExemple + 'user' + os.sep + project_type
             status = self.executeFiles(folder)
             if not status and self.dev_commit == 'FALSE':
                 return False
@@ -1188,7 +1188,7 @@ class UpdateSQL(ApiParent):
                                 if status is False:
                                     return False
                     else:
-                        if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) <= str(self.plugin_version).replace('.',''):
+                        if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
                             if self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep,
                                                    '') is True:
                                 status = self.executeFiles(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep + '')
@@ -1282,7 +1282,7 @@ class UpdateSQL(ApiParent):
             current_date = QDate.currentDate().toString('dd-MM-yyyy')
             extras += ', ' + '"date":"' + str(current_date) + '"'
 
-        extras += ', "superUsers":' + str(self.super_users).replace("'",'"') + ''
+        extras += ', "superUsers":' + str(self.super_users).replace("'", '"') + ''
 
         self.schema_name = schema_name
 
@@ -1327,7 +1327,7 @@ class UpdateSQL(ApiParent):
             if random.randint(0, 1000) == 10:
                 raise Exception('Bad value!')
 
-        #return True
+        # return True
         self.task_completed(None, {'total': total, 'iterations': iterations, 'task': task.description()})
 
 
@@ -1402,7 +1402,7 @@ class UpdateSQL(ApiParent):
                             if str(project_name) + "_bk" == str(row[0]) or \
                                str(project_name) + "_bk_" + str(i) == str(row[0]):
                                 msg = "This 'Project_name' is already exist. Do you want rename old schema to '" + str(
-                                    project_name) + "_bk_" + str(i+1) + "' ?"
+                                    project_name) + "_bk_" + str(i + 1) + "' ?"
                                 result = self.controller.ask_question(msg, "Info")
                                 i = i + 1
                             else:
@@ -1518,7 +1518,7 @@ class UpdateSQL(ApiParent):
 
         # Custom execution
         if self.rdb_import_data.isChecked():
-            #TODO:
+            # TODO:
             if not is_test: self.task1.setProgress(100)
             self.controller.plugin_settings_set_value('create_schema_type', 'rdb_import_data')
             msg = ("The sql files have been correctly executed."
@@ -1791,7 +1791,7 @@ class UpdateSQL(ApiParent):
                 utils_giswater.setWidgetText(self.dlg_readsql, 'lbl_status_text',
                     "You don't have permissions to administrate project schemas on this connection")
                 utils_giswater.setWidgetText(self.dlg_readsql, 'lbl_schema_name', '')
-                
+
 
     def set_last_connection(self, connection_name):
 
@@ -1935,7 +1935,7 @@ class UpdateSQL(ApiParent):
         for folder in folders:
             sub_folders = sorted(os.listdir(self.folderUpdates + folder))
             for sub_folder in sub_folders:
-                if str(sub_folder) > str(self.project_version).replace('.',''):
+                if str(sub_folder) > str(self.project_version).replace('.', ''):
                     folder_aux = self.folderUpdates + folder + os.sep + sub_folder
                     if self.process_folder(folder_aux, ''):
                         status = self.readFiles(sorted(os.listdir(folder_aux + '')), folder_aux + '')
@@ -2681,9 +2681,9 @@ class UpdateSQL(ApiParent):
             utils_giswater.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", True)
 
         # Control if schema_version is updated to 3.2
-        if str(self.project_version).replace('.','') < str(self.plugin_version).replace('.', ''):
+        if str(self.project_version).replace('.', '') < str(self.plugin_version).replace('.', ''):
 
-            utils_giswater.getWidget(self.dlg_readsql,self.dlg_readsql.grb_manage_addfields).setEnabled(False)
+            utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_addfields).setEnabled(False)
             utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_ui).setEnabled(False)
             utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_childviews).setEnabled(False)
             utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_sys_fields).setEnabled(False)
@@ -2702,13 +2702,13 @@ class UpdateSQL(ApiParent):
             utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_sys_fields).setEnabled(True)
 
             sql = (f"SELECT cat_feature.child_layer, cat_feature.child_layer FROM {schema_name}.cat_feature "
-                        f" ORDER BY id")
+                   f" ORDER BY id")
 
             rows = self.controller.get_rows(sql)
             utils_giswater.set_item_data(self.dlg_readsql.cmb_formname_ui, rows, 1)
-            
+
             sql = (f"SELECT cat_feature.id, cat_feature.id FROM {schema_name}.cat_feature "
-                       f" ORDER BY id")
+                   f" ORDER BY id")
 
             rows = self.controller.get_rows(sql)
             utils_giswater.set_item_data(self.dlg_readsql.cmb_formname_fields, rows, 1)
@@ -2724,7 +2724,7 @@ class UpdateSQL(ApiParent):
 
         # Create body
         feature = '"catFeature":"' + form_name + '"'
-        extras = '"multi_create":' + str(utils_giswater.isChecked(self.dlg_readsql,self.dlg_readsql.chk_multi_create)).lower() + ''
+        extras = '"multi_create":' + str(utils_giswater.isChecked(self.dlg_readsql, self.dlg_readsql.chk_multi_create)).lower() + ''
         body = self.create_body(feature=feature, extras=extras)
         body = body.replace('""', 'null')
 
@@ -3080,7 +3080,7 @@ class UpdateSQL(ApiParent):
                         value = utils_giswater.get_item_data(self.dlg_manage_fields, widget, 0)
                     elif type(widget) is QCheckBox:
                         value = utils_giswater.isChecked(self.dlg_manage_fields, widget)
-                    elif type(widget) is QgsDateTimeEdit :
+                    elif type(widget) is QgsDateTimeEdit:
                         value = utils_giswater.getCalendarDate(self.dlg_manage_fields, widget)
                     elif type(widget) is QPlainTextEdit:
                         value = widget.document().toPlainText()
@@ -3108,8 +3108,8 @@ class UpdateSQL(ApiParent):
             _json = {}
             for widget in list_widgets:
                 if type(widget) not in (
-                QScrollArea, QFrame, QWidget, QScrollBar, QLabel, QAbstractButton, QHeaderView, QListView, QGroupBox,
-                QTableView) and widget.objectName() not in ('qt_spinbox_lineedit', 'chk_multi_insert'):
+                    QScrollArea, QFrame, QWidget, QScrollBar, QLabel, QAbstractButton, QHeaderView, QListView, QGroupBox,
+                    QTableView) and widget.objectName() not in ('qt_spinbox_lineedit', 'chk_multi_insert'):
 
                     if type(widget) in (QLineEdit, QSpinBox, QDoubleSpinBox):
                         value = utils_giswater.getWidgetText(self.dlg_manage_fields, widget, return_string_null=False)

@@ -26,6 +26,6 @@ class OmVisitXNode(Table):
     is_last = GenericDescriptor(None)
 
     def __init__(self, controller):
-        """ Class constructor """        
+        """ Class constructor """
         Table.__init__(self, controller, 'om_visit_x_node', 'id')
-        
+

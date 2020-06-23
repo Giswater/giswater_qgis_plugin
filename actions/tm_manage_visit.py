@@ -181,7 +181,7 @@ class TmManageVisit(TmParentManage, QObject):
             self.update_geom()
         self.refresh_map_canvas()
         self.canvas.setMapTool(self.previous_map_tool)
-        #self.iface.actionPan().trigger()
+        # self.iface.actionPan().trigger()
 
 
     def update_geom(self):

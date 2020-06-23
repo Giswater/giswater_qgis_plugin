@@ -19,7 +19,7 @@ class Edit(ParentAction):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'edit' """
-                
+
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
         self.manage_document = ManageDocument(iface, settings, controller, plugin_dir)
         self.manage_element = ManageElement(iface, settings, controller, plugin_dir)
@@ -100,15 +100,15 @@ class Edit(ParentAction):
     def edit_add_file(self):
         """ Button 34: Add document """
         self.manage_document.manage_document()
-        
-    
+
+
     def edit_document(self):
-        """ Button 66: Edit document """          
-        self.manage_document.edit_document()        
-        
-            
+        """ Button 66: Edit document """
+        self.manage_document.edit_document()
+
+
     def edit_element(self):
-        """ Button 67: Edit element """          
+        """ Button 67: Edit element """
         self.manage_element.edit_element()
 
 

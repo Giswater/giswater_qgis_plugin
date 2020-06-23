@@ -201,7 +201,7 @@ class ApiConfig(ApiParent):
         chk_dma = self.dlg_config.tab_main.findChild(QWidget, 'chk_dma_vdefault')
         if chk_dma and chk_expl:
             chk_dma.stateChanged.connect(partial(self.check_child_to_parent, chk_dma, chk_expl))
-            chk_expl.stateChanged.connect(partial(self.check_parent_to_child,  chk_expl, chk_dma))
+            chk_expl.stateChanged.connect(partial(self.check_parent_to_child, chk_expl, chk_dma))
         self.hide_void_groupbox(self.dlg_config)
         # Check user/role and remove tabs
         role_admin = self.controller.check_role_user("role_admin", cur_user)
@@ -378,15 +378,15 @@ class ApiConfig(ApiParent):
                 # Order Widgets
                 if 'layoutname' in field:
                     if field['layoutname'] == 'lyt_topology':
-                        self.order_widgets_system(field, self.topology_form, lbl,  widget)
+                        self.order_widgets_system(field, self.topology_form, lbl, widget)
                     elif field['layoutname'] == 'lyt_builder':
-                        self.order_widgets_system(field, self.builder_form, lbl,  widget)
+                        self.order_widgets_system(field, self.builder_form, lbl, widget)
                     elif field['layoutname'] == 'lyt_review':
-                        self.order_widgets_system(field, self.review_form, lbl,  widget)
+                        self.order_widgets_system(field, self.review_form, lbl, widget)
                     elif field['layoutname'] == 'lyt_analysis':
-                        self.order_widgets_system(field, self.analysis_form, lbl,  widget)
+                        self.order_widgets_system(field, self.analysis_form, lbl, widget)
                     elif field['layoutname'] == 'lyt_system':
-                        self.order_widgets_system(field, self.system_form, lbl,  widget)
+                        self.order_widgets_system(field, self.system_form, lbl, widget)
 
 
     def get_event_combo_parent(self, row):
@@ -410,7 +410,7 @@ class ApiConfig(ApiParent):
                 if field['comboIds'][i] is not None and field['comboNames'][i] is not None:
                     elem = [field['comboIds'][i], field['comboNames'][i]]
                     combolist.append(elem)
-                    
+
             records_sorted = sorted(combolist, key=operator.itemgetter(1))
             # Populate combo
             for record in records_sorted:
@@ -427,7 +427,7 @@ class ApiConfig(ApiParent):
         # TODO cambiar por gw_fct_getchilds
         sql = f"SELECT gw_fct_getcombochilds('config' ,'' ,'' ,'{combo_parent}', '{combo_id}','')"
         row = self.controller.get_row(sql, log_sql=True)
-        #TODO::Refactor input and output for function "gw_fct_getcombochilds" and refactor "row[0]['fields']"
+        # TODO::Refactor input and output for function "gw_fct_getcombochilds" and refactor "row[0]['fields']"
         for combo_child in row[0]['fields']:
             if combo_child is not None:
                 self.populate_child(combo_child)
@@ -450,7 +450,7 @@ class ApiConfig(ApiParent):
             form.addWidget(chk, field['layoutorder'], 1)
 
 
-    def order_widgets_system(self, field, form, lbl,  widget):
+    def order_widgets_system(self, field, form, lbl, widget):
 
         form.addWidget(lbl, field['layoutorder'], 0)
         if field['widgettype'] == 'checkbox' or field['widgettype'] == 'check':
@@ -483,7 +483,7 @@ class ApiConfig(ApiParent):
         elif type(widget) is QgsDateTimeEdit:
             value = utils_giswater.getCalendarDate(self.dlg_config, widget)
             elem['widget_type'] = 'datetime'
-            
+
         elem['isChecked'] = str(utils_giswater.isChecked(self.dlg_config, chk))
         elem['value'] = value
 
@@ -575,5 +575,5 @@ class ApiConfig(ApiParent):
         result = layers_name[:-2] + '}", ' + tables_name[:-2] + '}"}'
 
         sql = f'INSERT INTO temp_table (fid, text_column, cur_user) VALUES (163, $${result}$$, current_user);'
-        self.controller.execute_sql(sql, log_sql = True)
+        self.controller.execute_sql(sql, log_sql=True)
 

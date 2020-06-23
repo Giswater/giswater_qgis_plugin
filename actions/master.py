@@ -73,7 +73,7 @@ class Master(ParentAction):
 
 
     def update_current_psector(self, dialog, qtbl_psm):
-      
+
         selected_list = qtbl_psm.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
@@ -94,7 +94,7 @@ class Master(ParentAction):
         self.open_dialog(dialog)
 
 
-    def upsert_config_param_user(self, dialog,  widget, parameter):
+    def upsert_config_param_user(self, dialog, widget, parameter):
         """ Insert or update values in tables with current_user control """
 
         tablename = "config_param_user"
@@ -183,7 +183,7 @@ class Master(ParentAction):
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_ = widget.model().record(row).value(str(column_id))
-            inf_text += str(id_)+", "
+            inf_text += str(id_) + ", "
             list_id += f"'{id_}', "
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]

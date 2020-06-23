@@ -14,7 +14,13 @@ from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox
     QDateEdit, QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QMenu, QPushButton, QSizePolicy, \
     QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit
 
-import json, os, re, subprocess, urllib.parse as parse, sys, webbrowser
+import json
+import os
+import re
+import subprocess
+import urllib.parse as parse
+import sys
+import webbrowser
 from collections import OrderedDict
 from functools import partial
 
@@ -31,7 +37,7 @@ from ..actions.api_dimensioning import ApiDimensioning
 
 
 class ApiCF(ApiParent, QObject):
-    
+
     # :var signal_activate: emitted from def cancel_snapping_tool(self, dialog, action) in order to re-start CadApiInfo
     signal_activate = pyqtSignal()
 
@@ -394,7 +400,7 @@ class ApiCF(ApiParent, QObject):
         self.hydro_info_dlg.rejected.connect(partial(self.resetRubberbands))
         # Open dialog
         self.open_dialog(self.hydro_info_dlg, dlg_name='info_generic')
-        
+
         return result, self.hydro_info_dlg
 
 
@@ -750,7 +756,7 @@ class ApiCF(ApiParent, QObject):
             def manage_doubleSpinbox(self, dialog, complet_result, field)
             def manage_tableView(self, dialog, complet_result, field)
          """
-        
+
         widget = None
         label = None
         if field['label']:
@@ -806,7 +812,7 @@ class ApiCF(ApiParent, QObject):
         if field['widgetcontrols'] and 'maxMinValues' in field['widgetcontrols']:
             if 'max' in field['widgetcontrols']['maxMinValues']:
                 widget.setProperty('maxValue', field['widgetcontrols']['maxMinValues']['max'])
-                
+
         return widget
 
 
@@ -950,7 +956,7 @@ class ApiCF(ApiParent, QObject):
         # Set dialog not resizable
         dlg_sections.setFixedSize(dlg_sections.size())
 
-        feature = '"id":"'+self.feature_id+'"'
+        feature = '"id":"' + self.feature_id + '"'
         body = self.create_body(feature=feature)
         json_result = self.controller.get_json('gw_fct_getinfocrossection', body)
         if not json_result:
@@ -981,7 +987,7 @@ class ApiCF(ApiParent, QObject):
         :param close_dialog:
         :return:
         """
-        
+
         if _json == '' or str(_json) == '{}':
             if self.controller.dlg_docker:
                 self.controller.dlg_docker.setMinimumWidth(dialog.width())
@@ -1012,7 +1018,7 @@ class ApiCF(ApiParent, QObject):
             msg = "Some mandatory values are missing. Please check the widgets marked in red."
             self.controller.show_warning(msg)
             return
-        
+
         # If we create a new feature
         if self.new_feature_id is not None:
             for k, v in list(_json.items()):
@@ -1139,20 +1145,20 @@ class ApiCF(ApiParent, QObject):
             def integer_validator(self, value, widget, btn_accept)
             def double_validator(self, value, widget, btn_accept)
          """
-        
+
         value = utils_giswater.getWidgetText(dialog, widget, return_string_null=False)
         try:
-            getattr(self, f"{widget.property('datatype')}_validator")( value, widget, btn)
+            getattr(self, f"{widget.property('datatype')}_validator")(value, widget, btn)
         except AttributeError:
             """If the function called by getattr don't exist raise this exception"""
             pass
 
 
-    def check_min_max_value(self,dialog, widget, btn_accept):
-        
+    def check_min_max_value(self, dialog, widget, btn_accept):
+
         value = utils_giswater.getWidgetText(dialog, widget, return_string_null=False)
         try:
-            if value and ((widget.property('minValue') and float(value) < float(widget.property('minValue'))) or \
+            if value and ((widget.property('minValue') and float(value) < float(widget.property('minValue'))) or
                     (widget.property('maxValue') and float(value) > float(widget.property('maxValue')))):
                 widget.setStyleSheet("border: 1px solid red")
                 btn_accept.setEnabled(False)
@@ -1189,7 +1195,7 @@ class ApiCF(ApiParent, QObject):
     def set_auto_update_lineedit(self, field, dialog, widget):
 
         if self.check_tab_data(dialog):
-            if field['isautoupdate'] and self.new_feature_id is None and field['widgettype']!='typeahead':
+            if field['isautoupdate'] and self.new_feature_id is None and field['widgettype'] != 'typeahead':
                 _json = {}
                 widget.editingFinished.connect(partial(self.clean_my_json, widget))
                 widget.editingFinished.connect(partial(self.get_values, dialog, widget, _json))
@@ -1210,7 +1216,7 @@ class ApiCF(ApiParent, QObject):
         :param result: row with info (json)
         :param p_widget: Widget that has changed
         """
-        
+
         if not p_widget: return
 
         for field in result['body']['data']['fields']:
@@ -1327,6 +1333,7 @@ class ApiCF(ApiParent, QObject):
 
 
     """ MANAGE TABS """
+
     def tab_activation(self):
         """ Call functions depend on tab selection """
 
@@ -1511,6 +1518,7 @@ class ApiCF(ApiParent, QObject):
             widget.model().select()
 
     """ FUNCTIONS RELATED WITH TAB ELEMENT"""
+
     def manage_element(self, dialog, element_id=None, feature=None):
         """ Execute action of button 33 """
 
@@ -1567,6 +1575,7 @@ class ApiCF(ApiParent, QObject):
 
 
     """ FUNCTIONS RELATED WITH TAB RELATIONS"""
+
     def manage_tab_relations(self, viewname, field_id):
         """ Hide tab 'relations' if no data in the view """
 
@@ -1638,9 +1647,10 @@ class ApiCF(ApiParent, QObject):
 
 
     """ FUNCTIONS RELATED WITH TAB CONNECTIONS """
+
     def fill_tab_connections(self):
         """ Fill tab 'Connections' """
-        
+
         filter_ = f"node_id='{self.feature_id}'"
         self.fill_table(self.dlg_cf.tbl_upstream, self.schema_name + ".v_ui_node_x_connection_upstream", filter_)
         self.set_columns_config(self.dlg_cf.tbl_upstream, "v_ui_node_x_connection_upstream")
@@ -1673,12 +1683,13 @@ class ApiCF(ApiParent, QObject):
 
 
     """ FUNCTIONS RELATED WITH TAB HYDROMETER"""
+
     def fill_tab_hydrometer(self):
         """ Fill tab 'Hydrometer' """
 
         table_hydro = "v_rtc_hydrometer"
         txt_hydrometer_id = self.dlg_cf.findChild(QLineEdit, "txt_hydrometer_id")
-        self.fill_tbl_hydrometer(self.tbl_hydrometer,  table_hydro)
+        self.fill_tbl_hydrometer(self.tbl_hydrometer, table_hydro)
         self.set_columns_config(self.tbl_hydrometer, table_hydro)
         txt_hydrometer_id.textChanged.connect(partial(self.fill_tbl_hydrometer, self.tbl_hydrometer, table_hydro))
         self.tbl_hydrometer.doubleClicked.connect(partial(self.open_selected_hydro, self.tbl_hydrometer))
@@ -1743,6 +1754,7 @@ class ApiCF(ApiParent, QObject):
 
 
     """ FUNCTIONS RELATED WITH TAB HYDROMETER VALUES"""
+
     def fill_tab_hydrometer_values(self):
 
         table_hydro_value = "v_ui_hydroval_x_connec"
@@ -1759,7 +1771,7 @@ class ApiCF(ApiParent, QObject):
 
         sql = ("SELECT hydrometer_id, hydrometer_customer_code "
                " FROM v_rtc_hydrometer "
-               " WHERE connec_id = '"+str(self.feature_id)+"' "
+               " WHERE connec_id = '" + str(self.feature_id) + "' "
                " ORDER BY hydrometer_customer_code")
         rows_list = []
         rows = self.controller.get_rows(sql, log_sql=True)
@@ -1809,6 +1821,7 @@ class ApiCF(ApiParent, QObject):
 
 
     """ FUNCTIONS RELATED WITH TAB OM"""
+
     def fill_tab_om(self, geom_type):
         """ Fill tab 'O&M' (event) """
 
@@ -1927,7 +1940,7 @@ class ApiCF(ApiParent, QObject):
         self.dlg_event_full.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_event_full))
         self.dlg_event_full.tbl_docs_x_event.doubleClicked.connect(self.open_file)
         utils_giswater.set_qtv_config(self.dlg_event_full.tbl_docs_x_event)
-        
+
         self.open_dialog(self.dlg_event_full, 'visit_event_full')
 
 
@@ -2055,7 +2068,7 @@ class ApiCF(ApiParent, QObject):
         format_low = 'yyyy-MM-dd 00:00:00.000'
         format_high = 'yyyy-MM-dd 23:59:59.999'
         interval = f"'{visit_start.toString(format_low)}'::timestamp AND '{visit_end.toString(format_high)}'::timestamp"
-        
+
         # Set filter to model
         expr = f"{self.field_id} = '{self.feature_id}'"
         # Set filter
@@ -2088,7 +2101,7 @@ class ApiCF(ApiParent, QObject):
         format_low = 'yyyy-MM-dd 00:00:00.000'
         format_high = 'yyyy-MM-dd 23:59:59.999'
         interval = f"'{visit_start.toString(format_low)}'::timestamp AND '{visit_end.toString(format_high)}'::timestamp"
-        
+
         # Set filter to model
         expr = f"{self.field_id} = '{self.feature_id}'"
         # Set filter
@@ -2127,7 +2140,7 @@ class ApiCF(ApiParent, QObject):
         """ Call button 64: om_add_visit """
 
         # Get expl_id to save it on om_visit and show the geometry of visit
-        expl_id = utils_giswater.get_item_data(self.dlg_cf, self.tab_type+'_expl_id', 0)
+        expl_id = utils_giswater.get_item_data(self.dlg_cf, self.tab_type + '_expl_id', 0)
         if expl_id == -1:
             msg = "Widget expl_id not found"
             self.controller.show_warning(msg)
@@ -2251,9 +2264,10 @@ class ApiCF(ApiParent, QObject):
 
 
     """ FUNCTIONS RELATED WITH TAB DOC"""
+
     def fill_tab_document(self):
         """ Fill tab 'Document' """
-        
+
         table_document = "v_ui_doc_x_" + self.geom_type
         self.fill_tbl_document_man(self.dlg_cf, self.tbl_document, table_document, self.filter)
         self.set_columns_config(self.tbl_document, table_document)
@@ -2261,10 +2275,10 @@ class ApiCF(ApiParent, QObject):
 
     def fill_tbl_document_man(self, dialog, widget, table_name, expr_filter):
         """ Fill the table control to show documents """
-        
+
         if not self.feature:
             self.get_feature(self.tab_type)
-            
+
         # Get widgets
         doc_type = self.dlg_cf.findChild(QComboBox, "doc_type")
         self.date_document_to = self.dlg_cf.findChild(QDateEdit, "date_document_to")
@@ -2393,6 +2407,7 @@ class ApiCF(ApiParent, QObject):
 
 
     """ FUNCTIONS RELATED WITH TAB RPT """
+
     def fill_tab_rpt(self, complet_result):
 
         complet_list, widget_list = self.init_tbl_rpt(complet_result, self.dlg_cf)
@@ -2463,7 +2478,7 @@ class ApiCF(ApiParent, QObject):
         form = f'"formName":"{form_name}", "tabName":"{tab_name}"'
         id_name = complet_result[0]['body']['feature']['idName']
         feature = f'"tableName":"{self.tablename}", "idName":"{id_name}", "id":"{self.feature_id}"'
-        body = self.create_body(form, feature,  filter_fields)
+        body = self.create_body(form, feature, filter_fields)
         function_name = 'gw_fct_getlist'
         json_result = self.controller.get_json(function_name, body)
         if json_result is None:
@@ -2475,7 +2490,7 @@ class ApiCF(ApiParent, QObject):
         return complet_list
 
 
-    def filter_table(self, complet_result,  standar_model,  dialog, widget_list):
+    def filter_table(self, complet_result, standar_model, dialog, widget_list):
 
         filter_fields = self.get_filter_qtableview(standar_model, dialog, widget_list)
         index_tab = self.tab_main.currentIndex()
@@ -2515,7 +2530,7 @@ class ApiCF(ApiParent, QObject):
         self.open_rpt_result(widget, complet_result)
 
 
-    def open_rpt_result(self, qtable,  complet_list):
+    def open_rpt_result(self, qtable, complet_list):
         """ Open form of selected element of the @widget?? """
 
         # Get selected rows
@@ -2542,6 +2557,7 @@ class ApiCF(ApiParent, QObject):
 
 
     """ FUNCTIONS RELATED WITH TAB PLAN """
+
     def fill_tab_plan(self, complet_result):
 
         plan_layout = self.dlg_cf.findChild(QGridLayout, 'plan_layout')
@@ -2591,6 +2607,7 @@ class ApiCF(ApiParent, QObject):
 
 
     """ NEW WORKCAT"""
+
     def cf_new_workcat(self, tab_type):
 
         body = '$${"client":{"device":4, "infoType":1, "lang":"ES"}, '
@@ -2781,7 +2798,7 @@ class ApiCF(ApiParent, QObject):
 
     def get_id(self, dialog, action, option, point, event):
         """ Get selected attribute from snapped feature """
-        
+
         # @options{'key':['att to get from snapped feature', 'widget name destination']}
         options = {'arc': ['arc_id', 'data_arc_id'], 'node': ['node_id', 'data_parent_id']}
 
@@ -2809,7 +2826,7 @@ class ApiCF(ApiParent, QObject):
 
 
     def cancel_snapping_tool(self, dialog, action):
-        
+
         self.disconnect_snapping(False)
         dialog.blockSignals(False)
         action.setChecked(False)
@@ -2830,6 +2847,7 @@ class ApiCF(ApiParent, QObject):
 
 
     """ OTHER FUNCTIONS """
+
     def set_image(self, dialog, widget):
         utils_giswater.setImage(dialog, widget, "ws_shape.png")
 

@@ -69,7 +69,7 @@ class GwToolBox(ApiParent):
         extras = f'"filterText":"{text}"'
         body = self.create_body(extras=extras)
         json_result = self.controller.get_json('gw_fct_gettoolbox', body)
-        if not json_result :
+        if not json_result:
             return False
 
         self.populate_trv(self.dlg_toolbox_doc.trv, json_result['body']['data'], expand=True)
@@ -287,7 +287,7 @@ class GwToolBox(ApiParent):
                 features = layer.selectedFeatures()
                 feature_type = utils_giswater.get_item_data(dialog, dialog.cmb_geom_type, 0)
                 for feature in features:
-                    feature_id = feature.attribute(feature_type+"_id")
+                    feature_id = feature.attribute(feature_type + "_id")
                     feature_id_list += f'"{feature_id}", '
                 if len(features) > 0:
                     feature_id_list = feature_id_list[:-2] + ']'
@@ -415,7 +415,7 @@ class GwToolBox(ApiParent):
             if len(function) != 0:
                 dialog.setWindowTitle(function[0]['alias'])
                 dialog.txt_info.setText(str(function[0]['descript']))
-                if str(function[0]['isparametric']) in ('false', 'False', False, 'None',  None, 'null'):
+                if str(function[0]['isparametric']) in ('false', 'False', False, 'None', None, 'null'):
                     self.is_paramtetric = False
                     self.control_isparametric(dialog)
                     self.load_settings_values(dialog, function)
@@ -478,7 +478,7 @@ class GwToolBox(ApiParent):
                     list_items.append(elem)
 
         return list_items
-    
+
 
     def control_isparametric(self, dialog):
         """ Control if the function is not parameterized whit a json, is old and we need disable all widgets """
@@ -563,7 +563,7 @@ class GwToolBox(ApiParent):
                         label.setIcon(icon)
                         label.setForeground(QColor(255, 0, 0))
                         msg = f"Function {function['functionname']}" \
-                              f" configured on the table config_toolbox, but not found in the database"
+                            f" configured on the table config_toolbox, but not found in the database"
                         label.setToolTip(msg)
                         self.no_clickable_items.append(str(function['alias']))
                 else:
@@ -574,7 +574,7 @@ class GwToolBox(ApiParent):
                 enable_run = QStandardItem("True")
                 if function['input_params'] is not None:
                     if 'btnRunEnabled' in function['input_params']:
-                        bool_dict = {True: "True",  False:"False"}
+                        bool_dict = {True: "True", False: "False"}
                         enable_run = QStandardItem(bool_dict[function['input_params']['btnRunEnabled']])
 
                 parent1.appendRow([label, func_name, enable_run])

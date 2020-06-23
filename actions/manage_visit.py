@@ -91,7 +91,7 @@ class ManageVisit(ParentManage, QObject):
         # Feature type of selected parameter
         self.feature_type_parameter = None
 
-        # Reset geometry  
+        # Reset geometry
         self.x = None
         self.y = None
 
@@ -104,7 +104,7 @@ class ManageVisit(ParentManage, QObject):
         self.set_icon(self.dlg_add_visit.btn_doc_new, "134")
         self.set_icon(self.dlg_add_visit.btn_open_doc, "170")
         self.set_icon(self.dlg_add_visit.btn_add_geom, "133")
-        
+
         # tab events
         self.tabs = self.dlg_add_visit.findChild(QTabWidget, 'tab_widget')
         self.button_box = self.dlg_add_visit.findChild(QDialogButtonBox, 'button_box')
@@ -206,7 +206,7 @@ class ManageVisit(ParentManage, QObject):
 
     def set_locked_relation(self):
         """ Set geom_type and listed feature_id in @table_name to lock it """
-        
+
         # Enable tab
         index = self.tab_index('tab_relations')
         self.tabs.setTabEnabled(index, True)
@@ -255,7 +255,7 @@ class ManageVisit(ParentManage, QObject):
         # Remove all previous selections
         self.disconnect_signal_selection_changed()
         self.remove_selection()
-        
+
         # Update geometry field (if user have selected a point)
         if self.x:
             self.update_geom()
@@ -310,7 +310,7 @@ class ManageVisit(ParentManage, QObject):
 
     def tab_index(self, tab_name):
         """Get the index of a tab basing on objectName."""
-        
+
         for idx in range(self.tabs.count()):
             if self.tabs.widget(idx).objectName() == tab_name:
                 return idx
@@ -360,7 +360,7 @@ class ManageVisit(ParentManage, QObject):
         The steps to follow are:
         1) check geometry type looking what table contain records related with visit_id
         2) set gemetry type."""
-        
+
         feature_type = None
         feature_type_index = None
         for index in range(self.feature_type.count()):
@@ -405,7 +405,7 @@ class ManageVisit(ParentManage, QObject):
         self.current_visit.status = utils_giswater.get_item_data(self.dlg_add_visit, 'status', 0)
         if self.expl_id:
             self.current_visit.expl_id = self.expl_id
-            
+
         # update or insert but without closing the transaction
         self.current_visit.upsert()
 
@@ -472,7 +472,7 @@ class ManageVisit(ParentManage, QObject):
             return None
 
         # do nothing if model is None or no element is present
-        if not widget.model(): #or not widget.rowCount():
+        if not widget.model():  # or not widget.rowCount():
             self.controller.log_info(f"Widget model is none: tbl_visit_x_{geom_type}")
             return
 
@@ -601,7 +601,7 @@ class ManageVisit(ParentManage, QObject):
 
         self.connect_signal_tab_feature_signal(True)
 
-        #self.hide_generic_layers(excluded_layers=excluded_layers)
+        # self.hide_generic_layers(excluded_layers=excluded_layers)
         widget_name = f"tbl_visit_x_{self.geom_type}"
         viewname = f"v_edit_{self.geom_type}"
         widget_table = utils_giswater.getWidget(self.dlg_add_visit, widget_name)
@@ -702,7 +702,7 @@ class ManageVisit(ParentManage, QObject):
         # Select list of related features
         # Set 'expr_filter' with features that are in the list
         expr_filter = f"{geom_type}_id IN ({','.join(ids)})"
-        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
         if not is_valid:
             return
 
@@ -742,7 +742,7 @@ class ManageVisit(ParentManage, QObject):
             filed_to_filter = "code"
             table_object = "v_ui_om_visitman_x_" + str(geom_type)
             expr_filter = f"{geom_type}_id = '{feature_id}'"
-            # Refresh model with selected filter            
+            # Refresh model with selected filter
             self.fill_table_object(self.dlg_man.tbl_visit, self.schema_name + "." + table_object, expr_filter)
             self.set_table_columns(self.dlg_man, self.dlg_man.tbl_visit, table_object)
 
@@ -814,7 +814,7 @@ class ManageVisit(ParentManage, QObject):
                " WHERE active is true"
                " ORDER BY name")
         self.visitcat_ids = self.controller.get_rows(sql)
-        
+
         if self.visitcat_ids:
             utils_giswater.set_item_data(self.dlg_add_visit.visitcat_id, self.visitcat_ids, 1)
             # now get default value to be show in visitcat_id
@@ -933,11 +933,11 @@ class ManageVisit(ParentManage, QObject):
 
     def manage_document(self, qtable):
         """Access GUI to manage documents e.g Execute action of button 34 """
-        
-        visit_id = utils_giswater.getText(self.dlg_add_visit, self.dlg_add_visit.visit_id)        
+
+        visit_id = utils_giswater.getText(self.dlg_add_visit, self.dlg_add_visit.visit_id)
         manage_document = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir, single_tool=False)
         dlg_docman = manage_document.manage_document(tablename='visit', qtable=self.dlg_add_visit.tbl_document, item_id=visit_id)
-        utils_giswater.remove_tab_by_tabName(dlg_docman.tabWidget, 'tab_rel')        
+        utils_giswater.remove_tab_by_tabName(dlg_docman.tabWidget, 'tab_rel')
         dlg_docman.btn_accept.clicked.connect(partial(self.set_completer_object, dlg_docman, 'doc'))
 
 
@@ -1039,7 +1039,7 @@ class ManageVisit(ParentManage, QObject):
         # Get row index
         index = self.dlg_event.tbl_docs_x_event.selectionModel().selectedRows()[0]
         column_index = utils_giswater.get_col_index_by_col_name(self.dlg_event.tbl_docs_x_event, 'value')
-        
+
         path = index.sibling(index.row(), column_index).data()
         if os.path.exists(path):
             # Open the document
@@ -1223,8 +1223,8 @@ class ManageVisit(ParentManage, QObject):
 
         # Get selected rows
         # TODO: use tbl_event.model().fieldIndex(event.pk()) to be pk name independent
-        # 0 is the column of the pk 0 'id'        
-        selected_list = self.tbl_event.selectionModel().selectedRows(0)  
+        # 0 is the column of the pk 0 'id'
+        selected_list = self.tbl_event.selectionModel().selectedRows(0)
         if selected_list == 0:
             message = "Any record selected"
             self.controller.show_info_box(message)
@@ -1349,7 +1349,7 @@ class ManageVisit(ParentManage, QObject):
 
     def event_delete(self):
         """Delete a selected event."""
-        
+
         if not self.tbl_event.selectionModel().hasSelection():
             message = "Any record selected"
             self.controller.show_info_box(message)
@@ -1360,7 +1360,7 @@ class ManageVisit(ParentManage, QObject):
 
         # Get selected rows
         # TODO: use tbl_event.model().fieldIndex(event.pk()) to be pk name independent
-        # 0 is the column of the pk 0 'id'        
+        # 0 is the column of the pk 0 'id'
         selected_list = self.tbl_event.selectionModel().selectedRows(0)
         selected_id = []
         list_id = ""
@@ -1401,7 +1401,7 @@ class ManageVisit(ParentManage, QObject):
 
     def document_insert(self):
         """Insert a document related to the current visit."""
-        
+
         doc_id = self.doc_id.text()
         visit_id = self.visit_id.text()
         if not doc_id:

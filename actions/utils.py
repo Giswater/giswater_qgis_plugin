@@ -120,7 +120,7 @@ class Utils(ParentAction):
         if not unicode:
             unicode = 'latin1'
         utils_giswater.setWidgetText(self.dlg_csv, self.dlg_csv.cmb_unicode_list, unicode)
-        
+
         if str(self.controller.plugin_settings_value('Csv2Pg_rb_comma_' + cur_user)).upper() == 'TRUE':
             self.dlg_csv.rb_comma.setChecked(True)
         else:
@@ -281,10 +281,10 @@ class Utils(ParentAction):
                 sql += "INSERT INTO temp_csv (fid, "
                 values = f"VALUES({fid_aux}, "
                 for x in range(0, len(row)):
-                        sql += f"csv{x + 1}, "
-                        value = f"$$" + row[x].strip().replace("\n", "") + "$$, "
-                        value = str(value)
-                        values += value.replace("$$$$", "null")
+                    sql += f"csv{x + 1}, "
+                    value = f"$$" + row[x].strip().replace("\n", "") + "$$, "
+                    value = str(value)
+                    values += value.replace("$$$$", "null")
                 sql = sql[:-2] + ") "
                 values = values[:-2] + ");\n"
                 sql += values

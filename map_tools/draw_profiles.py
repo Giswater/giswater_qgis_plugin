@@ -145,7 +145,7 @@ class DrawProfiles(ParentMapTool):
         # composer = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.cmb_composer)
         links_distance = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance)
         legend_factor = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_legend_factor)
-        scale_to_fit =  utils_giswater.isChecked(self.dlg_draw_profile, "chk_scalte_to_fit")
+        scale_to_fit = utils_giswater.isChecked(self.dlg_draw_profile, "chk_scalte_to_fit")
         eh = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_horizontal)
         ev = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_vertical)
         papersize_id = utils_giswater.get_item_data(self.dlg_draw_profile, self.dlg_draw_profile.cmb_papersize, 0)
@@ -159,15 +159,15 @@ class DrawProfiles(ParentMapTool):
 
         # Create variable with all the content of the form
         extras = f'"initNode":"{self.initNode}", "endNode":"{self.endNode}", "composer":"mincutA4", ' \
-                 f'"legendFactor":{legend_factor}, "linksDistance":{links_distance}, ' \
-                 f'"scale":{{"scaleToFit":"{scale_to_fit}", "eh":{eh}, "ev":{ev}}}, ' \
-                 f'"papersize":{{"id":{int(papersize_id)}, "customDim":{custom_dim}, ' \
-                 f'"ComposerTemplates":[{{"ComposerTemplate":"mincutA4", ' \
-                 f'"ComposerMap":[{{"width":"179.0","height":"140.826","index":0, "name":"map0"}},' \
-                 f'{{"width":"77.729","height":"55.9066","index":1, "name":"map7"}}]}},' \
-                 f'{{"ComposerTemplate":"mincutA3",' \
-                 f'"ComposerMap":[{{"width":"53.44","height":"55.9066","index":0, "name":"map7"}},' \
-                 f'{{"width":"337.865","height":"275.914","index":1, "name":"map6"}}]}}]'
+            f'"legendFactor":{legend_factor}, "linksDistance":{links_distance}, ' \
+            f'"scale":{{"scaleToFit":"{scale_to_fit}", "eh":{eh}, "ev":{ev}}}, ' \
+            f'"papersize":{{"id":{int(papersize_id)}, "customDim":{custom_dim}, ' \
+            f'"ComposerTemplates":[{{"ComposerTemplate":"mincutA4", ' \
+            f'"ComposerMap":[{{"width":"179.0","height":"140.826","index":0, "name":"map0"}},' \
+            f'{{"width":"77.729","height":"55.9066","index":1, "name":"map7"}}]}},' \
+            f'{{"ComposerTemplate":"mincutA3",' \
+            f'"ComposerMap":[{{"width":"53.44","height":"55.9066","index":0, "name":"map7"}},' \
+            f'{{"width":"337.865","height":"275.914","index":1, "name":"map6"}}]}}]'
 
         body = self.create_body(extras=extras)
 
@@ -230,10 +230,10 @@ class DrawProfiles(ParentMapTool):
 
         # Create variable with all the content of the form
         extras = f'"profile_id":"{profile_id}", "listArcs":"{list_arc}","initNode":"{self.initNode}", ' \
-                 f'"endNode":"{self.endNode}", "composer":"mincutA4", "legendFactor":{legend_factor}, ' \
-                 f'"linksDistance":{links_distance}, "scale":{{"scaleToFit":"{scale_to_fit}", "eh":{eh}, ' \
-                 f'"ev":{ev}}}, "title":"{title}", "date":"{date}", "papersize":{{"id":{int(papersize_id)}, ' \
-                 f'"customDim":{custom_dim}}}'
+            f'"endNode":"{self.endNode}", "composer":"mincutA4", "legendFactor":{legend_factor}, ' \
+            f'"linksDistance":{links_distance}, "scale":{{"scaleToFit":"{scale_to_fit}", "eh":{eh}, ' \
+            f'"ev":{ev}}}, "title":"{title}", "date":"{date}", "papersize":{{"id":{int(papersize_id)}, ' \
+            f'"customDim":{custom_dim}}}'
         body = self.create_body(extras=extras)
         result = self.controller.get_json('gw_fct_setprofile', body, log_sql=True)
         message = f"{result['message']}"
@@ -451,10 +451,10 @@ class DrawProfiles(ParentMapTool):
 
         # Draw ground first node and nodes between first and last node
         for i in range(1, self.t):
-            self.first_top_x = self.links[i-1].start_point
+            self.first_top_x = self.links[i - 1].start_point
             self.node_top_x = self.links[i].start_point
-            self.first_top_y = self.links[i-1].node_id # node_id = top_n1
-            self.node_top_y =  self.links[i-1].geom # geom = top_n2
+            self.first_top_y = self.links[i - 1].node_id  # node_id = top_n1
+            self.node_top_y = self.links[i - 1].geom  # geom = top_n2
             self.draw_ground()
 
             # DRAW TABLE-MARKS
@@ -518,10 +518,10 @@ class DrawProfiles(ParentMapTool):
         self.axes.set_xlim([x_min, x_max])
 
         # Set y-axes
-        y_min = round(self.min_top_elev - self.z - self.height_row*Decimal(1.5))
-        y_max = round(Decimal(self.max_top_elev) +Decimal(self.height_row)*Decimal(1.5))
+        y_min = round(self.min_top_elev - self.z - self.height_row * Decimal(1.5))
+        y_max = round(Decimal(self.max_top_elev) + Decimal(self.height_row) * Decimal(1.5))
         # y_max = self.profile_json['body']['data']['extension']['height']
-        self.axes.set_ylim([y_min, y_max + 1 ])
+        self.axes.set_ylim([y_min, y_max + 1])
 
         # Draw margins
         x = [x_min, x_min]
@@ -619,7 +619,7 @@ class DrawProfiles(ParentMapTool):
             self.nodes[n].elev2 = arc['elev2']
             self.nodes[n].y1 = arc['y1']
             self.nodes[n].y2 = arc['y2']
-            #TODO:: Send SLOPE for arc
+            # TODO:: Send SLOPE for arc
             self.nodes[n].slope = 1
             self.nodes[n].node_1 = arc['node_1']
             self.nodes[n].node_2 = arc['node_2']
@@ -698,7 +698,7 @@ class DrawProfiles(ParentMapTool):
 
         # Vertical line [-2,0]
         x = [start_point - self.fix_x * Decimal(0.75), start_point - self.fix_x * Decimal(0.75)]
-        y = [self.min_top_elev -  Decimal(1.9) * self.height_row, self.min_top_elev -  Decimal(5.10) * self.height_row]
+        y = [self.min_top_elev - Decimal(1.9) * self.height_row, self.min_top_elev - Decimal(5.10) * self.height_row]
         plt.plot(x, y, 'black', zorder=100)
 
         # Vertical line [-3,0]
@@ -739,7 +739,7 @@ class DrawProfiles(ParentMapTool):
         plt.plot(x, y, 'black', zorder=100)
 
 
-    def data_fix_table(self, start_point, reverse):  #@UnusedVariable
+    def data_fix_table(self, start_point, reverse):  # @UnusedVariable
         """ FILL THE FIXED PART OF TABLE WITH DATA - DRAW TEXT """
 
         legend = self.profile_json['body']['data']['legend']
@@ -780,7 +780,7 @@ class DrawProfiles(ParentMapTool):
         plt.text(-self.fix_x * Decimal(1), self.min_top_elev - Decimal(5.75) * self.height_row - self.height_row / 2,
                  title, fontsize=11, verticalalignment='center')
         plt.text(-self.fix_x * Decimal(1), self.min_top_elev - Decimal(6) * self.height_row - self.height_row / 2,
-                 str(scale) + " / " + str(utils_giswater.getCalendarDate(self.dlg_draw_profile, self.dlg_draw_profile.date)),  verticalalignment='center')
+                 str(scale) + " / " + str(utils_giswater.getCalendarDate(self.dlg_draw_profile, self.dlg_draw_profile.date)), verticalalignment='center')
 
         # Fill table with values
         self.fill_data(0, 0, reverse)
@@ -818,7 +818,7 @@ class DrawProfiles(ParentMapTool):
         s4x = node.start_point + node.geom / 2
         s4y = node.top_elev
         s5x = node.start_point + node.geom / 2
-        s5y = node.top_elev -node.ymax + z2 + node.cat_geom
+        s5y = node.top_elev - node.ymax + z2 + node.cat_geom
 
         # Get inferior points
         i1x = self.ilast[0]
@@ -1063,20 +1063,20 @@ class DrawProfiles(ParentMapTool):
             plt.annotate(' ' + '\n' + str(round(self.links[0].ymax, 2)),
                  xy=(Decimal(0 + start_point),
                      self.min_top_elev - Decimal(self.height_row * Decimal(2.60) + self.height_row / 2)), fontsize=6,
-                 rotation='vertical', horizontalalignment='center', verticalalignment='center')
+                rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
             # Fill elevation
             plt.annotate(' ' + '\n' + str(round(self.links[0].elev, 2)),
                  xy=(Decimal(0 + start_point),
                      self.min_top_elev - Decimal(self.height_row * Decimal(3.40) + self.height_row / 2)), fontsize=6,
-                 rotation='vertical', horizontalalignment='center', verticalalignment='center')
+                rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
             # Fill total length
             plt.annotate(str(round(self.links[0].total_distance, 2)),
                  xy=(Decimal(0 + start_point),
                      self.min_top_elev - Decimal(self.height_row * Decimal(4.20) + self.height_row / 2)),
-                 fontsize=6,
-                 rotation='vertical', horizontalalignment='center', verticalalignment='center')
+                fontsize=6,
+                rotation='vertical', horizontalalignment='center', verticalalignment='center')
         else:
             # Fill y_max
             plt.annotate(
@@ -1096,8 +1096,8 @@ class DrawProfiles(ParentMapTool):
             plt.annotate(str(round(self.links[indx].total_distance, 2)),
                  xy=(Decimal(0 + start_point),
                      self.min_top_elev - Decimal(self.height_row * Decimal(4.20) + self.height_row / 2)),
-                 fontsize=6,
-                 rotation='vertical', horizontalalignment='center', verticalalignment='center')
+                fontsize=6,
+                rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
 
     def draw_last_node(self, node, prev_node, index):
@@ -1116,7 +1116,7 @@ class DrawProfiles(ParentMapTool):
         s2y = node.top_elev - node.ymax + z + prev_node.cat_geom
         s3x = node.start_point - node.geom / 2
         s3y = node.top_elev
-        s4x = node.start_point + node.geom /2
+        s4x = node.start_point + node.geom / 2
         s4y = node.top_elev
 
         # Get inferior points
@@ -1194,11 +1194,11 @@ class DrawProfiles(ParentMapTool):
         # Draw horizontal lines
         x = [self.nodes[self.n - 1].start_point, self.nodes[0].start_point - self.fix_x]
         y = [self.min_top_elev - self.height_row, self.min_top_elev - self.height_row]
-        plt.plot(x, y, 'black',zorder=100)
+        plt.plot(x, y, 'black', zorder=100)
 
         x = [self.nodes[self.n - 1].start_point, self.nodes[0].start_point - self.fix_x]
         y = [self.min_top_elev - Decimal(1.9) * self.height_row, self.min_top_elev - Decimal(1.9) * self.height_row]
-        plt.plot(x, y, 'black',zorder=100)
+        plt.plot(x, y, 'black', zorder=100)
 
         # Draw horizontal(shorter) lines
         x = [self.nodes[self.n - 1].start_point, self.nodes[0].start_point - self.fix_x * Decimal(0.75)]
@@ -1214,10 +1214,10 @@ class DrawProfiles(ParentMapTool):
         # Last two lines
         x = [self.nodes[self.n - 1].start_point, self.nodes[0].start_point - self.fix_x]
         y = [self.min_top_elev - Decimal(5.10) * self.height_row, self.min_top_elev - Decimal(5.10) * self.height_row]
-        plt.plot(x, y, 'black',zorder=100)
+        plt.plot(x, y, 'black', zorder=100)
         x = [self.nodes[self.n - 1].start_point, self.nodes[0].start_point - self.fix_x]
         y = [self.min_top_elev - Decimal(6) * self.height_row, self.min_top_elev - Decimal(6) * self.height_row]
-        plt.plot(x, y, 'black',zorder=100)
+        plt.plot(x, y, 'black', zorder=100)
 
 
     def draw_coordinates(self):
@@ -1227,53 +1227,53 @@ class DrawProfiles(ParentMapTool):
 
         # Draw coocrdinates
         x = [0, 0]
-        y = [self.min_top_elev - 1 * self.height_row, int(math.ceil(self.max_top_elev) + 1 )]
-        plt.plot(x, y, 'black',zorder=100)
-        x = [start_point,start_point]
-        y = [self.min_top_elev - 1 * self.height_row, int(math.ceil(self.max_top_elev) + 1 )]
-        plt.plot(x, y, 'black',zorder=100)
-        x = [0,start_point]
-        y = [int(math.ceil(self.max_top_elev) + 1 ),int(math.ceil(self.max_top_elev) + 1 )]
-        plt.plot(x, y, 'black',zorder=100)
+        y = [self.min_top_elev - 1 * self.height_row, int(math.ceil(self.max_top_elev) + 1)]
+        plt.plot(x, y, 'black', zorder=100)
+        x = [start_point, start_point]
+        y = [self.min_top_elev - 1 * self.height_row, int(math.ceil(self.max_top_elev) + 1)]
+        plt.plot(x, y, 'black', zorder=100)
+        x = [0, start_point]
+        y = [int(math.ceil(self.max_top_elev) + 1), int(math.ceil(self.max_top_elev) + 1)]
+        plt.plot(x, y, 'black', zorder=100)
 
         # Loop till self.max_top_elev + height_row
         y = int(math.ceil(self.min_top_elev - 1 * self.height_row))
         x = int(math.floor(self.max_top_elev))
-        if x%2 == 0 :
+        if x % 2 == 0:
             x = x + 2
-        else :
+        else:
             x = x + 1
 
         for i in range(y, x):
-            if i%2 == 0:
+            if i % 2 == 0:
                 x1 = [0, start_point]
                 y1 = [i, i]
             else:
-                i = i+1
+                i = i + 1
                 x1 = [0, start_point]
                 y1 = [i, i]
             plt.plot(x1, y1, 'lightgray', zorder=1)
             # Values left y_ordinate_all
-            plt.text(0 - geom1 * Decimal(1.5), i,str(i), fontsize=7.5, horizontalalignment='right', verticalalignment='center')
+            plt.text(0 - geom1 * Decimal(1.5), i, str(i), fontsize=7.5, horizontalalignment='right', verticalalignment='center')
 
 
     def draw_grid(self):
 
         # Values right y_ordinate_max
-        start_point = self.nodes[self.n-1].start_point
-        geom1 = self.nodes[self.n-1].geom
-        plt.annotate('P.C. '+str(round(self.min_top_elev - 1 * self.height_row,2)) + '\n' + ' ',
-                     xy=(0 - geom1 * Decimal(1.5) , self.min_top_elev - 1 * self.height_row),
+        start_point = self.nodes[self.n - 1].start_point
+        geom1 = self.nodes[self.n - 1].geom
+        plt.annotate('P.C. ' + str(round(self.min_top_elev - 1 * self.height_row, 2)) + '\n' + ' ',
+                     xy=(0 - geom1 * Decimal(1.5), self.min_top_elev - 1 * self.height_row),
                      fontsize=6.5, horizontalalignment='right', verticalalignment='center')
 
         # Values right x_ordinate_min
-        plt.annotate('0'+ '\n' + ' ',
-                     xy=(0,int(math.ceil(self.max_top_elev) + 1 )),
+        plt.annotate('0' + '\n' + ' ',
+                     xy=(0, int(math.ceil(self.max_top_elev) + 1)),
                      fontsize=6.5, horizontalalignment='center')
 
         # Values right x_ordinate_max
-        plt.annotate(str(round(start_point,2))+ '\n' + ' ',
-                     xy=(start_point, int(math.ceil(self.max_top_elev) + 1 ) ),
+        plt.annotate(str(round(start_point, 2)) + '\n' + ' ',
+                     xy=(start_point, int(math.ceil(self.max_top_elev) + 1)),
                      fontsize=6.5, horizontalalignment='center')
 
         # Loop from 0 to start_point(of last node)
@@ -1281,23 +1281,23 @@ class DrawProfiles(ParentMapTool):
         # First after 0 (first is drawn ,start from i(0)+1)
         for i in range(50, x, 50):
             x1 = [i, i]
-            y1 = [self.min_top_elev - 1 * self.height_row, int(math.ceil(self.max_top_elev) + 1 )]
-            plt.plot(x1, y1, 'lightgray',zorder=1 )
+            y1 = [self.min_top_elev - 1 * self.height_row, int(math.ceil(self.max_top_elev) + 1)]
+            plt.plot(x1, y1, 'lightgray', zorder=1)
             # values left y_ordinate_all
             plt.text(0 - geom1 * Decimal(1.5), i, str(i), fontsize=6.5,
                 horizontalalignment='right', verticalalignment='center')
             plt.text(Decimal(start_point) + geom1 * Decimal(1.5), i, str(i), fontsize=6.5,
                 horizontalalignment='left', verticalalignment='center')
             # values right x_ordinate_all
-            plt.annotate(str(i) + '\n' + ' ', xy=(i, int(math.ceil(self.max_top_elev) + 1 )),
+            plt.annotate(str(i) + '\n' + ' ', xy=(i, int(math.ceil(self.max_top_elev) + 1)),
                 fontsize=6.5, horizontalalignment='center')
 
 
     def draw_ground(self):
 
         # Green triangle
-        plt.plot(self.first_top_x,self.first_top_y,'g^',linewidth=3.5)
-        plt.plot(self.node_top_x, self.node_top_y, 'g^',linewidth=3.5)
+        plt.plot(self.first_top_x, self.first_top_y, 'g^', linewidth=3.5)
+        plt.plot(self.node_top_x, self.node_top_y, 'g^', linewidth=3.5)
         x = [self.first_top_x, self.node_top_x]
         y = [self.first_top_y, self.node_top_y]
         plt.plot(x, y, 'green', linestyle='dashed')

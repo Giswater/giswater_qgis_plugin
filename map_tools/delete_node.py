@@ -37,7 +37,7 @@ class DeleteNodeMapTool(ParentMapTool):
 
 
     """ QgsMapTools inherited event functions """
-                
+
     def keyPressEvent(self, event):
 
         if event.key() == Qt.Key_Escape:
@@ -118,7 +118,7 @@ class DeleteNodeMapTool(ParentMapTool):
 
         # Set active layer to 'v_edit_node'
         self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
-        self.iface.setActiveLayer(self.layer_node)            
+        self.iface.setActiveLayer(self.layer_node)
 
         # Change cursor
         self.canvas.setCursor(self.cursor)
@@ -127,10 +127,10 @@ class DeleteNodeMapTool(ParentMapTool):
         if self.show_help:
             message = "Select the node inside a pipe by clicking on it and it will be removed"
             self.controller.show_info(message)
-            
+
 
     def deactivate(self):
 
-        # Call parent method     
+        # Call parent method
         ParentMapTool.deactivate(self)
-    
+

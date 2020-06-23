@@ -118,7 +118,7 @@ class CheckProjectResult(ApiParent):
     def update_config(self, state):
         """ Set qgis_form_initproject_hidden True or False into config_param_user """
 
-        value = {0:"False", 2:"True"}
+        value = {0: "False", 2: "True"}
         sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) "
                f" VALUES('qgis_form_initproject_hidden', '{value[state]}', current_user) "
                f" ON CONFLICT  (parameter, cur_user) "

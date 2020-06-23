@@ -17,6 +17,7 @@ from ..ui_manager import PsectorDuplicate
 class DuplicatePsector(ParentManage, QObject):
 
     is_duplicated = pyqtSignal()
+
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control 'Workcat end' of toolbar 'edit' """
 

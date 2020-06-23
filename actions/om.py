@@ -44,13 +44,13 @@ class Om(ParentAction):
 
     def om_visit_management(self):
         """ Button 65: Visit management """
-        self.manage_visit.edit_visit()     
-        
+        self.manage_visit.edit_visit()
+
 
     def om_psector(self, psector_id=None):
         """ Button 81: Psector """
         self.manage_new_psector.new_psector(psector_id, 'om')
-        
+
 
     def om_psector_management(self):
         """ Button 82: Psector management """
@@ -200,7 +200,7 @@ class Om(ParentAction):
                 sql = f"INSERT INTO {tablename} (parameter, value, cur_user)"
                 _date = widget.dateTime().toString('yyyy-MM-dd')
                 sql += f" VALUES ('{parameter}', '{_date}', current_user)"
-                
+
         self.controller.execute_sql(sql)
 
 
@@ -246,7 +246,7 @@ class Om(ParentAction):
         sql = (f"SELECT * FROM selector_date"
                f" WHERE cur_user = '{self.current_user}'")
         row = self.controller.get_row(sql)
-        if not row :
+        if not row:
             sql = (f"INSERT INTO selector_date"
                    f" (from_date, to_date, context, cur_user)"
                    f" VALUES('{from_date}', '{to_date}', 'om_visit', '{self.current_user}')")

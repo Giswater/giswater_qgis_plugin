@@ -34,7 +34,7 @@ class DeleteFeature(ApiParent):
         utils_giswater.set_item_data(self.dlg_feature_delete.feature_type, rows, 1)
 
         # Set active layer
-        layer_name = 'v_edit_' + utils_giswater.getWidgetText(self.dlg_feature_delete,self.dlg_feature_delete.feature_type).lower()
+        layer_name = 'v_edit_' + utils_giswater.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
         layer = self.controller.get_layer_by_tablename(layer_name)
         self.iface.setActiveLayer(layer)
         self.controller.set_layer_visible(layer)
@@ -183,12 +183,12 @@ class DeleteFeature(ApiParent):
 
     def set_active_layer(self):
 
-        #Get current layer and remove selection
+        # Get current layer and remove selection
         self.current_layer = self.iface.activeLayer()
         self.current_layer.removeSelection()
 
         # Set active layer
-        layer_name = 'v_edit_' + utils_giswater.getWidgetText(self.dlg_feature_delete,self.dlg_feature_delete.feature_type).lower()
+        layer_name = 'v_edit_' + utils_giswater.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
         layer = self.controller.get_layer_by_tablename(layer_name)
         self.iface.setActiveLayer(layer)
         self.controller.set_layer_visible(layer)

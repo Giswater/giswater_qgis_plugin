@@ -91,7 +91,7 @@ class AddLayer(object):
             self.controller.log_info(F"ERROR --> {error[1]}")
 
 
-    def from_postgres_to_toc(self, tablename=None, the_geom="the_geom", field_id="id",  child_layers=None, group="GW Layers"):
+    def from_postgres_to_toc(self, tablename=None, the_geom="the_geom", field_id="id", child_layers=None, group="GW Layers"):
         """ Put selected layer into TOC
         :param tablename: Postgres table name (string)
         :param the_geom: Geometry field of the table (string)
@@ -174,7 +174,7 @@ class AddLayer(object):
                         self.delete_layer_from_toc(layer_name)
                     v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", layer_name, 'memory')
                     layer_name = None
-                    #TODO This if controls if the function already works with GeoJson or is still to be refactored
+                    # TODO This if controls if the function already works with GeoJson or is still to be refactored
                     # once all are refactored the if should be: if 'feature' not in data [k]: continue
                     if key == 'values':
                         self.populate_vlayer_old(v_layer, data, k, counter, group)
@@ -310,7 +310,7 @@ class AddLayer(object):
                 else:
                     text += "\n"
 
-        utils_giswater.setWidgetText(dialog, 'txt_infolog', text+"\n")
+        utils_giswater.setWidgetText(dialog, 'txt_infolog', text + "\n")
         qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
         if qtabwidget is not None:
             if change_tab and qtabwidget is not None:
@@ -328,7 +328,7 @@ class AddLayer(object):
         """
 
         qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
-        for x in range(0, qtabwidget.count()-1):
+        for x in range(0, qtabwidget.count() - 1):
             qtabwidget.widget(x).setEnabled(False)
 
         btn_accept = dialog.findChild(QPushButton, 'btn_accept')
@@ -475,7 +475,7 @@ class AddLayer(object):
         coordinates = "("
         for coords in feature['geometry']['coordinates']:
             coordinates += f"{coords[0]} {coords[1]}, "
-        coordinates = coordinates[:-2]+")"
+        coordinates = coordinates[:-2] + ")"
         return coordinates
 
 

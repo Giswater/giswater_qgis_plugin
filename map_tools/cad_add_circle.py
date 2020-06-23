@@ -43,7 +43,7 @@ class CadAddCircle(ParentMapTool):
         self.dlg_create_circle.btn_accept.clicked.connect(partial(self.get_radius, point))
         self.dlg_create_circle.btn_cancel.clicked.connect(self.cancel)
         self.dlg_create_circle.radius.setFocus()
-        
+
         self.open_dialog(self.dlg_create_circle, dlg_name='auxcircle')
 
 
@@ -76,7 +76,7 @@ class CadAddCircle(ParentMapTool):
             self.layer_circle.commitChanges()
             self.layer_circle.dataProvider().reloadData()
             self.layer_circle.triggerRepaint()
-            
+
         else:
             self.iface.actionPan().trigger()
             self.cancel_circle = False
@@ -198,4 +198,4 @@ class CadAddCircle(ParentMapTool):
         # Call parent method
         ParentMapTool.deactivate(self)
         self.iface.setActiveLayer(self.current_layer)
-        
+

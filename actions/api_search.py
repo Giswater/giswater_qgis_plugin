@@ -176,9 +176,9 @@ class ApiSearch(ApiParent):
         # Get selected tab name
         tab_selected = self.dlg_search.main_tab.widget(index).objectName()
 
-        #check for addschema
-        if tab_selected =='add_network':
-           is_add_schema = True
+        # check for addschema
+        if tab_selected == 'add_network':
+            is_add_schema = True
 
         # Tab 'network or add_network'
         if tab_selected == 'network' or tab_selected == 'add_network':
@@ -199,7 +199,7 @@ class ApiSearch(ApiParent):
         elif tab_selected == 'address' and 'id' in item and 'sys_id' not in item:
             polygon = item['st_astext']
             if polygon:
-                polygon = polygon[9:len(polygon)-2]
+                polygon = polygon[9:len(polygon) - 2]
                 polygon = polygon.split(',')
                 x1, y1 = polygon[0].split(' ')
                 x2, y2 = polygon[2].split(' ')
@@ -207,7 +207,7 @@ class ApiSearch(ApiParent):
             else:
                 message = f"Zoom unavailable. Doesn't exist the geometry for the street"
                 self.controller.show_info(message, parameter=item['display_name'])
-                
+
         # Tab 'address'
         elif tab_selected == 'address' and 'sys_x' in item and 'sys_y' in item:
             x1 = item['sys_x']
@@ -311,7 +311,7 @@ class ApiSearch(ApiParent):
             value = utils_giswater.getWidgetText(self.dlg_search, line_edit, return_string_null=False)
             if str(value) == '':
                 return
-            
+
             qgis_project_add_schema = self.controller.plugin_settings_value('gwAddSchema')
             extras_search += f'"{line_edit.property("columnname")}":{{"text":"{value}"}}, '
             extras_search += f'"addSchema":"{qgis_project_add_schema}"'
@@ -391,7 +391,7 @@ class ApiSearch(ApiParent):
 
 
     def populate_combo(self, widget, field, allow_blank=True):
-        
+
         # Generate list of items to add into combo
         widget.blockSignals(True)
         widget.clear()
@@ -489,9 +489,9 @@ class ApiSearch(ApiParent):
         table_name = "v_ui_workcat_x_feature"
         table_name_end = "v_ui_workcat_x_feature_end"
         table_doc = "v_ui_doc_x_workcat"
-        self.items_dialog.btn_doc_insert.clicked.connect(partial(self.document_insert, self.items_dialog, 'doc_x_workcat', 'workcat_id' ,item['sys_id']))
+        self.items_dialog.btn_doc_insert.clicked.connect(partial(self.document_insert, self.items_dialog, 'doc_x_workcat', 'workcat_id', item['sys_id']))
         self.items_dialog.btn_doc_delete.clicked.connect(partial(self.document_delete, self.items_dialog.tbl_document, 'doc_x_workcat'))
-        self.items_dialog.btn_doc_new.clicked.connect(partial(self.manage_document, self.items_dialog.tbl_document, item ['sys_id']))
+        self.items_dialog.btn_doc_new.clicked.connect(partial(self.manage_document, self.items_dialog.tbl_document, item['sys_id']))
         self.items_dialog.btn_open_doc.clicked.connect(partial(self.document_open, self.items_dialog.tbl_document))
         self.items_dialog.tbl_document.doubleClicked.connect(partial(self.document_open, self.items_dialog.tbl_document))
 
@@ -542,7 +542,7 @@ class ApiSearch(ApiParent):
         utils_giswater.remove_tab_by_tabName(dlg_docman.tabWidget, 'tab_rel')
 
 
-    def force_expl(self,  workcat_id):
+    def force_expl(self, workcat_id):
         """ Active exploitations are compared with workcat farms.
             If there is consistency nothing happens, if there is no consistency force this exploitations to selector."""
 
@@ -617,7 +617,7 @@ class ApiSearch(ApiParent):
         row = self.controller.get_row(sql)
         if row:
             return
-        
+
         sql = (f"INSERT INTO selector_state(state_id, cur_user) "
                f"VALUES('{state}', current_user)")
         self.controller.execute_sql(sql)
@@ -756,7 +756,7 @@ class ApiSearch(ApiParent):
         feature_id = qtable.model().record(row).value('feature_id')
 
         self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, tab_type='data')
-        complet_result, dialog = self.ApiCF.open_form(table_name=table_name,  feature_id=feature_id, tab_type='data')
+        complet_result, dialog = self.ApiCF.open_form(table_name=table_name, feature_id=feature_id, tab_type='data')
 
         # Get list of all coords in field geometry
         list_coord = re.search('\((.*)\)', str(complet_result[0]['body']['feature']['geometry']['st_astext']))
@@ -795,7 +795,7 @@ class ApiSearch(ApiParent):
             widget.setText(str(feature.lower().title()) + "s: " + str(total))
             if self.project_type == 'ws' and feature == 'GULLY':
                 widget.setVisible(False)
-            
+
             if not rows:
                 continue
 

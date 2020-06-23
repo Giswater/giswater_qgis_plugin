@@ -21,14 +21,14 @@ from .parent_manage import ParentManage
 
 
 class ManageGallery(ParentManage):
-    
+
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control 'Add element' of toolbar 'edit' """
         ParentManage.__init__(self, iface, settings, controller, plugin_dir)
 
 
     def manage_gallery(self):
-        
+
         # Create the dialog and signals
         self.dlg_gallery = Gallery()
         self.load_settings(self.dlg_gallery)
@@ -71,7 +71,7 @@ class ManageGallery(ParentManage):
                 self.img_path_list[0][br] = self.img_path_list1D[br]
         else:
             for h in range(0, rows):
-                for r in range(0, columns-1):
+                for r in range(0, columns - 1):
                     if idx >= columns:
                         break
                     self.img_path_list[h][r] = self.img_path_list1D[idx]
@@ -121,10 +121,10 @@ class ManageGallery(ParentManage):
         self.set_icon(self.btn_next, "108")
         self.btn_close = self.dlg_gallery.findChild(QPushButton, "btn_close")
         self.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_gallery))
-         
-        # If all images set in one page, disable button next   
+
+        # If all images set in one page, disable button next
         if num <= 9:
-            self.btn_next.setDisabled(True)        
+            self.btn_next.setDisabled(True)
 
         # Open dialog
         self.open_dialog(self.dlg_gallery, dlg_name='visit_gallery', maximize_button=False)
@@ -133,7 +133,7 @@ class ManageGallery(ParentManage):
     def next_gallery(self):
 
         self.start_indx = self.start_indx + 1
-        
+
         # Clear previous
         for i in self.list_widget:
             i.clear()
@@ -203,7 +203,7 @@ class ManageGallery(ParentManage):
 
 
     def zoom_img(self, i, visit_id, event_id):
-        
+
         handeler_index = i
 
         self.dlg_gallery_zoom = GalleryZoom()
@@ -241,7 +241,7 @@ class ManageGallery(ParentManage):
         self.i = i
         self.btn_slidePrevious.clicked.connect(self.slide_previous)
         self.btn_slideNext.clicked.connect(self.slide_next)
-    
+
         # Open dialog
         self.open_dialog(self.dlg_gallery_zoom, dlg_name='visit_gallery_zoom', maximize_button=False)
 

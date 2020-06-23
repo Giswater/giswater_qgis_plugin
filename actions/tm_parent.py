@@ -6,12 +6,14 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.core import QgsExpression
-from qgis.PyQt.QtCore import QStringListModel, Qt,QDate
+from qgis.PyQt.QtCore import QStringListModel, Qt, QDate
 from qgis.PyQt.QtGui import QCursor, QIcon, QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QApplication, QComboBox, QCompleter, QTableView
 
-import configparser, os, sys
+import configparser
+import os
+import sys
 from functools import partial
 
 if 'nt' in sys.builtin_module_names:
@@ -22,7 +24,7 @@ from ..ui_manager import GwDialog, GwMainWindow
 
 
 class TmParentAction(object):
-    
+
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class constructor """
 
@@ -186,7 +188,7 @@ class TmParentAction(object):
             message = "Expression Error"
             self.controller.log_warning(message, parameter=expr_filter)
             return False, expr
-        
+
         return True, expr
 
 
@@ -230,7 +232,7 @@ class TmParentAction(object):
         """ Set autocomplete of widget @table_object + "_id"
             getting id's from selected @table_object
         """
-        
+
         if not widget:
             return
 
@@ -399,9 +401,9 @@ class TmParentAction(object):
 
     def set_dates_from_to(self, widget_from, widget_to, table_name, field_from, field_to):
 
-        sql = ("SELECT MIN(LEAST("+field_from+", "+field_to+")),"
-               " MAX(GREATEST("+field_from+", "+field_to+"))"
-               " FROM "+table_name+"")
+        sql = ("SELECT MIN(LEAST(" + field_from + ", " + field_to + ")),"
+               " MAX(GREATEST(" + field_from + ", " + field_to + "))"
+               " FROM " + table_name + "")
         row = self.controller.get_row(sql, log_sql=False)
         current_date = QDate.currentDate()
         if row:

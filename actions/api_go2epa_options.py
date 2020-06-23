@@ -33,7 +33,7 @@ class Go2EpaOptions(ApiParent):
 
         # Clear list
         self.epa_options_list = []
-        
+
         # Create dialog
         self.dlg_options = Go2EpaOptionsUi()
         self.load_settings(self.dlg_options)

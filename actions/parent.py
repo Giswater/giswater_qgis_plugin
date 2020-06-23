@@ -15,7 +15,12 @@ from qgis.PyQt.QtGui import QIcon, QColor, QCursor, QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel
 
 import random
-import configparser, os, re, subprocess, sys, webbrowser
+import configparser
+import os
+import re
+import subprocess
+import sys
+import webbrowser
 if 'nt' in sys.builtin_module_names:
     import ctypes
 
@@ -28,16 +33,16 @@ from ..ui_manager import DialogTextUi, GwDialog, GwMainWindow
 
 class ParentAction(object):
 
-    def __init__(self, iface, settings, controller, plugin_dir):  
+    def __init__(self, iface, settings, controller, plugin_dir):
         """ Class constructor """
 
         # Initialize instance attributes
         self.iface = iface
-        self.canvas = self.iface.mapCanvas()        
+        self.canvas = self.iface.mapCanvas()
         self.settings = settings
         self.controller = controller
-        self.plugin_dir = plugin_dir       
-        self.dao = self.controller.dao         
+        self.plugin_dir = plugin_dir
+        self.dao = self.controller.dao
         self.schema_name = self.controller.schema_name
         self.project_type = None
         self.plugin_version = self.get_plugin_version()
@@ -63,21 +68,21 @@ class ParentAction(object):
 
     def set_controller(self, controller):
         """ Set controller class """
-        
+
         self.controller = controller
-        self.schema_name = self.controller.schema_name       
+        self.schema_name = self.controller.schema_name
 
 
     def open_web_browser(self, dialog, widget=None):
         """ Display url using the default browser """
-        
-        if widget is not None:           
+
+        if widget is not None:
             url = utils_giswater.getWidgetText(dialog, widget)
             if url == 'null':
                 url = 'http://www.giswater.org'
         else:
             url = 'http://www.giswater.org'
-                     
+
         webbrowser.open(url)
 
 
@@ -103,36 +108,36 @@ class ParentAction(object):
 
     def get_file_dialog(self, dialog, widget):
         """ Get file dialog """
-        
+
         # Check if selected file exists. Set default value if necessary
         file_path = utils_giswater.getWidgetText(dialog, widget)
-        if file_path is None or file_path == 'null' or not os.path.exists(str(file_path)): 
-            folder_path = self.plugin_dir   
-        else:     
-            folder_path = os.path.dirname(file_path) 
-                
+        if file_path is None or file_path == 'null' or not os.path.exists(str(file_path)):
+            folder_path = self.plugin_dir
+        else:
+            folder_path = os.path.dirname(file_path)
+
         # Open dialog to select file
         os.chdir(folder_path)
         file_dialog = QFileDialog()
-        file_dialog.setFileMode(QFileDialog.AnyFile)        
+        file_dialog.setFileMode(QFileDialog.AnyFile)
         message = "Select file"
         folder_path, filter_ = file_dialog.getOpenFileName(parent=None, caption=self.controller.tr(message))
         if folder_path:
             utils_giswater.setWidgetText(dialog, widget, str(folder_path))
-                
-                
+
+
     def get_folder_dialog(self, dialog, widget):
         """ Get folder dialog """
-        
+
         # Check if selected folder exists. Set default value if necessary
         folder_path = utils_giswater.getWidgetText(dialog, widget)
-        if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path): 
+        if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path):
             folder_path = os.path.expanduser("~")
 
         # Open dialog to select folder
         os.chdir(folder_path)
         file_dialog = QFileDialog()
-        file_dialog.setFileMode(QFileDialog.Directory)      
+        file_dialog.setFileMode(QFileDialog.Directory)
         message = "Select folder"
         folder_path = file_dialog.getExistingDirectory(parent=None, caption=self.controller.tr(message), directory=folder_path)
         if folder_path:
@@ -144,7 +149,7 @@ class ParentAction(object):
 
         if dialog is None:
             dialog = self.dlg
-                    
+
         try:
             x = self.controller.plugin_settings_value(dialog.objectName() + "_x")
             y = self.controller.plugin_settings_value(dialog.objectName() + "_y")
@@ -156,7 +161,7 @@ class ParentAction(object):
             else:
                 screens = ctypes.windll.user32
                 screen_x = screens.GetSystemMetrics(78)
-                screen_y = screens.GetSystemMetrics(79)                
+                screen_y = screens.GetSystemMetrics(79)
                 if int(x) > screen_x:
                     x = int(screen_x) - int(width)
                 if int(y) > screen_y:
@@ -168,14 +173,14 @@ class ParentAction(object):
 
     def save_settings(self, dialog=None):
         """ Save QGIS settings related with dialog position and size """
-                
+
         if dialog is None:
             dialog = self.dlg
-            
+
         self.controller.plugin_settings_set_value(dialog.objectName() + "_width", dialog.property('width'))
         self.controller.plugin_settings_set_value(dialog.objectName() + "_height", dialog.property('height'))
-        self.controller.plugin_settings_set_value(dialog.objectName() + "_x", dialog.pos().x()+8)
-        self.controller.plugin_settings_set_value(dialog.objectName() + "_y", dialog.pos().y()+31)
+        self.controller.plugin_settings_set_value(dialog.objectName() + "_x", dialog.pos().x() + 8)
+        self.controller.plugin_settings_set_value(dialog.objectName() + "_y", dialog.pos().y() + 31)
 
 
     def get_last_tab(self, dialog, selector_name):
@@ -239,9 +244,9 @@ class ParentAction(object):
             dlg.show()
         else:
             dlg.show()
-    
-        
-    def close_dialog(self, dlg=None): 
+
+
+    def close_dialog(self, dlg=None):
         """ Close dialog """
 
         if dlg is None or type(dlg) is bool:
@@ -252,13 +257,13 @@ class ParentAction(object):
             map_tool = self.canvas.mapTool()
             # If selected map tool is from the plugin, set 'Pan' as current one
             if map_tool.toolName() == '':
-                self.iface.actionPan().trigger() 
+                self.iface.actionPan().trigger()
         except AttributeError:
             pass
         except Exception as e:
             self.controller.log_info(type(e).__name__)
-        
-        
+
+
     def multi_row_selector(self, dialog, tableleft, tableright, field_id_left, field_id_right, name='name',
                            hide_left=[0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
                                   25, 26, 27, 28, 29, 30], hide_right=[1, 2, 3], aql=""):
@@ -360,7 +365,7 @@ class ParentAction(object):
         col_to_sort = qtable_left.model().headerData(idx, Qt.Horizontal)
         query_left += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
         self.fill_table_by_query(qtable_left, query_left)
-        
+
         sort_order = qtable_right.horizontalHeader().sortIndicatorOrder()
         idx = qtable_right.horizontalHeader().sortIndicatorSection()
         col_to_sort = qtable_right.model().headerData(idx, Qt.Horizontal)
@@ -369,7 +374,7 @@ class ParentAction(object):
         self.refresh_map_canvas()
 
 
-    def multi_rows_selector(self, qtable_left, qtable_right, id_ori, 
+    def multi_rows_selector(self, qtable_left, qtable_right, id_ori,
                             tablename_des, id_des, query_left, query_right, field_id):
         """
             :param qtable_left: QTableView origin
@@ -444,7 +449,7 @@ class ParentAction(object):
         # Check for errors
         if self.model.lastError().isValid():
             self.controller.show_warning(self.model.lastError().text())
-            
+
         # Attach model to table view
         widget.setModel(self.model)
 
@@ -486,8 +491,8 @@ class ParentAction(object):
 
         # Check for errors
         if model.lastError().isValid():
-            self.controller.show_warning(model.lastError().text())  
-            
+            self.controller.show_warning(model.lastError().text())
+
 
     def query_like_widget_text(self, dialog, text_line, qtable, tableleft, tableright, field_id_r, field_id_l, name='name', aql=''):
         """ Fill the QTableView by filtering through the QLineEdit"""
@@ -502,68 +507,68 @@ class ParentAction(object):
                f"  AND  {field_id_l} > -1")
         sql += aql
         self.fill_table_by_query(qtable, sql)
-        
-        
+
+
     def set_icon(self, widget, icon):
         """ Set @icon to selected @widget """
 
         # Get icons folder
-        icons_folder = os.path.join(self.plugin_dir, 'icons')           
-        icon_path = os.path.join(icons_folder, str(icon) + ".png")           
+        icons_folder = os.path.join(self.plugin_dir, 'icons')
+        icon_path = os.path.join(icons_folder, str(icon) + ".png")
         if os.path.exists(icon_path):
             widget.setIcon(QIcon(icon_path))
         else:
             self.controller.log_info("File not found", parameter=icon_path)
-                    
+
 
     def check_expression(self, expr_filter, log_info=False):
         """ Check if expression filter @expr_filter is valid """
-        
+
         if log_info:
             self.controller.log_info(expr_filter)
         expr = QgsExpression(expr_filter)
         if expr.hasParserError():
             message = "Expression Error"
-            self.controller.log_warning(message, parameter=expr_filter)      
+            self.controller.log_warning(message, parameter=expr_filter)
             return False, expr
 
         return True, expr
-        
+
 
     def refresh_map_canvas(self, restore_cursor=False):
         """ Refresh all layers present in map canvas """
-        
+
         self.canvas.refreshAllLayers()
         for layer_refresh in self.canvas.layers():
             layer_refresh.triggerRepaint()
 
         if restore_cursor:
-            self.set_cursor_restore() 
+            self.set_cursor_restore()
 
 
     def set_cursor_wait(self):
         """ Change cursor to 'WaitCursor' """
         QApplication.setOverrideCursor(Qt.WaitCursor)
-            
-            
+
+
     def set_cursor_restore(self):
         """ Restore to previous cursors """
-        QApplication.restoreOverrideCursor() 
-        
-        
+        QApplication.restoreOverrideCursor()
+
+
     def get_cursor_multiple_selection(self):
         """ Set cursor for multiple selection """
-        
-        path_folder = os.path.join(os.path.dirname(__file__), os.pardir) 
-        path_cursor = os.path.join(path_folder, 'icons', '201.png')                
-        if os.path.exists(path_cursor):      
-            cursor = QCursor(QPixmap(path_cursor))    
-        else:        
-            cursor = QCursor(Qt.ArrowCursor)  
-                
-        return cursor        
-                    
-                
+
+        path_folder = os.path.join(os.path.dirname(__file__), os.pardir)
+        path_cursor = os.path.join(path_folder, 'icons', '201.png')
+        if os.path.exists(path_cursor):
+            cursor = QCursor(QPixmap(path_cursor))
+        else:
+            cursor = QCursor(Qt.ArrowCursor)
+
+        return cursor
+
+
     def set_table_columns(self, dialog, widget, table_name, sort_order=0, isQStandardItemModel=False):
         """ Configuration of tables. Set visibility and width of columns """
 
@@ -606,22 +611,22 @@ class ParentAction(object):
 
     def connect_signal_selection_changed(self, option):
         """ Connect signal selectionChanged """
-            
-        try:            
+
+        try:
             if option == "mincut_connec":
-                self.canvas.selectionChanged.connect(partial(self.snapping_selection_connec))                 
+                self.canvas.selectionChanged.connect(partial(self.snapping_selection_connec))
             elif option == "mincut_hydro":
-                self.canvas.selectionChanged.connect(partial(self.snapping_selection_hydro))                 
-        except Exception:    
+                self.canvas.selectionChanged.connect(partial(self.snapping_selection_hydro))
+        except Exception:
             pass
-    
-    
+
+
     def disconnect_signal_selection_changed(self):
         """ Disconnect signal selectionChanged """
-        
-        try:                     
-            self.canvas.selectionChanged.disconnect()  
-        except Exception:                     
+
+        try:
+            self.canvas.selectionChanged.disconnect()
+        except Exception:
             pass
         finally:
             self.iface.actionPan().trigger()
@@ -793,7 +798,7 @@ class ParentAction(object):
 
     def zoom_to_rectangle(self, x1, y1, x2, y2, margin=5):
 
-        rect = QgsRectangle(float(x1)-margin, float(y1)-margin, float(x2)+margin, float(y2)+margin)
+        rect = QgsRectangle(float(x1) - margin, float(y1) - margin, float(x2) + margin, float(y2) + margin)
         self.canvas.setExtent(rect)
         self.canvas.refresh()
 
@@ -1037,7 +1042,7 @@ class ParentAction(object):
         elem = combo.itemData(combo.currentIndex())
         i = qtable.model().index(pos_x, widget_pos)
         qtable.model().setData(i, elem[0])
-        i = qtable.model().index(pos_x, widget_pos+1)
+        i = qtable.model().index(pos_x, widget_pos + 1)
         qtable.model().setData(i, elem[1])
 
 
@@ -1149,8 +1154,8 @@ class ParentAction(object):
 
         actions_list = self.iface.mainWindow().findChildren(QAction)
         for action in actions_list:
-           self.controller.log_info(str(action.objectName()))
-           action.triggered.connect(partial(self.show_action_name, action))
+            self.controller.log_info(str(action.objectName()))
+            action.triggered.connect(partial(self.show_action_name, action))
 
 
     def show_action_name(self, action):

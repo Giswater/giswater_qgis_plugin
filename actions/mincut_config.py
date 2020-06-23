@@ -24,7 +24,7 @@ from ..ui_manager import SelectorUi, MincutManagerUi
 
 
 class MincutConfig(ParentAction):
-    
+
     def __init__(self, mincut):
         """ Class constructor """
 
@@ -50,11 +50,11 @@ class MincutConfig(ParentAction):
         self.dlg_min_edit.date_from.setEnabled(False)
         self.dlg_min_edit.date_to.setEnabled(False)
         self.set_icon(self.dlg_min_edit.btn_selector_mincut, "191")
-        
+
         self.tbl_mincut_edit = self.dlg_min_edit.findChild(QTableView, "tbl_mincut_edit")
         self.txt_mincut_id = self.dlg_min_edit.findChild(QLineEdit, "txt_mincut_id")
-        self.tbl_mincut_edit.setSelectionBehavior(QAbstractItemView.SelectRows)        
-        
+        self.tbl_mincut_edit.setSelectionBehavior(QAbstractItemView.SelectRows)
+
         # Adding auto-completion to a QLineEdit
         self.completer = QCompleter()
         self.txt_mincut_id.setCompleter(self.completer)
@@ -278,7 +278,7 @@ class MincutConfig(ParentAction):
             message = "Any record selected"
             self.controller.show_warning(message)
             return
-        
+
         row = selected_list[0].row()
 
         # Get mincut_id from selected row
@@ -390,7 +390,7 @@ class MincutConfig(ParentAction):
 
     def delete_mincut_management(self, widget, table_name, column_id):
         """ Delete selected elements of the table (by id) """
-        
+
         # Get selected rows
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:

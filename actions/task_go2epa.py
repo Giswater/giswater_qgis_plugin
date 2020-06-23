@@ -19,6 +19,7 @@ class TaskGo2Epa(QgsTask):
     """ This shows how to subclass QgsTask """
 
     fake_progress = pyqtSignal()
+
     def __init__(self, description, controller, go2epa):
 
         super().__init__(description, QgsTask.CanCancel)
@@ -32,7 +33,7 @@ class TaskGo2Epa(QgsTask):
         self.fid = 140
         self.set_variables_from_go2epa()
         self.add_layer = AddLayer(self.controller.iface, None, controller, None)
-        #self.progressChanged.connect(self.progress_changed)
+        # self.progressChanged.connect(self.progress_changed)
 
 
     def set_variables_from_go2epa(self):
@@ -247,7 +248,7 @@ class TaskGo2Epa(QgsTask):
         rows = self.controller.get_rows(sql)
         sources = {}
         for row in rows:
-            json_elem = row[1].replace('{','').replace('}', '')
+            json_elem = row[1].replace('{', '').replace('}', '')
             item = json_elem.split(',')
             for i in item:
                 sources[i.strip()] = row[0].strip()

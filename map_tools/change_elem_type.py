@@ -22,37 +22,37 @@ class ChangeElemType(ParentMapTool):
         Combo to select new node_type.type
         Combo to select new node_type.id
         Combo to select new cat_node.id
-    """    
+    """
 
     def __init__(self, iface, settings, action, index_action):
-        """ Class constructor """        
-        
-        # Call ParentMapTool constructor     
-        super(ChangeElemType, self).__init__(iface, settings, action, index_action)       
+        """ Class constructor """
+
+        # Call ParentMapTool constructor
+        super(ChangeElemType, self).__init__(iface, settings, action, index_action)
 
 
     def open_catalog(self):
 
         # Get feature_type
-        feature_type = utils_giswater.getWidgetText(self.dlg_chg_node_type,self.dlg_chg_node_type.node_node_type_new)
+        feature_type = utils_giswater.getWidgetText(self.dlg_chg_node_type, self.dlg_chg_node_type.node_node_type_new)
 
         if feature_type is 'null':
             msg = "New node type is null. Please, select a valid value."
             self.controller.show_info_box(msg, "Info")
             return
         self.catalog = ApiCatalog(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.catalog.api_catalog(self.dlg_chg_node_type,'node_nodecat_id', 'node', feature_type)
+        self.catalog.api_catalog(self.dlg_chg_node_type, 'node_nodecat_id', 'node', feature_type)
 
 
     def edit_change_elem_type_accept(self):
         """ Update current type of node and save changes in database """
-        
-        project_type = self.controller.get_project_type() 
+
+        project_type = self.controller.get_project_type()
         node_node_type_new = utils_giswater.getWidgetText(self.dlg_chg_node_type, self.dlg_chg_node_type.node_node_type_new)
         node_nodecat_id = utils_giswater.getWidgetText(self.dlg_chg_node_type, self.dlg_chg_node_type.node_nodecat_id)
         layer = False
         if node_node_type_new != "null":
-                    
+
             if (node_nodecat_id != "null" and node_nodecat_id is not None and project_type == 'ws') or (project_type == 'ud'):
                 # Update field 'nodecat_id'
                 sql = (f"UPDATE v_edit_node SET nodecat_id = '{node_nodecat_id}' "
@@ -63,19 +63,19 @@ class ChangeElemType(ParentMapTool):
                     sql = (f"UPDATE v_edit_node SET node_type = '{node_node_type_new}' "
                            f"WHERE node_id = '{self.node_id}'")
                     self.controller.execute_sql(sql)
-                    
+
                 # Set active layer
                 layer = self.controller.get_layer_by_tablename('v_edit_node')
                 if layer:
                     self.iface.setActiveLayer(layer)
                 message = "Values has been updated"
                 self.controller.show_info(message)
-                
+
             else:
                 message = "Field catalog_id required!"
                 self.controller.show_warning(message)
                 return
-                
+
         else:
             message = "The node has not been updated because no catalog has been selected"
             self.controller.show_warning(message)
@@ -88,7 +88,7 @@ class ChangeElemType(ParentMapTool):
 
         # Check if the expression is valid
         expr_filter = f"node_id = '{self.node_id}'"
-        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
         if not is_valid:
             return
         if layer:
@@ -112,14 +112,14 @@ class ChangeElemType(ParentMapTool):
 
 
     def change_elem_type(self, feature):
-                        
+
         # Create the dialog, fill node_type and define its signals
         self.dlg_chg_node_type = NodeTypeChange()
         self.load_settings(self.dlg_chg_node_type)
 
         # Get nodetype_id from current node
         node_type = ""
-        project_type = self.controller.get_project_type()         
+        project_type = self.controller.get_project_type()
         if project_type == 'ws':
             node_type = feature.attribute('nodetype_id')
             self.dlg_chg_node_type.node_node_type_new.currentIndexChanged.connect(partial(self.filter_catalog))
@@ -149,7 +149,7 @@ class ChangeElemType(ParentMapTool):
         node_node_type_new = utils_giswater.getWidgetText(self.dlg_chg_node_type,
                                                           self.dlg_chg_node_type.node_node_type_new)
 
-        if node_node_type_new =="null":
+        if node_node_type_new == "null":
             return
 
         # Populate catalog_id
@@ -172,10 +172,10 @@ class ChangeElemType(ParentMapTool):
                 self.set_action_pan()
         except AttributeError:
             pass
-               
-            
+
+
     """ QgsMapTools inherited event functions """
-                
+
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
             self.cancel_map_tool()
@@ -208,7 +208,7 @@ class ChangeElemType(ParentMapTool):
     def activate(self):
 
         # Check button
-        self.action().setChecked(True)     
+        self.action().setChecked(True)
 
         # Store user snapping configuration
         self.snapper_manager.store_snapping_options()
@@ -218,7 +218,7 @@ class ChangeElemType(ParentMapTool):
         self.current_layer = self.iface.activeLayer()
         # Set active layer to 'v_edit_node'
         self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
-        self.iface.setActiveLayer(self.layer_node)  
+        self.iface.setActiveLayer(self.layer_node)
 
         # Change cursor
         self.canvas.setCursor(self.cursor)

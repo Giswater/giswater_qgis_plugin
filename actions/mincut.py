@@ -44,9 +44,9 @@ class MincutParent(ParentAction):
         # Call ParentAction constructor
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
         self.canvas = self.iface.mapCanvas()
-        
+
         # Create separate class to manage 'actionConfig'
-        self.mincut_config = MincutConfig(self)                
+        self.mincut_config = MincutConfig(self)
 
         # Get layers of node, arc, connec group
         self.node_group = []
@@ -64,7 +64,7 @@ class MincutParent(ParentAction):
 
     def set_states(self):
         """ Serialize data of mincut states """
-        
+
         self.states = {}
         sql = ("SELECT id, idval "
                "FROM om_typevalue WHERE typevalue = 'mincut_state' "
@@ -72,7 +72,7 @@ class MincutParent(ParentAction):
         rows = self.controller.get_rows(sql)
         if not rows:
             return
-        
+
         for row in rows:
             self.states[int(row['id'])] = row['idval']
 
@@ -133,7 +133,7 @@ class MincutParent(ParentAction):
         self.real_description = self.dlg_mincut.findChild(QTextEdit, "real_description")
         self.distance = self.dlg_mincut.findChild(QLineEdit, "distance")
         self.depth = self.dlg_mincut.findChild(QLineEdit, "depth")
-        
+
         utils_giswater.double_validator(self.distance, 0, 9999999, 3)
         utils_giswater.double_validator(self.depth, 0, 9999999, 3)
         utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.txt_exec_user, self.controller.get_project_user())
@@ -206,8 +206,8 @@ class MincutParent(ParentAction):
         # Set state name
         if self.states != {}:
             utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, str(self.states[0]))
-        self.current_state = 0        
-        
+        self.current_state = 0
+
         self.sql_connec = ""
         self.sql_hydro = ""
 
@@ -228,10 +228,10 @@ class MincutParent(ParentAction):
 
         self.dlg_mincut.cbx_date_start_predict.dateChanged.connect(partial(
             self.check_dates_coherence, self.dlg_mincut.cbx_date_start_predict, self.dlg_mincut.cbx_date_end_predict,
-        self.dlg_mincut.cbx_hours_start_predict, self.dlg_mincut.cbx_hours_end_predict))
+            self.dlg_mincut.cbx_hours_start_predict, self.dlg_mincut.cbx_hours_end_predict))
         self.dlg_mincut.cbx_date_end_predict.dateChanged.connect(partial(
             self.check_dates_coherence, self.dlg_mincut.cbx_date_start_predict, self.dlg_mincut.cbx_date_end_predict,
-        self.dlg_mincut.cbx_hours_start_predict, self.dlg_mincut.cbx_hours_end_predict))
+            self.dlg_mincut.cbx_hours_start_predict, self.dlg_mincut.cbx_hours_end_predict))
 
         self.dlg_mincut.cbx_date_start.dateChanged.connect(partial(
             self.check_dates_coherence, self.dlg_mincut.cbx_date_start, self.dlg_mincut.cbx_date_end,
@@ -295,7 +295,7 @@ class MincutParent(ParentAction):
         if not row or row[0] is None or row[0] < 1:
             result_mincut_id = '1'
         elif row[0]:
-            result_mincut_id = str(int(row[0])+1)
+            result_mincut_id = str(int(row[0]) + 1)
 
         utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id, str(result_mincut_id))
 
@@ -314,7 +314,7 @@ class MincutParent(ParentAction):
         utils_giswater.setCalendarDate(self.dlg_mincut, "cbx_recieved_day", date_start)
         utils_giswater.setCalendarDate(self.dlg_mincut, "cbx_date_start_predict", date_start)
         utils_giswater.setCalendarDate(self.dlg_mincut, "cbx_date_end_predict", date_start)
-        
+
         # Get current time
         current_time = QTime.currentTime()
         self.dlg_mincut.cbx_recieved_time.setTime(current_time)
@@ -362,19 +362,19 @@ class MincutParent(ParentAction):
                 sql = (f"DELETE FROM om_mincut"
                        f" WHERE id = {result_mincut_id}")
                 self.controller.execute_sql(sql)
-                self.controller.show_info("Mincut canceled!")                   
-        
+                self.controller.show_info("Mincut canceled!")
+
         # Rollback transaction
         else:
             self.controller.dao.rollback()
-            
+
         # Close dialog, save dialog position, and disconnect snapping
         self.close_dialog(self.dlg_mincut)
         self.disconnect_snapping()
         self.remove_selection()
         self.refresh_map_canvas()
-        
-    
+
+
     def disconnect_snapping(self, action_pan=True):
         """ Select 'Pan' as current map tool and disconnect snapping """
 
@@ -491,13 +491,13 @@ class MincutParent(ParentAction):
         self.vertex_marker.setPenWidth(3)
 
         # Activate snapping of node and arcs
-        self.canvas.xyCoordinates.connect(self.mouse_move_node_arc)        
+        self.canvas.xyCoordinates.connect(self.mouse_move_node_arc)
         self.emit_point.canvasClicked.connect(self.snapping_node_arc_real_location)
 
 
     def accept_save_data(self):
         """ Slot function button 'Accept' """
-        
+
         self.save_settings(self.dlg_mincut)
         mincut_result_state = self.current_state
 
@@ -515,7 +515,7 @@ class MincutParent(ParentAction):
         exec_depth = str(self.dlg_mincut.depth.text())
         exec_descript = utils_giswater.getWidgetText(self.dlg_mincut, "real_description", return_string_null=False)
         exec_user = utils_giswater.getWidgetText(self.dlg_mincut, "exec_user", return_string_null=False)
-        
+
         # Get prediction date - start
         date_start_predict = self.dlg_mincut.cbx_date_start_predict.date()
         time_start_predict = self.dlg_mincut.cbx_hours_start_predict.time()
@@ -545,7 +545,7 @@ class MincutParent(ParentAction):
         cur_user = self.controller.get_project_user()
         appropiate_status = utils_giswater.isChecked(self.dlg_mincut, "appropiate")
 
-        check_data = [str(mincut_result_state), str(anl_cause), str(received_date), 
+        check_data = [str(mincut_result_state), str(anl_cause), str(received_date),
                       str(forecast_start_predict), str(forecast_end_predict)]
         for data in check_data:
             if data == '':
@@ -562,7 +562,7 @@ class MincutParent(ParentAction):
         sql = (f"SELECT id FROM om_mincut "
                f"WHERE id = '{result_mincut_id}';")
         rows = self.controller.get_rows(sql)
-        
+
         # If not found Insert just its 'id'
         sql = ""
         if not rows:
@@ -576,15 +576,15 @@ class MincutParent(ParentAction):
                 f" anl_tstamp = '{received_date}', received_date = '{received_date}',"
                 f" forecast_start = '{forecast_start_predict}', forecast_end = '{forecast_end_predict}',"
                 f" assigned_to = '{assigned_to}', exec_appropiate = '{appropiate_status}'")
-        
+
         # Manage fields 'work_order' and 'anl_descript'
-        if work_order != "":        
+        if work_order != "":
             sql += f", work_order = $${work_order}$$"
-        if anl_descript != "":        
+        if anl_descript != "":
             sql += f", anl_descript = $${anl_descript}$$ "
 
         # Manage address
-        if address_exploitation_id != -1:        
+        if address_exploitation_id != -1:
             sql += f", muni_id = '{address_exploitation_id}'"
         if address_street:
             sql += f", streetaxis_id = '{address_street}'"
@@ -604,7 +604,7 @@ class MincutParent(ParentAction):
                 sql += f", exec_user = '{exec_user}'"
             else:
                 sql += f", exec_user = '{cur_user}'"
-                
+
         sql += f" WHERE id = '{result_mincut_id}';\n"
 
         # Update table 'selector_mincut_result'
@@ -615,19 +615,19 @@ class MincutParent(ParentAction):
         # Check if any 'connec' or 'hydro' associated
         if self.sql_connec != "":
             sql += self.sql_connec
-                
+
         if self.sql_hydro != "":
             sql += self.sql_hydro
 
         status = self.controller.execute_sql(sql, log_error=True)
-        if status:                                  
+        if status:
             message = "Values has been updated"
             self.controller.show_info(message)
             self.update_result_selector(result_mincut_id)
         else:
             message = "Error updating element in table, you need to review data"
-            self.controller.show_warning(message)           
-        
+            self.controller.show_warning(message)
+
         # Close dialog and disconnect snapping
         self.disconnect_snapping()
         sql = (f"SELECT mincut_state, mincut_class FROM om_mincut "
@@ -682,7 +682,7 @@ class MincutParent(ParentAction):
                              'outline_width_unit': 'MM', 'scale_method': 'diameter', 'size': '2.6',
                              'size_map_unit_scale': '3x:0,0,0,0,0,0', 'size_unit': 'MM', 'vertical_anchor_point': '1'}
                     self.add_layer.set_layer_symbology(layer, props)
-                    #Add cross
+                    # Add cross
                     renderer = layer.renderer()
                     symbol1 = renderer.symbol()
                     symbol2 = QgsMarkerSymbol.createSimple({'name': 'cross', 'color': 'black', 'size': '4.0'})
@@ -765,17 +765,17 @@ class MincutParent(ParentAction):
         self.action_custom_mincut.setEnabled(False)
 
 
-    def update_result_selector(self, result_mincut_id, commit=True):    
+    def update_result_selector(self, result_mincut_id, commit=True):
         """ Update table 'selector_mincut_result' """
-            
+
         sql = (f"DELETE FROM selector_mincut_result WHERE cur_user = current_user;"
                f"\nINSERT INTO selector_mincut_result (cur_user, result_id) VALUES"
                f" (current_user, {result_mincut_id});")
-        status = self.controller.execute_sql(sql, commit)    
-        if not status:    
-            message = "Error updating table"    
+        status = self.controller.execute_sql(sql, commit)
+        if not status:
+            message = "Error updating table"
             self.controller.show_warning(message, parameter='selector_mincut_result')
-                
+
 
     def real_end_accept(self):
 
@@ -784,7 +784,7 @@ class MincutParent(ParentAction):
         exec_start_time = self.dlg_fin.cbx_hours_start_fin.time()
         exec_end_day = self.dlg_fin.cbx_date_end_fin.date()
         exec_end_time = self.dlg_fin.cbx_hours_end_fin.time()
- 
+
         # Set new values in mincut dialog also
         self.dlg_mincut.cbx_date_start.setDate(exec_start_day)
         self.dlg_mincut.cbx_hours_start.setTime(exec_start_time)
@@ -808,7 +808,7 @@ class MincutParent(ParentAction):
         # Return to state 'In Progress'
         utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, str(self.states[1]))
         self.enable_widgets('1')
-        
+
         self.dlg_fin.close()
 
 
@@ -858,10 +858,10 @@ class MincutParent(ParentAction):
             # Read selection and reload table
             self.select_features_connec()
         self.snapping_selection_connec()
-        
+
         self.open_dialog(self.dlg_connec, dlg_name='mincut_connec')
 
-        
+
     def set_completer_customer_code(self, widget, set_signal=False):
         """ Set autocompleter for 'customer_code' """
 
@@ -878,18 +878,18 @@ class MincutParent(ParentAction):
         widget.setCompleter(self.completer)
         model = QStringListModel()
         model.setStringList(values)
-        self.completer.setModel(model)        
-        
+        self.completer.setModel(model)
+
         if set_signal:
-            self.completer.activated.connect(self.auto_fill_hydro_id)          
-        
+            self.completer.activated.connect(self.auto_fill_hydro_id)
+
 
     def snapping_init_connec(self):
         """ Snap connec """
 
-        multiple_snapping = MultipleSelection(self.iface, self.controller, self.layers_connec, self)       
-        self.canvas.setMapTool(multiple_snapping)        
-        self.canvas.selectionChanged.connect(partial(self.snapping_selection_connec))     
+        multiple_snapping = MultipleSelection(self.iface, self.controller, self.layers_connec, self)
+        self.canvas.setMapTool(multiple_snapping)
+        self.canvas.selectionChanged.connect(partial(self.snapping_selection_connec))
         cursor = self.get_cursor_multiple_selection()
         self.canvas.setCursor(cursor)
 
@@ -902,15 +902,15 @@ class MincutParent(ParentAction):
         self.canvas.selectionChanged.connect(
             partial(self.snapping_selection_hydro, self.layers_connec, "rtc_hydrometer", "connec_id"))
         cursor = self.get_cursor_multiple_selection()
-        self.canvas.setCursor(cursor)        
+        self.canvas.setCursor(cursor)
 
 
     def snapping_selection_hydro(self):
         """ Snap to connec layers to add its hydrometers """
-        
+
         self.connec_list = []
-        
-        for layer in self.layers_connec:                      
+
+        for layer in self.layers_connec:
             if layer.selectedFeatureCount() > 0:
                 # Get selected features of the layer
                 features = layer.selectedFeatures()
@@ -924,7 +924,7 @@ class MincutParent(ParentAction):
                         return
                     else:
                         self.connec_list.append(connec_id)
-        
+
         # Set 'expr_filter' with features that are in the list
         expr_filter = "\"connec_id\" IN ("
         for i in range(len(self.connec_list)):
@@ -933,19 +933,19 @@ class MincutParent(ParentAction):
         if len(self.connec_list) == 0:
             expr_filter = "\"connec_id\" =''"
         # Check expression
-        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
         if not is_valid:
-            return        
+            return
 
         self.reload_table_hydro(expr_filter)
 
 
     def snapping_selection_connec(self):
         """ Snap to connec layers """
-        
+
         self.connec_list = []
-        
-        for layer in self.layers_connec:                      
+
+        for layer in self.layers_connec:
             if layer.selectedFeatureCount() > 0:
                 # Get selected features of the layer
                 features = layer.selectedFeatures()
@@ -955,7 +955,7 @@ class MincutParent(ParentAction):
                     # Add element
                     if connec_id not in self.connec_list:
                         self.connec_list.append(connec_id)
-        
+
         expr_filter = None
         if len(self.connec_list) > 0:
             # Set 'expr_filter' with features that are in the list
@@ -966,10 +966,10 @@ class MincutParent(ParentAction):
             if len(self.connec_list) == 0:
                 expr_filter = "\"connec_id\" =''"
             # Check expression
-            (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+            (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
             if not is_valid:
-                return                           
-        
+                return
+
         self.reload_table_connec(expr_filter)
 
 
@@ -988,7 +988,7 @@ class MincutParent(ParentAction):
                    f" VALUES ('{result_mincut_id_text}', 3);")
             self.controller.execute_sql(sql)
             self.is_new = False
-            
+
         # On inserting work order
         self.action_mincut.setDisabled(True)
         self.action_custom_mincut.setDisabled(True)
@@ -1000,7 +1000,7 @@ class MincutParent(ParentAction):
         self.dlg_hydro.setWindowTitle("Hydrometer management")
         self.dlg_hydro.tbl_hydro.setSelectionBehavior(QAbstractItemView.SelectRows)
         # self.dlg_hydro.btn_snapping.setEnabled(False)
-        
+
         # Set icons
         self.set_icon(self.dlg_hydro.btn_insert, "111")
         self.set_icon(self.dlg_hydro.btn_delete, "112")
@@ -1032,8 +1032,8 @@ class MincutParent(ParentAction):
         customer_code = str(self.dlg_hydro.customer_code_connec.text())
         connec_id = self.get_connec_id_from_customer_code(customer_code)
         if connec_id is None:
-            return        
-        
+            return
+
         # Get 'hydrometers' related with this 'connec'
         sql = (f"SELECT DISTINCT(hydrometer_customer_code)"
                f" FROM v_rtc_hydrometer"
@@ -1058,13 +1058,13 @@ class MincutParent(ParentAction):
             message = "You need to enter hydrometer_id"
             self.controller.show_info_box(message)
             return
-                        
+
         # Show message if element is already in the list
         if hydrometer_cc in self.hydro_list:
             message = "Selected element already in the list"
             self.controller.show_info_box(message, parameter=hydrometer_cc)
             return
-        
+
         # Check if hydrometer_id belongs to any 'connec_id'
         sql = (f"SELECT hydrometer_id FROM v_rtc_hydrometer"
                f" WHERE hydrometer_customer_code = '{hydrometer_cc}'")
@@ -1088,14 +1088,14 @@ class MincutParent(ParentAction):
         for i in range(len(self.hydro_list)):
             expr_filter += f"'{self.hydro_list[i]}', "
         expr_filter = expr_filter[:-2] + ")"
-        
+
         # Reload table
         self.reload_table_hydro(expr_filter)
 
 
     def select_features_group_layers(self, expr):
         """ Select features of the layers filtering by @expr """
-        
+
         # Iterate over all layers of type 'connec'
         # Select features and them to 'connec_list'
         for layer in self.layers_connec:
@@ -1111,12 +1111,12 @@ class MincutParent(ParentAction):
                     connec_id = feature.attribute("connec_id")
                     # Check if 'connec_id' is already in 'connec_list'
                     if connec_id not in self.connec_list:
-                        self.connec_list.append(connec_id)              
-        
+                        self.connec_list.append(connec_id)
+
 
     def select_features_connec(self):
         """ Select features of 'connec' of selected mincut """
-                    
+
         # Set 'expr_filter' of connecs related with current mincut
         result_mincut_id = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
         sql = (f"SELECT connec_id FROM om_mincut_connec"
@@ -1135,17 +1135,17 @@ class MincutParent(ParentAction):
             # Check expression
             (is_valid, expr) = self.check_expression(expr_filter)
             if not is_valid:
-                return     
-    
+                return
+
             # Select features of the layers filtering by @expr
-            self.select_features_group_layers(expr)         
-                                                        
+            self.select_features_group_layers(expr)
+
             # Reload table
             self.reload_table_connec(expr_filter)
 
 
     def select_features_hydro(self):
-        
+
         self.connec_list = []
 
         # Set 'expr_filter' of connecs related with current mincut
@@ -1157,7 +1157,7 @@ class MincutParent(ParentAction):
         rows = self.controller.get_rows(sql)
         if rows:
             expr_filter = "\"connec_id\" IN ("
-            for row in rows:                   
+            for row in rows:
                 expr_filter += f"'{row[0]}', "
             expr_filter = expr_filter[:-2] + ")"
             if len(self.connec_list) == 0:
@@ -1165,7 +1165,7 @@ class MincutParent(ParentAction):
             # Check expression
             (is_valid, expr) = self.check_expression(expr_filter)
             if not is_valid:
-                return     
+                return
 
             # Select features of the layers filtering by @expr
             self.select_features_group_layers(expr)
@@ -1199,13 +1199,13 @@ class MincutParent(ParentAction):
             Attach that model to selected table 
         """
 
-        self.disconnect_signal_selection_changed()   
-        
+        self.disconnect_signal_selection_changed()
+
         # Get 'connec_id' from selected 'customer_code'
         customer_code = utils_giswater.getWidgetText(self.dlg_connec, self.dlg_connec.connec_id)
         if customer_code == 'null':
             message = "You need to enter a customer code"
-            self.controller.show_info_box(message) 
+            self.controller.show_info_box(message)
             return
 
         connec_id = self.get_connec_id_from_customer_code(customer_code)
@@ -1228,13 +1228,13 @@ class MincutParent(ParentAction):
             message = "Selected element already in the list"
             self.controller.show_info_box(message, parameter=connec_id)
             return
-        
+
         # If feature id doesn't exist in list -> add
         self.connec_list.append(connec_id)
 
         expr_filter = None
         if len(self.connec_list) > 0:
-            
+
             # Set expression filter with 'connec_list'
             expr_filter = "\"connec_id\" IN ("
             for i in range(len(self.connec_list)):
@@ -1245,24 +1245,24 @@ class MincutParent(ParentAction):
             # Check expression
             (is_valid, expr) = self.check_expression(expr_filter)
             if not is_valid:
-                return   
-                
+                return
+
             # Select features with previous filter
             for layer in self.layers_connec:
                 # Build a list of feature id's and select them
                 it = layer.getFeatures(QgsFeatureRequest(expr))
                 id_list = [i.id() for i in it]
                 layer.selectByIds(id_list)
-    
+
         # Reload contents of table 'connec'
         self.reload_table_connec(expr_filter)
 
-        self.connect_signal_selection_changed("mincut_connec")   
-        
+        self.connect_signal_selection_changed("mincut_connec")
+
 
     def get_connec_id_from_customer_code(self, customer_code):
         """ Get 'connec_id' from @customer_code """
-                   
+
         sql = (f"SELECT connec_id FROM v_edit_connec"
                f" WHERE customer_code = '{customer_code}'")
         row = self.controller.get_row(sql)
@@ -1272,11 +1272,11 @@ class MincutParent(ParentAction):
             return None
         else:
             return str(row[0])
-        
-                
+
+
     def check_expression(self, expr_filter, log_info=False):
         """ Check if expression filter @expr is valid """
-        
+
         if log_info:
             self.controller.log_info(expr_filter)
         expr = QgsExpression(expr_filter)
@@ -1289,11 +1289,11 @@ class MincutParent(ParentAction):
 
     def set_table_model(self, widget, table_name, expr_filter):
         """ Sets a TableModel to @widget attached to @table_name and filter @expr_filter """
-        
+
         expr = None
         if expr_filter:
-            # Check expression          
-            (is_valid, expr) = self.check_expression(expr_filter)    #@UnusedVariable
+            # Check expression
+            (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
             if not is_valid:
                 return expr
 
@@ -1308,22 +1308,22 @@ class MincutParent(ParentAction):
         if model.lastError().isValid():
             self.controller.show_warning(model.lastError().text())
             return expr
-        # Attach model to selected table 
+        # Attach model to selected table
         if expr_filter:
             widget.setModel(model)
             widget.model().setFilter(expr_filter)
-            widget.model().select() 
+            widget.model().select()
         else:
             widget.setModel(None)
-        
-        return expr      
-        
+
+        return expr
+
 
     def reload_table_connec(self, expr_filter=None):
         """ Reload contents of table 'connec' with selected @expr_filter """
 
         table_name = self.schema_name + ".v_edit_connec"
-        widget = self.dlg_connec.tbl_mincut_connec     
+        widget = self.dlg_connec.tbl_mincut_connec
         expr = self.set_table_model(widget, table_name, expr_filter)
         self.set_table_columns(self.dlg_connec, widget, 'v_edit_connec')
         return expr
@@ -1333,17 +1333,17 @@ class MincutParent(ParentAction):
         """ Reload contents of table 'hydro' """
 
         table_name = self.schema_name + ".v_rtc_hydrometer"
-        widget = self.dlg_hydro.tbl_hydro  
+        widget = self.dlg_hydro.tbl_hydro
         expr = self.set_table_model(widget, table_name, expr_filter)
         self.set_table_columns(self.dlg_hydro, widget, 'v_rtc_hydrometer')
-        return expr        
+        return expr
 
 
-    def delete_records_connec(self):  
+    def delete_records_connec(self):
         """ Delete selected rows of the table """
-                
-        self.disconnect_signal_selection_changed()   
-                        
+
+        self.disconnect_signal_selection_changed()
+
         # Get selected rows
         widget = self.dlg_connec.tbl_mincut_connec
         selected_list = widget.selectionModel().selectedRows()
@@ -1351,7 +1351,7 @@ class MincutParent(ParentAction):
             message = "Any record selected"
             self.controller.show_warning(message)
             return
-        
+
         del_id = []
         inf_text = ""
         list_id = ""
@@ -1375,7 +1375,7 @@ class MincutParent(ParentAction):
         else:
             for el in del_id:
                 self.connec_list.remove(el)
-                
+
         # Select features which are in the list
         expr_filter = "\"connec_id\" IN ("
         for i in range(len(self.connec_list)):
@@ -1385,8 +1385,8 @@ class MincutParent(ParentAction):
         if len(self.connec_list) == 0:
             expr_filter = "connec_id=''"
 
-        # Update model of the widget with selected expr_filter     
-        expr = self.reload_table_connec(expr_filter)               
+        # Update model of the widget with selected expr_filter
+        expr = self.reload_table_connec(expr_filter)
 
         # Reload selection
         for layer in self.layers_connec:
@@ -1394,15 +1394,15 @@ class MincutParent(ParentAction):
             it = layer.getFeatures(QgsFeatureRequest(expr))
             id_list = [i.id() for i in it]
             layer.selectByIds(id_list)
-            
-        self.connect_signal_selection_changed("mincut_connec")               
+
+        self.connect_signal_selection_changed("mincut_connec")
 
 
-    def delete_records_hydro(self):  
+    def delete_records_hydro(self):
         """ Delete selected rows of the table """
-        
+
         # Get selected rows
-        widget = self.dlg_hydro.tbl_hydro    
+        widget = self.dlg_hydro.tbl_hydro
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
@@ -1443,15 +1443,15 @@ class MincutParent(ParentAction):
 
         # Update model of the widget with selected expr_filter
         self.reload_table_hydro(expr_filter)
-        
+
         self.connect_signal_selection_changed("mincut_hydro")
-        
+
 
     def accept_connec(self, dlg, element):
         """ Slot function widget 'btn_accept' of 'connec' dialog 
             Insert into table 'om_mincut_connec' values of current mincut
         """
-        
+
         result_mincut_id = utils_giswater.getWidgetText(dlg, self.dlg_mincut.result_mincut_id)
         if result_mincut_id == 'null':
             return
@@ -1476,7 +1476,7 @@ class MincutParent(ParentAction):
         self.sql_connec = sql
         self.dlg_mincut.btn_start.setDisabled(False)
         self.close_dialog(self.dlg_connec)
-        
+
 
     def accept_hydro(self, dlg, element):
         """ Slot function widget 'btn_accept' of 'hydrometer' dialog 
@@ -1493,7 +1493,7 @@ class MincutParent(ParentAction):
             sql += (f"INSERT INTO om_mincut_{element}"
                     f" (result_id, {element}_id) "
                     f" VALUES ('{result_mincut_id}', '{element_id}');\n")
-        
+
         self.sql_hydro = sql
         self.dlg_mincut.btn_start.setDisabled(False)
         self.close_dialog(self.dlg_hydro)
@@ -1512,7 +1512,7 @@ class MincutParent(ParentAction):
         self.vertex_marker.setIconSize(15)
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
         self.vertex_marker.setPenWidth(3)
-        
+
         # On inserting work order
         self.action_add_connec.setDisabled(True)
         self.action_add_hydrometer.setDisabled(True)
@@ -1521,11 +1521,11 @@ class MincutParent(ParentAction):
         self.snapper_manager.store_snapping_options()
 
         # Set signals
-        self.canvas.xyCoordinates.connect(self.mouse_move_node_arc)        
+        self.canvas.xyCoordinates.connect(self.mouse_move_node_arc)
         self.emit_point.canvasClicked.connect(self.auto_mincut_snapping)
 
 
-    def auto_mincut_snapping(self, point, btn):  #@UnusedVariable
+    def auto_mincut_snapping(self, point, btn):  # @UnusedVariable
         """ Automatic mincut: Snapping to 'node' and 'arc' layers """
 
         # Get coordinates
@@ -1535,7 +1535,7 @@ class MincutParent(ParentAction):
         self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
         self.iface.setActiveLayer(self.layer_arc)
         self.current_layer = self.layer_arc
-  
+
         # Snapping
         result = self.snapper_manager.snap_to_current_layer(event_point)
         if not self.snapper_manager.result_is_valid():
@@ -1562,17 +1562,17 @@ class MincutParent(ParentAction):
 
     def set_visible_mincut_layers(self, zoom=False):
         """ Set visible mincut result layers """
-        
+
         layer = self.controller.get_layer_by_tablename("v_om_mincut_valve")
         if layer:
             self.controller.set_layer_visible(layer)
-                    
+
         layer = self.controller.get_layer_by_tablename("v_om_mincut_arc")
         if layer:
             self.controller.set_layer_visible(layer)
-            
+
         layer = self.controller.get_layer_by_tablename("v_om_mincut_connec")
-        if layer:            
+        if layer:
             self.controller.set_layer_visible(layer)
 
         # Refresh extension of layer
@@ -1587,7 +1587,7 @@ class MincutParent(ParentAction):
                 self.iface.zoomToActiveLayer()
 
 
-    def snapping_node_arc_real_location(self, point, btn):  #@UnusedVariable
+    def snapping_node_arc_real_location(self, point, btn):  # @UnusedVariable
 
         # Get coordinates
         event_point = self.snapper_manager.get_event_point(point=point)
@@ -1669,7 +1669,7 @@ class MincutParent(ParentAction):
 
             # Zoom to rectangle (zoom to mincut)
             polygon = complet_result['geometry']
-            polygon = polygon[9:len(polygon)-2]
+            polygon = polygon[9:len(polygon) - 2]
             polygon = polygon.split(',')
             if polygon[0] == '':
                 message = "Error on create auto mincut, you need to review data"
@@ -1728,14 +1728,14 @@ class MincutParent(ParentAction):
 
         # Disconnect previous connections
         self.disconnect_snapping(False)
-        
+
         # Vertex marker
         self.vertex_marker = QgsVertexMarker(self.canvas)
         self.vertex_marker.setColor(QColor(255, 100, 255))
         self.vertex_marker.setIconSize(15)
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
-        self.vertex_marker.setPenWidth(3)        
-        
+        self.vertex_marker.setPenWidth(3)
+
         # Set snapping icon to circle
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
 
@@ -1769,7 +1769,7 @@ class MincutParent(ParentAction):
 
         if not self.layer_arc:
             return
-        
+
         # Set active layer
         self.iface.setActiveLayer(self.layer_arc)
 
@@ -1808,12 +1808,12 @@ class MincutParent(ParentAction):
 
 
     def custom_mincut_execute(self, elem_id):
-        """ Custom mincut. Execute function 'gw_fct_mincut_valve_unaccess' """ 
-        
-        # Change cursor to 'WaitCursor'     
-        self.set_cursor_wait()                
-        
-        cur_user = self.controller.get_project_user()               
+        """ Custom mincut. Execute function 'gw_fct_mincut_valve_unaccess' """
+
+        # Change cursor to 'WaitCursor'
+        self.set_cursor_wait()
+
+        cur_user = self.controller.get_project_user()
         result_mincut_id = utils_giswater.getWidgetText(self.dlg_mincut, "result_mincut_id")
         if result_mincut_id != 'null':
             sql = f"SELECT gw_fct_mincut_valve_unaccess('{elem_id}', '{result_mincut_id}', '{cur_user}');"
@@ -1824,9 +1824,9 @@ class MincutParent(ParentAction):
 
         # Refresh map canvas
         self.refresh_map_canvas(True)
-                
+
         # Disconnect snapping and related signals
-        self.disconnect_snapping(False)        
+        self.disconnect_snapping(False)
 
 
     def remove_selection(self):
@@ -1906,7 +1906,7 @@ class MincutParent(ParentAction):
 
         expr_filter = f"result_id={result_mincut_id}"
         utils_giswater.set_qtv_config(self.dlg_mincut.tbl_hydro)
-        self.fill_table(self.dlg_mincut.tbl_hydro, 'v_om_mincut_hydrometer',  expr_filter=expr_filter)
+        self.fill_table(self.dlg_mincut.tbl_hydro, 'v_om_mincut_hydrometer', expr_filter=expr_filter)
 
         # Depend of mincut_state and mincut_clase desable/enable widgets
         # Current_state == '0': Planified
@@ -2040,17 +2040,17 @@ class MincutParent(ParentAction):
 
     def open_mincut_manage_dates(self, row):
         """ Management of null values in fields of type date """
-        
-        self.manage_date(row['anl_tstamp'], "cbx_recieved_day", "cbx_recieved_time") 
-        self.manage_date(row['forecast_start'], "cbx_date_start_predict", "cbx_hours_start_predict") 
-        self.manage_date(row['forecast_end'], "cbx_date_end_predict", "cbx_hours_end_predict") 
-        self.manage_date(row['exec_start'], "cbx_date_start", "cbx_hours_start")                                         
-        self.manage_date(row['exec_end'], "cbx_date_end", "cbx_hours_end")        
-          
-          
-    def manage_date(self, date_value, widget_date, widget_time):   
+
+        self.manage_date(row['anl_tstamp'], "cbx_recieved_day", "cbx_recieved_time")
+        self.manage_date(row['forecast_start'], "cbx_date_start_predict", "cbx_hours_start_predict")
+        self.manage_date(row['forecast_end'], "cbx_date_end_predict", "cbx_hours_end_predict")
+        self.manage_date(row['exec_start'], "cbx_date_start", "cbx_hours_start")
+        self.manage_date(row['exec_end'], "cbx_date_end", "cbx_hours_end")
+
+
+    def manage_date(self, date_value, widget_date, widget_time):
         """ Manage date of current field """
-        
+
         if date_value:
             date_time = (str(date_value))
             date = str(date_time.split()[0])
@@ -2094,7 +2094,7 @@ class MincutParent(ParentAction):
         self.dlg_comp.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_comp))
         self.dlg_comp.rejected.connect(partial(self.close_dialog, self.dlg_comp))
         self.dlg_comp.cbx_template.currentIndexChanged.connect(self.set_template)
-        
+
         # Open dialog
         self.open_dialog(self.dlg_comp, dlg_name='mincut_composer')
 
@@ -2140,7 +2140,7 @@ class MincutParent(ParentAction):
 
             project = QgsProject.instance()
             comp_view = QgsPrintLayout(project)
-            comp_view.loadFromTemplate(document,  QgsReadWriteContext())
+            comp_view.loadFromTemplate(document, QgsReadWriteContext())
 
             layout_manager = project.layoutManager()
             layout_manager.addLayout(comp_view)
@@ -2170,7 +2170,7 @@ class MincutParent(ParentAction):
 
         # Zoom map to extent, rotation, title
         map_item = layout.itemById('Mapa')
-        #map_item.setMapCanvas(self.canvas)
+        # map_item.setMapCanvas(self.canvas)
         map_item.zoomToExtent(self.canvas.extent())
         map_item.setMapRotation(rotation)
         profile_title = layout.itemById('title')
@@ -2183,10 +2183,10 @@ class MincutParent(ParentAction):
 
     def enable_widgets(self, state):
         """ Enable/Disable widget depending @state """
-        
+
         # Planified
         if state == '0':
-            
+
             self.dlg_mincut.work_order.setDisabled(False)
             # Group
 
@@ -2215,18 +2215,18 @@ class MincutParent(ParentAction):
             self.dlg_mincut.appropiate.setDisabled(True)
             self.dlg_mincut.real_description.setDisabled(True)
             self.dlg_mincut.btn_start.setDisabled(True)
-            self.dlg_mincut.btn_end.setDisabled(True)        
+            self.dlg_mincut.btn_end.setDisabled(True)
             # Actions
             self.action_mincut.setDisabled(False)
             self.action_custom_mincut.setDisabled(True)
             self.action_add_connec.setDisabled(False)
             self.action_add_hydrometer.setDisabled(False)
-        
-        # In Progess    
+
+        # In Progess
         elif state == '1':
-            
+
             self.dlg_mincut.work_order.setDisabled(True)
-            # Group Location            
+            # Group Location
             self.dlg_mincut.address_add_muni.setDisabled(True)
             self.dlg_mincut.address_add_street.setDisabled(True)
             self.dlg_mincut.address_add_postnumber.setDisabled(True)
@@ -2252,18 +2252,18 @@ class MincutParent(ParentAction):
             self.dlg_mincut.appropiate.setDisabled(False)
             self.dlg_mincut.real_description.setDisabled(False)
             self.dlg_mincut.btn_start.setDisabled(True)
-            self.dlg_mincut.btn_end.setDisabled(False)        
+            self.dlg_mincut.btn_end.setDisabled(False)
             # Actions
             self.action_mincut.setDisabled(True)
             self.action_custom_mincut.setDisabled(True)
             self.action_add_connec.setDisabled(False)
             self.action_add_hydrometer.setDisabled(False)
-                       
+
         # Finished
         elif state == '2':
-            
+
             self.dlg_mincut.work_order.setDisabled(True)
-            # Group Location  
+            # Group Location
             self.dlg_mincut.address_add_muni.setDisabled(True)
             self.dlg_mincut.address_add_street.setDisabled(True)
             self.dlg_mincut.address_add_postnumber.setDisabled(True)
@@ -2289,8 +2289,8 @@ class MincutParent(ParentAction):
             self.dlg_mincut.appropiate.setDisabled(True)
             self.dlg_mincut.real_description.setDisabled(True)
             self.dlg_mincut.btn_start.setDisabled(True)
-            self.dlg_mincut.btn_end.setDisabled(True) 
-            # Actions        
+            self.dlg_mincut.btn_end.setDisabled(True)
+            # Actions
             self.action_mincut.setDisabled(True)
             self.action_custom_mincut.setDisabled(True)
             self.action_add_connec.setDisabled(True)

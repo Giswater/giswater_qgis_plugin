@@ -15,6 +15,7 @@ class GwTask(QgsTask, QObject):
     """ This shows how to subclass QgsTask """
 
     fake_progress = pyqtSignal()
+
     def __init__(self, description, duration=0, controller=None):
 
         QObject.__init__(self)

@@ -60,7 +60,7 @@ class ApiDimensioning(ApiParent):
             features = self.layer_dimensions.getFeatures()
             for feature in features:
                 if feature['id'] == fid:
-                     return feature
+                    return feature
             qgis_feature = feature
 
         #qgis_feature = self.get_feature_by_id(self.layer_dimensions, fid, 'id')

@@ -162,7 +162,7 @@ class AddNewLot(ParentManage):
             self.geom_type = utils_giswater.get_item_data(self.dlg_lot, self.visit_class, 2).lower()
             self.populate_table_relations(lot_id)
             self.update_id_list()
-            self.set_dates_from_to(self.dlg_lot.date_event_from, self.dlg_lot.date_event_to, 've_visit_emb_neteja', 'startdate','enddate')
+            self.set_dates_from_to(self.dlg_lot.date_event_from, self.dlg_lot.date_event_to, 've_visit_emb_neteja', 'startdate', 'enddate')
             self.reload_table_visit()
             self.manage_cmb_status()
 
@@ -251,7 +251,7 @@ class AddNewLot(ParentManage):
 
         model = self.dlg_lot.tbl_relation.model()
         for x in range(0, model.rowCount()):
-            index = model.index(x, self.cmb_position-1)
+            index = model.index(x, self.cmb_position - 1)
             value = model.data(index)
 
             widget_cell = self.dlg_lot.tbl_relation.model().index(x, self.cmb_position)
@@ -459,7 +459,7 @@ class AddNewLot(ParentManage):
         utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.txt_ot_type, item[0])
         utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.txt_wotype_id, item[2])
         utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.txt_ot_address, item[3])
-        utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.descript,  item[1])
+        utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.descript, item[1])
         utils_giswater.set_combo_itemData(self.dlg_lot.cmb_visit_class, str(item[5]), 0)
 
         # Enable/Disable visit class combo according selected OT
@@ -620,7 +620,7 @@ class AddNewLot(ParentManage):
         if not row or not row[0]:
             return 0
         else:
-            return row[0]+1
+            return row[0] + 1
 
 
     def event_feature_type_selected(self, dialog):
@@ -737,7 +737,7 @@ class AddNewLot(ParentManage):
 
         if qtable.model() is None:
             return []
-        column_index = utils_giswater.get_col_index_by_col_name(qtable, geom_type+'_id')
+        column_index = utils_giswater.get_col_index_by_col_name(qtable, geom_type + '_id')
         model = qtable.model()
 
         id_list = []
@@ -754,7 +754,7 @@ class AddNewLot(ParentManage):
         self.disconnect_signal_selection_changed()
         self.iface.mainWindow().findChild(QAction, action_name).triggered.connect(
             partial(self.selection_changed_by_expr, self.layer_lot, self.geom_type))
-        self.iface.mainWindow().findChild(QAction,action_name).trigger()
+        self.iface.mainWindow().findChild(QAction, action_name).trigger()
 
 
     def selection_changed_by_expr(self, layer, geom_type):
@@ -855,7 +855,7 @@ class AddNewLot(ParentManage):
         lay_out.setAlignment(Qt.AlignCenter)
         lay_out.setContentsMargins(0, 0, 0, 0)
         cell_widget.setLayout(lay_out)
-        i = qtable.model().index(qtable.model().rowCount()-1, self.cmb_position)
+        i = qtable.model().index(qtable.model().rowCount() - 1, self.cmb_position)
         qtable.setIndexWidget(i, cell_widget)
 
 
@@ -873,7 +873,7 @@ class AddNewLot(ParentManage):
         index = index_list[0]
         model = qtable.model()
 
-        for i in range(len(index_list)-1, -1, -1):
+        for i in range(len(index_list) - 1, -1, -1):
             row = index_list[i].row()
             column_index = utils_giswater.get_col_index_by_col_name(qtable, feature_type + '_id')
             feature_id = index.sibling(row, column_index).data()
@@ -1132,7 +1132,7 @@ class AddNewLot(ParentManage):
             keys = "lot_id, "
             values = f"$${lot_id}$$, "
             for key, value in list(item.items()):
-                if key in (lot['feature_type']+'_id', 'code', 'status', 'observ', 'validate'):
+                if key in (lot['feature_type'] + '_id', 'code', 'status', 'observ', 'validate'):
                     if value not in('', None):
                         keys += f"{key}, "
                         # if type(value) in (int, bool):
@@ -1163,7 +1163,7 @@ class AddNewLot(ParentManage):
             visit_id = None
             status = None
             for key, value in list(item.items()):
-                if key=="visit_id":
+                if key == "visit_id":
                     visit_id = str(value)
                 if key == "status":
                     if value not in('', None):
@@ -1236,13 +1236,13 @@ class AddNewLot(ParentManage):
 
         index = selected_list[0]
         row = index.row()
-        column_index = utils_giswater.get_col_index_by_col_name(qtable, feature_type+'_id')
+        column_index = utils_giswater.get_col_index_by_col_name(qtable, feature_type + '_id')
         feature_id = index.sibling(row, column_index).data()
         # expr_filter = '"{}_id" IN ({})'.format(feature_type, "'"+feature_id+"'")
         expr_filter = f"\"{feature_type}_id\" IN ('{feature_id}')"
         # Check expression
         (is_valid, expr) = self.check_expression(expr_filter)
-        
+
         self.select_features_by_ids(feature_type, expr)
         # self.iface.actionZoomToSelected().trigger()
         self.iface.actionZoomActualSize().trigger()
@@ -1650,7 +1650,7 @@ class AddNewLot(ParentManage):
             pass
 
 
-    def write_to_csv(self,  folder_path=None, all_rows=None):
+    def write_to_csv(self, folder_path=None, all_rows=None):
 
         with open(folder_path, "w") as output:
             writer = csv.writer(output, lineterminator='\n')
@@ -1757,7 +1757,7 @@ class AddNewLot(ParentManage):
 
     def check_for_ids(self):
 
-        if len(self.ids) !=0:
+        if len(self.ids) != 0:
             self.visit_class.setEnabled(False)
         else:
             layer = self.iface.activeLayer()
@@ -1768,6 +1768,7 @@ class AddNewLot(ParentManage):
 
 
     """ FUNCTIONS RELATED WITH TAB LOAD"""
+
     def fill_tab_load(self):
         """ Fill tab 'Load' """
 
