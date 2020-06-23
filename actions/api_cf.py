@@ -947,6 +947,10 @@ class ApiCF(ApiParent, QObject):
 
         dlg_sections = InfoCrossectUi()
         self.load_settings(dlg_sections)
+
+        # Set dialog not resizable
+        dlg_sections.setFixedSize(dlg_sections.size())
+
         feature = '"id":"'+self.feature_id+'"'
         body = self.create_body(feature=feature)
         json_result = self.controller.get_json('gw_fct_getinfocrossection', body)
