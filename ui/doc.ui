@@ -83,7 +83,7 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>38</width>
+                <width>45</width>
                 <height>20</height>
                </size>
               </property>
@@ -151,7 +151,7 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>24</width>
+                <width>31</width>
                 <height>20</height>
                </size>
               </property>
@@ -175,6 +175,9 @@
              <spacer name="horizontalSpacer_5">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Expanding</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -273,7 +276,7 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>56</width>
+                <width>62</width>
                 <height>20</height>
                </size>
               </property>
