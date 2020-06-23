@@ -1885,7 +1885,7 @@ class ApiParent(ParentAction):
             #reload layer, zoom to layer, style mapzones and refresh canvas
             layer = self.controller.get_layer_by_tablename('v_edit_arc')
             if layer:
-                layer.dataProvider().forceReload()
+                layer.dataProvider().reloadData()
                 self.iface.setActiveLayer(layer)
                 self.iface.zoomToActiveLayer()
             self.set_style_mapzones()

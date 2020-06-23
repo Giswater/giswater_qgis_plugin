@@ -74,7 +74,7 @@ class CadAddCircle(ParentMapTool):
                 provider.addFeatures([feature])
 
             self.layer_circle.commitChanges()
-            self.layer_circle.dataProvider().forceReload()
+            self.layer_circle.dataProvider().reloadData()
             self.layer_circle.triggerRepaint()
             
         else:
