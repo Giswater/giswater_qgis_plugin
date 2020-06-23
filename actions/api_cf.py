@@ -615,8 +615,7 @@ class ApiCF(ApiParent, QObject):
             self.controller.dock_dialog(self.dlg_cf)
             self.controller.dlg_docker.dlg_closed.connect(partial(self.manage_docker_close))
             self.controller.dlg_docker.setWindowTitle(title)
-            btn_accept.clicked.connect(partial(
-                self.accept, self.dlg_cf, self.complet_result[0], self.my_json))
+            btn_accept.setVisible(False)
             btn_cancel.setVisible(False)
 
         else:
