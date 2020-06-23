@@ -86,7 +86,8 @@ class AddLayer(object):
         self.set_uri()
         self.uri.setDataSource(schema_name, layer.name(), None, "", layer.name())
 
-        error = QgsVectorLayerExporter.exportLayer(layer, self.uri.uri(), self.controller.credentials['user'], crs, False)
+        error = QgsVectorLayerExporter.exportLayer(
+            layer, self.uri.uri(), self.controller.credentials['user'], crs, False)
         if error[0] != 0:
             self.controller.log_info(F"ERROR --> {error[1]}")
 

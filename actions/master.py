@@ -59,9 +59,11 @@ class Master(ParentAction):
         self.dlg_psector_mng.btn_delete.clicked.connect(partial(
             self.multi_rows_delete, self.dlg_psector_mng, self.qtbl_psm, table_name, column_id, 'lbl_vdefault_psector',
             'plan_psector_vdefault'))
-        self.dlg_psector_mng.btn_update_psector.clicked.connect(partial(self.update_current_psector, self.dlg_psector_mng, self.qtbl_psm))
+        self.dlg_psector_mng.btn_update_psector.clicked.connect(
+            partial(self.update_current_psector, self.dlg_psector_mng, self.qtbl_psm))
         self.dlg_psector_mng.btn_duplicate.clicked.connect(self.psector_duplicate)
-        self.dlg_psector_mng.txt_name.textChanged.connect(partial(self.filter_by_text, self.dlg_psector_mng, self.qtbl_psm, self.dlg_psector_mng.txt_name, table_name))
+        self.dlg_psector_mng.txt_name.textChanged.connect(
+            partial(self.filter_by_text, self.dlg_psector_mng, self.qtbl_psm, self.dlg_psector_mng.txt_name, table_name))
         self.dlg_psector_mng.tbl_psm.doubleClicked.connect(partial(self.charge_psector, self.qtbl_psm))
         self.fill_table_psector(self.qtbl_psm, table_name)
         self.set_table_columns(self.dlg_psector_mng, self.qtbl_psm, table_name)
@@ -274,7 +276,8 @@ class Master(ParentAction):
     def delete_merm(self, dialog):
         """ Delete selected row from 'master_estimate_result_manager' dialog from selected tab """
 
-        self.multi_rows_delete(dialog, dialog.tbl_om_result_cat, 'plan_result_cat', 'result_id', 'lbl_vdefault_price', '', is_price=True)
+        self.multi_rows_delete(dialog, dialog.tbl_om_result_cat, 'plan_result_cat',
+                               'result_id', 'lbl_vdefault_price', '', is_price=True)
 
 
     def filter_merm(self, dialog, tablename):

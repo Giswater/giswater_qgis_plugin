@@ -429,7 +429,8 @@ class ApiCF(ApiParent, QObject):
         self.tbl_hydrometer = self.dlg_cf.findChild(QTableView, "tbl_hydrometer")
         utils_giswater.set_qtv_config(self.tbl_hydrometer)
         self.tbl_hydrometer_value = self.dlg_cf.findChild(QTableView, "tbl_hydrometer_value")
-        utils_giswater.set_qtv_config(self.tbl_hydrometer_value, QAbstractItemView.SelectItems, QTableView.CurrentChanged)
+        utils_giswater.set_qtv_config(self.tbl_hydrometer_value,
+                                      QAbstractItemView.SelectItems, QTableView.CurrentChanged)
         self.tbl_event_cf = self.dlg_cf.findChild(QTableView, "tbl_event_cf")
         utils_giswater.set_qtv_config(self.tbl_event_cf)
         self.tbl_document = self.dlg_cf.findChild(QTableView, "tbl_document")
@@ -595,7 +596,8 @@ class ApiCF(ApiParent, QObject):
         action_catalog.triggered.connect(partial(self.open_catalog, tab_type, self.feature_type))
         action_workcat.triggered.connect(partial(self.cf_new_workcat, tab_type))
         action_get_arc_id.triggered.connect(partial(self.get_snapped_feature_id, self.dlg_cf, action_get_arc_id, 'arc'))
-        action_get_parent_id.triggered.connect(partial(self.get_snapped_feature_id, self.dlg_cf, action_get_parent_id, 'node'))
+        action_get_parent_id.triggered.connect(
+            partial(self.get_snapped_feature_id, self.dlg_cf, action_get_parent_id, 'node'))
         action_zoom_in.triggered.connect(partial(self.api_action_zoom_in, self.canvas, self.layer))
         action_centered.triggered.connect(partial(self.api_action_centered, self.canvas, self.layer))
         action_zoom_out.triggered.connect(partial(self.api_action_zoom_out, self.canvas, self.layer))
@@ -1199,7 +1201,8 @@ class ApiCF(ApiParent, QObject):
                 _json = {}
                 widget.editingFinished.connect(partial(self.clean_my_json, widget))
                 widget.editingFinished.connect(partial(self.get_values, dialog, widget, _json))
-                widget.editingFinished.connect(partial(self.accept, dialog, self.complet_result[0], _json, widget, True, False))
+                widget.editingFinished.connect(
+                    partial(self.accept, dialog, self.complet_result[0], _json, widget, True, False))
             else:
                 widget.editingFinished.connect(partial(self.get_values, dialog, widget, self.my_json))
 
@@ -1784,7 +1787,8 @@ class ApiCF(ApiParent, QObject):
         self.fill_tbl_hydrometer_values(self.tbl_hydrometer_value, table_hydro_value)
         self.set_columns_config(self.tbl_hydrometer_value, table_hydro_value)
 
-        self.dlg_cf.cmb_cat_period_id_filter.currentIndexChanged.connect(partial(self.fill_tbl_hydrometer_values, self.tbl_hydrometer_value, table_hydro_value))
+        self.dlg_cf.cmb_cat_period_id_filter.currentIndexChanged.connect(
+            partial(self.fill_tbl_hydrometer_values, self.tbl_hydrometer_value, table_hydro_value))
         self.dlg_cf.cmb_hyd_customer_code.currentIndexChanged.connect(
             partial(self.fill_tbl_hydrometer_values, self.tbl_hydrometer_value, table_hydro_value))
 
@@ -2628,7 +2632,8 @@ class ApiCF(ApiParent, QObject):
         # Set signals
         self.dlg_new_workcat.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_new_workcat))
         self.dlg_new_workcat.rejected.connect(partial(self.close_dialog, self.dlg_new_workcat))
-        self.dlg_new_workcat.btn_accept.clicked.connect(partial(self.cf_manage_new_workcat_accept, 'cat_work', tab_type))
+        self.dlg_new_workcat.btn_accept.clicked.connect(
+            partial(self.cf_manage_new_workcat_accept, 'cat_work', tab_type))
 
         self.populate_basic_info(self.dlg_new_workcat, complet_list, self.field_id)
 

@@ -238,9 +238,11 @@ class ParentManage(ParentAction, object):
             self.reset_widgets(dialog, table_object)
             if table_object == 'element':
                 self.set_combo(dialog, 'state', 'value_state', 'edit_state_vdefault', field_name='name')
-                self.set_combo(dialog, 'expl_id', 'exploitation', 'edit_exploitation_vdefault', field_id='expl_id', field_name='name')
+                self.set_combo(dialog, 'expl_id', 'exploitation', 'edit_exploitation_vdefault',
+                               field_id='expl_id', field_name='name')
                 self.set_calendars(dialog, 'builtdate', 'config_param_user', 'value', 'edit_builtdate_vdefault')
-                self.set_combo(dialog, 'workcat_id', 'cat_work', 'edit_workcat_vdefault', field_id='id', field_name='id')
+                self.set_combo(dialog, 'workcat_id', 'cat_work',
+                               'edit_workcat_vdefault', field_id='id', field_name='id')
             if hasattr(self, 'single_tool_mode'):
                 # some tools can work differently if standalone or integrated in
                 # another tool
@@ -1139,7 +1141,8 @@ class ParentManage(ParentAction, object):
         """ Connect signal selectionChanged """
 
         try:
-            self.canvas.selectionChanged.connect(partial(self.selection_changed, dialog, table_object, self.geom_type, query))
+            self.canvas.selectionChanged.connect(
+                partial(self.selection_changed, dialog, table_object, self.geom_type, query))
         except Exception as e:
             self.controller.log_info(f"connect_signal_selection_changed: {e}")
 

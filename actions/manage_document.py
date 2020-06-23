@@ -93,16 +93,21 @@ class ManageDocument(ParentManage):
         # Set signals
         self.dlg_add_doc.btn_path_url.clicked.connect(partial(self.open_web_browser, self.dlg_add_doc, "path"))
         self.dlg_add_doc.btn_path_doc.clicked.connect(partial(self.get_file_dialog, self.dlg_add_doc, "path"))
-        self.dlg_add_doc.btn_accept.clicked.connect(partial(self.manage_document_accept, table_object, tablename, qtable, item_id))
-        self.dlg_add_doc.btn_cancel.clicked.connect(partial(self.manage_close, self.dlg_add_doc, table_object, cur_active_layer, excluded_layers=["v_edit_element"]))
-        self.dlg_add_doc.rejected.connect(partial(self.manage_close, self.dlg_add_doc, table_object, cur_active_layer, excluded_layers=["v_edit_element"]))
-        self.dlg_add_doc.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, self.dlg_add_doc, table_object, excluded_layers=["v_edit_element"]))
+        self.dlg_add_doc.btn_accept.clicked.connect(
+            partial(self.manage_document_accept, table_object, tablename, qtable, item_id))
+        self.dlg_add_doc.btn_cancel.clicked.connect(
+            partial(self.manage_close, self.dlg_add_doc, table_object, cur_active_layer, excluded_layers=["v_edit_element"]))
+        self.dlg_add_doc.rejected.connect(partial(self.manage_close, self.dlg_add_doc,
+                                          table_object, cur_active_layer, excluded_layers=["v_edit_element"]))
+        self.dlg_add_doc.tab_feature.currentChanged.connect(
+            partial(self.tab_feature_changed, self.dlg_add_doc, table_object, excluded_layers=["v_edit_element"]))
         self.dlg_add_doc.doc_id.textChanged.connect(partial(self.exist_object, self.dlg_add_doc, table_object))
         self.dlg_add_doc.btn_insert.clicked.connect(partial(self.insert_feature, self.dlg_add_doc, table_object))
         self.dlg_add_doc.btn_delete.clicked.connect(partial(self.delete_records, self.dlg_add_doc, table_object))
         self.dlg_add_doc.btn_snapping.clicked.connect(partial(self.selection_init, self.dlg_add_doc, table_object))
         if feature:
-            self.dlg_add_doc.tabWidget.currentChanged.connect(partial(self.fill_table_doc, self.dlg_add_doc, geom_type, feature[geom_type + "_id"]))
+            self.dlg_add_doc.tabWidget.currentChanged.connect(
+                partial(self.fill_table_doc, self.dlg_add_doc, geom_type, feature[geom_type + "_id"]))
 
         # Set default tab 'arc'
         self.dlg_add_doc.tab_feature.setCurrentIndex(0)
@@ -230,11 +235,14 @@ class ManageDocument(ParentManage):
         self.set_table_columns(self.dlg_man, self.dlg_man.tbl_document, table_object)
 
         # Set dignals
-        self.dlg_man.doc_id.textChanged.connect(partial(self.filter_by_id, self.dlg_man, self.dlg_man.tbl_document, self.dlg_man.doc_id, table_object))
-        self.dlg_man.tbl_document.doubleClicked.connect(partial(self.open_selected_object, self.dlg_man, self.dlg_man.tbl_document, table_object))
+        self.dlg_man.doc_id.textChanged.connect(
+            partial(self.filter_by_id, self.dlg_man, self.dlg_man.tbl_document, self.dlg_man.doc_id, table_object))
+        self.dlg_man.tbl_document.doubleClicked.connect(
+            partial(self.open_selected_object, self.dlg_man, self.dlg_man.tbl_document, table_object))
         self.dlg_man.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_man))
         self.dlg_man.rejected.connect(partial(self.close_dialog, self.dlg_man))
-        self.dlg_man.btn_delete.clicked.connect(partial(self.delete_selected_object, self.dlg_man.tbl_document, table_object))
+        self.dlg_man.btn_delete.clicked.connect(
+            partial(self.delete_selected_object, self.dlg_man.tbl_document, table_object))
 
         # Open form
         self.open_dialog(self.dlg_man, dlg_name='doc_manager')

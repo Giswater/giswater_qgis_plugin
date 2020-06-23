@@ -279,7 +279,8 @@ class NotifyFunctions(ParentAction):
 
         if field['widgettype'] == 'text':
             if field['widgetcontrols'] and 'setQgisMultiline' in field['widgetcontrols']:
-                editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': field['widgetcontrols']['setQgisMultiline']})
+                editor_widget_setup = QgsEditorWidgetSetup(
+                    'TextEdit', {'IsMultiline': field['widgetcontrols']['setQgisMultiline']})
                 layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
 
 

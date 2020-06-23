@@ -34,7 +34,8 @@ class DeleteFeature(ApiParent):
         utils_giswater.set_item_data(self.dlg_feature_delete.feature_type, rows, 1)
 
         # Set active layer
-        layer_name = 'v_edit_' + utils_giswater.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
+        layer_name = 'v_edit_' + \
+            utils_giswater.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
         layer = self.controller.get_layer_by_tablename(layer_name)
         self.iface.setActiveLayer(layer)
         self.controller.set_layer_visible(layer)
@@ -48,7 +49,8 @@ class DeleteFeature(ApiParent):
         self.filter_typeahead(self.dlg_feature_delete.feature_id, completer, model)
 
         # Set listeners
-        self.dlg_feature_delete.feature_id.textChanged.connect(partial(self.filter_typeahead, self.dlg_feature_delete.feature_id, completer, model))
+        self.dlg_feature_delete.feature_id.textChanged.connect(
+            partial(self.filter_typeahead, self.dlg_feature_delete.feature_id, completer, model))
 
         # Set button snapping
         self.dlg_feature_delete.btn_snapping.clicked.connect(partial(self.set_active_layer))
@@ -163,7 +165,8 @@ class DeleteFeature(ApiParent):
         """ Slot function for signal 'canvas.selectionChanged' """
 
         # Get feature_type and feature_id
-        feature_type = utils_giswater.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
+        feature_type = utils_giswater.getWidgetText(
+            self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
         layer_name = 'v_edit_' + feature_type
         layer = self.controller.get_layer_by_tablename(layer_name)
         field_id = feature_type + "_id"
@@ -178,7 +181,8 @@ class DeleteFeature(ApiParent):
                 selected_id = feature.attribute(field_id)
 
             if selected_id:
-                utils_giswater.setWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_id, str(selected_id))
+                utils_giswater.setWidgetText(self.dlg_feature_delete,
+                                             self.dlg_feature_delete.feature_id, str(selected_id))
 
 
     def set_active_layer(self):
@@ -188,7 +192,8 @@ class DeleteFeature(ApiParent):
         self.current_layer.removeSelection()
 
         # Set active layer
-        layer_name = 'v_edit_' + utils_giswater.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
+        layer_name = 'v_edit_' + \
+            utils_giswater.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
         layer = self.controller.get_layer_by_tablename(layer_name)
         self.iface.setActiveLayer(layer)
         self.controller.set_layer_visible(layer)

@@ -79,7 +79,8 @@ class CrmTrace(ApiParent):
          # Check if script path exists
         script_path = script_folder + os.sep + 'main.py'
         if not os.path.exists(script_path):
-            msg = "File not found: {}. Check config system parameter: '{}'".format(script_path, 'crm_daily_script_folderpath')
+            msg = "File not found: {}. Check config system parameter: '{}'".format(
+                script_path, 'crm_daily_script_folderpath')
             self.controller.show_warning(msg, duration=20)
             return False
 

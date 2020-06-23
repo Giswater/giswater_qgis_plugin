@@ -1112,7 +1112,8 @@ class ApiParent(ParentAction):
         if field['isautoupdate']:
             _json = {}
             btn_calendar.clicked.connect(partial(self.get_values, dialog, widget, _json))
-            btn_calendar.clicked.connect(partial(self.accept, dialog, self.complet_result[0], self.feature_id, _json, True, False))
+            btn_calendar.clicked.connect(
+                partial(self.accept, dialog, self.complet_result[0], self.feature_id, _json, True, False))
         else:
             btn_calendar.clicked.connect(partial(self.get_values, dialog, widget, self.my_json))
         btn_calendar.clicked.connect(partial(self.set_calendar_empty, widget))
@@ -1215,13 +1216,15 @@ class ApiParent(ParentAction):
                 message = "Selected node"
                 if self.node1 is None:
                     self.node1 = str(element_id)
-                    rb = self.draw_point(QgsPointXY(result.point()), color=QColor(0, 150, 55, 100), width=10, is_new=True)
+                    rb = self.draw_point(QgsPointXY(result.point()), color=QColor(
+                        0, 150, 55, 100), width=10, is_new=True)
                     self.rb_interpolate.append(rb)
                     self.dlg_dtext.lbl_text.setText(f"Node1: {self.node1}\nNode2:")
                     self.controller.show_message(message, message_level=0, parameter=self.node1)
                 elif self.node1 != str(element_id):
                     self.node2 = str(element_id)
-                    rb = self.draw_point(QgsPointXY(result.point()), color=QColor(0, 150, 55, 100), width=10, is_new=True)
+                    rb = self.draw_point(QgsPointXY(result.point()), color=QColor(
+                        0, 150, 55, 100), width=10, is_new=True)
                     self.rb_interpolate.append(rb)
                     self.dlg_dtext.lbl_text.setText(f"Node1: {self.node1}\nNode2: {self.node2}")
                     self.controller.show_message(message, message_level=0, parameter=self.node2)
@@ -1327,11 +1330,13 @@ class ApiParent(ParentAction):
                         if 'regexpControl' in field['widgetcontrols']:
                             if field['widgetcontrols']['regexpControl'] is not None:
                                 pass
-                    widget.editingFinished.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
+                    widget.editingFinished.connect(
+                        partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'combo':
                     widget = self.add_combobox(field)
-                    widget.currentIndexChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
+                    widget.currentIndexChanged.connect(
+                        partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'check':
                     widget = QCheckBox()
@@ -1339,7 +1344,8 @@ class ApiParent(ParentAction):
                         widget.setChecked(True)
                     else:
                         widget.setChecked(False)
-                    widget.stateChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
+                    widget.stateChanged.connect(partial(self.get_values_changed_param_user,
+                                                dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'datetime':
                     widget = QgsDateTimeEdit()
@@ -1350,14 +1356,16 @@ class ApiParent(ParentAction):
                     if 'value' in field and field['value'] not in ('', None, 'null'):
                         date = QDate.fromString(field['value'].replace('/', '-'), 'yyyy-MM-dd')
                     widget.setDate(date)
-                    widget.dateChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
+                    widget.dateChanged.connect(partial(self.get_values_changed_param_user,
+                                               dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'spinbox':
                     widget = QDoubleSpinBox()
                     if 'value' in field and field['value'] not in(None, ""):
                         value = float(str(field['value']))
                         widget.setValue(value)
-                    widget.valueChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
+                    widget.valueChanged.connect(partial(self.get_values_changed_param_user,
+                                                dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'button':
                     widget = self.add_button(dialog, field)

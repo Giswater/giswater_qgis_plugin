@@ -49,7 +49,8 @@ class DuplicatePsector(ParentManage, QObject):
 
     def duplicate_psector(self):
 
-        id_psector = utils_giswater.get_item_data(self.dlg_duplicate_psector, self.dlg_duplicate_psector.duplicate_psector, 0)
+        id_psector = utils_giswater.get_item_data(
+            self.dlg_duplicate_psector, self.dlg_duplicate_psector.duplicate_psector, 0)
         new_psector_name = utils_giswater.getWidgetText(self.dlg_duplicate_psector,
                                                         self.dlg_duplicate_psector.new_psector_name)
 
@@ -75,6 +76,7 @@ class DuplicatePsector(ParentManage, QObject):
         if not change_tab:
             self.close_dialog(self.dlg_duplicate_psector)
         else:
-            utils_giswater.getWidget(self.dlg_duplicate_psector, self.dlg_duplicate_psector.btn_accept).setEnabled(False)
+            utils_giswater.getWidget(self.dlg_duplicate_psector,
+                                     self.dlg_duplicate_psector.btn_accept).setEnabled(False)
             self.dlg_duplicate_psector.setWindowTitle(f'SUCCESS IN DUPLICATING PSECTOR')
         self.is_duplicated.emit()

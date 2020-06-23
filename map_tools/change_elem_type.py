@@ -48,7 +48,8 @@ class ChangeElemType(ParentMapTool):
         """ Update current type of node and save changes in database """
 
         project_type = self.controller.get_project_type()
-        node_node_type_new = utils_giswater.getWidgetText(self.dlg_chg_node_type, self.dlg_chg_node_type.node_node_type_new)
+        node_node_type_new = utils_giswater.getWidgetText(
+            self.dlg_chg_node_type, self.dlg_chg_node_type.node_node_type_new)
         node_nodecat_id = utils_giswater.getWidgetText(self.dlg_chg_node_type, self.dlg_chg_node_type.node_nodecat_id)
         layer = False
         if node_node_type_new != "null":

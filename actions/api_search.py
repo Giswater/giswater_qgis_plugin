@@ -489,18 +489,25 @@ class ApiSearch(ApiParent):
         table_name = "v_ui_workcat_x_feature"
         table_name_end = "v_ui_workcat_x_feature_end"
         table_doc = "v_ui_doc_x_workcat"
-        self.items_dialog.btn_doc_insert.clicked.connect(partial(self.document_insert, self.items_dialog, 'doc_x_workcat', 'workcat_id', item['sys_id']))
-        self.items_dialog.btn_doc_delete.clicked.connect(partial(self.document_delete, self.items_dialog.tbl_document, 'doc_x_workcat'))
-        self.items_dialog.btn_doc_new.clicked.connect(partial(self.manage_document, self.items_dialog.tbl_document, item['sys_id']))
+        self.items_dialog.btn_doc_insert.clicked.connect(
+            partial(self.document_insert, self.items_dialog, 'doc_x_workcat', 'workcat_id', item['sys_id']))
+        self.items_dialog.btn_doc_delete.clicked.connect(
+            partial(self.document_delete, self.items_dialog.tbl_document, 'doc_x_workcat'))
+        self.items_dialog.btn_doc_new.clicked.connect(
+            partial(self.manage_document, self.items_dialog.tbl_document, item['sys_id']))
         self.items_dialog.btn_open_doc.clicked.connect(partial(self.document_open, self.items_dialog.tbl_document))
-        self.items_dialog.tbl_document.doubleClicked.connect(partial(self.document_open, self.items_dialog.tbl_document))
+        self.items_dialog.tbl_document.doubleClicked.connect(
+            partial(self.document_open, self.items_dialog.tbl_document))
 
         self.items_dialog.btn_close.clicked.connect(partial(self.close_dialog, self.items_dialog))
-        self.items_dialog.btn_path.clicked.connect(partial(self.get_folder_dialog, self.items_dialog, self.items_dialog.txt_path))
+        self.items_dialog.btn_path.clicked.connect(
+            partial(self.get_folder_dialog, self.items_dialog, self.items_dialog.txt_path))
         self.items_dialog.rejected.connect(partial(self.close_dialog, self.items_dialog))
         self.items_dialog.rejected.connect(partial(self.resetRubberbands))
-        self.items_dialog.btn_state1.clicked.connect(partial(self.force_state, self.items_dialog.btn_state1, 1, self.items_dialog.tbl_psm))
-        self.items_dialog.btn_state0.clicked.connect(partial(self.force_state, self.items_dialog.btn_state0, 0, self.items_dialog.tbl_psm_end))
+        self.items_dialog.btn_state1.clicked.connect(
+            partial(self.force_state, self.items_dialog.btn_state1, 1, self.items_dialog.tbl_psm))
+        self.items_dialog.btn_state0.clicked.connect(
+            partial(self.force_state, self.items_dialog.btn_state0, 0, self.items_dialog.tbl_psm_end))
         self.items_dialog.btn_export_to_csv.clicked.connect(
             partial(self.export_to_csv, self.items_dialog, self.items_dialog.tbl_psm, self.items_dialog.tbl_psm_end,
                     self.items_dialog.txt_path))
@@ -510,7 +517,8 @@ class ApiSearch(ApiParent):
         self.items_dialog.txt_name_end.textChanged.connect(partial
             (self.workcat_filter_by_text, self.items_dialog, self.items_dialog.tbl_psm_end, self.items_dialog.txt_name_end, table_name_end, workcat_id, field_id))
         self.items_dialog.tbl_psm.doubleClicked.connect(partial(self.open_feature_form, self.items_dialog.tbl_psm))
-        self.items_dialog.tbl_psm_end.doubleClicked.connect(partial(self.open_feature_form, self.items_dialog.tbl_psm_end))
+        self.items_dialog.tbl_psm_end.doubleClicked.connect(
+            partial(self.open_feature_form, self.items_dialog.tbl_psm_end))
 
         expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
         self.workcat_fill_table(self.items_dialog.tbl_psm, table_name, expr=expr)

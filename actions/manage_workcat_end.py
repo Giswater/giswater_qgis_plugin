@@ -68,15 +68,19 @@ class ManageWorkcatEnd(ParentManage):
 
         # Set signals
         self.dlg_work_end.btn_accept.clicked.connect(partial(self.manage_workcat_end_accept))
-        self.dlg_work_end.btn_cancel.clicked.connect(partial(self.manage_close, self.dlg_work_end, self.table_object, self.cur_active_layer, force_downgrade=True))
-        self.dlg_work_end.rejected.connect(partial(self.manage_close, self.dlg_work_end, self.table_object, self.cur_active_layer, force_downgrade=True, show_warning=True))
+        self.dlg_work_end.btn_cancel.clicked.connect(
+            partial(self.manage_close, self.dlg_work_end, self.table_object, self.cur_active_layer, force_downgrade=True))
+        self.dlg_work_end.rejected.connect(partial(self.manage_close, self.dlg_work_end,
+                                           self.table_object, self.cur_active_layer, force_downgrade=True, show_warning=True))
         self.dlg_work_end.workcat_id_end.editTextChanged.connect(partial(self.fill_workids))
         self.dlg_work_end.btn_new_workcat.clicked.connect(partial(self.new_workcat))
         self.dlg_work_end.btn_insert.clicked.connect(partial(self.insert_feature, self.dlg_work_end, self.table_object))
         self.dlg_work_end.btn_delete.clicked.connect(partial(self.delete_records, self.dlg_work_end, self.table_object))
-        self.dlg_work_end.btn_snapping.clicked.connect(partial(self.selection_init, self.dlg_work_end, self.table_object))
+        self.dlg_work_end.btn_snapping.clicked.connect(
+            partial(self.selection_init, self.dlg_work_end, self.table_object))
         self.dlg_work_end.workcat_id_end.activated.connect(partial(self.fill_workids))
-        self.dlg_work_end.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, self.dlg_work_end, self.table_object, excluded_layers=["v_edit_element"]))
+        self.dlg_work_end.tab_feature.currentChanged.connect(
+            partial(self.tab_feature_changed, self.dlg_work_end, self.table_object, excluded_layers=["v_edit_element"]))
 
         # Set values
         self.fill_fields()

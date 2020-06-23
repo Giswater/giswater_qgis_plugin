@@ -309,7 +309,8 @@ class Go2Epa(ApiParent):
 
     def save_hydrology(self):
 
-        hydrology_id = utils_giswater.get_item_data(self.dlg_hydrology_selector, self.dlg_hydrology_selector.hydrology, 1)
+        hydrology_id = utils_giswater.get_item_data(
+            self.dlg_hydrology_selector, self.dlg_hydrology_selector.hydrology, 1)
         sql = ("SELECT cur_user FROM selector_inp_hydrology "
                "WHERE cur_user = current_user")
         row = self.controller.get_row(sql)
@@ -577,14 +578,16 @@ class Go2Epa(ApiParent):
         elif self.project_type == 'ud':
 
             # Populate GroupBox Selector date
-            result_id = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id, 0)
+            result_id = utils_giswater.get_item_data(
+                self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id, 0)
             sql = (f"SELECT DISTINCT(resultdate), resultdate FROM rpt_arc "
                    f"WHERE result_id = '{result_id}' "
                    f"ORDER BY resultdate")
             rows = self.controller.get_rows(sql)
             if rows is not None:
                 utils_giswater.set_item_data(self.dlg_go2epa_result.cmb_sel_date, rows)
-                selector_date = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_sel_date, 0)
+                selector_date = utils_giswater.get_item_data(
+                    self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_sel_date, 0)
                 sql = (f"SELECT DISTINCT(resulttime), resulttime FROM rpt_arc "
                        f"WHERE result_id = '{result_id}' "
                        f"AND resultdate = '{selector_date}' "
@@ -608,7 +611,8 @@ class Go2Epa(ApiParent):
             rows = self.controller.get_rows(sql)
             if rows is not None:
                 utils_giswater.set_item_data(self.dlg_go2epa_result.cmb_com_date, rows)
-                selector_cmp_date = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_com_date, 0)
+                selector_cmp_date = utils_giswater.get_item_data(
+                    self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_com_date, 0)
                 sql = (f"SELECT DISTINCT(resulttime), resulttime FROM rpt_arc "
                        f"WHERE result_id = '{result_id_to_comp}' "
                        f"AND resultdate = '{selector_cmp_date}' "
@@ -637,7 +641,8 @@ class Go2Epa(ApiParent):
 
     def populate_date_time(self, combo_date):
 
-        result_id = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id, 0)
+        result_id = utils_giswater.get_item_data(
+            self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id, 0)
         sql = (f"SELECT DISTINCT(resultdate), resultdate FROM rpt_arc "
                f"WHERE result_id = '{result_id}' "
                f"ORDER BY resultdate")
@@ -677,8 +682,10 @@ class Go2Epa(ApiParent):
         self.controller.execute_sql(sql)
 
         # Get new values from widgets of type QComboBox
-        rpt_selector_result_id = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id)
-        rpt_selector_compare_id = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_compare_id)
+        rpt_selector_result_id = utils_giswater.get_item_data(
+            self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id)
+        rpt_selector_compare_id = utils_giswater.get_item_data(
+            self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_compare_id)
 
         if rpt_selector_result_id not in (None, -1, ''):
             sql = (f"INSERT INTO selector_rpt_main (result_id, cur_user)"
@@ -692,7 +699,8 @@ class Go2Epa(ApiParent):
 
         if self.project_type == 'ws':
             time_to_show = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_time_to_show)
-            time_to_compare = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_time_to_compare)
+            time_to_compare = utils_giswater.get_item_data(
+                self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_time_to_compare)
             if time_to_show not in (None, -1, ''):
                 sql = (f"INSERT INTO rpt_selector_hourly (timestep, cur_user)"
                        f" VALUES ('{time_to_show}', '{user}');\n")

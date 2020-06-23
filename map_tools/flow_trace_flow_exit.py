@@ -40,7 +40,8 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
                 self.add_layer.from_postgres_to_toc(layer_name, field_id=values['field_id'])
                 layer = self.controller.get_layer_by_tablename(layer_name)
                 self.layers_added.append(layer)
-                self.add_layer.categoryze_layer(layer, values['field_cat'], values['size'], values['color_values'], ['Flow exit', 'Flow trace'])
+                self.add_layer.categoryze_layer(layer, values['field_cat'], values['size'], values['color_values'], [
+                                                'Flow exit', 'Flow trace'])
                 self.controller.set_layer_visible(layer, False)
 
 
@@ -83,7 +84,8 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
                     self.controller.set_layer_visible(layer)
                     if layer in self.layers_added:
                         values = self.needed_layers[layer.name()]
-                        self.add_layer.categoryze_layer(layer, values['field_cat'], values['size'], values['color_values'])
+                        self.add_layer.categoryze_layer(
+                            layer, values['field_cat'], values['size'], values['color_values'])
 
             self.layers_added = []
 

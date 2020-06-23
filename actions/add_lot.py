@@ -70,8 +70,10 @@ class AddNewLot(ParentManage):
         self.dropdown.setPopupMode(QToolButton.MenuButtonPopup)
 
         # Create action and put into QToolButton
-        action_by_expression = self.create_action('action_by_expression', self.dlg_lot.action_selector, '204', 'Select by expression')
-        action_by_polygon = self.create_action('action_by_polygon', self.dlg_lot.action_selector, '205', 'Select by polygon')
+        action_by_expression = self.create_action(
+            'action_by_expression', self.dlg_lot.action_selector, '204', 'Select by expression')
+        action_by_polygon = self.create_action(
+            'action_by_polygon', self.dlg_lot.action_selector, '205', 'Select by polygon')
         self.dropdown.addAction(action_by_expression)
         self.dropdown.addAction(action_by_polygon)
         self.dropdown.setDefaultAction(action_by_expression)
@@ -120,7 +122,8 @@ class AddNewLot(ParentManage):
         self.clear_selection()
 
         # Set actions signals
-        action_by_expression.triggered.connect(partial(self.activate_selection, action_by_expression, 'mActionSelectByExpression'))
+        action_by_expression.triggered.connect(
+            partial(self.activate_selection, action_by_expression, 'mActionSelectByExpression'))
         action_by_polygon.triggered.connect(partial(self.activate_selection, action_by_polygon, 'mActionSelectPolygon'))
 
         # Set widgets signals
@@ -133,7 +136,8 @@ class AddNewLot(ParentManage):
         self.dlg_lot.btn_feature_snapping.clicked.connect(partial(self.selection_init, self.dlg_lot))
         self.dlg_lot.cmb_visit_class.currentIndexChanged.connect(self.set_tab_dis_enabled)
         self.dlg_lot.cmb_visit_class.currentIndexChanged.connect(self.set_active_layer)
-        self.dlg_lot.cmb_visit_class.currentIndexChanged.connect(partial(self.event_feature_type_selected, self.dlg_lot))
+        self.dlg_lot.cmb_visit_class.currentIndexChanged.connect(
+            partial(self.event_feature_type_selected, self.dlg_lot))
         self.dlg_lot.cmb_visit_class.currentIndexChanged.connect(partial(self.reload_table_visit))
         self.dlg_lot.cmb_status.currentIndexChanged.connect(partial(self.manage_cmb_status))
         self.dlg_lot.txt_filter.textChanged.connect(partial(self.reload_table_visit))
@@ -162,7 +166,8 @@ class AddNewLot(ParentManage):
             self.geom_type = utils_giswater.get_item_data(self.dlg_lot, self.visit_class, 2).lower()
             self.populate_table_relations(lot_id)
             self.update_id_list()
-            self.set_dates_from_to(self.dlg_lot.date_event_from, self.dlg_lot.date_event_to, 've_visit_emb_neteja', 'startdate', 'enddate')
+            self.set_dates_from_to(self.dlg_lot.date_event_from, self.dlg_lot.date_event_to,
+                                   've_visit_emb_neteja', 'startdate', 'enddate')
             self.reload_table_visit()
             self.manage_cmb_status()
 
@@ -306,7 +311,8 @@ class AddNewLot(ParentManage):
         self.set_table_columns(self.dlg_basic_table, self.dlg_basic_table.tbl_basic, table_name)
         self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.cancel_changes, self.dlg_basic_table.tbl_basic))
         self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_basic_table))
-        self.dlg_basic_table.btn_accept.clicked.connect(partial(self.save_basic_table, self.dlg_basic_table.tbl_basic, 'team'))
+        self.dlg_basic_table.btn_accept.clicked.connect(
+            partial(self.save_basic_table, self.dlg_basic_table.tbl_basic, 'team'))
         self.dlg_basic_table.btn_add_row.clicked.connect(partial(self.add_row, self.dlg_basic_table.tbl_basic))
         self.dlg_basic_table.rejected.connect(partial(self.save_settings, self.dlg_basic_table))
         self.open_dialog(self.dlg_basic_table, dlg_name='dialog_table')
@@ -1360,7 +1366,8 @@ class AddNewLot(ParentManage):
         self.dlg_lot_man.btn_path.clicked.connect(partial(self.select_path, self.dlg_lot_man, 'txt_path'))
         self.dlg_lot_man.btn_export.clicked.connect(
             partial(self.export_model_to_csv, self.dlg_lot_man, 'txt_path', self.dlg_lot_man.tbl_lots, '', self.lot_date_format))
-        self.dlg_lot_man.tbl_lots.doubleClicked.connect(partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_lots))
+        self.dlg_lot_man.tbl_lots.doubleClicked.connect(
+            partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_lots))
         self.dlg_lot_man.btn_open.clicked.connect(partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_lots))
         self.dlg_lot_man.btn_delete.clicked.connect(partial(self.delete_lot, self.dlg_lot_man.tbl_lots))
         self.dlg_lot_man.btn_manage_user.clicked.connect(partial(self.open_user_manage))
@@ -1400,7 +1407,8 @@ class AddNewLot(ParentManage):
         self.set_table_columns(self.dlg_basic_table, self.dlg_basic_table.tbl_basic, table_name)
         self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.cancel_changes, self.dlg_basic_table.tbl_basic))
         self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_basic_table))
-        self.dlg_basic_table.btn_accept.clicked.connect(partial(self.save_basic_table, self.dlg_basic_table.tbl_basic, 'vehicle'))
+        self.dlg_basic_table.btn_accept.clicked.connect(
+            partial(self.save_basic_table, self.dlg_basic_table.tbl_basic, 'vehicle'))
         self.dlg_basic_table.btn_add_row.clicked.connect(partial(self.add_row, self.dlg_basic_table.tbl_basic))
         self.dlg_basic_table.rejected.connect(partial(self.save_settings, self.dlg_basic_table))
         self.open_dialog(self.dlg_basic_table, dlg_name='dialog_table')
@@ -1480,7 +1488,8 @@ class AddNewLot(ParentManage):
 
         # TODO: Disable columns user_id + team_id
 
-        self.dlg_user_manage.btn_export_user.clicked.connect(partial(self.export_model_to_csv, self.dlg_user_manage, self.dlg_user_manage.tbl_user, result_relation, 'yyyy-MM-dd hh:mm:ss'))
+        self.dlg_user_manage.btn_export_user.clicked.connect(partial(
+            self.export_model_to_csv, self.dlg_user_manage, self.dlg_user_manage.tbl_user, result_relation, 'yyyy-MM-dd hh:mm:ss'))
 
         # Open form
         self.open_dialog(self.dlg_user_manage, dlg_name='lot_usermanager')
@@ -1537,9 +1546,12 @@ class AddNewLot(ParentManage):
         self.dlg_lot_sel.rejected.connect(partial(self.close_dialog, self.dlg_lot_sel))
         self.dlg_lot_sel.rejected.connect(partial(self.save_settings, self.dlg_lot_sel))
         self.dlg_lot_sel.setWindowTitle("Selector de lots")
-        utils_giswater.setWidgetText(self.dlg_lot_sel, 'lbl_filter', self.controller.tr('Filtrar per: Lot id', context_name='labels'))
-        utils_giswater.setWidgetText(self.dlg_lot_sel, 'lbl_unselected', self.controller.tr('Lots disponibles:', context_name='labels'))
-        utils_giswater.setWidgetText(self.dlg_lot_sel, 'lbl_selected', self.controller.tr('Lots seleccionats', context_name='labels'))
+        utils_giswater.setWidgetText(self.dlg_lot_sel, 'lbl_filter', self.controller.tr(
+            'Filtrar per: Lot id', context_name='labels'))
+        utils_giswater.setWidgetText(self.dlg_lot_sel, 'lbl_unselected',
+                                     self.controller.tr('Lots disponibles:', context_name='labels'))
+        utils_giswater.setWidgetText(self.dlg_lot_sel, 'lbl_selected',
+                                     self.controller.tr('Lots seleccionats', context_name='labels'))
 
         tableleft = "om_visit_lot"
         tableright = "selector_lot"
@@ -1548,7 +1560,8 @@ class AddNewLot(ParentManage):
         hide_left = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
         hide_right = [0, 1, 2]
 
-        self.multi_row_selector(self.dlg_lot_sel, tableleft, tableright, field_id_left, field_id_right, name='id', hide_left=hide_left, hide_right=hide_right)
+        self.multi_row_selector(self.dlg_lot_sel, tableleft, tableright, field_id_left,
+                                field_id_right, name='id', hide_left=hide_left, hide_right=hide_right)
         self.dlg_lot_sel.btn_select.clicked.connect(partial(self.set_visible_lot_layers, True))
         self.dlg_lot_sel.btn_unselect.clicked.connect(partial(self.set_visible_lot_layers, True))
 

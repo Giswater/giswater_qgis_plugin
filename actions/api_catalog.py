@@ -90,9 +90,12 @@ class ApiCatalog(ApiParent):
         self.get_api_catalog(matcat_id, pnom, dnom, id, feature_type, geom_type)
 
         # Set Listeners
-        matcat_id.currentIndexChanged.connect(partial(self.populate_pn_dn, matcat_id, pnom, dnom, feature_type, geom_type))
-        pnom.currentIndexChanged.connect(partial(self.get_api_catalog, matcat_id, pnom, dnom, id, feature_type, geom_type))
-        dnom.currentIndexChanged.connect(partial(self.get_api_catalog, matcat_id, pnom, dnom, id, feature_type, geom_type))
+        matcat_id.currentIndexChanged.connect(
+            partial(self.populate_pn_dn, matcat_id, pnom, dnom, feature_type, geom_type))
+        pnom.currentIndexChanged.connect(partial(self.get_api_catalog, matcat_id,
+                                         pnom, dnom, id, feature_type, geom_type))
+        dnom.currentIndexChanged.connect(partial(self.get_api_catalog, matcat_id,
+                                         pnom, dnom, id, feature_type, geom_type))
 
         # Open form
         self.open_dialog(self.dlg_catalog, dlg_name='info_catalog')

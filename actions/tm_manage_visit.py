@@ -122,8 +122,10 @@ class TmManageVisit(TmParentManage, QObject):
         self.dlg_add_visit.btn_event_insert.clicked.connect(self.event_insert)
         self.dlg_add_visit.btn_event_delete.clicked.connect(self.event_delete)
         self.dlg_add_visit.btn_event_update.clicked.connect(self.event_update)
-        self.dlg_add_visit.btn_feature_insert.clicked.connect(partial(self.insert_feature, self.feature_id, self.tbl_relation))
-        self.dlg_add_visit.btn_feature_delete.clicked.connect(partial(self.delete_records, self.dlg_add_visit, self.tbl_relation))
+        self.dlg_add_visit.btn_feature_insert.clicked.connect(
+            partial(self.insert_feature, self.feature_id, self.tbl_relation))
+        self.dlg_add_visit.btn_feature_delete.clicked.connect(
+            partial(self.delete_records, self.dlg_add_visit, self.tbl_relation))
         self.dlg_add_visit.btn_feature_snapping.clicked.connect(partial(self.selection_init, self.tbl_relation))
         self.tabs.currentChanged.connect(partial(self.manage_tab_changed))
         self.visit_id.textChanged.connect(self.manage_visit_id_change)
@@ -294,7 +296,8 @@ class TmManageVisit(TmParentManage, QObject):
         self.current_visit.enddate = self.dlg_add_visit.enddate.date().toString(Qt.ISODate)
         self.current_visit.user_name = self.user_name.text()
         self.current_visit.ext_code = self.ext_code.text()
-        self.current_visit.visitcat_id = utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.visitcat_id, 0)
+        self.current_visit.visitcat_id = utils_giswater.get_item_data(
+            self.dlg_add_visit, self.dlg_add_visit.visitcat_id, 0)
         self.current_visit.descript = self.dlg_add_visit.descript.text()
         if self.expl_id:
             self.current_visit.expl_id = self.expl_id
@@ -500,7 +503,8 @@ class TmManageVisit(TmParentManage, QObject):
         sql = ("SELECT id FROM om_visit_parameter_type"
                " ORDER BY id")
         parameter_type_ids = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_add_visit, self.dlg_add_visit.parameter_type_id, parameter_type_ids, allow_nulls=False)
+        utils_giswater.fillComboBox(self.dlg_add_visit, self.dlg_add_visit.parameter_type_id,
+                                    parameter_type_ids, allow_nulls=False)
 
 
     def set_completers(self, widget, table_name):

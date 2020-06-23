@@ -93,10 +93,14 @@ class TmPlanningUnit(TmParentAction):
         self.update_table(self.dlg_unit, self.dlg_unit.tbl_unit, table_name)
 
         # Signals
-        self.dlg_unit.cmb_campaign.currentIndexChanged.connect(partial(self.update_table, self.dlg_unit, self.dlg_unit.tbl_unit, table_name))
-        self.dlg_unit.cmb_work.currentIndexChanged.connect(partial(self.update_table, self.dlg_unit, self.dlg_unit.tbl_unit, table_name))
-        self.dlg_unit.cmb_builder.currentIndexChanged.connect(partial(self.update_table, self.dlg_unit, self.dlg_unit.tbl_unit, table_name))
-        self.dlg_unit.cmb_priority.currentIndexChanged.connect(partial(self.update_table, self.dlg_unit, self.dlg_unit.tbl_unit, table_name))
+        self.dlg_unit.cmb_campaign.currentIndexChanged.connect(
+            partial(self.update_table, self.dlg_unit, self.dlg_unit.tbl_unit, table_name))
+        self.dlg_unit.cmb_work.currentIndexChanged.connect(
+            partial(self.update_table, self.dlg_unit, self.dlg_unit.tbl_unit, table_name))
+        self.dlg_unit.cmb_builder.currentIndexChanged.connect(
+            partial(self.update_table, self.dlg_unit, self.dlg_unit.tbl_unit, table_name))
+        self.dlg_unit.cmb_priority.currentIndexChanged.connect(
+            partial(self.update_table, self.dlg_unit, self.dlg_unit.tbl_unit, table_name))
 
         completer = QCompleter()
         self.dlg_unit.txt_id.textChanged.connect(
@@ -177,7 +181,8 @@ class TmPlanningUnit(TmParentAction):
     def selection_init(self, qtable):
         """ Set canvas map tool to an instance of class 'MultipleSelection' """
 
-        multiple_selection = TmMultipleSelection(self.iface, self.controller, self.layers['node'], parent_manage=self, table_object=qtable)
+        multiple_selection = TmMultipleSelection(
+            self.iface, self.controller, self.layers['node'], parent_manage=self, table_object=qtable)
         self.disconnect_signal_selection_changed()
         self.canvas.setMapTool(multiple_selection)
         self.connect_signal_selection_changed(qtable)

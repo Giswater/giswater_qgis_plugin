@@ -139,7 +139,8 @@ class ParentAction(object):
         file_dialog = QFileDialog()
         file_dialog.setFileMode(QFileDialog.Directory)
         message = "Select folder"
-        folder_path = file_dialog.getExistingDirectory(parent=None, caption=self.controller.tr(message), directory=folder_path)
+        folder_path = file_dialog.getExistingDirectory(
+            parent=None, caption=self.controller.tr(message), directory=folder_path)
         if folder_path:
             utils_giswater.setWidgetText(dialog, widget, str(folder_path))
 
@@ -308,19 +309,23 @@ class ParentAction(object):
         self.hide_colums(tbl_selected_rows, hide_right)
         tbl_selected_rows.setColumnWidth(0, 200)
         # Button select
-        dialog.btn_select.clicked.connect(partial(self.multi_rows_selector, tbl_all_rows, tbl_selected_rows, field_id_left, tableright, field_id_right, query_left, query_right, field_id_right))
+        dialog.btn_select.clicked.connect(partial(self.multi_rows_selector, tbl_all_rows, tbl_selected_rows,
+                                          field_id_left, tableright, field_id_right, query_left, query_right, field_id_right))
 
         # Button unselect
         query_delete = f"DELETE FROM {schema_name}.{tableright}"
         query_delete += f" WHERE current_user = cur_user AND {tableright}.{field_id_right}="
-        dialog.btn_unselect.clicked.connect(partial(self.unselector, tbl_all_rows, tbl_selected_rows, query_delete, query_left, query_right, field_id_right))
+        dialog.btn_unselect.clicked.connect(partial(self.unselector, tbl_all_rows,
+                                            tbl_selected_rows, query_delete, query_left, query_right, field_id_right))
 
         # QLineEdit
-        dialog.txt_name.textChanged.connect(partial(self.query_like_widget_text, dialog, dialog.txt_name, tbl_all_rows, tableleft, tableright, field_id_right, field_id_left, name, aql))
+        dialog.txt_name.textChanged.connect(partial(self.query_like_widget_text, dialog, dialog.txt_name,
+                                            tbl_all_rows, tableleft, tableright, field_id_right, field_id_left, name, aql))
 
         # Order control
         tbl_all_rows.horizontalHeader().sectionClicked.connect(partial(self.order_by_column, tbl_all_rows, query_left))
-        tbl_selected_rows.horizontalHeader().sectionClicked.connect(partial(self.order_by_column, tbl_selected_rows, query_right))
+        tbl_selected_rows.horizontalHeader().sectionClicked.connect(
+            partial(self.order_by_column, tbl_selected_rows, query_right))
 
 
     def order_by_column(self, qtable, query, idx):

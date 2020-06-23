@@ -442,9 +442,11 @@ class MincutParent(ParentAction):
         # Manage address
         municipality_current = utils_giswater.get_item_data(self.dlg_mincut, self.dlg_mincut.address_add_muni, 1)
         utils_giswater.set_combo_itemData(self.dlg_fin.address_add_muni, municipality_current, 1)
-        address_street_current = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_street, False, False)
+        address_street_current = utils_giswater.getWidgetText(
+            self.dlg_mincut, self.dlg_mincut.address_add_street, False, False)
         utils_giswater.setWidgetText(self.dlg_fin, self.dlg_fin.address_add_street, address_street_current)
-        address_number_current = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_postnumber, False, False)
+        address_number_current = utils_giswater.getWidgetText(
+            self.dlg_mincut, self.dlg_mincut.address_add_postnumber, False, False)
         utils_giswater.setWidgetText(self.dlg_fin, self.dlg_fin.address_add_postnumber, address_number_current)
 
         # Fill ComboBox exec_user
@@ -504,7 +506,8 @@ class MincutParent(ParentAction):
         # Manage 'address'
         address_exploitation_id = utils_giswater.get_item_data(self.dlg_mincut, self.dlg_mincut.address_add_muni)
         address_street = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_street, False, False)
-        address_number = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_postnumber, False, False)
+        address_number = utils_giswater.getWidgetText(
+            self.dlg_mincut, self.dlg_mincut.address_add_postnumber, False, False)
 
         mincut_result_type = utils_giswater.get_item_data(self.dlg_mincut, self.dlg_mincut.type, 0)
         anl_cause = utils_giswater.get_item_data(self.dlg_mincut, self.dlg_mincut.cause, 0)
@@ -519,7 +522,8 @@ class MincutParent(ParentAction):
         # Get prediction date - start
         date_start_predict = self.dlg_mincut.cbx_date_start_predict.date()
         time_start_predict = self.dlg_mincut.cbx_hours_start_predict.time()
-        forecast_start_predict = date_start_predict.toString('yyyy-MM-dd') + " " + time_start_predict.toString('HH:mm:ss')
+        forecast_start_predict = date_start_predict.toString(
+            'yyyy-MM-dd') + " " + time_start_predict.toString('HH:mm:ss')
 
         # Get prediction date - end
         date_end_predict = self.dlg_mincut.cbx_date_end_predict.date()
@@ -648,7 +652,8 @@ class MincutParent(ParentAction):
         if not result: return
 
         if result['body']['actions']['overlap'] == 'Conflict':
-            result_layer = self.add_layer.add_temp_layer(self.dlg_mincut, result['body']['data'], None, False, tab_idx=2)
+            result_layer = self.add_layer.add_temp_layer(
+                self.dlg_mincut, result['body']['data'], None, False, tab_idx=2)
             for layer in result_layer['temp_layers_added']:
 
                 symbol = QgsSymbol.defaultSymbol(layer.geometryType())

@@ -158,8 +158,10 @@ class TmBasic(TmParentAction):
 
         # Populate QTableView
         table_view = 'v_edit_price'
-        self.fill_table_prices(dlg_prices_management.tbl_price_list, table_view, id_camp, set_edit_triggers=QTableView.DoubleClicked)
-        self.set_table_columns(dlg_prices_management, dlg_prices_management.tbl_price_list, table_view, 'basic_cat_price')
+        self.fill_table_prices(dlg_prices_management.tbl_price_list, table_view,
+                               id_camp, set_edit_triggers=QTableView.DoubleClicked)
+        self.set_table_columns(dlg_prices_management, dlg_prices_management.tbl_price_list,
+                               table_view, 'basic_cat_price')
 
         self.open_dialog(dlg_prices_management)
 
@@ -362,13 +364,20 @@ class TmBasic(TmParentAction):
 
         # Set signals
         dlg_selector.chk_permanent.stateChanged.connect(partial(self.force_chk_current, dlg_selector))
-        dlg_selector.btn_select.clicked.connect(partial(self.rows_selector, dlg_selector, id_table_left, tableright, id_table_right, tableleft, table_view))
-        dlg_selector.all_rows.doubleClicked.connect(partial(self.rows_selector, dlg_selector, id_table_left, tableright, id_table_right, tableleft, table_view))
-        dlg_selector.btn_unselect.clicked.connect(partial(self.rows_unselector, dlg_selector, tableright, id_table_right, tableleft, table_view))
-        dlg_selector.selected_rows.doubleClicked.connect(partial(self.rows_unselector, dlg_selector, tableright, id_table_right, tableleft, table_view))
-        dlg_selector.txt_search.textChanged.connect(partial(self.fill_main_table, dlg_selector, tableleft, set_edit_triggers=QTableView.NoEditTriggers))
-        dlg_selector.txt_selected_filter.textChanged.connect(partial(self.fill_table, dlg_selector, table_view, set_edit_triggers=QTableView.NoEditTriggers))
-        dlg_selector.cmb_filter_builder.currentIndexChanged.connect(partial(self.fill_table, dlg_selector, table_view, set_edit_triggers=QTableView.NoEditTriggers))
+        dlg_selector.btn_select.clicked.connect(
+            partial(self.rows_selector, dlg_selector, id_table_left, tableright, id_table_right, tableleft, table_view))
+        dlg_selector.all_rows.doubleClicked.connect(
+            partial(self.rows_selector, dlg_selector, id_table_left, tableright, id_table_right, tableleft, table_view))
+        dlg_selector.btn_unselect.clicked.connect(
+            partial(self.rows_unselector, dlg_selector, tableright, id_table_right, tableleft, table_view))
+        dlg_selector.selected_rows.doubleClicked.connect(
+            partial(self.rows_unselector, dlg_selector, tableright, id_table_right, tableleft, table_view))
+        dlg_selector.txt_search.textChanged.connect(
+            partial(self.fill_main_table, dlg_selector, tableleft, set_edit_triggers=QTableView.NoEditTriggers))
+        dlg_selector.txt_selected_filter.textChanged.connect(
+            partial(self.fill_table, dlg_selector, table_view, set_edit_triggers=QTableView.NoEditTriggers))
+        dlg_selector.cmb_filter_builder.currentIndexChanged.connect(
+            partial(self.fill_table, dlg_selector, table_view, set_edit_triggers=QTableView.NoEditTriggers))
         dlg_selector.btn_close.clicked.connect(partial(self.close_dialog, dlg_selector))
         dlg_selector.btn_close.clicked.connect(partial(self.close_dialog, dlg_selector))
         dlg_selector.rejected.connect(partial(self.close_dialog, dlg_selector))
@@ -956,15 +965,20 @@ class TmBasic(TmParentAction):
         self.update_table(self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name)
 
         # Signals
-        self.dlg_incident_manager.txt_visit_id.textChanged.connect(partial(self.update_table, self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name))
-        self.dlg_incident_manager.cmb_status.currentIndexChanged.connect(partial(self.update_table, self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name))
+        self.dlg_incident_manager.txt_visit_id.textChanged.connect(
+            partial(self.update_table, self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name))
+        self.dlg_incident_manager.cmb_status.currentIndexChanged.connect(
+            partial(self.update_table, self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name))
         self.dlg_incident_manager.btn_process.clicked.connect(partial(self.open_incident_planning, 'PROCESS'))
         self.dlg_incident_manager.btn_discard.clicked.connect(partial(self.open_incident_planning, 'DISCARD'))
         self.dlg_incident_manager.btn_zoom.clicked.connect(partial(self.zoom_to_element))
-        self.dlg_incident_manager.btn_image.clicked.connect(partial(self.open_image, self.dlg_incident_manager.tbl_incident))
+        self.dlg_incident_manager.btn_image.clicked.connect(
+            partial(self.open_image, self.dlg_incident_manager.tbl_incident))
         self.dlg_incident_manager.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_incident_manager))
-        self.dlg_incident_manager.date_from.dateChanged.connect(partial(self.update_table, self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name))
-        self.dlg_incident_manager.date_to.dateChanged.connect(partial(self.update_table, self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name))
+        self.dlg_incident_manager.date_from.dateChanged.connect(
+            partial(self.update_table, self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name))
+        self.dlg_incident_manager.date_to.dateChanged.connect(
+            partial(self.update_table, self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name))
         self.dlg_incident_manager.tbl_incident.selectionModel().selectionChanged.connect(
             partial(self.enable_widget_x_qtable, self.dlg_incident_manager.tbl_incident,
                     self.dlg_incident_manager.btn_image, 'incident_foto'))
@@ -1049,7 +1063,8 @@ class TmBasic(TmParentAction):
         self.ids = []
         column_index = utils_giswater.get_col_index_by_col_name(self.dlg_incident_manager.tbl_incident, 'node_id')
         for x in range(0, self.dlg_incident_manager.tbl_incident.model().rowCount()):
-            _id = self.dlg_incident_manager.tbl_incident.model().data(self.dlg_incident_manager.tbl_incident.model().index(x, column_index))
+            _id = self.dlg_incident_manager.tbl_incident.model().data(
+                self.dlg_incident_manager.tbl_incident.model().index(x, column_index))
             self.ids.append(_id)
 
 
@@ -1107,11 +1122,16 @@ class TmBasic(TmParentAction):
             self.incident_comment = ''
         utils_giswater.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.visit_id, self.visit_id)
         utils_giswater.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.node_id, self.node_id)
-        utils_giswater.setCalendarDate(self.dlg_incident_planning, self.dlg_incident_planning.incident_date, self.incident_date)
-        utils_giswater.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.incident_user, self.incident_user)
-        utils_giswater.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.parameter_id, self.parameter_id)
-        utils_giswater.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.incident_comment, self.incident_comment)
-        utils_giswater.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.process_user, self.controller.get_current_user())
+        utils_giswater.setCalendarDate(self.dlg_incident_planning,
+                                       self.dlg_incident_planning.incident_date, self.incident_date)
+        utils_giswater.setWidgetText(self.dlg_incident_planning,
+                                     self.dlg_incident_planning.incident_user, self.incident_user)
+        utils_giswater.setWidgetText(self.dlg_incident_planning,
+                                     self.dlg_incident_planning.parameter_id, self.parameter_id)
+        utils_giswater.setWidgetText(self.dlg_incident_planning,
+                                     self.dlg_incident_planning.incident_comment, self.incident_comment)
+        utils_giswater.setWidgetText(self.dlg_incident_planning,
+                                     self.dlg_incident_planning.process_user, self.controller.get_current_user())
 
         utils_giswater.setCalendarDate(self.dlg_incident_planning, self.dlg_incident_planning.process_date, None)
 
@@ -1126,10 +1146,13 @@ class TmBasic(TmParentAction):
 
         if action == 'PROCESS':
 
-            campaign_id = utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.campaign_id, 0)
+            campaign_id = utils_giswater.get_item_data(
+                self.dlg_incident_planning, self.dlg_incident_planning.campaign_id, 0)
             work_id = utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.work_id, 0)
-            priority_id = utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.priority_id, 0)
-            builder_id = utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.builder_id, 0)
+            priority_id = utils_giswater.get_item_data(
+                self.dlg_incident_planning, self.dlg_incident_planning.priority_id, 0)
+            builder_id = utils_giswater.get_item_data(
+                self.dlg_incident_planning, self.dlg_incident_planning.builder_id, 0)
 
             if self.visit_id in ('', None, 'null') or campaign_id in ('', None, 'null') or work_id in ('', None, 'null')\
                     or priority_id in ('', None, 'null') or builder_id in ('', None, 'null'):
@@ -1151,8 +1174,10 @@ class TmBasic(TmParentAction):
 
                 self.dlg_incident_info.txt_infolog.setText(message)
 
-                self.dlg_incident_info.btn_duplicate.clicked.connect(partial(self.manage_process_planning, action, True))
-                self.dlg_incident_info.btn_overwrite.clicked.connect(partial(self.manage_process_planning, 'OVERWRITE', True))
+                self.dlg_incident_info.btn_duplicate.clicked.connect(
+                    partial(self.manage_process_planning, action, True))
+                self.dlg_incident_info.btn_overwrite.clicked.connect(
+                    partial(self.manage_process_planning, 'OVERWRITE', True))
                 self.dlg_incident_info.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_incident_info))
 
                 self.open_dialog(self.dlg_incident_info)
@@ -1170,7 +1195,8 @@ class TmBasic(TmParentAction):
 
             if result['status'] == "Accepted":
                 self.close_dialog(self.dlg_incident_planning)
-                self.update_table(self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, "v_ui_om_visit_incident")
+                self.update_table(self.dlg_incident_manager,
+                                  self.dlg_incident_manager.tbl_incident, "v_ui_om_visit_incident")
 
 
     def manage_process_planning(self, action, close_dlg_aux=False):

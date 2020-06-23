@@ -191,7 +191,8 @@ class ManageVisit(ParentManage, QObject):
         self.tabs.currentChanged.connect(partial(self.manage_tab_changed, self.dlg_add_visit))
         self.visit_id.textChanged.connect(partial(self.manage_visit_id_change, self.dlg_add_visit))
         self.dlg_add_visit.btn_doc_insert.clicked.connect(self.document_insert)
-        self.dlg_add_visit.btn_doc_delete.clicked.connect(partial(self.document_delete, self.tbl_document, "doc_x_visit"))
+        self.dlg_add_visit.btn_doc_delete.clicked.connect(
+            partial(self.document_delete, self.tbl_document, "doc_x_visit"))
         self.dlg_add_visit.btn_doc_new.clicked.connect(self.manage_document)
         self.dlg_add_visit.btn_open_doc.clicked.connect(partial(self.document_open, self.tbl_document))
         self.tbl_document.doubleClicked.connect(partial(self.document_open, self.tbl_document))
@@ -199,7 +200,8 @@ class ManageVisit(ParentManage, QObject):
 
         # Fill combo boxes of the form and related events
         self.parameter_type_id.currentIndexChanged.connect(partial(self.set_parameter_id_combo, self.dlg_add_visit))
-        self.feature_type.currentIndexChanged.connect(partial(self.event_feature_type_selected, self.dlg_add_visit, None))
+        self.feature_type.currentIndexChanged.connect(
+            partial(self.event_feature_type_selected, self.dlg_add_visit, None))
         self.feature_type.currentIndexChanged.connect(partial(self.manage_tabs_enabled, True))
         self.parameter_id.currentIndexChanged.connect(self.get_feature_type_of_parameter)
 
@@ -748,7 +750,8 @@ class ManageVisit(ParentManage, QObject):
 
         # manage save and rollback when closing the dialog
         self.dlg_man.rejected.connect(partial(self.close_dialog, self.dlg_man))
-        self.dlg_man.accepted.connect(partial(self.open_selected_object, self.dlg_man, self.dlg_man.tbl_visit, table_object))
+        self.dlg_man.accepted.connect(partial(self.open_selected_object, self.dlg_man,
+                                      self.dlg_man.tbl_visit, table_object))
 
         # Set signals
         self.dlg_man.tbl_visit.doubleClicked.connect(
@@ -761,7 +764,8 @@ class ManageVisit(ParentManage, QObject):
             self.dlg_man.txt_filter, table_object, expr_filter, filed_to_filter))
 
         # set timeStart and timeEnd as the min/max dave values get from model
-        self.set_dates_from_to(self.dlg_man.date_event_from, self.dlg_man.date_event_to, 'om_visit', 'startdate', 'enddate')
+        self.set_dates_from_to(self.dlg_man.date_event_from, self.dlg_man.date_event_to,
+                               'om_visit', 'startdate', 'enddate')
 
         # set date events
         self.dlg_man.date_event_from.dateChanged.connect(partial(self.filter_visit, self.dlg_man,
@@ -936,7 +940,8 @@ class ManageVisit(ParentManage, QObject):
 
         visit_id = utils_giswater.getText(self.dlg_add_visit, self.dlg_add_visit.visit_id)
         manage_document = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir, single_tool=False)
-        dlg_docman = manage_document.manage_document(tablename='visit', qtable=self.dlg_add_visit.tbl_document, item_id=visit_id)
+        dlg_docman = manage_document.manage_document(
+            tablename='visit', qtable=self.dlg_add_visit.tbl_document, item_id=visit_id)
         utils_giswater.remove_tab_by_tabName(dlg_docman.tabWidget, 'tab_rel')
         dlg_docman.btn_accept.clicked.connect(partial(self.set_completer_object, dlg_docman, 'doc'))
 
@@ -1300,7 +1305,8 @@ class ManageVisit(ParentManage, QObject):
         utils_giswater.set_qtv_config(self.dlg_event.tbl_docs_x_event)
         self.dlg_event.tbl_docs_x_event.doubleClicked.connect(self.open_file)
         self.dlg_event.btn_add_file.clicked.connect(partial(self.get_added_files, event.visit_id, event.id, save=True))
-        self.dlg_event.btn_delete_file.clicked.connect(partial(self.delete_files, self.dlg_event.tbl_docs_x_event, event.visit_id, event.id))
+        self.dlg_event.btn_delete_file.clicked.connect(
+            partial(self.delete_files, self.dlg_event.tbl_docs_x_event, event.visit_id, event.id))
         self.populate_tbl_docs_x_event(event.id)
 
         # fill widget values if the values are present

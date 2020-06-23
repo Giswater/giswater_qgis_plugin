@@ -372,7 +372,8 @@ class ManageNewPsector(ParentManage):
             'plan_psector', psector_id, 'other'))
 
         self.dlg_plan_psector.btn_doc_insert.clicked.connect(self.document_insert)
-        self.dlg_plan_psector.btn_doc_delete.clicked.connect(partial(self.document_delete, self.tbl_document, 'doc_x_psector'))
+        self.dlg_plan_psector.btn_doc_delete.clicked.connect(
+            partial(self.document_delete, self.tbl_document, 'doc_x_psector'))
         self.dlg_plan_psector.btn_doc_new.clicked.connect(partial(self.manage_document, self.tbl_document))
         self.dlg_plan_psector.btn_open_doc.clicked.connect(partial(self.document_open, self.tbl_document))
         self.cmb_status.currentIndexChanged.connect(partial(self.show_status_warning))
@@ -794,7 +795,8 @@ class ManageNewPsector(ParentManage):
         """ Connect signal selectionChanged """
 
         try:
-            self.canvas.selectionChanged.connect(partial(self.selection_changed, dialog, table_object, self.geom_type, query))
+            self.canvas.selectionChanged.connect(
+                partial(self.selection_changed, dialog, table_object, self.geom_type, query))
         except Exception:
             pass
 
@@ -839,7 +841,8 @@ class ManageNewPsector(ParentManage):
             self.price_selector(self.dlg_plan_psector, tableleft, tableright, field_id_right)
             self.update_total(self.dlg_plan_psector, self.dlg_plan_psector.selected_rows)
         elif self.dlg_plan_psector.tabWidget.currentIndex() == 3:
-            self.populate_budget(self.dlg_plan_psector, utils_giswater.getWidgetText(self.dlg_plan_psector, 'psector_id'))
+            self.populate_budget(self.dlg_plan_psector, utils_giswater.getWidgetText(
+                self.dlg_plan_psector, 'psector_id'))
         elif self.dlg_plan_psector.tabWidget.currentIndex() == 4:
             psector_id = utils_giswater.getWidgetText(self.dlg_plan_psector, 'psector_id')
             expr = f"psector_id = '{psector_id}'"

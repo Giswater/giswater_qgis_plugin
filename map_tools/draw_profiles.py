@@ -226,7 +226,8 @@ class DrawProfiles(ParentMapTool):
             custom_dim = f'{{"xdim":{x_dim}, "ydim":{y_dim}}}'
 
         title = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_title)
-        date = utils_giswater.getCalendarDate(self.dlg_draw_profile, self.dlg_draw_profile.date, date_format='dd/MM/yyyy')
+        date = utils_giswater.getCalendarDate(
+            self.dlg_draw_profile, self.dlg_draw_profile.date, date_format='dd/MM/yyyy')
 
         # Create variable with all the content of the form
         extras = f'"profile_id":"{profile_id}", "listArcs":"{list_arc}","initNode":"{self.initNode}", ' \
@@ -296,7 +297,8 @@ class DrawProfiles(ParentMapTool):
                 self.dlg_draw_profile.txt_min_distance.setText(str(profile['values']['linksDistance']))
                 self.dlg_draw_profile.txt_legend_factor.setText(str(profile['values']['legendFactor']))
 
-                utils_giswater.set_combo_itemData(self.dlg_draw_profile.cmb_papersize, profile['values']['papersize']['id'], 0)
+                utils_giswater.set_combo_itemData(self.dlg_draw_profile.cmb_papersize,
+                                                  profile['values']['papersize']['id'], 0)
                 if 'customDim' in profile['values']['papersize']:
                     self.dlg_draw_profile.txt_x_dim.setText(str(profile['values']['papersize']['customDim']['xdim']))
                     self.dlg_draw_profile.txt_y_dim.setText(str(profile['values']['papersize']['customDim']['ydim']))
@@ -585,7 +587,8 @@ class DrawProfiles(ParentMapTool):
             parameters.ymax = [json.loads(node['descript'], object_pairs_hook=OrderedDict)][0]['ymax']
             parameters.elev = [json.loads(node['descript'], object_pairs_hook=OrderedDict)][0]['elev']
             parameters.code = [json.loads(node['descript'], object_pairs_hook=OrderedDict)][0]['code']
-            parameters.total_distance = [json.loads(node['descript'], object_pairs_hook=OrderedDict)][0]['total_distance']
+            parameters.total_distance = [json.loads(
+                node['descript'], object_pairs_hook=OrderedDict)][0]['total_distance']
             parameters.node_id = node['node_id']
             parameters.geom = node['cat_geom1']
 
@@ -601,7 +604,8 @@ class DrawProfiles(ParentMapTool):
             parameters.ymax = [json.loads(terrain['label_n1'], object_pairs_hook=OrderedDict)][0]['ymax']
             parameters.elev = [json.loads(terrain['label_n1'], object_pairs_hook=OrderedDict)][0]['elev']
             parameters.code = [json.loads(terrain['label_n1'], object_pairs_hook=OrderedDict)][0]['code']
-            parameters.total_distance = [json.loads(terrain['label_n1'], object_pairs_hook=OrderedDict)][0]['total_distance']
+            parameters.total_distance = [json.loads(
+                terrain['label_n1'], object_pairs_hook=OrderedDict)][0]['total_distance']
             parameters.node_id = terrain['top_n1']
             parameters.geom = terrain['top_n2']
 
@@ -874,7 +878,8 @@ class DrawProfiles(ParentMapTool):
 
         # Fill top_elevation and node_id for all nodes
         plt.annotate(' ' + '\n' + str(round(self.nodes[indx].top_elev, 2)) + '\n' + ' ',
-                     xy=(Decimal(start_point), self.min_top_elev - Decimal(self.height_row * Decimal(1.8) + self.height_row / 2)),
+                     xy=(Decimal(start_point), self.min_top_elev - \
+                         Decimal(self.height_row * Decimal(1.8) + self.height_row / 2)),
                      fontsize=6, rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
         # Draw node_id
@@ -1049,7 +1054,8 @@ class DrawProfiles(ParentMapTool):
 
         # Fill top_elevation and node_id for all nodes
         plt.annotate(' ' + '\n' + str(round(self.links[indx].top_elev, 2)) + '\n' + ' ',
-                     xy=(Decimal(start_point), self.min_top_elev - Decimal(self.height_row * Decimal(1.8) + self.height_row / 2)),
+                     xy=(Decimal(start_point), self.min_top_elev - \
+                         Decimal(self.height_row * Decimal(1.8) + self.height_row / 2)),
                      fontsize=6, rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
         # Draw node_id
@@ -1254,7 +1260,8 @@ class DrawProfiles(ParentMapTool):
                 y1 = [i, i]
             plt.plot(x1, y1, 'lightgray', zorder=1)
             # Values left y_ordinate_all
-            plt.text(0 - geom1 * Decimal(1.5), i, str(i), fontsize=7.5, horizontalalignment='right', verticalalignment='center')
+            plt.text(0 - geom1 * Decimal(1.5), i, str(i), fontsize=7.5,
+                     horizontalalignment='right', verticalalignment='center')
 
 
     def draw_grid(self):
