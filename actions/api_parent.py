@@ -1728,13 +1728,17 @@ class ApiParent(ParentAction):
             if text_filter in ('null', None):
                 text_filter = ''
 
+            # Set current_tab
+            index = dialog.main_tab.currentIndex()
+            self.current_tab = dialog.main_tab.widget(index).objectName()
+
         # Profilactic control of nones
         if text_filter is None:
                 text_filter=''
 
         # built querytext
         form = f'"currentTab":"{self.current_tab}"'
-        extras = f'"selectorType":{selector_type}, "textFilter":"{text_filter}"'
+        extras = f'"selectorType":{selector_type}, "filterText":"{text_filter}"'
         body = self.create_body(form=form, extras=extras)
         json_result = self.controller.get_json('gw_fct_getselectors', body, log_sql=True)
         if not json_result:
@@ -1742,13 +1746,20 @@ class ApiParent(ParentAction):
 
         for form_tab in json_result['body']['form']['formTabs']:
 
+            if filter and form_tab['tabName'] != str(self.current_tab):
+                continue
+
             selection_mode = form_tab['selectionMode']
 
             # Create one tab for each form_tab and add to QTabWidget
             tab_widget = QWidget(main_tab)
             tab_widget.setObjectName(form_tab['tabName'])
             tab_widget.setProperty('selector_type', form_tab['selectorType'])
-            main_tab.addTab(tab_widget, form_tab['tabLabel'])
+            if filter:
+                main_tab.removeTab(index)
+                main_tab.insertTab(index, tab_widget, form_tab['tabLabel'])
+            else:
+                main_tab.addTab(tab_widget, form_tab['tabLabel'])
 
             # Create a new QGridLayout and put it into tab
             gridlayout = QGridLayout()
@@ -1805,8 +1816,6 @@ class ApiParent(ParentAction):
 
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
             gridlayout.addItem(vertical_spacer1)
-            if filter is not False:
-                main_tab.removeTab(0)
 
             # Set last tab used by user as current tab
             tabname = json_result['body']['form']['currentTab']
