@@ -161,13 +161,7 @@ class DrawProfiles(ParentMapTool):
         extras = f'"initNode":"{self.initNode}", "endNode":"{self.endNode}", "composer":"mincutA4", ' \
             f'"legendFactor":{legend_factor}, "linksDistance":{links_distance}, ' \
             f'"scale":{{"scaleToFit":"{scale_to_fit}", "eh":{eh}, "ev":{ev}}}, ' \
-            f'"papersize":{{"id":{int(papersize_id)}, "customDim":{custom_dim}, ' \
-            f'"ComposerTemplates":[{{"ComposerTemplate":"mincutA4", ' \
-            f'"ComposerMap":[{{"width":"179.0","height":"140.826","index":0, "name":"map0"}},' \
-            f'{{"width":"77.729","height":"55.9066","index":1, "name":"map7"}}]}},' \
-            f'{{"ComposerTemplate":"mincutA3",' \
-            f'"ComposerMap":[{{"width":"53.44","height":"55.9066","index":0, "name":"map7"}},' \
-            f'{{"width":"337.865","height":"275.914","index":1, "name":"map6"}}]}}]'
+            f'"papersize":{{"id":{int(papersize_id)}, "customDim":{custom_dim}'
 
         body = self.create_body(extras=extras)
 
@@ -514,37 +508,15 @@ class DrawProfiles(ParentMapTool):
         self.rect = self.fig1.patch
         self.rect.set_facecolor('white')
 
-        # Set axes
+        # Set x-axis
         x_min = round(Decimal(self.nodes[0].start_point) - Decimal(self.fix_x) - Decimal(self.fix_x) * Decimal(0.15))
         x_max = round(Decimal(self.nodes[self.n - 1].start_point) + Decimal(self.fix_x) * Decimal(0.15))
-        # x_min = self.profile_json['body']['data']['extension']['height']
-        # x_max = self.profile_json['body']['data']['extension']['width']
-        self.axes.set_xlim([x_min, x_max])
 
-        # Set y-axes
-        y_min = round(self.min_top_elev - self.z - self.height_row * Decimal(1.5))
-        y_max = round(Decimal(self.max_top_elev) + Decimal(self.height_row) * Decimal(1.5))
-        # y_max = self.profile_json['body']['data']['extension']['height']
-        self.axes.set_ylim([y_min, y_max + 1])
+        # Set y-axis
+        y_min = round(self.min_top_elev - self.z - self.height_row * Decimal(3))
+        y_max = round(Decimal(self.max_top_elev) + Decimal(self.height_row) * Decimal(3))
 
-        # Draw margins
-        x = [x_min, x_min]
-        y = [y_min, y_max]
-        plt.plot(x, y, 'black', zorder=100)
-
-        x = [x_min, x_max]
-        y = [y_min, y_min]
-        plt.plot(x, y, 'black', zorder=100)
-
-        x = [x_max, x_max]
-        y = [y_min, y_max]
-        plt.plot(x, y, 'black', zorder=100)
-
-        x = [x_max, x_min]
-        y = [y_max, y_max]
-        plt.plot(x, y, 'black', zorder=100)
-
-
+       
     def set_parameters(self, arcs, nodes, terrains):
         """ Get and calculate parameters and values for drawing """
 
