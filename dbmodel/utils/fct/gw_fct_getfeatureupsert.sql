@@ -435,10 +435,12 @@ BEGIN
 	END IF;
 
 	-- Getting node header
-	v_grafdelimiter = (SELECT graf_delimiter FROM cat_feature JOIN cat_feature_node USING (id) WHERE child_layer = p_table_id);
-	IF v_grafdelimiter IN ('PRESSZONE','DQA','DMA','SECTOR') THEN
-		v_isnodeheader = true;
-		v_mapzonetype = lower(v_grafdelimiter);
+	IF v_project_type = 'WS' THEN
+		v_grafdelimiter = (SELECT graf_delimiter FROM cat_feature JOIN cat_feature_node USING (id) WHERE child_layer = p_table_id);
+		IF v_grafdelimiter IN ('PRESSZONE','DQA','DMA','SECTOR') THEN
+			v_isnodeheader = true;
+			v_mapzonetype = lower(v_grafdelimiter);
+		END IF;
 	END IF;
 	
 	-- Filling the form widgets with values

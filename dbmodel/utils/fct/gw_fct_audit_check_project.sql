@@ -6,13 +6,13 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2794
 
-DROP FUNCTION IF EXISTS ws_sample.gw_fct_audit_check_project(INTEGER);
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_audit_check_project(p_data json)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_audit_check_project(INTEGER);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_audit_check_project(p_data json)
   RETURNS json AS
 $BODY$
 
 /*
-SELECT ws_sample.gw_fct_audit_check_project($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
+SELECT SCHEMA_NAME.gw_fct_audit_check_project($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
 "feature":{}, "data":{"filterFields":{}, "addSchema":"ud_sample", "qgisVersion":"3.10.003.1", "initProject":"false", "pageInfo":{}, "version":"3.3.019", "fid":1}}$$);
 
 -- fid: 101 (main)
@@ -74,8 +74,8 @@ v_addschema text;
 BEGIN 
 
 	-- search path
-	SET search_path = "ws_sample", public;
-	v_schemaname = 'ws_sample';
+	SET search_path = "SCHEMA_NAME", public;
+	v_schemaname = 'SCHEMA_NAME';
 
 	SELECT project_type, giswater, epsg INTO v_project_type, v_version, v_srid FROM sys_version order by id desc limit 1;
 	
@@ -169,13 +169,13 @@ BEGIN
 	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
 
 	IF v_max_seq_id IS NOT null THEN
-		EXECUTE 'SELECT setval(''ws_sample.urn_id_seq'','||v_max_seq_id||', true)';
+		EXECUTE 'SELECT setval(''SCHEMA_NAME.urn_id_seq'','||v_max_seq_id||', true)';
 	END IF;
 	
 	-- Special cases (doc_seq. inp_vertice_seq)
 	SELECT max(id::integer) FROM doc WHERE id ~ '^\d+$' into v_max_seq_id;
 	IF v_max_seq_id IS NOT null THEN
-		EXECUTE 'SELECT setval(''ws_sample.doc_seq'','||v_max_seq_id||', true)';
+		EXECUTE 'SELECT setval(''SCHEMA_NAME.doc_seq'','||v_max_seq_id||', true)';
 	END IF;
 	
 	--Set hydrology_selector when null values from user
@@ -192,7 +192,7 @@ BEGIN
 		v_query_string:= 'SELECT max('||v_rectable.sys_sequence_field||') FROM '||v_rectable.id||';' ;
 		EXECUTE v_query_string INTO v_max_seq_id;	
 		IF v_max_seq_id IS NOT NULL AND v_max_seq_id > 0 THEN 
-			EXECUTE 'SELECT setval(''ws_sample.'||v_rectable.sys_sequence||' '','||v_max_seq_id||', true)';			
+			EXECUTE 'SELECT setval(''SCHEMA_NAME.'||v_rectable.sys_sequence||' '','||v_max_seq_id||', true)';			
 		END IF;
 	END LOOP;
 
@@ -239,7 +239,7 @@ BEGIN
 		IF v_addschema IS NOT NULL AND v_addschema != v_schemaname THEN
 			EXECUTE 'SET search_path = '||v_addschema||', public';
 			PERFORM gw_fct_setselectors(p_data);
-			SET search_path = 'ws_sample', public;
+			SET search_path = 'SCHEMA_NAME', public;
 		END IF;
 	ELSE
 		-- Force exploitation selector in case of null values
