@@ -1946,7 +1946,7 @@ class UpdateSQL(ApiParent):
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         utils_giswater.set_item_data(self.dlg_manage_visit_param.parameter_type, rows, 1)
 
-        sql = "SELECT id, idval FROM config_api_typevalue WHERE typevalue = 'datatype'"
+        sql = "SELECT id, idval FROM config_typevalue WHERE typevalue = 'datatype'"
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         utils_giswater.set_item_data(self.dlg_manage_visit_param.data_type, rows, 1)
 
@@ -1954,7 +1954,7 @@ class UpdateSQL(ApiParent):
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         utils_giswater.set_item_data(self.dlg_manage_visit_param.form_type, rows, 1)
 
-        sql = "SELECT id, idval FROM config_api_typevalue WHERE typevalue = 'widgettype'"
+        sql = "SELECT id, idval FROM config_typevalue WHERE typevalue = 'widgettype'"
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         utils_giswater.set_item_data(self.dlg_manage_visit_param.widget_type, rows, 1)
 
@@ -2662,7 +2662,7 @@ class UpdateSQL(ApiParent):
         sql = ("SELECT " + schema_name + ".gw_fct_import_ui_xml('" + \
                str(form_name_ui) + "', " + str(status_update_childs) + ")::text")
         status = self.controller.execute_sql(sql, log_sql=True)
-        self.manage_result_message(status, parameter="Import data into 'config_api_form_fields'")
+        self.manage_result_message(status, parameter="Import data into 'config_form_fields'")
 
         # Clear temp_csv
         self.clear_temp_table()
@@ -2808,7 +2808,7 @@ class UpdateSQL(ApiParent):
         # Execute query
         status = self.controller.get_json('gw_fct_admin_manage_child_views', body,
                                           schema_name=schema_name, commit=False)
-        self.manage_result_message(status, parameter="Created child view")
+        self.manage_result_message(status, parameter="Create child view")
 
 
     def update_sys_fields(self):
@@ -2948,7 +2948,7 @@ class UpdateSQL(ApiParent):
 
         form_name_fields = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_formname_fields)
         self.chk_multi_insert = utils_giswater.isChecked(self.dlg_readsql, self.dlg_readsql.chk_multi_insert)
-        self.dlg_manage_fields.column_id.setEnabled(False)
+        self.dlg_manage_fields.columnname.setEnabled(False)
 
         # Set listeners
         self.dlg_manage_fields.btn_accept.clicked.connect(
@@ -2990,20 +2990,20 @@ class UpdateSQL(ApiParent):
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
 
         # Populate widgettype combo
-        sql = (f"SELECT DISTINCT(id), idval FROM {schema_name}.config_api_typevalue "
+        sql = (f"SELECT DISTINCT(id), idval FROM {schema_name}.config_typevalue "
                f"WHERE typevalue = 'widgettype_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
         rows = self.controller.get_rows(sql, log_sql=True)
         utils_giswater.set_item_data(self.dlg_manage_fields.widgettype, rows, 1)
 
         # Populate datatype combo
-        sql = (f"SELECT id, idval FROM {schema_name}.config_api_typevalue "
+        sql = (f"SELECT id, idval FROM {schema_name}.config_typevalue "
                f"WHERE typevalue = 'datatype_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
         rows = self.controller.get_rows(sql, log_sql=True)
         utils_giswater.set_item_data(self.dlg_manage_fields.datatype, rows, 1)
 
         # Populate widgetfunction combo
         sql = (f"SELECT null as id, null as idval UNION ALL "
-               f"SELECT id, idval FROM {schema_name}.config_api_typevalue "
+               f"SELECT id, idval FROM {schema_name}.config_typevalue "
                f"WHERE typevalue = 'widgetfunction_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
         rows = self.controller.get_rows(sql, log_sql=True)
         utils_giswater.set_item_data(self.dlg_manage_fields.widgetfunction, rows, 1)
@@ -3085,7 +3085,7 @@ class UpdateSQL(ApiParent):
     def manage_sys_update(self, form_name):
 
         list_widgets = self.dlg_manage_sys_fields.tab_create.findChildren(QWidget)
-        column_id = utils_giswater.getWidgetText(self.dlg_manage_sys_fields, self.dlg_manage_sys_fields.column_id)
+        columname = utils_giswater.getWidgetText(self.dlg_manage_sys_fields, self.dlg_manage_sys_fields.columnname)
         sql = f"UPDATE ve_config_sys_fields SET "
         for widget in list_widgets:
             if type(widget) not in (
@@ -3110,7 +3110,7 @@ class UpdateSQL(ApiParent):
                 sql += f" {widget.objectName()} = {value},"
 
         sql = sql[:-1]
-        sql += f" WHERE cat_feature_id = '{form_name}' and columname = '{column_id}'"
+        sql += f" WHERE cat_feature_id = '{form_name}' and columname = '{columname}'"
         self.controller.execute_sql(sql)
 
         # Close dialog
@@ -3123,22 +3123,22 @@ class UpdateSQL(ApiParent):
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
 
         # Execute manage add fields function
-        param_name = utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.column_id)
-        sql = (f"SELECT param_name FROM config_addfields_parameter "
-               f"WHERE param_name = '{param_name}'")
+        param_name = utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.columnname)
+        sql = (f"SELECT param_name FROM sys_addfields "
+               f"WHERE param_name = '{param_name}' AND  cat_feature_id = '{form_name}' ")
         row = self.controller.get_row(sql, log_sql=True)
 
         if action == 'create':
 
             # Control mandatory widgets
-            if utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.column_id) is 'null' or \
+            if utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.columnname) is 'null' or \
                     utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.label) is 'null':
-                msg = "Column_id and Label fields mandatory. Please set correctly value."
+                msg = "Column name and Label fields mandatory. Please set value correctly."
                 self.controller.show_info_box(msg, "Info")
                 return
 
             elif row is not None:
-                msg = "The column id value is already exists."
+                msg = "Column name already exists."
                 self.controller.show_info_box(msg, "Info")
                 return
 
@@ -3180,7 +3180,7 @@ class UpdateSQL(ApiParent):
             # Execute manage add fields function
             status = self.controller.get_json('gw_fct_admin_manage_addfields', body,
                                               schema_name=schema_name, commit=False)
-            self.manage_result_message(status, parameter="Created field into 'config_api_form_fields'")
+            self.manage_result_message(status, parameter="Field configured in 'config_form_fields'")
             if not status:
                 return
 
@@ -3219,7 +3219,7 @@ class UpdateSQL(ApiParent):
             # Execute manage add fields function
             status = self.controller.get_json('gw_fct_admin_manage_addfields', body,
                                               schema_name=schema_name, commit=False)
-            self.manage_result_message(status, parameter="Update field into 'config_api_form_fields'")
+            self.manage_result_message(status, parameter="Field update in 'config_form_fields'")
             if not status:
                 return
 
@@ -3230,7 +3230,7 @@ class UpdateSQL(ApiParent):
             # Create body
             feature = '"catFeature":"' + form_name + '"'
             extras = '"action":"DELETE", "multi_create":' + str(
-                self.chk_multi_insert).lower() + ',"parameters":{"column_id":"' + field_value + '"}'
+                self.chk_multi_insert).lower() + ',"parameters":{"columnname":"' + field_value + '"}'
             body = self.create_body(feature=feature, extras=extras)
 
             # Execute manage add fields function
