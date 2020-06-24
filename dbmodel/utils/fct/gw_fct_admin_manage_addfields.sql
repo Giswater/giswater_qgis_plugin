@@ -678,7 +678,7 @@ BEGIN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (218, null, 4, 'Delete values from config_form_fields related to parameter.');
 
-			DELETE FROM layoutorder WHERE formname=v_viewname AND columnname=v_param_name;
+			DELETE FROM config_form_fields WHERE formname=v_viewname AND columnname=v_param_name;
 
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (218, null, 4, concat('Delete definition of vdefault: ', concat('edit_addfield_p', v_idaddparam,'_vdefault')));
