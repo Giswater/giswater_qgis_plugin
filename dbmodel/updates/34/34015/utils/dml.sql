@@ -76,3 +76,5 @@ WHERE id = 2784;
 
 INSERT INTO config_typevalue(typevalue, id, idval, camelstyle, addparam)
 VALUES ('datatype_typevalue', 'text', 'text', 'text', '{"createAddfield":"TRUE"}') ON CONFLICT (typevalue, id) DO NOTHING;
+
+UPDATE config_form_tabs SET tabname ='tab_data' WHERE tabname = 'tabData';
