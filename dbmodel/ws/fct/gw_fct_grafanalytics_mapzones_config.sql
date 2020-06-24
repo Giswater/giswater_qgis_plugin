@@ -8,13 +8,13 @@ This version of Giswater is provided by Giswater Association
 
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_grafanalytics_mapzones_config(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.ws_gw_fct_grafanalytics_mapzones_config(p_data json)
   RETURNS json AS
 $BODY$
 /*
 
 
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_mapzones_config($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{},
+SELECT SCHEMA_NAME.ws_gw_fct_grafanalytics_mapzones_config($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{},
  "data":{"parameters":{"mapzoneAddfield":"c_sector", "grafClass":"DMA" }}}$$);
 
 
@@ -67,118 +67,129 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (249, null, 4, 'CONFIGURE MAPZONES');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (249, null, 4, '-------------------------------------------------------------');
 
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (195, null, 2, 'WARNINGS');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (195, null, 2, '--------------');
+
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (195, null, 1, 'INFO');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (195, null, 1, '-------');
 
     --find delimiter node types
-    SELECT string_agg(quote_literal(id), ',') INTO v_mapzone_nodetype FROM node_type WHERE graf_delimiter = v_graf_class;
+    SELECT string_agg(quote_literal(id), ',') INTO v_mapzone_nodetype FROM cat_feature_node WHERE graf_delimiter = v_graf_class;
 
     INSERT INTO audit_check_data (fid,  criticity, error_message)
 	VALUES (249, 1, concat('Delimitier node type: ', v_mapzone_nodetype,'.'));
 
 
     SELECT string_agg(child_layer, ','), string_agg(quote_literal(cat_feature.id), ',') INTO v_arc_layers, v_cat_feature_arc  
-    FROM cat_feature JOIN man_addfields_parameter ON cat_feature.id = cat_feature_id
+    FROM cat_feature JOIN sys_addfields ON cat_feature.id = cat_feature_id
     WHERE feature_type = 'ARC' AND param_name =  v_mapzone_addfield;
 
-    FOR rec IN (SELECT node_id::text FROM v_edit_node WHERE node_type IN 
-    	(SELECT id FROM node_type WHERE graf_delimiter = v_graf_class)) LOOP
-	
-		--find defined sector value of node
-		EXECUTE 'SELECT value_param FROM man_addfields_value 
-		JOIN man_addfields_parameter on parameter_id = man_addfields_parameter.id
-		WHERE feature_id = '||rec.node_id||'::text and param_name = '||quote_literal(v_mapzone_addfield)||''
-		INTO v_node_delimiter_mapzone;
+    IF v_arc_layers IS NULL THEN
 
-		--check first direction
-		IF v_node_delimiter_mapzone IS NOT NULL AND v_node_delimiter_mapzone != '' THEN
+    	INSERT INTO audit_check_data (fid,  criticity, error_message)
+		VALUES (249, 2, concat('Addfield ', v_mapzone_addfield, ' is not defined for arc layer.'));
+    ELSE
+	    FOR rec IN (SELECT node_id::text FROM v_edit_node WHERE nodetype_id IN 
+	    	(SELECT id FROM cat_feature_node WHERE graf_delimiter = v_graf_class)) LOOP
 		
-			EXECUTE 'SELECT arc_id FROM '||v_arc_layers||' WHERE node_1 = '||rec.node_id||'::text 
-			AND '||v_mapzone_addfield||' = '||v_node_delimiter_mapzone||'::text'
-			into v_arc_id1;
+			--find defined sector value of node
+			EXECUTE 'SELECT value_param FROM man_addfields_value 
+			JOIN sys_addfields on parameter_id = sys_addfields.id
+			WHERE feature_id = '||rec.node_id||'::text and param_name = '||quote_literal(v_mapzone_addfield)||''
+			INTO v_node_delimiter_mapzone;
+
+			--check first direction
+			IF v_node_delimiter_mapzone IS NOT NULL AND v_node_delimiter_mapzone != '' THEN
 			
-			
-		ELSIF v_node_delimiter_mapzone = '' THEN 
-			INSERT INTO audit_check_data (fid,  criticity, error_message)
-			VALUES (249, 1, concat('There is no mapzone defined for delimiter: ', rec.node_id,'.'));
-		END IF;	
+				EXECUTE 'SELECT arc_id FROM '||v_arc_layers||' WHERE node_1 = '||rec.node_id||'::text 
+				AND '||v_mapzone_addfield||' = '||v_node_delimiter_mapzone||'::text'
+				into v_arc_id1;
+				
+				
+			ELSIF v_node_delimiter_mapzone = '' THEN 
+				INSERT INTO audit_check_data (fid,  criticity, error_message)
+				VALUES (249, 2, concat('There is no mapzone defined for delimiter: ', rec.node_id,'.'));
+			END IF;	
 
-		IF v_arc_id1 IS NOT NULL THEN
-			--find final node of the first arc
-			EXECUTE 'SELECT node_2 FROM '||v_arc_layers||' WHERE arc_id ='||v_arc_id1||'::text'
-			INTO v_final_node_id;
-			
-			--find arc_id of the next arc
-			EXECUTE 'SELECT arc_id FROM '||v_arc_layers||' WHERE node_1 ='||v_final_node_id||'::text OR node_2 ='||v_final_node_id||'::text
-			AND arc_id != '''||v_arc_id1||''''
-			INTO v_next_arc_id;
-
-			
-			IF v_next_arc_id IS NOT NULL THEN
-				--find mapzone value of the next arc
-				EXECUTE 'SELECT value_param FROM man_addfields_value 
-				JOIN man_addfields_parameter on parameter_id = man_addfields_parameter.id
-				WHERE feature_id = '||v_next_arc_id||'::text and param_name = '||quote_literal(v_mapzone_addfield)||''
-				INTO v_arc_1_mapzone;
-
-				--configure mapzone if next arc mapzone is the same as delimiter mapzone
-				IF v_node_delimiter_mapzone = v_arc_1_mapzone THEN
-					v_json = concat('{"use":[{"nodeParent":"',rec.node_id,'", "toArc":[',v_arc_id1,']}], "ignore":[]}'); 
-
-					EXECUTE 'UPDATE '||v_graf_class||' SET grafconfig= '''||v_json||''' 
-					WHERE '||v_graf_class||'_id = '||v_node_delimiter_mapzone||';';
-					INSERT INTO audit_check_data (fid,  criticity, error_message)
-					VALUES (249, 1, concat('Configuration done for mapzone: ', v_node_delimiter_mapzone,'.'));
-
-				END IF;
-			END IF;
-		END IF;
-
-		IF (v_arc_id1 IS NULL OR v_node_delimiter_mapzone != v_arc_1_mapzone )AND v_node_delimiter_mapzone !=''THEN
-
-			--check second direction direction
-			EXECUTE 'SELECT arc_id FROM '||v_arc_layers||' WHERE node_2 = '||rec.node_id||'::text 
-			AND '||v_mapzone_addfield||' = '||v_node_delimiter_mapzone||'::text'
-			into v_arc_id2;
-
-			IF v_arc_id2 IS NOT NULL THEN
+			IF v_arc_id1 IS NOT NULL THEN
 				--find final node of the first arc
-				EXECUTE 'SELECT node_1 FROM '||v_arc_layers||' WHERE arc_id ='||v_arc_id2||'::text'
+				EXECUTE 'SELECT node_2 FROM '||v_arc_layers||' WHERE arc_id ='||v_arc_id1||'::text'
 				INTO v_final_node_id;
-
+				
 				--find arc_id of the next arc
 				EXECUTE 'SELECT arc_id FROM '||v_arc_layers||' WHERE node_1 ='||v_final_node_id||'::text OR node_2 ='||v_final_node_id||'::text
-				AND arc_id != '''||v_arc_id2||''''
+				AND arc_id != '''||v_arc_id1||''''
 				INTO v_next_arc_id;
-			
+
+				
 				IF v_next_arc_id IS NOT NULL THEN
 					--find mapzone value of the next arc
 					EXECUTE 'SELECT value_param FROM man_addfields_value 
-					JOIN man_addfields_parameter on parameter_id = man_addfields_parameter.id
+					JOIN sys_addfields on parameter_id = sys_addfields.id
 					WHERE feature_id = '||v_next_arc_id||'::text and param_name = '||quote_literal(v_mapzone_addfield)||''
-					INTO v_arc_2_mapzone;
+					INTO v_arc_1_mapzone;
 
-					IF v_node_delimiter_mapzone = v_arc_2_mapzone THEN
-						--configure mapzone if next arc mapzone is the same as delimiter mapzone
-						v_json = concat('{"use":[{"nodeParent":"',rec.node_id,'", "toArc":[',v_arc_id2,']}], "ignore":[]}'); 
+					--configure mapzone if next arc mapzone is the same as delimiter mapzone
+					IF v_node_delimiter_mapzone = v_arc_1_mapzone THEN
+						v_json = concat('{"use":[{"nodeParent":"',rec.node_id,'", "toArc":[',v_arc_id1,']}], "ignore":[]}'); 
 
 						EXECUTE 'UPDATE '||v_graf_class||' SET grafconfig= '''||v_json||''' 
 						WHERE '||v_graf_class||'_id = '||v_node_delimiter_mapzone||';';
-
 						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (249, 1, concat('Configuration done for mapzone: ', v_node_delimiter_mapzone,'.'));
 
 					END IF;
 				END IF;
 			END IF;
-	END IF;
-    END LOOP;
 
-    FOR rec IN  EXECUTE 'SELECT '||v_graf_class||'_id as undone_mapzone_id, name as undone_mapzone_name 
-    FROM v_edit_'||v_graf_class||' WHERE grafconfig IS NULL AND '||v_graf_class||'_id!= expl_id ;'
-    LOOP
-   
-	    INSERT INTO audit_check_data (fid,  criticity, error_message)
-		VALUES (249, 1, concat('Mapzone not configured for : ', rec.undone_mapzone_id,' - ',rec.undone_mapzone_name,'.'));
-	END LOOp;
+			IF (v_arc_id1 IS NULL OR v_node_delimiter_mapzone != v_arc_1_mapzone )AND v_node_delimiter_mapzone !=''THEN
+
+				--check second direction direction
+				EXECUTE 'SELECT arc_id FROM '||v_arc_layers||' WHERE node_2 = '||rec.node_id||'::text 
+				AND '||v_mapzone_addfield||' = '||v_node_delimiter_mapzone||'::text'
+				into v_arc_id2;
+
+				IF v_arc_id2 IS NOT NULL THEN
+					--find final node of the first arc
+					EXECUTE 'SELECT node_1 FROM '||v_arc_layers||' WHERE arc_id ='||v_arc_id2||'::text'
+					INTO v_final_node_id;
+
+					--find arc_id of the next arc
+					EXECUTE 'SELECT arc_id FROM '||v_arc_layers||' WHERE node_1 ='||v_final_node_id||'::text OR node_2 ='||v_final_node_id||'::text
+					AND arc_id != '''||v_arc_id2||''''
+					INTO v_next_arc_id;
+				
+					IF v_next_arc_id IS NOT NULL THEN
+						--find mapzone value of the next arc
+						EXECUTE 'SELECT value_param FROM man_addfields_value 
+						JOIN sys_addfields on parameter_id = sys_addfields.id
+						WHERE feature_id = '||v_next_arc_id||'::text and param_name = '||quote_literal(v_mapzone_addfield)||''
+						INTO v_arc_2_mapzone;
+
+						IF v_node_delimiter_mapzone = v_arc_2_mapzone THEN
+							--configure mapzone if next arc mapzone is the same as delimiter mapzone
+							v_json = concat('{"use":[{"nodeParent":"',rec.node_id,'", "toArc":[',v_arc_id2,']}], "ignore":[]}'); 
+
+							EXECUTE 'UPDATE '||v_graf_class||' SET grafconfig= '''||v_json||''' 
+							WHERE '||v_graf_class||'_id = '||v_node_delimiter_mapzone||';';
+
+							INSERT INTO audit_check_data (fid,  criticity, error_message)
+							VALUES (249, 1, concat('Configuration done for mapzone: ', v_node_delimiter_mapzone,'.'));
+
+						END IF;
+					END IF;
+				END IF;
+		END IF;
+	    END LOOP;
+
+	    FOR rec IN  EXECUTE 'SELECT '||v_graf_class||'_id as undone_mapzone_id, name as undone_mapzone_name 
+	    FROM v_edit_'||v_graf_class||' WHERE grafconfig IS NULL AND '||v_graf_class||'_id!= expl_id ;'
+	    LOOP
+	   
+		    INSERT INTO audit_check_data (fid,  criticity, error_message)
+			VALUES (249, 2, concat('Mapzone not configured for : ', rec.undone_mapzone_id,' - ',rec.undone_mapzone_name,'.'));
+		END LOOP;
+	END IF;	
 
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data 
