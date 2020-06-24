@@ -6,14 +6,14 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2794
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_audit_check_project(INTEGER);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_audit_check_project(p_data json)
+DROP FUNCTION IF EXISTS ws_sample.gw_fct_audit_check_project(INTEGER);
+CREATE OR REPLACE FUNCTION ws_sample.gw_fct_audit_check_project(p_data json)
   RETURNS json AS
 $BODY$
 
 /*
-SELECT SCHEMA_NAME.gw_fct_audit_check_project($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
-"feature":{}, "data":{"filterFields":{}, "qgisVersion":"3.10.003.1", "initProject":"false", "pageInfo":{}, "version":"3.3.019", "fid":1}}$$);
+SELECT ws_sample.gw_fct_audit_check_project($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
+"feature":{}, "data":{"filterFields":{}, "addSchema":"ud_sample", "qgisVersion":"3.10.003.1", "initProject":"false", "pageInfo":{}, "version":"3.3.019", "fid":1}}$$);
 
 -- fid: 101 (main)
 	om: 125
@@ -49,7 +49,7 @@ v_result_layers_criticity3 json;
 v_result_layers_criticity2 json;
 v_return json;
 v_missing_layers json;
-v_schema text;
+v_schemaname text;
 v_layer_list text;
 v_result_point json;
 v_result_line json;
@@ -69,12 +69,13 @@ v_init_project boolean;
 v_qgisversion text;
 v_osversion text;
 v_qgis_init_guide_map boolean;
+v_addschema text;
 
 BEGIN 
 
 	-- search path
-	SET search_path = "SCHEMA_NAME", public;
-	v_schema = 'SCHEMA_NAME';
+	SET search_path = "ws_sample", public;
+	v_schemaname = 'ws_sample';
 
 	SELECT project_type, giswater, epsg INTO v_project_type, v_version, v_srid FROM sys_version order by id desc limit 1;
 	
@@ -84,7 +85,12 @@ BEGIN
 	v_init_project := (p_data ->> 'data')::json->> 'initProject';
 	v_qgisversion := (p_data ->> 'data')::json->> 'qgisVersion';
 	v_osversion := (p_data ->> 'data')::json->> 'osVersion';
+	v_addschema := (p_data ->> 'data')::json->> 'addSchema';
 
+	-- control nulls of addschema
+	IF v_addschema = 'None' OR v_addschema = '' THEN
+		v_addschema = NULL;
+	END IF;
 	
 	-- get user parameters
 	SELECT value INTO v_qmlpointpath FROM config_param_user WHERE parameter='qgis_qml_pointlayer_path' AND cur_user=current_user;
@@ -163,13 +169,13 @@ BEGIN
 	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
 
 	IF v_max_seq_id IS NOT null THEN
-		EXECUTE 'SELECT setval(''SCHEMA_NAME.urn_id_seq'','||v_max_seq_id||', true)';
+		EXECUTE 'SELECT setval(''ws_sample.urn_id_seq'','||v_max_seq_id||', true)';
 	END IF;
 	
 	-- Special cases (doc_seq. inp_vertice_seq)
 	SELECT max(id::integer) FROM doc WHERE id ~ '^\d+$' into v_max_seq_id;
 	IF v_max_seq_id IS NOT null THEN
-		EXECUTE 'SELECT setval(''SCHEMA_NAME.doc_seq'','||v_max_seq_id||', true)';
+		EXECUTE 'SELECT setval(''ws_sample.doc_seq'','||v_max_seq_id||', true)';
 	END IF;
 	
 	--Set hydrology_selector when null values from user
@@ -186,7 +192,7 @@ BEGIN
 		v_query_string:= 'SELECT max('||v_rectable.sys_sequence_field||') FROM '||v_rectable.id||';' ;
 		EXECUTE v_query_string INTO v_max_seq_id;	
 		IF v_max_seq_id IS NOT NULL AND v_max_seq_id > 0 THEN 
-			EXECUTE 'SELECT setval(''SCHEMA_NAME.'||v_rectable.sys_sequence||' '','||v_max_seq_id||', true)';			
+			EXECUTE 'SELECT setval(''ws_sample.'||v_rectable.sys_sequence||' '','||v_max_seq_id||', true)';			
 		END IF;
 	END LOOP;
 
@@ -228,6 +234,13 @@ BEGIN
 	-- reset all exploitations
 	IF v_qgis_init_guide_map THEN
 		DELETE FROM selector_expl WHERE cur_user = current_user;
+
+		-- looking for additional schema 
+		IF v_addschema IS NOT NULL AND v_addschema != v_schemaname THEN
+			EXECUTE 'SET search_path = '||v_addschema||', public';
+			PERFORM gw_fct_setselectors(p_data);
+			SET search_path = 'ws_sample', public;
+		END IF;
 	ELSE
 		-- Force exploitation selector in case of null values
 		IF (SELECT count(*) FROM selector_expl WHERE cur_user=current_user) < 1 THEN 
@@ -422,24 +435,24 @@ BEGIN
 
 			EXECUTE 'SELECT json_agg(row_to_json(a)) FROM (SELECT table_id as layer,columns.column_name as id,
 			'''||v_srid||''' as srid,b.column_name as field_the_geom,''3'' as criticity, qgis_message
-			FROM '||v_schema||'.audit_check_project 
+			FROM '||v_schemaname||'.audit_check_project 
 			JOIN information_schema.columns ON table_name = table_id 
-			AND columns.table_schema = '''||v_schema||''' and ordinal_position=1 
-			LEFT JOIN '||v_schema||'.sys_table ON sys_table.id=audit_check_project.table_id
+			AND columns.table_schema = '''||v_schemaname||''' and ordinal_position=1 
+			LEFT JOIN '||v_schemaname||'.sys_table ON sys_table.id=audit_check_project.table_id
 			INNER JOIN (SELECT column_name ,table_name FROM information_schema.columns
-			WHERE table_schema = '''||v_schema||''' AND udt_name = ''geometry'')b ON b.table_name=sys_table.id
+			WHERE table_schema = '''||v_schemaname||''' AND udt_name = ''geometry'')b ON b.table_name=sys_table.id
 			WHERE criticity=3 and enabled IS NOT TRUE) a'
 			INTO v_result_layers_criticity3;
 
 
 			EXECUTE 'SELECT json_agg(row_to_json(a)) FROM (SELECT table_id as layer,columns.column_name as id,
 			'''||v_srid||''' as srid,b.column_name as field_the_geom,''2'' as criticity, qgis_message
-			FROM '||v_schema||'.audit_check_project 
+			FROM '||v_schemaname||'.audit_check_project 
 			JOIN information_schema.columns ON table_name = table_id 
-			AND columns.table_schema = '''||v_schema||''' and ordinal_position=1 
-			LEFT JOIN '||v_schema||'.sys_table ON sys_table.id=audit_check_project.table_id
+			AND columns.table_schema = '''||v_schemaname||''' and ordinal_position=1 
+			LEFT JOIN '||v_schemaname||'.sys_table ON sys_table.id=audit_check_project.table_id
 			INNER JOIN (SELECT column_name ,table_name FROM information_schema.columns
-			WHERE table_schema = '''||v_schema||''' AND udt_name = ''geometry'')b ON b.table_name=sys_table.id
+			WHERE table_schema = '''||v_schemaname||''' AND udt_name = ''geometry'')b ON b.table_name=sys_table.id
 			WHERE criticity=2 and enabled IS NOT TRUE) a'
 			INTO v_result_layers_criticity2;
 
