@@ -76,7 +76,7 @@ class CheckProjectResult(ApiParent):
         extras = f'"version":"{version}"'
         extras += f', "fid":101'
         extras += f', "initProject":{init_project}'
-        extras += f', "addSchema":{add_schema}'
+        extras += f', "addSchema":"{add_schema}"'
         extras += f', "qgisVersion":"{Qgis.QGIS_VERSION}"'
         extras += f', "osVersion":"{platform.system()} {platform.release()}"'
         body = self.create_body(extras=extras)
