@@ -125,6 +125,14 @@ v_node1 text;
 v_node2 text;
 v_formtype text;
 v_querytext text;
+v_isnodeheader boolean = false; -- For those nodes that headers of mapzone
+v_grafdelimiter text;
+v_mapzonetype text; -- Type of mapzone for that nodes that ar headers
+v_ispresszoneborder boolean = false; -- For those arcs that are on the border of mapzones againts two presszones (one each node)
+v_isdqaborder boolean = false; -- For those arcs that are on the border of mapzones againts two dqa (one each node)
+v_isdmaborder boolean = false; -- For those arcs that are on the border of mapzones againts two dma (one each node)
+v_issectorborder boolean = false; -- For those arcs that are on the border of mapzones againts two sectors (one each node)
+v_dqa_id integer;
 
 BEGIN
 
@@ -223,7 +231,7 @@ BEGIN
 						v_status = false;
 					END IF;
 
-					-- getting mapzone by heritage from nodes
+					-- getting presszone by heritage from nodes
 					IF v_project_type = 'WS' THEN
 						IF v_noderecord1.presszone_id = v_noderecord2.presszone_id THEN
 							v_presszone_id = v_noderecord1.presszone_id;
@@ -231,30 +239,56 @@ BEGIN
 							v_presszone_id = v_noderecord2.presszone_id;
 						ELSIF v_noderecord2.presszone_id = 0::text THEN
 							v_presszone_id = v_noderecord1.presszone_id;
+						ELSIF v_noderecord1.presszone_id::text != v_noderecord2.presszone_id::text THEN
+							v_presszone_id = v_noderecord1.presszone_id;
+							v_ispresszoneborder = true;						
 						END IF;
 					END IF;
 
+					-- getting sector_id by heritage from nodes
 					IF v_noderecord1.sector_id = v_noderecord2.sector_id THEN
 						v_sector_id = v_noderecord1.sector_id;
 					ELSIF v_noderecord1.sector_id = 0 THEN
 						v_sector_id = v_noderecord2.sector_id;
 					ELSIF v_noderecord2.sector_id = 0 THEN
 						v_sector_id = v_noderecord1.sector_id;
+					ELSIF v_noderecord1.presszone_id::text != v_noderecord2.presszone_id::text THEN
+						v_issectorborder = v_noderecord1.presszone_id;
+						v_sector_id = true;	
 					END IF;
-					
+
+					-- getting dma_id by heritage from nodes
 					IF v_noderecord1.dma_id = v_noderecord2.dma_id THEN
 						v_dma_id = v_noderecord1.dma_id;
 					ELSIF v_noderecord1.dma_id = 0 THEN
 						v_dma_id = v_noderecord2.dma_id;
 					ELSIF v_noderecord2.dma_id = 0 THEN
 						v_dma_id = v_noderecord1.dma_id;
+					ELSIF v_noderecord1.dma_id::text != v_noderecord2.dma_id::text THEN
+						v_dma_id = v_noderecord1.dma_id;
+						v_isdmaborder = true;	
 					END IF;
-						
+
+					-- getting dqa_id by heritage from nodes
+					IF v_noderecord1.dqa_id = v_noderecord2.dqa_id THEN
+						v_dqa_id = v_noderecord1.dqa_id;
+					ELSIF v_noderecord1.dqa_id = 0 THEN
+						v_dqa_id = v_noderecord2.dqa_id;
+					ELSIF v_noderecord2.dqa_id = 0 THEN
+						v_dqa_id = v_noderecord1.dqa_id;
+					ELSIF v_noderecord1.dqa_id::text != v_noderecord2.dqa_id::text THEN
+						v_dqa_id = v_noderecord1.dqa_id;
+						v_isdqaborder = true;	
+					END IF;
+
+					-- getting expl_id by heritage from nodes
 					IF v_noderecord1.expl_id = v_noderecord2.expl_id THEN
 						v_expl_id = v_noderecord1.expl_id;
 					ELSIF v_noderecord1.expl_id = 0 THEN
 						v_expl_id = v_noderecord2.expl_id;
 					ELSIF v_noderecord2.expl_id = 0 THEN
+						v_expl_id = v_noderecord1.expl_id;
+					ELSIF v_noderecord1.expl_id::text != v_noderecord2.expl_id::text THEN
 						v_expl_id = v_noderecord1.expl_id;
 					END IF;
 
@@ -288,8 +322,8 @@ BEGIN
 			END IF;
 		END IF;
 
-		-- get vdefaults user's mapzones (for vdefault is disabled because values are taken using heritage from nodes)
-		IF upper(v_catfeature.feature_type) != 'ARC' THEN
+		-- get vdefaults user's mapzones only for nodes (for arcs is disabled because values are taken using heritage from nodes. For connect also because they takes from arc)
+		IF upper(v_catfeature.feature_type) = 'NODE' THEN
 			SELECT value INTO v_sector_id FROM config_param_user WHERE parameter = 'edit_sector_vdefault' and cur_user = current_user;
 			SELECT value INTO v_dma_id FROM config_param_user WHERE parameter = 'edit_dma_vdefault' and cur_user = current_user;
 			SELECT value INTO v_expl_id FROM config_param_user WHERE parameter = 'edit_explitation_vdefault' and cur_user = current_user;
@@ -297,53 +331,28 @@ BEGIN
 			SELECT value INTO v_presszone_id FROM config_param_user WHERE parameter = 'edit_presszone_vdefault' and cur_user = current_user;
 		END IF;
 				
-		-- map zones controls setting values
-		IF v_project_type = 'WS' THEN
-
-			-- presszone	 
-			IF v_presszone_id IS NULL THEN
-				SELECT count(*) into count_aux FROM presszone WHERE ST_DWithin(p_reduced_geometry, presszone.the_geom,0.001);
-				IF count_aux = 1 THEN
-					v_presszone_id := (SELECT presszone_id FROM presszone WHERE ST_DWithin(p_reduced_geometry, presszone.the_geom,0.001) LIMIT 1);
-				ELSE
-					v_presszone_id =(SELECT presszone_id FROM v_edit_arc WHERE ST_DWithin(p_reduced_geometry, v_edit_arc.the_geom, v_promixity_buffer)
-					order by ST_Distance (p_reduced_geometry, v_edit_arc.the_geom) LIMIT 1);
-				END IF;	
-			END IF;
-
+		-- Presszone
+		IF v_project_type = 'WS' AND v_presszone_id IS NULL THEN
+			v_presszone_id =(SELECT presszone_id FROM v_edit_arc WHERE ST_DWithin(p_reduced_geometry, v_edit_arc.the_geom, v_promixity_buffer)
+			order by ST_Distance (p_reduced_geometry, v_edit_arc.the_geom) LIMIT 1);
 		END IF;
 			
 		-- Sector ID
 		IF v_sector_id IS NULL THEN
-			SELECT count(*) into count_aux FROM sector WHERE ST_DWithin(p_reduced_geometry, sector.the_geom,0.001);
-			IF count_aux = 1 THEN
-				v_sector_id = (SELECT sector_id FROM sector WHERE ST_DWithin(p_reduced_geometry, sector.the_geom,0.001) LIMIT 1);
-			ELSE
-				v_sector_id =(SELECT sector_id FROM v_edit_arc WHERE ST_DWithin(p_reduced_geometry, v_edit_arc.the_geom, v_promixity_buffer) 
-				order by ST_Distance (p_reduced_geometry, v_edit_arc.the_geom) LIMIT 1);
-			END IF;	
+			v_sector_id =(SELECT sector_id FROM v_edit_arc WHERE ST_DWithin(p_reduced_geometry, v_edit_arc.the_geom, v_promixity_buffer) 
+			order by ST_Distance (p_reduced_geometry, v_edit_arc.the_geom) LIMIT 1);
 		END IF;
 	
 		-- Dma ID
 		IF v_dma_id IS NULL THEN
-			SELECT count(*) into count_aux FROM dma WHERE ST_DWithin(p_reduced_geometry, dma.the_geom,0.001);
-			IF count_aux = 1 THEN
-				v_dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(p_reduced_geometry, dma.the_geom,0.001) LIMIT 1);
-			ELSE
-				v_dma_id =(SELECT dma_id FROM v_edit_arc WHERE ST_DWithin(p_reduced_geometry, v_edit_arc.the_geom, v_promixity_buffer) 
-				order by ST_Distance (p_reduced_geometry, v_edit_arc.the_geom) LIMIT 1);
-			END IF;	
+			v_dma_id =(SELECT dma_id FROM v_edit_arc WHERE ST_DWithin(p_reduced_geometry, v_edit_arc.the_geom, v_promixity_buffer) 
+			order by ST_Distance (p_reduced_geometry, v_edit_arc.the_geom) LIMIT 1);
 		END IF;
 
 		-- Expl ID
 		IF v_expl_id IS NULL THEN
-			SELECT count(*) into count_aux FROM exploitation WHERE ST_DWithin(p_reduced_geometry, exploitation.the_geom,0.001);
-			IF count_aux = 1 THEN
-				v_expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(p_reduced_geometry, exploitation.the_geom,0.001) LIMIT 1);
-			ELSE
-				v_expl_id =(SELECT expl_id FROM v_edit_arc WHERE ST_DWithin(p_reduced_geometry, v_edit_arc.the_geom, v_promixity_buffer) 
-				order by ST_Distance (p_reduced_geometry, v_edit_arc.the_geom) LIMIT 1);
-			END IF;
+			v_expl_id =(SELECT expl_id FROM v_edit_arc WHERE ST_DWithin(p_reduced_geometry, v_edit_arc.the_geom, v_promixity_buffer) 
+			order by ST_Distance (p_reduced_geometry, v_edit_arc.the_geom) LIMIT 1);
 		END IF;
 	
 		-- Macrodma
@@ -375,8 +384,6 @@ BEGIN
 			v_node2 := (v_values_array->>'node_2');	
 	END IF;
 
-	RAISE NOTICE 'v_values_array %',v_values_array;
-	
 	-- building the form widgets
 	----------------------------
 	IF  p_configtable is TRUE THEN 
@@ -425,6 +432,13 @@ BEGIN
 			ORDER BY a.attnum) a'
 				INTO v_fields_array
 				USING v_tablename, schemas_array[1]; 
+	END IF;
+
+	-- Getting node header
+	v_grafdelimiter = (SELECT graf_delimiter FROM cat_feature JOIN cat_feature_node USING (id) WHERE child_layer = p_table_id);
+	IF v_grafdelimiter IN ('PRESSZONE','DQA','DMA','SECTOR') THEN
+		v_isnodeheader = true;
+		v_mapzonetype = lower(v_grafdelimiter);
 	END IF;
 	
 	-- Filling the form widgets with values
@@ -505,15 +519,19 @@ BEGIN
 						field_value = nextval ('man_hydrant_fire_code_seq'::regclass);
 					END IF;
 
-				-- mapzones
+				-- dynamic mapzones
 				WHEN 'presszone_id' THEN
 					field_value = v_presszone_id;			
 				WHEN 'sector_id' THEN 
 					field_value = v_sector_id;
-				WHEN 'macrosector_id' THEN 
-					field_value = v_macrosector_id;
 				WHEN 'dma_id' THEN 
 					field_value = v_dma_id;
+				WHEN 'dqa_id' THEN 
+					field_value = v_dqa_id;
+	
+				-- static mapzones	
+				WHEN 'macrosector_id' THEN 
+					field_value = v_macrosector_id;
 				WHEN 'macrodma_id' THEN 
 					field_value = v_macrodma_id;
 				WHEN 'expl_id' THEN 
@@ -587,23 +605,36 @@ BEGIN
 						SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array_aux) AS a 	WHERE (a->>'param') = 'gratecat_id';
 					ELSE
 					END CASE;
-				END IF;	
+				END IF;
+
+				-- force enabled for arc mapzone borders
+				IF 	(v_ispresszoneborder AND (aux_json->>'columnname') = 'presszone_id') OR
+					(v_isdmaborder AND (aux_json->>'columnname') = 'dma_id') OR
+					(v_isdqaborder AND (aux_json->>'columnname') = 'dqa_id') OR 
+					(v_issectorborder AND (aux_json->>'columnname') = 'sector_id') THEN
+						v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'iseditable', 'true'::boolean);	
+				END IF;
 				
 			ELSIF  p_tg_op ='UPDATE' OR p_tg_op ='SELECT' THEN 
 				field_value := (v_values_array->>(aux_json->>'columnname'));
 			END IF;
-			
+		
 			-- setting values
 			IF (aux_json->>'widgettype')='combo' THEN 
-					v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'selectedId', COALESCE(field_value, ''));
+				v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'selectedId', COALESCE(field_value, ''));
 			ELSE 
-					v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'value', COALESCE(field_value, ''));
+				v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'value', COALESCE(field_value, ''));
 			END IF;	
 			
 			-- setting widgetcontrols
 			IF (aux_json->>'datatype')='double' OR (aux_json->>'datatype')='integer' OR (aux_json->>'datatype')='numeric' THEN 
 				v_widgetcontrols = gw_fct_json_object_set_key ((aux_json->>'widgetcontrols')::json, 'maxMinValues' ,(v_widgetvalues->>(aux_json->>'columnname'))::json);
 				v_fields_array[array_index] := gw_fct_json_object_set_key (v_fields_array[array_index], 'widgetcontrols', v_widgetcontrols);
+			END IF;
+			
+			-- force enabled widget of mapzones for nodes headers (insert or update)
+			IF v_isnodeheader AND (aux_json->>'columnname') IN('presszone_id','sector_id','dma_id','expl_id') THEN
+					v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'iseditable', 'true'::boolean);
 			END IF;
 		END LOOP;  
 	END IF;
