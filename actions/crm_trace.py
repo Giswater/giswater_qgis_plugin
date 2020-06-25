@@ -11,7 +11,7 @@ import subprocess
 from collections import OrderedDict
 from functools import partial
 
-from lib import os_tools, utils_giswater
+from lib import os_tools, qt_tools
 from ..ui_manager import DlgTrace
 from .api_parent import ApiParent
 
@@ -39,7 +39,7 @@ class CrmTrace(ApiParent):
         # Fill combo 'exploitation'
         sql = "SELECT name FROM exploitation WHERE active = True ORDER BY name"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_trace, 'cbo_expl', rows, allow_nulls=False)
+        qt_tools.fillComboBox(self.dlg_trace, 'cbo_expl', rows, allow_nulls=False)
 
         # Open dialog
         self.open_dialog(self.dlg_trace, dlg_name='crm_trace')
@@ -49,7 +49,7 @@ class CrmTrace(ApiParent):
         """ Main process """
 
         # Get selected 'exploitation'
-        expl_name = utils_giswater.getWidgetText(self.dlg_trace, 'cbo_expl')
+        expl_name = qt_tools.getWidgetText(self.dlg_trace, 'cbo_expl')
         self.controller.log_info(str(expl_name))
 
         # Execute synchronization script
@@ -99,7 +99,7 @@ class CrmTrace(ApiParent):
             self.controller.log_warning("Folder not found", parameter=python_folderpath)
 
         # Get parameter 'buffer'
-        buffer = utils_giswater.getWidgetText(self.dlg_trace, 'buffer', return_string_null=False)
+        buffer = qt_tools.getWidgetText(self.dlg_trace, 'buffer', return_string_null=False)
         if buffer is None or buffer == "":
             buffer = str(10)
 

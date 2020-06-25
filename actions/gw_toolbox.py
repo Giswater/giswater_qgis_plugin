@@ -17,7 +17,7 @@ import json
 from collections import OrderedDict
 from functools import partial
 
-from lib import utils_giswater
+from lib import qt_tools
 from .add_layer import AddLayer
 from .api_parent import ApiParent
 from ..ui_manager import ToolboxDockerUi, ToolboxUi
@@ -146,7 +146,7 @@ class GwToolBox(ApiParent):
 
     def set_selected_layer(self, dialog, combo):
 
-        layer_name = utils_giswater.get_item_data(dialog, combo, 1)
+        layer_name = qt_tools.get_item_data(dialog, combo, 1)
         layer = self.controller.get_layer_by_tablename(layer_name)
         if layer is None:
             self.controller.show_warning("Layer not found", parameter=layer_name)
@@ -171,9 +171,9 @@ class GwToolBox(ApiParent):
         cur_user = self.controller.get_current_user()
         function_name = function[0]['functionname']
         geom_type = self.controller.plugin_settings_value(f"{function_name}_{cur_user}_cmb_geom_type")
-        utils_giswater.set_combo_itemData(dialog.cmb_geom_type, geom_type, 0)
+        qt_tools.set_combo_itemData(dialog.cmb_geom_type, geom_type, 0)
         layer = self.controller.plugin_settings_value(f"{function_name}_{cur_user}_cmb_layers")
-        utils_giswater.set_combo_itemData(dialog.cmb_layers, layer, 0)
+        qt_tools.set_combo_itemData(dialog.cmb_layers, layer, 0)
         if self.controller.plugin_settings_value(f"{function_name}_{cur_user}_rbt_previous") == 'true':
             dialog.rbt_previous.setChecked(True)
         else:
@@ -197,10 +197,10 @@ class GwToolBox(ApiParent):
                     widget.setChecked(False)
             elif type(widget) is QComboBox:
                 value = self.controller.plugin_settings_value(f"{function_name}_{cur_user}_{widget.objectName()}")
-                utils_giswater.set_combo_itemData(widget, value, 0)
+                qt_tools.set_combo_itemData(widget, value, 0)
             elif type(widget) in (QLineEdit, QSpinBox):
                 value = self.controller.plugin_settings_value(f"{function_name}_{cur_user}_{widget.objectName()}")
-                utils_giswater.setWidgetText(dialog, widget, value)
+                qt_tools.setWidgetText(dialog, widget, value)
 
 
     def save_settings_values(self, dialog, function):
@@ -208,9 +208,9 @@ class GwToolBox(ApiParent):
 
         cur_user = self.controller.get_current_user()
         function_name = function[0]['functionname']
-        geom_type = utils_giswater.get_item_data(dialog, dialog.cmb_geom_type, 0)
+        geom_type = qt_tools.get_item_data(dialog, dialog.cmb_geom_type, 0)
         self.controller.plugin_settings_set_value(f"{function_name}_{cur_user}_cmb_geom_type", geom_type)
-        layer = utils_giswater.get_item_data(dialog, dialog.cmb_layers, 0)
+        layer = qt_tools.get_item_data(dialog, dialog.cmb_layers, 0)
         self.controller.plugin_settings_set_value(f"{function_name}_{cur_user}_cmb_layers", layer)
         self.controller.plugin_settings_set_value(f"{function_name}_{cur_user}_rbt_previous", dialog.rbt_previous.isChecked())
 
@@ -226,10 +226,10 @@ class GwToolBox(ApiParent):
             if type(widget) is QCheckBox:
                 self.controller.plugin_settings_set_value(f"{function_name}_{cur_user}_{widget.objectName()}", widget.isChecked())
             elif type(widget) is QComboBox:
-                value = utils_giswater.get_item_data(dialog, widget, 0)
+                value = qt_tools.get_item_data(dialog, widget, 0)
                 self.controller.plugin_settings_set_value(f"{function_name}_{cur_user}_{widget.objectName()}", value)
             elif type(widget) in (QLineEdit, QSpinBox):
-                value = utils_giswater.getWidgetText(dialog, widget, False, False)
+                value = qt_tools.getWidgetText(dialog, widget, False, False)
                 self.controller.plugin_settings_set_value(f"{function_name}_{cur_user}_{widget.objectName()}", value)
 
 
@@ -267,7 +267,7 @@ class GwToolBox(ApiParent):
 
         if function[0]['input_params']['featureType']:
             layer = None
-            layer_name = utils_giswater.get_item_data(dialog, combo, 1)
+            layer_name = qt_tools.get_item_data(dialog, combo, 1)
             if layer_name != -1:
                 layer = self.set_selected_layer(dialog, combo)
                 if not layer:
@@ -285,7 +285,7 @@ class GwToolBox(ApiParent):
                 feature_id_list += ']'
             elif selection_mode == 'previousSelection' and layer is not None:
                 features = layer.selectedFeatures()
-                feature_type = utils_giswater.get_item_data(dialog, dialog.cmb_geom_type, 0)
+                feature_type = qt_tools.get_item_data(dialog, dialog.cmb_geom_type, 0)
                 for feature in features:
                     feature_id = feature.attribute(feature_type+"_id")
                     feature_id_list += f'"{feature_id}", '
@@ -296,7 +296,7 @@ class GwToolBox(ApiParent):
 
             if layer_name != -1:
                 feature_field = f'"tableName":"{layer_name}", '
-                feature_type = utils_giswater.get_item_data(dialog, dialog.cmb_geom_type, 0)
+                feature_type = qt_tools.get_item_data(dialog, dialog.cmb_geom_type, 0)
                 feature_field += f'"featureType":"{feature_type}", '
             feature_field += feature_id_list
 
@@ -311,24 +311,24 @@ class GwToolBox(ApiParent):
                         param_name = widget.objectName()
                         if type(widget) in ('', QLineEdit):
                             widget.setStyleSheet(None)
-                            value = utils_giswater.getWidgetText(dialog, widget, False, False)
+                            value = qt_tools.getWidgetText(dialog, widget, False, False)
                             extras += f'"{param_name}":"{value}", '.replace('""', 'null')
                             if value is '' and widget.property('ismandatory'):
                                 widget_is_void = True
                                 widget.setStyleSheet("border: 1px solid red")
                         elif type(widget) in ('', QSpinBox, QDoubleSpinBox):
-                            value = utils_giswater.getWidgetText(dialog, widget, False, False)
+                            value = qt_tools.getWidgetText(dialog, widget, False, False)
                             if value == '':
                                 value = 0
                             extras += f'"{param_name}":"{value}", '
                         elif type(widget) in ('', QComboBox):
-                            value = utils_giswater.get_item_data(dialog, widget, 0)
+                            value = qt_tools.get_item_data(dialog, widget, 0)
                             extras += f'"{param_name}":"{value}", '
                         elif type(widget) in ('', QCheckBox):
-                            value = utils_giswater.isChecked(dialog, widget)
+                            value = qt_tools.isChecked(dialog, widget)
                             extras += f'"{param_name}":"{str(value).lower()}", '
                         elif type(widget) in ('', QgsDateTimeEdit):
-                            value = utils_giswater.getCalendarDate(dialog, widget)
+                            value = qt_tools.getCalendarDate(dialog, widget)
                             if value == "" or value is None:
                                 extras += f'"{param_name}":null, '
                             else:
@@ -457,7 +457,7 @@ class GwToolBox(ApiParent):
             feat_types.append(elem)
         if feat_types and len(feat_types) <= 1:
             self.dlg_functions.cmb_geom_type.setVisible(False)
-        utils_giswater.set_item_data(self.dlg_functions.cmb_geom_type, feat_types, 1)
+        qt_tools.set_item_data(self.dlg_functions.cmb_geom_type, feat_types, 1)
 
 
     def get_all_group_layers(self, geom_type):
@@ -505,7 +505,7 @@ class GwToolBox(ApiParent):
 
     def populate_layer_combo(self):
 
-        geom_type = utils_giswater.get_item_data(self.dlg_functions, self.dlg_functions.cmb_geom_type, 0)
+        geom_type = qt_tools.get_item_data(self.dlg_functions, self.dlg_functions.cmb_geom_type, 0)
         self.layers = []
         self.layers = self.get_all_group_layers(geom_type)
 
@@ -526,7 +526,7 @@ class GwToolBox(ApiParent):
             elem.append(None)
             layers.append(elem)
 
-        utils_giswater.set_item_data(self.dlg_functions.cmb_layers, layers, sort_combo=False)
+        qt_tools.set_item_data(self.dlg_functions.cmb_layers, layers, sort_combo=False)
 
 
     def populate_trv(self, trv_widget, result, expand=False):

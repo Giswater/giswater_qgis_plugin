@@ -14,7 +14,7 @@ from qgis.PyQt.QtCore import Qt, QDate, QDateTime, QStringListModel
 
 from functools import partial
 
-from lib import utils_giswater
+from lib import qt_tools
 from .parent import ParentAction
 from .multiple_selection import MultipleSelection
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
@@ -68,7 +68,7 @@ class ParentManage(ParentAction, object):
 
         table_relation = f"{table_object}_x_{geom_type}"
         widget_name = f"tbl_{table_relation}"
-        widget = utils_giswater.getWidget(dialog, widget_name)
+        widget = qt_tools.getWidget(dialog, widget_name)
         if widget:              
             widget.setModel(None)
 
@@ -116,24 +116,24 @@ class ParentManage(ParentAction, object):
         """ Clear contents of input widgets """
         
         if table_object == "doc":
-            utils_giswater.setWidgetText(dialog, "doc_type", "")
-            utils_giswater.setWidgetText(dialog, "observ", "")
-            utils_giswater.setWidgetText(dialog, "path", "")
+            qt_tools.setWidgetText(dialog, "doc_type", "")
+            qt_tools.setWidgetText(dialog, "observ", "")
+            qt_tools.setWidgetText(dialog, "path", "")
         elif table_object == "element":
-            utils_giswater.setWidgetText(dialog, "elementcat_id", "")
-            utils_giswater.setWidgetText(dialog, "state", "")
-            utils_giswater.setWidgetText(dialog, "expl_id", "")
-            utils_giswater.setWidgetText(dialog, "ownercat_id", "")
-            utils_giswater.setWidgetText(dialog, "location_type", "")
-            utils_giswater.setWidgetText(dialog, "buildercat_id", "")
-            utils_giswater.setWidgetText(dialog, "workcat_id", "")
-            utils_giswater.setWidgetText(dialog, "workcat_id_end", "")
-            utils_giswater.setWidgetText(dialog, "comment", "")
-            utils_giswater.setWidgetText(dialog, "observ", "")
-            utils_giswater.setWidgetText(dialog, "path", "")
-            utils_giswater.setWidgetText(dialog, "rotation", "")
-            utils_giswater.setWidgetText(dialog, "verified", "")
-            utils_giswater.setWidgetText(dialog, dialog.num_elements, "")
+            qt_tools.setWidgetText(dialog, "elementcat_id", "")
+            qt_tools.setWidgetText(dialog, "state", "")
+            qt_tools.setWidgetText(dialog, "expl_id", "")
+            qt_tools.setWidgetText(dialog, "ownercat_id", "")
+            qt_tools.setWidgetText(dialog, "location_type", "")
+            qt_tools.setWidgetText(dialog, "buildercat_id", "")
+            qt_tools.setWidgetText(dialog, "workcat_id", "")
+            qt_tools.setWidgetText(dialog, "workcat_id_end", "")
+            qt_tools.setWidgetText(dialog, "comment", "")
+            qt_tools.setWidgetText(dialog, "observ", "")
+            qt_tools.setWidgetText(dialog, "path", "")
+            qt_tools.setWidgetText(dialog, "rotation", "")
+            qt_tools.setWidgetText(dialog, "verified", "")
+            qt_tools.setWidgetText(dialog, dialog.num_elements, "")
                     
     
     def fill_widgets(self, dialog, table_object, row):
@@ -141,9 +141,9 @@ class ParentManage(ParentAction, object):
         
         if table_object == "doc":
             
-            utils_giswater.setWidgetText(dialog, "doc_type", row["doc_type"])
-            utils_giswater.setWidgetText(dialog, "observ", row["observ"])
-            utils_giswater.setWidgetText(dialog, "path", row["path"])
+            qt_tools.setWidgetText(dialog, "doc_type", row["doc_type"])
+            qt_tools.setWidgetText(dialog, "observ", row["observ"])
+            qt_tools.setWidgetText(dialog, "path", row["path"])
              
         elif table_object == "element":
                     
@@ -163,29 +163,29 @@ class ParentManage(ParentAction, object):
                 if row_aux:
                     expl_id = row_aux[0]
 
-            utils_giswater.setWidgetText(dialog, "code", row['code'])
+            qt_tools.setWidgetText(dialog, "code", row['code'])
             sql = (f"SELECT elementtype_id FROM cat_element"
                    f" WHERE id = '{row['elementcat_id']}'")
             row_type = self.controller.get_row(sql)
             if row_type:
-                utils_giswater.setWidgetText(dialog, "element_type", row_type[0])
+                qt_tools.setWidgetText(dialog, "element_type", row_type[0])
 
-            utils_giswater.setWidgetText(dialog, "elementcat_id", row['elementcat_id'])
-            utils_giswater.setWidgetText(dialog, "num_elements", row['num_elements'])
-            utils_giswater.setWidgetText(dialog, "state", state)
-            utils_giswater.set_combo_itemData(dialog.state_type, f"{row['state_type']}", 0)
-            utils_giswater.setWidgetText(dialog, "expl_id", expl_id)
-            utils_giswater.setWidgetText(dialog, "ownercat_id", row['ownercat_id'])
-            utils_giswater.setWidgetText(dialog, "location_type", row['location_type'])
-            utils_giswater.setWidgetText(dialog, "buildercat_id", row['buildercat_id'])
-            utils_giswater.setWidgetText(dialog, "builtdate", row['builtdate'])
-            utils_giswater.setWidgetText(dialog, "workcat_id", row['workcat_id'])
-            utils_giswater.setWidgetText(dialog, "workcat_id_end", row['workcat_id_end'])
-            utils_giswater.setWidgetText(dialog, "comment", row['comment'])
-            utils_giswater.setWidgetText(dialog, "observ", row['observ'])
-            utils_giswater.setWidgetText(dialog, "link", row['link'])
-            utils_giswater.setWidgetText(dialog, "verified", row['verified'])
-            utils_giswater.setWidgetText(dialog, "rotation", row['rotation'])
+            qt_tools.setWidgetText(dialog, "elementcat_id", row['elementcat_id'])
+            qt_tools.setWidgetText(dialog, "num_elements", row['num_elements'])
+            qt_tools.setWidgetText(dialog, "state", state)
+            qt_tools.set_combo_itemData(dialog.state_type, f"{row['state_type']}", 0)
+            qt_tools.setWidgetText(dialog, "expl_id", expl_id)
+            qt_tools.setWidgetText(dialog, "ownercat_id", row['ownercat_id'])
+            qt_tools.setWidgetText(dialog, "location_type", row['location_type'])
+            qt_tools.setWidgetText(dialog, "buildercat_id", row['buildercat_id'])
+            qt_tools.setWidgetText(dialog, "builtdate", row['builtdate'])
+            qt_tools.setWidgetText(dialog, "workcat_id", row['workcat_id'])
+            qt_tools.setWidgetText(dialog, "workcat_id_end", row['workcat_id_end'])
+            qt_tools.setWidgetText(dialog, "comment", row['comment'])
+            qt_tools.setWidgetText(dialog, "observ", row['observ'])
+            qt_tools.setWidgetText(dialog, "link", row['link'])
+            qt_tools.setWidgetText(dialog, "verified", row['verified'])
+            qt_tools.setWidgetText(dialog, "rotation", row['rotation'])
             if str(row['undelete']) == 'True':
                 dialog.undelete.setChecked(True)
             
@@ -193,7 +193,7 @@ class ParentManage(ParentAction, object):
     def get_records_geom_type(self, dialog, table_object, geom_type):
         """ Get records of @geom_type associated to selected @table_object """
         
-        object_id = utils_giswater.getWidgetText(dialog, table_object + "_id")
+        object_id = qt_tools.getWidgetText(dialog, table_object + "_id")
         table_relation = table_object + "_x_" + geom_type
         widget_name = "tbl_" + table_relation           
         
@@ -224,7 +224,7 @@ class ParentManage(ParentAction, object):
         field_object_id = "id"
         if table_object == "element":
             field_object_id = table_object + "_id"           
-        object_id = utils_giswater.getWidgetText(dialog, table_object + "_id")
+        object_id = qt_tools.getWidgetText(dialog, table_object + "_id")
 
         # Check if we already have data with selected object_id
         sql = (f"SELECT * "
@@ -283,9 +283,9 @@ class ParentManage(ParentAction, object):
                f" FROM {table_name}"
                f" ORDER BY {field_name}")
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(dialog, widget, rows)
+        qt_tools.fillComboBox(dialog, widget, rows)
         if rows:
-            utils_giswater.setCurrentIndex(dialog, widget, 0)
+            qt_tools.setCurrentIndex(dialog, widget, 0)
 
 
     def set_combo(self, dialog, widget, table_name, parameter, field_id='id', field_name='id'):
@@ -296,7 +296,7 @@ class ParentManage(ParentAction, object):
                f" WHERE parameter = '{parameter}' AND cur_user = current_user")
         row = self.controller.get_row(sql)
         if row:
-            utils_giswater.setWidgetText(dialog, widget, row[0])
+            qt_tools.setWidgetText(dialog, widget, row[0])
 
 
     def set_calendars(self, dialog, widget, table_name, value, parameter):
@@ -310,7 +310,7 @@ class ParentManage(ParentAction, object):
             date = QDate.fromString(row[0], 'yyyy-MM-dd')
         else:
             date = QDate.currentDate()
-        utils_giswater.setCalendarDate(dialog, widget, date)
+        qt_tools.setCalendarDate(dialog, widget, date)
 
 
     def add_point(self):
@@ -379,9 +379,9 @@ class ParentManage(ParentAction, object):
 
     def get_values_from_form(self, dialog):
 
-        self.enddate = utils_giswater.getCalendarDate(dialog, "enddate")
-        self.workcat_id_end = utils_giswater.getWidgetText(dialog, "workcat_id_end")
-        self.description = utils_giswater.getWidgetText(dialog, "descript")
+        self.enddate = qt_tools.getCalendarDate(dialog, "enddate")
+        self.workcat_id_end = qt_tools.getWidgetText(dialog, "workcat_id_end")
+        self.description = qt_tools.getWidgetText(dialog, "descript")
 
 
     def tab_feature_changed(self, dialog, table_object, excluded_layers=[]):
@@ -403,7 +403,7 @@ class ParentManage(ParentAction, object):
         self.hide_generic_layers(excluded_layers=excluded_layers)
         widget_name = f"tbl_{table_object}_x_{self.geom_type}"
         viewname = f"v_edit_{self.geom_type}"
-        self.widget = utils_giswater.getWidget(dialog, widget_name)
+        self.widget = qt_tools.getWidget(dialog, widget_name)
             
         # Adding auto-completion to a QLineEdit
         self.set_completer_feature_id(dialog.feature_id, self.geom_type, viewname)
@@ -416,7 +416,7 @@ class ParentManage(ParentAction, object):
             getting id's from selected @table_object 
         """
                      
-        widget = utils_giswater.getWidget(dialog, table_object + "_id")
+        widget = qt_tools.getWidget(dialog, table_object + "_id")
         if not widget:
             return
         
@@ -527,7 +527,7 @@ class ParentManage(ParentAction, object):
 
         if type(table_object) is str:
             widget_name = f"tbl_{table_object}_x_{geom_type}"
-            widget = utils_giswater.getWidget(dialog, widget_name)
+            widget = qt_tools.getWidget(dialog, widget_name)
             if not widget:
                 message = "Widget not found"
                 self.controller.log_info(message, parameter=widget_name)
@@ -572,7 +572,7 @@ class ParentManage(ParentAction, object):
         # Attach model to selected widget
         if type(table_object) is str:
             #self.controller.log_debug(f"set_table_model (str): {table_object}")
-            widget = utils_giswater.getWidget(dialog, table_object)
+            widget = qt_tools.getWidget(dialog, table_object)
             if not widget:
                 message = "Widget not found"
                 self.controller.log_info(message, parameter=table_object)
@@ -641,7 +641,7 @@ class ParentManage(ParentAction, object):
 
         if type(table_object) is str:
             widget_name = f"tbl_{table_object}_x_{self.geom_type}"
-            widget = utils_giswater.getWidget(dialog, widget_name)
+            widget = qt_tools.getWidget(dialog, widget_name)
             if not widget:
                 message = "Widget not found"
                 self.controller.show_warning(message, parameter=widget_name)
@@ -836,7 +836,7 @@ class ParentManage(ParentAction, object):
     def delete_feature_at_plan(self, dialog, geom_type, list_id):
         """ Delete features_id to table plan_@geom_type_x_psector"""
 
-        value = utils_giswater.getWidgetText(dialog, dialog.psector_id)
+        value = qt_tools.getWidgetText(dialog, dialog.psector_id)
         sql = (f"DELETE FROM plan_psector_x_{geom_type} "
                f"WHERE {geom_type}_id IN ({list_id}) AND psector_id = '{value}'")
         self.controller.execute_sql(sql)
@@ -844,8 +844,8 @@ class ParentManage(ParentAction, object):
 
     def enable_feature_type(self, dialog, widget_name='tbl_relation'):
 
-        feature_type = utils_giswater.getWidget(dialog, 'feature_type')
-        widget_table = utils_giswater.getWidget(dialog, widget_name)
+        feature_type = qt_tools.getWidget(dialog, 'feature_type')
+        widget_table = qt_tools.getWidget(dialog, widget_name)
         if feature_type is not None and widget_table is not None:
             if len(self.ids) > 0:
                 feature_type.setEnabled(False)
@@ -868,7 +868,7 @@ class ParentManage(ParentAction, object):
             self.ids = []
 
         field_id = f"{self.geom_type}_id"
-        feature_id = utils_giswater.getWidgetText(dialog, "feature_id")
+        feature_id = qt_tools.getWidgetText(dialog, "feature_id")
         expr_filter = f"{field_id} = '{feature_id}'"
 
         # Check expression
@@ -936,7 +936,7 @@ class ParentManage(ParentAction, object):
     def insert_feature_to_plan(self, dialog, geom_type):
         """ Insert features_id to table plan_@geom_type_x_psector """
 
-        value = utils_giswater.getWidgetText(dialog, dialog.psector_id)
+        value = qt_tools.getWidgetText(dialog, dialog.psector_id)
         for i in range(len(self.ids)):
             sql = (f"SELECT {geom_type}_id "
                    f"FROM plan_psector_x_{geom_type} "
@@ -952,9 +952,9 @@ class ParentManage(ParentAction, object):
     def reload_qtable(self, dialog, geom_type):
         """ Reload QtableView """
         
-        value = utils_giswater.getWidgetText(dialog, dialog.psector_id)
+        value = qt_tools.getWidgetText(dialog, dialog.psector_id)
         expr = f"psector_id = '{value}'"
-        qtable = utils_giswater.getWidget(dialog, f'tbl_psector_x_{geom_type}')
+        qtable = qt_tools.getWidget(dialog, f'tbl_psector_x_{geom_type}')
         self.fill_table_by_expr(qtable, f"plan_psector_x_{geom_type}", expr)
         self.set_table_columns(dialog, qtable, f"plan_psector_x_{geom_type}")
         self.refresh_map_canvas()
@@ -1021,7 +1021,7 @@ class ParentManage(ParentAction, object):
         field_object_id = "id"
         if table_object == "element":
             field_object_id = table_object + "_id"
-        object_id = utils_giswater.getWidgetText(dialog, widget_txt)
+        object_id = qt_tools.getWidgetText(dialog, widget_txt)
         if object_id != 'null':
             expr = f"{field_object_id}::text ILIKE '%{object_id}%'"
             # Refresh model with selected filter
@@ -1094,10 +1094,10 @@ class ParentManage(ParentAction, object):
 
         if table_object == "doc":
             self.manage_document(row=widget.model().record(row))
-            utils_giswater.setWidgetText(self.dlg_add_doc, widget_id, selected_object_id)
+            qt_tools.setWidgetText(self.dlg_add_doc, widget_id, selected_object_id)
         elif table_object == "element":
             self.manage_element(new_element_id=False)
-            utils_giswater.setWidgetText(self.dlg_add_element, widget_id, selected_object_id)
+            qt_tools.setWidgetText(self.dlg_add_element, widget_id, selected_object_id)
         elif table_object == "v_ui_om_visit":
             self.manage_visit(visit_id=selected_object_id)
         elif "v_ui_om_visitman_x_" in table_object:

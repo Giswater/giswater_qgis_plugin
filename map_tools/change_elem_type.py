@@ -10,7 +10,7 @@ from qgis.PyQt.QtCore import Qt
 
 from functools import partial
 
-from lib import utils_giswater
+from lib import qt_tools
 from ..ui_manager import NodeTypeChange
 from ..actions.api_catalog import ApiCatalog
 from ..actions.api_cf import ApiCF
@@ -34,7 +34,7 @@ class ChangeElemType(ParentMapTool):
     def open_catalog(self):
 
         # Get feature_type
-        feature_type = utils_giswater.getWidgetText(self.dlg_chg_node_type, self.dlg_chg_node_type.node_node_type_new)
+        feature_type = qt_tools.getWidgetText(self.dlg_chg_node_type, self.dlg_chg_node_type.node_node_type_new)
 
         if feature_type is 'null':
             msg = "New node type is null. Please, select a valid value."
@@ -48,8 +48,8 @@ class ChangeElemType(ParentMapTool):
         """ Update current type of node and save changes in database """
         
         project_type = self.controller.get_project_type() 
-        node_node_type_new = utils_giswater.getWidgetText(self.dlg_chg_node_type, self.dlg_chg_node_type.node_node_type_new)
-        node_nodecat_id = utils_giswater.getWidgetText(self.dlg_chg_node_type, self.dlg_chg_node_type.node_nodecat_id)
+        node_node_type_new = qt_tools.getWidgetText(self.dlg_chg_node_type, self.dlg_chg_node_type.node_node_type_new)
+        node_nodecat_id = qt_tools.getWidgetText(self.dlg_chg_node_type, self.dlg_chg_node_type.node_nodecat_id)
         layer = False
         if node_node_type_new != "null":
                     
@@ -127,7 +127,7 @@ class ChangeElemType(ParentMapTool):
             node_type = feature.attribute('node_type')
             sql = "SELECT DISTINCT(id), id FROM cat_node  ORDER BY id"
             rows = self.controller.get_rows(sql)
-            utils_giswater.set_item_data(self.dlg_chg_node_type.node_nodecat_id, rows, 1)
+            qt_tools.set_item_data(self.dlg_chg_node_type.node_nodecat_id, rows, 1)
 
         self.dlg_chg_node_type.node_node_type.setText(node_type)
         self.dlg_chg_node_type.btn_catalog.clicked.connect(partial(self.open_catalog))
@@ -138,7 +138,7 @@ class ChangeElemType(ParentMapTool):
         sql = ("SELECT DISTINCT(id) FROM cat_feature WHERE active is True "
                "AND feature_type = 'NODE' ORDER BY id")
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_chg_node_type, "node_node_type_new", rows)
+        qt_tools.fillComboBox(self.dlg_chg_node_type, "node_node_type_new", rows)
 
         # Open dialog
         self.open_dialog(self.dlg_chg_node_type, dlg_name='nodetype_change', maximize_button=False)
@@ -146,8 +146,8 @@ class ChangeElemType(ParentMapTool):
 
     def filter_catalog(self):
 
-        node_node_type_new = utils_giswater.getWidgetText(self.dlg_chg_node_type,
-                                                          self.dlg_chg_node_type.node_node_type_new)
+        node_node_type_new = qt_tools.getWidgetText(self.dlg_chg_node_type,
+                                                    self.dlg_chg_node_type.node_node_type_new)
 
         if node_node_type_new =="null":
             return
@@ -155,7 +155,7 @@ class ChangeElemType(ParentMapTool):
         # Populate catalog_id
         sql = f"SELECT DISTINCT(id), id FROM cat_node WHERE nodetype_id = '{node_node_type_new}' ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_chg_node_type.node_nodecat_id, rows, 1)
+        qt_tools.set_item_data(self.dlg_chg_node_type.node_nodecat_id, rows, 1)
 
 
     def close_dialog(self, dlg=None):

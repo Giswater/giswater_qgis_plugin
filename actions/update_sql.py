@@ -26,7 +26,7 @@ from collections import OrderedDict
 from functools import partial
 from time import sleep
 
-from lib import utils_giswater
+from lib import qt_tools
 from .api_parent import ApiParent
 from .create_gis_project import CreateGisProject
 from .gw_task import GwTask
@@ -165,9 +165,9 @@ class UpdateSQL(ApiParent):
         self.cmb_project_type = self.dlg_readsql.findChild(QComboBox, 'cmb_project_type')
 
         if self.dev_user != 'TRUE':
-            utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "schema_manager")
-            utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "api_manager")
-            utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "custom")
+            qt_tools.remove_tab_by_tabName(self.dlg_readsql.tab_main, "schema_manager")
+            qt_tools.remove_tab_by_tabName(self.dlg_readsql.tab_main, "api_manager")
+            qt_tools.remove_tab_by_tabName(self.dlg_readsql.tab_main, "custom")
             self.project_types = self.settings.value('system_variables/project_types')
         else:
             self.project_types = self.settings.value('system_variables/project_types_dev')
@@ -193,7 +193,7 @@ class UpdateSQL(ApiParent):
         self.set_signals()
 
         # Set default project type
-        utils_giswater.setWidgetText(self.dlg_readsql, self.cmb_project_type, 'ws')
+        qt_tools.setWidgetText(self.dlg_readsql, self.cmb_project_type, 'ws')
 
 
     def set_signals(self):
@@ -263,23 +263,23 @@ class UpdateSQL(ApiParent):
         self.populate_combo_connections()
 
         if str(self.list_connections) != '[]':
-            utils_giswater.set_item_data(self.cmb_connection, self.list_connections, 1)
+            qt_tools.set_item_data(self.cmb_connection, self.list_connections, 1)
 
         # Set last connection for default
-        utils_giswater.set_combo_itemData(self.cmb_connection, str(self.last_connection), 1)
+        qt_tools.set_combo_itemData(self.cmb_connection, str(self.last_connection), 1)
 
         # Set title
-        connection = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_connection)
+        connection = qt_tools.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_connection)
         window_title = f'Giswater ({connection} - {self.plugin_version})'
         self.dlg_readsql.setWindowTitle(window_title)
 
         if connection_status is False:
             msg = "Connection Failed. Please, check connection parameters"
             self.controller.show_message(msg, 1)
-            utils_giswater.dis_enable_dialog(self.dlg_readsql, False, 'cmb_connection')
+            qt_tools.dis_enable_dialog(self.dlg_readsql, False, 'cmb_connection')
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
-            utils_giswater.setWidgetText(self.dlg_readsql, 'lbl_status_text', msg)
-            utils_giswater.setWidgetText(self.dlg_readsql, 'lbl_schema_name', '')
+            qt_tools.setWidgetText(self.dlg_readsql, 'lbl_status_text', msg)
+            qt_tools.setWidgetText(self.dlg_readsql, 'lbl_schema_name', '')
             self.open_dialog(self.dlg_readsql, dlg_name='main_ui')
             return
 
@@ -288,7 +288,7 @@ class UpdateSQL(ApiParent):
         self.controller.execute_sql(sql)
 
         # Set projecte type
-        self.project_type_selected = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
+        self.project_type_selected = qt_tools.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
 
         # Manage widgets tabs
         self.populate_data_schema_name(self.cmb_project_type)
@@ -304,34 +304,34 @@ class UpdateSQL(ApiParent):
         if not role_admin and self.username not in self.super_users:
             msg = "You don't have permissions to administrate project schemas on this connection"
             self.controller.show_message(msg, 1)
-            utils_giswater.dis_enable_dialog(self.dlg_readsql, False, 'cmb_connection')
+            qt_tools.dis_enable_dialog(self.dlg_readsql, False, 'cmb_connection')
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
-            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
+            qt_tools.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
         else:
             if str(self.plugin_version) > str(self.project_version):
                 self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
-                utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
+                qt_tools.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
                     '(Schema version is lower than plugin version, please update schema)')
                 self.dlg_readsql.btn_info.setEnabled(True)
             elif str(self.plugin_version) < str(self.project_version):
                 self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
-                utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
+                qt_tools.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
                     '(Schema version is higher than plugin version, please update plugin)')
                 self.dlg_readsql.btn_info.setEnabled(True)
             else:
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
-                utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
+                qt_tools.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
                 self.dlg_readsql.btn_info.setEnabled(False)
-            utils_giswater.dis_enable_dialog(self.dlg_readsql, True)
+            qt_tools.dis_enable_dialog(self.dlg_readsql, True)
 
         # Load last schema name selected and project type
         if str(self.controller.plugin_settings_value('last_project_type_selected')) != '':
-            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type,
-                                         str(self.controller.plugin_settings_value('last_project_type_selected')))
+            qt_tools.setWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type,
+                                   str(self.controller.plugin_settings_value('last_project_type_selected')))
 
         if str(self.controller.plugin_settings_value('last_schema_name_selected')) != '':
-            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name,
-                                         str(self.controller.plugin_settings_value('last_schema_name_selected')))
+            qt_tools.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name,
+                                   str(self.controller.plugin_settings_value('last_schema_name_selected')))
 
         if show_dialog:
             self.manage_docker()
@@ -352,11 +352,11 @@ class UpdateSQL(ApiParent):
 
     def set_credentials(self, dialog, new_connection=False):
 
-        user_name = utils_giswater.getWidgetText(dialog, dialog.txt_user, False, False)
-        password = utils_giswater.getWidgetText(dialog, dialog.txt_pass, False, False)
+        user_name = qt_tools.getWidgetText(dialog, dialog.txt_user, False, False)
+        password = qt_tools.getWidgetText(dialog, dialog.txt_pass, False, False)
         settings = QSettings()
         settings.beginGroup("PostgreSQL/connections")
-        default_connection = utils_giswater.getWidgetText(dialog, dialog.cmb_connection)
+        default_connection = qt_tools.getWidgetText(dialog, dialog.cmb_connection)
         settings.setValue('selected', default_connection)
         if new_connection:
             connection_status, not_version = self.controller.set_database_connection()
@@ -375,22 +375,22 @@ class UpdateSQL(ApiParent):
     def gis_create_project(self):
 
         # Get gis folder, gis file, project type and schema
-        gis_folder = utils_giswater.getWidgetText(self.dlg_create_gis_project, 'txt_gis_folder')
+        gis_folder = qt_tools.getWidgetText(self.dlg_create_gis_project, 'txt_gis_folder')
         if gis_folder is None or gis_folder == 'null':
             self.controller.show_warning("GIS folder not set")
             return
 
-        gis_file = utils_giswater.getWidgetText(self.dlg_create_gis_project, 'txt_gis_file')
+        gis_file = qt_tools.getWidgetText(self.dlg_create_gis_project, 'txt_gis_file')
         if gis_file is None or gis_file == 'null':
             self.controller.show_warning("GIS file name not set")
             return
 
-        project_type = utils_giswater.getWidgetText(self.dlg_readsql, 'cmb_project_type')
-        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
+        project_type = qt_tools.getWidgetText(self.dlg_readsql, 'cmb_project_type')
+        schema_name = qt_tools.getWidgetText(self.dlg_readsql, 'project_schema_name')
 
         # Get roletype and export password
-        roletype = utils_giswater.getWidgetText(self.dlg_create_gis_project, 'cmb_roletype')
-        export_passwd = utils_giswater.isChecked(self.dlg_create_gis_project, 'chk_export_passwd')
+        roletype = qt_tools.getWidgetText(self.dlg_create_gis_project, 'cmb_roletype')
+        export_passwd = qt_tools.isChecked(self.dlg_create_gis_project, 'chk_export_passwd')
         sample = self.dlg_create_gis_project.chk_is_sample.isChecked()
 
         if export_passwd:
@@ -431,10 +431,10 @@ class UpdateSQL(ApiParent):
         self.load_settings(self.dlg_create_gis_project)
 
         # Set default values
-        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
-        utils_giswater.setWidgetText(self.dlg_create_gis_project, 'txt_gis_file', schema_name)
+        schema_name = qt_tools.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        qt_tools.setWidgetText(self.dlg_create_gis_project, 'txt_gis_file', schema_name)
         users_home = os.path.expanduser("~")
-        utils_giswater.setWidgetText(self.dlg_create_gis_project, 'txt_gis_folder', users_home)
+        qt_tools.setWidgetText(self.dlg_create_gis_project, 'txt_gis_folder', users_home)
 
         # Manage widgets
         if self.project_issample:
@@ -459,13 +459,13 @@ class UpdateSQL(ApiParent):
 
         checked = self.dlg_create_gis_project.chk_is_sample.isChecked()
         self.dlg_create_gis_project.cmb_roletype.setEnabled(not checked)
-        utils_giswater.setWidgetText(self.dlg_create_gis_project, self.dlg_create_gis_project.cmb_roletype, 'admin')
+        qt_tools.setWidgetText(self.dlg_create_gis_project, self.dlg_create_gis_project.cmb_roletype, 'admin')
 
 
     def btn_constrains_changed(self, button, call_function=False):
 
         lbl_constrains_info = self.dlg_readsql.findChild(QLabel, 'lbl_constrains_info')
-        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        schema_name = qt_tools.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
 
         if button.text() == 'OFF':
             button.setText("ON")
@@ -593,7 +593,7 @@ class UpdateSQL(ApiParent):
             if not status and self.dev_commit == 'FALSE':
                 return False
 
-            cmb_locale = utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_locale)
+            cmb_locale = qt_tools.getWidgetText(self.dlg_readsql, self.cmb_locale)
             folder_i18n = self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'i18n'
             if self.process_folder(folder_i18n + os.sep + self.locale + os.sep, '') is False:
                 if self.process_folder(folder_i18n + os.sep, 'EN') is False:
@@ -1080,7 +1080,7 @@ class UpdateSQL(ApiParent):
             return True
 
         if project_type is False:
-            project_type = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
+            project_type = qt_tools.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
 
         folders = sorted(os.listdir(self.folderUpdatesApi + ''))
         self.controller.log_info(str(folders))
@@ -1288,8 +1288,8 @@ class UpdateSQL(ApiParent):
 
         # Get current locale
         if not locale:
-            locale = utils_giswater.getWidgetText(self.dlg_readsql_create_project,
-                                                  self.dlg_readsql_create_project.cmb_locale)
+            locale = qt_tools.getWidgetText(self.dlg_readsql_create_project,
+                                            self.dlg_readsql_create_project.cmb_locale)
 
         client = '"client":{"device":4, "lang":"' + str(locale) + '"}, '
         data = '"data":{' + extras + '}'
@@ -1419,15 +1419,15 @@ class UpdateSQL(ApiParent):
 
         # Get project parameters
         if project_name_schema is None or not project_name_schema:
-            project_name_schema = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'project_name')
+            project_name_schema = qt_tools.getWidgetText(self.dlg_readsql_create_project, 'project_name')
         if project_title_schema is None or not project_title_schema:
-            project_title_schema = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'project_title')
+            project_title_schema = qt_tools.getWidgetText(self.dlg_readsql_create_project, 'project_title')
         if project_type is None:
-            project_type = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'cmb_create_project_type')
+            project_type = qt_tools.getWidgetText(self.dlg_readsql_create_project, 'cmb_create_project_type')
         if project_srid is None:
-            project_srid = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'srid_id')
+            project_srid = qt_tools.getWidgetText(self.dlg_readsql_create_project, 'srid_id')
         if project_locale is None:
-            project_locale = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'cmb_locale')
+            project_locale = qt_tools.getWidgetText(self.dlg_readsql_create_project, 'cmb_locale')
 
         # Set class variables
         self.schema = project_name_schema
@@ -1440,7 +1440,7 @@ class UpdateSQL(ApiParent):
         # Save in settings
         self.controller.plugin_settings_set_value('project_name_schema', project_name_schema)
         self.controller.plugin_settings_set_value('project_title_schema', project_title_schema)
-        inp_file_path = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'data_file')
+        inp_file_path = qt_tools.getWidgetText(self.dlg_readsql_create_project, 'data_file')
         self.controller.plugin_settings_set_value('inp_file_path', inp_file_path)
 
         # Check if project name is valid
@@ -1455,7 +1455,7 @@ class UpdateSQL(ApiParent):
             self.task1.setProgress(0)
 
         if self.rdb_import_data.isChecked():
-            self.file_inp = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'data_file')
+            self.file_inp = qt_tools.getWidgetText(self.dlg_readsql_create_project, 'data_file')
             if self.file_inp is 'null':
                 msg = "The 'Path' field is required for Import INP data."
                 self.controller.show_info_box(msg, "Info")
@@ -1469,8 +1469,8 @@ class UpdateSQL(ApiParent):
                 if result:
                     self.project_epsg = '25831'
                     self.locale = 'EN'
-                    utils_giswater.setWidgetText(self.dlg_readsql_create_project, 'srid_id', self.project_epsg)
-                    utils_giswater.setWidgetText(self.dlg_readsql_create_project, 'cmb_locale', self.locale)
+                    qt_tools.setWidgetText(self.dlg_readsql_create_project, 'srid_id', self.project_epsg)
+                    qt_tools.setWidgetText(self.dlg_readsql_create_project, 'cmb_locale', self.locale)
                 else:
                     return
 
@@ -1555,7 +1555,7 @@ class UpdateSQL(ApiParent):
             if not is_test:
                 self.populate_data_schema_name(self.cmb_project_type)
                 if schema_name is not None:
-                    utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name, schema_name)
+                    qt_tools.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name, schema_name)
                     self.set_info_project()
         else:
             self.controller.dao.rollback()
@@ -1567,7 +1567,7 @@ class UpdateSQL(ApiParent):
 
         if create_project is None or create_project is False:
             close_dlg_rename = True
-            self.schema = utils_giswater.getWidgetText(self.dlg_readsql_rename, self.dlg_readsql_rename.schema_rename_copy)
+            self.schema = qt_tools.getWidgetText(self.dlg_readsql_rename, self.dlg_readsql_rename.schema_rename_copy)
             if str(self.schema) == str(schema):
                 msg = "Please, select a diferent project name than current."
                 self.controller.show_info_box(msg, "Info")
@@ -1610,7 +1610,7 @@ class UpdateSQL(ApiParent):
         if status:
             self.controller.dao.commit()
             self.event_change_connection()
-            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name, str(self.schema))
+            qt_tools.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name, str(self.schema))
             if close_dlg_rename:
                 self.close_dialog(self.dlg_readsql_rename)
         else:
@@ -1622,7 +1622,7 @@ class UpdateSQL(ApiParent):
 
     def load_custom_sql_files(self, dialog, widget):
 
-        folder_path = utils_giswater.getWidgetText(dialog, widget)
+        folder_path = qt_tools.getWidgetText(dialog, widget)
         self.task1 = GwTask('Manage schema')
         QgsApplication.taskManager().addTask(self.task1)
         self.task1.setProgress(50)
@@ -1716,7 +1716,7 @@ class UpdateSQL(ApiParent):
 
     def get_schema_name(self):
 
-        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        schema_name = qt_tools.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
         return schema_name
 
 
@@ -1736,7 +1736,7 @@ class UpdateSQL(ApiParent):
 
     def event_change_connection(self):
 
-        connection_name = str(utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_connection))
+        connection_name = str(qt_tools.getWidgetText(self.dlg_readsql, self.cmb_connection))
 
         credentials = {'db': None, 'host': None, 'port': None, 'user': None, 'password': None, 'sslmode': None}
 
@@ -1765,19 +1765,19 @@ class UpdateSQL(ApiParent):
         else:
             if str(self.plugin_version) > str(self.project_version):
                 self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
-                utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
+                qt_tools.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
                 '(Schema version is lower than plugin version, please update schema)')
                 self.dlg_readsql.btn_info.setEnabled(True)
             elif str(self.plugin_version) < str(self.project_version):
                 self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
-                utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
+                qt_tools.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
                 '(Schema version is higher than plugin version, please update plugin)')
                 self.dlg_readsql.btn_info.setEnabled(True)
             else:
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
-                utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
+                qt_tools.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
                 self.dlg_readsql.btn_info.setEnabled(False)
-            utils_giswater.dis_enable_dialog(self.dlg_readsql, True)
+            qt_tools.dis_enable_dialog(self.dlg_readsql, True)
 
             self.populate_data_schema_name(self.cmb_project_type)
             self.set_last_connection(connection_name)
@@ -1786,11 +1786,11 @@ class UpdateSQL(ApiParent):
             self.username = self.get_user_connection(self.get_last_connection())
             role_admin = self.controller.check_role_user("role_admin", self.username)
             if not role_admin and self.username not in self.super_users:
-                utils_giswater.dis_enable_dialog(self.dlg_readsql, False, 'cmb_connection')
+                qt_tools.dis_enable_dialog(self.dlg_readsql, False, 'cmb_connection')
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
-                utils_giswater.setWidgetText(self.dlg_readsql, 'lbl_status_text',
+                qt_tools.setWidgetText(self.dlg_readsql, 'lbl_status_text',
                     "You don't have permissions to administrate project schemas on this connection")
-                utils_giswater.setWidgetText(self.dlg_readsql, 'lbl_schema_name', '')
+                qt_tools.setWidgetText(self.dlg_readsql, 'lbl_schema_name', '')
                 
 
     def set_last_connection(self, connection_name):
@@ -1826,7 +1826,7 @@ class UpdateSQL(ApiParent):
 
     def visit_manager(self):
         # TODO:: Remove tab visitclas. WIP
-        utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "visitclass")
+        qt_tools.remove_tab_by_tabName(self.dlg_readsql.tab_main, "visitclass")
         return
         # Populate visit class
         # TODO:: Populate combo from visitclass manager and wip
@@ -1849,11 +1849,11 @@ class UpdateSQL(ApiParent):
         # Manage widgets
         sql = "SELECT id, id as idval FROM sys_feature_type WHERE classlevel = 1 OR classlevel = 2"
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
-        utils_giswater.set_item_data(self.dlg_manage_visit_class.feature_type, rows, 1)
+        qt_tools.set_item_data(self.dlg_manage_visit_class.feature_type, rows, 1)
 
         sql = "SELECT id, idval FROM om_typevalue WHERE typevalue ='visit_type'"
         rows = self.controller.get_rows(sql, log_sql=True)
-        utils_giswater.set_item_data(self.dlg_manage_visit_class.visit_type, rows, 1)
+        qt_tools.set_item_data(self.dlg_manage_visit_class.visit_type, rows, 1)
 
         # Set listeners
 
@@ -1871,19 +1871,19 @@ class UpdateSQL(ApiParent):
         # Manage widgets
         sql = "SELECT id, id as idval FROM om_visit_parameter_type"
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
-        utils_giswater.set_item_data(self.dlg_manage_visit_param.parameter_type, rows, 1)
+        qt_tools.set_item_data(self.dlg_manage_visit_param.parameter_type, rows, 1)
 
         sql = "SELECT id, idval FROM config_api_typevalue WHERE typevalue = 'datatype'"
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
-        utils_giswater.set_item_data(self.dlg_manage_visit_param.data_type, rows, 1)
+        qt_tools.set_item_data(self.dlg_manage_visit_param.data_type, rows, 1)
 
         sql = "SELECT id, idval FROM om_typevalue WHERE typevalue = 'visit_form_type'"
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
-        utils_giswater.set_item_data(self.dlg_manage_visit_param.form_type, rows, 1)
+        qt_tools.set_item_data(self.dlg_manage_visit_param.form_type, rows, 1)
 
         sql = "SELECT id, idval FROM config_api_typevalue WHERE typevalue = 'widgettype'"
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
-        utils_giswater.set_item_data(self.dlg_manage_visit_param.widget_type, rows, 1)
+        qt_tools.set_item_data(self.dlg_manage_visit_param.widget_type, rows, 1)
 
         # Set listeners
 
@@ -1968,7 +1968,7 @@ class UpdateSQL(ApiParent):
     def update_locale(self):
 
         # TODO: Check this!
-        cmb_locale = utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_locale)
+        cmb_locale = qt_tools.getWidgetText(self.dlg_readsql, self.cmb_locale)
         self.folderLocale = self.sql_dir + os.sep + 'i18n' + os.sep + cmb_locale + os.sep
 
 
@@ -1985,7 +1985,7 @@ class UpdateSQL(ApiParent):
     def populate_data_schema_name(self, widget):
 
         # Get filter
-        filter_ = utils_giswater.getWidgetText(self.dlg_readsql, widget)
+        filter_ = qt_tools.getWidgetText(self.dlg_readsql, widget)
         if filter_ is None and self.schema_type:
             filter_ = self.schema_type
         if filter_ is None:
@@ -2025,13 +2025,13 @@ class UpdateSQL(ApiParent):
             self.dlg_readsql.project_schema_name.clear()
             return
 
-        utils_giswater.set_item_data(self.dlg_readsql.project_schema_name, result_list, 1)
+        qt_tools.set_item_data(self.dlg_readsql.project_schema_name, result_list, 1)
 
     def manage_srid(self):
         """ Manage SRID configuration """
 
         self.filter_srid = self.dlg_readsql_create_project.findChild(QLineEdit, 'srid_id')
-        utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.filter_srid, '25831')
+        qt_tools.setWidgetText(self.dlg_readsql_create_project, self.filter_srid, '25831')
         self.tbl_srid = self.dlg_readsql_create_project.findChild(QTableView, 'tbl_srid')
         self.tbl_srid.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.model_srid = QSqlQueryModel()
@@ -2040,7 +2040,7 @@ class UpdateSQL(ApiParent):
 
     def filter_srid_changed(self):
 
-        filter_value = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.filter_srid)
+        filter_value = qt_tools.getWidgetText(self.dlg_readsql_create_project, self.filter_srid)
         if filter_value is 'null':
             filter_value = ''
         sql = ("SELECT substr(srtext, 1, 6) as " + '"Type"' + ", srid as " + '"SRID"' + ", "
@@ -2059,7 +2059,7 @@ class UpdateSQL(ApiParent):
     def set_info_project(self):
 
         # set variables from table version
-        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        schema_name = qt_tools.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
 
         # TODO: Make just one SQL query
         self.project_type = self.controller.get_project_type(schemaname=schema_name)
@@ -2073,7 +2073,7 @@ class UpdateSQL(ApiParent):
         if schema_name is None:
             schema_name = 'Nothing to select'
             self.project_version = "Version not found"
-            utils_giswater.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", False)
+            qt_tools.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", False)
 
         # Set label schema name
         self.lbl_schema_name.setText(str(schema_name))
@@ -2093,25 +2093,25 @@ class UpdateSQL(ApiParent):
             self.software_version_info.setText(msg)
 
         # Update windowTitle
-        connection = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_connection)
+        connection = qt_tools.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_connection)
         window_title = f'Giswater ({connection} - {self.plugin_version})'
         self.dlg_readsql.setWindowTitle(window_title)
 
         if schema_name == 'Nothing to select' or schema_name == '':
-            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
+            qt_tools.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
         elif str(self.plugin_version) > str(self.project_version):
             self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
-            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
+            qt_tools.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
                                          '(Schema version is lower than plugin version, please update schema)')
             self.dlg_readsql.btn_info.setEnabled(True)
         elif str(self.plugin_version) < str(self.project_version):
             self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
-            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
+            qt_tools.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
                                          '(Schema version is higher than plugin version, please update plugin)')
             self.dlg_readsql.btn_info.setEnabled(False)
         else:
             self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
-            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
+            qt_tools.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
             self.dlg_readsql.btn_info.setEnabled(False)
 
 
@@ -2164,7 +2164,7 @@ class UpdateSQL(ApiParent):
         self.project_title.setText(str(self.controller.plugin_settings_value('project_title_schema')))
         create_schema_type = self.controller.plugin_settings_value('create_schema_type')
         if create_schema_type:
-            utils_giswater.setChecked(self.dlg_readsql_create_project, str(create_schema_type))
+            qt_tools.setChecked(self.dlg_readsql_create_project, str(create_schema_type))
 
         if str(self.controller.plugin_settings_value('inp_file_path')) != 'null':
             self.data_file.setText(str(self.controller.plugin_settings_value('inp_file_path')))
@@ -2184,7 +2184,7 @@ class UpdateSQL(ApiParent):
             self.cmb_create_project_type.addItem(str(aux))
 
         if project_type:
-            utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.cmb_create_project_type, project_type)
+            qt_tools.setWidgetText(self.dlg_readsql_create_project, self.cmb_create_project_type, project_type)
             self.change_project_type(self.cmb_create_project_type)
 
         # Enable_disable data file widgets
@@ -2198,10 +2198,10 @@ class UpdateSQL(ApiParent):
         for locale in locales:
             self.cmb_locale.addItem(locale)
             if locale == 'EN':
-                utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.cmb_locale, 'EN')
+                qt_tools.setWidgetText(self.dlg_readsql_create_project, self.cmb_locale, 'EN')
 
         # Get database connection name
-        self.connection_name = str(utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_connection))
+        self.connection_name = str(qt_tools.getWidgetText(self.dlg_readsql, self.cmb_connection))
 
         # Set signals
         self.set_signals_create_project()
@@ -2229,9 +2229,9 @@ class UpdateSQL(ApiParent):
         self.filter_srid_changed()
 
         # Get project_type from previous dialog
-        self.cmb_project_type = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
-        utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.cmb_create_project_type,
-                                     self.cmb_project_type)
+        self.cmb_project_type = qt_tools.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
+        qt_tools.setWidgetText(self.dlg_readsql_create_project, self.cmb_create_project_type,
+                               self.cmb_project_type)
         self.change_project_type(self.cmb_create_project_type)
 
         # Open dialog
@@ -2251,7 +2251,7 @@ class UpdateSQL(ApiParent):
         self.dlg_readsql_rename = MainRenameProjUi()
         self.load_settings(self.dlg_readsql_rename)
 
-        schema = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        schema = qt_tools.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
 
         # Set listeners
         self.dlg_readsql_rename.btn_accept.clicked.connect(partial(self.rename_project_data_schema, schema))
@@ -2274,7 +2274,7 @@ class UpdateSQL(ApiParent):
         filelist = sorted(os.listdir(filedir))
         status = True
         if self.schema is None:
-            schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+            schema_name = qt_tools.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
             schema_name = schema_name.replace('"', '')
         else:
             schema_name = self.schema.replace('"', '')
@@ -2362,7 +2362,7 @@ class UpdateSQL(ApiParent):
         self.dlg_readsql_copy = MainRenameProjUi()
         self.load_settings(self.dlg_readsql_copy)
 
-        schema = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        schema = qt_tools.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
 
         # Set listeners
         self.dlg_readsql_copy.btn_accept.clicked.connect(partial(self.copy_project_data_schema, schema))
@@ -2375,7 +2375,7 @@ class UpdateSQL(ApiParent):
 
     def copy_project_data_schema(self, schema):
 
-        new_schema_name = utils_giswater.getWidgetText(self.dlg_readsql_copy, self.dlg_readsql_copy.schema_rename_copy)
+        new_schema_name = qt_tools.getWidgetText(self.dlg_readsql_copy, self.dlg_readsql_copy.schema_rename_copy)
         sql = "SELECT schema_name, schema_name FROM information_schema.schemata"
         rows = self.controller.get_rows(sql)
 
@@ -2403,7 +2403,7 @@ class UpdateSQL(ApiParent):
         if status:
             self.controller.dao.commit()
             self.event_change_connection()
-            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name, str(new_schema_name))
+            qt_tools.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name, str(new_schema_name))
             self.close_dialog(self.dlg_readsql_copy)
         else:
             self.controller.dao.rollback()
@@ -2414,7 +2414,7 @@ class UpdateSQL(ApiParent):
 
     def delete_schema(self):
 
-        project_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        project_name = qt_tools.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
         if project_name is None:
             msg = "Please, select a project to delete"
             self.controller.show_info_box(msg, "Info")
@@ -2564,11 +2564,11 @@ class UpdateSQL(ApiParent):
 
     def execute_import_ui(self):
 
-        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
-        tpath = utils_giswater.getWidgetText(self.dlg_readsql, 'tpath')
+        schema_name = qt_tools.getWidgetText(self.dlg_readsql, 'project_schema_name')
+        tpath = qt_tools.getWidgetText(self.dlg_readsql, 'tpath')
         # tpath = utils_giswater.getWidget(self.dlg_readsql, 'tpath')
         # ui_path = tpath.document().toPlainText()
-        form_name_ui = utils_giswater.getWidgetText(self.dlg_readsql, 'cmb_formname_ui')
+        form_name_ui = qt_tools.getWidgetText(self.dlg_readsql, 'cmb_formname_ui')
         status_update_childs = self.dlg_readsql.chk_multi_update.isChecked()
 
         # Control if ui path is invalid or null
@@ -2594,9 +2594,9 @@ class UpdateSQL(ApiParent):
 
     def execute_export_ui(self):
 
-        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
-        tpath = utils_giswater.getWidgetText(self.dlg_readsql, 'tpath')
-        form_name_ui = utils_giswater.getWidgetText(self.dlg_readsql, 'cmb_formname_ui')
+        schema_name = qt_tools.getWidgetText(self.dlg_readsql, 'project_schema_name')
+        tpath = qt_tools.getWidgetText(self.dlg_readsql, 'tpath')
+        form_name_ui = qt_tools.getWidgetText(self.dlg_readsql, 'cmb_formname_ui')
         status_update_childs = self.dlg_readsql.chk_multi_update.isChecked()
 
         # Control if ui path is invalid or null
@@ -2647,7 +2647,7 @@ class UpdateSQL(ApiParent):
 
     def clear_temp_table(self):
 
-        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
+        schema_name = qt_tools.getWidgetText(self.dlg_readsql, 'project_schema_name')
         # Clear temp_csv
         sql = f"DELETE FROM {schema_name}.temp_csv WHERE cur_user = current_user"
         status = self.controller.execute_sql(sql, log_sql=True)
@@ -2656,7 +2656,7 @@ class UpdateSQL(ApiParent):
     def select_file_ui(self):
         """ Select UI file """
 
-        file_ui = utils_giswater.getWidgetText(self.dlg_readsql, 'tpath')
+        file_ui = qt_tools.getWidgetText(self.dlg_readsql, 'tpath')
         # Set default value if necessary
         if file_ui is None or file_ui == '':
             file_ui = self.plugin_dir
@@ -2668,25 +2668,25 @@ class UpdateSQL(ApiParent):
         os.chdir(folder_path)
         message = self.controller.tr("Select UI file")
         file_ui, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.ui')
-        utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.tpath, str(file_ui))
+        qt_tools.setWidgetText(self.dlg_readsql, self.dlg_readsql.tpath, str(file_ui))
 
 
     def update_manage_ui(self):
 
-        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
+        schema_name = qt_tools.getWidgetText(self.dlg_readsql, 'project_schema_name')
         if schema_name is None:
-            utils_giswater.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", False)
+            qt_tools.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", False)
             return
         else:
-            utils_giswater.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", True)
+            qt_tools.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", True)
 
         # Control if schema_version is updated to 3.2
         if str(self.project_version).replace('.','') < str(self.plugin_version).replace('.', ''):
 
-            utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_addfields).setEnabled(False)
-            utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_ui).setEnabled(False)
-            utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_childviews).setEnabled(False)
-            utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_sys_fields).setEnabled(False)
+            qt_tools.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_addfields).setEnabled(False)
+            qt_tools.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_ui).setEnabled(False)
+            qt_tools.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_childviews).setEnabled(False)
+            qt_tools.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_sys_fields).setEnabled(False)
 
             self.dlg_readsql.cmb_feature_name_view.clear()
             self.dlg_readsql.cmb_formname_fields.clear()
@@ -2696,36 +2696,36 @@ class UpdateSQL(ApiParent):
 
         else:
 
-            utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_addfields).setEnabled(True)
-            utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_ui).setEnabled(True)
-            utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_childviews).setEnabled(True)
-            utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_sys_fields).setEnabled(True)
+            qt_tools.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_addfields).setEnabled(True)
+            qt_tools.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_ui).setEnabled(True)
+            qt_tools.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_childviews).setEnabled(True)
+            qt_tools.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_sys_fields).setEnabled(True)
 
             sql = (f"SELECT cat_feature.child_layer, cat_feature.child_layer FROM {schema_name}.cat_feature "
                         f" ORDER BY id")
 
             rows = self.controller.get_rows(sql)
-            utils_giswater.set_item_data(self.dlg_readsql.cmb_formname_ui, rows, 1)
+            qt_tools.set_item_data(self.dlg_readsql.cmb_formname_ui, rows, 1)
             
             sql = (f"SELECT cat_feature.id, cat_feature.id FROM {schema_name}.cat_feature "
                        f" ORDER BY id")
 
             rows = self.controller.get_rows(sql)
-            utils_giswater.set_item_data(self.dlg_readsql.cmb_formname_fields, rows, 1)
-            utils_giswater.set_item_data(self.dlg_readsql.cmb_feature_name_view, rows, 1)
-            utils_giswater.set_item_data(self.dlg_readsql.cmb_feature_sys_fields, rows, 1)
+            qt_tools.set_item_data(self.dlg_readsql.cmb_formname_fields, rows, 1)
+            qt_tools.set_item_data(self.dlg_readsql.cmb_feature_name_view, rows, 1)
+            qt_tools.set_item_data(self.dlg_readsql.cmb_feature_sys_fields, rows, 1)
 
 
     def create_child_view(self):
         """ Create child view """
 
-        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
-        form_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_feature_name_view)
+        schema_name = qt_tools.getWidgetText(self.dlg_readsql, 'project_schema_name')
+        form_name = qt_tools.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_feature_name_view)
 
         # Create body
         feature = '"catFeature":"' + form_name + '"'
         extras = '"multi_create":' + str(
-            utils_giswater.isChecked(self.dlg_readsql, self.dlg_readsql.chk_multi_create)).lower() + ''
+            qt_tools.isChecked(self.dlg_readsql, self.dlg_readsql.chk_multi_create)).lower() + ''
         body = self.create_body(feature=feature, extras=extras)
         body = body.replace('""', 'null')
 
@@ -2744,10 +2744,10 @@ class UpdateSQL(ApiParent):
         # Remove unused tabs
         for x in range(self.dlg_manage_sys_fields.tab_sys_add_fields.count() - 1, -1, -1):
             if str(self.dlg_manage_sys_fields.tab_sys_add_fields.widget(x).objectName()) != 'tab_update':
-                utils_giswater.remove_tab_by_tabName(
+                qt_tools.remove_tab_by_tabName(
                     self.dlg_manage_sys_fields.tab_sys_add_fields, self.dlg_manage_sys_fields.tab_sys_add_fields.widget(x).objectName())
 
-        form_name_fields = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_feature_sys_fields)
+        form_name_fields = qt_tools.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_feature_sys_fields)
 
         # Set listeners
         self.dlg_manage_sys_fields.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_manage_sys_fields))
@@ -2774,11 +2774,11 @@ class UpdateSQL(ApiParent):
         # Remove unused tabs
         for x in range(self.dlg_manage_fields.tab_add_fields.count() - 1, -1, -1):
             if str(self.dlg_manage_fields.tab_add_fields.widget(x).objectName()) != f'tab_{action}':
-                utils_giswater.remove_tab_by_tabName(
+                qt_tools.remove_tab_by_tabName(
                     self.dlg_manage_fields.tab_add_fields, self.dlg_manage_fields.tab_add_fields.widget(x).objectName())
 
-        form_name_fields = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_formname_fields)
-        self.chk_multi_insert = utils_giswater.isChecked(self.dlg_readsql, self.dlg_readsql.chk_multi_insert)
+        form_name_fields = qt_tools.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_formname_fields)
+        self.chk_multi_insert = qt_tools.isChecked(self.dlg_readsql, self.dlg_readsql.chk_multi_insert)
 
         if action == 'create':
             window_title = 'Create field on "' + str(form_name_fields) + '"'
@@ -2819,7 +2819,7 @@ class UpdateSQL(ApiParent):
         self.load_settings(self.dlg_manage_sys_fields)
         self.model_update_table = None
 
-        form_name_fields = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_feature_sys_fields)
+        form_name_fields = qt_tools.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_feature_sys_fields)
 
         # Set listeners
         self.dlg_manage_sys_fields.btn_accept.clicked.connect(
@@ -2829,8 +2829,8 @@ class UpdateSQL(ApiParent):
         # Remove unused tabs
         for x in range(self.dlg_manage_sys_fields.tab_sys_add_fields.count() - 1, -1, -1):
             if str(self.dlg_manage_sys_fields.tab_sys_add_fields.widget(x).objectName()) != str('tab_create'):
-                utils_giswater.remove_tab_by_tabName(self.dlg_manage_sys_fields.tab_sys_add_fields,
-                                                     self.dlg_manage_sys_fields.tab_sys_add_fields.widget(x).objectName())
+                qt_tools.remove_tab_by_tabName(self.dlg_manage_sys_fields.tab_sys_add_fields,
+                                               self.dlg_manage_sys_fields.tab_sys_add_fields.widget(x).objectName())
 
         window_title = 'Update field on "' + str(form_name_fields) + '"'
         self.dlg_manage_sys_fields.setWindowTitle(window_title)
@@ -2839,8 +2839,8 @@ class UpdateSQL(ApiParent):
         for column in range(widget.model().columnCount()):
             index = widget.model().index(row, column)
 
-            result = utils_giswater.getWidget(self.dlg_manage_sys_fields,
-                                              str(widget.model().headerData(column, Qt.Horizontal)))
+            result = qt_tools.getWidget(self.dlg_manage_sys_fields,
+                                        str(widget.model().headerData(column, Qt.Horizontal)))
 
             if result is None:
                 continue
@@ -2849,7 +2849,7 @@ class UpdateSQL(ApiParent):
 
             if value == 'NULL':
                 value = None
-            utils_giswater.setWidgetText(self.dlg_manage_sys_fields, result, value)
+            qt_tools.setWidgetText(self.dlg_manage_sys_fields, result, value)
 
         self.open_dialog(self.dlg_manage_sys_fields)
 
@@ -2868,8 +2868,8 @@ class UpdateSQL(ApiParent):
         self.load_settings(self.dlg_manage_fields)
         self.model_update_table = None
 
-        form_name_fields = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_formname_fields)
-        self.chk_multi_insert = utils_giswater.isChecked(self.dlg_readsql, self.dlg_readsql.chk_multi_insert)
+        form_name_fields = qt_tools.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_formname_fields)
+        self.chk_multi_insert = qt_tools.isChecked(self.dlg_readsql, self.dlg_readsql.chk_multi_insert)
         self.dlg_manage_fields.column_id.setEnabled(False)
 
         # Set listeners
@@ -2880,7 +2880,7 @@ class UpdateSQL(ApiParent):
         # Remove unused tabs
         for x in range(self.dlg_manage_fields.tab_add_fields.count() - 1, -1, -1):
             if str(self.dlg_manage_fields.tab_add_fields.widget(x).objectName()) != str('tab_create'):
-                utils_giswater.remove_tab_by_tabName(self.dlg_manage_fields.tab_add_fields, self.dlg_manage_fields.tab_add_fields.widget(x).objectName())
+                qt_tools.remove_tab_by_tabName(self.dlg_manage_fields.tab_add_fields, self.dlg_manage_fields.tab_add_fields.widget(x).objectName())
 
         window_title = 'Update field on "' + str(form_name_fields) + '"'
         self.dlg_manage_fields.setWindowTitle(window_title)
@@ -2891,7 +2891,7 @@ class UpdateSQL(ApiParent):
         for column in range(widget.model().columnCount()):
             index = widget.model().index(row, column)
 
-            result = utils_giswater.getWidget(self.dlg_manage_fields, str(widget.model().headerData(column, Qt.Horizontal)))
+            result = qt_tools.getWidget(self.dlg_manage_fields, str(widget.model().headerData(column, Qt.Horizontal)))
 
             if result is None:
                 continue
@@ -2900,42 +2900,42 @@ class UpdateSQL(ApiParent):
 
             if value == 'NULL':
                 value = None
-            utils_giswater.setWidgetText(self.dlg_manage_fields, result, value)
+            qt_tools.setWidgetText(self.dlg_manage_fields, result, value)
 
         self.open_dialog(self.dlg_manage_fields, dlg_name='main_addfields')
 
 
     def manage_create_field(self, form_name):
 
-        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
+        schema_name = qt_tools.getWidgetText(self.dlg_readsql, 'project_schema_name')
 
         # Populate widgettype combo
         sql = (f"SELECT DISTINCT(id), idval FROM {schema_name}.config_api_typevalue "
                f"WHERE typevalue = 'widgettype_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
         rows = self.controller.get_rows(sql, log_sql=True)
-        utils_giswater.set_item_data(self.dlg_manage_fields.widgettype, rows, 1)
+        qt_tools.set_item_data(self.dlg_manage_fields.widgettype, rows, 1)
 
         # Populate datatype combo
         sql = (f"SELECT id, idval FROM {schema_name}.config_api_typevalue "
                f"WHERE typevalue = 'datatype_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
         rows = self.controller.get_rows(sql, log_sql=True)
-        utils_giswater.set_item_data(self.dlg_manage_fields.datatype, rows, 1)
+        qt_tools.set_item_data(self.dlg_manage_fields.datatype, rows, 1)
 
         # Populate widgetfunction combo
         sql = (f"SELECT null as id, null as idval UNION ALL "
                f"SELECT id, idval FROM {schema_name}.config_api_typevalue "
                f"WHERE typevalue = 'widgetfunction_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
         rows = self.controller.get_rows(sql, log_sql=True)
-        utils_giswater.set_item_data(self.dlg_manage_fields.widgetfunction, rows, 1)
+        qt_tools.set_item_data(self.dlg_manage_fields.widgetfunction, rows, 1)
 
         # Set default value for formtype widget
-        utils_giswater.setWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.formtype, 'feature')
+        qt_tools.setWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.formtype, 'feature')
 
 
     # TODO:: Enhance this function and use parametric parameters
     def manage_update_sys_field(self, form_name):
 
-        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
+        schema_name = qt_tools.getWidgetText(self.dlg_readsql, 'project_schema_name')
 
         # Populate table update
         qtable = self.dlg_manage_sys_fields.findChild(QTableView, "tbl_update")
@@ -2948,13 +2948,13 @@ class UpdateSQL(ApiParent):
 
     def manage_update_field(self, form_name):
 
-        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
+        schema_name = qt_tools.getWidgetText(self.dlg_readsql, 'project_schema_name')
 
         if schema_name is None:
-            utils_giswater.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", False)
+            qt_tools.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", False)
             return
         else:
-            utils_giswater.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", True)
+            qt_tools.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", True)
 
         # Populate table update
         qtable = self.dlg_manage_fields.findChild(QTableView, "tbl_update")
@@ -2972,12 +2972,12 @@ class UpdateSQL(ApiParent):
 
     def manage_delete_field(self, form_name):
 
-        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
+        schema_name = qt_tools.getWidgetText(self.dlg_readsql, 'project_schema_name')
         if schema_name is None:
-            utils_giswater.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", False)
+            qt_tools.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", False)
             return
         else:
-            utils_giswater.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", True)
+            qt_tools.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", True)
 
         # Populate widgettype combo
         if self.chk_multi_insert:
@@ -2990,7 +2990,7 @@ class UpdateSQL(ApiParent):
                    f"WHERE cat_feature_id = '" + form_name + "'")
 
         rows = self.controller.get_rows(sql, log_sql=True)
-        utils_giswater.set_item_data(self.dlg_manage_fields.cmb_fields, rows, 1)
+        qt_tools.set_item_data(self.dlg_manage_fields.cmb_fields, rows, 1)
 
 
     def manage_close_dlg(self, dlg_to_close):
@@ -3005,7 +3005,7 @@ class UpdateSQL(ApiParent):
     def manage_sys_update(self, form_name):
 
         list_widgets = self.dlg_manage_sys_fields.tab_create.findChildren(QWidget)
-        column_id = utils_giswater.getWidgetText(self.dlg_manage_sys_fields, self.dlg_manage_sys_fields.column_id)
+        column_id = qt_tools.getWidgetText(self.dlg_manage_sys_fields, self.dlg_manage_sys_fields.column_id)
         sql = f"UPDATE ve_config_sys_fields SET "
         for widget in list_widgets:
             if type(widget) not in (
@@ -3013,13 +3013,13 @@ class UpdateSQL(ApiParent):
                     QGroupBox, QTableView) and widget.objectName() not in ('qt_spinbox_lineedit', 'chk_multi_insert'):
 
                 if type(widget) in (QLineEdit, QSpinBox, QDoubleSpinBox):
-                    value = utils_giswater.getWidgetText(self.dlg_manage_sys_fields, widget, return_string_null=False)
+                    value = qt_tools.getWidgetText(self.dlg_manage_sys_fields, widget, return_string_null=False)
                 elif type(widget) is QComboBox:
-                    value = utils_giswater.get_item_data(self.dlg_manage_sys_fields, widget, 0)
+                    value = qt_tools.get_item_data(self.dlg_manage_sys_fields, widget, 0)
                 elif type(widget) is QCheckBox:
-                    value = utils_giswater.isChecked(self.dlg_manage_sys_fields, widget)
+                    value = qt_tools.isChecked(self.dlg_manage_sys_fields, widget)
                 elif type(widget) is QgsDateTimeEdit:
-                    value = utils_giswater.getCalendarDate(self.dlg_manage_sys_fields, widget)
+                    value = qt_tools.getCalendarDate(self.dlg_manage_sys_fields, widget)
                 elif type(widget) is QPlainTextEdit:
                     value = widget.document().toPlainText()
 
@@ -3040,10 +3040,10 @@ class UpdateSQL(ApiParent):
 
     def manage_accept(self, action, form_name, model=None):
 
-        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
+        schema_name = qt_tools.getWidgetText(self.dlg_readsql, 'project_schema_name')
 
         # Execute manage add fields function
-        param_name = utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.column_id)
+        param_name = qt_tools.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.column_id)
         sql = (f"SELECT param_name FROM config_addfields_parameter "
                f"WHERE param_name = '{param_name}'")
         row = self.controller.get_row(sql, log_sql=True)
@@ -3051,8 +3051,8 @@ class UpdateSQL(ApiParent):
         if action == 'create':
 
             # Control mandatory widgets
-            if utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.column_id) is 'null' or \
-                    utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.label) is 'null':
+            if qt_tools.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.column_id) is 'null' or \
+                    qt_tools.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.label) is 'null':
                 msg = "Column_id and Label fields mandatory. Please set correctly value."
                 self.controller.show_info_box(msg, "Info")
                 return
@@ -3062,8 +3062,8 @@ class UpdateSQL(ApiParent):
                 self.controller.show_info_box(msg, "Info")
                 return
 
-            elif utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.widgettype) == 'combo' and \
-                    utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.dv_querytext) in ('null', None):
+            elif qt_tools.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.widgettype) == 'combo' and \
+                    qt_tools.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.dv_querytext) in ('null', None):
                 msg = "Parameter 'Query text:' is mandatory for 'combo' widgets. Please set value."
                 self.controller.show_info_box(msg, "Info")
                 return
@@ -3076,13 +3076,13 @@ class UpdateSQL(ApiParent):
                         and widget.objectName() not in ('qt_spinbox_lineedit', 'chk_multi_insert'):
 
                     if type(widget) in (QLineEdit, QSpinBox, QDoubleSpinBox):
-                        value = utils_giswater.getWidgetText(self.dlg_manage_fields, widget, return_string_null=False)
+                        value = qt_tools.getWidgetText(self.dlg_manage_fields, widget, return_string_null=False)
                     elif type(widget) is QComboBox:
-                        value = utils_giswater.get_item_data(self.dlg_manage_fields, widget, 0)
+                        value = qt_tools.get_item_data(self.dlg_manage_fields, widget, 0)
                     elif type(widget) is QCheckBox:
-                        value = utils_giswater.isChecked(self.dlg_manage_fields, widget)
+                        value = qt_tools.isChecked(self.dlg_manage_fields, widget)
                     elif type(widget) is QgsDateTimeEdit :
-                        value = utils_giswater.getCalendarDate(self.dlg_manage_fields, widget)
+                        value = qt_tools.getCalendarDate(self.dlg_manage_fields, widget)
                     elif type(widget) is QPlainTextEdit:
                         value = widget.document().toPlainText()
 
@@ -3113,13 +3113,13 @@ class UpdateSQL(ApiParent):
                 QTableView) and widget.objectName() not in ('qt_spinbox_lineedit', 'chk_multi_insert'):
 
                     if type(widget) in (QLineEdit, QSpinBox, QDoubleSpinBox):
-                        value = utils_giswater.getWidgetText(self.dlg_manage_fields, widget, return_string_null=False)
+                        value = qt_tools.getWidgetText(self.dlg_manage_fields, widget, return_string_null=False)
                     elif type(widget) is QComboBox:
-                        value = utils_giswater.get_item_data(self.dlg_manage_fields, widget, 0)
+                        value = qt_tools.get_item_data(self.dlg_manage_fields, widget, 0)
                     elif type(widget) is QCheckBox:
-                        value = utils_giswater.isChecked(self.dlg_manage_fields, widget)
+                        value = qt_tools.isChecked(self.dlg_manage_fields, widget)
                     elif type(widget) is QgsDateTimeEdit:
-                        value = utils_giswater.getCalendarDate(self.dlg_manage_fields, widget)
+                        value = qt_tools.getCalendarDate(self.dlg_manage_fields, widget)
                     elif type(widget) is QPlainTextEdit:
                         value = widget.document().toPlainText()
 
@@ -3142,7 +3142,7 @@ class UpdateSQL(ApiParent):
 
         elif action == 'delete':
 
-            field_value = utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.cmb_fields)
+            field_value = qt_tools.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.cmb_fields)
 
             # Create body
             feature = '"catFeature":"' + form_name + '"'
@@ -3165,7 +3165,7 @@ class UpdateSQL(ApiParent):
         """ Set a model with selected filter.
         Attach that model to selected table """
 
-        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
+        schema_name = qt_tools.getWidgetText(self.dlg_readsql, 'project_schema_name')
         if schema_name not in table_name:
             table_name = schema_name + "." + table_name
 
@@ -3186,7 +3186,7 @@ class UpdateSQL(ApiParent):
     def change_project_type(self, widget):
         """ Take current project type changed """
 
-        self.project_type_selected = utils_giswater.getWidgetText(self.dlg_readsql, widget)
+        self.project_type_selected = qt_tools.getWidgetText(self.dlg_readsql, widget)
         self.folderSoftware = self.sql_dir + os.sep + self.project_type_selected + os.sep
 
 
@@ -3256,7 +3256,7 @@ class UpdateSQL(ApiParent):
     def select_file_inp(self):
         """ Select INP file """
 
-        file_inp = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'data_file')
+        file_inp = qt_tools.getWidgetText(self.dlg_readsql_create_project, 'data_file')
         # Set default value if necessary
         if file_inp is None or file_inp == '':
             file_inp = self.plugin_dir
@@ -3309,8 +3309,8 @@ class UpdateSQL(ApiParent):
     def save_selection(self):
 
         # Save last Project schema name and type selected
-        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
-        project_type = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
+        schema_name = qt_tools.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        project_type = qt_tools.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
 
         self.controller.plugin_settings_set_value('last_project_type_selected', project_type)
         self.controller.plugin_settings_set_value('last_schema_name_selected', schema_name)
@@ -3321,9 +3321,9 @@ class UpdateSQL(ApiParent):
         self.dlg_credentials = Credentials()
 
         if str(self.list_connections) != '[]':
-            utils_giswater.set_item_data(self.dlg_credentials.cmb_connection, self.list_connections, 1)
+            qt_tools.set_item_data(self.dlg_credentials.cmb_connection, self.list_connections, 1)
 
-        utils_giswater.setWidgetText(self.dlg_credentials, self.dlg_credentials.cmb_connection, str(set_connection))
+        qt_tools.setWidgetText(self.dlg_credentials, self.dlg_credentials.cmb_connection, str(set_connection))
 
         self.dlg_credentials.btn_accept.clicked.connect(partial(self.set_credentials, self.dlg_credentials))
         self.dlg_credentials.cmb_connection.currentIndexChanged.connect(

@@ -19,7 +19,7 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import Qt, QDate
 
-from lib import utils_giswater
+from lib import qt_tools
 from .parent import ParentMapTool
 from ..ui_manager import ArcFusionUi
 from functools import partial
@@ -68,11 +68,11 @@ class DeleteNodeMapTool(ParentMapTool):
             # Fill ComboBox workcat_id_end
             sql = "SELECT id FROM cat_work ORDER BY id"
             rows = self.controller.get_rows(sql)
-            utils_giswater.fillComboBox(self.dlg_fusion, "workcat_id_end", rows, False)
+            qt_tools.fillComboBox(self.dlg_fusion, "workcat_id_end", rows, False)
 
             # Set QDateEdit to current date
             current_date = QDate.currentDate()
-            utils_giswater.setCalendarDate(self.dlg_fusion, "enddate", current_date)
+            qt_tools.setCalendarDate(self.dlg_fusion, "enddate", current_date)
 
             # Set signals
             self.dlg_fusion.btn_accept.clicked.connect(self.exec_fusion)

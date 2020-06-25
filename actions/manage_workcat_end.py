@@ -13,7 +13,7 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QCompleter
 from functools import partial
 from datetime import datetime
 
-from lib import utils_giswater
+from lib import qt_tools
 from .parent_manage import ParentManage
 from ..ui_manager import FeatureEndUi, InfoWorkcatUi
 from ..ui_manager import FeatureEndConnecUi
@@ -115,11 +115,11 @@ class ManageWorkcatEnd(ParentManage):
 
         sql = 'SELECT id as id, name as idval FROM value_state_type WHERE id IS NOT NULL AND state = 0'
         rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_work_end.cmb_statetype_end, rows, 1)
+        qt_tools.set_item_data(self.dlg_work_end.cmb_statetype_end, rows, 1)
         row = self.controller.get_config('statetype_end_vdefault')
 
         if row:
-            utils_giswater.set_combo_itemData(self.dlg_work_end.cmb_statetype_end, row[0], 0)
+            qt_tools.set_combo_itemData(self.dlg_work_end.cmb_statetype_end, row[0], 0)
         row = self.controller.get_config('edit_enddate_vdefault')
 
         if row:
@@ -127,15 +127,15 @@ class ManageWorkcatEnd(ParentManage):
             self.dlg_work_end.enddate.setDate(enddate)
         else:
             enddate = QDate.currentDate()
-        utils_giswater.setCalendarDate(self.dlg_work_end, "enddate", enddate)
+        qt_tools.setCalendarDate(self.dlg_work_end, "enddate", enddate)
 
         sql = "SELECT id FROM cat_work"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows, allow_nulls=False)
-        utils_giswater.set_autocompleter(self.dlg_work_end.workcat_id_end)
+        qt_tools.fillComboBox(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows, allow_nulls=False)
+        qt_tools.set_autocompleter(self.dlg_work_end.workcat_id_end)
         row = self.controller.get_config('edit_workcat_end_vdefault')
         if row:
-            utils_giswater.setWidgetText(self.dlg_work_end, self.dlg_work_end.workcat_id_end, row[0])
+            qt_tools.setWidgetText(self.dlg_work_end, self.dlg_work_end.workcat_id_end, row[0])
 
 
     def manage_dates(self, date_value):
@@ -155,7 +155,7 @@ class ManageWorkcatEnd(ParentManage):
     def fill_workids(self):
         """ Auto fill descriptions and workid's """
         
-        workcat_id = utils_giswater.getWidgetText(self.dlg_work_end, self.dlg_work_end.workcat_id_end)
+        workcat_id = qt_tools.getWidgetText(self.dlg_work_end, self.dlg_work_end.workcat_id_end)
         if not workcat_id:
             return
         sql = (f"SELECT descript, builtdate "
@@ -163,11 +163,11 @@ class ManageWorkcatEnd(ParentManage):
                f"WHERE id = '{workcat_id}'")
         row = self.controller.get_row(sql)
         if row:
-            utils_giswater.setText(self.dlg_work_end, self.dlg_work_end.descript, row['descript'])
-            utils_giswater.setCalendarDate(self.dlg_work_end, self.dlg_work_end.builtdate, row['builtdate'], False)
+            qt_tools.setText(self.dlg_work_end, self.dlg_work_end.descript, row['descript'])
+            qt_tools.setCalendarDate(self.dlg_work_end, self.dlg_work_end.builtdate, row['builtdate'], False)
         else:
-            utils_giswater.setText(self.dlg_work_end, self.dlg_work_end.descript, '')
-            utils_giswater.setCalendarDate(self.dlg_work_end, self.dlg_work_end.builtdate, None, False)
+            qt_tools.setText(self.dlg_work_end, self.dlg_work_end.descript, '')
+            qt_tools.setCalendarDate(self.dlg_work_end, self.dlg_work_end.builtdate, None, False)
 
 
     def get_list_selected_id(self, qtable):
@@ -193,9 +193,9 @@ class ManageWorkcatEnd(ParentManage):
         """ Get elements from all the tables and update his data """
 
         # Setting values
-        self.workcat_id_end = utils_giswater.getWidgetText(self.dlg_work_end, self.dlg_work_end.workcat_id_end)
-        self.enddate = utils_giswater.getCalendarDate(self.dlg_work_end, self.dlg_work_end.enddate)
-        self.statetype_id_end = utils_giswater.get_item_data(self.dlg_work_end, self.dlg_work_end.cmb_statetype_end, 0)
+        self.workcat_id_end = qt_tools.getWidgetText(self.dlg_work_end, self.dlg_work_end.workcat_id_end)
+        self.enddate = qt_tools.getCalendarDate(self.dlg_work_end, self.dlg_work_end.enddate)
+        self.statetype_id_end = qt_tools.get_item_data(self.dlg_work_end, self.dlg_work_end.cmb_statetype_end, 0)
 
         if self.workcat_id_end in ('null', None):
             message = "Please select a workcat id end"
@@ -389,7 +389,7 @@ class ManageWorkcatEnd(ParentManage):
 
     def filter_by_id(self, table, widget_txt, tablename):
 
-        id_ = utils_giswater.getWidgetText(self.dlg_work, widget_txt)
+        id_ = qt_tools.getWidgetText(self.dlg_work, widget_txt)
         if id_ != 'null':
             expr = f" arc_id = '{id_}'"
             # Refresh model with selected filter
@@ -484,7 +484,7 @@ class ManageWorkcatEnd(ParentManage):
         self.dlg_new_workcat = InfoWorkcatUi()
         self.load_settings(self.dlg_new_workcat)
 
-        utils_giswater.setCalendarDate(self.dlg_new_workcat, self.dlg_new_workcat.builtdate, None, True)
+        qt_tools.setCalendarDate(self.dlg_new_workcat, self.dlg_new_workcat.builtdate, None, True)
         table_object = "cat_work"
         self.set_completer_widget(table_object,self.dlg_new_workcat.cat_work_id, 'id')
 
@@ -503,23 +503,23 @@ class ManageWorkcatEnd(ParentManage):
         values = ""
         fields = ""
         
-        cat_work_id = utils_giswater.getWidgetText(self.dlg_new_workcat, self.dlg_new_workcat.cat_work_id)
+        cat_work_id = qt_tools.getWidgetText(self.dlg_new_workcat, self.dlg_new_workcat.cat_work_id)
         if cat_work_id != "null":
             fields += 'id, '
             values += f"'{cat_work_id}', "
-        descript = utils_giswater.getWidgetText(self.dlg_new_workcat, "descript")
+        descript = qt_tools.getWidgetText(self.dlg_new_workcat, "descript")
         if descript != "null":
             fields += 'descript, '
             values += f"'{descript}', "
-        link = utils_giswater.getWidgetText(self.dlg_new_workcat, "link")
+        link = qt_tools.getWidgetText(self.dlg_new_workcat, "link")
         if link != "null":
             fields += 'link, '
             values += f"'{link}', "
-        workid_key_1 = utils_giswater.getWidgetText(self.dlg_new_workcat, "workid_key_1")
+        workid_key_1 = qt_tools.getWidgetText(self.dlg_new_workcat, "workid_key_1")
         if workid_key_1 != "null":
             fields += 'workid_key1, '
             values += f"'{workid_key_1}', "
-        workid_key_2 = utils_giswater.getWidgetText(self.dlg_new_workcat, "workid_key_2")
+        workid_key_2 = qt_tools.getWidgetText(self.dlg_new_workcat, "workid_key_2")
         if workid_key_2 != "null":
             fields += 'workid_key2, '
             values += f"'{workid_key_2}', "
@@ -549,7 +549,7 @@ class ManageWorkcatEnd(ParentManage):
                 sql = "SELECT id FROM cat_work ORDER BY id"
                 rows = self.controller.get_rows(sql)
                 if rows:
-                    utils_giswater.fillComboBox(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows)
+                    qt_tools.fillComboBox(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows)
                     aux = self.dlg_work_end.workcat_id_end.findText(str(cat_work_id))
                     self.dlg_work_end.workcat_id_end.setCurrentIndex(aux)
 

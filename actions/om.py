@@ -11,7 +11,7 @@ from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView, QLineEdit, QDateE
 from datetime import datetime
 from functools import partial
 
-from lib import utils_giswater
+from lib import qt_tools
 from .add_lot import AddNewLot
 from .manage_visit import ManageVisit
 from .manage_new_psector import ManageNewPsector
@@ -168,26 +168,26 @@ class Om(ParentAction):
         rows = self.controller.get_rows(sql)
         exist_param = False
         if type(widget) != QDateEdit:
-            if utils_giswater.getWidgetText(dialog, widget) != "":
+            if qt_tools.getWidgetText(dialog, widget) != "":
                 for row in rows:
                     if row[1] == parameter:
                         exist_param = True
                 if exist_param:
                     sql = f"UPDATE {tablename} SET value="
                     if widget.objectName() != 'edit_state_vdefault':
-                        sql += f"'{utils_giswater.getWidgetText(dialog, widget)}' WHERE parameter='{parameter}'"
+                        sql += f"'{qt_tools.getWidgetText(dialog, widget)}' WHERE parameter='{parameter}'"
                     else:
                         sql += (f"(SELECT id FROM value_state"
-                                f" WHERE name = '{utils_giswater.getWidgetText(dialog, widget)}')"
+                                f" WHERE name = '{qt_tools.getWidgetText(dialog, widget)}')"
                                 f" WHERE parameter = 'edit_state_vdefault'")
                 else:
                     sql = f"INSERT INTO {tablename} (parameter, value, cur_user)"
                     if widget.objectName() != 'edit_state_vdefault':
-                        sql += f" VALUES ('{parameter}', '{utils_giswater.getWidgetText(dialog, widget)}', current_user)"
+                        sql += f" VALUES ('{parameter}', '{qt_tools.getWidgetText(dialog, widget)}', current_user)"
                     else:
                         sql += (f" VALUES ('{parameter}',"
                                 f" (SELECT id FROM value_state"
-                                f" WHERE name ='{utils_giswater.getWidgetText(dialog, widget)}'), current_user)")
+                                f" WHERE name ='{qt_tools.getWidgetText(dialog, widget)}'), current_user)")
         else:
             for row in rows:
                 if row[1] == parameter:
@@ -206,7 +206,7 @@ class Om(ParentAction):
 
     def filter_by_text(self, table, widget_txt, tablename):
 
-        result_select = utils_giswater.getWidgetText(self.dlg_psector_mng, widget_txt)
+        result_select = qt_tools.getWidgetText(self.dlg_psector_mng, widget_txt)
         if result_select != 'null':
             expr = f" name ILIKE '%{result_select}'"
             # Refresh model with selected filter
@@ -230,8 +230,8 @@ class Om(ParentAction):
         self.widget_date_to.dateChanged.connect(partial(self.update_date_from))
 
         self.get_default_dates()
-        utils_giswater.setCalendarDate(self.dlg_selector_date, self.widget_date_from, self.from_date)
-        utils_giswater.setCalendarDate(self.dlg_selector_date, self.widget_date_to, self.to_date)
+        qt_tools.setCalendarDate(self.dlg_selector_date, self.widget_date_from, self.from_date)
+        qt_tools.setCalendarDate(self.dlg_selector_date, self.widget_date_to, self.to_date)
         self.open_dialog(self.dlg_selector_date, dlg_name="selector_date")
 
 
@@ -268,7 +268,7 @@ class Om(ParentAction):
         to_date = self.widget_date_to.date().toString('yyyy-MM-dd')
         if from_date >= to_date:
             to_date = self.widget_date_from.date().addDays(1).toString('yyyy-MM-dd')
-            utils_giswater.setCalendarDate(self.dlg_selector_date, self.widget_date_to, datetime.strptime(to_date, '%Y-%m-%d'))
+            qt_tools.setCalendarDate(self.dlg_selector_date, self.widget_date_to, datetime.strptime(to_date, '%Y-%m-%d'))
 
 
     def update_date_from(self):
@@ -278,7 +278,7 @@ class Om(ParentAction):
         to_date = self.widget_date_to.date().toString('yyyy-MM-dd')
         if to_date <= from_date:
             from_date = self.widget_date_to.date().addDays(-1).toString('yyyy-MM-dd')
-            utils_giswater.setCalendarDate(self.dlg_selector_date, self.widget_date_from, datetime.strptime(from_date, '%Y-%m-%d'))
+            qt_tools.setCalendarDate(self.dlg_selector_date, self.widget_date_from, datetime.strptime(from_date, '%Y-%m-%d'))
 
 
     def get_default_dates(self):

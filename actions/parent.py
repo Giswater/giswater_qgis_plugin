@@ -22,7 +22,7 @@ if 'nt' in sys.builtin_module_names:
 from functools import partial
 
 from .. import global_vars
-from lib import utils_giswater
+from lib import qt_tools
 from .add_layer import AddLayer
 from ..ui_manager import DialogTextUi, GwDialog, GwMainWindow
 
@@ -73,7 +73,7 @@ class ParentAction(object):
         """ Display url using the default browser """
         
         if widget is not None:           
-            url = utils_giswater.getWidgetText(dialog, widget)
+            url = qt_tools.getWidgetText(dialog, widget)
             if url == 'null':
                 url = 'http://www.giswater.org'
         else:
@@ -106,7 +106,7 @@ class ParentAction(object):
         """ Get file dialog """
         
         # Check if selected file exists. Set default value if necessary
-        file_path = utils_giswater.getWidgetText(dialog, widget)
+        file_path = qt_tools.getWidgetText(dialog, widget)
         if file_path is None or file_path == 'null' or not os.path.exists(str(file_path)): 
             folder_path = self.plugin_dir   
         else:     
@@ -119,14 +119,14 @@ class ParentAction(object):
         message = "Select file"
         folder_path, filter_ = file_dialog.getOpenFileName(parent=None, caption=self.controller.tr(message))
         if folder_path:
-            utils_giswater.setWidgetText(dialog, widget, str(folder_path))
+            qt_tools.setWidgetText(dialog, widget, str(folder_path))
                 
                 
     def get_folder_dialog(self, dialog, widget):
         """ Get folder dialog """
         
         # Check if selected folder exists. Set default value if necessary
-        folder_path = utils_giswater.getWidgetText(dialog, widget)
+        folder_path = qt_tools.getWidgetText(dialog, widget)
         if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path): 
             folder_path = os.path.expanduser("~")
 
@@ -137,7 +137,7 @@ class ParentAction(object):
         message = "Select folder"
         folder_path = file_dialog.getExistingDirectory(parent=None, caption=self.controller.tr(message), directory=folder_path)
         if folder_path:
-            utils_giswater.setWidgetText(dialog, widget, str(folder_path))
+            qt_tools.setWidgetText(dialog, widget, str(folder_path))
 
 
     def load_settings(self, dialog=None):
@@ -494,7 +494,7 @@ class ParentAction(object):
         """ Fill the QTableView by filtering through the QLineEdit"""
 
         schema_name = self.schema_name.replace('"', '')
-        query = utils_giswater.getWidgetText(dialog, text_line, return_string_null=False).lower()
+        query = qt_tools.getWidgetText(dialog, text_line, return_string_null=False).lower()
         sql = (f"SELECT * FROM {schema_name}.{tableleft} WHERE {name} NOT IN "
                f"(SELECT {tableleft}.{name} FROM {schema_name}.{tableleft}"
                f" RIGHT JOIN {schema_name}.{tableright}"
@@ -568,7 +568,7 @@ class ParentAction(object):
     def set_table_columns(self, dialog, widget, table_name, sort_order=0, isQStandardItemModel=False):
         """ Configuration of tables. Set visibility and width of columns """
 
-        widget = utils_giswater.getWidget(dialog, widget)
+        widget = qt_tools.getWidget(dialog, widget)
         if not widget:
             return
 
@@ -636,7 +636,7 @@ class ParentAction(object):
         row = self.controller.get_row(sql)
         if not row:
             return
-        utils_giswater.setWidgetText(dialog, 'lbl_vdefault_psector', row[0])
+        qt_tools.setWidgetText(dialog, 'lbl_vdefault_psector', row[0])
 
 
     def multi_rows_delete(self, widget, table_name, column_id):
@@ -1000,7 +1000,7 @@ class ParentAction(object):
         self.dlg_info.btn_accept.setVisible(False)
         self.dlg_info.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_info))
         self.dlg_info.setWindowTitle(title)
-        utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.txt_infolog, msg)
+        qt_tools.setWidgetText(self.dlg_info, self.dlg_info.txt_infolog, msg)
         self.open_dialog(self.dlg_info, dlg_name='dialog_text')
 
 
@@ -1019,9 +1019,9 @@ class ParentAction(object):
             combo = QComboBox()
             row = rows[x]
             # Populate QComboBox
-            utils_giswater.set_item_data(combo, combo_values, 1)
+            qt_tools.set_item_data(combo, combo_values, 1)
             # Set QCombobox to wanted item
-            utils_giswater.set_combo_itemData(combo, str(row[field]), 1)
+            qt_tools.set_combo_itemData(combo, str(row[field]), 1)
             # Get index and put QComboBox into QTableView at index position
             idx = qtable.model().index(x, widget_pos)
             qtable.setIndexWidget(idx, combo)

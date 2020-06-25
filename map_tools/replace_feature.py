@@ -13,7 +13,7 @@ from collections import OrderedDict
 from functools import partial
 from datetime import datetime
 
-from lib import utils_giswater
+from lib import qt_tools
 from .parent import ParentMapTool
 from ..ui_manager import FeatureReplace
 from ..ui_manager import InfoWorkcatUi
@@ -59,8 +59,8 @@ class ReplaceFeatureMapTool(ParentMapTool):
         sql = "SELECT id FROM cat_work ORDER BY id"
         rows = self.controller.get_rows(sql)
         if rows:
-            utils_giswater.fillComboBox(self.dlg_replace, self.dlg_replace.workcat_id_end, rows)
-            utils_giswater.set_autocompleter(self.dlg_replace.workcat_id_end)
+            qt_tools.fillComboBox(self.dlg_replace, self.dlg_replace.workcat_id_end, rows)
+            qt_tools.set_autocompleter(self.dlg_replace.workcat_id_end)
 
         row = self.controller.get_config('edit_workcat_end_vdefault')
         if row:
@@ -72,7 +72,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
         if row:
             self.enddate_aux = self.manage_dates(row[0]).date()
         else:
-            work_id = utils_giswater.getWidgetText(self.dlg_replace, self.dlg_replace.workcat_id_end)
+            work_id = qt_tools.getWidgetText(self.dlg_replace, self.dlg_replace.workcat_id_end)
             sql = (f"SELECT builtdate FROM cat_work "
                    f"WHERE id = '{work_id}'")
             row = self.controller.get_row(sql)
@@ -97,7 +97,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
             if self.geom_type in ('node', 'connec'):
                 sql = f"SELECT DISTINCT(id) FROM {self.cat_table} ORDER BY id"
                 rows = self.controller.get_rows(sql)
-                utils_giswater.fillComboBox(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
+                qt_tools.fillComboBox(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
 
         self.dlg_replace.feature_type.setText(feature_type)
         self.dlg_replace.feature_type_new.currentIndexChanged.connect(self.edit_change_elem_type_get_value)
@@ -109,7 +109,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
                f"AND active is True "
                f"ORDER BY id")
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_replace, "feature_type_new", rows)
+        qt_tools.fillComboBox(self.dlg_replace, "feature_type_new", rows)
 
         self.dlg_replace.btn_new_workcat.clicked.connect(partial(self.new_workcat))
         self.dlg_replace.btn_accept.clicked.connect(partial(self.get_values, self.dlg_replace))
@@ -122,7 +122,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
     def open_catalog(self):
 
         # Get feature_type
-        feature_type = utils_giswater.getWidgetText(self.dlg_replace, self.dlg_replace.feature_type_new)
+        feature_type = qt_tools.getWidgetText(self.dlg_replace, self.dlg_replace.feature_type_new)
 
         if feature_type is 'null':
             msg = "New feature type is null. Please, select a valid value."
@@ -142,7 +142,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
         if row:
             self.enddate_aux = self.manage_dates(row[0]).date()
         else:
-            work_id = utils_giswater.getWidgetText(self.dlg_replace, self.dlg_replace.workcat_id_end)
+            work_id = qt_tools.getWidgetText(self.dlg_replace, self.dlg_replace.workcat_id_end)
             sql = (f"SELECT builtdate FROM cat_work "
                    f"WHERE id = '{work_id}'")
             row = self.controller.get_row(sql)
@@ -163,7 +163,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
 
         self.dlg_new_workcat = InfoWorkcatUi()
         self.load_settings(self.dlg_new_workcat)
-        utils_giswater.setCalendarDate(self.dlg_new_workcat, self.dlg_new_workcat.builtdate, None, True)
+        qt_tools.setCalendarDate(self.dlg_new_workcat, self.dlg_new_workcat.builtdate, None, True)
 
         table_object = "cat_work"
         self.set_completer_object(table_object, self.dlg_new_workcat.cat_work_id, 'id')
@@ -182,23 +182,23 @@ class ReplaceFeatureMapTool(ParentMapTool):
         # Get values from dialog
         values = ""
         fields = ""
-        cat_work_id = utils_giswater.getWidgetText(self.dlg_new_workcat, self.dlg_new_workcat.cat_work_id)
+        cat_work_id = qt_tools.getWidgetText(self.dlg_new_workcat, self.dlg_new_workcat.cat_work_id)
         if cat_work_id != "null":
             fields += 'id, '
             values += ("'" + str(cat_work_id) + "', ")
-        descript = utils_giswater.getWidgetText(self.dlg_new_workcat, "descript")
+        descript = qt_tools.getWidgetText(self.dlg_new_workcat, "descript")
         if descript != "null":
             fields += 'descript, '
             values += ("'" + str(descript) + "', ")
-        link = utils_giswater.getWidgetText(self.dlg_new_workcat, "link")
+        link = qt_tools.getWidgetText(self.dlg_new_workcat, "link")
         if link != "null":
             fields += 'link, '
             values += ("'" + str(link) + "', ")
-        workid_key_1 = utils_giswater.getWidgetText(self.dlg_new_workcat, "workid_key_1")
+        workid_key_1 = qt_tools.getWidgetText(self.dlg_new_workcat, "workid_key_1")
         if workid_key_1 != "null":
             fields += 'workid_key1, '
             values += ("'" + str(workid_key_1) + "', ")
-        workid_key_2 = utils_giswater.getWidgetText(self.dlg_new_workcat, "workid_key_2")
+        workid_key_2 = qt_tools.getWidgetText(self.dlg_new_workcat, "workid_key_2")
         if workid_key_2 != "null":
             fields += 'workid_key2, '
             values += ("'" + str(workid_key_2) + "', ")
@@ -226,7 +226,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
                     sql = "SELECT id FROM cat_work ORDER BY id"
                     rows = self.controller.get_rows(sql)
                     if rows:
-                        utils_giswater.fillComboBox(self.dlg_replace, self.dlg_replace.workcat_id_end, rows)
+                        qt_tools.fillComboBox(self.dlg_replace, self.dlg_replace.workcat_id_end, rows)
                         current_index = self.dlg_replace.workcat_id_end.findText(str(cat_work_id))
                         self.dlg_replace.workcat_id_end.setCurrentIndex(current_index)
 
@@ -266,7 +266,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
 
     def get_values(self, dialog):
 
-        self.workcat_id_end_aux = utils_giswater.getWidgetText(dialog, dialog.workcat_id_end)
+        self.workcat_id_end_aux = qt_tools.getWidgetText(dialog, dialog.workcat_id_end)
         self.enddate_aux = dialog.enddate.date().toString('yyyy-MM-dd')
 
         # Check null values
@@ -275,8 +275,8 @@ class ReplaceFeatureMapTool(ParentMapTool):
             self.controller.show_warning(message, parameter='Workcat_id')
             return
 
-        feature_type_new = utils_giswater.getWidgetText(dialog, dialog.feature_type_new)
-        featurecat_id = utils_giswater.getWidgetText(dialog, dialog.featurecat_id)
+        feature_type_new = qt_tools.getWidgetText(dialog, dialog.feature_type_new)
+        featurecat_id = qt_tools.getWidgetText(dialog, dialog.featurecat_id)
 
         # Ask question before executing
         message = "Are you sure you want to replace selected feature with a new one?"
@@ -288,7 +288,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
             extras = f'"old_feature_id":"{self.feature_id}"'
             extras += f', "workcat_id_end":"{self.workcat_id_end_aux}"'
             extras += f', "enddate":"{self.enddate_aux}"'
-            extras += f', "keep_elements":"{utils_giswater.isChecked(dialog, "keep_elements")}"'
+            extras += f', "keep_elements":"{qt_tools.isChecked(dialog, "keep_elements")}"'
             body = self.create_body(feature=feature, extras=extras)
 
             # Execute SQL function and show result to the user
@@ -468,7 +468,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
             return
 
         # Get selected value from 2nd combobox
-        feature_type_new = utils_giswater.getWidgetText(self.dlg_replace, "feature_type_new")
+        feature_type_new = qt_tools.getWidgetText(self.dlg_replace, "feature_type_new")
 
         # When value is selected, enabled 3rd combo box
         if feature_type_new == 'null':
@@ -476,10 +476,10 @@ class ReplaceFeatureMapTool(ParentMapTool):
 
         if self.project_type == 'ws':
             # Fill 3rd combo_box-catalog_id
-            utils_giswater.setWidgetEnabled(self.dlg_replace, self.dlg_replace.featurecat_id, True)
+            qt_tools.setWidgetEnabled(self.dlg_replace, self.dlg_replace.featurecat_id, True)
             sql = (f"SELECT DISTINCT(id) "
                    f"FROM {self.cat_table} "
                    f"WHERE {self.feature_type_ws} = '{feature_type_new}'")
             rows = self.controller.get_rows(sql)
-            utils_giswater.fillComboBox(self.dlg_replace, self.dlg_replace.featurecat_id, rows)
+            qt_tools.fillComboBox(self.dlg_replace, self.dlg_replace.featurecat_id, rows)
 

@@ -18,7 +18,7 @@ import math
 import os
 import json
 
-from lib import utils_giswater
+from lib import qt_tools
 from .parent import ParentMapTool
 from ..ui_manager import Profile
 from ..ui_manager import ProfilesList
@@ -99,18 +99,18 @@ class DrawProfiles(ParentMapTool):
                "FROM om_typevalue WHERE typevalue = 'profile_papersize' "
                "ORDER BY id")
         rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_draw_profile.cmb_papersize, rows, 1)
+        qt_tools.set_item_data(self.dlg_draw_profile.cmb_papersize, rows, 1)
 
-        utils_giswater.setCalendarDate(self.dlg_draw_profile, "date", None)
+        qt_tools.setCalendarDate(self.dlg_draw_profile, "date", None)
 
         # Set parameters vdefault
-        utils_giswater.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance, '1')
-        utils_giswater.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_legend_factor, '1')
-        utils_giswater.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_x_dim, '300')
-        utils_giswater.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_y_dim, '100')
-        utils_giswater.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_horizontal, '2000')
-        utils_giswater.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_vertical, '500')
-        utils_giswater.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_title, 'Test title')
+        qt_tools.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance, '1')
+        qt_tools.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_legend_factor, '1')
+        qt_tools.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_x_dim, '300')
+        qt_tools.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_y_dim, '100')
+        qt_tools.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_horizontal, '2000')
+        qt_tools.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_vertical, '500')
+        qt_tools.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_title, 'Test title')
 
         # Show form in docker?
         self.controller.init_docker('qgis_form_docker')
@@ -136,15 +136,15 @@ class DrawProfiles(ParentMapTool):
 
         # Get parameters
         # composer = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.cmb_composer)
-        links_distance = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance)
-        legend_factor = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_legend_factor)
-        scale_to_fit =  utils_giswater.isChecked(self.dlg_draw_profile, "chk_scalte_to_fit")
-        eh = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_horizontal)
-        ev = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_vertical)
+        links_distance = qt_tools.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance)
+        legend_factor = qt_tools.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_legend_factor)
+        scale_to_fit =  qt_tools.isChecked(self.dlg_draw_profile, "chk_scalte_to_fit")
+        eh = qt_tools.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_horizontal)
+        ev = qt_tools.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_vertical)
 
-        papersize_id = utils_giswater.get_item_data(self.dlg_draw_profile, self.dlg_draw_profile.cmb_papersize, 0)
-        x_dim = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_x_dim)
-        y_dim = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_y_dim)
+        papersize_id = qt_tools.get_item_data(self.dlg_draw_profile, self.dlg_draw_profile.cmb_papersize, 0)
+        x_dim = qt_tools.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_x_dim)
+        y_dim = qt_tools.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_y_dim)
         if int(papersize_id) != 0:
             custom_dim = f'{{}}'
         else:
@@ -166,28 +166,28 @@ class DrawProfiles(ParentMapTool):
     def save_profile(self):
         """ Save profile """
 
-        profile_id = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_profile_id)
+        profile_id = qt_tools.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_profile_id)
 
         list_arc = []
         n = self.dlg_draw_profile.tbl_list_arc.count()
         for i in range(n):
             list_arc.append(int(self.dlg_draw_profile.tbl_list_arc.item(i).text()))
 
-        links_distance = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance)
-        legend_factor = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_legend_factor)
-        scale_to_fit = utils_giswater.isChecked(self.dlg_draw_profile, "chk_scalte_to_fit")
-        eh = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_horizontal)
-        ev = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_vertical)
+        links_distance = qt_tools.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance)
+        legend_factor = qt_tools.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_legend_factor)
+        scale_to_fit = qt_tools.isChecked(self.dlg_draw_profile, "chk_scalte_to_fit")
+        eh = qt_tools.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_horizontal)
+        ev = qt_tools.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_vertical)
 
-        papersize_id = utils_giswater.get_item_data(self.dlg_draw_profile, self.dlg_draw_profile.cmb_papersize, 0)
-        x_dim = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_x_dim)
-        y_dim = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_y_dim)
+        papersize_id = qt_tools.get_item_data(self.dlg_draw_profile, self.dlg_draw_profile.cmb_papersize, 0)
+        x_dim = qt_tools.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_x_dim)
+        y_dim = qt_tools.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_y_dim)
         if int(papersize_id) != 0:
             custom_dim = f'{{}}'
         else:
             custom_dim = f'{{"xdim":{x_dim}, "ydim":{y_dim}}}'
-        title = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_title)
-        date = utils_giswater.getCalendarDate(self.dlg_draw_profile, self.dlg_draw_profile.date, date_format='dd/MM/yyyy')
+        title = qt_tools.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_title)
+        date = qt_tools.getCalendarDate(self.dlg_draw_profile, self.dlg_draw_profile.date, date_format='dd/MM/yyyy')
 
         extras = f'"profile_id":"{profile_id}", "listArcs":"{list_arc}","initNode":"{self.initNode}", "endNode":"{self.endNode}", "composer":"mincutA4", "legendFactor":{legend_factor}, "linksDistance":{links_distance}, "scale":{{"scaleToFit":"{scale_to_fit}", "eh":{eh}, "ev":{ev}}}, "title":"{title}", "date":"{date}", "papersize":{{"id":{int(papersize_id)}, "customDim":{custom_dim}}}'
         body = self.create_body(extras=extras)
@@ -252,13 +252,13 @@ class DrawProfiles(ParentMapTool):
                 self.dlg_draw_profile.txt_min_distance.setText(str(profile['values']['linksDistance']))
                 self.dlg_draw_profile.txt_legend_factor.setText(str(profile['values']['legendFactor']))
 
-                utils_giswater.set_combo_itemData(self.dlg_draw_profile.cmb_papersize, profile['values']['papersize']['id'], 0)
+                qt_tools.set_combo_itemData(self.dlg_draw_profile.cmb_papersize, profile['values']['papersize']['id'], 0)
                 if 'customDim' in profile['values']['papersize']:
                     self.dlg_draw_profile.txt_x_dim.setText(str(profile['values']['papersize']['customDim']['xdim']))
                     self.dlg_draw_profile.txt_y_dim.setText(str(profile['values']['papersize']['customDim']['ydim']))
                 self.dlg_draw_profile.txt_title.setText(str(profile['values']['title']))
                 date = QDate.fromString(profile['values']['date'], 'dd-MM-yyyy')
-                utils_giswater.setCalendarDate(self.dlg_draw_profile, self.dlg_draw_profile.date, date)
+                qt_tools.setCalendarDate(self.dlg_draw_profile, self.dlg_draw_profile.date, date)
                 self.dlg_draw_profile.chk_scalte_to_fit.setChecked(profile['values']['scale']['scaleToFit'])
                 self.dlg_draw_profile.txt_horizontal.setText(str(profile['values']['scale']['eh']))
                 self.dlg_draw_profile.txt_vertical.setText(str(profile['values']['scale']['ev']))
@@ -750,7 +750,7 @@ class DrawProfiles(ParentMapTool):
                  horizontalalignment='center', verticalalignment='center')
 
         scale = self.profile_json['body']['data']['scale']
-        title = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_title)
+        title = qt_tools.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_title)
         if title in (None, 'null'):
             title = ''
 
@@ -758,7 +758,7 @@ class DrawProfiles(ParentMapTool):
                  title, fontsize=11, verticalalignment='center')
         plt.text(-self.fix_x * Decimal(1), self.min_top_elev - Decimal(6) * self.height_row - self.height_row / 2,
                  str(scale) + " / " + str(
-                     utils_giswater.getCalendarDate(self.dlg_draw_profile, self.dlg_draw_profile.date)), verticalalignment='center')
+                     qt_tools.getCalendarDate(self.dlg_draw_profile, self.dlg_draw_profile.date)), verticalalignment='center')
 
         # Fill table with values
         self.fill_data(0, 0, reverse)
@@ -1359,7 +1359,7 @@ class DrawProfiles(ParentMapTool):
 
     def manage_papersize(self):
 
-        id = utils_giswater.get_item_data(self.dlg_draw_profile, self.dlg_draw_profile.cmb_papersize, 0)
+        id = qt_tools.get_item_data(self.dlg_draw_profile, self.dlg_draw_profile.cmb_papersize, 0)
         if int(id) == 0:
             self.dlg_draw_profile.txt_x_dim.setText('')
             self.dlg_draw_profile.txt_y_dim.setText('')
@@ -1368,7 +1368,7 @@ class DrawProfiles(ParentMapTool):
             self.dlg_draw_profile.txt_x_dim.setStyleSheet(None)
             self.dlg_draw_profile.txt_y_dim.setStyleSheet(None)
         else:
-            dim = utils_giswater.get_item_data(self.dlg_draw_profile, self.dlg_draw_profile.cmb_papersize, 2)
+            dim = qt_tools.get_item_data(self.dlg_draw_profile, self.dlg_draw_profile.cmb_papersize, 2)
             self.dlg_draw_profile.txt_x_dim.setText(str(dim['xdim']))
             self.dlg_draw_profile.txt_y_dim.setText(str(dim['ydim']))
             self.dlg_draw_profile.txt_x_dim.setReadOnly(True)

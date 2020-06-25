@@ -24,7 +24,7 @@ import sys
 from .. import global_vars
 from .pg_dao import PgDao
 from .logger import Logger
-from lib import os_tools, utils_giswater
+from lib import os_tools, qt_tools
 from ..ui_manager import DialogTextUi, DockerUi
 
 
@@ -1695,7 +1695,7 @@ class DaoController(object):
         self.dlg_info.btn_close.clicked.connect(lambda: self.dlg_info.close())
         self.dlg_info.setWindowTitle(window_title)
         if title: self.dlg_info.lbl_text.setText(title)
-        utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.txt_infolog, msg)
+        qt_tools.setWidgetText(self.dlg_info, self.dlg_info.txt_infolog, msg)
         self.dlg_info.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.set_text_bold(self.dlg_info.txt_infolog)
         self.dlg_info.show()

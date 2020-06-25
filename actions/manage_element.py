@@ -9,7 +9,7 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView
 
 from functools import partial
 
-from lib import utils_giswater
+from lib import qt_tools
 from ..ui_manager import ElementUi
 from ..ui_manager import ElementManager
 from .parent_manage import ParentManage
@@ -64,7 +64,7 @@ class ManageElement(ParentManage):
             layer = self.iface.activeLayer()
             layer.selectByIds([feature.id()])
 
-        utils_giswater.set_regexp_date_validator(self.dlg_add_element.builtdate, self.dlg_add_element.btn_accept, 1)
+        qt_tools.set_regexp_date_validator(self.dlg_add_element.builtdate, self.dlg_add_element.btn_accept, 1)
 
         # Get layer element and save if is visible or not for restore when finish process
         layer_element = self.controller.get_layer_by_tablename("v_edit_element")
@@ -108,15 +108,15 @@ class ManageElement(ParentManage):
         # Fill combo boxes
         sql = "SELECT DISTINCT(elementtype_id), elementtype_id FROM cat_element ORDER BY elementtype_id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_add_element.element_type, rows, 1)
+        qt_tools.set_item_data(self.dlg_add_element.element_type, rows, 1)
 
         sql = "SELECT expl_id, name FROM exploitation WHERE expl_id != '0' ORDER BY name"
         rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_add_element.expl_id, rows, 1)
+        qt_tools.set_item_data(self.dlg_add_element.expl_id, rows, 1)
 
         sql = "SELECT DISTINCT(id), name FROM value_state"
         rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_add_element.state, rows, 1)
+        qt_tools.set_item_data(self.dlg_add_element.state, rows, 1)
 
         self.filter_state_type()
 
@@ -124,30 +124,30 @@ class ManageElement(ParentManage):
                " WHERE feature_type = 'ELEMENT' "
                " ORDER BY location_type")
         rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_add_element.location_type, rows, 1)
+        qt_tools.set_item_data(self.dlg_add_element.location_type, rows, 1)
 
         if rows:
-            utils_giswater.set_combo_itemData(self.dlg_add_element.location_type, rows[0][0], 0)
+            qt_tools.set_combo_itemData(self.dlg_add_element.location_type, rows[0][0], 0)
 
         sql = "SELECT DISTINCT(id), id FROM cat_owner"
         rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_add_element.ownercat_id, rows, 1, add_empty=True)
+        qt_tools.set_item_data(self.dlg_add_element.ownercat_id, rows, 1, add_empty=True)
 
         sql = "SELECT DISTINCT(id), id FROM cat_builder"
         rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_add_element.buildercat_id, rows, 1, add_empty=True)
+        qt_tools.set_item_data(self.dlg_add_element.buildercat_id, rows, 1, add_empty=True)
 
         sql = "SELECT DISTINCT(id), id FROM cat_work"
         rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_add_element.workcat_id, rows, 1, add_empty=True)
+        qt_tools.set_item_data(self.dlg_add_element.workcat_id, rows, 1, add_empty=True)
 
         sql = "SELECT DISTINCT(id), id FROM cat_work"
         rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_add_element.workcat_id_end, rows, 1, add_empty=True)
+        qt_tools.set_item_data(self.dlg_add_element.workcat_id_end, rows, 1, add_empty=True)
 
         sql = "SELECT id, idval FROM edit_typevalue WHERE typevalue = 'value_verified'"
         rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_add_element.verified, rows, 1, add_empty=True)
+        qt_tools.set_item_data(self.dlg_add_element.verified, rows, 1, add_empty=True)
         self.filter_elementcat_id()
 
         if self.new_element_id:
@@ -173,7 +173,7 @@ class ManageElement(ParentManage):
 
         # If is a new element dont need set enddate
         if self.new_element_id is True:
-            utils_giswater.setWidgetText(self.dlg_add_element, 'num_elements', '1')
+            qt_tools.setWidgetText(self.dlg_add_element, 'num_elements', '1')
 
         self.update_location_cmb()
         if not self.new_element_id:
@@ -202,29 +202,29 @@ class ManageElement(ParentManage):
 
         row = self.controller.get_config(parameter)
         if row:
-            utils_giswater.set_combo_itemData(combo, row[0], 0)
+            qt_tools.set_combo_itemData(combo, row[0], 0)
 
 
     def filter_state_type(self):
 
-        state = utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.state, 0)
+        state = qt_tools.get_item_data(self.dlg_add_element, self.dlg_add_element.state, 0)
         sql = (f"SELECT DISTINCT(id), name FROM value_state_type "
                f"WHERE state = {state}")
         rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_add_element.state_type, rows, 1)
+        qt_tools.set_item_data(self.dlg_add_element.state_type, rows, 1)
 
 
     def update_location_cmb(self):
 
-        element_type = utils_giswater.getWidgetText(self.dlg_add_element, self.dlg_add_element.element_type)
+        element_type = qt_tools.getWidgetText(self.dlg_add_element, self.dlg_add_element.element_type)
         sql = (f"SELECT location_type, location_type FROM man_type_location"
                f" WHERE feature_type = 'ELEMENT' "
                f" AND (featurecat_id = '{element_type}' OR featurecat_id is null)"
                f" ORDER BY location_type")
         rows = self.controller.get_rows(sql, log_sql=True)
-        utils_giswater.set_item_data(self.dlg_add_element.location_type, rows, add_empty=True)
+        qt_tools.set_item_data(self.dlg_add_element.location_type, rows, add_empty=True)
         if rows:
-            utils_giswater.set_combo_itemData(self.dlg_add_element.location_type, rows[0][0], 0)
+            qt_tools.set_combo_itemData(self.dlg_add_element.location_type, rows[0][0], 0)
 
 
     def fill_tbl_new_element(self, dialog, geom_type, feature_id):
@@ -247,20 +247,20 @@ class ManageElement(ParentManage):
         """ Insert or update table 'element'. Add element to selected feature """
 
         # Get values from dialog
-        element_id = utils_giswater.getWidgetText(self.dlg_add_element, "element_id", return_string_null=False)
-        code = utils_giswater.getWidgetText(self.dlg_add_element, "code", return_string_null=False)
-        elementcat_id = utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.elementcat_id)
-        ownercat_id = utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.ownercat_id)
-        location_type = utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.location_type)
-        buildercat_id = utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.buildercat_id)
-        builtdate = utils_giswater.getWidgetText(self.dlg_add_element, "builtdate", return_string_null=False)
-        workcat_id = utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.workcat_id)
-        workcat_id_end = utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.workcat_id_end)
-        comment = utils_giswater.getWidgetText(self.dlg_add_element, "comment", return_string_null=False)
-        observ = utils_giswater.getWidgetText(self.dlg_add_element, "observ", return_string_null=False)
-        link = utils_giswater.getWidgetText(self.dlg_add_element, "link", return_string_null=False)
-        verified = utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.verified)
-        rotation = utils_giswater.getWidgetText(self.dlg_add_element, "rotation")
+        element_id = qt_tools.getWidgetText(self.dlg_add_element, "element_id", return_string_null=False)
+        code = qt_tools.getWidgetText(self.dlg_add_element, "code", return_string_null=False)
+        elementcat_id = qt_tools.get_item_data(self.dlg_add_element, self.dlg_add_element.elementcat_id)
+        ownercat_id = qt_tools.get_item_data(self.dlg_add_element, self.dlg_add_element.ownercat_id)
+        location_type = qt_tools.get_item_data(self.dlg_add_element, self.dlg_add_element.location_type)
+        buildercat_id = qt_tools.get_item_data(self.dlg_add_element, self.dlg_add_element.buildercat_id)
+        builtdate = qt_tools.getWidgetText(self.dlg_add_element, "builtdate", return_string_null=False)
+        workcat_id = qt_tools.get_item_data(self.dlg_add_element, self.dlg_add_element.workcat_id)
+        workcat_id_end = qt_tools.get_item_data(self.dlg_add_element, self.dlg_add_element.workcat_id_end)
+        comment = qt_tools.getWidgetText(self.dlg_add_element, "comment", return_string_null=False)
+        observ = qt_tools.getWidgetText(self.dlg_add_element, "observ", return_string_null=False)
+        link = qt_tools.getWidgetText(self.dlg_add_element, "link", return_string_null=False)
+        verified = qt_tools.get_item_data(self.dlg_add_element, self.dlg_add_element.verified)
+        rotation = qt_tools.getWidgetText(self.dlg_add_element, "rotation")
         if rotation == 0 or rotation is None or rotation == 'null':
             rotation = '0'
         undelete = self.dlg_add_element.undelete.isChecked()
@@ -270,17 +270,17 @@ class ManageElement(ParentManage):
         if elementcat_id == '':
             self.controller.show_warning(message, parameter="elementcat_id")
             return
-        num_elements = utils_giswater.getWidgetText(self.dlg_add_element, "num_elements", return_string_null=False)
+        num_elements = qt_tools.getWidgetText(self.dlg_add_element, "num_elements", return_string_null=False)
         if num_elements == '':
             self.controller.show_warning(message, parameter="num_elements")
             return
-        state = utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.state)
+        state = qt_tools.get_item_data(self.dlg_add_element, self.dlg_add_element.state)
         if state == '':
             self.controller.show_warning(message, parameter="state_id")
             return            
 
-        state_type = utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.state_type)
-        expl_id = utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.expl_id)
+        state_type = qt_tools.get_item_data(self.dlg_add_element, self.dlg_add_element.state_type)
+        expl_id = qt_tools.get_item_data(self.dlg_add_element, self.dlg_add_element.expl_id)
 
         # Get SRID
         srid = self.controller.plugin_settings_value('srid')   
@@ -435,12 +435,12 @@ class ManageElement(ParentManage):
     def filter_elementcat_id(self):
         """ Filter QComboBox @elementcat_id according QComboBox @elementtype_id """
 
-        element_type = utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.element_type, 1)
+        element_type = qt_tools.get_item_data(self.dlg_add_element, self.dlg_add_element.element_type, 1)
         sql = (f"SELECT DISTINCT(id), id FROM cat_element"
                f" WHERE elementtype_id = '{element_type}'"
                f" ORDER BY id")
         rows = self.controller.get_rows(sql, log_sql=True)
-        utils_giswater.set_item_data(self.dlg_add_element.elementcat_id, rows, 1)
+        qt_tools.set_item_data(self.dlg_add_element.elementcat_id, rows, 1)
 
 
     def edit_element(self):

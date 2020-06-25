@@ -17,7 +17,7 @@ from functools import partial
 if 'nt' in sys.builtin_module_names:
     import ctypes
 
-from lib import utils_giswater
+from lib import qt_tools
 from ..ui_manager import GwDialog, GwMainWindow
 
 
@@ -193,7 +193,7 @@ class TmParentAction(object):
     def set_table_columns(self, dialog, widget, table_name, project_type=None):
         """ Configuration of tables. Set visibility and width of columns """
 
-        widget = utils_giswater.getWidget(dialog, widget)
+        widget = qt_tools.getWidget(dialog, widget)
         if not widget:
             return
 
@@ -354,9 +354,9 @@ class TmParentAction(object):
             combo = QComboBox()
             combo.setSizeAdjustPolicy(2)
             # Populate QComboBox
-            utils_giswater.set_item_data(combo, combo_values, 1)
+            qt_tools.set_item_data(combo, combo_values, 1)
             # Set QCombobox to wanted item
-            utils_giswater.set_combo_itemData(combo, str(row[field]), 0)
+            qt_tools.set_combo_itemData(combo, str(row[field]), 0)
             # Get index and put QComboBox into QTableView at index position
             idx = qtable.model().index(x, combo_pos)
             qtable.setIndexWidget(idx, combo)

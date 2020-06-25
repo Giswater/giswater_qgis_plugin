@@ -9,7 +9,7 @@ from qgis.PyQt.QtCore import pyqtSignal, QObject
 
 from functools import partial
 
-from lib import utils_giswater
+from lib import qt_tools
 from .parent_manage import ParentManage
 from ..ui_manager import PsectorDuplicate
 
@@ -33,10 +33,10 @@ class DuplicatePsector(ParentManage, QObject):
         # Populate combo duplicate psector
         sql = "SELECT psector_id, name FROM plan_psector"
         rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_duplicate_psector.duplicate_psector, rows, 1)
+        qt_tools.set_item_data(self.dlg_duplicate_psector.duplicate_psector, rows, 1)
 
         # Set QComboBox with selected psector
-        utils_giswater.set_combo_itemData(self.dlg_duplicate_psector.duplicate_psector, str(psector_id), 0)
+        qt_tools.set_combo_itemData(self.dlg_duplicate_psector.duplicate_psector, str(psector_id), 0)
 
         # Set listeners
         self.dlg_duplicate_psector.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_duplicate_psector))
@@ -48,9 +48,9 @@ class DuplicatePsector(ParentManage, QObject):
 
     def duplicate_psector(self):
 
-        id_psector = utils_giswater.get_item_data(self.dlg_duplicate_psector, self.dlg_duplicate_psector.duplicate_psector, 0)
-        new_psector_name = utils_giswater.getWidgetText(self.dlg_duplicate_psector,
-                                                        self.dlg_duplicate_psector.new_psector_name)
+        id_psector = qt_tools.get_item_data(self.dlg_duplicate_psector, self.dlg_duplicate_psector.duplicate_psector, 0)
+        new_psector_name = qt_tools.getWidgetText(self.dlg_duplicate_psector,
+                                                  self.dlg_duplicate_psector.new_psector_name)
 
         # Create body
         feature = '"type":"PSECTOR"'
@@ -74,6 +74,6 @@ class DuplicatePsector(ParentManage, QObject):
         if not change_tab:
             self.close_dialog(self.dlg_duplicate_psector)
         else:
-            utils_giswater.getWidget(self.dlg_duplicate_psector, self.dlg_duplicate_psector.btn_accept).setEnabled(False)
+            qt_tools.getWidget(self.dlg_duplicate_psector, self.dlg_duplicate_psector.btn_accept).setEnabled(False)
             self.dlg_duplicate_psector.setWindowTitle(f'SUCCESS IN DUPLICATING PSECTOR')
         self.is_duplicated.emit()

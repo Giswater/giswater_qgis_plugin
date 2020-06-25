@@ -14,7 +14,7 @@ import json
 import operator
 from functools import partial
 
-from lib import utils_giswater
+from lib import qt_tools
 from .api_parent import ApiParent
 from ..ui_manager import ConfigUi
 
@@ -206,7 +206,7 @@ class ApiConfig(ApiParent):
         # Check user/role and remove tabs
         role_admin = self.controller.check_role_user("role_admin", cur_user)
         if not role_admin and cur_user not in super_users:
-            utils_giswater.remove_tab_by_tabName(self.dlg_config.tab_main, "tab_admin")
+            qt_tools.remove_tab_by_tabName(self.dlg_config.tab_main, "tab_admin")
 
         # Open form
         self.open_dialog(self.dlg_config, dlg_name='config')
@@ -417,13 +417,13 @@ class ApiConfig(ApiParent):
                 widget.addItem(record[1], record)
         if 'value' in field:
             if str(field['value']) != 'None':
-                utils_giswater.set_combo_itemData(widget, field['value'], 0)
+                qt_tools.set_combo_itemData(widget, field['value'], 0)
 
 
     def fill_child(self, widget):
 
         combo_parent = widget.objectName()
-        combo_id = utils_giswater.get_item_data(self.dlg_config, widget)
+        combo_id = qt_tools.get_item_data(self.dlg_config, widget)
         # TODO cambiar por gw_fct_getchilds
         sql = f"SELECT gw_fct_getcombochilds('config' ,'' ,'' ,'{combo_parent}', '{combo_id}','')"
         row = self.controller.get_row(sql, log_sql=True)
@@ -469,22 +469,22 @@ class ApiConfig(ApiParent):
         elem['chk'] = str(chk.objectName())
 
         if type(widget) is QLineEdit:
-            value = utils_giswater.getWidgetText(self.dlg_config, widget, return_string_null=False)
+            value = qt_tools.getWidgetText(self.dlg_config, widget, return_string_null=False)
             elem['widget_type'] = 'text'
         elif type(widget) is QComboBox:
-            value = utils_giswater.get_item_data(self.dlg_config, widget, 0)
+            value = qt_tools.get_item_data(self.dlg_config, widget, 0)
             elem['widget_type'] = 'combo'
         elif type(widget) is QCheckBox:
-            value = utils_giswater.isChecked(self.dlg_config, chk)
+            value = qt_tools.isChecked(self.dlg_config, chk)
             elem['widget_type'] = 'check'
         elif type(widget) is QDateEdit:
-            value = utils_giswater.getCalendarDate(self.dlg_config, widget)
+            value = qt_tools.getCalendarDate(self.dlg_config, widget)
             elem['widget_type'] = 'datetime'
         elif type(widget) is QgsDateTimeEdit:
-            value = utils_giswater.getCalendarDate(self.dlg_config, widget)
+            value = qt_tools.getCalendarDate(self.dlg_config, widget)
             elem['widget_type'] = 'datetime'
             
-        elem['isChecked'] = str(utils_giswater.isChecked(self.dlg_config, chk))
+        elem['isChecked'] = str(qt_tools.isChecked(self.dlg_config, chk))
         elem['value'] = value
 
         self.list_update.append(elem)
@@ -494,19 +494,19 @@ class ApiConfig(ApiParent):
 
         elem = {}
         if type(widget) is QLineEdit:
-            value = utils_giswater.getWidgetText(self.dlg_config, widget, return_string_null=False)
+            value = qt_tools.getWidgetText(self.dlg_config, widget, return_string_null=False)
         elif type(widget) is QComboBox:
-            value = utils_giswater.get_item_data(self.dlg_config, widget, 0)
+            value = qt_tools.get_item_data(self.dlg_config, widget, 0)
         elif type(widget) is QCheckBox:
-            value = utils_giswater.isChecked(self.dlg_config, chk)
+            value = qt_tools.isChecked(self.dlg_config, chk)
         elif type(widget) is QDateEdit:
-            value = utils_giswater.getCalendarDate(self.dlg_config, widget)
+            value = qt_tools.getCalendarDate(self.dlg_config, widget)
         elif type(widget) is QgsDateTimeEdit:
-            value = utils_giswater.getCalendarDate(self.dlg_config, widget)
+            value = qt_tools.getCalendarDate(self.dlg_config, widget)
         if chk.isChecked():
             elem['widget'] = str(widget.objectName())
             elem['chk'] = str(chk.objectName())
-            elem['isChecked'] = str(utils_giswater.isChecked(self.dlg_config, chk))
+            elem['isChecked'] = str(qt_tools.isChecked(self.dlg_config, chk))
             elem['value'] = value
 
             self.list_update.append(elem)
@@ -517,13 +517,13 @@ class ApiConfig(ApiParent):
         elem = {}
 
         if type(widget) is QLineEdit:
-            value = utils_giswater.getWidgetText(self.dlg_config, widget, return_string_null=False)
+            value = qt_tools.getWidgetText(self.dlg_config, widget, return_string_null=False)
         elif type(widget) is QComboBox:
-            value = utils_giswater.get_item_data(self.dlg_config, widget, 0)
+            value = qt_tools.get_item_data(self.dlg_config, widget, 0)
         elif type(widget) is QCheckBox:
-            value = utils_giswater.isChecked(self.dlg_config, widget)
+            value = qt_tools.isChecked(self.dlg_config, widget)
         elif type(widget) is QDateEdit:
-            value = utils_giswater.getCalendarDate(self.dlg_config, widget)
+            value = qt_tools.getCalendarDate(self.dlg_config, widget)
 
         elem['widget'] = str(widget.objectName())
         elem['chk'] = str('')

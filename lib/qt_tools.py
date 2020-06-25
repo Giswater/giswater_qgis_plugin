@@ -5,10 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-""" Module with utility functions to interact with dialog and its widgets """
-
 from qgis.gui import QgsDateTimeEdit
-
 from qgis.PyQt.QtCore import QDate, QDateTime, QSortFilterProxyModel, QStringListModel, QTime, Qt, QRegExp
 from qgis.PyQt.QtGui import QPixmap, QDoubleValidator, QRegExpValidator
 from qgis.PyQt.QtWidgets import QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit
@@ -330,16 +327,6 @@ def fillWidget(dialog, widget, row):
             widget.setText("")
     else:
         widget.setText("")
-
-
-def set_table_selection_behavior(dialog, widget):
-    """ Set selection behavior of @widget """
-
-    if type(widget) is str or type(widget) is str:
-        widget = dialog.findChild(QWidget, widget)
-    if not widget:
-        return
-    widget.setSelectionBehavior(QAbstractItemView.SelectRows)
 
 
 def set_autocompleter(combobox, list_items=None):

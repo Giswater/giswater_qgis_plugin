@@ -12,7 +12,7 @@ from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QGrid
 
 from functools import partial
 
-from lib import utils_giswater
+from lib import qt_tools
 from .api_parent import ApiParent
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 from ..ui_manager import DimensioningUi
@@ -90,7 +90,7 @@ class ApiDimensioning(ApiParent):
             label, widget = self.set_widgets(self.dlg_dim, db_return, field)
 
             if widget.objectName() == 'id':
-                utils_giswater.setWidgetText(self.dlg_dim, widget, self.fid)
+                qt_tools.setWidgetText(self.dlg_dim, widget, self.fid)
             layout = self.dlg_dim.findChild(QGridLayout, field['layoutname'])
 
             # profilactic issue to prevent missed layouts againts db response and form
@@ -137,7 +137,7 @@ class ApiDimensioning(ApiParent):
         list_widgets = self.dlg_dim.findChildren(QLineEdit)
         for widget in list_widgets:
             widget_name = widget.property('columnname')
-            widget_value = utils_giswater.getWidgetText(self.dlg_dim, widget)
+            widget_value = qt_tools.getWidgetText(self.dlg_dim, widget)
             if widget_value == 'null':
                 continue
             fields += f'"{widget_name}":"{widget_value}", '
@@ -145,7 +145,7 @@ class ApiDimensioning(ApiParent):
         list_widgets = self.dlg_dim.findChildren(QCheckBox)
         for widget in list_widgets:
             widget_name = widget.property('columnname')
-            widget_value = f'"{utils_giswater.isChecked(self.dlg_dim, widget)}"'
+            widget_value = f'"{qt_tools.isChecked(self.dlg_dim, widget)}"'
             if widget_value == 'null':
                 continue
             fields += f'"{widget_name}":{widget_value},'
@@ -154,7 +154,7 @@ class ApiDimensioning(ApiParent):
         list_widgets = self.dlg_dim.findChildren(QComboBox)
         for widget in list_widgets:
             widget_name = widget.property('columnname')
-            widget_value = f'"{utils_giswater.get_item_data(self.dlg_dim, widget)}"'
+            widget_value = f'"{qt_tools.get_item_data(self.dlg_dim, widget)}"'
             if widget_value == 'null':
                 continue
             fields += f'"{widget_name}":{widget_value},'
@@ -284,9 +284,9 @@ class ApiDimensioning(ApiParent):
 
             depth = snapped_feat.attribute(fieldname)
             if depth:
-                utils_giswater.setText(self.dlg_dim, "depth", depth)
-            utils_giswater.setText(self.dlg_dim, "feature_id", element_id)
-            utils_giswater.setText(self.dlg_dim, "feature_type", feat_type.upper())
+                qt_tools.setText(self.dlg_dim, "depth", depth)
+            qt_tools.setText(self.dlg_dim, "feature_id", element_id)
+            qt_tools.setText(self.dlg_dim, "feature_type", feat_type.upper())
 
             self.snapper_manager.recover_snapping_options()
             self.deactivate_signals(action)
@@ -427,7 +427,7 @@ class ApiDimensioning(ApiParent):
             widget = self.set_headers(widget, field)
             widget = self.populate_table(widget, field)
             widget = self.set_columns_config(widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)
-            utils_giswater.set_qtv_config(widget)
+            qt_tools.set_qtv_config(widget)
         widget.setObjectName(widget.property('columnname'))
 
         return label, widget

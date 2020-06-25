@@ -15,7 +15,7 @@ from qgis.PyQt.QtWidgets import QPushButton, QTabWidget
 import os
 from random import randrange
 
-from lib import utils_giswater
+from lib import qt_tools
 
 
 class AddLayer(object):
@@ -297,7 +297,7 @@ class AddLayer(object):
         """
 
         change_tab = False
-        text = utils_giswater.getWidgetText(dialog, dialog.txt_infolog, return_string_null=False)
+        text = qt_tools.getWidgetText(dialog, dialog.txt_infolog, return_string_null=False)
 
         if reset_text:
             text = ""
@@ -310,7 +310,7 @@ class AddLayer(object):
                 else:
                     text += "\n"
 
-        utils_giswater.setWidgetText(dialog, 'txt_infolog', text + "\n")
+        qt_tools.setWidgetText(dialog, 'txt_infolog', text + "\n")
         qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
         if qtabwidget is not None:
             if change_tab and qtabwidget is not None:
@@ -337,7 +337,7 @@ class AddLayer(object):
 
         btn_cancel = dialog.findChild(QPushButton, 'btn_cancel')
         if btn_cancel:
-            utils_giswater.setWidgetText(dialog, btn_accept, 'Close')
+            qt_tools.setWidgetText(dialog, btn_accept, 'Close')
 
 
     def populate_vlayer(self, virtual_layer, data, layer_type, counter, group='GW Temporal Layers'):
