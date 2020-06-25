@@ -51,7 +51,6 @@ class CheckProjectResult(ApiParent):
                         "VALUES ('" + str(schema_name) + "', '" + str(table_name) + "', '" + str(
                     db_name) + "', '" + str(host_name) + "', 1, '" + str(table_user) + "');")
         status = self.controller.execute_sql(sql)
-        print(status)
         if not status:
             return False, None
 
