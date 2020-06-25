@@ -294,7 +294,7 @@
         <layer-tree-layer name="Plan psector" source="dbname='__DBNAME__' host=__HOST__ port=__PORT__ sslmode=disable key='psector_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_plan_psector&quot; (the_geom) sql=" checked="Qt::Unchecked" expanded="1" id="v_edit_plan_psector20170627152846650" providerKey="postgres">
           <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer name="Current psector" source="dbname='__DBNAME__' host=__HOST__ port=__PORT__  sslmode=disable key='psector_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;ws_415&quot;.&quot;v_plan_current_psector&quot; (the_geom) sql=" checked="Qt::Checked" expanded="1" id="v_plan_current_psector_f06a81e3_8008_44ea_88bf_a0edec25044e" providerKey="postgres">
+        <layer-tree-layer name="Current psector" source="dbname='__DBNAME__' host=__HOST__ port=__PORT__  sslmode=disable key='psector_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_plan_current_psector&quot; (the_geom) sql=" checked="Qt::Checked" expanded="1" id="v_plan_current_psector_f06a81e3_8008_44ea_88bf_a0edec25044e" providerKey="postgres">
           <customproperties/>
         </layer-tree-layer>
       </layer-tree-group>
@@ -23944,7 +23944,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyAlgorithm="0" minScale="1e+08" type="vector" styleCategories="AllStyleCategories" readOnly="0" geometry="Polygon" simplifyLocal="1" labelsEnabled="1" simplifyDrawingTol="1" refreshOnNotifyEnabled="0" hasScaleBasedVisibilityFlag="0" maxScale="100000" simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshTime="0" wkbType="MultiPolygon" refreshOnNotifyMessage="" autoRefreshEnabled="0">
       <id>v_plan_current_psector_f06a81e3_8008_44ea_88bf_a0edec25044e</id>
-      <datasource>dbname='__DBNAME__' host=__HOST__ port=__PORT__   sslmode=disable key='psector_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="ws_415"."v_plan_current_psector" (the_geom) sql=</datasource>
+      <datasource>dbname='__DBNAME__' host=__HOST__ port=__PORT__   sslmode=disable key='psector_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_plan_current_psector" (the_geom) sql=</datasource>
       <keywordList>
         <value></value>
       </keywordList>
