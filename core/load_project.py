@@ -13,9 +13,9 @@ from qgis.PyQt.QtGui import QCursor, QIcon, QPixmap
 import os
 from functools import partial
 
-from .actions.add_layer import AddLayer
-from .actions.check_project_result import CheckProjectResult
-from .actions.task_config_layer_fields import TaskConfigLayerFields
+from ..actions.add_layer import AddLayer
+from ..actions.check_project_result import CheckProjectResult
+from ..actions.task_config_layer_fields import TaskConfigLayerFields
 
 
 class LoadProject:

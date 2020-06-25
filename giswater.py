@@ -20,7 +20,7 @@ from json import JSONDecodeError
 
 from . import global_vars
 from .lib.qgis_tools import QgisTools
-from .load_project import LoadProject
+from .core.load_project import LoadProject
 from .actions.basic import Basic
 from .actions.edit import Edit
 from .actions.go2epa import Go2Epa
