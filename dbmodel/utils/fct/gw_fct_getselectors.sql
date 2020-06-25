@@ -14,7 +14,7 @@ $BODY$
 
 /*example
 
-SELECT gw_fct_getselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"currentTab":"tab_exploitation"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic" ,"filterText":""}}$$);
+SELECT gw_fct_getselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"currentTab":"tab_exploitation"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic" ,"filterText":"1"}}$$);
 SELECT gw_fct_getselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"currentTab":"tab_exploitation"}, "feature":{}, "data":{"filterText":"", "selectorType":"selector_basic"}}$$);
 
 */
@@ -38,7 +38,7 @@ v_table_id text;
 v_selector_id text;
 v_filterfromconfig text;
 v_manageall boolean;
-v_typeahead json;
+v_typeahead text;
 v_expl_x_user boolean;
 v_filter text;
 v_selectionMode text;
@@ -50,6 +50,7 @@ v_filterfrominput text;
 v_filterfromids text;
 v_fullfilter text;
 v_finalquery text;
+v_querytab text;
 
 BEGIN
 
@@ -63,14 +64,22 @@ BEGIN
 	-- Get input parameters:
 	v_selector_type := (p_data ->> 'data')::json->> 'selectorType';
 	v_currenttab := (p_data ->> 'form')::json->> 'currentTab';
+	v_filterfrominput := (p_data ->> 'data')::json->> 'filterText';
 	
 	-- get system variables:
 	v_expl_x_user = (SELECT value FROM config_param_system WHERE parameter = 'admin_exploitation_x_user');
-	
+
+	-- when typeahead only one tab is executed
+	IF v_filterfrominput IS NOT NULL OR v_filterfrominput !='' OR lower(v_filterfrominput) !='None' or lower(v_filterfrominput) != 'null' THEN
+		v_querytab = concat(' AND tabname = ', quote_literal(v_currenttab));
+	ELSE 
+		v_querytab = '';
+	END IF;
+
 	-- Start the construction of the tabs array
 	v_formTabs := '[';
 
-	FOR v_tab IN SELECT config_form_tabs.*, value FROM config_form_tabs, config_param_system WHERE formname=v_selector_type AND concat('basic_selector_', tabname) = parameter 
+	FOR v_tab IN EXECUTE 'SELECT config_form_tabs.*, value FROM config_form_tabs, config_param_system WHERE formname='||quote_literal(v_selector_type)||' AND concat(''basic_selector_'', tabname) = parameter '||(v_querytab)
 	LOOP		
 
 		-- get variables form input
@@ -105,7 +114,7 @@ BEGIN
 		END IF;
 
 		-- built filter from input (recalled from typeahead)
-		v_filterfrominput = concat (' AND ', v_table_id, '::text LIKE ''%', v_filterfrominput, '%''');
+		v_filterfrominput = concat (v_typeahead,' LIKE ''%', v_filterfrominput, '%''');
 
 		-- built full filter 
 		v_fullfilter = concat(v_filterfromids, v_filterfromconfig, v_filterfrominput);
@@ -121,6 +130,8 @@ BEGIN
 			 v_fullfilter ||' ORDER BY label) a';
 
 		EXECUTE  v_finalquery INTO v_formTabsAux;
+
+		raise notice 'v_formTabsAux %', v_formTabsAux;
 		
 
 		-- Add tab name to json
@@ -185,9 +196,9 @@ BEGIN
 	END IF;
 
 	-- Exception handling
-	--EXCEPTION WHEN OTHERS THEN
-	--GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	--RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$

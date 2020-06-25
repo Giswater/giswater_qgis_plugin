@@ -40,7 +40,7 @@ UPDATE config_param_system set parameter = 'basic_selector_tab_mincut' where par
 
 UPDATE config_param_system set value =
 '{"table":"exploitation", "selector":"selector_expl", "table_id":"expl_id",  "selector_id":"expl_id",  "label":"expl_id, '' - '', name", 
-"manageAll":true, "selectionMode":"keepPreviousUsingShift" ,  "query_filter":"AND expl_id > 0", "typeaheadFilter":{"queryText":"SELECT expl_id as id, name AS idval FROM v_edit_exploitation WHERE expl_id > 0"}}'
+"manageAll":true, "selectionMode":"keepPreviousUsingShift" ,  "query_filter":"AND expl_id > 0", "typeaheadFilter":" AND concat(expl_id, '' - '', name)"}'
 WHERE parameter = 'basic_selector_tab_exploitation';
 
 UPDATE config_param_system set value =
@@ -78,3 +78,6 @@ INSERT INTO config_typevalue(typevalue, id, idval, camelstyle, addparam)
 VALUES ('datatype_typevalue', 'text', 'text', 'text', '{"createAddfield":"TRUE"}') ON CONFLICT (typevalue, id) DO NOTHING;
 
 UPDATE config_form_tabs SET tabname ='tab_data' WHERE tabname = 'tabData';
+
+INSERT INTO sys_message (3132, 'Schema defined does not exists. Check your qgis project variable gwAddSchema');
+
