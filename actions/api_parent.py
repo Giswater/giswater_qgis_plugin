@@ -1913,9 +1913,30 @@ class ApiParent(ParentAction):
             # reload layer, zoom to layer, style mapzones and refresh canvas
             layer = self.controller.get_layer_by_tablename('v_edit_arc')
             if layer:
-                layer.dataProvider().forceReload()
-                layer.triggerRepaint()
                 self.iface.setActiveLayer(layer)
                 self.iface.zoomToActiveLayer()
             self.set_style_mapzones()
+
+        #refresh canvas
+        layer = self.controller.get_layer_by_tablename('v_edit_arc')
+        if layer:
+            layer.dataProvider().forceReload()
+            layer.triggerRepaint()
+        layer = self.controller.get_layer_by_tablename('v_edit_node')
+        if layer:
+            layer.dataProvider().forceReload()
+            layer.triggerRepaint()
+        layer = self.controller.get_layer_by_tablename('v_edit_connec')
+        if layer:
+            layer.dataProvider().forceReload()
+            layer.triggerRepaint()
+        layer = self.controller.get_layer_by_tablename('v_edit_gully')
+        if layer:
+            layer.dataProvider().forceReload()
+            layer.triggerRepaint()
+            self.refresh_map_canvas()
+        layer = self.controller.get_layer_by_tablename('v_edit_link')
+        if layer:
+            layer.dataProvider().forceReload()
+            layer.triggerRepaint()
             self.refresh_map_canvas()
