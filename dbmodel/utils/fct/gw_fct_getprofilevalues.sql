@@ -285,22 +285,10 @@ BEGIN
 	EXECUTE 'UPDATE anl_node SET descript = gw_fct_json_object_set_key(descript::json, ''ymax'', ''N/I''::text),  '||v_fymax||' = '||v_ftopelev||' - elev 
 		WHERE fid=222 AND cur_user = current_user AND '||v_fymax||' IS NULL';
 
-	-- step1: temporary code lines
-	------------------------------------------------------
-	UPDATE cat_feature_node SET isprofilesurface = false;
-	------------------------------------------------------
-
 	-- update node table setting those nodes without manhole on surface (isprofilesurface IS FALSE)
 	UPDATE anl_node SET sys_type = 'BOTTOM' FROM cat_feature_node n WHERE n.id = sys_type AND isprofilesurface IS FALSE AND fid=222 AND cur_user = current_user;
 	UPDATE anl_node SET sys_type = 'TOP-REAL' WHERE sys_type NOT IN ('BOTTOM', 'LINK') AND fid=222 AND cur_user = current_user;
 	UPDATE anl_node SET sys_type = 'TOP-ESTIM' WHERE sys_type ='TOP-REAL' AND result_id = 'estimated' AND fid=222 AND cur_user = current_user;
-
-	-- step2: temporary code lines to solve python issues in order to send all possible values
-	--------------------------------------------------------------------------------------------------------------------
-	UPDATE anl_node SET sys_type = 'TOP-ESTIM' WHERE id IN (SELECT id FROM anl_node WHERE sys_type = 'BOTTOM' LIMIT 1);
-	UPDATE anl_node SET sys_type = 'TOP-REAL' WHERE id IN (SELECT id FROM anl_node WHERE sys_type = 'BOTTOM' LIMIT 1);
-	UPDATE cat_feature_node SET isprofilesurface = true;
-	--------------------------------------------------------------------------------------------------------------------
 
 	-- setting scale key return value
 	v_scale = concat('1:',v_hs, '(',v_hstext,') - 1:',v_vs,'(',v_vstext,')');
@@ -309,14 +297,10 @@ BEGIN
 	v_vs = v_vs/1000;
 	v_hs = v_hs/1000;
 	
-	UPDATE anl_arc SET cat_geom1 = cat_geom1*v_vs, length = length*v_hs WHERE fid=222 AND cur_user = current_user;
-
-	---------- remove when fix bug pon python
-	v_hs = 1;
-	----------
+	UPDATE anl_arc SET cat_geom1 = cat_geom1/v_vs, length = length/v_hs WHERE fid=222 AND cur_user = current_user;
 	
-	EXECUTE 'UPDATE anl_node SET cat_geom1 = cat_geom1*'||v_hs||', '||v_ftopelev||' = '||v_ftopelev||'*'||v_vs||', elev = elev*'||v_vs||', '||
-	v_fymax||' = '||v_fymax||'*'||v_vs||' WHERE fid=222 AND cur_user = current_user';
+	EXECUTE 'UPDATE anl_node SET total_distance = total_distance/' || v_hs || ', cat_geom1 = cat_geom1/'||v_hs||', '||v_ftopelev||' = '||v_ftopelev||'/'||v_vs||', elev = elev/'||v_vs||', '||
+	v_fymax||' = '||v_fymax||'/'||v_vs||' WHERE fid=222 AND cur_user = current_user';
 
 	-- recover values form temp table into response (filtering by spacing certain distance of length in order to not collapse profile)
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_arc
