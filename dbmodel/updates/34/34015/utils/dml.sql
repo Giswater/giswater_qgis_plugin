@@ -79,5 +79,9 @@ VALUES ('datatype_typevalue', 'text', 'text', 'text', '{"createAddfield":"TRUE"}
 
 UPDATE config_form_tabs SET tabname ='tab_data' WHERE tabname = 'tabData';
 
-INSERT INTO sys_message (3132, 'Schema defined does not exists. Check your qgis project variable gwAddSchema');
+INSERT INTO sys_message VALUES (3132, 'Schema defined does not exists. Check your qgis project variable gwAddSchema');
 
+UPDATE sys_table SET notify_action = (replace (notify_action::text ,', "v_edit_link"', ''))::json;
+UPDATE sys_table SET notify_action = (replace (notify_action::text ,', "v_edit_vnode"', ''))::json;
+UPDATE sys_table SET notify_action = (replace (notify_action::text ,',"v_edit_link"', ''))::json;
+UPDATE sys_table SET notify_action = (replace (notify_action::text ,',"v_edit_vnode"', ''))::json;
