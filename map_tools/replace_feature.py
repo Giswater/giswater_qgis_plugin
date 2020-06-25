@@ -13,7 +13,7 @@ from collections import OrderedDict
 from functools import partial
 from datetime import datetime
 
-from .. import utils_giswater
+from lib import utils_giswater
 from .parent import ParentMapTool
 from ..ui_manager import FeatureReplace
 from ..ui_manager import InfoWorkcatUi
@@ -122,7 +122,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
     def open_catalog(self):
 
         # Get feature_type
-        feature_type = utils_giswater.getWidgetText(self.dlg_replace,self.dlg_replace.feature_type_new)
+        feature_type = utils_giswater.getWidgetText(self.dlg_replace, self.dlg_replace.feature_type_new)
 
         if feature_type is 'null':
             msg = "New feature type is null. Please, select a valid value."

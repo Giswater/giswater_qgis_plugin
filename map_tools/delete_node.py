@@ -19,7 +19,7 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import Qt, QDate
 
-from .. import utils_giswater
+from lib import utils_giswater
 from .parent import ParentMapTool
 from ..ui_manager import ArcFusionUi
 from functools import partial

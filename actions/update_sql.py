@@ -26,12 +26,12 @@ from collections import OrderedDict
 from functools import partial
 from time import sleep
 
-from .. import utils_giswater
+from lib import utils_giswater
 from .api_parent import ApiParent
 from .create_gis_project import CreateGisProject
 from .gw_task import GwTask
 from .i18n_generator import I18NGenerator
-from ..ui_manager import MainUi, InfoShowInfo, MainDbProjectUi, MainRenameProjUi, MainProjectInfoUi, \
+from ..ui_manager import MainUi, MainDbProjectUi, MainRenameProjUi, MainProjectInfoUi, \
     MainGisProjectUi, ToolboxUi, MainFields, MainVisitClass, MainVisitParam, MainSysFields, Credentials
 
 
@@ -327,11 +327,11 @@ class UpdateSQL(ApiParent):
         # Load last schema name selected and project type
         if str(self.controller.plugin_settings_value('last_project_type_selected')) != '':
             utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type,
-                str(self.controller.plugin_settings_value('last_project_type_selected')))
+                                         str(self.controller.plugin_settings_value('last_project_type_selected')))
 
         if str(self.controller.plugin_settings_value('last_schema_name_selected')) != '':
             utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name,
-                str(self.controller.plugin_settings_value('last_schema_name_selected')))
+                                         str(self.controller.plugin_settings_value('last_schema_name_selected')))
 
         if show_dialog:
             self.manage_docker()
@@ -2231,7 +2231,7 @@ class UpdateSQL(ApiParent):
         # Get project_type from previous dialog
         self.cmb_project_type = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
         utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.cmb_create_project_type,
-            self.cmb_project_type)
+                                     self.cmb_project_type)
         self.change_project_type(self.cmb_create_project_type)
 
         # Open dialog
@@ -2683,7 +2683,7 @@ class UpdateSQL(ApiParent):
         # Control if schema_version is updated to 3.2
         if str(self.project_version).replace('.','') < str(self.plugin_version).replace('.', ''):
 
-            utils_giswater.getWidget(self.dlg_readsql,self.dlg_readsql.grb_manage_addfields).setEnabled(False)
+            utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_addfields).setEnabled(False)
             utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_ui).setEnabled(False)
             utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_childviews).setEnabled(False)
             utils_giswater.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_sys_fields).setEnabled(False)
@@ -2724,7 +2724,8 @@ class UpdateSQL(ApiParent):
 
         # Create body
         feature = '"catFeature":"' + form_name + '"'
-        extras = '"multi_create":' + str(utils_giswater.isChecked(self.dlg_readsql,self.dlg_readsql.chk_multi_create)).lower() + ''
+        extras = '"multi_create":' + str(
+            utils_giswater.isChecked(self.dlg_readsql, self.dlg_readsql.chk_multi_create)).lower() + ''
         body = self.create_body(feature=feature, extras=extras)
         body = body.replace('""', 'null')
 

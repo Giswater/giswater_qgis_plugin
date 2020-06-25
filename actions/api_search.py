@@ -20,7 +20,7 @@ import sys
 from functools import partial
 
 from .. import global_vars
-from .. import utils_giswater
+from lib import utils_giswater
 from .api_cf import ApiCF
 from .manage_document import ManageDocument
 from .manage_new_psector import ManageNewPsector

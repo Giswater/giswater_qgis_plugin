@@ -6,14 +6,12 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtWidgets import QDateEdit, QLineEdit, QTableView, QAbstractItemView
-from qgis.PyQt.QtGui import QDoubleValidator
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtCore import Qt
 
-import operator
 from functools import partial
 
-from .. import utils_giswater
+from lib import utils_giswater
 from .manage_new_psector import ManageNewPsector
 from ..ui_manager import PsectorManagerUi
 from ..ui_manager import PriceManagerUi

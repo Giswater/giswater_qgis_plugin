@@ -11,8 +11,7 @@ import subprocess
 from collections import OrderedDict
 from functools import partial
 
-from lib import os_tools
-from .. import utils_giswater
+from lib import os_tools, utils_giswater
 from ..ui_manager import DlgTrace
 from .api_parent import ApiParent
 

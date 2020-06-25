@@ -4,14 +4,13 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-
 from qgis.PyQt.QtCore import Qt, QDate, QObject, QStringListModel, pyqtSignal
 from qgis.PyQt.QtWidgets import QAbstractItemView, QCompleter, QLineEdit, QTableView, QComboBox, QTabWidget, QDialogButtonBox
 from qgis.PyQt.QtSql import QSqlTableModel
 
 from functools import partial
 
-from .. import utils_giswater
+from lib import utils_giswater
 from .tm_parent_manage import TmParentManage
 from ..dao.om_visit import OmVisit
 from ..dao.om_visit_event import OmVisitEvent

@@ -9,7 +9,7 @@ import os, psycopg2, psycopg2.extras, subprocess
 
 from functools import partial
 
-from .. import utils_giswater
+from lib import utils_giswater
 from .parent import ParentAction
 from ..ui_manager import MainQtDialogUi
 

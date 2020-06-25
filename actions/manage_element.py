@@ -9,7 +9,7 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView
 
 from functools import partial
 
-from .. import utils_giswater
+from lib import utils_giswater
 from ..ui_manager import ElementUi
 from ..ui_manager import ElementManager
 from .parent_manage import ParentManage

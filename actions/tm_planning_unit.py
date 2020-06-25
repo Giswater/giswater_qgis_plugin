@@ -4,20 +4,16 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-
 # -*- coding: utf-8 -*-
-
 from qgis.core import QgsFeatureRequest
-
 from qgis.PyQt.QtCore import QStringListModel, Qt
 from qgis.PyQt.QtGui import QIntValidator
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QCompleter, QTableView
 
-
 from functools import partial
 
-from .. import utils_giswater
+from lib import utils_giswater
 from .tm_multiple_selection import TmMultipleSelection
 from .tm_parent import TmParentAction
 from ..ui_manager import PlaningUnit

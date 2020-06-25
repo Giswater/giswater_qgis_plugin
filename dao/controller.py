@@ -5,7 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsMessageLog, QgsCredentials, QgsExpressionContextUtils, QgsProject, QgsDataSourceUri
+from qgis.core import QgsMessageLog, QgsCredentials, QgsProject, QgsDataSourceUri
 from qgis.PyQt.QtCore import QCoreApplication, QRegExp, QSettings, Qt, QTranslator
 from qgis.PyQt.QtGui import QTextCharFormat, QFont
 from qgis.PyQt.QtSql import QSqlDatabase
@@ -24,8 +24,7 @@ import sys
 from .. import global_vars
 from .pg_dao import PgDao
 from .logger import Logger
-from .. import utils_giswater
-from lib import os_tools
+from lib import os_tools, utils_giswater
 from ..ui_manager import DialogTextUi, DockerUi
 
 

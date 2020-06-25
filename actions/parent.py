@@ -22,7 +22,7 @@ if 'nt' in sys.builtin_module_names:
 from functools import partial
 
 from .. import global_vars
-from .. import utils_giswater
+from lib import utils_giswater
 from .add_layer import AddLayer
 from ..ui_manager import DialogTextUi, GwDialog, GwMainWindow
 

@@ -14,7 +14,7 @@ import json
 import operator
 from functools import partial
 
-from .. import utils_giswater
+from lib import utils_giswater
 from .api_parent import ApiParent
 from ..ui_manager import ConfigUi
 

@@ -11,7 +11,7 @@ from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView, QLineEdit, QDateE
 from datetime import datetime
 from functools import partial
 
-from .. import utils_giswater
+from lib import utils_giswater
 from .add_lot import AddNewLot
 from .manage_visit import ManageVisit
 from .manage_new_psector import ManageNewPsector

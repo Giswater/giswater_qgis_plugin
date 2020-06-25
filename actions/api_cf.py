@@ -5,12 +5,12 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: latin-1 -*-
-from qgis.core import Qgis, QgsExpressionContextUtils, QgsGeometry, QgsMapToPixel, QgsPointXY, QgsProject, QgsVectorLayer
+from qgis.core import QgsGeometry, QgsMapToPixel, QgsPointXY, QgsVectorLayer
 from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint, QgsRubberBand, QgsVertexMarker
 from qgis.PyQt.QtCore import pyqtSignal, QDate, QObject, QPoint, QRegExp, QStringListModel, Qt
 from qgis.PyQt.QtGui import QColor, QCursor, QIcon, QRegExpValidator, QStandardItem, QStandardItemModel
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDockWidget, QDoubleSpinBox, \
+from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, \
     QDateEdit,QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QMenu, QPushButton, QSizePolicy, \
     QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit
 
@@ -19,7 +19,7 @@ from collections import OrderedDict
 from functools import partial
 
 from .. import global_vars
-from .. import utils_giswater
+from lib import utils_giswater
 from .api_catalog import ApiCatalog
 from .api_parent import ApiParent
 from .manage_document import ManageDocument
@@ -2126,7 +2126,7 @@ class ApiCF(ApiParent, QObject):
         """ Call button 64: om_add_visit """
 
         # Get expl_id to save it on om_visit and show the geometry of visit
-        expl_id = utils_giswater.get_item_data(self.dlg_cf, self.tab_type+'_expl_id', 0)
+        expl_id = utils_giswater.get_item_data(self.dlg_cf, self.tab_type + '_expl_id', 0)
         if expl_id == -1:
             msg = "Widget expl_id not found"
             self.controller.show_warning(msg)

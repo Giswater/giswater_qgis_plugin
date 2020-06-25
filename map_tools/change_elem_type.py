@@ -10,7 +10,7 @@ from qgis.PyQt.QtCore import Qt
 
 from functools import partial
 
-from .. import utils_giswater
+from lib import utils_giswater
 from ..ui_manager import NodeTypeChange
 from ..actions.api_catalog import ApiCatalog
 from ..actions.api_cf import ApiCF
@@ -34,7 +34,7 @@ class ChangeElemType(ParentMapTool):
     def open_catalog(self):
 
         # Get feature_type
-        feature_type = utils_giswater.getWidgetText(self.dlg_chg_node_type,self.dlg_chg_node_type.node_node_type_new)
+        feature_type = utils_giswater.getWidgetText(self.dlg_chg_node_type, self.dlg_chg_node_type.node_node_type_new)
 
         if feature_type is 'null':
             msg = "New node type is null. Please, select a valid value."

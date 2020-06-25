@@ -8,15 +8,11 @@ or (at your option) any later version.
 from qgis.core import QgsPointXY
 from qgis.gui import QgsMapToolEmitPoint, QgsMapTip
 from qgis.PyQt.QtCore import Qt, QTimer
-from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QGridLayout, QLabel, QLineEdit, QPushButton,\
-    QSizePolicy, QSpacerItem, QWidget
-
-import json
-from collections import OrderedDict
+from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QGridLayout, QLabel, QLineEdit, QSizePolicy, QSpacerItem
 
 from functools import partial
 
-from .. import utils_giswater
+from lib import utils_giswater
 from .api_parent import ApiParent
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 from ..ui_manager import DimensioningUi

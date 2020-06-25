@@ -15,7 +15,7 @@ from collections import OrderedDict
 from encodings.aliases import aliases
 from functools import partial
 
-from .. import utils_giswater
+from lib import utils_giswater
 from .api_config import ApiConfig
 from .api_manage_composer import ApiManageComposer
 from .check_project_result import CheckProjectResult
@@ -114,7 +114,7 @@ class Utils(ParentAction):
 
         cur_user = self.controller.get_current_user()
         utils_giswater.setWidgetText(self.dlg_csv, self.dlg_csv.txt_file_csv,
-            self.controller.plugin_settings_value('Csv2Pg_txt_file_csv_' + cur_user))
+                                     self.controller.plugin_settings_value('Csv2Pg_txt_file_csv_' + cur_user))
 
         unicode = self.controller.plugin_settings_value('Csv2Pg_cmb_unicode_list_' + cur_user)
         if not unicode:
@@ -132,9 +132,9 @@ class Utils(ParentAction):
 
         cur_user = self.controller.get_current_user()
         self.controller.plugin_settings_set_value("Csv2Pg_txt_file_csv_" + cur_user,
-            utils_giswater.getWidgetText(self.dlg_csv, 'txt_file_csv'))
+                                                  utils_giswater.getWidgetText(self.dlg_csv, 'txt_file_csv'))
         self.controller.plugin_settings_set_value("Csv2Pg_cmb_unicode_list_" + cur_user,
-            utils_giswater.getWidgetText(self.dlg_csv, 'cmb_unicode_list'))
+                                                  utils_giswater.getWidgetText(self.dlg_csv, 'cmb_unicode_list'))
         self.controller.plugin_settings_set_value("Csv2Pg_rb_comma_" + cur_user,
             bool(self.dlg_csv.rb_comma.isChecked()))
         self.controller.plugin_settings_set_value("Csv2Pg_rb_semicolon_" + cur_user,

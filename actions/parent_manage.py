@@ -14,7 +14,7 @@ from qgis.PyQt.QtCore import Qt, QDate, QDateTime, QStringListModel
 
 from functools import partial
 
-from .. import utils_giswater
+from lib import utils_giswater
 from .parent import ParentAction
 from .multiple_selection import MultipleSelection
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
@@ -122,7 +122,7 @@ class ParentManage(ParentAction, object):
         elif table_object == "element":
             utils_giswater.setWidgetText(dialog, "elementcat_id", "")
             utils_giswater.setWidgetText(dialog, "state", "")
-            utils_giswater.setWidgetText(dialog, "expl_id","")
+            utils_giswater.setWidgetText(dialog, "expl_id", "")
             utils_giswater.setWidgetText(dialog, "ownercat_id", "")
             utils_giswater.setWidgetText(dialog, "location_type", "")
             utils_giswater.setWidgetText(dialog, "buildercat_id", "")
@@ -142,8 +142,8 @@ class ParentManage(ParentAction, object):
         if table_object == "doc":
             
             utils_giswater.setWidgetText(dialog, "doc_type", row["doc_type"])
-            utils_giswater.setWidgetText(dialog, "observ",  row["observ"])
-            utils_giswater.setWidgetText(dialog, "path",  row["path"])
+            utils_giswater.setWidgetText(dialog, "observ", row["observ"])
+            utils_giswater.setWidgetText(dialog, "path", row["path"])
              
         elif table_object == "element":
                     

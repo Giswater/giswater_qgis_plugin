@@ -8,7 +8,7 @@ or (at your option) any later version.
 from qgis.core import QgsFeatureRequest, QgsVectorLayer, QgsExpression
 from qgis.gui import QgsMapToolEmitPoint
 from qgis.PyQt.QtCore import Qt, QDate
-from qgis.PyQt.QtWidgets import QListWidget, QListWidgetItem, QLineEdit, QAction
+from qgis.PyQt.QtWidgets import QListWidgetItem, QLineEdit, QAction
 
 from functools import partial
 from decimal import Decimal
@@ -18,7 +18,7 @@ import math
 import os
 import json
 
-from .. import utils_giswater
+from lib import utils_giswater
 from .parent import ParentMapTool
 from ..ui_manager import Profile
 from ..ui_manager import ProfilesList
@@ -757,7 +757,8 @@ class DrawProfiles(ParentMapTool):
         plt.text(-self.fix_x * Decimal(1), self.min_top_elev - Decimal(5.75) * self.height_row - self.height_row / 2,
                  title, fontsize=11, verticalalignment='center')
         plt.text(-self.fix_x * Decimal(1), self.min_top_elev - Decimal(6) * self.height_row - self.height_row / 2,
-                 str(scale) + " / " + str(utils_giswater.getCalendarDate(self.dlg_draw_profile, self.dlg_draw_profile.date)),  verticalalignment='center')
+                 str(scale) + " / " + str(
+                     utils_giswater.getCalendarDate(self.dlg_draw_profile, self.dlg_draw_profile.date)), verticalalignment='center')
 
         # Fill table with values
         self.fill_data(0, 0, reverse)

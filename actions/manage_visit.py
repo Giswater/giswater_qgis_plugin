@@ -15,7 +15,7 @@ import subprocess
 import webbrowser
 from functools import partial
 
-from .. import utils_giswater
+from lib import utils_giswater
 from ..dao.om_visit_event import OmVisitEvent
 from ..dao.om_visit import OmVisit
 from ..dao.om_visit_x_arc import OmVisitXArc

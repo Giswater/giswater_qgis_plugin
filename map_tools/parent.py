@@ -28,7 +28,7 @@ import sys
 if 'nt' in sys.builtin_module_names:
     import ctypes
 
-from .. import utils_giswater
+from lib import utils_giswater
 from .snapping_utils_v3 import SnappingConfigManager
 from ..ui_manager import GwDialog, GwMainWindow
 

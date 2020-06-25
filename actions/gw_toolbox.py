@@ -17,7 +17,7 @@ import json
 from collections import OrderedDict
 from functools import partial
 
-from .. import utils_giswater
+from lib import utils_giswater
 from .add_layer import AddLayer
 from .api_parent import ApiParent
 from ..ui_manager import ToolboxDockerUi, ToolboxUi

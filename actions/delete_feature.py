@@ -10,7 +10,7 @@ from qgis.PyQt.QtWidgets import QCompleter
 
 from functools import partial
 
-from .. import utils_giswater
+from lib import utils_giswater
 from .api_parent import ApiParent
 from ..ui_manager import FeatureDelete
 
@@ -34,7 +34,7 @@ class DeleteFeature(ApiParent):
         utils_giswater.set_item_data(self.dlg_feature_delete.feature_type, rows, 1)
 
         # Set active layer
-        layer_name = 'v_edit_' + utils_giswater.getWidgetText(self.dlg_feature_delete,self.dlg_feature_delete.feature_type).lower()
+        layer_name = 'v_edit_' + utils_giswater.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
         layer = self.controller.get_layer_by_tablename(layer_name)
         self.iface.setActiveLayer(layer)
         self.controller.set_layer_visible(layer)
@@ -188,7 +188,7 @@ class DeleteFeature(ApiParent):
         self.current_layer.removeSelection()
 
         # Set active layer
-        layer_name = 'v_edit_' + utils_giswater.getWidgetText(self.dlg_feature_delete,self.dlg_feature_delete.feature_type).lower()
+        layer_name = 'v_edit_' + utils_giswater.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
         layer = self.controller.get_layer_by_tablename(layer_name)
         self.iface.setActiveLayer(layer)
         self.controller.set_layer_visible(layer)

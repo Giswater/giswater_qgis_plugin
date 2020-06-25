@@ -15,7 +15,7 @@ from qgis.PyQt.QtWidgets import QPushButton, QTabWidget
 import os
 from random import randrange
 
-from .. import utils_giswater
+from lib import utils_giswater
 
 
 class AddLayer(object):
@@ -310,7 +310,7 @@ class AddLayer(object):
                 else:
                     text += "\n"
 
-        utils_giswater.setWidgetText(dialog, 'txt_infolog', text+"\n")
+        utils_giswater.setWidgetText(dialog, 'txt_infolog', text + "\n")
         qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
         if qtabwidget is not None:
             if change_tab and qtabwidget is not None:

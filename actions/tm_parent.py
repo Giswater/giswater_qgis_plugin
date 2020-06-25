@@ -5,7 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-
 from qgis.core import QgsExpression
 from qgis.PyQt.QtCore import QStringListModel, Qt,QDate
 from qgis.PyQt.QtGui import QCursor, QIcon, QPixmap
@@ -18,7 +17,7 @@ from functools import partial
 if 'nt' in sys.builtin_module_names:
     import ctypes
 
-from .. import utils_giswater
+from lib import utils_giswater
 from ..ui_manager import GwDialog, GwMainWindow
 
 

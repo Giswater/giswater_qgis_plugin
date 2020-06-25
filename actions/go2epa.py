@@ -5,23 +5,19 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import Qgis, QgsApplication
+from qgis.core import QgsApplication
 from qgis.PyQt.QtCore import QDate, QStringListModel, QTime,  Qt, QRegExp
 from qgis.PyQt.QtWidgets import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QComboBox, QCompleter, \
-    QFileDialog, QMessageBox
+    QFileDialog
 from qgis.PyQt.QtGui import QRegExpValidator
 
 import csv
-import json
 import os
-import re
-import subprocess
 import sys
 
-from collections import OrderedDict
 from functools import partial
 
-from .. import utils_giswater
+from lib import utils_giswater
 from .api_go2epa_options import Go2EpaOptions
 from .api_parent import ApiParent
 from .task_go2epa import TaskGo2Epa
@@ -225,21 +221,21 @@ class Go2Epa(ApiParent):
 
         cur_user = self.controller.get_current_user()
         self.controller.plugin_settings_set_value('go2epa_RESULT_NAME' + cur_user,
-            utils_giswater.getWidgetText(self.dlg_go2epa, 'txt_result_name', return_string_null=False))
+                                                  utils_giswater.getWidgetText(self.dlg_go2epa, 'txt_result_name', return_string_null=False))
         self.controller.plugin_settings_set_value('go2epa_FILE_INP' + cur_user,
-            utils_giswater.getWidgetText(self.dlg_go2epa, 'txt_file_inp', return_string_null=False))
+                                                  utils_giswater.getWidgetText(self.dlg_go2epa, 'txt_file_inp', return_string_null=False))
         self.controller.plugin_settings_set_value('go2epa_FILE_RPT' + cur_user,
-            utils_giswater.getWidgetText(self.dlg_go2epa, 'txt_file_rpt', return_string_null=False))
+                                                  utils_giswater.getWidgetText(self.dlg_go2epa, 'txt_file_rpt', return_string_null=False))
         self.controller.plugin_settings_set_value('go2epa_chk_NETWORK_GEOM' + cur_user,
-            utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check))
+                                                  utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check))
         self.controller.plugin_settings_set_value('go2epa_chk_INP' + cur_user,
-            utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export))
+                                                  utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export))
         self.controller.plugin_settings_set_value('go2epa_chk_UD' + cur_user,
-            utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch))
+                                                  utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch))
         self.controller.plugin_settings_set_value('go2epa_chk_EPA' + cur_user,
-            utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec))
+                                                  utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec))
         self.controller.plugin_settings_set_value('go2epa_chk_RPT' + cur_user,
-            utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result))
+                                                  utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result))
         
 
     def sector_selection(self, tableleft, tableright, field_id_left, field_id_right, aql=""):
@@ -605,7 +601,7 @@ class Go2Epa(ApiParent):
 
             # Populate GroupBox Selector compare
             result_id_to_comp = utils_giswater.get_item_data(self.dlg_go2epa_result,
-                self.dlg_go2epa_result.rpt_selector_result_id, 0)
+                                                             self.dlg_go2epa_result.rpt_selector_result_id, 0)
             sql = (f"SELECT DISTINCT(resultdate), resultdate FROM rpt_arc "
                    f"WHERE result_id = '{result_id_to_comp}' "
                    f"ORDER BY resultdate ")
@@ -641,7 +637,7 @@ class Go2Epa(ApiParent):
 
     def populate_date_time(self, combo_date):
 
-        result_id = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id,0)
+        result_id = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id, 0)
         sql = (f"SELECT DISTINCT(resultdate), resultdate FROM rpt_arc "
                f"WHERE result_id = '{result_id}' "
                f"ORDER BY resultdate")

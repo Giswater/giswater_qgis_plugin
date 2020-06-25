@@ -23,7 +23,7 @@ import webbrowser
 from functools import partial
 
 from .. import global_vars
-from .. import utils_giswater
+from lib import utils_giswater
 from .parent import ParentAction
 from .HyperLinkLabel import HyperLinkLabel
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager

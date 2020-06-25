@@ -12,7 +12,7 @@ from qgis.PyQt.QtGui import QDoubleValidator
 
 from functools import partial
 
-from .. import utils_giswater
+from lib import utils_giswater
 from .parent import ParentMapTool
 from ..ui_manager import AuxCircle
 

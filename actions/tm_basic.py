@@ -26,7 +26,7 @@ from ..ui.tm.tree_selector import TreeSelector
 from ..ui.tm.incident_manager import IncidentManager
 from ..ui_manager import IncidentPlanning
 from ..ui_manager import InfoIncident
-from .. import utils_giswater
+from lib import utils_giswater
 
 
 class TmBasic(TmParentAction):
@@ -1127,7 +1127,7 @@ class TmBasic(TmParentAction):
         if action == 'PROCESS':
 
             campaign_id = utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.campaign_id, 0)
-            work_id =utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.work_id, 0)
+            work_id = utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.work_id, 0)
             priority_id = utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.priority_id, 0)
             builder_id = utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.builder_id, 0)
 

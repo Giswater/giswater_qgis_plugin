@@ -5,11 +5,10 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsApplication, QgsExpression, QgsExpressionContextUtils,  QgsFeatureRequest, QgsFillSymbol, \
-    QgsLineSymbol, QgsMarkerSymbol, QgsPrintLayout, QgsProject, QgsReadWriteContext, QgsSymbol, QgsVectorLayer, \
-    QgsPointLocator, QgsPointXY, QgsSnappingConfig, QgsSnappingUtils, QgsTolerance
+from qgis.core import QgsApplication, QgsExpression, QgsFeatureRequest, QgsFillSymbol, \
+    QgsLineSymbol, QgsMarkerSymbol, QgsPrintLayout, QgsProject, QgsReadWriteContext, QgsSymbol, QgsVectorLayer
 
-from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker, QgsMapCanvas
+from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTime
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QCompleter, QDateEdit, QLineEdit, \
     QTableView, QTextEdit, QTimeEdit, QWidget
@@ -17,13 +16,13 @@ from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtXml import QDomDocument
 
-import json, operator, os, re
+import json, os
 from datetime import datetime
 from collections import OrderedDict
 from functools import partial
 
 from .gw_task import GwTask
-from .. import utils_giswater
+from lib import utils_giswater
 from .api_search import ApiSearch
 from .mincut_config import MincutConfig
 from .multiple_selection import MultipleSelection

@@ -9,7 +9,7 @@ from qgis.PyQt.QtCore import pyqtSignal, QObject
 
 from functools import partial
 
-from .. import utils_giswater
+from lib import utils_giswater
 from .parent_manage import ParentManage
 from ..ui_manager import PsectorDuplicate
 

@@ -7,7 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import QStringListModel
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtWidgets import QTableView, QMenu, QPushButton, QLineEdit, QCompleter, QAbstractItemView
+from qgis.PyQt.QtWidgets import QTableView, QPushButton, QLineEdit, QCompleter, QAbstractItemView
 
 import datetime
 import json
@@ -17,7 +17,7 @@ import subprocess
 from collections import OrderedDict
 from functools import partial
 
-from .. import utils_giswater
+from lib import utils_giswater
 from .api_parent import ApiParent
 from .parent import ParentAction
 from ..ui_manager import SelectorUi, MincutManagerUi

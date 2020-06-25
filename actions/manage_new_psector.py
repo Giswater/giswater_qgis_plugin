@@ -6,23 +6,21 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.core import QgsLayoutExporter, QgsPointXY, QgsProject, QgsRectangle
-from qgis.PyQt.QtCore import QStringListModel, Qt
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence
 from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel
-from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QCompleter, QDateEdit, QLabel
+from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QDateEdit, QLabel
 from qgis.PyQt.QtWidgets import QLineEdit, QTableView
 
 import csv
 import json
 import os
 import operator
-import subprocess
 import sys
-import webbrowser
 from collections import OrderedDict
 from functools import partial
 
-from .. import utils_giswater
+from lib import utils_giswater
 from ..ui_manager import Plan_psector
 from ..ui_manager import PsectorRapportUi
 from .parent_manage import ParentManage
@@ -403,9 +401,9 @@ class ManageNewPsector(ParentManage):
         utils_giswater.setWidgetText(self.dlg_plan_psector, 'cur_total_node', self.sys_currency['symbol'])
         utils_giswater.setWidgetText(self.dlg_plan_psector, 'cur_total_arc', self.sys_currency['symbol'])
         utils_giswater.setWidgetText(self.dlg_plan_psector, 'cur_total_other', self.sys_currency['symbol'])
-        utils_giswater.setWidgetText(self.dlg_plan_psector, 'cur_pem',  self.sys_currency['symbol'])
+        utils_giswater.setWidgetText(self.dlg_plan_psector, 'cur_pem', self.sys_currency['symbol'])
         utils_giswater.setWidgetText(self.dlg_plan_psector, 'cur_pec_pem', self.sys_currency['symbol'])
-        utils_giswater.setWidgetText(self.dlg_plan_psector, 'cur_pec',  self.sys_currency['symbol'])
+        utils_giswater.setWidgetText(self.dlg_plan_psector, 'cur_pec', self.sys_currency['symbol'])
         utils_giswater.setWidgetText(self.dlg_plan_psector, 'cur_pecvat_pem', self.sys_currency['symbol'])
         utils_giswater.setWidgetText(self.dlg_plan_psector, 'cur_pec_vat', self.sys_currency['symbol'])
         utils_giswater.setWidgetText(self.dlg_plan_psector, 'cur_pca_pecvat', self.sys_currency['symbol'])
@@ -484,13 +482,13 @@ class ManageNewPsector(ParentManage):
             self.dlg_psector_rapport.txt_path))
 
         utils_giswater.setWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path,
-            self.controller.plugin_settings_value('psector_rapport_path'))
+                                     self.controller.plugin_settings_value('psector_rapport_path'))
         utils_giswater.setChecked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_composer,
-            bool(self.controller.plugin_settings_value('psector_rapport_chk_composer')))
+                                  bool(self.controller.plugin_settings_value('psector_rapport_chk_composer')))
         utils_giswater.setChecked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv_detail,
-            self.controller.plugin_settings_value('psector_rapport_chk_csv_detail'))
+                                  self.controller.plugin_settings_value('psector_rapport_chk_csv_detail'))
         utils_giswater.setChecked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv,
-            self.controller.plugin_settings_value('psector_rapport_chk_csv'))
+                                  self.controller.plugin_settings_value('psector_rapport_chk_csv'))
         if utils_giswater.getWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path) == 'null':
             if 'nt' in sys.builtin_module_names:
                 plugin_dir = os.path.expanduser("~\Documents")
@@ -538,14 +536,14 @@ class ManageNewPsector(ParentManage):
 
     def generate_rapports(self):
         
-        self.controller.plugin_settings_set_value("psector_rapport_path", 
-            utils_giswater.getWidgetText(self.dlg_psector_rapport, 'txt_path'))
-        self.controller.plugin_settings_set_value("psector_rapport_chk_composer", 
-            utils_giswater.isChecked(self.dlg_psector_rapport, 'chk_composer'))
-        self.controller.plugin_settings_set_value("psector_rapport_chk_csv_detail", 
-            utils_giswater.isChecked(self.dlg_psector_rapport, 'chk_csv_detail'))
-        self.controller.plugin_settings_set_value("psector_rapport_chk_csv", 
-            utils_giswater.isChecked(self.dlg_psector_rapport, 'chk_csv'))
+        self.controller.plugin_settings_set_value("psector_rapport_path",
+                                                  utils_giswater.getWidgetText(self.dlg_psector_rapport, 'txt_path'))
+        self.controller.plugin_settings_set_value("psector_rapport_chk_composer",
+                                                  utils_giswater.isChecked(self.dlg_psector_rapport, 'chk_composer'))
+        self.controller.plugin_settings_set_value("psector_rapport_chk_csv_detail",
+                                                  utils_giswater.isChecked(self.dlg_psector_rapport, 'chk_csv_detail'))
+        self.controller.plugin_settings_set_value("psector_rapport_chk_csv",
+                                                  utils_giswater.isChecked(self.dlg_psector_rapport, 'chk_csv'))
         
         folder_path = utils_giswater.getWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path)
         if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path):
@@ -1072,7 +1070,7 @@ class ManageNewPsector(ParentManage):
         self.dlg_plan_psector.tabWidget.setTabEnabled(1, True)
         self.delete_psector_selector('selector_plan_psector')
         self.insert_psector_selector('selector_plan_psector', 'psector_id',
-            utils_giswater.getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id))
+                                     utils_giswater.getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id))
 
         if close_dlg:
             self.reload_states_selector()

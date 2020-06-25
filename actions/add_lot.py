@@ -18,10 +18,9 @@ import csv
 import os
 import re
 from functools import partial
-import urllib.parse
 import webbrowser
 
-from .. import utils_giswater
+from lib import utils_giswater
 from .manage_visit import ManageVisit
 from .parent_manage import ParentManage
 from ..ui_manager import LotUi
@@ -460,7 +459,7 @@ class AddNewLot(ParentManage):
         utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.txt_ot_type, item[0])
         utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.txt_wotype_id, item[2])
         utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.txt_ot_address, item[3])
-        utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.descript,  item[1])
+        utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.descript, item[1])
         utils_giswater.set_combo_itemData(self.dlg_lot.cmb_visit_class, str(item[5]), 0)
 
         # Enable/Disable visit class combo according selected OT
@@ -738,7 +737,7 @@ class AddNewLot(ParentManage):
 
         if qtable.model() is None:
             return []
-        column_index = utils_giswater.get_col_index_by_col_name(qtable, geom_type+'_id')
+        column_index = utils_giswater.get_col_index_by_col_name(qtable, geom_type + '_id')
         model = qtable.model()
 
         id_list = []
@@ -1237,7 +1236,7 @@ class AddNewLot(ParentManage):
 
         index = selected_list[0]
         row = index.row()
-        column_index = utils_giswater.get_col_index_by_col_name(qtable, feature_type+'_id')
+        column_index = utils_giswater.get_col_index_by_col_name(qtable, feature_type + '_id')
         feature_id = index.sibling(row, column_index).data()
         # expr_filter = '"{}_id" IN ({})'.format(feature_type, "'"+feature_id+"'")
         expr_filter = f"\"{feature_type}_id\" IN ('{feature_id}')"
