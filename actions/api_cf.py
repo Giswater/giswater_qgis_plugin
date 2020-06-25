@@ -389,6 +389,7 @@ class ApiCF(ApiParent, QObject):
 
 
     def open_generic_form(self, complet_result):
+
         self.draw(complet_result, zoom=False)
         self.hydro_info_dlg = InfoGenericUi()
         self.load_settings(self.hydro_info_dlg)
@@ -1133,12 +1134,15 @@ class ApiCF(ApiParent, QObject):
     def enable_actions(self, enabled):
         """ Enable actions according if layer is editable or not """
 
-        actions_list = self.dlg_cf.findChildren(QAction)
-        static_actions = ('actionEdit', 'actionCentered', 'actionZoomOut', 'actionZoom', 'actionLink', 'actionHelp',
-                          'actionSection')
-        for action in actions_list:
-            if action.objectName() not in static_actions:
-                self.enable_action(action, enabled)
+        try:
+            actions_list = self.dlg_cf.findChildren(QAction)
+            static_actions = ('actionEdit', 'actionCentered', 'actionZoomOut', 'actionZoom', 'actionLink', 'actionHelp',
+                              'actionSection')
+            for action in actions_list:
+                if action.objectName() not in static_actions:
+                    self.enable_action(action, enabled)
+        except RuntimeError:
+            pass
 
 
     def enable_action(self, action, enabled):
@@ -1150,7 +1154,7 @@ class ApiCF(ApiParent, QObject):
         functions called in ->  widget = getattr(self, f"{widget.property('datatype')}_validator")( value, widget, btn):
             def integer_validator(self, value, widget, btn_accept)
             def double_validator(self, value, widget, btn_accept)
-         """
+        """
 
         value = utils_giswater.getWidgetText(dialog, widget, return_string_null=False)
         try:
@@ -1969,7 +1973,6 @@ class ApiCF(ApiParent, QObject):
         model.setHorizontalHeaderLabels(headers)
 
         # Get values in order to populate model
-
         sql = (f"SELECT value, filetype, fextension FROM om_visit_event_photo "
                f"WHERE visit_id='{self.visit_id}' AND event_id='{self.event_id}'")
         rows = self.controller.get_rows(sql)
@@ -1980,7 +1983,7 @@ class ApiCF(ApiParent, QObject):
             item = []
             for value in row:
                 if value is not None:
-                    if type(value) != unicode:
+                    if type(value) != str:
                         item.append(QStandardItem(str(value)))
                     else:
                         item.append(QStandardItem(value))
@@ -2631,7 +2634,7 @@ class ApiCF(ApiParent, QObject):
         if not complet_list:
             return
 
-        self.dlg_new_workcat = ApiBasicInfo()
+        self.dlg_new_workcat = InfoGenericUi()
         self.load_settings(self.dlg_new_workcat)
 
         # Set signals
