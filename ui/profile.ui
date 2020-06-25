@@ -21,10 +21,20 @@
        <string>Profile</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="9" column="0">
-        <widget class="QLabel" name="lbl_min_distance">
+       <item row="4" column="0" colspan="2">
+        <widget class="QPushButton" name="btn_clear_profile">
          <property name="text">
-          <string>Min distance:</string>
+          <string>Clear profile</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0" colspan="2">
+        <widget class="QLineEdit" name="txt_profile_id"/>
+       </item>
+       <item row="9" column="1">
+        <widget class="QLineEdit" name="txt_min_distance">
+         <property name="text">
+          <string/>
          </property>
         </widget>
        </item>
@@ -41,23 +51,10 @@
        <item row="1" column="0" colspan="2">
         <widget class="QListWidget" name="tbl_list_arc"/>
        </item>
-       <item row="4" column="0" colspan="2">
-        <widget class="QPushButton" name="btn_clear_profile">
+       <item row="9" column="0">
+        <widget class="QLabel" name="lbl_min_distance">
          <property name="text">
-          <string>Clear profile</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0" colspan="2">
-        <widget class="QLineEdit" name="txt_profile_id"/>
-       </item>
-       <item row="10" column="1">
-        <widget class="QLineEdit" name="txt_legend_factor"/>
-       </item>
-       <item row="10" column="0">
-        <widget class="QLabel" name="lbl_legend_factor">
-         <property name="text">
-          <string>Legend factor:</string>
+          <string>Min distance:</string>
          </property>
         </widget>
        </item>
@@ -65,13 +62,6 @@
         <widget class="QPushButton" name="btn_load_profile">
          <property name="text">
           <string>Load profiile</string>
-         </property>
-        </widget>
-       </item>
-       <item row="9" column="1">
-        <widget class="QLineEdit" name="txt_min_distance">
-         <property name="text">
-          <string/>
          </property>
         </widget>
        </item>
@@ -84,54 +74,14 @@
        <string>Leaflet</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_3">
-       <item row="1" column="0">
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>X dim:              </string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0">
+       <item row="3" column="0">
         <widget class="QLabel" name="label_2">
          <property name="text">
           <string>Title:</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="label_3">
-         <property name="text">
-          <string>Y dim:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="9" column="0">
-        <widget class="QLabel" name="label_4">
-         <property name="text">
-          <string>Date:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLineEdit" name="txt_x_dim"/>
-       </item>
-       <item row="4" column="1">
-        <widget class="QLineEdit" name="txt_y_dim"/>
-       </item>
        <item row="6" column="1">
-        <widget class="QLineEdit" name="txt_title"/>
-       </item>
-       <item row="0" column="1">
-        <widget class="QComboBox" name="cmb_papersize"/>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_5">
-         <property name="text">
-          <string>Papersize:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="9" column="1">
         <widget class="QDateEdit" name="date">
          <property name="displayFormat">
           <string>dd/MM/yyyy</string>
@@ -140,6 +90,16 @@
           <bool>true</bool>
          </property>
         </widget>
+       </item>
+       <item row="6" column="0">
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>Date:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QLineEdit" name="txt_title"/>
        </item>
       </layout>
      </widget>
@@ -150,6 +110,9 @@
        <string>Scale</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_4">
+       <item row="1" column="1">
+        <widget class="QLineEdit" name="txt_vertical"/>
+       </item>
        <item row="1" column="0">
         <widget class="QLabel" name="lbl_vertical">
          <property name="text">
@@ -157,26 +120,13 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
-        <widget class="QLineEdit" name="txt_vertical"/>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="txt_horizontal"/>
        </item>
        <item row="0" column="0">
         <widget class="QLabel" name="lbl_horizontal">
          <property name="text">
           <string>Horitzontal:    </string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QLineEdit" name="txt_horizontal"/>
-       </item>
-       <item row="2" column="1">
-        <widget class="QCheckBox" name="chk_scalte_to_fit">
-         <property name="layoutDirection">
-          <enum>Qt::RightToLeft</enum>
-         </property>
-         <property name="text">
-          <string>Scale to fit</string>
          </property>
         </widget>
        </item>
