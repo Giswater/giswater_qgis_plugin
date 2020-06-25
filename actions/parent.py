@@ -50,7 +50,6 @@ class ParentAction(object):
         self.user_current_layer = None
         self.rubber_point = None
         self.rubber_polygon = None
-        self.current_tab = None
 
 
     def init_rubber(self):

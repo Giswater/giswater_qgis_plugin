@@ -1706,6 +1706,7 @@ class ApiParent(ParentAction):
         widget_list = dialog.main_tab.widget(index).findChildren(QCheckBox)
         selector_type = dialog.main_tab.widget(index).property('selector_type')
         widget_all = dialog.findChild(QCheckBox, f'chk_all_{selector_type}')
+
         if key_modifier == Qt.ShiftModifier:
             return
         if status is True:
@@ -1714,7 +1715,7 @@ class ApiParent(ParentAction):
                     continue
                 widget.blockSignals(True)
                 utils_giswater.setChecked(dialog, widget, True)
-                self.set_selector(dialog, widget)
+                self.set_selector(dialog, widget, False)
                 widget.blockSignals(False)
         elif status is False:
             for widget in widget_list:
@@ -1722,11 +1723,11 @@ class ApiParent(ParentAction):
                     continue
                 widget.blockSignals(True)
                 utils_giswater.setChecked(dialog, widget, False)
-                self.set_selector(dialog, widget)
+                self.set_selector(dialog, widget, False)
                 widget.blockSignals(False)
 
 
-    def get_selector(self, dialog, selector_type, filter=False, widget=None, text_filter=None):
+    def get_selector(self, dialog, selector_type, filter=False, widget=None, text_filter=None, current_tab=None):
         """ Ask to DB for selectors and make dialog
         :param dialog: Is a standard dialog, from file api_selectors.ui, where put widgets
         :param selector_type: list of selectors to ask DB ['exploitation', 'state', ...]
@@ -1743,14 +1744,14 @@ class ApiParent(ParentAction):
 
             # Set current_tab
             index = dialog.main_tab.currentIndex()
-            self.current_tab = dialog.main_tab.widget(index).objectName()
+            current_tab = dialog.main_tab.widget(index).objectName()
 
         # Profilactic control of nones
         if text_filter is None:
             text_filter = ''
 
         # built querytext
-        form = f'"currentTab":"{self.current_tab}"'
+        form = f'"currentTab":"{current_tab}"'
         extras = f'"selectorType":{selector_type}, "filterText":"{text_filter}"'
         body = self.create_body(form=form, extras=extras)
         json_result = self.controller.get_json('gw_fct_getselectors', body, log_sql=True)
@@ -1759,7 +1760,7 @@ class ApiParent(ParentAction):
 
         for form_tab in json_result['body']['form']['formTabs']:
 
-            if filter and form_tab['tabName'] != str(self.current_tab):
+            if filter and form_tab['tabName'] != str(current_tab):
                 continue
 
             selection_mode = form_tab['selectionMode']
@@ -1791,7 +1792,7 @@ class ApiParent(ParentAction):
                     utils_giswater.setWidgetText(dialog, widget, text_filter)
 
                 widget.textChanged.connect(partial(self.get_selector, self.dlg_selector, selector_type, filter=True,
-                                                   widget=widget, type=form_tab['selectorType']))
+                                                   widget=widget, current_tab=current_tab))
                 widget.setLayoutDirection(Qt.RightToLeft)
                 field['layoutname'] = gridlayout.objectName()
                 field['layoutorder'] = i
@@ -1848,22 +1849,22 @@ class ApiParent(ParentAction):
         widget_list = dialog.main_tab.widget(index).findChildren(QCheckBox)
         selector_type = dialog.main_tab.widget(index).property('selector_type')
         widget_all = dialog.findChild(QCheckBox, f'chk_all_{selector_type}')
-
+        is_alone = False
         key_modifier = QApplication.keyboardModifiers()
-
         if selection_mode == 'removePrevious':
+            is_alone = True
             if utils_giswater.isChecked(dialog, widget_all):
                 utils_giswater.setChecked(dialog, widget_all, False)
             else:
                 self.remove_previuos(dialog, widget, widget_all, widget_list)
-
         elif selection_mode == 'keepPreviousUsingShift' and key_modifier != Qt.ShiftModifier:
-            if utils_giswater.isChecked(dialog, widget_all):
-                utils_giswater.setChecked(dialog, widget_all, False)
-            else:
-                self.remove_previuos(dialog, widget, widget_all, widget_list)
+                is_alone = True
+                if utils_giswater.isChecked(dialog, widget_all):
+                    utils_giswater.setChecked(dialog, widget_all, False)
+                else:
+                    self.remove_previuos(dialog, widget, widget_all, widget_list)
 
-        self.set_selector(dialog, widget)
+        self.set_selector(dialog, widget, is_alone)
 
 
     def remove_previuos(self, dialog, widget, widget_all, widget_list):
@@ -1882,26 +1883,28 @@ class ApiParent(ParentAction):
                 elif checkbox.objectName() != widget.objectName():
                     checkbox.blockSignals(True)
                     utils_giswater.setChecked(dialog, checkbox, False)
-                    self.set_selector(dialog, checkbox)
                     checkbox.blockSignals(False)
 
             elif checkbox.objectName() != widget.objectName():
                 checkbox.blockSignals(True)
                 utils_giswater.setChecked(dialog, checkbox, False)
-                self.set_selector(dialog, checkbox)
                 checkbox.blockSignals(False)
 
 
-    def set_selector(self, dialog, widget):
+    def set_selector(self, dialog, widget, is_alone):
         """  Send values to DB and reload selectors
+        :param dialog: QDialog
         :param widget: QCheckBox that contains the information to generate the json (QCheckBox)
+        :param is_alone: Defines if the selector is unique (True) or multiple (False) (Boolean)
         """
+        # Get current tab name
         index = dialog.main_tab.currentIndex()
         tab_name = dialog.main_tab.widget(index).objectName()
+
         qgis_project_add_schema = self.controller.plugin_settings_value('gwAddSchema')
-        extras = f'"selectorType":"{widget.property("selector_type")}", "tabName":"{tab_name}", ' \
-            f'"id":"{widget.objectName()}", '
-        extras += f'"value":"{widget.isChecked()}", "addSchema":"{qgis_project_add_schema}"'
+        extras = (f'"selectorType":"{widget.property("selector_type")}", "tabName":"{tab_name}", '
+                  f'"id":"{widget.objectName()}", "isAlone":"{is_alone}", "value":"{widget.isChecked()}", '
+                  f'"addSchema":"{qgis_project_add_schema}"')
         body = self.create_body(extras=extras)
         json_result = self.controller.get_json('gw_fct_setselectors', body, log_sql=True)
 

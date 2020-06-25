@@ -45,8 +45,8 @@ class Basic(ApiParent):
         self.load_settings(self.dlg_selector)
 
         # Get the name of the last tab used by the user
-        self.current_tab = self.get_last_tab(self.dlg_selector, 'basic')
-        self.get_selector(self.dlg_selector, selector_values)
+        current_tab = self.get_last_tab(self.dlg_selector, 'basic')
+        self.get_selector(self.dlg_selector, selector_values,current_tab=current_tab)
 
         if self.controller.dlg_docker:
             self.controller.dock_dialog(self.dlg_selector)
