@@ -70,10 +70,10 @@ BEGIN
 	v_expl_x_user = (SELECT value FROM config_param_system WHERE parameter = 'admin_exploitation_x_user');
 
 	-- when typeahead only one tab is executed
-	IF v_filterfrominput IS NOT NULL OR v_filterfrominput !='' OR lower(v_filterfrominput) !='None' or lower(v_filterfrominput) != 'null' THEN
-		v_querytab = concat(' AND tabname = ', quote_literal(v_currenttab));
-	ELSE 
+	IF v_filterfrominput IS NULL OR v_filterfrominput = '' OR lower(v_filterfrominput) ='None' or lower(v_filterfrominput) = 'null' THEN
 		v_querytab = '';
+	ELSE 
+		v_querytab = concat(' AND tabname = ', quote_literal(v_currenttab));
 	END IF;
 
 	-- Start the construction of the tabs array
@@ -114,7 +114,11 @@ BEGIN
 		END IF;
 
 		-- built filter from input (recalled from typeahead)
-		v_filterfrominput = concat (v_typeahead,' LIKE ''%', v_filterfrominput, '%''');
+		IF v_filterfrominput IS NULL OR v_filterfrominput = '' OR lower(v_filterfrominput) ='None' or lower(v_filterfrominput) = 'null' THEN
+			v_filterfrominput := NULL;
+		ELSE 
+			v_filterfrominput = concat (v_typeahead,' LIKE ''%', v_filterfrominput, '%''');
+		END IF;
 
 		-- built full filter 
 		v_fullfilter = concat(v_filterfromids, v_filterfromconfig, v_filterfrominput);
@@ -130,9 +134,6 @@ BEGIN
 			 v_fullfilter ||' ORDER BY label) a';
 
 		EXECUTE  v_finalquery INTO v_formTabsAux;
-
-		raise notice 'v_formTabsAux %', v_formTabsAux;
-		
 
 		-- Add tab name to json
 		IF v_formTabsAux IS NULL THEN
