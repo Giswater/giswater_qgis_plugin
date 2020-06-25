@@ -128,18 +128,18 @@ class GwToolBox(ApiParent):
             self.temp_layers_added.remove(layer)
             # Possible QGIS bug: Instead of returning None because it is not found in the TOC, it breaks
             try:
-                demRaster = root.findLayer(layer.id())
+                dem_raster = root.findLayer(layer.id())
             except RuntimeError:
                 continue
 
-            parentGroup = demRaster.parent()
+            parent_group = dem_raster.parent()
             try:
                 QgsProject.instance().removeMapLayer(layer.id())
             except Exception:
                 pass
 
-            if len(parentGroup.findLayers())== 0:
-                root.removeChildNode(parentGroup)
+            if len(parent_group.findLayers()) == 0:
+                root.removeChildNode(parent_group)
 
         self.iface.mapCanvas().refresh()
 
@@ -281,7 +281,7 @@ class GwToolBox(ApiParent):
             extras += f'"selectionMode":"{selection_mode}",'
             # Check selection mode and get (or not get) all feature id
             feature_id_list = '"id":['
-            if (selection_mode == 'wholeSelection') or(selection_mode == 'previousSelection' and layer is None):
+            if (selection_mode == 'wholeSelection') or (selection_mode == 'previousSelection' and layer is None):
                 feature_id_list += ']'
             elif selection_mode == 'previousSelection' and layer is not None:
                 features = layer.selectedFeatures()
@@ -371,10 +371,8 @@ class GwToolBox(ApiParent):
             self.add_layer.set_layers_visible(json_result['body']['data']['setVisibleLayers'])
 
             # getting simbology capabilities
-            print('1')
             if 'setStyle' in json_result['body']['data']:
                 set_sytle = json_result['body']['data']['setStyle']
-                print(set_sytle)
                 if set_sytle == "Mapzones":
                     # call function to simbolize mapzones
                     self.set_style_mapzones()
@@ -397,8 +395,8 @@ class GwToolBox(ApiParent):
         dialog.progressBar.setFormat("")
 
         sql = f"SELECT {function_name}()::text"
-        row = self.controller.get_row(sql, log_sql=True)
-        if not row or row[0] is None:
+        row = self.controller.get_row(sql)
+        if not row or row[0] in (None, ''):
             self.controller.show_message(f"Function: {function_name} executed with no result ", 3)
             return True
 
@@ -491,7 +489,7 @@ class GwToolBox(ApiParent):
                 widget.setReadOnly(True)
                 widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
             elif type(widget) in (QCheckBox, QComboBox, QRadioButton):
-                    widget.setEnabled(False)
+                widget.setEnabled(False)
 
         dialog.grb_input_layer.setVisible(False)
         dialog.grb_selection_type.setVisible(False)
@@ -564,7 +562,8 @@ class GwToolBox(ApiParent):
                         icon = QIcon(path_icon_red)
                         label.setIcon(icon)
                         label.setForeground(QColor(255, 0, 0))
-                        msg = f"Function {function['functionname']} configured on the table config_toolbox, but not found in the database"
+                        msg = f"Function {function['functionname']}" \
+                              f" configured on the table config_toolbox, but not found in the database"
                         label.setToolTip(msg)
                         self.no_clickable_items.append(str(function['alias']))
                 else:

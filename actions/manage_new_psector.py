@@ -1299,7 +1299,7 @@ class ManageNewPsector(ParentManage):
         sql = (f"SELECT doc_id"
                f" FROM doc_x_psector"
                f" WHERE doc_id = '{doc_id}' AND psector_id = '{psector_id}'")
-        row = self.controller.get_row(sql, commit=self.autocommit)
+        row = self.controller.get_row(sql)
         if row:
             msg = "Document already exist"
             self.controller.show_warning(msg)
@@ -1308,7 +1308,7 @@ class ManageNewPsector(ParentManage):
         # Insert into new table
         sql = (f"INSERT INTO doc_x_psector (doc_id, psector_id)"
                f" VALUES ('{doc_id}', {psector_id})")
-        status = self.controller.execute_sql(sql, commit=self.autocommit)
+        status = self.controller.execute_sql(sql)
         if status:
             message = "Document inserted successfully"
             self.controller.show_info(message)

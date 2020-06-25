@@ -68,6 +68,7 @@ class ApiSearch(ApiParent):
         self.dlg_search.lbl_msg.setStyleSheet("QLabel{color:red;}")
         self.dlg_search.lbl_msg.setVisible(False)
         qgis_project_add_schema = self.controller.plugin_settings_value('gwAddSchema')
+
         self.controller.set_user_settings_value('open_search', 'true')
 
         if qgis_project_add_schema is None:
@@ -81,7 +82,7 @@ class ApiSearch(ApiParent):
             return False
 
         main_tab = self.dlg_search.findChild(QTabWidget, 'main_tab')
-        if dlg_mincut:
+        if dlg_mincut and len(complet_list["form"]) == 1:
             main_tab = self.dlg_search.findChild(QTabWidget, 'main_tab')
             main_tab.setStyleSheet("background-color: #f0f0f0;")
             main_tab.setStyleSheet("QTabBar::tab { background-color: transparent; text-align:left;"
@@ -145,7 +146,7 @@ class ApiSearch(ApiParent):
         return widget
 
 
-    def check_tab(self, completer):
+    def check_tab(self, completer, is_add_schema=False):
 
         # We look for the index of current tab so we can search by name
         index = self.dlg_search.main_tab.currentIndex()
@@ -177,12 +178,15 @@ class ApiSearch(ApiParent):
         # Get selected tab name
         tab_selected = self.dlg_search.main_tab.widget(index).objectName()
 
-        # Tab 'network'
-        if tab_selected == 'network':
-            self.controller.log_info("network")
+        #check for addschema
+        if tab_selected =='add_network':
+           is_add_schema = True
+
+        # Tab 'network or add_network'
+        if tab_selected == 'network' or tab_selected == 'add_network':
             self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, tab_type='data')
             complet_result, dialog = self.ApiCF.open_form(table_name=item['sys_table_id'], feature_id=item['sys_id'],
-                                                          tab_type='data')
+                                   tab_type='data', is_add_schema=is_add_schema)
             if not complet_result:
                 return
             self.draw(complet_result)
@@ -206,13 +210,13 @@ class ApiSearch(ApiParent):
                 message = f"Zoom unavailable. Doesn't exist the geometry for the street"
                 self.controller.show_info(message, parameter=item['display_name'])
                 
-        # Tab 'address' (postnumbers)
+        # Tab 'address'
         elif tab_selected == 'address' and 'sys_x' in item and 'sys_y' in item:
             x1 = item['sys_x']
             y1 = item['sys_y']
             point = QgsPointXY(float(x1), float(y1))
             self.draw_point(point, duration_time=5000)
-            self.zoom_to_rectangle(x1, y1, x1, y1)
+            self.zoom_to_rectangle(x1, y1, x1, y1, margin=100)
             self.canvas.refresh()
 
         # Tab 'hydro'
@@ -221,7 +225,7 @@ class ApiSearch(ApiParent):
             y1 = item['sys_y']
             point = QgsPointXY(float(x1), float(y1))
             self.draw_point(point)
-            self.zoom_to_rectangle(x1, y1, x1, y1)
+            self.zoom_to_rectangle(x1, y1, x1, y1, margin=100)
             self.open_hydrometer_dialog(table_name=item['sys_table_id'], feature_id=item['sys_id'])
 
         # Tab 'workcat'
@@ -252,7 +256,7 @@ class ApiSearch(ApiParent):
             self.resetRubberbands()
             self.draw_polygon(points, fill_color=QColor(255, 0, 255, 50))
             max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
-            self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
+            self.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin=50)
 
         # Tab 'visit'
         elif tab_selected == 'visit':
@@ -265,7 +269,7 @@ class ApiSearch(ApiParent):
             self.resetRubberbands()
             point = QgsPointXY(float(max_x), float(max_y))
             self.draw_point(point)
-            self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
+            self.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin=100)
             self.manage_visit.manage_visit(visit_id=item['sys_id'])
             self.manage_visit.dlg_add_visit.rejected.connect(self.resetRubberbands)
             return
@@ -295,7 +299,7 @@ class ApiSearch(ApiParent):
             name = utils_giswater.get_item_data(self.dlg_search, combo, 1)
             try:
                 feature_type = utils_giswater.get_item_data(self.dlg_search, combo, 2)
-                extras_search += f'"featureType":"{feature_type}", '
+                extras_search += f'"searchType":"{feature_type}", '
             except IndexError:
                 pass
             extras_search += f'"{combo.property("columnname")}":{{"id":"{id}", "name":"{name}"}}, '
@@ -412,10 +416,10 @@ class ApiSearch(ApiParent):
     def open_hydrometer_dialog(self, table_name=None, feature_id=None):
 
         # get sys variale
-        self.qgis_project_infotype = self.controller.plugin_settings_value('infoType')
+        qgis_project_infotype = self.controller.plugin_settings_value('infoType')
 
         feature = f'"tableName":"{table_name}", "id":"{feature_id}"'
-        extras = f'"infoType":"{self.qgis_project_infotype}"'
+        extras = f'"infoType":"{qgis_project_infotype}"'
         body = self.create_body(feature=feature, extras=extras)
         function_name = 'gw_fct_getinfofromid'
         json_result = self.controller.get_json(function_name, body, log_sql=True)
@@ -755,6 +759,7 @@ class ApiSearch(ApiParent):
 
         self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, tab_type='data')
         complet_result, dialog = self.ApiCF.open_form(table_name=table_name,  feature_id=feature_id, tab_type='data')
+
         # Get list of all coords in field geometry
         list_coord = re.search('\((.*)\)', str(complet_result[0]['body']['feature']['geometry']['st_astext']))
 

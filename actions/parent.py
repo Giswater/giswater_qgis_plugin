@@ -45,6 +45,7 @@ class ParentAction(object):
         self.user_current_layer = None
         self.rubber_point = None
         self.rubber_polygon = None
+        self.current_tab = None
 
 
     def init_rubber(self):
@@ -177,6 +178,28 @@ class ParentAction(object):
         self.controller.plugin_settings_set_value(dialog.objectName() + "_y", dialog.pos().y()+31)
 
 
+    def get_last_tab(self, dialog, selector_name):
+        """ Get the name of the last tab used by the user from QSettings()
+        :param dialog: QDialog
+        :param selector_name: Name of the selector (String)
+        :return: Name of the last tab used by the user (string)
+        """
+        tab_name = self.controller.plugin_settings_value(f"{dialog.objectName()}_{selector_name}")
+        return tab_name
+
+
+    def save_current_tab(self, dialog, tab_widget, selector_name):
+        """ Save the name of current tab used by the user into QSettings()
+        :param dialog: QDialog
+        :param tab_widget:  QTabWidget
+        :param selector_name: Name of the selector (String)
+        """
+        index = tab_widget.currentIndex()
+        tab_name = tab_widget.widget(index).objectName()
+        dlg_name = dialog.objectName()
+        self.controller.plugin_settings_set_value(f"{dlg_name}_{selector_name}", tab_name)
+
+
     def open_dialog(self, dlg=None, dlg_name=None, info=True, maximize_button=True, stay_on_top=True, title=None):
         """ Open dialog """
 
@@ -187,7 +210,7 @@ class ParentAction(object):
         if dlg is None or type(dlg) is bool:
             dlg = self.dlg
 
-        # set window title
+        # Set window title
         if title is not None:
             dlg.setWindowTitle(title)
         else:
@@ -1194,12 +1217,15 @@ class ParentAction(object):
 
         extras = f'"mapzones":""'
         body = self.create_body(extras=extras)
+
+        self.controller.log_info(f"SELECT gw_fct_getstylemapzones ({body})")
         json_return = self.controller.get_json('gw_fct_getstylemapzones', body)
         if not json_return:
             return False
 
         for mapzone in json_return['body']['data']['mapzones']:
 
+            self.controller.log_info(f"Mapzone: ({mapzone})")
             # Loop for each mapzone returned on json
             lyr = self.controller.get_layer_by_tablename(mapzone['layer'])
             categories = []

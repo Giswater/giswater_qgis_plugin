@@ -33,7 +33,6 @@ class ParentManage(ParentAction, object):
         self.canvas = self.iface.mapCanvas()
         self.plan_om = None
         self.previous_map_tool = None
-        self.autocommit = True
         self.lazy_widget = None
         self.workcat_id_end = None
         self.xyCoordinates_conected = False
@@ -152,7 +151,7 @@ class ParentManage(ParentAction, object):
             if row['state']:          
                 sql = (f"SELECT name FROM value_state"
                        f" WHERE id = '{row['state']}'")
-                row_aux = self.controller.get_row(sql, commit=self.autocommit)
+                row_aux = self.controller.get_row(sql)
                 if row_aux:
                     state = row_aux[0]
     
@@ -160,7 +159,7 @@ class ParentManage(ParentAction, object):
             if row['expl_id']:
                 sql = (f"SELECT name FROM exploitation"
                        f" WHERE expl_id = '{row['expl_id']}'")
-                row_aux = self.controller.get_row(sql, commit=self.autocommit)
+                row_aux = self.controller.get_row(sql)
                 if row_aux:
                     expl_id = row_aux[0]
 
@@ -283,7 +282,7 @@ class ParentManage(ParentAction, object):
         sql = (f"SELECT {field_name}"
                f" FROM {table_name}"
                f" ORDER BY {field_name}")
-        rows = self.controller.get_rows(sql, commit=self.autocommit)
+        rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(dialog, widget, rows)
         if rows:
             utils_giswater.setCurrentIndex(dialog, widget, 0)
@@ -427,7 +426,7 @@ class ParentManage(ParentAction, object):
             field_object_id = table_object + "_id"
         sql = (f"SELECT DISTINCT({field_object_id})"
                f" FROM {table_object}")
-        rows = self.controller.get_rows(sql, commit=self.autocommit)
+        rows = self.controller.get_rows(sql)
         if rows is None:
             return
 
@@ -486,7 +485,7 @@ class ParentManage(ParentAction, object):
 
         sql = (f"SELECT {geom_type}_id"
                f" FROM {viewname}")
-        row = self.controller.get_rows(sql, commit=self.autocommit)
+        row = self.controller.get_rows(sql)
         if row:
             for i in range(0, len(row)):
                 aux = row[i]
@@ -572,14 +571,14 @@ class ParentManage(ParentAction, object):
 
         # Attach model to selected widget
         if type(table_object) is str:
-            self.controller.log_info(f"set_table_model (str): {table_object}")
+            #self.controller.log_debug(f"set_table_model (str): {table_object}")
             widget = utils_giswater.getWidget(dialog, table_object)
             if not widget:
                 message = "Widget not found"
                 self.controller.log_info(message, parameter=table_object)
                 return expr
         elif type(table_object) is QTableView:
-            self.controller.log_info(f"set_table_model: {table_object.objectName()}")
+            #self.controller.log_debug(f"set_table_model: {table_object.objectName()}")
             widget = table_object
         else:
             msg = "Table_object is not a table name or QTableView"
@@ -618,6 +617,9 @@ class ParentManage(ParentAction, object):
 
     def select_features_by_ids(self, geom_type, expr):
         """ Select features of layers of group @geom_type applying @expr """
+
+        if not geom_type in self.layers:
+            return
 
         # Build a list of feature id's and select them
         for layer in self.layers[geom_type]:
@@ -758,9 +760,8 @@ class ParentManage(ParentAction, object):
 
         if self.geom_type == 'all':
             self.geom_type = 'arc'
-
-        multiple_selection = MultipleSelection(self.iface, self.controller, self.layers[self.geom_type], 
-            parent_manage=self, table_object=table_object, dialog=dialog)
+        multiple_selection = MultipleSelection(self.iface, self.controller, self.layers[self.geom_type],
+                                               parent_manage=self, table_object=table_object, dialog=dialog)
         self.disconnect_signal_selection_changed()
         self.previous_map_tool = self.canvas.mapTool()        
         self.canvas.setMapTool(multiple_selection)              
@@ -771,8 +772,6 @@ class ParentManage(ParentAction, object):
 
     def selection_changed(self, dialog, table_object, geom_type, query=False):
         """ Slot function for signal 'canvas.selectionChanged' """
-
-        self.controller.log_info(f"selection_changed: {geom_type}")
 
         self.disconnect_signal_selection_changed()
         field_id = f"{geom_type}_id"
@@ -824,7 +823,6 @@ class ParentManage(ParentAction, object):
                 self.remove_selection()
             self.reload_qtable(dialog, geom_type)
         else:
-            self.controller.log_info("selection_changed: reload_table")
             self.reload_table(dialog, table_object, geom_type, expr_filter)
             self.apply_lazy_init(table_object)
 
@@ -850,13 +848,9 @@ class ParentManage(ParentAction, object):
         widget_table = utils_giswater.getWidget(dialog, widget_name)
         if feature_type is not None and widget_table is not None:
             if len(self.ids) > 0:
-                self.controller.log_info("enable_feature_type: False")
                 feature_type.setEnabled(False)
             else:
-                self.controller.log_info("enable_feature_type: True")
                 feature_type.setEnabled(True)
-        else:
-            self.controller.log_info("enable_feature_type: else")
 
 
     def insert_feature(self, dialog, table_object, query=False, remove_ids=True):
@@ -866,13 +860,17 @@ class ParentManage(ParentAction, object):
 
         self.disconnect_signal_selection_changed()
 
+        if self.geom_type == 'all':
+            self.tab_feature_changed(dialog, table_object)
+
         # Clear list of ids
         if remove_ids:
             self.ids = []
-        field_id = f"{self.geom_type}_id"
 
+        field_id = f"{self.geom_type}_id"
         feature_id = utils_giswater.getWidgetText(dialog, "feature_id")
         expr_filter = f"{field_id} = '{feature_id}'"
+
         # Check expression
         (is_valid, expr) = self.check_expression(expr_filter)
         if not is_valid:
@@ -1065,7 +1063,7 @@ class ParentManage(ParentAction, object):
         if answer:
             sql = (f"DELETE FROM {table_object} "
                    f"WHERE {field_object_id} IN ({list_id})")
-            self.controller.execute_sql(sql, commit=self.autocommit)
+            self.controller.execute_sql(sql)
             widget.model().select()
 
     
@@ -1140,7 +1138,6 @@ class ParentManage(ParentAction, object):
         """ Connect signal selectionChanged """
         
         try:
-            self.controller.log_info(f"connect_signal_selection_changed: {self.geom_type}")
             self.canvas.selectionChanged.connect(partial(self.selection_changed, dialog, table_object, self.geom_type, query))
         except Exception as e:
             self.controller.log_info(f"connect_signal_selection_changed: {e}")

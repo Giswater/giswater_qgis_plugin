@@ -713,11 +713,9 @@ class ApiParent(ParentAction):
 
         # Set width and alias of visible columns
         columns_to_delete = []
-        sql = (f"SELECT columnindex, width, alias, status"
-               f" FROM config_form_tableview"
-               f" WHERE tablename = '{table_name}'"
-               f" ORDER BY columnindex")
-        rows = self.controller.get_rows(sql, log_info=False)
+        sql = (f"SELECT columnindex, width, alias, status FROM config_form_tableview"
+               f" WHERE tablename = '{table_name}' ORDER BY columnindex")
+        rows = self.controller.get_rows(sql, log_info=True)
         if not rows:
             return widget
 
@@ -1691,20 +1689,30 @@ class ApiParent(ParentAction):
 
 
     def manage_all(self, dialog, widget):
-
+        key_modifier = QApplication.keyboardModifiers()
         status = utils_giswater.isChecked(dialog, widget)
         index = dialog.main_tab.currentIndex()
         widget_list = dialog.main_tab.widget(index).findChildren(QCheckBox)
+        selector_type = dialog.main_tab.widget(index).property('selector_type')
+        widget_all = dialog.findChild(QCheckBox, f'chk_all_{selector_type}')
+        if key_modifier == Qt.ShiftModifier: return
         if status is True:
             for widget in widget_list:
+                if widget == widget_all or widget.objectName() == widget_all.objectName(): continue
+                widget.blockSignals(True)
                 utils_giswater.setChecked(dialog, widget, True)
-            return
+                self.set_selector(widget)
+                widget.blockSignals(False)
         elif status is False:
             for widget in widget_list:
+                if widget == widget_all or widget.objectName() == widget_all.objectName(): continue
+                widget.blockSignals(True)
                 utils_giswater.setChecked(dialog, widget, False)
+                self.set_selector(widget)
+                widget.blockSignals(False)
 
 
-    def get_selector(self, dialog, selector_type, filter=False, widget=None, type=None):
+    def get_selector(self, dialog, selector_type, filter=False, widget=None, type=None, text_filter=None, current_tab=None):
         """ Ask to DB for selectors and make dialog
         :param dialog: Is a standard dialog, from file api_selectors.ui, where put widgets
         :param selector_type: list of selectors to ask DB ['exploitation', 'state', ...]
@@ -1714,30 +1722,43 @@ class ApiParent(ParentAction):
 
         # Set filter
         if filter is not False:
-
             main_tab = dialog.findChild(QTabWidget, 'main_tab')
-            filter = utils_giswater.getWidgetText(dialog, widget)
-            if filter in ('null', None):
-                filter = ''
-            aux_selector_type = json.loads(selector_type)
-            aux_selector_type[type]['filter'] = filter
-            aux_selector_type = json.dumps(aux_selector_type)
+            text_filter = utils_giswater.getWidgetText(dialog, widget)
+            if text_filter in ('null', None):
+                text_filter = ''
 
-        else:
-            aux_selector_type = selector_type
+            # Set current_tab
+            index = dialog.main_tab.currentIndex()
+            self.current_tab = dialog.main_tab.widget(index).objectName()
 
-        extras = f'"selector_type":{aux_selector_type}'
-        body = self.create_body(extras=extras)
-        json_result = self.controller.get_json('gw_fct_getselectors', body)
+        #profilactic control of nones
+        if text_filter is None:
+                text_filter=''
+
+        # built querytext
+        form = f'"currentTab":"{self.current_tab}"'
+        extras = f'"selectorType":{selector_type}, "filterText":"{text_filter}"'
+        body = self.create_body(form=form, extras=extras)
+        json_result = self.controller.get_json('gw_fct_getselectors', body, log_sql=True)
         if not json_result:
             return False
 
         for form_tab in json_result['body']['form']['formTabs']:
 
+            if filter and form_tab['tabName'] != str(self.current_tab):
+                continue
+
+            selection_mode = form_tab['selectionMode']
+
             # Create one tab for each form_tab and add to QTabWidget
             tab_widget = QWidget(main_tab)
             tab_widget.setObjectName(form_tab['tabName'])
-            main_tab.addTab(tab_widget, form_tab['tabLabel'])
+            tab_widget.setProperty('selector_type', form_tab['selectorType'])
+            if filter:
+                main_tab.removeTab(index)
+                main_tab.insertTab(index, tab_widget, form_tab['tabLabel'])
+            else:
+                main_tab.addTab(tab_widget, form_tab['tabLabel'])
 
             # Create a new QGridLayout and put it into tab
             gridlayout = QGridLayout()
@@ -1753,7 +1774,7 @@ class ApiParent(ParentAction):
                 widget = QLineEdit()
                 widget.setObjectName('txt_filter_' + str(form_tab['selectorType']))
                 if filter is not False:
-                    utils_giswater.setWidgetText(dialog,widget,filter)
+                    utils_giswater.setWidgetText(dialog, widget, text_filter)
 
                 widget.textChanged.connect(partial(self.get_selector, self.dlg_selector, selector_type, filter=True,
                                                    widget=widget, type=form_tab['selectorType']))
@@ -1764,20 +1785,21 @@ class ApiParent(ParentAction):
                 self.txt_filter = widget
                 self.put_widgets(dialog, field, label, widget)
                 widget.setFocus()
+
             if 'manageAll' in form_tab:
-                # if form_tab['manageAll']:
-                label = QLabel()
-                label.setObjectName('lbl_manage_all')
-                label.setText('Check all')
-                widget = QCheckBox()
-                widget.setObjectName('chk_all_' + str(form_tab['selectorType']))
-                widget.stateChanged.connect(partial(self.manage_all, dialog, widget))
-                widget.setLayoutDirection(Qt.RightToLeft)
-                field['layoutname'] = gridlayout.objectName()
-                field['layoutorder'] = i
-                i = i + 1
-                self.chk_all = widget
-                self.put_widgets(dialog, field, label, widget)
+                if (form_tab['manageAll']).lower() == 'true':
+                    label = QLabel()
+                    label.setObjectName('lbl_manage_all')
+                    label.setText('Check all')
+                    widget = QCheckBox()
+                    widget.setObjectName('chk_all_' + str(form_tab['selectorType']))
+                    widget.stateChanged.connect(partial(self.manage_all, dialog, widget))
+                    widget.setLayoutDirection(Qt.RightToLeft)
+                    field['layoutname'] = gridlayout.objectName()
+                    field['layoutorder'] = i
+                    i = i + 1
+                    self.chk_all = widget
+                    self.put_widgets(dialog, field, label, widget)
 
             for order, field in enumerate(form_tab['fields']):
                 label = QLabel()
@@ -1785,7 +1807,7 @@ class ApiParent(ParentAction):
                 label.setText(field['label'])
                 widget = self.add_checkbox(field)
                 widget.setProperty('selector_type', form_tab['selectorType'])
-                widget.stateChanged.connect(partial(self.set_selector, widget, form_tab['selectorType']))
+                widget.stateChanged.connect(partial(self.set_selection_mode, dialog, widget, selection_mode))
                 widget.setLayoutDirection(Qt.RightToLeft)
                 field['layoutname'] = gridlayout.objectName()
                 field['layoutorder'] = order + i
@@ -1793,26 +1815,79 @@ class ApiParent(ParentAction):
 
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
             gridlayout.addItem(vertical_spacer1)
-            if filter is not False:
-                main_tab.removeTab(0)
+
+            # Set last tab used by user as current tab
+            tabname = json_result['body']['form']['currentTab']
+            tab = main_tab.findChild(QWidget, tabname)
+            if tab:
+                main_tab.setCurrentWidget(tab)
 
 
-    def set_selector(self, widget, selector_type):
-        """ Send values to DB
-        :param widget: QCheckBox that has changed status
-        :param table_name: name of the table that we have to update (deprecated)
-        :param column_name: name of the column that we have to update (deprecated)
+    def set_selection_mode(self, dialog, widget, selection_mode):
+        """ Manage selection mode
+        :param dialog: QDialog where search all checkbox
+        :param widget: QCheckBox that has changed status (QCheckBox)
+        :param selection_mode: "keepPrevious", "keepPreviousUsingShift", "removePrevious" (String)
         """
+                             
+        # Get QCheckBox check all
+        index = dialog.main_tab.currentIndex()
+        widget_list = dialog.main_tab.widget(index).findChildren(QCheckBox)
+        selector_type = dialog.main_tab.widget(index).property('selector_type')
+        widget_all = dialog.findChild(QCheckBox, f'chk_all_{selector_type}')
+        key_modifier = QApplication.keyboardModifiers()
 
-        qgis_project_add_schema = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('gwAddSchema')
-        extras = f'"selectorType":"{widget.property("selector_type")}", "id":"{widget.objectName()}", '
+        if selection_mode == 'removePrevious':
+            if utils_giswater.isChecked(dialog, widget_all):
+                utils_giswater.setChecked(dialog, widget_all, False)
+            else:
+                self.remove_previuos(dialog, widget, widget_all, widget_list)
+                
+        elif selection_mode == 'keepPreviousUsingShift' and key_modifier != Qt.ShiftModifier:
+            if utils_giswater.isChecked(dialog, widget_all):
+                utils_giswater.setChecked(dialog, widget_all, False)
+            else:
+                self.remove_previuos(dialog, widget, widget_all, widget_list)
+
+        self.set_selector(widget)
+
+
+    def remove_previuos(self, dialog, widget, widget_all, widget_list):
+        """ Remove checks of not selected QCheckBox
+        :param dialog: QDialog
+        :param widget: QCheckBox that has changed status (QCheckBox)
+        :param widget_all: QCheckBox that handles global selection (QCheckBox)
+        :param widget_list: List of all QCheckBox in the current tab ([QCheckBox,QCheckBox,...])
+        """
+                             
+        for checkbox in widget_list:
+            if checkbox == widget_all or checkbox.objectName() == widget_all.objectName(): continue
+            elif checkbox.objectName() != widget.objectName():
+                checkbox.blockSignals(True)
+                utils_giswater.setChecked(dialog, checkbox, False)
+                self.set_selector(checkbox)
+                checkbox.blockSignals(False)
+
+                             
+    def set_selector(self, widget):
+        """  Send values to DB and reload selectors
+        :param widget: QCheckBox that contains the information to generate the json (QCheckBox)
+        """
+                             
+        qgis_project_add_schema = self.controller.plugin_settings_value('gwAddSchema')
+        extras = f'"selectorType":"{widget.property("selector_type")}", "tabName":"{self.current_tab}", ' \
+                 f'"id":"{widget.objectName()}", '
         extras += f'"value":"{widget.isChecked()}", "addSchema":"{qgis_project_add_schema}"'
         body = self.create_body(extras=extras)
-        json_result = self.controller.get_json('gw_fct_setselectors', body)
-        if not json_result:
-            return False
+        json_result = self.controller.get_json('gw_fct_setselectors', body, log_sql=True)
 
-        if selector_type in json_result['body']['data']['indexingLayers']:
-            for layer_name in json_result['body']['data']['indexingLayers'][selector_type]:
-                self.controller.indexing_spatial_layer(layer_name)
+        if str(self.current_tab) == 'tab_exploitation':
 
+            #reload layer, zoom to layer, style mapzones and refresh canvas
+            layer = self.controller.get_layer_by_tablename('v_edit_arc')
+            if layer:
+                layer.dataProvider().forceReload()
+                self.iface.setActiveLayer(layer)
+                self.iface.zoomToActiveLayer()
+            self.set_style_mapzones()
+            self.refresh_map_canvas()
