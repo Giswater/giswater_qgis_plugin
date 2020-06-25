@@ -34,6 +34,7 @@ v_auto_pol_id text;
 v_streetaxis text;
 v_streetaxis2 text;
 v_matfromcat boolean = false;
+v_sys_type text;
 
 
 BEGIN
@@ -51,8 +52,10 @@ BEGIN
 
 	--Get data from config table	
 	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_buffer_on_mapzone');
-	SELECT ((value::json)->>'activated')::boolean INTO v_insert_double_geom FROM config_param_system WHERE parameter='insert_double_geometry';
-	SELECT ((value::json)->>'value') INTO v_double_geom_buffer FROM config_param_system WHERE parameter='insert_double_geometry';
+	SELECT ((value::json)->>'activated')::boolean INTO v_insert_double_geom FROM config_param_system WHERE parameter='edit_node_doublegeom';
+	SELECT ((value::json)->>'value') INTO v_double_geom_buffer FROM config_param_system WHERE parameter='edit_node_doublegeom';
+	v_sys_type := (SELECT type FROM cat_feature_node JOIN cat_node ON cat_node.node_type=cat_feature_node.id WHERE cat_node.id = NEW.nodecat_id);
+
 
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
 		-- transforming streetaxis name into id	
@@ -486,7 +489,7 @@ BEGIN
 				v_auto_pol_id:= (SELECT nextval('urn_id_seq'));
 
 				INSERT INTO polygon(pol_id, sys_type, the_geom) 
-				VALUES (v_auto_pol_id, NEW.node_type, (SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_double_geom_buffer))) 
+				VALUES (v_auto_pol_id, v_sys_type, (SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_double_geom_buffer))) 
 				from node where node_id=NEW.node_id));
 				
 				EXECUTE 'UPDATE '||v_man_table||' SET pol_id = '''||v_auto_pol_id||''' WHERE node_id = '''||NEW.node_id||''';';
