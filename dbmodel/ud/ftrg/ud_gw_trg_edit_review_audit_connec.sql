@@ -52,17 +52,17 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 				INSERT INTO v_edit_connec (connec_id, y1, y2, connec_type, connecat_id, annotation, observ, expl_id, the_geom, matcat_id)
 				VALUES (NEW.connec_id, NEW.new_y1, NEW.new_y2, NEW.new_connec_type, NEW.new_connecat_id, NEW.annotation, NEW.observ, NEW.expl_id, 
-				NEW.the_geom, NEW.matcat_id); 
+				NEW.the_geom, NEW.new_matcat_id); 
 		
 			ELSIF v_review_status=2 THEN
 				UPDATE v_edit_connec SET the_geom=NEW.the_geom, y1=NEW.new_y1, y2=NEW.new_y2, connecat_id=NEW.new_connecat_id, 
-				connec_type=NEW.new_connec_type, annotation=NEW.new_annotation, observ=NEW.new_observ, matcat_id=NEW.matcat_id
+				connec_type=NEW.new_connec_type, annotation=NEW.new_annotation, observ=NEW.new_observ, matcat_id=NEW.new_matcat_id
 				WHERE connec_id=NEW.connec_id;
 					
 			ELSIF v_review_status=3 THEN
 
 				UPDATE v_edit_connec SET y1=NEW.new_y1, y2=NEW.new_y2, connecat_id=NEW.new_connecat_id, connec_type=NEW.new_connec_type,
-				annotation=NEW.new_annotation, observ=NEW.new_observ, matcat_id=NEW.matcat_id
+				annotation=NEW.new_annotation, observ=NEW.new_observ, matcat_id=NEW.new_matcat_id
 				WHERE connec_id=NEW.connec_id;
 	
 			END IF;	
