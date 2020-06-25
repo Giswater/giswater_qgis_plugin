@@ -5,11 +5,11 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsEditorWidgetSetup, QgsExpressionContextUtils, QgsFieldConstraints, QgsPointLocator, \
+from qgis.core import QgsExpressionContextUtils, QgsPointLocator, \
     QgsProject, QgsSnappingUtils, QgsTolerance
-from qgis.PyQt.QtCore import QObject, QPoint, QSettings, Qt
-from qgis.PyQt.QtWidgets import QAction, QActionGroup, QApplication, QDockWidget, QMenu, QToolBar, QToolButton
-from qgis.PyQt.QtGui import QCursor, QIcon, QKeySequence, QPixmap
+from qgis.PyQt.QtCore import QObject, QSettings
+from qgis.PyQt.QtWidgets import QAction, QActionGroup, QDockWidget, QMenu, QToolBar, QToolButton
+from qgis.PyQt.QtGui import QIcon, QKeySequence
 
 import configparser
 import json
@@ -20,9 +20,8 @@ from collections import OrderedDict
 from functools import partial
 from json import JSONDecodeError
 
-from .actions.add_layer import AddLayer
+from .load_project import LoadProject
 from .actions.basic import Basic
-from .actions.check_project_result import CheckProjectResult
 from .actions.edit import Edit
 from .actions.go2epa import Go2Epa
 from .actions.master import Master
@@ -927,7 +926,6 @@ class Giswater(QObject):
         if status is False: return
 
         self.parent = ParentAction(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.add_layer = AddLayer(self.iface, self.settings, self.controller, self.plugin_dir)
 
         # Get water software from table 'version'
         self.project_type = self.controller.get_project_type()
@@ -952,10 +950,6 @@ class Giswater(QObject):
         if self.project_type == 'ws':
             self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)
 
-        # Manage layers and check project
-        if not self.manage_layers():
-            return
-
         # Manage records from table 'cat_feature'
         self.manage_feature_cat()
 
@@ -974,11 +968,6 @@ class Giswater(QObject):
         # Check roles of this user to show or hide toolbars
         self.controller.check_user_roles()
 
-        # Set project layers with gw_fct_getinfofromid: This process takes time for user
-        if self.hide_form is False:
-            self.get_layers_to_config()
-            self.set_layer_config(self.available_layers)
-
         # Create a thread to listen selected database channels
         if self.settings.value('system_variables/use_notify').upper() == 'TRUE':
             self.notify = NotifyFunctions(self.iface, self.settings, self.controller, self.plugin_dir)
@@ -988,12 +977,6 @@ class Giswater(QObject):
 
         # Save toolbar position after save project
         self.iface.actionSaveProject().triggered.connect(self.save_toolbars_position)
-
-        # Set config layer fields when user add new layer into the TOC
-        QgsProject.instance().legendLayersAdded.connect(self.get_new_layers_name)
-
-        # Put add layers button into toc
-        self.add_layers_button()
 
         # Hide info button if giswater project is loaded
         if show_warning:
@@ -1006,6 +989,15 @@ class Giswater(QObject):
 
         # call dynamic mapzones repaint
         self.parent.set_style_mapzones()
+
+        # Manage layers and check project
+        self.load_project = LoadProject(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.load_project.set_params(self.project_type, self.schema_name, self.qgis_project_infotype,
+                                     self.qgis_project_add_schema)
+        self.controller.log_info("Start load_project")
+        if not self.load_project.config_layers():
+            self.controller.log_info("False load_project")
+            return
 
         # Log it
         message = "Project read successfully"
@@ -1029,126 +1021,6 @@ class Giswater(QObject):
         finally:
             # TODO remove this line when do you want enabled api info for epa
             self.list_to_hide.append('199')
-
-
-    def add_layers_button(self):
-
-        icon_path = self.plugin_dir + '/icons/306.png'
-        dockwidget = self.iface.mainWindow().findChild(QDockWidget, 'Layers')
-        toolbar = dockwidget.findChildren(QToolBar)[0]
-        btn_exist = toolbar.findChild(QToolButton, 'gw_add_layers')
-
-        if btn_exist is None:
-            self.btn_add_layers = QToolButton()
-            self.btn_add_layers.setIcon(QIcon(icon_path))
-            self.btn_add_layers.setObjectName('gw_add_layers')
-            self.btn_add_layers.setToolTip('Load giswater layer')
-            toolbar.addWidget(self.btn_add_layers)
-            self.btn_add_layers.clicked.connect(partial(self.create_add_layer_menu))
-
-
-    def create_add_layer_menu(self):
-
-        # Create main menu and get cursor click position
-        main_menu = QMenu()
-        cursor = QCursor()
-        x = cursor.pos().x()
-        y = cursor.pos().y()
-        click_point = QPoint(x + 5, y + 5)
-        schema_name = self.schema_name.replace('"', '')
-        # Get parent layers
-        sql = ("SELECT distinct ( CASE parent_layer WHEN 'v_edit_node' THEN 'Node' "
-               "WHEN 'v_edit_arc' THEN 'Arc' WHEN 'v_edit_connec' THEN 'Connec' "
-               "WHEN 'v_edit_gully' THEN 'Gully' END ), parent_layer FROM cat_feature"
-               " ORDER BY parent_layer")
-        parent_layers = self.controller.get_rows(sql)
-
-        for parent_layer in parent_layers:
-
-
-            # Get child layers
-            sql = (f"SELECT DISTINCT(child_layer), lower(feature_type), id as alias FROM cat_feature "
-                   f"WHERE parent_layer = '{parent_layer[1]}' "
-                   f"AND child_layer IN ("
-                   f"   SELECT table_name FROM information_schema.tables"
-                   f"   WHERE table_schema = '{schema_name}')"
-                   f" ORDER BY child_layer")
-
-            child_layers = self.controller.get_rows(sql)
-            if not child_layers: continue
-
-            # Create sub menu
-            sub_menu = main_menu.addMenu(str(parent_layer[0]))
-            child_layers.insert(0, ['Load all', 'Load all', 'Load all'])
-            for child_layer in child_layers:
-                # Create actions
-                action = QAction(str(child_layer[2]), sub_menu, checkable=True)
-
-                # Get load layers and create child layers menu (actions)
-                layers_list = []
-                layers = self.iface.mapCanvas().layers()
-                for layer in layers:
-                    layers_list.append(str(layer.name()))
-
-                if str(child_layer[0]) in layers_list:
-                    action.setChecked(True)
-
-                sub_menu.addAction(action)
-                if child_layer[0] == 'Load all':
-                    action.triggered.connect(partial(self.add_layer.from_postgres_to_toc,
-                        child_layers=child_layers, group=None))
-                else:
-                    action.triggered.connect(partial(self.add_layer.from_postgres_to_toc,
-                        child_layer[0], "the_geom", child_layer[1]+"_id", None, None))
-
-        main_menu.exec_(click_point)
-
-
-    def get_new_layers_name(self, layers_list):
-
-        layers_name = []
-        for layer in layers_list:
-            layer_source = self.controller.get_layer_source(layer)
-            # Collect only the layers of the work scheme
-            if 'schema' in layer_source:
-                schema = layer_source['schema']
-                if schema and schema.replace('"', '') == self.schema_name:
-                    layers_name.append(layer.name())
-
-        self.set_layer_config(layers_name)
-
-
-    def manage_layers(self):
-        """ Get references to project main layers """
-
-        # Check if we have any layer loaded
-        layers = self.controller.get_layers()
-        if len(layers) == 0:
-            return False
-
-        if self.project_type in ('ws', 'ud'):
-            QApplication.setOverrideCursor(Qt.ArrowCursor)
-            self.check_project_result = CheckProjectResult(self.iface, self.settings, self.controller, self.plugin_dir)
-            self.check_project_result.set_controller(self.controller)
-
-            # check project
-            status, result = self.check_project_result.populate_audit_check_project(layers, "true")
-            self.hide_form = True
-            try:
-                if 'actions' in result['body']:
-                    if 'useGuideMap' in result['body']['actions']:
-                        guided_map = result['body']['actions']['useGuideMap']
-                        self.hide_form = result['body']['actions']['hideForm']
-                        if guided_map:
-                            self.controller.log_info("manage_guided_map")
-                            self.manage_guided_map()
-            except Exception as e:
-                self.controller.log_info(str(e))
-            finally:
-                QApplication.restoreOverrideCursor()
-                return status
-
-        return True
 
 
     def manage_snapping_layers(self):
@@ -1218,7 +1090,6 @@ class Giswater(QObject):
             self.controller.show_warning("AttributeError: "+str(e))
         except KeyError as e:
             self.controller.show_warning("KeyError: "+str(e))
-
 
 
     def project_read_pl(self):
@@ -1301,169 +1172,6 @@ class Giswater(QObject):
             return value
 
 
-    def get_layers_to_config(self):
-        """ Get available layers to be configured """
-
-        schema_name = self.schema_name.replace('"','')
-        sql =(f"SELECT DISTINCT(parent_layer) FROM cat_feature "
-              f"UNION "
-              f"SELECT DISTINCT(child_layer) FROM cat_feature "
-              f"WHERE child_layer IN ("
-              f"     SELECT table_name FROM information_schema.tables"
-              f"     WHERE table_schema = '{schema_name}')")
-        rows = self.controller.get_rows(sql)
-        self.available_layers = [layer[0] for layer in rows]
-
-        self.set_form_suppress(self.available_layers)
-        all_layers_toc = self.controller.get_layers()
-        for layer in all_layers_toc:
-            layer_source = self.controller.get_layer_source(layer)
-            # Filter to take only the layers of the current schema
-            if 'schema' in layer_source:
-                schema = layer_source['schema']
-                if schema and schema.replace('"', '') == self.schema_name:
-                    table_name = f"{self.controller.get_layer_source_table_name(layer)}"
-                    self.available_layers.append(table_name)
-
-
-    def set_form_suppress(self, layers_list):
-        """ Set form suppress on "Hide form on add feature (global settings) """
-
-        for layer_name in layers_list:
-            layer = self.controller.get_layer_by_tablename(layer_name)
-            if layer is None: continue
-            config = layer.editFormConfig()
-            config.setSuppress(0)
-            layer.setEditFormConfig(config)
-
-
-    def set_read_only(self, layer, field, field_index):
-        """ Set field readOnly according to client configuration into config_api_form_fields (field 'iseditable') """
-
-        # Get layer config
-        config = layer.editFormConfig()
-        try:
-            # Set field editability
-            config.setReadOnly(field_index, not field['iseditable'])
-        except KeyError:
-            pass
-        finally:
-            # Set layer config
-            layer.setEditFormConfig(config)
-
-
-    def set_layer_config(self, layers):
-        """ Set layer fields configured according to client configuration.
-            At the moment manage:
-                Column names as alias, combos as ValueMap, typeahead as textedit"""
-
-        msg_failed = ""
-        msg_key = ""
-        for layer_name in layers:
-            layer = self.controller.get_layer_by_tablename(layer_name)
-            if not layer:
-                continue
-
-            feature = '"tableName":"' + str(layer_name) + '", "id":"", "isLayer":true'
-            extras = f'"infoType":"{self.qgis_project_infotype}"'
-            body = self.create_body(feature=feature, extras=extras)
-            complet_result = self.controller.get_json('gw_fct_getinfofromid', body)
-            if not complet_result: continue
-            
-            for field in complet_result['body']['data']['fields']:
-                valuemap_values = {}
-
-                # Get column index
-                fieldIndex = layer.fields().indexFromName(field['columnname'])
-
-                # Hide selected fields according table config_api_form_fields.hidden
-                if 'hidden' in field:
-                    self.set_column_visibility(layer, field['columnname'], field['hidden'])
-
-                # Set alias column
-                if field['label']:
-                    layer.setFieldAlias(fieldIndex, field['label'])
-
-                if 'widgetcontrols' in field:
-                    # Set multiline fields according table config_api_form_fields.widgetcontrols['setQgisMultiline']
-                    if field['widgetcontrols'] is not None and 'setQgisMultiline' in field['widgetcontrols']:
-                        self.set_column_multiline(layer, field, fieldIndex)
-
-                    # Set field constraints
-                    if field['widgetcontrols'] and 'setQgisConstraints' in field['widgetcontrols']:
-                        if field['widgetcontrols']['setQgisConstraints'] is True:
-                            layer.setFieldConstraint(fieldIndex, QgsFieldConstraints.ConstraintNotNull,
-                                                     QgsFieldConstraints.ConstraintStrengthSoft)
-                            layer.setFieldConstraint(fieldIndex, QgsFieldConstraints.ConstraintUnique,
-                                                     QgsFieldConstraints.ConstraintStrengthHard)
-
-                if 'ismandatory' in field and not field['ismandatory']:
-                    layer.setFieldConstraint(fieldIndex, QgsFieldConstraints.ConstraintNotNull,
-                                             QgsFieldConstraints.ConstraintStrengthSoft)
-                # Manage editability
-                self.set_read_only(layer, field, fieldIndex)
-
-                # delete old values on ValueMap
-                editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': valuemap_values})
-                layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
-
-                # Manage new values in ValueMap
-                if field['widgettype'] == 'combo':
-                    if 'comboIds' in field:
-                        # Set values
-                        for i in range(0, len(field['comboIds'])):
-                            valuemap_values[field['comboNames'][i]] = field['comboIds'][i]
-                    # Set values into valueMap
-                    editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': valuemap_values})
-                    layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
-
-
-        if msg_failed != "":
-            self.controller.show_exceptions_msg("Execute failed.", msg_failed)
-
-        if msg_key != "":
-            self.controller.show_exceptions_msg("Key on returned json from ddbb is missed.", msg_key)
-
-
-    def set_column_visibility(self, layer, col_name, hidden):
-        """ Hide selected fields according table config_api_form_fields.hidden """
-
-        config = layer.attributeTableConfig()
-        columns = config.columns()
-        for column in columns:
-            if column.name == str(col_name):
-                column.hidden = hidden
-                break
-        config.setColumns(columns)
-        layer.setAttributeTableConfig(config)
-
-
-    def set_column_multiline(self, layer, field, fieldIndex):
-        """ Set multiline selected fields according table config_api_form_fields.widgetcontrols['setQgisMultiline'] """
-
-        if field['widgettype'] == 'text':
-            if field['widgetcontrols'] and 'setQgisMultiline' in field['widgetcontrols']:
-                editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': field['widgetcontrols']['setQgisMultiline']})
-                layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
-
-
-    def create_body(self, form='', feature='', filter_fields='', extras=None):
-        """ Create and return parameters as body to functions"""
-
-        client = f'$${{"client":{{"device":4, "infoType":1, "lang":"ES"}}, '
-        form = '"form":{' + form + '}, '
-        feature = '"feature":{' + feature + '}, '
-        filter_fields = '"filterFields":{' + filter_fields + '}'
-        page_info = '"pageInfo":{}'
-        data = '"data":{' + filter_fields + ', ' + page_info
-        if extras is not None:
-            data += ', ' + extras
-        data += f'}}}}$$'
-        body = "" + client + form + feature + data
-
-        return body
-
-
     def get_qgis_project_variables(self):
         """ Manage qgis project variables """
 
@@ -1476,64 +1184,3 @@ class Giswater(QObject):
         self.controller.plugin_settings_set_value("gwMainSchema", self.qgis_project_main_schema)
         self.controller.plugin_settings_set_value("gwProjectRole", self.qgis_project_role)
 
-
-    def manage_guided_map(self):
-        """ Guide map works using ext_municipality """
-
-        self.layer_muni = self.controller.get_layer_by_tablename('ext_municipality')
-        if self.layer_muni is None:
-            return
-
-        self.iface.setActiveLayer(self.layer_muni)
-        self.controller.set_layer_visible(self.layer_muni)
-        self.layer_muni.selectAll()
-        self.iface.actionZoomToSelected().trigger()
-        self.layer_muni.removeSelection()
-        self.iface.actionSelect().trigger()
-        self.iface.mapCanvas().selectionChanged.connect(self.selection_changed)
-        cursor = self.get_cursor_multiple_selection()
-        if cursor:
-            self.iface.mapCanvas().setCursor(cursor)
-
-
-    def selection_changed(self):
-        """ Get selected muni_id and execute function setselectors """
-
-        muni_id = None
-        features = self.layer_muni.getSelectedFeatures()
-        for feature in features:
-            muni_id = feature["muni_id"]
-            self.controller.log_info(f"Selected muni_id: {muni_id}")
-            break
-
-        self.iface.mapCanvas().selectionChanged.disconnect()
-        self.iface.actionZoomToSelected().trigger()
-        self.layer_muni.removeSelection()
-
-        if muni_id is None:
-            return
-
-        extras = f'"selectorType":"explfrommuni", "id":{muni_id}, "value":true, "isAlone":true, '
-        extras += f'"addSchema":"{self.qgis_project_add_schema}"'
-        body = self.create_body(extras=extras)
-        sql = f"SELECT gw_fct_setselectors({body})::text"
-        row = self.controller.get_row(sql, commit=True, log_sql=True)
-        if row:
-            self.iface.mapCanvas().refreshAllLayers()
-            self.layer_muni.triggerRepaint()
-            self.iface.actionPan().trigger()
-            self.iface.actionZoomIn().trigger()
-
-
-    def get_cursor_multiple_selection(self):
-        """ Set cursor for multiple selection """
-
-        path_folder = os.path.dirname(__file__)
-        path_cursor = path_folder + '\icons\\'+'211.png'
-
-        if os.path.exists(path_cursor):
-            cursor = QCursor(QPixmap(path_cursor))
-        else:
-            cursor = None
-
-        return cursor

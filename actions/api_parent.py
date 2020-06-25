@@ -6,13 +6,13 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.core import QgsPointXY, QgsVectorLayer
-from qgis.core import QgsExpression, QgsFeatureRequest, QgsExpressionContextUtils, QgsRectangle, QgsGeometry, QgsProject
+from qgis.core import QgsExpression, QgsFeatureRequest, QgsExpressionContextUtils, QgsGeometry, QgsProject
 from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand, QgsDateTimeEdit
-from qgis.PyQt.QtCore import Qt, QSettings, QTimer, QDate, QRegExp, QStringListModel
-from qgis.PyQt.QtGui import QColor, QIntValidator, QDoubleValidator, QRegExpValidator, QStandardItemModel, QStandardItem
+from qgis.PyQt.QtCore import Qt, QSettings, QTimer, QDate, QStringListModel
+from qgis.PyQt.QtGui import QColor, QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QLineEdit, QSizePolicy, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel, QCheckBox
-from qgis.PyQt.QtWidgets import QCompleter, QToolButton, QFrame, QSpinBox, QDoubleSpinBox, QDateEdit, QGroupBox, QAction
-from qgis.PyQt.QtWidgets import QTableView, QTabWidget, QPushButton, QTextEdit, QFileDialog, QApplication
+from qgis.PyQt.QtWidgets import QCompleter, QToolButton, QFrame, QSpinBox, QDoubleSpinBox, QDateEdit, QAction
+from qgis.PyQt.QtWidgets import QTableView, QTabWidget, QPushButton, QTextEdit
 from qgis.PyQt.QtSql import QSqlTableModel
 
 import os
@@ -21,7 +21,6 @@ import subprocess
 import sys
 import webbrowser
 import json
-from collections import OrderedDict
 from functools import partial
 
 from .. import utils_giswater
@@ -1830,12 +1829,12 @@ class ApiParent(ParentAction):
         :param widget: QCheckBox that has changed status (QCheckBox)
         :param selection_mode: "keepPrevious", "keepPreviousUsingShift", "removePrevious" (String)
         """
+                             
         # Get QCheckBox check all
         index = dialog.main_tab.currentIndex()
         widget_list = dialog.main_tab.widget(index).findChildren(QCheckBox)
         selector_type = dialog.main_tab.widget(index).property('selector_type')
         widget_all = dialog.findChild(QCheckBox, f'chk_all_{selector_type}')
-
         key_modifier = QApplication.keyboardModifiers()
 
         if selection_mode == 'removePrevious':
@@ -1860,6 +1859,7 @@ class ApiParent(ParentAction):
         :param widget_all: QCheckBox that handles global selection (QCheckBox)
         :param widget_list: List of all QCheckBox in the current tab ([QCheckBox,QCheckBox,...])
         """
+                             
         for checkbox in widget_list:
             if checkbox == widget_all or checkbox.objectName() == widget_all.objectName(): continue
             elif checkbox.objectName() != widget.objectName():
@@ -1868,10 +1868,12 @@ class ApiParent(ParentAction):
                 self.set_selector(checkbox)
                 checkbox.blockSignals(False)
 
+                             
     def set_selector(self, widget):
         """  Send values to DB and reload selectors
         :param widget: QCheckBox that contains the information to generate the json (QCheckBox)
         """
+                             
         qgis_project_add_schema = self.controller.plugin_settings_value('gwAddSchema')
         extras = f'"selectorType":"{widget.property("selector_type")}", "tabName":"{self.current_tab}", ' \
                  f'"id":"{widget.objectName()}", '

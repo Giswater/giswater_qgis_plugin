@@ -31,14 +31,20 @@ class CheckProjectResult(ApiParent):
         self.controller.execute_sql(sql)
         sql = ""
         for layer in layers:
-            if layer is None: continue
-            if layer.providerType() != 'postgres': continue
+            if layer is None:
+                continue
+            if layer.providerType() != 'postgres':
+                continue
             layer_source = self.controller.get_layer_source(layer)
+            if layer_source['schema'] is None:
+                continue
             layer_source['schema'] = layer_source['schema'].replace('"', '')
-            if 'schema' not in layer_source or layer_source['schema'] != self.schema_name: continue
+            if 'schema' not in layer_source or layer_source['schema'] != self.schema_name:
+                continue
             # TODO:: Find differences between PostgreSQL and query layers, and replace this if condition.
             uri = layer.dataProvider().dataSourceUri()
-            if 'SELECT row_number() over ()' in str(uri): continue
+            if 'SELECT row_number() over ()' in str(uri):
+                continue
             schema_name = layer_source['schema']
             if schema_name is not None:
                 schema_name = schema_name.replace('"', '')
@@ -46,10 +52,9 @@ class CheckProjectResult(ApiParent):
                 db_name = layer_source['db']
                 host_name = layer_source['host']
                 table_user = layer_source['user']
-                sql += ("\nINSERT INTO audit_check_project "
-                        "(table_schema, table_id, table_dbname, table_host, fid, table_user) "
-                        "VALUES ('" + str(schema_name) + "', '" + str(table_name) + "', '" + str(
-                    db_name) + "', '" + str(host_name) + "', 101, '" + str(table_user) + "');")
+                sql += (f"\nINSERT INTO audit_check_project "
+                        f"(table_schema, table_id, table_dbname, table_host, fid, table_user) "
+                        f"VALUES ('{schema_name}', '{table_name}', '{db_name}', '{host_name}', 101, '{table_user}');")
 
         status = self.controller.execute_sql(sql)
         if not status:
