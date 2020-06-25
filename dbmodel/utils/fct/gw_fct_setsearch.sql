@@ -141,7 +141,18 @@ BEGIN
 	v_tab := ((p_data->>'form')::json)->>'tabName';
 	v_featuretype := (p_data->>'data')::json->>'searchType';
 	v_addschema := (p_data->>'data')::json->>'addSchema';
-
+	
+	-- profilactic control of schema name
+	IF lower(v_addschema) = 'none' OR v_addschema = '' OR lower(v_addschema) ='null'
+		THEN v_addschema = null; 
+	ELSE
+		IF (select schemaname from pg_tables WHERE schemaname = v_addschema LIMIT 1) IS NULL THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+            "data":{"message":"3132", "function":"2618","debug_msg":null}}$$)';
+			-- todo: send message to response
+		END IF;
+	END IF;
+	
 	-- looking for additional schema 
 	IF v_addschema IS NOT NULL AND v_addschema != v_schemaname AND v_tab = 'add_network' THEN
 	

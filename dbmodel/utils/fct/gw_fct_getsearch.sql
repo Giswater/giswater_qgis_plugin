@@ -76,8 +76,18 @@ BEGIN
 
 	-- profilactic control for singletab
         IF v_singletab IN ('NULL', 'None', '') then v_singletab = null; end if;
-        IF v_addschema IN ('NULL', 'None', '') then v_addschema = null; end if;
 
+        
+	-- profilactic control of schema name
+	IF lower(v_addschema) = 'none' OR v_addschema = '' OR lower(v_addschema) ='null'
+		THEN v_addschema = null; 
+	ELSE
+		IF (select schemaname from pg_tables WHERE schemaname = v_addschema LIMIT 1) IS NULL THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3132", "function":"2580","debug_msg":null}}$$)';
+			-- todo: send message to response
+		END IF;
+	END IF;
         
 	-- Create tabs array
 	v_form := '[';

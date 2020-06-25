@@ -64,7 +64,7 @@ BEGIN
 	IF lower(v_addschema) = 'none' OR v_addschema = '' OR lower(v_addschema) ='null'
 		THEN v_addschema = null; 
 	ELSE
-		IF (select schemaname from pg_tables WHERE schemaname = v_addschema) IS NULL THEN
+		IF (select schemaname from pg_tables WHERE schemaname = v_addschema LIMIT 1) IS NULL THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
             "data":{"message":"3132", "function":"2870","debug_msg":null}}$$)';
 			-- todo: send message to response
