@@ -69,7 +69,7 @@ BEGIN
 	IF v_projectype = 'WS' THEN
 		v_partialquery = 'JOIN cat_node nc ON nodecat_id=id JOIN cat_feature_node nt ON nt.id=nc.nodetype_id';
 	ELSIF v_projectype = 'UD' THEN
-		v_partialquery = 'JOIN cat_feature_node ON id = a.cat_feature_node';
+		v_partialquery = 'JOIN cat_feature_node ON id = a.node_type';
 	END IF;
 
 	-- Computing process
