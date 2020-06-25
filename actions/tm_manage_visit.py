@@ -12,10 +12,10 @@ from functools import partial
 
 from lib import qt_tools
 from .tm_parent_manage import TmParentManage
-from ..dao.om_visit import OmVisit
-from ..dao.om_visit_event import OmVisitEvent
-from ..dao.om_visit_parameter import OmVisitParameter
-from ..dao.om_visit_x_node import OmVisitXNode
+from core.models.om_visit import OmVisit
+from core.models.om_visit_event import OmVisitEvent
+from core.models.om_visit_parameter import OmVisitParameter
+from core.models.om_visit_x_node import OmVisitXNode
 from ..ui_manager import AddVisitTm
 from ..ui_manager import EventStandardTm
 

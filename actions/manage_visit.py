@@ -16,13 +16,13 @@ import webbrowser
 from functools import partial
 
 from lib import qt_tools
-from ..dao.om_visit_event import OmVisitEvent
-from ..dao.om_visit import OmVisit
-from ..dao.om_visit_x_arc import OmVisitXArc
-from ..dao.om_visit_x_connec import OmVisitXConnec
-from ..dao.om_visit_x_node import OmVisitXNode
-from ..dao.om_visit_x_gully import OmVisitXGully
-from ..dao.om_visit_parameter import OmVisitParameter
+from core.models.om_visit_event import OmVisitEvent
+from core.models.om_visit import OmVisit
+from core.models.om_visit_x_arc import OmVisitXArc
+from core.models.om_visit_x_connec import OmVisitXConnec
+from core.models.om_visit_x_node import OmVisitXNode
+from core.models.om_visit_x_gully import OmVisitXGully
+from core.models.om_visit_parameter import OmVisitParameter
 from ..ui_manager import VisitUi
 from ..ui_manager import VisitEvent
 from ..ui_manager import VisitEventRehab
