@@ -5,8 +5,8 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsCategorizedSymbolRenderer, QgsFillSymbol, QgsDataSourceUri, QgsFeature, QgsField, \
-    QgsGeometry, QgsMarkerSymbol, QgsLayerTreeLayer, QgsLineSymbol, QgsProject, QgsRectangle, QgsRendererCategory, \
+from qgis.core import QgsCategorizedSymbolRenderer, QgsDataSourceUri, QgsFeature, QgsField, QgsGeometry, QgsFillSymbol,\
+    QgsMarkerSymbol, QgsLayerTreeLayer, QgsLineSymbol, QgsProject, QgsRectangle, QgsRendererCategory, \
     QgsSymbol, QgsVectorLayer, QgsVectorLayerExporter
 from qgis.PyQt.QtCore import QVariant
 from qgis.PyQt.QtGui import QColor
@@ -35,17 +35,21 @@ class AddLayer(object):
 
 
     def set_uri(self):
+        """ Set the component parts of a RDBMS data source URI
+        :return: QgsDataSourceUri() with the connection established according to the parameters of the controller.
+        """
 
         self.uri = QgsDataSourceUri()
         self.uri.setConnection(self.controller.credentials['host'], self.controller.credentials['port'],
-                          self.controller.credentials['db'], self.controller.credentials['user'],
-                          self.controller.credentials['password'])
+                               self.controller.credentials['db'], self.controller.credentials['user'],
+                               self.controller.credentials['password'])
         return self.uri
 
 
     def manage_geometry(self, geometry):
         """ Get QgsGeometry and return as text
          :param geometry: (QgsGeometry)
+         :return: (String)
         """
         geometry = geometry.asWkt().replace('Z (', ' (')
         geometry = geometry.replace(' 0)', ')')
@@ -87,8 +91,7 @@ class AddLayer(object):
             self.controller.log_info(F"ERROR --> {error[1]}")
 
 
-    def from_postgres_to_toc(self, tablename=None, the_geom="the_geom", field_id="id",  child_layers=None,
-        group="GW Layers"):
+    def from_postgres_to_toc(self, tablename=None, the_geom="the_geom", field_id="id",  child_layers=None, group="GW Layers"):
         """ Put selected layer into TOC
         :param tablename: Postgres table name (string)
         :param the_geom: Geometry field of the table (string)
@@ -130,7 +133,7 @@ class AddLayer(object):
 
 
     def add_temp_layer(self, dialog, data, layer_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True,
-        group='GW Temporal Layers', disable_tabs=True):
+                       group='GW Temporal Layers', disable_tabs=True):
         """ Add QgsVectorLayer into TOC
         :param dialog:
         :param data:
@@ -140,8 +143,8 @@ class AddLayer(object):
         :param tab_idx:
         :param del_old_layers:
         :param group:
-        :param disable_tabs: set all tabs, except the last, enabled or disabled (boolean)
-        :return:
+        :param disable_tabs: set all tabs, except the last, enabled or disabled (boolean).
+        :return: Dictionary with text as result of previuos data (String), and list of layers added (QgsVectorLayer).
         """
 
         text_result = None
@@ -200,7 +203,10 @@ class AddLayer(object):
 
 
     def set_layers_visible(self, layers):
-
+        """ Set layers visibles in the canvas
+        :param layers: list of layer names
+        :return:
+        """
         for layer in layers:
             lyr = self.controller.get_layer_by_tablename(layer)
             if lyr:
@@ -254,7 +260,17 @@ class AddLayer(object):
 
 
     def set_layer_symbology(self, layer, properties=None):
-
+        """ Set the received symbology in the corresponding layer
+        :param layer: (QgsVectorLayer)
+        :param properties: Properties that we want to put on the layer (dictionary)
+                example: {'capstyle': 'round', 'customdash': '5;2', 'customdash_map_unit_scale': '3x:0,0,0,0,0,0',
+                'customdash_unit': 'MM', 'draw_inside_polygon': '0', 'joinstyle': 'round',
+                'line_color': '76,119,220,255', 'line_style': 'solid', 'line_width': '1.6',
+                'line_width_unit': 'MM', 'offset': '0', 'offset_map_unit_scale': '3x:0,0,0,0,0,0',
+                'offset_unit': 'MM', 'ring_filter': '0', 'use_custom_dash': '0',
+                'width_map_unit_scale': '3x:0,0,0,0,0,0'}
+        :return:
+        """
         renderer = layer.renderer()
         symbol = renderer.symbol()
 
@@ -271,12 +287,13 @@ class AddLayer(object):
 
     def populate_info_text(self, dialog, data, force_tab=True, reset_text=True, tab_idx=1, disable_tabs=True):
         """ Populate txt_infolog QTextEdit widget
+        :param dialog: QDialog
         :param data: Json
         :param force_tab: Force show tab (boolean)
         :param reset_text: Reset(or not) text for each iteration (boolean)
         :param tab_idx: index of tab to force (integer)
         :param disable_tabs: set all tabs, except the last, enabled or disabled (boolean)
-        :return:
+        :return: Text received from data (String)
         """
 
         change_tab = False
@@ -350,7 +367,7 @@ class AddLayer(object):
             fet = QgsFeature()
             fet.setGeometry(geometry)
             for key, value in feature['properties'].items():
-                if key =='the_geom': continue
+                if key == 'the_geom': continue
                 attributes.append(value)
 
             fet.setAttributes(attributes)
@@ -370,7 +387,7 @@ class AddLayer(object):
         """ Get coordinates from GeoJson and return QGsGeometry
         :param feature: feature to get geometry type and coordinates (GeoJson)
         :return: Geometry of the feature (QgsGeometry)
-        functions  called in -> getattr(self, f"get_{feature['geometry']['type'].lower()}")(feature):
+        functions  called in -> getattr(self, f"get_{feature['geometry']['type'].lower()}")(feature)
             def get_point(self, feature)
             get_linestring(self, feature)
             get_multilinestring(self, feature)
@@ -450,6 +467,10 @@ class AddLayer(object):
 
 
     def get_coordinates(self, feature):
+        """ Get coordinates of the received feature, to be a point
+        :param feature: Json with the information of the received feature (geoJson)
+        :return: Coordinates of the feature received (String)
+        """
 
         coordinates = "("
         for coords in feature['geometry']['coordinates']:
@@ -459,7 +480,10 @@ class AddLayer(object):
 
 
     def get_multi_coordinates(self, feature):
-
+        """ Get coordinates of the received feature, can be a line
+        :param feature: Json with the information of the received feature (geoJson)
+        :return: Coordinates of the feature received (String)
+        """
         coordinates = "("
         for coords in feature['geometry']['coordinates']:
             coordinates += "("
@@ -532,7 +556,7 @@ class AddLayer(object):
             # Remove layer
             QgsProject.instance().removeMapLayer(layer)
 
-            #Remove group if is void
+            # Remove group if is void
             root = QgsProject.instance().layerTreeRoot()
             group = root.findGroup('GW Temporal Layers')
             if group:
@@ -548,6 +572,7 @@ class AddLayer(object):
         """ Apply QML style located in @qml_path in @layer
         :param layer: layer to set qml (QgsVectorLayer)
         :param qml_path: desired path (string)
+        :return: True or False (boolean)
         """
 
         if layer is None:
@@ -568,7 +593,11 @@ class AddLayer(object):
 
 
     def zoom_to_group(self, group_name, buffer=10):
-
+        """ Make zoom to extent of the received group
+        :param group_name: Group name where to zoom
+        :param buffer: Space left between the group zoom and the canvas (integer)
+        :return: False if don't find the group
+        """
         extent = QgsRectangle()
         extent.setMinimal()
 

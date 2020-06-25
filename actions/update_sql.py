@@ -287,6 +287,9 @@ class UpdateSQL(ApiParent):
         sql = "CREATE EXTENSION IF NOT EXISTS POSTGIS;"
         self.controller.execute_sql(sql)
 
+        # Set projecte type
+        self.project_type_selected = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
+
         # Manage widgets tabs
         self.populate_data_schema_name(self.cmb_project_type)
         self.set_info_project()

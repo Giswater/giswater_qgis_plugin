@@ -335,7 +335,7 @@ class DaoController(object):
     def connect_to_database(self, host, port, db, user, pwd, sslmode):
         """ Connect to database with selected parameters """
 
-        self.log_info(f"connect_to_database - sslmode: {sslmode}")
+        # self.log_info(f"connect_to_database - sslmode: {sslmode}")
 
         # Check if selected parameters is correct
         if None in (host, port, db, user, pwd):
@@ -770,7 +770,6 @@ class DaoController(object):
                  log_result=False, json_loads=False, is_notify=False):
         """ Manage execution API function
         :param function_name: Name of function to call (text)
-        :param body: Parameter for function (json)
         :param commit: Commit sql (bool)
         :param log_sql: Show query in qgis log (bool)
         :return: Response of the function executed (json)
@@ -812,6 +811,9 @@ class DaoController(object):
         if 'status' in json_result and json_result['status'] == 'Failed':
             self.manage_exception_api(json_result, sql, is_notify=is_notify)
             return False
+
+        # Manage options for layers (active, visible, zoom and indexing)
+        self.layer_manager(json_result)
 
         return json_result
 
@@ -1261,7 +1263,7 @@ class DaoController(object):
         schema_name = schema_name.replace('"', '')
         sql = ("SELECT routine_name FROM information_schema.routines "
                "WHERE lower(routine_schema) = %s "
-               "AND lower(routine_name) = %s ")
+               "AND lower(routine_name) = %s")
         params = [schema_name, function_name]
         row = self.get_row(sql, params=params, commit=commit)
         return row
@@ -1279,7 +1281,7 @@ class DaoController(object):
                     return None
 
         schemaname = schemaname.replace('"', '')
-        sql = ("SELECT * FROM pg_tables WHERE schemaname = %s AND tablename = %s ")
+        sql = "SELECT * FROM pg_tables WHERE schemaname = %s AND tablename = %s"
         params = [schemaname, tablename]
         row = self.get_row(sql, log_info=False, params=params)
         return row
@@ -1307,7 +1309,7 @@ class DaoController(object):
 
         schemaname = schemaname.replace('"', '')
         sql = ("SELECT * FROM information_schema.columns "
-               "WHERE table_schema = %s AND table_name = %s AND column_name = %s ")
+               "WHERE table_schema = %s AND table_name = %s AND column_name = %s")
         params = [schemaname, tablename, columname]
         row = self.get_row(sql, log_info=False, params=params)
         return row
@@ -1544,12 +1546,13 @@ class DaoController(object):
         return row
 
 
-    def indexing_spatial_layer(self, layer_name):
+    def set_layer_index(self, layer_name):
         """ Force reload dataProvider of layer """
 
         layer = self.get_layer_by_tablename(layer_name)
         if layer:
             layer.dataProvider().forceReload()
+            layer.triggerRepaint()
 
 
     def manage_exception(self, title=None, description=None, sql=None):
@@ -1777,4 +1780,48 @@ class DaoController(object):
             self.info_cf.resetRubberbands()
         except AttributeError:
             pass
+
+
+    def layer_manager(self, json_result):
+        """
+        Manage options for layers (active, visible, zoom and indexing)
+        :param json_result: Json result of a query (Json)
+        :return: None
+        """
+
+        try:
+            layermanager = json_result['body']['form']['layerManager']
+        except KeyError:
+            return
+        # Get a list of layers names force reload dataProvider of layer
+        if 'index' in layermanager:
+            for layer_name in layermanager['index']:
+                self.set_layer_index(layer_name)
+                layer = self.get_layer_by_tablename(layer_name)
+
+        # Get a list of layers names, but obviously it will stay active the last one
+        if 'active' in layermanager:
+            for layer_name in layermanager['active']:
+                layer = self.get_layer_by_tablename(layer_name)
+                if layer:
+                    self.iface.setActiveLayer(layer)
+
+        # Get a list of layers names and set visible
+        if 'visible' in layermanager:
+            for layer_name in layermanager['visible']:
+                layer = self.get_layer_by_tablename(layer_name)
+                if layer:
+                    self.set_layer_visible(layer)
+
+        # Get a list of layers names, but obviously remain zoomed to the last
+        if 'zoom' in layermanager:
+            for layer_name in layermanager['zoom']:
+                layer = self.get_layer_by_tablename(layer_name)
+                if layer:
+                    prev_layer = self.iface.activeLayer()
+                    self.iface.setActiveLayer(layer)
+                    self.iface.zoomToActiveLayer()
+                    if prev_layer:
+                        self.iface.setActiveLayer(prev_layer)
+
 

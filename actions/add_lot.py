@@ -48,8 +48,6 @@ class AddNewLot(ParentManage):
 
     def manage_lot(self, lot_id=None, is_new=True, visitclass_id=None):
 
-        # turnoff autocommit of this and base class. Commit will be done at dialog button box level management
-        self.autocommit = True
         self.remove_ids = False
         self.is_new_lot = is_new
         self.cmb_position = 15  # Variable used to set the position of the QCheckBox in the relations table
@@ -569,7 +567,7 @@ class AddNewLot(ParentManage):
 
         # Set current user
         sql = "SELECT current_user"
-        row = self.controller.get_row(sql, commit=self.autocommit)
+        row = self.controller.get_row(sql)
         utils_giswater.setWidgetText(self.dlg_lot, self.user_name, row[0])
 
         # Fill ComboBox cmb_ot
@@ -611,7 +609,7 @@ class AddNewLot(ParentManage):
                "FROM sys_feature_type "
                "WHERE classlevel = 1 OR classlevel = 2"
                "ORDER BY id")
-        feature_type = self.controller.get_rows(sql, commit=self.autocommit)
+        feature_type = self.controller.get_rows(sql)
         if feature_type:
             utils_giswater.set_item_data(self.dlg_lot.feature_type, feature_type, 1)
 
@@ -1191,7 +1189,7 @@ class AddNewLot(ParentManage):
         model = QStringListModel()
 
         sql = "SELECT DISTINCT(id) FROM om_visit"
-        rows = self.controller.get_rows(sql, commit=self.autocommit)
+        rows = self.controller.get_rows(sql)
         values = []
         if rows:
             for row in rows:
@@ -1341,7 +1339,7 @@ class AddNewLot(ParentManage):
         current_date = QDate.currentDate()
         sql = (f'SELECT MIN(startdate), MAX(startdate)'
                f' FROM om_visit_lot')
-        row = self.controller.get_row(sql, commit=self.autocommit)
+        row = self.controller.get_row(sql)
         if row:
             if row[0]:
                 self.dlg_lot_man.date_event_from.setDate(row[0])
@@ -1472,7 +1470,7 @@ class AddNewLot(ParentManage):
         current_date = QDate.currentDate()
         sql = ('SELECT MIN(starttime), MAX(endtime)'
                ' FROM om_visit_lot_x_user')
-        row = self.controller.get_row(sql, commit=self.autocommit)
+        row = self.controller.get_row(sql)
         if row:
             if row[0]:
                 self.dlg_user_manage.date_event_from.setDate(row[0])
