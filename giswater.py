@@ -45,8 +45,8 @@ from .map_tools.draw_profiles import DrawProfiles
 from .map_tools.flow_trace_flow_exit import FlowTraceFlowExitMapTool
 from .map_tools.move_node import MoveNodeMapTool
 from .map_tools.replace_feature import ReplaceFeatureMapTool
-from .models.plugin_toolbar import PluginToolbar
-from .models.sys_feature_cat import SysFeatureCat
+from core.models.plugin_toolbar import PluginToolbar
+from core.models.sys_feature_cat import SysFeatureCat
 from .ui_manager import DialogTextUi
 
 
