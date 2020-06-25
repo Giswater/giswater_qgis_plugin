@@ -75,7 +75,9 @@ BEGIN
         v_singletab = (p_data ->>'form')::json->>'singleTab';
 
 	-- profilactic control for singletab
-        IF v_singletab = '' then v_singletab = null; end if;
+        IF v_singletab IN ('NULL', 'None', '') then v_singletab = null; end if;
+        IF v_addschema IN ('NULL', 'None', '') then v_addschema = null; end if;
+
         
 	-- Create tabs array
 	v_form := '[';
