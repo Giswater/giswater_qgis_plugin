@@ -269,16 +269,18 @@ BEGIN
 						v_isdmaborder = true;	
 					END IF;
 
-					-- getting dqa_id by heritage from nodes
-					IF v_noderecord1.dqa_id = v_noderecord2.dqa_id THEN
-						v_dqa_id = v_noderecord1.dqa_id;
-					ELSIF v_noderecord1.dqa_id = 0 THEN
-						v_dqa_id = v_noderecord2.dqa_id;
-					ELSIF v_noderecord2.dqa_id = 0 THEN
-						v_dqa_id = v_noderecord1.dqa_id;
-					ELSIF v_noderecord1.dqa_id::text != v_noderecord2.dqa_id::text THEN
-						v_dqa_id = v_noderecord1.dqa_id;
-						v_isdqaborder = true;	
+					IF v_project_type = 'WS' THEN
+						-- getting dqa_id by heritage from nodes
+						IF v_noderecord1.dqa_id = v_noderecord2.dqa_id THEN
+							v_dqa_id = v_noderecord1.dqa_id;
+						ELSIF v_noderecord1.dqa_id = 0 THEN
+							v_dqa_id = v_noderecord2.dqa_id;
+						ELSIF v_noderecord2.dqa_id = 0 THEN
+							v_dqa_id = v_noderecord1.dqa_id;
+						ELSIF v_noderecord1.dqa_id::text != v_noderecord2.dqa_id::text THEN
+							v_dqa_id = v_noderecord1.dqa_id;
+							v_isdqaborder = true;	
+						END IF;
 					END IF;
 
 					-- getting expl_id by heritage from nodes
