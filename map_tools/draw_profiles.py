@@ -147,7 +147,7 @@ class DrawProfiles(ParentMapTool):
         ev = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_vertical)
 
         # Create variable with all the content of the form
-        extras = f'"initNode":"{self.initNode}", "endNode":"{self.endNode}", "composer":"mincutA4", ' \
+        extras = f'"initNode":"{self.initNode}", "endNode":"{self.endNode}", ' \
             f'"linksDistance":{links_distance}, ' \
             f'"scale":{{ "eh":{eh}, "ev":{ev}}}'
 
@@ -211,7 +211,7 @@ class DrawProfiles(ParentMapTool):
 
         # Create variable with all the content of the form
         extras = f'"profile_id":"{profile_id}", "listArcs":"{list_arc}","initNode":"{self.initNode}", ' \
-            f'"endNode":"{self.endNode}", "composer":"mincutA4", ' \
+            f'"endNode":"{self.endNode}", ' \
             f'"linksDistance":{links_distance}, "scale":{{ "eh":{eh}, ' \
             f'"ev":{ev}}}, "title":"{title}", "date":"{date}"'
         body = self.create_body(extras=extras)
