@@ -59,9 +59,9 @@ BEGIN
 	v_ispresszone:= (SELECT value::json->>'PRESSZONE' FROM config_param_system WHERE parameter = 'utils_grafanalytics_status');
 
 	-- get automatic insert for mapzone
-	v_isautoinsertdma := (SELECT value::json->>'DMA' FROM config_param_system WHERE parameter = 'edit_mapzone_automatic_insert');
 	v_isautoinsertsector:= (SELECT value::json->>'SECTOR' FROM config_param_system WHERE parameter = 'edit_mapzone_automatic_insert');
-	v_isautoinsertpresszone:= (SELECT value::json->>'PRESSZONE' FROM config_param_system WHERE parameter = 'edit_mapzone_automatic_insert');
+	v_isautoinsertdma := (SELECT value::json->>'DMA' FROM config_param_system WHERE parameter = 'edit_mapzones_automatic_insert');
+	v_isautoinsertpresszone:= (SELECT value::json->>'PRESSZONE' FROM config_param_system WHERE parameter = 'edit_mapzones_automatic_insert');
 
 	--modify values for custom view inserts
 	IF v_man_table IN (SELECT id FROM cat_feature WHERE feature_type = 'NODE') THEN
@@ -155,112 +155,111 @@ BEGIN
 				"data":{"message":"2012", "function":"1320","debug_msg":"'||NEW.node_id::text||'"}}$$);';
 			END IF;            
 		END IF;
-		
-		
-		-- Sector ID
-		IF (NEW.sector_id IS NULL) THEN
-			
-			-- control error without any mapzones defined on the table of mapzone
-			IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		       	"data":{"message":"1008", "function":"1320","debug_msg":null}}$$);';
-			END IF;
-			
-			-- getting value default
-			IF (NEW.sector_id IS NULL) THEN
-				NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_sector_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			END IF;
-			
-			-- getting value from geometry of mapzone
-			IF (NEW.sector_id IS NULL) THEN
-				SELECT count(*)into v_count FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001);
-				IF v_count = 1 THEN
-					NEW.sector_id = (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
-				ELSE
-					NEW.sector_id =(SELECT sector_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, v_promixity_buffer) 
-					order by ST_Distance (NEW.the_geom, v_edit_arc.the_geom) LIMIT 1);
-				END IF;	
-			END IF;
-
-			-- force cero values always - undefined
-			IF (NEW.sector_id IS NULL) THEN
-				NEW.sector_id := 0;
-			END IF; 
+				
+		-- Sector
+		IF NEW.sector_name IS NOT NULL AND v_isautoinsertsector AND v_issector AND (SELECT sector_id FROM sector WHERE sector_id=NEW.sector_name::integer) IS NULL THEN
+				INSERT INTO sector VALUES (NEW.sector_name::integer, NEW.sector_name, NEW.expl_id);
 		ELSE
-			IF v_isautoinsertsector AND v_issector AND (SELECT sector_id FROM sector WHERE sector_id=NEW.sector_id) IS NULL THEN
-				INSERT INTO sector VALUES (NEW.sector_id, NEW.sector_id);
+			IF (NEW.sector_id IS NULL) THEN
+				
+				-- control error without any mapzones defined on the table of mapzone
+				IF ((SELECT COUNT(*) FROM sector) = 0) THEN
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"1008", "function":"1320","debug_msg":null}}$$);';
+				END IF;
+				
+				-- getting value default
+				IF (NEW.sector_id IS NULL) THEN
+					NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_sector_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+				END IF;
+				
+				-- getting value from geometry of mapzone
+				IF (NEW.sector_id IS NULL) THEN
+					SELECT count(*)into v_count FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001);
+					IF v_count = 1 THEN
+						NEW.sector_id = (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
+					ELSE
+						NEW.sector_id =(SELECT sector_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, v_promixity_buffer) 
+						order by ST_Distance (NEW.the_geom, v_edit_arc.the_geom) LIMIT 1);
+					END IF;	
+				END IF;
+
+				-- force cero values always - undefined
+				IF (NEW.sector_id IS NULL) THEN
+					NEW.sector_id := 0;
+				END IF; 
 			END IF;
 		END IF;
 		
-		
-		-- Dma ID
-		IF (NEW.dma_id IS NULL) THEN
-			
-			-- control error without any mapzones defined on the table of mapzone
-			IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		       	"data":{"message":"1012", "function":"1320","debug_msg":null}}$$);';
-			END IF;
-			
-			-- getting value default
-			IF (NEW.dma_id IS NULL) THEN
-				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_dma_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			END IF;
-			
-			-- getting value from geometry of mapzone
-			IF (NEW.dma_id IS NULL) THEN
-				SELECT count(*)into v_count FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001);
-				IF v_count = 1 THEN
-					NEW.dma_id = (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
-				ELSE
-					NEW.dma_id =(SELECT dma_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, v_promixity_buffer) 
-					order by ST_Distance (NEW.the_geom, v_edit_arc.the_geom) LIMIT 1);
-				END IF;	
-			END IF;
-
-			-- force cero values always - undefined
-			IF (NEW.dma_id IS NULL) THEN
-				NEW.dma_id := 0;
-			END IF; 		
+		-- Dma
+		IF NEW.dma_name IS NOT NULL AND v_isautoinsertdma AND v_isdma AND (SELECT dma_id FROM dma WHERE dma_id=NEW.dma_name::integer) IS NULL THEN
+			INSERT INTO dma VALUES (NEW.dma_name::integer, NEW.dma_name, NEW.expl_id);
+			NEW.dma_id = NEW.dma_name;
 		ELSE
-			IF v_isautoinsertdma AND v_isdma AND (SELECT dma_id FROM dma WHERE dma_id=NEW.dma_id) IS NULL THEN
-				INSERT INTO dma VALUES (NEW.dma_id, NEW.dma_id);
-			END IF;
+			IF (NEW.dma_id IS NULL) THEN
+				
+				-- control error without any mapzones defined on the table of mapzone
+				IF ((SELECT COUNT(*) FROM dma) = 0) THEN
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"1012", "function":"1320","debug_msg":null}}$$);';
+				END IF;
+				
+				-- getting value default
+				IF (NEW.dma_id IS NULL) THEN
+					NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_dma_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+				END IF;
+				
+				-- getting value from geometry of mapzone
+				IF (NEW.dma_id IS NULL) THEN
+					SELECT count(*)into v_count FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001);
+					IF v_count = 1 THEN
+						NEW.dma_id = (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
+					ELSE
+						NEW.dma_id =(SELECT dma_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, v_promixity_buffer) 
+						order by ST_Distance (NEW.the_geom, v_edit_arc.the_geom) LIMIT 1);
+					END IF;	
+				END IF;
+
+				-- force cero values always - undefined
+				IF (NEW.dma_id IS NULL) THEN
+					NEW.dma_id := 0;
+				END IF;
+			END IF;		
 		END IF;
-			
 			
 		-- Presszone
-		IF (NEW.presszone_id IS NULL) THEN
-			
-			-- control error without any mapzones defined on the table of mapzone
-			IF ((SELECT COUNT(*) FROM presszone) = 0) THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		       	"data":{"message":"3106", "function":"1320","debug_msg":null}}$$);';
-			END IF;
-			
-			-- getting value default
-			IF (NEW.presszone_id IS NULL) THEN
-				NEW.presszone_id := (SELECT "value" FROM config_param_user WHERE "parameter"='presszone_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			END IF;
-			
-			-- getting value from geometry of mapzone
-			IF (NEW.presszone_id IS NULL) THEN
-				SELECT count(*)into v_count FROM presszone WHERE ST_DWithin(NEW.the_geom, presszone.the_geom,0.001);
-				IF v_count = 1 THEN
-					NEW.presszone_id = (SELECT presszone_id FROM presszone WHERE ST_DWithin(NEW.the_geom, presszone.the_geom,0.001) LIMIT 1);
-				ELSE
-					NEW.presszone_id =(SELECT presszone_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, v_promixity_buffer)
-					order by ST_Distance (NEW.the_geom, v_edit_arc.the_geom) LIMIT 1);
-				END IF;	
-			END IF;
-			
-			-- force cero values always - undefined
-			IF (NEW.presszone_id IS NULL) THEN
-				NEW.presszone_id := 0;
-			END IF;            
+		IF NEW.presszone_name IS NOT NULL AND v_isautoinsertpresszone AND v_ispresszone AND (SELECT presszone_id FROM presszone WHERE presszone_id=NEW.presszone_name) IS NULL THEN
+			INSERT INTO dma VALUES (NEW.dma_name, NEW.dma_name, NEW.expl_id);
+			NEW.presszone_id = NEW.presszone_name;
 		ELSE
-			IF v_isautoinsertpresszone AND v_ispresszone AND (SELECT presszone_id FROM presszone WHERE presszone_id=NEW.presszone_id) IS NULL THEN
-				INSERT INTO presszone VALUES (NEW.presszone_id, NEW.presszone_id);
+			IF (NEW.presszone_id IS NULL) THEN
+			
+				-- control error without any mapzones defined on the table of mapzone
+				IF ((SELECT COUNT(*) FROM presszone) = 0) THEN
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"3106", "function":"1320","debug_msg":null}}$$);';
+				END IF;
+				
+				-- getting value default
+				IF (NEW.presszone_id IS NULL) THEN
+					NEW.presszone_id := (SELECT "value" FROM config_param_user WHERE "parameter"='presszone_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+				END IF;
+				
+				-- getting value from geometry of mapzone
+				IF (NEW.presszone_id IS NULL) THEN
+					SELECT count(*)into v_count FROM presszone WHERE ST_DWithin(NEW.the_geom, presszone.the_geom,0.001);
+					IF v_count = 1 THEN
+						NEW.presszone_id = (SELECT presszone_id FROM presszone WHERE ST_DWithin(NEW.the_geom, presszone.the_geom,0.001) LIMIT 1);
+					ELSE
+						NEW.presszone_id =(SELECT presszone_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, v_promixity_buffer)
+						order by ST_Distance (NEW.the_geom, v_edit_arc.the_geom) LIMIT 1);
+					END IF;	
+				END IF;
+				
+				-- force cero values always - undefined
+				IF (NEW.presszone_id IS NULL) THEN
+					NEW.presszone_id := 0;
+				END IF;            
 			END IF;
 		END IF;
 		

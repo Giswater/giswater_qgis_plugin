@@ -612,10 +612,10 @@ BEGIN
 				END IF;
 
 				-- force enabled for arc mapzone borders
-				IF 	(v_ispresszoneborder AND (aux_json->>'columnname') = 'presszone_id') OR
-					(v_isdmaborder AND (aux_json->>'columnname') = 'dma_id') OR
-					(v_isdqaborder AND (aux_json->>'columnname') = 'dqa_id') OR 
-					(v_issectorborder AND (aux_json->>'columnname') = 'sector_id') THEN
+				IF 	(v_ispresszoneborder AND (aux_json->>'columnname') = 'presszone_name') OR
+					(v_isdmaborder AND (aux_json->>'columnname') = 'dma_name') OR
+					(v_isdqaborder AND (aux_json->>'columnname') = 'dqa_name') OR 
+					(v_issectorborder AND (aux_json->>'columnname') = 'sector_name') THEN
 						v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'iseditable', 'true'::boolean);	
 				END IF;
 				
@@ -637,7 +637,7 @@ BEGIN
 			END IF;
 			
 			-- force enabled widget of mapzones for nodes headers (insert or update)
-			IF v_isnodeheader AND (aux_json->>'columnname') IN('presszone_id','sector_id','dma_id','expl_id') THEN
+			IF v_isnodeheader AND (aux_json->>'columnname') IN('presszone_name','sector_name','dma_name','expl_name') THEN
 					v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'iseditable', 'true'::boolean);
 			END IF;
 		END LOOP;  

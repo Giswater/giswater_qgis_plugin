@@ -13,12 +13,13 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.ws_gw_fct_grafanalytics_mapzones_config(p
 $BODY$
 /*
 
-
 SELECT SCHEMA_NAME.ws_gw_fct_grafanalytics_mapzones_config($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{},
- "data":{"parameters":{"mapzoneAddfield":"c_sector", "grafClass":"DMA" }}}$$);
+ "data":{"parameters":{"mapzoneField":"c_sector", "grafClass":"DMA" }}}$$);
 
+WARNING: Using this function config_form_fields is modified hidden mapzone_id and visibilize mapzone_name, also setting key of system variable 'utils_grafanalytics_status' as true
 
 */
+
 DECLARE 
 rec record;
 v_mapzone_addfield text;
@@ -48,17 +49,23 @@ v_status text;
 v_message text;
 v_hide_form boolean;
 
-
 BEGIN
 
-    SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "SCHEMA_NAME", public;
 
-    v_mapzone_addfield = (((p_data ->>'data')::json->>'parameters')::json ->>'mapzoneAddfield')::text;
-    v_graf_class = (((p_data ->>'data')::json->>'parameters')::json->>'grafClass')::text;
+	v_mapzone_addfield = (((p_data ->>'data')::json->>'parameters')::json ->>'mapzoneField')::text;
+	v_graf_class = (((p_data ->>'data')::json->>'parameters')::json->>'grafClass')::text;
 
-    -- select version
+	-- select version
 	SELECT giswater INTO v_version FROM sys_version order by 1 desc limit 1;
 
+	-- Configure system to work with dynamic mapzone
+	-- put hidden mapzone_id name
+	EXECUTE 'UPDATE config_form_fields SET hidden = true WHERE columnname = '''||lower(v_graf_class)||'_id'' and (formname like ''%_node%'' or formname like ''%_arc%'' or formname like ''%_connec%'')';
+	-- put visible mapzone_name field
+	EXECUTE 'UPDATE config_form_fields SET hidden = false WHERE columnname = '''||lower(v_graf_class)||'_name'' and (formname like ''%_node%'' or formname like ''%_arc%'' or formname like ''%_connec%'')';
+	-- set system variable
+	EXECUTE 'UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json,'''||upper(v_graf_class)||''',''true''::boolean) WHERE parameter = ''utils_grafanalytics_status''';
 
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fid=249 AND cur_user=current_user;
@@ -73,22 +80,22 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (195, null, 1, 'INFO');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (195, null, 1, '-------');
 
-    --find delimiter node types
-    SELECT string_agg(quote_literal(id), ',') INTO v_mapzone_nodetype FROM cat_feature_node WHERE graf_delimiter = v_graf_class;
+	--find delimiter node types
+	SELECT string_agg(quote_literal(id), ',') INTO v_mapzone_nodetype FROM cat_feature_node WHERE graf_delimiter = v_graf_class;
 
-    INSERT INTO audit_check_data (fid,  criticity, error_message)
+	INSERT INTO audit_check_data (fid,  criticity, error_message)
 	VALUES (249, 1, concat('Delimitier node type: ', v_mapzone_nodetype,'.'));
 
 
-    SELECT string_agg(child_layer, ','), string_agg(quote_literal(cat_feature.id), ',') INTO v_arc_layers, v_cat_feature_arc  
-    FROM cat_feature JOIN sys_addfields ON cat_feature.id = cat_feature_id
-    WHERE feature_type = 'ARC' AND param_name =  v_mapzone_addfield;
+	SELECT string_agg(child_layer, ','), string_agg(quote_literal(cat_feature.id), ',') INTO v_arc_layers, v_cat_feature_arc  
+	FROM cat_feature JOIN sys_addfields ON cat_feature.id = cat_feature_id
+	WHERE feature_type = 'ARC' AND param_name =  v_mapzone_addfield;
 
-    IF v_arc_layers IS NULL THEN
+	IF v_arc_layers IS NULL THEN
 
-    	INSERT INTO audit_check_data (fid,  criticity, error_message)
+		INSERT INTO audit_check_data (fid,  criticity, error_message)
 		VALUES (249, 2, concat('Addfield ', v_mapzone_addfield, ' is not defined for arc layer.'));
-    ELSE
+	ELSE
 	    FOR rec IN (SELECT node_id::text FROM v_edit_node WHERE nodetype_id IN 
 	    	(SELECT id FROM cat_feature_node WHERE graf_delimiter = v_graf_class)) LOOP
 		
@@ -179,35 +186,34 @@ BEGIN
 						END IF;
 					END IF;
 				END IF;
-		END IF;
-	    END LOOP;
+			END IF;
+		END LOOP;
 
-	    FOR rec IN  EXECUTE 'SELECT '||v_graf_class||'_id as undone_mapzone_id, name as undone_mapzone_name 
-	    FROM v_edit_'||v_graf_class||' WHERE grafconfig IS NULL AND '||v_graf_class||'_id!= expl_id ;'
-	    LOOP
-	   
-		    INSERT INTO audit_check_data (fid,  criticity, error_message)
+		FOR rec IN  EXECUTE 'SELECT '||v_graf_class||'_id as undone_mapzone_id, name as undone_mapzone_name 
+		FROM v_edit_'||v_graf_class||' WHERE grafconfig IS NULL AND '||v_graf_class||'_id!= expl_id ;'
+		LOOP
+			INSERT INTO audit_check_data (fid,  criticity, error_message)
 			VALUES (249, 2, concat('Mapzone not configured for : ', rec.undone_mapzone_id,' - ',rec.undone_mapzone_name,'.'));
 		END LOOP;
-	END IF;	
+		END IF;	
 
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
-	FROM (SELECT id, error_message as message FROM audit_check_data 
-	WHERE cur_user="current_user"() AND fid=249 ORDER BY criticity desc, id asc) row;
-	
-	IF v_audit_result is null THEN
-        v_status = 'Accepted';
-        v_level = 3;
-        v_message = 'Mapzone config done successfully';
-    ELSE
+		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
+		FROM (SELECT id, error_message as message FROM audit_check_data 
+		WHERE cur_user="current_user"() AND fid=249 ORDER BY criticity desc, id asc) row;
+		
+		IF v_audit_result is null THEN
+		v_status = 'Accepted';
+		v_level = 3;
+		v_message = 'Mapzone config done successfully';
+	ELSE
 
-        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
-        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
-        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
+		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
+		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
+		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
 
-    END IF;
+	END IF;
 
-    v_result_info := COALESCE(v_result, '{}'); 
+	v_result_info := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
 
 	v_status := COALESCE(v_status, '{}'); 
@@ -232,9 +238,9 @@ BEGIN
 		       '}'||
 	    '}')::json;
 
-	EXCEPTION WHEN OTHERS THEN
-	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	--EXCEPTION WHEN OTHERS THEN
+	--GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	--RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$

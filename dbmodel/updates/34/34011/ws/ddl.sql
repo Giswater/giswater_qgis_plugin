@@ -17,7 +17,6 @@ ALTER TABLE presszone ADD COLUMN stylesheet json;
 ALTER TABLE dqa ADD COLUMN stylesheet json;
 
 ALTER TABLE presszone RENAME id TO presszone_id;
-ALTER TABLE presszone RENAME descript TO name;
 
 
 -- config_mincut_inlet

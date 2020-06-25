@@ -87,9 +87,15 @@ BEGIN
 	v_osversion := (p_data ->> 'data')::json->> 'osVersion';
 	v_addschema := (p_data ->> 'data')::json->> 'addSchema';
 
-	-- control nulls of addschema
-	IF v_addschema = 'None' OR v_addschema = '' THEN
-		v_addschema = NULL;
+	-- profilactic control of schema name
+	IF lower(v_addschema) = 'none' OR v_addschema = '' OR lower(v_addschema) ='null'
+		THEN v_addschema = null; 
+	ELSE
+		IF (select schemaname from pg_tables WHERE schemaname = v_addschema LIMIT 1) IS NULL THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3132", "function":"2580","debug_msg":null}}$$)';
+			-- todo: send message to response
+		END IF;
 	END IF;
 	
 	-- get user parameters
@@ -549,9 +555,9 @@ BEGIN
 	RETURN v_return;
 	
 	--  Exception handling
-	--EXCEPTION WHEN OTHERS THEN
-	--GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;  
-	--RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_error_context) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;  
+	RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_error_context) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 	  
 END;
 

@@ -183,6 +183,7 @@ CREATE OR REPLACE VIEW vu_node AS
 	node.expl_id,
 	exploitation.macroexpl_id,
 	node.sector_id,
+	sector.name AS sector_name,
 	sector.macrosector_id,
 	node.arc_id,
 	node.parent_id,
@@ -193,10 +194,13 @@ CREATE OR REPLACE VIEW vu_node AS
 	node.comment,
 	node.minsector_id,    
 	node.dma_id,
+	dma.name AS dma_name,
 	dma.macrodma_id,
 	node.presszone_id,
+	cat_presszone.name AS presszone_name,
 	node.staticpressure,
 	node.dqa_id,
+	dqa.name AS dqa_name,
 	dqa.macrodqa_id,
 	node.soilcat_id,
 	node.function_type,
@@ -245,6 +249,7 @@ CREATE OR REPLACE VIEW vu_node AS
 	 LEFT JOIN sector ON node.sector_id = sector.sector_id
 	 LEFT JOIN exploitation ON node.expl_id = exploitation.expl_id
 	 LEFT JOIN dqa ON node.dqa_id = dqa.dqa_id
+	 LEFT JOIN cat_presszone ON cat_presszone.id = node.presszone_id
 	 LEFT JOIN ext_streetaxis a ON a.id::text = node.streetaxis_id::text
 	 LEFT JOIN ext_streetaxis b ON b.id::text = node.streetaxis2_id::text;
 
@@ -268,6 +273,7 @@ CREATE OR REPLACE VIEW vu_arc AS
 	arc.expl_id,
 	exploitation.macroexpl_id,
 	arc.sector_id,
+	sector.name AS sector_name,
 	sector.macrosector_id,
 	arc.state,
 	arc.state_type,
@@ -278,9 +284,12 @@ CREATE OR REPLACE VIEW vu_arc AS
 	arc.custom_length,
 	arc.minsector_id,
 	arc.dma_id,
+	dma.name AS dma_name,
 	dma.macrodma_id,
 	arc.presszone_id,
+	cat_presszone.name AS presszone_name,
 	arc.dqa_id,
+	dqa.name AS dqa_name,
 	dqa.macrodqa_id,
 	arc.soilcat_id,
 	arc.function_type,
@@ -332,6 +341,7 @@ CREATE OR REPLACE VIEW vu_arc AS
 	 LEFT JOIN vu_node a ON a.node_id::text = arc.node_1::text
 	 LEFT JOIN vu_node b ON b.node_id::text = arc.node_2::text
 	 LEFT JOIN dqa ON arc.dqa_id = dqa.dqa_id
+ 	 LEFT JOIN cat_presszone ON cat_presszone.id = arc.presszone_id
 	 LEFT JOIN ext_streetaxis c ON c.id = arc.streetaxis_id
 	 LEFT JOIN ext_streetaxis d ON d.id = arc.streetaxis2_id;
 
@@ -348,6 +358,7 @@ CREATE OR REPLACE VIEW vu_connec AS
 	connec.expl_id,
 	exploitation.macroexpl_id,
 	connec.sector_id,
+	sector.name AS sector_name,
 	sector.macrosector_id,
 	connec.customer_code,
 	cat_connec.matcat_id AS cat_matcat_id,
@@ -363,10 +374,13 @@ CREATE OR REPLACE VIEW vu_connec AS
 	connec.comment,
 	connec.minsector_id,
 	connec.dma_id,
+	dma.name AS dma_name,
 	dma.macrodma_id,
 	connec.presszone_id,
+	cat_presszone.name AS presszone_name,
 	connec.staticpressure,
 	connec.dqa_id,
+	dqa.name AS dqa_name,
 	dqa.macrodqa_id,
 	connec.soilcat_id,
 	connec.function_type,
@@ -423,6 +437,7 @@ CREATE OR REPLACE VIEW vu_connec AS
 	 LEFT JOIN sector ON connec.sector_id = sector.sector_id
 	 LEFT JOIN exploitation ON connec.expl_id = exploitation.expl_id
 	 LEFT JOIN dqa ON connec.dqa_id = dqa.dqa_id
+ 	 LEFT JOIN cat_presszone ON cat_presszone.id = connec.presszone_id
 	 LEFT JOIN ext_streetaxis c ON c.id = streetaxis_id
 	 LEFT JOIN ext_streetaxis b ON b.id = streetaxis2_id;
 

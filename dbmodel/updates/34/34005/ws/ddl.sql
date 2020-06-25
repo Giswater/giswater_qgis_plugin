@@ -18,3 +18,5 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_valve",
 ALTER TABLE arc RENAME presszonecat_id TO presszone_id;
 ALTER TABLE node RENAME presszonecat_id TO presszone_id;
 ALTER TABLE connec RENAME presszonecat_id TO presszone_id;
+ALTER TABLE cat_presszone RENAME descript TO name;
+

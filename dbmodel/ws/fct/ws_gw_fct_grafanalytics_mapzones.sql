@@ -270,8 +270,8 @@ BEGIN
 		PERFORM gw_fct_grafanalytics_check_data(v_input);
 
 		-- (1) check if mapzone process is enabled in order to continue or not
-		IF (SELECT (value::json->>quote_literal(v_class))::boolean FROM config_param_system WHERE parameter='utils_grafanalytics_status') IS FALSE THEN
-		
+		IF (SELECT (value::json->>(v_class))::boolean FROM config_param_system WHERE parameter='utils_grafanalytics_status') IS FALSE THEN
+
 			INSERT INTO audit_check_data (fid, criticity, error_message)
 			VALUES (v_fid, 3, concat('ERROR: Dynamic analysis for ',v_class,'''s is not configured on database. Please update system variable ''utils_grafanalytics_status''
 			 to enable it '));
@@ -472,10 +472,6 @@ BEGIN
 					v_querytext = 'UPDATE v_edit_connec SET '||quote_ident(v_field)||' = arc.'||quote_ident(v_field)||' FROM arc WHERE arc.arc_id=v_edit_connec.arc_id';
 					EXECUTE v_querytext;
 				
-					-- update config_api_form fields in order to set widget as disabled text
-					v_querytext = 'UPDATE config_form_fields SET iseditable = false WHERE formtype = ''feature'' and columnname ='||quote_literal(v_field);
-					EXECUTE v_querytext;
-
 					-- recalculate staticpressure (fid=147)
 					IF v_fid=130 THEN
 					
