@@ -304,8 +304,18 @@ BEGIN
 		
 		
 		-- State_type
-		IF (NEW.state_type IS NULL) THEN
-			NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='statetype_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		IF (NEW.state=0) THEN
+			IF (NEW.state_type IS NULL) THEN
+				NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_statetype_0_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			END IF;
+		ELSIF (NEW.state=1) THEN
+			IF (NEW.state_type IS NULL) THEN
+				NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_statetype_1_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			END IF;
+		ELSIF (NEW.state=2) THEN
+			IF (NEW.state_type IS NULL) THEN
+				NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_statetype_2_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			END IF;
 		END IF;
 
 		--check relation state - state_type

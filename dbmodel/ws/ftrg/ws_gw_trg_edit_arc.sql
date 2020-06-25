@@ -261,20 +261,30 @@ BEGIN
 		
 		
 		-- State
-        IF (NEW.state IS NULL) THEN
-            NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_state_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-        END IF;
+		IF (NEW.state IS NULL) THEN
+		    NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_state_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
 
 		-- State_type
-		IF (NEW.state_type IS NULL) THEN
-			NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='statetype_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-        END IF;
+		IF (NEW.state=0) THEN
+			IF (NEW.state_type IS NULL) THEN
+				NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_statetype_0_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			END IF;
+		ELSIF (NEW.state=1) THEN
+			IF (NEW.state_type IS NULL) THEN
+				NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_statetype_1_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			END IF;
+		ELSIF (NEW.state=2) THEN
+			IF (NEW.state_type IS NULL) THEN
+				NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_statetype_2_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			END IF;
+		END IF;
 
-		--check relation state - state_type
-        IF NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
-        	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3036", "function":"1318","debug_msg":"'||NEW.state::text||'"}}$$);';
-       	END IF;
+			--check relation state - state_type
+		IF NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"3036", "function":"1318","debug_msg":"'||NEW.state::text||'"}}$$);';
+		END IF;
 
 		--Inventory	
 		NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
@@ -297,14 +307,14 @@ BEGIN
 		END IF;
 		
 		-- Ownercat_id
-        IF (NEW.ownercat_id IS NULL) THEN
-            NEW.ownercat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_ownercat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-        END IF;
+		IF (NEW.ownercat_id IS NULL) THEN
+		    NEW.ownercat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_ownercat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
 		
 		-- Soilcat_id
-        IF (NEW.soilcat_id IS NULL) THEN
-            NEW.soilcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_soilcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-        END IF;
+		IF (NEW.soilcat_id IS NULL) THEN
+			NEW.soilcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_soilcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
 
 		-- Builtdate
 		IF (NEW.builtdate IS NULL) THEN
@@ -312,14 +322,14 @@ BEGIN
 		END IF;
 		
 		-- Verified
-        IF (NEW.verified IS NULL) THEN
-            NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-        END IF;
+		IF (NEW.verified IS NULL) THEN
+			NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
 	
 		-- LINK
-	    IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_usefid_on_linkid')::boolean=TRUE THEN
-	       NEW.link=NEW.arc_id;
-	    END IF;
+		IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_usefid_on_linkid')::boolean=TRUE THEN
+			NEW.link=NEW.arc_id;
+		END IF;
 		
 		v_featurecat = (SELECT arctype_id FROM cat_arc WHERE id = NEW.arccat_id);
 

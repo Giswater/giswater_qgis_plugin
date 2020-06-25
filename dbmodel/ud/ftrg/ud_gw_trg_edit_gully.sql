@@ -1,4 +1,4 @@
- /*
+﻿ /*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -261,14 +261,24 @@ BEGIN
 		END IF;
 		
 		-- State_type
-		IF (NEW.state_type IS NULL) THEN
-			NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='statetype_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		IF (NEW.state=0) THEN
+			IF (NEW.state_type IS NULL) THEN
+				NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_statetype_0_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			END IF;
+		ELSIF (NEW.state=1) THEN
+			IF (NEW.state_type IS NULL) THEN
+				NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_statetype_1_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			END IF;
+		ELSIF (NEW.state=2) THEN
+			IF (NEW.state_type IS NULL) THEN
+				NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_statetype_2_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			END IF;
 		END IF;
 
 		--check relation state - state_type
-	    IF NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
-	      	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3036", "function":"1206","debug_msg":"'||NEW.state::text||'"}}$$);'; 
+		IF NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"3036", "function":"1206","debug_msg":"'||NEW.state::text||'"}}$$);'; 
 	   	END IF;		
 
 		-- Workcat_id
