@@ -40,11 +40,28 @@ v_streetaxis text;
 v_streetaxis2 text;
 v_sys_type text;
 
+-- dynamic mapzones strategy
+v_isdma boolean = false;
+v_issector boolean = false;
+v_ispresszone boolean = false;
+v_isautoinsertdma boolean = false;
+v_isautoinsertsector boolean = false;
+v_isautoinsertpresszone boolean = false;
 
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	v_man_table:= TG_ARGV[0];
+
+	-- get dynamic mapzones status
+	v_isdma := (SELECT value::json->>'DMA' FROM config_param_system WHERE parameter = 'utils_grafanalytics_status');
+	v_issector:= (SELECT value::json->>'SECTOR' FROM config_param_system WHERE parameter = 'utils_grafanalytics_status');
+	v_ispresszone:= (SELECT value::json->>'PRESSZONE' FROM config_param_system WHERE parameter = 'utils_grafanalytics_status');
+
+	-- get automatic insert for mapzone
+	v_isautoinsertdma := (SELECT value::json->>'DMA' FROM config_param_system WHERE parameter = 'edit_mapzone_automatic_insert');
+	v_isautoinsertsector:= (SELECT value::json->>'SECTOR' FROM config_param_system WHERE parameter = 'edit_mapzone_automatic_insert');
+	v_isautoinsertpresszone:= (SELECT value::json->>'PRESSZONE' FROM config_param_system WHERE parameter = 'edit_mapzone_automatic_insert');
 
 	--modify values for custom view inserts
 	IF v_man_table IN (SELECT id FROM cat_feature WHERE feature_type = 'NODE') THEN
@@ -168,7 +185,11 @@ BEGIN
 			-- force cero values always - undefined
 			IF (NEW.sector_id IS NULL) THEN
 				NEW.sector_id := 0;
-			END IF; 		
+			END IF; 
+		ELSE
+			IF v_isautoinsertsector AND v_issector AND (SELECT sector_id FROM sector WHERE sector_id=NEW.sector_id) IS NULL THEN
+				INSERT INTO sector VALUES (NEW.sector_id, NEW.sector_id);
+			END IF;
 		END IF;
 		
 		
@@ -201,6 +222,10 @@ BEGIN
 			IF (NEW.dma_id IS NULL) THEN
 				NEW.dma_id := 0;
 			END IF; 		
+		ELSE
+			IF v_isautoinsertdma AND v_isdma AND (SELECT dma_id FROM dma WHERE dma_id=NEW.dma_id) IS NULL THEN
+				INSERT INTO dma VALUES (NEW.dma_id, NEW.dma_id);
+			END IF;
 		END IF;
 			
 			
@@ -233,6 +258,10 @@ BEGIN
 			IF (NEW.presszone_id IS NULL) THEN
 				NEW.presszone_id := 0;
 			END IF;            
+		ELSE
+			IF v_isautoinsertpresszone AND v_ispresszone AND (SELECT presszone_id FROM presszone WHERE presszone_id=NEW.presszone_id) IS NULL THEN
+				INSERT INTO presszone VALUES (NEW.presszone_id, NEW.presszone_id);
+			END IF;
 		END IF;
 		
 		-- Municipality 
