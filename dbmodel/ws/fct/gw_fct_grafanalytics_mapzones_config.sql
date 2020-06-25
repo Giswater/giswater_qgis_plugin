@@ -60,12 +60,15 @@ BEGIN
 	SELECT giswater INTO v_version FROM sys_version order by 1 desc limit 1;
 
 	-- Configure system to work with dynamic mapzone
+	
+	/*
 	-- put hidden mapzone_id name
 	EXECUTE 'UPDATE config_form_fields SET hidden = true WHERE columnname = '''||lower(v_graf_class)||'_id'' and (formname like ''%_node%'' or formname like ''%_arc%'' or formname like ''%_connec%'')';
 	-- put visible mapzone_name field
 	EXECUTE 'UPDATE config_form_fields SET hidden = false WHERE columnname = '''||lower(v_graf_class)||'_name'' and (formname like ''%_node%'' or formname like ''%_arc%'' or formname like ''%_connec%'')';
 	-- set system variable
 	EXECUTE 'UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json,'''||upper(v_graf_class)||''',''true''::boolean) WHERE parameter = ''utils_grafanalytics_status''';
+	*/
 
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fid=249 AND cur_user=current_user;

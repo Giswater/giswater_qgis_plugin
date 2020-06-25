@@ -10,7 +10,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2020/06/18
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role)
-VALUES (2970, 'ws_gw_fct_grafanalytics_mapzones_config','ws', 'function','json', 'json', 'Function to automatically configure mapzones', 'role_master')
+VALUES (2970, 'gw_fct_grafanalytics_mapzones_config','ws', 'function','json', 'json', 'Function to automatically configure mapzones.', 'role_master')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO config_toolbox(id, alias, isparametric, functionparams, inputparams, observ, active)
