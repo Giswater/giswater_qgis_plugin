@@ -819,6 +819,9 @@ class DaoController(object):
             self.manage_exception_api(json_result, sql, is_notify=is_notify)
             return False
 
+        # Manage options for layers (active, visible, zoom and indexing)
+        self.layer_manager(json_result)
+
         return json_result
 
 
@@ -1512,7 +1515,6 @@ class DaoController(object):
             self.giswater.enable_toolbar("master")
             self.giswater.hide_action(False, 38)
             self.giswater.hide_action(False, 47)
-            self.giswater.hide_action(False, 49)
             self.giswater.hide_action(False, 50)
         elif restriction == 'role_master':
             self.giswater.enable_toolbar("master")
@@ -1675,12 +1677,13 @@ class DaoController(object):
         return row
 
 
-    def indexing_spatial_layer(self, layer_name):
+    def set_layer_index(self, layer_name):
         """ Force reload dataProvider of layer """
 
         layer = self.get_layer_by_tablename(layer_name)
         if layer:
             layer.dataProvider().forceReload()
+            layer.triggerRepaint()
 
 
     def manage_exception(self, title=None, description=None, sql=None):
@@ -1908,4 +1911,48 @@ class DaoController(object):
             self.info_cf.resetRubberbands()
         except AttributeError:
             pass
+
+
+    def layer_manager(self, json_result):
+        """
+        Manage options for layers (active, visible, zoom and indexing)
+        :param json_result: Json result of a query (Json)
+        :return: None
+        """
+
+        try:
+            layermanager = json_result['body']['form']['layerManager']
+        except KeyError:
+            return
+        # Get a list of layers names force reload dataProvider of layer
+        if 'index' in layermanager:
+            for layer_name in layermanager['index']:
+                self.set_layer_index(layer_name)
+                layer = self.get_layer_by_tablename(layer_name)
+
+        # Get a list of layers names, but obviously it will stay active the last one
+        if 'active' in layermanager:
+            for layer_name in layermanager['active']:
+                layer = self.get_layer_by_tablename(layer_name)
+                if layer:
+                    self.iface.setActiveLayer(layer)
+
+        # Get a list of layers names and set visible
+        if 'visible' in layermanager:
+            for layer_name in layermanager['visible']:
+                layer = self.get_layer_by_tablename(layer_name)
+                if layer:
+                    self.set_layer_visible(layer)
+
+        # Get a list of layers names, but obviously remain zoomed to the last
+        if 'zoom' in layermanager:
+            for layer_name in layermanager['zoom']:
+                layer = self.get_layer_by_tablename(layer_name)
+                if layer:
+                    prev_layer = self.iface.activeLayer()
+                    self.iface.setActiveLayer(layer)
+                    self.iface.zoomToActiveLayer()
+                    if prev_layer:
+                        self.iface.setActiveLayer(prev_layer)
+
 

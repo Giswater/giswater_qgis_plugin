@@ -478,14 +478,6 @@
 			<translation>Parameters related with 'searchplus' not set in table 'config_param_system'</translation>
 		</message>
 		<message>
-			<source>Error getting pgRouting version</source>
-			<translation>Error getting pgRouting version</translation>
-		</message>
-		<message>
-			<source>You need to upgrade your version of pgRouting</source>
-			<translation>You need to upgrade your version of pgRouting</translation>
-		</message>
-		<message>
 			<source>Some data is missing</source>
 			<translation>Some data is missing</translation>
 		</message>
@@ -978,11 +970,15 @@
 			<translation>Select a node and click on it, the downstream nodes are computed</translation>
 		</message>
 		<message>
-			<source>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
- Please ensure that features has no undelete value on true.\n
+			<source>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
+
+ Please ensure that features has no undelete value on true.\n
+
  On the other hand you must know that traceability table will storage precedent information.</source>
-			<translation>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
- Please ensure that features has no undelete value on true.\n
+			<translation>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
+
+ Please ensure that features has no undelete value on true.\n
+
  On the other hand you must know that traceability table will storage precedent information.</translation>
 		</message>
 		<message>
@@ -7165,7 +7161,7 @@
 		<name>visit_event</name>
 		<message>
 			<source>title</source>
-			<translation>Evento estándar de arco</translation>
+			<translation>Evento estándar</translation>
 		</message>
 		<message>
 			<source>btn_delete_file</source>
@@ -7177,7 +7173,7 @@
 		</message>
 		<message>
 			<source>dlg_visit_event</source>
-			<translation>Evento estándar de arco</translation>
+			<translation>Evento estándar</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_visit_event</source>

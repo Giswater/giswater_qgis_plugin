@@ -164,7 +164,7 @@ class ApiCF(ApiParent, QObject):
 
 
     def open_form(self, point=None, table_name=None, feature_id=None, feature_cat=None, new_feature_id=None,
-                  layer_new_feature=None, tab_type=None, new_feature=None, is_docker=True):
+                  layer_new_feature=None, tab_type=None, new_feature=None, is_docker=True, is_add_schema=False):
         """
         :param point: point where use clicked
         :param table_name: table where do sql query
@@ -190,10 +190,10 @@ class ApiCF(ApiParent, QObject):
         self.tab_type = tab_type
 
         # Get values
-        self.qgis_project_add_schema = self.controller.plugin_settings_value('gwAddSchema')
-        self.qgis_project_main_schema = self.controller.plugin_settings_value('gwMainSchema')
-        self.qgis_project_infotype = self.controller.plugin_settings_value('gwInfoType')
-        self.qgis_project_role = self.controller.plugin_settings_value('gwProjectRole')
+        qgis_project_add_schema = self.controller.plugin_settings_value('gwAddSchema')
+        qgis_project_main_schema = self.controller.plugin_settings_value('gwMainSchema')
+        qgis_project_infotype = self.controller.plugin_settings_value('gwInfoType')
+        qgis_project_role = self.controller.plugin_settings_value('gwProjectRole')
 
         self.new_feature = new_feature
 
@@ -216,8 +216,8 @@ class ApiCF(ApiParent, QObject):
         elif tab_type == 'data':
             extras = '"toolBar":"basic"'
 
-        project_role = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('project_role')
-        extras += f', "rolePermissions":"{project_role}"'
+        extras += f', "rolePermissions":"{qgis_project_infotype}"'
+
         function_name = None
         body = None
 
@@ -238,18 +238,22 @@ class ApiCF(ApiParent, QObject):
             scale_zoom = self.iface.mapCanvas().scale()
             extras += f', "activeLayer":"{active_layer}"'
             extras += f', "visibleLayer":{visible_layer}'
-            extras += f', "mainSchema":"{self.qgis_project_main_schema}"'
-            extras += f', "addSchema":"{self.qgis_project_add_schema}"'
-            extras += f', "infoType":"{self.qgis_project_infotype}"'
-            extras += f', "projecRole":"{self.qgis_project_role}"'
+            extras += f', "mainSchema":"{qgis_project_main_schema}"'
+            extras += f', "addSchema":"{qgis_project_add_schema}"'
+            extras += f', "infoType":"{qgis_project_infotype}"'
+            extras += f', "projecRole":"{qgis_project_role}"'
             extras += f', "coordinates":{{"xcoord":{point.x()},"ycoord":{point.y()}, "zoomRatio":{scale_zoom}}}'
             body = self.create_body(extras=extras)
             function_name = 'gw_fct_getinfofromcoordinates'
 
-        # Come from QPushButtons node1 or node2 from custom form or RightButton
+        # Comes from QPushButtons node1 or node2 from custom form or RightButton
         elif feature_id:
+            if is_add_schema is True:
+                add_schema = self.controller.plugin_settings_value('gwAddSchema')
+                extras = f'"addSchema":"{add_schema}"'
+            else:
+                extras = '"addSchema":""'
             feature = f'"tableName":"{table_name}", "id":"{feature_id}"'
-            extras = f'"infoType":"{self.qgis_project_infotype}"'
             body = self.create_body(feature=feature, extras=extras)
             function_name = 'gw_fct_getinfofromid'
 
@@ -316,6 +320,7 @@ class ApiCF(ApiParent, QObject):
                     sub_tag = 'arc'
                 else:
                     sub_tag = 'node'
+            feature_id = self.complet_result[0]['body']['feature']['id']
             result, dialog = self.open_custom_form(feature_id, self.complet_result, tab_type, sub_tag, is_docker)
             if feature_cat is not None:
                 self.manage_new_feature(self.complet_result, dialog)
@@ -440,7 +445,9 @@ class ApiCF(ApiParent, QObject):
         # Remove unused tabs
         tabs_to_show = []
 
-        self.fid = complet_result[0]['body']['feature']['id']
+        # Get field id name and feature id
+        self.field_id = str(complet_result[0]['body']['feature']['idName'])
+        self.feature_id = complet_result[0]['body']['feature']['id']
 
         if 'visibleTabs' in complet_result[0]['body']['form']:
             for tab in complet_result[0]['body']['form']['visibleTabs']:
@@ -522,10 +529,6 @@ class ApiCF(ApiParent, QObject):
             if result:
                 self.geom_type = result[0]
 
-        # Get field id name
-        self.field_id = str(complet_result[0]['body']['feature']['idName'])
-
-        self.feature_id = None
         result = complet_result[0]['body']['data']
         layout_list = []
         for field in complet_result[0]['body']['data']['fields']:
@@ -545,11 +548,6 @@ class ApiCF(ApiParent, QObject):
                     layout.addWidget(widget, 1, field['layoutorder'])
                 else:
                     self.put_widgets(self.dlg_cf, field, label, widget)
-
-        # Get current feature id
-        widget_field_id = self.dlg_cf.findChild(QLineEdit, f'{tab_type}_{self.field_id}')
-        if widget_field_id is not None:
-            self.feature_id = widget_field_id.text()
 
         # Add a QSpacerItem into each QGridLayout of the list
         for layout in layout_list:
@@ -605,6 +603,7 @@ class ApiCF(ApiParent, QObject):
 
         btn_cancel = self.dlg_cf.findChild(QPushButton, 'btn_cancel')
         btn_accept = self.dlg_cf.findChild(QPushButton, 'btn_accept')
+        title = f"{complet_result[0]['body']['feature']['childType']} - {self.feature_id}"
 
         if self.controller.dlg_docker and is_docker:
             # Delete last form from memory
@@ -615,8 +614,9 @@ class ApiCF(ApiParent, QObject):
 
             self.controller.dock_dialog(self.dlg_cf)
             self.controller.dlg_docker.dlg_closed.connect(partial(self.manage_docker_close))
-            self.controller.dlg_docker.setWindowTitle(f"{complet_result[0]['body']['feature']['childType']} - {self.fid}")
-            btn_accept.setVisible(False)
+            self.controller.dlg_docker.setWindowTitle(title)
+            btn_accept.clicked.connect(partial(
+                self.accept, self.dlg_cf, self.complet_result[0], self.my_json))
             btn_cancel.setVisible(False)
 
         else:
@@ -640,7 +640,7 @@ class ApiCF(ApiParent, QObject):
 
         # Open dialog
         self.open_dialog(self.dlg_cf, dlg_name='info_feature')
-        self.dlg_cf.setWindowTitle(f"{complet_result[0]['body']['feature']['childType']} - {self.fid}")
+        self.dlg_cf.setWindowTitle(title)
 
         return self.complet_result, self.dlg_cf
 
@@ -730,7 +730,6 @@ class ApiCF(ApiParent, QObject):
 
         try:
             self.iface.actionRollbackEdits().trigger()
-            self.layer.disconnect()
         except TypeError:
             pass
 
@@ -983,6 +982,7 @@ class ApiCF(ApiParent, QObject):
         if _json == '' or str(_json) == '{}':
             if self.controller.dlg_docker:
                 self.controller.dlg_docker.setMinimumWidth(dialog.width())
+                self.controller.close_docker()
             self.close_dialog(dialog)
             return
 
@@ -1023,6 +1023,7 @@ class ApiCF(ApiParent, QObject):
             if my_json == '' or str(my_json) == '{}':
                 if self.controller.dlg_docker:
                     self.controller.dlg_docker.setMinimumWidth(dialog.width())
+                    self.controller.close_docker()
                 self.close_dialog(dialog)
                 return
 
@@ -1031,7 +1032,8 @@ class ApiCF(ApiParent, QObject):
         # If we make an info
         else:
             my_json = json.dumps(_json)
-            feature = f'"id":"{self.fid}", '
+            feature = f'"id":"{self.feature_id}", '
+
         feature += f'"featureType":"{self.feature_type}", '
         feature += f'"tableName":"{p_table_id}"'
         extras = f'"fields":{my_json}, "reload":"{fields_reload}"'
@@ -1054,6 +1056,7 @@ class ApiCF(ApiParent, QObject):
         if close_dialog:
             if self.controller.dlg_docker:
                 self.controller.dlg_docker.setMinimumWidth(dialog.width())
+                self.controller.close_docker()
             self.close_dialog(dialog)
 
 
@@ -1065,45 +1068,51 @@ class ApiCF(ApiParent, QObject):
 
     def disable_all(self, dialog, result, enable):
 
-        widget_list = dialog.findChildren(QWidget)
-        for widget in widget_list:
-            for field in result['fields']:
-                if widget.objectName() == field['widgetname']:
-                    if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit):
-                        widget.setReadOnly(not enable)
-                        widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
-                    elif type(widget) in (QComboBox, QCheckBox, QgsDateTimeEdit):
-                        widget.setEnabled(enable)
-                    elif type(widget) is QPushButton:
-                        # Manage the clickability of the buttons according to the configuration
-                        # in the table config_api_form_fields simultaneously with the edition,
-                        # but giving preference to the configuration when iseditable is True
-                        if not field['iseditable']:
-                            widget.setEnabled(field['iseditable'])
-
-        self.new_feature_id = None
+        try:
+            widget_list = dialog.findChildren(QWidget)
+            for widget in widget_list:
+                for field in result['fields']:
+                    if widget.objectName() == field['widgetname']:
+                        if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit):
+                            widget.setReadOnly(not enable)
+                            widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
+                        elif type(widget) in (QComboBox, QCheckBox, QgsDateTimeEdit):
+                            widget.setEnabled(enable)
+                        elif type(widget) is QPushButton:
+                            # Manage the clickability of the buttons according to the configuration
+                            # in the table config_api_form_fields simultaneously with the edition,
+                            # but giving preference to the configuration when iseditable is True
+                            if not field['iseditable']:
+                                widget.setEnabled(field['iseditable'])
+        except RuntimeError:
+            pass
+        finally:
+            self.new_feature_id = None
 
 
     def enable_all(self, dialog, result):
 
-        widget_list = dialog.findChildren(QWidget)
-        for widget in widget_list:
-            if widget.property('keepDisbled'):
-                continue
-            for field in result['fields']:
-                if widget.objectName() == field['widgetname']:
-                    if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit):
-                        widget.setReadOnly(not field['iseditable'])
-                        if not field['iseditable']:
-                            widget.setFocusPolicy(Qt.NoFocus)
-                            widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
-                        else:
-                            widget.setFocusPolicy(Qt.StrongFocus)
-                            widget.setStyleSheet(None)
-                    elif type(widget) in(QComboBox, QCheckBox, QPushButton, QgsDateTimeEdit):
-                        widget.setEnabled(field['iseditable'])
-                        widget.focusPolicy(Qt.StrongFocus) if widget.setEnabled(
-                            field['iseditable']) else widget.setFocusPolicy(Qt.NoFocus)
+        try:
+            widget_list = dialog.findChildren(QWidget)
+            for widget in widget_list:
+                if widget.property('keepDisbled'):
+                    continue
+                for field in result['fields']:
+                    if widget.objectName() == field['widgetname']:
+                        if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit):
+                            widget.setReadOnly(not field['iseditable'])
+                            if not field['iseditable']:
+                                widget.setFocusPolicy(Qt.NoFocus)
+                                widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
+                            else:
+                                widget.setFocusPolicy(Qt.StrongFocus)
+                                widget.setStyleSheet(None)
+                        elif type(widget) in(QComboBox, QCheckBox, QPushButton, QgsDateTimeEdit):
+                            widget.setEnabled(field['iseditable'])
+                            widget.focusPolicy(Qt.StrongFocus) if widget.setEnabled(
+                                field['iseditable']) else widget.setFocusPolicy(Qt.NoFocus)
+        except RuntimeError:
+            pass
 
 
     def enable_actions(self, enabled):
@@ -1360,7 +1369,6 @@ class ApiCF(ApiParent, QObject):
             self.tab_plan_loaded = True
 
 
-    """ FUNCTIONS RELATED TAB ELEMENT"""
     def fill_tab_element(self):
         """ Fill tab 'Element' """
 
@@ -1371,10 +1379,10 @@ class ApiCF(ApiParent, QObject):
 
     def fill_tbl_element_man(self, dialog, widget, table_name, expr_filter):
         """ Fill the table control to show elements """
-        
+
         if not self.feature:
             self.get_feature(self.tab_type)
-            
+
         # Get widgets
         self.element_id = self.dlg_cf.findChild(QLineEdit, "element_id")
         btn_open_element = self.dlg_cf.findChild(QPushButton, "btn_open_element")
@@ -1499,7 +1507,7 @@ class ApiCF(ApiParent, QObject):
             self.controller.execute_sql(sql, log_sql=False)
             widget.model().select()
 
-
+    """ FUNCTIONS RELATED WITH TAB ELEMENT"""
     def manage_element(self, dialog, element_id=None, feature=None):
         """ Execute action of button 33 """
 
@@ -2822,13 +2830,6 @@ class ApiCF(ApiParent, QObject):
     def set_image(self, dialog, widget):
         utils_giswater.setImage(dialog, widget, "ws_shape.png")
 
-
-    def check_column_exist(self, table_name, column_name):
-
-        sql = (f"SELECT DISTINCT column_name FROM information_schema.columns"
-               f" WHERE table_name = '{table_name}' AND column_name = '{column_name}'")
-        row = self.controller.get_row(sql, log_sql=False)
-        return row
 
 
     """ FUNCTIONS ASSOCIATED TO BUTTONS FROM POSTGRES"""
