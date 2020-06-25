@@ -530,6 +530,7 @@ class ApiConfig(ApiParent):
         elem['chk'] = str('')
         elem['isChecked'] = str('')
         elem['value'] = value
+        elem['sysRoleId'] = 'role_admin'
 
         self.list_update.append(elem)
 
