@@ -76,8 +76,8 @@ BEGIN
 			INSERT INTO cat_node(id, nodetype_id, active)
 			VALUES ('DXF_JUN_CAT', 'DXF_JUN', true) ON CONFLICT DO NOTHING;
 		ELSIF v_project_type = 'UD' THEN
-			INSERT INTO cat_feature_node(id, type, epa_default, man_table, epa_table, isarcdivide)
-			VALUES ('DXF_JUN', 'JUNCTION','JUNCTION','man_junction', 'inp_junction', true) 
+			INSERT INTO cat_feature_node(id, type, epa_default, man_table, epa_table, isarcdivide, choose_hemisphere)
+			VALUES ('DXF_JUN', 'JUNCTION','JUNCTION','man_junction', 'inp_junction', true, false) 
 			ON CONFLICT DO NOTHING;
 
 			INSERT INTO cat_node(id, active)

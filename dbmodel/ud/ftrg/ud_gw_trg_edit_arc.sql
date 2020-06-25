@@ -90,7 +90,7 @@ BEGIN
 
 		 -- Epa type
 		IF (NEW.epa_type IS NULL) THEN
-			NEW.epa_type:= (SELECT epa_default FROM cat_feature.arc WHERE arc_type.id=NEW.arc_type)::text;   
+			NEW.epa_type:= (SELECT epa_default FROM cat_feature_arc WHERE cat_feature_arc.id=NEW.arc_type)::text;   
 		END IF;
 		
 		-- Arc catalog ID
