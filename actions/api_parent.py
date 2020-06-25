@@ -1726,7 +1726,7 @@ class ApiParent(ParentAction):
                 widget.blockSignals(False)
 
 
-    def get_selector(self, dialog, selector_type, filter=False, widget=None, type=None, text_filter=None, current_tab=None):
+    def get_selector(self, dialog, selector_type, filter=False, widget=None, text_filter=None):
         """ Ask to DB for selectors and make dialog
         :param dialog: Is a standard dialog, from file api_selectors.ui, where put widgets
         :param selector_type: list of selectors to ask DB ['exploitation', 'state', ...]
@@ -1905,12 +1905,13 @@ class ApiParent(ParentAction):
         body = self.create_body(extras=extras)
         json_result = self.controller.get_json('gw_fct_setselectors', body, log_sql=True)
 
-        if str(self.current_tab) == 'tab_exploitation':
+        if str(tab_name) == 'tab_exploitation':
 
             # reload layer, zoom to layer, style mapzones and refresh canvas
             layer = self.controller.get_layer_by_tablename('v_edit_arc')
             if layer:
-                layer.dataProvider().reloadData()
+                layer.dataProvider().forceReload()
+                layer.triggerRepaint()
                 self.iface.setActiveLayer(layer)
                 self.iface.zoomToActiveLayer()
             self.set_style_mapzones()
