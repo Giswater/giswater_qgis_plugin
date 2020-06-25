@@ -6,13 +6,13 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.core import QgsPointXY, QgsVectorLayer
-from qgis.core import QgsExpression, QgsFeatureRequest, QgsExpressionContextUtils, QgsRectangle, QgsGeometry, QgsProject
+from qgis.core import QgsExpression, QgsFeatureRequest, QgsExpressionContextUtils, QgsGeometry, QgsProject
 from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand, QgsDateTimeEdit
-from qgis.PyQt.QtCore import Qt, QSettings, QTimer, QDate, QRegExp, QStringListModel
-from qgis.PyQt.QtGui import QColor, QIntValidator, QDoubleValidator, QRegExpValidator, QStandardItemModel, QStandardItem
+from qgis.PyQt.QtCore import Qt, QSettings, QTimer, QDate, QStringListModel
+from qgis.PyQt.QtGui import QColor, QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QLineEdit, QSizePolicy, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel, QCheckBox
-from qgis.PyQt.QtWidgets import QCompleter, QToolButton, QFrame, QSpinBox, QDoubleSpinBox, QDateEdit, QGroupBox, QAction
-from qgis.PyQt.QtWidgets import QTableView, QTabWidget, QPushButton, QTextEdit, QFileDialog
+from qgis.PyQt.QtWidgets import QCompleter, QToolButton, QFrame, QSpinBox, QDoubleSpinBox, QDateEdit, QAction
+from qgis.PyQt.QtWidgets import QTableView, QTabWidget, QPushButton, QTextEdit
 from qgis.PyQt.QtSql import QSqlTableModel
 
 import os
@@ -21,7 +21,6 @@ import subprocess
 import sys
 import webbrowser
 import json
-from collections import OrderedDict
 from functools import partial
 
 from .. import utils_giswater
@@ -1804,6 +1803,7 @@ class ApiParent(ParentAction):
         :param table_name: name of the table that we have to update (deprecated)
         :param column_name: name of the column that we have to update (deprecated)
         """
+
         qgis_project_add_schema = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('gwAddSchema')
         extras = f'"selectorType":"{widget.property("selector_type")}", "id":"{widget.objectName()}", '
         extras += f'"value":"{widget.isChecked()}", "addSchema":"{qgis_project_add_schema}"'

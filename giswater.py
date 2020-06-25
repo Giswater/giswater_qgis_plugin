@@ -992,7 +992,8 @@ class Giswater(QObject):
 
         # Manage layers and check project
         self.load_project = LoadProject(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.load_project.set_params(self.project_type, self.schema_name, self.qgis_project_infotype)
+        self.load_project.set_params(self.project_type, self.schema_name, self.qgis_project_infotype,
+                                     self.qgis_project_add_schema)
         self.controller.log_info("Start load_project")
         if not self.load_project.config_layers():
             self.controller.log_info("False load_project")

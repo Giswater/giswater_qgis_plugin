@@ -10,9 +10,9 @@ from qgis.PyQt.QtCore import QPoint, Qt
 from qgis.PyQt.QtWidgets import QAction, QApplication, QDockWidget, QMenu, QToolBar, QToolButton
 from qgis.PyQt.QtGui import QCursor, QIcon, QPixmap
 
+import os
 from functools import partial
 
-from . import utils_giswater
 from .actions.add_layer import AddLayer
 from .actions.check_project_result import CheckProjectResult
 from .actions.task_config_layer_fields import TaskConfigLayerFields
@@ -30,17 +30,17 @@ class LoadProject:
         self.available_layers = None
         self.hide_form = None
         self.add_layer = None
-
         self.project_type = None
         self.schema_name = None
         self.qgis_project_infotype = None
 
 
-    def set_params(self, project_type, schema_name, qgis_project_infotype):
+    def set_params(self, project_type, schema_name, qgis_project_infotype, qgis_project_add_schema):
 
         self.project_type = project_type
         self.schema_name = schema_name
         self.qgis_project_infotype = qgis_project_infotype
+        self.qgis_project_add_schema = qgis_project_add_schema
         self.add_layer = AddLayer(self.iface, self.settings, self.controller, self.plugin_dir)
 
 
@@ -326,7 +326,7 @@ class LoadProject:
         extras += f'"addSchema":"{self.qgis_project_add_schema}"'
         body = self.create_body(extras=extras)
         sql = f"SELECT gw_fct_setselectors({body})::text"
-        row = self.controller.get_row(sql, commit=Truel)
+        row = self.controller.get_row(sql, commit=True)
         if row:
             self.iface.mapCanvas().refreshAllLayers()
             self.layer_muni.triggerRepaint()
@@ -337,7 +337,6 @@ class LoadProject:
     def get_cursor_multiple_selection(self):
         """ Set cursor for multiple selection """
 
-        path_folder = os.path.dirname(__file__)
         icon_path = self.plugin_dir + '/icons/211.png'
         if os.path.exists(icon_path):
             cursor = QCursor(QPixmap(icon_path))
@@ -353,7 +352,6 @@ class LoadProject:
         dockwidget = self.iface.mainWindow().findChild(QDockWidget, 'Layers')
         toolbar = dockwidget.findChildren(QToolBar)[0]
         btn_exist = toolbar.findChild(QToolButton, 'gw_add_layers')
-
         if btn_exist is None:
             self.btn_add_layers = QToolButton()
             self.btn_add_layers.setIcon(QIcon(icon_path))
@@ -375,8 +373,8 @@ class LoadProject:
         # Get parent layers
         sql = ("SELECT distinct ( CASE parent_layer WHEN 'v_edit_node' THEN 'Node' "
                "WHEN 'v_edit_arc' THEN 'Arc' WHEN 'v_edit_connec' THEN 'Connec' "
-               "WHEN 'v_edit_gully' THEN 'Gully' END ), parent_layer FROM cat_feature"
-               " ORDER BY parent_layer")
+               "WHEN 'v_edit_gully' THEN 'Gully' END ), parent_layer FROM cat_feature "
+               "ORDER BY parent_layer")
         parent_layers = self.controller.get_rows(sql)
 
         for parent_layer in parent_layers:
