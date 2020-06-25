@@ -221,6 +221,11 @@ class ManageVisit(ParentManage, QObject):
         e.g. all necessary commits and cleanings.
         A) Trigger SELECT gw_fct_om_visit_multiplier (visit_id, feature_type)
         for multiple visits management."""
+
+        index = self.tabs.currentIndex()
+        self.manage_tab_changed(self.dlg_add_visit, index)
+		
+		
         # tab Visit
         if self.current_tab_index == self.tab_index('VisitTab'):
             self.manage_leave_visit_tab()
