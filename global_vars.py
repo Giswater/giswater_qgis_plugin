@@ -12,6 +12,7 @@ settings = None
 qgis_settings = None
 plugin_name = None
 qgis_tools = None
+project_vars = {}
 
 
 def init_settings(setting_file):
@@ -46,6 +47,14 @@ def plugin_settings_value(key, default_value=""):
     global plugin_name, qgis_settings
     key = plugin_name + "/" + key
     value = qgis_settings.value(key, default_value)
-
     return value
+
+
+def set_project_vars(p_project_vars):
+    global project_vars
+    project_vars = p_project_vars
+
+
+def get_project_vars():
+    return project_vars
 

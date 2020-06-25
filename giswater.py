@@ -5,8 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsExpressionContextUtils, QgsPointLocator, \
-    QgsProject, QgsSnappingUtils, QgsTolerance
+from qgis.core import QgsPointLocator, QgsSnappingUtils, QgsTolerance
 from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtWidgets import QAction, QActionGroup, QDockWidget, QMenu, QToolBar, QToolButton
 from qgis.PyQt.QtGui import QIcon, QKeySequence
@@ -838,7 +837,7 @@ class Giswater(QObject):
                 repeated_layers[layer_source['schema'].replace('"', '')] = 'v_edit_node'
 
         if len(repeated_layers) > 1:
-            if self.qgis_project_main_schema is None or self.qgis_project_add_schema is None:
+            if self.project_vars['main_schema'] is None or self.project_vars['add_schema'] is None:
                 self.dlg_dtext = DialogTextUi()
                 self.dlg_dtext.btn_accept.hide()
                 self.dlg_dtext.btn_close.clicked.connect(lambda: self.dlg_dtext.close())
@@ -851,10 +850,10 @@ class Giswater(QObject):
                 self.dlg_dtext.open()
                 return False
 
-            # If there are layers with a different scheme, the one that the user has in the project variable
-            # self.qgis_project_main_schema is taken as the schema_name.
-            self.schema_name = self.qgis_project_main_schema
-            self.controller.set_schema_name(self.qgis_project_main_schema)
+            # If there are layers with a different schema, the one that the user has in the project variable
+            # 'gwMainSchema' is taken as the schema_name.
+            self.schema_name = self.project_vars['main_schema']
+            self.controller.set_schema_name(self.project_vars['main_schema'])
 
         return True
 
@@ -937,7 +936,8 @@ class Giswater(QObject):
         self.controller.plugin_settings_set_value("srid", self.srid)
 
         # Get variables from qgis project
-        self.get_qgis_project_variables()
+        self.project_vars = self.qgis_tools.get_qgis_project_variables()
+        global_vars.set_project_vars(self.project_vars)
 
         # Check that there are no layers (v_edit_node) with the same view name, coming from different schemes
         status = self.check_layers_from_distinct_schema()
@@ -1010,8 +1010,8 @@ class Giswater(QObject):
 
         # Manage layers and check project
         self.load_project = LoadProject(self.iface, global_vars.settings, self.controller, self.plugin_dir)
-        self.load_project.set_params(self.project_type, self.schema_name, self.qgis_project_infotype,
-                                     self.qgis_project_add_schema)
+        self.load_project.set_params(self.project_type, self.schema_name, self.project_vars['infotype'],
+                                     self.project_vars['add_schema'])
         self.controller.log_info("Start load_project")
         if not self.load_project.config_layers():
             self.controller.log_info("False load_project")
@@ -1025,7 +1025,7 @@ class Giswater(QObject):
     def check_user_roles(self):
         """ Check roles of this user to show or hide toolbars """
 
-        restriction = self.controller.get_restriction()
+        restriction = self.controller.get_restriction(self.project_vars['role'])
 
         if restriction == 'role_basic':
             pass
@@ -1204,40 +1204,4 @@ class Giswater(QObject):
         self.enable_toolbar("utils")
         self.enable_toolbar("tm_basic")
         self.tm_basic.set_controller(self.controller)
-
-
-    def get_value_from_metadata(self, parameter, default_value):
-        """ Get @parameter from metadata.txt file """
-
-        # Check if metadata file exists
-        metadata_file = os.path.join(self.plugin_dir, 'metadata.txt')
-        if not os.path.exists(metadata_file):
-            message = f"Metadata file not found: {metadata_file}"
-            self.iface.messageBar().pushMessage("", message, 1, 20)
-            return default_value
-
-        value = None
-        try:
-            metadata = configparser.ConfigParser()
-            metadata.read(metadata_file)
-            value = metadata.get('general', parameter)
-        except configparser.NoOptionError:
-            message = f"Parameter not found: {parameter}"
-            self.iface.messageBar().pushMessage("", message, 1, 20)
-            value = default_value
-        finally:
-            return value
-
-
-    def get_qgis_project_variables(self):
-        """ Manage qgis project variables """
-
-        self.qgis_project_infotype = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('gwInfoType')
-        self.qgis_project_add_schema = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('gwAddSchema')
-        self.qgis_project_main_schema = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('gwMainSchema')
-        self.qgis_project_role = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('gwProjectRole')
-        self.controller.plugin_settings_set_value("gwInfoType", self.qgis_project_infotype)
-        self.controller.plugin_settings_set_value("gwAddSchema", self.qgis_project_add_schema)
-        self.controller.plugin_settings_set_value("gwMainSchema", self.qgis_project_main_schema)
-        self.controller.plugin_settings_set_value("gwProjectRole", self.qgis_project_role)
 

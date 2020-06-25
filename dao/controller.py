@@ -1477,10 +1477,7 @@ class DaoController(object):
             qtextedit.setText(path[0])
 
 
-    def get_restriction(self):
-
-        # Get project variable 'project_role'
-        qgis_project_role = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('gwProjectRole')
+    def get_restriction(self, qgis_project_role):
 
         role_edit = False
         role_om = False

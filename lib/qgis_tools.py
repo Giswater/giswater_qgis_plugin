@@ -49,6 +49,17 @@ class QgisTools:
             return value
 
 
+    def get_qgis_project_variables(self):
+        """ Manage QGIS project variables """
+
+        project_vars = {}
+        project_vars['infotype'] = self.get_project_variable('gwInfoType')
+        project_vars['add_schema'] = self.get_project_variable('gwAddSchema')
+        project_vars['main_schema'] = self.get_project_variable('gwMainSchema')
+        project_vars['role'] = self.get_project_variable('gwProjectRole')
+        return project_vars
+
+
     def enable_python_console(self):
         """ Enable Python console and Log Messages panel if parameter 'enable_python_console' = True """
 

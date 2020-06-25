@@ -6,13 +6,13 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.core import QgsPointXY, QgsVectorLayer
-from qgis.core import QgsExpression, QgsFeatureRequest, QgsExpressionContextUtils, QgsGeometry, QgsProject
+from qgis.core import QgsExpression, QgsFeatureRequest, QgsGeometry
 from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand, QgsDateTimeEdit
 from qgis.PyQt.QtCore import Qt, QSettings, QTimer, QDate, QStringListModel
 from qgis.PyQt.QtGui import QColor, QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QLineEdit, QSizePolicy, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel, QCheckBox
 from qgis.PyQt.QtWidgets import QCompleter, QToolButton, QFrame, QSpinBox, QDoubleSpinBox, QDateEdit, QAction
-from qgis.PyQt.QtWidgets import QTableView, QTabWidget, QPushButton, QTextEdit
+from qgis.PyQt.QtWidgets import QTableView, QTabWidget, QPushButton, QTextEdit, QApplication
 from qgis.PyQt.QtSql import QSqlTableModel
 
 import os
@@ -20,9 +20,9 @@ import re
 import subprocess
 import sys
 import webbrowser
-import json
 from functools import partial
 
+from .. import global_vars
 from .. import utils_giswater
 from .parent import ParentAction
 from .HyperLinkLabel import HyperLinkLabel
@@ -1689,6 +1689,7 @@ class ApiParent(ParentAction):
 
 
     def manage_all(self, dialog, widget):
+
         key_modifier = QApplication.keyboardModifiers()
         status = utils_giswater.isChecked(dialog, widget)
         index = dialog.main_tab.currentIndex()
@@ -1873,8 +1874,9 @@ class ApiParent(ParentAction):
         """  Send values to DB and reload selectors
         :param widget: QCheckBox that contains the information to generate the json (QCheckBox)
         """
-                             
-        qgis_project_add_schema = self.controller.plugin_settings_value('gwAddSchema')
+
+        project_vars = global_vars.get_project_vars()
+        qgis_project_add_schema = project_vars['add_schema']
         extras = f'"selectorType":"{widget.property("selector_type")}", "tabName":"{self.current_tab}", ' \
                  f'"id":"{widget.objectName()}", '
         extras += f'"value":"{widget.isChecked()}", "addSchema":"{qgis_project_add_schema}"'
@@ -1891,3 +1893,4 @@ class ApiParent(ParentAction):
                 self.iface.zoomToActiveLayer()
             self.set_style_mapzones()
             self.refresh_map_canvas()
+

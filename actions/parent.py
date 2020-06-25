@@ -21,6 +21,7 @@ if 'nt' in sys.builtin_module_names:
 
 from functools import partial
 
+from .. import global_vars
 from .. import utils_giswater
 from .add_layer import AddLayer
 from ..ui_manager import DialogTextUi, GwDialog, GwMainWindow
@@ -892,7 +893,9 @@ class ParentAction(object):
         :return:
         """
 
-        role = self.controller.get_restriction()
+        project_vars = global_vars.get_project_vars()
+        role = project_vars['role']
+        role = self.controller.get_restriction(role)
         if role in restriction:
             widget_list = dialog.findChildren(QWidget)
             for widget in widget_list:

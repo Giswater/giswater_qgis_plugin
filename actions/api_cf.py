@@ -18,6 +18,7 @@ import json, os, re, subprocess, urllib.parse as parse, sys, webbrowser
 from collections import OrderedDict
 from functools import partial
 
+from .. import global_vars
 from .. import utils_giswater
 from .api_catalog import ApiCatalog
 from .api_parent import ApiParent
@@ -168,7 +169,6 @@ class ApiCF(ApiParent, QObject):
         """
         :param point: point where use clicked
         :param table_name: table where do sql query
-        :param feature_type: (arc, node, connec...)
         :param feature_id: id of feature to do info
         :return:
         """
@@ -189,11 +189,12 @@ class ApiCF(ApiParent, QObject):
         self.my_json = {}
         self.tab_type = tab_type
 
-        # Get values
-        qgis_project_add_schema = self.controller.plugin_settings_value('gwAddSchema')
-        qgis_project_main_schema = self.controller.plugin_settings_value('gwMainSchema')
-        qgis_project_infotype = self.controller.plugin_settings_value('gwInfoType')
-        qgis_project_role = self.controller.plugin_settings_value('gwProjectRole')
+        # Get project variables
+        project_vars = global_vars.get_project_vars()
+        qgis_project_add_schema = project_vars['add_schema']
+        qgis_project_main_schema = project_vars['main_schema']
+        qgis_project_infotype = project_vars['infotype']
+        qgis_project_role = project_vars['role']
 
         self.new_feature = new_feature
 
@@ -249,7 +250,8 @@ class ApiCF(ApiParent, QObject):
         # Comes from QPushButtons node1 or node2 from custom form or RightButton
         elif feature_id:
             if is_add_schema is True:
-                add_schema = self.controller.plugin_settings_value('gwAddSchema')
+                project_vars = global_vars.get_project_vars()
+                add_schema = project_vars['add_schema']
                 extras = f'"addSchema":"{add_schema}"'
             else:
                 extras = '"addSchema":""'

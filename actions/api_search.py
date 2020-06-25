@@ -13,14 +13,13 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QComboBox, QCompleter, QFileD
     QLabel, QLineEdit, QSizePolicy, QSpacerItem, QTableView, QTabWidget, QWidget
 
 import csv
-import json
 import operator
 import os
 import re
 import sys
 from functools import partial
-from collections import OrderedDict
 
+from .. import global_vars
 from .. import utils_giswater
 from .api_cf import ApiCF
 from .manage_document import ManageDocument
@@ -67,7 +66,8 @@ class ApiSearch(ApiParent):
 
         self.dlg_search.lbl_msg.setStyleSheet("QLabel{color:red;}")
         self.dlg_search.lbl_msg.setVisible(False)
-        qgis_project_add_schema = self.controller.plugin_settings_value('gwAddSchema')
+        project_vars = global_vars.get_project_vars()
+        qgis_project_add_schema = project_vars['add_schema']
 
         self.controller.set_user_settings_value('open_search', 'true')
 
