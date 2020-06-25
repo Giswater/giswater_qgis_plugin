@@ -88,7 +88,7 @@ class CadAddPoint(ParentMapTool):
                    f"{self.dist_y}, {self.direction}, {self.delete_prev})")
             self.controller.execute_sql(sql)
             self.layer_points.commitChanges()
-            self.layer_points.dataProvider().reloadData()
+            self.layer_points.dataProvider().forceReload()
             self.layer_points.triggerRepaint()
 
         else:
