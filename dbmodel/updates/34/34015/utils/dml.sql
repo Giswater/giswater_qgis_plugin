@@ -85,3 +85,5 @@ UPDATE sys_table SET notify_action = (replace (notify_action::text ,', "v_edit_l
 UPDATE sys_table SET notify_action = (replace (notify_action::text ,', "v_edit_vnode"', ''))::json;
 UPDATE sys_table SET notify_action = (replace (notify_action::text ,',"v_edit_link"', ''))::json;
 UPDATE sys_table SET notify_action = (replace (notify_action::text ,',"v_edit_vnode"', ''))::json;
+
+UPDATE sys_param_user SET widgettype = 'datetime' WHERE widgettype = 'datepickertime';
