@@ -1714,7 +1714,7 @@ class ApiParent(ParentAction):
                     continue
                 widget.blockSignals(True)
                 utils_giswater.setChecked(dialog, widget, True)
-                self.set_selector(widget)
+                self.set_selector(dialog, widget)
                 widget.blockSignals(False)
         elif status is False:
             for widget in widget_list:
@@ -1722,7 +1722,7 @@ class ApiParent(ParentAction):
                     continue
                 widget.blockSignals(True)
                 utils_giswater.setChecked(dialog, widget, False)
-                self.set_selector(widget)
+                self.set_selector(dialog, widget)
                 widget.blockSignals(False)
 
 
@@ -1863,7 +1863,7 @@ class ApiParent(ParentAction):
             else:
                 self.remove_previuos(dialog, widget, widget_all, widget_list)
 
-        self.set_selector(widget)
+        self.set_selector(dialog, widget)
 
 
     def remove_previuos(self, dialog, widget, widget_all, widget_list):
@@ -1882,22 +1882,24 @@ class ApiParent(ParentAction):
                 elif checkbox.objectName() != widget.objectName():
                     checkbox.blockSignals(True)
                     utils_giswater.setChecked(dialog, checkbox, False)
-                    self.set_selector(checkbox)
+                    self.set_selector(dialog, checkbox)
                     checkbox.blockSignals(False)
 
             elif checkbox.objectName() != widget.objectName():
                 checkbox.blockSignals(True)
                 utils_giswater.setChecked(dialog, checkbox, False)
-                self.set_selector(checkbox)
+                self.set_selector(dialog, checkbox)
                 checkbox.blockSignals(False)
 
 
-    def set_selector(self, widget):
+    def set_selector(self, dialog, widget):
         """  Send values to DB and reload selectors
         :param widget: QCheckBox that contains the information to generate the json (QCheckBox)
         """
+        index = dialog.main_tab.currentIndex()
+        tab_name = dialog.main_tab.widget(index).objectName()
         qgis_project_add_schema = self.controller.plugin_settings_value('gwAddSchema')
-        extras = f'"selectorType":"{widget.property("selector_type")}", "tabName":"{self.current_tab}", ' \
+        extras = f'"selectorType":"{widget.property("selector_type")}", "tabName":"{tab_name}", ' \
             f'"id":"{widget.objectName()}", '
         extras += f'"value":"{widget.isChecked()}", "addSchema":"{qgis_project_add_schema}"'
         body = self.create_body(extras=extras)
