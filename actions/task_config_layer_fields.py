@@ -5,7 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsProject, QgsApplication
+from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints
 from qgis.PyQt.QtCore import pyqtSignal
 from qgis.core import QgsTask
 
@@ -22,7 +22,6 @@ class TaskConfigLayerFields(QgsTask):
         self.message = None
         self.available_layers = None
         self.get_layers = True
-
         self.project_type = None
         self.schema_name = None
         self.qgis_project_infotype = None

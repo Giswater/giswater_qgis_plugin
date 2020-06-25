@@ -58,11 +58,10 @@ class LoadProject:
 
         # Set project layers with gw_fct_getinfofromid: This process takes time for user
         if self.hide_form is False:
-            # self.get_layers_to_config()
-            # self.set_layer_config(self.available_layers)
             # Set background task 'ConfigLayerFields'
             description = f"ConfigLayerFields"
             self.task_get_layers = TaskConfigLayerFields(description, self.controller)
+            self.task_get_layers.set_params(self.project_type, self.schema_name, self.qgis_project_infotype)
             QgsApplication.taskManager().addTask(self.task_get_layers)
             QgsApplication.taskManager().triggerTask(self.task_get_layers)
         else:
@@ -194,31 +193,6 @@ class LoadProject:
             self.controller.show_exceptions_msg("Key on returned json from ddbb is missed.", msg_key)
 
         self.controller.log_info("Finish set_layer_config")
-
-
-    def get_layers_to_config(self):
-        """ Get available layers to be configured """
-
-        schema_name = self.schema_name.replace('"','')
-        sql = (f"SELECT DISTINCT(parent_layer) FROM cat_feature "
-              f"UNION "
-              f"SELECT DISTINCT(child_layer) FROM cat_feature "
-              f"WHERE child_layer IN ("
-              f"     SELECT table_name FROM information_schema.tables"
-              f"     WHERE table_schema = '{schema_name}')")
-        rows = self.controller.get_rows(sql)
-        self.available_layers = [layer[0] for layer in rows]
-
-        self.set_form_suppress(self.available_layers)
-        all_layers_toc = self.controller.get_layers()
-        for layer in all_layers_toc:
-            layer_source = self.controller.get_layer_source(layer)
-            # Filter to take only the layers of the current schema
-            if 'schema' in layer_source:
-                schema = layer_source['schema']
-                if schema and schema.replace('"', '') == self.schema_name:
-                    table_name = f"{self.controller.get_layer_source_table_name(layer)}"
-                    self.available_layers.append(table_name)
 
 
     def set_form_suppress(self, layers_list):
