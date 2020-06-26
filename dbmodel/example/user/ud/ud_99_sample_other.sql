@@ -118,7 +118,7 @@ update gully set link='https://www.giswater.org';
 UPDATE config_form_fields set layoutorder = layoutorder+1 WHERE formname in ('ve_arc', 've_node', 've_connec','ve_gully')
 AND columnname in ('streetname','streetname2', 'postnumber','postnumber2','postcomplement','postcomplement2');
 
-UPDATE config_form_fields set hidden = false  WHERE formname in ('ve_arc', 've_node', 've_connec')
+UPDATE config_form_fields set hidden = false  WHERE formname in ('ve_arc', 've_node', 've_connec','ve_gully')
 AND columnname = 'district_id';
 
 UPDATE config_form_fields set layoutorder = 2 WHERE formname in ('ve_arc', 've_node') AND columnname = 'district_id';
