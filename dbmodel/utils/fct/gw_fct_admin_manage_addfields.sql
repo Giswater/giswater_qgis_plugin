@@ -150,7 +150,7 @@ BEGIN
 	END IF;
 	
 	-- get input parameters - config_form_fields
-	v_formtype = 'feature';
+	v_formtype = 'form_feature';
 	v_placeholder = (((p_data ->>'data')::json->>'parameters')::json->>'placeholder')::text;
 	v_tooltip = (((p_data ->>'data')::json->>'parameters')::json ->>'tooltip')::text;
 	v_isparent = (((p_data ->>'data')::json->>'parameters')::json ->>'isparent')::text;
@@ -354,8 +354,7 @@ BEGIN
 
 			IF v_action = 'CREATE' THEN
 
-				EXECUTE 'SELECT max(layoutorder) + 1 FROM config_form_fields WHERE formname='''||v_viewname||'''
-				AND layoutname = ''lyt_data_1'';'
+				EXECUTE 'SELECT max(layoutorder) + 1 FROM config_form_fields WHERE formname='''||v_viewname||''' AND layoutname = ''lyt_data_1'';'
 				INTO v_layoutorder;
 
 				IF v_layoutorder IS NULL THEN
@@ -524,7 +523,7 @@ BEGIN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (218, null, 4, 'Delete values from sys_addfields related to parameter.');
 
-			EXECUTE 'DELETE FROM config_form_fields WHERE columnname='''||v_param_name||'''and formtype=''feature'';' ;
+			EXECUTE 'DELETE FROM config_form_fields WHERE columnname='''||v_param_name||'''and formtype=''form_feature'';' ;
 
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (218, null, 4, 'Delete values from config_form_fields related to parameter.');
@@ -602,8 +601,7 @@ BEGIN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (218, null, 4, 'Insert parameter definition into sys_addfields.');
 
-			EXECUTE 'SELECT max(layoutorder) + 1 FROM config_form_fields WHERE formname='''||v_viewname||'''
-			AND layoutname = ''lyt_data_1'';'
+			EXECUTE 'SELECT max(layoutorder) + 1 FROM config_form_fields WHERE formname='''||v_viewname||''' AND layoutname = ''lyt_data_1'';'
 			INTO v_layoutorder;
 
 			IF v_layoutorder IS NULL THEN
