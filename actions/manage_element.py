@@ -140,7 +140,8 @@ class ManageElement(ParentManage):
         sql = "SELECT DISTINCT(id), id FROM cat_work"
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_add_element.workcat_id, rows, 1, add_empty=True)
-
+        self.dlg_add_element.workcat_id.currentIndexChanged.connect(partial(
+            self.set_style_sheet, self.dlg_add_element.workcat_id, None))
         sql = "SELECT DISTINCT(id), id FROM cat_work"
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_add_element.workcat_id_end, rows, 1, add_empty=True)
@@ -182,6 +183,10 @@ class ManageElement(ParentManage):
         # Open the dialog
         self.open_dialog(self.dlg_add_element, dlg_name='element', maximize_button=False)
         return self.dlg_add_element
+
+
+    def set_style_sheet(self, widget, style="border: 1px solid red"):
+        widget.setStyleSheet(style)
 
 
     def set_default_values(self):
@@ -328,7 +333,8 @@ class ManageElement(ParentManage):
             if workcat_id:
                 sql_values += f", '{workcat_id}'"
             else:
-                sql_values += ", null"
+                self.set_style_sheet(self.dlg_add_element.workcat_id)
+                return
             if workcat_id_end:
                 sql_values += f", '{workcat_id_end}'"
             else:
