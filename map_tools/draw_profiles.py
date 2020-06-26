@@ -81,8 +81,7 @@ class DrawProfiles(ParentMapTool):
         self.composers_path = self.dlg_draw_profile.findChild(QLineEdit, "composers_path")
 
         # Set layer_node
-        layername = f'v_edit_node'
-        self.layer_node = self.controller.get_layer_by_tablename(layername, show_warning=False)
+        self.layer_node = self.controller.get_layer_by_tablename('v_edit_node', show_warning=False)
 
         # Toolbar actions
         action = self.dlg_draw_profile.findChild(QAction, "actionProfile")
@@ -91,7 +90,7 @@ class DrawProfiles(ParentMapTool):
         self.action_profile = action
 
         # Declare draw style lines dict
-        self.dict_style = {"TOP-REAL": "dashed", "TOP-ESTIM": "dashed", "BOTTOM": "solid"}
+        self.dict_style = {"TOP-REAL": "solid", "TOP-ESTIM": "dashed", "BOTTOM": "solid"}
 
         # Triggers
         self.dlg_draw_profile.btn_draw_profile.clicked.connect(partial(self.get_profile))
@@ -110,7 +109,7 @@ class DrawProfiles(ParentMapTool):
         utils_giswater.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_title,
                                      self.controller.plugin_settings_value('titleProfile'))
 
-        # Show form in docker?
+        # Show form in docker
         self.controller.init_docker('qgis_form_docker')
         if self.controller.dlg_docker:
             # self.controller.manage_translation('draw_profile', self.dlg_draw_profile)

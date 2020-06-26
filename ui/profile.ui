@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>337</width>
-    <height>490</height>
+    <height>500</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -31,13 +31,6 @@
        <item row="0" column="0" colspan="2">
         <widget class="QLineEdit" name="txt_profile_id"/>
        </item>
-       <item row="9" column="1">
-        <widget class="QLineEdit" name="txt_min_distance">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
        <item row="3" column="0" colspan="2">
         <widget class="QPushButton" name="btn_save_profile">
          <property name="enabled">
@@ -50,13 +43,6 @@
        </item>
        <item row="1" column="0" colspan="2">
         <widget class="QListWidget" name="tbl_list_arc"/>
-       </item>
-       <item row="9" column="0">
-        <widget class="QLabel" name="lbl_min_distance">
-         <property name="text">
-          <string>Min distance:</string>
-         </property>
-        </widget>
        </item>
        <item row="2" column="0" colspan="2">
         <widget class="QPushButton" name="btn_load_profile">
@@ -71,7 +57,7 @@
     <item>
      <widget class="QGroupBox" name="grb_composer">
       <property name="title">
-       <string>Leaflet</string>
+       <string>Parameters</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_3">
        <item row="3" column="0">
@@ -100,6 +86,20 @@
        </item>
        <item row="3" column="1">
         <widget class="QLineEdit" name="txt_title"/>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="txt_min_distance">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="lbl_min_distance">
+         <property name="text">
+          <string>Min Dist:</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
