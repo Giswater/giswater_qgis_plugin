@@ -121,9 +121,9 @@ AND columnname in ('streetname','streetname2', 'postnumber','postnumber2','postc
 UPDATE config_form_fields set hidden = false  WHERE formname in ('ve_arc', 've_node', 've_connec','ve_gully')
 AND columnname = 'district_id';
 
-UPDATE config_form_fields set layoutorder = 2 WHERE formname in ('ve_arc', 've_node') AND columnname = 'district_id';
+UPDATE config_form_fields set layoutorder = 2 WHERE formname in ('ve_arc', 've_node','ve_gully') AND columnname = 'district_id';
 
-UPDATE config_form_fields set layoutorder = 3 WHERE formname in ('ve_connec', 've_gully') AND columnname = 'district_id';
+UPDATE config_form_fields set layoutorder = 3 WHERE formname in ('ve_connec' AND columnname = 'district_id';
 
 
 SELECT gw_fct_audit_check_project($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "version":"0", "fid":1}}$$)::text;
