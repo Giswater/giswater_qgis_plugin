@@ -176,16 +176,6 @@ class Go2Epa(ApiParent):
         return True
 
 
-    def go2epa_sector_selector(self):
-
-        tableleft = "sector"
-        tableright = "selector_sector"
-        field_id_left = "sector_id"
-        field_id_right = "sector_id"
-        aql = f" AND sector_id != 0"
-        self.sector_selection(tableleft, tableright, field_id_left, field_id_right, aql)
-
-
     def load_user_values(self):
         """ Load QGIS settings related with file_manager """
 
@@ -244,14 +234,7 @@ class Go2Epa(ApiParent):
         dlg_psector_sel = Multirow_selector('dscenario')
         self.load_settings(dlg_psector_sel)
         dlg_psector_sel.btn_ok.clicked.connect(dlg_psector_sel.close)
-        if tableleft == 'sector':
-            dlg_psector_sel.setWindowTitle(" Sector selector")
-            utils_giswater.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_filter,
-                                         self.controller.tr('Filter by: Sector name', context_name='labels'))
-            utils_giswater.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_unselected,
-                                         self.controller.tr('Unselected sectors', context_name='labels'))
-            utils_giswater.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_selected,
-                                         self.controller.tr('Selected sectors', context_name='labels'))
+
         if tableleft == 'cat_dscenario':
             dlg_psector_sel.setWindowTitle(" Dscenario selector")
             utils_giswater.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_filter,
