@@ -365,11 +365,11 @@ class ApiCF(ApiParent, QObject):
 
         result = complet_result[0]['body']['data']
         for field in result['fields']:
-            if 'hidden' in field and field['hidden']:
-                continue
+            if 'hidden' in field and field['hidden']: continue
+            if 'layoutname' in field and field['layoutname'] == 'lyt_none': continue
             widget = dialog.findChild(QWidget, field['widgetname'])
             value = None
-            if type(widget) in(QLineEdit, QPushButton, QSpinBox, QDoubleSpinBox):
+            if type(widget) in (QLineEdit, QPushButton, QSpinBox, QDoubleSpinBox):
                 value = utils_giswater.getWidgetText(dialog, widget, return_string_null=False)
             elif type(widget) is QComboBox:
                 value = utils_giswater.get_item_data(dialog, widget, 0)
