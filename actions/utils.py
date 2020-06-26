@@ -243,12 +243,9 @@ class Utils(ParentAction):
         extras = f'"importParam":"{label_aux}"'
         extras += f', "fid":"{fid_aux}"'
         body = self.create_body(extras=extras)
-        sql = ("SELECT " + str(self.func_name) + "($${" + body + "}$$)::text")
-        row = self.controller.get_row(sql, log_sql=True)
-        if not row:
-            self.controller.show_warning("NOT ROW FOR: " + sql)
-            message = "Import failed"
-            self.controller.show_info_box(message)
+
+        row = self.controller.get_json(self.func_name, body, log_sql=True)
+        if row is None:
             return
         else:
             complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
