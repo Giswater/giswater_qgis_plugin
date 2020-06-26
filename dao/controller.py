@@ -69,6 +69,7 @@ class DaoController(object):
             if not self.dao.close_db():
                 self.log_info(str(self.last_error))
             del self.dao
+        self.current_user = None
 
 
     def set_giswater(self, giswater):
@@ -164,6 +165,7 @@ class DaoController(object):
         self.dao = None
         self.last_error = None
         self.logged = False
+        self.current_user = None
 
         self.layer_source, not_version = self.get_layer_source_from_credentials()
         if self.layer_source:
@@ -354,6 +356,7 @@ class DaoController(object):
 
         # Update current user
         self.user = user
+        self.current_user = user
 
         # We need to create this connections for Table Views
         self.db = QSqlDatabase.addDatabase("QPSQL")
@@ -1456,6 +1459,9 @@ class DaoController(object):
 
     def get_current_user(self):
         """ Get current user connected to database """
+
+        if self.current_user:
+            return self.current_user
 
         sql = "SELECT current_user"
         row = self.get_row(sql)
