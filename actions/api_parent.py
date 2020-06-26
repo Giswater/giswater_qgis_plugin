@@ -215,14 +215,14 @@ class ApiParent(ParentAction):
         project_type = self.controller.get_project_type()
         # Get PDF file
         pdf_folder = os.path.join(self.plugin_dir, 'png')
-        pdf_path = os.path.join(pdf_folder, f"{project_type}_{geom_type}_{locale}.pdf")
+        pdf_path = os.path.join(pdf_folder, f"{project_type}_{geom_type}_{locale}.png")
 
         # Open PDF if exists. If not open Spanish version
         if os.path.exists(pdf_path):
             os.system(pdf_path)
         else:
             locale = "es"
-            pdf_path = os.path.join(pdf_folder, f"{project_type}_{geom_type}_{locale}.pdf")
+            pdf_path = os.path.join(pdf_folder, f"{project_type}_{geom_type}_{locale}.png")
             if os.path.exists(pdf_path):
                 os.system(pdf_path)
             else:
