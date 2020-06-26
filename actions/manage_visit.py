@@ -253,8 +253,7 @@ class ManageVisit(ParentManage, QObject):
         if self.current_tab_index == self.tab_index('tab_visit'):
             self.manage_leave_visit_tab()
 
-        # notify that a new visit has been added
-        self.visit_added.emit(self.current_visit.id)
+
 
         # Remove all previous selections
         self.disconnect_signal_selection_changed()
@@ -268,6 +267,9 @@ class ManageVisit(ParentManage, QObject):
         if self.it_is_new_visit:
             self.execute_pgfunction()
 
+        # notify that a new visit has been added
+        self.visit_added.emit(self.current_visit.id)
+        
         self.refresh_map_canvas()
 
 
