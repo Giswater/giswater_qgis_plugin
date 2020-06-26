@@ -997,6 +997,7 @@ class ManageVisit(ParentManage, QObject):
 
         # set fixed values
         self.dlg_event.parameter_id.setText(parameter_text)
+
         # create an empty Event
         event = OmVisitEvent(self.controller)
         event.id = event.max_pk() + 1
@@ -1015,7 +1016,6 @@ class ManageVisit(ParentManage, QObject):
         if not ret:
             # clicked cancel
             return
-
 
         for field_name in event.field_names():
             value = None
@@ -1256,7 +1256,7 @@ class ManageVisit(ParentManage, QObject):
         if not om_event_parameter.fetch():
             return
         dlg_name = None
-        if om_event_parameter.form_type == 'event_ud_arc_standard':
+        if om_event_parameter.form_type in ('event_ud_arc_standard', 'event_standard'):
             _value = self.dlg_add_visit.tbl_event.model().record(0).value('value')
             position_value = self.dlg_add_visit.tbl_event.model().record(0).value('position_value')
             text = self.dlg_add_visit.tbl_event.model().record(0).value('text')

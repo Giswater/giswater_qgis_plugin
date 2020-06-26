@@ -816,7 +816,7 @@ class ParentManage(ParentAction, object):
             expr_filter = expr_filter[:-2] + ")"
 
             # Check expression
-            (is_valid, expr) = self.check_expression(expr_filter, log_info=True)  # @UnusedVariable
+            (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
             if not is_valid:
                 return
 
