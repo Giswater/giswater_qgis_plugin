@@ -82,9 +82,9 @@ class ApiSearch(ApiParent):
         main_tab = self.dlg_search.findChild(QTabWidget, 'main_tab')
         if dlg_mincut and len(complet_list["form"]) == 1:
             main_tab = self.dlg_search.findChild(QTabWidget, 'main_tab')
-            main_tab.setStyleSheet("background-color: #f0f0f0;")
             main_tab.setStyleSheet("QTabBar::tab { background-color: transparent; text-align:left;"
-                                   "border: 1px solid transparent;}")
+                                   "border: 1px solid transparent;}"    
+                                   "QTabWidget::pane { background-color: #fcfcfc; border: 1 solid #dadada;}")
 
         first_tab = None
         self.lineedit_list = []
@@ -116,6 +116,7 @@ class ApiSearch(ApiParent):
 
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
             gridlayout.addItem(vertical_spacer1)
+
         if self.is_mincut is False:
             self.controller.manage_translation('search', self.dlg_search)
 
