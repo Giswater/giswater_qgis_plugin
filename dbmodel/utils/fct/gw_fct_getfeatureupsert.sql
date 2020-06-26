@@ -125,7 +125,10 @@ v_node1 text;
 v_node2 text;
 v_formtype text;
 v_querytext text;
-v_isnodeheader boolean = false; -- For those nodes that headers of mapzone
+v_isdmaheader boolean = false; -- For those nodes that headers of mapzone
+v_isdqaheader boolean = false; -- For those nodes that headers of mapzone
+v_issectorheader boolean = false; -- For those nodes that headers of mapzone
+v_ispresszoneheader boolean = false; -- For those nodes that headers of mapzone
 v_grafdelimiter text;
 v_mapzonetype text; -- Type of mapzone for that nodes that ar headers
 v_ispresszoneborder boolean = false; -- For those arcs that are on the border of mapzones againts two presszones (one each node)
@@ -439,8 +442,17 @@ BEGIN
 	-- Getting node header
 	IF v_project_type = 'WS' THEN
 		v_grafdelimiter = (SELECT graf_delimiter FROM cat_feature JOIN cat_feature_node USING (id) WHERE child_layer = p_table_id);
-		IF v_grafdelimiter IN ('PRESSZONE','DQA','DMA','SECTOR') THEN
-			v_isnodeheader = true;
+		IF v_grafdelimiter = 'PRESSZONE' THEN
+			v_ispresszoneheader = true;
+			v_mapzonetype = lower(v_grafdelimiter);
+		ELSIF v_grafdelimiter = 'DMA' THEN
+			v_isdmaheader = true;
+			v_mapzonetype = lower(v_grafdelimiter);
+		ELSIF v_grafdelimiter = 'DQA' THEN
+			v_isdqaheader = true;
+			v_mapzonetype = lower(v_grafdelimiter);
+		ELSIF v_grafdelimiter = 'SECTOR' THEN
+			v_issectorheader = true;
 			v_mapzonetype = lower(v_grafdelimiter);
 		END IF;
 	END IF;
@@ -637,7 +649,10 @@ BEGIN
 			END IF;
 			
 			-- force enabled widget of mapzones for nodes headers (insert or update)
-			IF v_isnodeheader AND (aux_json->>'columnname') IN('presszone_name','sector_name','dma_name','expl_name') THEN
+			IF 	(v_dmaheader AND (aux_json->>'columnname'='dma_name')) OR 
+				(v_dqaheader AND (aux_json->>'columnname'='dqa_name')) OR 
+				(v_sectorheader AND (aux_json->>'columnname'='sector_name')) OR 
+				(v_presszoneheader AND (aux_json->>'columnname'='presszone_name')) THEN
 					v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'iseditable', 'true'::boolean);
 			END IF;
 		END LOOP;  
