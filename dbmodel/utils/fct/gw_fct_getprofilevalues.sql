@@ -11,11 +11,22 @@ RETURNS json AS
 $BODY$
 
 /*example
+current petition from client:
+SELECT SCHEMA_NAME.gw_fct_getprofilevalues($${"data":{"initNode":"116", "endNode":"111", "linksDistance":1, "scale":{ "eh":1000, "ev":1000}}}$$);
+SELECT SCHEMA_NAME.gw_fct_getprofilevalues($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "initNode":"60", "endNode":"61", "linksDistance":5, "scale":{ "eh":1000, "ev":1000}}}$$);
 
-SELECT SCHEMA_NAME.gw_fct_getprofilevalues($${"client":{},"data":{"initNode":"116", "endNode":"111", "scale":{"scaleToFit":false, "eh":2000, "ev":500}}}$$);
+further petitions from client:
+SELECT SCHEMA_NAME.gw_fct_getprofilevalues($${"client":{},
+	"data":{"initNode":"116", "endNode":"111", "composer":"mincutA4", "legendFactor":1, "linksDistance":1, "scale":{"scaleToFit":false, "eh":2000, "ev":500}, "papersize":{"id":0, "customDim":{"xdim":300, "ydim":200}},
+		"ComposerTemplates":[{"ComposerTemplate":"mincutA4", "ComposerMap":[{"width":"179.0","height":"140.826","index":0, "name":"map0"},{"width":"77.729","height":"55.9066","index":1, "name":"map7"}]},
+				     {"ComposerTemplate":"mincutA3","ComposerMap":[{"width":"53.44","height":"55.9066","index":0, "name":"map7"},{"width":"337.865","height":"275.914","index":1, "name":"map6"}]}]
+				     }}$$);
 
-SELECT gw_fct_getprofilevalues($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "initNode":"51", "endNode":"37"}}$$);
-
+SELECT SCHEMA_NAME.gw_fct_getprofilevalues($${"client":{},
+	"data":{"initNode":"116", "endNode":"111", "composer":"mincutA4", "legendFactor":1, "linksDistance":1, "scale":{"scaleToFit":false, "eh":2000, "ev":500},"papersize":{"id":2, "customDim":{}},
+		"ComposerTemplates":[{"ComposerTemplate":"mincutA4", "ComposerMap":[{"width":"179.0","height":"140.826","index":0, "name":"map0"},{"width":"77.729","height":"55.9066","index":1, "name":"map7"}]},
+				     {"ComposerTemplate":"mincutA3","ComposerMap":[{"width":"53.44","height":"55.9066","index":0, "name":"map7"},{"width":"337.865","height":"275.914","index":1, "name":"map6"}]}]
+				     }}$$); 
 				     
 -- fid: 222
 
@@ -26,6 +37,7 @@ Mains:
 	- BOTTOM: Node has not representation on surface (node_type WHERE isprofilesurface IS FALSE) 
 	- LINK: vnodes
 - profile works with user-friendly variables
+	- legendFactor: Factor on make bigger o smaller llegend and text 
 	- linksDistance: Value to prevent on guitar when text is overlaped with another text 
 
 */
@@ -105,19 +117,20 @@ v_papersize integer;
 
 BEGIN
 
-	--  Search path
-	SET search_path = "SCHEMA_NAME", public;
-
 	--  Get input data
 	v_init = (p_data->>'data')::json->>'initNode';
 	v_end = (p_data->>'data')::json->>'endNode';
 	v_hs = ((p_data->>'data')::json->>'scale')::json->>'eh';
 	v_vs = ((p_data->>'data')::json->>'scale')::json->>'ev';
+	v_scaletofit := ((p_data->>'data')::json->>'scale')::json->>'scaleToFit';
+	v_legendfactor = (p_data->>'data')::json->>'legendFactor';
 	v_linksdistance = (p_data->>'data')::json->>'linksDistance';
+	v_composer := (p_data ->> 'data')::json->> 'composer';
+	v_templates := (p_data ->> 'data')::json->> 'ComposerTemplates';
+	v_papersize := ((p_data ->> 'data')::json->> 'papersize')::json->>'id';
 
-	-- control of profiliactic nulls
-	IF v_hs IS NULL THEN v_hs = 1000; END IF;
-	IF v_vs IS NULL THEN v_vs = 1000; END IF;
+	--  Search path
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- get projectytpe
 	SELECT project_type, giswater FROM sys_version LIMIT 1 INTO v_project_type, v_version;
@@ -183,7 +196,7 @@ BEGIN
 
 	-- insert node values on anl_node table
 	EXECUTE 'INSERT INTO anl_node (fid, node_id, code, '||v_ftopelev||', '||v_fymax||', elev, sys_type, nodecat_id, cat_geom1, arc_id, arc_distance, total_distance)
-		SELECT  222, node_id, n.code, '||v_fsystopelev||', '||v_fsysymax||', '||v_fsyselev||', n.node_type, nodecat_id, null, a.arc_id, 0, total_length FROM v_edit_node n JOIN cat_node ON nodecat_id = id JOIN
+		SELECT  222, node_id, n.code, '||v_fsystopelev||', '||v_fsysymax||', '||v_fsyselev||', n.sys_type, nodecat_id, null, a.arc_id, 0, total_length FROM v_edit_node n JOIN cat_node ON nodecat_id = id JOIN
 		(SELECT edge::text AS arc_id, node::text AS node_id, agg_cost as total_length FROM pgr_dijkstra(''SELECT arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, gis_length::float as cost, 
 		gis_length::float as reverse_cost FROM v_edit_arc'', '||v_init||','||v_end||'))a
 		USING (node_id)';
@@ -289,26 +302,115 @@ BEGIN
 	UPDATE anl_node SET sys_type = 'BOTTOM' FROM cat_feature_node n WHERE n.id = sys_type AND isprofilesurface IS FALSE AND fid=222 AND cur_user = current_user;
 	UPDATE anl_node SET sys_type = 'TOP-REAL' WHERE sys_type NOT IN ('BOTTOM', 'LINK') AND fid=222 AND cur_user = current_user;
 	UPDATE anl_node SET sys_type = 'TOP-ESTIM' WHERE sys_type ='TOP-REAL' AND result_id = 'estimated' AND fid=222 AND cur_user = current_user;
-
-	-- setting scale key return value
-	v_scale = concat('1:',v_hs, '(',v_hstext,') - 1:',v_vs,'(',v_vstext,')');
-
-	-- transform on the fly scale units (1:1000)
-	v_vs = v_vs/1000;
-	v_hs = v_hs/1000;
 	
-	UPDATE anl_arc SET cat_geom1 = cat_geom1/v_vs, length = length/v_hs WHERE fid=222 AND cur_user = current_user;
+	UPDATE anl_node SET result_id = null where result_id is not null AND fid=222 AND cur_user = current_user;
+
+	-- get profile dimensions
+	EXECUTE 'SELECT max('||v_ftopelev||')-min(elev) FROM anl_node WHERE fid=222 AND cur_user = current_user'
+	INTO v_elevation;
+	v_distance = (SELECT max(total_distance) FROM anl_node WHERE fid=222 AND cur_user = current_user);
 	
-	EXECUTE 'UPDATE anl_node SET total_distance = total_distance/' || v_hs || ', cat_geom1 = cat_geom1/'||v_hs||', '||v_ftopelev||' = '||v_ftopelev||'/'||v_vs||', elev = elev/'||v_vs||', '||
-	v_fymax||' = '||v_fymax||'/'||v_vs||' WHERE fid=222 AND cur_user = current_user';
+	-- get leaflet dimensions
+	v_profheigtht = 1000*v_elevation/v_vs + v_legendfactor*50 + 10;
+	v_profwidth = 1000*v_distance/v_hs + v_legendfactor*20 + 10; -- profile + guitar + margin
+
+
+	-- get portrait extension
+	IF v_composer !='' THEN
+		SELECT * INTO v_json FROM json_array_elements(v_templates) AS a WHERE a->>'ComposerTemplate' = v_composer;
+
+		-- select map with maximum width
+		SELECT array_agg(a->>'width') INTO v_array_width FROM json_array_elements( v_json ->'ComposerMap') AS a;
+		SELECT max (a) INTO v_compwidth FROM unnest(v_array_width) AS a;
+		SELECT a->>'name' INTO v_mapcomposer_name FROM json_array_elements( v_json ->'ComposerMap') AS a WHERE (a->>'width')::float = v_compwidth::float;
+		SELECT a->>'height' INTO v_compheight FROM json_array_elements( v_json ->'ComposerMap') AS a WHERE a->>'name' = v_mapcomposer_name;  
+		SELECT a->>'index' INTO v_index FROM json_array_elements( v_json ->'ComposerMap') AS a WHERE a->>'name' = v_mapcomposer_name; 
+
+		IF v_scaletofit IS FALSE THEN
+			IF v_compheight < v_profheigtht THEN
+				v_level = 2;
+				v_message = 'Profile too large. You need to modify the vertical scale or change the composer';
+				RETURN (concat('{"status":"accepted", "message":{"level":',v_level,', "text":"',v_message,'"}}')::json);
+			END IF;
+			IF v_compwidth < v_profwidth THEN
+				v_level = 2;
+				v_message = 'Profile too long. You need to modify the horitzontal scale or change the composer';
+				RETURN (concat('{"status":"accepted", "message":{"level":',v_level,', "text":"',v_message,'"}}')::json);
+			END IF;
+		END IF;
+	ELSE
+		-- set values for v_compheight & v_compwidth
+		v_compheight = v_profheigtht;
+		v_compwidth = v_profwidth;
+	END IF;
+
+	
+	-- get portrait extension
+	IF v_papersize = 0 THEN
+		v_compwidth = (((p_data ->> 'data')::json->> 'papersize')::json->>'customDim')::json->>'xdim';
+		v_compheight = (((p_data ->> 'data')::json->> 'papersize')::json->>'customDim')::json->>'ydim';
+	ELSE
+		v_compwidth = (SELECT addparam->>'xdim' FROM om_typevalue WHERE typevalue = 'profile_papersize' AND id = v_papersize::text);
+		v_compheight = (SELECT addparam->>'ydim' FROM om_typevalue WHERE typevalue = 'profile_papersize' AND id = v_papersize::text);
+	END IF;
+
+	-- check dimensions againts scale
+	IF v_scaletofit IS FALSE THEN
+		IF v_compheight < v_profheigtht THEN
+			v_level = 2;
+			v_message = 'Profile too large. You need to modify the vertical scale or change the composer';
+			RETURN (concat('{"status":"accepted", "message":{"level":',v_level,', "text":"',v_message,'"}}')::json);
+		END IF;
+		IF v_compwidth < v_profwidth THEN
+			v_level = 2;
+			v_message = 'Profile too long. You need to modify the horitzontal scale or change the composer';
+			RETURN (concat('{"status":"accepted", "message":{"level":',v_level,', "text":"',v_message,'"}}')::json);
+		END IF;
+		-- calculate the init point to start to draw profile
+		v_initv = (v_compheight - v_profheigtht)/2;
+		v_inith = (v_compwidth - v_profwidth)/2;
+	ELSE
+		-- calculate scale 
+		v_vs = (v_compheight - v_legendfactor*50 - 10)/(1000*v_elevation);
+		v_hs = (v_compwidth - v_legendfactor*20 - 10)/(1000*v_distance);
+
+		-- calculate the init point to start to draw profile
+		v_initv = v_legendfactor*50;
+		v_inith = v_legendfactor*20;
+	END IF;
+
+	IF v_compwidth IS NOT NULL  and v_compheight IS NOT NULL AND v_inith IS NOT NULL  and v_initv IS NOT NULL 
+		AND v_hs IS NOT NULL  AND v_hstext IS NOT NULL  AND v_vs IS NOT NULL AND v_vstext IS NOT NULL THEN
+
+		-- extension as composer (redundant to fit the image as is)
+		v_extension = (concat('{"width":', v_compwidth,', "height":', v_compheight,'}'))::json;	
+
+		-- initpoint to start to draw profile
+		v_initpoint = (concat('{"initx":', v_inith,', "inity":', v_initv,'}'))::json;	
+
+		-- scale text
+		v_scale = concat('1:',v_hs, '(',v_hstext,') - 1:',v_vs,'(',v_vstext,')');
+		
+		-- update values using scale factor
+		v_hs = 2000/v_hs;
+		v_vs = 500/v_vs;
+	ELSE
+		v_vs = 1;
+		v_hs= 1;
+	END IF;
+	
+	UPDATE anl_arc SET cat_geom1 = cat_geom1*v_vs, length = length*v_hs WHERE fid=222 AND cur_user = current_user;
+	EXECUTE 'UPDATE anl_node SET cat_geom1 = cat_geom1*'||v_vs||', '||v_ftopelev||' = '||v_ftopelev||'*'||v_vs||', elev = elev*'||v_vs||', '||
+	v_fymax||' = '||v_fymax||'*'||v_vs||' WHERE fid=222 AND cur_user = current_user';
 
 	-- recover values form temp table into response (filtering by spacing certain distance of length in order to not collapse profile)
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_arc
-	FROM (SELECT arc_id, descript, cat_geom1, length, z1, z2, y1, y2, elev1, elev2, node_1, node_2 FROM anl_arc WHERE fid=222 AND cur_user = current_user) row;
+	FROM (SELECT arc_id, descript, cat_geom1, length, z1, z2, y1, y2, elev1, elev2, node_1, node_2 FROM anl_arc WHERE fid=222 AND cur_user = current_user ORDER BY total_length) row;
 
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(row))) FROM (SELECT node_id, descript, sys_type, cat_geom1, '||
 			v_ftopelev||' AS top_elev, elev, '||v_fymax||' AS ymax FROM anl_node WHERE fid=222 AND cur_user = current_user AND nodecat_id != ''VNODE'' ORDER BY total_distance) row'
 			INTO v_node;
+
 
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(row))) FROM (
 			WITH querytext AS (SELECT row_number() over (order by total_distance) as rid, * FROM anl_node where fid = 222 AND cur_user = current_user ORDER by total_distance)
@@ -323,9 +425,12 @@ BEGIN
 	IF v_stylesheet IS NULL THEN v_stylesheet='{}'; END IF;
 
 	v_scale := COALESCE(v_scale, '{}'); 
+	v_extension := COALESCE(v_extension, '{}'); 
+	v_initpoint := COALESCE(v_initpoint, '{}'); 	
 	v_arc := COALESCE(v_arc, '{}'); 
 	v_node := COALESCE(v_node, '{}'); 
 	v_terrain := COALESCE(v_terrain, '{}'); 
+
 
 	-- default values
 	v_status = 'Accepted';	
@@ -337,6 +442,8 @@ BEGIN
                ',"body":{"form":{}'||
                ',"data":{"legend":'||v_guitarlegend||','||
 			'"scale":"'||v_scale||'",'||
+			'"extension":'||v_extension||','||
+			'"initpoint":'||v_initpoint||','||
 			'"stylesheet":'||v_stylesheet||','||
 			'"node":'||v_node||','||
 			'"terrain":'||v_terrain||','||
