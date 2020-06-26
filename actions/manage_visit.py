@@ -175,7 +175,9 @@ class ManageVisit(ParentManage, QObject):
 
         # Open the dialog
         if open_dialog:
-            self.feature_type.currentIndexChanged.emit(0)
+            # If the new visit dont come from info emit signal
+            if self.locked_geom_type is None:
+                self.feature_type.currentIndexChanged.emit(0)
             self.open_dialog(self.dlg_add_visit, dlg_name="visit")
 
 
