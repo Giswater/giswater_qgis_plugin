@@ -244,14 +244,13 @@ class Utils(ParentAction):
         extras += f', "fid":"{fid_aux}"'
         body = self.create_body(extras=extras)
 
-        row = self.controller.get_json(self.func_name, body, log_sql=True)
-        if row is None:
+        result = self.controller.get_json(self.func_name, body, log_sql=True)
+        if not result:
             return
         else:
-            complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-            if complet_result[0]['status'] == "Accepted":
-                self.add_layer.populate_info_text(dialog, complet_result[0]['body']['data'])
-            msg = complet_result[0]['message']['text']
+            if result['status'] == "Accepted":
+                self.add_layer.populate_info_text(dialog, result['body']['data'])
+            msg = result['message']['text']
             self.controller.show_info_box(msg)
 
 
