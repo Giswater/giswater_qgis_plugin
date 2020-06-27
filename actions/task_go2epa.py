@@ -139,13 +139,12 @@ class TaskGo2Epa(QgsTask):
     def exec_function_pg2epa(self):
 
         self.setProgress(0)
-        extras = '"iterative":"off"'
-        extras += f', "resultId":"{self.result_name}"'
+        extras = f', "resultId":"{self.result_name}"'
         extras += f', "useNetworkGeom":"{self.net_geom}"'
         extras += f', "dumpSubcatch":"{self.export_subcatch}"'
         body = self.create_body(extras=extras)
         function_name = 'gw_fct_pg2epa_main'
-        json_result = self.controller.get_json(function_name, body)
+        json_result = self.controller.get_json(function_name, body, log_sql=True)
         if json_result is None:
             return False
 

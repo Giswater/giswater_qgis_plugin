@@ -82,8 +82,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>668</width>
-        <height>697</height>
+        <width>664</width>
+        <height>687</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_3">
@@ -119,10 +119,10 @@
                </property>
                <layout class="QGridLayout" name="gridLayout_2" rowstretch="0" columnstretch="0,0">
                 <item row="0" column="0">
-                 <layout class="QGridLayout" name="grl_general_1" rowstretch="0" columnstretch="0"/>
+                 <layout class="QGridLayout" name="lyt_general_1" rowstretch="0" columnstretch="0"/>
                 </item>
                 <item row="0" column="1">
-                 <layout class="QGridLayout" name="grl_general_2"/>
+                 <layout class="QGridLayout" name="lyt_general_2"/>
                 </item>
                </layout>
               </widget>
@@ -134,70 +134,10 @@
                </property>
                <layout class="QGridLayout" name="gridLayout_6">
                 <item row="0" column="1">
-                 <layout class="QGridLayout" name="grl_hyd_4"/>
+                 <layout class="QGridLayout" name="lyt_hydraulics_2"/>
                 </item>
                 <item row="0" column="0">
-                 <layout class="QGridLayout" name="grl_hyd_3"/>
-                </item>
-               </layout>
-              </widget>
-             </item>
-             <item>
-              <widget class="QGroupBox" name="grb_quality">
-               <property name="title">
-                <string>QUALITY</string>
-               </property>
-               <layout class="QGridLayout" name="gridLayout_9">
-                <item row="0" column="0">
-                 <layout class="QGridLayout" name="grl_quality_5"/>
-                </item>
-                <item row="0" column="1">
-                 <layout class="QGridLayout" name="grl_quality_6" columnstretch="0"/>
-                </item>
-               </layout>
-              </widget>
-             </item>
-             <item>
-              <widget class="QGroupBox" name="grb_valve_status">
-               <property name="title">
-                <string>VALVE STATUS</string>
-               </property>
-               <layout class="QGridLayout" name="gridLayout_13">
-                <item row="0" column="1">
-                 <layout class="QGridLayout" name="grl_status_8"/>
-                </item>
-                <item row="0" column="0">
-                 <layout class="QGridLayout" name="grl_status_7"/>
-                </item>
-               </layout>
-              </widget>
-             </item>
-             <item>
-              <widget class="QGroupBox" name="grb_crm">
-               <property name="title">
-                <string>PATTERN METHOD OPTIONS</string>
-               </property>
-               <layout class="QGridLayout" name="gridLayout_16">
-                <item row="0" column="0">
-                 <layout class="QGridLayout" name="grl_crm_9"/>
-                </item>
-                <item row="0" column="1">
-                 <layout class="QGridLayout" name="grl_crm_10"/>
-                </item>
-               </layout>
-              </widget>
-             </item>
-             <item>
-              <widget class="QGroupBox" name="grb_din">
-               <property name="title">
-                <string>DINAMIC WAVE</string>
-               </property>
-               <layout class="QGridLayout" name="gridLayout_11">
-                <item row="1" column="0">
-                 <layout class="QGridLayout" name="grp_dinw_11"/>
-                </item>
-                <item row="1" column="1">
-                 <layout class="QGridLayout" name="grp_dinw_12"/>
+                 <layout class="QGridLayout" name="lyt_hydraulics_1"/>
                 </item>
                </layout>
               </widget>
@@ -209,10 +149,10 @@
                </property>
                <layout class="QGridLayout" name="gridLayout_19">
                 <item row="0" column="1">
-                 <layout class="QGridLayout" name="grl_date_14" rowstretch="0" columnstretch="0"/>
+                 <layout class="QGridLayout" name="lyt_date_2" rowstretch="0" columnstretch="0"/>
                 </item>
                 <item row="0" column="0">
-                 <layout class="QGridLayout" name="grl_date_13"/>
+                 <layout class="QGridLayout" name="lyt_date_1"/>
                 </item>
                </layout>
               </widget>
@@ -224,10 +164,10 @@
                </property>
                <layout class="QGridLayout" name="gridLayout_12">
                 <item row="0" column="1">
-                 <layout class="QGridLayout" name="grl_inpother_16"/>
+                 <layout class="QGridLayout" name="lyt_other_2"/>
                 </item>
                 <item row="0" column="0">
-                 <layout class="QGridLayout" name="grl_inpother_15"/>
+                 <layout class="QGridLayout" name="lyt_other_1"/>
                 </item>
                </layout>
               </widget>
@@ -250,25 +190,10 @@
                </property>
                <layout class="QGridLayout" name="gridLayout_10">
                 <item row="0" column="0">
-                 <layout class="QGridLayout" name="grl_reports_17"/>
+                 <layout class="QGridLayout" name="lyt_reports_1"/>
                 </item>
                 <item row="0" column="1">
-                 <layout class="QGridLayout" name="grl_reports_18"/>
-                </item>
-               </layout>
-              </widget>
-             </item>
-             <item row="1" column="0">
-              <widget class="QGroupBox" name="grb_rpt_others">
-               <property name="title">
-                <string>OTHER</string>
-               </property>
-               <layout class="QGridLayout" name="gridLayout_14">
-                <item row="0" column="0">
-                 <layout class="QGridLayout" name="drl_rptother_19"/>
-                </item>
-                <item row="0" column="1">
-                 <layout class="QGridLayout" name="drl_rptother_20"/>
+                 <layout class="QGridLayout" name="lyt_reports_2"/>
                 </item>
                </layout>
               </widget>
