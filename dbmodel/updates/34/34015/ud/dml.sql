@@ -10,3 +10,8 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2020/06/27
 DELETE FROM config_fprocess WHERE target IN ('[ADJUSTMENTS]', '[GWF]');
+
+
+UPDATE sys_param_user SET formname = 'epaoptions', project_type = 'ud', label, ='Default values', datatype = 'json', layoutorder = 16, layoutname = 'grl_general_2'
+iseditable = 'true', epaversion = '{"from":"5.0.022", "to":null,"language":"english"}' , descript = 'Default values on go2epa generation inp file'
+WHERE id = 'inp_options_vdefault';

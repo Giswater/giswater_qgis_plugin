@@ -90,3 +90,8 @@ VALUES ('ve_connec', 'form_feature', 'dqa_name', 32, 'string', 'text', 'Dqa name
 INSERT INTO config_param_system VALUES
 ('edit_mapzones_automatic_insert', '{"SECTOR":false, "DMA":false, "PRESSZONE":false, "DQA":false, "MINSECTOR":false}', 'Enable automatic insert of mapzone when new node header is created and code of mapzones is filled on widget',
 'Automatic mapzones insert', null, null, TRUE, NULL, 'ws');
+
+
+UPDATE sys_param_user SET project_type = 'ws' , label, ='Default values', datatype = 'json', 
+iseditable = 'true', epaversion = '{"from":"2.0.12", "to":null,"language":"english"}' , descript = 'Default values on go2epa generation inp file'
+WHERE id = 'inp_options_vdefault';
