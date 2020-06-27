@@ -87,3 +87,18 @@ UPDATE sys_table SET notify_action = (replace (notify_action::text ,',"v_edit_li
 UPDATE sys_table SET notify_action = (replace (notify_action::text ,',"v_edit_vnode"', ''))::json;
 
 UPDATE sys_param_user SET widgettype = 'datetime' WHERE widgettype = 'datepickertime';
+
+-- 2020/06/27
+UPDATE sys_param_user SET layoutname = 'lyt_reports_1' where layoutname = 'grl_reports_17';
+UPDATE sys_param_user SET layoutname = 'lyt_reports_1' where layoutname = 'grl_reports_17';
+
+UPDATE sys_param_user SET layoutname = 'lyt_date_1' where layoutname = 'grl_date_13';
+UPDATE sys_param_user SET layoutname = 'lyt_date_2' where layoutname = 'grl_date_14';
+
+UPDATE sys_param_user SET layoutname = 'lyt_hydraulics_1' where layoutname = 'grl_hyd_3';
+UPDATE sys_param_user SET layoutname = 'lyt_hydraulics_2' where layoutname = 'grl_hyd_4';
+
+UPDATE sys_param_user SET layoutname = 'lyt_general_1' where layoutname = 'grl_general_1';
+UPDATE sys_param_user SET layoutname = 'lyt_general_2' where layoutname = 'grl_general_2';
+
+DELETE FROM sys_param_user where id='inp_options_rtc_enabled'
