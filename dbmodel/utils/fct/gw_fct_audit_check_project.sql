@@ -15,10 +15,10 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_audit_check_project($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
 "feature":{}, "data":{"filterFields":{}, "addSchema":"ud_sample", "qgisVersion":"3.10.003.1", "initProject":"false", "pageInfo":{}, "version":"3.3.019", "fid":1}}$$);
 
--- fid: 101 (main)
+-- fid: main: 101
 	om: 125
 	graf: 211
-	epa: 114
+	epa: 225
 	plan: 115
 	admin: 195
 */
@@ -56,7 +56,6 @@ v_result_line json;
 v_result_polygon json;
 v_result json;
 v_result_info json;
-v_fid_aux integer;
 v_qgis_version text;
 v_qmlpointpath text = '';
 v_qmllinepath text = '';
@@ -70,6 +69,10 @@ v_qgisversion text;
 v_osversion text;
 v_qgis_init_guide_map boolean;
 v_addschema text;
+v_fid integer;
+v_mainschema text;
+v_projectrole text;
+v_infotype text;
 
 BEGIN 
 
@@ -80,12 +83,20 @@ BEGIN
 	SELECT project_type, giswater, epsg INTO v_project_type, v_version, v_srid FROM sys_version order by id desc limit 1;
 	
 	-- Get input parameters
-	v_fid_aux := (p_data ->> 'data')::json->> 'fid';
+	v_fid := (p_data ->> 'data')::json->> 'fid';
 	v_qgis_version := (p_data ->> 'data')::json->> 'version';
 	v_init_project := (p_data ->> 'data')::json->> 'initProject';
 	v_qgisversion := (p_data ->> 'data')::json->> 'qgisVersion';
 	v_osversion := (p_data ->> 'data')::json->> 'osVersion';
 	v_addschema := (p_data ->> 'data')::json->> 'addSchema';
+	v_mainschema := (p_data ->> 'data')::json->> 'mainSchema';
+	v_projectrole := (p_data ->> 'data')::json->> 'projecRole';
+	v_infotype := (p_data ->> 'data')::json->> 'infoType';
+
+	-- profilactic control of qgis variables
+	IF lower(v_mainschema) = 'none' OR v_mainschema = '' OR lower(v_mainschema) ='null' THEN v_mainschema = null; END IF;
+	IF lower(v_projectrole) = 'none' OR v_projectrole = '' OR lower(v_projectrole) ='null' THEN v_projectrole = null; END IF;
+	IF lower(v_infotype) = 'none' OR v_infotype = '' OR lower(v_infotype) ='null' THEN v_infotype = null; END IF;
 
 	-- profilactic control of schema name
 	IF lower(v_addschema) = 'none' OR v_addschema = '' OR lower(v_addschema) ='null'
@@ -148,6 +159,8 @@ BEGIN
 	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('PostGIS versión: ',(SELECT postgis_version())));
 	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('QGIS versión: ', v_qgisversion));
 	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('O/S versión: ', v_osversion));
+	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('QGIS variables:  gwAddSchema:',quote_nullable(v_addschema),
+		',  gwMainSchema:',quote_nullable(v_mainschema),',  gwProjectRole:', quote_nullable(v_projectrole), ',  gwInfoType:',quote_nullable(v_infotype)));
 		
 	
 	-- Reset urn sequence
@@ -310,7 +323,7 @@ BEGIN
 				"feature":{},"data":{"parameters":{"selectionMode":"wholeSystem", "grafClass":"ALL"}}}$$)';
 				-- insert results 
 				INSERT INTO audit_check_data  (fid, criticity, error_message)
-				SELECT 101, criticity, replace(error_message,':', ' (DB OM):') FROM audit_check_data 
+				SELECT 101, criticity, replace(error_message,':', ' (DB GRAF):') FROM audit_check_data 
 				WHERE fid=211 AND criticity < 4 AND error_message !='' AND cur_user=current_user OFFSET 6 ;
 			END IF;
 		END IF;
@@ -322,7 +335,7 @@ BEGIN
 				-- insert results 
 				INSERT INTO audit_check_data  (fid, criticity, error_message)
 				SELECT 101, criticity, replace(error_message,':', ' (DB EPA):') FROM audit_check_data 
-				WHERE fid=125 AND criticity < 4 AND error_message !='' AND cur_user=current_user OFFSET 6;
+				WHERE fid=225 AND criticity < 4 AND error_message !='' AND cur_user=current_user OFFSET 6;
 		END IF;
 
 		IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
@@ -354,120 +367,115 @@ BEGIN
 	END IF;
 
 	-- show form
+	IF v_hidden_form IS FALSE AND v_fid=101 THEN
 
-	IF v_hidden_form IS FALSE THEN
-
-		-- check qgis project (1)
-		IF v_fid_aux=1 THEN
-		
-			-- get values using v_edit_node as 'current'  (in case v_edit_node is wrong all will he wrong)
-			SELECT table_host, table_dbname, table_schema INTO v_table_host, v_table_dbname, v_table_schema 
-			FROM audit_check_project where table_id = 'v_edit_node' and cur_user=current_user;
+		-- get values using v_edit_node as 'current'  (in case v_edit_node is wrong all will he wrong)
+		SELECT table_host, table_dbname, table_schema INTO v_table_host, v_table_dbname, v_table_schema 
+		FROM audit_check_project where table_id = 'v_edit_node' and cur_user=current_user;
 			
-			--check layers host
-			SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list 
-			FROM audit_check_project WHERE table_host != v_table_host AND cur_user=current_user;
+		--check layers host
+		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list 
+		FROM audit_check_project WHERE table_host != v_table_host AND cur_user=current_user;
 			
-			IF v_count>0 THEN
-				v_errortext = concat('ERROR( QGIS PROJ): There is/are ',v_count,' layers that come from differen host: ',v_layer_list,'.');
+		IF v_count>0 THEN
+			v_errortext = concat('ERROR( QGIS PROJ): There is/are ',v_count,' layers that come from differen host: ',v_layer_list,'.');
 			
-				INSERT INTO audit_check_data (fid,  criticity, error_message)
-				VALUES (101, 3,v_errortext );
-			ELSE
-				INSERT INTO audit_check_data (fid,  criticity, error_message)
-				VALUES (101, 1, 'INFO (QGIS PROJ): All layers come from current host');
-			END IF;
-			
-			--check layers database
-			SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list 
-			FROM audit_check_project WHERE table_dbname != v_table_dbname AND cur_user=current_user;
-			
-			IF v_count>0 THEN
-				v_errortext = concat('ERROR (QGIS PROJ): There is/are ',v_count,' layers that come from different database: ',v_layer_list,'.');
-			
-				INSERT INTO audit_check_data (fid,  criticity, error_message)
-				VALUES (101, 3,v_errortext );
-			ELSE
-				INSERT INTO audit_check_data (fid,  criticity, error_message)
-				VALUES (101, 1, 'INFO (QGIS PROJ): All layers come from current database');
-			END IF;
-
-			--check layers database
-			SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list 
-			FROM audit_check_project WHERE table_schema != v_table_schema AND cur_user=current_user;
-			
-			IF v_count>0 THEN
-				v_errortext = concat('ERROR (QGIS PROJ): There is/are ',v_count,' layers that come from different schema: ',v_layer_list,'.');
-			
-				INSERT INTO audit_check_data (fid,  criticity, error_message)
-				VALUES (101, 3,v_errortext );
-			ELSE
-				INSERT INTO audit_check_data (fid,  criticity, error_message)
-				VALUES (101, 1, 'INFO (QGIS PROJ): All layers come from current schema');
-			END IF;
-
-			--check layers user
-			SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list 
-			FROM audit_check_project WHERE cur_user != table_user AND table_user != 'None' AND cur_user=current_user;
-			
-			IF v_count>0 THEN
-				v_errortext = concat('ERROR (QGIS PROJ): There is/are ',v_count,' layers that have been added by different user: ',v_layer_list,'.');
-			
-				INSERT INTO audit_check_data (fid,  criticity, error_message)
-				VALUES (101, 3,v_errortext );
-			ELSE
-				INSERT INTO audit_check_data (fid,  criticity, error_message)
-				VALUES (101, 1, 'INFO (QGIS PROJ): All layers have been added by current user');
-			END IF;
-
-			-- start process
-			FOR v_rectable IN SELECT * FROM sys_table WHERE qgis_role_id IN 
-			(SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member') )
-			LOOP
-			
-				--RAISE NOTICE 'v_count % id % ', v_count, v_rectable.id;
-				IF v_rectable.id NOT IN (SELECT table_id FROM audit_check_project WHERE cur_user=current_user AND fid=v_fid_aux) THEN
-					INSERT INTO audit_check_project (table_id, fid, criticity, enabled, message) VALUES (v_rectable.id, 101, v_rectable.qgis_criticity, FALSE, v_rectable.qgis_message);
-				--ELSE 
-				--	UPDATE audit_check_project SET criticity=v_rectable.qgis_criticity, enabled=TRUE WHERE table_id=v_rectable.id;
-				END IF;	
-				v_count=v_count+1;
-			END LOOP;
-			
-			--error 1 (criticity = 3 and false)
-			SELECT count (*) INTO v_error FROM audit_check_project WHERE cur_user=current_user AND fid=101 AND criticity=3 AND enabled=FALSE;
-
-			--list missing layers with criticity 3 and 2
-
-			EXECUTE 'SELECT json_agg(row_to_json(a)) FROM (SELECT table_id as layer,columns.column_name as id,
-			'''||v_srid||''' as srid,b.column_name as field_the_geom,''3'' as criticity, qgis_message
-			FROM '||v_schemaname||'.audit_check_project 
-			JOIN information_schema.columns ON table_name = table_id 
-			AND columns.table_schema = '''||v_schemaname||''' and ordinal_position=1 
-			LEFT JOIN '||v_schemaname||'.sys_table ON sys_table.id=audit_check_project.table_id
-			INNER JOIN (SELECT column_name ,table_name FROM information_schema.columns
-			WHERE table_schema = '''||v_schemaname||''' AND udt_name = ''geometry'')b ON b.table_name=sys_table.id
-			WHERE criticity=3 and enabled IS NOT TRUE) a'
-			INTO v_result_layers_criticity3;
-
-
-			EXECUTE 'SELECT json_agg(row_to_json(a)) FROM (SELECT table_id as layer,columns.column_name as id,
-			'''||v_srid||''' as srid,b.column_name as field_the_geom,''2'' as criticity, qgis_message
-			FROM '||v_schemaname||'.audit_check_project 
-			JOIN information_schema.columns ON table_name = table_id 
-			AND columns.table_schema = '''||v_schemaname||''' and ordinal_position=1 
-			LEFT JOIN '||v_schemaname||'.sys_table ON sys_table.id=audit_check_project.table_id
-			INNER JOIN (SELECT column_name ,table_name FROM information_schema.columns
-			WHERE table_schema = '''||v_schemaname||''' AND udt_name = ''geometry'')b ON b.table_name=sys_table.id
-			WHERE criticity=2 and enabled IS NOT TRUE) a'
-			INTO v_result_layers_criticity2;
-
-			v_result_layers_criticity3 := COALESCE(v_result_layers_criticity3, '{}'); 
-			v_result_layers_criticity2 := COALESCE(v_result_layers_criticity2, '{}'); 
-
-			v_missing_layers = v_result_layers_criticity3::jsonb||v_result_layers_criticity2::jsonb;
-
+			INSERT INTO audit_check_data (fid,  criticity, error_message)
+			VALUES (101, 3,v_errortext );
+		ELSE
+			INSERT INTO audit_check_data (fid,  criticity, error_message)
+			VALUES (101, 1, 'INFO (QGIS PROJ): All layers come from current host');
 		END IF;
+		
+		--check layers database
+		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list 
+		FROM audit_check_project WHERE table_dbname != v_table_dbname AND cur_user=current_user;
+		
+		IF v_count>0 THEN
+			v_errortext = concat('ERROR (QGIS PROJ): There is/are ',v_count,' layers that come from different database: ',v_layer_list,'.');
+		
+			INSERT INTO audit_check_data (fid,  criticity, error_message)
+			VALUES (101, 3,v_errortext );
+		ELSE
+			INSERT INTO audit_check_data (fid,  criticity, error_message)
+			VALUES (101, 1, 'INFO (QGIS PROJ): All layers come from current database');
+		END IF;
+
+		--check layers database
+		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list 
+		FROM audit_check_project WHERE table_schema != v_table_schema AND cur_user=current_user;
+		
+		IF v_count>0 THEN
+			v_errortext = concat('ERROR (QGIS PROJ): There is/are ',v_count,' layers that come from different schema: ',v_layer_list,'.');
+		
+			INSERT INTO audit_check_data (fid,  criticity, error_message)
+			VALUES (101, 3,v_errortext );
+		ELSE
+			INSERT INTO audit_check_data (fid,  criticity, error_message)
+			VALUES (101, 1, 'INFO (QGIS PROJ): All layers come from current schema');
+		END IF;
+
+		--check layers user
+		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list 
+		FROM audit_check_project WHERE cur_user != table_user AND table_user != 'None' AND cur_user=current_user;
+		
+		IF v_count>0 THEN
+			v_errortext = concat('ERROR (QGIS PROJ): There is/are ',v_count,' layers that have been added by different user: ',v_layer_list,'.');
+		
+			INSERT INTO audit_check_data (fid,  criticity, error_message)
+			VALUES (101, 3,v_errortext );
+		ELSE
+			INSERT INTO audit_check_data (fid,  criticity, error_message)
+			VALUES (101, 1, 'INFO (QGIS PROJ): All layers have been added by current user');
+		END IF;
+
+		-- start process
+		FOR v_rectable IN SELECT * FROM sys_table WHERE qgis_role_id IN 
+		(SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member') )
+		LOOP
+		
+			--RAISE NOTICE 'v_count % id % ', v_count, v_rectable.id;
+			IF v_rectable.id NOT IN (SELECT table_id FROM audit_check_project WHERE cur_user=current_user AND fid=v_fid) THEN
+				INSERT INTO audit_check_project (table_id, fid, criticity, enabled, message) VALUES (v_rectable.id, 101, v_rectable.qgis_criticity, FALSE, v_rectable.qgis_message);
+			--ELSE 
+			--	UPDATE audit_check_project SET criticity=v_rectable.qgis_criticity, enabled=TRUE WHERE table_id=v_rectable.id;
+			END IF;	
+			v_count=v_count+1;
+		END LOOP;
+		
+		--error 1 (criticity = 3 and false)
+		SELECT count (*) INTO v_error FROM audit_check_project WHERE cur_user=current_user AND fid=101 AND criticity=3 AND enabled=FALSE;
+
+		--list missing layers with criticity 3 and 2
+
+		EXECUTE 'SELECT json_agg(row_to_json(a)) FROM (SELECT table_id as layer,columns.column_name as id,
+		'''||v_srid||''' as srid,b.column_name as field_the_geom,''3'' as criticity, qgis_message
+		FROM '||v_schemaname||'.audit_check_project 
+		JOIN information_schema.columns ON table_name = table_id 
+		AND columns.table_schema = '''||v_schemaname||''' and ordinal_position=1 
+		LEFT JOIN '||v_schemaname||'.sys_table ON sys_table.id=audit_check_project.table_id
+		INNER JOIN (SELECT column_name ,table_name FROM information_schema.columns
+		WHERE table_schema = '''||v_schemaname||''' AND udt_name = ''geometry'')b ON b.table_name=sys_table.id
+		WHERE criticity=3 and enabled IS NOT TRUE) a'
+		INTO v_result_layers_criticity3;
+
+
+		EXECUTE 'SELECT json_agg(row_to_json(a)) FROM (SELECT table_id as layer,columns.column_name as id,
+		'''||v_srid||''' as srid,b.column_name as field_the_geom,''2'' as criticity, qgis_message
+		FROM '||v_schemaname||'.audit_check_project 
+		JOIN information_schema.columns ON table_name = table_id 
+		AND columns.table_schema = '''||v_schemaname||''' and ordinal_position=1 
+		LEFT JOIN '||v_schemaname||'.sys_table ON sys_table.id=audit_check_project.table_id
+		INNER JOIN (SELECT column_name ,table_name FROM information_schema.columns
+		WHERE table_schema = '''||v_schemaname||''' AND udt_name = ''geometry'')b ON b.table_name=sys_table.id
+		WHERE criticity=2 and enabled IS NOT TRUE) a'
+		INTO v_result_layers_criticity2;
+
+		v_result_layers_criticity3 := COALESCE(v_result_layers_criticity3, '{}'); 
+		v_result_layers_criticity2 := COALESCE(v_result_layers_criticity2, '{}'); 
+
+		v_missing_layers = v_result_layers_criticity3::jsonb||v_result_layers_criticity2::jsonb;
+		
 
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, v_result_id, 4, NULL);
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, v_result_id, 3, NULL);
