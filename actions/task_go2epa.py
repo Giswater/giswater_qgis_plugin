@@ -54,8 +54,6 @@ class TaskGo2Epa(QgsTask):
 
     def run(self):
 
-        self.controller.log_info(f"Task started: {self.description()}")
-
         if not self.exec_function_pg2epa():
             return False
 
@@ -160,7 +158,7 @@ class TaskGo2Epa(QgsTask):
 
     def export_to_inp(self):
 
-        self.complet_result = None
+        self.controller.log_info(f"Create inp file into POSTGRESQL")
 
         # Get values from complet_result['body']['file'] and insert into INP file
         if 'file' not in self.complet_result['body']:
@@ -173,7 +171,7 @@ class TaskGo2Epa(QgsTask):
 
     def fill_inp_file(self, folder_path=None, all_rows=None):
 
-        self.controller.log_info(f"fill_inp_file: {folder_path}")
+        self.controller.log_info(f"Write inp file........: {folder_path}")
 
         file1 = open(folder_path, "w")
         for row in all_rows:
@@ -185,6 +183,8 @@ class TaskGo2Epa(QgsTask):
 
 
     def execute_epa(self):
+
+        self.controller.log_info(f"Execute EPA software")
 
         if self.file_rpt == "null":
             message = "You have to set this parameter"
@@ -219,25 +219,26 @@ class TaskGo2Epa(QgsTask):
 
 
     def import_rpt(self):
+        """import result file"""
 
-        self.controller.log_info(f"import_rpt: {self.file_rpt}")
+        self.controller.log_info(f"Import rpt file........: {self.file_rpt}")
 
         self.rpt_result = None
         self.json_rpt = None
         status = False
         try:
             # Call import function
-            status = self.insert_rpt_into_db(self.file_rpt)
+            status = self.read_rpt_file(self.file_rpt)
             if not status:
                 return False
-            status = self.exec_function_rpt2pg()
+            status = self.exec_import_function()
         except Exception as e:
             self.error_msg = str(e)
         finally:
             return status
 
 
-    def insert_rpt_into_db(self, folder_path=None):
+    def read_rpt_file(self, folder_path=None):
 
         self._file = open(folder_path, "r+")
         full_file = self._file.readlines()
@@ -259,7 +260,7 @@ class TaskGo2Epa(QgsTask):
         json_rpt = ""
         row_count = sum(1 for rows in full_file)  # @UnusedVariable
 
-        self.controller.log_info(f"'{self.description()}'. Row count: {row_count}")
+        # self.controller.log_info(f"'{self.description()}'. Row count: {row_count}")
 
         for line_number, row in enumerate(full_file):
 
@@ -337,7 +338,7 @@ class TaskGo2Epa(QgsTask):
 
         # Manage JSON
         json_rpt = '[' + str(json_rpt[:-2]) + ']'
-        self.controller.log_info(json_rpt)
+        #self.controller.log_info(json_rpt)
         self.json_rpt = json_rpt
 
         self.close_file()
@@ -362,18 +363,15 @@ class TaskGo2Epa(QgsTask):
         return body
 
 
-    def exec_function_rpt2pg(self):
+    def exec_import_function(self):
         """ Call function gw_fct_rpt2pg_main """
 
-        extras = '"iterative":"disabled"'
-        extras += f', "resultId":"{self.result_name}"'
-        extras += f', "currentStep":"1"'
-        extras += f', "continue":"False"'
+        extras = f'"resultId":"{self.result_name}"'
         if self.json_rpt:
             extras += f', "file": {self.json_rpt}'
         body = self.create_body(extras=extras)
         function_name = 'gw_fct_rpt2pg_main'
-        json_result = self.controller.get_json(function_name, body, log_sql=True)
+        json_result = self.controller.get_json(function_name, body, log_sql=False)
         if json_result is None:
             return False
 
@@ -382,7 +380,6 @@ class TaskGo2Epa(QgsTask):
             return False
 
         # final message
-        self.common_msg += "Import RPT finished."
+        self.common_msg += "Import RPT file finished."
 
         return True
-
