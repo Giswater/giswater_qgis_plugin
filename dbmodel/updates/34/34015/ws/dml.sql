@@ -95,3 +95,20 @@ INSERT INTO config_param_system VALUES
 UPDATE sys_param_user SET project_type = 'ws' , label, ='Default values', datatype = 'json', 
 iseditable = 'true', epaversion = '{"from":"2.0.12", "to":null,"language":"english"}' , descript = 'Default values on go2epa generation inp file'
 WHERE id = 'inp_options_vdefault';
+
+UPDATE sys_table SET qgis_criticity = 0 WHERE id = 'presszone';
+UPDATE sys_table SET qgis_criticity = 0 WHERE id = 'v_rpt_node_hourly';
+UPDATE sys_table SET qgis_criticity = 0 WHERE id = 'v_rpt_comp_arc_hourly';
+UPDATE sys_table SET qgis_criticity = 0 WHERE id = 'v_rpt_comp_node_hourly';
+UPDATE sys_table SET qgis_criticity = 0 WHERE id = 'v_edit_macrosector';
+UPDATE sys_table SET qgis_criticity = 0 WHERE id = 'v_edit_macrodma';
+
+UPDATE sys_table SET qgis_criticity = 0 WHERE id = 'v_rpt_arc_all';
+UPDATE sys_table SET qgis_criticity = 0 WHERE id = 'v_rpt_node_all';
+UPDATE sys_table SET qgis_criticity = 0 WHERE id = 'v_rpt_comp_arc';
+UPDATE sys_table SET qgis_criticity = 0 WHERE id = 'v_rpt_comp_node';
+
+UPDATE sys_table SET qgis_criticity = 0 WHERE id = 'v_ext_streetaxis';
+UPDATE sys_table SET qgis_criticity = 0 WHERE id = 'v_ext_plot';
+UPDATE sys_table SET qgis_criticity = 0 WHERE id = 'v_ext_address';
+UPDATE sys_table SET qgis_criticity = 0 WHERE id = 'v_minsector';
