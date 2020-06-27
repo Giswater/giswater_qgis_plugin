@@ -41,7 +41,7 @@ BEGIN
 	END LOOP;
 
 	-- Return the temporal table
-	RETURN QUERY SELECT text_column::varchar FROM temp_table WHERE cur_user=current_user AND fid = 17;
+	RETURN QUERY SELECT text_column::varchar FROM temp_table WHERE cur_user=current_user AND fid = 117;
 
 END
 $$;

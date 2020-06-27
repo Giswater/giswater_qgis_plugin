@@ -12,7 +12,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_rpt2pg_log(p_result text)
 $BODY$
 
 /*EXAMPLE
-SELECT gw_fct_rpt2pg_log('test')
+SELECT gw_fct_rpt2pg_log('t1')
 
 -- fid: 103,107,114,139,164,166,170,171,198
 
@@ -53,76 +53,102 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 4, concat('Imported by: ', current_user, ', on ', to_char(now(),'YYYY-MM-DD HH:MM:SS')));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 4, '');
 
-	-- basic statistics
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 1, 'BASIC STATISTICS');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 1, '-----------------------');
 
 	IF v_project_type = 'WS' THEN
 
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		SELECT 114, 'stats', 1, concat ('FLOW : Max.(',max(flow)::numeric(12,3), ') , Avg.(', avg(flow)::numeric(12,3), ') , Standard dev.(', stddev(flow)::numeric(12,3)
-		, ') , Min.(', min (flow)::numeric(12,3),').') FROM rpt_arc WHERE result_id = p_result;
+		IF (SELECT count(*) FROM rpt_arc WHERE result_id = p_result) < 1 THEN
 
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		SELECT 114, 'stats', 1, concat ('VELOCITY : Max.(',max(vel)::numeric(12,3), ') , Avg.(', avg(vel)::numeric(12,3), ') , Standard dev.(', stddev(vel)::numeric(12,3)
-		, ') , Min.(', min (vel)::numeric(12,3),').') FROM rpt_arc WHERE result_id = p_result;
+			-- errors
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 3, 'CRITICAL ERRORS');
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 3, '------------------');
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			SELECT 114, p_result, 3, concat(csv1, ' ', csv2,' ', csv3, ' ',csv4, ' ',csv5, ' ',csv6, ' ',csv7, ' ',csv8, ' ',csv9, ' ',csv10, ' ',csv11, ' ',csv12, ' ',csv13, ' ',
+			csv14, ' ',csv15, ' ',csv16, ' ',csv17, ' ',csv18, ' ',csv19, ' ',csv20)
+			FROM temp_csv WHERE fid=140 and csv1 !='*';
 
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		SELECT 114, 'stats', 1, concat ('PRESSURE : Max.(',max(press)::numeric(12,3), ') , Avg.(', avg(press)::numeric(12,3), ') , Standard dev.(', stddev(press)::numeric(12,3)
-		, ') , Min.(', min (press)::numeric(12,3),').') FROM rpt_node WHERE result_id = p_result;
+		ELSE
+			-- rpt file info
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 3, 'RPT FILE INFO');
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 3, '------------------');
+		
+			-- basic statistics
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 1, 'BASIC STATISTICS');
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 1, '-----------------------');
 
-		-- warnings
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 1, '');
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 1, 'WARNINGS');
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 1, '-----------------------');
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		SELECT 114, p_result, 1, concat (time, ' ', text) FROM rpt_hydraulic_status WHERE result_id = p_result AND time = 'WARNING:';
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			SELECT 114, 'stats', 1, concat ('FLOW : Max.(',max(flow)::numeric(12,3), ') , Avg.(', avg(flow)::numeric(12,3), ') , Standard dev.(', stddev(flow)::numeric(12,3)
+			, ') , Min.(', min (flow)::numeric(12,3),').') FROM rpt_arc WHERE result_id = p_result;
+
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			SELECT 114, 'stats', 1, concat ('VELOCITY : Max.(',max(vel)::numeric(12,3), ') , Avg.(', avg(vel)::numeric(12,3), ') , Standard dev.(', stddev(vel)::numeric(12,3)
+			, ') , Min.(', min (vel)::numeric(12,3),').') FROM rpt_arc WHERE result_id = p_result;
+
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			SELECT 114, 'stats', 1, concat ('PRESSURE : Max.(',max(press)::numeric(12,3), ') , Avg.(', avg(press)::numeric(12,3), ') , Standard dev.(', stddev(press)::numeric(12,3)
+			, ') , Min.(', min (press)::numeric(12,3),').') FROM rpt_node WHERE result_id = p_result;
+
+			-- warnings
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 2, '');
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 2, 'WARNINGS');
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 2, '-----------------------');
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			SELECT 114, p_result, 2, concat (time, ' ', text) FROM rpt_hydraulic_status WHERE result_id = p_result AND time = 'WARNING:';
+		END IF;
 
 	ELSIF v_project_type = 'UD' THEN
 
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		SELECT 114, p_result, 1, concat ('MAX. FLOW : Max.(',max(max_flow)::numeric(12,3), ') , Avg.(', avg(max_flow)::numeric(12,3), ') , Standard dev.(', stddev(max_flow)::numeric(12,3)
-		, ') , Min.(', min (max_flow)::numeric(12,3),').') FROM rpt_arcflow_sum WHERE result_id = p_result;
+		IF (SELECT count(*) FROM rpt_arcflow_sum WHERE result_id = p_result) < 1 THEN
+		
+			-- errors
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 3, 'CRITICAL ERRORS');
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 3, '------------------');
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			SELECT 114, p_result, 3, concat(csv1, ' ', csv2,' ', csv3, ' ',csv4, ' ',csv5, ' ',csv6, ' ',csv7, ' ',csv8, ' ',csv9, ' ',csv10, ' ',csv11, ' ',csv12, ' ',csv13, ' ',
+			csv14, ' ',csv15, ' ',csv16, ' ',csv17, ' ',csv18, ' ',csv19, ' ',csv20)
+			FROM temp_csv WHERE fid=140 and csv1 !='*';
 
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		SELECT 114, p_result, 1, concat ('VELOCITY : Max.(',max(max_veloc)::numeric(12,3), ') , Avg.(', avg(max_veloc)::numeric(12,3), ') , Standard dev.(', stddev(max_veloc)::numeric(12,3)
-		, ') , Min.(', min (max_veloc)::numeric(12,3),').') FROM rpt_arcflow_sum WHERE result_id = p_result;
+		ELSE
+			-- basic statistics
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 1, 'BASIC STATISTICS');
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 1, '-----------------------');
 
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		SELECT 114, p_result, 1, concat ('FULL PERCENT. : Max.(',max(mfull_dept)::numeric(12,3), ') , Avg.(', avg(mfull_dept)::numeric(12,3), ') , Standard dev.(', stddev(mfull_dept)::numeric(12,3)
-		, ') , Min.(', min (mfull_dept)::numeric(12,3),').') FROM rpt_arcflow_sum WHERE result_id = p_result;
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			SELECT 114, p_result, 1, concat ('MAX. FLOW : Max.(',max(max_flow)::numeric(12,3), ') , Avg.(', avg(max_flow)::numeric(12,3), ') , Standard dev.(', stddev(max_flow)::numeric(12,3)
+			, ') , Min.(', min (max_flow)::numeric(12,3),').') FROM rpt_arcflow_sum WHERE result_id = p_result;
 
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		SELECT 114, p_result, 1, concat ('NODE SURCHARGE : Number of nodes (', count(*)::integer,').') 
-		FROM rpt_nodesurcharge_sum WHERE result_id = p_result;
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			SELECT 114, p_result, 1, concat ('VELOCITY : Max.(',max(max_veloc)::numeric(12,3), ') , Avg.(', avg(max_veloc)::numeric(12,3), ') , Standard dev.(', stddev(max_veloc)::numeric(12,3)
+			, ') , Min.(', min (max_veloc)::numeric(12,3),').') FROM rpt_arcflow_sum WHERE result_id = p_result;
 
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		SELECT 114, p_result, 1, concat ('NODE FLOODING: Number of nodes (', count(*)::integer,'), Max. rate (',max(max_rate)::numeric(12,3), '), Total flood (' ,sum(tot_flood), 
-		'), Max. flood (', max(tot_flood),').')
-		FROM rpt_nodeflooding_sum WHERE result_id = p_result;
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			SELECT 114, p_result, 1, concat ('FULL PERCENT. : Max.(',max(mfull_dept)::numeric(12,3), ') , Avg.(', avg(mfull_dept)::numeric(12,3), ') , Standard dev.(', stddev(mfull_dept)::numeric(12,3)
+			, ') , Min.(', min (mfull_dept)::numeric(12,3),').') FROM rpt_arcflow_sum WHERE result_id = p_result;
 
-		-- warnings
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 1, '');
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 1, 'WARNINGS');
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 1, '-----------------------');
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		SELECT 114, p_result, 1, concat(csv1,' ',csv2, ' ',csv3, ' ',csv4, ' ',csv5, ' ',csv6, ' ',csv7, ' ',csv8, ' ',csv9, ' ',csv10, ' ',csv11, ' ',csv12) from temp_csv
-		where fid = 11 and source='rpt_warning_summary' and cur_user=current_user;
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		SELECT 114, p_result, 1, concat(csv1,' ',csv2, ' ',csv3, ' ',csv4, ' ',csv5, ' ',csv6, ' ',csv7, ' ',csv8, ' ',csv9, ' ',csv10, ' ',csv11, ' ',csv12) from temp_csv
-		where fid = 11 and source='rpt_warning_summary' and cur_user=current_user;
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			SELECT 114, p_result, 1, concat ('NODE SURCHARGE : Number of nodes (', count(*)::integer,').') 
+			FROM rpt_nodesurcharge_sum WHERE result_id = p_result;
 
-	
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			SELECT 114, p_result, 1, concat ('NODE FLOODING: Number of nodes (', count(*)::integer,'), Max. rate (',max(max_rate)::numeric(12,3), '), Total flood (' ,sum(tot_flood), 
+			'), Max. flood (', max(tot_flood),').')
+			FROM rpt_nodeflooding_sum WHERE result_id = p_result;
+
+			-- warnings
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 1, '');
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 1, 'WARNINGS');
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 1, '-----------------------');
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			SELECT 114, p_result, 1, concat(csv1,' ',csv2, ' ',csv3, ' ',csv4, ' ',csv5, ' ',csv6, ' ',csv7, ' ',csv8, ' ',csv9, ' ',csv10, ' ',csv11, ' ',csv12) from temp_csv
+			where fid = 11 and source='rpt_warning_summary' and cur_user=current_user;
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			SELECT 114, p_result, 1, concat(csv1,' ',csv2, ' ',csv3, ' ',csv4, ' ',csv5, ' ',csv6, ' ',csv7, ' ',csv8, ' ',csv9, ' ',csv10, ' ',csv11, ' ',csv12) from temp_csv
+			where fid = 11 and source='rpt_warning_summary' and cur_user=current_user;
+		END IF;
 	END IF;
 
 	v_stats = (SELECT array_to_json(array_agg(error_message)) FROM audit_check_data WHERE result_id='stats' AND fid=114 AND cur_user=current_user);
 
 	UPDATE rpt_cat_result SET stats = v_stats WHERE result_id=p_result;
-
-	-- rpt file info
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 1, '');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 1, 'RPT FILE INFO');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 1, '------------------');
 
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 	SELECT 114, p_result, 1, concat(csv1,' ',csv2, ' ',csv3, ' ',csv4, ' ',csv5, ' ',csv6, ' ',csv7, ' ',csv8, ' ',csv9, ' ',csv10, ' ',csv11, ' ',csv12) from temp_csv
