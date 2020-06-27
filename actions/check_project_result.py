@@ -69,14 +69,20 @@ class CheckProjectResult(ApiParent):
     def execute_audit_check_project(self, init_project):
         """ Execute function 'gw_fct_audit_check_project' """
 
-        # get addschema variable
+        # get project variables
         add_schema = self.controller.plugin_settings_value('gwAddSchema')
+        main_schema = self.controller.plugin_settings_value('gwMainSchema')
+        project_role = self.controller.plugin_settings_value('gwProjecRole')
+        info_type = self.controller.plugin_settings_value('gwInfoType')
 
         version = self.get_plugin_version()
         extras = f'"version":"{version}"'
         extras += f', "fid":101'
         extras += f', "initProject":{init_project}'
         extras += f', "addSchema":"{add_schema}"'
+        extras += f', "mainSchema":"{main_schema}"'
+        extras += f', "projecRole":"{project_role}"'
+        extras += f', "infoType":"{info_type}"'
         extras += f', "qgisVersion":"{Qgis.QGIS_VERSION}"'
         extras += f', "osVersion":"{platform.system()} {platform.release()}"'
         body = self.create_body(extras=extras)
