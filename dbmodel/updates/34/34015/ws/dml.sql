@@ -73,7 +73,6 @@ VALUES ('ve_node', 'form_feature', 'presszone_name', 31, 'string', 'text', 'Pres
 INSERT INTO config_form_fields (formname, formtype, columnname,  layoutorder, datatype, widgettype, label,  ismandatory, isparent, iseditable, isautoupdate, layoutname, hidden) 
 VALUES ('ve_node', 'form_feature', 'dqa_name', 32, 'string', 'text', 'Dqa name', FALSE, FALSE, FALSE, FALSE,  'lyt_data_2', TRUE);
 
-
 INSERT INTO config_form_fields (formname, formtype, columnname,  layoutorder, datatype, widgettype, label,  ismandatory, isparent, iseditable, isautoupdate, layoutname, hidden) 
 VALUES ('ve_connec', 'form_feature', 'sector_name', 41, 'string', 'text', 'Dma name', FALSE, FALSE, FALSE, FALSE,  'lyt_data_1', TRUE);
 
@@ -92,8 +91,8 @@ INSERT INTO config_param_system VALUES
 'Automatic mapzones insert', null, null, TRUE, NULL, 'ws');
 
 
-UPDATE sys_param_user SET project_type = 'ws' , label, ='Default values', datatype = 'json', 
-iseditable = 'true', epaversion = '{"from":"2.0.12", "to":null,"language":"english"}' , descript = 'Default values on go2epa generation inp file'
+UPDATE sys_param_user SET project_type = 'ws', label = 'Default values', datatype = 'json', 
+iseditable = 'true', epaversion = '{"from":"2.0.12", "to":null,"language":"english"}', descript = 'Default values on go2epa generation inp file'
 WHERE id = 'inp_options_vdefault';
 
 UPDATE sys_table SET qgis_criticity = 0 WHERE id = 'presszone';
