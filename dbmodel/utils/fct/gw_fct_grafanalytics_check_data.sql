@@ -20,7 +20,10 @@ SELECT SCHEMA_NAME.gw_fct_grafanalytics_check_data($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{},"data":{"parameters":{"selectionMode":"userSelectors","grafClass":"SECTOR"}}}$$)
 
--- fid: 211,176,179,180,181,192,208,209
+-- fid: main:211,
+	other: 176,179,180,181,192,208,209
+
+select * FROM audit_check_data WHERE fid=211 AND cur_user=current_user; 
 
 */
 
@@ -292,7 +295,7 @@ BEGIN
 	IF v_presszone IS TRUE AND (v_grafclass = 'PRESSZONE' OR v_grafclass = 'ALL') THEN
 
 		-- check presszone.grafconfig values
-		v_querytext = 	'SELECT * FROM presszone WHERE grafconfig IS NULL and id > 0::text' ;
+		v_querytext = 	'SELECT * FROM presszone WHERE grafconfig IS NULL and presszone_id > 0::text' ;
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
 		IF v_count > 0 THEN
@@ -365,7 +368,7 @@ BEGIN
 	v_result_polygon := COALESCE(v_result_polygon, '{}'); 
 	
 	-- Return
-    RETURN ('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
+	RETURN ('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 		     	'"setVisibleLayers":[]'||','||

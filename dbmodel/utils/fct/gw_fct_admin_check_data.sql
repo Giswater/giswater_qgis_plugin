@@ -150,8 +150,8 @@ BEGIN
 
 
 	--check if all views with active cat_feature have a definition in config_form_fields
-    SELECT count(id), string_agg(child_layer,',')  INTO v_count,v_view_list FROM cat_feature WHERE active IS TRUE AND
-    child_layer not in (select formname FROM config_form_fields);
+	SELECT count(id), string_agg(child_layer,',')  INTO v_count,v_view_list FROM cat_feature WHERE active IS TRUE AND
+	child_layer not in (select formname FROM config_form_fields);
 
 	IF v_count > 0 THEN
 		v_errortext = concat('ERROR: There is/are ',v_count,' active features which views are not defined in config_form_fields. Undefined views: ',v_view_list,'.');
@@ -205,7 +205,7 @@ BEGIN
 
 	--check if all the fields defined as combo or typeahead have dv_querytext defined
 	SELECT count(*), string_agg(concat(formname,'.',columnname),',') INTO v_count, v_view_list  FROM config_form_fields
-	WHERE (widgettype = 'combo' or widgettype ='typeahead') and dv_querytext is null;
+	WHERE (widgettype = 'combo' or widgettype ='typeahead') and dv_querytext is null and columnname !='composer';
 
 	IF v_count > 0 THEN
 		v_errortext = concat('ERROR: There is/are ',v_count,' feature form fields in config_form_fields that are combo or typeahead but don''t have dv_querytext defined. Fields: ',v_view_list,'.');

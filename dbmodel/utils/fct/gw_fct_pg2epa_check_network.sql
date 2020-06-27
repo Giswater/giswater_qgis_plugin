@@ -3,7 +3,7 @@ This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
--- The code of this inundation function have been provided by Enric Amat (FISERSA)
+-- Part of code of this inundation function have been provided by Enric Amat (FISERSA)
 
 
 --FUNCTION CODE: 2680
@@ -16,16 +16,17 @@ $BODY$
 /*
 --EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_network('{"data":{"parameters":{"resultId":"z1","fid":227}}}')::json; -- when is called from go2epa
-SELECT SCHEMA_NAME.gw_fct_pg2epa_check_network('{"data":{"parameters":{"resultId":"r1"}}}')::json; -- when is called from toolbox
+SELECT SCHEMA_NAME.gw_fct_pg2epa_check_network('{"data":{"parameters":{}}}')::json; -- when is called from toolbox
 
 --RESULTS
 SELECT node_id FROM anl_node WHERE fid = 233 AND cur_user=current_user
 SELECT arc_id FROM anl_arc WHERE fid = 232 AND cur_user=current_user
 SELECT node_id FROM anl_node WHERE fid = 139 AND cur_user=current_user
-SELECT * FROM audit_check_data WHERE fid = 227
+SELECT * FROM audit_check_data WHERE fid = 139
 SELECT * FROM temp_anlgraf;
 
--- fid: 139,227,231,233,238
+-- fid: main:139
+	other: 227,231,233,238
 
 */
 

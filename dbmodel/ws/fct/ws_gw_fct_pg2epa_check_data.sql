@@ -16,7 +16,8 @@ $BODY$
 SELECT gw_fct_pg2epa_check_data($${"data":{"parameters":{"fid":227}}}$$)-- when is called from go2epa_main
 SELECT gw_fct_pg2epa_check_data('{"parameters":{}}')-- when is called from toolbox or from checkproject
 
--- fid: 107,164,165,166,167,169,170,171,188,198,227,229,230 
+-- fid: main: 225
+		other: 107,164,165,166,167,169,170,171,188,198,227,229,230 
 
 */
 
