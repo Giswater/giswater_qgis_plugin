@@ -544,3 +544,5 @@ UPDATE config_form_fields SET layoutname = 'lyt_top_1', layoutorder = 9 where co
 UPDATE config_form_fields SET layoutname = 'lyt_top_1', layoutorder = 9 where columnname = 'arc_id' and formname like '%v_edit_gully%';
 update config_form_fields SET layoutorder = 1 where columnname = 'soilcat_id' and formname like '%ve_gully_%';
 update config_form_fields SET layoutorder = 1 where columnname = 'soilcat_id' and formname like '%ve_gully_%';
+
+UPDATE cat_feature_node SET isexitupperintro = 1 WHERE id = 'CIRC_MANHOLE';
