@@ -101,4 +101,4 @@ UPDATE sys_param_user SET layoutname = 'lyt_hydraulics_2' where layoutname = 'gr
 UPDATE sys_param_user SET layoutname = 'lyt_general_1' where layoutname = 'grl_general_1';
 UPDATE sys_param_user SET layoutname = 'lyt_general_2' where layoutname = 'grl_general_2';
 
-DELETE FROM sys_param_user where id='inp_options_rtc_enabled'
+DELETE FROM sys_param_user where id='inp_options_rtc_enabled';
