@@ -102,3 +102,5 @@ UPDATE sys_param_user SET layoutname = 'lyt_general_1' where layoutname = 'grl_g
 UPDATE sys_param_user SET layoutname = 'lyt_general_2' where layoutname = 'grl_general_2';
 
 DELETE FROM sys_param_user where id='inp_options_rtc_enabled';
+
+UPDATE config_fprocess SET fid2 = 239 WHERE fid2 = 12;
