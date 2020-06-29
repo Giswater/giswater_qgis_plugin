@@ -99,12 +99,14 @@ BEGIN
 			v_featurecat_id = 'node_type';
 		ELSIF v_formname='upsert_catalog_connec' THEN
 			v_featurecat_id = 'connec_type';
+		ELSIF v_formname='upsert_catalog_gully' THEN
+			v_featurecat_id = 'gully_type';
 		END IF;
 		
 	END IF;
 	
 	--	Setting the catalog 'id' value  (hard coded for catalogs, fixed objective field as id on 4th position
-	IF v_formname='upsert_catalog_arc' OR v_formname='upsert_catalog_node' OR v_formname='upsert_catalog_connec' THEN
+	IF v_formname='upsert_catalog_arc' OR v_formname='upsert_catalog_node' OR v_formname='upsert_catalog_connec' OR v_formname='upsert_catalog_gully' THEN
 
 		--  get querytext
 		EXECUTE 'SELECT dv_querytext FROM config_form_fields WHERE formname = $1 and columnname=''id'''
@@ -138,7 +140,8 @@ BEGIN
 			
 			IF v_project_type = 'WS' THEN
 				v_query_result := v_query_result || ' AND '|| quote_ident(v_featurecat_id) ||' = '|| quote_literal(v_feature_type) ||'';
-			ELSIF v_project_type = 'UD' THEN
+				
+			ELSIF v_project_type = 'UD' AND v_formname!='upsert_catalog_gully'  THEN
 				v_query_result := v_query_result || ' AND '|| quote_ident(v_featurecat_id) ||' = '|| quote_literal(v_feature_type) ||' OR '|| quote_ident(v_featurecat_id) ||' = null';
 			END IF;
 			

@@ -29,3 +29,7 @@ UPDATE sys_table SET qgis_criticity = 0 WHERE id like '%v_rpt_%';
 UPDATE sys_table SET qgis_criticity = 2 WHERE id ='v_rpt_arcflow_sum';
 UPDATE sys_table SET qgis_criticity = 2 WHERE id ='v_rpt_nodeflooding_sum';
 UPDATE sys_table SET qgis_criticity = 2 WHERE id ='v_rpt_nodesurcharge_sum';
+
+-- 2020/06/29
+UPDATE config_form_fields SET dv_querytext = 'SELECT distinct  NULL AS id,  NULL  AS idval FROM cat_grate WHERE id IS NOT NULL' 
+WHERE formname='upsert_catalog_gully' AND columnname IN ('geom1','shape');
