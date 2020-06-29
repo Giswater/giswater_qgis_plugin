@@ -9,8 +9,7 @@ from qgis.core import QgsApplication, QgsExpression, QgsFeatureRequest, QgsFillS
     QgsPrintLayout, QgsProject, QgsReadWriteContext, QgsSymbol, QgsVectorLayer
 from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTime
-from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QCompleter, QDateEdit, QLineEdit, \
-    QTableView, QTextEdit, QTimeEdit, QWidget
+from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCompleter, QLineEdit, QTableView, QTabWidget, QTextEdit
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtXml import QDomDocument
@@ -138,8 +137,6 @@ class MincutParent(ParentAction):
         utils_giswater.double_validator(self.depth, 0, 9999999, 3)
         utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.txt_exec_user, self.controller.get_project_user())
 
-        # Fill address : todo
-
         # Fill ComboBox type
         sql = ("SELECT id, descript "
                "FROM om_mincut_cat_type "
@@ -255,15 +252,15 @@ class MincutParent(ParentAction):
         Chek if date_to.date() is >= than date_from.date()
         :param date_from: QDateEdit.date from
         :param date_to: QDateEdit.date to
-        :param widget_to_get: QDateEdit to get date in order to set widget_to_set
-        :param widget_to_set: QDateEdit to set coherence date
+        :param time_from: QDateEdit to get date in order to set widget_to_set
+        :param time_to: QDateEdit to set coherence date
         :return:
         """
 
         d_from = datetime(date_from.date().year(), date_from.date().month(), date_from.date().day(),
-            time_from.time().hour(), time_from.time().minute())
+                          time_from.time().hour(), time_from.time().minute())
         d_to = datetime(date_to.date().year(), date_to.date().month(), date_to.date().day(),
-            time_to.time().hour(), time_to.time().minute())
+                        time_to.time().hour(), time_to.time().minute())
 
         if d_from > d_to:
             date_to.setDate(date_from.date())
@@ -670,11 +667,11 @@ class MincutParent(ParentAction):
                     renderer = layer.renderer()
                     symbol1 = renderer.symbol()
                     props2 = {'capstyle': 'round', 'customdash': '5;2', 'customdash_map_unit_scale': '3x:0,0,0,0,0,0',
-                             'customdash_unit': 'MM', 'draw_inside_polygon': '0', 'joinstyle': 'round',
-                             'line_color': '76,38,0,255', 'line_style': 'solid', 'line_width': '1.8',
-                             'line_width_unit': 'MM', 'offset': '0', 'offset_map_unit_scale': '3x:0,0,0,0,0,0',
-                             'offset_unit': 'MM', 'ring_filter': '0', 'use_custom_dash': '0',
-                             'width_map_unit_scale': '3x:0,0,0,0,0,0'}
+                              'customdash_unit': 'MM', 'draw_inside_polygon': '0', 'joinstyle': 'round',
+                              'line_color': '76,38,0,255', 'line_style': 'solid', 'line_width': '1.8',
+                              'line_width_unit': 'MM', 'offset': '0', 'offset_map_unit_scale': '3x:0,0,0,0,0,0',
+                              'offset_unit': 'MM', 'ring_filter': '0', 'use_custom_dash': '0',
+                              'width_map_unit_scale': '3x:0,0,0,0,0,0'}
                     symbol2 = QgsLineSymbol.createSimple(props2)
                     symbol_layer = symbol2.symbolLayer(0)
                     symbol1.insertSymbolLayer(0, symbol_layer.clone())
@@ -704,6 +701,7 @@ class MincutParent(ParentAction):
                     self.add_layer.set_layer_symbology(layer, props)
                 layer.triggerRepaint()
                 self.iface.layerTreeView().refreshLayerSymbology(layer.id())
+
             self.dlg_dtext = DialogTextUi()
             self.load_settings(self.dlg_dtext)
             self.dlg_dtext.btn_close.setText('Cancel')
@@ -1364,10 +1362,10 @@ class MincutParent(ParentAction):
         inf_text = ""
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
-            # id to delete
+            # Id to delete
             id_feature = widget.model().record(row).value("connec_id")
             del_id.append(id_feature)
-            # id to ask
+            # Id to ask
             customer_code = widget.model().record(row).value("customer_code")
             inf_text += str(customer_code) + ", "
         inf_text = inf_text[:-2]
@@ -1416,16 +1414,13 @@ class MincutParent(ParentAction):
 
         del_id = []
         inf_text = ""
-        list_id = ""
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_feature = widget.model().record(row).value("hydrometer_customer_code")
             hydro_id = widget.model().record(row).value("hydrometer_id")
             inf_text += str(id_feature) + ", "
-            list_id += f"'{id_feature}', "
             del_id.append(hydro_id)
         inf_text = inf_text[:-2]
-        list_id = list_id[:-2]
         message = "Are you sure you want to delete these records?"
         title = "Delete records"
         answer = self.controller.ask_question(message, title, inf_text)
@@ -1614,8 +1609,8 @@ class MincutParent(ParentAction):
             return
 
         self.disconnect_snapping(False)
-        node_exist = False
         layer = self.snapper_manager.get_snapped_layer(result)
+        
         # Check feature
         layers_arc = self.controller.get_group_layers('arc')
         self.layernames_arc = []
