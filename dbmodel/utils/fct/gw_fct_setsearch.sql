@@ -215,19 +215,22 @@ BEGIN
 
 			-- Get Ids for type combo
 			EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT sys_id, sys_table_id, 
-					CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname, search_type FROM ('||(v_querytext)||')b
-					WHERE CONCAT (search_field, '' : '', cat_id) ILIKE ' || quote_literal(v_textarg) || ' 
-					ORDER BY search_field LIMIT 10) a'
-					INTO v_response;
+			CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname, '||quote_literal(v_value::json->>'search_type')::text||' 
+			FROM ('||(v_querytext)||')b
+			WHERE CONCAT (search_field, '' : '', cat_id) ILIKE ' || quote_literal(v_textarg) || ' 
+			ORDER BY search_field LIMIT 10) a'
+			INTO v_response;
 		ELSE 
 			-- Get values for type combo    
 			EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT sys_id, sys_table_id, 
-					CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname, search_type FROM ('||(v_querytext)||')b
-					WHERE CONCAT (search_field, '' : '', cat_id) ILIKE ' || quote_literal(v_textarg) || ' AND sys_table_id = '||quote_literal(v_idarg)||'
-					ORDER BY search_field LIMIT 10) a'
-					INTO v_response;
+			CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname, '||quote_literal(v_value::json->>'search_type')::text||' 
+			FROM ('||(v_querytext)||')b
+			WHERE CONCAT (search_field, '' : '', cat_id) ILIKE ' || quote_literal(v_textarg) || ' AND sys_table_id = '||quote_literal(v_idarg)||'
+			ORDER BY search_field LIMIT 10) a'
+			INTO v_response;
+
 		END IF;
-	
+
 	-- address
 	ELSIF v_tab = 'address' THEN
 
