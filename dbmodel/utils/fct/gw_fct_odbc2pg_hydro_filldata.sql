@@ -121,9 +121,7 @@ BEGIN
 	FROM audit_log_data WHERE fid = 174 and user_name = current_user)
 	SELECT sum(ps::integer*value::numeric(12,5)/1000)::numeric(12,2) as m3value, connec_id, expl_id::integer FROM query group by expl_id, connec_id) a WHERE connec.expl_id = a.expl_id and connec.code = a.connec_id;
 
-	-- delete audit_log_data
-	DELETE FROM audit_log_data WHERE fid = 174;
-	
+
 	--  Return
     RETURN ('{"status":"Accepted", "message":{"level":1, "text":"ODBC hydro fill data done succesfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
