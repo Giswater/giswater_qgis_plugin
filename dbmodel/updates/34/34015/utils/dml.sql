@@ -104,3 +104,10 @@ UPDATE sys_param_user SET layoutname = 'lyt_general_2' where layoutname = 'grl_g
 DELETE FROM sys_param_user where id='inp_options_rtc_enabled';
 
 UPDATE config_fprocess SET fid2 = 239 WHERE fid2 = 12;
+
+--2020/06/29
+INSERT INTO ws_sample.sys_param_user
+VALUES ('qgis_layers_set_propierties','config','If true, qgis starts setting all layers with appropiate settigs from config_form_fields', 'role_basic',  NULL, 
+'QGIS init guide map', NULL, NULL, true, 20, 'utils', false, NULL, NULL, NULL, 
+false, 'boolean', 'check', true, NULL, true, NULL, NULL, NULL, NULL, NULL)
+ON conflict (id) DO NOTHING;

@@ -68,6 +68,7 @@ v_init_project boolean;
 v_qgisversion text;
 v_osversion text;
 v_qgis_init_guide_map boolean;
+v_qgis_layers_setpropierties boolean;
 v_addschema text;
 v_fid integer;
 v_mainschema text;
@@ -117,6 +118,11 @@ BEGIN
 	SELECT value INTO v_layer_log FROM config_param_user where parameter='utils_checkproject_qgislayer' AND cur_user=current_user;
 	SELECT value INTO v_hidden_form FROM config_param_user where parameter='qgis_form_initproject_hidden' AND cur_user=current_user;
 	SELECT value INTO v_qgis_init_guide_map FROM config_param_user where parameter='qgis_init_guide_map' AND cur_user=current_user;
+	SELECT value INTO v_qgis_layers_setpropierties FROM config_param_user where parameter='qgis_layers_set_propierties' AND cur_user=current_user;
+
+	-- profilactic null control
+	IF v_qgis_init_guide_map IS NULL THEN v_qgis_init_guide_map = FALSE; END IF;
+	IF v_qgis_layers_setpropierties IS NULL THEN v_qgis_layers_setpropierties = FALSE; END IF;
 
 	-- when funcion gw_fct_audit_check_project is called by click on utils button, force to show user dialog and user control
 	IF v_init_project IS FALSE THEN
@@ -547,7 +553,7 @@ BEGIN
 						'"line":'||v_result_line||','||
 						'"polygon":'||v_result_polygon||','||
 						'"missingLayers":'||v_missing_layers||'}'||
-				', "actions":{"hideForm":' || v_hidden_form || ', "useGuideMap":'||v_qgis_init_guide_map||'}}}')::json;
+				', "actions":{"hideForm":' || v_hidden_form || ', "setQgisLayers":' || v_qgis_layers_setpropierties||', "useGuideMap":'||v_qgis_init_guide_map||'}}}')::json;
 	ELSE
 		v_return= ('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'" '||
 			',"body":{"form":{}'||
@@ -556,7 +562,7 @@ BEGIN
 						'"line":{},'||
 						'"polygon":{},'||
 						'"missingLayers":{}}'||
-				', "actions":{"hideForm":true, "useGuideMap":'||v_qgis_init_guide_map||'}}}')::json;
+				', "actions":{"hideForm":true, "setQgisLayers":' || v_qgis_layers_setpropierties||', "useGuideMap":'||v_qgis_init_guide_map||'}}}')::json;
 	END IF;
 		
 	--  Return	   
