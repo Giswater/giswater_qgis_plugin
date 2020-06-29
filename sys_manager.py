@@ -37,3 +37,11 @@ def manage_tstamp(prefix_name='log', tstamp_format='%Y%m%d', extension='.log'):
     name = prefix_name + "_" + tstamp + ".log"
     return name
 
+
+def get_file_with_parents(filepath, levels=1):
+
+    common = filepath
+    for i in range(levels + 1):
+        common = os.path.dirname(common)
+
+    return os.path.relpath(filepath, common)
