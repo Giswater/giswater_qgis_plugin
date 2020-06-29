@@ -216,8 +216,8 @@ class ParentAction(object):
         
         
     def multi_row_selector(self, dialog, tableleft, tableright, field_id_left, field_id_right, name='name',
-                           hide_left=[0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
-                                  25, 26, 27, 28, 29, 30], hide_right=[1, 2, 3], aql=""):
+                           hide_left=[0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+                                      24, 25, 26, 27, 28, 29, 30], hide_right=[1, 2, 3], aql=""):
         """
         :param dialog:
         :param tableleft: Table to consult and load on the left side
@@ -252,28 +252,39 @@ class ParentAction(object):
         query_right = f"SELECT {tableleft}.{name}, cur_user, {tableleft}.{field_id_left}, {tableright}.{field_id_right}"
         query_right += f" FROM {schema_name}.{tableleft}"
         query_right += f" JOIN {schema_name}.{tableright} ON {tableleft}.{field_id_left} = {tableright}.{field_id_right}"
-
-        query_right += " WHERE cur_user = current_user "
-        if aql != '':
-            query_right += f" AND active IS NOT FALSE"
+        query_right += f" WHERE cur_user = current_user "
 
         self.fill_table_by_query(tbl_selected_rows, query_right)
         self.hide_colums(tbl_selected_rows, hide_right)
         tbl_selected_rows.setColumnWidth(0, 200)
         # Button select
-        dialog.btn_select.clicked.connect(partial(self.multi_rows_selector, tbl_all_rows, tbl_selected_rows, field_id_left, tableright, field_id_right, query_left, query_right, field_id_right))
-
+        dialog.btn_select.clicked.connect(
+            partial(self.multi_rows_selector, tbl_all_rows, tbl_selected_rows, field_id_left, tableright,
+                    field_id_right, query_left, query_right, field_id_right))
+        if aql != "":
+            dialog.btn_select.clicked.connect(
+                partial(self.query_like_widget_text, dialog, dialog.txt_name, tbl_all_rows, tableleft, tableright,
+                        field_id_right, field_id_left, name, aql=aql))
         # Button unselect
         query_delete = f"DELETE FROM {schema_name}.{tableright}"
         query_delete += f" WHERE current_user = cur_user AND {tableright}.{field_id_right}="
-        dialog.btn_unselect.clicked.connect(partial(self.unselector, tbl_all_rows, tbl_selected_rows, query_delete, query_left, query_right, field_id_right))
-
+        dialog.btn_unselect.clicked.connect(
+            partial(self.unselector, tbl_all_rows, tbl_selected_rows, query_delete, query_left, query_right,
+                    field_id_right))
+        self.controller.log_info(str(aql))
+        if aql != "":
+            dialog.btn_unselect.clicked.connect(
+                partial(self.query_like_widget_text, dialog, dialog.txt_name, tbl_all_rows, tableleft, tableright,
+                        field_id_right, field_id_left, name, aql=aql))
         # QLineEdit
-        dialog.txt_name.textChanged.connect(partial(self.query_like_widget_text, dialog, dialog.txt_name, tbl_all_rows, tableleft, tableright, field_id_right, field_id_left, name))
+        dialog.txt_name.textChanged.connect(
+            partial(self.query_like_widget_text, dialog, dialog.txt_name, tbl_all_rows, tableleft, tableright,
+                    field_id_right, field_id_left, name, aql=aql))
 
         # Order control
         tbl_all_rows.horizontalHeader().sectionClicked.connect(partial(self.order_by_column, tbl_all_rows, query_left))
-        tbl_selected_rows.horizontalHeader().sectionClicked.connect(partial(self.order_by_column, tbl_selected_rows, query_right))
+        tbl_selected_rows.horizontalHeader().sectionClicked.connect(
+            partial(self.order_by_column, tbl_selected_rows, query_right))
 
 
     def order_by_column(self, qtable, query, idx):
@@ -465,14 +476,15 @@ class ParentAction(object):
             self.controller.show_warning(model.lastError().text())  
             
 
-    def query_like_widget_text(self, dialog, text_line, qtable, tableleft, tableright, field_id_r, field_id_l, name='name', aql=''):
+    def query_like_widget_text(self, dialog, text_line, qtable, tableleft, tableright, field_id_r, field_id_l,
+                               name='name', aql=''):
         """ Fill the QTableView by filtering through the QLineEdit"""
         query = utils_giswater.getWidgetText(dialog, text_line, return_string_null=False).lower()
         sql = (f"SELECT * FROM {self.schema_name}.{tableleft} WHERE {name} NOT IN "
                f"(SELECT {tableleft}.{name} FROM {self.schema_name}.{tableleft}"
                f" RIGHT JOIN {self.schema_name}.{tableright}"
                f" ON {tableleft}.{field_id_l} = {tableright}.{field_id_r}"
-               f" WHERE cur_user = current_user) AND LOWER({name}::text) LIKE '%{query}%' and expl_id != 0")
+               f" WHERE cur_user = current_user) AND LOWER({name}::text) LIKE '%{query}%' ")
         sql += aql
         self.fill_table_by_query(qtable, sql)
         
