@@ -227,7 +227,6 @@ class CrmTrace(ApiParent):
                             v_layer.renderer().symbol().setWidth(1.5)
                             v_layer.renderer().symbol().setColor(QColor("red"))
                     v_layer.renderer().symbol().setOpacity(0.7)
-                    iface.layerTreeView().refreshLayerSymbology(v_layer.id())
                 else:
                     self.controller.log_info("No data found")
 
