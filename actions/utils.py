@@ -368,7 +368,7 @@ class Utils(ParentAction):
     def utils_toolbox(self):
 
         self.toolbox.open_toolbox()
-
+        self.controller.gw_actions.test("WORK")
 
     def utils_print_composer(self):
 

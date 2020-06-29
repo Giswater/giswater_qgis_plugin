@@ -57,7 +57,7 @@ class DaoController(object):
         self.docker_type = None
         self.show_docker = None
         self.prev_maptool = None
-
+        self.gw_actions = None
         if create_logger:
             self.set_logger(logger_name)
 

@@ -25,6 +25,7 @@ from .actions.basic import Basic
 from .actions.check_project_result import CheckProjectResult
 from .actions.edit import Edit
 from .actions.go2epa import Go2Epa
+from .actions.gw_actions import GwActions
 from .actions.master import Master
 from .actions.mincut import MincutParent
 from .actions.notify_functions import NotifyFunctions
@@ -74,6 +75,7 @@ class Giswater(QObject):
         self.action = None
         self.action_info = None
         self.toolButton = None
+        self.gw_actions = None
 
         # Initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)
@@ -929,6 +931,7 @@ class Giswater(QObject):
 
         self.parent = ParentAction(self.iface, self.settings, self.controller, self.plugin_dir)
         self.add_layer = AddLayer(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.controller.gw_actions = GwActions(self.iface, self.settings, self.controller, self.plugin_dir)
 
         # Get water software from table 'version'
         self.project_type = self.controller.get_project_type()
