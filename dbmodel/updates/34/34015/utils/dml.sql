@@ -106,8 +106,45 @@ DELETE FROM sys_param_user where id='inp_options_rtc_enabled';
 UPDATE config_fprocess SET fid2 = 239 WHERE fid2 = 12;
 
 --2020/06/29
-INSERT INTO ws_sample.sys_param_user
+INSERT INTO sys_param_user
 VALUES ('qgis_layers_set_propierties','config','If true, qgis starts setting all layers with appropiate settings from config_form_fields', 'role_basic',  NULL, 
 'QGIS init guide map', NULL, NULL, true, 20, 'utils', false, NULL, NULL, NULL, 
 false, 'boolean', 'check', true, NULL, true, NULL, NULL, NULL, NULL, NULL)
 ON conflict (id) DO NOTHING;
+
+
+
+UPDATE sys_table SET id='sys_fprocess' WHERE id='sys_fprocess_cat';
+INSERT INTO sys_table VALUES ('ext_cat_hydrometer_priority', NULL, 'role_edit', 0);
+INSERT INTO sys_table VALUES ('ext_cat_hydrometer_type', NULL, 'role_edit', 0);
+INSERT INTO sys_table VALUES ('om_team_x_vehicle', 'Relation between teams and their vehicles', 'role_om', 0);
+INSERT INTO sys_table VALUES ('ext_cat_vehicle', 'External catalog of vehicles', 'role_om', 0);
+INSERT INTO sys_table VALUES ('om_vehicle_x_parameters', 'Relation between vehicles and their parameters', 'role_om', 0);
+INSERT INTO sys_table VALUES ('doc_x_workcat', 'Contains the information of document related to workcat', 'role_basic', 0);
+INSERT INTO sys_table VALUES ('temp_go2epa', NULL, 'role_epa', 0);
+INSERT INTO sys_table VALUES ('temp_arc', NULL, 'role_edit', 0);
+INSERT INTO sys_table VALUES ('temp_node', NULL, 'role_edit', 0);
+INSERT INTO sys_table VALUES ('config_form_actions', NULL, 'role_admin', 0);
+INSERT INTO sys_table VALUES ('config_toolbox', 'Catalog and configuration of toolbox functions', 'role_admin', 0);
+DELETE FROM sys_table WHERE id='config';
+DELETE FROM sys_table WHERE id='config_api_message';
+DELETE FROM sys_table WHERE id='config_api_visit_x_featuretable';
+DELETE FROM sys_table WHERE id='dattrib';
+DELETE FROM sys_table WHERE id='dattrib_type';
+DELETE FROM sys_table WHERE id='ext_rtc_scada_x_data';
+DELETE FROM sys_table WHERE id='ext_rtc_scada_x_value';
+DELETE FROM sys_table WHERE id='inp_options';
+DELETE FROM sys_table WHERE id='man_addfields_cat_combo';
+DELETE FROM sys_table WHERE id='man_addfields_cat_datatype';
+DELETE FROM sys_table WHERE id='man_addfields_cat_widgettype';
+DELETE FROM sys_table WHERE id='om_visit_parameter_cat_action';
+DELETE FROM sys_table WHERE id='om_visit_parameter_form_type';
+DELETE FROM sys_table WHERE id='om_visit_parameter_type';
+DELETE FROM sys_table WHERE id='om_visit_type';
+DELETE FROM sys_table WHERE id='om_visit_value_criticity';
+DELETE FROM sys_table WHERE id='plan_psector_cat_type';
+DELETE FROM sys_table WHERE id='plan_result_type';
+DELETE FROM sys_table WHERE id='price_simple';
+DELETE FROM sys_table WHERE id='price_value_unit';
+DELETE FROM sys_table WHERE id='inp_value_buildup';
+
