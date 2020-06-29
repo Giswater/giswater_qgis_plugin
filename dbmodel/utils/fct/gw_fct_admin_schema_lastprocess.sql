@@ -235,7 +235,7 @@ BEGIN
 		END IF;
 		-- inserting version table
 		SELECT * INTO v_version FROM sys_version LIMIT 1;
-		INSERT INTO version (giswater, project_type, postgres, postgis, language, epsg, sample)
+		INSERT INTO sys_version (giswater, project_type, postgres, postgis, language, epsg, sample)
 		VALUES (v_gwversion, v_version.project_type, (select version()), (select postgis_version()), v_version.language, v_version.epsg, v_version.sample);
 
 		-- get return message
