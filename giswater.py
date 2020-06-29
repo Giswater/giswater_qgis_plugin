@@ -1034,9 +1034,9 @@ class Giswater(QObject):
             status, result = self.check_project_result.populate_audit_check_project(layers, "true")
             try:
                 if 'actions' in result['body']:
+                    self.hide_form = result['body']['actions']['hideForm']
                     if 'useGuideMap' in result['body']['actions']:
                         guided_map = result['body']['actions']['useGuideMap']
-                        self.hide_form = result['body']['actions']['hideForm']
                         if guided_map:
                             self.controller.log_info("manage_guided_map")
                             self.manage_guided_map()
