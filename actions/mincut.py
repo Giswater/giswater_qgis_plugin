@@ -737,11 +737,12 @@ class MincutParent(ParentAction):
         # Manage result and force tab log
         self.add_layer.add_temp_layer(self.dlg_mincut, result['body']['data'], None, True, tab_idx=3)
 
-        # Set all widgets of the data tab enabled(False)
-        widget_list = self.dlg_mincut.mainTab.widget(0).findChildren(QWidget)
-        for widget in widget_list:
-            if type(widget) in (QCheckBox, QComboBox, QDateEdit, QLineEdit, QTextEdit, QTimeEdit):
-                widget.setEnabled(False)
+        # Set tabs enabled(True/False)
+        qtabwidget = self.dlg_mincut.findChild(QTabWidget, 'mainTab')
+        qtabwidget.widget(0).setEnabled(False)  # Tab plan
+        qtabwidget.widget(1).setEnabled(True)   # Tab Exec
+        qtabwidget.widget(2).setEnabled(False)  # Tab Hydro
+        qtabwidget.widget(3).setEnabled(False)  # Tab Log
 
         self.dlg_mincut.closeMainWin = False
         self.dlg_mincut.mincutCanceled = True
