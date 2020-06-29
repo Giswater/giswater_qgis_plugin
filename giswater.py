@@ -976,7 +976,7 @@ class Giswater(QObject):
         self.controller.check_user_roles()
 
         # Set project layers with gw_fct_getinfofromid: This process takes time for user
-        if self.set_qgis_layer is True:
+        if self.set_qgis_layers is True:
             self.get_layers_to_config()
             self.set_layer_config(self.available_layers)
 
@@ -1140,7 +1140,7 @@ class Giswater(QObject):
             try:
                 if 'actions' in result['body']:
                     if 'setQgisLayers' in result['body']['actions']:
-                        self.set_qgis_layer = result['body']['actions']['setQgisLayers']
+                        self.set_qgis_layers = result['body']['actions']['setQgisLayers']
                     if 'useGuideMap' in result['body']['actions']:
                         guided_map = result['body']['actions']['useGuideMap']
                         if guided_map:
