@@ -1139,9 +1139,9 @@ class Giswater(QObject):
             self.hide_form = True
             try:
                 if 'actions' in result['body']:
+                    self.hide_form = result['body']['actions']['hideForm']
                     if 'useGuideMap' in result['body']['actions']:
                         guided_map = result['body']['actions']['useGuideMap']
-                        self.hide_form = result['body']['actions']['hideForm']
                         if guided_map:
                             self.controller.log_info("manage_guided_map")
                             self.manage_guided_map()
