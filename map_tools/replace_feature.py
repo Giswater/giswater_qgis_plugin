@@ -98,6 +98,10 @@ class ReplaceFeatureMapTool(ParentMapTool):
                 sql = f"SELECT DISTINCT(id) FROM {self.cat_table} ORDER BY id"
                 rows = self.controller.get_rows(sql)
                 utils_giswater.fillComboBox(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
+            elif self.geom_type in ('gully'):
+                sql = f"SELECT DISTINCT(id) FROM cat_grate ORDER BY id"
+                rows = self.controller.get_rows(sql)
+                utils_giswater.fillComboBox(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
 
         self.dlg_replace.feature_type.setText(feature_type)
         self.dlg_replace.feature_type_new.currentIndexChanged.connect(self.edit_change_elem_type_get_value)
