@@ -824,9 +824,9 @@ class DaoController(object):
         if 'status' in json_result and json_result['status'] == 'Failed':
             self.manage_exception_api(json_result, sql, is_notify=is_notify)
             return False
-
+        self.manage_return_manager(json_result)
         # Manage options for layers (active, visible, zoom and indexing)
-        self.layer_manager(json_result)
+        self.manage_layer_manager(json_result)
 
         return json_result
 
@@ -1935,20 +1935,27 @@ class DaoController(object):
         except AttributeError:
             pass
 
-
-    def layer_manager(self, json_result):
+    def manage_return_manager(self, json_result):
         """
         Manage options for layers (active, visible, zoom and indexing)
         :param json_result: Json result of a query (Json)
         :return: None
         """
+        pass
 
+    def manage_layer_manager(self, json_result):
+        """
+        Manage options for layers (active, visible, zoom and indexing)
+        :param json_result: Json result of a query (Json)
+        :return: None
+        """
+        print(json_result)
         try:
-            layermanager = json_result['body']['form']['layerManager']
+            layermanager = json_result['body']['layerManager']
         except KeyError:
             return
         # Get a list of layers names force reload dataProvider of layer
-        if 'index' in layermanager:
+        if 'reload' in layermanager:
             for layer_name in layermanager['index']:
                 self.set_layer_index(layer_name)
                 layer = self.get_layer_by_tablename(layer_name)
@@ -1979,3 +1986,8 @@ class DaoController(object):
                         self.iface.setActiveLayer(prev_layer)
 
 
+        if 'snnaping' in layermanager:
+            pass
+
+        if 'style' in layermanager:
+            pass
