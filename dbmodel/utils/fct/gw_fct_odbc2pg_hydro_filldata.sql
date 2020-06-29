@@ -118,14 +118,8 @@ BEGIN
 	UPDATE connec SET num_value = m3value FROM (
 	WITH query AS (
 	SELECT log_message::json->>'periodSeconds' as ps, log_message::json->>'value' as value, log_message::json->>'connec_id'::text as connec_id, log_message::json->>'expl_id' as expl_id
-<<<<<<< HEAD
-	FROM audit_log_data WHERE fid = 174 and user_name = current_user)
-	SELECT sum(ps::integer*value::numeric(12,5)/1000)::numeric(12,2) as m3value, connec_id, expl_id::integer FROM query group by expl_id, connec_id) a WHERE connec.expl_id = a.expl_id and connec.code = a.connec_id;
-=======
 	FROM audit_log_data WHERE fprocesscat_id = 74 and user_name = current_user)
 	SELECT sum(ps::integer*value::numeric(12,5)/1000)::numeric(12,2) as m3value, connec_id, expl_id::integer FROM query group by expl_id, connec_id) a WHERE connec.expl_id = a.expl_id and connec.connec_id = a.connec_id;
->>>>>>> afdc04f4... Bug fix on odbc2pg_hydro_filldata
-
 
 	--  Return
     RETURN ('{"status":"Accepted", "message":{"level":1, "text":"ODBC hydro fill data done succesfully"}, "version":"'||v_version||'"'||
