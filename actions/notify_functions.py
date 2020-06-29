@@ -214,6 +214,10 @@ class NotifyFunctions(ParentAction):
                     # Set values into valueMap
                     editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': _values})
                     layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+                elif field['widgettype'] == 'check':
+                    # set widgetcheck
+                else:
+                    # set widgettext
 
 
     def refresh_canvas(self, **kwargs):
