@@ -898,7 +898,7 @@ class Giswater(QObject):
         # Manage layer fields
         if self.hide_form is False:
             self.get_layers_to_config()
-            self.set_layer_config(self.available_layers)
+        self.set_layer_config(self.available_layers)
 
         # Disable info button
         self.enable_info_button(False)
