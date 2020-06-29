@@ -853,7 +853,7 @@ class Giswater(QObject):
             self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)
 
         # Manage layers
-        self.hide_form = True
+        self.set_qgis_layer = True
         if not self.manage_layers():
             return
 
@@ -865,7 +865,7 @@ class Giswater(QObject):
 
         self.list_to_hide = []
         try:
-            #db format of value for parameter qgis_toolbar_hidebuttons -> {"index_action":[199, 74,75]}
+            # db format of value for parameter qgis_toolbar_hidebuttons -> {"index_action":[199, 74,75]}
             row = self.controller.get_config('qgis_toolbar_hidebuttons')
             json_list = json.loads(row[0], object_pairs_hook=OrderedDict)
             self.list_to_hide = [str(x) for x in json_list['action_index']]
@@ -897,9 +897,9 @@ class Giswater(QObject):
         self.manage_expl_id()
 
         # Manage layer fields
-        if self.hide_form is False:
+        if self.set_qgis_layers is True:
             self.get_layers_to_config()
-        self.set_layer_config(self.available_layers)
+            self.set_layer_config(self.available_layers)
 
         # Disable info button
         self.enable_info_button(False)
@@ -1035,12 +1035,14 @@ class Giswater(QObject):
             status, result = self.check_project_result.populate_audit_check_project(layers, "true")
             try:
                 if 'actions' in result['body']:
-                    self.hide_form = result['body']['actions']['hideForm']
+                    if 'setQgisLayers' in result['body']['actions']:
+                        self.set_qgis_layer = result['body']['actions']['setQgisLayers']
                     if 'useGuideMap' in result['body']['actions']:
                         guided_map = result['body']['actions']['useGuideMap']
                         if guided_map:
                             self.controller.log_info("manage_guided_map")
                             self.manage_guided_map()
+
             except Exception as e:
                 self.controller.log_info(str(e))
             finally:
