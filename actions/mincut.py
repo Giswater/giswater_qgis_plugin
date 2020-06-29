@@ -1360,18 +1360,15 @@ class MincutParent(ParentAction):
 
         del_id = []
         inf_text = ""
-        list_id = ""
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             # id to delete
             id_feature = widget.model().record(row).value("connec_id")
-            list_id += f"'{id_feature}', "
             del_id.append(id_feature)
             # id to ask
             customer_code = widget.model().record(row).value("customer_code")
             inf_text += str(customer_code) + ", "
         inf_text = inf_text[:-2]
-        list_id = list_id[:-2]
         message = "Are you sure you want to delete these records?"
         title = "Delete records"
         answer = self.controller.ask_question(message, title, inf_text)
