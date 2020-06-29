@@ -649,10 +649,10 @@ BEGIN
 			END IF;
 			
 			-- force enabled widget of mapzones for nodes headers (insert or update)
-			IF 	(v_dmaheader AND (aux_json->>'columnname'='dma_name')) OR 
-				(v_dqaheader AND (aux_json->>'columnname'='dqa_name')) OR 
-				(v_sectorheader AND (aux_json->>'columnname'='sector_name')) OR 
-				(v_presszoneheader AND (aux_json->>'columnname'='presszone_name')) THEN
+			IF 	(v_isdmaheader AND (aux_json->>'columnname'='dma_name')) OR 
+				(v_isdqaheader AND (aux_json->>'columnname'='dqa_name')) OR 
+				(v_issectorheader AND (aux_json->>'columnname'='sector_name')) OR 
+				(v_ispresszoneheader AND (aux_json->>'columnname'='presszone_name')) THEN
 					v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'iseditable', 'true'::boolean);
 			END IF;
 		END LOOP;  
