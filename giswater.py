@@ -853,7 +853,7 @@ class Giswater(QObject):
             self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)
 
         # Manage layers
-        self.set_qgis_layer = True
+        self.set_qgis_layers = True
         if not self.manage_layers():
             return
 
@@ -1036,7 +1036,7 @@ class Giswater(QObject):
             try:
                 if 'actions' in result['body']:
                     if 'setQgisLayers' in result['body']['actions']:
-                        self.set_qgis_layer = result['body']['actions']['setQgisLayers']
+                        self.set_qgis_layers = result['body']['actions']['setQgisLayers']
                     if 'useGuideMap' in result['body']['actions']:
                         guided_map = result['body']['actions']['useGuideMap']
                         if guided_map:
