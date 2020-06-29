@@ -853,6 +853,7 @@ class Giswater(QObject):
             self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)
 
         # Manage layers
+        self.hide_form = True
         if not self.manage_layers():
             return
 
