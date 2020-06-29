@@ -734,7 +734,8 @@ class MincutParent(ParentAction):
 
     def mincut_ok(self, result):
 
-        self.add_layer.add_temp_layer(self.dlg_mincut, result['body']['data'], None, True, tab_idx=2)
+        # Manage result and force tab log
+        self.add_layer.add_temp_layer(self.dlg_mincut, result['body']['data'], None, True, tab_idx=3)
 
         # Set all widgets of the data tab enabled(False)
         widget_list = self.dlg_mincut.mainTab.widget(0).findChildren(QWidget)
