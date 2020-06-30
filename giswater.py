@@ -1553,10 +1553,9 @@ class Giswater(QObject):
                     # Set values into valueMap
                     editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': valuemap_values})
                     layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
-                elif field['widgettype'] == 'check':
-                    # set widgetcheck
-                else:
-                    # set widgettext
+                elif field['widgettype'] in ('text', 'check'):
+                    editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'True'})
+                    layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
 
         if msg_failed != "":
             self.controller.show_exceptions_msg("Execute failed.", msg_failed)
