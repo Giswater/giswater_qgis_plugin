@@ -88,7 +88,7 @@
     </message>
      <message>
         <source>76_text</source>
-        <translation>Selector de lotes</translation>
+        <translation>Gestor de recursos</translation>
     </message>
     <message>
         <source>76_text</source>
