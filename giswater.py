@@ -1396,10 +1396,6 @@ class Giswater(QObject):
                 # Manage editability
                 self.set_read_only(layer, field, fieldIndex)
 
-                # delete old values on ValueMap
-                editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': valuemap_values})
-                layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
-
                 # Manage new values in ValueMap
                 if field['widgettype'] == 'combo':
                     if 'comboIds' in field:
@@ -1413,8 +1409,18 @@ class Giswater(QObject):
                     editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'True'})
                     layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
                 elif field['widgettype'] == 'check':
-                    editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'False'})
+                    config = {'CheckedState': 'true', 'UncheckedState': 'false'}
+                    editor_widget_setup = QgsEditorWidgetSetup('CheckBox', config)
                     layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+                elif field['widgettype'] == 'datetime':
+                    config = {'allow_null': True,
+                              'calendar_popup': True,
+                              'display_format': 'yyyy-MM-dd',
+                              'field_format': 'yyyy-MM-dd',
+                              'field_iso_format': False}
+                    editor_widget_setup = QgsEditorWidgetSetup('DateTime', config)
+                    layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+
 
         if msg_failed != "":
             self.controller.show_exceptions_msg("Execute failed.", msg_failed)
