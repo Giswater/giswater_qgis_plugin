@@ -1091,7 +1091,7 @@ class ManageVisit(ParentManage, QObject):
                 self.files_all.append(str(row[0]))
             for _file in row:
                 if _file is not None:
-                    if type(_file) != unicode:
+                    if type(_file) != str:
                         item.append(QStandardItem(str(_file)))
                     else:
                         item.append(QStandardItem(_file))
