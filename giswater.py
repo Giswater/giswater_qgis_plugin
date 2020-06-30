@@ -1560,7 +1560,7 @@ class Giswater(QObject):
                     config = {'CheckedState': 'true', 'UncheckedState': 'false'}
                     editor_widget_setup = QgsEditorWidgetSetup('CheckBox', config)
                     layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
-                elif field['widgettype'] == 'datetime':
+                elif field['widgettype'] == 'datepickertime':
                     config = {'allow_null': True,
                               'calendar_popup': True,
                               'display_format': 'yyyy-MM-dd',
