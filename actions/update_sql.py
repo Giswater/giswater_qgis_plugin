@@ -429,7 +429,7 @@ class UpdateSQL(ApiParent):
         # Check if exist schema
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
         if schema_name is None:
-            msg = "For create a qgis project you need to create a schema before."
+            msg = "In order to create a qgis project you have to create a schema first ."
             self.controller.show_info_box(msg)
             return
 
