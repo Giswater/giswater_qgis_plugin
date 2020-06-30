@@ -176,6 +176,7 @@ BEGIN
 	v_currentpage := ((p_data ->> 'data')::json->> 'pageInfo')::json->>'currentPage';
 	v_offset := ((p_data ->> 'data')::json->> 'pageInfo')::json->>'offset';
 	v_filter_feature := (p_data ->> 'data')::json->> 'filterFeatureField';
+	v_isattribute := (p_data ->> 'data')::json->> 'isAttribute';
 
 	IF v_tabname IS NULL THEN
 		v_tabname = 'data';
@@ -200,7 +201,16 @@ BEGIN
 
 	END IF;
 
-	--  Creating the list fields
+--  Create filter if is attribute table list
+----------------------------
+	IF v_isattribute THEN
+		v_attribute_filter = ' AND listtype = ''attributeTable''';
+	ELSE
+		v_attribute_filter = '';
+	END IF;
+	
+--  Creating the list fields
+----------------------------
 	-- control not existing table
 	IF v_tablename IN (SELECT table_name FROM information_schema.tables WHERE table_schema = v_schemaname) THEN
 
@@ -246,13 +256,13 @@ BEGIN
 			INTO v_the_geom;
 
 		--  get querytext
-		EXECUTE 'SELECT query_text, listtype FROM config_form_list WHERE tablename = $1 AND device = $2'
+		EXECUTE concat('SELECT query_text, listtype FROM config_api_list WHERE tablename = $1 AND device = $2', v_attribute_filter)
 			INTO v_query_result, v_listtype
 			USING v_tablename, v_device;
 
 		-- if v_device is not configured on config_form_list table
 		IF v_query_result IS NULL THEN
-			EXECUTE 'SELECT query_text, listtype FROM config_form_list WHERE tablename = $1 LIMIT 1'
+			EXECUTE concat('SELECT query_text, listtype FROM config_api_list WHERE tablename = $1 LIMIT 1', v_attribute_filter)
 				INTO v_query_result, v_listtype
 				USING v_tablename;
 		END IF;	
@@ -264,13 +274,13 @@ BEGIN
 
 	ELSE
 		--  get querytext
-		EXECUTE 'SELECT query_text, vdefault, listtype FROM config_form_list WHERE tablename = $1 AND device = $2'
+		EXECUTE concat('SELECT query_text, vdefault, listtype FROM config_api_list WHERE tablename = $1 AND device = $2', v_attribute_filter)
 			INTO v_query_result, v_default, v_listtype
 			USING v_tablename, v_device;
 
 		-- if v_device is not configured on config_form_list table
 		IF v_query_result IS NULL THEN
-			EXECUTE 'SELECT query_text, vdefault, listtype FROM config_form_list WHERE tablename = $1 LIMIT 1'
+			EXECUTE concat('SELECT query_text, vdefault, listtype FROM config_api_list WHERE tablename = $1 LIMIT 1', v_attribute_filter)
 				INTO v_query_result, v_default, v_listtype
 				USING v_tablename;
 		END IF;	
