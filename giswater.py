@@ -1557,7 +1557,16 @@ class Giswater(QObject):
                     editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'True'})
                     layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
                 elif field['widgettype'] == 'check':
-                    editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'False'})
+                    config = {'CheckedState': 'true', 'UncheckedState': 'false'}
+                    editor_widget_setup = QgsEditorWidgetSetup('CheckBox', config)
+                    layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+                elif field['widgettype'] == 'datetime':
+                    config = {'allow_null': True,
+                              'calendar_popup': True,
+                              'display_format': 'yyyy-MM-dd',
+                              'field_format': 'yyyy-MM-dd',
+                              'field_iso_format': False}
+                    editor_widget_setup = QgsEditorWidgetSetup('DateTime', config)
                     layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
 
         if msg_failed != "":
