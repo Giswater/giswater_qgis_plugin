@@ -954,6 +954,7 @@ class Giswater(QObject):
             self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)
 
         # Manage layers and check project
+        self.set_qgis_layers = True
         if not self.manage_layers():
             return
 
@@ -1136,7 +1137,6 @@ class Giswater(QObject):
 
             # check project
             status, result = self.check_project_result.populate_audit_check_project(layers, "true")
-            self.hide_form = True
             try:
                 if 'actions' in result['body']:
                     if 'setQgisLayers' in result['body']['actions']:
