@@ -104,6 +104,7 @@ class AddNewLot(ParentManage):
         self.set_icon(self.dlg_lot.btn_feature_insert, "111")
         self.set_icon(self.dlg_lot.btn_feature_delete, "112")
         self.set_icon(self.dlg_lot.btn_feature_snapping, "137")
+        self.set_icon(self.dlg_lot.btn_refresh_materialize_view, "100")
 
         # Set date format to date widgets
         utils_giswater.set_regexp_date_validator(self.dlg_lot.startdate, self.dlg_lot.btn_accept, 1)
@@ -173,6 +174,8 @@ class AddNewLot(ParentManage):
         self.dlg_lot.tbl_visit.doubleClicked.connect(partial(self.zoom_to_feature, self.dlg_lot.tbl_visit))
         self.dlg_lot.btn_open_visit.clicked.connect(partial(self.open_visit, self.dlg_lot.tbl_visit))
         self.dlg_lot.btn_delete_visit.clicked.connect(partial(self.delete_visit, self.dlg_lot.tbl_visit))
+
+        self.dlg_lot.btn_refresh_materialize_view.clicked.connect(partial(self.refresh_materialize_view))
 
         self.dlg_lot.btn_cancel.clicked.connect(partial(self.manage_rejected))
         self.dlg_lot.rejected.connect(partial(self.manage_rejected))
@@ -2477,3 +2480,11 @@ class AddNewLot(ParentManage):
 
         settings = QSettings()
         settings.setValue("vdefault/date_filter", str(date_type))
+
+
+    def refresh_materialize_view(self):
+
+        sql = ("REFRESH MATERIALIZED VIEW ext_workorder WITH DATA;")
+        self.controller.execute_sql(sql)
+        msg = "Materialized view has been updated successfully."
+        self.controller.show_info(msg)
