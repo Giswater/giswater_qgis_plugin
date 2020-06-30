@@ -211,7 +211,13 @@ class NotifyFunctions(ParentAction):
                     # Set values into valueMap
                     editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': _values})
                     layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
-
+                elif field['widgettype'] == 'text':
+                    editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'True'})
+                    layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+                elif field['widgettype'] == 'check':
+                    editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'False'})
+                    layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+                    
 
     def refresh_canvas(self, **kwargs):
         """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params) """
