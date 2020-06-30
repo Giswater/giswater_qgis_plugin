@@ -932,6 +932,7 @@ class Giswater(QObject):
         self.parent = ParentAction(self.iface, self.settings, self.controller, self.plugin_dir)
         self.add_layer = AddLayer(self.iface, self.settings, self.controller, self.plugin_dir)
         self.controller.gw_actions = GwActions(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.controller.add_layer = AddLayer(self.iface, self.settings, self.controller, self.plugin_dir)
 
         # Get water software from table 'version'
         self.project_type = self.controller.get_project_type()

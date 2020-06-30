@@ -7,7 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from qgis.core import QgsMessageLog, QgsCredentials, QgsExpressionContextUtils, QgsProject, QgsDataSourceUri
 from qgis.PyQt.QtCore import QCoreApplication, QRegExp, QSettings, Qt, QTranslator
-from qgis.PyQt.QtGui import QTextCharFormat, QFont
+from qgis.PyQt.QtGui import QColor, QTextCharFormat, QFont
 from qgis.PyQt.QtSql import QSqlDatabase
 from qgis.PyQt.QtWidgets import QCheckBox, QGroupBox, QLabel, QMessageBox, QPushButton, QRadioButton, QTabWidget, \
     QToolBox
@@ -58,6 +58,8 @@ class DaoController(object):
         self.show_docker = None
         self.prev_maptool = None
         self.gw_actions = None
+        self.add_layer = None
+
         if create_logger:
             self.set_logger(logger_name)
 
@@ -1941,7 +1943,32 @@ class DaoController(object):
         :param json_result: Json result of a query (Json)
         :return: None
         """
-        pass
+        try:
+            style = json_result['body']['returnManager']
+
+        except KeyError:
+            return
+
+
+        if style['style'] == 'categorized':
+            try:
+                layer = self.get_layer_by_tablename('v_edit_arc')
+                opacity = 255*float(style['opacity'])
+                size = style['width']
+                cat_field = style['field']
+                color_values = {}
+                for item in style['values']:
+                    color_values[item['id']] = QColor(item['color'][0], item['color'][2], item['color'][2], opacity)
+                self.add_layer.categoryze_layer(layer, cat_field, size, color_values)
+
+            except KeyError as e:
+                print(f"{type(e).__name__} --> {e}")
+
+
+
+
+
+
 
     def manage_layer_manager(self, json_result):
         """
