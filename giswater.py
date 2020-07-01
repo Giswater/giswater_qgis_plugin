@@ -20,7 +20,7 @@ from json import JSONDecodeError
 
 from . import global_vars
 from .lib.qgis_tools import QgisTools
-from .core.load_project import LoadProject
+from .core.manage_layers import ManageLayers
 from .actions.basic import Basic
 from .actions.edit import Edit
 from .actions.go2epa import Go2Epa
@@ -1009,11 +1009,11 @@ class Giswater(QObject):
         self.parent.set_style_mapzones()
 
         # Manage layers and check project
-        self.load_project = LoadProject(self.iface, global_vars.settings, self.controller, self.plugin_dir)
-        self.load_project.set_params(self.project_type, self.schema_name, self.project_vars['infotype'],
+        self.manage_layers = ManageLayers(self.iface, global_vars.settings, self.controller, self.plugin_dir)
+        self.manage_layers.set_params(self.project_type, self.schema_name, self.project_vars['infotype'],
                                      self.project_vars['add_schema'])
         self.controller.log_info("Start load_project")
-        if not self.load_project.config_layers():
+        if not self.manage_layers.config_layers():
             self.controller.log_info("False load_project")
             return
 
@@ -1148,6 +1148,7 @@ class Giswater(QObject):
             self.controller.show_warning("AttributeError: " + str(e))
         except KeyError as e:
             self.controller.show_warning("KeyError: " + str(e))
+
 
     def project_read_pl(self):
         """ Function executed when a user opens a QGIS project of type 'pl' """

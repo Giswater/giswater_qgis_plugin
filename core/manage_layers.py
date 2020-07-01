@@ -18,7 +18,7 @@ from ..actions.check_project_result import CheckProjectResult
 from ..actions.task_config_layer_fields import TaskConfigLayerFields
 
 
-class LoadProject:
+class ManageLayers:
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to manage layers. Refactor code from giswater.py """
