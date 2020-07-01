@@ -13,7 +13,7 @@ $BODY$
 
 /*example
 SELECT gw_fct_setsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"tabName":"addNetwork"}, "feature":{},
-"data":{"filterFields":{}, "pageInfo":{}, "net_type":{"id":"v_edit_arc", "name":"Arcs"}, "searchType":"arc", "addSchema":"SCHEMA_NAME", "net_code":{"text":"3"}}}$$);
+"data":{"filterFields":{}, "pageInfo":{}, "net_type":{"id":"v_edit_arc", "name":"Arcs"}, "searchType":"arc", "net_code":{"text":"3"}}}$$);
 
 SELECT gw_fct_setsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"tabName":"network"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "searchType":"None", "net_type":{"id":"", "name":""}, "net_code":{"text":"e"}, "addSchema":"None"}}$$);
 
@@ -23,6 +23,9 @@ SELECT gw_fct_setsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "fo
 
  SELECT gw_fct_setsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"tabName":"network"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "searchType":"None", "net_type":{"id":"", "name":""}, "net_code":{"text":"3"}, "addSchema":"SCHEMA_NAME"}}$$);
 
+SELECT gw_fct_setsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"tabName":"network"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "searchType":"None", "net_type":{"id":"", "name":""}, "net_code":{"text":"3"}, "addSchema":"None"}}$$);
+
+SELECT gw_fct_setsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"tabName":"network"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "searchType":"arc", "net_type":{"id":"v_edit_arc", "name":"Arcs"}, "net_code":{"text":"5"}, "addSchema":"None"}}$$);
 
 SELECT gw_fct_setsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"tabName":"add_network"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "net_type":{"id":"", "name":""}, "net_code":{"text":"3"}, "addSchema":"SCHEMA_NAME"}}$$);
 
@@ -162,8 +165,6 @@ BEGIN
 		RETURN v_return;
 	END IF;
 
-	RAISE NOTICE 'getsearch on SCHEMA_NAME';
-
 	-- Network tab
 	--------------
 	IF v_tab = 'network' OR v_tab = 'add_network' THEN
@@ -205,7 +206,7 @@ BEGIN
 		ELSE
 			-- buid querytext
 			v_querytext= concat('SELECT ',v_network_idname,' AS sys_id, ', v_network_code,' AS search_field, ', v_network_catalog,' AS cat_id,', 
-					quote_literal(v_network_idname)::text,' AS sys_idname,',quote_literal(v_featuretype)::text,' AS feature_type, ',
+					quote_literal(v_network_idname)::text,' AS sys_idname,',quote_literal(v_featuretype)::text,' AS search_type, ',
 					quote_literal(v_network_layername)::text,'::text AS sys_table_id 
 					FROM ', v_network_layername);
 		END IF;			 
@@ -213,9 +214,11 @@ BEGIN
 		-- built second part of query
 		IF v_idarg = '' THEN 
 
+			v_value	 = '{}';
+
 			-- Get Ids for type combo
 			EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT sys_id, sys_table_id, 
-			CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname, '||quote_literal(v_value::json->>'search_type')::text||' 
+			CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname
 			FROM ('||(v_querytext)||')b
 			WHERE CONCAT (search_field, '' : '', cat_id) ILIKE ' || quote_literal(v_textarg) || ' 
 			ORDER BY search_field LIMIT 10) a'
@@ -314,34 +317,35 @@ BEGIN
 		SELECT ((value::json)->>'sys_search_field') INTO v_workcat_display_field FROM config_param_system WHERE parameter='basic_search_workcat';
 		SELECT ((value::json)->>'sys_geom_field') INTO v_workcat_geom_field FROM config_param_system WHERE parameter='basic_search_workcat';
 		SELECT ((value::json)->>'filter_text') INTO v_filter_text FROM config_param_system WHERE parameter='basic_search_workcat';
+		IF v_filter_text is null then v_filter_text = ''; end if;
 		
 			-- Text to search
 		v_edittext := ((p_data->>'data')::json)->>'workcat_search';
 		v_textarg := concat('%', v_edittext->>'text' ,'%');
 
-		v_querytext = ' SELECT node.workcat_id, node.the_geom FROM SCHEMA_NAME.node WHERE node.state = 1
+		v_querytext = ' SELECT node.workcat_id, node.the_geom FROM node WHERE node.state = 1
 					UNION
-					 SELECT arc.workcat_id, arc.the_geom FROM SCHEMA_NAME.arc WHERE arc.state = 1
+					 SELECT arc.workcat_id, arc.the_geom FROM arc WHERE arc.state = 1
 					UNION
-					 SELECT connec.workcat_id, connec.the_geom FROM SCHEMA_NAME.connec WHERE connec.state = 1
+					 SELECT connec.workcat_id, connec.the_geom FROM connec WHERE connec.state = 1
 					UNION
-					 SELECT element.workcat_id, element.the_geom FROM SCHEMA_NAME.element WHERE element.state = 1
+					 SELECT element.workcat_id, element.the_geom FROM element WHERE element.state = 1
 					UNION
-					  SELECT node.workcat_id_end AS workcat_id,node.the_geom FROM SCHEMA_NAME.node WHERE node.state = 0
+					  SELECT node.workcat_id_end AS workcat_id,node.the_geom FROM node WHERE node.state = 0
 					UNION
-					  SELECT arc.workcat_id_end AS workcat_id, arc.the_geom FROM SCHEMA_NAME.arc WHERE arc.state = 0
+					  SELECT arc.workcat_id_end AS workcat_id, arc.the_geom FROM arc WHERE arc.state = 0
 					UNION
-					 SELECT connec.workcat_id_end AS workcat_id,connec.the_geom FROM SCHEMA_NAME.connec WHERE connec.state = 0
+					 SELECT connec.workcat_id_end AS workcat_id,connec.the_geom FROM connec WHERE connec.state = 0
 					UNION  
-					 SELECT element.workcat_id_end AS workcat_id, element.the_geom FROM SCHEMA_NAME.element WHERE element.state = 0';
+					 SELECT element.workcat_id_end AS workcat_id, element.the_geom FROM element WHERE element.state = 0';
 
 			IF v_projecttype = 'UD' THEN
-			v_querytext = concat (v_querytext, ' UNION SELECT gully.workcat_id,gully.the_geom FROM SCHEMA_NAME.gully WHERE gully.state = 1 
-					UNION SELECT gully.workcat_id,gully.the_geom FROM SCHEMA_NAME.gully WHERE gully.state = 0');
+			v_querytext = concat (v_querytext, ' UNION SELECT gully.workcat_id,gully.the_geom FROM gully WHERE gully.state = 1 
+					UNION SELECT gully.workcat_id,gully.the_geom FROM gully WHERE gully.state = 0');
 			END IF;
 
 		--  Search in the workcat
-		RAISE NOTICE '% % % % %', v_workcat_display_field, v_workcat_layer, v_workcat_id_field, v_workcat_layer, v_filter_text;
+		RAISE NOTICE '1 % 2 % 3 % 4 % 5 %', v_workcat_display_field, v_workcat_layer, v_workcat_id_field, v_workcat_layer, v_filter_text;
 
 		
 		EXECUTE 'SELECT array_to_json(array_agg(row_to_json(c))) 
