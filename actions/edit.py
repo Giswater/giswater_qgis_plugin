@@ -38,12 +38,8 @@ class Edit(ParentAction):
         self.feature_cat = feature_cat
         self.layer = self.controller.get_layer_by_tablename(feature_cat.parent_layer)
         if self.layer:
-            # Get user value (show / suppress form when insert) and set suppress
-            config = self.layer.editFormConfig()
-            self.suppres_form = config.suppress()
-            config.setSuppress(0)
-            self.layer.setEditFormConfig(config)
-
+            self.suppres_form = QSettings().value("/Qgis/digitizing/disable_enter_attribute_values_dialog")
+            QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", True)
             self.iface.setActiveLayer(self.layer)
             self.layer.startEditing()
             self.iface.actionAddFeature().trigger()
@@ -79,10 +75,8 @@ class Edit(ParentAction):
                                                new_feature_id=feature_id, layer_new_feature=self.layer,
                                                tab_type='data', new_feature=feature)
 
-        # Restore user value (show / suppress form when insert)
-        config = self.layer.editFormConfig()
-        config.setSuppress(self.suppres_form)
-        self.layer.setEditFormConfig(config)
+        # Restore user value (Settings/Options/Digitizing/Suppress attribute from pop-up after feature creation)
+        QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", self.suppres_form)
 
         if not result:
             self.layer.deleteFeature(feature.id())
