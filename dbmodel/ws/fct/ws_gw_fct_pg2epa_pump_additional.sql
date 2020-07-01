@@ -20,7 +20,7 @@ arc_rec record;
 pump_rec record;
 node_id_aux text;
 rec record;
-record_new_arc SCHEMA_NAME.arc%ROWTYPE;
+record_new_arc record;
 n1_geom public.geometry;
 n2_geom public.geometry;
 p1_geom public.geometry;

@@ -7,6 +7,8 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+
+
 -- 2020/05/25
 ALTER TABLE config_param_system DROP CONSTRAINT config_param_system_pkey;
 ALTER TABLE config_param_system DROP CONSTRAINT config_param_system_parameter_unique;
@@ -66,12 +68,15 @@ ALTER TABLE sys_param_user RENAME layout_order TO layoutorder;
 
 
 -- config csv param
+
 ALTER TABLE config_csv_param ADD COLUMN orderby integer;
 UPDATE config_csv_param SET orderby = id;
 ALTER TABLE config_csv_param DROP CONSTRAINT sys_csv2pg_config_pkey;
 ALTER TABLE config_csv_param ADD CONSTRAINT config_csv_param_pkey PRIMARY KEY(pg2csvcat_id,tablename, target);
 ALTER TABLE config_csv_param DROP COLUMN id;
 UPDATE sys_table SET sys_sequence = null, sys_sequence_field = null WHERE id = 'config_csv_param';
+
+ALTER TABLE config_csv ALTER COLUMN readheader DROP NOT NULL;
 
 -- config csv
 UPDATE config_csv SET functionname = replace (functionname, '_utils_csv2pg_', '_');

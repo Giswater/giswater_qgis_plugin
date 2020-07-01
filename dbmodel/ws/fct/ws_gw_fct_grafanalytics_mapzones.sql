@@ -39,7 +39,8 @@ TO EXECUTE
 ----------
 
 -- SECTOR
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "exploitation": "[1,2]", "checkData": false, "updateFeature":"TRUE", "updateMapZone":2, "geomParamUpdate":15, "debug":"false"}}}');
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "exploitation": "[1,2]", "checkData": false, "updateFeature":"FALSE", "updateMapZone":2, "geomParamUpdate":15, "debug":"false"}}}');
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "node":"113952", "updateFeature":TRUE}}}');
 SELECT count(*), log_message FROM audit_log_data WHERE fid=130 AND cur_user=current_user group by log_message order by 2 --SECTOR
 SELECT sector_id, count(sector_id) from v_edit_arc group by sector_id order by 1;
 
@@ -472,7 +473,7 @@ BEGIN
 					EXECUTE v_querytext;
 				
 					-- recalculate staticpressure (fid=147)
-					IF v_fid=146 THEN
+					IF v_fid=130 THEN
 					
 						DELETE FROM audit_log_data WHERE fid=147 AND cur_user=current_user;
 				
@@ -497,7 +498,7 @@ BEGIN
 										and n.arc_id IS NOT NULL AND node.node_id=n.node_id;
 												
 						-- updat connec table
-						UPDATE v_edit_connec SET staticpressure = (a.head - a.elevation) FROM 
+						UPDATE v_edit_connec SET staticpressure = (head - elevation) FROM 
 							(SELECT connec_id, head, elevation FROM connec
 							JOIN presszone USING (presszone_id)) a
 							WHERE v_edit_connec.connec_id=a.connec_id;

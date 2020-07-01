@@ -7,6 +7,10 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+
+DELETE FROM _temp_csv2pg_;
+
+
 -- sys_param_user
 UPDATE sys_param_user SET dv_querytext = replace(dv_querytext, 'fprocesscat_id', 'fid') WHERE id = 'edit_cadtools_baselayer_vdefault';
 UPDATE sys_param_user SET dv_querytext = replace(dv_querytext, 'om_visit_parameter', 'config_visit_parameter') WHERE id = 'om_visit_parameter_vdefault';
@@ -47,6 +51,7 @@ UPDATE sys_feature_type SET classlevel = 2 WHERE id IN ('CONNEC' , 'GULLY');
 
 -- sys_feature_cat
 UPDATE sys_feature_cat SET epa_default = 'NONE' WHERE epa_default IS NULL;
+
 
 -- sys_fprocess
 UPDATE sys_fprocess set fid = fid+100 WHERE fid > 99;

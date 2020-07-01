@@ -142,6 +142,8 @@ v_sign text;
 v_data json;
 v_default json;
 v_listtype text;
+v_isattribute boolean;
+v_attribute_filter text;
 
 BEGIN
 

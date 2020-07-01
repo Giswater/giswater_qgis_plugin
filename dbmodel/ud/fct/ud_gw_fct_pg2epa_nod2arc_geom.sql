@@ -13,11 +13,11 @@ $BODY$
 
 DECLARE
 	
-rec_node SCHEMA_NAME.temp_node%ROWTYPE;
-rec_arc1 SCHEMA_NAME.temp_arc%ROWTYPE;
-rec_arc2 SCHEMA_NAME.temp_arc%ROWTYPE;
+rec_node record;
+rec_arc1 record;
+rec_arc2 record;
 rec_arc record;
-rec_new_arc SCHEMA_NAME.temp_arc%ROWTYPE;
+rec_new_arc record;
 rec_flowreg record;
 
 v_nodarc_geom geometry;

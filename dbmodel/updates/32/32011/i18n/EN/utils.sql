@@ -13,11 +13,16 @@ INSERT INTO om_visit_cat_status VALUES (2, 'Stand by', NULL);
 INSERT INTO om_visit_cat_status VALUES (3, 'Canceled', NULL);
 INSERT INTO om_visit_cat_status VALUES (4, 'Closed', NULL);
 
-INSERT INTO om_visit_filetype_x_extension VALUES ('Document', 'doc');
-INSERT INTO om_visit_filetype_x_extension VALUES ('Pdf', 'pdf');
-INSERT INTO om_visit_filetype_x_extension VALUES ('Image', 'jpg');
-INSERT INTO om_visit_filetype_x_extension VALUES ('Image', 'png');
-INSERT INTO om_visit_filetype_x_extension VALUES ('Video', 'mp4');
+INSERT INTO om_visit_filetype_x_extension VALUES ('Document', 'doc')
+ON CONFLICT (filetype, fextension) DO NOTHING;
+INSERT INTO om_visit_filetype_x_extension VALUES ('Pdf', 'pdf')
+ON CONFLICT (filetype, fextension) DO NOTHING;
+INSERT INTO om_visit_filetype_x_extension VALUES ('Image', 'jpg')
+ON CONFLICT (filetype, fextension) DO NOTHING;
+INSERT INTO om_visit_filetype_x_extension VALUES ('Image', 'png')
+ON CONFLICT (filetype, fextension) DO NOTHING;
+INSERT INTO om_visit_filetype_x_extension VALUES ('Video', 'mp4')
+ON CONFLICT (filetype, fextension) DO NOTHING;
 
 
 
