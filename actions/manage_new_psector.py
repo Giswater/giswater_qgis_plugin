@@ -252,18 +252,27 @@ class ManageNewPsector(ParentManage):
             expr = " psector_id = " + str(psector_id)
             self.qtbl_arc.model().setFilter(expr)
             self.qtbl_arc.model().select()
+            self.qtbl_arc.clicked.connect(
+                partial(self.hilight_feature_by_id, self.qtbl_arc, "v_edit_arc", "arc_id", 5))
 
             expr = " psector_id = " + str(psector_id)
             self.qtbl_node.model().setFilter(expr)
             self.qtbl_node.model().select()
+            self.qtbl_node.clicked.connect(
+                partial(self.hilight_feature_by_id, self.qtbl_node, "v_edit_node", "node_id", 1))
 
             expr = " psector_id = " + str(psector_id)
             self.qtbl_connec.model().setFilter(expr)
             self.qtbl_connec.model().select()
+            self.qtbl_connec.clicked.connect(
+                partial(self.hilight_feature_by_id, self.qtbl_connec, "v_edit_connec", "connec_id", 1))
+
             if self.project_type.upper() == 'UD':
                 expr = " psector_id = " + str(psector_id)
                 self.qtbl_gully.model().setFilter(expr)
                 self.qtbl_gully.model().select()
+                self.qtbl_gully.clicked.connect(
+                    partial(self.hilight_feature_by_id, self.qtbl_gully, "v_edit_gully", "gully_id", 1))
 
             self.populate_budget(self.dlg_plan_psector, psector_id)
             self.update = True
@@ -922,6 +931,7 @@ class ManageNewPsector(ParentManage):
     def close_psector(self, cur_active_layer=None):
         """ Close dialog and disconnect snapping """
 
+        self.resetRubberbands()
         self.reload_states_selector()
         if cur_active_layer:
             self.iface.setActiveLayer(cur_active_layer)

@@ -1187,6 +1187,28 @@ class ParentAction(object):
         return points
 
 
+    def hilight_feature_by_id(self, qtable, layer_name, field_id, width, index):
+        """ Based on the received index and field_id, the id of the received field_id is searched within the table
+         and is painted in red on the canvas """
+
+        self.resetRubberbands()
+        layer = self.controller.get_layer_by_tablename(layer_name)
+        if not layer: return
+
+        row = index.row()
+        column_index = utils_giswater.get_col_index_by_col_name(qtable, field_id)
+        _id = index.sibling(row, column_index).data()
+        feature = self.get_feature_by_id(layer, _id, field_id)
+        try:
+            geometry = feature.geometry()
+            self.rubber_polygon.setToGeometry(geometry, None)
+            self.rubber_polygon.setColor(QColor(255, 0, 0, 100))
+            self.rubber_polygon.setWidth(width)
+            self.rubber_polygon.show()
+        except AttributeError:
+            pass
+
+
     def draw_polyline(self, points, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
         """ Draw 'line' over canvas following list of points
          :param duration_time: integer milliseconds ex: 3000 for 3 seconds
