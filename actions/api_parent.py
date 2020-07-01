@@ -1732,7 +1732,7 @@ class ApiParent(ParentAction):
                     label.setObjectName('lbl_manage_all')
                     label.setText('Check all')
                     widget = QCheckBox()
-                    widget.setObjectName('chk_all_' + str(form_tab['selectorType']))
+                    widget.setObjectName('chk_all_' + str(form_tab['tabName']))
                     widget.stateChanged.connect(partial(self.manage_all, dialog, widget))
                     widget.setLayoutDirection(Qt.RightToLeft)
                     field['layoutname'] = gridlayout.objectName()
@@ -1776,8 +1776,7 @@ class ApiParent(ParentAction):
 
         is_alone = False
         key_modifier = QApplication.keyboardModifiers()
-        selection_mode = 'removePrevious'
-        if selection_mode == 'removePrevious' or\
+        if selection_mode == 'removePrevious' or \
                 (selection_mode == 'keepPreviousUsingShift' and key_modifier != Qt.ShiftModifier):
             is_alone = True
             widget_all.blockSignals(True)
