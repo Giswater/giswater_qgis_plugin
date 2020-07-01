@@ -19,3 +19,4 @@ sytletype varchar(16),
 sytelvalue text,
 active boolean);
 
+ALTER TABLE config_form_tabs ADD COLUMN orderby integer;
