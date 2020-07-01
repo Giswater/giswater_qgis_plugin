@@ -56,7 +56,7 @@ INSERT INTO config_param_system VALUES ('basic_selector_tab_psector',
 '{"table":"plan_psector", "selector":"selector_psector", "table_id":"psector_id",  "selector_id":"psector_id",  "label":"psector_id, '' - '', name", 
 "manageAll":true, "query_filter":" AND expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)",
 "layermanager":{"active":"v_edit_psector", "visible":["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_gully"], "addToc":["v_edit_psector"]},
-"typeaheadFilter":" AND lower(concat(expl_id, ' - ', name))"}');
+"typeaheadFilter":" AND lower(concat(expl_id, '' - '', name))"}');
 
 
 UPDATE config_param_system set descript = 'Variable to configura all options related to search for the specificic tab' , label = 'Selector variables' ,

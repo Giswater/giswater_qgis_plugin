@@ -46,6 +46,9 @@ BEGIN
     RAISE NOTICE 'Starting flowregulators process.';
 
     SELECT * INTO rec FROM sys_version LIMIT 1;
+	
+	-- setting record_new_arc
+	SELECT * INTO record_new_arc FROM v_edit_arc LIMIT 1;
     
     FOR rec_flowreg IN
 	SELECT rpt_inp_node.node_id, flwreg_id, to_arc, flwreg_length, 'ori'::text as flw_type FROM inp_flwreg_orifice JOIN rpt_inp_node ON rpt_inp_node.node_id=inp_flwreg_orifice.node_id  
