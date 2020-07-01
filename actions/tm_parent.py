@@ -5,8 +5,9 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsExpression
-from qgis.PyQt.QtCore import QStringListModel, Qt, QDate
+
+from qgis.core import QgsExpression, QgsVectorLayer
+from qgis.PyQt.QtCore import QStringListModel, Qt,QDate
 from qgis.PyQt.QtGui import QCursor, QIcon, QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QApplication, QComboBox, QCompleter, QTableView
@@ -415,3 +416,17 @@ class TmParentAction(object):
                 widget_to.setDate(row[1])
             else:
                 widget_to.setDate(current_date)
+
+
+    def remove_selection(self):
+        """ Remove selected features of all layers """
+
+        for layer in self.canvas.layers():
+            if type(layer) is QgsVectorLayer:
+                layer.removeSelection()
+        self.canvas.refresh()
+
+        for a in self.iface.attributesToolBar().actions():
+            if a.objectName() == 'mActionDeselectAll':
+                a.trigger()
+                break

@@ -1247,7 +1247,6 @@ class Giswater(QObject):
         self.tm_basic.set_tree_manage(self)
 
         # Manage actions of the different plugin_toolbars
-        self.manage_toolbars_common()
         self.manage_toolbars_tm()
 
         # Set actions to controller class for further management
