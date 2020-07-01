@@ -39,8 +39,8 @@ UPDATE config_param_system set parameter = 'basic_selector_tab_exploitation' whe
 UPDATE config_param_system set parameter = 'basic_selector_tab_mincut' where parameter = 'basic_selector_mincut';
 
 UPDATE config_param_system set value =
-'{"table":"exploitation", "selector":"selector_expl", "table_id":"expl_id",  "selector_id":"expl_id",  "label":"expl_id, '' - '', name", 
-"manageAll":true, "selectionMode":"keepPreviousUsingShift" ,  "query_filter":"AND expl_id > 0", "typeaheadFilter":" AND concat(expl_id, '' - '', name)"}'
+'{"table":"exploitation", "selector":"selector_expl", "table_id":"expl_id",  "selector_id":"expl_id",  "label":"expl_id, '' - '', name", "orderBy":"expl_id", 
+"manageAll":true, "selectionMode":"keepPreviousUsingShift" ,  "query_filter":"AND expl_id > 0", "typeaheadFilter":" AND lower(concat(expl_id, '' - '', name))"}'
 WHERE parameter = 'basic_selector_tab_exploitation';
 
 UPDATE config_param_system set value =
@@ -56,7 +56,8 @@ INSERT INTO config_param_system VALUES ('basic_selector_tab_psector',
 '{"table":"plan_psector", "selector":"selector_psector", "table_id":"psector_id",  "selector_id":"psector_id",  "label":"psector_id, '' - '', name", 
 "manageAll":true, "query_filter":" AND expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)",
 "layermanager":{"active":"v_edit_psector", "visible":["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_gully"], "addToc":["v_edit_psector"]},
-"typeaheadFilter":{"queryText":"SELECT psector_id as id, name AS idval FROM v_edit_psector"}}');
+"typeaheadFilter":" AND lower(concat(expl_id, ' - ', name))"}');
+
 
 UPDATE config_param_system set descript = 'Variable to configura all options related to search for the specificic tab' , label = 'Selector variables' ,
 isenabled  = true, project_type = 'utils', datatype = 'json' where parameter like '%basic_selector%';
