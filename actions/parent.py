@@ -1281,3 +1281,122 @@ class ParentAction(object):
 
                     # repaint layer
                     lyr.triggerRepaint()
+
+
+    def manage_return_manager(self, json_result, sql):
+        """
+        Manage options for layers (active, visible, zoom and indexing)
+        :param json_result: Json result of a query (Json)
+        :return: None
+        """
+        try:
+            style = json_result['body']['returnManager']
+
+        except KeyError:
+            return
+
+        try:
+            if 'style' in style:
+                if style['style'] == 'categorized':
+                    layer = self.controller.get_layer_by_tablename('v_edit_arc')
+                    opacity = 255*float(style['opacity'])
+                    size = style['width']
+                    cat_field = style['field']
+                    color_values = {}
+                    for item in style['values']:
+                        color_values[item['id']] = QColor(item['color'][0], item['color'][2], item['color'][2], opacity)
+                    self.add_layer.categoryze_layer(layer, cat_field, size, color_values)
+
+        except Exception as e:
+            self.controller.manage_exception(None, f"{type(e).__name__}: {e}", sql)
+
+
+
+
+
+    def manage_layer_manager(self, json_result, sql):
+        """
+        Manage options for layers (active, visible, zoom and indexing)
+        :param json_result: Json result of a query (Json)
+        :return: None
+        """
+        try:
+            layermanager = json_result['body']['layerManager']
+        except KeyError:
+            return
+
+        try:
+            # Get a list of layers names force reload dataProvider of layer
+            if 'index' in layermanager:
+                for layer_name in layermanager['index']:
+                    self.controller.set_layer_index(layer_name)
+
+            # Get a list of layers names and set visible
+            if 'visible' in layermanager:
+                for layer_name in layermanager['visible']:
+                    layer = self.controller.get_layer_by_tablename(layer_name)
+                    if layer:
+                        self.controller.set_layer_visible(layer)
+
+            # Get a layer name and set active
+            if 'active' in layermanager:
+                layer = self.controller.get_layer_by_tablename(layermanager['active'])
+                if layer:
+                    self.iface.setActiveLayer(layer)
+
+            # Get a layer name and zoom to extent with a margin of 20
+            if 'zoom' in layermanager:
+                layer = self.controller.get_layer_by_tablename(layermanager['zoom'])
+                if layer:
+                    prev_layer = self.iface.activeLayer()
+                    self.iface.setActiveLayer(layer)
+                    self.iface.zoomToActiveLayer()
+
+                    extent = QgsRectangle()
+                    extent.setMinimal()
+                    extent.combineExtentWith(layer.extent())
+                    xmax = extent.xMaximum() + 20
+                    xmin = extent.xMinimum() - 20
+                    ymax = extent.yMaximum() + 20
+                    ymin = extent.yMinimum() - 20
+                    extent.set(xmin, ymin, xmax, ymax)
+                    self.iface.mapCanvas().setExtent(extent)
+                    self.iface.mapCanvas().refresh()
+                    if prev_layer:
+                        self.iface.setActiveLayer(prev_layer)
+
+            if 'qmlPath' in layermanager:
+                layer = self.controller.get_layer_by_tablename(layermanager['zoom'])
+                qml_path = layermanager['qmlPath']
+                if layer:
+                    self.load_qml(layer, qml_path)
+
+            if 'snnaping' in layermanager:
+                pass
+
+        except Exception as e:
+            self.controller.manage_exception(None, f"{type(e).__name__}: {e}", sql)
+
+
+    def manage_actions(self, json_result, sql):
+        """
+        Manage options for layers (active, visible, zoom and indexing)
+        :param json_result: Json result of a query (Json)
+        :return: None
+        """
+
+        try:
+            actions = json_result['body']['actions']
+        except KeyError:
+            return
+        for action in actions:
+            try:
+                function_name = action['funcName']
+                params = action['params']
+                getattr(self.controller.gw_actions, f"{function_name}")(**params)
+            except AttributeError as e:
+                # If function_name not exist as python function
+                self.controller.log_warning(f"Exception error: {e}")
+            except Exception as e:
+                self.controller.log_debug(f"{type(e).__name__}: {e}")
+

@@ -5,7 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsMessageLog, QgsCredentials, QgsExpressionContextUtils, QgsProject, QgsDataSourceUri
+from qgis.core import QgsMessageLog, QgsCredentials, QgsExpressionContextUtils, QgsProject, QgsDataSourceUri, QgsRectangle
 from qgis.PyQt.QtCore import QCoreApplication, QRegExp, QSettings, Qt, QTranslator
 from qgis.PyQt.QtGui import QColor, QTextCharFormat, QFont
 from qgis.PyQt.QtSql import QSqlDatabase
@@ -57,9 +57,8 @@ class DaoController(object):
         self.docker_type = None
         self.show_docker = None
         self.prev_maptool = None
+        self.parent = None
         self.gw_actions = None
-        self.add_layer = None
-
         if create_logger:
             self.set_logger(logger_name)
 
@@ -826,10 +825,12 @@ class DaoController(object):
         if 'status' in json_result and json_result['status'] == 'Failed':
             self.manage_exception_api(json_result, sql, is_notify=is_notify)
             return False
-        self.manage_return_manager(json_result)
-        # Manage options for layers (active, visible, zoom and indexing)
-        self.manage_layer_manager(json_result)
 
+        self.parent.manage_return_manager(json_result, sql)
+        # Manage options for layers (active, visible, zoom and indexing)
+        self.parent.manage_layer_manager(json_result, sql)
+
+        self.parent.manage_actions(json_result, sql)
         return json_result
 
 
@@ -1937,84 +1938,3 @@ class DaoController(object):
         except AttributeError:
             pass
 
-    def manage_return_manager(self, json_result):
-        """
-        Manage options for layers (active, visible, zoom and indexing)
-        :param json_result: Json result of a query (Json)
-        :return: None
-        """
-        try:
-            style = json_result['body']['returnManager']
-
-        except KeyError:
-            return
-
-
-        if style['style'] == 'categorized':
-            try:
-                layer = self.get_layer_by_tablename('v_edit_arc')
-                opacity = 255*float(style['opacity'])
-                size = style['width']
-                cat_field = style['field']
-                color_values = {}
-                for item in style['values']:
-                    color_values[item['id']] = QColor(item['color'][0], item['color'][2], item['color'][2], opacity)
-                self.add_layer.categoryze_layer(layer, cat_field, size, color_values)
-
-            except KeyError as e:
-                print(f"{type(e).__name__} --> {e}")
-
-
-
-
-
-
-
-    def manage_layer_manager(self, json_result):
-        """
-        Manage options for layers (active, visible, zoom and indexing)
-        :param json_result: Json result of a query (Json)
-        :return: None
-        """
-        print(json_result)
-        try:
-            layermanager = json_result['body']['layerManager']
-        except KeyError:
-            return
-        # Get a list of layers names force reload dataProvider of layer
-        if 'reload' in layermanager:
-            for layer_name in layermanager['index']:
-                self.set_layer_index(layer_name)
-                layer = self.get_layer_by_tablename(layer_name)
-
-        # Get a list of layers names, but obviously it will stay active the last one
-        if 'active' in layermanager:
-            for layer_name in layermanager['active']:
-                layer = self.get_layer_by_tablename(layer_name)
-                if layer:
-                    self.iface.setActiveLayer(layer)
-
-        # Get a list of layers names and set visible
-        if 'visible' in layermanager:
-            for layer_name in layermanager['visible']:
-                layer = self.get_layer_by_tablename(layer_name)
-                if layer:
-                    self.set_layer_visible(layer)
-
-        # Get a list of layers names, but obviously remain zoomed to the last
-        if 'zoom' in layermanager:
-            for layer_name in layermanager['zoom']:
-                layer = self.get_layer_by_tablename(layer_name)
-                if layer:
-                    prev_layer = self.iface.activeLayer()
-                    self.iface.setActiveLayer(layer)
-                    self.iface.zoomToActiveLayer()
-                    if prev_layer:
-                        self.iface.setActiveLayer(prev_layer)
-
-
-        if 'snnaping' in layermanager:
-            pass
-
-        if 'style' in layermanager:
-            pass
