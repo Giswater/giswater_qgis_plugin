@@ -1630,8 +1630,8 @@ class ApiParent(ParentAction):
         status = utils_giswater.isChecked(dialog, widget)
         index = dialog.main_tab.currentIndex()
         widget_list = dialog.main_tab.widget(index).findChildren(QCheckBox)
-        selector_type = dialog.main_tab.widget(index).property('selector_type')
-        widget_all = dialog.findChild(QCheckBox, f'chk_all_{selector_type}')
+        tab_name = dialog.main_tab.widget(index).objectName()
+        widget_all = dialog.findChild(QCheckBox, f'chk_all_{tab_name}')
 
         if key_modifier == Qt.ShiftModifier:
             return
@@ -1723,7 +1723,6 @@ class ApiParent(ParentAction):
                 field['layoutname'] = gridlayout.objectName()
                 field['layoutorder'] = i
                 i = i + 1
-                self.txt_filter = widget
                 self.put_widgets(dialog, field, label, widget)
                 widget.setFocus()
 
@@ -1747,7 +1746,6 @@ class ApiParent(ParentAction):
                 label.setObjectName('lbl_' + field['label'])
                 label.setText(field['label'])
                 widget = self.add_checkbox(field)
-                widget.setProperty('selector_type', form_tab['selectorType'])
                 widget.stateChanged.connect(partial(self.set_selection_mode, dialog, widget, selection_mode))
                 widget.setLayoutDirection(Qt.RightToLeft)
                 field['layoutname'] = gridlayout.objectName()
@@ -1773,22 +1771,19 @@ class ApiParent(ParentAction):
         # Get QCheckBox check all
         index = dialog.main_tab.currentIndex()
         widget_list = dialog.main_tab.widget(index).findChildren(QCheckBox)
-        selector_type = dialog.main_tab.widget(index).property('selector_type')
-        widget_all = dialog.findChild(QCheckBox, f'chk_all_{selector_type}')
+        tab_name = dialog.main_tab.widget(index).objectName()
+        widget_all = dialog.findChild(QCheckBox, f'chk_all_{tab_name}')
+
         is_alone = False
         key_modifier = QApplication.keyboardModifiers()
-        if selection_mode == 'removePrevious':
+        selection_mode = 'removePrevious'
+        if selection_mode == 'removePrevious' or\
+                (selection_mode == 'keepPreviousUsingShift' and key_modifier != Qt.ShiftModifier):
             is_alone = True
-            if utils_giswater.isChecked(dialog, widget_all):
-                utils_giswater.setChecked(dialog, widget_all, False)
-            else:
-                self.remove_previuos(dialog, widget, widget_all, widget_list)
-        elif selection_mode == 'keepPreviousUsingShift' and key_modifier != Qt.ShiftModifier:
-                is_alone = True
-                if utils_giswater.isChecked(dialog, widget_all):
-                    utils_giswater.setChecked(dialog, widget_all, False)
-                else:
-                    self.remove_previuos(dialog, widget, widget_all, widget_list)
+            widget_all.blockSignals(True)
+            utils_giswater.setChecked(dialog, widget_all, False)
+            widget_all.blockSignals(False)
+            self.remove_previuos(dialog, widget, widget_all, widget_list)
 
         self.set_selector(dialog, widget, is_alone)
 
