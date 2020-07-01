@@ -12,14 +12,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setselectors(p_data json)
 $BODY$
 
 /*example
-SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{}, 
-"data":{"addSchema":"", "selectorType":"exploitation", "id":2, "value":true, "isAlone":true}}$$);
-
-SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"selectorType":"selector_basic", "tabName":"tab_exploitation", "id":"2", "value":"False", "addSchema":"None"}}$$);
-SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"selectorType":"selector_basic", "tabName":"tab_psector", "id":"2", "value":"False", "addSchema":"None"}}$$);
-
-SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"explfrommuni", "id":1, "value":true, "isAlone":true, "addSchema":"None"}}$$)::text;
-
+SELECT gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"None", "tabName":"tab_exploitation", "id":"12", "isAlone":"True", "value":"True", "addSchema":"None"}}$$);
 */
 
 DECLARE
@@ -40,6 +33,7 @@ v_error_context text;
 v_selectortype text;
 v_layermanager json;
 v_schemaname text;
+v_return json;
 
 BEGIN
 
@@ -59,6 +53,9 @@ BEGIN
 	v_isalone := (p_data ->> 'data')::json->> 'isAlone';
 	v_addschema := (p_data ->> 'data')::json->> 'addSchema';
 	v_data = p_data->>'data';
+
+	-- profilactic control of selector type
+	IF lower(v_selectortype) = 'none' OR v_selectortype = '' OR lower(v_selectortype) ='null' THEN v_selectortype = 'selector_basic'; END IF;
 
 	-- profilactic control of schema name
 	IF lower(v_addschema) = 'none' OR v_addschema = '' OR lower(v_addschema) ='null'
@@ -111,10 +108,11 @@ BEGIN
 
 	-- control nulls
 	v_layermanager = COALESCE (v_layermanager, '{}');
-	
-	-- Return
-	RETURN ('{"status":"Accepted", "version":"","body":{"message":{"level":1, "text":"This is a test message"} ,"form":{},"feature":{},"layermanager":'||v_layermanager||', "data":{}}}')::json;
 
+	-- Return
+	v_return = concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"currentTab":"', v_tabname,'"}, "feature":{}, "data":{"selectorType":"',v_selectortype,'"}, "layermanager":'||v_layermanager||'}');
+	RETURN gw_fct_getselectors(v_return);
+	
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
