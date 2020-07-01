@@ -90,7 +90,7 @@ class Master(ParentAction):
         message = "Values has been updated"
         self.controller.show_info(message)
 
-        self.fill_table(qtbl_psm, "plan_psector")
+        self.fill_table_psector(qtbl_psm, "v_edit_plan_psector")
         self.set_table_columns(dialog, qtbl_psm, "plan_psector")
         self.set_label_current_psector(dialog)
         self.open_dialog(dialog)
