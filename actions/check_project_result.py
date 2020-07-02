@@ -76,7 +76,7 @@ class CheckProjectResult(ApiParent):
         extras += f', "qgisVersion":"{Qgis.QGIS_VERSION}"'
         extras += f', "osVersion":"{platform.system()} {platform.release()}"'
         body = self.create_body(extras=extras)
-        result = self.controller.get_json('gw_fct_audit_check_project', body, log_sql=True)
+        result = self.controller.get_json('gw_fct_audit_check_project', body)
         try:
             if not result or (result['body']['actions']['hideForm'] == True):
                 return result
