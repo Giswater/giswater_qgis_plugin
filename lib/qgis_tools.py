@@ -6,6 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.core import QgsExpressionContextUtils, QgsProject
+from qgis.core import QgsPointLocator, QgsSnappingUtils, QgsTolerance
 from qgis.PyQt.QtWidgets import QDockWidget
 
 import configparser
@@ -185,4 +186,47 @@ class QgisTools:
             uri_pk = uri[pos_ini + 5:pos_end - 2]
 
         return uri_pk
+
+
+    def qgis_get_layer_by_tablename(self, tablename, show_warning=False, log_info=False):
+        """ Iterate over all layers and get the one with selected @tablename """
+
+        # Check if we have any layer loaded
+        layers = self.qgis_get_layers()
+        if len(layers) == 0:
+            return None
+
+        # Iterate over all layers
+        layer = None
+        for cur_layer in layers:
+            uri_table = self.qgis_get_layer_source_table_name(cur_layer)
+            if uri_table is not None and uri_table == tablename:
+                layer = cur_layer
+                break
+
+        if layer is None and show_warning:
+            pass
+            #self.show_warning("Layer not found", parameter=tablename)
+
+        if layer is None and log_info:
+            pass
+            #self.log_info("Layer not found", parameter=tablename)
+
+        return layer
+
+
+    def qgis_manage_snapping_layer(self, layername, snapping_type=0, tolerance=15.0):
+        """ Manage snapping of @layername """
+
+        layer = self.qgis_get_layer_by_tablename(layername)
+        if not layer:
+            return
+        if snapping_type == 0:
+            snapping_type = QgsPointLocator.Vertex
+        elif snapping_type == 1:
+            snapping_type = QgsPointLocator.Edge
+        elif snapping_type == 2:
+            snapping_type = QgsPointLocator.All
+
+        QgsSnappingUtils.LayerConfig(layer, snapping_type, tolerance, QgsTolerance.Pixels)
 
