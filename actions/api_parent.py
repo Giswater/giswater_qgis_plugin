@@ -1653,13 +1653,13 @@ class ApiParent(ParentAction):
                 widget.blockSignals(False)
 
 
-    def get_selector(self, dialog, selector_type, filter=False, widget=None, text_filter=None, current_tab=None):
+    def get_selector(self, dialog, selector_type, filter=False, widget=None, text_filter=None, current_tab=None, is_setselector=None):
         """ Ask to DB for selectors and make dialog
         :param dialog: Is a standard dialog, from file api_selectors.ui, where put widgets
         :param selector_type: list of selectors to ask DB ['exploitation', 'state', ...]
         """
-
         main_tab = dialog.findChild(QTabWidget, 'main_tab')
+        main_tab.tabBarClicked.connect(partial(self.manage_filter, dialog, None, None))
 
         # Set filter
         if filter is not False:
@@ -1675,12 +1675,18 @@ class ApiParent(ParentAction):
         # Profilactic control of nones
         if text_filter is None:
             text_filter = ''
+        if is_setselector is None:
+            # Built querytext
+            form = f'"currentTab":"{current_tab}"'
+            extras = f'"selectorType":{selector_type}, "filterText":"{text_filter}"'
+            body = self.create_body(form=form, extras=extras)
+            json_result = self.controller.get_json('gw_fct_getselectors', body, log_sql=True)
+        else:
+            json_result = is_setselector
 
-        # built querytext
-        form = f'"currentTab":"{current_tab}"'
-        extras = f'"selectorType":{selector_type}, "filterText":"{text_filter}"'
-        body = self.create_body(form=form, extras=extras)
-        json_result = self.controller.get_json('gw_fct_getselectors', body, log_sql=True)
+            for x in range(dialog.main_tab.count() - 1, -1, -1):
+                dialog.main_tab.widget(x).deleteLater()
+
         if not json_result:
             return False
 
@@ -1720,6 +1726,7 @@ class ApiParent(ParentAction):
 
                 widget.textChanged.connect(partial(self.get_selector, self.dlg_selector, selector_type, filter=True,
                                                    widget=widget, current_tab=current_tab))
+                widget.textChanged.connect(partial(self.manage_filter, dialog, widget, 'save'))
                 widget.setLayoutDirection(Qt.RightToLeft)
                 field['layoutname'] = gridlayout.objectName()
                 field['layoutorder'] = i
@@ -1756,11 +1763,16 @@ class ApiParent(ParentAction):
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
             gridlayout.addItem(vertical_spacer1)
 
-            # Set last tab used by user as current tab
-            tabname = json_result['body']['form']['currentTab']
-            tab = main_tab.findChild(QWidget, tabname)
-            if tab:
-                main_tab.setCurrentWidget(tab)
+        # Set last tab used by user as current tab
+        tabname = json_result['body']['form']['currentTab']
+        tab = main_tab.findChild(QWidget, tabname)
+
+        if tab:
+            main_tab.setCurrentWidget(tab)
+
+        if is_setselector is not None:
+            widget = dialog.main_tab.findChild(QLineEdit, f'txt_filter_{tabname}')
+            utils_giswater.setWidgetText(dialog, widget, f'{self.widget_filter}')
 
 
     def set_selection_mode(self, dialog, widget, selection_mode):
@@ -1821,14 +1833,15 @@ class ApiParent(ParentAction):
         # Get current tab name
         index = dialog.main_tab.currentIndex()
         tab_name = dialog.main_tab.widget(index).objectName()
-
+        selector_type = dialog.main_tab.widget(index).property("selector_type")
         qgis_project_add_schema = self.controller.plugin_settings_value('gwAddSchema')
-        extras = (f'"selectorType":"{widget.property("selector_type")}", "tabName":"{tab_name}", '
+
+        extras = (f'"selectorType":"{selector_type}", "tabName":"{tab_name}", '
                   f'"id":"{widget.objectName()}", "isAlone":"{is_alone}", "value":"{widget.isChecked()}", '
                   f'"addSchema":"{qgis_project_add_schema}"')
         body = self.create_body(extras=extras)
         json_result = self.controller.get_json('gw_fct_setselectors', body, log_sql=True)
-
+        # json_result = '{"status":"Accepted", "version":{"value":"3.4.015"},"body":{"message":{"level":1, "text":"This is a test message"},"form":{"formName":"", "formLabel":"", "currentTab":"tab_exploitation", "formText":"", "formTabs":[{"fields":[{"expl_id":1,"label":"1 - expl_01","widgetname":"1","columnname":"expl_id","type":"check","dataType":"boolean","value":true},{"expl_id":2,"label":"2 - expl_02","widgetname":"2","columnname":"expl_id","type":"check","dataType":"boolean","value":false}],"tabName":"tab_exploitation","tableName":"selector_expl","tabLabel":"Expl","tooltip":"Active exploitation","selectorType":"selector_basic","manageAll":"true","typeaheadFilter":" AND lower(concat(expl_id, ' - ', name))","selectionMode":"keepPreviousUsingShift"},{"fields":[{"id":0,"label":"0 - STATE0","widgetname":"0","columnname":"state_id","type":"check","dataType":"boolean","value":true},{"id":1,"label":"1 - STATE1","widgetname":"1","columnname":"state_id","type":"check","dataType":"boolean","value":true},{"id":2,"label":"2 - STATE2","widgetname":"2","columnname":"state_id","type":"check","dataType":"boolean","value":true},{"id":3,"label":"3 - STATE3","widgetname":"3","columnname":"state_id","type":"check","dataType":"boolean","value":true},{"id":4,"label":"4 - STATE4","widgetname":"4","columnname":"state_id","type":"check","dataType":"boolean","value":false}],"tabName":"tab_hydro_state","tableName":"selector_hydrometer","tabLabel":"Hydrometer","tooltip":"Hydrometer","selectorType":"selector_basic","manageAll":"true","selectionMode":"keepPrevious"},{"fields":[{"psector_id":1,"label":"1 - Masterplan 01","widgetname":"1","columnname":"psector_id","type":"check","dataType":"boolean","value":true},{"psector_id":2,"label":"2 - Masterplan 02","widgetname":"2","columnname":"psector_id","type":"check","dataType":"boolean","value":false}],"tabName":"tab_psector","tableName":"selector_psector","tabLabel":"Psector","tooltip":"Psector","selectorType":"selector_basic","manageAll":"true","typeaheadFilter":" AND lower(concat(expl_id, ' - ', name))","selectionMode":"keepPrevious"},{"fields":[{"sector_id":1,"label":"1 - sector1-1s","widgetname":"1","columnname":"sector_id","type":"check","dataType":"boolean","value":true},{"sector_id":2,"label":"2 - sector1-2s","widgetname":"2","columnname":"sector_id","type":"check","dataType":"boolean","value":true},{"sector_id":3,"label":"3 - sector1-1d","widgetname":"3","columnname":"sector_id","type":"check","dataType":"boolean","value":true},{"sector_id":4,"label":"4 - sector2-1s","widgetname":"4","columnname":"sector_id","type":"check","dataType":"boolean","value":true},{"sector_id":5,"label":"5 - sector2-1d","widgetname":"5","columnname":"sector_id","type":"check","dataType":"boolean","value":true}],"tabName":"tab_sector","tableName":"selector_sector","tabLabel":"Sector","tooltip":"Sector","selectorType":"selector_basic","manageAll":"true","selectionMode":"keepPrevious"},{"fields":[{"id":0,"label":"0 - OBSOLETE","widgetname":"0","columnname":"state_id","type":"check","dataType":"boolean","value":false},{"id":1,"label":"1 - ON_SERVICE","widgetname":"1","columnname":"state_id","type":"check","dataType":"boolean","value":true},{"id":2,"label":"2 - PLANIFIED","widgetname":"2","columnname":"state_id","type":"check","dataType":"boolean","value":false}],"tabName":"tab_network_state","tableName":"selector_state","tabLabel":"State","tooltip":"Network","selectorType":"selector_basic","manageAll":"false","selectionMode":"keepPrevious"}]},"feature":{},"layermanager":{},"data":{}}}'
         if str(tab_name) == 'tab_exploitation':
 
             # reload layer, zoom to layer, style mapzones and refresh canvas
@@ -1838,7 +1851,7 @@ class ApiParent(ParentAction):
                 self.iface.zoomToActiveLayer()
             self.set_style_mapzones()
 
-        #refresh canvas
+        # Refresh canvas
         layer = self.controller.get_layer_by_tablename('v_edit_arc')
         if layer:
             layer.dataProvider().forceReload()
@@ -1861,3 +1874,14 @@ class ApiParent(ParentAction):
             layer.dataProvider().forceReload()
             layer.triggerRepaint()
             self.refresh_map_canvas()
+
+        self.get_selector(dialog, f'"{selector_type}"', is_setselector=json_result)
+
+
+    def manage_filter(self, dialog, widget, action):
+
+        if action == 'save':
+            self.widget_filter = utils_giswater.getWidgetText(dialog, widget)
+        else:
+            self.widget_filter = ''
+            
