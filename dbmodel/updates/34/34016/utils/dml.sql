@@ -10,3 +10,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 -- 2020/07/02
 UPDATE  config_form_fields set dv_querytext = 'SELECT id as id,idval FROM plan_typevalue WHERE typevalue=''value_priority'''
 where columnname='priority' and formname='v_edit_plan_psector';
+
+-- update priority when updateing from older verions where priority has the idval of the typevalue
+UPDATE plan_psector SET priority=id FROM plan_typevalue WHERE plan_typevalue.idval=plan_psector.priority AND plan_typevalue.typevalue='value_priority';
