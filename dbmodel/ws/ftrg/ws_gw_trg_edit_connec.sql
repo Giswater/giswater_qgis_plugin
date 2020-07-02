@@ -428,7 +428,7 @@ BEGIN
 
 		IF v_man_table='parent' THEN
 		    v_man_table:= (SELECT man_table FROM cat_feature_connec JOIN cat_connec ON cat_connec.id=NEW.connecat_id
-		    	WHERE cat_feature.id = cat_connec.connectype_id LIMIT 1)::text;
+		    	WHERE cat_feature_connec.id = cat_connec.connectype_id LIMIT 1)::text;
 	         
 	        IF v_man_table IS NOT NULL THEN
 	            v_sql:= 'INSERT INTO '||v_man_table||' (connec_id) VALUES ('||quote_literal(NEW.connec_id)||')';
