@@ -282,7 +282,6 @@ class Master(ParentAction):
 
     def filter_merm(self, dialog, tablename):
         """ Filter rows from 'master_estimate_result_manager' dialog from selected tab """
-
         self.filter_by_text(dialog, dialog.tbl_om_result_cat, dialog.txt_name, tablename)
 
 
