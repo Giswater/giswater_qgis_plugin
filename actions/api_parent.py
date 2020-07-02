@@ -1713,7 +1713,7 @@ class ApiParent(ParentAction):
                 label.setObjectName('lbl_filter')
                 label.setText('Filter:')
                 widget = QLineEdit()
-                widget.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)
+                widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
                 widget.setObjectName('txt_filter_' + str(form_tab['tabName']))
                 if filter is not False:
                     utils_giswater.setWidgetText(dialog, widget, text_filter)
