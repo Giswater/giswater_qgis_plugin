@@ -203,7 +203,7 @@ BEGIN
 			',"body":{"message":{"level":1, "text":"This is a test message"}'||
 			',"form":{"formName":"", "formLabel":"", "currentTab":"'||v_currenttab||'", "formText":"", "formTabs":'||v_formTabs||'}'||
 			',"feature":{}'||
-			',"layermanager":'||
+			',"layermanager":{}'||
 			',"data":{}}'||
 		    '}')::json;
 	END IF;
