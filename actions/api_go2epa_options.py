@@ -82,10 +82,12 @@ class Go2EpaOptions(ApiParent):
 
 
     def get_event_combo_parent(self, complet_result):
+
         for field in complet_result['body']['form']['formTabs'][0]["fields"]:
             if field['isparent']:
                 widget = self.dlg_options.findChild(QComboBox, field['widgetname'])
-                widget.currentIndexChanged.connect(partial(self.fill_child, self.dlg_options, widget))
+                if widget:
+                    widget.currentIndexChanged.connect(partial(self.fill_child, self.dlg_options, widget))
 
 
     def fill_child(self, dialog, widget):
