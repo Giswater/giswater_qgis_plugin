@@ -498,7 +498,7 @@ BEGIN
 										and n.arc_id IS NOT NULL AND node.node_id=n.node_id;
 												
 						-- updat connec table
-						UPDATE v_edit_connec SET staticpressure = (head - elevation) FROM 
+						UPDATE v_edit_connec SET staticpressure = (a.head - a.elevation) FROM 
 							(SELECT connec_id, head, elevation FROM connec
 							JOIN presszone USING (presszone_id)) a
 							WHERE v_edit_connec.connec_id=a.connec_id;
