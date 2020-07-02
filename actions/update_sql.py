@@ -2168,7 +2168,7 @@ class UpdateSQL(ApiParent):
                    'Schema name: ' + schema_name + '\n' + ''
                    'Version: ' + self.project_version + ' \n' + ''
                    'EPSG: ' + str(self.project_epsg) + ' \n' + ''
-                   'Language: ' + str(self.project_epsg) + ' \n' + '')
+                   'Language: ' + str(self.project_language) + ' \n' + '')
 
             self.software_version_info.setText(msg)
 
