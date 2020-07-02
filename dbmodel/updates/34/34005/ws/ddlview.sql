@@ -3421,6 +3421,78 @@ CREATE OR REPLACE VIEW v_edit_man_greentap AS
 	 JOIN man_greentap ON man_greentap.connec_id::text = connec.connec_id::text;
 
 
+CREATE OR REPLACE VIEW v_edit_man_wjoin AS 
+ SELECT connec.connec_id,
+	connec.code,
+	connec.elevation,
+	connec.depth,
+	cat_connec.connectype_id,
+	connec.connecat_id,
+	cat_connec.matcat_id,
+	cat_connec.pnom,
+	cat_connec.dnom,
+	connec.sector_id,
+	sector.macrosector_id,
+	connec.customer_code,
+	a.n_hydrometer,
+	connec.state,
+	connec.state_type,
+	connec.annotation,
+	connec.observ,
+	connec.comment,
+	connec.dma_id,
+	connec.presszone_id,
+	connec.soilcat_id,
+	connec.function_type,
+	connec.category_type,
+	connec.fluid_type,
+	connec.location_type,
+	connec.workcat_id,
+	connec.workcat_id_end,
+	connec.buildercat_id,
+	connec.builtdate,
+	connec.enddate,
+	connec.ownercat_id,
+	connec.muni_id,
+	connec.postcode,
+	connec.district_id,
+	connec.streetaxis_id,
+	connec.postnumber,
+	connec.postcomplement,
+	connec.streetaxis2_id,
+	connec.postnumber2,
+	connec.postcomplement2,
+	connec.descript,
+	connec.arc_id,
+	cat_connec.svg,
+	connec.rotation,
+	connec.label_x,
+	connec.label_y,
+	connec.label_rotation,
+	concat(cat_feature.link_path, connec.link) AS link,
+	connec.connec_length,
+	connec.verified,
+	connec.undelete,
+	connec.publish,
+	connec.inventory,
+	dma.macrodma_id,
+	connec.expl_id,
+	connec.num_value,
+	connec.the_geom,
+	man_wjoin.top_floor,
+	man_wjoin.cat_valve
+   FROM connec
+	 LEFT JOIN ( SELECT connec_1.connec_id,
+			count(ext_rtc_hydrometer.id)::integer AS n_hydrometer
+		   FROM ext_rtc_hydrometer
+			 JOIN connec connec_1 ON ext_rtc_hydrometer.connec_id::text = connec_1.customer_code::text
+		  GROUP BY connec_1.connec_id) a USING (connec_id)
+	 JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
+	 JOIN cat_feature ON cat_feature.id::text = cat_connec.connectype_id::text
+	 JOIN v_state_connec ON v_state_connec.connec_id::text = connec.connec_id::text
+	 LEFT JOIN dma ON connec.dma_id = dma.dma_id
+	 LEFT JOIN sector ON connec.sector_id = sector.sector_id
+	 JOIN man_wjoin ON man_wjoin.connec_id::text = connec.connec_id::text;
 
 CREATE OR REPLACE VIEW v_edit_man_hydrant AS 
  SELECT v_node.node_id,
