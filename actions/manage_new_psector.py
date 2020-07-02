@@ -1017,8 +1017,12 @@ class ManageNewPsector(ParentManage):
                             date = self.dlg_plan_psector.findChild(QDateEdit, str(column_name))
                             value = date.dateTime().toString('yyyy-MM-dd HH:mm:ss')
                         elif widget_type is QComboBox:
+                            # Get combo id
                             combo = utils_giswater.getWidget(self.dlg_plan_psector, column_name)
                             value = str(utils_giswater.get_item_data(self.dlg_plan_psector, combo))
+                            # Get combo value
+                            if combo.objectName() == 'priority':
+                                value = str(utils_giswater.get_item_data(self.dlg_plan_psector, combo, 1))
                         else:
                             value = utils_giswater.getWidgetText(self.dlg_plan_psector, column_name)
                         if value is None or value == 'null':
@@ -1046,8 +1050,12 @@ class ManageNewPsector(ParentManage):
                                 date = self.dlg_plan_psector.findChild(QDateEdit, str(column_name))
                                 values += date.dateTime().toString('yyyy-MM-dd HH:mm:ss') + ", "
                             elif widget_type is QComboBox:
+                                # Get combo id
                                 combo = utils_giswater.getWidget(self.dlg_plan_psector, column_name)
                                 value = str(utils_giswater.get_item_data(self.dlg_plan_psector, combo))
+                                # Get combo value
+                                if combo.objectName() == 'priority':
+                                    value = str(utils_giswater.get_item_data(self.dlg_plan_psector, combo, 1))
                             else:
                                 value = utils_giswater.getWidgetText(self.dlg_plan_psector, column_name)
 
