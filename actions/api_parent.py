@@ -1759,12 +1759,9 @@ class ApiParent(ParentAction):
                     self.put_widgets(dialog, field, label, widget)
 
             for order, field in enumerate(form_tab['fields']):
-                if utils_giswater.getWidget(dialog, f"lbl_{field['label']}") is None:
-                    label = QLabel()
-                    label.setObjectName('lbl_' + field['label'])
-                    label.setText(field['label'])
-                else:
-                    label = utils_giswater.getWidget(dialog, f"lbl_{field['label']}")
+                label = QLabel()
+                label.setObjectName('lbl_' + field['label'])
+                label.setText(field['label'])
 
                 widget = self.add_checkbox(field)
                 widget.stateChanged.connect(partial(self.set_selection_mode, dialog, widget, selection_mode))
@@ -1880,11 +1877,12 @@ class ApiParent(ParentAction):
         self.controller.set_layer_index('v_edit_gully')
         self.controller.set_layer_index('v_edit_link')
         self.controller.set_layer_index('v_edit_plan_psector')
-        self.refresh_map_canvas()
 
         self.get_selector(dialog, f'"{selector_type}"', is_setselector=json_result)
         widget_filter = utils_giswater.getWidget(dialog, f"txt_filter_{tab_name}")
-        widget_filter.textChanged.emit(widget_filter.text())
+        if widget_filter:
+            widget_filter.textChanged.emit(widget_filter.text())
+
 
     def manage_filter(self, dialog, widget, action):
         index = dialog.main_tab.currentIndex()
