@@ -1659,7 +1659,6 @@ class ApiParent(ParentAction):
         :param selector_type: list of selectors to ask DB ['exploitation', 'state', ...]
         """
         main_tab = dialog.findChild(QTabWidget, 'main_tab')
-        main_tab.tabBarClicked.connect(partial(self.manage_filter, dialog, None, None))
 
         # Set filter
         if filter is not False:
@@ -1718,16 +1717,17 @@ class ApiParent(ParentAction):
                 label = QLabel()
                 label.setObjectName('lbl_filter')
                 label.setText('Filter:')
-                widget = QLineEdit()
-                widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-                widget.setObjectName('txt_filter_' + str(form_tab['tabName']))
-                if filter is not False:
-                    utils_giswater.setWidgetText(dialog, widget, text_filter)
-
-                widget.textChanged.connect(partial(self.get_selector, self.dlg_selector, selector_type, filter=True,
-                                                   widget=widget, current_tab=current_tab))
-                widget.textChanged.connect(partial(self.manage_filter, dialog, widget, 'save'))
-                widget.setLayoutDirection(Qt.RightToLeft)
+                if utils_giswater.getWidget(dialog, 'txt_filter_' + str(form_tab['tabName'])) is None:
+                    widget = QLineEdit()
+                    widget.setObjectName('txt_filter_' + str(form_tab['tabName']))
+                    widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+                    widget.textChanged.connect(partial(self.get_selector, self.dlg_selector, selector_type, filter=True,
+                                                       widget=widget, current_tab=current_tab))
+                    widget.textChanged.connect(partial(self.manage_filter, dialog, widget, 'save'))
+                    widget.setLayoutDirection(Qt.RightToLeft)
+                    setattr(self, f"var_txt_filter_{form_tab['tabName']}", '')
+                else:
+                    widget = utils_giswater.getWidget(dialog, 'txt_filter_' + str(form_tab['tabName']))
                 field['layoutname'] = gridlayout.objectName()
                 field['layoutorder'] = i
                 i = i + 1
@@ -1736,13 +1736,22 @@ class ApiParent(ParentAction):
 
             if 'manageAll' in form_tab:
                 if (form_tab['manageAll']).lower() == 'true':
-                    label = QLabel()
-                    label.setObjectName('lbl_manage_all')
-                    label.setText('Check all')
-                    widget = QCheckBox()
-                    widget.setObjectName('chk_all_' + str(form_tab['tabName']))
-                    widget.stateChanged.connect(partial(self.manage_all, dialog, widget))
-                    widget.setLayoutDirection(Qt.RightToLeft)
+                    if utils_giswater.getWidget(dialog, f"lbl_manage_all_{form_tab['tabName']}") is None:
+                        label = QLabel()
+                        label.setObjectName(f"lbl_manage_all_{form_tab['tabName']}")
+                        label.setText('Check all')
+
+                    else:
+                        label = utils_giswater.getWidget(dialog, f"lbl_manage_all_{form_tab['tabName']}")
+
+                    if utils_giswater.getWidget(dialog, f"lbl_manage_all_{form_tab['tabName']}") is None:
+                        widget = QCheckBox()
+                        widget.setObjectName('chk_all_' + str(form_tab['tabName']))
+                        widget.stateChanged.connect(partial(self.manage_all, dialog, widget))
+                        widget.setLayoutDirection(Qt.RightToLeft)
+
+                    else:
+                        widget = utils_giswater.getWidget(dialog, f"chk_all_{form_tab['tabName']}")
                     field['layoutname'] = gridlayout.objectName()
                     field['layoutorder'] = i
                     i = i + 1
@@ -1750,12 +1759,17 @@ class ApiParent(ParentAction):
                     self.put_widgets(dialog, field, label, widget)
 
             for order, field in enumerate(form_tab['fields']):
-                label = QLabel()
-                label.setObjectName('lbl_' + field['label'])
-                label.setText(field['label'])
+                if utils_giswater.getWidget(dialog, f"lbl_{field['label']}") is None:
+                    label = QLabel()
+                    label.setObjectName('lbl_' + field['label'])
+                    label.setText(field['label'])
+                else:
+                    label = utils_giswater.getWidget(dialog, f"lbl_{field['label']}")
+
                 widget = self.add_checkbox(field)
                 widget.stateChanged.connect(partial(self.set_selection_mode, dialog, widget, selection_mode))
                 widget.setLayoutDirection(Qt.RightToLeft)
+
                 field['layoutname'] = gridlayout.objectName()
                 field['layoutorder'] = order + i
                 self.put_widgets(dialog, field, label, widget)
@@ -1770,9 +1784,15 @@ class ApiParent(ParentAction):
         if tab:
             main_tab.setCurrentWidget(tab)
 
-        if is_setselector is not None:
+        if is_setselector is not None and hasattr(self, 'widget_filter'):
             widget = dialog.main_tab.findChild(QLineEdit, f'txt_filter_{tabname}')
-            utils_giswater.setWidgetText(dialog, widget, f'{self.widget_filter}')
+            if widget:
+                widget.blockSignals(True)
+                index = dialog.main_tab.currentIndex()
+                tab_name = dialog.main_tab.widget(index).objectName()
+                value = getattr(self, f"var_txt_filter_{tab_name}")
+                utils_giswater.setWidgetText(dialog, widget, f'{value}')
+                widget.blockSignals(False)
 
 
     def set_selection_mode(self, dialog, widget, selection_mode):
@@ -1789,6 +1809,7 @@ class ApiParent(ParentAction):
 
         is_alone = False
         key_modifier = QApplication.keyboardModifiers()
+
         if selection_mode == 'removePrevious' or \
                 (selection_mode == 'keepPreviousUsingShift' and key_modifier != Qt.ShiftModifier):
             is_alone = True
@@ -1830,6 +1851,7 @@ class ApiParent(ParentAction):
         :param widget: QCheckBox that contains the information to generate the json (QCheckBox)
         :param is_alone: Defines if the selector is unique (True) or multiple (False) (Boolean)
         """
+
         # Get current tab name
         index = dialog.main_tab.currentIndex()
         tab_name = dialog.main_tab.widget(index).objectName()
@@ -1841,7 +1863,7 @@ class ApiParent(ParentAction):
                   f'"addSchema":"{qgis_project_add_schema}"')
         body = self.create_body(extras=extras)
         json_result = self.controller.get_json('gw_fct_setselectors', body, log_sql=True)
-        # json_result = '{"status":"Accepted", "version":{"value":"3.4.015"},"body":{"message":{"level":1, "text":"This is a test message"},"form":{"formName":"", "formLabel":"", "currentTab":"tab_exploitation", "formText":"", "formTabs":[{"fields":[{"expl_id":1,"label":"1 - expl_01","widgetname":"1","columnname":"expl_id","type":"check","dataType":"boolean","value":true},{"expl_id":2,"label":"2 - expl_02","widgetname":"2","columnname":"expl_id","type":"check","dataType":"boolean","value":false}],"tabName":"tab_exploitation","tableName":"selector_expl","tabLabel":"Expl","tooltip":"Active exploitation","selectorType":"selector_basic","manageAll":"true","typeaheadFilter":" AND lower(concat(expl_id, ' - ', name))","selectionMode":"keepPreviousUsingShift"},{"fields":[{"id":0,"label":"0 - STATE0","widgetname":"0","columnname":"state_id","type":"check","dataType":"boolean","value":true},{"id":1,"label":"1 - STATE1","widgetname":"1","columnname":"state_id","type":"check","dataType":"boolean","value":true},{"id":2,"label":"2 - STATE2","widgetname":"2","columnname":"state_id","type":"check","dataType":"boolean","value":true},{"id":3,"label":"3 - STATE3","widgetname":"3","columnname":"state_id","type":"check","dataType":"boolean","value":true},{"id":4,"label":"4 - STATE4","widgetname":"4","columnname":"state_id","type":"check","dataType":"boolean","value":false}],"tabName":"tab_hydro_state","tableName":"selector_hydrometer","tabLabel":"Hydrometer","tooltip":"Hydrometer","selectorType":"selector_basic","manageAll":"true","selectionMode":"keepPrevious"},{"fields":[{"psector_id":1,"label":"1 - Masterplan 01","widgetname":"1","columnname":"psector_id","type":"check","dataType":"boolean","value":true},{"psector_id":2,"label":"2 - Masterplan 02","widgetname":"2","columnname":"psector_id","type":"check","dataType":"boolean","value":false}],"tabName":"tab_psector","tableName":"selector_psector","tabLabel":"Psector","tooltip":"Psector","selectorType":"selector_basic","manageAll":"true","typeaheadFilter":" AND lower(concat(expl_id, ' - ', name))","selectionMode":"keepPrevious"},{"fields":[{"sector_id":1,"label":"1 - sector1-1s","widgetname":"1","columnname":"sector_id","type":"check","dataType":"boolean","value":true},{"sector_id":2,"label":"2 - sector1-2s","widgetname":"2","columnname":"sector_id","type":"check","dataType":"boolean","value":true},{"sector_id":3,"label":"3 - sector1-1d","widgetname":"3","columnname":"sector_id","type":"check","dataType":"boolean","value":true},{"sector_id":4,"label":"4 - sector2-1s","widgetname":"4","columnname":"sector_id","type":"check","dataType":"boolean","value":true},{"sector_id":5,"label":"5 - sector2-1d","widgetname":"5","columnname":"sector_id","type":"check","dataType":"boolean","value":true}],"tabName":"tab_sector","tableName":"selector_sector","tabLabel":"Sector","tooltip":"Sector","selectorType":"selector_basic","manageAll":"true","selectionMode":"keepPrevious"},{"fields":[{"id":0,"label":"0 - OBSOLETE","widgetname":"0","columnname":"state_id","type":"check","dataType":"boolean","value":false},{"id":1,"label":"1 - ON_SERVICE","widgetname":"1","columnname":"state_id","type":"check","dataType":"boolean","value":true},{"id":2,"label":"2 - PLANIFIED","widgetname":"2","columnname":"state_id","type":"check","dataType":"boolean","value":false}],"tabName":"tab_network_state","tableName":"selector_state","tabLabel":"State","tooltip":"Network","selectorType":"selector_basic","manageAll":"false","selectionMode":"keepPrevious"}]},"feature":{},"layermanager":{},"data":{}}}'
+
         if str(tab_name) == 'tab_exploitation':
 
             # reload layer, zoom to layer, style mapzones and refresh canvas
@@ -1852,36 +1874,22 @@ class ApiParent(ParentAction):
             self.set_style_mapzones()
 
         # Refresh canvas
-        layer = self.controller.get_layer_by_tablename('v_edit_arc')
-        if layer:
-            layer.dataProvider().forceReload()
-            layer.triggerRepaint()
-        layer = self.controller.get_layer_by_tablename('v_edit_node')
-        if layer:
-            layer.dataProvider().forceReload()
-            layer.triggerRepaint()
-        layer = self.controller.get_layer_by_tablename('v_edit_connec')
-        if layer:
-            layer.dataProvider().forceReload()
-            layer.triggerRepaint()
-        layer = self.controller.get_layer_by_tablename('v_edit_gully')
-        if layer:
-            layer.dataProvider().forceReload()
-            layer.triggerRepaint()
-            self.refresh_map_canvas()
-        layer = self.controller.get_layer_by_tablename('v_edit_link')
-        if layer:
-            layer.dataProvider().forceReload()
-            layer.triggerRepaint()
-            self.refresh_map_canvas()
+        self.controller.set_layer_index('v_edit_arc')
+        self.controller.set_layer_index('v_edit_node')
+        self.controller.set_layer_index('v_edit_connec')
+        self.controller.set_layer_index('v_edit_gully')
+        self.controller.set_layer_index('v_edit_link')
+        self.controller.set_layer_index('v_edit_plan_psector')
+        self.refresh_map_canvas()
 
         self.get_selector(dialog, f'"{selector_type}"', is_setselector=json_result)
-
+        widget_filter = utils_giswater.getWidget(dialog, f"txt_filter_{tab_name}")
+        widget_filter.textChanged.emit(widget_filter.text())
 
     def manage_filter(self, dialog, widget, action):
-
+        index = dialog.main_tab.currentIndex()
+        tab_name = dialog.main_tab.widget(index).objectName()
         if action == 'save':
-            self.widget_filter = utils_giswater.getWidgetText(dialog, widget)
+            setattr(self, f"var_txt_filter_{tab_name}", utils_giswater.getWidgetText(dialog, widget))
         else:
-            self.widget_filter = ''
-            
+            setattr(self, f"var_txt_filter_{tab_name}", '')
