@@ -246,7 +246,7 @@ BEGIN
 		-- reset graf & audit_log tables
 		DELETE FROM anl_arc where cur_user=current_user and fid=v_fid;
 		DELETE FROM anl_node where cur_user=current_user and fid=v_fid;
-		DELETE FROM temp_anlgraf;
+		TRUNCATE temp_anlgraf;
 		DELETE FROM audit_check_data WHERE fid=v_fid AND cur_user=current_user;
 			
 		-- reset selectors

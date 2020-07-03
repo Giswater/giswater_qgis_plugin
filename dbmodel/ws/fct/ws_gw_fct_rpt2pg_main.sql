@@ -32,7 +32,7 @@ BEGIN
 
 	RAISE NOTICE 'Starting rpt2pg process.';
 	
-	DELETE FROM temp_csv WHERE fid = 140 AND cur_user = current_user;
+	TRUNCATE temp_csv;
 
 	-- inserting file into temp table
 	INSERT INTO temp_csv (fid, cur_user, source, csv1, csv2, csv3, csv4, csv5, csv6, csv7, csv8, csv9, csv10, csv11, csv12, csv13, csv14, csv15, csv16, csv17, csv18, csv19, csv20)

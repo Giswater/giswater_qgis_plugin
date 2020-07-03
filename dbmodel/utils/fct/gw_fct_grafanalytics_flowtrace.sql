@@ -70,7 +70,7 @@ BEGIN
 	-- reset graf & audit tables
 	DELETE FROM anl_arc where cur_user=current_user AND fid=v_fid;
 	DELETE FROM audit_check_data WHERE fid=v_fid AND cur_user=current_user;
-	DELETE FROM temp_anlgraf;	
+	TRUNCATE temp_anlgraf;	
 
 	-- reset exploitation
 	IF v_expl IS NOT NULL THEN
