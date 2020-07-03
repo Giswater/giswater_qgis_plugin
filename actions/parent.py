@@ -1346,30 +1346,38 @@ class ParentAction(object):
 
             # Get a layer name and zoom to extent with a margin of 20
             if 'zoom' in layermanager:
-                layer = self.controller.get_layer_by_tablename(layermanager['zoom'])
+                layer = self.controller.get_layer_by_tablename(layermanager['zoom']['layer'])
                 if layer:
                     prev_layer = self.iface.activeLayer()
                     self.iface.setActiveLayer(layer)
                     self.iface.zoomToActiveLayer()
-
+                    margin = layermanager['zoom']['margin']
                     extent = QgsRectangle()
                     extent.setMinimal()
                     extent.combineExtentWith(layer.extent())
-                    xmax = extent.xMaximum() + 20
-                    xmin = extent.xMinimum() - 20
-                    ymax = extent.yMaximum() + 20
-                    ymin = extent.yMinimum() - 20
+                    xmax = extent.xMaximum() + margin
+                    xmin = extent.xMinimum() - margin
+                    ymax = extent.yMaximum() + margin
+                    ymin = extent.yMinimum() - margin
                     extent.set(xmin, ymin, xmax, ymax)
                     self.iface.mapCanvas().setExtent(extent)
                     self.iface.mapCanvas().refresh()
                     if prev_layer:
                         self.iface.setActiveLayer(prev_layer)
 
-            if 'qmlPath' in layermanager:
-                layer = self.controller.get_layer_by_tablename(layermanager['zoom'])
-                qml_path = layermanager['qmlPath']
+            if 'style' in layermanager:
+                layer = self.controller.get_layer_by_tablename('v_edit_arc')
+                style = layermanager['style']
+
                 if layer:
-                    self.load_qml(layer, qml_path)
+                    path_temp_file = self.plugin_dir + os.sep + 'resources' + os.sep + 'temp_qml.qml'
+                    file = open(path_temp_file, 'w')
+                    file.write(style)
+                    file.close()
+                    del file
+
+                    layer.loadNamedStyle(path_temp_file)
+                    layer.triggerRepaint()
 
             if 'snnaping' in layermanager:
                 pass

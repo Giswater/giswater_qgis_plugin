@@ -368,7 +368,8 @@ class Utils(ParentAction):
     def utils_toolbox(self):
 
         self.toolbox.open_toolbox()
-        self.controller.gw_actions.test("WORK")
+        body = self.create_body()
+        json = self.controller.get_json('gw_fct_admin_check_data', body, log_sql=True)
 
     def utils_print_composer(self):
 
