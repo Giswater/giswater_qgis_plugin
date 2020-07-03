@@ -154,10 +154,15 @@ BEGIN
 	END IF;
 
 	RAISE NOTICE '5 - Check for missed features on inp tables';
-	v_querytext = '(SELECT arc_id FROM arc WHERE arc_id NOT IN (SELECT arc_id from inp_pipe UNION SELECT arc_id FROM inp_virtualvalve) AND state > 0 
-			AND epa_type !=''NOT DEFINED'' UNION SELECT node_id FROM node WHERE node_id 
-			NOT IN (select node_id from inp_shortpipe UNION select node_id from inp_valve UNION select node_id from inp_tank 
-			UNION select node_id FROM inp_reservoir UNION select node_id FROM inp_pump UNION SELECT node_id from inp_inlet 
+	v_querytext = '(SELECT arc_id FROM arc LEFT JOIN 
+			(SELECT arc_id from inp_pipe UNION SELECT arc_id FROM inp_virtualvalve) b using (arc_id)
+			WHERE b.arc_id IS NULL AND state > 0 AND epa_type !=''NOT DEFINED''
+			UNION 
+			SELECT node_id FROM node WHERE node_id NOT IN
+			(select node_id from inp_shortpipe UNION select node_id from inp_valve 
+			UNION select node_id from inp_tank 
+			UNION select node_id FROM inp_reservoir UNION select node_id FROM inp_pump 
+			UNION SELECT node_id from inp_inlet 
 			UNION SELECT node_id from inp_junction) AND state >0 AND epa_type !=''NOT DEFINED'') a';
 
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;

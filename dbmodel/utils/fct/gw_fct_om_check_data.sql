@@ -95,7 +95,7 @@ BEGIN
 		
 	-- UTILS
 
-	-- system variables
+	RAISE NOTICE '01 - system variables';
 	v_querytext = 'SELECT parameter FROM config_param_system WHERE lower(value) != lower(standardvalue) AND standardvalue IS NOT NULL';
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	EXECUTE concat('SELECT (array_agg(parameter))::text FROM (',v_querytext,')a') INTO v_result;
@@ -109,8 +109,7 @@ BEGIN
 	END IF;
 
 	
-	
-	-- Check node_1 or node_2 nulls (fid:  104)
+	RAISE NOTICE '02 - Check node_1 or node_2 nulls (fid:  104)';
 	v_querytext = '(SELECT arc_id,arccat_id,the_geom FROM '||v_edit||'arc WHERE state > 0 AND node_1 IS NULL UNION SELECT arc_id, arccat_id, the_geom FROM '
 	||v_edit||'arc WHERE state > 0 AND node_2 IS NULL) a';
 
@@ -127,7 +126,7 @@ BEGIN
 		VALUES (125, 1, 'INFO: No arc''s without node_1 or node_2 nodes found.');
 	END IF;
 
-	-- Chec state 1 arcs with state 0 nodes (196)
+	RAISE NOTICE '03 - Chec state 1 arcs with state 0 nodes (196)';
 	v_querytext = '(SELECT a.arc_id, arccat_id, a.the_geom FROM '||v_edit||'arc a JOIN '||v_edit||'node n ON node_1=node_id WHERE a.state =1 AND n.state=0 UNION
 			SELECT a.arc_id, arccat_id, a.the_geom FROM '||v_edit||'arc a JOIN '||v_edit||'node n ON node_2=node_id WHERE a.state =1 AND n.state=0) a';
 			
@@ -145,7 +144,7 @@ BEGIN
 		VALUES (125, 1, 'INFO: No arcs with state=1 using nodes with state=0 found.');
 	END IF;
 
-	-- check conduits (UD) with negative slope and inverted slope is not checked
+	RAISE NOTICE '04 - check conduits (UD) with negative slope and inverted slope is not checked';
 	IF v_project_type  ='UD' THEN
 
 		IF v_edit IS NULL THEN 
@@ -166,7 +165,7 @@ BEGIN
 		END IF;	
 	END IF;
 
-	-- Chec state 1 arcs with state 2 nodes (197)
+	RAISE NOTICE '05 - Chec state 1 arcs with state 2 nodes (197)';
 	v_querytext = '(SELECT a.arc_id, arccat_id, a.the_geom FROM '||v_edit||'arc a JOIN '||v_edit||'node n ON node_1=node_id WHERE a.state =1 AND n.state=2 UNION
 			SELECT a.arc_id, arccat_id, a.the_geom FROM '||v_edit||'arc a JOIN '||v_edit||'node n ON node_2=node_id WHERE a.state =1 AND n.state=2) a';
 			
@@ -184,7 +183,7 @@ BEGIN
 		VALUES (125, 1, 'INFO: No arcs with state=1 using nodes with state=0 found.');
 	END IF;	
 
-	-- Check all state=2 are involved in at least in one psector
+	RAISE NOTICE '06 - Check all state=2 are involved in at least in one psector';
 	v_querytext = 'SELECT a.arc_id FROM '||v_edit||'arc a RIGHT JOIN plan_psector_x_arc USING (arc_id) WHERE a.state = 2 AND a.arc_id IS NULL
 			UNION
 			SELECT a.node_id FROM '||v_edit||'node a RIGHT JOIN plan_psector_x_node USING (node_id) WHERE a.state = 2 AND a.node_id IS NULL
@@ -206,7 +205,7 @@ BEGIN
 	END IF;
 
 
-	-- Check state_type nulls (arc, node)
+	RAISE NOTICE '07 - Check state_type nulls (arc, node)';
 	v_querytext = '(SELECT arc_id, arccat_id, the_geom FROM '||v_edit||'arc WHERE state > 0 AND state_type IS NULL 
 		        UNION SELECT node_id, nodecat_id, the_geom FROM '||v_edit||'node WHERE state > 0 AND state_type IS NULL) a';
 
@@ -220,7 +219,7 @@ BEGIN
 	END IF;
 
 
-	-- Check nodes with state_type isoperative = false (fid:  187)
+	RAISE NOTICE '08 - Check nodes with state_type isoperative = false (fid:  187)';
 	v_querytext = 'SELECT node_id, nodecat_id, the_geom FROM '||v_edit||'node n JOIN value_state_type ON id=state_type WHERE n.state > 0 AND is_operative IS FALSE';
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
@@ -237,7 +236,7 @@ BEGIN
 	END IF;
 
 
-	-- Check arcs with state_type isoperative = false (fid:  188)
+	RAISE NOTICE 'Check arcs with state_type isoperative = false (fid:  188)';
 	v_querytext = 'SELECT arc_id, arccat_id, the_geom FROM '||v_edit||'arc a JOIN value_state_type ON id=state_type WHERE a.state > 0 AND is_operative IS FALSE';
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
@@ -255,7 +254,7 @@ BEGIN
 		VALUES (125, 1, 'INFO: No arcs with state > 0 AND state_type.is_operative on FALSE found.');
 	END IF;
 
-	--check if all tanks are defined in config_mincut_inlet  (fid:  77)
+	RAISE NOTICE '09 - check if all tanks are defined in config_mincut_inlet  (fid: 177)';
 	IF v_project_type = 'WS' THEN
 		v_querytext = 'SELECT node_id, nodecat_id, the_geom FROM '||v_edit||'node 
 		JOIN cat_node ON nodecat_id=cat_node.id
@@ -268,7 +267,7 @@ BEGIN
 
 		IF v_count > 0 THEN
 			EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom)
-			SELECT 77, node_id, nodecat_id, ''Tanks not defined in config_mincut_inlet'', the_geom FROM (', v_querytext,')a');
+			SELECT 177, node_id, nodecat_id, ''Tanks not defined in config_mincut_inlet'', the_geom FROM (', v_querytext,')a');
 			INSERT INTO audit_check_data (fid, criticity, error_message)
 			VALUES (125, 2, concat('WARNING: There is/are ',v_count,' tanks which are not defined on config_mincut_inlet. Node_id: ',v_feature_id,'. Please, check your data before continue'));
 		ELSE
@@ -277,34 +276,25 @@ BEGIN
 		END IF;
 	END IF;
 
-	--check if drawn arc direction is the same as defined node_1, node_2
-	v_querytext = 'SELECT array_agg(arc_id)  FROM '||v_edit||'arc';
+	RAISE NOTICE '09 - check if drawn arc direction is the same as defined node_1, node_2';
 
-	EXECUTE v_querytext INTO v_arc_array;
+	v_querytext = 'SELECT a.arc_id , arccat_id, a.the_geom FROM arc a, node n WHERE st_dwithin(st_startpoint(a.the_geom), n.the_geom, 0.0001) and node_2 = node_id
+			UNION
+			SELECT a.arc_id , arccat_id, a.the_geom  FROM arc a, node n WHERE st_dwithin(st_endpoint(a.the_geom), n.the_geom, 0.0001) and node_1 = node_id';
 
-	FOREACH rec_arc IN ARRAY(v_arc_array)
-	LOOP
-		
-		EXECUTE 'SELECT node_1 FROM '||v_edit||'arc WHERE arc_id = '||quote_literal(rec_arc)||';'
-		INTO v_node_1;
+	EXECUTE concat('SELECT count(*) FROM (',v_querytext,') a ') INTO v_count;
 
-		EXECUTE 'SELECT node_id FROM '||v_edit||'arc, '||v_edit||'node
-		WHERE st_dwithin(St_StartPoint('||v_edit||'arc.the_geom), '||v_edit||'node.the_geom, 0.1) 
-		AND '||v_edit||'arc.arc_id = '||quote_literal(rec_arc)||' AND '||v_edit||'node.state = 1;'
-		INTO v_feature_id;
+	IF v_count > 0 THEN
+		EXECUTE concat('INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom)
+		SELECT 123, arc_id, arccat_id, ''Drawing direction different than definition of node_1, node_2'', the_geom FROM (',v_querytext,')a');
+		INSERT INTO audit_check_data (fid, criticity, error_message)
+		VALUES (125, 2, concat('WARNING: There is/are ',v_count,' arcs with drawing direction different than definition of node_1, node_2'));
+	ELSE
+		INSERT INTO audit_check_data (fid, criticity, error_message)
+		VALUES (125, 1, 'INFO: No arcs with drawing direction different than definition of node_1, node_2');
+	END IF;
 
-		IF v_node_1 != v_feature_id THEN
-			EXECUTE concat ('INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom)
-			SELECT 123, arc_id, arccat_id, ''Drawing direction different than definition of node_1, node_2'', the_geom 
-			FROM '||v_edit||'arc WHERE arc_id = '||quote_literal(rec_arc)||';');
-
-			INSERT INTO audit_check_data (fid, criticity, error_message)
-			VALUES (125, 2, concat('WARNING: Drawing direction of arc ',rec_arc,' is different than definition of node_1, node_2. Please, check your data before continue.'));
-		END IF;
-	END LOOP;
-
-
-	-- Check nulls customer code for connecs (110)
+	RAISE NOTICE '10 - Check nulls customer code for connecs (110)';
 	v_querytext = 'SELECT customer_code FROM '||v_edit||'connec WHERE state=1 and customer_code IS NULL';
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,') a ') INTO v_count;
@@ -319,8 +309,7 @@ BEGIN
 		VALUES (125, 1, 'INFO: No connecs with null customer code.');
 	END IF;
 
-
-	-- Check unique customer code for connecs with state=1 
+	RAISE NOTICE '11 - Check unique customer code for connecs with state=1';
 	v_querytext = 'SELECT customer_code FROM '||v_edit||'connec WHERE state=1 and customer_code IS NOT NULL group by customer_code having count(*) > 1';
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,') a ') INTO v_count;
@@ -335,7 +324,8 @@ BEGIN
 		VALUES (125, 1, 'INFO: No connecs with customer code duplicated.');
 	END IF;
 
-	--Check if all id are integers
+
+	RAISE NOTICE '12 - Check if all id are integers';
 	IF v_project_type = 'WS' THEN
 		v_querytext = '(SELECT CASE WHEN arc_id~E''^\\d+$'' THEN CAST (arc_id AS INTEGER)
 						ELSE 0 END  as feature_id, ''ARC'' as type, arccat_id as featurecat, the_geom FROM '||v_edit||'arc
@@ -385,7 +375,7 @@ BEGIN
 		VALUES (125, 1, 'INFO: All features with id integer.');
 	END IF;
 
-	-- Check state not according with state_type	
+	RAISE NOTICE '13 - Check state not according with state_type';
 	IF v_project_type = 'UD' THEN
 		v_querytext =  'SELECT a.state, state_type FROM '||v_edit||'arc a JOIN value_state_type b ON id=state_type WHERE a.state <> b.state
 				UNION SELECT a.state, state_type FROM '||v_edit||'node a JOIN value_state_type b ON id=state_type WHERE a.state <> b.state
@@ -420,8 +410,9 @@ BEGIN
 			VALUES (125, 1, 'INFO: No features without concordance againts state and state_type.');
 		END IF;
 	END IF;
-	
-	-- Check code with null values
+
+
+	RAISE NOTICE '14 - Check code with null values';
 	IF v_project_type ='UD' THEN
 		v_querytext = '(SELECT arc_id, arccat_id, the_geom FROM '||v_edit||'arc WHERE code IS NULL 
 					UNION SELECT node_id, nodecat_id, the_geom FROM '||v_edit||'node WHERE code IS NULL
@@ -456,7 +447,7 @@ BEGIN
 		END IF;
 	END IF;
 			
-	-- Check for orphan polygons on polygon table
+	RAISE NOTICE '15 - Check for orphan polygons on polygon table';
 	IF v_project_type ='UD' THEN
 
 		v_querytext = '(SELECT pol_id FROM polygon EXCEPT SELECT pol_id FROM (select pol_id from gully UNION select pol_id from man_chamber 
@@ -475,7 +466,7 @@ BEGIN
 
 	END IF;
 
-	-- Check for orphan rows on man_addfields values table
+	RAISE NOTICE '16 - Check for orphan rows on man_addfields values table';
 	IF v_project_type ='UD' THEN
 
 		v_querytext = 'SELECT * FROM man_addfields_value WHERE feature_id NOT IN (SELECT arc_id FROM arc UNION SELECT node_id FROM node UNION SELECT connec_id FROM connec UNION SELECT gully_id FROM gully)';
@@ -507,7 +498,7 @@ BEGIN
 
 	END IF;
 	
-	-- connec/gully without link
+	RAISE NOTICE '17 - connec/gully without link';
 	v_querytext = 'SELECT connec_id,connecat_id,the_geom from '||v_edit||'connec WHERE state= 1 
 					AND connec_id NOT IN (select feature_id from link)';
 
@@ -544,7 +535,7 @@ BEGIN
 	
 	END IF;
 
-	--connec/gully without arc_id or with arc_id different than the one to which points its link
+	RAISE NOTICE '18 - connec/gully without arc_id or with arc_id different than the one to which points its link';
 	v_querytext = 'SELECT  '||v_edit||'connec.connec_id,  '||v_edit||'connec.connecat_id,  '||v_edit||'connec.the_geom
 				FROM '||v_edit||'link
 				LEFT JOIN '||v_edit||'connec ON '||v_edit||'link.feature_id = '||v_edit||'connec.connec_id 
@@ -559,7 +550,7 @@ BEGIN
 
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
-	
+
 	IF v_count > 0 THEN
 		EXECUTE concat ('INSERT INTO anl_connec (fid, connec_id, connecat_id, descript, the_geom)
 		SELECT 206, connec_id, connecat_id, ''Connecs without or with incorrect arc_id'', the_geom FROM (', v_querytext,')a');
@@ -598,7 +589,8 @@ BEGIN
 		END IF;
 	END IF;
 
-	-- links without feature_id
+
+	RAISE NOTICE '19 - links without feature_id';
 	v_querytext = 'SELECT link_id, the_geom FROM link where feature_id is null and state > 0';
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
@@ -611,7 +603,7 @@ BEGIN
 		VALUES (125, 1, 'INFO: All links state > 0 have feature_id.');
 	END IF;
 
-	-- links without exit_id
+	RAISE NOTICE 'links without exit_id';
 	v_querytext = 'SELECT link_id, the_geom FROM link where exit_id is null and state > 0';
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
@@ -626,7 +618,7 @@ BEGIN
 		VALUES (125, 1, 'INFO: All links state > 0 have exit_id.');
 	END IF;
 
-	--Chained connecs/gullies which has different arc_id than the final connec/gully.
+	RAISE NOTICE 'Chained connecs/gullies which has different arc_id than the final connec/gully.';
 	IF v_project_type = 'WS' THEN 
 		v_querytext = 'with c as (
 					Select '||v_edit||'connec.connec_id as id, arc_id as arc, '||v_edit||'connec.connecat_id as 
@@ -680,7 +672,7 @@ BEGIN
 		END IF;
 	END IF;
 
-	--features with state 1 and end date
+	RAISE NOTICE '20 - features with state 1 and end date';
 	IF v_project_type = 'WS' THEN
 		v_querytext = 'SELECT arc_id as feature_id  from '||v_edit||'arc where state = 1 and enddate is not null
 					UNION SELECT node_id from '||v_edit||'node where state = 1 and enddate is not null
@@ -702,7 +694,7 @@ BEGIN
 		VALUES (125, 1, 'INFO: No features on service have value of end date');
 	END IF;
 
-	--features with state 0 and without end date
+	RAISE NOTICE 'features with state 0 and without end date';
 	IF v_project_type = 'WS' THEN
 		v_querytext = 'SELECT arc_id as feature_id  from '||v_edit||'arc where state = 0 and enddate is null
 					UNION SELECT node_id from '||v_edit||'node where state = 0 and enddate is null
@@ -724,7 +716,7 @@ BEGIN
 		VALUES (125, 1, 'INFO: No features with state 0 are missing the end date');
 	END IF;
 
-	--features with state 1 and end date
+	RAISE NOTICE '21 - features with state 1 and end date';
 	IF v_project_type = 'WS' THEN
 		v_querytext = 'SELECT arc_id as feature_id  from '||v_edit||'arc where enddate < builtdate
 					UNION SELECT node_id from '||v_edit||'node where enddate < builtdate
@@ -746,7 +738,7 @@ BEGIN
 		VALUES (125, 1, 'INFO: No features with end date earlier than built date');
 	END IF;
 
-	--Automatic links with more than 100 mts (longitude out-of-range)
+	RAISE NOTICE '22 - Automatic links with more than 100 mts (longitude out-of-range)';
 	EXECUTE 'SELECT count(*) FROM v_edit_link where userdefined_geom  = false AND st_length(the_geom) > 100'
 	INTO v_count;
 
@@ -842,9 +834,9 @@ BEGIN
 	    '}')::json;
 
 	--  Exception handling
-	EXCEPTION WHEN OTHERS THEN
-	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	--EXCEPTION WHEN OTHERS THEN
+	--GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	--RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 
 END;
