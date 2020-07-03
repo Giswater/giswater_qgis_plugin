@@ -148,5 +148,3 @@ DELETE FROM sys_table WHERE id='plan_result_type';
 DELETE FROM sys_table WHERE id='price_simple';
 DELETE FROM sys_table WHERE id='price_value_unit';
 DELETE FROM sys_table WHERE id='inp_value_buildup';
-
-UPDATE sys_foreignkey  SET target_field = 'priority' WHERE typevalue_name = 'value_priority';

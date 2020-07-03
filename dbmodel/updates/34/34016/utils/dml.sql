@@ -8,6 +8,9 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2020/07/02
+
+UPDATE sys_foreignkey  SET target_field = 'priority' WHERE typevalue_name = 'value_priority';
+
 UPDATE  config_form_fields set dv_querytext = 'SELECT id as id,idval FROM plan_typevalue WHERE typevalue=''value_priority'''
 where columnname='priority' and formname='v_edit_plan_psector';
 
