@@ -65,7 +65,7 @@ class Master(ParentAction):
         self.dlg_psector_mng.txt_name.textChanged.connect(
             partial(self.filter_by_text, self.dlg_psector_mng, self.qtbl_psm, self.dlg_psector_mng.txt_name, table_name))
         self.dlg_psector_mng.tbl_psm.doubleClicked.connect(partial(self.charge_psector, self.qtbl_psm))
-        self.fill_table_psector(self.qtbl_psm, table_name)
+        self.fill_table(self.qtbl_psm, table_name)
         self.set_table_columns(self.dlg_psector_mng, self.qtbl_psm, table_name)
         self.set_label_current_psector(self.dlg_psector_mng)
 
@@ -90,8 +90,8 @@ class Master(ParentAction):
         message = "Values has been updated"
         self.controller.show_info(message)
 
-        self.fill_table_psector(qtbl_psm, "v_edit_plan_psector")
-        self.set_table_columns(dialog, qtbl_psm, "plan_psector")
+        self.fill_table(qtbl_psm, "v_edit_plan_psector")
+        self.set_table_columns(dialog, qtbl_psm, "v_edit_plan_psector")
         self.set_label_current_psector(dialog)
         self.open_dialog(dialog)
 
@@ -295,7 +295,7 @@ class Master(ParentAction):
         row = selected_list[0].row()
         psector_id = self.qtbl_psm.model().record(row).value("psector_id")
         self.duplicate_psector = DuplicatePsector(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.duplicate_psector.is_duplicated.connect(partial(self.fill_table_psector, self.qtbl_psm, 'v_edit_plan_psector'))
+        self.duplicate_psector.is_duplicated.connect(partial(self.fill_table, self.qtbl_psm, 'v_edit_plan_psector'))
         self.duplicate_psector.is_duplicated.connect(partial(self.set_label_current_psector, self.dlg_psector_mng))
         self.duplicate_psector.manage_duplicate_psector(psector_id)
 

@@ -441,27 +441,6 @@ class ParentAction(object):
         self.refresh_map_canvas()
 
 
-    def fill_table_psector(self, widget, table_name, set_edit_strategy=QSqlTableModel.OnManualSubmit):
-        """ Set a model with selected @table_name. Attach that model to selected table """
-
-        if self.schema_name not in table_name:
-            table_name = self.schema_name + "." + table_name
-
-        # Set model
-        self.model = QSqlTableModel()
-        self.model.setTable(table_name)
-        self.model.setEditStrategy(set_edit_strategy)
-        self.model.setSort(0, 0)
-        self.model.select()
-
-        # Check for errors
-        if self.model.lastError().isValid():
-            self.controller.show_warning(self.model.lastError().text())
-
-        # Attach model to table view
-        widget.setModel(self.model)
-
-
     def fill_table(self, widget, table_name, set_edit_strategy=QSqlTableModel.OnManualSubmit, expr_filter=None):
         """ Set a model with selected filter.
         Attach that model to selected table """
