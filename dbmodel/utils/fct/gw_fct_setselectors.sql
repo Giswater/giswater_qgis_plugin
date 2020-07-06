@@ -101,7 +101,7 @@ BEGIN
 	END IF;
 
 	-- manage isalone
-	IF v_isalone THEN
+	IF v_isalone OR v_checkall IS FALSE THEN
 		EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user';
 	END IF;
 
