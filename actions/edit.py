@@ -40,6 +40,10 @@ class Edit(ParentAction):
         if self.layer:
             self.suppres_form = QSettings().value("/Qgis/digitizing/disable_enter_attribute_values_dialog")
             QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", True)
+            config = self.layer.editFormConfig()
+            self.conf_supp = config.suppress()
+            config.setSuppress(0)
+            self.layer.setEditFormConfig(config)
             self.iface.setActiveLayer(self.layer)
             self.layer.startEditing()
             self.iface.actionAddFeature().trigger()
@@ -77,7 +81,9 @@ class Edit(ParentAction):
 
         # Restore user value (Settings/Options/Digitizing/Suppress attribute from pop-up after feature creation)
         QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", self.suppres_form)
-
+        config = self.layer.editFormConfig()
+        config.setSuppress(self.conf_supp)
+        self.layer.setEditFormConfig(config)
         if not result:
             self.layer.deleteFeature(feature.id())
             self.iface.actionRollbackEdits().trigger()

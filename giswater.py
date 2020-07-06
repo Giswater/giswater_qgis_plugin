@@ -1309,15 +1309,14 @@ class Giswater(QObject):
 
         schema_name = self.schema_name.replace('"', '')
         sql = (f"SELECT DISTINCT(parent_layer) FROM cat_feature "
-              f"UNION "
-              f"SELECT DISTINCT(child_layer) FROM cat_feature "
-              f"WHERE child_layer IN ("
-              f"     SELECT table_name FROM information_schema.tables"
-              f"     WHERE table_schema = '{schema_name}')")
+               f"UNION "
+               f"SELECT DISTINCT(child_layer) FROM cat_feature "
+               f"WHERE child_layer IN ("
+               f"     SELECT table_name FROM information_schema.tables"
+               f"     WHERE table_schema = '{schema_name}')")
         rows = self.controller.get_rows(sql)
         self.available_layers = [layer[0] for layer in rows]
 
-        self.set_form_suppress(self.available_layers)
         all_layers_toc = self.controller.get_layers()
         for layer in all_layers_toc:
             layer_source = self.controller.get_layer_source(layer)
@@ -1327,18 +1326,6 @@ class Giswater(QObject):
                 if schema and schema.replace('"', '') == self.schema_name:
                     table_name = f"{self.controller.get_layer_source_table_name(layer)}"
                     self.available_layers.append(table_name)
-
-
-    def set_form_suppress(self, layers_list):
-        """ Set form suppress on "Hide form on add feature (global settings) """
-
-        for layer_name in layers_list:
-            layer = self.controller.get_layer_by_tablename(layer_name)
-            if layer is None:
-                continue
-            config = layer.editFormConfig()
-            config.setSuppress(0)
-            layer.setEditFormConfig(config)
 
 
     def set_read_only(self, layer, field, field_index):
