@@ -46,7 +46,6 @@ class ManageNewPsector(ParentManage):
         self.dlg_plan_psector = Plan_psector()
         self.load_settings(self.dlg_plan_psector)
         self.plan_om = str(plan_om)
-        # self.dlg_plan_psector.setWindowTitle(self.plan_om + " psector")
 
         # Capture the current layer to return it at the end of the operation
         cur_active_layer = self.iface.activeLayer()
@@ -161,7 +160,7 @@ class ManageNewPsector(ParentManage):
 
         # if a row is selected from mg_psector_mangement(button 46 or button 81)
         # Si psector_id contiene "1" o "0" python lo toma como boolean, si es True, quiere decir que no contiene valor
-        # y por lo tanto es uno nuevo. Convertimos ese valor en 0 ya que ningun id va a ser 0. de esta manera si psector_id
+        # y por lo tanto es uno nuevo. Convertimos ese valor en 0 ya que ningun id va a ser 0 de esta manera si psector_id
         # tiene un valor distinto de 0, es que el sector ya existe y queremos hacer un update.
         if isinstance(psector_id, bool):
             psector_id = 0
@@ -374,11 +373,11 @@ class ManageNewPsector(ParentManage):
             self.dlg_plan_psector.txt_name, self.dlg_plan_psector.all_rows, 'v_price_compost', viewname, "id"))
 
         self.dlg_plan_psector.gexpenses.returnPressed.connect(partial(self.calulate_percents,
-            'plan_psector', psector_id, 'gexpenses'))
+            'plan_psector', 'gexpenses'))
         self.dlg_plan_psector.vat.returnPressed.connect(partial(self.calulate_percents,
-            'plan_psector', psector_id, 'vat'))
+            'plan_psector', 'vat'))
         self.dlg_plan_psector.other.returnPressed.connect(partial(self.calulate_percents,
-            'plan_psector', psector_id, 'other'))
+            'plan_psector', 'other'))
 
         self.dlg_plan_psector.btn_doc_insert.clicked.connect(self.document_insert)
         self.dlg_plan_psector.btn_doc_delete.clicked.connect(
@@ -432,7 +431,7 @@ class ManageNewPsector(ParentManage):
         widget_to_ignore = ('btn_accept', 'btn_cancel', 'btn_rapports', 'btn_open_doc')
         restriction = ('role_basic', 'role_om', 'role_epa', 'role_om')
         self.set_restriction(self.dlg_plan_psector, widget_to_ignore, restriction)
-        # self.controller.translate_form(self.dlg_plan_psector, 'plan_psector')
+
         # Open dialog
         self.open_dialog(self.dlg_plan_psector, dlg_name='plan_psector', maximize_button=False)
 
@@ -475,7 +474,7 @@ class ManageNewPsector(ParentManage):
             pass
 
 
-    def open_dlg_rapports(self, previous_dialog):
+    def open_dlg_rapports(self):
 
         default_file_name = utils_giswater.getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.name)
 
@@ -610,7 +609,7 @@ class ManageNewPsector(ParentManage):
         layout_name = utils_giswater.getWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.cmb_templates)
         layout = layout_manager.layoutByName(layout_name)
 
-        # Since qgis 3.4 cant dor .setAtlasMode(QgsComposition.PreviewAtlas)
+        # Since qgis 3.4 cant do .setAtlasMode(QgsComposition.PreviewAtlas)
         # then we need to force the opening of the layout designer, trigger the mActionAtlasPreview action and
         # close the layout designer again (finally sentence)
         designer = self.iface.openLayoutDesigner(layout)
@@ -747,7 +746,7 @@ class ManageNewPsector(ParentManage):
         utils_giswater.setWidgetText(dialog, 'pca_pecvat', res)
 
 
-    def calulate_percents(self, tablename, psector_id, field):
+    def calulate_percents(self, tablename, field):
         psector_id = utils_giswater.getWidgetText(self.dlg_plan_psector, "psector_id")
         sql = ("UPDATE " + tablename + " "
                " SET " + field + " = '" + utils_giswater.getText(self.dlg_plan_psector, field) + "'"
@@ -1121,13 +1120,11 @@ class ManageNewPsector(ParentManage):
 
     def rows_selector(self, dialog, tbl_all_rows, tbl_selected_rows, id_ori, tableright, id_des, field_id):
         """
-            :param qtable_left: QTableView origin
-            :param qtable_right: QTableView destini
+            :param tbl_all_rows: QTableView origin
+            :param tbl_selected_rows: QTableView destini
             :param id_ori: Refers to the id of the source table
-            :param tablename_des: table destini
+            :param tableright: table destini
             :param id_des: Refers to the id of the target table, on which the query will be made
-            :param query_right:
-            :param query_left:
             :param field_id:
         """
 
