@@ -54,7 +54,6 @@ BEGIN
 	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_buffer_on_mapzone');
 	SELECT ((value::json)->>'activated')::boolean INTO v_insert_double_geom FROM config_param_system WHERE parameter='edit_node_doublegeom';
 	SELECT ((value::json)->>'value') INTO v_double_geom_buffer FROM config_param_system WHERE parameter='edit_node_doublegeom';
-	v_sys_type := (SELECT type FROM cat_feature_node JOIN cat_node ON cat_node.node_type=cat_feature_node.id WHERE cat_node.id = NEW.nodecat_id);
 
 
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
@@ -497,6 +496,7 @@ BEGIN
         		and (v_insert_double_geom IS TRUE)) THEN
 				
 				v_auto_pol_id:= (SELECT nextval('urn_id_seq'));
+                v_sys_type := (SELECT type FROM cat_feature_node JOIN cat_node ON cat_node.node_type=cat_feature_node.id WHERE cat_node.id = NEW.nodecat_id);
 
 				INSERT INTO polygon(pol_id, sys_type, the_geom) 
 				VALUES (v_auto_pol_id, v_sys_type, (SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_double_geom_buffer))) 

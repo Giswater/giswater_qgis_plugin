@@ -76,7 +76,6 @@ BEGIN
 	v_edit_node_reduction_auto_d1d2 = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_node_reduction_auto_d1d2');
 	SELECT ((value::json)->>'activated')::boolean INTO v_insert_double_geom FROM config_param_system WHERE parameter='edit_node_doublegeom';
 	SELECT ((value::json)->>'value') INTO v_double_geom_buffer FROM config_param_system WHERE parameter='edit_node_doublegeom';
-	v_sys_type := (SELECT type FROM cat_feature_node JOIN cat_node ON cat_node.nodetype_id=cat_feature_node.id WHERE cat_node.id = NEW.nodecat_id);
 
 	-- transforming streetaxis name into id
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
@@ -538,6 +537,7 @@ BEGIN
 			IF (v_man_table IN ('man_register', 'man_tank') and (v_insert_double_geom IS TRUE)) THEN
 					
 				v_auto_pol_id:= (SELECT nextval('urn_id_seq'));
+                v_sys_type := (SELECT type FROM cat_feature_node JOIN cat_node ON cat_node.nodetype_id=cat_feature_node.id WHERE cat_node.id = NEW.nodecat_id);
 
 				INSERT INTO polygon(pol_id, sys_type, the_geom) 
 				VALUES (v_auto_pol_id, v_sys_type, (SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_double_geom_buffer))) 
