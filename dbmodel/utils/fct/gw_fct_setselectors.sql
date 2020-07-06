@@ -12,7 +12,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setselectors(p_data json)
 $BODY$
 
 /*example
-SELECT gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"None", "tabName":"tab_exploitation", "id":"1", "checkAll":"True", "addSchema":"None"}}$$);
+SELECT gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"None", "tabName":"tab_exploitation", "checkAll":"True", "addSchema":"None"}}$$);
 */
 
 DECLARE
@@ -100,22 +100,27 @@ BEGIN
 		EXECUTE 'INSERT INTO selector_expl (expl_id, cur_user) VALUES('|| v_expl ||', '''|| current_user ||''')';	
 	END IF;
 
-	-- manage isalone
-	IF v_isalone OR v_checkall IS FALSE THEN
-		EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user';
-	END IF;
-
-	-- manage value
-	IF v_value THEN
-		EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) VALUES('|| v_id ||', '''|| current_user ||''')ON CONFLICT DO NOTHING';
-	ELSE
-		EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE ' || v_columnname || ' = '|| v_id ||'';
-	END IF;
-
 	-- manage check all
 	IF v_checkall THEN
 		EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) SELECT '||v_tableid||', current_user FROM '||v_table||' ON CONFLICT DO NOTHING';
+	ELSIF v_checkall IS FALSE THEN
+		EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user';
+	ELSE
+
+		-- manage isalone
+		IF v_isalone OR v_checkall IS FALSE THEN
+			EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user';
+		END IF;
+
+		-- manage value
+		IF v_value THEN
+			EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) VALUES('|| v_id ||', '''|| current_user ||''')ON CONFLICT DO NOTHING';
+		ELSE
+			EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE ' || v_columnname || ' = '|| v_id ||'';
+		END IF;
+
 	END IF;
+
 
 	-- control nulls
 	v_layermanager = COALESCE (v_layermanager, '{}');
