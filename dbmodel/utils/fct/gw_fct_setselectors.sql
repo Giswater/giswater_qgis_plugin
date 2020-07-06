@@ -12,7 +12,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setselectors(p_data json)
 $BODY$
 
 /*example
-SELECT gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"None", "tabName":"tab_exploitation", "id":"12", "isAlone":"True", "value":"True", "addSchema":"None"}}$$);
+SELECT gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"None", "tabName":"tab_exploitation", "id":"1", "checkAll":"True", "addSchema":"None"}}$$);
 */
 
 DECLARE
@@ -34,6 +34,9 @@ v_selectortype text;
 v_layermanager json;
 v_schemaname text;
 v_return json;
+v_table text;
+v_tableid text;
+v_checkall boolean;
 
 BEGIN
 
@@ -51,6 +54,7 @@ BEGIN
 	v_id := (p_data ->> 'data')::json->> 'id';
 	v_value := (p_data ->> 'data')::json->> 'value';
 	v_isalone := (p_data ->> 'data')::json->> 'isAlone';
+	v_checkall := (p_data ->> 'data')::json->> 'checkAll';
 	v_addschema := (p_data ->> 'data')::json->> 'addSchema';
 	v_data = p_data->>'data';
 
@@ -79,6 +83,8 @@ BEGIN
 	v_parameter_selector = (SELECT value::json FROM config_param_system WHERE parameter = concat('basic_selector_', v_tabname));
 	v_tablename = v_parameter_selector->>'selector';
 	v_columnname = v_parameter_selector->>'selector_id'; 
+	v_table = v_parameter_selector->>'table';
+	v_tableid = v_parameter_selector->>'table_id';	
 	v_layermanager = v_parameter_selector->>'layermanager'; 
 
 	-- get expl from muni
@@ -104,6 +110,11 @@ BEGIN
 		EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) VALUES('|| v_id ||', '''|| current_user ||''')ON CONFLICT DO NOTHING';
 	ELSE
 		EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE ' || v_columnname || ' = '|| v_id ||'';
+	END IF;
+
+	-- manage check all
+	IF v_checkall THEN
+		EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) SELECT '||v_tableid||', current_user FROM '||v_table||' ON CONFLICT DO NOTHING';
 	END IF;
 
 	-- control nulls
