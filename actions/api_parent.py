@@ -1625,32 +1625,23 @@ class ApiParent(ParentAction):
         return {"path": dxf_path, "result": result, "temp_layers_added": temp_layers_added}
 
 
-    def manage_all(self, dialog, widget):
+    def manage_all(self, dialog, widget_all):
         key_modifier = QApplication.keyboardModifiers()
-        status = utils_giswater.isChecked(dialog, widget)
+        status = utils_giswater.isChecked(dialog, widget_all)
         index = dialog.main_tab.currentIndex()
         widget_list = dialog.main_tab.widget(index).findChildren(QCheckBox)
-        tab_name = dialog.main_tab.widget(index).objectName()
-        widget_all = dialog.findChild(QCheckBox, f'chk_all_{tab_name}')
 
         if key_modifier == Qt.ShiftModifier:
             return
-        if status is True:
-            for widget in widget_list:
+
+        for widget in widget_list:
+            if widget_all is not None:
                 if widget == widget_all or widget.objectName() == widget_all.objectName():
                     continue
-                widget.blockSignals(True)
-                utils_giswater.setChecked(dialog, widget, True)
-                self.set_selector(dialog, widget, False)
-                widget.blockSignals(False)
-        elif status is False:
-            for widget in widget_list:
-                if widget == widget_all or widget.objectName() == widget_all.objectName():
-                    continue
-                widget.blockSignals(True)
-                utils_giswater.setChecked(dialog, widget, False)
-                self.set_selector(dialog, widget, False)
-                widget.blockSignals(False)
+            widget.blockSignals(True)
+            utils_giswater.setChecked(dialog, widget, status)
+            widget.blockSignals(False)
+        self.set_selector(dialog, widget_all, False)
 
 
     def get_selector(self, dialog, selector_type, filter=False, widget=None, text_filter=None, current_tab=None, is_setselector=None):
@@ -1682,7 +1673,6 @@ class ApiParent(ParentAction):
             json_result = self.controller.get_json('gw_fct_getselectors', body, log_sql=True)
         else:
             json_result = is_setselector
-
             for x in range(dialog.main_tab.count() - 1, -1, -1):
                 dialog.main_tab.widget(x).deleteLater()
 
@@ -1740,11 +1730,10 @@ class ApiParent(ParentAction):
                         label = QLabel()
                         label.setObjectName(f"lbl_manage_all_{form_tab['tabName']}")
                         label.setText('Check all')
-
                     else:
                         label = utils_giswater.getWidget(dialog, f"lbl_manage_all_{form_tab['tabName']}")
 
-                    if utils_giswater.getWidget(dialog, f"lbl_manage_all_{form_tab['tabName']}") is None:
+                    if utils_giswater.getWidget(dialog, f"chk_all_{form_tab['tabName']}") is None:
                         widget = QCheckBox()
                         widget.setObjectName('chk_all_' + str(form_tab['tabName']))
                         widget.stateChanged.connect(partial(self.manage_all, dialog, widget))
@@ -1810,9 +1799,10 @@ class ApiParent(ParentAction):
         if selection_mode == 'removePrevious' or \
                 (selection_mode == 'keepPreviousUsingShift' and key_modifier != Qt.ShiftModifier):
             is_alone = True
-            widget_all.blockSignals(True)
-            utils_giswater.setChecked(dialog, widget_all, False)
-            widget_all.blockSignals(False)
+            if widget_all is not None:
+                widget_all.blockSignals(True)
+                utils_giswater.setChecked(dialog, widget_all, False)
+                widget_all.blockSignals(False)
             self.remove_previuos(dialog, widget, widget_all, widget_list)
 
         self.set_selector(dialog, widget, is_alone)
@@ -1854,16 +1844,20 @@ class ApiParent(ParentAction):
         tab_name = dialog.main_tab.widget(index).objectName()
         selector_type = dialog.main_tab.widget(index).property("selector_type")
         qgis_project_add_schema = self.controller.plugin_settings_value('gwAddSchema')
+        widget_all = dialog.findChild(QCheckBox, f'chk_all_{tab_name}')
 
-        extras = (f'"selectorType":"{selector_type}", "tabName":"{tab_name}", '
-                  f'"id":"{widget.objectName()}", "isAlone":"{is_alone}", "value":"{widget.isChecked()}", '
-                  f'"addSchema":"{qgis_project_add_schema}"')
+        if is_alone is True or (widget_all is not None and widget.objectName() != widget_all.objectName()):
+            extras = (f'"selectorType":"{selector_type}", "tabName":"{tab_name}", '
+                      f'"id":"{widget.objectName()}", "isAlone":"{is_alone}", "value":"{widget.isChecked()}", '
+                      f'"addSchema":"{qgis_project_add_schema}"')
+        else:
+            check_all = utils_giswater.isChecked(dialog, widget_all)
+            extras = f'"selectorType":"None", "tabName":"{tab_name}", "checkAll":"{check_all}",  "addSchema":"None"'
         body = self.create_body(extras=extras)
         json_result = self.controller.get_json('gw_fct_setselectors', body, log_sql=True)
 
         if str(tab_name) == 'tab_exploitation':
-
-            # reload layer, zoom to layer, style mapzones and refresh canvas
+            # Reload layer, zoom to layer, style mapzones and refresh canvas
             layer = self.controller.get_layer_by_tablename('v_edit_arc')
             if layer:
                 self.iface.setActiveLayer(layer)
@@ -1879,8 +1873,9 @@ class ApiParent(ParentAction):
         self.controller.set_layer_index('v_edit_plan_psector')
 
         self.get_selector(dialog, f'"{selector_type}"', is_setselector=json_result)
+
         widget_filter = utils_giswater.getWidget(dialog, f"txt_filter_{tab_name}")
-        if widget_filter:
+        if widget_filter and utils_giswater.getWidgetText(dialog, widget_filter, False, False) not in (None, ''):
             widget_filter.textChanged.emit(widget_filter.text())
 
 
