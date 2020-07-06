@@ -45,7 +45,7 @@ class Master(ParentAction):
         self.dlg_psector_mng = PsectorManagerUi()
 
         self.load_settings(self.dlg_psector_mng)
-        table_name = "v_edit_plan_psector"
+        table_name = "v_ui_plan_psector"
         column_id = "psector_id"
 
         # Tables
@@ -90,8 +90,8 @@ class Master(ParentAction):
         message = "Values has been updated"
         self.controller.show_info(message)
 
-        self.fill_table(qtbl_psm, "v_edit_plan_psector")
-        self.set_table_columns(dialog, qtbl_psm, "v_edit_plan_psector")
+        self.fill_table(qtbl_psm, "v_ui_plan_psector")
+        self.set_table_columns(dialog, qtbl_psm, "v_ui_plan_psector")
         self.set_label_current_psector(dialog)
         self.open_dialog(dialog)
 
