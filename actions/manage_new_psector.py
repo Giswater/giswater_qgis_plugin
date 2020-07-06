@@ -240,7 +240,7 @@ class ManageNewPsector(ParentManage):
             utils_giswater.setChecked(self.dlg_plan_psector, "active", row['active'])
             utils_giswater.fillWidget(self.dlg_plan_psector, "name", row)
             utils_giswater.fillWidget(self.dlg_plan_psector, "descript", row)
-            utils_giswater.set_combo_itemData(self.dlg_plan_psector.priority, str(row["priority"]), 1)
+            utils_giswater.set_combo_itemData(self.dlg_plan_psector.priority, str(row["priority"]), 0)
             utils_giswater.fillWidget(self.dlg_plan_psector, "text1", row)
             utils_giswater.fillWidget(self.dlg_plan_psector, "text2", row)
             utils_giswater.fillWidget(self.dlg_plan_psector, "observ", row)
