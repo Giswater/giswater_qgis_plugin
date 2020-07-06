@@ -1020,9 +1020,6 @@ class ManageNewPsector(ParentManage):
                             # Get combo id
                             combo = utils_giswater.getWidget(self.dlg_plan_psector, column_name)
                             value = str(utils_giswater.get_item_data(self.dlg_plan_psector, combo))
-                            # Get combo value
-                            if combo.objectName() == 'priority':
-                                value = str(utils_giswater.get_item_data(self.dlg_plan_psector, combo, 1))
                         else:
                             value = utils_giswater.getWidgetText(self.dlg_plan_psector, column_name)
                         if value is None or value == 'null':
@@ -1053,9 +1050,6 @@ class ManageNewPsector(ParentManage):
                                 # Get combo id
                                 combo = utils_giswater.getWidget(self.dlg_plan_psector, column_name)
                                 value = str(utils_giswater.get_item_data(self.dlg_plan_psector, combo))
-                                # Get combo value
-                                if combo.objectName() == 'priority':
-                                    value = str(utils_giswater.get_item_data(self.dlg_plan_psector, combo, 1))
                             else:
                                 value = utils_giswater.getWidgetText(self.dlg_plan_psector, column_name)
 
