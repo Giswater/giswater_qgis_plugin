@@ -1846,13 +1846,15 @@ class ApiParent(ParentAction):
         qgis_project_add_schema = self.controller.plugin_settings_value('gwAddSchema')
         widget_all = dialog.findChild(QCheckBox, f'chk_all_{tab_name}')
 
-        if is_alone is True or (widget_all is not None and widget.objectName() != widget_all.objectName()):
+        if widget_all is None or (widget_all is not None and widget.objectName() != widget_all.objectName()):
             extras = (f'"selectorType":"{selector_type}", "tabName":"{tab_name}", '
                       f'"id":"{widget.objectName()}", "isAlone":"{is_alone}", "value":"{widget.isChecked()}", '
                       f'"addSchema":"{qgis_project_add_schema}"')
         else:
             check_all = utils_giswater.isChecked(dialog, widget_all)
-            extras = f'"selectorType":"None", "tabName":"{tab_name}", "checkAll":"{check_all}",  "addSchema":"None"'
+            extras = f'"selectorType":"{selector_type}", "tabName":"{tab_name}", "checkAll":"{check_all}",  ' \
+                     f'"addSchema":"{qgis_project_add_schema}"'
+
         body = self.create_body(extras=extras)
         json_result = self.controller.get_json('gw_fct_setselectors', body, log_sql=True)
 
