@@ -6,14 +6,10 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2970
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_grafanalytics_mapzones_config(
-	p_data json)
-    RETURNS json
-    LANGUAGE 'plpgsql'
-
-    COST 100
-    VOLATILE 
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_grafanalytics_mapzones_config(p_data json)
+RETURNS json
 AS $BODY$
+
 /*
 
 SELECT SCHEMA_NAME.ws_gw_fct_grafanalytics_mapzones_config($${"client":{"device":9, "infoType":100, "lang":"ES"}, "form":{}, "feature":{},
@@ -270,5 +266,6 @@ BEGIN
 
 END;
 $BODY$;
-
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
 
