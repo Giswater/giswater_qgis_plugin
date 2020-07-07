@@ -59,6 +59,13 @@ INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder,  da
 	FALSE, FALSE, FALSE, FALSE, TRUE)
 	ON CONFLICT (formname, formtype, columnname) DO NOTHING;
 
+INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder,  datatype, widgettype, label, tooltip, placeholder, 
+	ismandatory, isparent, iseditable, isautoupdate, hidden) 
+	VALUES ('ve_node', 'form_feature', 'accessibility', null , 'integer', 'text', 'Accessibility', 'Accessibility', null, 
+	FALSE, FALSE, FALSE, FALSE, TRUE)
+	ON CONFLICT (formname, formtype, columnname) DO NOTHING;
+
+
 
 
 INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder,  datatype, widgettype, label, tooltip, placeholder, 
@@ -76,6 +83,12 @@ INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder,  da
 INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder,  datatype, widgettype, label, tooltip, placeholder, 
 	ismandatory, isparent, iseditable, isautoupdate, hidden) 
 	VALUES ('ve_connec', 'form_feature', 'adescript', null , 'text', 'text', 'A descript', 'Additional description', null, 
+	FALSE, FALSE, FALSE, FALSE, TRUE)
+	ON CONFLICT (formname, formtype, columnname) DO NOTHING;
+
+INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder,  datatype, widgettype, label, tooltip, placeholder, 
+	ismandatory, isparent, iseditable, isautoupdate, hidden) 
+	VALUES ('ve_connec', 'form_feature', 'accessibility', null , 'integer', 'text', 'Accessibility', 'Accessibility', null, 
 	FALSE, FALSE, FALSE, FALSE, TRUE)
 	ON CONFLICT (formname, formtype, columnname) DO NOTHING;
 

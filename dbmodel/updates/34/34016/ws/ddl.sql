@@ -17,10 +17,12 @@ ALTER TABLE arc ADD COLUMN adescript text;
 ALTER TABLE node ADD COLUMN state_om text;
 ALTER TABLE node ADD COLUMN adate text;
 ALTER TABLE node ADD COLUMN adescript text;
+ALTER TABLE node ADD COLUMN accessibility int2;
 
 ALTER TABLE connec ADD COLUMN state_om text;
 ALTER TABLE connec ADD COLUMN adate text;
 ALTER TABLE connec ADD COLUMN adescript text;
+ALTER TABLE connec ADD COLUMN accessibility int2;
 
 
 --arc child
@@ -31,51 +33,33 @@ ALTER TABLE man_pipe ADD COLUMN pobserv text;
 
 -- node child
 ALTER TABLE man_tank ADD COLUMN hmax numeric (12,3);
-ALTER TABLE man_tank ADD COLUMN com1 text;
-ALTER TABLE man_tank ADD COLUMN com2 text;
 
 ALTER TABLE man_hydrant ADD COLUMN geom1 float;
 ALTER TABLE man_hydrant ADD COLUMN geom2 float;
 ALTER TABLE man_hydrant ADD COLUMN brand text;
 ALTER TABLE man_hydrant ADD COLUMN model text;
-ALTER TABLE man_hydrant ADD COLUMN accessibility int2;
 
 ALTER TABLE man_pump ADD COLUMN brand text;
 ALTER TABLE man_pump ADD COLUMN model text;
-ALTER TABLE man_pump ADD COLUMN com1 text;
-ALTER TABLE man_pump ADD COLUMN com2 text;
-ALTER TABLE man_pump ADD COLUMN accessibility int2;
 
 ALTER TABLE man_valve ADD COLUMN valve_type text;
 ALTER TABLE man_valve ADD COLUMN brand text;
 ALTER TABLE man_valve ADD COLUMN brand2 text;
 ALTER TABLE man_valve ADD COLUMN model text;
 ALTER TABLE man_valve ADD COLUMN mode2 text;
-ALTER TABLE man_valve ADD COLUMN com1 text;
-ALTER TABLE man_valve ADD COLUMN com2 text;
-ALTER TABLE man_valve ADD COLUMN accessibility int2;
 
 ALTER TABLE man_meter ADD COLUMN brand text;
 ALTER TABLE man_meter ADD COLUMN model text;
-ALTER TABLE man_meter ADD COLUMN com1 text;
-ALTER TABLE man_meter ADD COLUMN com2 text;
-ALTER TABLE man_meter ADD COLUMN accessibility int2;
 
 ALTER TABLE man_netwjoin ADD COLUMN brand text;
 ALTER TABLE man_netwjoin ADD COLUMN model text;
-ALTER TABLE man_netwjoin ADD COLUMN com1 text;
-ALTER TABLE man_netwjoin ADD COLUMN com2 text;
-ALTER TABLE man_netwjoin ADD COLUMN accessibility int2;
 
 ALTER TABLE man_netelement ADD COLUMN brand text;
 ALTER TABLE man_netelement ADD COLUMN model text;
-ALTER TABLE man_netelement ADD COLUMN com1 text;
-ALTER TABLE man_netelement ADD COLUMN com2 text;
-ALTER TABLE man_netelement ADD COLUMN accessibility int2;
 
-ALTER TABLE man_netsamplepoint ADD COLUMN com1 text;
-ALTER TABLE man_netsamplepoint ADD COLUMN com2 text;
-ALTER TABLE man_netsamplepoint ADD COLUMN accessibility int2;
+--ALTER TABLE man_netsamplepoint ADD COLUMN com1 text;
+--ALTER TABLE man_netsamplepoint ADD COLUMN com2 text;
+--ALTER TABLE man_netsamplepoint ADD COLUMN accessibility int2;
 
 
 -- connec child

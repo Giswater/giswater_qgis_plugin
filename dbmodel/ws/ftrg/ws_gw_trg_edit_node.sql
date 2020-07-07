@@ -427,15 +427,15 @@ BEGIN
 		-- FEATURE INSERT      
 		INSERT INTO node (node_id, code, elevation, depth, nodecat_id, epa_type, sector_id, arc_id, parent_id, state, state_type, annotation, observ,comment, dma_id, presszone_id, 
 		soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id,streetaxis_id, 
-		streetaxis2_id, postcode, postnumber, postnumber2, postcomplement, district_id,
-		postcomplement2, descript, link, rotation,verified, undelete,label_x,label_y,label_rotation, expl_id, publish, inventory, the_geom, hemisphere, num_value, state_om, adate, adescript)
+		streetaxis2_id, postcode, postnumber, postnumber2, postcomplement, district_id,	postcomplement2, descript, link, rotation,verified, undelete,label_x,label_y,label_rotation,
+		expl_id, publish, inventory, the_geom, hemisphere, num_value, state_om, adate, adescript. accessibility)
 
 		VALUES (NEW.node_id, NEW.code, NEW.elevation, NEW.depth, NEW.nodecat_id, NEW.epa_type, NEW.sector_id, NEW.arc_id, NEW.parent_id, NEW.state, NEW.state_type, NEW.annotation, NEW.observ,
 		NEW.comment,NEW.dma_id, NEW.presszone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type,NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, 
 		NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.muni_id, v_streetaxis, v_streetaxis2, NEW.postcode, NEW.postnumber ,NEW.postnumber2, NEW.postcomplement, NEW.district_id, 
 		NEW.postcomplement2, NEW.descript, NEW.link, NEW.rotation, NEW.verified, NEW.undelete,NEW.label_x,NEW.label_y,NEW.label_rotation, 
 		NEW.expl_id, NEW.publish, NEW.inventory, NEW.the_geom,  NEW.hemisphere,NEW.num_value,
-		NEW.state_om, NEW.adate, NEW.adescript);
+		NEW.state_om, NEW.adate, NEW.adescript, NEW.accessibility);
 
 		
 		IF v_man_table='man_tank' THEN
@@ -447,24 +447,24 @@ BEGIN
 				INSERT INTO polygon(pol_id, sys_type, the_geom) VALUES (NEW.pol_id, 'TANK', (SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_double_geom_buffer))) 
 				from node where node_id=NEW.node_id));
 				
-				INSERT INTO man_tank (node_id, pol_id, vmax, vutil, area, chlorination, name, hmax, com1, com2) 
-				VALUES (NEW.node_id, NEW.pol_id, NEW.vmax, NEW.vutil, NEW.area,NEW.chlorination, NEW.name, NEW.hmax, NEW.com1, NEW.com2);
+				INSERT INTO man_tank (node_id, pol_id, vmax, vutil, area, chlorination, name, hmax) 
+				VALUES (NEW.node_id, NEW.pol_id, NEW.vmax, NEW.vutil, NEW.area,NEW.chlorination, NEW.name, NEW.hmax);
 			ELSE
-				INSERT INTO man_tank (node_id, vmax, vutil, area, chlorination, name, hmax, com1, com2) 
-				VALUES (NEW.node_id, NEW.vmax, NEW.vutil, NEW.area,NEW.chlorination, NEW.name, NEW.hmax, NEW.com1, NEW.com2);
+				INSERT INTO man_tank (node_id, vmax, vutil, area, chlorination, name, hmax) 
+				VALUES (NEW.node_id, NEW.vmax, NEW.vutil, NEW.area,NEW.chlorination, NEW.name, NEW.hmax);
 			END IF;
 					
 		ELSIF v_man_table='man_hydrant' THEN
-			INSERT INTO man_hydrant (node_id, fire_code, communication, valve, geom1, geom2, brand, model, accessibility) 
-			VALUES (NEW.node_id, NEW.fire_code, NEW.communication, NEW.valve, NEW.geom1, NEW.geom2, NEW.brand, NEW.model, NEW.accessibility);		
+			INSERT INTO man_hydrant (node_id, fire_code, communication, valve, geom1, geom2, brand, model) 
+			VALUES (NEW.node_id, NEW.fire_code, NEW.communication, NEW.valve, NEW.geom1, NEW.geom2, NEW.brand, NEW.model);		
 		
 		ELSIF v_man_table='man_junction' THEN
 			INSERT INTO man_junction (node_id) VALUES(NEW.node_id);
 			
 		ELSIF v_man_table='man_pump' THEN		
-			INSERT INTO man_pump (node_id, max_flow, min_flow, nom_flow, power, pressure, elev_height, name, pump_number, brand, model, accessibility, com1, com2) 
+			INSERT INTO man_pump (node_id, max_flow, min_flow, nom_flow, power, pressure, elev_height, name, pump_number, brand, model) 
 			VALUES(NEW.node_id, NEW.max_flow, NEW.min_flow, NEW.nom_flow, NEW.power, NEW.pressure, NEW.elev_height, NEW.name, NEW.pump_number,
-			NEW.brand, NEW.model, NEW.accessibility, NEW.com1, NEW.com2);
+			NEW.brand, NEW.model);
 		
 		ELSIF v_man_table='man_reduction' THEN
 			
@@ -481,17 +481,17 @@ BEGIN
 			
 		ELSIF v_man_table='man_valve' THEN	
 			INSERT INTO man_valve (node_id,closed, broken, buried,irrigation_indicator,pression_entry, pression_exit, depth_valveshaft,regulator_situation, regulator_location, regulator_observ,
-			lin_meters, exit_type,exit_code,drive_type, cat_valve2, valve_type, brand, brand2, model, model2, com1, com2, accessibility) 
+			lin_meters, exit_type,exit_code,drive_type, cat_valve2, valve_type, brand, brand2, model, model2) 
 			VALUES (NEW.node_id, NEW.closed, NEW.broken, NEW.buried, NEW.irrigation_indicator, NEW.pression_entry, NEW.pression_exit, NEW.depth_valveshaft, NEW.regulator_situation, 
 			NEW.regulator_location, NEW.regulator_observ, NEW.lin_meters, NEW.exit_type, NEW.exit_code, NEW.drive_type, NEW.cat_valve2, NEW.ordinarystatus,
-			NEW.valve_type, NEW.brand, NEW.brand2, NEW.model, NEW.model2, NEW.com1, NEW.com2, NEW.accessibility) ;
+			NEW.valve_type, NEW.brand, NEW.brand2, NEW.model, NEW.model2) ;
 		
 		ELSIF v_man_table='man_manhole' THEN	
 			INSERT INTO man_manhole (node_id, name) VALUES(NEW.node_id, NEW.name);
 		
 		ELSIF v_man_table='man_meter' THEN
-			INSERT INTO man_meter (node_id, brand, model, accessibility, com1, com2) 
-			VALUES(NEW.node_id, NEW.brand, NEW.model, NEW.accessibility, NEW.com1, NEW.com2);
+			INSERT INTO man_meter (node_id, brand, model) 
+			VALUES(NEW.node_id, NEW.brand, NEW.model);
 		
 		ELSIF v_man_table='man_source' THEN	
 			INSERT INTO man_source (node_id, name) VALUES(NEW.node_id, NEW.name);
@@ -515,8 +515,8 @@ BEGIN
 			END IF;
 			
 		ELSIF v_man_table='man_netwjoin' THEN
-			INSERT INTO man_netwjoin (node_id, top_floor,  cat_valve, customer_code, brand, model, accessibility, com1, com2)
-			VALUES(NEW.node_id, NEW.top_floor, NEW.cat_valve, NEW.customer_code, NEW.brand, NEW.model, NEW.accessibility, NEW.com1, NEW.com2);
+			INSERT INTO man_netwjoin (node_id, top_floor,  cat_valve, customer_code, brand, model)
+			VALUES(NEW.node_id, NEW.top_floor, NEW.cat_valve, NEW.customer_code, NEW.brand, NEW.model);
 		
 		ELSIF v_man_table='man_expansiontank' THEN
 			INSERT INTO man_expansiontank (node_id) VALUES(NEW.node_id);
@@ -525,12 +525,12 @@ BEGIN
 			INSERT INTO man_flexunion (node_id) VALUES(NEW.node_id);
 		
 		ELSIF v_man_table='man_netelement' THEN
-			INSERT INTO man_netelement (node_id, serial_number, brand, model, accessibility, com1, com2)
-			VALUES(NEW.node_id, NEW.serial_number, NEW.brand, NEW.model, NEW.accessibility, NEW.com1, NEW.com2);		
+			INSERT INTO man_netelement (node_id, serial_number, brand, model)
+			VALUES(NEW.node_id, NEW.serial_number, NEW.brand, NEW.model);		
 		
 		ELSIF v_man_table='man_netsamplepoint' THEN
-			INSERT INTO man_netsamplepoint (node_id, lab_code, com1, com2, accessiblity) 
-			VALUES (NEW.node_id, NEW.lab_code, NEW.com1, NEW.com2, NEW.accessibility);
+			INSERT INTO man_netsamplepoint (node_id, lab_code) 
+			VALUES (NEW.node_id, NEW.lab_code);
 		
 		ELSIF v_man_table='man_wtp' THEN
 			INSERT INTO man_wtp (node_id, name) VALUES(NEW.node_id, NEW.name);
@@ -770,7 +770,7 @@ BEGIN
 		postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, streetaxis2_id=v_streetaxis2,postcode=NEW.postcode,district_id=NEW.district_id,postnumber=NEW.postnumber,
 		postnumber2=NEW.postnumber2, descript=NEW.descript, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation, 
 		publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value, link=NEW.link, lastupdate=now(), lastupdate_user=current_user,
-		state_om=NEW.state_om, adate=NEW.adate, adescript=NEW.adescript
+		state_om=NEW.state_om, adate=NEW.adate, adescript=NEW.adescript, accessibility = NEW.accessibility
 		WHERE node_id = OLD.node_id;
 		
 		IF v_man_table ='man_junction' THEN
@@ -790,7 +790,7 @@ BEGIN
 		ELSIF v_man_table ='man_pump' THEN
 			UPDATE man_pump SET max_flow=NEW.max_flow, min_flow=NEW.min_flow, nom_flow=NEW.nom_flow, "power"=NEW.power, 
 			pressure=NEW.pressure, elev_height=NEW.elev_height, name=NEW.name, pump_number=NEW.pump_number,
-			brand=NEW.brand, model=NEW.model, accessibility=NEW.accessibility, com1=NEW.com1, com2=NEW.com2
+			brand=NEW.brand, model=NEW.model
 			WHERE node_id=OLD.node_id;
 		
 		ELSIF v_man_table ='man_manhole' THEN
@@ -799,7 +799,7 @@ BEGIN
 
 		ELSIF v_man_table ='man_hydrant' THEN
 			UPDATE man_hydrant SET fire_code=NEW.fire_code, communication=NEW.communication, valve=NEW.valve,
-			geom1=NEW.geom1, geom2=NEW.geom2, brand=NEW.brand, model=NEW.model, accessibility=NEW.accessibility
+			geom1=NEW.geom1, geom2=NEW.geom2, brand=NEW.brand, model=NEW.model
 			WHERE node_id=OLD.node_id;			
 
 		ELSIF v_man_table ='man_source' THEN
@@ -808,7 +808,7 @@ BEGIN
 
 		ELSIF v_man_table ='man_meter' THEN
 			UPDATE man_meter SET
-			brand=NEW.brand, model=NEW.model, accessibility=NEW.accessibility, com1=NEW.com1, com2=NEW.com2
+			brand=NEW.brand, model=NEW.model
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table ='man_waterwell' THEN
@@ -824,7 +824,7 @@ BEGIN
 			SET closed=NEW.closed, broken=NEW.broken, buried=NEW.buried, irrigation_indicator=NEW.irrigation_indicator, pression_entry=NEW.pression_entry, pression_exit=NEW.pression_exit, 
 			depth_valveshaft=NEW.depth_valveshaft, regulator_situation=NEW.regulator_situation, regulator_location=NEW.regulator_location, regulator_observ=NEW.regulator_observ, 
 			lin_meters=NEW.lin_meters, exit_type=NEW.exit_type, exit_code=NEW.exit_code, drive_type=NEW.drive_type, cat_valve2=NEW.cat_valve2, ordinarystatus = NEW.ordinarystatus,
-			valve_type=NEW.valve_type, brand=NEW.brand, brand2=NEW.brand2, model=NEW.model, model2=NEW.model2, com1=NEW.com1, com2=NEW.com2, accessibility=NEW.accessibility
+			valve_type=NEW.valve_type, brand=NEW.brand, brand2=NEW.brand2, model=NEW.model, model2=NEW.model2
 			WHERE node_id=OLD.node_id;	
 		
 		ELSIF v_man_table ='man_register' THEN
@@ -834,7 +834,7 @@ BEGIN
 		ELSIF v_man_table ='man_netwjoin' THEN			
 			UPDATE man_netwjoin
 			SET top_floor= NEW.top_floor, cat_valve=NEW.cat_valve, customer_code=NEW.customer_code,
-			brand=NEW.brand, model=NEW.model, accessibility=NEW.accessibility, com1=NEW.com1, com2=NEW.com2
+			brand=NEW.brand, model=NEW.model
 			WHERE node_id=OLD.node_id;		
 		
 		ELSIF v_man_table ='man_expansiontank' THEN
@@ -847,12 +847,11 @@ BEGIN
 		
 		ELSIF v_man_table ='man_netelement' THEN
 			UPDATE man_netelement SET serial_number=NEW.serial_number,
-			brand=NEW.brand, model=NEW.model, accessibility=NEW.accessibility, com1=NEW.com1, com2=NEW.com2
+			brand=NEW.brand, model=NEW.model
 			WHERE node_id=OLD.node_id;	
 	
 		ELSIF v_man_table ='man_netsamplepoint' THEN
-			UPDATE man_netsamplepoint SET node_id=NEW.node_id, lab_code=NEW.lab_code,
-			accessibility=NEW.accessibility, com1=NEW.com1, com2=NEW.com2
+			UPDATE man_netsamplepoint SET node_id=NEW.node_id, lab_code=NEW.lab_code
 			WHERE node_id=OLD.node_id;		
 		
 		ELSIF v_man_table ='man_wtp' THEN		

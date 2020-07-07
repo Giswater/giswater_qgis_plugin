@@ -88,7 +88,8 @@ CREATE OR REPLACE VIEW vu_node AS
 	node.the_geom,
 	node.state_om,
 	node.adate,
-	node.adescript
+	node.adescript,
+	node.accessibility
 	FROM node
 	 LEFT JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
 	 JOIN cat_feature ON cat_feature.id::text = cat_node.nodetype_id::text
@@ -277,7 +278,8 @@ CREATE OR REPLACE VIEW vu_connec AS
 	connec.the_geom,
 	connec.state_om,
 	connec.adate,
-	connec.adescript
+	connec.adescript,
+	connec.accessibility
    FROM connec
 	 LEFT JOIN (SELECT connec_1.connec_id,
 			count(ext_rtc_hydrometer.id)::integer AS n_hydrometer
