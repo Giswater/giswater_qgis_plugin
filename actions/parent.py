@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsGeometry, QgsPointXY, QgsProject, QgsRectangle, QgsSymbol, \
-    QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsSimpleFillSymbolLayer
+    QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsSimpleFillSymbolLayer, QgsSnappingConfig, QgsPointLocator
 from qgis.gui import QgsRubberBand
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTimer
 from qgis.PyQt.QtWidgets import QGroupBox, QAbstractItemView, QTableView, QFileDialog, QApplication, QCompleter, \
@@ -28,6 +28,8 @@ from functools import partial
 
 from .. import utils_giswater
 from .add_layer import AddLayer
+from ..map_tools.snapping_utils_v3 import SnappingConfigManager
+
 from ..ui_manager import DialogTextUi, GwDialog, GwMainWindow
 
 
@@ -1289,23 +1291,39 @@ class ParentAction(object):
         :param json_result: Json result of a query (Json)
         :return: None
         """
-        try:
-            style = json_result['body']['returnManager']
 
+        try:
+            styles = json_result['body']['returnManager']
         except KeyError:
             return
 
         try:
-            if 'style' in style:
-                if style['style'] == 'categorized':
-                    layer = self.controller.get_layer_by_tablename('v_edit_arc')
-                    opacity = 255*float(style['opacity'])
-                    size = style['width']
-                    cat_field = style['field']
-                    color_values = {}
-                    for item in style['values']:
-                        color_values[item['id']] = QColor(item['color'][0], item['color'][2], item['color'][2], opacity)
-                    self.add_layer.categoryze_layer(layer, cat_field, size, color_values)
+            layers_to_add = '  '
+            for style in styles['styles']:
+                layer = self.controller.get_layer_by_tablename(style['layerName'])
+                if layer:
+                    self.controller.set_layer_visible(layer)
+                else:
+                    layer_name = style['layerName'] if 'layerName' in style else None
+                    layers_to_add += f'"{layer_name}", '
+            layers_to_add = layers_to_add[:-2]
+
+            for style in styles:
+                print(style)
+                if 'layerName' in style:
+                    layer = self.controller.get_layer_by_tablename(style['layerName'])
+
+                if layer:
+                    if style['style'] == 'categorized':
+                        layer = self.controller.get_layer_by_tablename('v_edit_arc')
+                        opacity = 255*float(style['opacity'])
+                        size = style['width']
+                        cat_field = style['field']
+                        color_values = {}
+                        for item in style['values']:
+                            color_values[item['id']] = QColor(item['color'][0], item['color'][2], item['color'][2], opacity)
+                        self.add_layer.categoryze_layer(layer, cat_field, size, color_values)
+
 
         except Exception as e:
             self.controller.manage_exception(None, f"{type(e).__name__}: {e}", sql)
@@ -1326,7 +1344,7 @@ class ParentAction(object):
             return
 
         try:
-
+            funct_id = layermanager['functionId'] if 'functionId' in layermanager else None
 
             # Get a list of layers names and set visible
             if 'visible' in layermanager:
@@ -1337,16 +1355,47 @@ class ParentAction(object):
                         self.controller.set_layer_visible(layer)
                     else:
                         layers_to_add += f'"{layer_name}", '
-                        # layers_to_add.append(layer_name)
                 layers_to_add = layers_to_add[:-2]
-                if layers_to_add is not None:
-
-                    extras = f'"layers":[{layers_to_add}]'
+                if layers_to_add is not None and funct_id is not None:
+                    extras = f'"layers":[{layers_to_add}], '
+                    extras += f'"function_id":"{funct_id}"'
                     body = self.create_body(extras=extras)
                     styles = self.controller.get_json('gw_fct_getstyle', body, log_sql=True)
-                    for layer_name in layers_to_add:
-                        print(layer_name)
-                        # self.add_layer.from_postgres_to_toc(layer_name, )
+
+                    for layer_info in styles['body']['data']['addToc']['layers']:
+
+                        if 'error' in layer_info:
+                            msg = layer_info['error']
+                            self.controller.show_warning(msg)
+                            continue
+
+                        try:
+                            tablename = layer_info['tableName']
+                            teh_geom = layer_info['geom']
+                            field_id = layer_info['primaryKey']
+                            group = layer_info['group'] if 'group' in layer_info else None
+                            self.add_layer.from_postgres_to_toc(tablename, teh_geom, field_id, None, group)
+
+
+
+                        except KeyError as e:
+                            self.controller.log_info(f"{type(e).__name__} --> {e}")
+                        if 'style' in layer_info:
+                            style = layer_info['style']
+                            layer = self.controller.get_layer_by_tablename(tablename)
+                            if layer:
+                                main_folder = os.path.join(os.path.expanduser("~"), self.controller.plugin_name)
+                                config_folder = main_folder + os.sep + "temp" + os.sep
+                                if not os.path.exists(config_folder):
+                                    os.makedirs(config_folder)
+                                path_temp_file = config_folder + 'temp_qml.qml'
+                                file = open(path_temp_file, 'w')
+                                file.write(style)
+                                file.close()
+                                del file
+                                layer.loadNamedStyle(path_temp_file)
+                                layer.triggerRepaint()
+
             # Get a list of layers names force reload dataProvider of layer
             if 'index' in layermanager:
                 for layer_name in layermanager['index']:
@@ -1379,26 +1428,30 @@ class ParentAction(object):
                     if prev_layer:
                         self.iface.setActiveLayer(prev_layer)
 
-            if 'style' in layermanager:
-                layer = self.controller.get_layer_by_tablename('v_edit_arc')
-                style = layermanager['style']
-
-                if layer:
-                    main_folder = os.path.join(os.path.expanduser("~"), self.controller.plugin_name)
-                    config_folder = main_folder + os.sep + "temp" + os.sep
-                    if not os.path.exists(config_folder):
-                        os.makedirs(config_folder)
-                    path_temp_file = config_folder + 'temp_qml.qml'
-                    file = open(path_temp_file, 'w')
-                    file.write(style)
-                    file.close()
-                    del file
-
-                    layer.loadNamedStyle(path_temp_file)
-                    layer.triggerRepaint()
-
+            # Set snnaping options
             if 'snnaping' in layermanager:
-                pass
+                self.snapper_manager = SnappingConfigManager(self.iface)
+                if self.snapper_manager.controller is None:
+                    self.snapper_manager.set_controller(self.controller)
+                for layer_name in layermanager['snnaping']:
+                    layer = self.controller.get_layer_by_tablename(layer_name)
+                    if layer:
+                        QgsProject.instance().blockSignals(True)
+                        layer_settings = self.snapper_manager.snap_to_layer(layer, QgsPointLocator.All,
+                                                                            True)
+                        if layer_settings:
+                            layer_settings.setType(2)
+                            layer_settings.setTolerance(15)
+                            layer_settings.setEnabled(True)
+                        else:
+                            layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 2, 15, 1)
+                        self.snapper_manager.snapping_config.setIndividualLayerSettings(layer,
+                                                                                        layer_settings)
+                        QgsProject.instance().blockSignals(False)
+                        QgsProject.instance().snappingConfigChanged.emit(
+                            self.snapper_manager.snapping_config)
+                self.snapper_manager.set_snapping_mode()
+
 
         except Exception as e:
             self.controller.manage_exception(None, f"{type(e).__name__}: {e}", sql)
@@ -1415,14 +1468,16 @@ class ParentAction(object):
             actions = json_result['body']['actions']
         except KeyError:
             return
-        for action in actions:
-            try:
-                function_name = action['funcName']
-                params = action['params']
-                getattr(self.controller.gw_actions, f"{function_name}")(**params)
-            except AttributeError as e:
-                # If function_name not exist as python function
-                self.controller.log_warning(f"Exception error: {e}")
-            except Exception as e:
-                self.controller.log_debug(f"{type(e).__name__}: {e}")
-
+        try:
+            for action in actions:
+                try:
+                    function_name = action['funcName']
+                    params = action['params']
+                    getattr(self.controller.gw_actions, f"{function_name}")(**params)
+                except AttributeError as e:
+                    # If function_name not exist as python function
+                    self.controller.log_warning(f"Exception error: {e}")
+                except Exception as e:
+                    self.controller.log_debug(f"{type(e).__name__}: {e}")
+        except Exception as e:
+            self.controller.manage_exception(None, f"{type(e).__name__}: {e}", sql)

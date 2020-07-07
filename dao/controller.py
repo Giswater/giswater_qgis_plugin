@@ -826,10 +826,10 @@ class DaoController(object):
             self.manage_exception_api(json_result, sql, is_notify=is_notify)
             return False
 
-        self.parent.manage_return_manager(json_result, sql)
+        #self.parent.manage_return_manager(json_result, sql)
         # Manage options for layers (active, visible, zoom and indexing)
         self.parent.manage_layer_manager(json_result, sql)
-
+        # self.parent.manage_return_manager(json_result, sql)
         self.parent.manage_actions(json_result, sql)
         return json_result
 
