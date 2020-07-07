@@ -1104,6 +1104,11 @@ class TmBasic(TmParentAction):
             rows = self.controller.get_rows(sql, add_empty_row=True)
             utils_giswater.set_item_data(self.dlg_incident_planning.priority_id, rows, 1)
 
+        # Set last campaign_id
+        campaign_id = self.controller.plugin_settings_value('incident_campaign_id')
+        if campaign_id is not None:
+            utils_giswater.set_combo_itemData(self.dlg_incident_planning.campaign_id, str(campaign_id), 0)
+
         # Get record selected
         selected_list = self.dlg_incident_manager.tbl_incident.selectionModel().selectedRows()
         if len(selected_list) == 0:
@@ -1154,6 +1159,10 @@ class TmBasic(TmParentAction):
 
             campaign_id = utils_giswater.get_item_data(
                 self.dlg_incident_planning, self.dlg_incident_planning.campaign_id, 0)
+
+            # Set last campaign_id
+            self.controller.plugin_settings_set_value('incident_campaign_id', campaign_id)
+
             work_id = utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.work_id, 0)
             priority_id = utils_giswater.get_item_data(
                 self.dlg_incident_planning, self.dlg_incident_planning.priority_id, 0)
