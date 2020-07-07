@@ -1326,17 +1326,31 @@ class ParentAction(object):
             return
 
         try:
-            # Get a list of layers names force reload dataProvider of layer
-            if 'index' in layermanager:
-                for layer_name in layermanager['index']:
-                    self.controller.set_layer_index(layer_name)
+
 
             # Get a list of layers names and set visible
             if 'visible' in layermanager:
+                layers_to_add = '  '
                 for layer_name in layermanager['visible']:
                     layer = self.controller.get_layer_by_tablename(layer_name)
                     if layer:
                         self.controller.set_layer_visible(layer)
+                    else:
+                        layers_to_add += f'"{layer_name}", '
+                        # layers_to_add.append(layer_name)
+                layers_to_add = layers_to_add[:-2]
+                if layers_to_add is not None:
+
+                    extras = f'"layers":[{layers_to_add}]'
+                    body = self.create_body(extras=extras)
+                    styles = self.controller.get_json('gw_fct_getstyle', body, log_sql=True)
+                    for layer_name in layers_to_add:
+                        print(layer_name)
+                        # self.add_layer.from_postgres_to_toc(layer_name, )
+            # Get a list of layers names force reload dataProvider of layer
+            if 'index' in layermanager:
+                for layer_name in layermanager['index']:
+                    self.controller.set_layer_index(layer_name)
 
             # Get a layer name and set active
             if 'active' in layermanager:
@@ -1370,7 +1384,11 @@ class ParentAction(object):
                 style = layermanager['style']
 
                 if layer:
-                    path_temp_file = self.plugin_dir + os.sep + 'resources' + os.sep + 'temp_qml.qml'
+                    main_folder = os.path.join(os.path.expanduser("~"), self.controller.plugin_name)
+                    config_folder = main_folder + os.sep + "temp" + os.sep
+                    if not os.path.exists(config_folder):
+                        os.makedirs(config_folder)
+                    path_temp_file = config_folder + 'temp_qml.qml'
                     file = open(path_temp_file, 'w')
                     file.write(style)
                     file.close()
