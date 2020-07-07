@@ -535,60 +535,61 @@ BEGIN
 	
 	END IF;
 
-	RAISE NOTICE '18 - connec/gully without arc_id or with arc_id different than the one to which points its link';
-	v_querytext = 'SELECT  '||v_edit||'connec.connec_id,  '||v_edit||'connec.connecat_id,  '||v_edit||'connec.the_geom
-				FROM '||v_edit||'link
-				LEFT JOIN '||v_edit||'connec ON '||v_edit||'link.feature_id = '||v_edit||'connec.connec_id 
-				INNER JOIN arc ON st_dwithin(arc.the_geom, st_endpoint('||v_edit||'link.the_geom), 0.01)
-				WHERE exit_type = ''VNODE'' AND (arc.arc_id <> '||v_edit||'connec.arc_id or '||v_edit||'connec.arc_id is null) 
-				AND '||v_edit||'link.feature_type = ''CONNEC'' AND arc.state=1 and '||v_edit||'connec.connec_id IS NOT NULL
-				and '||v_edit||'link.feature_id NOT IN (SELECT connec_id FROM node,link
-				LEFT JOIN '||v_edit||'connec ON '||v_edit||'link.feature_id = '||v_edit||'connec.connec_id 
-				LEFT JOIN vnode ON '||v_edit||'link.exit_id=vnode.vnode_id::text
-				WHERE exit_type = ''VNODE'' AND st_dwithin(vnode.the_geom, node.the_geom,0.01))
-				ORDER BY '||v_edit||'link.feature_type, link_id';
-
-
-	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
-
-	IF v_count > 0 THEN
-		EXECUTE concat ('INSERT INTO anl_connec (fid, connec_id, connecat_id, descript, the_geom)
-		SELECT 206, connec_id, connecat_id, ''Connecs without or with incorrect arc_id'', the_geom FROM (', v_querytext,')a');
-
-		INSERT INTO audit_check_data (fid, criticity, error_message)
-		VALUES (125, 2, concat('WARNING: There is/are ',v_count,' connecs without or with incorrect arc_id.'));
-	ELSE
-		INSERT INTO audit_check_data (fid, criticity, error_message)
-		VALUES (125, 1, 'INFO: All connecs have correct arc_id.');
-	END IF;
-
-	IF v_project_type = 'UD' THEN
-		v_querytext = 'SELECT  '||v_edit||'gully.gully_id,  '||v_edit||'gully.gratecat_id,  '||v_edit||'gully.the_geom
+	IF (SELECT count(*) FROM arc ) < 20000 THEN -- too big
+		RAISE NOTICE '18 - connec/gully without arc_id or with arc_id different than the one to which points its link';
+		v_querytext = 'SELECT  '||v_edit||'connec.connec_id,  '||v_edit||'connec.connecat_id,  '||v_edit||'connec.the_geom
 					FROM '||v_edit||'link
-					LEFT JOIN '||v_edit||'gully ON '||v_edit||'link.feature_id = '||v_edit||'gully.gully_id 
+					LEFT JOIN '||v_edit||'connec ON '||v_edit||'link.feature_id = '||v_edit||'connec.connec_id 
 					INNER JOIN arc ON st_dwithin(arc.the_geom, st_endpoint('||v_edit||'link.the_geom), 0.01)
-					WHERE exit_type = ''VNODE'' AND (arc.arc_id <> '||v_edit||'gully.arc_id or '||v_edit||'gully.arc_id is null) 
-					AND '||v_edit||'link.feature_type = ''GULLY'' AND arc.state=1 AND '||v_edit||'gully.gully_id IS NOT NULL
-					and '||v_edit||'link.feature_id NOT IN (SELECT gully_id FROM node,link
-					LEFT JOIN '||v_edit||'gully ON '||v_edit||'link.feature_id = '||v_edit||'gully.gully_id 
+					WHERE exit_type = ''VNODE'' AND (arc.arc_id <> '||v_edit||'connec.arc_id or '||v_edit||'connec.arc_id is null) 
+					AND '||v_edit||'link.feature_type = ''CONNEC'' AND arc.state=1 and '||v_edit||'connec.connec_id IS NOT NULL
+					and '||v_edit||'link.feature_id NOT IN (SELECT connec_id FROM node,link
+					LEFT JOIN '||v_edit||'connec ON '||v_edit||'link.feature_id = '||v_edit||'connec.connec_id 
 					LEFT JOIN vnode ON '||v_edit||'link.exit_id=vnode.vnode_id::text
 					WHERE exit_type = ''VNODE'' AND st_dwithin(vnode.the_geom, node.the_geom,0.01))
 					ORDER BY '||v_edit||'link.feature_type, link_id';
+
 
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
 		IF v_count > 0 THEN
 			EXECUTE concat ('INSERT INTO anl_connec (fid, connec_id, connecat_id, descript, the_geom)
-			SELECT 206, gully_id, gratecat_id, ''Gullies without or with incorrect arc_id'', the_geom FROM (', v_querytext,')a');
+			SELECT 206, connec_id, connecat_id, ''Connecs without or with incorrect arc_id'', the_geom FROM (', v_querytext,')a');
 
 			INSERT INTO audit_check_data (fid, criticity, error_message)
-			VALUES (125, 2, concat('WARNING: There is/are ',v_count,' gullies without or with incorrect arc_id.'));
+			VALUES (125, 2, concat('WARNING: There is/are ',v_count,' connecs without or with incorrect arc_id.'));
 		ELSE
 			INSERT INTO audit_check_data (fid, criticity, error_message)
-			VALUES (125, 1, 'INFO: All gullies have correct arc_id.');
+			VALUES (125, 1, 'INFO: All connecs have correct arc_id.');
+		END IF;
+
+		IF v_project_type = 'UD' THEN
+			v_querytext = 'SELECT  '||v_edit||'gully.gully_id,  '||v_edit||'gully.gratecat_id,  '||v_edit||'gully.the_geom
+						FROM '||v_edit||'link
+						LEFT JOIN '||v_edit||'gully ON '||v_edit||'link.feature_id = '||v_edit||'gully.gully_id 
+						INNER JOIN arc ON st_dwithin(arc.the_geom, st_endpoint('||v_edit||'link.the_geom), 0.01)
+						WHERE exit_type = ''VNODE'' AND (arc.arc_id <> '||v_edit||'gully.arc_id or '||v_edit||'gully.arc_id is null) 
+						AND '||v_edit||'link.feature_type = ''GULLY'' AND arc.state=1 AND '||v_edit||'gully.gully_id IS NOT NULL
+						and '||v_edit||'link.feature_id NOT IN (SELECT gully_id FROM node,link
+						LEFT JOIN '||v_edit||'gully ON '||v_edit||'link.feature_id = '||v_edit||'gully.gully_id 
+						LEFT JOIN vnode ON '||v_edit||'link.exit_id=vnode.vnode_id::text
+						WHERE exit_type = ''VNODE'' AND st_dwithin(vnode.the_geom, node.the_geom,0.01))
+						ORDER BY '||v_edit||'link.feature_type, link_id';
+
+			EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+
+			IF v_count > 0 THEN
+				EXECUTE concat ('INSERT INTO anl_connec (fid, connec_id, connecat_id, descript, the_geom)
+				SELECT 206, gully_id, gratecat_id, ''Gullies without or with incorrect arc_id'', the_geom FROM (', v_querytext,')a');
+
+				INSERT INTO audit_check_data (fid, criticity, error_message)
+				VALUES (125, 2, concat('WARNING: There is/are ',v_count,' gullies without or with incorrect arc_id.'));
+			ELSE
+				INSERT INTO audit_check_data (fid, criticity, error_message)
+				VALUES (125, 1, 'INFO: All gullies have correct arc_id.');
+			END IF;
 		END IF;
 	END IF;
-
 
 	RAISE NOTICE '19 - links without feature_id';
 	v_querytext = 'SELECT link_id, the_geom FROM link where feature_id is null and state > 0';
