@@ -41,7 +41,7 @@ CREATE OR REPLACE VIEW vu_node AS
 	dma.name AS dma_name,
 	dma.macrodma_id,
 	node.presszone_id,
-	cat_presszone.name AS presszone_name,
+	presszone.name AS presszone_name,
 	node.staticpressure,
 	node.dqa_id,
 	dqa.name AS dqa_name,
@@ -96,7 +96,7 @@ CREATE OR REPLACE VIEW vu_node AS
 	 LEFT JOIN sector ON node.sector_id = sector.sector_id
 	 LEFT JOIN exploitation ON node.expl_id = exploitation.expl_id
 	 LEFT JOIN dqa ON node.dqa_id = dqa.dqa_id
-	 LEFT JOIN cat_presszone ON cat_presszone.id = node.presszone_id
+	 LEFT JOIN presszone ON presszone.presszone_id = node.presszone_id
 	 LEFT JOIN ext_streetaxis a ON a.id::text = node.streetaxis_id::text
 	 LEFT JOIN ext_streetaxis b ON b.id::text = node.streetaxis2_id::text;
 
@@ -134,7 +134,7 @@ CREATE OR REPLACE VIEW vu_arc AS
 	dma.name AS dma_name,
 	dma.macrodma_id,
 	arc.presszone_id,
-	cat_presszone.name AS presszone_name,
+	presszone.name AS presszone_name,
 	arc.dqa_id,
 	dqa.name AS dqa_name,
 	dqa.macrodqa_id,
@@ -192,7 +192,7 @@ CREATE OR REPLACE VIEW vu_arc AS
 	 LEFT JOIN vu_node a ON a.node_id::text = arc.node_1::text
 	 LEFT JOIN vu_node b ON b.node_id::text = arc.node_2::text
 	 LEFT JOIN dqa ON arc.dqa_id = dqa.dqa_id
- 	 LEFT JOIN cat_presszone ON cat_presszone.id = arc.presszone_id
+ 	 LEFT JOIN presszone ON presszone.presszone_id = arc.presszone_id
 	 LEFT JOIN ext_streetaxis c ON c.id = arc.streetaxis_id
 	 LEFT JOIN ext_streetaxis d ON d.id = arc.streetaxis2_id;
 
@@ -227,7 +227,7 @@ CREATE OR REPLACE VIEW vu_connec AS
 	dma.name AS dma_name,
 	dma.macrodma_id,
 	connec.presszone_id,
-	cat_presszone.name AS presszone_name,
+	presszone.name AS presszone_name,
 	connec.staticpressure,
 	connec.dqa_id,
 	dqa.name AS dqa_name,
@@ -290,7 +290,7 @@ CREATE OR REPLACE VIEW vu_connec AS
 	 LEFT JOIN sector ON connec.sector_id = sector.sector_id
 	 LEFT JOIN exploitation ON connec.expl_id = exploitation.expl_id
 	 LEFT JOIN dqa ON connec.dqa_id = dqa.dqa_id
- 	 LEFT JOIN cat_presszone ON cat_presszone.id = connec.presszone_id
+ 	 LEFT JOIN presszone ON presszone.presszone_id = connec.presszone_id
 	 LEFT JOIN ext_streetaxis c ON c.id = streetaxis_id
 	 LEFT JOIN ext_streetaxis b ON b.id = streetaxis2_id;
 
@@ -415,7 +415,7 @@ adescript
 FROM vu_connec
 JOIN v_state_connec USING (connec_id);
 	 
-CREATE VIEW v_edit_connec AS
+CREATE OR REPLACE VIEW v_edit_connec AS
 SELECT * FROM v_connec;
 
 CREATE OR REPLACE VIEW ve_connec AS 
