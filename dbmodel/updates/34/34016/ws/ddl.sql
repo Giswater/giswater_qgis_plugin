@@ -65,9 +65,7 @@ ALTER TABLE man_netelement ADD COLUMN model text;
 -- connec child
 ALTER TABLE man_greentap ADD COLUMN brand text;
 ALTER TABLE man_greentap ADD COLUMN model text;
-ALTER TABLE man_greentap ADD COLUMN accessibility int2;
 
 
 ALTER TABLE man_wjoin ADD COLUMN brand text;
 ALTER TABLE man_wjoin ADD COLUMN model text;
-ALTER TABLE man_wjoin ADD COLUMN accessibility int2;
