@@ -57,10 +57,6 @@ ALTER TABLE man_netwjoin ADD COLUMN model text;
 ALTER TABLE man_netelement ADD COLUMN brand text;
 ALTER TABLE man_netelement ADD COLUMN model text;
 
---ALTER TABLE man_netsamplepoint ADD COLUMN com1 text;
---ALTER TABLE man_netsamplepoint ADD COLUMN com2 text;
---ALTER TABLE man_netsamplepoint ADD COLUMN accessibility int2;
-
 
 -- connec child
 ALTER TABLE man_greentap ADD COLUMN brand text;
