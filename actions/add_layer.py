@@ -239,9 +239,9 @@ class AddLayer(object):
 
             # configure a symbol layer
             try:
-                color = color_values.get(unique_value)
+                color = color_values.get(str(unique_value))
                 symbol.setColor(color)
-            except Exception:
+            except Exception as e:
                 color = QColor(randrange(0, 256), randrange(0, 256), randrange(0, 256))
                 symbol.setColor(color)
 

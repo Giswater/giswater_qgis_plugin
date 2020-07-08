@@ -5,8 +5,9 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsExpression, QgsFeatureRequest, QgsGeometry, QgsPointXY, QgsProject, QgsRectangle, QgsSymbol, \
-    QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsSimpleFillSymbolLayer, QgsSnappingConfig, QgsPointLocator
+from qgis.core import QgsCategorizedSymbolRenderer, QgsExpression, QgsFeatureRequest, QgsGeometry, QgsPointLocator, \
+    QgsPointXY, QgsProject, QgsRectangle, QgsRendererCategory,  QgsSimpleFillSymbolLayer, QgsSnappingConfig, QgsSymbol,\
+    QgsVectorLayer
 from qgis.gui import QgsRubberBand
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTimer
 from qgis.PyQt.QtWidgets import QGroupBox, QAbstractItemView, QTableView, QFileDialog, QApplication, QCompleter, \
@@ -1201,7 +1202,7 @@ class ParentAction(object):
             self.draw_point(point, color, width)
         else:
             points = self.get_points(list_coord)
-            self.draw_polyline(points)
+            self.draw_polyline(points, color, width)
         if zoom:
             margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
             self.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin)
@@ -1342,6 +1343,7 @@ class ParentAction(object):
         except KeyError:
             return
 
+        srid = self.controller.plugin_settings_value('srid')
         try:
             if 'ruberband' in styles['style']:
                 # Set default values
@@ -1352,11 +1354,43 @@ class ParentAction(object):
                 if 'color' in styles['style']['ruberband']:
                     color = styles['style']['ruberband']['color']
                     color = QColor(color[0], color[1], color[2], opacity)
-
                 if 'width' in styles['style']['ruberband']:
                     width = styles['style']['ruberband']['width']
+                self.draw(json_result, color=color, width=width)
+            else:
+                for key, value in list(json_result['body']['data'].items()):
+                    if key in ('point', 'line', 'polygon'):
+                        if key not in json_result['body']['data']: continue
+                        if 'features' not in json_result['body']['data'][key]: continue
+                        layer_name = f'Temporal layer {key}'
+                        self.delete_layer_from_toc(layer_name)
 
-                self.draw(json_result,color=color, width=width)
+                        # Get values for create and populate layer
+                        counter = len(json_result['body']['data'][key]['features'])
+                        geometry_type = json_result['body']['data'][key]['geometryType']
+                        v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", layer_name, 'memory')
+                        self.add_layer.populate_vlayer(v_layer, json_result['body']['data'], key, counter)
+
+                        # Get values for set layer style
+                        style = json_result['body']['returnManager']['style']
+                        if 'field' not in style[key]: continue
+                        cat_field = str(style[key]['field'])
+                        size = style['width'] if 'width' in style and style['width'] else 2
+                        if 'transparency' in styles['style'][key]:
+                            opacity = styles['style'][key]['transparency']
+                        if style[key]['style'] == 'categorized':
+                            color_values = {}
+                            for item in json_result['body']['returnManager']['style'][key]['values']:
+                                color_values[item['id']] = QColor(item['color'][0], item['color'][1], item['color'][2], opacity*255)
+                            self.add_layer.categoryze_layer(v_layer, cat_field, size, color_values)
+                        elif style[key]['style'] == 'random':
+                            if geometry_type == 'Point':
+                                v_layer.renderer().symbol().setSize(size)
+                            else:
+                                v_layer.renderer().symbol().setWidth(size)
+                            v_layer.renderer().symbol().setOpacity(opacity)
+                        self.iface.layerTreeView().refreshLayerSymbology(v_layer.id())
+
 
         except Exception as e:
             self.controller.manage_exception(None, f"{type(e).__name__}: {e}", sql)
@@ -1385,6 +1419,7 @@ class ParentAction(object):
                         self.controller.set_layer_visible(layer)
                     else:
                         layers_to_add += f'"{layer_name}", '
+
                 layers_to_add = layers_to_add[:-2]
                 if layers_to_add is not None and funct_id is not None:
                     extras = f'"layers":[{layers_to_add}], '
@@ -1405,11 +1440,9 @@ class ParentAction(object):
                             field_id = layer_info['primaryKey']
                             group = layer_info['group'] if 'group' in layer_info else None
                             self.add_layer.from_postgres_to_toc(tablename, teh_geom, field_id, None, group)
-
-
-
                         except KeyError as e:
                             self.controller.log_info(f"{type(e).__name__} --> {e}")
+
                         if 'style' in layer_info:
                             style = layer_info['style']
                             layer = self.controller.get_layer_by_tablename(tablename)
