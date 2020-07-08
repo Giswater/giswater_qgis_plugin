@@ -209,10 +209,6 @@
 			<translation>Fasprint</translation>
 		</message>
 		<message>
-			<source>196_text</source>
-			<translation>Selector de sectores</translation>
-		</message>
-		<message>
 			<source>206_text</source>
 			<translation>Caja de herramientas</translation>
 		</message>
@@ -1000,6 +996,10 @@
 		<message>
 			<source>Feature replaced successfully</source>
 			<translation>Feature replaced successfully</translation>
+		</message>
+		<message>
+			<source>You are trying to delete your current psector. Please, change your current psector before delete.</source>
+			<translation>Estás intentando eliminar tu psector actual. Por favor, cambie su psector actual antes de eliminarlo.</translation>
 		</message>
 		<message>
 			<source>Selected date interval is not valid</source>

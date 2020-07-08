@@ -179,13 +179,18 @@ class Master(ParentAction):
             message = "Any record selected"
             self.controller.show_warning(message)
             return
-
+        cur_psector = self.controller.get_config('plan_psector_vdefault')
         inf_text = ""
         list_id = ""
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_ = widget.model().record(row).value(str(column_id))
-            inf_text += str(id_) + ", "
+            if cur_psector is not None and (str(id_) == str(cur_psector[0])):
+                message = ("You are trying to delete your current psector. " 
+                           "Please, change your current psector before delete.")
+                self.show_exceptions_msg('Current psector', self.controller.tr(message))
+                return
+
             list_id += f"'{id_}', "
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
@@ -203,18 +208,7 @@ class Master(ParentAction):
                    f" WHERE {column_id} IN ({list_id});")
             self.controller.execute_sql(sql)
             widget.model().select()
-            self.clean_label(dialog, label, list_id, config_param)
-
-
-    def clean_label(self, dialog, label, list_id, config_param):
-        row = self.controller.get_config(config_param, sql_added=f" AND value IN ({list_id})")
-        if row is not None:
-            sql = (f"DELETE FROM config_param_user "
-                   f" WHERE parameter = '{config_param}' AND cur_user = current_user"
-                   f" AND value = '{row[0]}'")
-            self.controller.execute_sql(sql)
-            utils_giswater.setWidgetText(dialog, label, '')
-
+ 
 
     def master_estimate_result_manager(self):
         """ Button 50: Plan estimate result manager """
