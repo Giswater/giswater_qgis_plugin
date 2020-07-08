@@ -389,14 +389,14 @@ BEGIN
 		INSERT INTO connec (connec_id, code, elevation, depth,connecat_id,  sector_id, customer_code,  state, state_type, annotation, observ, comment,dma_id, presszone_id, soilcat_id,
 		function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, streetaxis2_id, postnumber, postnumber2, 
 		muni_id, streetaxis_id,  postcode, district_id, postcomplement, postcomplement2, descript, link, verified, rotation,  the_geom, undelete, label_x,label_y,label_rotation, expl_id,
-		publish, inventory,num_value, connec_length, arc_id, minsector_id, dqa_id, staticpressure, state_om, adate, adescript, accessibility) 
+		publish, inventory,num_value, connec_length, arc_id, minsector_id, dqa_id, staticpressure, adate, adescript, accessibility) 
 		
 		VALUES (NEW.connec_id, NEW.code, NEW.elevation, NEW.depth, NEW.connecat_id, NEW.sector_id, NEW.customer_code,  NEW.state, NEW.state_type, NEW.annotation,   NEW.observ, NEW.comment, 
 		NEW.dma_id, NEW.presszone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type,  NEW.location_type, NEW.workcat_id, NEW.workcat_id_end,  NEW.buildercat_id,
 		NEW.builtdate, NEW.enddate, NEW.ownercat_id, v_streetaxis, NEW.postnumber, NEW.postnumber2, NEW.muni_id, v_streetaxis, NEW.postcode, NEW.district_id, NEW.postcomplement, 
 		NEW.postcomplement2, NEW.descript, NEW.link, NEW.verified, NEW.rotation, NEW.the_geom,NEW.undelete,NEW.label_x, NEW.label_y,NEW.label_rotation,  NEW.expl_id, NEW.publish, NEW.inventory, 
 		NEW.num_value, NEW.connec_length, NEW.arc_id, NEW.minsector_id, NEW.dqa_id, NEW.staticpressure,
-		NEW.state_om, NEW.adate, NEW.adescript, NEW.accessibility);
+		NEW.adate, NEW.adescript, NEW.accessibility);
 		 
 		IF v_man_table='man_greentap' THEN
 			INSERT INTO man_greentap (connec_id, linked_connec, brand, model) 

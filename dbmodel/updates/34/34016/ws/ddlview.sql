@@ -86,7 +86,6 @@ CREATE OR REPLACE VIEW vu_node AS
 	date_trunc('second'::text, lastupdate) AS lastupdate,
 	node.lastupdate_user,
 	node.the_geom,
-	node.state_om,
 	node.adate,
 	node.adescript,
 	node.accessibility
@@ -181,7 +180,6 @@ CREATE OR REPLACE VIEW vu_arc AS
 	arc.lastupdate_user,
 	arc.the_geom,
 	arc.depth,
-	arc.state_om,
 	arc.adate,
 	arc.adescript
 	FROM arc
@@ -276,7 +274,6 @@ CREATE OR REPLACE VIEW vu_connec AS
 	date_trunc('second'::text, lastupdate) AS lastupdate,
 	connec.lastupdate_user,
 	connec.the_geom,
-	connec.state_om,
 	connec.adate,
 	connec.adescript,
 	connec.accessibility
@@ -411,9 +408,9 @@ insert_user,
 lastupdate,
 lastupdate_user,
 the_geom,
-state_om,
 adate,
-adescript
+adescript,
+accessibility
 FROM vu_connec
 JOIN v_state_connec USING (connec_id);
 	 

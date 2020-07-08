@@ -10,25 +10,17 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- parent:
 ALTER TABLE arc ADD COLUMN depth numeric (12,3);
-ALTER TABLE arc ADD COLUMN state_om text;
 ALTER TABLE arc ADD COLUMN adate text;
 ALTER TABLE arc ADD COLUMN adescript text;
 
-ALTER TABLE node ADD COLUMN state_om text;
 ALTER TABLE node ADD COLUMN adate text;
 ALTER TABLE node ADD COLUMN adescript text;
 ALTER TABLE node ADD COLUMN accessibility int2;
 
-ALTER TABLE connec ADD COLUMN state_om text;
 ALTER TABLE connec ADD COLUMN adate text;
 ALTER TABLE connec ADD COLUMN adescript text;
 ALTER TABLE connec ADD COLUMN accessibility int2;
 
-
---arc child
-ALTER TABLE man_pipe ADD COLUMN pvalue numeric (12,3);
-ALTER TABLE man_pipe ADD COLUMN pdescript text;
-ALTER TABLE man_pipe ADD COLUMN pobserv text;
 
 
 -- node child
@@ -42,7 +34,7 @@ ALTER TABLE man_hydrant ADD COLUMN model text;
 ALTER TABLE man_pump ADD COLUMN brand text;
 ALTER TABLE man_pump ADD COLUMN model text;
 
-ALTER TABLE man_valve ADD COLUMN valve_type text;
+ALTER TABLE man_valve ADD COLUMN shutter text;
 ALTER TABLE man_valve ADD COLUMN brand text;
 ALTER TABLE man_valve ADD COLUMN brand2 text;
 ALTER TABLE man_valve ADD COLUMN model text;
@@ -57,11 +49,9 @@ ALTER TABLE man_netwjoin ADD COLUMN model text;
 ALTER TABLE man_netelement ADD COLUMN brand text;
 ALTER TABLE man_netelement ADD COLUMN model text;
 
-
 -- connec child
 ALTER TABLE man_greentap ADD COLUMN brand text;
 ALTER TABLE man_greentap ADD COLUMN model text;
-
 
 ALTER TABLE man_wjoin ADD COLUMN brand text;
 ALTER TABLE man_wjoin ADD COLUMN model text;

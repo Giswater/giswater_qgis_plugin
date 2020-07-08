@@ -22,12 +22,6 @@ INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder,  da
 
 INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder,  datatype, widgettype, label, tooltip, placeholder, 
 	ismandatory, isparent, iseditable, isautoupdate, hidden) 
-	VALUES ('ve_arc', 'form_feature', 'state_om', null , 'text', 'text', 'State OM', 'Operational state, value coming from visit functions on automatic way', null, 
-	FALSE, FALSE, FALSE, FALSE, TRUE)
-	ON CONFLICT (formname, formtype, columnname) DO NOTHING;
-
-INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder,  datatype, widgettype, label, tooltip, placeholder, 
-	ismandatory, isparent, iseditable, isautoupdate, hidden) 
 	VALUES ('ve_arc', 'form_feature', 'adate', null , 'text', 'text', 'Adate', 'Date used as complementary date', null, 
 	FALSE, FALSE, FALSE, FALSE, TRUE)
 	ON CONFLICT (formname, formtype, columnname) DO NOTHING;
@@ -39,13 +33,6 @@ INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder,  da
 	ON CONFLICT (formname, formtype, columnname) DO NOTHING;
 
 
-
-
-INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder,  datatype, widgettype, label, tooltip, placeholder, 
-	ismandatory, isparent, iseditable, isautoupdate, hidden) 
-	VALUES ('ve_node', 'form_feature', 'state_om', null , 'text', 'text', 'State OM', 'Operational state, value coming from visit functions on automatic way', null, 
-	FALSE, FALSE, FALSE, FALSE, TRUE)
-	ON CONFLICT (formname, formtype, columnname) DO NOTHING;
 
 INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder,  datatype, widgettype, label, tooltip, placeholder, 
 	ismandatory, isparent, iseditable, isautoupdate, hidden) 
@@ -66,13 +53,6 @@ INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder,  da
 	ON CONFLICT (formname, formtype, columnname) DO NOTHING;
 
 
-
-
-INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder,  datatype, widgettype, label, tooltip, placeholder, 
-	ismandatory, isparent, iseditable, isautoupdate, hidden) 
-	VALUES ('ve_connec', 'form_feature', 'state_om', null , 'text', 'text', 'State OM', 'Operational state, value coming from visit functions on automatic way', null, 
-	FALSE, FALSE, FALSE, FALSE, TRUE)
-	ON CONFLICT (formname, formtype, columnname) DO NOTHING;
 
 INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder,  datatype, widgettype, label, tooltip, placeholder, 
 	ismandatory, isparent, iseditable, isautoupdate, hidden) 

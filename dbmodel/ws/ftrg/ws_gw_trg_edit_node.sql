@@ -428,14 +428,14 @@ BEGIN
 		INSERT INTO node (node_id, code, elevation, depth, nodecat_id, epa_type, sector_id, arc_id, parent_id, state, state_type, annotation, observ,comment, dma_id, presszone_id, 
 		soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id,streetaxis_id, 
 		streetaxis2_id, postcode, postnumber, postnumber2, postcomplement, district_id,	postcomplement2, descript, link, rotation,verified, undelete,label_x,label_y,label_rotation,
-		expl_id, publish, inventory, the_geom, hemisphere, num_value, state_om, adate, adescript, accessibility)
+		expl_id, publish, inventory, the_geom, hemisphere, num_value, adate, adescript, accessibility)
 
 		VALUES (NEW.node_id, NEW.code, NEW.elevation, NEW.depth, NEW.nodecat_id, NEW.epa_type, NEW.sector_id, NEW.arc_id, NEW.parent_id, NEW.state, NEW.state_type, NEW.annotation, NEW.observ,
 		NEW.comment,NEW.dma_id, NEW.presszone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type,NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, 
 		NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.muni_id, v_streetaxis, v_streetaxis2, NEW.postcode, NEW.postnumber ,NEW.postnumber2, NEW.postcomplement, NEW.district_id, 
 		NEW.postcomplement2, NEW.descript, NEW.link, NEW.rotation, NEW.verified, NEW.undelete,NEW.label_x,NEW.label_y,NEW.label_rotation, 
 		NEW.expl_id, NEW.publish, NEW.inventory, NEW.the_geom,  NEW.hemisphere,NEW.num_value,
-		NEW.state_om, NEW.adate, NEW.adescript, NEW.accessibility);
+		NEW.adate, NEW.adescript, NEW.accessibility);
 
 		
 		IF v_man_table='man_tank' THEN
@@ -481,10 +481,10 @@ BEGIN
 			
 		ELSIF v_man_table='man_valve' THEN	
 			INSERT INTO man_valve (node_id,closed, broken, buried,irrigation_indicator,pression_entry, pression_exit, depth_valveshaft,regulator_situation, regulator_location, regulator_observ,
-			lin_meters, exit_type,exit_code,drive_type, cat_valve2, valve_type, brand, brand2, model, model2) 
+			lin_meters, exit_type,exit_code,drive_type, cat_valve2, shutter, brand, brand2, model, model2) 
 			VALUES (NEW.node_id, NEW.closed, NEW.broken, NEW.buried, NEW.irrigation_indicator, NEW.pression_entry, NEW.pression_exit, NEW.depth_valveshaft, NEW.regulator_situation, 
 			NEW.regulator_location, NEW.regulator_observ, NEW.lin_meters, NEW.exit_type, NEW.exit_code, NEW.drive_type, NEW.cat_valve2, NEW.ordinarystatus,
-			NEW.valve_type, NEW.brand, NEW.brand2, NEW.model, NEW.model2) ;
+			NEW.shutter, NEW.brand, NEW.brand2, NEW.model, NEW.model2) ;
 		
 		ELSIF v_man_table='man_manhole' THEN	
 			INSERT INTO man_manhole (node_id, name) VALUES(NEW.node_id, NEW.name);
@@ -824,7 +824,7 @@ BEGIN
 			SET closed=NEW.closed, broken=NEW.broken, buried=NEW.buried, irrigation_indicator=NEW.irrigation_indicator, pression_entry=NEW.pression_entry, pression_exit=NEW.pression_exit, 
 			depth_valveshaft=NEW.depth_valveshaft, regulator_situation=NEW.regulator_situation, regulator_location=NEW.regulator_location, regulator_observ=NEW.regulator_observ, 
 			lin_meters=NEW.lin_meters, exit_type=NEW.exit_type, exit_code=NEW.exit_code, drive_type=NEW.drive_type, cat_valve2=NEW.cat_valve2, ordinarystatus = NEW.ordinarystatus,
-			valve_type=NEW.valve_type, brand=NEW.brand, brand2=NEW.brand2, model=NEW.model, model2=NEW.model2
+			shutter=NEW.shutter, brand=NEW.brand, brand2=NEW.brand2, model=NEW.model, model2=NEW.model2
 			WHERE node_id=OLD.node_id;	
 		
 		ELSIF v_man_table ='man_register' THEN
