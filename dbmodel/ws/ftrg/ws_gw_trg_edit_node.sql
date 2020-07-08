@@ -770,7 +770,7 @@ BEGIN
 		postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, streetaxis2_id=v_streetaxis2,postcode=NEW.postcode,district_id=NEW.district_id,postnumber=NEW.postnumber,
 		postnumber2=NEW.postnumber2, descript=NEW.descript, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation, 
 		publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value, link=NEW.link, lastupdate=now(), lastupdate_user=current_user,
-		state_om=NEW.state_om, adate=NEW.adate, adescript=NEW.adescript, accessibility = NEW.accessibility
+		adate=NEW.adate, adescript=NEW.adescript, accessibility = NEW.accessibility
 		WHERE node_id = OLD.node_id;
 		
 		IF v_man_table ='man_junction' THEN

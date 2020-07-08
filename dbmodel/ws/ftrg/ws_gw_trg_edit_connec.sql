@@ -629,7 +629,7 @@ BEGIN
 			undelete=NEW.undelete, label_x=NEW.label_x,label_y=NEW.label_y, label_rotation=NEW.label_rotation,publish=NEW.publish, 
 			inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value, connec_length=NEW.connec_length, link=NEW.link, lastupdate=now(), lastupdate_user=current_user,
 			dqa_id=NEW.dqa_id, minsector_id=NEW.minsector_id, staticpressure=NEW.staticpressure,
-			state_om=NEW.state_om, adate=NEW.adate, adescript=NEW.adescript, accessibility =  NEW.accessibility
+			adate=NEW.adate, adescript=NEW.adescript, accessibility =  NEW.accessibility
 			WHERE connec_id=OLD.connec_id;
 			
 		IF v_man_table ='man_greentap' THEN
