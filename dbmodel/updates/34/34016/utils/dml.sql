@@ -29,3 +29,6 @@ ON CONFLICT (parameter) DO NOTHING;
 INSERT INTO config_param_system (parameter, value, datatype, descript, isenabled)
 VALUES ('grafanalytics_lrs_graf', '{"headers":[{"node": "", "toArc": [""]}],"ignoreArc":[""]}', 'json',  'Configuration of starting points(headers) and arc which indicate direction of calculating linear reference', false)
 ON CONFLICT (parameter) DO NOTHING;
+
+--07/07/2020
+UPDATE  config_form_fields set dv_querytext = 'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL AND expl_id != 0  ' WHERE formname='v_edit_dimensions' AND columnname='expl_id';
