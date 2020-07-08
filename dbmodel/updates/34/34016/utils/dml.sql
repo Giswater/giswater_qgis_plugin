@@ -32,3 +32,7 @@ ON CONFLICT (parameter) DO NOTHING;
 
 --07/07/2020
 UPDATE  config_form_fields set dv_querytext = 'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL AND expl_id != 0  ' WHERE formname='v_edit_dimensions' AND columnname='expl_id';
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, sys_role)
+VALUES (2972, 'gw_trg_ui_plan_psector','utils', 'trigger function', 'role_master')
+ON CONFLICT (id) DO NOTHING;

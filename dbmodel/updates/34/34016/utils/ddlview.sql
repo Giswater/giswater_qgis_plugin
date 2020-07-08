@@ -25,7 +25,10 @@ CREATE OR REPLACE VIEW v_ui_plan_psector AS
     plan_psector.expl_id,
     t.idval AS psector_type,
     plan_psector.active
-   FROM plan_psector
+   FROM selector_expl,
+    plan_psector
+     JOIN exploitation USING (expl_id)
      LEFT JOIN plan_typevalue p ON p.id::text = plan_psector.priority::text AND p.typevalue = 'value_priority'::text
      LEFT JOIN plan_typevalue s ON s.id::text = plan_psector.status::text AND s.typevalue = 'psector_status'::text
-     LEFT JOIN plan_typevalue t ON t.id::integer = plan_psector.psector_type AND t.typevalue = 'psector_type'::text;
+     LEFT JOIN plan_typevalue t ON t.id::integer = plan_psector.psector_type AND t.typevalue = 'psector_type'::text
+     WHERE plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
