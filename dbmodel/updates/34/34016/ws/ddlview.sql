@@ -88,7 +88,11 @@ CREATE OR REPLACE VIEW vu_node AS
 	node.the_geom,
 	node.adate,
 	node.adescript,
-	node.accessibility
+	node.accessibility,
+	sector.stylesheet as sector_style,
+	dma.stylesheet as dma_style,
+	presszone.stylesheet as presszone_style,
+	dqa.stylesheet as dqa_style
 	FROM node
 	 LEFT JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
 	 JOIN cat_feature ON cat_feature.id::text = cat_node.nodetype_id::text
@@ -181,7 +185,11 @@ CREATE OR REPLACE VIEW vu_arc AS
 	arc.the_geom,
 	arc.depth,
 	arc.adate,
-	arc.adescript
+	arc.adescript,
+	sector.stylesheet as sector_style,
+	dma.stylesheet as dma_style,
+	presszone.stylesheet as presszone_style,
+	dqa.stylesheet as dqa_style
 	FROM arc
 	 LEFT JOIN sector ON arc.sector_id = sector.sector_id
 	 LEFT JOIN exploitation ON arc.expl_id = exploitation.expl_id
@@ -276,7 +284,11 @@ CREATE OR REPLACE VIEW vu_connec AS
 	connec.the_geom,
 	connec.adate,
 	connec.adescript,
-	connec.accessibility
+	connec.accessibility,
+	sector.stylesheet as sector_style,
+	dma.stylesheet as dma_style,
+	presszone.stylesheet as presszone_style,
+	dqa.stylesheet as dqa_style
     FROM connec
 	LEFT JOIN  (SELECT connec_1.connec_id, count(ext_rtc_hydrometer.id)::integer AS n_hydrometer
 				FROM ws.selector_hydrometer, ws.ext_rtc_hydrometer
