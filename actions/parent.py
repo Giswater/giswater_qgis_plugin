@@ -1185,6 +1185,51 @@ class ParentAction(object):
         return points
 
 
+    def draw(self, complet_result, zoom=True, reset_rb=True, color=QColor(255, 0, 0, 100), width=3):
+
+        if complet_result['body']['feature']['geometry'] is None:
+            return
+        if complet_result['body']['feature']['geometry']['st_astext'] is None:
+            return
+        list_coord = re.search('\((.*)\)', str(complet_result['body']['feature']['geometry']['st_astext']))
+        max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
+
+        if reset_rb:
+            self.resetRubberbands()
+        if str(max_x) == str(min_x) and str(max_y) == str(min_y):
+            point = QgsPointXY(float(max_x), float(max_y))
+            self.draw_point(point, color, width)
+        else:
+            points = self.get_points(list_coord)
+            self.draw_polyline(points)
+        if zoom:
+            margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
+            self.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin)
+
+
+    def draw_point(self, point, color=QColor(255, 0, 0, 100), width=3, duration_time=None, is_new=False):
+        """
+        :param duration_time: integer milliseconds ex: 3000 for 3 seconds
+        """
+
+        if self.rubber_point is None:
+            self.init_rubber()
+
+        if is_new:
+            rb = QgsRubberBand(self.canvas, 0)
+        else:
+            rb = self.rubber_point
+
+        rb.setColor(color)
+        rb.setWidth(width)
+        rb.addPoint(point)
+
+        # wait to simulate a flashing effect
+        if duration_time is not None:
+            QTimer.singleShot(duration_time, self.resetRubberbands)
+        return rb
+
+
     def draw_polyline(self, points, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
         """ Draw 'line' over canvas following list of points
          :param duration_time: integer milliseconds ex: 3000 for 3 seconds
@@ -1298,38 +1343,23 @@ class ParentAction(object):
             return
 
         try:
-            layers_to_add = '  '
-            for style in styles['styles']:
-                layer = self.controller.get_layer_by_tablename(style['layerName'])
-                if layer:
-                    self.controller.set_layer_visible(layer)
-                else:
-                    layer_name = style['layerName'] if 'layerName' in style else None
-                    layers_to_add += f'"{layer_name}", '
-            layers_to_add = layers_to_add[:-2]
+            if 'ruberband' in styles['style']:
+                # Set default values
+                opacity = 100
+                width = 3
+                if 'transparency' in styles['style']['ruberband']:
+                    opacity = styles['style']['ruberband']['transparency'] * 255
+                if 'color' in styles['style']['ruberband']:
+                    color = styles['style']['ruberband']['color']
+                    color = QColor(color[0], color[1], color[2], opacity)
 
-            for style in styles:
-                print(style)
-                if 'layerName' in style:
-                    layer = self.controller.get_layer_by_tablename(style['layerName'])
+                if 'width' in styles['style']['ruberband']:
+                    width = styles['style']['ruberband']['width']
 
-                if layer:
-                    if style['style'] == 'categorized':
-                        layer = self.controller.get_layer_by_tablename('v_edit_arc')
-                        opacity = 255*float(style['opacity'])
-                        size = style['width']
-                        cat_field = style['field']
-                        color_values = {}
-                        for item in style['values']:
-                            color_values[item['id']] = QColor(item['color'][0], item['color'][2], item['color'][2], opacity)
-                        self.add_layer.categoryze_layer(layer, cat_field, size, color_values)
-
+                self.draw(json_result,color=color, width=width)
 
         except Exception as e:
             self.controller.manage_exception(None, f"{type(e).__name__}: {e}", sql)
-
-
-
 
 
     def manage_layer_manager(self, json_result, sql):
@@ -1481,3 +1511,5 @@ class ParentAction(object):
                     self.controller.log_debug(f"{type(e).__name__}: {e}")
         except Exception as e:
             self.controller.manage_exception(None, f"{type(e).__name__}: {e}", sql)
+
+

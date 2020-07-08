@@ -188,7 +188,7 @@ class ApiSearch(ApiParent):
                                    tab_type='data', is_add_schema=is_add_schema)
             if not complet_result:
                 return
-            self.draw(complet_result)
+            self.draw(complet_result[0])
             self.resetRubberbands()
 
         # Tab 'search'

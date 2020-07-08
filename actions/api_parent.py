@@ -865,51 +865,6 @@ class ApiParent(ParentAction):
         return widget
 
 
-    def draw(self, complet_result, zoom=True, reset_rb=True):
-
-        if complet_result[0]['body']['feature']['geometry'] is None:
-            return
-        if complet_result[0]['body']['feature']['geometry']['st_astext'] is None:
-            return
-        list_coord = re.search('\((.*)\)', str(complet_result[0]['body']['feature']['geometry']['st_astext']))
-        max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
-
-        if reset_rb:
-            self.resetRubberbands()
-        if str(max_x) == str(min_x) and str(max_y) == str(min_y):
-            point = QgsPointXY(float(max_x), float(max_y))
-            self.draw_point(point)
-        else:
-            points = self.get_points(list_coord)
-            self.draw_polyline(points)
-        if zoom:
-            margin = float(complet_result[0]['body']['feature']['zoomCanvasMargin']['mts'])
-            self.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin)
-
-
-    def draw_point(self, point, color=QColor(255, 0, 0, 100), width=3, duration_time=None, is_new=False):
-        """
-        :param duration_time: integer milliseconds ex: 3000 for 3 seconds
-        """
-
-        if self.rubber_point is None:
-            self.init_rubber()
-
-        if is_new:
-            rb = QgsRubberBand(self.canvas, 0)
-        else:
-            rb = self.rubber_point
-
-        rb.setColor(color)
-        rb.setWidth(width)
-        rb.addPoint(point)
-
-        # wait to simulate a flashing effect
-        if duration_time is not None:
-            QTimer.singleShot(duration_time, self.resetRubberbands)
-        return rb
-
-
     def draw_polygon(self, points, border=QColor(255, 0, 0, 100), width=3, duration_time=None, fill_color=None):
         """ Draw 'polygon' over canvas following list of points
         :param duration_time: integer milliseconds ex: 3000 for 3 seconds
@@ -1088,7 +1043,7 @@ class ApiParent(ParentAction):
 
         self.canvas.setMapTool(ep)
         # We redraw the selected feature because self.canvas.setMapTool(emit_point) erases it
-        self.draw(complet_result, False, False)
+        self.draw(complet_result[0], False, False)
 
         # Store user snapping configuration
         self.snapper_manager = SnappingConfigManager(self.iface)

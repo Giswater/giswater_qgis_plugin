@@ -167,7 +167,7 @@ class ApiCF(ApiParent, QObject):
             self.iface.setActiveLayer(layer)
             complet_result, dialog = self.open_form(
                 table_name=layer_source['table'], feature_id=action.text(), tab_type=tab_type)
-            self.draw(complet_result)
+            self.draw(complet_result[0])
 
 
     def open_form(self, point=None, table_name=None, feature_id=None, feature_cat=None, new_feature_id=None,
@@ -390,7 +390,7 @@ class ApiCF(ApiParent, QObject):
 
     def open_generic_form(self, complet_result):
 
-        self.draw(complet_result, zoom=False)
+        self.draw(complet_result[0], zoom=False)
         self.hydro_info_dlg = InfoGenericUi()
         self.load_settings(self.hydro_info_dlg)
         self.hydro_info_dlg.btn_close.clicked.connect(partial(self.close_dialog, self.hydro_info_dlg))
@@ -412,7 +412,6 @@ class ApiCF(ApiParent, QObject):
         # Dialog
         self.dlg_cf = InfoFeatureUi(sub_tag)
         self.load_settings(self.dlg_cf)
-        self.draw(complet_result, zoom=False)
 
         if feature_id:
             self.dlg_cf.setGeometry(self.dlg_cf.pos().x() + 25, self.dlg_cf.pos().y() + 25, self.dlg_cf.width(),
@@ -1655,7 +1654,7 @@ class ApiCF(ApiParent, QObject):
         if not complet_result:
             self.controller.log_info("FAIL open_relation")
             return
-        self.draw(complet_result)
+        self.draw(complet_result[0])
 
 
     """ FUNCTIONS RELATED WITH TAB CONNECTIONS """
@@ -1691,7 +1690,7 @@ class ApiCF(ApiParent, QObject):
         if not complet_result:
             self.controller.log_info("FAIL open_up_down_stream")
             return
-        self.draw(complet_result)
+        self.draw(complet_result[0])
 
 
     """ FUNCTIONS RELATED WITH TAB HYDROMETER"""
@@ -2565,7 +2564,7 @@ class ApiCF(ApiParent, QObject):
             self.controller.log_info("FAIL open_rpt_result")
             return
 
-        self.draw(complet_result)
+        self.draw(complet_result[0])
 
 
     """ FUNCTIONS RELATED WITH TAB PLAN """
@@ -2883,5 +2882,5 @@ class ApiCF(ApiParent, QObject):
             self.controller.log_info("FAIL open_node")
             return
 
-        self.draw(complet_result)
+        self.draw(complet_result[0])
 
