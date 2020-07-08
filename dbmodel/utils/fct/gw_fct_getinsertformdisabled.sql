@@ -149,6 +149,7 @@ BEGIN
 
 			-- Update array
             IF aux_json->>'type' = 'combo' THEN
+			    EXECUTE 'SELECT id FROM cat_node WHERE idval = '''|| field_value ||'''' INTO field_value;
                 fields_array[array_index] := gw_fct_json_object_set_key(fields_array[array_index], 'selectedId', field_value);
             ELSE            
                 fields_array[array_index] := gw_fct_json_object_set_key(fields_array[array_index], 'value', field_value);
