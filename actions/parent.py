@@ -990,7 +990,7 @@ class ParentAction(object):
         self.dlg_info.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_info))
         self.dlg_info.setWindowTitle(title)
         utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.txt_infolog, msg)
-        self.open_dialog(self.dlg_info, dlg_name='dialog_text')
+        self.open_dialog(self.dlg_info, dlg_name='dialog_text', title=title)
 
 
 
