@@ -62,10 +62,10 @@ BEGIN
   
 	--  Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
-    schemas_array := current_schemas(FALSE);
+	schemas_array := current_schemas(FALSE);
 
 	--  get api version
-    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
+	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
         INTO v_version;
 
 	-- Get input parameters:
@@ -79,21 +79,21 @@ BEGIN
 
 	-- Sensibility factor
 	IF v_device = 1 OR v_device = 2 THEN
-        EXECUTE 'SELECT value::float FROM config_param_system WHERE parameter=''basic_info_sensibility_factor''::json->''mobile'''
+		EXECUTE 'SELECT value::json->>''mobile'' FROM config_param_system WHERE parameter=''basic_info_sensibility_factor'''
 		INTO v_sensibility_f;
 		-- 10 pixels of base sensibility
 		v_sensibility = (v_zoomScale * 10 * v_sensibility_f);
 		v_config_layer='config_web_layer';
 		
 	ELSIF  v_device = 3 THEN
-        EXECUTE 'SELECT value::float FROM config_param_system WHERE parameter=''basic_info_sensibility_factor''::json->''web'''
+		EXECUTE 'SELECT value::json->>''web'' FROM config_param_system WHERE parameter=''basic_info_sensibility_factor'''
 		INTO v_sensibility_f;     
 		-- 10 pixels of base sensibility
 		v_sensibility = (v_zoomScale * 10 * v_sensibility_f);
 		v_config_layer='config_web_layer';
 
-    ELSIF  v_device = 4 THEN
-	EXECUTE 'SELECT value::float FROM config_param_system WHERE parameter=''basic_info_sensibility_factor''::json->''desktop'''
+	ELSIF  v_device = 4 THEN
+		EXECUTE 'SELECT value::json->>''desktop'' FROM config_param_system WHERE parameter=''basic_info_sensibility_factor'''
 		INTO v_sensibility_f;
 		-- ESCALE 1:5000 as base sensibility
 		v_sensibility = ((v_zoomScale/5000) * 10 * v_sensibility_f);
@@ -109,14 +109,14 @@ BEGIN
 	raise notice '============== -> %',v_visibleLayers;
 
 	--   Make point
-     SELECT ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_epsg) INTO v_point;
+	SELECT ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_epsg) INTO v_point;
 
-     v_sql := 'SELECT layer_id, 0 as orderby FROM  '||quote_ident(v_config_layer)||' WHERE layer_id= '''' UNION 
+	v_sql := 'SELECT layer_id, 0 as orderby FROM  '||quote_ident(v_config_layer)||' WHERE layer_id= '''' UNION 
               SELECT layer_id, orderby FROM  '||quote_ident(v_config_layer)||' WHERE layer_id = any('||quote_literal(v_visibleLayers)||'::text[]) ORDER BY orderby';
 
 	raise notice 'v_sql -> %', v_sql;
-    FOR v_layer IN EXECUTE v_sql 
-    LOOP
+	FOR v_layer IN EXECUTE v_sql 
+	LOOP
 		raise notice 'v_layer -> %', v_layer;
 			v_count=v_count+1;
 				--    Get id column
@@ -172,7 +172,8 @@ BEGIN
 		IF v_geometrytype = 'ST_Polygon'::text OR v_geometrytype= 'ST_Multipolygon'::text THEN
 				--  Get element from active layer, using the area of the elements to order possible multiselection (minor as first)        
 				EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (
-				SELECT '||quote_ident(v_idname)||' AS id, '||quote_ident(v_the_geom)||' as the_geom, (SELECT St_AsText('||quote_ident(v_the_geom)||') as geometry) FROM '||quote_ident(v_layer)||' WHERE st_dwithin ($1, '||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $2) 
+				SELECT '||quote_ident(v_idname)||' AS id, '||quote_ident(v_the_geom)||' as the_geom, (SELECT St_AsText('||quote_ident(v_the_geom)||') as geometry) 
+				FROM '||quote_ident(v_layer)||' WHERE st_dwithin ($1, '||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $2) 
 				ORDER BY  ST_area('||v_layer||'.'||v_the_geom||') asc) a'
 						INTO v_ids
 						USING v_point, v_sensibility;
@@ -182,7 +183,8 @@ BEGIN
 			raise notice 'v_sensibility %',v_sensibility;
 				--  Get element from active layer, using the distance from the clicked point to order possible multiselection (minor as first)
 				EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (
-				SELECT '||quote_ident(v_idname)||' AS id, '||quote_ident(v_the_geom)||' as the_geom, (SELECT St_AsText('||quote_ident(v_the_geom)||') as geometry) FROM '||quote_ident(v_layer)||' WHERE st_dwithin ($1, '||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $2) 
+				SELECT '||quote_ident(v_idname)||' AS id, '||quote_ident(v_the_geom)||' as the_geom, (SELECT St_AsText('||quote_ident(v_the_geom)||') as geometry) 
+				FROM '||quote_ident(v_layer)||' WHERE st_dwithin ($1, '||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $2) 
 				ORDER BY  ST_Distance('||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $1) asc) a'
 						INTO v_ids
 						USING v_point, v_sensibility;
@@ -208,22 +210,22 @@ BEGIN
 			fields_array[(x)::INT] := gw_fct_json_object_set_key(fields_array[(x)::INT], 'icon', COALESCE(v_icon, '{}'));
 			x = x+1;
 		END IF;
-    END LOOP;
+	END LOOP;
     
 	fields := array_to_json(fields_array);
 	fields := COALESCE(fields, '[]');    
 
 	-- Return
-    RETURN ('{"status":"Accepted", "version":'||v_version||
+	RETURN ('{"status":"Accepted", "version":'||v_version||
              ',"body":{"message":{"level":1, "text":"This is a test message"}'||
 			',"form":{}'||
 			',"feature":{}'||
 			',"data":{"layersNames":' || fields ||'}}'||
 	    '}')::json;
 
-	--	Exception handling
+	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN 
-    RETURN ('{"status":"Failed","message":' || (to_json(SQLERRM)) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	RETURN ('{"status":"Failed","message":' || (to_json(SQLERRM)) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$
