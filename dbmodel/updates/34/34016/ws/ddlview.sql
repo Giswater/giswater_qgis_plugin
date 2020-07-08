@@ -291,8 +291,8 @@ CREATE OR REPLACE VIEW vu_connec AS
 	dqa.stylesheet as dqa_style
     FROM connec
 	LEFT JOIN  (SELECT connec_1.connec_id, count(ext_rtc_hydrometer.id)::integer AS n_hydrometer
-				FROM ws.selector_hydrometer, ws.ext_rtc_hydrometer
-				JOIN ws.connec connec_1 ON ext_rtc_hydrometer.connec_id::text = connec_1.customer_code::text
+				FROM selector_hydrometer, ext_rtc_hydrometer
+				JOIN connec connec_1 ON ext_rtc_hydrometer.connec_id::text = connec_1.customer_code::text
 				WHERE selector_hydrometer.state_id = ext_rtc_hydrometer.state_id AND cur_user = current_user
 				GROUP BY connec_1.connec_id) a USING (connec_id)
 	 JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
