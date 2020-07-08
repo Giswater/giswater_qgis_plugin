@@ -823,7 +823,7 @@ class DaoController(object):
         # If failed, manage exception
         if 'status' in json_result and json_result['status'] == 'Failed':
             self.manage_exception_api(json_result, sql, is_notify=is_notify)
-            return False
+            return json_result
 
         # Manage options for layers (active, visible, zoom and indexing)
         self.layer_manager(json_result)
