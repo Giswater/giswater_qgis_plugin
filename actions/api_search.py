@@ -229,7 +229,7 @@ class ApiSearch(ApiParent):
 
         # Tab 'workcat'
         elif tab_selected == 'workcat':
-            list_coord = re.search('\(\((.*)\)\)', str(item['sys_geometry']))
+            list_coord = re.search('\(\((.*)\)\)', str(item['geometry']))
             if not list_coord:
                 msg = "Empty coordinate list"
                 self.controller.show_warning(msg)
@@ -244,7 +244,7 @@ class ApiSearch(ApiParent):
 
         # Tab 'psector'
         elif tab_selected == 'psector':
-            list_coord = re.search('\(\((.*)\)\)', str(item['sys_geometry']))
+            list_coord = re.search('\(\((.*)\)\)', str(item['geometry']))
             self.manage_new_psector.new_psector(item['sys_id'], 'plan', is_api=True)
             self.manage_new_psector.dlg_plan_psector.rejected.connect(self.resetRubberbands)
             if not list_coord:
@@ -259,7 +259,7 @@ class ApiSearch(ApiParent):
 
         # Tab 'visit'
         elif tab_selected == 'visit':
-            list_coord = re.search('\((.*)\)', str(item['sys_geometry']))
+            list_coord = re.search('\((.*)\)', str(item['geometry']))
             if not list_coord:
                 msg = "Empty coordinate list"
                 self.controller.show_warning(msg)
