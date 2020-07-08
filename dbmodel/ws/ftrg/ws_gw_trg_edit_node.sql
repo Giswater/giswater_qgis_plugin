@@ -428,7 +428,7 @@ BEGIN
 		INSERT INTO node (node_id, code, elevation, depth, nodecat_id, epa_type, sector_id, arc_id, parent_id, state, state_type, annotation, observ,comment, dma_id, presszone_id, 
 		soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id,streetaxis_id, 
 		streetaxis2_id, postcode, postnumber, postnumber2, postcomplement, district_id,	postcomplement2, descript, link, rotation,verified, undelete,label_x,label_y,label_rotation,
-		expl_id, publish, inventory, the_geom, hemisphere, num_value, state_om, adate, adescript. accessibility)
+		expl_id, publish, inventory, the_geom, hemisphere, num_value, state_om, adate, adescript, accessibility)
 
 		VALUES (NEW.node_id, NEW.code, NEW.elevation, NEW.depth, NEW.nodecat_id, NEW.epa_type, NEW.sector_id, NEW.arc_id, NEW.parent_id, NEW.state, NEW.state_type, NEW.annotation, NEW.observ,
 		NEW.comment,NEW.dma_id, NEW.presszone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type,NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, 
