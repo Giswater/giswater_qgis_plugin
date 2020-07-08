@@ -75,9 +75,9 @@ BEGIN
 	DELETE FROM audit_check_data WHERE fid = 125 AND cur_user=current_user;
 	
 	-- delete old values on anl table
-	DELETE FROM anl_connec WHERE cur_user=current_user AND fid IN (201,202,204,205,206);
-	DELETE FROM anl_arc WHERE cur_user=current_user AND fid IN (104,188,202);
-	DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (104,187,196,197,202,203);
+	DELETE FROM anl_connec WHERE cur_user=current_user AND fid IN (110,201,202,204,205,206);
+	DELETE FROM anl_arc WHERE cur_user=current_user AND fid IN (104, 196, 197, 188, 123, 202 );
+	DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (177,187, 202);
 
 	-- Starting process
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (125, null, 4, concat('DATA QUALITY ANALYSIS ACORDING O&M RULES'));
@@ -295,13 +295,13 @@ BEGIN
 	END IF;
 
 	RAISE NOTICE '10 - Check nulls customer code for connecs (110)';
-	v_querytext = 'SELECT customer_code FROM '||v_edit||'connec WHERE state=1 and customer_code IS NULL';
+	v_querytext = 'SELECT connec_id FROM '||v_edit||'connec WHERE state=1 and customer_code IS NULL';
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,') a ') INTO v_count;
 
 	IF v_count > 0 THEN
 		EXECUTE concat ('INSERT INTO anl_connec (fid, connec_id, connecat_id, descript, the_geom)
-		SELECT 110, connec_id, connecat_id, ''Connecs with null customer code'', the_geom FROM connec WHERE customer_code IN (', v_querytext,')');
+		SELECT 110, connec_id, connecat_id, ''Connecs with null customer code'', the_geom FROM connec WHERE connec_id IN (', v_querytext,')');
 		INSERT INTO audit_check_data (fid, criticity, error_message)
 		VALUES (125, 2, concat('WARNING: There is/are ',v_count,' connec with customer code null. Please, check your data before continue'));
 	ELSE
@@ -779,10 +779,10 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
   	FROM (SELECT id, node_id as feature_id, nodecat_id as feature_catalog, state, expl_id, descript,fid, the_geom FROM anl_node WHERE cur_user="current_user"()
-	AND fid IN (104,77,187,196,187,202,203)
+	AND fid IN (177,187, 202)
 	UNION
 	SELECT id, connec_id, connecat_id, state, expl_id, descript,fid, the_geom FROM anl_connec WHERE cur_user="current_user"()
-	AND fid IN (201,202,204,205,206)) row) features;
+	AND fid IN (110,201,202,204,205,206)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 
@@ -802,7 +802,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
   	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, fid, the_geom
-  	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (4, 188, 202, 123)) row) features;
+  	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (104, 196, 197, 188, 123, 202)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
