@@ -393,7 +393,7 @@ BEGIN
 					
 		-- MAN INSERT
 		IF v_man_table='man_pipe' THEN 			
-				INSERT INTO man_pipe (arc_id, pvalue, pdescript, pobserv) VALUES (NEW.arc_id, NEW.pvalue, NEW.pdescript. NEW.pobserv);			
+				INSERT INTO man_pipe (arc_id) VALUES (NEW.arc_id);			
 			
 		ELSIF v_man_table='man_varc' THEN		
 				INSERT INTO man_varc (arc_id) VALUES (NEW.arc_id);

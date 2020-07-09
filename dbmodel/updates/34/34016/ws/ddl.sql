@@ -38,7 +38,7 @@ ALTER TABLE man_valve ADD COLUMN shutter text;
 ALTER TABLE man_valve ADD COLUMN brand text;
 ALTER TABLE man_valve ADD COLUMN brand2 text;
 ALTER TABLE man_valve ADD COLUMN model text;
-ALTER TABLE man_valve ADD COLUMN mode2 text;
+ALTER TABLE man_valve ADD COLUMN model2 text;
 
 ALTER TABLE man_meter ADD COLUMN brand text;
 ALTER TABLE man_meter ADD COLUMN model text;
