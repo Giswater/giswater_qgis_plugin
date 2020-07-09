@@ -369,10 +369,10 @@ class Utils(ParentAction):
 
         # self.toolbox.open_toolbox()
         body = self.create_body()
-        json = self.controller.get_json('gw_fct_admin_check_data', body, log_sql=True)
+        # json = self.controller.get_json('gw_fct_admin_check_data', body, log_sql=True)
         extras = '"parameters":{"selectionMode":"wholeSystem"}'
         body = self.create_body(extras=extras)
-        # json = self.controller.get_json('gw_fct_om_check_data', body, log_sql=True)
+        json = self.controller.get_json('gw_fct_om_check_data', body, log_sql=True)
     def utils_print_composer(self):
 
         self.api_composer = ApiManageComposer(self.iface, self.settings, self.controller, self.plugin_dir)

@@ -1342,7 +1342,6 @@ class ParentAction(object):
             styles = json_result['body']['returnManager']
         except KeyError:
             return
-
         srid = self.controller.plugin_settings_value('srid')
         try:
             if 'ruberband' in styles['style']:
@@ -1374,25 +1373,29 @@ class ParentAction(object):
 
                         # Get values for set layer style
                         style = json_result['body']['returnManager']['style']
-                        if 'field' not in style[key]: continue
-                        cat_field = str(style[key]['field'])
-                        size = style['width'] if 'width' in style and style['width'] else 2
-                        if 'transparency' in styles['style'][key]:
+                        if 'style' in styles and 'transparency' in styles['style'][key]:
                             opacity = styles['style'][key]['transparency']
                         if style[key]['style'] == 'categorized':
                             color_values = {}
                             for item in json_result['body']['returnManager']['style'][key]['values']:
                                 color_values[item['id']] = QColor(item['color'][0], item['color'][1], item['color'][2], opacity*255)
+                            cat_field = str(style[key]['field'])
+                            size = style['width'] if 'width' in style and style['width'] else 2
                             self.add_layer.categoryze_layer(v_layer, cat_field, size, color_values)
                         elif style[key]['style'] == 'random':
+                            size = style['width'] if 'width' in style and style['width'] else 2
                             if geometry_type == 'Point':
                                 v_layer.renderer().symbol().setSize(size)
                             else:
                                 v_layer.renderer().symbol().setWidth(size)
                             v_layer.renderer().symbol().setOpacity(opacity)
                         elif style[key]['style'] == 'qml':
-                            pass
-
+                            extras = f'"temp_layer":"{key}", '
+                            funct_id = style[key]['id']
+                            extras += f'"function_id":"{funct_id}"'
+                            body = self.create_body(extras=extras)
+                            return_styles = self.controller.get_json('gw_fct_getstyle', body, log_sql=True)
+                            self.create_qml(v_layer, return_styles['body']['data']['addToc']['style'])
                         self.iface.layerTreeView().refreshLayerSymbology(v_layer.id())
 
 
@@ -1448,11 +1451,12 @@ class ParentAction(object):
                                 self.add_layer.from_postgres_to_toc(tablename, teh_geom, field_id, None, group)
                             except KeyError as e:
                                 self.controller.log_info(f"{type(e).__name__} --> {e}")
+
                             if 'style' in layer_info:
                                 style = layer_info['style']
                                 layer = self.controller.get_layer_by_tablename(tablename)
                                 if layer:
-                                    self.load_qml(layer, style)
+                                    self.create_qml(layer, style)
 
 
             # Get a list of layers names force reload dataProvider of layer
@@ -1516,7 +1520,7 @@ class ParentAction(object):
             self.controller.manage_exception(None, f"{type(e).__name__}: {e}", sql)
 
 
-    def load_qml(self, layer, style):
+    def create_qml(self, layer, style):
         main_folder = os.path.join(os.path.expanduser("~"), self.controller.plugin_name)
         config_folder = main_folder + os.sep + "temp" + os.sep
         if not os.path.exists(config_folder):
@@ -1526,8 +1530,7 @@ class ParentAction(object):
         file.write(style)
         file.close()
         del file
-        layer.loadNamedStyle(path_temp_file)
-        layer.triggerRepaint()
+        self.load_qml(layer, path_temp_file)
 
     def manage_actions(self, json_result, sql):
         """
