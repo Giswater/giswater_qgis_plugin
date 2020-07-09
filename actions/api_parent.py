@@ -515,6 +515,8 @@ class ApiParent(ParentAction):
         widget.setObjectName(field['widgetname'])
         if 'columnname' in field:
             widget.setProperty('columnname', field['columnname'])
+        if 'placeholder' in field:
+            widget.setPlaceholderText(field['placeholder'])
         if 'value' in field:
             widget.setText(field['value'])
         if 'iseditable' in field:
