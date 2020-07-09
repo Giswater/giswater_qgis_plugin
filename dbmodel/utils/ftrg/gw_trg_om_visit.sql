@@ -94,7 +94,7 @@ BEGIN
 				SELECT * INTO v_visit FROM om_visit WHERE id=NEW.visit_id;
 
 				-- move status of lot element to status=0 (visited)
-				IF v_visit.status=4 AND v_visit.visit_type=1 THEN
+				IF v_visit.visit_type=1 THEN
 				--visit type=1 is planned visit. For unexpected visits planned element keeps planned
 
 					IF v_featuretype ='arc' THEN	
