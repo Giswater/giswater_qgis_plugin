@@ -871,7 +871,8 @@ class ApiParent(ParentAction):
         """
 
         if self.rubber_polygon is None:
-            self.init_rubber()
+            self.init_rubber_polygon()
+
 
         rb = self.rubber_polygon
         polygon = QgsGeometry.fromPolygonXY([points])

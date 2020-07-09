@@ -55,15 +55,21 @@ class ParentAction(object):
         self.rubber_polygon = None
 
 
-    def init_rubber(self):
+    def init_rubber_polygon(self):
 
+        try:
+            self.rubber_polygon = QgsRubberBand(self.canvas, 2)
+            self.rubber_polygon.setColor(Qt.darkRed)
+            self.rubber_polygon.setIconSize(20)
+        except:
+            pass
+
+
+    def init_rubber_point(self):
         try:
             self.rubber_point = QgsRubberBand(self.canvas, 0)
             self.rubber_point.setColor(Qt.yellow)
             self.rubber_point.setIconSize(10)
-            self.rubber_polygon = QgsRubberBand(self.canvas, 2)
-            self.rubber_polygon.setColor(Qt.darkRed)
-            self.rubber_polygon.setIconSize(20)
         except:
             pass
 
@@ -1214,13 +1220,12 @@ class ParentAction(object):
         """
 
         if self.rubber_point is None:
-            self.init_rubber()
+            self.init_rubber_point()
 
         if is_new:
             rb = QgsRubberBand(self.canvas, 0)
         else:
             rb = self.rubber_point
-
         rb.setColor(color)
         rb.setWidth(width)
         rb.addPoint(point)
@@ -1237,7 +1242,7 @@ class ParentAction(object):
          """
 
         if self.rubber_polygon is None:
-            self.init_rubber()
+            self.init_rubber_polygon()
 
         rb = self.rubber_polygon
         polyline = QgsGeometry.fromPolylineXY(points)
@@ -1254,12 +1259,14 @@ class ParentAction(object):
 
 
     def resetRubberbands(self):
+        print(f"resetRubberbands--> {self.rubber_point}")
+        if self.rubber_polygon is not None:
+            self.rubber_polygon.reset(2)
 
-        if self.rubber_polygon is None:
-            self.init_rubber()
+        if self.rubber_point is not None:
+            self.rubber_point.reset(0)
 
-        self.rubber_point.reset(0)
-        self.rubber_polygon.reset(2)
+
 
 
     def restore_user_layer(self):
