@@ -1396,6 +1396,17 @@ class ParentAction(object):
                             body = self.create_body(extras=extras)
                             return_styles = self.controller.get_json('gw_fct_getstyle', body, log_sql=True)
                             self.create_qml(v_layer, return_styles['body']['data']['addToc']['style'])
+                        if style[key]['style'] == 'unique':
+                            color = style[key]['style']['values']['color']
+                            size = style['width'] if 'width' in style and style['width'] else 2
+                            opacity = styles['style'][key]['transparency']
+                            color = QColor(color[0], color[1], color[2])
+                            if key == 'point':
+                                v_layer.renderer().symbol().setSize(size)
+                            elif key in ('line', 'polygon'):
+                                v_layer.renderer().symbol().setWidth(size)
+                            v_layer.renderer().symbol().setColor(color)
+                            v_layer.renderer().symbol().setOpacity(opacity)
                         self.iface.layerTreeView().refreshLayerSymbology(v_layer.id())
 
 
