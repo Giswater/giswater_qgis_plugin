@@ -1398,7 +1398,7 @@ class ParentDialog(QDialog):
             table_name = str(table_name[utils_giswater.get_item_data(self.dialog, self.cmb_visit_class, 0)])
         # Set model of selected widget
         if visitClass:
-            self.set_model_to_table(widget, table_name)
+            self.set_model_to_table(widget, table_name, self.filter)
             self.set_filter_dates('startdate', 'enddate', table_name, self.date_event_from, self.date_event_to, column_filter, value_filter)
 
         # Get new selected dates
