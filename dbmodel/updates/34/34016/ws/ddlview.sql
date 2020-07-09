@@ -436,3 +436,27 @@ CREATE OR REPLACE VIEW vp_basic_connec AS
 SELECT v_connec.connec_id AS nid,
 v_connec.connectype_id AS custom_type
 FROM v_connec;
+
+
+
+CREATE OR REPLACE VIEW ws_sample.v_edit_inp_connec AS 
+ SELECT connec.connec_id,
+    connec.elevation,
+    connec.depth,
+    connec.connecat_id,
+    connec.arc_id,
+    connec.sector_id,
+    connec.dma_id,
+    connec.state,
+    connec.state_type,
+    connec.annotation,
+    connec.expl_id,
+    connec.pjoint_type,
+    connec.pjoint_id,
+    inp_connec.demand,
+    inp_connec.pattern_id,
+    connec.the_geom
+   FROM ws_sample.selector_sector,
+    ws_sample.v_connec connec
+     JOIN ws_sample.inp_connec USING (connec_id)
+  WHERE connec.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
