@@ -35,11 +35,19 @@ BEGIN
 	IF NEW.startdate IS NULL THEN
 		NEW.startdate = left (date_trunc('second', now())::text, 19);
 	END IF;
+    
+    IF NEW.status IS NULL THEN
+		NEW.status=4;
+	END IF;
+
+	IF NEW.status=4 AND NEW.enddate IS NULL THEN
+		NEW.enddate=left (date_trunc('second', now())::text, 19);
+	END IF;
 	 
 
-        INSERT INTO om_visit(id, visitcat_id, ext_code, startdate, webclient_id, expl_id, the_geom, descript, is_done, class_id, lot_id, status) 
-        VALUES (NEW.visit_id, NEW.visitcat_id, NEW.ext_code, NEW.startdate::timestamp, NEW.webclient_id, NEW.expl_id, NEW.the_geom, NEW.descript, 
-        NEW.is_done, NEW.class_id, NEW.lot_id, NEW.status);
+    INSERT INTO om_visit(id, visitcat_id, ext_code, startdate, webclient_id, expl_id, the_geom, descript, is_done, class_id, lot_id, status) 
+    VALUES (NEW.visit_id, NEW.visitcat_id, NEW.ext_code, NEW.startdate::timestamp, NEW.webclient_id, NEW.expl_id, NEW.the_geom, NEW.descript, 
+    NEW.is_done, NEW.class_id, NEW.lot_id, NEW.status);
 
 
 	-- Get related parameters(events) from visit_class
