@@ -1358,6 +1358,7 @@ class ParentAction(object):
                     width = styles['style']['ruberband']['width']
                 self.draw(json_result, color=color, width=width)
             else:
+
                 for key, value in list(json_result['body']['data'].items()):
                     if key in ('point', 'line', 'polygon'):
                         if key not in json_result['body']['data']: continue
@@ -1389,6 +1390,9 @@ class ParentAction(object):
                             else:
                                 v_layer.renderer().symbol().setWidth(size)
                             v_layer.renderer().symbol().setOpacity(opacity)
+                        elif style[key]['style'] == 'qml':
+                            pass
+
                         self.iface.layerTreeView().refreshLayerSymbology(v_layer.id())
 
 
@@ -1421,43 +1425,35 @@ class ParentAction(object):
                         layers_to_add += f'"{layer_name}", '
 
                 layers_to_add = layers_to_add[:-2]
-                if layers_to_add is not None and funct_id is not None:
+
+                if layers_to_add not in (None, '') and funct_id not in (None, ''):
                     extras = f'"layers":[{layers_to_add}], '
                     extras += f'"function_id":"{funct_id}"'
                     body = self.create_body(extras=extras)
                     styles = self.controller.get_json('gw_fct_getstyle', body, log_sql=True)
+                    if 'layers' in styles['body']['data']['addToc']:
+                        for layer_info in styles['body']['data']['addToc']['layers']:
+                            if 'error' in layer_info:
+                                msg = layer_info['error']
+                                self.controller.show_warning(msg)
+                                continue
+                            try:
+                                tablename = layer_info['tableName']
+                                teh_geom = layer_info['geom']
+                                field_id = layer_info['primaryKey']
+                                if 'group' in layer_info and layer_info['group']:
+                                    group = layer_info['group']
+                                else:
+                                    group = None
+                                self.add_layer.from_postgres_to_toc(tablename, teh_geom, field_id, None, group)
+                            except KeyError as e:
+                                self.controller.log_info(f"{type(e).__name__} --> {e}")
+                            if 'style' in layer_info:
+                                style = layer_info['style']
+                                layer = self.controller.get_layer_by_tablename(tablename)
+                                if layer:
+                                    self.load_qml(layer, style)
 
-                    for layer_info in styles['body']['data']['addToc']['layers']:
-
-                        if 'error' in layer_info:
-                            msg = layer_info['error']
-                            self.controller.show_warning(msg)
-                            continue
-
-                        try:
-                            tablename = layer_info['tableName']
-                            teh_geom = layer_info['geom']
-                            field_id = layer_info['primaryKey']
-                            group = layer_info['group'] if 'group' in layer_info else None
-                            self.add_layer.from_postgres_to_toc(tablename, teh_geom, field_id, None, group)
-                        except KeyError as e:
-                            self.controller.log_info(f"{type(e).__name__} --> {e}")
-
-                        if 'style' in layer_info:
-                            style = layer_info['style']
-                            layer = self.controller.get_layer_by_tablename(tablename)
-                            if layer:
-                                main_folder = os.path.join(os.path.expanduser("~"), self.controller.plugin_name)
-                                config_folder = main_folder + os.sep + "temp" + os.sep
-                                if not os.path.exists(config_folder):
-                                    os.makedirs(config_folder)
-                                path_temp_file = config_folder + 'temp_qml.qml'
-                                file = open(path_temp_file, 'w')
-                                file.write(style)
-                                file.close()
-                                del file
-                                layer.loadNamedStyle(path_temp_file)
-                                layer.triggerRepaint()
 
             # Get a list of layers names force reload dataProvider of layer
             if 'index' in layermanager:
@@ -1519,6 +1515,19 @@ class ParentAction(object):
         except Exception as e:
             self.controller.manage_exception(None, f"{type(e).__name__}: {e}", sql)
 
+
+    def load_qml(self, layer, style):
+        main_folder = os.path.join(os.path.expanduser("~"), self.controller.plugin_name)
+        config_folder = main_folder + os.sep + "temp" + os.sep
+        if not os.path.exists(config_folder):
+            os.makedirs(config_folder)
+        path_temp_file = config_folder + 'temp_qml.qml'
+        file = open(path_temp_file, 'w')
+        file.write(style)
+        file.close()
+        del file
+        layer.loadNamedStyle(path_temp_file)
+        layer.triggerRepaint()
 
     def manage_actions(self, json_result, sql):
         """

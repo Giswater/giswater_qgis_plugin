@@ -20,10 +20,12 @@ class GwActions(ApiParent):
         ApiParent.__init__(self, iface, settings, controller, plugin_dir)
 
     def test1(self, **params):
+        return
         print("test1")
         print(f"test 1--> {params}")
 
     def test2(self, **params):
+        return
         print("test2")
         print(f"test 2--> {params}")
 

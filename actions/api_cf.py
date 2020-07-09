@@ -167,7 +167,6 @@ class ApiCF(ApiParent, QObject):
             self.iface.setActiveLayer(layer)
             complet_result, dialog = self.open_form(
                 table_name=layer_source['table'], feature_id=action.text(), tab_type=tab_type)
-            self.draw(complet_result[0])
 
 
     def open_form(self, point=None, table_name=None, feature_id=None, feature_cat=None, new_feature_id=None,
