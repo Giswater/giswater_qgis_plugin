@@ -1513,7 +1513,6 @@ class AddNewLot(ParentManage):
 
         # manage open and close the dialog
         self.dlg_lot_man.rejected.connect(partial(self.save_user_values, self.dlg_lot_man))
-        self.dlg_lot_man.btn_accept.clicked.connect(partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_lots))
         self.dlg_lot_man.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_lot_man))
 
         # Set signals

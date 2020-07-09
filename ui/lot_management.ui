@@ -294,16 +294,9 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="btn_accept">
-       <property name="text">
-        <string>Acceptar</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QPushButton" name="btn_cancel">
        <property name="text">
-        <string>Cancel·lar</string>
+        <string>Tancar</string>
        </property>
       </widget>
      </item>

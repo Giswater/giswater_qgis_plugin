@@ -1349,7 +1349,7 @@ class ParentDialog(QDialog):
 
         # Set signals
         widget.clicked.connect(partial(self.tbl_event_clicked, table_name))
-        self.cmb_visit_class.currentIndexChanged.connect(partial(self.set_filter_table_event, widget, table_name, set_date=True, column_filter=feature_key,value_filter=self.id))
+        self.cmb_visit_class.currentIndexChanged.connect(partial(self.set_filter_table_event, widget, table_name, visitClass=True, column_filter=feature_key, value_filter=self.id))
         self.date_event_to.dateChanged.connect(partial(self.set_filter_table_event, widget, table_name, column_filter=feature_key, value_filter=self.id))
         self.date_event_from.dateChanged.connect(partial(self.set_filter_table_event, widget, table_name, column_filter=feature_key, value_filter=self.id))
 
@@ -1384,7 +1384,7 @@ class ParentDialog(QDialog):
         self.set_filter_dates('startdate', 'enddate', table_name, self.date_event_from, self.date_event_to, column_filter=feature_key, value_filter=self.id, widget=widget)
 
 
-    def set_filter_table_event(self, widget, table_name, set_date=False, column_filter=None, value_filter=None):
+    def set_filter_table_event(self, widget, table_name, visitClass=False, column_filter=None, value_filter=None):
         """ Get values selected by the user and sets a new filter for its table model """
         # Get selected dates
         date_from = self.date_event_from.date().toString('yyyyMMdd 00:00:00')
@@ -1397,8 +1397,8 @@ class ParentDialog(QDialog):
         if type(table_name) is dict:
             table_name = str(table_name[utils_giswater.get_item_data(self.dialog, self.cmb_visit_class, 0)])
         # Set model of selected widget
-        self.set_model_to_table(widget, table_name)
-        if set_date is True:
+        if visitClass:
+            self.set_model_to_table(widget, table_name)
             self.set_filter_dates('startdate', 'enddate', table_name, self.date_event_from, self.date_event_to, column_filter, value_filter)
 
         # Get new selected dates
