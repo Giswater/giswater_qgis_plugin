@@ -437,7 +437,8 @@ class AddNewLot(ParentManage):
                     " WHERE id = '"+str(lot_id)+"'")
             ct = self.controller.get_row(_sql, commit=True)
             sql += " OR ext_workorder.serie = '"+str(ct[0])+"'"
-        sql += " order by ct"
+        sql += " order by ct desc"
+
         rows = self.controller.get_rows(sql, commit=True)
 
         self.list_to_show = ['']  # List to show
