@@ -36,3 +36,5 @@ UPDATE  config_form_fields set dv_querytext = 'SELECT expl_id as id, name as idv
 INSERT INTO sys_function(id, function_name, project_type, function_type, sys_role)
 VALUES (2972, 'gw_trg_ui_plan_psector','utils', 'trigger function', 'role_master')
 ON CONFLICT (id) DO NOTHING;
+
+DELETE FROM config_form_fields where formname = 'v_ui_hydrometer';
