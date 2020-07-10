@@ -636,6 +636,7 @@ class ApiCF(ApiParent, QObject):
                 self.accept, self.dlg_cf, self.complet_result[0], self.my_json))
             self.dlg_cf.dlg_closed.connect(self.roll_back)
             self.dlg_cf.dlg_closed.connect(partial(self.controller.parent.resetRubberbands))
+            self.dlg_cf.dlg_closed.connect(partial(self.resetRubberbands))
             self.dlg_cf.dlg_closed.connect(partial(self.save_settings, self.dlg_cf))
             self.dlg_cf.dlg_closed.connect(partial(self.set_vdefault_edition))
             self.dlg_cf.key_pressed.connect(partial(self.close_dialog, self.dlg_cf))
@@ -658,6 +659,7 @@ class ApiCF(ApiParent, QObject):
     def manage_docker_close(self):
 
         self.roll_back()
+        self.resetRubberbands()
         self.controller.parent.resetRubberbands()
         self.set_vdefault_edition()
 
