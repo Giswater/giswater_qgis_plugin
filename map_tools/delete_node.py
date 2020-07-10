@@ -90,7 +90,7 @@ class DeleteNodeMapTool(ParentMapTool):
         extras = f'"workcat_id_end":"{workcat_id_end}", "enddate":"{enddate_str}"'
         body = self.create_body(feature=feature_id, extras=extras)
         # Execute SQL function and show result to the user
-        result = self.controller.get_json('gw_fct_arc_fusion', body)
+        result = self.controller.get_json('gw_fct_arc_fusion', body, log_sql=True)
         if not result:
             return
 

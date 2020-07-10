@@ -1259,7 +1259,6 @@ class ParentAction(object):
 
 
     def resetRubberbands(self):
-        print(f"resetRubberbands--> {self.rubber_point}")
         if self.rubber_polygon is not None:
             self.rubber_polygon.reset(2)
 
@@ -1350,7 +1349,9 @@ class ParentAction(object):
         except KeyError:
             return
         srid = self.controller.plugin_settings_value('srid')
+        print(styles)
         try:
+            if 'style' not in styles: return
             if 'ruberband' in styles['style']:
                 # Set default values
                 opacity = 100
@@ -1427,6 +1428,7 @@ class ParentAction(object):
         :param json_result: Json result of a query (Json)
         :return: None
         """
+
         try:
             layermanager = json_result['body']['layerManager']
         except KeyError:
@@ -1436,6 +1438,16 @@ class ParentAction(object):
             funct_id = layermanager['functionId'] if 'functionId' in layermanager else None
 
             # Get a list of layers names and set visible
+            # For the visible layers, xxx names of layers are received, it is checked if they exist in the TOC,
+            # if so they become visible. If not, a string is generated with the name of the layers that are not in the
+            # TOC and through the function gw_fct_getstyle the table sys_table.addtoc is looked for the configuration of
+            # each one, the configuration of this layer It must be as in the following example:
+            # {"tableName":"v_edit_arc","primaryKey":"arc_id", "geom":"the_geom","group":"grouptest","style":"qml"}.
+            # The indispensable fields to load the layer are tableName, primaryKey and geom.
+            # The group and qml fields are optional, where group is to indicate in which TOC group we want our layer to
+            # enter and qml is to indicate that we want to add a qml to this layer. If you want to add a qml, it must be
+            # inserted in the table sys_style.stylevalue where idval is the id of the postgre function that is running
+            # and styletype if the layer is line, poin or polygon
             if 'visible' in layermanager:
                 layers_to_add = '  '
                 for layer_name in layermanager['visible']:
@@ -1475,7 +1487,6 @@ class ParentAction(object):
                                 layer = self.controller.get_layer_by_tablename(tablename)
                                 if layer:
                                     self.create_qml(layer, style)
-
 
             # Get a list of layers names force reload dataProvider of layer
             if 'index' in layermanager:
