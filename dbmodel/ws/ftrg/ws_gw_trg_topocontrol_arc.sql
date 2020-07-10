@@ -152,7 +152,7 @@ BEGIN
 		IF (nodeRecord1.node_id = nodeRecord2.node_id) AND (v_samenode_init_end_control IS TRUE) THEN
 			IF v_dsbl_error IS NOT TRUE THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"1040", "function":"1344","debug_msg":"'||nodeRecord1.node_id'"}}$$);';
+				"data":{"message":"1040", "function":"1344","debug_msg":"'||nodeRecord1.node_id||'"}}$$);';
 			ELSE
 				INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (3, NEW.arc_id, 'Node_1 and Node_2 are the same');
 			END IF;
