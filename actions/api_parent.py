@@ -5,8 +5,8 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsPointXY, QgsVectorLayer
-from qgis.core import QgsExpression, QgsFeatureRequest, QgsGeometry
+from qgis.core import QgsPointXY, QgsVectorLayer, QgsGeometry
+from qgis.core import QgsExpression, QgsFeatureRequest, QgsExpressionContextUtils, QgsGeometry, QgsProject
 from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand, QgsDateTimeEdit
 from qgis.PyQt.QtCore import Qt, QSettings, QTimer, QDate, QStringListModel
 from qgis.PyQt.QtGui import QColor, QStandardItemModel, QStandardItem
@@ -1626,14 +1626,14 @@ class ApiParent(ParentAction):
 
             # Set current_tab
             index = dialog.main_tab.currentIndex()
-            current_tab = dialog.main_tab.widget(index).objectName()
+            self.current_tab = dialog.main_tab.widget(index).objectName()
 
-        # Profilactic control of nones
+        #profilactic control of nones
         if text_filter is None:
             text_filter = ''
 
         # built querytext
-        form = f'"currentTab":"{current_tab}"'
+        form = f'"currentTab":"{self.current_tab}"'
         extras = f'"selectorType":{selector_type}, "filterText":"{text_filter}"'
         body = self.create_body(form=form, extras=extras)
         json_result = self.controller.get_json('gw_fct_getselectors', body, log_sql=True)
@@ -1641,8 +1641,7 @@ class ApiParent(ParentAction):
             return False
 
         for form_tab in json_result['body']['form']['formTabs']:
-
-            if filter and form_tab['tabName'] != str(current_tab):
+            if filter and form_tab['tabName'] != str(self.current_tab):
                 continue
 
             selection_mode = form_tab['selectionMode']
@@ -1726,12 +1725,12 @@ class ApiParent(ParentAction):
         :param widget: QCheckBox that has changed status (QCheckBox)
         :param selection_mode: "keepPrevious", "keepPreviousUsingShift", "removePrevious" (String)
         """
+                             
         # Get QCheckBox check all
         index = dialog.main_tab.currentIndex()
         widget_list = dialog.main_tab.widget(index).findChildren(QCheckBox)
         selector_type = dialog.main_tab.widget(index).property('selector_type')
         widget_all = dialog.findChild(QCheckBox, f'chk_all_{selector_type}')
-        is_alone = False
         key_modifier = QApplication.keyboardModifiers()
         if selection_mode == 'removePrevious':
             is_alone = True
@@ -1772,16 +1771,13 @@ class ApiParent(ParentAction):
                 utils_giswater.setChecked(dialog, checkbox, False)
                 checkbox.blockSignals(False)
 
-
-    def set_selector(self, dialog, widget, is_alone):
+                    
+    def set_selector(self, widget):
         """  Send values to DB and reload selectors
         :param dialog: QDialog
         :param widget: QCheckBox that contains the information to generate the json (QCheckBox)
         :param is_alone: Defines if the selector is unique (True) or multiple (False) (Boolean)
         """
-        # Get current tab name
-        index = dialog.main_tab.currentIndex()
-        tab_name = dialog.main_tab.widget(index).objectName()
 
         qgis_project_add_schema = self.controller.plugin_settings_value('gwAddSchema')
         extras = (f'"selectorType":"{widget.property("selector_type")}", "tabName":"{tab_name}", '

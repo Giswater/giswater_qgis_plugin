@@ -271,7 +271,7 @@ class DaoController(object):
         # Get sslmode from user config file
         self.manage_user_config_file()
         sslmode = self.get_user_setting_value('sslmode', 'disable')
-        self.log_info(f"sslmode user config file: {sslmode}")
+        # self.log_info(f"sslmode user config file: {sslmode}")
 
         credentials = None
         not_version = True
@@ -347,7 +347,7 @@ class DaoController(object):
     def connect_to_database(self, host, port, db, user, pwd, sslmode):
         """ Connect to database with selected parameters """
 
-        self.log_info(f"connect_to_database - sslmode: {sslmode}")
+        # self.log_info(f"connect_to_database - sslmode: {sslmode}")
 
         # Check if selected parameters is correct
         if None in (host, port, db, user, pwd):

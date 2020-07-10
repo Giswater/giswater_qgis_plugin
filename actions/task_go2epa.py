@@ -112,13 +112,9 @@ class TaskGo2Epa(QgsTask):
 
     def cancel(self):
 
-        self.controller.log_info(f"Task {self.description()} was cancelled")
-        super().cancel()
-
-
-    def isCanceled(self):
-
+        self.controller.log_info(f"Task canceled: {self.description()}")
         self.close_file()
+        super().cancel()
 
 
     def progress_changed(self, progress):
@@ -138,6 +134,7 @@ class TaskGo2Epa(QgsTask):
 
     def exec_function_pg2epa(self):
 
+        self.complet_result = None
         self.setProgress(0)
         extras = f', "resultId":"{self.result_name}"'
         extras += f', "useNetworkGeom":"{self.net_geom}"'
@@ -337,7 +334,6 @@ class TaskGo2Epa(QgsTask):
 
         # Manage JSON
         json_rpt = '[' + str(json_rpt[:-2]) + ']'
-        #self.controller.log_info(json_rpt)
         self.json_rpt = json_rpt
 
         self.close_file()
