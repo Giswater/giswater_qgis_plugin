@@ -136,7 +136,7 @@ class TaskGo2Epa(QgsTask):
 
         self.complet_result = None
         self.setProgress(0)
-        extras = f', "resultId":"{self.result_name}"'
+        extras = f'"resultId":"{self.result_name}"'
         extras += f', "useNetworkGeom":"{self.net_geom}"'
         extras += f', "dumpSubcatch":"{self.export_subcatch}"'
         body = self.create_body(extras=extras)
