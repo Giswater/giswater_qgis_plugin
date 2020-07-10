@@ -5,14 +5,14 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsPointXY, QgsVectorLayer
+from qgis.core import QgsPointXY, QgsVectorLayer, QgsGeometry
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsExpressionContextUtils, QgsGeometry, QgsProject
 from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand, QgsDateTimeEdit
 from qgis.PyQt.QtCore import Qt, QSettings, QTimer, QDate, QStringListModel
 from qgis.PyQt.QtGui import QColor, QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QLineEdit, QSizePolicy, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel, QCheckBox
 from qgis.PyQt.QtWidgets import QCompleter, QToolButton, QFrame, QSpinBox, QDoubleSpinBox, QDateEdit, QAction
-from qgis.PyQt.QtWidgets import QTableView, QTabWidget, QPushButton, QTextEdit
+from qgis.PyQt.QtWidgets import QTableView, QTabWidget, QPushButton, QTextEdit, QApplication
 from qgis.PyQt.QtSql import QSqlTableModel
 
 import os
@@ -20,7 +20,6 @@ import re
 import subprocess
 import sys
 import webbrowser
-import json
 from functools import partial
 
 from .. import utils_giswater
@@ -44,7 +43,7 @@ class ApiParent(ParentAction):
 
     def get_visible_layers(self, as_list=False):
         """ Return string as {...} or [...] with name of table in DB of all visible layer in TOC """
-        
+
         visible_layer = '{'
         if as_list is True:
             visible_layer = '['
@@ -69,7 +68,7 @@ class ApiParent(ParentAction):
 
     def get_editable_layers(self):
         """ Return string as {...}  with name of table in DB of all editable layer in TOC """
-        
+
         editable_layer = '{'
         layers = self.controller.get_layers()
         for layer in layers:
@@ -137,7 +136,7 @@ class ApiParent(ParentAction):
         except Exception:
             pass
 
-            
+
     def check_expression(self, expr_filter, log_info=False):
         """ Check if expression filter @expr is valid """
 
@@ -216,14 +215,14 @@ class ApiParent(ParentAction):
         project_type = self.controller.get_project_type()
         # Get PDF file
         pdf_folder = os.path.join(self.plugin_dir, 'png')
-        pdf_path = os.path.join(pdf_folder, f"{project_type}_{geom_type}_{locale}.pdf")
+        pdf_path = os.path.join(pdf_folder, f"{project_type}_{geom_type}_{locale}.png")
 
         # Open PDF if exists. If not open Spanish version
         if os.path.exists(pdf_path):
             os.system(pdf_path)
         else:
             locale = "es"
-            pdf_path = os.path.join(pdf_folder, f"{project_type}_{geom_type}_{locale}.pdf")
+            pdf_path = os.path.join(pdf_folder, f"{project_type}_{geom_type}_{locale}.png")
             if os.path.exists(pdf_path):
                 os.system(pdf_path)
             else:
@@ -331,7 +330,7 @@ class ApiParent(ParentAction):
         self.vertex_marker.setIconSize(15)
         self.vertex_marker.setPenWidth(3)
 
-        
+
     def api_action_copy_paste_mouse_move(self, point):
         """ Slot function when mouse is moved in the canvas.
             Add marker if any feature is snapped
@@ -394,7 +393,7 @@ class ApiParent(ParentAction):
         feature = feature_list[0]
         feature_id = feature.attribute(str(self.geom_type) + '_id')
         msg = (f"Selected snapped feature_id to copy values from: {snapped_feature_attr[0]}\n"
-                   f"Do you want to copy its values to the current node?\n\n")
+               f"Do you want to copy its values to the current node?\n\n")
         # Replace id because we don't have to copy it!
         snapped_feature_attr[0] = feature_id
         snapped_feature_attr_aux = []
@@ -436,7 +435,7 @@ class ApiParent(ParentAction):
 
         self.api_disable_copy_paste(dialog)
 
-        
+
     def api_disable_copy_paste(self, dialog):
         """ Disable actionCopyPaste and set action 'Identify' """
 
@@ -451,80 +450,6 @@ class ApiParent(ParentAction):
             self.emit_point.canvasClicked.disconnect()
         except:
             pass
-
-            
-    def set_table_columns(self, dialog, widget, table_name, schema_name=None):
-        """ Configuration of tables. Set visibility and width of columns """
-
-        widget = utils_giswater.getWidget(dialog, widget)
-        if not widget:
-            return
-
-        if schema_name is not None:
-            self.schema_name = schema_name
-            self.controller.set_search_path(self.schema_name)
-
-        # Set width and alias of visible columns
-        columns_to_delete = []
-        sql = (f"SELECT columnindex, width, alias, status"
-               f" FROM config_form_tableview"
-               f" WHERE tablename = '{table_name}'"
-               f" ORDER BY columnindex")
-        rows = self.controller.get_rows(sql, log_info=False)
-        if not rows:
-            return
-
-        for row in rows:
-            if not row['status']:
-                columns_to_delete.append(row['columnindex'] - 1)
-            else:
-                width = row['width']
-                if width is None:
-                    width = 100
-                widget.setColumnWidth(row['columnindex'] - 1, width)
-                widget.model().setHeaderData(row['columnindex'] - 1, Qt.Horizontal, row['alias'])
-
-        # Set order
-        # widget.model().setSort(0, Qt.AscendingOrder)
-        widget.model().select()
-
-        # Delete columns
-        for column in columns_to_delete:
-            widget.hideColumn(column)
-
-
-    def set_table_columns_for_query(self, dialog, widget, table_name):
-    
-        widget = utils_giswater.getWidget(dialog, widget)
-        if not widget:
-            return
-
-        # Set width and alias of visible columns
-        columns_to_show = ""
-        sql = (f"SELECT columnindex, width, columnname, alias, status"
-               f" FROM config_form_tableview"
-               f" WHERE tablename = '{table_name}'"
-               f" ORDER BY columnindex")
-        rows = self.controller.get_rows(sql, log_sql=False)
-        if not rows:
-            return
-        for row in rows:
-            if row['status']:
-                if row['columnname'] is not None:
-                    columns_to_show += str(row['columnname'])
-                    if row['alias'] is not None:
-                        columns_to_show += " AS " + str(row['alias'])
-                    columns_to_show += ", "
-                    width = row['width']
-                    if width is None:
-                        width = 100
-                    widget.setColumnWidth(row['columnindex'] - 1, width)
-
-        if len(columns_to_show) > 1:
-            columns_to_show = columns_to_show[:-2]
-        else:
-            columns_to_show = "*"
-        return columns_to_show
 
 
     def set_widget_size(self, widget, field):
@@ -560,7 +485,7 @@ class ApiParent(ParentAction):
                 message = "Parameter button_function is null for button"
                 self.controller.show_message(message, 2, parameter=widget.objectName())
 
-        kwargs = {'dialog': dialog, 'widget': widget, 'message_level':1, 'function_name':function_name}
+        kwargs = {'dialog': dialog, 'widget': widget, 'message_level': 1, 'function_name': function_name}
         widget.clicked.connect(partial(getattr(self, function_name), **kwargs))
 
         return widget
@@ -585,7 +510,7 @@ class ApiParent(ParentAction):
 
     def add_lineedit(self, field):
         """ Add widgets QLineEdit type """
-        
+
         widget = QLineEdit()
         widget.setObjectName(field['widgetname'])
         if 'columnname' in field:
@@ -636,7 +561,8 @@ class ApiParent(ParentAction):
         extras += f', "textToSearch":"{utils_giswater.getWidgetText(dialog, widget)}"'
         body = self.create_body(extras=extras)
         complet_list = self.controller.get_json('gw_fct_gettypeahead', body)
-        if not complet_list: return False
+        if not complet_list:
+            return False
 
         list_items = []
         for field in complet_list['body']['data']:
@@ -757,7 +683,7 @@ class ApiParent(ParentAction):
 
 
     def add_combobox(self, field):
-    
+
         widget = QComboBox()
         widget.setObjectName(field['widgetname'])
         if 'columnname' in field:
@@ -786,7 +712,8 @@ class ApiParent(ParentAction):
         extras = f'"comboParent":"{combo_parent}", "comboId":"{combo_id}"'
         body = self.create_body(feature=feature, extras=extras)
         result = self.controller.get_json('gw_fct_getchilds', body)
-        if not result: return False
+        if not result:
+            return False
 
         for combo_child in result['body']['data']:
             if combo_child is not None:
@@ -820,7 +747,7 @@ class ApiParent(ParentAction):
         if child:
             self.populate_combo(child, combo_child)
 
-        
+
     def populate_combo(self, widget, field):
         # Generate list of items to add into combo
 
@@ -830,7 +757,7 @@ class ApiParent(ParentAction):
         combolist = []
         if 'comboIds' in field:
             if 'isNullValue' in field and field['isNullValue']:
-                combolist.append(['',''])
+                combolist.append(['', ''])
             for i in range(0, len(field['comboIds'])):
                 elem = [field['comboIds'][i], field['comboNames'][i]]
                 combolist.append(elem)
@@ -843,7 +770,7 @@ class ApiParent(ParentAction):
 
 
     def add_frame(self, field, x=None):
-    
+
         widget = QFrame()
         widget.setObjectName(f"{field['widgetname']}_{x}")
         if 'columnname' in field:
@@ -856,7 +783,7 @@ class ApiParent(ParentAction):
 
     def add_label(self, field):
         """ Add widgets QLineEdit type """
-        
+
         widget = QLabel()
         widget.setTextInteractionFlags(Qt.TextSelectableByMouse)
         widget.setObjectName(field['widgetname'])
@@ -872,9 +799,9 @@ class ApiParent(ParentAction):
         """ Set calendar empty when click inner button of QgsDateTimeEdit because aesthetically it looks better"""
         widget.setEmpty()
 
-        
+
     def add_hyperlink(self, field):
-    
+
         widget = HyperLinkLabel()
         widget.setObjectName(field['widgetname'])
         if 'columnname' in field:
@@ -905,13 +832,13 @@ class ApiParent(ParentAction):
 
         return widget
 
-        
+
     def add_horizontal_spacer(self):
 
         widget = QSpacerItem(10, 10, QSizePolicy.Expanding, QSizePolicy.Minimum)
         return widget
 
-        
+
     def add_verical_spacer(self):
 
         widget = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
@@ -938,57 +865,14 @@ class ApiParent(ParentAction):
         return widget
 
 
-    def draw(self, complet_result, zoom=True, reset_rb=True):
-
-        if complet_result[0]['body']['feature']['geometry'] is None:
-            return
-        if complet_result[0]['body']['feature']['geometry']['st_astext'] is None:
-            return
-        list_coord = re.search('\((.*)\)', str(complet_result[0]['body']['feature']['geometry']['st_astext']))
-        max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
-
-        if reset_rb: self.resetRubberbands()
-        if str(max_x) == str(min_x) and str(max_y) == str(min_y):
-            point = QgsPointXY(float(max_x), float(max_y))
-            self.draw_point(point)
-        else:
-            points = self.get_points(list_coord)
-            self.draw_polyline(points)
-        if zoom:
-            margin = float(complet_result[0]['body']['feature']['zoomCanvasMargin']['mts'])
-            self.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin)
-
-            
-    def draw_point(self, point, color=QColor(255, 0, 0, 100), width=3, duration_time=None, is_new=False):
-        """
-        :param duration_time: integer milliseconds ex: 3000 for 3 seconds
-        """
-
-        if self.rubber_point is None:
-            self.init_rubber()
-
-        if is_new:
-            rb = QgsRubberBand(self.canvas, 0)
-        else:
-            rb = self.rubber_point
-
-        rb.setColor(color)
-        rb.setWidth(width)
-        rb.addPoint(point)
-
-        # wait to simulate a flashing effect
-        if duration_time is not None:
-            QTimer.singleShot(duration_time, self.resetRubberbands)
-        return rb
-
-
     def draw_polygon(self, points, border=QColor(255, 0, 0, 100), width=3, duration_time=None, fill_color=None):
         """ Draw 'polygon' over canvas following list of points
         :param duration_time: integer milliseconds ex: 3000 for 3 seconds
         """
 
         if self.rubber_polygon is None:
-            self.init_rubber()
+            self.init_rubber_polygon()
+
 
         rb = self.rubber_polygon
         polygon = QgsGeometry.fromPolygonXY([points])
@@ -1005,7 +889,7 @@ class ApiParent(ParentAction):
 
         return rb
 
-           
+
     def fill_table(self, widget, table_name, filter_=None):
         """ Set a model with selected filter.
         Attach that model to selected table """
@@ -1029,7 +913,7 @@ class ApiParent(ParentAction):
         # Attach model to table view
         widget.setModel(model)
 
-        
+
     def populate_basic_info(self, dialog, result, field_id):
 
         fields = result[0]['body']['data']
@@ -1069,33 +953,33 @@ class ApiParent(ParentAction):
                 widget = QComboBox()
                 self.populate_combo(widget, field)
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-            elif field['widgettype'] in ('check','checkbox'):
+            elif field['widgettype'] in ('check', 'checkbox'):
                 widget = self.add_checkbox(field)
                 widget.stateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
             elif field['widgettype'] == 'button':
                 widget = self.add_button(dialog, field)
 
-            grid_layout.addWidget(label,x, 0)
+            grid_layout.addWidget(label, x, 0)
             grid_layout.addWidget(widget, x, 1)
 
         verticalSpacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         grid_layout.addItem(verticalSpacer1)
-        
+
         return result
 
 
     def clear_gridlayout(self, layout):
         """  Remove all widgets of layout """
-        
+
         while layout.count() > 0:
             child = layout.takeAt(0).widget()
             if child:
                 child.setParent(None)
                 child.deleteLater()
-                
+
 
     def add_calendar(self, dialog, field):
-    
+
         widget = QgsDateTimeEdit()
         widget.setObjectName(field['widgetname'])
         if 'columnname' in field:
@@ -1113,7 +997,8 @@ class ApiParent(ParentAction):
         if field['isautoupdate']:
             _json = {}
             btn_calendar.clicked.connect(partial(self.get_values, dialog, widget, _json))
-            btn_calendar.clicked.connect(partial(self.accept, dialog, self.complet_result[0], self.feature_id, _json, True, False))
+            btn_calendar.clicked.connect(
+                partial(self.accept, dialog, self.complet_result[0], self.feature_id, _json, True, False))
         else:
             btn_calendar.clicked.connect(partial(self.get_values, dialog, widget, self.my_json))
         btn_calendar.clicked.connect(partial(self.set_calendar_empty, widget))
@@ -1137,7 +1022,7 @@ class ApiParent(ParentAction):
 
         utils_giswater.setWidgetText(self.dlg_dtext, self.dlg_dtext.txt_infolog, 'Interpolate tool')
         self.dlg_dtext.lbl_text.setText("Please, use the cursor to select two nodes to proceed with the "
-                                         "interpolation\nNode1: \nNode2:")
+                                        "interpolation\nNode1: \nNode2:")
 
         self.dlg_dtext.btn_accept.clicked.connect(partial(self.chek_for_existing_values))
         self.dlg_dtext.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_dtext))
@@ -1159,7 +1044,7 @@ class ApiParent(ParentAction):
 
         self.canvas.setMapTool(ep)
         # We redraw the selected feature because self.canvas.setMapTool(emit_point) erases it
-        self.draw(complet_result, False, False)
+        self.draw(complet_result[0], False, False)
 
         # Store user snapping configuration
         self.snapper_manager = SnappingConfigManager(self.iface)
@@ -1204,7 +1089,8 @@ class ApiParent(ParentAction):
 
         # Get coordinates
         event_point = self.snapper_manager.get_event_point(point=point)
-        if not event_point: return
+        if not event_point:
+            return
         # Snapping
         result = self.snapper_manager.snap_to_current_layer(event_point)
         if self.snapper_manager.result_is_valid():
@@ -1215,14 +1101,16 @@ class ApiParent(ParentAction):
                 element_id = snapped_feat.attribute('node_id')
                 message = "Selected node"
                 if self.node1 is None:
-                    self.node1 = str(element_id)                    
-                    rb = self.draw_point(QgsPointXY(result.point()),color=QColor(0, 150, 55, 100), width=10, is_new=True)
+                    self.node1 = str(element_id)
+                    rb = self.draw_point(QgsPointXY(result.point()), color=QColor(
+                        0, 150, 55, 100), width=10, is_new=True)
                     self.rb_interpolate.append(rb)
                     self.dlg_dtext.lbl_text.setText(f"Node1: {self.node1}\nNode2:")
                     self.controller.show_message(message, message_level=0, parameter=self.node1)
                 elif self.node1 != str(element_id):
                     self.node2 = str(element_id)
-                    rb = self.draw_point(QgsPointXY(result.point()),color=QColor(0, 150, 55, 100), width=10, is_new=True)
+                    rb = self.draw_point(QgsPointXY(result.point()), color=QColor(
+                        0, 150, 55, 100), width=10, is_new=True)
                     self.rb_interpolate.append(rb)
                     self.dlg_dtext.lbl_text.setText(f"Node1: {self.node1}\nNode2: {self.node2}")
                     self.controller.show_message(message, message_level=0, parameter=self.node2)
@@ -1328,13 +1216,13 @@ class ApiParent(ParentAction):
                         if 'regexpControl' in field['widgetcontrols']:
                             if field['widgetcontrols']['regexpControl'] is not None:
                                 pass
-                                #reg_exp = QRegExp(str(field['widgetcontrols']['regexpControl']))
-                                #widget.setValidator(QRegExpValidator(reg_exp))
-                    widget.editingFinished.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
+                    widget.editingFinished.connect(
+                        partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'combo':
                     widget = self.add_combobox(field)
-                    widget.currentIndexChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
+                    widget.currentIndexChanged.connect(
+                        partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'check':
                     widget = QCheckBox()
@@ -1342,7 +1230,8 @@ class ApiParent(ParentAction):
                         widget.setChecked(True)
                     else:
                         widget.setChecked(False)
-                    widget.stateChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
+                    widget.stateChanged.connect(partial(self.get_values_changed_param_user,
+                                                dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'datetime':
                     widget = QgsDateTimeEdit()
@@ -1353,14 +1242,16 @@ class ApiParent(ParentAction):
                     if 'value' in field and field['value'] not in ('', None, 'null'):
                         date = QDate.fromString(field['value'].replace('/', '-'), 'yyyy-MM-dd')
                     widget.setDate(date)
-                    widget.dateChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
+                    widget.dateChanged.connect(partial(self.get_values_changed_param_user,
+                                               dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'spinbox':
                     widget = QDoubleSpinBox()
                     if 'value' in field and field['value'] not in(None, ""):
                         value = float(str(field['value']))
                         widget.setValue(value)
-                    widget.valueChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
+                    widget.valueChanged.connect(partial(self.get_values_changed_param_user,
+                                                dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'button':
                     widget = self.add_button(dialog, field)
@@ -1384,7 +1275,7 @@ class ApiParent(ParentAction):
                 self.put_widgets(dialog, field, lbl, widget)
 
 
-    def put_widgets(self, dialog, field,  lbl, widget):
+    def put_widgets(self, dialog, field, lbl, widget):
         """ Insert widget into layout """
 
         layout = dialog.findChild(QGridLayout, field['layoutname'])
@@ -1578,8 +1469,9 @@ class ApiParent(ParentAction):
         """ Function called in def add_button(self, dialog, field): -->
                 widget.clicked.connect(partial(getattr(self, function_name), dialog, widget)) """
 
-        path, filter_ = self.open_file_path(filter_ = "DXF Files (*.dxf)")
-        if not path: return
+        path, filter_ = self.open_file_path(filter_="DXF Files (*.dxf)")
+        if not path:
+            return
 
         dialog = kwargs['dialog']
         widget = kwargs['widget']
@@ -1593,7 +1485,7 @@ class ApiParent(ParentAction):
             widget.setText(complet_result['path'])
         if complet_result['result']:
             data = complet_result['result']['body']['data']
-            result =  self.add_layer.add_temp_layer(dialog, data, function_name, True, False, 1, True)
+            result = self.add_layer.add_temp_layer(dialog, data, function_name, True, False, 1, True)
             for layer in result['temp_layers_added']:
                 self.temp_layers_added.append(layer)
         dialog.btn_run.setEnabled(True)
@@ -1638,7 +1530,7 @@ class ApiParent(ParentAction):
             field_names = [field.name() for field in dxf_layer.fields()]
 
             sql = ""
-            geom_types = {0:'geom_point', 1:'geom_line', 2:'geom_polygon'}
+            geom_types = {0: 'geom_point', 1: 'geom_line', 2: 'geom_polygon'}
             for count, feature in enumerate(dxf_layer.getFeatures()):
                 geom_type = feature.geometry().type()
                 sql += (f"INSERT INTO temp_table (fid, text_column, {geom_types[int(geom_type)]})"
@@ -1683,9 +1575,10 @@ class ApiParent(ParentAction):
         extras = extras[:-2]
         body = self.create_body(extras)
         result = self.controller.get_json('gw_fct_check_importdxf', None, log_sql=True)
-        if not result: return False
+        if not result:
+            return False
 
-        return {"path": dxf_path, "result":result, "temp_layers_added":temp_layers_added}
+        return {"path": dxf_path, "result": result, "temp_layers_added": temp_layers_added}
 
 
     def manage_all(self, dialog, widget):
@@ -1695,24 +1588,28 @@ class ApiParent(ParentAction):
         widget_list = dialog.main_tab.widget(index).findChildren(QCheckBox)
         selector_type = dialog.main_tab.widget(index).property('selector_type')
         widget_all = dialog.findChild(QCheckBox, f'chk_all_{selector_type}')
-        if key_modifier == Qt.ShiftModifier: return
+
+        if key_modifier == Qt.ShiftModifier:
+            return
         if status is True:
             for widget in widget_list:
-                if widget == widget_all or widget.objectName() == widget_all.objectName(): continue
+                if widget == widget_all or widget.objectName() == widget_all.objectName():
+                    continue
                 widget.blockSignals(True)
                 utils_giswater.setChecked(dialog, widget, True)
-                self.set_selector(widget)
+                self.set_selector(dialog, widget, False)
                 widget.blockSignals(False)
         elif status is False:
             for widget in widget_list:
-                if widget == widget_all or widget.objectName() == widget_all.objectName(): continue
+                if widget == widget_all or widget.objectName() == widget_all.objectName():
+                    continue
                 widget.blockSignals(True)
                 utils_giswater.setChecked(dialog, widget, False)
-                self.set_selector(widget)
+                self.set_selector(dialog, widget, False)
                 widget.blockSignals(False)
 
 
-    def get_selector(self, dialog, selector_type, filter=False, widget=None, type=None, text_filter=None, current_tab=None):
+    def get_selector(self, dialog, selector_type, filter=False, widget=None, text_filter=None, current_tab=None):
         """ Ask to DB for selectors and make dialog
         :param dialog: Is a standard dialog, from file api_selectors.ui, where put widgets
         :param selector_type: list of selectors to ask DB ['exploitation', 'state', ...]
@@ -1733,7 +1630,7 @@ class ApiParent(ParentAction):
 
         #profilactic control of nones
         if text_filter is None:
-                text_filter=''
+            text_filter = ''
 
         # built querytext
         form = f'"currentTab":"{self.current_tab}"'
@@ -1744,7 +1641,6 @@ class ApiParent(ParentAction):
             return False
 
         for form_tab in json_result['body']['form']['formTabs']:
-
             if filter and form_tab['tabName'] != str(self.current_tab):
                 continue
 
@@ -1777,7 +1673,7 @@ class ApiParent(ParentAction):
                     utils_giswater.setWidgetText(dialog, widget, text_filter)
 
                 widget.textChanged.connect(partial(self.get_selector, self.dlg_selector, selector_type, filter=True,
-                                                   widget=widget, type=form_tab['selectorType']))
+                                                   widget=widget, current_tab=current_tab))
                 widget.setLayoutDirection(Qt.RightToLeft)
                 field['layoutname'] = gridlayout.objectName()
                 field['layoutorder'] = i
@@ -1836,20 +1732,20 @@ class ApiParent(ParentAction):
         selector_type = dialog.main_tab.widget(index).property('selector_type')
         widget_all = dialog.findChild(QCheckBox, f'chk_all_{selector_type}')
         key_modifier = QApplication.keyboardModifiers()
-
         if selection_mode == 'removePrevious':
+            is_alone = True
             if utils_giswater.isChecked(dialog, widget_all):
                 utils_giswater.setChecked(dialog, widget_all, False)
             else:
                 self.remove_previuos(dialog, widget, widget_all, widget_list)
-                
         elif selection_mode == 'keepPreviousUsingShift' and key_modifier != Qt.ShiftModifier:
-            if utils_giswater.isChecked(dialog, widget_all):
-                utils_giswater.setChecked(dialog, widget_all, False)
-            else:
-                self.remove_previuos(dialog, widget, widget_all, widget_list)
+                is_alone = True
+                if utils_giswater.isChecked(dialog, widget_all):
+                    utils_giswater.setChecked(dialog, widget_all, False)
+                else:
+                    self.remove_previuos(dialog, widget, widget_all, widget_list)
 
-        self.set_selector(widget)
+        self.set_selector(dialog, widget, is_alone)
 
 
     def remove_previuos(self, dialog, widget, widget_all, widget_list):
@@ -1857,37 +1753,68 @@ class ApiParent(ParentAction):
         :param dialog: QDialog
         :param widget: QCheckBox that has changed status (QCheckBox)
         :param widget_all: QCheckBox that handles global selection (QCheckBox)
-        :param widget_list: List of all QCheckBox in the current tab ([QCheckBox,QCheckBox,...])
+        :param widget_list: List of all QCheckBox in the current tab ([QCheckBox, QCheckBox, ...])
         """
-                             
+
         for checkbox in widget_list:
-            if checkbox == widget_all or checkbox.objectName() == widget_all.objectName(): continue
+            # Some selectors.ui dont have widget_all
+            if widget_all is not None:
+                if checkbox == widget_all or checkbox.objectName() == widget_all.objectName():
+                    continue
+                elif checkbox.objectName() != widget.objectName():
+                    checkbox.blockSignals(True)
+                    utils_giswater.setChecked(dialog, checkbox, False)
+                    checkbox.blockSignals(False)
+
             elif checkbox.objectName() != widget.objectName():
                 checkbox.blockSignals(True)
                 utils_giswater.setChecked(dialog, checkbox, False)
-                self.set_selector(checkbox)
                 checkbox.blockSignals(False)
 
-                             
+                    
     def set_selector(self, widget):
         """  Send values to DB and reload selectors
+        :param dialog: QDialog
         :param widget: QCheckBox that contains the information to generate the json (QCheckBox)
+        :param is_alone: Defines if the selector is unique (True) or multiple (False) (Boolean)
         """
-                             
+
         qgis_project_add_schema = self.controller.plugin_settings_value('gwAddSchema')
-        extras = f'"selectorType":"{widget.property("selector_type")}", "tabName":"{self.current_tab}", ' \
-                 f'"id":"{widget.objectName()}", '
-        extras += f'"value":"{widget.isChecked()}", "addSchema":"{qgis_project_add_schema}"'
+        extras = (f'"selectorType":"{widget.property("selector_type")}", "tabName":"{tab_name}", '
+                  f'"id":"{widget.objectName()}", "isAlone":"{is_alone}", "value":"{widget.isChecked()}", '
+                  f'"addSchema":"{qgis_project_add_schema}"')
         body = self.create_body(extras=extras)
         json_result = self.controller.get_json('gw_fct_setselectors', body, log_sql=True)
 
-        if str(self.current_tab) == 'tab_exploitation':
+        if str(tab_name) == 'tab_exploitation':
 
-            #reload layer, zoom to layer, style mapzones and refresh canvas
+            # reload layer, zoom to layer, style mapzones and refresh canvas
             layer = self.controller.get_layer_by_tablename('v_edit_arc')
             if layer:
-                layer.dataProvider().forceReload()
                 self.iface.setActiveLayer(layer)
                 self.iface.zoomToActiveLayer()
             self.set_style_mapzones()
+
+        #refresh canvas
+        layer = self.controller.get_layer_by_tablename('v_edit_arc')
+        if layer:
+            layer.dataProvider().forceReload()
+            layer.triggerRepaint()
+        layer = self.controller.get_layer_by_tablename('v_edit_node')
+        if layer:
+            layer.dataProvider().forceReload()
+            layer.triggerRepaint()
+        layer = self.controller.get_layer_by_tablename('v_edit_connec')
+        if layer:
+            layer.dataProvider().forceReload()
+            layer.triggerRepaint()
+        layer = self.controller.get_layer_by_tablename('v_edit_gully')
+        if layer:
+            layer.dataProvider().forceReload()
+            layer.triggerRepaint()
+            self.refresh_map_canvas()
+        layer = self.controller.get_layer_by_tablename('v_edit_link')
+        if layer:
+            layer.dataProvider().forceReload()
+            layer.triggerRepaint()
             self.refresh_map_canvas()

@@ -10,10 +10,6 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QCursor
 from qgis.PyQt.QtWidgets import QAction
 
-import json
-from collections import OrderedDict
-from functools import partial
-
 from .parent import ParentMapTool
 from ..actions.api_cf import ApiCF
 

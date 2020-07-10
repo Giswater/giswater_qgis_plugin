@@ -28,4 +28,4 @@ class OmVisitXConnec(Table):
     def __init__(self, controller):
         """ Class constructor """
         Table.__init__(self, controller, 'om_visit_x_connec', 'id')
-        
+

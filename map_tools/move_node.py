@@ -28,20 +28,20 @@ from ..ui_manager import DialogTextUi
 
 class MoveNodeMapTool(ParentMapTool):
     """ Button 16. Move node
-    Execute SQL function: 'gw_fct_node2arc' """        
+    Execute SQL function: 'gw_fct_node2arc' """
 
     def __init__(self, iface, settings, action, index_action):
-        """ Class constructor """        
-        
-        # Call ParentMapTool constructor     
-        super(MoveNodeMapTool, self).__init__(iface, settings, action, index_action)  
-          
-            
+        """ Class constructor """
+
+        # Call ParentMapTool constructor
+        super(MoveNodeMapTool, self).__init__(iface, settings, action, index_action)
+
+
     def move_node(self, node_id, point):
-        """ Move selected node to the current point """  
-           
-        srid = self.controller.plugin_settings_value('srid')                 
-                   
+        """ Move selected node to the current point """
+
+        srid = self.controller.plugin_settings_value('srid')
+
         # Update node geometry
         the_geom = f"ST_GeomFromText('POINT({point.x()} {point.y()})', {srid})"
         sql = (f"UPDATE node SET the_geom = {the_geom} "
@@ -51,7 +51,8 @@ class MoveNodeMapTool(ParentMapTool):
             feature_id = f'"id":["{node_id}"]'
             body = self.create_body(feature=feature_id)
             result = self.controller.get_json('gw_fct_arc_divide', body)
-            if not result: return
+            if not result:
+                return
             if 'hideForm' not in result['body']['actions'] or not result['body']['actions']['hideForm']:
                 self.dlg_dtext = DialogTextUi()
                 self.dlg_dtext.btn_accept.hide()
@@ -62,10 +63,10 @@ class MoveNodeMapTool(ParentMapTool):
         else:
             message = "Move node: Error updating geometry"
             self.controller.show_warning(message)
-            
+
         # Rubberband reset
         self.reset()
-                                
+
         # Refresh map canvas
         self.refresh_map_canvas()
 
@@ -73,8 +74,8 @@ class MoveNodeMapTool(ParentMapTool):
         self.deactivate()
         self.set_action_pan()
 
-                
-    
+
+
     """ QgsMapTool inherited event functions """
 
     def keyPressEvent(self, event):
@@ -97,21 +98,21 @@ class MoveNodeMapTool(ParentMapTool):
 
         # Get active layer
         self.active_layer = self.iface.activeLayer()
-        
+
         # Set active layer to 'v_edit_node'
         self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
-        self.iface.setActiveLayer(self.layer_node)    
-        
+        self.iface.setActiveLayer(self.layer_node)
+
         # Get layer to 'v_edit_arc'
-        self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")          
- 
+        self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
+
         # Set the mapTool's parent cursor
-        self.canvas.setCursor(self.cursor)  
-            
+        self.canvas.setCursor(self.cursor)
+
         # Reset
         self.reset()
-        
-        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)         
+
+        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
 
         # Show help message when action is activated
         if self.show_help:
@@ -122,12 +123,12 @@ class MoveNodeMapTool(ParentMapTool):
     def deactivate(self):
         """ Called when map tool is being deactivated """
 
-        # Call parent method     
+        # Call parent method
         ParentMapTool.deactivate(self)
-        
+
         # Restore previous active layer
         if self.active_layer:
-            self.iface.setActiveLayer(self.active_layer)           
+            self.iface.setActiveLayer(self.active_layer)
 
         try:
             self.reset_rubber_band("line")
@@ -136,17 +137,17 @@ class MoveNodeMapTool(ParentMapTool):
 
 
     def canvasMoveEvent(self, event):
-        """ Mouse movement event """      
+        """ Mouse movement event """
 
         # Hide marker and get coordinates
         self.vertex_marker.hide()
         x = event.pos().x()
         y = event.pos().y()
         event_point = self.snapper_manager.get_event_point(event)
-        
+
         # Snap to node
         if self.snapped_feat is None:
-            
+
             # Make sure active layer is 'v_edit_node'
             cur_layer = self.iface.activeLayer()
             if cur_layer != self.layer_node:
@@ -165,16 +166,16 @@ class MoveNodeMapTool(ParentMapTool):
 
         # Snap to arc
         else:
-            
+
             # Make sure active layer is 'v_edit_arc'
             cur_layer = self.iface.activeLayer()
             if cur_layer != self.layer_arc:
-                self.iface.setActiveLayer(self.layer_arc)               
+                self.iface.setActiveLayer(self.layer_arc)
 
             # Snapping
             result = self.snapper_manager.snap_to_current_layer(event_point)
-            
-            #if result and result[0].snappedVertexNr == -1:
+
+            # if result and result[0].snappedVertexNr == -1:
             if self.snapper_manager.result_is_valid():
                 layer = self.snapper_manager.get_snapped_layer(result)
                 feature_id = self.snapper_manager.get_snapped_feature_id(result)
@@ -190,8 +191,8 @@ class MoveNodeMapTool(ParentMapTool):
 
 
     def canvasReleaseEvent(self, event):
-        """ Mouse release event """         
-        
+        """ Mouse release event """
+
         if event.button() == Qt.LeftButton:
 
             event_point = self.snapper_manager.get_event_point(event)
@@ -247,4 +248,4 @@ class MoveNodeMapTool(ParentMapTool):
 
         elif event.button() == Qt.RightButton:
             self.cancel_map_tool()
-            
+

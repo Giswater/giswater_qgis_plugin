@@ -9,34 +9,34 @@
     <spatialrefsys>
       <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
       <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-      <srsid>2104</srsid>
-      <srid>25831</srid>
-      <authid>EPSG:25831</authid>
-      <description>ETRS89 / UTM zone 31N</description>
-      <projectionacronym>utm</projectionacronym>
+      <srsid>__SRSID__</srsid>
+      <srid>__SRID__</srid>
+      <authid>__AUTHID__</authid>
+      <description>__DESCRIPTION__</description>
+      <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
       <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-      <geographicflag>false</geographicflag>
+      <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
     </spatialrefsys>
   </projectCrs>
   <layer-tree-group>
     <customproperties/>
     <layer-tree-group name="O&amp;M" checked="Qt::Unchecked" expanded="0">
       <customproperties/>
-      <layer-tree-layer name="OM Visits" source="dbname='giswater3' host=localhost port=5432 user='postgres' sslmode=disable key='id' srid=25831 type=Point checkPrimaryKeyUnicity='1' table=&quot;ud_414&quot;.&quot;v_edit_om_visit&quot; (the_geom) sql=" checked="Qt::Unchecked" expanded="1" id="v_edit_om_visit_1e824d9d_e558_4cf1_a5fd_7ae9ee773690" providerKey="postgres">
+      <layer-tree-layer name="OM Visits" source="dbname='__DBNAME__' host=__HOST__ port=__PORT__  sslmode=disable key='id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_om_visit&quot; (the_geom) sql=" checked="Qt::Unchecked" expanded="1" id="v_edit_om_visit_1e824d9d_e558_4cf1_a5fd_7ae9ee773690" providerKey="postgres">
         <customproperties/>
       </layer-tree-layer>
       <layer-tree-group name="Flowtrace analysis" checked="Qt::Unchecked" expanded="0">
         <customproperties/>
-        <layer-tree-layer name="Flowtrace node" source="dbname='giswater3' host=localhost port=5432 user='postgres' sslmode=disable key='id' srid=25831 type=Point checkPrimaryKeyUnicity='1' table=&quot;ud_414&quot;.&quot;v_anl_flow_node&quot; (the_geom) sql=" checked="Qt::Checked" expanded="0" id="v_anl_flow_node_4d575c87_1bb3_4cfb_9cf4_206d690d4270" providerKey="postgres">
+        <layer-tree-layer name="Flowtrace node" source="dbname='__DBNAME__' host=__HOST__ port=__PORT__  sslmode=disable key='id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_anl_flow_node&quot; (the_geom) sql=" checked="Qt::Checked" expanded="0" id="v_anl_flow_node_4d575c87_1bb3_4cfb_9cf4_206d690d4270" providerKey="postgres">
           <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer name="Flowtrace connec" source="dbname='giswater3' host=localhost port=5432 user='postgres' sslmode=disable key='connec_id' srid=25831 type=Point checkPrimaryKeyUnicity='1' table=&quot;ud_414&quot;.&quot;v_anl_flow_connec&quot; (the_geom) sql=" checked="Qt::Checked" expanded="0" id="v_anl_flow_connec_dedac24e_181f_4b33_9f6e_adb7abb78087" providerKey="postgres">
+        <layer-tree-layer name="Flowtrace connec" source="dbname='__DBNAME__' host=__HOST__ port=__PORT__  sslmode=disable key='connec_id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_anl_flow_connec&quot; (the_geom) sql=" checked="Qt::Checked" expanded="0" id="v_anl_flow_connec_dedac24e_181f_4b33_9f6e_adb7abb78087" providerKey="postgres">
           <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer name="Flowtrace gully" source="dbname='giswater3' host=localhost port=5432 user='postgres' sslmode=disable key='gully_id' srid=25831 type=Point checkPrimaryKeyUnicity='1' table=&quot;ud_414&quot;.&quot;v_anl_flow_gully&quot; (the_geom) sql=" checked="Qt::Checked" expanded="0" id="v_anl_flow_gully_c19802c2_4f79_4ac9_ada5_6300ec45e42e" providerKey="postgres">
+        <layer-tree-layer name="Flowtrace gully" source="dbname='__DBNAME__' host=__HOST__ port=__PORT__  sslmode=disable key='gully_id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_anl_flow_gully&quot; (the_geom) sql=" checked="Qt::Checked" expanded="0" id="v_anl_flow_gully_c19802c2_4f79_4ac9_ada5_6300ec45e42e" providerKey="postgres">
           <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer name="Flowtrace arc" source="dbname='giswater3' host=localhost port=5432 user='postgres' sslmode=disable key='id' srid=25831 type=LineString checkPrimaryKeyUnicity='1' table=&quot;ud_414&quot;.&quot;v_anl_flow_arc&quot; (the_geom) sql=" checked="Qt::Checked" expanded="0" id="v_anl_flow_arc_26e14ed9_441a_401b_8aff_3a83432ac182" providerKey="postgres">
+        <layer-tree-layer name="Flowtrace arc" source="dbname='__DBNAME__' host=__HOST__ port=__PORT__  sslmode=disable key='id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_anl_flow_arc&quot; (the_geom) sql=" checked="Qt::Checked" expanded="0" id="v_anl_flow_arc_26e14ed9_441a_401b_8aff_3a83432ac182" providerKey="postgres">
           <customproperties/>
         </layer-tree-layer>
       </layer-tree-group>
@@ -45,61 +45,61 @@
       <customproperties/>
       <layer-tree-group name="Map zones" checked="Qt::Checked" expanded="0">
         <customproperties/>
-        <layer-tree-layer name="Exploitation" source="dbname='giswater3' host=localhost port=5432 user='postgres' sslmode=disable key='expl_id' srid=25831 type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;ud_414&quot;.&quot;v_edit_exploitation&quot; (the_geom) sql=" checked="Qt::Checked" expanded="1" id="v_edit_exploitation_79f9ccda_070f_4e89_b991_6f956aec4b36" providerKey="postgres">
+        <layer-tree-layer name="Exploitation" source="dbname='__DBNAME__' host=__HOST__ port=__PORT__  sslmode=disable key='expl_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_exploitation&quot; (the_geom) sql=" checked="Qt::Checked" expanded="1" id="v_edit_exploitation_79f9ccda_070f_4e89_b991_6f956aec4b36" providerKey="postgres">
           <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer name="Dma" source="dbname='giswater3' host=localhost port=5432 user='postgres' sslmode=disable key='dma_id' srid=25831 type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;ud_414&quot;.&quot;v_edit_dma&quot; (the_geom) sql=" checked="Qt::Checked" expanded="1" id="v_edit_dma_6ef4194d_f9a3_49e1_8179_bbdcc7f6549c" providerKey="postgres">
+        <layer-tree-layer name="Dma" source="dbname='__DBNAME__' host=__HOST__ port=__PORT__  sslmode=disable key='dma_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_dma&quot; (the_geom) sql=" checked="Qt::Checked" expanded="1" id="v_edit_dma_6ef4194d_f9a3_49e1_8179_bbdcc7f6549c" providerKey="postgres">
           <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer name="Sector" source="dbname='giswater3' host=localhost port=5432 user='postgres' sslmode=disable key='sector_id' srid=25831 type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;ud_414&quot;.&quot;v_edit_sector&quot; (the_geom) sql=" checked="Qt::Checked" expanded="1" id="v_edit_sector_d4924986_50a2_4c42_bad8_bfff1644805d" providerKey="postgres">
+        <layer-tree-layer name="Sector" source="dbname='__DBNAME__' host=__HOST__ port=__PORT__  sslmode=disable key='sector_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_sector&quot; (the_geom) sql=" checked="Qt::Checked" expanded="1" id="v_edit_sector_d4924986_50a2_4c42_bad8_bfff1644805d" providerKey="postgres">
           <customproperties/>
         </layer-tree-layer>
       </layer-tree-group>
       <layer-tree-group name="Network" checked="Qt::Checked" expanded="1">
         <customproperties/>
-        <layer-tree-layer name="Node" source="dbname='giswater3' host=localhost port=5432 user='postgres' sslmode=disable key='node_id' srid=25831 type=Point checkPrimaryKeyUnicity='1' table=&quot;ud_414&quot;.&quot;v_edit_node&quot; (the_geom) sql=" checked="Qt::Checked" expanded="0" id="v_edit_node_505585a2_32e2_4c2e_a451_d9becc988d7c" providerKey="postgres">
+        <layer-tree-layer name="Node" source="dbname='__DBNAME__' host=__HOST__ port=__PORT__  sslmode=disable key='node_id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_node&quot; (the_geom) sql=" checked="Qt::Checked" expanded="0" id="v_edit_node_505585a2_32e2_4c2e_a451_d9becc988d7c" providerKey="postgres">
           <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer name="Connec" source="dbname='giswater3' host=localhost port=5432 user='postgres' sslmode=disable key='connec_id' srid=25831 type=Point checkPrimaryKeyUnicity='1' table=&quot;ud_414&quot;.&quot;v_edit_connec&quot; (the_geom) sql=" checked="Qt::Checked" expanded="1" id="v_edit_connec_8a7cc13f_d89f_485c_baa6_dea1fcfe3331" providerKey="postgres">
+        <layer-tree-layer name="Connec" source="dbname='__DBNAME__' host=__HOST__ port=__PORT__  sslmode=disable key='connec_id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_connec&quot; (the_geom) sql=" checked="Qt::Checked" expanded="1" id="v_edit_connec_8a7cc13f_d89f_485c_baa6_dea1fcfe3331" providerKey="postgres">
           <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer name="Gully" source="dbname='giswater3' host=localhost port=5432 user='postgres' sslmode=disable key='gully_id' srid=25831 type=Point checkPrimaryKeyUnicity='1' table=&quot;ud_414&quot;.&quot;v_edit_gully&quot; (the_geom) sql=" checked="Qt::Checked" expanded="1" id="v_edit_gully_2fae9786_ee66_45f2_9da6_d665653031fb" providerKey="postgres">
+        <layer-tree-layer name="Gully" source="dbname='__DBNAME__' host=__HOST__ port=__PORT__  sslmode=disable key='gully_id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_gully&quot; (the_geom) sql=" checked="Qt::Checked" expanded="1" id="v_edit_gully_2fae9786_ee66_45f2_9da6_d665653031fb" providerKey="postgres">
           <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer name="Arc" source="dbname='giswater3' host=localhost port=5432 user='postgres' sslmode=disable key='arc_id' srid=25831 type=LineString checkPrimaryKeyUnicity='1' table=&quot;ud_414&quot;.&quot;v_edit_arc&quot; (the_geom) sql=" checked="Qt::Checked" expanded="0" id="v_edit_arc_20c2fc8b_1eba_4b5b_99c3_1f6836ca8281" providerKey="postgres">
+        <layer-tree-layer name="Arc" source="dbname='__DBNAME__' host=__HOST__ port=__PORT__  sslmode=disable key='arc_id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_arc&quot; (the_geom) sql=" checked="Qt::Checked" expanded="0" id="v_edit_arc_20c2fc8b_1eba_4b5b_99c3_1f6836ca8281" providerKey="postgres">
           <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer name="Link" source="dbname='giswater3' host=localhost port=5432 user='postgres' sslmode=disable key='link_id' srid=25831 type=LineString checkPrimaryKeyUnicity='1' table=&quot;ud_414&quot;.&quot;v_edit_link&quot; (the_geom) sql=" checked="Qt::Checked" expanded="1" id="v_edit_link_0c252985_de4f_4df3_a76a_c279ffeffed8" providerKey="postgres">
+        <layer-tree-layer name="Link" source="dbname='__DBNAME__' host=__HOST__ port=__PORT__  sslmode=disable key='link_id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_link&quot; (the_geom) sql=" checked="Qt::Checked" expanded="1" id="v_edit_link_0c252985_de4f_4df3_a76a_c279ffeffed8" providerKey="postgres">
           <customproperties/>
         </layer-tree-layer>
         <layer-tree-group name="Polygon GROUP" checked="Qt::Checked" expanded="0">
           <customproperties/>
-          <layer-tree-layer name="Chamber polygon" source="dbname='giswater3' host=localhost port=5432 user='postgres' sslmode=disable key='pol_id' srid=25831 type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;ud_414&quot;.&quot;ve_pol_chamber&quot; (the_geom) sql=" checked="Qt::Checked" expanded="1" id="ve_pol_chamber_1ca950d7_23d1_4b20_9087_4e1a403002ae" providerKey="postgres">
+          <layer-tree-layer name="Chamber polygon" source="dbname='__DBNAME__' host=__HOST__ port=__PORT__  sslmode=disable key='pol_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;ve_pol_chamber&quot; (the_geom) sql=" checked="Qt::Checked" expanded="1" id="ve_pol_chamber_1ca950d7_23d1_4b20_9087_4e1a403002ae" providerKey="postgres">
             <customproperties/>
           </layer-tree-layer>
-          <layer-tree-layer name="Gully polygon" source="dbname='giswater3' host=localhost port=5432 user='postgres' sslmode=disable key='pol_id' srid=25831 type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;ud_414&quot;.&quot;ve_pol_gully&quot; (the_geom) sql=" checked="Qt::Checked" expanded="1" id="ve_pol_gully_62d6bf96_9fb7_4951_81d1_feb290799438" providerKey="postgres">
+          <layer-tree-layer name="Gully polygon" source="dbname='__DBNAME__' host=__HOST__ port=__PORT__  sslmode=disable key='pol_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;ve_pol_gully&quot; (the_geom) sql=" checked="Qt::Checked" expanded="1" id="ve_pol_gully_62d6bf96_9fb7_4951_81d1_feb290799438" providerKey="postgres">
             <customproperties/>
           </layer-tree-layer>
-          <layer-tree-layer name="Netgully polygon" source="dbname='giswater3' host=localhost port=5432 user='postgres' sslmode=disable key='pol_id' srid=25831 type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;ud_414&quot;.&quot;ve_pol_netgully&quot; (the_geom) sql=" checked="Qt::Checked" expanded="1" id="ve_pol_netgully_117490c4_d510_4c64_a913_b7b3dadd99dd" providerKey="postgres">
+          <layer-tree-layer name="Netgully polygon" source="dbname='__DBNAME__' host=__HOST__ port=__PORT__  sslmode=disable key='pol_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;ve_pol_netgully&quot; (the_geom) sql=" checked="Qt::Checked" expanded="1" id="ve_pol_netgully_117490c4_d510_4c64_a913_b7b3dadd99dd" providerKey="postgres">
             <customproperties/>
           </layer-tree-layer>
-          <layer-tree-layer name="Storage polygon" source="dbname='giswater3' host=localhost port=5432 user='postgres' sslmode=disable key='pol_id' srid=25831 type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;ud_414&quot;.&quot;ve_pol_storage&quot; (the_geom) sql=" checked="Qt::Checked" expanded="1" id="ve_pol_storage_b61e8684_ff62_482a_bebe_4bfa315e2f83" providerKey="postgres">
+          <layer-tree-layer name="Storage polygon" source="dbname='__DBNAME__' host=__HOST__ port=__PORT__  sslmode=disable key='pol_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;ve_pol_storage&quot; (the_geom) sql=" checked="Qt::Checked" expanded="1" id="ve_pol_storage_b61e8684_ff62_482a_bebe_4bfa315e2f83" providerKey="postgres">
             <customproperties/>
           </layer-tree-layer>
-          <layer-tree-layer name="Wwtp polygon" source="dbname='giswater3' host=localhost port=5432 user='postgres' sslmode=disable key='pol_id' srid=25831 type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;ud_414&quot;.&quot;ve_pol_wwtp&quot; (the_geom) sql=" checked="Qt::Checked" expanded="1" id="ve_pol_wwtp_0fccdbfe_cfb2_43f9_ab89_943c51666986" providerKey="postgres">
+          <layer-tree-layer name="Wwtp polygon" source="dbname='__DBNAME__' host=__HOST__ port=__PORT__  sslmode=disable key='pol_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;ve_pol_wwtp&quot; (the_geom) sql=" checked="Qt::Checked" expanded="1" id="ve_pol_wwtp_0fccdbfe_cfb2_43f9_ab89_943c51666986" providerKey="postgres">
             <customproperties/>
           </layer-tree-layer>
         </layer-tree-group>
       </layer-tree-group>
       <layer-tree-group name="Other" checked="Qt::Unchecked" expanded="0">
         <customproperties/>
-        <layer-tree-layer name="Dimensioning" source="dbname='giswater3' host=localhost port=5432 user='postgres' sslmode=disable key='id' srid=25831 type=LineString checkPrimaryKeyUnicity='1' table=&quot;ud_414&quot;.&quot;v_edit_dimensions&quot; (the_geom) sql=" checked="Qt::Checked" expanded="0" id="v_edit_dimensions_f966f7af_448b_41d3_9ac5_c8adf0f785ea" providerKey="postgres">
+        <layer-tree-layer name="Dimensioning" source="dbname='__DBNAME__' host=__HOST__ port=__PORT__  sslmode=disable key='id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_dimensions&quot; (the_geom) sql=" checked="Qt::Checked" expanded="0" id="v_edit_dimensions_f966f7af_448b_41d3_9ac5_c8adf0f785ea" providerKey="postgres">
           <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer name="Element" source="dbname='giswater3' host=localhost port=5432 user='postgres' sslmode=disable key='element_id' srid=25831 type=Point checkPrimaryKeyUnicity='1' table=&quot;ud_414&quot;.&quot;v_edit_element&quot; (the_geom) sql=" checked="Qt::Checked" expanded="1" id="v_edit_element_e5ea3ac0_d64b_4db9_ba41_01b6ba993917" providerKey="postgres">
+        <layer-tree-layer name="Element" source="dbname='__DBNAME__' host=__HOST__ port=__PORT__  sslmode=disable key='element_id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_element&quot; (the_geom) sql=" checked="Qt::Checked" expanded="1" id="v_edit_element_e5ea3ac0_d64b_4db9_ba41_01b6ba993917" providerKey="postgres">
           <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer name="Samplepoint" source="dbname='giswater3' host=localhost port=5432 user='postgres' sslmode=disable key='sample_id' srid=25831 type=Point checkPrimaryKeyUnicity='1' table=&quot;ud_414&quot;.&quot;v_edit_samplepoint&quot; (the_geom) sql=" checked="Qt::Checked" expanded="1" id="v_edit_samplepoint_7a1cbe53_7b69_401c_b949_e84b558c70ef" providerKey="postgres">
+        <layer-tree-layer name="Samplepoint" source="dbname='__DBNAME__' host=__HOST__ port=__PORT__  sslmode=disable key='sample_id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_samplepoint&quot; (the_geom) sql=" checked="Qt::Checked" expanded="1" id="v_edit_samplepoint_7a1cbe53_7b69_401c_b949_e84b558c70ef" providerKey="postgres">
           <customproperties/>
         </layer-tree-layer>
       </layer-tree-group>
@@ -108,10 +108,10 @@
       <customproperties/>
       <layer-tree-group name="CAD auxiliar layers" checked="Qt::Checked" expanded="0">
         <customproperties/>
-        <layer-tree-layer name="Circle" source="dbname='giswater3' host=localhost port=5432 user='postgres' sslmode=disable key='id' srid=25831 type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;ud_414&quot;.&quot;v_edit_cad_auxcircle&quot; (geom_polygon) sql=" checked="Qt::Checked" expanded="1" id="v_edit_cad_auxcircle_059d7d8c_424a_4b7c_8305_e504f21918a6" providerKey="postgres">
+        <layer-tree-layer name="Circle" source="dbname='__DBNAME__' host=__HOST__ port=__PORT__  sslmode=disable key='id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_cad_auxcircle&quot; (geom_polygon) sql=" checked="Qt::Checked" expanded="1" id="v_edit_cad_auxcircle_059d7d8c_424a_4b7c_8305_e504f21918a6" providerKey="postgres">
           <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer name="Point" source="dbname='giswater3' host=localhost port=5432 user='postgres' sslmode=disable key='id' srid=25831 type=Point checkPrimaryKeyUnicity='1' table=&quot;ud_414&quot;.&quot;v_edit_cad_auxpoint&quot; (geom_point) sql=" checked="Qt::Checked" expanded="1" id="v_edit_cad_auxpoint_97a71e5d_6dd5_4df1_88a5_64559796eb04" providerKey="postgres">
+        <layer-tree-layer name="Point" source="dbname='__DBNAME__' host=__HOST__ port=__PORT__  sslmode=disable key='id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_cad_auxpoint&quot; (geom_point) sql=" checked="Qt::Checked" expanded="1" id="v_edit_cad_auxpoint_97a71e5d_6dd5_4df1_88a5_64559796eb04" providerKey="postgres">
           <customproperties/>
         </layer-tree-layer>
       </layer-tree-group>
@@ -120,16 +120,16 @@
       <customproperties/>
       <layer-tree-group name="Address" checked="Qt::Checked" expanded="1">
         <customproperties/>
-        <layer-tree-layer name="Municipality" source="dbname='giswater3' host=localhost port=5432 user='postgres' sslmode=disable key='muni_id' srid=25831 type=MultiPolygon checkPrimaryKeyUnicity='0' table=&quot;ud_414&quot;.&quot;ext_municipality&quot; (the_geom) sql=" checked="Qt::Checked" expanded="1" id="ext_municipality_7901e95f_4c75_42cb_b520_f89bb2e71ff9" providerKey="postgres">
+        <layer-tree-layer name="Municipality" source="dbname='__DBNAME__' host=__HOST__ port=__PORT__  sslmode=disable key='muni_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='0' table=&quot;SCHEMA_NAME&quot;.&quot;ext_municipality&quot; (the_geom) sql=" checked="Qt::Checked" expanded="1" id="ext_municipality_7901e95f_4c75_42cb_b520_f89bb2e71ff9" providerKey="postgres">
           <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer name="Address" source="dbname='giswater3' host=localhost port=5432 user='postgres' sslmode=disable key='id' srid=25831 type=Point checkPrimaryKeyUnicity='1' table=&quot;ud_414&quot;.&quot;v_ext_address&quot; (the_geom) sql=" checked="Qt::Unchecked" expanded="1" id="v_ext_address_50461371_f0e5_46c9_81f8_4c182b00a9e9" providerKey="postgres">
+        <layer-tree-layer name="Address" source="dbname='__DBNAME__' host=__HOST__ port=__PORT__  sslmode=disable key='id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_ext_address&quot; (the_geom) sql=" checked="Qt::Unchecked" expanded="1" id="v_ext_address_50461371_f0e5_46c9_81f8_4c182b00a9e9" providerKey="postgres">
           <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer name="Streetaxis" source="dbname='giswater3' host=localhost port=5432 user='postgres' sslmode=disable key='id' srid=25831 type=MultiLineString checkPrimaryKeyUnicity='1' table=&quot;ud_414&quot;.&quot;v_ext_streetaxis&quot; (the_geom) sql=" checked="Qt::Checked" expanded="1" id="v_ext_streetaxis_8e9c4012_5761_44d2_b410_878464ca38b4" providerKey="postgres">
+        <layer-tree-layer name="Streetaxis" source="dbname='__DBNAME__' host=__HOST__ port=__PORT__  sslmode=disable key='id' srid=__SRID__ type=MultiLineString checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_ext_streetaxis&quot; (the_geom) sql=" checked="Qt::Checked" expanded="1" id="v_ext_streetaxis_8e9c4012_5761_44d2_b410_878464ca38b4" providerKey="postgres">
           <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer name="Plot" source="dbname='giswater3' host=localhost port=5432 user='postgres' sslmode=disable key='id' srid=25831 type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;ud_414&quot;.&quot;v_ext_plot&quot; (the_geom) sql=" checked="Qt::Checked" expanded="1" id="v_ext_plot_16824253_6498_4e46_a047_38297ad658c7" providerKey="postgres">
+        <layer-tree-layer name="Plot" source="dbname='__DBNAME__' host=__HOST__ port=__PORT__  sslmode=disable key='id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_ext_plot&quot; (the_geom) sql=" checked="Qt::Checked" expanded="1" id="v_ext_plot_16824253_6498_4e46_a047_38297ad658c7" providerKey="postgres">
           <customproperties/>
         </layer-tree-layer>
       </layer-tree-group>
@@ -199,23 +199,23 @@
   <mapcanvas name="theMapCanvas" annotationsVisible="1">
     <units>meters</units>
     <extent>
-      <xmin>418754.11458398698596284</xmin>
-      <ymin>4576125.65778942033648491</ymin>
-      <xmax>419825.98435934929875657</xmax>
-      <ymax>4577140.52177019044756889</ymax>
+      <xmin>__XMIN__</xmin>
+      <ymin>__YMIN__</ymin>
+      <xmax>__XMAX__</xmax>
+      <ymax>__YMAX__</ymax>
     </extent>
     <rotation>0</rotation>
     <destinationsrs>
       <spatialrefsys>
         <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
         <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-        <srsid>2104</srsid>
-        <srid>25831</srid>
-        <authid>EPSG:25831</authid>
-        <description>ETRS89 / UTM zone 31N</description>
-        <projectionacronym>utm</projectionacronym>
+        <srsid>__SRSID__</srsid>
+        <srid>__SRID__</srid>
+        <authid>__AUTHID__</authid>
+        <description>__DESCRIPTION__</description>
+        <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
         <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-        <geographicflag>false</geographicflag>
+        <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
       </spatialrefsys>
     </destinationsrs>
     <rendermaptile>0</rendermaptile>
@@ -386,13 +386,13 @@
   <projectlayers>
     <maplayer simplifyAlgorithm="0" minScale="1e+08" type="vector" styleCategories="AllStyleCategories" readOnly="0" geometry="Polygon" simplifyLocal="1" labelsEnabled="0" simplifyDrawingTol="1" refreshOnNotifyEnabled="1" hasScaleBasedVisibilityFlag="0" maxScale="0" simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshTime="0" wkbType="MultiPolygon" refreshOnNotifyMessage="" autoRefreshEnabled="0">
       <extent>
-        <xmin>418280.98291339102433994</xmin>
-        <ymin>4576171.1946372902020812</ymin>
-        <xmax>419590.43511445500189438</xmax>
-        <ymax>4578106.68520885985344648</ymax>
+        <xmin>__XMIN__</xmin>
+        <ymin>__YMIN__</ymin>
+        <xmax>__XMAX__</xmax>
+        <ymax>__YMAX__</ymax>
       </extent>
       <id>ext_municipality_7901e95f_4c75_42cb_b520_f89bb2e71ff9</id>
-      <datasource>dbname='giswater3' host=localhost port=5432 user='postgres' password='postgres' sslmode=disable key='muni_id' srid=25831 type=MultiPolygon checkPrimaryKeyUnicity='0' table="ud_414"."ext_municipality" (the_geom) sql=</datasource>
+      <datasource>dbname='__DBNAME__' host=__HOST__ port=__PORT__   sslmode=disable key='muni_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='0' table="SCHEMA_NAME"."ext_municipality" (the_geom) sql=</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -401,13 +401,13 @@
         <spatialrefsys>
           <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-          <srsid>2104</srsid>
-          <srid>25831</srid>
-          <authid>EPSG:25831</authid>
-          <description>ETRS89 / UTM zone 31N</description>
-          <projectionacronym>utm</projectionacronym>
+          <srsid>__SRSID__</srsid>
+          <srid>__SRID__</srid>
+          <authid>__AUTHID__</authid>
+          <description>__DESCRIPTION__</description>
+          <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          <geographicflag>false</geographicflag>
+          <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -433,13 +433,13 @@
           <spatialrefsys>
             <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-            <srsid>2104</srsid>
-            <srid>25831</srid>
-            <authid>EPSG:25831</authid>
-            <description>ETRS89 / UTM zone 31N</description>
-            <projectionacronym>utm</projectionacronym>
+            <srsid>__SRSID__</srsid>
+            <srid>__SRID__</srid>
+            <authid>__AUTHID__</authid>
+            <description>__DESCRIPTION__</description>
+            <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            <geographicflag>false</geographicflag>
+            <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
           </spatialrefsys>
         </crs>
         <extent>
@@ -659,7 +659,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyAlgorithm="0" minScale="1e+08" type="vector" styleCategories="AllStyleCategories" readOnly="0" geometry="Line" simplifyLocal="1" labelsEnabled="0" simplifyDrawingTol="1" refreshOnNotifyEnabled="0" hasScaleBasedVisibilityFlag="0" maxScale="0" simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshTime="0" wkbType="LineString" refreshOnNotifyMessage="" autoRefreshEnabled="0">
       <id>v_anl_flow_arc_26e14ed9_441a_401b_8aff_3a83432ac182</id>
-      <datasource>dbname='giswater3' host=localhost port=5432 user='postgres' password='postgres' sslmode=disable key='id' srid=25831 type=LineString checkPrimaryKeyUnicity='1' table="ud_414"."v_anl_flow_arc" (the_geom) sql=</datasource>
+      <datasource>dbname='__DBNAME__' host=__HOST__ port=__PORT__   sslmode=disable key='id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_anl_flow_arc" (the_geom) sql=</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -668,13 +668,13 @@ def my_form_open(dialog, layer, feature):
         <spatialrefsys>
           <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-          <srsid>2104</srsid>
-          <srid>25831</srid>
-          <authid>EPSG:25831</authid>
-          <description>ETRS89 / UTM zone 31N</description>
-          <projectionacronym>utm</projectionacronym>
+          <srsid>__SRSID__</srsid>
+          <srid>__SRID__</srid>
+          <authid>__AUTHID__</authid>
+          <description>__DESCRIPTION__</description>
+          <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          <geographicflag>false</geographicflag>
+          <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -691,13 +691,13 @@ def my_form_open(dialog, layer, feature):
           <spatialrefsys>
             <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-            <srsid>2104</srsid>
-            <srid>25831</srid>
-            <authid>EPSG:25831</authid>
-            <description>ETRS89 / UTM zone 31N</description>
-            <projectionacronym>utm</projectionacronym>
+            <srsid>__SRSID__</srsid>
+            <srid>__SRID__</srid>
+            <authid>__AUTHID__</authid>
+            <description>__DESCRIPTION__</description>
+            <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            <geographicflag>false</geographicflag>
+            <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
           </spatialrefsys>
         </crs>
         <extent/>
@@ -914,7 +914,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyAlgorithm="0" minScale="1e+08" type="vector" styleCategories="AllStyleCategories" readOnly="0" geometry="Point" simplifyLocal="1" labelsEnabled="0" simplifyDrawingTol="1" refreshOnNotifyEnabled="0" hasScaleBasedVisibilityFlag="0" maxScale="0" simplifyDrawingHints="0" simplifyMaxScale="1" autoRefreshTime="0" wkbType="Point" refreshOnNotifyMessage="" autoRefreshEnabled="0">
       <id>v_anl_flow_connec_dedac24e_181f_4b33_9f6e_adb7abb78087</id>
-      <datasource>dbname='giswater3' host=localhost port=5432 user='postgres' password='postgres' sslmode=disable key='connec_id' srid=25831 type=Point checkPrimaryKeyUnicity='1' table="ud_414"."v_anl_flow_connec" (the_geom) sql=</datasource>
+      <datasource>dbname='__DBNAME__' host=__HOST__ port=__PORT__   sslmode=disable key='connec_id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_anl_flow_connec" (the_geom) sql=</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -923,13 +923,13 @@ def my_form_open(dialog, layer, feature):
         <spatialrefsys>
           <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-          <srsid>2104</srsid>
-          <srid>25831</srid>
-          <authid>EPSG:25831</authid>
-          <description>ETRS89 / UTM zone 31N</description>
-          <projectionacronym>utm</projectionacronym>
+          <srsid>__SRSID__</srsid>
+          <srid>__SRID__</srid>
+          <authid>__AUTHID__</authid>
+          <description>__DESCRIPTION__</description>
+          <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          <geographicflag>false</geographicflag>
+          <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -955,13 +955,13 @@ def my_form_open(dialog, layer, feature):
           <spatialrefsys>
             <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-            <srsid>2104</srsid>
-            <srid>25831</srid>
-            <authid>EPSG:25831</authid>
-            <description>ETRS89 / UTM zone 31N</description>
-            <projectionacronym>utm</projectionacronym>
+            <srsid>__SRSID__</srsid>
+            <srid>__SRID__</srid>
+            <authid>__AUTHID__</authid>
+            <description>__DESCRIPTION__</description>
+            <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            <geographicflag>false</geographicflag>
+            <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
           </spatialrefsys>
         </crs>
         <extent>
@@ -1216,7 +1216,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyAlgorithm="0" minScale="1e+08" type="vector" styleCategories="AllStyleCategories" readOnly="0" geometry="Point" simplifyLocal="1" labelsEnabled="0" simplifyDrawingTol="1" refreshOnNotifyEnabled="0" hasScaleBasedVisibilityFlag="0" maxScale="0" simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshTime="0" wkbType="Point" refreshOnNotifyMessage="" autoRefreshEnabled="0">
       <id>v_anl_flow_gully_c19802c2_4f79_4ac9_ada5_6300ec45e42e</id>
-      <datasource>dbname='giswater3' host=localhost port=5432 user='postgres' password='postgres' sslmode=disable key='gully_id' srid=25831 type=Point checkPrimaryKeyUnicity='1' table="ud_414"."v_anl_flow_gully" (the_geom) sql=</datasource>
+      <datasource>dbname='__DBNAME__' host=__HOST__ port=__PORT__   sslmode=disable key='gully_id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_anl_flow_gully" (the_geom) sql=</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -1225,13 +1225,13 @@ def my_form_open(dialog, layer, feature):
         <spatialrefsys>
           <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-          <srsid>2104</srsid>
-          <srid>25831</srid>
-          <authid>EPSG:25831</authid>
-          <description>ETRS89 / UTM zone 31N</description>
-          <projectionacronym>utm</projectionacronym>
+          <srsid>__SRSID__</srsid>
+          <srid>__SRID__</srid>
+          <authid>__AUTHID__</authid>
+          <description>__DESCRIPTION__</description>
+          <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          <geographicflag>false</geographicflag>
+          <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -1248,13 +1248,13 @@ def my_form_open(dialog, layer, feature):
           <spatialrefsys>
             <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-            <srsid>2104</srsid>
-            <srid>25831</srid>
-            <authid>EPSG:25831</authid>
-            <description>ETRS89 / UTM zone 31N</description>
-            <projectionacronym>utm</projectionacronym>
+            <srsid>__SRSID__</srsid>
+            <srid>__SRID__</srid>
+            <authid>__AUTHID__</authid>
+            <description>__DESCRIPTION__</description>
+            <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            <geographicflag>false</geographicflag>
+            <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
           </spatialrefsys>
         </crs>
         <extent/>
@@ -1455,7 +1455,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyAlgorithm="0" minScale="1e+08" type="vector" styleCategories="AllStyleCategories" readOnly="0" geometry="Point" simplifyLocal="1" labelsEnabled="0" simplifyDrawingTol="1" refreshOnNotifyEnabled="0" hasScaleBasedVisibilityFlag="0" maxScale="0" simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshTime="0" wkbType="Point" refreshOnNotifyMessage="" autoRefreshEnabled="0">
       <id>v_anl_flow_node_4d575c87_1bb3_4cfb_9cf4_206d690d4270</id>
-      <datasource>dbname='giswater3' host=localhost port=5432 user='postgres' password='postgres' sslmode=disable key='id' srid=25831 type=Point checkPrimaryKeyUnicity='1' table="ud_414"."v_anl_flow_node" (the_geom) sql=</datasource>
+      <datasource>dbname='__DBNAME__' host=__HOST__ port=__PORT__   sslmode=disable key='id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_anl_flow_node" (the_geom) sql=</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -1464,13 +1464,13 @@ def my_form_open(dialog, layer, feature):
         <spatialrefsys>
           <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-          <srsid>2104</srsid>
-          <srid>25831</srid>
-          <authid>EPSG:25831</authid>
-          <description>ETRS89 / UTM zone 31N</description>
-          <projectionacronym>utm</projectionacronym>
+          <srsid>__SRSID__</srsid>
+          <srid>__SRID__</srid>
+          <authid>__AUTHID__</authid>
+          <description>__DESCRIPTION__</description>
+          <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          <geographicflag>false</geographicflag>
+          <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -1487,13 +1487,13 @@ def my_form_open(dialog, layer, feature):
           <spatialrefsys>
             <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-            <srsid>2104</srsid>
-            <srid>25831</srid>
-            <authid>EPSG:25831</authid>
-            <description>ETRS89 / UTM zone 31N</description>
-            <projectionacronym>utm</projectionacronym>
+            <srsid>__SRSID__</srsid>
+            <srid>__SRID__</srid>
+            <authid>__AUTHID__</authid>
+            <description>__DESCRIPTION__</description>
+            <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            <geographicflag>false</geographicflag>
+            <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
           </spatialrefsys>
         </crs>
         <extent/>
@@ -1716,13 +1716,13 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyAlgorithm="0" minScale="1e+08" type="vector" styleCategories="AllStyleCategories" readOnly="0" geometry="Line" simplifyLocal="1" labelsEnabled="1" simplifyDrawingTol="1" refreshOnNotifyEnabled="1" hasScaleBasedVisibilityFlag="0" maxScale="0" simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshTime="0" wkbType="LineString" refreshOnNotifyMessage="" autoRefreshEnabled="0">
       <extent>
-        <xmin>418308.4736272600130178</xmin>
-        <ymin>4576237.72665109019726515</ymin>
-        <xmax>419639.83136157802073285</xmax>
-        <ymax>4578106.61798823997378349</ymax>
+        <xmin>__XMIN__</xmin>
+        <ymin>__YMIN__</ymin>
+        <xmax>__XMAX__</xmax>
+        <ymax>__YMAX__</ymax>
       </extent>
       <id>v_edit_arc_20c2fc8b_1eba_4b5b_99c3_1f6836ca8281</id>
-      <datasource>dbname='giswater3' host=localhost port=5432 user='postgres' password='postgres' sslmode=disable key='arc_id' srid=25831 type=LineString checkPrimaryKeyUnicity='1' table="ud_414"."v_edit_arc" (the_geom) sql=</datasource>
+      <datasource>dbname='__DBNAME__' host=__HOST__ port=__PORT__   sslmode=disable key='arc_id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_arc" (the_geom) sql=</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -1731,13 +1731,13 @@ def my_form_open(dialog, layer, feature):
         <spatialrefsys>
           <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-          <srsid>2104</srsid>
-          <srid>25831</srid>
-          <authid>EPSG:25831</authid>
-          <description>ETRS89 / UTM zone 31N</description>
-          <projectionacronym>utm</projectionacronym>
+          <srsid>__SRSID__</srsid>
+          <srid>__SRID__</srid>
+          <authid>__AUTHID__</authid>
+          <description>__DESCRIPTION__</description>
+          <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          <geographicflag>false</geographicflag>
+          <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -1763,13 +1763,13 @@ def my_form_open(dialog, layer, feature):
           <spatialrefsys>
             <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-            <srsid>2104</srsid>
-            <srid>25831</srid>
-            <authid>EPSG:25831</authid>
-            <description>ETRS89 / UTM zone 31N</description>
-            <projectionacronym>utm</projectionacronym>
+            <srsid>__SRSID__</srsid>
+            <srid>__SRID__</srid>
+            <authid>__AUTHID__</authid>
+            <description>__DESCRIPTION__</description>
+            <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            <geographicflag>false</geographicflag>
+            <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
           </spatialrefsys>
         </crs>
         <extent>
@@ -3710,7 +3710,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyAlgorithm="0" minScale="1e+08" type="vector" styleCategories="AllStyleCategories" readOnly="0" geometry="Polygon" simplifyLocal="0" labelsEnabled="1" simplifyDrawingTol="1" refreshOnNotifyEnabled="0" hasScaleBasedVisibilityFlag="0" maxScale="0" simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshTime="0" wkbType="MultiPolygon" refreshOnNotifyMessage="" autoRefreshEnabled="0">
       <id>v_edit_cad_auxcircle_059d7d8c_424a_4b7c_8305_e504f21918a6</id>
-      <datasource>dbname='giswater3' host=localhost port=5432 user='postgres' password='postgres' sslmode=disable key='id' srid=25831 type=MultiPolygon checkPrimaryKeyUnicity='1' table="ud_414"."v_edit_cad_auxcircle" (geom_polygon) sql=</datasource>
+      <datasource>dbname='__DBNAME__' host=__HOST__ port=__PORT__   sslmode=disable key='id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_cad_auxcircle" (geom_polygon) sql=</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -3719,13 +3719,13 @@ def my_form_open(dialog, layer, feature):
         <spatialrefsys>
           <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-          <srsid>2104</srsid>
-          <srid>25831</srid>
-          <authid>EPSG:25831</authid>
-          <description>ETRS89 / UTM zone 31N</description>
-          <projectionacronym>utm</projectionacronym>
+          <srsid>__SRSID__</srsid>
+          <srid>__SRID__</srid>
+          <authid>__AUTHID__</authid>
+          <description>__DESCRIPTION__</description>
+          <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          <geographicflag>false</geographicflag>
+          <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -3742,13 +3742,13 @@ def my_form_open(dialog, layer, feature):
           <spatialrefsys>
             <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-            <srsid>2104</srsid>
-            <srid>25831</srid>
-            <authid>EPSG:25831</authid>
-            <description>ETRS89 / UTM zone 31N</description>
-            <projectionacronym>utm</projectionacronym>
+            <srsid>__SRSID__</srsid>
+            <srid>__SRID__</srid>
+            <authid>__AUTHID__</authid>
+            <description>__DESCRIPTION__</description>
+            <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            <geographicflag>false</geographicflag>
+            <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
           </spatialrefsys>
         </crs>
         <extent/>
@@ -3897,7 +3897,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyAlgorithm="0" minScale="1e+08" type="vector" styleCategories="AllStyleCategories" readOnly="0" geometry="Point" simplifyLocal="0" labelsEnabled="1" simplifyDrawingTol="1" refreshOnNotifyEnabled="0" hasScaleBasedVisibilityFlag="0" maxScale="0" simplifyDrawingHints="0" simplifyMaxScale="1" autoRefreshTime="0" wkbType="Point" refreshOnNotifyMessage="" autoRefreshEnabled="0">
       <id>v_edit_cad_auxpoint_97a71e5d_6dd5_4df1_88a5_64559796eb04</id>
-      <datasource>dbname='giswater3' host=localhost port=5432 user='postgres' password='postgres' sslmode=disable key='id' srid=25831 type=Point checkPrimaryKeyUnicity='1' table="ud_414"."v_edit_cad_auxpoint" (geom_point) sql=</datasource>
+      <datasource>dbname='__DBNAME__' host=__HOST__ port=__PORT__   sslmode=disable key='id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_cad_auxpoint" (geom_point) sql=</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -3906,13 +3906,13 @@ def my_form_open(dialog, layer, feature):
         <spatialrefsys>
           <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-          <srsid>2104</srsid>
-          <srid>25831</srid>
-          <authid>EPSG:25831</authid>
-          <description>ETRS89 / UTM zone 31N</description>
-          <projectionacronym>utm</projectionacronym>
+          <srsid>__SRSID__</srsid>
+          <srid>__SRID__</srid>
+          <authid>__AUTHID__</authid>
+          <description>__DESCRIPTION__</description>
+          <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          <geographicflag>false</geographicflag>
+          <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -3929,13 +3929,13 @@ def my_form_open(dialog, layer, feature):
           <spatialrefsys>
             <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-            <srsid>2104</srsid>
-            <srid>25831</srid>
-            <authid>EPSG:25831</authid>
-            <description>ETRS89 / UTM zone 31N</description>
-            <projectionacronym>utm</projectionacronym>
+            <srsid>__SRSID__</srsid>
+            <srid>__SRID__</srid>
+            <authid>__AUTHID__</authid>
+            <description>__DESCRIPTION__</description>
+            <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            <geographicflag>false</geographicflag>
+            <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
           </spatialrefsys>
         </crs>
         <extent/>
@@ -4091,13 +4091,13 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyAlgorithm="0" minScale="1500" type="vector" styleCategories="AllStyleCategories" readOnly="0" geometry="Point" simplifyLocal="1" labelsEnabled="0" simplifyDrawingTol="1" refreshOnNotifyEnabled="1" hasScaleBasedVisibilityFlag="1" maxScale="0" simplifyDrawingHints="0" simplifyMaxScale="1" autoRefreshTime="0" wkbType="Point" refreshOnNotifyMessage="" autoRefreshEnabled="0">
       <extent>
-        <xmin>418332.21465897001326084</xmin>
-        <ymin>4576257.39869481977075338</ymin>
-        <xmax>419524.85673911200137809</xmax>
-        <ymax>4578057.68812317959964275</ymax>
+        <xmin>__XMIN__</xmin>
+        <ymin>__YMIN__</ymin>
+        <xmax>__XMAX__</xmax>
+        <ymax>__YMAX__</ymax>
       </extent>
       <id>v_edit_connec_8a7cc13f_d89f_485c_baa6_dea1fcfe3331</id>
-      <datasource>dbname='giswater3' host=localhost port=5432 user='postgres' password='postgres' sslmode=disable key='connec_id' srid=25831 type=Point checkPrimaryKeyUnicity='1' table="ud_414"."v_edit_connec" (the_geom) sql=</datasource>
+      <datasource>dbname='__DBNAME__' host=__HOST__ port=__PORT__   sslmode=disable key='connec_id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_connec" (the_geom) sql=</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -4106,13 +4106,13 @@ def my_form_open(dialog, layer, feature):
         <spatialrefsys>
           <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-          <srsid>2104</srsid>
-          <srid>25831</srid>
-          <authid>EPSG:25831</authid>
-          <description>ETRS89 / UTM zone 31N</description>
-          <projectionacronym>utm</projectionacronym>
+          <srsid>__SRSID__</srsid>
+          <srid>__SRID__</srid>
+          <authid>__AUTHID__</authid>
+          <description>__DESCRIPTION__</description>
+          <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          <geographicflag>false</geographicflag>
+          <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -4138,13 +4138,13 @@ def my_form_open(dialog, layer, feature):
           <spatialrefsys>
             <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-            <srsid>2104</srsid>
-            <srid>25831</srid>
-            <authid>EPSG:25831</authid>
-            <description>ETRS89 / UTM zone 31N</description>
-            <projectionacronym>utm</projectionacronym>
+            <srsid>__SRSID__</srsid>
+            <srid>__SRID__</srid>
+            <authid>__AUTHID__</authid>
+            <description>__DESCRIPTION__</description>
+            <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            <geographicflag>false</geographicflag>
+            <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
           </spatialrefsys>
         </crs>
         <extent>
@@ -5300,7 +5300,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyAlgorithm="0" minScale="1e+08" type="vector" styleCategories="AllStyleCategories" readOnly="0" geometry="Line" simplifyLocal="1" labelsEnabled="1" simplifyDrawingTol="1" refreshOnNotifyEnabled="0" hasScaleBasedVisibilityFlag="0" maxScale="0" simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshTime="0" wkbType="LineString" refreshOnNotifyMessage="" autoRefreshEnabled="0">
       <id>v_edit_dimensions_f966f7af_448b_41d3_9ac5_c8adf0f785ea</id>
-      <datasource>dbname='giswater3' host=localhost port=5432 user='postgres' password='postgres' sslmode=disable key='id' srid=25831 type=LineString checkPrimaryKeyUnicity='1' table="ud_414"."v_edit_dimensions" (the_geom) sql=</datasource>
+      <datasource>dbname='__DBNAME__' host=__HOST__ port=__PORT__   sslmode=disable key='id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_dimensions" (the_geom) sql=</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -5309,13 +5309,13 @@ def my_form_open(dialog, layer, feature):
         <spatialrefsys>
           <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-          <srsid>2104</srsid>
-          <srid>25831</srid>
-          <authid>EPSG:25831</authid>
-          <description>ETRS89 / UTM zone 31N</description>
-          <projectionacronym>utm</projectionacronym>
+          <srsid>__SRSID__</srsid>
+          <srid>__SRID__</srid>
+          <authid>__AUTHID__</authid>
+          <description>__DESCRIPTION__</description>
+          <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          <geographicflag>false</geographicflag>
+          <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -5332,13 +5332,13 @@ def my_form_open(dialog, layer, feature):
           <spatialrefsys>
             <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-            <srsid>2104</srsid>
-            <srid>25831</srid>
-            <authid>EPSG:25831</authid>
-            <description>ETRS89 / UTM zone 31N</description>
-            <projectionacronym>utm</projectionacronym>
+            <srsid>__SRSID__</srsid>
+            <srid>__SRID__</srid>
+            <authid>__AUTHID__</authid>
+            <description>__DESCRIPTION__</description>
+            <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            <geographicflag>false</geographicflag>
+            <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
           </spatialrefsys>
         </crs>
         <extent/>
@@ -6997,13 +6997,13 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyAlgorithm="0" minScale="0" type="vector" styleCategories="AllStyleCategories" readOnly="0" geometry="Polygon" simplifyLocal="1" labelsEnabled="1" simplifyDrawingTol="1" refreshOnNotifyEnabled="0" hasScaleBasedVisibilityFlag="0" maxScale="0" simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshTime="0" wkbType="MultiPolygon" refreshOnNotifyMessage="" autoRefreshEnabled="0">
       <extent>
-        <xmin>418280.98291339102433994</xmin>
-        <ymin>4576171.1946372902020812</ymin>
-        <xmax>419590.43511445500189438</xmax>
-        <ymax>4578106.68520885985344648</ymax>
+        <xmin>__XMIN__</xmin>
+        <ymin>__YMIN__</ymin>
+        <xmax>__XMAX__</xmax>
+        <ymax>__YMAX__</ymax>
       </extent>
       <id>v_edit_dma_6ef4194d_f9a3_49e1_8179_bbdcc7f6549c</id>
-      <datasource>dbname='giswater3' host=localhost port=5432 user='postgres' password='postgres' sslmode=disable key='dma_id' srid=25831 type=MultiPolygon checkPrimaryKeyUnicity='1' table="ud_414"."v_edit_dma" (the_geom) sql=</datasource>
+      <datasource>dbname='__DBNAME__' host=__HOST__ port=__PORT__   sslmode=disable key='dma_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_dma" (the_geom) sql=</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -7012,13 +7012,13 @@ def my_form_open(dialog, layer, feature):
         <spatialrefsys>
           <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-          <srsid>2104</srsid>
-          <srid>25831</srid>
-          <authid>EPSG:25831</authid>
-          <description>ETRS89 / UTM zone 31N</description>
-          <projectionacronym>utm</projectionacronym>
+          <srsid>__SRSID__</srsid>
+          <srid>__SRID__</srid>
+          <authid>__AUTHID__</authid>
+          <description>__DESCRIPTION__</description>
+          <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          <geographicflag>false</geographicflag>
+          <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -7035,13 +7035,13 @@ def my_form_open(dialog, layer, feature):
           <spatialrefsys>
             <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-            <srsid>2104</srsid>
-            <srid>25831</srid>
-            <authid>EPSG:25831</authid>
-            <description>ETRS89 / UTM zone 31N</description>
-            <projectionacronym>utm</projectionacronym>
+            <srsid>__SRSID__</srsid>
+            <srid>__SRID__</srid>
+            <authid>__AUTHID__</authid>
+            <description>__DESCRIPTION__</description>
+            <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            <geographicflag>false</geographicflag>
+            <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
           </spatialrefsys>
         </crs>
         <extent/>
@@ -7257,13 +7257,13 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyAlgorithm="0" minScale="1500" type="vector" styleCategories="AllStyleCategories" readOnly="0" geometry="Point" simplifyLocal="1" labelsEnabled="0" simplifyDrawingTol="1" refreshOnNotifyEnabled="1" hasScaleBasedVisibilityFlag="1" maxScale="1" simplifyDrawingHints="0" simplifyMaxScale="1" autoRefreshTime="0" wkbType="Point" refreshOnNotifyMessage="" autoRefreshEnabled="0">
       <extent>
-        <xmin>418308.4736272600130178</xmin>
-        <ymin>4576210.73056439962238073</ymin>
-        <xmax>419639.83136157802073285</xmax>
-        <ymax>4578106.61798823997378349</ymax>
+        <xmin>__XMIN__</xmin>
+        <ymin>__YMIN__</ymin>
+        <xmax>__XMAX__</xmax>
+        <ymax>__YMAX__</ymax>
       </extent>
       <id>v_edit_element_e5ea3ac0_d64b_4db9_ba41_01b6ba993917</id>
-      <datasource>dbname='giswater3' host=localhost port=5432 user='postgres' password='postgres' sslmode=disable key='element_id' srid=25831 type=Point checkPrimaryKeyUnicity='1' table="ud_414"."v_edit_element" (the_geom) sql=</datasource>
+      <datasource>dbname='__DBNAME__' host=__HOST__ port=__PORT__   sslmode=disable key='element_id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_element" (the_geom) sql=</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -7272,13 +7272,13 @@ def my_form_open(dialog, layer, feature):
         <spatialrefsys>
           <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-          <srsid>2104</srsid>
-          <srid>25831</srid>
-          <authid>EPSG:25831</authid>
-          <description>ETRS89 / UTM zone 31N</description>
-          <projectionacronym>utm</projectionacronym>
+          <srsid>__SRSID__</srsid>
+          <srid>__SRID__</srid>
+          <authid>__AUTHID__</authid>
+          <description>__DESCRIPTION__</description>
+          <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          <geographicflag>false</geographicflag>
+          <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -7304,13 +7304,13 @@ def my_form_open(dialog, layer, feature):
           <spatialrefsys>
             <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-            <srsid>2104</srsid>
-            <srid>25831</srid>
-            <authid>EPSG:25831</authid>
-            <description>ETRS89 / UTM zone 31N</description>
-            <projectionacronym>utm</projectionacronym>
+            <srsid>__SRSID__</srsid>
+            <srid>__SRID__</srid>
+            <authid>__AUTHID__</authid>
+            <description>__DESCRIPTION__</description>
+            <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            <geographicflag>false</geographicflag>
+            <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
           </spatialrefsys>
         </crs>
         <extent>
@@ -7879,13 +7879,13 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyAlgorithm="0" minScale="1e+08" type="vector" styleCategories="AllStyleCategories" readOnly="0" geometry="Polygon" simplifyLocal="1" labelsEnabled="0" simplifyDrawingTol="1" refreshOnNotifyEnabled="0" hasScaleBasedVisibilityFlag="0" maxScale="0" simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshTime="0" wkbType="MultiPolygon" refreshOnNotifyMessage="" autoRefreshEnabled="0">
       <extent>
-        <xmin>418280.98291339102433994</xmin>
-        <ymin>4576171.1946372902020812</ymin>
-        <xmax>419590.43511445500189438</xmax>
-        <ymax>4578106.68520885985344648</ymax>
+        <xmin>__XMIN__</xmin>
+        <ymin>__YMIN__</ymin>
+        <xmax>__XMAX__</xmax>
+        <ymax>__YMAX__</ymax>
       </extent>
       <id>v_edit_exploitation_79f9ccda_070f_4e89_b991_6f956aec4b36</id>
-      <datasource>dbname='giswater3' host=localhost port=5432 user='postgres' password='postgres' sslmode=disable key='expl_id' srid=25831 type=MultiPolygon checkPrimaryKeyUnicity='1' table="ud_414"."v_edit_exploitation" (the_geom) sql=</datasource>
+      <datasource>dbname='__DBNAME__' host=__HOST__ port=__PORT__   sslmode=disable key='expl_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_exploitation" (the_geom) sql=</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -7894,13 +7894,13 @@ def my_form_open(dialog, layer, feature):
         <spatialrefsys>
           <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-          <srsid>2104</srsid>
-          <srid>25831</srid>
-          <authid>EPSG:25831</authid>
-          <description>ETRS89 / UTM zone 31N</description>
-          <projectionacronym>utm</projectionacronym>
+          <srsid>__SRSID__</srsid>
+          <srid>__SRID__</srid>
+          <authid>__AUTHID__</authid>
+          <description>__DESCRIPTION__</description>
+          <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          <geographicflag>false</geographicflag>
+          <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -7917,13 +7917,13 @@ def my_form_open(dialog, layer, feature):
           <spatialrefsys>
             <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-            <srsid>2104</srsid>
-            <srid>25831</srid>
-            <authid>EPSG:25831</authid>
-            <description>ETRS89 / UTM zone 31N</description>
-            <projectionacronym>utm</projectionacronym>
+            <srsid>__SRSID__</srsid>
+            <srid>__SRID__</srid>
+            <authid>__AUTHID__</authid>
+            <description>__DESCRIPTION__</description>
+            <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            <geographicflag>false</geographicflag>
+            <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
           </spatialrefsys>
         </crs>
         <extent/>
@@ -8086,13 +8086,13 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyAlgorithm="0" minScale="1500" type="vector" styleCategories="AllStyleCategories" readOnly="0" geometry="Point" simplifyLocal="1" labelsEnabled="0" simplifyDrawingTol="1" refreshOnNotifyEnabled="1" hasScaleBasedVisibilityFlag="1" maxScale="0" simplifyDrawingHints="0" simplifyMaxScale="1" autoRefreshTime="0" wkbType="Point" refreshOnNotifyMessage="" autoRefreshEnabled="0">
       <extent>
-        <xmin>418323.90046196000184864</xmin>
-        <ymin>4576263.82078278996050358</ymin>
-        <xmax>419585.07021676999283955</xmax>
-        <ymax>4578072.98721737042069435</ymax>
+        <xmin>__XMIN__</xmin>
+        <ymin>__YMIN__</ymin>
+        <xmax>__XMAX__</xmax>
+        <ymax>__YMAX__</ymax>
       </extent>
       <id>v_edit_gully_2fae9786_ee66_45f2_9da6_d665653031fb</id>
-      <datasource>dbname='giswater3' host=localhost port=5432 user='postgres' password='postgres' sslmode=disable key='gully_id' srid=25831 type=Point checkPrimaryKeyUnicity='1' table="ud_414"."v_edit_gully" (the_geom) sql=</datasource>
+      <datasource>dbname='__DBNAME__' host=__HOST__ port=__PORT__   sslmode=disable key='gully_id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_gully" (the_geom) sql=</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -8101,13 +8101,13 @@ def my_form_open(dialog, layer, feature):
         <spatialrefsys>
           <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-          <srsid>2104</srsid>
-          <srid>25831</srid>
-          <authid>EPSG:25831</authid>
-          <description>ETRS89 / UTM zone 31N</description>
-          <projectionacronym>utm</projectionacronym>
+          <srsid>__SRSID__</srsid>
+          <srid>__SRID__</srid>
+          <authid>__AUTHID__</authid>
+          <description>__DESCRIPTION__</description>
+          <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          <geographicflag>false</geographicflag>
+          <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -8133,13 +8133,13 @@ def my_form_open(dialog, layer, feature):
           <spatialrefsys>
             <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-            <srsid>2104</srsid>
-            <srid>25831</srid>
-            <authid>EPSG:25831</authid>
-            <description>ETRS89 / UTM zone 31N</description>
-            <projectionacronym>utm</projectionacronym>
+            <srsid>__SRSID__</srsid>
+            <srid>__SRID__</srid>
+            <authid>__AUTHID__</authid>
+            <description>__DESCRIPTION__</description>
+            <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            <geographicflag>false</geographicflag>
+            <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
           </spatialrefsys>
         </crs>
         <extent>
@@ -9268,13 +9268,13 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyAlgorithm="0" minScale="1500" type="vector" styleCategories="AllStyleCategories" readOnly="0" geometry="Line" simplifyLocal="1" labelsEnabled="0" simplifyDrawingTol="1" refreshOnNotifyEnabled="1" hasScaleBasedVisibilityFlag="1" maxScale="0" simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshTime="0" wkbType="LineString" refreshOnNotifyMessage="" autoRefreshEnabled="0">
       <extent>
-        <xmin>418311.99838344502495602</xmin>
-        <ymin>4576257.39869481977075338</ymin>
-        <xmax>419585.07021676999283955</xmax>
-        <ymax>4578081.51569753978401423</ymax>
+        <xmin>__XMIN__</xmin>
+        <ymin>__YMIN__</ymin>
+        <xmax>__XMAX__</xmax>
+        <ymax>__YMAX__</ymax>
       </extent>
       <id>v_edit_link_0c252985_de4f_4df3_a76a_c279ffeffed8</id>
-      <datasource>dbname='giswater3' host=localhost port=5432 user='postgres' password='postgres' sslmode=disable key='link_id' srid=25831 type=LineString checkPrimaryKeyUnicity='1' table="ud_414"."v_edit_link" (the_geom) sql=</datasource>
+      <datasource>dbname='__DBNAME__' host=__HOST__ port=__PORT__   sslmode=disable key='link_id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_link" (the_geom) sql=</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -9283,13 +9283,13 @@ def my_form_open(dialog, layer, feature):
         <spatialrefsys>
           <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-          <srsid>2104</srsid>
-          <srid>25831</srid>
-          <authid>EPSG:25831</authid>
-          <description>ETRS89 / UTM zone 31N</description>
-          <projectionacronym>utm</projectionacronym>
+          <srsid>__SRSID__</srsid>
+          <srid>__SRID__</srid>
+          <authid>__AUTHID__</authid>
+          <description>__DESCRIPTION__</description>
+          <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          <geographicflag>false</geographicflag>
+          <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -9315,13 +9315,13 @@ def my_form_open(dialog, layer, feature):
           <spatialrefsys>
             <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-            <srsid>2104</srsid>
-            <srid>25831</srid>
-            <authid>EPSG:25831</authid>
-            <description>ETRS89 / UTM zone 31N</description>
-            <projectionacronym>utm</projectionacronym>
+            <srsid>__SRSID__</srsid>
+            <srid>__SRID__</srid>
+            <authid>__AUTHID__</authid>
+            <description>__DESCRIPTION__</description>
+            <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            <geographicflag>false</geographicflag>
+            <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
           </spatialrefsys>
         </crs>
         <extent>
@@ -9746,13 +9746,13 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyAlgorithm="0" minScale="2500" type="vector" styleCategories="AllStyleCategories" readOnly="0" geometry="Point" simplifyLocal="1" labelsEnabled="0" simplifyDrawingTol="1" refreshOnNotifyEnabled="1" hasScaleBasedVisibilityFlag="1" maxScale="0" simplifyDrawingHints="0" simplifyMaxScale="1" autoRefreshTime="0" wkbType="Point" refreshOnNotifyMessage="" autoRefreshEnabled="0">
       <extent>
-        <xmin>418308.4736272600130178</xmin>
-        <ymin>4576237.72665109019726515</ymin>
-        <xmax>419639.83136157802073285</xmax>
-        <ymax>4578106.61798823997378349</ymax>
+        <xmin>__XMIN__</xmin>
+        <ymin>__YMIN__</ymin>
+        <xmax>__XMAX__</xmax>
+        <ymax>__YMAX__</ymax>
       </extent>
       <id>v_edit_node_505585a2_32e2_4c2e_a451_d9becc988d7c</id>
-      <datasource>dbname='giswater3' host=localhost port=5432 user='postgres' password='postgres' sslmode=disable key='node_id' srid=25831 type=Point checkPrimaryKeyUnicity='1' table="ud_414"."v_edit_node" (the_geom) sql=</datasource>
+      <datasource>dbname='__DBNAME__' host=__HOST__ port=__PORT__   sslmode=disable key='node_id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_node" (the_geom) sql=</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -9761,13 +9761,13 @@ def my_form_open(dialog, layer, feature):
         <spatialrefsys>
           <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-          <srsid>2104</srsid>
-          <srid>25831</srid>
-          <authid>EPSG:25831</authid>
-          <description>ETRS89 / UTM zone 31N</description>
-          <projectionacronym>utm</projectionacronym>
+          <srsid>__SRSID__</srsid>
+          <srid>__SRID__</srid>
+          <authid>__AUTHID__</authid>
+          <description>__DESCRIPTION__</description>
+          <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          <geographicflag>false</geographicflag>
+          <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -9793,13 +9793,13 @@ def my_form_open(dialog, layer, feature):
           <spatialrefsys>
             <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-            <srsid>2104</srsid>
-            <srid>25831</srid>
-            <authid>EPSG:25831</authid>
-            <description>ETRS89 / UTM zone 31N</description>
-            <projectionacronym>utm</projectionacronym>
+            <srsid>__SRSID__</srsid>
+            <srid>__SRID__</srid>
+            <authid>__AUTHID__</authid>
+            <description>__DESCRIPTION__</description>
+            <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            <geographicflag>false</geographicflag>
+            <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
           </spatialrefsys>
         </crs>
         <extent>
@@ -11301,13 +11301,13 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyAlgorithm="0" minScale="2500" type="vector" styleCategories="AllStyleCategories" readOnly="0" geometry="Point" simplifyLocal="1" labelsEnabled="0" simplifyDrawingTol="1" refreshOnNotifyEnabled="0" hasScaleBasedVisibilityFlag="1" maxScale="0" simplifyDrawingHints="0" simplifyMaxScale="1" autoRefreshTime="0" wkbType="Point" refreshOnNotifyMessage="" autoRefreshEnabled="0">
       <extent>
-        <xmin>418308.4736272600130178</xmin>
-        <ymin>4576210.73056439962238073</ymin>
-        <xmax>419639.83136157802073285</xmax>
-        <ymax>4578106.61798823997378349</ymax>
+        <xmin>__XMIN__</xmin>
+        <ymin>__YMIN__</ymin>
+        <xmax>__XMAX__</xmax>
+        <ymax>__YMAX__</ymax>
       </extent>
       <id>v_edit_om_visit_1e824d9d_e558_4cf1_a5fd_7ae9ee773690</id>
-      <datasource>dbname='giswater3' host=localhost port=5432 user='postgres' password='postgres' sslmode=disable key='id' srid=25831 type=Point checkPrimaryKeyUnicity='1' table="ud_414"."v_edit_om_visit" (the_geom) sql=</datasource>
+      <datasource>dbname='__DBNAME__' host=__HOST__ port=__PORT__   sslmode=disable key='id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_om_visit" (the_geom) sql=</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -11316,13 +11316,13 @@ def my_form_open(dialog, layer, feature):
         <spatialrefsys>
           <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-          <srsid>2104</srsid>
-          <srid>25831</srid>
-          <authid>EPSG:25831</authid>
-          <description>ETRS89 / UTM zone 31N</description>
-          <projectionacronym>utm</projectionacronym>
+          <srsid>__SRSID__</srsid>
+          <srid>__SRID__</srid>
+          <authid>__AUTHID__</authid>
+          <description>__DESCRIPTION__</description>
+          <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          <geographicflag>false</geographicflag>
+          <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -11348,13 +11348,13 @@ def my_form_open(dialog, layer, feature):
           <spatialrefsys>
             <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-            <srsid>2104</srsid>
-            <srid>25831</srid>
-            <authid>EPSG:25831</authid>
-            <description>ETRS89 / UTM zone 31N</description>
-            <projectionacronym>utm</projectionacronym>
+            <srsid>__SRSID__</srsid>
+            <srid>__SRID__</srid>
+            <authid>__AUTHID__</authid>
+            <description>__DESCRIPTION__</description>
+            <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            <geographicflag>false</geographicflag>
+            <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
           </spatialrefsys>
         </crs>
         <extent>
@@ -11615,7 +11615,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyAlgorithm="0" minScale="2000" type="vector" styleCategories="AllStyleCategories" readOnly="0" geometry="Point" simplifyLocal="1" labelsEnabled="0" simplifyDrawingTol="1" refreshOnNotifyEnabled="1" hasScaleBasedVisibilityFlag="1" maxScale="1" simplifyDrawingHints="0" simplifyMaxScale="1" autoRefreshTime="0" wkbType="Point" refreshOnNotifyMessage="" autoRefreshEnabled="0">
       <id>v_edit_samplepoint_7a1cbe53_7b69_401c_b949_e84b558c70ef</id>
-      <datasource>dbname='giswater3' host=localhost port=5432 user='postgres' password='postgres' sslmode=disable key='sample_id' srid=25831 type=Point checkPrimaryKeyUnicity='1' table="ud_414"."v_edit_samplepoint" (the_geom) sql=</datasource>
+      <datasource>dbname='__DBNAME__' host=__HOST__ port=__PORT__   sslmode=disable key='sample_id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_samplepoint" (the_geom) sql=</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -11624,13 +11624,13 @@ def my_form_open(dialog, layer, feature):
         <spatialrefsys>
           <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-          <srsid>2104</srsid>
-          <srid>25831</srid>
-          <authid>EPSG:25831</authid>
-          <description>ETRS89 / UTM zone 31N</description>
-          <projectionacronym>utm</projectionacronym>
+          <srsid>__SRSID__</srsid>
+          <srid>__SRID__</srid>
+          <authid>__AUTHID__</authid>
+          <description>__DESCRIPTION__</description>
+          <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          <geographicflag>false</geographicflag>
+          <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -11656,13 +11656,13 @@ def my_form_open(dialog, layer, feature):
           <spatialrefsys>
             <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-            <srsid>2104</srsid>
-            <srid>25831</srid>
-            <authid>EPSG:25831</authid>
-            <description>ETRS89 / UTM zone 31N</description>
-            <projectionacronym>utm</projectionacronym>
+            <srsid>__SRSID__</srsid>
+            <srid>__SRID__</srid>
+            <authid>__AUTHID__</authid>
+            <description>__DESCRIPTION__</description>
+            <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            <geographicflag>false</geographicflag>
+            <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
           </spatialrefsys>
         </crs>
         <extent>
@@ -12229,13 +12229,13 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyAlgorithm="0" minScale="1e+08" type="vector" styleCategories="AllStyleCategories" readOnly="0" geometry="Polygon" simplifyLocal="1" labelsEnabled="0" simplifyDrawingTol="1" refreshOnNotifyEnabled="0" hasScaleBasedVisibilityFlag="0" maxScale="0" simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshTime="0" wkbType="MultiPolygon" refreshOnNotifyMessage="" autoRefreshEnabled="0">
       <extent>
-        <xmin>418280.98291339102433994</xmin>
-        <ymin>4576171.1946372902020812</ymin>
-        <xmax>419590.43511445500189438</xmax>
-        <ymax>4578106.68520885985344648</ymax>
+        <xmin>__XMIN__</xmin>
+        <ymin>__YMIN__</ymin>
+        <xmax>__XMAX__</xmax>
+        <ymax>__YMAX__</ymax>
       </extent>
       <id>v_edit_sector_d4924986_50a2_4c42_bad8_bfff1644805d</id>
-      <datasource>dbname='giswater3' host=localhost port=5432 user='postgres' password='postgres' sslmode=disable key='sector_id' srid=25831 type=MultiPolygon checkPrimaryKeyUnicity='1' table="ud_414"."v_edit_sector" (the_geom) sql=</datasource>
+      <datasource>dbname='__DBNAME__' host=__HOST__ port=__PORT__   sslmode=disable key='sector_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_sector" (the_geom) sql=</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -12244,13 +12244,13 @@ def my_form_open(dialog, layer, feature):
         <spatialrefsys>
           <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-          <srsid>2104</srsid>
-          <srid>25831</srid>
-          <authid>EPSG:25831</authid>
-          <description>ETRS89 / UTM zone 31N</description>
-          <projectionacronym>utm</projectionacronym>
+          <srsid>__SRSID__</srsid>
+          <srid>__SRID__</srid>
+          <authid>__AUTHID__</authid>
+          <description>__DESCRIPTION__</description>
+          <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          <geographicflag>false</geographicflag>
+          <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -12267,13 +12267,13 @@ def my_form_open(dialog, layer, feature):
           <spatialrefsys>
             <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-            <srsid>2104</srsid>
-            <srid>25831</srid>
-            <authid>EPSG:25831</authid>
-            <description>ETRS89 / UTM zone 31N</description>
-            <projectionacronym>utm</projectionacronym>
+            <srsid>__SRSID__</srsid>
+            <srid>__SRID__</srid>
+            <authid>__AUTHID__</authid>
+            <description>__DESCRIPTION__</description>
+            <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            <geographicflag>false</geographicflag>
+            <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
           </spatialrefsys>
         </crs>
         <extent/>
@@ -12425,13 +12425,13 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyAlgorithm="0" minScale="1500" type="vector" styleCategories="AllStyleCategories" readOnly="0" geometry="Point" simplifyLocal="1" labelsEnabled="1" simplifyDrawingTol="1" refreshOnNotifyEnabled="1" hasScaleBasedVisibilityFlag="1" maxScale="0" simplifyDrawingHints="0" simplifyMaxScale="1" autoRefreshTime="0" wkbType="Point" refreshOnNotifyMessage="" autoRefreshEnabled="0">
       <extent>
-        <xmin>418332.21465897001326084</xmin>
-        <ymin>4576210.73056439962238073</ymin>
-        <xmax>419524.85673911200137809</xmax>
-        <ymax>4578057.68812317959964275</ymax>
+        <xmin>__XMIN__</xmin>
+        <ymin>__YMIN__</ymin>
+        <xmax>__XMAX__</xmax>
+        <ymax>__YMAX__</ymax>
       </extent>
       <id>v_ext_address_50461371_f0e5_46c9_81f8_4c182b00a9e9</id>
-      <datasource>dbname='giswater3' host=localhost port=5432 user='postgres' password='postgres' sslmode=disable key='id' srid=25831 type=Point checkPrimaryKeyUnicity='1' table="ud_414"."v_ext_address" (the_geom) sql=</datasource>
+      <datasource>dbname='__DBNAME__' host=__HOST__ port=__PORT__   sslmode=disable key='id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_ext_address" (the_geom) sql=</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -12440,13 +12440,13 @@ def my_form_open(dialog, layer, feature):
         <spatialrefsys>
           <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-          <srsid>2104</srsid>
-          <srid>25831</srid>
-          <authid>EPSG:25831</authid>
-          <description>ETRS89 / UTM zone 31N</description>
-          <projectionacronym>utm</projectionacronym>
+          <srsid>__SRSID__</srsid>
+          <srid>__SRID__</srid>
+          <authid>__AUTHID__</authid>
+          <description>__DESCRIPTION__</description>
+          <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          <geographicflag>false</geographicflag>
+          <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -12472,13 +12472,13 @@ def my_form_open(dialog, layer, feature):
           <spatialrefsys>
             <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-            <srsid>2104</srsid>
-            <srid>25831</srid>
-            <authid>EPSG:25831</authid>
-            <description>ETRS89 / UTM zone 31N</description>
-            <projectionacronym>utm</projectionacronym>
+            <srsid>__SRSID__</srsid>
+            <srid>__SRID__</srid>
+            <authid>__AUTHID__</authid>
+            <description>__DESCRIPTION__</description>
+            <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            <geographicflag>false</geographicflag>
+            <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
           </spatialrefsys>
         </crs>
         <extent>
@@ -12842,13 +12842,13 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyAlgorithm="0" minScale="1e+08" type="vector" styleCategories="AllStyleCategories" readOnly="0" geometry="Polygon" simplifyLocal="1" labelsEnabled="0" simplifyDrawingTol="1" refreshOnNotifyEnabled="1" hasScaleBasedVisibilityFlag="0" maxScale="0" simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshTime="0" wkbType="MultiPolygon" refreshOnNotifyMessage="" autoRefreshEnabled="0">
       <extent>
-        <xmin>418327.70520833297632635</xmin>
-        <ymin>4576127.71764998976141214</ymin>
-        <xmax>419591.76799999101785943</xmax>
-        <ymax>4578071.41101191006600857</ymax>
+        <xmin>__XMIN__</xmin>
+        <ymin>__YMIN__</ymin>
+        <xmax>__XMAX__</xmax>
+        <ymax>__YMAX__</ymax>
       </extent>
       <id>v_ext_plot_16824253_6498_4e46_a047_38297ad658c7</id>
-      <datasource>dbname='giswater3' host=localhost port=5432 user='postgres' password='postgres' sslmode=disable key='id' srid=25831 type=MultiPolygon checkPrimaryKeyUnicity='1' table="ud_414"."v_ext_plot" (the_geom) sql=</datasource>
+      <datasource>dbname='__DBNAME__' host=__HOST__ port=__PORT__   sslmode=disable key='id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_ext_plot" (the_geom) sql=</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -12857,13 +12857,13 @@ def my_form_open(dialog, layer, feature):
         <spatialrefsys>
           <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-          <srsid>2104</srsid>
-          <srid>25831</srid>
-          <authid>EPSG:25831</authid>
-          <description>ETRS89 / UTM zone 31N</description>
-          <projectionacronym>utm</projectionacronym>
+          <srsid>__SRSID__</srsid>
+          <srid>__SRID__</srid>
+          <authid>__AUTHID__</authid>
+          <description>__DESCRIPTION__</description>
+          <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          <geographicflag>false</geographicflag>
+          <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -12889,13 +12889,13 @@ def my_form_open(dialog, layer, feature):
           <spatialrefsys>
             <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-            <srsid>2104</srsid>
-            <srid>25831</srid>
-            <authid>EPSG:25831</authid>
-            <description>ETRS89 / UTM zone 31N</description>
-            <projectionacronym>utm</projectionacronym>
+            <srsid>__SRSID__</srsid>
+            <srid>__SRID__</srid>
+            <authid>__AUTHID__</authid>
+            <description>__DESCRIPTION__</description>
+            <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            <geographicflag>false</geographicflag>
+            <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
           </spatialrefsys>
         </crs>
         <extent>
@@ -13253,13 +13253,13 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyAlgorithm="0" minScale="3000" type="vector" styleCategories="AllStyleCategories" readOnly="0" geometry="Line" simplifyLocal="1" labelsEnabled="1" simplifyDrawingTol="1" refreshOnNotifyEnabled="1" hasScaleBasedVisibilityFlag="1" maxScale="0" simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshTime="0" wkbType="MultiLineString" refreshOnNotifyMessage="" autoRefreshEnabled="0">
       <extent>
-        <xmin>418308.12961521197576076</xmin>
-        <ymin>4576206.26448575966060162</ymin>
-        <xmax>419529.78547440201509744</xmax>
-        <ymax>4578092.20347531978040934</ymax>
+        <xmin>__XMIN__</xmin>
+        <ymin>__YMIN__</ymin>
+        <xmax>__XMAX__</xmax>
+        <ymax>__YMAX__</ymax>
       </extent>
       <id>v_ext_streetaxis_8e9c4012_5761_44d2_b410_878464ca38b4</id>
-      <datasource>dbname='giswater3' host=localhost port=5432 user='postgres' password='postgres' sslmode=disable key='id' srid=25831 type=MultiLineString checkPrimaryKeyUnicity='1' table="ud_414"."v_ext_streetaxis" (the_geom) sql=</datasource>
+      <datasource>dbname='__DBNAME__' host=__HOST__ port=__PORT__   sslmode=disable key='id' srid=__SRID__ type=MultiLineString checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_ext_streetaxis" (the_geom) sql=</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -13268,13 +13268,13 @@ def my_form_open(dialog, layer, feature):
         <spatialrefsys>
           <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-          <srsid>2104</srsid>
-          <srid>25831</srid>
-          <authid>EPSG:25831</authid>
-          <description>ETRS89 / UTM zone 31N</description>
-          <projectionacronym>utm</projectionacronym>
+          <srsid>__SRSID__</srsid>
+          <srid>__SRID__</srid>
+          <authid>__AUTHID__</authid>
+          <description>__DESCRIPTION__</description>
+          <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          <geographicflag>false</geographicflag>
+          <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -13300,13 +13300,13 @@ def my_form_open(dialog, layer, feature):
           <spatialrefsys>
             <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-            <srsid>2104</srsid>
-            <srid>25831</srid>
-            <authid>EPSG:25831</authid>
-            <description>ETRS89 / UTM zone 31N</description>
-            <projectionacronym>utm</projectionacronym>
+            <srsid>__SRSID__</srsid>
+            <srid>__SRID__</srid>
+            <authid>__AUTHID__</authid>
+            <description>__DESCRIPTION__</description>
+            <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            <geographicflag>false</geographicflag>
+            <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
           </spatialrefsys>
         </crs>
         <extent>
@@ -13668,13 +13668,13 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyAlgorithm="0" minScale="5000" type="vector" styleCategories="AllStyleCategories" readOnly="0" geometry="Polygon" simplifyLocal="1" labelsEnabled="0" simplifyDrawingTol="1" refreshOnNotifyEnabled="1" hasScaleBasedVisibilityFlag="1" maxScale="0" simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshTime="0" wkbType="MultiPolygon" refreshOnNotifyMessage="" autoRefreshEnabled="0">
       <extent>
-        <xmin>419596.30211075599072501</xmin>
-        <ymin>4576459.23623915016651154</ymin>
-        <xmax>419599.15361485397443175</xmax>
-        <ymax>4576462.10419281013309956</ymax>
+        <xmin>__XMIN__</xmin>
+        <ymin>__YMIN__</ymin>
+        <xmax>__XMAX__</xmax>
+        <ymax>__YMAX__</ymax>
       </extent>
       <id>ve_pol_chamber_1ca950d7_23d1_4b20_9087_4e1a403002ae</id>
-      <datasource>dbname='giswater3' host=localhost port=5432 user='postgres' password='postgres' sslmode=disable key='pol_id' srid=25831 type=MultiPolygon checkPrimaryKeyUnicity='1' table="ud_414"."ve_pol_chamber" (the_geom) sql=</datasource>
+      <datasource>dbname='__DBNAME__' host=__HOST__ port=__PORT__   sslmode=disable key='pol_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."ve_pol_chamber" (the_geom) sql=</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -13683,13 +13683,13 @@ def my_form_open(dialog, layer, feature):
         <spatialrefsys>
           <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-          <srsid>2104</srsid>
-          <srid>25831</srid>
-          <authid>EPSG:25831</authid>
-          <description>ETRS89 / UTM zone 31N</description>
-          <projectionacronym>utm</projectionacronym>
+          <srsid>__SRSID__</srsid>
+          <srid>__SRID__</srid>
+          <authid>__AUTHID__</authid>
+          <description>__DESCRIPTION__</description>
+          <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          <geographicflag>false</geographicflag>
+          <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -13715,13 +13715,13 @@ def my_form_open(dialog, layer, feature):
           <spatialrefsys>
             <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-            <srsid>2104</srsid>
-            <srid>25831</srid>
-            <authid>EPSG:25831</authid>
-            <description>ETRS89 / UTM zone 31N</description>
-            <projectionacronym>utm</projectionacronym>
+            <srsid>__SRSID__</srsid>
+            <srid>__SRID__</srid>
+            <authid>__AUTHID__</authid>
+            <description>__DESCRIPTION__</description>
+            <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            <geographicflag>false</geographicflag>
+            <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
           </spatialrefsys>
         </crs>
         <extent>
@@ -13897,13 +13897,13 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyAlgorithm="0" minScale="5000" type="vector" styleCategories="AllStyleCategories" readOnly="0" geometry="Polygon" simplifyLocal="1" labelsEnabled="0" simplifyDrawingTol="1" refreshOnNotifyEnabled="1" hasScaleBasedVisibilityFlag="1" maxScale="0" simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshTime="0" wkbType="MultiPolygon" refreshOnNotifyMessage="" autoRefreshEnabled="0">
       <extent>
-        <xmin>418351.21662553801434115</xmin>
-        <ymin>4576549.36315282993018627</ymin>
-        <xmax>419458.97003130498342216</xmax>
-        <ymax>4577946.37695745006203651</ymax>
+        <xmin>__XMIN__</xmin>
+        <ymin>__YMIN__</ymin>
+        <xmax>__XMAX__</xmax>
+        <ymax>__YMAX__</ymax>
       </extent>
       <id>ve_pol_gully_62d6bf96_9fb7_4951_81d1_feb290799438</id>
-      <datasource>dbname='giswater3' host=localhost port=5432 user='postgres' password='postgres' sslmode=disable key='pol_id' srid=25831 type=MultiPolygon checkPrimaryKeyUnicity='1' table="ud_414"."ve_pol_gully" (the_geom) sql=</datasource>
+      <datasource>dbname='__DBNAME__' host=__HOST__ port=__PORT__   sslmode=disable key='pol_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."ve_pol_gully" (the_geom) sql=</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -13912,13 +13912,13 @@ def my_form_open(dialog, layer, feature):
         <spatialrefsys>
           <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-          <srsid>2104</srsid>
-          <srid>25831</srid>
-          <authid>EPSG:25831</authid>
-          <description>ETRS89 / UTM zone 31N</description>
-          <projectionacronym>utm</projectionacronym>
+          <srsid>__SRSID__</srsid>
+          <srid>__SRID__</srid>
+          <authid>__AUTHID__</authid>
+          <description>__DESCRIPTION__</description>
+          <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          <geographicflag>false</geographicflag>
+          <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -13944,13 +13944,13 @@ def my_form_open(dialog, layer, feature):
           <spatialrefsys>
             <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-            <srsid>2104</srsid>
-            <srid>25831</srid>
-            <authid>EPSG:25831</authid>
-            <description>ETRS89 / UTM zone 31N</description>
-            <projectionacronym>utm</projectionacronym>
+            <srsid>__SRSID__</srsid>
+            <srid>__SRID__</srid>
+            <authid>__AUTHID__</authid>
+            <description>__DESCRIPTION__</description>
+            <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            <geographicflag>false</geographicflag>
+            <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
           </spatialrefsys>
         </crs>
         <extent>
@@ -14126,13 +14126,13 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyAlgorithm="0" minScale="5000" type="vector" styleCategories="AllStyleCategories" readOnly="0" geometry="Polygon" simplifyLocal="1" labelsEnabled="0" simplifyDrawingTol="1" refreshOnNotifyEnabled="1" hasScaleBasedVisibilityFlag="1" maxScale="0" simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshTime="0" wkbType="MultiPolygon" refreshOnNotifyMessage="" autoRefreshEnabled="0">
       <extent>
-        <xmin>418562.72623787197517231</xmin>
-        <ymin>4577566.56317226961255074</ymin>
-        <xmax>418567.55816177697852254</xmax>
-        <ymax>4577585.01941301021724939</ymax>
+        <xmin>__XMIN__</xmin>
+        <ymin>__YMIN__</ymin>
+        <xmax>__XMAX__</xmax>
+        <ymax>__YMAX__</ymax>
       </extent>
       <id>ve_pol_netgully_117490c4_d510_4c64_a913_b7b3dadd99dd</id>
-      <datasource>dbname='giswater3' host=localhost port=5432 user='postgres' password='postgres' sslmode=disable key='pol_id' srid=25831 type=MultiPolygon checkPrimaryKeyUnicity='1' table="ud_414"."ve_pol_netgully" (the_geom) sql=</datasource>
+      <datasource>dbname='__DBNAME__' host=__HOST__ port=__PORT__   sslmode=disable key='pol_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."ve_pol_netgully" (the_geom) sql=</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -14141,13 +14141,13 @@ def my_form_open(dialog, layer, feature):
         <spatialrefsys>
           <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-          <srsid>2104</srsid>
-          <srid>25831</srid>
-          <authid>EPSG:25831</authid>
-          <description>ETRS89 / UTM zone 31N</description>
-          <projectionacronym>utm</projectionacronym>
+          <srsid>__SRSID__</srsid>
+          <srid>__SRID__</srid>
+          <authid>__AUTHID__</authid>
+          <description>__DESCRIPTION__</description>
+          <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          <geographicflag>false</geographicflag>
+          <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -14173,13 +14173,13 @@ def my_form_open(dialog, layer, feature):
           <spatialrefsys>
             <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-            <srsid>2104</srsid>
-            <srid>25831</srid>
-            <authid>EPSG:25831</authid>
-            <description>ETRS89 / UTM zone 31N</description>
-            <projectionacronym>utm</projectionacronym>
+            <srsid>__SRSID__</srsid>
+            <srid>__SRID__</srid>
+            <authid>__AUTHID__</authid>
+            <description>__DESCRIPTION__</description>
+            <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            <geographicflag>false</geographicflag>
+            <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
           </spatialrefsys>
         </crs>
         <extent>
@@ -14355,13 +14355,13 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyAlgorithm="0" minScale="5000" type="vector" styleCategories="AllStyleCategories" readOnly="0" geometry="Polygon" simplifyLocal="1" labelsEnabled="0" simplifyDrawingTol="1" refreshOnNotifyEnabled="1" hasScaleBasedVisibilityFlag="1" maxScale="0" simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshTime="0" wkbType="MultiPolygon" refreshOnNotifyMessage="" autoRefreshEnabled="0">
       <extent>
-        <xmin>418713.76774450502125546</xmin>
-        <ymin>4576463.62807867024093866</ymin>
-        <xmax>419622.227622699982021</xmax>
-        <ymax>4577603.88826039992272854</ymax>
+        <xmin>__XMIN__</xmin>
+        <ymin>__YMIN__</ymin>
+        <xmax>__XMAX__</xmax>
+        <ymax>__YMAX__</ymax>
       </extent>
       <id>ve_pol_storage_b61e8684_ff62_482a_bebe_4bfa315e2f83</id>
-      <datasource>dbname='giswater3' host=localhost port=5432 user='postgres' password='postgres' sslmode=disable key='pol_id' srid=25831 type=MultiPolygon checkPrimaryKeyUnicity='1' table="ud_414"."ve_pol_storage" (the_geom) sql=</datasource>
+      <datasource>dbname='__DBNAME__' host=__HOST__ port=__PORT__   sslmode=disable key='pol_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."ve_pol_storage" (the_geom) sql=</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -14370,13 +14370,13 @@ def my_form_open(dialog, layer, feature):
         <spatialrefsys>
           <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-          <srsid>2104</srsid>
-          <srid>25831</srid>
-          <authid>EPSG:25831</authid>
-          <description>ETRS89 / UTM zone 31N</description>
-          <projectionacronym>utm</projectionacronym>
+          <srsid>__SRSID__</srsid>
+          <srid>__SRID__</srid>
+          <authid>__AUTHID__</authid>
+          <description>__DESCRIPTION__</description>
+          <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          <geographicflag>false</geographicflag>
+          <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -14402,13 +14402,13 @@ def my_form_open(dialog, layer, feature):
           <spatialrefsys>
             <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-            <srsid>2104</srsid>
-            <srid>25831</srid>
-            <authid>EPSG:25831</authid>
-            <description>ETRS89 / UTM zone 31N</description>
-            <projectionacronym>utm</projectionacronym>
+            <srsid>__SRSID__</srsid>
+            <srid>__SRID__</srid>
+            <authid>__AUTHID__</authid>
+            <description>__DESCRIPTION__</description>
+            <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            <geographicflag>false</geographicflag>
+            <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
           </spatialrefsys>
         </crs>
         <extent>
@@ -14584,7 +14584,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyAlgorithm="0" minScale="5000" type="vector" styleCategories="AllStyleCategories" readOnly="0" geometry="Polygon" simplifyLocal="1" labelsEnabled="0" simplifyDrawingTol="1" refreshOnNotifyEnabled="1" hasScaleBasedVisibilityFlag="1" maxScale="0" simplifyDrawingHints="1" simplifyMaxScale="1" autoRefreshTime="0" wkbType="MultiPolygon" refreshOnNotifyMessage="" autoRefreshEnabled="0">
       <id>ve_pol_wwtp_0fccdbfe_cfb2_43f9_ab89_943c51666986</id>
-      <datasource>dbname='giswater3' host=localhost port=5432 user='postgres' password='postgres' sslmode=disable key='pol_id' srid=25831 type=MultiPolygon checkPrimaryKeyUnicity='1' table="ud_414"."ve_pol_wwtp" (the_geom) sql=</datasource>
+      <datasource>dbname='__DBNAME__' host=__HOST__ port=__PORT__   sslmode=disable key='pol_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."ve_pol_wwtp" (the_geom) sql=</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -14593,13 +14593,13 @@ def my_form_open(dialog, layer, feature):
         <spatialrefsys>
           <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-          <srsid>2104</srsid>
-          <srid>25831</srid>
-          <authid>EPSG:25831</authid>
-          <description>ETRS89 / UTM zone 31N</description>
-          <projectionacronym>utm</projectionacronym>
+          <srsid>__SRSID__</srsid>
+          <srid>__SRID__</srid>
+          <authid>__AUTHID__</authid>
+          <description>__DESCRIPTION__</description>
+          <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          <geographicflag>false</geographicflag>
+          <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -14625,13 +14625,13 @@ def my_form_open(dialog, layer, feature):
           <spatialrefsys>
             <wkt>PROJCRS["ETRS89 / UTM zone 31N",BASEGEOGCRS["ETRS89",DATUM["European Terrestrial Reference System 1989",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4258]],CONVERSION["UTM zone 31N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",3,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["unknown"],AREA["Europe - 0°E to 6°E and ETRS89 by country"],BBOX[37,0,82.41,6.01]],ID["EPSG",25831]]</wkt>
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-            <srsid>2104</srsid>
-            <srid>25831</srid>
-            <authid>EPSG:25831</authid>
-            <description>ETRS89 / UTM zone 31N</description>
-            <projectionacronym>utm</projectionacronym>
+            <srsid>__SRSID__</srsid>
+            <srid>__SRID__</srid>
+            <authid>__AUTHID__</authid>
+            <description>__DESCRIPTION__</description>
+            <projectionacronym>__PROJECTIONACRONYM__</projectionacronym>
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            <geographicflag>false</geographicflag>
+            <geographicflag>__GEOGRAPHICFLAG__</geographicflag>
           </spatialrefsys>
         </crs>
         <extent>

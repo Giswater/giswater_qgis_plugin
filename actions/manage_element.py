@@ -20,8 +20,8 @@ class ManageElement(ParentManage):
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control 'Add element' of toolbar 'edit' """
         ParentManage.__init__(self, iface, settings, controller, plugin_dir)
-        
-         
+
+
     def manage_element(self, new_element_id=True, feature=None, geom_type=None):
         """ Button 33: Add element """
 
@@ -34,24 +34,24 @@ class ManageElement(ParentManage):
 
         # Capture the current layer to return it at the end of the operation
         cur_active_layer = self.iface.activeLayer()
-        
+
         self.set_selectionbehavior(self.dlg_add_element)
-        
+
         # Get layers of every geom_type
         self.reset_lists()
-        self.reset_layers()    
+        self.reset_layers()
         self.layers['arc'] = self.controller.get_group_layers('arc')
         self.layers['node'] = self.controller.get_group_layers('node')
         self.layers['connec'] = self.controller.get_group_layers('connec')
-        self.layers['element'] = self.controller.get_group_layers('element')        
-                
+        self.layers['element'] = self.controller.get_group_layers('element')
+
         # Remove 'gully' for 'WS'
         self.project_type = self.controller.get_project_type()
         if self.project_type == 'ws':
             self.dlg_add_element.tab_feature.removeTab(3)
         else:
-            self.layers['gully'] = self.controller.get_group_layers('gully')            
-                            
+            self.layers['gully'] = self.controller.get_group_layers('gully')
+
         # Set icons
         self.set_icon(self.dlg_add_element.btn_add_geom, "133")
         self.set_icon(self.dlg_add_element.btn_insert, "111")
@@ -140,7 +140,8 @@ class ManageElement(ParentManage):
         sql = "SELECT DISTINCT(id), id FROM cat_work"
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_add_element.workcat_id, rows, 1, add_empty=True)
-
+        self.dlg_add_element.workcat_id.currentIndexChanged.connect(partial(
+            self.set_style_sheet, self.dlg_add_element.workcat_id, None))
         sql = "SELECT DISTINCT(id), id FROM cat_work"
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_add_element.workcat_id_end, rows, 1, add_empty=True)
@@ -160,7 +161,7 @@ class ManageElement(ParentManage):
 
         if feature:
             self.dlg_add_element.tabWidget.currentChanged.connect(partial(self.fill_tbl_new_element,
-                self.dlg_add_element, geom_type, feature[geom_type+"_id"]))
+                self.dlg_add_element, geom_type, feature[geom_type + "_id"]))
 
         # Set default tab 'arc'
         self.dlg_add_element.tab_feature.setCurrentIndex(0)
@@ -179,9 +180,13 @@ class ManageElement(ParentManage):
         if not self.new_element_id:
             self.exist_object(self.dlg_add_element, 'element')
 
-        # Open the dialog    
+        # Open the dialog
         self.open_dialog(self.dlg_add_element, dlg_name='element', maximize_button=False)
         return self.dlg_add_element
+
+
+    def set_style_sheet(self, widget, style="border: 1px solid red"):
+        widget.setStyleSheet(style)
 
 
     def set_default_values(self):
@@ -277,14 +282,14 @@ class ManageElement(ParentManage):
         state = utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.state)
         if state == '':
             self.controller.show_warning(message, parameter="state_id")
-            return            
+            return
 
         state_type = utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.state_type)
         expl_id = utils_giswater.get_item_data(self.dlg_add_element, self.dlg_add_element.expl_id)
 
         # Get SRID
-        srid = self.controller.plugin_settings_value('srid')   
-        
+        srid = self.controller.plugin_settings_value('srid')
+
         # Check if this element already exists
         sql = (f"SELECT DISTINCT(element_id)"
                f" FROM {table_object}"
@@ -328,7 +333,8 @@ class ManageElement(ParentManage):
             if workcat_id:
                 sql_values += f", '{workcat_id}'"
             else:
-                sql_values += ", null"
+                self.set_style_sheet(self.dlg_add_element.workcat_id)
+                return
             if workcat_id_end:
                 sql_values += f", '{workcat_id_end}'"
             else:
@@ -404,13 +410,13 @@ class ManageElement(ParentManage):
                 sql += f", the_geom = ST_SetSRID(ST_MakePoint({self.x},{self.y}), {srid})"
 
             sql += f" WHERE element_id = '{element_id}';"
-            
+
         # Manage records in tables @table_object_x_@geom_type
-        sql+= (f"\nDELETE FROM element_x_node"
+        sql += (f"\nDELETE FROM element_x_node"
                f" WHERE element_id = '{element_id}';")
-        sql+= (f"\nDELETE FROM element_x_arc"
+        sql += (f"\nDELETE FROM element_x_arc"
                f" WHERE element_id = '{element_id}';")
-        sql+= (f"\nDELETE FROM element_x_connec"
+        sql += (f"\nDELETE FROM element_x_connec"
                f" WHERE element_id = '{element_id}';")
 
         if self.list_ids['arc']:
@@ -419,13 +425,13 @@ class ManageElement(ParentManage):
                         f" VALUES ('{element_id}', '{feature_id}');")
         if self.list_ids['node']:
             for feature_id in self.list_ids['node']:
-                sql+= (f"\nINSERT INTO element_x_node (element_id, node_id)"
+                sql += (f"\nINSERT INTO element_x_node (element_id, node_id)"
                        f" VALUES ('{element_id}', '{feature_id}');")
         if self.list_ids['connec']:
             for feature_id in self.list_ids['connec']:
                 sql += (f"\nINSERT INTO element_x_connec (element_id, connec_id)"
                         f" VALUES ('{element_id}', '{feature_id}');")
-                
+
         status = self.controller.execute_sql(sql, log_sql=True)
         if status:
             self.element_id = element_id
@@ -444,21 +450,21 @@ class ManageElement(ParentManage):
 
 
     def edit_element(self):
-        """ Button 67: Edit element """          
-        
+        """ Button 67: Edit element """
+
         # Create the dialog
         self.dlg_man = ElementManager()
         self.load_settings(self.dlg_man)
         self.dlg_man.tbl_element.setSelectionBehavior(QAbstractItemView.SelectRows)
-                
+
         # Adding auto-completion to a QLineEdit
-        table_object = "element"        
+        table_object = "element"
         self.set_completer_object(self.dlg_man, table_object)
 
         # Set a model with selected filter. Attach that model to selected table
-        self.fill_table_object(self.dlg_man.tbl_element, self.schema_name + "." + table_object)                
+        self.fill_table_object(self.dlg_man.tbl_element, self.schema_name + "." + table_object)
         self.set_table_columns(self.dlg_man, self.dlg_man.tbl_element, table_object)
-        
+
         # Set signals
         self.dlg_man.element_id.textChanged.connect(partial(self.filter_by_id, self.dlg_man, self.dlg_man.tbl_element,
             self.dlg_man.element_id, table_object))
@@ -468,8 +474,8 @@ class ManageElement(ParentManage):
         self.dlg_man.rejected.connect(partial(self.close_dialog, self.dlg_man))
         self.dlg_man.btn_delete.clicked.connect(partial(self.delete_selected_object, self.dlg_man.tbl_element,
             table_object))
-                                        
+
         # Open form
         self.open_dialog(self.dlg_man, dlg_name='element_manager')
-        
-        
+
+

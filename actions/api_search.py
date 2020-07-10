@@ -13,13 +13,11 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QComboBox, QCompleter, QFileD
     QLabel, QLineEdit, QSizePolicy, QSpacerItem, QTableView, QTabWidget, QWidget
 
 import csv
-import json
 import operator
 import os
 import re
 import sys
 from functools import partial
-from collections import OrderedDict
 
 from .. import utils_giswater
 from .api_cf import ApiCF
@@ -84,9 +82,9 @@ class ApiSearch(ApiParent):
         main_tab = self.dlg_search.findChild(QTabWidget, 'main_tab')
         if dlg_mincut and len(complet_list["form"]) == 1:
             main_tab = self.dlg_search.findChild(QTabWidget, 'main_tab')
-            main_tab.setStyleSheet("background-color: #f0f0f0;")
             main_tab.setStyleSheet("QTabBar::tab { background-color: transparent; text-align:left;"
-                                   "border: 1px solid transparent;}")
+                                   "border: 1px solid transparent;}"    
+                                   "QTabWidget::pane { background-color: #fcfcfc; border: 1 solid #dadada;}")
 
         first_tab = None
         self.lineedit_list = []
@@ -118,6 +116,7 @@ class ApiSearch(ApiParent):
 
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
             gridlayout.addItem(vertical_spacer1)
+
         if self.is_mincut is False:
             self.controller.manage_translation('search', self.dlg_search)
 
@@ -178,9 +177,9 @@ class ApiSearch(ApiParent):
         # Get selected tab name
         tab_selected = self.dlg_search.main_tab.widget(index).objectName()
 
-        #check for addschema
-        if tab_selected =='add_network':
-           is_add_schema = True
+        # check for addschema
+        if tab_selected == 'add_network':
+            is_add_schema = True
 
         # Tab 'network or add_network'
         if tab_selected == 'network' or tab_selected == 'add_network':
@@ -189,7 +188,7 @@ class ApiSearch(ApiParent):
                                    tab_type='data', is_add_schema=is_add_schema)
             if not complet_result:
                 return
-            self.draw(complet_result)
+            self.draw(complet_result[0])
             self.resetRubberbands()
 
         # Tab 'search'
@@ -201,7 +200,7 @@ class ApiSearch(ApiParent):
         elif tab_selected == 'address' and 'id' in item and 'sys_id' not in item:
             polygon = item['st_astext']
             if polygon:
-                polygon = polygon[9:len(polygon)-2]
+                polygon = polygon[9:len(polygon) - 2]
                 polygon = polygon.split(',')
                 x1, y1 = polygon[0].split(' ')
                 x2, y2 = polygon[2].split(' ')
@@ -209,7 +208,7 @@ class ApiSearch(ApiParent):
             else:
                 message = f"Zoom unavailable. Doesn't exist the geometry for the street"
                 self.controller.show_info(message, parameter=item['display_name'])
-                
+
         # Tab 'address'
         elif tab_selected == 'address' and 'sys_x' in item and 'sys_y' in item:
             x1 = item['sys_x']
@@ -313,14 +312,15 @@ class ApiSearch(ApiParent):
             value = utils_giswater.getWidgetText(self.dlg_search, line_edit, return_string_null=False)
             if str(value) == '':
                 return
-            
+
             qgis_project_add_schema = self.controller.plugin_settings_value('gwAddSchema')
             extras_search += f'"{line_edit.property("columnname")}":{{"text":"{value}"}}, '
             extras_search += f'"addSchema":"{qgis_project_add_schema}"'
             extras_search_add += f'"{line_edit.property("columnname")}":{{"text":"{value}"}}'
             body = self.create_body(form=form_search, extras=extras_search)
             result = self.controller.get_json('gw_fct_setsearch', body, log_sql=True)
-            if not result: return False
+            if not result:
+                return False
 
             if result:
                 self.result_data = result
@@ -352,7 +352,8 @@ class ApiSearch(ApiParent):
             extras_search_add += f', "{line_edit_add.property("columnname")}":{{"text":"{value}"}}'
             body = self.create_body(form=form_search_add, extras=extras_search_add)
             result = self.controller.get_json('gw_fct_setsearchadd', body, log_sql=True)
-            if not result: return False
+            if not result:
+                return False
 
             if result:
                 self.result_data = result
@@ -393,7 +394,7 @@ class ApiSearch(ApiParent):
 
 
     def populate_combo(self, widget, field, allow_blank=True):
-        
+
         # Generate list of items to add into combo
         widget.blockSignals(True)
         widget.clear()
@@ -491,18 +492,25 @@ class ApiSearch(ApiParent):
         table_name = "v_ui_workcat_x_feature"
         table_name_end = "v_ui_workcat_x_feature_end"
         table_doc = "v_ui_doc_x_workcat"
-        self.items_dialog.btn_doc_insert.clicked.connect(partial(self.document_insert, self.items_dialog, 'doc_x_workcat', 'workcat_id' ,item['sys_id']))
-        self.items_dialog.btn_doc_delete.clicked.connect(partial(self.document_delete, self.items_dialog.tbl_document, 'doc_x_workcat'))
-        self.items_dialog.btn_doc_new.clicked.connect(partial(self.manage_document, self.items_dialog.tbl_document, item ['sys_id']))
+        self.items_dialog.btn_doc_insert.clicked.connect(
+            partial(self.document_insert, self.items_dialog, 'doc_x_workcat', 'workcat_id', item['sys_id']))
+        self.items_dialog.btn_doc_delete.clicked.connect(
+            partial(self.document_delete, self.items_dialog.tbl_document, 'doc_x_workcat'))
+        self.items_dialog.btn_doc_new.clicked.connect(
+            partial(self.manage_document, self.items_dialog.tbl_document, item['sys_id']))
         self.items_dialog.btn_open_doc.clicked.connect(partial(self.document_open, self.items_dialog.tbl_document))
-        self.items_dialog.tbl_document.doubleClicked.connect(partial(self.document_open, self.items_dialog.tbl_document))
+        self.items_dialog.tbl_document.doubleClicked.connect(
+            partial(self.document_open, self.items_dialog.tbl_document))
 
         self.items_dialog.btn_close.clicked.connect(partial(self.close_dialog, self.items_dialog))
-        self.items_dialog.btn_path.clicked.connect(partial(self.get_folder_dialog, self.items_dialog, self.items_dialog.txt_path))
+        self.items_dialog.btn_path.clicked.connect(
+            partial(self.get_folder_dialog, self.items_dialog, self.items_dialog.txt_path))
         self.items_dialog.rejected.connect(partial(self.close_dialog, self.items_dialog))
         self.items_dialog.rejected.connect(partial(self.resetRubberbands))
-        self.items_dialog.btn_state1.clicked.connect(partial(self.force_state, self.items_dialog.btn_state1, 1, self.items_dialog.tbl_psm))
-        self.items_dialog.btn_state0.clicked.connect(partial(self.force_state, self.items_dialog.btn_state0, 0, self.items_dialog.tbl_psm_end))
+        self.items_dialog.btn_state1.clicked.connect(
+            partial(self.force_state, self.items_dialog.btn_state1, 1, self.items_dialog.tbl_psm))
+        self.items_dialog.btn_state0.clicked.connect(
+            partial(self.force_state, self.items_dialog.btn_state0, 0, self.items_dialog.tbl_psm_end))
         self.items_dialog.btn_export_to_csv.clicked.connect(
             partial(self.export_to_csv, self.items_dialog, self.items_dialog.tbl_psm, self.items_dialog.tbl_psm_end,
                     self.items_dialog.txt_path))
@@ -512,7 +520,8 @@ class ApiSearch(ApiParent):
         self.items_dialog.txt_name_end.textChanged.connect(partial
             (self.workcat_filter_by_text, self.items_dialog, self.items_dialog.tbl_psm_end, self.items_dialog.txt_name_end, table_name_end, workcat_id, field_id))
         self.items_dialog.tbl_psm.doubleClicked.connect(partial(self.open_feature_form, self.items_dialog.tbl_psm))
-        self.items_dialog.tbl_psm_end.doubleClicked.connect(partial(self.open_feature_form, self.items_dialog.tbl_psm_end))
+        self.items_dialog.tbl_psm_end.doubleClicked.connect(
+            partial(self.open_feature_form, self.items_dialog.tbl_psm_end))
 
         expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
         self.workcat_fill_table(self.items_dialog.tbl_psm, table_name, expr=expr)
@@ -544,7 +553,7 @@ class ApiSearch(ApiParent):
         utils_giswater.remove_tab_by_tabName(dlg_docman.tabWidget, 'tab_rel')
 
 
-    def force_expl(self,  workcat_id):
+    def force_expl(self, workcat_id):
         """ Active exploitations are compared with workcat farms.
             If there is consistency nothing happens, if there is no consistency force this exploitations to selector."""
 
@@ -595,7 +604,7 @@ class ApiSearch(ApiParent):
 
         widget.setStyleSheet(None)
         if 'nt' in sys.builtin_module_names:
-            folder_path = os.path.expanduser("~\Documents")
+            folder_path = os.path.expanduser("~/Documents")
         else:
             folder_path = os.path.expanduser("~")
 
@@ -619,7 +628,7 @@ class ApiSearch(ApiParent):
         row = self.controller.get_row(sql)
         if row:
             return
-        
+
         sql = (f"INSERT INTO selector_state(state_id, cur_user) "
                f"VALUES('{state}', current_user)")
         self.controller.execute_sql(sql)
@@ -758,7 +767,7 @@ class ApiSearch(ApiParent):
         feature_id = qtable.model().record(row).value('feature_id')
 
         self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, tab_type='data')
-        complet_result, dialog = self.ApiCF.open_form(table_name=table_name,  feature_id=feature_id, tab_type='data')
+        complet_result, dialog = self.ApiCF.open_form(table_name=table_name, feature_id=feature_id, tab_type='data')
 
         # Get list of all coords in field geometry
         list_coord = re.search('\((.*)\)', str(complet_result[0]['body']['feature']['geometry']['st_astext']))
@@ -797,7 +806,7 @@ class ApiSearch(ApiParent):
             widget.setText(str(feature.lower().title()) + "s: " + str(total))
             if self.project_type == 'ws' and feature == 'GULLY':
                 widget.setVisible(False)
-            
+
             if not rows:
                 continue
 

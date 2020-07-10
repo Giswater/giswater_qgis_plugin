@@ -19,5 +19,5 @@ class HyperLinkLabel(QLabel):
     def mouseReleaseEvent(self, ev):
         self.clicked.emit()
         self.setStyleSheet("QLabel{color:purple; text-decoration: underline;}")
-        
-        
+
+

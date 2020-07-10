@@ -7,7 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import QStringListModel
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtWidgets import QTableView, QMenu, QPushButton, QLineEdit, QCompleter, QAbstractItemView
+from qgis.PyQt.QtWidgets import QTableView, QPushButton, QLineEdit, QCompleter, QAbstractItemView
 
 import datetime
 import json
@@ -24,7 +24,7 @@ from ..ui_manager import SelectorUi, MincutManagerUi
 
 
 class MincutConfig(ParentAction):
-    
+
     def __init__(self, mincut):
         """ Class constructor """
 
@@ -50,11 +50,11 @@ class MincutConfig(ParentAction):
         self.dlg_min_edit.date_from.setEnabled(False)
         self.dlg_min_edit.date_to.setEnabled(False)
         self.set_icon(self.dlg_min_edit.btn_selector_mincut, "191")
-        
+
         self.tbl_mincut_edit = self.dlg_min_edit.findChild(QTableView, "tbl_mincut_edit")
         self.txt_mincut_id = self.dlg_min_edit.findChild(QLineEdit, "txt_mincut_id")
-        self.tbl_mincut_edit.setSelectionBehavior(QAbstractItemView.SelectRows)        
-        
+        self.tbl_mincut_edit.setSelectionBehavior(QAbstractItemView.SelectRows)
+
         # Adding auto-completion to a QLineEdit
         self.completer = QCompleter()
         self.txt_mincut_id.setCompleter(self.completer)
@@ -236,16 +236,21 @@ class MincutConfig(ParentAction):
             i = int(model.fieldIndex(field_id))
             value = model.data(model.index(x, i))
             selected_mincuts.append(value)
+
+        if len(selected_mincuts) == 0:
+            msg = "There are no visible mincuts in the table. Try a different filter or make one"
+            self.controller.show_message(msg)
+            return
         selector_values = f'"selector_mincut", "ids":{selected_mincuts}'
         self.dlg_selector = SelectorUi()
         self.load_settings(self.dlg_selector)
-        self.current_tab = self.get_last_tab(self.dlg_selector, 'mincut')
+        current_tab = self.get_last_tab(self.dlg_selector, 'mincut')
         self.dlg_selector.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_selector))
         self.dlg_selector.rejected.connect(partial(self.save_settings, self.dlg_selector))
         self.dlg_selector.rejected.connect(partial(
             self.save_current_tab, self.dlg_selector, self.dlg_selector.main_tab, 'mincut'))
 
-        self.api_parent.get_selector(self.dlg_selector, selector_values)
+        self.api_parent.get_selector(self.dlg_selector, selector_values, current_tab=current_tab)
 
         self.open_dialog(self.dlg_selector, dlg_name='selector', maximize_button=False)
 
@@ -273,7 +278,7 @@ class MincutConfig(ParentAction):
             message = "Any record selected"
             self.controller.show_warning(message)
             return
-        
+
         row = selected_list[0].row()
 
         # Get mincut_id from selected row
@@ -339,11 +344,13 @@ class MincutConfig(ParentAction):
             format_high = 'yyyy-MM-dd 23:59:59.999'
             interval = f"'{visit_start.toString(format_low)}'::timestamp AND '{visit_end.toString(format_high)}'::timestamp"
             if str(state_id) in ('0', '3'):
-                utils_giswater.setWidgetText(self.dlg_min_edit, self.dlg_min_edit.lbl_date_from, 'Date from: forecast_start')
+                utils_giswater.setWidgetText(
+                    self.dlg_min_edit, self.dlg_min_edit.lbl_date_from, 'Date from: forecast_start')
                 utils_giswater.setWidgetText(self.dlg_min_edit, self.dlg_min_edit.lbl_date_to, 'Date to: forecast_end')
                 dates_filter = f"AND (forecast_start BETWEEN {interval}) AND (forecast_end BETWEEN {interval})"
             elif str(state_id) in ('1', '2'):
-                utils_giswater.setWidgetText(self.dlg_min_edit, self.dlg_min_edit.lbl_date_from, 'Date from: exec_start')
+                utils_giswater.setWidgetText(
+                    self.dlg_min_edit, self.dlg_min_edit.lbl_date_from, 'Date from: exec_start')
                 utils_giswater.setWidgetText(self.dlg_min_edit, self.dlg_min_edit.lbl_date_to, 'Date to: exec_end')
                 dates_filter = f"AND (exec_start BETWEEN {interval}) AND (exec_end BETWEEN {interval})"
             else:
@@ -385,7 +392,7 @@ class MincutConfig(ParentAction):
 
     def delete_mincut_management(self, widget, table_name, column_id):
         """ Delete selected elements of the table (by id) """
-        
+
         # Get selected rows
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:

@@ -5,7 +5,10 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-import os, psycopg2, psycopg2.extras, subprocess
+import os
+import psycopg2
+import psycopg2.extras
+import subprocess
 
 from functools import partial
 
@@ -213,7 +216,7 @@ class I18NGenerator(ParentAction):
                 py_dlg[key_tooltip] = py_dlg['lb_enen']
             line += f"\t\t\t<translation>{py_dlg[key_tooltip]}</translation>\n"
             line += f"\t\t</message>\n"
-            
+
         # Close last context and TS
         line += '\t</context>\n'
         line += '</TS>\n\n'
@@ -221,7 +224,7 @@ class I18NGenerator(ParentAction):
         ts_file.write(line)
         ts_file.close()
         del ts_file
-        lrelease_path = self.plugin_dir + os.sep + 'resources' + os.sep +'lrelease.exe'
+        lrelease_path = self.plugin_dir + os.sep + 'resources' + os.sep + 'lrelease.exe'
         status = subprocess.call([lrelease_path, ts_path], shell=False)
         if status == 0:
             return True
@@ -256,7 +259,8 @@ class I18NGenerator(ParentAction):
                f" WHERE context in ('config_param_system', 'sys_param_user')"
                f" ORDER BY formname;")
         rows = self.get_rows(sql)
-        if not rows: return False
+        if not rows:
+            return False
         cfg_path = (self.plugin_dir + os.sep + 'sql' + os.sep + 'updates' + os.sep + f'{plugin_version}' + ''
                     + os.sep + f"{plugin_release}" + os.sep + 'i18n' + os.sep + f'{file_lng}' + os.sep + '')
         file_name = f'dml.sql'
@@ -267,7 +271,7 @@ class I18NGenerator(ParentAction):
             if not answer:
                 return
         else:
-            os.makedirs(cfg_path, exist_ok=True)      
+            os.makedirs(cfg_path, exist_ok=True)
 
         status = self.write_values(rows, cfg_path + file_name)
         return status
@@ -290,10 +294,11 @@ class I18NGenerator(ParentAction):
                f" WHERE context not in ('config_param_system', 'sys_param_user')"
                f" ORDER BY formname;")
         rows = self.get_rows(sql)
-        if not rows: return
+        if not rows:
+            return
 
-        db_path = (self.plugin_dir + os.sep + 'sql' + os.sep + 'api' + os.sep + 'updates' + os.sep + f'{plugin_version}' +''
-                + os.sep + f"{plugin_release}"  + os.sep + 'i18n' + os.sep + f'{file_lng}' + os.sep + '')
+        db_path = (self.plugin_dir + os.sep + 'sql' + os.sep + 'api' + os.sep + 'updates' + os.sep + f'{plugin_version}' + ''
+                + os.sep + f"{plugin_release}" + os.sep + 'i18n' + os.sep + f'{file_lng}' + os.sep + '')
         file_name = f'dml.sql'
 
         # Check if file exist
@@ -342,14 +347,14 @@ class I18NGenerator(ParentAction):
 
             line = f'SELECT gw_fct_admin_schema_i18n($$'
             if row['context'] in ('config_param_system', 'sys_param_user'):
-                line +=(f'{{"data":'
-                            f'{{"table":"{table}", '                                
-                                f'"formname":"{form_name}", '
-                                f'"label":{{"column":"label", "value":"{lbl_value}"}}, '
-                                f'"tooltip":{{"column":"descript", "value":"{tt_value}"}}')
+                line += (f'{{"data":'
+                        f'{{"table":"{table}", '
+                        f'"formname":"{form_name}", '
+                        f'"label":{{"column":"label", "value":"{lbl_value}"}}, '
+                        f'"tooltip":{{"column":"descript", "value":"{tt_value}"}}')
             elif row['context'] not in ('config_param_system', 'sys_param_user'):
                 line += (f'{{"data":'
-                         f'{{"table":"{table}", '                         
+                         f'{{"table":"{table}", '
                          f'"formname":"{form_name}", '
                          f'"label":{{"column":"label", "value":"{lbl_value}"}}, '
                          f'"tooltip":{{"column":"tooltip", "value":"{tt_value}"}}')
@@ -374,8 +379,8 @@ class I18NGenerator(ParentAction):
         file.close()
         del file
         return True
-    
-    
+
+
     def save_user_values(self):
         """ Save selected user values """
         host = utils_giswater.getWidgetText(self.dlg_qm, self.dlg_qm.txt_host, return_string_null=False)

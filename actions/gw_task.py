@@ -5,8 +5,9 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+from qgis.core import QgsTask
 from qgis.PyQt.QtCore import pyqtSignal, QObject
-from qgis.core import QgsTask, QgsMessageLog, Qgis
+
 from time import sleep
 
 
@@ -14,6 +15,7 @@ class GwTask(QgsTask, QObject):
     """ This shows how to subclass QgsTask """
 
     fake_progress = pyqtSignal()
+
     def __init__(self, description, duration=0, controller=None):
 
         QObject.__init__(self)

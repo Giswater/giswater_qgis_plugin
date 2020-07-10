@@ -56,7 +56,8 @@ class Utils(ParentAction):
         roles = self.controller.get_rolenames()
         temp_tablename = 'temp_csv'
         self.populate_cmb_unicodes(self.dlg_csv.cmb_unicode_list)
-        self.populate_combos(self.dlg_csv.cmb_import_type, 'fid', 'alias, config_csv.descript, functionname, readheader, orderby', 'config_csv', roles)
+        self.populate_combos(self.dlg_csv.cmb_import_type, 'fid',
+                             'alias, config_csv.descript, functionname, readheader, orderby', 'config_csv', roles)
 
         self.dlg_csv.lbl_info.setWordWrap(True)
         utils_giswater.setWidgetText(self.dlg_csv, self.dlg_csv.cmb_unicode_list, 'utf8')
@@ -120,7 +121,7 @@ class Utils(ParentAction):
         if not unicode:
             unicode = 'latin1'
         utils_giswater.setWidgetText(self.dlg_csv, self.dlg_csv.cmb_unicode_list, unicode)
-        
+
         if str(self.controller.plugin_settings_value('Csv2Pg_rb_comma_' + cur_user)).upper() == 'TRUE':
             self.dlg_csv.rb_comma.setChecked(True)
         else:
@@ -242,18 +243,14 @@ class Utils(ParentAction):
         extras = f'"importParam":"{label_aux}"'
         extras += f', "fid":"{fid_aux}"'
         body = self.create_body(extras=extras)
-        sql = ("SELECT " + str(self.func_name) + "($${" + body + "}$$)::text")
-        row = self.controller.get_row(sql, log_sql=True)
-        if not row:
-            self.controller.show_warning("NOT ROW FOR: " + sql)
-            message = "Import failed"
-            self.controller.show_info_box(message)
+
+        result = self.controller.get_json(self.func_name, body, log_sql=True)
+        if not result:
             return
         else:
-            complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-            if complet_result[0]['status'] == "Accepted":
-                self.add_layer.populate_info_text(dialog, complet_result[0]['body']['data'])
-            msg = complet_result[0]['message']['text']
+            if result['status'] == "Accepted":
+                self.add_layer.populate_info_text(dialog, result['body']['data'])
+            msg = result['message']['text']
             self.controller.show_info_box(msg)
 
 
@@ -281,10 +278,10 @@ class Utils(ParentAction):
                 sql += "INSERT INTO temp_csv (fid, "
                 values = f"VALUES({fid_aux}, "
                 for x in range(0, len(row)):
-                        sql += f"csv{x + 1}, "
-                        value = f"$$" + row[x].strip().replace("\n", "") + "$$, "
-                        value = str(value)
-                        values += value.replace("$$$$", "null")
+                    sql += f"csv{x + 1}, "
+                    value = f"$$" + row[x].strip().replace("\n", "") + "$$, "
+                    value = str(value)
+                    values += value.replace("$$$$", "null")
                 sql = sql[:-2] + ") "
                 values = values[:-2] + ");\n"
                 sql += values
@@ -371,7 +368,7 @@ class Utils(ParentAction):
     def utils_toolbox(self):
 
         self.toolbox.open_toolbox()
-
+        
 
     def utils_print_composer(self):
 

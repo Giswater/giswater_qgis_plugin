@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.core import QgsExpression, QgsFeatureRequest
-from qgis.PyQt.QtCore import Qt, QDate, QStringListModel
+from qgis.PyQt.QtCore import QDate, QStringListModel
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QCompleter
 
@@ -27,14 +27,14 @@ class ManageWorkcatEnd(ParentManage):
 
 
     def manage_workcat_end(self):
-        
+
         self.remove_selection(True)
-        
+
         # Create the dialog and signals
         self.dlg_work_end = FeatureEndUi()
         self.load_settings(self.dlg_work_end)
         self.set_edit_arc_downgrade_force('True')
-        
+
         # Capture the current layer to return it at the end of the operation
         self.cur_active_layer = self.iface.activeLayer()
 
@@ -68,15 +68,19 @@ class ManageWorkcatEnd(ParentManage):
 
         # Set signals
         self.dlg_work_end.btn_accept.clicked.connect(partial(self.manage_workcat_end_accept))
-        self.dlg_work_end.btn_cancel.clicked.connect(partial(self.manage_close, self.dlg_work_end, self.table_object, self.cur_active_layer,  force_downgrade=True))
-        self.dlg_work_end.rejected.connect(partial(self.manage_close, self.dlg_work_end, self.table_object, self.cur_active_layer,  force_downgrade=True, show_warning=True))
+        self.dlg_work_end.btn_cancel.clicked.connect(
+            partial(self.manage_close, self.dlg_work_end, self.table_object, self.cur_active_layer, force_downgrade=True))
+        self.dlg_work_end.rejected.connect(partial(self.manage_close, self.dlg_work_end,
+                                           self.table_object, self.cur_active_layer, force_downgrade=True, show_warning=True))
         self.dlg_work_end.workcat_id_end.editTextChanged.connect(partial(self.fill_workids))
         self.dlg_work_end.btn_new_workcat.clicked.connect(partial(self.new_workcat))
         self.dlg_work_end.btn_insert.clicked.connect(partial(self.insert_feature, self.dlg_work_end, self.table_object))
         self.dlg_work_end.btn_delete.clicked.connect(partial(self.delete_records, self.dlg_work_end, self.table_object))
-        self.dlg_work_end.btn_snapping.clicked.connect(partial(self.selection_init, self.dlg_work_end, self.table_object))
+        self.dlg_work_end.btn_snapping.clicked.connect(
+            partial(self.selection_init, self.dlg_work_end, self.table_object))
         self.dlg_work_end.workcat_id_end.activated.connect(partial(self.fill_workids))
-        self.dlg_work_end.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, self.dlg_work_end, self.table_object, excluded_layers=["v_edit_element"]))
+        self.dlg_work_end.tab_feature.currentChanged.connect(
+            partial(self.tab_feature_changed, self.dlg_work_end, self.table_object, excluded_layers=["v_edit_element"]))
 
         # Set values
         self.fill_fields()
@@ -92,11 +96,11 @@ class ManageWorkcatEnd(ParentManage):
         self.tab_feature_changed(self.dlg_work_end, self.table_object, excluded_layers=["v_edit_element"])
 
         # Open dialog
-        self.open_dialog(self.dlg_work_end, dlg_name='feature_end',maximize_button=False)
+        self.open_dialog(self.dlg_work_end, dlg_name='feature_end', maximize_button=False)
 
 
     def set_edit_arc_downgrade_force(self, value):
-        
+
         # Update (or insert) on config_param_user the value of edit_arc_downgrade_force to true
         row = self.controller.get_config('edit_arc_downgrade_force')
         if row:
@@ -154,7 +158,7 @@ class ManageWorkcatEnd(ParentManage):
 
     def fill_workids(self):
         """ Auto fill descriptions and workid's """
-        
+
         workcat_id = utils_giswater.getWidgetText(self.dlg_work_end, self.dlg_work_end.workcat_id_end)
         if not workcat_id:
             return
@@ -171,12 +175,12 @@ class ManageWorkcatEnd(ParentManage):
 
 
     def get_list_selected_id(self, qtable):
-        
+
         selected_list = qtable.model()
         self.selected_list = []
         ids_list = ""
         if selected_list is None:
-            self.manage_close(self.dlg_work_end, self.table_object, self.cur_active_layer,  force_downgrade=False)
+            self.manage_close(self.dlg_work_end, self.table_object, self.cur_active_layer, force_downgrade=False)
             return
 
         for x in range(0, selected_list.rowCount()):
@@ -234,7 +238,7 @@ class ManageWorkcatEnd(ParentManage):
             self.fill_table(self.tbl_arc_x_relations, table_relations, filter_)
             self.tbl_arc_x_relations.doubleClicked.connect(
                 partial(self.open_selected_object, self.tbl_arc_x_relations))
-            
+
             self.open_dialog(self.dlg_work, dlg_name='feature_end_connec')
 
         # TODO: Function update_geom_type() don't use parameter ids_list
@@ -332,7 +336,7 @@ class ManageWorkcatEnd(ParentManage):
 
         arc_type = row[0].lower()
         arc_table = "v_edit_man_" + arc_type
-        layer_arc= self.controller.get_layer_by_tablename(arc_table)
+        layer_arc = self.controller.get_layer_by_tablename(arc_table)
 
         aux = "\"arc_id\" = "
         aux += f"'{arc_id}'"
@@ -359,7 +363,7 @@ class ManageWorkcatEnd(ParentManage):
 
 
     def exec_downgrade(self):
-        
+
         message = "Are you sure you want to disconnect this elements?"
         title = "Disconnect elements"
         answer = self.controller.ask_question(message, title)
@@ -467,7 +471,6 @@ class ManageWorkcatEnd(ParentManage):
                            f"WHERE {row[0]}_id = '{row[1]}';")
                     self.controller.execute_sql(sql)
 
-                self.set_edit_arc_downgrade_force('False')
                 ids_ = ids_[:-2]
                 if show_warning and len(ids_) != 0:
                     msg = 'These items could not be downgrade to state 0'
@@ -475,7 +478,7 @@ class ManageWorkcatEnd(ParentManage):
                 sql = ("DELETE FROM audit_log_data "
                        "WHERE fid = 128 AND cur_user = current_user")
                 self.controller.execute_sql(sql)
-
+        self.set_edit_arc_downgrade_force('False')
         self.canvas.refresh()
 
 
@@ -486,7 +489,7 @@ class ManageWorkcatEnd(ParentManage):
 
         utils_giswater.setCalendarDate(self.dlg_new_workcat, self.dlg_new_workcat.builtdate, None, True)
         table_object = "cat_work"
-        self.set_completer_widget(table_object,self.dlg_new_workcat.cat_work_id, 'id')
+        self.set_completer_widget(table_object, self.dlg_new_workcat.cat_work_id, 'id')
 
         # Set signals
         self.dlg_new_workcat.btn_accept.clicked.connect(partial(self.manage_new_workcat_accept, table_object))
@@ -502,7 +505,7 @@ class ManageWorkcatEnd(ParentManage):
         # Get values from dialog
         values = ""
         fields = ""
-        
+
         cat_work_id = utils_giswater.getWidgetText(self.dlg_new_workcat, self.dlg_new_workcat.cat_work_id)
         if cat_work_id != "null":
             fields += 'id, '
@@ -558,4 +561,4 @@ class ManageWorkcatEnd(ParentManage):
             else:
                 msg = "This Workcat already exist"
                 self.controller.show_info_box(msg, "Warning")
-        
+

@@ -4,16 +4,12 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-
 # -*- coding: utf-8 -*-
-
 from qgis.core import QgsFeatureRequest
-
 from qgis.PyQt.QtCore import QStringListModel, Qt
 from qgis.PyQt.QtGui import QIntValidator
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QCompleter, QTableView
-
 
 from functools import partial
 
@@ -97,14 +93,18 @@ class TmPlanningUnit(TmParentAction):
         self.update_table(self.dlg_unit, self.dlg_unit.tbl_unit, table_name)
 
         # Signals
-        self.dlg_unit.cmb_campaign.currentIndexChanged.connect(partial(self.update_table, self.dlg_unit, self.dlg_unit.tbl_unit, table_name))
-        self.dlg_unit.cmb_work.currentIndexChanged.connect(partial(self.update_table, self.dlg_unit, self.dlg_unit.tbl_unit, table_name))
-        self.dlg_unit.cmb_builder.currentIndexChanged.connect(partial(self.update_table, self.dlg_unit, self.dlg_unit.tbl_unit, table_name))
-        self.dlg_unit.cmb_priority.currentIndexChanged.connect(partial(self.update_table, self.dlg_unit, self.dlg_unit.tbl_unit, table_name))
+        self.dlg_unit.cmb_campaign.currentIndexChanged.connect(
+            partial(self.update_table, self.dlg_unit, self.dlg_unit.tbl_unit, table_name))
+        self.dlg_unit.cmb_work.currentIndexChanged.connect(
+            partial(self.update_table, self.dlg_unit, self.dlg_unit.tbl_unit, table_name))
+        self.dlg_unit.cmb_builder.currentIndexChanged.connect(
+            partial(self.update_table, self.dlg_unit, self.dlg_unit.tbl_unit, table_name))
+        self.dlg_unit.cmb_priority.currentIndexChanged.connect(
+            partial(self.update_table, self.dlg_unit, self.dlg_unit.tbl_unit, table_name))
 
         completer = QCompleter()
         self.dlg_unit.txt_id.textChanged.connect(
-            partial(self.populate_comboline, self.dlg_unit,self.dlg_unit.txt_id, completer))
+            partial(self.populate_comboline, self.dlg_unit, self.dlg_unit.txt_id, completer))
 
         self.dlg_unit.btn_close.clicked.connect(partial(self.save_default_values))
         self.dlg_unit.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_unit))
@@ -112,7 +112,7 @@ class TmPlanningUnit(TmParentAction):
         self.dlg_unit.rejected.connect(partial(self.save_default_values))
         self.dlg_unit.rejected.connect(partial(self.close_dialog, self.dlg_unit))
         self.dlg_unit.rejected.connect(partial(self.remove_selection))
-        self.dlg_unit.btn_snapping.clicked.connect(partial(self.selection_init,  self.dlg_unit.tbl_unit))
+        self.dlg_unit.btn_snapping.clicked.connect(partial(self.selection_init, self.dlg_unit.tbl_unit))
         self.dlg_unit.btn_insert.clicked.connect(partial(self.insert_single, self.dlg_unit, self.dlg_unit.txt_id))
         self.dlg_unit.btn_delete.clicked.connect(partial(self.delete_row, self.dlg_unit.tbl_unit, table_name))
 
@@ -178,10 +178,11 @@ class TmPlanningUnit(TmParentAction):
         self.update_table(self.dlg_unit, self.dlg_unit.tbl_unit, table_name)
 
 
-    def selection_init(self,  qtable):
+    def selection_init(self, qtable):
         """ Set canvas map tool to an instance of class 'MultipleSelection' """
 
-        multiple_selection = TmMultipleSelection(self.iface, self.controller, self.layers['node'], parent_manage=self, table_object=qtable)
+        multiple_selection = TmMultipleSelection(
+            self.iface, self.controller, self.layers['node'], parent_manage=self, table_object=qtable)
         self.disconnect_signal_selection_changed()
         self.canvas.setMapTool(multiple_selection)
         self.connect_signal_selection_changed(qtable)
@@ -294,7 +295,7 @@ class TmPlanningUnit(TmParentAction):
         builder = utils_giswater.get_item_data(dialog, dialog.cmb_builder, 0)
         priority = utils_giswater.get_item_data(dialog, dialog.cmb_priority, 0)
 
-        if work_id  in (None, "") or builder in (None, "") or priority in (None, ""):
+        if work_id in (None, "") or builder in (None, "") or priority in (None, ""):
             self.dlg_unit.btn_insert.setEnabled(False)
             self.dlg_unit.btn_snapping.setEnabled(False)
         else:
@@ -302,9 +303,12 @@ class TmPlanningUnit(TmParentAction):
             self.dlg_unit.btn_snapping.setEnabled(True)
         expr_filter = f"campaign_id ='{campaign_id}'"
 
-        if work_id: expr_filter += f" AND work_id ='{work_id}'"
-        if builder: expr_filter += f" AND builder_id ='{builder}'"
-        if priority: expr_filter += f" AND priority_id ='{priority}'"
+        if work_id:
+            expr_filter += f" AND work_id ='{work_id}'"
+        if builder:
+            expr_filter += f" AND builder_id ='{builder}'"
+        if priority:
+            expr_filter += f" AND priority_id ='{priority}'"
         self.fill_table_unit(qtable, table_name, expr_filter=expr_filter)
 
         # self.manage_combos(qtable, table_name, expr_filter)
@@ -323,7 +327,7 @@ class TmPlanningUnit(TmParentAction):
             self.put_combobox(qtable, rows, combo_values, 0, 10, 11)
 
 
-    def fill_table_unit(self, qtable, table_name,  expr_filter=None):
+    def fill_table_unit(self, qtable, table_name, expr_filter=None):
         """ Fill table @widget filtering query by @workcat_id
             Set a model with selected filter.
             Attach that model to selected table

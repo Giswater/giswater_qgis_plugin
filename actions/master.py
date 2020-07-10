@@ -6,11 +6,9 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtWidgets import QDateEdit, QLineEdit, QTableView, QAbstractItemView
-from qgis.PyQt.QtGui import QDoubleValidator
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtCore import Qt
 
-import operator
 from functools import partial
 
 from .. import utils_giswater
@@ -61,9 +59,11 @@ class Master(ParentAction):
         self.dlg_psector_mng.btn_delete.clicked.connect(partial(
             self.multi_rows_delete, self.dlg_psector_mng, self.qtbl_psm, table_name, column_id, 'lbl_vdefault_psector',
             'plan_psector_vdefault'))
-        self.dlg_psector_mng.btn_update_psector.clicked.connect(partial(self.update_current_psector, self.dlg_psector_mng, self.qtbl_psm))
+        self.dlg_psector_mng.btn_update_psector.clicked.connect(
+            partial(self.update_current_psector, self.dlg_psector_mng, self.qtbl_psm))
         self.dlg_psector_mng.btn_duplicate.clicked.connect(self.psector_duplicate)
-        self.dlg_psector_mng.txt_name.textChanged.connect(partial(self.filter_by_text, self.dlg_psector_mng, self.qtbl_psm, self.dlg_psector_mng.txt_name, table_name))
+        self.dlg_psector_mng.txt_name.textChanged.connect(
+            partial(self.filter_by_text, self.dlg_psector_mng, self.qtbl_psm, self.dlg_psector_mng.txt_name, table_name))
         self.dlg_psector_mng.tbl_psm.doubleClicked.connect(partial(self.charge_psector, self.qtbl_psm))
         self.fill_table_psector(self.qtbl_psm, table_name)
         self.set_table_columns(self.dlg_psector_mng, self.qtbl_psm, table_name)
@@ -75,7 +75,7 @@ class Master(ParentAction):
 
 
     def update_current_psector(self, dialog, qtbl_psm):
-      
+
         selected_list = qtbl_psm.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
@@ -96,7 +96,7 @@ class Master(ParentAction):
         self.open_dialog(dialog)
 
 
-    def upsert_config_param_user(self, dialog,  widget, parameter):
+    def upsert_config_param_user(self, dialog, widget, parameter):
         """ Insert or update values in tables with current_user control """
 
         tablename = "config_param_user"
@@ -185,7 +185,7 @@ class Master(ParentAction):
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_ = widget.model().record(row).value(str(column_id))
-            inf_text += str(id_)+", "
+            inf_text += str(id_) + ", "
             list_id += f"'{id_}', "
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
@@ -276,7 +276,8 @@ class Master(ParentAction):
     def delete_merm(self, dialog):
         """ Delete selected row from 'master_estimate_result_manager' dialog from selected tab """
 
-        self.multi_rows_delete(dialog, dialog.tbl_om_result_cat, 'plan_result_cat', 'result_id', 'lbl_vdefault_price', '', is_price=True)
+        self.multi_rows_delete(dialog, dialog.tbl_om_result_cat, 'plan_result_cat',
+                               'result_id', 'lbl_vdefault_price', '', is_price=True)
 
 
     def filter_merm(self, dialog, tablename):

@@ -122,7 +122,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
     def open_catalog(self):
 
         # Get feature_type
-        feature_type = utils_giswater.getWidgetText(self.dlg_replace,self.dlg_replace.feature_type_new)
+        feature_type = utils_giswater.getWidgetText(self.dlg_replace, self.dlg_replace.feature_type_new)
 
         if feature_type is 'null':
             msg = "New feature type is null. Please, select a valid value."
@@ -240,7 +240,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
         """ Set autocomplete of widget @table_object + "_id"
             getting id's from selected @table_object
         """
-        
+
         if not widget:
             return
 
@@ -356,7 +356,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
             self.deactivate()
             self.set_action_pan()
 
-            #Disable ok button at the end of process
+            # Disable ok button at the end of process
             self.dlg_replace.btn_accept.setEnabled(False)
 
 
@@ -386,7 +386,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
 
 
     def canvasReleaseEvent(self, event):
-        
+
         if event.button() == Qt.RightButton:
             self.cancel_map_tool()
             return

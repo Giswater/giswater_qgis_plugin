@@ -46,10 +46,10 @@ class Dimensioning(ParentMapTool):
 
 
     """ QgsMapTools inherited event functions """
-          
+
     def canvasMoveEvent(self, event):
         pass
-                    
+
 
     def canvasReleaseEvent(self, event):
         pass
@@ -65,7 +65,7 @@ class Dimensioning(ParentMapTool):
     def activate(self):
 
         # Check button
-        self.action().setChecked(True)          
+        self.action().setChecked(True)
 
         self.layer = self.controller.get_layer_by_tablename("v_edit_dimensions", show_warning=True)
         if self.layer:
@@ -84,5 +84,5 @@ class Dimensioning(ParentMapTool):
 
     def deactivate(self):
 
-        # Call parent method     
+        # Call parent method
         ParentMapTool.deactivate(self)

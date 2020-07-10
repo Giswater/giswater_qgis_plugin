@@ -5,7 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-
 from qgis.core import QgsPointXY, QgsRectangle
 from qgis.gui import QgsMapCanvas, QgsMapTool, QgsRubberBand
 from qgis.PyQt.QtCore import Qt, pyqtSignal
@@ -25,7 +24,7 @@ class TmMultipleSelection(QgsMapTool):
         self.canvas = self.iface.mapCanvas()
         self.parent_manage = parent_manage
         self.table_object = table_object
-        
+
         # Call superclass constructor and set current action
         QgsMapTool.__init__(self, self.canvas)
 
@@ -48,7 +47,7 @@ class TmMultipleSelection(QgsMapTool):
 
 
     def reset(self):
-        
+
         self.start_point = self.end_point = None
         self.is_emitting_point = False
         self.reset_rubber_band()
@@ -64,21 +63,21 @@ class TmMultipleSelection(QgsMapTool):
 
 
     def canvasReleaseEvent(self, event):
-        
+
         self.is_emitting_point = False
         rectangle = self.get_rectangle()
         selected_rectangle = None
-        key = QApplication.keyboardModifiers()                
+        key = QApplication.keyboardModifiers()
 
         if event.button() != Qt.LeftButton:
-            self.rubber_band.hide()            
+            self.rubber_band.hide()
             return
-        
+
         # Disconnect signal to enhance process
         # We will reconnect it when processing last layer of the group
-        if self.parent_manage: 
-            self.parent_manage.disconnect_signal_selection_changed()           
-        
+        if self.parent_manage:
+            self.parent_manage.disconnect_signal_selection_changed()
+
         for layer in self.layers:
 
             if self.controller.is_layer_visible(layer):
@@ -112,7 +111,7 @@ class TmMultipleSelection(QgsMapTool):
 
 
     def canvasMoveEvent(self, e):
-        
+
         if not self.is_emitting_point:
             return
         self.end_point = self.toMapCoordinates(e.pos())
@@ -120,7 +119,7 @@ class TmMultipleSelection(QgsMapTool):
 
 
     def show_rect(self, start_point, end_point):
-        
+
         self.reset_rubber_band()
         if start_point.x() == end_point.x() or start_point.y() == end_point.y():
             return
@@ -138,7 +137,7 @@ class TmMultipleSelection(QgsMapTool):
 
 
     def get_rectangle(self):
-        
+
         if self.start_point is None or self.end_point is None:
             return None
         elif self.start_point.x() == self.end_point.x() or self.start_point.y() == self.end_point.y():

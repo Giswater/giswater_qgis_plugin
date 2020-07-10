@@ -24,6 +24,7 @@ from .load_project import LoadProject
 from .actions.basic import Basic
 from .actions.edit import Edit
 from .actions.go2epa import Go2Epa
+from .actions.gw_actions import GwActions
 from .actions.master import Master
 from .actions.mincut import MincutParent
 from .actions.notify_functions import NotifyFunctions
@@ -73,6 +74,7 @@ class Giswater(QObject):
         self.action = None
         self.action_info = None
         self.toolButton = None
+        self.gw_actions = None
 
         # Initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)
@@ -199,7 +201,7 @@ class Giswater(QObject):
                 callback_function = getattr(self.edit, function_name)
                 action.triggered.connect(callback_function)
             # Go2epa toolbar actions
-            elif int(index_action) in (23, 25, 29, 196):
+            elif int(index_action) in (23, 25, 29):
                 callback_function = getattr(self.go2epa, function_name)
                 action.triggered.connect(callback_function)
             # Master toolbar actions
@@ -270,7 +272,7 @@ class Giswater(QObject):
         list_feature_cat = self.controller.get_values_from_dictionary(self.feature_cat)
         for feature_cat in list_feature_cat:
             if (index_action == '01' and feature_cat.feature_type.upper() == 'NODE') or (
-                index_action == '02' and feature_cat.feature_type.upper() == 'ARC'):
+                    index_action == '02' and feature_cat.feature_type.upper() == 'ARC'):
                 obj_action = QAction(str(feature_cat.id), self)
                 obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
                 try:
@@ -325,7 +327,7 @@ class Giswater(QObject):
 
         # Buttons NOT checkable (normally because they open a form)
         list_actions = (18, 23, 25, 26, 27, 29, 33, 34, 45, 46, 50, 58, 59, 86, 64, 65, 66,
-                        67, 68, 69, 74, 75, 76, 81, 82, 83, 84, 98, 99, 142, 143, 196, 206, 301, 302, 303, 304, 305, 309)
+                        67, 68, 69, 74, 75, 76, 81, 82, 83, 84, 98, 99, 142, 143, 206, 301, 302, 303, 304, 305, 309)
 
         if int(index_action) in list_actions:
             action = self.create_action(index_action, text_action, toolbar, False, function_name, action_group)
@@ -470,7 +472,7 @@ class Giswater(QObject):
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
 
-        list_actions = ['199', '196', '23', '25', '29']
+        list_actions = ['199', '23', '25', '29']
         self.manage_toolbar(toolbar_id, list_actions)
         self.set_toolbar_position(self.tr('toolbar_' + toolbar_id + '_name'), x, y)
 
@@ -512,7 +514,7 @@ class Giswater(QObject):
             parser = configparser.RawConfigParser()
             parser.add_section('toolbars_position')
 
-        if len(own_toolbars)==8:
+        if len(own_toolbars) == 8:
             for w in own_toolbars:
                 parser['toolbars_position'][f'pos_{x}'] = f"{w.property('gw_name')},{w.x()},{w.y()}"
                 x += 1
@@ -578,7 +580,7 @@ class Giswater(QObject):
         parent = self.iface.mainWindow()
         for plugin_toolbar in list(self.plugin_toolbars.values()):
             ag = QActionGroup(parent)
-            ag.setProperty('gw_name','gw_QActionGroup')
+            ag.setProperty('gw_name', 'gw_QActionGroup')
             for index_action in plugin_toolbar.list_actions:
                 self.add_action(index_action, plugin_toolbar.toolbar, ag)
 
@@ -651,7 +653,7 @@ class Giswater(QObject):
         sql = None
         self.feature_cat = {}
         sql = ("SELECT cat_feature.* FROM cat_feature "
-                   "WHERE active IS TRUE ORDER BY id")
+               "WHERE active IS TRUE ORDER BY id")
         rows = self.controller.get_rows(sql)
         if not rows:
             return False
@@ -689,7 +691,7 @@ class Giswater(QObject):
             dockwidget = self.iface.mainWindow().findChild(QDockWidget, 'Layers')
             toolbar = dockwidget.findChildren(QToolBar)[0]
             # TODO improve this, now remove last action
-            toolbar.removeAction(toolbar.actions()[len(toolbar.actions())-1])
+            toolbar.removeAction(toolbar.actions()[len(toolbar.actions()) - 1])
             self.btn_add_layers = None
 
 
@@ -750,7 +752,7 @@ class Giswater(QObject):
     def enable_actions(self, enable=True, start=1, stop=100):
         """ Utility to enable/disable all actions """
 
-        for i in range(start, stop+1):
+        for i in range(start, stop + 1):
             self.enable_action(enable, i)
 
 
@@ -923,9 +925,14 @@ class Giswater(QObject):
 
         # Check that there are no layers (v_edit_node) with the same view name, coming from different schemes
         status = self.check_layers_from_distinct_schema()
-        if status is False: return
+        if status is False:
+            return
 
         self.parent = ParentAction(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.add_layer = AddLayer(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.controller.parent = ParentAction(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.controller.gw_actions = GwActions(self.iface, self.settings, self.controller, self.plugin_dir)
+
 
         # Get water software from table 'version'
         self.project_type = self.controller.get_project_type()
@@ -1008,9 +1015,10 @@ class Giswater(QObject):
 
         self.list_to_hide = []
         try:
-            #db format of value for parameter qgis_toolbar_hidebuttons -> {"index_action":[199, 74,75]}
+            # db format of value for parameter qgis_toolbar_hidebuttons -> {"index_action":[199, 74,75]}
             row = self.controller.get_config('qgis_toolbar_hidebuttons')
-            if not row: return
+            if not row:
+                return
             json_list = json.loads(row[0], object_pairs_hook=OrderedDict)
             self.list_to_hide = [str(x) for x in json_list['action_index']]
         except KeyError:
@@ -1087,9 +1095,9 @@ class Giswater(QObject):
                 else:
                     self.iface.mapCanvas().unsetMapTool(map_tool)
         except AttributeError as e:
-            self.controller.show_warning("AttributeError: "+str(e))
+            self.controller.show_warning("AttributeError: " + str(e))
         except KeyError as e:
-            self.controller.show_warning("KeyError: "+str(e))
+            self.controller.show_warning("KeyError: " + str(e))
 
 
     def project_read_pl(self):
@@ -1183,4 +1191,5 @@ class Giswater(QObject):
         self.controller.plugin_settings_set_value("gwAddSchema", self.qgis_project_add_schema)
         self.controller.plugin_settings_set_value("gwMainSchema", self.qgis_project_main_schema)
         self.controller.plugin_settings_set_value("gwProjectRole", self.qgis_project_role)
+
 

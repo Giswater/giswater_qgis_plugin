@@ -30,10 +30,10 @@ from .. import utils_giswater
 
 
 class TmBasic(TmParentAction):
-    
+
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'basic' """
-        
+
         TmParentAction.__init__(self, iface, settings, controller, plugin_dir)
         self.manage_visit = TmManageVisit(iface, settings, controller, plugin_dir)
         self.selected_camp = None
@@ -49,7 +49,7 @@ class TmBasic(TmParentAction):
 
     def basic_new_prices(self, dialog=None):
         """ Button 303: Price generator """
-        
+
         # Close previous dialog
         if dialog is not None:
             self.close_dialog(dialog)
@@ -60,7 +60,7 @@ class TmBasic(TmParentAction):
         current_year = QDate.currentDate().year()
         start_date = QDate.fromString(str(int(current_year)) + '-11-01', 'yyyy-MM-dd')
         self.dlg_new_campaign.start_date.setDate(start_date)
-        end_date = QDate.fromString(str(int(current_year)+1) + '-10-31', 'yyyy-MM-dd')
+        end_date = QDate.fromString(str(int(current_year) + 1) + '-10-31', 'yyyy-MM-dd')
         self.dlg_new_campaign.end_date.setDate(end_date)
 
         table_name = 'cat_campaign'
@@ -69,12 +69,12 @@ class TmBasic(TmParentAction):
         self.dlg_new_campaign.rejected.connect(partial(self.close_dialog, self.dlg_new_campaign))
         self.dlg_new_campaign.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_new_campaign))
         self.dlg_new_campaign.btn_accept.clicked.connect(partial(self.manage_new_price_catalog))
-        
-        self.populate_cmb_years(table_name, field_id, field_name,  self.dlg_new_campaign.cbx_years)
+
+        self.populate_cmb_years(table_name, field_id, field_name, self.dlg_new_campaign.cbx_years)
         self.set_completer_object(table_name, self.dlg_new_campaign.txt_campaign, field_name)
-        
+
         if self.rows_cmb_poda_type is None:
-            self.update_cmb_poda_type()     
+            self.update_cmb_poda_type()
 
         if self.rows_cmb_builder is None:
             self.update_cmb_builder()
@@ -104,11 +104,11 @@ class TmBasic(TmParentAction):
             self.controller.execute_sql(sql)
             sql = "SELECT currval('cat_campaign_id_seq');"
             row = self.controller.get_row(sql)
-            
+
             # Update contents of variable 'self.cmb_poda_type'
             self.update_cmb_poda_type()
-          
-        # Get id_campaign            
+
+        # Get id_campaign
         id_new_camp = str(row[0])
 
         # Check if want copy any campaign or do new price list
@@ -155,11 +155,13 @@ class TmBasic(TmParentAction):
         # Set dialog and signals
         dlg_prices_management.btn_close.clicked.connect(partial(self.close_dialog, dlg_prices_management))
         dlg_prices_management.rejected.connect(partial(self.close_dialog, dlg_prices_management))
-        
+
         # Populate QTableView
         table_view = 'v_edit_price'
-        self.fill_table_prices(dlg_prices_management.tbl_price_list, table_view, id_camp, set_edit_triggers=QTableView.DoubleClicked)
-        self.set_table_columns(dlg_prices_management, dlg_prices_management.tbl_price_list, table_view, 'basic_cat_price')
+        self.fill_table_prices(dlg_prices_management.tbl_price_list, table_view,
+                               id_camp, set_edit_triggers=QTableView.DoubleClicked)
+        self.set_table_columns(dlg_prices_management, dlg_prices_management.tbl_price_list,
+                               table_view, 'basic_cat_price')
 
         self.open_dialog(dlg_prices_management)
 
@@ -170,9 +172,9 @@ class TmBasic(TmParentAction):
                " FROM v_plan_mu"
                " ORDER BY work_name")
         self.rows_cmb_poda_type = self.controller.get_rows(sql)
-        
+
         if not self.rows_cmb_poda_type:
-            self.controller.log_info("Error in update_cmb_poda_type")           
+            self.controller.log_info("Error in update_cmb_poda_type")
 
     def update_cmb_builder(self):
 
@@ -180,7 +182,7 @@ class TmBasic(TmParentAction):
                " FROM cat_builder"
                " ORDER BY name")
         self.rows_cmb_builder = self.controller.get_rows(sql)
-        
+
         if not self.rows_cmb_builder:
             self.controller.log_info("Error in update_cmb_builder")
 
@@ -200,12 +202,12 @@ class TmBasic(TmParentAction):
         model.select()
 
         qtable.setEditTriggers(set_edit_triggers)
-        
+
         # Check for errors
         if model.lastError().isValid():
             self.controller.show_warning(model.lastError().text())
             return
-        
+
         # Attach model to table view
         expr = f"campaign_id = '{new_camp}'"
         qtable.setModel(model)
@@ -221,8 +223,8 @@ class TmBasic(TmParentAction):
         table_name = 'cat_campaign'
         field_id = 'id'
         field_name = 'name'
-        self.populate_cmb_years(table_name,  field_id, field_name, dlg_tree_manage.cbx_campaigns)
-        self.populate_cmb_years(table_name,  field_id, field_name, dlg_tree_manage.cbx_pendientes)
+        self.populate_cmb_years(table_name, field_id, field_name, dlg_tree_manage.cbx_campaigns)
+        self.populate_cmb_years(table_name, field_id, field_name, dlg_tree_manage.cbx_pendientes)
 
         dlg_tree_manage.rejected.connect(partial(self.close_dialog, dlg_tree_manage))
         dlg_tree_manage.btn_cancel.clicked.connect(partial(self.close_dialog, dlg_tree_manage))
@@ -236,7 +238,7 @@ class TmBasic(TmParentAction):
 
 
     def check_prices(self, dialog):
-        sql = (f"SELECT * FROM v_edit_price " 
+        sql = (f"SELECT * FROM v_edit_price "
               f"WHERE name = '{dialog.txt_campaign.text()}'"
                f" AND price is null")
         rows = self.controller.get_rows(sql)
@@ -269,15 +271,16 @@ class TmBasic(TmParentAction):
         self.campaign_id = row[0]
         return row[0]
 
-    
+
     def get_year(self, dialog):
-               
+
         update = False
         self.selected_camp = None
 
         if dialog.txt_campaign.text() != '':
             status = self.get_campaing_id(dialog)
-            if not status: return None
+            if not status:
+                return None
             sql = f"DELETE FROM selector_planning WHERE cur_user=current_user;"
             sql += f"INSERT INTO selector_planning VALUES ('{status}', current_user);"
             self.controller.execute_sql(sql, log_sql=True)
@@ -312,9 +315,9 @@ class TmBasic(TmParentAction):
         else:
             message = "Any recuperat es obligatori"
             self.controller.show_warning(message)
-        
+
         self.controller.log_info("get_year_end")
-        
+
 
     def tree_selector(self, update=False):
 
@@ -330,20 +333,20 @@ class TmBasic(TmParentAction):
         table_view = 'v_plan_mu_year'
         id_table_left = 'mu_id'
         id_table_right = 'mu_id'
-        
+
         # Get data to fill combo from memory
         if self.rows_cmb_poda_type is None:
-            self.update_cmb_poda_type()   
+            self.update_cmb_poda_type()
 
         utils_giswater.set_item_data(dlg_selector.cmb_poda_type, self.rows_cmb_poda_type, 1, sort_combo=False)
 
         # Get data to fill combo from memory
         if self.rows_cmb_builder is None:
-            self.update_cmb_builder()   
+            self.update_cmb_builder()
 
         utils_giswater.set_item_data(dlg_selector.cmb_builder, self.rows_cmb_builder, 1, sort_combo=False)
 
-        filter_builder = [['','']]
+        filter_builder = [['', '']]
         for item in self.rows_cmb_builder:
             filter_builder.append(item)
         utils_giswater.set_item_data(dlg_selector.cmb_filter_builder, filter_builder, 1, sort_combo=False)
@@ -362,19 +365,26 @@ class TmBasic(TmParentAction):
 
         # Set signals
         dlg_selector.chk_permanent.stateChanged.connect(partial(self.force_chk_current, dlg_selector))
-        dlg_selector.btn_select.clicked.connect(partial(self.rows_selector, dlg_selector, id_table_left, tableright, id_table_right, tableleft, table_view))
-        dlg_selector.all_rows.doubleClicked.connect(partial(self.rows_selector, dlg_selector, id_table_left, tableright, id_table_right, tableleft, table_view))
-        dlg_selector.btn_unselect.clicked.connect(partial(self.rows_unselector, dlg_selector, tableright, id_table_right, tableleft, table_view))
-        dlg_selector.selected_rows.doubleClicked.connect(partial(self.rows_unselector, dlg_selector, tableright, id_table_right, tableleft, table_view))
-        dlg_selector.txt_search.textChanged.connect(partial(self.fill_main_table, dlg_selector, tableleft, set_edit_triggers=QTableView.NoEditTriggers))
-        dlg_selector.txt_selected_filter.textChanged.connect(partial(self.fill_table, dlg_selector, table_view, set_edit_triggers=QTableView.NoEditTriggers))
-        dlg_selector.cmb_filter_builder.currentIndexChanged.connect(partial(self.fill_table, dlg_selector, table_view, set_edit_triggers=QTableView.NoEditTriggers))
+        dlg_selector.btn_select.clicked.connect(
+            partial(self.rows_selector, dlg_selector, id_table_left, tableright, id_table_right, tableleft, table_view))
+        dlg_selector.all_rows.doubleClicked.connect(
+            partial(self.rows_selector, dlg_selector, id_table_left, tableright, id_table_right, tableleft, table_view))
+        dlg_selector.btn_unselect.clicked.connect(
+            partial(self.rows_unselector, dlg_selector, tableright, id_table_right, tableleft, table_view))
+        dlg_selector.selected_rows.doubleClicked.connect(
+            partial(self.rows_unselector, dlg_selector, tableright, id_table_right, tableleft, table_view))
+        dlg_selector.txt_search.textChanged.connect(
+            partial(self.fill_main_table, dlg_selector, tableleft, set_edit_triggers=QTableView.NoEditTriggers))
+        dlg_selector.txt_selected_filter.textChanged.connect(
+            partial(self.fill_table, dlg_selector, table_view, set_edit_triggers=QTableView.NoEditTriggers))
+        dlg_selector.cmb_filter_builder.currentIndexChanged.connect(
+            partial(self.fill_table, dlg_selector, table_view, set_edit_triggers=QTableView.NoEditTriggers))
         dlg_selector.btn_close.clicked.connect(partial(self.close_dialog, dlg_selector))
         dlg_selector.btn_close.clicked.connect(partial(self.close_dialog, dlg_selector))
-        dlg_selector.rejected.connect(partial(self.close_dialog, dlg_selector))  
-        
+        dlg_selector.rejected.connect(partial(self.close_dialog, dlg_selector))
+
         self.open_dialog(dlg_selector)
-        
+
 
     def force_chk_current(self, dialog):
 
@@ -394,7 +404,7 @@ class TmBasic(TmParentAction):
         model = QSqlTableModel()
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnFieldChange)
-        
+
         dialog.all_rows.setEditTriggers(set_edit_triggers)
         # Check for errors
         if model.lastError().isValid():
@@ -417,14 +427,14 @@ class TmBasic(TmParentAction):
         if not is_valid:
             return
         model.setFilter(expr)
-        
+
         # Refresh model?
-        if refresh_model:               
+        if refresh_model:
             model.select()
-                    
+
         # Attach model to table view
         dialog.all_rows.setModel(model)
-             
+
 
 
     def fill_table(self, dialog, table_view, set_edit_triggers=QTableView.NoEditTriggers, update=False):
@@ -441,9 +451,9 @@ class TmBasic(TmParentAction):
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)
         model.setSort(2, 0)
         model.select()
-                
+
         dialog.selected_rows.setEditTriggers(set_edit_triggers)
-        
+
         # Check for errors
         if model.lastError().isValid():
             self.controller.show_warning(model.lastError().text())
@@ -457,7 +467,7 @@ class TmBasic(TmParentAction):
             expr += f" AND campaign_id = '{self.campaign_id}'"
             if update:
                 expr += f" OR campaign_id = '{self.selected_camp}'"
- 
+
         # Attach model to table or view
         dialog.selected_rows.setModel(model)
         dialog.selected_rows.model().setFilter(expr)
@@ -467,36 +477,36 @@ class TmBasic(TmParentAction):
             i = int(dialog.selected_rows.model().fieldIndex('campaign_id'))
             index = dialog.selected_rows.model().index(x, i)
             model.setData(index, self.campaign_id)
-            
+
         self.calculate_total_price(dialog, self.campaign_id)
 
 
     def calculate_total_price(self, dialog, year):
         """ Update QLabel @lbl_total_price with sum of all price in @select_rows """
-        
+
         selected_list = dialog.selected_rows.model()
         if selected_list is None:
             return
         total = 0
-        
+
         # Sum all price
         for x in range(0, selected_list.rowCount()):
             if str(dialog.selected_rows.model().record(x).value('campaign_id')) == str(year):
                 if str(dialog.selected_rows.model().record(x).value('price')) != 'NULL':
                     total += float(dialog.selected_rows.model().record(x).value('price'))
-                    
+
         utils_giswater.setText(dialog, dialog.lbl_total_price, str(total))
 
 
     def insert_into_planning(self, tableright):
-        
+
         sql = (f"SELECT * FROM {tableright} "
                f"WHERE campaign_id::text = '{self.selected_camp}'")
         rows = self.controller.get_rows(sql)
 
         if not rows:
             return
-        
+
         for row in rows:
             insert_values = ""
             function_values = ""
@@ -545,13 +555,13 @@ class TmBasic(TmParentAction):
         # tableleft = 'v_plan_mu'
         # tableright = 'planning'
         # table_view = 'v_plan_mu_year'
-        
+
         left_selected_list = dialog.all_rows.selectionModel().selectedRows()
         if len(left_selected_list) == 0:
             message = "Cap registre seleccionat"
             self.controller.show_warning(message)
             return
-        
+
         # Get all selected ids
         field_list = []
         for i in range(0, len(left_selected_list)):
@@ -567,7 +577,7 @@ class TmBasic(TmParentAction):
                 message = "No heu seleccionat cap poda"
                 self.controller.show_warning(message)
                 return
-            
+
         if utils_giswater.isChecked(dialog, dialog.chk_permanent):
             for i in range(0, len(left_selected_list)):
                 row = left_selected_list[i].row()
@@ -635,7 +645,7 @@ class TmBasic(TmParentAction):
             message = "Cap registre seleccionat"
             self.controller.show_warning(message)
             return
-        
+
         field_list = []
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
@@ -644,7 +654,7 @@ class TmBasic(TmParentAction):
         for i in range(0, len(field_list)):
             _sql = sql + f"'{field_list[i]}'"
             self.controller.execute_sql(_sql, log_sql=True)
-            
+
         # Refresh tables
         self.fill_table(dialog, table_view, set_edit_triggers=QTableView.NoEditTriggers)
         self.fill_main_table(dialog, tableleft)
@@ -652,7 +662,7 @@ class TmBasic(TmParentAction):
 
     def basic_month_manage(self):
         """ Button 302: Planned year manage """
-        
+
         month_manage = MonthManage()
 
         self.load_settings(month_manage)
@@ -690,7 +700,7 @@ class TmBasic(TmParentAction):
             message = "No hi ha cap any planificat"
             self.controller.show_warning(message)
             return
-        
+
         sql = f"DELETE FROM selector_planning WHERE cur_user=current_user;"
         sql += f"INSERT INTO selector_planning VALUES ('{self.planned_camp_id}', current_user);"
         self.controller.execute_sql(sql, log_sql=True)
@@ -701,9 +711,9 @@ class TmBasic(TmParentAction):
 
 
     def month_selector(self):
-        
+
         month_selector = MonthSelector()
-        
+
         self.load_settings(month_selector)
         month_selector.all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
         month_selector.selected_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -763,7 +773,7 @@ class TmBasic(TmParentAction):
 
 
     def month_selector_row(self, dialog, id_table_left, tableleft, view_name):
-        
+
         left_selected_list = dialog.all_rows.selectionModel().selectedRows()
         if len(left_selected_list) == 0:
             message = "Cap registre seleccionat"
@@ -805,7 +815,7 @@ class TmBasic(TmParentAction):
 
 
     def month_unselector_row(self, dialog, id_table_left, tableleft, view_name):
-        
+
         left_selected_list = dialog.selected_rows.selectionModel().selectedRows()
         if len(left_selected_list) == 0:
             message = "Cap registre seleccionat"
@@ -871,7 +881,7 @@ class TmBasic(TmParentAction):
 
     def select_all_rows(self, qtable, id, clear_selection=True):
         """ Return list of index in @qtable """
-                       
+
         # Select all rows and get all id
         qtable.selectAll()
         right_selected_list = qtable.selectionModel().selectedRows()
@@ -882,7 +892,7 @@ class TmBasic(TmParentAction):
             right_field_list.append(id_)
         if clear_selection:
             qtable.clearSelection()
-                    
+
         return right_field_list
 
 
@@ -898,7 +908,7 @@ class TmBasic(TmParentAction):
 
 
     def accept_changes(self, dialog, tableleft):
-        
+
         model = dialog.selected_rows.model()
         model.database().transaction()
         if model.submitAll():
@@ -927,9 +937,9 @@ class TmBasic(TmParentAction):
 
     def add_visit(self):
         """ Button 304: Add visit """
-        
+
         self.manage_visit.manage_visit()
-        
+
 
     def open_planning_unit(self):
 
@@ -956,15 +966,20 @@ class TmBasic(TmParentAction):
         self.update_table(self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name)
 
         # Signals
-        self.dlg_incident_manager.txt_visit_id.textChanged.connect(partial(self.update_table, self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name))
-        self.dlg_incident_manager.cmb_status.currentIndexChanged.connect(partial(self.update_table, self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name))
+        self.dlg_incident_manager.txt_visit_id.textChanged.connect(
+            partial(self.update_table, self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name))
+        self.dlg_incident_manager.cmb_status.currentIndexChanged.connect(
+            partial(self.update_table, self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name))
         self.dlg_incident_manager.btn_process.clicked.connect(partial(self.open_incident_planning, 'PROCESS'))
         self.dlg_incident_manager.btn_discard.clicked.connect(partial(self.open_incident_planning, 'DISCARD'))
         self.dlg_incident_manager.btn_zoom.clicked.connect(partial(self.zoom_to_element))
-        self.dlg_incident_manager.btn_image.clicked.connect(partial(self.open_image, self.dlg_incident_manager.tbl_incident))
+        self.dlg_incident_manager.btn_image.clicked.connect(
+            partial(self.open_image, self.dlg_incident_manager.tbl_incident))
         self.dlg_incident_manager.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_incident_manager))
-        self.dlg_incident_manager.date_from.dateChanged.connect(partial(self.update_table, self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name))
-        self.dlg_incident_manager.date_to.dateChanged.connect(partial(self.update_table, self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name))
+        self.dlg_incident_manager.date_from.dateChanged.connect(
+            partial(self.update_table, self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name))
+        self.dlg_incident_manager.date_to.dateChanged.connect(
+            partial(self.update_table, self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name))
         self.dlg_incident_manager.tbl_incident.selectionModel().selectionChanged.connect(
             partial(self.enable_widget_x_qtable, self.dlg_incident_manager.tbl_incident,
                     self.dlg_incident_manager.btn_image, 'incident_foto'))
@@ -999,7 +1014,8 @@ class TmBasic(TmParentAction):
         # expr_filter = " AND (incident_date BETWEEN " + str(interval) + ")"
 
         # if visit_id not in (None, '', 'null'): expr_filter += f" AND visit_id::text LIKE '%{visit_id}%'"
-        if status_id: expr_filter += f" AND status ='{status_id}'"
+        if status_id:
+            expr_filter += f" AND status ='{status_id}'"
 
         self.fill_table_incident(qtable, table_name, expr_filter=expr_filter)
 
@@ -1011,7 +1027,7 @@ class TmBasic(TmParentAction):
                     self.dlg_incident_manager.btn_image, 'incident_foto'))
 
 
-    def fill_table_incident(self, qtable, table_name,  expr_filter=None):
+    def fill_table_incident(self, qtable, table_name, expr_filter=None):
 
         expr = None
         if expr_filter:
@@ -1049,7 +1065,8 @@ class TmBasic(TmParentAction):
         self.ids = []
         column_index = utils_giswater.get_col_index_by_col_name(self.dlg_incident_manager.tbl_incident, 'node_id')
         for x in range(0, self.dlg_incident_manager.tbl_incident.model().rowCount()):
-            _id = self.dlg_incident_manager.tbl_incident.model().data(self.dlg_incident_manager.tbl_incident.model().index(x, column_index))
+            _id = self.dlg_incident_manager.tbl_incident.model().data(
+                self.dlg_incident_manager.tbl_incident.model().index(x, column_index))
             self.ids.append(_id)
 
 
@@ -1059,7 +1076,7 @@ class TmBasic(TmParentAction):
         self.load_settings(self.dlg_incident_planning)
 
 
-        #Hide widgets
+        # Hide widgets
         if action == 'DISCARD':
             self.dlg_incident_planning.lbl_campaign_id.setVisible(False)
             self.dlg_incident_planning.lbl_work_id.setVisible(False)
@@ -1107,11 +1124,16 @@ class TmBasic(TmParentAction):
             self.incident_comment = ''
         utils_giswater.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.visit_id, self.visit_id)
         utils_giswater.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.node_id, self.node_id)
-        utils_giswater.setCalendarDate(self.dlg_incident_planning, self.dlg_incident_planning.incident_date, self.incident_date)
-        utils_giswater.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.incident_user, self.incident_user)
-        utils_giswater.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.parameter_id, self.parameter_id)
-        utils_giswater.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.incident_comment, self.incident_comment)
-        utils_giswater.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.process_user, self.controller.get_current_user())
+        utils_giswater.setCalendarDate(self.dlg_incident_planning,
+                                       self.dlg_incident_planning.incident_date, self.incident_date)
+        utils_giswater.setWidgetText(self.dlg_incident_planning,
+                                     self.dlg_incident_planning.incident_user, self.incident_user)
+        utils_giswater.setWidgetText(self.dlg_incident_planning,
+                                     self.dlg_incident_planning.parameter_id, self.parameter_id)
+        utils_giswater.setWidgetText(self.dlg_incident_planning,
+                                     self.dlg_incident_planning.incident_comment, self.incident_comment)
+        utils_giswater.setWidgetText(self.dlg_incident_planning,
+                                     self.dlg_incident_planning.process_user, self.controller.get_current_user())
 
         utils_giswater.setCalendarDate(self.dlg_incident_planning, self.dlg_incident_planning.process_date, None)
 
@@ -1126,10 +1148,13 @@ class TmBasic(TmParentAction):
 
         if action == 'PROCESS':
 
-            campaign_id = utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.campaign_id, 0)
-            work_id =utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.work_id, 0)
-            priority_id = utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.priority_id, 0)
-            builder_id = utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.builder_id, 0)
+            campaign_id = utils_giswater.get_item_data(
+                self.dlg_incident_planning, self.dlg_incident_planning.campaign_id, 0)
+            work_id = utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.work_id, 0)
+            priority_id = utils_giswater.get_item_data(
+                self.dlg_incident_planning, self.dlg_incident_planning.priority_id, 0)
+            builder_id = utils_giswater.get_item_data(
+                self.dlg_incident_planning, self.dlg_incident_planning.builder_id, 0)
 
             if self.visit_id in ('', None, 'null') or campaign_id in ('', None, 'null') or work_id in ('', None, 'null')\
                     or priority_id in ('', None, 'null') or builder_id in ('', None, 'null'):
@@ -1144,15 +1169,17 @@ class TmBasic(TmParentAction):
             result = self.controller.get_json('tm_fct_incident_check_plan', body, log_sql=True)
 
             if result['message']['level'] == 1:
-                message = str(result['body']['data'] ['info'])
+                message = str(result['body']['data']['info'])
 
                 self.dlg_incident_info = InfoIncident()
                 self.load_settings(self.dlg_incident_info)
 
                 self.dlg_incident_info.txt_infolog.setText(message)
 
-                self.dlg_incident_info.btn_duplicate.clicked.connect(partial(self.manage_process_planning, action, True))
-                self.dlg_incident_info.btn_overwrite.clicked.connect(partial(self.manage_process_planning, 'OVERWRITE', True))
+                self.dlg_incident_info.btn_duplicate.clicked.connect(
+                    partial(self.manage_process_planning, action, True))
+                self.dlg_incident_info.btn_overwrite.clicked.connect(
+                    partial(self.manage_process_planning, 'OVERWRITE', True))
                 self.dlg_incident_info.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_incident_info))
 
                 self.open_dialog(self.dlg_incident_info)
@@ -1170,7 +1197,8 @@ class TmBasic(TmParentAction):
 
             if result['status'] == "Accepted":
                 self.close_dialog(self.dlg_incident_planning)
-                self.update_table(self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident,"v_ui_om_visit_incident")
+                self.update_table(self.dlg_incident_manager,
+                                  self.dlg_incident_manager.tbl_incident, "v_ui_om_visit_incident")
 
 
     def manage_process_planning(self, action, close_dlg_aux=False):

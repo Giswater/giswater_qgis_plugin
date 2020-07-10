@@ -5,20 +5,16 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import Qgis, QgsApplication
-from qgis.PyQt.QtCore import QDate, QStringListModel, QTime,  Qt, QRegExp
+from qgis.core import QgsApplication
+from qgis.PyQt.QtCore import QDate, QStringListModel, QTime, Qt, QRegExp
 from qgis.PyQt.QtWidgets import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QComboBox, QCompleter, \
-    QFileDialog, QMessageBox
+    QFileDialog
 from qgis.PyQt.QtGui import QRegExpValidator
 
 import csv
-import json
 import os
-import re
-import subprocess
 import sys
 
-from collections import OrderedDict
 from functools import partial
 
 from .. import utils_giswater
@@ -180,16 +176,6 @@ class Go2Epa(ApiParent):
         return True
 
 
-    def go2epa_sector_selector(self):
-
-        tableleft = "sector"
-        tableright = "selector_sector"
-        field_id_left = "sector_id"
-        field_id_right = "sector_id"
-        aql = f" AND sector_id != 0"
-        self.sector_selection(tableleft, tableright, field_id_left, field_id_right, aql)
-
-
     def load_user_values(self):
         """ Load QGIS settings related with file_manager """
 
@@ -240,7 +226,7 @@ class Go2Epa(ApiParent):
             utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec))
         self.controller.plugin_settings_set_value('go2epa_chk_RPT' + cur_user,
             utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result))
-        
+
 
     def sector_selection(self, tableleft, tableright, field_id_left, field_id_right, aql=""):
         """ Load the tables in the selection form """
@@ -248,14 +234,7 @@ class Go2Epa(ApiParent):
         dlg_psector_sel = Multirow_selector('dscenario')
         self.load_settings(dlg_psector_sel)
         dlg_psector_sel.btn_ok.clicked.connect(dlg_psector_sel.close)
-        if tableleft == 'sector':
-            dlg_psector_sel.setWindowTitle(" Sector selector")
-            utils_giswater.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_filter,
-                                         self.controller.tr('Filter by: Sector name', context_name='labels'))
-            utils_giswater.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_unselected,
-                                         self.controller.tr('Unselected sectors', context_name='labels'))
-            utils_giswater.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_selected,
-                                         self.controller.tr('Selected sectors', context_name='labels'))
+
         if tableleft == 'cat_dscenario':
             dlg_psector_sel.setWindowTitle(" Dscenario selector")
             utils_giswater.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_filter,
@@ -266,7 +245,7 @@ class Go2Epa(ApiParent):
                                          self.controller.tr('Selected dscenarios', context_name='labels'))
 
         self.multi_row_selector(dlg_psector_sel, tableleft, tableright, field_id_left, field_id_right, aql=aql)
-        
+
         self.open_dialog(dlg_psector_sel)
 
 
@@ -313,7 +292,8 @@ class Go2Epa(ApiParent):
 
     def save_hydrology(self):
 
-        hydrology_id = utils_giswater.get_item_data(self.dlg_hydrology_selector, self.dlg_hydrology_selector.hydrology, 1)
+        hydrology_id = utils_giswater.get_item_data(
+            self.dlg_hydrology_selector, self.dlg_hydrology_selector.hydrology, 1)
         sql = ("SELECT cur_user FROM selector_inp_hydrology "
                "WHERE cur_user = current_user")
         row = self.controller.get_row(sql)
@@ -396,7 +376,7 @@ class Go2Epa(ApiParent):
 
         # Save user values
         self.save_user_values()
-        
+
         self.dlg_go2epa.txt_infolog.clear()
         self.dlg_go2epa.txt_file_rpt.setStyleSheet(None)
         status = self.check_fields()
@@ -581,14 +561,16 @@ class Go2Epa(ApiParent):
         elif self.project_type == 'ud':
 
             # Populate GroupBox Selector date
-            result_id = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id, 0)
+            result_id = utils_giswater.get_item_data(
+                self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id, 0)
             sql = (f"SELECT DISTINCT(resultdate), resultdate FROM rpt_arc "
                    f"WHERE result_id = '{result_id}' "
                    f"ORDER BY resultdate")
             rows = self.controller.get_rows(sql)
             if rows is not None:
                 utils_giswater.set_item_data(self.dlg_go2epa_result.cmb_sel_date, rows)
-                selector_date = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_sel_date, 0)
+                selector_date = utils_giswater.get_item_data(
+                    self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_sel_date, 0)
                 sql = (f"SELECT DISTINCT(resulttime), resulttime FROM rpt_arc "
                        f"WHERE result_id = '{result_id}' "
                        f"AND resultdate = '{selector_date}' "
@@ -612,7 +594,8 @@ class Go2Epa(ApiParent):
             rows = self.controller.get_rows(sql)
             if rows is not None:
                 utils_giswater.set_item_data(self.dlg_go2epa_result.cmb_com_date, rows)
-                selector_cmp_date = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_com_date, 0)
+                selector_cmp_date = utils_giswater.get_item_data(
+                    self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_com_date, 0)
                 sql = (f"SELECT DISTINCT(resulttime), resulttime FROM rpt_arc "
                        f"WHERE result_id = '{result_id_to_comp}' "
                        f"AND resultdate = '{selector_cmp_date}' "
@@ -641,7 +624,8 @@ class Go2Epa(ApiParent):
 
     def populate_date_time(self, combo_date):
 
-        result_id = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id,0)
+        result_id = utils_giswater.get_item_data(
+            self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id, 0)
         sql = (f"SELECT DISTINCT(resultdate), resultdate FROM rpt_arc "
                f"WHERE result_id = '{result_id}' "
                f"ORDER BY resultdate")
@@ -681,8 +665,10 @@ class Go2Epa(ApiParent):
         self.controller.execute_sql(sql)
 
         # Get new values from widgets of type QComboBox
-        rpt_selector_result_id = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id)
-        rpt_selector_compare_id = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_compare_id)
+        rpt_selector_result_id = utils_giswater.get_item_data(
+            self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id)
+        rpt_selector_compare_id = utils_giswater.get_item_data(
+            self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_compare_id)
 
         if rpt_selector_result_id not in (None, -1, ''):
             sql = (f"INSERT INTO selector_rpt_main (result_id, cur_user)"
@@ -696,7 +682,8 @@ class Go2Epa(ApiParent):
 
         if self.project_type == 'ws':
             time_to_show = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_time_to_show)
-            time_to_compare = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_time_to_compare)
+            time_to_compare = utils_giswater.get_item_data(
+                self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_time_to_compare)
             if time_to_show not in (None, -1, ''):
                 sql = (f"INSERT INTO rpt_selector_hourly (timestep, cur_user)"
                        f" VALUES ('{time_to_show}', '{user}');\n")

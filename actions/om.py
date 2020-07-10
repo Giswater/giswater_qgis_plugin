@@ -44,13 +44,13 @@ class Om(ParentAction):
 
     def om_visit_management(self):
         """ Button 65: Visit management """
-        self.manage_visit.edit_visit()     
-        
+        self.manage_visit.edit_visit()
+
 
     def om_psector(self, psector_id=None):
         """ Button 81: Psector """
         self.manage_new_psector.new_psector(psector_id, 'om')
-        
+
 
     def om_psector_management(self):
         """ Button 82: Psector management """
@@ -68,9 +68,12 @@ class Om(ParentAction):
         # Set signals
         self.dlg_psector_mng.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_psector_mng))
         self.dlg_psector_mng.rejected.connect(partial(self.close_dialog, self.dlg_psector_mng))
-        self.dlg_psector_mng.btn_delete.clicked.connect(partial(self.multi_rows_delete, qtbl_psm, table_name, column_id))
-        self.dlg_psector_mng.btn_update_psector.clicked.connect(partial(self.update_current_psector, self.dlg_psector_mng, qtbl_psm))
-        self.dlg_psector_mng.txt_name.textChanged.connect(partial(self.filter_by_text, qtbl_psm, self.dlg_psector_mng.txt_name, table_name))
+        self.dlg_psector_mng.btn_delete.clicked.connect(
+            partial(self.multi_rows_delete, qtbl_psm, table_name, column_id))
+        self.dlg_psector_mng.btn_update_psector.clicked.connect(
+            partial(self.update_current_psector, self.dlg_psector_mng, qtbl_psm))
+        self.dlg_psector_mng.txt_name.textChanged.connect(
+            partial(self.filter_by_text, qtbl_psm, self.dlg_psector_mng.txt_name, table_name))
         self.dlg_psector_mng.tbl_psm.doubleClicked.connect(partial(self.charge_psector, qtbl_psm))
         self.fill_table_psector(qtbl_psm, table_name)
         self.set_table_columns(self.dlg_psector_mng, qtbl_psm, table_name)
@@ -200,7 +203,7 @@ class Om(ParentAction):
                 sql = f"INSERT INTO {tablename} (parameter, value, cur_user)"
                 _date = widget.dateTime().toString('yyyy-MM-dd')
                 sql += f" VALUES ('{parameter}', '{_date}', current_user)"
-                
+
         self.controller.execute_sql(sql)
 
 
@@ -246,7 +249,7 @@ class Om(ParentAction):
         sql = (f"SELECT * FROM selector_date"
                f" WHERE cur_user = '{self.current_user}'")
         row = self.controller.get_row(sql)
-        if not row :
+        if not row:
             sql = (f"INSERT INTO selector_date"
                    f" (from_date, to_date, context, cur_user)"
                    f" VALUES('{from_date}', '{to_date}', 'om_visit', '{self.current_user}')")
@@ -268,7 +271,8 @@ class Om(ParentAction):
         to_date = self.widget_date_to.date().toString('yyyy-MM-dd')
         if from_date >= to_date:
             to_date = self.widget_date_from.date().addDays(1).toString('yyyy-MM-dd')
-            utils_giswater.setCalendarDate(self.dlg_selector_date, self.widget_date_to, datetime.strptime(to_date, '%Y-%m-%d'))
+            utils_giswater.setCalendarDate(self.dlg_selector_date, self.widget_date_to,
+                                           datetime.strptime(to_date, '%Y-%m-%d'))
 
 
     def update_date_from(self):
@@ -278,7 +282,8 @@ class Om(ParentAction):
         to_date = self.widget_date_to.date().toString('yyyy-MM-dd')
         if to_date <= from_date:
             from_date = self.widget_date_to.date().addDays(-1).toString('yyyy-MM-dd')
-            utils_giswater.setCalendarDate(self.dlg_selector_date, self.widget_date_from, datetime.strptime(from_date, '%Y-%m-%d'))
+            utils_giswater.setCalendarDate(self.dlg_selector_date, self.widget_date_from,
+                                           datetime.strptime(from_date, '%Y-%m-%d'))
 
 
     def get_default_dates(self):

@@ -33,7 +33,7 @@ class Go2EpaOptions(ApiParent):
 
         # Clear list
         self.epa_options_list = []
-        
+
         # Create dialog
         self.dlg_options = Go2EpaOptionsUi()
         self.load_settings(self.dlg_options)
@@ -44,7 +44,8 @@ class Go2EpaOptions(ApiParent):
         if not json_result:
             return False
 
-        self.construct_form_param_user(self.dlg_options, json_result['body']['form']['formTabs'], 0, self.epa_options_list)
+        self.construct_form_param_user(
+            self.dlg_options, json_result['body']['form']['formTabs'], 0, self.epa_options_list)
         grbox_list = self.dlg_options.findChildren(QGroupBox)
         for grbox in grbox_list:
             widget_list = grbox.findChildren(QWidget)

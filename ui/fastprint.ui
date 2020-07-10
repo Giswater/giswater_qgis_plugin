@@ -68,7 +68,7 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_4">
       <item row="0" column="0">
-       <layout class="QGridLayout" name="data_2"/>
+       <layout class="QGridLayout" name="lyt_data_2"/>
       </item>
      </layout>
     </widget>
@@ -80,7 +80,7 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="0" column="0">
-       <layout class="QGridLayout" name="data_1"/>
+       <layout class="QGridLayout" name="lyt_data_1"/>
       </item>
      </layout>
     </widget>

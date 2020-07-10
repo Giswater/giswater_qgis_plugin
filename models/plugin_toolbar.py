@@ -3,7 +3,7 @@
 
 class PluginToolbar(object):
     """ Keep data related with every toolbar of the plugin """
-    
+
     def __init__(self, toolbar_id, name, enabled, toolbar=None, list_actions=[]):
         """ 
         :param toolbar: QToolBar
@@ -14,5 +14,5 @@ class PluginToolbar(object):
         self.enabled = enabled
         self.toolbar = toolbar
         self.list_actions = list_actions
-              
-        
+
+

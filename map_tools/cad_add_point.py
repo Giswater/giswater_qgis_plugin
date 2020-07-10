@@ -53,7 +53,7 @@ class CadAddPoint(ParentMapTool):
         else:
             self.dlg_create_point.rb_right.setChecked(True)
 
-        self.open_dialog(self.dlg_create_point, dlg_name='auxpoint' ,maximize_button=False)
+        self.open_dialog(self.dlg_create_point, dlg_name='auxpoint', maximize_button=False)
 
 
     def get_values(self, point_1, point_2):
@@ -67,7 +67,7 @@ class CadAddPoint(ParentMapTool):
         if not self.dist_y:
             self.dist_y = 0
         self.delete_prev = utils_giswater.isChecked(self.dlg_create_point, self.dlg_create_point.chk_delete_prev)
-        
+
         if self.layer_points:
             self.layer_points.startEditing()
             self.close_dialog(self.dlg_create_point)
@@ -90,7 +90,7 @@ class CadAddPoint(ParentMapTool):
             self.layer_points.commitChanges()
             self.layer_points.dataProvider().forceReload()
             self.layer_points.triggerRepaint()
-            
+
         else:
             self.iface.actionPan().trigger()
             self.cancel_point = False
@@ -112,7 +112,7 @@ class CadAddPoint(ParentMapTool):
 
 
     """ QgsMapTools inherited event functions """
-    
+
     def keyPressEvent(self, event):
 
         if event.key() == Qt.Key_Escape:
@@ -178,7 +178,7 @@ class CadAddPoint(ParentMapTool):
         self.snap_to_selected_layer = False
         # Get SRID
         self.srid = self.controller.plugin_settings_value('srid')
-        
+
         # Check button
         self.action().setChecked(True)
 
@@ -217,11 +217,11 @@ class CadAddPoint(ParentMapTool):
 
 
     def deactivate(self):
-        
+
         self.point_1 = None
         self.point_2 = None
-        
+
         # Call parent method
         ParentMapTool.deactivate(self)
         self.iface.setActiveLayer(self.current_layer)
-        
+

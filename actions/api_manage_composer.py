@@ -87,7 +87,7 @@ class ApiManageComposer(ApiParent):
 
         self.check_whidget_exist(self.dlg_composer)
         self.load_composer_values(self.dlg_composer)
-        
+
         self.open_dialog(self.dlg_composer, dlg_name='fastprint')
 
         # Control if no have composers
@@ -98,6 +98,7 @@ class ApiManageComposer(ApiParent):
             self.dlg_composer.btn_print.setEnabled(False)
             self.dlg_composer.btn_preview.setEnabled(False)
 
+
     def set_rotation(self, widget):
         """ Set rotation to mapCanvas """
         self.iface.mapCanvas().setRotation(float(widget.text()))
@@ -106,6 +107,7 @@ class ApiManageComposer(ApiParent):
     def set_scale(self, widget):
         """ Set zoomScale to mapCanvas """
         self.iface.mapCanvas().zoomScale(float(widget.text()))
+
 
     def check_whidget_exist(self, dialog):
         """ Check if widget exist in composer """
@@ -323,4 +325,3 @@ class ApiManageComposer(ApiParent):
             maps[map_index].setMapRotation(float(rotation))
 
         return True
-

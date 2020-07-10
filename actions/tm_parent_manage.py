@@ -5,7 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel
 from qgis.PyQt.QtWidgets import QCompleter, QTableView, QDateEdit, QLineEdit, QTextEdit, QDateTimeEdit, QComboBox
 from qgis.PyQt.QtSql import QSqlTableModel
@@ -160,7 +159,7 @@ class TmParentManage(TmParentAction, object):
         if widget != self.lazy_widget:
             return
         self.lazy_init_function(self.lazy_widget)
-        
+
 
     def lazy_configuration(self, widget, init_function):
         """ set the init_function where all necessary events are set.
@@ -169,7 +168,7 @@ class TmParentManage(TmParentAction, object):
 
         self.lazy_widget = widget
         self.lazy_init_function = init_function
-        
+
 
     def select_features_by_ids(self, geom_type, expr):
         """ Select features of layers of group @geom_type applying @expr """
@@ -324,7 +323,7 @@ class TmParentManage(TmParentAction, object):
         self.reload_table(qtable, self.geom_type, expr_filter)
         self.apply_lazy_init(qtable)
         # Remove selection in generic 'v_edit' layers
-        #self.remove_selection(False)
+        # self.remove_selection(False)
 
         self.connect_signal_selection_changed(qtable)
 

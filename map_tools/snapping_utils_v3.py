@@ -17,7 +17,8 @@
 """
 # -*- coding: utf-8 -*-
 from qgis.gui import QgsMapCanvas, QgsVertexMarker
-from qgis.core import QgsFeatureRequest, QgsPointLocator, QgsPointXY, QgsProject, QgsSnappingConfig, QgsSnappingUtils, QgsTolerance, QgsVectorLayer
+from qgis.core import QgsFeatureRequest, QgsPointLocator, QgsPointXY, QgsProject, QgsSnappingConfig, QgsSnappingUtils, \
+    QgsTolerance, QgsVectorLayer
 from qgis.PyQt.QtCore import QPoint
 from qgis.PyQt.QtGui import QColor
 

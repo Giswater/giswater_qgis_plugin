@@ -12,5 +12,5 @@ class SysFeatureCat(object):
         self.shortcut_key = shortcut_key
         self.parent_layer = parent_layer
         self.child_layer = child_layer
-    
+
 

@@ -5,8 +5,9 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsExpression, QgsFeatureRequest, QgsGeometry, QgsPointXY, QgsProject, QgsRectangle, QgsSymbol, \
-    QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsSimpleFillSymbolLayer
+from qgis.core import QgsCategorizedSymbolRenderer, QgsExpression, QgsFeatureRequest, QgsGeometry, QgsPointLocator, \
+    QgsPointXY, QgsProject, QgsRectangle, QgsRendererCategory,  QgsSimpleFillSymbolLayer, QgsSnappingConfig, QgsSymbol,\
+    QgsVectorLayer
 from qgis.gui import QgsRubberBand
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTimer
 from qgis.PyQt.QtWidgets import QGroupBox, QAbstractItemView, QTableView, QFileDialog, QApplication, QCompleter, \
@@ -15,7 +16,12 @@ from qgis.PyQt.QtGui import QIcon, QColor, QCursor, QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel
 
 import random
-import configparser, os, re, subprocess, sys, webbrowser
+import configparser
+import os
+import re
+import subprocess
+import sys
+import webbrowser
 if 'nt' in sys.builtin_module_names:
     import ctypes
 
@@ -23,21 +29,23 @@ from functools import partial
 
 from .. import utils_giswater
 from .add_layer import AddLayer
+from ..map_tools.snapping_utils_v3 import SnappingConfigManager
+
 from ..ui_manager import DialogTextUi, GwDialog, GwMainWindow
 
 
 class ParentAction(object):
 
-    def __init__(self, iface, settings, controller, plugin_dir):  
+    def __init__(self, iface, settings, controller, plugin_dir):
         """ Class constructor """
 
         # Initialize instance attributes
         self.iface = iface
-        self.canvas = self.iface.mapCanvas()        
+        self.canvas = self.iface.mapCanvas()
         self.settings = settings
         self.controller = controller
-        self.plugin_dir = plugin_dir       
-        self.dao = self.controller.dao         
+        self.plugin_dir = plugin_dir
+        self.dao = self.controller.dao
         self.schema_name = self.controller.schema_name
         self.project_type = None
         self.plugin_version = self.get_plugin_version()
@@ -45,15 +53,11 @@ class ParentAction(object):
         self.user_current_layer = None
         self.rubber_point = None
         self.rubber_polygon = None
-        self.current_tab = None
 
 
-    def init_rubber(self):
+    def init_rubber_polygon(self):
 
         try:
-            self.rubber_point = QgsRubberBand(self.canvas, 0)
-            self.rubber_point.setColor(Qt.yellow)
-            self.rubber_point.setIconSize(10)
             self.rubber_polygon = QgsRubberBand(self.canvas, 2)
             self.rubber_polygon.setColor(Qt.darkRed)
             self.rubber_polygon.setIconSize(20)
@@ -61,23 +65,32 @@ class ParentAction(object):
             pass
 
 
+    def init_rubber_point(self):
+        try:
+            self.rubber_point = QgsRubberBand(self.canvas, 0)
+            self.rubber_point.setColor(Qt.yellow)
+            self.rubber_point.setIconSize(10)
+        except:
+            pass
+
+
     def set_controller(self, controller):
         """ Set controller class """
-        
+
         self.controller = controller
-        self.schema_name = self.controller.schema_name       
+        self.schema_name = self.controller.schema_name
 
 
     def open_web_browser(self, dialog, widget=None):
         """ Display url using the default browser """
-        
-        if widget is not None:           
+
+        if widget is not None:
             url = utils_giswater.getWidgetText(dialog, widget)
             if url == 'null':
                 url = 'http://www.giswater.org'
         else:
             url = 'http://www.giswater.org'
-                     
+
         webbrowser.open(url)
 
 
@@ -103,38 +116,39 @@ class ParentAction(object):
 
     def get_file_dialog(self, dialog, widget):
         """ Get file dialog """
-        
+
         # Check if selected file exists. Set default value if necessary
         file_path = utils_giswater.getWidgetText(dialog, widget)
-        if file_path is None or file_path == 'null' or not os.path.exists(str(file_path)): 
-            folder_path = self.plugin_dir   
-        else:     
-            folder_path = os.path.dirname(file_path) 
-                
+        if file_path is None or file_path == 'null' or not os.path.exists(str(file_path)):
+            folder_path = self.plugin_dir
+        else:
+            folder_path = os.path.dirname(file_path)
+
         # Open dialog to select file
         os.chdir(folder_path)
         file_dialog = QFileDialog()
-        file_dialog.setFileMode(QFileDialog.AnyFile)        
+        file_dialog.setFileMode(QFileDialog.AnyFile)
         message = "Select file"
         folder_path, filter_ = file_dialog.getOpenFileName(parent=None, caption=self.controller.tr(message))
         if folder_path:
             utils_giswater.setWidgetText(dialog, widget, str(folder_path))
-                
-                
+
+
     def get_folder_dialog(self, dialog, widget):
         """ Get folder dialog """
-        
+
         # Check if selected folder exists. Set default value if necessary
         folder_path = utils_giswater.getWidgetText(dialog, widget)
-        if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path): 
+        if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path):
             folder_path = os.path.expanduser("~")
 
         # Open dialog to select folder
         os.chdir(folder_path)
         file_dialog = QFileDialog()
-        file_dialog.setFileMode(QFileDialog.Directory)      
+        file_dialog.setFileMode(QFileDialog.Directory)
         message = "Select folder"
-        folder_path = file_dialog.getExistingDirectory(parent=None, caption=self.controller.tr(message), directory=folder_path)
+        folder_path = file_dialog.getExistingDirectory(
+            parent=None, caption=self.controller.tr(message), directory=folder_path)
         if folder_path:
             utils_giswater.setWidgetText(dialog, widget, str(folder_path))
 
@@ -144,7 +158,7 @@ class ParentAction(object):
 
         if dialog is None:
             dialog = self.dlg
-                    
+
         try:
             x = self.controller.plugin_settings_value(dialog.objectName() + "_x")
             y = self.controller.plugin_settings_value(dialog.objectName() + "_y")
@@ -156,7 +170,7 @@ class ParentAction(object):
             else:
                 screens = ctypes.windll.user32
                 screen_x = screens.GetSystemMetrics(78)
-                screen_y = screens.GetSystemMetrics(79)                
+                screen_y = screens.GetSystemMetrics(79)
                 if int(x) > screen_x:
                     x = int(screen_x) - int(width)
                 if int(y) > screen_y:
@@ -168,14 +182,14 @@ class ParentAction(object):
 
     def save_settings(self, dialog=None):
         """ Save QGIS settings related with dialog position and size """
-                
+
         if dialog is None:
             dialog = self.dlg
-            
+
         self.controller.plugin_settings_set_value(dialog.objectName() + "_width", dialog.property('width'))
         self.controller.plugin_settings_set_value(dialog.objectName() + "_height", dialog.property('height'))
-        self.controller.plugin_settings_set_value(dialog.objectName() + "_x", dialog.pos().x()+8)
-        self.controller.plugin_settings_set_value(dialog.objectName() + "_y", dialog.pos().y()+31)
+        self.controller.plugin_settings_set_value(dialog.objectName() + "_x", dialog.pos().x() + 8)
+        self.controller.plugin_settings_set_value(dialog.objectName() + "_y", dialog.pos().y() + 31)
 
 
     def get_last_tab(self, dialog, selector_name):
@@ -239,9 +253,9 @@ class ParentAction(object):
             dlg.show()
         else:
             dlg.show()
-    
-        
-    def close_dialog(self, dlg=None): 
+
+
+    def close_dialog(self, dlg=None):
         """ Close dialog """
 
         if dlg is None or type(dlg) is bool:
@@ -252,13 +266,13 @@ class ParentAction(object):
             map_tool = self.canvas.mapTool()
             # If selected map tool is from the plugin, set 'Pan' as current one
             if map_tool.toolName() == '':
-                self.iface.actionPan().trigger() 
+                self.iface.actionPan().trigger()
         except AttributeError:
             pass
         except Exception as e:
             self.controller.log_info(type(e).__name__)
-        
-        
+
+
     def multi_row_selector(self, dialog, tableleft, tableright, field_id_left, field_id_right, name='name',
                            hide_left=[0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
                                   25, 26, 27, 28, 29, 30], hide_right=[1, 2, 3], aql=""):
@@ -303,19 +317,23 @@ class ParentAction(object):
         self.hide_colums(tbl_selected_rows, hide_right)
         tbl_selected_rows.setColumnWidth(0, 200)
         # Button select
-        dialog.btn_select.clicked.connect(partial(self.multi_rows_selector, tbl_all_rows, tbl_selected_rows, field_id_left, tableright, field_id_right, query_left, query_right, field_id_right))
+        dialog.btn_select.clicked.connect(partial(self.multi_rows_selector, tbl_all_rows, tbl_selected_rows,
+                                          field_id_left, tableright, field_id_right, query_left, query_right, field_id_right))
 
         # Button unselect
         query_delete = f"DELETE FROM {schema_name}.{tableright}"
         query_delete += f" WHERE current_user = cur_user AND {tableright}.{field_id_right}="
-        dialog.btn_unselect.clicked.connect(partial(self.unselector, tbl_all_rows, tbl_selected_rows, query_delete, query_left, query_right, field_id_right))
+        dialog.btn_unselect.clicked.connect(partial(self.unselector, tbl_all_rows,
+                                            tbl_selected_rows, query_delete, query_left, query_right, field_id_right))
 
         # QLineEdit
-        dialog.txt_name.textChanged.connect(partial(self.query_like_widget_text, dialog, dialog.txt_name, tbl_all_rows, tableleft, tableright, field_id_right, field_id_left, name, aql))
+        dialog.txt_name.textChanged.connect(partial(self.query_like_widget_text, dialog, dialog.txt_name,
+                                            tbl_all_rows, tableleft, tableright, field_id_right, field_id_left, name, aql))
 
         # Order control
         tbl_all_rows.horizontalHeader().sectionClicked.connect(partial(self.order_by_column, tbl_all_rows, query_left))
-        tbl_selected_rows.horizontalHeader().sectionClicked.connect(partial(self.order_by_column, tbl_selected_rows, query_right))
+        tbl_selected_rows.horizontalHeader().sectionClicked.connect(
+            partial(self.order_by_column, tbl_selected_rows, query_right))
 
 
     def order_by_column(self, qtable, query, idx):
@@ -360,7 +378,7 @@ class ParentAction(object):
         col_to_sort = qtable_left.model().headerData(idx, Qt.Horizontal)
         query_left += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
         self.fill_table_by_query(qtable_left, query_left)
-        
+
         sort_order = qtable_right.horizontalHeader().sortIndicatorOrder()
         idx = qtable_right.horizontalHeader().sortIndicatorSection()
         col_to_sort = qtable_right.model().headerData(idx, Qt.Horizontal)
@@ -369,7 +387,7 @@ class ParentAction(object):
         self.refresh_map_canvas()
 
 
-    def multi_rows_selector(self, qtable_left, qtable_right, id_ori, 
+    def multi_rows_selector(self, qtable_left, qtable_right, id_ori,
                             tablename_des, id_des, query_left, query_right, field_id):
         """
             :param qtable_left: QTableView origin
@@ -444,7 +462,7 @@ class ParentAction(object):
         # Check for errors
         if self.model.lastError().isValid():
             self.controller.show_warning(self.model.lastError().text())
-            
+
         # Attach model to table view
         widget.setModel(self.model)
 
@@ -486,8 +504,8 @@ class ParentAction(object):
 
         # Check for errors
         if model.lastError().isValid():
-            self.controller.show_warning(model.lastError().text())  
-            
+            self.controller.show_warning(model.lastError().text())
+
 
     def query_like_widget_text(self, dialog, text_line, qtable, tableleft, tableright, field_id_r, field_id_l, name='name', aql=''):
         """ Fill the QTableView by filtering through the QLineEdit"""
@@ -502,68 +520,68 @@ class ParentAction(object):
                f"  AND  {field_id_l} > -1")
         sql += aql
         self.fill_table_by_query(qtable, sql)
-        
-        
+
+
     def set_icon(self, widget, icon):
         """ Set @icon to selected @widget """
 
         # Get icons folder
-        icons_folder = os.path.join(self.plugin_dir, 'icons')           
-        icon_path = os.path.join(icons_folder, str(icon) + ".png")           
+        icons_folder = os.path.join(self.plugin_dir, 'icons')
+        icon_path = os.path.join(icons_folder, str(icon) + ".png")
         if os.path.exists(icon_path):
             widget.setIcon(QIcon(icon_path))
         else:
             self.controller.log_info("File not found", parameter=icon_path)
-                    
+
 
     def check_expression(self, expr_filter, log_info=False):
         """ Check if expression filter @expr_filter is valid """
-        
+
         if log_info:
             self.controller.log_info(expr_filter)
         expr = QgsExpression(expr_filter)
         if expr.hasParserError():
             message = "Expression Error"
-            self.controller.log_warning(message, parameter=expr_filter)      
+            self.controller.log_warning(message, parameter=expr_filter)
             return False, expr
 
         return True, expr
-        
+
 
     def refresh_map_canvas(self, restore_cursor=False):
         """ Refresh all layers present in map canvas """
-        
+
         self.canvas.refreshAllLayers()
         for layer_refresh in self.canvas.layers():
             layer_refresh.triggerRepaint()
 
         if restore_cursor:
-            self.set_cursor_restore() 
+            self.set_cursor_restore()
 
 
     def set_cursor_wait(self):
         """ Change cursor to 'WaitCursor' """
         QApplication.setOverrideCursor(Qt.WaitCursor)
-            
-            
+
+
     def set_cursor_restore(self):
         """ Restore to previous cursors """
-        QApplication.restoreOverrideCursor() 
-        
-        
+        QApplication.restoreOverrideCursor()
+
+
     def get_cursor_multiple_selection(self):
         """ Set cursor for multiple selection """
-        
-        path_folder = os.path.join(os.path.dirname(__file__), os.pardir) 
-        path_cursor = os.path.join(path_folder, 'icons', '201.png')                
-        if os.path.exists(path_cursor):      
-            cursor = QCursor(QPixmap(path_cursor))    
-        else:        
-            cursor = QCursor(Qt.ArrowCursor)  
-                
-        return cursor        
-                    
-                
+
+        path_folder = os.path.join(os.path.dirname(__file__), os.pardir)
+        path_cursor = os.path.join(path_folder, 'icons', '201.png')
+        if os.path.exists(path_cursor):
+            cursor = QCursor(QPixmap(path_cursor))
+        else:
+            cursor = QCursor(Qt.ArrowCursor)
+
+        return cursor
+
+
     def set_table_columns(self, dialog, widget, table_name, sort_order=0, isQStandardItemModel=False):
         """ Configuration of tables. Set visibility and width of columns """
 
@@ -606,22 +624,22 @@ class ParentAction(object):
 
     def connect_signal_selection_changed(self, option):
         """ Connect signal selectionChanged """
-            
-        try:            
+
+        try:
             if option == "mincut_connec":
-                self.canvas.selectionChanged.connect(partial(self.snapping_selection_connec))                 
+                self.canvas.selectionChanged.connect(partial(self.snapping_selection_connec))
             elif option == "mincut_hydro":
-                self.canvas.selectionChanged.connect(partial(self.snapping_selection_hydro))                 
-        except Exception:    
+                self.canvas.selectionChanged.connect(partial(self.snapping_selection_hydro))
+        except Exception:
             pass
-    
-    
+
+
     def disconnect_signal_selection_changed(self):
         """ Disconnect signal selectionChanged """
-        
-        try:                     
-            self.canvas.selectionChanged.disconnect()  
-        except Exception:                     
+
+        try:
+            self.canvas.selectionChanged.disconnect()
+        except Exception:
             pass
         finally:
             self.iface.actionPan().trigger()
@@ -793,7 +811,7 @@ class ParentAction(object):
 
     def zoom_to_rectangle(self, x1, y1, x2, y2, margin=5):
 
-        rect = QgsRectangle(float(x1)-margin, float(y1)-margin, float(x2)+margin, float(y2)+margin)
+        rect = QgsRectangle(float(x1) - margin, float(y1) - margin, float(x2) + margin, float(y2) + margin)
         self.canvas.setExtent(rect)
         self.canvas.refresh()
 
@@ -1037,7 +1055,7 @@ class ParentAction(object):
         elem = combo.itemData(combo.currentIndex())
         i = qtable.model().index(pos_x, widget_pos)
         qtable.model().setData(i, elem[0])
-        i = qtable.model().index(pos_x, widget_pos+1)
+        i = qtable.model().index(pos_x, widget_pos + 1)
         qtable.model().setData(i, elem[1])
 
 
@@ -1149,8 +1167,8 @@ class ParentAction(object):
 
         actions_list = self.iface.mainWindow().findChildren(QAction)
         for action in actions_list:
-           self.controller.log_info(str(action.objectName()))
-           action.triggered.connect(partial(self.show_action_name, action))
+            self.controller.log_info(str(action.objectName()))
+            action.triggered.connect(partial(self.show_action_name, action))
 
 
     def show_action_name(self, action):
@@ -1174,13 +1192,57 @@ class ParentAction(object):
         return points
 
 
+    def draw(self, complet_result, zoom=True, reset_rb=True, color=QColor(255, 0, 0, 100), width=3):
+
+        if complet_result['body']['feature']['geometry'] is None:
+            return
+        if complet_result['body']['feature']['geometry']['st_astext'] is None:
+            return
+        list_coord = re.search('\((.*)\)', str(complet_result['body']['feature']['geometry']['st_astext']))
+        max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
+
+        if reset_rb:
+            self.resetRubberbands()
+        if str(max_x) == str(min_x) and str(max_y) == str(min_y):
+            point = QgsPointXY(float(max_x), float(max_y))
+            self.draw_point(point, color, width)
+        else:
+            points = self.get_points(list_coord)
+            self.draw_polyline(points, color, width)
+        if zoom:
+            margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
+            self.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin)
+
+
+    def draw_point(self, point, color=QColor(255, 0, 0, 100), width=3, duration_time=None, is_new=False):
+        """
+        :param duration_time: integer milliseconds ex: 3000 for 3 seconds
+        """
+
+        if self.rubber_point is None:
+            self.init_rubber_point()
+
+        if is_new:
+            rb = QgsRubberBand(self.canvas, 0)
+        else:
+            rb = self.rubber_point
+        rb.setColor(color)
+        rb.setWidth(width)
+        rb.addPoint(point)
+
+        # wait to simulate a flashing effect
+        if duration_time is not None:
+            QTimer.singleShot(duration_time, self.resetRubberbands)
+        return rb
+
+
     def draw_polyline(self, points, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
         """ Draw 'line' over canvas following list of points
          :param duration_time: integer milliseconds ex: 3000 for 3 seconds
          """
 
         if self.rubber_polygon is None:
-            self.init_rubber()
+            self.init_rubber_polygon()
 
         rb = self.rubber_polygon
         polyline = QgsGeometry.fromPolylineXY(points)
@@ -1197,12 +1259,13 @@ class ParentAction(object):
 
 
     def resetRubberbands(self):
+        if self.rubber_polygon is not None:
+            self.rubber_polygon.reset(2)
 
-        if self.rubber_polygon is None:
-            self.init_rubber()
+        if self.rubber_point is not None:
+            self.rubber_point.reset(0)
 
-        self.rubber_point.reset(0)
-        self.rubber_polygon.reset(2)
+
 
 
     def restore_user_layer(self):
@@ -1211,21 +1274,20 @@ class ParentAction(object):
             self.iface.setActiveLayer(self.user_current_layer)
         else:
             layer = self.controller.get_layer_by_tablename('v_edit_node')
-            if layer: self.iface.setActiveLayer(layer)
+            if layer:
+                self.iface.setActiveLayer(layer)
+
 
     def set_style_mapzones(self):
 
         extras = f'"mapzones":""'
         body = self.create_body(extras=extras)
-
-        self.controller.log_info(f"SELECT gw_fct_getstylemapzones ({body})")
         json_return = self.controller.get_json('gw_fct_getstylemapzones', body)
         if not json_return:
             return False
 
         for mapzone in json_return['body']['data']['mapzones']:
 
-            self.controller.log_info(f"Mapzone: ({mapzone})")
             # Loop for each mapzone returned on json
             lyr = self.controller.get_layer_by_tablename(mapzone['layer'])
             categories = []
@@ -1273,3 +1335,255 @@ class ParentAction(object):
 
                     # repaint layer
                     lyr.triggerRepaint()
+
+
+    def manage_return_manager(self, json_result, sql):
+        """
+        Manage options for layers (active, visible, zoom and indexing)
+        :param json_result: Json result of a query (Json)
+        :return: None
+        """
+
+        try:
+            styles = json_result['body']['returnManager']
+        except KeyError:
+            return
+        srid = self.controller.plugin_settings_value('srid')
+        print(styles)
+        try:
+            if 'style' not in styles: return
+            if 'ruberband' in styles['style']:
+                # Set default values
+                opacity = 100
+                width = 3
+                if 'transparency' in styles['style']['ruberband']:
+                    opacity = styles['style']['ruberband']['transparency'] * 255
+                if 'color' in styles['style']['ruberband']:
+                    color = styles['style']['ruberband']['color']
+                    color = QColor(color[0], color[1], color[2], opacity)
+                if 'width' in styles['style']['ruberband']:
+                    width = styles['style']['ruberband']['width']
+                self.draw(json_result, color=color, width=width)
+            else:
+
+                for key, value in list(json_result['body']['data'].items()):
+                    if key in ('point', 'line', 'polygon'):
+                        if key not in json_result['body']['data']: continue
+                        if 'features' not in json_result['body']['data'][key]: continue
+                        layer_name = f'Temporal layer {key}'
+                        self.delete_layer_from_toc(layer_name)
+
+                        # Get values for create and populate layer
+                        counter = len(json_result['body']['data'][key]['features'])
+                        geometry_type = json_result['body']['data'][key]['geometryType']
+                        v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", layer_name, 'memory')
+                        self.add_layer.populate_vlayer(v_layer, json_result['body']['data'], key, counter)
+
+                        # Get values for set layer style
+                        style = json_result['body']['returnManager']['style']
+                        if 'style' in styles and 'transparency' in styles['style'][key]:
+                            opacity = styles['style'][key]['transparency']
+                        if style[key]['style'] == 'categorized':
+                            color_values = {}
+                            for item in json_result['body']['returnManager']['style'][key]['values']:
+                                color_values[item['id']] = QColor(item['color'][0], item['color'][1], item['color'][2], opacity*255)
+                            cat_field = str(style[key]['field'])
+                            size = style['width'] if 'width' in style and style['width'] else 2
+                            self.add_layer.categoryze_layer(v_layer, cat_field, size, color_values)
+                        elif style[key]['style'] == 'random':
+                            size = style['width'] if 'width' in style and style['width'] else 2
+                            if geometry_type == 'Point':
+                                v_layer.renderer().symbol().setSize(size)
+                            else:
+                                v_layer.renderer().symbol().setWidth(size)
+                            v_layer.renderer().symbol().setOpacity(opacity)
+                        elif style[key]['style'] == 'qml':
+                            extras = f'"temp_layer":"{key}", '
+                            funct_id = style[key]['id']
+                            extras += f'"function_id":"{funct_id}"'
+                            body = self.create_body(extras=extras)
+                            return_styles = self.controller.get_json('gw_fct_getstyle', body, log_sql=True)
+                            self.create_qml(v_layer, return_styles['body']['data']['addToc']['style'])
+                        if style[key]['style'] == 'unique':
+                            color = style[key]['style']['values']['color']
+                            size = style['width'] if 'width' in style and style['width'] else 2
+                            opacity = styles['style'][key]['transparency']
+                            color = QColor(color[0], color[1], color[2])
+                            if key == 'point':
+                                v_layer.renderer().symbol().setSize(size)
+                            elif key in ('line', 'polygon'):
+                                v_layer.renderer().symbol().setWidth(size)
+                            v_layer.renderer().symbol().setColor(color)
+                            v_layer.renderer().symbol().setOpacity(opacity)
+                        self.iface.layerTreeView().refreshLayerSymbology(v_layer.id())
+
+
+        except Exception as e:
+            self.controller.manage_exception(None, f"{type(e).__name__}: {e}", sql)
+
+
+    def manage_layer_manager(self, json_result, sql):
+        """
+        Manage options for layers (active, visible, zoom and indexing)
+        :param json_result: Json result of a query (Json)
+        :return: None
+        """
+
+        try:
+            layermanager = json_result['body']['layerManager']
+        except KeyError:
+            return
+
+        try:
+            funct_id = layermanager['functionId'] if 'functionId' in layermanager else None
+
+            # Get a list of layers names and set visible
+            # For the visible layers, xxx names of layers are received, it is checked if they exist in the TOC,
+            # if so they become visible. If not, a string is generated with the name of the layers that are not in the
+            # TOC and through the function gw_fct_getstyle the table sys_table.addtoc is looked for the configuration of
+            # each one, the configuration of this layer It must be as in the following example:
+            # {"tableName":"v_edit_arc","primaryKey":"arc_id", "geom":"the_geom","group":"grouptest","style":"qml"}.
+            # The indispensable fields to load the layer are tableName, primaryKey and geom.
+            # The group and qml fields are optional, where group is to indicate in which TOC group we want our layer to
+            # enter and qml is to indicate that we want to add a qml to this layer. If you want to add a qml, it must be
+            # inserted in the table sys_style.stylevalue where idval is the id of the postgre function that is running
+            # and styletype if the layer is line, poin or polygon
+            if 'visible' in layermanager:
+                layers_to_add = '  '
+                for layer_name in layermanager['visible']:
+                    layer = self.controller.get_layer_by_tablename(layer_name)
+                    if layer:
+                        self.controller.set_layer_visible(layer)
+                    else:
+                        layers_to_add += f'"{layer_name}", '
+
+                layers_to_add = layers_to_add[:-2]
+
+                if layers_to_add not in (None, '') and funct_id not in (None, ''):
+                    extras = f'"layers":[{layers_to_add}], '
+                    extras += f'"function_id":"{funct_id}"'
+                    body = self.create_body(extras=extras)
+                    styles = self.controller.get_json('gw_fct_getstyle', body, log_sql=True)
+                    if 'layers' in styles['body']['data']['addToc']:
+                        for layer_info in styles['body']['data']['addToc']['layers']:
+                            if 'error' in layer_info:
+                                msg = layer_info['error']
+                                self.controller.show_warning(msg)
+                                continue
+                            try:
+                                tablename = layer_info['tableName']
+                                teh_geom = layer_info['geom']
+                                field_id = layer_info['primaryKey']
+                                if 'group' in layer_info and layer_info['group']:
+                                    group = layer_info['group']
+                                else:
+                                    group = None
+                                self.add_layer.from_postgres_to_toc(tablename, teh_geom, field_id, None, group)
+                            except KeyError as e:
+                                self.controller.log_info(f"{type(e).__name__} --> {e}")
+
+                            if 'style' in layer_info:
+                                style = layer_info['style']
+                                layer = self.controller.get_layer_by_tablename(tablename)
+                                if layer:
+                                    self.create_qml(layer, style)
+
+            # Get a list of layers names force reload dataProvider of layer
+            if 'index' in layermanager:
+                for layer_name in layermanager['index']:
+                    self.controller.set_layer_index(layer_name)
+
+            # Get a layer name and set active
+            if 'active' in layermanager:
+                layer = self.controller.get_layer_by_tablename(layermanager['active'])
+                if layer:
+                    self.iface.setActiveLayer(layer)
+
+            # Get a layer name and zoom to extent with a margin of 20
+            if 'zoom' in layermanager:
+                layer = self.controller.get_layer_by_tablename(layermanager['zoom']['layer'])
+                if layer:
+                    prev_layer = self.iface.activeLayer()
+                    self.iface.setActiveLayer(layer)
+                    self.iface.zoomToActiveLayer()
+                    margin = layermanager['zoom']['margin']
+                    extent = QgsRectangle()
+                    extent.setMinimal()
+                    extent.combineExtentWith(layer.extent())
+                    xmax = extent.xMaximum() + margin
+                    xmin = extent.xMinimum() - margin
+                    ymax = extent.yMaximum() + margin
+                    ymin = extent.yMinimum() - margin
+                    extent.set(xmin, ymin, xmax, ymax)
+                    self.iface.mapCanvas().setExtent(extent)
+                    self.iface.mapCanvas().refresh()
+                    if prev_layer:
+                        self.iface.setActiveLayer(prev_layer)
+
+            # Set snnaping options
+            if 'snnaping' in layermanager:
+                self.snapper_manager = SnappingConfigManager(self.iface)
+                if self.snapper_manager.controller is None:
+                    self.snapper_manager.set_controller(self.controller)
+                for layer_name in layermanager['snnaping']:
+                    layer = self.controller.get_layer_by_tablename(layer_name)
+                    if layer:
+                        QgsProject.instance().blockSignals(True)
+                        layer_settings = self.snapper_manager.snap_to_layer(layer, QgsPointLocator.All,
+                                                                            True)
+                        if layer_settings:
+                            layer_settings.setType(2)
+                            layer_settings.setTolerance(15)
+                            layer_settings.setEnabled(True)
+                        else:
+                            layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 2, 15, 1)
+                        self.snapper_manager.snapping_config.setIndividualLayerSettings(layer,
+                                                                                        layer_settings)
+                        QgsProject.instance().blockSignals(False)
+                        QgsProject.instance().snappingConfigChanged.emit(
+                            self.snapper_manager.snapping_config)
+                self.snapper_manager.set_snapping_mode()
+
+
+        except Exception as e:
+            self.controller.manage_exception(None, f"{type(e).__name__}: {e}", sql)
+
+
+    def create_qml(self, layer, style):
+        main_folder = os.path.join(os.path.expanduser("~"), self.controller.plugin_name)
+        config_folder = main_folder + os.sep + "temp" + os.sep
+        if not os.path.exists(config_folder):
+            os.makedirs(config_folder)
+        path_temp_file = config_folder + 'temp_qml.qml'
+        file = open(path_temp_file, 'w')
+        file.write(style)
+        file.close()
+        del file
+        self.load_qml(layer, path_temp_file)
+
+    def manage_actions(self, json_result, sql):
+        """
+        Manage options for layers (active, visible, zoom and indexing)
+        :param json_result: Json result of a query (Json)
+        :return: None
+        """
+
+        try:
+            actions = json_result['body']['actions']
+        except KeyError:
+            return
+        try:
+            for action in actions:
+                try:
+                    function_name = action['funcName']
+                    params = action['params']
+                    getattr(self.controller.gw_actions, f"{function_name}")(**params)
+                except AttributeError as e:
+                    # If function_name not exist as python function
+                    self.controller.log_warning(f"Exception error: {e}")
+                except Exception as e:
+                    self.controller.log_debug(f"{type(e).__name__}: {e}")
+        except Exception as e:
+            self.controller.manage_exception(None, f"{type(e).__name__}: {e}", sql)
+
+

@@ -5,18 +5,18 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-
 from qgis.core import QgsPointXY, QgsRectangle
 from qgis.gui import QgsMapTool, QgsRubberBand
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QApplication
 from qgis.PyQt.QtGui import QColor
+
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
+
 
 class MultipleSelection(QgsMapTool):
 
-
-    def __init__(self, iface, controller, layers, 
+    def __init__(self, iface, controller, layers,
                  mincut=None, parent_manage=None, manage_new_psector=None, table_object=None, dialog=None):
         """ Class constructor """
 
@@ -28,7 +28,7 @@ class MultipleSelection(QgsMapTool):
         self.manage_new_psector = manage_new_psector
         self.table_object = table_object
         self.dialog = dialog
-        
+
         # Call superclass constructor and set current action
         QgsMapTool.__init__(self, self.canvas)
 
@@ -46,7 +46,7 @@ class MultipleSelection(QgsMapTool):
 
 
     def reset(self):
-        
+
         self.start_point = self.end_point = None
         self.is_emitting_point = False
         self.reset_rubber_band()
@@ -62,31 +62,31 @@ class MultipleSelection(QgsMapTool):
 
 
     def canvasReleaseEvent(self, event):
-        
+
         self.is_emitting_point = False
         rectangle = self.get_rectangle()
         selected_rectangle = None
-        key = QApplication.keyboardModifiers()                
+        key = QApplication.keyboardModifiers()
 
         if event.button() != Qt.LeftButton:
-            self.rubber_band.hide()            
+            self.rubber_band.hide()
             return
-        
+
         # Disconnect signal to enhance process
-        # We will reconnect it when processing last layer of the group 
-        if self.mincut:                            
-            self.mincut.disconnect_signal_selection_changed()           
-        if self.parent_manage: 
+        # We will reconnect it when processing last layer of the group
+        if self.mincut:
+            self.mincut.disconnect_signal_selection_changed()
+        if self.parent_manage:
             self.parent_manage.disconnect_signal_selection_changed()
         if self.manage_new_psector:
             self.manage_new_psector.disconnect_signal_selection_changed()
-        
+
         for i in range(len(self.layers)):
             layer = self.layers[i]
             if i == len(self.layers) - 1:
-                if self.mincut:                              
+                if self.mincut:
                     self.mincut.connect_signal_selection_changed("mincut_connec")
-                if self.parent_manage:                          
+                if self.parent_manage:
                     self.parent_manage.connect_signal_selection_changed(self.dialog, self.table_object)
                 if self.manage_new_psector:
                     self.manage_new_psector.connect_signal_selection_changed(
@@ -97,7 +97,7 @@ class MultipleSelection(QgsMapTool):
                 if selected_rectangle is None:
                     selected_rectangle = self.canvas.mapSettings().mapToLayerCoordinates(layer, rectangle)
                 # If Ctrl+Shift clicked: remove features from selection
-                if key == (Qt.ControlModifier | Qt.ShiftModifier):                
+                if key == (Qt.ControlModifier | Qt.ShiftModifier):
                     layer.selectByRect(selected_rectangle, layer.RemoveFromSelection)
                 # If Ctrl clicked: add features to selection
                 elif key == Qt.ControlModifier:
@@ -105,7 +105,7 @@ class MultipleSelection(QgsMapTool):
                 # If Ctrl not clicked: add features to selection
                 else:
                     layer.selectByRect(selected_rectangle, layer.AddToSelection)
-                                        
+
             # Selection one by one
             else:
                 event_point = self.snapper_manager.get_event_point(event)
@@ -118,7 +118,7 @@ class MultipleSelection(QgsMapTool):
 
 
     def canvasMoveEvent(self, event):
-        
+
         if not self.is_emitting_point:
             return
 
@@ -127,7 +127,7 @@ class MultipleSelection(QgsMapTool):
 
 
     def show_rect(self, start_point, end_point):
-        
+
         self.reset_rubber_band()
         if start_point.x() == end_point.x() or start_point.y() == end_point.y():
             return
@@ -145,7 +145,7 @@ class MultipleSelection(QgsMapTool):
 
 
     def get_rectangle(self):
-        
+
         if self.start_point is None or self.end_point is None:
             return None
         elif self.start_point.x() == self.end_point.x() or self.start_point.y() == self.end_point.y():
