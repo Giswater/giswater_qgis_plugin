@@ -21,6 +21,7 @@ from functools import partial
 from json import JSONDecodeError
 
 from .load_project import LoadProject
+from .actions.add_layer import AddLayer
 from .actions.basic import Basic
 from .actions.edit import Edit
 from .actions.go2epa import Go2Epa
