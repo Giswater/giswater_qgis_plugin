@@ -459,3 +459,34 @@ CREATE OR REPLACE VIEW v_edit_inp_connec AS
    FROM selector_sector,v_connec connec
      JOIN inp_connec USING (connec_id)
   WHERE connec.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW vi_options AS 
+ SELECT a.parameter,
+    a.value
+   FROM ( SELECT a_1.idval AS parameter,
+                CASE
+                    WHEN a_1.idval = 'UNBALANCED'::text AND b.value = 'CONTINUE'::text THEN concat(b.value, ' ', ( SELECT config_param_user.value
+                       FROM config_param_user
+                      WHERE config_param_user.parameter::text = 'inp_options_unbalanced_n'::text AND config_param_user.cur_user::name = "current_user"()))
+                    WHEN a_1.idval = 'QUALITY'::text AND b.value = 'TRACE'::text THEN concat(b.value, ' ', ( SELECT config_param_user.value
+                       FROM config_param_user
+                      WHERE config_param_user.parameter::text = 'inp_options_node_id'::text AND config_param_user.cur_user::name = "current_user"()))
+                    WHEN a_1.idval = 'HYDRAULICS'::text AND (b.value = 'USE'::text OR b.value = 'SAVE'::text) THEN concat(b.value, ' ', ( SELECT config_param_user.value
+                       FROM config_param_user
+                      WHERE config_param_user.parameter::text = 'inp_options_hydraulics_fname'::text AND config_param_user.cur_user::name = "current_user"()))
+                    WHEN a_1.idval = 'HYDRAULICS'::text AND b.value = 'NONE'::text THEN NULL::text
+                    ELSE b.value
+                END AS value
+           FROM sys_param_user a_1
+             JOIN config_param_user b ON a_1.id = b.parameter::text
+          WHERE (a_1.layoutname = ANY (ARRAY['lyt_general_1'::text, 'lyt_general_2'::text, 'lyt_hydraulics_1'::text, 'lyt_hydraulics_2'::text,'lyt_date_1'::text, 'lyt_date_2'::text])) AND (a_1.idval <> ALL (ARRAY['UNBALANCED_N'::text, 'NODE_ID'::text, 'HYDRAULICS_FNAME'::text])) AND b.cur_user::name = "current_user"() AND b.value IS NOT NULL AND b.parameter::text <> 'PATTERN'::text AND b.value <> 'NULLVALUE'::text) a
+  WHERE a.parameter <> 'HYDRAULICS'::text OR a.parameter = 'HYDRAULICS'::text AND a.value IS NOT NULL;
+
+
+CREATE OR REPLACE VIEW vi_report AS 
+ SELECT a.idval AS parameter,
+    b.value
+   FROM sys_param_user a
+     JOIN config_param_user b ON a.id = b.parameter::text
+  WHERE (a.layoutname = ANY (ARRAY['lyt_reports_1'::text, 'lyt_reports_2'::text])) AND b.cur_user::name = "current_user"() AND b.value IS NOT NULL;
