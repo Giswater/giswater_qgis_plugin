@@ -49,7 +49,7 @@ BEGIN
 	
 	-- Header
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 4, concat('IMPORT RPT FILE LOG'));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 4, '-------------------------------------------');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 4, '---------------------------------');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 4, concat('Result id: ', p_result));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 4, concat('Imported by: ', current_user, ', on ', to_char(now(),'YYYY-MM-DD HH:MM:SS')));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 4, '');
@@ -94,7 +94,7 @@ BEGIN
 			-- warnings
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 2, '');
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 2, 'WARNINGS');
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 2, '---------------');
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 2, '-----------');
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			SELECT 114, p_result, 2, concat (time, ' ', text) FROM rpt_hydraulic_status WHERE result_id = p_result AND time = 'WARNING:';
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 2, '');
