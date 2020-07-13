@@ -1771,14 +1771,16 @@ class ApiParent(ParentAction):
                 utils_giswater.setChecked(dialog, checkbox, False)
                 checkbox.blockSignals(False)
 
-                    
-    def set_selector(self, widget):
+
+    def set_selector(self, dialog, widget, is_alone):
         """  Send values to DB and reload selectors
         :param dialog: QDialog
         :param widget: QCheckBox that contains the information to generate the json (QCheckBox)
         :param is_alone: Defines if the selector is unique (True) or multiple (False) (Boolean)
         """
-
+        # Get current tab name
+        index = dialog.main_tab.currentIndex()
+        tab_name = dialog.main_tab.widget(index).objectName()
         qgis_project_add_schema = self.controller.plugin_settings_value('gwAddSchema')
         extras = (f'"selectorType":"{widget.property("selector_type")}", "tabName":"{tab_name}", '
                   f'"id":"{widget.objectName()}", "isAlone":"{is_alone}", "value":"{widget.isChecked()}", '
@@ -1795,7 +1797,7 @@ class ApiParent(ParentAction):
                 self.iface.zoomToActiveLayer()
             self.set_style_mapzones()
 
-        #refresh canvas
+        # Refresh canvas
         layer = self.controller.get_layer_by_tablename('v_edit_arc')
         if layer:
             layer.dataProvider().forceReload()
