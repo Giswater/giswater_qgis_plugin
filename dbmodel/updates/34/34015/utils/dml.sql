@@ -110,7 +110,7 @@ UPDATE config_fprocess SET fid2 = 239 WHERE fid2 = 12;
 INSERT INTO sys_param_user
 VALUES ('qgis_layers_set_propierties','config','If true, qgis starts setting all layers with appropiate settigs from config_form_fields', 'role_basic', NULL, 
 'QGIS set layer properties', NULL, NULL, true, 8, 'utils', false, NULL, NULL, NULL, 
-false, 'boolean', 'check', true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL)
+false, 'boolean', 'check', true, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL)
 ON conflict (id) DO NOTHING;
 
 
