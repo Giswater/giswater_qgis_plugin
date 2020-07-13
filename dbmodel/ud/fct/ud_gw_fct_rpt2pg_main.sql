@@ -23,6 +23,7 @@ rec_table record;
 v_result text;
 v_val integer;
 v_file json;
+v_import json;
   
 BEGIN
 
@@ -38,21 +39,21 @@ BEGIN
 	DELETE FROM temp_csv WHERE fid = 140 AND cur_user = current_user;
 
 	-- inserting file into temp table
-	INSERT INTO temp_csv (fid, cur_user, source, csv1, csv2, csv3, csv4, csv5, csv6, csv7, csv8, csv9, csv10, csv11, csv12, csv13, csv14, csv15, csv16, csv17, csv18, csv19, csv20)
-	SELECT 140 , current_user, replace(a::json->>'target','''',''), a::json->>'col1', a::json->>'col2',a::json->>'col3',a::json->>'col4',a::json->>'col5',a::json->>'col6',a::json->>'col7',a::json->>'col8',
-	a::json->>'col9',a::json->>'col10',	a::json->>'col11',a::json->>'col12',a::json->>'col13',a::json->>'col14',a::json->>'col15',a::json->>'col16',a::json->>'col17',a::json->>'col18'
-	,a::json->>'col19',a::json->>'col20'
+	INSERT INTO temp_csv (fid, cur_user, source, csv1, csv2, csv3, csv4, csv5, csv6, csv7, csv8, csv9, csv10, csv11, csv12, csv13, csv14, csv15, csv16, csv17, csv18, csv19, csv20, csv40)
+	SELECT 140 , current_user, replace(a::json->>'target','''',''), a::json->>'col1', a::json->>'col2',a::json->>'col3',a::json->>'col4',a::json->>'col5',a::json->>'col6',a::json->>'col7',
+	a::json->>'col8', a::json->>'col9',a::json->>'col10', a::json->>'col11',a::json->>'col12',a::json->>'col13',a::json->>'col14',a::json->>'col15',a::json->>'col16',
+	a::json->>'col17',a::json->>'col18',a::json->>'col19',a::json->>'col20', replace(a::json->>'col40','''', '')
 	FROM json_array_elements(v_file) AS a;
 
 	-- call import epa function
-	PERFORM gw_fct_rpt2pg_import_rpt(p_data);
+	SELECT gw_fct_rpt2pg_import_rpt(p_data) INTO v_import;
 	
 	-- set result on result selector: In spite of there are two selectors tables () only it's setted one
 	DELETE FROM selector_rpt_main WHERE cur_user=current_user;
 	INSERT INTO selector_rpt_main (result_id, cur_user) VALUES (v_result, current_user);
 
 	-- create log
-	RETURN gw_fct_rpt2pg_log (v_result);
+	RETURN gw_fct_rpt2pg_log(v_result, v_import);
 	
 END;
 $BODY$

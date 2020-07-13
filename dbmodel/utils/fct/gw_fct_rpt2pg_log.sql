@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE:2782
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_rpt2pg_log(text);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_rpt2pg_log(p_result text)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_rpt2pg_log(p_result text, p_return json)
   RETURNS json AS
 $BODY$
 
@@ -32,6 +32,7 @@ v_project_type text;
 v_version text;
 v_stats json;
 v_error_context text;
+v_status text;
 
 BEGIN
 
@@ -53,6 +54,7 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 4, concat('Imported by: ', current_user, ', on ', to_char(now(),'YYYY-MM-DD HH:MM:SS')));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 4, '');
 
+	v_status  = p_return ->>'status';
 
 	IF v_project_type = 'WS' THEN
 
@@ -60,17 +62,19 @@ BEGIN
 
 			-- errors
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 3, 'CRITICAL ERRORS');
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 3, '------------------');
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			SELECT 114, p_result, 3, concat(csv1, ' ', csv2,' ', csv3, ' ',csv4, ' ',csv5, ' ',csv6, ' ',csv7, ' ',csv8, ' ',csv9, ' ',csv10, ' ',csv11, ' ',csv12, ' ',csv13, ' ',
-			csv14, ' ',csv15, ' ',csv16, ' ',csv17, ' ',csv18, ' ',csv19, ' ',csv20)
-			FROM temp_csv WHERE fid=140 and csv1 !='*';
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 3, '----------------------');
+			IF v_status = 'Failed' THEN
+				INSERT INTO audit_check_data (fid, result_id, criticity, error_message) 
+				VALUES (114, p_result, 3, 'The import function have been failed. This is because some data of rpt file has not values according standard format. PLEASE REVIEW your rpt file and your options data!!!');
+			ELSE 
+			
+				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+				SELECT 114, p_result, 3, concat(csv1, ' ', csv2,' ', csv3, ' ',csv4, ' ',csv5, ' ',csv6, ' ',csv7, ' ',csv8, ' ',csv9, ' ',csv10, ' ',csv11, ' ',csv12, ' ',csv13, ' ',
+				csv14, ' ',csv15, ' ',csv16, ' ',csv17, ' ',csv18, ' ',csv19, ' ',csv20)
+				FROM temp_csv WHERE fid=140 and csv1 !='*';
+			END IF;
 
-		ELSE
-			-- rpt file info
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 3, 'RPT FILE INFO');
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 3, '------------------');
-		
+		ELSE		
 			-- basic statistics
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 1, 'BASIC STATISTICS');
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 1, '-----------------------');
@@ -90,9 +94,10 @@ BEGIN
 			-- warnings
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 2, '');
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 2, 'WARNINGS');
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 2, '-----------------------');
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 2, '---------------');
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			SELECT 114, p_result, 2, concat (time, ' ', text) FROM rpt_hydraulic_status WHERE result_id = p_result AND time = 'WARNING:';
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 2, '');
 		END IF;
 
 	ELSIF v_project_type = 'UD' THEN
@@ -101,7 +106,7 @@ BEGIN
 		
 			-- errors
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 3, 'CRITICAL ERRORS');
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 3, '------------------');
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 3, '----------------------');
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			SELECT 114, p_result, 3, concat(csv1, ' ', csv2,' ', csv3, ' ',csv4, ' ',csv5, ' ',csv6, ' ',csv7, ' ',csv8, ' ',csv9, ' ',csv10, ' ',csv11, ' ',csv12, ' ',csv13, ' ',
 			csv14, ' ',csv15, ' ',csv16, ' ',csv17, ' ',csv18, ' ',csv19, ' ',csv20)
@@ -134,15 +139,16 @@ BEGIN
 			FROM rpt_nodeflooding_sum WHERE result_id = p_result;
 
 			-- warnings
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 1, '');
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 1, 'WARNINGS');
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 1, '-----------------------');
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 2, '');
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 2, 'WARNINGS');
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 2, '-----------------------');
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			SELECT 114, p_result, 1, concat(csv1,' ',csv2, ' ',csv3, ' ',csv4, ' ',csv5, ' ',csv6, ' ',csv7, ' ',csv8, ' ',csv9, ' ',csv10, ' ',csv11, ' ',csv12) from temp_csv
 			where fid = 11 and source='rpt_warning_summary' and cur_user=current_user;
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			SELECT 114, p_result, 1, concat(csv1,' ',csv2, ' ',csv3, ' ',csv4, ' ',csv5, ' ',csv6, ' ',csv7, ' ',csv8, ' ',csv9, ' ',csv10, ' ',csv11, ' ',csv12) from temp_csv
 			where fid = 11 and source='rpt_warning_summary' and cur_user=current_user;
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 2, '');
 		END IF;
 	END IF;
 

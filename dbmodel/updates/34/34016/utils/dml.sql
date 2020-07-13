@@ -38,3 +38,5 @@ VALUES (2972, 'gw_trg_ui_plan_psector','utils', 'trigger function', 'role_master
 ON CONFLICT (id) DO NOTHING;
 
 DELETE FROM config_form_fields where formname = 'v_ui_hydrometer';
+
+UPDATE sys_param_user SET layoutname = 'lyt_reports_2' WHERE  layoutname = 'grl_reports_18';
