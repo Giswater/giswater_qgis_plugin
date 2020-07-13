@@ -70,7 +70,7 @@ BEGIN
 	-- reset graf & audit tables
 	DELETE FROM anl_arc where cur_user=current_user AND fid=v_fid;
 	DELETE FROM audit_check_data WHERE fid=v_fid AND cur_user=current_user;
-	DELETE FROM temp_anlgraf;	
+	TRUNCATE temp_anlgraf;	
 
 	-- reset exploitation
 	IF v_expl IS NOT NULL THEN
@@ -97,7 +97,7 @@ BEGIN
 	-- set boundary conditions of graf table ONLY FOR WS (flag=1 it means water is disabled to flow)
 	IF v_projectype = 'WS' THEN
 	
-		v_text = 'SELECT (json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'' as node_id from '||quote_ident(v_table)||' WHERE grafconfig IS NOT NULL';
+		v_text = 'SELECT (json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'' as node_id from sector WHERE grafconfig IS NOT NULL';
 
 		-- close boundary conditions setting flag=1 for all nodes that fits on graf delimiters and closed valves
 		v_querytext  = 'UPDATE temp_anlgraf SET flag=1 WHERE 

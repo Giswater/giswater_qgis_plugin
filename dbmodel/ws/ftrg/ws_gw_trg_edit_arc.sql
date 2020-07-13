@@ -261,20 +261,30 @@ BEGIN
 		
 		
 		-- State
-        IF (NEW.state IS NULL) THEN
-            NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_state_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-        END IF;
+		IF (NEW.state IS NULL) THEN
+		    NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_state_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
 
 		-- State_type
-		IF (NEW.state_type IS NULL) THEN
-			NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='statetype_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-        END IF;
+		IF (NEW.state=0) THEN
+			IF (NEW.state_type IS NULL) THEN
+				NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_statetype_0_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			END IF;
+		ELSIF (NEW.state=1) THEN
+			IF (NEW.state_type IS NULL) THEN
+				NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_statetype_1_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			END IF;
+		ELSIF (NEW.state=2) THEN
+			IF (NEW.state_type IS NULL) THEN
+				NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_statetype_2_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			END IF;
+		END IF;
 
-		--check relation state - state_type
-        IF NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
-        	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3036", "function":"1318","debug_msg":"'||NEW.state::text||'"}}$$);';
-       	END IF;
+			--check relation state - state_type
+		IF NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"3036", "function":"1318","debug_msg":"'||NEW.state::text||'"}}$$);';
+		END IF;
 
 		--Inventory	
 		NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
@@ -297,14 +307,14 @@ BEGIN
 		END IF;
 		
 		-- Ownercat_id
-        IF (NEW.ownercat_id IS NULL) THEN
-            NEW.ownercat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_ownercat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-        END IF;
+		IF (NEW.ownercat_id IS NULL) THEN
+		    NEW.ownercat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_ownercat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
 		
 		-- Soilcat_id
-        IF (NEW.soilcat_id IS NULL) THEN
-            NEW.soilcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_soilcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-        END IF;
+		IF (NEW.soilcat_id IS NULL) THEN
+			NEW.soilcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_soilcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
 
 		-- Builtdate
 		IF (NEW.builtdate IS NULL) THEN
@@ -312,14 +322,14 @@ BEGIN
 		END IF;
 		
 		-- Verified
-        IF (NEW.verified IS NULL) THEN
-            NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-        END IF;
+		IF (NEW.verified IS NULL) THEN
+			NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
 	
 		-- LINK
-	    IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_usefid_on_linkid')::boolean=TRUE THEN
-	       NEW.link=NEW.arc_id;
-	    END IF;
+		IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_usefid_on_linkid')::boolean=TRUE THEN
+			NEW.link=NEW.arc_id;
+		END IF;
 		
 		v_featurecat = (SELECT arctype_id FROM cat_arc WHERE id = NEW.arccat_id);
 
@@ -359,14 +369,16 @@ BEGIN
 			NEW.function_type = (SELECT value FROM config_param_user WHERE parameter = 'edit_arc_function_vdefault' AND cur_user = current_user);
 		END IF;
 
-        -- FEATURE INSERT
+		-- FEATURE INSERT
 		INSERT INTO arc (arc_id, code, node_1,node_2, arccat_id, epa_type, sector_id, "state", state_type, annotation, observ,"comment",custom_length,dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type, location_type,
 					workcat_id, workcat_id_end, buildercat_id, builtdate,enddate, ownercat_id, muni_id, postcode, district_id, streetaxis_id, postnumber, postcomplement,
-					streetaxis2_id,postnumber2, postcomplement2,descript,link,verified,the_geom,undelete,label_x,label_y,label_rotation,  publish, inventory, expl_id,num_value)
+					streetaxis2_id,postnumber2, postcomplement2,descript,link,verified,the_geom,undelete,label_x,label_y,label_rotation,  publish, inventory, expl_id, num_value, 
+					depth, adate, adescript)
 					VALUES (NEW.arc_id, NEW.code, NEW.node_1, NEW.node_2, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW."state", NEW.state_type, NEW.annotation, NEW.observ, NEW.comment, NEW.custom_length,NEW.dma_id,NEW. presszone_id,
 					NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate,NEW.enddate, NEW.ownercat_id,
 					NEW.muni_id, NEW.postcode, NEW.district_id,v_streetaxis,NEW.postnumber, NEW.postcomplement, v_streetaxis2, NEW.postnumber2, NEW.postcomplement2, NEW.descript,NEW.link, NEW.verified, 
-                    NEW.the_geom,NEW.undelete,NEW.label_x,NEW.label_y,NEW.label_rotation, NEW.publish, NEW.inventory, NEW.expl_id, NEW.num_value);
+					NEW.the_geom,NEW.undelete,NEW.label_x,NEW.label_y,NEW.label_rotation, NEW.publish, NEW.inventory, NEW.expl_id, NEW.num_value,
+					NEW.depth, NEW.adate, NEW.adescript);
 
 		-- this overwrites triger topocontrol arc values (triggered before insertion) just in that moment: In order to make more profilactic this issue only will be overwrited in case of NEW.node_* not nulls
 		IF v_edit_enable_arc_nodes_update IS TRUE THEN
@@ -394,7 +406,7 @@ BEGIN
       		END IF;		
 		END IF;
 
-	-- man addfields insert
+		-- man addfields insert
 		IF v_customfeature IS NOT NULL THEN
 			FOR v_addfields IN SELECT * FROM sys_addfields
 			WHERE (cat_feature_id = v_customfeature OR cat_feature_id is null) AND active IS TRUE AND iseditable IS TRUE
@@ -466,10 +478,10 @@ BEGIN
 		END IF;
 
 		--check relation state - state_type
-	    IF (NEW.state_type != OLD.state_type) AND NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
-        	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+		IF (NEW.state_type != OLD.state_type) AND NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"3036", "function":"1318","debug_msg":"'||NEW.state::text||'"}}$$);';
-       	END IF;	
+		END IF;	
        			
 		-- The geom
 		IF st_orderingequals(NEW.the_geom, OLD.the_geom) IS FALSE  THEN
@@ -484,7 +496,7 @@ BEGIN
 		END IF;
 
 		 -- Arc type for parent view
-    	IF v_man_table='parent' THEN
+		IF v_man_table='parent' THEN
 	    	IF (NEW.arccat_id != OLD.arccat_id) THEN
 				v_new_arc_type= (SELECT system_id FROM cat_feature JOIN cat_arc ON cat_feature.id=arctype_id where cat_arc.id=NEW.arccat_id);
 				v_old_arc_type= (SELECT system_id FROM cat_feature JOIN cat_arc ON cat_feature.id=arctype_id where cat_arc.id=OLD.arccat_id);
@@ -497,7 +509,6 @@ BEGIN
 			END IF;
 		END IF;
 
-
 		UPDATE arc
 		SET code=NEW.code, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id,  state_type=NEW.state_type, annotation= NEW.annotation, "observ"=NEW.observ, 
 				"comment"=NEW.comment, custom_length=NEW.custom_length, dma_id=NEW.dma_id, presszone_id=NEW.presszone_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type,
@@ -506,15 +517,16 @@ BEGIN
 				streetaxis2_id=v_streetaxis2,postcode=NEW.postcode, district_id = NEW.district_id, postnumber=NEW.postnumber, postnumber2=NEW.postnumber2,descript=NEW.descript, verified=NEW.verified, 
 				undelete=NEW.undelete, label_x=NEW.label_x,
 				postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2,label_y=NEW.label_y,label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, 
-				expl_id=NEW.expl_id,num_value=NEW.num_value, link=NEW.link, lastupdate=now(), lastupdate_user=current_user
-			WHERE arc_id=OLD.arc_id;
+				expl_id=NEW.expl_id,num_value=NEW.num_value, link=NEW.link, lastupdate=now(), lastupdate_user=current_user,
+				depth=NEW.depth, adate=NEW.adate, adescript=NEW.adescript
+				WHERE arc_id=OLD.arc_id;
 
 
--- man addfields update
-	IF v_customfeature IS NOT NULL THEN
-		FOR v_addfields IN SELECT * FROM sys_addfields
-		WHERE (cat_feature_id = v_customfeature OR cat_feature_id is null) AND active IS TRUE AND iseditable IS TRUE
-		LOOP
+		-- man addfields update
+		IF v_customfeature IS NOT NULL THEN
+			FOR v_addfields IN SELECT * FROM sys_addfields
+			WHERE (cat_feature_id = v_customfeature OR cat_feature_id is null) AND active IS TRUE AND iseditable IS TRUE
+			LOOP
 
 			EXECUTE 'SELECT $1."' || v_addfields.param_name||'"'
 				USING NEW

@@ -24,7 +24,7 @@ BEGIN
         RETURN NEW;
 
     ELSIF TG_OP = 'DELETE' THEN
-        v_sql:= 'DELETE FROM anl_mincut_result_cat WHERE id = '||quote_literal(OLD.id);
+        v_sql:= 'DELETE FROM om_mincut WHERE id = '||quote_literal(OLD.id);
         EXECUTE v_sql;
         RETURN NULL;
     

@@ -18,12 +18,12 @@ INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('plan_psector
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('plan_psector_vdefault', '1', current_user);
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('plan_arc_vdivision_dsbl', 'FALSE', current_user);
 
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_arccat_vdefault', 'FC110-PN10', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_arccat_vdefault', 'CC040', current_user);
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_state_vdefault', '1', current_user);
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_workcat_vdefault', 'work1', current_user);
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_verified_vdefault', 'VERIFIED', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_connecat_vdefault', 'PVC25-PN16-DOM', current_user);
-INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_nodecat_vdefault', 'AIR VALVE DN50', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_connecat_vdefault', 'CC020_D', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_nodecat_vdefault', 'NETINIT-01', current_user);
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_pavementcat_vdefault', 'Asphalt', current_user);
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_elementcat_vdefault', 'COVER', current_user);
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_soilcat_vdefault', 'soil1', current_user);
@@ -79,9 +79,9 @@ INSERT INTO sector VALUES (2, 'sector_02', 2, 'sector_project_ud', NULL, '010600
 
 
 INSERT INTO plan_psector (psector_id, name, psector_type, descript, expl_id, priority, text1, text2, observ, rotation, scale, sector_id, atlas_id, gexpenses, vat, other, active, the_geom, status)
-VALUES (2, 'ACT_02_F1', 1, 'Expanding the capacity of the conduits located on Francesc Layret street and General Prim avenue.', 1, 'NORMAL_PRIORITY', NULL, NULL, 'Action caused by the hydraulic insufficiency of the conduit.', 90.0000, 1000.00, 1, '02', 19.00, 21.00, 4.50, true, NULL, 2);
+VALUES (2, 'ACT_02_F1', 1, 'Expanding the capacity of the conduits located on Francesc Layret street and General Prim avenue.', 1, '2', NULL, NULL, 'Action caused by the hydraulic insufficiency of the conduit.', 90.0000, 1000.00, 1, '02', 19.00, 21.00, 4.50, true, NULL, 2);
 INSERT INTO plan_psector (psector_id, name, psector_type, descript, expl_id, priority, text1, text2, observ, rotation, scale, sector_id, atlas_id, gexpenses, vat, other, active, the_geom, status) 
-VALUES (1, 'ACT_01_F0', 1, 'Expanding the capacity of the conduits located on Aragó avenue and Torre de la Vila avenue.', 1, 'HIGH_PRIORITY', NULL, NULL, 'Action caused by the hydraulic insufficiency of the conduit and serious structural problems.', 0.0000, 1500.00, 1, '01', 19.00, 21.00, 4.50, true, '0106000020E764000001000000010300000001000000050000001904560EAF96194114AE47F1117551411904560EAF96194120FEC358F97451412FDD24861694194120FEC358F97451412FDD24861694194114AE47F1117551411904560EAF96194114AE47F111755141', 2);
+VALUES (1, 'ACT_01_F0', 1, 'Expanding the capacity of the conduits located on Aragó avenue and Torre de la Vila avenue.', 1, '1', NULL, NULL, 'Action caused by the hydraulic insufficiency of the conduit and serious structural problems.', 0.0000, 1500.00, 1, '01', 19.00, 21.00, 4.50, true, '0106000020E764000001000000010300000001000000050000001904560EAF96194114AE47F1117551411904560EAF96194120FEC358F97451412FDD24861694194120FEC358F97451412FDD24861694194114AE47F1117551411904560EAF96194114AE47F111755141', 2);
 
 
 

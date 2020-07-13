@@ -67,14 +67,14 @@ BEGIN
 
 	-- built partial query
 	IF v_projectype = 'WS' THEN
-		v_partialquery = 'JOIN cat_node nc ON nodecat_id=id JOIN node_type nt ON nt.id=nc.nodetype_id';
+		v_partialquery = 'JOIN cat_node nc ON nodecat_id=id JOIN cat_feature_node nt ON nt.id=nc.nodetype_id';
 	ELSIF v_projectype = 'UD' THEN
-		v_partialquery = 'JOIN node_type ON id = a.node_type';
+		v_partialquery = 'JOIN cat_feature_node ON id = a.node_type';
 	END IF;
 
 	-- Computing process
 	IF v_array != '()' THEN
-		FOR rec_node IN EXECUTE 'SELECT DISTINCT * FROM '||v_worklayer||' a '||v_partialquery||'  WHERE a.state>0 AND node_id IN '||v_array||' 
+		FOR rec_node IN EXECUTE 'SELECT  * FROM '||v_worklayer||' a '||v_partialquery||'  WHERE a.state>0 AND node_id IN '||v_array||' 
 		AND isarcdivide= '||v_isarcdivide||' AND 
 		(SELECT COUNT(*) FROM arc WHERE node_1 = a.node_id OR node_2 = a.node_id and arc.state>0) = 0' 
 		LOOP
@@ -86,7 +86,7 @@ BEGIN
 			VALUES (rec_node.node_id, rec_node.state, rec_node.expl_id, 107, rec_node.the_geom, rec_node.nodecat_id,v_closest_arc_id,v_closest_arc_distance);
 		END LOOP;
 	ELSE
-		FOR rec_node IN EXECUTE 'SELECT DISTINCT * FROM '||v_worklayer||' a '||v_partialquery||'  WHERE a.state>0 AND isarcdivide='||v_isarcdivide||' AND 
+		FOR rec_node IN EXECUTE 'SELECT  * FROM '||v_worklayer||' a '||v_partialquery||'  WHERE a.state>0 AND isarcdivide='||v_isarcdivide||' AND 
 		(SELECT COUNT(*) FROM arc WHERE node_1 = a.node_id OR node_2 = a.node_id and arc.state>0) = 0' 
 		LOOP
 			--find the closest arc and the distance between arc and node

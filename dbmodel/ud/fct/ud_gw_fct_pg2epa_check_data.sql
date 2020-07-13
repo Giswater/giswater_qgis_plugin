@@ -17,7 +17,10 @@ $BODY$
 SELECT gw_fct_pg2epa_check_data($${"data":{"parameters":{"fid":127}}}$$)-- when is called from go2epa_main
 SELECT gw_fct_pg2epa_check_data($${"parameters":{}}$$)-- when is called from toolbox or from checkproject
 
--- fid: 225,188,107,111,113,187
+-- fid: main: 225,
+	other: 188,107,111,113,187
+
+SELECT * FROM audit_check_data WHERE fid = 225
 
 */
 
@@ -67,8 +70,6 @@ BEGIN
 	DELETE FROM audit_check_data WHERE fid=225 AND cur_user=current_user;
 	DELETE FROM anl_arc WHERE fid IN (188) AND cur_user=current_user;
 	DELETE FROM anl_node WHERE fid IN (107,111,113,187) AND cur_user=current_user;
-
-	raise notice 'v_fid %',v_fid;
 
 	-- Header
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 4, concat('DATA QUALITY ANALYSIS ACORDING EPA RULES'));
@@ -216,8 +217,9 @@ BEGIN
 	RAISE NOTICE '107- Node exit upper intro';
 	INSERT INTO anl_node (fid, node_id, nodecat_id, sector_id, the_geom, descript)
 	SELECT 111, node_id, nodecat_id, sector_id, a.the_geom, concat('Node exit upper intro with: Max. entry: ', max_entry , ', Max. exit:',max_exit) 
-	FROM ( SELECT node_id, max(sys_elev1) AS max_exit, nodecat_id, node.sector_id, node.the_geom FROM v_edit_arc JOIN node ON node_1 = node_id JOIN node_type ON node_type = id WHERE isexitupperintro = 0 GROUP BY node_id, node.sector_id )a
-	JOIN ( SELECT node_id, max(sys_elev2) AS max_entry FROM v_edit_arc JOIN node ON node_2 = node_id JOIN node_type ON node_type = id WHERE isexitupperintro = 0 GROUP BY node_id )b USING (node_id)
+	FROM ( SELECT node_id, max(sys_elev1) AS max_exit, nodecat_id, node.sector_id, node.the_geom FROM v_edit_arc JOIN node ON node_1 = node_id JOIN cat_feature_node ON node_type = id
+	WHERE isexitupperintro = 0 GROUP BY node_id, node.sector_id )a
+	JOIN ( SELECT node_id, max(sys_elev2) AS max_entry FROM v_edit_arc JOIN node ON node_2 = node_id JOIN cat_feature_node ON node_type = id WHERE isexitupperintro = 0 GROUP BY node_id )b USING (node_id)
 	JOIN selector_sector USING (sector_id) 
 	WHERE max_entry < max_exit AND cur_user = current_user;
 
@@ -239,7 +241,7 @@ BEGIN
 	
 	IF v_count > 0 THEN
 		INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom)
-		SELECT 64, node_id, nodecat_id, the_geom FROM v_edit_node WHERE result_id=v_result_id AND elevation IS NULL;
+		SELECT 64, node_id, nodecat_id, the_geom FROM v_edit_node WHERE top_elev IS NULL;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ',v_count,' node(s) without elevation. Take a look on temporal table for details.'));
 	ELSE

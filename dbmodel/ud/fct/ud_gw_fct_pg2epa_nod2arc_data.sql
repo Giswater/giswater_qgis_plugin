@@ -17,7 +17,7 @@ arc_rec record;
 pump_rec record;
 node_id_aux text;
 rec record;
-record_new_arc "SCHEMA_NAME".rpt_inp_arc%ROWTYPE;
+record_new_arc record;
 n1_geom public.geometry;
 n2_geom public.geometry;
 p1_geom public.geometry;
@@ -46,6 +46,9 @@ BEGIN
     RAISE NOTICE 'Starting flowregulators process.';
 
     SELECT * INTO rec FROM sys_version LIMIT 1;
+	
+	-- setting record_new_arc
+	SELECT * INTO record_new_arc FROM v_edit_arc LIMIT 1;
     
     FOR rec_flowreg IN
 	SELECT rpt_inp_node.node_id, flwreg_id, to_arc, flwreg_length, 'ori'::text as flw_type FROM inp_flwreg_orifice JOIN rpt_inp_node ON rpt_inp_node.node_id=inp_flwreg_orifice.node_id  

@@ -119,7 +119,7 @@ CREATE OR REPLACE VIEW v_edit_samplepoint AS
     samplepoint.featurecat_id,
     samplepoint.dma_id,
     dma.macrodma_id,
-    samplepoint.presszonecat_id,
+    samplepoint.presszone_id,
     samplepoint.state,
     samplepoint.builtdate,
     samplepoint.enddate,

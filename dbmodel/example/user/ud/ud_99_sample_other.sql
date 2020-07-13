@@ -118,12 +118,12 @@ update gully set link='https://www.giswater.org';
 UPDATE config_form_fields set layoutorder = layoutorder+1 WHERE formname in ('ve_arc', 've_node', 've_connec','ve_gully')
 AND columnname in ('streetname','streetname2', 'postnumber','postnumber2','postcomplement','postcomplement2');
 
-UPDATE config_form_fields set hidden = false  WHERE formname in ('ve_arc', 've_node', 've_connec')
+UPDATE config_form_fields set hidden = false  WHERE formname in ('ve_arc', 've_node', 've_connec','ve_gully')
 AND columnname = 'district_id';
 
-UPDATE config_form_fields set layoutorder = 2 WHERE formname in ('ve_arc', 've_node') AND columnname = 'district_id';
+UPDATE config_form_fields set layoutorder = 2 WHERE formname in ('ve_arc', 've_node','ve_gully') AND columnname = 'district_id';
 
-UPDATE config_form_fields set layoutorder = 3 WHERE formname in ('ve_connec', 've_gully') AND columnname = 'district_id';
+UPDATE config_form_fields set layoutorder = 3 WHERE formname in ('ve_connec') AND columnname = 'district_id';
 
 
 SELECT gw_fct_audit_check_project($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "version":"0", "fid":1}}$$)::text;
@@ -544,3 +544,5 @@ UPDATE config_form_fields SET layoutname = 'lyt_top_1', layoutorder = 9 where co
 UPDATE config_form_fields SET layoutname = 'lyt_top_1', layoutorder = 9 where columnname = 'arc_id' and formname like '%v_edit_gully%';
 update config_form_fields SET layoutorder = 1 where columnname = 'soilcat_id' and formname like '%ve_gully_%';
 update config_form_fields SET layoutorder = 1 where columnname = 'soilcat_id' and formname like '%ve_gully_%';
+
+UPDATE cat_feature_node SET isexitupperintro = 1 WHERE id = 'CIRC_MANHOLE';

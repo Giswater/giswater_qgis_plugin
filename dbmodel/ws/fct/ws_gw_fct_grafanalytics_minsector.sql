@@ -112,7 +112,7 @@ BEGIN
 	END IF;
  
 	-- reset graf & audit_log tables
-	DELETE FROM temp_anlgraf;
+	TRUNCATE temp_anlgraf;
 	DELETE FROM audit_log_data WHERE fid=v_fid AND cur_user=current_user;
 	DELETE FROM anl_node WHERE fid=134 AND cur_user=current_user;
 	DELETE FROM anl_arc WHERE fid=134 AND cur_user=current_user;
@@ -155,7 +155,7 @@ BEGIN
 	WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE;
 	
 	-- set boundary conditions of graf table	
-	UPDATE temp_anlgraf SET flag=2 FROM node_type a JOIN cat_node b ON a.id=nodetype_id JOIN node c ON nodecat_id=b.id 
+	UPDATE temp_anlgraf SET flag=2 FROM cat_feature_node a JOIN cat_node b ON a.id=nodetype_id JOIN node c ON nodecat_id=b.id 
 	WHERE c.node_id=temp_anlgraf.node_1 AND graf_delimiter !='NONE' ;
 			
 	-- starting process
@@ -222,7 +222,7 @@ BEGIN
 		UPDATE node SET minsector_id = a.descript::integer FROM anl_node a WHERE fid=134 AND a.node_id=node.node_id AND a.descript::integer >0 AND cur_user=current_user;
 	
 		-- update graf nodes on the border of minsectors
-		UPDATE node SET minsector_id = 0 FROM anl_node a JOIN v_edit_node USING (node_id) JOIN node_type c ON c.id=node_type 
+		UPDATE node SET minsector_id = 0 FROM anl_node a JOIN v_edit_node USING (node_id) JOIN cat_feature_node c ON c.id=cat_feature_node 
 		WHERE fid=134 AND a.node_id=node.node_id AND a.descript::integer =0 AND graf_delimiter!='NONE' AND cur_user=current_user;
 			
 		-- update non graf nodes (not connected) using arc_id parent on v_edit_node (not used node table because the exploitation filter).
@@ -250,14 +250,14 @@ BEGIN
 		-- message
 		INSERT INTO audit_check_data (fid, error_message)
 		VALUES (v_fid, concat('INFO: Minsector attribute (minsector_id) on arc/node/connec features keeps same value previous function. Nothing have been updated by this process'));
-		VALUES (v_fid, concat('INFO: To take a look on results you can do querys like this:'));
-		VALUES (v_fid, concat('SELECT * FROM anl_arc WHERE fid = 134  AND cur_user=current_user;'));
-		VALUES (v_fid, concat('SELECT * FROM anl_node WHERE fid = 134  AND cur_user=current_user;'));
+		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('INFO: To take a look on results you can do querys like this:'));
+		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('SELECT * FROM anl_arc WHERE fid = 134  AND cur_user=current_user;'));
+		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('SELECT * FROM anl_node WHERE fid = 134  AND cur_user=current_user;'));
 	
 	END IF;
 
 	-- update geometry of mapzones
-	IF v_updatemapzgeom = 0 THEN
+	IF v_updatemapzgeom = 0 OR v_updatemapzgeom IS NULL THEN
 		-- do nothing
 	ELSIF  v_updatemapzgeom = 1 THEN
 		

@@ -14,6 +14,12 @@ INSERT INTO om_typevalue SELECT 'mincut_cause', row_number() over (order by id),
 INSERT INTO om_typevalue SELECT 'mincut_class', id, name FROM _anl_mincut_cat_class_;
 INSERT INTO om_typevalue SELECT 'mincut_state', id, name FROM _anl_mincut_cat_state_;
 
+
 INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field) VALUES ('om_typevalue','mincut_cause','om_mincut','anl_cause');
 INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field) VALUES ('om_typevalue','mincut_class','om_mincut','mincut_class');
 INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field) VALUES ('om_typevalue','mincut_state','om_mincut','mincut_state');
+
+
+ALTER TABLE om_mincut DROP CONSTRAINT anl_mincut_result_cat_mincut_state_fkey;
+ALTER TABLE om_mincut DROP CONSTRAINT anl_mincut_result_cat_mincut_class_fkey;
+ALTER TABLE om_mincut DROP CONSTRAINT anl_mincut_result_cat_cause_anl_cause_fkey;

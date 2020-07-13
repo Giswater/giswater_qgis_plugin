@@ -76,11 +76,11 @@ BEGIN
 	
 		-- control of price units (csv2)
 		SELECT csv2 INTO v_units FROM temp_csv WHERE cur_user=current_user AND fid = 234
-		AND csv2 IS NOT NULL AND csv2 NOT IN (SELECT id FROM price_value_unit);
+		AND csv2 IS NOT NULL AND csv2 NOT IN (SELECT id FROM plan_typevalue WHERE typevalue = 'price_units');
 
 		IF v_units IS NOT NULL THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"2088", "function":"2440","debug_msg":"'||v_units||'"}}$$);'INTO v_audit_result;
+			"data":{"message":"2088", "function":"2440","debug_msg":"'''||v_units||'''"}}$$);'INTO v_audit_result;
 		END IF;
 
 		-- control of price descript (csv3)
@@ -111,14 +111,14 @@ BEGIN
 		ON CONFLICT (id) DO NOTHING;
 	
 		-- update if price exists
-		UPDATE price_simple SET pricecat_id=v_label, price=csv5::numeric(12,4) FROM temp_csv WHERE cur_user=current_user AND fid = 234 AND price_simple.id=csv1;
+		UPDATE plan_price SET pricecat_id=v_label, price=csv5::numeric(12,4) FROM temp_csv WHERE cur_user=current_user AND fid = 234 AND plan_price.id=csv1;
 			
 		-- Delete values on temporal table
 		DELETE FROM temp_csv WHERE cur_user=current_user AND fid = 234;
 	
 		-- manage log (fid: 234)
 		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (234, v_result_id, concat('Reading values from temp_csv table -> Done'));
-		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (234, v_result_id, concat('Inserting values on price_simple table -> Done'));
+		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (234, v_result_id, concat('Inserting values on plan_price table -> Done'));
 		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (234, v_result_id, concat('Deleting values from temp_csv -> Done'));
 		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (234, v_result_id, concat('Process finished'));
 

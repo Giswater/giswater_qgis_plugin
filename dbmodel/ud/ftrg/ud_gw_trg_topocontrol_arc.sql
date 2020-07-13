@@ -10,57 +10,55 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_topocontrol_arc()  RETURNS trigger
 $BODY$
 
 DECLARE 
-    nodeRecord1 Record; 
-    nodeRecord2 Record;
-    optionsRecord Record;
-    sys_elev1_aux double precision;
-    sys_elev2_aux double precision;
-	custom_elev1_aux double precision;
-    custom_elev2_aux double precision;
-    y_aux double precision;
-    vnoderec Record;
-    newPoint public.geometry;    
-    connecPoint public.geometry;
-    value1 boolean;
-    value2 boolean;
-    featurecat_aux text;
-    v_sys_statetopocontrol boolean;
-    sys_y1_aux double precision;
-    sys_y2_aux double precision;
-	sys_length_aux double precision;
-	is_reversed boolean;
-	geom_slp_direction_bool boolean;
-	connec_id_aux varchar;
-    gully_id_aux varchar;
-    array_agg varchar [];
-	project_type_aux text;
-	v_dsbl_error boolean;
-	v_samenode_init_end_control boolean;
-	v_nodeinsert_arcendpoint boolean;
-	v_node_proximity_control boolean;
-	v_node_proximity double precision;
-	v_arc_searchnodes_control boolean;
-	v_arc_searchnodes double precision;
-	v_user_dis_statetopocontrol boolean;
+nodeRecord1 Record; 
+nodeRecord2 Record;
+optionsRecord Record;
+sys_elev1_aux double precision;
+sys_elev2_aux double precision;
+custom_elev1_aux double precision;
+custom_elev2_aux double precision;
+y_aux double precision;
+vnoderec Record;
+newPoint public.geometry;    
+connecPoint public.geometry;
+value1 boolean;
+value2 boolean;
+featurecat_aux text;
+v_sys_statetopocontrol boolean;
+sys_y1_aux double precision;
+sys_y2_aux double precision;
+sys_length_aux double precision;
+is_reversed boolean;
+geom_slp_direction_bool boolean;
+connec_id_aux varchar;
+gully_id_aux varchar;
+array_agg varchar [];
+v_projecttype text;
+v_dsbl_error boolean;
+v_samenode_init_end_control boolean;
+v_nodeinsert_arcendpoint boolean;
+v_node_proximity_control boolean;
+v_node_proximity double precision;
+v_arc_searchnodes_control boolean;
+v_arc_searchnodes double precision;
+v_user_dis_statetopocontrol boolean;
 
 BEGIN 
 
-    EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-
+	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
  
- -- Get data from config tables
-    --SELECT * INTO optionsRecord FROM inp_options LIMIT 1;  
-	SELECT project_type INTO project_type_aux FROM sys_version LIMIT 1;
+	-- Get data from config tables
+ 	SELECT project_type INTO v_projecttype FROM sys_version LIMIT 1;
 	SELECT value::boolean INTO v_sys_statetopocontrol FROM config_param_system WHERE parameter='edit_state_topocontrol' ;
 	SELECT value::boolean INTO geom_slp_direction_bool FROM config_param_system WHERE parameter='edit_slope_direction' ;
 	SELECT value::boolean INTO v_dsbl_error FROM config_param_system WHERE parameter='edit_topocontrol_disable_error' ;
    	SELECT value::boolean INTO v_samenode_init_end_control FROM config_param_system WHERE parameter='edit_arc_samenode_control' ;
 	SELECT value::boolean INTO v_nodeinsert_arcendpoint  FROM config_param_system WHERE parameter='edit_arc_insert_automatic_endpoint';
-    SELECT ((value::json)->>'activated') INTO v_arc_searchnodes_control FROM config_param_system WHERE parameter='edit_arc_searchnodes';
+	SELECT ((value::json)->>'activated') INTO v_arc_searchnodes_control FROM config_param_system WHERE parameter='edit_arc_searchnodes';
 	SELECT ((value::json)->>'value') INTO v_arc_searchnodes FROM config_param_system WHERE parameter='edit_arc_searchnodes';
 	SELECT value::boolean INTO v_user_dis_statetopocontrol FROM config_param_user WHERE parameter='edit_disable_statetopocontrol';
 	
-    IF v_sys_statetopocontrol IS NOT TRUE OR v_user_dis_statetopocontrol IS TRUE THEN
+	IF v_sys_statetopocontrol IS NOT TRUE OR v_user_dis_statetopocontrol IS TRUE THEN
 
 		SELECT * INTO nodeRecord1 FROM node WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes)
 		ORDER BY ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
@@ -68,7 +66,7 @@ BEGIN
 		SELECT * INTO nodeRecord2 FROM node WHERE ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes)
 		ORDER BY ST_Distance(node.the_geom, ST_endpoint(NEW.the_geom)) LIMIT 1;
        
-    ELSIF v_sys_statetopocontrol IS TRUE THEN
+	ELSIF v_sys_statetopocontrol IS TRUE THEN
 	
 		-- Looking for state control
 		PERFORM gw_fct_state_control('ARC', NEW.arc_id, NEW.state, TG_OP);
@@ -157,12 +155,12 @@ BEGIN
 					ORDER BY ST_Distance(node.the_geom, ST_endpoint(NEW.the_geom)) LIMIT 1;
 		END IF;
 	
-    END IF;
+	END IF;
     
     	--  Control of start/end node
 	IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN	
 
-        -- Control of same node initial and final
+		-- Control of same node initial and final
 		IF (nodeRecord1.node_id = nodeRecord2.node_id) AND (v_samenode_init_end_control IS TRUE) THEN
 			IF v_dsbl_error IS NOT TRUE THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
@@ -321,7 +319,7 @@ BEGIN
 	ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (v_arc_searchnodes_control IS TRUE) THEN
 		IF v_dsbl_error IS NOT TRUE THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"1042", "function":"1244","debug_msg":"'||NEW.arc_id||'"}}$$);';
+				"data":{"message":"1042", "function":"1244","debug_msg":""}}$$);';
 		ELSE
 			INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (4, NEW.arc_id, concat('Node_1 ', nodeRecord1.node_id, ' or Node_2 ', nodeRecord2.node_id, ' does not exists or does not has compatible state with arc'));
 		END IF;
@@ -333,7 +331,7 @@ BEGIN
 	ELSE
 		IF v_dsbl_error IS NOT TRUE THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"1042", "function":"1244","debug_msg":"'||NEW.arc_id||'"}}$$);';
+				"data":{"message":"1042", "function":"1244","debug_msg":""}}$$);';
 		ELSE
 			INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (4, NEW.arc_id, concat('Node_1 ', nodeRecord1.node_id, ' or Node_2 ', nodeRecord2.node_id, ' does not exists or does not has compatible state with arc'));
 		END IF;

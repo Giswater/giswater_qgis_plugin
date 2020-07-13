@@ -32,8 +32,8 @@ BEGIN
 	raise notice 'Delete previous values from same result';
 
 	-- Delete previous results on rpt_inp_node & arc tables
-	DELETE FROM temp_node;
-	DELETE FROM temp_arc;
+	TRUNCATE temp_node;
+	TRUNCATE temp_arc;
 
 	--Use state_type only is operative true or not
 	IF v_isoperative THEN

@@ -66,7 +66,7 @@ BEGIN
 
 	IF v_action ='CREATE' THEN
 
-		IF (SELECT count(*) FROM temp_table WHERE text_column::json->>'name' = v_backupname ) > 0 THEN
+		IF (SELECT count(*) FROM temp_table WHERE text_column::json->>'name' = v_backupname AND fid = 211) > 0 THEN
 			RAISE EXCEPTION 'The backup name exists. Try with other name or delete it before';
 		END IF;
 

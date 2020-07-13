@@ -10,11 +10,11 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2020/06/18
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role)
-VALUES (2970, 'gw_fct_grafanalytics_mapzones_config','ws', 'function','json', 'json', 'Function to automatically configure mapzones', 'role_master')
+VALUES (2970, 'gw_fct_grafanalytics_mapzones_config','ws', 'function','json', 'json', 'Function to automatically configure mapzones.', 'role_master')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO config_toolbox(id, alias, isparametric, functionparams, inputparams, observ, active)
-VALUES (2970, 'Config mapzones', true,'{"featureType":[]}', '[{"widgetname":"grafClass", "label":"Graf class:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layout_order":1,"comboIds":["DMA"],"comboNames":["District Metering Areas (DMA)"], "selectedId":"DMA"}, {"widgetname":"mapzoneAddfield", "label":"Mapzone field name:","widgettype":"text","datatype":"string","layoutname":"grl_option_parameters","layout_order":2, "value":"c_sector"}]',
+VALUES (2970, 'Config mapzones', true,'{"featureType":[]}', '[{"widgetname":"grafClass", "label":"Graf class:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,"comboIds":["DMA"],"comboNames":["District Metering Areas (DMA)"], "selectedId":"DMA"}, {"widgetname":"mapzoneAddfield", "label":"Mapzone field name:","widgettype":"text","datatype":"string","layoutname":"grl_option_parameters","layoutorder":2, "value":"c_sector"}]',
 null, true) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type)

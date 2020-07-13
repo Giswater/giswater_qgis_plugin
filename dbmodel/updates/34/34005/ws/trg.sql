@@ -39,6 +39,9 @@ ON v_edit_man_fountain FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_connec('man_fo
 CREATE TRIGGER gw_trg_edit_man_greentap INSTEAD OF INSERT OR UPDATE OR DELETE
 ON v_edit_man_greentap FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_connec('man_greentap');
 
+CREATE TRIGGER gw_trg_edit_man_wjoin INSTEAD OF INSERT OR UPDATE OR DELETE
+ON v_edit_man_wjoin FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_connec('man_wjoin');
+
 CREATE TRIGGER gw_trg_edit_man_hydrant INSTEAD OF INSERT OR UPDATE OR DELETE
 ON v_edit_man_hydrant FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_node('man_hydrant');
 

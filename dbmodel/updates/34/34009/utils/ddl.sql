@@ -155,7 +155,6 @@ ALTER TABLE selector_plan_psector DROP COLUMN id;
 
 
 ALTER TABLE config_api_form_actions RENAME TO config_form_actions;
-ALTER TABLE config_api_form_fields RENAME TO config_form_fields;
 ALTER TABLE config_api_form_groupbox RENAME TO config_form_groupbox;
 ALTER TABLE config_api_form_tabs RENAME TO config_form_tabs;
 ALTER TABLE config_api_images RENAME TO sys_image;

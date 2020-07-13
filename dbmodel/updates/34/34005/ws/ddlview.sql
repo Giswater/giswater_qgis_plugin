@@ -183,6 +183,7 @@ CREATE OR REPLACE VIEW vu_node AS
 	node.expl_id,
 	exploitation.macroexpl_id,
 	node.sector_id,
+	sector.name AS sector_name,
 	sector.macrosector_id,
 	node.arc_id,
 	node.parent_id,
@@ -193,10 +194,13 @@ CREATE OR REPLACE VIEW vu_node AS
 	node.comment,
 	node.minsector_id,    
 	node.dma_id,
+	dma.name AS dma_name,
 	dma.macrodma_id,
 	node.presszone_id,
+	cat_presszone.name AS presszone_name,
 	node.staticpressure,
 	node.dqa_id,
+	dqa.name AS dqa_name,
 	dqa.macrodqa_id,
 	node.soilcat_id,
 	node.function_type,
@@ -245,6 +249,7 @@ CREATE OR REPLACE VIEW vu_node AS
 	 LEFT JOIN sector ON node.sector_id = sector.sector_id
 	 LEFT JOIN exploitation ON node.expl_id = exploitation.expl_id
 	 LEFT JOIN dqa ON node.dqa_id = dqa.dqa_id
+	 LEFT JOIN cat_presszone ON cat_presszone.id = node.presszone_id
 	 LEFT JOIN ext_streetaxis a ON a.id::text = node.streetaxis_id::text
 	 LEFT JOIN ext_streetaxis b ON b.id::text = node.streetaxis2_id::text;
 
@@ -268,6 +273,7 @@ CREATE OR REPLACE VIEW vu_arc AS
 	arc.expl_id,
 	exploitation.macroexpl_id,
 	arc.sector_id,
+	sector.name AS sector_name,
 	sector.macrosector_id,
 	arc.state,
 	arc.state_type,
@@ -278,9 +284,12 @@ CREATE OR REPLACE VIEW vu_arc AS
 	arc.custom_length,
 	arc.minsector_id,
 	arc.dma_id,
+	dma.name AS dma_name,
 	dma.macrodma_id,
 	arc.presszone_id,
+	cat_presszone.name AS presszone_name,
 	arc.dqa_id,
+	dqa.name AS dqa_name,
 	dqa.macrodqa_id,
 	arc.soilcat_id,
 	arc.function_type,
@@ -332,6 +341,7 @@ CREATE OR REPLACE VIEW vu_arc AS
 	 LEFT JOIN vu_node a ON a.node_id::text = arc.node_1::text
 	 LEFT JOIN vu_node b ON b.node_id::text = arc.node_2::text
 	 LEFT JOIN dqa ON arc.dqa_id = dqa.dqa_id
+ 	 LEFT JOIN cat_presszone ON cat_presszone.id = arc.presszone_id
 	 LEFT JOIN ext_streetaxis c ON c.id = arc.streetaxis_id
 	 LEFT JOIN ext_streetaxis d ON d.id = arc.streetaxis2_id;
 
@@ -348,6 +358,7 @@ CREATE OR REPLACE VIEW vu_connec AS
 	connec.expl_id,
 	exploitation.macroexpl_id,
 	connec.sector_id,
+	sector.name AS sector_name,
 	sector.macrosector_id,
 	connec.customer_code,
 	cat_connec.matcat_id AS cat_matcat_id,
@@ -363,10 +374,13 @@ CREATE OR REPLACE VIEW vu_connec AS
 	connec.comment,
 	connec.minsector_id,
 	connec.dma_id,
+	dma.name AS dma_name,
 	dma.macrodma_id,
 	connec.presszone_id,
+	cat_presszone.name AS presszone_name,
 	connec.staticpressure,
 	connec.dqa_id,
+	dqa.name AS dqa_name,
 	dqa.macrodqa_id,
 	connec.soilcat_id,
 	connec.function_type,
@@ -423,6 +437,7 @@ CREATE OR REPLACE VIEW vu_connec AS
 	 LEFT JOIN sector ON connec.sector_id = sector.sector_id
 	 LEFT JOIN exploitation ON connec.expl_id = exploitation.expl_id
 	 LEFT JOIN dqa ON connec.dqa_id = dqa.dqa_id
+ 	 LEFT JOIN cat_presszone ON cat_presszone.id = connec.presszone_id
 	 LEFT JOIN ext_streetaxis c ON c.id = streetaxis_id
 	 LEFT JOIN ext_streetaxis b ON b.id = streetaxis2_id;
 
@@ -474,6 +489,7 @@ connecat_id,
 expl_id,
 macroexpl_id,
 sector_id,
+sector_name,
 macrosector_id,
 customer_code,
 cat_matcat_id,
@@ -489,10 +505,13 @@ observ,
 comment,
 minsector_id,
 dma_id,
+dma_name,
 macrodma_id,
 presszone_id,
+presszone_name,
 staticpressure,
 dqa_id,
+dqa_name,
 macrodqa_id,
 soilcat_id,
 function_type,
@@ -3402,6 +3421,78 @@ CREATE OR REPLACE VIEW v_edit_man_greentap AS
 	 JOIN man_greentap ON man_greentap.connec_id::text = connec.connec_id::text;
 
 
+CREATE OR REPLACE VIEW v_edit_man_wjoin AS 
+ SELECT connec.connec_id,
+	connec.code,
+	connec.elevation,
+	connec.depth,
+	cat_connec.connectype_id,
+	connec.connecat_id,
+	cat_connec.matcat_id,
+	cat_connec.pnom,
+	cat_connec.dnom,
+	connec.sector_id,
+	sector.macrosector_id,
+	connec.customer_code,
+	a.n_hydrometer,
+	connec.state,
+	connec.state_type,
+	connec.annotation,
+	connec.observ,
+	connec.comment,
+	connec.dma_id,
+	connec.presszone_id,
+	connec.soilcat_id,
+	connec.function_type,
+	connec.category_type,
+	connec.fluid_type,
+	connec.location_type,
+	connec.workcat_id,
+	connec.workcat_id_end,
+	connec.buildercat_id,
+	connec.builtdate,
+	connec.enddate,
+	connec.ownercat_id,
+	connec.muni_id,
+	connec.postcode,
+	connec.district_id,
+	connec.streetaxis_id,
+	connec.postnumber,
+	connec.postcomplement,
+	connec.streetaxis2_id,
+	connec.postnumber2,
+	connec.postcomplement2,
+	connec.descript,
+	connec.arc_id,
+	cat_connec.svg,
+	connec.rotation,
+	connec.label_x,
+	connec.label_y,
+	connec.label_rotation,
+	concat(cat_feature.link_path, connec.link) AS link,
+	connec.connec_length,
+	connec.verified,
+	connec.undelete,
+	connec.publish,
+	connec.inventory,
+	dma.macrodma_id,
+	connec.expl_id,
+	connec.num_value,
+	connec.the_geom,
+	man_wjoin.top_floor,
+	man_wjoin.cat_valve
+   FROM connec
+	 LEFT JOIN ( SELECT connec_1.connec_id,
+			count(ext_rtc_hydrometer.id)::integer AS n_hydrometer
+		   FROM ext_rtc_hydrometer
+			 JOIN connec connec_1 ON ext_rtc_hydrometer.connec_id::text = connec_1.customer_code::text
+		  GROUP BY connec_1.connec_id) a USING (connec_id)
+	 JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
+	 JOIN cat_feature ON cat_feature.id::text = cat_connec.connectype_id::text
+	 JOIN v_state_connec ON v_state_connec.connec_id::text = connec.connec_id::text
+	 LEFT JOIN dma ON connec.dma_id = dma.dma_id
+	 LEFT JOIN sector ON connec.sector_id = sector.sector_id
+	 JOIN man_wjoin ON man_wjoin.connec_id::text = connec.connec_id::text;
 
 CREATE OR REPLACE VIEW v_edit_man_hydrant AS 
  SELECT v_node.node_id,

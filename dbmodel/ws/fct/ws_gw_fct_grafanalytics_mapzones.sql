@@ -61,7 +61,7 @@ SELECT dqa_id, count(dma_id) from v_edit_arc  group by dqa_id order by 1;
 
 
 -- PRESZZONE
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"PRESSZONE","exploitation":"[1,2]", "checkData": false, "updateFeature":"TRUE", "updateMapZone":2, "geomParamUpdate":15,"debug":"false"}}}');
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"PRESSZONE","exploitation":"[1]", "checkData": false, "updateFeature":"TRUE", "updateMapZone":2, "geomParamUpdate":15,"debug":"false"}}}');
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"PRESSZONE", "node":"113952", "updateFeature":TRUE}}}');
 SELECT count(*), log_message FROM audit_log_data WHERE fid=48 AND cur_user=current_user group by log_message order by 2 --PZONE
 SELECT presszone_id, count(presszone_id) from v_edit_arc  group by presszone_id order by 1;
@@ -172,15 +172,23 @@ BEGIN
 
 	-- data quality analysis
 	IF v_checkdata THEN
+		-- om data quality analysis
 		v_input = '{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}'::json;
 		PERFORM gw_fct_om_check_data(v_input);
-		SELECT count(*) INTO v_count FROM audit_check_data WHERE cur_user="current_user"() AND fid=125 AND criticity=3;
+		SELECT count(*) INTO v_count1 FROM audit_check_data WHERE cur_user="current_user"() AND fid=125 AND criticity=3;
+
+		-- graf quality analysis
+		v_input = concat('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors", "grafClass":',quote_ident(v_class),'}}}')::json;
+		PERFORM gw_fct_grafanalytics_check_data(v_input);
+		SELECT count(*) INTO v_count2 FROM audit_check_data WHERE cur_user="current_user"() AND fid=211 AND criticity=3;
+
+		v_count = v_count1 + v_count2;
 	END IF;
 
 	-- check criticity of data in order to continue or not
-	IF v_count > 3 THEN
+	IF v_count > 0 THEN
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-		FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=125 order by criticity desc, id asc) row;
+		FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND (fid=125 or fid=211) order by criticity desc, id asc) row;
 
 		v_result := COALESCE(v_result, '{}'); 
 		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
@@ -191,6 +199,7 @@ BEGIN
 		--  Return
 		RETURN ('{"status":"Accepted", "message":{"level":3, "text":"Mapzones dynamic analysis canceled. Data is not ready to work with"}, "version":"'||v_version||'"'||
 		',"body":{"form":{}, "data":{ "info":'||v_result_info||'}}}')::json;	
+
 	END IF;
 
 	-- set fid:
@@ -229,10 +238,11 @@ BEGIN
 		
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		"data":{"message":"3090", "function":"2710","debug_msg":null}}$$);'  INTO v_audit_result;
+
 	END IF;
-	
+
 	IF v_audit_result IS NULL THEN
-	
+
 		-- select user values
 		EXECUTE 'SELECT value::json->>'''||v_table||''' FROM config_param_user WHERE parameter = ''qgis_qml_pointlayer_path'' and cur_user = current_user'
 		INTO v_pointqmlpath;
@@ -246,7 +256,7 @@ BEGIN
 		-- reset graf & audit_log tables
 		DELETE FROM anl_arc where cur_user=current_user and fid=v_fid;
 		DELETE FROM anl_node where cur_user=current_user and fid=v_fid;
-		DELETE FROM temp_anlgraf;
+		TRUNCATE temp_anlgraf;
 		DELETE FROM audit_check_data WHERE fid=v_fid AND cur_user=current_user;
 			
 		-- reset selectors
@@ -265,23 +275,16 @@ BEGIN
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('MAPZONES DYNAMIC SECTORITZATION - ', upper(v_class)));
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('----------------------------------------------------------'));
 
-		-- trigger data quality analysis
-		v_input = concat('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors", "grafClass":',quote_ident(v_class),'}}}')::json;
-		PERFORM gw_fct_grafanalytics_check_data(v_input);
+		IF (SELECT (value::json->>(v_class))::boolean FROM config_param_system WHERE parameter='utils_grafanalytics_status') IS FALSE THEN
 
-		-- (1) check if mapzone process is enabled in order to continue or not
-		IF (SELECT (value::json->>quote_literal(v_class))::boolean FROM config_param_system WHERE parameter='utils_grafanalytics_status') IS FALSE THEN
-		
+			RAISE NOTICE 'Mapzone grafanalytics is not enabled to continue';
+	
 			INSERT INTO audit_check_data (fid, criticity, error_message)
 			VALUES (v_fid, 3, concat('ERROR: Dynamic analysis for ',v_class,'''s is not configured on database. Please update system variable ''utils_grafanalytics_status''
 			 to enable it '));
-		
-		-- (2) check data quality in order to continue or not
-		ELSIF (SELECT count(*) FROM audit_check_data WHERE cur_user="current_user"() AND fid=125 AND criticity=3) > 3 THEN
-		
-			INSERT INTO audit_check_data (fid, criticity, error_message)
-			SELECT 144, criticity, error_message FROM audit_check_data WHERE cur_user=current_user AND fid=125 AND criticity=3 AND error_message LIKE('%ERROR:%');
 		ELSE 
+			RAISE NOTICE 'Mapzone grafanalytics is in progress';
+
 			-- start build log message
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 2, 'WARNINGS');
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 2, '--------------');
@@ -472,10 +475,6 @@ BEGIN
 					v_querytext = 'UPDATE v_edit_connec SET '||quote_ident(v_field)||' = arc.'||quote_ident(v_field)||' FROM arc WHERE arc.arc_id=v_edit_connec.arc_id';
 					EXECUTE v_querytext;
 				
-					-- update config_api_form fields in order to set widget as disabled text
-					v_querytext = 'UPDATE config_form_fields SET iseditable = false WHERE formtype = ''feature'' and columnname ='||quote_literal(v_field);
-					EXECUTE v_querytext;
-
 					-- recalculate staticpressure (fid=147)
 					IF v_fid=130 THEN
 					
@@ -502,7 +501,7 @@ BEGIN
 										and n.arc_id IS NOT NULL AND node.node_id=n.node_id;
 												
 						-- updat connec table
-						UPDATE v_edit_connec SET staticpressure = (head - elevation) FROM 
+						UPDATE v_edit_connec SET staticpressure = (a.head - a.elevation) FROM 
 							(SELECT connec_id, head, elevation FROM connec
 							JOIN presszone USING (presszone_id)) a
 							WHERE v_edit_connec.connec_id=a.connec_id;
@@ -558,7 +557,7 @@ BEGIN
 					-- pipe buffer
 					v_querytext = '	UPDATE '||quote_ident(v_table)||' set the_geom = geom FROM
 							(SELECT '||quote_ident(v_field)||', st_multi(st_buffer(st_collect(the_geom),'||v_geomparamupdate||')) as geom from v_edit_arc where '||
-							quote_ident(v_field)||'::integer > 0 AND v_edit_arc.'||quote_ident(v_field)||' IN
+							quote_ident(v_field)||'::text != ''0'' AND v_edit_arc.'||quote_ident(v_field)||' IN
 							(SELECT DISTINCT '||quote_ident(v_field)||' FROM v_edit_arc JOIN anl_arc USING (arc_id) WHERE fid = '||v_fid||' and cur_user = current_user)
 							group by '||quote_ident(v_field)||')a 
 							WHERE a.'||quote_ident(v_field)||'='||quote_ident(v_table)||'.'||quote_ident(v_fieldmp);
@@ -579,12 +578,12 @@ BEGIN
 					v_querytext = '	UPDATE '||quote_ident(v_table)||' set the_geom = geom FROM
 								(SELECT '||quote_ident(v_field)||', st_multi(st_buffer(st_collect(geom),0.01)) as geom FROM
 								(SELECT '||quote_ident(v_field)||', st_buffer(st_collect(the_geom), '||v_geomparamupdate||') as geom from v_edit_arc 
-								where '||quote_ident(v_field)||'::integer > 0 AND v_edit_arc.'||quote_ident(v_field)||' IN
+								where '||quote_ident(v_field)||'::text != ''0'' AND v_edit_arc.'||quote_ident(v_field)||' IN
 								(SELECT DISTINCT '||quote_ident(v_field)||' FROM v_edit_arc JOIN anl_arc USING (arc_id) WHERE fid = '||v_fid||' and cur_user = current_user)
 								group by '||quote_ident(v_field)||'
 								UNION
 								SELECT '||quote_ident(v_field)||', st_collect(ext_plot.the_geom) as geom FROM v_edit_connec, ext_plot
-								WHERE '||quote_ident(v_field)||'::integer > 0 
+								WHERE '||quote_ident(v_field)||'::text != ''0'' 
 								AND v_edit_connec.'||quote_ident(v_field)||' IN
 								(SELECT DISTINCT '||quote_ident(v_field)||' FROM v_edit_arc JOIN anl_arc USING (arc_id) WHERE fid = '||v_fid||' and cur_user = current_user)
 								AND st_dwithin(v_edit_connec.the_geom, ext_plot.the_geom, 0.001)

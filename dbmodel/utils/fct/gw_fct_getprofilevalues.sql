@@ -11,14 +11,16 @@ RETURNS json AS
 $BODY$
 
 /*example
+current petition from client:
+SELECT SCHEMA_NAME.gw_fct_getprofilevalues($${"data":{"initNode":"116", "endNode":"111", "linksDistance":1, "scale":{ "eh":1000, "ev":1000}}}$$);
+SELECT SCHEMA_NAME.gw_fct_getprofilevalues($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "initNode":"60", "endNode":"61", "linksDistance":5, "scale":{ "eh":1000, "ev":1000}}}$$);
+
+further petitions from client:
 SELECT SCHEMA_NAME.gw_fct_getprofilevalues($${"client":{},
 	"data":{"initNode":"116", "endNode":"111", "composer":"mincutA4", "legendFactor":1, "linksDistance":1, "scale":{"scaleToFit":false, "eh":2000, "ev":500}, "papersize":{"id":0, "customDim":{"xdim":300, "ydim":200}},
 		"ComposerTemplates":[{"ComposerTemplate":"mincutA4", "ComposerMap":[{"width":"179.0","height":"140.826","index":0, "name":"map0"},{"width":"77.729","height":"55.9066","index":1, "name":"map7"}]},
 				     {"ComposerTemplate":"mincutA3","ComposerMap":[{"width":"53.44","height":"55.9066","index":0, "name":"map7"},{"width":"337.865","height":"275.914","index":1, "name":"map6"}]}]
 				     }}$$);
-
-SELECT SCHEMA_NAME.gw_fct_getprofilevalues($${"client":{},"data":{"initNode":"116", "endNode":"111"}}$$);
-
 
 SELECT SCHEMA_NAME.gw_fct_getprofilevalues($${"client":{},
 	"data":{"initNode":"116", "endNode":"111", "composer":"mincutA4", "legendFactor":1, "linksDistance":1, "scale":{"scaleToFit":false, "eh":2000, "ev":500},"papersize":{"id":2, "customDim":{}},
@@ -29,7 +31,6 @@ SELECT SCHEMA_NAME.gw_fct_getprofilevalues($${"client":{},
 -- fid: 222
 
 Mains:
-- Due a bug on composer templates it is not enabled yet to incrust profile on composer
 - Profile works with 4 types of nodes
 	- TOP-REAL: Normal case, dimensions provided and node has representation on surface
 	- TOP-ESTIM: Node has representation on surface but dimensions are not provided (ymax). Interpolation is done
@@ -314,7 +315,6 @@ BEGIN
 	v_profwidth = 1000*v_distance/v_hs + v_legendfactor*20 + 10; -- profile + guitar + margin
 
 
-/*
 	-- get portrait extension
 	IF v_composer !='' THEN
 		SELECT * INTO v_json FROM json_array_elements(v_templates) AS a WHERE a->>'ComposerTemplate' = v_composer;
@@ -344,7 +344,7 @@ BEGIN
 		v_compwidth = v_profwidth;
 	END IF;
 
-*/	
+	
 	-- get portrait extension
 	IF v_papersize = 0 THEN
 		v_compwidth = (((p_data ->> 'data')::json->> 'papersize')::json->>'customDim')::json->>'xdim';
@@ -405,11 +405,12 @@ BEGIN
 
 	-- recover values form temp table into response (filtering by spacing certain distance of length in order to not collapse profile)
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_arc
-	FROM (SELECT arc_id, descript, cat_geom1, length, z1, z2, y1, y2, elev1, elev2, node_1, node_2 FROM anl_arc WHERE fid=222 AND cur_user = current_user) row;
+	FROM (SELECT arc_id, descript, cat_geom1, length, z1, z2, y1, y2, elev1, elev2, node_1, node_2 FROM anl_arc WHERE fid=222 AND cur_user = current_user ORDER BY total_length) row;
 
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(row))) FROM (SELECT node_id, descript, sys_type, cat_geom1, '||
 			v_ftopelev||' AS top_elev, elev, '||v_fymax||' AS ymax FROM anl_node WHERE fid=222 AND cur_user = current_user AND nodecat_id != ''VNODE'' ORDER BY total_distance) row'
 			INTO v_node;
+
 
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(row))) FROM (
 			WITH querytext AS (SELECT row_number() over (order by total_distance) as rid, * FROM anl_node where fid = 222 AND cur_user = current_user ORDER by total_distance)

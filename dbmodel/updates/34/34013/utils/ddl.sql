@@ -8,6 +8,12 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
+DROP VIEW IF EXISTS v_om_current_psector;
+DROP VIEW IF EXISTS v_om_current_psector_budget;
+DROP VIEW IF EXISTS v_om_current_psector_budget_detail_rec;
+DROP VIEW IF EXISTS v_om_current_psector_budget_detail_reh;
+
+
 -- 2020/06/05
 DROP TABLE cat_arc_class;
 DROP TABLE cat_arc_class_cat;

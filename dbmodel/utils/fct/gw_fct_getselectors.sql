@@ -14,8 +14,8 @@ $BODY$
 
 /*example
 
-SELECT gw_fct_getselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"currentTab":"tab_exploitation"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic" ,"filterText":""}}$$);
-SELECT gw_fct_getselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"currentTab":"tab_exploitation"}, "feature":{}, "data":{"filterText":"", "selectorType":"selector_basic"}}$$);
+SELECT gw_fct_getselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"currentTab":"tab_exploitation"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic" ,"filterText":"1"}}$$);
+SELECT gw_fct_getselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"currentTab":"tab_exploitation"}, "feature":{}, "data":{"selectorType":"selector_basic"}}$$);
 
 */
 
@@ -38,7 +38,7 @@ v_table_id text;
 v_selector_id text;
 v_filterfromconfig text;
 v_manageall boolean;
-v_typeahead json;
+v_typeahead text;
 v_expl_x_user boolean;
 v_filter text;
 v_selectionMode text;
@@ -50,6 +50,9 @@ v_filterfrominput text;
 v_filterfromids text;
 v_fullfilter text;
 v_finalquery text;
+v_querytab text;
+v_orderby text;
+v_layermanager json;
 
 BEGIN
 
@@ -63,16 +66,27 @@ BEGIN
 	-- Get input parameters:
 	v_selector_type := (p_data ->> 'data')::json->> 'selectorType';
 	v_currenttab := (p_data ->> 'form')::json->> 'currentTab';
+	v_filterfrominput := (p_data ->> 'data')::json->> 'filterText';
+	v_layermanager := (p_data ->> 'layermanager');
+
 	
 	-- get system variables:
 	v_expl_x_user = (SELECT value FROM config_param_system WHERE parameter = 'admin_exploitation_x_user');
-	
+
+	-- when typeahead only one tab is executed
+	IF v_filterfrominput IS NULL OR v_filterfrominput = '' OR lower(v_filterfrominput) ='None' or lower(v_filterfrominput) = 'null' THEN
+		v_querytab = '';
+	ELSE 
+		v_querytab = concat(' AND tabname = ', quote_literal(v_currenttab));
+	END IF;
+
 	-- Start the construction of the tabs array
 	v_formTabs := '[';
 
-	FOR v_tab IN SELECT config_form_tabs.*, value FROM config_form_tabs, config_param_system WHERE formname=v_selector_type AND concat('basic_selector_', tabname) = parameter 
-	LOOP		
+	FOR v_tab IN EXECUTE 'SELECT config_form_tabs.*, value FROM config_form_tabs, config_param_system WHERE formname='||quote_literal(v_selector_type)||
+	' AND concat(''basic_selector_'', tabname) = parameter '||(v_querytab)||' AND sys_role IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, ''member''))  ORDER BY orderby'
 
+	LOOP		
 		-- get variables form input
 		v_selector_list := (p_data ->> 'data')::json->> 'ids';
 		v_filterfrominput := (p_data ->> 'data')::json->> 'filterText';
@@ -87,6 +101,10 @@ BEGIN
 		v_manageall = v_tab.value::json->>'manageAll';
 		v_typeahead = v_tab.value::json->>'typeaheadFilter';
 		v_selectionMode = v_tab.value::json->>'selectionMode';
+		v_orderby = v_tab.value::json->>'orderBy';
+
+		-- profilactic control of v_orderby
+		IF v_orderby IS NULL THEN v_orderby = '2'; end if;
 
 		-- profilactic control of selection mode
 		IF v_selectionMode = '' OR v_selectionMode is null then
@@ -100,11 +118,18 @@ BEGIN
 		END IF;
 
 		-- built filter from input (recalled from typeahead)
+<<<<<<< HEAD
 		v_filterfrominput = concat (' AND concat('||v_label||') ILIKE ''%', v_filterfrominput, '%''');
 
 		-- getting from v_expl_x_user variable to setup v_filterfrominput
 		IF v_selector = 'selector_expl' AND v_expl_x_user THEN
 			v_filterfrominput = concat (v_filterfrominput, ' AND expl_id IN (SELECT expl_id FROM config_user_x_expl WHERE username = current_user)');
+=======
+		IF v_filterfrominput IS NULL OR v_filterfrominput = '' OR lower(v_filterfrominput) ='None' or lower(v_filterfrominput) = 'null' THEN
+			v_filterfrominput := NULL;
+		ELSE 
+			v_filterfrominput = concat (v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
+>>>>>>> release-3.4
 		END IF;
 
 		-- built full filter 
@@ -114,14 +139,13 @@ BEGIN
 		v_fullfilter := COALESCE(v_fullfilter, '');
 
 		v_finalquery =  'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-			SELECT concat(' || v_label || ') AS label, ' || v_table_id || '::text as widgetname, ''' || v_selector_id || ''' as columnname, ''check'' as type, ''boolean'' as "dataType", true as "value" 
+			SELECT '||quote_ident(v_table_id)||', concat(' || v_label || ') AS label, ' || v_table_id || '::text as widgetname, ''' || v_selector_id || ''' as columnname, ''check'' as type, ''boolean'' as "dataType", true as "value" 
 			FROM '|| v_table ||' WHERE ' || v_table_id || ' IN (SELECT ' || v_selector_id || ' FROM '|| v_selector ||' WHERE cur_user=' || quote_literal(current_user) || ') '|| v_fullfilter ||' UNION 
-			SELECT concat(' || v_label || ') AS label, ' || v_table_id || '::text as widgetname, ''' || v_selector_id || ''' as columnname, ''check'' as type, ''boolean'' as "dataType", false as "value" 
+			SELECT '||quote_ident(v_table_id)||', concat(' || v_label || ') AS label, ' || v_table_id || '::text as widgetname, ''' || v_selector_id || ''' as columnname, ''check'' as type, ''boolean'' as "dataType", false as "value" 
 			FROM '|| v_table ||' WHERE ' || v_table_id || ' NOT IN (SELECT ' || v_selector_id || ' FROM '|| v_selector ||' WHERE cur_user=' || quote_literal(current_user) || ') '||
-			 v_fullfilter ||' ORDER BY label) a';
+			 v_fullfilter ||' ORDER BY '||v_orderby||' ) a';
 
 		EXECUTE  v_finalquery INTO v_formTabsAux;
-		
 
 		-- Add tab name to json
 		IF v_formTabsAux IS NULL THEN
@@ -147,6 +171,8 @@ BEGIN
 		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'typeaheadFilter', v_typeahead::TEXT);
 		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'selectionMode', v_selectionMode::TEXT);
 
+		raise notice 'v_formTabsAux %', v_formTabsAux;
+	
 		-- Create tabs array
 		IF v_firsttab THEN
 			v_formTabs := v_formTabs || ',' || v_formTabsAux::text;
@@ -180,14 +206,15 @@ BEGIN
 			',"body":{"message":{"level":1, "text":"This is a test message"}'||
 			',"form":{"formName":"", "formLabel":"", "currentTab":"'||v_currenttab||'", "formText":"", "formTabs":'||v_formTabs||'}'||
 			',"feature":{}'||
+			',"layermanager":{}'||
 			',"data":{}}'||
 		    '}')::json;
 	END IF;
 
 	-- Exception handling
-	--EXCEPTION WHEN OTHERS THEN
-	--GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	--RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$

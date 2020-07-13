@@ -91,7 +91,8 @@ BEGIN
 			JOIN '||v_schemaname||'.man_'||v_feature_system_id||' ON man_'||v_feature_system_id||'.'||v_feature_type||'_id = ve_'||v_feature_type||'.'||v_feature_type||'_id
 			LEFT JOIN (SELECT ct.feature_id, '||v_ct_param||' FROM crosstab (''SELECT feature_id, parameter_id, value_param
 			FROM '||v_schemaname||'.man_addfields_value LEFT JOIN '||v_schemaname||'.sys_addfields ON sys_addfields.id=parameter_id
-			WHERE cat_feature_id='''''||v_feature_cat||''''' OR cat_feature_id is null  ORDER BY 1,2''::text, 
+			JOIN '||v_schemaname||'.v_state_'||v_feature_type||' ON '||v_feature_type||'_id = feature_id
+			WHERE value_param IS NOT NULL AND cat_feature_id='''''||v_feature_cat||''''' OR cat_feature_id is null  ORDER BY 1,2''::text, 
 			''VALUES '||v_id_param||'''::text) ct(feature_id character varying,'||v_datatype||' )) a 
 			ON a.feature_id::text=ve_'||v_feature_type||'.'||v_feature_type||'_id 
 			WHERE '||v_feature_type||'_type ='''||v_feature_cat||''' ;';
@@ -104,7 +105,8 @@ BEGIN
 			FROM '||v_schemaname||'.ve_'||v_feature_type||'
 			LEFT JOIN (SELECT ct.feature_id, '||v_ct_param||' FROM crosstab (''SELECT feature_id, parameter_id, value_param
 			FROM '||v_schemaname||'.man_addfields_value LEFT JOIN '||v_schemaname||'.sys_addfields ON sys_addfields.id=parameter_id
-			WHERE cat_feature_id='''''||v_feature_cat||''''' OR cat_feature_id is null ORDER BY 1,2''::text, 
+			JOIN '||v_schemaname||'.v_state_'||v_feature_type||' ON '||v_feature_type||'_id = feature_id
+			WHERE value_param IS NOT NULL AND cat_feature_id='''''||v_feature_cat||''''' OR cat_feature_id is null ORDER BY 1,2''::text, 
 			''VALUES '||v_id_param||'''::text) ct(feature_id character varying,'||v_datatype||' )) a 
 			ON a.feature_id::text=ve_'||v_feature_type||'.'||v_feature_type||'_id 
 			WHERE '||v_feature_type||'_type ='''||v_feature_cat||''' ;';
@@ -120,7 +122,8 @@ BEGIN
 			ON man_'||v_feature_system_id||'.'||v_feature_type||'_id = ve_'||v_feature_type||'.'||v_feature_type||'_id
 			LEFT JOIN (SELECT ct.feature_id, '||v_ct_param||' FROM crosstab (''SELECT feature_id, parameter_id, value_param
 			FROM '||v_schemaname||'.man_addfields_value LEFT JOIN '||v_schemaname||'.sys_addfields ON sys_addfields.id=parameter_id
-			WHERE cat_feature_id='''''||v_feature_cat||''''' OR cat_feature_id is null  ORDER BY 1,2''::text, 
+			JOIN '||v_schemaname||'.v_state_'||v_feature_type||' ON '||v_feature_type||'_id = feature_id
+			WHERE value_param IS NOT NULL AND cat_feature_id='''''||v_feature_cat||''''' OR cat_feature_id is null  ORDER BY 1,2''::text, 
 			''VALUES '||v_id_param||'''::text) ct(feature_id character varying,'||v_datatype||' )) a 
 			ON a.feature_id::text=ve_'||v_feature_type||'.'||v_feature_type||'_id 
 			WHERE '||v_feature_type||'_type ='''||v_feature_cat||''' ;';

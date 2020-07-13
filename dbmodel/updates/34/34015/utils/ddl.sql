@@ -15,7 +15,8 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_functio
 CREATE TABLE sys_style (
 id serial PRIMARY KEY,
 idval text,
-sytletype varchar(16),
-sytelvalue text,
+styletype varchar(16),
+stylevalue text,
 active boolean);
 
+ALTER TABLE config_form_tabs ADD COLUMN orderby integer;

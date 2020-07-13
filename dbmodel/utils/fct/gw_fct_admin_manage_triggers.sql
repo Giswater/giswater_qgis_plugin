@@ -41,7 +41,7 @@ BEGIN
 
 	IF p_action = 'notify' THEN
 
-		FOR rec IN (select * FROM sys_table WHERE notify_action IS NOT NULL) LOOP
+		FOR rec IN (select * FROM sys_table WHERE notify_action IS NOT NULL AND id NOT IN (SELECT viewname FROM pg_views WHERE schemaname = 'SCHEMA_NAME')) LOOP
 			v_notify_action = rec.notify_action;
 
 			FOR rec_json IN  SELECT (a)->>'action' as action,(a)->>'name' as name, (a)->>'trg_fields' as trg_fields,(a)->>'featureType' as featureType 

@@ -16,7 +16,8 @@ $BODY$
 SELECT gw_fct_pg2epa_check_data($${"data":{"parameters":{"fid":227}}}$$)-- when is called from go2epa_main
 SELECT gw_fct_pg2epa_check_data('{"parameters":{}}')-- when is called from toolbox or from checkproject
 
--- fid: 107,164,165,166,167,169,170,171,188,198,227,229,230 
+-- fid: main: 225
+		other: 107,164,165,166,167,169,170,171,188,198,227,229,230 
 
 */
 
@@ -153,10 +154,15 @@ BEGIN
 	END IF;
 
 	RAISE NOTICE '5 - Check for missed features on inp tables';
-	v_querytext = '(SELECT arc_id FROM arc WHERE arc_id NOT IN (SELECT arc_id from inp_pipe UNION SELECT arc_id FROM inp_virtualvalve) AND state > 0 
-			AND epa_type !=''NOT DEFINED'' UNION SELECT node_id FROM node WHERE node_id 
-			NOT IN (select node_id from inp_shortpipe UNION select node_id from inp_valve UNION select node_id from inp_tank 
-			UNION select node_id FROM inp_reservoir UNION select node_id FROM inp_pump UNION SELECT node_id from inp_inlet 
+	v_querytext = '(SELECT arc_id FROM arc LEFT JOIN 
+			(SELECT arc_id from inp_pipe UNION SELECT arc_id FROM inp_virtualvalve) b using (arc_id)
+			WHERE b.arc_id IS NULL AND state > 0 AND epa_type !=''NOT DEFINED''
+			UNION 
+			SELECT node_id FROM node WHERE node_id NOT IN
+			(select node_id from inp_shortpipe UNION select node_id from inp_valve 
+			UNION select node_id from inp_tank 
+			UNION select node_id FROM inp_reservoir UNION select node_id FROM inp_pump 
+			UNION SELECT node_id from inp_inlet 
 			UNION SELECT node_id from inp_junction) AND state >0 AND epa_type !=''NOT DEFINED'') a';
 
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
@@ -174,7 +180,7 @@ BEGIN
 		
 	IF v_count > 0 THEN
 		INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom)
-		SELECT 164, node_id, nodecat_id, the_geom FROM v_edit_node WHERE result_id=v_result_id AND elevation IS NULL;
+		SELECT 164, node_id, nodecat_id, the_geom FROM v_edit_node WHERE elevation IS NULL;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ',v_count,' node(s) without elevation. Take a look on temporal table for details.'));
 	ELSE

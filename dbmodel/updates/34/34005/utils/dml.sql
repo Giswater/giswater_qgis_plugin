@@ -15,7 +15,7 @@ UPDATE config_param_system SET value = gw_fct_json_object_set_key (value::json, 
 UPDATE audit_cat_table SET isdeprecated = TRUE where id IN ('v_ui_workcat_polygon_all','v_ui_workcat_polygon_aux');
 
 
-SELECT setval('SCHEMA_NAME.config_api_form_fields_id_seq', (SELECT max(id) FROM config_api_form_fields), true);
+SELECT setval('SCHEMA_NAME.config_api_form_fields_id_seq', (SELECT max(id) FROM config_form_fields), true);
 
 -- 07/04/2020
 
@@ -26,4 +26,4 @@ SELECT setval('config_param_system_id_seq', (SELECT max(id) FROM config_param_sy
 INSERT INTO config_param_system (parameter, value, context,  descript, label, project_type, datatype, isdeprecated) 
 VALUES ('api_selector_exploitation', '{"table":"exploitation", "selector":"selector_expl", "table_id":"expl_id",  "selector_id":"expl_id",  "label":"expl_id, '' - '', name, '' '', CASE WHEN descript IS NULL THEN '''' ELSE concat('' - '', descript) END"}', 'system', 'Select which label to display for selectors', 'Selector labels:', 'utils', 'json', FALSE);
 
-UPDATE config_api_form_fields SET dv_querytext = null WHERE formname = 'printGeneric' and widgettype  ='combo';
+UPDATE config_form_fields SET dv_querytext = null WHERE formname = 'printGeneric' and widgettype  ='combo';

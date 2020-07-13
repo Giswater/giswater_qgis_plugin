@@ -42,6 +42,12 @@ v_epa_user text;
 v_querytext text;
 v_querytext_mod text;
 v_queryresult text;
+v_expl text;
+v_state text;
+v_inp_result text; 
+v_rpt_result text;
+v_return json;
+v_return2 text;
 
 BEGIN
 
@@ -123,21 +129,27 @@ BEGIN
 	-- refactor dvquerytext		
 	FOR v_querytext in select distinct querytext from (
 		
-		SELECT id, json_array_elements_text (inputparams::json)::json->>'widgetname' as widgetname, json_array_elements_text (inputparams::json)::json->>'dvQueryText'
-		as querytext FROM sys_function JOIN config_toolbox USING (id) where alias = v_filter AND (project_type=v_projectype OR project_type='utils'))a
-		WHERE querytext is not null
-		LOOP
+	SELECT id, json_array_elements_text (inputparams::json)::json->>'widgetname' as widgetname, json_array_elements_text (inputparams::json)::json->>'dvQueryText'
+	as querytext FROM sys_function JOIN config_toolbox USING (id) where alias = v_filter AND (project_type=v_projectype OR project_type='utils'))a
+	WHERE querytext is not null
+	LOOP
 		
-			v_querytext_mod =  'SELECT concat (''"comboIds":'',array_to_json(array_agg(to_json(id::text))) , '', "comboNames":'',array_to_json(array_agg(to_json(idval::text)))) FROM ('||v_querytext||')a';
-			EXECUTE v_querytext_mod INTO v_queryresult;
+		v_querytext_mod =  'SELECT concat (''"comboIds":'',array_to_json(array_agg(to_json(id::text))) , '', "comboNames":'',array_to_json(array_agg(to_json(idval::text)))) FROM ('||v_querytext||')a';
+		EXECUTE v_querytext_mod INTO v_queryresult;
 	
-			v_om_fields = (REPLACE(v_om_fields::text, concat('"dvQueryText":"', v_querytext,'"') , v_queryresult))::json;
-			v_edit_fields = (REPLACE(v_edit_fields::text, concat('"dvQueryText":"', v_querytext,'"') , v_queryresult))::json;
-			v_epa_fields = (REPLACE(v_epa_fields::text, concat('"dvQueryText":"', v_querytext,'"') , v_queryresult))::json;
-			v_master_fields = (REPLACE(v_master_fields::text, concat('"dvQueryText":"', v_querytext,'"') , v_queryresult))::json;
-			v_admin_fields = (REPLACE(v_admin_fields::text, concat('"dvQueryText":"', v_querytext,'"') , v_queryresult))::json;
+		v_om_fields = (REPLACE(v_om_fields::text, concat('"dvQueryText":"', v_querytext,'"') , v_queryresult))::json;
+		v_edit_fields = (REPLACE(v_edit_fields::text, concat('"dvQueryText":"', v_querytext,'"') , v_queryresult))::json;
+		v_epa_fields = (REPLACE(v_epa_fields::text, concat('"dvQueryText":"', v_querytext,'"') , v_queryresult))::json;
+		v_master_fields = (REPLACE(v_master_fields::text, concat('"dvQueryText":"', v_querytext,'"') , v_queryresult))::json;
+		v_admin_fields = (REPLACE(v_admin_fields::text, concat('"dvQueryText":"', v_querytext,'"') , v_queryresult))::json;
 		
-		END LOOP;
+	END LOOP;
+
+	-- get variables
+	v_expl  = (SELECT expl_id FROM selector_expl WHERE cur_user = current_user limit 1);
+	v_state  = (SELECT expl_id FROM selector_expl WHERE cur_user = current_user limit 1);
+	v_inp_result = (SELECT result_id FROM selector_inp_result WHERE cur_user = current_user limit 1);
+	v_rpt_result = (SELECT result_id FROM selector_rpt_main WHERE cur_user = current_user limit 1);
 
 	--    Control NULL's
 	v_om_fields := COALESCE(v_om_fields, '[]');
@@ -145,22 +157,32 @@ BEGIN
 	v_epa_fields := COALESCE(v_epa_fields, '[]');
 	v_master_fields := COALESCE(v_master_fields, '[]');
 	v_admin_fields := COALESCE(v_admin_fields, '[]');
-
-	-- Return
-	RETURN ('{"status":"Accepted", "message":{"level":1, "text":"This is a test message"}, "apiVersion":'||v_version||
-             ',"body":{"form":{}'||
+	
+	v_expl := COALESCE(v_expl, '');
+	v_state := COALESCE(v_state, '');
+	v_inp_result := COALESCE(v_inp_result, '');
+	v_rpt_result := COALESCE(v_rpt_result, '');
+	
+	-- make return
+	v_return ='{"status":"Accepted", "message":{"level":1, "text":"This is a test message"}, "version":'||v_version||',"body":{"form":{}'||
 		     ',"feature":{}'||
-		     ',"data":{"fields":{'||
-					   ' "om":' || v_om_fields ||
-					 ' , "edit":' || v_edit_fields ||
-					 ' , "epa":' || v_epa_fields ||
-					 ' , "master":' || v_master_fields ||
-					 ' , "admin":' || v_admin_fields ||'}}}'||
-	    '}')::json;
+		     ',"data":{"fields":{ "om":' || v_om_fields ||
+				      ' , "edit":' || v_edit_fields ||
+				      ' , "epa":' || v_epa_fields ||
+				      ' , "master":' || v_master_fields ||
+				      ' , "admin":' || v_admin_fields ||'}}}}';
+
+	-- manage variables ($)
+	v_return = REPLACE (v_return::text, '$userExploitation', v_expl);
+	v_return = REPLACE (v_return::text, '$userState', v_state);
+	v_return = REPLACE (v_return::text, '$userInpResult', v_inp_result);
+	v_return = REPLACE (v_return::text, '$userRptResult', v_rpt_result);
+
+	RETURN v_return;
        
 	--Exception handling
-	--EXCEPTION WHEN OTHERS THEN 
-	--RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	EXCEPTION WHEN OTHERS THEN 
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

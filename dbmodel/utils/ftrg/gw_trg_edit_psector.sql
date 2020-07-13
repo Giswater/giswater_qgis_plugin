@@ -74,14 +74,7 @@ BEGIN
 				NEW.psector_id:= (SELECT nextval('plan_psector_id_seq'));
 			END IF;   
 	
-	IF om_aux='om' THEN
-	               
-		INSERT INTO om_psector (psector_id, name, psector_type, result_id, descript, priority, text1, text2, observ, rotation, scale, 
-		sector_id, atlas_id, gexpenses, vat, other, the_geom, expl_id, active)
-		VALUES  (NEW.psector_id, NEW.name, NEW.psector_type, NEW.result_id, NEW.descript, NEW.priority, NEW.text1, NEW.text2, NEW.observ, 
-		NEW.rotation, NEW.scale, NEW.sector_id, NEW.atlas_id, NEW.gexpenses, NEW.vat, NEW.other, NEW.the_geom, NEW.expl_id, NEW.active);
-
-	ELSIF om_aux='plan' THEN
+	IF om_aux='plan' THEN
 
 		INSERT INTO plan_psector (psector_id, name, psector_type, descript, priority, text1, text2, observ, rotation, scale, sector_id,
 		 atlas_id, gexpenses, vat, other, the_geom, expl_id, active, ext_code, status)
@@ -95,15 +88,7 @@ BEGIN
 
     ELSIF TG_OP = 'UPDATE' THEN
 
-	IF om_aux='om' THEN
-	               
-		UPDATE om_psector 
-		SET psector_id=NEW.psector_id, name=NEW.name, psector_type=NEW.psector_type, result_id=NEW.result_id, descript=NEW.descript, priority=NEW.priority, 
-		text1=NEW.text1, text2=NEW.text2, observ=NEW.observ, rotation=NEW.rotation, scale=NEW.scale, sector_id=NEW.sector_id, atlas_id=NEW.atlas_id, 
-		gexpenses=NEW.gexpenses, vat=NEW.vat, other=NEW.other, expl_id=NEW.expl_id, active=NEW.active
-		WHERE psector_id=OLD.psector_id;
-
-	ELSIF om_aux='plan' THEN
+	IF om_aux='plan' THEN
 
 		UPDATE plan_psector 
 		SET psector_id=NEW.psector_id, name=NEW.name, psector_type=NEW.psector_type, descript=NEW.descript, priority=NEW.priority, text1=NEW.text1, 
@@ -189,43 +174,16 @@ BEGIN
 
     ELSIF TG_OP = 'DELETE' THEN
     
-	IF om_aux='om' THEN
-		DELETE FROM om_psector WHERE psector_id = OLD.psector_id;      
+	IF om_aux='plan' THEN
 
-	ELSIF om_aux='plan' THEN
-	
-		FOR rec_type IN (SELECT * FROM sys_feature_type WHERE classlevel = 1  OR classlevel = 2 ORDER BY CASE
-		WHEN id='CONNEC' THEN 1 
-		WHEN id='GULLY' THEN 2
-		WHEN id='ARC' THEN 3 
-		WHEN id='NODE' THEN 4 END) LOOP
-		
-			v_plan_table=concat('plan_psector_x_',lower(rec_type.id));
-			v_plan_table_id=concat(lower(rec_type.id),'_id');
-
-			FOR rec IN EXECUTE 'SELECT * FROM '||v_plan_table||' WHERE psector_id = '||OLD.psector_id||'
-			and '||v_plan_table_id||' not IN (SELECT '||v_plan_table_id||' FROM '||v_plan_table||' WHERE psector_id != '||OLD.psector_id||')' LOOP
-	
-				IF rec_type.id='NODE' THEN
-					v_id = rec.node_id;		
-				ELSIF rec_type.id='ARC' THEN
-					v_id = rec.arc_id;	
-				ELSIF rec_type.id='GULLY' THEN
-					v_id = rec.gully_id;
-				ELSIF rec_type.id='CONNEC' THEN
-					v_id = rec.connec_id;
-				END IF;
-
-				EXECUTE 'DELETE FROM '||lower(rec_type.id)||' WHERE state=2 and '||v_plan_table_id||' =  '''||v_id||'''';
-					
-			END LOOP;
-			
-
-		END LOOP;
-
-		DELETE FROM config_param_user WHERE parameter = 'plan_psector_vdefault' and value = OLD.psector_id::text;
-
-		DELETE FROM plan_psector WHERE psector_id = OLD.psector_id;
+			DELETE FROM plan_psector WHERE psector_id = OLD.psector_id;
+			DELETE FROM arc WHERE state = 2 AND arc_id NOT IN (SELECT arc_id FROM plan_psector_x_arc);	
+			DELETE FROM node WHERE state = 2 AND node_id NOT IN (SELECT node_id FROM plan_psector_x_node);	
+			DELETE FROM connec WHERE state = 2 AND connec_id NOT IN (SELECT connec_id FROM plan_psector_x_connec);
+			IF (select project_type FROM sys_version LIMIT 1)='UD' THEN	
+				DELETE FROM gully WHERE state = 2 AND gully_id NOT IN (SELECT gully_id FROM plan_psector_x_gully);
+			END IF;
+			RETURN NULL;
 
 	END IF;
 

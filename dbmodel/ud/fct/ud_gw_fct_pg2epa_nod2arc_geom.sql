@@ -13,11 +13,11 @@ $BODY$
 
 DECLARE
 	
-rec_node SCHEMA_NAME.temp_node%ROWTYPE;
-rec_arc1 SCHEMA_NAME.temp_arc%ROWTYPE;
-rec_arc2 SCHEMA_NAME.temp_arc%ROWTYPE;
+rec_node record;
+rec_arc1 record;
+rec_arc2 record;
 rec_arc record;
-rec_new_arc SCHEMA_NAME.temp_arc%ROWTYPE;
+rec_new_arc record;
 rec_flowreg record;
 
 v_nodarc_geom geometry;
@@ -38,6 +38,9 @@ BEGIN
    
 	--  Move valves to arc
     RAISE NOTICE 'Starting process of nodarcs';
+	
+	-- setting record_new_arc
+	SELECT * INTO rec_new_arc FROM temp_arc LIMIT 1;
 
     FOR rec_flowreg IN 
 	SELECT DISTINCT ON (node_id, to_arc) node_id,  to_arc, max(flwreg_length) AS flwreg_length, flw_type FROM 

@@ -10,13 +10,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 ALTER TABLE node_type ADD CONSTRAINT node_type_graf_delimiter_check CHECK (graf_delimiter::text = ANY (ARRAY['NONE','MINSECTOR', 'PRESSZONE', 'DQA', 'DMA', 'SECTOR']));
 
-ALTER TABLE inp_pattern_value ALTER COLUMN _factor_19 DROP DEFAULT;
-ALTER TABLE inp_pattern_value ALTER COLUMN _factor_20 DROP DEFAULT;
-ALTER TABLE inp_pattern_value ALTER COLUMN _factor_21 DROP DEFAULT;
-ALTER TABLE inp_pattern_value ALTER COLUMN _factor_22 DROP DEFAULT;
-ALTER TABLE inp_pattern_value ALTER COLUMN _factor_23 DROP DEFAULT;
-ALTER TABLE inp_pattern_value ALTER COLUMN _factor_24 DROP DEFAULT;
-
 
 ALTER TABLE dqa ADD CONSTRAINT dqa_expl_id_fkey FOREIGN KEY (expl_id)
 REFERENCES exploitation (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;

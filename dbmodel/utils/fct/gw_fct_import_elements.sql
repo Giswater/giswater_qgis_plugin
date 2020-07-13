@@ -78,7 +78,7 @@ BEGIN
 	END LOOP;
 
 	-- Delete values on temporal table
-	DELETE FROM temp_csv WHERE cur_user=current_user AND fid = 235;
+	DELETE FROM temp_csv;
 
 	-- manage log (fid: 235)
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (235, v_result_id, concat('Reading values from temp_csv table -> Done'));

@@ -12,14 +12,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setselectors(p_data json)
 $BODY$
 
 /*example
-SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{}, 
-"data":{"addSchema":"", "selectorType":"exploitation", "id":2, "value":true, "isAlone":true}}$$);
-
-SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"selectorType":"selector_basic", "tabName":"tab_exploitation", "id":"2", "value":"False", "addSchema":"None"}}$$);
-SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"selectorType":"selector_basic", "tabName":"tab_psector", "id":"2", "value":"False", "addSchema":"None"}}$$);
-
-SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"explfrommuni", "id":1, "value":true, "isAlone":true, "addSchema":"None"}}$$)::text;
-
+SELECT gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"None", "tabName":"tab_exploitation", "checkAll":"True", "addSchema":"None"}}$$);
 */
 
 DECLARE
@@ -40,6 +33,10 @@ v_error_context text;
 v_selectortype text;
 v_layermanager json;
 v_schemaname text;
+v_return json;
+v_table text;
+v_tableid text;
+v_checkall boolean;
 
 BEGIN
 
@@ -57,12 +54,22 @@ BEGIN
 	v_id := (p_data ->> 'data')::json->> 'id';
 	v_value := (p_data ->> 'data')::json->> 'value';
 	v_isalone := (p_data ->> 'data')::json->> 'isAlone';
+	v_checkall := (p_data ->> 'data')::json->> 'checkAll';
 	v_addschema := (p_data ->> 'data')::json->> 'addSchema';
 	v_data = p_data->>'data';
 
-	-- control nulls of addschema
-	IF v_addschema = 'None' OR v_addschema = '' THEN
-		v_addschema = NULL;
+	-- profilactic control of selector type
+	IF lower(v_selectortype) = 'none' OR v_selectortype = '' OR lower(v_selectortype) ='null' THEN v_selectortype = 'selector_basic'; END IF;
+
+	-- profilactic control of schema name
+	IF lower(v_addschema) = 'none' OR v_addschema = '' OR lower(v_addschema) ='null'
+		THEN v_addschema = null; 
+	ELSE
+		IF (select schemaname from pg_tables WHERE schemaname = v_addschema LIMIT 1) IS NULL THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+            "data":{"message":"3132", "function":"2870","debug_msg":null}}$$)';
+			-- todo: send message to response
+		END IF;
 	END IF;
 
 	-- looking for additional schema 
@@ -76,6 +83,8 @@ BEGIN
 	v_parameter_selector = (SELECT value::json FROM config_param_system WHERE parameter = concat('basic_selector_', v_tabname));
 	v_tablename = v_parameter_selector->>'selector';
 	v_columnname = v_parameter_selector->>'selector_id'; 
+	v_table = v_parameter_selector->>'table';
+	v_tableid = v_parameter_selector->>'table_id';	
 	v_layermanager = v_parameter_selector->>'layermanager'; 
 
 	-- get expl from muni
@@ -91,24 +100,35 @@ BEGIN
 		EXECUTE 'INSERT INTO selector_expl (expl_id, cur_user) VALUES('|| v_expl ||', '''|| current_user ||''')';	
 	END IF;
 
-	-- manage isalone
-	IF v_isalone THEN
+	-- manage check all
+	IF v_checkall THEN
+		EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) SELECT '||v_tableid||', current_user FROM '||v_table||' ON CONFLICT DO NOTHING';
+	ELSIF v_checkall IS FALSE THEN
 		EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user';
+	ELSE
+
+		-- manage isalone
+		IF v_isalone OR v_checkall IS FALSE THEN
+			EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user';
+		END IF;
+
+		-- manage value
+		IF v_value THEN
+			EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) VALUES('|| v_id ||', '''|| current_user ||''')ON CONFLICT DO NOTHING';
+		ELSE
+			EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE ' || v_columnname || ' = '|| v_id ||' AND cur_user = current_user';
+		END IF;
+
 	END IF;
 
-	-- manage value
-	IF v_value THEN
-		EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) VALUES('|| v_id ||', '''|| current_user ||''')ON CONFLICT DO NOTHING';
-	ELSE
-		EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE ' || v_columnname || ' = '|| v_id ||'';
-	END IF;
 
 	-- control nulls
 	v_layermanager = COALESCE (v_layermanager, '{}');
-	
-	-- Return
-	RETURN ('{"status":"Accepted", "version":"","body":{"message":{"level":1, "text":"This is a test message"} ,"form":{},"feature":{},"layermanager":'||v_layermanager||', "data":{}}}')::json;
 
+	-- Return
+	v_return = concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"currentTab":"', v_tabname,'"}, "feature":{}, "data":{"selectorType":"',v_selectortype,'"}, "layermanager":'||v_layermanager||'}');
+	RETURN gw_fct_getselectors(v_return);
+	
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;

@@ -20,7 +20,7 @@ arc_rec record;
 pump_rec record;
 node_id_aux text;
 rec record;
-record_new_arc SCHEMA_NAME.arc%ROWTYPE;
+record_new_arc record;
 n1_geom public.geometry;
 n2_geom public.geometry;
 p1_geom public.geometry;
@@ -43,6 +43,9 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public; 
 
     SELECT * INTO rec FROM sys_version LIMIT 1;
+	
+	-- assign value for record_new_arc
+	SELECT * INTO record_new_arc FROM arc LIMIT 1;
  
 	--  Start process	
     RAISE NOTICE 'Starting additional pumps process.';
