@@ -45,7 +45,8 @@ BEGIN
 	a::json->>'col17',a::json->>'col18',a::json->>'col19',a::json->>'col20', replace(a::json->>'col40','''', '')
 	FROM json_array_elements(v_file) AS a;
 
-	-- call import epa function
+	-- reordening data from temp table to rpt tables
+	p_data = concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"resultId":"'||v_result||'"}}');
 	SELECT gw_fct_rpt2pg_import_rpt(p_data) INTO v_import;
 	
 	-- set result on result selector: In spite of there are two selectors tables () only it's setted one

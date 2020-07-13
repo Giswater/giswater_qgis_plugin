@@ -43,6 +43,7 @@ BEGIN
 	FROM json_array_elements(v_file) AS a;
 
 	-- reordening data from temp table to rpt tables
+	p_data = concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"resultId":"'||v_result||'"}}');
 	SELECT gw_fct_rpt2pg_import_rpt(p_data) INTO v_import;
 	
 	-- Reverse geometries where flow is negative and updating flow values with absolute value
