@@ -118,18 +118,10 @@ BEGIN
 		END IF;
 
 		-- built filter from input (recalled from typeahead)
-<<<<<<< HEAD
-		v_filterfrominput = concat (' AND concat('||v_label||') ILIKE ''%', v_filterfrominput, '%''');
-
-		-- getting from v_expl_x_user variable to setup v_filterfrominput
-		IF v_selector = 'selector_expl' AND v_expl_x_user THEN
-			v_filterfrominput = concat (v_filterfrominput, ' AND expl_id IN (SELECT expl_id FROM config_user_x_expl WHERE username = current_user)');
-=======
 		IF v_filterfrominput IS NULL OR v_filterfrominput = '' OR lower(v_filterfrominput) ='None' or lower(v_filterfrominput) = 'null' THEN
 			v_filterfrominput := NULL;
 		ELSE 
 			v_filterfrominput = concat (v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
->>>>>>> release-3.4
 		END IF;
 
 		-- built full filter 
