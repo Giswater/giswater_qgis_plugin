@@ -62,6 +62,9 @@ SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_arc", "id":"2001"},
 		"data":{"toolBar":"epa"}}$$)
+		
+SELECT SCHEMA_NAME.gw_fct_getinfofromid($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"tableName":"v_ext_plot", "id":"", "isLayer":true},
+"data":{"filterFields":{}, "pageInfo":{}, "infoType":"full"}}$$);	
 
 */
 
@@ -533,8 +536,8 @@ BEGIN
 		END IF;
 
 		-- getting id from URN
-		IF v_id IS NULL THEN
-			v_id = (SELECT currval('SCHEMA_NAME.urn_id_seq'));
+		IF v_id IS NULL AND v_islayer is not true THEN
+			v_id = (SELECT nextval('SCHEMA_NAME.urn_id_seq'));
 		END IF;
 
 	ELSE
