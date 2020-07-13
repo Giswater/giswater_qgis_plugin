@@ -40,3 +40,12 @@ ON CONFLICT (id) DO NOTHING;
 DELETE FROM config_form_fields where formname = 'v_ui_hydrometer';
 
 UPDATE sys_param_user SET layoutname = 'lyt_reports_2' WHERE  layoutname = 'grl_reports_18';
+
+UPDATE config_form_fields set dv_querytext = 'SELECT id, idval FROM plan_typevalue 
+WHERE typevalue = ''price_units'''  WHERE dv_querytext like'%price_value%';
+
+UPDATE config_form_fields set dv_querytext = 'SELECT id, idval FROM plan_typevalue 
+WHERE typevalue = ''psector_type'''  WHERE dv_querytext like'%psector_cat_type%';
+
+UPDATE config_form_fields set dv_querytext = 'SELECT id, id AS idval FROM inp_curve 
+WHERE id IS NOT NULL'  WHERE dv_querytext like'%inp_curve_id%';
