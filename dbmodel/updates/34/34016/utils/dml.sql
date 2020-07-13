@@ -40,3 +40,10 @@ ON CONFLICT (id) DO NOTHING;
 DELETE FROM config_form_fields where formname = 'v_ui_hydrometer';
 
 UPDATE sys_param_user SET layoutname = 'lyt_reports_2' WHERE  layoutname = 'grl_reports_18';
+
+INSERT INTO config_typevalue VALUES ('formtype_typevalue', 'form_print', 'form_print', 'formPrint');
+
+UPDATE config_form_fields SET formtype='form_feature' WHERE formtype='form_generic';
+UPDATE config_form_fields SET formtype='form_print' WHERE formname='print';
+
+UPDATE config_form_fields SET widgettype='combo' WHERE columnname='macroexpl_id' AND formname='v_edit_exploitation';
