@@ -93,18 +93,21 @@ class NotifyFunctions(ParentAction):
                 self.conn_failed = False
 
             # Initialize thread
-            thread = threading.Timer(interval=0.1, function=self.wait_notifications)
+            thread = threading.Timer(interval=1, function=self.wait_notifications)
             thread.start()
 
             # Check if any notification to process
             dao = self.controller.dao
             dao.get_poll()
+
+            last_paiload = None
             while dao.conn.notifies:
                 notify = dao.conn.notifies.pop()
                 msg = f'<font color="blue"><bold>Got NOTIFY: </font>'
                 msg += f'<font color="black"><bold>{notify.pid}, {notify.channel}, {notify.payload} </font>'
                 self.controller.log_info(msg)
-                if notify.payload:
+                if notify.payload and notify.payload != last_paiload:
+                    last_paiload = notify.payload
                     try:
                         complet_result = json.loads(notify.payload, object_pairs_hook=OrderedDict)
                         self.execute_functions(complet_result)
@@ -171,10 +174,10 @@ class NotifyFunctions(ParentAction):
             # get sys variale
             self.qgis_project_infotype = self.controller.plugin_settings_value('infoType')
 
-            feature = '"tableName":"' + str(layer_name) + '", "id":""'
+            feature = '"tableName":"' + str(layer_name) + '", "id":"", "isLayer":true'
             extras = f'"infoType":"{self.qgis_project_infotype}"'
             body = self.create_body(feature=feature, extras=extras)
-            result = self.controller.get_json('gw_fct_getinfofromid', body, is_notify=True)
+            result = self.controller.get_json('gw_fct_getinfofromid', body, is_notify=True, log_sql=True)
             if not result:
                 continue
             for field in result['body']['data']['fields']:
@@ -225,6 +228,9 @@ class NotifyFunctions(ParentAction):
                               'field_format': 'yyyy-MM-dd',
                               'field_iso_format': False}
                     editor_widget_setup = QgsEditorWidgetSetup('DateTime', config)
+                    layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+                else:
+                    editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'True'})
                     layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
 
 
@@ -302,7 +308,7 @@ class NotifyFunctions(ParentAction):
 
 
     def set_read_only(self, layer, field, field_index):
-        """ Set field readOnly according to client configuration into config_api_form_fields (field 'iseditable')"""
+        """ Set field readOnly according to client configuration into config_form_fields (field 'iseditable')"""
 
         # Get layer config
         config = layer.editFormConfig()
