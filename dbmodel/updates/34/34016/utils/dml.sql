@@ -49,3 +49,10 @@ WHERE typevalue = ''psector_type'''  WHERE dv_querytext like'%psector_cat_type%'
 
 UPDATE config_form_fields set dv_querytext = 'SELECT id, id AS idval FROM inp_curve 
 WHERE id IS NOT NULL'  WHERE dv_querytext like'%inp_curve_id%';
+
+INSERT INTO config_typevalue VALUES ('formtype_typevalue', 'form_print', 'form_print', 'formPrint');
+
+UPDATE config_form_fields SET formtype='form_feature' WHERE formtype='form_generic';
+UPDATE config_form_fields SET formtype='form_print' WHERE formname='print';
+
+UPDATE config_form_fields SET widgettype='combo' WHERE columnname='macroexpl_id' AND formname='v_edit_exploitation';
