@@ -685,7 +685,7 @@ class Go2Epa(ApiParent):
             time_to_compare = utils_giswater.get_item_data(
                 self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_time_to_compare)
             if time_to_show not in (None, -1, ''):
-                sql = (f"INSERT INTO rpt_selector_hourly (timestep, cur_user)"
+                sql = (f"INSERT INTO selector_rpt_main_tstep (timestep, cur_user)"
                        f" VALUES ('{time_to_show}', '{user}');\n")
                 self.controller.execute_sql(sql)
             if time_to_compare not in (None, -1, ''):
