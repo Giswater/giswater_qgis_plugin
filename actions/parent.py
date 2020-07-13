@@ -1341,6 +1341,7 @@ class ParentAction(object):
         """
         Manage options for layers (active, visible, zoom and indexing)
         :param json_result: Json result of a query (Json)
+        :param sql: query executed (String)
         :return: None
         """
 
@@ -1349,13 +1350,12 @@ class ParentAction(object):
         except KeyError:
             return
         srid = self.controller.plugin_settings_value('srid')
-        print(styles)
         try:
-            if 'style' not in styles: return
-            if 'ruberband' in styles['style']:
+            if 'style' not in styles and 'ruberband' in styles['style']:
                 # Set default values
                 opacity = 100
                 width = 3
+                color = QColor(255, 0, 0, 125)
                 if 'transparency' in styles['style']['ruberband']:
                     opacity = styles['style']['ruberband']['transparency'] * 255
                 if 'color' in styles['style']['ruberband']:
@@ -1416,7 +1416,6 @@ class ParentAction(object):
                             v_layer.renderer().symbol().setColor(color)
                             v_layer.renderer().symbol().setOpacity(opacity)
                         self.iface.layerTreeView().refreshLayerSymbology(v_layer.id())
-
 
         except Exception as e:
             self.controller.manage_exception(None, f"{type(e).__name__}: {e}", sql)

@@ -783,7 +783,7 @@ class DaoController(object):
                  log_result=False, json_loads=False, is_notify=False):
         """ Manage execution API function
         :param function_name: Name of function to call (text)
-        :param body: Parameter for function (json)
+        :param parameters: Parameters for function (json) or (query parameters)
         :param commit: Commit sql (bool)
         :param log_sql: Show query in qgis log (bool)
         :return: Response of the function executed (json)
