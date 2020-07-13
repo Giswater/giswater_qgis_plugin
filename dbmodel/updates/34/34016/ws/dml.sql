@@ -77,3 +77,8 @@ INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder,  da
 -- re-creation of child
 SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
 "data":{"filterFields":{}, "pageInfo":{}, "multi_create":"True" }}$$);
+
+
+UPDATE config_form_fields SET 
+dv_querytext = 'SELECT presszone.presszone_id as id, name as idval FROM presszone WHERE presszone_id=''0'' UNION SELECT presszone.presszone_id AS id, presszone.name AS idval FROM presszone WHERE presszone_id IS NOT NULL'
+WHERE columnname = 'presszone_id' AND widgettype = 'combo';

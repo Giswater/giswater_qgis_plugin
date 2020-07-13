@@ -56,3 +56,7 @@ UPDATE config_form_fields SET formtype='form_feature' WHERE formtype='form_gener
 UPDATE config_form_fields SET formtype='form_print' WHERE formname='print';
 
 UPDATE config_form_fields SET widgettype='combo' WHERE columnname='macroexpl_id' AND formname='v_edit_exploitation';
+
+UPDATE config_form_fields SET 
+dv_querytext = 'SELECT dma_id as id, name as idval FROM dma WHERE dma_id = 0 UNION SELECT dma_id as id, name as idval FROM dma WHERE dma_id IS NOT NULL'
+WHERE columnname = 'dma_id' AND widgettype = 'combo';
