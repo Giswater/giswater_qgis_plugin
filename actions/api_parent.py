@@ -693,6 +693,9 @@ class ApiParent(ParentAction):
         widget = self.populate_combo(widget, field)
         if 'selectedId' in field:
             utils_giswater.set_combo_itemData(widget, field['selectedId'], 0)
+            widget.setProperty('selectedId', field['selectedId'])
+        else:
+            widget.setProperty('selectedId', None)
         return widget
 
 
