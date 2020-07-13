@@ -91,18 +91,21 @@ class NotifyFunctions(ParentAction):
                 self.conn_failed = False
 
             # Initialize thread
-            thread = threading.Timer(interval=0.1, function=self.wait_notifications)
+            thread = threading.Timer(interval=1, function=self.wait_notifications)
             thread.start()
 
             # Check if any notification to process
             dao = self.controller.dao
             dao.get_poll()
+
+            last_paiload = None
             while dao.conn.notifies:
                 notify = dao.conn.notifies.pop()
                 msg = f'<font color="blue"><bold>Got NOTIFY: </font>'
                 msg += f'<font color="black"><bold>{notify.pid}, {notify.channel}, {notify.payload} </font>'
                 self.controller.log_info(msg)
-                if notify.payload:
+                if notify.payload and notify.payload != last_paiload:
+                    last_paiload = notify.payload
                     try:
                         complet_result = json.loads(notify.payload, object_pairs_hook=OrderedDict)
                         self.execute_functions(complet_result)
@@ -132,6 +135,114 @@ class NotifyFunctions(ParentAction):
             except AttributeError as e:
                 # If function_name not exist as python function
                 self.controller.log_warning(f"Exception error: {e}")
+
+
+    # Functions called by def wait_notifications(...)
+    def set_layer_index(self, **kwargs):
+        """ Force reload dataProvider of layer """
+        """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params) """
+
+        # Get list of layer names
+        layers_name_list = kwargs['tableName']
+        if not layers_name_list:
+            return
+        if type(layers_name_list) == str:
+            self.controller.set_layer_index(layers_name_list)
+        if type(layers_name_list) == list:
+            for layer_name in layers_name_list:
+                self.controller.set_layer_index(layer_name)
+
+
+    def refresh_attribute_table(self, **kwargs):
+        """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params) """
+        """ Set layer fields configured according to client configuration.
+            At the moment manage:
+                Column names as alias, combos and typeahead as ValueMap"""
+
+        # Get list of layer names
+        layers_name_list = kwargs['tableName']
+        if not layers_name_list:
+            return
+
+        for layer_name in layers_name_list:
+            layer = self.controller.get_layer_by_tablename(layer_name)
+            if not layer:
+                msg = f"Layer {layer_name} does not found, therefore, not configured"
+                self.controller.log_info(msg)
+                continue
+
+            # get sys variale
+            self.qgis_project_infotype = self.controller.plugin_settings_value('infoType')
+
+            feature = '"tableName":"' + str(layer_name) + '", "id":"", "isLayer":true'
+            extras = f'"infoType":"{self.qgis_project_infotype}"'
+            body = self.create_body(feature=feature, extras=extras)
+            result = self.controller.get_json('gw_fct_getinfofromid', body, is_notify=True, log_sql=True)
+            if not result:
+                continue
+            for field in result['body']['data']['fields']:
+                _values = {}
+                # Get column index
+                fieldIndex = layer.fields().indexFromName(field['columnname'])
+
+                # Hide selected fields according table config_api_form_fields.hidden
+                if 'hidden' in field:
+                    self.set_column_visibility(layer, field['columnname'], field['hidden'])
+                # Set multiline fields according table config_api_form_fields.widgetcontrols['setQgisMultiline']
+                if field['widgetcontrols'] is not None and 'setQgisMultiline' in field['widgetcontrols']:
+                    self.set_column_multiline(layer, field, fieldIndex)
+                # Set alias column
+                if field['label']:
+                    layer.setFieldAlias(fieldIndex, field['label'])
+
+                # Set field constraints
+                if field['widgetcontrols'] and 'setQgisConstraints' in field['widgetcontrols']:
+                    if field['widgetcontrols']['setQgisConstraints'] is True:
+                        layer.setFieldConstraint(fieldIndex, QgsFieldConstraints.ConstraintNotNull,
+                                             QgsFieldConstraints.ConstraintStrengthSoft)
+                        layer.setFieldConstraint(fieldIndex, QgsFieldConstraints.ConstraintUnique,
+                                             QgsFieldConstraints.ConstraintStrengthHard)
+
+                # Manage editability
+                self.set_read_only(layer, field, fieldIndex)
+
+                # Manage fields
+                if field['widgettype'] == 'combo':
+                    if 'comboIds' in field:
+                        for i in range(0, len(field['comboIds'])):
+                            _values[field['comboNames'][i]] = field['comboIds'][i]
+                    # Set values into valueMap
+                    editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': _values})
+                    layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+                elif field['widgettype'] == 'text':
+                    editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'True'})
+                    layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+                elif field['widgettype'] == 'check':
+                    config = {'CheckedState': 'true', 'UncheckedState': 'false'}
+                    editor_widget_setup = QgsEditorWidgetSetup('CheckBox', config)
+                    layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+                elif field['widgettype'] == 'datetime':
+                    config = {'allow_null': True,
+                              'calendar_popup': True,
+                              'display_format': 'yyyy-MM-dd',
+                              'field_format': 'yyyy-MM-dd',
+                              'field_iso_format': False}
+                    editor_widget_setup = QgsEditorWidgetSetup('DateTime', config)
+                    layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+                else:
+                    editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'True'})
+                    layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+
+
+
+    def refresh_canvas(self, **kwargs):
+        """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params) """
+        # Note: canvas.refreshAllLayers() mysteriously that leaves the layers broken
+        # self.canvas.refreshAllLayers()
+
+        all_layers = self.controller.get_layers()
+        for layer in all_layers:
+            layer.triggerRepaint()
 
 
     def show_message(self, **kwargs):
@@ -170,6 +281,46 @@ class NotifyFunctions(ParentAction):
 
         msg = f'<font color="{color}"><{bold}>{msg}</font>'
         QgsMessageLog.logMessage(msg, tab_name, level)
+
+
+    # Another used functions
+    def set_column_visibility(self, layer, col_name, hidden):
+        """ Hide selected fields according table config_api_form_fields.hidden """
+
+        config = layer.attributeTableConfig()
+        columns = config.columns()
+        for column in columns:
+            if column.name == str(col_name):
+                column.hidden = hidden
+                break
+        config.setColumns(columns)
+        layer.setAttributeTableConfig(config)
+
+
+    def set_column_multiline(self, layer, field, fieldIndex):
+        """ Set multiline selected fields according table config_api_form_fields.widgetcontrols['setQgisMultiline'] """
+
+        if field['widgettype'] == 'text':
+            if field['widgetcontrols'] and 'setQgisMultiline' in field['widgetcontrols']:
+                editor_widget_setup = QgsEditorWidgetSetup(
+                    'TextEdit', {'IsMultiline': field['widgetcontrols']['setQgisMultiline']})
+                layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+
+
+    def set_read_only(self, layer, field, field_index):
+        """ Set field readOnly according to client configuration into config_form_fields (field 'iseditable')"""
+
+        # Get layer config
+        config = layer.editFormConfig()
+        try:
+            # Set field editability
+            config.setReadOnly(field_index, not field['iseditable'])
+        except KeyError as e:
+            # Control if key 'iseditable' not exist
+            pass
+        finally:
+            # Set layer config
+            layer.setEditFormConfig(config)
 
 
     #  TODO unused functions atm
