@@ -825,11 +825,13 @@ class DaoController(object):
         if 'status' in json_result and json_result['status'] == 'Failed':
             self.manage_exception_api(json_result, sql, is_notify=is_notify)
             return False
-
-        # Layer styles
-        self.parent.manage_return_manager(json_result, sql)
-        self.parent.manage_layer_manager(json_result, sql)
-        self.parent.manage_actions(json_result, sql)
+        try:
+            # Layer styles
+            self.parent.manage_return_manager(json_result, sql)
+            self.parent.manage_layer_manager(json_result, sql)
+            self.parent.manage_actions(json_result, sql)
+        except AttributeError:
+            pass
 
         return json_result
 
