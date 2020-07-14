@@ -89,7 +89,7 @@ BEGIN
 	DELETE FROM selector_inp_result WHERE cur_user=current_user;
 	INSERT INTO selector_inp_result (result_id, cur_user) VALUES (v_result, current_user);
 	
-	RAISE NOTICE '3 - Fill inprpt tables';
+	RAISE NOTICE '3 - Fill temp tables';
 	PERFORM gw_fct_pg2epa_fill_data(v_result);
 	
 	RAISE NOTICE '4 - manage varcs';

@@ -11,6 +11,10 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_pg2epa_nod2arc_data(result_id_va
   RETURNS integer AS
 $BODY$
 
+/*
+SELECT  "SCHEMA_NAME".gw_fct_pg2epa_nod2arc_data('r1')
+*/
+
 DECLARE
     
 arc_rec record;
@@ -48,20 +52,20 @@ BEGIN
     SELECT * INTO rec FROM sys_version LIMIT 1;
 	
 	-- setting record_new_arc
-	SELECT * INTO record_new_arc FROM v_edit_arc LIMIT 1;
+	SELECT * INTO record_new_arc FROM temp_arc LIMIT 1;
     
     FOR rec_flowreg IN
-	SELECT rpt_inp_node.node_id, flwreg_id, to_arc, flwreg_length, 'ori'::text as flw_type FROM inp_flwreg_orifice JOIN rpt_inp_node ON rpt_inp_node.node_id=inp_flwreg_orifice.node_id  
-	JOIN selector_sector ON selector_sector.sector_id=rpt_inp_node.sector_id WHERE result_id=result_id_var 
+	SELECT temp_node.node_id, flwreg_id, to_arc, flwreg_length, 'ori'::text as flw_type FROM inp_flwreg_orifice JOIN temp_node ON temp_node.node_id=inp_flwreg_orifice.node_id  
+	JOIN selector_sector ON selector_sector.sector_id=temp_node.sector_id
 		UNION 
-	SELECT rpt_inp_node.node_id, flwreg_id,  to_arc, flwreg_length, 'out'::text as flw_type FROM inp_flwreg_outlet JOIN rpt_inp_node ON rpt_inp_node.node_id=inp_flwreg_outlet.node_id 
-	JOIN selector_sector ON selector_sector.sector_id=rpt_inp_node.sector_id WHERE result_id=result_id_var 		
+	SELECT temp_node.node_id, flwreg_id,  to_arc, flwreg_length, 'out'::text as flw_type FROM inp_flwreg_outlet JOIN temp_node ON temp_node.node_id=inp_flwreg_outlet.node_id 
+	JOIN selector_sector ON selector_sector.sector_id=temp_node.sector_id
 		UNION 
-	SELECT rpt_inp_node.node_id, flwreg_id,  to_arc, flwreg_length, 'pump'::text as flw_type FROM inp_flwreg_pump JOIN rpt_inp_node ON rpt_inp_node.node_id=inp_flwreg_pump.node_id 
-	JOIN selector_sector ON selector_sector.sector_id=rpt_inp_node.sector_id WHERE result_id=result_id_var
+	SELECT temp_node.node_id, flwreg_id,  to_arc, flwreg_length, 'pump'::text as flw_type FROM inp_flwreg_pump JOIN temp_node ON temp_node.node_id=inp_flwreg_pump.node_id 
+	JOIN selector_sector ON selector_sector.sector_id=temp_node.sector_id
 		UNION 
-	SELECT rpt_inp_node.node_id, flwreg_id, to_arc, flwreg_length, 'weir'::text as flw_type FROM inp_flwreg_weir 
-	JOIN rpt_inp_node ON rpt_inp_node.node_id=inp_flwreg_weir.node_id JOIN selector_sector ON selector_sector.sector_id=rpt_inp_node.sector_id WHERE result_id=result_id_var
+	SELECT temp_node.node_id, flwreg_id, to_arc, flwreg_length, 'weir'::text as flw_type FROM inp_flwreg_weir 
+	JOIN temp_node ON temp_node.node_id=inp_flwreg_weir.node_id JOIN selector_sector ON selector_sector.sector_id=temp_node.sector_id
 	ORDER BY node_id, to_arc DESC, flwreg_id ASC
 
 	LOOP
@@ -79,7 +83,7 @@ BEGIN
 			-- Right or left hand
 			odd_var = counter %2;
 	
-			IF (odd_var)=0 then 
+			IF (odd_var)=0 then
 				angle=(ST_Azimuth(ST_startpoint(nodarc_rec.the_geom), ST_endpoint(nodarc_rec.the_geom)))+1.57;
 			ELSE 
 				angle=(ST_Azimuth(ST_startpoint(nodarc_rec.the_geom), ST_endpoint(nodarc_rec.the_geom)))-1.57;
@@ -102,9 +106,9 @@ BEGIN
 
 			-- Geometry construction from pattern arc
 			-- intermediate variables
-			n1_geom = ST_LineInterpolatePoint(nodarc_rec.the_geom, 0.1);
-			n2_geom = ST_LineInterpolatePoint(nodarc_rec.the_geom, 0.9);
-			dist = (ST_Distance(ST_transform(ST_startpoint(nodarc_rec.the_geom),rec.epsg), ST_LineInterpolatePoint(nodarc_rec.the_geom, 0.2))); 
+			n1_geom = ST_LineInterpolatePoint(nodarc_rec.the_geom, 0.4);
+			n2_geom = ST_LineInterpolatePoint(nodarc_rec.the_geom, 0.6);
+			dist = (ST_Distance(ST_transform(ST_startpoint(nodarc_rec.the_geom),rec.epsg), ST_LineInterpolatePoint(nodarc_rec.the_geom, 0.3))); 
 
 			--create point1
 			yp1 = ST_y(n1_geom)-(cos(angle))*dist*0.1*(counter)::float;
@@ -112,8 +116,8 @@ BEGIN
 			p1_geom = ST_SetSRID(ST_MakePoint(xp1, yp1),rec.epsg);	
 
 			--create point2
-			yp2 = ST_y(n2_geom)-cos(angle)*dist*0.15*(counter)::float;
-			xp2 = ST_x(n2_geom)-sin(angle)*dist*0.15*(counter)::float;
+			yp2 = ST_y(n2_geom)-cos(angle)*dist*0.1*(counter)::float;
+			xp2 = ST_x(n2_geom)-sin(angle)*dist*0.1*(counter)::float;
 			p2_geom = ST_SetSRID(ST_MakePoint(xp2, yp2),rec.epsg);	
 
 
@@ -121,19 +125,19 @@ BEGIN
 			record_new_arc.the_geom=ST_makeline(ARRAY[ST_startpoint(nodarc_rec.the_geom), p1_geom, p2_geom, ST_endpoint(nodarc_rec.the_geom)]);
 	
 			-- Inserting into inp_rpt_arc
-			INSERT INTO rpt_inp_arc (result_id, arc_id, flw_code, node_1, node_2, epa_type, sector_id, arc_type, arccat_id, state, state_type, the_geom)
+			INSERT INTO temp_arc (result_id, arc_id, flw_code, node_1, node_2, epa_type, sector_id, arc_type, arccat_id, state, state_type, the_geom)
 			VALUES (result_id_var, record_new_arc.arc_id, record_new_arc.flw_code,record_new_arc.node_1, record_new_arc.node_2, record_new_arc.epa_type, 
 			record_new_arc.sector_id, record_new_arc.arc_type, record_new_arc.arccat_id, record_new_arc.state, record_new_arc.state_type, record_new_arc.the_geom);
 
 		ELSE
 
-			SELECT * INTO nodarc_rec FROM rpt_inp_arc WHERE arc_id=concat(rec_flowreg.node_id,rec_flowreg.to_arc) AND result_id=result_id_var;
+			SELECT * INTO nodarc_rec FROM temp_arc WHERE arc_id=concat(rec_flowreg.node_id,rec_flowreg.to_arc);
 			
 			-- updating flw_code
 			record_new_arc.flw_code=concat(rec_flowreg.node_id,'_',rec_flowreg.to_arc,'_',rec_flowreg.flw_type,'_',rec_flowreg.flwreg_id);
 
 			-- udpating the feature
-			UPDATE rpt_inp_arc SET flw_code=record_new_arc.flw_code, epa_type=epa_type_aux WHERE arc_id=nodarc_rec.arc_id;
+			UPDATE temp_arc SET flw_code=record_new_arc.flw_code, epa_type=epa_type_aux WHERE arc_id=nodarc_rec.arc_id;
 			counter :=1;
 	
 		END IF;
@@ -142,7 +146,7 @@ BEGIN
 
 		-- update values on node_2 when flow regulator it's a pump, fixing ysur as maximum as possible
 		IF rec_flowreg.flw_type='pump' THEN
-			UPDATE rpt_inp_node SET y0=0, ysur=9999 WHERE node_id=record_new_arc.node_2;
+			UPDATE temp_node SET y0=0, ysur=9999 WHERE node_id=record_new_arc.node_2;
 		END IF;
 		
     END LOOP;
