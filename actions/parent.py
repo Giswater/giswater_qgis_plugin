@@ -1192,7 +1192,7 @@ class ParentAction(object):
         return points
 
 
-    def draw(self, complet_result, zoom=True, reset_rb=True, color=QColor(255, 0, 0, 100), width=3):
+    def draw(self, complet_result, margin=None, reset_rb=True, color=QColor(255, 0, 0, 100), width=3):
 
         if complet_result['body']['feature']['geometry'] is None:
             return
@@ -1209,8 +1209,7 @@ class ParentAction(object):
         else:
             points = self.get_points(list_coord)
             self.draw_polyline(points, color, width)
-        if zoom:
-            margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
+        if margin is not None:
             self.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin)
 
 
@@ -1351,6 +1350,10 @@ class ParentAction(object):
             return
         srid = self.controller.plugin_settings_value('srid')
         try:
+            margin = 1
+            if 'zoom' in styles and 'margin' in styles['zoom']:
+                margin = styles['zoom']['margin']
+                
             if 'style' not in styles and 'ruberband' in styles['style']:
                 # Set default values
                 opacity = 100
@@ -1363,9 +1366,8 @@ class ParentAction(object):
                     color = QColor(color[0], color[1], color[2], opacity)
                 if 'width' in styles['style']['ruberband']:
                     width = styles['style']['ruberband']['width']
-                self.draw(json_result, color=color, width=width)
+                self.draw(json_result, margin, color=color, width=width)
             else:
-
                 for key, value in list(json_result['body']['data'].items()):
                     if key in ('point', 'line', 'polygon'):
                         if key not in json_result['body']['data']: continue
@@ -1416,6 +1418,7 @@ class ParentAction(object):
                             v_layer.renderer().symbol().setColor(color)
                             v_layer.renderer().symbol().setOpacity(opacity)
                         self.iface.layerTreeView().refreshLayerSymbology(v_layer.id())
+                        self.set_margin(v_layer, margin)
 
         except Exception as e:
             self.controller.manage_exception(None, f"{type(e).__name__}: {e}", sql)
@@ -1506,16 +1509,7 @@ class ParentAction(object):
                     self.iface.setActiveLayer(layer)
                     self.iface.zoomToActiveLayer()
                     margin = layermanager['zoom']['margin']
-                    extent = QgsRectangle()
-                    extent.setMinimal()
-                    extent.combineExtentWith(layer.extent())
-                    xmax = extent.xMaximum() + margin
-                    xmin = extent.xMinimum() - margin
-                    ymax = extent.yMaximum() + margin
-                    ymin = extent.yMinimum() - margin
-                    extent.set(xmin, ymin, xmax, ymax)
-                    self.iface.mapCanvas().setExtent(extent)
-                    self.iface.mapCanvas().refresh()
+                    self.set_margin(layer, margin)
                     if prev_layer:
                         self.iface.setActiveLayer(prev_layer)
 
@@ -1546,6 +1540,18 @@ class ParentAction(object):
 
         except Exception as e:
             self.controller.manage_exception(None, f"{type(e).__name__}: {e}", sql)
+
+    def set_margin(self, layer, margin):
+        extent = QgsRectangle()
+        extent.setMinimal()
+        extent.combineExtentWith(layer.extent())
+        xmax = extent.xMaximum() + margin
+        xmin = extent.xMinimum() - margin
+        ymax = extent.yMaximum() + margin
+        ymin = extent.yMinimum() - margin
+        extent.set(xmin, ymin, xmax, ymax)
+        self.iface.mapCanvas().setExtent(extent)
+        self.iface.mapCanvas().refresh()
 
 
     def create_qml(self, layer, style):

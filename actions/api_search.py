@@ -188,7 +188,9 @@ class ApiSearch(ApiParent):
                                    tab_type='data', is_add_schema=is_add_schema)
             if not complet_result:
                 return
-            self.draw(complet_result[0])
+
+            margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
+            self.draw(complet_result[0], margin)
             self.resetRubberbands()
 
         # Tab 'search'

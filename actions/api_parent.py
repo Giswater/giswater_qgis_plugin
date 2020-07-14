@@ -1044,7 +1044,7 @@ class ApiParent(ParentAction):
 
         self.canvas.setMapTool(ep)
         # We redraw the selected feature because self.canvas.setMapTool(emit_point) erases it
-        self.draw(complet_result[0], False, False)
+        self.draw(complet_result[0], None, False)
 
         # Store user snapping configuration
         self.snapper_manager = SnappingConfigManager(self.iface)
