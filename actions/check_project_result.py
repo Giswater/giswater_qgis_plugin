@@ -120,6 +120,7 @@ class CheckProjectResult(ApiParent):
         self.hide_void_groupbox(self.dlg_audit_project)
 
         if int(critical_level) > 0 or text_result:
+            print("TEST 10")
             self.dlg_audit_project.btn_accept.clicked.connect(partial(self.add_selected_layers))
             self.dlg_audit_project.chk_hide_form.stateChanged.connect(partial(self.update_config))
             self.open_dialog(self.dlg_audit_project, dlg_name='project_check')

@@ -1192,7 +1192,7 @@ class ParentAction(object):
         return points
 
 
-    def draw(self, complet_result, zoom=True, reset_rb=True, color=QColor(255, 0, 0, 100), width=3):
+    def draw(self, complet_result, margin=None, reset_rb=True, color=QColor(255, 0, 0, 100), width=3):
 
         if complet_result['body']['feature']['geometry'] is None:
             return
@@ -1209,8 +1209,7 @@ class ParentAction(object):
         else:
             points = self.get_points(list_coord)
             self.draw_polyline(points, color, width)
-        if zoom:
-            margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
+        if margin is not None:
             self.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin)
 
 
@@ -1356,6 +1355,7 @@ class ParentAction(object):
                 opacity = 100
                 width = 3
                 color = QColor(255, 0, 0, 125)
+                margin = 50
                 if 'transparency' in styles['style']['ruberband']:
                     opacity = styles['style']['ruberband']['transparency'] * 255
                 if 'color' in styles['style']['ruberband']:
@@ -1363,7 +1363,9 @@ class ParentAction(object):
                     color = QColor(color[0], color[1], color[2], opacity)
                 if 'width' in styles['style']['ruberband']:
                     width = styles['style']['ruberband']['width']
-                self.draw(json_result, color=color, width=width)
+                if 'zoom' in styles['style'] and 'margin' in styles['style']['zoom']:
+                    margin = styles['style']['zoom']['margin']
+                self.draw(json_result, margin, color=color, width=width)
             else:
 
                 for key, value in list(json_result['body']['data'].items()):

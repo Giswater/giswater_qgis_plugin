@@ -389,7 +389,7 @@ class ApiCF(ApiParent, QObject):
 
     def open_generic_form(self, complet_result):
 
-        self.draw(complet_result[0], zoom=False)
+        self.draw(complet_result[0])
         self.hydro_info_dlg = InfoGenericUi()
         self.load_settings(self.hydro_info_dlg)
         self.hydro_info_dlg.btn_close.clicked.connect(partial(self.close_dialog, self.hydro_info_dlg))
@@ -1655,7 +1655,9 @@ class ApiCF(ApiParent, QObject):
         if not complet_result:
             self.controller.log_info("FAIL open_relation")
             return
-        self.draw(complet_result[0])
+
+        margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
+        self.draw(complet_result[0], margin)
 
 
     """ FUNCTIONS RELATED WITH TAB CONNECTIONS """
@@ -1691,7 +1693,9 @@ class ApiCF(ApiParent, QObject):
         if not complet_result:
             self.controller.log_info("FAIL open_up_down_stream")
             return
-        self.draw(complet_result[0])
+
+        margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
+        self.draw(complet_result[0], margin)
 
 
     """ FUNCTIONS RELATED WITH TAB HYDROMETER"""
@@ -2565,7 +2569,8 @@ class ApiCF(ApiParent, QObject):
             self.controller.log_info("FAIL open_rpt_result")
             return
 
-        self.draw(complet_result[0])
+        margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
+        self.draw(complet_result[0], margin)
 
 
     """ FUNCTIONS RELATED WITH TAB PLAN """
@@ -2883,5 +2888,6 @@ class ApiCF(ApiParent, QObject):
             self.controller.log_info("FAIL open_node")
             return
 
-        self.draw(complet_result[0])
+        margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
+        self.draw(complet_result[0], margin)
 
