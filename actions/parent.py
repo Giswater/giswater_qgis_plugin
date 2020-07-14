@@ -1175,7 +1175,6 @@ class ParentAction(object):
         return points
 
 
-<<<<<<< HEAD
     def draw(self, complet_result, margin=None, reset_rb=True, color=QColor(255, 0, 0, 100), width=3):
 
         if complet_result['body']['feature']['geometry'] is None:
@@ -1209,6 +1208,7 @@ class ParentAction(object):
             rb = QgsRubberBand(self.canvas, 0)
         else:
             rb = self.rubber_point
+
         rb.setColor(color)
         rb.setWidth(width)
         rb.addPoint(point)
@@ -1217,7 +1217,8 @@ class ParentAction(object):
         if duration_time is not None:
             QTimer.singleShot(duration_time, self.resetRubberbands)
         return rb
-=======
+
+
     def hilight_feature_by_id(self, qtable, layer_name, field_id, width, index):
         """ Based on the received index and field_id, the id of the received field_id is searched within the table
          and is painted in red on the canvas """
@@ -1238,7 +1239,6 @@ class ParentAction(object):
             self.rubber_polygon.show()
         except AttributeError:
             pass
->>>>>>> release-3.4
 
 
     def draw_polyline(self, points, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
@@ -1264,13 +1264,12 @@ class ParentAction(object):
 
 
     def resetRubberbands(self):
+
         if self.rubber_polygon is not None:
             self.rubber_polygon.reset(2)
 
         if self.rubber_point is not None:
             self.rubber_point.reset(0)
-
-
 
 
     def restore_user_layer(self):
@@ -1547,7 +1546,9 @@ class ParentAction(object):
         except Exception as e:
             self.controller.manage_exception(None, f"{type(e).__name__}: {e}", sql)
 
+
     def set_margin(self, layer, margin):
+
         extent = QgsRectangle()
         extent.setMinimal()
         extent.combineExtentWith(layer.extent())
@@ -1561,6 +1562,7 @@ class ParentAction(object):
 
 
     def create_qml(self, layer, style):
+
         main_folder = os.path.join(os.path.expanduser("~"), self.controller.plugin_name)
         config_folder = main_folder + os.sep + "temp" + os.sep
         if not os.path.exists(config_folder):
@@ -1571,6 +1573,7 @@ class ParentAction(object):
         file.close()
         del file
         self.load_qml(layer, path_temp_file)
+
 
     def manage_actions(self, json_result, sql):
         """
@@ -1596,5 +1599,4 @@ class ParentAction(object):
                     self.controller.log_debug(f"{type(e).__name__}: {e}")
         except Exception as e:
             self.controller.manage_exception(None, f"{type(e).__name__}: {e}", sql)
-
 

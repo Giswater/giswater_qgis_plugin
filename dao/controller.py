@@ -1944,3 +1944,46 @@ class DaoController(object):
         except AttributeError:
             pass
 
+
+    def layer_manager(self, json_result):
+        """
+        Manage options for layers (active, visible, zoom and indexing)
+        :param json_result: Json result of a query (Json)
+        :return: None
+        """
+
+        try:
+            layermanager = json_result['body']['form']['layerManager']
+        except KeyError:
+            return
+        # Get a list of layers names force reload dataProvider of layer
+        if 'index' in layermanager:
+            for layer_name in layermanager['index']:
+                self.set_layer_index(layer_name)
+                layer = self.get_layer_by_tablename(layer_name)
+
+        # Get a list of layers names, but obviously it will stay active the last one
+        if 'active' in layermanager:
+            for layer_name in layermanager['active']:
+                layer = self.get_layer_by_tablename(layer_name)
+                if layer:
+                    self.iface.setActiveLayer(layer)
+
+        # Get a list of layers names and set visible
+        if 'visible' in layermanager:
+            for layer_name in layermanager['visible']:
+                layer = self.get_layer_by_tablename(layer_name)
+                if layer:
+                    self.set_layer_visible(layer)
+
+        # Get a list of layers names, but obviously remain zoomed to the last
+        if 'zoom' in layermanager:
+            for layer_name in layermanager['zoom']:
+                layer = self.get_layer_by_tablename(layer_name)
+                if layer:
+                    prev_layer = self.iface.activeLayer()
+                    self.iface.setActiveLayer(layer)
+                    self.iface.zoomToActiveLayer()
+                    if prev_layer:
+                        self.iface.setActiveLayer(prev_layer)
+
