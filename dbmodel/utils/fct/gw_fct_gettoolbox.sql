@@ -70,7 +70,7 @@ BEGIN
 		v_isepa = true;
 		v_epa_user = (SELECT result_id FROM rpt_cat_result WHERE cur_user=current_user LIMIT 1);
 		IF v_epa_user IS NULL THEN
-			v_epa_user = (SELECT id FROM rpt_cat_result LIMIT 1);
+			v_epa_user = (SELECT result_id FROM rpt_cat_result LIMIT 1);
 		END IF;
 	END IF;
 
