@@ -1353,7 +1353,7 @@ class ParentAction(object):
             margin = 1
             if 'zoom' in styles and 'margin' in styles['zoom']:
                 margin = styles['zoom']['margin']
-                
+
             if 'style' not in styles and 'ruberband' in styles['style']:
                 # Set default values
                 opacity = 100
@@ -1458,6 +1458,8 @@ class ParentAction(object):
                         self.controller.set_layer_visible(layer)
                     else:
                         layers_to_add += f'"{layer_name}", '
+                if 'zoom' in layermanager and layermanager['zoom'] not in (None, '', '{}'):
+                    layers_to_add += f'"{layermanager["zoom"]["layer"]}", '
 
                 layers_to_add = layers_to_add[:-2]
 
@@ -1501,7 +1503,7 @@ class ParentAction(object):
                 if layer:
                     self.iface.setActiveLayer(layer)
 
-            # Get a layer name and zoom to extent with a margin of 20
+            # Get a layer name and zoom to extent with a margin
             if 'zoom' in layermanager:
                 layer = self.controller.get_layer_by_tablename(layermanager['zoom']['layer'])
                 if layer:
@@ -1522,16 +1524,14 @@ class ParentAction(object):
                     layer = self.controller.get_layer_by_tablename(layer_name)
                     if layer:
                         QgsProject.instance().blockSignals(True)
-                        layer_settings = self.snapper_manager.snap_to_layer(layer, QgsPointLocator.All,
-                                                                            True)
+                        layer_settings = self.snapper_manager.snap_to_layer(layer, QgsPointLocator.All, True)
                         if layer_settings:
                             layer_settings.setType(2)
                             layer_settings.setTolerance(15)
                             layer_settings.setEnabled(True)
                         else:
                             layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 2, 15, 1)
-                        self.snapper_manager.snapping_config.setIndividualLayerSettings(layer,
-                                                                                        layer_settings)
+                        self.snapper_manager.snapping_config.setIndividualLayerSettings(layer, layer_settings)
                         QgsProject.instance().blockSignals(False)
                         QgsProject.instance().snappingConfigChanged.emit(
                             self.snapper_manager.snapping_config)
