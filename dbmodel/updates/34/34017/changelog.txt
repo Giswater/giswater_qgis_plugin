@@ -1,0 +1,3 @@
+3.4.017
+*************
+- Enhance grafanalytics function using config_valve table

@@ -7,17 +7,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
--- 2020/07/08
 
-ALTER TABLE sys_table ADD COLUMN addtoc json;
-
-
-CREATE TABLE SCHEMA_NAME.config_function
-(
-  id integer NOT NULL,
-  function_name text NOT NULL,
-  returnmanager json,
-  layermanager json,
-  actions json,
-  CONSTRAINT config_function_pkey PRIMARY KEY (id)
-);
+-- parent:
+ALTER TABLE config_mincut_valve RENAME TO config_valve;

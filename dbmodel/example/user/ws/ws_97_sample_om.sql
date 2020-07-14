@@ -222,5 +222,5 @@ UPDATE config_mincut_checkvalve SET active = TRUE;
  -- config_mincut_inlet
 UPDATE config_mincut_inlet SET active = TRUE;
 
- -- config_mincut_valve
-UPDATE config_mincut_valve SET active = TRUE;
+ -- config_valve
+UPDATE config_valve SET active = TRUE;

@@ -30,6 +30,8 @@ v_expl integer;
 v_updatemapzone integer;
 v_data json;
 v_paramupdate float;
+v_forceclose text;
+v_forceopen text;
 
 BEGIN
 
@@ -40,15 +42,19 @@ BEGIN
 	v_updatemapzone = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
 	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 	v_paramupdate = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'geomParamUpdate');
+	v_forceclose = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'forceClose');
+	v_forceopen = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'forceOpen');
 
+	-- control nulls;
 	IF v_paramupdate IS NULL THEN v_paramupdate = 5; END IF;
-	
 	IF v_updatemapzone IS NULL THEN
 		v_updatemapzone = 1;
 	END IF;
+	v_forceclose = COALESCE (v_forceclose, '[]');
+	v_forceopen = COALESCE (v_forceopen, '[]');
 
 	v_data = concat ('{"data":{"parameters":{"grafClass":"',v_class,'", "exploitation": [',v_expl,'], "updateFeature":"TRUE",
-	"updateMapZone":'||v_updatemapzone||', "geomParamUpdate":'||v_paramupdate||', "debug":"FALSE", "setVisibleLayers":[]}}}');
+	"updateMapZone":',v_updatemapzone,', "forceOpen":',v_forceopen,', "forceClose":',v_forceclose,', "geomParamUpdate":',v_paramupdate,', "debug":"FALSE", "setVisibleLayers":[]}}}');
 
 	RETURN gw_fct_grafanalytics_mapzones(v_data);
 

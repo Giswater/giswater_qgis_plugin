@@ -9,6 +9,8 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2020/07/14
 
+/*
+
 UPDATE sys_table SET (addtoc) = ('{"tableName":"v_edit_arc","primaryKey":"arc_id", "geom":"the_geom","group":"GW Temporal Layers","style":"qml"}')
 WHERE id ='v_edit_arc';
 
@@ -163,7 +165,10 @@ VALUES(2850,'gw_fct_pg2epa_check_options','{"style":{"line":{"style":"categorize
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
 VALUES(2430,'gw_fct_pg2epa_check_data','{"style":{"line":{"style":"categorized","field":"fid","width":2,"transparency":0.5,"values":[{"id":"104","color":[0,0,255]},{"id":"121","color":[200,200,200]}]},"point":{}}}', '{"zoom": {"layer":"v_edit_arc", "margin":20}}',NULL);
-/*
+
+
+
+
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
 VALUES(,'',NULL,NULL,NULL);
 
