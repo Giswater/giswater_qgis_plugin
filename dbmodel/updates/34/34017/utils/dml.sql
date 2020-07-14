@@ -9,6 +9,13 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2020/07/14
 
+update sys_function set input_params = null, return_type = null where id = 2718;
+
+UPDATE config_form_fields SET formtype = 'form_list_header' where formtype = 'listfilter';
+DELETE FROM config_typevalue WHERE id = 'listfilter';
+DELETE FROM config_typevalue WHERE id IN (select id FROM config_typevalue WHERE id = 'tabData' LIMIT 1);
+
+
 /*
 
 UPDATE sys_table SET (addtoc) = ('{"tableName":"v_edit_arc","primaryKey":"arc_id", "geom":"the_geom","group":"GW Temporal Layers","style":"qml"}')
