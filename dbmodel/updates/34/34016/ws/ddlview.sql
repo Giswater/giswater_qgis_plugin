@@ -89,10 +89,8 @@ CREATE OR REPLACE VIEW vu_node AS
 	node.adate,
 	node.adescript,
 	node.accessibility,
-    sector.stylesheet->>'featureColor' sector_color,
-    dma.stylesheet->>'featureColor' dma_color,
-    presszone.stylesheet->>'featureColor' presszone_color,
-    dqa.stylesheet->>'featureColor' dqa_color
+    dma.stylesheet->>'featureColor' AS dma_style,
+    presszone.stylesheet->>'featureColor' AS presszone_style
 	FROM node
 	 LEFT JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
 	 JOIN cat_feature ON cat_feature.id::text = cat_node.nodetype_id::text
@@ -186,10 +184,8 @@ CREATE OR REPLACE VIEW vu_arc AS
 	arc.depth,
 	arc.adate,
 	arc.adescript,
-    sector.stylesheet->>'featureColor' sector_color,
-    dma.stylesheet->>'featureColor' dma_color,
-    presszone.stylesheet->>'featureColor' presszone_color,
-    dqa.stylesheet->>'featureColor' dqa_color
+    dma.stylesheet->>'featureColor' AS dma_style,
+    presszone.stylesheet->>'featureColor' AS presszone_style
 	FROM arc
 	 LEFT JOIN sector ON arc.sector_id = sector.sector_id
 	 LEFT JOIN exploitation ON arc.expl_id = exploitation.expl_id
@@ -285,10 +281,8 @@ CREATE OR REPLACE VIEW vu_connec AS
 	connec.adate,
 	connec.adescript,
 	connec.accessibility,
-    sector.stylesheet->>'featureColor' sector_color,
-    dma.stylesheet->>'featureColor' dma_color,
-    presszone.stylesheet->>'featureColor' presszone_color,
-    dqa.stylesheet->>'featureColor' dqa_color
+    dma.stylesheet->>'featureColor' AS dma_style,
+    presszone.stylesheet->>'featureColor' AS presszone_style
     FROM connec
 	LEFT JOIN  (SELECT connec_1.connec_id, count(ext_rtc_hydrometer.id)::integer AS n_hydrometer
 				FROM selector_hydrometer, ext_rtc_hydrometer
