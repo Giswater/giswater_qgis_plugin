@@ -718,6 +718,7 @@ class MincutParent(ParentAction):
         elif result['body']['actions']['overlap'] == 'Ok':
             self.mincut_ok(result)
         self.iface.actionPan().trigger()
+        self.remove_selection()
 
 
     def force_mincut_overlap(self):

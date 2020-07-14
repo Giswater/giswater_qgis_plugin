@@ -112,7 +112,7 @@ class TaskGo2Epa(QgsTask):
 
     def cancel(self):
 
-        self.controller.log_info(f"Task canceled: {self.description()}")
+        self.controller.show_info(f"Task canceled: {self.description()}")
         self.close_file()
         super().cancel()
 
@@ -136,7 +136,7 @@ class TaskGo2Epa(QgsTask):
 
         self.complet_result = None
         self.setProgress(0)
-        extras = f', "resultId":"{self.result_name}"'
+        extras = f'"resultId":"{self.result_name}"'
         extras += f', "useNetworkGeom":"{self.net_geom}"'
         extras += f', "dumpSubcatch":"{self.export_subcatch}"'
         body = self.create_body(extras=extras)
@@ -154,11 +154,14 @@ class TaskGo2Epa(QgsTask):
 
     def export_to_inp(self):
 
+        if self.isCanceled():
+            return
+
         self.controller.log_info(f"Create inp file into POSTGRESQL")
 
         # Get values from complet_result['body']['file'] and insert into INP file
         if 'file' not in self.complet_result['body']:
-            return False
+            return
 
         self.fill_inp_file(self.file_inp, self.complet_result['body']['file'])
         self.message = self.complet_result['message']['text']
@@ -179,6 +182,9 @@ class TaskGo2Epa(QgsTask):
 
 
     def execute_epa(self):
+
+        if self.isCanceled():
+            return
 
         self.controller.log_info(f"Execute EPA software")
 

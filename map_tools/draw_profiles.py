@@ -343,6 +343,9 @@ class DrawProfiles(ParentMapTool):
                     self.dlg_draw_profile.btn_draw_profile.setEnabled(True)
                     self.dlg_draw_profile.btn_save_profile.setEnabled(True)
 
+                    # Clear old list arcs
+                    self.dlg_draw_profile.tbl_list_arc.clear()
+
                     # Populate list arcs
                     extras = f'"initNode":"{self.initNode}", "endNode":"{self.endNode}"'
                     body = self.create_body(extras=extras)

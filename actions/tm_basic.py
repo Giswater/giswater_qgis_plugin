@@ -980,9 +980,17 @@ class TmBasic(TmParentAction):
             partial(self.update_table, self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name))
         self.dlg_incident_manager.date_to.dateChanged.connect(
             partial(self.update_table, self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name))
+        self.dlg_incident_manager.btn_close.clicked.connect(partial(self.remove_selection))
+        self.dlg_incident_manager.rejected.connect(partial(self.remove_selection))
         self.dlg_incident_manager.tbl_incident.selectionModel().selectionChanged.connect(
             partial(self.enable_widget_x_qtable, self.dlg_incident_manager.tbl_incident,
                     self.dlg_incident_manager.btn_image, 'incident_foto'))
+        self.dlg_incident_manager.tbl_incident.selectionModel().selectionChanged.connect(
+            partial(self.enable_widget_x_qtable, self.dlg_incident_manager.tbl_incident,
+                    self.dlg_incident_manager.btn_process, 'status', value='1 - GENERADA'))
+        self.dlg_incident_manager.tbl_incident.selectionModel().selectionChanged.connect(
+            partial(self.enable_widget_x_qtable, self.dlg_incident_manager.tbl_incident,
+                    self.dlg_incident_manager.btn_discard, 'status', value='1 - GENERADA'))
 
         # Open form
         self.dlg_incident_manager.setWindowTitle("Incident Manager")
@@ -996,23 +1004,21 @@ class TmBasic(TmParentAction):
         visit_start = dialog.date_from.date()
         visit_end = dialog.date_to.date()
 
-        date_from = visit_start.toString('ddMMyyyy')
-        date_to = visit_end.toString('ddMMyyyy')
-
-        if date_from > date_to:
+        if visit_start > visit_end:
             message = "Selected date interval is not valid"
             self.controller.show_warning(message)
             return
 
-        expr_filter = f"1=1 "
 
         format_low = 'dd-MM-yyyy' + ' 00:00:00.000'
         format_high = 'dd-MM-yyyy' + ' 23:59:59.999'
         interval = "'" + str(visit_start.toString(format_low)) + "'::timestamp AND '" + str(
             visit_end.toString(format_high)) + "'::timestamp"
 
-        # expr_filter = " AND (incident_date BETWEEN " + str(interval) + ")"
+        expr_filter = " (incident_date BETWEEN " + str(interval) + ")"
 
+        if visit_id not in (None, 'null'):
+            expr_filter += " AND visit_id::text LIKE '%" + str(visit_id) + "%'"
         # if visit_id not in (None, '', 'null'): expr_filter += f" AND visit_id::text LIKE '%{visit_id}%'"
         if status_id:
             expr_filter += f" AND status ='{status_id}'"
@@ -1024,17 +1030,16 @@ class TmBasic(TmParentAction):
         # Set selection model
         self.dlg_incident_manager.tbl_incident.selectionModel().selectionChanged.connect(
             partial(self.enable_widget_x_qtable, self.dlg_incident_manager.tbl_incident,
-                    self.dlg_incident_manager.btn_image, 'incident_foto'))
+                    self.dlg_incident_manager.btn_image, 'incident_foto', value=True))
+        self.dlg_incident_manager.tbl_incident.selectionModel().selectionChanged.connect(
+            partial(self.enable_widget_x_qtable, self.dlg_incident_manager.tbl_incident,
+                    self.dlg_incident_manager.btn_process, 'status', value='1 - GENERADA'))
+        self.dlg_incident_manager.tbl_incident.selectionModel().selectionChanged.connect(
+            partial(self.enable_widget_x_qtable, self.dlg_incident_manager.tbl_incident,
+                    self.dlg_incident_manager.btn_discard, 'status', value='1 - GENERADA'))
 
 
     def fill_table_incident(self, qtable, table_name, expr_filter=None):
-
-        expr = None
-        if expr_filter:
-            # Check expression
-            (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
-            if not is_valid:
-                return expr
 
         # Set a model with selected filter expression
         if self.schema_name not in table_name:
@@ -1051,13 +1056,13 @@ class TmBasic(TmParentAction):
         if model.lastError().isValid():
             self.controller.show_warning(model.lastError().text())
         # Attach model to table view
-        if expr:
+        if expr_filter:
             qtable.setModel(model)
             qtable.model().setFilter(expr_filter)
         else:
             qtable.setModel(model)
 
-        return expr
+        return expr_filter
 
 
     def get_id_list(self):
@@ -1099,6 +1104,11 @@ class TmBasic(TmParentAction):
             sql = "SELECT id, name FROM cat_priority"
             rows = self.controller.get_rows(sql, add_empty_row=True)
             utils_giswater.set_item_data(self.dlg_incident_planning.priority_id, rows, 1)
+
+        # Set last campaign_id
+        campaign_id = self.controller.plugin_settings_value('incident_campaign_id')
+        if campaign_id is not None:
+            utils_giswater.set_combo_itemData(self.dlg_incident_planning.campaign_id, str(campaign_id), 0)
 
         # Get record selected
         selected_list = self.dlg_incident_manager.tbl_incident.selectionModel().selectedRows()
@@ -1150,6 +1160,10 @@ class TmBasic(TmParentAction):
 
             campaign_id = utils_giswater.get_item_data(
                 self.dlg_incident_planning, self.dlg_incident_planning.campaign_id, 0)
+
+            # Set last campaign_id
+            self.controller.plugin_settings_set_value('incident_campaign_id', campaign_id)
+
             work_id = utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.work_id, 0)
             priority_id = utils_giswater.get_item_data(
                 self.dlg_incident_planning, self.dlg_incident_planning.priority_id, 0)
@@ -1288,7 +1302,7 @@ class TmBasic(TmParentAction):
             self.controller.show_info(message)
 
 
-    def enable_widget_x_qtable(self, qtable, widget, column_name):
+    def enable_widget_x_qtable(self, qtable, widget, column_name, value):
 
         selected_list = qtable.selectionModel().selectedRows()
         if selected_list:
@@ -1296,8 +1310,9 @@ class TmBasic(TmParentAction):
 
             # Get object_id from selected row
             result = self.dlg_incident_manager.tbl_incident.model().record(row).value(column_name)
+
             # Set enabled
-            utils_giswater.setWidgetEnabled(self.dlg_incident_manager, widget, result)
-
-
-
+            if result == value:
+                utils_giswater.setWidgetEnabled(self.dlg_incident_manager, widget, True)
+            else:
+                utils_giswater.setWidgetEnabled(self.dlg_incident_manager, widget, False)

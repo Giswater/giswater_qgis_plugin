@@ -958,6 +958,11 @@ class Giswater(QObject):
         if self.project_type == 'ws':
             self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)
 
+        # Manage layers and check project
+        self.set_qgis_layers = True
+        if not self.manage_layers():
+            return
+
         # Manage records from table 'cat_feature'
         self.manage_feature_cat()
 
@@ -975,6 +980,11 @@ class Giswater(QObject):
 
         # Check roles of this user to show or hide toolbars
         self.controller.check_user_roles()
+
+        # Set project layers with gw_fct_getinfofromid: This process takes time for user
+        if self.set_qgis_layers is True:
+            self.get_layers_to_config()
+            self.set_layer_config(self.available_layers)
 
         # Create a thread to listen selected database channels
         if self.settings.value('system_variables/use_notify').upper() == 'TRUE':
@@ -1123,7 +1133,6 @@ class Giswater(QObject):
         self.tm_basic.set_tree_manage(self)
 
         # Manage actions of the different plugin_toolbars
-        self.manage_toolbars_common()
         self.manage_toolbars_tm()
 
         # Set actions to controller class for further management
@@ -1192,5 +1201,4 @@ class Giswater(QObject):
         self.controller.plugin_settings_set_value("gwAddSchema", self.qgis_project_add_schema)
         self.controller.plugin_settings_set_value("gwMainSchema", self.qgis_project_main_schema)
         self.controller.plugin_settings_set_value("gwProjectRole", self.qgis_project_role)
-
 

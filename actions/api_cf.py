@@ -389,7 +389,7 @@ class ApiCF(ApiParent, QObject):
 
     def open_generic_form(self, complet_result):
 
-        self.draw(complet_result[0])
+        self.draw(complet_result, zoom=False)
         self.hydro_info_dlg = InfoGenericUi()
         self.load_settings(self.hydro_info_dlg)
         self.hydro_info_dlg.btn_close.clicked.connect(partial(self.close_dialog, self.hydro_info_dlg))
@@ -1033,7 +1033,10 @@ class ApiCF(ApiParent, QObject):
                     self.new_feature.setAttribute(k, v)
                     _json.pop(k, None)
             self.layer_new_feature.updateFeature(self.new_feature)
-            self.layer_new_feature.commitChanges()
+
+            status = self.layer_new_feature.commitChanges()
+            if status is False:
+                return
 
             my_json = json.dumps(_json)
             if my_json == '' or str(my_json) == '{}':
@@ -1066,8 +1069,8 @@ class ApiCF(ApiParent, QObject):
             self.controller.show_message(msg, message_level=3)
             self.reload_fields(dialog, json_result, p_widget)
         elif "Failed" in json_result['status']:
-            msg = "FAIL"
-            self.controller.show_message(msg, message_level=2)
+            # If json_result['status'] is Failed message from database is showed user by get_json-->manage_exception_api
+            return
 
         if close_dialog:
             if self.controller.dlg_docker:

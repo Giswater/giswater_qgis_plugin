@@ -57,7 +57,6 @@ class DaoController(object):
         self.docker_type = None
         self.show_docker = None
         self.prev_maptool = None
-        self.parent = None
         self.gw_actions = None
         if create_logger:
             self.set_logger(logger_name)
@@ -824,14 +823,10 @@ class DaoController(object):
         # If failed, manage exception
         if 'status' in json_result and json_result['status'] == 'Failed':
             self.manage_exception_api(json_result, sql, is_notify=is_notify)
-            return False
-        try:
-            # Layer styles
-            self.parent.manage_return_manager(json_result, sql)
-            self.parent.manage_layer_manager(json_result, sql)
-            self.parent.manage_actions(json_result, sql)
-        except AttributeError:
-            pass
+            return json_result
+
+        # Manage options for layers (active, visible, zoom and indexing)
+        self.layer_manager(json_result)
 
         return json_result
 
@@ -1726,8 +1721,14 @@ class DaoController(object):
         self.log_warning(msg)
 
 
-    def manage_exception_db(self, description=None, sql=None, stack_level=2, stack_level_increase=0, filepath=None):
+    def manage_exception_db(self, exception=None, sql=None, stack_level=2, stack_level_increase=0, filepath=None):
         """ Manage exception in database queries and show information to the user """
+
+        show_exception_msg = True
+        if exception:
+            description = str(exception)
+            if 'unknown error' in description:
+                show_exception_msg = False
 
         try:
             stack_level += stack_level_increase
@@ -1741,16 +1742,19 @@ class DaoController(object):
             msg += f"File name: {file_name}\n"
             msg += f"Function name: {function_name}\n"
             msg += f"Line number: {function_line}\n"
-            if description:
-                msg += f"Description:\n {description}\n"
+            if exception:
+                msg += f"Description:\n{description}\n"
             if filepath:
-                msg += f"SQL file:\n {filepath}\n\n"
+                msg += f"SQL file:\n{filepath}\n\n"
             if sql:
-                msg += f"SQL:\n {sql}\n"
+                msg += f"SQL:\n{sql}\n"
 
             # Show exception message in dialog and log it
-            title = "Database error"
-            self.show_exceptions_msg(title, msg)
+            if show_exception_msg:
+                title = "Database error"
+                self.show_exceptions_msg(title, msg)
+            else:
+                self.log_warning("Exception message not shown to user")
             self.log_warning(msg, stack_level_increase=2)
 
         except Exception:
@@ -1765,7 +1769,7 @@ class DaoController(object):
         """
 
         if not pattern:
-            pattern = "File\sname:|Function\sname:|Line\snumber:|SQL:|SQL\sfile:|Detail:|Context:"
+            pattern = "File\sname:|Function\sname:|Line\snumber:|SQL:|SQL\sfile:|Detail:|Context:|Description"
         cursor = widget.textCursor()
         format = QTextCharFormat()
         format.setFontWeight(QFont.Bold)

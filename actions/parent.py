@@ -198,6 +198,7 @@ class ParentAction(object):
         :param selector_name: Name of the selector (String)
         :return: Name of the last tab used by the user (string)
         """
+
         tab_name = self.controller.plugin_settings_value(f"{dialog.objectName()}_{selector_name}")
         return tab_name
 
@@ -208,10 +209,13 @@ class ParentAction(object):
         :param tab_widget:  QTabWidget
         :param selector_name: Name of the selector (String)
         """
+
         index = tab_widget.currentIndex()
-        tab_name = tab_widget.widget(index).objectName()
-        dlg_name = dialog.objectName()
-        self.controller.plugin_settings_set_value(f"{dlg_name}_{selector_name}", tab_name)
+        tab = tab_widget.widget(index)
+        if tab:
+            tab_name = tab.objectName()
+            dlg_name = dialog.objectName()
+            self.controller.plugin_settings_set_value(f"{dlg_name}_{selector_name}", tab_name)
 
 
     def open_dialog(self, dlg=None, dlg_name=None, info=True, maximize_button=True, stay_on_top=True, title=None):
@@ -274,8 +278,8 @@ class ParentAction(object):
 
 
     def multi_row_selector(self, dialog, tableleft, tableright, field_id_left, field_id_right, name='name',
-                           hide_left=[0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
-                                  25, 26, 27, 28, 29, 30], hide_right=[1, 2, 3], aql=""):
+                           hide_left=[0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
+                                      23, 24, 25, 26, 27, 28, 29, 30], hide_right=[1, 2, 3], aql=""):
         """
         :param dialog:
         :param tableleft: Table to consult and load on the left side
@@ -444,27 +448,6 @@ class ParentAction(object):
         query_right += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
         self.fill_table_by_query(qtable_left, query_left)
         self.refresh_map_canvas()
-
-
-    def fill_table_psector(self, widget, table_name, set_edit_strategy=QSqlTableModel.OnManualSubmit):
-        """ Set a model with selected @table_name. Attach that model to selected table """
-
-        if self.schema_name not in table_name:
-            table_name = self.schema_name + "." + table_name
-
-        # Set model
-        self.model = QSqlTableModel()
-        self.model.setTable(table_name)
-        self.model.setEditStrategy(set_edit_strategy)
-        self.model.setSort(0, 0)
-        self.model.select()
-
-        # Check for errors
-        if self.model.lastError().isValid():
-            self.controller.show_warning(self.model.lastError().text())
-
-        # Attach model to table view
-        widget.setModel(self.model)
 
 
     def fill_table(self, widget, table_name, set_edit_strategy=QSqlTableModel.OnManualSubmit, expr_filter=None):
@@ -1016,7 +999,7 @@ class ParentAction(object):
         self.dlg_info.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_info))
         self.dlg_info.setWindowTitle(title)
         utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.txt_infolog, msg)
-        self.open_dialog(self.dlg_info, dlg_name='dialog_text')
+        self.open_dialog(self.dlg_info, dlg_name='dialog_text', title=title)
 
 
 
@@ -1192,6 +1175,7 @@ class ParentAction(object):
         return points
 
 
+<<<<<<< HEAD
     def draw(self, complet_result, margin=None, reset_rb=True, color=QColor(255, 0, 0, 100), width=3):
 
         if complet_result['body']['feature']['geometry'] is None:
@@ -1233,6 +1217,28 @@ class ParentAction(object):
         if duration_time is not None:
             QTimer.singleShot(duration_time, self.resetRubberbands)
         return rb
+=======
+    def hilight_feature_by_id(self, qtable, layer_name, field_id, width, index):
+        """ Based on the received index and field_id, the id of the received field_id is searched within the table
+         and is painted in red on the canvas """
+
+        self.resetRubberbands()
+        layer = self.controller.get_layer_by_tablename(layer_name)
+        if not layer: return
+
+        row = index.row()
+        column_index = utils_giswater.get_col_index_by_col_name(qtable, field_id)
+        _id = index.sibling(row, column_index).data()
+        feature = self.get_feature_by_id(layer, _id, field_id)
+        try:
+            geometry = feature.geometry()
+            self.rubber_polygon.setToGeometry(geometry, None)
+            self.rubber_polygon.setColor(QColor(255, 0, 0, 100))
+            self.rubber_polygon.setWidth(width)
+            self.rubber_polygon.show()
+        except AttributeError:
+            pass
+>>>>>>> release-3.4
 
 
     def draw_polyline(self, points, color=QColor(255, 0, 0, 100), width=5, duration_time=None):

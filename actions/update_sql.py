@@ -426,6 +426,13 @@ class UpdateSQL(ApiParent):
 
     def open_form_create_gis_project(self):
 
+        # Check if exist schema
+        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
+        if schema_name is None:
+            msg = "In order to create a qgis project you have to create a schema first ."
+            self.controller.show_info_box(msg)
+            return
+
         # Create GIS project dialog
         self.dlg_create_gis_project = MainGisProjectUi()
         self.load_settings(self.dlg_create_gis_project)
@@ -2161,7 +2168,7 @@ class UpdateSQL(ApiParent):
                    'Schema name: ' + schema_name + '\n' + ''
                    'Version: ' + self.project_version + ' \n' + ''
                    'EPSG: ' + str(self.project_epsg) + ' \n' + ''
-                   'Language: ' + str(self.project_epsg) + ' \n' + '')
+                   'Language: ' + str(self.project_language) + ' \n' + '')
 
             self.software_version_info.setText(msg)
 

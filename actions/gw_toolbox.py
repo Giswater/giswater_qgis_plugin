@@ -170,9 +170,15 @@ class GwToolBox(ApiParent):
 
         cur_user = self.controller.get_current_user()
         function_name = function[0]['functionname']
-        geom_type = self.controller.plugin_settings_value(f"{function_name}_{cur_user}_cmb_geom_type")
+        if dialog.cmb_geom_type.property('selectedId') in (None, '', 'NULL'):
+            geom_type = self.controller.plugin_settings_value(f"{function_name}_{cur_user}_cmb_geom_type")
+        else:
+            geom_type = dialog.cmb_geom_type.property('selectedId')
         utils_giswater.set_combo_itemData(dialog.cmb_geom_type, geom_type, 0)
-        layer = self.controller.plugin_settings_value(f"{function_name}_{cur_user}_cmb_layers")
+        if dialog.cmb_layers.property('selectedId') in (None, '', 'NULL'):
+            layer = self.controller.plugin_settings_value(f"{function_name}_{cur_user}_cmb_layers")
+        else:
+            layer = dialog.cmb_layers.property('selectedId')
         utils_giswater.set_combo_itemData(dialog.cmb_layers, layer, 0)
         if self.controller.plugin_settings_value(f"{function_name}_{cur_user}_rbt_previous") == 'true':
             dialog.rbt_previous.setChecked(True)
@@ -196,7 +202,10 @@ class GwToolBox(ApiParent):
                 else:
                     widget.setChecked(False)
             elif type(widget) is QComboBox:
-                value = self.controller.plugin_settings_value(f"{function_name}_{cur_user}_{widget.objectName()}")
+                if widget.property('selectedId') in (None, '', 'NULL'):
+                    value = self.controller.plugin_settings_value(f"{function_name}_{cur_user}_{widget.objectName()}")
+                else:
+                    value = widget.property('selectedId')
                 utils_giswater.set_combo_itemData(widget, value, 0)
             elif type(widget) in (QLineEdit, QSpinBox):
                 value = self.controller.plugin_settings_value(f"{function_name}_{cur_user}_{widget.objectName()}")

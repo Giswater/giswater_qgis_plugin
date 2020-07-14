@@ -45,7 +45,7 @@ class Master(ParentAction):
         self.dlg_psector_mng = PsectorManagerUi()
 
         self.load_settings(self.dlg_psector_mng)
-        table_name = "v_edit_plan_psector"
+        table_name = "v_ui_plan_psector"
         column_id = "psector_id"
 
         # Tables
@@ -65,7 +65,7 @@ class Master(ParentAction):
         self.dlg_psector_mng.txt_name.textChanged.connect(
             partial(self.filter_by_text, self.dlg_psector_mng, self.qtbl_psm, self.dlg_psector_mng.txt_name, table_name))
         self.dlg_psector_mng.tbl_psm.doubleClicked.connect(partial(self.charge_psector, self.qtbl_psm))
-        self.fill_table_psector(self.qtbl_psm, table_name)
+        self.fill_table(self.qtbl_psm, table_name)
         self.set_table_columns(self.dlg_psector_mng, self.qtbl_psm, table_name)
         self.set_label_current_psector(self.dlg_psector_mng)
 
@@ -90,8 +90,8 @@ class Master(ParentAction):
         message = "Values has been updated"
         self.controller.show_info(message)
 
-        self.fill_table(qtbl_psm, "plan_psector")
-        self.set_table_columns(dialog, qtbl_psm, "plan_psector")
+        self.fill_table(qtbl_psm, "v_ui_plan_psector")
+        self.set_table_columns(dialog, qtbl_psm, "v_ui_plan_psector")
         self.set_label_current_psector(dialog)
         self.open_dialog(dialog)
 
@@ -179,13 +179,18 @@ class Master(ParentAction):
             message = "Any record selected"
             self.controller.show_warning(message)
             return
-
+        cur_psector = self.controller.get_config('plan_psector_vdefault')
         inf_text = ""
         list_id = ""
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_ = widget.model().record(row).value(str(column_id))
-            inf_text += str(id_) + ", "
+            if cur_psector is not None and (str(id_) == str(cur_psector[0])):
+                message = ("You are trying to delete your current psector. "
+                           "Please, change your current psector before delete.")
+                self.show_exceptions_msg('Current psector', self.controller.tr(message))
+                return
+
             list_id += f"'{id_}', "
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
@@ -203,17 +208,6 @@ class Master(ParentAction):
                    f" WHERE {column_id} IN ({list_id});")
             self.controller.execute_sql(sql)
             widget.model().select()
-            self.clean_label(dialog, label, list_id, config_param)
-
-
-    def clean_label(self, dialog, label, list_id, config_param):
-        row = self.controller.get_config(config_param, sql_added=f" AND value IN ({list_id})")
-        if row is not None:
-            sql = (f"DELETE FROM config_param_user "
-                   f" WHERE parameter = '{config_param}' AND cur_user = current_user"
-                   f" AND value = '{row[0]}'")
-            self.controller.execute_sql(sql)
-            utils_giswater.setWidgetText(dialog, label, '')
 
 
     def master_estimate_result_manager(self):
@@ -282,7 +276,6 @@ class Master(ParentAction):
 
     def filter_merm(self, dialog, tablename):
         """ Filter rows from 'master_estimate_result_manager' dialog from selected tab """
-
         self.filter_by_text(dialog, dialog.tbl_om_result_cat, dialog.txt_name, tablename)
 
 
@@ -296,7 +289,7 @@ class Master(ParentAction):
         row = selected_list[0].row()
         psector_id = self.qtbl_psm.model().record(row).value("psector_id")
         self.duplicate_psector = DuplicatePsector(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.duplicate_psector.is_duplicated.connect(partial(self.fill_table_psector, self.qtbl_psm, 'plan_psector'))
+        self.duplicate_psector.is_duplicated.connect(partial(self.fill_table, self.qtbl_psm, 'v_ui_plan_psector'))
         self.duplicate_psector.is_duplicated.connect(partial(self.set_label_current_psector, self.dlg_psector_mng))
         self.duplicate_psector.manage_duplicate_psector(psector_id)
 
