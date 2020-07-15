@@ -434,8 +434,6 @@ class ManageWorkcatEnd(ParentManage):
     def close_dialog_workcat_list(self, dlg=None):
         """ Close dialog """
 
-        if dlg is None or type(dlg) is bool:
-            dlg = self.dlg
         try:
             self.save_settings(dlg)
             dlg.close()
