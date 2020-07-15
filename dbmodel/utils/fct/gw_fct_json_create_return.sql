@@ -42,11 +42,7 @@ BEGIN
 	p_data = gw_fct_json_object_set_key((p_data)::json, 'body', v_body);
 	
 	-- LAYER MANAGER
-	-- example how fill column layermanager : 	{"visible":["v_edit_arc","v_edit_node","v_edit_connec"],
-	--						"zoom":{"layer":"v_edit_arc","margin":200},
-	--						"index":["v_edit_arc","v_edit_node"],
-	--						"active":"v_edit_connec",
-	--						"snnaping":["v_edit_arc","v_edit_node"]}
+	
 	IF ((p_data->>'body')::json)->>'layerManager' IS NULL THEN
 		v_layermanager = (SELECT layermanager FROM config_function where id = p_fnumber);
 		v_layermanager = gw_fct_json_object_set_key((v_layermanager)::json, 'functionId', p_fnumber);

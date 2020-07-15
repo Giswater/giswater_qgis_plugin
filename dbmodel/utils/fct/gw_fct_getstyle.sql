@@ -47,8 +47,9 @@ BEGIN
 				v_value=gw_fct_json_object_set_key((v_value)::json, 'error', 'Layer '||v_layer||' cannot be added, maybe it is a configuration problem, check the table sys_table or add it manually.');
 				
 			end if;
-			if v_value->>'style' = 'qml' then
-				EXECUTE 'SELECT stylevalue from sys_style WHERE idval ='||quote_literal(v_funtion_id)||' AND styletype ='||quote_literal(v_layer)||''
+			if v_value->>'style' is NOT NULL then
+				EXECUTE 'SELECT stylevalue from sys_style WHERE idval ='||v_value->>'style'||''
+				--EXECUTE 'SELECT stylevalue from sys_style WHERE idval ='||quote_literal(v_funtion_id)||' AND styletype ='||quote_literal(v_layer)||''
 				into v_style;
 				if v_style is not null then			
 					v_value=gw_fct_json_object_set_key((v_value)::json, 'style', v_style);			
