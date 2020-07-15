@@ -1593,27 +1593,6 @@ class ApiParent(ParentAction):
         status = utils_giswater.isChecked(dialog, widget_all)
         index = dialog.main_tab.currentIndex()
         widget_list = dialog.main_tab.widget(index).findChildren(QCheckBox)
-        selector_type = dialog.main_tab.widget(index).property('selector_type')
-        widget_all = dialog.findChild(QCheckBox, f'chk_all_{selector_type}')
-
-        if key_modifier == Qt.ShiftModifier:
-            return
-        if status is True:
-            for widget in widget_list:
-                if widget == widget_all or widget.objectName() == widget_all.objectName():
-                    continue
-                widget.blockSignals(True)
-                utils_giswater.setChecked(dialog, widget, True)
-                self.set_selector(dialog, widget, False)
-                widget.blockSignals(False)
-        elif status is False:
-            for widget in widget_list:
-                if widget == widget_all or widget.objectName() == widget_all.objectName():
-                    continue
-                widget.blockSignals(True)
-                utils_giswater.setChecked(dialog, widget, False)
-                self.set_selector(dialog, widget, False)
-                widget.blockSignals(False)
 
         if key_modifier == Qt.ShiftModifier:
             return
@@ -1665,8 +1644,6 @@ class ApiParent(ParentAction):
             return False
 
         for form_tab in json_result['body']['form']['formTabs']:
-            if filter and form_tab['tabName'] != str(self.current_tab):
-                continue
 
             if filter and form_tab['tabName'] != str(current_tab):
                 continue
@@ -1705,7 +1682,6 @@ class ApiParent(ParentAction):
                     setattr(self, f"var_txt_filter_{form_tab['tabName']}", '')
                 else:
                     widget = utils_giswater.getWidget(dialog, 'txt_filter_' + str(form_tab['tabName']))
-
                 field['layoutname'] = gridlayout.objectName()
                 field['layoutorder'] = i
                 i = i + 1
@@ -1775,7 +1751,7 @@ class ApiParent(ParentAction):
         :param widget: QCheckBox that has changed status (QCheckBox)
         :param selection_mode: "keepPrevious", "keepPreviousUsingShift", "removePrevious" (String)
         """
-                             
+
         # Get QCheckBox check all
         index = dialog.main_tab.currentIndex()
         widget_list = dialog.main_tab.widget(index).findChildren(QCheckBox)
@@ -1848,6 +1824,7 @@ class ApiParent(ParentAction):
         json_result = self.controller.get_json('gw_fct_setselectors', body, log_sql=True)
 
         if str(tab_name) == 'tab_exploitation':
+            # Reload layer, zoom to layer, style mapzones and refresh canvas
             layer = self.controller.get_layer_by_tablename('v_edit_arc')
             if layer:
                 self.iface.setActiveLayer(layer)
@@ -1870,7 +1847,6 @@ class ApiParent(ParentAction):
 
 
     def manage_filter(self, dialog, widget, action):
-
         index = dialog.main_tab.currentIndex()
         tab_name = dialog.main_tab.widget(index).objectName()
         if action == 'save':
