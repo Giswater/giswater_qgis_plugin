@@ -56,7 +56,7 @@ class TmPlanningUnit(TmParentAction):
         self.geom_type = 'node'
         layer = self.controller.get_layer_by_tablename('v_edit_node')
         if not layer:
-            self.last_error = self.tr("Layer not found") + ": v_edit_node"
+            self.last_error = f"Layer not found: 'v_edit_node'"
             return None
         self.layers['node'] = [layer]
 
@@ -213,7 +213,7 @@ class TmPlanningUnit(TmParentAction):
         feature_id = utils_giswater.getWidgetText(dialog, qline)
         layer = self.controller.get_layer_by_tablename('v_edit_node')
         if not layer:
-            self.last_error = self.tr("Layer not found") + ": v_edit_node"
+            self.last_error = f"Layer not found: 'v_edit_node'"
             return None
 
         feature = self.get_feature_by_id(layer, feature_id, 'node_id')

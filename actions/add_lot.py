@@ -1860,10 +1860,9 @@ class AddNewLot(ParentManage):
         if not row:
             return
 
-        path = str(row[0])
-
         # Parse a URL into components
-        url = parse.urlsplit(path)
+        path = str(row[0])
+        url = urllib.parse.urlsplit(path)
 
         # Open selected image
         # Check if path is URL

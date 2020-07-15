@@ -5,6 +5,11 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+from PyQt5.QtWidgets import QTabWidget, QPushButton
+from qgis.core import QgsProject, QgsFeature, QgsGeometry, QgsVectorLayer, QgsField
+from qgis.PyQt.QtCore import QVariant
+from qgis.PyQt.QtGui import QColor
+
 import json
 import os
 import subprocess
@@ -269,3 +274,59 @@ class CrmTrace(ApiParent):
             my_group = root.insertGroup(0, 'GW Temporal Layers')
 
         my_group.insertLayer(0, virtual_layer)
+
+
+    def populate_info_text(self, dialog, data, force_tab=True, reset_text=True, tab_idx=1, disable_tabs=True):
+        """ Populate txt_infolog QTextEdit widget
+        :param dialog: QDialog
+        :param data: Json
+        :param force_tab: Force show tab (boolean)
+        :param reset_text: Reset(or not) text for each iteration (boolean)
+        :param tab_idx: index of tab to force (integer)
+        :param disable_tabs: set all tabs, except the last, enabled or disabled (boolean)
+        :return: Text received from data (String)
+        """
+
+        change_tab = False
+        text = utils_giswater.getWidgetText(dialog, dialog.txt_infolog, return_string_null=False)
+
+        if reset_text:
+            text = ""
+        for item in data['info']['values']:
+            if 'message' in item:
+                if item['message'] is not None:
+                    text += str(item['message']) + "\n"
+                    if force_tab:
+                        change_tab = True
+                else:
+                    text += "\n"
+
+        utils_giswater.setWidgetText(dialog, 'txt_infolog', text + "\n")
+        qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
+        if qtabwidget is not None:
+            if change_tab and qtabwidget is not None:
+                qtabwidget.setCurrentIndex(tab_idx)
+            if disable_tabs:
+                self.disable_tabs(dialog)
+
+        return text
+
+
+    def disable_tabs(self, dialog):
+        """ Disable all tabs in the dialog except the log one and change the state of the buttons
+        :param dialog: Dialog where tabs are disabled (QDialog)
+        :return:
+        """
+
+        qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
+        for x in range(0, qtabwidget.count() - 1):
+            qtabwidget.widget(x).setEnabled(False)
+
+        btn_accept = dialog.findChild(QPushButton, 'btn_accept')
+        if btn_accept:
+            btn_accept.hide()
+
+        btn_cancel = dialog.findChild(QPushButton, 'btn_cancel')
+        if btn_cancel:
+            utils_giswater.setWidgetText(dialog, btn_accept, 'Close')
+
