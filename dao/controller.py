@@ -826,10 +826,13 @@ class DaoController(object):
             self.manage_exception_api(json_result, sql, is_notify=is_notify)
             return json_result
 
-        # Layer styles
-        self.parent.manage_return_manager(json_result, sql)
-        self.parent.manage_layer_manager(json_result, sql)
-        self.parent.manage_actions(json_result, sql)
+        try:
+            # Layer styles
+            self.parent.manage_return_manager(json_result, sql)
+            self.parent.manage_layer_manager(json_result, sql)
+            self.parent.manage_actions(json_result, sql)
+        except Exception:
+            pass
 
         return json_result
 
