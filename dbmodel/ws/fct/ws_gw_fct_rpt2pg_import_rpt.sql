@@ -76,7 +76,7 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (140, v_result_id, concat('IMPORT RPT FILE'));
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (140, v_result_id, concat('-----------------------------'));
 	
-	UPDATE temp_csv SET fid = v_fid WHERE fid IS NULL AND cur_user=current_user;
+	UPDATE temp_csv SET fid = v_fid;
 	
 	--remove data from with the same result_id
 	FOR v_rpt IN SELECT tablename FROM config_fprocess WHERE fid=v_fid EXCEPT SELECT tablename FROM config_fprocess WHERE tablename='rpt_cat_result' LOOP

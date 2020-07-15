@@ -65,7 +65,7 @@ BEGIN
 	END LOOP;
 
 
-	FOR rpt_rec IN SELECT * FROM temp_csv WHERE cur_user=current_user AND fid = v_fid order by id
+	FOR rpt_rec IN SELECT * FROM temp_csv order by id
 	LOOP
 
 		IF (SELECT tablename FROM config_fprocess WHERE target=concat(rpt_rec.csv1,' ',rpt_rec.csv2) AND fid=v_fid) IS NOT NULL THEN

@@ -145,7 +145,7 @@ BEGIN
 		select id, concat(rpad(csv1,18),' ',rpad(csv2,18),' ', rpad(csv3,18),' ',rpad(csv4,18),' ',rpad(csv5,18),' ',rpad(csv6,18),' ',rpad(csv7,18),' ',
 		rpad(csv8,18),' ',rpad(csv9,18),' ',rpad(csv10,18),' ',rpad(csv11,18),' ',rpad(csv12,18),' ',rpad(csv13,18),' ',rpad(csv14,18),' ',rpad(csv15,18),' ',
 		rpad(csv15,18),' ',rpad(csv16,18),' ',rpad(csv17,18),' ', rpad(csv18,18), ' ', rpad(csv19,18),' ',rpad(csv20,18)) as text
-		from temp_csv where fid  = 141 and cur_user = current_user and source not in ('header','vi_controls','vi_rules', 'vi_backdrop')
+		from temp_csv where source not in ('header','vi_controls','vi_rules', 'vi_backdrop')
 		order by id)a )row;
 	
 	RETURN v_return;
