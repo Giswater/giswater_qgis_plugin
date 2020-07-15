@@ -26,25 +26,6 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
         self.layers_added = []
 
 
-    def check_for_layers(self):
-
-        self.needed_layers = {"v_anl_flow_node": {"field_cat": "context", "field_id": "id", "size": 2, "color_values": {'Flow exit': QColor(235, 74, 117), 'Flow trace': QColor(235, 167, 48)}},
-                              "v_anl_flow_gully": {"field_cat": "context", "field_id": "gully_id", "size": 2, "color_values": {'Flow exit': QColor(235, 74, 117), 'Flow trace': QColor(235, 167, 48)}},
-                              "v_anl_flow_connec": {"field_cat": "context", "field_id": "connec_id", "size": 2, "color_values": {'Flow exit': QColor(235, 74, 117), 'Flow trace': QColor(235, 167, 48)}},
-                              "v_anl_flow_arc": {"field_cat": "context", "field_id": "id", "size": 0.86, "color_values": {'Flow exit': QColor(235, 74, 117), 'Flow trace': QColor(235, 167, 48)}}}
-
-        self.add_layer = AddLayer(self.iface, self.settings, self.controller, self.plugin_dir)
-        for layer_name, values in self.needed_layers.items():
-            layer = self.controller.get_layer_by_tablename(layer_name)
-            if not layer:
-                self.add_layer.from_postgres_to_toc(layer_name, field_id=values['field_id'])
-                layer = self.controller.get_layer_by_tablename(layer_name)
-                self.layers_added.append(layer)
-                self.add_layer.categoryze_layer(layer, values['field_cat'], values['size'], values['color_values'], [
-                                                'Flow exit', 'Flow trace'])
-                self.controller.set_layer_visible(layer, False)
-
-
     """ QgsMapTools inherited event functions """
 
     def canvasMoveEvent(self, event):
@@ -78,17 +59,6 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
             result = self.controller.get_json(function_name, body, log_sql=True)
             if not result:
                 return
-
-            for layer_name in result['body']['data']['setVisibleLayers']:
-                layer = self.controller.get_layer_by_tablename(layer_name)
-                if layer:
-                    self.controller.set_layer_visible(layer)
-                    if layer in self.layers_added:
-                        values = self.needed_layers[layer.name()]
-                        self.add_layer.categoryze_layer(
-                            layer, values['field_cat'], values['size'], values['color_values'])
-
-            self.layers_added = []
 
             # Refresh map canvas
             self.refresh_map_canvas()
@@ -129,7 +99,6 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
             else:
                 message = "Select a node and click on it, the downstream nodes are computed"
             self.controller.show_info(message)
-        self.check_for_layers()
 
         # Control current layer (due to QGIS bug in snapping system)
         if self.canvas.currentLayer() is None:
