@@ -39,30 +39,25 @@ TO EXECUTE
 ----------
 
 -- QUERY SAMPLE
+----------------
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation": "[1]", "macroExploitation": "[1]", "checkData":false, "updateFeature":"TRUE", 
-"updateMapZone":2, "geomParamUpdate":15,"debug":"false", "usePsector":true, "forceOpen":[1,2,3], "forceClose":"[2,3,4]"}}}');
+"updateMapZone":2, "geomParamUpdate":15,"debug":"false", "usePlanPsector":false, "forceOpen":[1,2,3], "forceClosed":"[2,3,4]"}}}');
+----------------
 
 --SECTOR
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "node":"113952", "updateFeature":TRUE}}}');
 SELECT count(*), log_message FROM audit_log_data WHERE fid=130 AND cur_user=current_user group by log_message order by 2 --SECTOR
 SELECT sector_id, count(sector_id) from v_edit_arc group by sector_id order by 1;
 
 -- DMA
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation": "[1]", "checkData": false,"updateFeature":"TRUE", "updateMapZone":2, "geomParamUpdate":15,"debug":"false", "forceOpen":[1,2,3], "forceClose":"[2,3,4]"}}}');
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "node":"1046", "updateFeature":"TRUE", "updateMapZone":2,"concaveHullParam":0.85,"debug":"false"}}}');
 SELECT count(*), log_message FROM audit_log_data WHERE fid=145 AND cur_user=current_user group by log_message order by 2 --DMA
 SELECT dma_id, count(dma_id) from v_edit_arc  group by dma_id order by 1;
 UPDATE arc SET dma_id=0
 
 -- DQA
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DQA", "exploitation": "[1,2]", "checkData": false,"updateFeature":"TRUE", "updateMapZone":2 , "geomParamUpdate":15, "debug":"false"}}}');
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DQA", "node":"113952", "updateFeature":TRUE}}}');
 SELECT count(*), log_message FROM audit_log_data WHERE fid=144 AND cur_user=current_user group by log_message order by 2 --DQA
 SELECT dqa_id, count(dma_id) from v_edit_arc  group by dqa_id order by 1;
 
 -- PRESZZONE
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"PRESSZONE","exploitation":"[1]", "checkData": false, "updateFeature":"TRUE", "updateMapZone":2, "geomParamUpdate":15,"debug":"false"}}}');
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"PRESSZONE", "node":"113952", "updateFeature":TRUE}}}');
 SELECT count(*), log_message FROM audit_log_data WHERE fid=48 AND cur_user=current_user group by log_message order by 2 --PZONE
 SELECT presszone_id, count(presszone_id) from v_edit_arc  group by presszone_id order by 1;
 
@@ -168,7 +163,7 @@ BEGIN
 	v_geomparamupdate = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'geomParamUpdate');
 	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 	v_macroexpl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'macroExploitation');
-	v_usepsector = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'usePsector');
+	v_usepsector = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'usePlanPsector');
 	v_debug = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'debug');
 	v_checkdata = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'checkData');
 	v_parameters = (SELECT ((p_data::json->>'data')::json->>'parameters'));
@@ -274,6 +269,23 @@ BEGIN
 			DELETE FROM selector_expl WHERE cur_user=current_user;
 			INSERT INTO selector_expl (expl_id, cur_user) 
 			SELECT expl_id, current_user FROM exploitation WHERE expl_id IN	(SELECT (json_array_elements_text(v_expl))::integer);
+		END IF;
+
+		IF v_macroexpl IS NOT NULL THEN
+			DELETE FROM selector_expl WHERE cur_user=current_user;
+			INSERT INTO selector_expl (expl_id, cur_user) 
+			SELECT expl_id, current_user FROM exploitation WHERE macroexpl_id IN (SELECT (json_array_elements_text(v_macroexpl))::integer);
+		END IF;
+
+		IF v_usepsector IS NOT TRUE THEN
+		
+			-- save psector selector 
+			DELETE FROM temp_table WHERE fid=199 AND cur_user=current_user;
+			INSERT INTO temp_table (fid, text_column)
+			SELECT 199, (array_agg(psector_id)) FROM selector_psector WHERE cur_user=current_user;
+
+			-- set psector selector
+			DELETE FROM selector_psector WHERE cur_user=current_user;
 		END IF;
 
 		-- start build log message
@@ -384,8 +396,8 @@ BEGIN
 
 
 			-- close custom nodes acording init parameters
-			UPDATE temp_anlgraf SET flag = 1 WHERE node_1 IN (SELECT json_array_elements_text((v_parameters->>'forceClose')::json));
-			UPDATE temp_anlgraf SET flag = 1 WHERE node_2 IN (SELECT json_array_elements_text((v_parameters->>'forceClose')::json));
+			UPDATE temp_anlgraf SET flag = 1 WHERE node_1 IN (SELECT json_array_elements_text((v_parameters->>'forceClosed')::json));
+			UPDATE temp_anlgraf SET flag = 1 WHERE node_2 IN (SELECT json_array_elements_text((v_parameters->>'forceClosed')::json));
 
 			-- open custom nodes acording init parameters
 			UPDATE temp_anlgraf SET flag = 0 WHERE node_1 IN (SELECT json_array_elements_text((v_parameters->>'forceOpen')::json));
@@ -649,6 +661,14 @@ BEGIN
 			END IF;
 		END IF;
 	END IF;
+
+	-- restore state selector (if it's needed)
+	IF v_usepsector IS NOT TRUE THEN
+		INSERT INTO selector_psector (psector_id, cur_user)
+		select unnest(text_column::integer[]), current_user from temp_table where fid=199 and cur_user=current_user
+		ON CONFLICT (psector_id, cur_user) DO NOTHING;
+	END IF;
+	
 	-- insert spacers on log
 	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  3, '');
 	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  2, '');
