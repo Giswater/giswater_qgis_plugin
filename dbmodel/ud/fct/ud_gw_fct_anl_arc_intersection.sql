@@ -108,13 +108,13 @@ BEGIN
 	v_result_line := COALESCE(v_result_line, '{}'); 
 
 	--  Return
-	RETURN ('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
+	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 				'"line":'||v_result_line||','||
 				'"setVisibleLayers":[]'||
 		       '}}'||
-	    '}')::json; 
+	    '}')::json, 2202); 
 
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;

@@ -178,11 +178,11 @@ BEGIN
 
 	
 	--  Return
-	RETURN ('{"status":"Accepted", "message":{"level":1, "text":"Mapzones dynamic analysis done succesfully"}, "version":"'||v_version||'"'||
+	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Mapzones dynamic analysis done succesfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}, "data":{ "info":'||v_result_info||','||
 					  '"line":'||v_result_line||','||
 					  '"setVisibleLayers":[]'||
-					  '}}}')::json;
+					  '}}}')::json, 2772);
 
 	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN

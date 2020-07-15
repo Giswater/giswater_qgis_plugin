@@ -104,7 +104,7 @@ BEGIN
 		-- generic: todo
 	END IF;
 
-	RETURN v_rectgeometry;
+	RETURN gw_fct_json_create_return(v_rectgeometry, 2584);
 	
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN 

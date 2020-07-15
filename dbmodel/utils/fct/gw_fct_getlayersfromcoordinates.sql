@@ -216,12 +216,12 @@ BEGIN
 	fields := COALESCE(fields, '[]');    
 
 	-- Return
-	RETURN ('{"status":"Accepted", "version":'||v_version||
+	RETURN gw_fct_json_create_return(('{"status":"Accepted", "version":'||v_version||
              ',"body":{"message":{"level":1, "text":"This is a test message"}'||
 			',"form":{}'||
 			',"feature":{}'||
 			',"data":{"layersNames":' || fields ||'}}'||
-	    '}')::json;
+	    '}')::json, 2590);
 
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN 

@@ -133,13 +133,13 @@ BEGIN
 	v_result_point := COALESCE(v_result_point, '{}'); 
 
 	-- Return
-	RETURN ('{"status":"Accepted", "message":{"level":1, "text":"This is a test message"}, "version":"'||v_version||'"'||
+	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"This is a test message"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 				'"point":'||v_result_point||','||
 				'"setVisibleLayers":[]'||
 			'}}'||
-	    '}')::json;
+	    '}')::json, 2118);
 	
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN 

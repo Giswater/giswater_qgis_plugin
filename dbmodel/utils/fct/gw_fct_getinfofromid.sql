@@ -592,7 +592,7 @@ BEGIN
 
 	--    Return
 	-----------------------
-	RETURN ('{"status":"'||v_status||'", "message":'||v_message||', "apiVersion":' || v_version ||
+	RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":'||v_message||', "apiVersion":' || v_version ||
 	      ',"body":{"form":' || v_forminfo ||
 		     ', "toggledition":'|| v_toggledition ||
 		     ', "feature":'|| v_featureinfo ||
@@ -601,7 +601,7 @@ BEGIN
 			      ',"fields":' || v_fields || 
 			      '}'||
 			'}'||
-		'}')::json;
+		'}')::json, 2582);
 
 	-- Exception handling
 	-- EXCEPTION WHEN OTHERS THEN

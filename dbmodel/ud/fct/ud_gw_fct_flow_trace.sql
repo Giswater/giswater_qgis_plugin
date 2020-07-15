@@ -78,7 +78,7 @@ BEGIN
 		v_result_point = '{"geometryType":"", "features":[]}';
 
 		--  Return
-		RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
+		RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
 				   ',"body":{"form":{}'||
 				   ',"data":{ "info":'||v_result_info||','||
 					  '"setVisibleLayers":["v_anl_flow_arc","v_anl_flow_node","v_anl_flow_connec","v_anl_flow_gully"]'||','||
@@ -86,7 +86,7 @@ BEGIN
 					  '"line":'||v_result_line||','||
 					  '"polygon":'||v_result_polygon||'}'||
 					 '}'
-			  '}')::json;
+			  '}')::json, 2218);
 	ELSE 
 		RETURN v_result_json;
 	END IF;

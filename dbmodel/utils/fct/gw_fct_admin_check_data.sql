@@ -265,7 +265,7 @@ BEGIN
 	v_result_info := COALESCE(v_result_info, '{}'); 
 
 	-- Return
-	RETURN ('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
+	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
 			 ',"body":{"form":{}'||
 			 ',"data":{ "info":'||v_result_info||','||
 				'"setVisibleLayers":[]'||','||
@@ -273,7 +273,7 @@ BEGIN
 				'"line":{"geometryType":"", "values":[]}'||','||
 				'"polygon":{"geometryType":"", "values":[]}'||
 			   '}}'||
-		'}')::json;
+		'}')::json, 2776);
 
 END;
 $BODY$

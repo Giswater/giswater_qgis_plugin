@@ -368,7 +368,7 @@ BEGIN
 	v_result_polygon := COALESCE(v_result_polygon, '{}'); 
 	
 	-- Return
-	RETURN ('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
+	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 		     	'"setVisibleLayers":[]'||','||
@@ -376,7 +376,7 @@ BEGIN
 				'"line":'||v_result_line||','||
 				'"polygon":'||v_result_polygon||'}'||
 		       '}'||
-	    '}')::json;
+	    '}')::json, 2790);
 
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN

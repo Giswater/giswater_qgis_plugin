@@ -78,7 +78,7 @@ BEGIN
 	v_fields := COALESCE(v_fields, '{}');
 
 	-- Return
-    RETURN ('{"status":"'||v_status||'", "message":'||v_message||', "version":' || v_apiversion ||
+    RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":'||v_message||', "version":' || v_apiversion ||
 	      ',"body":{"form":' || v_forminfo ||
 		     ', "feature":'|| v_featureinfo ||
 		      ',"data":{"linkPath":' || v_linkpath ||
@@ -86,7 +86,7 @@ BEGIN
 			      ',"fields":' || v_fields || 
 			      '}'||
 			'}'||
-		'}')::json;
+		'}')::json, 2824);
 
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN 

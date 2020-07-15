@@ -755,13 +755,13 @@ BEGIN
 	v_result_line := COALESCE(v_result_line, '{}'); 
 
 	--  Return
-	RETURN  ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
+	RETURN  gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}, "data":{ "info":'||v_result_info||','||
 					  '"setVisibleLayers":["'||v_visible_layer||'"],'||
   					  '"setStyle":"Mapzones",'||
 					  '"point":'||v_result_point||','||
 					  '"line":'||v_result_line||
-					  '}}}')::json;
+					  '}}}')::json, 2710);
 
 	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN

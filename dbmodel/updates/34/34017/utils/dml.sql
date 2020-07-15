@@ -48,37 +48,59 @@ WHERE id ='v_anl_flow_node';
 
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2431,'gw_fct_pg2epa_check_data', {"style":{"point":{"style":"random","field":"fid","width":2,"transparency":0.5}},"line":{"style":"random","field":"fid","width":2,"transparency":0.5}}, NULL, NULL);
+VALUES(2431,'gw_fct_pg2epa_check_data', '{"style":{"point":{"style":"random","field":"fid","width":2,"transparency":0.5}},
+"line":{"style":"random","field":"fid","width":2,"transparency":0.5},
+"polygon":{"style":"random","field":"fid","width":2,"transparency":0.5}}', NULL, NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2914,'gw_fct_anl_node_proximity', '{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, "line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}', NULL, NULL);
+VALUES(2914,'gw_fct_anl_node_proximity', '{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}', NULL, NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2858,'gw_fct_pg2epa_check_result',{"style":{"point":{"style":"random","field":"fid","width":2,"transparency":0.5}},"line":{"style":"random","field":"fid","width":2,"transparency":0.5}},NULL,NULL);
+VALUES(2858,'gw_fct_pg2epa_check_result','{"style":{"point":{"style":"random","field":"fid","width":2,"transparency":0.5}},
+"line":{"style":"random","field":"fid","width":2,"transparency":0.5},
+"polygon":{"style":"random","field":"fid","width":2,"transparency":0.5}}',NULL,NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2860,'gw_fct_pg2epa_check_options',{"style":{"point":{"style":"random","field":"fid","width":2,"transparency":0.5}},"line":{"style":"random","field":"fid","width":2,"transparency":0.5}},"point":{}}}',NULL,NULL);
+VALUES(2860,'gw_fct_pg2epa_check_options','{"style":{"point":{"style":"random","field":"fid","width":2,"transparency":0.5}},
+"line":{"style":"random","field":"fid","width":2,"transparency":0.5},
+"polygon":{"style":"random","field":"fid","width":2,"transparency":0.5}}',NULL,NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2772,'gw_fct_grafanalytics_flowtrace','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, "line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
+VALUES(2772,'gw_fct_grafanalytics_flowtrace','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2790,'gw_fct_grafanalytics_check_data','{"style":{"line":{"style":"categorized","field":"fid","width":2,"transparency":0.5,"values":[{"id":"104","color":[0,0,255]},{"id":"121","color":[200,200,200]}]},"point":{}}}',NULL,NULL);
+VALUES(2790,'gw_fct_grafanalytics_check_data','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2102,'gw_fct_anl_arc_no_startend_node','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, "line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
+VALUES(2102,'gw_fct_anl_arc_no_startend_node','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2104,'gw_fct_anl_arc_same_startend','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, "line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
+VALUES(2104,'gw_fct_anl_arc_same_startend','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2106,'gw_fct_anl_connec_duplicated','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, "line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
+VALUES(2106,'gw_fct_anl_connec_duplicated','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2108,'gw_fct_anl_node_duplicated','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, "line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
+VALUES(2108,'gw_fct_anl_node_duplicated','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2110,'gw_fct_anl_node_orphan','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, "line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
+VALUES(2110,'gw_fct_anl_node_orphan','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
 VALUES(2112,'gw_fct_arc_fusion',NULL,'{"visible": ["v_edit_arc", "v_edit_node"],"index": ["v_edit_node" ]}',NULL);
@@ -87,25 +109,37 @@ INSERT INTO config_function (id, function_name, returnmanager, layermanager, act
 VALUES(2114,'gw_fct_arc_divide',NULL,'{"visible": ["v_edit_arc", "v_edit_node"],"index": ["v_edit_node" ]}',NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2124,'gw_fct_connect_to_network',NULL,'{"visible": ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_arc", "v_edit_gully", "v_edit_link"]',NULL);
+VALUES(2124,'gw_fct_connect_to_network',NULL,'{"visible": ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_arc", "v_edit_gully", "v_edit_link"]}',NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2202,'gw_fct_anl_arc_intersection','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, "line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
+VALUES(2202,'gw_fct_anl_arc_intersection','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2204,'gw_fct_anl_arc_inverted','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, "line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
+VALUES(2204,'gw_fct_anl_arc_inverted','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2206,'gw_fct_anl_node_exit_upper_intro','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, "line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
+VALUES(2206,'gw_fct_anl_node_exit_upper_intro','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2208,'gw_fct_anl_node_flowregulator','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, "line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
+VALUES(2208,'gw_fct_anl_node_flowregulator','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2210,'gw_fct_anl_node_sink','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, "line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
+VALUES(2210,'gw_fct_anl_node_sink','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}', NULL,NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2212,'gw_fct_anl_node_topological_consistency','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, "line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
+VALUES(2212,'gw_fct_anl_node_topological_consistency','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}', NULL,NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
 VALUES(2214,'gw_fct_flow_exit','{"style":{"point":{"style":"qml", "id":"2214"},  "line":{"style":"qml", "id":"2214"}}}','{"visible": ["v_anl_flow_node", "v_anl_flow_gully", "v_anl_flow_connec", "v_anl_flow_arc"]}',NULL);
@@ -117,10 +151,14 @@ INSERT INTO config_function (id, function_name, returnmanager, layermanager, act
 VALUES(2244,'gw_fct_mincut_result_overlap','{"style":{"point":{"style":"qml", "id":"2244"},  "line":{"style":"qml", "id":"2244"}}}',NULL,NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2302,'gw_fct_anl_node_topological_consistency','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, "line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
+VALUES(2302,'gw_fct_anl_node_topological_consistency','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2436,'gw_fct_plan_check_data','{"style":{"line":{"style":"categorized","field":"fid","width":2,"transparency":0.5,"values":[{"id":"104","color":[0,0,255]},{"id":"121","color":[200,200,200]}]},"point":{}}}',NULL,NULL);
+VALUES(2436,'gw_fct_plan_check_data','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
 VALUES(2522,'gw_fct_import_epanet_inp',NULL,'{"visible": ["v_edit_arc", "v_edit_node"],"zoom": {"layer":"v_edit_arc", "margin":20}}',NULL);
@@ -129,31 +167,37 @@ INSERT INTO config_function (id, function_name, returnmanager, layermanager, act
 VALUES(2524,'gw_fct_import_swmm_inp',NULL,'{"visible": ["v_edit_arc", "v_edit_node"],"zoom": {"layer":"v_edit_arc", "margin":20}}',NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2580,'gw_fct_getinfofromcoordinates','{"style":{"ruberband":{"width":3, "color":[255,1,1], "transparency":0.5}}}',NULL,NULL);
+VALUES(2580,'gw_fct_getinfofromcoordinates','{"style":{"ruberband":{"width":3, "color":[255,241,1], "transparency":0.5}}}',NULL,NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2582,'gw_fct_getinfofromid','{"style":{"ruberband":{"width":3, "color":[255,1,1], "transparency":0.5}}, "zoom":{"margin":50}}',NULL,NULL);
+VALUES(2582,'gw_fct_getinfofromid','{"style":{"ruberband":{"width":3, "color":[255,241,1], "transparency":0.5}}, "zoom":{"margin":50}}',NULL,NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2584,'gw_fct_getinfofromlist','{"style":{"ruberband":{"width":3, "color":[255,1,1], "transparency":0.5}}}',NULL,NULL);
+VALUES(2584,'gw_fct_getinfofromlist','{"style":{"ruberband":{"width":3, "color":[255,241,1], "transparency":0.5}}}',NULL,NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2590,'gw_fct_getlayersfromcoordinates','{"style":{"ruberband":{"width":3, "color":[255,1,1], "transparency":0.5}}}',NULL,NULL);
+VALUES(2590,'gw_fct_getlayersfromcoordinates','{"style":{"ruberband":{"width":3, "color":[255,241,1], "transparency":0.5}}}',NULL,NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2618,'gw_fct_setsearch','{"style":{"ruberband":{"width":3, "color":[255,1,1], "transparency":0.5}}}',NULL,NULL);
+VALUES(2618,'gw_fct_setsearch','{"style":{"ruberband":{"width":3, "color":[255,241,1], "transparency":0.5}}}',NULL,NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2620,'gw_fct_setsearchadd','{"style":{"ruberband":{"width":3, "color":[255,1,1], "transparency":0.5}}, "zoom":{"margin":50}}',NULL,NULL);
+VALUES(2620,'gw_fct_setsearchadd','{"style":{"ruberband":{"width":3, "color":[255,241,1], "transparency":0.5}}, "zoom":{"margin":50}}',NULL,NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2670,'gw_fct_om_check_data','{"style":{"line":{"style":"categorized","field":"fid","width":2,"transparency":0.5,"values":[{"id":"104","color":[0,0,255]},{"id":"121","color":[200,200,200]}]},"point":{}}}', NULL,NULL);
+VALUES(2670,'gw_fct_om_check_data','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}', NULL,NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2680,'gw_fct_pg2epa_check_network','{"style":{"line":{"style":"categorized","field":"fid","width":2,"transparency":0.5,"values":[{"id":"104","color":[0,0,255]},{"id":"121","color":[200,200,200]}]},"point":{}}}',NULL,NULL);
+VALUES(2680,'gw_fct_pg2epa_check_network','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2706,'gw_fct_grafanalytics_minsector','{"style":{"point":{"style":"random","field":"fid","width":2,"transparency":0.5}},"line":{"style":"random","field":"fid","width":2,"transparency":0.5}}',NULL,NULL);
+VALUES(2706,'gw_fct_grafanalytics_minsector','{"style":{"point":{"style":"random","field":"fid","width":2,"transparency":0.5}},
+"line":{"style":"random","field":"fid","width":2,"transparency":0.5},
+"polygon":{"style":"random","field":"fid","width":2,"transparency":0.5}}',NULL,NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
 VALUES(2710,'gw_fct_grafanalytics_mapzones',NULL, NULL,'["style_mapzones"]');
@@ -162,7 +206,9 @@ INSERT INTO config_function (id, function_name, returnmanager, layermanager, act
 VALUES(2734,'gw_fct_psector_duplicate','{"zoom":{"margin":20}}',NULL,NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2776,'gw_fct_admin_check_data', '{"style":{"line":{"style":"categorized","field":"fid","width":2,"transparency":0.5,"values":[{"id":"104","color":[0,0,255]},{"id":"121","color":[200,200,200]}]},"point":{}}}',NULL,NULL);
+VALUES(2776,'gw_fct_admin_check_data', '{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
 
 --INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
 --VALUES(2784,'gw_fct_insert_importdxf',NULL,NULL,NULL);
@@ -171,75 +217,32 @@ INSERT INTO config_function (id, function_name, returnmanager, layermanager, act
 VALUES(2824,'',NULL,'{"visible": ["v_edit_dimensions"],"zoom": {"layer":"v_edit_arc", "margin":20}}',NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2826,'gw_fct_grafanalytics_lrs','{"style":{"point":{"style":"random","field":"fid","width":2,"transparency":0.5}},"line":{"style":"random","field":"fid","width":2,"transparency":0.5}}',NULL,NULL);
+VALUES(2826,'gw_fct_grafanalytics_lrs','{"style":{"point":{"style":"random","field":"fid","width":2,"transparency":0.5}},
+"line":{"style":"random","field":"fid","width":2,"transparency":0.5},
+"polygon":{"style":"random","field":"fid","width":2,"transparency":0.5}}',NULL,NULL);
 
 --INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
 --VALUES(2870,'gw_fct_setselectors',NULL,NULL,NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2118,'gw_fct_node_builtfromarc','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, "line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
+VALUES(2118,'gw_fct_node_builtfromarc','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2848,'gw_fct_pg2epa_check_result','{"style":{"line":{"style":"categorized","field":"fid","width":2,"transparency":0.5,"values":[{"id":"104","color":[0,0,255]},{"id":"121","color":[200,200,200]}]},"point":{}}}', '{"zoom": {"layer":"v_edit_arc", "margin":20}}',NULL);
+VALUES(2848,'gw_fct_pg2epa_check_result','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL, NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2850,'gw_fct_pg2epa_check_options','{"style":{"line":{"style":"categorized","field":"fid","width":2,"transparency":0.5,"values":[{"id":"104","color":[0,0,255]},{"id":"121","color":[200,200,200]}]},"point":{}}}', '{"zoom": {"layer":"v_edit_arc", "margin":20}}',NULL);
+VALUES(2850,'gw_fct_pg2epa_check_options','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}', '{"zoom": {"layer":"v_edit_arc", "margin":20}}',NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2430,'gw_fct_pg2epa_check_data','{"style":{"line":{"style":"categorized","field":"fid","width":2,"transparency":0.5,"values":[{"id":"104","color":[0,0,255]},{"id":"121","color":[200,200,200]}]},"point":{}}}', '{"zoom": {"layer":"v_edit_arc", "margin":20}}',NULL);
+VALUES(2430,'gw_fct_pg2epa_check_data','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}', '{"zoom": {"layer":"v_edit_arc", "margin":20}}',NULL);
 
 
-
-
-INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(,'',NULL,NULL,NULL);
-
-INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(,'',NULL,NULL,NULL);
-INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(,'',NULL,NULL,NULL);
-
-INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(,'',NULL,NULL,NULL);
-
-INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(,'',NULL,NULL,NULL);
-INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(,'',NULL,NULL,NULL);
-
-INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(,'',NULL,NULL,NULL);
-
-INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(,'',NULL,NULL,NULL);
-
-INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(,'',NULL,NULL,NULL);
-INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(,'',NULL,NULL,NULL);
-
-INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(,'',NULL,NULL,NULL);
-
-INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(,'',NULL,NULL,NULL);
-INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(,'',NULL,NULL,NULL);
-
-INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(,'',NULL,NULL,NULL);
-
-INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(,'',NULL,NULL,NULL);
-
-INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(,'',NULL,NULL,NULL);
-INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(,'',NULL,NULL,NULL);
-
-INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(,'',NULL,NULL,NULL);
-
-INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(,'',NULL,NULL,NULL);
 */

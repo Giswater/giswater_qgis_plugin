@@ -351,7 +351,7 @@ BEGIN
 	v_result_polygon := COALESCE(v_result_polygon, '{}');
 	
 	--  Return
-	RETURN ('{"status":"Accepted", "message":{"level":1, "text":"Mapzones dynamic analysis done succesfully"}, "version":"'||v_version||'"'||
+	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Mapzones dynamic analysis done succesfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 				'"setVisibleLayers":["'||v_visible_layer||'"],'||
@@ -359,7 +359,7 @@ BEGIN
 				'"line":'||v_result_line||','||
 				'"polygon":'||v_result_polygon||'}'||
 		       '}'||
-	    '}')::json;
+	    '}')::json, 2706);
 
 	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN

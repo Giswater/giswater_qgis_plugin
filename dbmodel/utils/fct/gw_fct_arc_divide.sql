@@ -814,7 +814,7 @@ END IF;
 	v_hide_form := COALESCE(v_hide_form, true); 
 
 --  Return
-	 RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
+	 RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
 			 ',"body":{"form":{}'||
 			 ',"data":{ "info":'||v_result_info||','||
 				'"setVisibleLayers":[]'||','||
@@ -823,7 +823,7 @@ END IF;
 				'"polygon":'||v_result_polygon||'}'||
 				', "actions":{"hideForm":' || v_hide_form || '}'||
 			   '}'||
-		'}')::json;
+		'}')::json, 2114);
 
 	EXCEPTION WHEN OTHERS THEN
 	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;

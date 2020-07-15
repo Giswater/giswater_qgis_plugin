@@ -824,7 +824,7 @@ BEGIN
 	v_result_polygon := COALESCE(v_result_polygon, '{}'); 
 	
 	--  Return
-	RETURN ('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
+	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 				'"point":'||v_result_point||','||
@@ -832,7 +832,7 @@ BEGIN
 				'"polygon":'||v_result_polygon||','||
 				'"setVisibleLayers":[] }'||
 		       '}'||
-	    '}')::json;
+	    '}')::json, 2670);
 
 	--  Exception handling
 	--EXCEPTION WHEN OTHERS THEN

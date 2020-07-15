@@ -596,12 +596,12 @@ BEGIN
 	v_version := COALESCE(v_version, '{}'); 	
 
 	-- Return
-	RETURN ('{"status":"Accepted", "message":{"level":1, "text":"Import inp done successfully"}, "version":"'||v_version||'"'||
+	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Import inp done successfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 				'"point":'||v_result_point||','||
 				'"line":'||v_result_line||'}'||
-	    '}}')::json;
+	    '}}')::json, 2522);
 	
 	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN

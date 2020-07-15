@@ -38,28 +38,29 @@ BEGIN
 	v_layers_array = ARRAY(SELECT json_array_elements_text(v_layers::json)); 
 	raise notice 'v_layers-->%',v_layers;
 
+
 	-- WHEN COME FROM config_function.layermanager
 	IF v_layers IS NOT NULL THEN
 		FOREACH v_layer IN ARRAY v_layers_array LOOP
 			EXECUTE 'SELECT addtoc FROM sys_table WHERE id='||quote_literal(v_layer)||''
-			into v_value; 
-			if v_value is null then
+			INTO v_value; 
+			IF v_value IS NULL THEN
 				v_value=gw_fct_json_object_set_key((v_value)::json, 'error', 'Layer '||v_layer||' cannot be added, maybe it is a configuration problem, check the table sys_table or add it manually.');
 				
-			end if;
-			if v_value->>'style' is NOT NULL then
-				EXECUTE 'SELECT stylevalue from sys_style WHERE idval ='||v_value->>'style'||''
-				--EXECUTE 'SELECT stylevalue from sys_style WHERE idval ='||quote_literal(v_funtion_id)||' AND styletype ='||quote_literal(v_layer)||''
+			END IF;
+			IF v_value->>'style' IS NOT NULL THEN
+				EXECUTE 'SELECT stylevalue from sys_style WHERE idval ='||quote_literal(v_value->>'style')||''
 				into v_style;
-				if v_style is not null then			
+				IF v_style IS NOT NULL THEN			
 					v_value=gw_fct_json_object_set_key((v_value)::json, 'style', v_style);			
-				end if;
-			end if;
+				END IF;
+			END IF;
 			v_addtoc=array_append(v_addtoc,v_value);		
 		END LOOP;		
 		v_return = gw_fct_json_object_set_key((p_data->>'body')::json, 'layers', v_addtoc);
 	END IF;
 	
+    
 	-- WHEN COME FROM config_function.returnmanager
 	IF v_temp_layer IS NOT NULL THEN
 		EXECUTE 'SELECT stylevalue from sys_style WHERE idval ='||quote_literal(v_funtion_id)||' AND styletype ='||quote_literal(v_temp_layer)||''
@@ -67,9 +68,9 @@ BEGIN
 		if v_style is not null then			
 			v_return=gw_fct_json_object_set_key((v_value)::json, 'style', v_style);			
 		end if;
-		
-
 	END IF;
+    
+    
 	v_version := COALESCE(v_version, '{}');
 	v_return := COALESCE(v_return, '{}');
 
