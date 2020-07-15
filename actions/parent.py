@@ -1358,8 +1358,7 @@ class ParentAction(object):
             margin = 1
             if 'zoom' in styles and 'margin' in styles['zoom']:
                 margin = styles['zoom']['margin']
-
-            if 'style' not in styles and 'ruberband' in styles['style']:
+            if 'ruberband' in styles['style']:
                 # Set default values
                 opacity = 100
                 width = 3
@@ -1377,6 +1376,8 @@ class ParentAction(object):
                     if key in ('point', 'line', 'polygon'):
                         if key not in json_result['body']['data']: continue
                         if 'features' not in json_result['body']['data'][key]: continue
+                        if len(json_result['body']['data'][key]['features']) == 0: continue
+
                         layer_name = f'Temporal layer {key}'
                         self.delete_layer_from_toc(layer_name)
 
@@ -1406,11 +1407,33 @@ class ParentAction(object):
                             v_layer.renderer().symbol().setOpacity(opacity)
                         elif style[key]['style'] == 'qml':
                             extras = f'"temp_layer":"{key}", '
-                            funct_id = style[key]['id']
-                            extras += f'"function_id":"{funct_id}"'
+                            stiyle_id = style[key]['id']
+                            extras += f'"function_id":"{stiyle_id}"'
                             body = self.create_body(extras=extras)
                             return_styles = self.controller.get_json('gw_fct_getstyle', body, log_sql=True)
-                            self.create_qml(v_layer, return_styles['body']['data']['addToc']['style'])
+                            if 'layers' in return_styles['body']['data']['addToc']:
+                                for layer_info in return_styles['body']['data']['addToc']['layers']:
+                                    if 'error' in layer_info:
+                                        msg = layer_info['error']
+                                        self.controller.show_warning(msg)
+                                        continue
+                                    try:
+                                        tablename = layer_info['tableName']
+                                        teh_geom = layer_info['geom']
+                                        field_id = layer_info['primaryKey']
+                                        if 'group' in layer_info and layer_info['group']:
+                                            group = layer_info['group']
+                                        else:
+                                            group = None
+                                        self.add_layer.from_postgres_to_toc(tablename, teh_geom, field_id, None, group)
+                                    except KeyError as e:
+                                        self.controller.log_info(f"{type(e).__name__} --> {e}")
+
+                                    if 'style' in layer_info:
+                                        style = layer_info['style']
+                                        layer = self.controller.get_layer_by_tablename(tablename)
+                                        if layer:
+                                            self.create_qml(layer, style)
                         if style[key]['style'] == 'unique':
                             color = style[key]['style']['values']['color']
                             size = style['width'] if 'width' in style and style['width'] else 2
@@ -1449,7 +1472,7 @@ class ParentAction(object):
             # if so they become visible. If not, a string is generated with the name of the layers that are not in the
             # TOC and through the function gw_fct_getstyle the table sys_table.addtoc is looked for the configuration of
             # each one, the configuration of this layer It must be as in the following example:
-            # {"tableName":"v_edit_arc","primaryKey":"arc_id", "geom":"the_geom","group":"grouptest","style":"qml"}.
+            # {"tableName":"v_edit_arc","primaryKey":"arc_id", "geom":"the_geom","group":"grouptest","style":"xxx"}.
             # The indispensable fields to load the layer are tableName, primaryKey and geom.
             # The group and qml fields are optional, where group is to indicate in which TOC group we want our layer to
             # enter and qml is to indicate that we want to add a qml to this layer. If you want to add a qml, it must be
