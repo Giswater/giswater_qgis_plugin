@@ -57,6 +57,7 @@ class DaoController(object):
         self.docker_type = None
         self.show_docker = None
         self.prev_maptool = None
+        self.parent = None
         self.gw_actions = None
         if create_logger:
             self.set_logger(logger_name)
@@ -825,8 +826,10 @@ class DaoController(object):
             self.manage_exception_api(json_result, sql, is_notify=is_notify)
             return json_result
 
-        # Manage options for layers (active, visible, zoom and indexing)
-        self.layer_manager(json_result)
+        # Layer styles
+        self.parent.manage_return_manager(json_result, sql)
+        self.parent.manage_layer_manager(json_result, sql)
+        self.parent.manage_actions(json_result, sql)
 
         return json_result
 
