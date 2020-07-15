@@ -121,7 +121,6 @@ class ApiCatalog(ApiParent):
         row = self.controller.get_row(sql, log_sql=True)
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
         if complet_result[0]['status'] == "Failed":
-            dialog.progressBar.setFormat(f"Function: {function_name} failed. See log file for more details")
             self.controller.log_warning(complet_result[0])
             return False
         if complet_result[0]['status'] == "Accepted":
