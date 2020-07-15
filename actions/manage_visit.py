@@ -1317,11 +1317,12 @@ class ManageVisit(ParentManage, QObject):
         for field_name in event.field_names():
             if not hasattr(self.dlg_event, field_name):
                 continue
+            value = None
             if type(getattr(self.dlg_event, field_name)) is QLineEdit:
                 value = getattr(self.dlg_event, field_name).text()
-            if type(getattr(self.dlg_event, field_name)) is QTextEdit:
+            elif type(getattr(self.dlg_event, field_name)) is QTextEdit:
                 value = getattr(self.dlg_event, field_name).toPlainText()
-            if type(getattr(self.dlg_event, field_name)) is QComboBox:
+            elif type(getattr(self.dlg_event, field_name)) is QComboBox:
                 value = utils_giswater.get_item_data(self.dlg_event, getattr(self.dlg_event, field_name), index=0)
             if value and str(value) != 'NULL':
                 setattr(event, field_name, value)

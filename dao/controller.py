@@ -1725,6 +1725,7 @@ class DaoController(object):
         """ Manage exception in database queries and show information to the user """
 
         show_exception_msg = True
+        description = ""
         if exception:
             description = str(exception)
             if 'unknown error' in description:

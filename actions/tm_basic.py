@@ -570,6 +570,7 @@ class TmBasic(TmParentAction):
             field_list.append(id_)
 
         # Select all rows and get all id
+        current_poda_type = None
         self.select_all_rows(dialog.selected_rows, id_table_right)
         if utils_giswater.isChecked(dialog, dialog.chk_current):
             current_poda_type = utils_giswater.get_item_data(dialog, dialog.cmb_poda_type, 0)

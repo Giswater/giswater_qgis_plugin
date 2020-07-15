@@ -56,6 +56,7 @@ class ApiDimensioning(ApiParent):
         self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
         self.layer_connec = self.controller.get_layer_by_tablename("v_edit_connec")
 
+        feature = None
         if qgis_feature is None:
             features = self.layer_dimensions.getFeatures()
             for feature in features:
@@ -424,7 +425,7 @@ class ApiDimensioning(ApiParent):
             widget = self.add_verical_spacer()
         elif field['widgettype'] == 'textarea':
             widget = self.add_textarea(field)
-        elif field['widgettype'] in ('spinbox'):
+        elif field['widgettype'] in 'spinbox':
             widget = self.add_spinbox(field)
         elif field['widgettype'] == 'tableview':
             widget = self.add_tableview(db_return, field)

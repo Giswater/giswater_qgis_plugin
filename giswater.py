@@ -651,7 +651,6 @@ class Giswater(QObject):
         # Key: field tablename
         # Value: Object of the class SysFeatureCat
 
-        sql = None
         self.feature_cat = {}
         sql = ("SELECT cat_feature.* FROM cat_feature "
                "WHERE active IS TRUE ORDER BY id")

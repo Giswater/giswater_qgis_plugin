@@ -7,7 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from qgis.core import QgsPointXY, QgsVectorLayer
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsGeometry
-from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand, QgsDateTimeEdit
+from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint, QgsDateTimeEdit
 from qgis.PyQt.QtCore import Qt, QSettings, QTimer, QDate, QStringListModel
 from qgis.PyQt.QtGui import QColor, QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QLineEdit, QSizePolicy, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel, QCheckBox

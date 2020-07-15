@@ -174,7 +174,6 @@ class ApiCF(ApiParent, QObject):
         """
         :param point: point where use clicked
         :param table_name: table where do sql query
-        :param feature_type: (arc, node, connec...)
         :param feature_id: id of feature to do info
         :return:
         """

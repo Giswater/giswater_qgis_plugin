@@ -9,9 +9,7 @@ from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
 from qgis.PyQt.QtWidgets import QFileDialog
 
 import csv
-import json
 import os
-from collections import OrderedDict
 from encodings.aliases import aliases
 from functools import partial
 

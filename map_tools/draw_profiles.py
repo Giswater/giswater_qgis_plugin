@@ -8,7 +8,7 @@ or (at your option) any later version.
 from qgis.core import QgsFeatureRequest, QgsVectorLayer, QgsExpression
 from qgis.gui import QgsMapToolEmitPoint
 from qgis.PyQt.QtCore import Qt, QDate
-from qgis.PyQt.QtWidgets import QListWidget, QListWidgetItem, QLineEdit, QAction
+from qgis.PyQt.QtWidgets import QListWidgetItem, QLineEdit, QAction
 
 from functools import partial
 from decimal import Decimal
@@ -123,7 +123,7 @@ class DrawProfiles(ParentMapTool):
         try:
             self.canvas.xyCoordinates.disconnect()
             self.emit_point.canvasClicked.disconnect()
-        except Exception as e:
+        except Exception:
             pass
         finally:
             ParentMapTool.deactivate(self)
