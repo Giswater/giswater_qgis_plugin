@@ -38,12 +38,14 @@ update connec set sector_id=0, dma_id=0, dqa_id=0, presszone_id=0
 TO EXECUTE
 ----------
 
--- SECTOR
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "exploitation": "[1,2]", "checkData": false, "updateFeature":"FALSE", "updateMapZone":2, "geomParamUpdate":15, "debug":"false"}}}');
+-- QUERY SAMPLE
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation": "[1]", "macroExploitation": "[1]", "checkData":false, "updateFeature":"TRUE", 
+"updateMapZone":2, "geomParamUpdate":15,"debug":"false", "usePsector":true, "forceOpen":[1,2,3], "forceClose":"[2,3,4]"}}}');
+
+--SECTOR
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "node":"113952", "updateFeature":TRUE}}}');
 SELECT count(*), log_message FROM audit_log_data WHERE fid=130 AND cur_user=current_user group by log_message order by 2 --SECTOR
 SELECT sector_id, count(sector_id) from v_edit_arc group by sector_id order by 1;
-
 
 -- DMA
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation": "[1]", "checkData": false,"updateFeature":"TRUE", "updateMapZone":2, "geomParamUpdate":15,"debug":"false", "forceOpen":[1,2,3], "forceClose":"[2,3,4]"}}}');
@@ -52,13 +54,11 @@ SELECT count(*), log_message FROM audit_log_data WHERE fid=145 AND cur_user=curr
 SELECT dma_id, count(dma_id) from v_edit_arc  group by dma_id order by 1;
 UPDATE arc SET dma_id=0
 
-
 -- DQA
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DQA", "exploitation": "[1,2]", "checkData": false,"updateFeature":"TRUE", "updateMapZone":2 , "geomParamUpdate":15, "debug":"false"}}}');
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DQA", "node":"113952", "updateFeature":TRUE}}}');
 SELECT count(*), log_message FROM audit_log_data WHERE fid=144 AND cur_user=current_user group by log_message order by 2 --DQA
 SELECT dqa_id, count(dma_id) from v_edit_arc  group by dqa_id order by 1;
-
 
 -- PRESZZONE
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"PRESSZONE","exploitation":"[1]", "checkData": false, "updateFeature":"TRUE", "updateMapZone":2, "geomParamUpdate":15,"debug":"false"}}}');
@@ -110,6 +110,7 @@ v_cont1 integer default 0;
 v_class text;
 v_feature record;
 v_expl json;
+v_macroexpl json;
 v_data json;
 v_fid integer;
 v_nodeid text;
@@ -147,6 +148,7 @@ v_message text;
 v_checkdata boolean;
 v_mapzonename text;
 v_parameters json;
+v_usepsector boolean;
 
 BEGIN
 	-- Search path
@@ -165,6 +167,8 @@ BEGIN
 	v_updatemapzgeom = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
 	v_geomparamupdate = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'geomParamUpdate');
 	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
+	v_macroexpl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'macroExploitation');
+	v_usepsector = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'usePsector');
 	v_debug = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'debug');
 	v_checkdata = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'checkData');
 	v_parameters = (SELECT ((p_data::json->>'data')::json->>'parameters'));
