@@ -18,31 +18,46 @@ DELETE FROM config_typevalue WHERE id IN (select id FROM config_typevalue WHERE 
 
 /*
 
-UPDATE sys_table SET (addtoc) = ('{"tableName":"v_edit_arc","primaryKey":"arc_id", "geom":"the_geom","group":"GW Temporal Layers","style":"qml"}')
+UPDATE sys_table SET (addtoc) = ('{"tableName":"v_edit_arc","primaryKey":"arc_id", "geom":"the_geom","group":"GW Temporal Layers","style":"101"}')
 WHERE id ='v_edit_arc';
 
-UPDATE sys_table SET (addtoc) = ('{"tableName":"v_edit_connec","primaryKey":"connec_id", "geom":"the_geom","group":"GW Temporal Layers","style":"qml"}')
+UPDATE sys_table SET (addtoc) = ('{"tableName":"v_edit_connec","primaryKey":"connec_id", "geom":"the_geom","group":"GW Temporal Layers","style":"102"}')
 WHERE id ='v_edit_connec';
 
-UPDATE sys_table SET (addtoc) = ('{"tableName":"v_edit_node","primaryKey":"node_id", "geom":"the_geom","group":"GW Temporal Layers","style":"qml"}')
+UPDATE sys_table SET (addtoc) = ('{"tableName":"v_edit_gully","primaryKey":"gully_id", "geom":"the_geom","group":"GW Temporal Layers","style":"103"}')
+WHERE id ='v_edit_gully';
+
+UPDATE sys_table SET (addtoc) = ('{"tableName":"v_edit_link","primaryKey":"link_id", "geom":"the_geom","group":"GW Temporal Layers","style":"104"}')
+WHERE id ='v_edit_link';
+
+UPDATE sys_table SET (addtoc) = ('{"tableName":"v_edit_node","primaryKey":"node_id", "geom":"the_geom","group":"GW Temporal Layers","style":"105"}')
 WHERE id ='v_edit_node';
 
---UPDATE sys_table SET (addtoc) = ('{"tableName":"v_edit_gully","primaryKey":"gully_id", "geom":"the_geom","group":"GW Temporal Layers","style":"qml"}')
---WHERE id ='v_edit_gully';
+UPDATE sys_table SET (addtoc) = ('{"tableName":"v_anl_flow_arc","primaryKey":"id", "geom":"the_geom","group":"GW Temporal Layers","style":"106"}')
+WHERE id ='v_anl_flow_arc';
+
+UPDATE sys_table SET (addtoc) = ('{"tableName":"v_anl_flow_connec","primaryKey":"id", "geom":"the_geom","group":"GW Temporal Layers","style":"107"}')
+WHERE id ='v_anl_flow_connec';
+
+UPDATE sys_table SET (addtoc) = ('{"tableName":"v_anl_flow_gully","primaryKey":"id", "geom":"the_geom","group":"GW Temporal Layers","style":"108"}')
+WHERE id ='v_anl_flow_gully';
+
+UPDATE sys_table SET (addtoc) = ('{"tableName":"v_anl_flow_node","primaryKey":"id", "geom":"the_geom","group":"GW Temporal Layers","style":"109"}')
+WHERE id ='v_anl_flow_node';
 
 
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2431,'gw_fct_pg2epa_check_data', '{"style": {"point": {"style":"categorized", "field":"fid", "width":2, "transparency":0.5, "values":[{"id":"120", "color":[100,100,100]}, {"id":"121", "color":[200,200,200]}]}},"line":{}}', NULL, NULL);
+VALUES(2431,'gw_fct_pg2epa_check_data', {"style":{"point":{"style":"random","field":"fid","width":2,"transparency":0.5}},"line":{"style":"random","field":"fid","width":2,"transparency":0.5}}, NULL, NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
 VALUES(2914,'gw_fct_anl_node_proximity', '{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, "line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}', NULL, NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2858,'gw_fct_pg2epa_check_result','{"style":{"line":{"style":"categorized","field":"fid","width":2,"transparency":0.5,"values":[{"id":"104","color":[0,0,255]},{"id":"121","color":[200,200,200]}]},"point":{}}}',NULL,NULL);
+VALUES(2858,'gw_fct_pg2epa_check_result',{"style":{"point":{"style":"random","field":"fid","width":2,"transparency":0.5}},"line":{"style":"random","field":"fid","width":2,"transparency":0.5}},NULL,NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2860,'gw_fct_pg2epa_check_options','{"style":{"line":{"style":"categorized","field":"fid","width":2,"transparency":0.5,"values":[{"id":"104","color":[0,0,255]},{"id":"121","color":[200,200,200]}]},"point":{}}}',NULL,NULL);
+VALUES(2860,'gw_fct_pg2epa_check_options',{"style":{"point":{"style":"random","field":"fid","width":2,"transparency":0.5}},"line":{"style":"random","field":"fid","width":2,"transparency":0.5}},"point":{}}}',NULL,NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
 VALUES(2772,'gw_fct_grafanalytics_flowtrace','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, "line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
@@ -72,7 +87,7 @@ INSERT INTO config_function (id, function_name, returnmanager, layermanager, act
 VALUES(2114,'gw_fct_arc_divide',NULL,'{"visible": ["v_edit_arc", "v_edit_node"],"index": ["v_edit_node" ]}',NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2124,'gw_fct_connect_to_network',NULL,'{"visible": ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_arc", "v_edit_gully", "line"]',NULL);
+VALUES(2124,'gw_fct_connect_to_network',NULL,'{"visible": ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_arc", "v_edit_gully", "v_edit_link"]',NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
 VALUES(2202,'gw_fct_anl_arc_intersection','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, "line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
