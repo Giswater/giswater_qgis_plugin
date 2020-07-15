@@ -113,9 +113,6 @@ BEGIN
 		-- update if price exists
 		UPDATE plan_price SET pricecat_id=v_label, price=csv5::numeric(12,4) FROM temp_csv WHERE cur_user=current_user AND fid = 234 AND plan_price.id=csv1;
 			
-		-- Delete values on temporal table
-		DELETE FROM temp_csv WHERE cur_user=current_user AND fid = 234;
-	
 		-- manage log (fid: 234)
 		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (234, v_result_id, concat('Reading values from temp_csv table -> Done'));
 		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (234, v_result_id, concat('Inserting values on plan_price table -> Done'));

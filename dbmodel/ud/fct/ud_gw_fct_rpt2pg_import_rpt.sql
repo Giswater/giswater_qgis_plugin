@@ -58,13 +58,6 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (140, v_result_id, concat('IMPORT RPT FILE'));
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (140, v_result_id, concat('-----------------------------'));
 	
-	-- use the copy function of postgres to import from file in case of file must be provided as a parameter
-	IF v_path IS NOT NULL THEN
-		DELETE FROM temp_csv WHERE cur_user=current_user AND fid = v_fid;
-		EXECUTE 'COPY temp_csv (csv1, csv2, csv3, csv4, csv5, csv6, csv7, csv8, csv9, csv10, csv11, csv12) FROM '||quote_literal(v_path)||' WITH (NULL '''', FORMAT TEXT)';
-		UPDATE temp_csv SET fid = v_fid WHERE fid IS NULL AND cur_user=current_user;
-	END IF;
-	
 	--remove data from with the same result_id
 	FOR rpt_rec IN SELECT tablename FROM config_fprocess WHERE fid=v_fid EXCEPT SELECT tablename FROM config_fprocess WHERE tablename='rpt_cat_result'
 	LOOP

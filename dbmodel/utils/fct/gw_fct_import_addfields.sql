@@ -50,9 +50,6 @@ BEGIN
 		(v_addfields.csv1, v_addfields.csv2::integer, v_addfields.csv3);			
 	END LOOP;
 
-	-- Delete values on temporal table
-	DELETE FROM temp_csv WHERE cur_user=current_user AND fid = 236;
-
 	-- manage log (fid: 236)
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (236, v_result_id, concat('Reading values from temp_csv table -> Done'));
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (236, v_result_id, concat('Inserting values on man_addfields_value table -> Done'));

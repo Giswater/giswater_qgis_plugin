@@ -148,10 +148,7 @@ BEGIN
 	-- inserting result on point temp_table
 	INSERT INTO temp_table (fid, text_column, geom_point)
 	SELECT 237, concat('"value":"',csv4,'"rotation":"',csv5,'"layer":"',csv6), st_setsrid(st_makepoint(csv2::float, csv3::float),v_epsg) FROM temp_csv WHERE cur_user=current_user AND fid = 237;
-
-	-- Delete values from csv temporal table
-	DELETE FROM temp_csv WHERE cur_user=current_user AND fid = 237;
-
+	
 	-- manage log (fid: 237)
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (237, v_result_id, concat('Reading values from temp_csv table -> Done'));
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (237, v_result_id, concat('Inserting values on temp_table as point geometry -> Done'));

@@ -77,9 +77,6 @@ BEGIN
 		END IF;	
 	END LOOP;
 
-	-- Delete values on temporal table
-	DELETE FROM temp_csv;
-
 	-- manage log (fid: 235)
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (235, v_result_id, concat('Reading values from temp_csv table -> Done'));
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (235, v_result_id, concat('Inserting values on element table -> Done'));

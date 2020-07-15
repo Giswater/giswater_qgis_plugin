@@ -28,7 +28,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	RAISE NOTICE 'Starting pg2epa vnode trim arcs ';
-	DELETE FROM temp_go2epa;
+	TRUNCATE temp_go2epa;
 
 	RAISE NOTICE 'insert data on temp_table new arcs';
 	INSERT INTO temp_go2epa (arc_id, vnode_id, locate, elevation, depth)

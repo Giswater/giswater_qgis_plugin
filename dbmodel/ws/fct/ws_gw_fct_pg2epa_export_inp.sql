@@ -45,7 +45,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	--Delete previous
-	DELETE FROM temp_csv WHERE cur_user=current_user AND fid = v_fid;
+	TRUNCATE temp_csv;
 
 	-- get parameters to put on header
 	SELECT result_id INTO result_id_aux FROM selector_inp_result where cur_user=current_user;

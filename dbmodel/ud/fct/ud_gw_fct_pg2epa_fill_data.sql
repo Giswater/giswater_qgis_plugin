@@ -25,8 +25,8 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- Delete previous results on temp_node & arc tables
-	DELETE FROM temp_node;
-	DELETE FROM temp_arc;
+	TRUNCATE temp_node;
+	TRUNCATE temp_arc;
 
 	-- set all timeseries of raingage using user's value
 	v_rainfall:= (SELECT value FROM config_param_user WHERE parameter='inp_options_setallraingages' AND cur_user=current_user);

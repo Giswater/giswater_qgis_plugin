@@ -19,9 +19,6 @@ BEGIN
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
 
-	--  Reset values
-	DELETE FROM temp_table WHERE cur_user=current_user AND fid = 117;
-
 	-- Dump node coordinates for every polygon
 	FOR row_id IN SELECT subc_id FROM v_edit_inp_subcatchment
 	LOOP

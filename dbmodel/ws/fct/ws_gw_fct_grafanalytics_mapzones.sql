@@ -40,8 +40,8 @@ TO EXECUTE
 
 -- QUERY SAMPLE
 ----------------
-SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation": "[1]", "macroExploitation": "[1]", "checkData":false, "updateFeature":"TRUE", 
-"updateMapZone":2, "geomParamUpdate":15,"debug":"false", "usePlanPsector":false, "forceOpen":[1,2,3], "forceClosed":"[2,3,4]"}}}');
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation":[1], "macroExploitation":[1], "checkData":false, 
+"updateFeature":true, "updateMapZone":2, "geomParamUpdate":15,"debug":false, "usePlanPsector":false, "forceOpen":[1,2,3], "forceClosed":[2,3,4]}}}');
 ----------------
 
 --SECTOR

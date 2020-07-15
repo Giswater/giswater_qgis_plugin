@@ -55,8 +55,9 @@ BEGIN
 	v_checkdata = (SELECT value::json->>'checkData' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 	v_checknetwork = (SELECT value::json->>'checkNetwork' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 
-	-- delete audit table
+	-- delete aux table
 	DELETE FROM audit_check_data WHERE fid = 227 AND cur_user=current_user;
+	DELETE FROM temp_table WHERE fid = 117 AND cur_user=current_user;
 
 	v_inpoptions = (SELECT (replace (replace (replace (array_to_json(array_agg(json_build_object((t.parameter),(t.value))))::text,'},{', ' , '),'[',''),']',''))::json 
 				FROM (SELECT parameter, value FROM config_param_user 

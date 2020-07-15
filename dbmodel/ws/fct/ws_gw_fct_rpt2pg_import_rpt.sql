@@ -76,12 +76,6 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (140, v_result_id, concat('IMPORT RPT FILE'));
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (140, v_result_id, concat('-----------------------------'));
 	
-
-	IF v_path IS NOT NULL THEN
-		DELETE FROM temp_csv WHERE cur_user=current_user AND fid = v_fid;
-		EXECUTE 'SELECT gw_fct_utils_csv2pg_import_temp_data('||quote_literal(v_fid)||','||quote_literal(v_path)||' )';
-	END IF;
-
 	UPDATE temp_csv SET fid = v_fid WHERE fid IS NULL AND cur_user=current_user;
 	
 	--remove data from with the same result_id

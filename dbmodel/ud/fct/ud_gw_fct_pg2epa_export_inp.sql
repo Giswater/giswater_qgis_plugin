@@ -34,7 +34,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	--Delete previous
-	DELETE FROM temp_csv WHERE cur_user=current_user AND fid = v_fid;
+	TRUNCATE temp_csv;
       
 	SELECT result_id INTO result_id_aux FROM selector_inp_result where cur_user=current_user;
 	SELECT title INTO title_aux FROM inp_project_id where author=current_user;

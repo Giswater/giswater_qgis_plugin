@@ -102,10 +102,9 @@ BEGIN
 	INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('---------------------------------------------------'));
 	
 	-- reset tables (graf & audit_log)
-	DELETE FROM temp_anlgraf;
+	TRUNCATE temp_anlgraf;
 	DELETE FROM audit_log_data WHERE fid=v_fid AND cur_user=current_user;
 	DELETE FROM anl_node WHERE fid=v_fid AND cur_user=current_user;
-	--DELETE FROM anl_node;
 	DELETE FROM anl_arc WHERE fid=v_fid AND cur_user=current_user;
 	DELETE FROM audit_check_data WHERE fid=v_fid AND cur_user=current_user;
 

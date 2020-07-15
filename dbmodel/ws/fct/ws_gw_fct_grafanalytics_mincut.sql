@@ -47,7 +47,7 @@ BEGIN
 	v_isrecursive = ((SELECT (p_data::json->>'data')::json->>'parameters')::json->>'isRecursive');
 
 	-- reset graf & audit_log tables
-	DELETE FROM temp_anlgraf;
+	TRUNCATE temp_anlgraf;
 	
 	-- reset selectors
 	DELETE FROM selector_state WHERE cur_user=current_user;
