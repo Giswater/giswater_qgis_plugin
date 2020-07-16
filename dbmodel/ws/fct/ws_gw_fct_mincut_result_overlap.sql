@@ -467,13 +467,13 @@ BEGIN
 		v_geometry := COALESCE(v_geometry, '{}'); 
 	
 		-- return
-		RETURN ('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version.giswater||'"'||
+		RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version.giswater||'"'||
 			',"body":{"form":{}'||
 			',"data":{ "info":'||v_result_info||','||
 				  '"geometry":"'||v_geometry||'",'|| 			
 				  '"setVisibleLayers":['||v_visiblelayer||']'||
 			'}}'||
-			'}')::json;
+			'}')::json, 2244);
 	END IF;
 
 	EXCEPTION WHEN OTHERS THEN

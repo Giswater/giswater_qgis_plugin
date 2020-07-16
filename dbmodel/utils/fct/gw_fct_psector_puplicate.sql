@@ -221,8 +221,8 @@ BEGIN
 	v_version := COALESCE(v_version, '[]');
 
 	-- return
-	RETURN ('{"status":"Accepted", "version":'||v_version||
-            ',"message":{"level":1, "text":""},"body":{"data": {"info":'||v_result_info||'}}}')::json;
+	RETURN gw_fct_json_create_return(('{"status":"Accepted", "version":'||v_version||
+            ',"message":{"level":1, "text":""},"body":{"data": {"info":'||v_result_info||'}}}')::json, 2734);
 
 	-- manage exceptions
 	EXCEPTION WHEN OTHERS THEN

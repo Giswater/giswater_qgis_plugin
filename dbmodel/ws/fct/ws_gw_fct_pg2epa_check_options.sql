@@ -71,7 +71,7 @@ BEGIN
 	END IF;
 
 	--  Return
-	RETURN v_return;
+	RETURN gw_fct_json_create_return(v_return, 2850);
 
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN

@@ -429,9 +429,9 @@ BEGIN
 	v_response := COALESCE(v_response, '{}');
 
 	-- Return
-	RETURN ('{"status":"Accepted"' || ', "version":'|| v_version ||
+	RETURN gw_fct_json_create_return(('{"status":"Accepted"' || ', "version":'|| v_version ||
         ', "data":' || v_response ||      
-        '}')::json;
+        '}')::json, 2618);
 
 	-- exception handling
 	EXCEPTION WHEN OTHERS THEN 

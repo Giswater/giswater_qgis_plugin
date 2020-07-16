@@ -127,7 +127,7 @@ BEGIN
 
 	-- Return
 	v_return = concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"currentTab":"', v_tabname,'"}, "feature":{}, "data":{"selectorType":"',v_selectortype,'"}, "layermanager":'||v_layermanager||'}');
-	RETURN gw_fct_getselectors(v_return);
+	RETURN gw_fct_json_create_return(gw_fct_getselectors(v_return), 2870);
 	
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN

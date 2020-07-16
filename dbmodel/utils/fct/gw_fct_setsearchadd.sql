@@ -102,10 +102,10 @@ BEGIN
     v_response := COALESCE(v_response, '{}');
 
 	-- Return
-    RETURN ('{"status":"Accepted"' ||
+    RETURN gw_fct_json_create_return(('{"status":"Accepted"' ||
         ', "version":'|| v_version ||
         ', "data":' || v_response ||    
-        '}')::json;
+        '}')::json, 2620);
 
 	-- Exception handling
     EXCEPTION WHEN OTHERS THEN 

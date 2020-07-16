@@ -10,6 +10,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 -- 2020/07/08
 
 ALTER TABLE sys_table ADD COLUMN addtoc json;
+ALTER TABLE sys_style ALTER styletype TYPE character varying(30);
 
 
 CREATE TABLE SCHEMA_NAME.config_function

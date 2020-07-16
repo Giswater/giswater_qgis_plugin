@@ -15,7 +15,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_functio
 CREATE TABLE sys_style (
 id serial PRIMARY KEY,
 idval text,
-styletype varchar(16),
+styletype varchar(24),
 stylevalue text,
 active boolean);
 
