@@ -1358,7 +1358,8 @@ class ParentAction(object):
             margin = 1
             if 'zoom' in styles and 'margin' in styles['zoom']:
                 margin = styles['zoom']['margin']
-            if 'ruberband' in styles['style']:
+
+            if 'style' in styles and 'ruberband' in styles['style']:
                 # Set default values
                 opacity = 100
                 width = 3
