@@ -25,7 +25,7 @@ SELECT SCHEMA_NAME.gw_fct_grafanalytics_lrs('{"data":{"parameters":{"exploitatio
 */
 
 DECLARE
-v_acc_value numeric;
+v_acc_value numeric(12,3);
 v_affectedrows numeric; 
 v_feature record;
 v_expl json;
