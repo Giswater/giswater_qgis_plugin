@@ -1176,10 +1176,12 @@ class ParentAction(object):
 
 
     def draw(self, complet_result, margin=None, reset_rb=True, color=QColor(255, 0, 0, 100), width=3):
-
-        if complet_result['body']['feature']['geometry'] is None:
-            return
-        if complet_result['body']['feature']['geometry']['st_astext'] is None:
+        try:
+            if complet_result['body']['feature']['geometry'] is None:
+                return
+            if complet_result['body']['feature']['geometry']['st_astext'] is None:
+                return
+        except KeyError as e:
             return
         list_coord = re.search('\((.*)\)', str(complet_result['body']['feature']['geometry']['st_astext']))
         max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
@@ -1350,34 +1352,37 @@ class ParentAction(object):
         """
 
         try:
-            styles = json_result['body']['returnManager']
+            return_manager = json_result['body']['returnManager']
         except KeyError:
             return
         srid = self.controller.plugin_settings_value('srid')
         try:
             margin = 1
-            if 'zoom' in styles and 'margin' in styles['zoom']:
-                margin = styles['zoom']['margin']
+            if 'zoom' in return_manager and 'margin' in return_manager['zoom']:
+                margin = return_manager['zoom']['margin']
 
-            if 'style' in styles and 'ruberband' in styles['style']:
+            if 'style' in return_manager and 'ruberband' in return_manager['style']:
                 # Set default values
                 opacity = 100
                 width = 3
                 color = QColor(255, 0, 0, 125)
-                if 'transparency' in styles['style']['ruberband']:
-                    opacity = styles['style']['ruberband']['transparency'] * 255
-                if 'color' in styles['style']['ruberband']:
-                    color = styles['style']['ruberband']['color']
+                if 'transparency' in return_manager['style']['ruberband']:
+                    opacity = return_manager['style']['ruberband']['transparency'] * 255
+                if 'color' in return_manager['style']['ruberband']:
+                    color = return_manager['style']['ruberband']['color']
                     color = QColor(color[0], color[1], color[2], opacity)
-                if 'width' in styles['style']['ruberband']:
-                    width = styles['style']['ruberband']['width']
+                if 'width' in return_manager['style']['ruberband']:
+                    width = return_manager['style']['ruberband']['width']
                 self.draw(json_result, margin, color=color, width=width)
             else:
                 for key, value in list(json_result['body']['data'].items()):
                     if key in ('point', 'line', 'polygon'):
-                        if key not in json_result['body']['data']: continue
-                        if 'features' not in json_result['body']['data'][key]: continue
-                        if len(json_result['body']['data'][key]['features']) == 0: continue
+                        if key not in json_result['body']['data']:
+                            continue
+                        if 'features' not in json_result['body']['data'][key]:
+                            continue
+                        if len(json_result['body']['data'][key]['features']) == 0:
+                            continue
 
                         layer_name = f'Temporal layer {key}'
                         self.delete_layer_from_toc(layer_name)
@@ -1390,8 +1395,8 @@ class ParentAction(object):
 
                         # Get values for set layer style
                         style = json_result['body']['returnManager']['style']
-                        if 'style' in styles and 'transparency' in styles['style'][key]:
-                            opacity = styles['style'][key]['transparency']
+                        if 'style' in return_manager and 'transparency' in return_manager['style'][key]:
+                            opacity = return_manager['style'][key]['transparency']
                         if style[key]['style'] == 'categorized':
                             color_values = {}
                             for item in json_result['body']['returnManager']['style'][key]['values']:
@@ -1411,9 +1416,9 @@ class ParentAction(object):
                             stiyle_id = style[key]['id']
                             extras += f'"function_id":"{stiyle_id}"'
                             body = self.create_body(extras=extras)
-                            return_styles = self.controller.get_json('gw_fct_getstyle', body, log_sql=True)
-                            if 'layers' in return_styles['body']['data']['addToc']:
-                                for layer_info in return_styles['body']['data']['addToc']['layers']:
+                            styles = self.controller.get_json('gw_fct_getstyle', body, log_sql=True)
+                            if 'layers' in styles['body']['data']['addToc']:
+                                for layer_info in styles['body']['data']['addToc']['layers']:
                                     if 'error' in layer_info:
                                         msg = layer_info['error']
                                         self.controller.show_warning(msg)
@@ -1438,7 +1443,7 @@ class ParentAction(object):
                         if style[key]['style'] == 'unique':
                             color = style[key]['style']['values']['color']
                             size = style['width'] if 'width' in style and style['width'] else 2
-                            opacity = styles['style'][key]['transparency']
+                            opacity = return_manager['style'][key]['transparency']
                             color = QColor(color[0], color[1], color[2])
                             if key == 'point':
                                 v_layer.renderer().symbol().setSize(size)

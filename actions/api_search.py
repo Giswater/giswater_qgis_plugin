@@ -189,7 +189,7 @@ class ApiSearch(ApiParent):
             if not complet_result:
                 return
 
-            margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
+            margin = float(complet_result[0]['body']['feature']['zoomCanvasMargin']['mts'])
             self.draw(complet_result[0], margin)
             self.resetRubberbands()
 
