@@ -936,7 +936,7 @@ class ApiCF(ApiParent, QObject):
         for widget in widget_list:
             for field in result['fields']:
                 if widget.objectName() == field['widgetname']:
-                    if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit):
+                    if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit, QTextEdit):
                         widget.setReadOnly(not enable)
                         widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
                     elif type(widget) in (QComboBox, QCheckBox, QgsDateTimeEdit):
@@ -957,7 +957,7 @@ class ApiCF(ApiParent, QObject):
         for widget in widget_list:
             for field in result['fields']:
                 if widget.objectName() == field['widgetname']:
-                    if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit):
+                    if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit, QTextEdit):
                         widget.setReadOnly(not field['iseditable'])
                         if not field['iseditable']:
                             widget.setFocusPolicy(Qt.NoFocus)
