@@ -181,7 +181,7 @@ INSERT INTO config_function (id, function_name, returnmanager, layermanager, act
 VALUES(2618,'gw_fct_setsearch','{"style":{"ruberband":{"width":3, "color":[255,0,0], "transparency":0.5}}}',NULL,NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2620,'gw_fct_setsearchadd','{"style":{"ruberband":{"width":3, "color":[2550,0], "transparency":0.5}}, "zoom":{"margin":50}}',NULL,NULL);
+VALUES(2620,'gw_fct_setsearchadd','{"style":{"ruberband":{"width":3, "color":[255, 0,0], "transparency":0.5}}, "zoom":{"margin":50}}',NULL,NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
 VALUES(2670,'gw_fct_om_check_data','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
