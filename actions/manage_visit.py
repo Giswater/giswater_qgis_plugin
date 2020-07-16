@@ -240,6 +240,10 @@ class ManageVisit(ParentManage, QObject):
         if self.x:
             self.update_geom()
 
+        layer = self.controller.get_layer_by_tablename('v_edit_om_visit')
+        if layer:
+            layer.dataProvider().forceReload()
+        
         self.refresh_map_canvas()
 
 
