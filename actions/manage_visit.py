@@ -269,7 +269,10 @@ class ManageVisit(ParentManage, QObject):
 
         # notify that a new visit has been added
         self.visit_added.emit(self.current_visit.id)
-        
+
+        layer = self.controller.get_layer_by_tablename('v_edit_om_visit')
+        if layer:
+            layer.dataProvider().forceReload()
         self.refresh_map_canvas()
 
 
