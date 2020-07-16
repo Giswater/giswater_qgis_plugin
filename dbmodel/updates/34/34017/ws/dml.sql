@@ -22,3 +22,10 @@ UPDATE ws_sample.config_toolbox SET inputparams  =
 "comboIds":[0,1,2,3], "comboNames":["NONE", "CONCAVE POLYGON", "PIPE BUFFER", "PLOT & PIPE BUFFER"], "selectedId":"2"}, 
 {"widgetname":"geomParamUpdate", "label":"Update parameter:","widgettype":"text","datatype":"float","layoutname":"grl_option_parameters","layoutorder":8, "isMandatory":false, "placeholder":"5-30", "value":""}]'
 WHERE id = 2768;
+
+
+SELECT ws.gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
+ "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-DELETE" }}$$);
+ 
+ SELECT ws.gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
+"data":{"filterFields":{}, "pageInfo":{}, "multi_create":"True" }}$$);
