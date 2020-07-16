@@ -1705,7 +1705,7 @@ class ApiCF(ApiParent, QObject):
     def fill_tab_hydrometer(self):
         """ Fill tab 'Hydrometer' """
 
-        table_hydro = "v_rtc_hydrometer"
+        table_hydro = "v_ui_hydrometer"
         txt_hydrometer_id = self.dlg_cf.findChild(QLineEdit, "txt_hydrometer_id")
         self.fill_tbl_hydrometer(self.tbl_hydrometer, table_hydro)
         self.set_columns_config(self.tbl_hydrometer, table_hydro)
