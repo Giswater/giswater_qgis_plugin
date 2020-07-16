@@ -329,17 +329,21 @@ BEGIN
 
 			-- close boundary conditions setting flag=1 for all nodes that fits on graf delimiters and closed valves
 			v_querytext  = 'UPDATE temp_anlgraf SET flag=1 WHERE 
-					node_1::integer IN('||v_text||' UNION
-					SELECT (a.node_id::integer) FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN cat_feature_node c ON c.id=b.nodetype_id 
+					node_1::integer IN ('||v_text||' 
+					UNION
+					SELECT a.node_id::integer FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN cat_feature_node c ON c.id=b.nodetype_id 
 					LEFT JOIN man_valve d ON a.node_id::integer=d.node_id::integer 
 					JOIN temp_anlgraf e ON a.node_id::integer=e.node_1::integer 
 					JOIN config_valve v ON v.id = c.id
-					WHERE closed=TRUE)
-					OR node_2::integer IN ('||v_text||' UNION
+					WHERE closed=TRUE)';
+			EXECUTE v_querytext;
+			
+			v_querytext  = 'UPDATE temp_anlgraf SET flag=1 WHERE 
+					node_2::integer IN ('||v_text||' 
+					UNION
 					SELECT (a.node_id::integer) FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN cat_feature_node c ON c.id=b.nodetype_id 
 					LEFT JOIN man_valve d ON a.node_id::integer=d.node_id::integer 
-					JOIN temp_anlgraf e ON a.node_id::integer=e.node_1::integer 
-					JOIN config_valve v ON v.id = c.id
+					JOIN temp_anlgraf e ON a.node_id::integer=e.node_1::integer JOIN config_valve v ON v.id = c.id
 					WHERE closed=TRUE)';
 			EXECUTE v_querytext;
 
