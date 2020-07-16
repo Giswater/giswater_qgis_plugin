@@ -185,7 +185,7 @@ INSERT INTO config_typevalue VALUES ('device_typevalue','3','Web');
 INSERT INTO config_typevalue VALUES ('device_typevalue','4','Desktop');
 
 
-INSERT INTO config_typevalue VALUES ('widgettype_typevalue','textarea','Text area', 'textArea');
+INSERT INTO config_typevalue VALUES ('widgettype_typevalue','textarea','Text area', 'textArea') ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO config_typevalue VALUES ('device_typevalue','vspacer','vspacer','vspacer');
 INSERT INTO config_typevalue VALUES ('device_typevalue','hspacer','hspacer','hspacer');
 INSERT INTO config_typevalue VALUES ('device_typevalue','tableview','tableview', 'tableView');
