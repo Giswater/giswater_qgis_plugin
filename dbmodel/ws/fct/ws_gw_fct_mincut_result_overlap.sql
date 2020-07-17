@@ -380,7 +380,7 @@ BEGIN
 		v_message := COALESCE(v_message, ''); 
 
 		--  Return
-		RETURN ('{"status":"Accepted", "message":{'||v_message||'}, "version":"'||v_version.giswater||'"'||
+		RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{'||v_message||'}, "version":"'||v_version.giswater||'"'||
 			',"body":{"form":{}'||
 			',"data":{ "info":'||v_result_info||','||
 				'"geometry":"'||v_geometry||'",'|| 			
@@ -388,7 +388,7 @@ BEGIN
 				'"line":'||v_result_line||','||
 				'"polygon":'||v_result_pol||','||
 				'"setVisibleLayers":['||v_visiblelayer||']}'||
-			', "actions":{"overlap":"' || v_signal || '"}}}')::json;
+			', "actions":{"overlap":"' || v_signal || '"}}}')::json, 2244);
 		
 	ELSIF v_step  = 'continue' THEN
 	
