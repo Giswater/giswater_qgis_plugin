@@ -15,6 +15,25 @@ UPDATE config_form_fields SET formtype = 'form_list_header' where formtype = 'li
 DELETE FROM config_typevalue WHERE id = 'listfilter';
 DELETE FROM config_typevalue WHERE id IN (select id FROM config_typevalue WHERE id = 'tabData' LIMIT 1);
 
+UPDATE sys_table SET(field_geom, field_id) = ('the_geom', 'arc_id') WHERE id = 'v_edit_arc';
+UPDATE sys_table SET(field_geom, field_id) = ('the_geom', 'connec_id') WHERE id = 'v_edit_connec';
+UPDATE sys_table SET(field_geom, field_id) = ('the_geom', 'gully_id') WHERE id = 'v_edit_gully';
+UPDATE sys_table SET(field_geom, field_id) = ('the_geom', 'link_id') WHERE id = 'v_edit_link';
+UPDATE sys_table SET(field_geom, field_id) = ('the_geom', 'node_id') WHERE id = 'v_edit_node';
+
+INSERT INTO config_table(id, style) VALUES('v_edit_arc', 1);
+INSERT INTO config_table(id, style) VALUES('v_edit_connec', 2);
+INSERT INTO config_table(id, style) VALUES('v_edit_gully', 3);
+INSERT INTO config_table(id, style) VALUES('v_edit_link', 4);
+INSERT INTO config_table(id, style) VALUES('v_edit_node', 5);
+INSERT INTO config_table(id, style) VALUES('v_anl_flow_arc', 6);
+INSERT INTO config_table(id, style) VALUES('v_anl_flow_connec', 7);
+INSERT INTO config_table(id, style) VALUES('v_anl_flow_gully', 8);
+INSERT INTO config_table(id, style) VALUES('v_anl_flow_node', 9);
+INSERT INTO config_table(id, style) VALUES('Overlap affected arcs', 10);
+INSERT INTO config_table(id, style) VALUES('Overlap affected connecs', 11);
+INSERT INTO config_table(id, style) VALUES('Other mincuts whichs overlaps', 12);
+
 
 
 UPDATE sys_table SET (addtoc) = ('{"tableName":"v_edit_arc","primaryKey":"arc_id", "geom":"the_geom","group":"GW Temporal Layers","style":"101"}')
