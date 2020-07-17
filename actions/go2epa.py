@@ -11,10 +11,8 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QWidget, QCheckBox, QDateEdit
     QFileDialog
 from qgis.PyQt.QtGui import QRegExpValidator
 
-import csv
 import os
 import sys
-
 from functools import partial
 
 from .. import utils_giswater
@@ -448,79 +446,6 @@ class Go2Epa(ApiParent):
             self.dlg_go2epa.chk_only_check.setEnabled(False)
         else:
             self.dlg_go2epa.chk_only_check.setEnabled(True)
-
-
-    def check_data(self):
-        """ Check data executing function 'gw_fct_pg2epa' """
-
-        sql = f"SELECT gw_fct_pg2epa('{self.project_name}', 'True');"
-        row = self.controller.get_row(sql)
-        if not row:
-            return False
-
-        if row[0] > 0:
-            message = ("It is not possible to execute the epa model."
-                       "There are errors on your project. Review it!")
-            sql_details = (f"SELECT table_id, column_id, error_message"
-                           f" FROM audit_check_data"
-                           f" WHERE fid = 114 AND result_id = '{self.project_name}'")
-            inf_text = "For more details execute query:\n" + sql_details
-            title = "Execute epa model"
-            self.controller.show_info_box(message, title, inf_text, parameter=row[0])
-            self.csv_audit_check_data("audit_check_data", "audit_check_data_log.csv")
-            return False
-
-        else:
-            message = "Data is ok. You can try to generate the INP file"
-            title = "Execute epa model"
-            self.controller.show_info_box(message, title)
-            return True
-
-
-    def csv_audit_check_data(self, tablename, filename):
-
-        # Get columns name in order of the table
-        rows = self.controller.get_columns_list(tablename)
-        if not rows:
-            message = "Table not found"
-            self.controller.show_warning(message, parameter=tablename)
-            return
-
-        columns = []
-        for i in range(0, len(rows)):
-            column_name = rows[i]
-            columns.append(str(column_name[0]))
-        sql = (f"SELECT table_id, column_id, error_message"
-               f" FROM {tablename}"
-               f" WHERE fid = 114 AND result_id = '{self.project_name}'")
-        rows = self.controller.get_rows(sql)
-        if not rows:
-            message = "No records found with selected 'result_id'"
-            self.controller.show_warning(message, parameter=self.project_name)
-            return
-
-        all_rows = []
-        all_rows.append(columns)
-        for i in rows:
-            all_rows.append(i)
-        path = self.controller.get_log_folder() + filename
-        try:
-            with open(path, "w") as output:
-                writer = csv.writer(output, lineterminator='\n')
-                writer.writerows(all_rows)
-            message = "File created successfully"
-            self.controller.show_info(message, parameter=path)
-        except IOError:
-            message = "File cannot be created. Check if it is already opened"
-            self.controller.show_warning(message, parameter=path)
-
-
-    def save_file_parameters(self):
-        """ Save INP, RPT and result name into GSW file """
-
-        self.gsw_settings.setValue('FILE_INP', self.file_inp)
-        self.gsw_settings.setValue('FILE_RPT', self.file_rpt)
-        self.gsw_settings.setValue('RESULT_NAME', self.result_name)
 
 
     def go2epa_result_selector(self):

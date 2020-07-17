@@ -39,7 +39,6 @@ class TmParentAction(object):
         self.schema_name = self.controller.schema_name
         self.project_type = None
         self.file_gsw = None
-        self.gsw_settings = None
         self.lazy_widget = None
 
 
