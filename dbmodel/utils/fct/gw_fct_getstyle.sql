@@ -21,71 +21,75 @@ SELECT SCHEMA_NAME.gw_fct_getstyle($${"client":{"device":4, "infoType":1, "lang"
 */
  
 DECLARE
-v_addtoc json[];
+
 v_value json;
 v_layer text;
 v_layers json;
 v_return json;
+v_result json;
 v_style_type text;
-v_style json;
 v_version json;
 v_layers_array text[];
 v_temp_layer text;
-
-
+--v_style text;
+v_json_array json[];
 BEGIN
 
 	-- Search path
-	SET search_path = 'SCHEMA_NAME', public;	
+	SET search_path = 'SCHEMA_NAME', public;
 	
 	v_layers = ((p_data ->>'data')::json->>'layers')::json;
 	v_temp_layer = ((p_data ->>'data')::json->>'temp_layer')::text;
 	v_style_type =((p_data ->>'data')::json->>'style_type')::text;
-	v_layers_array = ARRAY(SELECT json_array_elements_text(v_layers::json)); 
-
+	v_layers_array = (select array_agg(value) as list from  json_array_elements_text(v_layers));
 	-- WHEN COME FROM config_function.layermanager
 	IF v_layers IS NOT NULL THEN
 		FOREACH v_layer IN ARRAY v_layers_array LOOP
-			EXECUTE 'SELECT addtoc FROM sys_table WHERE id='||quote_literal(v_layer)||''
-			INTO v_value; 
-			IF v_value IS NULL THEN
-				v_value=gw_fct_json_object_set_key((v_value)::json, 'error', 'Layer '||v_layer||' cannot be added, maybe it is a configuration problem, check the table sys_table or add it manually.');
-				
-			END IF;
-			IF v_value->>'style' IS NOT NULL THEN
-				EXECUTE 'SELECT stylevalue from sys_style WHERE idval ='||quote_literal(v_value->>'style')||''
-				into v_style;
-				IF v_style IS NOT NULL THEN			
-					v_value=gw_fct_json_object_set_key((v_value)::json, 'style', v_style);			
-				END IF;
-			END IF;
-			v_addtoc=array_append(v_addtoc,v_value);		
+			EXECUTE 'SELECT jsonb_build_object ('''||v_layer||''',feature)
+					FROM	(
+				SELECT jsonb_build_object(				
+				''stylevalue'',stylevalue
+				) AS feature
+				FROM (SELECT stylevalue FROM sys_style 
+				JOIN config_table ON config_table.style::text = sys_style.id::text
+				AND config_table.id = '||quote_literal(v_layer)||') row) a;'
+				INTO v_result;
+					
+			SELECT array_append(v_json_array, v_result) into v_json_array;			
+			
 		END LOOP;		
-		v_return = gw_fct_json_object_set_key((p_data->>'body')::json, 'layers', v_addtoc);
-	END IF;
+		v_return = gw_fct_json_object_set_key((p_data->>'body')::json, 'layers', v_json_array);
 
+	END IF;
+	RAISE NOTICE 'p_data-->%',p_data;
 	
 	-- WHEN COME FROM config_function.returnmanager
+	/*
 	IF v_temp_layer IS NOT NULL THEN
+
 		EXECUTE '
 			SELECT jsonb_build_object(
 			''styletype'', row.styletype,
-			''stylevalue'', row.stylevalue) 
+			''stylevalue'', row.stylevalue
+			) 
 			FROM (SELECT styletype, stylevalue from sys_style WHERE idval ='''||v_style_type||''') row ;'
 			INTO v_style;
 
 		IF v_style IS NOT NULL THEN			
 			v_return=gw_fct_json_object_set_key((v_value)::json, 'style', v_style);			
 		END IF;
+
 	END IF;
+	*/
     
-        v_version := COALESCE(v_version, '{}');
-        v_return := COALESCE(v_return, '{}');
+    	v_version := COALESCE(v_version, '{}');
+	v_return := COALESCE(v_return, '{}');
 	 
 	-- Return
 		RETURN ('{"status":"Accepted", "message":{"level":1, "text":"Executed successfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
-		     ',"data":{"addToc":'||v_return||'}'||
+		     ',"data":{}'||
+		     ',"styles":'||v_return||''||
 	    '}}')::json;
 	    
 END;
