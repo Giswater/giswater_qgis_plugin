@@ -1285,7 +1285,7 @@ class ApiParent(ParentAction):
         """ Insert widget into layout """
 
         layout = dialog.findChild(QGridLayout, field['layoutname'])
-        if layout is None:
+        if layout in (None, 'null', 'NULL', 'Null'):
             return
         layout.addWidget(lbl, int(field['layoutorder']), 0)
         layout.addWidget(widget, int(field['layoutorder']), 2)
