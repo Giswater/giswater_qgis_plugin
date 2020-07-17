@@ -5,7 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsProject, QgsApplication
+from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsApplication
 from qgis.PyQt.QtCore import QPoint, Qt
 from qgis.PyQt.QtWidgets import QAction, QApplication, QDockWidget, QMenu, QToolBar, QToolButton
 from qgis.PyQt.QtGui import QCursor, QIcon, QPixmap
@@ -15,7 +15,7 @@ from functools import partial
 
 from ..actions.add_layer import AddLayer
 from ..actions.check_project_result import CheckProjectResult
-from ..actions.task_config_layer_fields import TaskConfigLayerFields
+from .task_config_layer_fields import TaskConfigLayerFields
 
 
 class ManageLayers:
