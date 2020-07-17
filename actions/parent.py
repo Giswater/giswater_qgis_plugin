@@ -1350,7 +1350,6 @@ class ParentAction(object):
         :param sql: query executed (String)
         :return: None
         """
-
         try:
             return_manager = json_result['body']['returnManager']
         except KeyError:
@@ -1376,7 +1375,7 @@ class ParentAction(object):
                 self.draw(json_result, margin, color=color, width=width)
             else:
                 for key, value in list(json_result['body']['data'].items()):
-                    if key in ('point', 'line', 'polygon'):
+                    if key.lower() in ('point', 'line', 'polygon'):
                         if key not in json_result['body']['data']:
                             continue
                         if 'features' not in json_result['body']['data'][key]:
@@ -1385,12 +1384,15 @@ class ParentAction(object):
                             continue
 
                         layer_name = f'Temporal layer {key}'
+                        if 'layerName' in key:
+                            layer_name = key['layerName']
                         self.delete_layer_from_toc(layer_name)
 
                         # Get values for create and populate layer
                         counter = len(json_result['body']['data'][key]['features'])
                         geometry_type = json_result['body']['data'][key]['geometryType']
                         v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", layer_name, 'memory')
+
                         self.add_layer.populate_vlayer(v_layer, json_result['body']['data'], key, counter)
 
                         # Get values for set layer style
@@ -1413,33 +1415,21 @@ class ParentAction(object):
                             v_layer.renderer().symbol().setOpacity(opacity)
                         elif style[key]['style'] == 'qml':
                             extras = f'"temp_layer":"{key}", '
-                            stiyle_id = style[key]['id']
-                            extras += f'"function_id":"{stiyle_id}"'
+                            style_id = style[key]['id']
+                            extras += f'"style_type":"{style_id}"'
                             body = self.create_body(extras=extras)
-                            styles = self.controller.get_json('gw_fct_getstyle', body, log_sql=True)
-                            if 'layers' in styles['body']['data']['addToc']:
-                                for layer_info in styles['body']['data']['addToc']['layers']:
-                                    if 'error' in layer_info:
-                                        msg = layer_info['error']
-                                        self.controller.show_warning(msg)
-                                        continue
-                                    try:
-                                        tablename = layer_info['tableName']
-                                        teh_geom = layer_info['geom']
-                                        field_id = layer_info['primaryKey']
-                                        if 'group' in layer_info and layer_info['group']:
-                                            group = layer_info['group']
-                                        else:
-                                            group = None
-                                        self.add_layer.from_postgres_to_toc(tablename, teh_geom, field_id, None, group)
-                                    except KeyError as e:
-                                        self.controller.log_info(f"{type(e).__name__} --> {e}")
+                            styles = self.controller.get_json('gw_fct_getstyle', body)
+                            new_layer_name = v_layer.name()
+                            if 'style' in styles['body']['data']['addToc']:
+                                if 'styletype' in styles['body']['data']['addToc']['style']:
+                                    if styles['body']['data']['addToc']['style']['styletype'] is not None:
+                                        new_layer_name = styles['body']['data']['addToc']['style']['styletype']
+                                if 'stylevalue' in styles['body']['data']['addToc']['style']:
+                                    qml = styles['body']['data']['addToc']['style']['stylevalue']
 
-                                    if 'style' in layer_info:
-                                        style = layer_info['style']
-                                        layer = self.controller.get_layer_by_tablename(tablename)
-                                        if layer:
-                                            self.create_qml(layer, style)
+                                v_layer.setName(new_layer_name)
+                                self.create_qml(v_layer, qml)
+
                         if style[key]['style'] == 'unique':
                             color = style[key]['style']['values']['color']
                             size = style['width'] if 'width' in style and style['width'] else 2
@@ -1485,46 +1475,30 @@ class ParentAction(object):
             # inserted in the table sys_style.stylevalue where idval is the id of the postgre function that is running
             # and styletype if the layer is line, poin or polygon
             if 'visible' in layermanager:
-                layers_to_add = '  '
-                for layer_name in layermanager['visible']:
+                layers_to_set_style = '  '
+                for lyr in layermanager['visible']:
+                    layer_name = [key for key in lyr][0]
+
                     layer = self.controller.get_layer_by_tablename(layer_name)
-                    if layer:
-                        self.controller.set_layer_visible(layer)
-                    else:
-                        layers_to_add += f'"{layer_name}", '
-                if 'zoom' in layermanager and layermanager['zoom'] not in (None, '', '{}'):
-                    layers_to_add += f'"{layermanager["zoom"]["layer"]}", '
-
-                layers_to_add = layers_to_add[:-2]
-
-                if layers_to_add not in (None, '') and funct_id not in (None, ''):
-                    extras = f'"layers":[{layers_to_add}], '
+                    if layer is None:
+                        the_geom = lyr[layer_name]['field_geom']
+                        field_id = lyr[layer_name]['field_id']
+                        layers_to_set_style += f'"{layer_name}", '
+                        self.add_layer.from_postgres_to_toc(layer_name, the_geom, field_id)
+                    layer = self.controller.get_layer_by_tablename(layer_name)
+                    self.controller.set_layer_visible(layer)
+                layers_to_set_style = layers_to_set_style[:-2]
+                if layers_to_set_style not in (None, '') and funct_id not in (None, ''):
+                    extras = f'"layers":[{layers_to_set_style}], '
                     extras += f'"function_id":"{funct_id}"'
                     body = self.create_body(extras=extras)
                     styles = self.controller.get_json('gw_fct_getstyle', body, log_sql=True)
-                    if 'layers' in styles['body']['data']['addToc']:
-                        for layer_info in styles['body']['data']['addToc']['layers']:
-                            if 'error' in layer_info:
-                                msg = layer_info['error']
-                                self.controller.show_warning(msg)
-                                continue
-                            try:
-                                tablename = layer_info['tableName']
-                                teh_geom = layer_info['geom']
-                                field_id = layer_info['primaryKey']
-                                if 'group' in layer_info and layer_info['group']:
-                                    group = layer_info['group']
-                                else:
-                                    group = None
-                                self.add_layer.from_postgres_to_toc(tablename, teh_geom, field_id, None, group)
-                            except KeyError as e:
-                                self.controller.log_info(f"{type(e).__name__} --> {e}")
-
-                            if 'style' in layer_info:
-                                style = layer_info['style']
-                                layer = self.controller.get_layer_by_tablename(tablename)
-                                if layer:
-                                    self.create_qml(layer, style)
+                for lyr in styles['body']['styles']['layers']:
+                    layer_name = [key for key in lyr][0]
+                    qml = lyr[layer_name]['stylevalue']
+                    layer = self.controller.get_layer_by_tablename(layer_name)
+                    if layer:
+                        self.create_qml(layer, qml)
 
             # Get a list of layers names force reload dataProvider of layer
             if 'index' in layermanager:
@@ -1612,7 +1586,7 @@ class ParentAction(object):
         """
 
         try:
-            actions = json_result['body']['actions']
+            actions = json_result['body']['python_actions']
         except KeyError:
             return
         try:
