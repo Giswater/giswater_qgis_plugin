@@ -7245,7 +7245,7 @@ $$, true);
 
 
 INSERT INTO sys_style(idval, styletype, stylevalue, active)
-VALUES('111', 'Overlap affected connecs' $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
+VALUES('111', 'Overlap affected connecs', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
 <qgis hasScaleBasedVisibilityFlag="0" simplifyLocal="1" readOnly="0" labelsEnabled="0" simplifyAlgorithm="0" simplifyMaxScale="1" minScale="1e+08" simplifyDrawingHints="1" version="3.10.4-A Coruña" styleCategories="AllStyleCategories" simplifyDrawingTol="1" maxScale="0">
   <flags>
     <Identifiable>1</Identifiable>
@@ -7388,7 +7388,7 @@ $$, true);
 
 
 INSERT INTO sys_style(idval, styletype, stylevalue, active)
-VALUES('112', 'Other mincuts whichs overlaps' $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
+VALUES('112', 'Other mincuts whichs overlaps', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
 <qgis hasScaleBasedVisibilityFlag="0" simplifyLocal="1" readOnly="0" labelsEnabled="0" simplifyAlgorithm="0" simplifyMaxScale="1" minScale="1e+08" simplifyDrawingHints="1" version="3.10.4-A Coruña" styleCategories="AllStyleCategories" simplifyDrawingTol="1" maxScale="0">
   <flags>
     <Identifiable>1</Identifiable>
