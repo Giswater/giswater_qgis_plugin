@@ -20,7 +20,7 @@ v_value json;
 v_layer text;
 v_layers json;
 v_return json;
-v_funtion_id text;
+v_style text;
 v_style text;
 v_version json;
 v_layers_array text[];
@@ -34,7 +34,7 @@ BEGIN
 	
 	v_layers = ((p_data ->>'data')::json->>'layers')::json;
 	v_temp_layer = ((p_data ->>'data')::json->>'temp_layer')::text;
-	v_funtion_id =((p_data ->>'data')::json->>'function_id')::text;
+	v_style_type =((p_data ->>'data')::json->>'style_type')::text;
 	v_layers_array = ARRAY(SELECT json_array_elements_text(v_layers::json)); 
 	raise notice 'v_layers-->%',v_layers;
 
