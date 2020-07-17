@@ -20,7 +20,7 @@ v_value json;
 v_layer text;
 v_layers json;
 v_return json;
-v_style text;
+v_style_type text;
 v_style text;
 v_version json;
 v_layers_array text[];
