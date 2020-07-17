@@ -1,3 +1,9 @@
+/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
 -- Function: SCHEMA_NAME.gw_fct_getstyle(json)
 
 -- DROP FUNCTION SCHEMA_NAME.gw_fct_getstyle(json);
@@ -21,7 +27,7 @@ v_layer text;
 v_layers json;
 v_return json;
 v_style_type text;
-v_style text;
+v_style json;
 v_version json;
 v_layers_array text[];
 v_temp_layer text;
@@ -36,8 +42,6 @@ BEGIN
 	v_temp_layer = ((p_data ->>'data')::json->>'temp_layer')::text;
 	v_style_type =((p_data ->>'data')::json->>'style_type')::text;
 	v_layers_array = ARRAY(SELECT json_array_elements_text(v_layers::json)); 
-	raise notice 'v_layers-->%',v_layers;
-
 
 	-- WHEN COME FROM config_function.layermanager
 	IF v_layers IS NOT NULL THEN
@@ -59,21 +63,24 @@ BEGIN
 		END LOOP;		
 		v_return = gw_fct_json_object_set_key((p_data->>'body')::json, 'layers', v_addtoc);
 	END IF;
+
 	
-    
 	-- WHEN COME FROM config_function.returnmanager
 	IF v_temp_layer IS NOT NULL THEN
-		EXECUTE 'SELECT stylevalue from sys_style WHERE idval ='||quote_literal(v_funtion_id)||' AND styletype ='||quote_literal(v_temp_layer)||''
-		into v_style;
-		if v_style is not null then			
+		EXECUTE '
+			SELECT jsonb_build_object(
+			''styletype'', row.styletype,
+			''stylevalue'', row.stylevalue) 
+			FROM (SELECT styletype, stylevalue from sys_style WHERE idval ='''||v_style_type||''') row ;'
+			INTO v_style;
+
+		IF v_style IS NOT NULL THEN			
 			v_return=gw_fct_json_object_set_key((v_value)::json, 'style', v_style);			
-		end if;
+		END IF;
 	END IF;
     
-    
-	v_version := COALESCE(v_version, '{}');
-	v_return := COALESCE(v_return, '{}');
-
+        v_version := COALESCE(v_version, '{}');
+        v_return := COALESCE(v_return, '{}');
 	 
 	-- Return
 		RETURN ('{"status":"Accepted", "message":{"level":1, "text":"Executed successfully"}, "version":"'||v_version||'"'||
@@ -85,5 +92,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_fct_getstyle(json)
-  OWNER TO postgres;
