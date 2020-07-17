@@ -11,7 +11,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 UPDATE sys_table SET id = 'config_valve' WHERE id = 'config_mincut_valve';
 
 
-UPDATE ws_sample.config_toolbox SET inputparams  = 
+UPDATE config_toolbox SET inputparams  = 
 '[{"widgetname":"grafClass", "label":"Graf class:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,"comboIds":["PRESSZONE","DQA","DMA","SECTOR"],
 "comboNames":["Pressure Zonification (PRESSZONE)", "District Quality Areas (DQA) ", "District Metering Areas (DMA)", "Inlet Sectorization (SECTOR-HIGH / SECTOR-LOW)"], "selectedId":"DMA"}, 
 {"widgetname":"exploitation", "label":"Exploitation:","widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":2, 
@@ -24,8 +24,8 @@ UPDATE ws_sample.config_toolbox SET inputparams  =
 WHERE id = 2768;
 
 
-SELECT ws.gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
+SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
  "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-DELETE" }}$$);
  
- SELECT ws.gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
+ SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
 "data":{"filterFields":{}, "pageInfo":{}, "multi_create":"True" }}$$);
