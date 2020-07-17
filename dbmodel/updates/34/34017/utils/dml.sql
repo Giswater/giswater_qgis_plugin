@@ -147,7 +147,7 @@ INSERT INTO config_function (id, function_name, returnmanager, layermanager, act
 VALUES(2218,'gw_fct_flow_trace','{"style":{"point":{"style":"qml", "id":"2218"},  "line":{"style":"qml", "id":"2218"}}}','{"visible": ["v_anl_flow_node", "v_anl_flow_gully", "v_anl_flow_connec", "v_anl_flow_arc"]}',NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2244,'gw_fct_mincut_result_overlap','{"style":{"point":{"style":"qml", "id":"2244"},  "line":{"style":"qml", "id":"2244"}}}',NULL,NULL);
+VALUES(2244,'gw_fct_mincut_result_overlap','{"style":{"point":{"style":"qml", "id":"111"},  "line":{"style":"qml", "id":"110"}, "polygon":{"style":"qml", "id":"112"}}}',NULL,NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
 VALUES(2302,'gw_fct_anl_node_topological_consistency','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
@@ -213,7 +213,7 @@ VALUES(2776,'gw_fct_admin_check_data', '{"style":{"point":{"style":"unique", "va
 --VALUES(2784,'gw_fct_insert_importdxf',NULL,NULL,NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2824,'',NULL,'{"visible": ["v_edit_dimensions"],"zoom": {"layer":"v_edit_arc", "margin":20}}',NULL);
+VALUES(2824,'gw_fct_getdimensioning',NULL,'{"visible": ["v_edit_dimensions"],"zoom": {"layer":"v_edit_arc", "margin":20}}',NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
 VALUES(2826,'gw_fct_grafanalytics_lrs','{"style":{"point":{"style":"random","field":"fid","width":2,"transparency":0.5}},
