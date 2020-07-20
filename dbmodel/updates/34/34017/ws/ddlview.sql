@@ -8,6 +8,17 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2020/07/16
+
+drop VIEW if exists vi_pjoint;
+CREATE OR REPLACE VIEW vi_pjoint AS 
+SELECT v_edit_inp_connec.pjoint_id,
+     pjoint_type,
+    sum(v_edit_inp_connec.demand) AS sum
+   FROM v_edit_inp_connec
+  WHERE v_edit_inp_connec.pjoint_id IS NOT NULL
+  GROUP BY v_edit_inp_connec.pjoint_id, pjoint_type;
+
+
 CREATE OR REPLACE VIEW v_inp_pjointpattern AS 
  SELECT row_number() OVER (ORDER BY a.pattern_id, a.idrow) AS id,
     a.idrow,

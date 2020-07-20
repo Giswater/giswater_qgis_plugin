@@ -109,8 +109,8 @@ BEGIN
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
 				   FROM vi_pjointpattern JOIN node ON pattern_id=node_id ORDER by 3,4;		
 
-			UPDATE temp_node SET demand = 1, pattern_id=node_id 
-			FROM vi_pjoint WHERE node_id = concat('VN',pjoint_id) AND result_id=result_id_var;
+			UPDATE temp_node SET demand = 1, pattern_id=node_id FROM vi_pjoint WHERE node_id = concat('VN',pjoint_id) AND pjoint_type = 'VNODE';
+			UPDATE temp_node SET demand = 1, pattern_id=node_id FROM vi_pjoint WHERE node_id = pjoint_id AND pjoint_type = 'NODE';
 		END IF;	
 		
 	ELSIF v_demandtype = 3 THEN -- SIMPLIFIED PERIOD (losses as unique multiplier for the whole system)
