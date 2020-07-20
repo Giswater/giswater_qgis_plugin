@@ -59,7 +59,6 @@ class DaoController(object):
         self.show_docker = None
         self.prev_maptool = None
         self.parent = None
-        self.gw_actions = None
         if create_logger:
             self.set_logger(logger_name)
 
@@ -1792,6 +1791,7 @@ class DaoController(object):
         if type(pos) is int and pos in (1, 2, 4, 8):
             self.dlg_docker.position = pos
 
+        # TODO: Check this
         # If user want to dock the dialog, we reset rubberbands for each info
         # For the first time, cf_info does not exist, therefore we cannot access it and reset rubberbands
         try:

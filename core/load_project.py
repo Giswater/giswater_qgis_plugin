@@ -28,6 +28,7 @@ from ..actions.master import Master
 from ..actions.mincut import MincutParent
 from ..actions.notify_functions import NotifyFunctions
 from ..actions.om import Om
+from ..actions.parent import ParentAction
 from ..actions.utils import Utils
 from ..actions.custom import Custom
 from ..actions.tm_basic import TmBasic
@@ -116,7 +117,11 @@ class LoadProject(QObject):
 
         # Check that there are no layers (v_edit_node) with the same view name, coming from different schemes
         status = self.check_layers_from_distinct_schema()
-        if status is False: return
+        if status is False:
+            return
+
+        # TODO: Refactor this
+        self.controller.parent = ParentAction(self.iface, self.settings, self.controller, self.plugin_dir)
 
         # Get water software from table 'version'
         self.project_type = self.controller.get_project_type()
