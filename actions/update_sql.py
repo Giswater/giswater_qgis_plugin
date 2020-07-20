@@ -2388,6 +2388,7 @@ class UpdateSQL(ApiParent):
     def read_execute_file(self, filedir, file, schema_name, project_epsg):
 
         status = False
+        f = None
         try:
             filepath = filedir + os.sep + file
             f = open(filepath, 'r', encoding="utf8")
@@ -2414,7 +2415,8 @@ class UpdateSQL(ApiParent):
                 self.controller.dao.rollback()
             status = False
         finally:
-            f.close()
+            if f:
+                f.close()
             return status
 
 
@@ -2663,8 +2665,8 @@ class UpdateSQL(ApiParent):
         status = self.controller.execute_sql(sql, log_sql=True)
 
         # Import xml to database
-        sql = ("SELECT " + schema_name + ".gw_fct_import_ui_xml('" + \
-               str(form_name_ui) + "', " + str(status_update_childs) + ")::text")
+        sql = ("SELECT " + schema_name + ".gw_fct_import_ui_xml('" + str(form_name_ui) + "', " +
+               str(status_update_childs) + ")::text")
         status = self.controller.execute_sql(sql, log_sql=True)
         self.manage_result_message(status, parameter="Import data into 'config_form_fields'")
 
@@ -2859,6 +2861,7 @@ class UpdateSQL(ApiParent):
         form_name_fields = qt_tools.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_formname_fields)
         self.chk_multi_insert = qt_tools.isChecked(self.dlg_readsql, self.dlg_readsql.chk_multi_insert)
 
+        window_title = ""
         if action == 'create':
             window_title = 'Create field on "' + str(form_name_fields) + '"'
             self.manage_create_field(form_name_fields)
@@ -3091,6 +3094,7 @@ class UpdateSQL(ApiParent):
                     QScrollArea, QFrame, QWidget, QScrollBar, QLabel, QAbstractButton, QHeaderView, QListView,
                     QGroupBox, QTableView) and widget.objectName() not in ('qt_spinbox_lineedit', 'chk_multi_insert'):
 
+                value = None
                 if type(widget) in (QLineEdit, QSpinBox, QDoubleSpinBox):
                     value = qt_tools.getWidgetText(self.dlg_manage_sys_fields, widget, return_string_null=False)
                 elif type(widget) is QComboBox:
@@ -3165,6 +3169,7 @@ class UpdateSQL(ApiParent):
                     elif type(widget) is QPlainTextEdit:
                         value = widget.document().toPlainText()
 
+                    result_json = None
                     if str(widget.objectName()) not in (None, 'null', '', ""):
                         _json[str(widget.objectName())] = value
                         result_json = json.dumps(_json)
@@ -3204,6 +3209,7 @@ class UpdateSQL(ApiParent):
                     elif type(widget) is QPlainTextEdit:
                         value = widget.document().toPlainText()
 
+                    result_json = None
                     if str(widget.objectName()) not in (None, 'null', '', ""):
                         _json[str(widget.objectName())] = value
                         result_json = json.dumps(_json)

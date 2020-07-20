@@ -286,6 +286,7 @@ class TaskGo2Epa(QgsTask):
                 for x in range(0, len(dirty_list)):
                     if bool(re.search('[0-9][-]\d{1,2}[.]]*', str(dirty_list[x]))):
                         last_index = 0
+                        i = 0
                         for i, c in enumerate(dirty_list[x]):
                             if "-" == c:
                                 json_elem = dirty_list[x][last_index:i]

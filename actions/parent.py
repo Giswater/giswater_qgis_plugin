@@ -293,6 +293,7 @@ class ParentAction(object):
         :param aql: (add query left) Query added to the left side (used in basic.py def basic_exploitation_selector())
         :return:
         """
+
         # fill QTableView all_rows
         tbl_all_rows = dialog.findChild(QTableView, "all_rows")
         tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -321,19 +322,20 @@ class ParentAction(object):
         self.fill_table_by_query(tbl_selected_rows, query_right + f" ORDER BY {name};")
         self.hide_colums(tbl_selected_rows, hide_right)
         tbl_selected_rows.setColumnWidth(0, 200)
+
         # Button select
         dialog.btn_select.clicked.connect(partial(self.multi_rows_selector, tbl_all_rows, tbl_selected_rows,
-                                          field_id_left, tableright, field_id_right, query_left, query_right, field_id_right))
+            field_id_left, tableright, field_id_right, query_left, query_right, field_id_right))
 
         # Button unselect
         query_delete = f"DELETE FROM {schema_name}.{tableright}"
         query_delete += f" WHERE current_user = cur_user AND {tableright}.{field_id_right}="
-        dialog.btn_unselect.clicked.connect(partial(self.unselector, tbl_all_rows,
-                                            tbl_selected_rows, query_delete, query_left, query_right, field_id_right))
+        dialog.btn_unselect.clicked.connect(partial(self.unselector, tbl_all_rows, tbl_selected_rows, query_delete,
+            query_left, query_right, field_id_right))
 
         # QLineEdit
         dialog.txt_name.textChanged.connect(partial(self.query_like_widget_text, dialog, dialog.txt_name,
-                                            tbl_all_rows, tableleft, tableright, field_id_right, field_id_left, name, aql))
+            tbl_all_rows, tableleft, tableright, field_id_right, field_id_left, name, aql))
 
         # Order control
         tbl_all_rows.horizontalHeader().sectionClicked.connect(partial(self.order_by_column, tbl_all_rows, query_left))
@@ -491,7 +493,8 @@ class ParentAction(object):
             self.controller.show_warning(model.lastError().text())
 
 
-    def query_like_widget_text(self, dialog, text_line, qtable, tableleft, tableright, field_id_r, field_id_l, name='name', aql=''):
+    def query_like_widget_text(self, dialog, text_line, qtable, tableleft, tableright, field_id_r, field_id_l,
+            name='name', aql=''):
         """ Fill the QTableView by filtering through the QLineEdit"""
 
         schema_name = self.schema_name.replace('"', '')
@@ -1377,6 +1380,7 @@ class ParentAction(object):
                 if 'width' in return_manager['style']['ruberband']:
                     width = return_manager['style']['ruberband']['width']
                 self.draw(json_result, margin, color=color, width=width)
+
             else:
                 for key, value in list(json_result['body']['data'].items()):
                     if key in ('point', 'line', 'polygon'):
@@ -1397,13 +1401,15 @@ class ParentAction(object):
                         self.add_layer.populate_vlayer(v_layer, json_result['body']['data'], key, counter)
 
                         # Get values for set layer style
+                        opacity = 100
                         style = json_result['body']['returnManager']['style']
                         if 'style' in return_manager and 'transparency' in return_manager['style'][key]:
                             opacity = return_manager['style'][key]['transparency']
                         if style[key]['style'] == 'categorized':
                             color_values = {}
                             for item in json_result['body']['returnManager']['style'][key]['values']:
-                                color_values[item['id']] = QColor(item['color'][0], item['color'][1], item['color'][2], opacity*255)
+                                color = QColor(item['color'][0], item['color'][1], item['color'][2], opacity*255)
+                                color_values[item['id']] = color
                             cat_field = str(style[key]['field'])
                             size = style['width'] if 'width' in style and style['width'] else 2
                             self.add_layer.categoryze_layer(v_layer, cat_field, size, color_values)
@@ -1426,6 +1432,7 @@ class ParentAction(object):
                                         msg = layer_info['error']
                                         self.controller.show_warning(msg)
                                         continue
+                                    tablename = ""
                                     try:
                                         tablename = layer_info['tableName']
                                         teh_geom = layer_info['geom']
@@ -1443,6 +1450,7 @@ class ParentAction(object):
                                         layer = self.controller.get_layer_by_tablename(tablename)
                                         if layer:
                                             self.create_qml(layer, style)
+
                         if style[key]['style'] == 'unique':
                             color = style[key]['style']['values']['color']
                             size = style['width'] if 'width' in style and style['width'] else 2
@@ -1511,6 +1519,7 @@ class ParentAction(object):
                                 msg = layer_info['error']
                                 self.controller.show_warning(msg)
                                 continue
+                            tablename = ""
                             try:
                                 tablename = layer_info['tableName']
                                 teh_geom = layer_info['geom']
