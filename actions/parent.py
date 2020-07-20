@@ -1383,9 +1383,10 @@ class ParentAction(object):
                         if len(json_result['body']['data'][key]['features']) == 0:
                             continue
 
-                        layer_name = f'Temporal layer {key}'
-                        if 'layerName' in key:
-                            layer_name = key['layerName']
+                        layer_name = f'{key}'
+                        if json_result['body']['data'][key]['layerName']:
+                            layer_name = json_result['body']['data'][key]['layerName']
+
                         self.delete_layer_from_toc(layer_name)
 
                         # Get values for create and populate layer
@@ -1396,43 +1397,40 @@ class ParentAction(object):
                         self.add_layer.populate_vlayer(v_layer, json_result['body']['data'], key, counter)
 
                         # Get values for set layer style
-                        style = json_result['body']['returnManager']['style']
+                        style_type = json_result['body']['returnManager']['style']
                         if 'style' in return_manager and 'transparency' in return_manager['style'][key]:
                             opacity = return_manager['style'][key]['transparency']
-                        if style[key]['style'] == 'categorized':
+                        if style_type[key]['style'] == 'categorized':
                             color_values = {}
                             for item in json_result['body']['returnManager']['style'][key]['values']:
                                 color_values[item['id']] = QColor(item['color'][0], item['color'][1], item['color'][2], opacity*255)
-                            cat_field = str(style[key]['field'])
-                            size = style['width'] if 'width' in style and style['width'] else 2
+                            cat_field = str(style_type[key]['field'])
+                            size = style_type['width'] if 'width' in style_type and style_type['width'] else 2
                             self.add_layer.categoryze_layer(v_layer, cat_field, size, color_values)
-                        elif style[key]['style'] == 'random':
-                            size = style['width'] if 'width' in style and style['width'] else 2
+                        elif style_type[key]['style'] == 'random':
+                            size = style_type['width'] if 'width' in style_type and style_type['width'] else 2
                             if geometry_type == 'Point':
                                 v_layer.renderer().symbol().setSize(size)
                             else:
                                 v_layer.renderer().symbol().setWidth(size)
                             v_layer.renderer().symbol().setOpacity(opacity)
-                        elif style[key]['style'] == 'qml':
-                            extras = f'"temp_layer":"{key}", '
-                            style_id = style[key]['id']
-                            extras += f'"style_type":"{style_id}"'
-                            body = self.create_body(extras=extras)
-                            styles = self.controller.get_json('gw_fct_getstyle', body)
-                            new_layer_name = v_layer.name()
-                            if 'style' in styles['body']['data']['addToc']:
-                                if 'styletype' in styles['body']['data']['addToc']['style']:
-                                    if styles['body']['data']['addToc']['style']['styletype'] is not None:
-                                        new_layer_name = styles['body']['data']['addToc']['style']['styletype']
-                                if 'stylevalue' in styles['body']['data']['addToc']['style']:
-                                    qml = styles['body']['data']['addToc']['style']['stylevalue']
 
+                        elif style_type[key]['style'] == 'qml':
+                            style_id = style_type[key]['id']
+                            extras = f'"style_id":"{style_id}"'
+                            body = self.create_body(extras=extras)
+                            style = self.controller.get_json('gw_fct_getstyle', body, log_sql=True)
+                            new_layer_name = v_layer.name()
+
+                            if 'styles' in style['body']:
+                                if 'style' in style['body']['styles']:
+                                    qml = style['body']['styles']['style']
                                 v_layer.setName(new_layer_name)
                                 self.create_qml(v_layer, qml)
 
-                        if style[key]['style'] == 'unique':
-                            color = style[key]['style']['values']['color']
-                            size = style['width'] if 'width' in style and style['width'] else 2
+                        elif style_type[key]['style'] == 'unique':
+                            color = style_type[key]['style']['values']['color']
+                            size = style_type['width'] if 'width' in style_type and style_type['width'] else 2
                             opacity = return_manager['style'][key]['transparency']
                             color = QColor(color[0], color[1], color[2])
                             if key == 'point':
@@ -1475,30 +1473,32 @@ class ParentAction(object):
             # inserted in the table sys_style.stylevalue where idval is the id of the postgre function that is running
             # and styletype if the layer is line, poin or polygon
             if 'visible' in layermanager:
-                layers_to_set_style = '  '
                 for lyr in layermanager['visible']:
                     layer_name = [key for key in lyr][0]
 
                     layer = self.controller.get_layer_by_tablename(layer_name)
                     if layer is None:
-                        the_geom = lyr[layer_name]['field_geom']
-                        field_id = lyr[layer_name]['field_id']
-                        layers_to_set_style += f'"{layer_name}", '
-                        self.add_layer.from_postgres_to_toc(layer_name, the_geom, field_id)
+
+                        the_geom = lyr[layer_name]['geom_field']
+                        field_id = lyr[layer_name]['pkey_field']
+                        if lyr[layer_name]['group_layer'] is not None:
+                            group = lyr[layer_name]['group_layer']
+                        else:
+                            group = "GW Layers"
+                        self.add_layer.from_postgres_to_toc(layer_name, the_geom, field_id, group=group)
                     layer = self.controller.get_layer_by_tablename(layer_name)
                     self.controller.set_layer_visible(layer)
-                layers_to_set_style = layers_to_set_style[:-2]
-                if layers_to_set_style not in (None, '') and funct_id not in (None, ''):
-                    extras = f'"layers":[{layers_to_set_style}], '
-                    extras += f'"function_id":"{funct_id}"'
+                    print(layermanager['visible'])
+                    style_id = layermanager['visible'][0][layer_name]['style_id']
+                    extras = f'"style_id":"{style_id}"'
                     body = self.create_body(extras=extras)
-                    styles = self.controller.get_json('gw_fct_getstyle', body, log_sql=True)
-                for lyr in styles['body']['styles']['layers']:
-                    layer_name = [key for key in lyr][0]
-                    qml = lyr[layer_name]['stylevalue']
-                    layer = self.controller.get_layer_by_tablename(layer_name)
-                    if layer:
+                    style = self.controller.get_json('gw_fct_getstyle', body, log_sql=True)
+                    
+                    if 'styles' in style['body']:
+                        if 'style' in style['body']['styles']:
+                            qml = style['body']['styles']['style']
                         self.create_qml(layer, qml)
+
 
             # Get a list of layers names force reload dataProvider of layer
             if 'index' in layermanager:
