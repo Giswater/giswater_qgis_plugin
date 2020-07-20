@@ -5820,7 +5820,3 @@ VALUES('107', 'Other mincuts whichs overlaps', $$<!DOCTYPE qgis PUBLIC 'http://m
   <layerGeometryType>1</layerGeometryType>
 </qgis>
 $$, true);
-
-
-
->>>>>>> 9de7acc1266796bf758177fb7f3e013bac90be86
