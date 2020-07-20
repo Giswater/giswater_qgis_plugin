@@ -7,8 +7,9 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2312
 
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_mincut_valve_unaccess(character varying, integer, text);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut_valve_unaccess(node_id_var character varying, result_id_var integer, cur_user_var text)
-  RETURNS void AS
+  RETURNS json AS
 $BODY$
 
 DECLARE 
@@ -16,6 +17,7 @@ DECLARE
 feature_id_aux text;
 feature_type_aux text;
 v_flag boolean = false;
+v_return json;
 
 BEGIN 
 	-- set search_path
@@ -41,7 +43,7 @@ BEGIN
 	END IF;
 	
 	-- Recalculate the mincut
-	PERFORM gw_fct_mincut(feature_id_aux, feature_type_aux, result_id_var);
+	SELECT gw_fct_mincut(feature_id_aux, feature_type_aux, result_id_var) INTO v_return;
 
 	-- In case of variable om_mincut_valvestatus_unaccess on TRUE and valve closed status on TRUE)
 	IF v_flag IS TRUE THEN
@@ -53,7 +55,7 @@ BEGIN
 		UPDATE man_valve SET closed=TRUE WHERE node_id=node_id_var;
 	END IF;
 
-RETURN;
+RETURN v_return;
     
 END;  
 $BODY$

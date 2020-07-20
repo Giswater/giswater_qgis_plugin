@@ -340,30 +340,31 @@ BEGIN
         SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
         SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
 
-    v_result := COALESCE(v_result, '{}'); 
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-	v_result_point:=COALESCE(v_result_point,'{}');
-	v_result_line:=COALESCE(v_result_line,'{}');
-	v_result_polygon:=COALESCE(v_result_polygon,'{}');
+		v_result := COALESCE(v_result, '{}'); 
+		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+		v_result_point:=COALESCE(v_result_point,'{}');
+		v_result_line:=COALESCE(v_result_line,'{}');
+		v_result_polygon:=COALESCE(v_result_polygon,'{}');
 
-     v_return = ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
-             ',"body":{"form":{}'||
-		     ',"data":{ "info":'||v_result_info||','||
-		     	'"setVisibleLayers":["v_om_mincut_initpoint", "v_om_mincut_arc", "v_om_mincut_node", "v_om_mincut_valve", "v_om_mincut_connec"]'||','||
+
+		--  Return
+		RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
+			',"body":{"form":{}'||
+				',"data":{ "info":'||v_result_info||','||
 				'"point":'||v_result_point||','||
 				'"line":'||v_result_line||','||
 				'"polygon":'||v_result_polygon||'}'||
-		       '}'||
-	    '}')::json;
-    END IF;
+				'}'
+			'}')::json, 2304);
+	END IF;
 
 	IF v_debug THEN RAISE NOTICE 'End of process ';	END IF;
 	
-	RETURN v_return;
+    RETURN v_return;
 
-	EXCEPTION WHEN OTHERS THEN
-	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+    EXCEPTION WHEN OTHERS THEN
+    GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+    RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
  
 END;
