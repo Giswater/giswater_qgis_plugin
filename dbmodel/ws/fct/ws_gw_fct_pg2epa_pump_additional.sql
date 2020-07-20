@@ -83,26 +83,18 @@ BEGIN
 			record_new_arc.state = arc_rec.state;
 			record_new_arc.arccat_id = arc_rec.arccat_id;
 			
-			-- Geometry construction from pattern arc
 			-- intermediate variables
 			n1_geom = ST_LineInterpolatePoint(arc_rec.the_geom, 0.500000);
-			n2_geom = ST_LineInterpolatePoint(arc_rec.the_geom, 0.500000);
 			dist = (ST_Distance(ST_transform(ST_startpoint(arc_rec.the_geom),rec.epsg), ST_LineInterpolatePoint(arc_rec.the_geom, 0.5000000))); 
 
 			--create point1
-			xp1 = ST_x(n1_geom)-(sin(angle))*dist*0.50000*(pump_order::float);
-			yp1 = ST_y(n1_geom)-(cos(angle))*dist*0.50000*(pump_order::float);
-			raise notice' % % %', cos(angle), dist, pump_order::float;
-			
-			--create point2
-			xp2 = ST_x(n2_geom)-sin(angle)*dist*0.500000*(pump_order::float);
-		    yp2 = ST_y(n2_geom)-cos(angle)*dist*0.500000*(pump_order::float);
-
+			xp1 = ST_x(n1_geom)-(sin(angle))*dist*0.15000*(pump_order::float);
+			yp1 = ST_y(n1_geom)-(cos(angle))*dist*0.15000*(pump_order::float);
+						
 			p1_geom = ST_SetSRID(ST_MakePoint(xp1, yp1),rec.epsg);	
-			p2_geom = ST_SetSRID(ST_MakePoint(xp2, yp2),rec.epsg);	
-
+			
 			--create arc
-			record_new_arc.the_geom=ST_makeline(ARRAY[ST_startpoint(arc_rec.the_geom), p1_geom, p2_geom, ST_endpoint(arc_rec.the_geom)]);
+			record_new_arc.the_geom=ST_makeline(ARRAY[ST_startpoint(arc_rec.the_geom), p1_geom, ST_endpoint(arc_rec.the_geom)]);
 
 			--addparam
 			v_addparam = concat('{"power":"',pump_rec.power,'","curve_id":"',pump_rec.curve_id,'","speed":"',pump_rec.speed,'","pattern":"', pump_rec.pattern,'","to_arc":"',

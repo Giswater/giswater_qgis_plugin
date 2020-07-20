@@ -128,8 +128,17 @@ BEGIN
 	RAISE NOTICE '12 - Move from temp tables';
 	UPDATE temp_arc SET result_id  = v_result;
 	UPDATE temp_node SET result_id  = v_result;
-	INSERT INTO rpt_inp_arc SELECT * FROM temp_arc;
-	INSERT INTO rpt_inp_node SELECT * FROM temp_node;
+	INSERT INTO rpt_inp_arc (result_id, arc_id, flw_code, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, 
+	length, n, the_geom, expl_id, minorloss, addparam, arcparent, q0, qmax, barrels, slope)
+	SELECT
+	result_id, arc_id, flw_code, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation,
+	length, n, the_geom, expl_id, minorloss, addparam, arcparent, q0, qmax, barrels, slope
+	FROM temp_arc;
+	INSERT INTO rpt_inp_node (result_id, node_id, flw_code, top_elev, ymax, elev, node_type, nodecat_id,
+	epa_type, sector_id, state, state_type, annotation, y0, ysur, apond, the_geom, expl_id, addparam, nodeparent, arcposition)
+	SELECT result_id, node_id, flw_code, top_elev, ymax, elev, node_type, nodecat_id, epa_type,
+	sector_id, state, state_type, annotation, y0, ysur, apond, the_geom, expl_id, addparam, nodeparent, arcposition
+	FROM temp_node;
 
 	RAISE NOTICE '13 - Create the inp file structure';	
 	SELECT gw_fct_pg2epa_export_inp(v_result, null) INTO v_file;
