@@ -48,7 +48,8 @@ class DeleteFeature(ApiParent):
         self.filter_typeahead(self.dlg_feature_delete.feature_id, completer, model)
 
         # Set listeners
-        self.dlg_feature_delete.feature_id.textChanged.connect(partial(self.filter_typeahead, self.dlg_feature_delete.feature_id, completer, model))
+        self.dlg_feature_delete.feature_id.textChanged.connect(
+            partial(self.filter_typeahead, self.dlg_feature_delete.feature_id, completer, model))
 
         # Set button snapping
         self.dlg_feature_delete.btn_snapping.clicked.connect(partial(self.set_active_layer))
@@ -100,7 +101,8 @@ class DeleteFeature(ApiParent):
         extras = '"feature_id":"' + feature_id + '"'
         body = self.create_body(feature=feature, extras=extras)
         result = self.controller.get_json('gw_fct_getfeaturerelation', body, log_sql=True)
-        if not result: return
+        if not result:
+            return
 
         # Construct message result
         result_msg = ''
@@ -183,12 +185,13 @@ class DeleteFeature(ApiParent):
 
     def set_active_layer(self):
 
-        #Get current layer and remove selection
+        # Get current layer and remove selection
         self.current_layer = self.iface.activeLayer()
         self.current_layer.removeSelection()
 
         # Set active layer
-        layer_name = 'v_edit_' + qt_tools.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
+        layer_name = 'v_edit_' + \
+            qt_tools.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
         layer = self.controller.get_layer_by_tablename(layer_name)
         self.iface.setActiveLayer(layer)
         self.controller.set_layer_visible(layer)

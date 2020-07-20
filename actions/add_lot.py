@@ -5,14 +5,13 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-from qgis.core import QgsPointXY
+from qgis.core import QgsPointXY, QgsFeatureRequest, QgsGeometry
+from qgis.gui import QgsRubberBand
 from qgis.PyQt.QtCore import QStringListModel, QDate, QSortFilterProxyModel, Qt, QDateTime
 from qgis.PyQt.QtGui import QColor, QStandardItem, QStandardItemModel
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QCompleter, QFileDialog, QHBoxLayout
 from qgis.PyQt.QtWidgets import QLineEdit, QTableView, QToolButton, QWidget, QDateEdit, QPushButton
-from qgis.core import QgsFeatureRequest, QgsGeometry
-from qgis.gui import QgsRubberBand
 
 import csv
 import os
@@ -70,8 +69,10 @@ class AddNewLot(ParentManage):
         self.dropdown.setPopupMode(QToolButton.MenuButtonPopup)
 
         # Create action and put into QToolButton
-        action_by_expression = self.create_action('action_by_expression', self.dlg_lot.action_selector, '204', 'Select by expression')
-        action_by_polygon = self.create_action('action_by_polygon', self.dlg_lot.action_selector, '205', 'Select by polygon')
+        action_by_expression = self.create_action(
+            'action_by_expression', self.dlg_lot.action_selector, '204', 'Select by expression')
+        action_by_polygon = self.create_action(
+            'action_by_polygon', self.dlg_lot.action_selector, '205', 'Select by polygon')
         self.dropdown.addAction(action_by_expression)
         self.dropdown.addAction(action_by_polygon)
         self.dropdown.setDefaultAction(action_by_expression)
@@ -120,7 +121,8 @@ class AddNewLot(ParentManage):
         self.clear_selection()
 
         # Set actions signals
-        action_by_expression.triggered.connect(partial(self.activate_selection, action_by_expression, 'mActionSelectByExpression'))
+        action_by_expression.triggered.connect(
+            partial(self.activate_selection, action_by_expression, 'mActionSelectByExpression'))
         action_by_polygon.triggered.connect(partial(self.activate_selection, action_by_polygon, 'mActionSelectPolygon'))
 
         # Set widgets signals
@@ -133,7 +135,8 @@ class AddNewLot(ParentManage):
         self.dlg_lot.btn_feature_snapping.clicked.connect(partial(self.selection_init, self.dlg_lot))
         self.dlg_lot.cmb_visit_class.currentIndexChanged.connect(self.set_tab_dis_enabled)
         self.dlg_lot.cmb_visit_class.currentIndexChanged.connect(self.set_active_layer)
-        self.dlg_lot.cmb_visit_class.currentIndexChanged.connect(partial(self.event_feature_type_selected, self.dlg_lot))
+        self.dlg_lot.cmb_visit_class.currentIndexChanged.connect(
+            partial(self.event_feature_type_selected, self.dlg_lot))
         self.dlg_lot.cmb_visit_class.currentIndexChanged.connect(partial(self.reload_table_visit))
         self.dlg_lot.cmb_status.currentIndexChanged.connect(partial(self.manage_cmb_status))
         self.dlg_lot.txt_filter.textChanged.connect(partial(self.reload_table_visit))
@@ -162,7 +165,8 @@ class AddNewLot(ParentManage):
             self.geom_type = qt_tools.get_item_data(self.dlg_lot, self.visit_class, 2).lower()
             self.populate_table_relations(lot_id)
             self.update_id_list()
-            self.set_dates_from_to(self.dlg_lot.date_event_from, self.dlg_lot.date_event_to, 've_visit_emb_neteja', 'startdate','enddate')
+            self.set_dates_from_to(self.dlg_lot.date_event_from, self.dlg_lot.date_event_to,
+                                   've_visit_emb_neteja', 'startdate', 'enddate')
             self.reload_table_visit()
             self.manage_cmb_status()
 
@@ -251,7 +255,7 @@ class AddNewLot(ParentManage):
 
         model = self.dlg_lot.tbl_relation.model()
         for x in range(0, model.rowCount()):
-            index = model.index(x, self.cmb_position-1)
+            index = model.index(x, self.cmb_position - 1)
             value = model.data(index)
 
             widget_cell = self.dlg_lot.tbl_relation.model().index(x, self.cmb_position)
@@ -306,7 +310,8 @@ class AddNewLot(ParentManage):
         self.set_table_columns(self.dlg_basic_table, self.dlg_basic_table.tbl_basic, table_name)
         self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.cancel_changes, self.dlg_basic_table.tbl_basic))
         self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_basic_table))
-        self.dlg_basic_table.btn_accept.clicked.connect(partial(self.save_basic_table, self.dlg_basic_table.tbl_basic, 'team'))
+        self.dlg_basic_table.btn_accept.clicked.connect(
+            partial(self.save_basic_table, self.dlg_basic_table.tbl_basic, 'team'))
         self.dlg_basic_table.btn_add_row.clicked.connect(partial(self.add_row, self.dlg_basic_table.tbl_basic))
         self.dlg_basic_table.rejected.connect(partial(self.save_settings, self.dlg_basic_table))
         self.open_dialog(self.dlg_basic_table, dlg_name='dialog_table')
@@ -440,9 +445,11 @@ class AddNewLot(ParentManage):
             return
 
         # Transform text dates as QDate
-        if startdate: startdate = startdate.replace('/', '-')
+        if startdate:
+            startdate = startdate.replace('/', '-')
         startdate = QDate.fromString(startdate, self.lot_date_format)
-        if enddate: enddate = enddate.replace('/', '-')
+        if enddate:
+            enddate = enddate.replace('/', '-')
         enddate = QDate.fromString(enddate, self.lot_date_format)
 
         if startdate <= enddate:
@@ -620,7 +627,7 @@ class AddNewLot(ParentManage):
         if not row or not row[0]:
             return 0
         else:
-            return row[0]+1
+            return row[0] + 1
 
 
     def event_feature_type_selected(self, dialog):
@@ -737,13 +744,14 @@ class AddNewLot(ParentManage):
 
         if qtable.model() is None:
             return []
+
         column_index = qt_tools.get_col_index_by_col_name(qtable, geom_type + '_id')
         model = qtable.model()
-
         id_list = []
         for i in range(0, model.rowCount()):
             i = model.index(i, column_index)
             id_list.append(i.data())
+
         return id_list
 
 
@@ -754,7 +762,7 @@ class AddNewLot(ParentManage):
         self.disconnect_signal_selection_changed()
         self.iface.mainWindow().findChild(QAction, action_name).triggered.connect(
             partial(self.selection_changed_by_expr, self.layer_lot, self.geom_type))
-        self.iface.mainWindow().findChild(QAction,action_name).trigger()
+        self.iface.mainWindow().findChild(QAction, action_name).trigger()
 
 
     def selection_changed_by_expr(self, layer, geom_type):
@@ -855,7 +863,7 @@ class AddNewLot(ParentManage):
         lay_out.setAlignment(Qt.AlignCenter)
         lay_out.setContentsMargins(0, 0, 0, 0)
         cell_widget.setLayout(lay_out)
-        i = qtable.model().index(qtable.model().rowCount()-1, self.cmb_position)
+        i = qtable.model().index(qtable.model().rowCount() - 1, self.cmb_position)
         qtable.setIndexWidget(i, cell_widget)
 
 
@@ -873,7 +881,7 @@ class AddNewLot(ParentManage):
         index = index_list[0]
         model = qtable.model()
 
-        for i in range(len(index_list)-1, -1, -1):
+        for i in range(len(index_list) - 1, -1, -1):
             row = index_list[i].row()
             column_index = qt_tools.get_col_index_by_col_name(qtable, feature_type + '_id')
             feature_id = index.sibling(row, column_index).data()
@@ -998,7 +1006,7 @@ class AddNewLot(ParentManage):
             item = []
             for value in row:
                 if value is not None:
-                    if type(value) != unicode:
+                    if type(value) != str:
                         item.append(QStandardItem(str(value)))
                     else:
                         item.append(QStandardItem(value))
@@ -1132,7 +1140,7 @@ class AddNewLot(ParentManage):
             keys = "lot_id, "
             values = f"$${lot_id}$$, "
             for key, value in list(item.items()):
-                if key in (lot['feature_type']+'_id', 'code', 'status', 'observ', 'validate'):
+                if key in (lot['feature_type'] + '_id', 'code', 'status', 'observ', 'validate'):
                     if value not in('', None):
                         keys += f"{key}, "
                         # if type(value) in (int, bool):
@@ -1163,7 +1171,7 @@ class AddNewLot(ParentManage):
             visit_id = None
             status = None
             for key, value in list(item.items()):
-                if key=="visit_id":
+                if key == "visit_id":
                     visit_id = str(value)
                 if key == "status":
                     if value not in('', None):
@@ -1242,7 +1250,7 @@ class AddNewLot(ParentManage):
         expr_filter = f"\"{feature_type}_id\" IN ('{feature_id}')"
         # Check expression
         (is_valid, expr) = self.check_expression(expr_filter)
-        
+
         self.select_features_by_ids(feature_type, expr)
         # self.iface.actionZoomToSelected().trigger()
         self.iface.actionZoomActualSize().trigger()
@@ -1360,7 +1368,8 @@ class AddNewLot(ParentManage):
         self.dlg_lot_man.btn_path.clicked.connect(partial(self.select_path, self.dlg_lot_man, 'txt_path'))
         self.dlg_lot_man.btn_export.clicked.connect(
             partial(self.export_model_to_csv, self.dlg_lot_man, 'txt_path', self.dlg_lot_man.tbl_lots, '', self.lot_date_format))
-        self.dlg_lot_man.tbl_lots.doubleClicked.connect(partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_lots))
+        self.dlg_lot_man.tbl_lots.doubleClicked.connect(
+            partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_lots))
         self.dlg_lot_man.btn_open.clicked.connect(partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_lots))
         self.dlg_lot_man.btn_delete.clicked.connect(partial(self.delete_lot, self.dlg_lot_man.tbl_lots))
         self.dlg_lot_man.btn_manage_user.clicked.connect(partial(self.open_user_manage))
@@ -1400,7 +1409,8 @@ class AddNewLot(ParentManage):
         self.set_table_columns(self.dlg_basic_table, self.dlg_basic_table.tbl_basic, table_name)
         self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.cancel_changes, self.dlg_basic_table.tbl_basic))
         self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_basic_table))
-        self.dlg_basic_table.btn_accept.clicked.connect(partial(self.save_basic_table, self.dlg_basic_table.tbl_basic, 'vehicle'))
+        self.dlg_basic_table.btn_accept.clicked.connect(
+            partial(self.save_basic_table, self.dlg_basic_table.tbl_basic, 'vehicle'))
         self.dlg_basic_table.btn_add_row.clicked.connect(partial(self.add_row, self.dlg_basic_table.tbl_basic))
         self.dlg_basic_table.rejected.connect(partial(self.save_settings, self.dlg_basic_table))
         self.open_dialog(self.dlg_basic_table, dlg_name='dialog_table')
@@ -1480,7 +1490,8 @@ class AddNewLot(ParentManage):
 
         # TODO: Disable columns user_id + team_id
 
-        self.dlg_user_manage.btn_export_user.clicked.connect(partial(self.export_model_to_csv, self.dlg_user_manage, self.dlg_user_manage.tbl_user, result_relation, 'yyyy-MM-dd hh:mm:ss'))
+        self.dlg_user_manage.btn_export_user.clicked.connect(partial(
+            self.export_model_to_csv, self.dlg_user_manage, self.dlg_user_manage.tbl_user, result_relation, 'yyyy-MM-dd hh:mm:ss'))
 
         # Open form
         self.open_dialog(self.dlg_user_manage, dlg_name='lot_usermanager')
@@ -1537,9 +1548,12 @@ class AddNewLot(ParentManage):
         self.dlg_lot_sel.rejected.connect(partial(self.close_dialog, self.dlg_lot_sel))
         self.dlg_lot_sel.rejected.connect(partial(self.save_settings, self.dlg_lot_sel))
         self.dlg_lot_sel.setWindowTitle("Selector de lots")
-        qt_tools.setWidgetText(self.dlg_lot_sel, 'lbl_filter', self.controller.tr('Filtrar per: Lot id', context_name='labels'))
-        qt_tools.setWidgetText(self.dlg_lot_sel, 'lbl_unselected', self.controller.tr('Lots disponibles:', context_name='labels'))
-        qt_tools.setWidgetText(self.dlg_lot_sel, 'lbl_selected', self.controller.tr('Lots seleccionats', context_name='labels'))
+        qt_tools.setWidgetText(self.dlg_lot_sel, 'lbl_filter', self.controller.tr('Filtrar per: Lot id',
+            context_name='labels'))
+        qt_tools.setWidgetText(self.dlg_lot_sel, 'lbl_unselected', self.controller.tr('Lots disponibles:',
+            context_name='labels'))
+        qt_tools.setWidgetText(self.dlg_lot_sel, 'lbl_selected', self.controller.tr('Lots seleccionats',
+            context_name='labels'))
 
         tableleft = "om_visit_lot"
         tableright = "selector_lot"
@@ -1548,7 +1562,8 @@ class AddNewLot(ParentManage):
         hide_left = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
         hide_right = [0, 1, 2]
 
-        self.multi_row_selector(self.dlg_lot_sel, tableleft, tableright, field_id_left, field_id_right, name='id', hide_left=hide_left, hide_right=hide_right)
+        self.multi_row_selector(self.dlg_lot_sel, tableleft, tableright, field_id_left,
+                                field_id_right, name='id', hide_left=hide_left, hide_right=hide_right)
         self.dlg_lot_sel.btn_select.clicked.connect(partial(self.set_visible_lot_layers, True))
         self.dlg_lot_sel.btn_unselect.clicked.connect(partial(self.set_visible_lot_layers, True))
 
@@ -1650,7 +1665,7 @@ class AddNewLot(ParentManage):
             pass
 
 
-    def write_to_csv(self,  folder_path=None, all_rows=None):
+    def write_to_csv(self, folder_path=None, all_rows=None):
 
         with open(folder_path, "w") as output:
             writer = csv.writer(output, lineterminator='\n')
@@ -1757,7 +1772,7 @@ class AddNewLot(ParentManage):
 
     def check_for_ids(self):
 
-        if len(self.ids) !=0:
+        if len(self.ids) != 0:
             self.visit_class.setEnabled(False)
         else:
             layer = self.iface.activeLayer()
@@ -1768,6 +1783,7 @@ class AddNewLot(ParentManage):
 
 
     """ FUNCTIONS RELATED WITH TAB LOAD"""
+
     def fill_tab_load(self):
         """ Fill tab 'Load' """
 
@@ -1844,10 +1860,9 @@ class AddNewLot(ParentManage):
         if not row:
             return
 
-        path = str(row[0])
-
         # Parse a URL into components
-        url = parse.urlsplit(path)
+        path = str(row[0])
+        url = urllib.parse.urlsplit(path)
 
         # Open selected image
         # Check if path is URL

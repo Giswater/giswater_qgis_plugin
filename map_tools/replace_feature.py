@@ -98,6 +98,10 @@ class ReplaceFeatureMapTool(ParentMapTool):
                 sql = f"SELECT DISTINCT(id) FROM {self.cat_table} ORDER BY id"
                 rows = self.controller.get_rows(sql)
                 qt_tools.fillComboBox(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
+            elif self.geom_type in 'gully':
+                sql = f"SELECT DISTINCT(id) FROM cat_grate ORDER BY id"
+                rows = self.controller.get_rows(sql)
+                qt_tools.fillComboBox(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
 
         self.dlg_replace.feature_type.setText(feature_type)
         self.dlg_replace.feature_type_new.currentIndexChanged.connect(self.edit_change_elem_type_get_value)
@@ -123,7 +127,6 @@ class ReplaceFeatureMapTool(ParentMapTool):
 
         # Get feature_type
         feature_type = qt_tools.getWidgetText(self.dlg_replace, self.dlg_replace.feature_type_new)
-
         if feature_type is 'null':
             msg = "New feature type is null. Please, select a valid value."
             self.controller.show_info_box(msg, "Info")
@@ -240,7 +243,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
         """ Set autocomplete of widget @table_object + "_id"
             getting id's from selected @table_object
         """
-        
+
         if not widget:
             return
 
@@ -356,7 +359,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
             self.deactivate()
             self.set_action_pan()
 
-            #Disable ok button at the end of process
+            # Disable ok button at the end of process
             self.dlg_replace.btn_accept.setEnabled(False)
 
 
@@ -386,7 +389,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
 
 
     def canvasReleaseEvent(self, event):
-        
+
         if event.button() == Qt.RightButton:
             self.cancel_map_tool()
             return

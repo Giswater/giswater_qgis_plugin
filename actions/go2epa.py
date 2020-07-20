@@ -6,15 +6,13 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.core import QgsApplication
-from qgis.PyQt.QtCore import QDate, QStringListModel, QTime,  Qt, QRegExp
+from qgis.PyQt.QtCore import QDate, QStringListModel, QTime, Qt, QRegExp
 from qgis.PyQt.QtWidgets import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QComboBox, QCompleter, \
     QFileDialog
 from qgis.PyQt.QtGui import QRegExpValidator
 
-import csv
 import os
 import sys
-
 from functools import partial
 
 from lib import qt_tools
@@ -176,16 +174,6 @@ class Go2Epa(ApiParent):
         return True
 
 
-    def go2epa_sector_selector(self):
-
-        tableleft = "sector"
-        tableright = "selector_sector"
-        field_id_left = "sector_id"
-        field_id_right = "sector_id"
-        aql = f" AND sector_id != 0"
-        self.sector_selection(tableleft, tableright, field_id_left, field_id_right, aql)
-
-
     def load_user_values(self):
         """ Load QGIS settings related with file_manager """
 
@@ -221,22 +209,22 @@ class Go2Epa(ApiParent):
 
         cur_user = self.controller.get_current_user()
         self.controller.plugin_settings_set_value('go2epa_RESULT_NAME' + cur_user,
-                                                  qt_tools.getWidgetText(self.dlg_go2epa, 'txt_result_name', return_string_null=False))
+            qt_tools.getWidgetText(self.dlg_go2epa, 'txt_result_name', return_string_null=False))
         self.controller.plugin_settings_set_value('go2epa_FILE_INP' + cur_user,
-                                                  qt_tools.getWidgetText(self.dlg_go2epa, 'txt_file_inp', return_string_null=False))
+            qt_tools.getWidgetText(self.dlg_go2epa, 'txt_file_inp', return_string_null=False))
         self.controller.plugin_settings_set_value('go2epa_FILE_RPT' + cur_user,
-                                                  qt_tools.getWidgetText(self.dlg_go2epa, 'txt_file_rpt', return_string_null=False))
+            qt_tools.getWidgetText(self.dlg_go2epa, 'txt_file_rpt', return_string_null=False))
         self.controller.plugin_settings_set_value('go2epa_chk_NETWORK_GEOM' + cur_user,
-                                                  qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check))
+            qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check))
         self.controller.plugin_settings_set_value('go2epa_chk_INP' + cur_user,
-                                                  qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export))
+            qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export))
         self.controller.plugin_settings_set_value('go2epa_chk_UD' + cur_user,
-                                                  qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch))
+            qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch))
         self.controller.plugin_settings_set_value('go2epa_chk_EPA' + cur_user,
-                                                  qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec))
+            qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec))
         self.controller.plugin_settings_set_value('go2epa_chk_RPT' + cur_user,
-                                                  qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result))
-        
+            qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result))
+
 
     def sector_selection(self, tableleft, tableright, field_id_left, field_id_right, aql=""):
         """ Load the tables in the selection form """
@@ -244,14 +232,7 @@ class Go2Epa(ApiParent):
         dlg_psector_sel = Multirow_selector('dscenario')
         self.load_settings(dlg_psector_sel)
         dlg_psector_sel.btn_ok.clicked.connect(dlg_psector_sel.close)
-        if tableleft == 'sector':
-            dlg_psector_sel.setWindowTitle(" Sector selector")
-            qt_tools.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_filter,
-                                   self.controller.tr('Filter by: Sector name', context_name='labels'))
-            qt_tools.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_unselected,
-                                   self.controller.tr('Unselected sectors', context_name='labels'))
-            qt_tools.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_selected,
-                                   self.controller.tr('Selected sectors', context_name='labels'))
+
         if tableleft == 'cat_dscenario':
             dlg_psector_sel.setWindowTitle(" Dscenario selector")
             qt_tools.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_filter,
@@ -262,7 +243,7 @@ class Go2Epa(ApiParent):
                                    self.controller.tr('Selected dscenarios', context_name='labels'))
 
         self.multi_row_selector(dlg_psector_sel, tableleft, tableright, field_id_left, field_id_right, aql=aql)
-        
+
         self.open_dialog(dlg_psector_sel)
 
 
@@ -392,7 +373,7 @@ class Go2Epa(ApiParent):
 
         # Save user values
         self.save_user_values()
-        
+
         self.dlg_go2epa.txt_infolog.clear()
         self.dlg_go2epa.txt_file_rpt.setStyleSheet(None)
         status = self.check_fields()
@@ -466,79 +447,6 @@ class Go2Epa(ApiParent):
             self.dlg_go2epa.chk_only_check.setEnabled(True)
 
 
-    def check_data(self):
-        """ Check data executing function 'gw_fct_pg2epa' """
-
-        sql = f"SELECT gw_fct_pg2epa('{self.project_name}', 'True');"
-        row = self.controller.get_row(sql)
-        if not row:
-            return False
-
-        if row[0] > 0:
-            message = ("It is not possible to execute the epa model."
-                       "There are errors on your project. Review it!")
-            sql_details = (f"SELECT table_id, column_id, error_message"
-                           f" FROM audit_check_data"
-                           f" WHERE fid = 114 AND result_id = '{self.project_name}'")
-            inf_text = "For more details execute query:\n" + sql_details
-            title = "Execute epa model"
-            self.controller.show_info_box(message, title, inf_text, parameter=row[0])
-            self.csv_audit_check_data("audit_check_data", "audit_check_data_log.csv")
-            return False
-
-        else:
-            message = "Data is ok. You can try to generate the INP file"
-            title = "Execute epa model"
-            self.controller.show_info_box(message, title)
-            return True
-
-
-    def csv_audit_check_data(self, tablename, filename):
-
-        # Get columns name in order of the table
-        rows = self.controller.get_columns_list(tablename)
-        if not rows:
-            message = "Table not found"
-            self.controller.show_warning(message, parameter=tablename)
-            return
-
-        columns = []
-        for i in range(0, len(rows)):
-            column_name = rows[i]
-            columns.append(str(column_name[0]))
-        sql = (f"SELECT table_id, column_id, error_message"
-               f" FROM {tablename}"
-               f" WHERE fid = 114 AND result_id = '{self.project_name}'")
-        rows = self.controller.get_rows(sql)
-        if not rows:
-            message = "No records found with selected 'result_id'"
-            self.controller.show_warning(message, parameter=self.project_name)
-            return
-
-        all_rows = []
-        all_rows.append(columns)
-        for i in rows:
-            all_rows.append(i)
-        path = self.controller.get_log_folder() + filename
-        try:
-            with open(path, "w") as output:
-                writer = csv.writer(output, lineterminator='\n')
-                writer.writerows(all_rows)
-            message = "File created successfully"
-            self.controller.show_info(message, parameter=path)
-        except IOError:
-            message = "File cannot be created. Check if it is already opened"
-            self.controller.show_warning(message, parameter=path)
-
-
-    def save_file_parameters(self):
-        """ Save INP, RPT and result name into GSW file """
-
-        self.gsw_settings.setValue('FILE_INP', self.file_inp)
-        self.gsw_settings.setValue('FILE_RPT', self.file_rpt)
-        self.gsw_settings.setValue('RESULT_NAME', self.result_name)
-
-
     def go2epa_result_selector(self):
         """ Button 29: Epa result selector """
 
@@ -606,7 +514,7 @@ class Go2Epa(ApiParent):
                    f"WHERE result_id = '{result_id_to_comp}' "
                    f"ORDER BY resultdate ")
             rows = self.controller.get_rows(sql)
-            if rows is not None:
+            if rows:
                 qt_tools.set_item_data(self.dlg_go2epa_result.cmb_com_date, rows)
                 selector_cmp_date = qt_tools.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_com_date, 0)
                 sql = (f"SELECT DISTINCT(resulttime), resulttime FROM rpt_arc "
@@ -677,9 +585,10 @@ class Go2Epa(ApiParent):
         self.controller.execute_sql(sql)
 
         # Get new values from widgets of type QComboBox
-        rpt_selector_result_id = qt_tools.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id)
-        rpt_selector_compare_id = qt_tools.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_compare_id)
-
+        rpt_selector_result_id = qt_tools.get_item_data(
+            self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id)
+        rpt_selector_compare_id = qt_tools.get_item_data(
+            self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_compare_id)
         if rpt_selector_result_id not in (None, -1, ''):
             sql = (f"INSERT INTO selector_rpt_main (result_id, cur_user)"
                    f" VALUES ('{rpt_selector_result_id}', '{user}');\n")
@@ -694,7 +603,7 @@ class Go2Epa(ApiParent):
             time_to_show = qt_tools.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_time_to_show)
             time_to_compare = qt_tools.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_time_to_compare)
             if time_to_show not in (None, -1, ''):
-                sql = (f"INSERT INTO rpt_selector_hourly (timestep, cur_user)"
+                sql = (f"INSERT INTO selector_rpt_main_tstep (timestep, cur_user)"
                        f" VALUES ('{time_to_show}', '{user}');\n")
                 self.controller.execute_sql(sql)
             if time_to_compare not in (None, -1, ''):

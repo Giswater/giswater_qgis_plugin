@@ -7,7 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from qgis.core import QgsPointXY, QgsVectorLayer
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsGeometry
-from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand, QgsDateTimeEdit
+from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint, QgsDateTimeEdit
 from qgis.PyQt.QtCore import Qt, QSettings, QTimer, QDate, QStringListModel
 from qgis.PyQt.QtGui import QColor, QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QLineEdit, QSizePolicy, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel, QCheckBox
@@ -44,7 +44,7 @@ class ApiParent(ParentAction):
 
     def get_visible_layers(self, as_list=False):
         """ Return string as {...} or [...] with name of table in DB of all visible layer in TOC """
-        
+
         visible_layer = '{'
         if as_list is True:
             visible_layer = '['
@@ -69,7 +69,7 @@ class ApiParent(ParentAction):
 
     def get_editable_layers(self):
         """ Return string as {...}  with name of table in DB of all editable layer in TOC """
-        
+
         editable_layer = '{'
         layers = self.controller.get_layers()
         for layer in layers:
@@ -137,7 +137,7 @@ class ApiParent(ParentAction):
         except Exception:
             pass
 
-            
+
     def check_expression(self, expr_filter, log_info=False):
         """ Check if expression filter @expr is valid """
 
@@ -216,14 +216,14 @@ class ApiParent(ParentAction):
         project_type = self.controller.get_project_type()
         # Get PDF file
         pdf_folder = os.path.join(self.plugin_dir, 'png')
-        pdf_path = os.path.join(pdf_folder, f"{project_type}_{geom_type}_{locale}.pdf")
+        pdf_path = os.path.join(pdf_folder, f"{project_type}_{geom_type}_{locale}.png")
 
         # Open PDF if exists. If not open Spanish version
         if os.path.exists(pdf_path):
             os.system(pdf_path)
         else:
             locale = "es"
-            pdf_path = os.path.join(pdf_folder, f"{project_type}_{geom_type}_{locale}.pdf")
+            pdf_path = os.path.join(pdf_folder, f"{project_type}_{geom_type}_{locale}.png")
             if os.path.exists(pdf_path):
                 os.system(pdf_path)
             else:
@@ -331,7 +331,7 @@ class ApiParent(ParentAction):
         self.vertex_marker.setIconSize(15)
         self.vertex_marker.setPenWidth(3)
 
-        
+
     def api_action_copy_paste_mouse_move(self, point):
         """ Slot function when mouse is moved in the canvas.
             Add marker if any feature is snapped
@@ -394,7 +394,7 @@ class ApiParent(ParentAction):
         feature = feature_list[0]
         feature_id = feature.attribute(str(self.geom_type) + '_id')
         msg = (f"Selected snapped feature_id to copy values from: {snapped_feature_attr[0]}\n"
-                   f"Do you want to copy its values to the current node?\n\n")
+               f"Do you want to copy its values to the current node?\n\n")
         # Replace id because we don't have to copy it!
         snapped_feature_attr[0] = feature_id
         snapped_feature_attr_aux = []
@@ -436,7 +436,7 @@ class ApiParent(ParentAction):
 
         self.api_disable_copy_paste(dialog)
 
-        
+
     def api_disable_copy_paste(self, dialog):
         """ Disable actionCopyPaste and set action 'Identify' """
 
@@ -451,80 +451,6 @@ class ApiParent(ParentAction):
             self.emit_point.canvasClicked.disconnect()
         except:
             pass
-
-            
-    def set_table_columns(self, dialog, widget, table_name, schema_name=None):
-        """ Configuration of tables. Set visibility and width of columns """
-
-        widget = qt_tools.getWidget(dialog, widget)
-        if not widget:
-            return
-
-        if schema_name is not None:
-            self.schema_name = schema_name
-            self.controller.set_search_path(self.schema_name)
-
-        # Set width and alias of visible columns
-        columns_to_delete = []
-        sql = (f"SELECT columnindex, width, alias, status"
-               f" FROM config_form_tableview"
-               f" WHERE tablename = '{table_name}'"
-               f" ORDER BY columnindex")
-        rows = self.controller.get_rows(sql, log_info=False)
-        if not rows:
-            return
-
-        for row in rows:
-            if not row['status']:
-                columns_to_delete.append(row['columnindex'] - 1)
-            else:
-                width = row['width']
-                if width is None:
-                    width = 100
-                widget.setColumnWidth(row['columnindex'] - 1, width)
-                widget.model().setHeaderData(row['columnindex'] - 1, Qt.Horizontal, row['alias'])
-
-        # Set order
-        # widget.model().setSort(0, Qt.AscendingOrder)
-        widget.model().select()
-
-        # Delete columns
-        for column in columns_to_delete:
-            widget.hideColumn(column)
-
-
-    def set_table_columns_for_query(self, dialog, widget, table_name):
-    
-        widget = qt_tools.getWidget(dialog, widget)
-        if not widget:
-            return
-
-        # Set width and alias of visible columns
-        columns_to_show = ""
-        sql = (f"SELECT columnindex, width, columnname, alias, status"
-               f" FROM config_form_tableview"
-               f" WHERE tablename = '{table_name}'"
-               f" ORDER BY columnindex")
-        rows = self.controller.get_rows(sql, log_sql=False)
-        if not rows:
-            return
-        for row in rows:
-            if row['status']:
-                if row['columnname'] is not None:
-                    columns_to_show += str(row['columnname'])
-                    if row['alias'] is not None:
-                        columns_to_show += " AS " + str(row['alias'])
-                    columns_to_show += ", "
-                    width = row['width']
-                    if width is None:
-                        width = 100
-                    widget.setColumnWidth(row['columnindex'] - 1, width)
-
-        if len(columns_to_show) > 1:
-            columns_to_show = columns_to_show[:-2]
-        else:
-            columns_to_show = "*"
-        return columns_to_show
 
 
     def set_widget_size(self, widget, field):
@@ -560,7 +486,7 @@ class ApiParent(ParentAction):
                 message = "Parameter button_function is null for button"
                 self.controller.show_message(message, 2, parameter=widget.objectName())
 
-        kwargs = {'dialog': dialog, 'widget': widget, 'message_level':1, 'function_name':function_name}
+        kwargs = {'dialog': dialog, 'widget': widget, 'message_level': 1, 'function_name': function_name}
         widget.clicked.connect(partial(getattr(self, function_name), **kwargs))
 
         return widget
@@ -585,11 +511,13 @@ class ApiParent(ParentAction):
 
     def add_lineedit(self, field):
         """ Add widgets QLineEdit type """
-        
+
         widget = QLineEdit()
         widget.setObjectName(field['widgetname'])
         if 'columnname' in field:
             widget.setProperty('columnname', field['columnname'])
+        if 'placeholder' in field:
+            widget.setPlaceholderText(field['placeholder'])
         if 'value' in field:
             widget.setText(field['value'])
         if 'iseditable' in field:
@@ -636,7 +564,8 @@ class ApiParent(ParentAction):
         extras += f', "textToSearch":"{qt_tools.getWidgetText(dialog, widget)}"'
         body = self.create_body(extras=extras)
         complet_list = self.controller.get_json('gw_fct_gettypeahead', body)
-        if not complet_list: return False
+        if not complet_list:
+            return False
 
         list_items = []
         for field in complet_list['body']['data']:
@@ -757,7 +686,7 @@ class ApiParent(ParentAction):
 
 
     def add_combobox(self, field):
-    
+
         widget = QComboBox()
         widget.setObjectName(field['widgetname'])
         if 'columnname' in field:
@@ -765,6 +694,10 @@ class ApiParent(ParentAction):
         widget = self.populate_combo(widget, field)
         if 'selectedId' in field:
             qt_tools.set_combo_itemData(widget, field['selectedId'], 0)
+            widget.setProperty('selectedId', field['selectedId'])
+        else:
+            widget.setProperty('selectedId', None)
+
         return widget
 
 
@@ -786,7 +719,8 @@ class ApiParent(ParentAction):
         extras = f'"comboParent":"{combo_parent}", "comboId":"{combo_id}"'
         body = self.create_body(feature=feature, extras=extras)
         result = self.controller.get_json('gw_fct_getchilds', body)
-        if not result: return False
+        if not result:
+            return False
 
         for combo_child in result['body']['data']:
             if combo_child is not None:
@@ -820,7 +754,7 @@ class ApiParent(ParentAction):
         if child:
             self.populate_combo(child, combo_child)
 
-        
+
     def populate_combo(self, widget, field):
         # Generate list of items to add into combo
 
@@ -830,7 +764,7 @@ class ApiParent(ParentAction):
         combolist = []
         if 'comboIds' in field:
             if 'isNullValue' in field and field['isNullValue']:
-                combolist.append(['',''])
+                combolist.append(['', ''])
             for i in range(0, len(field['comboIds'])):
                 elem = [field['comboIds'][i], field['comboNames'][i]]
                 combolist.append(elem)
@@ -843,7 +777,7 @@ class ApiParent(ParentAction):
 
 
     def add_frame(self, field, x=None):
-    
+
         widget = QFrame()
         widget.setObjectName(f"{field['widgetname']}_{x}")
         if 'columnname' in field:
@@ -856,7 +790,7 @@ class ApiParent(ParentAction):
 
     def add_label(self, field):
         """ Add widgets QLineEdit type """
-        
+
         widget = QLabel()
         widget.setTextInteractionFlags(Qt.TextSelectableByMouse)
         widget.setObjectName(field['widgetname'])
@@ -872,9 +806,9 @@ class ApiParent(ParentAction):
         """ Set calendar empty when click inner button of QgsDateTimeEdit because aesthetically it looks better"""
         widget.setEmpty()
 
-        
+
     def add_hyperlink(self, field):
-    
+
         widget = HyperLinkLabel()
         widget.setObjectName(field['widgetname'])
         if 'columnname' in field:
@@ -905,13 +839,13 @@ class ApiParent(ParentAction):
 
         return widget
 
-        
+
     def add_horizontal_spacer(self):
 
         widget = QSpacerItem(10, 10, QSizePolicy.Expanding, QSizePolicy.Minimum)
         return widget
 
-        
+
     def add_verical_spacer(self):
 
         widget = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
@@ -938,57 +872,14 @@ class ApiParent(ParentAction):
         return widget
 
 
-    def draw(self, complet_result, zoom=True, reset_rb=True):
-
-        if complet_result[0]['body']['feature']['geometry'] is None:
-            return
-        if complet_result[0]['body']['feature']['geometry']['st_astext'] is None:
-            return
-        list_coord = re.search('\((.*)\)', str(complet_result[0]['body']['feature']['geometry']['st_astext']))
-        max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
-
-        if reset_rb: self.resetRubberbands()
-        if str(max_x) == str(min_x) and str(max_y) == str(min_y):
-            point = QgsPointXY(float(max_x), float(max_y))
-            self.draw_point(point)
-        else:
-            points = self.get_points(list_coord)
-            self.draw_polyline(points)
-        if zoom:
-            margin = float(complet_result[0]['body']['feature']['zoomCanvasMargin']['mts'])
-            self.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin)
-
-            
-    def draw_point(self, point, color=QColor(255, 0, 0, 100), width=3, duration_time=None, is_new=False):
-        """
-        :param duration_time: integer milliseconds ex: 3000 for 3 seconds
-        """
-
-        if self.rubber_point is None:
-            self.init_rubber()
-
-        if is_new:
-            rb = QgsRubberBand(self.canvas, 0)
-        else:
-            rb = self.rubber_point
-
-        rb.setColor(color)
-        rb.setWidth(width)
-        rb.addPoint(point)
-
-        # wait to simulate a flashing effect
-        if duration_time is not None:
-            QTimer.singleShot(duration_time, self.resetRubberbands)
-        return rb
-
-
     def draw_polygon(self, points, border=QColor(255, 0, 0, 100), width=3, duration_time=None, fill_color=None):
         """ Draw 'polygon' over canvas following list of points
         :param duration_time: integer milliseconds ex: 3000 for 3 seconds
         """
 
         if self.rubber_polygon is None:
-            self.init_rubber()
+            self.init_rubber_polygon()
+
 
         rb = self.rubber_polygon
         polygon = QgsGeometry.fromPolygonXY([points])
@@ -1005,7 +896,7 @@ class ApiParent(ParentAction):
 
         return rb
 
-           
+
     def fill_table(self, widget, table_name, filter_=None):
         """ Set a model with selected filter.
         Attach that model to selected table """
@@ -1029,7 +920,7 @@ class ApiParent(ParentAction):
         # Attach model to table view
         widget.setModel(model)
 
-        
+
     def populate_basic_info(self, dialog, result, field_id):
 
         fields = result[0]['body']['data']
@@ -1069,33 +960,33 @@ class ApiParent(ParentAction):
                 widget = QComboBox()
                 self.populate_combo(widget, field)
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-            elif field['widgettype'] in ('check','checkbox'):
+            elif field['widgettype'] in ('check', 'checkbox'):
                 widget = self.add_checkbox(field)
                 widget.stateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
             elif field['widgettype'] == 'button':
                 widget = self.add_button(dialog, field)
 
-            grid_layout.addWidget(label,x, 0)
+            grid_layout.addWidget(label, x, 0)
             grid_layout.addWidget(widget, x, 1)
 
         verticalSpacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         grid_layout.addItem(verticalSpacer1)
-        
+
         return result
 
 
     def clear_gridlayout(self, layout):
         """  Remove all widgets of layout """
-        
+
         while layout.count() > 0:
             child = layout.takeAt(0).widget()
             if child:
                 child.setParent(None)
                 child.deleteLater()
-                
+
 
     def add_calendar(self, dialog, field):
-    
+
         widget = QgsDateTimeEdit()
         widget.setObjectName(field['widgetname'])
         if 'columnname' in field:
@@ -1113,7 +1004,8 @@ class ApiParent(ParentAction):
         if field['isautoupdate']:
             _json = {}
             btn_calendar.clicked.connect(partial(self.get_values, dialog, widget, _json))
-            btn_calendar.clicked.connect(partial(self.accept, dialog, self.complet_result[0], self.feature_id, _json, True, False))
+            btn_calendar.clicked.connect(
+                partial(self.accept, dialog, self.complet_result[0], self.feature_id, _json, True, False))
         else:
             btn_calendar.clicked.connect(partial(self.get_values, dialog, widget, self.my_json))
         btn_calendar.clicked.connect(partial(self.set_calendar_empty, widget))
@@ -1137,7 +1029,7 @@ class ApiParent(ParentAction):
 
         qt_tools.setWidgetText(self.dlg_dtext, self.dlg_dtext.txt_infolog, 'Interpolate tool')
         self.dlg_dtext.lbl_text.setText("Please, use the cursor to select two nodes to proceed with the "
-                                         "interpolation\nNode1: \nNode2:")
+                                        "interpolation\nNode1: \nNode2:")
 
         self.dlg_dtext.btn_accept.clicked.connect(partial(self.chek_for_existing_values))
         self.dlg_dtext.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_dtext))
@@ -1159,7 +1051,7 @@ class ApiParent(ParentAction):
 
         self.canvas.setMapTool(ep)
         # We redraw the selected feature because self.canvas.setMapTool(emit_point) erases it
-        self.draw(complet_result, False, False)
+        self.draw(complet_result[0], None, False)
 
         # Store user snapping configuration
         self.snapper_manager = SnappingConfigManager(self.iface)
@@ -1181,8 +1073,9 @@ class ApiParent(ParentAction):
         if layer is not None:
             self.iface.setActiveLayer(layer)
         else:
-            if self.layer is not None:
-                self.iface.setActiveLayer(self.layer)
+            if hasattr(self, 'layer'):
+                if self.layer is not None:
+                    self.iface.setActiveLayer(self.layer)
         if vertex is not None:
             self.iface.mapCanvas().scene().removeItem(vertex)
         else:
@@ -1204,7 +1097,8 @@ class ApiParent(ParentAction):
 
         # Get coordinates
         event_point = self.snapper_manager.get_event_point(point=point)
-        if not event_point: return
+        if not event_point:
+            return
         # Snapping
         result = self.snapper_manager.snap_to_current_layer(event_point)
         if self.snapper_manager.result_is_valid():
@@ -1215,14 +1109,16 @@ class ApiParent(ParentAction):
                 element_id = snapped_feat.attribute('node_id')
                 message = "Selected node"
                 if self.node1 is None:
-                    self.node1 = str(element_id)                    
-                    rb = self.draw_point(QgsPointXY(result.point()),color=QColor(0, 150, 55, 100), width=10, is_new=True)
+                    self.node1 = str(element_id)
+                    rb = self.draw_point(QgsPointXY(result.point()), color=QColor(
+                        0, 150, 55, 100), width=10, is_new=True)
                     self.rb_interpolate.append(rb)
                     self.dlg_dtext.lbl_text.setText(f"Node1: {self.node1}\nNode2:")
                     self.controller.show_message(message, message_level=0, parameter=self.node1)
                 elif self.node1 != str(element_id):
                     self.node2 = str(element_id)
-                    rb = self.draw_point(QgsPointXY(result.point()),color=QColor(0, 150, 55, 100), width=10, is_new=True)
+                    rb = self.draw_point(QgsPointXY(result.point()), color=QColor(
+                        0, 150, 55, 100), width=10, is_new=True)
                     self.rb_interpolate.append(rb)
                     self.dlg_dtext.lbl_text.setText(f"Node1: {self.node1}\nNode2: {self.node2}")
                     self.controller.show_message(message, message_level=0, parameter=self.node2)
@@ -1328,13 +1224,13 @@ class ApiParent(ParentAction):
                         if 'regexpControl' in field['widgetcontrols']:
                             if field['widgetcontrols']['regexpControl'] is not None:
                                 pass
-                                #reg_exp = QRegExp(str(field['widgetcontrols']['regexpControl']))
-                                #widget.setValidator(QRegExpValidator(reg_exp))
-                    widget.editingFinished.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
+                    widget.editingFinished.connect(
+                        partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'combo':
                     widget = self.add_combobox(field)
-                    widget.currentIndexChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
+                    widget.currentIndexChanged.connect(
+                        partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'check':
                     widget = QCheckBox()
@@ -1342,7 +1238,8 @@ class ApiParent(ParentAction):
                         widget.setChecked(True)
                     else:
                         widget.setChecked(False)
-                    widget.stateChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
+                    widget.stateChanged.connect(partial(self.get_values_changed_param_user,
+                                                dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'datetime':
                     widget = QgsDateTimeEdit()
@@ -1353,14 +1250,16 @@ class ApiParent(ParentAction):
                     if 'value' in field and field['value'] not in ('', None, 'null'):
                         date = QDate.fromString(field['value'].replace('/', '-'), 'yyyy-MM-dd')
                     widget.setDate(date)
-                    widget.dateChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
+                    widget.dateChanged.connect(partial(self.get_values_changed_param_user,
+                                               dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'spinbox':
                     widget = QDoubleSpinBox()
                     if 'value' in field and field['value'] not in(None, ""):
                         value = float(str(field['value']))
                         widget.setValue(value)
-                    widget.valueChanged.connect(partial(self.get_values_changed_param_user, dialog, None, widget, field, _json))
+                    widget.valueChanged.connect(partial(self.get_values_changed_param_user,
+                                                dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'button':
                     widget = self.add_button(dialog, field)
@@ -1384,11 +1283,11 @@ class ApiParent(ParentAction):
                 self.put_widgets(dialog, field, lbl, widget)
 
 
-    def put_widgets(self, dialog, field,  lbl, widget):
+    def put_widgets(self, dialog, field, lbl, widget):
         """ Insert widget into layout """
 
         layout = dialog.findChild(QGridLayout, field['layoutname'])
-        if layout is None:
+        if layout in (None, 'null', 'NULL', 'Null'):
             return
         layout.addWidget(lbl, int(field['layoutorder']), 0)
         layout.addWidget(widget, int(field['layoutorder']), 2)
@@ -1578,8 +1477,9 @@ class ApiParent(ParentAction):
         """ Function called in def add_button(self, dialog, field): -->
                 widget.clicked.connect(partial(getattr(self, function_name), dialog, widget)) """
 
-        path, filter_ = self.open_file_path(filter_ = "DXF Files (*.dxf)")
-        if not path: return
+        path, filter_ = self.open_file_path(filter_="DXF Files (*.dxf)")
+        if not path:
+            return
 
         dialog = kwargs['dialog']
         widget = kwargs['widget']
@@ -1593,7 +1493,7 @@ class ApiParent(ParentAction):
             widget.setText(complet_result['path'])
         if complet_result['result']:
             data = complet_result['result']['body']['data']
-            result =  self.add_layer.add_temp_layer(dialog, data, function_name, True, False, 1, True)
+            result = self.add_layer.add_temp_layer(dialog, data, function_name, True, False, 1, True)
             for layer in result['temp_layers_added']:
                 self.temp_layers_added.append(layer)
         dialog.btn_run.setEnabled(True)
@@ -1638,7 +1538,7 @@ class ApiParent(ParentAction):
             field_names = [field.name() for field in dxf_layer.fields()]
 
             sql = ""
-            geom_types = {0:'geom_point', 1:'geom_line', 2:'geom_polygon'}
+            geom_types = {0: 'geom_point', 1: 'geom_line', 2: 'geom_polygon'}
             for count, feature in enumerate(dxf_layer.getFeatures()):
                 geom_type = feature.geometry().type()
                 sql += (f"INSERT INTO temp_table (fid, text_column, {geom_types[int(geom_type)]})"
@@ -1683,42 +1583,38 @@ class ApiParent(ParentAction):
         extras = extras[:-2]
         body = self.create_body(extras)
         result = self.controller.get_json('gw_fct_check_importdxf', None, log_sql=True)
-        if not result: return False
+        if not result:
+            return False
 
-        return {"path": dxf_path, "result":result, "temp_layers_added":temp_layers_added}
+        return {"path": dxf_path, "result": result, "temp_layers_added": temp_layers_added}
 
 
-    def manage_all(self, dialog, widget):
+    def manage_all(self, dialog, widget_all):
 
         key_modifier = QApplication.keyboardModifiers()
-        status = qt_tools.isChecked(dialog, widget)
+        status = qt_tools.isChecked(dialog, widget_all)
         index = dialog.main_tab.currentIndex()
         widget_list = dialog.main_tab.widget(index).findChildren(QCheckBox)
-        selector_type = dialog.main_tab.widget(index).property('selector_type')
-        widget_all = dialog.findChild(QCheckBox, f'chk_all_{selector_type}')
-        if key_modifier == Qt.ShiftModifier: return
-        if status is True:
-            for widget in widget_list:
-                if widget == widget_all or widget.objectName() == widget_all.objectName(): continue
-                widget.blockSignals(True)
-                qt_tools.setChecked(dialog, widget, True)
-                self.set_selector(widget)
-                widget.blockSignals(False)
-        elif status is False:
-            for widget in widget_list:
-                if widget == widget_all or widget.objectName() == widget_all.objectName(): continue
-                widget.blockSignals(True)
-                qt_tools.setChecked(dialog, widget, False)
-                self.set_selector(widget)
-                widget.blockSignals(False)
+        if key_modifier == Qt.ShiftModifier:
+            return
+
+        for widget in widget_list:
+            if widget_all is not None:
+                if widget == widget_all or widget.objectName() == widget_all.objectName():
+                    continue
+            widget.blockSignals(True)
+            qt_tools.setChecked(dialog, widget, status)
+            widget.blockSignals(False)
+
+        self.set_selector(dialog, widget_all, False)
 
 
-    def get_selector(self, dialog, selector_type, filter=False, widget=None, type=None, text_filter=None, current_tab=None):
+    def get_selector(self, dialog, selector_type, filter=False, widget=None, text_filter=None, current_tab=None,
+                     is_setselector=None):
         """ Ask to DB for selectors and make dialog
         :param dialog: Is a standard dialog, from file api_selectors.ui, where put widgets
         :param selector_type: list of selectors to ask DB ['exploitation', 'state', ...]
         """
-
         main_tab = dialog.findChild(QTabWidget, 'main_tab')
 
         # Set filter
@@ -1730,23 +1626,28 @@ class ApiParent(ParentAction):
 
             # Set current_tab
             index = dialog.main_tab.currentIndex()
-            self.current_tab = dialog.main_tab.widget(index).objectName()
+            current_tab = dialog.main_tab.widget(index).objectName()
 
-        #profilactic control of nones
+        # Profilactic control of nones
         if text_filter is None:
-                text_filter=''
+            text_filter = ''
+        if is_setselector is None:
+            # Built querytext
+            form = f'"currentTab":"{current_tab}"'
+            extras = f'"selectorType":{selector_type}, "filterText":"{text_filter}"'
+            body = self.create_body(form=form, extras=extras)
+            json_result = self.controller.get_json('gw_fct_getselectors', body, log_sql=True)
+        else:
+            json_result = is_setselector
+            for x in range(dialog.main_tab.count() - 1, -1, -1):
+                dialog.main_tab.widget(x).deleteLater()
 
-        # built querytext
-        form = f'"currentTab":"{self.current_tab}"'
-        extras = f'"selectorType":{selector_type}, "filterText":"{text_filter}"'
-        body = self.create_body(form=form, extras=extras)
-        json_result = self.controller.get_json('gw_fct_getselectors', body, log_sql=True)
         if not json_result:
             return False
 
         for form_tab in json_result['body']['form']['formTabs']:
 
-            if filter and form_tab['tabName'] != str(self.current_tab):
+            if filter and form_tab['tabName'] != str(current_tab):
                 continue
 
             selection_mode = form_tab['selectionMode']
@@ -1772,30 +1673,41 @@ class ApiParent(ParentAction):
                 label = QLabel()
                 label.setObjectName('lbl_filter')
                 label.setText('Filter:')
-                widget = QLineEdit()
-                widget.setObjectName('txt_filter_' + str(form_tab['selectorType']))
-                if filter is not False:
-                    qt_tools.setWidgetText(dialog, widget, text_filter)
+                if qt_tools.getWidget(dialog, 'txt_filter_' + str(form_tab['tabName'])) is None:
+                    widget = QLineEdit()
+                    widget.setObjectName('txt_filter_' + str(form_tab['tabName']))
+                    widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+                    widget.textChanged.connect(partial(self.get_selector, self.dlg_selector, selector_type, filter=True,
+                                                       widget=widget, current_tab=current_tab))
+                    widget.textChanged.connect(partial(self.manage_filter, dialog, widget, 'save'))
+                    widget.setLayoutDirection(Qt.RightToLeft)
+                    setattr(self, f"var_txt_filter_{form_tab['tabName']}", '')
+                else:
+                    widget = qt_tools.getWidget(dialog, 'txt_filter_' + str(form_tab['tabName']))
 
-                widget.textChanged.connect(partial(self.get_selector, self.dlg_selector, selector_type, filter=True,
-                                                   widget=widget, type=form_tab['selectorType']))
-                widget.setLayoutDirection(Qt.RightToLeft)
                 field['layoutname'] = gridlayout.objectName()
                 field['layoutorder'] = i
                 i = i + 1
-                self.txt_filter = widget
                 self.put_widgets(dialog, field, label, widget)
                 widget.setFocus()
 
             if 'manageAll' in form_tab:
                 if (form_tab['manageAll']).lower() == 'true':
-                    label = QLabel()
-                    label.setObjectName('lbl_manage_all')
-                    label.setText('Check all')
-                    widget = QCheckBox()
-                    widget.setObjectName('chk_all_' + str(form_tab['selectorType']))
-                    widget.stateChanged.connect(partial(self.manage_all, dialog, widget))
-                    widget.setLayoutDirection(Qt.RightToLeft)
+                    if qt_tools.getWidget(dialog, f"lbl_manage_all_{form_tab['tabName']}") is None:
+                        label = QLabel()
+                        label.setObjectName(f"lbl_manage_all_{form_tab['tabName']}")
+                        label.setText('Check all')
+                    else:
+                        label = qt_tools.getWidget(dialog, f"lbl_manage_all_{form_tab['tabName']}")
+
+                    if qt_tools.getWidget(dialog, f"chk_all_{form_tab['tabName']}") is None:
+                        widget = QCheckBox()
+                        widget.setObjectName('chk_all_' + str(form_tab['tabName']))
+                        widget.stateChanged.connect(partial(self.manage_all, dialog, widget))
+                        widget.setLayoutDirection(Qt.RightToLeft)
+
+                    else:
+                        widget = qt_tools.getWidget(dialog, f"chk_all_{form_tab['tabName']}")
                     field['layoutname'] = gridlayout.objectName()
                     field['layoutorder'] = i
                     i = i + 1
@@ -1806,10 +1718,11 @@ class ApiParent(ParentAction):
                 label = QLabel()
                 label.setObjectName('lbl_' + field['label'])
                 label.setText(field['label'])
+
                 widget = self.add_checkbox(field)
-                widget.setProperty('selector_type', form_tab['selectorType'])
                 widget.stateChanged.connect(partial(self.set_selection_mode, dialog, widget, selection_mode))
                 widget.setLayoutDirection(Qt.RightToLeft)
+
                 field['layoutname'] = gridlayout.objectName()
                 field['layoutorder'] = order + i
                 self.put_widgets(dialog, field, label, widget)
@@ -1817,11 +1730,22 @@ class ApiParent(ParentAction):
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
             gridlayout.addItem(vertical_spacer1)
 
-            # Set last tab used by user as current tab
-            tabname = json_result['body']['form']['currentTab']
-            tab = main_tab.findChild(QWidget, tabname)
-            if tab:
-                main_tab.setCurrentWidget(tab)
+        # Set last tab used by user as current tab
+        tabname = json_result['body']['form']['currentTab']
+        tab = main_tab.findChild(QWidget, tabname)
+
+        if tab:
+            main_tab.setCurrentWidget(tab)
+
+        if is_setselector is not None and hasattr(self, 'widget_filter'):
+            widget = dialog.main_tab.findChild(QLineEdit, f'txt_filter_{tabname}')
+            if widget:
+                widget.blockSignals(True)
+                index = dialog.main_tab.currentIndex()
+                tab_name = dialog.main_tab.widget(index).objectName()
+                value = getattr(self, f"var_txt_filter_{tab_name}")
+                qt_tools.setWidgetText(dialog, widget, f'{value}')
+                widget.blockSignals(False)
 
 
     def set_selection_mode(self, dialog, widget, selection_mode):
@@ -1830,27 +1754,26 @@ class ApiParent(ParentAction):
         :param widget: QCheckBox that has changed status (QCheckBox)
         :param selection_mode: "keepPrevious", "keepPreviousUsingShift", "removePrevious" (String)
         """
-                             
+
         # Get QCheckBox check all
         index = dialog.main_tab.currentIndex()
         widget_list = dialog.main_tab.widget(index).findChildren(QCheckBox)
-        selector_type = dialog.main_tab.widget(index).property('selector_type')
-        widget_all = dialog.findChild(QCheckBox, f'chk_all_{selector_type}')
+        tab_name = dialog.main_tab.widget(index).objectName()
+        widget_all = dialog.findChild(QCheckBox, f'chk_all_{tab_name}')
+
+        is_alone = False
         key_modifier = QApplication.keyboardModifiers()
 
-        if selection_mode == 'removePrevious':
-            if qt_tools.isChecked(dialog, widget_all):
+        if selection_mode == 'removePrevious' or \
+                (selection_mode == 'keepPreviousUsingShift' and key_modifier != Qt.ShiftModifier):
+            is_alone = True
+            if widget_all is not None:
+                widget_all.blockSignals(True)
                 qt_tools.setChecked(dialog, widget_all, False)
-            else:
-                self.remove_previuos(dialog, widget, widget_all, widget_list)
-                
-        elif selection_mode == 'keepPreviousUsingShift' and key_modifier != Qt.ShiftModifier:
-            if qt_tools.isChecked(dialog, widget_all):
-                qt_tools.setChecked(dialog, widget_all, False)
-            else:
-                self.remove_previuos(dialog, widget, widget_all, widget_list)
+                widget_all.blockSignals(False)
+            self.remove_previuos(dialog, widget, widget_all, widget_list)
 
-        self.set_selector(widget)
+        self.set_selector(dialog, widget, is_alone)
 
 
     def remove_previuos(self, dialog, widget, widget_all, widget_list):
@@ -1858,39 +1781,79 @@ class ApiParent(ParentAction):
         :param dialog: QDialog
         :param widget: QCheckBox that has changed status (QCheckBox)
         :param widget_all: QCheckBox that handles global selection (QCheckBox)
-        :param widget_list: List of all QCheckBox in the current tab ([QCheckBox,QCheckBox,...])
+        :param widget_list: List of all QCheckBox in the current tab ([QCheckBox, QCheckBox, ...])
         """
-                             
+
         for checkbox in widget_list:
-            if checkbox == widget_all or checkbox.objectName() == widget_all.objectName(): continue
+            # Some selectors.ui dont have widget_all
+            if widget_all is not None:
+                if checkbox == widget_all or checkbox.objectName() == widget_all.objectName():
+                    continue
+                elif checkbox.objectName() != widget.objectName():
+                    checkbox.blockSignals(True)
+                    qt_tools.setChecked(dialog, checkbox, False)
+                    checkbox.blockSignals(False)
+
             elif checkbox.objectName() != widget.objectName():
                 checkbox.blockSignals(True)
                 qt_tools.setChecked(dialog, checkbox, False)
-                self.set_selector(checkbox)
                 checkbox.blockSignals(False)
 
-                             
-    def set_selector(self, widget):
+
+    def set_selector(self, dialog, widget, is_alone):
         """  Send values to DB and reload selectors
+        :param dialog: QDialog
         :param widget: QCheckBox that contains the information to generate the json (QCheckBox)
+        :param is_alone: Defines if the selector is unique (True) or multiple (False) (Boolean)
         """
 
-        project_vars = global_vars.get_project_vars()
-        qgis_project_add_schema = project_vars['add_schema']
-        extras = f'"selectorType":"{widget.property("selector_type")}", "tabName":"{self.current_tab}", ' \
-                 f'"id":"{widget.objectName()}", '
-        extras += f'"value":"{widget.isChecked()}", "addSchema":"{qgis_project_add_schema}"'
+        # Get current tab name
+        index = dialog.main_tab.currentIndex()
+        tab_name = dialog.main_tab.widget(index).objectName()
+        selector_type = dialog.main_tab.widget(index).property("selector_type")
+        qgis_project_add_schema = self.controller.plugin_settings_value('gwAddSchema')
+        widget_all = dialog.findChild(QCheckBox, f'chk_all_{tab_name}')
+
+        if widget_all is None or (widget_all is not None and widget.objectName() != widget_all.objectName()):
+            extras = (f'"selectorType":"{selector_type}", "tabName":"{tab_name}", '
+                      f'"id":"{widget.objectName()}", "isAlone":"{is_alone}", "value":"{widget.isChecked()}", '
+                      f'"addSchema":"{qgis_project_add_schema}"')
+        else:
+            check_all = qt_tools.isChecked(dialog, widget_all)
+            extras = f'"selectorType":"{selector_type}", "tabName":"{tab_name}", "checkAll":"{check_all}",  ' \
+                     f'"addSchema":"{qgis_project_add_schema}"'
+
         body = self.create_body(extras=extras)
         json_result = self.controller.get_json('gw_fct_setselectors', body, log_sql=True)
 
-        if str(self.current_tab) == 'tab_exploitation':
-
-            #reload layer, zoom to layer, style mapzones and refresh canvas
+        if str(tab_name) == 'tab_exploitation':
+            # Reload layer, zoom to layer, style mapzones and refresh canvas
             layer = self.controller.get_layer_by_tablename('v_edit_arc')
             if layer:
-                layer.dataProvider().forceReload()
                 self.iface.setActiveLayer(layer)
                 self.iface.zoomToActiveLayer()
             self.set_style_mapzones()
-            self.refresh_map_canvas()
+
+        # Refresh canvas
+        self.controller.set_layer_index('v_edit_arc')
+        self.controller.set_layer_index('v_edit_node')
+        self.controller.set_layer_index('v_edit_connec')
+        self.controller.set_layer_index('v_edit_gully')
+        self.controller.set_layer_index('v_edit_link')
+        self.controller.set_layer_index('v_edit_plan_psector')
+
+        self.get_selector(dialog, f'"{selector_type}"', is_setselector=json_result)
+
+        widget_filter = qt_tools.getWidget(dialog, f"txt_filter_{tab_name}")
+        if widget_filter and qt_tools.getWidgetText(dialog, widget_filter, False, False) not in (None, ''):
+            widget_filter.textChanged.emit(widget_filter.text())
+
+
+    def manage_filter(self, dialog, widget, action):
+        index = dialog.main_tab.currentIndex()
+        tab_name = dialog.main_tab.widget(index).objectName()
+        if action == 'save':
+            setattr(self, f"var_txt_filter_{tab_name}", qt_tools.getWidgetText(dialog, widget))
+        else:
+            setattr(self, f"var_txt_filter_{tab_name}", '')
 

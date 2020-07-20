@@ -137,7 +137,7 @@ def setCalendarDate(dialog, widget, date, default_current_date=True):
     if not widget:
         return
     if type(widget) is QDateEdit \
-        or (type(widget) is QgsDateTimeEdit and widget.displayFormat() in ('dd/MM/yyyy', 'yyyy/MM/dd')):
+            or (type(widget) is QgsDateTimeEdit and widget.displayFormat() in ('dd/MM/yyyy', 'yyyy/MM/dd')):
         if date is None:
             if default_current_date:
                 date = QDate.currentDate()
@@ -196,7 +196,7 @@ def getWidgetText(dialog, widget, add_quote=False, return_string_null=True):
     elif type(widget) is QComboBox:
         text = getSelectedItem(dialog, widget, return_string_null)
     if add_quote and text != "null":
-        text = "'"+text+"'"
+        text = "'" + text + "'"
     return text
 
 
@@ -293,7 +293,7 @@ def setWidgetEnabled(dialog, widget, enabled=True):
         widget.setEnabled(enabled)
 
 
-def setImage(dialog, widget,cat_shape):
+def setImage(dialog, widget, cat_shape):
     """ Set pictures for UD"""
 
     element = cat_shape.lower()
@@ -303,7 +303,7 @@ def setImage(dialog, widget,cat_shape):
         return
     if type(widget) is QLabel:
         plugin_dir = os.path.dirname(__file__)
-        pic_file = os.path.join(plugin_dir, 'png', ''+element+'')
+        pic_file = os.path.join(plugin_dir, 'png', '' + element + '')
         pixmap = QPixmap(pic_file)
         widget.setPixmap(pixmap)
         widget.show()
@@ -375,11 +375,11 @@ def get_item_data(dialog, widget, index=0, add_quote=False):
         widget = dialog.findChild(QWidget, widget)
     if widget:
         if type(widget) is QComboBox:
-            current_index = widget.currentIndex()     
+            current_index = widget.currentIndex()
             elem = widget.itemData(current_index)
             if index == -1:
                 return elem
-            code = elem[index]            
+            code = elem[index]
 
     return code
 
@@ -401,12 +401,12 @@ def set_item_data(combo, rows, index_to_show=0, combo_clear=True, sort_combo=Tru
     """ Populate @combo with list @rows and show field @index_to_show
     :param sort_by: sort combo by this element (column)
     """
-    
+
     records = []
     if rows is None:
         rows = [['', '']]
 
-    if sort_by > len(rows[0])-1:
+    if sort_by > len(rows[0]) - 1:
         sort_by = 1
 
     for row in rows:
@@ -426,7 +426,7 @@ def set_item_data(combo, rows, index_to_show=0, combo_clear=True, sort_combo=Tru
     except:
         pass
     finally:
-        
+
         if add_empty:
             records_sorted.insert(0, ['', ''])
 
@@ -468,7 +468,7 @@ def set_combo_item_select_unselectable(qcombo, list_id=[], column=0, opt=0):
 
 def remove_tab_by_tabName(tab_widget, tab_name):
     """ Look in @tab_widget for a tab with @tab_name and remove it """
-    
+
     for x in range(0, tab_widget.count()):
         if tab_widget.widget(x).objectName() == tab_name:
             tab_widget.removeTab(x)

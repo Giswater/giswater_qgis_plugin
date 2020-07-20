@@ -8,7 +8,8 @@ or (at your option) any later version.
 from qgis.core import QgsPointXY
 from qgis.gui import QgsMapToolEmitPoint, QgsMapTip
 from qgis.PyQt.QtCore import Qt, QTimer
-from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QGridLayout, QLabel, QLineEdit, QSizePolicy, QSpacerItem
+from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QGridLayout, QLabel, QLineEdit, \
+    QSizePolicy, QSpacerItem
 
 from functools import partial
 
@@ -55,11 +56,12 @@ class ApiDimensioning(ApiParent):
         self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
         self.layer_connec = self.controller.get_layer_by_tablename("v_edit_connec")
 
+        feature = None
         if qgis_feature is None:
             features = self.layer_dimensions.getFeatures()
             for feature in features:
                 if feature['id'] == fid:
-                     return feature
+                    return feature
             qgis_feature = feature
 
         #qgis_feature = self.get_feature_by_id(self.layer_dimensions, fid, 'id')
@@ -85,7 +87,8 @@ class ApiDimensioning(ApiParent):
 
         layout_list = []
         for field in db_return[0]['body']['data']['fields']:
-            if 'hidden' in field and field['hidden']: continue
+            if 'hidden' in field and field['hidden']:
+                continue
 
             label, widget = self.set_widgets(self.dlg_dim, db_return, field)
 
@@ -199,7 +202,8 @@ class ApiDimensioning(ApiParent):
         # Set active layer and set signals
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
-        if self.deactivate_signals(action): return
+        if self.deactivate_signals(action):
+            return
 
         self.snapper_manager.set_snapping_layers()
         self.snapper_manager.remove_marker()
@@ -296,7 +300,8 @@ class ApiDimensioning(ApiParent):
 
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
-        if self.deactivate_signals(action): return
+        if self.deactivate_signals(action):
+            return
 
         self.snapper_manager.set_snapping_layers()
         self.snapper_manager.remove_marker()
@@ -420,7 +425,7 @@ class ApiDimensioning(ApiParent):
             widget = self.add_verical_spacer()
         elif field['widgettype'] == 'textarea':
             widget = self.add_textarea(field)
-        elif field['widgettype'] in ('spinbox'):
+        elif field['widgettype'] in 'spinbox':
             widget = self.add_spinbox(field)
         elif field['widgettype'] == 'tableview':
             widget = self.add_tableview(db_return, field)

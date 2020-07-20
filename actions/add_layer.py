@@ -86,12 +86,13 @@ class AddLayer(object):
         self.set_uri()
         self.uri.setDataSource(schema_name, layer.name(), None, "", layer.name())
 
-        error = QgsVectorLayerExporter.exportLayer(layer, self.uri.uri(), self.controller.credentials['user'], crs, False)
+        error = QgsVectorLayerExporter.exportLayer(
+            layer, self.uri.uri(), self.controller.credentials['user'], crs, False)
         if error[0] != 0:
             self.controller.log_info(F"ERROR --> {error[1]}")
 
 
-    def from_postgres_to_toc(self, tablename=None, the_geom="the_geom", field_id="id",  child_layers=None, group="GW Layers"):
+    def from_postgres_to_toc(self, tablename=None, the_geom="the_geom", field_id="id", child_layers=None, group="GW Layers"):
         """ Put selected layer into TOC
         :param tablename: Postgres table name (string)
         :param the_geom: Geometry field of the table (string)
@@ -160,7 +161,8 @@ class AddLayer(object):
                     key = 'values'
                 elif 'features' in data[k]:
                     key = 'features'
-                else: continue
+                else:
+                    continue
                 counter = len(data[k][key])
                 if counter > 0:
                     counter = len(data[k][key])
@@ -174,7 +176,7 @@ class AddLayer(object):
                         self.delete_layer_from_toc(layer_name)
                     v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", layer_name, 'memory')
                     layer_name = None
-                    #TODO This if controls if the function already works with GeoJson or is still to be refactored
+                    # TODO This if controls if the function already works with GeoJson or is still to be refactored
                     # once all are refactored the if should be: if 'feature' not in data [k]: continue
                     if key == 'values':
                         self.populate_vlayer_old(v_layer, data, k, counter, group)
@@ -237,9 +239,9 @@ class AddLayer(object):
 
             # configure a symbol layer
             try:
-                color = color_values.get(unique_value)
+                color = color_values.get(str(unique_value))
                 symbol.setColor(color)
-            except Exception:
+            except Exception as e:
                 color = QColor(randrange(0, 256), randrange(0, 256), randrange(0, 256))
                 symbol.setColor(color)
 
@@ -328,7 +330,7 @@ class AddLayer(object):
         """
 
         qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
-        for x in range(0, qtabwidget.count()-1):
+        for x in range(0, qtabwidget.count() - 1):
             qtabwidget.widget(x).setEnabled(False)
 
         btn_accept = dialog.findChild(QPushButton, 'btn_accept')
@@ -357,17 +359,20 @@ class AddLayer(object):
         # Add headers to layer
         if counter > 0:
             for key, value in list(data[layer_type]['features'][0]['properties'].items()):
-                if key == 'the_geom': continue
+                if key == 'the_geom':
+                    continue
                 prov.addAttributes([QgsField(str(key), QVariant.String)])
 
         for feature in data[layer_type]['features']:
             geometry = self.get_geometry(feature)
-            if not geometry: continue
+            if not geometry:
+                continue
             attributes = []
             fet = QgsFeature()
             fet.setGeometry(geometry)
             for key, value in feature['properties'].items():
-                if key == 'the_geom': continue
+                if key == 'the_geom':
+                    continue
                 attributes.append(value)
 
             fet.setAttributes(attributes)
@@ -475,7 +480,7 @@ class AddLayer(object):
         coordinates = "("
         for coords in feature['geometry']['coordinates']:
             coordinates += f"{coords[0]} {coords[1]}, "
-        coordinates = coordinates[:-2]+")"
+        coordinates = coordinates[:-2] + ")"
         return coordinates
 
 
@@ -604,7 +609,8 @@ class AddLayer(object):
         # Iterate through layers from certain group and combine their extent
         root = QgsProject.instance().layerTreeRoot()
         group = root.findGroup(group_name)  # Adjust this to fit your group's name
-        if not group: return False
+        if not group:
+            return False
         for child in group.children():
             if isinstance(child, QgsLayerTreeLayer):
                 extent.combineExtentWith(child.layer().extent())

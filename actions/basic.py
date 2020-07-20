@@ -5,10 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsCategorizedSymbolRenderer, QgsRendererCategory, QgsSimpleFillSymbolLayer, QgsSymbol
-
 import os
-import random
 from functools import partial
 
 from ..ui_manager import SelectorUi
@@ -45,8 +42,8 @@ class Basic(ApiParent):
         self.load_settings(self.dlg_selector)
 
         # Get the name of the last tab used by the user
-        self.current_tab = self.get_last_tab(self.dlg_selector, 'basic')
-        self.get_selector(self.dlg_selector, selector_values, current_tab=self.current_tab)
+        current_tab = self.get_last_tab(self.dlg_selector, 'basic')
+        self.get_selector(self.dlg_selector, selector_values, current_tab=current_tab)
 
         if self.controller.dlg_docker:
             self.controller.dock_dialog(self.dlg_selector)

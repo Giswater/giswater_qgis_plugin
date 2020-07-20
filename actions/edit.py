@@ -6,9 +6,6 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import QSettings
-from qgis.PyQt.QtWidgets import QDockWidget
-
-from functools import partial
 
 from .api_cf import ApiCF
 from .manage_element import ManageElement
@@ -22,7 +19,7 @@ class Edit(ParentAction):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'edit' """
-                
+
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
         self.manage_document = ManageDocument(iface, settings, controller, plugin_dir)
         self.manage_element = ManageElement(iface, settings, controller, plugin_dir)
@@ -43,6 +40,10 @@ class Edit(ParentAction):
         if self.layer:
             self.suppres_form = QSettings().value("/Qgis/digitizing/disable_enter_attribute_values_dialog")
             QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", True)
+            config = self.layer.editFormConfig()
+            self.conf_supp = config.suppress()
+            config.setSuppress(0)
+            self.layer.setEditFormConfig(config)
             self.iface.setActiveLayer(self.layer)
             self.layer.startEditing()
             self.iface.actionAddFeature().trigger()
@@ -80,7 +81,9 @@ class Edit(ParentAction):
 
         # Restore user value (Settings/Options/Digitizing/Suppress attribute from pop-up after feature creation)
         QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", self.suppres_form)
-
+        config = self.layer.editFormConfig()
+        config.setSuppress(self.conf_supp)
+        self.layer.setEditFormConfig(config)
         if not result:
             self.layer.deleteFeature(feature.id())
             self.iface.actionRollbackEdits().trigger()
@@ -103,15 +106,15 @@ class Edit(ParentAction):
     def edit_add_file(self):
         """ Button 34: Add document """
         self.manage_document.manage_document()
-        
-    
+
+
     def edit_document(self):
-        """ Button 66: Edit document """          
-        self.manage_document.edit_document()        
-        
-            
+        """ Button 66: Edit document """
+        self.manage_document.edit_document()
+
+
     def edit_element(self):
-        """ Button 67: Edit element """          
+        """ Button 67: Edit element """
         self.manage_element.edit_element()
 
 

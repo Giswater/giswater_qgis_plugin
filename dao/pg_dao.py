@@ -13,8 +13,8 @@ class PgDao(object):
 
     def __init__(self):
         self.last_error = None
-        
-        
+
+
     def init_db(self):
         """ Initializes database connection """
 
@@ -23,14 +23,14 @@ class PgDao(object):
             self.cursor = self.conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
             status = True
         except psycopg2.DatabaseError as e:
-            self.last_error = e            
+            self.last_error = e
             status = False
         return status
 
-    
+
     def close_db(self):
         """ Close database connection """
-        
+
         try:
             status = True
             if self.cursor:
@@ -40,9 +40,9 @@ class PgDao(object):
             del self.cursor
             del self.conn
         except Exception as e:
-            self.last_error = e            
+            self.last_error = e
             status = False
-            
+
         return status
 
 
@@ -100,7 +100,7 @@ class PgDao(object):
         if sslmode:
             self.conn_string += f" sslmode={sslmode}"
 
-        
+
     def mogrify(self, sql, params):
         """ Return a query string after arguments binding """
 
@@ -112,7 +112,7 @@ class PgDao(object):
         finally:
             return query
 
-        
+
     def get_rows(self, sql, commit=False):
         """ Get multiple rows from selected query """
 
@@ -120,17 +120,17 @@ class PgDao(object):
         rows = None
         try:
             self.cursor_execute(sql)
-            rows = self.cursor.fetchall()     
+            rows = self.cursor.fetchall()
             if commit:
-                self.commit()             
+                self.commit()
         except Exception as e:
             self.last_error = e
             if commit:
                 self.rollback()
         finally:
             return rows
-    
-    
+
+
     def get_row(self, sql, commit=False):
         """ Get single row from selected query """
 
@@ -160,8 +160,8 @@ class PgDao(object):
             self.last_error = e
         finally:
             return name
-        
-        
+
+
     def get_columns_length(self):
         """ Get number of columns of current query """
 
@@ -178,19 +178,19 @@ class PgDao(object):
     def execute_sql(self, sql, commit=True):
         """ Execute selected query """
 
-        self.last_error = None         
+        self.last_error = None
         status = True
         try:
             self.cursor_execute(sql)
             if commit:
                 self.commit()
-        except Exception as e: 
-            self.last_error = e               
+        except Exception as e:
+            self.last_error = e
             status = False
             if commit:
-                self.rollback() 
+                self.rollback()
         finally:
-            return status 
+            return status
 
 
     def execute_returning(self, sql, commit=True):
@@ -210,24 +210,24 @@ class PgDao(object):
             return value
 
 
-    def get_rowcount(self):       
+    def get_rowcount(self):
         """ Returns number of rows of current query """
         self.check_cursor()
-        return self.cursor.rowcount      
- 
- 
+        return self.cursor.rowcount
+
+
     def commit(self):
         """ Commit current database transaction """
         self.check_cursor()
         self.conn.commit()
-        
-        
+
+
     def rollback(self):
         """ Rollback current database transaction """
         self.check_cursor()
         self.conn.rollback()
-        
-        
+
+
     def copy_expert(self, sql, csv_file):
         """ Dumps contents of the query to selected CSV file """
 
@@ -235,6 +235,6 @@ class PgDao(object):
             self.cursor.copy_expert(sql, csv_file)
             return None
         except Exception as e:
-            return e   
-        
-        
+            return e
+
+

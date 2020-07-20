@@ -35,7 +35,7 @@ from ..ui_manager import GwDialog, GwMainWindow
 
 class ParentMapTool(QgsMapTool):
 
-    def __init__(self, iface, settings, action, index_action):  
+    def __init__(self, iface, settings, action, index_action):
         """ Class constructor """
 
         self.iface = iface
@@ -43,16 +43,16 @@ class ParentMapTool(QgsMapTool):
         self.settings = settings
         self.show_help = bool(int(self.settings.value('status/show_help', 1)))
         self.index_action = index_action
-        self.layer_arc = None        
+        self.layer_arc = None
         self.layer_connec = None
         self.layer_gully = None
         self.layer_node = None
-        self.schema_name = None        
-        self.controller = None        
+        self.schema_name = None
+        self.controller = None
         self.dao = None
         self.snapper_manager = None
-        
-        # Call superclass constructor and set current action        
+
+        # Call superclass constructor and set current action
         QgsMapTool.__init__(self, self.canvas)
         self.setAction(action)
 
@@ -78,20 +78,20 @@ class ParentMapTool(QgsMapTool):
         self.rubber_band.setFillColor(color_selection)
         self.rubber_band.setWidth(1)
         self.reset()
-        
+
         self.force_active_layer = True
 
-        
+
     def get_cursor_multiple_selection(self):
         """ Set cursor for multiple selection """
-        
-        path_folder = os.path.join(os.path.dirname(__file__), os.pardir) 
-        path_cursor = os.path.join(path_folder, 'icons', '201.png')                
-        if os.path.exists(path_cursor):      
-            cursor = QCursor(QPixmap(path_cursor))    
-        else:        
-            cursor = QCursor(Qt.ArrowCursor)  
-                
+
+        path_folder = os.path.join(os.path.dirname(__file__), os.pardir)
+        path_cursor = os.path.join(path_folder, 'icons', '201.png')
+        if os.path.exists(path_cursor):
+            cursor = QCursor(QPixmap(path_cursor))
+        else:
+            cursor = QCursor(Qt.ArrowCursor)
+
         return cursor
 
 
@@ -103,8 +103,8 @@ class ParentMapTool(QgsMapTool):
         if self.snapper_manager is None:
             self.snapper_manager = SnappingConfigManager(self.iface)
         self.snapper_manager.controller = controller
-        
-        
+
+
     def deactivate(self):
 
         # Uncheck button
@@ -143,19 +143,19 @@ class ParentMapTool(QgsMapTool):
         """ Set @icon to selected @widget """
 
         # Get icons folder
-        icons_folder = os.path.join(self.plugin_dir, 'icons')           
-        icon_path = os.path.join(icons_folder, str(icon) + ".png")           
+        icons_folder = os.path.join(self.plugin_dir, 'icons')
+        icon_path = os.path.join(icons_folder, str(icon) + ".png")
         if os.path.exists(icon_path):
             widget.setIcon(QIcon(icon_path))
         else:
             self.controller.log_info("File not found", parameter=icon_path)
-            
-    
+
+
     def set_action_pan(self):
-        """ Set action 'Pan' """  
+        """ Set action 'Pan' """
         try:
-            self.iface.actionPan().trigger()     
-        except Exception:          
+            self.iface.actionPan().trigger()
+        except Exception:
             pass
 
 
@@ -174,32 +174,32 @@ class ParentMapTool(QgsMapTool):
     def reset(self):
 
         self.reset_rubber_band()
-        self.snapped_feat = None      
-        
-    
+        self.snapped_feat = None
+
+
     def cancel_map_tool(self):
         """ Executed if user press right button or escape key """
-        
+
         # Reset rubber band
         self.reset()
 
         # Deactivate map tool
         self.deactivate()
         self.set_action_pan()
-                        
+
 
     def remove_markers(self):
         """ Remove previous markers """
-             
+
         vertex_items = [i for i in list(self.canvas.scene().items()) if issubclass(type(i), QgsVertexMarker)]
         for ver in vertex_items:
             if ver in list(self.canvas.scene().items()):
                 self.canvas.scene().removeItem(ver)
-        
+
 
     def refresh_map_canvas(self):
         """ Refresh all layers present in map canvas """
-        
+
         self.canvas.refreshAllLayers()
         for layer_refresh in self.canvas.layers():
             layer_refresh.triggerRepaint()
@@ -214,7 +214,7 @@ class ParentMapTool(QgsMapTool):
 
         if dlg is None or type(dlg) is bool:
             dlg = self.dlg
-            
+
         # Manage i18n of the dialog
         if dlg_name:
             self.controller.manage_translation(dlg_name, dlg)
@@ -241,11 +241,11 @@ class ParentMapTool(QgsMapTool):
             dlg.show()
         else:
             dlg.show()
-                    
 
-    def close_dialog(self, dlg=None, set_action_pan=True): 
+
+    def close_dialog(self, dlg=None, set_action_pan=True):
         """ Close dialog """
-        
+
         if dlg is None or type(dlg) is bool:
             dlg = self.dlg
         try:
@@ -253,7 +253,7 @@ class ParentMapTool(QgsMapTool):
             dlg.close()
             if set_action_pan:
                 map_tool = self.canvas.mapTool()
-                # If selected map tool is from the plugin, set 'Pan' as current one 
+                # If selected map tool is from the plugin, set 'Pan' as current one
                 if map_tool.toolName() == '':
                     self.set_action_pan()
         except AttributeError:
@@ -285,32 +285,32 @@ class ParentMapTool(QgsMapTool):
                 dialog.setGeometry(int(x), int(y), int(width), int(height))
         except:
             pass
-            
-            
+
+
     def save_settings(self, dialog=None):
-        """ Save QGIS settings related with dialog position and size """   
-                   
+        """ Save QGIS settings related with dialog position and size """
+
         if dialog is None:
             dialog = self.dlg
-            
-        try:             
+
+        try:
             self.controller.plugin_settings_set_value(dialog.objectName() + "_width", dialog.property('width'))
             self.controller.plugin_settings_set_value(dialog.objectName() + "_height", dialog.property('height'))
             self.controller.plugin_settings_set_value(dialog.objectName() + "_x", dialog.pos().x())
-            self.controller.plugin_settings_set_value(dialog.objectName() + "_y", dialog.pos().y())  
+            self.controller.plugin_settings_set_value(dialog.objectName() + "_y", dialog.pos().y())
         except:
-            pass                      
-            
-        
+            pass
+
+
     def check_expression(self, expr_filter, log_info=False):
         """ Check if expression filter @expr is valid """
-        
+
         if log_info:
             self.controller.log_info(expr_filter)
         expr = QgsExpression(expr_filter)
         if expr.hasParserError():
             message = "Expression Error"
-            self.controller.log_warning(message, parameter=expr_filter)      
+            self.controller.log_warning(message, parameter=expr_filter)
             return False, expr
 
         return True, expr
@@ -336,7 +336,7 @@ class ParentMapTool(QgsMapTool):
 
         return index
 
-        
+
     def canvasMoveEvent(self, event):
 
         # Make sure active layer is always 'v_edit_node'
@@ -376,7 +376,7 @@ class ParentMapTool(QgsMapTool):
         Mysteriously this bug is solved by checking and unchecking the categorization of the tables.
         # TODO solve this bug
         """
-        layers =[self.controller.get_layer_by_tablename('v_edit_node'),
+        layers = [self.controller.get_layer_by_tablename('v_edit_node'),
                  self.controller.get_layer_by_tablename('v_edit_connec'),
                  self.controller.get_layer_by_tablename('v_edit_gully')]
 

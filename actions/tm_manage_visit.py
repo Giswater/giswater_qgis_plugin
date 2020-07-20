@@ -5,7 +5,8 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 from qgis.PyQt.QtCore import Qt, QDate, QObject, QStringListModel, pyqtSignal
-from qgis.PyQt.QtWidgets import QAbstractItemView, QCompleter, QLineEdit, QTableView, QComboBox, QTabWidget, QDialogButtonBox
+from qgis.PyQt.QtWidgets import QAbstractItemView, QCompleter, QLineEdit, QTableView, QComboBox, QTabWidget, \
+    QDialogButtonBox
 from qgis.PyQt.QtSql import QSqlTableModel
 
 from functools import partial
@@ -121,8 +122,10 @@ class TmManageVisit(TmParentManage, QObject):
         self.dlg_add_visit.btn_event_insert.clicked.connect(self.event_insert)
         self.dlg_add_visit.btn_event_delete.clicked.connect(self.event_delete)
         self.dlg_add_visit.btn_event_update.clicked.connect(self.event_update)
-        self.dlg_add_visit.btn_feature_insert.clicked.connect(partial(self.insert_feature, self.feature_id, self.tbl_relation))
-        self.dlg_add_visit.btn_feature_delete.clicked.connect(partial(self.delete_records, self.dlg_add_visit, self.tbl_relation))
+        self.dlg_add_visit.btn_feature_insert.clicked.connect(
+            partial(self.insert_feature, self.feature_id, self.tbl_relation))
+        self.dlg_add_visit.btn_feature_delete.clicked.connect(
+            partial(self.delete_records, self.dlg_add_visit, self.tbl_relation))
         self.dlg_add_visit.btn_feature_snapping.clicked.connect(partial(self.selection_init, self.tbl_relation))
         self.tabs.currentChanged.connect(partial(self.manage_tab_changed))
         self.visit_id.textChanged.connect(self.manage_visit_id_change)
@@ -180,7 +183,7 @@ class TmManageVisit(TmParentManage, QObject):
             self.update_geom()
         self.refresh_map_canvas()
         self.canvas.setMapTool(self.previous_map_tool)
-        #self.iface.actionPan().trigger()
+        # self.iface.actionPan().trigger()
 
 
     def update_geom(self):
@@ -499,7 +502,8 @@ class TmManageVisit(TmParentManage, QObject):
         sql = ("SELECT id FROM om_visit_parameter_type"
                " ORDER BY id")
         parameter_type_ids = self.controller.get_rows(sql)
-        qt_tools.fillComboBox(self.dlg_add_visit, self.dlg_add_visit.parameter_type_id, parameter_type_ids, allow_nulls=False)
+        qt_tools.fillComboBox(self.dlg_add_visit, self.dlg_add_visit.parameter_type_id, parameter_type_ids,
+            allow_nulls=False)
 
 
     def set_completers(self, widget, table_name):

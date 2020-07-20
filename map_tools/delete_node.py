@@ -37,7 +37,7 @@ class DeleteNodeMapTool(ParentMapTool):
 
 
     """ QgsMapTools inherited event functions """
-                
+
     def keyPressEvent(self, event):
 
         if event.key() == Qt.Key_Escape:
@@ -91,11 +91,13 @@ class DeleteNodeMapTool(ParentMapTool):
         body = self.create_body(feature=feature_id, extras=extras)
         # Execute SQL function and show result to the user
         result = self.controller.get_json('gw_fct_arc_fusion', body)
-        if not result: return
+        if not result:
+            return
 
         text_result = self.populate_info_text(self.dlg_fusion, result['body']['data'], True, True, 1)
 
-        if not text_result: self.dlg_fusion.close()
+        if not text_result:
+            self.dlg_fusion.close()
         # Refresh map canvas
         self.refresh_map_canvas()
 
@@ -118,7 +120,7 @@ class DeleteNodeMapTool(ParentMapTool):
 
         # Set active layer to 'v_edit_node'
         self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
-        self.iface.setActiveLayer(self.layer_node)            
+        self.iface.setActiveLayer(self.layer_node)
 
         # Change cursor
         self.canvas.setCursor(self.cursor)
@@ -127,10 +129,10 @@ class DeleteNodeMapTool(ParentMapTool):
         if self.show_help:
             message = "Select the node inside a pipe by clicking on it and it will be removed"
             self.controller.show_info(message)
-            
+
 
     def deactivate(self):
 
-        # Call parent method     
+        # Call parent method
         ParentMapTool.deactivate(self)
-    
+

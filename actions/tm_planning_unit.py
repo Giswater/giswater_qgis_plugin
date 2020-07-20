@@ -56,7 +56,7 @@ class TmPlanningUnit(TmParentAction):
         self.geom_type = 'node'
         layer = self.controller.get_layer_by_tablename('v_edit_node')
         if not layer:
-            self.last_error = self.tr("Layer not found") + ": v_edit_node"
+            self.last_error = f"Layer not found: 'v_edit_node'"
             return None
         self.layers['node'] = [layer]
 
@@ -72,7 +72,6 @@ class TmPlanningUnit(TmParentAction):
         validator = QIntValidator(1, 9999999)
         self.dlg_unit.txt_times.setValidator(validator)
 
-        # utils_giswater.set_qtv_config(self.dlg_unit.tbl_unit, edit_triggers=QTableView.DoubleClicked)
         qt_tools.set_qtv_config(self.dlg_unit.tbl_unit, edit_triggers=QTableView.NoEditTriggers)
 
         sql = "SELECT id, name FROM cat_campaign"
@@ -93,14 +92,18 @@ class TmPlanningUnit(TmParentAction):
         self.update_table(self.dlg_unit, self.dlg_unit.tbl_unit, table_name)
 
         # Signals
-        self.dlg_unit.cmb_campaign.currentIndexChanged.connect(partial(self.update_table, self.dlg_unit, self.dlg_unit.tbl_unit, table_name))
-        self.dlg_unit.cmb_work.currentIndexChanged.connect(partial(self.update_table, self.dlg_unit, self.dlg_unit.tbl_unit, table_name))
-        self.dlg_unit.cmb_builder.currentIndexChanged.connect(partial(self.update_table, self.dlg_unit, self.dlg_unit.tbl_unit, table_name))
-        self.dlg_unit.cmb_priority.currentIndexChanged.connect(partial(self.update_table, self.dlg_unit, self.dlg_unit.tbl_unit, table_name))
+        self.dlg_unit.cmb_campaign.currentIndexChanged.connect(
+            partial(self.update_table, self.dlg_unit, self.dlg_unit.tbl_unit, table_name))
+        self.dlg_unit.cmb_work.currentIndexChanged.connect(
+            partial(self.update_table, self.dlg_unit, self.dlg_unit.tbl_unit, table_name))
+        self.dlg_unit.cmb_builder.currentIndexChanged.connect(
+            partial(self.update_table, self.dlg_unit, self.dlg_unit.tbl_unit, table_name))
+        self.dlg_unit.cmb_priority.currentIndexChanged.connect(
+            partial(self.update_table, self.dlg_unit, self.dlg_unit.tbl_unit, table_name))
 
         completer = QCompleter()
         self.dlg_unit.txt_id.textChanged.connect(
-            partial(self.populate_comboline, self.dlg_unit,self.dlg_unit.txt_id, completer))
+            partial(self.populate_comboline, self.dlg_unit, self.dlg_unit.txt_id, completer))
 
         self.dlg_unit.btn_close.clicked.connect(partial(self.save_default_values))
         self.dlg_unit.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_unit))
@@ -108,7 +111,7 @@ class TmPlanningUnit(TmParentAction):
         self.dlg_unit.rejected.connect(partial(self.save_default_values))
         self.dlg_unit.rejected.connect(partial(self.close_dialog, self.dlg_unit))
         self.dlg_unit.rejected.connect(partial(self.remove_selection))
-        self.dlg_unit.btn_snapping.clicked.connect(partial(self.selection_init,  self.dlg_unit.tbl_unit))
+        self.dlg_unit.btn_snapping.clicked.connect(partial(self.selection_init, self.dlg_unit.tbl_unit))
         self.dlg_unit.btn_insert.clicked.connect(partial(self.insert_single, self.dlg_unit, self.dlg_unit.txt_id))
         self.dlg_unit.btn_delete.clicked.connect(partial(self.delete_row, self.dlg_unit.tbl_unit, table_name))
 
@@ -174,10 +177,11 @@ class TmPlanningUnit(TmParentAction):
         self.update_table(self.dlg_unit, self.dlg_unit.tbl_unit, table_name)
 
 
-    def selection_init(self,  qtable):
+    def selection_init(self, qtable):
         """ Set canvas map tool to an instance of class 'MultipleSelection' """
 
-        multiple_selection = TmMultipleSelection(self.iface, self.controller, self.layers['node'], parent_manage=self, table_object=qtable)
+        multiple_selection = TmMultipleSelection(
+            self.iface, self.controller, self.layers['node'], parent_manage=self, table_object=qtable)
         self.disconnect_signal_selection_changed()
         self.canvas.setMapTool(multiple_selection)
         self.connect_signal_selection_changed(qtable)
@@ -208,7 +212,7 @@ class TmPlanningUnit(TmParentAction):
         feature_id = qt_tools.getWidgetText(dialog, qline)
         layer = self.controller.get_layer_by_tablename('v_edit_node')
         if not layer:
-            self.last_error = self.tr("Layer not found") + ": v_edit_node"
+            self.last_error = f"Layer not found: 'v_edit_node'"
             return None
 
         feature = self.get_feature_by_id(layer, feature_id, 'node_id')
@@ -290,7 +294,7 @@ class TmPlanningUnit(TmParentAction):
         builder = qt_tools.get_item_data(dialog, dialog.cmb_builder, 0)
         priority = qt_tools.get_item_data(dialog, dialog.cmb_priority, 0)
 
-        if work_id  in (None, "") or builder in (None, "") or priority in (None, ""):
+        if work_id in (None, "") or builder in (None, "") or priority in (None, ""):
             self.dlg_unit.btn_insert.setEnabled(False)
             self.dlg_unit.btn_snapping.setEnabled(False)
         else:
@@ -298,9 +302,12 @@ class TmPlanningUnit(TmParentAction):
             self.dlg_unit.btn_snapping.setEnabled(True)
         expr_filter = f"campaign_id ='{campaign_id}'"
 
-        if work_id: expr_filter += f" AND work_id ='{work_id}'"
-        if builder: expr_filter += f" AND builder_id ='{builder}'"
-        if priority: expr_filter += f" AND priority_id ='{priority}'"
+        if work_id:
+            expr_filter += f" AND work_id ='{work_id}'"
+        if builder:
+            expr_filter += f" AND builder_id ='{builder}'"
+        if priority:
+            expr_filter += f" AND priority_id ='{priority}'"
         self.fill_table_unit(qtable, table_name, expr_filter=expr_filter)
 
         # self.manage_combos(qtable, table_name, expr_filter)
@@ -319,7 +326,7 @@ class TmPlanningUnit(TmParentAction):
             self.put_combobox(qtable, rows, combo_values, 0, 10, 11)
 
 
-    def fill_table_unit(self, qtable, table_name,  expr_filter=None):
+    def fill_table_unit(self, qtable, table_name, expr_filter=None):
         """ Fill table @widget filtering query by @workcat_id
             Set a model with selected filter.
             Attach that model to selected table

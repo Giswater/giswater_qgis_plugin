@@ -31,7 +31,7 @@ class Logger(object):
         if not os.path.exists(log_folder):
             os.makedirs(log_folder)
 
-            # Define filename
+        # Define filename
         filepath = log_folder + log_name
         if file_has_tstamp:
             tstamp = str(time.strftime(log_suffix))

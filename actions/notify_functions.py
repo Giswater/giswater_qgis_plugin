@@ -15,7 +15,6 @@ from collections import OrderedDict
 
 from .parent import ParentAction
 
-
 class NotifyFunctions(ParentAction):
     # :var conn_failed: some times, when user click so fast 2 actions, LISTEN channel is stopped, and we need to
     #                   re-LISTEN all channels
@@ -34,7 +33,6 @@ class NotifyFunctions(ParentAction):
         self.settings = settings
         self.controller = controller
         self.plugin_dir = plugin_dir
-
 
     def start_listening(self, list_channels):
         """
@@ -93,18 +91,21 @@ class NotifyFunctions(ParentAction):
                 self.conn_failed = False
 
             # Initialize thread
-            thread = threading.Timer(interval=0.1, function=self.wait_notifications)
+            thread = threading.Timer(interval=1, function=self.wait_notifications)
             thread.start()
 
             # Check if any notification to process
             dao = self.controller.dao
             dao.get_poll()
+
+            last_paiload = None
             while dao.conn.notifies:
                 notify = dao.conn.notifies.pop()
                 msg = f'<font color="blue"><bold>Got NOTIFY: </font>'
                 msg += f'<font color="black"><bold>{notify.pid}, {notify.channel}, {notify.payload} </font>'
                 self.controller.log_info(msg)
-                if notify.payload:
+                if notify.payload and notify.payload != last_paiload:
+                    last_paiload = notify.payload
                     try:
                         complet_result = json.loads(notify.payload, object_pairs_hook=OrderedDict)
                         self.execute_functions(complet_result)
@@ -117,18 +118,20 @@ class NotifyFunctions(ParentAction):
 
     def execute_functions(self, complet_result):
         """
-        functions called in -> getattr(self, function_name)(**params):
+        functions called in -> getattr(self.controller.gw_actions, function_name)(**params)
             def set_layer_index(self, **kwargs)
             def refresh_attribute_table(self, **kwargs)
             def refresh_canvas(self, **kwargs)
             def show_message(self, **kwargs)
+
         """
 
         for function in complet_result['functionAction']['functions']:
             function_name = function['name']
             params = function['parameters']
             try:
-                getattr(self, function_name)(**params)
+                # getattr(self, function_name)(**params)
+                getattr(self.controller.gw_actions, function_name)(**params)
             except AttributeError as e:
                 # If function_name not exist as python function
                 self.controller.log_warning(f"Exception error: {e}")
@@ -171,11 +174,12 @@ class NotifyFunctions(ParentAction):
             # get sys variale
             self.qgis_project_infotype = self.controller.plugin_settings_value('infoType')
 
-            feature = '"tableName":"' + str(layer_name) + '", "id":""'
+            feature = '"tableName":"' + str(layer_name) + '", "id":"", "isLayer":true'
             extras = f'"infoType":"{self.qgis_project_infotype}"'
             body = self.create_body(feature=feature, extras=extras)
-            result = self.controller.get_json('gw_fct_getinfofromid', body, is_notify=True)
-            if not result: continue
+            result = self.controller.get_json('gw_fct_getinfofromid', body, is_notify=True, log_sql=True)
+            if not result:
+                continue
             for field in result['body']['data']['fields']:
                 _values = {}
                 # Get column index
@@ -210,6 +214,25 @@ class NotifyFunctions(ParentAction):
                     # Set values into valueMap
                     editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': _values})
                     layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+                elif field['widgettype'] == 'text':
+                    editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'True'})
+                    layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+                elif field['widgettype'] == 'check':
+                    config = {'CheckedState': 'true', 'UncheckedState': 'false'}
+                    editor_widget_setup = QgsEditorWidgetSetup('CheckBox', config)
+                    layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+                elif field['widgettype'] == 'datetime':
+                    config = {'allow_null': True,
+                              'calendar_popup': True,
+                              'display_format': 'yyyy-MM-dd',
+                              'field_format': 'yyyy-MM-dd',
+                              'field_iso_format': False}
+                    editor_widget_setup = QgsEditorWidgetSetup('DateTime', config)
+                    layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+                else:
+                    editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'True'})
+                    layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+
 
 
     def refresh_canvas(self, **kwargs):
@@ -279,12 +302,13 @@ class NotifyFunctions(ParentAction):
 
         if field['widgettype'] == 'text':
             if field['widgetcontrols'] and 'setQgisMultiline' in field['widgetcontrols']:
-                editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': field['widgetcontrols']['setQgisMultiline']})
+                editor_widget_setup = QgsEditorWidgetSetup(
+                    'TextEdit', {'IsMultiline': field['widgetcontrols']['setQgisMultiline']})
                 layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
 
 
     def set_read_only(self, layer, field, field_index):
-        """ Set field readOnly according to client configuration into config_api_form_fields (field 'iseditable')"""
+        """ Set field readOnly according to client configuration into config_form_fields (field 'iseditable')"""
 
         # Get layer config
         config = layer.editFormConfig()

@@ -5,6 +5,11 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+from PyQt5.QtWidgets import QTabWidget, QPushButton
+from qgis.core import QgsProject, QgsFeature, QgsGeometry, QgsVectorLayer, QgsField
+from qgis.PyQt.QtCore import QVariant
+from qgis.PyQt.QtGui import QColor
+
 import json
 import os
 import subprocess
@@ -78,7 +83,8 @@ class CrmTrace(ApiParent):
          # Check if script path exists
         script_path = script_folder + os.sep + 'main.py'
         if not os.path.exists(script_path):
-            msg = "File not found: {}. Check config system parameter: '{}'".format(script_path, 'crm_daily_script_folderpath')
+            msg = "File not found: {}. Check config system parameter: '{}'".format(
+                script_path, 'crm_daily_script_folderpath')
             self.controller.show_warning(msg, duration=20)
             return False
 
@@ -195,4 +201,131 @@ class CrmTrace(ApiParent):
         self.controller.show_info(msg, parameter=message, duration=20)
 
         return True
+
+
+    def add_temp_layer(self, dialog, tab_main, txt_infolog, data, function_name):
+        """ Manage parameter 'data' from JSON response """
+
+        self.delete_layer_from_toc(function_name)
+        srid = self.controller.plugin_settings_value('srid')
+        for k, v in list(data.items()):
+            if str(k) == "info":
+                self.controller.log_info("populate_info_text")
+                self.populate_info_text(dialog, data)
+            else:
+                counter = len(data[k]['values'])
+                if counter > 0:
+                    geometry_type = data[k]['geometryType']
+                    v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", function_name, 'memory')
+                    self.controller.log_info("populate_vlayer")
+                    self.populate_vlayer(v_layer, data, k)
+                    if 'qmlPath' in data[k]:
+                        qml_path = data[k]['qmlPath']
+                        self.load_qml(v_layer, qml_path)
+                    else:
+                        if geometry_type == 'Point':
+                            v_layer.renderer().symbol().setSize(3.5)
+                            v_layer.renderer().symbol().setColor(QColor("red"))
+                        elif geometry_type == 'LineString':
+                            v_layer.renderer().symbol().setWidth(1.5)
+                            v_layer.renderer().symbol().setColor(QColor("red"))
+                    v_layer.renderer().symbol().setOpacity(0.7)
+                else:
+                    self.controller.log_info("No data found")
+
+
+    def populate_vlayer(self, virtual_layer, data, layer_type):
+        """ Populate @virtual_layer with contents get from JSON response """
+
+        # Enter editing mode
+        data_provider = virtual_layer.dataProvider()
+        virtual_layer.startEditing()
+        columns = data[layer_type]['values'][0]
+        for key, value in list(columns.items()):
+            # add columns
+            if str(key) != 'the_geom':
+                data_provider.addAttributes([QgsField(str(key), QVariant.String)])
+
+        # Add features
+        for item in data[layer_type]['values']:
+            attributes = []
+            fet = QgsFeature()
+            for k, v in list(item.items()):
+                if str(k) != 'the_geom':
+                    attributes.append(v)
+                if str(k) in 'the_geom':
+                    sql = f"SELECT St_AsText('{v}')"
+                    row = self.controller.get_row(sql, log_sql=False)
+                    if row:
+                        wkt = str(row[0])
+                        geometry = QgsGeometry.fromWkt(wkt)
+                        fet.setGeometry(geometry)
+            fet.setAttributes(attributes)
+            data_provider.addFeatures([fet])
+
+        # Commit changes
+        virtual_layer.commitChanges()
+        QgsProject.instance().addMapLayer(virtual_layer, False)
+
+        root = QgsProject.instance().layerTreeRoot()
+        my_group = root.findGroup('GW Temporal Layers')
+        if my_group is None:
+            my_group = root.insertGroup(0, 'GW Temporal Layers')
+
+        my_group.insertLayer(0, virtual_layer)
+
+
+    def populate_info_text(self, dialog, data, force_tab=True, reset_text=True, tab_idx=1, disable_tabs=True):
+        """ Populate txt_infolog QTextEdit widget
+        :param dialog: QDialog
+        :param data: Json
+        :param force_tab: Force show tab (boolean)
+        :param reset_text: Reset(or not) text for each iteration (boolean)
+        :param tab_idx: index of tab to force (integer)
+        :param disable_tabs: set all tabs, except the last, enabled or disabled (boolean)
+        :return: Text received from data (String)
+        """
+
+        change_tab = False
+        text = qt_tools.getWidgetText(dialog, dialog.txt_infolog, return_string_null=False)
+
+        if reset_text:
+            text = ""
+        for item in data['info']['values']:
+            if 'message' in item:
+                if item['message'] is not None:
+                    text += str(item['message']) + "\n"
+                    if force_tab:
+                        change_tab = True
+                else:
+                    text += "\n"
+
+        qt_tools.setWidgetText(dialog, 'txt_infolog', text + "\n")
+        qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
+        if qtabwidget is not None:
+            if change_tab and qtabwidget is not None:
+                qtabwidget.setCurrentIndex(tab_idx)
+            if disable_tabs:
+                self.disable_tabs(dialog)
+
+        return text
+
+
+    def disable_tabs(self, dialog):
+        """ Disable all tabs in the dialog except the log one and change the state of the buttons
+        :param dialog: Dialog where tabs are disabled (QDialog)
+        :return:
+        """
+
+        qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
+        for x in range(0, qtabwidget.count() - 1):
+            qtabwidget.widget(x).setEnabled(False)
+
+        btn_accept = dialog.findChild(QPushButton, 'btn_accept')
+        if btn_accept:
+            btn_accept.hide()
+
+        btn_cancel = dialog.findChild(QPushButton, 'btn_cancel')
+        if btn_cancel:
+            qt_tools.setWidgetText(dialog, btn_accept, 'Close')
 

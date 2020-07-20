@@ -25,13 +25,13 @@ from qgis.PyQt.QtWidgets import QApplication
 
 from functools import partial
 
-from ..ui_manager import  DialogTextUi
+from ..ui_manager import DialogTextUi
 from .parent import ParentMapTool
 
 
 class ConnecMapTool(ParentMapTool):
     """ Button 20: User select connections from layer 'connec'
-    Execute SQL function: 'gw_fct_connect_to_network' """    
+    Execute SQL function: 'gw_fct_connect_to_network' """
 
     def __init__(self, iface, settings, action, index_action):
         """ Class constructor """
@@ -61,7 +61,7 @@ class ConnecMapTool(ParentMapTool):
             self.set_rubber_band()
 
 
-    def canvasPressEvent(self, event):   #@UnusedVariable
+    def canvasPressEvent(self, event):  # @UnusedVariable
 
         self.select_rect.setRect(0, 0, 0, 0)
         self.rubber_band.reset(2)
@@ -69,7 +69,7 @@ class ConnecMapTool(ParentMapTool):
 
     def canvasReleaseEvent(self, event):
         """ With left click the digitizing is finished """
-        
+
         if event.button() == Qt.LeftButton:
 
             # Get coordinates
@@ -117,7 +117,7 @@ class ConnecMapTool(ParentMapTool):
                 self.dragging = False
 
                 # Refresh map canvas
-                self.rubber_band.reset()                
+                self.rubber_band.reset()
 
         elif event.button() == Qt.RightButton:
 
@@ -130,22 +130,22 @@ class ConnecMapTool(ParentMapTool):
             if number_features > 0:
                 message = "Number of features selected in the group of"
                 title = "Interpolate value - Do you want to update values"
-                answer = self.controller.ask_question(message, title, parameter='connec: '+str(number_features))
+                answer = self.controller.ask_question(message, title, parameter='connec: ' + str(number_features))
                 if answer:
                     # Create link
                     self.link_selected_features('connec', layer)
                     self.cancel_map_tool()
-                    
+
             layer = self.snapper_manager.layer_gully
             if layer:
                 # Check selected records
                 number_features = 0
                 number_features += layer.selectedFeatureCount()
-    
+
                 if number_features > 0:
                     message = "Number of features selected in the group of"
                     title = "Interpolate value - Do you want to update values"
-                    answer = self.controller.ask_question(message, title, parameter='gully: '+str(number_features))
+                    answer = self.controller.ask_question(message, title, parameter='gully: ' + str(number_features))
                     if answer:
                         # Create link
                         self.link_selected_features('gully', layer)
@@ -183,7 +183,7 @@ class ConnecMapTool(ParentMapTool):
         # Show help message when action is activated
         if self.show_help:
             message = "Right click to use current selection, select connec points by clicking or dragging (selection box)"
-            self.controller.show_info(message)  
+            self.controller.show_info(message)
 
 
     def deactivate(self):
@@ -260,9 +260,9 @@ class ConnecMapTool(ParentMapTool):
     def select_multiple_features(self, selectGeometry):
 
         key = QApplication.keyboardModifiers()
-        
+
         # If Ctrl+Shift clicked: remove features from selection
-        if key == (Qt.ControlModifier | Qt.ShiftModifier):                
+        if key == (Qt.ControlModifier | Qt.ShiftModifier):
             behaviour = QgsVectorLayer.RemoveFromSelection
         # If Ctrl clicked: add features to selection
         elif key == Qt.ControlModifier:
@@ -275,8 +275,8 @@ class ConnecMapTool(ParentMapTool):
         layer = self.snapper_manager.layer_connec
         if layer:
             layer.selectByRect(selectGeometry, behaviour)
-            
+
         layer = self.snapper_manager.layer_gully
         if layer:
             layer.selectByRect(selectGeometry, behaviour)
-        
+

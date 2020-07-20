@@ -240,13 +240,6 @@
                    </property>
                   </widget>
                  </item>
-                 <item row="6" column="0">
-                  <widget class="QLabel" name="lbl_output_details">
-                   <property name="text">
-                    <string>Output details:</string>
-                   </property>
-                  </widget>
-                 </item>
                  <item row="8" column="0">
                   <widget class="QLabel" name="lbl_descript_pd">
                    <property name="font">
@@ -290,9 +283,6 @@
                     <bool>true</bool>
                    </property>
                   </widget>
-                 </item>
-                 <item row="6" column="1" colspan="2">
-                  <widget class="QLineEdit" name="output_details"/>
                  </item>
                  <item row="8" column="1" colspan="2">
                   <widget class="QLineEdit" name="pred_description"/>
@@ -386,6 +376,22 @@
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="6" column="1" colspan="2">
+                  <widget class="QTextEdit" name="textEdit">
+                   <property name="font">
+                    <font>
+                     <pointsize>7</pointsize>
+                    </font>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="6" column="0">
+                  <widget class="QLabel" name="lbl_output_details">
+                   <property name="text">
+                    <string>Output details:</string>
                    </property>
                   </widget>
                  </item>
@@ -843,7 +849,6 @@
          </widget>
         </item>
        </layout>
-       <zorder></zorder>
        <zorder></zorder>
        <zorder>mainTab</zorder>
       </widget>

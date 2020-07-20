@@ -9,8 +9,8 @@ from qgis.core import QgsLayoutExporter, QgsPointXY, QgsProject, QgsRectangle
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence
 from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel
-from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QDateEdit, QLabel
-from qgis.PyQt.QtWidgets import QLineEdit, QTableView
+from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QDateEdit, QLabel, \
+    QLineEdit, QTableView
 
 import csv
 import json
@@ -46,7 +46,6 @@ class ManageNewPsector(ParentManage):
         self.dlg_plan_psector = Plan_psector()
         self.load_settings(self.dlg_plan_psector)
         self.plan_om = str(plan_om)
-        # self.dlg_plan_psector.setWindowTitle(self.plan_om + " psector")
 
         # Capture the current layer to return it at the end of the operation
         cur_active_layer = self.iface.activeLayer()
@@ -161,7 +160,7 @@ class ManageNewPsector(ParentManage):
 
         # if a row is selected from mg_psector_mangement(button 46 or button 81)
         # Si psector_id contiene "1" o "0" python lo toma como boolean, si es True, quiere decir que no contiene valor
-        # y por lo tanto es uno nuevo. Convertimos ese valor en 0 ya que ningun id va a ser 0. de esta manera si psector_id
+        # y por lo tanto es uno nuevo. Convertimos ese valor en 0 ya que ningun id va a ser 0 de esta manera si psector_id
         # tiene un valor distinto de 0, es que el sector ya existe y queremos hacer un update.
         if isinstance(psector_id, bool):
             psector_id = 0
@@ -252,18 +251,27 @@ class ManageNewPsector(ParentManage):
             expr = " psector_id = " + str(psector_id)
             self.qtbl_arc.model().setFilter(expr)
             self.qtbl_arc.model().select()
+            self.qtbl_arc.clicked.connect(
+                partial(self.hilight_feature_by_id, self.qtbl_arc, "v_edit_arc", "arc_id", 5))
 
             expr = " psector_id = " + str(psector_id)
             self.qtbl_node.model().setFilter(expr)
             self.qtbl_node.model().select()
+            self.qtbl_node.clicked.connect(
+                partial(self.hilight_feature_by_id, self.qtbl_node, "v_edit_node", "node_id", 1))
 
             expr = " psector_id = " + str(psector_id)
             self.qtbl_connec.model().setFilter(expr)
             self.qtbl_connec.model().select()
+            self.qtbl_connec.clicked.connect(
+                partial(self.hilight_feature_by_id, self.qtbl_connec, "v_edit_connec", "connec_id", 1))
+
             if self.project_type.upper() == 'UD':
                 expr = " psector_id = " + str(psector_id)
                 self.qtbl_gully.model().setFilter(expr)
                 self.qtbl_gully.model().select()
+                self.qtbl_gully.clicked.connect(
+                    partial(self.hilight_feature_by_id, self.qtbl_gully, "v_edit_gully", "gully_id", 1))
 
             self.populate_budget(self.dlg_plan_psector, psector_id)
             self.update = True
@@ -304,14 +312,14 @@ class ManageNewPsector(ParentManage):
                     feature = layer.selectedFeatures()[0]
                 except IndexError:
                     feature = layer.selectedFeatures()
-                    
+
                 if feature != []:
                     if feature.geometry().get() is not None:
                         psector_rec = feature.geometry().boundingBox()
                         # Do zoom when QgsRectangles don't intersect
                         if not canvas_rec.intersects(psector_rec):
                             self.zoom_to_selected_features(layer)
-                        if psector_rec.width() < (canvas_width * 10)/100 or psector_rec.height() < (canvas_height * 10)/100:
+                        if psector_rec.width() < (canvas_width * 10) / 100 or psector_rec.height() < (canvas_height * 10) / 100:
                             self.zoom_to_selected_features(layer)
                         layer.removeSelection()
 
@@ -365,14 +373,15 @@ class ManageNewPsector(ParentManage):
             self.dlg_plan_psector.txt_name, self.dlg_plan_psector.all_rows, 'v_price_compost', viewname, "id"))
 
         self.dlg_plan_psector.gexpenses.returnPressed.connect(partial(self.calulate_percents,
-            'plan_psector', psector_id, 'gexpenses'))
+            'plan_psector', 'gexpenses'))
         self.dlg_plan_psector.vat.returnPressed.connect(partial(self.calulate_percents,
-            'plan_psector', psector_id, 'vat'))
+            'plan_psector', 'vat'))
         self.dlg_plan_psector.other.returnPressed.connect(partial(self.calulate_percents,
-            'plan_psector', psector_id, 'other'))
+            'plan_psector', 'other'))
 
         self.dlg_plan_psector.btn_doc_insert.clicked.connect(self.document_insert)
-        self.dlg_plan_psector.btn_doc_delete.clicked.connect(partial(self.document_delete, self.tbl_document, 'doc_x_psector'))
+        self.dlg_plan_psector.btn_doc_delete.clicked.connect(
+            partial(self.document_delete, self.tbl_document, 'doc_x_psector'))
         self.dlg_plan_psector.btn_doc_new.clicked.connect(partial(self.manage_document, self.tbl_document))
         self.dlg_plan_psector.btn_open_doc.clicked.connect(partial(self.document_open, self.tbl_document))
         self.cmb_status.currentIndexChanged.connect(partial(self.show_status_warning))
@@ -394,6 +403,7 @@ class ManageNewPsector(ParentManage):
             other = float(row[0]) if row[0] is not None else 0
             gexpenses = float(row[1]) if row[1] is not None else 0
             vat = float(row[2]) if row[2] is not None else 0
+
         qt_tools.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.other, other)
         qt_tools.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.gexpenses, gexpenses)
         qt_tools.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.vat, vat)
@@ -422,7 +432,7 @@ class ManageNewPsector(ParentManage):
         widget_to_ignore = ('btn_accept', 'btn_cancel', 'btn_rapports', 'btn_open_doc')
         restriction = ('role_basic', 'role_om', 'role_epa', 'role_om')
         self.set_restriction(self.dlg_plan_psector, widget_to_ignore, restriction)
-        # self.controller.translate_form(self.dlg_plan_psector, 'plan_psector')
+
         # Open dialog
         self.open_dialog(self.dlg_plan_psector, dlg_name='plan_psector', maximize_button=False)
 
@@ -465,7 +475,7 @@ class ManageNewPsector(ParentManage):
             pass
 
 
-    def open_dlg_rapports(self, previous_dialog):
+    def open_dlg_rapports(self):
 
         default_file_name = qt_tools.getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.name)
 
@@ -496,13 +506,13 @@ class ManageNewPsector(ParentManage):
                 plugin_dir = os.path.expanduser("~")
             qt_tools.setWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path, plugin_dir)
         self.populate_cmb_templates()
-        
+
         # Open dialog
         self.open_dialog(self.dlg_psector_rapport, dlg_name='psector_rapport', maximize_button=False)
 
 
     def populate_cmb_templates(self):
-        
+
         index = 0
         records = []
         layout_manager = QgsProject.instance().layoutManager()
@@ -537,19 +547,19 @@ class ManageNewPsector(ParentManage):
     def generate_rapports(self):
         
         self.controller.plugin_settings_set_value("psector_rapport_path",
-                                                  qt_tools.getWidgetText(self.dlg_psector_rapport, 'txt_path'))
+            qt_tools.getWidgetText(self.dlg_psector_rapport, 'txt_path'))
         self.controller.plugin_settings_set_value("psector_rapport_chk_composer",
-                                                  qt_tools.isChecked(self.dlg_psector_rapport, 'chk_composer'))
+            qt_tools.isChecked(self.dlg_psector_rapport, 'chk_composer'))
         self.controller.plugin_settings_set_value("psector_rapport_chk_csv_detail",
-                                                  qt_tools.isChecked(self.dlg_psector_rapport, 'chk_csv_detail'))
+            qt_tools.isChecked(self.dlg_psector_rapport, 'chk_csv_detail'))
         self.controller.plugin_settings_set_value("psector_rapport_chk_csv",
-                                                  qt_tools.isChecked(self.dlg_psector_rapport, 'chk_csv'))
+            qt_tools.isChecked(self.dlg_psector_rapport, 'chk_csv'))
         
         folder_path = qt_tools.getWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path)
         if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path):
             self.get_folder_dialog(self.dlg_psector_rapport.txt_path)
             folder_path = qt_tools.getWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path)
-            
+
         # Generate Composer
         if qt_tools.isChecked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_composer):
             file_name = qt_tools.getWidgetText(self.dlg_psector_rapport, 'txt_composer_path')
@@ -600,7 +610,7 @@ class ManageNewPsector(ParentManage):
         layout_name = qt_tools.getWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.cmb_templates)
         layout = layout_manager.layoutByName(layout_name)
 
-        # Since qgis 3.4 cant dor .setAtlasMode(QgsComposition.PreviewAtlas)
+        # Since qgis 3.4 cant do .setAtlasMode(QgsComposition.PreviewAtlas)
         # then we need to force the opening of the layout designer, trigger the mActionAtlasPreview action and
         # close the layout designer again (finally sentence)
         designer = self.iface.openLayoutDesigner(layout)
@@ -665,7 +675,7 @@ class ManageNewPsector(ParentManage):
 
 
     def populate_budget(self, dialog, psector_id):
-        
+
         sql = (f"SELECT DISTINCT(column_name) FROM information_schema.columns"
                f" WHERE table_name = 'v_plan_current_psector'")
         rows = self.controller.get_rows(sql)
@@ -739,6 +749,7 @@ class ManageNewPsector(ParentManage):
 
     def calulate_percents(self, tablename, psector_id, field):
         psector_id = qt_tools.getWidgetText(self.dlg_plan_psector, "psector_id")
+
         sql = ("UPDATE " + tablename + " "
                " SET " + field + " = '" + qt_tools.getText(self.dlg_plan_psector, field) + "'"
                " WHERE psector_id = '" + str(psector_id) + "'")
@@ -748,7 +759,7 @@ class ManageNewPsector(ParentManage):
 
     def show_description(self):
         """ Show description of product plan/om _psector as label"""
-        
+
         selected_list = self.dlg_plan_psector.all_rows.selectionModel().selectedRows()
         des = ""
         for i in range(0, len(selected_list)):
@@ -794,13 +805,14 @@ class ManageNewPsector(ParentManage):
         """ Connect signal selectionChanged """
 
         try:
-            self.canvas.selectionChanged.connect(partial(self.selection_changed, dialog, table_object, self.geom_type, query))
+            self.canvas.selectionChanged.connect(
+                partial(self.selection_changed, dialog, table_object, self.geom_type, query))
         except Exception:
             pass
 
 
     def enable_relation_tab(self, tablename):
-        
+
         sql = (f"SELECT name FROM {tablename} "
                f" WHERE LOWER(name) = '{qt_tools.getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.name)}'")
         rows = self.controller.get_rows(sql)
@@ -828,7 +840,7 @@ class ManageNewPsector(ParentManage):
 
 
     def check_tab_position(self):
-        
+
         self.dlg_plan_psector.name.setEnabled(False)
         self.insert_or_update_new_psector(tablename=f'v_edit_plan_psector', close_dlg=False)
         self.update = True
@@ -906,7 +918,7 @@ class ManageNewPsector(ParentManage):
     def reload_states_selector(self):
 
         self.delete_psector_selector('selector_state')
-        try :
+        try:
             for x in range(0, len(self.all_states)):
                 sql = (f"INSERT INTO selector_state (state_id, cur_user)"
                        f" VALUES ('{self.all_states[x][0]}', current_user)")
@@ -918,7 +930,8 @@ class ManageNewPsector(ParentManage):
 
     def close_psector(self, cur_active_layer=None):
         """ Close dialog and disconnect snapping """
-        
+
+        self.resetRubberbands()
         self.reload_states_selector()
         if cur_active_layer:
             self.iface.setActiveLayer(cur_active_layer)
@@ -937,7 +950,7 @@ class ManageNewPsector(ParentManage):
 
     def reset_model_psector(self, geom_type):
         """ Reset model of the widget """
-        
+
         table_relation = "" + geom_type + "_plan"
         widget_name = "tbl_" + table_relation
         widget = qt_tools.getWidget(self.dlg_plan_psector, widget_name)
@@ -1066,7 +1079,7 @@ class ManageNewPsector(ParentManage):
                 self.controller.execute_sql(sql, log_sql=True)
         else:
             self.controller.execute_sql(sql, log_sql=True)
-            
+
         self.dlg_plan_psector.tabWidget.setTabEnabled(1, True)
         self.delete_psector_selector('selector_plan_psector')
         self.insert_psector_selector('selector_plan_psector', 'psector_id',
@@ -1077,7 +1090,7 @@ class ManageNewPsector(ParentManage):
             self.close_dialog(self.dlg_plan_psector)
 
 
-    def price_selector(self, dialog, tableleft, tableright,  field_id_right):
+    def price_selector(self, dialog, tableleft, tableright, field_id_right):
 
         # fill QTableView all_rows
         tbl_all_rows = dialog.findChild(QTableView, "all_rows")
@@ -1106,13 +1119,11 @@ class ManageNewPsector(ParentManage):
 
     def rows_selector(self, dialog, tbl_all_rows, tbl_selected_rows, id_ori, tableright, id_des, field_id):
         """
-            :param qtable_left: QTableView origin
-            :param qtable_right: QTableView destini
+            :param tbl_all_rows: QTableView origin
+            :param tbl_selected_rows: QTableView destini
             :param id_ori: Refers to the id of the source table
-            :param tablename_des: table destini
+            :param tableright: table destini
             :param id_des: Refers to the id of the target table, on which the query will be made
-            :param query_right:
-            :param query_left:
             :param field_id:
         """
 
@@ -1132,19 +1143,19 @@ class ManageNewPsector(ParentManage):
             values = ""
             psector_id = qt_tools.getWidgetText(dialog, 'psector_id')
             values += f"'{psector_id}', "
-            if tbl_all_rows.model().record(row).value('unit') not in  (None, 'null', 'NULL'):
+            if tbl_all_rows.model().record(row).value('unit') not in (None, 'null', 'NULL'):
                 values += f"'{tbl_all_rows.model().record(row).value('unit')}', "
             else:
                 values += 'null, '
-            if tbl_all_rows.model().record(row).value('id') not in  (None, 'null', 'NULL'):
+            if tbl_all_rows.model().record(row).value('id') not in (None, 'null', 'NULL'):
                 values += f"'{tbl_all_rows.model().record(row).value('id')}', "
             else:
                 values += 'null, '
-            if tbl_all_rows.model().record(row).value('description') not in  (None, 'null', 'NULL'):
+            if tbl_all_rows.model().record(row).value('description') not in (None, 'null', 'NULL'):
                 values += f"'{tbl_all_rows.model().record(row).value('description')}', "
             else:
                 values += 'null, '
-            if tbl_all_rows.model().record(row).value('price') not in  (None, 'null', 'NULL'):
+            if tbl_all_rows.model().record(row).value('price') not in (None, 'null', 'NULL'):
                 values += f"'{tbl_all_rows.model().record(row).value('price')}', "
             else:
                 values += 'null, '
@@ -1175,7 +1186,7 @@ class ManageNewPsector(ParentManage):
 
 
     def rows_unselector(self, dialog, tbl_selected_rows, tableright, field_id_right):
-        
+
         query = (f"DELETE FROM {tableright}"
                  f" WHERE {tableright}.{field_id_right} = ")
         selected_list = tbl_selected_rows.selectionModel().selectedRows()
@@ -1203,6 +1214,7 @@ class ManageNewPsector(ParentManage):
 
     def query_like_widget_text(self, dialog, text_line, qtable, tableleft, tableright, field_id):
         """ Populate the QTableView by filtering through the QLineEdit"""
+
         schema_name = self.schema_name.replace('"','')
         query = qt_tools.getWidgetText(dialog, text_line).lower()
         if query == 'null':
@@ -1252,7 +1264,7 @@ class ManageNewPsector(ParentManage):
         model.dataChanged.connect(partial(self.refresh_table, dialog, widget))
         model.dataChanged.connect(partial(self.update_total, dialog, widget))
         widget.setEditTriggers(set_edit_triggers)
-        
+
         # Check for errors
         if model.lastError().isValid():
             self.controller.show_warning(model.lastError().text())
@@ -1269,7 +1281,7 @@ class ManageNewPsector(ParentManage):
 
     def refresh_table(self, dialog, widget):
         """ Refresh qTableView 'selected_rows' """
-        
+
         widget.selectAll()
         selected_list = widget.selectionModel().selectedRows()
         widget.clearSelection()

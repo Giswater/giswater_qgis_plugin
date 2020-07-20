@@ -33,7 +33,7 @@ class Go2EpaOptions(ApiParent):
 
         # Clear list
         self.epa_options_list = []
-        
+
         # Create dialog
         self.dlg_options = Go2EpaOptionsUi()
         self.load_settings(self.dlg_options)
@@ -44,7 +44,8 @@ class Go2EpaOptions(ApiParent):
         if not json_result:
             return False
 
-        self.construct_form_param_user(self.dlg_options, json_result['body']['form']['formTabs'], 0, self.epa_options_list)
+        self.construct_form_param_user(
+            self.dlg_options, json_result['body']['form']['formTabs'], 0, self.epa_options_list)
         grbox_list = self.dlg_options.findChildren(QGroupBox)
         for grbox in grbox_list:
             widget_list = grbox.findChildren(QWidget)
@@ -81,10 +82,12 @@ class Go2EpaOptions(ApiParent):
 
 
     def get_event_combo_parent(self, complet_result):
+
         for field in complet_result['body']['form']['formTabs'][0]["fields"]:
             if field['isparent']:
                 widget = self.dlg_options.findChild(QComboBox, field['widgetname'])
-                widget.currentIndexChanged.connect(partial(self.fill_child, self.dlg_options, widget))
+                if widget:
+                    widget.currentIndexChanged.connect(partial(self.fill_child, self.dlg_options, widget))
 
 
     def fill_child(self, dialog, widget):

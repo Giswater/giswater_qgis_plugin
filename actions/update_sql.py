@@ -237,7 +237,7 @@ class UpdateSQL(ApiParent):
 
 
     def manage_translations(self):
-      
+
         qm_gen = I18NGenerator(self.iface, self.settings, self.controller, self.plugin_dir)
         qm_gen.init_dialog()
 
@@ -402,7 +402,7 @@ class UpdateSQL(ApiParent):
 
 
     def generate_qgis_project(self, gis_folder, gis_file, project_type, schema_name, export_passwd, roletype, sample,
-        get_database_parameters=True):
+            get_database_parameters=True):
         """ Generate QGIS project """
 
         gis = CreateGisProject(self.controller, self.plugin_dir)
@@ -425,6 +425,13 @@ class UpdateSQL(ApiParent):
 
 
     def open_form_create_gis_project(self):
+
+        # Check if exist schema
+        schema_name = qt_tools.getWidgetText(self.dlg_readsql, 'project_schema_name')
+        if schema_name is None:
+            msg = "In order to create a qgis project you have to create a schema first ."
+            self.controller.show_info_box(msg)
+            return
 
         # Create GIS project dialog
         self.dlg_create_gis_project = MainGisProjectUi()
@@ -626,7 +633,8 @@ class UpdateSQL(ApiParent):
                         if self.read_all_updates == 'TRUE':
                             if str(sub_folder) > '31100':
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep):
-                                    status = self.load_sql(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep, no_ct=no_ct)
+                                    status = self.load_sql(self.folderUpdates + folder + os.sep + \
+                                                           sub_folder + os.sep + 'utils' + os.sep, no_ct=no_ct)
                                     if status is False:
                                         return False
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + project_type + os.sep, ''):
@@ -636,30 +644,36 @@ class UpdateSQL(ApiParent):
                                         return False
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
                                         self.locale + os.sep), '') is True:
-                                    status = self.executeFiles(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), True)
+                                    status = self.executeFiles(
+                                        self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), True)
                                     if status is False:
                                         return False
                                 elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN'):
-                                    status = self.executeFiles(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
+                                    status = self.executeFiles(self.folderUpdates + folder + \
+                                                               os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
                                     if status is False:
                                         return False
 
                         else:
                             if str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
-                                if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder,  os.sep + 'utils' + os.sep):
-                                    status = self.load_sql(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep, no_ct=no_ct)
+                                if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep):
+                                    status = self.load_sql(self.folderUpdates + folder + os.sep + \
+                                                           sub_folder + os.sep + 'utils' + os.sep, no_ct=no_ct)
                                     if status is False:
                                         return False
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + project_type + os.sep, ''):
-                                    status = self.load_sql(self.folderUpdates + folder + os.sep + sub_folder + os.sep + project_type + os.sep, no_ct=no_ct)
+                                    status = self.load_sql(self.folderUpdates + folder + os.sep + \
+                                                           sub_folder + os.sep + project_type + os.sep, no_ct=no_ct)
                                     if status is False:
                                         return False
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), ''):
-                                    status = self.executeFiles(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), True)
+                                    status = self.executeFiles(
+                                        self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), True)
                                     if status is False:
                                         return False
                                 elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN'):
-                                    status = self.executeFiles(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
+                                    status = self.executeFiles(self.folderUpdates + folder + \
+                                                               os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
                                     if status is False:
                                         return False
 
@@ -667,7 +681,8 @@ class UpdateSQL(ApiParent):
                         if self.read_all_updates == 'TRUE':
                             if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100':
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
-                                    status = self.load_sql(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep)
+                                    status = self.load_sql(self.folderUpdates + folder + os.sep + \
+                                                           sub_folder + os.sep + 'utils' + os.sep)
                                     if status is False:
                                         return False
                                 if self.process_folder(
@@ -678,7 +693,8 @@ class UpdateSQL(ApiParent):
                                     if status is False:
                                         return False
                                 if self.process_folder(
-                                        self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
+                                        self.folderUpdates + folder + os.sep + sub_folder + \
+                                            os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
                                         '') is True:
                                     status = self.executeFiles(
                                         self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
@@ -686,14 +702,16 @@ class UpdateSQL(ApiParent):
                                     if status is False:
                                         return False
                                 elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
-                                    status = self.executeFiles(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
+                                    status = self.executeFiles(self.folderUpdates + folder + \
+                                                               os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
                                     if status is False:
                                         return False
 
                         else:
                             if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
-                                    status = self.load_sql(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep)
+                                    status = self.load_sql(self.folderUpdates + folder + os.sep + \
+                                                           sub_folder + os.sep + 'utils' + os.sep)
                                     if status is False:
                                         return False
                                 if self.process_folder(
@@ -703,12 +721,14 @@ class UpdateSQL(ApiParent):
                                         self.folderUpdates + folder + os.sep + sub_folder + os.sep + self.project_type_selected + os.sep)
                                     if status is False:
                                         return False
-                                if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep),'') is True:
-                                    status = self.executeFiles(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), True)
+                                if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), '') is True:
+                                    status = self.executeFiles(
+                                        self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), True)
                                     if status is False:
                                         return False
                                 elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
-                                    status = self.executeFiles(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
+                                    status = self.executeFiles(self.folderUpdates + folder + \
+                                                               os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
                                     if status is False:
                                         return False
 
@@ -716,27 +736,32 @@ class UpdateSQL(ApiParent):
 
             if not os.path.exists(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + ''):
                 return
-            folders = sorted(os.listdir(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + ''))
+            folders = sorted(os.listdir(self.sql_dir + os.sep + str(project_type) + \
+                             os.sep + os.sep + 'updates' + os.sep + ''))
             for folder in folders:
-                sub_folders = sorted(os.listdir(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder))
+                sub_folders = sorted(os.listdir(self.sql_dir + os.sep + str(project_type) + \
+                                     os.sep + os.sep + 'updates' + os.sep + folder))
                 for sub_folder in sub_folders:
                     if new_project:
                         if self.read_all_updates == 'TRUE':
                             if str(sub_folder) > '31100':
                                 if self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), '') is True:
-                                    status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), True)
+                                    status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + \
+                                                               folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), True)
                                     if status is False:
                                         return False
                                 elif self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', '') is True:
-                                    status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
+                                    status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + \
+                                                               os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
                                     if status is False:
                                         return False
 
                         else:
-                            if str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.',''):
+                            if str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
                                 if self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder,
                                                        '') is True:
-                                    status = self.load_sql(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder)
+                                    status = self.load_sql(self.sql_dir + os.sep + str(project_type) + \
+                                                           os.sep + 'updates' + os.sep + folder + os.sep + sub_folder)
                                     if status is False:
                                         return False
                                 if self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
@@ -745,7 +770,8 @@ class UpdateSQL(ApiParent):
                                         project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
                                         self.locale + os.sep), True)
                                 elif self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
-                                    status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'EN', True)
+                                    status = self.executeFiles(
+                                        self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'EN', True)
                                     if status is False:
                                         return False
 
@@ -753,7 +779,8 @@ class UpdateSQL(ApiParent):
                         if self.read_all_updates == 'TRUE':
                             if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100':
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
-                                    status = self.load_sql(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep)
+                                    status = self.load_sql(self.folderUpdates + folder + os.sep + \
+                                                           sub_folder + os.sep + 'utils' + os.sep)
                                     if status is False:
                                         return False
                                 if self.process_folder(
@@ -763,21 +790,23 @@ class UpdateSQL(ApiParent):
                                         self.folderUpdates + folder + os.sep + sub_folder + os.sep + self.project_type + os.sep)
                                     if status is False:
                                         return False
-                                if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep),'') is True:
+                                if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), '') is True:
                                     status = self.executeFiles(
                                         self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
                                             self.locale + os.sep), True)
                                     if status is False:
                                         return False
                                 elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
-                                    status = self.executeFiles(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
+                                    status = self.executeFiles(self.folderUpdates + folder + \
+                                                               os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
                                     if status is False:
                                         return False
 
                         else:
                             if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
-                                    status = self.load_sql(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep)
+                                    status = self.load_sql(self.folderUpdates + folder + os.sep + \
+                                                           sub_folder + os.sep + 'utils' + os.sep)
                                     if status is False:
                                         return False
                                 if self.process_folder(
@@ -788,7 +817,8 @@ class UpdateSQL(ApiParent):
                                     if status is False:
                                         return False
                                 if self.process_folder(
-                                        self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
+                                        self.folderUpdates + folder + os.sep + sub_folder + \
+                                            os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
                                         '') is True:
                                     status = self.executeFiles(
                                         self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
@@ -796,7 +826,8 @@ class UpdateSQL(ApiParent):
                                     if status is False:
                                         return False
                                 elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
-                                    status = self.executeFiles(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
+                                    status = self.executeFiles(self.folderUpdates + folder + \
+                                                               os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
                                     if status is False:
                                         return False
 
@@ -841,15 +872,18 @@ class UpdateSQL(ApiParent):
                     if new_project:
                         if str(sub_folder) <= '31100':
                             if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
-                                status = self.load_sql(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep)
+                                status = self.load_sql(self.folderUpdates + folder + os.sep + \
+                                                       sub_folder + os.sep + 'utils' + os.sep)
                                 if status is False:
                                     return False
                             if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + project_type + os.sep, '') is True:
-                                status = self.load_sql(self.folderUpdates + folder + os.sep + sub_folder + os.sep + project_type + os.sep)
+                                status = self.load_sql(self.folderUpdates + folder + os.sep + \
+                                                       sub_folder + os.sep + project_type + os.sep)
                                 if status is False:
                                     return False
                             if self.process_folder(
-                                    self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
+                                    self.folderUpdates + folder + os.sep + sub_folder + \
+                                        os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
                                     '') is True:
                                 status = self.executeFiles(
                                     self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
@@ -857,13 +891,15 @@ class UpdateSQL(ApiParent):
                                 if status is False:
                                     return False
                             elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is False:
-                                status = self.executeFiles(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
+                                status = self.executeFiles(self.folderUpdates + folder + \
+                                                           os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
                                 if status is False:
                                     return False
                     else:
                         if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) <= '31100':
                             if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
-                                status = self.load_sql(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep)
+                                status = self.load_sql(self.folderUpdates + folder + os.sep + \
+                                                       sub_folder + os.sep + 'utils' + os.sep)
                                 if status is False:
                                     return False
                             if self.process_folder(
@@ -874,7 +910,8 @@ class UpdateSQL(ApiParent):
                                 if status is False:
                                     return False
                             if self.process_folder(
-                                    self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
+                                    self.folderUpdates + folder + os.sep + sub_folder + \
+                                        os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
                                     '') is True:
                                 status = self.executeFiles(
                                     self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
@@ -882,7 +919,8 @@ class UpdateSQL(ApiParent):
                                 if status is False:
                                     return False
                             elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', '') is True:
-                                status = self.executeFiles(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
+                                status = self.executeFiles(self.folderUpdates + folder + \
+                                                           os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
                                 if status is False:
                                     return False
 
@@ -891,18 +929,23 @@ class UpdateSQL(ApiParent):
             if not os.path.exists(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + ''):
                 return True
 
-            folders = sorted(os.listdir(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + ''))
+            folders = sorted(os.listdir(self.sql_dir + os.sep + str(project_type) + \
+                             os.sep + os.sep + 'updates' + os.sep + ''))
             for folder in folders:
-                sub_folders = sorted(os.listdir(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder))
+                sub_folders = sorted(os.listdir(self.sql_dir + os.sep + str(project_type) + \
+                                     os.sep + os.sep + 'updates' + os.sep + folder))
                 for sub_folder in sub_folders:
                     if new_project:
                         if str(sub_folder) <= '31100':
                             if self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder, '') is True:
-                                status = self.load_sql(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + '')
+                                status = self.load_sql(self.sql_dir + os.sep + str(project_type) + os.sep + \
+                                                       os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + '')
                                 if status is False:
                                     return False
                             if self.process_folder(
-                                    self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
+                                    self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + \
+                                                                folder + os.sep + sub_folder + os.sep + \
+                                                                    'i18n' + os.sep + str(self.locale + os.sep),
                                     '') is True:
                                 status = self.executeFiles(self.sql_dir + os.sep + str(
                                     project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
@@ -910,18 +953,22 @@ class UpdateSQL(ApiParent):
                                 if status is False:
                                     return False
                             elif self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
-                                status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN' + os.sep, True)
+                                status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + \
+                                                           os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN' + os.sep, True)
                                 if status is False:
                                     return False
 
                     else:
                         if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) <= '31100':
                             if self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder, '') is True:
-                                status = self.load_sql(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + '')
+                                status = self.load_sql(self.sql_dir + os.sep + str(project_type) + os.sep + \
+                                                       os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + '')
                                 if status is False:
                                     return False
                             if self.process_folder(
-                                    self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
+                                    self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + \
+                                                                folder + os.sep + sub_folder + os.sep + \
+                                                                    'i18n' + os.sep + str(self.locale + os.sep),
                                     '') is True:
                                 status = self.executeFiles(self.sql_dir + os.sep + str(
                                     project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
@@ -929,7 +976,8 @@ class UpdateSQL(ApiParent):
                                 if status is False:
                                     return False
                             elif self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
-                                status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN' + os.sep, True)
+                                status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + \
+                                                           os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN' + os.sep, True)
                                 if status is False:
                                     return False
 
@@ -942,7 +990,7 @@ class UpdateSQL(ApiParent):
         self.controller.execute_sql(sql, commit=False)
 
         if str(project_type) == 'ws' or str(project_type) == 'ud':
-            folder = self.folderExemple + 'user' + os.sep+project_type
+            folder = self.folderExemple + 'user' + os.sep + project_type
             status = self.executeFiles(folder)
             if not status and self.dev_commit == 'FALSE':
                 return False
@@ -1090,15 +1138,18 @@ class UpdateSQL(ApiParent):
                 if new_api:
                     if self.read_all_updates == 'TRUE':
                         if self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep, '') is True:
-                            status = self.executeFiles(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep + '')
+                            status = self.executeFiles(self.folderUpdatesApi + folder + \
+                                                       os.sep + sub_folder + os.sep + 'utils' + os.sep + '')
                             if status is False:
                                 return False
                         if self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + project_type + os.sep, '') is True:
-                            status = self.executeFiles(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + project_type + os.sep + '')
+                            status = self.executeFiles(self.folderUpdatesApi + folder + \
+                                                       os.sep + sub_folder + os.sep + project_type + os.sep + '')
                             if status is False:
                                 return False
                         if self.process_folder(
-                                self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
+                                self.folderUpdatesApi + folder + os.sep + sub_folder + \
+                                    os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
                                 '') is True:
                             status = self.executeFiles(
                                 self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
@@ -1106,7 +1157,8 @@ class UpdateSQL(ApiParent):
                             if status is False:
                                 return False
                         elif self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
-                            status = self.executeFiles(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN' + os.sep, True)
+                            status = self.executeFiles(self.folderUpdatesApi + folder + os.sep + \
+                                                       sub_folder + os.sep + 'i18n' + os.sep + 'EN' + os.sep, True)
                             if status is False:
                                 return False
                         if self.process_folder(self.sql_dir + os.sep + 'api' + os.sep, self.file_pattern_trg) is True:
@@ -1114,19 +1166,22 @@ class UpdateSQL(ApiParent):
                             if status is False:
                                 return False
                         if self.process_folder(self.sql_dir + os.sep + 'api' + os.sep, self.file_pattern_tablect) is True:
-                            status = self.executeFiles(self.sql_dir + os.sep + 'api' + os.sep + self.file_pattern_tablect)
+                            status = self.executeFiles(self.sql_dir + os.sep + 'api' + \
+                                                       os.sep + self.file_pattern_tablect)
                             if status is False:
                                 return False
                     else:
                         if str(sub_folder) <= str(self.plugin_version).replace('.', ''):
                             if self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep,
                                                    '') is True:
-                                status = self.executeFiles(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep + '')
+                                status = self.executeFiles(self.folderUpdatesApi + folder + \
+                                                           os.sep + sub_folder + os.sep + 'utils' + os.sep + '')
                                 if status is False:
                                     return False
                             if self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + project_type + os.sep,
                                                    '') is True:
-                                status = self.executeFiles(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + project_type + os.sep + '')
+                                status = self.executeFiles(self.folderUpdatesApi + folder + \
+                                                           os.sep + sub_folder + os.sep + project_type + os.sep + '')
                                 if status is False:
                                     return False
                             if self.process_folder(
@@ -1145,11 +1200,13 @@ class UpdateSQL(ApiParent):
                                 if status is False:
                                     return False
                             if self.process_folder(self.sql_dir + os.sep + 'api' + os.sep, self.file_pattern_trg) is True:
-                                status = self.executeFiles(self.sql_dir + os.sep + 'api' + os.sep + self.file_pattern_trg)
+                                status = self.executeFiles(self.sql_dir + os.sep + 'api' + \
+                                                           os.sep + self.file_pattern_trg)
                                 if status is False:
                                     return False
                             if self.process_folder(self.sql_dir + os.sep + 'api' + os.sep, self.file_pattern_tablect) is True:
-                                status = self.executeFiles(self.sql_dir + os.sep + 'api' + os.sep + self.file_pattern_tablect)
+                                status = self.executeFiles(self.sql_dir + os.sep + 'api' + \
+                                                           os.sep + self.file_pattern_tablect)
                                 if status is False:
                                     return False
 
@@ -1157,7 +1214,8 @@ class UpdateSQL(ApiParent):
                     if self.read_all_updates == 'TRUE':
                         if str(sub_folder) > str(self.project_version).replace('.', ''):
                             if self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep, '') is True:
-                                status = self.executeFiles(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep + '')
+                                status = self.executeFiles(self.folderUpdatesApi + folder + \
+                                                           os.sep + sub_folder + os.sep + 'utils' + os.sep + '')
                                 if status is False:
                                     return False
                             if self.process_folder(
@@ -1168,7 +1226,8 @@ class UpdateSQL(ApiParent):
                                 if status is False:
                                     return False
                             if self.process_folder(
-                                    self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
+                                    self.folderUpdatesApi + folder + os.sep + sub_folder + \
+                                        os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
                                     '') is True:
                                 status = self.executeFiles(
                                     self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
@@ -1176,27 +1235,32 @@ class UpdateSQL(ApiParent):
                                 if status is False:
                                     return False
                             elif self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
-                                status = self.executeFiles(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN' + os.sep, True)
+                                status = self.executeFiles(self.folderUpdatesApi + folder + os.sep + \
+                                                           sub_folder + os.sep + 'i18n' + os.sep + 'EN' + os.sep, True)
                                 if status is False:
                                     return False
                             if self.process_folder(self.sql_dir + os.sep + 'api' + os.sep, self.file_pattern_trg) is True:
-                                status = self.executeFiles(self.sql_dir + os.sep + 'api' + os.sep + self.file_pattern_trg)
+                                status = self.executeFiles(self.sql_dir + os.sep + 'api' + \
+                                                           os.sep + self.file_pattern_trg)
                                 if status is False:
                                     return False
                             if self.process_folder(self.sql_dir + os.sep + 'api' + os.sep, self.file_pattern_tablect) is True:
-                                status = self.executeFiles(self.sql_dir + os.sep + 'api' + os.sep + self.file_pattern_tablect)
+                                status = self.executeFiles(self.sql_dir + os.sep + 'api' + \
+                                                           os.sep + self.file_pattern_tablect)
                                 if status is False:
                                     return False
                     else:
-                        if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) <= str(self.plugin_version).replace('.',''):
+                        if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
                             if self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep,
                                                    '') is True:
-                                status = self.executeFiles(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep + '')
+                                status = self.executeFiles(self.folderUpdatesApi + folder + \
+                                                           os.sep + sub_folder + os.sep + 'utils' + os.sep + '')
                                 if status is False:
                                     return False
                             if self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + project_type + os.sep,
                                                    '') is True:
-                                status = self.executeFiles(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + project_type + os.sep + '')
+                                status = self.executeFiles(self.folderUpdatesApi + folder + \
+                                                           os.sep + sub_folder + os.sep + project_type + os.sep + '')
                                 if status is False:
                                     return False
                             if self.process_folder(
@@ -1215,11 +1279,13 @@ class UpdateSQL(ApiParent):
                                 if status is False:
                                     return False
                             if self.process_folder(self.sql_dir + os.sep + 'api' + os.sep, self.file_pattern_trg) is True:
-                                status = self.executeFiles(self.sql_dir + os.sep + 'api' + os.sep + self.file_pattern_trg)
+                                status = self.executeFiles(self.sql_dir + os.sep + 'api' + \
+                                                           os.sep + self.file_pattern_trg)
                                 if status is False:
                                     return False
                             if self.process_folder(self.sql_dir + os.sep + 'api' + os.sep, self.file_pattern_tablect) is True:
-                                status = self.executeFiles(self.sql_dir + os.sep + 'api' + os.sep + self.file_pattern_tablect)
+                                status = self.executeFiles(self.sql_dir + os.sep + 'api' + \
+                                                           os.sep + self.file_pattern_tablect)
                                 if status is False:
                                     return False
 
@@ -1251,11 +1317,13 @@ class UpdateSQL(ApiParent):
         extras += ', "isToolbox":false'
         body = self.create_body(extras=extras)
         complet_result = self.controller.get_json('gw_fct_gettoolbox', body, schema_name=self.schema, commit=False)
-        if not complet_result: return False
+        if not complet_result:
+            return False
         self.populate_functions_dlg(self.dlg_import_inp, complet_result['body']['data'])
 
         # Set listeners
-        self.dlg_import_inp.btn_run.clicked.connect(partial(self.execute_import_inp, accepted=True, schema_type=schema_type))
+        self.dlg_import_inp.btn_run.clicked.connect(
+            partial(self.execute_import_inp, accepted=True, schema_type=schema_type))
         self.dlg_import_inp.btn_close.clicked.connect(partial(self.execute_import_inp, accepted=False))
 
         # Open dialog
@@ -1282,7 +1350,7 @@ class UpdateSQL(ApiParent):
             current_date = QDate.currentDate().toString('dd-MM-yyyy')
             extras += ', ' + '"date":"' + str(current_date) + '"'
 
-        extras += ', "superUsers":' + str(self.super_users).replace("'",'"') + ''
+        extras += ', "superUsers":' + str(self.super_users).replace("'", '"') + ''
 
         self.schema_name = schema_name
 
@@ -1294,7 +1362,8 @@ class UpdateSQL(ApiParent):
         client = '"client":{"device":4, "lang":"' + str(locale) + '"}, '
         data = '"data":{' + extras + '}'
         body = "$${" + client + data + "}$$"
-        status = self.controller.get_json('gw_fct_admin_schema_lastprocess', body, schema_name=self.schema_name, commit=False)
+        status = self.controller.get_json('gw_fct_admin_schema_lastprocess', body,
+                                          schema_name=self.schema_name, commit=False)
         if status is False:
             self.error_count = self.error_count + 1
 
@@ -1327,7 +1396,7 @@ class UpdateSQL(ApiParent):
             if random.randint(0, 1000) == 10:
                 raise Exception('Bad value!')
 
-        #return True
+        # return True
         self.task_completed(None, {'total': total, 'iterations': iterations, 'task': task.description()})
 
 
@@ -1402,7 +1471,7 @@ class UpdateSQL(ApiParent):
                             if str(project_name) + "_bk" == str(row[0]) or \
                                str(project_name) + "_bk_" + str(i) == str(row[0]):
                                 msg = "This 'Project_name' is already exist. Do you want rename old schema to '" + str(
-                                    project_name) + "_bk_" + str(i+1) + "' ?"
+                                    project_name) + "_bk_" + str(i + 1) + "' ?"
                                 result = self.controller.ask_question(msg, "Info")
                                 i = i + 1
                             else:
@@ -1480,32 +1549,38 @@ class UpdateSQL(ApiParent):
             self.manage_process_result(is_test=is_test)
             return
 
-        if not is_test: self.task1.setProgress(10)
+        if not is_test:
+            self.task1.setProgress(10)
         status = self.update_30to31(new_project=True, project_type=project_type)
         if not status and self.dev_commit == 'FALSE':
             self.manage_process_result(is_test=is_test)
             return
-        if not is_test: self.task1.setProgress(20)
+        if not is_test:
+            self.task1.setProgress(20)
         status = self.load_views(project_type=project_type)
         if not status and self.dev_commit == 'FALSE':
             self.manage_process_result(is_test=is_test)
             return
-        if not is_test: self.task1.setProgress(30)
+        if not is_test:
+            self.task1.setProgress(30)
         status = self.load_trg(project_type=project_type)
         if not status and self.dev_commit == 'FALSE':
             self.manage_process_result(is_test=is_test)
             return
-        if not is_test: self.task1.setProgress(40)
+        if not is_test:
+            self.task1.setProgress(40)
         status = self.update_31to39(new_project=True, project_type=project_type)
         if not status and self.dev_commit == 'FALSE':
             self.manage_process_result(is_test=is_test)
             return
-        if not is_test: self.task1.setProgress(50)
+        if not is_test:
+            self.task1.setProgress(50)
         status = self.api(new_api=True, project_type=project_type)
         if not status and self.dev_commit == 'FALSE':
             self.manage_process_result(is_test=is_test)
             return
-        if not is_test: self.task1.setProgress(60)
+        if not is_test:
+            self.task1.setProgress(60)
 
         status = True
         if exec_last_process:
@@ -1518,8 +1593,9 @@ class UpdateSQL(ApiParent):
 
         # Custom execution
         if self.rdb_import_data.isChecked():
-            #TODO:
-            if not is_test: self.task1.setProgress(100)
+            # TODO:
+            if not is_test:
+                self.task1.setProgress(100)
             self.controller.plugin_settings_set_value('create_schema_type', 'rdb_import_data')
             msg = ("The sql files have been correctly executed."
                    "\nNow, a form will be opened to manage the import inp.")
@@ -1529,12 +1605,14 @@ class UpdateSQL(ApiParent):
         elif self.rdb_sample.isChecked() and example_data:
             self.controller.plugin_settings_set_value('create_schema_type', 'rdb_sample')
             self.load_sample_data(project_type=project_type)
-            if not is_test: self.task1.setProgress(80)
+            if not is_test:
+                self.task1.setProgress(80)
         elif self.rdb_sample_dev.isChecked():
             self.controller.plugin_settings_set_value('create_schema_type', 'rdb_sample_dev')
             self.load_sample_data(project_type=project_type)
             self.load_dev_data(project_type=project_type)
-            if not is_test: self.task1.setProgress(80)
+            if not is_test:
+                self.task1.setProgress(80)
         elif self.rdb_data.isChecked():
             self.controller.plugin_settings_set_value('create_schema_type', 'rdb_data')
 
@@ -1546,7 +1624,8 @@ class UpdateSQL(ApiParent):
 
     def manage_process_result(self, schema_name=None, is_test=False):
 
-        if not is_test: self.task1.setProgress(100)
+        if not is_test:
+            self.task1.setProgress(100)
         status = (self.error_count == 0)
         self.manage_result_message(status, parameter="Create project")
         if status:
@@ -1791,7 +1870,7 @@ class UpdateSQL(ApiParent):
                 qt_tools.setWidgetText(self.dlg_readsql, 'lbl_status_text',
                     "You don't have permissions to administrate project schemas on this connection")
                 qt_tools.setWidgetText(self.dlg_readsql, 'lbl_schema_name', '')
-                
+
 
     def set_last_connection(self, connection_name):
 
@@ -1832,7 +1911,7 @@ class UpdateSQL(ApiParent):
         # TODO:: Populate combo from visitclass manager and wip
         # sql = ("SELECT id, idval FROM config_visit_class")
         # rows = self.controller.get_rows(sql, log_sql=True, commit=True)
-        # utils_giswater.set_item_data(self.dlg_readsql.cmb_visit_class, rows, 1)
+        # qt_tools.set_item_data(self.dlg_readsql.cmb_visit_class, rows, 1)
 
         # Set listeners
         self.dlg_readsql.btn_visit_create.clicked.connect(partial(self.create_visit_param))
@@ -1873,7 +1952,7 @@ class UpdateSQL(ApiParent):
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         qt_tools.set_item_data(self.dlg_manage_visit_param.parameter_type, rows, 1)
 
-        sql = "SELECT id, idval FROM config_api_typevalue WHERE typevalue = 'datatype'"
+        sql = "SELECT id, idval FROM config_typevalue WHERE typevalue = 'datatype'"
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         qt_tools.set_item_data(self.dlg_manage_visit_param.data_type, rows, 1)
 
@@ -1881,7 +1960,7 @@ class UpdateSQL(ApiParent):
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         qt_tools.set_item_data(self.dlg_manage_visit_param.form_type, rows, 1)
 
-        sql = "SELECT id, idval FROM config_api_typevalue WHERE typevalue = 'widgettype'"
+        sql = "SELECT id, idval FROM config_typevalue WHERE typevalue = 'widgettype'"
         rows = self.controller.get_rows(sql, log_sql=True, commit=True)
         qt_tools.set_item_data(self.dlg_manage_visit_param.widget_type, rows, 1)
 
@@ -1935,7 +2014,7 @@ class UpdateSQL(ApiParent):
         for folder in folders:
             sub_folders = sorted(os.listdir(self.folderUpdates + folder))
             for sub_folder in sub_folders:
-                if str(sub_folder) > str(self.project_version).replace('.',''):
+                if str(sub_folder) > str(self.project_version).replace('.', ''):
                     folder_aux = self.folderUpdates + folder + os.sep + sub_folder
                     if self.process_folder(folder_aux, ''):
                         status = self.readFiles(sorted(os.listdir(folder_aux + '')), folder_aux + '')
@@ -2088,7 +2167,7 @@ class UpdateSQL(ApiParent):
                    'Schema name: ' + schema_name + '\n' + ''
                    'Version: ' + self.project_version + ' \n' + ''
                    'EPSG: ' + str(self.project_epsg) + ' \n' + ''
-                   'Language: ' + str(self.project_epsg) + ' \n' + '')
+                   'Language: ' + str(self.project_language) + ' \n' + '')
 
             self.software_version_info.setText(msg)
 
@@ -2393,8 +2472,10 @@ class UpdateSQL(ApiParent):
         extras = f'"parameters":{{"source_schema":"{schema}", "dest_schema":"{new_schema_name}"}}'
         body = self.create_body(extras=extras)
         self.task1.setProgress(50)
-        result = self.controller.get_json('gw_fct_admin_schema_clone', body, schema_name=schema, log_sql=True, commit=False)
-        if not result: return
+        result = self.controller.get_json('gw_fct_admin_schema_clone', body,
+                                          schema_name=schema, log_sql=True, commit=False)
+        if not result:
+            return
         self.task1.setProgress(100)
 
         # Show message
@@ -2566,8 +2647,6 @@ class UpdateSQL(ApiParent):
 
         schema_name = qt_tools.getWidgetText(self.dlg_readsql, 'project_schema_name')
         tpath = qt_tools.getWidgetText(self.dlg_readsql, 'tpath')
-        # tpath = utils_giswater.getWidget(self.dlg_readsql, 'tpath')
-        # ui_path = tpath.document().toPlainText()
         form_name_ui = qt_tools.getWidgetText(self.dlg_readsql, 'cmb_formname_ui')
         status_update_childs = self.dlg_readsql.chk_multi_update.isChecked()
 
@@ -2584,9 +2663,10 @@ class UpdateSQL(ApiParent):
         status = self.controller.execute_sql(sql, log_sql=True)
 
         # Import xml to database
-        sql = ("SELECT " + schema_name + ".gw_fct_import_ui_xml('" + str(form_name_ui) + "', " + str(status_update_childs) + ")::text")
+        sql = ("SELECT " + schema_name + ".gw_fct_import_ui_xml('" + \
+               str(form_name_ui) + "', " + str(status_update_childs) + ")::text")
         status = self.controller.execute_sql(sql, log_sql=True)
-        self.manage_result_message(status, parameter="Import data into 'config_api_form_fields'")
+        self.manage_result_message(status, parameter="Import data into 'config_form_fields'")
 
         # Clear temp_csv
         self.clear_temp_table()
@@ -2681,7 +2761,7 @@ class UpdateSQL(ApiParent):
             qt_tools.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", True)
 
         # Control if schema_version is updated to 3.2
-        if str(self.project_version).replace('.','') < str(self.plugin_version).replace('.', ''):
+        if str(self.project_version).replace('.', '') < str(self.plugin_version).replace('.', ''):
 
             qt_tools.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_addfields).setEnabled(False)
             qt_tools.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_ui).setEnabled(False)
@@ -2702,14 +2782,12 @@ class UpdateSQL(ApiParent):
             qt_tools.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_sys_fields).setEnabled(True)
 
             sql = (f"SELECT cat_feature.child_layer, cat_feature.child_layer FROM {schema_name}.cat_feature "
-                        f" ORDER BY id")
-
+                   f" ORDER BY id")
             rows = self.controller.get_rows(sql)
             qt_tools.set_item_data(self.dlg_readsql.cmb_formname_ui, rows, 1)
-            
-            sql = (f"SELECT cat_feature.id, cat_feature.id FROM {schema_name}.cat_feature "
-                       f" ORDER BY id")
 
+            sql = (f"SELECT cat_feature.id, cat_feature.id FROM {schema_name}.cat_feature "
+                   f" ORDER BY id")
             rows = self.controller.get_rows(sql)
             qt_tools.set_item_data(self.dlg_readsql.cmb_formname_fields, rows, 1)
             qt_tools.set_item_data(self.dlg_readsql.cmb_feature_name_view, rows, 1)
@@ -2730,8 +2808,9 @@ class UpdateSQL(ApiParent):
         body = body.replace('""', 'null')
 
         # Execute query
-        status = self.controller.get_json('gw_fct_admin_manage_child_views', body, schema_name=schema_name, commit=False)
-        self.manage_result_message(status, parameter="Created child view")
+        status = self.controller.get_json('gw_fct_admin_manage_child_views', body,
+                                          schema_name=schema_name, commit=False)
+        self.manage_result_message(status, parameter="Create child view")
 
 
     def update_sys_fields(self):
@@ -2824,7 +2903,8 @@ class UpdateSQL(ApiParent):
         # Set listeners
         self.dlg_manage_sys_fields.btn_accept.clicked.connect(
             partial(self.manage_sys_update, form_name_fields))
-        self.dlg_manage_sys_fields.btn_cancel.clicked.connect(partial(self.manage_close_dlg, self.dlg_manage_sys_fields))
+        self.dlg_manage_sys_fields.btn_cancel.clicked.connect(
+            partial(self.manage_close_dlg, self.dlg_manage_sys_fields))
 
         # Remove unused tabs
         for x in range(self.dlg_manage_sys_fields.tab_sys_add_fields.count() - 1, -1, -1):
@@ -2880,7 +2960,8 @@ class UpdateSQL(ApiParent):
         # Remove unused tabs
         for x in range(self.dlg_manage_fields.tab_add_fields.count() - 1, -1, -1):
             if str(self.dlg_manage_fields.tab_add_fields.widget(x).objectName()) != str('tab_create'):
-                qt_tools.remove_tab_by_tabName(self.dlg_manage_fields.tab_add_fields, self.dlg_manage_fields.tab_add_fields.widget(x).objectName())
+                qt_tools.remove_tab_by_tabName(self.dlg_manage_fields.tab_add_fields,
+                    self.dlg_manage_fields.tab_add_fields.widget(x).objectName())
 
         window_title = 'Update field on "' + str(form_name_fields) + '"'
         self.dlg_manage_fields.setWindowTitle(window_title)
@@ -2892,12 +2973,10 @@ class UpdateSQL(ApiParent):
             index = widget.model().index(row, column)
 
             result = qt_tools.getWidget(self.dlg_manage_fields, str(widget.model().headerData(column, Qt.Horizontal)))
-
             if result is None:
                 continue
 
             value = str(widget.model().data(index))
-
             if value == 'NULL':
                 value = None
             qt_tools.setWidgetText(self.dlg_manage_fields, result, value)
@@ -2910,20 +2989,20 @@ class UpdateSQL(ApiParent):
         schema_name = qt_tools.getWidgetText(self.dlg_readsql, 'project_schema_name')
 
         # Populate widgettype combo
-        sql = (f"SELECT DISTINCT(id), idval FROM {schema_name}.config_api_typevalue "
+        sql = (f"SELECT DISTINCT(id), idval FROM {schema_name}.config_typevalue "
                f"WHERE typevalue = 'widgettype_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
         rows = self.controller.get_rows(sql, log_sql=True)
         qt_tools.set_item_data(self.dlg_manage_fields.widgettype, rows, 1)
 
         # Populate datatype combo
-        sql = (f"SELECT id, idval FROM {schema_name}.config_api_typevalue "
+        sql = (f"SELECT id, idval FROM {schema_name}.config_typevalue "
                f"WHERE typevalue = 'datatype_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
         rows = self.controller.get_rows(sql, log_sql=True)
         qt_tools.set_item_data(self.dlg_manage_fields.datatype, rows, 1)
 
         # Populate widgetfunction combo
         sql = (f"SELECT null as id, null as idval UNION ALL "
-               f"SELECT id, idval FROM {schema_name}.config_api_typevalue "
+               f"SELECT id, idval FROM {schema_name}.config_typevalue "
                f"WHERE typevalue = 'widgetfunction_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
         rows = self.controller.get_rows(sql, log_sql=True)
         qt_tools.set_item_data(self.dlg_manage_fields.widgetfunction, rows, 1)
@@ -3030,7 +3109,7 @@ class UpdateSQL(ApiParent):
                 sql += f" {widget.objectName()} = {value},"
 
         sql = sql[:-1]
-        sql += f" WHERE cat_feature_id = '{form_name}' and columname = '{column_id}'"
+        sql += f" WHERE cat_feature_id = '{form_name}' and columname = '{columname}'"
         self.controller.execute_sql(sql)
 
         # Close dialog
@@ -3058,7 +3137,7 @@ class UpdateSQL(ApiParent):
                 return
 
             elif row is not None:
-                msg = "The column id value is already exists."
+                msg = "Column name already exists."
                 self.controller.show_info_box(msg, "Info")
                 return
 
@@ -3092,13 +3171,15 @@ class UpdateSQL(ApiParent):
 
             # Create body
             feature = '"catFeature":"' + form_name + '"'
-            extras = '"action":"CREATE", "multi_create":' + str(self.chk_multi_insert).lower() + ', "parameters":' + result_json + ''
+            extras = '"action":"CREATE", "multi_create":' + \
+                str(self.chk_multi_insert).lower() + ', "parameters":' + result_json + ''
             body = self.create_body(feature=feature, extras=extras)
             body = body.replace('""', 'null')
 
             # Execute manage add fields function
-            status = self.controller.get_json('gw_fct_admin_manage_addfields', body, schema_name=schema_name, commit=False)
-            self.manage_result_message(status, parameter="Created field into 'config_api_form_fields'")
+            status = self.controller.get_json('gw_fct_admin_manage_addfields', body,
+                                              schema_name=schema_name, commit=False)
+            self.manage_result_message(status, parameter="Field configured in 'config_form_fields'")
             if not status:
                 return
 
@@ -3109,8 +3190,8 @@ class UpdateSQL(ApiParent):
             _json = {}
             for widget in list_widgets:
                 if type(widget) not in (
-                QScrollArea, QFrame, QWidget, QScrollBar, QLabel, QAbstractButton, QHeaderView, QListView, QGroupBox,
-                QTableView) and widget.objectName() not in ('qt_spinbox_lineedit', 'chk_multi_insert'):
+                        QScrollArea, QFrame, QWidget, QScrollBar, QLabel, QAbstractButton, QHeaderView, QListView, QGroupBox,
+                        QTableView) and widget.objectName() not in ('qt_spinbox_lineedit', 'chk_multi_insert'):
 
                     if type(widget) in (QLineEdit, QSpinBox, QDoubleSpinBox):
                         value = qt_tools.getWidgetText(self.dlg_manage_fields, widget, return_string_null=False)
@@ -3135,8 +3216,9 @@ class UpdateSQL(ApiParent):
             body = body.replace('""', 'null')
 
             # Execute manage add fields function
-            status = self.controller.get_json('gw_fct_admin_manage_addfields', body, schema_name=schema_name, commit=False)
-            self.manage_result_message(status, parameter="Update field into 'config_api_form_fields'")
+            status = self.controller.get_json('gw_fct_admin_manage_addfields', body,
+                                              schema_name=schema_name, commit=False)
+            self.manage_result_message(status, parameter="Field update in 'config_form_fields'")
             if not status:
                 return
 
@@ -3147,11 +3229,12 @@ class UpdateSQL(ApiParent):
             # Create body
             feature = '"catFeature":"' + form_name + '"'
             extras = '"action":"DELETE", "multi_create":' + str(
-                self.chk_multi_insert).lower() + ',"parameters":{"column_id":"' + field_value + '"}'
+                self.chk_multi_insert).lower() + ',"parameters":{"columnname":"' + field_value + '"}'
             body = self.create_body(feature=feature, extras=extras)
 
             # Execute manage add fields function
-            status = self.controller.get_json('gw_fct_admin_manage_addfields', body, schema_name=schema_name, commit=False)
+            status = self.controller.get_json('gw_fct_admin_manage_addfields', body,
+                                              schema_name=schema_name, commit=False)
             self.manage_result_message(status, parameter="Delete function")
 
         # Close dialog

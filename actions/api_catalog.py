@@ -90,9 +90,12 @@ class ApiCatalog(ApiParent):
         self.get_api_catalog(matcat_id, pnom, dnom, id, feature_type, geom_type)
 
         # Set Listeners
-        matcat_id.currentIndexChanged.connect(partial(self.populate_pn_dn, matcat_id, pnom, dnom, feature_type, geom_type))
-        pnom.currentIndexChanged.connect(partial(self.get_api_catalog, matcat_id, pnom, dnom, id, feature_type, geom_type))
-        dnom.currentIndexChanged.connect(partial(self.get_api_catalog, matcat_id, pnom, dnom, id, feature_type, geom_type))
+        matcat_id.currentIndexChanged.connect(
+            partial(self.populate_pn_dn, matcat_id, pnom, dnom, feature_type, geom_type))
+        pnom.currentIndexChanged.connect(partial(self.get_api_catalog, matcat_id,
+                                         pnom, dnom, id, feature_type, geom_type))
+        dnom.currentIndexChanged.connect(partial(self.get_api_catalog, matcat_id,
+                                         pnom, dnom, id, feature_type, geom_type))
 
         # Open form
         self.open_dialog(self.dlg_catalog, dlg_name='info_catalog')
@@ -118,14 +121,13 @@ class ApiCatalog(ApiParent):
         row = self.controller.get_row(sql, log_sql=True)
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
         if complet_result[0]['status'] == "Failed":
-            dialog.progressBar.setFormat(f"Function: {function_name} failed. See log file for more details")
             self.controller.log_warning(complet_result[0])
             return False
         if complet_result[0]['status'] == "Accepted":
             result = complet_result[0]['body']['data']
             for field in result['fields']:
                 if field['columnname'] == 'id':
-                    self.populate_combo(id,field)
+                    self.populate_combo(id, field)
 
 
     def populate_pn_dn(self, matcat_id, pnom, dnom, feature_type, geom_type):
@@ -143,13 +145,13 @@ class ApiCatalog(ApiParent):
         result = complet_list[0]['body']['data']
         for field in result['fields']:
             if field['columnname'] == 'pnom':
-                self.populate_combo(pnom,field)
+                self.populate_combo(pnom, field)
             elif field['columnname'] == 'dnom':
-                self.populate_combo(dnom,field)
+                self.populate_combo(dnom, field)
             elif field['columnname'] == 'shape':
                 self.populate_combo(pnom, field)
             elif field['columnname'] == 'geom1':
-                self.populate_combo(dnom,field)
+                self.populate_combo(dnom, field)
 
 
     def get_event_combo_parent(self, fields, row, geom_type):
