@@ -17,6 +17,7 @@ import matplotlib.pyplot as plt
 import math
 import os
 import json
+import configparser
 
 from .. import utils_giswater
 from .parent import ParentMapTool
@@ -444,8 +445,16 @@ class DrawProfiles(ParentMapTool):
         self.plot = plt
 
         # If file profile.png exist overwrite
-        plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-        img_path = plugin_path + os.sep + "templates" + os.sep + "profile.png"
+        plugin_name = self.get_value_from_metadata('name', 'giswater')
+        main_folder = os.path.join(os.path.expanduser("~"), plugin_name)
+        temp_folder = main_folder + os.sep + "temp"
+        img_path = temp_folder + os.sep + "profile.png"
+        if not os.path.exists(img_path):
+            os.makedirs(temp_folder)
+        else:
+            self.controller.log_info(f"User settings file: {img_path}")
+
+
         fig_size = plt.rcParams["figure.figsize"]
 
         # Set figure width to 10.4  and height to 4.8
@@ -1299,3 +1308,24 @@ class DrawProfiles(ParentMapTool):
         if actionpan:
             self.iface.actionPan().trigger()
 
+    def get_value_from_metadata(self, parameter, default_value):
+        """ Get @parameter from metadata.txt file """
+
+        # Check if metadata file exists
+        metadata_file = os.path.join(self.plugin_dir, 'metadata.txt')
+        if not os.path.exists(metadata_file):
+            message = f"Metadata file not found: {metadata_file}"
+            self.iface.messageBar().pushMessage("", message, 1, 20)
+            return default_value
+
+        value = None
+        try:
+            metadata = configparser.ConfigParser()
+            metadata.read(metadata_file)
+            value = metadata.get('general', parameter)
+        except configparser.NoOptionError:
+            message = f"Parameter not found: {parameter}"
+            self.iface.messageBar().pushMessage("", message, 1, 20)
+            value = default_value
+        finally:
+            return value
