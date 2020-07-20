@@ -34,7 +34,7 @@ class ApiCatalog(ApiParent):
 
         # Manage if geom_type is gully and set grate
         if geom_type == 'gully':
-            geom_type == 'grate'
+            geom_type = 'grate'
 
         form_name = 'upsert_catalog_' + geom_type + ''
         form = f'"formName":"{form_name}", "tabName":"data", "editable":"TRUE"'
