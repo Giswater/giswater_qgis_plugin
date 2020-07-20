@@ -299,7 +299,7 @@ class ManageVisit(ParentManage, QObject):
 
         # C) load all related events in the relative table
         self.filter = f"visit_id = '{text}'"
-        table_name = self.schema_name + ".om_visit_event"
+        table_name = self.schema_name + ".v_ui_om_event"
         self.fill_table_object(self.tbl_event, table_name, self.filter)
         self.set_configuration(dialog, self.tbl_event, table_name)
         self.manage_events_changed()
