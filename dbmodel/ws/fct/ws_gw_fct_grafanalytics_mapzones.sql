@@ -517,7 +517,7 @@ BEGIN
 					EXECUTE v_querytext;
 				
 					-- recalculate staticpressure (fid=147)
-					IF v_fid=130 THEN
+					IF v_fid=146 THEN
 					
 						DELETE FROM audit_log_data WHERE fid=147 AND cur_user=current_user;
 				
@@ -529,7 +529,7 @@ BEGIN
 						JOIN anl_node USING (node_id)
 						JOIN 
 						(select head, json_array_elements_text((grafconfig->>'use')::json)::json->>'nodeParent' as node_id from presszone) pz ON pz.node_id = anl_node.descript
-						WHERE fid=130 AND cur_user=current_user;
+						WHERE fid=146 AND cur_user=current_user;
 
 						-- update on node table those elements connected on graf
 						UPDATE node SET staticpressure=(log_message::json->>'staticpressure')::float FROM audit_log_data a WHERE a.feature_id=node_id 
