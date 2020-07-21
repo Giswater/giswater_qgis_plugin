@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2716
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_manage_child_views(p_data json)
-  RETURNS void AS
+  RETURNS json AS
 $BODY$
 
 /*EXAMPLE
@@ -46,6 +46,8 @@ v_action text;
 v_childview text;
 v_tableversion text = 'sys_version';
 v_columntype text = 'project_type';
+v_return_status text = 'Failed';
+v_return_msg text = 'Process finished with some errors';
 	
 BEGIN
 
@@ -342,7 +344,8 @@ BEGIN
 				"man_fields":"'||v_man_fields||'","a_param":"null","ct_param":"null","id_param":"null","datatype":"null"}}';
 
 				PERFORM gw_fct_admin_manage_child_views_view(v_data_view);
-
+				v_return_status = 'Accepted';
+				v_return_msg = 'Process finished successfully';
 				END IF;
 
 			IF 	v_viewname NOT IN (SELECT formname FROM config_form_fields) THEN
@@ -357,10 +360,20 @@ BEGIN
 			EXECUTE 'CREATE TRIGGER gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(v_cat_feature, ' ','_'),'-','_'),'.','_'))||'
 			INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_schemaname||'.'||v_viewname||'
 			FOR EACH ROW EXECUTE PROCEDURE '||v_schemaname||'.gw_trg_edit_'||v_feature_type||'('''||v_cat_feature||''');';
-			
+
+			ELSE
+				v_return_status = 'Accepted';
+				v_return_msg = 'View already exist';
+				
 			END IF;
 		END IF;
 	END IF;
+
+	--  Return
+	RETURN ('{"status":"'||v_return_status||'", "message":{"level":0, "text":"'||v_return_msg||'"} '||
+		',"body":{"form":{}'||
+		',"data":{}}'||
+		'}')::json;
 
 END;
 $BODY$

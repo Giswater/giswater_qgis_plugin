@@ -6,7 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2690
 
-drop function if exists SCHEMA_NAME.gw_fct_admin_manage_addfields(json);
+-- DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_admin_manage_addfields(json);
+
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_manage_addfields(p_data json)
   RETURNS json AS
 $BODY$
@@ -832,6 +833,9 @@ BEGIN
 	v_result_line = '{"geometryType":"", "features":[]}';
 	v_result_polygon = '{"geometryType":"", "features":[]}';
 
+	-- Control NULL's
+	v_hide_form := COALESCE(v_hide_form, FALSE); 
+	
 	--  Return
 	RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
