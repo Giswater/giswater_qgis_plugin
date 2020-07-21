@@ -1463,7 +1463,7 @@ class ParentAction(object):
 
         try:
 
-            # force visible
+            # force visible and in case of does not exits, load it
             if 'visible' in layermanager:
                 for lyr in layermanager['visible']:
                     layer_name = [key for key in lyr][0]
@@ -1481,39 +1481,19 @@ class ParentAction(object):
                             extras = f'"style_id":"{style_id}"'
                             body = self.create_body(extras=extras)
                             style = self.controller.get_json('gw_fct_getstyle', body, log_sql=True)
-
                             if 'styles' in style['body']:
                                 if 'style' in style['body']['styles']:
                                     qml = style['body']['styles']['style']
                                 self.create_qml(layer, qml)
-                    layer = self.controller.get_layer_by_tablename(layer_name)
                     self.controller.set_layer_visible(layer)
 
-            # force reload dataProvider in order to reindex
+            # force reload dataProvider in order to reindex.
             if 'index' in layermanager:
                 for lyr in layermanager['index']:
                     layer_name = [key for key in lyr][0]
                     layer = self.controller.get_layer_by_tablename(layer_name)
-                    if layer is None:
-                        the_geom = lyr[layer_name]['geom_field']
-                        field_id = lyr[layer_name]['pkey_field']
-                        if lyr[layer_name]['group_layer'] is not None:
-                            group = lyr[layer_name]['group_layer']
-                        else:
-                            group = "GW Layers"
-                        self.add_layer.from_postgres_to_toc(layer_name, the_geom, field_id, group=group)
-                        style_id = lyr[layer_name]['style_id']
-                        if style_id is not None:
-                            extras = f'"style_id":"{style_id}"'
-                            body = self.create_body(extras=extras)
-                            style = self.controller.get_json('gw_fct_getstyle', body, log_sql=True)
-
-                            if 'styles' in style['body']:
-                                if 'style' in style['body']['styles']:
-                                    qml = style['body']['styles']['style']
-                                self.create_qml(layer, qml)
-                    layer = self.controller.get_layer_by_tablename(layer_name)
-                    self.controller.set_layer_index(layer)
+                    if layer:
+                        self.controller.set_layer_index(layer)
 
             # Set active
             if 'active' in layermanager:
