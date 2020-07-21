@@ -10,6 +10,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 -- 2020/07/14
 UPDATE sys_table SET id = 'config_valve' WHERE id = 'config_mincut_valve';
 
+DELETE FROM sys_param_user WHERE id = 'inp_options_skipdemandpattern';
 
 UPDATE config_toolbox SET inputparams  = 
 '[{"widgetname":"grafClass", "label":"Graf class:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,"comboIds":["PRESSZONE","DQA","DMA","SECTOR"],
