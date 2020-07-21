@@ -9,9 +9,10 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2020/07/08
 
-ALTER TABLE sys_table ADD COLUMN addtoc json;
-ALTER TABLE sys_table ADD COLUMN field_geom text;
-ALTER TABLE sys_table ADD COLUMN field_id text;
+--ALTER TABLE sys_table ADD COLUMN addtoc json;
+ALTER TABLE sys_table ADD COLUMN geom_field text;
+ALTER TABLE sys_table ADD COLUMN pkey_field text;
+
 ALTER TABLE sys_style ALTER styletype TYPE character varying(30);
 
 
@@ -29,7 +30,7 @@ CREATE TABLE SCHEMA_NAME.config_table
 (
   id text NOT NULL,
   style integer NOT NULL,
-
+  group_layer text, 
   CONSTRAINT config_table_pkey PRIMARY KEY (id)
 );
 

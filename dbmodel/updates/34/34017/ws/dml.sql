@@ -35,17 +35,18 @@ update config_form_fields SET columnname = 'staticpress2' where  columnname = 's
 
 
 -- 2020/07/20
-INSERT INTO config_table(id, style) VALUES('v_edit_arc', 1);
-INSERT INTO config_table(id, style) VALUES('v_edit_connec', 2);
-INSERT INTO config_table(id, style) VALUES('v_edit_link', 3);
-INSERT INTO config_table(id, style) VALUES('v_edit_node', 4);
-INSERT INTO config_table(id, style) VALUES('Overlap affected arcs', 5);
-INSERT INTO config_table(id, style) VALUES('Overlap affected connecs', 6);
-INSERT INTO config_table(id, style) VALUES('Other mincuts whichs overlaps', 7);
+INSERT INTO config_table(id, style, group_layer) VALUES('v_edit_arc', 101, 'GW Layers');
+INSERT INTO config_table(id, style, group_layer) VALUES('v_edit_connec', 102, 'GW Layers');
+INSERT INTO config_table(id, style, group_layer) VALUES('v_edit_link', 103, 'GW Layers');
+INSERT INTO config_table(id, style, group_layer) VALUES('v_edit_node', 104, 'GW Layers');
+
+INSERT INTO config_table(id, style) VALUES('Overlap affected arcs', 105);
+INSERT INTO config_table(id, style) VALUES('Overlap affected connecs', 106);
+INSERT INTO config_table(id, style) VALUES('Other mincuts whichs overlaps', 107);
 
 
-INSERT INTO sys_style (idval, styletype, stylevalue, active)
-VALUES('101', 'v_edi_arc',$$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
+INSERT INTO sys_style (id, idval, styletype, stylevalue, active)
+VALUES('101', 'v_edi_arc', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
 <qgis simplifyDrawingHints="1" simplifyDrawingTol="1" version="3.10.3-A Coruña" simplifyAlgorithm="0" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" labelsEnabled="1" styleCategories="AllStyleCategories" maxScale="0" simplifyMaxScale="1" readOnly="0" minScale="1e+08">
   <flags>
     <Identifiable>1</Identifiable>
@@ -1446,8 +1447,8 @@ def my_form_open(dialog, layer, feature):
 $$, true);
 
 
-INSERT INTO sys_style (idval, styletype, stylevalue, active)
-VALUES('102', 'v_edit_connec',$$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
+INSERT INTO sys_style (id, idval, styletype, stylevalue, active)
+VALUES('102', 'v_edit_connec', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
 <qgis simplifyDrawingHints="0" simplifyDrawingTol="1" version="3.10.3-A Coruña" simplifyAlgorithm="0" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" labelsEnabled="0" styleCategories="AllStyleCategories" maxScale="0" simplifyMaxScale="1" readOnly="0" minScale="1e+08">
   <flags>
     <Identifiable>1</Identifiable>
@@ -2806,8 +2807,8 @@ def my_form_open(dialog, layer, feature):
 $$, true);
 
 
-INSERT INTO sys_style (idval, styletype, stylevalue, active)
-VALUES('103', 'v_edit_link',$$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
+INSERT INTO sys_style (id, idval, styletype, stylevalue, active)
+VALUES('103', 'v_edit_link', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
 <qgis simplifyDrawingHints="1" simplifyDrawingTol="1" version="3.10.3-A Coruña" simplifyAlgorithm="0" hasScaleBasedVisibilityFlag="1" simplifyLocal="1" labelsEnabled="0" styleCategories="AllStyleCategories" maxScale="1" simplifyMaxScale="1" readOnly="0" minScale="1500">
   <flags>
     <Identifiable>1</Identifiable>
@@ -3294,8 +3295,8 @@ def my_form_open(dialog, layer, feature):
 $$, true);
 
 
-INSERT INTO sys_style (idval, styletype, stylevalue, active)
-VALUES('104', 'v_edit_node',$$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
+INSERT INTO sys_style (id, idval, styletype, stylevalue, active)
+VALUES('104', 'v_edit_node', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
 <qgis simplifyDrawingHints="0" simplifyDrawingTol="1" version="3.10.3-A Coruña" simplifyAlgorithm="0" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" labelsEnabled="0" styleCategories="AllStyleCategories" maxScale="0" simplifyMaxScale="1" readOnly="0" minScale="1e+08">
   <flags>
     <Identifiable>1</Identifiable>
@@ -5431,8 +5432,8 @@ def my_form_open(dialog, layer, feature):
 $$, true);
 
 
-INSERT INTO sys_style(idval, styletype, stylevalue, active)
-VALUES('105', 'Overlap affected arcs', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
+INSERT INTO sys_style(id, idval, styletype, stylevalue, active)
+VALUES('105', 'Overlap affected arcs', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
 <qgis hasScaleBasedVisibilityFlag="0" simplifyLocal="1" readOnly="0" labelsEnabled="0" simplifyAlgorithm="0" simplifyMaxScale="1" minScale="1e+08" simplifyDrawingHints="1" version="3.10.4-A Coruña" styleCategories="AllStyleCategories" simplifyDrawingTol="1" maxScale="0">
   <flags>
     <Identifiable>1</Identifiable>
@@ -5540,8 +5541,8 @@ VALUES('105', 'Overlap affected arcs', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/
 $$, true);
 
 
-INSERT INTO sys_style(idval, styletype, stylevalue, active)
-VALUES('106', 'Overlap affected connecs', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
+INSERT INTO sys_style(id, idval, styletype, stylevalue, active)
+VALUES('106', 'Overlap affected connecs', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
 <qgis hasScaleBasedVisibilityFlag="0" simplifyLocal="1" readOnly="0" labelsEnabled="0" simplifyAlgorithm="0" simplifyMaxScale="1" minScale="1e+08" simplifyDrawingHints="1" version="3.10.4-A Coruña" styleCategories="AllStyleCategories" simplifyDrawingTol="1" maxScale="0">
   <flags>
     <Identifiable>1</Identifiable>
@@ -5683,8 +5684,8 @@ VALUES('106', 'Overlap affected connecs', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.c
 $$, true);
 
 
-INSERT INTO sys_style(idval, styletype, stylevalue, active)
-VALUES('107', 'Other mincuts whichs overlaps', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
+INSERT INTO sys_style(id, idval, styletype, stylevalue, active)
+VALUES('107', 'Other mincuts whichs overlaps', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
 <qgis hasScaleBasedVisibilityFlag="0" simplifyLocal="1" readOnly="0" labelsEnabled="0" simplifyAlgorithm="0" simplifyMaxScale="1" minScale="1e+08" simplifyDrawingHints="1" version="3.10.4-A Coruña" styleCategories="AllStyleCategories" simplifyDrawingTol="1" maxScale="0">
   <flags>
     <Identifiable>1</Identifiable>

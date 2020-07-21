@@ -15,45 +15,17 @@ UPDATE config_form_fields SET formtype = 'form_list_header' where formtype = 'li
 DELETE FROM config_typevalue WHERE id = 'listfilter';
 DELETE FROM config_typevalue WHERE id IN (select id FROM config_typevalue WHERE id = 'tabData' LIMIT 1);
 
-UPDATE sys_table SET(field_geom, field_id) = ('the_geom', 'arc_id') WHERE id = 'v_edit_arc';
-UPDATE sys_table SET(field_geom, field_id) = ('the_geom', 'connec_id') WHERE id = 'v_edit_connec';
-
-UPDATE sys_table SET(field_geom, field_id) = ('the_geom', 'link_id') WHERE id = 'v_edit_link';
-UPDATE sys_table SET(field_geom, field_id) = ('the_geom', 'node_id') WHERE id = 'v_edit_node';
-UPDATE sys_table SET(field_geom, field_id) = ('the_geom', 'id') WHERE id = 'v_edit_dimensions';
-
+UPDATE sys_table SET(geom_field, pkey_field) = ('the_geom', 'arc_id') WHERE id = 'v_edit_arc';
+UPDATE sys_table SET(geom_field, pkey_field) = ('the_geom', 'connec_id') WHERE id = 'v_edit_connec';
+UPDATE sys_table SET(geom_field, pkey_field) = ('the_geom', 'link_id') WHERE id = 'v_edit_link';
+UPDATE sys_table SET(geom_field, pkey_field) = ('the_geom', 'node_id') WHERE id = 'v_edit_node';
+UPDATE sys_table SET(geom_field, pkey_field) = ('the_geom', 'id') WHERE id = 'v_edit_dimensions';
 
 
-
-
-
-UPDATE sys_table SET (addtoc) = ('{"tableName":"v_edit_arc","primaryKey":"arc_id", "geom":"the_geom","group":"GW Temporal Layers","style":"101"}')
-WHERE id ='v_edit_arc';
-
-UPDATE sys_table SET (addtoc) = ('{"tableName":"v_edit_connec","primaryKey":"connec_id", "geom":"the_geom","group":"GW Temporal Layers","style":"102"}')
-WHERE id ='v_edit_connec';
-
-UPDATE sys_table SET (addtoc) = ('{"tableName":"v_edit_gully","primaryKey":"gully_id", "geom":"the_geom","group":"GW Temporal Layers","style":"103"}')
-WHERE id ='v_edit_gully';
-
-UPDATE sys_table SET (addtoc) = ('{"tableName":"v_edit_link","primaryKey":"link_id", "geom":"the_geom","group":"GW Temporal Layers","style":"104"}')
-WHERE id ='v_edit_link';
-
-UPDATE sys_table SET (addtoc) = ('{"tableName":"v_edit_node","primaryKey":"node_id", "geom":"the_geom","group":"GW Temporal Layers","style":"105"}')
-WHERE id ='v_edit_node';
-
-UPDATE sys_table SET (addtoc) = ('{"tableName":"v_anl_flow_arc","primaryKey":"arc_id", "geom":"the_geom","group":"GW Temporal Layers","style":"106"}')
-WHERE id ='v_anl_flow_arc';
-
-UPDATE sys_table SET (addtoc) = ('{"tableName":"v_anl_flow_connec","primaryKey":"connec_id", "geom":"the_geom","group":"GW Temporal Layers","style":"107"}')
-WHERE id ='v_anl_flow_connec';
-
-UPDATE sys_table SET (addtoc) = ('{"tableName":"v_anl_flow_gully","primaryKey":"gully_id", "geom":"the_geom","group":"GW Temporal Layers","style":"108"}')
-WHERE id ='v_anl_flow_gully';
-
-UPDATE sys_table SET (addtoc) = ('{"tableName":"v_anl_flow_node","primaryKey":"node_id", "geom":"the_geom","group":"GW Temporal Layers","style":"109"}')
-WHERE id ='v_anl_flow_node';
-
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role)
+VALUES (2976, 'gw_fct_json_create_return', 'utils', 'function', 'json, integer', 'json', 'Handles styles according to config_function', 'role_edit');
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role)
+VALUES (2978, 'gw_fct_get_style', 'utils', 'function', 'json', 'json', 'Retun styles', 'role_edit');
 
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
@@ -157,7 +129,7 @@ INSERT INTO config_function (id, function_name, returnmanager, layermanager, act
 VALUES(2218,'gw_fct_flow_trace','{"style":{"point":{"style":"qml", "id":"2218"},  "line":{"style":"qml", "id":"2218"}}}','{"visible": ["v_anl_flow_node", "v_anl_flow_gully", "v_anl_flow_connec", "v_anl_flow_arc"]}',NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2244,'gw_fct_mincut_result_overlap','{"style":{"point":{"style":"qml", "id":"111"},  "line":{"style":"qml", "id":"110"}, "polygon":{"style":"qml", "id":"112"}}}',NULL,NULL);
+VALUES(2244,'gw_fct_mincut_result_overlap','{"style":{"point":{"style":"qml", "id":"106"},  "line":{"style":"qml", "id":"105"}, "polygon":{"style":"qml", "id":"107"}}}',NULL,NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
 VALUES(2302,'gw_fct_anl_node_topological_consistency','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 

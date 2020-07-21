@@ -70,6 +70,7 @@ BEGIN
 					) AS feature
 					FROM (SELECT geom_field, pkey_field, style, group_layer from sys_table 
 						LEFT JOIN config_table USING (id)
+						WHERE id = '''||rec||'''
 					) row) a;'
 				INTO v_result;
 				
@@ -88,6 +89,7 @@ BEGIN
 					) AS feature
 					FROM (SELECT geom_field, pkey_field, style, group_layer from sys_table 
 						LEFT JOIN config_table USING (id)
+						WHERE id = '''||v_layer_zoom||'''
 					) row) a;'
 				INTO v_result;
 

@@ -9,19 +9,25 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2020/07/20
 
-UPDATE sys_table SET(field_geom, field_id) = ('the_geom', 'gully_id') WHERE id = 'v_edit_gully';
-INSERT INTO config_table(id, style) VALUES('v_edit_arc', 1);
-INSERT INTO config_table(id, style) VALUES('v_edit_connec', 2);
-INSERT INTO config_table(id, style) VALUES('v_edit_link', 3);
-INSERT INTO config_table(id, style) VALUES('v_edit_node', 4);
-INSERT INTO config_table(id, style) VALUES('v_edit_gully', 5);
-INSERT INTO config_table(id, style) VALUES('v_anl_flow_arc', 6);
-INSERT INTO config_table(id, style) VALUES('v_anl_flow_connec', 7);
-INSERT INTO config_table(id, style) VALUES('v_anl_flow_gully', 8);
-INSERT INTO config_table(id, style) VALUES('v_anl_flow_node', 9);
+UPDATE sys_table SET(geom_field, pkey_field) = ('the_geom', 'gully_id') WHERE id = 'v_edit_gully';
+UPDATE sys_table SET(geom_field, pkey_field) = ('the_geom', 'arc_id') WHERE id = 'v_anl_flow_arc';
+UPDATE sys_table SET(geom_field, pkey_field) = ('the_geom', 'connec_id') WHERE id = 'v_anl_flow_connec';
+UPDATE sys_table SET(geom_field, pkey_field) = ('the_geom', 'gully_id') WHERE id = 'v_anl_flow_gully';
+UPDATE sys_table SET(geom_field, pkey_field) = ('the_geom', 'node_id') WHERE id = 'v_anl_flow_node';
 
-INSERT INTO sys_style (idval, styletype, stylevalue, active)
-VALUES('101', 'v_edit_Arc',$$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
+INSERT INTO config_table(id, style, group_layer) VALUES('v_edit_arc', 101, 'GW Layers');
+INSERT INTO config_table(id, style, group_layer) VALUES('v_edit_connec', 102, 'GW Layers');
+INSERT INTO config_table(id, style, group_layer) VALUES('v_edit_link', 103, 'GW Layers');
+INSERT INTO config_table(id, style, group_layer) VALUES('v_edit_node', 104, 'GW Layers');
+INSERT INTO config_table(id, style, group_layer) VALUES('v_edit_gully', 105, 'GW Layers');
+
+INSERT INTO config_table(id, style) VALUES('v_anl_flow_arc', 106);
+INSERT INTO config_table(id, style) VALUES('v_anl_flow_connec', 107);
+INSERT INTO config_table(id, style) VALUES('v_anl_flow_gully', 108);
+INSERT INTO config_table(id, style) VALUES('v_anl_flow_node', 109);
+
+INSERT INTO sys_style (id, idval, styletype, stylevalue, active)
+VALUES('101', 'v_edit_Arc', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
 <qgis simplifyDrawingTol="1" labelsEnabled="1" simplifyDrawingHints="1" minScale="1e+08" simplifyLocal="1" simplifyMaxScale="1" maxScale="100000" readOnly="0" version="3.10.3-A Coruña" hasScaleBasedVisibilityFlag="0" simplifyAlgorithm="0" styleCategories="AllStyleCategories">
   <flags>
     <Identifiable>1</Identifiable>
@@ -2333,8 +2339,8 @@ def my_form_open(dialog, layer, feature):
 $$, true);
 
 
-INSERT INTO sys_style (idval, styletype, stylevalue, active)
-VALUES('102', 'v_edit_connec',$$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
+INSERT INTO sys_style (id, idval, styletype, stylevalue, active)
+VALUES('102', 'v_edit_connec', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
 <qgis simplifyDrawingTol="1" labelsEnabled="1" simplifyDrawingHints="0" minScale="1500" simplifyLocal="1" simplifyMaxScale="1" maxScale="1" readOnly="0" version="3.10.3-A Coruña" hasScaleBasedVisibilityFlag="1" simplifyAlgorithm="0" styleCategories="AllStyleCategories">
   <flags>
     <Identifiable>1</Identifiable>
@@ -3807,8 +3813,8 @@ def my_form_open(dialog, layer, feature):
 $$, true);
 
 
-INSERT INTO ws_sample.sys_style (idval, styletype, stylevalue, active)
-VALUES('103', 'v_edit_link',$$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
+INSERT INTO sys_style (id, idval, styletype, stylevalue, active)
+VALUES('103', 'v_edit_link', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
 <qgis simplifyDrawingTol="1" labelsEnabled="0" simplifyDrawingHints="1" minScale="1500" simplifyLocal="1" simplifyMaxScale="1" maxScale="0" readOnly="0" version="3.10.3-A Coruña" hasScaleBasedVisibilityFlag="1" simplifyAlgorithm="0" styleCategories="AllStyleCategories">
   <flags>
     <Identifiable>1</Identifiable>
@@ -4253,8 +4259,8 @@ def my_form_open(dialog, layer, feature):
 $$, true);
 
 
-INSERT INTO ws_sample.sys_style (idval, styletype, stylevalue, active)
-VALUES('104', 'v_edit_node',$$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
+INSERT INTO sys_style (id, idval, styletype, stylevalue, active)
+VALUES('104', 'v_edit_node', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
 <qgis simplifyDrawingTol="1" labelsEnabled="0" simplifyDrawingHints="0" minScale="2500" simplifyLocal="1" simplifyMaxScale="1" maxScale="1" readOnly="0" version="3.10.3-A Coruña" hasScaleBasedVisibilityFlag="1" simplifyAlgorithm="0" styleCategories="AllStyleCategories">
   <flags>
     <Identifiable>1</Identifiable>
@@ -5988,8 +5994,8 @@ def my_form_open(dialog, layer, feature):
 $$, true);
 
 
-INSERT INTO sys_style (idval, styletype, stylevalue, active)
-VALUES('105', 'v_edit_gully',$$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
+INSERT INTO sys_style (id, idval, styletype, stylevalue, active)
+VALUES('105', 'v_edit_gully', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
 <qgis simplifyDrawingTol="1" labelsEnabled="1" simplifyDrawingHints="0" minScale="1500" simplifyLocal="1" simplifyMaxScale="1" maxScale="1" readOnly="0" version="3.10.3-A Coruña" hasScaleBasedVisibilityFlag="1" simplifyAlgorithm="0" styleCategories="AllStyleCategories">
   <flags>
     <Identifiable>1</Identifiable>
@@ -7852,8 +7858,8 @@ def my_form_open(dialog, layer, feature):
 $$, true);
 
 
-INSERT INTO sys_style(idval, styletype, stylevalue, active)
-VALUES('106', 'v_anl_flow_arc',$$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
+INSERT INTO sys_style(id, idval, styletype, stylevalue, active)
+VALUES('106', 'v_anl_flow_arc', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
 <qgis styleCategories="AllStyleCategories" simplifyMaxScale="1" simplifyLocal="1" hasScaleBasedVisibilityFlag="0" version="3.10.3-A Coruña" maxScale="0" simplifyDrawingTol="1" labelsEnabled="0" simplifyAlgorithm="0" simplifyDrawingHints="1" minScale="1e+08" readOnly="0">
   <flags>
     <Identifiable>1</Identifiable>
@@ -8059,8 +8065,8 @@ VALUES('106', 'v_anl_flow_arc',$$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd
 $$ , true);
 
 
-INSERT INTO sys_style(idval, styletype, stylevalue, active)
-VALUES('107', 'v_anl_flow_connec',$$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
+INSERT INTO sys_style(id, idval, styletype, stylevalue, active)
+VALUES('107', 'v_anl_flow_connec', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
 <qgis styleCategories="AllStyleCategories" simplifyLocal="1" simplifyAlgorithm="0" maxScale="0" hasScaleBasedVisibilityFlag="0" labelsEnabled="0" simplifyDrawingTol="1" readOnly="0" simplifyMaxScale="1" version="3.10.3-A Coruña" minScale="1e+08" simplifyDrawingHints="0">
   <flags>
     <Identifiable>1</Identifiable>
@@ -8296,8 +8302,8 @@ def my_form_open(dialog, layer, feature):
 $$ , true);
 
 
-INSERT INTO sys_style(idval, styletype, stylevalue, active)
-VALUES('108', 'v_anl_flow_gully',$$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
+INSERT INTO sys_style(id, idval, styletype, stylevalue, active)
+VALUES('108', 'v_anl_flow_gully', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
 <qgis styleCategories="AllStyleCategories" simplifyLocal="1" simplifyAlgorithm="0" maxScale="0" hasScaleBasedVisibilityFlag="0" labelsEnabled="0" simplifyDrawingTol="1" readOnly="0" simplifyMaxScale="1" version="3.10.3-A Coruña" minScale="1e+08" simplifyDrawingHints="1">
   <flags>
     <Identifiable>1</Identifiable>
@@ -8487,8 +8493,8 @@ VALUES('108', 'v_anl_flow_gully',$$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.d
 $$ , true);
 
 
-INSERT INTO sys_style(idval, styletype, stylevalue, active)
-VALUES('109', 'v_anl_flow_node',$$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
+INSERT INTO sys_style(id, idval, styletype, stylevalue, active)
+VALUES('109', 'v_anl_flow_node', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
 <qgis styleCategories="AllStyleCategories" simplifyLocal="1" simplifyAlgorithm="0" maxScale="0" hasScaleBasedVisibilityFlag="0" labelsEnabled="0" simplifyDrawingTol="1" readOnly="0" simplifyMaxScale="1" version="3.10.3-A Coruña" minScale="1e+08" simplifyDrawingHints="1">
   <flags>
     <Identifiable>1</Identifiable>
