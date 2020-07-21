@@ -43,11 +43,17 @@ BEGIN
 	IF NEW.status=4 AND NEW.enddate IS NULL THEN
 		NEW.enddate=left (date_trunc('second', now())::text, 19);
 	END IF;
-	 
-
-    INSERT INTO om_visit(id, visitcat_id, ext_code, startdate, webclient_id, expl_id, the_geom, descript, is_done, class_id, lot_id, status) 
-    VALUES (NEW.visit_id, NEW.visitcat_id, NEW.ext_code, NEW.startdate::timestamp, NEW.webclient_id, NEW.expl_id, NEW.the_geom, NEW.descript, 
-    NEW.is_done, NEW.class_id, NEW.lot_id, NEW.status);
+	
+	-- only for planified visits insert lot_id
+	IF (SELECT visit_type FROM om_visit_class WHERE id=visit_class)=1 THEN
+		INSERT INTO om_visit(id, visitcat_id, ext_code, startdate, enddate, webclient_id, expl_id, the_geom, descript, is_done, class_id, lot_id, status) 
+		VALUES (NEW.visit_id, NEW.visitcat_id, NEW.ext_code, NEW.startdate::timestamp, NEW.enddate, NEW.webclient_id, NEW.expl_id, NEW.the_geom, NEW.descript, 
+		NEW.is_done, NEW.class_id, NEW.lot_id, NEW.status);
+	ELSE 
+		INSERT INTO om_visit(id, visitcat_id, ext_code, startdate, enddate, webclient_id, expl_id, the_geom, descript, is_done, class_id, status) 
+		VALUES (NEW.visit_id, NEW.visitcat_id, NEW.ext_code, NEW.startdate::timestamp, NEW.enddate, NEW.webclient_id, NEW.expl_id, NEW.the_geom, NEW.descript, 
+		NEW.is_done, NEW.class_id, NEW.status);
+	END IF;
 
 
 	-- Get related parameters(events) from visit_class
