@@ -44,8 +44,11 @@ INSERT INTO config_table(id, style) VALUES('Overlap affected arcs', 105);
 INSERT INTO config_table(id, style) VALUES('Overlap affected connecs', 106);
 INSERT INTO config_table(id, style) VALUES('Other mincuts whichs overlaps', 107);
 
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role)
+VALUES (2980, 'gw_fct_setmincut', 'utils', 'function', 'json', 'json', NULL, 'role_edit');
+
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2870,'gw_fct_setmincut',NULL,'{"index": ["om_mincut_arc", "om_mincut_connec", "om_mincut_node"]}',NULL);
+VALUES(2980,'gw_fct_setmincut',NULL,'{"index": ["om_mincut_arc", "om_mincut_connec", "om_mincut_node"]}',NULL);
 
 
 INSERT INTO sys_style (id, idval, styletype, stylevalue, active)
