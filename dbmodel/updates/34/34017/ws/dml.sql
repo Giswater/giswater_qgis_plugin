@@ -44,6 +44,9 @@ INSERT INTO config_table(id, style) VALUES('Overlap affected arcs', 105);
 INSERT INTO config_table(id, style) VALUES('Overlap affected connecs', 106);
 INSERT INTO config_table(id, style) VALUES('Other mincuts whichs overlaps', 107);
 
+INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
+VALUES(2870,'gw_fct_setmincut',NULL,'{"index": ["om_mincut_arc", "om_mincut_connec", "om_mincut_node"]}',NULL);
+
 
 INSERT INTO sys_style (id, idval, styletype, stylevalue, active)
 VALUES('101', 'v_edi_arc', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>

@@ -27,6 +27,9 @@ VALUES (2976, 'gw_fct_json_create_return', 'utils', 'function', 'json, integer',
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role)
 VALUES (2978, 'gw_fct_get_style', 'utils', 'function', 'json', 'json', 'Retun styles', 'role_edit');
 
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role)
+VALUES (2980, 'gw_fct_setmincut', 'utils', 'function', 'json', 'json', NULL, 'role_edit');
+
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
 VALUES(2431,'gw_fct_pg2epa_check_data', '{"style":{"point":{"style":"random","field":"fid","width":2,"transparency":0.5}},
