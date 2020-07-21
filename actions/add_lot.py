@@ -2230,7 +2230,7 @@ class AddNewLot(ParentManage):
         team_name = utils_giswater.getWidgetText(self.dlg_resources_man, self.dlg_resources_man.cmb_team)
 
         # Populate tables
-        query = ("SELECT user_id AS " + '"' + "Usuari" + '"' + " FROM " + self.schema_name + ".v_om_user_x_team WHERE team = '" + str(team_name) + "'")
+        query = ("SELECT user_id AS " + '"' + "Usuari" + '"' + ", user_name AS " + '"' + "Nom" + '"' + " FROM " + self.schema_name + ".v_om_user_x_team WHERE team = '" + str(team_name) + "'")
         self.fill_table_by_query(self.dlg_resources_man.tbl_view_team_user, query)
 
         query = ("SELECT vehicle  AS " + '"' + "Vehicle" + '"' + " FROM " + self.schema_name + ".v_om_team_x_vehicle WHERE team = '" + str(team_name) + "'")
@@ -2266,7 +2266,7 @@ class AddNewLot(ParentManage):
         # Tab Users
         self.populate_team_selectors(self.dlg_team_man, "cat_users", "v_om_user_x_team", "id", "user_id", "Usuaris",
                                      [], [], "all_user_rows", "selected_user_rows", "btn_user_select", "btn_user_unselect",
-                                     'id AS "Usuaris"', 'user_id AS "Usuaris"')
+                                     'id AS "Usuaris", name AS "Nom", context AS "Context"', 'user_id AS "Usuaris", name AS "Nom", context AS "Context"')
         # Tab Vehciles
         self.populate_team_selectors(self.dlg_team_man, "ext_cat_vehicle", "v_om_team_x_vehicle", "idval", "vehicle", "Vehicle",
                                      [], [], "all_vehicle_rows", "selected_vehicle_rows", "btn_vehicle_select",
@@ -2488,3 +2488,7 @@ class AddNewLot(ParentManage):
         self.controller.execute_sql(sql)
         msg = "Data updated successfully."
         self.controller.show_info(msg)
+
+        # Refresh combo work_order
+        self.manage_widget_lot(None)
+        self.set_ot_fields(0)
