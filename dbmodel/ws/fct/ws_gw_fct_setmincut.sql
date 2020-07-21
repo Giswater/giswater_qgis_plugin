@@ -31,7 +31,7 @@ v_valveunaccess json;
 BEGIN
 
 	-- Search path
-	SET search_path = "ws_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 	-- get input parameters
 	v_mincut :=	 ((p_data ->>'data')::json->>'mincutId')::integer;	
 	v_arc :=	 ((p_data ->>'data')::json->>'arcId')::integer;
@@ -41,10 +41,9 @@ BEGIN
 
 	-- execute process
 	IF v_status THEN
-	RAISE NOTICE '%%%',(v_node::text, v_mincut, current_user);
-		RETURN gw_fct_mincut_valve_unaccess(v_node::text, v_mincut, current_user);
+		RETURN gw_fct_json_create_return(gw_fct_mincut_valve_unaccess(v_node::text, v_mincut, current_user), 2980);
 	ELSE	
-		RETURN gw_fct_mincut(v_mincut, 'arc'::text, v_arc);
+		RETURN gw_fct_json_create_return(gw_fct_mincut(v_mincut, 'arc'::text, v_arc), 2980);
 	END IF;
 
 END;

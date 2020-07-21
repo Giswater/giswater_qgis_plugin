@@ -52,7 +52,7 @@ INSERT INTO sys_function(id, function_name, project_type, function_type, input_p
 VALUES (2980, 'gw_fct_setmincut', 'utils', 'function', 'json', 'json', NULL, 'role_edit');
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2980,'gw_fct_setmincut',NULL,'{"index": ["om_mincut_arc", "om_mincut_connec", "om_mincut_node"]}',NULL);
+VALUES(2980,'gw_fct_setmincut',NULL,'{"visible": ["v_om_mincut_arc", "v_om_mincut_connec", "v_om_mincut_initpoint", "v_om_mincut_node"], "zoom":{"layer":"v_om_mincut_arc", "margin":20}}',NULL);
 
 
 INSERT INTO sys_style (id, idval, styletype, stylevalue, active)
