@@ -2813,9 +2813,9 @@ class UpdateSQL(ApiParent):
         body = body.replace('""', 'null')
 
         # Execute query
-        status = self.controller.get_json('gw_fct_admin_manage_child_views', body,
-                                          schema_name=schema_name, commit=False)
-        self.manage_result_message(status, parameter="Create child view")
+        json_result = self.controller.get_json('gw_fct_admin_manage_child_views', body,
+                                          schema_name=schema_name, commit=True)
+        self.manage_json_message(json_result, title="Create child view")
 
 
     def update_sys_fields(self):
@@ -2824,6 +2824,7 @@ class UpdateSQL(ApiParent):
         self.dlg_manage_sys_fields = MainSysFields()
         self.load_settings(self.dlg_manage_sys_fields)
         self.model_update_table = None
+        self.chk_multi_insert = None
 
         # Remove unused tabs
         for x in range(self.dlg_manage_sys_fields.tab_sys_add_fields.count() - 1, -1, -1):
@@ -2831,7 +2832,9 @@ class UpdateSQL(ApiParent):
                 utils_giswater.remove_tab_by_tabName(
                     self.dlg_manage_sys_fields.tab_sys_add_fields, self.dlg_manage_sys_fields.tab_sys_add_fields.widget(x).objectName())
 
-        form_name_fields = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_feature_sys_fields)
+            form_name_fields = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_feature_sys_fields)
+
+        self.manage_update_field(self.dlg_manage_sys_fields, form_name_fields, tableview='ve_config_sysfields')
 
         # Set listeners
         self.dlg_manage_sys_fields.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_manage_sys_fields))
@@ -2869,7 +2872,7 @@ class UpdateSQL(ApiParent):
             self.manage_create_field(form_name_fields)
         elif action == 'update':
             window_title = 'Update field on "' + str(form_name_fields) + '"'
-            self.manage_update_field(form_name_fields)
+            self.manage_update_field(self.dlg_manage_fields, form_name_fields, tableview='ve_config_addfields')
         elif action == 'delete':
             window_title = 'Delete field on "' + str(form_name_fields) + '"'
             self.manage_delete_field(form_name_fields)
@@ -3030,10 +3033,10 @@ class UpdateSQL(ApiParent):
         qtable.setSelectionBehavior(QAbstractItemView.SelectRows)
         expr_filter = "cat_feature_id = '" + form_name + "'"
         self.fill_table(qtable, 've_config_sysfields', self.model_update_table, expr_filter)
-        self.set_table_columns(self.dlg_manage_sys_fields, qtable, 've_config_sysfields', schema_name)
+        self.set_table_columns(self.dlg_manage_sys_fields, qtable, 've_config_sysfields', schema_name=schema_name)
 
 
-    def manage_update_field(self, form_name):
+    def manage_update_field(self, dialog, form_name, tableview):
 
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
 
@@ -3044,7 +3047,7 @@ class UpdateSQL(ApiParent):
             utils_giswater.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", True)
 
         # Populate table update
-        qtable = self.dlg_manage_fields.findChild(QTableView, "tbl_update")
+        qtable = dialog.findChild(QTableView, "tbl_update")
         self.model_update_table = QSqlTableModel()
         qtable.setSelectionBehavior(QAbstractItemView.SelectRows)
 
@@ -3053,8 +3056,8 @@ class UpdateSQL(ApiParent):
         else:
             expr_filter = "cat_feature_id = '" + form_name + "'"
 
-        self.fill_table(qtable, 've_config_addfields', self.model_update_table, expr_filter)
-        self.set_table_columns(self.dlg_manage_fields, qtable, 've_config_addfields', schema_name)
+        self.fill_table(qtable, tableview, self.model_update_table, expr_filter)
+        self.set_table_columns(dialog, qtable, tableview, schema_name=schema_name)
 
 
     def manage_delete_field(self, form_name):
@@ -3131,7 +3134,7 @@ class UpdateSQL(ApiParent):
 
         # Execute manage add fields function
         param_name = utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.columnname)
-        sql = (f"SELECT param_name FROM sys_addfields "
+        sql = (f"SELECT param_name FROM {schema_name}.sys_addfields "
                f"WHERE param_name = '{param_name}' AND  cat_feature_id = '{form_name}' ")
         row = self.controller.get_row(sql, log_sql=True)
 
@@ -3185,10 +3188,10 @@ class UpdateSQL(ApiParent):
             body = body.replace('""', 'null')
 
             # Execute manage add fields function
-            status = self.controller.get_json('gw_fct_admin_manage_addfields', body,
-                                              schema_name=schema_name, commit=False)
-            self.manage_result_message(status, parameter="Field configured in 'config_form_fields'")
-            if not status:
+            json_result = self.controller.get_json('gw_fct_admin_manage_addfields', body,
+                                              schema_name=schema_name, commit=True)
+            self.manage_json_message(json_result, parameter="Field configured in 'config_form_fields'")
+            if not json_result:
                 return
 
         elif action == 'update':
@@ -3224,10 +3227,10 @@ class UpdateSQL(ApiParent):
             body = body.replace('""', 'null')
 
             # Execute manage add fields function
-            status = self.controller.get_json('gw_fct_admin_manage_addfields', body,
-                                              schema_name=schema_name, commit=False)
-            self.manage_result_message(status, parameter="Field update in 'config_form_fields'")
-            if not status:
+            json_result = self.controller.get_json('gw_fct_admin_manage_addfields', body,
+                                              schema_name=schema_name, commit=True)
+            self.manage_json_message(json_result, parameter="Field update in 'config_form_fields'")
+            if not json_result:
                 return
 
         elif action == 'delete':
@@ -3241,9 +3244,9 @@ class UpdateSQL(ApiParent):
             body = self.create_body(feature=feature, extras=extras)
 
             # Execute manage add fields function
-            status = self.controller.get_json('gw_fct_admin_manage_addfields', body,
-                                              schema_name=schema_name, commit=False)
-            self.manage_result_message(status, parameter="Delete function")
+            json_result = self.controller.get_json('gw_fct_admin_manage_addfields', body,
+                                              schema_name=schema_name, commit=True)
+            self.manage_json_message(json_result, parameter="Delete function")
 
         # Close dialog
         self.close_dialog(self.dlg_manage_fields)
@@ -3395,6 +3398,22 @@ class UpdateSQL(ApiParent):
             if msg_error is None:
                 msg_error = "Process finished with some errors"
             self.controller.show_info_box(msg_error, "Warning", parameter=parameter)
+
+
+    def manage_json_message(self, json_result, parameter=None, title=None):
+        """ Manage message depending result @status """
+
+        if 'message' in json_result:
+
+            level = 1
+            if 'level' in json_result['message']:
+                level = int(json_result['message']['level'])
+            if 'text' in json_result['message']:
+                msg = json_result['message']['text']
+            else:
+                msg = "Key on returned json from ddbb is missed"
+
+            self.controller.show_message(msg, level, parameter=parameter, title=title)
 
 
     def save_selection(self):

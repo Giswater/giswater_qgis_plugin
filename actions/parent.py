@@ -565,17 +565,22 @@ class ParentAction(object):
         return cursor
 
 
-    def set_table_columns(self, dialog, widget, table_name, sort_order=0, isQStandardItemModel=False):
+    def set_table_columns(self, dialog, widget, table_name, sort_order=0, isQStandardItemModel=False, schema_name=None):
         """ Configuration of tables. Set visibility and width of columns """
 
         widget = utils_giswater.getWidget(dialog, widget)
         if not widget:
             return
 
+        if schema_name is not None:
+            config_table = f"{schema_name}.config_form_tableview"
+        else:
+            config_table = f"config_form_tableview"
+
         # Set width and alias of visible columns
         columns_to_delete = []
         sql = (f"SELECT columnindex, width, alias, status"
-               f" FROM config_form_tableview"
+               f" FROM {config_table}"
                f" WHERE tablename = '{table_name}'"
                f" ORDER BY columnindex")
         rows = self.controller.get_rows(sql, log_info=False)
