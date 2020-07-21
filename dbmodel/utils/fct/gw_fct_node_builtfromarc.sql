@@ -137,7 +137,6 @@ BEGIN
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 				'"point":'||v_result_point||','||
-				'"setVisibleLayers":[]'||
 			'}}'||
 	    '}')::json, 2118);
 	
