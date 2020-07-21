@@ -1601,13 +1601,13 @@ class MincutParent(ParentAction):
         # feature_id: id of snapped arc/node
         # feature_type: type of snapped element (arc/node)
         # result_mincut_id: result_mincut_id from form
-        sql = f"SELECT gw_fct_mincut('{elem_id}', '{elem_type}', '{real_mincut_id}');"
-        row = self.controller.get_row(sql)
-        if not row or not row[0]:
-            self.controller.show_message("NOT ROW FOR: " + sql, 2)
-            return False
 
-        complet_result = row[0]
+        extras = f'"valveUnaccess":{{"status":"false"}}, '
+        extras += f'"mincutId":"{real_mincut_id}", "arcId":"{elem_id}"'
+        body = self.create_body(extras=extras)
+        complet_result = self.controller.get_json('gw_fct_setmincut', body, log_sql=True)
+        if complet_result is False: return False
+
         if 'mincutOverlap' in complet_result:
             if complet_result['mincutOverlap'] != "":
                 message = "Mincut done, but has conflict and overlaps with"
@@ -1765,12 +1765,11 @@ class MincutParent(ParentAction):
         cur_user = self.controller.get_project_user()
         result_mincut_id = utils_giswater.getWidgetText(self.dlg_mincut, "result_mincut_id")
         if result_mincut_id != 'null':
-            sql = f"SELECT gw_fct_mincut_valve_unaccess('{elem_id}', '{result_mincut_id}', '{cur_user}');"
-            status = self.controller.execute_sql(sql, log_sql=False)
-            if status:
-                message = "Custom mincut executed successfully"
-                self.controller.show_info(message)
-
+            extras = f'"valveUnaccess":{{"status":"true", "nodeId":{elem_id}}}, '
+            extras += f'"mincutId":"{result_mincut_id}"'
+            body = self.create_body(extras=extras)
+            result = self.controller.get_json('gw_fct_setmincut', body, log_sql=True)
+ 
         # Refresh map canvas
         self.refresh_map_canvas(True)
 
