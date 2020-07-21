@@ -1463,6 +1463,7 @@ class ParentAction(object):
 
         try:
 
+            # force visible
             if 'visible' in layermanager:
                 for lyr in layermanager['visible']:
                     layer_name = [key for key in lyr][0]
@@ -1475,49 +1476,52 @@ class ParentAction(object):
                         else:
                             group = "GW Layers"
                         self.add_layer.from_postgres_to_toc(layer_name, the_geom, field_id, group=group)
+                        style_id = lyr[layer_name]['style_id']
+                        if style_id is not None:
+                            extras = f'"style_id":"{style_id}"'
+                            body = self.create_body(extras=extras)
+                            style = self.controller.get_json('gw_fct_getstyle', body, log_sql=True)
+
+                            if 'styles' in style['body']:
+                                if 'style' in style['body']['styles']:
+                                    qml = style['body']['styles']['style']
+                                self.create_qml(layer, qml)
                     layer = self.controller.get_layer_by_tablename(layer_name)
                     self.controller.set_layer_visible(layer)
-                    style_id = lyr[layer_name]['style_id']
-                    if style_id is not None:
-                        extras = f'"style_id":"{style_id}"'
-                        body = self.create_body(extras=extras)
-                        style = self.controller.get_json('gw_fct_getstyle', body, log_sql=True)
 
-                        if 'styles' in style['body']:
-                            if 'style' in style['body']['styles']:
-                                qml = style['body']['styles']['style']
-                            self.create_qml(layer, qml)
-
-
-            # Get a list of layers names force reload dataProvider of layer
+            # force reload dataProvider in order to reindex
             if 'index' in layermanager:
-                for layer_name in layermanager['index']:
+                for lyr in layermanager['index']:
+                    layer_name = [key for key in lyr][0]
                     layer = self.controller.get_layer_by_tablename(layer_name)
                     if layer is None:
-                        sql = (f"SELECT jsonb_build_object ('{layer_name}',feature) "
-                               "FROM (SELECT jsonb_build_object('geom_field', geom_field, 'pkey_field', pkey_field, "
-                               "'style_id', style,'group_layer', group_layer) AS feature "
-                               "FROM (SELECT geom_field, pkey_field, style, group_layer from ws_sample.sys_table "
-                               f" LEFT JOIN ws_sample.config_table USING (id) WHERE id = '{layer_name}' "
-                               ") row) a;")
-                        row = self.controller.get_row(sql, commit=True, log_sql=True)
-                        the_geom = row[0][layer_name]['geom_field']
-                        field_id = row[0][layer_name]['pkey_field']
-                        group = row[0][layer_name]['group_layer']
-                        if the_geom is None or field_id is None:
-                            msg = "The next layer is misconfigured and cannot be loaded into the TOC"
-                            self.controller.show_warning(msg, parameter=layer_name)
+                        the_geom = lyr[layer_name]['geom_field']
+                        field_id = lyr[layer_name]['pkey_field']
+                        if lyr[layer_name]['group_layer'] is not None:
+                            group = lyr[layer_name]['group_layer']
                         else:
-                            self.add_layer.from_postgres_to_toc(layer_name, the_geom, field_id, group=group)
-                    self.controller.set_layer_index(layer_name)
+                            group = "GW Layers"
+                        self.add_layer.from_postgres_to_toc(layer_name, the_geom, field_id, group=group)
+                        style_id = lyr[layer_name]['style_id']
+                        if style_id is not None:
+                            extras = f'"style_id":"{style_id}"'
+                            body = self.create_body(extras=extras)
+                            style = self.controller.get_json('gw_fct_getstyle', body, log_sql=True)
 
-            # Get a layer name and set active
+                            if 'styles' in style['body']:
+                                if 'style' in style['body']['styles']:
+                                    qml = style['body']['styles']['style']
+                                self.create_qml(layer, qml)
+                    layer = self.controller.get_layer_by_tablename(layer_name)
+                    self.controller.set_layer_index(layer)
+
+            # Set active
             if 'active' in layermanager:
                 layer = self.controller.get_layer_by_tablename(layermanager['active'])
                 if layer:
                     self.iface.setActiveLayer(layer)
 
-            # Get a layer name and zoom to extent with a margin
+            # Set zoom to extent with a margin
             if 'zoom' in layermanager:
                 layer = self.controller.get_layer_by_tablename(layermanager['zoom']['layer'])
                 if layer:
