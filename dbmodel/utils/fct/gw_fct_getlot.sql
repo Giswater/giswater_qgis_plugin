@@ -143,9 +143,9 @@ BEGIN
 		v_fields_json := COALESCE(v_fields_json, '{}');	
 				
 		-- building
-		SELECT * INTO v_tab FROM config_form_tabs WHERE formname='lot' AND tabname='tabData' and device = v_device LIMIT 1;
+		SELECT * INTO v_tab FROM config_form_tabs WHERE formname='lot' AND tabname='tab_data' and device = v_device LIMIT 1;
 		IF v_tab IS NULL THEN 
-			SELECT * INTO v_tab FROM config_form_tabs WHERE formname='lot' AND tabname='tabData' LIMIT 1;			
+			SELECT * INTO v_tab FROM config_form_tabs WHERE formname='lot' AND tabname='tab_data' LIMIT 1;			
 		END IF;
 		v_tabaux := json_build_object('tabName',v_tab.tabname,'tabLabel',v_tab.label, 'tooltip',v_tab.tooltip, 
 		'tabFunction', v_tab.tabfunction::json, 'tabActions', v_tab.tabactions::json, 'active',v_activedatatab);

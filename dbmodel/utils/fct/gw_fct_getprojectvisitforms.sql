@@ -126,10 +126,10 @@ Generate one form for layer and one form for visitclass=incident
 		v_fields_json = array_to_json (v_fields);
 		v_fields_json := COALESCE(v_fields_json, '{}');	
 
-		SELECT * INTO v_tab FROM config_form_tabs WHERE formname='visit' AND tabname='tabData' and device = v_device LIMIT 1;
+		SELECT * INTO v_tab FROM config_form_tabs WHERE formname='visit' AND tabname='tab_data' and device = v_device LIMIT 1;
 
 		IF v_tab IS NULL THEN 
-			SELECT * INTO v_tab FROM config_form_tabs WHERE formname='visit' AND tabname='tabData' LIMIT 1;
+			SELECT * INTO v_tab FROM config_form_tabs WHERE formname='visit' AND tabname='tab_data' LIMIT 1;
 		END IF;
 
 		v_tabaux := json_build_object('tabName',v_tab.tabname,'tabLabel',v_tab.tablabel, 'tooltip',v_tab.tooltip, 
@@ -168,10 +168,10 @@ Generate one form for layer and one form for visitclass=incident
 		v_fields_json := COALESCE(v_fields_json, '{}');
 
 		-- building tab
-		SELECT * INTO v_tab FROM config_form_tabs WHERE formname='visit' AND tabname='tabFiles' and device = v_device LIMIT 1;
+		SELECT * INTO v_tab FROM config_form_tabs WHERE formname='visit' AND tabname='tab_file' and device = v_device LIMIT 1;
 		
 		IF v_tab IS NULL THEN 
-			SELECT * INTO v_tab FROM config_form_tabs WHERE formname='visit' AND tabname='tabFiles' LIMIT 1;
+			SELECT * INTO v_tab FROM config_form_tabs WHERE formname='visit' AND tabname='tab_file' LIMIT 1;
 		END IF;
 		
 		v_tabaux := json_build_object('tabName',v_tab.tabname,'tabLabel',v_tab.tablabel, 'tooltip',v_tab.tooltip, 
