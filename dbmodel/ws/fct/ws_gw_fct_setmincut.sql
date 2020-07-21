@@ -43,7 +43,7 @@ BEGIN
 	IF v_status THEN
 		RETURN gw_fct_json_create_return(gw_fct_mincut_valve_unaccess(v_node::text, v_mincut, current_user), 2980);
 	ELSE	
-		RETURN gw_fct_json_create_return(gw_fct_mincut(v_mincut, 'arc'::text, v_arc), 2980);
+		RETURN gw_fct_json_create_return(gw_fct_mincut(v_arc::text, 'arc'::text, v_mincut), 2980);
 	END IF;
 
 END;
