@@ -94,14 +94,14 @@ BEGIN
 			v_nodetype_id =  (SELECT value FROM config_param_user WHERE parameter='edit_nodetype_vdefault' AND cur_user=current_user);
 		END IF;
 	
-		SELECT isarcdivide INTO v_isarcdivide FROM node_type WHERE id=v_nodetype_id;
-		UPDATE node_type SET isarcdivide=FALSE WHERE id=v_nodetype_id;	
+		SELECT isarcdivide INTO v_isarcdivide FROM cat_feature_node WHERE id=v_nodetype_id;
+		UPDATE cat_feature_node SET isarcdivide=FALSE WHERE id=v_nodetype_id;	
 	
 		-- execute function
 		PERFORM gw_fct_arc_repair(arc_id, 0,0) FROM arc WHERE expl_id=v_expl AND (node_1 IS NULL OR node_2 IS NULL);
 	
 		-- restore isarcdivide to previous value
-		UPDATE node_type SET isarcdivide=v_isarcdivide WHERE id=v_nodetype_id;	
+		UPDATE cat_feature_node SET isarcdivide=v_isarcdivide WHERE id=v_nodetype_id;	
 		
 	END IF;	
 
