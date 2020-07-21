@@ -112,8 +112,7 @@ BEGIN
 		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom) SELECT 187, node_id, nodecat_id, ''nodes
 		with state_type isoperative = false'', the_geom FROM (', v_querytext,')a');
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
-		VALUES (v_fid, 2, concat('WARNING: There is/are ',v_count,' node(s) with state > 0 and state_type.is_operative on FALSE. Please, check your
-		data before continue. ()'));
+		VALUES (v_fid, 2, concat('WARNING: There is/are ',v_count,' node(s) with state > 0 and state_type.is_operative on FALSE. Please, check your data before continue. ()'));
 		INSERT INTO audit_check_data (fid, criticity, error_message)
 		VALUES (v_fid, 2, concat('SELECT * FROM anl_node WHERE fid = 187 AND cur_user=current_user'));
 	ELSE
@@ -385,7 +384,7 @@ BEGIN
 	SELECT count(*) INTO v_count FROM v_edit_inp_pump WHERE pump_type IS NULL;
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ',v_count,' pump''s with null values on pump_type column).'));
+		VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ',v_count,' pump''s with null values on pump_type column.'));
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -395,7 +394,7 @@ BEGIN
 	--pump curve
 	SELECT count(*) INTO v_count FROM v_edit_inp_pump WHERE curve_id IS NULL;
 	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, error_message)
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 3, concat(
 		'ERROR: There is/are ',v_count,' pump(s) with null values at least on mandatory column curve_id.'));
 		v_count=0;
@@ -408,7 +407,7 @@ BEGIN
 	--pump additional
 	SELECT count(*) INTO v_count FROM inp_pump_additional JOIN v_edit_inp_pump USING (node_id) WHERE inp_pump_additional.curve_id IS NULL;
 	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fid, result_id, table_id, column_id, error_message)
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 3, concat(
 		'ERROR: There is/are ',v_count,' additional pump(s) with null values at least on mandatory column curve_id.'));
 		v_count=0;
@@ -473,7 +472,7 @@ BEGIN
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 3, concat(
-		'ERROR: There is/are ',v_count,' register(s) on arc''s catalog with null values on dint column).'));
+		'ERROR: There is/are ',v_count,' register(s) on arc''s catalog with null values on dint column.'));
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
