@@ -14,9 +14,7 @@ RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"data":{ "resultId":"z1", "useNetworkGeom":"false"}}$$)
-
-delete from SCHEMA_NAME.rpt_cat_result
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"data":{ "resultId":"test_bgeo_b1", "useNetworkGeom":"false"}}$$)
 
 --fid: 227
 
@@ -204,27 +202,27 @@ BEGIN
 	IF v_delnetwork THEN
 		RAISE NOTICE '18 - Delete disconnected arcs with associated nodes';
 		INSERT INTO audit_log_data (fid, feature_id, feature_type, log_message) SELECT v_fid, arc_id, arc_type, '18 - Delete disconnected arcs with associated nodes'
-		FROM temp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fid = 39 AND cur_user=current_user);
-		DELETE FROM temp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fid = 39 AND cur_user=current_user);
+		FROM temp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fid = 139 AND cur_user=current_user);
+		DELETE FROM temp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fid = 139 AND cur_user=current_user);
 		
 		INSERT INTO audit_log_data (fid, feature_id, feature_type, log_message) SELECT v_fid, node_id, node_type, '18 - Delete disconnected arcs with associated nodes'
-		FROM temp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fid = 39 AND cur_user=current_user);
-		DELETE FROM temp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fid = 39 AND cur_user=current_user);
+		FROM temp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fid = 139 AND cur_user=current_user);
+		DELETE FROM temp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fid = 139 AND cur_user=current_user);
 			
 		RAISE NOTICE '19 - Delete orphan nodes';
 		INSERT INTO audit_log_data (fid, feature_id, feature_type, log_message) SELECT v_fid, node_id, node_type, '19 - Delete orphan nodes'
-		FROM temp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fid = 7 AND cur_user=current_user);
-		DELETE FROM temp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fid = 7 AND cur_user=current_user);
+		FROM temp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fid = 107 AND cur_user=current_user);
+		DELETE FROM temp_node WHERE node_id IN (SELECT node_id FROM anl_node WHERE fid = 107 AND cur_user=current_user);
 
 		RAISE NOTICE '20 - Delete arcs without extremal nodes';
 		INSERT INTO audit_log_data (fid, feature_id, feature_type, log_message) SELECT v_fid, arc_id, arc_type, '20 - Delete arcs without extremal nodes'
-		FROM temp_arc  WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fid = 3 AND cur_user=current_user);
-		DELETE FROM temp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fid = 3 AND cur_user=current_user);
+		FROM temp_arc  WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fid = 103 AND cur_user=current_user);
+		DELETE FROM temp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fid = 103 AND cur_user=current_user);
 	END IF;
 
 	IF v_removedemand THEN
 		RAISE NOTICE '21 Set demand = 0 for dry nodes';
-		UPDATE temp_node n SET demand = 0 FROM anl_node a WHERE fid = 132 AND cur_user = current_user AND a.node_id = t.node_id;
+		UPDATE temp_node n SET demand = 0 FROM anl_node a WHERE fid = 132 AND cur_user = current_user AND a.node_id = n.node_id;
 	END IF;
 
 	RAISE NOTICE '22 - Check result previous exportation';
