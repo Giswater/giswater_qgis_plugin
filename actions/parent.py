@@ -1425,13 +1425,11 @@ class ParentAction(object):
                             extras = f'"style_id":"{style_id}"'
                             body = self.create_body(extras=extras)
                             style = self.controller.get_json('gw_fct_getstyle', body, log_sql=True)
-                            new_layer_name = v_layer.name()
 
                             if 'styles' in style['body']:
                                 if 'style' in style['body']['styles']:
                                     qml = style['body']['styles']['style']
-                                v_layer.setName(new_layer_name)
-                                self.create_qml(v_layer, qml)
+                                    self.create_qml(v_layer, qml)
 
                         elif style_type[key]['style'] == 'unique':
                             color = style_type[key]['style']['values']['color']
@@ -1464,26 +1462,12 @@ class ParentAction(object):
             return
 
         try:
-            funct_id = layermanager['functionId'] if 'functionId' in layermanager else None
 
-            # Get a list of layers names and set visible
-            # For the visible layers, xxx names of layers are received, it is checked if they exist in the TOC,
-            # if so they become visible. If not, a string is generated with the name of the layers that are not in the
-            # TOC and through the function gw_fct_getstyle the table sys_table.addtoc is looked for the configuration of
-            # each one, the configuration of this layer It must be as in the following example:
-            # {"tableName":"v_edit_arc","primaryKey":"arc_id", "geom":"the_geom","group":"grouptest","style":"xxx"}.
-            # The indispensable fields to load the layer are tableName, primaryKey and geom.
-            # The group and qml fields are optional, where group is to indicate in which TOC group we want our layer to
-            # enter and qml is to indicate that we want to add a qml to this layer. If you want to add a qml, it must be
-            # inserted in the table sys_style.stylevalue where idval is the id of the postgre function that is running
-            # and styletype if the layer is line, poin or polygon
             if 'visible' in layermanager:
                 for lyr in layermanager['visible']:
                     layer_name = [key for key in lyr][0]
-
                     layer = self.controller.get_layer_by_tablename(layer_name)
                     if layer is None:
-
                         the_geom = lyr[layer_name]['geom_field']
                         field_id = lyr[layer_name]['pkey_field']
                         if lyr[layer_name]['group_layer'] is not None:
@@ -1493,12 +1477,11 @@ class ParentAction(object):
                         self.add_layer.from_postgres_to_toc(layer_name, the_geom, field_id, group=group)
                     layer = self.controller.get_layer_by_tablename(layer_name)
                     self.controller.set_layer_visible(layer)
-                    print(layermanager['visible'])
-                    style_id = layermanager['visible'][0][layer_name]['style_id']
+                    style_id = lyr[layer_name]['style_id']
                     extras = f'"style_id":"{style_id}"'
                     body = self.create_body(extras=extras)
                     style = self.controller.get_json('gw_fct_getstyle', body, log_sql=True)
-                    
+
                     if 'styles' in style['body']:
                         if 'style' in style['body']['styles']:
                             qml = style['body']['styles']['style']
