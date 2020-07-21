@@ -44,6 +44,10 @@ INSERT INTO config_table(id, style) VALUES('Overlap affected arcs', 105);
 INSERT INTO config_table(id, style) VALUES('Overlap affected connecs', 106);
 INSERT INTO config_table(id, style) VALUES('Other mincuts whichs overlaps', 107);
 
+UPDATE sys_table SET(geom_field, pkey_field) = ('the_geom', 'id') WHERE id = 'om_mincut_arc';
+UPDATE sys_table SET(geom_field, pkey_field) = ('the_geom', 'id') WHERE id = 'om_mincut_connec';
+UPDATE sys_table SET(geom_field, pkey_field) = ('the_geom', 'id') WHERE id = 'om_mincut_node';
+
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role)
 VALUES (2980, 'gw_fct_setmincut', 'utils', 'function', 'json', 'json', NULL, 'role_edit');
 
