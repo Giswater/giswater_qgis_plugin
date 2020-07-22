@@ -61,7 +61,7 @@ class LoadProject(QObject):
         self.plugin_toolbars = {}
         self.dict_toolbars = {}
         self.dict_actions = {}
-        self.buttons_not_checkable = []
+        self.actions_not_checkable = []
         self.list_to_hide = []
         self.actions = {}
         self.map_tools = {}
@@ -70,11 +70,11 @@ class LoadProject(QObject):
         self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep
 
 
-    def set_params_config(self, dict_toolbars, dict_actions, buttons_not_checkable):
+    def set_params_config(self, dict_toolbars, dict_actions, actions_not_checkable):
 
         self.dict_toolbars = dict_toolbars
         self.dict_actions = dict_actions
-        self.buttons_not_checkable = buttons_not_checkable
+        self.actions_not_checkable = actions_not_checkable
 
 
     def project_read(self, show_warning=True):
@@ -603,11 +603,11 @@ class LoadProject(QObject):
         if not function_name:
             return None
 
-        # Buttons NOT checkable (normally because they open a form)
-        if index_action in self.buttons_not_checkable:
+        # Actions NOT checkable (normally because they open a form)
+        if index_action in self.actions_not_checkable:
             action = self.create_action(index_action, text_action, toolbar, False, function_name, action_group)
 
-        # Buttons checkable (normally related with 'map_tools')
+        # Actions checkable (normally related with 'map_tools')
         else:
             action = self.create_action(index_action, text_action, toolbar, True, function_name, action_group)
 

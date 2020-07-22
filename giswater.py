@@ -38,7 +38,7 @@ class Giswater(QObject):
         self.load_project = None
         self.dict_toolbars = {}
         self.dict_actions = {}
-        self.buttons_not_checkable = None
+        self.actions_not_checkable = None
         self.available_layers = []
         self.btn_add_layers = None
         self.update_sql = None
@@ -138,9 +138,6 @@ class Giswater(QObject):
         # Manage section 'actions_list' of config file
         self.manage_section_actions_list()
 
-        # Manage section 'actions' of config file
-        self.manage_section_actions()
-
         # Manage section 'toolbars' of config file
         self.manage_section_toolbars()
 
@@ -149,7 +146,7 @@ class Giswater(QObject):
         """ Manage section 'actions_list' of config file """
 
         # Dynamically get parameters defined in section 'actions_list'
-        section = 'actions_list'
+        section = 'actions_not_checkable'
         global_vars.settings.beginGroup(section)
         list_keys = global_vars.settings.allKeys()
         global_vars.settings.endGroup()
@@ -160,19 +157,13 @@ class Giswater(QObject):
             else:
                 self.controller.show_warning(f"Parameter not set in section '{section}' of config file: '{key}'")
 
-        self.controller.log_info(self.dict_actions)
-
-
-    def manage_section_actions(self):
-        """ Manage section 'actions' of config file """
-
-        # Load list of buttons that are not checkable
+        # Get list of actions not checkable (normally because they open a form)
         aux = []
         for list_actions in self.dict_actions.values():
             for elem in list_actions:
                 aux.append(elem)
 
-        self.buttons_not_checkable = sorted(aux)
+        self.actions_not_checkable = sorted(aux)
 
 
     def manage_section_toolbars(self):
@@ -208,7 +199,7 @@ class Giswater(QObject):
 
         # Create class to manage code that performs project configuration
         self.load_project = LoadProject(self.iface, global_vars.settings, self.controller, self.plugin_dir)
-        self.load_project.set_params_config(self.dict_toolbars, self.dict_actions, self.buttons_not_checkable)
+        self.load_project.set_params_config(self.dict_toolbars, self.dict_actions, self.actions_not_checkable)
         self.load_project.project_read(show_warning)
 
 
