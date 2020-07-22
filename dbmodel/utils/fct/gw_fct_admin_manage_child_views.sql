@@ -48,7 +48,8 @@ v_tableversion text = 'sys_version';
 v_columntype text = 'project_type';
 v_return_status text = 'Failed';
 v_return_msg text = 'Process finished with some errors';
-	
+v_error_context text;
+
 BEGIN
 
 	-- search path
@@ -83,6 +84,9 @@ BEGIN
 			PERFORM gw_fct_debug(concat('{"data":{"msg":"Deleted layer: ", "variables":"',v_childview,'"}}')::json);
 
 		END LOOP;
+
+		v_return_status = 'Accepted';
+		v_return_msg = 'Process finished successfully';
 
 	ELSE 
 		--if the view should be created for all the features loop over the cat_features
@@ -226,6 +230,10 @@ BEGIN
 					"feature":{"catFeature":"'||v_cat_feature||'"}, 
 					"data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'", "feature_type":"'||v_feature_type||'" }}$$);';
 				END IF;
+
+				v_return_status = 'Accepted';
+				v_return_msg = 'Process finished successfully';
+
 			END LOOP;
 			
 		ELSIF v_multi_create IS NOT TRUE AND v_project_type IS NOT NULL THEN 
@@ -367,13 +375,23 @@ BEGIN
 				
 			END IF;
 		END IF;
+
+		PERFORM gw_fct_admin_role_permissions();
 	END IF;
+
+	
 
 	--  Return
 	RETURN ('{"status":"'||v_return_status||'", "message":{"level":0, "text":"'||v_return_msg||'"} '||
 		',"body":{"form":{}'||
 		',"data":{}}'||
 		'}')::json;
+
+
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+
 
 END;
 $BODY$
