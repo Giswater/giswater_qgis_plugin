@@ -222,7 +222,7 @@ class CrmTrace(ApiParent):
                     self.populate_vlayer(v_layer, data, k)
                     if 'qmlPath' in data[k]:
                         qml_path = data[k]['qmlPath']
-                        self.load_qml(v_layer, qml_path)
+                        self.add_layer.load_qml(v_layer, qml_path)
                     else:
                         if geometry_type == 'Point':
                             v_layer.renderer().symbol().setSize(3.5)

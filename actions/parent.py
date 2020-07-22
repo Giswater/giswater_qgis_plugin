@@ -968,26 +968,6 @@ class ParentAction(object):
             btn_accept.setEnabled(False)
 
 
-    def load_qml(self, layer, qml_path):
-        """ Apply QML style located in @qml_path in @layer """
-
-        if layer is None:
-            return False
-
-        if not os.path.exists(qml_path):
-            self.controller.log_warning("File not found", parameter=qml_path)
-            return False
-
-        if not qml_path.endswith(".qml"):
-            self.controller.log_warning("File extension not valid", parameter=qml_path)
-            return False
-
-        layer.loadNamedStyle(qml_path)
-        layer.triggerRepaint()
-
-        return True
-
-
     def open_file_path(self, filter_="All (*.*)"):
         """ Open QFileDialog """
         msg = self.controller.tr("Select DXF file")
@@ -1429,7 +1409,7 @@ class ParentAction(object):
                             if 'styles' in style['body']:
                                 if 'style' in style['body']['styles']:
                                     qml = style['body']['styles']['style']
-                                    self.create_qml(v_layer, qml)
+                                    self.add_layer.create_qml(v_layer, qml)
 
                         elif style_type[key]['style'] == 'unique':
                             color = style_type[key]['style']['values']['color']
@@ -1484,7 +1464,7 @@ class ParentAction(object):
                             if 'styles' in style['body']:
                                 if 'style' in style['body']['styles']:
                                     qml = style['body']['styles']['style']
-                                self.create_qml(layer, qml)
+                                self.add_layer.create_qml(layer, qml)
                     self.controller.set_layer_visible(layer)
 
             # force reload dataProvider in order to reindex.
@@ -1552,20 +1532,6 @@ class ParentAction(object):
         extent.set(xmin, ymin, xmax, ymax)
         self.iface.mapCanvas().setExtent(extent)
         self.iface.mapCanvas().refresh()
-
-
-    def create_qml(self, layer, style):
-
-        main_folder = os.path.join(os.path.expanduser("~"), self.controller.plugin_name)
-        config_folder = main_folder + os.sep + "temp" + os.sep
-        if not os.path.exists(config_folder):
-            os.makedirs(config_folder)
-        path_temp_file = config_folder + 'temp_qml.qml'
-        file = open(path_temp_file, 'w')
-        file.write(style)
-        file.close()
-        del file
-        self.load_qml(layer, path_temp_file)
 
 
     def manage_actions(self, json_result, sql):

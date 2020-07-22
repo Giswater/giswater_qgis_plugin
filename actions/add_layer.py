@@ -116,6 +116,20 @@ class AddLayer(object):
         self.iface.mapCanvas().refresh()
 
 
+    def create_qml(self, layer, style):
+
+        main_folder = os.path.join(os.path.expanduser("~"), self.controller.plugin_name)
+        config_folder = main_folder + os.sep + "temp" + os.sep
+        if not os.path.exists(config_folder):
+            os.makedirs(config_folder)
+        path_temp_file = config_folder + 'temp_qml.qml'
+        file = open(path_temp_file, 'w')
+        file.write(style)
+        file.close()
+        del file
+        self.load_qml(layer, path_temp_file)
+
+
     def check_for_group(self, layer, group=None):
         """ If the function receives a group name, check if it exists or not and put the layer in this group
         :param layer: (QgsVectorLayer)

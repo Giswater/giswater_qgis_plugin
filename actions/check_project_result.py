@@ -201,7 +201,7 @@ class CheckProjectResult(ApiParent):
                         if 'styles' in style['body']:
                             if 'style' in style['body']['styles']:
                                 qml = style['body']['styles']['style']
-                            self.create_qml(layer, qml)
+                            self.add_layer.create_qml(layer, qml)
                 self.controller.set_layer_visible(layer)
 
         self.close_dialog(self.dlg_audit_project)
