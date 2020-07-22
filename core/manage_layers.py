@@ -28,7 +28,6 @@ class ManageLayers:
         self.controller = controller
         self.plugin_dir = plugin_dir
         self.available_layers = None
-        self.hide_form = None
         self.add_layer = None
         self.project_type = None
         self.schema_name = None
@@ -57,15 +56,12 @@ class ManageLayers:
         self.add_layers_button()
 
         # Set project layers with gw_fct_getinfofromid: This process takes time for user
-        if self.hide_form is False:
-            # Set background task 'ConfigLayerFields'
-            description = f"ConfigLayerFields"
-            self.task_get_layers = TaskConfigLayerFields(description, self.controller)
-            self.task_get_layers.set_params(self.project_type, self.schema_name, self.qgis_project_infotype)
-            QgsApplication.taskManager().addTask(self.task_get_layers)
-            QgsApplication.taskManager().triggerTask(self.task_get_layers)
-        else:
-            self.controller.log_info(f"hideForm is True")
+        # Set background task 'ConfigLayerFields'
+        description = f"ConfigLayerFields"
+        self.task_get_layers = TaskConfigLayerFields(description, self.controller)
+        self.task_get_layers.set_params(self.project_type, self.schema_name, self.qgis_project_infotype)
+        QgsApplication.taskManager().addTask(self.task_get_layers)
+        QgsApplication.taskManager().triggerTask(self.task_get_layers)
 
         return True
 
@@ -85,12 +81,10 @@ class ManageLayers:
 
             # check project
             status, result = self.check_project_result.populate_audit_check_project(layers, "true")
-            self.hide_form = False
             try:
                 if 'actions' in result['body']:
                     if 'useGuideMap' in result['body']['actions']:
                         guided_map = result['body']['actions']['useGuideMap']
-                        self.hide_form = result['body']['actions']['hideForm']
                         if guided_map:
                             self.controller.log_info("manage_guided_map")
                             self.manage_guided_map()
