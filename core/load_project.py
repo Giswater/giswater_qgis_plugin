@@ -405,11 +405,10 @@ class LoadProject(QObject):
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
 
-        toolbar_key = f"{toolbar_id}_{self.controller.get_project_type()}"
-        if toolbar_key not in self.dict_toolbars:
+        if toolbar_id not in self.dict_toolbars:
             return
 
-        list_actions = self.dict_toolbars[toolbar_key]
+        list_actions = self.dict_toolbars[toolbar_id]
         self.manage_toolbar(toolbar_id, list_actions)
         if x and y:
             self.set_toolbar_position(self.translate(f'toolbar_{toolbar_id}_name'), x, y)
@@ -420,11 +419,10 @@ class LoadProject(QObject):
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
 
-        toolbar_key = f"{toolbar_id}_{self.controller.get_project_type()}"
-        if toolbar_key not in self.dict_toolbars:
+        if toolbar_id not in self.dict_toolbars:
             return
 
-        list_actions = self.dict_toolbars[toolbar_key]
+        list_actions = self.dict_toolbars[toolbar_id]
         self.manage_toolbar(toolbar_id, list_actions)
         if x and y:
             self.set_toolbar_position(self.translate(f'toolbar_{toolbar_id}_name'), x, y)
