@@ -370,8 +370,11 @@ class LoadProject:
         for parent_layer in parent_layers:
 
             # Get child layers
-            sql = (f"SELECT DISTINCT(child_layer), lower(feature_type), id as alias FROM cat_feature "
-                   f"WHERE parent_layer = '{parent_layer[1]}' "
+            sql = (f"SELECT DISTINCT(child_layer), lower(feature_type), cat_feature.id as alias, style as style_id, "
+                   f" group_layer "
+                   f" FROM cat_feature "
+                   f" LEFT JOIN config_table ON config_table.id = child_layer "
+                   f"WHERE parent_layer = '{parent_layer[1]}' "                   
                    f"AND child_layer IN ("
                    f"   SELECT table_name FROM information_schema.tables"
                    f"   WHERE table_schema = '{schema_name}')"
@@ -382,7 +385,7 @@ class LoadProject:
 
             # Create sub menu
             sub_menu = main_menu.addMenu(str(parent_layer[0]))
-            child_layers.insert(0, ['Load all', 'Load all', 'Load all'])
+            child_layers.insert(0, ['Load all', 'Load all', 'Load all', 'Load all', 'Load all'])
             for child_layer in child_layers:
                 # Create actions
                 action = QAction(str(child_layer[2]), sub_menu, checkable=True)
@@ -398,11 +401,15 @@ class LoadProject:
 
                 sub_menu.addAction(action)
                 if child_layer[0] == 'Load all':
-                    action.triggered.connect(partial(self.add_layer.from_postgres_to_toc,
-                        child_layers=child_layers, group=None))
+                    action.triggered.connect(partial(self.add_layer.from_postgres_to_toc, child_layers=child_layers))
+
                 else:
-                    action.triggered.connect(partial(self.add_layer.from_postgres_to_toc,
-                        child_layer[0], "the_geom", child_layer[1]+"_id", None, None))
+                    layer_name = child_layer[0]
+                    the_geom = "the_geom"
+                    geom_field = child_layer[1]+"_id"
+                    style_id = child_layer[3]
+                    group = child_layer[4] if child_layer[4] is not None else 'GW Layers'
+                    action.triggered.connect(partial(self.add_layer.from_postgres_to_toc, layer_name, the_geom, geom_field, None, group, style_id))
 
         main_menu.exec_(click_point)
 
