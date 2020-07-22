@@ -186,8 +186,8 @@ class AddNewLot(ParentManage):
 
         self.set_icon(self.dlg_lot.btn_open_image, "136b")
         self.dlg_lot.btn_open_image.clicked.connect(partial(self.open_load_image, self.tbl_load, 'v_ui_om_vehicle_x_parameters'))
-        
-        if lot_id is not None and utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 1) not in (None, ''):
+
+        if lot_id is not None:
             self.set_values(lot_id)
             self.geom_type = utils_giswater.get_item_data(self.dlg_lot, self.visit_class, 2).lower()
             self.populate_table_relations(lot_id)
