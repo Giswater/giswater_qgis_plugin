@@ -556,6 +556,7 @@ BEGIN
 						'"polygon":'||v_result_polygon||','||
 						'"missingLayers":'||v_missing_layers||'}'||
 				', "variables":{"hideForm":' || v_hidden_form || ', "setQgisLayers":' || v_qgis_layers_setpropierties||', "useGuideMap":'||v_qgis_init_guide_map||'}}}')::json;
+				-- setQgisLayers: not used variable on python 3.4 because threath is operative to refresh_attributte of whole layers
 	ELSE
 		v_return= ('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'" '||
 			',"body":{"form":{}'||
@@ -565,6 +566,7 @@ BEGIN
 						'"polygon":{},'||
 						'"missingLayers":{}}'||
 				', "variables":{"hideForm":true, "setQgisLayers":' || v_qgis_layers_setpropierties||', "useGuideMap":'||v_qgis_init_guide_map||'}}}')::json;
+				-- setQgisLayers: not used variable on python 3.4 because threath is operative to refresh_attribute of whole layers
 	END IF;
 		
 	--  Return	   
