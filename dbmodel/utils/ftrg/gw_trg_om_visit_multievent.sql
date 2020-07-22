@@ -16,6 +16,7 @@ DECLARE
     v_new_value_param text;
     v_query_text text;
     visit_table text;
+    v_visit_type integer;
     
 BEGIN
 
@@ -23,6 +24,9 @@ BEGIN
     visit_class:= TG_ARGV[0];
 
     visit_table=(SELECT lower(feature_type) FROM config_visit_class WHERE id=visit_class);
+
+    --INFO: v_visit_type=1 (planned) v_visit_type=2(unexpected/incidencia)	
+    v_visit_type=(SELECT visit_type FROM om_visit_class WHERE id=visit_class);
 
 
     IF TG_OP = 'INSERT' THEN
@@ -40,12 +44,13 @@ BEGIN
 		NEW.status=4;
 	END IF;
 
-	IF NEW.status=4 AND NEW.enddate IS NULL THEN
+	-- force enddate for planified visits (unexpected can have enddate NULL to manage it later)
+	IF NEW.status=4 AND NEW.enddate IS NULL AND v_visit_type=1 THEN
 		NEW.enddate=left (date_trunc('second', now())::text, 19);
 	END IF;
 	
 	-- only for planified visits insert lot_id
-	IF (SELECT visit_type FROM om_visit_class WHERE id=visit_class)=1 THEN
+	IF v_visit_type=1 THEN
 		INSERT INTO om_visit(id, visitcat_id, ext_code, startdate, enddate, webclient_id, expl_id, the_geom, descript, is_done, class_id, lot_id, status) 
 		VALUES (NEW.visit_id, NEW.visitcat_id, NEW.ext_code, NEW.startdate::timestamp, NEW.enddate, NEW.webclient_id, NEW.expl_id, NEW.the_geom, NEW.descript, 
 		NEW.is_done, NEW.class_id, NEW.lot_id, NEW.status);
@@ -87,18 +92,15 @@ BEGIN
         RETURN NEW; 
 
     ELSIF TG_OP = 'UPDATE' THEN
+     
  
- 
-	IF  NEW.enddate IS NOT NULL THEN
-		UPDATE om_visit SET enddate=left (date_trunc('second', NEW.enddate::date)::text, 19)::timestamp WHERE id=NEW.visit_id;	
-	END IF;
-    
-	IF (SELECT visit_type FROM om_visit_class WHERE id=visit_class)=1 THEN
-		UPDATE om_visit SET  visitcat_id=NEW.visitcat_id, ext_code=NEW.ext_code, 
+	IF v_visit_type=1 THEN
+		UPDATE om_visit SET  visitcat_id=NEW.visitcat_id, ext_code=NEW.ext_code, enddate=NEW.enddate, 
 		webclient_id=NEW.webclient_id, expl_id=NEW.expl_id, the_geom=NEW.the_geom, descript=NEW.descript, is_done=NEW.is_done, class_id=NEW.class_id,
 		lot_id=NEW.lot_id, status=NEW.status WHERE id=NEW.visit_id;
 	ELSE 
-		UPDATE om_visit SET  visitcat_id=NEW.visitcat_id, ext_code=NEW.ext_code, 
+		
+		UPDATE om_visit SET  visitcat_id=NEW.visitcat_id, ext_code=NEW.ext_code, enddate=NEW.enddate,
 		webclient_id=NEW.webclient_id, expl_id=NEW.expl_id, the_geom=NEW.the_geom, descript=NEW.descript, is_done=NEW.is_done, class_id=NEW.class_id,
 		status=NEW.status WHERE id=NEW.visit_id;
 	END IF;
