@@ -24,9 +24,6 @@ UPDATE sys_table SET(geom_field, pkey_field) = ('the_geom', 'id') WHERE id = 'v_
 
 INSERT INTO sys_table(id, descript, sys_role, sys_criticity, sys_sequence, sys_sequence_field, pkey_field)
 VALUES ('config_function', 'Table with the layers and styles of them, which are needed to handle other functions', 'role_om', 0, NULL, NULL, 'id');
-INSERT INTO sys_table(id, descript, sys_role, sys_criticity, sys_sequence, sys_sequence_field, pkey_field)
-VALUES ('config_function', 'Tabla con los estilos de las capas', 'role_edit', 0, NULL, NULL, 'id');
-
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role)
 VALUES (2976, 'gw_fct_json_create_return', 'utils', 'function', 'json, integer', 'json', 'Handles styles according to config_function', 'role_edit');
