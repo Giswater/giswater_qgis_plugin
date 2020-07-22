@@ -40,7 +40,7 @@ BEGIN
     
     IF TG_OP = 'INSERT' THEN
      
-      IF v_isutils IS FALSE THEN  
+      IF v_isutils IS FALSE OR v_isutils IS NULL THEN  
         --get muni and expl_id value if its null    
         IF NEW.expl_id IS NULL THEN
           NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
