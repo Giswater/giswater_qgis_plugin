@@ -92,13 +92,14 @@ class AddLayer(object):
             self.controller.log_info(F"ERROR --> {error[1]}")
 
 
-    def from_postgres_to_toc(self, tablename=None, the_geom="the_geom", field_id="id", child_layers=None, group="GW Layers"):
+    def from_postgres_to_toc(self, tablename=None, the_geom="the_geom", field_id="id", child_layers=None, group="GW Layers", style_id="-1"):
         """ Put selected layer into TOC
-        :param tablename: Postgres table name (string)
-        :param the_geom: Geometry field of the table (string)
-        :param field_id: Field id of the table (string)
-        :param child_layers: List of layers (stringList)
-        :param group: Name of the group that will be created in the toc (string)
+        :param tablename: Postgres table name (String)
+        :param the_geom: Geometry field of the table (String)
+        :param field_id: Field id of the table (String)
+        :param child_layers: List of layers (StringList)
+        :param group: Name of the group that will be created in the toc (String)
+        :param style_id: Id of the style we want to load (integer or String)
         """
 
         self.set_uri()
@@ -108,11 +109,31 @@ class AddLayer(object):
                 if layer[0] != 'Load all':
                     self.uri.setDataSource(schema_name, f'{layer[0]}', the_geom, None, layer[1] + "_id")
                     vlayer = QgsVectorLayer(self.uri.uri(), f'{layer[0]}', "postgres")
+                    group = layer[4] if layer[4] is not None else group
+                    group = group if group is not None else 'GW Layers'
                     self.check_for_group(vlayer, group)
+                    style_id = layer[3]
+                    if style_id is not None:
+                        body = f'$${{"data":{{"style_id":"{style_id}"}}}}$$'
+                        style = self.controller.get_json('gw_fct_getstyle', body, log_sql=True)
+                        if 'styles' in style['body']:
+                            if 'style' in style['body']['styles']:
+                                qml = style['body']['styles']['style']
+                                self.create_qml(vlayer, qml)
         else:
             self.uri.setDataSource(schema_name, f'{tablename}', the_geom, None, field_id)
             vlayer = QgsVectorLayer(self.uri.uri(), f'{tablename}', 'postgres')
             self.check_for_group(vlayer, group)
+            # The triggered function (action.triggered.connect(partial(...)) as the last parameter sends a boolean,
+            # if we define style_id = None, style_id will take the boolean of the triggered action as a fault,
+            # therefore, we define it with "-1"
+            if style_id not in (None, "-1"):
+                body = f'$${{"data":{{"style_id":"{style_id}"}}}}$$'
+                style = self.controller.get_json('gw_fct_getstyle', body, log_sql=True)
+                if 'styles' in style['body']:
+                    if 'style' in style['body']['styles']:
+                        qml = style['body']['styles']['style']
+                        self.create_qml(vlayer, qml)
         self.iface.mapCanvas().refresh()
 
 

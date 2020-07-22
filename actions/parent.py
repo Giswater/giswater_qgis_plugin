@@ -1455,16 +1455,8 @@ class ParentAction(object):
                             group = lyr[layer_name]['group_layer']
                         else:
                             group = "GW Layers"
-                        self.add_layer.from_postgres_to_toc(layer_name, the_geom, field_id, group=group)
                         style_id = lyr[layer_name]['style_id']
-                        if style_id is not None:
-                            extras = f'"style_id":"{style_id}"'
-                            body = self.create_body(extras=extras)
-                            style = self.controller.get_json('gw_fct_getstyle', body, log_sql=True)
-                            if 'styles' in style['body']:
-                                if 'style' in style['body']['styles']:
-                                    qml = style['body']['styles']['style']
-                                self.add_layer.create_qml(layer, qml)
+                        self.add_layer.from_postgres_to_toc(layer_name, the_geom, field_id, group=group, style_id=style_id)
                     self.controller.set_layer_visible(layer)
 
             # force reload dataProvider in order to reindex.
