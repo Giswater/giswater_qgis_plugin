@@ -231,10 +231,8 @@ VALUES(2430,'gw_fct_pg2epa_check_data','{"style":{"point":{"style":"unique", "va
 -- 21/02/2020
 UPDATE config_form_fields SET dv_querytext = 'SELECT id, idval FROM config_visit_class WHERE feature_type=''ARC'' AND  active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))' WHERE formname = 'visit_singlevent' AND columnname = 'class_id';
 
+UPDATE config_form_fields SET dv_querytext = 'SELECT id, idval FROM config_visit_class WHERE feature_type=''ARC'' AND  active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))' WHERE formname = 'visit_multievent' AND columnname = 'class_id';
+
 UPDATE config_form_fields SET dv_querytext = 'SELECT id, idval FROM (SELECT node_1 AS id, node_1 AS idval FROM arc UNION SELECT DISTINCT node_2 AS id, node_2 AS idval FROM arc)c WHERE id IS NOT NULL' WHERE formname = 'visit_singlevent' AND columnname = 'position_id';
-
-UPDATE config_form_fields SET dv_querytext = 'SELECT id, idval FROM config_visit_class WHERE feature_type=''ARC'' AND  active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))' WHERE formname = 'visit_node_inspeccio' AND columnname = 'class_id';
-
-UPDATE config_form_fields SET dv_querytext = 'SELECT id, idval FROM config_visit_class WHERE feature_type=''ARC'' AND  active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))' WHERE formname = 'visit_node_revisio' AND columnname = 'class_id';
 
 UPDATE sys_param_user SET formname = 'hidden' WHERE formname = 'hidden_value';
