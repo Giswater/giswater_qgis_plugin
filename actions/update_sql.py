@@ -3432,6 +3432,10 @@ class UpdateSQL(ApiParent):
 
         if str(self.list_connections) != '[]':
             utils_giswater.set_item_data(self.dlg_credentials.cmb_connection, self.list_connections, 1)
+        else:
+            msg = ("You don't have any connection configurated on QGIS. Check your connections.")
+            self.controller.show_info_box(msg, "Info")
+            return
 
         utils_giswater.setWidgetText(self.dlg_credentials, self.dlg_credentials.cmb_connection, str(set_connection))
 
