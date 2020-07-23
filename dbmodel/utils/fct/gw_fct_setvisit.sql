@@ -207,7 +207,9 @@ BEGIN
 		FOREACH v_addphotos IN ARRAY v_addphotos_array
 		LOOP
 			-- Inserting data
-			EXECUTE 'INSERT INTO om_visit_event_photo (visit_id, event_id, tstamp, value, text, hash) VALUES('''||v_id||''', '''||v_event_id||''', '''||NOW()||''', '''||CONCAT((v_addphotos->>'json_array_elements')::json->>'photo_url'::text, (v_addphotos->>'json_array_elements')::json->>'hash'::text)||''', ''demo image'', '''||((v_addphotos->>'json_array_elements')::json->>'hash'::text)::text||''')';
+			EXECUTE 'INSERT INTO om_visit_event_photo (visit_id, event_id, tstamp, value, hash, fextension)
+			 VALUES('''||v_id||''', '''||v_event_id||''', '''||NOW()||''', '''||CONCAT((v_addphotos->>'json_array_elements')::json->>'photo_url'::text, (v_addphotos->>'json_array_elements')::json->>'hash'::text)||''',
+			 '''||((v_addphotos->>'json_array_elements')::json->>'hash'::text)::text||''','''||((v_addphotos->>'json_array_elements')::json->>'fextension'::text)::text||''')';
 			
 			-- message
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
