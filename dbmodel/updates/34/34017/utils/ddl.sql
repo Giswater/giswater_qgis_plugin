@@ -10,8 +10,8 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 -- 2020/07/08
 
 --ALTER TABLE sys_table ADD COLUMN addtoc json;
-ALTER TABLE sys_table ADD COLUMN geom_field text;
-ALTER TABLE sys_table ADD COLUMN pkey_field text;
+--ALTER TABLE sys_table ADD COLUMN geom_field text;
+--ALTER TABLE sys_table ADD COLUMN pkey_field text;
 
 ALTER TABLE sys_style ALTER styletype TYPE character varying(30);
 

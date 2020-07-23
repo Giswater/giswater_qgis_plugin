@@ -9,12 +9,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2020/07/20
 
-UPDATE sys_table SET(geom_field, pkey_field) = ('the_geom', 'gully_id') WHERE id = 'v_edit_gully';
-UPDATE sys_table SET(geom_field, pkey_field) = ('the_geom', 'arc_id') WHERE id = 'v_anl_flow_arc';
-UPDATE sys_table SET(geom_field, pkey_field) = ('the_geom', 'connec_id') WHERE id = 'v_anl_flow_connec';
-UPDATE sys_table SET(geom_field, pkey_field) = ('the_geom', 'gully_id') WHERE id = 'v_anl_flow_gully';
-UPDATE sys_table SET(geom_field, pkey_field) = ('the_geom', 'node_id') WHERE id = 'v_anl_flow_node';
-
 INSERT INTO config_table(id, style, group_layer) VALUES('v_edit_arc', 101, 'GW Layers');
 INSERT INTO config_table(id, style, group_layer) VALUES('v_edit_connec', 102, 'GW Layers');
 INSERT INTO config_table(id, style, group_layer) VALUES('v_edit_link', 103, 'GW Layers');
@@ -25,6 +19,62 @@ INSERT INTO config_table(id, style) VALUES('v_anl_flow_arc', 106);
 INSERT INTO config_table(id, style) VALUES('v_anl_flow_connec', 107);
 INSERT INTO config_table(id, style) VALUES('v_anl_flow_gully', 108);
 INSERT INTO config_table(id, style) VALUES('v_anl_flow_node', 109);
+
+
+INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
+VALUES(2202,'gw_fct_anl_arc_intersection','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
+
+INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
+VALUES(2204,'gw_fct_anl_arc_inverted','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
+
+INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
+VALUES(2206,'gw_fct_anl_node_exit_upper_intro','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
+
+INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
+VALUES(2208,'gw_fct_anl_node_flowregulator','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
+
+INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
+VALUES(2210,'gw_fct_anl_node_sink','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}', NULL,NULL);
+
+INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
+VALUES(2212,'gw_fct_anl_node_topological_consistency','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}', NULL,NULL);
+
+INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
+VALUES(2214,'gw_fct_flow_exit','{"style":{"point":{"style":"qml", "id":"2214"},  "line":{"style":"qml", "id":"2214"}}}','{"visible": ["v_anl_flow_node", "v_anl_flow_gully", "v_anl_flow_connec", "v_anl_flow_arc"]}',NULL);
+
+INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
+VALUES(2218,'gw_fct_flow_trace','{"style":{"point":{"style":"qml", "id":"2218"},  "line":{"style":"qml", "id":"2218"}}}','{"visible": ["v_anl_flow_node", "v_anl_flow_gully", "v_anl_flow_connec", "v_anl_flow_arc"]}',NULL);
+
+INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
+VALUES(2431,'gw_fct_pg2epa_check_data', '{"style":{"point":{"style":"random","field":"fid","width":2,"transparency":0.5}},
+"line":{"style":"random","field":"fid","width":2,"transparency":0.5},
+"polygon":{"style":"random","field":"fid","width":2,"transparency":0.5}}', NULL, NULL);
+
+INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
+VALUES(2524,'gw_fct_import_swmm_inp',NULL,'{"visible": ["v_edit_arc", "v_edit_node"],"zoom": {"layer":"v_edit_arc", "margin":20}}',NULL);
+
+INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
+VALUES(2858,'gw_fct_pg2epa_check_result','{"style":{"point":{"style":"random","field":"fid","width":2,"transparency":0.5}},
+"line":{"style":"random","field":"fid","width":2,"transparency":0.5},
+"polygon":{"style":"random","field":"fid","width":2,"transparency":0.5}}',NULL,NULL);
+
+INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
+VALUES(2860,'gw_fct_pg2epa_check_options','{"style":{"point":{"style":"random","field":"fid","width":2,"transparency":0.5}},
+"line":{"style":"random","field":"fid","width":2,"transparency":0.5},
+"polygon":{"style":"random","field":"fid","width":2,"transparency":0.5}}',NULL,NULL);
+
 
 INSERT INTO sys_style (id, idval, styletype, stylevalue, active)
 VALUES('101', 'v_edit_Arc', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>

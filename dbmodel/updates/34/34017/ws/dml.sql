@@ -45,20 +45,47 @@ INSERT INTO config_table(id, style) VALUES('Overlap affected arcs', 105);
 INSERT INTO config_table(id, style) VALUES('Overlap affected connecs', 106);
 INSERT INTO config_table(id, style) VALUES('Other mincuts whichs overlaps', 107);
 
-UPDATE sys_table SET(geom_field, pkey_field) = ('the_geom', 'id') WHERE id = 'om_mincut_arc';
-UPDATE sys_table SET(geom_field, pkey_field) = ('the_geom', 'id') WHERE id = 'om_mincut_connec';
-UPDATE sys_table SET(geom_field, pkey_field) = ('the_geom', 'id') WHERE id = 'om_mincut_node';
-UPDATE sys_table SET(geom_field, pkey_field) = ('the_geom', 'id') WHERE id = 'v_om_mincut_arc';
-UPDATE sys_table SET(geom_field, pkey_field) = ('the_geom', 'id') WHERE id = 'v_om_mincut_connec';
-UPDATE sys_table SET(geom_field, pkey_field) = ('the_geom', 'id') WHERE id = 'v_om_mincut_node';
-UPDATE sys_table SET(geom_field, pkey_field) = ('the_geom', 'id') WHERE id = 'v_om_mincut_valve';
-UPDATE sys_table SET(geom_field, pkey_field) = ('anl_the_geom', 'id') WHERE id = 'v_om_mincut_initpoint';
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role)
 VALUES (2980, 'gw_fct_setmincut', 'utils', 'function', 'json', 'json', NULL, 'role_edit');
 
+
+
+
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2980,'gw_fct_setmincut',NULL,'{"visible": ["v_om_mincut_arc", "v_om_mincut_connec", "v_om_mincut_initpoint", "v_om_mincut_node"], "zoom":{"layer":"v_om_mincut_arc", "margin":20}}',NULL);
+VALUES(2244,'gw_fct_mincut_result_overlap','{"style":{"point":{"style":"qml", "id":"106"},  "line":{"style":"qml", "id":"105"}, "polygon":{"style":"qml", "id":"107"}}}',NULL,NULL);
+
+INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
+VALUES(2302,'gw_fct_anl_node_topological_consistency','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
+
+INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
+VALUES(2430,'gw_fct_pg2epa_check_data','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}', '{"zoom": {"layer":"v_edit_arc", "margin":20}}',NULL);
+
+INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
+VALUES(2522,'gw_fct_import_epanet_inp',NULL,'{"visible": ["v_edit_arc", "v_edit_node"],"zoom": {"layer":"v_edit_arc", "margin":20}}',NULL);
+
+INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
+VALUES(2706,'gw_fct_grafanalytics_minsector','{"style":{"point":{"style":"random","field":"fid","width":2,"transparency":0.5}},
+"line":{"style":"random","field":"fid","width":2,"transparency":0.5},
+"polygon":{"style":"random","field":"fid","width":2,"transparency":0.5}}',NULL,NULL);
+
+INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
+VALUES(2710,'gw_fct_grafanalytics_mapzones',NULL, NULL,'["style_mapzones"]');
+
+INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
+VALUES(2848,'gw_fct_pg2epa_check_result','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL, NULL);
+
+INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
+VALUES(2850,'gw_fct_pg2epa_check_options','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}', '{"zoom": {"layer":"v_edit_arc", "margin":20}}',NULL);
+
 
 
 INSERT INTO sys_style (id, idval, styletype, stylevalue, active)
@@ -1462,7 +1489,6 @@ def my_form_open(dialog, layer, feature):
 </qgis>
 $$, true);
 
-
 INSERT INTO sys_style (id, idval, styletype, stylevalue, active)
 VALUES('102', 'v_edit_connec', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
 <qgis simplifyDrawingHints="0" simplifyDrawingTol="1" version="3.10.3-A Coruña" simplifyAlgorithm="0" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" labelsEnabled="0" styleCategories="AllStyleCategories" maxScale="0" simplifyMaxScale="1" readOnly="0" minScale="1e+08">
@@ -2822,7 +2848,6 @@ def my_form_open(dialog, layer, feature):
 </qgis>
 $$, true);
 
-
 INSERT INTO sys_style (id, idval, styletype, stylevalue, active)
 VALUES('103', 'v_edit_link', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
 <qgis simplifyDrawingHints="1" simplifyDrawingTol="1" version="3.10.3-A Coruña" simplifyAlgorithm="0" hasScaleBasedVisibilityFlag="1" simplifyLocal="1" labelsEnabled="0" styleCategories="AllStyleCategories" maxScale="1" simplifyMaxScale="1" readOnly="0" minScale="1500">
@@ -3309,7 +3334,6 @@ def my_form_open(dialog, layer, feature):
   <layerGeometryType>1</layerGeometryType>
 </qgis>
 $$, true);
-
 
 INSERT INTO sys_style (id, idval, styletype, stylevalue, active)
 VALUES('104', 'v_edit_node', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
@@ -5447,7 +5471,6 @@ def my_form_open(dialog, layer, feature):
 </qgis>
 $$, true);
 
-
 INSERT INTO sys_style(id, idval, styletype, stylevalue, active)
 VALUES('105', 'Overlap affected arcs', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
 <qgis simplifyDrawingHints="1" hasScaleBasedVisibilityFlag="0" labelsEnabled="0" version="3.10.3-A Coruña" styleCategories="AllStyleCategories" simplifyDrawingTol="1" simplifyMaxScale="1" minScale="1e+08" simplifyAlgorithm="0" maxScale="0" simplifyLocal="1" readOnly="0">
@@ -5585,7 +5608,6 @@ VALUES('105', 'Overlap affected arcs', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mr
   <layerGeometryType>1</layerGeometryType>
 </qgis>
 $$, true);
-
 
 INSERT INTO sys_style(id, idval, styletype, stylevalue, active)
 VALUES('106', 'Overlap affected connecs', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
@@ -5728,7 +5750,6 @@ VALUES('106', 'Overlap affected connecs', 'qml', $$<!DOCTYPE qgis PUBLIC 'http:/
   <layerGeometryType>0</layerGeometryType>
 </qgis>
 $$, true);
-
 
 INSERT INTO sys_style(id, idval, styletype, stylevalue, active)
 VALUES('107', 'Other mincuts whichs overlaps', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
