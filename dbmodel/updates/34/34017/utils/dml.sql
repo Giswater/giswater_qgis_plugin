@@ -27,10 +27,10 @@ INSERT INTO sys_function(id, function_name, project_type, function_type, input_p
 VALUES (2978, 'gw_fct_get_style', 'utils', 'function', 'json', 'json', 'Retun styles', 'role_basic');
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role)
-VALUES (2982, 'gw_fct_getgeomfield', 'utils', 'function', 'json', 'json', 'Returns the geometry field of a table or view', 'role_basic');
+VALUES (2982, 'gw_fct_getgeomfield', 'utils', 'function', 'character varying', 'character varying', 'Returns the geometry field of a table or view', 'role_basic');
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role)
-VALUES (2983, 'gw_fct_getpkeyfield', 'utils', 'function', 'json', 'json', 'Returns the geometry field of a table or view', 'role_basic');
+VALUES (2984, 'gw_fct_getpkeyfield', 'utils', 'function', 'character varying', 'character varying', 'Returns the geometry field of a table or view', 'role_basic');
 
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
