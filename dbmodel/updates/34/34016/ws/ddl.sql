@@ -9,49 +9,49 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 -- parent:
-ALTER TABLE arc ADD COLUMN depth numeric (12,3);
-ALTER TABLE arc ADD COLUMN adate text;
-ALTER TABLE arc ADD COLUMN adescript text;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"depth", "dataType":"numeric (12,3)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"adate", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"adescript", "dataType":"text", "isUtils":"False"}}$$);
 
-ALTER TABLE node ADD COLUMN adate text;
-ALTER TABLE node ADD COLUMN adescript text;
-ALTER TABLE node ADD COLUMN accessibility int2;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"adate", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"adescript", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"accessibility", "dataType":"int2", "isUtils":"False"}}$$);
 
-ALTER TABLE connec ADD COLUMN adate text;
-ALTER TABLE connec ADD COLUMN adescript text;
-ALTER TABLE connec ADD COLUMN accessibility int2;
-
-
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"adate", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"adescript", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"accessibility", "dataType":"int2", "isUtils":"False"}}$$);
 
 -- node child
-ALTER TABLE man_tank ADD COLUMN hmax numeric (12,3);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_tank", "column":"hmax", "dataType":"numeric (12,3)", "isUtils":"False"}}$$);
 
-ALTER TABLE man_hydrant ADD COLUMN geom1 float;
-ALTER TABLE man_hydrant ADD COLUMN geom2 float;
-ALTER TABLE man_hydrant ADD COLUMN brand text;
-ALTER TABLE man_hydrant ADD COLUMN model text;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_hydrant", "column":"geom1", "dataType":"float", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_hydrant", "column":"geom2", "dataType":"float", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_hydrant", "column":"brand", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_hydrant", "column":"model", "dataType":"text", "isUtils":"False"}}$$);
 
-ALTER TABLE man_pump ADD COLUMN brand text;
-ALTER TABLE man_pump ADD COLUMN model text;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_pump", "column":"brand", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_pump", "column":"model", "dataType":"text", "isUtils":"False"}}$$);
 
-ALTER TABLE man_valve ADD COLUMN shutter text;
-ALTER TABLE man_valve ADD COLUMN brand text;
-ALTER TABLE man_valve ADD COLUMN brand2 text;
-ALTER TABLE man_valve ADD COLUMN model text;
-ALTER TABLE man_valve ADD COLUMN model2 text;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_valve", "column":"shutter", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_valve", "column":"brand", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_valve", "column":"model", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_valve", "column":"brand2", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_valve", "column":"model2", "dataType":"text", "isUtils":"False"}}$$);
 
-ALTER TABLE man_meter ADD COLUMN brand text;
-ALTER TABLE man_meter ADD COLUMN model text;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_meter", "column":"brand", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_meter", "column":"model", "dataType":"text", "isUtils":"False"}}$$);
 
-ALTER TABLE man_netwjoin ADD COLUMN brand text;
-ALTER TABLE man_netwjoin ADD COLUMN model text;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_netwjoin", "column":"brand", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_netwjoin", "column":"model", "dataType":"text", "isUtils":"False"}}$$);
 
-ALTER TABLE man_netelement ADD COLUMN brand text;
-ALTER TABLE man_netelement ADD COLUMN model text;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_netelement", "column":"brand", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_netelement", "column":"model", "dataType":"text", "isUtils":"False"}}$$);
 
 -- connec child
-ALTER TABLE man_greentap ADD COLUMN brand text;
-ALTER TABLE man_greentap ADD COLUMN model text;
 
-ALTER TABLE man_wjoin ADD COLUMN brand text;
-ALTER TABLE man_wjoin ADD COLUMN model text;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_greentap", "column":"brand", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_greentap", "column":"model", "dataType":"text", "isUtils":"False"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_wjoin", "column":"brand", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_wjoin", "column":"model", "dataType":"text", "isUtils":"False"}}$$);
+
