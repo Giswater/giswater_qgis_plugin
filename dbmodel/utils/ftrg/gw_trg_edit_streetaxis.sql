@@ -107,7 +107,7 @@ BEGIN
           
     ELSIF TG_OP = 'UPDATE' THEN
 
-		IF v_isutils IS FALSE THEN				
+		IF v_isutils IS FALSE OR v_isutils IS NULL THEN				
 			UPDATE ext_streetaxis 
 			SET id=NEW.id, code=NEW.code, type=NEW.type, name=NEW.name, text=NEW.text, the_geom=NEW.the_geom, expl_id=NEW.expl_id,
 			muni_id=NEW.muni_id
@@ -130,7 +130,7 @@ BEGIN
 
 	ELSIF TG_OP = 'DELETE' THEN  		
 
-		IF v_isutils IS FALSE THEN	
+		IF v_isutils IS FALSE OR v_isutils IS NULL THEN	
 			DELETE FROM ext_streetaxis WHERE id=OLD.id;
  		ELSE
      		EXECUTE 'DELETE FROM '||v_schema_utils||'.streetaxis WHERE id=$1'

@@ -112,7 +112,7 @@ BEGIN
           
     ELSIF TG_OP = 'UPDATE' THEN
 
-    IF v_isutils IS FALSE THEN  
+    IF v_isutils IS FALSE OR v_isutils IS NULL THEN  
 
       UPDATE ext_plot 
       SET id=NEW.id, plot_code=NEW.plot_code, muni_id=NEW.muni_id, postcode=NEW.postcode, streetaxis_id=NEW.streetaxis_id, 
@@ -146,7 +146,7 @@ BEGIN
 
   ELSIF TG_OP = 'DELETE' THEN     
 
-    IF v_isutils IS FALSE THEN  
+    IF v_isutils IS FALSE OR v_isutils IS NULL THEN  
       DELETE FROM ext_plot WHERE id=OLD.id;
     ELSE
      EXECUTE 'DELETE FROM '||v_schema_utils||'.plot WHERE id=$1'
