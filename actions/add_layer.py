@@ -187,9 +187,7 @@ class AddLayer(object):
         temp_layers_added = []
         srid = self.controller.plugin_settings_value('srid')
         for k, v in list(data.items()):
-            if str(k) == 'setVisibleLayers':
-                self.set_layers_visible(v)
-            elif str(k) == "info":
+            if str(k) == "info":
                 text_result = self.populate_info_text(dialog, data, force_tab, reset_text, tab_idx, disable_tabs)
             elif k in ('point', 'line', 'polygon'):
                 if 'values' in data[k]:
