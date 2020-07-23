@@ -48,7 +48,7 @@ class ManageVisit(ParentManage, QObject):
 
 
     def manage_visit(self, visit_id=None, geom_type=None, feature_id=None, single_tool=True, expl_id=None, tag=None,
-            open_dialog=True):
+            open_dialog=True, is_new=False):
         """ Button 64. Add visit.
         if visit_id => load record related to the visit_id
         if geom_type => lock geom_type in relations tab
@@ -160,23 +160,22 @@ class ManageVisit(ParentManage, QObject):
 
         self.visit_id.setText(str(visit_id))
 
-        # Force tab_feature_changed
-        self.tab_feature_changed(self.dlg_add_visit, 'visit', excluded_layers=["v_edit_element"])
-
         if self.controller.get_project_type() == 'ud':
             self.event_feature_type_selected(self.dlg_add_visit, "gully")
         self.event_feature_type_selected(self.dlg_add_visit, "node")
         self.event_feature_type_selected(self.dlg_add_visit, "connec")
         self.event_feature_type_selected(self.dlg_add_visit, "arc")
 
+        # Force tab_feature_changed
+        self.tab_feature_changed(self.dlg_add_visit, 'visit', excluded_layers=["v_edit_element"])
+
         # Manage relation locking
         if self.locked_geom_type:
             self.set_locked_relation()
-
         # Open the dialog
         if open_dialog:
             # If the new visit dont come from info emit signal
-            if self.locked_geom_type is None:
+            if is_new is False:
                 self.feature_type.currentIndexChanged.emit(0)
             self.open_dialog(self.dlg_add_visit, dlg_name="visit")
 

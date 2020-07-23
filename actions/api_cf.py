@@ -2171,7 +2171,7 @@ class ApiCF(ApiParent, QObject):
         # so the workaroud is to do a unuseful query to have the dao controller active
         sql = "SELECT id FROM om_visit LIMIT 1"
         self.controller.get_rows(sql)
-        manage_visit.manage_visit(geom_type=self.geom_type, feature_id=self.feature_id, expl_id=expl_id)
+        manage_visit.manage_visit(geom_type=self.geom_type, feature_id=self.feature_id, expl_id=expl_id, is_new=True)
 
 
     def open_gallery(self):
