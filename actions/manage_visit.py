@@ -252,8 +252,6 @@ class ManageVisit(ParentManage, QObject):
         if self.current_tab_index == self.tab_index('tab_visit'):
             self.manage_leave_visit_tab()
 
-
-
         # Remove all previous selections
         self.disconnect_signal_selection_changed()
         self.remove_selection()
