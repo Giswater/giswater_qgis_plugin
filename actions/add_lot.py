@@ -1536,7 +1536,9 @@ class AddNewLot(ParentManage):
         self.dlg_lot_man.cmb_estat.currentIndexChanged.connect(self.filter_lot)
         self.dlg_lot_man.chk_assignacio.stateChanged.connect(self.filter_lot)
         self.dlg_lot_man.date_event_from.dateChanged.connect(self.filter_lot)
+        self.dlg_lot_man.date_event_from.dateChanged.connect(partial(self.save_date, self.dlg_lot_man.date_event_from, 'date_event_from'))
         self.dlg_lot_man.date_event_to.dateChanged.connect(self.filter_lot)
+        self.dlg_lot_man.date_event_to.dateChanged.connect(partial(self.save_date, self.dlg_lot_man.date_event_to, 'date_event_to'))
         self.dlg_lot_man.cmb_date_filter_type.currentIndexChanged.connect(self.filter_lot)
         self.dlg_lot_man.cmb_date_filter_type.currentIndexChanged.connect(self.manage_date_filter)
         self.dlg_lot_man.chk_show_nulls.stateChanged.connect(self.filter_lot)
@@ -1548,6 +1550,15 @@ class AddNewLot(ParentManage):
 
         # Open form
         self.filter_lot()
+
+        # Set last user dates for date_event_from and date_event_to
+        date_event_from = QDate.fromString(str(self.controller.plugin_settings_value('date_event_from')), 'dd/MM/yyyy')
+        date_event_to = QDate.fromString(str(self.controller.plugin_settings_value('date_event_to')), 'dd/MM/yyyy')
+        if date_event_from:
+            utils_giswater.setCalendarDate(self.dlg_lot_man, self.dlg_lot_man.date_event_from, date_event_from)
+        if date_event_to:
+            utils_giswater.setCalendarDate(self.dlg_lot_man, self.dlg_lot_man.date_event_to, date_event_to)
+
         self.open_dialog(self.dlg_lot_man, dlg_name="visit_management")
 
 
@@ -1632,10 +1643,7 @@ class AddNewLot(ParentManage):
         if row:
             if row[0]:
                 self.dlg_work_register.date_event_from.setDate(row[0])
-            if row[1]:
-                self.dlg_work_register.date_event_to.setDate(row[1])
-            else:
-                self.dlg_work_register.date_event_to.setDate(current_date)
+            self.dlg_work_register.date_event_to.setDate(current_date)
 
         # TODO: Disable columns user_id + team_id
 
@@ -2491,3 +2499,10 @@ class AddNewLot(ParentManage):
         # Refresh combo work_order
         self.manage_widget_lot(None)
         self.set_ot_fields(0)
+
+
+    def save_date(self, widget, key):
+
+        # Manage date_from, date_to and save into settings variables
+        date = utils_giswater.getCalendarDate(self.dlg_lot_man, widget, 'dd/MM/yyyy')
+        self.controller.plugin_settings_set_value(key, str(date))
