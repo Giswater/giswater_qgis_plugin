@@ -1083,10 +1083,23 @@ class ManageVisit(ParentManage, QObject):
             self.dlg_event.position_value.setEnabled(True)
 
         elif om_event_parameter.form_type == 'event_standard':
-            _value = self.dlg_add_visit.tbl_event.model().record(0).value('value')
-            text = self.dlg_add_visit.tbl_event.model().record(0).value('text')
+            index = selected_list[0]
+            row = index.row()
+
+            column_index = utils_giswater.get_col_index_by_col_name(self.dlg_add_visit.tbl_event, 'parameter_id')
+            parameter_id = index.sibling(row, column_index).data()
+            column_index = utils_giswater.get_col_index_by_col_name(self.dlg_add_visit.tbl_event, 'event_code')
+            event_code = index.sibling(row, column_index).data()
+            column_index = utils_giswater.get_col_index_by_col_name(self.dlg_add_visit.tbl_event, 'value')
+            _value = index.sibling(row, column_index).data()
+            column_index = utils_giswater.get_col_index_by_col_name(self.dlg_add_visit.tbl_event, 'text')
+            text = index.sibling(row, column_index).data()
+
             self.dlg_event = EventStandard()
             self.load_settings(self.dlg_event)
+
+            if event_code not in ('NULL', None):
+                utils_giswater.setWidgetText(self.dlg_event, self.dlg_event.event_code, event_code)
             if _value not in ('NULL', None):
                 utils_giswater.setWidgetText(self.dlg_event, self.dlg_event.value, _value)
             if text not in ('NULL', None):
