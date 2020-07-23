@@ -17,28 +17,28 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_json_create_return(
 $BODY$
 
 DECLARE
+
 v_actions json;
 v_body json;
-v_returnmanager json;
+v_geom_field text;
+v_json_array json[];
+v_layer_zoom text;
 v_layermanager json;
-v_return json;
 v_layermanager_array text[];
 v_layervisible json;
-rec text;
+v_pkey_field character varying;
+v_rec text;
 v_result json;
-v_json_array json[];
+v_return json;
+v_returnmanager json;
 v_visible json;
-v_layer_zoom text;
 v_zoomed_exist boolean ;
+
 BEGIN
 	-- Search path
 	SET search_path = 'SCHEMA_NAME', public;
 	
 	-- RETURN MANAGER	
-	-- example for:
-	--	categorized:	[{"layerName":"v_edit_arc","style":"categorized","field":"expl_id","width":2,"opacity":0.5,"values":[{"id":2,"color":[255,0,0]},{"id":1,"color":[0,2,250]}]}]
-	-- example1: v_style: {["layer":"tablename1", "mode":"Disabled", "parameters": null], ["layer":"tablename2", "mode":"basicRGB", "parameters": [R,G,B, opacidad]], ["layer":"tablename3", "mode":"qml", "parameters": {"id":4}]}
-	-- example2: v_style: {["layer":"temp_point", "mode":"Disabled", "parameters": null], ["layer":"temp_line", "mode":"BasicRGB", "parameters": [R,G,B, opacidad]], ["layer":"temp_pol", "mode":"qml", "parameters": {"id":4}]}
 	v_returnmanager = (SELECT returnmanager FROM config_function where id = p_fnumber);
 	IF v_returnmanager IS NOT NULL THEN
 		v_returnmanager = gw_fct_json_object_set_key((v_returnmanager)::json, 'functionId', p_fnumber);
@@ -58,20 +58,22 @@ BEGIN
 			v_layermanager_array = (select array_agg(value) as list from  json_array_elements_text(v_layervisible));
 			
 			v_zoomed_exist = false;			
-			FOREACH rec IN ARRAY (v_layermanager_array) LOOP
-				IF v_layer_zoom = rec THEN v_zoomed_exist = true; END IF;
-				
-				EXECUTE 'SELECT jsonb_build_object ('''||rec||''',feature)
+			FOREACH v_rec IN ARRAY (v_layermanager_array) LOOP
+				IF v_layer_zoom = v_rec THEN v_zoomed_exist = true; END IF;
+                
+				v_geom_field = (SELECT gw_fct_getgeomfield(v_rec));
+				v_pkey_field = (SELECT gw_fct_getpkeyfield(v_rec));
+				EXECUTE 'SELECT jsonb_build_object ('''||v_rec||''',feature)
 					FROM	(
 					SELECT jsonb_build_object(
-					''geom_field'', geom_field,
-					''pkey_field'', pkey_field,
+					''geom_field'', '''||v_geom_field||''',
+					''pkey_field'', '''||v_pkey_field||''',
 					''style_id'', style, 
 					''group_layer'', group_layer
 					) AS feature
-					FROM (SELECT geom_field, pkey_field, style, group_layer from sys_table 
+					FROM (SELECT style, group_layer from sys_table 
 						LEFT JOIN config_table USING (id)
-						WHERE id = '''||rec||'''
+						WHERE id = '''||v_rec||'''
 					) row) a;'
 				INTO v_result;
 				
@@ -80,17 +82,19 @@ BEGIN
 			END LOOP;
 			-- If the layer we are going to zoom is not already in the json, we add it
 			IF v_layer_zoom IS NOT NULL AND v_zoomed_exist IS false THEN
-				EXECUTE 'SELECT jsonb_build_object ('''||v_layer_zoom||''',feature)
+				v_geom_field = (SELECT gw_fct_getgeomfield(v_rec));
+				v_pkey_field = (SELECT gw_fct_getpkeyfield(v_rec));
+				EXECUTE 'SELECT jsonb_build_object ('''||v_rec||''',feature)
 					FROM	(
 					SELECT jsonb_build_object(
-					''geom_field'', geom_field,
-					''pkey_field'', pkey_field,
+					''geom_field'', '''||v_geom_field||''',
+					''pkey_field'', '''||v_pkey_field||''',
 					''style_id'', style, 
 					''group_layer'', group_layer
 					) AS feature
-					FROM (SELECT geom_field, pkey_field, style, group_layer from sys_table 
+					FROM (SELECT style, group_layer from sys_table 
 						LEFT JOIN config_table USING (id)
-						WHERE id = '''||v_layer_zoom||'''
+						WHERE id = '''||v_rec||'''
 					) row) a;'
 				INTO v_result;
 
