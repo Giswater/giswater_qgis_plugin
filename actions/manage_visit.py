@@ -48,7 +48,7 @@ class ManageVisit(ParentManage, QObject):
 
 
     def manage_visit(self, visit_id=None, geom_type=None, feature_id=None, single_tool=True, expl_id=None, tag=None,
-            open_dialog=True, is_new=False):
+            open_dialog=True, is_new_from_cf=False):
         """ Button 64. Add visit.
         if visit_id => load record related to the visit_id
         if geom_type => lock geom_type in relations tab
@@ -175,7 +175,7 @@ class ManageVisit(ParentManage, QObject):
         # Open the dialog
         if open_dialog:
             # If the new visit dont come from info emit signal
-            if is_new is False:
+            if is_new_from_cf is False:
                 self.feature_type.currentIndexChanged.emit(0)
             self.open_dialog(self.dlg_add_visit, dlg_name="visit")
 
