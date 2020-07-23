@@ -1369,8 +1369,9 @@ class ParentAction(object):
                             continue
 
                         layer_name = f'{key}'
-                        if json_result['body']['data'][key]['layerName']:
-                            layer_name = json_result['body']['data'][key]['layerName']
+                        if 'layerName' in json_result['body']['data'][key]:
+                            if json_result['body']['data'][key]['layerName']:
+                                layer_name = json_result['body']['data'][key]['layerName']
 
                         self.delete_layer_from_toc(layer_name)
 
@@ -1412,9 +1413,9 @@ class ParentAction(object):
                                     self.add_layer.create_qml(v_layer, qml)
 
                         elif style_type[key]['style'] == 'unique':
-                            color = style_type[key]['style']['values']['color']
+                            color = style_type[key]['values']['color']
                             size = style_type['width'] if 'width' in style_type and style_type['width'] else 2
-                            opacity = return_manager['style'][key]['transparency']
+                            opacity = return_manager['style'][key]['values']['transparency']
                             color = QColor(color[0], color[1], color[2])
                             if key == 'point':
                                 v_layer.renderer().symbol().setSize(size)
