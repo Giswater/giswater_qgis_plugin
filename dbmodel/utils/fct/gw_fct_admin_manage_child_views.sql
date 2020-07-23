@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 --FUNCTION CODE: 2716
-DROP FUNCTION SCHEMA_NAME.gw_fct_admin_manage_child_views(p_data json);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_admin_manage_child_views(p_data json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_manage_child_views(p_data json)
   RETURNS json AS
 $BODY$
