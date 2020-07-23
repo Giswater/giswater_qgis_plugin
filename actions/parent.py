@@ -1342,12 +1342,13 @@ class ParentAction(object):
         srid = self.controller.plugin_settings_value('srid')
         try:
             margin = 1
+            opacity = 100
+
             if 'zoom' in return_manager and 'margin' in return_manager['zoom']:
                 margin = return_manager['zoom']['margin']
 
             if 'style' in return_manager and 'ruberband' in return_manager['style']:
                 # Set default values
-                opacity = 100
                 width = 3
                 color = QColor(255, 0, 0, 125)
                 if 'transparency' in return_manager['style']['ruberband']:
@@ -1385,11 +1386,12 @@ class ParentAction(object):
                         # Get values for set layer style
                         style_type = json_result['body']['returnManager']['style']
                         if 'style' in return_manager and 'transparency' in return_manager['style'][key]:
-                            opacity = return_manager['style'][key]['transparency']
+                            opacity = return_manager['style'][key]['transparency'] * 255
+
                         if style_type[key]['style'] == 'categorized':
                             color_values = {}
                             for item in json_result['body']['returnManager']['style'][key]['values']:
-                                color_values[item['id']] = QColor(item['color'][0], item['color'][1], item['color'][2], opacity*255)
+                                color_values[item['id']] = QColor(item['color'][0], item['color'][1], item['color'][2], opacity)
                             cat_field = str(style_type[key]['field'])
                             size = style_type['width'] if 'width' in style_type and style_type['width'] else 2
                             self.add_layer.categoryze_layer(v_layer, cat_field, size, color_values)
@@ -1415,7 +1417,6 @@ class ParentAction(object):
                         elif style_type[key]['style'] == 'unique':
                             color = style_type[key]['values']['color']
                             size = style_type['width'] if 'width' in style_type and style_type['width'] else 2
-                            opacity = return_manager['style'][key]['values']['transparency']
                             color = QColor(color[0], color[1], color[2])
                             if key == 'point':
                                 v_layer.renderer().symbol().setSize(size)
