@@ -35,6 +35,8 @@ aux_json json;
 v_fields json;
 field json;
 v_id int8;
+v_expl integer;
+v_state integer;
 
 BEGIN
 
@@ -55,11 +57,26 @@ BEGIN
 	INTO v_fields_array
 	USING 'v_edit_dimensions', 'form_feature', '', NULL, NULL, NULL, NULL, 'SELECT', null, 3, null::json;
 
+	-- TODO USE reduced geometry to intersect with expl mapzone in order to enhance the selectedId expl
+
+	-- get user's values
+	SELECT expl_id INTO v_expl FROM selector_expl WHERE cur_user = current_user LIMIT 1;
+	SELECT state_id INTO v_state FROM selector_state WHERE cur_user = current_user ORDER BY 1 ASC LIMIT 1;
+
 	-- Set widget_name without tabname for widgets
 	FOREACH field IN ARRAY v_fields_array
 	LOOP
 		v_fields_array[(field->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields_array[(field->>'orderby')::INT], 'widgetname', field->>'columnname');
-	END LOOP;
+			
+		IF (field->>'columnname') = 'expl_id' THEN
+			v_fields_array[(field->>'orderby')::INT] := gw_fct_json_object_set_key(field, 'selectedId', v_expl::text);
+		END IF;
+		
+		IF (field->>'columnname') = 'state' THEN
+			v_fields_array[(field->>'orderby')::INT] := gw_fct_json_object_set_key(field, 'selectedId', v_state::text);
+		END IF;
+		
+	END LOOP; 
 
 	v_fields := array_to_json(v_fields_array);
 

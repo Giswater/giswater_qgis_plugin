@@ -786,7 +786,7 @@ BEGIN
 
 		ELSIF v_man_table ='man_tank' THEN
 			UPDATE man_tank SET pol_id=NEW.pol_id, vmax=NEW.vmax, vutil=NEW.vutil, area=NEW.area, chlorination=NEW.chlorination, name=NEW.name,
-			hmax=NEW.hmax, com1=NEW.com1, com1=NEW.com2
+			hmax=NEW.hmax
 			WHERE node_id=OLD.node_id;
 			
 			--update config_mincut_inlet if exploitation changes
