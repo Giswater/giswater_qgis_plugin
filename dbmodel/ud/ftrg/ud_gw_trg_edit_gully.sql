@@ -277,8 +277,14 @@ BEGIN
 
 		--check relation state - state_type
 		IF NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
+			IF NEW.state IS NOT NULL THEN
+				v_sql = NEW.state;
+			ELSE
+				v_sql = 'null';
+			END IF;
+
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3036", "function":"1206","debug_msg":"'||NEW.state::text||'"}}$$);'; 
+			"data":{"message":"3036", "function":"1206","debug_msg":"'||v_sql::text||'"}}$$);'; 
 	   	END IF;		
 
 		-- Workcat_id
