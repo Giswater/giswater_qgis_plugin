@@ -172,6 +172,14 @@ class ManageVisit(ParentManage, QObject):
         # Manage relation locking
         if self.locked_geom_type:
             self.set_locked_relation()
+
+        # Disable widgets when the visit is not new
+        if self.it_is_new_visit is False:
+            self.dlg_add_visit.btn_feature_insert.setEnabled(False)
+            self.dlg_add_visit.btn_feature_delete.setEnabled(False)
+            self.dlg_add_visit.btn_feature_snapping.setEnabled(False)
+            self.dlg_add_visit.tab_feature.setEnabled(False)
+
         # Open the dialog
         if open_dialog:
             # If the new visit dont come from info emit signal
