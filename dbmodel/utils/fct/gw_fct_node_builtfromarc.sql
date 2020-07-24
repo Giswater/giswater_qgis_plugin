@@ -43,6 +43,12 @@ v_nodecat text;
 v_nodetype_id text;
 v_isarcdivide boolean;
 
+v_workcat text;
+v_state integer;
+v_state_type integer;
+v_builtdate date;
+v_nodecat_id text;
+
 BEGIN
 
 	-- Search path
@@ -56,6 +62,14 @@ BEGIN
 	v_buffer := ((p_data ->>'data')::json->>'parameters')::json->>'nodeTolerance';
 	v_insertnode := ((p_data ->>'data')::json->>'parameters')::json->>'insertIntoNode';
 
+	v_workcat := ((p_data ->>'data')::json->>'parameters')::json->>'workcatId'::text;
+	v_state_type := ((p_data ->>'data')::json->>'parameters')::json->>'stateType'::text;
+	v_builtdate := ((p_data ->>'data')::json->>'parameters')::json->>'builtdate'::text;
+	v_nodetype_id := ((p_data ->>'data')::json->>'parameters')::json->>'nodeType'::text;
+	v_nodecat_id := ((p_data ->>'data')::json->>'parameters')::json->>'nodeCat'::text;
+
+	select state into v_state from value_state_type where id=v_state_type;
+	
 	--  Reset values
 	DELETE FROM temp_table WHERE cur_user=current_user AND fid = 116;
 	DELETE FROM anl_node WHERE cur_user=current_user AND fid = 116;
@@ -74,9 +88,15 @@ BEGIN
 		numNodes:= (SELECT COUNT(*) FROM node WHERE st_dwithin(node.the_geom, rec_table.geom_point, v_buffer));
 		IF numNodes = 0 THEN
 			IF v_insertnode THEN
-				INSERT INTO v_edit_node (the_geom) VALUES (rec_table.geom_point);
+				INSERT INTO v_edit_node (expl_id, workcat_id, state, state_type, builtdate, node_type, the_geom, nodecat_id) 
+				VALUES (v_expl, v_workcat, v_state, v_state_type, v_builtdate, v_nodetype_id, rec_table.geom_point, v_nodecat_id);
+
+				INSERT INTO anl_node (the_geom, state, fid, expl_id, nodecat_id) 
+				VALUES (rec_table.geom_point, v_state, 116, v_expl, v_nodecat_id);
+
 			ELSE 
-				INSERT INTO anl_node (the_geom, state, fid, expl_id) VALUES (rec_table.geom_point, 1, 116,v_expl);
+				INSERT INTO anl_node (the_geom, state, fid, expl_id, nodecat_id) 
+				VALUES (rec_table.geom_point, v_state, 116,v_expl, v_nodecat_id);
 			END IF;
 		ELSE
 
@@ -86,20 +106,15 @@ BEGIN
 	-- repair arcs
 	IF v_insertnode THEN
 	
-		-- set isarcdivide of chosed nodetype on false
-		IF v_projecttype ='WS' THEN
-			v_nodecat =  (SELECT value FROM config_param_user WHERE parameter='edit_nodecat_vdefault' AND cur_user=current_user);
-			SELECT nodetype_id INTO v_nodetype_id FROM cat_node WHERE id=v_nodecat;
-		ELSE
-			v_nodetype_id =  (SELECT value FROM config_param_user WHERE parameter='edit_nodetype_vdefault' AND cur_user=current_user);
-		END IF;
-	
+		-- set isarcdivide of chosed nodetype on falsea
 		SELECT isarcdivide INTO v_isarcdivide FROM cat_feature_node WHERE id=v_nodetype_id;
 		UPDATE cat_feature_node SET isarcdivide=FALSE WHERE id=v_nodetype_id;	
 	
 		-- execute function
-		PERFORM gw_fct_arc_repair(arc_id, 0,0) FROM arc WHERE expl_id=v_expl AND (node_1 IS NULL OR node_2 IS NULL);
-	
+		EXECUTE 'SELECT gw_fct_arc_repair($${"client":{"device":4, "infoType":1,"lang":"ES"},"feature":{"id":
+		"SELECT array_to_json(array_agg(arc_id::text)) FROM arc WHERE expl_id='||v_expl||' AND (node_1 IS NULL OR node_2 IS NULL)"},
+		"data":{}}$$);';
+
 		-- restore isarcdivide to previous value
 		UPDATE cat_feature_node SET isarcdivide=v_isarcdivide WHERE id=v_nodetype_id;	
 		

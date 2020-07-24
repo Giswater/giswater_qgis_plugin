@@ -570,7 +570,9 @@ BEGIN
 		DELETE FROM node WHERE state=0;
 			
 		-- repair arcs
-		PERFORM gw_fct_arc_repair (arc_id, null, null) FROM arc;
+		PERFORM gw_fct_arc_repair($${"client":{"device":4, "infoType":1,"lang":"ES"},"feature":{"id":
+		"SELECT array_to_json(array_agg(arc_id::text)) FROM arc WHERE arc_id IS NOT NULL "},
+		"data":{}}$$);
 
 		-- restore default default values
 		UPDATE config_param_system SET value=0.1 where parameter = 'edit_arc_searchnodes';
