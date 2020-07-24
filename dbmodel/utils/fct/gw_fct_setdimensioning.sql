@@ -136,15 +136,15 @@ BEGIN
 
 	END LOOP;
 
-	-- query text, final step
-	v_querytext := concat ((v_querytext),' )WHERE id = ' || v_id || ' RETURNING id');
-
+	-- query text, final step	
+	v_querytext := concat ((v_querytext),' )WHERE id = ' || v_id || '');
 	-- execute query text
-	EXECUTE v_querytext into v_newid;
+	
+	EXECUTE v_querytext; 
 	
 	-- Return
     RETURN ('{"status":"Accepted", "message":"Dimensioning update succesfully", "version":'|| v_version ||
-	    ', "body": {"feature":{"tableName":"'||v_tablename||'", "id":"'||v_newid||'"}}}')::json;    
+	    ', "body": {"feature":{}}}')::json; 
 
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN 
