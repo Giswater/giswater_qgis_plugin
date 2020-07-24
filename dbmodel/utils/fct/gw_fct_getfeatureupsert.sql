@@ -193,7 +193,7 @@ BEGIN
 
 	-- profilactic control when is not feature
 	IF v_catfeature.feature_type IS NULL THEN
-		v_catfeature.feature_type = p_table_id;
+		v_catfeature.feature_type = '';
 	END IF;
 
 	--  Starting control process
@@ -418,11 +418,13 @@ BEGIN
 		-- Call the function of feature fields generation
 		v_formtype = 'form_feature';	
 		v_querytext = 'SELECT gw_fct_getformfields( '||quote_literal(v_formname)||','||quote_literal(v_formtype)||','||quote_literal(v_tabname)||','||quote_literal(v_tablename)||','||quote_literal(p_idname)||','||
-		quote_literal(p_id)||','||quote_literal(p_columntype)||','||quote_literal(p_tg_op)||','||'''text'''||','||p_device||','||quote_literal(v_values_array)||' )'; 		
+		quote_literal(p_id)||','||quote_literal(p_columntype)||','||quote_literal(p_tg_op)||','||'''text'''||','||p_device||','''||COALESCE(v_values_array, '{}')||''' )'; 	
+
 		RAISE NOTICE 'v_querytext %', v_querytext;
+		
 		SELECT gw_fct_getformfields(v_formname , v_formtype , v_tabname , v_tablename , p_idname , p_id , p_columntype, p_tg_op, NULL, p_device , v_values_array)
 		INTO v_fields_array;
-
+			
 	ELSE	
 		PERFORM gw_fct_debug(concat('{"data":{"msg":"--> Configuration fields are NOT defined on layoutorder table. System values are used <--", "variables":""}}')::json);
 	
@@ -492,12 +494,12 @@ BEGIN
 		SELECT (a->>'vdef'), (a->>'param') INTO v_catalog, v_catalogtype FROM json_array_elements(v_values_array) AS a 
 			WHERE (a->>'param') = 'arccat_id' OR (a->>'param') = 'nodecat_id' OR (a->>'param') = 'connecat_id' OR (a->>'param') = 'gratecat_id';
 
-		IF v_project_type ='WS' THEN 
+		IF v_project_type ='WS' AND v_catfeature.feature_type != '' THEN 
 			EXECUTE 'SELECT pnom::integer, dnom::integer, matcat_id FROM cat_'||lower(v_catfeature.feature_type)||' WHERE id=$1'
 				USING v_catalog
 				INTO v_pnom, v_dnom, v_matcat_id;
 				
-		ELSIF v_project_type ='UD' THEN 
+		ELSIF v_project_type ='UD' AND v_catfeature.feature_type != '' THEN 
 			IF (v_catfeature.feature_type) ='GULLY' THEN
 				EXECUTE 'SELECT matcat_id FROM cat_grate WHERE id=$1'
 					USING v_catalog
