@@ -9,11 +9,11 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2020/05/25
 -- config_mincut_inlet
-ALTER TABLE config_mincut_inlet RENAME config TO parameters;
-ALTER TABLE config_mincut_inlet ADD COLUMN active boolean;
-ALTER TABLE config_mincut_valve ADD COLUMN active boolean;
-ALTER TABLE config_mincut_checkvalve ADD COLUMN active boolean;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"config_mincut_inlet", "column":"config", "newName":"parameters"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_mincut_inlet", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_mincut_valve", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_mincut_checkvalve", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
 
 -- tstep on selector
-ALTER TABLE selector_rpt_compare_tstep RENAME time TO timestep;
-ALTER TABLE selector_rpt_main_tstep RENAME time TO timestep;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"selector_rpt_compare_tstep", "column":"time", "newName":"timestep"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"selector_rpt_main_tstep", "column":"time", "newName":"timestep"}}$$);
