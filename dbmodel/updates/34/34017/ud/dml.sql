@@ -8754,3 +8754,18 @@ VALUES('109', 'v_anl_flow_node', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com
   <layerGeometryType>0</layerGeometryType>
 </qgis>
 $$ , true);
+
+
+--2020/07/24
+
+UPDATE sys_table SET notify_action = '[{"channel":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["cat_grate"]}]'
+WHERE id = 'cat_mat_grate';
+
+UPDATE sys_table SET notify_action = '[{"channel":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["gully"]}]'
+WHERE id = 'cat_mat_gully';
+
+UPDATE sys_table SET notify_action = '[{"channel":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["cat_arc", "arc"]}]'
+WHERE id = 'cat_mat_arc';
+
+UPDATE sys_table SET notify_action = '[{"channel":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["cat_node", "node", "connec"]}]'
+WHERE id = 'cat_mat_node';

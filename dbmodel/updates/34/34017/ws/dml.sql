@@ -5858,3 +5858,12 @@ VALUES('107', 'Other mincuts whichs overlaps', 'qml', $$<!DOCTYPE qgis PUBLIC 'h
   <layerGeometryType>2</layerGeometryType>
 </qgis>
 $$, true);
+
+
+
+--24/07/2020
+UPDATE sys_table SET notify_action = '[{"channel":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["cat_arc"]}]'
+WHERE id = 'cat_mat_arc';
+
+UPDATE sys_table SET notify_action = '[{"channel":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["cat_node", "cat_connec"]}]'
+WHERE id = 'cat_mat_node';

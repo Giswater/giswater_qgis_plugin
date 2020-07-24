@@ -155,3 +155,16 @@ UPDATE config_param_system set isenabled = true, layoutorder = 6, widgettype='ch
 dv_isparent=false, isautoupdate=false where parameter='edit_topocontrol_disable_error';
 
 UPDATE config_param_system set  layoutorder = 7 where parameter='admin_currency';
+
+
+UPDATE sys_table SET notify_action = '[{"channel":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"muni_id, name","featureType":["arc", "node", "connec", "v_ext_plot","v_ext_streetaxis", "v_ext_address"]}]' 
+WHERE id = 'ext_municipality';
+
+UPDATE sys_table SET notify_action = '[{"channel":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"expl_id, name","featureType":["arc", "node", "connec","v_edit_element", "v_edit_samplepoint","v_edit_pond", "v_edit_pool", "v_edit_dma", "v_ext_plot","v_ext_streetaxis", "v_ext_address"]}]' 
+WHERE id = 'exploitation';
+
+UPDATE sys_table SET notify_action = '[{"channel":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec","v_ext_plot","v_ext_address"]}]'
+WHERE id = 'ext_streetaxis';
+
+UPDATE sys_table SET notify_action = '[{"channel":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["arc", "node", "connec", "v_ext_address"]}]'
+WHERE id = 'ext_plot';
