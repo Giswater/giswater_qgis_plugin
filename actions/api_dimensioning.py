@@ -168,10 +168,7 @@ class ApiDimensioning(ApiParent):
         feature += f'"id":"{self.fid}"'
         extras = f'"fields":{{{fields}}}'
         body = self.create_body(feature=feature, extras=extras)
-
-        # Execute query
-        sql = f"SELECT gw_fct_setdimensioning({body})::text"
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        result = self.controller.get_json('gw_fct_setdimensioning', body)
 
         # Close dialog
         self.close_dialog(self.dlg_dim)
