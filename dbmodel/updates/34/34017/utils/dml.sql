@@ -149,3 +149,9 @@ UPDATE config_form_fields SET dv_querytext = 'SELECT id, idval FROM config_visit
 UPDATE config_form_fields SET dv_querytext = 'SELECT id, idval FROM (SELECT node_1 AS id, node_1 AS idval FROM arc UNION SELECT DISTINCT node_2 AS id, node_2 AS idval FROM arc)c WHERE id IS NOT NULL' WHERE formname = 'visit_singlevent' AND columnname = 'position_id';
 
 UPDATE sys_param_user SET formname = 'hidden' WHERE formname = 'hidden_value';
+
+-- 2020/07/24
+UPDATE config_param_system set isenabled = true, layoutorder = 6, widgettype='check', ismandatory = false, iseditable = true, layoutname='lyt_system',
+dv_isparent=false, isautoupdate=false where parameter='edit_topocontrol_disable_error';
+
+UPDATE config_param_system set  layoutorder = 7 where parameter='admin_currency';
