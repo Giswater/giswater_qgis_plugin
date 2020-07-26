@@ -1483,19 +1483,13 @@ class ApiParent(ParentAction):
 
         dialog = kwargs['dialog']
         widget = kwargs['widget']
-        function_name = kwargs['function_name']
         complet_result = self.manage_dxf(dialog, path, False, True)
-        gruop_name = os.path.splitext(os.path.basename(path))[0]
-        self.add_layer.zoom_to_group(gruop_name)
+
         for layer in complet_result['temp_layers_added']:
             self.temp_layers_added.append(layer)
         if complet_result is not False:
             widget.setText(complet_result['path'])
-        if complet_result['result']:
-            data = complet_result['result']['body']['data']
-            result = self.add_layer.add_temp_layer(dialog, data, function_name, True, False, 1, True)
-            for layer in result['temp_layers_added']:
-                self.temp_layers_added.append(layer)
+
         dialog.btn_run.setEnabled(True)
         dialog.btn_cancel.setEnabled(True)
 

@@ -48,7 +48,7 @@ class ManageVisit(ParentManage, QObject):
 
 
     def manage_visit(self, visit_id=None, geom_type=None, feature_id=None, single_tool=True, expl_id=None, tag=None,
-            open_dialog=True):
+            open_dialog=True, is_new_from_cf=False):
         """ Button 64. Add visit.
         if visit_id => load record related to the visit_id
         if geom_type => lock geom_type in relations tab
@@ -160,23 +160,30 @@ class ManageVisit(ParentManage, QObject):
 
         self.visit_id.setText(str(visit_id))
 
-        # Force tab_feature_changed
-        self.tab_feature_changed(self.dlg_add_visit, 'visit', excluded_layers=["v_edit_element"])
-
         if self.controller.get_project_type() == 'ud':
             self.event_feature_type_selected(self.dlg_add_visit, "gully")
         self.event_feature_type_selected(self.dlg_add_visit, "node")
         self.event_feature_type_selected(self.dlg_add_visit, "connec")
         self.event_feature_type_selected(self.dlg_add_visit, "arc")
 
+        # Force tab_feature_changed
+        self.tab_feature_changed(self.dlg_add_visit, 'visit', excluded_layers=["v_edit_element"])
+
         # Manage relation locking
         if self.locked_geom_type:
             self.set_locked_relation()
 
+        # Disable widgets when the visit is not new
+        if self.it_is_new_visit is False:
+            self.dlg_add_visit.btn_feature_insert.setEnabled(False)
+            self.dlg_add_visit.btn_feature_delete.setEnabled(False)
+            self.dlg_add_visit.btn_feature_snapping.setEnabled(False)
+            self.dlg_add_visit.tab_feature.setEnabled(False)
+
         # Open the dialog
         if open_dialog:
             # If the new visit dont come from info emit signal
-            if self.locked_geom_type is None:
+            if is_new_from_cf is False:
                 self.feature_type.currentIndexChanged.emit(0)
             self.open_dialog(self.dlg_add_visit, dlg_name="visit")
 
@@ -252,8 +259,6 @@ class ManageVisit(ParentManage, QObject):
         # tab Visit
         if self.current_tab_index == self.tab_index('tab_visit'):
             self.manage_leave_visit_tab()
-
-
 
         # Remove all previous selections
         self.disconnect_signal_selection_changed()
@@ -350,7 +355,7 @@ class ManageVisit(ParentManage, QObject):
 
         # C) load all related events in the relative table
         self.filter = f"visit_id = '{text}'"
-        table_name = f"{self.schema_name}.om_visit_event"
+        table_name = f"{self.schema_name}.v_ui_om_event"
         self.fill_table_object(self.tbl_event, table_name, self.filter)
         self.set_configuration(dialog, self.tbl_event, table_name)
         self.manage_events_changed()
@@ -1255,7 +1260,7 @@ class ManageVisit(ParentManage, QObject):
         if not om_event_parameter.fetch():
             return
         dlg_name = None
-        if om_event_parameter.form_type in ('event_ud_arc_standard', 'event_standard'):
+        if om_event_parameter.form_type  == 'event_ud_arc_standard':
             _value = self.dlg_add_visit.tbl_event.model().record(0).value('value')
             position_value = self.dlg_add_visit.tbl_event.model().record(0).value('position_value')
             text = self.dlg_add_visit.tbl_event.model().record(0).value('text')
@@ -1295,10 +1300,21 @@ class ManageVisit(ParentManage, QObject):
             self.dlg_event.position_value.setEnabled(True)
 
         elif om_event_parameter.form_type == 'event_standard':
-            _value = self.dlg_add_visit.tbl_event.model().record(0).value('value')
-            text = self.dlg_add_visit.tbl_event.model().record(0).value('text')
+            index = selected_list[0]
+            row = index.row()
+            column_index = qt_tools.get_col_index_by_col_name(self.dlg_add_visit.tbl_event, 'parameter_id')
+            parameter_id = index.sibling(row, column_index).data()
+            column_index = qt_tools.get_col_index_by_col_name(self.dlg_add_visit.tbl_event, 'event_code')
+            event_code = index.sibling(row, column_index).data()
+            column_index = qt_tools.get_col_index_by_col_name(self.dlg_add_visit.tbl_event, 'value')
+            _value = index.sibling(row, column_index).data()
+            column_index = qt_tools.get_col_index_by_col_name(self.dlg_add_visit.tbl_event, 'text')
+            text = index.sibling(row, column_index).data()
+
             self.dlg_event = VisitEvent()
             self.load_settings(self.dlg_event)
+            if event_code not in ('NULL', None):
+                qt_tools.setWidgetText(self.dlg_event, self.dlg_event.event_code, event_code)
             if _value not in ('NULL', None):
                 qt_tools.setWidgetText(self.dlg_event, self.dlg_event.value, _value)
             if text not in ('NULL', None):

@@ -17,6 +17,7 @@ import matplotlib.pyplot as plt
 import math
 import os
 import json
+import configparser
 
 from lib import qt_tools
 from .parent import ParentMapTool
@@ -440,8 +441,16 @@ class DrawProfiles(ParentMapTool):
         self.plot = plt
 
         # If file profile.png exist overwrite
-        plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-        img_path = plugin_path + os.sep + "templates" + os.sep + "profile.png"
+        plugin_name = self.get_value_from_metadata('name', 'giswater')
+        main_folder = os.path.join(os.path.expanduser("~"), plugin_name)
+        temp_folder = main_folder + os.sep + "temp"
+        img_path = temp_folder + os.sep + "profile.png"
+        if not os.path.exists(img_path):
+            os.makedirs(temp_folder)
+        else:
+            self.controller.log_info(f"User settings file: {img_path}")
+
+
         fig_size = plt.rcParams["figure.figsize"]
 
         # Set figure width to 10.4  and height to 4.8
@@ -540,9 +549,8 @@ class DrawProfiles(ParentMapTool):
             self.links.append(parameters)
             n = n + 1
 
-        n = 0
-
         # Populate node parameters with associated arcs
+        n = 0
         for arc in arcs:
             self.nodes[n].z1 = arc['z1']
             self.nodes[n].z2 = arc['z2']
@@ -799,7 +807,6 @@ class DrawProfiles(ParentMapTool):
         self.slast = [s5x, s5y]
         self.ilast = [i5x, i5y]
 
-
         # Save last points for draw ground
         self.slast2 = [s3x, s3y]
         self.ilast2 = [i3x, i3y]
@@ -823,7 +830,7 @@ class DrawProfiles(ParentMapTool):
             # Fill y_max and elevation
             # 1st node : y_max,y2 and top_elev, elev2
             if indx == 0:
-                # # Fill y_max
+                # Fill y_max
                 plt.annotate(' ' + '\n' + str(round(self.nodes[0].descript['ymax'], 2)) + '\n' + str(round(self.nodes[0].y2, 2)),
                              xy=(Decimal(0 + start_point),
                                  self.min_top_elev - Decimal(self.height_row * Decimal(2.60) + self.height_row / 2)), fontsize=6,
@@ -1080,7 +1087,6 @@ class DrawProfiles(ParentMapTool):
         plt.plot(xsup_up, ysup_up, self.profile_json['body']['data']['stylesheet']['infra']['color'], zorder=100,
                  linestyle=self.dict_style[node.sys_type])
 
-
         self.first_top_x = self.slast2[0]
         self.first_top_y = self.slast2[1]
 
@@ -1294,4 +1300,27 @@ class DrawProfiles(ParentMapTool):
         self.canvas.refresh()
         if actionpan:
             self.iface.actionPan().trigger()
+
+
+    def get_value_from_metadata(self, parameter, default_value):
+        """ Get @parameter from metadata.txt file """
+
+        # Check if metadata file exists
+        metadata_file = os.path.join(self.plugin_dir, 'metadata.txt')
+        if not os.path.exists(metadata_file):
+            message = f"Metadata file not found: {metadata_file}"
+            self.iface.messageBar().pushMessage("", message, 1, 20)
+            return default_value
+
+        value = None
+        try:
+            metadata = configparser.ConfigParser()
+            metadata.read(metadata_file)
+            value = metadata.get('general', parameter)
+        except configparser.NoOptionError:
+            message = f"Parameter not found: {parameter}"
+            self.iface.messageBar().pushMessage("", message, 1, 20)
+            value = default_value
+        finally:
+            return value
 

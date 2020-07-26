@@ -648,58 +648,6 @@ class MincutParent(ParentAction):
             return
 
         if result['body']['actions']['overlap'] == 'Conflict':
-            result_layer = self.add_layer.add_temp_layer(
-                self.dlg_mincut, result['body']['data'], None, False, tab_idx=2)
-            for layer in result_layer['temp_layers_added']:
-
-                symbol = QgsSymbol.defaultSymbol(layer.geometryType())
-                if type(symbol) == QgsLineSymbol:
-                    props = {'capstyle': 'round', 'customdash': '5;2', 'customdash_map_unit_scale': '3x:0,0,0,0,0,0',
-                             'customdash_unit': 'MM', 'draw_inside_polygon': '0', 'joinstyle': 'round',
-                             'line_color': '76,119,220,255', 'line_style': 'solid', 'line_width': '1.6',
-                             'line_width_unit': 'MM', 'offset': '0', 'offset_map_unit_scale': '3x:0,0,0,0,0,0',
-                             'offset_unit': 'MM', 'ring_filter': '0', 'use_custom_dash': '0',
-                             'width_map_unit_scale': '3x:0,0,0,0,0,0'}
-                    self.add_layer.set_layer_symbology(layer, props)
-                    # Add border
-                    renderer = layer.renderer()
-                    symbol1 = renderer.symbol()
-                    props2 = {'capstyle': 'round', 'customdash': '5;2', 'customdash_map_unit_scale': '3x:0,0,0,0,0,0',
-                              'customdash_unit': 'MM', 'draw_inside_polygon': '0', 'joinstyle': 'round',
-                              'line_color': '76,38,0,255', 'line_style': 'solid', 'line_width': '1.8',
-                              'line_width_unit': 'MM', 'offset': '0', 'offset_map_unit_scale': '3x:0,0,0,0,0,0',
-                              'offset_unit': 'MM', 'ring_filter': '0', 'use_custom_dash': '0',
-                              'width_map_unit_scale': '3x:0,0,0,0,0,0'}
-                    symbol2 = QgsLineSymbol.createSimple(props2)
-                    symbol_layer = symbol2.symbolLayer(0)
-                    symbol1.insertSymbolLayer(0, symbol_layer.clone())
-
-                elif type(symbol) == QgsMarkerSymbol:
-                    props = {'angle': '0', 'color': '255,0,0,150', 'horizontal_anchor_point': '1',
-                             'joinstyle': 'bevel', 'name': 'circle', 'offset': '0,0',
-                             'offset_map_unit_scale': '3x:0,0,0,0,0,0',
-                             'offset_unit': 'MM', 'outline_color': '35,35,35,255', 'outline_style': 'solid',
-                             'outline_width': '0', 'outline_width_map_unit_scale': '3x:0,0,0,0,0,0',
-                             'outline_width_unit': 'MM', 'scale_method': 'diameter', 'size': '2.6',
-                             'size_map_unit_scale': '3x:0,0,0,0,0,0', 'size_unit': 'MM', 'vertical_anchor_point': '1'}
-                    self.add_layer.set_layer_symbology(layer, props)
-                    # Add cross
-                    renderer = layer.renderer()
-                    symbol1 = renderer.symbol()
-                    symbol2 = QgsMarkerSymbol.createSimple({'name': 'cross', 'color': 'black', 'size': '4.0'})
-                    symbol_layer = symbol2.symbolLayer(0)
-                    symbol1.appendSymbolLayer(symbol_layer.clone())
-
-                elif type(symbol) == QgsFillSymbol:
-                    props = {'border_width_map_unit_scale': '3x:0,0,0,0,0,0', 'color': '255,112,40,125',
-                             'joinstyle': 'bevel', 'offset': '0,0', 'offset_map_unit_scale': '3x:0,0,0,0,0,0',
-                             'offset_unit': 'MM', 'outline_color': '35,35,35,255', 'outline_style': 'solid',
-                             'outline_width': '0.26', 'outline_width_unit': 'MM', 'style': 'solid'}
-
-                    self.add_layer.set_layer_symbology(layer, props)
-                layer.triggerRepaint()
-                self.iface.layerTreeView().refreshLayerSymbology(layer.id())
-
             self.dlg_dtext = DialogTextUi()
             self.load_settings(self.dlg_dtext)
             self.dlg_dtext.btn_close.setText('Cancel')
@@ -732,7 +680,7 @@ class MincutParent(ParentAction):
     def mincut_ok(self, result):
 
         # Manage result and force tab log
-        self.add_layer.add_temp_layer(self.dlg_mincut, result['body']['data'], None, True, tab_idx=3)
+        # self.add_layer.add_temp_layer(self.dlg_mincut, result['body']['data'], None, True, tab_idx=3)
 
         # Set tabs enabled(True/False)
         qtabwidget = self.dlg_mincut.findChild(QTabWidget, 'mainTab')
@@ -1651,13 +1599,13 @@ class MincutParent(ParentAction):
         # feature_id: id of snapped arc/node
         # feature_type: type of snapped element (arc/node)
         # result_mincut_id: result_mincut_id from form
-        sql = f"SELECT gw_fct_mincut('{elem_id}', '{elem_type}', '{real_mincut_id}');"
-        row = self.controller.get_row(sql)
-        if not row or not row[0]:
-            self.controller.show_message("NOT ROW FOR: " + sql, 2)
-            return False
 
-        complet_result = row[0]
+        extras = f'"valveUnaccess":{{"status":"false"}}, '
+        extras += f'"mincutId":"{real_mincut_id}", "arcId":"{elem_id}"'
+        body = self.create_body(extras=extras)
+        complet_result = self.controller.get_json('gw_fct_setmincut', body, log_sql=True)
+        if complet_result is False: return False
+
         if 'mincutOverlap' in complet_result:
             if complet_result['mincutOverlap'] != "":
                 message = "Mincut done, but has conflict and overlaps with"
@@ -1815,11 +1763,10 @@ class MincutParent(ParentAction):
         cur_user = self.controller.get_project_user()               
         result_mincut_id = qt_tools.getWidgetText(self.dlg_mincut, "result_mincut_id")
         if result_mincut_id != 'null':
-            sql = f"SELECT gw_fct_mincut_valve_unaccess('{elem_id}', '{result_mincut_id}', '{cur_user}');"
-            status = self.controller.execute_sql(sql, log_sql=False)
-            if status:
-                message = "Custom mincut executed successfully"
-                self.controller.show_info(message)
+            extras = f'"valveUnaccess":{{"status":"true", "nodeId":{elem_id}}}, '
+            extras += f'"mincutId":"{result_mincut_id}"'
+            body = self.create_body(extras=extras)
+            result = self.controller.get_json('gw_fct_setmincut', body, log_sql=True)
 
         # Refresh map canvas
         self.refresh_map_canvas(True)

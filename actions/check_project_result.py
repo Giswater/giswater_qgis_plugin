@@ -88,7 +88,7 @@ class CheckProjectResult(ApiParent):
         body = self.create_body(extras=extras)
         result = self.controller.get_json('gw_fct_audit_check_project', body)
         try:
-            if not result or (result['body']['actions']['hideForm'] == True):
+            if not result or (result['body']['variables']['hideForm'] == True):
                 return result
         except KeyError as e:
             self.controller.log_warning(f"EXCEPTION: {type(e).__name__}, {e}")
@@ -120,7 +120,8 @@ class CheckProjectResult(ApiParent):
         self.hide_void_groupbox(self.dlg_audit_project)
 
         if int(critical_level) > 0 or text_result:
-            self.dlg_audit_project.btn_accept.clicked.connect(partial(self.add_selected_layers))
+            self.dlg_audit_project.btn_accept.clicked.connect(partial(self.add_selected_layers, self.dlg_audit_project,
+                                                                      result['body']['data']['missingLayers']))
             self.dlg_audit_project.chk_hide_form.stateChanged.connect(partial(self.update_config))
             self.open_dialog(self.dlg_audit_project, dlg_name='project_check')
 
@@ -158,8 +159,6 @@ class CheckProjectResult(ApiParent):
                 widget = QCheckBox()
                 widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
                 widget.setObjectName(f"{item['layer']}")
-                widget.setProperty('field_id', item['id'])
-                widget.setProperty('field_the_geom', item['field_the_geom'])
 
                 if int(item['criticity']) == 3:
                     grl_critical.addWidget(label, pos, 0)
@@ -174,26 +173,36 @@ class CheckProjectResult(ApiParent):
         return critical_level
 
 
-    def add_selected_layers(self):
+    def add_selected_layers(self, dialog, m_layers):
+        """ Receive a list of layers, look for the checks associated with each layer and if they are checked,
+            load the corresponding layer and put styles
+        :param dialog: Dialog where to look for QCheckBox (QDialog)
+        :param m_layers: List with the information of the missing layers (list)[{...}, {...}, {...}, ...]
+        :return:
+        """
 
-        checks = self.dlg_audit_project.scrollArea.findChildren(QCheckBox)
-        schemaname = self.schema_name.replace('"', '')
-        for check in checks:
+        for layer_info in m_layers:
+            if layer_info == {}: continue
+
+            check = dialog.findChild(QCheckBox, layer_info['layer'])
             if check.isChecked():
-                try:
-                    the_geom = check.property('field_the_geom')
-                except KeyError:
-                    sql = (f"SELECT attname FROM pg_attribute a "
-                           f" JOIN pg_class t on a.attrelid = t.oid "
-                           f" JOIN pg_namespace s on t.relnamespace = s.oid "
-                           f" WHERE a.attnum > 0  AND NOT a.attisdropped  AND t.relname = '{check.objectName()}' "
-                           f" AND s.nspname = '{schemaname}' "
-                           f" AND left (pg_catalog.format_type(a.atttypid, a.atttypmod), 8)='geometry' "
-                           f" ORDER BY a.attnum limit 1")
-                    the_geom = self.controller.get_row(sql)
-                if not the_geom:
-                    the_geom = None
-                self.add_layer.from_postgres_to_toc(check.objectName(), the_geom, check.property('field_id'), None)
+                geom_field = layer_info['geom_field']
+                pkey_field = layer_info['pkey_field']
+                group = layer_info['group_layer'] if layer_info['group_layer'] is not None else 'GW Layers'
+                style_id = layer_info['style_id']
+
+                self.add_layer.from_postgres_to_toc(layer_info['layer'], geom_field, pkey_field, None, group=group)
+                if style_id is not None:
+                    layer = self.controller.get_layer_by_tablename(layer_info['layer'])
+                    if layer:
+                        extras = f'"style_id":"{style_id}"'
+                        body = self.create_body(extras=extras)
+                        style = self.controller.get_json('gw_fct_getstyle', body, log_sql=True)
+                        if 'styles' in style['body']:
+                            if 'style' in style['body']['styles']:
+                                qml = style['body']['styles']['style']
+                            self.add_layer.create_qml(layer, qml)
+                self.controller.set_layer_visible(layer)
 
         self.close_dialog(self.dlg_audit_project)
 

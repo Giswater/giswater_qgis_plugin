@@ -117,10 +117,10 @@ class GwActions(ApiParent):
             layer = kwargs["layer"]
             if type(layer) is str:
                 layer = self.controller.get_layer_by_tablename(layer)
-            col_name = kwargs["columnname"]
+            col_name = kwargs["field"]
             hidden = kwargs["hidden"]
         except Exception as e:
-            self.controller.log_info(f"{type(e).__name__} --> {e}")
+            self.controller.log_info(f"{kwargs}-->{type(e).__name__} --> {e}")
             return
 
         config = layer.attributeTableConfig()
