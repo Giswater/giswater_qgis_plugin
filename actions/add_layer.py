@@ -15,7 +15,7 @@ from qgis.PyQt.QtWidgets import QPushButton, QTabWidget
 import os
 from random import randrange
 
-from .. import utils_giswater
+from lib import qt_tools
 
 
 class AddLayer(object):
@@ -92,7 +92,8 @@ class AddLayer(object):
             self.controller.log_info(F"ERROR --> {error[1]}")
 
 
-    def from_postgres_to_toc(self, tablename=None, the_geom="the_geom", field_id="id", child_layers=None, group="GW Layers", style_id="-1"):
+    def from_postgres_to_toc(self, tablename=None, the_geom="the_geom", field_id="id", child_layers=None,
+        group="GW Layers", style_id="-1"):
         """ Put selected layer into TOC
         :param tablename: Postgres table name (String)
         :param the_geom: Geometry field of the table (String)
@@ -332,7 +333,7 @@ class AddLayer(object):
         """
 
         change_tab = False
-        text = utils_giswater.getWidgetText(dialog, dialog.txt_infolog, return_string_null=False)
+        text = qt_tools.getWidgetText(dialog, dialog.txt_infolog, return_string_null=False)
 
         if reset_text:
             text = ""
@@ -345,7 +346,7 @@ class AddLayer(object):
                 else:
                     text += "\n"
 
-        utils_giswater.setWidgetText(dialog, 'txt_infolog', text + "\n")
+        qt_tools.setWidgetText(dialog, 'txt_infolog', text + "\n")
         qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
         if qtabwidget is not None:
             if change_tab and qtabwidget is not None:
@@ -372,7 +373,7 @@ class AddLayer(object):
 
         btn_cancel = dialog.findChild(QPushButton, 'btn_cancel')
         if btn_cancel:
-            utils_giswater.setWidgetText(dialog, btn_accept, 'Close')
+            qt_tools.setWidgetText(dialog, btn_accept, 'Close')
 
 
     def populate_vlayer(self, virtual_layer, data, layer_type, counter, group='GW Temporal Layers'):
@@ -449,7 +450,7 @@ class AddLayer(object):
         :return: Coordinates of the feature (String)
         This function is called in def get_geometry(self, feature)
               geometry = getattr(self, f"get_{feature['geometry']['type'].lower()}")(feature)
-          """
+        """
         return f"({feature['geometry']['coordinates'][0]} {feature['geometry']['coordinates'][1]})"
 
 
@@ -459,7 +460,7 @@ class AddLayer(object):
         :return: Coordinates of the feature (String)
         This function is called in def get_geometry(self, feature)
               geometry = getattr(self, f"get_{feature['geometry']['type'].lower()}")(feature)
-          """
+        """
         return self.get_coordinates(feature)
 
 
@@ -469,7 +470,7 @@ class AddLayer(object):
         :return: Coordinates of the feature (String)
         This function is called in def get_geometry(self, feature)
               geometry = getattr(self, f"get_{feature['geometry']['type'].lower()}")(feature)
-          """
+        """
         return self.get_multi_coordinates(feature)
 
 
@@ -479,7 +480,7 @@ class AddLayer(object):
         :return: Coordinates of the feature (String)
         This function is called in def get_geometry(self, feature)
               geometry = getattr(self, f"get_{feature['geometry']['type'].lower()}")(feature)
-          """
+        """
         return self.get_multi_coordinates(feature)
 
 
@@ -522,6 +523,7 @@ class AddLayer(object):
         :param feature: Json with the information of the received feature (geoJson)
         :return: Coordinates of the feature received (String)
         """
+
         coordinates = "("
         for coords in feature['geometry']['coordinates']:
             coordinates += "("
@@ -604,8 +606,6 @@ class AddLayer(object):
             self.delete_layer_from_toc(layer_name)
 
 
-
-
     def load_qml(self, layer, qml_path):
         """ Apply QML style located in @qml_path in @layer
         :param layer: layer to set qml (QgsVectorLayer)
@@ -636,6 +636,7 @@ class AddLayer(object):
         :param buffer: Space left between the group zoom and the canvas (integer)
         :return: False if don't find the group
         """
+
         extent = QgsRectangle()
         extent.setMinimal()
 

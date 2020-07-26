@@ -160,7 +160,7 @@ class CreateGisProject:
 
         status = False
         try:
-            db_path = self.plugin_dir + os.sep + "config" + os.sep + "config.sqlite"
+            db_path = self.plugin_dir + os.sep + "resources" + os.sep + "gis" + os.sep + "srid.sqlite"
             self.controller.log_info(db_path)
             if os.path.exists(db_path):
                 self.conn = sqlite3.connect(db_path)
@@ -187,7 +187,8 @@ class CreateGisProject:
 
         else:
             sql = (f"SELECT proj4text as parameters, 2104 as srs_id, srid, auth_name || ':' || auth_srid as auth_id, "
-                   f"'ETRS89 / UTM zone 31N' as description, 'UTM' as projection_acronym, 'GRS80' as ellipsoid_acronym, 0 as is_geo "
+                   f"'ETRS89 / UTM zone 31N' as description, 'UTM' as projection_acronym, "
+                   f"'GRS80' as ellipsoid_acronym, 0 as is_geo "
                    f"FROM spatial_ref_sys "
                    f"WHERE srid = '{srid}'")
             row = self.controller.get_row(sql, log_sql=True)

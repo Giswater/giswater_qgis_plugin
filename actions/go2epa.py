@@ -15,7 +15,7 @@ import os
 import sys
 from functools import partial
 
-from .. import utils_giswater
+from lib import qt_tools
 from .api_go2epa_options import Go2EpaOptions
 from .api_parent import ApiParent
 from .task_go2epa import TaskGo2Epa
@@ -69,7 +69,7 @@ class Go2Epa(ApiParent):
 
         # Check OS and enable/disable checkbox execute EPA software
         if sys.platform != "win32":
-            utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec, False)
+            qt_tools.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec, False)
             self.dlg_go2epa.chk_exec.setEnabled(False)
             self.dlg_go2epa.chk_exec.setText('Execute EPA software (Runs only on Windows)')
 
@@ -105,11 +105,11 @@ class Go2Epa(ApiParent):
 
     def check_rpt(self):
 
-        file_inp = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp)
-        file_rpt = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt)
+        file_inp = qt_tools.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp)
+        file_rpt = qt_tools.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt)
 
         # Control execute epa software
-        if utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec):
+        if qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec):
             if self.check_inp_chk(file_inp) is False:
                 return False
 
@@ -118,7 +118,7 @@ class Go2Epa(ApiParent):
                 self.controller.show_warning(msg, parameter=str(file_rpt))
                 return False
 
-            if not utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export):
+            if not qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export):
                 if not os.path.exists(file_inp):
                     msg = "File INP not found"
                     self.controller.show_warning(msg, parameter=str(file_rpt))
@@ -127,12 +127,12 @@ class Go2Epa(ApiParent):
 
     def check_fields(self):
 
-        file_inp = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp)
-        file_rpt = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt)
-        result_name = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_result_name, False, False)
+        file_inp = qt_tools.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp)
+        file_rpt = qt_tools.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt)
+        result_name = qt_tools.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_result_name, False, False)
 
         # Control export INP
-        if utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export):
+        if qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export):
             if self.check_inp_chk(file_inp) is False:
                 return False
 
@@ -141,12 +141,12 @@ class Go2Epa(ApiParent):
             return False
 
         # Control import result
-        if utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result):
+        if qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result):
             if file_rpt is None:
                 msg = "Select valid RPT file"
                 self.controller.show_warning(msg, parameter=str(file_rpt))
                 return False
-            if not utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec):
+            if not qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec):
                 if not os.path.exists(file_rpt):
                     msg = "File RPT not found"
                     self.controller.show_warning(msg, parameter=str(file_rpt))
@@ -189,19 +189,19 @@ class Go2Epa(ApiParent):
 
         value = self.controller.plugin_settings_value('go2epa_chk_NETWORK_GEOM' + cur_user)
         if str(value) == 'true':
-            utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check, True)
+            qt_tools.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check, True)
         value = self.controller.plugin_settings_value('go2epa_chk_INP' + cur_user)
         if str(value) == 'true':
-            utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export, True)
+            qt_tools.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export, True)
         value = self.controller.plugin_settings_value('go2epa_chk_UD' + cur_user)
         if str(value) == 'true':
-            utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch, True)
+            qt_tools.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch, True)
         value = self.controller.plugin_settings_value('go2epa_chk_EPA' + cur_user)
         if str(value) == 'true':
-            utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec, True)
+            qt_tools.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec, True)
         value = self.controller.plugin_settings_value('go2epa_chk_RPT' + cur_user)
         if str(value) == 'true':
-            utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result, True)
+            qt_tools.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result, True)
 
 
     def save_user_values(self):
@@ -209,21 +209,21 @@ class Go2Epa(ApiParent):
 
         cur_user = self.controller.get_current_user()
         self.controller.plugin_settings_set_value('go2epa_RESULT_NAME' + cur_user,
-            utils_giswater.getWidgetText(self.dlg_go2epa, 'txt_result_name', return_string_null=False))
+            qt_tools.getWidgetText(self.dlg_go2epa, 'txt_result_name', return_string_null=False))
         self.controller.plugin_settings_set_value('go2epa_FILE_INP' + cur_user,
-            utils_giswater.getWidgetText(self.dlg_go2epa, 'txt_file_inp', return_string_null=False))
+            qt_tools.getWidgetText(self.dlg_go2epa, 'txt_file_inp', return_string_null=False))
         self.controller.plugin_settings_set_value('go2epa_FILE_RPT' + cur_user,
-            utils_giswater.getWidgetText(self.dlg_go2epa, 'txt_file_rpt', return_string_null=False))
+            qt_tools.getWidgetText(self.dlg_go2epa, 'txt_file_rpt', return_string_null=False))
         self.controller.plugin_settings_set_value('go2epa_chk_NETWORK_GEOM' + cur_user,
-            utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check))
+            qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check))
         self.controller.plugin_settings_set_value('go2epa_chk_INP' + cur_user,
-            utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export))
+            qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export))
         self.controller.plugin_settings_set_value('go2epa_chk_UD' + cur_user,
-            utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch))
+            qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch))
         self.controller.plugin_settings_set_value('go2epa_chk_EPA' + cur_user,
-            utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec))
+            qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec))
         self.controller.plugin_settings_set_value('go2epa_chk_RPT' + cur_user,
-            utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result))
+            qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result))
 
 
     def sector_selection(self, tableleft, tableright, field_id_left, field_id_right, aql=""):
@@ -235,12 +235,12 @@ class Go2Epa(ApiParent):
 
         if tableleft == 'cat_dscenario':
             dlg_psector_sel.setWindowTitle(" Dscenario selector")
-            utils_giswater.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_filter,
-                                         self.controller.tr('Filter by: Dscenario name', context_name='labels'))
-            utils_giswater.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_unselected,
-                                         self.controller.tr('Unselected dscenarios', context_name='labels'))
-            utils_giswater.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_selected,
-                                         self.controller.tr('Selected dscenarios', context_name='labels'))
+            qt_tools.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_filter,
+                                   self.controller.tr('Filter by: Dscenario name', context_name='labels'))
+            qt_tools.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_unselected,
+                                   self.controller.tr('Unselected dscenarios', context_name='labels'))
+            qt_tools.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_selected,
+                                   self.controller.tr('Selected dscenarios', context_name='labels'))
 
         self.multi_row_selector(dlg_psector_sel, tableleft, tableright, field_id_left, field_id_right, aql=aql)
 
@@ -273,16 +273,16 @@ class Go2Epa(ApiParent):
             self.controller.show_warning(message, parameter='cat_hydrology')
             return False
 
-        utils_giswater.set_item_data(self.dlg_hydrology_selector.hydrology, rows)
+        qt_tools.set_item_data(self.dlg_hydrology_selector.hydrology, rows)
 
         sql = ("SELECT DISTINCT(t1.name) FROM cat_hydrology AS t1 "
                "INNER JOIN selector_inp_hydrology AS t2 ON t1.hydrology_id = t2.hydrology_id "
                "WHERE t2.cur_user = current_user")
         row = self.controller.get_row(sql)
         if row:
-            utils_giswater.setWidgetText(self.dlg_hydrology_selector, self.dlg_hydrology_selector.hydrology, row[0])
+            qt_tools.setWidgetText(self.dlg_hydrology_selector, self.dlg_hydrology_selector.hydrology, row[0])
         else:
-            utils_giswater.setWidgetText(self.dlg_hydrology_selector, self.dlg_hydrology_selector.hydrology, 0)
+            qt_tools.setWidgetText(self.dlg_hydrology_selector, self.dlg_hydrology_selector.hydrology, 0)
 
         self.update_labels()
         self.open_dialog(self.dlg_hydrology_selector)
@@ -290,8 +290,7 @@ class Go2Epa(ApiParent):
 
     def save_hydrology(self):
 
-        hydrology_id = utils_giswater.get_item_data(
-            self.dlg_hydrology_selector, self.dlg_hydrology_selector.hydrology, 1)
+        hydrology_id = qt_tools.get_item_data(self.dlg_hydrology_selector, self.dlg_hydrology_selector.hydrology, 1)
         sql = ("SELECT cur_user FROM selector_inp_hydrology "
                "WHERE cur_user = current_user")
         row = self.controller.get_row(sql)
@@ -316,8 +315,8 @@ class Go2Epa(ApiParent):
                f" WHERE name = '{self.dlg_hydrology_selector.hydrology.currentText()}'")
         row = self.controller.get_row(sql)
         if row is not None:
-            utils_giswater.setText(self.dlg_hydrology_selector, self.dlg_hydrology_selector.infiltration, row[0])
-            utils_giswater.setText(self.dlg_hydrology_selector, self.dlg_hydrology_selector.descript, row[1])
+            qt_tools.setText(self.dlg_hydrology_selector, self.dlg_hydrology_selector.infiltration, row[0])
+            qt_tools.setText(self.dlg_hydrology_selector, self.dlg_hydrology_selector.descript, row[1])
 
 
     def filter_cbx_by_text(self, tablename, widgettxt, widgetcbx):
@@ -330,14 +329,14 @@ class Go2Epa(ApiParent):
             message = "Check the table 'cat_hydrology' "
             self.controller.show_warning(message)
             return False
-        utils_giswater.set_item_data(widgetcbx, rows)
+        qt_tools.set_item_data(widgetcbx, rows)
         self.update_labels()
 
 
     def go2epa_select_file_inp(self):
         """ Select INP file """
 
-        self.file_inp = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp)
+        self.file_inp = qt_tools.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp)
         # Set default value if necessary
         if self.file_inp is None or self.file_inp == '':
             self.file_inp = self.plugin_dir
@@ -349,7 +348,7 @@ class Go2Epa(ApiParent):
         os.chdir(folder_path)
         message = self.controller.tr("Select INP file")
         self.file_inp, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.inp')
-        utils_giswater.setWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp, self.file_inp)
+        qt_tools.setWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp, self.file_inp)
 
 
     def go2epa_select_file_rpt(self):
@@ -366,7 +365,7 @@ class Go2Epa(ApiParent):
         os.chdir(folder_path)
         message = self.controller.tr("Select RPT file")
         self.file_rpt, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.rpt')
-        utils_giswater.setWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt, self.file_rpt)
+        qt_tools.setWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt, self.file_rpt)
 
 
     def go2epa_accept(self):
@@ -382,14 +381,14 @@ class Go2Epa(ApiParent):
             return
 
         # Get widgets values
-        self.result_name = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_result_name, False, False)
-        self.net_geom = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check)
-        self.export_inp = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export)
-        self.export_subcatch = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch)
-        self.file_inp = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp)
-        self.exec_epa = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec)
-        self.file_rpt = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt)
-        self.import_result = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result)
+        self.result_name = qt_tools.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_result_name, False, False)
+        self.net_geom = qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check)
+        self.export_inp = qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export)
+        self.export_subcatch = qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch)
+        self.file_inp = qt_tools.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp)
+        self.exec_epa = qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec)
+        self.file_rpt = qt_tools.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt)
+        self.import_result = qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result)
 
         # Check for sector selector
         if self.export_inp:
@@ -412,7 +411,7 @@ class Go2Epa(ApiParent):
             getting id's from selected @viewname
         """
 
-        result_name = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_result_name)
+        result_name = qt_tools.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_result_name)
 
         # Adding auto-completion to a QLineEdit
         self.completer = QCompleter()
@@ -437,7 +436,7 @@ class Go2Epa(ApiParent):
     def check_result_id(self):
         """ Check if selected @result_id already exists """
 
-        result_id = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_result_name)
+        result_id = qt_tools.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_result_name)
         sql = (f"SELECT result_id FROM v_ui_rpt_cat_result"
                f" WHERE result_id = '{result_id}'")
         row = self.controller.get_row(sql, log_info=False)
@@ -455,9 +454,9 @@ class Go2Epa(ApiParent):
         self.dlg_go2epa_result = Go2EpaSelectorUi()
         self.load_settings(self.dlg_go2epa_result)
         if self.project_type == 'ud':
-            utils_giswater.remove_tab_by_tabName(self.dlg_go2epa_result.tabWidget, "tab_time")
+            qt_tools.remove_tab_by_tabName(self.dlg_go2epa_result.tabWidget, "tab_time")
         if self.project_type == 'ws':
-            utils_giswater.remove_tab_by_tabName(self.dlg_go2epa_result.tabWidget, "tab_datetime")
+            qt_tools.remove_tab_by_tabName(self.dlg_go2epa_result.tabWidget, "tab_datetime")
         self.dlg_go2epa_result.btn_accept.clicked.connect(self.result_selector_accept)
         self.dlg_go2epa_result.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_go2epa_result))
         self.dlg_go2epa_result.rejected.connect(partial(self.close_dialog, self.dlg_go2epa_result))
@@ -466,17 +465,17 @@ class Go2Epa(ApiParent):
         sql = ("SELECT DISTINCT(result_id), result_id "
                "FROM v_ui_rpt_cat_result ORDER BY result_id")
         rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_go2epa_result.rpt_selector_result_id, rows)
+        qt_tools.set_item_data(self.dlg_go2epa_result.rpt_selector_result_id, rows)
         rows = self.controller.get_rows(sql, add_empty_row=True)
-        utils_giswater.set_item_data(self.dlg_go2epa_result.rpt_selector_compare_id, rows)
+        qt_tools.set_item_data(self.dlg_go2epa_result.rpt_selector_compare_id, rows)
 
         if self.project_type == 'ws':
 
             sql = ("SELECT DISTINCT time, time FROM rpt_arc "
                    "WHERE result_id ILIKE '%%' ORDER BY time")
             rows = self.controller.get_rows(sql, add_empty_row=True)
-            utils_giswater.set_item_data(self.dlg_go2epa_result.cmb_time_to_show, rows)
-            utils_giswater.set_item_data(self.dlg_go2epa_result.cmb_time_to_compare, rows)
+            qt_tools.set_item_data(self.dlg_go2epa_result.cmb_time_to_show, rows)
+            qt_tools.set_item_data(self.dlg_go2epa_result.cmb_time_to_compare, rows)
 
             self.dlg_go2epa_result.rpt_selector_result_id.currentIndexChanged.connect(partial(
                 self.populate_time, self.dlg_go2epa_result.rpt_selector_result_id, self.dlg_go2epa_result.cmb_time_to_show))
@@ -486,22 +485,20 @@ class Go2Epa(ApiParent):
         elif self.project_type == 'ud':
 
             # Populate GroupBox Selector date
-            result_id = utils_giswater.get_item_data(
-                self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id, 0)
+            result_id = qt_tools.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id, 0)
             sql = (f"SELECT DISTINCT(resultdate), resultdate FROM rpt_arc "
                    f"WHERE result_id = '{result_id}' "
                    f"ORDER BY resultdate")
             rows = self.controller.get_rows(sql)
             if rows is not None:
-                utils_giswater.set_item_data(self.dlg_go2epa_result.cmb_sel_date, rows)
-                selector_date = utils_giswater.get_item_data(
-                    self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_sel_date, 0)
+                qt_tools.set_item_data(self.dlg_go2epa_result.cmb_sel_date, rows)
+                selector_date = qt_tools.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_sel_date, 0)
                 sql = (f"SELECT DISTINCT(resulttime), resulttime FROM rpt_arc "
                        f"WHERE result_id = '{result_id}' "
                        f"AND resultdate = '{selector_date}' "
                        f"ORDER BY resulttime")
                 rows = self.controller.get_rows(sql, add_empty_row=True)
-                utils_giswater.set_item_data(self.dlg_go2epa_result.cmb_sel_time, rows)
+                qt_tools.set_item_data(self.dlg_go2epa_result.cmb_sel_time, rows)
 
             self.dlg_go2epa_result.rpt_selector_result_id.currentIndexChanged.connect(partial(self.populate_date_time,
                         self.dlg_go2epa_result.cmb_sel_date))
@@ -511,22 +508,21 @@ class Go2Epa(ApiParent):
 
 
             # Populate GroupBox Selector compare
-            result_id_to_comp = utils_giswater.get_item_data(self.dlg_go2epa_result,
-                self.dlg_go2epa_result.rpt_selector_result_id, 0)
+            result_id_to_comp = qt_tools.get_item_data(self.dlg_go2epa_result,
+                                                       self.dlg_go2epa_result.rpt_selector_result_id, 0)
             sql = (f"SELECT DISTINCT(resultdate), resultdate FROM rpt_arc "
                    f"WHERE result_id = '{result_id_to_comp}' "
                    f"ORDER BY resultdate ")
             rows = self.controller.get_rows(sql)
-            if rows is not None:
-                utils_giswater.set_item_data(self.dlg_go2epa_result.cmb_com_date, rows)
-                selector_cmp_date = utils_giswater.get_item_data(
-                    self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_com_date, 0)
+            if rows:
+                qt_tools.set_item_data(self.dlg_go2epa_result.cmb_com_date, rows)
+                selector_cmp_date = qt_tools.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_com_date, 0)
                 sql = (f"SELECT DISTINCT(resulttime), resulttime FROM rpt_arc "
                        f"WHERE result_id = '{result_id_to_comp}' "
                        f"AND resultdate = '{selector_cmp_date}' "
                        f"ORDER BY resulttime")
                 rows = self.controller.get_rows(sql, add_empty_row=True)
-                utils_giswater.set_item_data(self.dlg_go2epa_result.cmb_com_time, rows)
+                qt_tools.set_item_data(self.dlg_go2epa_result.cmb_com_time, rows)
 
             self.dlg_go2epa_result.rpt_selector_compare_id.currentIndexChanged.connect(partial(
                 self.populate_date_time, self.dlg_go2epa_result.cmb_com_date))
@@ -537,11 +533,11 @@ class Go2Epa(ApiParent):
         sql = "SELECT result_id FROM selector_rpt_main"
         row = self.controller.get_row(sql)
         if row:
-            utils_giswater.set_combo_itemData(self.dlg_go2epa_result.rpt_selector_result_id, row["result_id"], 0)
+            qt_tools.set_combo_itemData(self.dlg_go2epa_result.rpt_selector_result_id, row["result_id"], 0)
         sql = "SELECT result_id FROM selector_rpt_compare"
         row = self.controller.get_row(sql)
         if row:
-            utils_giswater.set_combo_itemData(self.dlg_go2epa_result.rpt_selector_compare_id, row["result_id"], 0)
+            qt_tools.set_combo_itemData(self.dlg_go2epa_result.rpt_selector_compare_id, row["result_id"], 0)
 
         # Open the dialog
         self.open_dialog(self.dlg_go2epa_result, dlg_name='go2epa_selector')
@@ -549,19 +545,18 @@ class Go2Epa(ApiParent):
 
     def populate_date_time(self, combo_date):
 
-        result_id = utils_giswater.get_item_data(
-            self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id, 0)
+        result_id = qt_tools.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id, 0)
         sql = (f"SELECT DISTINCT(resultdate), resultdate FROM rpt_arc "
                f"WHERE result_id = '{result_id}' "
                f"ORDER BY resultdate")
         rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(combo_date, rows)
+        qt_tools.set_item_data(combo_date, rows)
 
 
     def populate_time(self, combo_result, combo_time):
         """ Populate combo times """
 
-        result_id = utils_giswater.get_item_data(self.dlg_go2epa_result, combo_result)
+        result_id = qt_tools.get_item_data(self.dlg_go2epa_result, combo_result)
         if self.project_type == 'ws':
             field = "time"
         else:
@@ -573,7 +568,7 @@ class Go2Epa(ApiParent):
                f"ORDER BY {field};")
 
         rows = self.controller.get_rows(sql, add_empty_row=True)
-        utils_giswater.set_item_data(combo_time, rows)
+        qt_tools.set_item_data(combo_time, rows)
 
 
     def result_selector_accept(self):
@@ -590,11 +585,10 @@ class Go2Epa(ApiParent):
         self.controller.execute_sql(sql)
 
         # Get new values from widgets of type QComboBox
-        rpt_selector_result_id = utils_giswater.get_item_data(
+        rpt_selector_result_id = qt_tools.get_item_data(
             self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id)
-        rpt_selector_compare_id = utils_giswater.get_item_data(
+        rpt_selector_compare_id = qt_tools.get_item_data(
             self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_compare_id)
-
         if rpt_selector_result_id not in (None, -1, ''):
             sql = (f"INSERT INTO selector_rpt_main (result_id, cur_user)"
                    f" VALUES ('{rpt_selector_result_id}', '{user}');\n")
@@ -606,9 +600,8 @@ class Go2Epa(ApiParent):
             self.controller.execute_sql(sql)
 
         if self.project_type == 'ws':
-            time_to_show = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_time_to_show)
-            time_to_compare = utils_giswater.get_item_data(
-                self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_time_to_compare)
+            time_to_show = qt_tools.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_time_to_show)
+            time_to_compare = qt_tools.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_time_to_compare)
             if time_to_show not in (None, -1, ''):
                 sql = (f"INSERT INTO selector_rpt_main_tstep (timestep, cur_user)"
                        f" VALUES ('{time_to_show}', '{user}');\n")
@@ -619,10 +612,10 @@ class Go2Epa(ApiParent):
                 self.controller.execute_sql(sql)
 
         elif self.project_type == 'ud':
-            date_to_show = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_sel_date)
-            time_to_show = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_sel_time)
-            date_to_compare = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_com_date)
-            time_to_compare = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_com_time)
+            date_to_show = qt_tools.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_sel_date)
+            time_to_show = qt_tools.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_sel_time)
+            date_to_compare = qt_tools.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_com_date)
+            time_to_compare = qt_tools.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_com_time)
             if date_to_show not in (None, -1, ''):
                 sql = (f"INSERT INTO selector_rpt_main_tstep (resultdate, resulttime, cur_user)"
                        f" VALUES ('{date_to_show}', '{time_to_show}', '{user}');\n")
@@ -653,16 +646,16 @@ class Go2Epa(ApiParent):
         for i in range(0, len(row)):
             column_name = self.dao.get_column_name(i)
             widget = dialog.findChild(QWidget, column_name)
-            widget_type = utils_giswater.getWidgetType(dialog, widget)
+            widget_type = qt_tools.getWidgetType(dialog, widget)
             if row[column_name] is not None:
                 if widget_type is QCheckBox:
-                    utils_giswater.setChecked(dialog, widget, row[column_name])
+                    qt_tools.setChecked(dialog, widget, row[column_name])
                 elif widget_type is QComboBox:
-                    utils_giswater.set_combo_itemData(widget, row[column_name], 0)
+                    qt_tools.set_combo_itemData(widget, row[column_name], 0)
                 elif widget_type is QDateEdit:
                     dateaux = row[column_name].replace('/', '-')
                     date = QDate.fromString(dateaux, 'dd-MM-yyyy')
-                    utils_giswater.setCalendarDate(dialog, widget, date)
+                    qt_tools.setCalendarDate(dialog, widget, date)
                 elif widget_type is QTimeEdit:
                     timeparts = str(row[column_name]).split(':')
                     if len(timeparts) < 3:
@@ -672,10 +665,10 @@ class Go2Epa(ApiParent):
                     minuts = int(timeparts[1])
                     seconds = int(timeparts[2])
                     time = QTime(hours, minuts, seconds)
-                    utils_giswater.setTimeEdit(dialog, widget, time)
-                    utils_giswater.setText(dialog, column_name + "_day", days)
+                    qt_tools.setTimeEdit(dialog, widget, time)
+                    qt_tools.setText(dialog, column_name + "_day", days)
                 else:
-                    utils_giswater.setWidgetText(dialog, widget, str(row[column_name]))
+                    qt_tools.setWidgetText(dialog, widget, str(row[column_name]))
 
             columns.append(column_name)
 
@@ -714,7 +707,7 @@ class Go2Epa(ApiParent):
 
         sql = "SELECT result_id FROM v_ui_rpt_cat_result ORDER BY result_id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_manager, self.dlg_manager.txt_result_id, rows)
+        qt_tools.fillComboBox(self.dlg_manager, self.dlg_manager.txt_result_id, rows)
 
 
     def filter_by_result_id(self):
@@ -722,7 +715,7 @@ class Go2Epa(ApiParent):
         table = self.dlg_manager.tbl_rpt_cat_result
         widget_txt = self.dlg_manager.txt_result_id
         tablename = 'v_ui_rpt_cat_result'
-        result_id = utils_giswater.getWidgetText(self.dlg_manager, widget_txt)
+        result_id = qt_tools.getWidgetText(self.dlg_manager, widget_txt)
         if result_id != 'null':
             expr = f" result_id ILIKE '%{result_id}%'"
             # Refresh model with selected filter

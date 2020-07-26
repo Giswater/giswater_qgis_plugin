@@ -26,7 +26,7 @@ from ..ui.tm.tree_selector import TreeSelector
 from ..ui.tm.incident_manager import IncidentManager
 from ..ui_manager import IncidentPlanning
 from ..ui_manager import InfoIncident
-from .. import utils_giswater
+from lib import qt_tools
 
 
 class TmBasic(TmParentAction):
@@ -97,8 +97,8 @@ class TmBasic(TmParentAction):
 
         # If campaign not exist, create new one
         if row is None:
-            start_date = utils_giswater.getCalendarDate(self.dlg_new_campaign, self.dlg_new_campaign.start_date)
-            end_date = utils_giswater.getCalendarDate(self.dlg_new_campaign, self.dlg_new_campaign.end_date)
+            start_date = qt_tools.getCalendarDate(self.dlg_new_campaign, self.dlg_new_campaign.start_date)
+            end_date = qt_tools.getCalendarDate(self.dlg_new_campaign, self.dlg_new_campaign.end_date)
             sql = (f"INSERT INTO cat_campaign(name, start_date, end_date) "
                    f" VALUES('{new_camp}', '{start_date}', '{end_date}');")
             self.controller.execute_sql(sql)
@@ -114,7 +114,7 @@ class TmBasic(TmParentAction):
         # Check if want copy any campaign or do new price list
         copy_years = self.dlg_new_campaign.chk_campaign.isChecked()
         if copy_years:
-            id_old_camp = utils_giswater.get_item_data(self.dlg_new_campaign, self.dlg_new_campaign.cbx_years)
+            id_old_camp = qt_tools.get_item_data(self.dlg_new_campaign, self.dlg_new_campaign.cbx_years)
             # If checkbox is checked but don't have any campaign selected do return.
             if id_old_camp == -1:
                 msg = "No tens cap any seleccionat, desmarca l'opcio de copiar preus"
@@ -257,7 +257,7 @@ class TmBasic(TmParentAction):
         if rows is None:
             return
 
-        utils_giswater.set_item_data(combo, rows, 1, reverse)
+        qt_tools.set_item_data(combo, rows, 1, reverse)
 
 
     def get_campaing_id(self, dialog):
@@ -284,8 +284,8 @@ class TmBasic(TmParentAction):
             sql = f"DELETE FROM selector_planning WHERE cur_user=current_user;"
             sql += f"INSERT INTO selector_planning VALUES ('{status}', current_user);"
             self.controller.execute_sql(sql, log_sql=True)
-            if utils_giswater.isChecked(dialog, dialog.chk_campaign) and utils_giswater.get_item_data(dialog, dialog.cbx_campaigns, 0) != -1:
-                self.selected_camp = utils_giswater.get_item_data(dialog, dialog.cbx_campaigns, 0)
+            if qt_tools.isChecked(dialog, dialog.chk_campaign) and qt_tools.get_item_data(dialog, dialog.cbx_campaigns, 0) != -1:
+                self.selected_camp = qt_tools.get_item_data(dialog, dialog.cbx_campaigns, 0)
                 sql = (f"SELECT DISTINCT(campaign_id) FROM planning"
                        f" WHERE campaign_id ='{self.selected_camp}'")
                 row = self.controller.get_row(sql)
@@ -297,10 +297,10 @@ class TmBasic(TmParentAction):
             self.campaign_name = dialog.txt_campaign.text()
             self.close_dialog(dialog)
             bool_dic = {False: "false", True: "true"}
-            cmb_pending = utils_giswater.get_item_data(dialog, dialog.cbx_pendientes)
-            chk_pending = utils_giswater.isChecked(dialog, dialog.chk_pendiente)
-            cmb_campaign = utils_giswater.get_item_data(dialog, dialog.cbx_campaigns)
-            chk_campaign = utils_giswater.isChecked(dialog, dialog.chk_campaign)
+            cmb_pending = qt_tools.get_item_data(dialog, dialog.cbx_pendientes)
+            chk_pending = qt_tools.isChecked(dialog, dialog.chk_pendiente)
+            cmb_campaign = qt_tools.get_item_data(dialog, dialog.cbx_campaigns)
+            chk_campaign = qt_tools.isChecked(dialog, dialog.chk_campaign)
             extras = f'"parameters":{{'
             extras += f'"txt_campaign":{self.campaign_id}, '
             extras += f'"cbx_pendientes":{cmb_pending}, '
@@ -338,18 +338,18 @@ class TmBasic(TmParentAction):
         if self.rows_cmb_poda_type is None:
             self.update_cmb_poda_type()
 
-        utils_giswater.set_item_data(dlg_selector.cmb_poda_type, self.rows_cmb_poda_type, 1, sort_combo=False)
+        qt_tools.set_item_data(dlg_selector.cmb_poda_type, self.rows_cmb_poda_type, 1, sort_combo=False)
 
         # Get data to fill combo from memory
         if self.rows_cmb_builder is None:
             self.update_cmb_builder()
 
-        utils_giswater.set_item_data(dlg_selector.cmb_builder, self.rows_cmb_builder, 1, sort_combo=False)
+        qt_tools.set_item_data(dlg_selector.cmb_builder, self.rows_cmb_builder, 1, sort_combo=False)
 
         filter_builder = [['', '']]
         for item in self.rows_cmb_builder:
             filter_builder.append(item)
-        utils_giswater.set_item_data(dlg_selector.cmb_filter_builder, filter_builder, 1, sort_combo=False)
+        qt_tools.set_item_data(dlg_selector.cmb_filter_builder, filter_builder, 1, sort_combo=False)
 
         # Populate QTableView
         self.fill_table(dlg_selector, table_view, set_edit_triggers=QTableView.NoEditTriggers, update=True)
@@ -457,7 +457,7 @@ class TmBasic(TmParentAction):
         # Check for errors
         if model.lastError().isValid():
             self.controller.show_warning(model.lastError().text())
-        builder = utils_giswater.get_item_data(dialog, dialog.cmb_filter_builder, 1)
+        builder = qt_tools.get_item_data(dialog, dialog.cmb_filter_builder, 1)
         # Create expresion
         expr = f" mu_name ILIKE '%{dialog.txt_selected_filter.text()}%'"
         if builder:
@@ -495,7 +495,7 @@ class TmBasic(TmParentAction):
                 if str(dialog.selected_rows.model().record(x).value('price')) != 'NULL':
                     total += float(dialog.selected_rows.model().record(x).value('price'))
 
-        utils_giswater.setText(dialog, dialog.lbl_total_price, str(total))
+        qt_tools.setText(dialog, dialog.lbl_total_price, str(total))
 
 
     def insert_into_planning(self, tableright):
@@ -572,14 +572,14 @@ class TmBasic(TmParentAction):
         # Select all rows and get all id
         current_poda_type = None
         self.select_all_rows(dialog.selected_rows, id_table_right)
-        if utils_giswater.isChecked(dialog, dialog.chk_current):
-            current_poda_type = utils_giswater.get_item_data(dialog, dialog.cmb_poda_type, 0)
+        if qt_tools.isChecked(dialog, dialog.chk_current):
+            current_poda_type = qt_tools.get_item_data(dialog, dialog.cmb_poda_type, 0)
             if current_poda_type is None:
                 message = "No heu seleccionat cap poda"
                 self.controller.show_warning(message)
                 return
 
-        if utils_giswater.isChecked(dialog, dialog.chk_permanent):
+        if qt_tools.isChecked(dialog, dialog.chk_permanent):
             for i in range(0, len(left_selected_list)):
                 row = left_selected_list[i].row()
                 sql = (f"UPDATE cat_mu "
@@ -587,7 +587,7 @@ class TmBasic(TmParentAction):
                        f" WHERE id = '{dialog.all_rows.model().record(row).value('mu_id')}'")
                 self.controller.execute_sql(sql)
 
-        builder = utils_giswater.get_item_data(dialog, dialog.cmb_builder, 0)
+        builder = qt_tools.get_item_data(dialog, dialog.cmb_builder, 0)
         for i in range(0, len(left_selected_list)):
             row = left_selected_list[i].row()
             values = ""
@@ -599,7 +599,7 @@ class TmBasic(TmParentAction):
                 values += 'null, '
 
             if dialog.all_rows.model().record(row).value('work_id') is not None:
-                if utils_giswater.isChecked(dialog, dialog.chk_current):
+                if qt_tools.isChecked(dialog, dialog.chk_current):
                     values += f"{current_poda_type}, "
                     function_values += f"{current_poda_type}, "
                 else:
@@ -685,14 +685,14 @@ class TmBasic(TmParentAction):
 
     def get_planned_camp(self, dialog):
 
-        if str(utils_giswater.getWidgetText(dialog, dialog.txt_plan_code)) == 'null':
+        if str(qt_tools.getWidgetText(dialog, dialog.txt_plan_code)) == 'null':
             message = "El camp text a no pot estar vuit"
             self.controller.show_warning(message)
             return
 
-        self.plan_code = utils_giswater.getWidgetText(dialog, dialog.txt_plan_code)
-        self.planned_camp_id = utils_giswater.get_item_data(dialog, dialog.cbx_years, 0)
-        self.planned_camp_name = utils_giswater.get_item_data(dialog, dialog.cbx_years, 1)
+        self.plan_code = qt_tools.getWidgetText(dialog, dialog.txt_plan_code)
+        self.planned_camp_id = qt_tools.get_item_data(dialog, dialog.cbx_years, 0)
+        self.planned_camp_name = qt_tools.get_item_data(dialog, dialog.cbx_years, 1)
         sql = f"DELETE FROM selector_planning WHERE cur_user=current_user;"
         sql += f"INSERT INTO selector_planning VALUES ('{self.planned_camp_id}', current_user);"
         self.controller.execute_sql(sql, log_sql=True)
@@ -734,8 +734,8 @@ class TmBasic(TmParentAction):
             start_date = QDate.currentDate()
             end_date = QDate.currentDate().addYears(1)
 
-        utils_giswater.setCalendarDate(month_selector, month_selector.date_inici, start_date)
-        utils_giswater.setCalendarDate(month_selector, month_selector.date_fi, end_date)
+        qt_tools.setCalendarDate(month_selector, month_selector.date_inici, start_date)
+        qt_tools.setCalendarDate(month_selector, month_selector.date_fi, end_date)
 
         view_name = 'v_plan_mu_year'
         tableleft = 'planning'
@@ -765,7 +765,7 @@ class TmBasic(TmParentAction):
 
         # Get data to fill combo from memory
         self.update_cmb_builder()
-        utils_giswater.set_item_data(month_selector.cmb_builder, self.rows_cmb_builder, 1, sort_combo=False)
+        qt_tools.set_item_data(month_selector.cmb_builder, self.rows_cmb_builder, 1, sort_combo=False)
 
         month_selector.btn_close.clicked.connect(partial(self.close_dialog, month_selector))
         month_selector.rejected.connect(partial(self.close_dialog, month_selector))
@@ -789,10 +789,10 @@ class TmBasic(TmParentAction):
             field_list.append(id_)
 
         # Get dates
-        plan_month_start = utils_giswater.getCalendarDate(dialog, dialog.date_inici)
-        plan_month_end = utils_giswater.getCalendarDate(dialog, dialog.date_fi)
-        chk_builder = utils_giswater.isChecked(dialog, dialog.chk_builder)
-        builder = utils_giswater.get_item_data(dialog, dialog.cmb_builder)
+        plan_month_start = qt_tools.getCalendarDate(dialog, dialog.date_inici)
+        plan_month_end = qt_tools.getCalendarDate(dialog, dialog.date_fi)
+        chk_builder = qt_tools.isChecked(dialog, dialog.chk_builder)
+        builder = qt_tools.get_item_data(dialog, dialog.cmb_builder)
         # Update values
         for i in range(0, len(left_selected_list)):
             row = left_selected_list[i].row()
@@ -829,8 +829,8 @@ class TmBasic(TmParentAction):
             row = left_selected_list[i].row()
             id_ = dialog.selected_rows.model().record(row).value(id_table_left)
             field_list.append(id_)
-        chk_builder = utils_giswater.isChecked(dialog, dialog.chk_builder)
-        builder = utils_giswater.get_item_data(dialog, dialog.cmb_builder)
+        chk_builder = qt_tools.isChecked(dialog, dialog.chk_builder)
+        builder = qt_tools.get_item_data(dialog, dialog.cmb_builder)
         for i in range(0, len(left_selected_list)):
             row = left_selected_list[i].row()
             sql = (f"UPDATE {tableleft} "
@@ -956,13 +956,13 @@ class TmBasic(TmParentAction):
 
         sql = "SELECT id, idval FROM om_visit_typevalue WHERE typevalue = 'incident_status'"
         rows = self.controller.get_rows(sql, log_sql=True)
-        utils_giswater.set_item_data(self.dlg_incident_manager.cmb_status, rows, 1, add_empty=True)
+        qt_tools.set_item_data(self.dlg_incident_manager.cmb_status, rows, 1, add_empty=True)
 
         self.set_dates_from_to(self.dlg_incident_manager.date_from, self.dlg_incident_manager.date_to,
                                'v_ui_om_visit_incident', 'incident_date', 'incident_date')
 
         # Poulate TableView
-        utils_giswater.set_qtv_config(self.dlg_incident_manager.tbl_incident, edit_triggers=QTableView.NoEditTriggers)
+        qt_tools.set_qtv_config(self.dlg_incident_manager.tbl_incident, edit_triggers=QTableView.NoEditTriggers)
         table_name = "v_ui_om_visit_incident"
         self.update_table(self.dlg_incident_manager, self.dlg_incident_manager.tbl_incident, table_name)
 
@@ -1000,8 +1000,8 @@ class TmBasic(TmParentAction):
 
     def update_table(self, dialog, qtable, table_name):
 
-        visit_id = utils_giswater.getWidgetText(dialog, dialog.txt_visit_id)
-        status_id = utils_giswater.get_item_data(dialog, dialog.cmb_status, 1)
+        visit_id = qt_tools.getWidgetText(dialog, dialog.txt_visit_id)
+        status_id = qt_tools.get_item_data(dialog, dialog.cmb_status, 1)
         visit_start = dialog.date_from.date()
         visit_end = dialog.date_to.date()
 
@@ -1069,7 +1069,7 @@ class TmBasic(TmParentAction):
     def get_id_list(self):
 
         self.ids = []
-        column_index = utils_giswater.get_col_index_by_col_name(self.dlg_incident_manager.tbl_incident, 'node_id')
+        column_index = qt_tools.get_col_index_by_col_name(self.dlg_incident_manager.tbl_incident, 'node_id')
         for x in range(0, self.dlg_incident_manager.tbl_incident.model().rowCount()):
             _id = self.dlg_incident_manager.tbl_incident.model().data(
                 self.dlg_incident_manager.tbl_incident.model().index(x, column_index))
@@ -1095,21 +1095,21 @@ class TmBasic(TmParentAction):
         else:
             sql = "SELECT id, name FROM cat_campaign"
             rows = self.controller.get_rows(sql, log_sql=True)
-            utils_giswater.set_item_data(self.dlg_incident_planning.campaign_id, rows, 1)
+            qt_tools.set_item_data(self.dlg_incident_planning.campaign_id, rows, 1)
             sql = "SELECT id, name FROM cat_work"
             rows = self.controller.get_rows(sql, add_empty_row=True)
-            utils_giswater.set_item_data(self.dlg_incident_planning.work_id, rows, 1)
+            qt_tools.set_item_data(self.dlg_incident_planning.work_id, rows, 1)
             sql = "SELECT id, name FROM cat_builder"
             rows = self.controller.get_rows(sql, add_empty_row=True)
-            utils_giswater.set_item_data(self.dlg_incident_planning.builder_id, rows, 1)
+            qt_tools.set_item_data(self.dlg_incident_planning.builder_id, rows, 1)
             sql = "SELECT id, name FROM cat_priority"
             rows = self.controller.get_rows(sql, add_empty_row=True)
-            utils_giswater.set_item_data(self.dlg_incident_planning.priority_id, rows, 1)
+            qt_tools.set_item_data(self.dlg_incident_planning.priority_id, rows, 1)
 
         # Set last campaign_id
         campaign_id = self.controller.plugin_settings_value('incident_campaign_id')
         if campaign_id is not None:
-            utils_giswater.set_combo_itemData(self.dlg_incident_planning.campaign_id, str(campaign_id), 0)
+            qt_tools.set_combo_itemData(self.dlg_incident_planning.campaign_id, str(campaign_id), 0)
 
         # Get record selected
         selected_list = self.dlg_incident_manager.tbl_incident.selectionModel().selectedRows()
@@ -1133,20 +1133,18 @@ class TmBasic(TmParentAction):
         self.incident_comment = self.dlg_incident_manager.tbl_incident.model().record(row).value("incident_comment")
         if self.incident_comment in (None, 'null', 'NULL'):
             self.incident_comment = ''
-        utils_giswater.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.visit_id, self.visit_id)
-        utils_giswater.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.node_id, self.node_id)
-        utils_giswater.setCalendarDate(self.dlg_incident_planning,
-                                       self.dlg_incident_planning.incident_date, self.incident_date)
-        utils_giswater.setWidgetText(self.dlg_incident_planning,
-                                     self.dlg_incident_planning.incident_user, self.incident_user)
-        utils_giswater.setWidgetText(self.dlg_incident_planning,
-                                     self.dlg_incident_planning.parameter_id, self.parameter_id)
-        utils_giswater.setWidgetText(self.dlg_incident_planning,
-                                     self.dlg_incident_planning.incident_comment, self.incident_comment)
-        utils_giswater.setWidgetText(self.dlg_incident_planning,
-                                     self.dlg_incident_planning.process_user, self.controller.get_current_user())
 
-        utils_giswater.setCalendarDate(self.dlg_incident_planning, self.dlg_incident_planning.process_date, None)
+        qt_tools.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.visit_id, self.visit_id)
+        qt_tools.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.node_id, self.node_id)
+        qt_tools.setCalendarDate(self.dlg_incident_planning, self.dlg_incident_planning.incident_date,
+            self.incident_date)
+        qt_tools.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.incident_user, self.incident_user)
+        qt_tools.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.parameter_id, self.parameter_id)
+        qt_tools.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.incident_comment,
+            self.incident_comment)
+        qt_tools.setWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.process_user,
+            self.controller.get_current_user())
+        qt_tools.setCalendarDate(self.dlg_incident_planning, self.dlg_incident_planning.process_date, None)
 
         # Set signals
         self.dlg_incident_planning.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_incident_planning))
@@ -1159,17 +1157,13 @@ class TmBasic(TmParentAction):
 
         if action == 'PROCESS':
 
-            campaign_id = utils_giswater.get_item_data(
-                self.dlg_incident_planning, self.dlg_incident_planning.campaign_id, 0)
+            campaign_id = qt_tools.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.campaign_id, 0)
+            work_id = qt_tools.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.work_id, 0)
+            priority_id = qt_tools.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.priority_id, 0)
+            builder_id = qt_tools.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.builder_id, 0)
 
             # Set last campaign_id
             self.controller.plugin_settings_set_value('incident_campaign_id', campaign_id)
-
-            work_id = utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.work_id, 0)
-            priority_id = utils_giswater.get_item_data(
-                self.dlg_incident_planning, self.dlg_incident_planning.priority_id, 0)
-            builder_id = utils_giswater.get_item_data(
-                self.dlg_incident_planning, self.dlg_incident_planning.builder_id, 0)
 
             if self.visit_id in ('', None, 'null') or campaign_id in ('', None, 'null') or work_id in ('', None, 'null')\
                     or priority_id in ('', None, 'null') or builder_id in ('', None, 'null'):
@@ -1204,8 +1198,8 @@ class TmBasic(TmParentAction):
         elif action == 'DISCARD':
             extras = f'"action":"{action}"'
             extras += f', "visit_id":{self.visit_id}'
-            extras += f', "process_date":"{utils_giswater.getCalendarDate(self.dlg_incident_planning, self.dlg_incident_planning.process_date)}"'
-            extras += f', "incident_comment":"{utils_giswater.getWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.incident_comment)}"'
+            extras += f', "process_date":"{qt_tools.getCalendarDate(self.dlg_incident_planning, self.dlg_incident_planning.process_date)}"'
+            extras += f', "incident_comment":"{qt_tools.getWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.incident_comment)}"'
             body = self.create_body(extras=extras)
 
             result = self.controller.get_json('tm_fct_incident', body, log_sql=True)
@@ -1223,12 +1217,12 @@ class TmBasic(TmParentAction):
 
         extras = f'"action":"{action}"'
         extras += f', "visit_id":{self.visit_id}'
-        extras += f', "process_date":"{utils_giswater.getCalendarDate(self.dlg_incident_planning, self.dlg_incident_planning.process_date)}"'
-        extras += f', "campaign_id":{utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.campaign_id, 0)}'
-        extras += f', "builder_id":{utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.builder_id, 0)}'
-        extras += f', "priority_id":{utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.priority_id, 0)}'
-        extras += f', "work_id":{utils_giswater.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.work_id, 0)}'
-        extras += f', "incident_comment":"{utils_giswater.getWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.incident_comment)}"'
+        extras += f', "process_date":"{qt_tools.getCalendarDate(self.dlg_incident_planning, self.dlg_incident_planning.process_date)}"'
+        extras += f', "campaign_id":{qt_tools.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.campaign_id, 0)}'
+        extras += f', "builder_id":{qt_tools.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.builder_id, 0)}'
+        extras += f', "priority_id":{qt_tools.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.priority_id, 0)}'
+        extras += f', "work_id":{qt_tools.get_item_data(self.dlg_incident_planning, self.dlg_incident_planning.work_id, 0)}'
+        extras += f', "incident_comment":"{qt_tools.getWidgetText(self.dlg_incident_planning, self.dlg_incident_planning.incident_comment)}"'
         body = self.create_body(extras=extras)
 
         result = self.controller.get_json('tm_fct_incident', body, log_sql=True)
@@ -1289,7 +1283,7 @@ class TmBasic(TmParentAction):
 
         index = selected_list[0]
         row = index.row()
-        column_index = utils_giswater.get_col_index_by_col_name(qtable, 'visit_id')
+        column_index = qt_tools.get_col_index_by_col_name(qtable, 'visit_id')
         visit_id = index.sibling(row, column_index).data()
 
         sql = ("SELECT value FROM om_visit_event_photo WHERE visit_id = " + str(visit_id))
@@ -1314,6 +1308,7 @@ class TmBasic(TmParentAction):
 
             # Set enabled
             if result == value:
-                utils_giswater.setWidgetEnabled(self.dlg_incident_manager, widget, True)
+                qt_tools.setWidgetEnabled(self.dlg_incident_manager, widget, True)
             else:
-                utils_giswater.setWidgetEnabled(self.dlg_incident_manager, widget, False)
+                qt_tools.setWidgetEnabled(self.dlg_incident_manager, widget, False)
+

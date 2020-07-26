@@ -10,7 +10,7 @@ from qgis.PyQt.QtWidgets import QGroupBox, QSpacerItem, QSizePolicy, QGridLayout
 import json
 from functools import partial
 
-from .. import utils_giswater
+from lib import qt_tools
 from .api_parent import ApiParent
 from ..ui_manager import Go2EpaOptionsUi
 
@@ -93,7 +93,7 @@ class Go2EpaOptions(ApiParent):
     def fill_child(self, dialog, widget):
 
         combo_parent = widget.objectName()
-        combo_id = utils_giswater.get_item_data(self.dlg_options, widget)
+        combo_id = qt_tools.get_item_data(self.dlg_options, widget)
         json_result = self.controller.get_json('gw_fct_getcombochilds', f"'epaoptions', '', '', '{combo_parent}', '{combo_id}', ''")
         if not json_result:
             return False

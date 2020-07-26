@@ -12,7 +12,7 @@ from qgis.PyQt.QtGui import QDoubleValidator
 
 from functools import partial
 
-from .. import utils_giswater
+from lib import qt_tools
 from .parent import ParentMapTool
 from ..ui_manager import AuxPoint
 
@@ -66,8 +66,8 @@ class CadAddPoint(ParentMapTool):
         self.dist_y = self.dlg_create_point.dist_y.text()
         if not self.dist_y:
             self.dist_y = 0
-        self.delete_prev = utils_giswater.isChecked(self.dlg_create_point, self.dlg_create_point.chk_delete_prev)
 
+        self.delete_prev = qt_tools.isChecked(self.dlg_create_point, self.dlg_create_point.chk_delete_prev)
         if self.layer_points:
             self.layer_points.startEditing()
             self.close_dialog(self.dlg_create_point)

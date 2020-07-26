@@ -19,7 +19,8 @@ import re
 import sys
 from functools import partial
 
-from .. import utils_giswater
+from .. import global_vars
+from lib import qt_tools
 from .api_cf import ApiCF
 from .manage_document import ManageDocument
 from .manage_new_psector import ManageNewPsector
@@ -65,7 +66,8 @@ class ApiSearch(ApiParent):
 
         self.dlg_search.lbl_msg.setStyleSheet("QLabel{color:red;}")
         self.dlg_search.lbl_msg.setVisible(False)
-        qgis_project_add_schema = self.controller.plugin_settings_value('gwAddSchema')
+        project_vars = global_vars.get_project_vars()
+        qgis_project_add_schema = project_vars['add_schema']
 
         self.controller.set_user_settings_value('open_search', 'true')
 
@@ -296,10 +298,10 @@ class ApiSearch(ApiParent):
 
         if combo_list:
             combo = combo_list[0]
-            id = utils_giswater.get_item_data(self.dlg_search, combo, 0)
-            name = utils_giswater.get_item_data(self.dlg_search, combo, 1)
+            id = qt_tools.get_item_data(self.dlg_search, combo, 0)
+            name = qt_tools.get_item_data(self.dlg_search, combo, 1)
             try:
-                feature_type = utils_giswater.get_item_data(self.dlg_search, combo, 2)
+                feature_type = qt_tools.get_item_data(self.dlg_search, combo, 2)
                 extras_search += f'"searchType":"{feature_type}", '
             except IndexError:
                 pass
@@ -311,7 +313,7 @@ class ApiSearch(ApiParent):
             if len(line_list) == 2:
                 line_edit.textChanged.connect(partial(self.clear_line_edit_add, line_list))
 
-            value = utils_giswater.getWidgetText(self.dlg_search, line_edit, return_string_null=False)
+            value = qt_tools.getWidgetText(self.dlg_search, line_edit, return_string_null=False)
             if str(value) == '':
                 return
 
@@ -347,7 +349,7 @@ class ApiSearch(ApiParent):
 
         if len(line_list) == 2:
             line_edit_add = line_list[1]
-            value = utils_giswater.getWidgetText(self.dlg_search, line_edit_add)
+            value = qt_tools.getWidgetText(self.dlg_search, line_edit_add)
             if str(value) == 'null':
                 return
 
@@ -382,7 +384,7 @@ class ApiSearch(ApiParent):
         widget.setProperty('columnname', field['columnname'])
         self.populate_combo(widget, field)
         if 'selectedId' in field:
-            utils_giswater.set_combo_itemData(widget, field['selectedId'], 0)
+            qt_tools.set_combo_itemData(widget, field['selectedId'], 0)
         widget.currentIndexChanged.connect(partial(self.clear_lineedits))
 
         return widget
@@ -392,7 +394,7 @@ class ApiSearch(ApiParent):
 
         # Clear all lineedit widgets from search tabs
         for widget in self.lineedit_list:
-            utils_giswater.setWidgetText(self.dlg_search, widget, '')
+            qt_tools.setWidgetText(self.dlg_search, widget, '')
 
 
     def populate_combo(self, widget, field, allow_blank=True):
@@ -472,9 +474,9 @@ class ApiSearch(ApiParent):
         self.items_dialog.btn_state0.setEnabled(False)
 
         search_csv_path = self.controller.plugin_settings_value('search_csv_path')
-        utils_giswater.setWidgetText(self.items_dialog, self.items_dialog.txt_path, search_csv_path)
-        utils_giswater.setWidgetText(self.items_dialog, self.items_dialog.lbl_init, f"Filter by: {field_id}")
-        utils_giswater.setWidgetText(self.items_dialog, self.items_dialog.lbl_end, f"Filter by: {field_id}")
+        qt_tools.setWidgetText(self.items_dialog, self.items_dialog.txt_path, search_csv_path)
+        qt_tools.setWidgetText(self.items_dialog, self.items_dialog.lbl_init, f"Filter by: {field_id}")
+        qt_tools.setWidgetText(self.items_dialog, self.items_dialog.lbl_end, f"Filter by: {field_id}")
 
         self.items_dialog.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.items_dialog.tbl_psm.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
@@ -552,7 +554,7 @@ class ApiSearch(ApiParent):
         manage_document = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir, single_tool=False)
         dlg_docman = manage_document.manage_document(tablename='workcat', qtable=qtable, item_id=item_id)
         dlg_docman.btn_accept.clicked.connect(partial(self.set_completer_object, dlg_docman, 'doc'))
-        utils_giswater.remove_tab_by_tabName(dlg_docman.tabWidget, 'tab_rel')
+        qt_tools.remove_tab_by_tabName(dlg_docman.tabWidget, 'tab_rel')
 
 
     def force_expl(self, workcat_id):
@@ -618,7 +620,7 @@ class ApiSearch(ApiParent):
         msg = "Save as"
         folder_path, filter_ = file_dialog.getSaveFileName(None, self.controller.tr(msg), folder_path, '*.csv')
         if folder_path:
-            utils_giswater.setWidgetText(dialog, widget, str(folder_path))
+            qt_tools.setWidgetText(dialog, widget, str(folder_path))
 
 
     def force_state(self, qbutton, state, qtable):
@@ -642,7 +644,7 @@ class ApiSearch(ApiParent):
 
     def export_to_csv(self, dialog, qtable_1=None, qtable_2=None, path=None):
 
-        folder_path = utils_giswater.getWidgetText(dialog, path)
+        folder_path = qt_tools.getWidgetText(dialog, path)
         if folder_path is None or folder_path == 'null':
             path.setStyleSheet("border: 1px solid red")
             return
@@ -701,7 +703,7 @@ class ApiSearch(ApiParent):
         with open(folder_path, "w") as output:
             writer = csv.writer(output, lineterminator='\n')
             writer.writerows(all_rows)
-        self.controller.plugin_settings_set_value("search_csv_path", utils_giswater.getWidgetText(dialog, 'txt_path'))
+        self.controller.plugin_settings_set_value("search_csv_path", qt_tools.getWidgetText(dialog, 'txt_path'))
         message = "The csv file has been successfully exported"
         self.controller.show_info(message)
 
@@ -709,7 +711,7 @@ class ApiSearch(ApiParent):
     def workcat_filter_by_text(self, dialog, qtable, widget_txt, table_name, workcat_id, field_id):
         """ Filter list of workcats by workcat_id and field_id """
 
-        result_select = utils_giswater.getWidgetText(dialog, widget_txt)
+        result_select = qt_tools.getWidgetText(dialog, widget_txt)
         if result_select != 'null':
             expr = (f"workcat_id = '{workcat_id}'"
                     f" and {field_id} ILIKE '%{result_select}%'")

@@ -16,8 +16,7 @@ import subprocess
 from collections import OrderedDict
 from functools import partial
 
-from .. import sys_manager
-from .. import utils_giswater
+from lib import os_tools, qt_tools
 from ..ui_manager import DlgTrace
 from .api_parent import ApiParent
 
@@ -45,7 +44,7 @@ class CrmTrace(ApiParent):
         # Fill combo 'exploitation'
         sql = "SELECT name FROM exploitation WHERE active = True ORDER BY name"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_trace, 'cbo_expl', rows, allow_nulls=False)
+        qt_tools.fillComboBox(self.dlg_trace, 'cbo_expl', rows, allow_nulls=False)
 
         # Open dialog
         self.open_dialog(self.dlg_trace, dlg_name='crm_trace')
@@ -55,7 +54,7 @@ class CrmTrace(ApiParent):
         """ Main process """
 
         # Get selected 'exploitation'
-        expl_name = utils_giswater.getWidgetText(self.dlg_trace, 'cbo_expl')
+        expl_name = qt_tools.getWidgetText(self.dlg_trace, 'cbo_expl')
         self.controller.log_info(str(expl_name))
 
         # Execute synchronization script
@@ -106,7 +105,7 @@ class CrmTrace(ApiParent):
             self.controller.log_warning("Folder not found", parameter=python_folderpath)
 
         # Get parameter 'buffer'
-        buffer = utils_giswater.getWidgetText(self.dlg_trace, 'buffer', return_string_null=False)
+        buffer = qt_tools.getWidgetText(self.dlg_trace, 'buffer', return_string_null=False)
         if buffer is None or buffer == "":
             buffer = str(10)
 
@@ -116,7 +115,7 @@ class CrmTrace(ApiParent):
         status = True
 
         # Get script log file path
-        log_file = sys_manager.manage_tstamp()
+        log_file = os_tools.manage_tstamp()
         log_path = script_folder + os.sep + "log" + os.sep + log_file
         self.controller.log_info(log_path)
 
@@ -288,7 +287,7 @@ class CrmTrace(ApiParent):
         """
 
         change_tab = False
-        text = utils_giswater.getWidgetText(dialog, dialog.txt_infolog, return_string_null=False)
+        text = qt_tools.getWidgetText(dialog, dialog.txt_infolog, return_string_null=False)
 
         if reset_text:
             text = ""
@@ -301,7 +300,7 @@ class CrmTrace(ApiParent):
                 else:
                     text += "\n"
 
-        utils_giswater.setWidgetText(dialog, 'txt_infolog', text + "\n")
+        qt_tools.setWidgetText(dialog, 'txt_infolog', text + "\n")
         qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
         if qtabwidget is not None:
             if change_tab and qtabwidget is not None:
@@ -328,5 +327,5 @@ class CrmTrace(ApiParent):
 
         btn_cancel = dialog.findChild(QPushButton, 'btn_cancel')
         if btn_cancel:
-            utils_giswater.setWidgetText(dialog, btn_accept, 'Close')
+            qt_tools.setWidgetText(dialog, btn_accept, 'Close')
 

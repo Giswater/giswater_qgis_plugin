@@ -18,10 +18,7 @@ class Basic(ApiParent):
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'basic' """
 
-        self.minor_version = "3.0"
         ApiParent.__init__(self, iface, settings, controller, plugin_dir)
-        self.login_file = os.path.join(self.plugin_dir, 'config', 'login.auth')
-        self.logged = False
         self.api_search = None
 
 

@@ -27,7 +27,8 @@ if 'nt' in sys.builtin_module_names:
 
 from functools import partial
 
-from .. import utils_giswater
+from .. import global_vars
+from lib import qt_tools
 from .add_layer import AddLayer
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 
@@ -84,8 +85,8 @@ class ParentAction(object):
     def open_web_browser(self, dialog, widget=None):
         """ Display url using the default browser """
 
-        if widget is not None:
-            url = utils_giswater.getWidgetText(dialog, widget)
+        if widget is not None:           
+            url = qt_tools.getWidgetText(dialog, widget)
             if url == 'null':
                 url = 'http://www.giswater.org'
         else:
@@ -118,11 +119,11 @@ class ParentAction(object):
         """ Get file dialog """
 
         # Check if selected file exists. Set default value if necessary
-        file_path = utils_giswater.getWidgetText(dialog, widget)
-        if file_path is None or file_path == 'null' or not os.path.exists(str(file_path)):
-            folder_path = self.plugin_dir
-        else:
-            folder_path = os.path.dirname(file_path)
+        file_path = qt_tools.getWidgetText(dialog, widget)
+        if file_path is None or file_path == 'null' or not os.path.exists(str(file_path)): 
+            folder_path = self.plugin_dir   
+        else:     
+            folder_path = os.path.dirname(file_path) 
 
         # Open dialog to select file
         os.chdir(folder_path)
@@ -131,15 +132,15 @@ class ParentAction(object):
         message = "Select file"
         folder_path, filter_ = file_dialog.getOpenFileName(parent=None, caption=self.controller.tr(message))
         if folder_path:
-            utils_giswater.setWidgetText(dialog, widget, str(folder_path))
+            qt_tools.setWidgetText(dialog, widget, str(folder_path))
 
 
     def get_folder_dialog(self, dialog, widget):
         """ Get folder dialog """
 
         # Check if selected folder exists. Set default value if necessary
-        folder_path = utils_giswater.getWidgetText(dialog, widget)
-        if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path):
+        folder_path = qt_tools.getWidgetText(dialog, widget)
+        if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path): 
             folder_path = os.path.expanduser("~")
 
         # Open dialog to select folder
@@ -150,7 +151,7 @@ class ParentAction(object):
         folder_path = file_dialog.getExistingDirectory(
             parent=None, caption=self.controller.tr(message), directory=folder_path)
         if folder_path:
-            utils_giswater.setWidgetText(dialog, widget, str(folder_path))
+            qt_tools.setWidgetText(dialog, widget, str(folder_path))
 
 
     def load_settings(self, dialog=None):
@@ -292,6 +293,7 @@ class ParentAction(object):
         :param aql: (add query left) Query added to the left side (used in basic.py def basic_exploitation_selector())
         :return:
         """
+
         # fill QTableView all_rows
         tbl_all_rows = dialog.findChild(QTableView, "all_rows")
         tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -320,19 +322,20 @@ class ParentAction(object):
         self.fill_table_by_query(tbl_selected_rows, query_right + f" ORDER BY {name};")
         self.hide_colums(tbl_selected_rows, hide_right)
         tbl_selected_rows.setColumnWidth(0, 200)
+
         # Button select
         dialog.btn_select.clicked.connect(partial(self.multi_rows_selector, tbl_all_rows, tbl_selected_rows,
-                                          field_id_left, tableright, field_id_right, query_left, query_right, field_id_right))
+            field_id_left, tableright, field_id_right, query_left, query_right, field_id_right))
 
         # Button unselect
         query_delete = f"DELETE FROM {schema_name}.{tableright}"
         query_delete += f" WHERE current_user = cur_user AND {tableright}.{field_id_right}="
-        dialog.btn_unselect.clicked.connect(partial(self.unselector, tbl_all_rows,
-                                            tbl_selected_rows, query_delete, query_left, query_right, field_id_right))
+        dialog.btn_unselect.clicked.connect(partial(self.unselector, tbl_all_rows, tbl_selected_rows, query_delete,
+            query_left, query_right, field_id_right))
 
         # QLineEdit
         dialog.txt_name.textChanged.connect(partial(self.query_like_widget_text, dialog, dialog.txt_name,
-                                            tbl_all_rows, tableleft, tableright, field_id_right, field_id_left, name, aql))
+            tbl_all_rows, tableleft, tableright, field_id_right, field_id_left, name, aql))
 
         # Order control
         tbl_all_rows.horizontalHeader().sectionClicked.connect(partial(self.order_by_column, tbl_all_rows, query_left))
@@ -490,11 +493,12 @@ class ParentAction(object):
             self.controller.show_warning(model.lastError().text())
 
 
-    def query_like_widget_text(self, dialog, text_line, qtable, tableleft, tableright, field_id_r, field_id_l, name='name', aql=''):
+    def query_like_widget_text(self, dialog, text_line, qtable, tableleft, tableright, field_id_r, field_id_l,
+            name='name', aql=''):
         """ Fill the QTableView by filtering through the QLineEdit"""
 
         schema_name = self.schema_name.replace('"', '')
-        query = utils_giswater.getWidgetText(dialog, text_line, return_string_null=False).lower()
+        query = qt_tools.getWidgetText(dialog, text_line, return_string_null=False).lower()
         sql = (f"SELECT * FROM {schema_name}.{tableleft} WHERE {name} NOT IN "
                f"(SELECT {tableleft}.{name} FROM {schema_name}.{tableleft}"
                f" RIGHT JOIN {schema_name}.{tableright}"
@@ -568,7 +572,7 @@ class ParentAction(object):
     def set_table_columns(self, dialog, widget, table_name, sort_order=0, isQStandardItemModel=False, schema_name=None):
         """ Configuration of tables. Set visibility and width of columns """
 
-        widget = utils_giswater.getWidget(dialog, widget)
+        widget = qt_tools.getWidget(dialog, widget)
         if not widget:
             return
 
@@ -641,7 +645,7 @@ class ParentAction(object):
         row = self.controller.get_row(sql)
         if not row:
             return
-        utils_giswater.setWidgetText(dialog, 'lbl_vdefault_psector', row[0])
+        qt_tools.setWidgetText(dialog, 'lbl_vdefault_psector', row[0])
 
 
     def multi_rows_delete(self, widget, table_name, column_id):
@@ -898,7 +902,9 @@ class ParentAction(object):
         :return:
         """
 
-        role = self.controller.get_restriction()
+        project_vars = global_vars.get_project_vars()
+        role = project_vars['role']
+        role = self.controller.get_restriction(role)
         if role in restriction:
             widget_list = dialog.findChildren(QWidget)
             for widget in widget_list:
@@ -983,9 +989,8 @@ class ParentAction(object):
         self.dlg_info.btn_accept.setVisible(False)
         self.dlg_info.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_info))
         self.dlg_info.setWindowTitle(title)
-        utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.txt_infolog, msg)
-        self.open_dialog(self.dlg_info, dlg_name='dialog_text', title=title)
-
+        qt_tools.setWidgetText(self.dlg_info, self.dlg_info.txt_infolog, msg)
+        self.open_dialog(self.dlg_info, dlg_name='dialog_text')
 
 
     def put_combobox(self, qtable, rows, field, widget_pos, combo_values):
@@ -1002,9 +1007,9 @@ class ParentAction(object):
             combo = QComboBox()
             row = rows[x]
             # Populate QComboBox
-            utils_giswater.set_item_data(combo, combo_values, 1)
+            qt_tools.set_item_data(combo, combo_values, 1)
             # Set QCombobox to wanted item
-            utils_giswater.set_combo_itemData(combo, str(row[field]), 1)
+            qt_tools.set_combo_itemData(combo, str(row[field]), 1)
             # Get index and put QComboBox into QTableView at index position
             idx = qtable.model().index(x, widget_pos)
             qtable.setIndexWidget(idx, combo)
@@ -1215,7 +1220,7 @@ class ParentAction(object):
         if not layer: return
 
         row = index.row()
-        column_index = utils_giswater.get_col_index_by_col_name(qtable, field_id)
+        column_index = qt_tools.get_col_index_by_col_name(qtable, field_id)
         _id = index.sibling(row, column_index).data()
         feature = self.get_feature_by_id(layer, _id, field_id)
         try:
@@ -1267,6 +1272,7 @@ class ParentAction(object):
             layer = self.controller.get_layer_by_tablename('v_edit_node')
             if layer:
                 self.iface.setActiveLayer(layer)
+
 
 
     def set_style_mapzones(self):
@@ -1359,7 +1365,9 @@ class ParentAction(object):
                 if 'width' in return_manager['style']['ruberband']:
                     width = return_manager['style']['ruberband']['width']
                 self.draw(json_result, margin, color=color, width=width)
+
             else:
+
                 for key, value in list(json_result['body']['data'].items()):
                     if key.lower() in ('point', 'line', 'polygon'):
                         if key not in json_result['body']['data']:
@@ -1384,6 +1392,7 @@ class ParentAction(object):
                         self.add_layer.populate_vlayer(v_layer, json_result['body']['data'], key, counter)
 
                         # Get values for set layer style
+                        opacity = 100
                         style_type = json_result['body']['returnManager']['style']
                         if 'style' in return_manager and 'transparency' in return_manager['style'][key]:
                             opacity = return_manager['style'][key]['transparency'] * 255
@@ -1391,10 +1400,12 @@ class ParentAction(object):
                         if style_type[key]['style'] == 'categorized':
                             color_values = {}
                             for item in json_result['body']['returnManager']['style'][key]['values']:
-                                color_values[item['id']] = QColor(item['color'][0], item['color'][1], item['color'][2], opacity)
+                                color = QColor(item['color'][0], item['color'][1], item['color'][2], opacity * 255)
+                                color_values[item['id']] = color
                             cat_field = str(style_type[key]['field'])
                             size = style_type['width'] if 'width' in style_type and style_type['width'] else 2
                             self.add_layer.categoryze_layer(v_layer, cat_field, size, color_values)
+
                         elif style_type[key]['style'] == 'random':
                             size = style_type['width'] if 'width' in style_type and style_type['width'] else 2
                             if geometry_type == 'Point':
@@ -1408,7 +1419,6 @@ class ParentAction(object):
                             extras = f'"style_id":"{style_id}"'
                             body = self.create_body(extras=extras)
                             style = self.controller.get_json('gw_fct_getstyle', body, log_sql=True)
-
                             if 'styles' in style['body']:
                                 if 'style' in style['body']['styles']:
                                     qml = style['body']['styles']['style']
@@ -1424,6 +1434,7 @@ class ParentAction(object):
                                 v_layer.renderer().symbol().setWidth(size)
                             v_layer.renderer().symbol().setColor(color)
                             v_layer.renderer().symbol().setOpacity(opacity)
+
                         self.iface.layerTreeView().refreshLayerSymbology(v_layer.id())
                         self.set_margin(v_layer, margin)
 

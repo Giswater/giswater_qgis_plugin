@@ -9,7 +9,7 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView
 
 from functools import partial
 
-from .. import utils_giswater
+from lib import qt_tools
 from ..ui_manager import DocUi, DocManager
 from .parent_manage import ParentManage
 
@@ -75,10 +75,10 @@ class ManageDocument(ParentManage):
 
         # Set current/selected date and link
         if row:
-            utils_giswater.setCalendarDate(self.dlg_add_doc, 'date', row.value('date'))
-            utils_giswater.setWidgetText(self.dlg_add_doc, 'path', row.value('path'))
+            qt_tools.setCalendarDate(self.dlg_add_doc, 'date', row.value('date'))
+            qt_tools.setWidgetText(self.dlg_add_doc, 'path', row.value('path'))
         else:
-            utils_giswater.setCalendarDate(self.dlg_add_doc, 'date', None)
+            qt_tools.setCalendarDate(self.dlg_add_doc, 'date', None)
 
         # Adding auto-completion to a QLineEdit
         table_object = "doc"
@@ -136,11 +136,11 @@ class ManageDocument(ParentManage):
         """ Insert or update table 'document'. Add document to selected feature """
 
         # Get values from dialog
-        doc_id = utils_giswater.getWidgetText(self.dlg_add_doc, "doc_id")
-        doc_type = utils_giswater.getWidgetText(self.dlg_add_doc, "doc_type", return_string_null=True)
-        date = utils_giswater.getCalendarDate(self.dlg_add_doc, "date", datetime_format="yyyy/MM/dd")
-        observ = utils_giswater.getWidgetText(self.dlg_add_doc, "observ", return_string_null=False)
-        path = utils_giswater.getWidgetText(self.dlg_add_doc, "path", return_string_null=False)
+        doc_id = qt_tools.getWidgetText(self.dlg_add_doc, "doc_id")
+        doc_type = qt_tools.getWidgetText(self.dlg_add_doc, "doc_type", return_string_null=True)
+        date = qt_tools.getCalendarDate(self.dlg_add_doc, "date", datetime_format="yyyy/MM/dd")
+        observ = qt_tools.getWidgetText(self.dlg_add_doc, "observ", return_string_null=False)
+        path = qt_tools.getWidgetText(self.dlg_add_doc, "path", return_string_null=False)
 
         if doc_type == 'null':
             message = "You need to insert doc_type"

@@ -10,7 +10,7 @@ from qgis.PyQt.QtWidgets import QCompleter
 
 from functools import partial
 
-from .. import utils_giswater
+from lib import qt_tools
 from .api_parent import ApiParent
 from ..ui_manager import FeatureDelete
 
@@ -31,11 +31,10 @@ class DeleteFeature(ApiParent):
         # Populate combo feature type
         sql = 'SELECT DISTINCT(feature_type) AS id, feature_type AS idval FROM cat_feature'
         rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_feature_delete.feature_type, rows, 1)
+        qt_tools.set_item_data(self.dlg_feature_delete.feature_type, rows, 1)
 
         # Set active layer
-        layer_name = 'v_edit_' + \
-            utils_giswater.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
+        layer_name = 'v_edit_' + qt_tools.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
         layer = self.controller.get_layer_by_tablename(layer_name)
         self.iface.setActiveLayer(layer)
         self.controller.set_layer_visible(layer)
@@ -73,8 +72,8 @@ class DeleteFeature(ApiParent):
     def filter_typeahead(self, widget, completer, model):
 
         # Get feature_type and feature_id
-        feature_type = utils_giswater.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_type)
-        feature_id = utils_giswater.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_id)
+        feature_type = qt_tools.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_type)
+        feature_id = qt_tools.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_id)
 
         # Get child layer
         sql = (f"SELECT array_agg({feature_type}_id) FROM {feature_type} "
@@ -92,8 +91,8 @@ class DeleteFeature(ApiParent):
     def show_feature_relation(self):
 
         # Get feature_type and feature_id
-        feature_type = utils_giswater.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_type)
-        feature_id = utils_giswater.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_id)
+        feature_type = qt_tools.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_type)
+        feature_id = qt_tools.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_id)
         if feature_id in (None, "null"):
             message = f"Select one"
             self.controller.show_warning(message, parameter=feature_type)
@@ -110,7 +109,7 @@ class DeleteFeature(ApiParent):
         for value in result['body']['data']['info']['values']:
             result_msg += value['message'] + '\n\n'
 
-        utils_giswater.setWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.txt_feature_infolog, result_msg)
+        qt_tools.setWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.txt_feature_infolog, result_msg)
 
         # Enable button delete feature
         if result_msg != '':
@@ -120,8 +119,8 @@ class DeleteFeature(ApiParent):
     def delete_feature_relation(self):
 
         # Get feature_type and feature_id
-        feature_type = utils_giswater.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_type)
-        feature_id = utils_giswater.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_id)
+        feature_type = qt_tools.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_type)
+        feature_id = qt_tools.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_id)
 
         feature = '"type":"' + feature_type + '"'
         extras = '"feature_id":"' + feature_id + '"'
@@ -166,8 +165,7 @@ class DeleteFeature(ApiParent):
         """ Slot function for signal 'canvas.selectionChanged' """
 
         # Get feature_type and feature_id
-        feature_type = utils_giswater.getWidgetText(
-            self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
+        feature_type = qt_tools.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
         layer_name = 'v_edit_' + feature_type
         layer = self.controller.get_layer_by_tablename(layer_name)
         field_id = feature_type + "_id"
@@ -182,8 +180,7 @@ class DeleteFeature(ApiParent):
                 selected_id = feature.attribute(field_id)
 
             if selected_id:
-                utils_giswater.setWidgetText(self.dlg_feature_delete,
-                                             self.dlg_feature_delete.feature_id, str(selected_id))
+                qt_tools.setWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_id, str(selected_id))
 
 
     def set_active_layer(self):
@@ -194,11 +191,11 @@ class DeleteFeature(ApiParent):
 
         # Set active layer
         layer_name = 'v_edit_' + \
-            utils_giswater.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
+            qt_tools.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
         layer = self.controller.get_layer_by_tablename(layer_name)
         self.iface.setActiveLayer(layer)
         self.controller.set_layer_visible(layer)
 
         # Clear feature id field
-        utils_giswater.setWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_id, '')
+        qt_tools.setWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_id, '')
 

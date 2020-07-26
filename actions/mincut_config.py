@@ -17,7 +17,7 @@ import subprocess
 from collections import OrderedDict
 from functools import partial
 
-from .. import utils_giswater
+from lib import qt_tools
 from .api_parent import ApiParent
 from .parent import ParentAction
 from ..ui_manager import SelectorUi, MincutManagerUi
@@ -262,12 +262,12 @@ class MincutConfig(ParentAction):
                "FROM om_typevalue WHERE typevalue = 'mincut_state' "
                "ORDER BY id")
         rows = self.controller.get_rows(sql, add_empty_row=True)
-        utils_giswater.set_item_data(self.dlg_min_edit.state_edit, rows, 1)
+        qt_tools.set_item_data(self.dlg_min_edit.state_edit, rows, 1)
 
         # Fill ComboBox exploitation
         sql = "SELECT expl_id, name FROM exploitation WHERE expl_id > 0 ORDER BY name"
         rows = self.controller.get_rows(sql, add_empty_row=True)
-        utils_giswater.set_item_data(self.dlg_min_edit.cmb_expl, rows, 1)
+        qt_tools.set_item_data(self.dlg_min_edit.cmb_expl, rows, 1)
 
 
     def open_mincut(self):
@@ -317,10 +317,10 @@ class MincutConfig(ParentAction):
     def filter_by_id(self, qtable):
 
         expr = ""
-        id_ = utils_giswater.getWidgetText(self.dlg_min_edit, self.dlg_min_edit.txt_mincut_id, False, False)
-        state_id = utils_giswater.get_item_data(self.dlg_min_edit, self.dlg_min_edit.state_edit, 0)
-        state_text = utils_giswater.get_item_data(self.dlg_min_edit, self.dlg_min_edit.state_edit, 1)
-        expl = utils_giswater.get_item_data(self.dlg_min_edit, self.dlg_min_edit.cmb_expl, 1)
+        id_ = qt_tools.getWidgetText(self.dlg_min_edit, self.dlg_min_edit.txt_mincut_id, False, False)
+        state_id = qt_tools.get_item_data(self.dlg_min_edit, self.dlg_min_edit.state_edit, 0)
+        state_text = qt_tools.get_item_data(self.dlg_min_edit, self.dlg_min_edit.state_edit, 1)
+        expl = qt_tools.get_item_data(self.dlg_min_edit, self.dlg_min_edit.cmb_expl, 1)
         dates_filter = ""
         if state_id == '':
             self.dlg_min_edit.date_from.setEnabled(False)
@@ -344,18 +344,16 @@ class MincutConfig(ParentAction):
             format_high = 'yyyy-MM-dd 23:59:59.999'
             interval = f"'{visit_start.toString(format_low)}'::timestamp AND '{visit_end.toString(format_high)}'::timestamp"
             if str(state_id) in ('0', '3'):
-                utils_giswater.setWidgetText(
-                    self.dlg_min_edit, self.dlg_min_edit.lbl_date_from, 'Date from: forecast_start')
-                utils_giswater.setWidgetText(self.dlg_min_edit, self.dlg_min_edit.lbl_date_to, 'Date to: forecast_end')
+                qt_tools.setWidgetText(self.dlg_min_edit, self.dlg_min_edit.lbl_date_from, 'Date from: forecast_start')
+                qt_tools.setWidgetText(self.dlg_min_edit, self.dlg_min_edit.lbl_date_to, 'Date to: forecast_end')
                 dates_filter = f"AND (forecast_start BETWEEN {interval}) AND (forecast_end BETWEEN {interval})"
             elif str(state_id) in ('1', '2'):
-                utils_giswater.setWidgetText(
-                    self.dlg_min_edit, self.dlg_min_edit.lbl_date_from, 'Date from: exec_start')
-                utils_giswater.setWidgetText(self.dlg_min_edit, self.dlg_min_edit.lbl_date_to, 'Date to: exec_end')
+                qt_tools.setWidgetText(self.dlg_min_edit, self.dlg_min_edit.lbl_date_from, 'Date from: exec_start')
+                qt_tools.setWidgetText(self.dlg_min_edit, self.dlg_min_edit.lbl_date_to, 'Date to: exec_end')
                 dates_filter = f"AND (exec_start BETWEEN {interval}) AND (exec_end BETWEEN {interval})"
             else:
-                utils_giswater.setWidgetText(self.dlg_min_edit, self.dlg_min_edit.lbl_date_from, 'Date from:')
-                utils_giswater.setWidgetText(self.dlg_min_edit, self.dlg_min_edit.lbl_date_to, 'Date to:')
+                qt_tools.setWidgetText(self.dlg_min_edit, self.dlg_min_edit.lbl_date_from, 'Date from:')
+                qt_tools.setWidgetText(self.dlg_min_edit, self.dlg_min_edit.lbl_date_to, 'Date to:')
 
         expr += f" (id::text ILIKE '%{id_}%'"
         expr += f" OR work_order::text ILIKE '%{id_}%')"

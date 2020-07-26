@@ -11,12 +11,12 @@ from qgis.PyQt.QtSql import QSqlTableModel
 
 from functools import partial
 
-from .. import utils_giswater
+from lib import qt_tools
 from .tm_parent_manage import TmParentManage
-from ..dao.om_visit import OmVisit
-from ..dao.om_visit_event import OmVisitEvent
-from ..dao.om_visit_parameter import OmVisitParameter
-from ..dao.om_visit_x_node import OmVisitXNode
+from core.models.om_visit import OmVisit
+from core.models.om_visit_event import OmVisitEvent
+from core.models.om_visit_parameter import OmVisitParameter
+from core.models.om_visit_x_node import OmVisitXNode
 from ..ui_manager import AddVisitTm
 from ..ui_manager import EventStandardTm
 
@@ -141,7 +141,7 @@ class TmManageVisit(TmParentManage, QObject):
                " WHERE parameter = 'visitcat_id' AND cur_user = current_user AND context='arbrat'")
         row = self.controller.get_row(sql)
         if row:
-            utils_giswater.set_combo_itemData(self.visitcat_id, str(row['value']), 1)
+            qt_tools.set_combo_itemData(self.visitcat_id, str(row['value']), 1)
         self.set_combos(self.dlg_add_visit, self.dlg_add_visit.parameter_type_id, 'parameter_type_id')
         self.set_combos(self.dlg_add_visit, self.dlg_add_visit.parameter_id, 'parameter_id')
         # Set autocompleters of the form
@@ -165,7 +165,7 @@ class TmManageVisit(TmParentManage, QObject):
                f" WHERE parameter = '{parameter}' AND cur_user= current_user AND context='arbrat'")
         row = self.controller.get_row(sql)
         if row:
-            utils_giswater.setWidgetText(dialog, qcombo, str(row['value']))
+            qt_tools.setWidgetText(dialog, qcombo, str(row['value']))
 
 
     def manage_accepted(self):
@@ -296,8 +296,7 @@ class TmManageVisit(TmParentManage, QObject):
         self.current_visit.enddate = self.dlg_add_visit.enddate.date().toString(Qt.ISODate)
         self.current_visit.user_name = self.user_name.text()
         self.current_visit.ext_code = self.ext_code.text()
-        self.current_visit.visitcat_id = utils_giswater.get_item_data(
-            self.dlg_add_visit, self.dlg_add_visit.visitcat_id, 0)
+        self.current_visit.visitcat_id = qt_tools.get_item_data(self.dlg_add_visit, self.dlg_add_visit.visitcat_id, 0)
         self.current_visit.descript = self.dlg_add_visit.descript.text()
         if self.expl_id:
             self.current_visit.expl_id = self.expl_id
@@ -400,7 +399,7 @@ class TmManageVisit(TmParentManage, QObject):
         rows = self.controller.get_rows(sql)
 
         if rows:
-            utils_giswater.set_item_data(self.dlg_add_visit.parameter_id, rows, 1)
+            qt_tools.set_item_data(self.dlg_add_visit.parameter_id, rows, 1)
 
 
     def config_relation_table(self, qtable):
@@ -476,7 +475,7 @@ class TmManageVisit(TmParentManage, QObject):
         self.visitcat_ids = self.controller.get_rows(sql)
 
         if self.visitcat_ids:
-            utils_giswater.set_item_data(self.dlg_add_visit.visitcat_id, self.visitcat_ids, 1)
+            qt_tools.set_item_data(self.dlg_add_visit.visitcat_id, self.visitcat_ids, 1)
             # now get default value to be show in visitcat_id
             sql = ("SELECT value FROM config_param_user"
                    " WHERE parameter = 'om_visit_cat_vdefault' AND cur_user = current_user")
@@ -484,11 +483,11 @@ class TmManageVisit(TmParentManage, QObject):
             if row:
                 # if int then look for default row ans set it
                 try:
-                    utils_giswater.set_combo_itemData(self.dlg_add_visit.visitcat_id, row[0], 0)
+                    qt_tools.set_combo_itemData(self.dlg_add_visit.visitcat_id, row[0], 0)
                     for i in range(0, self.dlg_add_visit.visitcat_id.count()):
                         elem = self.dlg_add_visit.visitcat_id.itemData(i)
                         if str(row[0]) == str(elem[0]):
-                            utils_giswater.setWidgetText(self.dlg_add_visit, self.dlg_add_visit.visitcat_id, (elem[1]))
+                            qt_tools.setWidgetText(self.dlg_add_visit, self.dlg_add_visit.visitcat_id, (elem[1]))
                 except TypeError:
                     pass
                 except ValueError:
@@ -496,15 +495,15 @@ class TmManageVisit(TmParentManage, QObject):
 
         # Relations tab
         rows = [['node']]
-        utils_giswater.fillComboBox(self.dlg_add_visit, self.dlg_add_visit.feature_type, rows, allow_nulls=False)
+        qt_tools.fillComboBox(self.dlg_add_visit, self.dlg_add_visit.feature_type, rows, allow_nulls=False)
 
         # Event tab
         # Fill ComboBox parameter_type_id
         sql = ("SELECT id FROM om_visit_parameter_type"
                " ORDER BY id")
         parameter_type_ids = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_add_visit, self.dlg_add_visit.parameter_type_id,
-                                    parameter_type_ids, allow_nulls=False)
+        qt_tools.fillComboBox(self.dlg_add_visit, self.dlg_add_visit.parameter_type_id, parameter_type_ids,
+            allow_nulls=False)
 
 
     def set_completers(self, widget, table_name):
@@ -552,7 +551,7 @@ class TmManageVisit(TmParentManage, QObject):
         """ Add and event basing on form associated to the selected parameter_id """
 
         # check a parameter_id is selected (can be that no value is available)
-        parameter_id = utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.parameter_id, 0)
+        parameter_id = qt_tools.get_item_data(self.dlg_add_visit, self.dlg_add_visit.parameter_id, 0)
         if not parameter_id:
             message = "You need to select a valid parameter id"
             self.controller.show_info_box(message)

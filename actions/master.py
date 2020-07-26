@@ -11,7 +11,7 @@ from qgis.PyQt.QtCore import Qt
 
 from functools import partial
 
-from .. import utils_giswater
+from lib import qt_tools
 from .manage_new_psector import ManageNewPsector
 from ..ui_manager import PsectorManagerUi
 from ..ui_manager import PriceManagerUi
@@ -105,27 +105,27 @@ class Master(ParentAction):
         rows = self.controller.get_rows(sql)
         exist_param = False
         if type(widget) != QDateEdit:
-            if utils_giswater.getWidgetText(dialog, widget) != "":
+            if qt_tools.getWidgetText(dialog, widget) != "":
                 for row in rows:
                     if row[0] == parameter:
                         exist_param = True
                 if exist_param:
                     sql = f"UPDATE {tablename} SET value = "
                     if widget.objectName() != 'edit_state_vdefault':
-                        sql += (f"'{utils_giswater.getWidgetText(dialog, widget)}'"
+                        sql += (f"'{qt_tools.getWidgetText(dialog, widget)}'"
                                 f" WHERE cur_user = current_user AND parameter = '{parameter}'")
                     else:
                         sql += (f"(SELECT id FROM value_state"
-                                f" WHERE name = '{utils_giswater.getWidgetText(dialog, widget)}')"
+                                f" WHERE name = '{qt_tools.getWidgetText(dialog, widget)}')"
                                 f" WHERE cur_user = current_user AND parameter = 'edit_state_vdefault'")
                 else:
                     sql = f'INSERT INTO {tablename} (parameter, value, cur_user)'
                     if widget.objectName() != 'edit_state_vdefault':
-                        sql += f" VALUES ('{parameter}', '{utils_giswater.getWidgetText(dialog, widget)}', current_user)"
+                        sql += f" VALUES ('{parameter}', '{qt_tools.getWidgetText(dialog, widget)}', current_user)"
                     else:
                         sql += (f" VALUES ('{parameter}',"
                                 f" (SELECT id FROM value_state"
-                                f" WHERE name = '{utils_giswater.getWidgetText(dialog, widget)}'), current_user)")
+                                f" WHERE name = '{qt_tools.getWidgetText(dialog, widget)}'), current_user)")
         else:
             for row in rows:
                 if row[0] == parameter:
@@ -143,7 +143,7 @@ class Master(ParentAction):
 
     def filter_by_text(self, dialog, table, widget_txt, tablename):
 
-        result_select = utils_giswater.getWidgetText(dialog, widget_txt)
+        result_select = qt_tools.getWidgetText(dialog, widget_txt)
         if result_select != 'null':
             expr = f" name ILIKE '%{result_select}%'"
             # Refresh model with selected filter
@@ -203,7 +203,7 @@ class Master(ParentAction):
                 if list_id != '':
                     sql += f"{list_id}) AND cur_user = current_user;"
                     self.controller.execute_sql(sql, log_sql=True)
-                    utils_giswater.setWidgetText(dialog, label, '')
+                    qt_tools.setWidgetText(dialog, label, '')
             sql = (f"DELETE FROM {table_name}"
                    f" WHERE {column_id} IN ({list_id});")
             self.controller.execute_sql(sql)
@@ -222,12 +222,12 @@ class Master(ParentAction):
                f"WHERE cur_user = current_user)")
         row = self.controller.get_row(sql, log_sql=True)
         if row:
-            utils_giswater.setWidgetText(self.dlg_merm, 'lbl_vdefault_price', str(row[0]))
+            qt_tools.setWidgetText(self.dlg_merm, 'lbl_vdefault_price', str(row[0]))
 
         # Tables
         tablename = 'plan_result_cat'
         self.tbl_om_result_cat = self.dlg_merm.findChild(QTableView, "tbl_om_result_cat")
-        utils_giswater.set_qtv_config(self.tbl_om_result_cat)
+        qt_tools.set_qtv_config(self.tbl_om_result_cat)
 
         # Set signals
         self.dlg_merm.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_merm))
@@ -254,7 +254,7 @@ class Master(ParentAction):
         row = selected_list[0].row()
         price_name = self.dlg_merm.tbl_om_result_cat.model().record(row).value("name")
         result_id = self.dlg_merm.tbl_om_result_cat.model().record(row).value("result_id")
-        utils_giswater.setWidgetText(self.dlg_merm, 'lbl_vdefault_price', price_name)
+        qt_tools.setWidgetText(self.dlg_merm, 'lbl_vdefault_price', price_name)
         sql = (f"DELETE FROM selector_plan_result WHERE current_user = cur_user;"
                f"\nINSERT INTO selector_plan_result (result_id, cur_user)"
                f" VALUES({result_id}, current_user);")

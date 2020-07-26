@@ -28,7 +28,7 @@ import sys
 if 'nt' in sys.builtin_module_names:
     import ctypes
 
-from .. import utils_giswater
+from lib import qt_tools
 from .snapping_utils_v3 import SnappingConfigManager
 from ..ui_manager import GwDialog, GwMainWindow
 
@@ -419,7 +419,7 @@ class ParentMapTool(QgsMapTool):
     def populate_info_text(self, dialog, data, force_tab=True, reset_text=True, tab_idx=1):
 
         change_tab = False
-        text = utils_giswater.getWidgetText(dialog, 'txt_infolog', return_string_null=False)
+        text = qt_tools.getWidgetText(dialog, 'txt_infolog', return_string_null=False)
         if reset_text:
             text = ""
         for item in data['info']['values']:
@@ -431,7 +431,7 @@ class ParentMapTool(QgsMapTool):
                 else:
                     text += "\n"
 
-        utils_giswater.setWidgetText(dialog, 'txt_infolog', text + "\n")
+        qt_tools.setWidgetText(dialog, 'txt_infolog', text + "\n")
         qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
         if change_tab and qtabwidget is not None:
             qtabwidget.setCurrentIndex(tab_idx)

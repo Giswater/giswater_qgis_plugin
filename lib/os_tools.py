@@ -46,3 +46,9 @@ def get_file_with_parents(filepath, levels=1):
 
     return os.path.relpath(filepath, common)
 
+
+def open_browser(web_tag):
+    """ Open the web browser according to the drop down menu of the feature to insert """
+
+    webbrowser.open_new_tab('https://giswater.org/giswater-manual/#' + web_tag)
+

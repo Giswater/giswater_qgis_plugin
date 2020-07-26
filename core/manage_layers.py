@@ -13,12 +13,12 @@ from qgis.PyQt.QtGui import QCursor, QIcon, QPixmap
 import os
 from functools import partial
 
-from .actions.add_layer import AddLayer
-from .actions.check_project_result import CheckProjectResult
-from .actions.task_config_layer_fields import TaskConfigLayerFields
+from ..actions.add_layer import AddLayer
+from ..actions.check_project_result import CheckProjectResult
+from .task_config_layer_fields import TaskConfigLayerFields
 
 
-class LoadProject:
+class ManageLayers:
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to manage layers. Refactor code from giswater.py """
@@ -28,7 +28,6 @@ class LoadProject:
         self.controller = controller
         self.plugin_dir = plugin_dir
         self.available_layers = None
-        self.hide_form = None
         self.add_layer = None
         self.project_type = None
         self.schema_name = None
@@ -57,15 +56,12 @@ class LoadProject:
         self.add_layers_button()
 
         # Set project layers with gw_fct_getinfofromid: This process takes time for user
-        if self.hide_form is False:
-            # Set background task 'ConfigLayerFields'
-            description = f"ConfigLayerFields"
-            self.task_get_layers = TaskConfigLayerFields(description, self.controller)
-            self.task_get_layers.set_params(self.project_type, self.schema_name, self.qgis_project_infotype)
-            QgsApplication.taskManager().addTask(self.task_get_layers)
-            QgsApplication.taskManager().triggerTask(self.task_get_layers)
-        else:
-            self.controller.log_info(f"hideForm is True")
+        # Set background task 'ConfigLayerFields'
+        description = f"ConfigLayerFields"
+        self.task_get_layers = TaskConfigLayerFields(description, self.controller)
+        self.task_get_layers.set_params(self.project_type, self.schema_name, self.qgis_project_infotype)
+        QgsApplication.taskManager().addTask(self.task_get_layers)
+        QgsApplication.taskManager().triggerTask(self.task_get_layers)
 
         return True
 
@@ -85,12 +81,10 @@ class LoadProject:
 
             # check project
             status, result = self.check_project_result.populate_audit_check_project(layers, "true")
-            self.hide_form = False
             try:
                 if 'actions' in result['body']:
                     if 'useGuideMap' in result['body']['actions']:
                         guided_map = result['body']['actions']['useGuideMap']
-                        self.hide_form = result['body']['actions']['hideForm']
                         if guided_map:
                             self.controller.log_info("manage_guided_map")
                             self.manage_guided_map()
@@ -374,7 +368,7 @@ class LoadProject:
                    f" group_layer "
                    f" FROM cat_feature "
                    f" LEFT JOIN config_table ON config_table.id = child_layer "
-                   f"WHERE parent_layer = '{parent_layer[1]}' "                   
+                   f"WHERE parent_layer = '{parent_layer[1]}' "
                    f"AND child_layer IN ("
                    f"   SELECT table_name FROM information_schema.tables"
                    f"   WHERE table_schema = '{schema_name}')"
@@ -409,7 +403,8 @@ class LoadProject:
                     geom_field = child_layer[1]+"_id"
                     style_id = child_layer[3]
                     group = child_layer[4] if child_layer[4] is not None else 'GW Layers'
-                    action.triggered.connect(partial(self.add_layer.from_postgres_to_toc, layer_name, the_geom, geom_field, None, group, style_id))
+                    action.triggered.connect(partial(self.add_layer.from_postgres_to_toc, layer_name, the_geom,
+                        geom_field, None, group, style_id))
 
         main_menu.exec_(click_point)
 

@@ -24,7 +24,8 @@ import webbrowser
 from collections import OrderedDict
 from functools import partial
 
-from .. import utils_giswater
+from .. import global_vars
+from lib import qt_tools
 from .api_catalog import ApiCatalog
 from .api_parent import ApiParent
 from .manage_document import ManageDocument
@@ -194,11 +195,12 @@ class ApiCF(ApiParent, QObject):
         self.my_json = {}
         self.tab_type = tab_type
 
-        # Get values
-        qgis_project_add_schema = self.controller.plugin_settings_value('gwAddSchema')
-        qgis_project_main_schema = self.controller.plugin_settings_value('gwMainSchema')
-        qgis_project_infotype = self.controller.plugin_settings_value('gwInfoType')
-        qgis_project_role = self.controller.plugin_settings_value('gwProjectRole')
+        # Get project variables
+        project_vars = global_vars.get_project_vars()
+        qgis_project_add_schema = project_vars['add_schema']
+        qgis_project_main_schema = project_vars['main_schema']
+        qgis_project_infotype = project_vars['infotype']
+        qgis_project_role = project_vars['role']
 
         self.new_feature = new_feature
 
@@ -254,7 +256,8 @@ class ApiCF(ApiParent, QObject):
         # Comes from QPushButtons node1 or node2 from custom form or RightButton
         elif feature_id:
             if is_add_schema is True:
-                add_schema = self.controller.plugin_settings_value('gwAddSchema')
+                project_vars = global_vars.get_project_vars()
+                add_schema = project_vars['add_schema']
                 extras = f'"addSchema":"{add_schema}"'
             else:
                 extras = '"addSchema":""'
@@ -367,14 +370,14 @@ class ApiCF(ApiParent, QObject):
             if 'layoutname' in field and field['layoutname'] == 'lyt_none': continue
             widget = dialog.findChild(QWidget, field['widgetname'])
             value = None
-            if type(widget) in (QLineEdit, QPushButton, QSpinBox, QDoubleSpinBox):
-                value = utils_giswater.getWidgetText(dialog, widget, return_string_null=False)
+            if type(widget) in(QLineEdit, QPushButton, QSpinBox, QDoubleSpinBox):
+                value = qt_tools.getWidgetText(dialog, widget, return_string_null=False)
             elif type(widget) is QComboBox:
-                value = utils_giswater.get_item_data(dialog, widget, 0)
+                value = qt_tools.get_item_data(dialog, widget, 0)
             elif type(widget) is QCheckBox:
-                value = utils_giswater.isChecked(dialog, widget)
+                value = qt_tools.isChecked(dialog, widget)
             elif type(widget) is QgsDateTimeEdit:
-                value = utils_giswater.getCalendarDate(dialog, widget)
+                value = qt_tools.getCalendarDate(dialog, widget)
             else:
                 if widget is None:
                     msg = f"Widget {field['columnname']} is not configured or have a bad config"
@@ -419,22 +422,21 @@ class ApiCF(ApiParent, QObject):
         self.tab_main = self.dlg_cf.findChild(QTabWidget, "tab_main")
         self.tab_main.currentChanged.connect(self.tab_activation)
         self.tbl_element = self.dlg_cf.findChild(QTableView, "tbl_element")
-        utils_giswater.set_qtv_config(self.tbl_element)
+        qt_tools.set_qtv_config(self.tbl_element)
         self.tbl_relations = self.dlg_cf.findChild(QTableView, "tbl_relations")
-        utils_giswater.set_qtv_config(self.tbl_relations)
+        qt_tools.set_qtv_config(self.tbl_relations)
         self.tbl_upstream = self.dlg_cf.findChild(QTableView, "tbl_upstream")
-        utils_giswater.set_qtv_config(self.tbl_upstream)
+        qt_tools.set_qtv_config(self.tbl_upstream)
         self.tbl_downstream = self.dlg_cf.findChild(QTableView, "tbl_downstream")
-        utils_giswater.set_qtv_config(self.tbl_downstream)
+        qt_tools.set_qtv_config(self.tbl_downstream)
         self.tbl_hydrometer = self.dlg_cf.findChild(QTableView, "tbl_hydrometer")
-        utils_giswater.set_qtv_config(self.tbl_hydrometer)
+        qt_tools.set_qtv_config(self.tbl_hydrometer)
         self.tbl_hydrometer_value = self.dlg_cf.findChild(QTableView, "tbl_hydrometer_value")
-        utils_giswater.set_qtv_config(self.tbl_hydrometer_value,
-                                      QAbstractItemView.SelectItems, QTableView.CurrentChanged)
+        qt_tools.set_qtv_config(self.tbl_hydrometer_value, QAbstractItemView.SelectItems, QTableView.CurrentChanged)
         self.tbl_event_cf = self.dlg_cf.findChild(QTableView, "tbl_event_cf")
-        utils_giswater.set_qtv_config(self.tbl_event_cf)
+        qt_tools.set_qtv_config(self.tbl_event_cf)
         self.tbl_document = self.dlg_cf.findChild(QTableView, "tbl_document")
-        utils_giswater.set_qtv_config(self.tbl_document)
+        qt_tools.set_qtv_config(self.tbl_document)
 
         # Get table name
         self.tablename = complet_result[0]['body']['feature']['tableName']
@@ -462,7 +464,7 @@ class ApiCF(ApiParent, QObject):
 
         for x in range(self.tab_main.count() - 1, 0, -1):
             if self.tab_main.widget(x).objectName() not in tabs_to_show:
-                utils_giswater.remove_tab_by_tabName(self.tab_main, self.tab_main.widget(x).objectName())
+                qt_tools.remove_tab_by_tabName(self.tab_main, self.tab_main.widget(x).objectName())
 
         # Actions
         action_edit = self.dlg_cf.findChild(QAction, "actionEdit")
@@ -716,7 +718,7 @@ class ApiCF(ApiParent, QObject):
         widgets = self.dlg_cf.tab_data.findChildren(QWidget)
         for widget in widgets:
             if widget.hasFocus():
-                value = utils_giswater.getWidgetText(self.dlg_cf, widget)
+                value = qt_tools.getWidgetText(self.dlg_cf, widget)
                 if str(value) not in ('', None, -1, "None") and widget.property('columnname'):
                     self.my_json[str(widget.property('columnname'))] = str(value)
 
@@ -950,7 +952,7 @@ class ApiCF(ApiParent, QObject):
         widget = self.set_headers(widget, field)
         widget = self.populate_table(widget, field)
         widget = self.set_columns_config(widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)
-        utils_giswater.set_qtv_config(widget)
+        qt_tools.set_qtv_config(widget)
         return widget
 
 
@@ -970,14 +972,14 @@ class ApiCF(ApiParent, QObject):
 
         # Set image
         img = json_result['body']['data']['shapepng']
-        utils_giswater.setImage(dlg_sections, 'lbl_section_image', img)
+        qt_tools.setImage(dlg_sections, 'lbl_section_image', img)
 
         # Set values into QLineEdits
         for field in json_result['body']['data']['fields']:
             widget = dlg_sections.findChild(QLineEdit, field['columnname'])
             if widget:
                 if 'value' in field:
-                    utils_giswater.setWidgetText(dlg_sections, widget, field['value'])
+                    qt_tools.setWidgetText(dlg_sections, widget, field['value'])
 
         dlg_sections.btn_close.clicked.connect(partial(self.close_dialog, dlg_sections))
         self.open_dialog(dlg_sections, dlg_name='info_crossect', maximize_button=False)
@@ -1015,7 +1017,7 @@ class ApiCF(ApiParent, QObject):
                 widget_name = 'data_' + field['columnname']
                 widget = self.dlg_cf.findChild(QWidget, widget_name)
                 widget.setStyleSheet(None)
-                value = utils_giswater.getWidgetText(self.dlg_cf, widget)
+                value = qt_tools.getWidgetText(self.dlg_cf, widget)
                 if value in ('null', None, ''):
                     widget.setStyleSheet("border: 1px solid red")
                     list_mandatory.append(widget_name)
@@ -1157,18 +1159,18 @@ class ApiCF(ApiParent, QObject):
             def integer_validator(self, value, widget, btn_accept)
             def double_validator(self, value, widget, btn_accept)
         """
-
-        value = utils_giswater.getWidgetText(dialog, widget, return_string_null=False)
+        
+        value = qt_tools.getWidgetText(dialog, widget, return_string_null=False)
         try:
             getattr(self, f"{widget.property('datatype')}_validator")(value, widget, btn)
         except AttributeError:
-            """If the function called by getattr don't exist raise this exception"""
+            """ If the function called by getattr don't exist raise this exception """
             pass
 
 
-    def check_min_max_value(self, dialog, widget, btn_accept):
-
-        value = utils_giswater.getWidgetText(dialog, widget, return_string_null=False)
+    def check_min_max_value(self,dialog, widget, btn_accept):
+        
+        value = qt_tools.getWidgetText(dialog, widget, return_string_null=False)
         try:
             if value and ((widget.property('minValue') and float(value) < float(widget.property('minValue'))) or
                     (widget.property('maxValue') and float(value) > float(widget.property('maxValue')))):
@@ -1237,7 +1239,7 @@ class ApiCF(ApiParent, QObject):
             widget = dialog.findChild(QLineEdit, f'{field["widgetname"]}')
             if widget:
                 value = field["value"]
-                utils_giswater.setText(dialog, widget, value)
+                qt_tools.setText(dialog, widget, value)
                 if not field['iseditable']:
                     widget.setStyleSheet("QLineEdit { background: rgb(0, 255, 0); color: rgb(0, 0, 0)}")
                 else:
@@ -1453,7 +1455,7 @@ class ApiCF(ApiParent, QObject):
         """ Add object (doc or element) to selected feature """
 
         # Get values from dialog
-        object_id = utils_giswater.getWidgetText(self.dlg_cf, table_object + "_id")
+        object_id = qt_tools.getWidgetText(self.dlg_cf, table_object + "_id")
         if object_id == 'null':
             message = "You need to insert data"
             self.controller.show_warning(message, parameter=table_object + "_id")
@@ -1545,7 +1547,7 @@ class ApiCF(ApiParent, QObject):
         self.set_completer_object(dialog, self.table_object)
 
         if element_id:
-            utils_giswater.setWidgetText(elem.dlg_add_element, "element_id", element_id)
+            qt_tools.setWidgetText(elem.dlg_add_element, "element_id", element_id)
 
         # Open dialog
         elem.open_dialog(elem.dlg_add_element)
@@ -1557,7 +1559,7 @@ class ApiCF(ApiParent, QObject):
         if elem.element_id is None:
             return
 
-        utils_giswater.setWidgetText(dialog, "element_id", elem.element_id)
+        qt_tools.setWidgetText(dialog, "element_id", elem.element_id)
         self.add_object(self.tbl_element, "element", "v_ui_element")
         self.tbl_element.model().select()
 
@@ -1600,7 +1602,7 @@ class ApiCF(ApiParent, QObject):
 
         if not row:
             # Hide tab 'relations'
-            utils_giswater.remove_tab_by_tabName(self.tab_main, "relations")
+            qt_tools.remove_tab_by_tabName(self.tab_main, "relations")
 
         else:
             # Manage signal 'doubleClicked'
@@ -1726,7 +1728,7 @@ class ApiCF(ApiParent, QObject):
         row = index.row()
 
         table_name = 'v_ui_hydrometer'
-        column_index = utils_giswater.get_col_index_by_col_name(qtable, 'hydrometer_id')
+        column_index = qt_tools.get_col_index_by_col_name(qtable, 'hydrometer_id')
         feature_id = index.sibling(row, column_index).data()
 
         # return
@@ -1785,7 +1787,7 @@ class ApiCF(ApiParent, QObject):
         rows = self.controller.get_rows(sql)
         if not rows:
             return False
-        utils_giswater.set_item_data(self.dlg_cf.cmb_cat_period_id_filter, rows, add_empty=True, sort_combo=False)
+        qt_tools.set_item_data(self.dlg_cf.cmb_cat_period_id_filter, rows, add_empty=True, sort_combo=False)
 
         sql = ("SELECT hydrometer_id, hydrometer_customer_code "
                " FROM v_rtc_hydrometer "
@@ -1797,7 +1799,7 @@ class ApiCF(ApiParent, QObject):
         if rows:
             for row in rows:
                 rows_list.append(row)
-        utils_giswater.set_item_data(self.dlg_cf.cmb_hyd_customer_code, rows_list, 1)
+        qt_tools.set_item_data(self.dlg_cf.cmb_hyd_customer_code, rows_list, 1)
 
         self.fill_tbl_hydrometer_values(self.tbl_hydrometer_value, table_hydro_value)
         self.set_columns_config(self.tbl_hydrometer_value, table_hydro_value)
@@ -1811,8 +1813,8 @@ class ApiCF(ApiParent, QObject):
     def fill_tbl_hydrometer_values(self, qtable, table_name):
         """ Fill the table control to show hydrometers values """
 
-        cat_period = utils_giswater.get_item_data(self.dlg_cf, self.dlg_cf.cmb_cat_period_id_filter, 1)
-        customer_code = utils_giswater.get_item_data(self.dlg_cf, self.dlg_cf.cmb_hyd_customer_code)
+        cat_period = qt_tools.get_item_data(self.dlg_cf, self.dlg_cf.cmb_cat_period_id_filter, 1)
+        customer_code = qt_tools.get_item_data(self.dlg_cf, self.dlg_cf.cmb_hyd_customer_code)
         filter_ = f"connec_id::text = '{self.feature_id}' "
         if cat_period != '':
             filter_ += f" AND cat_period_id::text = '{cat_period}'"
@@ -1828,7 +1830,7 @@ class ApiCF(ApiParent, QObject):
         """ Get Filter for table hydrometer value with combo value"""
 
         # Get combo value
-        cat_period_id_filter = utils_giswater.get_item_data(self.dlg_cf, self.dlg_cf.cmb_cat_period_id_filter, 0)
+        cat_period_id_filter = qt_tools.get_item_data(self.dlg_cf, self.dlg_cf.cmb_cat_period_id_filter, 0)
 
         # Set filter
         expr = f"{self.field_id} = '{self.feature_id}'"
@@ -1896,7 +1898,7 @@ class ApiCF(ApiParent, QObject):
         rows = self.controller.get_rows(sql)
         if rows:
             rows.append(['', ''])
-            utils_giswater.set_item_data(self.dlg_cf.event_id, rows)
+            qt_tools.set_item_data(self.dlg_cf.event_id, rows)
         # Fill ComboBox event_type
         sql = (f"SELECT DISTINCT(parameter_type), parameter_type "
                f"FROM {table_name_event_id} "
@@ -1905,7 +1907,7 @@ class ApiCF(ApiParent, QObject):
         rows = self.controller.get_rows(sql)
         if rows:
             rows.append(['', ''])
-            utils_giswater.set_item_data(self.dlg_cf.event_type, rows)
+            qt_tools.set_item_data(self.dlg_cf.event_type, rows)
 
         self.set_model_to_table(widget, table_name)
         self.set_filter_table_event(widget)
@@ -1925,25 +1927,25 @@ class ApiCF(ApiParent, QObject):
         if not row:
             return
 
-        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.id, row['id'])
-        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.event_code, row['event_code'])
-        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.visit_id, row['visit_id'])
-        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.position_id, row['position_id'])
-        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.position_value, row['position_value'])
-        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.parameter_id, row['parameter_id'])
-        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.value, row['value'])
-        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.value1, row['value1'])
-        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.value2, row['value2'])
-        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.geom1, row['geom1'])
-        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.geom2, row['geom2'])
-        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.geom3, row['geom3'])
-        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.xcoord, row['xcoord'])
-        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.ycoord, row['ycoord'])
-        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.compass, row['compass'])
-        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.tstamp, row['tstamp'])
-        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.text, row['text'])
-        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.index_val, row['index_val'])
-        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.is_last, row['is_last'])
+        qt_tools.setWidgetText(self.dlg_event_full, self.dlg_event_full.id, row['id'])
+        qt_tools.setWidgetText(self.dlg_event_full, self.dlg_event_full.event_code, row['event_code'])
+        qt_tools.setWidgetText(self.dlg_event_full, self.dlg_event_full.visit_id, row['visit_id'])
+        qt_tools.setWidgetText(self.dlg_event_full, self.dlg_event_full.position_id, row['position_id'])
+        qt_tools.setWidgetText(self.dlg_event_full, self.dlg_event_full.position_value, row['position_value'])
+        qt_tools.setWidgetText(self.dlg_event_full, self.dlg_event_full.parameter_id, row['parameter_id'])
+        qt_tools.setWidgetText(self.dlg_event_full, self.dlg_event_full.value, row['value'])
+        qt_tools.setWidgetText(self.dlg_event_full, self.dlg_event_full.value1, row['value1'])
+        qt_tools.setWidgetText(self.dlg_event_full, self.dlg_event_full.value2, row['value2'])
+        qt_tools.setWidgetText(self.dlg_event_full, self.dlg_event_full.geom1, row['geom1'])
+        qt_tools.setWidgetText(self.dlg_event_full, self.dlg_event_full.geom2, row['geom2'])
+        qt_tools.setWidgetText(self.dlg_event_full, self.dlg_event_full.geom3, row['geom3'])
+        qt_tools.setWidgetText(self.dlg_event_full, self.dlg_event_full.xcoord, row['xcoord'])
+        qt_tools.setWidgetText(self.dlg_event_full, self.dlg_event_full.ycoord, row['ycoord'])
+        qt_tools.setWidgetText(self.dlg_event_full, self.dlg_event_full.compass, row['compass'])
+        qt_tools.setWidgetText(self.dlg_event_full, self.dlg_event_full.tstamp, row['tstamp'])
+        qt_tools.setWidgetText(self.dlg_event_full, self.dlg_event_full.text, row['text'])
+        qt_tools.setWidgetText(self.dlg_event_full, self.dlg_event_full.index_val, row['index_val'])
+        qt_tools.setWidgetText(self.dlg_event_full, self.dlg_event_full.is_last, row['is_last'])
         self.populate_tbl_docs_x_event()
 
         # Set all QLineEdit readOnly(True)
@@ -1958,8 +1960,7 @@ class ApiCF(ApiParent, QObject):
                                  " color: rgb(100, 100, 100)}")
         self.dlg_event_full.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_event_full))
         self.dlg_event_full.tbl_docs_x_event.doubleClicked.connect(self.open_file)
-        utils_giswater.set_qtv_config(self.dlg_event_full.tbl_docs_x_event)
-
+        qt_tools.set_qtv_config(self.dlg_event_full.tbl_docs_x_event)
         self.open_dialog(self.dlg_event_full, 'visit_event_full')
 
 
@@ -2003,7 +2004,7 @@ class ApiCF(ApiParent, QObject):
 
         # Get row index
         index = self.dlg_event_full.tbl_docs_x_event.selectionModel().selectedRows()[0]
-        column_index = utils_giswater.get_col_index_by_col_name(self.dlg_event_full.tbl_docs_x_event, 'value')
+        column_index = qt_tools.get_col_index_by_col_name(self.dlg_event_full.tbl_docs_x_event, 'value')
 
         path = index.sibling(index.row(), column_index).data()
         # Check if file exist
@@ -2065,7 +2066,7 @@ class ApiCF(ApiParent, QObject):
 
         # Cascade filter
         table_name_event_id = "config_visit_parameter"
-        event_type_value = utils_giswater.get_item_data(self.dlg_cf, self.dlg_cf.event_type, 0)
+        event_type_value = qt_tools.get_item_data(self.dlg_cf, self.dlg_cf.event_type, 0)
 
         feature_type = {'arc_id': 'ARC', 'connec_id': 'CONNEC', 'gully_id': 'GULLY', 'node_id': 'NODE'}
         # Fill ComboBox event_id
@@ -2077,12 +2078,12 @@ class ApiCF(ApiParent, QObject):
         rows = self.controller.get_rows(sql, log_sql=True)
         if rows:
             rows.append(['', ''])
-            utils_giswater.set_item_data(self.dlg_cf.event_id, rows, 1)
+            qt_tools.set_item_data(self.dlg_cf.event_id, rows, 1)
 
         # End cascading filter
         # Get selected values in Comboboxes
-        event_type_value = utils_giswater.get_item_data(self.dlg_cf, self.dlg_cf.event_type, 0)
-        event_id = utils_giswater.get_item_data(self.dlg_cf, self.dlg_cf.event_id, 0)
+        event_type_value = qt_tools.get_item_data(self.dlg_cf, self.dlg_cf.event_type, 0)
+        event_id = qt_tools.get_item_data(self.dlg_cf, self.dlg_cf.event_id, 0)
         format_low = 'yyyy-MM-dd 00:00:00.000'
         format_high = 'yyyy-MM-dd 23:59:59.999'
         interval = f"'{visit_start.toString(format_low)}'::timestamp AND '{visit_end.toString(format_high)}'::timestamp"
@@ -2126,10 +2127,10 @@ class ApiCF(ApiParent, QObject):
         expr += f" AND visit_start BETWEEN {interval}"
 
         # Get selected values in Comboboxes
-        event_type_value = utils_giswater.get_item_data(self.dlg_cf, self.dlg_cf.event_type, 0)
+        event_type_value = qt_tools.get_item_data(self.dlg_cf, self.dlg_cf.event_type, 0)
         if event_type_value != 'null':
             expr += f" AND parameter_type ILIKE '%{event_type_value}%'"
-        event_id = utils_giswater.get_item_data(self.dlg_cf, self.dlg_cf.event_id, 0)
+        event_id = qt_tools.get_item_data(self.dlg_cf, self.dlg_cf.event_id, 0)
         if event_id != 'null':
             expr += f" AND parameter_id ILIKE '%{event_id}%'"
 
@@ -2158,7 +2159,7 @@ class ApiCF(ApiParent, QObject):
         """ Call button 64: om_add_visit """
 
         # Get expl_id to save it on om_visit and show the geometry of visit
-        expl_id = utils_giswater.get_item_data(self.dlg_cf, self.tab_type + '_expl_id', 0)
+        expl_id = qt_tools.get_item_data(self.dlg_cf, self.tab_type + '_expl_id', 0)
         if expl_id == -1:
             msg = "Widget expl_id not found"
             self.controller.show_warning(msg)
@@ -2327,7 +2328,7 @@ class ApiCF(ApiParent, QObject):
         rows = self.controller.get_rows(sql)
         if rows:
             rows.append(['', ''])
-        utils_giswater.set_item_data(doc_type, rows)
+        qt_tools.set_item_data(doc_type, rows)
 
         # Adding auto-completion to a QLineEdit
         self.table_object = "doc"
@@ -2358,7 +2359,7 @@ class ApiCF(ApiParent, QObject):
         expr += f" AND(date BETWEEN {interval}) AND (date BETWEEN {interval})"
 
         # Get selected values in Comboboxes
-        doc_type_value = utils_giswater.get_item_data(self.dlg_cf, self.dlg_cf.doc_type, 0)
+        doc_type_value = qt_tools.get_item_data(self.dlg_cf, self.dlg_cf.doc_type, 0)
         if doc_type_value != 'null' and doc_type_value is not None:
             expr += f" AND doc_type ILIKE '%{doc_type_value}%'"
 
@@ -2408,7 +2409,7 @@ class ApiCF(ApiParent, QObject):
         # Set completer
         self.set_completer_object(dialog, self.table_object)
         if doc_id:
-            utils_giswater.setWidgetText(dialog, "doc_id", doc_id)
+            qt_tools.setWidgetText(dialog, "doc_id", doc_id)
 
         # # Open dialog
         # doc.open_dialog(doc.dlg_add_doc)
@@ -2420,7 +2421,7 @@ class ApiCF(ApiParent, QObject):
         if doc.doc_id is None:
             return
 
-        utils_giswater.setWidgetText(dialog, "doc_id", doc.doc_id)
+        qt_tools.setWidgetText(dialog, "doc_id", doc.doc_id)
         self.add_object(self.tbl_document, "doc", "v_ui_doc")
 
 
@@ -2534,7 +2535,7 @@ class ApiCF(ApiParent, QObject):
         for widget in widget_list:
             if type(widget) != QTableView:
                 columnname = widget.property('columnname')
-                text = utils_giswater.getWidgetText(dialog, widget)
+                text = qt_tools.getWidgetText(dialog, widget)
                 if text != "null":
                     filter_fields += f'"{columnname}":"{text}", '
 
@@ -2561,7 +2562,7 @@ class ApiCF(ApiParent, QObject):
         index = selected_list[0]
         row = index.row()
         table_name = complet_list[0]['body']['feature']['tableName']
-        column_index = utils_giswater.get_col_index_by_col_name(qtable, 'sys_id')
+        column_index = qt_tools.get_col_index_by_col_name(qtable, 'sys_id')
         feature_id = index.sibling(row, column_index).data()
 
         # return
@@ -2671,23 +2672,23 @@ class ApiCF(ApiParent, QObject):
         # Get values from dialog
         values = ""
         fields = ""
-        cat_work_id = utils_giswater.getWidgetText(self.dlg_new_workcat, cat_work_id)
+        cat_work_id = qt_tools.getWidgetText(self.dlg_new_workcat, cat_work_id)
         if cat_work_id != "null":
             fields += 'id, '
             values += f"'{cat_work_id}', "
-        descript = utils_giswater.getWidgetText(self.dlg_new_workcat, descript)
+        descript = qt_tools.getWidgetText(self.dlg_new_workcat, descript)
         if descript != "null":
             fields += 'descript, '
             values += f"'{descript}', "
-        link = utils_giswater.getWidgetText(self.dlg_new_workcat, link)
+        link = qt_tools.getWidgetText(self.dlg_new_workcat, link)
         if link != "null":
             fields += 'link, '
             values += f"'{link}', "
-        workid_key_1 = utils_giswater.getWidgetText(self.dlg_new_workcat, workid_key_1)
+        workid_key_1 = qt_tools.getWidgetText(self.dlg_new_workcat, workid_key_1)
         if workid_key_1 != "null":
             fields += 'workid_key1, '
             values += f"'{workid_key_1}', "
-        workid_key_2 = utils_giswater.getWidgetText(self.dlg_new_workcat, workid_key_2)
+        workid_key_2 = qt_tools.getWidgetText(self.dlg_new_workcat, workid_key_2)
         if workid_key_2 != "null":
             fields += 'workid_key2, '
             values += f"'{workid_key_2}', "
@@ -2718,7 +2719,7 @@ class ApiCF(ApiParent, QObject):
                         model = QStringListModel()
                         completer = QCompleter()
                         self.set_completer_object_api(completer, model, cmb_workcat_id, rows[0])
-                        utils_giswater.setWidgetText(self.dlg_cf, cmb_workcat_id, cat_work_id)
+                        qt_tools.setWidgetText(self.dlg_cf, cmb_workcat_id, cat_work_id)
                         self.my_json[str(cmb_workcat_id.property('columnname'))] = str(cat_work_id)
                     self.close_dialog(self.dlg_new_workcat)
                 else:
@@ -2840,7 +2841,7 @@ class ApiCF(ApiParent, QObject):
         feat_id = snapped_feat.attribute(f'{options[option][0]}')
         widget = dialog.findChild(QWidget, f"{options[option][1]}")
         widget.setFocus()
-        utils_giswater.setWidgetText(dialog, widget, str(feat_id))
+        qt_tools.setWidgetText(dialog, widget, str(feat_id))
         self.snapper_manager.recover_snapping_options()
         self.cancel_snapping_tool(dialog, action)
 
@@ -2869,7 +2870,7 @@ class ApiCF(ApiParent, QObject):
     """ OTHER FUNCTIONS """
 
     def set_image(self, dialog, widget):
-        utils_giswater.setImage(dialog, widget, "ws_shape.png")
+        qt_tools.setImage(dialog, widget, "ws_shape.png")
 
 
 
@@ -2882,7 +2883,7 @@ class ApiCF(ApiParent, QObject):
         dialog = kwargs['dialog']
         widget = kwargs['widget']
 
-        feature_id = utils_giswater.getWidgetText(dialog, widget)
+        feature_id = qt_tools.getWidgetText(dialog, widget)
         self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, self.tab_type)
         complet_result, dialog = self.ApiCF.open_form(table_name='v_edit_node', feature_id=feature_id,
             tab_type=self.tab_type, is_docker=False)

@@ -5,9 +5,9 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsMessageLog, QgsCredentials, QgsExpressionContextUtils, QgsProject, QgsDataSourceUri, QgsRectangle
+from qgis.core import QgsMessageLog, QgsCredentials, QgsProject, QgsDataSourceUri
 from qgis.PyQt.QtCore import QCoreApplication, QRegExp, QSettings, Qt, QTranslator
-from qgis.PyQt.QtGui import QColor, QTextCharFormat, QFont
+from qgis.PyQt.QtGui import QTextCharFormat, QFont
 from qgis.PyQt.QtSql import QSqlDatabase
 from qgis.PyQt.QtWidgets import QCheckBox, QGroupBox, QLabel, QMessageBox, QPushButton, QRadioButton, QTabWidget, \
     QToolBox
@@ -22,24 +22,25 @@ import inspect
 import traceback
 import sys
 
+from .. import global_vars
 from .pg_dao import PgDao
 from .logger import Logger
-from .. import utils_giswater
-from .. import sys_manager
+from lib import os_tools, qt_tools
 from ..ui_manager import DialogTextUi, DockerUi
 
 
 class DaoController(object):
 
-    def __init__(self, settings, plugin_name, iface, logger_name='plugin', create_logger=True):
+    def __init__(self, plugin_name, iface, logger_name='plugin', create_logger=True):
         """ Class constructor """
-
-        self.settings = settings
+        
+        self.settings = global_vars.settings
+        self.qgis_settings = global_vars.qgis_settings
+        self.qgis_tools = global_vars.qgis_tools
         self.plugin_name = plugin_name
         self.iface = iface
         self.translator = None
         self.plugin_dir = None
-        self.giswater = None
         self.logged = False
         self.postgresql_version = None
         self.logger = None
@@ -58,7 +59,6 @@ class DaoController(object):
         self.show_docker = None
         self.prev_maptool = None
         self.parent = None
-        self.gw_actions = None
         if create_logger:
             self.set_logger(logger_name)
 
@@ -70,19 +70,12 @@ class DaoController(object):
             if not self.dao.close_db():
                 self.log_info(str(self.last_error))
             del self.dao
+
         self.current_user = None
-
-
-    def set_giswater(self, giswater):
-        self.giswater = giswater
 
 
     def set_schema_name(self, schema_name):
         self.schema_name = schema_name
-
-
-    def set_qgis_settings(self, qgis_settings):
-        self.qgis_settings = qgis_settings
 
 
     def set_plugin_dir(self, plugin_dir):
@@ -327,7 +320,7 @@ class DaoController(object):
         """ Connect to database with selected database @credentials """
 
         # Check if credential parameter 'service' is set
-        if credentials['service']:
+        if 'service' in credentials and credentials['service']:
             logged = self.connect_to_database_service(credentials['service'], credentials['sslmode'])
             return logged, credentials
 
@@ -538,7 +531,7 @@ class DaoController(object):
         widget = self.iface.messageBar().createMessage(self.tr(text, context_name), self.tr(inf_text))
         button = QPushButton(widget)
         button.setText(self.tr("Open file"))
-        button.clicked.connect(partial(sys_manager.open_file, file_path))
+        button.clicked.connect(partial(os_tools.open_file, file_path))
         widget.layout().addWidget(button)
         self.iface.messageBar().pushWidget(widget, 1)
 
@@ -954,124 +947,25 @@ class DaoController(object):
     def get_layer_by_tablename(self, tablename, show_warning=False, log_info=False):
         """ Iterate over all layers and get the one with selected @tablename """
 
-        # Check if we have any layer loaded
-        layers = self.get_layers()
-        if len(layers) == 0:
-            return None
-
-        # Iterate over all layers
-        layer = None
-        for cur_layer in layers:
-            uri_table = self.get_layer_source_table_name(cur_layer)
-            if uri_table is not None and uri_table == tablename:
-                layer = cur_layer
-                break
-
-        if layer is None and show_warning:
-            self.show_warning("Layer not found", parameter=tablename)
-
-        if layer is None and log_info:
-            self.log_info("Layer not found", parameter=tablename)
-
-        return layer
+        return self.qgis_tools.qgis_get_layer_by_tablename(tablename, show_warning, log_info)
 
 
     def get_layer_source(self, layer):
         """ Get database connection paramaters of @layer """
 
-        # Initialize variables
-        layer_source = {'db': None, 'schema': None, 'table': None, 'service': None,
-                        'host': None, 'port': None, 'user': None, 'password': None, 'sslmode': None}
-
-        if layer is None:
-            return layer_source
-
-        # Get uri to parse it
-        uri = layer.dataProvider().dataSourceUri()
-
-        # Check if service is set
-        pos_service = uri.find('service=')
-        pos_sslmode = uri.find(' sslmode=')
-        if pos_service != -1 and pos_sslmode != -1:
-            uri_service = uri[pos_service + 9:pos_sslmode]
-            layer_source['service'] = uri_service.replace("'", "")
-
-        # Get dbname, host, port, user and password
-        pos_db = uri.find('dbname=')
-        pos_host = uri.find(' host=')
-        pos_port = uri.find(' port=')
-        pos_user = uri.find(' user=')
-        pos_password = uri.find(' password=')
-        pos_key = uri.find(' key=')
-        if pos_db != -1 and pos_host != -1:
-            uri_db = uri[pos_db + 8:pos_host - 1]
-            layer_source['db'] = uri_db
-        if pos_host != -1 and pos_port != -1:
-            uri_host = uri[pos_host + 6:pos_port]
-            layer_source['host'] = uri_host
-        if pos_port != -1:
-            if pos_user != -1:
-                pos_end = pos_user
-            elif pos_sslmode != -1:
-                pos_end = pos_sslmode
-            elif pos_key != -1:
-                pos_end = pos_key
-            else:
-                pos_end = pos_port + 10
-            uri_port = uri[pos_port + 6:pos_end]
-            layer_source['port'] = uri_port
-        if pos_user != -1 and pos_password != -1:
-            uri_user = uri[pos_user + 7:pos_password - 1]
-            layer_source['user'] = uri_user
-        if pos_password != -1 and pos_sslmode != -1:
-            uri_password = uri[pos_password + 11:pos_sslmode - 1]
-            layer_source['password'] = uri_password
-
-        # Get schema and table or view name
-        pos_table = uri.find('table=')
-        pos_end_schema = uri.rfind('.')
-        pos_fi = uri.find('" ')
-        if pos_table != -1 and pos_fi != -1:
-            uri_schema = uri[pos_table + 6:pos_end_schema]
-            uri_table = uri[pos_end_schema + 2:pos_fi]
-            layer_source['schema'] = uri_schema
-            layer_source['table'] = uri_table
-
-        return layer_source
+        return self.qgis_tools.qgis_get_layer_source(layer)
 
 
     def get_layer_source_table_name(self, layer):
         """ Get table or view name of selected layer """
 
-        if layer is None:
-            return None
-
-        uri_table = None
-        uri = layer.dataProvider().dataSourceUri().lower()
-        pos_ini = uri.find('table=')
-        pos_end_schema = uri.rfind('.')
-        pos_fi = uri.find('" ')
-        if pos_ini != -1 and pos_fi != -1:
-            uri_table = uri[pos_end_schema + 2:pos_fi]
-
-        return uri_table
+        return self.qgis_tools.qgis_get_layer_source_table_name(layer)
 
 
     def get_layer_primary_key(self, layer=None):
         """ Get primary key of selected layer """
 
-        uri_pk = None
-        if layer is None:
-            layer = self.iface.activeLayer()
-        if layer is None:
-            return uri_pk
-        uri = layer.dataProvider().dataSourceUri().lower()
-        pos_ini = uri.find('key=')
-        pos_end = uri.rfind('srid=')
-        if pos_ini != -1:
-            uri_pk = uri[pos_ini + 5:pos_end - 2]
-
-        return uri_pk
+        return self.qgis_tools.qgis_get_layer_primary_key(layer)
 
 
     def get_project_user(self):
@@ -1362,7 +1256,7 @@ class DaoController(object):
         schema_name = schema_name.replace('"', '')
         sql = ("SELECT routine_name FROM information_schema.routines "
                "WHERE lower(routine_schema) = %s "
-               "AND lower(routine_name) = %s ")
+               "AND lower(routine_name) = %s")
         params = [schema_name, function_name]
         row = self.get_row(sql, params=params, commit=commit)
         return row
@@ -1380,7 +1274,7 @@ class DaoController(object):
                     return None
 
         schemaname = schemaname.replace('"', '')
-        sql = ("SELECT * FROM pg_tables WHERE schemaname = %s AND tablename = %s ")
+        sql = "SELECT * FROM pg_tables WHERE schemaname = %s AND tablename = %s"
         params = [schemaname, tablename]
         row = self.get_row(sql, log_info=False, params=params)
         return row
@@ -1408,7 +1302,7 @@ class DaoController(object):
 
         schemaname = schemaname.replace('"', '')
         sql = ("SELECT * FROM information_schema.columns "
-               "WHERE table_schema = %s AND table_name = %s AND column_name = %s ")
+               "WHERE table_schema = %s AND table_name = %s AND column_name = %s")
         params = [schemaname, tablename, columname]
         row = self.get_row(sql, log_info=False, params=params)
         return row
@@ -1500,48 +1394,6 @@ class DaoController(object):
         return roles
 
 
-    def check_user_roles(self):
-        """ Check roles of this user to show or hide toolbars """
-
-        restriction = self.get_restriction()
-
-        if restriction == 'role_basic':
-            pass
-        elif restriction == 'role_om':
-            if self.giswater.project_type == 'ws':
-                self.giswater.enable_toolbar("om_ws")
-            elif self.giswater.project_type == 'ud':
-                self.giswater.enable_toolbar("om_ud")
-        elif restriction == 'role_edit':
-            if self.giswater.project_type == 'ws':
-                self.giswater.enable_toolbar("om_ws")
-            elif self.giswater.project_type == 'ud':
-                self.giswater.enable_toolbar("om_ud")
-            self.giswater.enable_toolbar("edit")
-            self.giswater.enable_toolbar("cad")
-        elif restriction == 'role_epa':
-            if self.giswater.project_type == 'ws':
-                self.giswater.enable_toolbar("om_ws")
-            elif self.giswater.project_type == 'ud':
-                self.giswater.enable_toolbar("om_ud")
-            self.giswater.enable_toolbar("edit")
-            self.giswater.enable_toolbar("cad")
-            self.giswater.enable_toolbar("epa")
-            self.giswater.enable_toolbar("master")
-            self.giswater.hide_action(False, 38)
-            self.giswater.hide_action(False, 47)
-            self.giswater.hide_action(False, 50)
-        elif restriction == 'role_master':
-            self.giswater.enable_toolbar("master")
-            self.giswater.enable_toolbar("epa")
-            self.giswater.enable_toolbar("edit")
-            self.giswater.enable_toolbar("cad")
-            if self.giswater.project_type == 'ws':
-                self.giswater.enable_toolbar("om_ws")
-            elif self.giswater.project_type == 'ud':
-                self.giswater.enable_toolbar("om_ud")
-
-
     def get_columns_list(self, tablename, schemaname=None):
         """ Return list of all columns in @tablename """
 
@@ -1605,9 +1457,7 @@ class DaoController(object):
     def get_layers(self):
         """ Return layers in the same order as listed in TOC """
 
-        layers = [layer.layer() for layer in QgsProject.instance().layerTreeRoot().findLayers()]
-
-        return layers
+        return self.qgis_tools.qgis_get_layers()
 
 
     def set_search_path(self, schema_name):
@@ -1623,10 +1473,7 @@ class DaoController(object):
             qtextedit.setText(path[0])
 
 
-    def get_restriction(self):
-
-        # Get project variable 'project_role'
-        qgis_project_role = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('gwProjectRole')
+    def get_restriction(self, qgis_project_role):
 
         role_edit = False
         role_om = False
@@ -1740,7 +1587,7 @@ class DaoController(object):
         try:
             stack_level += stack_level_increase
             module_path = inspect.stack()[stack_level][1]
-            file_name = sys_manager.get_file_with_parents(module_path, 2)
+            file_name = os_tools.get_file_with_parents(module_path, 2)
             function_line = inspect.stack()[stack_level][2]
             function_name = inspect.stack()[stack_level][3]
 
@@ -1820,7 +1667,7 @@ class DaoController(object):
 
                 stack_level += stack_level_increase
                 module_path = inspect.stack()[stack_level][1]
-                file_name = sys_manager.get_file_with_parents(module_path, 2)
+                file_name = os_tools.get_file_with_parents(module_path, 2)
                 function_line = inspect.stack()[stack_level][2]
                 function_name = inspect.stack()[stack_level][3]
 
@@ -1856,7 +1703,7 @@ class DaoController(object):
         self.dlg_info.setWindowTitle(window_title)
         if title:
             self.dlg_info.lbl_text.setText(title)
-        utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.txt_infolog, msg)
+        qt_tools.setWidgetText(self.dlg_info, self.dlg_info.txt_infolog, msg)
         self.dlg_info.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.set_text_bold(self.dlg_info.txt_infolog)
         self.dlg_info.show()
@@ -1944,6 +1791,7 @@ class DaoController(object):
         if type(pos) is int and pos in (1, 2, 4, 8):
             self.dlg_docker.position = pos
 
+        # TODO: Check this
         # If user want to dock the dialog, we reset rubberbands for each info
         # For the first time, cf_info does not exist, therefore we cannot access it and reset rubberbands
         try:

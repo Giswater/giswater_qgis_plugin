@@ -14,7 +14,7 @@ from qgis.PyQt.QtWidgets import QLineEdit, QDialog
 import json
 from functools import partial
 
-from .. import utils_giswater
+from lib import qt_tools
 from .api_parent import ApiParent
 from ..ui_manager import FastPrintUi
 
@@ -65,14 +65,14 @@ class ApiManageComposer(ApiParent):
         w_rotation = self.dlg_composer.findChild(QLineEdit, "data_rotation")
         if w_rotation:
             w_rotation.editingFinished.connect(partial(self.set_rotation, w_rotation))
-            utils_giswater.setWidgetText(self.dlg_composer, w_rotation, rotation)
+            qt_tools.setWidgetText(self.dlg_composer, w_rotation, rotation)
 
         w_scale = self.dlg_composer.findChild(QLineEdit, "data_scale")
         if w_scale:
             w_scale.editingFinished.connect(partial(self.set_scale, w_scale))
             reg_exp = QRegExp("\d{0,8}[\r]?")
             w_scale.setValidator(QRegExpValidator(reg_exp))
-            utils_giswater.setWidgetText(self.dlg_composer, w_scale, scale)
+            qt_tools.setWidgetText(self.dlg_composer, w_scale, scale)
         self.my_json['rotation'] = rotation
         self.my_json['scale'] = scale
 

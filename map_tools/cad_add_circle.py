@@ -12,7 +12,7 @@ from qgis.PyQt.QtGui import QDoubleValidator
 
 from functools import partial
 
-from .. import utils_giswater
+from lib import qt_tools
 from .parent import ParentMapTool
 from ..ui_manager import AuxCircle
 
@@ -52,7 +52,7 @@ class CadAddCircle(ParentMapTool):
         self.radius = self.dlg_create_circle.radius.text()
         if not self.radius:
             self.radius = 0.1
-        self.delete_prev = utils_giswater.isChecked(self.dlg_create_circle, self.dlg_create_circle.chk_delete_prev)
+        self.delete_prev = qt_tools.isChecked(self.dlg_create_circle, self.dlg_create_circle.chk_delete_prev)
 
         if self.layer_circle:
             self.layer_circle.startEditing()

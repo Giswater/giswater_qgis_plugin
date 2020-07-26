@@ -7,6 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from qgis.core import QgsApplication, QgsExpression, QgsFeatureRequest, QgsFillSymbol, QgsLineSymbol, QgsMarkerSymbol, \
     QgsPrintLayout, QgsProject, QgsReadWriteContext, QgsSymbol, QgsVectorLayer
+
 from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTime
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCompleter, QLineEdit, QTableView, QTabWidget, QTextEdit
@@ -21,7 +22,7 @@ from collections import OrderedDict
 from functools import partial
 
 from .gw_task import GwTask
-from .. import utils_giswater
+from lib import qt_tools
 from .api_search import ApiSearch
 from .mincut_config import MincutConfig
 from .multiple_selection import MultipleSelection
@@ -121,9 +122,9 @@ class MincutParent(ParentAction):
         # These widgets are put from the api, mysteriously if we do something like:
         # self.dlg_mincut.address_add_muni.text() or self.dlg_mincut.address_add_muni.setDiabled(True) etc...
         # it doesn't count them, and that's why we have to force them
-        self.dlg_mincut.address_add_muni = utils_giswater.getWidget(self.dlg_mincut, 'address_add_muni')
-        self.dlg_mincut.address_add_street = utils_giswater.getWidget(self.dlg_mincut, 'address_add_street')
-        self.dlg_mincut.address_add_postnumber = utils_giswater.getWidget(self.dlg_mincut, 'address_add_postnumber')
+        self.dlg_mincut.address_add_muni = qt_tools.getWidget(self.dlg_mincut, 'address_add_muni')
+        self.dlg_mincut.address_add_street = qt_tools.getWidget(self.dlg_mincut, 'address_add_street')
+        self.dlg_mincut.address_add_postnumber = qt_tools.getWidget(self.dlg_mincut, 'address_add_postnumber')
 
         self.result_mincut_id = self.dlg_mincut.findChild(QLineEdit, "result_mincut_id")
         self.customer_state = self.dlg_mincut.findChild(QLineEdit, "customer_state")
@@ -133,30 +134,30 @@ class MincutParent(ParentAction):
         self.distance = self.dlg_mincut.findChild(QLineEdit, "distance")
         self.depth = self.dlg_mincut.findChild(QLineEdit, "depth")
 
-        utils_giswater.double_validator(self.distance, 0, 9999999, 3)
-        utils_giswater.double_validator(self.depth, 0, 9999999, 3)
-        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.txt_exec_user, self.controller.get_project_user())
+        qt_tools.double_validator(self.distance, 0, 9999999, 3)
+        qt_tools.double_validator(self.depth, 0, 9999999, 3)
+        qt_tools.setWidgetText(self.dlg_mincut, self.dlg_mincut.txt_exec_user, self.controller.get_project_user())
 
         # Fill ComboBox type
         sql = ("SELECT id, descript "
                "FROM om_mincut_cat_type "
                "ORDER BY id")
         rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_mincut.type, rows, 1)
+        qt_tools.set_item_data(self.dlg_mincut.type, rows, 1)
 
         # Fill ComboBox cause
         sql = ("SELECT id, idval "
                "FROM om_typevalue WHERE typevalue = 'mincut_cause' "
                "ORDER BY id")
         rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_mincut.cause, rows, 1)
+        qt_tools.set_item_data(self.dlg_mincut.cause, rows, 1)
 
         # Fill ComboBox assigned_to
         sql = ("SELECT id, name "
                "FROM cat_users "
                "ORDER BY name")
         rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_mincut.assigned_to, rows, 1)
+        qt_tools.set_item_data(self.dlg_mincut.assigned_to, rows, 1)
 
         # Toolbar actions
         action = self.dlg_mincut.findChild(QAction, "actionMincut")
@@ -202,9 +203,9 @@ class MincutParent(ParentAction):
 
         # Set state name
         if self.states != {}:
-            utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, str(self.states[0]))
-        self.current_state = 0
+            qt_tools.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, str(self.states[0]))
 
+        self.current_state = 0        
         self.sql_connec = ""
         self.sql_hydro = ""
 
@@ -240,9 +241,9 @@ class MincutParent(ParentAction):
 
     def refresh_tab_hydro(self):
 
-        result_mincut_id = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
+        result_mincut_id = qt_tools.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
         expr_filter = f"result_id={result_mincut_id}"
-        utils_giswater.set_qtv_config(self.dlg_mincut.tbl_hydro, edit_triggers=QTableView.DoubleClicked)
+        qt_tools.set_qtv_config(self.dlg_mincut.tbl_hydro, edit_triggers=QTableView.DoubleClicked)
         self.fill_table(self.dlg_mincut.tbl_hydro, 'v_om_mincut_hydrometer', expr_filter=expr_filter)
         self.set_table_columns(self.dlg_mincut, self.dlg_mincut.tbl_hydro, 'v_om_mincut_hydrometer')
 
@@ -269,7 +270,7 @@ class MincutParent(ParentAction):
 
     def show_notified_list(self):
 
-        mincut_id = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
+        mincut_id = qt_tools.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
         sql = (f"SELECT notified FROM om_mincut "
                f"WHERE id = '{mincut_id}'")
         row = self.controller.get_row(sql, log_sql=True)
@@ -294,7 +295,7 @@ class MincutParent(ParentAction):
         elif row[0]:
             result_mincut_id = str(int(row[0]) + 1)
 
-        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id, str(result_mincut_id))
+        qt_tools.setWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id, str(result_mincut_id))
 
 
     def mg_mincut(self):
@@ -306,12 +307,12 @@ class MincutParent(ParentAction):
 
         # Get current date. Set all QDateEdit to current date
         date_start = QDate.currentDate()
-        utils_giswater.setCalendarDate(self.dlg_mincut, "cbx_date_start", date_start)
-        utils_giswater.setCalendarDate(self.dlg_mincut, "cbx_date_end", date_start)
-        utils_giswater.setCalendarDate(self.dlg_mincut, "cbx_recieved_day", date_start)
-        utils_giswater.setCalendarDate(self.dlg_mincut, "cbx_date_start_predict", date_start)
-        utils_giswater.setCalendarDate(self.dlg_mincut, "cbx_date_end_predict", date_start)
-
+        qt_tools.setCalendarDate(self.dlg_mincut, "cbx_date_start", date_start)
+        qt_tools.setCalendarDate(self.dlg_mincut, "cbx_date_end", date_start)
+        qt_tools.setCalendarDate(self.dlg_mincut, "cbx_recieved_day", date_start)
+        qt_tools.setCalendarDate(self.dlg_mincut, "cbx_date_start_predict", date_start)
+        qt_tools.setCalendarDate(self.dlg_mincut, "cbx_date_end_predict", date_start)
+        
         # Get current time
         current_time = QTime.currentTime()
         self.dlg_mincut.cbx_recieved_time.setTime(current_time)
@@ -407,7 +408,7 @@ class MincutParent(ParentAction):
         self.dlg_mincut.real_description.setEnabled(True)
 
         # Set state to 'In Progress'
-        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, str(self.states[1]))
+        qt_tools.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, str(self.states[1]))
         self.current_state = 1
 
         # Enable/Disable widget depending state
@@ -426,34 +427,32 @@ class MincutParent(ParentAction):
         # These widgets are put from the api, mysteriously if we do something like:
         # self.dlg_mincut.address_add_muni.text() or self.dlg_mincut.address_add_muni.setDiabled(True) etc...
         # it doesn't count them, and that's why we have to force them
-        self.dlg_fin.address_add_muni = utils_giswater.getWidget(self.dlg_fin, 'address_add_muni')
-        self.dlg_fin.address_add_street = utils_giswater.getWidget(self.dlg_fin, 'address_add_street')
-        self.dlg_fin.address_add_postnumber = utils_giswater.getWidget(self.dlg_fin, 'address_add_postnumber')
+        self.dlg_fin.address_add_muni = qt_tools.getWidget(self.dlg_fin, 'address_add_muni')
+        self.dlg_fin.address_add_street = qt_tools.getWidget(self.dlg_fin, 'address_add_street')
+        self.dlg_fin.address_add_postnumber = qt_tools.getWidget(self.dlg_fin, 'address_add_postnumber')
 
-        mincut = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
-        utils_giswater.setWidgetText(self.dlg_fin, self.dlg_fin.mincut, mincut)
-        work_order = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.work_order)
+        mincut = qt_tools.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
+        qt_tools.setWidgetText(self.dlg_fin, self.dlg_fin.mincut, mincut)
+        work_order = qt_tools.getWidgetText(self.dlg_mincut, self.dlg_mincut.work_order)
         if str(work_order) != 'null':
-            utils_giswater.setWidgetText(self.dlg_fin, self.dlg_fin.work_order, work_order)
+            qt_tools.setWidgetText(self.dlg_fin, self.dlg_fin.work_order, work_order)
 
         # Manage address
-        municipality_current = utils_giswater.get_item_data(self.dlg_mincut, self.dlg_mincut.address_add_muni, 1)
-        utils_giswater.set_combo_itemData(self.dlg_fin.address_add_muni, municipality_current, 1)
-        address_street_current = utils_giswater.getWidgetText(
-            self.dlg_mincut, self.dlg_mincut.address_add_street, False, False)
-        utils_giswater.setWidgetText(self.dlg_fin, self.dlg_fin.address_add_street, address_street_current)
-        address_number_current = utils_giswater.getWidgetText(
-            self.dlg_mincut, self.dlg_mincut.address_add_postnumber, False, False)
-        utils_giswater.setWidgetText(self.dlg_fin, self.dlg_fin.address_add_postnumber, address_number_current)
+        municipality_current = qt_tools.get_item_data(self.dlg_mincut, self.dlg_mincut.address_add_muni, 1)
+        qt_tools.set_combo_itemData(self.dlg_fin.address_add_muni, municipality_current, 1)
+        address_street_current = qt_tools.getWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_street, False, False)
+        qt_tools.setWidgetText(self.dlg_fin, self.dlg_fin.address_add_street, address_street_current)
+        address_number_current = qt_tools.getWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_postnumber, False, False)
+        qt_tools.setWidgetText(self.dlg_fin, self.dlg_fin.address_add_postnumber, address_number_current)
 
         # Fill ComboBox exec_user
         sql = ("SELECT name "
                "FROM cat_users "
                "ORDER BY name")
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_fin, "exec_user", rows, False)
-        assigned_to = utils_giswater.get_item_data(self.dlg_mincut, self.dlg_mincut.assigned_to, 1)
-        utils_giswater.setWidgetText(self.dlg_fin, "exec_user", str(assigned_to))
+        qt_tools.fillComboBox(self.dlg_fin, "exec_user", rows, False)
+        assigned_to = qt_tools.get_item_data(self.dlg_mincut, self.dlg_mincut.assigned_to, 1)
+        qt_tools.setWidgetText(self.dlg_fin, "exec_user", str(assigned_to))
 
         date_start = self.dlg_mincut.cbx_date_start.date()
         time_start = self.dlg_mincut.cbx_hours_start.time()
@@ -465,7 +464,7 @@ class MincutParent(ParentAction):
         self.dlg_fin.cbx_hours_end_fin.setTime(time_end)
 
         # Set state to 'Finished'
-        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, str(self.states[2]))
+        qt_tools.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, str(self.states[2]))
         self.current_state = 2
 
         # Enable/Disable widget depending state
@@ -501,20 +500,19 @@ class MincutParent(ParentAction):
         mincut_result_state = self.current_state
 
         # Manage 'address'
-        address_exploitation_id = utils_giswater.get_item_data(self.dlg_mincut, self.dlg_mincut.address_add_muni)
-        address_street = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_street, False, False)
-        address_number = utils_giswater.getWidgetText(
-            self.dlg_mincut, self.dlg_mincut.address_add_postnumber, False, False)
+        address_exploitation_id = qt_tools.get_item_data(self.dlg_mincut, self.dlg_mincut.address_add_muni)
+        address_street = qt_tools.getWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_street, False, False)
+        address_number = qt_tools.getWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_postnumber, False, False)
 
-        mincut_result_type = utils_giswater.get_item_data(self.dlg_mincut, self.dlg_mincut.type, 0)
-        anl_cause = utils_giswater.get_item_data(self.dlg_mincut, self.dlg_mincut.cause, 0)
+        mincut_result_type = qt_tools.get_item_data(self.dlg_mincut, self.dlg_mincut.type, 0)
+        anl_cause = qt_tools.get_item_data(self.dlg_mincut, self.dlg_mincut.cause, 0)
         work_order = self.dlg_mincut.work_order.text()
 
-        anl_descript = utils_giswater.getWidgetText(self.dlg_mincut, "pred_description", return_string_null=False)
+        anl_descript = qt_tools.getWidgetText(self.dlg_mincut, "pred_description", return_string_null=False)
         exec_from_plot = str(self.dlg_mincut.distance.text())
         exec_depth = str(self.dlg_mincut.depth.text())
-        exec_descript = utils_giswater.getWidgetText(self.dlg_mincut, "real_description", return_string_null=False)
-        exec_user = utils_giswater.getWidgetText(self.dlg_mincut, "exec_user", return_string_null=False)
+        exec_descript = qt_tools.getWidgetText(self.dlg_mincut, "real_description", return_string_null=False)
+        exec_user = qt_tools.getWidgetText(self.dlg_mincut, "exec_user", return_string_null=False)
 
         # Get prediction date - start
         date_start_predict = self.dlg_mincut.cbx_date_start_predict.date()
@@ -542,9 +540,9 @@ class MincutParent(ParentAction):
         received_time = self.dlg_mincut.cbx_recieved_time.time()
         received_date = received_day.toString('yyyy-MM-dd') + " " + received_time.toString('HH:mm:ss')
 
-        assigned_to = utils_giswater.get_item_data(self.dlg_mincut, self.dlg_mincut.assigned_to, 0)
+        assigned_to = qt_tools.get_item_data(self.dlg_mincut, self.dlg_mincut.assigned_to, 0)
         cur_user = self.controller.get_project_user()
-        appropiate_status = utils_giswater.isChecked(self.dlg_mincut, "appropiate")
+        appropiate_status = qt_tools.isChecked(self.dlg_mincut, "appropiate")
 
         check_data = [str(mincut_result_state), str(anl_cause), str(received_date),
                       str(forecast_start_predict), str(forecast_end_predict)]
@@ -745,15 +743,15 @@ class MincutParent(ParentAction):
         self.dlg_mincut.cbx_hours_start.setTime(exec_start_time)
         self.dlg_mincut.cbx_date_end.setDate(exec_end_day)
         self.dlg_mincut.cbx_hours_end.setTime(exec_end_time)
-        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.work_order, str(self.dlg_fin.work_order.text()))
+        qt_tools.setWidgetText(self.dlg_mincut, self.dlg_mincut.work_order, str(self.dlg_fin.work_order.text()))
         municipality = self.dlg_fin.address_add_muni.currentText()
-        utils_giswater.set_combo_itemData(self.dlg_mincut.address_add_muni, municipality, 1)
-        street = utils_giswater.getWidgetText(self.dlg_fin, self.dlg_fin.address_add_street)
-        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_street, street)
-        number = utils_giswater.getWidgetText(self.dlg_fin, self.dlg_fin.address_add_postnumber)
-        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_postnumber, number)
-        exec_user = utils_giswater.getWidgetText(self.dlg_fin, self.dlg_fin.exec_user)
-        utils_giswater.set_combo_itemData(self.dlg_mincut.assigned_to, exec_user, 1)
+        qt_tools.set_combo_itemData(self.dlg_mincut.address_add_muni, municipality, 1)
+        street = qt_tools.getWidgetText(self.dlg_fin, self.dlg_fin.address_add_street)
+        qt_tools.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_street, street)
+        number = qt_tools.getWidgetText(self.dlg_fin, self.dlg_fin.address_add_postnumber)
+        qt_tools.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_postnumber, number)
+        exec_user = qt_tools.getWidgetText(self.dlg_fin, self.dlg_fin.exec_user)
+        qt_tools.set_combo_itemData(self.dlg_mincut.assigned_to, exec_user, 1)
 
         self.dlg_fin.close()
 
@@ -761,7 +759,7 @@ class MincutParent(ParentAction):
     def real_end_cancel(self):
 
         # Return to state 'In Progress'
-        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, str(self.states[1]))
+        qt_tools.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, str(self.states[1]))
         self.enable_widgets('1')
 
         self.dlg_fin.close()
@@ -1008,7 +1006,7 @@ class MincutParent(ParentAction):
         """
 
         # Check if user entered hydrometer_id
-        hydrometer_cc = utils_giswater.getWidgetText(self.dlg_hydro, self.dlg_hydro.hydrometer_cc)
+        hydrometer_cc = qt_tools.getWidgetText(self.dlg_hydro, self.dlg_hydro.hydrometer_cc)
         if hydrometer_cc == "null":
             message = "You need to enter hydrometer_id"
             self.controller.show_info_box(message)
@@ -1073,7 +1071,7 @@ class MincutParent(ParentAction):
         """ Select features of 'connec' of selected mincut """
 
         # Set 'expr_filter' of connecs related with current mincut
-        result_mincut_id = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
+        result_mincut_id = qt_tools.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
         sql = (f"SELECT connec_id FROM om_mincut_connec"
                f" WHERE result_id = {result_mincut_id}")
         rows = self.controller.get_rows(sql)
@@ -1104,7 +1102,7 @@ class MincutParent(ParentAction):
         self.connec_list = []
 
         # Set 'expr_filter' of connecs related with current mincut
-        result_mincut_id = utils_giswater.getWidgetText(self.dlg_hydro, self.result_mincut_id)
+        result_mincut_id = qt_tools.getWidgetText(self.dlg_hydro, self.result_mincut_id)
         sql = (f"SELECT DISTINCT(connec_id) FROM rtc_hydrometer_x_connec AS rtc"
                f" INNER JOIN om_mincut_hydrometer AS anl"
                f" ON anl.hydrometer_id = rtc.hydrometer_id"
@@ -1126,7 +1124,7 @@ class MincutParent(ParentAction):
             self.select_features_group_layers(expr)
 
         # Get list of 'hydrometer_id' belonging to current result_mincut
-        result_mincut_id = utils_giswater.getWidgetText(self.dlg_hydro, self.result_mincut_id)
+        result_mincut_id = qt_tools.getWidgetText(self.dlg_hydro, self.result_mincut_id)
         sql = (f"SELECT hydrometer_id FROM om_mincut_hydrometer"
                f" WHERE result_id = {result_mincut_id}")
         rows = self.controller.get_rows(sql)
@@ -1157,7 +1155,7 @@ class MincutParent(ParentAction):
         self.disconnect_signal_selection_changed()
 
         # Get 'connec_id' from selected 'customer_code'
-        customer_code = utils_giswater.getWidgetText(self.dlg_connec, self.dlg_connec.connec_id)
+        customer_code = qt_tools.getWidgetText(self.dlg_connec, self.dlg_connec.connec_id)
         if customer_code == 'null':
             message = "You need to enter a customer code"
             self.controller.show_info_box(message)
@@ -1401,7 +1399,7 @@ class MincutParent(ParentAction):
             Insert into table 'om_mincut_connec' values of current mincut
         """
 
-        result_mincut_id = utils_giswater.getWidgetText(dlg, self.dlg_mincut.result_mincut_id)
+        result_mincut_id = qt_tools.getWidgetText(dlg, self.dlg_mincut.result_mincut_id)
         if result_mincut_id == 'null':
             return
 
@@ -1432,7 +1430,7 @@ class MincutParent(ParentAction):
             Insert into table 'om_mincut_hydrometer' values of current mincut
         """
 
-        result_mincut_id = utils_giswater.getWidgetText(dlg, self.dlg_mincut.result_mincut_id)
+        result_mincut_id = qt_tools.getWidgetText(dlg, self.dlg_mincut.result_mincut_id)
         if result_mincut_id == 'null':
             return
 
@@ -1579,7 +1577,7 @@ class MincutParent(ParentAction):
         self.task1.setProgress(0)
 
         srid = self.controller.plugin_settings_value('srid')
-        real_mincut_id = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
+        real_mincut_id = qt_tools.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
         if self.is_new:
             self.set_id_val()
             self.is_new = False
@@ -1595,7 +1593,7 @@ class MincutParent(ParentAction):
             else:
                 real_mincut_id = new_mincut_id[0]
 
-        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id, real_mincut_id)
+        qt_tools.setWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id, real_mincut_id)
         self.task1.setProgress(25)
         # Execute gw_fct_mincut ('feature_id', 'feature_type', 'result_id')
         # feature_id: id of snapped arc/node
@@ -1758,18 +1756,18 @@ class MincutParent(ParentAction):
 
     def custom_mincut_execute(self, elem_id):
         """ Custom mincut. Execute function 'gw_fct_mincut_valve_unaccess' """
-
-        # Change cursor to 'WaitCursor'
-        self.set_cursor_wait()
-
-        cur_user = self.controller.get_project_user()
-        result_mincut_id = utils_giswater.getWidgetText(self.dlg_mincut, "result_mincut_id")
+        
+        # Change cursor to 'WaitCursor'     
+        self.set_cursor_wait()                
+        
+        cur_user = self.controller.get_project_user()               
+        result_mincut_id = qt_tools.getWidgetText(self.dlg_mincut, "result_mincut_id")
         if result_mincut_id != 'null':
             extras = f'"valveUnaccess":{{"status":"true", "nodeId":{elem_id}}}, '
             extras += f'"mincutId":"{result_mincut_id}"'
             body = self.create_body(extras=extras)
             result = self.controller.get_json('gw_fct_setmincut', body, log_sql=True)
- 
+
         # Refresh map canvas
         self.refresh_map_canvas(True)
 
@@ -1819,25 +1817,25 @@ class MincutParent(ParentAction):
         if row['mincut_state'] in self.states:
             mincut_state_name = self.states[row['mincut_state']]
 
-        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.work_order, row['work_order'])
-        utils_giswater.set_combo_itemData(self.dlg_mincut.type, row['mincut_type'], 0)
-        utils_giswater.set_combo_itemData(self.dlg_mincut.cause, row['anl_cause'], 0)
-        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, mincut_state_name)
-        utils_giswater.setWidgetText(self.dlg_mincut, "output_details", row['output'])
+        qt_tools.setWidgetText(self.dlg_mincut, self.dlg_mincut.work_order, row['work_order'])
+        qt_tools.set_combo_itemData(self.dlg_mincut.type, row['mincut_type'], 0)
+        qt_tools.set_combo_itemData(self.dlg_mincut.cause, row['anl_cause'], 0)
+        qt_tools.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, mincut_state_name)
+        qt_tools.setWidgetText(self.dlg_mincut, "output_details", row['output'])
 
         # Manage location
-        utils_giswater.set_combo_itemData(self.dlg_mincut.address_add_muni, str(row['muni_id']), 0)
-        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_street, str(row['streetaxis_id']))
-        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_postnumber, str(row['postnumber']))
+        qt_tools.set_combo_itemData(self.dlg_mincut.address_add_muni, str(row['muni_id']), 0)
+        qt_tools.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_street, str(row['streetaxis_id']))
+        qt_tools.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_postnumber, str(row['postnumber']))
 
         # Manage dates
         self.open_mincut_manage_dates(row)
 
-        utils_giswater.setWidgetText(self.dlg_mincut, "pred_description", row['anl_descript'])
-        utils_giswater.setWidgetText(self.dlg_mincut, "real_description", row['exec_descript'])
-        utils_giswater.setWidgetText(self.dlg_mincut, "distance", row['exec_from_plot'])
-        utils_giswater.setWidgetText(self.dlg_mincut, "depth", row['exec_depth'])
-        utils_giswater.setWidgetText(self.dlg_mincut, "assigned_to", row['assigned_to_name'])
+        qt_tools.setWidgetText(self.dlg_mincut, "pred_description", row['anl_descript'])
+        qt_tools.setWidgetText(self.dlg_mincut, "real_description", row['exec_descript'])
+        qt_tools.setWidgetText(self.dlg_mincut, "distance", row['exec_from_plot'])
+        qt_tools.setWidgetText(self.dlg_mincut, "depth", row['exec_depth'])
+        qt_tools.setWidgetText(self.dlg_mincut, "assigned_to", row['assigned_to_name'])
 
         # Update table 'selector_mincut_result'
         self.update_result_selector(result_mincut_id)
@@ -1853,8 +1851,8 @@ class MincutParent(ParentAction):
         self.set_visible_mincut_layers(True)
 
         expr_filter = f"result_id={result_mincut_id}"
-        utils_giswater.set_qtv_config(self.dlg_mincut.tbl_hydro)
-        self.fill_table(self.dlg_mincut.tbl_hydro, 'v_om_mincut_hydrometer', expr_filter=expr_filter)
+        qt_tools.set_qtv_config(self.dlg_mincut.tbl_hydro)
+        self.fill_table(self.dlg_mincut.tbl_hydro, 'v_om_mincut_hydrometer',  expr_filter=expr_filter)
 
         # Depend of mincut_state and mincut_clase desable/enable widgets
         # Current_state == '0': Planified
@@ -2007,8 +2005,8 @@ class MincutParent(ParentAction):
                 date = date.replace('/', '-')
             qt_date = QDate.fromString(date, 'yyyy-MM-dd')
             qt_time = QTime.fromString(time, 'h:mm:ss')
-            utils_giswater.setCalendarDate(self.dlg_mincut, widget_date, qt_date)
-            utils_giswater.setTimeEdit(self.dlg_mincut, widget_time, qt_time)
+            qt_tools.setCalendarDate(self.dlg_mincut, widget_date, qt_date)
+            qt_tools.setTimeEdit(self.dlg_mincut, widget_time, qt_time)
 
 
     def mincut_composer(self):

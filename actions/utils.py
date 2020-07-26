@@ -13,7 +13,7 @@ import os
 from encodings.aliases import aliases
 from functools import partial
 
-from .. import utils_giswater
+from lib import qt_tools
 from .api_config import ApiConfig
 from .api_manage_composer import ApiManageComposer
 from .check_project_result import CheckProjectResult
@@ -58,7 +58,7 @@ class Utils(ParentAction):
                              'alias, config_csv.descript, functionname, readheader, orderby', 'config_csv', roles)
 
         self.dlg_csv.lbl_info.setWordWrap(True)
-        utils_giswater.setWidgetText(self.dlg_csv, self.dlg_csv.cmb_unicode_list, 'utf8')
+        qt_tools.setWidgetText(self.dlg_csv, self.dlg_csv.cmb_unicode_list, 'utf8')
         self.dlg_csv.rb_comma.setChecked(False)
         self.dlg_csv.rb_semicolon.setChecked(True)
 
@@ -75,7 +75,7 @@ class Utils(ParentAction):
         self.get_function_name()
         self.load_settings_values()
 
-        if str(utils_giswater.getWidgetText(self.dlg_csv, self.dlg_csv.txt_file_csv)) != 'null':
+        if str(qt_tools.getWidgetText(self.dlg_csv, self.dlg_csv.txt_file_csv)) != 'null':
             self.preview_csv(self.dlg_csv)
         self.dlg_csv.progressBar.setVisible(False)
 
@@ -85,7 +85,7 @@ class Utils(ParentAction):
 
     def get_function_name(self):
 
-        self.func_name = utils_giswater.get_item_data(self.dlg_csv, self.dlg_csv.cmb_import_type, 3)
+        self.func_name = qt_tools.get_item_data(self.dlg_csv, self.dlg_csv.cmb_import_type, 3)
         self.controller.log_info(str(self.func_name))
 
 
@@ -99,27 +99,27 @@ class Utils(ParentAction):
             sorted_list = sorted(unicode_list, key=str.lower)
 
         if sorted_list:
-            utils_giswater.set_autocompleter(combo, sorted_list)
+            qt_tools.set_autocompleter(combo, sorted_list)
 
 
     def update_info(self, dialog):
         """ Update the tag according to item selected from cmb_import_type """
 
-        dialog.lbl_info.setText(utils_giswater.get_item_data(self.dlg_csv, self.dlg_csv.cmb_import_type, 2))
+        dialog.lbl_info.setText(qt_tools.get_item_data(self.dlg_csv, self.dlg_csv.cmb_import_type, 2))
 
 
     def load_settings_values(self):
         """ Load QGIS settings related with csv options """
 
         cur_user = self.controller.get_current_user()
-        utils_giswater.setWidgetText(self.dlg_csv, self.dlg_csv.txt_file_csv,
-            self.controller.plugin_settings_value('Csv2Pg_txt_file_csv_' + cur_user))
+        qt_tools.setWidgetText(self.dlg_csv, self.dlg_csv.txt_file_csv,
+                               self.controller.plugin_settings_value('Csv2Pg_txt_file_csv_' + cur_user))
 
         unicode = self.controller.plugin_settings_value('Csv2Pg_cmb_unicode_list_' + cur_user)
         if not unicode:
             unicode = 'latin1'
-        utils_giswater.setWidgetText(self.dlg_csv, self.dlg_csv.cmb_unicode_list, unicode)
 
+        qt_tools.setWidgetText(self.dlg_csv, self.dlg_csv.cmb_unicode_list, unicode)
         if str(self.controller.plugin_settings_value('Csv2Pg_rb_comma_' + cur_user)).upper() == 'TRUE':
             self.dlg_csv.rb_comma.setChecked(True)
         else:
@@ -131,9 +131,9 @@ class Utils(ParentAction):
 
         cur_user = self.controller.get_current_user()
         self.controller.plugin_settings_set_value("Csv2Pg_txt_file_csv_" + cur_user,
-            utils_giswater.getWidgetText(self.dlg_csv, 'txt_file_csv'))
+                                                  qt_tools.getWidgetText(self.dlg_csv, 'txt_file_csv'))
         self.controller.plugin_settings_set_value("Csv2Pg_cmb_unicode_list_" + cur_user,
-            utils_giswater.getWidgetText(self.dlg_csv, 'cmb_unicode_list'))
+                                                  qt_tools.getWidgetText(self.dlg_csv, 'cmb_unicode_list'))
         self.controller.plugin_settings_set_value("Csv2Pg_rb_comma_" + cur_user,
             bool(self.dlg_csv.rb_comma.isChecked()))
         self.controller.plugin_settings_set_value("Csv2Pg_rb_semicolon_" + cur_user,
@@ -153,7 +153,7 @@ class Utils(ParentAction):
     def get_path(self, dialog):
         """ Take the file path if exist. AND if not exit ask it """
 
-        path = utils_giswater.getWidgetText(dialog, dialog.txt_file_csv)
+        path = qt_tools.getWidgetText(dialog, dialog.txt_file_csv)
         if path is None or path == 'null' or not os.path.exists(path):
             message = "Please choose a valid path"
             self.controller.show_message(message, message_level=0)
@@ -185,7 +185,7 @@ class Utils(ParentAction):
 
         delimiter = self.get_delimiter(dialog)
         model = QStandardItemModel()
-        _unicode = utils_giswater.getWidgetText(dialog, dialog.cmb_unicode_list)
+        _unicode = qt_tools.getWidgetText(dialog, dialog.cmb_unicode_list)
         dialog.tbl_csv.setModel(model)
         dialog.tbl_csv.horizontalHeader().setStretchLastSection(True)
 
@@ -219,12 +219,12 @@ class Utils(ParentAction):
         if not self.validate_params(dialog):
             return
 
-        fid_aux = utils_giswater.get_item_data(dialog, dialog.cmb_import_type, 0)
+        fid_aux = qt_tools.get_item_data(dialog, dialog.cmb_import_type, 0)
         self.delete_table_csv(temp_tablename, fid_aux)
-        path = utils_giswater.getWidgetText(dialog, dialog.txt_file_csv)
-        label_aux = utils_giswater.getWidgetText(dialog, dialog.txt_import, return_string_null=False)
+        path = qt_tools.getWidgetText(dialog, dialog.txt_file_csv)
+        label_aux = qt_tools.getWidgetText(dialog, dialog.txt_import, return_string_null=False)
         delimiter = self.get_delimiter(dialog)
-        _unicode = utils_giswater.getWidgetText(dialog, dialog.cmb_unicode_list)
+        _unicode = qt_tools.getWidgetText(dialog, dialog.cmb_unicode_list)
 
         try:
             with open(path, 'r', encoding=_unicode) as csvfile:
@@ -266,8 +266,8 @@ class Utils(ParentAction):
         dialog.progressBar.setMaximum(row_count)  # -20 for see 100% complete progress
         csvfile.seek(0)  # Position the cursor at position 0 of the file
         reader = csv.reader(csvfile, delimiter=delimiter)
-        fid_aux = utils_giswater.get_item_data(dialog, dialog.cmb_import_type, 0)
-        readheader = utils_giswater.get_item_data(dialog, dialog.cmb_import_type, 4)
+        fid_aux = qt_tools.get_item_data(dialog, dialog.cmb_import_type, 0)
+        readheader = qt_tools.get_item_data(dialog, dialog.cmb_import_type, 4)
         for row in reader:
             if readheader is False:
                 readheader = True
@@ -326,14 +326,14 @@ class Utils(ParentAction):
             return
 
 
-        utils_giswater.set_item_data(combo, rows, 1, True, True, 1)
+        qt_tools.set_item_data(combo, rows, 1, True, True, 1)
         self.update_info(self.dlg_csv)
 
 
     def select_file_csv(self):
         """ Select CSV file """
 
-        file_csv = utils_giswater.getWidgetText(self.dlg_csv, 'txt_file_csv')
+        file_csv = qt_tools.getWidgetText(self.dlg_csv, 'txt_file_csv')
         # Set default value if necessary
         if file_csv is None or file_csv == '':
             file_csv = self.plugin_dir
@@ -344,7 +344,7 @@ class Utils(ParentAction):
         os.chdir(folder_path)
         message = self.controller.tr("Select CSV file")
         file_csv, filter_ = QFileDialog.getOpenFileName(None, message, "", '*.csv')
-        utils_giswater.setWidgetText(self.dlg_csv, self.dlg_csv.txt_file_csv, file_csv)
+        qt_tools.setWidgetText(self.dlg_csv, self.dlg_csv.txt_file_csv, file_csv)
 
         self.save_settings_values()
         self.preview_csv(self.dlg_csv)

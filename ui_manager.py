@@ -17,7 +17,7 @@ class GwDockWidget(QDockWidget):
 
     dlg_closed = QtCore.pyqtSignal()
     
-    def __init__(self, subtag=None, position=None):
+    def __init__(self, subtag=None):
         super().__init__()
         self.setupUi(self)
         self.subtag = subtag
@@ -43,9 +43,13 @@ class GwDialog(QDialog):
         if event.type() == QtCore.QEvent.EnterWhatsThisMode and self.isActiveWindow():
             QWhatsThis.leaveWhatsThisMode()
             parser = configparser.ConfigParser()
-            path = os.path.dirname(__file__) + '/config/ui_config.config'
+            path = os.path.dirname(__file__) + os.sep + 'config' + os.sep + 'init2.config'
+            if not os.path.exists(path):
+                print(f"File not found: {path}")
+                webbrowser.open_new_tab('https://giswater.org/giswater-manual')
+                return True
+
             parser.read(path)
-            
             if self.subtag is not None:
                 tag = f'{self.objectName()}_{self.subtag}'
             else:
@@ -53,11 +57,12 @@ class GwDialog(QDialog):
 
             try:
                 web_tag = parser.get('web_tag', tag)
-                webbrowser.open_new_tab('https://giswater.org/giswater-manual/#' + web_tag)
+                webbrowser.open_new_tab(f'https://giswater.org/giswater-manual/#{web_tag}')
             except Exception as e:
                 webbrowser.open_new_tab('https://giswater.org/giswater-manual')
-            
-            return True
+            finally:
+                return True
+
         return False
 
 
@@ -83,20 +88,22 @@ class GwMainWindow(QMainWindow):
         if event.type() == QtCore.QEvent.EnterWhatsThisMode and self.isActiveWindow():
             QWhatsThis.leaveWhatsThisMode()
             parser = configparser.ConfigParser()
-            path = os.path.dirname(__file__) + '/config/ui_config.config'
+            path = os.path.dirname(__file__) + os.sep + 'config' + os.sep + 'init2.config'
+            if not os.path.exists(path):
+                print(f"File not found: {path}")
+                webbrowser.open_new_tab('https://giswater.org/giswater-manual')
+                return True
+
             parser.read(path)
-        
             if self.subtag is not None:
                 tag = f'{self.objectName()}_{self.subtag}'
             else:
                 tag = str(self.objectName())
-                
             try:
                 web_tag = parser.get('web_tag', tag)
-                webbrowser.open_new_tab('https://giswater.org/giswater-manual/#' + web_tag)
+                webbrowser.open_new_tab(f'https://giswater.org/giswater-manual/#{web_tag}')
             except Exception as e:
                 webbrowser.open_new_tab('https://giswater.org/giswater-manual')
-
             return True
         return False
 

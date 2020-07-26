@@ -12,7 +12,7 @@ import operator
 from functools import partial
 from collections import OrderedDict
 
-from .. import utils_giswater
+from lib import qt_tools
 from .api_parent import ApiParent
 from ..ui_manager import InfoCatalogUi
 
@@ -34,7 +34,7 @@ class ApiCatalog(ApiParent):
 
         # Manage if geom_type is gully and set grate
         if geom_type == 'gully':
-            geom_type == 'grate'
+            geom_type = 'grate'
 
         form_name = 'upsert_catalog_' + geom_type + ''
         form = f'"formName":"{form_name}", "tabName":"data", "editable":"TRUE"'
@@ -103,9 +103,9 @@ class ApiCatalog(ApiParent):
 
     def get_api_catalog(self, matcat_id, pnom, dnom, id, feature_type, geom_type):
 
-        matcat_id_value = utils_giswater.get_item_data(self.dlg_catalog, matcat_id)
-        pn_value = utils_giswater.get_item_data(self.dlg_catalog, pnom)
-        dn_value = utils_giswater.get_item_data(self.dlg_catalog, dnom)
+        matcat_id_value = qt_tools.get_item_data(self.dlg_catalog, matcat_id)
+        pn_value = qt_tools.get_item_data(self.dlg_catalog, pnom)
+        dn_value = qt_tools.get_item_data(self.dlg_catalog, dnom)
 
         form_name = 'upsert_catalog_' + geom_type + ''
         form = f'"formName":"{form_name}", "tabName":"data", "editable":"TRUE"'
@@ -132,7 +132,7 @@ class ApiCatalog(ApiParent):
 
     def populate_pn_dn(self, matcat_id, pnom, dnom, feature_type, geom_type):
 
-        matcat_id_value = utils_giswater.get_item_data(self.dlg_catalog, matcat_id)
+        matcat_id_value = qt_tools.get_item_data(self.dlg_catalog, matcat_id)
 
         form_name = f'upsert_catalog_' + geom_type + ''
         form = f'"formName":"{form_name}", "tabName":"data", "editable":"TRUE"'
@@ -167,7 +167,7 @@ class ApiCatalog(ApiParent):
     def fill_child(self, widget, geom_type):
 
         combo_parent = widget.objectName()
-        combo_id = utils_giswater.get_item_data(self.dlg_catalog, widget)
+        combo_id = qt_tools.get_item_data(self.dlg_catalog, widget)
         # TODO cambiar por gw_fct_getchilds
         sql = f"SELECT gw_fct_getcombochilds('catalog' ,'' ,'' ,'{combo_parent}', '{combo_id}','{geom_type}')"
         row = self.controller.get_row(sql, log_sql=True)
@@ -185,9 +185,9 @@ class ApiCatalog(ApiParent):
         widget_id = self.dlg_catalog.findChild(QComboBox, 'id')
 
         # Get values from combo parents
-        metcat_value = utils_giswater.getWidgetText(self.dlg_catalog, widget_metcat_id)
-        pn_value = utils_giswater.getWidgetText(self.dlg_catalog, widget_pn)
-        dn_value = utils_giswater.getWidgetText(self.dlg_catalog, widget_dn)
+        metcat_value = qt_tools.getWidgetText(self.dlg_catalog, widget_metcat_id)
+        pn_value = qt_tools.getWidgetText(self.dlg_catalog, widget_pn)
+        dn_value = qt_tools.getWidgetText(self.dlg_catalog, widget_dn)
 
         exists = self.controller.check_function('gw_api_get_catalog_id')
         if exists:
@@ -220,7 +220,7 @@ class ApiCatalog(ApiParent):
         widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         self.populate_combo(widget, field)
         if 'selectedId' in field:
-            utils_giswater.set_combo_itemData(widget, field['selectedId'], 0)
+            qt_tools.set_combo_itemData(widget, field['selectedId'], 0)
 
         return widget
 
@@ -248,7 +248,7 @@ class ApiCatalog(ApiParent):
     def fill_geomcat_id(self, previous_dialog, widget_name):
 
         widget_id = self.dlg_catalog.findChild(QComboBox, 'id')
-        catalog_id = utils_giswater.getWidgetText(self.dlg_catalog, widget_id)
+        catalog_id = qt_tools.getWidgetText(self.dlg_catalog, widget_id)
 
         widget = previous_dialog.findChild(QWidget, widget_name)
 
@@ -256,7 +256,7 @@ class ApiCatalog(ApiParent):
             widget.setText(catalog_id)
             widget.setFocus()
         elif type(widget) is QComboBox:
-            utils_giswater.setWidgetText(previous_dialog, widget, catalog_id)
+            qt_tools.setWidgetText(previous_dialog, widget, catalog_id)
             widget.setFocus()
         else:
             message = "Widget not found"
