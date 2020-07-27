@@ -260,7 +260,7 @@ BEGIN
 					END IF;
 
 					-- geting current user if exists
-					IF (aux_json->>'column_id')='user_id' AND v_team is NULL THEN
+					IF (aux_json->>'columnname')='user_id' AND v_team is NULL THEN
 						v_current_user = aux_json->>'selectedId';
 						
 						IF v_current_user IS NOT NULL THEN
