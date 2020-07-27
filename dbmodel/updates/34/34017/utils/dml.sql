@@ -236,3 +236,10 @@ UPDATE config_form_tabs SET orderby = 7 WHERE formname ='v_edit_connec' AND tabn
 UPDATE config_form_tabs SET orderby = 8 WHERE formname ='v_edit_connec' AND tabname='tab_epa';
 
 UPDATE sys_table SET sys_role = 'role_master' WHERE id  ='v_ui_plan_psector';
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role)
+VALUES (2986, 'gw_fct_anl_slope_consistency', 'ud', 'function', 'json', 'json', 'Identifies arcs that have a drawing direction opposite to the water flow. Calculation based on sys_elev values of arc',
+'role_edit') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (250, 'Slope consistency', 'ud') ON CONFLICT (fid) DO NOTHING;

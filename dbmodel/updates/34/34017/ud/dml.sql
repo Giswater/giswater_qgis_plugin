@@ -8776,3 +8776,7 @@ UPDATE config_form_tabs SET orderby = 2 WHERE formname ='v_edit_gully' AND tabna
 UPDATE config_form_tabs SET orderby = 3 WHERE formname ='v_edit_gully' AND tabname='tab_om';
 UPDATE config_form_tabs SET orderby = 4 WHERE formname ='v_edit_gully' AND tabname='tab_visit';
 UPDATE config_form_tabs SET orderby = 5 WHERE formname ='v_edit_gully' AND tabname='tab_documents';
+
+
+INSERT INTO config_toolbox(id, alias, isparametric, functionparams,  active)
+VALUES (2986, 'Slope consistency', true, '{"featureType":["arc"]}', true) ON CONFLICT (id) DO NOTHING;
