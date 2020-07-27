@@ -177,3 +177,61 @@ inputparams = '[{"widgetname":"insertIntoNode", "label":"Direct insert into node
 "dvQueryText":"select expl_id as id, name as idval from exploitation where active is not false order by name", "selectedId":"1"},{"widgetname":"stateType", "label":"State:", "widgettype":"combo","datatype":"integer","layoutname":"grl_option_parameters","layoutorder":4, "dvQueryText":"select value_state_type.id as id, concat(''state: '',value_state.name,'' state type: '', value_state_type.name) as idval from value_state_type join value_state on value_state.id = state where value_state_type.id is not null order by state, id", "selectedId":"2","isparent":"true"},{"widgetname":"workcatId", "label":"Workcat:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":5, "dvQueryText":"select id as id, id as idval from cat_work where id is not null order by id", "selectedId":"1"},{"widgetname":"builtdate", "label":"Builtdate:", "widgettype":"datetime","datatype":"date","layoutname":"grl_option_parameters","layoutorder":6, "value":null },{"widgetname":"nodeType", "label":"Node type:", "widgettype":"combo","datatype":"integer","layoutname":"grl_option_parameters","layoutorder":7, "dvQueryText":"select distinct id as id, id as idval from cat_feature_node where id is not null order by id", "selectedId":"1"},
 {"widgetname":"nodeCat", "label":"Node catalog:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":8, "dvQueryText":"select distinct id as id, id as idval from cat_node where id is not null order by id", "selectedId":"1"}]'
 WHERE id = 2118;
+
+
+--2020/07/27
+UPDATE config_form_tabs SET orderby = 1 WHERE formname = 'selector_basic' AND tabname = 'tab_exploitation';
+UPDATE config_form_tabs SET orderby = 2 WHERE formname = 'selector_basic' AND tabname = 'tab_network_state';
+UPDATE config_form_tabs SET orderby = 3 WHERE formname = 'selector_basic' AND tabname = 'tab_hydro_state';
+UPDATE config_form_tabs SET orderby = 4 WHERE formname = 'selector_basic' AND tabname = 'tab_psector';
+UPDATE config_form_tabs SET orderby = 5 WHERE formname = 'selector_basic' AND tabname = 'tab_sector';
+
+UPDATE config_form_tabs SET orderby = 1 WHERE formname='search' AND tabname='tab_network';
+UPDATE config_form_tabs SET orderby = 2 WHERE formname='search' AND tabname='tab_add_network';
+UPDATE config_form_tabs SET orderby = 3 WHERE formname='search' AND tabname='tab_address';
+UPDATE config_form_tabs SET orderby = 4 WHERE formname='search' AND tabname='tab_hydro';
+UPDATE config_form_tabs SET orderby = 5 WHERE formname='search' AND tabname='tab_workcat';
+UPDATE config_form_tabs SET orderby = 6 WHERE formname='search' AND tabname='tab_psector';
+UPDATE config_form_tabs SET orderby = 7 WHERE formname='search' AND tabname='tab_visit';
+
+UPDATE config_form_tabs SET orderby = 1 WHERE formname='lot' AND tabname='tab_data';
+
+UPDATE config_form_tabs SET orderby = 1 WHERE formname='selector_mincut' AND tabname='tab_mincut';
+
+UPDATE config_form_tabs SET orderby = 1 WHERE formname='config' AND tabname='tab_user';
+UPDATE config_form_tabs SET orderby = 2 WHERE formname='config' AND tabname='tab_admin';
+
+UPDATE config_form_tabs SET orderby = 1 WHERE formname='visit' AND tabname='tab_data';
+UPDATE config_form_tabs SET orderby = 2 WHERE formname='visit' AND tabname='tab_file';
+
+UPDATE config_form_tabs SET orderby = 1 WHERE formname='visit_manager' AND tabname='tab_data';
+UPDATE config_form_tabs SET orderby = 2 WHERE formname='visit_manager' AND tabname='tab_done';
+UPDATE config_form_tabs SET orderby = 3 WHERE formname='visit_manager' AND tabname='tab_lot';
+
+UPDATE config_form_tabs SET orderby = 1 WHERE formname ='v_edit_node' AND tabname='tab_data';
+UPDATE config_form_tabs SET orderby = 2 WHERE formname ='v_edit_node' AND tabname='tab_elements';
+UPDATE config_form_tabs SET orderby = 3 WHERE formname ='v_edit_node' AND (tabname='tab_relations' or tabname='tab_connections');
+UPDATE config_form_tabs SET orderby = 4 WHERE formname ='v_edit_node' AND tabname='tab_om';
+UPDATE config_form_tabs SET orderby = 5 WHERE formname ='v_edit_node' AND tabname='tab_visit';
+UPDATE config_form_tabs SET orderby = 6 WHERE formname ='v_edit_node' AND tabname='tab_documents';
+UPDATE config_form_tabs SET orderby = 7 WHERE formname ='v_edit_node' AND tabname='tab_plan';
+UPDATE config_form_tabs SET orderby = 8 WHERE formname ='v_edit_node' AND tabname='tab_epa';
+
+UPDATE config_form_tabs SET orderby = 1 WHERE formname ='v_edit_arc' AND tabname='tab_data';
+UPDATE config_form_tabs SET orderby = 2 WHERE formname ='v_edit_arc' AND tabname='tab_elements';
+UPDATE config_form_tabs SET orderby = 3 WHERE formname ='v_edit_arc' AND tabname='tab_relations';
+UPDATE config_form_tabs SET orderby = 4 WHERE formname ='v_edit_arc' AND tabname='tab_om';
+UPDATE config_form_tabs SET orderby = 5 WHERE formname ='v_edit_arc' AND tabname='tab_visit';
+UPDATE config_form_tabs SET orderby = 6 WHERE formname ='v_edit_arc' AND tabname='tab_documents';
+UPDATE config_form_tabs SET orderby = 7 WHERE formname ='v_edit_arc' AND tabname='tab_plan';
+UPDATE config_form_tabs SET orderby = 8 WHERE formname ='v_edit_arc' AND tabname='tab_epa';
+
+
+UPDATE config_form_tabs SET orderby = 1 WHERE formname ='v_edit_connec' AND tabname='tab_data';
+UPDATE config_form_tabs SET orderby = 2 WHERE formname ='v_edit_connec' AND tabname='tab_elements';
+UPDATE config_form_tabs SET orderby = 3 WHERE formname ='v_edit_connec' AND tabname='tab_hydrometer';
+UPDATE config_form_tabs SET orderby = 4 WHERE formname ='v_edit_connec' AND tabname='tab_hydrometer_val';
+UPDATE config_form_tabs SET orderby = 5 WHERE formname ='v_edit_connec' AND tabname='tab_om';
+UPDATE config_form_tabs SET orderby = 6 WHERE formname ='v_edit_connec' AND tabname='tab_visit';
+UPDATE config_form_tabs SET orderby = 7 WHERE formname ='v_edit_connec' AND tabname='tab_documents';
+UPDATE config_form_tabs SET orderby = 8 WHERE formname ='v_edit_connec' AND tabname='tab_epa';
