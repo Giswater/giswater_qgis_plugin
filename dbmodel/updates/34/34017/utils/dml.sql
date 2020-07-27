@@ -178,7 +178,6 @@ inputparams = '[{"widgetname":"insertIntoNode", "label":"Direct insert into node
 {"widgetname":"nodeCat", "label":"Node catalog:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":8, "dvQueryText":"select distinct id as id, id as idval from cat_node where id is not null order by id", "selectedId":"1"}]'
 WHERE id = 2118;
 
-
 --2020/07/27
 UPDATE config_form_tabs SET orderby = 1 WHERE formname = 'selector_basic' AND tabname = 'tab_exploitation';
 UPDATE config_form_tabs SET orderby = 2 WHERE formname = 'selector_basic' AND tabname = 'tab_network_state';
@@ -235,3 +234,5 @@ UPDATE config_form_tabs SET orderby = 5 WHERE formname ='v_edit_connec' AND tabn
 UPDATE config_form_tabs SET orderby = 6 WHERE formname ='v_edit_connec' AND tabname='tab_visit';
 UPDATE config_form_tabs SET orderby = 7 WHERE formname ='v_edit_connec' AND tabname='tab_documents';
 UPDATE config_form_tabs SET orderby = 8 WHERE formname ='v_edit_connec' AND tabname='tab_epa';
+
+UPDATE sys_table SET sys_role = 'role_plan' WHERE id  ='v_ui_plan_psector';
