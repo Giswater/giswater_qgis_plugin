@@ -6,8 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2430
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_epa_check_data(text);
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_epa_check_data(json);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa_check_data(character varying);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_check_data(p_data json)
   RETURNS json AS
 $BODY$
