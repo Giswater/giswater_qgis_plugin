@@ -235,4 +235,4 @@ UPDATE config_form_tabs SET orderby = 6 WHERE formname ='v_edit_connec' AND tabn
 UPDATE config_form_tabs SET orderby = 7 WHERE formname ='v_edit_connec' AND tabname='tab_documents';
 UPDATE config_form_tabs SET orderby = 8 WHERE formname ='v_edit_connec' AND tabname='tab_epa';
 
-UPDATE sys_table SET sys_role = 'role_plan' WHERE id  ='v_ui_plan_psector';
+UPDATE sys_table SET sys_role = 'role_master' WHERE id  ='v_ui_plan_psector';
