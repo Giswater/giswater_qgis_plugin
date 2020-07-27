@@ -260,10 +260,17 @@ BEGIN
 					END IF;
 
 					-- geting current user if exists
-					IF (aux_json->>'columnname')='user_id' AND v_team is NULL THEN
+					IF (aux_json->>'column_id')='user_id' AND v_team is NULL THEN
 						v_current_user = aux_json->>'selectedId';
+						
 						IF v_current_user IS NOT NULL THEN
-							EXECUTE 'SELECT team_id FROM om_visit_lot_x_user WHERE user_id = ''' || v_current_user || ''' ORDER BY id DESC LIMIT 1' INTO v_team;
+							EXECUTE 'SELECT team_id FROM om_visit_lot_x_user WHERE user_id = ''' || v_current_user || ''' AND endtime is NULL ORDER BY id DESC LIMIT 1' INTO v_team;
+							IF v_team IS NULL THEN
+								EXECUTE 'SELECT a.team_id FROM ud.om_visit_lot_x_user a JOIN ud.om_user_x_team b USING (user_id) WHERE user_id = ''' || v_current_user || ''' AND a.team_id NOT IN (SELECT team_id FROM ud.om_visit_lot_x_user WHERE endtime is NULL) AND a.team_id = b.team_id ORDER BY a.id DESC LIMIT 1' INTO v_team;
+								IF v_team IS NULL THEN
+									EXECUTE 'SELECT team_id FROM ud.om_user_x_team WHERE user_id = ''' || v_current_user || ''' AND team_id NOT IN (SELECT team_id FROM ud.om_visit_lot_x_user WHERE endtime is NULL) ORDER BY id DESC LIMIT 1' INTO v_team;
+								END IF;
+							END IF;
 						END IF;
 						
 					END IF;
