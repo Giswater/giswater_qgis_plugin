@@ -195,6 +195,9 @@ class UpdateSQL(ApiParent):
         # Set default project type
         qt_tools.setWidgetText(self.dlg_readsql, self.cmb_project_type, 'ws')
 
+        # Update folderSoftware
+        self.change_project_type(self.cmb_project_type)
+
 
     def set_signals(self):
         """ Set signals. Function has to be executed only once (during form initialization) """
