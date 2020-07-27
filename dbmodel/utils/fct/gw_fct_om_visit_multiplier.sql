@@ -51,7 +51,7 @@ BEGIN
 	PERFORM setval('SCHEMA_NAME.om_visit_event_photo_id_seq', (SELECT max(id) FROM om_visit_event_photo) , true);
 	
 	IF v_project_type = 'UD' THEN
-		PERFORM setval('SCHEMA_NAME.om_visit_x_gully_id_seq', (SELECT max(id) FROM om_visit) , true);
+		PERFORM setval('SCHEMA_NAME.om_visit_x_gully_id_seq', (SELECT max(id) FROM om_visit_x_gully) , true);
 	END IF;
 
 	-- get input data
