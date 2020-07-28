@@ -78,8 +78,8 @@ BEGIN
 				a.id,
 				a.source,
 				a.target,
-				(case when (a.id = b.id and a.source::text = b.source::text) then -1 else cost end) as cost, 			-- close especial case of config_mincut_checkvalve only direct sense
-				(case when (a.id = b.id and a.source::text != b.source::text) then -1 else reverse_cost end) as reverse_cost  	-- close especial case of config_mincut_checkvalve only reverse sense
+				(case when (a.id = b.id and a.source::text = b.source::text) then -1 else cost end) as cost, 			-- close especial case of config_checkvalve only direct sense
+				(case when (a.id = b.id and a.source::text != b.source::text) then -1 else reverse_cost end) as reverse_cost  	-- close especial case of config_checkvalve only reverse sense
 				FROM (
 					SELECT v_edit_arc.arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, 
 					(case when a.closed=true then -1 else 1 end) as cost,
@@ -104,7 +104,7 @@ BEGIN
 						ON a.arc_id=v_edit_arc.arc_id
 					WHERE node_1 is not null and node_2 is not null
 					)a	
-				LEFT JOIN (SELECT to_arc::int8 AS id, node_id::int8 AS source FROM config_mincut_checkvalve)b USING (id)'',
+				LEFT JOIN (SELECT to_arc::int8 AS id, node_id::int8 AS source FROM config_checkvalve)b USING (id)'',
 
 				'||rec_valve.node_id||'::int8, '||rec_tank.node_id||'::int8)';
 

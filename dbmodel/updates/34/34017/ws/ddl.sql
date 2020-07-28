@@ -10,3 +10,4 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- parent:
 ALTER TABLE config_mincut_valve RENAME TO config_valve;
+ALTER TABLE config_mincut_checkvalve  RENAME TO config_checkvalve;
