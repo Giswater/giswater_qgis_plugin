@@ -30,7 +30,7 @@
           <string>Visit</string>
          </attribute>
          <layout class="QGridLayout" name="gridLayout">
-          <item row="7" column="0">
+          <item row="9" column="0">
            <widget class="QLabel" name="lbl_descript">
             <property name="font">
              <font>
@@ -60,7 +60,102 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
+          <item row="0" column="3">
+           <widget class="QLineEdit" name="visit_id">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="frame">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="3">
+           <widget class="QComboBox" name="visitcat_id">
+            <property name="editable">
+             <bool>true</bool>
+            </property>
+            <property name="sizeAdjustPolicy">
+             <enum>QComboBox::AdjustToContents</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="11" column="0" colspan="4">
+           <widget class="QPushButton" name="btn_add_geom">
+            <property name="text">
+             <string>Add geom</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>../icons/133.png</normaloff>../icons/133.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="lbl_code">
+            <property name="font">
+             <font>
+              <pointsize>8</pointsize>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Plain</enum>
+            </property>
+            <property name="text">
+             <string>Code:</string>
+            </property>
+            <property name="textFormat">
+             <enum>Qt::AutoText</enum>
+            </property>
+            <property name="scaledContents">
+             <bool>false</bool>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+            </property>
+            <property name="margin">
+             <number>3</number>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="lbl_user_name">
+            <property name="font">
+             <font>
+              <pointsize>8</pointsize>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Plain</enum>
+            </property>
+            <property name="text">
+             <string>User name:</string>
+            </property>
+            <property name="textFormat">
+             <enum>Qt::AutoText</enum>
+            </property>
+            <property name="scaledContents">
+             <bool>false</bool>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+            </property>
+            <property name="margin">
+             <number>3</number>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3">
            <widget class="QDateTimeEdit" name="startdate">
             <property name="enabled">
              <bool>true</bool>
@@ -118,39 +213,14 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="lbl_id">
-            <property name="font">
-             <font>
-              <pointsize>8</pointsize>
-              <weight>50</weight>
-              <bold>false</bold>
-             </font>
-            </property>
-            <property name="frameShape">
-             <enum>QFrame::NoFrame</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Plain</enum>
-            </property>
-            <property name="text">
-             <string>Id:</string>
-            </property>
-            <property name="textFormat">
-             <enum>Qt::AutoText</enum>
-            </property>
-            <property name="scaledContents">
-             <bool>false</bool>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-            </property>
-            <property name="margin">
-             <number>3</number>
+          <item row="8" column="3">
+           <widget class="QComboBox" name="status">
+            <property name="editable">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
-          <item row="4" column="1">
+          <item row="4" column="3">
            <widget class="QLineEdit" name="ext_code">
             <property name="enabled">
              <bool>true</bool>
@@ -160,8 +230,8 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="visit_id">
+          <item row="3" column="3">
+           <widget class="QLineEdit" name="user_name">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -170,7 +240,7 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
+          <item row="2" column="3">
            <widget class="QDateTimeEdit" name="enddate">
             <property name="enabled">
              <bool>true</bool>
@@ -190,33 +260,16 @@
             </property>
            </widget>
           </item>
-          <item row="5" column="0">
-           <widget class="QLabel" name="lbl_visitcat_id">
-            <property name="font">
-             <font>
-              <pointsize>8</pointsize>
-             </font>
-            </property>
-            <property name="frameShape">
-             <enum>QFrame::NoFrame</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Plain</enum>
+          <item row="8" column="0">
+           <widget class="QLabel" name="lbl_status">
+            <property name="maximumSize">
+             <size>
+              <width>40</width>
+              <height>16777215</height>
+             </size>
             </property>
             <property name="text">
-             <string>Visitcat id:*</string>
-            </property>
-            <property name="textFormat">
-             <enum>Qt::AutoText</enum>
-            </property>
-            <property name="scaledContents">
-             <bool>false</bool>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-            </property>
-            <property name="margin">
-             <number>3</number>
+             <string>Status:</string>
             </property>
            </widget>
           </item>
@@ -258,219 +311,80 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="lbl_user_name">
-            <property name="font">
-             <font>
-              <pointsize>8</pointsize>
-              <weight>50</weight>
-              <bold>false</bold>
-             </font>
-            </property>
-            <property name="frameShape">
-             <enum>QFrame::NoFrame</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Plain</enum>
-            </property>
-            <property name="text">
-             <string>User name:</string>
-            </property>
-            <property name="textFormat">
-             <enum>Qt::AutoText</enum>
-            </property>
-            <property name="scaledContents">
-             <bool>false</bool>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-            </property>
-            <property name="margin">
-             <number>3</number>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="1">
-           <widget class="QComboBox" name="visitcat_id">
-            <property name="editable">
-             <bool>true</bool>
-            </property>
-            <property name="sizeAdjustPolicy">
-             <enum>QComboBox::AdjustToContents</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="1">
-           <widget class="QComboBox" name="status">
-            <property name="editable">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QLineEdit" name="user_name">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="frame">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="0">
-           <widget class="QLabel" name="lbl_status">
-            <property name="maximumSize">
-             <size>
-              <width>40</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Status:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="lbl_code">
-            <property name="font">
-             <font>
-              <pointsize>8</pointsize>
-              <weight>50</weight>
-              <bold>false</bold>
-             </font>
-            </property>
-            <property name="frameShape">
-             <enum>QFrame::NoFrame</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Plain</enum>
-            </property>
-            <property name="text">
-             <string>Code:</string>
-            </property>
-            <property name="textFormat">
-             <enum>Qt::AutoText</enum>
-            </property>
-            <property name="scaledContents">
-             <bool>false</bool>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-            </property>
-            <property name="margin">
-             <number>3</number>
-            </property>
-           </widget>
-          </item>
-          <item row="8" column="0" colspan="2">
+          <item row="10" column="0" colspan="4">
            <widget class="QTextEdit" name="descript"/>
           </item>
-          <item row="9" column="0" colspan="2">
-           <widget class="QPushButton" name="btn_add_geom">
-            <property name="text">
-             <string>Add geom</string>
-            </property>
-            <property name="icon">
-             <iconset>
-              <normaloff>../icons/133.png</normaloff>../icons/133.png</iconset>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="tab_event">
-         <attribute name="title">
-          <string>Event</string>
-         </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout_5">
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_10" stretch="1">
-            <item>
-             <widget class="QComboBox" name="parameter_type_id">
-              <property name="editable">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <widget class="QComboBox" name="feature_type">
-            <property name="editable">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="1">
-            <item>
-             <widget class="QComboBox" name="parameter_id">
-              <property name="editable">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_12">
-            <item>
-             <widget class="QPushButton" name="btn_event_insert">
-              <property name="text">
-               <string>INSERT EVENT</string>
-              </property>
-              <property name="autoDefault">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <widget class="QLabel" name="lbl_info">
+          <item row="6" column="0">
+           <widget class="QLabel" name="lbl_visitcat_id">
             <property name="font">
              <font>
+              <pointsize>8</pointsize>
+             </font>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Plain</enum>
+            </property>
+            <property name="text">
+             <string>Visitcat id:*</string>
+            </property>
+            <property name="textFormat">
+             <enum>Qt::AutoText</enum>
+            </property>
+            <property name="scaledContents">
+             <bool>false</bool>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+            </property>
+            <property name="margin">
+             <number>3</number>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="lbl_id">
+            <property name="font">
+             <font>
+              <pointsize>8</pointsize>
               <weight>50</weight>
-              <italic>false</italic>
               <bold>false</bold>
              </font>
             </property>
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Plain</enum>
+            </property>
             <property name="text">
-             <string>From toolbar only STANDARD EVENTS are enabled.</string>
+             <string>Id:</string>
+            </property>
+            <property name="textFormat">
+             <enum>Qt::AutoText</enum>
+            </property>
+            <property name="scaledContents">
+             <bool>false</bool>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+            </property>
+            <property name="margin">
+             <number>3</number>
             </property>
            </widget>
           </item>
-          <item>
-           <widget class="Line" name="line">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_13">
-            <item>
-             <widget class="QPushButton" name="btn_event_update">
-              <property name="text">
-               <string>UPDATE EVENT</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <widget class="QPushButton" name="btn_event_delete">
+          <item row="5" column="0">
+           <widget class="QLabel" name="label">
             <property name="text">
-             <string>DELETE EVENT</string>
+             <string>Feature type:</string>
             </property>
            </widget>
           </item>
-          <item>
-           <widget class="QTableView" name="tbl_event">
-            <property name="sortingEnabled">
-             <bool>true</bool>
-            </property>
-           </widget>
+          <item row="5" column="3">
+           <widget class="QComboBox" name="feature_type"/>
           </item>
          </layout>
         </widget>
@@ -587,6 +501,95 @@
               </item>
              </layout>
             </widget>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tab_event">
+         <attribute name="title">
+          <string>Event</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_5">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_10" stretch="1">
+            <item>
+             <widget class="QComboBox" name="parameter_type_id">
+              <property name="editable">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="1">
+            <item>
+             <widget class="QComboBox" name="parameter_id">
+              <property name="editable">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_12">
+            <item>
+             <widget class="QPushButton" name="btn_event_insert">
+              <property name="text">
+               <string>INSERT EVENT</string>
+              </property>
+              <property name="autoDefault">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QLabel" name="lbl_info">
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <italic>false</italic>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>From toolbar only STANDARD EVENTS are enabled.</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="Line" name="line">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_13">
+            <item>
+             <widget class="QPushButton" name="btn_event_update">
+              <property name="text">
+               <string>UPDATE EVENT</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btn_event_delete">
+            <property name="text">
+             <string>DELETE EVENT</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTableView" name="tbl_event">
+            <property name="sortingEnabled">
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
          </layout>
