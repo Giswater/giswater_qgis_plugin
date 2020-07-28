@@ -13,13 +13,13 @@ DROP TRIGGER IF EXISTS gw_trg_edit_inp_node_valve ON v_edit_inp_valve;
 CREATE TRIGGER gw_trg_edit_inp_node_valve INSTEAD OF INSERT OR UPDATE OR DELETE
 ON v_edit_inp_valve FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_valve');
 
-DROP TRIGGER gw_trg_edit_rtc_hydro_data ON v_ui_hydroval_x_connec;
+DROP TRIGGER IF EXISTS gw_trg_edit_rtc_hydro_data ON v_ui_hydroval_x_connec;
 CREATE TRIGGER gw_trg_edit_hydroval_x_connec INSTEAD OF UPDATE
 ON v_ui_hydroval_x_connec FOR EACH ROW EXECUTE PROCEDURE gw_trg_ui_hydroval_connec();
 
-DROP TRIGGER gw_trg_ui_mincut_result_cat ON v_ui_mincut;
+DROP TRIGGER IF EXISTS gw_trg_ui_mincut ON v_ui_mincut;
 CREATE TRIGGER gw_trg_ui_mincut INSTEAD OF INSERT OR UPDATE OR DELETE 
-ON v_ui_mincut FOR EACH ROW EXECUTE PROCEDURE gw_trg_ui_mincut_result_cat();
+ON v_ui_mincut FOR EACH ROW EXECUTE PROCEDURE gw_trg_ui_mincut();
 
 DROP TRIGGER IF EXISTS gw_trg_vi_curves ON SCHEMA_NAME.vi_curves;
 CREATE TRIGGER gw_trg_vi_curves INSTEAD OF INSERT OR UPDATE OR DELETE 
