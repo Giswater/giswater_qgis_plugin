@@ -1279,6 +1279,8 @@ class ApiParent(ParentAction):
                         if str(field['iseditable']) == "False":
                             widget.setEnabled(False)
                 widget.setObjectName(field['widgetname'])
+                if 'iseditable' in field:
+                    widget.setEnabled(bool(field['iseditable']))
 
                 self.put_widgets(dialog, field, lbl, widget)
 
