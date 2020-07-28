@@ -142,7 +142,7 @@ BEGIN
 				v_query_result := v_query_result || ' AND '|| quote_ident(v_featurecat_id) ||' = '|| quote_literal(v_feature_type) ||'';
 				
 			ELSIF v_project_type = 'UD' AND v_formname!='upsert_catalog_gully'  THEN
-				v_query_result := v_query_result || ' AND '|| quote_ident(v_featurecat_id) ||' = '|| quote_literal(v_feature_type) ||' OR '|| quote_ident(v_featurecat_id) ||' = null';
+				v_query_result := v_query_result || ' AND ('|| quote_ident(v_featurecat_id) ||' = '|| quote_literal(v_feature_type) ||' OR '|| quote_ident(v_featurecat_id) ||' IS null)';
 			END IF;
 			
 		END IF;
