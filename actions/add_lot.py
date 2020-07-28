@@ -970,14 +970,16 @@ class AddNewLot(ParentManage):
         model = qtable.model()
 
         for i in range(len(index_list) - 1, -1, -1):
-            row = index_list[i].row()
-            column_index = utils_giswater.get_col_index_by_col_name(qtable, feature_type + '_id')
-            feature_id = index.sibling(row, column_index).data()
             sql = "SELECT alias FROM " + self.schema_name + ".config_client_forms WHERE location_type = 'tbl_relations' AND column_id = '" + str(
                 feature_type) + "_id'"
-            row = self.controller.get_row(sql)
-            if row:
-                column_name = row[0]
+            return_row = self.controller.get_row(sql)
+            if return_row:
+                column_name = return_row[0]
+
+            row = index_list[i].row()
+            column_index = utils_giswater.get_col_index_by_col_name(qtable, column_name)
+            feature_id = index.sibling(row, column_index).data()
+
             list_ids = self.get_table_values(self.tbl_relation, column_name)
             list_ids.remove(feature_id)
             model.takeRow(row)
