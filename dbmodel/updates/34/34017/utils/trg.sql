@@ -18,3 +18,26 @@ DROP TRIGGER IF EXISTS gw_trg_edit_streetaxis ON v_ext_streetaxis;
 CREATE TRIGGER gw_trg_edit_streetaxis INSTEAD OF INSERT OR UPDATE OR DELETE
 ON SCHEMA_NAME.v_ext_streetaxis
 FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_edit_streetaxis();
+
+-- 2020/07/27
+
+DROP TRIGGER IF EXISTS gw_trg_edit_cad_aux ON v_edit_cad_auxcircle;
+CREATE TRIGGER gw_trg_edit_cad_auxcircle INSTEAD OF INSERT OR UPDATE OR DELETE
+ON SCHEMA_NAME.v_edit_cad_auxcircle FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_cad_aux('circle');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_cad_aux ON v_edit_cad_auxpoint;
+CREATE TRIGGER gw_trg_edit_cad_auxpoint INSTEAD OF INSERT OR UPDATE OR DELETE
+ON SCHEMA_NAME.v_edit_cad_auxpoint FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_cad_aux('point');
+
+DROP TRIGGER IF EXISTS gw_trg_config_control ON config_form_fields;
+CREATE TRIGGER gw_trg_config_control BEFORE INSERT OR UPDATE OR DELETE
+ON SCHEMA_NAME.config_form_fields FOR EACH ROW EXECUTE PROCEDURE gw_trg_config_control('config_form_fields');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_rtc_hydro_data ON "SCHEMA_NAME".v_edit_rtc_hydro_data_x_connec;
+CREATE TRIGGER gw_trg_edit_rtc_hydro_data INSTEAD OF UPDATE ON "SCHEMA_NAME".v_edit_rtc_hydro_data_x_connec 
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_rtc_hydro_data();
+
+CREATE INDEX anl_connec_index
+  ON anl_connec
+  USING gist
+  (the_geom);
