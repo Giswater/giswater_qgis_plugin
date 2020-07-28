@@ -47,17 +47,17 @@ v_muni integer;
 BEGIN
 
 	-- Set search path to local schema
-    SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	--  get api version
-    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-        INTO v_version;
+	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
+		INTO v_version;
 
 	--  get project type
-    SELECT project_type INTO v_projecttype FROM sys_version LIMIT 1;
+	SELECT project_type INTO v_projecttype FROM sys_version LIMIT 1;
 
 	--  Get tab
-    v_tab := ((p_data->>'form')::json)->>'tabName';
+	v_tab := ((p_data->>'form')::json)->>'tabName';
 
 	-- address
 	IF v_tab = 'address' THEN
@@ -80,9 +80,7 @@ BEGIN
 		v_muni := ((((p_data->>'data')::json)->>'add_muni')::json->>'id')::integer;
 		v_idarg := (((p_data->>'data')::json)->>'add_street')::json->>'text';
 		v_editable := (((p_data->>'data')::json)->>'add_postnumber')::json->>'text';
-		v_searchtext := concat('%', v_editable ,'%');
-		raise notice 'name_arg %', v_idarg;
-		raise notice 'v_searchtext % % % % % % % % % % % % %', v_searchtext, v_address_layer, v_address_display_field, v_address_layer, v_address_geom_id_field, v_street_layer, v_street_id_field, v_address_street_id_field, v_street_display_field, v_idarg, v_street_muni_id_field, v_muni, v_searchtext;
+		v_searchtext := concat(v_editable ,'%');
 
 		-- Get address
 		EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) 
@@ -99,17 +97,17 @@ BEGIN
 	END IF;
 
 	-- Control NULL's
-    v_response := COALESCE(v_response, '{}');
+	v_response := COALESCE(v_response, '{}');
 
 	-- Return
-    RETURN gw_fct_json_create_return(('{"status":"Accepted"' ||
-        ', "version":'|| v_version ||
-        ', "data":' || v_response ||    
-        '}')::json, 2620);
+	RETURN gw_fct_json_create_return(('{"status":"Accepted"' ||
+		', "version":'|| v_version ||
+		', "data":' || v_response ||    
+		'}')::json, 2620);
 
 	-- Exception handling
-    EXCEPTION WHEN OTHERS THEN 
-    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_apiversion || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	EXCEPTION WHEN OTHERS THEN 
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_apiversion || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
