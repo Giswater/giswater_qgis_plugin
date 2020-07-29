@@ -243,4 +243,10 @@ Uncheck direct insert into node table if you want to use intermediate table (anl
 WHERE id = 2118;
 
 
-
+UPDATE config_user_x_expl SET active = TRUE;
+UPDATE config_visit_class_x_feature SET active = TRUE;
+UPDATE config_visit_class_x_parameter SET active = TRUE;
+UPDATE config_visit_class_x_workorder SET active = TRUE;
+UPDATE config_visit_parameter SET active = TRUE;
+UPDATE sys_foreignkey SET active = TRUE;
+	
