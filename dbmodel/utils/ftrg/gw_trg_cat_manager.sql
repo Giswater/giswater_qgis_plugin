@@ -51,7 +51,7 @@ BEGIN
 						
 						--if there is a different manager with the same expl assigned change the manager_id and maintain relation
 						--if not, remove it	
-						IF (SELECT count(*) FROM config_user_x_expl WHERE username=rec_user and expl_id=rec_expl) > 0 THEN
+						IF (SELECT count(*) FROM config_user_x_expl WHERE username=rec_user and expl_id=rec_expl AND active IS TRUE) > 0 THEN
 
 							UPDATE config_user_x_expl set manager_id = v_new_id WHERE username=rec_user and expl_id=rec_expl;
 						END IF;
@@ -78,7 +78,7 @@ BEGIN
 					
 						SELECT id INTO v_new_id FROM cat_manager WHERE rec_user = ANY(username) AND rec_expl::integer = ANY(expl_id);
 							
-						IF (SELECT count(*) FROM config_user_x_expl WHERE username=rec_user and expl_id=rec_expl) > 0 THEN
+						IF (SELECT count(*) FROM config_user_x_expl WHERE username=rec_user and expl_id=rec_expl AND active IS TRUE) > 0 THEN
 							UPDATE config_user_x_expl set manager_id = v_new_id WHERE username=rec_user and expl_id=rec_expl;
 						END IF;
 					ELSE
