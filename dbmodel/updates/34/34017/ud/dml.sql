@@ -8790,3 +8790,6 @@ UPDATE config_toolbox SET inputparams = '[{"widgetname":"insertIntoNode", "label
 {"widgetname":"nodeType", "label":"Node type:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":7, "dvQueryText":"select distinct id as id, id as idval from cat_feature_node where id is not null", "selectedId":"$userNodetype"},
 {"widgetname":"nodeCat", "label":"Node catalog:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":8, "dvQueryText":"select distinct id as id, id as idval from cat_node where node_type = $userNodetype  OR node_type is null order by id", "selectedId":"$userNodecat"}]'
 WHERE id =2118;
+
+--2020/07/29
+UPDATE sys_param_user SET ismandatory=FALSE WHERE id='edit_gully_doublegeom';
