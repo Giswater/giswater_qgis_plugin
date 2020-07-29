@@ -132,11 +132,11 @@ BEGIN
 	RAISE NOTICE '2 - Check result arcs without start/end node (fid:  231)';
 	v_querytext = '	SELECT 231, arc_id, arccat_id, state, expl_id, the_geom, '||quote_literal(v_result_id)||', ''Arcs without node_1 or node_2.'' FROM temp_arc where result_id = '||quote_literal(v_result_id)||'
 			EXCEPT ( 
-			SELECT 231, arc_id, arccat_id, state, expl_id, the_geom, '||quote_literal(v_result_id)||', ''Arcs without node_1 or node_2.'' FROM temp_arc where result_id = '||quote_literal(v_result_id)||' JOIN 
-			(SELECT node_id FROM temp_node where result_id = '||quote_literal(v_result_id)||' ) a ON node_1=node_id 
+			SELECT 231, arc_id, arccat_id, state, expl_id, the_geom, '||quote_literal(v_result_id)||', ''Arcs without node_1 or node_2.'' FROM temp_arc JOIN 
+			(SELECT node_id FROM temp_node where result_id = '||quote_literal(v_result_id)||' ) a ON node_1=node_id where result_id = '||quote_literal(v_result_id)||'
 			UNION 
-			SELECT 231, arc_id, arccat_id, state, expl_id, the_geom, '||quote_literal(v_result_id)||', ''Arcs without node_1 or node_2.'' FROM temp_arc JOIN where result_id = '||quote_literal(v_result_id)||'
-			(SELECT node_id FROM temp_node where result_id = '||quote_literal(v_result_id)||') b ON node_2=node_id )';
+			SELECT 231, arc_id, arccat_id, state, expl_id, the_geom, '||quote_literal(v_result_id)||', ''Arcs without node_1 or node_2.'' FROM temp_arc  JOIN
+			(SELECT node_id FROM temp_node where result_id = '||quote_literal(v_result_id)||') b ON node_2=node_id where result_id = '||quote_literal(v_result_id)||')';
 
 	EXECUTE 'SELECT count(*) FROM ('||v_querytext ||')a'
 		INTO v_count;

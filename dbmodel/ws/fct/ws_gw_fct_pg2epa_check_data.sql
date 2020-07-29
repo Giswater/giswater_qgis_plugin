@@ -95,7 +95,7 @@ BEGIN
 		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom) SELECT 107, node_id, nodecat_id, ''Orphan node'',
 		the_geom FROM ', v_querytext);
 		INSERT INTO audit_check_data (fid, criticity, error_message)
-		VALUES (v_fid, 3, concat('ERROR: There is/are ',v_count,' node''s orphans with epa_type and state_type ready to work but without any arcs connected (Will not exported). Take a look on temporal for details.'));
+		VALUES (v_fid, 3, concat('ERROR: ',v_count,' node''s orphans with epa_type and state_type ready to work, will not exported because any arcs are connected. Take a look on temporal for details.'));
 	ELSE
 		INSERT INTO audit_check_data (fid, criticity, error_message)
 		VALUES (v_fid, 1, 'INFO: No node(s) orphan found.');
@@ -111,7 +111,7 @@ BEGIN
 		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom) SELECT 187, node_id, nodecat_id, ''nodes
 		with state_type isoperative = false'', the_geom FROM (', v_querytext,')a');
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
-		VALUES (v_fid, 2, concat('WARNING: There is/are ',v_count,' node(s) with state > 0 and state_type.is_operative on FALSE. Please, check your data before continue. ()'));
+		VALUES (v_fid, 2, concat('WARNING: There is/are ',v_count,' node(s) with state > 0 and state_type.is_operative on FALSE. Please, check your data before continue.'));
 		INSERT INTO audit_check_data (fid, criticity, error_message)
 		VALUES (v_fid, 2, concat('SELECT * FROM anl_node WHERE fid = 187 AND cur_user=current_user'));
 	ELSE
@@ -421,7 +421,8 @@ BEGIN
 
 	IF v_count > 0 THEN
 		INSERT INTO anl_arc (fid, arc_id, arccat_id, the_geom, descript)
-		SELECT 229, arc_id, arcccat_id , the_geom, concat('Length: ', (st_length(the_geom))::numeric (12,3)) where st_length(the_geom) < 0.2;
+		SELECT 229, arc_id, arccat_id , the_geom, concat('Length: ', (st_length(the_geom))::numeric (12,3)) FROM v_edit_inp_pipe 
+		WHERE st_length(the_geom) < 0.2;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 2, concat('WARNING: There is/are ',v_count,
 		' pipe(s) with length less than 0.2 meters. Check it before continue.'));
@@ -438,7 +439,7 @@ BEGIN
 
 	IF v_count > 0 THEN
 		INSERT INTO anl_arc (fid, arc_id, arccat_id, the_geom, descript)
-		SELECT 230, arc_id, arcccat_id , the_geom, concat('Length: ', (st_length(the_geom))::numeric (12,3)) where st_length(the_geom) < 0.05;
+		SELECT 230, arc_id, arcccat_id , the_geom, concat('Length: ', (st_length(the_geom))::numeric (12,3)) FROM v_edit_inp_pipe where st_length(the_geom) < 0.05;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 3, concat('WARNING: There is/are ',v_count,
 		' pipe(s) with length less than 0.05 meters. Check it before continue.'));
@@ -471,7 +472,7 @@ BEGIN
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 3, concat(
-		'ERROR: There is/are ',v_count,' register(s) on arc''s catalog with null values on dint column.'));
+		'ERROR: There is/are ',v_count,' register(s) on arc''s catalog not VARC with null values on dint column for the whole system.'));
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
