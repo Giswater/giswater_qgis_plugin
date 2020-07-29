@@ -32,7 +32,7 @@ BEGIN
 
 	
 	v_style_id = ((p_data ->>'data')::json->>'style_id')::json;
-	v_style = (SELECT stylevalue FROM sys_style where id::text = v_style_id::text);
+	v_style = (SELECT stylevalue FROM sys_style where id::text = v_style_id::text and active IS TRUE);
 	v_return = gw_fct_json_object_set_key((p_data->>'body')::json, 'style', v_style);
 
 	v_version := COALESCE(v_version, '{}');
