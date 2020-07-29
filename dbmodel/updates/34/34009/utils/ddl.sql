@@ -213,3 +213,6 @@ DROP VIEW IF EXISTS ve_lot_x_gully;
 
 ALTER TABLE om_typevalue ALTER COLUMN id TYPE character varying(30);
 ALTER TABLE plan_typevalue ALTER COLUMN id TYPE character varying(30);
+
+--2020/07/29
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_foreignkey", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
