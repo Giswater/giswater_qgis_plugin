@@ -177,18 +177,17 @@ BEGIN
 	IF om_aux='plan' THEN
 
 			DELETE FROM plan_psector WHERE psector_id = OLD.psector_id;
-			DELETE FROM arc WHERE state = 2 AND arc_id NOT IN (SELECT arc_id FROM plan_psector_x_arc);	
-			DELETE FROM node WHERE state = 2 AND node_id NOT IN (SELECT node_id FROM plan_psector_x_node);	
-			DELETE FROM connec WHERE state = 2 AND connec_id NOT IN (SELECT connec_id FROM plan_psector_x_connec);
+			DELETE FROM arc WHERE state = 2 AND arc_id IN (SELECT arc_id FROM plan_psector_x_arc WHERE psector_id = OLD.psector_id) ;	
+			DELETE FROM node WHERE state = 2 AND node_id IN (SELECT node_id FROM plan_psector_x_node WHERE psector_id = OLD.psector_id);	
+			DELETE FROM connec WHERE state = 2 AND connec_id IN (SELECT connec_id FROM plan_psector_x_connec WHERE psector_id = OLD.psector_id);
 			IF (select project_type FROM sys_version LIMIT 1)='UD' THEN	
-				DELETE FROM gully WHERE state = 2 AND gully_id NOT IN (SELECT gully_id FROM plan_psector_x_gully);
+				DELETE FROM gully WHERE state = 2 AND gully_id IN (SELECT gully_id FROM plan_psector_x_gully WHERE psector_id = OLD.psector_id);
 			END IF;
 			RETURN NULL;
-
 	END IF;
 
         RETURN NULL;
-   
+ 
     END IF;
 
 END;
