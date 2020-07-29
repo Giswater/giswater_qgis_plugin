@@ -52,9 +52,9 @@ BEGIN
 	string_agg(concat('(''''',config_visit_parameter.id,''''')'),',' order by config_visit_parameter.id) as id_param,
 	string_agg(concat(config_visit_parameter.id,' ', lower(config_visit_parameter.data_type)),', ' order by config_visit_parameter.id) as datatype
 	INTO v_new_parameters
-	FROM config_visit_parameter JOIN config_visit_parameter_action ON config_visit_parameter.id=config_visit_parameter_action.parameter_id
-	WHERE class_id=v_class_id;
-	
+	FROM config_visit_parameter JOIN config_visit_class_x_parameter ON config_visit_parameter.id=config_visit_class_x_parameter.parameter_id
+	WHERE class_id=v_class_id AND config_visit_parameter.active IS TRUE AND config_visit_class_x_parameter.active IS TRUE;
+	 
 	raise notice 'v_new_parameters - a,%',v_new_parameters.a_param;
 	raise notice 'v_old_a_param,%',v_old_a_param;
 	raise notice 'v_new_parameters - ct,%',v_new_parameters.ct_param;

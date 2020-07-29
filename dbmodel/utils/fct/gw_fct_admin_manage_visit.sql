@@ -196,8 +196,8 @@ BEGIN
 	string_agg(concat('(''''',config_visit_parameter.id,''''')'),',' order by config_visit_parameter.id) as id_param,
 	string_agg(concat(config_visit_parameter.id,' ', lower(config_visit_parameter.data_type)),', ' order by config_visit_parameter.id) as datatype
 	INTO v_old_parameters
-	FROM config_visit_parameter JOIN config_visit_parameter_action ON config_visit_parameter.id=config_visit_parameter_action.parameter_id
-	WHERE class_id=v_class_id;
+	FROM config_visit_parameter JOIN config_visit_class_x_parameter ON config_visit_parameter.id=config_visit_class_x_parameter.parameter_id
+	WHERE class_id=v_class_id AND config_visit_parameter.active IS TRUE AND config_visit_class_x_parameter.active IS TRUE;
 
 	raise notice 'v_old_parameters,%,%',v_old_parameters,v_class_id;
 
@@ -227,8 +227,8 @@ BEGIN
 				VALUES (219, null, 4, concat('Insert values into config_api_visit.'));
 			END IF;
 			
-			IF (SELECT visitclass_id FROM config_visit_class_x_feature WHERE visitclass_id = v_class_id) IS NULL THEN
-				INSERT INTO config_visit_class_x_feature (visitclass_id, tablename) VALUES (v_class_id, concat('v_edit_',v_feature_system_id));	
+			IF (SELECT visitclass_id FROM config_visit_class_x_feature WHERE visitclass_id = v_class_id AND active IS TRUE) IS NULL THEN
+				INSERT INTO config_visit_class_x_feature (visitclass_id, tablename, active) VALUES (v_class_id, concat('v_edit_',v_feature_system_id), TRUE);	
 
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (219, null, 4, concat('Insert values into config_visit_class_x_feature.'));
@@ -294,16 +294,17 @@ BEGIN
 			END IF;
 
 			--insert new parameter
-			INSERT INTO config_visit_parameter(id, code, parameter_type, feature_type, data_type, descript, form_type, vdefault, ismultifeature, short_descript)
+			INSERT INTO config_visit_parameter(id, code, parameter_type, feature_type, data_type, descript, form_type, vdefault, 
+			ismultifeature, short_descript, active)
 			VALUES (v_param_name, v_code, v_parameter_type, upper(v_feature_system_id),v_data_type, v_descript, v_form_type, v_vdefault,
-			v_ismultifeature, v_short_descript);
+			v_ismultifeature, v_short_descript, TRUE);
 
 			--relate new parameters with new class
-			INSERT INTO config_visit_parameter_action (class_id, parameter_id)
-			VALUES (v_class_id, v_param_name);
+			INSERT INTO config_visit_class_x_parameter (class_id, parameter_id, active)
+			VALUES (v_class_id, v_param_name, TRUE);
 
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (219, null, 4, concat('Insert parameter ',v_param_name,' into config_visit_parameter and relate it with class ',v_class_id,' in config_visit_parameter_action.'));
+			VALUES (219, null, 4, concat('Insert parameter ',v_param_name,' into config_visit_parameter and relate it with class ',v_class_id,' in config_visit_class_x_parameter.'));
 
 			--add configuration of new parameters to config_form_fields
 			IF v_ismultievent = TRUE THEN
