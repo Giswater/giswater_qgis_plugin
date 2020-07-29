@@ -9,80 +9,79 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 -- 2020/05/25
 
 
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"config_typevalue", "column":"descript", "newName":"camelstyle"}}$$);
 
-ALTER TABLE config_typevalue RENAME COLUMN descript TO camelstyle;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"config_form_tableview", "column":"column_id", "newName":"columnname"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"config_form_tableview", "column":"column_index", "newName":"columnindex"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"config_form_tableview", "column":"table_id", "newName":"tablename"}}$$);
 
-
-ALTER TABLE config_form_tableview RENAME column_id TO columnname;
-ALTER TABLE config_form_tableview RENAME column_index TO columnindex;
-ALTER TABLE config_form_tableview RENAME table_id TO tablename;
-
-
-ALTER TABLE audit_check_project RENAME fprocesscat_id TO fid;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"audit_check_project", "column":"fprocesscat_id", "newName":"fid"}}$$);
 
 -- sys_fprocess
-ALTER TABLE sys_fprocess RENAME id TO fid;
-ALTER TABLE sys_fprocess ADD column parameters JSON;
-ALTER TABLE sys_fprocess DROP column context;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"sys_fprocess", "column":"id", "newName":"fid"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_fprocess", "column":"parameters", "dataType":"json", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"sys_fprocess", "column":"context"}}$$);
 
 -- config_csv
 DELETE FROM config_csv WHERE id IN(14,15,16);
-ALTER TABLE config_csv RENAME id TO fid;
-ALTER TABLE config_csv RENAME isdeprecated TO active;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"config_csv", "column":"id", "newName":"fid"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"config_csv", "column":"isdeprecated", "newName":"active"}}$$);
 ALTER TABLE config_csv ALTER COLUMN active set DEFAULT true;
-ALTER TABLE config_csv RENAME csv_structure TO descript;
-ALTER TABLE config_csv DROP column formname;
-ALTER TABLE config_csv ADD COLUMN addparam JSON;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"config_csv", "column":"csv_structure", "newName":"descript"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_csv", "column":"formname"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_csv", "column":"addparam", "dataType":"json", "isUtils":"False"}}$$);
 
 -- config_info_layer
-ALTER TABLE config_info_layer RENAME add_param TO addparam;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"config_info_layer", "column":"add_param", "newName":"addparam"}}$$);
 
 -- temp_csv
 ALTER TABLE temp_csv2pg RENAME TO temp_csv;
-ALTER TABLE temp_csv DROP CONSTRAINT temp_csv2pg_csv2pgcat_id_fkey2;
-ALTER TABLE temp_csv DROP CONSTRAINT temp_csv2pg_pkey1;
-ALTER TABLE temp_csv RENAME csv2pgcat_id TO fid;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"temp_csv", "column":"temp_csv2pg_csv2pgcat_id_fkey2"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"temp_csv", "column":"temp_csv2pg_pkey1"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"temp_csv", "column":"csv2pgcat_id", "newName":"fid"}}$$);
+
 ALTER TABLE temp_csv ADD CONSTRAINT temp_csv_pkey PRIMARY KEY(id);
 ALTER TABLE temp_csv ADD CONSTRAINT temp_csv_fkey FOREIGN KEY (fid) REFERENCES sys_fprocess (fid) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
 -- config_fprocess
 ALTER TABLE config_csv_param RENAME TO config_fprocess;
-ALTER TABLE config_fprocess RENAME pg2csvcat_id TO fid;
-ALTER TABLE config_fprocess RENAME reverse_pg2csvcat_id TO fid2;
-ALTER TABLE config_fprocess DROP column csvversion;
-ALTER TABLE config_fprocess ADD column addparam JSON;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"config_fprocess", "column":"pg2csvcat_id", "newName":"fid"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"config_fprocess", "column":"reverse_pg2csvcat_id", "newName":"fid2"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_fprocess", "column":"csvversion"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_fprocess", "column":"addparam", "dataType":"json", "isUtils":"False"}}$$);
 
 -- fid
-ALTER TABLE audit_check_data RENAME fprocesscat_id TO fid;
-ALTER TABLE audit_log_data RENAME fprocesscat_id TO fid;
-ALTER TABLE anl_arc RENAME fprocesscat_id TO fid;
-ALTER TABLE anl_arc_x_node RENAME fprocesscat_id TO fid;
-ALTER TABLE anl_connec RENAME fprocesscat_id TO fid;
-ALTER TABLE anl_node RENAME fprocesscat_id TO fid;
-ALTER TABLE temp_table RENAME fprocesscat_id TO fid;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"audit_check_data", "column":"fprocesscat_id", "newName":"fid"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"audit_log_data", "column":"fprocesscat_id", "newName":"fid"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"anl_arc", "column":"fprocesscat_id", "newName":"fid"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"anl_arc_x_node", "column":"fprocesscat_id", "newName":"fid"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"anl_connec", "column":"fprocesscat_id", "newName":"fid"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"anl_node", "column":"fprocesscat_id", "newName":"fid"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"temp_table", "column":"fprocesscat_id", "newName":"fid"}}$$);
 
 -- sys_foreignkey
 ALTER TABLE sys_foreignkey DROP constraint typevalue_fk_pkey ;
 ALTER TABLE sys_foreignkey DROP constraint sys_foreingkey_unique;
 ALTER TABLE sys_foreignkey ADD CONSTRAINT sys_foreingkey_pkey PRIMARY KEY (typevalue_table, typevalue_name, target_table, target_field);
-ALTER TABLE sys_foreignkey DROP column id;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"sys_foreignkey", "column":"id"}}$$);
 
 -- sys_typevalue
 ALTER TABLE sys_typevalue DROP constraint sys_typevalue_cat_pkey;
 ALTER TABLE sys_typevalue DROP constraint sys_typevalue_unique;
 ALTER TABLE sys_typevalue ADD CONSTRAINT sys_typevalue_pkey PRIMARY KEY (typevalue_table, typevalue_name);
-ALTER TABLE sys_typevalue DROP column id;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"sys_typevalue", "column":"id"}}$$);
 
 -- active
-ALTER TABLE config_toolbox ADD column active boolean;
-ALTER TABLE config_file ADD column active boolean;
-ALTER TABLE config_visit_parameter_action ADD column active boolean;
-ALTER TABLE config_visit_parameter ADD column active boolean;
-ALTER TABLE config_user_x_expl ADD column active boolean;
-ALTER TABLE config_visit_class_x_feature ADD column active boolean;
-ALTER TABLE config_visit_class_x_parameter ADD column active boolean;
-ALTER TABLE config_visit_class_x_workorder ADD column active boolean;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_toolbox", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_file", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_visit_parameter_action", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_visit_parameter", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_user_x_expl", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_visit_class_x_feature", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_visit_class_x_parameter", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_visit_class_x_workorder", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
+
 
 ALTER TABLE config_toolbox ALTER COLUMN active SET DEFAULT TRUE;
 ALTER TABLE config_file ALTER COLUMN active SET DEFAULT TRUE;
@@ -93,7 +92,7 @@ ALTER TABLE config_visit_class_x_feature ALTER COLUMN active SET DEFAULT TRUE;
 ALTER TABLE config_visit_class_x_parameter ALTER COLUMN active SET DEFAULT TRUE;
 ALTER TABLE config_visit_class_x_workorder ALTER COLUMN active SET DEFAULT TRUE;
 
-ALTER TABLE sys_foreignkey ADD column active boolean;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_foreignkey", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
 ALTER TABLE sys_foreignkey ALTER column active SET DEFAULT TRUE;
 
 
