@@ -24,7 +24,7 @@ SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
 		"client":{"device":4, "infoType":1, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_arc_pipe", "inputGeometry":"0102000020E764000002000000998B3C512F881941B28315AA7F76514105968D7D748819419FDF72D781765141" },
-		"data":{"addSchema":"ud_sample"}}$$)
+		"data":{"addSchema":"SCHEMA_NAME"}}$$)
 INFO BASIC
 SELECT SCHEMA_NAME.gw_fct_getinfofromid($${
 		"client":{"device":4, "infoType":1, "lang":"ES"},
@@ -509,10 +509,17 @@ BEGIN
 		ELSIF v_editable = FALSE AND v_configtabledefined = FALSE THEN
 			v_formtype := 'default';
 		END IF;
-	
+
+
+
 		-- call fields function
 		-------------------
 		IF v_editable THEN
+
+			-- getting id from URN
+			IF v_id IS NULL AND v_islayer is not true THEN
+				v_id = (SELECT nextval('SCHEMA_NAME.urn_id_seq'));
+			END IF;
 
 			RAISE NOTICE 'User has permissions to edit table % using id %', v_tablename, v_id;
 			-- call edit form function
@@ -526,7 +533,7 @@ BEGIN
 				v_status = 'Failed';
 			END IF;
 						
-		ELSIF v_editable = FALSE OR v_id IS NULL THEN 
+		ELSIF v_editable = FALSE OR v_islayer THEN 
 		
 			RAISE NOTICE 'User has NOT permissions to edit table % using id %', v_tablename, v_id;
 			-- call info form function
@@ -535,10 +542,6 @@ BEGIN
 			USING v_tablename, v_id, v_device, v_infotype, v_configtabledefined, v_idname, column_type, v_tg_op;
 		END IF;
 
-		-- getting id from URN
-		IF v_id IS NULL AND v_islayer is not true THEN
-			v_id = (SELECT nextval('SCHEMA_NAME.urn_id_seq'));
-		END IF;
 
 	ELSE
 		IF (SELECT distinct formname from config_form_fields WHERE formname=v_table_parent) IS NOT NULL THEN 

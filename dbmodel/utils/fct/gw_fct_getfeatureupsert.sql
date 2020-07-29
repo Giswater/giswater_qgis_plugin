@@ -63,7 +63,6 @@ field_value character varying;
 v_version json;
 v_selected_id text;
 v_vdefault text;
-v_id int8;
 v_numnodes integer;
 v_feature_type text;
 count_aux integer;
@@ -201,10 +200,12 @@ BEGIN
 	IF p_tg_op = 'INSERT' THEN 
 
 		-- urn_id assingment
-		v_id = (SELECT nextval('urn_id_seq'));
-		p_id = v_id;
+		IF p_id IS NULL THEN
+			p_id = (SELECT nextval('urn_id_seq'));
+		END IF;
+
 		IF v_catfeature.code_autofill IS TRUE THEN
-			v_code=v_id;
+			v_code=p_id;
 		END IF;
 
 		-- topology control (enabled without state topocontrol. Does not make sense to activate this because in this phase of workflow
@@ -214,7 +215,7 @@ BEGIN
 			
 				v_numnodes := (SELECT COUNT(*) FROM node WHERE ST_DWithin(p_reduced_geometry, node.the_geom, v_node_proximity) AND node.node_id != p_id AND node.state!=0);		
 				IF (v_numnodes >1) AND (v_node_proximity_control IS TRUE) THEN
-					v_message = (SELECT concat('Error[1096]:',error_message, v_id,'. ',hint_message) FROM sys_message WHERE id=1096);
+					v_message = (SELECT concat('Error[1096]:',error_message, p_id,'. ',hint_message) FROM sys_message WHERE id=1096);
 					v_status = false;
 				END IF;
 				
@@ -314,14 +315,14 @@ BEGIN
 			ELSIF upper(v_catfeature.feature_type) ='CONNEC' THEN 
 				v_numnodes := (SELECT COUNT(*) FROM connec WHERE ST_DWithin(p_reduced_geometry, connec.the_geom, v_connec_proximity) AND connec.connec_id != p_id AND connec.state!=0);		
 				IF (v_numnodes >1) AND (v_connec_proximity_control IS TRUE) THEN
-					v_message = (SELECT concat('Error[1044]:',error_message, v_id,'. ',hint_message) FROM sys_message WHERE id=1044);
+					v_message = (SELECT concat('Error[1044]:',error_message, p_id,'. ',hint_message) FROM sys_message WHERE id=1044);
 					v_status = false;
 				END IF;
 				
 			ELSIF upper(v_catfeature.feature_type) ='GULLY' THEN
 				v_numnodes := (SELECT COUNT(*) FROM gully WHERE ST_DWithin(p_reduced_geometry, gully.the_geom, v_gully_proximity) AND gully.gully_id != p_id AND gully.state!=0);		
 				IF (v_numnodes >1) AND (v_gully_proximity_control IS TRUE) THEN
-					v_message = (SELECT concat('Error[1045]:',error_message, v_id,'. ',hint_message) FROM sys_message WHERE id=1045);
+					v_message = (SELECT concat('Error[1045]:',error_message, p_id,'. ',hint_message) FROM sys_message WHERE id=1045);
 					v_status = false;
 				END IF;
 			END IF;
@@ -537,13 +538,13 @@ BEGIN
 				
 				-- special values
 				WHEN quote_ident(p_idname) THEN
-					field_value = v_id;
+					field_value = p_id;
 				WHEN concat(lower(v_catfeature.feature_type),'_type') THEN 
 					EXECUTE 'SELECT id FROM cat_feature WHERE child_layer = ''' || p_table_id ||''' LIMIT 1' INTO field_value;
 				WHEN 'code' THEN 
 					field_value = v_code;
 				WHEN 'customer_code' THEN 
-					field_value = v_id;
+					field_value = p_id;
 				WHEN 'node_1' THEN 
 					field_value = v_noderecord1.node_id;
 				WHEN 'node_2' THEN 
