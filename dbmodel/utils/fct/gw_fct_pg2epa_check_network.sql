@@ -232,10 +232,10 @@ BEGIN
 		-- fill the graf table
 		INSERT INTO temp_anlgraf (arc_id, node_1, node_2, water, flag, checkf)
 		select  a.arc_id, case when node_1 is null then '00000' else node_1 end, case when node_2 is null then '00000' else node_2 end, 0, 0, 0
-		from temp_arc a
+		from temp_arc a where result_id = v_result_id
 		union all
 		select  a.arc_id, case when node_2 is null then '00000' else node_2 end, case when node_1 is null then '00000' else node_1 end, 0, 0, 0
-		from temp_arc a
+		from temp_arc a where result_id = v_result_id
 		ON CONFLICT (arc_id, node_1) DO NOTHING;
 		
 		-- Delete from the graf table all that rows that only exists one time (it means that arc don't have the correct topology)
@@ -288,16 +288,16 @@ BEGIN
 
 		-- insert into result table dry nodes with demands (error)
 		INSERT INTO anl_node (fid, node_id, the_geom, descript)
-		SELECT DISTINCT ON (a.node_1) 233, a.node_1, the_geom, concat('Dry nodes with demands')  
-			FROM temp_anlgraf a
-			JOIN temp_node b ON a.node_1=b.node_id
-			WHERE demand > 0
-			GROUP BY a.node_1, the_geom
-			having max(water) = 0;
+		SELECT 233, n.node_id, n.the_geom, concat('Dry nodes with demands') FROM node n
+		JOIN
+		(SELECT node_1 AS node_id FROM arc JOIN (SELECT arc_id FROM anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
+		UNION
+		SELECT node_2 FROM arc JOIN (SELECT arc_id FROM anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id))
+		a USING (node_id)
+		JOIN temp_node ON a.node_id = temp_node.node_id
+		WHERE demand > 0;
 
 		SELECT count(*) FROM anl_node INTO v_count WHERE fid = 233 AND cur_user=current_user;
-
-		--raise exception 'v_count %', v_count;
 
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
