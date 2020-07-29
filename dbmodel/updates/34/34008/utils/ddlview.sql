@@ -33,13 +33,13 @@ CREATE OR REPLACE VIEW v_anl_graf AS
  
 CREATE OR REPLACE VIEW v_ext_raster_dem AS 
 SELECT DISTINCT ON (r.id) r.id,
-code,
-alias,
-raster_type, 
+c.code,
+c.alias,
+c.raster_type, 
 c.descript,
-source,
-provider,
-year,
+c.source,
+c.provider,
+c.year,
 r.rast,
 r.rastercat_id,
 r.envelope
