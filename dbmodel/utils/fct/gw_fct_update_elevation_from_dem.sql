@@ -63,7 +63,7 @@ BEGIN
 	v_exploitation := ((p_data ->>'data')::json->>'parameters')::json->>'exploitation';
 
 	DELETE FROM selector_expl WHERE cur_user = current_user;
-	INSERT INTO selector_expl VALUES (v_exploitation, cur_user);
+	INSERT INTO selector_expl VALUES (v_exploitation, current_user);
 	
 	--Execute the process only if admin_raster_dem is true
 	IF (SELECT value FROM config_param_system WHERE parameter='admin_raster_dem') = 'TRUE' THEN
@@ -143,7 +143,7 @@ BEGIN
 
 				--temporal insert values into anl_node to create layer with all updated points
 				INSERT INTO anl_node (node_id, state,   expl_id, fid, the_geom, descript)
-				VALUES (rec.feature_id, rec.state::integer, v_exploitation, 168,rec.the_geom, upper(v_feature_type));
+				VALUES (rec.feature_id::text, rec.state::integer, v_exploitation, 168,rec.the_geom, upper(v_feature_type));
 
 				INSERT INTO audit_check_data(fid,result_id, error_message)
 				VALUES (168,'elevation from raster',concat('ELEVATION UPDATED - FEATURE TYPE:',upper(v_feature_type),', ID: ', rec.feature_id));
