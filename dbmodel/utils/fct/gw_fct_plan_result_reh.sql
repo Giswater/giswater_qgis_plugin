@@ -30,9 +30,12 @@ arc_id_var text;
 BEGIN 
 
 	SET search_path = "SCHEMA_NAME", public;
- 
-	FOR rec_parameter IN SELECT * FROM om_visit_event JOIN config_visit_parameter ON parameter_id=config_visit_parameter.id
-	JOIN om_visit_parameter_type ON parameter_type=om_visit_parameter_type.id where go2plan IS TRUE and is_last IS TRUE
+ 	
+	FOR rec_parameter IN 
+		SELECT * FROM om_visit_event JOIN config_visit_parameter cvp ON parameter_id=cvp.id
+		JOIN om_typevalue ON cvp.parameter_type=idval 
+		WHERE typevalue = 'visit_param_type' and (addparam ->>'go2plan')::boolean IS TRUE and is_last IS TRUE
+		AND cvp.active IS TRUE
 	LOOP
 				
 		--get arc/node parameters
