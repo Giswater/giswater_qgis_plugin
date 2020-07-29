@@ -568,8 +568,8 @@ BEGIN
 
 		--insert tank into config_mincut_inlet
 		IF v_man_table='man_tank' THEN
-			INSERT INTO config_mincut_inlet(node_id, expl_id)
-			VALUES (NEW.node_id, NEW.expl_id);
+			INSERT INTO config_mincut_inlet(node_id, expl_id, active)
+			VALUES (NEW.node_id, NEW.expl_id, TRUE);
 		END IF;
 
 		-- man addfields insert

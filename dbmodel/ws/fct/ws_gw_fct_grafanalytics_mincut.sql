@@ -78,7 +78,7 @@ BEGIN
 	-- closing check-valves
 	UPDATE temp_anlgraf SET flag = 1 
 	FROM config_checkvalve c 
-	WHERE (temp_anlgraf.node_1 = c.node_id OR temp_anlgraf.node_2 = c.node_id);
+	WHERE (temp_anlgraf.node_1 = c.node_id OR temp_anlgraf.node_2 = c.node_id) AND active IS TRUE;
 	
 	-- setting the graf matrix with closed valves
 	UPDATE temp_anlgraf SET flag = 1 
@@ -88,7 +88,7 @@ BEGIN
 	-- setting the graf matrix with tanks
 	UPDATE temp_anlgraf SET flag=1 
 	FROM config_mincut_inlet 
-	WHERE (temp_anlgraf.node_1 = config_mincut_inlet.node_id OR temp_anlgraf.node_2 = config_mincut_inlet.node_id);
+	WHERE (temp_anlgraf.node_1 = config_mincut_inlet.node_id OR temp_anlgraf.node_2 = config_mincut_inlet.node_id) AND active IS TRUE;
 
 	-- reset water flag
 	UPDATE temp_anlgraf SET water=0;
@@ -162,7 +162,9 @@ BEGIN
 
 
 	-- looking for check-valves
-	FOR v_checkvalve IN SELECT config_checkvalve.* FROM om_mincut_valve JOIN config_checkvalve USING (node_id) WHERE proposed = true and result_id = v_mincutid
+	FOR v_checkvalve IN 
+	SELECT config_checkvalve.* FROM om_mincut_valve JOIN config_checkvalve USING (node_id) WHERE proposed = true and result_id = v_mincutid
+	AND active IS TRUE
 	LOOP
 		IF v_checkvalve.to_arc IN (SELECT arc_id FROM om_mincut_arc WHERE result_id = v_mincutid) AND v_isrecursive IS NOT TRUE THEN  -- checkvalve is proposed valve and to_arc is wet
 
@@ -184,7 +186,7 @@ BEGIN
 
 	-- set proposed = false for check valves (as they act as automatic mode)
 	v_querytext = 'UPDATE om_mincut_valve v SET proposed=FALSE FROM (SELECT node_id FROM config_checkvalve) a 
-		       WHERE a.node_id = v.node_id AND result_id = '||v_mincutid;
+		       WHERE a.node_id = v.node_id AND active IS TRUE AND result_id = '||v_mincutid;
 	EXECUTE v_querytext;
 
 	
