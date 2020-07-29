@@ -243,4 +243,18 @@ Uncheck direct insert into node table if you want to use intermediate table (anl
 WHERE id = 2118;
 
 
+--2020/07/29
+UPDATE om_typevalue SET addparam = '{"go2plan":false}' WHERE typevalue = 'visit_param_type';
+UPDATE om_typevalue SET addparam = '{"go2plan":true}' WHERE typevalue = 'visit_param_type' and id = 'REHABIT';
 
+UPDATE config_user_x_expl SET active = TRUE;
+UPDATE config_visit_class_x_feature SET active = TRUE;
+UPDATE config_visit_class_x_parameter SET active = TRUE;
+UPDATE config_visit_class_x_workorder SET active = TRUE;
+UPDATE config_visit_parameter SET active = TRUE;
+UPDATE sys_foreignkey SET active = TRUE;
+
+
+INSERT INTO config_csv(fid, alias, descript, functionname, active)
+VALUES (141, 'Export inp', 'The csv file generated is according standard INP file of EPA software','role_epa', TRUE)
+on conflict (fid) do nothing;

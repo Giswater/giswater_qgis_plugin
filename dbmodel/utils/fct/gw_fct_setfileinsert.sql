@@ -55,7 +55,7 @@ BEGIN
 	
 	-- set output parameter
 	v_fextension = (((p_data)->>'data')::json->>'fields')::json->>'fextension';
-	v_filetype = (SELECT filetype FROM config_file WHERE fextension=v_fextension);
+	v_filetype = (SELECT filetype FROM config_file WHERE fextension=v_fextension AND active IS TRUE);
 
 	v_data = (p_data->>'data')::json;
 	v_fields = ((p_data->>'data')::json->>'fields')::json;
