@@ -61,6 +61,9 @@ BEGIN
 	v_updatevalues :=  ((p_data ->>'data')::json->>'parameters')::json->>'updateValues'::text;
 	v_array :=  replace(replace(replace (v_id::text, ']', ')'),'"', ''''), '[', '(');
 	v_exploitation := ((p_data ->>'data')::json->>'parameters')::json->>'exploitation';
+
+	DELETE FROM selector_expl WHERE cur_user = current_user;
+	INSERT INTO selector_expl VALUES (v_exploitation, cur_user);
 	
 	--Execute the process only if admin_raster_dem is true
 	IF (SELECT value FROM config_param_system WHERE parameter='admin_raster_dem') = 'TRUE' THEN
