@@ -1046,8 +1046,10 @@ class ApiCF(ApiParent, QObject):
                     self.controller.close_docker()
                 self.close_dialog(dialog)
                 return
-
-            feature = f'"id":"{self.new_feature.attribute(id_name)}", '
+            if self.new_feature.attribute(id_name) is not None:
+                feature = f'"id":"{self.new_feature.attribute(id_name)}", '
+            else:
+                feature = f'"id":"{self.feature_id}", '
 
         # If we make an info
         else:
