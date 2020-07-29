@@ -111,9 +111,9 @@ BEGIN
 
 	RAISE NOTICE '1 - Check result orphan nodes on rpt tables (fid:  238)';
 	v_querytext = '(SELECT node_id, nodecat_id, the_geom FROM (
-			SELECT node_id FROM temp_node WHERE sector_id > 0 EXCEPT 
-			(SELECT node_1 as node_id FROM temp_arc UNION
-			SELECT node_2 FROM temp_arc ))a
+			SELECT node_id FROM temp_node where result_id = '||quote_literal(v_result_id)||' and sector_id > 0 EXCEPT 
+			(SELECT node_1 as node_id FROM temp_arc where result_id = '||quote_literal(v_result_id)||' UNION
+			SELECT node_2 FROM temp_arc where result_id = '||quote_literal(v_result_id)||'))a
 			JOIN temp_node USING (node_id)) b';
 	
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
@@ -122,7 +122,7 @@ BEGIN
 		SELECT 238, node_id, nodecat_id, ''Orphan node'', the_geom FROM ', v_querytext);
 		INSERT INTO audit_check_data (fid, criticity, error_message)
 		VALUES (v_fid, 3, concat('ERROR: There is/are ',v_count,
-		' node''s orphan on this result. Some inconsistency may have been generated because state_type.'));
+		' node''s orphan on this result. Some inconsistency may have been generated because state_type (238).'));
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 1, 'INFO: No node(s) orphan found on this result.');
@@ -130,13 +130,13 @@ BEGIN
 
 	
 	RAISE NOTICE '2 - Check result arcs without start/end node (fid:  231)';
-	v_querytext = '	SELECT 231, arc_id, arccat_id, state, expl_id, the_geom, '||quote_literal(v_result_id)||', ''Arcs without node_1 or node_2.'' FROM temp_arc 
+	v_querytext = '	SELECT 231, arc_id, arccat_id, state, expl_id, the_geom, '||quote_literal(v_result_id)||', ''Arcs without node_1 or node_2.'' FROM temp_arc where result_id = '||quote_literal(v_result_id)||'
 			EXCEPT ( 
-			SELECT 231, arc_id, arccat_id, state, expl_id, the_geom, '||quote_literal(v_result_id)||', ''Arcs without node_1 or node_2.'' FROM temp_arc JOIN 
-			(SELECT node_id FROM temp_node ) a ON node_1=node_id 
+			SELECT 231, arc_id, arccat_id, state, expl_id, the_geom, '||quote_literal(v_result_id)||', ''Arcs without node_1 or node_2.'' FROM temp_arc where result_id = '||quote_literal(v_result_id)||' JOIN 
+			(SELECT node_id FROM temp_node where result_id = '||quote_literal(v_result_id)||' ) a ON node_1=node_id 
 			UNION 
-			SELECT 231, arc_id, arccat_id, state, expl_id, the_geom, '||quote_literal(v_result_id)||', ''Arcs without node_1 or node_2.'' FROM temp_arc JOIN 
-			(SELECT node_id FROM temp_node ) b ON node_2=node_id )';
+			SELECT 231, arc_id, arccat_id, state, expl_id, the_geom, '||quote_literal(v_result_id)||', ''Arcs without node_1 or node_2.'' FROM temp_arc JOIN where result_id = '||quote_literal(v_result_id)||'
+			(SELECT node_id FROM temp_node where result_id = '||quote_literal(v_result_id)||') b ON node_2=node_id )';
 
 	EXECUTE 'SELECT count(*) FROM ('||v_querytext ||')a'
 		INTO v_count;
@@ -157,15 +157,11 @@ BEGIN
 	-- fill the graf table
 	INSERT INTO temp_anlgraf (arc_id, node_1, node_2, water, flag, checkf)
 	select  a.arc_id, case when node_1 is null then '00000' else node_1 end, case when node_2 is null then '00000' else node_2 end, 0, 0, 0
-	from temp_arc a
+	from temp_arc a where result_id = v_result_id
 	union all
 	select  a.arc_id, case when node_2 is null then '00000' else node_2 end, case when node_1 is null then '00000' else node_1 end, 0, 0, 0
-	from temp_arc a
+	from temp_arc a where result_id = v_result_id
 	ON CONFLICT (arc_id, node_1) DO NOTHING;
-	
-	-- Delete from the graf table all that rows that only exists one time (it means that arc don't have the correct topology)
-	DELETE FROM temp_anlgraf WHERE arc_id IN 
-	(SELECT a.arc_id FROM (SELECT count(*) AS count, arc_id FROM temp_anlgraf GROUP BY 2 HAVING count(*)=1 ORDER BY 2)a);
 
 	-- set boundary conditions of graf table
 	IF v_project_type = 'WS' THEN
@@ -318,45 +314,45 @@ BEGIN
 	RAISE NOTICE '5 - Stats';
 	
 	IF v_project_type =  'WS' THEN
-		SELECT min(elevation), max(elevation) INTO v_min, v_max FROM temp_node;
+		SELECT min(elevation), max(elevation) INTO v_min, v_max FROM temp_node WHERE result_id = v_result_id;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 		concat('Data analysis for node elevation. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 		
-		SELECT min(length), max(length) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'PIPE';
+		SELECT min(length), max(length) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'PIPE' AND result_id = v_result_id;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 		concat('Data analysis for pipe length. Minimun and maximum values are: (',v_min,' - ',v_max,' ).'));
 		
-		SELECT min(diameter), max(diameter) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'PIPE';
+		SELECT min(diameter), max(diameter) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'PIPE' AND result_id = v_result_id;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 		concat('Data analysis for pipe diameter. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 
-		SELECT min(roughness), max(roughness) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'PIPE';
+		SELECT min(roughness), max(roughness) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'PIPE' AND result_id = v_result_id;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 		concat('Data analysis for pipe roughness. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 		
 	ELSIF v_project_type  ='UD' THEN
 		
-		SELECT min(length), max(length) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'CONDUIT';
+		SELECT min(length), max(length) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'CONDUIT' AND result_id = v_result_id;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 		concat('Data analysis for conduit length. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 
-		SELECT min(n), max(n) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'CONDUIT';
+		SELECT min(n), max(n) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'CONDUIT' AND result_id = v_result_id;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 		concat('Data analysis for conduit manning roughness coeficient. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 
-		SELECT min(elevmax1), max(elevmax1) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'CONDUIT';
+		SELECT min(elevmax1), max(elevmax1) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'CONDUIT' AND result_id = v_result_id;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 		concat('Data analysis for conduit z1. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 		
-		SELECT min(elevmax2), max(elevmax2) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'CONDUIT';
+		SELECT min(elevmax2), max(elevmax2) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'CONDUIT' AND result_id = v_result_id;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 		concat('Data analysis for conduit z2. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 	
-		SELECT min(slope), max(slope) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'CONDUIT';
+		SELECT min(slope), max(slope) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'CONDUIT' AND result_id = v_result_id;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 		concat('Data analysis for conduit slope. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 		
-		SELECT min(elev), max(elev) INTO v_min, v_max FROM temp_node;
+		SELECT min(elev), max(elev) INTO v_min, v_max FROM temp_node WHERE result_id = v_result_id;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 		concat('Data analysis for node elevation. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));	
 	END IF;

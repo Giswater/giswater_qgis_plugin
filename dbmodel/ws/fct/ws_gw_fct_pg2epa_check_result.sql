@@ -120,7 +120,8 @@ BEGIN
 	INTO v_options;		
 			
 	SELECT  count(*) INTO v_doublen2a FROM inp_pump JOIN temp_arc ON concat(node_id, '_n2a_4') = arc_id 
-	JOIN inp_curve c ON c.id=curve_id;
+	JOIN inp_curve c ON c.id=curve_id
+	WHERE temp_arc.result_id = v_result_id;
 	
 	SELECT value INTO v_demandtype FROM config_param_user WHERE parameter = 'inp_options_demandtype' AND cur_user=current_user;
 	SELECT value INTO v_patternmethod FROM config_param_user WHERE parameter = 'inp_options_patternmethod' AND cur_user=current_user;
@@ -213,7 +214,7 @@ BEGIN
 
 
 		RAISE NOTICE '2 - Check nod2arc length control';	
-		v_nodearc_real = (SELECT st_length (the_geom) FROM temp_arc WHERE  arc_type='NODE2ARC' LIMIT 1);
+		v_nodearc_real = (SELECT st_length (the_geom) FROM temp_arc WHERE  arc_type='NODE2ARC' AND result_id =  v_result_id LIMIT 1);
 		v_nodearc_user = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_nodarc_length' AND cur_user=current_user);
 
 		IF  v_nodearc_user > (v_nodearc_real+0.01) THEN 
@@ -255,7 +256,7 @@ BEGIN
 		RAISE NOTICE '4 - Check curves 3p';
 		IF v_buildupmode = 1 THEN
 
-			SELECT count(*) INTO v_count FROM temp_arc WHERE epa_type='PUMP' AND addparam::json->>'curve_id' = '' AND addparam::json->>'pump_type' = '1';
+			SELECT count(*) INTO v_count FROM temp_arc WHERE epa_type='PUMP' AND result_id =  v_result_id AND addparam::json->>'curve_id' = '' AND addparam::json->>'pump_type' = '1';
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid, v_result_id, 4, concat('SUPPLY MODE: There is/are ',v_count,' pump_type = 1 with null values on curve_id column. Default user value for curve of pumptype = 1 ( ',
@@ -263,7 +264,7 @@ BEGIN
 				v_count=0;
 			END IF;	
 		ELSE
-			SELECT count(*) INTO v_count FROM temp_arc WHERE epa_type='PUMP' AND addparam::json->>'curve_id' = '';
+			SELECT count(*) INTO v_count FROM temp_arc WHERE result_id =  v_result_id AND epa_type='PUMP' AND addparam::json->>'curve_id' = '';
 
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -280,7 +281,7 @@ BEGIN
 
 			-- vnode over nodarc for case of use vnode treaming arcs on network model
 			SELECT count(vnode_id) INTO v_count FROM temp_arc , vnode JOIN v_edit_link a ON vnode_id=exit_id::integer
-			WHERE st_dwithin ( temp_arc.the_geom, vnode.the_geom, 0.01) AND vnode.state > 0 AND arc_type = 'NODE2ARC';
+			WHERE st_dwithin ( temp_arc.the_geom, vnode.the_geom, 0.01) AND temp_arc.result_id =  v_result_id  AND vnode.state > 0 AND arc_type = 'NODE2ARC';
 
 			IF v_count > 0 THEN
 
@@ -293,7 +294,7 @@ BEGIN
 				INSERT INTO anl_node (fid, node_id, nodecat_id, state, expl_id, the_geom, result_id, descript)
 				SELECT 159, vnode_id, 'VNODE', 1, temp_arc.expl_id, vnode.the_geom, v_result_id, 'Vnode overlaping nodarcs'  
 				FROM temp_arc , vnode JOIN v_edit_link a ON vnode_id=exit_id::integer
-				WHERE st_dwithin ( temp_arc.the_geom, vnode.the_geom, 0.01) AND vnode.state > 0 AND arc_type = 'NODE2ARC';
+				WHERE st_dwithin ( temp_arc.the_geom, vnode.the_geom, 0.01) AND temp_arc.result_id =  v_result_id AND vnode.state > 0 AND arc_type = 'NODE2ARC';
 				v_count=0;	
 			ELSE
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
