@@ -47,7 +47,7 @@ BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
  
-	-- Get data from config tables
+	-- Get system variables
  	SELECT project_type INTO v_projecttype FROM sys_version LIMIT 1;
 	SELECT value::boolean INTO v_sys_statetopocontrol FROM config_param_system WHERE parameter='edit_state_topocontrol' ;
 	SELECT value::boolean INTO geom_slp_direction_bool FROM config_param_system WHERE parameter='edit_slope_direction' ;
@@ -56,7 +56,9 @@ BEGIN
 	SELECT value::boolean INTO v_nodeinsert_arcendpoint  FROM config_param_system WHERE parameter='edit_arc_insert_automatic_endpoint';
 	SELECT ((value::json)->>'activated') INTO v_arc_searchnodes_control FROM config_param_system WHERE parameter='edit_arc_searchnodes';
 	SELECT ((value::json)->>'value') INTO v_arc_searchnodes FROM config_param_system WHERE parameter='edit_arc_searchnodes';
-	SELECT value::boolean INTO v_user_dis_statetopocontrol FROM config_param_user WHERE parameter='edit_disable_statetopocontrol';
+	
+	-- Get user variables
+	SELECT value::boolean INTO v_user_dis_statetopocontrol FROM config_param_user WHERE parameter='edit_disable_statetopocontrol' AND cur_user = current_user;
 	
 	IF v_sys_statetopocontrol IS NOT TRUE OR v_user_dis_statetopocontrol IS TRUE THEN
 
