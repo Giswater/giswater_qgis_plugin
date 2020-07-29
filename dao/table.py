@@ -105,11 +105,14 @@ class Table(object):
         # remove all None elements
         none_indexes = []
         for index, value in enumerate(values):
-            if value in (None, '', 'null'):
+            if value in (None, '', 'null', 'NULL'):
                 none_indexes.append(index)
+
         for index in reversed(none_indexes):  # reversed to avoid change of index
-            del fields[index]
-            del values[index]
+
+            if fields[index] not in ('event_code', 'value', 'text'):
+                del fields[index]
+                del values[index]
         values = [str(x) for x in values]
 
         current_pk = getattr(self, self.pk())
