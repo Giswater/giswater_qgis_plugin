@@ -72,7 +72,7 @@ BEGIN
 				
 	ELSIF p_action = 'fk' AND p_table IS NOT NULL AND p_table ='ALL' THEN
 
-		FOR v_table IN SELECT * FROM sys_foreignkey
+		FOR v_table IN SELECT * FROM sys_foreignkey AND active IS TRUE
 		LOOP
 			RAISE NOTICE ' v_table %', v_table;
 			EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_typevalue_fk ON '||v_table.target_table||';';
@@ -82,7 +82,7 @@ BEGIN
 
 	ELSIF p_action = 'fk' AND p_table IS NOT NULL AND p_table ='CHECK' THEN
 
-		FOR v_table IN SELECT * FROM sys_foreignkey
+		FOR v_table IN SELECT * FROM sys_foreignkey AND active IS TRUE
 		LOOP
 			RAISE NOTICE ' v_table %', v_table;
 			EXECUTE 'UPDATE '||v_table.target_table||' SET '||v_table.target_field||' = '||v_table.target_field;
