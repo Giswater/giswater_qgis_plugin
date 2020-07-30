@@ -7,15 +7,12 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-INSERT INTO audit_cat_table(id, context, description, sys_role_id, sys_criticity, qgis_criticity)
-    VALUES ('ext_cat_raster', 'external catalog', 'Catalog of rasters', 'role_edit', 0, 0)
+INSERT INTO audit_cat_table(id, description, sys_role_id, sys_criticity, qgis_criticity)
+    VALUES ('ext_cat_raster', 'Catalog of rasters', 'role_edit', 0, 0)
     ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO audit_cat_table(id, context, description, sys_role_id, sys_criticity, qgis_criticity)
-    VALUES ('ext_raster_dem', 'external table', 'Table to store raster DEM', 'role_edit', 0, 0)
+INSERT INTO audit_cat_table(id, description, sys_role_id, sys_criticity, qgis_criticity)
+    VALUES ('ext_raster_dem', 'Table to store raster DEM', 'role_edit', 0, 0)
     ON CONFLICT (id) DO NOTHING;
- 
-UPDATE audit_cat_table SET context='view from external schema'  WHERE id IN ('ext_cat_raster','ext_raster_dem');
-
 
 
