@@ -481,7 +481,7 @@ UPDATE man_type_category SET category_type = replace (category_type, 'Standard',
 UPDATE man_type_location SET location_type = replace (location_type, 'Standard', 'St.');
 UPDATE man_type_function SET function_type = replace (function_type, 'Standard', 'St.');
 
-update config_form_fields SET widgettype = 'text' WHERE columnname  = 'macrosector_id' AND dv_querytext = null AND placeholder  ='Ex.macrosector_id';
+update config_form_fields SET widgettype = 'text' WHERE columnname  = 'macrosector_id' AND dv_querytext = null;
 
 UPDATE v_edit_node SET nodecat_id = 'CHK-VALVE100-PN16' WHERE node_id = '1092';
 
@@ -661,10 +661,14 @@ UPDATE connec SET district_id =2 WHERE expl_id=2;
 --arc
 UPDATE config_form_fields SET layoutname = 'lyt_none' where columnname = 'arc_id' and formname like '%ve_arc_%';
 UPDATE config_form_fields SET layoutname = 'lyt_none' where columnname = 'arc_id' and formname like '%v_edit_arc%';
+UPDATE config_form_fields SET placeholder = NULL where formname like '%v_edit_arc%';
+UPDATE config_form_fields SET placeholder = NULL where formname like '%ve_arc%';
 
 --node
 UPDATE config_form_fields SET layoutname = 'lyt_none' where columnname = 'node_id' and formname like '%ve_node_%';
 UPDATE config_form_fields SET layoutname = 'lyt_none' where columnname = 'node_id' and formname like '%v_edit_node%';
+UPDATE config_form_fields SET placeholder = NULL where formname like '%v_edit_node%';
+UPDATE config_form_fields SET placeholder = NULL where formname like '%ve_node%';
 
 --connec
 UPDATE config_form_fields SET layoutname = 'lyt_none' where columnname = 'connec_id' and formname like '%ve_connec_%';
@@ -673,3 +677,11 @@ UPDATE config_form_fields SET layoutname = 'lyt_top_1', layoutorder = 9 where co
 UPDATE config_form_fields SET layoutname = 'lyt_top_1', layoutorder = 9 where columnname = 'arc_id' and formname like '%v_edit_connec%';
 update config_form_fields SET layoutorder = 1 where columnname = 'soilcat_id' and formname like '%ve_connec_%';
 update config_form_fields SET layoutorder = 1 where columnname = 'soilcat_id' and formname like '%v_edit_connec%';
+UPDATE config_form_fields SET placeholder = NULL where formname like '%v_edit_connec%';
+UPDATE config_form_fields SET placeholder = NULL where formname like '%ve_connec%';
+
+--placeholders
+UPDATE config_form_fields SET placeholder = 'Only when state is obsolete' where columnname = 'workcat_id_end';
+UPDATE config_form_fields SET placeholder = 'Top floor of the building (ex: 3)' where columnname = 'top_floor' AND formname like '%ve_connec%';
+UPDATE config_form_fields SET placeholder = 'Optional: Arc_id of related arc' where columnname = 'arc_id' AND formname like '%ve_node%';
+UPDATE config_form_fields SET placeholder = 'Optional: Node_id of the parent node' where columnname = 'parent_id' AND formname like '%ve_node%';

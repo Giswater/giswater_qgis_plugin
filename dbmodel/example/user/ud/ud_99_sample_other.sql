@@ -524,10 +524,14 @@ UPDATE gully SET district_id =2 WHERE expl_id=2;
 --arc
 UPDATE config_form_fields SET layoutname = 'lyt_none' where columnname = 'arc_id' and formname like '%ve_arc_%';
 UPDATE config_form_fields SET layoutname = 'lyt_none' where columnname = 'arc_id' and formname like '%v_edit_arc%';
+UPDATE config_form_fields SET placeholder = NULL where formname like '%v_edit_arc%';
+UPDATE config_form_fields SET placeholder = NULL where formname like '%ve_arc%';
 
 --node
 UPDATE config_form_fields SET layoutname = 'lyt_none' where columnname = 'node_id' and formname like '%ve_node_%';
 UPDATE config_form_fields SET layoutname = 'lyt_none' where columnname = 'node_id' and formname like '%v_edit_node%';
+UPDATE config_form_fields SET placeholder = NULL where formname like '%v_edit_node%';
+UPDATE config_form_fields SET placeholder = NULL where formname like '%ve_node%';
 
 --connec
 UPDATE config_form_fields SET layoutname = 'lyt_none' where columnname = 'connec_id' and formname like '%ve_connec_%';
@@ -536,6 +540,8 @@ UPDATE config_form_fields SET layoutname = 'lyt_top_1', layoutorder = 9 where co
 UPDATE config_form_fields SET layoutname = 'lyt_top_1', layoutorder = 9 where columnname = 'arc_id' and formname like '%v_edit_connec%';
 update config_form_fields SET layoutorder = 1 where columnname = 'soilcat_id' and formname like '%ve_connec_%';
 update config_form_fields SET layoutorder = 1 where columnname = 'soilcat_id' and formname like '%v_edit_connec%';
+UPDATE config_form_fields SET placeholder = NULL where formname like '%v_edit_connec%';
+UPDATE config_form_fields SET placeholder = NULL where formname like '%ve_connec%';
 
 --gully
 UPDATE config_form_fields SET layoutname = 'lyt_none' where columnname = 'gully_id' and formname like '%ve_gully_%';
@@ -544,5 +550,11 @@ UPDATE config_form_fields SET layoutname = 'lyt_top_1', layoutorder = 9 where co
 UPDATE config_form_fields SET layoutname = 'lyt_top_1', layoutorder = 9 where columnname = 'arc_id' and formname like '%v_edit_gully%';
 update config_form_fields SET layoutorder = 1 where columnname = 'soilcat_id' and formname like '%ve_gully_%';
 update config_form_fields SET layoutorder = 1 where columnname = 'soilcat_id' and formname like '%ve_gully_%';
+UPDATE config_form_fields SET placeholder = NULL where formname like '%v_edit_gully%';
+UPDATE config_form_fields SET placeholder = NULL where formname like '%ve_gully%';
 
 UPDATE cat_feature_node SET isexitupperintro = 1 WHERE id = 'CIRC_MANHOLE';
+
+--placeholder
+UPDATE config_form_fields SET placeholder = 'Only when state is obsolete' where columnname = 'workcat_id_end';
+UPDATE config_form_fields SET placeholder = 'Catalog of the private part of connection' where columnname = 'private_connecat_id' AND formname like '%ve_connec%';
