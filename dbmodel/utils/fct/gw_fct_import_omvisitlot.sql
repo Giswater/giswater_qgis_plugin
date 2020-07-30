@@ -45,8 +45,10 @@ BEGIN
 	-- get input parameter
 	v_featuretype = (SELECT csv2 FROM temp_csv WHERE cur_user=current_user AND fid = 154 LIMIT 1);
 	v_featuretable = (SELECT tablename FROM config_api_visit WHERE visitclass_id=(SELECT csv3 FROM temp_csv WHERE cur_user=current_user AND fid = 154 LIMIT 1)::integer);
-	v_parameter1 = (SELECT parameter_id FROM config_visit_parameter_action cxp JOIN config_api_visit cav ON cav.visitclass_id=cxp.class_id WHERE cav.tablename = v_featuretable LIMIT 1);
-	v_parameter2 = (SELECT parameter_id FROM config_visit_parameter_action cxp JOIN config_api_visit cav ON cav.visitclass_id=cxp.class_id WHERE cav.tablename = v_featuretable LIMIT 1 OFFSET 1);
+	v_parameter1 = (SELECT parameter_id FROM config_visit_class_x_parameter cxp JOIN config_visit_class cav ON cav.id=cxp.class_id 
+		WHERE cav.tablename = v_featuretable AND cav.active IS TRUE AND cxp.active IS TRUE LIMIT 1);
+	v_parameter2 = (SELECT parameter_id FROM config_visit_class_x_parameter cxp JOIN config_visit_class cav ON cav.id=cxp.class_id 
+		WHERE cav.tablename = v_featuretable AND cav.active IS TRUE AND cxp.active IS TRUE LIMIT 1 OFFSET 1);
 
 	-- manage log (fid: 154)
 	DELETE FROM audit_check_data WHERE fid=154 AND cur_user=current_user;
