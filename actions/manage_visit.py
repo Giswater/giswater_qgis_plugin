@@ -351,7 +351,6 @@ class ManageVisit(ParentManage, QObject):
             # Get parameter_id and feature_type from his event
             self.event_parameter_id, self.event_feature_type = self.get_data_from_event(self.visit_id_value)
             qt_tools.set_combo_itemData(self.dlg_add_visit.parameter_id, self.event_parameter_id, 0)
-            qt_tools.setWidgetEnabled(self.dlg_add_visit, 'parameter_id', False)
 
         # C) load all related events in the relative table
         self.filter = f"visit_id = '{text}'"
@@ -674,7 +673,6 @@ class ManageVisit(ParentManage, QObject):
 
         if self.event_parameter_id:
             qt_tools.set_combo_itemData(self.dlg_add_visit.parameter_id, self.event_parameter_id, 0)
-            qt_tools.setWidgetEnabled(self.dlg_add_visit, 'parameter_id', False)
 
         if geom_type.lower() == 'all':
             return
