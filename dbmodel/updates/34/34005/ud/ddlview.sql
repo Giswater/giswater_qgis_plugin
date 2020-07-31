@@ -194,6 +194,23 @@ DROP VIEW IF EXISTS ve_gully;
 DROP VIEW IF EXISTS v_gully;
 DROP VIEW IF EXISTS vu_gully;
 
+--change type of description columns
+ALTER TABLE node ALTER COLUMN observ TYPE text;
+ALTER TABLE node ALTER COLUMN descript TYPE text;
+ALTER TABLE node ALTER COLUMN annotation TYPE text;
+ALTER TABLE node ALTER COLUMN comment TYPE text;
+ALTER TABLE arc ALTER COLUMN observ TYPE text;
+ALTER TABLE arc ALTER COLUMN descript TYPE text;
+ALTER TABLE arc ALTER COLUMN annotation TYPE text;
+ALTER TABLE arc ALTER COLUMN comment TYPE text;
+ALTER TABLE connec ALTER COLUMN observ TYPE text;
+ALTER TABLE connec ALTER COLUMN descript TYPE text;
+ALTER TABLE connec ALTER COLUMN annotation TYPE text;
+ALTER TABLE connec ALTER COLUMN comment TYPE text;
+ALTER TABLE gully ALTER COLUMN observ TYPE text;
+ALTER TABLE gully ALTER COLUMN descript TYPE text;
+ALTER TABLE gully ALTER COLUMN annotation TYPE text;
+ALTER TABLE gully ALTER COLUMN comment TYPE text;
 
 
 -- CREACIO DE LES VU

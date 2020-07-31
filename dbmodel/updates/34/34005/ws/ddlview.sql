@@ -163,7 +163,11 @@ DROP VIEW IF EXISTS v_edit_man_tap;
 DROP VIEW IF EXISTS v_edit_man_greentap;
 DROP VIEW IF EXISTS v_edit_man_wjoin;
 
-
+--change type of description columns
+ALTER TABLE connec ALTER COLUMN observ TYPE text;
+ALTER TABLE connec ALTER COLUMN descript TYPE text;
+ALTER TABLE connec ALTER COLUMN annotation TYPE text;
+ALTER TABLE connec ALTER COLUMN comment TYPE text;
 
 -- CREACIO DE LES VU
 --------------------
