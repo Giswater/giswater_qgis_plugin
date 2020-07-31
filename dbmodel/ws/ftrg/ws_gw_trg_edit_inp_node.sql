@@ -104,7 +104,7 @@ BEGIN
 
         UPDATE node 
         SET elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", 
-            annotation=NEW.annotation, the_geom=NEW.the_geom 
+            annotation=NEW.annotation
         WHERE node_id=OLD.node_id;
 
         EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
