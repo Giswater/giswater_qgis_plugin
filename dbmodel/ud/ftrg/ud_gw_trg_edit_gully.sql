@@ -590,21 +590,22 @@ BEGIN
 			NEW.link = replace(NEW.link, v_link_path,'');
 		END IF;
 
-        --set rotation field
-		WITH index_query AS(
-		SELECT ST_Distance(the_geom, NEW.the_geom) as distance, the_geom FROM arc WHERE state=1 ORDER BY the_geom <-> NEW.the_geom LIMIT 10)
-		SELECT St_linelocatepoint(the_geom, St_closestpoint(the_geom, NEW.the_geom)), the_geom INTO v_linelocatepoint, v_thegeom FROM index_query ORDER BY distance LIMIT 1;
-		IF v_linelocatepoint < 0.01 THEN
-			v_rotation = st_azimuth (st_startpoint(v_thegeom), st_lineinterpolatepoint(v_thegeom,0.01));
-		ELSIF v_linelocatepoint > 0.99 THEN
-			v_rotation = st_azimuth (st_lineinterpolatepoint(v_thegeom,0.98), st_lineinterpolatepoint(v_thegeom,0.99));
-		ELSE
-			v_rotation = st_azimuth (st_lineinterpolatepoint(v_thegeom,v_linelocatepoint), st_lineinterpolatepoint(v_thegeom,v_linelocatepoint+0.01));
+		-- double geometry rotation update
+		IF v_doublegeometry AND ST_equals(NEW.the_geom, OLD.the_geom) IS FALSE THEN
+			WITH index_query AS(
+			SELECT ST_Distance(the_geom, NEW.the_geom) as distance, the_geom FROM arc WHERE state=1 ORDER BY the_geom <-> NEW.the_geom LIMIT 10)
+			SELECT St_linelocatepoint(the_geom, St_closestpoint(the_geom, NEW.the_geom)), the_geom INTO v_linelocatepoint, v_thegeom FROM index_query ORDER BY distance LIMIT 1;
+			IF v_linelocatepoint < 0.01 THEN
+				v_rotation = st_azimuth (st_startpoint(v_thegeom), st_lineinterpolatepoint(v_thegeom,0.01));
+			ELSIF v_linelocatepoint > 0.99 THEN
+				v_rotation = st_azimuth (st_lineinterpolatepoint(v_thegeom,0.98), st_lineinterpolatepoint(v_thegeom,0.99));
+			ELSE
+				v_rotation = st_azimuth (st_lineinterpolatepoint(v_thegeom,v_linelocatepoint), st_lineinterpolatepoint(v_thegeom,v_linelocatepoint+0.01));
+			END IF;
+
+			NEW.rotation = v_rotation*180/pi();
+			v_rotation = -(v_rotation - pi()/2);
 		END IF;
-
-		NEW.rotation = v_rotation*180/pi();
-		v_rotation = -(v_rotation - pi()/2);
-
 
 		-- double geometry catalog update
 		IF v_doublegeometry AND NEW.gratecat_id != OLD.gratecat_id THEN
@@ -661,7 +662,6 @@ BEGIN
 					ELSE
 						UPDATE polygon SET the_geom = v_the_geom_pol WHERE pol_id = (SELECT pol_id FROM gully WHERE gully_id = NEW.gully_id);
 					END IF;
-					
 				END IF;
 		END IF;
 
