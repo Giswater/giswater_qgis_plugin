@@ -111,9 +111,9 @@ BEGIN
 		v_width = (SELECT width FROM cat_grate WHERE id=NEW.gratecat_id);
 
 		-- control null grate dimensions
-		IF v_length*v_width IS NULL THEN
-			v_length = 70;
-			v_width = 30;
+		IF v_length*v_width IS NULL OR v_length*v_width = 0 THEN -- use default values for node polygon
+			v_length = v_doublegeom_buffer*100;
+			v_width = v_doublegeom_buffer*100;
 		END IF;
 					
 		-- transform grate dimensions
