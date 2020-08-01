@@ -8,4 +8,4 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2020/07/14
-UPDATE config_param_syste SET project_type = 'ws' WHERE parameter = 'om_mincut_enable_alerts';
+UPDATE config_param_system SET project_type = 'ws' WHERE parameter = 'om_mincut_enable_alerts';
