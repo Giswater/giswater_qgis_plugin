@@ -6,10 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 1220
  
-
--- DROP FUNCTION "SCHEMA_NAME".gw_trg_edit_node();
-
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_node()
+CREATE OR REPLACE FUNCTION ud_sample.gw_trg_edit_node()
   RETURNS trigger AS
 $BODY$
 DECLARE 
@@ -23,18 +20,39 @@ v_code_autofill_bool boolean;
 v_count integer;
 v_promixity_buffer double precision;
 v_link_path varchar;
-v_insert_double_geom boolean;
-v_double_geom_buffer double precision;
+v_doublegeom_buffer double precision;
 v_addfields record;
 v_new_value_param text;
 v_old_value_param text;
 v_customfeature text;
 v_featurecat text;
-v_auto_pol_id text;
 v_streetaxis text;
 v_streetaxis2 text;
 v_matfromcat boolean = false;
 v_sys_type text;
+v_doublegeometry boolean;
+v_length float;
+v_width float;
+v_rotation float;
+v_unitsfactor float;
+v_linelocatepoint float;
+v_thegeom public.geometry;
+v_the_geom_pol public.geometry;
+p21x float; 
+p02x float;
+p21y float; 
+p02y float;
+p22x float;
+p22y float;
+p01x float;
+p01y float;
+dx float;
+dy float;
+v_x float;
+v_y float;
+v_new_pol_id varchar(16);
+v_codeautofill boolean;
+v_srid integer;
 
 
 BEGIN
@@ -42,7 +60,7 @@ BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	v_man_table:= TG_ARGV[0];
 
-	--modify values for custom view inserts
+	-- modify values for custom view inserts
 	IF v_man_table IN (SELECT id FROM cat_feature_node) THEN
 		v_customfeature:=v_man_table;
 		v_man_table:=(SELECT man_table FROM cat_feature_node WHERE id=v_man_table);
@@ -50,10 +68,12 @@ BEGIN
 
 	v_type_v_man_table:=v_man_table;
 
-	--Get data from config table	
+	-- get data from config table	
 	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_buffer_on_mapzone');
-	SELECT ((value::json)->>'activated')::boolean INTO v_insert_double_geom FROM config_param_system WHERE parameter='edit_node_doublegeom';
-	SELECT ((value::json)->>'value') INTO v_double_geom_buffer FROM config_param_system WHERE parameter='edit_node_doublegeom';
+	SELECT ((value::json)->>'activated')::boolean INTO v_doublegeometry FROM config_param_system WHERE parameter='edit_node_doublegeom';
+	SELECT ((value::json)->>'value') INTO v_doublegeom_buffer FROM config_param_system WHERE parameter='edit_node_doublegeom';
+	v_unitsfactor = (SELECT value::float FROM config_param_user WHERE "parameter"='edit_gully_doublegeom' AND cur_user=current_user);
+	v_srid = (SELECT epsg FROM sys_version LIMIT 1);
 
 
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
@@ -65,16 +85,88 @@ BEGIN
 		IF (SELECT matcat_id FROM cat_node WHERE id = NEW.nodecat_id) IS NOT NULL THEN
 			v_matfromcat = true;
 		END IF;
-		
 	END IF;
-	
+		
 	-- Control insertions ID
 	IF TG_OP = 'INSERT' THEN
 
-		-- Node ID
+		-- Node_id
 		IF (NEW.node_id IS NULL) THEN
 			PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
 			NEW.node_id:= (SELECT nextval('urn_id_seq'));
+		END IF;
+
+		-- set and get id for polygon
+		IF v_doublegeometry THEN
+			PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
+			v_new_pol_id:= (SELECT nextval('urn_id_seq'));
+		END IF;
+
+		-- get sys type for parent table
+		IF v_man_table = 'parent' THEN
+			v_sys_type := (SELECT type FROM cat_feature_node JOIN cat_node ON cat_node.node_type=cat_feature_node.id WHERE cat_node.id = NEW.nodecat_id);
+		END IF;
+
+		-- manage netgully doublegeom in case of exists
+		IF v_doublegeometry AND (v_sys_type = 'NETGULLY' OR v_man_table = 'man_netgully') THEN
+
+			--set rotation field
+			WITH index_query AS(
+			SELECT ST_Distance(the_geom, NEW.the_geom) as distance, the_geom FROM arc WHERE state=1 ORDER BY the_geom <-> NEW.the_geom LIMIT 10)
+			SELECT St_linelocatepoint(the_geom, St_closestpoint(the_geom, NEW.the_geom)), the_geom INTO v_linelocatepoint, v_thegeom FROM index_query ORDER BY distance LIMIT 1;
+			IF v_linelocatepoint < 0.01 THEN
+				v_rotation = st_azimuth (st_startpoint(v_thegeom), st_lineinterpolatepoint(v_thegeom,0.01));
+			ELSIF v_linelocatepoint > 0.99 THEN
+				v_rotation = st_azimuth (st_lineinterpolatepoint(v_thegeom,0.98), st_lineinterpolatepoint(v_thegeom,0.99));
+			ELSE
+				v_rotation = st_azimuth (st_lineinterpolatepoint(v_thegeom,v_linelocatepoint), st_lineinterpolatepoint(v_thegeom,v_linelocatepoint+0.01));
+			END IF;
+
+			NEW.rotation = v_rotation*180/pi();
+			v_rotation = -(v_rotation - pi()/2);
+
+			-- get gratecat dimensions
+			IF v_man_table = 'man_netgully' THEN
+				v_length = (SELECT length FROM cat_grate WHERE id=NEW.gratecat_id);
+				v_width = (SELECT width FROM cat_grate WHERE id=NEW.gratecat_id);
+			END IF;
+
+			-- control null grate dimensions
+			IF v_length*v_width IS NULL THEN
+				v_length = 70;
+				v_width = 30;
+			END IF;
+						
+			-- transform grate dimensions
+			v_unitsfactor = 0.01*v_unitsfactor ; -- using 0.01 to convert from cms of catalog  to meters of the map
+			v_length = v_length*v_unitsfactor;
+			v_width = v_width*v_unitsfactor;
+
+			-- calculate center coordinates
+			v_x = st_x(NEW.the_geom);
+			v_y = st_y(NEW.the_geom);
+    
+			-- calculate dx & dy to fix extend from center
+			dx = v_length/2;
+			dy = v_width/2;
+
+			-- calculate the extend polygon
+			p01x = v_x - dx*cos(v_rotation)-dy*sin(v_rotation);
+			p01y = v_y - dx*sin(v_rotation)+dy*cos(v_rotation);
+	
+			p02x = v_x + dx*cos(v_rotation)-dy*sin(v_rotation);
+			p02y = v_y + dx*sin(v_rotation)+dy*cos(v_rotation);
+
+			p21x = v_x - dx*cos(v_rotation)+dy*sin(v_rotation);
+			p21y = v_y - dx*sin(v_rotation)-dy*cos(v_rotation); 
+
+			p22x = v_x + dx*cos(v_rotation)+dy*sin(v_rotation);
+			p22y = v_y + dx*sin(v_rotation)-dy*cos(v_rotation);
+			
+			-- generating the geometry
+			EXECUTE 'SELECT ST_Multi(ST_makePolygon(St_SetSrid(ST_GeomFromText(''LINESTRING(' || p21x ||' '|| p21y || ',' ||
+				p22x ||' '|| p22y || ',' || p02x || ' ' || p02y || ','|| p01x ||' '|| p01y || ',' || p21x ||' '|| p21y || ')''),'||v_srid||')))'
+				INTO v_the_geom_pol;
 		END IF;
 
 		-- Node type
@@ -103,7 +195,7 @@ BEGIN
 			NEW.epa_type:= (SELECT epa_default FROM cat_feature_node WHERE id=NEW.node_type LIMIT 1)::text;   
 		END IF;
 
-		-- Node Catalog ID
+		-- Node catalog
 		IF (NEW.nodecat_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
@@ -144,8 +236,7 @@ BEGIN
 			END IF;            
 		END IF;
 		
-		
-		-- Sector ID
+		-- Sector
 		IF (NEW.sector_id IS NULL) THEN
 			
 			-- control error without any mapzones defined on the table of mapzone
@@ -177,8 +268,7 @@ BEGIN
 			END IF;            
 		END IF;
 		
-		
-		-- Dma ID
+		-- Dma
 		IF (NEW.dma_id IS NULL) THEN
 			
 			-- control error without any mapzones defined on the table of mapzone
@@ -209,7 +299,6 @@ BEGIN
 				"data":{"message":"1014", "function":"1220","debug_msg":"'||NEW.node_id::text||'"}}$$);';
 			END IF;            
 		END IF;
-		
 		
 		-- Municipality 
 		IF (NEW.muni_id IS NULL) THEN
@@ -243,16 +332,15 @@ BEGIN
 			END IF;            
 		END IF;
 		
-		
 		-- Verified
-        IF (NEW.verified IS NULL) THEN
-            NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-        END IF;
+		IF (NEW.verified IS NULL) THEN
+			NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
 
 		-- State
-        IF (NEW.state IS NULL) THEN
-            NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_state_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-        END IF;
+		IF (NEW.state IS NULL) THEN
+			NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_state_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
 		
 		-- State_type
 		IF (NEW.state=0) THEN
@@ -270,16 +358,16 @@ BEGIN
 		END IF;
 
 		--check relation state - state_type
-        IF NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
-        	IF NEW.state IS NOT NULL THEN
+		IF NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
+			IF NEW.state IS NOT NULL THEN
 				v_sql = NEW.state;
 			ELSE
 				v_sql = 'null';
 			END IF;
 
-	       	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-      		"data":{"message":"3036", "function":"1220","debug_msg":"'||v_sql::text||'"}}$$);';
-	    END IF;
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3036", "function":"1220","debug_msg":"'||v_sql::text||'"}}$$);';
+		END IF;
 	
 		--Inventory	
 		NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
@@ -294,9 +382,9 @@ BEGIN
 		SELECT code_autofill INTO v_code_autofill_bool FROM cat_feature WHERE id=NEW.node_type;
 		
 		--Copy id to code field
-			IF (NEW.code IS NULL AND v_code_autofill_bool IS TRUE) THEN 
-				NEW.code=NEW.node_id;
-			END IF;		
+		IF (NEW.code IS NULL AND v_code_autofill_bool IS TRUE) THEN 
+			NEW.code=NEW.node_id;
+		END IF;		
 
 		-- Workcat_id
 		IF (NEW.workcat_id IS NULL) THEN
@@ -304,25 +392,24 @@ BEGIN
 		END IF;
 			
 		-- Ownercat_id
-        IF (NEW.ownercat_id IS NULL) THEN
-            NEW.ownercat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_ownercat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-        END IF;
+		IF (NEW.ownercat_id IS NULL) THEN
+		    NEW.ownercat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_ownercat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
 		
 		-- Soilcat_id
-        IF (NEW.soilcat_id IS NULL) THEN
-            NEW.soilcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_soilcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-        END IF;
+		IF (NEW.soilcat_id IS NULL) THEN
+		    NEW.soilcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_soilcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
 
 		--Builtdate
 		IF (NEW.builtdate IS NULL) THEN
 			NEW.builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='edit_builtdate_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;
 
-			
-	    -- LINK
-	    IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_usefid_on_linkid')::boolean=TRUE THEN
-	       NEW.link=NEW.node_id;
-	    END IF;
+		-- Link
+		IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_usefid_on_linkid')::boolean=TRUE THEN
+			NEW.link=NEW.node_id;
+		END IF;
 		
 		v_featurecat = NEW.node_type;
 
@@ -366,10 +453,11 @@ BEGIN
 		IF (SELECT upper(value) FROM config_param_system WHERE parameter='admin_raster_dem') = 'TRUE' AND (NEW.top_elev IS NULL) AND
 		(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_upsert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
 			NEW.top_elev = (SELECT ST_Value(rast,1,NEW.the_geom,false) FROM v_ext_raster_dem WHERE id =
-				(SELECT id FROM v_ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
+			(SELECT id FROM v_ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
 		END IF; 
 
-            -- FEATURE INSERT
+		
+		-- feature insert
 		IF v_matfromcat THEN
 			INSERT INTO node (node_id, code, top_elev, custom_top_elev, ymax, custom_ymax, elev, custom_elev, node_type,nodecat_id,epa_type,sector_id,"state", state_type, annotation,observ,"comment",
 			dma_id,soilcat_id, function_type, category_type,fluid_type,location_type,workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id,
@@ -382,7 +470,8 @@ BEGIN
 			NEW.descript, NEW.rotation,NEW.link, NEW.verified, NEW.undelete, NEW.label_x,NEW.label_y,NEW.label_rotation,NEW.the_geom,
 			NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.xyz_date, NEW.unconnected, NEW.num_value, now(), current_user);	
 		ELSE
-			INSERT INTO node (node_id, code, top_elev, custom_top_elev, ymax, custom_ymax, elev, custom_elev, node_type,nodecat_id,epa_type,sector_id,"state", state_type, annotation,observ,"comment",
+			INSERT INTO node 
+			(node_id, code, top_elev, custom_top_elev, ymax, custom_ymax, elev, custom_elev, node_type,nodecat_id,epa_type,sector_id,"state", state_type, annotation,observ,"comment",
 			dma_id,soilcat_id, function_type, category_type,fluid_type,location_type,workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id,
 			muni_id, streetaxis_id, postcode, district_id, streetaxis2_id,postnumber, postnumber2, postcomplement, postcomplement2, descript,rotation,link,verified,
 			undelete,label_x,label_y,label_rotation,the_geom, expl_id, publish, inventory, uncertain, xyz_date, unconnected, num_value, lastupdate, lastupdate_user, matcat_id)
@@ -408,59 +497,41 @@ BEGIN
 		
 		ELSIF v_man_table='man_storage' THEN
 			
-			IF (v_insert_double_geom IS TRUE) THEN
-				IF (NEW.pol_id IS NULL) THEN
-					NEW.pol_id:= (SELECT nextval('urn_id_seq'));
-				END IF;
-
-				INSERT INTO polygon(pol_id, sys_type, the_geom) VALUES (NEW.pol_id, 'STORAGE', (SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_double_geom_buffer))) 
-				from node where node_id=NEW.node_id));
-				INSERT INTO man_storage (node_id,pol_id, length, width, custom_area, max_volume, util_volume, min_height, accessibility, name)
-				VALUES(NEW.node_id, NEW.pol_id, NEW.length, NEW.width,NEW.custom_area, NEW.max_volume, NEW.util_volume, NEW.min_height,NEW.accessibility, NEW.name);
-			
-			ELSE
-				INSERT INTO man_storage (node_id,pol_id, length, width, custom_area, max_volume, util_volume, min_height, accessibility, name)
-				VALUES(NEW.node_id, NEW.pol_id, NEW.length, NEW.width,NEW.custom_area, NEW.max_volume, NEW.util_volume, NEW.min_height,NEW.accessibility, NEW.name);
+			IF v_doublegeometry THEN
+				INSERT INTO polygon(pol_id, sys_type, the_geom) 
+				VALUES (v_new_pol_id, 'STORAGE', (SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_doublegeom_buffer))) 
+				from node where node_id=NEW.node_id));		
 			END IF;
+
+			INSERT INTO man_storage (node_id, pol_id, length, width, custom_area, max_volume, util_volume, min_height, accessibility, name)
+			VALUES(NEW.node_id, v_new_pol_id, NEW.length, NEW.width,NEW.custom_area, NEW.max_volume, NEW.util_volume, NEW.min_height,NEW.accessibility, NEW.name);
 						
 		ELSIF v_man_table='man_netgully' THEN
-					
-			IF (v_insert_double_geom IS TRUE) THEN
-				IF (NEW.pol_id IS NULL) THEN
-					NEW.pol_id:= (SELECT nextval('urn_id_seq'));
-				END IF;
 
-				INSERT INTO polygon(pol_id, sys_type, the_geom) VALUES (NEW.pol_id, 'NETGULLY', (SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_double_geom_buffer))) from node where node_id=NEW.node_id));
-				INSERT INTO man_netgully (node_id,pol_id, sander_depth, gratecat_id, units, groove, siphon ) 
-				VALUES(NEW.node_id, NEW.pol_id, NEW.sander_depth, NEW.gratecat_id, NEW.units, 
-				NEW.groove, NEW.siphon );
-				
-			ELSE
-				INSERT INTO man_netgully (node_id) VALUES(NEW.node_id);
+			IF v_doublegeometry THEN
+				INSERT INTO polygon(pol_id, sys_type, the_geom) 
+				VALUES (v_new_pol_id, 'NETGULLY', v_the_geom_pol);
 			END IF;
-					 			
+			
+			INSERT INTO man_netgully (node_id, pol_id, sander_depth, gratecat_id, units, groove, siphon ) 
+			VALUES(NEW.node_id, v_new_pol_id, NEW.sander_depth, NEW.gratecat_id, NEW.units, 
+			NEW.groove, NEW.siphon );
+									 			
 		ELSIF v_man_table='man_chamber' THEN
 
-			IF (v_insert_double_geom IS TRUE) THEN
-				IF (NEW.pol_id IS NULL) THEN
-					NEW.pol_id:= (SELECT nextval('urn_id_seq'));
-				END IF;
+			IF v_doublegeometry THEN
+				INSERT INTO polygon(pol_id, sys_type, the_geom) 
+				VALUES (v_new_pol_id, 'CHAMBER', (SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_doublegeom_buffer))) from node where node_id=NEW.node_id));
+			END IF;
 
-				INSERT INTO polygon(pol_id, sys_type, the_geom) VALUES (NEW.pol_id,'CHAMBER', (SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_double_geom_buffer))) from node where node_id=NEW.node_id));
-				INSERT INTO man_chamber (node_id,pol_id, length, width, sander_depth, max_volume, util_volume, inlet, bottom_channel, accessibility, name)
-				VALUES (NEW.node_id,NEW.pol_id, NEW.length,NEW.width, NEW.sander_depth, NEW.max_volume, NEW.util_volume, 
-				NEW.inlet, NEW.bottom_channel, NEW.accessibility,NEW.name);
-			
-			ELSE
-				INSERT INTO man_chamber (node_id,pol_id, length, width, sander_depth, max_volume, util_volume, inlet, bottom_channel, accessibility, name)
-				VALUES (NEW.node_id,NEW.pol_id, NEW.length,NEW.width, NEW.sander_depth, NEW.max_volume, NEW.util_volume, 
-				NEW.inlet, NEW.bottom_channel, NEW.accessibility,NEW.name);
-			END IF;	
+			INSERT INTO man_chamber (node_id, pol_id, length, width, sander_depth, max_volume, util_volume, inlet, bottom_channel, accessibility, name)
+			VALUES (NEW.node_id, v_new_pol_id, NEW.length,NEW.width, NEW.sander_depth, NEW.max_volume, NEW.util_volume, 
+			NEW.inlet, NEW.bottom_channel, NEW.accessibility,NEW.name);
 						
 		ELSIF v_man_table='man_manhole' THEN
 		
-				INSERT INTO man_manhole (node_id,length, width, sander_depth,prot_surface, inlet, bottom_channel, accessibility) 
-				VALUES (NEW.node_id,NEW.length, NEW.width, NEW.sander_depth,NEW.prot_surface, NEW.inlet, NEW.bottom_channel, NEW.accessibility);	
+			INSERT INTO man_manhole (node_id,length, width, sander_depth,prot_surface, inlet, bottom_channel, accessibility) 
+			VALUES (NEW.node_id,NEW.length, NEW.width, NEW.sander_depth,NEW.prot_surface, NEW.inlet, NEW.bottom_channel, NEW.accessibility);	
 		
 		ELSIF v_man_table='man_netinit' THEN
 			
@@ -474,18 +545,12 @@ BEGIN
 
 		ELSIF v_man_table='man_wwtp' THEN
 		
-			IF (v_insert_double_geom IS TRUE) THEN
-				IF (NEW.pol_id IS NULL) THEN
-					NEW.pol_id:= (SELECT nextval('urn_id_seq'));
-				END IF;
-				
-				INSERT INTO polygon(pol_id, sys_type, the_geom) VALUES (NEW.pol_id, 'WWTP', (SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_double_geom_buffer)))
+			IF v_doublegeometry THEN
+				INSERT INTO polygon(pol_id, sys_type, the_geom) VALUES (v_new_pol_id, 'WWTP', (SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_doublegeom_buffer)))
 				from node where node_id=NEW.node_id));
-				INSERT INTO man_wwtp (node_id,pol_id, name) VALUES (NEW.node_id,NEW.pol_id,NEW.name);
+			END IF;
 			
-			ELSE
-				INSERT INTO man_wwtp (node_id, name) VALUES (NEW.node_id,NEW.name);
-			END IF;	
+			INSERT INTO man_wwtp (node_id,pol_id, name) VALUES (NEW.node_id, v_new_pol_id, NEW.name);
 						
 		ELSIF v_man_table='man_netelement' THEN
 					
@@ -494,22 +559,23 @@ BEGIN
 		ELSIF v_man_table='parent' THEN
 
 			v_man_table:= (SELECT man_table FROM cat_feature_node WHERE id=NEW.node_type);
-        	v_sql:= 'INSERT INTO '||v_man_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
-        	EXECUTE v_sql;
+			v_sql:= 'INSERT INTO '||v_man_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
+			EXECUTE v_sql;
 
-        	--insert double geometry
-			IF (v_man_table IN ('man_chamber', 'man_storage', 'man_wwtp','man_netgully') 
-        		and (v_insert_double_geom IS TRUE)) THEN
-				
-				v_auto_pol_id:= (SELECT nextval('urn_id_seq'));
-                v_sys_type := (SELECT type FROM cat_feature_node JOIN cat_node ON cat_node.node_type=cat_feature_node.id WHERE cat_node.id = NEW.nodecat_id);
+			--insert double geometry
+			IF (v_man_table IN ('man_chamber', 'man_storage', 'man_wwtp','man_netgully') and (v_doublegeometry IS TRUE)) THEN
+					
+				IF v_man_table = 'man_netgully' THEN
+					INSERT INTO polygon(pol_id, sys_type, the_geom) VALUES (v_new_pol_id, 'NETGULLY', v_the_geom_pol);					
+				ELSE
+					v_sys_type := (SELECT type FROM cat_feature_node JOIN cat_node ON cat_node.node_type=cat_feature_node.id WHERE cat_node.id = NEW.nodecat_id);
 
-				INSERT INTO polygon(pol_id, sys_type, the_geom) 
-				VALUES (v_auto_pol_id, v_sys_type, (SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_double_geom_buffer))) 
-				from node where node_id=NEW.node_id));
-				
-				EXECUTE 'UPDATE '||v_man_table||' SET pol_id = '''||v_auto_pol_id||''' WHERE node_id = '''||NEW.node_id||''';';
+					INSERT INTO polygon(pol_id, sys_type, the_geom) 
+					VALUES (v_new_pol_id, v_sys_type, (SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_doublegeom_buffer))) 
+					from node where node_id=NEW.node_id));
+				END IF;
 
+				EXECUTE 'UPDATE '||v_man_table||' SET pol_id = '''||v_new_pol_id||''' WHERE node_id = '''||NEW.node_id||''';';
 			END IF;
 		END IF;
 
@@ -529,58 +595,54 @@ BEGIN
 			END LOOP;
 		END IF;			
 
-		-- EPA INSERT
-	    IF (NEW.epa_type = 'JUNCTION') THEN
+		-- epa type
+		IF (NEW.epa_type = 'JUNCTION') THEN
 			INSERT INTO inp_junction (node_id, y0, ysur, apond) VALUES (NEW.node_id, 0, 0, 0);
-
 		ELSIF (NEW.epa_type = 'DIVIDER') THEN
 			INSERT INTO inp_divider (node_id, divider_type) VALUES (NEW.node_id, 'CUTOFF');
-        ELSIF (NEW.epa_type = 'OUTFALL') THEN
+		ELSIF (NEW.epa_type = 'OUTFALL') THEN
 			INSERT INTO inp_outfall (node_id, outfall_type) VALUES (NEW.node_id, 'NORMAL');			
-        ELSIF (NEW.epa_type = 'STORAGE') THEN
+		ELSIF (NEW.epa_type = 'STORAGE') THEN
 			INSERT INTO inp_storage (node_id, storage_type) VALUES (NEW.node_id, 'TABULAR');	
-	    END IF;
-	          
-        RETURN NEW;
-
+		END IF;
+			  
+		RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
-
-        IF (NEW.epa_type != OLD.epa_type) THEN    
-         
-            IF (OLD.epa_type = 'JUNCTION') THEN
-                v_inp_table:= 'inp_junction';            
-            ELSIF (OLD.epa_type = 'DIVIDER') THEN
-                v_inp_table:= 'inp_divider';                
-            ELSIF (OLD.epa_type = 'OUTFALL') THEN
-                v_inp_table:= 'inp_outfall';    
-            ELSIF (OLD.epa_type = 'STORAGE') THEN
-                v_inp_table:= 'inp_storage';    
+	
+		-- epa type
+		IF (NEW.epa_type != OLD.epa_type) THEN    
+			IF (OLD.epa_type = 'JUNCTION') THEN
+				v_inp_table:= 'inp_junction';            
+			ELSIF (OLD.epa_type = 'DIVIDER') THEN
+				v_inp_table:= 'inp_divider';                
+			ELSIF (OLD.epa_type = 'OUTFALL') THEN
+				v_inp_table:= 'inp_outfall';    
+			ELSIF (OLD.epa_type = 'STORAGE') THEN
+				v_inp_table:= 'inp_storage';    
 			END IF;
+		
 			IF v_inp_table IS NOT NULL THEN
-                v_sql:= 'DELETE FROM '||v_inp_table||' WHERE node_id = '||quote_literal(OLD.node_id);
-                EXECUTE v_sql;
-            END IF;
-            
+				v_sql:= 'DELETE FROM '||v_inp_table||' WHERE node_id = '||quote_literal(OLD.node_id);
+				EXECUTE v_sql;
+			END IF;
+		    
 			v_inp_table := NULL;
 
-            IF (NEW.epa_type = 'JUNCTION') THEN
-                v_inp_table:= 'inp_junction';   
-            ELSIF (NEW.epa_type = 'DIVIDER') THEN
-                v_inp_table:= 'inp_divider';     
-            ELSIF (NEW.epa_type = 'OUTFALL') THEN
-                v_inp_table:= 'inp_outfall';  
-            ELSIF (NEW.epa_type = 'STORAGE') THEN
-                v_inp_table:= 'inp_storage';
-            END IF;
-            IF v_inp_table IS NOT NULL THEN
-                v_sql:= 'INSERT INTO '||v_inp_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
+			IF (NEW.epa_type = 'JUNCTION') THEN
+				v_inp_table:= 'inp_junction';   
+			ELSIF (NEW.epa_type = 'DIVIDER') THEN
+				v_inp_table:= 'inp_divider';     
+			ELSIF (NEW.epa_type = 'OUTFALL') THEN
+				v_inp_table:= 'inp_outfall';  
+			ELSIF (NEW.epa_type = 'STORAGE') THEN
+				v_inp_table:= 'inp_storage';
+			END IF;
+			IF v_inp_table IS NOT NULL THEN
+				v_sql:= 'INSERT INTO '||v_inp_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
 				EXECUTE v_sql;
-            END IF;
-
-        END IF;
-
-		-- UPDATE management values
+			END IF;
+		END IF;
 
 		-- node type
 		IF (NEW.node_type <> OLD.node_type) THEN 
@@ -615,16 +677,16 @@ BEGIN
 				NEW.state_type=(SELECT id from value_state_type WHERE state=0 LIMIT 1);
 					IF NEW.state_type IS NULL THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-      		 	"data":{"message":"2110", "function":"1220","debug_msg":null}}$$);';
+			"data":{"message":"2110", "function":"1220","debug_msg":null}}$$);';
 					END IF;
 				END IF;
 			END IF;
 		END IF;
 		
 		--check relation state - state_type
-	    IF (NEW.state_type != OLD.state_type) AND NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
+		IF (NEW.state_type != OLD.state_type) AND NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-      		"data":{"message":"3036", "function":"1220","debug_msg":"'||NEW.state::text||'"}}$$);';
+		"data":{"message":"3036", "function":"1220","debug_msg":"'||NEW.state::text||'"}}$$);';
 		END IF;		
 
 		-- rotation
@@ -703,6 +765,7 @@ BEGIN
 			WHERE node_id=OLD.node_id;
 			
 		ELSIF v_man_table='man_netgully' THEN
+
 			UPDATE man_netgully SET pol_id=NEW.pol_id, sander_depth=NEW.sander_depth, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, siphon=NEW.siphon
 			WHERE node_id=OLD.node_id;
 			
@@ -719,7 +782,6 @@ BEGIN
 		ELSIF v_man_table='man_valve' THEN
 			UPDATE man_valve SET name=NEW.name
 			WHERE node_id=OLD.node_id;
-
 		
 		ELSIF v_man_table='man_chamber' THEN
 			UPDATE man_chamber SET pol_id=NEW.pol_id, length=NEW.length, width=NEW.width, sander_depth=NEW.sander_depth, max_volume=NEW.max_volume, util_volume=NEW.util_volume,
@@ -745,11 +807,10 @@ BEGIN
 				
 		ELSIF v_man_table ='man_netelement' THEN
 			UPDATE man_netelement SET serial_number=NEW.serial_number
-			WHERE node_id=OLD.node_id;	
-		
+			WHERE node_id=OLD.node_id;
 		END IF;
 
-			-- man addfields update
+		-- man addfields update
 		IF v_customfeature IS NOT NULL THEN
 			FOR v_addfields IN SELECT * FROM sys_addfields
 			WHERE (cat_feature_id = v_customfeature OR cat_feature_id is null) AND active IS TRUE AND iseditable IS TRUE
@@ -775,12 +836,11 @@ BEGIN
 					EXECUTE 'DELETE FROM man_addfields_value WHERE feature_id=$1 AND parameter_id=$2'
 						USING NEW.node_id , v_addfields.id;
 				END IF;
-			
 			END LOOP;
-	    END IF;       
-	    		
-        RETURN NEW;
+		END IF;       
 			
+		RETURN NEW;
+		
     ELSIF TG_OP = 'DELETE' THEN
 
 		EXECUTE 'SELECT gw_fct_check_delete($${"client":{"device":4, "infoType":1, "lang":"ES"},
@@ -798,11 +858,8 @@ BEGIN
 		--Delete addfields (after or before deletion of node, doesn't matter)
 		DELETE FROM man_addfields_value WHERE feature_id = OLD.node_id;
 
-		RETURN NULL;
-	
+		RETURN NULL;	
 	END IF;
-
-
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
