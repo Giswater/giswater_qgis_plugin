@@ -555,6 +555,11 @@ UPDATE config_form_fields SET placeholder = NULL where formname like '%ve_gully%
 
 UPDATE cat_feature_node SET isexitupperintro = 1 WHERE id = 'CIRC_MANHOLE';
 
+UPDATE config_form_fields SET widgettype = 'typeahead',
+dv_querytext = 'SELECT id, id as idval FROM cat_grate WHERE id IS NOT NULL' FROM cat_feature WHERE 
+system_id = 'NETGULLY' AND formname = child_layer and columnname = 'gratecat_id';
+
+
 --placeholder
 UPDATE config_form_fields SET placeholder = 'Only when state is obsolete' where columnname = 'workcat_id_end';
 UPDATE config_form_fields SET placeholder = 'Catalog of the private part of connection' where columnname = 'private_connecat_id' AND formname like '%ve_connec%';
