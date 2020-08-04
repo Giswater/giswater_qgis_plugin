@@ -255,7 +255,7 @@ BEGIN
 		(ws_expl_id IS NOT NULL AND ud_expl_id IS NULL OR ws_expl_id IS NULL AND ud_expl_id IS NOT NULL OR 
 		ws_expl_id IS NOT NULL AND ud_expl_id IS NOT NULL  );';
 
-		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.district ADD CONSTRAINT plot_expl_id_check CHECK 
+		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.district ADD CONSTRAINT district_expl_id_check CHECK 
 		(ws_expl_id IS NOT NULL AND ud_expl_id IS NULL OR ws_expl_id IS NULL AND ud_expl_id IS NOT NULL OR 
 		ws_expl_id IS NOT NULL AND ud_expl_id IS NOT NULL  );';
 
