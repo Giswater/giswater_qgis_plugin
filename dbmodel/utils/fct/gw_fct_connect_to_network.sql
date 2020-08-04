@@ -37,7 +37,7 @@ SELECT SCHEMA_NAME.gw_fct_connect_to_network($${"client":{"device":4, "infoType"
 */
 
 DECLARE
-
+	
 v_connect record;
 v_link record;
 v_exit record;
@@ -131,27 +131,27 @@ BEGIN
 				"data":{"message":"3054", "function":"2124","debug_msg":"'||v_connect_id||'"}}$$);' INTO v_audit_result;
 			END IF;
 		END IF;
-
-		
-		-- get values from old vnode
-		SELECT * INTO v_exit FROM vnode WHERE vnode_id::text=v_link.exit_id;
 	
 		-- get arc_id (if feature does not have) using buffer  
-		IF v_connect.arc_id IS NULL AND v_link.exit_id IS NULL THEN
-			WITH index_query AS(
-			SELECT ST_Distance(the_geom, v_connect.the_geom) as distance, arc_id FROM v_edit_arc WHERE state>0 ORDER BY the_geom <-> v_connect.the_geom LIMIT 50)
-			SELECT arc_id INTO v_connect.arc_id FROM index_query ORDER BY distance limit 1;
+		IF v_connect.arc_id IS NULL THEN
+
+			IF v_link.the_geom IS NULL THEN -- looking for closest arc from connect
+				WITH index_query AS(
+				SELECT ST_Distance(the_geom, v_connect.the_geom) as distance, arc_id FROM v_edit_arc WHERE state > 0 LIMIT 5)
+				SELECT arc_id INTO v_connect.arc_id FROM index_query ORDER BY distance limit 1;
 			
-		ELSIF v_connect.arc_id IS NULL AND v_link.exit_id IS NOT NULL THEN
-			WITH index_query AS(
-			SELECT ST_Distance(the_geom, v_exit.the_geom) as distance, arc_id FROM v_edit_arc WHERE state>0 ORDER BY the_geom <-> v_exit.the_geom LIMIT 50)
-			SELECT arc_id INTO v_connect.arc_id FROM index_query ORDER BY distance limit 1;			
+			ELSIF v_link.the_geom IS NOT NULL THEN -- looking for closest arc from link's endpoint
+				WITH index_query AS(
+				SELECT ST_Distance(the_geom, st_endpoint(v_link.the_geom)) as distance, arc_id FROM v_edit_arc WHERE state > 0 LIMIT 5)
+				SELECT arc_id INTO v_connect.arc_id FROM index_query ORDER BY distance limit 1;			
+			END IF;
 		END IF;
 			
 		-- get v_edit_arc information
 		SELECT * INTO v_arc FROM arc WHERE arc_id = v_connect.arc_id;
-
-		raise notice 'v_connect.arc_id %, v_arc: % ', v_connect.arc_id, v_arc;
+		
+		-- get values from old vnode
+		SELECT * INTO v_exit FROM vnode WHERE vnode_id::text=v_link.exit_id;
 
 		-- state control
 		IF v_arc.state=2 AND v_connect.state=1 THEN
