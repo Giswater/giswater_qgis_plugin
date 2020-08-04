@@ -31,10 +31,12 @@ BEGIN
 
 	IF (SELECT EXISTS (SELECT FROM information_schema.tables  WHERE  table_schema = 'SCHEMA_NAME' AND table_name   = 'sys_foreignkey')) IS TRUE THEN
 		v_config_table = 'sys_foreignkey';
-		v_config_list = (SELECT DISTINCT string_agg(typevalue_table,',') FROM sys_foreignkey);
+		v_config_list = (SELECT DISTINCT string_agg(typevalue_table,', ') FROM sys_foreignkey);
+		v_old_typevalue = (SELECT string_agg(typevalue_name, ', ') FROM sys_typevalue);
 	ELSE
 		v_config_table = 'typevalue_fk';
-		v_config_list = (SELECT DISTINCT string_agg(typevalue_table,',') FROM typevalue_fk);
+		v_config_list = (SELECT DISTINCT string_agg(typevalue_table,', ') FROM typevalue_fk);
+		v_old_typevalue = (SELECT string_agg(typevalue_name, ', ') FROM sys_typevalue_cat);
 	END IF;
 
 	--on insert of a new typevalue create a trigger for the table
@@ -100,7 +102,7 @@ BEGIN
 		v_query = 'SELECT * FROM SCHEMA_NAME.'||v_table||' WHERE '||v_table||'.typevalue = '''|| OLD.typevalue||''' AND  '||v_table||'.id = '''||OLD.id||''';';
 
 		--if typevalue is a system typevalue - error, cant delete the value, else proceed with the delete process
-		IF OLD.typevalue IN (SELECT typevalue_name FROM sys_typevalue) THEN
+		IF OLD.typevalue IN (v_old_typevalue) THEN
 			
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
        		"data":{"message":"3028", "function":"2750","debug_msg":"'||OLD.typevalue||'"}}$$);';
