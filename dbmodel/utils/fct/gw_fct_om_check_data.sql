@@ -206,6 +206,7 @@ BEGIN
 
 
 	RAISE NOTICE '07 - Check state_type nulls (arc, node)';
+
 	v_querytext = '(SELECT arc_id, arccat_id, the_geom FROM '||v_edit||'arc WHERE state > 0 AND state_type IS NULL 
 		        UNION SELECT node_id, nodecat_id, the_geom FROM '||v_edit||'node WHERE state > 0 AND state_type IS NULL) a';
 
@@ -536,20 +537,20 @@ BEGIN
 	
 	END IF;
 
+	RAISE NOTICE '18 - connec/gully without arc_id or with arc_id different than the one to which points its link';
 	IF (SELECT count(*) FROM arc ) < 20000 THEN -- too big
-		RAISE NOTICE '18 - connec/gully without arc_id or with arc_id different than the one to which points its link';
+	
 		v_querytext = 'SELECT  '||v_edit||'connec.connec_id,  '||v_edit||'connec.connecat_id,  '||v_edit||'connec.the_geom
-					FROM '||v_edit||'link
-					LEFT JOIN '||v_edit||'connec ON '||v_edit||'link.feature_id = '||v_edit||'connec.connec_id 
-					INNER JOIN arc ON st_dwithin(arc.the_geom, st_endpoint('||v_edit||'link.the_geom), 0.01)
-					WHERE exit_type = ''VNODE'' AND (arc.arc_id <> '||v_edit||'connec.arc_id or '||v_edit||'connec.arc_id is null) 
-					AND '||v_edit||'link.feature_type = ''CONNEC'' AND arc.state=1 and '||v_edit||'connec.connec_id IS NOT NULL
-					and '||v_edit||'link.feature_id NOT IN (SELECT connec_id FROM node,link
-					LEFT JOIN '||v_edit||'connec ON '||v_edit||'link.feature_id = '||v_edit||'connec.connec_id 
-					LEFT JOIN vnode ON '||v_edit||'link.exit_id=vnode.vnode_id::text
-					WHERE exit_type = ''VNODE'' AND st_dwithin(vnode.the_geom, node.the_geom,0.01))
-					ORDER BY '||v_edit||'link.feature_type, link_id';
-
+			FROM '||v_edit||'link
+			LEFT JOIN '||v_edit||'connec ON '||v_edit||'link.feature_id = '||v_edit||'connec.connec_id 
+			INNER JOIN arc ON st_dwithin(arc.the_geom, st_endpoint('||v_edit||'link.the_geom), 0.01)
+			WHERE exit_type = ''VNODE'' AND (arc.arc_id <> '||v_edit||'connec.arc_id or '||v_edit||'connec.arc_id is null) 
+			AND '||v_edit||'link.feature_type = ''CONNEC'' AND arc.state=1 and '||v_edit||'connec.connec_id IS NOT NULL
+			and '||v_edit||'link.feature_id NOT IN (SELECT connec_id FROM node,link
+			LEFT JOIN '||v_edit||'connec ON '||v_edit||'link.feature_id = '||v_edit||'connec.connec_id 
+			LEFT JOIN vnode ON '||v_edit||'link.exit_id=vnode.vnode_id::text
+			WHERE exit_type = ''VNODE'' AND st_dwithin(vnode.the_geom, node.the_geom,0.01))
+			ORDER BY '||v_edit||'link.feature_type, link_id';
 
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
@@ -592,7 +593,42 @@ BEGIN
 		END IF;
 	END IF;
 
-	RAISE NOTICE '19 - links without feature_id';
+	RAISE NOTICE '19 - Check vnode inconsistency (link without vnode)';
+	v_querytext = 'SELECT * FROM v_edit_link LEFT JOIN vnode ON vnode_id = exit_id::integer where exit_type =''VNODE'' AND vnode_id IS NULL';
+	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+	
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, criticity, error_message)
+		VALUES (125, 2, concat('WARNING: There is/are ',v_count,' vnode links without vnode. This will be automatic repaired.'));
+		
+		PERFORM gw_fct_vnode_repair();	
+		
+	ELSE
+		INSERT INTO audit_check_data (fid, criticity, error_message)
+		VALUES (125, 1, 'INFO: All vnode links have vnode.');
+
+	END IF;
+	
+	RAISE NOTICE '20 - Check vnode inconsistency (vnode without link)';
+	v_querytext = 'SELECT vnode_id FROM vnode LEFT JOIN link ON vnode_id = exit_id::integer where link_id IS NULL';
+	
+	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+	
+	IF v_count > 0 THEN
+	
+		INSERT INTO audit_check_data (fid, criticity, error_message)
+		VALUES (125, 2, concat('WARNING: There is/are ',v_count,' vnodes without link. This will be automatic repaired'));
+		
+		EXECUTE 'DELETE FROM vnode WHERE vnode_id IN ('||v_querytext||')a';
+		
+	ELSE
+		INSERT INTO audit_check_data (fid, criticity, error_message)
+		VALUES (125, 1, 'INFO: All vnodes have vnode link.');
+
+	END IF;
+	
+
+	RAISE NOTICE '21 - links without feature_id';
 	v_querytext = 'SELECT link_id, the_geom FROM link where feature_id is null and state > 0';
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
@@ -674,7 +710,7 @@ BEGIN
 		END IF;
 	END IF;
 
-	RAISE NOTICE '20 - features with state 1 and end date';
+	RAISE NOTICE '22 - features with state 1 and end date';
 	IF v_project_type = 'WS' THEN
 		v_querytext = 'SELECT arc_id as feature_id  from '||v_edit||'arc where state = 1 and enddate is not null
 					UNION SELECT node_id from '||v_edit||'node where state = 1 and enddate is not null
@@ -718,7 +754,7 @@ BEGIN
 		VALUES (125, 1, 'INFO: No features with state 0 are missing the end date');
 	END IF;
 
-	RAISE NOTICE '21 - features with state 1 and end date';
+	RAISE NOTICE '23 - features with state 1 and end date';
 	IF v_project_type = 'WS' THEN
 		v_querytext = 'SELECT arc_id as feature_id  from '||v_edit||'arc where enddate < builtdate
 					UNION SELECT node_id from '||v_edit||'node where enddate < builtdate
@@ -740,7 +776,7 @@ BEGIN
 		VALUES (125, 1, 'INFO: No features with end date earlier than built date');
 	END IF;
 
-	RAISE NOTICE '22 - Automatic links with more than 100 mts (longitude out-of-range)';
+	RAISE NOTICE '24 - Automatic links with more than 100 mts (longitude out-of-range)';
 	EXECUTE 'SELECT count(*) FROM v_edit_link where userdefined_geom  = false AND st_length(the_geom) > 100'
 	INTO v_count;
 
