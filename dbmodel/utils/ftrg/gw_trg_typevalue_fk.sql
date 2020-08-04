@@ -26,8 +26,12 @@ BEGIN
 	v_table:= TG_ARGV[0];
 
 	--select typevalue for the table
-	v_typevalue_fk = 'SELECT * FROM sys_foreignkey WHERE active IS TRUE AND  target_table='''||v_table||''';';
-	
+	IF (SELECT EXISTS (SELECT FROM information_schema.tables  WHERE  table_schema = 'SCHEMA_NAME' AND table_name   = 'sys_foreignkey')) IS TRUE THEN
+		v_typevalue_fk = 'SELECT * FROM sys_foreignkey WHERE active IS TRUE AND  target_table='''||v_table||''';';
+	ELSE
+		v_typevalue_fk = 'SELECT * FROM typevalue_fk WHERE target_table='''||v_table||''';';
+	END IF;
+		
 	--insert new fields values into json
 	v_new_data := row_to_json(NEW.*);
 
