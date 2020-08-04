@@ -9,7 +9,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field)
-VALUES ('edit_typevalue','value_verified', 'gully', 'verified') ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;	
+VALUES ('edit_typevalue','value_verified', 'gully', 'verified') ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;	
 
 UPDATE sys_table SET id ='subcatchment' WHERE id ='inp_subcatchment';
 

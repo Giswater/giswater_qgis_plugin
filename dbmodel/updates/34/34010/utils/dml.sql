@@ -23,18 +23,18 @@ VALUES ('edit_typevalue','value_review_validation') ON CONFLICT (typevalue_table
 
 
 INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field)
-VALUES ('edit_typevalue','value_verified', 'arc', 'verified') ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;	
+VALUES ('edit_typevalue','value_verified', 'arc', 'verified') ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;	
 
 INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field)
-VALUES('edit_typevalue','value_verified', 'node', 'verified') ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;	
+VALUES('edit_typevalue','value_verified', 'node', 'verified') ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;	
 
 INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field)
-VALUES ('edit_typevalue','value_verified', 'connec', 'verified') ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;	
+VALUES ('edit_typevalue','value_verified', 'connec', 'verified') ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;	
 
 UPDATE config_form_fields SET dv_querytext = 'SELECT id, id as idval FROM edit_typevalue WHERE typevalue = ''value_verified''' where column_id = 'verified';
 
 INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field)
-VALUES ('plan_typevalue','value_priority', 'plan_psector', 'plan_psector') ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;	
+VALUES ('plan_typevalue','value_priority', 'plan_psector', 'plan_psector') ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field, parameter_id) DO NOTHING;	
 
 UPDATE config_form_fields SET dv_querytext = 'SELECT idval as id,idval FROM plan_typevalue WHERE typevalue=''value_priority''' WHERE formname = 'v_edit_plan_psector' 
 and column_id = 'priority';
@@ -253,28 +253,48 @@ UPDATE sys_table SET sys_sequence = null WHERE id like 'v_inp_vertice';
 UPDATE sys_table SET id = 'config_user_x_expl' WHERE id = 'exploitation_x_user';
 
 
-INSERT INTO sys_function VALUES (2116, 'gw_fct_audit_function','utils','function','void','void','Function to work with messages','role_basic',true);
-INSERT INTO sys_function VALUES (2126, 'gw_fct_node_replace','utils','function','character varying, character varying, date, boolean','character varying','Function used to replace a node','role_edit',false);
-INSERT INTO sys_function VALUES (2890, 'gw_fct_plan_result_rec','utils','function','integer, double precision, text','integer','Function to calculate costs of reconstruction','role_master',false);
-INSERT INTO sys_function VALUES (2892, 'gw_fct_plan_result_reh','utils','function','integer, double precision, text','integer','Function to calculate costs of rehabilitation','role_master',false);
-INSERT INTO sys_function VALUES (2894, 'gw_fct_pg2epa_main','ud','function','json','json','Main function to export epa files','role_epa',false);
-INSERT INTO sys_function VALUES (2431, 'gw_fct_pg2epa_check_data','ud','function','json','json','Function to check result data before inp file creation (it depends only of the whole network consistency)','role_epa',false);
-INSERT INTO sys_function VALUES (2464, 'gw_fct_setvalurn','utils','function','void','int8','Function to set value of urn sequence','role_edit',false);
-INSERT INTO sys_function VALUES (2922, 'gw_fct_admin_role_resetuserprofile','utils','function','json','json','Function to reset user profile values','role_admin',false);
-INSERT INTO sys_function VALUES (2568, 'gw_fct_getcatalog','utils','function','json','json','Function to provide catalog form','role_edit',false);
-INSERT INTO sys_function VALUES (2896, 'gw_fct_createwidgetjson','utils','function','text, text, text, text, text, boolean, text','json','Creates a widget','role_basic',false);
-INSERT INTO sys_function VALUES (2898, 'gw_fct_getlot','utils','function','json','json','Function to provide lot form','role_om',false);
-INSERT INTO sys_function VALUES (2900, 'gw_fct_getprojectvisitforms','utils','function','json','json','Function to provide project visit form','role_om',false);
-INSERT INTO sys_function VALUES (2902, 'gw_fct_pg2epa_inlet_flowtrace','ws','function','text ','integer','Analyze the whole result network checking topological inconsistency','role_epa',false);
-INSERT INTO sys_function VALUES (2904, 'gw_fct_odbc2pg_hydro_filldata','utils','function','json','json','Analyze data for the odbc2pg hdyro data','role_epa',false);
-INSERT INTO sys_function VALUES (2906, 'gw_fct_pg2epa_advancedsettings','ud','function','text ','integer','Provides user defined advanced settings on go2epa process','role_epa',false);
-INSERT INTO sys_function VALUES (2908, 'gw_fct_pg2epa_vdefault','ud','function','json','integer','Function to set default values on go2epa process','role_epa',false);
-INSERT INTO sys_function VALUES (2910, 'gw_fct_pg2epa_manage_varc','ud','function','character varying','json','Function to manage with virtual arcs on go2epa process','role_epa',false);
-INSERT INTO sys_function VALUES (2912, 'gw_fct_setvehicleload','utils','function','json','json','Function to set loads of vehicles (vehicle management)','role_om',false);
-INSERT INTO sys_function VALUES (2914, 'gw_fct_anl_node_proximity','utils','function','json','json','Function to identify nodes within certain buffer tolerance','role_edit',false);
-INSERT INTO sys_function VALUES (2858, 'gw_fct_pg2epa_check_result','ud','function','json','json','Function to check result data before inp file creation (it depends for each result)','role_epa',false);
-INSERT INTO sys_function VALUES (2860, 'gw_fct_pg2epa_check_options','ud','function','json','json','Function to check options before inp file creation (it depends for each result)','role_epa',false);
-INSERT INTO sys_function VALUES (2920, 'gw_fct_rpt2pg_import_rpt','ud','function','json','json','Function to import results','role_epa',false);
+INSERT INTO sys_function VALUES (2116, 'gw_fct_audit_function','utils','function','void','void','Function to work with messages','role_basic',true) 
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES (2126, 'gw_fct_node_replace','utils','function','character varying, character varying, date, boolean','character varying','Function used to replace a node','role_edit',false) 
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES (2890, 'gw_fct_plan_result_rec','utils','function','integer, double precision, text','integer','Function to calculate costs of reconstruction','role_master',false) 
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES (2892, 'gw_fct_plan_result_reh','utils','function','integer, double precision, text','integer','Function to calculate costs of rehabilitation','role_master',false) 
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES (2894, 'gw_fct_pg2epa_main','ud','function','json','json','Main function to export epa files','role_epa',false) 
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES (2431, 'gw_fct_pg2epa_check_data','ud','function','json','json','Function to check result data before inp file creation (it depends only of the whole network consistency)','role_epa',false) 
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES (2464, 'gw_fct_setvalurn','utils','function','void','int8','Function to set value of urn sequence','role_edit',false) 
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES (2922, 'gw_fct_admin_role_resetuserprofile','utils','function','json','json','Function to reset user profile values','role_admin',false) 
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES (2568, 'gw_fct_getcatalog','utils','function','json','json','Function to provide catalog form','role_edit',false) 
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES (2896, 'gw_fct_createwidgetjson','utils','function','text, text, text, text, text, boolean, text','json','Creates a widget','role_basic',false) 
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES (2898, 'gw_fct_getlot','utils','function','json','json','Function to provide lot form','role_om',false) 
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES (2900, 'gw_fct_getprojectvisitforms','utils','function','json','json','Function to provide project visit form','role_om',false) 
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES (2902, 'gw_fct_pg2epa_inlet_flowtrace','ws','function','text ','integer','Analyze the whole result network checking topological inconsistency','role_epa',false) 
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES (2904, 'gw_fct_odbc2pg_hydro_filldata','utils','function','json','json','Analyze data for the odbc2pg hdyro data','role_epa',false) 
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES (2906, 'gw_fct_pg2epa_advancedsettings','ud','function','text ','integer','Provides user defined advanced settings on go2epa process','role_epa',false) 
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES (2908, 'gw_fct_pg2epa_vdefault','ud','function','json','integer','Function to set default values on go2epa process','role_epa',false) 
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES (2910, 'gw_fct_pg2epa_manage_varc','ud','function','character varying','json','Function to manage with virtual arcs on go2epa process','role_epa',false) 
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES (2912, 'gw_fct_setvehicleload','utils','function','json','json','Function to set loads of vehicles (vehicle management)','role_om',false) 
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES (2858, 'gw_fct_pg2epa_check_result','ud','function','json','json','Function to check result data before inp file creation (it depends for each result)','role_epa',false) 
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES (2860, 'gw_fct_pg2epa_check_options','ud','function','json','json','Function to check options before inp file creation (it depends for each result)','role_epa',false) 
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES (2920, 'gw_fct_rpt2pg_import_rpt','ud','function','json','json','Function to import results','role_epa',false) 
+ON CONFLICT (id) DO NOTHING;
 
 
 UPDATE sys_function SET input_params ='json', return_type ='json' WHERE id =2314;
@@ -621,12 +641,12 @@ UPDATE sys_function SET function_name = 'gw_fct_getwidgetvalues' WHERE function_
 
 
 DELETE FROM sys_function WHERE function_name IN ('gw_trg_edit_man_arc', 'gw_trg_edit_man_node', 'gw_trg_edit_man_connec', 'gw_trg_edit_man_gully');
-INSERT INTO sys_function VALUES ('1314', 'gw_trg_ui_visitman', 'utils', 'trigger function', NULL, NULL, NULL, 'role_om');
-INSERT INTO sys_function VALUES ('1132', 'gw_trg_plan_psector_x_node', 'utils', 'trigger function', NULL, NULL, NULL, 'role_master');
+INSERT INTO sys_function VALUES ('1314', 'gw_trg_ui_visitman', 'utils', 'trigger function', NULL, NULL, NULL, 'role_om') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES ('1132', 'gw_trg_plan_psector_x_node', 'utils', 'trigger function', NULL, NULL, NULL, 'role_master') ON CONFLICT (id) DO NOTHING;
 UPDATE sys_function SET function_name = 'gw_trg_edit_om_visit' WHERE id=1118;
 UPDATE sys_function SET function_name = 'gw_trg_edit_config_sysfields' WHERE id=2742;
 UPDATE sys_function SET function_name = 'gw_fct_setlot' WHERE id=2862;
-INSERT INTO sys_function VALUES ('2648', 'gw_trg_calculate_period', 'utils', 'trigger function', NULL, NULL, NULL, 'role_epa');
+INSERT INTO sys_function VALUES ('2648', 'gw_trg_calculate_period', 'utils', 'trigger function', NULL, NULL, NULL, 'role_epa') ON CONFLICT (id) DO NOTHING;
 DELETE FROM sys_function WHERE id = 1102;
 UPDATE sys_function SET project_type='ws' WHERE id=2846;
 UPDATE sys_function SET function_name = 'gw_fct_pg2epa_valve_status' WHERE id=2332;
@@ -644,39 +664,33 @@ UPDATE sys_function SET project_type='ws' WHERE id=2848;
 UPDATE sys_function SET project_type='ws' WHERE id=2850;
 UPDATE sys_function SET project_type='ws' WHERE id=2430;
 UPDATE sys_function SET project_type='ws' WHERE id=2798;
-INSERT INTO sys_function VALUES ('2320', 'gw_fct_mincut_inverted_flowtrace', 'utils', 'trigger function', NULL, NULL, NULL, 'role_om');
+INSERT INTO sys_function VALUES ('2320', 'gw_fct_mincut_inverted_flowtrace', 'utils', 'trigger function', NULL, NULL, NULL, 'role_om') ON CONFLICT (id) DO NOTHING;
 UPDATE sys_function SET project_type='utils' WHERE id=2788;
 DELETE FROM sys_function WHERE id = 2828;
 UPDATE sys_function SET project_type='utils' WHERE id=2740;
 UPDATE sys_function SET project_type='utils' WHERE id=2796;
 
-INSERT INTO sys_function VALUES ('2930', 'gw_trg_visit_expl', 'utils', 'trigger function', NULL, NULL, NULL, 'role_basic');
-INSERT INTO sys_function VALUES ('2932', 'gw_trg_ui_rpt_cat_result', 'utils', 'trigger function', NULL, NULL, NULL, 'role_epa');
-INSERT INTO sys_function VALUES ('2934', 'gw_trg_ui_event', 'utils', 'trigger function', NULL, NULL, NULL, 'role_om');
-INSERT INTO sys_function VALUES ('2936', 'gw_trg_plan_psector_x_connec', 'utils', 'trigger function', NULL, NULL, NULL, 'role_master');
-INSERT INTO sys_function VALUES ('2938', 'gw_trg_plan_psector_link', 'utils', 'trigger function', NULL, NULL, NULL, 'role_master');
-INSERT INTO sys_function VALUES ('2940', 'gw_trg_plan_psector_geom', 'utils', 'trigger function', NULL, NULL, NULL, 'role_master');
-INSERT INTO sys_function VALUES ('2942', 'gw_trg_om_visit_singlevent', 'utils', 'trigger function', NULL, NULL, NULL, 'role_om');
-INSERT INTO sys_function VALUES ('2944', 'gw_trg_om_visit_multievent' ,'utils', 'trigger function', NULL, NULL, NULL, 'role_om');
-INSERT INTO sys_function VALUES ('2946', 'gw_trg_notify', 'utils', 'trigger function', NULL, NULL, NULL, 'role_basic');
-INSERT INTO sys_function VALUES ('2948', 'gw_trg_node_statecontrol', 'utils', 'trigger function', NULL, NULL, NULL, 'role_basic');
-INSERT INTO sys_function VALUES ('1146', 'gw_trg_node_arc_divide', 'utils', 'trigger function', NULL, NULL, NULL, 'role_basic');
-INSERT INTO sys_function VALUES ('2950', 'gw_trg_edit_streetaxis', 'utils', 'trigger function', NULL, NULL, NULL, 'role_basic');
-INSERT INTO sys_function VALUES ('2952', 'gw_trg_edit_plot', 'utils', 'trigger function', NULL, NULL, NULL, 'role_basic');
-INSERT INTO sys_function VALUES ('2954', 'gw_trg_edit_macrodqa', 'ws', 'trigger function', NULL, NULL, NULL, 'role_basic');
-INSERT INTO sys_function VALUES ('2956', 'gw_trg_edit_cad_aux', 'utils', 'trigger function', NULL, NULL, NULL, 'role_basic');
-INSERT INTO sys_function VALUES ('2958', 'gw_trg_edit_address', 'utils', 'trigger function', NULL, NULL, NULL, 'role_basic');
-INSERT INTO sys_function VALUES ('2960', 'gw_trg_ui_hydroval_connec', 'ws', 'trigger function', NULL, NULL, NULL, 'role_basic');
-INSERT INTO sys_function VALUES ('1316', 'gw_trg_ui_visit', 'utils', 'trigger function', NULL, NULL, NULL, 'role_basic');
-INSERT INTO sys_function VALUES ('2962', 'gw_trg_ui_mincut_result_cat', 'ws', 'trigger function', NULL, NULL, NULL, 'role_om');
-INSERT INTO sys_function VALUES ('1348', 'gw_trg_node_rotation_update', 'utils', 'trigger function', NULL, NULL, NULL, 'role_edit');
-INSERT INTO sys_function VALUES ('2964', 'gw_fct_getprofile', 'utils', 'trigger function', NULL, NULL, NULL, 'role_om');
-INSERT INTO sys_function VALUES ('2966', 'gw_fct_setprofile', 'utils', 'trigger function', NULL, NULL, NULL, 'role_om');
-INSERT INTO sys_function VALUES ('2968', 'gw_trg_plan_psector_x_gully', 'ud', 'trigger function', NULL, NULL, NULL, 'role_master');
-
-
-
-
-
-
+INSERT INTO sys_function VALUES ('2930', 'gw_trg_visit_expl', 'utils', 'trigger function', NULL, NULL, NULL, 'role_basic') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES ('2932', 'gw_trg_ui_rpt_cat_result', 'utils', 'trigger function', NULL, NULL, NULL, 'role_epa') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES ('2934', 'gw_trg_ui_event', 'utils', 'trigger function', NULL, NULL, NULL, 'role_om') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES ('2936', 'gw_trg_plan_psector_x_connec', 'utils', 'trigger function', NULL, NULL, NULL, 'role_master') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES ('2938', 'gw_trg_plan_psector_link', 'utils', 'trigger function', NULL, NULL, NULL, 'role_master') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES ('2940', 'gw_trg_plan_psector_geom', 'utils', 'trigger function', NULL, NULL, NULL, 'role_master') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES ('2942', 'gw_trg_om_visit_singlevent', 'utils', 'trigger function', NULL, NULL, NULL, 'role_om') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES ('2944', 'gw_trg_om_visit_multievent' ,'utils', 'trigger function', NULL, NULL, NULL, 'role_om') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES ('2946', 'gw_trg_notify', 'utils', 'trigger function', NULL, NULL, NULL, 'role_basic') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES ('2948', 'gw_trg_node_statecontrol', 'utils', 'trigger function', NULL, NULL, NULL, 'role_basic') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES ('1146', 'gw_trg_node_arc_divide', 'utils', 'trigger function', NULL, NULL, NULL, 'role_basic') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES ('2950', 'gw_trg_edit_streetaxis', 'utils', 'trigger function', NULL, NULL, NULL, 'role_basic') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES ('2952', 'gw_trg_edit_plot', 'utils', 'trigger function', NULL, NULL, NULL, 'role_basic') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES ('2954', 'gw_trg_edit_macrodqa', 'ws', 'trigger function', NULL, NULL, NULL, 'role_basic') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES ('2956', 'gw_trg_edit_cad_aux', 'utils', 'trigger function', NULL, NULL, NULL, 'role_basic') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES ('2958', 'gw_trg_edit_address', 'utils', 'trigger function', NULL, NULL, NULL, 'role_basic') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES ('2960', 'gw_trg_ui_hydroval_connec', 'ws', 'trigger function', NULL, NULL, NULL, 'role_basic') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES ('1316', 'gw_trg_ui_visit', 'utils', 'trigger function', NULL, NULL, NULL, 'role_basic') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES ('2962', 'gw_trg_ui_mincut_result_cat', 'ws', 'trigger function', NULL, NULL, NULL, 'role_om') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES ('1348', 'gw_trg_node_rotation_update', 'utils', 'trigger function', NULL, NULL, NULL, 'role_edit') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES ('2964', 'gw_fct_getprofile', 'utils', 'trigger function', NULL, NULL, NULL, 'role_om') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES ('2966', 'gw_fct_setprofile', 'utils', 'trigger function', NULL, NULL, NULL, 'role_om') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES ('2968', 'gw_trg_plan_psector_x_gully', 'ud', 'trigger function', NULL, NULL, NULL, 'role_master') ON CONFLICT (id) DO NOTHING;
 
