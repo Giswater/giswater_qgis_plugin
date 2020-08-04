@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2690
 
--- DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_admin_manage_addfields(json);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_admin_manage_addfields(json);
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_manage_addfields(p_data json)
   RETURNS json AS
