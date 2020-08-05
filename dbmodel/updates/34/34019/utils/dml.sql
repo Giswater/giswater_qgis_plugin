@@ -20,7 +20,7 @@ VALUES (2990, 'gw_fct_setmincutstart', 'ws', 'function', 'json', 'json', 'Set mi
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role)
 VALUES (2992, 'gw_fct_setmincutend', 'ws', 'function', 'json', 'json', 'Set mincut end', 'role_om') ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO audit_cat_function (id, function_name, project_type, function_type) 
+INSERT INTO sys_function (id, function_name, project_type, function_type) 
 VALUES (2994, 'gw_fct_vnode_repair', 'utils', 'function')ON CONFLICT (id) DO NOTHING;
 
 UPDATE sys_param_user SET id = 'edit_insert_elevation_from_dem', label = 'Insert elevation from DEM:'
