@@ -22,3 +22,12 @@ VALUES (2992, 'gw_fct_setmincutend', 'ws', 'function', 'json', 'json', 'Set minc
 
 INSERT INTO audit_cat_function (id, function_name, project_type, function_type) 
 VALUES (2994, 'gw_fct_vnode_repair', 'utils', 'function')ON CONFLICT (id) DO NOTHING;
+
+UPDATE sys_param_user SET id = 'edit_insert_elevation_from_dem', label = 'Insert elevation from DEM:'
+WHERE id = 'edit_upsert_elevation_from_dem';
+
+INSERT INTO sys_param_user(id, formname, descript, sys_role,  label, isenabled, layoutorder, project_type, isparent, 
+isautoupdate, datatype, widgettype, ismandatory, layoutname, iseditable,  isdeprecated)
+VALUES ('edit_update_elevation_from_dem', 'config', 'If true, the the elevation will be automatically updated from the DEM raster',
+'role_edit', 'Update elevation from DEM:', TRUE, 18, 'utils', FALSE, FALSE, 'boolean', 'check', FALSE, 'lyt_other',
+TRUE, FALSE) ON CONFLICT (id) DO NOTHING;

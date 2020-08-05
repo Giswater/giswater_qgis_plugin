@@ -111,7 +111,7 @@ v_type text;
 v_active_feature text;
 v_promixity_buffer double precision;
 v_sys_raster_dem boolean=false;
-v_edit_upsert_elevation_from_dem boolean=false;
+v_edit_insert_elevation_from_dem boolean=false;
 v_noderecord1 record;
 v_noderecord2 record;
 v_input json;
@@ -170,7 +170,7 @@ BEGIN
 	SELECT (value)::boolean INTO v_sys_raster_dem FROM config_param_system WHERE parameter='admin_raster_dem';
 
 	-- get user parameters
-	SELECT (value)::boolean INTO v_edit_upsert_elevation_from_dem FROM config_param_user WHERE parameter='edit_upsert_elevation_from_dem' AND cur_user = current_user;
+	SELECT (value)::boolean INTO v_edit_insert_elevation_from_dem FROM config_param_user WHERE parameter='edit_insert_elevation_from_dem' AND cur_user = current_user;
 
 	IF v_automatic_ccode IS TRUE AND v_automatic_ccode_field ='connec_id' THEN v_automatic_ccode = TRUE; ELSE v_automatic_ccode = FALSE; END IF;
 
@@ -580,7 +580,7 @@ BEGIN
 
 				-- elevation from raster
 				WHEN 'elevation', 'top_elev' THEN 
-					IF v_sys_raster_dem AND v_edit_upsert_elevation_from_dem THEN
+					IF v_sys_raster_dem AND v_edit_insert_elevation_from_dem THEN
 						field_value = (SELECT ST_Value(rast,1, p_reduced_geometry, false) FROM v_ext_raster_dem WHERE 
 						id = (SELECT id FROM v_ext_raster_dem WHERE st_dwithin (envelope, p_reduced_geometry, 1) LIMIT 1))::numeric (12,3);
 					ELSE
