@@ -14,6 +14,7 @@ import json
 import configparser
 from collections import OrderedDict
 from functools import partial
+import sys
 
 from .manage_layers import ManageLayers
 from .models.plugin_toolbar import PluginToolbar
@@ -44,6 +45,7 @@ from ..map_tools.flow_trace_flow_exit import FlowTraceFlowExitMapTool
 from ..map_tools.move_node import MoveNodeMapTool
 from ..map_tools.replace_feature import ReplaceFeatureMapTool
 
+from .toolbars.basic.basic import *
 
 class LoadProject(QObject):
 
@@ -68,6 +70,8 @@ class LoadProject(QObject):
         self.action = None
         self.plugin_name = self.qgis_tools.get_value_from_metadata('name', 'giswater')
         self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep
+        
+        self.buttons = {}
 
 
     def set_params_config(self, dict_toolbars, dict_actions, actions_not_checkable):
@@ -178,7 +182,7 @@ class LoadProject(QObject):
         # Open automatically 'search docker' depending its value in user settings
         open_search = self.controller.get_user_setting_value('open_search', 'true')
         if open_search == 'true':
-            self.basic.basic_api_search()
+            GwSearch(self.iface, self.settings, self.controller, self.plugin_dir).api_search()
 
         # call dynamic mapzones repaint
         self.pg_man.set_style_mapzones()
@@ -343,7 +347,20 @@ class LoadProject(QObject):
             ag = QActionGroup(parent)
             ag.setProperty('gw_name', 'gw_QActionGroup')
             for index_action in plugin_toolbar.list_actions:
-                self.add_action(index_action, plugin_toolbar.toolbar, ag)
+    
+                button_def = global_vars.settings.value(f"buttons_def/{index_action}")
+    
+                if not button_def:
+                    self.add_action(index_action, plugin_toolbar.toolbar, ag)
+    
+                else:
+                    text = self.translate(f'{index_action}_text')
+                    
+                    icon_path = self.icon_folder + plugin_toolbar.toolbar_id + os.sep + index_action + ".png"
+                    button = getattr(sys.modules[__name__], button_def)(icon_path, text, plugin_toolbar.toolbar, ag, self.iface, self.settings, self.controller, self.plugin_dir)
+                    
+                    self.buttons[index_action] = button
+    
 
         # Disable and hide all plugin_toolbars and actions
         self.enable_toolbars(False)
@@ -796,7 +813,9 @@ class LoadProject(QObject):
 
     def action_triggered(self, function_name):
         """ Action with corresponding funcion name has been triggered """
-
+        
+        print("Action Triggered")
+        
         try:
             if function_name in self.map_tools:
                 self.controller.check_actions(False)
