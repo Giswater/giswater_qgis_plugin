@@ -12,13 +12,13 @@ UPDATE config_param_system SET project_type = 'ws' WHERE parameter = 'om_mincut_
 
 --2020/08/04
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role)
-VALUES (2988, 'gw_fct_getmincut', 'ws', 'function', 'json', 'json', 'Get mincut values', 'role_ws')DO NOTHING;
+VALUES (2988, 'gw_fct_getmincut', 'ws', 'function', 'json', 'json', 'Get mincut values', 'role_ws') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role)
-VALUES (2990, 'gw_fct_setmincutstart', 'ws', 'function', 'json', 'json', 'Set mincut start', 'role_ws')DO NOTHING;
+VALUES (2990, 'gw_fct_setmincutstart', 'ws', 'function', 'json', 'json', 'Set mincut start', 'role_ws') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role)
-VALUES (2992, 'gw_fct_setmincutend', 'ws', 'function', 'json', 'json', 'Set mincut end', 'role_ws')DO NOTHING;
+VALUES (2992, 'gw_fct_setmincutend', 'ws', 'function', 'json', 'json', 'Set mincut end', 'role_ws') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO audit_cat_function (id, function_name, project_type, function_type) 
 VALUES (2994, 'gw_fct_vnode_repair', 'utils', 'function')ON CONFLICT (id) DO NOTHING;
