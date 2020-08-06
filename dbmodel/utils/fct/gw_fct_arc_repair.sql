@@ -68,7 +68,7 @@ BEGIN
 	LOOP
 		--counter
 		v_count_partial = v_count_partial+1;
-		RAISE NOTICE 'Comptador: % / %', v_count_partial,v_count;
+		RAISE NOTICE 'Counter: % / %', v_count_partial,v_count;
 		
 		-- execute
 		EXECUTE 'UPDATE arc SET the_geom=the_geom WHERE arc_id='||quote_literal(arcrec)||';';
