@@ -45,7 +45,11 @@ from ..map_tools.flow_trace_flow_exit import FlowTraceFlowExitMapTool
 from ..map_tools.move_node import MoveNodeMapTool
 from ..map_tools.replace_feature import ReplaceFeatureMapTool
 
+from .basic.search import GwSearch
+
+
 from .toolbars.basic.basic import *
+from .toolbars.edit.edit import *
 
 class LoadProject(QObject):
 
@@ -647,7 +651,7 @@ class LoadProject(QObject):
         # Button add_node or add_arc: add drop down menu to button in toolbar
         if self.schema_exists and (index_action == '01' or index_action == '02'):
             action = self.manage_dropdown_menu(action, index_action)
-
+        
         toolbar.addAction(action)
         action.setCheckable(is_checkable)
         self.actions[index_action] = action

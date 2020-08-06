@@ -24,20 +24,20 @@ import webbrowser
 from collections import OrderedDict
 from functools import partial
 
-from .... import global_vars
+from ... import global_vars
 from lib import qt_tools
-from ....actions.api_catalog import ApiCatalog
-from ...parent_utils import ParentUtils
-from ....actions.manage_document import ManageDocument
-from ....actions.manage_element import ManageElement
-from ....actions.manage_gallery import ManageGallery
-from ....actions.manage_visit import ManageVisit
-from ....map_tools.snapping_utils_v3 import SnappingConfigManager
-from ....ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFull, GwMainWindow, VisitDocument, InfoCrossectUi
-from ....actions.api_dimensioning import ApiDimensioning
+from ...actions.api_catalog import ApiCatalog
+from ...actions.api_parent import ApiParent
+from ...actions.manage_document import ManageDocument
+from ...actions.manage_element import ManageElement
+from ...actions.manage_gallery import ManageGallery
+from ...actions.manage_visit import ManageVisit
+from ...map_tools.snapping_utils_v3 import SnappingConfigManager
+from ...ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFull, GwMainWindow, VisitDocument, InfoCrossectUi
+from ...actions.api_dimensioning import ApiDimensioning
 
 
-class GwInfo(ParentUtils, QObject):
+class GwInfo(ApiParent, QObject):
 
     # :var signal_activate: emitted from def cancel_snapping_tool(self, dialog, action) in order to re-start CadApiInfo
     signal_activate = pyqtSignal()
@@ -45,7 +45,7 @@ class GwInfo(ParentUtils, QObject):
     def __init__(self, iface, settings, controller, plugin_dir, tab_type):
         """ Class constructor """
 
-        ParentUtils.__init__(self, iface, settings, controller, plugin_dir)
+        ApiParent.__init__(self, iface, settings, controller, plugin_dir)
         QObject.__init__(self)
         self.iface = iface
         self.settings = settings

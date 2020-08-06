@@ -19,17 +19,17 @@ import re
 import sys
 from functools import partial
 
-from .... import global_vars
+from ... import global_vars
 from lib import qt_tools
 from .info import GwInfo
-from ....actions.manage_document import ManageDocument
-from ....actions.manage_new_psector import ManageNewPsector
-from ....actions.manage_visit import ManageVisit
-from ...parent_utils import ParentUtils
-from ....ui_manager import SearchUi, InfoGenericUi, SearchWorkcat
+from ...actions.manage_document import ManageDocument
+from ...actions.manage_new_psector import ManageNewPsector
+from ...actions.manage_visit import ManageVisit
+from ...actions.api_parent import ApiParent
+from ...ui_manager import SearchUi, InfoGenericUi, SearchWorkcat
 
 
-class GwSearch(ParentUtils):
+class GwSearch(ApiParent):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class constructor """
@@ -770,7 +770,7 @@ class GwSearch(ParentUtils):
 
         feature_id = qtable.model().record(row).value('feature_id')
 
-        self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, tab_type='data')
+        self.ApiCF = GwInfo(self.iface, self.settings, self.controller, self.plugin_dir, tab_type='data')
         complet_result, dialog = self.ApiCF.open_form(table_name=table_name, feature_id=feature_id, tab_type='data')
 
         # Get list of all coords in field geometry

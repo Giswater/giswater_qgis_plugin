@@ -25,6 +25,7 @@ class GwParentAction:
 		self.action.triggered.connect(self.clicked_event)
 		
 		toolbar.addAction(self.action)
-		
+	
+	
 	def clicked_event(self):
 		self.controller.show_message("Action has no function!!", "INFO")
