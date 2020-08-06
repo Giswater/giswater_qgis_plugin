@@ -33,3 +33,10 @@ isautoupdate, datatype, widgettype, ismandatory, layoutname, iseditable,  isdepr
 VALUES ('edit_update_elevation_from_dem', 'config', 'If true, the the elevation will be automatically updated from the DEM raster',
 'role_edit', 'Update elevation from DEM:', TRUE, 18, 'utils', FALSE, FALSE, 'boolean', 'check', FALSE, 'lyt_other',
 TRUE, FALSE) ON CONFLICT (id) DO NOTHING;
+
+--2020/08/06
+INSERT INTO config_csv(fid, alias, descript, functionname, active, readheader)
+VALUES (246, 'Export ui', 'Export ui form', 'gw_fct_export_ui_xml', true,false) ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO config_csv(fid, alias, descript, functionname, active, readheader)
+VALUES (247, 'Import ui', 'Import ui form', 'gw_fct_import_ui_xml', true,false) ON CONFLICT (fid) DO NOTHING;
