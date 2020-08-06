@@ -80,7 +80,7 @@ BEGIN
 		LOOP
 			--find the closest arc and the distance between arc and node
 			SELECT ST_Distance(arc.the_geom, rec_node.the_geom) as d, arc.arc_id INTO v_closest_arc_distance, v_closest_arc_id 
-			FROM arc ORDER BY arc.the_geom <-> rec_node.the_geom  LIMIT 1;
+			FROM arc WHERE arc.state = 1 ORDER BY arc.the_geom <-> rec_node.the_geom  LIMIT 1;
 		
 			INSERT INTO anl_node (node_id, state, expl_id, fid, the_geom, nodecat_id,arc_id,arc_distance)
 			VALUES (rec_node.node_id, rec_node.state, rec_node.expl_id, 107, rec_node.the_geom, rec_node.nodecat_id,v_closest_arc_id,v_closest_arc_distance);
@@ -91,7 +91,7 @@ BEGIN
 		LOOP
 			--find the closest arc and the distance between arc and node
 			SELECT ST_Distance(arc.the_geom, rec_node.the_geom) as d, arc.arc_id INTO v_closest_arc_distance, v_closest_arc_id 
-			FROM arc ORDER BY arc.the_geom <-> rec_node.the_geom  LIMIT 1;
+			FROM arc WHERE arc.state = 1 ORDER BY arc.the_geom <-> rec_node.the_geom  LIMIT 1;
 		
 			INSERT INTO anl_node (node_id, state, expl_id, fid, the_geom, nodecat_id,arc_id,arc_distance)
 			VALUES (rec_node.node_id, rec_node.state, rec_node.expl_id, 107, rec_node.the_geom, rec_node.nodecat_id,v_closest_arc_id,v_closest_arc_distance);
