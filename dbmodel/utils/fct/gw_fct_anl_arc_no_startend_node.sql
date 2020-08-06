@@ -19,6 +19,9 @@ SELECT SCHEMA_NAME.gw_fct_anl_arc_no_startend_node($${
 "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
 "parameters":{"arcSearchNodes":"0.1", "saveOnDatabase":"true"}}}$$)::text
 
+WARNINGS: This function only works with node with state = 1
+
+
 -- fid: 103
 
 */
@@ -80,14 +83,14 @@ BEGIN
 	
 		v_partcount = v_partcount +1;
 	
-		SELECT * INTO nodeRecord1 FROM node WHERE ST_DWithin(ST_startpoint(arc_rec.the_geom), node.the_geom, v_arcsearchnodes) AND (node.state=1 OR node.state=2)
+		SELECT * INTO nodeRecord1 FROM node WHERE ST_DWithin(ST_startpoint(arc_rec.the_geom), node.the_geom, v_arcsearchnodes) AND (node.state=1)
 		ORDER BY ST_Distance(node.the_geom, ST_startpoint(arc_rec.the_geom)) LIMIT 1;
 		IF nodeRecord1 IS NULL 	THEN
 			INSERT INTO anl_arc_x_node (arc_id, state, expl_id, fid, the_geom, the_geom_p, arccat_id)
 			SELECT arc_rec.arc_id, arc_rec.state, arc_rec.expl_id, 103, arc_rec.the_geom, st_startpoint(arc_rec.the_geom), arc_rec.arccat_id;
 		END IF;
 	
-		SELECT * INTO nodeRecord2 FROM node WHERE ST_DWithin(ST_endpoint(arc_rec.the_geom), node.the_geom, v_arcsearchnodes) AND (node.state=1 OR node.state=2)
+		SELECT * INTO nodeRecord2 FROM node WHERE ST_DWithin(ST_endpoint(arc_rec.the_geom), node.the_geom, v_arcsearchnodes) AND (node.state=1)
 		ORDER BY ST_Distance(node.the_geom, ST_endpoint(arc_rec.the_geom)) LIMIT 1;
 		IF nodeRecord2 IS NULL 	THEN
 			INSERT INTO anl_arc_x_node (arc_id, state, expl_id, fid, the_geom, the_geom_p, arccat_id)
