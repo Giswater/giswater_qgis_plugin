@@ -11,7 +11,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_export_ui_xml(p_formname text, p_p
 RETURNS json AS
 $BODY$
 
---select SCHEMA_NAME.gw_fct_export_ui_xml('ve_node_x');
+--select SCHEMA_NAME.gw_fct_export_ui_xml('ve_node_x',false);
 
 --fid:246
 
@@ -32,7 +32,7 @@ BEGIN
 	SET search_path=SCHEMA_NAME;
 
 	--iterate over fields defined for the selected form
-	FOR rec IN (SELECT * FROM config_form_fields where formname=p_formname AND formtype='feature' order by layoutorder) LOOP
+	FOR rec IN (SELECT * FROM config_form_fields where formname=p_formname AND formtype='form_feature' AND layoutorder IS NOT NULL order by layoutorder) LOOP
 
 	IF p_parent IS TRUE THEN
 		IF (SELECT param_name FROM sys_addfields
