@@ -48,6 +48,7 @@ from ..map_tools.replace_feature import ReplaceFeatureMapTool
 
 from .toolbars.basic.basic import *
 from .toolbars.edit.edit import *
+from .toolbars.cad.cad import *
 
 class LoadProject(QObject):
 
