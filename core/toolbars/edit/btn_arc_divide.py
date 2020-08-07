@@ -28,7 +28,7 @@ from ....ui_manager import DialogTextUi
 from ...utils.giswater_tools import populate_info_text, create_body, refresh_legend
 
 
-class GwArcDivide(GwParentMapTool):
+class GwArcDivideButton(GwParentMapTool):
 	""" Button 16. Move node
 	Execute SQL function: 'gw_fct_node2arc' """
 	

@@ -118,12 +118,12 @@ class GwEdit(ParentAction):
 		self.manage_element.edit_element()
 	
 	
-	def edit_end_feature(self):
-		""" Button 68: Edit end feature """
-		self.manage_workcat_end.manage_workcat_end()
+	# def edit_end_feature(self):
+	# 	""" Button 68: Edit end feature """
+	# 	self.manage_workcat_end.manage_workcat_end()
 	
 	
-	def del_feature(self):
-		"""" Button 69: Delete Feature """
-		self.delete_feature.manage_delete_feature()
+	# def del_feature(self):
+	# 	"""" Button 69: Delete Feature """
+	# 	self.delete_feature.manage_delete_feature()
 

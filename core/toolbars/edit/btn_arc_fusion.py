@@ -26,7 +26,7 @@ from functools import partial
 from ...utils.giswater_tools import load_settings, open_dialog, close_dialog, create_body, populate_info_text
 
 
-class GwArcFusion(GwParentMapTool):
+class GwArcFusionButton(GwParentMapTool):
 	""" Button 17: User select one node. Execute SQL function: 'gw_fct_delete_node' """
 	
 	def __init__(self, icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir):

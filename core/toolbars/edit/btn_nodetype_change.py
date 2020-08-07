@@ -18,7 +18,7 @@ from ..parent_maptool import GwParentMapTool
 from ...utils.giswater_tools import load_settings, save_settings, open_dialog, check_expression
 
 
-class GwNodeTypeChange(GwParentMapTool):
+class GwNodeTypeChangeButton(GwParentMapTool):
 	""" Button 28: User select one node. A form is opened showing current node_type.type
 		Combo to select new node_type.type
 		Combo to select new node_type.id

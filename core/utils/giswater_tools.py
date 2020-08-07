@@ -1,8 +1,10 @@
 from qgis.PyQt.QtWidgets import QLineEdit, QSizePolicy, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel, QCheckBox
 from qgis.PyQt.QtWidgets import QTableView, QTabWidget, QPushButton, QTextEdit, QApplication
 from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtGui import QCursor, QPixmap
 from qgis.core import QgsProject, QgsExpression
 
+import os
 from functools import partial
 import sys
 if 'nt' in sys.builtin_module_names:
@@ -191,6 +193,20 @@ def check_expression(expr_filter, controller, log_info=False):
 		return False, expr
 	
 	return True, expr
+
+
+def get_cursor_multiple_selection():
+	""" Set cursor for multiple selection """
+	
+	path_folder = os.path.join(os.path.dirname(__file__), os.pardir)
+	path_cursor = os.path.join(path_folder, 'icons', '201.png')
+	if os.path.exists(path_cursor):
+		cursor = QCursor(QPixmap(path_cursor))
+	else:
+		cursor = QCursor(Qt.ArrowCursor)
+	
+	return cursor
+
 
 # Doesn't work because of hasattr and getattr
 '''
