@@ -22,7 +22,8 @@ from .utils.pg_man import PgMan
 from .. import global_vars
 from ..lib.qgis_tools import QgisTools
 from ..ui_manager import DialogTextUi
-from ..actions.basic import Basic
+# from ..actions.basic import Basic
+from .actions.basic.basic_func import GwBasic
 from ..actions.edit import Edit
 from ..actions.go2epa import Go2Epa
 from ..actions.master import Master
@@ -44,9 +45,6 @@ from ..map_tools.draw_profiles import DrawProfiles
 from ..map_tools.flow_trace_flow_exit import FlowTraceFlowExitMapTool
 from ..map_tools.move_node import MoveNodeMapTool
 from ..map_tools.replace_feature import ReplaceFeatureMapTool
-
-from .actions.basic.search import GwSearch
-
 
 from .toolbars.basic.basic import *
 from .toolbars.edit.edit import *
@@ -186,7 +184,7 @@ class LoadProject(QObject):
         # Open automatically 'search docker' depending its value in user settings
         open_search = self.controller.get_user_setting_value('open_search', 'true')
         if open_search == 'true':
-            GwSearch(self.iface, self.settings, self.controller, self.plugin_dir).api_search()
+            self.basic.basic_api_search()
 
         # call dynamic mapzones repaint
         self.pg_man.set_style_mapzones()
@@ -283,7 +281,7 @@ class LoadProject(QObject):
     def initialize_toolbars(self):
         """ Initialize toolbars """
 
-        self.basic = Basic(self.iface, global_vars.settings, self.controller, self.plugin_dir)
+        self.basic = GwBasic(self.iface, global_vars.settings, self.controller, self.plugin_dir)
         self.utils = Utils(self.iface, global_vars.settings, self.controller, self.plugin_dir)
         self.go2epa = Go2Epa(self.iface, global_vars.settings, self.controller, self.plugin_dir)
         self.om = Om(self.iface, global_vars.settings, self.controller, self.plugin_dir)

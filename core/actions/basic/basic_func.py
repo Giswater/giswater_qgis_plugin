@@ -8,12 +8,12 @@ or (at your option) any later version.
 import os
 from functools import partial
 
-from ..ui_manager import SelectorUi
-from .api_search import ApiSearch
-from .api_parent import ApiParent
+from ....ui_manager import SelectorUi
+from ..basic.search import GwSearch
+from ....actions.api_parent import ApiParent
 
 
-class Basic(ApiParent):
+class GwBasic(ApiParent):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'basic' """
@@ -61,7 +61,7 @@ class Basic(ApiParent):
         """ Button 143: ApiSearch """
 
         if self.api_search is None:
-            self.api_search = ApiSearch(self.iface, self.settings, self.controller, self.plugin_dir)
+            self.api_search = GwSearch(self.iface, self.settings, self.controller, self.plugin_dir)
 
         self.api_search.api_search()
 
