@@ -18,7 +18,6 @@ This function have been refactorized on 2019/04/24 changing the full strategy of
 	
 
 MAIN CHANGES
-- Vnode_type = 'CUSTOM' dissapears. Only 'AUTO' is possible. 
 - Vnode geometry is only updateable. It's no posible to create a new one using ToC layer
 - It's forbidden to connec links on vnode without arcs.
 - Connect_to_network works also with node/connec/gully as endpoints (deprecated)
@@ -214,8 +213,8 @@ BEGIN
 			-- vnode, only for those links connected to vnode
 			IF v_link.exit_type = 'VNODE' THEN
 				DELETE FROM vnode WHERE vnode_id=v_exit.vnode_id::integer;			
-				INSERT INTO vnode (vnode_id, vnode_type, state, sector_id, dma_id, expl_id, the_geom) 
-				VALUES ((SELECT nextval('vnode_vnode_id_seq')), 'AUTO', v_arc.state, v_arc.sector_id, v_arc.dma_id, v_arc.expl_id, v_exit.the_geom) RETURNING vnode_id INTO v_exit_id;	
+				INSERT INTO vnode (state,  the_geom) 
+				VALUES (v_arc.state, v_exit.the_geom) RETURNING vnode_id INTO v_exit_id;	
 				v_link.exit_id = v_exit_id;
 				v_pjointtype = v_link.exit_type;
 				v_link.exit_type = 'VNODE';

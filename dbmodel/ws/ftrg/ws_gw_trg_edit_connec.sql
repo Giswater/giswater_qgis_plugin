@@ -535,7 +535,6 @@ BEGIN
 		IF (NEW.arc_id != OLD.arc_id OR (OLD.arc_id IS NULL AND NEW.arc_id IS NOT NULL)) THEN  -- case when arc_id comes from connec table
 			UPDATE connec SET arc_id=NEW.arc_id where connec_id=NEW.connec_id;
 			IF (SELECT link_id FROM link WHERE feature_id=NEW.connec_id AND feature_type='CONNEC' LIMIT 1) IS NOT NULL THEN
-				UPDATE vnode SET vnode_type='AUTO' WHERE vnode_id=(SELECT exit_id FROM link WHERE feature_id=NEW.connec_id AND exit_type='VNODE' LIMIT 1)::int8;
 
 				EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":4, "infoType":1, "lang":"ES"},
 				"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';

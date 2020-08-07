@@ -237,8 +237,8 @@ BEGIN
             IF  (SELECT link_id FROM link WHERE exit_type='NODE' and exit_id=v_node_id LIMIT 1) IS NOT NULL THEN
             
                 -- insert one vnode (indenpendently of the number of links. Only one vnode must replace the node)
-                INSERT INTO vnode (vnode_id, vnode_type, state, sector_id, dma_id, expl_id, the_geom) 
-                VALUES ((SELECT nextval('vnode_vnode_id_seq')), 'AUTO', v_new_record.state, v_new_record.sector_id, v_new_record.dma_id, v_new_record.expl_id, v_node_geom) 
+                INSERT INTO vnode (state, the_geom) 
+                VALUES (v_new_record.state, v_node_geom) 
                 RETURNING vnode_id INTO v_vnode;
                 
                 -- update link with new vnode

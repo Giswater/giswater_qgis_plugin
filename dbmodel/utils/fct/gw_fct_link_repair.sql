@@ -95,8 +95,8 @@ BEGIN
 			UPDATE link SET the_geom = v_link.the_geom WHERE link_id = p_link_id;
 
 			-- insert vnode on the end point geometry
-			INSERT INTO vnode (vnode_type, sector_id, state, dma_id, expl_id, the_geom) 
-			VALUES ('AUTO', v_connec.sector_id, v_connec.state, v_connec.dma_id, v_connec.expl_id, v_end_point) RETURNING vnode_id INTO v_id;
+			INSERT INTO vnode (state, the_geom) 
+			VALUES (v_connec.state, v_end_point) RETURNING vnode_id INTO v_id;
 	
 			-- update link values
 			UPDATE link SET exit_id= v_id, exit_type='VNODE' WHERE link_id=p_link_id;
@@ -159,8 +159,8 @@ BEGIN
 			UPDATE link SET the_geom = v_link.the_geom WHERE link_id = p_link_id;
 
 			-- insert vnode on the end point geometry
-			INSERT INTO vnode (vnode_type, sector_id, state, dma_id, expl_id, the_geom) 
-			VALUES ('AUTO', v_gully.sector_id, v_gully.state, v_gully.dma_id, v_gully.expl_id, v_end_point) RETURNING vnode_id INTO v_id;
+			INSERT INTO vnode (state, the_geom) 
+			VALUES (v_gully.state, v_end_point) RETURNING vnode_id INTO v_id;
 	
 			-- update link values
 			UPDATE link SET exit_id= v_id, exit_type='VNODE' WHERE link_id=p_link_id;

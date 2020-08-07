@@ -199,8 +199,8 @@ BEGIN
 				v_node_id = (select vnode_id FROM vnode WHERE vnode_id::text = NEW.exit_id AND NEW.exit_type='VNODE');
 
 				IF v_node_id IS NULL THEN -- there is no vnode existing linked				
-					INSERT INTO vnode (vnode_id, state, expl_id, sector_id, dma_id, vnode_type, the_geom) 
-					VALUES ((SELECT nextval('vnode_vnode_id_seq')), v_arc.state, v_arc.expl_id, v_arc.sector_id, v_arc.dma_id, 'AUTO', v_end_point) RETURNING vnode_id INTO v_node_id;			
+					INSERT INTO vnode (state, the_geom) 
+					VALUES (v_arc.state, v_end_point) RETURNING vnode_id INTO v_node_id;			
 				END IF;
 			ELSE
 				v_end_point = v_vnode.the_geom;
