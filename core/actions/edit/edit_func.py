@@ -8,11 +8,11 @@ or (at your option) any later version.
 from qgis.PyQt.QtCore import QSettings
 
 from ..basic.info import GwInfo
-from ...actions.manage_element import ManageElement
-from ...actions.manage_document import ManageDocument
-from ...actions.manage_workcat_end import ManageWorkcatEnd
-from ...actions.delete_feature import DeleteFeature
-from ...actions.parent import ParentAction
+from ..epa.element import GwElement
+from ..edit.document import GwDocument
+from ..epa.feature_end import GwFeatureEnd
+from ..edit.feature_delete import GwFeatureDelete
+from ....actions.parent import ParentAction
 
 
 class GwEdit(ParentAction):
@@ -21,10 +21,10 @@ class GwEdit(ParentAction):
 		""" Class to control toolbar 'edit' """
 		
 		ParentAction.__init__(self, iface, settings, controller, plugin_dir)
-		self.manage_document = ManageDocument(iface, settings, controller, plugin_dir)
-		self.manage_element = ManageElement(iface, settings, controller, plugin_dir)
-		self.manage_workcat_end = ManageWorkcatEnd(iface, settings, controller, plugin_dir)
-		self.delete_feature = DeleteFeature(iface, settings, controller, plugin_dir)
+		self.manage_document = GwDocument(iface, settings, controller, plugin_dir)
+		self.manage_element = GwElement(iface, settings, controller, plugin_dir)
+		self.manage_workcat_end = GwFeatureEnd(iface, settings, controller, plugin_dir)
+		self.delete_feature = GwFeatureDelete(iface, settings, controller, plugin_dir)
 		self.suppres_form = None
 	
 	

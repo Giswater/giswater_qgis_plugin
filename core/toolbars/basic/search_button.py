@@ -1,5 +1,5 @@
 from ..parent_action import GwParentAction
-from ...basic.search import GwSearch
+from ...actions.basic.search import GwSearch
 
 
 class GwSearchButton(GwParentAction):

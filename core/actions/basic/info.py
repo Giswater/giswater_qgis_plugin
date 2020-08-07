@@ -24,17 +24,17 @@ import webbrowser
 from collections import OrderedDict
 from functools import partial
 
-from ... import global_vars
+from .... import global_vars
 from lib import qt_tools
-from ...actions.api_catalog import ApiCatalog
-from ...actions.api_parent import ApiParent
-from ...actions.manage_document import ManageDocument
-from ...actions.manage_element import ManageElement
-from ...actions.manage_gallery import ManageGallery
-from ...actions.manage_visit import ManageVisit
-from ...map_tools.snapping_utils_v3 import SnappingConfigManager
-from ...ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFull, GwMainWindow, VisitDocument, InfoCrossectUi
-from ...actions.api_dimensioning import ApiDimensioning
+from .catalog import GwCatalog
+from ....actions.api_parent import ApiParent
+from ..edit.document import GwDocument
+from ..epa.element import GwElement
+from ..om.visit_gallery import GwVisitGallery
+from ..om.visit_manager import GwVisitManager
+from ....map_tools.snapping_utils_v3 import SnappingConfigManager
+from ....ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFull, GwMainWindow, VisitDocument, InfoCrossectUi
+from ..edit.dimensioning import GwDimensioning
 
 
 class GwInfo(ApiParent, QObject):
@@ -316,7 +316,7 @@ class GwInfo(ApiParent, QObject):
         elif template == 'dimensioning':
             self.lyr_dim = self.controller.get_layer_by_tablename("v_edit_dimensions", show_warning=True)
             if self.lyr_dim:
-                self.api_dim = ApiDimensioning(self.iface, self.settings, self.controller, self.plugin_dir)
+                self.api_dim = GwDimensioning(self.iface, self.settings, self.controller, self.plugin_dir)
                 feature_id = self.complet_result[0]['body']['feature']['id']
                 result, dialog = self.api_dim.open_form(None, self.lyr_dim, self.complet_result, feature_id)
                 return result, dialog
@@ -337,7 +337,7 @@ class GwInfo(ApiParent, QObject):
         elif template == 'visit':
             visit_id = self.complet_result[0]['body']['feature']['id']
             layers_visibility = self.get_layers_visibility()
-            manage_visit = ManageVisit(self.iface, self.settings, self.controller, self.plugin_dir)
+            manage_visit = GwVisitManager(self.iface, self.settings, self.controller, self.plugin_dir)
             manage_visit.manage_visit(visit_id=visit_id, tag='info')
             manage_visit.dlg_add_visit.rejected.connect(partial(self.restore_layers_visibility, layers_visibility))
 
@@ -1316,7 +1316,7 @@ class GwInfo(ApiParent, QObject):
 
     def open_catalog(self, tab_type, feature_type):
 
-        self.catalog = ApiCatalog(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.catalog = GwCatalog(self.iface, self.settings, self.controller, self.plugin_dir)
 
         # Check geom_type
         if self.geom_type == 'connec':
@@ -1540,7 +1540,7 @@ class GwInfo(ApiParent, QObject):
     def manage_element(self, dialog, element_id=None, feature=None):
         """ Execute action of button 33 """
 
-        elem = ManageElement(self.iface, self.settings, self.controller, self.plugin_dir)
+        elem = GwElement(self.iface, self.settings, self.controller, self.plugin_dir)
         elem.manage_element(True, feature, self.geom_type)
         elem.dlg_add_element.accepted.connect(partial(self.manage_element_new, dialog, elem))
         elem.dlg_add_element.rejected.connect(partial(self.manage_element_new, dialog, elem))
@@ -2144,7 +2144,7 @@ class GwInfo(ApiParent, QObject):
     def open_visit(self):
         """ Call button 65: om_visit_management """
 
-        manage_visit = ManageVisit(self.iface, self.settings, self.controller, self.plugin_dir)
+        manage_visit = GwVisitManager(self.iface, self.settings, self.controller, self.plugin_dir)
         manage_visit.visit_added.connect(self.update_visit_table)
         manage_visit.edit_visit(self.geom_type, self.feature_id)
 
@@ -2167,7 +2167,7 @@ class GwInfo(ApiParent, QObject):
             self.controller.show_warning(msg)
             return
 
-        manage_visit = ManageVisit(self.iface, self.settings, self.controller, self.plugin_dir)
+        manage_visit = GwVisitManager(self.iface, self.settings, self.controller, self.plugin_dir)
         manage_visit.visit_added.connect(self.update_visit_table)
         # TODO: the following query fix a (for me) misterious bug
         # the DB connection is not available during manage_visit.manage_visit first call
@@ -2181,7 +2181,7 @@ class GwInfo(ApiParent, QObject):
         """ Open gallery of selected record of the table """
 
         # Open Gallery
-        gal = ManageGallery(self.iface, self.settings, self.controller, self.plugin_dir)
+        gal = GwVisitGallery(self.iface, self.settings, self.controller, self.plugin_dir)
         gal.manage_gallery()
         gal.fill_gallery(self.visit_id, self.event_id)
 
@@ -2403,7 +2403,7 @@ class GwInfo(ApiParent, QObject):
     def manage_new_document(self, dialog, doc_id=None, feature=None):
         """ Execute action of button 34 """
 
-        doc = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir)
+        doc = GwDocument(self.iface, self.settings, self.controller, self.plugin_dir)
         doc.manage_document(feature=feature, geom_type=self.geom_type)
         doc.dlg_add_doc.accepted.connect(partial(self.manage_document_new, dialog, doc))
         doc.dlg_add_doc.rejected.connect(partial(self.manage_document_new, dialog, doc))

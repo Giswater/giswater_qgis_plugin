@@ -45,7 +45,7 @@ from ..map_tools.flow_trace_flow_exit import FlowTraceFlowExitMapTool
 from ..map_tools.move_node import MoveNodeMapTool
 from ..map_tools.replace_feature import ReplaceFeatureMapTool
 
-from .basic.search import GwSearch
+from .actions.basic.search import GwSearch
 
 
 from .toolbars.basic.basic import *

@@ -4,7 +4,7 @@ from qgis.PyQt.QtGui import QKeySequence
 from functools import partial
 
 from ..parent_action import GwParentAction
-from ...edit.edit_func import GwEdit
+from ...actions.edit.edit_func import GwEdit
 from ...utils.pg_man import PgMan
 
 class GwAddPointButton(GwParentAction):
@@ -36,7 +36,6 @@ class GwAddPointButton(GwParentAction):
 					pass
 				menu.addAction(obj_action)
 				obj_action.triggered.connect(partial(self.edit.edit_add_feature, feature_cat))
-				print("Entered 1")
 		menu.addSeparator()
 		
 		list_feature_cat = self.controller.get_values_from_dictionary(self.feature_cat)
@@ -50,7 +49,6 @@ class GwAddPointButton(GwParentAction):
 					pass
 				menu.addAction(obj_action)
 				obj_action.triggered.connect(partial(self.edit.edit_add_feature, feature_cat))
-				print("Entered 2")
 		menu.addSeparator()
 		
 		list_feature_cat = self.controller.get_values_from_dictionary(self.feature_cat)
@@ -64,7 +62,6 @@ class GwAddPointButton(GwParentAction):
 					pass
 				menu.addAction(obj_action)
 				obj_action.triggered.connect(partial(self.edit.edit_add_feature, feature_cat))
-				print("Entered 3")
 		menu.addSeparator()
 		
 		

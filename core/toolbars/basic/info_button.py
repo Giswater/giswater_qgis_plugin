@@ -5,7 +5,7 @@ from qgis.PyQt.QtGui import QCursor
 
 from ..parent_maptool import GwParentMapTool
 
-from ...basic.info import GwInfo
+from ...actions.basic.info import GwInfo
 
 
 class GwInfoButton(GwParentMapTool):

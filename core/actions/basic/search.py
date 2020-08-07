@@ -19,14 +19,14 @@ import re
 import sys
 from functools import partial
 
-from ... import global_vars
+from .... import global_vars
 from lib import qt_tools
 from .info import GwInfo
-from ...actions.manage_document import ManageDocument
-from ...actions.manage_new_psector import ManageNewPsector
-from ...actions.manage_visit import ManageVisit
-from ...actions.api_parent import ApiParent
-from ...ui_manager import SearchUi, InfoGenericUi, SearchWorkcat
+from ..edit.document import GwDocument
+from ..plan.psector import GwPsector
+from ..om.visit_manager import GwVisitManager
+from ....actions.api_parent import ApiParent
+from ....ui_manager import SearchUi, InfoGenericUi, SearchWorkcat
 
 
 class GwSearch(ApiParent):
@@ -35,8 +35,8 @@ class GwSearch(ApiParent):
         """ Class constructor """
 
         super().__init__(iface, settings, controller, plugin_dir)
-        self.manage_new_psector = ManageNewPsector(iface, settings, controller, plugin_dir)
-        self.manage_visit = ManageVisit(iface, settings, controller, plugin_dir)
+        self.manage_new_psector = GwPsector(iface, settings, controller, plugin_dir)
+        self.manage_visit = GwVisitManager(iface, settings, controller, plugin_dir)
         self.iface = iface
         self.project_type = controller.get_project_type()
         self.json_search = {}
@@ -551,7 +551,7 @@ class GwSearch(ApiParent):
     def manage_document(self, qtable, item_id):
         """ Access GUI to manage documents e.g Execute action of button 34 """
 
-        manage_document = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir, single_tool=False)
+        manage_document = GwDocument(self.iface, self.settings, self.controller, self.plugin_dir, single_tool=False)
         dlg_docman = manage_document.manage_document(tablename='workcat', qtable=qtable, item_id=item_id)
         dlg_docman.btn_accept.clicked.connect(partial(self.set_completer_object, dlg_docman, 'doc'))
         qt_tools.remove_tab_by_tabName(dlg_docman.tabWidget, 'tab_rel')
