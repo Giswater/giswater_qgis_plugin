@@ -1,3 +1,3 @@
-from .add_point_button import GwAddPointButton
-from .add_line_button import GwAddLineButton
-from .feature_replace_button import GwFeatureReplaceButton
+from .btn_add_point import GwAddPointButton
+from .btn_add_line import GwAddLineButton
+from .btn_feature_replace import GwFeatureReplaceButton

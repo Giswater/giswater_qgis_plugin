@@ -1,3 +1,3 @@
-from .info_button import GwInfoButton
-from .search_button import GwSearchButton
-from .selector_button import GwSelectorButton
+from .btn_info import GwInfoButton
+from .btn_search import GwSearchButton
+from .btn_selector import GwSelectorButton
