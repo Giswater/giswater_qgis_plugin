@@ -1,7 +1,7 @@
 from qgis.PyQt.QtWidgets import QLineEdit, QSizePolicy, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel, QCheckBox
 from qgis.PyQt.QtWidgets import QTableView, QTabWidget, QPushButton, QTextEdit, QApplication
 from qgis.PyQt.QtCore import Qt
-from qgis.core import QgsProject
+from qgis.core import QgsProject, QgsExpression
 
 from functools import partial
 import sys
@@ -179,7 +179,18 @@ def refresh_legend(controller):
 				ln.setData(current_state, Qt.CheckStateRole)
 
 
-
+def check_expression(expr_filter, controller, log_info=False):
+	""" Check if expression filter @expr is valid """
+	
+	if log_info:
+		controller.log_info(expr_filter)
+	expr = QgsExpression(expr_filter)
+	if expr.hasParserError():
+		message = "Expression Error"
+		controller.log_warning(message, parameter=expr_filter)
+		return False, expr
+	
+	return True, expr
 
 # Doesn't work because of hasattr and getattr
 '''
