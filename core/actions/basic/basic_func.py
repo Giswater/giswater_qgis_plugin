@@ -57,11 +57,11 @@ class GwBasic(ApiParent):
         self.dlg_selector.rejected.connect(partial(
             self.save_current_tab, self.dlg_selector, self.dlg_selector.main_tab, 'basic'))
 
-    def basic_api_search(self):
-        """ Button 143: ApiSearch """
-
-        if self.api_search is None:
-            self.api_search = GwSearch(self.iface, self.settings, self.controller, self.plugin_dir)
-
-        self.api_search.api_search()
+    # def basic_api_search(self):
+    #     """ Button 143: ApiSearch """
+    #
+    #     if self.api_search is None:
+    #         self.api_search = GwSearch(self.iface, self.settings, self.controller, self.plugin_dir)
+    #
+    #     self.api_search.api_search()
 

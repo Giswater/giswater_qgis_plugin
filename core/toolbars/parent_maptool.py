@@ -150,6 +150,7 @@ class GwParentMapTool(QgsMapTool):
 		except:
 			pass
 	
+	
 	def reset(self):
 	
 		self.reset_rubber_band()
