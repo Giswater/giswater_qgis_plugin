@@ -11,7 +11,7 @@ from ..actions.api_dimensioning import ApiDimensioning
 from .parent import ParentMapTool
 
 
-class Dimensioning(ParentMapTool):
+class Dimensioning():
     """ Button 39: Dimensioning """
 
     def __init__(self, iface, settings, action, index_action):

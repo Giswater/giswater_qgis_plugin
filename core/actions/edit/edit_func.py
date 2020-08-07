@@ -98,19 +98,19 @@ class GwEdit(ParentAction):
 		return False
 	
 	
-	def edit_add_element(self):
-		""" Button 33: Add element """
-		self.manage_element.manage_element()
+	# def edit_add_element(self):
+	# 	""" Button 33: Add element """
+	# 	self.manage_element.manage_element()
 	
 	
-	def edit_add_file(self):
-		""" Button 34: Add document """
-		self.manage_document.manage_document()
+	# def edit_add_file(self):
+	# 	""" Button 34: Add document """
+	# 	self.manage_document.manage_document()
 	
 	
-	def edit_document(self):
-		""" Button 66: Edit document """
-		self.manage_document.edit_document()
+	# def edit_document(self):
+	# 	""" Button 66: Edit document """
+	# 	self.manage_document.edit_document()
 	
 	
 	def edit_element(self):
