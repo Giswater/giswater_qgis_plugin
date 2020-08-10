@@ -441,7 +441,7 @@ BEGIN
 
 					raise notice '------------ Feature_id % ', v_featureid;
 
-					-- check for current mapzone of feature looking onde nodeparent graf
+					-- check for current mapzone of feature looking on nodeparent mapzone table
 					EXECUTE 'SELECT '||quote_ident(v_fieldmp)||'::integer FROM 
 					(select *, json_array_elements_text((grafconfig->>''use'')::json)::json->>''nodeParent'' as np FROM '||quote_ident(v_table)||')a where np::integer = '||v_featureid
 					INTO v_currentmapzone;
@@ -466,7 +466,7 @@ BEGIN
 
 					-- inundation process
 					LOOP	
-						IF v_prevmapzone != v_currentmapzone THEN
+						IF v_prevmapzone > 0 AND v_prevmapzone != v_currentmapzone THEN
 							INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 3,
 							concat('ERROR: nodeParent: ',v_featureid,' is related to more of one mapzones (',v_prevmapzone,' & ',v_currentmapzone,'). Process for mapzone ',
 							v_currentmapzone,'(',v_currentmapzone,') have been cancelled'));
