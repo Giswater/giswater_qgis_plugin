@@ -7,7 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtGui import QIcon, QKeySequence
-from qgis.PyQt.QtWidgets import QAction, QMenu, QToolBar, QActionGroup
+from qgis.PyQt.QtWidgets import QAction, QMenu, QToolBar, QActionGroup, QDockWidget
 
 import os
 import json
@@ -16,7 +16,6 @@ from collections import OrderedDict
 from functools import partial
 import sys
 
-from .manage_layers import ManageLayers
 from .models.plugin_toolbar import PluginToolbar
 from .utils.pg_man import PgMan
 from .. import global_vars
@@ -53,6 +52,7 @@ from .toolbars.basic.basic import *
 from .toolbars.edit.edit import *
 from .toolbars.cad.cad import *
 from .toolbars.epa.epa import *
+from .toolbars.toc.toc import *
 
 class LoadProject(QObject):
 
@@ -193,14 +193,6 @@ class LoadProject(QObject):
 
         # call dynamic mapzones repaint
         self.pg_man.set_style_mapzones()
-
-        # Manage layers and check project
-        self.manage_layers = ManageLayers(self.iface, global_vars.settings, self.controller, self.plugin_dir)
-        self.manage_layers.set_params(self.project_type, self.schema_name, self.project_vars['infotype'],
-            self.project_vars['add_schema'])
-        if not self.manage_layers.config_layers():
-            self.controller.log_info("manage_layers return False")
-            return
 
         # Log it
         message = "Project read successfully"
@@ -389,6 +381,7 @@ class LoadProject(QObject):
         # Enable toolbar 'basic' and 'utils'
         self.enable_toolbar("basic")
         self.enable_toolbar("utils")
+        self.enable_toolbar("toc")
 
 
     def manage_toolbar(self, toolbar_id, list_actions):
@@ -396,10 +389,15 @@ class LoadProject(QObject):
 
         if list_actions is None:
             return
-
+        
         toolbar_name = self.translate(f'toolbar_{toolbar_id}_name')
         plugin_toolbar = PluginToolbar(toolbar_id, toolbar_name, True)
-        plugin_toolbar.toolbar = self.iface.addToolBar(toolbar_name)
+        
+        if toolbar_id == "toc":
+            plugin_toolbar.toolbar = self.iface.mainWindow().findChild(QDockWidget, 'Layers').findChildren(QToolBar)[0]
+        else:
+            plugin_toolbar.toolbar = self.iface.addToolBar(toolbar_name)
+        
         plugin_toolbar.toolbar.setObjectName(toolbar_name)
         plugin_toolbar.toolbar.setProperty('gw_name', toolbar_id)
         plugin_toolbar.list_actions = list_actions

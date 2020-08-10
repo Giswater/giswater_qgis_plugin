@@ -10,7 +10,7 @@ from qgis.PyQt.QtCore import pyqtSignal
 from qgis.core import QgsTask
 
 
-class TaskConfigLayerFields(QgsTask):
+class GwConfigLayerTask(QgsTask):
     """ This shows how to subclass QgsTask """
 
     fake_progress = pyqtSignal()

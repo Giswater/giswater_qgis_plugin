@@ -18,7 +18,7 @@ from functools import partial
 from lib import qt_tools
 from ..epa.go2epa_options import GwGo2EpaOptions
 from ....actions.api_parent import ApiParent
-from ...tasks.task_go2epa import GwTaskGo2Epa
+from ...tasks.tsk_go2epa import GwGo2EpaTask
 from ...admin import GwAdmin
 from ....ui_manager import Go2EpaSelectorUi, EpaManager, Go2EpaUI, HydrologySelector, Multirow_selector
 

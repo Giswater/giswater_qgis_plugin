@@ -13,12 +13,13 @@ from qgis.PyQt.QtGui import QCursor, QIcon, QPixmap
 import os
 from functools import partial
 
-from ..actions.add_layer import AddLayer
-from ..actions.check_project_result import CheckProjectResult
-from .task_config_layer_fields import TaskConfigLayerFields
+from .... import global_vars
+from ..edit.layer_tools import GwLayerTools
+from ...project_check import GwProjectCheck
+from ...tasks.tsk_config_layer import GwConfigLayerTask
 
 
-class ManageLayers:
+class GwManageLayers:
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to manage layers. Refactor code from giswater.py """
@@ -28,19 +29,12 @@ class ManageLayers:
         self.controller = controller
         self.plugin_dir = plugin_dir
         self.available_layers = None
-        self.add_layer = None
-        self.project_type = None
-        self.schema_name = None
-        self.qgis_project_infotype = None
-
-
-    def set_params(self, project_type, schema_name, qgis_project_infotype, qgis_project_add_schema):
-
-        self.project_type = project_type
-        self.schema_name = schema_name
-        self.qgis_project_infotype = qgis_project_infotype
-        self.qgis_project_add_schema = qgis_project_add_schema
-        self.add_layer = AddLayer(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.add_layer = GwLayerTools(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.project_type = controller.get_project_type()
+        self.schema_name = controller.schema_name
+        self.project_vars = global_vars.qgis_tools.get_qgis_project_variables()
+        self.qgis_project_infotype = self.project_vars['infotype']
+        self.qgis_project_add_schema = self.project_vars['add_schema']
 
 
     def config_layers(self):
@@ -53,15 +47,15 @@ class ManageLayers:
         # QgsProject.instance().legendLayersAdded.connect(self.get_new_layers_name)
 
         # Put add layers button into toc
-        self.add_layers_button()
+        # self.add_layers_button()
 
         # Set project layers with gw_fct_getinfofromid: This process takes time for user
         # Set background task 'ConfigLayerFields'
         description = f"ConfigLayerFields"
-        self.task_get_layers = TaskConfigLayerFields(description, self.controller)
-        self.task_get_layers.set_params(self.project_type, self.schema_name, self.qgis_project_infotype)
-        QgsApplication.taskManager().addTask(self.task_get_layers)
-        QgsApplication.taskManager().triggerTask(self.task_get_layers)
+        task_get_layers = GwConfigLayerTask(description, self.controller)
+        task_get_layers.set_params(self.project_type, self.schema_name, self.qgis_project_infotype)
+        QgsApplication.taskManager().addTask(task_get_layers)
+        QgsApplication.taskManager().triggerTask(task_get_layers)
 
         return True
 
@@ -76,7 +70,7 @@ class ManageLayers:
 
         if self.project_type in ('ws', 'ud'):
             QApplication.setOverrideCursor(Qt.ArrowCursor)
-            self.check_project_result = CheckProjectResult(self.iface, self.settings, self.controller, self.plugin_dir)
+            self.check_project_result = GwProjectCheck(self.iface, self.settings, self.controller, self.plugin_dir)
             self.check_project_result.set_controller(self.controller)
 
             # check project

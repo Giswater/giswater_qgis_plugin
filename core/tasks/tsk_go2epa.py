@@ -15,7 +15,7 @@ import subprocess
 from ..actions.edit.layer_tools import GwLayerTools
 
 
-class GwTaskGo2Epa(QgsTask):
+class GwGo2EpaTask(QgsTask):
     """ This shows how to subclass QgsTask """
 
     fake_progress = pyqtSignal()
