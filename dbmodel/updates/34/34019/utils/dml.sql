@@ -40,3 +40,5 @@ VALUES (246, 'Export ui', 'Export ui form', 'gw_fct_export_ui_xml', true,false) 
 
 INSERT INTO config_csv(fid, alias, descript, functionname, active, readheader)
 VALUES (247, 'Import ui', 'Import ui form', 'gw_fct_import_ui_xml', true,false) ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO config_toolbox VALUES (2496, 'Arc repair', TRUE, '{"featureType":["arc"]}', NULL, NULL, TRUE);
