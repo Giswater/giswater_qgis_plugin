@@ -136,12 +136,12 @@ BEGIN
 
 			IF v_link.the_geom IS NULL THEN -- looking for closest arc from connect
 				WITH index_query AS(
-				SELECT ST_Distance(the_geom, v_connect.the_geom) as distance, arc_id FROM v_edit_arc WHERE state > 0 LIMIT 5)
+				SELECT ST_Distance(the_geom, v_connect.the_geom) as distance, arc_id FROM v_edit_arc WHERE state > 0)
 				SELECT arc_id INTO v_connect.arc_id FROM index_query ORDER BY distance limit 1;
 			
 			ELSIF v_link.the_geom IS NOT NULL THEN -- looking for closest arc from link's endpoint
 				WITH index_query AS(
-				SELECT ST_Distance(the_geom, st_endpoint(v_link.the_geom)) as distance, arc_id FROM v_edit_arc WHERE state > 0 LIMIT 5)
+				SELECT ST_Distance(the_geom, st_endpoint(v_link.the_geom)) as distance, arc_id FROM v_edit_arc WHERE state > 0)
 				SELECT arc_id INTO v_connect.arc_id FROM index_query ORDER BY distance limit 1;			
 			END IF;
 		END IF;
