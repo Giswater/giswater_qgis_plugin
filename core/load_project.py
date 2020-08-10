@@ -24,8 +24,9 @@ from ..lib.qgis_tools import QgisTools
 from ..ui_manager import DialogTextUi
 # from ..actions.basic import Basic
 from .actions.basic.basic_func import GwBasic
-from ..actions.edit import Edit
-from ..actions.go2epa import Go2Epa
+# from ..actions.edit import Edit
+from .actions.edit.edit_func import GwEdit
+from .actions.epa.go2epa import GwGo2Epa
 from ..actions.master import Master
 from ..actions.mincut import MincutParent
 from ..actions.notify_functions import NotifyFunctions
@@ -46,9 +47,12 @@ from ..map_tools.flow_trace_flow_exit import FlowTraceFlowExitMapTool
 from ..map_tools.move_node import MoveNodeMapTool
 from ..map_tools.replace_feature import ReplaceFeatureMapTool
 
+from .actions.basic.search import GwSearch
+
 from .toolbars.basic.basic import *
 from .toolbars.edit.edit import *
 from .toolbars.cad.cad import *
+from .toolbars.epa.epa import *
 
 class LoadProject(QObject):
 
@@ -134,7 +138,7 @@ class LoadProject(QObject):
         self.project_type = self.controller.get_project_type()
         if self.project_type is None:
             return
-
+        
         # Initialize toolbars
         self.initialize_toolbars()
         self.get_buttons_to_hide()
@@ -185,7 +189,7 @@ class LoadProject(QObject):
         # Open automatically 'search docker' depending its value in user settings
         open_search = self.controller.get_user_setting_value('open_search', 'true')
         if open_search == 'true':
-            GwBasic(self.iface, self.settings, self.controller, self.plugin_dir).basic_api_search()
+            GwSearch(self.iface, self.settings, self.controller, self.plugin_dir).api_search()
 
         # call dynamic mapzones repaint
         self.pg_man.set_style_mapzones()
@@ -284,9 +288,9 @@ class LoadProject(QObject):
 
         self.basic = GwBasic(self.iface, global_vars.settings, self.controller, self.plugin_dir)
         self.utils = Utils(self.iface, global_vars.settings, self.controller, self.plugin_dir)
-        self.go2epa = Go2Epa(self.iface, global_vars.settings, self.controller, self.plugin_dir)
+        self.go2epa = GwGo2Epa(self.iface, global_vars.settings, self.controller, self.plugin_dir)
         self.om = Om(self.iface, global_vars.settings, self.controller, self.plugin_dir)
-        self.edit = Edit(self.iface, global_vars.settings, self.controller, self.plugin_dir)
+        self.edit = GwEdit(self.iface, global_vars.settings, self.controller, self.plugin_dir)
         self.master = Master(self.iface, global_vars.settings, self.controller, self.plugin_dir)
         self.custom = Custom(self.iface, global_vars.settings, self.controller, self.plugin_dir)
 
