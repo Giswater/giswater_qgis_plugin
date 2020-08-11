@@ -26,7 +26,8 @@ from .actions.basic.basic_func import GwBasic
 # from ..actions.edit import Edit
 from .actions.edit.edit_func import GwEdit
 from .actions.epa.go2epa import GwGo2Epa
-from ..actions.master import Master
+# from ..actions.master import Master
+from .actions.plan.plan_func import GwPlan
 from ..actions.mincut import MincutParent
 from ..actions.notify_functions import NotifyFunctions
 from ..actions.om import Om
@@ -53,6 +54,7 @@ from .toolbars.edit.edit import *
 from .toolbars.cad.cad import *
 from .toolbars.epa.epa import *
 from .toolbars.toc.toc import *
+from .toolbars.plan.plan import *
 
 class LoadProject(QObject):
 
@@ -283,7 +285,7 @@ class LoadProject(QObject):
         self.go2epa = GwGo2Epa(self.iface, global_vars.settings, self.controller, self.plugin_dir)
         self.om = Om(self.iface, global_vars.settings, self.controller, self.plugin_dir)
         self.edit = GwEdit(self.iface, global_vars.settings, self.controller, self.plugin_dir)
-        self.master = Master(self.iface, global_vars.settings, self.controller, self.plugin_dir)
+        self.master = GwPlan(self.iface, global_vars.settings, self.controller, self.plugin_dir)
         self.custom = Custom(self.iface, global_vars.settings, self.controller, self.plugin_dir)
 
 
@@ -515,7 +517,7 @@ class LoadProject(QObject):
             self.enable_toolbar("edit")
             self.enable_toolbar("cad")
             self.enable_toolbar("epa")
-            self.enable_toolbar("master")
+            self.enable_toolbar("plan")
             self.hide_action(False, 38)
             self.hide_action(False, 47)
             self.hide_action(False, 49)
@@ -527,7 +529,7 @@ class LoadProject(QObject):
             self.enable_toolbar("edit")
             self.enable_toolbar("cad")
             self.enable_toolbar("epa")
-            self.enable_toolbar("master")
+            self.enable_toolbar("plan")
             self.enable_toolbar("custom")
 
 
@@ -696,8 +698,8 @@ class LoadProject(QObject):
             # Go2epa toolbar actions
             elif 'go2epa' in self.dict_actions and index_action in self.dict_actions['go2epa']:
                 callback_function = getattr(self.go2epa, function_name)
-            # Master toolbar actions
-            elif 'master' in self.dict_actions and index_action in self.dict_actions['master']:
+            # Plan toolbar actions
+            elif 'plan' in self.dict_actions and index_action in self.dict_actions['plan']:
                 callback_function = getattr(self.master, function_name)
             # Utils toolbar actions
             elif 'utils' in self.dict_actions and index_action in self.dict_actions['utils']:

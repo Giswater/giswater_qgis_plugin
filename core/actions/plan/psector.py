@@ -169,7 +169,7 @@ class GwPsector(ParentManage):
         self.doc_id = self.dlg_plan_psector.findChild(QLineEdit, "doc_id")
         self.tbl_document = self.dlg_plan_psector.findChild(QTableView, "tbl_document")
 
-        if psector_id != 0:
+        if psector_id is not None:
 
             self.enable_tabs(True)
             self.enable_buttons(True)
@@ -389,34 +389,35 @@ class GwPsector(ParentManage):
         sql = "SELECT DISTINCT(id) FROM v_ui_document ORDER BY id"
         list_items = self.make_list_for_completer(sql)
         self.set_completer_lineedit(self.dlg_plan_psector.doc_id, list_items)
+        
+        if psector_id is not None:
+            sql = (f"SELECT other, gexpenses, vat "
+                   f"FROM plan_psector "
+                   f"WHERE psector_id = '{psector_id}'")
+            row = self.controller.get_row(sql)
 
-        sql = (f"SELECT other, gexpenses, vat "
-               f"FROM plan_psector "
-               f"WHERE psector_id = '{psector_id}'")
-        row = self.controller.get_row(sql)
-
-        other = 0
-        gexpenses = 0
-        vat = 0
-        if row:
-            other = float(row[0]) if row[0] is not None else 0
-            gexpenses = float(row[1]) if row[1] is not None else 0
-            vat = float(row[2]) if row[2] is not None else 0
-
-        qt_tools.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.other, other)
-        qt_tools.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.gexpenses, gexpenses)
-        qt_tools.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.vat, vat)
-
-        qt_tools.setWidgetText(self.dlg_plan_psector, 'cur_total_node', self.sys_currency['symbol'])
-        qt_tools.setWidgetText(self.dlg_plan_psector, 'cur_total_arc', self.sys_currency['symbol'])
-        qt_tools.setWidgetText(self.dlg_plan_psector, 'cur_total_other', self.sys_currency['symbol'])
-        qt_tools.setWidgetText(self.dlg_plan_psector, 'cur_pem', self.sys_currency['symbol'])
-        qt_tools.setWidgetText(self.dlg_plan_psector, 'cur_pec_pem', self.sys_currency['symbol'])
-        qt_tools.setWidgetText(self.dlg_plan_psector, 'cur_pec', self.sys_currency['symbol'])
-        qt_tools.setWidgetText(self.dlg_plan_psector, 'cur_pecvat_pem', self.sys_currency['symbol'])
-        qt_tools.setWidgetText(self.dlg_plan_psector, 'cur_pec_vat', self.sys_currency['symbol'])
-        qt_tools.setWidgetText(self.dlg_plan_psector, 'cur_pca_pecvat', self.sys_currency['symbol'])
-        qt_tools.setWidgetText(self.dlg_plan_psector, 'cur_pca', self.sys_currency['symbol'])
+            other = 0
+            gexpenses = 0
+            vat = 0
+            if row:
+                other = float(row[0]) if row[0] is not None else 0
+                gexpenses = float(row[1]) if row[1] is not None else 0
+                vat = float(row[2]) if row[2] is not None else 0
+    
+            qt_tools.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.other, other)
+            qt_tools.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.gexpenses, gexpenses)
+            qt_tools.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.vat, vat)
+    
+            qt_tools.setWidgetText(self.dlg_plan_psector, 'cur_total_node', self.sys_currency['symbol'])
+            qt_tools.setWidgetText(self.dlg_plan_psector, 'cur_total_arc', self.sys_currency['symbol'])
+            qt_tools.setWidgetText(self.dlg_plan_psector, 'cur_total_other', self.sys_currency['symbol'])
+            qt_tools.setWidgetText(self.dlg_plan_psector, 'cur_pem', self.sys_currency['symbol'])
+            qt_tools.setWidgetText(self.dlg_plan_psector, 'cur_pec_pem', self.sys_currency['symbol'])
+            qt_tools.setWidgetText(self.dlg_plan_psector, 'cur_pec', self.sys_currency['symbol'])
+            qt_tools.setWidgetText(self.dlg_plan_psector, 'cur_pecvat_pem', self.sys_currency['symbol'])
+            qt_tools.setWidgetText(self.dlg_plan_psector, 'cur_pec_vat', self.sys_currency['symbol'])
+            qt_tools.setWidgetText(self.dlg_plan_psector, 'cur_pca_pecvat', self.sys_currency['symbol'])
+            qt_tools.setWidgetText(self.dlg_plan_psector, 'cur_pca', self.sys_currency['symbol'])
 
         # Adding auto-completion to a QLineEdit for default feature
         self.geom_type = "arc"
