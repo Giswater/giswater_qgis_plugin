@@ -602,13 +602,23 @@ BEGIN
 					field_value = v_matcat_id;
 				WHEN concat(lower(v_catfeature.feature_type),'cat_id') THEN	
 					SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a 
-					WHERE (reverse(substring(reverse(a->>'parameter'),10)) = lower(v_catfeature.id));
+					WHERE (a->>'param') = (aux_json->>'columnname') AND a->>'parameter' = concat('edit_', lower(v_catfeature.feature_type), 'cat_vdefault');
+
 
 				-- *_type
-				WHEN 'fluid_type','function_type','location_type','category_type' THEN
+				WHEN 'fluid_type' THEN	
 					SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a 
-					WHERE ((a->>'param') = (aux_json->>'columnname') AND left(lower(a->>'parameter'),3) = left(lower(v_catfeature.feature_type),3));
-			    
+					WHERE ((a->>'param') = (aux_json->>'columnname') AND a->>'parameter' = concat('edit_', lower(v_catfeature.feature_type), '_fluid_vdefault'));
+				WHEN 'function_type' THEN	
+					SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a 
+					WHERE ((a->>'param') = (aux_json->>'columnname') AND a->>'parameter' = concat('edit_', lower(v_catfeature.feature_type), '_function_vdefault'));
+				WHEN 'location_type' THEN	
+					SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a 
+					WHERE ((a->>'param') = (aux_json->>'columnname') AND a->>'parameter' = concat('edit_', lower(v_catfeature.feature_type), '_location_vdefault'));
+				WHEN 'category_type' THEN	
+					SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a 
+					WHERE ((a->>'param') = (aux_json->>'columnname') AND a->>'parameter' = concat('edit_', lower(v_catfeature.feature_type), '_category_vdefault'));
+					
 				-- state type
 				WHEN 'state_type' THEN
 					-- getting parent value
