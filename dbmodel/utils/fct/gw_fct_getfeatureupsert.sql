@@ -602,13 +602,12 @@ BEGIN
 					field_value = v_matcat_id;
 				WHEN concat(lower(v_catfeature.feature_type),'cat_id') THEN	
 					SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a 
-					WHERE (reverse(substring(reverse(a->>'parameter'),10)) = lower(v_catfeature.id));
+					WHERE ((a->>'param') = concat(lower(v_catfeature.feature_type),'cat_id'));
 
 				-- *_type
 				WHEN 'fluid_type','function_type','location_type','category_type' THEN
 					SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a 
-					WHERE ((a->>'param') = (aux_json->>'columnname') AND left(lower(a->>'parameter'),3) = left(lower(v_catfeature.feature_type),3));
-			    
+					WHERE ((a->>'param') = (aux_json->>'columnname'));
 				-- state type
 				WHEN 'state_type' THEN
 					-- getting parent value
