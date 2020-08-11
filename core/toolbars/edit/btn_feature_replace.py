@@ -10,10 +10,8 @@ from qgis.PyQt.QtCore import Qt, QDate, QStringListModel
 
 import json
 from collections import OrderedDict
-from functools import partial
 from datetime import datetime
 
-from lib import qt_tools
 from ....ui_manager import FeatureReplace, InfoWorkcatUi
 from ...actions.basic.catalog import GwCatalog
 from ...utils.giswater_tools import *

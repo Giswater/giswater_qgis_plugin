@@ -28,7 +28,8 @@ from .actions.edit.edit_func import GwEdit
 from .actions.epa.go2epa import GwGo2Epa
 # from ..actions.master import Master
 from .actions.plan.plan_func import GwPlan
-from ..actions.mincut import MincutParent
+# from ..actions.mincut import MincutParent
+from .actions.om.mincut import GwMincut
 from ..actions.notify_functions import NotifyFunctions
 from ..actions.om import Om
 from ..actions.parent import ParentAction
@@ -57,6 +58,7 @@ from .toolbars.epa.epa import *
 from .toolbars.toc.toc import *
 from .toolbars.plan.plan import *
 from .toolbars.utilities.utilities import *
+from .toolbars.om.om import *
 
 
 class LoadProject(QObject):
@@ -160,7 +162,7 @@ class LoadProject(QObject):
 
         # Set custom plugin toolbars (one action class per toolbar)
         if self.project_type == 'ws':
-            self.mincut = MincutParent(self.iface, global_vars.settings, self.controller, self.plugin_dir)
+            self.mincut = GwMincut(self.iface, global_vars.settings, self.controller, self.plugin_dir)
 
         # Manage records from table 'cat_feature'
         self.feature_cat = self.pg_man.manage_feature_cat()
@@ -344,7 +346,9 @@ class LoadProject(QObject):
                     getattr(self, f'toolbar_{toolbar_id[0]}')(toolbar_id[0], toolbar_id[1], toolbar_id[2])
                 else:
                     self.toolbar_common(toolbar_id[0], toolbar_id[1], toolbar_id[2])
-
+        
+        
+        
         # Manage action group of every toolbar
         parent = self.iface.mainWindow()
         for plugin_toolbar in list(self.plugin_toolbars.values()):
@@ -364,7 +368,9 @@ class LoadProject(QObject):
                     button = getattr(sys.modules[__name__], button_def)(icon_path, text, plugin_toolbar.toolbar, ag, self.iface, self.settings, self.controller, self.plugin_dir)
                     
                     self.buttons[index_action] = button
-    
+        
+        
+        # self.buttons["64"].action.setVisible(False)
 
         # Disable and hide all plugin_toolbars and actions
         self.enable_toolbars(False)
@@ -505,18 +511,15 @@ class LoadProject(QObject):
             pass
 
         elif restriction == 'role_om':
-            if self.project_type in ('ws', 'ud'):
-                self.enable_toolbar(f"om_{self.project_type}")
+            self.enable_toolbar("om")
 
         elif restriction == 'role_edit':
-            if self.project_type in ('ws', 'ud'):
-                self.enable_toolbar(f"om_{self.project_type}")
+            self.enable_toolbar("om")
             self.enable_toolbar("edit")
             self.enable_toolbar("cad")
 
         elif restriction == 'role_epa':
-            if self.project_type in ('ws', 'ud'):
-                self.enable_toolbar(f"om_{self.project_type}")
+            self.enable_toolbar("om")
             self.enable_toolbar("edit")
             self.enable_toolbar("cad")
             self.enable_toolbar("epa")
@@ -527,8 +530,7 @@ class LoadProject(QObject):
             self.hide_action(False, 50)
 
         elif restriction == 'role_master':
-            if self.project_type in ('ws', 'ud'):
-                self.enable_toolbar(f"om_{self.project_type}")
+            self.enable_toolbar("om")
             self.enable_toolbar("edit")
             self.enable_toolbar("cad")
             self.enable_toolbar("epa")
