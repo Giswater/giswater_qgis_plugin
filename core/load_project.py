@@ -32,7 +32,8 @@ from ..actions.mincut import MincutParent
 from ..actions.notify_functions import NotifyFunctions
 from ..actions.om import Om
 from ..actions.parent import ParentAction
-from ..actions.utils import Utils
+# from ..actions.utils import Utils
+from .actions.utilities.utilities_func import GwUtilities
 from ..actions.custom import Custom
 from ..actions.tm_basic import TmBasic
 from ..map_tools.cad_add_circle import CadAddCircle
@@ -55,6 +56,8 @@ from .toolbars.cad.cad import *
 from .toolbars.epa.epa import *
 from .toolbars.toc.toc import *
 from .toolbars.plan.plan import *
+from .toolbars.utilities.utilities import *
+
 
 class LoadProject(QObject):
 
@@ -281,7 +284,7 @@ class LoadProject(QObject):
         """ Initialize toolbars """
 
         self.basic = GwBasic(self.iface, global_vars.settings, self.controller, self.plugin_dir)
-        self.utils = Utils(self.iface, global_vars.settings, self.controller, self.plugin_dir)
+        self.utils = GwUtilities(self.iface, global_vars.settings, self.controller, self.plugin_dir)
         self.go2epa = GwGo2Epa(self.iface, global_vars.settings, self.controller, self.plugin_dir)
         self.om = Om(self.iface, global_vars.settings, self.controller, self.plugin_dir)
         self.edit = GwEdit(self.iface, global_vars.settings, self.controller, self.plugin_dir)
@@ -337,7 +340,7 @@ class LoadProject(QObject):
 
             toolbar_id = parser.get("toolbars_position", f'pos_{pos}').split(',')
             if toolbar_id:
-                if toolbar_id[0] in ('basic', 'utils'):
+                if toolbar_id[0] in ('basic', 'utilities'):
                     getattr(self, f'toolbar_{toolbar_id[0]}')(toolbar_id[0], toolbar_id[1], toolbar_id[2])
                 else:
                     self.toolbar_common(toolbar_id[0], toolbar_id[1], toolbar_id[2])
@@ -382,7 +385,7 @@ class LoadProject(QObject):
 
         # Enable toolbar 'basic' and 'utils'
         self.enable_toolbar("basic")
-        self.enable_toolbar("utils")
+        self.enable_toolbar("utilities")
         self.enable_toolbar("toc")
 
 
@@ -410,7 +413,7 @@ class LoadProject(QObject):
         """ Manage actions of the common plugin toolbars """
 
         self.toolbar_basic("basic")
-        self.toolbar_utils("utils")
+        self.toolbar_utilities("utilities")
 
 
     def toolbar_common(self, toolbar_id, x=0, y=0):
@@ -438,7 +441,7 @@ class LoadProject(QObject):
             self.set_toolbar_position(self.translate(f'toolbar_{toolbar_id}_name'), x, y)
 
 
-    def toolbar_utils(self, toolbar_id, x=None, y=None):
+    def toolbar_utilities(self, toolbar_id, x=None, y=None):
         """ Function called in def manage_toolbars(...)
                 getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
         """
@@ -702,7 +705,7 @@ class LoadProject(QObject):
             elif 'plan' in self.dict_actions and index_action in self.dict_actions['plan']:
                 callback_function = getattr(self.master, function_name)
             # Utils toolbar actions
-            elif 'utils' in self.dict_actions and index_action in self.dict_actions['utils']:
+            elif 'utilities' in self.dict_actions and index_action in self.dict_actions['utilities']:
                 callback_function = getattr(self.utils, function_name)
             # Tm Basic toolbar actions
             elif 'tm_basic' in self.dict_actions and index_action in self.dict_actions['tm_basic']:
@@ -876,7 +879,7 @@ class LoadProject(QObject):
 
         # Enable toolbars
         self.enable_toolbar("basic")
-        self.enable_toolbar("utils")
+        self.enable_toolbar("utilities")
         self.enable_toolbar("tm_basic")
         self.tm_basic.set_controller(self.controller)
 
