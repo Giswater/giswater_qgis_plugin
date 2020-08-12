@@ -142,16 +142,6 @@ class DaoController(object):
         self.qgis_settings.setValue(self.plugin_name + "/" + key, value)
 
 
-    def set_actions(self, actions):
-        self.actions = actions
-
-
-    def check_actions(self, check=True):
-        """ Utility to check/uncheck all actions """
-        for action_index, action in self.actions.items():  # @UnusedVariable
-            action.setChecked(check)
-
-
     def set_database_connection(self):
         """ Set database connection """
 

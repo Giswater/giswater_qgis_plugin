@@ -49,7 +49,6 @@ class LoadProject(QObject):
         self.pg_man = PgMan(controller)
         self.plugin_toolbars = {}
         self.buttons_to_hide = []
-        self.actions = {}
         self.plugin_name = self.qgis_tools.get_value_from_metadata('name', 'giswater')
         self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep
         
@@ -128,9 +127,6 @@ class LoadProject(QObject):
 
         # Manage actions of the different plugin_toolbars
         self.manage_toolbars()
-
-        # Set actions to controller class for further management
-        self.controller.set_actions(self.actions)
 
         # Check roles of this user to show or hide toolbars
         self.check_user_roles()

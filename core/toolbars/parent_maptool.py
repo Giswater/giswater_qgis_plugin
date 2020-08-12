@@ -72,7 +72,6 @@ class GwParentMapTool(QgsMapTool):
 	
 	
 	def clicked_event(self):
-		self.controller.check_actions(False)
 		self.controller.prev_maptool = self.iface.mapCanvas().mapTool()
 		if not (self == self.iface.mapCanvas().mapTool()):
 			self.iface.mapCanvas().setMapTool(self)
