@@ -25,7 +25,7 @@ from functools import partial
 from .. import global_vars
 from lib import qt_tools
 from .parent import ParentAction
-from .HyperLinkLabel import HyperLinkLabel
+from ..core.utils.hyperlink_label import GwHyperLinkLabel
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 from ..ui_manager import DialogTextUi
 
@@ -809,7 +809,7 @@ class ApiParent(ParentAction):
 
     def add_hyperlink(self, field):
 
-        widget = HyperLinkLabel()
+        widget = GwHyperLinkLabel()
         widget.setObjectName(field['widgetname'])
         if 'columnname' in field:
             widget.setProperty('columnname', field['columnname'])
@@ -1452,7 +1452,7 @@ class ApiParent(ParentAction):
         for field in result['fields']:
             if field['linkedaction'] == 'action_link':
                 function_name = field['widgetfunction']
-                widget = dialog.findChild(HyperLinkLabel, field['widgetname'])
+                widget = dialog.findChild(GwHyperLinkLabel, field['widgetname'])
                 break
 
         if widget:

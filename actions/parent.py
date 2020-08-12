@@ -29,7 +29,7 @@ from functools import partial
 
 from .. import global_vars
 from lib import qt_tools
-from .add_layer import AddLayer
+from core.actions.edit.layer_tools import GwLayerTools
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 
 from ..ui_manager import DialogTextUi, GwDialog, GwMainWindow
@@ -50,7 +50,7 @@ class ParentAction(object):
         self.schema_name = self.controller.schema_name
         self.project_type = None
         self.plugin_version = self.get_plugin_version()
-        self.add_layer = AddLayer(iface, settings, controller, plugin_dir)
+        self.add_layer = GwLayerTools(iface, settings, controller, plugin_dir)
         self.user_current_layer = None
         self.rubber_point = None
         self.rubber_polygon = None

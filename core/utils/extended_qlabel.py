@@ -8,7 +8,7 @@ from qgis.PyQt.QtWidgets import QLabel
 from qgis.PyQt.QtCore import pyqtSignal
 
 
-class ExtendedQLabel(QLabel):
+class GwExtendedQLabel(QLabel):
     clicked = pyqtSignal()
 
     def __init(self, parent):

@@ -16,7 +16,7 @@ from functools import partial
 import os
 import operator
 
-from actions.HyperLinkLabel import HyperLinkLabel
+from core.utils.hyperlink_label import GwHyperLinkLabel
 
 
 def fillComboBox(dialog, widget, rows, allow_nulls=True, clear_combo=True):
@@ -68,7 +68,7 @@ def getText(dialog, widget, return_string_null=True):
         widget = dialog.findChild(QWidget, widget)
     if widget:
         if type(widget) is QLineEdit or type(widget) is QPushButton or type(widget) is QLabel \
-                or type(widget) is HyperLinkLabel:
+                or type(widget) is GwHyperLinkLabel:
             text = widget.text()
         elif type(widget) is QDoubleSpinBox or type(widget) is QSpinBox:
             text = widget.value()
@@ -189,7 +189,7 @@ def getWidgetText(dialog, widget, add_quote=False, return_string_null=True):
         return None
 
     text = None
-    if type(widget) is QLineEdit or type(widget) is QTextEdit or type(widget) is QLabel or type(widget) is HyperLinkLabel \
+    if type(widget) is QLineEdit or type(widget) is QTextEdit or type(widget) is QLabel or type(widget) is GwHyperLinkLabel \
             or type(widget) is QSpinBox or type(widget) is QDoubleSpinBox or type(widget) is QPushButton \
             or type(widget) is QPlainTextEdit:
         text = getText(dialog, widget, return_string_null)

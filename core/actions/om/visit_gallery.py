@@ -14,7 +14,7 @@ import urllib.error
 import urllib.parse
 from functools import partial
 
-from ....actions import ExtendedQLabel
+from ...utils.extended_qlabel import GwExtendedQLabel
 from ....ui_manager import Gallery, GalleryZoom
 from ....actions.parent_manage import ParentManage
 
@@ -100,7 +100,7 @@ class GwVisitGallery(ParentManage):
                     pixmap = QPixmap(str(self.img_path_list[0][i]))
 
                 pixmap = pixmap.scaled(171, 151, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
-                widget_extended = ExtendedQLabel.ExtendedQLabel(widget)
+                widget_extended = GwExtendedQLabel(widget)
                 widget_extended.setPixmap(pixmap)
                 widget_extended.clicked.connect(partial(self.zoom_img, i, visit_id, event_id))
                 self.list_widget.append(widget_extended)

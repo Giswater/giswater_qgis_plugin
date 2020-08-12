@@ -6,14 +6,12 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import QObject
-from qgis.PyQt.QtGui import QIcon, QKeySequence
-from qgis.PyQt.QtWidgets import QAction, QMenu, QToolBar, QActionGroup, QDockWidget
+from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget
 
 import os
 import json
 import configparser
 from collections import OrderedDict
-from functools import partial
 import sys
 
 from .models.plugin_toolbar import PluginToolbar
@@ -23,7 +21,7 @@ from ..lib.qgis_tools import QgisTools
 from ..ui_manager import DialogTextUi
 from ..actions.notify_functions import NotifyFunctions
 from ..actions.parent import ParentAction
-from ..actions.tm_basic import TmBasic
+# from ..actions.tm_basic import TmBasic
 
 from .actions.basic.search import GwSearch
 
@@ -289,8 +287,6 @@ class LoadProject(QObject):
             if toolbar_id:
                 self.create_toolbar(toolbar_id[0], toolbar_id[1], toolbar_id[2])
         
-        
-        
         # Manage action group of every toolbar
         parent = self.iface.mainWindow()
         for plugin_toolbar in list(self.plugin_toolbars.values()):
@@ -477,58 +473,4 @@ class LoadProject(QObject):
             del configfile
 
         return parser
-
-
-    def project_read_tm(self):
-        """ Function executed when a user opens a QGIS project of type 'tm' """
-
-        # Set actions classes (define one class per plugin toolbar)
-        self.tm_basic = TmBasic(self.iface, global_vars.settings, self.controller, self.plugin_dir)
-        self.tm_basic.set_tree_manage(self)
-
-        # Manage actions of the different plugin_toolbars
-        self.manage_toolbars_common()
-        self.manage_toolbars_tm()
-
-        # Set actions to controller class for further management
-        self.controller.set_actions(self.actions)
-
-        # Log it
-        message = "Project read successfully ('tm')"
-        self.controller.log_info(message)
-
-
-    def manage_toolbars_tm(self):
-        """ Manage actions of the different plugin toolbars """
-
-        toolbar_id = "tm_basic"
-        list_actions = ['303', '301', '302', '304', '305', '309']
-        self.manage_toolbar(toolbar_id, list_actions)
-
-        # Manage action group of every toolbar
-        parent = self.iface.mainWindow()
-        for plugin_toolbar in list(self.plugin_toolbars.values()):
-            ag = QActionGroup(parent)
-            for index_action in plugin_toolbar.list_actions:
-                self.add_action(index_action, plugin_toolbar.toolbar, ag)
-
-        # Enable toolbars
-        self.enable_toolbar("basic")
-        self.enable_toolbar("utilities")
-        self.enable_toolbar("tm_basic")
-        self.tm_basic.set_controller(self.controller)
-
-
-    def project_read_pl(self):
-        """ Function executed when a user opens a QGIS project of type 'pl' """
-
-        # Manage actions of the different plugin_toolbars
-        self.manage_toolbars_common()
-
-        # Set actions to controller class for further management
-        self.controller.set_actions(self.actions)
-
-        # Log it
-        message = "Project read successfully ('pl')"
-        self.controller.log_info(message)
 
