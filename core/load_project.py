@@ -56,7 +56,6 @@ class LoadProject(QObject):
         self.actions_not_checkable = []
         self.list_to_hide = []
         self.actions = {}
-        self.map_tools = {}
         self.action = None
         self.plugin_name = self.qgis_tools.get_value_from_metadata('name', 'giswater')
         self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep
@@ -146,9 +145,6 @@ class LoadProject(QObject):
 
         # Set actions to controller class for further management
         self.controller.set_actions(self.actions)
-
-        # Set objects for map tools classes
-        self.manage_map_tools()
 
         # Check roles of this user to show or hide toolbars
         self.check_user_roles()
@@ -418,33 +414,6 @@ class LoadProject(QObject):
         self.qgis_tools.qgis_manage_snapping_layer('v_edit_gully', snapping_type=0)
 
 
-    def manage_map_tools(self):
-        """ Manage map tools """
-
-        self.set_map_tool('map_tool_api_info_data')
-        if self.controller.get_project_type() in ('ws', 'ud'):
-            self.set_map_tool('map_tool_api_info_inp')
-            self.set_map_tool('map_tool_move_node')
-            self.set_map_tool('map_tool_delete_node')
-            self.set_map_tool('map_tool_flow_trace')
-            self.set_map_tool('map_tool_flow_exit')
-            self.set_map_tool('map_tool_connec_tool')
-            self.set_map_tool('map_tool_draw_profiles')
-            self.set_map_tool('map_tool_replace_node')
-            self.set_map_tool('map_tool_change_node_type')
-            self.set_map_tool('map_tool_dimensioning')
-            self.set_map_tool('cad_add_circle')
-            self.set_map_tool('cad_add_point')
-
-
-    def set_map_tool(self, map_tool_name):
-        """ Set objects for map tools classes """
-
-        if map_tool_name in self.map_tools:
-            map_tool = self.map_tools[map_tool_name]
-            map_tool.set_controller(self.controller)
-
-
     def check_user_roles(self):
         """ Check roles of this user to show or hide toolbars """
 
@@ -573,9 +542,6 @@ class LoadProject(QObject):
 
         # Set actions to controller class for further management
         self.controller.set_actions(self.actions)
-
-        # Set objects for map tools classes
-        self.manage_map_tools()
 
         # Log it
         message = "Project read successfully ('tm')"
