@@ -750,6 +750,7 @@ class ManageVisit(ParentManage, QObject):
                        " WHERE id ='" + str(visit_id) + "' ")
                 id_visitcat = self.controller.get_row(sql)
                 utils_giswater.set_combo_itemData(self.dlg_add_visit.visitclass_id, str(id_visitcat[0]), 0)
+                utils_giswater.setWidgetEnabled(self.dlg_add_visit, self.dlg_add_visit.visitclass_id, False)
             else:
                 # now get default value to be show in visitclass_id
                 sql = ("SELECT value"
