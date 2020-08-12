@@ -19,7 +19,7 @@ from .utils.pg_man import PgMan
 from .. import global_vars
 from ..lib.qgis_tools import QgisTools
 from ..ui_manager import DialogTextUi
-from ..actions.notify_functions import NotifyFunctions
+from ..core.notify_tools import GwNotifyTools
 from ..actions.parent import ParentAction
 
 from .actions.basic.search import GwSearch
@@ -123,7 +123,7 @@ class LoadProject(QObject):
 
         # Create a thread to listen selected database channels
         if global_vars.settings.value('system_variables/use_notify').upper() == 'TRUE':
-            self.notify = NotifyFunctions(self.iface, global_vars.settings, self.controller, self.plugin_dir)
+            self.notify = GwNotifyTools(self.iface, global_vars.settings, self.controller, self.plugin_dir)
             self.notify.set_controller(self.controller)
             list_channels = ['desktop', self.controller.current_user]
             self.notify.start_listening(list_channels)

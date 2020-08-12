@@ -13,9 +13,9 @@ import json
 import threading
 from collections import OrderedDict
 
-from .parent import ParentAction
+from ..actions.parent import ParentAction
 
-class NotifyFunctions(ParentAction):
+class GwNotifyTools(ParentAction):
     # :var conn_failed: some times, when user click so fast 2 actions, LISTEN channel is stopped, and we need to
     #                   re-LISTEN all channels
 

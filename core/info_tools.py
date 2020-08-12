@@ -9,10 +9,10 @@ from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints
 
 import os
 
-from .api_parent import ApiParent
+from ..actions.api_parent import ApiParent
 
 
-class GwActions(ApiParent):
+class GwInfoTools(ApiParent):
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control functions called from data base """
 
