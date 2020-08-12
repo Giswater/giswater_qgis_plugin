@@ -372,11 +372,11 @@ class LoadProject(QObject):
 
         if self.project_type == 'ud':
             for index in self.settings.value("project_exclusive/ws"):
-                self.hide_action(index)
+                self.hide_button(index)
 
         if self.project_type == 'ws':
             for index in self.settings.value("project_exclusive/ud"):
-                self.hide_action(index)
+                self.hide_button(index)
 
         # Disable and hide all plugin_toolbars and actions
         self.enable_toolbars(False)
@@ -530,10 +530,10 @@ class LoadProject(QObject):
             self.enable_toolbar("cad")
             self.enable_toolbar("epa")
             self.enable_toolbar("plan")
-            self.hide_action(False, 38)
-            self.hide_action(False, 47)
-            self.hide_action(False, 49)
-            self.hide_action(False, 50)
+            self.hide_button(38)
+            self.hide_button(47)
+            self.hide_button(49)
+            self.hide_button(50)
 
         elif restriction == 'role_master':
             self.enable_toolbar("om")
@@ -548,7 +548,7 @@ class LoadProject(QObject):
         """ Enable/disable all plugin toolbars from QGIS GUI """
 
         # Enable/Disable actions
-        self.enable_actions(visible)
+        self.enable_all_buttons(visible)
         try:
             for plugin_toolbar in list(self.plugin_toolbars.values()):
                 if plugin_toolbar.enabled:
@@ -564,32 +564,30 @@ class LoadProject(QObject):
             plugin_toolbar = self.plugin_toolbars[toolbar_id]
             plugin_toolbar.toolbar.setVisible(enable)
             for index_action in plugin_toolbar.list_actions:
-                self.enable_action(enable, index_action)
+                self.enable_button(index_action, enable)
 
 
-    def enable_actions(self, enable=True, start=1, stop=1000):
-        """ Utility to enable/disable all actions """
+    def enable_all_buttons(self, enable=True):
+        """ Utility to enable/disable all buttons """
+    
+        for index in self.buttons.keys():
+            self.enable_button(index, enable)
+    
+    
+    def enable_button(self, index, enable=True):
+        """ Enable/disable selected button """
 
-        for i in range(start, stop + 1):
-            self.enable_action(enable, i)
+        key = str(index).zfill(2)
+        if key in self.buttons:
+            self.buttons[key].action.setEnabled(enable)
 
 
-    def enable_action(self, enable=True, index=1):
+    def hide_button(self, index, hide=True):
         """ Enable/disable selected action """
 
         key = str(index).zfill(2)
-        if key in self.actions:
-            action = self.actions[key]
-            action.setEnabled(enable)
-
-
-    def hide_action(self, visible=True, index=1):
-        """ Enable/disable selected action """
-
-        key = str(index).zfill(2)
-        if key in self.actions:
-            action = self.actions[key]
-            action.setVisible(visible)
+        if key in self.buttons:
+            self.buttons[key].action.setVisible(not hide)
 
 
     def set_toolbar_position(self, tb_name, x, y):
