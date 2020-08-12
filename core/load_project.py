@@ -369,8 +369,14 @@ class LoadProject(QObject):
                     
                     self.buttons[index_action] = button
         
-        
-        # self.buttons["64"].action.setVisible(False)
+
+        if self.project_type == 'ud':
+            for index in self.settings.value("project_exclusive/ws"):
+                self.hide_action(index)
+
+        if self.project_type == 'ws':
+            for index in self.settings.value("project_exclusive/ud"):
+                self.hide_action(index)
 
         # Disable and hide all plugin_toolbars and actions
         self.enable_toolbars(False)
