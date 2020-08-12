@@ -297,10 +297,7 @@ class LoadProject(QObject):
 
             toolbar_id = parser.get("toolbars_position", f'pos_{pos}').split(',')
             if toolbar_id:
-                if toolbar_id[0] in ('basic', 'utilities'):
-                    getattr(self, f'toolbar_{toolbar_id[0]}')(toolbar_id[0], toolbar_id[1], toolbar_id[2])
-                else:
-                    self.toolbar_common(toolbar_id[0], toolbar_id[1], toolbar_id[2])
+                self.create_toolbar(toolbar_id[0], toolbar_id[1], toolbar_id[2])
         
         
         
@@ -339,70 +336,29 @@ class LoadProject(QObject):
         self.enable_toolbar("toc")
 
 
-    def manage_toolbar(self, toolbar_id, list_actions):
-        """ Manage action of selected plugin toolbar """
+    def create_toolbar(self, toolbar_id, x=None, y=None):
+        
+        list_actions = self.settings.value(f"toolbars/{toolbar_id}")
 
         if list_actions is None:
             return
-        
+
         toolbar_name = self.translate(f'toolbar_{toolbar_id}_name')
         plugin_toolbar = PluginToolbar(toolbar_id, toolbar_name, True)
         
+        # If the toolbar is ToC, add it to the Layes docker toolbar, else create a new toolbar
         if toolbar_id == "toc":
             plugin_toolbar.toolbar = self.iface.mainWindow().findChild(QDockWidget, 'Layers').findChildren(QToolBar)[0]
         else:
             plugin_toolbar.toolbar = self.iface.addToolBar(toolbar_name)
-        
+
         plugin_toolbar.toolbar.setObjectName(toolbar_name)
         plugin_toolbar.toolbar.setProperty('gw_name', toolbar_id)
         plugin_toolbar.list_actions = list_actions
         self.plugin_toolbars[toolbar_id] = plugin_toolbar
 
-
-    def manage_toolbars_common(self):
-        """ Manage actions of the common plugin toolbars """
-
-        self.toolbar_basic("basic")
-        self.toolbar_utilities("utilities")
-
-
-    def toolbar_common(self, toolbar_id, x=0, y=0):
-        """ Manage toolbars: 'om_ud', 'om_ws', 'edit', 'cad', 'epa', 'master' """
-
-        if toolbar_id not in self.dict_toolbars:
-            return
-
-        list_actions = self.dict_toolbars[toolbar_id]
-        self.manage_toolbar(toolbar_id, list_actions)
-        self.set_toolbar_position(self.translate(f'toolbar_{toolbar_id}_name'), x, y)
-
-
-    def toolbar_basic(self, toolbar_id, x=None, y=None):
-        """ Function called in def manage_toolbars(...)
-                getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
-        """
-
-        if toolbar_id not in self.dict_toolbars:
-            return
-
-        list_actions = self.dict_toolbars[toolbar_id]
-        self.manage_toolbar(toolbar_id, list_actions)
         if x and y:
-            self.set_toolbar_position(self.translate(f'toolbar_{toolbar_id}_name'), x, y)
-
-
-    def toolbar_utilities(self, toolbar_id, x=None, y=None):
-        """ Function called in def manage_toolbars(...)
-                getattr(self, 'toolbar_'+str(toolbar_id[0]))(toolbar_id[1], toolbar_id[2])
-        """
-
-        if toolbar_id not in self.dict_toolbars:
-            return
-
-        list_actions = self.dict_toolbars[toolbar_id]
-        self.manage_toolbar(toolbar_id, list_actions)
-        if x and y:
-            self.set_toolbar_position(self.translate(f'toolbar_{toolbar_id}_name'), x, y)
+            self.set_toolbar_position(toolbar_id, x, y)
 
 
     def manage_snapping_layers(self):
@@ -496,9 +452,9 @@ class LoadProject(QObject):
             self.buttons[key].action.setVisible(not hide)
 
 
-    def set_toolbar_position(self, tb_name, x, y):
+    def set_toolbar_position(self, toolbar_id, x, y):
 
-        toolbar = self.iface.mainWindow().findChild(QToolBar, tb_name)
+        toolbar = self.plugin_toolbars[toolbar_id].toolbar
         if toolbar:
             toolbar.move(int(x), int(y))
 
