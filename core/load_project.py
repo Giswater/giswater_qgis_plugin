@@ -109,16 +109,6 @@ class LoadProject(QObject):
         # Initialize toolbars
         self.get_buttons_to_hide()
 
-        # Manage project read of type 'tm'
-        if self.project_type == 'tm':
-            self.project_read_tm()
-            return
-
-        # Manage project read of type 'pl'
-        elif self.project_type == 'pl':
-            self.project_read_pl()
-            return
-
         # Manage records from table 'cat_feature'
         self.feature_cat = self.pg_man.manage_feature_cat()
 
