@@ -51,7 +51,7 @@ class LoadProject(QObject):
         self.qgis_tools = QgisTools(iface, self.plugin_dir)
         self.pg_man = PgMan(controller)
         self.plugin_toolbars = {}
-        self.list_to_hide = []
+        self.buttons_to_hide = []
         self.actions = {}
         self.action = None
         self.plugin_name = self.qgis_tools.get_value_from_metadata('name', 'giswater')
@@ -246,7 +246,7 @@ class LoadProject(QObject):
             row = self.controller.get_config('qgis_toolbar_hidebuttons')
             if not row: return
             json_list = json.loads(row[0], object_pairs_hook=OrderedDict)
-            self.list_to_hide = [str(x) for x in json_list['action_index']]
+            self.buttons_to_hide = [str(x) for x in json_list['action_index']]
         except KeyError:
             pass
         except json.JSONDecodeError:
@@ -254,7 +254,7 @@ class LoadProject(QObject):
             pass
         finally:
             # TODO remove this line when do you want enabled api info for epa
-            self.list_to_hide.append('199')
+            self.buttons_to_hide.append('199')
 
 
     def manage_toolbars(self):
@@ -308,7 +308,7 @@ class LoadProject(QObject):
                     
                     self.buttons[index_action] = button
         
-
+        # Disable buttons which are project type exclusive
         if self.project_type == 'ud':
             for index in self.settings.value("project_exclusive/ws"):
                 self.hide_button(index)
@@ -316,6 +316,10 @@ class LoadProject(QObject):
         if self.project_type == 'ws':
             for index in self.settings.value("project_exclusive/ud"):
                 self.hide_button(index)
+
+        # Hide buttons from buttons_to_hide
+        for button_id in self.buttons_to_hide:
+            self.hide_button(button_id)
 
         # Disable and hide all plugin_toolbars and actions
         self.enable_toolbars(False)
@@ -426,18 +430,18 @@ class LoadProject(QObject):
             self.enable_button(index, enable)
     
     
-    def enable_button(self, index, enable=True):
+    def enable_button(self, button_id, enable=True):
         """ Enable/disable selected button """
 
-        key = str(index).zfill(2)
+        key = str(button_id).zfill(2)
         if key in self.buttons:
             self.buttons[key].action.setEnabled(enable)
 
 
-    def hide_button(self, index, hide=True):
+    def hide_button(self, button_id, hide=True):
         """ Enable/disable selected action """
 
-        key = str(index).zfill(2)
+        key = str(button_id).zfill(2)
         if key in self.buttons:
             self.buttons[key].action.setVisible(not hide)
 
