@@ -743,30 +743,31 @@ class ManageVisit(ParentManage, QObject):
 
         if self.visitclass_ids:
             utils_giswater.set_item_data(self.dlg_add_visit.visitclass_id, self.visitclass_ids, 1)
-            # now get default value to be show in visitclass_id
-            sql = ("SELECT value"
-                   " FROM " + self.schema_name + ".config_param_user"
-                   " WHERE parameter = 'visitcat_vdefault' AND cur_user = current_user")
-            row = self.controller.get_row(sql, commit=self.autocommit)
-            if row:
-                # if int then look for default row ans set it
-                try:
-                    utils_giswater.set_combo_itemData(self.dlg_add_visit.visitclass_id, row[0], 0)
-                    for i in range(0, self.dlg_add_visit.visitclass_id.count()):
-                        elem = self.dlg_add_visit.visitclass_id.itemData(i)
-                        if str(row[0]) == str(elem[0]):
-                            utils_giswater.setWidgetText(self.dlg_add_visit.visitclass_id, (elem[1]))
-                except TypeError:
-                    pass
-                except ValueError:
-                    pass
-            elif visit_id is not None:
 
+            if visit_id is not None:
                 sql = ("SELECT class_id"
                        " FROM " + self.schema_name + ".om_visit"
                        " WHERE id ='" + str(visit_id) + "' ")
                 id_visitcat = self.controller.get_row(sql)
                 utils_giswater.set_combo_itemData(self.dlg_add_visit.visitclass_id, str(id_visitcat[0]), 0)
+            else:
+                # now get default value to be show in visitclass_id
+                sql = ("SELECT value"
+                       " FROM " + self.schema_name + ".config_param_user"
+                       " WHERE parameter = 'visitcat_vdefault' AND cur_user = current_user")
+                row = self.controller.get_row(sql, commit=self.autocommit)
+                if row:
+                    # if int then look for default row ans set it
+                    try:
+                        utils_giswater.set_combo_itemData(self.dlg_add_visit.visitclass_id, row[0], 0)
+                        for i in range(0, self.dlg_add_visit.visitclass_id.count()):
+                            elem = self.dlg_add_visit.visitclass_id.itemData(i)
+                            if str(row[0]) == str(elem[0]):
+                                utils_giswater.setWidgetText(self.dlg_add_visit.visitclass_id, (elem[1]))
+                    except TypeError:
+                        pass
+                    except ValueError:
+                        pass
 
         # Relations tab
         # fill feature_type
