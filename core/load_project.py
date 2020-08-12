@@ -21,7 +21,6 @@ from ..lib.qgis_tools import QgisTools
 from ..ui_manager import DialogTextUi
 from ..actions.notify_functions import NotifyFunctions
 from ..actions.parent import ParentAction
-# from ..actions.tm_basic import TmBasic
 
 from .actions.basic.search import GwSearch
 
@@ -51,7 +50,6 @@ class LoadProject(QObject):
         self.plugin_toolbars = {}
         self.buttons_to_hide = []
         self.actions = {}
-        self.action = None
         self.plugin_name = self.qgis_tools.get_value_from_metadata('name', 'giswater')
         self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep
         
@@ -447,12 +445,6 @@ class LoadProject(QObject):
         toolbar = self.plugin_toolbars[toolbar_id].toolbar
         if toolbar:
             toolbar.move(int(x), int(y))
-
-
-    def set_info_button_visible(self, visible=True):
-
-        if self.action:
-            self.action.setVisible(visible)
 
 
     def init_user_config_file(self, path, toolbar_names):
