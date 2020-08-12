@@ -13,8 +13,7 @@ $BODY$
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_admin_schema_lastprocess($${
 "client":{"lang":"ES"}, 
-"data":{"isNewProject":"TRUE", "gwVersion":"3.1.105", "projectType":"WS", "isSample":true
-		"epsg":"25831", "title":"test project", "author":"test", "date":"01/01/2000", "superUsers":["postgres", "giswater"]}}$$)
+"data":{"isNewProject":"TRUE", "gwVersion":"3.1.105", "projectType":"WS", "isSample":true, "epsg":"25831", "title":"test project", "author":"test", "date":"01/01/2000", "superUsers":["postgres", "giswater"]}}$$)
 
 SELECT SCHEMA_NAME.gw_fct_admin_schema_lastprocess($${
 "client":{"lang":"ES"},
@@ -84,7 +83,8 @@ BEGIN
 	IF v_isnew IS TRUE THEN
 			
 		INSERT INTO config_param_system (parameter, value, datatype, descript, project_type, label)
-		VALUES ('admin_superusers', v_superusers ,'json', 'Basic information about superusers for this schema','utils', 'Schema manager:');
+		VALUES ('admin_superusers', v_superusers ,'json', 'Basic information about superusers for this schema','utils', 'Schema manager:')
+		ON CONFLICT (parameter) DO NOTHING;
 			
 		-- inserting version table
 		INSERT INTO sys_version (giswater, project_type, postgres, postgis, language, epsg, sample) VALUES (v_gwversion, upper(v_projecttype), (select version()),
@@ -194,7 +194,7 @@ BEGIN
 		
 		-- inserting on config_param_system table
 		INSERT INTO config_param_system (parameter, value, datatype, descript, project_type, label)
-		VALUES ('admin_schema_info', v_schema_info,'json', 'Basic information about schema','utils', 'Schema manager:');
+		VALUES ('admin_schema_info', v_schema_info,'json', 'Basic information about schema','utils', 'Schema manager:') ON CONFLICT (parameter) DO NOTHING;
 
 		-- fk from utils schema
 		IF (SELECT value FROM config_param_system WHERE parameter='admin_utils_schema') IS NOT NULL THEN
@@ -203,6 +203,9 @@ BEGIN
 		
 		-- generate child views 
 		PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
+		"data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-DELETE" }}$$);
+		
+		PERFORM  gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
 		"data":{"filterFields":{}, "pageInfo":{}, "multi_create":true}}$$)::text;
 		
 		--change widgettype for matcat_id when new empty data project (UD)
@@ -219,10 +222,10 @@ BEGIN
 		
 	ELSIF v_isnew IS FALSE THEN
 		
-        v_oldversion = (SELECT giswater FROM sys_version ORDER BY id DESC LIMIT 1);
+		v_oldversion = (SELECT giswater FROM sys_version ORDER BY id DESC LIMIT 1);
         
 
-        -- create child views for users from 3.2 to 3.3 updates
+		-- create child views for users from 3.2 to 3.3 updates
 		IF v_oldversion < '3.3.000' AND v_gwversion > '3.3.000' THEN
 			PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "multi_create":true}}$$)::text;
 		END IF;
