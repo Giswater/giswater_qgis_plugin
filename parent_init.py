@@ -785,7 +785,7 @@ class ParentDialog(QDialog):
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
 
-        sql = ("SELECT MIN("+str(mindate)+"), MAX("+str(maxdate)+")"
+        sql = ("SELECT MIN("+str(mindate)+"), MAX("+str(mindate)+")"
                " FROM {}".format(str(table_name)))
         if column_filter is not None and value_filter is not None:
             sql += " WHERE " + str(column_filter) + " = '" + str(value_filter) + "'"
@@ -1350,8 +1350,8 @@ class ParentDialog(QDialog):
         # Set signals
         widget.clicked.connect(partial(self.tbl_event_clicked, table_name))
         self.cmb_visit_class.currentIndexChanged.connect(partial(self.set_filter_table_event, widget, table_name, visitClass=True, column_filter=feature_key, value_filter=self.id))
-        self.date_event_to.dateChanged.connect(partial(self.set_filter_table_event, widget, table_name, column_filter=feature_key, value_filter=self.id))
-        self.date_event_from.dateChanged.connect(partial(self.set_filter_table_event, widget, table_name, column_filter=feature_key, value_filter=self.id))
+        self.date_event_to.dateChanged.connect(partial(self.set_filter_table_event, widget, table_name, visitClass=False, column_filter=feature_key, value_filter=self.id))
+        self.date_event_from.dateChanged.connect(partial(self.set_filter_table_event, widget, table_name, visitClass=False, column_filter=feature_key, value_filter=self.id))
 
         parameters = [widget, table_name, filter_, self.cmb_visit_class, self.id]
         btn_new_visit.clicked.connect(partial(self.new_visit, table_name, refresh_table=parameters))
@@ -1396,14 +1396,14 @@ class ParentDialog(QDialog):
             return
         if type(table_name) is dict:
             table_name = str(table_name[utils_giswater.get_item_data(self.dialog, self.cmb_visit_class, 0)])
+
         # Set model of selected widget
         if visitClass:
             self.set_model_to_table(widget, table_name, self.filter)
             self.set_filter_dates('startdate', 'enddate', table_name, self.date_event_from, self.date_event_to, column_filter, value_filter)
 
-        # Get new selected dates
-        date_from = self.date_event_from.date().toString('yyyyMMdd 00:00:00')
-        date_to = self.date_event_to.date().toString('yyyyMMdd 23:59:59')
+            date_from = self.date_event_from.date().toString('yyyyMMdd 00:00:00')
+            date_to = self.date_event_to.date().toString('yyyyMMdd 23:59:59')
 
         # Set filter to model
         expr = self.field_id + " = '" + self.id + "'"
@@ -1414,6 +1414,7 @@ class ParentDialog(QDialog):
         if str(visit_class_value) != 'null':
             expr += " AND class_id::text = '" + str(visit_class_value) + "'"
         expr += " ORDER BY startdate desc"
+
         # Refresh model with selected filter
         widget.model().setFilter(expr)
         widget.model().select()
