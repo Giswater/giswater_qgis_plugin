@@ -296,6 +296,9 @@ UPDATE config_form_fields SET layoutorder =70 , layoutname ='lyt_data_1' WHERE c
 UPDATE config_form_fields SET stylesheet ='{"label":"color:red; font-weight:bold"}' WHERE columnname IN ('expl_id', 'sector_id');
 
 
+SELECT gw_fct_admin_manage_triggers('fk','ALL');
+
+
 -- drop constraints
 SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$);
 

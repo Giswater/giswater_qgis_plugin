@@ -86,9 +86,6 @@ ALTER TABLE sys_foreignkey DISABLE TRIGGER gw_trg_typevalue_config_fk;
 
 UPDATE sys_foreignkey SET typevalue_table = 'config_typevalue' WHERE typevalue_table ='config_api_typevalue';
 
-ALTER TABLE sys_foreignkey ENABLE TRIGGER gw_trg_typevalue_config_fk;
-
-
 INSERT INTO config_typevalue(typevalue, id, idval) VALUES ('widgetfunction_typevalue', 'open_url', 'open_url');
 
 INSERT INTO config_typevalue(typevalue, id, idval) VALUES ('widgetfunction_typevalue', 'info_node', 'info_node');

@@ -67,15 +67,14 @@ BEGIN
 
 			IF NEW.id!= OLD.id THEN
 				
-				
 				FOR rec IN EXECUTE v_query LOOP
 
-					EXECUTE 'ALTER TABLE '||rec.target_table||' DISABLE TRIGGER gw_trg_typevalue_fk';
+					--EXECUTE 'ALTER TABLE '||rec.target_table||' DISABLE TRIGGER gw_trg_typevalue_fk';
 					
 					EXECUTE 'UPDATE '||rec.target_table||' SET '||rec.target_field||' = '''||NEW.id||''' 
 					WHERE '||rec.target_field||' = '''||OLD.id||''';';
 					
-					EXECUTE 'ALTER TABLE '||rec.target_table||' ENABLE TRIGGER gw_trg_typevalue_fk';
+					--EXECUTE 'ALTER TABLE '||rec.target_table||' ENABLE TRIGGER gw_trg_typevalue_fk';
 				END LOOP;
 			END IF;
 		END IF;
