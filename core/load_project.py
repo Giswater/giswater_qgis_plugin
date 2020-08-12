@@ -138,10 +138,6 @@ class LoadProject(QObject):
             list_channels = ['desktop', self.controller.current_user]
             self.notify.start_listening(list_channels)
 
-        # Hide info button if giswater project is loaded
-        if show_warning:
-            self.set_info_button_visible(False)
-
         # Open automatically 'search docker' depending its value in user settings
         open_search = self.controller.get_user_setting_value('open_search', 'true')
         if open_search == 'true':
