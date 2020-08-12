@@ -21,33 +21,9 @@ from .utils.pg_man import PgMan
 from .. import global_vars
 from ..lib.qgis_tools import QgisTools
 from ..ui_manager import DialogTextUi
-# from ..actions.basic import Basic
-from .actions.basic.basic_func import GwBasic
-# from ..actions.edit import Edit
-from .actions.edit.edit_func import GwEdit
-from .actions.epa.go2epa import GwGo2Epa
-# from ..actions.master import Master
-from .actions.plan.plan_func import GwPlan
-# from ..actions.mincut import MincutParent
-from .actions.om.mincut import GwMincut
 from ..actions.notify_functions import NotifyFunctions
-from ..actions.om import Om
 from ..actions.parent import ParentAction
-# from ..actions.utils import Utils
-from .actions.utilities.utilities_func import GwUtilities
-from ..actions.custom import Custom
 from ..actions.tm_basic import TmBasic
-from ..map_tools.cad_add_circle import CadAddCircle
-from ..map_tools.cad_add_point import CadAddPoint
-from ..map_tools.cad_api_info import CadApiInfo
-from ..map_tools.change_elem_type import ChangeElemType
-from ..map_tools.connec import ConnecMapTool
-from ..map_tools.delete_node import DeleteNodeMapTool
-from ..map_tools.dimensioning import Dimensioning
-from ..map_tools.draw_profiles import DrawProfiles
-from ..map_tools.flow_trace_flow_exit import FlowTraceFlowExitMapTool
-from ..map_tools.move_node import MoveNodeMapTool
-from ..map_tools.replace_feature import ReplaceFeatureMapTool
 
 from .actions.basic.search import GwSearch
 
@@ -147,7 +123,6 @@ class LoadProject(QObject):
             return
         
         # Initialize toolbars
-        self.initialize_toolbars()
         self.get_buttons_to_hide()
 
         # Manage project read of type 'tm'
@@ -159,10 +134,6 @@ class LoadProject(QObject):
         elif self.project_type == 'pl':
             self.project_read_pl()
             return
-
-        # Set custom plugin toolbars (one action class per toolbar)
-        if self.project_type == 'ws':
-            self.mincut = GwMincut(self.iface, global_vars.settings, self.controller, self.plugin_dir)
 
         # Manage records from table 'cat_feature'
         self.feature_cat = self.pg_man.manage_feature_cat()
@@ -282,18 +253,6 @@ class LoadProject(QObject):
         return True
 
 
-    def initialize_toolbars(self):
-        """ Initialize toolbars """
-
-        self.basic = GwBasic(self.iface, global_vars.settings, self.controller, self.plugin_dir)
-        self.utils = GwUtilities(self.iface, global_vars.settings, self.controller, self.plugin_dir)
-        self.go2epa = GwGo2Epa(self.iface, global_vars.settings, self.controller, self.plugin_dir)
-        self.om = Om(self.iface, global_vars.settings, self.controller, self.plugin_dir)
-        self.edit = GwEdit(self.iface, global_vars.settings, self.controller, self.plugin_dir)
-        self.master = GwPlan(self.iface, global_vars.settings, self.controller, self.plugin_dir)
-        self.custom = Custom(self.iface, global_vars.settings, self.controller, self.plugin_dir)
-
-
     def get_buttons_to_hide(self):
 
         try:
@@ -378,20 +337,6 @@ class LoadProject(QObject):
         # Disable and hide all plugin_toolbars and actions
         self.enable_toolbars(False)
 
-        self.edit.set_controller(self.controller)
-        self.go2epa.set_controller(self.controller)
-        self.master.set_controller(self.controller)
-        if self.project_type == 'ws':
-            self.mincut.set_controller(self.controller)
-        self.om.set_controller(self.controller)
-        self.custom.set_controller(self.controller)
-
-        self.edit.set_project_type(self.project_type)
-        self.go2epa.set_project_type(self.project_type)
-        self.master.set_project_type(self.project_type)
-        self.om.set_project_type(self.project_type)
-        self.custom.set_project_type(self.project_type)
-
         # Enable toolbar 'basic' and 'utils'
         self.enable_toolbar("basic")
         self.enable_toolbar("utilities")
@@ -462,11 +407,6 @@ class LoadProject(QObject):
         self.manage_toolbar(toolbar_id, list_actions)
         if x and y:
             self.set_toolbar_position(self.translate(f'toolbar_{toolbar_id}_name'), x, y)
-
-        self.basic.set_controller(self.controller)
-        self.utils.set_controller(self.controller)
-        self.basic.set_project_type(self.project_type)
-        self.utils.set_project_type(self.project_type)
 
 
     def manage_snapping_layers(self):
