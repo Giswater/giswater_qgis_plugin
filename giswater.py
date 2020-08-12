@@ -199,7 +199,6 @@ class Giswater(QObject):
 
         # Create class to manage code that performs project configuration
         self.load_project = LoadProject(self.iface, global_vars.settings, self.controller, self.plugin_dir)
-        self.load_project.set_params_config(self.dict_toolbars, self.dict_actions, self.actions_not_checkable)
         self.load_project.project_read(show_warning)
 
 

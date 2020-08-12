@@ -51,9 +51,6 @@ class LoadProject(QObject):
         self.qgis_tools = QgisTools(iface, self.plugin_dir)
         self.pg_man = PgMan(controller)
         self.plugin_toolbars = {}
-        self.dict_toolbars = {}
-        self.dict_actions = {}
-        self.actions_not_checkable = []
         self.list_to_hide = []
         self.actions = {}
         self.action = None
@@ -61,13 +58,6 @@ class LoadProject(QObject):
         self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep
         
         self.buttons = {}
-
-
-    def set_params_config(self, dict_toolbars, dict_actions, actions_not_checkable):
-
-        self.dict_toolbars = dict_toolbars
-        self.dict_actions = dict_actions
-        self.actions_not_checkable = actions_not_checkable
 
 
     def project_read(self, show_warning=True):
