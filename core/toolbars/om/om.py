@@ -6,3 +6,5 @@ from .btn_flow_exit import GwFlowExitButton
 
 from .btn_profile import GwProfileButton
 from .btn_add_visit import GwAddVisitButton
+from .btn_manage_visit import GwManageVisitButton
+from .btn_date_selector import GwDateSelectorButton
