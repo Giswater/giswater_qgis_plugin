@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-SET search_path = "ws_sample", public, pg_catalog;
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
 SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, 
@@ -10232,7 +10232,7 @@ INSERT INTO man_wjoin VALUES ('114463', NULL, NULL);
 
 INSERT INTO man_wtp VALUES (18);
 
-SELECT ws_sample.gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, 
+SELECT SCHEMA_NAME.gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, 
 "data":{"action":"ENABLE TOPO-TRIGGERS"}}$$);
 
 

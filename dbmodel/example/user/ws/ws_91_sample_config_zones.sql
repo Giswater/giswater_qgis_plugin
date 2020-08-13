@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-SET search_path = "ws_sample", public, pg_catalog;
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('feat_pipecat_vdefault', 'FC110-PN10', current_user);
