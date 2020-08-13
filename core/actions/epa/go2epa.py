@@ -402,7 +402,7 @@ class GwGo2Epa(ApiParent):
 
         # Set background task 'Go2Epa'
         description = f"Go2Epa"
-        self.task_go2epa = GwTaskGo2Epa(description, self.controller, self)
+        self.task_go2epa = GwGo2EpaTask(description, self.controller, self)
         QgsApplication.taskManager().addTask(self.task_go2epa)
         QgsApplication.taskManager().triggerTask(self.task_go2epa)
 

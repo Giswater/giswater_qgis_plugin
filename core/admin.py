@@ -2029,11 +2029,9 @@ class GwAdmin(ApiParent):
         return True
 
 
-    def close_dialog(self, dlg=None):
+    def close_dialog(self, dlg):
         """ Close dialog """
 
-        if dlg is None or type(dlg) is bool:
-            dlg = self.dlg
         try:
             self.save_settings(dlg)
             dlg.close()
@@ -2564,7 +2562,7 @@ class GwAdmin(ApiParent):
                 self.error_count = self.error_count + 1
 
             # Manage process result
-            self.manage_process_result(is_test=is_test)
+            self.manage_process_result()
 
         else:
             msg = "A rollback on schema will be done."
@@ -3118,7 +3116,7 @@ class GwAdmin(ApiParent):
                 sql += f" {widget.objectName()} = {value},"
 
         sql = sql[:-1]
-        sql += f" WHERE cat_feature_id = '{form_name}' and columname = '{columname}'"
+        sql += f" WHERE cat_feature_id = '{form_name}' and columname = '{column_id}'"
         self.controller.execute_sql(sql)
 
         # Close dialog

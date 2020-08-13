@@ -5,8 +5,8 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsApplication, QgsExpression, QgsFeatureRequest, QgsFillSymbol, QgsLineSymbol, QgsMarkerSymbol, \
-    QgsPrintLayout, QgsProject, QgsReadWriteContext, QgsSymbol, QgsVectorLayer
+from qgis.core import QgsApplication, QgsExpression, QgsFeatureRequest, QgsPrintLayout, QgsProject, \
+    QgsReadWriteContext, QgsVectorLayer
 
 from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTime
@@ -421,7 +421,7 @@ class GwMincut(ParentAction):
         self.dlg_fin = MincutEndUi()
         self.load_settings(self.dlg_fin)
 
-        api_search = ApiSearch(self.iface, self.settings, self.controller, self.plugin_dir)
+        api_search = GwSearch(self.iface, self.settings, self.controller, self.plugin_dir)
         api_search.api_search(self.dlg_fin)
 
         # These widgets are put from the api, mysteriously if we do something like:
