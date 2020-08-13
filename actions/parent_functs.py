@@ -1105,7 +1105,7 @@ def get_all_actions():
     actions_list = global_vars.iface.mainWindow().findChildren(QAction)
     for action in actions_list:
         global_vars.controller.log_info(str(action.objectName()))
-        action.triggered.connect(partial(global_vars.show_action_name, action))
+        action.triggered.connect(partial(show_action_name, action))
 
 
 def show_action_name(action):
@@ -1458,7 +1458,7 @@ def manage_layer_manager(json_result, sql):
                 global_vars.iface.setActiveLayer(layer)
                 global_vars.iface.zoomToActiveLayer()
                 margin = layermanager['zoom']['margin']
-                global_vars.set_margin(layer, margin)
+                set_margin(layer, margin)
                 if prev_layer:
                     global_vars.iface.setActiveLayer(prev_layer)
         
