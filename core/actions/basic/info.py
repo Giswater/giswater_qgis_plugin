@@ -396,7 +396,9 @@ class GwInfo(ApiParent, QObject):
         self.hydro_info_dlg.btn_close.clicked.connect(partial(self.close_dialog, self.hydro_info_dlg))
         self.hydro_info_dlg.rejected.connect(partial(self.close_dialog, self.hydro_info_dlg))
         field_id = str(self.complet_result[0]['body']['feature']['idName'])
-        result = self.populate_basic_info(self.hydro_info_dlg, complet_result, field_id, self.my_json)
+        result = self.populate_basic_info(self.hydro_info_dlg, complet_result, field_id, self.my_json,
+                 new_feature_id=self.new_feature_id, new_feature=self.new_feature, layer_new_feature=self.layer_new_feature,
+                 feature_id=self.feature_id, feature_type=self.feature_type)
 
         # Disable button accept for info on generic form
         self.hydro_info_dlg.btn_accept.setEnabled(False)
@@ -879,7 +881,10 @@ class GwInfo(ApiParent, QObject):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
-        widget = self.add_calendar(dialog, field, self.my_json, self.complet_result)
+        widget = self.add_calendar(dialog, field, my_json=self.my_json, complet_result=self.complet_result,
+                                   new_feature_id=self.new_feature_id, new_feature=self.new_feature,
+                                   layer_new_feature=self.layer_new_feature,
+                                   feature_id=self.feature_id, feature_type=self.feature_type)
         widget = self.set_auto_update_dateedit(field, dialog, widget)
         return widget
 
@@ -2652,7 +2657,9 @@ class GwInfo(ApiParent, QObject):
         self.dlg_new_workcat.btn_accept.clicked.connect(
             partial(self.cf_manage_new_workcat_accept, 'cat_work', tab_type))
 
-        self.populate_basic_info(self.dlg_new_workcat, complet_list, self.field_id, self.my_json)
+        self.populate_basic_info(self.dlg_new_workcat, complet_list, self.field_id, self.my_json,
+                 new_feature_id=self.new_feature_id, new_feature=self.new_feature, layer_new_feature=self.layer_new_feature,
+                 feature_id=self.feature_id, feature_type=self.feature_type)
 
         # Open dialog
         self.dlg_new_workcat.setWindowTitle("Create workcat")
