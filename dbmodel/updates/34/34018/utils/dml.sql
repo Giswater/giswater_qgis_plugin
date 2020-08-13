@@ -70,9 +70,6 @@ VALUES(2118,'gw_fct_node_builtfromarc','{"style":{"point":{"style":"unique", "va
 "polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2124,'gw_fct_connect_to_network',NULL,'{"visible": ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_arc", "v_edit_gully", "v_edit_link"]}',NULL);
-
-INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
 VALUES(2436,'gw_fct_plan_check_data','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
 "line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
 "polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);

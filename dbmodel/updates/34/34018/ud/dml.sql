@@ -7,8 +7,12 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
--- 2020/07/20
 
+INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
+VALUES(2124,'gw_fct_connect_to_network',NULL,'{"visible": ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_arc", "v_edit_gully", "v_edit_link"]}',NULL);
+
+
+-- 2020/07/20
 INSERT INTO config_table(id, style, group_layer) VALUES('v_edit_arc', 101, 'GW Layers');
 INSERT INTO config_table(id, style, group_layer) VALUES('v_edit_connec', 102, 'GW Layers');
 INSERT INTO config_table(id, style, group_layer) VALUES('v_edit_link', 103, 'GW Layers');

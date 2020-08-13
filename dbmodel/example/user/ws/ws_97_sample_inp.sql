@@ -16,26 +16,6 @@ INSERT INTO inp_curve VALUES ('PUMP_02', 'PUMP');
 INSERT INTO inp_curve_value VALUES (1, 'PUMP_02', 10, 50.0000);
 INSERT INTO inp_curve_value VALUES (2, 'PUMP_01', 5, 100.0000);
 
-INSERT INTO inp_pattern VALUES ('pattern_01', 'Estimated pattern for hydrometer using values from technical information');
-INSERT INTO inp_pattern VALUES ('pattern_02', 'Estimated pattern for hydrometer using values from technical information');
-INSERT INTO inp_pattern VALUES ('pattern_03', 'Estimated pattern for hydrometer using values from technical information');
-INSERT INTO inp_pattern VALUES ('pattern_hydrant', 'Especific pattern for hydrants');
-
-INSERT INTO inp_pattern VALUES ('dma01_period05', 'Real pattern for dma01 on period 05');
-INSERT INTO inp_pattern VALUES ('dma01_period06', 'Real pattern for dma01 on period 06');
-INSERT INTO inp_pattern VALUES ('dma01_period07', 'Real pattern for dma01 on period 07');
-INSERT INTO inp_pattern VALUES ('dma02_period05', 'Real pattern for dma02 on period 05');
-INSERT INTO inp_pattern VALUES ('dma02_period06', 'Real pattern for dma02 on period 06');
-INSERT INTO inp_pattern VALUES ('dma02_period07', 'Real pattern for dma02 on period 07');
-INSERT INTO inp_pattern VALUES ('dma03_period05', 'Real pattern for dma03 on period 05');
-INSERT INTO inp_pattern VALUES ('dma03_period06', 'Real pattern for dma03 on period 06');
-INSERT INTO inp_pattern VALUES ('dma03_period07', 'Real pattern for dma03 on period 07');
-
-INSERT INTO inp_pattern VALUES ('dma01_estimated', 'Estimated pattern for dma');
-INSERT INTO inp_pattern VALUES ('dma02_estimated', 'Estimated pattern for dma');
-INSERT INTO inp_pattern VALUES ('dma03_estimated', 'Estimated pattern for dma');
-
-
 INSERT INTO inp_pattern_value  VALUES (1, 'pattern_01',0.2,0.2,0.4,0.3,0.5,0.5,0.8,1.1,1.5,1.1,1.1,1.3);
 INSERT INTO inp_pattern_value  VALUES (2, 'pattern_01',1.9,2.4,2.2,1.9,1,0.7,0.9,1.3,1.2,0.7,0.5,0.3);
 INSERT INTO inp_pattern_value  VALUES (3, 'pattern_02',0.1,0.15,0.3,0.4,0.5,0.5,0.8,1.1,1.5,1.3,1.3,1.3);
