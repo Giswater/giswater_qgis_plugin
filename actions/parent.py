@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.core import QgsCategorizedSymbolRenderer, QgsExpression, QgsFeatureRequest, QgsGeometry, QgsPointLocator, \
-    QgsPointXY, QgsProject, QgsRectangle, QgsRendererCategory,  QgsSimpleFillSymbolLayer, QgsSnappingConfig, QgsSymbol,\
+    QgsPointXY, QgsProject, QgsRectangle, QgsRendererCategory, QgsSimpleFillSymbolLayer, QgsSnappingConfig, QgsSymbol,\
     QgsVectorLayer
 from qgis.gui import QgsRubberBand
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTimer
@@ -85,7 +85,7 @@ class ParentAction(object):
     def open_web_browser(self, dialog, widget=None):
         """ Display url using the default browser """
 
-        if widget is not None:           
+        if widget is not None:
             url = qt_tools.getWidgetText(dialog, widget)
             if url == 'null':
                 url = 'http://www.giswater.org'
@@ -120,10 +120,10 @@ class ParentAction(object):
 
         # Check if selected file exists. Set default value if necessary
         file_path = qt_tools.getWidgetText(dialog, widget)
-        if file_path is None or file_path == 'null' or not os.path.exists(str(file_path)): 
-            folder_path = self.plugin_dir   
-        else:     
-            folder_path = os.path.dirname(file_path) 
+        if file_path is None or file_path == 'null' or not os.path.exists(str(file_path)):
+            folder_path = self.plugin_dir
+        else:
+            folder_path = os.path.dirname(file_path)
 
         # Open dialog to select file
         os.chdir(folder_path)
@@ -140,7 +140,7 @@ class ParentAction(object):
 
         # Check if selected folder exists. Set default value if necessary
         folder_path = qt_tools.getWidgetText(dialog, widget)
-        if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path): 
+        if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path):
             folder_path = os.path.expanduser("~")
 
         # Open dialog to select folder

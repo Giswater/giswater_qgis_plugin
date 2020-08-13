@@ -33,7 +33,7 @@ class DaoController(object):
 
     def __init__(self, plugin_name, iface, logger_name='plugin', create_logger=True):
         """ Class constructor """
-        
+
         self.settings = global_vars.settings
         self.qgis_settings = global_vars.qgis_settings
         self.qgis_tools = global_vars.qgis_tools

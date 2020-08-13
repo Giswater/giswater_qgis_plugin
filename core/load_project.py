@@ -51,7 +51,7 @@ class LoadProject(QObject):
         self.buttons_to_hide = []
         self.plugin_name = self.qgis_tools.get_value_from_metadata('name', 'giswater')
         self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep
-        
+
         self.buttons = {}
 
 
@@ -105,7 +105,7 @@ class LoadProject(QObject):
         self.project_type = self.controller.get_project_type()
         if self.project_type is None:
             return
-        
+
         # Initialize toolbars
         self.get_buttons_to_hide()
 
@@ -266,24 +266,24 @@ class LoadProject(QObject):
             toolbar_id = parser.get("toolbars_position", f'pos_{pos}').split(',')
             if toolbar_id:
                 self.create_toolbar(toolbar_id[0], toolbar_id[1], toolbar_id[2])
-        
+
         # Manage action group of every toolbar
         parent = self.iface.mainWindow()
         for plugin_toolbar in list(self.plugin_toolbars.values()):
             ag = QActionGroup(parent)
             ag.setProperty('gw_name', 'gw_QActionGroup')
             for index_action in plugin_toolbar.list_actions:
-    
+
                 button_def = global_vars.settings.value(f"buttons_def/{index_action}")
-    
+
                 if button_def:
                     text = self.translate(f'{index_action}_text')
-                    
+
                     icon_path = self.icon_folder + plugin_toolbar.toolbar_id + os.sep + index_action + ".png"
                     button = getattr(sys.modules[__name__], button_def)(icon_path, text, plugin_toolbar.toolbar, ag, self.iface, self.settings, self.controller, self.plugin_dir)
-                    
+
                     self.buttons[index_action] = button
-        
+
         # Disable buttons which are project type exclusive
         if self.project_type == 'ud':
             for index in self.settings.value("project_exclusive/ws"):
@@ -307,7 +307,7 @@ class LoadProject(QObject):
 
 
     def create_toolbar(self, toolbar_id, x=None, y=None):
-        
+
         list_actions = self.settings.value(f"toolbars/{toolbar_id}")
 
         if list_actions is None:
@@ -315,7 +315,7 @@ class LoadProject(QObject):
 
         toolbar_name = self.translate(f'toolbar_{toolbar_id}_name')
         plugin_toolbar = PluginToolbar(toolbar_id, toolbar_name, True)
-        
+
         # If the toolbar is ToC, add it to the Layes docker toolbar, else create a new toolbar
         if toolbar_id == "toc":
             plugin_toolbar.toolbar = self.iface.mainWindow().findChild(QDockWidget, 'Layers').findChildren(QToolBar)[0]
@@ -401,11 +401,11 @@ class LoadProject(QObject):
 
     def enable_all_buttons(self, enable=True):
         """ Utility to enable/disable all buttons """
-    
+
         for index in self.buttons.keys():
             self.enable_button(index, enable)
-    
-    
+
+
     def enable_button(self, button_id, enable=True):
         """ Enable/disable selected button """
 

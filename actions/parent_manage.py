@@ -70,7 +70,7 @@ class ParentManage(ParentAction, object):
         table_relation = f"{table_object}_x_{geom_type}"
         widget_name = f"tbl_{table_relation}"
         widget = qt_tools.getWidget(dialog, widget_name)
-        if widget:              
+        if widget:
             widget.setModel(None)
 
 
@@ -135,8 +135,8 @@ class ParentManage(ParentAction, object):
             qt_tools.setWidgetText(dialog, "rotation", "")
             qt_tools.setWidgetText(dialog, "verified", "")
             qt_tools.setWidgetText(dialog, dialog.num_elements, "")
-                    
-    
+
+
     def fill_widgets(self, dialog, table_object, row):
         """ Fill input widgets with data int he @row """
 

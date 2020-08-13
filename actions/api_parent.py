@@ -1819,7 +1819,7 @@ class ApiParent(ParentAction):
         else:
             check_all = qt_tools.isChecked(dialog, widget_all)
             extras = f'"selectorType":"{selector_type}", "tabName":"{tab_name}", "checkAll":"{check_all}",  ' \
-                     f'"addSchema":"{qgis_project_add_schema}"'
+                f'"addSchema":"{qgis_project_add_schema}"'
 
         body = self.create_body(extras=extras)
         json_result = self.controller.get_json('gw_fct_setselectors', body, log_sql=True)
