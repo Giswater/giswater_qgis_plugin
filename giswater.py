@@ -16,7 +16,7 @@ import sys
 from . import global_vars
 from .lib.qgis_tools import QgisTools
 from .core.load_project import LoadProject
-from .actions.update_sql import UpdateSQL
+from .core.admin import GwAdmin
 from .dao.controller import DaoController
 
 
@@ -100,7 +100,7 @@ class Giswater(QObject):
             self.action = QAction("Show info", self.iface.mainWindow())
 
         self.toolButton.setDefaultAction(self.action)
-        self.update_sql = UpdateSQL(self.iface, global_vars.settings, self.controller, self.plugin_dir)
+        self.update_sql = GwAdmin(self.iface, global_vars.settings, self.controller, self.plugin_dir)
         self.action.triggered.connect(self.update_sql.init_sql)
 
 
@@ -199,7 +199,6 @@ class Giswater(QObject):
 
         # Create class to manage code that performs project configuration
         self.load_project = LoadProject(self.iface, global_vars.settings, self.controller, self.plugin_dir)
-        self.load_project.set_params_config(self.dict_toolbars, self.dict_actions, self.actions_not_checkable)
         self.load_project.project_read(show_warning)
 
 

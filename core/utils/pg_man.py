@@ -110,9 +110,13 @@ class PgMan:
         sql = ("SELECT cat_feature.* FROM cat_feature "
                    "WHERE active IS TRUE ORDER BY id")
         rows = self.controller.get_rows(sql)
+        
+        # If rows ara none, probably the conection has broken so try again
         if not rows:
-            return None
-
+            rows = self.controller.get_rows(sql)
+            if not rows:
+                return None
+        
         msg = "Field child_layer of id: "
         for row in rows:
             tablename = row['child_layer']

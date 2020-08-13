@@ -33,7 +33,7 @@ class DaoController(object):
 
     def __init__(self, plugin_name, iface, logger_name='plugin', create_logger=True):
         """ Class constructor """
-        
+
         self.settings = global_vars.settings
         self.qgis_settings = global_vars.qgis_settings
         self.qgis_tools = global_vars.qgis_tools
@@ -140,16 +140,6 @@ class DaoController(object):
 
     def plugin_settings_set_value(self, key, value):
         self.qgis_settings.setValue(self.plugin_name + "/" + key, value)
-
-
-    def set_actions(self, actions):
-        self.actions = actions
-
-
-    def check_actions(self, check=True):
-        """ Utility to check/uncheck all actions """
-        for action_index, action in self.actions.items():  # @UnusedVariable
-            action.setChecked(check)
 
 
     def set_database_connection(self):

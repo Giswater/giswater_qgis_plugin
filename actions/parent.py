@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.core import QgsCategorizedSymbolRenderer, QgsExpression, QgsFeatureRequest, QgsGeometry, QgsPointLocator, \
-    QgsPointXY, QgsProject, QgsRectangle, QgsRendererCategory,  QgsSimpleFillSymbolLayer, QgsSnappingConfig, QgsSymbol,\
+    QgsPointXY, QgsProject, QgsRectangle, QgsRendererCategory, QgsSimpleFillSymbolLayer, QgsSnappingConfig, QgsSymbol,\
     QgsVectorLayer
 from qgis.gui import QgsRubberBand
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTimer
@@ -29,7 +29,7 @@ from functools import partial
 
 from .. import global_vars
 from lib import qt_tools
-from .add_layer import AddLayer
+from core.actions.edit.layer_tools import GwLayerTools
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 
 from ..ui_manager import DialogTextUi, GwDialog, GwMainWindow
@@ -50,7 +50,7 @@ class ParentAction(object):
         self.schema_name = self.controller.schema_name
         self.project_type = None
         self.plugin_version = self.get_plugin_version()
-        self.add_layer = AddLayer(iface, settings, controller, plugin_dir)
+        self.add_layer = GwLayerTools(iface, settings, controller, plugin_dir)
         self.user_current_layer = None
         self.rubber_point = None
         self.rubber_polygon = None
@@ -85,7 +85,7 @@ class ParentAction(object):
     def open_web_browser(self, dialog, widget=None):
         """ Display url using the default browser """
 
-        if widget is not None:           
+        if widget is not None:
             url = qt_tools.getWidgetText(dialog, widget)
             if url == 'null':
                 url = 'http://www.giswater.org'
@@ -120,10 +120,10 @@ class ParentAction(object):
 
         # Check if selected file exists. Set default value if necessary
         file_path = qt_tools.getWidgetText(dialog, widget)
-        if file_path is None or file_path == 'null' or not os.path.exists(str(file_path)): 
-            folder_path = self.plugin_dir   
-        else:     
-            folder_path = os.path.dirname(file_path) 
+        if file_path is None or file_path == 'null' or not os.path.exists(str(file_path)):
+            folder_path = self.plugin_dir
+        else:
+            folder_path = os.path.dirname(file_path)
 
         # Open dialog to select file
         os.chdir(folder_path)
@@ -140,7 +140,7 @@ class ParentAction(object):
 
         # Check if selected folder exists. Set default value if necessary
         folder_path = qt_tools.getWidgetText(dialog, widget)
-        if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path): 
+        if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path):
             folder_path = os.path.expanduser("~")
 
         # Open dialog to select folder
@@ -154,11 +154,8 @@ class ParentAction(object):
             qt_tools.setWidgetText(dialog, widget, str(folder_path))
 
 
-    def load_settings(self, dialog=None):
+    def load_settings(self, dialog):
         """ Load QGIS settings related with dialog position and size """
-
-        if dialog is None:
-            dialog = self.dlg
 
         try:
             x = self.controller.plugin_settings_value(dialog.objectName() + "_x")
@@ -181,11 +178,8 @@ class ParentAction(object):
             pass
 
 
-    def save_settings(self, dialog=None):
+    def save_settings(self, dialog):
         """ Save QGIS settings related with dialog position and size """
-
-        if dialog is None:
-            dialog = self.dlg
 
         self.controller.plugin_settings_set_value(dialog.objectName() + "_width", dialog.property('width'))
         self.controller.plugin_settings_set_value(dialog.objectName() + "_height", dialog.property('height'))
@@ -219,15 +213,12 @@ class ParentAction(object):
             self.controller.plugin_settings_set_value(f"{dlg_name}_{selector_name}", tab_name)
 
 
-    def open_dialog(self, dlg=None, dlg_name=None, info=True, maximize_button=True, stay_on_top=True, title=None):
+    def open_dialog(self, dlg, dlg_name=None, info=True, maximize_button=True, stay_on_top=True, title=None):
         """ Open dialog """
 
         # Check database connection before opening dialog
         if not self.controller.check_db_connection():
             return
-
-        if dlg is None or type(dlg) is bool:
-            dlg = self.dlg
 
         # Set window title
         if title is not None:
@@ -260,11 +251,9 @@ class ParentAction(object):
             dlg.show()
 
 
-    def close_dialog(self, dlg=None):
+    def close_dialog(self, dlg):
         """ Close dialog """
 
-        if dlg is None or type(dlg) is bool:
-            dlg = self.dlg
         try:
             self.save_settings(dlg)
             dlg.close()

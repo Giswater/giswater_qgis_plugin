@@ -10,7 +10,6 @@ from qgis.PyQt.QtWidgets import QActionGroup
 from .. import global_vars
 from .load_project import LoadProject
 from ..actions.tm_basic import TmBasic
-from ..lib.qgis_tools import QgisTools
 
 
 class LoadProjectTm(LoadProject):

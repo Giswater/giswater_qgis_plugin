@@ -25,7 +25,7 @@ from functools import partial
 from .. import global_vars
 from lib import qt_tools
 from .parent import ParentAction
-from .HyperLinkLabel import HyperLinkLabel
+from ..core.utils.hyperlink_label import GwHyperLinkLabel
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 from ..ui_manager import DialogTextUi
 
@@ -809,7 +809,7 @@ class ApiParent(ParentAction):
 
     def add_hyperlink(self, field):
 
-        widget = HyperLinkLabel()
+        widget = GwHyperLinkLabel()
         widget.setObjectName(field['widgetname'])
         if 'columnname' in field:
             widget.setProperty('columnname', field['columnname'])
@@ -1452,7 +1452,7 @@ class ApiParent(ParentAction):
         for field in result['fields']:
             if field['linkedaction'] == 'action_link':
                 function_name = field['widgetfunction']
-                widget = dialog.findChild(HyperLinkLabel, field['widgetname'])
+                widget = dialog.findChild(GwHyperLinkLabel, field['widgetname'])
                 break
 
         if widget:
@@ -1611,6 +1611,8 @@ class ApiParent(ParentAction):
         :param dialog: Is a standard dialog, from file api_selectors.ui, where put widgets
         :param selector_type: list of selectors to ask DB ['exploitation', 'state', ...]
         """
+
+        index = 0
         main_tab = dialog.findChild(QTabWidget, 'main_tab')
 
         # Set filter
@@ -1817,7 +1819,7 @@ class ApiParent(ParentAction):
         else:
             check_all = qt_tools.isChecked(dialog, widget_all)
             extras = f'"selectorType":"{selector_type}", "tabName":"{tab_name}", "checkAll":"{check_all}",  ' \
-                     f'"addSchema":"{qgis_project_add_schema}"'
+                f'"addSchema":"{qgis_project_add_schema}"'
 
         body = self.create_body(extras=extras)
         json_result = self.controller.get_json('gw_fct_setselectors', body, log_sql=True)
