@@ -57,10 +57,10 @@ class GwVisitGallery(ParentManage):
             self.img_path_list1D.append(0)
 
         # Inicialization of two-dimensional array
-        rows = (self.num_events / 9) + 1
         columns = 9
         rows = self.num_events
-        self.img_path_list = [[0 for x in range(columns)] for x in range(rows)]  # @UnusedVariable
+        # noinspection PyUnusedLocal
+        self.img_path_list = [[0 for x in range(columns)] for x in range(rows)]
 
         # Convert one-dimensional array to two-dimensional array
         # Fill self.img_path_list with values from self.img_path_list1D

@@ -1611,6 +1611,8 @@ class ApiParent(ParentAction):
         :param dialog: Is a standard dialog, from file api_selectors.ui, where put widgets
         :param selector_type: list of selectors to ask DB ['exploitation', 'state', ...]
         """
+
+        index = 0
         main_tab = dialog.findChild(QTabWidget, 'main_tab')
 
         # Set filter

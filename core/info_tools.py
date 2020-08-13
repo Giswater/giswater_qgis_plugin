@@ -102,9 +102,9 @@ class GwInfoTools(ApiParent):
 
     def refresh_canvas(self, **kwargs):
         """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params) """
+
         # Note: canvas.refreshAllLayers() mysteriously that leaves the layers broken
         # self.canvas.refreshAllLayers()
-
         all_layers = self.controller.get_layers()
         for layer in all_layers:
             layer.triggerRepaint()
@@ -135,6 +135,7 @@ class GwInfoTools(ApiParent):
 
     def set_column_multiline(self, **kwargs):
         """ Set multiline selected fields according table config_api_form_fields.widgetcontrols['setQgisMultiline'] """
+
         try:
             field = kwargs["field"]
             layer = kwargs["layer"]
@@ -153,7 +154,8 @@ class GwInfoTools(ApiParent):
 
 
     def set_read_only(self, **kwargs):
-        """ Set field readOnly according to client configuration into config_api_form_fields (field 'iseditable')"""
+        """ Set field readOnly according to client configuration into config_api_form_fields (field 'iseditable') """
+
         try:
             field = kwargs["field"]
             layer = kwargs["layer"]
@@ -176,23 +178,6 @@ class GwInfoTools(ApiParent):
             layer.setEditFormConfig(config)
 
 
-
-
-
-
-    def test1(self, **kwargs):
-
-        print(f"test 1--> {type(kwargs)}")
-
-    def test2(self, **kwargs):
-
-        print(f"test 2--> {kwargs}")
-
-    def test3(self, **kwargs):
-        print(f"test 3--> {kwargs}")
-
-
-
     def load_qml(self, **kwargs):
         """ Apply QML style located in @qml_path in @layer
         :param params:[{"funcName": "load_qml",
@@ -200,6 +185,7 @@ class GwInfoTools(ApiParent):
                         "qmlPath": "C:\\xxxx\\xxxx\\xxxx\\qml_file.qml"}}]
         :return: Boolean value
         """
+
         # Get layer
         layer = self.controller.get_layer_by_tablename(kwargs['layerName']) if 'layerName' in kwargs else None
         if layer is None:

@@ -729,7 +729,6 @@ class GwProfileButton(GwParentMapTool):
     def draw_nodes(self, node, prev_node, index):
         """ Draw nodes between first and last node """
 
-        z1 = 0
         if node.node_id == prev_node.node_2:
             z1 = prev_node.z2
             self.reverse = False
@@ -740,7 +739,6 @@ class GwProfileButton(GwParentMapTool):
         if node.node_1 is None:
             return
 
-        z2 = 0
         if node.node_id == node.node_1:
             z2 = node.z1
         else:

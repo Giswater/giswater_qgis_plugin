@@ -192,6 +192,8 @@ class GwProjectCheck(ApiParent):
                 style_id = layer_info['style_id']
 
                 self.add_layer.from_postgres_to_toc(layer_info['layer'], geom_field, pkey_field, None, group=group)
+                layer = None
+                qml = None
                 if style_id is not None:
                     layer = self.controller.get_layer_by_tablename(layer_info['layer'])
                     if layer:

@@ -61,6 +61,7 @@ class ParentMapTool(QgsMapTool):
         self.cursor.setShape(Qt.CrossCursor)
 
         # Get default cursor
+        # noinspection PyCallingNonCallable
         self.std_cursor = self.parent().cursor()
 
         # Set default vertex marker

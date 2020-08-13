@@ -154,11 +154,8 @@ class ParentAction(object):
             qt_tools.setWidgetText(dialog, widget, str(folder_path))
 
 
-    def load_settings(self, dialog=None):
+    def load_settings(self, dialog):
         """ Load QGIS settings related with dialog position and size """
-
-        if dialog is None:
-            dialog = self.dlg
 
         try:
             x = self.controller.plugin_settings_value(dialog.objectName() + "_x")
@@ -181,11 +178,8 @@ class ParentAction(object):
             pass
 
 
-    def save_settings(self, dialog=None):
+    def save_settings(self, dialog):
         """ Save QGIS settings related with dialog position and size """
-
-        if dialog is None:
-            dialog = self.dlg
 
         self.controller.plugin_settings_set_value(dialog.objectName() + "_width", dialog.property('width'))
         self.controller.plugin_settings_set_value(dialog.objectName() + "_height", dialog.property('height'))
@@ -219,15 +213,12 @@ class ParentAction(object):
             self.controller.plugin_settings_set_value(f"{dlg_name}_{selector_name}", tab_name)
 
 
-    def open_dialog(self, dlg=None, dlg_name=None, info=True, maximize_button=True, stay_on_top=True, title=None):
+    def open_dialog(self, dlg, dlg_name=None, info=True, maximize_button=True, stay_on_top=True, title=None):
         """ Open dialog """
 
         # Check database connection before opening dialog
         if not self.controller.check_db_connection():
             return
-
-        if dlg is None or type(dlg) is bool:
-            dlg = self.dlg
 
         # Set window title
         if title is not None:
@@ -260,11 +251,9 @@ class ParentAction(object):
             dlg.show()
 
 
-    def close_dialog(self, dlg=None):
+    def close_dialog(self, dlg):
         """ Close dialog """
 
-        if dlg is None or type(dlg) is bool:
-            dlg = self.dlg
         try:
             self.save_settings(dlg)
             dlg.close()

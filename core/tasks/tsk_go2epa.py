@@ -260,9 +260,7 @@ class GwGo2EpaTask(QgsTask):
         target = "null"
         col40 = "null"
         json_rpt = ""
-        row_count = sum(1 for rows in full_file)  # @UnusedVariable
-
-        # self.controller.log_info(f"'{self.description()}'. Row count: {row_count}")
+        row_count = sum(1 for rows in full_file)
 
         for line_number, row in enumerate(full_file):
 

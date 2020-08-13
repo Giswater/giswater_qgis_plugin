@@ -211,7 +211,6 @@ class GwFeatureEnd(ParentManage):
             sql = (f"SELECT * FROM v_ui_arc_x_relations "
                    f"WHERE arc_id IN ( {ids_list}) AND arc_state = '1'")
             row = self.controller.get_row(sql)
-            ids_list = None
 
         if row:
             self.dlg_work = FeatureEndConnecUi()

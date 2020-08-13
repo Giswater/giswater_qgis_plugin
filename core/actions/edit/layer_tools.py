@@ -275,7 +275,7 @@ class GwLayerTools(object):
             try:
                 color = color_values.get(str(unique_value))
                 symbol.setColor(color)
-            except Exception as e:
+            except Exception:
                 color = QColor(randrange(0, 256), randrange(0, 256), randrange(0, 256))
                 symbol.setColor(color)
 

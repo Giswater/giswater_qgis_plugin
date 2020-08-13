@@ -1,5 +1,5 @@
 from qgis.PyQt.QtWidgets import QAction
-from qgis.PyQt.QtGui import QCursor, QColor, QIcon, QPixmap
+from qgis.PyQt.QtGui import QCursor, QColor, QIcon
 from qgis.gui import QgsMapTool, QgsVertexMarker, QgsRubberBand
 from qgis.core import QgsWkbTypes
 from qgis.PyQt.QtCore import Qt
@@ -47,6 +47,7 @@ class GwParentMapTool(QgsMapTool):
 		self.cursor.setShape(Qt.CrossCursor)
 		
 		# Get default cursor
+		# noinspection PyCallingNonCallable
 		self.std_cursor = self.parent().cursor()
 		
 		# Set default vertex marker

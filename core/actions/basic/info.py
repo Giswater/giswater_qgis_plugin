@@ -88,7 +88,6 @@ class GwInfo(ApiParent, QObject):
         # Create one menu for each layer
         for layer in json_result['body']['data']['layersNames']:
             layer_name = self.controller.get_layer_by_tablename(layer['layerName'])
-            icon = None
             icon_path = self.icon_folder + layer['icon'] + '.png'
             if os.path.exists(str(icon_path)):
                 icon = QIcon(icon_path)
@@ -1181,7 +1180,7 @@ class GwInfo(ApiParent, QObject):
             else:
                 widget.setStyleSheet(None)
                 btn_accept.setEnabled(True)
-        except ValueError as e:
+        except ValueError:
             widget.setStyleSheet("border: 1px solid red")
             btn_accept.setEnabled(False)
 

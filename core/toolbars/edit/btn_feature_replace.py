@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtWidgets import QCompleter
-from qgis.PyQt.QtCore import Qt, QDate, QStringListModel
+from qgis.PyQt.QtCore import QDate, QStringListModel
 
 import json
 from collections import OrderedDict

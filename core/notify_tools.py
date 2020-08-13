@@ -15,6 +15,7 @@ from collections import OrderedDict
 
 from ..actions.parent import ParentAction
 
+
 class GwNotifyTools(ParentAction):
     # :var conn_failed: some times, when user click so fast 2 actions, LISTEN channel is stopped, and we need to
     #                   re-LISTEN all channels
@@ -33,6 +34,7 @@ class GwNotifyTools(ParentAction):
         self.settings = settings
         self.controller = controller
         self.plugin_dir = plugin_dir
+
 
     def start_listening(self, list_channels):
         """
@@ -315,7 +317,7 @@ class GwNotifyTools(ParentAction):
         try:
             # Set field editability
             config.setReadOnly(field_index, not field['iseditable'])
-        except KeyError as e:
+        except KeyError:
             # Control if key 'iseditable' not exist
             pass
         finally:

@@ -1520,7 +1520,6 @@ class GwVisitManager(ParentManage, QObject):
             return
 
         self.hide_generic_layers(excluded_layers=excluded_layers)
-        widget_name = f"tbl_visit_x_{self.geom_type}"
         widget_name = f"tbl_{table_object}_x_{self.geom_type}"
         viewname = f"v_edit_{self.geom_type}"
         widget_table = qt_tools.getWidget(dialog, widget_name)

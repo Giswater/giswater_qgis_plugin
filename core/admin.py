@@ -2825,6 +2825,7 @@ class GwAdmin(ApiParent):
         self.chk_multi_insert = None
 
         # Remove unused tabs
+        form_name_fields = None
         for x in range(self.dlg_manage_sys_fields.tab_sys_add_fields.count() - 1, -1, -1):
             if str(self.dlg_manage_sys_fields.tab_sys_add_fields.widget(x).objectName()) != 'tab_update':
                 tab_name = self.dlg_manage_sys_fields.tab_sys_add_fields.widget(x).objectName()
@@ -3033,8 +3034,10 @@ class GwAdmin(ApiParent):
 
     def manage_update_field(self, dialog, form_name, tableview):
 
-        schema_name = qt_tools.getWidgetText(self.dlg_readsql, 'project_schema_name')
+        if form_name is None:
+            return
 
+        schema_name = qt_tools.getWidgetText(self.dlg_readsql, 'project_schema_name')
         if schema_name is None:
             qt_tools.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", False)
             return
@@ -3157,10 +3160,12 @@ class GwAdmin(ApiParent):
             list_widgets = self.dlg_manage_fields.tab_create.findChildren(QWidget)
 
             _json = {}
+            result_json = None
             for widget in list_widgets:
                 if type(widget) not in (QScrollArea, QFrame, QWidget, QScrollBar, QLabel, QAbstractButton, QHeaderView, QListView, QGroupBox, QTableView) \
                         and widget.objectName() not in ('qt_spinbox_lineedit', 'chk_multi_insert'):
 
+                    value = None
                     if type(widget) in (QLineEdit, QSpinBox, QDoubleSpinBox):
                         value = qt_tools.getWidgetText(self.dlg_manage_fields, widget, return_string_null=False)
                     elif type(widget) is QComboBox:
@@ -3172,7 +3177,6 @@ class GwAdmin(ApiParent):
                     elif type(widget) is QPlainTextEdit:
                         value = widget.document().toPlainText()
 
-                    result_json = None
                     if str(widget.objectName()) not in (None, 'null', '', ""):
                         _json[str(widget.objectName())] = value
                         result_json = json.dumps(_json)
@@ -3196,11 +3200,13 @@ class GwAdmin(ApiParent):
             list_widgets = self.dlg_manage_fields.tab_create.findChildren(QWidget)
 
             _json = {}
+            result_json = None
             for widget in list_widgets:
                 if type(widget) not in (
                         QScrollArea, QFrame, QWidget, QScrollBar, QLabel, QAbstractButton, QHeaderView, QListView, QGroupBox,
                         QTableView) and widget.objectName() not in ('qt_spinbox_lineedit', 'chk_multi_insert'):
 
+                    value = None
                     if type(widget) in (QLineEdit, QSpinBox, QDoubleSpinBox):
                         value = qt_tools.getWidgetText(self.dlg_manage_fields, widget, return_string_null=False)
                     elif type(widget) is QComboBox:

@@ -1759,8 +1759,7 @@ class GwMincut(ParentAction):
         
         # Change cursor to 'WaitCursor'     
         self.set_cursor_wait()                
-        
-        cur_user = self.controller.get_project_user()               
+
         result_mincut_id = qt_tools.getWidgetText(self.dlg_mincut, "result_mincut_id")
         if result_mincut_id != 'null':
             extras = f'"valveUnaccess":{{"status":"true", "nodeId":{elem_id}}}, '
@@ -2020,7 +2019,7 @@ class GwMincut(ParentAction):
 
         try:
             template_files = os.listdir(template_folder)
-        except FileNotFoundError as e:
+        except FileNotFoundError:
             message = "Your composer's path is bad configured. Please, modify it and try again."
             self.controller.show_message(message, 1)
             return
