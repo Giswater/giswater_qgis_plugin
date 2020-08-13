@@ -91,7 +91,7 @@ class LoadProject(QObject):
 
         # Get variables from qgis project
         self.project_vars = self.qgis_tools.get_qgis_project_variables()
-        global_vars.set_project_vars(self.project_vars)
+        global_vars.project_vars = self.project_vars
 
         # Check that there are no layers (v_edit_node) with the same view name, coming from different schemes
         status = self.check_layers_from_distinct_schema()

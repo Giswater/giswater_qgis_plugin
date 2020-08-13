@@ -891,7 +891,7 @@ class ParentAction(object):
         :return:
         """
 
-        project_vars = global_vars.get_project_vars()
+        project_vars = global_vars.project_vars
         role = project_vars['role']
         role = self.controller.get_restriction(role)
         if role in restriction:

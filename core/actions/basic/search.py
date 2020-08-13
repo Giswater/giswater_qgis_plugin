@@ -66,7 +66,7 @@ class GwSearch(ApiParent):
 
         self.dlg_search.lbl_msg.setStyleSheet("QLabel{color:red;}")
         self.dlg_search.lbl_msg.setVisible(False)
-        project_vars = global_vars.get_project_vars()
+        project_vars = global_vars.project_vars
         qgis_project_add_schema = project_vars['add_schema']
 
         self.controller.set_user_settings_value('open_search', 'true')

@@ -47,12 +47,13 @@ class Giswater(QObject):
         self.toolButton = None
         self.gw_actions = None
 
-        # Initialize plugin directory
+        # Initialize plugin global variables
         self.plugin_dir = os.path.dirname(__file__)
-        self.qgis_tools = QgisTools(iface, self.plugin_dir)
-        global_vars.init_qgis_tools(self.qgis_tools)
+        self.qgis_tools = QgisTools(self.iface, self.plugin_dir)
         self.plugin_name = self.qgis_tools.get_value_from_metadata('name', 'giswater')
         self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep
+
+        global_vars.init_global(self.iface, self.iface.mapCanvas(), self.plugin_dir, self.plugin_name, self.qgis_tools)
 
         # Check if config file exists
         setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name + '.config')
@@ -64,7 +65,6 @@ class Giswater(QObject):
         # Set plugin and QGIS settings: stored in the registry (on Windows) or .ini file (on Unix)
         global_vars.init_settings(setting_file)
         global_vars.init_qgis_settings(self.plugin_name)
-        global_vars.plugin_settings_set_value('aaa', 'vbrgs')
 
         # Enable Python console and Log Messages panel if parameter 'enable_python_console' = True
         enable_python_console = global_vars.settings.value('system_variables/enable_python_console', 'FALSE').upper()
@@ -131,6 +131,7 @@ class Giswater(QObject):
         # Set controller (no database connection yet)
         self.controller = DaoController(self.plugin_name, self.iface, create_logger=True)
         self.controller.set_plugin_dir(self.plugin_dir)
+        global_vars.controller = self.controller
 
         # Set main information button (always visible)
         self.set_info_button()
