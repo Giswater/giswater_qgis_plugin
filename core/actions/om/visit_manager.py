@@ -185,6 +185,31 @@ class GwVisitManager(ParentManage, QObject):
             self.open_dialog(self.dlg_add_visit, dlg_name="visit")
 
 
+    def open_selected_object_visit(self, dialog, widget, table_object):
+
+        selected_list = widget.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+
+        row = selected_list[0].row()
+
+        # Get object_id from selected row
+        field_object_id = "id"
+        if "v_ui_om_visitman_x_" in table_object:
+            field_object_id = "visit_id"
+        selected_object_id = widget.model().record(row).value(field_object_id)
+
+        # Close this dialog and open selected object
+        dialog.close()
+
+        if table_object == "v_ui_om_visit":
+            self.manage_visit(visit_id=selected_object_id)
+        elif "v_ui_om_visitman_x_" in table_object:
+            self.manage_visit(visit_id=selected_object_id)
+
+
     def set_signals(self):
 
         self.dlg_add_visit.rejected.connect(self.manage_rejected)
@@ -754,14 +779,14 @@ class GwVisitManager(ParentManage, QObject):
 
         # manage save and rollback when closing the dialog
         self.dlg_man.rejected.connect(partial(self.close_dialog, self.dlg_man))
-        self.dlg_man.accepted.connect(partial(self.open_selected_object, self.dlg_man,
+        self.dlg_man.accepted.connect(partial(self.open_selected_object_visit, self.dlg_man,
                                       self.dlg_man.tbl_visit, table_object))
 
         # Set signals
         self.dlg_man.tbl_visit.doubleClicked.connect(
-            partial(self.open_selected_object, self.dlg_man, self.dlg_man.tbl_visit, table_object))
+            partial(self.open_selected_object_visit, self.dlg_man, self.dlg_man.tbl_visit, table_object))
         self.dlg_man.btn_open.clicked.connect(
-            partial(self.open_selected_object, self.dlg_man, self.dlg_man.tbl_visit, table_object))
+            partial(self.open_selected_object_visit, self.dlg_man, self.dlg_man.tbl_visit, table_object))
         self.dlg_man.btn_delete.clicked.connect(
             partial(self.delete_selected_object, self.dlg_man.tbl_visit, table_object))
         self.dlg_man.txt_filter.textChanged.connect(partial(self.filter_visit, self.dlg_man, self.dlg_man.tbl_visit,

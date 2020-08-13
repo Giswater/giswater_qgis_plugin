@@ -238,7 +238,7 @@ class GwDocument(ParentManage):
         self.dlg_man.doc_id.textChanged.connect(
             partial(self.filter_by_id, self.dlg_man, self.dlg_man.tbl_document, self.dlg_man.doc_id, table_object))
         self.dlg_man.tbl_document.doubleClicked.connect(
-            partial(self.open_selected_object, self.dlg_man, self.dlg_man.tbl_document, table_object))
+            partial(self.open_selected_object_document, self.dlg_man, self.dlg_man.tbl_document, table_object))
         self.dlg_man.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_man))
         self.dlg_man.rejected.connect(partial(self.close_dialog, self.dlg_man))
         self.dlg_man.btn_delete.clicked.connect(
@@ -246,5 +246,27 @@ class GwDocument(ParentManage):
 
         # Open form
         self.open_dialog(self.dlg_man, dlg_name='doc_manager')
+
+    def open_selected_object_document(self, dialog, widget, table_object):
+
+        selected_list = widget.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+
+        row = selected_list[0].row()
+
+        # Get object_id from selected row
+        field_object_id = "id"
+        widget_id = table_object + "_id"
+        selected_object_id = widget.model().record(row).value(field_object_id)
+
+        # Close this dialog and open selected object
+        dialog.close()
+
+        self.manage_document(row=widget.model().record(row))
+        qt_tools.setWidgetText(self.dlg_add_doc, widget_id, selected_object_id)
+
 
 

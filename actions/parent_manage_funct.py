@@ -1048,43 +1048,6 @@ def delete_selected_object(widget, table_object):
         widget.model().select()
 
 
-def open_selected_object(dialog, widget, table_object):
-    """ Open object form with selected record of the table """
-
-    selected_list = widget.selectionModel().selectedRows()
-    if len(selected_list) == 0:
-        message = "Any record selected"
-        global_vars.controller.show_warning(message)
-        return
-
-    row = selected_list[0].row()
-
-    # Get object_id from selected row
-    field_object_id = "id"
-    widget_id = table_object + "_id"
-    if table_object == "element":
-        field_object_id = table_object + "_id"
-    if table_object == "v_ui_om_visit":
-        widget_id = "visit_id"
-    elif "v_ui_om_visitman_x_" in table_object:
-        field_object_id = "visit_id"
-    selected_object_id = widget.model().record(row).value(field_object_id)
-
-    # Close this dialog and open selected object
-    dialog.close()
-
-    if table_object == "doc":
-        self.manage_document(row=widget.model().record(row))
-        qt_tools.setWidgetText(self.dlg_add_doc, widget_id, selected_object_id)
-    elif table_object == "element":
-        self.manage_element(new_element_id=False)
-        qt_tools.setWidgetText(self.dlg_add_element, widget_id, selected_object_id)
-    elif table_object == "v_ui_om_visit":
-        self.manage_visit(visit_id=selected_object_id)
-    elif "v_ui_om_visitman_x_" in table_object:
-        self.manage_visit(visit_id=selected_object_id)
-
-
 def set_selectionbehavior(dialog):
 
     # Get objects of type: QTableView
