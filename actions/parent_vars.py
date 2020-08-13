@@ -4,6 +4,7 @@ layer = None
 feature_id = None
 geom_type = None
 snapper_manager = None
+snapper = None
 vertex_marker = None
 rubber_polygon = None
 dlg_dtext = None
@@ -17,3 +18,16 @@ dlg_cf = None
 temp_layers_added = None
 rubber_point = None
 user_current_layer = None
+
+# parent_manage.py
+single_tool_mode = None
+project_type = None
+xyCoordinates_conected = None
+snapped_point  = None
+x  = None
+y = None
+schema_name  = None
+plan_om = None
+ids = None
+list_ids = None
+layers = None
