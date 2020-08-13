@@ -35,6 +35,7 @@ plan_om = None
 ids = None
 list_ids = None
 layers = None
+remove_ids = None
 
 def init_global_vars():
 	global add_layer
