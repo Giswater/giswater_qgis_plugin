@@ -22,10 +22,10 @@ from ..parent_maptool import GwParentMapTool
 class GwFeatureReplaceButton(GwParentMapTool):
     """ Button 44: User select one feature. Execute SQL function: 'gw_fct_feature_replace' """
 
-    def __init__(self, icon_path, text, toolbar, action_group):
+    def __init__(self, icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir):
         """ Class constructor """
 
-        super().__init__(icon_path, text, toolbar, action_group)
+        super().__init__(icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir)
         self.current_date = QDate.currentDate().toString('yyyy-MM-dd')
         self.project_type = None
         self.geom_type = None
@@ -134,7 +134,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
         sql = f"SELECT lower(feature_type) FROM cat_feature WHERE id = '{feature_type}'"
         row = self.controller.get_row(sql)
 
-        self.catalog = GwCatalog()
+        self.catalog = GwCatalog(self.iface, self.settings, self.controller, self.plugin_dir)
         self.catalog.api_catalog(self.dlg_replace, 'featurecat_id', row[0], feature_type)
 
 

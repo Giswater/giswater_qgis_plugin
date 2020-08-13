@@ -21,10 +21,10 @@ from ...utils.giswater_tools import load_settings, open_dialog, close_dialog
 class GwAuxPointButton(GwParentMapTool):
     """ Button 72: Add point """
 
-    def __init__(self, icon_path, text, toolbar, action_group):
+    def __init__(self, icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir):
         """ Class constructor """
 
-        super().__init__(icon_path, text, toolbar, action_group)
+        super().__init__(icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir)
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
         self.cancel_point = False
         self.layer_points = None

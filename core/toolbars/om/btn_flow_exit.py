@@ -16,11 +16,11 @@ class GwFlowExitButton(GwParentMapTool):
         Button 57: Flow exit
     """
 
-    def __init__(self, icon_path, text, toolbar, action_group):
+    def __init__(self, icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir):
         """ Class constructor """
 
         # Call ParentMapTool constructor
-        super().__init__(icon_path, text, toolbar, action_group)
+        super().__init__(icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir)
 
         self.layers_added = []
 

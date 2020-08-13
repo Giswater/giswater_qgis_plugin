@@ -32,11 +32,11 @@ class GwArcDivideButton(GwParentMapTool):
 	""" Button 16. Move node
 	Execute SQL function: 'gw_fct_node2arc' """
 	
-	def __init__(self, icon_path, text, toolbar, action_group):
+	def __init__(self, icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir):
 		""" Class constructor """
 		
 		# Call ParentMapTool constructor
-		super().__init__(icon_path, text, toolbar, action_group)
+		super().__init__(icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir)
 	
 	
 	def move_node(self, node_id, point):
