@@ -1,3 +1,7 @@
+from ..core.actions.edit.layer_tools import GwLayerTools
+from .. import global_vars
+
+
 emit_point = None
 previous_map_tool = None
 layer = None
@@ -31,3 +35,7 @@ plan_om = None
 ids = None
 list_ids = None
 layers = None
+
+def init_global_vars():
+	global add_layer
+	add_layer = GwLayerTools(global_vars.iface, global_vars.settings, global_vars.controller, global_vars.plugin_dir)

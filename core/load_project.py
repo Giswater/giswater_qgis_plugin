@@ -33,6 +33,9 @@ from .toolbars.plan.plan import *
 from .toolbars.utilities.utilities import *
 from .toolbars.om.om import *
 
+# TEMP
+from ..actions.parent_vars import init_global_vars
+
 
 class LoadProject(QObject):
 
@@ -65,6 +68,9 @@ class LoadProject(QObject):
         # Force commit before opening project and set new database connection
         if not self.manage_controller(show_warning):
             return
+
+        # TEMP
+        init_global_vars()
 
         # Manage schema name
         self.controller.get_current_user()
