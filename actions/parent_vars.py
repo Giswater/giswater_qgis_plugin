@@ -22,6 +22,7 @@ dlg_cf = None
 temp_layers_added = None
 rubber_point = None
 user_current_layer = None
+list_update = None
 
 # parent_manage.py
 single_tool_mode = None
