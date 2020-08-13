@@ -468,7 +468,7 @@ def add_button(dialog, field):
     if 'widgetfunction' in field:
         if field['widgetfunction'] is not None:
             function_name = field['widgetfunction']
-            exist = global_vars.controller.check_python_function(self, function_name)
+            exist = global_vars.controller.check_python_function(sys.modules[__name__], function_name)
             if not exist:
                 msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
                 global_vars.controller.show_message(msg, 2)
@@ -478,7 +478,7 @@ def add_button(dialog, field):
             global_vars.controller.show_message(message, 2, parameter=widget.objectName())
 
     kwargs = {'dialog': dialog, 'widget': widget, 'message_level': 1, 'function_name': function_name}
-    widget.clicked.connect(partial(getattr(self, function_name), **kwargs))
+    widget.clicked.connect(partial(getattr(sys.modules[__name__], function_name), **kwargs))
 
     return widget
 
@@ -576,14 +576,14 @@ def add_tableview(complet_result, field):
     if 'widgetfunction' in field:
         if field['widgetfunction'] is not None:
             function_name = field['widgetfunction']
-            exist = global_vars.controller.check_python_function(self, function_name)
+            exist = global_vars.controller.check_python_function(sys.modules[__name__], function_name)
             if not exist:
                 msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
                 global_vars.controller.show_message(msg, 2)
                 return widget
 
     # Call def gw_api_open_rpt_result(self, widget, complet_result) of class ApiCf
-    widget.doubleClicked.connect(partial(getattr(self, function_name), widget, complet_result))
+    widget.doubleClicked.connect(partial(getattr(sys.modules[__name__], function_name), widget, complet_result))
 
     return widget
 
@@ -813,7 +813,7 @@ def add_hyperlink(field):
     if 'widgetfunction' in field:
         if field['widgetfunction'] is not None:
             func_name = field['widgetfunction']
-            exist = global_vars.controller.check_python_function(self, func_name)
+            exist = global_vars.controller.check_python_function(sys.modules[__name__], func_name)
             if not exist:
                 msg = f"widget {real_name} have associated function {func_name}, but {func_name} not exist"
                 global_vars.controller.show_message(msg, 2)
@@ -826,7 +826,7 @@ def add_hyperlink(field):
         global_vars.controller.show_message(message, 2, parameter='widgetfunction')
 
     # Call function (self, widget) or def no_function_associated(self, widget=None, message_level=1)
-    widget.clicked.connect(partial(getattr(self, func_name), widget))
+    widget.clicked.connect(partial(getattr(sys.modules[__name__], func_name), widget))
 
     return widget
 
@@ -1121,8 +1121,8 @@ def snapping_node(ep, point, button):
         global_vars.iface.setActiveLayer(parent_vars.layer)
         global_vars.iface.mapCanvas().scene().removeItem(parent_vars.vertex_marker)
         extras = f'"parameters":{{'
-        extras += f'"x":{parent_vars.last_point[0]}, '
-        extras += f'"y":{parent_vars.last_point[1]}, '
+        extras += f'"x":{self.last_point[0]}, '
+        extras += f'"y":{self.last_point[1]}, '
         extras += f'"node1":"{parent_vars.node1}", '
         extras += f'"node2":"{parent_vars.node2}"}}'
         body = create_body(extras=extras)
@@ -1400,7 +1400,7 @@ def set_function_associated(dialog, widget, field):
     if 'widgetfunction' in field:
         if field['widgetfunction'] is not None:
             function_name = field['widgetfunction']
-            exist = global_vars.controller.check_python_function(self, function_name)
+            exist = global_vars.controller.check_python_function(sys.modules[__name__], function_name)
             if not exist:
                 return widget
     else:
@@ -1409,8 +1409,8 @@ def set_function_associated(dialog, widget, field):
 
     if type(widget) == QLineEdit:
         # Call def gw_fct_setprint(self, dialog, my_json): of the class ApiManageComposer
-        widget.editingFinished.connect(partial(getattr(self, function_name), dialog, self.my_json))
-        widget.returnPressed.connect(partial(getattr(self, function_name), dialog, self.my_json))
+        widget.editingFinished.connect(partial(getattr(sys.modules[__name__], function_name), dialog, self.my_json))
+        widget.returnPressed.connect(partial(getattr(sys.modules[__name__], function_name), dialog, self.my_json))
 
     return widget
 
@@ -1448,7 +1448,7 @@ def action_open_url(dialog, result):
 
     if widget:
         # Call def  function (self, widget)
-        getattr(self, function_name)(widget)
+        getattr(sys.modules[__name__], function_name)(widget)
 
 
 def set_open_url(widget):
