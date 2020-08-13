@@ -14,6 +14,10 @@ plugin_dir = None
 plugin_name = None
 qgis_tools = None
 
+# TODO: Proper initialization
+schema_name = None
+project_type = None
+
 controller = None
 settings = None
 qgis_settings = None
