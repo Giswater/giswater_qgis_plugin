@@ -193,7 +193,7 @@ class GwComposerTools(ApiParent):
     def create_dialog(self, dialog, fields):
 
         for field in fields['fields']:
-            label, widget = self.set_widgets_into_composer(dialog, field)
+            label, widget = self.set_widgets_into_composer(dialog, field, self.my_json)
             self.put_widgets(dialog, field, label, widget)
             self.get_values(dialog, widget, self.my_json)
 

@@ -912,7 +912,7 @@ def fill_table(widget, table_name, filter_=None):
     widget.setModel(model)
 
 
-def populate_basic_info(dialog, result, field_id):
+def populate_basic_info(dialog, result, field_id, my_json=None):
 
     fields = result[0]['body']['data']
     if 'fields' not in fields:
@@ -941,7 +941,7 @@ def populate_basic_info(dialog, result, field_id):
             if widget.property('columnname') == field_id:
                 parent_vars.feature_id = widget.text()
         elif field['widgettype'] == 'datetime':
-            widget = add_calendar(dialog, field)
+            widget = add_calendar(dialog, field, my_json)
             widget = set_auto_update_dateedit(field, dialog, widget)
         elif field['widgettype'] == 'hyperlink':
             widget = add_hyperlink(field)
@@ -953,7 +953,7 @@ def populate_basic_info(dialog, result, field_id):
             widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         elif field['widgettype'] in ('check', 'checkbox'):
             widget = add_checkbox(field)
-            widget.stateChanged.connect(partial(get_values, dialog, widget, self.my_json))
+            widget.stateChanged.connect(partial(get_values, dialog, widget, my_json))
         elif field['widgettype'] == 'button':
             widget = add_button(dialog, field)
 
@@ -976,7 +976,7 @@ def clear_gridlayout(layout):
             child.deleteLater()
 
 
-def add_calendar(dialog, field):
+def add_calendar(dialog, field, my_json=None, complet_result=None):
 
     widget = QgsDateTimeEdit()
     widget.setObjectName(field['widgetname'])
@@ -996,9 +996,9 @@ def add_calendar(dialog, field):
         _json = {}
         btn_calendar.clicked.connect(partial(get_values, dialog, widget, _json))
         btn_calendar.clicked.connect(
-            partial(accept, dialog, self.complet_result[0], parent_vars.feature_id, _json, True, False))
+            partial(accept, dialog, complet_result[0], parent_vars.feature_id, _json, True, False))
     else:
-        btn_calendar.clicked.connect(partial(get_values, dialog, widget, self.my_json))
+        btn_calendar.clicked.connect(partial(get_values, dialog, widget, my_json))
     btn_calendar.clicked.connect(partial(set_calendar_empty, widget))
 
     return widget
@@ -1341,7 +1341,7 @@ def get_values_checked_param_user(dialog, chk, widget, field, _json, value=None)
     parent_vars.list_update.append(elem)
 
 
-def set_widgets_into_composer(dialog, field):
+def set_widgets_into_composer(dialog, field, my_json=None):
 
     widget = None
     label = None
@@ -1359,17 +1359,17 @@ def set_widgets_into_composer(dialog, field):
         widget = add_lineedit(field)
         widget = set_widget_size(widget, field)
         widget = set_data_type(field, widget)
-        widget.editingFinished.connect(partial(get_values, dialog, widget, self.my_json))
-        widget.returnPressed.connect(partial(get_values, dialog, widget, self.my_json))
+        widget.editingFinished.connect(partial(get_values, dialog, widget, my_json))
+        widget.returnPressed.connect(partial(get_values, dialog, widget, my_json))
     elif field['widgettype'] == 'combo':
         widget = add_combobox(field)
         widget = set_widget_size(widget, field)
-        widget.currentIndexChanged.connect(partial(get_values, dialog, widget, self.my_json))
+        widget.currentIndexChanged.connect(partial(get_values, dialog, widget, my_json))
         if 'widgetfunction' in field:
             if field['widgetfunction'] is not None:
                 function_name = field['widgetfunction']
                 # Call def gw_fct_setprint(self, dialog, my_json): of the class ApiManageComposer
-                widget.currentIndexChanged.connect(partial(getattr(sys.modules[__name__], function_name), dialog, self.my_json))
+                widget.currentIndexChanged.connect(partial(getattr(sys.modules[__name__], function_name), dialog, my_json))
 
     return label, widget
 
@@ -1394,6 +1394,7 @@ def get_values(dialog, widget, _json=None):
             _json[str(widget.property('columnname'))] = str(value)
 
 
+'''
 def set_function_associated(dialog, widget, field):
 
     function_name = 'no_function_associated'
@@ -1413,6 +1414,7 @@ def set_function_associated(dialog, widget, field):
         widget.returnPressed.connect(partial(getattr(sys.modules[__name__], function_name), dialog, self.my_json))
 
     return widget
+'''
 
 
 def draw_rectangle(result):

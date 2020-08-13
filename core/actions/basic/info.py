@@ -396,7 +396,7 @@ class GwInfo(ApiParent, QObject):
         self.hydro_info_dlg.btn_close.clicked.connect(partial(self.close_dialog, self.hydro_info_dlg))
         self.hydro_info_dlg.rejected.connect(partial(self.close_dialog, self.hydro_info_dlg))
         field_id = str(self.complet_result[0]['body']['feature']['idName'])
-        result = self.populate_basic_info(self.hydro_info_dlg, complet_result, field_id)
+        result = self.populate_basic_info(self.hydro_info_dlg, complet_result, field_id, self.my_json)
 
         # Disable button accept for info on generic form
         self.hydro_info_dlg.btn_accept.setEnabled(False)
@@ -879,7 +879,7 @@ class GwInfo(ApiParent, QObject):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
-        widget = self.add_calendar(dialog, field)
+        widget = self.add_calendar(dialog, field, self.my_json, self.complet_result)
         widget = self.set_auto_update_dateedit(field, dialog, widget)
         return widget
 
@@ -2652,7 +2652,7 @@ class GwInfo(ApiParent, QObject):
         self.dlg_new_workcat.btn_accept.clicked.connect(
             partial(self.cf_manage_new_workcat_accept, 'cat_work', tab_type))
 
-        self.populate_basic_info(self.dlg_new_workcat, complet_list, self.field_id)
+        self.populate_basic_info(self.dlg_new_workcat, complet_list, self.field_id, self.my_json)
 
         # Open dialog
         self.dlg_new_workcat.setWindowTitle("Create workcat")
