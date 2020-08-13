@@ -25,11 +25,11 @@ class GwNodeTypeChangeButton(GwParentMapTool):
 		Combo to select new cat_node.id
 	"""
 	
-	def __init__(self, icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir):
+	def __init__(self, icon_path, text, toolbar, action_group):
 		""" Class constructor """
 		
 		# Call ParentMapTool constructor
-		super().__init__(icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir)
+		super().__init__(icon_path, text, toolbar, action_group)
 	
 	
 	def open_catalog(self):
@@ -40,7 +40,7 @@ class GwNodeTypeChangeButton(GwParentMapTool):
 			msg = "New node type is null. Please, select a valid value."
 			self.controller.show_info_box(msg, "Info")
 			return
-		self.catalog = GwCatalog(self.iface, self.settings, self.controller, self.plugin_dir)
+		self.catalog = GwCatalog()
 		self.catalog.api_catalog(self.dlg_chg_node_type, 'node_nodecat_id', 'node', feature_type)
 	
 	

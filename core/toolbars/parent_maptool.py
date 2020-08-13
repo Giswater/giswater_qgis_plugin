@@ -6,15 +6,12 @@ from qgis.PyQt.QtCore import Qt
 
 import os
 
+from ... import global_vars
+
 from ...map_tools.snapping_utils_v3 import SnappingConfigManager
 
 class GwParentMapTool(QgsMapTool):
-	def __init__(self, icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir):
-		
-		self.iface = iface
-		self.settings = settings
-		self.controller = controller
-		self.plugin_dir = plugin_dir
+	def __init__(self, icon_path, text, toolbar, action_group):
 		
 		self.show_help = bool(int(self.settings.value('status/show_help', 1)))
 		self.layer_arc = None
@@ -22,11 +19,11 @@ class GwParentMapTool(QgsMapTool):
 		self.layer_gully = None
 		self.layer_node = None
 		self.snapper_manager = SnappingConfigManager(self.iface)
-		self.snapper_manager.controller = controller
+		self.snapper_manager.controller = global_vars.controller
 		
-		self.canvas = iface.mapCanvas()
+		self.canvas = global_vars.canvas
+		
 		super().__init__(self.canvas)
-		
 		
 		icon = None
 		if os.path.exists(icon_path):

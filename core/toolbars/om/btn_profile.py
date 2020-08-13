@@ -55,11 +55,11 @@ class NodeData:
 class GwProfileButton(GwParentMapTool):
     """ Button 43: Draw_profiles """
 
-    def __init__(self, icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir):
+    def __init__(self, icon_path, text, toolbar, action_group):
         """ Class constructor """
 
         # Call ParentMapTool constructor
-        super().__init__(icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir)
+        super().__init__(icon_path, text, toolbar, action_group)
 
         self.list_of_selected_nodes = []
         self.nodes = []

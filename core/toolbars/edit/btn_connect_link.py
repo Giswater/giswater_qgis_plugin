@@ -35,11 +35,11 @@ class GwConnectLinkButton(GwParentMapTool):
 	""" Button 20: User select connections from layer 'connec'
 	Execute SQL function: 'gw_fct_connect_to_network' """
 	
-	def __init__(self, icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir):
+	def __init__(self, icon_path, text, toolbar, action_group):
 		""" Class constructor """
 		
 		# Call ParentMapTool constructor
-		super().__init__(icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir)
+		super().__init__(icon_path, text, toolbar, action_group)
 		
 		self.dragging = False
 		

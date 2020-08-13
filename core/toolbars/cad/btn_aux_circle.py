@@ -20,10 +20,10 @@ from ...utils.giswater_tools import load_settings, open_dialog, close_dialog
 class GwAuxCircleButton(GwParentMapTool):
     """ Button 71: Add circle """
 
-    def __init__(self, icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir):
+    def __init__(self, icon_path, text, toolbar, action_group):
         """ Class constructor """
 
-        super().__init__(icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir)
+        super().__init__(icon_path, text, toolbar, action_group)
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
         self.cancel_circle = False
         self.layer_circle = None

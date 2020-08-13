@@ -29,11 +29,11 @@ from ...utils.giswater_tools import load_settings, open_dialog, close_dialog, cr
 class GwArcFusionButton(GwParentMapTool):
 	""" Button 17: User select one node. Execute SQL function: 'gw_fct_delete_node' """
 	
-	def __init__(self, icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir):
+	def __init__(self, icon_path, text, toolbar, action_group):
 		""" Class constructor """
 		
 		# Call ParentMapTool constructor
-		super().__init__(icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir)
+		super().__init__(icon_path, text, toolbar, action_group)
 	
 	
 	

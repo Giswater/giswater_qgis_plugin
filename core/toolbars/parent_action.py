@@ -2,13 +2,10 @@ from qgis.PyQt.QtWidgets import QAction
 from qgis.PyQt.QtGui import QIcon
 import os
 
+from ... import global_vars
+
 class GwParentAction:
-	def __init__(self, icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir):
-		
-		self.iface = iface
-		self.settings = settings
-		self.controller = controller
-		self.plugin_dir = plugin_dir
+	def __init__(self, icon_path, text, toolbar, action_group):
 		
 		icon = None
 		if os.path.exists(icon_path):
@@ -28,4 +25,4 @@ class GwParentAction:
 	
 	
 	def clicked_event(self):
-		self.controller.show_message("Action has no function!!", "INFO")
+		global_vars.controller.show_message("Action has no function!!", "INFO")

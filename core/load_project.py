@@ -286,7 +286,7 @@ class LoadProject(QObject):
                     text = self.translate(f'{index_action}_text')
 
                     icon_path = self.icon_folder + plugin_toolbar.toolbar_id + os.sep + index_action + ".png"
-                    button = getattr(sys.modules[__name__], button_def)(icon_path, text, plugin_toolbar.toolbar, ag, self.iface, self.settings, self.controller, self.plugin_dir)
+                    button = getattr(sys.modules[__name__], button_def)(icon_path, text, plugin_toolbar.toolbar, ag)
 
                     self.buttons[index_action] = button
 

@@ -3,10 +3,10 @@ from ..parent_action import GwParentAction
 from ...actions.edit.document import GwDocument
 
 class GwEditDocumentButton(GwParentAction):
-	def __init__(self, icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir):
-		super().__init__(icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir)
+	def __init__(self, icon_path, text, toolbar, action_group):
+		super().__init__(icon_path, text, toolbar, action_group)
 		
-		self.document = GwDocument(self.iface, self.settings, self.controller, self.plugin_dir)
+		self.document = GwDocument()
 	
 	
 	def clicked_event(self):

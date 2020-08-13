@@ -16,11 +16,11 @@ class GwFlowTraceButton(GwParentMapTool):
         Button 56: Flow trace
     """
 
-    def __init__(self, icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir):
+    def __init__(self, icon_path, text, toolbar, action_group):
         """ Class constructor """
 
         # Call ParentMapTool constructor
-        super().__init__(icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir)
+        super().__init__(icon_path, text, toolbar, action_group)
 
         self.layers_added = []
 
