@@ -18,13 +18,12 @@ from functools import partial
 from lib import qt_tools
 from .. import global_vars
 from . import parent_vars
-from . import parent_functs
+from .parent_functs import check_expression, close_dialog, get_cursor_multiple_selection, set_table_columns, \
+    refresh_map_canvas
+
+
 from .multiple_selection import MultipleSelection
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
-
-
-    # Global_vars/Parent_vars
-    # self.lazy_widget = None
 
 
 def reset_lists():
@@ -495,7 +494,7 @@ def get_expr_filter(geom_type):
     expr_filter = expr_filter[:-2] + ")"
 
     # Check expression
-    (is_valid, expr) = parent_functs.check_expression(expr_filter)
+    (is_valid, expr) = check_expression(expr_filter)
     if not is_valid:
         return None
 
@@ -534,7 +533,7 @@ def set_table_model(dialog, table_object, geom_type, expr_filter):
     expr = None
     if expr_filter:
         # Check expression
-        (is_valid, expr) = parent_functs.check_expression(expr_filter)  # @UnusedVariable
+        (is_valid, expr) = check_expression(expr_filter)  # @UnusedVariable
         if not is_valid:
             return expr
 
@@ -581,11 +580,11 @@ def apply_lazy_init(widget):
     """Apply the init function related to the model. It's necessary
     a lazy init because model is changed everytime is loaded."""
 
-    if self.lazy_widget is None:
+    if parent_vars.lazy_widget is None:
         return
-    if widget != self.lazy_widget:
+    if widget != parent_vars.lazy_widget:
         return
-    self.lazy_init_function(self.lazy_widget)
+    parent_vars.lazy_init_function(parent_vars.lazy_widget)
 
 
 def lazy_configuration(widget, init_function):
@@ -593,8 +592,8 @@ def lazy_configuration(widget, init_function):
     This is necessary to allow a lazy setup of the events because set_table_events
     can create a table with a None model loosing any event connection."""
 
-    self.lazy_widget = widget
-    self.lazy_init_function = init_function
+    parent_vars.lazy_widget = widget
+    parent_vars.lazy_init_function = init_function
 
 
 def select_features_by_ids(geom_type, expr):
@@ -687,7 +686,7 @@ def delete_records(dialog, table_object, query=False):
         expr_filter = expr_filter[:-2] + ")"
 
         # Check expression
-        (is_valid, expr) = parent_functs.check_expression(expr_filter)  # @UnusedVariable
+        (is_valid, expr) = check_expression(expr_filter)  # @UnusedVariable
         if not is_valid:
             return
 
@@ -731,7 +730,7 @@ def manage_close(dialog, table_object, cur_active_layer=None, excluded_layers=[]
     reset_model(dialog, table_object, "element")
     if parent_vars.project_type == 'ud':
         reset_model(dialog, table_object, "gully")
-    parent_functs.close_dialog(dialog)
+    close_dialog(dialog)
     hide_generic_layers(excluded_layers=excluded_layers)
     disconnect_snapping()
     disconnect_signal_selection_changed()
@@ -748,7 +747,7 @@ def selection_init(dialog, table_object, query=False):
     parent_vars.previous_map_tool = global_vars.canvas.mapTool()
     global_vars.canvas.setMapTool(multiple_selection)
     connect_signal_selection_changed(dialog, table_object, query)
-    cursor = parent_functs.get_cursor_multiple_selection()
+    cursor = get_cursor_multiple_selection()
     global_vars.canvas.setCursor(cursor)
 
 
@@ -792,7 +791,7 @@ def selection_changed(dialog, table_object, geom_type, query=False):
         expr_filter = expr_filter[:-2] + ")"
 
         # Check expression
-        (is_valid, expr) = parent_functs.check_expression(expr_filter)  # @UnusedVariable
+        (is_valid, expr) = check_expression(expr_filter)  # @UnusedVariable
         if not is_valid:
             return
 
@@ -854,7 +853,7 @@ def insert_feature(dialog, table_object, query=False, remove_ids=True):
     expr_filter = f"{field_id} = '{feature_id}'"
 
     # Check expression
-    (is_valid, expr) = parent_functs.check_expression(expr_filter)
+    (is_valid, expr) = check_expression(expr_filter)
     if not is_valid:
         return None
 
@@ -887,7 +886,7 @@ def insert_feature(dialog, table_object, query=False, remove_ids=True):
     expr_filter = expr_filter[:-2] + ")"
 
     # Check expression
-    (is_valid, expr) = parent_functs.check_expression(expr_filter)
+    (is_valid, expr) = check_expression(expr_filter)
     if not is_valid:
         return
 
@@ -938,8 +937,8 @@ def reload_qtable(dialog, geom_type):
     expr = f"psector_id = '{value}'"
     qtable = qt_tools.getWidget(dialog, f'tbl_psector_x_{geom_type}')
     fill_table_by_expr(qtable, f"plan_psector_x_{geom_type}", expr)
-    parent_functs.set_table_columns(dialog, qtable, f"plan_psector_x_{geom_type}")
-    parent_functs.refresh_map_canvas()
+    set_table_columns(dialog, qtable, f"plan_psector_x_{geom_type}")
+    refresh_map_canvas()
 
 
 def fill_table_by_expr(qtable, table_name, expr):
