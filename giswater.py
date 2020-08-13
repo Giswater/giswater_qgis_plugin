@@ -47,6 +47,20 @@ class Giswater(QObject):
         self.toolButton = None
         self.gw_actions = None
 
+
+    def initGui(self):
+        """ Create the menu entries and toolbar icons inside the QGIS GUI """
+
+        # Initialize plugin
+        self.init_plugin()
+
+        # Force project read (to work with PluginReloader)
+        self.project_read(False)
+
+
+    def init_plugin(self):
+        """ Plugin main initialization function """
+
         # Initialize plugin global variables
         self.plugin_dir = os.path.dirname(__file__)
         self.qgis_tools = QgisTools(self.iface, self.plugin_dir)
@@ -73,6 +87,20 @@ class Giswater(QObject):
 
         # Define signals
         self.set_signals()
+
+        # Set controller (no database connection yet)
+        self.controller = DaoController(self.plugin_name, self.iface, create_logger=True)
+        self.controller.set_plugin_dir(self.plugin_dir)
+        global_vars.controller = self.controller
+
+        # Set main information button (always visible)
+        self.set_info_button()
+
+        # Manage section 'actions_list' of config file
+        self.manage_section_actions_list()
+
+        # Manage section 'toolbars' of config file
+        self.manage_section_toolbars()
 
 
     def set_signals(self):
@@ -113,34 +141,6 @@ class Giswater(QObject):
             self.iface.removeToolBarIcon(self.action_info)
         self.action = None
         self.action_info = None
-
-
-    def initGui(self):
-        """ Create the menu entries and toolbar icons inside the QGIS GUI """
-
-        # Initialize plugin
-        self.init_plugin()
-
-        # Force project read (to work with PluginReloader)
-        self.project_read(False)
-
-
-    def init_plugin(self):
-        """ Plugin main initialization function """
-
-        # Set controller (no database connection yet)
-        self.controller = DaoController(self.plugin_name, self.iface, create_logger=True)
-        self.controller.set_plugin_dir(self.plugin_dir)
-        global_vars.controller = self.controller
-
-        # Set main information button (always visible)
-        self.set_info_button()
-
-        # Manage section 'actions_list' of config file
-        self.manage_section_actions_list()
-
-        # Manage section 'toolbars' of config file
-        self.manage_section_toolbars()
 
 
     def manage_section_actions_list(self):
