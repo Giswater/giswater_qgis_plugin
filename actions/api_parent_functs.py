@@ -1369,7 +1369,7 @@ def set_widgets_into_composer(dialog, field):
             if field['widgetfunction'] is not None:
                 function_name = field['widgetfunction']
                 # Call def gw_fct_setprint(self, dialog, my_json): of the class ApiManageComposer
-                widget.currentIndexChanged.connect(partial(getattr(self, function_name), dialog, self.my_json))
+                widget.currentIndexChanged.connect(partial(getattr(sys.modules[__name__], function_name), dialog, self.my_json))
 
     return label, widget
 
