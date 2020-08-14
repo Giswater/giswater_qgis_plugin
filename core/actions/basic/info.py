@@ -2186,7 +2186,7 @@ class GwInfo(ApiParent, QObject):
         """ Open gallery of selected record of the table """
 
         # Open Gallery
-        gal = GwVisitGallery(self.iface, self.settings, self.controller, self.plugin_dir)
+        gal = GwVisitGallery()
         gal.manage_gallery()
         gal.fill_gallery(self.visit_id, self.event_id)
 

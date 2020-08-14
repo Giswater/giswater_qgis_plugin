@@ -16,21 +16,24 @@ from functools import partial
 
 from ...utils.extended_qlabel import GwExtendedQLabel
 from ....ui_manager import Gallery, GalleryZoom
-from ....actions.parent_manage import ParentManage
 
+from .... import global_vars
+from ....actions.parent_functs import load_settings, set_icon, open_dialog
+from ....actions.parent_manage_funct import close_dialog
 
-class GwVisitGallery(ParentManage):
+class GwVisitGallery:
 
-    def __init__(self, iface, settings, controller, plugin_dir):
+    def __init__(self):
         """ Class to control 'Add element' of toolbar 'edit' """
-        ParentManage.__init__(self, iface, settings, controller, plugin_dir)
-
+        
+        self.controller = global_vars.controller
+        
 
     def manage_gallery(self):
 
         # Create the dialog and signals
         self.dlg_gallery = Gallery()
-        self.load_settings(self.dlg_gallery)
+        load_settings(self.dlg_gallery)
 
 
     def fill_gallery(self, visit_id, event_id):
@@ -116,17 +119,17 @@ class GwVisitGallery(ParentManage):
         self.btn_next.clicked.connect(self.next_gallery)
         self.btn_previous = self.dlg_gallery.findChild(QPushButton, "btn_previous")
         self.btn_previous.clicked.connect(self.previous_gallery)
-        self.set_icon(self.btn_previous, "109")
-        self.set_icon(self.btn_next, "108")
+        set_icon(self.btn_previous, "109")
+        set_icon(self.btn_next, "108")
         self.btn_close = self.dlg_gallery.findChild(QPushButton, "btn_close")
-        self.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_gallery))
+        self.btn_close.clicked.connect(partial(close_dialog, self.dlg_gallery))
 
         # If all images set in one page, disable button next
         if num <= 9:
             self.btn_next.setDisabled(True)
 
         # Open dialog
-        self.open_dialog(self.dlg_gallery, dlg_name='visit_gallery', maximize_button=False)
+        open_dialog(self.dlg_gallery, dlg_name='visit_gallery', maximize_button=False)
 
 
     def next_gallery(self):
@@ -206,7 +209,7 @@ class GwVisitGallery(ParentManage):
         handeler_index = i
 
         self.dlg_gallery_zoom = GalleryZoom()
-        self.load_settings(self.dlg_gallery_zoom)
+        load_settings(self.dlg_gallery_zoom)
         self.lbl_img = self.dlg_gallery_zoom.findChild(QLabel, "lbl_img_zoom")
 
         # Parse a URL into components
@@ -232,17 +235,17 @@ class GwVisitGallery(ParentManage):
 
         self.btn_slidePrevious = self.dlg_gallery_zoom.findChild(QPushButton, "btn_slidePrevious")
         self.btn_slideNext = self.dlg_gallery_zoom.findChild(QPushButton, "btn_slideNext")
-        self.set_icon(self.btn_slidePrevious, "109")
-        self.set_icon(self.btn_slideNext, "108")
+        set_icon(self.btn_slidePrevious, "109")
+        set_icon(self.btn_slideNext, "108")
 
-        self.dlg_gallery_zoom.rejected.connect(partial(self.close_dialog, self.dlg_gallery_zoom))
+        self.dlg_gallery_zoom.rejected.connect(partial(close_dialog, self.dlg_gallery_zoom))
 
         self.i = i
         self.btn_slidePrevious.clicked.connect(self.slide_previous)
         self.btn_slideNext.clicked.connect(self.slide_next)
 
         # Open dialog
-        self.open_dialog(self.dlg_gallery_zoom, dlg_name='visit_gallery_zoom', maximize_button=False)
+        open_dialog(self.dlg_gallery_zoom, dlg_name='visit_gallery_zoom', maximize_button=False)
 
         # Controling start index
         if handeler_index != i:
