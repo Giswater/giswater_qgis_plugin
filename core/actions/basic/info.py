@@ -1213,6 +1213,7 @@ class GwInfo(ApiParent, QObject):
             pass
 
 
+    # TODO: Remove this 5 funcions "set_auto_update_*" now it is in api_parent_functs.py. From here.
     def set_auto_update_lineedit(self, field, dialog, widget):
 
         if self.check_tab_data(dialog):
@@ -1230,34 +1231,6 @@ class GwInfo(ApiParent, QObject):
             widget.textChanged.connect(partial(self.check_min_max_value, dialog, widget, dialog.btn_accept))
 
         return widget
-
-
-    def reload_fields(self, dialog, result, p_widget):
-        """
-        :param dialog: QDialog where find and set widgets
-        :param result: row with info (json)
-        :param p_widget: Widget that has changed
-        """
-
-        if not p_widget:
-            return
-
-        for field in result['body']['data']['fields']:
-            widget = dialog.findChild(QLineEdit, f'{field["widgetname"]}')
-            if widget:
-                value = field["value"]
-                qt_tools.setText(dialog, widget, value)
-                if not field['iseditable']:
-                    widget.setStyleSheet("QLineEdit { background: rgb(0, 255, 0); color: rgb(0, 0, 0)}")
-                else:
-                    widget.setStyleSheet(None)
-            elif "message" in field:
-                level = field['message']['level'] if 'level' in field['message'] else 0
-                self.controller.show_message(field['message']['text'], level)
-
-
-    def enabled_accept(self, dialog):
-        dialog.btn_accept.setEnabled(True)
 
 
     def set_auto_update_combobox(self, field, dialog, widget):
@@ -1317,6 +1290,36 @@ class GwInfo(ApiParent, QObject):
             else:
                 widget.stateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
         return widget
+
+
+    # TODO: To here.
+    
+    def reload_fields(self, dialog, result, p_widget):
+        """
+        :param dialog: QDialog where find and set widgets
+        :param result: row with info (json)
+        :param p_widget: Widget that has changed
+        """
+
+        if not p_widget:
+            return
+
+        for field in result['body']['data']['fields']:
+            widget = dialog.findChild(QLineEdit, f'{field["widgetname"]}')
+            if widget:
+                value = field["value"]
+                qt_tools.setText(dialog, widget, value)
+                if not field['iseditable']:
+                    widget.setStyleSheet("QLineEdit { background: rgb(0, 255, 0); color: rgb(0, 0, 0)}")
+                else:
+                    widget.setStyleSheet(None)
+            elif "message" in field:
+                level = field['message']['level'] if 'level' in field['message'] else 0
+                self.controller.show_message(field['message']['text'], level)
+
+
+    def enabled_accept(self, dialog):
+        dialog.btn_accept.setEnabled(True)
 
 
     def open_catalog(self, tab_type, feature_type):
