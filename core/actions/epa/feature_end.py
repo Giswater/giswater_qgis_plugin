@@ -14,56 +14,66 @@ from functools import partial
 from datetime import datetime
 
 from lib import qt_tools
-from ....actions.parent_manage import ParentManage
 from ....ui_manager import FeatureEndUi, InfoWorkcatUi, FeatureEndConnecUi
+from .... import global_vars
+from ....actions import parent_vars
+
+from ....actions.parent_functs import load_settings, set_icon, open_dialog, save_settings, close_dialog
+from ....actions.parent_manage_funct import remove_selection, reset_lists, reset_layers, set_selectionbehavior, \
+    set_completer_object, insert_feature, selection_init, delete_records, tab_feature_changed, set_completer_feature_id, \
+    hide_generic_layers, disconnect_snapping, disconnect_signal_selection_changed, set_completer_widget
 
 
-class GwFeatureEnd(ParentManage):
+class GwFeatureEnd:
 
-    def __init__(self, iface, settings, controller, plugin_dir):
+    def __init__(self):
         """ Class to control 'Workcat end' of toolbar 'edit' """
-        ParentManage.__init__(self, iface, settings, controller, plugin_dir)
+        
+        self.iface = global_vars.iface
+        self.controller = global_vars.controller
+        self.schema_name = global_vars.schema_name
+        self.canvas = global_vars.canvas
 
 
     def manage_workcat_end(self):
 
-        self.remove_selection(True)
+        remove_selection(True)
 
         # Create the dialog and signals
         self.dlg_work_end = FeatureEndUi()
-        self.load_settings(self.dlg_work_end)
+        load_settings(self.dlg_work_end)
         self.set_edit_arc_downgrade_force('True')
 
         # Capture the current layer to return it at the end of the operation
         self.cur_active_layer = self.iface.activeLayer()
 
-        self.set_selectionbehavior(self.dlg_work_end)
+        set_selectionbehavior(self.dlg_work_end)
 
         # Get layers of every geom_type
-        self.reset_lists()
-        self.reset_layers()
-        self.layers['arc'] = self.controller.get_group_layers('arc')
-        self.layers['node'] = self.controller.get_group_layers('node')
-        self.layers['connec'] = self.controller.get_group_layers('connec')
-        self.layers['element'] = [self.controller.get_layer_by_tablename('v_edit_element')]
+        reset_lists()
+        reset_layers()
+        parent_vars.layers['arc'] = self.controller.get_group_layers('arc')
+        parent_vars.layers['node'] = self.controller.get_group_layers('node')
+        parent_vars.layers['connec'] = self.controller.get_group_layers('connec')
+        parent_vars.layers['element'] = [self.controller.get_layer_by_tablename('v_edit_element')]
 
         # Remove 'gully' for 'WS'
         self.project_type = self.controller.get_project_type()
         if self.project_type == 'ws':
             self.dlg_work_end.tab_feature.removeTab(4)
         else:
-            self.layers['gully'] = self.controller.get_group_layers('gully')
+            parent_vars.layers['gully'] = self.controller.get_group_layers('gully')
 
         # Set icons
-        self.set_icon(self.dlg_work_end.btn_insert, "111")
-        self.set_icon(self.dlg_work_end.btn_delete, "112")
-        self.set_icon(self.dlg_work_end.btn_snapping, "137")
-        self.set_icon(self.dlg_work_end.btn_new_workcat, "193")
+        set_icon(self.dlg_work_end.btn_insert, "111")
+        set_icon(self.dlg_work_end.btn_delete, "112")
+        set_icon(self.dlg_work_end.btn_snapping, "137")
+        set_icon(self.dlg_work_end.btn_new_workcat, "193")
 
 
         # Adding auto-completion to a QLineEdit
         self.table_object = "cat_work"
-        self.set_completer_object(self.dlg_work_end, self.table_object)
+        set_completer_object(self.dlg_work_end, self.table_object)
 
         # Set signals
         self.dlg_work_end.btn_accept.clicked.connect(partial(self.manage_workcat_end_accept))
@@ -73,13 +83,13 @@ class GwFeatureEnd(ParentManage):
                                            self.table_object, self.cur_active_layer, force_downgrade=True, show_warning=True))
         self.dlg_work_end.workcat_id_end.editTextChanged.connect(partial(self.fill_workids))
         self.dlg_work_end.btn_new_workcat.clicked.connect(partial(self.new_workcat))
-        self.dlg_work_end.btn_insert.clicked.connect(partial(self.insert_feature, self.dlg_work_end, self.table_object))
-        self.dlg_work_end.btn_delete.clicked.connect(partial(self.delete_records, self.dlg_work_end, self.table_object))
+        self.dlg_work_end.btn_insert.clicked.connect(partial(insert_feature, self.dlg_work_end, self.table_object))
+        self.dlg_work_end.btn_delete.clicked.connect(partial(delete_records, self.dlg_work_end, self.table_object))
         self.dlg_work_end.btn_snapping.clicked.connect(
-            partial(self.selection_init, self.dlg_work_end, self.table_object))
+            partial(selection_init, self.dlg_work_end, self.table_object))
         self.dlg_work_end.workcat_id_end.activated.connect(partial(self.fill_workids))
         self.dlg_work_end.tab_feature.currentChanged.connect(
-            partial(self.tab_feature_changed, self.dlg_work_end, self.table_object, excluded_layers=["v_edit_element"]))
+            partial(tab_feature_changed, self.dlg_work_end, self.table_object, excluded_layers=["v_edit_element"]))
 
         # Set values
         self.fill_fields()
@@ -87,15 +97,15 @@ class GwFeatureEnd(ParentManage):
         # Adding auto-completion to a QLineEdit for default feature
         geom_type = "arc"
         viewname = "v_edit_" + geom_type
-        self.set_completer_feature_id(self.dlg_work_end.feature_id, geom_type, viewname)
+        set_completer_feature_id(self.dlg_work_end.feature_id, geom_type, viewname)
 
         # Set default tab 'arc'
         self.dlg_work_end.tab_feature.setCurrentIndex(0)
         self.geom_type = "arc"
-        self.tab_feature_changed(self.dlg_work_end, self.table_object, excluded_layers=["v_edit_element"])
+        tab_feature_changed(self.dlg_work_end, self.table_object, excluded_layers=["v_edit_element"])
 
         # Open dialog
-        self.open_dialog(self.dlg_work_end, dlg_name='feature_end', maximize_button=False)
+        open_dialog(self.dlg_work_end, dlg_name='feature_end', maximize_button=False)
 
 
     def set_edit_arc_downgrade_force(self, value):
@@ -214,7 +224,7 @@ class GwFeatureEnd(ParentManage):
 
         if row:
             self.dlg_work = FeatureEndConnecUi()
-            self.load_settings(self.dlg_work)
+            load_settings(self.dlg_work)
 
             self.dlg_work.btn_cancel.clicked.connect(partial(self.close_dialog_workcat_list, self.dlg_work))
             self.dlg_work.btn_accept.clicked.connect(self.exec_downgrade)
@@ -237,7 +247,7 @@ class GwFeatureEnd(ParentManage):
             self.tbl_arc_x_relations.doubleClicked.connect(
                 partial(self.open_selected_object, self.tbl_arc_x_relations))
 
-            self.open_dialog(self.dlg_work, dlg_name='feature_end_connec')
+            open_dialog(self.dlg_work, dlg_name='feature_end_connec')
 
         # TODO: Function update_geom_type() don't use parameter ids_list
         else:
@@ -433,7 +443,7 @@ class GwFeatureEnd(ParentManage):
         """ Close dialog """
 
         try:
-            self.save_settings(dlg)
+            save_settings(dlg)
             dlg.close()
             map_tool = self.canvas.mapTool()
             # If selected map tool is from the plugin, set 'Pan' as current one
@@ -442,16 +452,16 @@ class GwFeatureEnd(ParentManage):
         except AttributeError:
             pass
 
-        self.open_dialog(self.dlg_work_end)
+        open_dialog(self.dlg_work_end)
 
 
     def manage_close(self, dialog, table_object, cur_active_layer=None, force_downgrade=False, show_warning=False):
         """ Close dialog and disconnect snapping """
 
-        self.close_dialog(dialog)
-        self.hide_generic_layers(excluded_layers=["v_edit_element"])
-        self.disconnect_snapping()
-        self.disconnect_signal_selection_changed()
+        close_dialog(dialog)
+        hide_generic_layers(excluded_layers=["v_edit_element"])
+        disconnect_snapping()
+        disconnect_signal_selection_changed()
         if force_downgrade:
             sql = ("SELECT feature_type, feature_id, log_message "
                    "FROM audit_log_data "
@@ -481,18 +491,18 @@ class GwFeatureEnd(ParentManage):
     def new_workcat(self):
 
         self.dlg_new_workcat = InfoWorkcatUi()
-        self.load_settings(self.dlg_new_workcat)
+        load_settings(self.dlg_new_workcat)
 
         qt_tools.setCalendarDate(self.dlg_new_workcat, self.dlg_new_workcat.builtdate, None, True)
         table_object = "cat_work"
-        self.set_completer_widget(table_object, self.dlg_new_workcat.cat_work_id, 'id')
+        set_completer_widget(table_object, self.dlg_new_workcat.cat_work_id, 'id')
 
         # Set signals
         self.dlg_new_workcat.btn_accept.clicked.connect(partial(self.manage_new_workcat_accept, table_object))
-        self.dlg_new_workcat.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_new_workcat))
+        self.dlg_new_workcat.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_new_workcat))
 
         # Open dialog
-        self.open_dialog(self.dlg_new_workcat, dlg_name='info_workcat')
+        open_dialog(self.dlg_new_workcat, dlg_name='info_workcat')
 
 
     def manage_new_workcat_accept(self, table_object):
@@ -552,7 +562,7 @@ class GwFeatureEnd(ParentManage):
                     aux = self.dlg_work_end.workcat_id_end.findText(str(cat_work_id))
                     self.dlg_work_end.workcat_id_end.setCurrentIndex(aux)
 
-                self.close_dialog(self.dlg_new_workcat)
+                close_dialog(self.dlg_new_workcat)
 
             else:
                 msg = "This Workcat already exist"
