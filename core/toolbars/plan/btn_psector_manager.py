@@ -7,7 +7,7 @@ class GwPsectorManagerButton(GwParentAction):
 	def __init__(self, icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir):
 		super().__init__(icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir)
 		
-		self.plan = GwPlan(self.iface, self.settings, self.controller, self.plugin_dir)
+		self.plan = GwPlan()
 	
 	
 	def clicked_event(self):
