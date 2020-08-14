@@ -25,20 +25,31 @@ from .info import GwInfo
 from ..edit.document import GwDocument
 from ..plan.psector import GwPsector
 from ..om.visit_manager import GwVisitManager
-from ....actions.api_parent import ApiParent
 from ....ui_manager import SearchUi, InfoGenericUi, SearchWorkcat
 
+from ....actions import parent_vars
 
-class GwSearch(ApiParent):
+from ....actions.parent_functs import zoom_to_rectangle, get_max_rectangle_from_coords, set_icon, \
+    make_list_for_completer, set_completer_lineedit, document_insert, document_delete, document_open, \
+    set_table_columns, refresh_map_canvas
+from ....actions.api_parent_functs import load_settings, create_body, add_lineedit, draw, resetRubberbands, draw_point, \
+    get_points, draw_polygon, set_completer_object_api, close_dialog, populate_basic_info, open_dialog, \
+    set_completer_object, draw_polyline
 
-    def __init__(self, iface, settings, controller, plugin_dir):
+
+class GwSearch:
+
+    def __init__(self):
         """ Class constructor """
 
-        super().__init__(iface, settings, controller, plugin_dir)
-        self.manage_new_psector = GwPsector(iface, settings, controller, plugin_dir)
+        self.manage_new_psector = GwPsector(global_vars.iface, global_vars.settings, global_vars.controller, global_vars.plugin_dir)
         self.manage_visit = GwVisitManager()
-        self.iface = iface
-        self.project_type = controller.get_project_type()
+        self.iface = global_vars.iface
+        self.project_type = global_vars.project_type
+        self.controller = global_vars.controller
+        self.canvas = global_vars.canvas
+        self.schema_name = global_vars.schema_name
+        
         self.json_search = {}
         self.lbl_visible = False
         self.dlg_search = None
@@ -49,7 +60,7 @@ class GwSearch(ApiParent):
         """ Initialize dialog. Make it dockable in left dock widget area """
 
         self.dlg_search = SearchUi()
-        self.load_settings(self.dlg_search)
+        load_settings(self.dlg_search)
         self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dlg_search)
         self.dlg_search.dlg_closed.connect(self.reset_rubber_polygon)
         self.dlg_search.dlg_closed.connect(self.close_search)
@@ -72,10 +83,10 @@ class GwSearch(ApiParent):
         self.controller.set_user_settings_value('open_search', 'true')
 
         if qgis_project_add_schema is None:
-            body = self.create_body(form=form)
+            body = create_body(form=form)
         else:
             extras = f'"addSchema":"{qgis_project_add_schema}"'
-            body = self.create_body(form=form, extras=extras)
+            body = create_body(form=form, extras=extras)
         function_name = "gw_fct_getsearch"
         complet_list = self.controller.get_json(function_name, body)
         if not complet_list:
@@ -107,7 +118,7 @@ class GwSearch(ApiParent):
                 widget = None
                 if field['widgettype'] == 'typeahead':
                     completer = QCompleter()
-                    widget = self.add_lineedit(field)
+                    widget = add_lineedit(field)
                     widget = self.set_typeahead_completer(widget, completer)
                     self.lineedit_list.append(widget)
                 elif field['widgettype'] == 'combo':
@@ -125,8 +136,8 @@ class GwSearch(ApiParent):
 
     def reset_rubber_polygon(self):
 
-        if self.rubber_polygon:
-            self.rubber_polygon.reset()
+        if parent_vars.rubber_polygon:
+            parent_vars.rubber_polygon.reset()
 
 
     def close_search(self):
@@ -192,8 +203,8 @@ class GwSearch(ApiParent):
                 return
 
             margin = float(complet_result[0]['body']['feature']['zoomCanvasMargin']['mts'])
-            self.draw(complet_result[0], margin)
-            self.resetRubberbands()
+            draw(complet_result[0], margin)
+            resetRubberbands()
 
         # Tab 'search'
         elif tab_selected == 'search':
@@ -208,7 +219,7 @@ class GwSearch(ApiParent):
                 polygon = polygon.split(',')
                 x1, y1 = polygon[0].split(' ')
                 x2, y2 = polygon[2].split(' ')
-                self.zoom_to_rectangle(x1, y1, x2, y2)
+                zoom_to_rectangle(x1, y1, x2, y2)
             else:
                 message = f"Zoom unavailable. Doesn't exist the geometry for the street"
                 self.controller.show_info(message, parameter=item['display_name'])
@@ -218,8 +229,8 @@ class GwSearch(ApiParent):
             x1 = item['sys_x']
             y1 = item['sys_y']
             point = QgsPointXY(float(x1), float(y1))
-            self.draw_point(point, duration_time=5000)
-            self.zoom_to_rectangle(x1, y1, x1, y1, margin=100)
+            draw_point(point, duration_time=5000)
+            zoom_to_rectangle(x1, y1, x1, y1, margin=100)
             self.canvas.refresh()
 
         # Tab 'hydro'
@@ -227,8 +238,8 @@ class GwSearch(ApiParent):
             x1 = item['sys_x']
             y1 = item['sys_y']
             point = QgsPointXY(float(x1), float(y1))
-            self.draw_point(point)
-            self.zoom_to_rectangle(x1, y1, x1, y1, margin=100)
+            draw_point(point)
+            zoom_to_rectangle(x1, y1, x1, y1, margin=100)
             self.open_hydrometer_dialog(table_name=item['sys_table_id'], feature_id=item['sys_id'])
 
         # Tab 'workcat'
@@ -238,11 +249,11 @@ class GwSearch(ApiParent):
                 msg = "Empty coordinate list"
                 self.controller.show_warning(msg)
                 return
-            points = self.get_points(list_coord)
-            self.resetRubberbands()
-            self.draw_polygon(points, fill_color=QColor(255, 0, 255, 50))
-            max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
-            self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
+            points = get_points(list_coord)
+            resetRubberbands()
+            draw_polygon(points, fill_color=QColor(255, 0, 255, 50))
+            max_x, max_y, min_x, min_y = get_max_rectangle_from_coords(list_coord)
+            zoom_to_rectangle(max_x, max_y, min_x, min_y)
             self.workcat_open_table_items(item)
             return
 
@@ -250,16 +261,16 @@ class GwSearch(ApiParent):
         elif tab_selected == 'psector':
             list_coord = re.search('\(\((.*)\)\)', str(item['sys_geometry']))
             self.manage_new_psector.new_psector(item['sys_id'], 'plan', is_api=True)
-            self.manage_new_psector.dlg_plan_psector.rejected.connect(self.resetRubberbands)
+            self.manage_new_psector.dlg_plan_psector.rejected.connect(resetRubberbands)
             if not list_coord:
                 msg = "Empty coordinate list"
                 self.controller.show_warning(msg)
                 return
-            points = self.get_points(list_coord)
-            self.resetRubberbands()
-            self.draw_polygon(points, fill_color=QColor(255, 0, 255, 50))
-            max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
-            self.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin=50)
+            points = get_points(list_coord)
+            resetRubberbands()
+            draw_polygon(points, fill_color=QColor(255, 0, 255, 50))
+            max_x, max_y, min_x, min_y = get_max_rectangle_from_coords(list_coord)
+            zoom_to_rectangle(max_x, max_y, min_x, min_y, margin=50)
 
         # Tab 'visit'
         elif tab_selected == 'visit':
@@ -268,13 +279,13 @@ class GwSearch(ApiParent):
                 msg = "Empty coordinate list"
                 self.controller.show_warning(msg)
                 return
-            max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
-            self.resetRubberbands()
+            max_x, max_y, min_x, min_y = get_max_rectangle_from_coords(list_coord)
+            resetRubberbands()
             point = QgsPointXY(float(max_x), float(max_y))
-            self.draw_point(point)
-            self.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin=100)
+            draw_point(point)
+            zoom_to_rectangle(max_x, max_y, min_x, min_y, margin=100)
             self.manage_visit.manage_visit(visit_id=item['sys_id'])
-            self.manage_visit.dlg_add_visit.rejected.connect(self.resetRubberbands)
+            self.manage_visit.dlg_add_visit.rejected.connect(resetRubberbands)
             return
 
         self.lbl_visible = False
@@ -321,7 +332,7 @@ class GwSearch(ApiParent):
             extras_search += f'"{line_edit.property("columnname")}":{{"text":"{value}"}}, '
             extras_search += f'"addSchema":"{qgis_project_add_schema}"'
             extras_search_add += f'"{line_edit.property("columnname")}":{{"text":"{value}"}}'
-            body = self.create_body(form=form_search, extras=extras_search)
+            body = create_body(form=form_search, extras=extras_search)
             result = self.controller.get_json('gw_fct_setsearch', body, log_sql=True)
             if not result:
                 return False
@@ -345,7 +356,7 @@ class GwSearch(ApiParent):
             display_list = []
             for data in self.result_data['data']:
                 display_list.append(data['display_name'])
-            self.set_completer_object_api(completer, model, widget, display_list)
+            set_completer_object_api(completer, model, widget, display_list)
 
         if len(line_list) == 2:
             line_edit_add = line_list[1]
@@ -354,7 +365,7 @@ class GwSearch(ApiParent):
                 return
 
             extras_search_add += f', "{line_edit_add.property("columnname")}":{{"text":"{value}"}}'
-            body = self.create_body(form=form_search_add, extras=extras_search_add)
+            body = create_body(form=form_search_add, extras=extras_search_add)
             result = self.controller.get_json('gw_fct_setsearchadd', body, log_sql=True)
             if not result:
                 return False
@@ -365,7 +376,7 @@ class GwSearch(ApiParent):
                     display_list = []
                     for data in self.result_data['data']:
                         display_list.append(data['display_name'])
-                    self.set_completer_object_api(completer, model, line_edit_add, display_list)
+                    set_completer_object_api(completer, model, line_edit_add, display_list)
 
 
     def clear_line_edit_add(self, line_list):
@@ -425,7 +436,7 @@ class GwSearch(ApiParent):
 
         feature = f'"tableName":"{table_name}", "id":"{feature_id}"'
         extras = f'"infoType":"{qgis_project_infotype}"'
-        body = self.create_body(feature=feature, extras=extras)
+        body = create_body(feature=feature, extras=extras)
         function_name = 'gw_fct_getinfofromid'
         json_result = self.controller.get_json(function_name, body, log_sql=True)
         if json_result is None:
@@ -436,15 +447,15 @@ class GwSearch(ApiParent):
             return
 
         self.hydro_info_dlg = InfoGenericUi()
-        self.load_settings(self.hydro_info_dlg)
+        load_settings(self.hydro_info_dlg)
 
-        self.hydro_info_dlg.btn_close.clicked.connect(partial(self.close_dialog, self.hydro_info_dlg))
-        self.hydro_info_dlg.rejected.connect(partial(self.close_dialog, self.hydro_info_dlg))
-        self.hydro_info_dlg.rejected.connect(partial(self.resetRubberbands))
+        self.hydro_info_dlg.btn_close.clicked.connect(partial(close_dialog, self.hydro_info_dlg))
+        self.hydro_info_dlg.rejected.connect(partial(close_dialog, self.hydro_info_dlg))
+        self.hydro_info_dlg.rejected.connect(partial(resetRubberbands))
         field_id = str(result[0]['body']['feature']['idName'])
-        self.populate_basic_info(self.hydro_info_dlg, result, field_id)
+        populate_basic_info(self.hydro_info_dlg, result, field_id)
 
-        self.open_dialog(self.hydro_info_dlg, dlg_name='info_generic')
+        open_dialog(self.hydro_info_dlg, dlg_name='info_generic')
 
 
     def workcat_open_table_items(self, item):
@@ -464,12 +475,12 @@ class GwSearch(ApiParent):
 
         self.items_dialog = SearchWorkcat()
         self.items_dialog.setWindowTitle(f'Workcat: {display_name}')
-        self.set_icon(self.items_dialog.btn_doc_insert, "111")
-        self.set_icon(self.items_dialog.btn_doc_delete, "112")
-        self.set_icon(self.items_dialog.btn_doc_new, "34")
-        self.set_icon(self.items_dialog.btn_open_doc, "170")
+        set_icon(self.items_dialog.btn_doc_insert, "111")
+        set_icon(self.items_dialog.btn_doc_delete, "112")
+        set_icon(self.items_dialog.btn_doc_new, "34")
+        set_icon(self.items_dialog.btn_open_doc, "170")
 
-        self.load_settings(self.items_dialog)
+        load_settings(self.items_dialog)
         self.items_dialog.btn_state1.setEnabled(False)
         self.items_dialog.btn_state0.setEnabled(False)
 
@@ -490,27 +501,27 @@ class GwSearch(ApiParent):
 
         # Create list for completer QLineEdit
         sql = "SELECT DISTINCT(id) FROM v_ui_document ORDER BY id"
-        list_items = self.make_list_for_completer(sql)
-        self.set_completer_lineedit(self.items_dialog.doc_id, list_items)
+        list_items = make_list_for_completer(sql)
+        set_completer_lineedit(self.items_dialog.doc_id, list_items)
 
         table_name = "v_ui_workcat_x_feature"
         table_name_end = "v_ui_workcat_x_feature_end"
         table_doc = "v_ui_doc_x_workcat"
         self.items_dialog.btn_doc_insert.clicked.connect(
-            partial(self.document_insert, self.items_dialog, 'doc_x_workcat', 'workcat_id', item['sys_id']))
+            partial(document_insert, self.items_dialog, 'doc_x_workcat', 'workcat_id', item['sys_id']))
         self.items_dialog.btn_doc_delete.clicked.connect(
-            partial(self.document_delete, self.items_dialog.tbl_document, 'doc_x_workcat'))
+            partial(document_delete, self.items_dialog.tbl_document, 'doc_x_workcat'))
         self.items_dialog.btn_doc_new.clicked.connect(
             partial(self.manage_document, self.items_dialog.tbl_document, item['sys_id']))
-        self.items_dialog.btn_open_doc.clicked.connect(partial(self.document_open, self.items_dialog.tbl_document))
+        self.items_dialog.btn_open_doc.clicked.connect(partial(document_open, self.items_dialog.tbl_document))
         self.items_dialog.tbl_document.doubleClicked.connect(
-            partial(self.document_open, self.items_dialog.tbl_document))
+            partial(document_open, self.items_dialog.tbl_document))
 
-        self.items_dialog.btn_close.clicked.connect(partial(self.close_dialog, self.items_dialog))
+        self.items_dialog.btn_close.clicked.connect(partial(close_dialog, self.items_dialog))
         self.items_dialog.btn_path.clicked.connect(
             partial(self.get_folder_dialog, self.items_dialog, self.items_dialog.txt_path))
-        self.items_dialog.rejected.connect(partial(self.close_dialog, self.items_dialog))
-        self.items_dialog.rejected.connect(partial(self.resetRubberbands))
+        self.items_dialog.rejected.connect(partial(close_dialog, self.items_dialog))
+        self.items_dialog.rejected.connect(partial(resetRubberbands))
         self.items_dialog.btn_state1.clicked.connect(
             partial(self.force_state, self.items_dialog.btn_state1, 1, self.items_dialog.tbl_psm))
         self.items_dialog.btn_state0.clicked.connect(
@@ -529,13 +540,13 @@ class GwSearch(ApiParent):
 
         expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
         self.workcat_fill_table(self.items_dialog.tbl_psm, table_name, expr=expr)
-        self.set_table_columns(self.items_dialog, self.items_dialog.tbl_psm, table_name)
+        set_table_columns(self.items_dialog, self.items_dialog.tbl_psm, table_name)
         expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
         self.workcat_fill_table(self.items_dialog.tbl_psm_end, table_name_end, expr=expr)
-        self.set_table_columns(self.items_dialog, self.items_dialog.tbl_psm_end, table_name_end)
+        set_table_columns(self.items_dialog, self.items_dialog.tbl_psm_end, table_name_end)
         expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
         self.workcat_fill_table(self.items_dialog.tbl_document, table_doc, expr=expr)
-        self.set_table_columns(self.items_dialog, self.items_dialog.tbl_document, table_doc)
+        set_table_columns(self.items_dialog, self.items_dialog.tbl_document, table_doc)
 
         #
         # Add data to workcat search form
@@ -545,7 +556,7 @@ class GwSearch(ApiParent):
         self.fill_label_data(workcat_id, table_name)
         self.fill_label_data(workcat_id, table_name_end, extension)
 
-        self.open_dialog(self.items_dialog, dlg_name='search_workcat')
+        open_dialog(self.items_dialog, dlg_name='search_workcat')
 
 
     def manage_document(self, qtable, item_id):
@@ -553,7 +564,7 @@ class GwSearch(ApiParent):
 
         manage_document = GwDocument(single_tool=False)
         dlg_docman = manage_document.manage_document(tablename='workcat', qtable=qtable, item_id=item_id)
-        dlg_docman.btn_accept.clicked.connect(partial(self.set_completer_object, dlg_docman, 'doc'))
+        dlg_docman.btn_accept.clicked.connect(partial(set_completer_object, dlg_docman, 'doc'))
         qt_tools.remove_tab_by_tabName(dlg_docman.tabWidget, 'tab_rel')
 
 
@@ -638,7 +649,7 @@ class GwSearch(ApiParent):
         self.controller.execute_sql(sql)
         qtable.setEnabled(True)
         qbutton.setEnabled(False)
-        self.refresh_map_canvas()
+        refresh_map_canvas()
         qtable.model().select()
 
 
@@ -718,7 +729,7 @@ class GwSearch(ApiParent):
         else:
             expr = f"workcat_id ILIKE '%{workcat_id}%'"
         self.workcat_fill_table(qtable, table_name, expr=expr)
-        self.set_table_columns(dialog, qtable, table_name)
+        set_table_columns(dialog, qtable, table_name)
 
 
     def workcat_fill_table(self, widget, table_name, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
@@ -770,18 +781,18 @@ class GwSearch(ApiParent):
 
         feature_id = qtable.model().record(row).value('feature_id')
 
-        self.ApiCF = GwInfo(self.iface, self.settings, self.controller, self.plugin_dir, tab_type='data')
+        self.ApiCF = GwInfo(tab_type='data')
         complet_result, dialog = self.ApiCF.open_form(table_name=table_name, feature_id=feature_id, tab_type='data')
 
         # Get list of all coords in field geometry
         list_coord = re.search('\((.*)\)', str(complet_result[0]['body']['feature']['geometry']['st_astext']))
 
-        points = self.get_points(list_coord)
+        points = get_points(list_coord)
         self.reset_rubber_polygon()
-        self.draw_polyline(points)
+        draw_polyline(points)
 
-        max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
-        self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
+        max_x, max_y, min_x, min_y = get_max_rectangle_from_coords(list_coord)
+        zoom_to_rectangle(max_x, max_y, min_x, min_y)
 
 
     def fill_label_data(self, workcat_id, table_name, extension=None):

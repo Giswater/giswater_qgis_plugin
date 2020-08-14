@@ -126,7 +126,7 @@ class GwMincut:
         load_settings(self.dlg_mincut)
         self.dlg_mincut.setWindowFlags(Qt.WindowStaysOnTopHint)
 
-        self.api_search = GwSearch(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.api_search = GwSearch()
         self.api_search.api_search(self.dlg_mincut)
 
         # These widgets are put from the api, mysteriously if we do something like:
