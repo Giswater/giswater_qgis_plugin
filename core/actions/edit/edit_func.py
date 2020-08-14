@@ -22,7 +22,7 @@ class GwEdit(ParentAction):
 		
 		ParentAction.__init__(self, iface, settings, controller, plugin_dir)
 		self.manage_document = GwDocument()
-		self.manage_element = GwElement(iface, settings, controller, plugin_dir)
+		self.manage_element = GwElement()
 		self.manage_workcat_end = GwFeatureEnd(iface, settings, controller, plugin_dir)
 		self.delete_feature = GwFeatureDelete(iface, settings, controller, plugin_dir)
 		self.suppres_form = None

@@ -1545,7 +1545,7 @@ class GwInfo(ApiParent, QObject):
     def manage_element(self, dialog, element_id=None, feature=None):
         """ Execute action of button 33 """
 
-        elem = GwElement(self.iface, self.settings, self.controller, self.plugin_dir)
+        elem = GwElement()
         elem.manage_element(True, feature, self.geom_type)
         elem.dlg_add_element.accepted.connect(partial(self.manage_element_new, dialog, elem))
         elem.dlg_add_element.rejected.connect(partial(self.manage_element_new, dialog, elem))
@@ -1557,7 +1557,7 @@ class GwInfo(ApiParent, QObject):
             qt_tools.setWidgetText(elem.dlg_add_element, "element_id", element_id)
 
         # Open dialog
-        elem.open_dialog(elem.dlg_add_element)
+        self.open_dialog(elem.dlg_add_element)
 
 
     def manage_element_new(self, dialog, elem):

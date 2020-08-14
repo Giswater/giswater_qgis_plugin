@@ -11,14 +11,24 @@ from functools import partial
 
 from lib import qt_tools
 from ....ui_manager import ElementUi, ElementManager
-from ....actions.parent_manage import ParentManage
 
+from ....actions import parent_vars
+from .... import global_vars
 
-class GwElement(ParentManage):
+from ....actions.parent_functs import load_settings, set_icon, open_dialog, close_dialog
+from ....actions.parent_manage_funct import set_selectionbehavior, reset_layers, reset_lists, remove_selection, \
+    set_completer_object, manage_close, tab_feature_changed, exist_object, insert_feature, delete_records, \
+    selection_init, add_point, set_completer_feature_id, set_model_to_table, fill_table_object, set_table_columns, \
+    filter_by_id, delete_selected_object
 
-    def __init__(self, iface, settings, controller, plugin_dir):
+class GwElement:
+
+    def __init__(self):
         """ Class to control 'Add element' of toolbar 'edit' """
-        ParentManage.__init__(self, iface, settings, controller, plugin_dir)
+        
+        self.iface = global_vars.iface
+        self.controller = global_vars.controller
+        self.schema_name = global_vars.schema_name
 
 
     def manage_element(self, new_element_id=True, feature=None, geom_type=None):
@@ -28,37 +38,37 @@ class GwElement(ParentManage):
 
         # Create the dialog and signals
         self.dlg_add_element = ElementUi()
-        self.load_settings(self.dlg_add_element)
+        load_settings(self.dlg_add_element)
         self.element_id = None
 
         # Capture the current layer to return it at the end of the operation
         cur_active_layer = self.iface.activeLayer()
 
-        self.set_selectionbehavior(self.dlg_add_element)
+        set_selectionbehavior(self.dlg_add_element)
 
         # Get layers of every geom_type
-        self.reset_lists()
-        self.reset_layers()
-        self.layers['arc'] = self.controller.get_group_layers('arc')
-        self.layers['node'] = self.controller.get_group_layers('node')
-        self.layers['connec'] = self.controller.get_group_layers('connec')
-        self.layers['element'] = self.controller.get_group_layers('element')
+        reset_lists()
+        reset_layers()
+        parent_vars.layers['arc'] = self.controller.get_group_layers('arc')
+        parent_vars.layers['node'] = self.controller.get_group_layers('node')
+        parent_vars.layers['connec'] = self.controller.get_group_layers('connec')
+        parent_vars.layers['element'] = self.controller.get_group_layers('element')
 
         # Remove 'gully' for 'WS'
         self.project_type = self.controller.get_project_type()
         if self.project_type == 'ws':
             self.dlg_add_element.tab_feature.removeTab(3)
         else:
-            self.layers['gully'] = self.controller.get_group_layers('gully')
+            parent_vars.layers['gully'] = self.controller.get_group_layers('gully')
 
         # Set icons
-        self.set_icon(self.dlg_add_element.btn_add_geom, "133")
-        self.set_icon(self.dlg_add_element.btn_insert, "111")
-        self.set_icon(self.dlg_add_element.btn_delete, "112")
-        self.set_icon(self.dlg_add_element.btn_snapping, "137")
+        set_icon(self.dlg_add_element.btn_add_geom, "133")
+        set_icon(self.dlg_add_element.btn_insert, "111")
+        set_icon(self.dlg_add_element.btn_delete, "112")
+        set_icon(self.dlg_add_element.btn_snapping, "137")
 
         # Remove all previous selections
-        self.remove_selection(True)
+        remove_selection(True)
         if feature:
             layer = self.iface.activeLayer()
             layer.selectByIds([feature.id()])
@@ -73,31 +83,31 @@ class GwElement(ParentManage):
 
         # Adding auto-completion to a QLineEdit
         table_object = "element"
-        self.set_completer_object(self.dlg_add_element, table_object)
+        set_completer_object(self.dlg_add_element, table_object)
 
         # Set signals
         self.dlg_add_element.btn_accept.clicked.connect(partial(self.manage_element_accept, table_object))
         self.dlg_add_element.btn_accept.clicked.connect(
             partial(self.controller.set_layer_visible, layer_element, layer_is_visible))
         self.dlg_add_element.btn_cancel.clicked.connect(
-            partial(self.manage_close, self.dlg_add_element, table_object, cur_active_layer, excluded_layers=[]))
+            partial(manage_close, self.dlg_add_element, table_object, cur_active_layer, excluded_layers=[]))
         self.dlg_add_element.btn_cancel.clicked.connect(
             partial(self.controller.set_layer_visible, layer_element, layer_is_visible))
         self.dlg_add_element.rejected.connect(
-            partial(self.manage_close, self.dlg_add_element, table_object, cur_active_layer, excluded_layers=[]))
+            partial(manage_close, self.dlg_add_element, table_object, cur_active_layer, excluded_layers=[]))
         self.dlg_add_element.rejected.connect(
             partial(self.controller.set_layer_visible, layer_element, layer_is_visible))
         self.dlg_add_element.tab_feature.currentChanged.connect(
-            partial(self.tab_feature_changed, self.dlg_add_element, table_object, []))
+            partial(tab_feature_changed, self.dlg_add_element, table_object, []))
         self.dlg_add_element.element_id.textChanged.connect(
-            partial(self.exist_object, self.dlg_add_element, table_object))
+            partial(exist_object, self.dlg_add_element, table_object))
         self.dlg_add_element.btn_insert.clicked.connect(
-            partial(self.insert_feature, self.dlg_add_element, table_object))
+            partial(insert_feature, self.dlg_add_element, table_object))
         self.dlg_add_element.btn_delete.clicked.connect(
-            partial(self.delete_records, self.dlg_add_element, table_object))
+            partial(delete_records, self.dlg_add_element, table_object))
         self.dlg_add_element.btn_snapping.clicked.connect(
-            partial(self.selection_init, self.dlg_add_element, table_object))
-        self.dlg_add_element.btn_add_geom.clicked.connect(self.add_point)
+            partial(selection_init, self.dlg_add_element, table_object))
+        self.dlg_add_element.btn_add_geom.clicked.connect(add_point)
         self.dlg_add_element.state.currentIndexChanged.connect(partial(self.filter_state_type))
 
         # Fill combo boxes of the form and related events
@@ -157,7 +167,7 @@ class GwElement(ParentManage):
             self.set_default_values()
 
         # Adding auto-completion to a QLineEdit for default feature
-        self.set_completer_feature_id(self.dlg_add_element.feature_id, "arc", "v_edit_arc")
+        set_completer_feature_id(self.dlg_add_element.feature_id, "arc", "v_edit_arc")
 
         if feature:
             self.dlg_add_element.tabWidget.currentChanged.connect(partial(self.fill_tbl_new_element,
@@ -166,7 +176,7 @@ class GwElement(ParentManage):
         # Set default tab 'arc'
         self.dlg_add_element.tab_feature.setCurrentIndex(0)
         self.geom_type = "arc"
-        self.tab_feature_changed(self.dlg_add_element, table_object)
+        tab_feature_changed(self.dlg_add_element, table_object)
 
         # Force layer v_edit_element set active True
         if layer_element:
@@ -178,10 +188,10 @@ class GwElement(ParentManage):
 
         self.update_location_cmb()
         if not self.new_element_id:
-            self.exist_object(self.dlg_add_element, 'element')
+            exist_object(self.dlg_add_element, 'element')
 
         # Open the dialog
-        self.open_dialog(self.dlg_add_element, dlg_name='element', maximize_button=False)
+        open_dialog(self.dlg_add_element, dlg_name='element', maximize_button=False)
         return self.dlg_add_element
 
 
@@ -241,11 +251,11 @@ class GwElement(ParentManage):
 
         # Set model of selected widget
         table_name = f"{self.schema_name}.v_edit_{geom_type}"
-        self.set_model_to_table(widget, table_name, expr_filter)
+        set_model_to_table(widget, table_name, expr_filter)
 
         # Adding auto-completion to a QLineEdit
         self.table_object = "element"
-        self.set_completer_object(dialog, self.table_object)
+        set_completer_object(dialog, self.table_object)
 
 
     def manage_element_accept(self, table_object):
@@ -344,9 +354,9 @@ class GwElement(ParentManage):
             else:
                 sql_values += ", null"
 
-            if str(self.x) != "":
-                sql_values += f", ST_SetSRID(ST_MakePoint({self.x},{self.y}), {srid})"
-                self.x = ""
+            if str(parent_vars.x) != "":
+                sql_values += f", ST_SetSRID(ST_MakePoint({parent_vars.x},{parent_vars.y}), {srid})"
+                parent_vars.x = ""
             else:
                 sql_values += ", null"
             if code:
@@ -406,8 +416,8 @@ class GwElement(ParentManage):
                 sql += f", verified = '{verified}'"
             else:
                 sql += ", verified = null"
-            if str(self.x) != "":
-                sql += f", the_geom = ST_SetSRID(ST_MakePoint({self.x},{self.y}), {srid})"
+            if str(parent_vars.x) != "":
+                sql += f", the_geom = ST_SetSRID(ST_MakePoint({parent_vars.x},{parent_vars.y}), {srid})"
 
             sql += f" WHERE element_id = '{element_id}';"
 
@@ -419,23 +429,23 @@ class GwElement(ParentManage):
         sql += (f"\nDELETE FROM element_x_connec"
                f" WHERE element_id = '{element_id}';")
 
-        if self.list_ids['arc']:
-            for feature_id in self.list_ids['arc']:
+        if parent_vars.list_ids['arc']:
+            for feature_id in parent_vars.list_ids['arc']:
                 sql += (f"\nINSERT INTO element_x_arc (element_id, arc_id)"
                         f" VALUES ('{element_id}', '{feature_id}');")
-        if self.list_ids['node']:
-            for feature_id in self.list_ids['node']:
+        if parent_vars.list_ids['node']:
+            for feature_id in parent_vars.list_ids['node']:
                 sql += (f"\nINSERT INTO element_x_node (element_id, node_id)"
                        f" VALUES ('{element_id}', '{feature_id}');")
-        if self.list_ids['connec']:
-            for feature_id in self.list_ids['connec']:
+        if parent_vars.list_ids['connec']:
+            for feature_id in parent_vars.list_ids['connec']:
                 sql += (f"\nINSERT INTO element_x_connec (element_id, connec_id)"
                         f" VALUES ('{element_id}', '{feature_id}');")
 
         status = self.controller.execute_sql(sql, log_sql=True)
         if status:
             self.element_id = element_id
-            self.manage_close(self.dlg_add_element, table_object, excluded_layers=[])
+            manage_close(self.dlg_add_element, table_object, excluded_layers=[])
 
 
     def filter_elementcat_id(self):
@@ -454,29 +464,29 @@ class GwElement(ParentManage):
 
         # Create the dialog
         self.dlg_man = ElementManager()
-        self.load_settings(self.dlg_man)
+        load_settings(self.dlg_man)
         self.dlg_man.tbl_element.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         # Adding auto-completion to a QLineEdit
         table_object = "element"
-        self.set_completer_object(self.dlg_man, table_object)
+        set_completer_object(self.dlg_man, table_object)
 
         # Set a model with selected filter. Attach that model to selected table
-        self.fill_table_object(self.dlg_man.tbl_element, self.schema_name + "." + table_object)
-        self.set_table_columns(self.dlg_man, self.dlg_man.tbl_element, table_object)
+        fill_table_object(self.dlg_man.tbl_element, self.schema_name + "." + table_object)
+        set_table_columns(self.dlg_man, self.dlg_man.tbl_element, table_object)
 
         # Set signals
-        self.dlg_man.element_id.textChanged.connect(partial(self.filter_by_id, self.dlg_man, self.dlg_man.tbl_element,
+        self.dlg_man.element_id.textChanged.connect(partial(filter_by_id, self.dlg_man, self.dlg_man.tbl_element,
             self.dlg_man.element_id, table_object))
         self.dlg_man.tbl_element.doubleClicked.connect(partial(self.open_selected_object_element, self.dlg_man,
             self.dlg_man.tbl_element, table_object))
-        self.dlg_man.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_man))
-        self.dlg_man.rejected.connect(partial(self.close_dialog, self.dlg_man))
-        self.dlg_man.btn_delete.clicked.connect(partial(self.delete_selected_object, self.dlg_man.tbl_element,
+        self.dlg_man.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_man))
+        self.dlg_man.rejected.connect(partial(close_dialog, self.dlg_man))
+        self.dlg_man.btn_delete.clicked.connect(partial(delete_selected_object, self.dlg_man.tbl_element,
             table_object))
 
         # Open form
-        self.open_dialog(self.dlg_man, dlg_name='element_manager')
+        open_dialog(self.dlg_man, dlg_name='element_manager')
 
 
     def open_selected_object_element(self, dialog, widget, table_object):
