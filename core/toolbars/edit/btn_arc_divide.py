@@ -154,7 +154,7 @@ class GwArcDivideButton(GwParentMapTool):
 			cur_layer = self.iface.activeLayer()
 			if cur_layer != self.layer_node:
 				self.iface.setActiveLayer(self.layer_node)
-			self.add_layer = GwLayerTools(self.iface, self.settings, self.controller, self.plugin_dir)
+			self.add_layer = GwLayerTools()
 			# Snapping
 			result = self.snapper_manager.snap_to_current_layer(event_point)
 			if self.snapper_manager.result_is_valid():

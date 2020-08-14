@@ -11,17 +11,18 @@ import json
 from functools import partial
 
 from lib import qt_tools
-from ....actions.api_parent import ApiParent
 from ....ui_manager import Go2EpaOptionsUi
+from .... import global_vars
+
+from ....actions.api_parent_functs import load_settings, create_body, construct_form_param_user, open_dialog, close_dialog, manage_child
 
 
-class GwGo2EpaOptions(ApiParent):
+class GwGo2EpaOptions:
 
-    def __init__(self, iface, settings, controller, plugin_dir):
+    def __init__(self):
         """ Class to control toolbar 'go2epa' """
-
-        ApiParent.__init__(self, iface, settings, controller, plugin_dir)
         self.epa_options_list = []
+        self.controller = global_vars.controller
 
 
     def set_project_type(self, project_type):
@@ -36,15 +37,15 @@ class GwGo2EpaOptions(ApiParent):
 
         # Create dialog
         self.dlg_options = Go2EpaOptionsUi()
-        self.load_settings(self.dlg_options)
+        load_settings(self.dlg_options)
 
         form = '"formName":"epaoptions"'
-        body = self.create_body(form=form)
+        body = create_body(form=form)
         json_result = self.controller.get_json('gw_fct_getconfig', body)
         if not json_result:
             return False
 
-        self.construct_form_param_user(
+        construct_form_param_user(
             self.dlg_options, json_result['body']['form']['formTabs'], 0, self.epa_options_list)
         grbox_list = self.dlg_options.findChildren(QGroupBox)
         for grbox in grbox_list:
@@ -60,9 +61,9 @@ class GwGo2EpaOptions(ApiParent):
         # Event on change from combo parent
         self.get_event_combo_parent(json_result)
         self.dlg_options.btn_accept.clicked.connect(partial(self.update_values, self.epa_options_list))
-        self.dlg_options.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_options))
+        self.dlg_options.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_options))
 
-        self.open_dialog(self.dlg_options, dlg_name='go2epa_options')
+        open_dialog(self.dlg_options, dlg_name='go2epa_options')
 
 
     def update_values(self, _json):
@@ -70,7 +71,7 @@ class GwGo2EpaOptions(ApiParent):
         my_json = json.dumps(_json)
         form = '"formName":"epaoptions"'
         extras = f'"fields":{my_json}'
-        body = self.create_body(form=form, extras=extras)
+        body = create_body(form=form, extras=extras)
         json_result = self.controller.get_json('gw_fct_setconfig', body)
         if not json_result:
             return False
@@ -78,7 +79,7 @@ class GwGo2EpaOptions(ApiParent):
         message = "Values has been updated"
         self.controller.show_info(message)
         # Close dialog
-        self.close_dialog(self.dlg_options)
+        close_dialog(self.dlg_options)
 
 
     def get_event_combo_parent(self, complet_result):
@@ -100,5 +101,5 @@ class GwGo2EpaOptions(ApiParent):
 
         for combo_child in json_result['fields']:
             if combo_child is not None:
-                self.manage_child(dialog, widget, combo_child)
+                manage_child(dialog, widget, combo_child)
 

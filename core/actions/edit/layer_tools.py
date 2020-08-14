@@ -17,17 +17,19 @@ from random import randrange
 
 from lib import qt_tools
 
+from .... import global_vars
 
-class GwLayerTools(object):
+class GwLayerTools:
 
-    def __init__(self, iface, settings, controller, plugin_dir):
+    def __init__(self):
 
         # Initialize instance attributes
-        self.iface = iface
-        self.canvas = self.iface.mapCanvas()
-        self.settings = settings
-        self.controller = controller
-        self.plugin_dir = plugin_dir
+        self.iface = global_vars.iface
+        self.canvas = global_vars.canvas
+        self.settings = global_vars.settings
+        self.controller = global_vars.controller
+        self.plugin_dir = global_vars.plugin_dir
+        
         self.dao = self.controller.dao
         self.schema_name = self.controller.schema_name
         self.project_type = None

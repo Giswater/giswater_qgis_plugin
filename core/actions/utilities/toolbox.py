@@ -29,7 +29,7 @@ class GwToolBox(ApiParent):
         """ Class to control toolbar 'om_ws' """
 
         ApiParent.__init__(self, iface, settings, controller, plugin_dir)
-        self.add_layer = GwLayerTools(iface, settings, controller, plugin_dir)
+        self.add_layer = GwLayerTools()
         self.function_list = []
         self.rbt_checked = {}
         self.is_paramtetric = True

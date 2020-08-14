@@ -14,17 +14,19 @@ import subprocess
 
 from ..actions.edit.layer_tools import GwLayerTools
 
+from ... import global_vars
+
 
 class GwGo2EpaTask(QgsTask):
     """ This shows how to subclass QgsTask """
 
     fake_progress = pyqtSignal()
 
-    def __init__(self, description, controller, go2epa):
+    def __init__(self, description, go2epa):
 
         super().__init__(description, QgsTask.CanCancel)
         self.exception = None
-        self.controller = controller
+        self.controller = global_vars.controller
         self.go2epa = go2epa
         self.error_msg = None
         self.message = None
@@ -32,7 +34,7 @@ class GwGo2EpaTask(QgsTask):
         self._file = None
         self.fid = 140
         self.set_variables_from_go2epa()
-        self.add_layer = GwLayerTools(self.controller.iface, None, controller, None)
+        self.add_layer = GwLayerTools()
         # self.progressChanged.connect(self.progress_changed)
 
 

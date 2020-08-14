@@ -29,7 +29,7 @@ class GwManageLayers:
         self.controller = controller
         self.plugin_dir = plugin_dir
         self.available_layers = None
-        self.add_layer = GwLayerTools(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.add_layer = GwLayerTools()
         self.project_type = controller.get_project_type()
         self.schema_name = controller.schema_name
         self.project_vars = global_vars.qgis_tools.get_qgis_project_variables()

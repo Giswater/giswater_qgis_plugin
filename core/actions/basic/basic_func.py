@@ -8,25 +8,17 @@ or (at your option) any later version.
 from functools import partial
 
 from ....ui_manager import SelectorUi
-from ..basic.search import GwSearch
-from ....actions.api_parent import ApiParent
 
+from .... import global_vars
 
-class GwBasic(ApiParent):
+from ....actions.api_parent_functs import load_settings, get_selector, close_dialog, open_dialog, save_settings
+from ....actions.parent_functs import get_last_tab, save_current_tab
 
-    def __init__(self, iface, settings, controller, plugin_dir):
+class GwBasic:
+
+    def __init__(self):
         """ Class to control toolbar 'basic' """
-
-        ApiParent.__init__(self, iface, settings, controller, plugin_dir)
-        self.api_search = None
-
-
-    def set_giswater(self, giswater):
-        self.giswater = giswater
-
-
-    def set_project_type(self, project_type):
-        self.project_type = project_type
+        pass
 
 
     def basic_filter_selectors(self):
@@ -35,32 +27,23 @@ class GwBasic(ApiParent):
         selector_values = '"selector_basic"'
 
         # Show form in docker?
-        self.controller.init_docker('qgis_form_docker')
+        global_vars.controller.init_docker('qgis_form_docker')
 
         self.dlg_selector = SelectorUi()
-        self.load_settings(self.dlg_selector)
+        load_settings(self.dlg_selector)
 
         # Get the name of the last tab used by the user
-        current_tab = self.get_last_tab(self.dlg_selector, 'basic')
-        self.get_selector(self.dlg_selector, selector_values, current_tab=current_tab)
+        current_tab = get_last_tab(self.dlg_selector, 'basic')
+        get_selector(self.dlg_selector, selector_values, current_tab=current_tab)
 
-        if self.controller.dlg_docker:
-            self.controller.dock_dialog(self.dlg_selector)
-            self.dlg_selector.btn_close.clicked.connect(self.controller.close_docker)
+        if global_vars.controller.dlg_docker:
+            global_vars.controller.dock_dialog(self.dlg_selector)
+            self.dlg_selector.btn_close.clicked.connect(global_vars.controller.close_docker)
         else:
-            self.dlg_selector.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_selector))
-            self.dlg_selector.rejected.connect(partial(self.save_settings, self.dlg_selector))
-            self.open_dialog(self.dlg_selector, dlg_name='selector', maximize_button=False)
+            self.dlg_selector.btn_close.clicked.connect(partial(close_dialog, self.dlg_selector))
+            self.dlg_selector.rejected.connect(partial(save_settings, self.dlg_selector))
+            open_dialog(self.dlg_selector, dlg_name='selector', maximize_button=False)
 
         # Save the name of current tab used by the user
         self.dlg_selector.rejected.connect(partial(
-            self.save_current_tab, self.dlg_selector, self.dlg_selector.main_tab, 'basic'))
-
-    # def basic_api_search(self):
-    #     """ Button 143: ApiSearch """
-    #
-    #     if self.api_search is None:
-    #         self.api_search = GwSearch(self.iface, self.settings, self.controller, self.plugin_dir)
-    #
-    #     self.api_search.api_search()
-
+            save_current_tab, self.dlg_selector, self.dlg_selector.main_tab, 'basic'))

@@ -42,4 +42,4 @@ lazy_init_function = None
 
 def init_global_vars():
 	global add_layer
-	add_layer = GwLayerTools(global_vars.iface, global_vars.settings, global_vars.controller, global_vars.plugin_dir)
+	add_layer = GwLayerTools()

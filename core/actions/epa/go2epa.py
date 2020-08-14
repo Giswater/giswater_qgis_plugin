@@ -15,24 +15,27 @@ import os
 import sys
 from functools import partial
 
+from .... import global_vars
 from lib import qt_tools
 from ..epa.go2epa_options import GwGo2EpaOptions
-from ....actions.api_parent import ApiParent
 from ...tasks.tsk_go2epa import GwGo2EpaTask
 from ...admin import GwAdmin
 from ....ui_manager import Go2EpaSelectorUi, EpaManager, Go2EpaUI, HydrologySelector, Multirow_selector
 
+from ....actions.api_parent_functs import load_settings, open_dialog, close_dialog, fill_table
+from ....actions.parent_functs import multi_row_selector, set_table_columns, multi_rows_delete
 
-class GwGo2Epa(ApiParent):
 
-    def __init__(self, iface, settings, controller, plugin_dir):
+class GwGo2Epa:
+
+    def __init__(self):
         """ Class to control toolbar 'go2epa' """
 
-        ApiParent.__init__(self, iface, settings, controller, plugin_dir)
-
-        self.g2epa_opt = GwGo2EpaOptions(iface, settings, controller, plugin_dir)
+        self.g2epa_opt = GwGo2EpaOptions()
         self.iterations = 0
-        self.project_type = controller.get_project_type()
+        self.controller = global_vars.controller
+        self.project_type = self.controller.get_project_type()
+        self.plugin_dir = global_vars.plugin_dir
 
 
     def set_project_type(self, project_type):
@@ -47,7 +50,7 @@ class GwGo2Epa(ApiParent):
 
         # Create dialog
         self.dlg_go2epa = Go2EpaUI()
-        self.load_settings(self.dlg_go2epa)
+        load_settings(self.dlg_go2epa)
         self.load_user_values()
         if self.project_type in 'ws':
             self.dlg_go2epa.chk_export_subcatch.setVisible(False)
@@ -82,7 +85,7 @@ class GwGo2Epa(ApiParent):
             self.dlg_go2epa.btn_cancel.clicked.disconnect()
             self.dlg_go2epa.btn_cancel.clicked.connect(self.controller.close_docker)
         else:
-            self.open_dialog(self.dlg_go2epa, dlg_name='go2epa')
+            open_dialog(self.dlg_go2epa, dlg_name='go2epa')
 
 
     def set_signals(self):
@@ -91,8 +94,8 @@ class GwGo2Epa(ApiParent):
         self.dlg_go2epa.btn_file_inp.clicked.connect(self.go2epa_select_file_inp)
         self.dlg_go2epa.btn_file_rpt.clicked.connect(self.go2epa_select_file_rpt)
         self.dlg_go2epa.btn_accept.clicked.connect(self.go2epa_accept)
-        self.dlg_go2epa.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_go2epa))
-        self.dlg_go2epa.rejected.connect(partial(self.close_dialog, self.dlg_go2epa))
+        self.dlg_go2epa.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_go2epa))
+        self.dlg_go2epa.rejected.connect(partial(close_dialog, self.dlg_go2epa))
         self.dlg_go2epa.btn_options.clicked.connect(self.epa_options)
 
 
@@ -231,7 +234,7 @@ class GwGo2Epa(ApiParent):
         """ Load the tables in the selection form """
 
         dlg_psector_sel = Multirow_selector('dscenario')
-        self.load_settings(dlg_psector_sel)
+        load_settings(dlg_psector_sel)
         dlg_psector_sel.btn_ok.clicked.connect(dlg_psector_sel.close)
 
         if tableleft == 'cat_dscenario':
@@ -243,9 +246,9 @@ class GwGo2Epa(ApiParent):
             qt_tools.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_selected,
                                    self.controller.tr('Selected dscenarios', context_name='labels'))
 
-        self.multi_row_selector(dlg_psector_sel, tableleft, tableright, field_id_left, field_id_right, aql=aql)
+        multi_row_selector(dlg_psector_sel, tableleft, tableright, field_id_left, field_id_right, aql=aql)
 
-        self.open_dialog(dlg_psector_sel)
+        open_dialog(dlg_psector_sel)
 
 
     def epa_options(self):
@@ -259,7 +262,7 @@ class GwGo2Epa(ApiParent):
         """ Dialog hydrology_selector.ui """
 
         self.dlg_hydrology_selector = HydrologySelector()
-        self.load_settings(self.dlg_hydrology_selector)
+        load_settings(self.dlg_hydrology_selector)
 
         self.dlg_hydrology_selector.btn_accept.clicked.connect(self.save_hydrology)
         self.dlg_hydrology_selector.hydrology.currentIndexChanged.connect(self.update_labels)
@@ -286,7 +289,7 @@ class GwGo2Epa(ApiParent):
             qt_tools.setWidgetText(self.dlg_hydrology_selector, self.dlg_hydrology_selector.hydrology, 0)
 
         self.update_labels()
-        self.open_dialog(self.dlg_hydrology_selector)
+        open_dialog(self.dlg_hydrology_selector)
 
 
     def save_hydrology(self):
@@ -306,7 +309,7 @@ class GwGo2Epa(ApiParent):
 
         message = "Values has been update"
         self.controller.show_info(message)
-        self.close_dialog(self.dlg_hydrology_selector)
+        close_dialog(self.dlg_hydrology_selector)
 
 
     def update_labels(self):
@@ -340,7 +343,7 @@ class GwGo2Epa(ApiParent):
         self.file_inp = qt_tools.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp)
         # Set default value if necessary
         if self.file_inp is None or self.file_inp == '':
-            self.file_inp = self.plugin_dir
+            self.file_inp = global_vars.plugin_dir
 
         # Get directory of that file
         folder_path = os.path.dirname(self.file_inp)
@@ -357,7 +360,7 @@ class GwGo2Epa(ApiParent):
 
         # Set default value if necessary
         if self.file_rpt is None or self.file_rpt == '':
-            self.file_rpt = self.plugin_dir
+            self.file_rpt = global_vars.plugin_dir
 
         # Get directory of that file
         folder_path = os.path.dirname(self.file_rpt)
@@ -402,7 +405,7 @@ class GwGo2Epa(ApiParent):
 
         # Set background task 'Go2Epa'
         description = f"Go2Epa"
-        self.task_go2epa = GwGo2EpaTask(description, self.controller, self)
+        self.task_go2epa = GwGo2EpaTask(description, self)
         QgsApplication.taskManager().addTask(self.task_go2epa)
         QgsApplication.taskManager().triggerTask(self.task_go2epa)
 
@@ -453,14 +456,14 @@ class GwGo2Epa(ApiParent):
 
         # Create the dialog and signals
         self.dlg_go2epa_result = Go2EpaSelectorUi()
-        self.load_settings(self.dlg_go2epa_result)
+        load_settings(self.dlg_go2epa_result)
         if self.project_type == 'ud':
             qt_tools.remove_tab_by_tabName(self.dlg_go2epa_result.tabWidget, "tab_time")
         if self.project_type == 'ws':
             qt_tools.remove_tab_by_tabName(self.dlg_go2epa_result.tabWidget, "tab_datetime")
         self.dlg_go2epa_result.btn_accept.clicked.connect(self.result_selector_accept)
-        self.dlg_go2epa_result.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_go2epa_result))
-        self.dlg_go2epa_result.rejected.connect(partial(self.close_dialog, self.dlg_go2epa_result))
+        self.dlg_go2epa_result.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_go2epa_result))
+        self.dlg_go2epa_result.rejected.connect(partial(close_dialog, self.dlg_go2epa_result))
 
         # Set values from widgets of type QComboBox
         sql = ("SELECT DISTINCT(result_id), result_id "
@@ -541,7 +544,7 @@ class GwGo2Epa(ApiParent):
             qt_tools.set_combo_itemData(self.dlg_go2epa_result.rpt_selector_compare_id, row["result_id"], 0)
 
         # Open the dialog
-        self.open_dialog(self.dlg_go2epa_result, dlg_name='go2epa_selector')
+        open_dialog(self.dlg_go2epa_result, dlg_name='go2epa_selector')
 
 
     def populate_date_time(self, combo_date):
@@ -629,7 +632,7 @@ class GwGo2Epa(ApiParent):
         # Show message to user
         message = "Values has been updated"
         self.controller.show_info(message)
-        self.close_dialog(self.dlg_go2epa_result)
+        close_dialog(self.dlg_go2epa_result)
 
 
     def go2epa_options_get_data(self, tablename, dialog):
@@ -645,7 +648,7 @@ class GwGo2Epa(ApiParent):
         # Iterate over all columns and populate its corresponding widget
         columns = []
         for i in range(0, len(row)):
-            column_name = self.dao.get_column_name(i)
+            column_name = self.controller.dao.get_column_name(i)
             widget = dialog.findChild(QWidget, column_name)
             widget_type = qt_tools.getWidgetType(dialog, widget)
             if row[column_name] is not None:
@@ -681,7 +684,7 @@ class GwGo2Epa(ApiParent):
 
         # Create the dialog
         self.dlg_manager = EpaManager()
-        self.load_settings(self.dlg_manager)
+        load_settings(self.dlg_manager)
 
         # Manage widgets
         reg_exp = QRegExp("^[A-Za-z0-9_]{1,16}$")
@@ -690,18 +693,18 @@ class GwGo2Epa(ApiParent):
         # Fill combo box and table view
         self.fill_combo_result_id()
         self.dlg_manager.tbl_rpt_cat_result.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.fill_table(self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result')
-        self.set_table_columns(self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result')
+        fill_table(self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result')
+        set_table_columns(self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result')
 
         # Set signals
-        self.dlg_manager.btn_delete.clicked.connect(partial(self.multi_rows_delete, self.dlg_manager.tbl_rpt_cat_result,
+        self.dlg_manager.btn_delete.clicked.connect(partial(multi_rows_delete, self.dlg_manager.tbl_rpt_cat_result,
                                                             'rpt_cat_result', 'result_id'))
-        self.dlg_manager.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_manager))
-        self.dlg_manager.rejected.connect(partial(self.close_dialog, self.dlg_manager))
+        self.dlg_manager.btn_close.clicked.connect(partial(close_dialog, self.dlg_manager))
+        self.dlg_manager.rejected.connect(partial(close_dialog, self.dlg_manager))
         self.dlg_manager.txt_result_id.editTextChanged.connect(self.filter_by_result_id)
 
         # Open form
-        self.open_dialog(self.dlg_manager, dlg_name='go2epa_manager')
+        open_dialog(self.dlg_manager, dlg_name='go2epa_manager')
 
 
     def fill_combo_result_id(self):
@@ -723,10 +726,10 @@ class GwGo2Epa(ApiParent):
             table.model().setFilter(expr)
             table.model().select()
         else:
-            self.fill_table(table, tablename)
+            fill_table(table, tablename)
 
 
     def update_sql(self):
-        usql = GwAdmin(self.iface, self.settings, self.controller, self.plugin_dir)
+        usql = GwAdmin(global_vars.iface, global_vars.settings, global_vars.controller, global_vars.plugin_dir)
         usql.init_sql()
 

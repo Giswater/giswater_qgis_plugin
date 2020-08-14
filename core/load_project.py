@@ -79,7 +79,10 @@ class LoadProject(QObject):
         self.schema_name = self.schema_name.replace('"', '')
         self.controller.plugin_settings_set_value("schema_name", self.schema_name)
         self.controller.set_schema_name(self.schema_name)
-
+        
+        # TEMP
+        global_vars.schema_name = self.schema_name
+        
         # Manage locale and corresponding 'i18n' file
         self.controller.manage_translation(self.plugin_name)
 
