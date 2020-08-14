@@ -12,42 +12,43 @@ from ..epa.element import GwElement
 from ..edit.document import GwDocument
 from ..epa.feature_end import GwFeatureEnd
 from ..edit.feature_delete import GwFeatureDelete
-from ....actions.parent import ParentAction
 
+from .... import global_vars
+from ....actions import parent_vars
 
-class GwEdit(ParentAction):
+class GwEdit:
 	
-	def __init__(self, iface, settings, controller, plugin_dir):
+	def __init__(self):
 		""" Class to control toolbar 'edit' """
 		
-		ParentAction.__init__(self, iface, settings, controller, plugin_dir)
+		self.controller = global_vars.controller
+		self.iface = global_vars.iface
+		self.plugin_dir = global_vars.plugin_dir
+		self.settings = global_vars.settings
+		
 		self.manage_document = GwDocument()
 		self.manage_element = GwElement()
-		self.manage_workcat_end = GwFeatureEnd(iface, settings, controller, plugin_dir)
-		self.delete_feature = GwFeatureDelete(iface, settings, controller, plugin_dir)
+		self.manage_workcat_end = GwFeatureEnd(global_vars.iface, global_vars.settings, global_vars.controller, global_vars.plugin_dir)
+		self.delete_feature = GwFeatureDelete(global_vars.iface, global_vars.settings, global_vars.controller, global_vars.plugin_dir)
 		self.suppres_form = None
-	
-	
-	def set_project_type(self, project_type):
-		self.project_type = project_type
 	
 	
 	def edit_add_feature(self, feature_cat):
 		""" Button 01, 02: Add 'node' or 'arc' """
 		
 		self.feature_cat = feature_cat
-		self.layer = self.controller.get_layer_by_tablename(feature_cat.parent_layer)
-		if self.layer:
+		parent_vars.layer = self.controller.get_layer_by_tablename(feature_cat.parent_layer)
+		if parent_vars.layer:
 			self.suppres_form = QSettings().value("/Qgis/digitizing/disable_enter_attribute_values_dialog")
 			QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", True)
-			config = self.layer.editFormConfig()
+			config = parent_vars.layer.editFormConfig()
 			self.conf_supp = config.suppress()
 			config.setSuppress(0)
-			self.layer.setEditFormConfig(config)
-			self.iface.setActiveLayer(self.layer)
-			self.layer.startEditing()
+			parent_vars.layer.setEditFormConfig(config)
+			self.iface.setActiveLayer(parent_vars.layer)
+			parent_vars.layer.startEditing()
 			self.iface.actionAddFeature().trigger()
-			self.layer.featureAdded.connect(self.open_new_feature)
+			parent_vars.layer.featureAdded.connect(self.open_new_feature)
 		else:
 			message = "Layer not found"
 			self.controller.show_warning(message, parameter=feature_cat.parent_layer)
@@ -55,15 +56,15 @@ class GwEdit(ParentAction):
 	
 	def open_new_feature(self, feature_id):
 		
-		self.layer.featureAdded.disconnect(self.open_new_feature)
-		feature = self.get_feature_by_id(self.layer, feature_id)
+		parent_vars.layer.featureAdded.disconnect(self.open_new_feature)
+		feature = self.get_feature_by_id(parent_vars.layer, feature_id)
 		
 		geom = feature.geometry()
 		list_points = None
-		if self.layer.geometryType() == 0:
+		if parent_vars.layer.geometryType() == 0:
 			points = geom.asPoint()
 			list_points = f'"x1":{points.x()}, "y1":{points.y()}'
-		elif self.layer.geometryType() in (1, 2):
+		elif parent_vars.layer.geometryType() in (1, 2):
 			points = geom.asPolyline()
 			init_point = points[0]
 			last_point = points[-1]
@@ -76,16 +77,16 @@ class GwEdit(ParentAction):
 		
 		self.api_cf = GwInfo(self.iface, self.settings, self.controller, self.plugin_dir, 'data')
 		result, dialog = self.api_cf.open_form(point=list_points, feature_cat=self.feature_cat,
-											   new_feature_id=feature_id, layer_new_feature=self.layer,
+											   new_feature_id=feature_id, layer_new_feature=parent_vars.layer,
 											   tab_type='data', new_feature=feature)
 		
 		# Restore user value (Settings/Options/Digitizing/Suppress attribute from pop-up after feature creation)
 		QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", self.suppres_form)
-		config = self.layer.editFormConfig()
+		config = parent_vars.layer.editFormConfig()
 		config.setSuppress(self.conf_supp)
-		self.layer.setEditFormConfig(config)
+		parent_vars.layer.setEditFormConfig(config)
 		if not result:
-			self.layer.deleteFeature(feature.id())
+			parent_vars.layer.deleteFeature(feature.id())
 			self.iface.actionRollbackEdits().trigger()
 	
 	
@@ -97,33 +98,3 @@ class GwEdit(ParentAction):
 				return feature
 		return False
 	
-	
-	# def edit_add_element(self):
-	# 	""" Button 33: Add element """
-	# 	self.manage_element.manage_element()
-	
-	
-	# def edit_add_file(self):
-	# 	""" Button 34: Add document """
-	# 	self.manage_document.manage_document()
-	
-	
-	# def edit_document(self):
-	# 	""" Button 66: Edit document """
-	# 	self.manage_document.edit_document()
-	
-	
-	def edit_element(self):
-		""" Button 67: Edit element """
-		self.manage_element.edit_element()
-	
-	
-	# def edit_end_feature(self):
-	# 	""" Button 68: Edit end feature """
-	# 	self.manage_workcat_end.manage_workcat_end()
-	
-	
-	# def del_feature(self):
-	# 	"""" Button 69: Delete Feature """
-	# 	self.delete_feature.manage_delete_feature()
-

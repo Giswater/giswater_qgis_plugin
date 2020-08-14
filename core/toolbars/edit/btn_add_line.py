@@ -18,7 +18,7 @@ class GwAddLineButton(GwParentAction):
 		pg_man = PgMan(controller)
 		self.feature_cat = pg_man.manage_feature_cat()
 		
-		self.edit = GwEdit(iface, settings, controller, plugin_dir)
+		self.edit = GwEdit()
 		
 		# Get list of different node and arc types
 		menu = QMenu()

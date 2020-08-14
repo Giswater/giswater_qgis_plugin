@@ -20,7 +20,7 @@ class GwAddPointButton(GwParentAction):
 		
 		project_type = self.controller.get_project_type()
 		
-		self.edit = GwEdit(iface, settings, controller, plugin_dir)
+		self.edit = GwEdit()
 		
 		# Get list of different node and arc types
 		menu = QMenu()
