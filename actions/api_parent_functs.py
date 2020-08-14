@@ -20,6 +20,7 @@ import re
 import subprocess
 import sys
 import webbrowser
+import json
 from functools import partial
 
 from .. import global_vars
@@ -912,7 +913,8 @@ def fill_table(widget, table_name, filter_=None):
     widget.setModel(model)
 
 
-def populate_basic_info(dialog, result, field_id, my_json=None):
+def populate_basic_info(dialog, result, field_id, my_json=None, new_feature_id=None, new_feature=None,
+                        layer_new_feature=None, feature_id=None, feature_type=None):
 
     fields = result[0]['body']['data']
     if 'fields' not in fields:
@@ -941,7 +943,8 @@ def populate_basic_info(dialog, result, field_id, my_json=None):
             if widget.property('columnname') == field_id:
                 parent_vars.feature_id = widget.text()
         elif field['widgettype'] == 'datetime':
-            widget = add_calendar(dialog, field, my_json)
+            widget = add_calendar(dialog, field, my_json, new_feature_id=new_feature_id, new_feature=new_feature,
+                                  layer_new_feature=layer_new_feature, feature_id=feature_id, feature_type=feature_type)
             widget = set_auto_update_dateedit(field, dialog, widget)
         elif field['widgettype'] == 'hyperlink':
             widget = add_hyperlink(field)
@@ -976,7 +979,8 @@ def clear_gridlayout(layout):
             child.deleteLater()
 
 
-def add_calendar(dialog, field, my_json=None, complet_result=None):
+def add_calendar(dialog, field, my_json=None, complet_result=None, new_feature_id=None, new_feature=None,
+                 layer_new_feature=None, feature_id=None, feature_type=None):
 
     widget = QgsDateTimeEdit()
     widget.setObjectName(field['widgetname'])
@@ -996,12 +1000,139 @@ def add_calendar(dialog, field, my_json=None, complet_result=None):
         _json = {}
         btn_calendar.clicked.connect(partial(get_values, dialog, widget, _json))
         btn_calendar.clicked.connect(
-            partial(accept, dialog, complet_result[0], parent_vars.feature_id, _json, True, False))
+            partial(accept, dialog, complet_result[0], _json, p_widget=parent_vars.feature_id, clear_json=True,
+                    close_dlg=False, new_feature_id=new_feature_id, new_feature=new_feature,
+                    layer_new_feature=layer_new_feature, feature_id=feature_id, feature_type=feature_type))
     else:
         btn_calendar.clicked.connect(partial(get_values, dialog, widget, my_json))
     btn_calendar.clicked.connect(partial(set_calendar_empty, widget))
 
     return widget
+
+
+def accept(dialog, complet_result, _json, p_widget=None, clear_json=False, close_dlg=True, new_feature_id=None,
+           new_feature=None, layer_new_feature=None, feature_id=None, feature_type=None):
+    """
+    :param dialog:
+    :param complet_result:
+    :param _json:
+    :param p_widget:
+    :param clear_json:
+    :param close_dialog:
+    :return:
+    """
+
+    if _json == '' or str(_json) == '{}':
+        if global_vars.controller.dlg_docker:
+            global_vars.controller.dlg_docker.setMinimumWidth(dialog.width())
+            global_vars.controller.close_docker()
+        close_dialog(dialog)
+        return
+
+    if None in (new_feature_id, new_feature_id, new_feature, layer_new_feature, feature_id, feature_type):
+        return
+
+    p_table_id = complet_result['body']['feature']['tableName']
+    id_name = complet_result['body']['feature']['idName']
+    parent_fields = complet_result['body']['data']['parentFields']
+    fields_reload = ""
+    list_mandatory = []
+    for field in complet_result['body']['data']['fields']:
+        if p_widget and (field['widgetname'] == p_widget.objectName()):
+            if field['widgetcontrols'] and 'autoupdateReloadFields' in field['widgetcontrols']:
+                fields_reload = field['widgetcontrols']['autoupdateReloadFields']
+
+        if field['ismandatory']:
+            widget_name = 'data_' + field['columnname']
+            widget = dialog.findChild(QWidget, widget_name)
+            widget.setStyleSheet(None)
+            value = qt_tools.getWidgetText(dialog, widget)
+            if value in ('null', None, ''):
+                widget.setStyleSheet("border: 1px solid red")
+                list_mandatory.append(widget_name)
+
+    if list_mandatory:
+        msg = "Some mandatory values are missing. Please check the widgets marked in red."
+        global_vars.controller.show_warning(msg)
+        return
+
+    # If we create a new feature
+    if new_feature_id is not None:
+        for k, v in list(_json.items()):
+            if k in parent_fields:
+                new_feature.setAttribute(k, v)
+                _json.pop(k, None)
+        layer_new_feature.updateFeature(new_feature)
+
+        status = layer_new_feature.commitChanges()
+        if status is False:
+            return
+
+        my_json = json.dumps(_json)
+        if my_json == '' or str(my_json) == '{}':
+            if global_vars.controller.dlg_docker:
+                global_vars.controller.dlg_docker.setMinimumWidth(dialog.width())
+                global_vars.controller.close_docker()
+            close_dialog(dialog)
+            return
+        if new_feature.attribute(id_name) is not None:
+            feature = f'"id":"{new_feature.attribute(id_name)}", '
+        else:
+            feature = f'"id":"{feature_id}", '
+
+    # If we make an info
+    else:
+        my_json = json.dumps(_json)
+        feature = f'"id":"{feature_id}", '
+
+    feature += f'"featureType":"{feature_type}", '
+    feature += f'"tableName":"{p_table_id}"'
+    extras = f'"fields":{my_json}, "reload":"{fields_reload}"'
+    body = create_body(feature=feature, extras=extras)
+    json_result = global_vars.controller.get_json('gw_fct_setfields', body)
+    if not json_result:
+        return
+
+    if clear_json:
+        _json = {}
+
+    if "Accepted" in json_result['status']:
+        msg = "OK"
+        global_vars.controller.show_message(msg, message_level=3)
+        reload_fields(dialog, json_result, p_widget)
+    elif "Failed" in json_result['status']:
+        # If json_result['status'] is Failed message from database is showed user by get_json-->manage_exception_api
+        return
+
+    if close_dlg:
+        if global_vars.controller.dlg_docker:
+            global_vars.controller.dlg_docker.setMinimumWidth(dialog.width())
+            global_vars.controller.close_docker()
+        close_dialog(dialog)
+
+
+def reload_fields(dialog, result, p_widget):
+    """
+    :param dialog: QDialog where find and set widgets
+    :param result: row with info (json)
+    :param p_widget: Widget that has changed
+    """
+
+    if not p_widget:
+        return
+
+    for field in result['body']['data']['fields']:
+        widget = dialog.findChild(QLineEdit, f'{field["widgetname"]}')
+        if widget:
+            value = field["value"]
+            qt_tools.setText(dialog, widget, value)
+            if not field['iseditable']:
+                widget.setStyleSheet("QLineEdit { background: rgb(0, 255, 0); color: rgb(0, 0, 0)}")
+            else:
+                widget.setStyleSheet(None)
+        elif "message" in field:
+            level = field['message']['level'] if 'level' in field['message'] else 0
+            global_vars.controller.show_message(field['message']['text'], level)
 
 
 def manage_close_interpolate():
