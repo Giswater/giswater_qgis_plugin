@@ -1799,7 +1799,7 @@ def get_selector(dialog, selector_type, filter=False, widget=None, text_filter=N
                 widget = QLineEdit()
                 widget.setObjectName('txt_filter_' + str(form_tab['tabName']))
                 widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-                widget.textChanged.connect(partial(get_selector, self.dlg_selector, selector_type, filter=True,
+                widget.textChanged.connect(partial(get_selector, dialog, selector_type, filter=True,
                                                    widget=widget, current_tab=current_tab))
                 widget.textChanged.connect(partial(manage_filter, dialog, widget, 'save'))
                 widget.setLayoutDirection(Qt.RightToLeft)
