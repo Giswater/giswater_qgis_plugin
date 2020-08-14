@@ -1212,6 +1212,87 @@ class GwInfo(ApiParent, QObject):
         except KeyError:
             pass
 
+
+    # TODO: Remove this 5 funcions "set_auto_update_*" now it is in api_parent_functs.py. From here.
+    def set_auto_update_lineedit(self, field, dialog, widget):
+
+        if self.check_tab_data(dialog):
+            if field['isautoupdate'] and self.new_feature_id is None and field['widgettype'] != 'typeahead':
+                _json = {}
+                widget.editingFinished.connect(partial(self.clean_my_json, widget))
+                widget.editingFinished.connect(partial(self.get_values, dialog, widget, _json))
+                widget.editingFinished.connect(
+                    partial(self.accept, dialog, self.complet_result[0], _json, widget, True, False))
+            else:
+                widget.editingFinished.connect(partial(self.get_values, dialog, widget, self.my_json))
+
+            widget.textChanged.connect(partial(self.enabled_accept, dialog))
+            widget.textChanged.connect(partial(self.check_datatype_validator, dialog, widget, dialog.btn_accept))
+            widget.textChanged.connect(partial(self.check_min_max_value, dialog, widget, dialog.btn_accept))
+
+        return widget
+
+
+    def set_auto_update_combobox(self, field, dialog, widget):
+
+        if self.check_tab_data(dialog):
+            if field['isautoupdate'] and self.new_feature_id is None:
+                _json = {}
+                widget.currentIndexChanged.connect(partial(self.clean_my_json, widget))
+                widget.currentIndexChanged.connect(partial(self.get_values, dialog, widget, _json))
+                widget.currentIndexChanged.connect(partial(
+                    self.accept, dialog, self.complet_result[0], _json, None, True, False))
+            else:
+                widget.currentIndexChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
+
+        return widget
+
+
+    def set_auto_update_dateedit(self, field, dialog, widget):
+
+        if self.check_tab_data(dialog):
+            if field['isautoupdate'] and self.new_feature_id is None:
+                _json = {}
+                widget.dateChanged.connect(partial(self.clean_my_json, widget))
+                widget.dateChanged.connect(partial(self.get_values, dialog, widget, _json))
+                widget.dateChanged.connect(partial(
+                    self.accept, dialog, self.complet_result[0], _json, None, True, False))
+            else:
+                widget.dateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
+
+        return widget
+
+
+    def set_auto_update_spinbox(self, field, dialog, widget):
+
+        if self.check_tab_data(dialog):
+            if field['isautoupdate'] and self.new_feature_id is None:
+                _json = {}
+                widget.valueChanged.connect(partial(self.clean_my_json, widget))
+                widget.valueChanged.connect(partial(self.get_values, dialog, widget, _json))
+                widget.valueChanged.connect(partial(
+                    self.accept, dialog, self.complet_result[0], _json, None, True, False))
+            else:
+                widget.valueChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
+
+        return widget
+
+
+    def set_auto_update_checkbox(self, field, dialog, widget):
+
+        if self.check_tab_data(dialog):
+            if field['isautoupdate'] and self.new_feature_id is None:
+                _json = {}
+                widget.stateChanged.connect(partial(self.clean_my_json, widget))
+                widget.stateChanged.connect(partial(self.get_values, dialog, widget, _json))
+                widget.stateChanged.connect(partial(
+                    self.accept, dialog, self.complet_result[0], _json, None, True, False))
+            else:
+                widget.stateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
+        return widget
+
+
+    # TODO: To here.
     
     def reload_fields(self, dialog, result, p_widget):
         """
