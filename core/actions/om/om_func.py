@@ -5,34 +5,36 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import QDate, Qt
-from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView, QLineEdit, QDateEdit, QPushButton
+# from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtCore import QDate
+# from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView, QLineEdit
+from qgis.PyQt.QtWidgets import QDateEdit, QPushButton
 
 from datetime import datetime
 from functools import partial
 
 from lib import qt_tools
-from ..om.visit_manager import GwVisitManager
-from ..plan.psector import GwPsector
-from ....actions.parent import ParentAction
-from ....ui_manager import PsectorManagerUi
+# from ..om.visit_manager import GwVisitManager
+# from ..plan.psector import GwPsector
+# from ....actions.parent import ParentAction
+# from ....ui_manager import PsectorManagerUi
 from ....ui_manager import SelectorDate
 
+from .... import global_vars
 
-class GwOm(ParentAction):
+from ....actions.parent_functs import load_settings, close_dialog, open_dialog, refresh_map_canvas
 
-    def __init__(self, iface, settings, controller, plugin_dir):
+class GwOm:
+
+    def __init__(self):
         """ Class to control toolbar 'om_ws' """
+        
+        self.controller = global_vars.controller
+        
+        # self.manage_visit = GwVisitManager(global_vars.iface, global_vars.settings, global_vars.controller, global_vars.plugin_dir)
+        # self.manage_new_psector = GwPsector(global_vars.iface, global_vars.settings, global_vars.controller, global_vars.plugin_dir)
 
-        ParentAction.__init__(self, iface, settings, controller, plugin_dir)
-        self.manage_visit = GwVisitManager(iface, settings, controller, plugin_dir)
-        self.manage_new_psector = GwPsector(iface, settings, controller, plugin_dir)
-
-
-    def set_project_type(self, project_type):
-        self.project_type = project_type
-
-
+    '''
     def om_add_visit(self):
         """ Button 64: Add visit """
         self.manage_visit.manage_visit(tag='add')
@@ -41,13 +43,13 @@ class GwOm(ParentAction):
     def om_visit_management(self):
         """ Button 65: Visit management """
         self.manage_visit.edit_visit()
-
+    
 
     def om_psector(self, psector_id=None):
         """ Button 81: Psector """
         self.manage_new_psector.new_psector(psector_id, 'om')
-
-
+    '''
+    '''
     def om_psector_management(self):
         """ Button 82: Psector management """
 
@@ -78,7 +80,7 @@ class GwOm(ParentAction):
         # Open form
         self.dlg_psector_mng.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.open_dialog(self.dlg_psector_mng, dlg_name="psector_manager")
-
+    
 
     def charge_psector(self, qtbl_psm):
 
@@ -91,7 +93,7 @@ class GwOm(ParentAction):
         psector_id = qtbl_psm.model().record(row).value("psector_id")
         self.close_dialog(self.dlg_psector_mng)
         self.om_psector(psector_id)
-
+    
 
     def multi_rows_delete(self, widget, table_name, column_id):
         """ Delete selected elements of the table
@@ -124,7 +126,7 @@ class GwOm(ParentAction):
             sql += f" WHERE {column_id} IN ({list_id})"
             self.controller.execute_sql(sql)
             widget.model().select()
-
+    
 
     def update_current_psector(self, dialog, qtbl_psm):
 
@@ -157,7 +159,7 @@ class GwOm(ParentAction):
         self.set_table_columns(dialog, qtbl_psm, "v_ui_plan_psector")
 
         dialog.exec_()
-
+    
 
     def insert_or_update_config_param_curuser(self, dialog, widget, parameter, tablename):
         """ Insert or update values in tables with current_user control """
@@ -201,7 +203,7 @@ class GwOm(ParentAction):
                 sql += f" VALUES ('{parameter}', '{_date}', current_user)"
 
         self.controller.execute_sql(sql)
-
+    
 
     def filter_by_text(self, table, widget_txt, tablename):
 
@@ -213,25 +215,25 @@ class GwOm(ParentAction):
             table.model().select()
         else:
             self.fill_table(table, tablename)
-
+    '''
 
     def selector_date(self):
         """ Button 84: Selector dates """
 
         self.dlg_selector_date = SelectorDate()
-        self.load_settings(self.dlg_selector_date)
+        load_settings(self.dlg_selector_date)
         self.widget_date_from = self.dlg_selector_date.findChild(QDateEdit, "date_from")
         self.widget_date_to = self.dlg_selector_date.findChild(QDateEdit, "date_to")
         self.dlg_selector_date.findChild(QPushButton, "btn_accept").clicked.connect(self.update_dates_into_db)
-        self.dlg_selector_date.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_selector_date))
-        self.dlg_selector_date.rejected.connect(partial(self.close_dialog, self.dlg_selector_date))
+        self.dlg_selector_date.btn_close.clicked.connect(partial(close_dialog, self.dlg_selector_date))
+        self.dlg_selector_date.rejected.connect(partial(close_dialog, self.dlg_selector_date))
         self.widget_date_from.dateChanged.connect(partial(self.update_date_to))
         self.widget_date_to.dateChanged.connect(partial(self.update_date_from))
 
         self.get_default_dates()
         qt_tools.setCalendarDate(self.dlg_selector_date, self.widget_date_from, self.from_date)
         qt_tools.setCalendarDate(self.dlg_selector_date, self.widget_date_to, self.to_date)
-        self.open_dialog(self.dlg_selector_date, dlg_name="selector_date")
+        open_dialog(self.dlg_selector_date, dlg_name="selector_date")
 
 
     def update_dates_into_db(self):
@@ -256,8 +258,8 @@ class GwOm(ParentAction):
 
         self.controller.execute_sql(sql)
 
-        self.close_dialog(self.dlg_selector_date)
-        self.refresh_map_canvas()
+        close_dialog(self.dlg_selector_date)
+        refresh_map_canvas()
 
 
     def update_date_to(self):
