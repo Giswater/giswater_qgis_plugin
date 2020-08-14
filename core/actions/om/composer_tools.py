@@ -15,16 +15,23 @@ import json
 from functools import partial
 
 from lib import qt_tools
-from ....actions.api_parent import ApiParent
 from ....ui_manager import FastPrintUi
 
+from .... import global_vars
 
-class GwComposerTools(ApiParent):
+from ....actions.parent_functs import hide_void_groupbox, get_composers_list
+from ....actions.api_parent_functs import load_settings, create_body, close_dialog, save_settings, open_dialog, \
+    set_widgets_into_composer, put_widgets, get_values, draw_rectangle
 
-    def __init__(self, iface, settings, controller, plugin_dir):
+
+class GwComposerTools:
+
+    def __init__(self):
         """ Class to control Composer button """
 
-        ApiParent.__init__(self, iface, settings, controller, plugin_dir)
+        self.controller = global_vars.controller
+        self.iface = global_vars.iface
+
         self.destroyed = False
         self.printer = None
 
@@ -41,11 +48,11 @@ class GwComposerTools(ApiParent):
         self.initial_rotation = self.iface.mapCanvas().rotation()
 
         self.dlg_composer = FastPrintUi()
-        self.load_settings(self.dlg_composer)
+        load_settings(self.dlg_composer)
 
         # Create and populate dialog
         extras = '"composers":' + str(composers_list)
-        body = self.create_body(extras=extras)
+        body = create_body(extras=extras)
         json_result = self.controller.get_json('gw_fct_getprint', body)
         if not json_result:
             return False
@@ -56,7 +63,7 @@ class GwComposerTools(ApiParent):
             # where formname == 'print' and formtype == 'utils'
             # At the moment, u can set column widgetfunction with 'gw_fct_setprint' or open_composer
             self.create_dialog(self.dlg_composer, fields)
-        self.hide_void_groupbox(self.dlg_composer)
+        hide_void_groupbox(self.dlg_composer)
 
         # Set current values from canvas
         rotation = self.iface.mapCanvas().rotation()
@@ -79,16 +86,16 @@ class GwComposerTools(ApiParent):
         # Signals
         self.dlg_composer.btn_print.clicked.connect(partial(self.__print, self.dlg_composer))
         self.dlg_composer.btn_preview.clicked.connect(partial(self.preview, self.dlg_composer, True))
-        self.dlg_composer.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_composer))
-        self.dlg_composer.btn_close.clicked.connect(partial(self.save_settings, self.dlg_composer))
+        self.dlg_composer.btn_close.clicked.connect(partial(close_dialog, self.dlg_composer))
+        self.dlg_composer.btn_close.clicked.connect(partial(save_settings, self.dlg_composer))
         self.dlg_composer.btn_close.clicked.connect(self.destructor)
-        self.dlg_composer.rejected.connect(partial(self.save_settings, self.dlg_composer))
+        self.dlg_composer.rejected.connect(partial(save_settings, self.dlg_composer))
         self.dlg_composer.rejected.connect(self.destructor)
 
         self.check_whidget_exist(self.dlg_composer)
         self.load_composer_values(self.dlg_composer)
 
-        self.open_dialog(self.dlg_composer, dlg_name='fastprint')
+        open_dialog(self.dlg_composer, dlg_name='fastprint')
 
         # Control if no have composers
         if composers_list != '"{}"':
@@ -176,7 +183,7 @@ class GwComposerTools(ApiParent):
         """ Get all composers from current QGis project """
 
         composers = '"{'
-        active_composers = self.get_composers_list()
+        active_composers = get_composers_list()
 
         for composer in active_composers:
             if type(composer) == QgsPrintLayout:
@@ -193,16 +200,16 @@ class GwComposerTools(ApiParent):
     def create_dialog(self, dialog, fields):
 
         for field in fields['fields']:
-            label, widget = self.set_widgets_into_composer(dialog, field, self.my_json)
-            self.put_widgets(dialog, field, label, widget)
-            self.get_values(dialog, widget, self.my_json)
+            label, widget = set_widgets_into_composer(dialog, field, self.my_json)
+            put_widgets(dialog, field, label, widget)
+            get_values(dialog, widget, self.my_json)
 
 
     def get_current_composer(self):
         """ Get composer selected in QComboBox """
 
         selected_com = None
-        active_composers = self.get_composers_list()
+        active_composers = get_composers_list()
         for composer in active_composers:
             if composer.name() == self.my_json['composer']:
                 selected_com = composer
@@ -258,11 +265,11 @@ class GwComposerTools(ApiParent):
             return
 
         if my_json == '' or str(my_json) == '{}':
-            self.close_dialog(dialog)
+            close_dialog(dialog)
             return False
 
         composer_templates = []
-        active_composers = self.get_composers_list()
+        active_composers = get_composers_list()
         for composer in active_composers:
             composer_map = []
             composer_template = {'ComposerTemplate': composer.name()}
@@ -301,11 +308,11 @@ class GwComposerTools(ApiParent):
             return False
 
         result = json_result['data']
-        self.draw_rectangle(result)
+        draw_rectangle(result)
         map_index = json_result['data']['mapIndex']
 
         maps = []
-        active_composers = self.get_composers_list()
+        active_composers = get_composers_list()
         for composer in active_composers:
             maps = []
             if composer.name() == composer_name:

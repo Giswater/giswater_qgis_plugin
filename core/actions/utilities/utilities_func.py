@@ -372,7 +372,7 @@ class GwUtilities(ParentAction):
 
     def utils_print_composer(self):
 
-        self.api_composer = GwComposerTools(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.api_composer = GwComposerTools()
         self.api_composer.composer()
 
 
