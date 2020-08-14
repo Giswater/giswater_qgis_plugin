@@ -29,7 +29,7 @@ class GwEdit:
 		self.manage_document = GwDocument()
 		self.manage_element = GwElement()
 		self.manage_workcat_end = GwFeatureEnd()
-		self.delete_feature = GwFeatureDelete(global_vars.iface, global_vars.settings, global_vars.controller, global_vars.plugin_dir)
+		self.delete_feature = GwFeatureDelete()
 		self.suppres_form = None
 	
 	

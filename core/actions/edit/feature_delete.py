@@ -11,22 +11,30 @@ from qgis.PyQt.QtWidgets import QCompleter
 from functools import partial
 
 from lib import qt_tools
-from ....actions.api_parent import ApiParent
 from ....ui_manager import FeatureDelete
 
+from .... import global_vars
+from ....actions import parent_vars
 
-class GwFeatureDelete(ApiParent):
+from ....actions.parent_functs import set_icon, disconnect_signal_selection_changed
+from ....actions.api_parent_functs import load_settings, close_dialog, save_settings, open_dialog, \
+    set_completer_object_api, create_body
 
-    def __init__(self, iface, settings, controller, plugin_dir):
+class GwFeatureDelete:
+
+    def __init__(self):
         """ Class to control 'Workcat end' of toolbar 'edit' """
-        ApiParent.__init__(self, iface, settings, controller, plugin_dir)
+        
+        self.controller = global_vars.controller
+        self.iface = global_vars.iface
+        self.canvas = global_vars.canvas
 
 
     def manage_delete_feature(self):
 
         # Create the dialog and signals
         self.dlg_feature_delete = FeatureDelete()
-        self.load_settings(self.dlg_feature_delete)
+        load_settings(self.dlg_feature_delete)
 
         # Populate combo feature type
         sql = 'SELECT DISTINCT(feature_type) AS id, feature_type AS idval FROM cat_feature'
@@ -54,19 +62,19 @@ class GwFeatureDelete(ApiParent):
         # Set button snapping
         self.dlg_feature_delete.btn_snapping.clicked.connect(partial(self.set_active_layer))
         self.dlg_feature_delete.btn_snapping.clicked.connect(partial(self.selection_init, self.dlg_feature_delete))
-        self.set_icon(self.dlg_feature_delete.btn_snapping, "137")
+        set_icon(self.dlg_feature_delete.btn_snapping, "137")
 
         # Set listeners
-        self.dlg_feature_delete.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_feature_delete))
-        self.dlg_feature_delete.rejected.connect(self.disconnect_signal_selection_changed)
-        self.dlg_feature_delete.rejected.connect(partial(self.save_settings, self.dlg_feature_delete))
+        self.dlg_feature_delete.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_feature_delete))
+        self.dlg_feature_delete.rejected.connect(disconnect_signal_selection_changed)
+        self.dlg_feature_delete.rejected.connect(partial(save_settings, self.dlg_feature_delete))
 
         self.dlg_feature_delete.btn_relations.clicked.connect(partial(self.show_feature_relation))
         self.dlg_feature_delete.btn_delete.clicked.connect(partial(self.delete_feature_relation))
         self.dlg_feature_delete.feature_type.currentIndexChanged.connect(partial(self.set_active_layer))
 
         # Open dialog
-        self.open_dialog(self.dlg_feature_delete, dlg_name='feature_delete')
+        open_dialog(self.dlg_feature_delete, dlg_name='feature_delete')
 
 
     def filter_typeahead(self, widget, completer, model):
@@ -85,7 +93,7 @@ class GwFeatureDelete(ApiParent):
             model.setStringList([''])
             return
 
-        self.set_completer_object_api(completer, model, widget, self.rows_typeahead)
+        set_completer_object_api(completer, model, widget, self.rows_typeahead)
 
 
     def show_feature_relation(self):
@@ -99,7 +107,7 @@ class GwFeatureDelete(ApiParent):
             return
         feature = '"type":"' + feature_type + '"'
         extras = '"feature_id":"' + feature_id + '"'
-        body = self.create_body(feature=feature, extras=extras)
+        body = create_body(feature=feature, extras=extras)
         result = self.controller.get_json('gw_fct_getfeaturerelation', body, log_sql=True)
         if not result:
             return
@@ -124,7 +132,7 @@ class GwFeatureDelete(ApiParent):
 
         feature = '"type":"' + feature_type + '"'
         extras = '"feature_id":"' + feature_id + '"'
-        body = self.create_body(feature=feature, extras=extras)
+        body = create_body(feature=feature, extras=extras)
         complet_result = self.controller.get_json('gw_fct_feature_delete', body, log_sql=True)
         if not complet_result:
             self.controller.show_message("Function gw_fct_feature_delete executed with no result ", 3)
@@ -135,19 +143,19 @@ class GwFeatureDelete(ApiParent):
         data = complet_result['body']['data']
         for k, v in list(data.items()):
             if str(k) == "info":
-                change_tab = self.add_layer.populate_info_text(self.dlg_feature_delete, data)
+                change_tab = parent_vars.add_layer.populate_info_text(self.dlg_feature_delete, data)
 
         self.dlg_feature_delete.btn_cancel.setText('Accept')
 
         # Close dialog
         if not change_tab:
-            self.close_dialog(self.dlg_feature_delete)
+            close_dialog(self.dlg_feature_delete)
 
 
     def selection_init(self, dialog):
         """ Set canvas map tool to an instance of class 'MultipleSelection' """
 
-        self.disconnect_signal_selection_changed()
+        disconnect_signal_selection_changed()
         self.iface.actionSelect().trigger()
         self.connect_signal_selection_changed(dialog)
 
