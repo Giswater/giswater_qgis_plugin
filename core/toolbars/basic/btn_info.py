@@ -7,6 +7,8 @@ from ..parent_maptool import GwParentMapTool
 
 from ...actions.basic.info import GwInfo
 
+from ....actions.api_parent_functs import resetRubberbands
+
 
 class GwInfoButton(GwParentMapTool):
 	
@@ -38,7 +40,7 @@ class GwInfoButton(GwParentMapTool):
 		if event.key() == Qt.Key_Escape:
 			for rb in self.rubberband_list:
 				rb.reset()
-			self.api_cf.resetRubberbands()
+			resetRubberbands()
 			self.action.trigger()
 			return
 	
@@ -93,7 +95,7 @@ class GwInfoButton(GwParentMapTool):
 		# elif self.index_action == '199':
 		# 	self.tab_type = 'inp'
 		
-		self.api_cf = GwInfo(self.iface, self.settings, self.controller, self.controller.plugin_dir, self.tab_type)
+		self.api_cf = GwInfo(self.tab_type)
 		
 		self.api_cf.signal_activate.connect(self.reactivate_map_tool)
 	
@@ -103,7 +105,7 @@ class GwInfoButton(GwParentMapTool):
 		for rb in self.rubberband_list:
 			rb.reset()
 		if hasattr(self, 'api_cf'):
-			self.api_cf.resetRubberbands()
+			resetRubberbands()
 		
 		super().deactivate()
 		

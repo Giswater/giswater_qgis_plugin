@@ -185,7 +185,7 @@ class GwSearch(ApiParent):
 
         # Tab 'network or add_network'
         if tab_selected == 'network' or tab_selected == 'add_network':
-            self.ApiCF = GwInfo(self.iface, self.settings, self.controller, self.plugin_dir, tab_type='data')
+            self.ApiCF = GwInfo(tab_type='data')
             complet_result, dialog = self.ApiCF.open_form(table_name=item['sys_table_id'], feature_id=item['sys_id'],
                                    tab_type='data', is_add_schema=is_add_schema)
             if not complet_result:

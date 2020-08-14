@@ -223,58 +223,6 @@ def api_action_help(geom_type):
             global_vars.controller.show_warning(message, parameter=pdf_path)
 
 
-def action_rotation(dialog):
-
-    # Set map tool emit point and signals
-    parent_vars.emit_point = QgsMapToolEmitPoint(global_vars.canvas)
-    parent_vars.previous_map_tool = global_vars.canvas.mapTool()
-    global_vars.canvas.setMapTool(parent_vars.emit_point)
-    parent_vars.emit_point.canvasClicked.connect(partial(action_rotation_canvas_clicked, dialog))
-
-
-def action_rotation_canvas_clicked(dialog, point, btn):
-
-    if btn == Qt.RightButton:
-        global_vars.canvas.setMapTool(parent_vars.previous_map_tool)
-        return
-
-    existing_point_x = None
-    existing_point_y = None
-    viewname = global_vars.controller.get_layer_source_table_name(parent_vars.layer)
-    sql = (f"SELECT ST_X(the_geom), ST_Y(the_geom)"
-           f" FROM {viewname}"
-           f" WHERE node_id = '{parent_vars.feature_id}'")
-    row = global_vars.controller.get_row(sql)
-    if row:
-        existing_point_x = row[0]
-        existing_point_y = row[1]
-
-    if existing_point_x:
-        sql = (f"UPDATE node"
-               f" SET hemisphere = (SELECT degrees(ST_Azimuth(ST_Point({existing_point_x}, {existing_point_y}), "
-               f" ST_Point({point.x()}, {point.y()}))))"
-               f" WHERE node_id = '{parent_vars.feature_id}'")
-        status = global_vars.controller.execute_sql(sql)
-        if not status:
-            global_vars.canvas.setMapTool(parent_vars.previous_map_tool)
-            return
-
-    sql = (f"SELECT rotation FROM node "
-           f" WHERE node_id = '{parent_vars.feature_id}'")
-    row = global_vars.controller.get_row(sql)
-    if row:
-        qt_tools.setWidgetText(dialog, "rotation", str(row[0]))
-
-    sql = (f"SELECT degrees(ST_Azimuth(ST_Point({existing_point_x}, {existing_point_y}),"
-           f" ST_Point({point.x()}, {point.y()})))")
-    row = global_vars.controller.get_row(sql)
-    if row:
-        qt_tools.setWidgetText(dialog, "hemisphere", str(row[0]))
-        message = "Hemisphere of the node has been updated. Value is"
-        global_vars.controller.show_info(message, parameter=str(row[0]))
-    api_disable_rotation(dialog)
-
-
 def api_disable_rotation(dialog):
     """ Disable actionRotation and set action 'Identify' """
 

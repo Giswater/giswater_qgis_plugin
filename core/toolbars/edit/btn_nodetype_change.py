@@ -17,6 +17,8 @@ from ...actions.basic.info import GwInfo
 from ..parent_maptool import GwParentMapTool
 from ...utils.giswater_tools import load_settings, save_settings, open_dialog, check_expression
 
+from ....actions.parent_functs import restore_user_layer
+
 
 class GwNodeTypeChangeButton(GwParentMapTool):
 	""" Button 28: User select one node. A form is opened showing current node_type.type
@@ -102,14 +104,14 @@ class GwNodeTypeChangeButton(GwParentMapTool):
 		it = layer.getFeatures(QgsFeatureRequest(expr))
 		features = [i for i in it]
 		if features[0]:
-			self.ApiCF = GwInfo(self.iface, self.settings, self.controller, self.plugin_dir, tab_type='data')
+			self.ApiCF = GwInfo(tab_type='data')
 			self.ApiCF.user_current_layer = self.current_layer
 			complet_result, dialog = self.ApiCF.open_form(table_name='v_edit_node', feature_id=features[0]["node_id"],
 														  tab_type='data')
 			if not complet_result:
 				return
 			
-			dialog.dlg_closed.connect(self.ApiCF.restore_user_layer)
+			dialog.dlg_closed.connect(restore_user_layer)
 	
 	
 	def change_elem_type(self, feature):

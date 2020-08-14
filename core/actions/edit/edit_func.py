@@ -75,7 +75,7 @@ class GwEdit:
 		
 		self.controller.init_docker()
 		
-		self.api_cf = GwInfo(self.iface, self.settings, self.controller, self.plugin_dir, 'data')
+		self.api_cf = GwInfo('data')
 		result, dialog = self.api_cf.open_form(point=list_points, feature_cat=self.feature_cat,
 											   new_feature_id=feature_id, layer_new_feature=parent_vars.layer,
 											   tab_type='data', new_feature=feature)
