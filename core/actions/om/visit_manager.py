@@ -968,7 +968,7 @@ class GwVisitManager(ParentManage, QObject):
         """Access GUI to manage documents e.g Execute action of button 34 """
         
         visit_id = qt_tools.getText(self.dlg_add_visit, self.dlg_add_visit.visit_id)
-        manage_document = GwDocument(self.iface, self.settings, self.controller, self.plugin_dir, single_tool=False)
+        manage_document = GwDocument(single_tool=False)
         dlg_docman = manage_document.manage_document(
             tablename='visit', qtable=self.dlg_add_visit.tbl_document, item_id=visit_id)
         qt_tools.remove_tab_by_tabName(dlg_docman.tabWidget, 'tab_rel')

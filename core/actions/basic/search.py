@@ -551,7 +551,7 @@ class GwSearch(ApiParent):
     def manage_document(self, qtable, item_id):
         """ Access GUI to manage documents e.g Execute action of button 34 """
 
-        manage_document = GwDocument(self.iface, self.settings, self.controller, self.plugin_dir, single_tool=False)
+        manage_document = GwDocument(single_tool=False)
         dlg_docman = manage_document.manage_document(tablename='workcat', qtable=qtable, item_id=item_id)
         dlg_docman.btn_accept.clicked.connect(partial(self.set_completer_object, dlg_docman, 'doc'))
         qt_tools.remove_tab_by_tabName(dlg_docman.tabWidget, 'tab_rel')

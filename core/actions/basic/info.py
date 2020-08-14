@@ -2408,7 +2408,7 @@ class GwInfo(ApiParent, QObject):
     def manage_new_document(self, dialog, doc_id=None, feature=None):
         """ Execute action of button 34 """
 
-        doc = GwDocument(self.iface, self.settings, self.controller, self.plugin_dir)
+        doc = GwDocument()
         doc.manage_document(feature=feature, geom_type=self.geom_type)
         doc.dlg_add_doc.accepted.connect(partial(self.manage_document_new, dialog, doc))
         doc.dlg_add_doc.rejected.connect(partial(self.manage_document_new, dialog, doc))
