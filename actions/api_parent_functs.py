@@ -838,7 +838,7 @@ def add_horizontal_spacer():
     return widget
 
 
-def add_verical_spacer():
+def add_vertical_spacer():
 
     widget = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
     return widget
