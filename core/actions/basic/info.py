@@ -315,7 +315,7 @@ class GwInfo(ApiParent, QObject):
         elif template == 'dimensioning':
             self.lyr_dim = self.controller.get_layer_by_tablename("v_edit_dimensions", show_warning=True)
             if self.lyr_dim:
-                self.api_dim = GwDimensioning(self.iface, self.settings, self.controller, self.plugin_dir)
+                self.api_dim = GwDimensioning()
                 feature_id = self.complet_result[0]['body']['feature']['id']
                 result, dialog = self.api_dim.open_form(None, self.lyr_dim, self.complet_result, feature_id)
                 return result, dialog

@@ -14,22 +14,27 @@ from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QGrid
 from functools import partial
 
 from lib import qt_tools
-from ....actions.api_parent import ApiParent
 from ....map_tools.snapping_utils_v3 import SnappingConfigManager
 from ....ui_manager import DimensioningUi
+from .... import global_vars
+from ....actions import parent_vars
 
+from ....actions.parent_functs import set_icon
+from ....actions.api_parent_functs import load_settings, save_settings, create_body, put_widgets, open_dialog, \
+    close_dialog, set_setStyleSheet, add_lineedit, set_widget_size, set_data_type, manage_lineedit, add_combobox, \
+    add_checkbox, add_calendar, add_button, add_hyperlink, add_horizontal_spacer, add_vertical_spacer, add_textarea, \
+    add_spinbox, add_tableview, set_headers, populate_table, set_columns_config
 
-class GwDimensioning(ApiParent):
+class GwDimensioning:
 
-    def __init__(self, iface, settings, controller, plugin_dir):
+    def __init__(self):
         """ Class constructor """
 
-        ApiParent.__init__(self, iface, settings, controller, plugin_dir)
-        self.iface = iface
-        self.settings = settings
-        self.controller = controller
-        self.plugin_dir = plugin_dir
-        self.canvas = self.iface.mapCanvas()
+        self.iface = global_vars.iface
+        self.settings = global_vars.settings
+        self.controller = global_vars.controller
+        self.plugin_dir = global_vars.plugin_dir
+        self.canvas = global_vars.canvas
 
         # Snapper
         self.snapper_manager = SnappingConfigManager(self.iface)
@@ -40,16 +45,16 @@ class GwDimensioning(ApiParent):
     def open_form(self, qgis_feature=None, layer=None, db_return=None, fid=None):
 
         self.dlg_dim = DimensioningUi()
-        self.load_settings(self.dlg_dim)
+        load_settings(self.dlg_dim)
 
         # Set signals
         actionSnapping = self.dlg_dim.findChild(QAction, "actionSnapping")
         actionSnapping.triggered.connect(partial(self.snapping, actionSnapping))
-        self.set_icon(actionSnapping, "103")
+        set_icon(actionSnapping, "103")
 
         actionOrientation = self.dlg_dim.findChild(QAction, "actionOrientation")
         actionOrientation.triggered.connect(partial(self.orientation, actionOrientation))
-        self.set_icon(actionOrientation, "133")
+        set_icon(actionOrientation, "133")
 
         # Set layers dimensions, node and connec
         self.layer_dimensions = self.controller.get_layer_by_tablename("v_edit_dimensions")
@@ -69,13 +74,13 @@ class GwDimensioning(ApiParent):
         self.dlg_dim.btn_accept.clicked.connect(partial(self.save_dimensioning, qgis_feature, layer))
         self.dlg_dim.btn_cancel.clicked.connect(partial(self.cancel_dimensioning))
         self.dlg_dim.dlg_closed.connect(partial(self.cancel_dimensioning))
-        self.dlg_dim.dlg_closed.connect(partial(self.save_settings, self.dlg_dim))
+        self.dlg_dim.dlg_closed.connect(partial(save_settings, self.dlg_dim))
 
         self.create_map_tips()
 
         # when funcion is called from new feature
         if db_return is None:
-            body = self.create_body()
+            body = create_body()
             function_name = 'gw_fct_getdimensioning'
             json_result = self.controller.get_json(function_name, body, log_sql=True)
             if json_result is None:
@@ -111,7 +116,7 @@ class GwDimensioning(ApiParent):
                     layout.addWidget(label, 0, field['layoutorder'])
                     layout.addWidget(widget, 1, field['layoutorder'])
                 else:
-                    self.put_widgets(self.dlg_dim, field, label, widget)
+                    put_widgets(self.dlg_dim, field, label, widget)
 
         # Add a QSpacerItem into each QGridLayout of the list
         for layout in layout_list:
@@ -119,14 +124,14 @@ class GwDimensioning(ApiParent):
             layout.addItem(vertical_spacer1)
 
         title = f"DIMENSIONING - {self.fid}"
-        self.open_dialog(self.dlg_dim, dlg_name='dimensioning', title=title)
+        open_dialog(self.dlg_dim, dlg_name='dimensioning', title=title)
         return False, False
 
 
     def cancel_dimensioning(self):
 
         self.iface.actionRollbackEdits().trigger()
-        self.close_dialog(self.dlg_dim)
+        close_dialog(self.dlg_dim)
 
 
     def save_dimensioning(self, qgis_feature, layer):
@@ -168,11 +173,11 @@ class GwDimensioning(ApiParent):
         feature = '"tableName":"v_edit_dimensions", '
         feature += f'"id":"{self.fid}"'
         extras = f'"fields":{{{fields}}}'
-        body = self.create_body(feature=feature, extras=extras)
+        body = create_body(feature=feature, extras=extras)
         result = self.controller.get_json('gw_fct_setdimensioning', body)
      
         # Close dialog
-        self.close_dialog(self.dlg_dim)
+        close_dialog(self.dlg_dim)
 
 
     def deactivate_signals(self, action):
@@ -183,7 +188,7 @@ class GwDimensioning(ApiParent):
             pass
 
         try:
-            self.emit_point.canvasClicked.disconnect()
+            parent_vars.emit_point.canvasClicked.disconnect()
         except TypeError:
             pass
 
@@ -197,8 +202,8 @@ class GwDimensioning(ApiParent):
     def snapping(self, action):
 
         # Set active layer and set signals
-        self.emit_point = QgsMapToolEmitPoint(self.canvas)
-        self.canvas.setMapTool(self.emit_point)
+        parent_vars.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(parent_vars.emit_point)
         if self.deactivate_signals(action):
             return
 
@@ -213,7 +218,7 @@ class GwDimensioning(ApiParent):
         self.dlg_dim.actionOrientation.setChecked(False)
         self.iface.setActiveLayer(self.layer_node)
         self.canvas.xyCoordinates.connect(self.mouse_move)
-        self.emit_point.canvasClicked.connect(partial(self.click_button_snapping, action))
+        parent_vars.emit_point.canvasClicked.connect(partial(self.click_button_snapping, action))
 
 
     def mouse_move(self, point):
@@ -294,9 +299,9 @@ class GwDimensioning(ApiParent):
             action.setChecked(False)
 
     def orientation(self, action):
-
-        self.emit_point = QgsMapToolEmitPoint(self.canvas)
-        self.canvas.setMapTool(self.emit_point)
+    
+        parent_vars.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(parent_vars.emit_point)
         if self.deactivate_signals(action):
             return
 
@@ -309,7 +314,7 @@ class GwDimensioning(ApiParent):
         self.snapper_manager.set_snapping_mode()
 
         self.dlg_dim.actionSnapping.setChecked(False)
-        self.emit_point.canvasClicked.connect(partial(self.click_button_orientation, action))
+        parent_vars.emit_point.canvasClicked.connect(partial(self.click_button_orientation, action))
 
 
     def click_button_orientation(self, action, point, btn):
@@ -391,44 +396,44 @@ class GwDimensioning(ApiParent):
             label.setObjectName('lbl_' + field['widgetname'])
             label.setText(field['label'].capitalize())
             if field['stylesheet'] is not None and 'label' in field['stylesheet']:
-                label = self.set_setStyleSheet(field, label)
+                label = set_setStyleSheet(field, label)
             if 'tooltip' in field:
                 label.setToolTip(field['tooltip'])
             else:
                 label.setToolTip(field['label'].capitalize())
         if field['widgettype'] == 'text' or field['widgettype'] == 'typeahead':
             completer = QCompleter()
-            widget = self.add_lineedit(field)
-            widget = self.set_widget_size(widget, field)
-            widget = self.set_data_type(field, widget)
+            widget = add_lineedit(field)
+            widget = set_widget_size(widget, field)
+            widget = set_data_type(field, widget)
             if field['widgettype'] == 'typeahead':
-                widget = self.manage_lineedit(field, dialog, widget, completer)
+                widget = manage_lineedit(field, dialog, widget, completer)
         elif field['widgettype'] == 'combo':
-            widget = self.add_combobox(field)
-            widget = self.set_widget_size(widget, field)
+            widget = add_combobox(field)
+            widget = set_widget_size(widget, field)
         elif field['widgettype'] == 'check':
-            widget = self.add_checkbox(field)
+            widget = add_checkbox(field)
         elif field['widgettype'] == 'datetime':
-            widget = self.add_calendar(dialog, field)
+            widget = add_calendar(dialog, field)
         elif field['widgettype'] == 'button':
-            widget = self.add_button(dialog, field)
-            widget = self.set_widget_size(widget, field)
+            widget = add_button(dialog, field)
+            widget = set_widget_size(widget, field)
         elif field['widgettype'] == 'hyperlink':
-            widget = self.add_hyperlink(field)
-            widget = self.set_widget_size(widget, field)
+            widget = add_hyperlink(field)
+            widget = set_widget_size(widget, field)
         elif field['widgettype'] == 'hspacer':
-            widget = self.add_horizontal_spacer()
+            widget = add_horizontal_spacer()
         elif field['widgettype'] == 'vspacer':
-            widget = self.add_verical_spacer()
+            widget = add_vertical_spacer()
         elif field['widgettype'] == 'textarea':
-            widget = self.add_textarea(field)
+            widget = add_textarea(field)
         elif field['widgettype'] in 'spinbox':
-            widget = self.add_spinbox(field)
+            widget = add_spinbox(field)
         elif field['widgettype'] == 'tableview':
-            widget = self.add_tableview(db_return, field)
-            widget = self.set_headers(widget, field)
-            widget = self.populate_table(widget, field)
-            widget = self.set_columns_config(widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)
+            widget = add_tableview(db_return, field)
+            widget = set_headers(widget, field)
+            widget = populate_table(widget, field)
+            widget = set_columns_config(widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)
             qt_tools.set_qtv_config(widget)
         widget.setObjectName(widget.property('columnname'))
 
