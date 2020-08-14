@@ -18,23 +18,25 @@ from collections import OrderedDict
 from functools import partial
 
 from lib import qt_tools
-from ....actions.api_parent import ApiParent
-from ....actions.parent import ParentAction
 from ....ui_manager import SelectorUi, MincutManagerUi
 
+from .... import global_vars
+from ....actions.api_parent_functs import get_selector
+from ....actions.parent_functs import load_settings, set_dates_from_to, set_icon, close_dialog, set_table_columns, \
+    open_dialog, get_last_tab, save_current_tab, save_settings
 
-class GwMincutManager(ParentAction):
+
+class GwMincutManager:
 
     def __init__(self, mincut):
         """ Class constructor """
 
         self.mincut = mincut
-        self.canvas = mincut.canvas
-        self.plugin_dir = mincut.plugin_dir
-        self.controller = self.mincut.controller
-        self.schema_name = self.controller.schema_name
-        self.settings = self.mincut.settings
-        self.api_parent = ApiParent(mincut.iface, self.settings, self.controller, self.plugin_dir)
+        self.canvas = global_vars.canvas
+        self.plugin_dir = global_vars.plugin_dir
+        self.controller = global_vars.controller
+        self.schema_name = global_vars.schema_name
+        self.settings = global_vars.settings
 
 
     def mg_mincut_management(self):
@@ -44,12 +46,12 @@ class GwMincutManager(ParentAction):
 
         # Create the dialog and signals
         self.dlg_min_edit = MincutManagerUi()
-        self.load_settings(self.dlg_min_edit)
-        self.set_dates_from_to(self.dlg_min_edit.date_from, self.dlg_min_edit.date_to, 'om_mincut',
+        load_settings(self.dlg_min_edit)
+        set_dates_from_to(self.dlg_min_edit.date_from, self.dlg_min_edit.date_to, 'om_mincut',
             'forecast_start, exec_start', 'forecast_end, exec_end')
         self.dlg_min_edit.date_from.setEnabled(False)
         self.dlg_min_edit.date_to.setEnabled(False)
-        self.set_icon(self.dlg_min_edit.btn_selector_mincut, "191")
+        set_icon(self.dlg_min_edit.btn_selector_mincut, "191")
 
         self.tbl_mincut_edit = self.dlg_min_edit.findChild(QTableView, "tbl_mincut_edit")
         self.txt_mincut_id = self.dlg_min_edit.findChild(QLineEdit, "txt_mincut_id")
@@ -78,15 +80,15 @@ class GwMincutManager(ParentAction):
         self.dlg_min_edit.spn_next_days.valueChanged.connect(self.filter_by_days)
         self.dlg_min_edit.btn_cancel_mincut.clicked.connect(self.set_state_cancel_mincut)
         self.dlg_min_edit.tbl_mincut_edit.doubleClicked.connect(self.open_mincut)
-        self.dlg_min_edit.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_min_edit))
-        self.dlg_min_edit.rejected.connect(partial(self.close_dialog, self.dlg_min_edit))
+        self.dlg_min_edit.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_min_edit))
+        self.dlg_min_edit.rejected.connect(partial(close_dialog, self.dlg_min_edit))
         self.dlg_min_edit.btn_delete.clicked.connect(partial(
             self.delete_mincut_management, self.tbl_mincut_edit, "om_mincut", "id"))
         self.dlg_min_edit.btn_selector_mincut.clicked.connect(partial(
             self.mincut_selector, self.tbl_mincut_edit, 'id'))
         self.btn_notify = self.dlg_min_edit.findChild(QPushButton, "btn_notify")
         self.btn_notify.clicked.connect(partial(self.get_clients_codes, self.dlg_min_edit.tbl_mincut_edit))
-        self.set_icon(self.btn_notify, "307")
+        set_icon(self.btn_notify, "307")
 
         try:
             row = self.controller.get_config('om_mincut_enable_alerts', 'value', 'config_param_system')
@@ -101,12 +103,12 @@ class GwMincutManager(ParentAction):
 
         # Set a model with selected filter. Attach that model to selected table
         self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + ".v_ui_mincut")
-        self.set_table_columns(self.dlg_min_edit, self.tbl_mincut_edit, "v_ui_mincut")
+        set_table_columns(self.dlg_min_edit, self.tbl_mincut_edit, "v_ui_mincut")
 
         #self.mincut.set_table_columns(self.tbl_mincut_edit, "v_ui_mincut")
 
         # Open the dialog
-        self.open_dialog(self.dlg_min_edit, dlg_name='mincut_manager')
+        open_dialog(self.dlg_min_edit, dlg_name='mincut_manager')
 
 
     def get_clients_codes(self, qtable):
@@ -198,7 +200,7 @@ class GwMincutManager(ParentAction):
 
             # Set a model with selected filter. Attach that model to selected table
             self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + ".v_ui_mincut")
-            self.set_table_columns(self.dlg_min_edit, self.tbl_mincut_edit, "v_ui_mincut")
+            set_table_columns(self.dlg_min_edit, self.tbl_mincut_edit, "v_ui_mincut")
 
 
     def set_state_cancel_mincut(self):
@@ -243,16 +245,16 @@ class GwMincutManager(ParentAction):
             return
         selector_values = f'"selector_mincut", "ids":{selected_mincuts}'
         self.dlg_selector = SelectorUi()
-        self.load_settings(self.dlg_selector)
-        current_tab = self.get_last_tab(self.dlg_selector, 'mincut')
-        self.dlg_selector.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_selector))
-        self.dlg_selector.rejected.connect(partial(self.save_settings, self.dlg_selector))
+        load_settings(self.dlg_selector)
+        current_tab = get_last_tab(self.dlg_selector, 'mincut')
+        self.dlg_selector.btn_close.clicked.connect(partial(close_dialog, self.dlg_selector))
+        self.dlg_selector.rejected.connect(partial(save_settings, self.dlg_selector))
         self.dlg_selector.rejected.connect(partial(
-            self.save_current_tab, self.dlg_selector, self.dlg_selector.main_tab, 'mincut'))
+            save_current_tab, self.dlg_selector, self.dlg_selector.main_tab, 'mincut'))
 
-        self.api_parent.get_selector(self.dlg_selector, selector_values, current_tab=current_tab)
+        get_selector(self.dlg_selector, selector_values, current_tab=current_tab)
 
-        self.open_dialog(self.dlg_selector, dlg_name='selector', maximize_button=False)
+        open_dialog(self.dlg_selector, dlg_name='selector', maximize_button=False)
 
 
     def populate_combos(self):
@@ -285,7 +287,7 @@ class GwMincutManager(ParentAction):
         result_mincut_id = self.tbl_mincut_edit.model().record(row).value("id")
 
         # Close this dialog and open selected mincut
-        self.close_dialog(self.dlg_min_edit)
+        close_dialog(self.dlg_min_edit)
         self.mincut.is_new = False
         self.mincut.init_mincut_form()
         self.mincut.load_mincut(result_mincut_id)
