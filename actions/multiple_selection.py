@@ -13,6 +13,7 @@ from qgis.PyQt.QtGui import QColor
 
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 
+from .parent_manage_funct import disconnect_signal_selection_changed, connect_signal_selection_changed
 
 class MultipleSelection(QgsMapTool):
 
@@ -24,7 +25,7 @@ class MultipleSelection(QgsMapTool):
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
         self.mincut = mincut
-        self.parent_manage = parent_manage
+        # self.parent_manage = parent_manage
         self.manage_new_psector = manage_new_psector
         self.table_object = table_object
         self.dialog = dialog
@@ -76,8 +77,9 @@ class MultipleSelection(QgsMapTool):
         # We will reconnect it when processing last layer of the group
         if self.mincut:
             self.mincut.disconnect_signal_selection_changed()
-        if self.parent_manage:
-            self.parent_manage.disconnect_signal_selection_changed()
+            
+        disconnect_signal_selection_changed()
+        
         if self.manage_new_psector:
             self.manage_new_psector.disconnect_signal_selection_changed()
 
@@ -86,8 +88,9 @@ class MultipleSelection(QgsMapTool):
             if i == len(self.layers) - 1:
                 if self.mincut:
                     self.mincut.connect_signal_selection_changed("mincut_connec")
-                if self.parent_manage:
-                    self.parent_manage.connect_signal_selection_changed(self.dialog, self.table_object)
+                    
+                connect_signal_selection_changed(self.dialog, self.table_object)
+                
                 if self.manage_new_psector:
                     self.manage_new_psector.connect_signal_selection_changed(
                         self.manage_new_psector.dlg_plan_psector, self.table_object)

@@ -22,7 +22,6 @@ from .parent_functs import check_expression, close_dialog, get_cursor_multiple_s
     refresh_map_canvas
 
 
-from .multiple_selection import MultipleSelection
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 
 
@@ -739,10 +738,12 @@ def manage_close(dialog, table_object, cur_active_layer=None, excluded_layers=[]
 def selection_init(dialog, table_object, query=False):
     """ Set canvas map tool to an instance of class 'MultipleSelection' """
 
+    from .multiple_selection import MultipleSelection
+    
     if parent_vars.geom_type == 'all':
         parent_vars.geom_type = 'arc'
     multiple_selection = MultipleSelection(global_vars.iface, global_vars.controller, parent_vars.layers[parent_vars.geom_type],
-                                           parent_manage=parent_vars, table_object=table_object, dialog=dialog)
+                                           parent_manage=None, table_object=table_object, dialog=dialog)
     disconnect_signal_selection_changed()
     parent_vars.previous_map_tool = global_vars.canvas.mapTool()
     global_vars.canvas.setMapTool(multiple_selection)

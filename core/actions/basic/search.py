@@ -36,7 +36,7 @@ class GwSearch(ApiParent):
 
         super().__init__(iface, settings, controller, plugin_dir)
         self.manage_new_psector = GwPsector(iface, settings, controller, plugin_dir)
-        self.manage_visit = GwVisitManager(iface, settings, controller, plugin_dir)
+        self.manage_visit = GwVisitManager()
         self.iface = iface
         self.project_type = controller.get_project_type()
         self.json_search = {}

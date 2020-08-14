@@ -336,7 +336,7 @@ class GwInfo(ApiParent, QObject):
         elif template == 'visit':
             visit_id = self.complet_result[0]['body']['feature']['id']
             layers_visibility = self.get_layers_visibility()
-            manage_visit = GwVisitManager(self.iface, self.settings, self.controller, self.plugin_dir)
+            manage_visit = GwVisitManager()
             manage_visit.manage_visit(visit_id=visit_id, tag='info')
             manage_visit.dlg_add_visit.rejected.connect(partial(self.restore_layers_visibility, layers_visibility))
 
@@ -2149,7 +2149,7 @@ class GwInfo(ApiParent, QObject):
     def open_visit(self):
         """ Call button 65: om_visit_management """
 
-        manage_visit = GwVisitManager(self.iface, self.settings, self.controller, self.plugin_dir)
+        manage_visit = GwVisitManager()
         manage_visit.visit_added.connect(self.update_visit_table)
         manage_visit.edit_visit(self.geom_type, self.feature_id)
 
@@ -2172,7 +2172,7 @@ class GwInfo(ApiParent, QObject):
             self.controller.show_warning(msg)
             return
 
-        manage_visit = GwVisitManager(self.iface, self.settings, self.controller, self.plugin_dir)
+        manage_visit = GwVisitManager()
         manage_visit.visit_added.connect(self.update_visit_table)
         # TODO: the following query fix a (for me) misterious bug
         # the DB connection is not available during manage_visit.manage_visit first call
