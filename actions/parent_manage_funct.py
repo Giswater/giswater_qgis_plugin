@@ -539,8 +539,8 @@ def set_table_model(dialog, table_object, geom_type, expr_filter):
 
     # Set a model with selected filter expression
     table_name = f"v_edit_{geom_type}"
-    if parent_vars.schema_name not in table_name:
-        table_name = parent_vars.schema_name + "." + table_name
+    if global_vars.schema_name not in table_name:
+        table_name = global_vars.schema_name + "." + table_name
 
     # Set the model
     model = QSqlTableModel()
@@ -946,8 +946,8 @@ def fill_table_by_expr(qtable, table_name, expr):
     :param qtable: QTableView to show
     :param expr: expression to set model
     """
-    if parent_vars.schema_name not in table_name:
-        table_name = parent_vars.schema_name + "." + table_name
+    if global_vars.schema_name not in table_name:
+        table_name = global_vars.schema_name + "." + table_name
 
     model = QSqlTableModel()
     model.setTable(table_name)
@@ -977,8 +977,8 @@ def disconnect_snapping():
 def fill_table_object(widget, table_name, expr_filter=None):
     """ Set a model with selected filter. Attach that model to selected table """
 
-    if parent_vars.schema_name not in table_name:
-        table_name = parent_vars.schema_name + "." + table_name
+    if global_vars.schema_name not in table_name:
+        table_name = global_vars.schema_name + "." + table_name
 
     # Set model
     model = QSqlTableModel()
@@ -1009,7 +1009,7 @@ def filter_by_id(dialog, widget_table, widget_txt, table_object, field_object_id
         widget_table.model().setFilter(expr)
         widget_table.model().select()
     else:
-        fill_table_object(widget_table, parent_vars.schema_name + "." + table_object)
+        fill_table_object(widget_table, global_vars.schema_name + "." + table_object)
 
 
 def delete_selected_object(widget, table_object):
@@ -1138,8 +1138,8 @@ def set_model_to_table(widget, table_name, expr_filter):
     """ Set a model with selected filter.
     Attach that model to selected table """
 
-    if parent_vars.schema_name not in table_name:
-        table_name = parent_vars.schema_name + "." + table_name
+    if global_vars.schema_name not in table_name:
+        table_name = global_vars.schema_name + "." + table_name
 
     # Set model
     model = QSqlTableModel()

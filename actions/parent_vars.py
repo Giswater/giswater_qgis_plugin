@@ -31,7 +31,6 @@ xyCoordinates_conected = None
 snapped_point  = None
 x  = None
 y = None
-schema_name  = None
 plan_om = None
 ids = None
 list_ids = None
