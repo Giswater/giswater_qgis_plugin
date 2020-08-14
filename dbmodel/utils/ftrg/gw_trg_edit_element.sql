@@ -10,25 +10,93 @@ This version of Giswater is provided by Giswater Association
 -- DROP FUNCTION "SCHEMA_NAME".gw_trg_edit_element();
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_element()
-  RETURNS trigger AS
+RETURNS trigger AS
 $BODY$
 DECLARE 
-	v_expl_id_int integer;
-	v_code_autofill_bool boolean;
+
+element_seq int8;
+expl_id_int integer;
+code_autofill_bool boolean;
+
+v_doublegeometry boolean;
+v_length float;
+v_width float;
+v_rotation float;
+v_unitsfactor float;
+v_linelocatepoint float;
+v_thegeom public.geometry;
+v_the_geom_pol public.geometry;
+p21x float; 
+p02x float;
+p21y float; 
+p02y float;
+p22x float;
+p22y float;
+p01x float;
+p01y float;
+dx float;
+dy float;
+v_x float;
+v_y float;
+v_new_pol_id varchar(16);
+v_srid integer;
+
+v_feature text;
+v_tablefeature text;
 
 BEGIN
 
-    EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
--- INSERT
+	-- get values
+	v_unitsfactor = (SELECT value::float FROM config_param_user WHERE "parameter"='edit_element_doublegeom' AND cur_user=current_user);
+	IF v_unitsfactor IS NULL THEN
+		v_unitsfactor = 1;
+	END IF;
 
+	v_srid = (SELECT epsg FROM version limit 1);
+
+	-- get associated feature
+	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
+		v_feature = (SELECT node_id FROM v_edit_node WHERE st_dwithin(the_geom, NEW.the_geom, 0.001));
+		IF v_feature IS NULL THEN
+			v_feature = (SELECT arc_id FROM v_edit_arc WHERE st_dwithin(the_geom, NEW.the_geom, 0.001));
+			IF v_feature IS NULL THEN
+				v_feature = (SELECT connec_id FROM v_edit_connec WHERE st_dwithin(the_geom, NEW.the_geom, 0.001));		
+				IF v_feature IS NULL THEN
+					v_feature = (SELECT gully_id FROM v_edit_gully WHERE st_dwithin(the_geom, NEW.the_geom, 0.001));				
+					IF v_feature IS NULL THEN
+						v_tablefeature = 'gully';
+					END IF;
+				ELSE
+					v_tablefeature = 'connec';
+				END IF;
+			ELSE
+				v_tablefeature = 'arc';
+			END IF;
+		v_tablefeature = 'node';
+		END IF;
+	END IF;
+ 	
+	-- INSERT
 	IF TG_OP = 'INSERT' THEN
+
+		-- element_id
+		IF (NEW.element_id IS NULL) THEN
+			PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
+			NEW.element_id:= (SELECT nextval('urn_id_seq'));
+		END IF;
+
+		-- update element_x_feature table
+		IF v_tablefeature IS NOT NULL THEN
+			EXECUTE 'INSERT INTO element_x_'||v_tablefeature||' ('||v_tablefeature'_id, element_id) VALUES ('||v_feature||','||NEW.element_id||')';
+		END IF;
+		
 
 		-- Cat element
 		IF (NEW.elementcat_id IS NULL) THEN
 			NEW.elementcat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='edit_elementcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;
-	
 	
 		-- Verified
 		IF (NEW.verified IS NULL) THEN
@@ -40,7 +108,7 @@ BEGIN
 			NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_state_vdefault' AND "cur_user"="current_user"());
 		END IF;
         
-        -- State type
+		-- State type
 		IF (NEW.state_type IS NULL) THEN
 			NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='state_type_vdefault' AND "cur_user"="current_user"());
 		END IF;
@@ -81,23 +149,88 @@ BEGIN
 		END IF;
 
 		-- LINK
-	    IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_usefid_on_linkid')::boolean=TRUE THEN
-	       NEW.link=NEW.element_id;
-	    END IF;
+		IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_automatic_insert_link')::boolean=TRUE THEN
+			NEW.link=NEW.element_id;
+		END IF;
+
+		--set rotation field
+		WITH index_query AS(
+		SELECT ST_Distance(the_geom, NEW.the_geom) as distance, the_geom FROM arc WHERE state=1 ORDER BY the_geom <-> NEW.the_geom LIMIT 10)
+		SELECT St_linelocatepoint(the_geom, St_closestpoint(the_geom, NEW.the_geom)), the_geom INTO v_linelocatepoint, v_thegeom FROM index_query ORDER BY distance LIMIT 1;
+		IF v_linelocatepoint < 0.01 THEN
+			v_rotation = st_azimuth (st_startpoint(v_thegeom), st_lineinterpolatepoint(v_thegeom,0.01));
+		ELSIF v_linelocatepoint > 0.99 THEN
+			v_rotation = st_azimuth (st_lineinterpolatepoint(v_thegeom,0.98), st_lineinterpolatepoint(v_thegeom,0.99));
+		ELSE
+			v_rotation = st_azimuth (st_lineinterpolatepoint(v_thegeom,v_linelocatepoint), st_lineinterpolatepoint(v_thegeom,v_linelocatepoint+0.01));
+		END IF;
+
+		NEW.rotation = v_rotation*180/pi();
+		v_rotation = -(v_rotation - pi()/2);
+
+		v_doublegeometry = (SELECT isdoublegeom FROM cat_element WHERE id = NEW.elementcat_id);
+
+		-- double geometry
+		IF v_doublegeometry AND NEW.elementcat_id IS NOT NULL THEN
+
+			v_length = (SELECT geom1 FROM cat_element WHERE id=NEW.elementcat_id);
+			v_width = (SELECT geom2 FROM cat_element WHERE id=NEW.elementcat_id);
+
+			IF v_length*v_width IS NULL THEN
+			
+				RAISE EXCEPTION 'Null values on geom1 or geom2 fields. Check your catalog before continue';
+				
+			ELSIF v_length*v_width != 0 THEN
+ 
+				-- get element dimensions
+				v_unitsfactor = 0.01*v_unitsfactor ; -- using 0.01 to convert from cms of catalog  to meters of the map
+				v_length = v_length*v_unitsfactor;
+				v_width = v_width*v_unitsfactor;
+
+				-- calculate center coordinates
+				v_x = st_x(NEW.the_geom);
+				v_y = st_y(NEW.the_geom);
+	    
+				-- calculate dx & dy to fix extend from center
+				dx = v_length/2;
+				dy = v_width/2;
+
+				-- calculate the extend polygon
+				p01x = v_x - dx*cos(v_rotation)-dy*sin(v_rotation);
+				p01y = v_y - dx*sin(v_rotation)+dy*cos(v_rotation);
 		
+				p02x = v_x + dx*cos(v_rotation)-dy*sin(v_rotation);
+				p02y = v_y + dx*sin(v_rotation)+dy*cos(v_rotation);
 
+				p21x = v_x - dx*cos(v_rotation)+dy*sin(v_rotation);
+				p21y = v_y - dx*sin(v_rotation)-dy*cos(v_rotation); 
+
+				p22x = v_x + dx*cos(v_rotation)+dy*sin(v_rotation);
+				p22y = v_y + dx*sin(v_rotation)-dy*cos(v_rotation);
+				
+
+				-- generating the geometry
+				EXECUTE 'SELECT ST_Multi(ST_makePolygon(St_SetSrid(ST_GeomFromText(''LINESTRING(' || p21x ||' '|| p21y || ',' ||
+					p22x ||' '|| p22y || ',' || p02x || ' ' || p02y || ','|| p01x ||' '|| p01y || ',' || p21x ||' '|| p21y || ')''),'||v_srid||')))'
+					INTO v_the_geom_pol;
+				
+				PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
+				v_new_pol_id:= (SELECT nextval('urn_id_seq'));
+
+				INSERT INTO polygon(sys_type, the_geom, pol_id) VALUES ('ELEMENT', v_the_geom_pol, v_new_pol_id);
+			END IF;
+		END IF;
+		
 		-- FEATURE INSERT      
-
 		INSERT INTO element (element_id, code, elementcat_id, serial_number, "state", state_type, observ, "comment", function_type, category_type, location_type, 
 		workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, rotation, link, verified, the_geom, label_x, label_y, label_rotation, publish, 
-		inventory, undelete, expl_id, num_elements, lastupdate, lastupdate_user)
+		inventory, undelete, expl_id, num_elements, pol_id)
 		VALUES (NEW.element_id, NEW.code, NEW.elementcat_id, NEW.serial_number, NEW."state", NEW.state_type, NEW.observ, NEW."comment", 
 		NEW.function_type, NEW.category_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, 
 		NEW.ownercat_id, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.label_x, NEW.label_y, NEW.label_rotation, NEW.publish, 
-		NEW.inventory, NEW.undelete, NEW.expl_id, NEW.num_elements, now(), current_user);
+		NEW.inventory, NEW.undelete, NEW.expl_id, NEW.num_elements, v_new_pol_id);
 			
-		RETURN NEW;
-						
+		RETURN NEW;			
 
 	-- UPDATE
 	ELSIF TG_OP = 'UPDATE' THEN
@@ -110,9 +243,67 @@ BEGIN
 		lastupdate=now(), lastupdate_user=current_user
 		WHERE element_id=OLD.element_id;
 
-        RETURN NEW;
-    
 
+		v_doublegeometry = (SELECT isdoublegeom FROM cat_element WHERE id = NEW.elementcat_id);
+
+		-- double geometry catalog update
+		IF v_doublegeometry AND NEW.elementcat_id != OLD.elementcat_id THEN
+
+			v_length = (SELECT geom1 FROM cat_element WHERE id=NEW.elementcat_id);
+			v_width = (SELECT geom2 FROM cat_element WHERE id=NEW.elementcat_id);
+
+			IF v_length*v_width IS NULL THEN
+					RAISE EXCEPTION 'Null values on geom1 or geom2 fields. Check your catalog before continue';
+				
+			ELSIF v_length*v_width != 0 THEN
+
+				-- get grate dimensions
+				v_unitsfactor = 0.01*v_unitsfactor; -- using 0.01 to convert from cms of catalog  to meters of the map
+				v_length = v_length*v_unitsfactor;
+				v_width = v_width*v_unitsfactor;
+
+				-- calculate center coordinates
+				v_x = st_x(NEW.the_geom);
+				v_y = st_y(NEW.the_geom);
+	    
+				-- calculate dx & dy to fix extend from center
+				dx = v_length/2;
+				dy = v_width/2;
+
+				-- calculate the extend polygon
+				p01x = v_x - dx*cos(v_rotation)-dy*sin(v_rotation);
+				p01y = v_y - dx*sin(v_rotation)+dy*cos(v_rotation);
+		
+				p02x = v_x + dx*cos(v_rotation)-dy*sin(v_rotation);
+				p02y = v_y + dx*sin(v_rotation)+dy*cos(v_rotation);
+
+				p21x = v_x - dx*cos(v_rotation)+dy*sin(v_rotation);
+				p21y = v_y - dx*sin(v_rotation)-dy*cos(v_rotation); 
+
+				p22x = v_x + dx*cos(v_rotation)+dy*sin(v_rotation);
+				p22y = v_y + dx*sin(v_rotation)-dy*cos(v_rotation);
+				
+				-- generating the geometry
+				EXECUTE 'SELECT ST_Multi(ST_makePolygon(St_SetSrid(ST_GeomFromText(''LINESTRING(' || p21x ||' '|| p21y || ',' ||
+					p22x ||' '|| p22y || ',' || p02x || ' ' || p02y || ','|| p01x ||' '|| p01y || ',' || p21x ||' '|| p21y || ')''),'||v_srid||')))'
+					INTO v_the_geom_pol;
+
+				PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
+				v_new_pol_id:= (SELECT nextval('urn_id_seq'));
+
+				IF (SELECT pol_id FROM gully WHERE gully_id = NEW.gully_id) IS NULL THEN
+					INSERT INTO polygon(sys_type, the_geom,pol_id) VALUES ('ELEMENT', v_the_geom_pol,v_new_pol_id);
+					UPDATE element SET pol_id=v_new_pol_id WHERE element_id = NEW.element_id;
+
+				ELSE
+					UPDATE polygon SET the_geom = v_the_geom_pol WHERE pol_id = (SELECT pol_id FROM element WHERE element_id = NEW.element_id);
+				END IF;
+				
+			END IF;
+		END IF;		
+
+		RETURN NEW;
+    
 	-- DELETE
 	ELSIF TG_OP = 'DELETE' THEN
 		DELETE FROM element WHERE element_id=OLD.element_id;

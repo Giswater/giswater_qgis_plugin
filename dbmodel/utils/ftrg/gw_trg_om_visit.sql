@@ -51,8 +51,10 @@ BEGIN
 				UPDATE om_visit_lot SET status = 4, real_startdate = NOW() WHERE id=NEW.lot_id;
 			END IF;
 
-			IF NEW.status <> 4 THEN 
+			-- when visit is not finished
+			IF NEW.status < 4 THEN 
 				NEW.enddate=null;
+				
 			-- when visit is finished and it has not lot_id assigned visit is automatic published
 			ELSIF NEW.status=4 AND NEW.lot_id IS NULL THEN
 				UPDATE om_visit SET publish=TRUE WHERE id=NEW.id;
@@ -63,8 +65,7 @@ BEGIN
 
 		ELSIF v_triggerfromtable ='om_visit_x_feature' THEN -- change feature_x_lot status (when function is triggered by om_visit_x_*
 
-
-        --TODO: when visit is inserted via QGIS, we need to set class_id (adding this widget in the form of the new visit)
+			--TODO: when visit is inserted via QGIS, we need to set class_id (adding this widget in the form of the new visit)
         
 			SELECT * INTO v_visit FROM om_visit WHERE id=NEW.visit_id;
 
@@ -124,7 +125,7 @@ BEGIN
 
 		-- move status of lot element to status=0 (visited)
 
-		IF NEW.status = 4 AND OLD.status <> 4 THEN 
+		IF NEW.status = 4 AND OLD.status < 4 THEN 
 		
 			v_featuretype = (SELECT lower(feature_type) FROM om_visit_lot WHERE id = NEW.lot_id LIMIT 1);
 
@@ -171,6 +172,7 @@ BEGIN
 			IF NEW.status=5 AND NEW.lot_id IS NOT NULL THEN
 				UPDATE om_visit SET publish=TRUE WHERE id=NEW.id;
 			END IF;
+			
 		END IF;
 
 		IF v_version > '3.2.019' THEN
