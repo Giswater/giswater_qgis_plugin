@@ -7,7 +7,7 @@ class GwMincutButton(GwParentAction):
 	def __init__(self, icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir):
 		super().__init__(icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir)
 		
-		self.mincut = GwMincut(self.iface, self.settings, self.controller, self.plugin_dir)
+		self.mincut = GwMincut()
 	
 	
 	def clicked_event(self):
