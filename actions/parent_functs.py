@@ -686,21 +686,21 @@ def zoom_to_selected_features(layer, geom_type=None, zoom=None):
 
     global_vars.iface.setActiveLayer(layer)
     global_vars.iface.actionZoomToSelected().trigger()
-    
-    if geom_type:
-        
+
+    if geom_type and zoom:
+
         # Set scale = scale_zoom
         if geom_type in ('node', 'connec', 'gully'):
-            scale = self.scale_zoom
-        
+            scale = zoom
+
         # Set scale = max(current_scale, scale_zoom)
         elif geom_type == 'arc':
             scale = global_vars.iface.mapCanvas().scale()
-            if int(scale) < int(self.scale_zoom):
-                scale = self.scale_zoom
+            if int(scale) < int(zoom):
+                scale = zoom
         else:
             scale = 5000
-        
+
         if zoom is not None:
             scale = zoom
 
