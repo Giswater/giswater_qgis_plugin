@@ -13,21 +13,19 @@ from functools import partial
 from collections import OrderedDict
 
 from lib import qt_tools
-from ....actions.api_parent import ApiParent
 from ....ui_manager import InfoCatalogUi
 
+from .... import global_vars
 
-class GwCatalog(ApiParent):
+from ....actions.api_parent_functs import create_body, load_settings, open_dialog, save_settings
 
-    def __init__(self, iface, settings, controller, plugin_dir):
+
+class GwCatalog:
+
+    def __init__(self):
         """ Class to control toolbar 'om_ws' """
-
-        ApiParent.__init__(self, iface, settings, controller, plugin_dir)
-
-
-    def set_project_type(self, project_type):
-
-        self.project_type = project_type
+        
+        self.controller = global_vars.controller
 
 
     def api_catalog(self, previous_dialog, widget_name, geom_type, feature_type):
@@ -39,7 +37,7 @@ class GwCatalog(ApiParent):
         form_name = 'upsert_catalog_' + geom_type + ''
         form = f'"formName":"{form_name}", "tabName":"data", "editable":"TRUE"'
         feature = f'"feature_type":"{feature_type}"'
-        body = self.create_body(form, feature)
+        body = create_body(form, feature)
         sql = f"SELECT gw_fct_getcatalog({body})::text"
         row = self.controller.get_row(sql, log_sql=True)
         if not row:
@@ -51,7 +49,7 @@ class GwCatalog(ApiParent):
         self.filter_form = QGridLayout()
 
         self.dlg_catalog = InfoCatalogUi()
-        self.load_settings(self.dlg_catalog)
+        load_settings(self.dlg_catalog)
         self.dlg_catalog.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_catalog))
         self.dlg_catalog.btn_accept.clicked.connect(partial(self.fill_geomcat_id, previous_dialog, widget_name))
 
@@ -98,7 +96,7 @@ class GwCatalog(ApiParent):
                                          pnom, dnom, id, feature_type, geom_type))
 
         # Open form
-        self.open_dialog(self.dlg_catalog, dlg_name='info_catalog')
+        open_dialog(self.dlg_catalog, dlg_name='info_catalog')
 
 
     def get_api_catalog(self, matcat_id, pnom, dnom, id, feature_type, geom_type):
@@ -116,7 +114,7 @@ class GwCatalog(ApiParent):
         elif self.controller.get_project_type() == 'ud':
             extras = f'"fields":{{"matcat_id":"{matcat_id_value}", "shape":"{pn_value}", "geom1":"{dn_value}"}}'
 
-        body = self.create_body(form=form, feature=feature, extras=extras)
+        body = create_body(form=form, feature=feature, extras=extras)
         sql = f"SELECT gw_fct_getcatalog({body})::text"
         row = self.controller.get_row(sql, log_sql=True)
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
@@ -138,7 +136,7 @@ class GwCatalog(ApiParent):
         form = f'"formName":"{form_name}", "tabName":"data", "editable":"TRUE"'
         feature = f'"feature_type":"{feature_type}"'
         extras = f'"fields":{{"matcat_id":"{matcat_id_value}"}}'
-        body = self.create_body(form=form, feature=feature, extras=extras)
+        body = create_body(form=form, feature=feature, extras=extras)
         sql = f"SELECT gw_fct_getcatalog({body})::text"
         row = self.controller.get_row(sql, log_sql=True)
         complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
@@ -206,7 +204,7 @@ class GwCatalog(ApiParent):
     def close_dialog(self, dlg=None):
         """ Close dialog """
         try:
-            self.save_settings(dlg)
+            save_settings(dlg)
             dlg.close()
 
         except AttributeError:

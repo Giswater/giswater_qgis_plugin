@@ -1321,7 +1321,7 @@ class GwInfo(ApiParent, QObject):
 
     def open_catalog(self, tab_type, feature_type):
 
-        self.catalog = GwCatalog(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.catalog = GwCatalog()
 
         # Check geom_type
         if self.geom_type == 'connec':

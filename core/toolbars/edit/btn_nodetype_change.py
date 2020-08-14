@@ -40,7 +40,7 @@ class GwNodeTypeChangeButton(GwParentMapTool):
 			msg = "New node type is null. Please, select a valid value."
 			self.controller.show_info_box(msg, "Info")
 			return
-		self.catalog = GwCatalog(self.iface, self.settings, self.controller, self.plugin_dir)
+		self.catalog = GwCatalog()
 		self.catalog.api_catalog(self.dlg_chg_node_type, 'node_nodecat_id', 'node', feature_type)
 	
 	

@@ -134,7 +134,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
         sql = f"SELECT lower(feature_type) FROM cat_feature WHERE id = '{feature_type}'"
         row = self.controller.get_row(sql)
 
-        self.catalog = GwCatalog(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.catalog = GwCatalog()
         self.catalog.api_catalog(self.dlg_replace, 'featurecat_id', row[0], feature_type)
 
 
