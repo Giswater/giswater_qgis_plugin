@@ -227,11 +227,9 @@ def exist_object(dialog, table_object):
             set_calendars(dialog, 'builtdate', 'config_param_user', 'value', 'edit_builtdate_vdefault')
             set_combo(dialog, 'workcat_id', 'cat_work',
                            'edit_workcat_vdefault', field_id='id', field_name='id')
-        if hasattr(self, 'single_tool_mode'):
-            # some tools can work differently if standalone or integrated in
-            # another tool
-            if parent_vars.single_tool_mode:
-                remove_selection(True)
+
+        if parent_vars.single_tool_mode:
+            remove_selection(True)
         else:
             remove_selection(True)
         reset_model(dialog, table_object, "arc")
@@ -715,10 +713,9 @@ def manage_close(dialog, table_object, cur_active_layer=None, excluded_layers=[]
 
     if cur_active_layer:
         global_vars.iface.setActiveLayer(cur_active_layer)
-    if hasattr(self, 'single_tool_mode'):
-        # some tools can work differently if standalone or integrated in
-        # another tool
-        if parent_vars.single_tool_mode:
+    # some tools can work differently if standalone or integrated in
+    # another tool
+    if parent_vars.single_tool_mode:
             remove_selection(True)
     else:
         remove_selection(True)

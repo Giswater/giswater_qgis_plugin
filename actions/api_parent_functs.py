@@ -1859,7 +1859,7 @@ def get_selector(dialog, selector_type, filter=False, widget=None, text_filter=N
     if tab:
         main_tab.setCurrentWidget(tab)
 
-    if is_setselector is not None and hasattr(self, 'widget_filter'):
+    if is_setselector is not None:
         widget = dialog.main_tab.findChild(QLineEdit, f'txt_filter_{tabname}')
         if widget:
             widget.blockSignals(True)
