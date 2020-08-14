@@ -1141,7 +1141,7 @@ def manage_close_interpolate():
     remove_interpolate_rb()
 
 
-def activate_snapping(complet_result, ep):
+def activate_snapping(complet_result, ep, last_point=None):
     
     parent_vars.rb_interpolate = []
     parent_vars.interpolate_result = None
@@ -1186,7 +1186,7 @@ def activate_snapping(complet_result, ep):
     global_vars.iface.setActiveLayer(parent_vars.layer_node)
 
     global_vars.canvas.xyCoordinates.connect(partial(mouse_move))
-    ep.canvasClicked.connect(partial(snapping_node, ep))
+    ep.canvasClicked.connect(partial(snapping_node, ep, last_point))
 
 
 def dlg_destroyed(layer=None, vertex=None):
@@ -1210,7 +1210,7 @@ def dlg_destroyed(layer=None, vertex=None):
         pass
 
 
-def snapping_node(ep, point, button):
+def snapping_node(ep, point, button, last_point=None):
     """ Get id of selected nodes (node1 and node2) """
 
     if button == 2:
@@ -1252,8 +1252,8 @@ def snapping_node(ep, point, button):
         global_vars.iface.setActiveLayer(parent_vars.layer)
         global_vars.iface.mapCanvas().scene().removeItem(parent_vars.vertex_marker)
         extras = f'"parameters":{{'
-        extras += f'"x":{self.last_point[0]}, '
-        extras += f'"y":{self.last_point[1]}, '
+        extras += f'"x":{last_point[0]}, '
+        extras += f'"y":{last_point[1]}, '
         extras += f'"node1":"{parent_vars.node1}", '
         extras += f'"node2":"{parent_vars.node2}"}}'
         body = create_body(extras=extras)

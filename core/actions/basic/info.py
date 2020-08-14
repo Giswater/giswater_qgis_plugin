@@ -612,7 +612,8 @@ class GwInfo(ApiParent, QObject):
         action_section.triggered.connect(partial(self.open_section_form))
         action_help.triggered.connect(partial(self.api_action_help, self.geom_type))
         self.ep = QgsMapToolEmitPoint(self.canvas)
-        action_interpolate.triggered.connect(partial(self.activate_snapping, complet_result, self.ep))
+        action_interpolate.triggered.connect(partial(self.activate_snapping, complet_result, self.ep,
+                                                     last_point=self.last_point))
 
         btn_cancel = self.dlg_cf.findChild(QPushButton, 'btn_cancel')
         btn_accept = self.dlg_cf.findChild(QPushButton, 'btn_accept')
