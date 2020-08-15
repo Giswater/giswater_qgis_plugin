@@ -20,7 +20,6 @@ from .. import global_vars
 from ..lib.qgis_tools import QgisTools
 from ..ui_manager import DialogTextUi
 from ..core.notify_tools import GwNotifyTools
-from ..actions.parent import ParentAction
 
 from .actions.basic.search import GwSearch
 
@@ -106,9 +105,6 @@ class LoadProject(QObject):
         status = self.check_layers_from_distinct_schema()
         if status is False:
             return
-
-        # TODO: Refactor this
-        self.controller.parent = ParentAction(self.iface, self.settings, self.controller, self.plugin_dir)
 
         # Get water software from table 'version'
         self.project_type = self.controller.get_project_type()

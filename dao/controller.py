@@ -28,8 +28,10 @@ from .logger import Logger
 from lib import os_tools, qt_tools
 from ..ui_manager import DialogTextUi, DockerUi
 
+from ..actions.parent_functs import manage_return_manager, manage_layer_manager, manage_actions
 
-class DaoController(object):
+
+class DaoController:
 
     def __init__(self, plugin_name, iface, logger_name='plugin', create_logger=True):
         """ Class constructor """
@@ -58,7 +60,6 @@ class DaoController(object):
         self.docker_type = None
         self.show_docker = None
         self.prev_maptool = None
-        self.parent = None
         if create_logger:
             self.set_logger(logger_name)
 
@@ -811,9 +812,9 @@ class DaoController(object):
 
         try:
             # Layer styles
-            self.parent.manage_return_manager(json_result, sql)
-            self.parent.manage_layer_manager(json_result, sql)
-            self.parent.manage_actions(json_result, sql)
+            manage_return_manager(json_result, sql)
+            manage_layer_manager(json_result, sql)
+            manage_actions(json_result, sql)
         except Exception:
             pass
 

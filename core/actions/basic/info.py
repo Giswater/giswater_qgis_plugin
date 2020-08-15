@@ -649,7 +649,6 @@ class GwInfo(QObject):
             btn_accept.clicked.connect(partial(
                 self.accept, self.dlg_cf, self.complet_result[0], self.my_json))
             self.dlg_cf.dlg_closed.connect(self.roll_back)
-            self.dlg_cf.dlg_closed.connect(partial(self.controller.parent.resetRubberbands))
             self.dlg_cf.dlg_closed.connect(partial(resetRubberbands))
             self.dlg_cf.dlg_closed.connect(partial(save_settings, self.dlg_cf))
             self.dlg_cf.dlg_closed.connect(partial(self.set_vdefault_edition))
@@ -726,7 +725,6 @@ class GwInfo(QObject):
 
         self.roll_back()
         resetRubberbands()
-        self.controller.parent.resetRubberbands()
         self.set_vdefault_edition()
 
 
