@@ -241,7 +241,7 @@ class GwAdmin(ApiParent):
 
     def manage_translations(self):
 
-        qm_gen = GwI18NGenerator(self.iface, self.settings, self.controller, self.plugin_dir)
+        qm_gen = GwI18NGenerator()
         qm_gen.init_dialog()
 
 

@@ -128,8 +128,7 @@ class LoadProject(QObject):
 
         # Create a thread to listen selected database channels
         if global_vars.settings.value('system_variables/use_notify').upper() == 'TRUE':
-            self.notify = GwNotifyTools(self.iface, global_vars.settings, self.controller, self.plugin_dir)
-            self.notify.set_controller(self.controller)
+            self.notify = GwNotifyTools()
             list_channels = ['desktop', self.controller.current_user]
             self.notify.start_listening(list_channels)
 

@@ -13,30 +13,32 @@ import subprocess
 from functools import partial
 
 from lib import qt_tools
-from ..actions.parent import ParentAction
 from ..ui_manager import MainQtDialogUi
 
+from .. import global_vars
+from ..actions.parent_functs import load_settings, open_dialog, close_dialog, get_plugin_version
 
-class GwI18NGenerator(ParentAction):
 
-    def __init__(self, iface, settings, controller, plugin_dir):
-        ParentAction.__init__(self, iface, settings, controller, plugin_dir)
-        self.plugin_dir = plugin_dir
+class GwI18NGenerator:
+
+    def __init__(self):
+        self.plugin_dir = global_vars.plugin_dir
+        self.controller = global_vars.controller
 
 
     def init_dialog(self):
         self.dlg_qm = MainQtDialogUi()
-        self.load_settings(self.dlg_qm)
+        load_settings(self.dlg_qm)
         self.load_user_values()
 
         self.dlg_qm.btn_translate.setEnabled(False)
 
         self.dlg_qm.btn_connection.clicked.connect(self.check_connection)
         self.dlg_qm.btn_translate.clicked.connect(self.check_translate_options)
-        self.dlg_qm.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_qm))
+        self.dlg_qm.btn_close.clicked.connect(partial(close_dialog, self.dlg_qm))
         self.dlg_qm.rejected.connect(self.save_user_values)
         self.dlg_qm.rejected.connect(self.close_db)
-        self.open_dialog(self.dlg_qm, dlg_name='main_qtdialog')
+        open_dialog(self.dlg_qm, dlg_name='main_qtdialog')
 
 
     def check_connection(self):
@@ -249,7 +251,7 @@ class GwI18NGenerator(ParentAction):
         db_lang = qt_tools.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 1)
         file_lng = qt_tools.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 3)
 
-        version_metadata = self.get_plugin_version()
+        version_metadata = get_plugin_version()
         ver = version_metadata.split('.')
         plugin_version = f'{ver[0]}{ver[1]}'
         plugin_release = version_metadata.replace('.', '')
@@ -283,7 +285,7 @@ class GwI18NGenerator(ParentAction):
         db_lang = qt_tools.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 1)
         file_lng = qt_tools.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 3)
 
-        version_metadata = self.get_plugin_version()
+        version_metadata = get_plugin_version()
         ver = version_metadata.split('.')
         plugin_version = f'{ver[0]}{ver[1]}'
         plugin_release = version_metadata.replace('.', '')
