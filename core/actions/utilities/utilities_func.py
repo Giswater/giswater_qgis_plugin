@@ -18,25 +18,25 @@ from .config import GwConfig
 from ..om.composer_tools import GwComposerTools
 from ...project_check import GwProjectCheck
 from .toolbox import GwToolBox
-from ....actions.parent import ParentAction
 from ..om.visit_manager import GwVisitManager
 from ....ui_manager import CsvUi
 
+from .... import global_vars
+from ....actions import parent_vars
 
-class GwUtilities(ParentAction):
+from ....actions.parent_functs import load_settings, close_dialog, open_dialog, create_body
 
-    def __init__(self, iface, settings, controller, plugin_dir):
+
+class GwUtilities:
+
+    def __init__(self):
         """ Class to control toolbar 'om_ws' """
 
-        ParentAction.__init__(self, iface, settings, controller, plugin_dir)
         self.manage_visit = GwVisitManager()
         self.toolbox = GwToolBox()
-
-        self.project_type = controller.get_project_type()
         
-
-    def set_project_type(self, project_type):
-        self.project_type = project_type
+        self.controller = global_vars.controller
+        self.project_type = global_vars.project_type
 
 
     def api_config(self):
@@ -50,7 +50,7 @@ class GwUtilities(ParentAction):
 
         self.func_name = None
         self.dlg_csv = CsvUi()
-        self.load_settings(self.dlg_csv)
+        load_settings(self.dlg_csv)
 
         # Get roles from BD
         roles = self.controller.get_rolenames()
@@ -65,8 +65,8 @@ class GwUtilities(ParentAction):
         self.dlg_csv.rb_semicolon.setChecked(True)
 
         # Signals
-        self.dlg_csv.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_csv))
-        self.dlg_csv.rejected.connect(partial(self.close_dialog, self.dlg_csv))
+        self.dlg_csv.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_csv))
+        self.dlg_csv.rejected.connect(partial(close_dialog, self.dlg_csv))
         self.dlg_csv.btn_accept.clicked.connect(partial(self.write_csv, self.dlg_csv, temp_tablename))
         self.dlg_csv.cmb_import_type.currentIndexChanged.connect(partial(self.update_info, self.dlg_csv))
         self.dlg_csv.cmb_import_type.currentIndexChanged.connect(partial(self.get_function_name))
@@ -82,7 +82,7 @@ class GwUtilities(ParentAction):
         self.dlg_csv.progressBar.setVisible(False)
 
         # Open dialog
-        self.open_dialog(self.dlg_csv, dlg_name='csv')
+        open_dialog(self.dlg_csv, dlg_name='csv')
 
 
     def get_function_name(self):
@@ -242,14 +242,14 @@ class GwUtilities(ParentAction):
 
         extras = f'"importParam":"{label_aux}"'
         extras += f', "fid":"{fid_aux}"'
-        body = self.create_body(extras=extras)
+        body = create_body(extras=extras)
 
         result = self.controller.get_json(self.func_name, body, log_sql=True)
         if not result:
             return
         else:
             if result['status'] == "Accepted":
-                self.add_layer.populate_info_text(dialog, result['body']['data'])
+                parent_vars.add_layer.populate_info_text(dialog, result['body']['data'])
             msg = result['message']['text']
             self.controller.show_info_box(msg)
 
@@ -338,7 +338,7 @@ class GwUtilities(ParentAction):
         file_csv = qt_tools.getWidgetText(self.dlg_csv, 'txt_file_csv')
         # Set default value if necessary
         if file_csv is None or file_csv == '':
-            file_csv = self.plugin_dir
+            file_csv = global_vars.plugin_dir
         # Get directory of that file
         folder_path = os.path.dirname(file_csv)
         if not os.path.exists(folder_path):
@@ -382,6 +382,6 @@ class GwUtilities(ParentAction):
         # Return layers in the same order as listed in TOC
         layers = self.controller.get_layers()
 
-        self.check_project_result = GwProjectCheck(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.check_project_result = GwProjectCheck(global_vars.iface, global_vars.settings, self.controller, global_vars.plugin_dir)
         self.check_project_result.populate_audit_check_project(layers, "false")
 
