@@ -30,7 +30,7 @@ class GwUtilities(ParentAction):
 
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
         self.manage_visit = GwVisitManager()
-        self.toolbox = GwToolBox(iface, settings, controller, plugin_dir)
+        self.toolbox = GwToolBox()
 
         self.project_type = controller.get_project_type()
         

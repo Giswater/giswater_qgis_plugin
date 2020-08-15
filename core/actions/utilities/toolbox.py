@@ -19,25 +19,29 @@ from functools import partial
 
 from lib import qt_tools
 from ..edit.layer_tools import GwLayerTools
-from ....actions.api_parent import ApiParent
 from ....ui_manager import ToolboxDockerUi, ToolboxUi
 
+from .... import global_vars
+from ....actions import parent_vars
 
-class GwToolBox(ApiParent):
+from ....actions.parent_functs import show_exceptions_msg
+from ....actions.api_parent_functs import create_body, load_settings, close_dialog, open_dialog, set_style_mapzones, \
+    construct_form_param_user
 
-    def __init__(self, iface, settings, controller, plugin_dir):
+class GwToolBox:
+
+    def __init__(self):
         """ Class to control toolbar 'om_ws' """
 
-        ApiParent.__init__(self, iface, settings, controller, plugin_dir)
-        self.add_layer = GwLayerTools()
+        self.controller = global_vars.controller
+        self.iface = global_vars.iface
+        self.plugin_dir = global_vars.plugin_dir
+
+        parent_vars.add_layer = GwLayerTools()
         self.function_list = []
         self.rbt_checked = {}
         self.is_paramtetric = True
         self.no_clickable_items = ['Giswater']
-
-
-    def set_project_type(self, project_type):
-        self.project_type = project_type
 
 
     def open_toolbox(self):
@@ -53,7 +57,7 @@ class GwToolBox(ApiParent):
         self.dlg_toolbox_doc.trv.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.dlg_toolbox_doc.trv.setHeaderHidden(True)
         extras = '"isToolbox":true'
-        body = self.create_body(extras=extras)
+        body = create_body(extras=extras)
         json_result = self.controller.get_json('gw_fct_gettoolbox', body)
         if not json_result:
             return False
@@ -67,7 +71,7 @@ class GwToolBox(ApiParent):
     def filter_functions(self, text):
 
         extras = f'"filterText":"{text}"'
-        body = self.create_body(extras=extras)
+        body = create_body(extras=extras)
         json_result = self.controller.get_json('gw_fct_gettoolbox', body)
         if not json_result:
             return False
@@ -86,7 +90,7 @@ class GwToolBox(ApiParent):
             return
 
         self.dlg_functions = ToolboxUi()
-        self.load_settings(self.dlg_functions)
+        load_settings(self.dlg_functions)
         self.dlg_functions.progressBar.setVisible(False)
 
         self.dlg_functions.cmb_layers.currentIndexChanged.connect(partial(self.set_selected_layer, self.dlg_functions,
@@ -97,7 +101,7 @@ class GwToolBox(ApiParent):
 
         extras = f'"filterText":"{self.alias_function}"'
         extras += ', "isToolbox":true'
-        body = self.create_body(extras=extras)
+        body = create_body(extras=extras)
         json_result = self.controller.get_json('gw_fct_gettoolbox', body)
         if not json_result:
             return False
@@ -111,21 +115,21 @@ class GwToolBox(ApiParent):
 
         self.dlg_functions.btn_run.clicked.connect(partial(self.execute_function, self.dlg_functions,
                                                    self.dlg_functions.cmb_layers, json_result['body']['data']))
-        self.dlg_functions.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_functions))
+        self.dlg_functions.btn_close.clicked.connect(partial(close_dialog, self.dlg_functions))
         self.dlg_functions.btn_cancel.clicked.connect(partial(self.remove_layers))
-        self.dlg_functions.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_functions))
+        self.dlg_functions.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_functions))
         enable_btn_run = index.sibling(index.row(), 2).data()
         bool_dict = {"True": True, "true": True, "False": False, "false": False}
         self.dlg_functions.btn_run.setEnabled(bool_dict[enable_btn_run])
         self.dlg_functions.btn_cancel.setEnabled(bool_dict[enable_btn_run])
-        self.open_dialog(self.dlg_functions, dlg_name='toolbox')
+        open_dialog(self.dlg_functions, dlg_name='toolbox')
 
 
     def remove_layers(self):
 
         root = QgsProject.instance().layerTreeRoot()
-        for layer in reversed(self.temp_layers_added):
-            self.temp_layers_added.remove(layer)
+        for layer in reversed(parent_vars.temp_layers_added):
+            parent_vars.temp_layers_added.remove(layer)
             # Possible QGIS bug: Instead of returning None because it is not found in the TOC, it breaks
             try:
                 dem_raster = root.findLayer(layer.id())
@@ -360,7 +364,7 @@ class GwToolBox(ApiParent):
         else:
             extras += '}'
 
-        body = self.create_body(feature=feature_field, extras=extras)
+        body = create_body(feature=feature_field, extras=extras)
         json_result = self.controller.get_json(function_name, body)
         dialog.progressBar.setAlignment(Qt.AlignCenter)
         dialog.progressBar.setMinimum(0)
@@ -382,14 +386,14 @@ class GwToolBox(ApiParent):
                 set_sytle = json_result['body']['data']['setStyle']
                 if set_sytle == "Mapzones":
                     # call function to simbolize mapzones
-                    self.set_style_mapzones()
+                    set_style_mapzones()
 
         except KeyError as e:
             msg = f"<b>Key: </b>{e}<br>"
             msg += f"<b>key container: </b>'body/data/ <br>"
             msg += f"<b>Python file: </b>{__name__} <br>"
             msg += f"<b>Python function:</b> {self.execute_function.__name__} <br>"
-            self.show_exceptions_msg("Key on returned json from ddbb is missed.", msg)
+            show_exceptions_msg("Key on returned json from ddbb is missed.", msg)
 
         self.remove_layers()
 
@@ -408,7 +412,7 @@ class GwToolBox(ApiParent):
             return True
 
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-        self.add_layer.add_temp_layer(dialog, complet_result[0]['body']['data'], self.alias_function)
+        parent_vars.add_layer.add_temp_layer(dialog, complet_result[0]['body']['data'], self.alias_function)
         dialog.progressBar.setFormat(f"Function {function_name} has finished.")
         dialog.progressBar.setAlignment(Qt.AlignCenter)
 
@@ -445,7 +449,7 @@ class GwToolBox(ApiParent):
                     self.populate_cmb_type(feature_types)
                     self.dlg_functions.cmb_geom_type.currentIndexChanged.connect(partial(self.populate_layer_combo))
                     self.populate_layer_combo()
-                self.construct_form_param_user(dialog, function, 0, self.function_list)
+                construct_form_param_user(dialog, function, 0, self.function_list)
                 self.load_settings_values(dialog, function)
                 self.load_parametric_values(dialog, function)
                 status = True
