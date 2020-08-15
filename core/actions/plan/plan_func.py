@@ -27,7 +27,7 @@ class GwPlan:
     def __init__(self):
         """ Class to control toolbar 'master' """
         self.config_dict = {}
-        self.manage_new_psector = GwPsector(global_vars.iface, global_vars.settings, global_vars.controller, global_vars.plugin_dir)
+        self.manage_new_psector = GwPsector()
         
         self.project_type = global_vars.project_type
         self.controller = global_vars.controller

@@ -42,7 +42,7 @@ class GwSearch:
     def __init__(self):
         """ Class constructor """
 
-        self.manage_new_psector = GwPsector(global_vars.iface, global_vars.settings, global_vars.controller, global_vars.plugin_dir)
+        self.manage_new_psector = GwPsector()
         self.manage_visit = GwVisitManager()
         self.iface = global_vars.iface
         self.project_type = global_vars.project_type
