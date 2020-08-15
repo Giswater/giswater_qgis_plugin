@@ -41,7 +41,7 @@ class GwUtilities(ParentAction):
 
     def api_config(self):
 
-        self.config = GwConfig(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.config = GwConfig()
         self.config.api_config()
 
 

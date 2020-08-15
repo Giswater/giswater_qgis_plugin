@@ -15,19 +15,22 @@ import operator
 from functools import partial
 
 from lib import qt_tools
-from ....actions.api_parent import ApiParent
 from ....ui_manager import ConfigUi
 
+from .... import global_vars
 
-class GwConfig(ApiParent):
+from ....actions.parent_functs import hide_void_groupbox
+from ....actions.api_parent_functs import create_body, close_dialog, load_settings, open_dialog
 
-    def __init__(self, iface, settings, controller, plugin_dir):
+
+class GwConfig:
+
+    def __init__(self):
         """ Class to control toolbar 'om_ws' """
-        ApiParent.__init__(self, iface, settings, controller, plugin_dir)
-
-
-    def set_project_type(self, project_type):
-        self.project_type = project_type
+        
+        self.controller = global_vars.controller
+        self.iface = global_vars.iface
+        self.settings = global_vars.settings
 
 
     def api_config(self):
@@ -45,14 +48,14 @@ class GwConfig(ApiParent):
         cur_user = self.controller.get_current_user()
 
         self.list_update = []
-        body = self.create_body(form='"formName":"config"')
+        body = create_body(form='"formName":"config"')
         json_result = self.controller.get_json('gw_fct_getconfig', body)
         if not json_result:
             return False
 
         self.dlg_config = ConfigUi()
-        self.load_settings(self.dlg_config)
-        self.dlg_config.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_config))
+        load_settings(self.dlg_config)
+        self.dlg_config.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_config))
         self.dlg_config.btn_accept.clicked.connect(partial(self.update_values))
 
         page1_layout1 = self.dlg_config.tab_main.findChild(QGridLayout, 'page1_layout1')
@@ -202,14 +205,14 @@ class GwConfig(ApiParent):
         if chk_dma and chk_expl:
             chk_dma.stateChanged.connect(partial(self.check_child_to_parent, chk_dma, chk_expl))
             chk_expl.stateChanged.connect(partial(self.check_parent_to_child, chk_expl, chk_dma))
-        self.hide_void_groupbox(self.dlg_config)
+        hide_void_groupbox(self.dlg_config)
         # Check user/role and remove tabs
         role_admin = self.controller.check_role_user("role_admin", cur_user)
         if not role_admin and cur_user not in super_users:
             qt_tools.remove_tab_by_tabName(self.dlg_config.tab_main, "tab_admin")
 
         # Open form
-        self.open_dialog(self.dlg_config, dlg_name='config')
+        open_dialog(self.dlg_config, dlg_name='config')
 
 
     def construct_form_param_user(self, row, pos):
@@ -539,7 +542,7 @@ class GwConfig(ApiParent):
 
         my_json = json.dumps(self.list_update)
         extras = f'"fields":{my_json}'
-        body = self.create_body(form='"formName":"config"', extras=extras)
+        body = create_body(form='"formName":"config"', extras=extras)
         json_result = self.controller.get_json('gw_fct_setconfig', body, log_sql=True)
         if not json_result:
             return False
@@ -547,7 +550,7 @@ class GwConfig(ApiParent):
         message = "Values has been updated"
         self.controller.show_info(message)
         # Close dialog
-        self.close_dialog(self.dlg_config)
+        close_dialog(self.dlg_config)
 
 
     def check_child_to_parent(self, widget_child, widget_parent):
