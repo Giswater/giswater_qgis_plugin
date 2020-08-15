@@ -7,7 +7,7 @@ class GwAddChildLayerButton(GwParentAction):
 	def __init__(self, icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir):
 		super().__init__(icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir)
 		
-		self.manage_layers = GwManageLayers(self.iface, self.settings, self.controller, self.plugin_dir)
+		self.manage_layers = GwManageLayers()
 		self.manage_layers.config_layers()
 	
 	

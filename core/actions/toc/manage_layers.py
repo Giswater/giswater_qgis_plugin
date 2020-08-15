@@ -21,17 +21,17 @@ from ...tasks.tsk_config_layer import GwConfigLayerTask
 
 class GwManageLayers:
 
-    def __init__(self, iface, settings, controller, plugin_dir):
+    def __init__(self):
         """ Class to manage layers. Refactor code from giswater.py """
 
-        self.iface = iface
-        self.settings = settings
-        self.controller = controller
-        self.plugin_dir = plugin_dir
+        self.iface = global_vars.iface
+        self.settings = global_vars.settings
+        self.controller = global_vars.controller
+        self.plugin_dir = global_vars.plugin_dir
         self.available_layers = None
         self.add_layer = GwLayerTools()
-        self.project_type = controller.get_project_type()
-        self.schema_name = controller.schema_name
+        self.project_type = global_vars.project_type
+        self.schema_name = global_vars.schema_name
         self.project_vars = global_vars.qgis_tools.get_qgis_project_variables()
         self.qgis_project_infotype = self.project_vars['infotype']
         self.qgis_project_add_schema = self.project_vars['add_schema']
