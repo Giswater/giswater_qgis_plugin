@@ -70,8 +70,7 @@ class GwManageLayers:
 
         if self.project_type in ('ws', 'ud'):
             QApplication.setOverrideCursor(Qt.ArrowCursor)
-            self.check_project_result = GwProjectCheck(self.iface, self.settings, self.controller, self.plugin_dir)
-            self.check_project_result.set_controller(self.controller)
+            self.check_project_result = GwProjectCheck()
 
             # check project
             status, result = self.check_project_result.populate_audit_check_project(layers, "true")

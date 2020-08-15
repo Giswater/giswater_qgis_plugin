@@ -382,6 +382,6 @@ class GwUtilities:
         # Return layers in the same order as listed in TOC
         layers = self.controller.get_layers()
 
-        self.check_project_result = GwProjectCheck(global_vars.iface, global_vars.settings, self.controller, global_vars.plugin_dir)
+        self.check_project_result = GwProjectCheck()
         self.check_project_result.populate_audit_check_project(layers, "false")
 

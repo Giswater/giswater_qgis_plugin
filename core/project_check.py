@@ -11,16 +11,22 @@ from qgis.PyQt.QtWidgets import QCheckBox, QGridLayout, QLabel, QSizePolicy
 import platform
 from functools import partial
 
-from ..actions.api_parent import ApiParent
 from ..ui_manager import ProjectCheckUi
 
+from .. import global_vars
+from ..actions import parent_vars
 
-class GwProjectCheck(ApiParent):
+from ..actions.parent_functs import get_plugin_version, hide_void_groupbox
+from ..actions.api_parent_functs import create_body, load_settings, save_settings, open_dialog, close_dialog
 
-    def __init__(self, iface, settings, controller, plugin_dir):
+
+class GwProjectCheck:
+
+    def __init__(self):
         """ Class to control Composer button """
-
-        ApiParent.__init__(self, iface, settings, controller, plugin_dir)
+        
+        self.controller = global_vars.controller
+        self.schema_name = global_vars.schema_name
 
 
     def populate_audit_check_project(self, layers, init_project):
@@ -75,7 +81,7 @@ class GwProjectCheck(ApiParent):
         project_role = self.controller.plugin_settings_value('gwProjecRole')
         info_type = self.controller.plugin_settings_value('gwInfoType')
 
-        version = self.get_plugin_version()
+        version = get_plugin_version()
         extras = f'"version":"{version}"'
         extras += f', "fid":101'
         extras += f', "initProject":{init_project}'
@@ -85,7 +91,7 @@ class GwProjectCheck(ApiParent):
         extras += f', "infoType":"{info_type}"'
         extras += f', "qgisVersion":"{Qgis.QGIS_VERSION}"'
         extras += f', "osVersion":"{platform.system()} {platform.release()}"'
-        body = self.create_body(extras=extras)
+        body = create_body(extras=extras)
         result = self.controller.get_json('gw_fct_audit_check_project', body)
         try:
             if not result or (result['body']['variables']['hideForm'] == True):
@@ -105,25 +111,25 @@ class GwProjectCheck(ApiParent):
 
         # Create dialog
         self.dlg_audit_project = ProjectCheckUi()
-        self.load_settings(self.dlg_audit_project)
-        self.dlg_audit_project.rejected.connect(partial(self.save_settings, self.dlg_audit_project))
+        load_settings(self.dlg_audit_project)
+        self.dlg_audit_project.rejected.connect(partial(save_settings, self.dlg_audit_project))
 
         # Populate info_log and missing layers
         critical_level = 0
-        text_result = self.add_layer.add_temp_layer(self.dlg_audit_project, result['body']['data'],
+        text_result = parent_vars.add_layer.add_temp_layer(self.dlg_audit_project, result['body']['data'],
             'gw_fct_audit_check_project_result', True, False, 0, True, disable_tabs=False)
 
         if 'missingLayers' in result['body']['data']:
             critical_level = self.get_missing_layers(self.dlg_audit_project,
                 result['body']['data']['missingLayers'], critical_level)
 
-        self.hide_void_groupbox(self.dlg_audit_project)
+        hide_void_groupbox(self.dlg_audit_project)
 
         if int(critical_level) > 0 or text_result:
             self.dlg_audit_project.btn_accept.clicked.connect(partial(self.add_selected_layers, self.dlg_audit_project,
                                                                       result['body']['data']['missingLayers']))
             self.dlg_audit_project.chk_hide_form.stateChanged.connect(partial(self.update_config))
-            self.open_dialog(self.dlg_audit_project, dlg_name='project_check')
+            open_dialog(self.dlg_audit_project, dlg_name='project_check')
 
 
     def update_config(self, state):
@@ -191,20 +197,20 @@ class GwProjectCheck(ApiParent):
                 group = layer_info['group_layer'] if layer_info['group_layer'] is not None else 'GW Layers'
                 style_id = layer_info['style_id']
 
-                self.add_layer.from_postgres_to_toc(layer_info['layer'], geom_field, pkey_field, None, group=group)
+                parent_vars.add_layer.from_postgres_to_toc(layer_info['layer'], geom_field, pkey_field, None, group=group)
                 layer = None
                 qml = None
                 if style_id is not None:
                     layer = self.controller.get_layer_by_tablename(layer_info['layer'])
                     if layer:
                         extras = f'"style_id":"{style_id}"'
-                        body = self.create_body(extras=extras)
+                        body = create_body(extras=extras)
                         style = self.controller.get_json('gw_fct_getstyle', body, log_sql=True)
                         if 'styles' in style['body']:
                             if 'style' in style['body']['styles']:
                                 qml = style['body']['styles']['style']
-                            self.add_layer.create_qml(layer, qml)
+                            parent_vars.add_layer.create_qml(layer, qml)
                 self.controller.set_layer_visible(layer)
 
-        self.close_dialog(self.dlg_audit_project)
+        close_dialog(self.dlg_audit_project)
 

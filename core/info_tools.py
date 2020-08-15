@@ -9,14 +9,15 @@ from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints
 
 import os
 
-from ..actions.api_parent import ApiParent
+from .. import global_vars
+from ..actions.api_parent_functs import create_body
 
 
-class GwInfoTools(ApiParent):
-    def __init__(self, iface, settings, controller, plugin_dir):
+class GwInfoTools:
+    def __init__(self):
         """ Class to control functions called from data base """
-
-        ApiParent.__init__(self, iface, settings, controller, plugin_dir)
+        
+        self.controller = global_vars.controller
 
 
     def set_layer_index(self, **kwargs):
@@ -57,7 +58,7 @@ class GwInfoTools(ApiParent):
 
             feature = '"tableName":"' + str(layer_name) + '", "id":""'
             extras = f'"infoType":"{self.qgis_project_infotype}"'
-            body = self.create_body(feature=feature, extras=extras)
+            body = create_body(feature=feature, extras=extras)
             result = self.controller.get_json('gw_fct_getinfofromid', body, is_notify=True, log_sql=True)
             if not result:
                 continue
