@@ -321,7 +321,10 @@ class LoadProject(QObject):
 
         if list_actions is None:
             return
-
+        
+        if type(list_actions) != list:
+            list_actions = [list_actions]
+        
         toolbar_name = self.translate(f'toolbar_{toolbar_id}_name')
         plugin_toolbar = PluginToolbar(toolbar_id, toolbar_name, True)
 
