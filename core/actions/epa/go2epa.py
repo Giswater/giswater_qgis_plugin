@@ -730,6 +730,6 @@ class GwGo2Epa:
 
 
     def update_sql(self):
-        usql = GwAdmin(global_vars.iface, global_vars.settings, global_vars.controller, global_vars.plugin_dir)
+        usql = GwAdmin()
         usql.init_sql()
 

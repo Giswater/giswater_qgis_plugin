@@ -128,7 +128,7 @@ class Giswater(QObject):
             self.action = QAction("Show info", self.iface.mainWindow())
 
         self.toolButton.setDefaultAction(self.action)
-        self.update_sql = GwAdmin(self.iface, global_vars.settings, self.controller, self.plugin_dir)
+        self.update_sql = GwAdmin()
         self.action.triggered.connect(self.update_sql.init_sql)
 
 
