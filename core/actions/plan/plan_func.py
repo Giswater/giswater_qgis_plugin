@@ -291,7 +291,7 @@ class GwPlan:
             return
         row = selected_list[0].row()
         psector_id = self.qtbl_psm.model().record(row).value("psector_id")
-        self.duplicate_psector = GwPsectorDuplicate(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.duplicate_psector = GwPsectorDuplicate()
         self.duplicate_psector.is_duplicated.connect(partial(fill_table, self.qtbl_psm, 'v_ui_plan_psector'))
         self.duplicate_psector.is_duplicated.connect(partial(set_label_current_psector, self.dlg_psector_mng))
         self.duplicate_psector.manage_duplicate_psector(psector_id)
