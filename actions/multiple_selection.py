@@ -14,16 +14,18 @@ from qgis.PyQt.QtGui import QColor
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 
 from .parent_manage_funct import disconnect_signal_selection_changed, connect_signal_selection_changed
+from .. import global_vars
+
 
 class MultipleSelection(QgsMapTool):
 
-    def __init__(self, iface, controller, layers,
+    def __init__(self, layers,
                  mincut=None, parent_manage=None, manage_new_psector=None, table_object=None, dialog=None):
         """ Class constructor """
 
         self.layers = layers
-        self.iface = iface
-        self.canvas = self.iface.mapCanvas()
+        self.iface = global_vars.iface
+        self.canvas = global_vars.canvas
         self.mincut = mincut
         # self.parent_manage = parent_manage
         self.manage_new_psector = manage_new_psector
@@ -33,7 +35,7 @@ class MultipleSelection(QgsMapTool):
         # Call superclass constructor and set current action
         QgsMapTool.__init__(self, self.canvas)
 
-        self.controller = controller
+        self.controller = global_vars.controller
         self.rubber_band = QgsRubberBand(self.canvas, 2)
         self.rubber_band.setColor(QColor(255, 100, 255))
         self.rubber_band.setFillColor(QColor(254, 178, 76, 63))

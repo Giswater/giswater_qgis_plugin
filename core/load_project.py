@@ -33,22 +33,23 @@ from .toolbars.utilities.utilities import *
 from .toolbars.om.om import *
 
 # TEMP
+from .. import global_vars
 from ..actions.parent_vars import init_global_vars
 
 
 class LoadProject(QObject):
 
-    def __init__(self, iface, settings, controller, plugin_dir):
+    def __init__(self):
         """ Class to manage layers. Refactor code from giswater.py """
 
-        super(LoadProject, self).__init__()
+        super().__init__()
 
-        self.iface = iface
-        self.settings = settings
-        self.controller = controller
-        self.plugin_dir = plugin_dir
-        self.qgis_tools = QgisTools(iface, self.plugin_dir)
-        self.pg_man = PgMan(controller)
+        self.iface = global_vars.iface
+        self.settings = global_vars.settings
+        self.controller = global_vars.controller
+        self.plugin_dir = global_vars.plugin_dir
+        self.qgis_tools = QgisTools(self.iface, self.plugin_dir)
+        self.pg_man = PgMan(global_vars.controller)
         self.plugin_toolbars = {}
         self.buttons_to_hide = []
         self.plugin_name = self.qgis_tools.get_value_from_metadata('name', 'giswater')
@@ -284,7 +285,7 @@ class LoadProject(QObject):
                     text = self.translate(f'{index_action}_text')
 
                     icon_path = self.icon_folder + plugin_toolbar.toolbar_id + os.sep + index_action + ".png"
-                    button = getattr(sys.modules[__name__], button_def)(icon_path, text, plugin_toolbar.toolbar, ag, self.iface, self.settings, self.controller, self.plugin_dir)
+                    button = getattr(sys.modules[__name__], button_def)(icon_path, text, plugin_toolbar.toolbar, ag)
 
                     self.buttons[index_action] = button
 

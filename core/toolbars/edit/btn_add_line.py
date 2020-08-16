@@ -6,16 +6,18 @@ from functools import partial
 from ..parent_action import GwParentAction
 from ...actions.edit.edit_func import GwEdit
 from ...utils.pg_man import PgMan
+from .... import global_vars
+
 
 class GwAddLineButton(GwParentAction):
 	
-	def __init__(self, icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir):
-		super().__init__(icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir)
+	def __init__(self, icon_path, text, toolbar, action_group):
+		super().__init__(icon_path, text, toolbar, action_group)
 		
 		# First add the menu before adding it to the toolbar
 		toolbar.removeAction(self.action)
 		
-		pg_man = PgMan(controller)
+		pg_man = PgMan(global_vars.controller)
 		self.feature_cat = pg_man.manage_feature_cat()
 		
 		self.edit = GwEdit()

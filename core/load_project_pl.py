@@ -10,10 +10,10 @@ from .load_project import LoadProject
 
 class LoadProjectPl(LoadProject):
 
-    def __init__(self, iface, settings, controller, plugin_dir):
+    def __init__(self):
         """ Class to manage load project of type 'tm' """
 
-        LoadProject.__init__(self, iface, settings, controller, plugin_dir)
+        LoadProject.__init__(self)
 
 
     def project_read_pl(self):
