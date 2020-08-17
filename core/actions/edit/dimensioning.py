@@ -42,7 +42,7 @@ class GwDimensioning:
         self.snapper = self.snapper_manager.get_snapper()
 
 
-    def open_form(self, qgis_feature=None, layer=None, db_return=None, fid=None):
+    def open_dimensioning_form(self, qgis_feature=None, layer=None, db_return=None, fid=None):
 
         self.dlg_dim = DimensioningUi()
         load_settings(self.dlg_dim)

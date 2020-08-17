@@ -33,7 +33,7 @@ class GwDimensioningButton(GwParentMapTool):
 		self.recover_previus_maptool()
 		
 		self.api_dim = GwDimensioning()
-		self.api_dim.open_form(qgis_feature=feature, layer=self.layer)
+		self.api_dim.open_dimensioning_form(qgis_feature=feature, layer=self.layer)
 	
 	
 	def get_feature_by_id(self, layer, id_):

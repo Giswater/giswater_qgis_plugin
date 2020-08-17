@@ -197,7 +197,7 @@ class GwSearch:
         # Tab 'network or add_network'
         if tab_selected == 'network' or tab_selected == 'add_network':
             self.ApiCF = GwInfo(tab_type='data')
-            complet_result, dialog = self.ApiCF.open_form(table_name=item['sys_table_id'], feature_id=item['sys_id'],
+            complet_result, dialog = self.ApiCF.get_info_from_id(table_name=item['sys_table_id'], feature_id=item['sys_id'],
                                    tab_type='data', is_add_schema=is_add_schema)
             if not complet_result:
                 return
@@ -782,7 +782,7 @@ class GwSearch:
         feature_id = qtable.model().record(row).value('feature_id')
 
         self.ApiCF = GwInfo(tab_type='data')
-        complet_result, dialog = self.ApiCF.open_form(table_name=table_name, feature_id=feature_id, tab_type='data')
+        complet_result, dialog = self.ApiCF.get_info_from_id(table_name=table_name, feature_id=feature_id, tab_type='data')
 
         # Get list of all coords in field geometry
         list_coord = re.search('\((.*)\)', str(complet_result[0]['body']['feature']['geometry']['st_astext']))

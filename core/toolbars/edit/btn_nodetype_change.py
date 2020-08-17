@@ -106,7 +106,7 @@ class GwNodeTypeChangeButton(GwParentMapTool):
 		if features[0]:
 			self.ApiCF = GwInfo(tab_type='data')
 			self.ApiCF.user_current_layer = self.current_layer
-			complet_result, dialog = self.ApiCF.open_form(table_name='v_edit_node', feature_id=features[0]["node_id"],
+			complet_result, dialog = self.ApiCF.get_info_from_id(table_name='v_edit_node', feature_id=features[0]["node_id"],
 														  tab_type='data')
 			if not complet_result:
 				return

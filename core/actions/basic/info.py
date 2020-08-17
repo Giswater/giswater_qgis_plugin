@@ -5,18 +5,17 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: latin-1 -*-
-from qgis.core import QgsGeometry, QgsMapToPixel, QgsPointXY, QgsVectorLayer
-from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint, QgsRubberBand, QgsVertexMarker
-from qgis.PyQt.QtCore import pyqtSignal, QDate, QObject, QPoint, QRegExp, QStringListModel, Qt
-from qgis.PyQt.QtGui import QColor, QCursor, QIcon, QRegExpValidator, QStandardItem, QStandardItemModel
+from qgis.core import QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest
+from qgis.gui import QgsDateTimeEdit, QgsVertexMarker, QgsMapToolEmitPoint
+from qgis.PyQt.QtCore import pyqtSignal, QDate, QObject, QRegExp, QStringListModel, Qt
+from qgis.PyQt.QtGui import QColor, QRegExpValidator, QStandardItem, QStandardItemModel
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, \
-    QDateEdit, QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QMenu, QPushButton, QSizePolicy, \
+    QDateEdit, QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QSizePolicy, \
     QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit
 
 import json
 import os
-import re
 import subprocess
 import urllib.parse as parse
 import sys
@@ -36,10 +35,10 @@ from ....map_tools.snapping_utils_v3 import SnappingConfigManager
 from ....ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFull, GwMainWindow, VisitDocument, InfoCrossectUi
 from ..edit.dimensioning import GwDimensioning
 
-from ....actions.parent_functs import get_max_rectangle_from_coords, set_icon, set_dates_from_to
-from ....actions.api_parent_functs import get_visible_layers, create_body, resetRubberbands, get_points, draw_polyline, \
-    draw_point, draw, load_settings, close_dialog, populate_basic_info, open_dialog, put_widgets, fill_child, \
-    check_actions, api_action_copy_paste, action_open_url, api_action_help, activate_snapping, save_settings, \
+from ....actions.parent_functs import set_icon, set_dates_from_to
+from ....actions.api_parent_functs import get_visible_layers, create_body, resetRubberbands, \
+    draw, load_settings, close_dialog, populate_basic_info, open_dialog, put_widgets, fill_child, \
+    check_actions, action_open_url, api_action_help, activate_snapping, save_settings, \
     get_feature_by_expr, set_setStyleSheet, set_data_type, add_lineedit, set_widget_size, manage_lineedit, add_combobox, \
     add_checkbox, get_values, add_calendar, add_button, add_hyperlink, add_horizontal_spacer, add_vertical_spacer, \
     add_textarea, add_spinbox, add_tableview, set_headers, populate_table, set_columns_config, set_completer_object, \
@@ -66,118 +65,17 @@ class GwInfo(QObject):
         self.layer_new_feature = None
         self.tab_type = tab_type
 
-
-    def hilight_feature(self, point, rb_list, tab_type=None):
-
-        cursor = QCursor()
-        x = cursor.pos().x()
-        y = cursor.pos().y()
-        click_point = QPoint(x + 5, y + 5)
-
-        visible_layers = get_visible_layers(as_list=True)
-        scale_zoom = self.iface.mapCanvas().scale()
-
-        # Get layers under mouse clicked
-        extras = f'"pointClickCoords":{{"xcoord":{point.x()}, "ycoord":{point.y()}}}, '
-        extras += f'"visibleLayers":{visible_layers}, '
-        extras += f'"zoomScale":{scale_zoom} '
-        body = create_body(extras=extras)
-        json_result = self.controller.get_json('gw_fct_getlayersfromcoordinates', body)
-        if not json_result:
-            return False
-
-        # hide QMenu identify if no feature under mouse
-        len_layers = len(json_result['body']['data']['layersNames'])
-        if len_layers == 0:
-            return False
-
-        self.icon_folder = self.plugin_dir + '/icons/'
-
-        # Right click main QMenu
-        main_menu = QMenu()
-
-        # Create one menu for each layer
-        for layer in json_result['body']['data']['layersNames']:
-            layer_name = self.controller.get_layer_by_tablename(layer['layerName'])
-            icon_path = self.icon_folder + layer['icon'] + '.png'
-            if os.path.exists(str(icon_path)):
-                icon = QIcon(icon_path)
-                sub_menu = main_menu.addMenu(icon, layer_name.name())
-            else:
-                sub_menu = main_menu.addMenu(layer_name.name())
-            # Create one QAction for each id
-            for feature in layer['ids']:
-                action = QAction(str(feature['id']), None)
-                sub_menu.addAction(action)
-                action.triggered.connect(partial(self.set_active_layer, action, tab_type))
-                action.hovered.connect(partial(self.draw_by_action, feature, rb_list))
-
-        main_menu.addSeparator()
-        # Identify all
-        cont = 0
-        for layer in json_result['body']['data']['layersNames']:
-            cont += len(layer['ids'])
-        action = QAction(f'Identify all ({cont})', None)
-        action.hovered.connect(partial(self.identify_all, json_result, rb_list))
-        main_menu.addAction(action)
-        main_menu.addSeparator()
-        main_menu.exec_(click_point)
-
-
-    def identify_all(self, complet_list, rb_list):
-
-        resetRubberbands()
-        for rb in rb_list:
-            rb.reset()
-        for layer in complet_list['body']['data']['layersNames']:
-            for feature in layer['ids']:
-                points = []
-                list_coord = re.search('\((.*)\)', str(feature['geometry']))
-                coords = list_coord.group(1)
-                polygon = coords.split(',')
-                for i in range(0, len(polygon)):
-                    x, y = polygon[i].split(' ')
-                    point = QgsPointXY(float(x), float(y))
-                    points.append(point)
-                rb = QgsRubberBand(self.canvas)
-                polyline = QgsGeometry.fromPolylineXY(points)
-                rb.setToGeometry(polyline, None)
-                rb.setColor(QColor(255, 0, 0, 100))
-                rb.setWidth(5)
-                rb.show()
-                rb_list.append(rb)
-
-
-    def draw_by_action(self, feature, rb_list, reset_rb=True):
-        """ Draw lines based on geometry """
-
-        for rb in rb_list:
-            rb.reset()
-        if feature['geometry'] is None:
-            return
-
-        list_coord = re.search('\((.*)\)', str(feature['geometry']))
-        max_x, max_y, min_x, min_y = get_max_rectangle_from_coords(list_coord)
-        if reset_rb is True:
-            resetRubberbands()
-        if str(max_x) == str(min_x) and str(max_y) == str(min_y):
-            point = QgsPointXY(float(max_x), float(max_y))
-            draw_point(point)
-        else:
-            points = get_points(list_coord)
-            draw_polyline(points)
-
-
-    def set_active_layer(self, action, tab_type):
-        """ Set active selected layer """
-
-        parent_menu = action.associatedWidgets()[0]
-        layer = self.controller.get_layer_by_layername(parent_menu.title())
-        if layer:
-            layer_source = self.controller.get_layer_source(layer)
-            self.iface.setActiveLayer(layer)
-            complet_result, dialog = self.open_form(
-                table_name=layer_source['table'], feature_id=action.text(), tab_type=tab_type)
+    
+    def get_info_from_coordinates(self, point, tab_type):
+        return self.open_form(point=point, tab_type=tab_type)
+    
+    
+    def get_info_from_id(self, table_name, feature_id, tab_type=None, is_add_schema=None):
+        return self.open_form(table_name=table_name, feature_id=feature_id, tab_type=tab_type, is_add_schema=is_add_schema)
+    
+    
+    def get_feature_insert(self, point, feature_cat, new_feature_id, layer_new_feature, tab_type, new_feature):
+        return self.open_form(point=point, feature_cat=feature_cat, new_feature_id=new_feature_id, layer_new_feature=layer_new_feature, tab_type=tab_type, new_feature=new_feature)
 
 
     def open_form(self, point=None, table_name=None, feature_id=None, feature_cat=None, new_feature_id=None,
@@ -617,7 +515,7 @@ class GwInfo(QObject):
         action_zoom_in.triggered.connect(partial(self.api_action_zoom_in, self.canvas, self.layer))
         action_centered.triggered.connect(partial(self.api_action_centered, self.canvas, self.layer))
         action_zoom_out.triggered.connect(partial(self.api_action_zoom_out, self.canvas, self.layer))
-        action_copy_paste.triggered.connect(partial(api_action_copy_paste, self.dlg_cf, self.geom_type, tab_type))
+        action_copy_paste.triggered.connect(partial(self.api_action_copy_paste, self.dlg_cf, self.geom_type, tab_type))
         action_rotation.triggered.connect(partial(self.action_rotation, self.dlg_cf))
         action_link.triggered.connect(partial(action_open_url, self.dlg_cf, result))
         action_section.triggered.connect(partial(self.open_section_form))
@@ -672,13 +570,15 @@ class GwInfo(QObject):
     def action_rotation(self, dialog):
         
         # Set map tool emit point and signals
-        parent_vars.emit_point = QgsMapToolEmitPoint(global_vars.canvas)
+        emit_point = QgsMapToolEmitPoint(global_vars.canvas)
         parent_vars.previous_map_tool = global_vars.canvas.mapTool()
-        global_vars.canvas.setMapTool(parent_vars.emit_point)
-        parent_vars.emit_point.canvasClicked.connect(partial(self.action_rotation_canvas_clicked, dialog))
+        global_vars.canvas.setMapTool(emit_point)
+        emit_point.canvasClicked.connect(partial(self.action_rotation_canvas_clicked, dialog, emit_point))
     
     
-    def action_rotation_canvas_clicked(self, dialog, point, btn):
+    def action_rotation_canvas_clicked(self, dialog, emit_point, point, btn):
+        
+        print(point)
         
         if btn == Qt.RightButton:
             global_vars.canvas.setMapTool(parent_vars.previous_map_tool)
@@ -686,11 +586,12 @@ class GwInfo(QObject):
         
         existing_point_x = None
         existing_point_y = None
-        viewname = global_vars.controller.get_layer_source_table_name(parent_vars.layer)
+        viewname = global_vars.controller.get_layer_source_table_name(self.layer)
         sql = (f"SELECT ST_X(the_geom), ST_Y(the_geom)"
                f" FROM {viewname}"
-               f" WHERE node_id = '{parent_vars.feature_id}'")
+               f" WHERE node_id = '{self.feature_id}'")
         row = global_vars.controller.get_row(sql)
+        
         if row:
             existing_point_x = row[0]
             existing_point_y = row[1]
@@ -699,14 +600,14 @@ class GwInfo(QObject):
             sql = (f"UPDATE node"
                    f" SET hemisphere = (SELECT degrees(ST_Azimuth(ST_Point({existing_point_x}, {existing_point_y}), "
                    f" ST_Point({point.x()}, {point.y()}))))"
-                   f" WHERE node_id = '{parent_vars.feature_id}'")
+                   f" WHERE node_id = '{self.feature_id}'")
             status = global_vars.controller.execute_sql(sql)
             if not status:
                 global_vars.canvas.setMapTool(parent_vars.previous_map_tool)
                 return
         
         sql = (f"SELECT rotation FROM node "
-               f" WHERE node_id = '{parent_vars.feature_id}'")
+               f" WHERE node_id = '{self.feature_id}'")
         row = global_vars.controller.get_row(sql)
         if row:
             qt_tools.setWidgetText(dialog, "rotation", str(row[0]))
@@ -718,21 +619,174 @@ class GwInfo(QObject):
             qt_tools.setWidgetText(dialog, "hemisphere", str(row[0]))
             message = "Hemisphere of the node has been updated. Value is"
             global_vars.controller.show_info(message, parameter=str(row[0]))
-        self.api_disable_rotation(dialog)
 
-
-    def api_disable_rotation(self, dialog):
-        """ Disable actionRotation and set action 'Identify' """
-
+        # Disable Rotation
         action_widget = dialog.findChild(QAction, "actionRotation")
         if action_widget:
             action_widget.setChecked(False)
         try:
-            parent_vars.emit_point.canvasClicked.disconnect()
+            emit_point.canvasClicked.disconnect()
             global_vars.canvas.setMapTool(parent_vars.previous_map_tool)
         except Exception as e:
             global_vars.controller.log_info(type(e).__name__)
+
+
+    def api_action_copy_paste(self, dialog, geom_type, tab_type=None):
+        """ Copy some fields from snapped feature to current feature """
+
+        # Set map tool emit point and signals
+        emit_point = QgsMapToolEmitPoint(global_vars.canvas)
+        global_vars.canvas.setMapTool(emit_point)
+        global_vars.canvas.xyCoordinates.connect(self.api_action_copy_paste_mouse_move)
+        emit_point.canvasClicked.connect(partial(self.api_action_copy_paste_canvas_clicked, dialog, tab_type, emit_point))
+        parent_vars.geom_type = geom_type
+    
+        # Store user snapping configuration
+        parent_vars.snapper_manager = SnappingConfigManager(global_vars.iface)
+        if parent_vars.snapper_manager.controller is None:
+            parent_vars.snapper_manager.set_controller(global_vars.controller)
+        parent_vars.snapper_manager.store_snapping_options()
+        parent_vars.snapper = parent_vars.snapper_manager.get_snapper()
+    
+        # Clear snapping
+        parent_vars.snapper_manager.enable_snapping()
+    
+        # Set snapping
+        layer = global_vars.iface.activeLayer()
+        parent_vars.snapper_manager.snap_to_layer(layer)
+    
+        # Set marker
+        color = QColor(255, 100, 255)
+        parent_vars.vertex_marker = QgsVertexMarker(global_vars.canvas)
+        if geom_type == 'node':
+            parent_vars.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
+        elif geom_type == 'arc':
+            parent_vars.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
+        parent_vars.vertex_marker.setColor(color)
+        parent_vars.vertex_marker.setIconSize(15)
+        parent_vars.vertex_marker.setPenWidth(3)
+    
+    
+    def api_action_copy_paste_mouse_move(self, point):
+        """ Slot function when mouse is moved in the canvas.
+            Add marker if any feature is snapped
+        """
         
+        # Hide marker and get coordinates
+        parent_vars.vertex_marker.hide()
+        event_point = parent_vars.snapper_manager.get_event_point(point=point)
+        
+        # Snapping
+        result = parent_vars.snapper_manager.snap_to_current_layer(event_point)
+        if not parent_vars.snapper_manager.result_is_valid():
+            return
+        
+        # Add marker to snapped feature
+        parent_vars.snapper_manager.add_marker(result, parent_vars.vertex_marker)
+    
+    
+    def api_action_copy_paste_canvas_clicked(self, dialog, tab_type, emit_point, point, btn):
+        """ Slot function when canvas is clicked """
+        
+        if btn == Qt.RightButton:
+            self.api_disable_copy_paste(dialog, emit_point)
+            return
+        
+        # Get clicked point
+        event_point = parent_vars.snapper_manager.get_event_point(point=point)
+        
+        # Snapping
+        result = parent_vars.snapper_manager.snap_to_current_layer(event_point)
+        if not parent_vars.snapper_manager.result_is_valid():
+            self.api_disable_copy_paste(dialog, emit_point)
+            return
+        
+        layer = global_vars.iface.activeLayer()
+        layername = layer.name()
+        
+        # Get the point. Leave selection
+        snapped_feature = parent_vars.snapper_manager.get_snapped_feature(result, True)
+        snapped_feature_attr = snapped_feature.attributes()
+        
+        aux = f'"{parent_vars.geom_type}_id" = '
+        aux += f"'{self.feature_id}'"
+        expr = QgsExpression(aux)
+        if expr.hasParserError():
+            message = "Expression Error"
+            global_vars.controller.show_warning(message, parameter=expr.parserErrorString())
+            self.api_disable_copy_paste(dialog, emit_point)
+            return
+        
+        fields = layer.dataProvider().fields()
+        layer.startEditing()
+        it = layer.getFeatures(QgsFeatureRequest(expr))
+        feature_list = [i for i in it]
+        if not feature_list:
+            self.api_disable_copy_paste(dialog, emit_point)
+            return
+        
+        # Select only first element of the feature list
+        feature = feature_list[0]
+        feature_id = feature.attribute(str(parent_vars.geom_type) + '_id')
+        msg = (f"Selected snapped feature_id to copy values from: {snapped_feature_attr[0]}\n"
+               f"Do you want to copy its values to the current node?\n\n")
+        # Replace id because we don't have to copy it!
+        snapped_feature_attr[0] = feature_id
+        snapped_feature_attr_aux = []
+        fields_aux = []
+        
+        # Iterate over all fields and copy only specific ones
+        for i in range(0, len(fields)):
+            if fields[i].name() == 'sector_id' or fields[i].name() == 'dma_id' or fields[i].name() == 'expl_id' \
+                    or fields[i].name() == 'state' or fields[i].name() == 'state_type' \
+                    or fields[i].name() == layername + '_workcat_id' or fields[i].name() == layername + '_builtdate' \
+                    or fields[i].name() == 'verified' or fields[i].name() == str(parent_vars.geom_type) + 'cat_id':
+                snapped_feature_attr_aux.append(snapped_feature_attr[i])
+                fields_aux.append(fields[i].name())
+            if global_vars.project_type == 'ud':
+                if fields[i].name() == str(parent_vars.geom_type) + '_type':
+                    snapped_feature_attr_aux.append(snapped_feature_attr[i])
+                    fields_aux.append(fields[i].name())
+        
+        for i in range(0, len(fields_aux)):
+            msg += f"{fields_aux[i]}: {snapped_feature_attr_aux[i]}\n"
+        
+        # Ask confirmation question showing fields that will be copied
+        answer = global_vars.controller.ask_question(msg, "Update records", None)
+        if answer:
+            for i in range(0, len(fields)):
+                for x in range(0, len(fields_aux)):
+                    if fields[i].name() == fields_aux[x]:
+                        layer.changeAttributeValue(feature.id(), i, snapped_feature_attr_aux[x])
+            
+            layer.commitChanges()
+            
+            # dialog.refreshFeature()
+            for i in range(0, len(fields_aux)):
+                widget = dialog.findChild(QWidget, tab_type + "_" + fields_aux[i])
+                if qt_tools.getWidgetType(dialog, widget) is QLineEdit:
+                    qt_tools.setWidgetText(dialog, widget, str(snapped_feature_attr_aux[i]))
+                elif qt_tools.getWidgetType(dialog, widget) is QComboBox:
+                    qt_tools.set_combo_itemData(widget, str(snapped_feature_attr_aux[i]), 0)
+
+        self.api_disable_copy_paste(dialog, emit_point)
+
+
+    def api_disable_copy_paste(self, dialog, emit_point):
+        """ Disable actionCopyPaste and set action 'Identify' """
+
+        action_widget = dialog.findChild(QAction, "actionCopyPaste")
+        if action_widget:
+            action_widget.setChecked(False)
+    
+        try:
+            parent_vars.snapper_manager.recover_snapping_options()
+            parent_vars.vertex_marker.hide()
+            global_vars.canvas.xyCoordinates.disconnect()
+            emit_point.canvasClicked.disconnect()
+        except:
+            pass
+    
 
     def manage_docker_close(self):
 
@@ -2874,9 +2928,9 @@ class GwInfo(QObject):
 
         # Set signals
         self.canvas.xyCoordinates.connect(partial(self.mouse_moved, layer))
-        self.emit_point = QgsMapToolEmitPoint(self.canvas)
-        self.canvas.setMapTool(self.emit_point)
-        self.emit_point.canvasClicked.connect(partial(self.get_id, dialog, action, option))
+        emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(emit_point)
+        emit_point.canvasClicked.connect(partial(self.get_id, dialog, action, option))
 
 
     def mouse_moved(self, layer, point):
@@ -2937,12 +2991,12 @@ class GwInfo(QObject):
         self.signal_activate.emit()
 
 
-    def disconnect_snapping(self, action_pan=True):
+    def disconnect_snapping(self, action_pan=True, emit_point=None):
         """ Select 'Pan' as current map tool and disconnect snapping """
 
+        emit_point.canvasClicked.disconnect()
         try:
             self.canvas.xyCoordinates.disconnect()
-            self.emit_point.canvasClicked.disconnect()
             if action_pan:
                 self.iface.actionPan().trigger()
             self.vertex_marker.hide()
