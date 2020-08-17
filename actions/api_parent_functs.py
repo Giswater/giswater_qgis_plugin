@@ -223,19 +223,6 @@ def api_action_help(geom_type):
             global_vars.controller.show_warning(message, parameter=pdf_path)
 
 
-def api_disable_rotation(dialog):
-    """ Disable actionRotation and set action 'Identify' """
-
-    action_widget = dialog.findChild(QAction, "actionRotation")
-    if action_widget:
-        action_widget.setChecked(False)
-    try:
-        parent_vars.emit_point.canvasClicked.disconnect()
-        global_vars.canvas.setMapTool(parent_vars.previous_map_tool)
-    except Exception as e:
-        global_vars.controller.log_info(type(e).__name__)
-
-
 def api_action_copy_paste(dialog, geom_type, tab_type=None):
     """ Copy some fields from snapped feature to current feature """
 
