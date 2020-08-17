@@ -239,7 +239,7 @@ class GwVisitManager:
         self.dlg_add_visit.btn_doc_new.clicked.connect(self.manage_document)
         self.dlg_add_visit.btn_open_doc.clicked.connect(partial(document_open, self.tbl_document))
         self.tbl_document.doubleClicked.connect(partial(document_open, self.tbl_document))
-        self.dlg_add_visit.btn_add_geom.clicked.connect(add_point)
+        self.dlg_add_visit.btn_add_geom.clicked.connect(self.add_feature_clicked)
 
         # Fill combo boxes of the form and related events
         self.parameter_type_id.currentIndexChanged.connect(partial(self.set_parameter_id_combo, self.dlg_add_visit))
@@ -247,6 +247,11 @@ class GwVisitManager:
             partial(self.event_feature_type_selected, self.dlg_add_visit, None))
         self.feature_type.currentIndexChanged.connect(partial(self.manage_tabs_enabled, True))
         self.parameter_id.currentIndexChanged.connect(self.get_feature_type_of_parameter)
+
+
+    def add_feature_clicked(self):
+        self.previous_map_tool = global_vars.canvas.mapTool()
+        add_point()
 
 
     def set_locked_relation(self):
@@ -344,7 +349,7 @@ class GwVisitManager:
                 if parent_vars.xyCoordinates_conected:
                     self.canvas.xyCoordinates.disconnect()
                     parent_vars.xyCoordinates_conected = False
-            self.canvas.setMapTool(parent_vars.previous_map_tool)
+            self.canvas.setMapTool(self.previous_map_tool)
             # removed current working visit. This should cascade removing of all related records
             if hasattr(self, 'it_is_new_visit') and self.it_is_new_visit:
                 self.current_visit.delete()
@@ -665,7 +670,7 @@ class GwVisitManager:
             self.dlg_add_visit.btn_feature_delete.clicked.connect(
                 partial(delete_records, self.dlg_add_visit, widget_table))
             self.dlg_add_visit.btn_feature_snapping.clicked.connect(
-                partial(selection_init, self.dlg_add_visit, widget_table))
+                partial(self.feature_snapping_clicked, self.dlg_add_visit, widget_table))
 
         # Adding auto-completion to a QLineEdit
         set_completer_feature_id(self.dlg_add_visit.feature_id, parent_vars.geom_type, viewname)
@@ -1573,7 +1578,7 @@ class GwVisitManager:
             self.dlg_add_visit.btn_feature_delete.clicked.connect(
                 partial(delete_records, self.dlg_add_visit, widget_table))
             self.dlg_add_visit.btn_feature_snapping.clicked.connect(
-                partial(selection_init, self.dlg_add_visit, widget_table))
+                partial(self.feature_snapping_clicked, self.dlg_add_visit, widget_table))
 
         # Adding auto-completion to a QLineEdit
         set_completer_feature_id(dialog.feature_id, parent_vars.geom_type, viewname)
@@ -1583,6 +1588,11 @@ class GwVisitManager:
             self.iface.actionPan().trigger()
         except Exception:
             pass
+
+
+    def feature_snapping_clicked(self, dialog, table_object):
+        self.previous_map_tool = global_vars.canvas.mapTool()
+        selection_init(dialog, table_object)
 
 
     def manage_visit_multifeature(self):

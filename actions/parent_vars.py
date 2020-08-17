@@ -2,7 +2,6 @@ from ..core.actions.edit.layer_tools import GwLayerTools
 from .. import global_vars
 
 
-previous_map_tool = None
 layer = None
 feature_id = None
 geom_type = None

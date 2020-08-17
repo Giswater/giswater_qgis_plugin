@@ -571,7 +571,7 @@ class GwInfo(QObject):
         
         # Set map tool emit point and signals
         emit_point = QgsMapToolEmitPoint(global_vars.canvas)
-        parent_vars.previous_map_tool = global_vars.canvas.mapTool()
+        self.previous_map_tool = global_vars.canvas.mapTool()
         global_vars.canvas.setMapTool(emit_point)
         emit_point.canvasClicked.connect(partial(self.action_rotation_canvas_clicked, dialog, emit_point))
     
@@ -581,7 +581,7 @@ class GwInfo(QObject):
         print(point)
         
         if btn == Qt.RightButton:
-            global_vars.canvas.setMapTool(parent_vars.previous_map_tool)
+            global_vars.canvas.setMapTool(self.previous_map_tool)
             return
         
         existing_point_x = None
@@ -603,7 +603,7 @@ class GwInfo(QObject):
                    f" WHERE node_id = '{self.feature_id}'")
             status = global_vars.controller.execute_sql(sql)
             if not status:
-                global_vars.canvas.setMapTool(parent_vars.previous_map_tool)
+                global_vars.canvas.setMapTool(self.previous_map_tool)
                 return
         
         sql = (f"SELECT rotation FROM node "
@@ -626,7 +626,7 @@ class GwInfo(QObject):
             action_widget.setChecked(False)
         try:
             emit_point.canvasClicked.disconnect()
-            global_vars.canvas.setMapTool(parent_vars.previous_map_tool)
+            global_vars.canvas.setMapTool(self.previous_map_tool)
         except Exception as e:
             global_vars.controller.log_info(type(e).__name__)
 

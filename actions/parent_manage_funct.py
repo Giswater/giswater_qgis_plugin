@@ -322,7 +322,6 @@ def add_point():
             parent_vars.snapper_manager.set_controller(global_vars.controller)
 
     emit_point = QgsMapToolEmitPoint(global_vars.canvas)
-    parent_vars.previous_map_tool = global_vars.canvas.mapTool()
     global_vars.canvas.setMapTool(emit_point)
     global_vars.canvas.xyCoordinates.connect(mouse_move)
     parent_vars.xyCoordinates_conected = True
@@ -742,7 +741,6 @@ def selection_init(dialog, table_object, query=False):
     multiple_selection = MultipleSelection(global_vars.iface, global_vars.controller, parent_vars.layers[parent_vars.geom_type],
                                            parent_manage=None, table_object=table_object, dialog=dialog)
     disconnect_signal_selection_changed()
-    parent_vars.previous_map_tool = global_vars.canvas.mapTool()
     global_vars.canvas.setMapTool(multiple_selection)
     connect_signal_selection_changed(dialog, table_object, query)
     cursor = get_cursor_multiple_selection()
