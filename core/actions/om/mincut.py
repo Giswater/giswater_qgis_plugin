@@ -87,11 +87,9 @@ class GwMincut:
             self.states[int(row['id'])] = row['idval']
 
 
-    def init_map_tool(self):
+    def init_mincut_canvas(self):
 
         # Create the appropriate map tool and connect the gotPoint() signal.
-        parent_vars.emit_point = QgsMapToolEmitPoint(self.canvas)
-        self.canvas.setMapTool(parent_vars.emit_point)
         self.connec_list = []
         self.hydro_list = []
         self.deleted_list = []
@@ -117,7 +115,7 @@ class GwMincut:
         """ Custom form initial configuration """
 
         self.user_current_layer = self.iface.activeLayer()
-        self.init_map_tool()
+        self.init_mincut_canvas()
         parent_vars.add_layer.delete_layer_from_toc('Overlap affected arcs')
         parent_vars.add_layer.delete_layer_from_toc('Other mincuts which overlaps')
         parent_vars.add_layer.delete_layer_from_toc('Overlap affected connecs')
@@ -392,7 +390,7 @@ class GwMincut:
             self.controller.log_info(f"{type(e).__name__} --> {e}")
 
         try:
-            parent_vars.emit_point.canvasClicked.disconnect()
+            self.emit_point.canvasClicked.disconnect()
         except TypeError as e:
             self.controller.log_info(f"{type(e).__name__} --> {e}")
 
@@ -500,7 +498,7 @@ class GwMincut:
 
         # Activate snapping of node and arcs
         self.canvas.xyCoordinates.connect(self.mouse_move_node_arc)
-        parent_vars.emit_point.canvasClicked.connect(self.snapping_node_arc_real_location)
+        self.emit_point.canvasClicked.connect(self.snapping_node_arc_real_location)
 
 
     def accept_save_data(self):
@@ -1459,7 +1457,10 @@ class GwMincut:
     def auto_mincut(self):
         """ B1-126: Automatic mincut analysis """
 
-        self.init_map_tool()
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
+        
+        self.init_mincut_canvas()
         self.dlg_mincut.closeMainWin = True
         self.dlg_mincut.canceled = False
 
@@ -1479,7 +1480,7 @@ class GwMincut:
 
         # Set signals
         self.canvas.xyCoordinates.connect(self.mouse_move_node_arc)
-        parent_vars.emit_point.canvasClicked.connect(self.auto_mincut_snapping)
+        self.emit_point.canvasClicked.connect(self.auto_mincut_snapping)
 
 
     def auto_mincut_snapping(self, point, btn):  # @UnusedVariable
@@ -1680,8 +1681,8 @@ class GwMincut:
         # Need this 3 lines here becouse if between one action and another we activate Pan, we cant open another valve
         # This is a safety measure
 
-        parent_vars.emit_point = QgsMapToolEmitPoint(self.canvas)
-        self.canvas.setMapTool(parent_vars.emit_point)
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
 
         # Disconnect previous connections
         self.disconnect_snapping(False)
@@ -1703,7 +1704,7 @@ class GwMincut:
             self.iface.setActiveLayer(layer)
             self.controller.set_layer_visible(layer)
             self.canvas.xyCoordinates.connect(self.mouse_move_valve)
-            parent_vars.emit_point.canvasClicked.connect(self.custom_mincut_snapping)
+            self.emit_point.canvasClicked.connect(self.custom_mincut_snapping)
 
 
     def mouse_move_valve(self, point):

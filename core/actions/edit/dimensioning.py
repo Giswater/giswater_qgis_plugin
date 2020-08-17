@@ -180,17 +180,15 @@ class GwDimensioning:
         close_dialog(self.dlg_dim)
 
 
-    def deactivate_signals(self, action):
+    def deactivate_signals(self, action, emit_point=None):
         self.snapper_manager.remove_marker()
         try:
             self.canvas.xyCoordinates.disconnect()
         except TypeError:
             pass
 
-        try:
-            parent_vars.emit_point.canvasClicked.disconnect()
-        except TypeError:
-            pass
+        if emit_point:
+            emit_point.canvasClicked.disconnect()
 
         if not action.isChecked():
             action.setChecked(False)
@@ -202,9 +200,9 @@ class GwDimensioning:
     def snapping(self, action):
 
         # Set active layer and set signals
-        parent_vars.emit_point = QgsMapToolEmitPoint(self.canvas)
-        self.canvas.setMapTool(parent_vars.emit_point)
-        if self.deactivate_signals(action):
+        emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(emit_point)
+        if self.deactivate_signals(action, emit_point):
             return
 
         self.snapper_manager.set_snapping_layers()
@@ -218,7 +216,7 @@ class GwDimensioning:
         self.dlg_dim.actionOrientation.setChecked(False)
         self.iface.setActiveLayer(self.layer_node)
         self.canvas.xyCoordinates.connect(self.mouse_move)
-        parent_vars.emit_point.canvasClicked.connect(partial(self.click_button_snapping, action))
+        emit_point.canvasClicked.connect(partial(self.click_button_snapping, action, emit_point))
 
 
     def mouse_move(self, point):
@@ -236,7 +234,7 @@ class GwDimensioning:
                 self.snapper_manager.add_marker(result)
 
 
-    def click_button_snapping(self, action, point, btn):
+    def click_button_snapping(self, action, emit_point, point, btn):
 
         if not self.layer_dimensions:
             return
@@ -244,7 +242,7 @@ class GwDimensioning:
         if btn == Qt.RightButton:
             if btn == Qt.RightButton:
                 action.setChecked(False)
-                self.deactivate_signals(action)
+                self.deactivate_signals(action, emit_point)
                 return
 
         layer = self.layer_dimensions
@@ -295,14 +293,14 @@ class GwDimensioning:
             qt_tools.setText(self.dlg_dim, "feature_type", feat_type.upper())
 
             self.snapper_manager.recover_snapping_options()
-            self.deactivate_signals(action)
+            self.deactivate_signals(action, emit_point)
             action.setChecked(False)
 
     def orientation(self, action):
     
-        parent_vars.emit_point = QgsMapToolEmitPoint(self.canvas)
-        self.canvas.setMapTool(parent_vars.emit_point)
-        if self.deactivate_signals(action):
+        emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(emit_point)
+        if self.deactivate_signals(action, emit_point):
             return
 
         self.snapper_manager.set_snapping_layers()
@@ -314,17 +312,17 @@ class GwDimensioning:
         self.snapper_manager.set_snapping_mode()
 
         self.dlg_dim.actionSnapping.setChecked(False)
-        parent_vars.emit_point.canvasClicked.connect(partial(self.click_button_orientation, action))
+        emit_point.canvasClicked.connect(partial(self.click_button_orientation, action, emit_point))
 
 
-    def click_button_orientation(self, action, point, btn):
+    def click_button_orientation(self, action, emit_point, point, btn):
 
         if not self.layer_dimensions:
             return
 
         if btn == Qt.RightButton:
             action.setChecked(False)
-            self.deactivate_signals(action)
+            self.deactivate_signals(action, emit_point)
             return
 
         self.x_symbol = self.dlg_dim.findChild(QLineEdit, "x_symbol")
@@ -335,7 +333,7 @@ class GwDimensioning:
         self.y_symbol.setText(str(int(point.y())))
 
         self.snapper_manager.recover_snapping_options()
-        self.deactivate_signals(action)
+        self.deactivate_signals(action, emit_point)
         action.setChecked(False)
 
     def create_map_tips(self):

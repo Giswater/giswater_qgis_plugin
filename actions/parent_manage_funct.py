@@ -321,12 +321,12 @@ def add_point():
         if parent_vars.snapper_manager.controller is None:
             parent_vars.snapper_manager.set_controller(global_vars.controller)
 
-    parent_vars.emit_point = QgsMapToolEmitPoint(global_vars.canvas)
+    emit_point = QgsMapToolEmitPoint(global_vars.canvas)
     parent_vars.previous_map_tool = global_vars.canvas.mapTool()
-    global_vars.canvas.setMapTool(parent_vars.emit_point)
+    global_vars.canvas.setMapTool(emit_point)
     global_vars.canvas.xyCoordinates.connect(mouse_move)
     parent_vars.xyCoordinates_conected = True
-    parent_vars.emit_point.canvasClicked.connect(partial(get_xy))
+    emit_point.canvasClicked.connect(partial(get_xy, emit_point))
 
 
 def mouse_move(point):
@@ -344,7 +344,7 @@ def mouse_move(point):
         parent_vars.vertex_marker.hide()
 
 
-def get_xy(point):
+def get_xy(point, emit_point):
     """ Get coordinates of selected point """
 
     if parent_vars.snapped_point:
@@ -356,7 +356,7 @@ def get_xy(point):
 
     message = "Geometry has been added!"
     global_vars.controller.show_info(message)
-    parent_vars.emit_point.canvasClicked.disconnect()
+    emit_point.canvasClicked.disconnect()
     global_vars.canvas.xyCoordinates.disconnect()
     parent_vars.xyCoordinates_conected = False
     global_vars.iface.mapCanvas().refreshAllLayers()
@@ -960,14 +960,13 @@ def fill_table_by_expr(qtable, table_name, expr):
     if model.lastError().isValid():
         global_vars.controller.show_warning(model.lastError().text())
 
+
 def disconnect_snapping():
     """ Select 'Pan' as current map tool and disconnect snapping """
 
     try:
         global_vars.iface.actionPan().trigger()
         global_vars.canvas.xyCoordinates.disconnect()
-        if parent_vars.emit_point:
-            parent_vars.emit_point.canvasClicked.disconnect()
     except:
         pass
 
