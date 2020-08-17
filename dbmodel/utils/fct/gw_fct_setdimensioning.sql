@@ -12,7 +12,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setdimensioning(p_data json)
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_api_setdimensioning($${
+SELECT SCHEMA_NAME.gw_fct_setdimensioning($${
 		"client":{"device":9, "infoType":100, "lang":"ES"},
 		"form":{},
 		"feature":{"tableName":"dimensions", "id":1},
@@ -135,6 +135,10 @@ BEGIN
 		i=i+1;
 
 	END LOOP;
+
+	-- force expl_id using spatial intersect with geometry
+	UPDATE dimensions SET expl_id = (SELECT e.expl_id FROM dimensions d, exploitation e WHERE st_dwithin(d.the_geom, e.the_geom, 0.01) AND id = v_id limit 1)
+	WHERE  id = v_id;
 
 	-- query text, final step	
 	v_querytext := concat ((v_querytext),' )WHERE id = ' || v_id || '');
