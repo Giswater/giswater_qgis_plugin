@@ -118,7 +118,7 @@ v_input json;
 v_presszone_id text;
 v_widgetvalues json;
 v_automatic_ccode boolean;
-v_automatic_ccode_field text;
+v_customercode text = null;
 v_use_fire_code_seq boolean;
 v_node1 text;
 v_node2 text;
@@ -166,13 +166,10 @@ BEGIN
 	SELECT value INTO v_promixity_buffer FROM config_param_system WHERE parameter='edit_feature_buffer_on_mapzone';
 	SELECT value INTO v_use_fire_code_seq FROM config_param_system WHERE parameter='edit_hydrant_use_firecode_seq';
 	SELECT ((value::json)->>'status') INTO v_automatic_ccode FROM config_param_system WHERE parameter='edit_connec_autofill_ccode';
-	SELECT ((value::json)->>'field') INTO v_automatic_ccode_field FROM config_param_system WHERE parameter='edit_connec_autofill_ccode';
 	SELECT (value)::boolean INTO v_sys_raster_dem FROM config_param_system WHERE parameter='admin_raster_dem';
 
 	-- get user parameters
 	SELECT (value)::boolean INTO v_edit_insert_elevation_from_dem FROM config_param_user WHERE parameter='edit_insert_elevation_from_dem' AND cur_user = current_user;
-
-	IF v_automatic_ccode IS TRUE AND v_automatic_ccode_field ='connec_id' THEN v_automatic_ccode = TRUE; ELSE v_automatic_ccode = FALSE; END IF;
 
 	-- get tablename and formname
 	-- Common
@@ -206,6 +203,11 @@ BEGIN
 
 		IF v_catfeature.code_autofill IS TRUE THEN
 			v_code=p_id;
+		END IF;
+
+		-- customer code only for connec
+		IF v_automatic_ccode IS TRUE THEN	
+			v_customercode = p_id;
 		END IF;
 
 		-- topology control (enabled without state topocontrol. Does not make sense to activate this because in this phase of workflow
@@ -544,7 +546,7 @@ BEGIN
 				WHEN 'code' THEN 
 					field_value = v_code;
 				WHEN 'customer_code' THEN 
-					field_value = p_id;
+					field_value = v_customercode;
 				WHEN 'node_1' THEN 
 					field_value = v_noderecord1.node_id;
 				WHEN 'node_2' THEN 
