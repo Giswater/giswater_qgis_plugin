@@ -77,7 +77,7 @@ class GwInfoButton(GwParentMapTool):
 			point = self.create_point(event)
 			if point is False:
 				return
-			self.api_cf.get_layers_from_coordinates(point, self.rubberband_list, self.tab_type)
+			self.get_layers_from_coordinates(point, self.rubberband_list, self.tab_type)
 	
 	
 	def reactivate_map_tool(self):
