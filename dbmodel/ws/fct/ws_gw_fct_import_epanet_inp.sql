@@ -354,7 +354,7 @@ BEGIN
 	-- improve velocity for pipes using directy tables in spite of vi_pipes view
 	INSERT INTO arc (arc_id, node_1, node_2, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type) 
 	SELECT csv1, csv2, csv3, concat((csv6::numeric(12,3))::text,'-',csv5), 'PIPE', 1, 1, 1, 1, 2 
-	FROM temp_csv where source='[PIPES]' AND fid = 12  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
+	FROM temp_csv where source='[PIPES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 	INSERT INTO inp_pipe SELECT csv1, csv7::numeric(12,6), csv8 FROM temp_csv where source='[PIPES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 	INSERT INTO man_pipe SELECT csv1 FROM temp_csv where source='[PIPES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 
@@ -421,7 +421,7 @@ BEGIN
 		 
 		LOOP
 			-- getting man_table to work with
-			SELECT man_table, epa_table INTO v_mantablename, v_epatablename FROM cat_feature JOIN node_type USING(id) WHERE epa_default=v_data.epa_type;
+			SELECT man_table, epa_table INTO v_mantablename, v_epatablename FROM cat_feature JOIN cat_feature_node USING(id) WHERE epa_default=v_data.epa_type;
 
 			-- defining new node parameters
 			v_node_id = replace(v_data.arc_id, '_n2a', '');

@@ -162,8 +162,8 @@ BEGIN
 	    END IF;
 	  ELSIF v_view='vi_report' THEN
 	    INSERT INTO config_param_user (parameter, value, cur_user) 
-	    SELECT id, vdefault, current_user FROM audit_cat_param_user 
-	    WHERE layoutname IN ('grl_reports_17', 'grl_reports_18') AND ismandatory=true AND vdefault IS NOT NULL
+	    SELECT id, vdefault, current_user FROM sys_param_user 
+	    WHERE layoutname IN ('lyt_reports_1', 'lyt_reports_2') AND ismandatory=true AND vdefault IS NOT NULL
 	    ON CONFLICT (parameter,cur_user) DO NOTHING;
 	    
 	  ELSIF v_view='vi_coordinates' THEN

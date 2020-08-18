@@ -10,20 +10,20 @@ SET search_path = 'SCHEMA_NAME', public;
 
 CREATE TRIGGER gw_trg_vi_tanks
   INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON ws_empty2.vi_tanks
+  ON vi_tanks
   FOR EACH ROW
-  EXECUTE PROCEDURE ws_empty2.gw_trg_vi('vi_tanks');
+  EXECUTE PROCEDURE gw_trg_vi('vi_tanks');
 
 
 CREATE TRIGGER gw_trg_vi_valves
   INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON ws_empty2.vi_valves
+  ON vi_valves
   FOR EACH ROW
-  EXECUTE PROCEDURE ws_empty2.gw_trg_vi('vi_valves');
+  EXECUTE PROCEDURE gw_trg_vi('vi_valves');
 
 
 CREATE TRIGGER gw_trg_vi_curves
   INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON ws_empty2.vi_curves
+  ON vi_curves
   FOR EACH ROW
-  EXECUTE PROCEDURE ws_empty2.gw_trg_vi('vi_curves');
+  EXECUTE PROCEDURE gw_trg_vi('vi_curves');
