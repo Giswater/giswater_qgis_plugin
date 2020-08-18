@@ -106,12 +106,15 @@ class GwDocument:
         self.dlg_add_doc.btn_accept.clicked.connect(
             partial(self.manage_document_accept, table_object, tablename, qtable, item_id))
         self.dlg_add_doc.btn_cancel.clicked.connect(
-            partial(manage_close, self.dlg_add_doc, table_object, cur_active_layer, excluded_layers=["v_edit_element"]))
-        self.dlg_add_doc.rejected.connect(partial(manage_close, self.dlg_add_doc,
-                                          table_object, cur_active_layer, excluded_layers=["v_edit_element"]))
+            partial(manage_close, self.dlg_add_doc, table_object, cur_active_layer, excluded_layers=["v_edit_element"],
+                    single_tool_mode=self.single_tool_mode))
+        self.dlg_add_doc.rejected.connect(
+            partial(manage_close, self.dlg_add_doc, table_object, cur_active_layer, excluded_layers=["v_edit_element"],
+                    single_tool_mode=self.single_tool_mode))
         self.dlg_add_doc.tab_feature.currentChanged.connect(
             partial(tab_feature_changed, self.dlg_add_doc, table_object, excluded_layers=["v_edit_element"]))
-        self.dlg_add_doc.doc_id.textChanged.connect(partial(exist_object, self.dlg_add_doc, table_object))
+        self.dlg_add_doc.doc_id.textChanged.connect(partial(exist_object, self.dlg_add_doc, table_object,
+                                                            self.single_tool_mode))
         self.dlg_add_doc.btn_insert.clicked.connect(partial(insert_feature, self.dlg_add_doc, table_object))
         self.dlg_add_doc.btn_delete.clicked.connect(partial(delete_records, self.dlg_add_doc, table_object))
         self.dlg_add_doc.btn_snapping.clicked.connect(partial(selection_init, self.dlg_add_doc, table_object))
@@ -216,7 +219,8 @@ class GwDocument:
         status = self.controller.execute_sql(sql)
         if status:
             self.doc_id = doc_id
-            manage_close(self.dlg_add_doc, table_object, excluded_layers=["v_edit_element"])
+            manage_close(self.dlg_add_doc, table_object, excluded_layers=["v_edit_element"],
+                         single_tool_mode=self.single_tool_mode)
 
         if tablename is None:
             return

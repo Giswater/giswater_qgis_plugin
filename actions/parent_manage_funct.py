@@ -200,7 +200,7 @@ def get_records_geom_type(dialog, table_object, geom_type):
         set_table_model(dialog, widget_name, geom_type, expr_filter)
 
 
-def exist_object(dialog, table_object):
+def exist_object(dialog, table_object, single_tool_mode=None):
     """ Check if selected object (document or element) already exists """
 
     # Reset list of selected records
@@ -228,8 +228,8 @@ def exist_object(dialog, table_object):
             set_combo(dialog, 'workcat_id', 'cat_work',
                            'edit_workcat_vdefault', field_id='id', field_name='id')
 
-        if parent_vars.single_tool_mode:
-            remove_selection(True)
+        if single_tool_mode is not None:
+            remove_selection(single_tool_mode)
         else:
             remove_selection(True)
         reset_model(dialog, table_object, "arc")
@@ -707,15 +707,15 @@ def delete_records(dialog, table_object, query=False):
     connect_signal_selection_changed(dialog, table_object)
 
 
-def manage_close(dialog, table_object, cur_active_layer=None, excluded_layers=[]):
+def manage_close(dialog, table_object, cur_active_layer=None, excluded_layers=[], single_tool_mode=None):
     """ Close dialog and disconnect snapping """
 
     if cur_active_layer:
         global_vars.iface.setActiveLayer(cur_active_layer)
     # some tools can work differently if standalone or integrated in
     # another tool
-    if parent_vars.single_tool_mode:
-            remove_selection(True)
+    if single_tool_mode is not None:
+        remove_selection(single_tool_mode)
     else:
         remove_selection(True)
 
