@@ -746,7 +746,7 @@ def selection_init(dialog, table_object, query=False):
     global_vars.canvas.setCursor(cursor)
 
 
-def selection_changed(dialog, table_object, geom_type, query=False):
+def selection_changed(dialog, table_object, geom_type, query=False, plan_om=None):
     """ Slot function for signal 'canvas.selectionChanged' """
 
     disconnect_signal_selection_changed()
@@ -795,7 +795,7 @@ def selection_changed(dialog, table_object, geom_type, query=False):
     # Reload contents of table 'tbl_@table_object_x_@geom_type'
     if query:
         insert_feature_to_plan(dialog, geom_type)
-        if parent_vars.plan_om == 'plan':
+        if plan_om == 'plan':
             remove_selection()
         reload_qtable(dialog, geom_type)
     else:

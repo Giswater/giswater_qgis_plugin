@@ -820,7 +820,7 @@ class GwPsector:
 
         try:
             self.canvas.selectionChanged.connect(
-                partial(selection_changed, dialog, table_object, self.geom_type, query))
+                partial(selection_changed, dialog, table_object, self.geom_type, query, plan_om='plan'))
         except Exception:
             pass
 
