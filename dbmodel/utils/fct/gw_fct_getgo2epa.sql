@@ -24,8 +24,6 @@ v_version json;
 v_formname text;
 v_fields  json[];
 v_fields_json json;
-v_formgroupbox json[];
-v_formgroupbox_json json;
    
 BEGIN
 
@@ -45,24 +43,17 @@ BEGIN
 
 	v_fields_json = array_to_json (v_fields);
 
-	-- Construction of groupbox formlayouts
-	EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (SELECT layout_id AS "layout", label FROM config_form_groupbox 
-		WHERE formname=$1 ORDER BY layout_id) a'
-			INTO v_formgroupbox
-			USING v_formname;
 
 	v_formgroupbox_json := array_to_json(v_formgroupbox);
 
 	-- Control NULL's
 	v_fields := COALESCE(v_fields, '{}');
 	v_version := COALESCE(v_version, '{}');
-	v_formgroupbox_json := COALESCE(v_formgroupbox_json, '{}');
 		
 	-- Return
     RETURN ('{"status":"Accepted", "version":'||v_version||
              ',"body":{"message":{"level":1, "text":"This is a test message"}'||
 			',"form":{"formName":"", "formLabel":"", "formText":""'||
-  				',"formGroupBox":'||v_formgroupbox_json||'}'||
 			',"data":{"fields":' || v_fields_json ||
 				'}'||
 			'}'||

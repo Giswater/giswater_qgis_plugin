@@ -63,3 +63,5 @@ VALUES (2996, 'gw_trg_edit_element_pol', 'utils', 'function')ON CONFLICT (id) DO
 
 INSERT INTO config_toolbox VALUES (2522, 'Import epanet inp file', TRUE, '{"featureType":[]}', '[{"widgetname":"useNode2arc", "label":"Create node2arc:", "widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layoutorder":1,"value":"false"}]', null, TRUE);
 INSERT INTO config_toolbox VALUES (2524, 'Import swmm inp file', TRUE, '{"featureType":[]}', '[{"widgetname":"createSubcGeom", "label":"Create subcatchments geometry:", "widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layoutorder":1,"value":"true"}]', null, TRUE);
+
+DELETE FROM sys_table WHERE id = 'config_form_groupbox';

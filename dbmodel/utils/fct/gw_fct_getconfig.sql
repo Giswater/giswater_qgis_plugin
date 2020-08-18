@@ -48,8 +48,6 @@ aux_json_child json;
 v_device integer;
 v_formname text;
 v_tabadmin json;
-v_formgroupbox json[];
-v_formgroupbox_json json;
 v_querytext json;
 v_epaversion text;
 v_orderby text;
@@ -323,15 +321,6 @@ BEGIN
 	--  Finish the construction of v_formtabs
     v_formtabs := v_formtabs ||']';
 
-	--  Construction of groupbox - formlayouts
-    EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (SELECT layoutname AS "layout", label FROM config_form_groupbox WHERE formname=$1 AND layoutname IN 
-			(SELECT layoutname FROM sys_param_user WHERE sys_role IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
-			UNION SELECT layoutname FROM config_param_system WHERE ''role_admin'' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member'')))
-		ORDER BY layoutname) a'
-		INTO v_formgroupbox
-		USING v_formname;
-
-	v_formgroupbox_json := array_to_json(v_formgroupbox);
 
 	-- Check null
     v_version := COALESCE(v_version, '[]');
@@ -343,7 +332,6 @@ BEGIN
              ',"body":{"message":{"level":1, "text":"This is a test message"}'||
 			',"form":{"formName":"", "formLabel":"", "formText":""'|| 
 				',"formTabs":'||v_formtabs||
-				',"formGroupBox":'||v_formgroupbox_json||
 				',"formActions":[]}'||
 			',"feature":{}'||
 			',"data":{}}'||
