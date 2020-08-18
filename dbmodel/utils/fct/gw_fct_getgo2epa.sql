@@ -43,9 +43,6 @@ BEGIN
 
 	v_fields_json = array_to_json (v_fields);
 
-
-	v_formgroupbox_json := array_to_json(v_formgroupbox);
-
 	-- Control NULL's
 	v_fields := COALESCE(v_fields, '{}');
 	v_version := COALESCE(v_version, '{}');

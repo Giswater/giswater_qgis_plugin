@@ -325,7 +325,6 @@ BEGIN
 	-- Check null
     v_version := COALESCE(v_version, '[]');
     v_formtabs := COALESCE(v_formtabs, '[]'); 
-    v_formgroupbox_json := COALESCE(v_formgroupbox_json, '[]'); 
 
 	-- Return
     RETURN ('{"status":"Accepted", "version":'||v_version||
