@@ -330,7 +330,6 @@ def add_point():
 def mouse_move(point):
 
     # Hide marker and get coordinates
-    parent_vars.snapped_point = None
     parent_vars.vertex_marker.hide()
     event_point = parent_vars.snapper_manager.get_event_point(point=point)
 
@@ -345,12 +344,8 @@ def mouse_move(point):
 def get_xy(point, emit_point):
     """ Get coordinates of selected point """
 
-    if parent_vars.snapped_point:
-        parent_vars.x = parent_vars.snapped_point.x()
-        parent_vars.y = parent_vars.snapped_point.y()
-    else:
-        parent_vars.x = point.x()
-        parent_vars.y = point.y()
+    parent_vars.x = point.x()
+    parent_vars.y = point.y()
 
     message = "Geometry has been added!"
     global_vars.controller.show_info(message)

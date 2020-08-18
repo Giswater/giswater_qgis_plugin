@@ -20,7 +20,6 @@ user_current_layer = None
 list_update = None
 
 # parent_manage.py
-snapped_point  = None
 x  = None
 y = None
 plan_om = None
