@@ -1048,32 +1048,6 @@ def get_values_changed_param_user(dialog, chk, widget, field, list, value=None):
     global_vars.controller.log_info(str(list))
 
 
-def get_values_checked_param_user(dialog, chk, widget, field, _json, value=None):
-
-    elem = {}
-    elem['widget'] = str(widget.objectName())
-    elem['chk'] = str(chk.objectName())
-
-    if type(widget) is QLineEdit:
-        value = qt_tools.getWidgetText(dialog, widget, return_string_null=False)
-    elif type(widget) is QComboBox:
-        value = qt_tools.get_item_data(dialog, widget, 0)
-    elif type(widget) is QCheckBox:
-        value = qt_tools.isChecked(dialog, chk)
-    elif type(widget) is QDateEdit:
-        value = qt_tools.getCalendarDate(dialog, widget)
-    elem['widget'] = str(widget.objectName())
-    elem['chk'] = str(chk.objectName())
-    elem['isChecked'] = str(qt_tools.isChecked(dialog, chk))
-    elem['value'] = value
-    if 'sys_role_id' in field:
-        elem['sys_role_id'] = str(field['sys_role_id'])
-    else:
-        elem['sys_role_id'] = 'role_admin'
-
-    parent_vars.list_update.append(elem)
-
-
 def set_widgets_into_composer(dialog, field, my_json=None):
 
     widget = None
