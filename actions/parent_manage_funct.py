@@ -803,7 +803,7 @@ def selection_changed(dialog, table_object, geom_type, query=False, plan_om=None
         apply_lazy_init(table_object)
 
     # Remove selection in generic 'v_edit' layers
-    if parent_vars.plan_om == 'plan':
+    if plan_om == 'plan':
         remove_selection(False)
     enable_feature_type(dialog, table_object)
     connect_signal_selection_changed(dialog, table_object)
