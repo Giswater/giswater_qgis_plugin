@@ -370,12 +370,12 @@ class GwPsector:
         self.dlg_plan_psector.btn_unselect.clicked.connect(partial(self.update_total,
             self.dlg_plan_psector, self.dlg_plan_psector.selected_rows))
         self.dlg_plan_psector.btn_insert.clicked.connect(partial(insert_feature,
-            self.dlg_plan_psector, table_object, True))
+            self.dlg_plan_psector, table_object, True, geom_type=self.geom_type))
         self.dlg_plan_psector.btn_delete.clicked.connect(partial(delete_records,
-            self.dlg_plan_psector, table_object, True))
+            self.dlg_plan_psector, table_object, True, geom_type=self.geom_type))
         self.dlg_plan_psector.btn_delete.setShortcut(QKeySequence(Qt.Key_Delete))
         self.dlg_plan_psector.btn_snapping.clicked.connect(partial(self.selection_init,
-            self.dlg_plan_psector, table_object, True))
+            self.dlg_plan_psector, table_object, True, geom_type=self.geom_type))
 
         self.dlg_plan_psector.btn_rapports.clicked.connect(partial(self.open_dlg_rapports))
         self.dlg_plan_psector.tab_feature.currentChanged.connect(partial(tab_feature_changed,

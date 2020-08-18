@@ -17,7 +17,6 @@ list_ids = None
 layers = None
 lazy_widget = None
 lazy_init_function = None
-geom_type = None
 
 def init_global_vars():
 	global add_layer

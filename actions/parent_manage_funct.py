@@ -369,21 +369,21 @@ def tab_feature_changed(dialog, table_object, excluded_layers=[]):
     # parent_vars.get_values_from_form(dialog)
     tab_position = dialog.tab_feature.currentIndex()
     if tab_position == 0:
-        parent_vars.geom_type = "arc"
+        geom_type = "arc"
     elif tab_position == 1:
-        parent_vars.geom_type = "node"
+        geom_type = "node"
     elif tab_position == 2:
-        parent_vars.geom_type = "connec"
+        geom_type = "connec"
     elif tab_position == 3:
-        parent_vars.geom_type = "element"
+        geom_type = "element"
     elif tab_position == 4:
-        parent_vars.geom_type = "gully"
+        geom_type = "gully"
 
     hide_generic_layers(excluded_layers=excluded_layers)
-    viewname = f"v_edit_{parent_vars.geom_type}"
+    viewname = f"v_edit_{geom_type}"
 
     # Adding auto-completion to a QLineEdit
-    set_completer_feature_id(dialog.feature_id, parent_vars.geom_type, viewname)
+    set_completer_feature_id(dialog.feature_id, geom_type, viewname)
 
     global_vars.iface.actionPan().trigger()
 
@@ -610,13 +610,13 @@ def select_features_by_ids(geom_type, expr):
                 layer.removeSelection()
 
 
-def delete_records(dialog, table_object, query=False):
+def delete_records(dialog, table_object, query=False, geom_type=None):
     """ Delete selected elements of the table """
 
     disconnect_signal_selection_changed()
 
     if type(table_object) is str:
-        widget_name = f"tbl_{table_object}_x_{parent_vars.geom_type}"
+        widget_name = f"tbl_{table_object}_x_{geom_type}"
         widget = qt_tools.getWidget(dialog, widget_name)
         if not widget:
             message = "Widget not found"
@@ -644,11 +644,11 @@ def delete_records(dialog, table_object, query=False):
     if query:
         full_list = widget.model()
         for x in range(0, full_list.rowCount()):
-            parent_vars.ids.append(widget.model().record(x).value(f"{parent_vars.geom_type}_id"))
+            parent_vars.ids.append(widget.model().record(x).value(f"{geom_type}_id"))
     else:
-        parent_vars.ids = parent_vars.list_ids[parent_vars.geom_type]
+        parent_vars.ids = parent_vars.list_ids[geom_type]
 
-    field_id = parent_vars.geom_type + "_id"
+    field_id = geom_type + "_id"
 
     del_id = []
     inf_text = ""
@@ -687,23 +687,23 @@ def delete_records(dialog, table_object, query=False):
 
     # Update model of the widget with selected expr_filter
     if query:
-        delete_feature_at_plan(dialog, parent_vars.geom_type, list_id)
-        reload_qtable(dialog, parent_vars.geom_type)
+        delete_feature_at_plan(dialog, geom_type, list_id)
+        reload_qtable(dialog, geom_type)
     else:
-        reload_table(dialog, table_object, parent_vars.geom_type, expr_filter)
+        reload_table(dialog, table_object, geom_type, expr_filter)
         apply_lazy_init(table_object)
 
     # Select features with previous filter
     # Build a list of feature id's and select them
-    select_features_by_ids(parent_vars.geom_type, expr)
+    select_features_by_ids(geom_type, expr)
 
     if query:
         remove_selection()
 
     # Update list
-    parent_vars.list_ids[parent_vars.geom_type] = parent_vars.ids
+    parent_vars.list_ids[geom_type] = parent_vars.ids
     enable_feature_type(dialog, table_object)
-    connect_signal_selection_changed(dialog, table_object)
+    connect_signal_selection_changed(dialog, table_object, geom_type)
 
 
 def manage_close(dialog, table_object, cur_active_layer=None, excluded_layers=[], single_tool_mode=None):
@@ -730,18 +730,18 @@ def manage_close(dialog, table_object, cur_active_layer=None, excluded_layers=[]
     disconnect_signal_selection_changed()
 
 
-def selection_init(dialog, table_object, query=False):
+def selection_init(dialog, table_object, query=False, geom_type=None):
     """ Set canvas map tool to an instance of class 'MultipleSelection' """
 
     from .multiple_selection import MultipleSelection
     
-    if parent_vars.geom_type == 'all':
-        parent_vars.geom_type = 'arc'
-    multiple_selection = MultipleSelection(parent_vars.layers[parent_vars.geom_type], parent_manage=None,
+    if geom_type in ('all', None):
+        geom_type = 'arc'
+    multiple_selection = MultipleSelection(parent_vars.layers[geom_type], parent_manage=None,
                                            table_object=table_object, dialog=dialog)
     disconnect_signal_selection_changed()
     global_vars.canvas.setMapTool(multiple_selection)
-    connect_signal_selection_changed(dialog, table_object, query)
+    connect_signal_selection_changed(dialog, table_object, query, geom_type)
     cursor = get_cursor_multiple_selection()
     global_vars.canvas.setCursor(cursor)
 
@@ -805,7 +805,7 @@ def selection_changed(dialog, table_object, geom_type, query=False, plan_om=None
     if plan_om == 'plan':
         remove_selection(False)
     enable_feature_type(dialog, table_object)
-    connect_signal_selection_changed(dialog, table_object)
+    connect_signal_selection_changed(dialog, table_object, geom_type)
 
 
 def delete_feature_at_plan(dialog, geom_type, list_id):
@@ -828,21 +828,21 @@ def enable_feature_type(dialog, widget_name='tbl_relation'):
             feature_type.setEnabled(True)
 
 
-def insert_feature(dialog, table_object, query=False, remove_ids=True):
+def insert_feature(dialog, table_object, query=False, remove_ids=True, geom_type=None):
     """ Select feature with entered id. Set a model with selected filter.
         Attach that model to selected table
     """
 
     disconnect_signal_selection_changed()
 
-    if parent_vars.geom_type == 'all':
+    if geom_type in ('all', None):
         tab_feature_changed(dialog, table_object)
 
     # Clear list of ids
     if remove_ids:
         parent_vars.ids = []
 
-    field_id = f"{parent_vars.geom_type}_id"
+    field_id = f"{geom_type}_id"
     feature_id = qt_tools.getWidgetText(dialog, "feature_id")
     expr_filter = f"{field_id} = '{feature_id}'"
 
@@ -852,7 +852,7 @@ def insert_feature(dialog, table_object, query=False, remove_ids=True):
         return None
 
     # Select features of layers applying @expr
-    select_features_by_ids(parent_vars.geom_type, expr)
+    select_features_by_ids(geom_type, expr)
 
     if feature_id == 'null':
         message = "You need to enter a feature id"
@@ -860,7 +860,7 @@ def insert_feature(dialog, table_object, query=False, remove_ids=True):
         return
 
     # Iterate over all layers of the group
-    for layer in parent_vars.layers[parent_vars.geom_type]:
+    for layer in parent_vars.layers[geom_type]:
         if layer.selectedFeatureCount() > 0:
             # Get selected features of the layer
             features = layer.selectedFeatures()
@@ -886,7 +886,7 @@ def insert_feature(dialog, table_object, query=False, remove_ids=True):
 
     # Select features with previous filter
     # Build a list of feature id's and select them
-    for layer in parent_vars.layers[parent_vars.geom_type]:
+    for layer in parent_vars.layers[geom_type]:
         it = layer.getFeatures(QgsFeatureRequest(expr))
         id_list = [i.id() for i in it]
         if len(id_list) > 0:
@@ -894,18 +894,18 @@ def insert_feature(dialog, table_object, query=False, remove_ids=True):
 
     # Reload contents of table 'tbl_???_x_@geom_type'
     if query:
-        insert_feature_to_plan(dialog, parent_vars.geom_type)
+        insert_feature_to_plan(dialog, geom_type)
         remove_selection()
     else:
-        reload_table(dialog, table_object, parent_vars.geom_type, expr_filter)
+        reload_table(dialog, table_object, geom_type, expr_filter)
         apply_lazy_init(table_object)
 
     # Update list
-    parent_vars.list_ids[parent_vars.geom_type] = parent_vars.ids
+    parent_vars.list_ids[geom_type] = parent_vars.ids
     enable_feature_type(dialog, table_object)
-    connect_signal_selection_changed(dialog, table_object)
+    connect_signal_selection_changed(dialog, table_object, geom_type)
 
-    global_vars.controller.log_info(parent_vars.list_ids[parent_vars.geom_type])
+    global_vars.controller.log_info(parent_vars.list_ids[geom_type])
 
 
 def insert_feature_to_plan(dialog, geom_type):
@@ -1071,12 +1071,14 @@ def hide_generic_layers(excluded_layers=[]):
             global_vars.controller.set_layer_visible(layer)
 
 
-def connect_signal_selection_changed(dialog, table_object, query=False):
+def connect_signal_selection_changed(dialog, table_object, query=False, geom_type=None):
     """ Connect signal selectionChanged """
 
     try:
+        if geom_type in ('all', None):
+            geom_type = 'arc'
         global_vars.canvas.selectionChanged.connect(
-            partial(selection_changed, dialog, table_object, parent_vars.geom_type, query))
+            partial(selection_changed, dialog, table_object, geom_type, query))
     except Exception as e:
         global_vars.controller.log_info(f"connect_signal_selection_changed: {e}")
 

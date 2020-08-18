@@ -83,10 +83,12 @@ class GwFeatureEnd:
                                            self.table_object, self.cur_active_layer, force_downgrade=True, show_warning=True))
         self.dlg_work_end.workcat_id_end.editTextChanged.connect(partial(self.fill_workids))
         self.dlg_work_end.btn_new_workcat.clicked.connect(partial(self.new_workcat))
-        self.dlg_work_end.btn_insert.clicked.connect(partial(insert_feature, self.dlg_work_end, self.table_object))
-        self.dlg_work_end.btn_delete.clicked.connect(partial(delete_records, self.dlg_work_end, self.table_object))
+        self.dlg_work_end.btn_insert.clicked.connect(partial(insert_feature, self.dlg_work_end, self.table_object,
+                                                             geom_type=self.geom_type))
+        self.dlg_work_end.btn_delete.clicked.connect(partial(delete_records, self.dlg_work_end, self.table_object,
+                                                             geom_type=self.geom_type))
         self.dlg_work_end.btn_snapping.clicked.connect(
-            partial(selection_init, self.dlg_work_end, self.table_object))
+            partial(selection_init, self.dlg_work_end, self.table_object, geom_type=self.geom_type))
         self.dlg_work_end.workcat_id_end.activated.connect(partial(self.fill_workids))
         self.dlg_work_end.tab_feature.currentChanged.connect(
             partial(tab_feature_changed, self.dlg_work_end, self.table_object, excluded_layers=["v_edit_element"]))

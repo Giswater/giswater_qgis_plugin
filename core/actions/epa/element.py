@@ -102,11 +102,11 @@ class GwElement:
         self.dlg_add_element.element_id.textChanged.connect(
             partial(exist_object, self.dlg_add_element, table_object))
         self.dlg_add_element.btn_insert.clicked.connect(
-            partial(insert_feature, self.dlg_add_element, table_object))
+            partial(insert_feature, self.dlg_add_element, table_object, geom_type=geom_type))
         self.dlg_add_element.btn_delete.clicked.connect(
-            partial(delete_records, self.dlg_add_element, table_object))
+            partial(delete_records, self.dlg_add_element, table_object, geom_type=geom_type))
         self.dlg_add_element.btn_snapping.clicked.connect(
-            partial(selection_init, self.dlg_add_element, table_object))
+            partial(selection_init, self.dlg_add_element, table_object, geom_type=geom_type))
         self.dlg_add_element.btn_add_geom.clicked.connect(add_point)
         self.dlg_add_element.state.currentIndexChanged.connect(partial(self.filter_state_type))
 
