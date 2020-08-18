@@ -919,19 +919,19 @@ def activate_snapping(complet_result, ep, layer, last_point=None):
     parent_vars.rb_interpolate = []
     parent_vars.interpolate_result = None
     resetRubberbands()
-    parent_vars.dlg_dtext = DialogTextUi()
-    load_settings(parent_vars.dlg_dtext)
+    dlg_dtext = DialogTextUi()
+    load_settings(dlg_dtext)
 
-    qt_tools.setWidgetText(parent_vars.dlg_dtext, parent_vars.dlg_dtext.txt_infolog, 'Interpolate tool')
-    parent_vars.dlg_dtext.lbl_text.setText("Please, use the cursor to select two nodes to proceed with the "
+    qt_tools.setWidgetText(dlg_dtext, dlg_dtext.txt_infolog, 'Interpolate tool')
+    dlg_dtext.lbl_text.setText("Please, use the cursor to select two nodes to proceed with the "
                                     "interpolation\nNode1: \nNode2:")
 
-    parent_vars.dlg_dtext.btn_accept.clicked.connect(partial(chek_for_existing_values))
-    parent_vars.dlg_dtext.btn_close.clicked.connect(partial(close_dialog, parent_vars.dlg_dtext))
-    parent_vars.dlg_dtext.rejected.connect(partial(save_settings, parent_vars.dlg_dtext))
-    parent_vars.dlg_dtext.rejected.connect(partial(remove_interpolate_rb))
+    dlg_dtext.btn_accept.clicked.connect(partial(chek_for_existing_values, dlg_dtext))
+    dlg_dtext.btn_close.clicked.connect(partial(close_dialog, dlg_dtext))
+    dlg_dtext.rejected.connect(partial(save_settings, dlg_dtext))
+    dlg_dtext.rejected.connect(partial(remove_interpolate_rb))
 
-    open_dialog(parent_vars.dlg_dtext, dlg_name='dialog_text')
+    open_dialog(dlg_dtext, dlg_name='dialog_text')
 
     # Set circle vertex marker
     color = QColor(255, 100, 255)
@@ -959,7 +959,7 @@ def activate_snapping(complet_result, ep, layer, last_point=None):
     global_vars.iface.setActiveLayer(parent_vars.layer_node)
 
     global_vars.canvas.xyCoordinates.connect(partial(mouse_move))
-    ep.canvasClicked.connect(partial(snapping_node, ep, last_point, layer))
+    ep.canvasClicked.connect(partial(snapping_node, ep, last_point, layer, dlg_dtext))
 
 
 def dlg_destroyed(layer=None, vertex=None):
@@ -979,7 +979,7 @@ def dlg_destroyed(layer=None, vertex=None):
         pass
 
 
-def snapping_node(ep, point, layer, button, last_point=None):
+def snapping_node(ep, point, layer, dlg_dtext, button, last_point=None):
     """ Get id of selected nodes (node1 and node2) """
 
     if button == 2:
@@ -1004,14 +1004,14 @@ def snapping_node(ep, point, layer, button, last_point=None):
                 rb = draw_point(QgsPointXY(result.point()), color=QColor(
                     0, 150, 55, 100), width=10, is_new=True)
                 parent_vars.rb_interpolate.append(rb)
-                parent_vars.dlg_dtext.lbl_text.setText(f"Node1: {parent_vars.node1}\nNode2:")
+                dlg_dtext.lbl_text.setText(f"Node1: {parent_vars.node1}\nNode2:")
                 global_vars.controller.show_message(message, message_level=0, parameter=parent_vars.node1)
             elif parent_vars.node1 != str(element_id):
                 parent_vars.node2 = str(element_id)
                 rb = draw_point(QgsPointXY(result.point()), color=QColor(
                     0, 150, 55, 100), width=10, is_new=True)
                 parent_vars.rb_interpolate.append(rb)
-                parent_vars.dlg_dtext.lbl_text.setText(f"Node1: {parent_vars.node1}\nNode2: {parent_vars.node2}")
+                dlg_dtext.lbl_text.setText(f"Node1: {parent_vars.node1}\nNode2: {parent_vars.node2}")
                 global_vars.controller.show_message(message, message_level=0, parameter=parent_vars.node2)
 
     if parent_vars.node1 and parent_vars.node2:
@@ -1027,10 +1027,10 @@ def snapping_node(ep, point, layer, button, last_point=None):
         extras += f'"node2":"{parent_vars.node2}"}}'
         body = create_body(extras=extras)
         parent_vars.interpolate_result = global_vars.controller.get_json('gw_fct_node_interpolate', body, log_sql=True)
-        parent_vars.add_layer.populate_info_text(parent_vars.dlg_dtext, parent_vars.interpolate_result['body']['data'])
+        parent_vars.add_layer.populate_info_text(dlg_dtext, parent_vars.interpolate_result['body']['data'])
 
 
-def chek_for_existing_values():
+def chek_for_existing_values(dlg_dtext):
 
     text = False
     for k, v in parent_vars.interpolate_result['body']['data']['fields'][0].items():
@@ -1041,13 +1041,13 @@ def chek_for_existing_values():
                 msg = "Do you want to overwrite custom values?"
                 answer = global_vars.controller.ask_question(msg, "Overwrite values")
                 if answer:
-                    set_values()
+                    set_values(dlg_dtext)
                 break
     if not text:
-        set_values()
+        set_values(dlg_dtext)
 
 
-def set_values():
+def set_values(dlg_dtext):
 
     # Set values tu info form
     for k, v in parent_vars.interpolate_result['body']['data']['fields'][0].items():
@@ -1056,7 +1056,7 @@ def set_values():
             widget.setStyleSheet(None)
             qt_tools.setWidgetText(parent_vars.dlg_cf, widget, f'{v}')
             widget.editingFinished.emit()
-    close_dialog(parent_vars.dlg_dtext)
+    close_dialog(dlg_dtext)
 
 
 def remove_interpolate_rb():
