@@ -74,7 +74,7 @@ def remove_selection(remove_groups=True):
     if layer:
         layer.removeSelection()
 
-    if parent_vars.project_type == 'ud':
+    if global_vars.project_type == 'ud':
         layer = global_vars.controller.get_layer_by_tablename("v_edit_gully")
         if layer:
             layer.removeSelection()
@@ -236,7 +236,7 @@ def exist_object(dialog, table_object, single_tool_mode=None):
         reset_model(dialog, table_object, "node")
         reset_model(dialog, table_object, "connec")
         reset_model(dialog, table_object, "element")
-        if parent_vars.project_type == 'ud':
+        if global_vars.project_type == 'ud':
             reset_model(dialog, table_object, "gully")
 
         return
@@ -257,7 +257,7 @@ def exist_object(dialog, table_object, single_tool_mode=None):
     get_records_geom_type(dialog, table_object, "element")
 
     # Check related 'gullys'
-    if parent_vars.project_type == 'ud':
+    if global_vars.project_type == 'ud':
         get_records_geom_type(dialog, table_object, "gully")
 
 
@@ -723,7 +723,7 @@ def manage_close(dialog, table_object, cur_active_layer=None, excluded_layers=[]
     reset_model(dialog, table_object, "node")
     reset_model(dialog, table_object, "connec")
     reset_model(dialog, table_object, "element")
-    if parent_vars.project_type == 'ud':
+    if global_vars.project_type == 'ud':
         reset_model(dialog, table_object, "gully")
     close_dialog(dialog)
     hide_generic_layers(excluded_layers=excluded_layers)
@@ -1067,7 +1067,7 @@ def hide_generic_layers(excluded_layers=[]):
     if layer and "v_edit_element" not in excluded_layers:
         global_vars.controller.set_layer_visible(layer)
 
-    if parent_vars.project_type == 'ud':
+    if global_vars.project_type == 'ud':
         layer = global_vars.controller.get_layer_by_tablename("v_edit_gully")
         if layer and "v_edit_gully" not in excluded_layers:
             global_vars.controller.set_layer_visible(layer)

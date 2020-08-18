@@ -3,7 +3,6 @@ from .. import global_vars
 
 
 feature_id = None
-geom_type = None
 snapper_manager = None
 snapper = None
 vertex_marker = None
@@ -22,7 +21,6 @@ user_current_layer = None
 list_update = None
 
 # parent_manage.py
-project_type = None
 xyCoordinates_conected = None
 snapped_point  = None
 x  = None
@@ -34,6 +32,7 @@ layers = None
 remove_ids = None
 lazy_widget = None
 lazy_init_function = None
+geom_type = None
 
 def init_global_vars():
 	global add_layer

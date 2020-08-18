@@ -82,7 +82,8 @@ class LoadProject(QObject):
         
         # TEMP
         global_vars.schema_name = self.schema_name
-        
+        global_vars.project_type = self.controller.get_project_type()
+
         # Manage locale and corresponding 'i18n' file
         self.controller.manage_translation(self.plugin_name)
 
