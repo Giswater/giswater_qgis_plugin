@@ -46,8 +46,8 @@ INSERT INTO config_toolbox VALUES (2496, 'Arc repair', TRUE, '{"featureType":["a
 INSERT INTO sys_param_user(id, formname, descript, sys_role,  label, isenabled, layoutorder, project_type, isparent, 
 isautoupdate, datatype, widgettype, ismandatory, layoutname, iseditable,  isdeprecated)
 VALUES ('edit_element_doublegeom', 'config', 'If value, overwrites trigger element value to create double geometry in case elementcat_id is defined with this attribute',
-'role_edit', 'Doublegeometry value for element:', 2, 11, 'utils', FALSE, FALSE, 'boolean', 'check', FALSE, 'lyt_inventory',
-TRUE, FALSE) ON CONFLICT (id) DO NOTHING;
+'role_edit', 'Doublegeometry value for element:', true, 11, 'utils', FALSE, 
+FALSE, 'boolean', 'check', FALSE, 'lyt_inventory',TRUE, FALSE) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_function (id, function_name, project_type, function_type) 
 VALUES (2996, 'gw_trg_edit_element_pol', 'utils', 'function')ON CONFLICT (id) DO NOTHING;

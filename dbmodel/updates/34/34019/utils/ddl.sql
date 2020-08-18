@@ -11,3 +11,5 @@ set search_path = 'SCHEMA_NAME';
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_element", "column":"geom1", "dataType":"numeric(12,3)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_element", "column":"geom2", "dataType":"numeric(12,3)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_element", "column":"isdoublegeom", "dataType":"boolean", "isUtils":"False"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"element", "column":"pol_id", "dataType":"varchar(16)", "isUtils":"False"}}$$);
