@@ -5,7 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: latin-1 -*-
-from qgis.core import QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest
+from qgis.core import QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, QgsPointXY
 from qgis.gui import QgsDateTimeEdit, QgsVertexMarker, QgsMapToolEmitPoint
 from qgis.PyQt.QtCore import pyqtSignal, QDate, QObject, QRegExp, QStringListModel, Qt
 from qgis.PyQt.QtGui import QColor, QRegExpValidator, QStandardItem, QStandardItemModel
@@ -32,17 +32,18 @@ from ..epa.element import GwElement
 from ..om.visit_gallery import GwVisitGallery
 from ..om.visit_manager import GwVisitManager
 from ....map_tools.snapping_utils_v3 import SnappingConfigManager
-from ....ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFull, GwMainWindow, VisitDocument, InfoCrossectUi
+from ....ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFull, GwMainWindow, VisitDocument, InfoCrossectUi, \
+    DialogTextUi
 from ..edit.dimensioning import GwDimensioning
 
 from ....actions.parent_functs import set_icon, set_dates_from_to
 from ....actions.api_parent_functs import get_visible_layers, create_body, resetRubberbands, \
     draw, load_settings, close_dialog, populate_basic_info, open_dialog, put_widgets, fill_child, \
-    check_actions, action_open_url, api_action_help, activate_snapping, save_settings, \
+    check_actions, action_open_url, api_action_help, save_settings, \
     get_feature_by_expr, set_setStyleSheet, set_data_type, add_lineedit, set_widget_size, manage_lineedit, add_combobox, \
     add_checkbox, get_values, add_calendar, add_button, add_hyperlink, add_horizontal_spacer, add_vertical_spacer, \
     add_textarea, add_spinbox, add_tableview, set_headers, populate_table, set_columns_config, set_completer_object, \
-    fill_table, clear_gridlayout, add_frame, add_label, set_completer_object_api
+    fill_table, clear_gridlayout, add_frame, add_label, set_completer_object_api, draw_point
 
 class GwInfo(QObject):
 
@@ -521,7 +522,7 @@ class GwInfo(QObject):
         action_section.triggered.connect(partial(self.open_section_form))
         action_help.triggered.connect(partial(api_action_help, self.geom_type))
         self.ep = QgsMapToolEmitPoint(self.canvas)
-        action_interpolate.triggered.connect(partial(activate_snapping, complet_result, self.ep, self.layer,
+        action_interpolate.triggered.connect(partial(self.activate_snapping, complet_result, self.ep, self.layer,
                                                      last_point=self.last_point))
 
         btn_cancel = self.dlg_cf.findChild(QPushButton, 'btn_cancel')
@@ -565,6 +566,173 @@ class GwInfo(QObject):
         self.dlg_cf.setWindowTitle(title)
 
         return self.complet_result, self.dlg_cf
+
+
+    def activate_snapping(self, complet_result, ep, layer, last_point=None):
+        
+        parent_vars.rb_interpolate = []
+        parent_vars.interpolate_result = None
+        resetRubberbands()
+        dlg_dtext = DialogTextUi()
+        load_settings(dlg_dtext)
+        
+        qt_tools.setWidgetText(dlg_dtext, dlg_dtext.txt_infolog, 'Interpolate tool')
+        dlg_dtext.lbl_text.setText("Please, use the cursor to select two nodes to proceed with the "
+                                   "interpolation\nNode1: \nNode2:")
+        
+        dlg_dtext.btn_accept.clicked.connect(partial(self.chek_for_existing_values, dlg_dtext))
+        dlg_dtext.btn_close.clicked.connect(partial(close_dialog, dlg_dtext))
+        dlg_dtext.rejected.connect(partial(save_settings, dlg_dtext))
+        dlg_dtext.rejected.connect(partial(self.remove_interpolate_rb))
+        
+        open_dialog(dlg_dtext, dlg_name='dialog_text')
+        
+        # Set circle vertex marker
+        color = QColor(255, 100, 255)
+        parent_vars.vertex_marker = QgsVertexMarker(global_vars.canvas)
+        parent_vars.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
+        parent_vars.vertex_marker.setColor(color)
+        parent_vars.vertex_marker.setIconSize(15)
+        parent_vars.vertex_marker.setPenWidth(3)
+        
+        parent_vars.node1 = None
+        parent_vars.node2 = None
+        
+        global_vars.canvas.setMapTool(ep)
+        # We redraw the selected feature because self.canvas.setMapTool(emit_point) erases it
+        draw(complet_result[0], None, False)
+        
+        # Store user snapping configuration
+        parent_vars.snapper_manager = SnappingConfigManager(global_vars.iface)
+        if parent_vars.snapper_manager.controller is None:
+            parent_vars.snapper_manager.set_controller(global_vars.controller)
+        parent_vars.snapper_manager.store_snapping_options()
+        parent_vars.snapper = parent_vars.snapper_manager.get_snapper()
+        
+        parent_vars.layer_node = global_vars.controller.get_layer_by_tablename("v_edit_node")
+        global_vars.iface.setActiveLayer(parent_vars.layer_node)
+        
+        global_vars.canvas.xyCoordinates.connect(partial(self.mouse_move))
+        ep.canvasClicked.connect(partial(self.snapping_node, ep, last_point, layer, dlg_dtext))
+
+
+    def snapping_node(self, ep, point, layer, dlg_dtext, button, last_point=None):
+        """ Get id of selected nodes (node1 and node2) """
+
+        if button == 2:
+            self.dlg_destroyed(layer)
+            return
+    
+        # Get coordinates
+        event_point = parent_vars.snapper_manager.get_event_point(point=point)
+        if not event_point:
+            return
+        # Snapping
+        result = parent_vars.snapper_manager.snap_to_current_layer(event_point)
+        if parent_vars.snapper_manager.result_is_valid():
+            layer = parent_vars.snapper_manager.get_snapped_layer(result)
+            # Check feature
+            if layer == parent_vars.layer_node:
+                snapped_feat = parent_vars.snapper_manager.get_snapped_feature(result)
+                element_id = snapped_feat.attribute('node_id')
+                message = "Selected node"
+                if parent_vars.node1 is None:
+                    parent_vars.node1 = str(element_id)
+                    rb = draw_point(QgsPointXY(result.point()), color=QColor(
+                        0, 150, 55, 100), width=10, is_new=True)
+                    parent_vars.rb_interpolate.append(rb)
+                    dlg_dtext.lbl_text.setText(f"Node1: {parent_vars.node1}\nNode2:")
+                    global_vars.controller.show_message(message, message_level=0, parameter=parent_vars.node1)
+                elif parent_vars.node1 != str(element_id):
+                    parent_vars.node2 = str(element_id)
+                    rb = draw_point(QgsPointXY(result.point()), color=QColor(
+                        0, 150, 55, 100), width=10, is_new=True)
+                    parent_vars.rb_interpolate.append(rb)
+                    dlg_dtext.lbl_text.setText(f"Node1: {parent_vars.node1}\nNode2: {parent_vars.node2}")
+                    global_vars.controller.show_message(message, message_level=0, parameter=parent_vars.node2)
+    
+        if parent_vars.node1 and parent_vars.node2:
+            global_vars.canvas.xyCoordinates.disconnect()
+            ep.canvasClicked.disconnect()
+        
+            global_vars.iface.setActiveLayer(layer)
+            global_vars.iface.mapCanvas().scene().removeItem(parent_vars.vertex_marker)
+            extras = f'"parameters":{{'
+            extras += f'"x":{last_point[0]}, '
+            extras += f'"y":{last_point[1]}, '
+            extras += f'"node1":"{parent_vars.node1}", '
+            extras += f'"node2":"{parent_vars.node2}"}}'
+            body = create_body(extras=extras)
+            parent_vars.interpolate_result = global_vars.controller.get_json('gw_fct_node_interpolate', body, log_sql=True)
+            parent_vars.add_layer.populate_info_text(dlg_dtext, parent_vars.interpolate_result['body']['data'])
+    
+    
+    def chek_for_existing_values(self, dlg_dtext):
+        
+        text = False
+        for k, v in parent_vars.interpolate_result['body']['data']['fields'][0].items():
+            widget = parent_vars.dlg_cf.findChild(QWidget, k)
+            if widget:
+                text = qt_tools.getWidgetText(parent_vars.dlg_cf, widget, False, False)
+                if text:
+                    msg = "Do you want to overwrite custom values?"
+                    answer = global_vars.controller.ask_question(msg, "Overwrite values")
+                    if answer:
+                        self.set_values(dlg_dtext)
+                    break
+        if not text:
+            self.set_values(dlg_dtext)
+    
+    
+    def set_values(self, dlg_dtext):
+        
+        # Set values tu info form
+        for k, v in parent_vars.interpolate_result['body']['data']['fields'][0].items():
+            widget = parent_vars.dlg_cf.findChild(QWidget, k)
+            if widget:
+                widget.setStyleSheet(None)
+                qt_tools.setWidgetText(parent_vars.dlg_cf, widget, f'{v}')
+                widget.editingFinished.emit()
+        close_dialog(dlg_dtext)
+
+
+    def dlg_destroyed(self, layer=None, vertex=None):
+
+        parent_vars.dlg_is_destroyed = True
+        if layer is not None:
+            global_vars.iface.setActiveLayer(layer)
+        if vertex is not None:
+            global_vars.iface.mapCanvas().scene().removeItem(vertex)
+        else:
+            if hasattr(parent_vars, 'vertex_marker'):
+                if parent_vars.vertex_marker is not None:
+                    global_vars.iface.mapCanvas().scene().removeItem(parent_vars.vertex_marker)
+        try:
+            global_vars.canvas.xyCoordinates.disconnect()
+        except:
+            pass
+
+
+    def remove_interpolate_rb(self):
+
+        # Remove the circumferences made by the interpolate
+        for rb in parent_vars.rb_interpolate:
+            global_vars.iface.mapCanvas().scene().removeItem(rb)
+    
+    
+    def mouse_move(self, point):
+        
+        # Get clicked point
+        event_point = parent_vars.snapper_manager.get_event_point(point=point)
+        
+        # Snapping
+        result = parent_vars.snapper_manager.snap_to_current_layer(event_point)
+        if parent_vars.snapper_manager.result_is_valid():
+            layer = parent_vars.snapper_manager.get_snapped_layer(result)
+            if layer == parent_vars.layer_node:
+                parent_vars.snapper_manager.add_marker(result, parent_vars.vertex_marker)
+        else:
+            parent_vars.vertex_marker.hide()
 
 
     def action_rotation(self, dialog):
