@@ -670,9 +670,9 @@ class GwInfo(QObject):
         
         text = False
         for k, v in self.interpolate_result['body']['data']['fields'][0].items():
-            widget = parent_vars.dlg_cf.findChild(QWidget, k)
+            widget = self.dlg_cf.findChild(QWidget, k)
             if widget:
-                text = qt_tools.getWidgetText(parent_vars.dlg_cf, widget, False, False)
+                text = qt_tools.getWidgetText(self.dlg_cf, widget, False, False)
                 if text:
                     msg = "Do you want to overwrite custom values?"
                     answer = global_vars.controller.ask_question(msg, "Overwrite values")
@@ -687,10 +687,10 @@ class GwInfo(QObject):
         
         # Set values tu info form
         for k, v in self.interpolate_result['body']['data']['fields'][0].items():
-            widget = parent_vars.dlg_cf.findChild(QWidget, k)
+            widget = self.dlg_cf.findChild(QWidget, k)
             if widget:
                 widget.setStyleSheet(None)
-                qt_tools.setWidgetText(parent_vars.dlg_cf, widget, f'{v}')
+                qt_tools.setWidgetText(self.dlg_cf, widget, f'{v}')
                 widget.editingFinished.emit()
         close_dialog(dlg_dtext)
 
