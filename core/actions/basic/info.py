@@ -522,8 +522,7 @@ class GwInfo(QObject):
         action_section.triggered.connect(partial(self.open_section_form))
         action_help.triggered.connect(partial(api_action_help, self.geom_type))
         self.ep = QgsMapToolEmitPoint(self.canvas)
-        action_interpolate.triggered.connect(partial(self.activate_snapping, complet_result, self.ep, self.layer,
-                                                     last_point=self.last_point))
+        action_interpolate.triggered.connect(partial(self.activate_snapping, complet_result, self.ep))
 
         btn_cancel = self.dlg_cf.findChild(QPushButton, 'btn_cancel')
         btn_accept = self.dlg_cf.findChild(QPushButton, 'btn_accept')
@@ -568,7 +567,7 @@ class GwInfo(QObject):
         return self.complet_result, self.dlg_cf
 
 
-    def activate_snapping(self, complet_result, ep, layer, last_point=None):
+    def activate_snapping(self, complet_result, ep):
         
         parent_vars.rb_interpolate = []
         parent_vars.interpolate_result = None
@@ -613,14 +612,14 @@ class GwInfo(QObject):
         global_vars.iface.setActiveLayer(parent_vars.layer_node)
         
         global_vars.canvas.xyCoordinates.connect(partial(self.mouse_move))
-        ep.canvasClicked.connect(partial(self.snapping_node, ep, last_point, layer, dlg_dtext))
+        ep.canvasClicked.connect(partial(self.snapping_node, ep, dlg_dtext))
 
 
-    def snapping_node(self, ep, point, layer, dlg_dtext, button, last_point=None):
+    def snapping_node(self, ep, point, dlg_dtext, button):
         """ Get id of selected nodes (node1 and node2) """
 
         if button == 2:
-            self.dlg_destroyed(layer)
+            self.dlg_destroyed(self.layer)
             return
     
         # Get coordinates
@@ -655,11 +654,11 @@ class GwInfo(QObject):
             global_vars.canvas.xyCoordinates.disconnect()
             ep.canvasClicked.disconnect()
         
-            global_vars.iface.setActiveLayer(layer)
+            global_vars.iface.setActiveLayer(self.layer)
             global_vars.iface.mapCanvas().scene().removeItem(parent_vars.vertex_marker)
             extras = f'"parameters":{{'
-            extras += f'"x":{last_point[0]}, '
-            extras += f'"y":{last_point[1]}, '
+            extras += f'"x":{self.last_point[0]}, '
+            extras += f'"y":{self.last_point[1]}, '
             extras += f'"node1":"{parent_vars.node1}", '
             extras += f'"node2":"{parent_vars.node2}"}}'
             body = create_body(extras=extras)
