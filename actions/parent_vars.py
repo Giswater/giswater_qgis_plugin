@@ -2,7 +2,6 @@ from ..core.actions.edit.layer_tools import GwLayerTools
 from .. import global_vars
 
 
-layer = None
 feature_id = None
 geom_type = None
 snapper_manager = None

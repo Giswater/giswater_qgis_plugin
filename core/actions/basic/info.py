@@ -307,7 +307,7 @@ class GwInfo(QObject):
         field_id = str(self.complet_result[0]['body']['feature']['idName'])
         result = populate_basic_info(self.hydro_info_dlg, complet_result, field_id, self.my_json,
                  new_feature_id=self.new_feature_id, new_feature=self.new_feature, layer_new_feature=self.layer_new_feature,
-                 feature_id=self.feature_id, feature_type=self.feature_type)
+                 feature_id=self.feature_id, feature_type=self.feature_type, layer=self.layer)
 
         # Disable button accept for info on generic form
         self.hydro_info_dlg.btn_accept.setEnabled(False)
@@ -521,7 +521,7 @@ class GwInfo(QObject):
         action_section.triggered.connect(partial(self.open_section_form))
         action_help.triggered.connect(partial(api_action_help, self.geom_type))
         self.ep = QgsMapToolEmitPoint(self.canvas)
-        action_interpolate.triggered.connect(partial(activate_snapping, complet_result, self.ep,
+        action_interpolate.triggered.connect(partial(activate_snapping, complet_result, self.ep, self.layer,
                                                      last_point=self.last_point))
 
         btn_cancel = self.dlg_cf.findChild(QPushButton, 'btn_cancel')
@@ -1001,7 +1001,7 @@ class GwInfo(QObject):
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
         widget = add_checkbox(field)
-        widget.stateChanged.connect(partial(get_values, dialog, widget, self.my_json))
+        widget.stateChanged.connect(partial(get_values, dialog, widget, self.my_json, self.layer))
         widget = self.set_auto_update_checkbox(field, dialog, widget)
         return widget
 
@@ -1013,7 +1013,7 @@ class GwInfo(QObject):
         widget = add_calendar(dialog, field, my_json=self.my_json, complet_result=self.complet_result,
                                    new_feature_id=self.new_feature_id, new_feature=self.new_feature,
                                    layer_new_feature=self.layer_new_feature,
-                                   feature_id=self.feature_id, feature_type=self.feature_type)
+                                   feature_id=self.feature_id, feature_type=self.feature_type, layer=self.layer)
         widget = self.set_auto_update_dateedit(field, dialog, widget)
         return widget
 
@@ -1347,7 +1347,7 @@ class GwInfo(QObject):
             if field['isautoupdate'] and self.new_feature_id is None and field['widgettype'] != 'typeahead':
                 _json = {}
                 widget.editingFinished.connect(partial(self.clean_my_json, widget))
-                widget.editingFinished.connect(partial(get_values, dialog, widget, _json))
+                widget.editingFinished.connect(partial(get_values, dialog, widget, _json, self.layer))
                 widget.editingFinished.connect(
                     partial(self.accept, dialog, self.complet_result[0], _json, widget, True, False))
             else:
@@ -1394,7 +1394,7 @@ class GwInfo(QObject):
             if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
                 widget.currentIndexChanged.connect(partial(self.clean_my_json, widget))
-                widget.currentIndexChanged.connect(partial(get_values, dialog, widget, _json))
+                widget.currentIndexChanged.connect(partial(get_values, dialog, widget, _json, self.layer))
                 widget.currentIndexChanged.connect(partial(
                     self.accept, dialog, self.complet_result[0], _json, None, True, False))
             else:
@@ -1409,11 +1409,11 @@ class GwInfo(QObject):
             if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
                 widget.dateChanged.connect(partial(self.clean_my_json, widget))
-                widget.dateChanged.connect(partial(get_values, dialog, widget, _json))
+                widget.dateChanged.connect(partial(get_values, dialog, widget, _json, self.layer))
                 widget.dateChanged.connect(partial(
                     self.accept, dialog, self.complet_result[0], _json, None, True, False))
             else:
-                widget.dateChanged.connect(partial(get_values, dialog, widget, self.my_json))
+                widget.dateChanged.connect(partial(get_values, dialog, widget, self.my_json, self.layer))
 
         return widget
 
@@ -1424,11 +1424,11 @@ class GwInfo(QObject):
             if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
                 widget.valueChanged.connect(partial(self.clean_my_json, widget))
-                widget.valueChanged.connect(partial(get_values, dialog, widget, _json))
+                widget.valueChanged.connect(partial(get_values, dialog, widget, _json, self.layer))
                 widget.valueChanged.connect(partial(
                     self.accept, dialog, self.complet_result[0], _json, None, True, False))
             else:
-                widget.valueChanged.connect(partial(get_values, dialog, widget, self.my_json))
+                widget.valueChanged.connect(partial(get_values, dialog, widget, self.my_json, self.layer))
 
         return widget
 
@@ -1439,11 +1439,11 @@ class GwInfo(QObject):
             if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
                 widget.stateChanged.connect(partial(self.clean_my_json, widget))
-                widget.stateChanged.connect(partial(get_values, dialog, widget, _json))
+                widget.stateChanged.connect(partial(get_values, dialog, widget, _json, self.layer))
                 widget.stateChanged.connect(partial(
                     self.accept, dialog, self.complet_result[0], _json, None, True, False))
             else:
-                widget.stateChanged.connect(partial(get_values, dialog, widget, self.my_json))
+                widget.stateChanged.connect(partial(get_values, dialog, widget, self.my_json, self.layer))
         return widget
 
 
@@ -2788,7 +2788,7 @@ class GwInfo(QObject):
 
         populate_basic_info(self.dlg_new_workcat, complet_list, self.field_id, self.my_json,
                  new_feature_id=self.new_feature_id, new_feature=self.new_feature, layer_new_feature=self.layer_new_feature,
-                 feature_id=self.feature_id, feature_type=self.feature_type)
+                 feature_id=self.feature_id, feature_type=self.feature_type, layer=self.layer)
 
         # Open dialog
         self.dlg_new_workcat.setWindowTitle("Create workcat")

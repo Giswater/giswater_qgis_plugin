@@ -14,7 +14,6 @@ from ..epa.feature_end import GwFeatureEnd
 from ..edit.feature_delete import GwFeatureDelete
 
 from .... import global_vars
-from ....actions import parent_vars
 
 class GwEdit:
 	
@@ -37,34 +36,34 @@ class GwEdit:
 		""" Button 01, 02: Add 'node' or 'arc' """
 		
 		self.feature_cat = feature_cat
-		parent_vars.layer = self.controller.get_layer_by_tablename(feature_cat.parent_layer)
-		if parent_vars.layer:
+		layer = self.controller.get_layer_by_tablename(feature_cat.parent_layer)
+		if layer:
 			self.suppres_form = QSettings().value("/Qgis/digitizing/disable_enter_attribute_values_dialog")
 			QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", True)
-			config = parent_vars.layer.editFormConfig()
+			config = layer.editFormConfig()
 			self.conf_supp = config.suppress()
 			config.setSuppress(0)
-			parent_vars.layer.setEditFormConfig(config)
-			self.iface.setActiveLayer(parent_vars.layer)
-			parent_vars.layer.startEditing()
+			layer.setEditFormConfig(config)
+			self.iface.setActiveLayer(layer)
+			layer.startEditing()
 			self.iface.actionAddFeature().trigger()
-			parent_vars.layer.featureAdded.connect(self.open_new_feature)
+			layer.featureAdded.connect(self.open_new_feature)
 		else:
 			message = "Layer not found"
 			self.controller.show_warning(message, parameter=feature_cat.parent_layer)
 	
 	
-	def open_new_feature(self, feature_id):
+	def open_new_feature(self, feature_id, layer):
 		
-		parent_vars.layer.featureAdded.disconnect(self.open_new_feature)
-		feature = self.get_feature_by_id(parent_vars.layer, feature_id)
+		layer.featureAdded.disconnect(self.open_new_feature)
+		feature = self.get_feature_by_id(layer, feature_id)
 		
 		geom = feature.geometry()
 		list_points = None
-		if parent_vars.layer.geometryType() == 0:
+		if layer.geometryType() == 0:
 			points = geom.asPoint()
 			list_points = f'"x1":{points.x()}, "y1":{points.y()}'
-		elif parent_vars.layer.geometryType() in (1, 2):
+		elif layer.geometryType() in (1, 2):
 			points = geom.asPolyline()
 			init_point = points[0]
 			last_point = points[-1]
@@ -77,16 +76,16 @@ class GwEdit:
 		
 		self.api_cf = GwInfo('data')
 		result, dialog = self.api_cf.get_feature_insert(point=list_points, feature_cat=self.feature_cat,
-											   new_feature_id=feature_id, layer_new_feature=parent_vars.layer,
+											   new_feature_id=feature_id, layer_new_feature=layer,
 											   tab_type='data', new_feature=feature)
 		
 		# Restore user value (Settings/Options/Digitizing/Suppress attribute from pop-up after feature creation)
 		QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", self.suppres_form)
-		config = parent_vars.layer.editFormConfig()
+		config = layer.editFormConfig()
 		config.setSuppress(self.conf_supp)
-		parent_vars.layer.setEditFormConfig(config)
+		layer.setEditFormConfig(config)
 		if not result:
-			parent_vars.layer.deleteFeature(feature.id())
+			layer.deleteFeature(feature.id())
 			self.iface.actionRollbackEdits().trigger()
 	
 	

@@ -692,7 +692,7 @@ def fill_table(widget, table_name, filter_=None):
 
 
 def populate_basic_info(dialog, result, field_id, my_json=None, new_feature_id=None, new_feature=None,
-                        layer_new_feature=None, feature_id=None, feature_type=None):
+                        layer_new_feature=None, feature_id=None, feature_type=None, layer=None):
 
     fields = result[0]['body']['data']
     if 'fields' not in fields:
@@ -722,7 +722,8 @@ def populate_basic_info(dialog, result, field_id, my_json=None, new_feature_id=N
                 parent_vars.feature_id = widget.text()
         elif field['widgettype'] == 'datetime':
             widget = add_calendar(dialog, field, my_json, new_feature_id=new_feature_id, new_feature=new_feature,
-                                  layer_new_feature=layer_new_feature, feature_id=feature_id, feature_type=feature_type)
+                                  layer_new_feature=layer_new_feature, feature_id=feature_id, feature_type=feature_type,
+                                  layer=layer)
             widget = set_auto_update_dateedit(field, dialog, widget)
         elif field['widgettype'] == 'hyperlink':
             widget = add_hyperlink(field)
@@ -734,7 +735,7 @@ def populate_basic_info(dialog, result, field_id, my_json=None, new_feature_id=N
             widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         elif field['widgettype'] in ('check', 'checkbox'):
             widget = add_checkbox(field)
-            widget.stateChanged.connect(partial(get_values, dialog, widget, my_json))
+            widget.stateChanged.connect(partial(get_values, dialog, widget, my_json, layer))
         elif field['widgettype'] == 'button':
             widget = add_button(dialog, field)
 
@@ -758,7 +759,7 @@ def clear_gridlayout(layout):
 
 
 def add_calendar(dialog, field, my_json=None, complet_result=None, new_feature_id=None, new_feature=None,
-                 layer_new_feature=None, feature_id=None, feature_type=None):
+                 layer_new_feature=None, feature_id=None, feature_type=None, layer=None):
 
     widget = QgsDateTimeEdit()
     widget.setObjectName(field['widgetname'])
@@ -776,13 +777,13 @@ def add_calendar(dialog, field, my_json=None, complet_result=None, new_feature_i
 
     if field['isautoupdate']:
         _json = {}
-        btn_calendar.clicked.connect(partial(get_values, dialog, widget, _json))
+        btn_calendar.clicked.connect(partial(get_values, dialog, widget, _json, layer))
         btn_calendar.clicked.connect(
             partial(accept, dialog, complet_result[0], _json, p_widget=parent_vars.feature_id, clear_json=True,
                     close_dlg=False, new_feature_id=new_feature_id, new_feature=new_feature,
                     layer_new_feature=layer_new_feature, feature_id=feature_id, feature_type=feature_type))
     else:
-        btn_calendar.clicked.connect(partial(get_values, dialog, widget, my_json))
+        btn_calendar.clicked.connect(partial(get_values, dialog, widget, my_json, layer))
     btn_calendar.clicked.connect(partial(set_calendar_empty, widget))
 
     return widget
@@ -919,7 +920,7 @@ def manage_close_interpolate():
     remove_interpolate_rb()
 
 
-def activate_snapping(complet_result, ep, last_point=None):
+def activate_snapping(complet_result, ep, layer, last_point=None):
     
     parent_vars.rb_interpolate = []
     parent_vars.interpolate_result = None
@@ -964,7 +965,7 @@ def activate_snapping(complet_result, ep, last_point=None):
     global_vars.iface.setActiveLayer(parent_vars.layer_node)
 
     global_vars.canvas.xyCoordinates.connect(partial(mouse_move))
-    ep.canvasClicked.connect(partial(snapping_node, ep, last_point))
+    ep.canvasClicked.connect(partial(snapping_node, ep, last_point, layer))
 
 
 def dlg_destroyed(layer=None, vertex=None):
@@ -972,10 +973,6 @@ def dlg_destroyed(layer=None, vertex=None):
     parent_vars.dlg_is_destroyed = True
     if layer is not None:
         global_vars.iface.setActiveLayer(layer)
-    else:
-        if hasattr(parent_vars, 'layer'):
-            if parent_vars.layer is not None:
-                global_vars.iface.setActiveLayer(parent_vars.layer)
     if vertex is not None:
         global_vars.iface.mapCanvas().scene().removeItem(vertex)
     else:
@@ -988,11 +985,11 @@ def dlg_destroyed(layer=None, vertex=None):
         pass
 
 
-def snapping_node(ep, point, button, last_point=None):
+def snapping_node(ep, point, layer, button, last_point=None):
     """ Get id of selected nodes (node1 and node2) """
 
     if button == 2:
-        dlg_destroyed()
+        dlg_destroyed(layer)
         return
 
     # Get coordinates
@@ -1027,7 +1024,7 @@ def snapping_node(ep, point, button, last_point=None):
         global_vars.canvas.xyCoordinates.disconnect()
         ep.canvasClicked.disconnect()
 
-        global_vars.iface.setActiveLayer(parent_vars.layer)
+        global_vars.iface.setActiveLayer(layer)
         global_vars.iface.mapCanvas().scene().removeItem(parent_vars.vertex_marker)
         extras = f'"parameters":{{'
         extras += f'"x":{last_point[0]}, '
@@ -1283,7 +1280,7 @@ def set_widgets_into_composer(dialog, field, my_json=None):
     return label, widget
 
 
-def get_values(dialog, widget, _json=None):
+def get_values(dialog, widget, _json=None, layer=None):
 
     value = None
     if type(widget) in(QLineEdit, QSpinBox, QDoubleSpinBox) and widget.isReadOnly() is False:
@@ -1295,7 +1292,7 @@ def get_values(dialog, widget, _json=None):
     elif type(widget) is QgsDateTimeEdit and widget.isEnabled():
         value = qt_tools.getCalendarDate(dialog, widget)
     # Only get values if layer is editable or if layer not exist(need for ApiManageComposer)
-    if not hasattr(parent_vars, 'layer') or parent_vars.layer.isEditable():
+    if layer is not None or layer.isEditable():
         # If widget.isEditable(False) return None, here control it.
         if str(value) == '' or value is None:
             _json[str(widget.property('columnname'))] = None
