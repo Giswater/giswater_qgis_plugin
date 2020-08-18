@@ -7,7 +7,6 @@ snapper_manager = None
 snapper = None
 vertex_marker = None
 rubber_polygon = None
-interpolate_result = None
 node1 = None
 node2 = None
 layer_node = None

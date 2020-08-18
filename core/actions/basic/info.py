@@ -570,7 +570,7 @@ class GwInfo(QObject):
     def activate_snapping(self, complet_result, ep):
         
         rb_interpolate = []
-        parent_vars.interpolate_result = None
+        self.interpolate_result = None
         resetRubberbands()
         dlg_dtext = DialogTextUi()
         load_settings(dlg_dtext)
@@ -662,14 +662,14 @@ class GwInfo(QObject):
             extras += f'"node1":"{parent_vars.node1}", '
             extras += f'"node2":"{parent_vars.node2}"}}'
             body = create_body(extras=extras)
-            parent_vars.interpolate_result = global_vars.controller.get_json('gw_fct_node_interpolate', body, log_sql=True)
-            parent_vars.add_layer.populate_info_text(dlg_dtext, parent_vars.interpolate_result['body']['data'])
+            self.interpolate_result = global_vars.controller.get_json('gw_fct_node_interpolate', body, log_sql=True)
+            parent_vars.add_layer.populate_info_text(dlg_dtext, self.interpolate_result['body']['data'])
     
     
     def chek_for_existing_values(self, dlg_dtext):
         
         text = False
-        for k, v in parent_vars.interpolate_result['body']['data']['fields'][0].items():
+        for k, v in self.interpolate_result['body']['data']['fields'][0].items():
             widget = parent_vars.dlg_cf.findChild(QWidget, k)
             if widget:
                 text = qt_tools.getWidgetText(parent_vars.dlg_cf, widget, False, False)
@@ -686,7 +686,7 @@ class GwInfo(QObject):
     def set_values(self, dlg_dtext):
         
         # Set values tu info form
-        for k, v in parent_vars.interpolate_result['body']['data']['fields'][0].items():
+        for k, v in self.interpolate_result['body']['data']['fields'][0].items():
             widget = parent_vars.dlg_cf.findChild(QWidget, k)
             if widget:
                 widget.setStyleSheet(None)
