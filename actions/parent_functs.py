@@ -1228,10 +1228,10 @@ def resetRubberbands():
         parent_vars.rubber_point.reset(0)
 
 
-def restore_user_layer():
+def restore_user_layer(user_current_layer=None):
     
-    if parent_vars.user_current_layer:
-        global_vars.iface.setActiveLayer(parent_vars.user_current_layer)
+    if user_current_layer:
+        global_vars.iface.setActiveLayer(user_current_layer)
     else:
         layer = global_vars.controller.get_layer_by_tablename('v_edit_node')
         if layer:

@@ -346,7 +346,7 @@ class GwMincut:
 
     def mincut_close(self):
 
-        restore_user_layer()
+        restore_user_layer(self.user_current_layer)
         self.remove_selection()
         resetRubberbands()
 
@@ -717,7 +717,7 @@ class GwMincut:
         self.dlg_mincut.btn_cancel.setText('Close')
         self.dlg_mincut.btn_cancel.disconnect()
         self.dlg_mincut.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_mincut))
-        self.dlg_mincut.btn_cancel.clicked.connect(partial(restore_user_layer))
+        self.dlg_mincut.btn_cancel.clicked.connect(partial(restore_user_layer, self.user_current_layer))
         self.dlg_mincut.btn_cancel.clicked.connect(partial(self.remove_selection))
         self.dlg_mincut.btn_cancel.clicked.connect(partial(resetRubberbands))
         self.refresh_tab_hydro()
