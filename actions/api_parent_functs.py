@@ -914,12 +914,6 @@ def reload_fields(dialog, result, p_widget):
             global_vars.controller.show_message(field['message']['text'], level)
 
 
-def manage_close_interpolate():
-
-    save_settings(parent_vars.dlg_dtext)
-    remove_interpolate_rb()
-
-
 def activate_snapping(complet_result, ep, layer, last_point=None):
     
     parent_vars.rb_interpolate = []
