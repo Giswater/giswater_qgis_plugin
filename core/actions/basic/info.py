@@ -594,8 +594,8 @@ class GwInfo(QObject):
         parent_vars.vertex_marker.setIconSize(15)
         parent_vars.vertex_marker.setPenWidth(3)
         
-        parent_vars.node1 = None
-        parent_vars.node2 = None
+        self.node1 = None
+        self.node2 = None
         
         global_vars.canvas.setMapTool(ep)
         # We redraw the selected feature because self.canvas.setMapTool(emit_point) erases it
@@ -635,22 +635,22 @@ class GwInfo(QObject):
                 snapped_feat = parent_vars.snapper_manager.get_snapped_feature(result)
                 element_id = snapped_feat.attribute('node_id')
                 message = "Selected node"
-                if parent_vars.node1 is None:
-                    parent_vars.node1 = str(element_id)
+                if self.node1 is None:
+                    self.node1 = str(element_id)
                     rb = draw_point(QgsPointXY(result.point()), color=QColor(
                         0, 150, 55, 100), width=10, is_new=True)
                     rb_interpolate.append(rb)
-                    dlg_dtext.lbl_text.setText(f"Node1: {parent_vars.node1}\nNode2:")
-                    global_vars.controller.show_message(message, message_level=0, parameter=parent_vars.node1)
-                elif parent_vars.node1 != str(element_id):
-                    parent_vars.node2 = str(element_id)
+                    dlg_dtext.lbl_text.setText(f"Node1: {self.node1}\nNode2:")
+                    global_vars.controller.show_message(message, message_level=0, parameter=self.node1)
+                elif self.node1 != str(element_id):
+                    self.node2 = str(element_id)
                     rb = draw_point(QgsPointXY(result.point()), color=QColor(
                         0, 150, 55, 100), width=10, is_new=True)
                     rb_interpolate.append(rb)
-                    dlg_dtext.lbl_text.setText(f"Node1: {parent_vars.node1}\nNode2: {parent_vars.node2}")
-                    global_vars.controller.show_message(message, message_level=0, parameter=parent_vars.node2)
+                    dlg_dtext.lbl_text.setText(f"Node1: {self.node1}\nNode2: {self.node2}")
+                    global_vars.controller.show_message(message, message_level=0, parameter=self.node2)
     
-        if parent_vars.node1 and parent_vars.node2:
+        if self.node1 and self.node2:
             global_vars.canvas.xyCoordinates.disconnect()
             ep.canvasClicked.disconnect()
         
@@ -659,8 +659,8 @@ class GwInfo(QObject):
             extras = f'"parameters":{{'
             extras += f'"x":{self.last_point[0]}, '
             extras += f'"y":{self.last_point[1]}, '
-            extras += f'"node1":"{parent_vars.node1}", '
-            extras += f'"node2":"{parent_vars.node2}"}}'
+            extras += f'"node1":"{self.node1}", '
+            extras += f'"node2":"{self.node2}"}}'
             body = create_body(extras=extras)
             self.interpolate_result = global_vars.controller.get_json('gw_fct_node_interpolate', body, log_sql=True)
             parent_vars.add_layer.populate_info_text(dlg_dtext, self.interpolate_result['body']['data'])
