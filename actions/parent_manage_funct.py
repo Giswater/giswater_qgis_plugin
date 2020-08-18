@@ -736,8 +736,8 @@ def selection_init(dialog, table_object, query=False):
     
     if parent_vars.geom_type == 'all':
         parent_vars.geom_type = 'arc'
-    multiple_selection = MultipleSelection(global_vars.iface, global_vars.controller, parent_vars.layers[parent_vars.geom_type],
-                                           parent_manage=None, table_object=table_object, dialog=dialog)
+    multiple_selection = MultipleSelection(parent_vars.layers[parent_vars.geom_type], parent_manage=None,
+                                           table_object=table_object, dialog=dialog)
     disconnect_signal_selection_changed()
     global_vars.canvas.setMapTool(multiple_selection)
     connect_signal_selection_changed(dialog, table_object, query)
