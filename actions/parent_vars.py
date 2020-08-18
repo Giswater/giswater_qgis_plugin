@@ -15,7 +15,6 @@ rubber_point = None
 ids = None
 list_ids = None
 layers = None
-remove_ids = None
 lazy_widget = None
 lazy_init_function = None
 geom_type = None

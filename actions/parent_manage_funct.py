@@ -752,8 +752,7 @@ def selection_changed(dialog, table_object, geom_type, query=False, plan_om=None
     disconnect_signal_selection_changed()
     field_id = f"{geom_type}_id"
 
-    if parent_vars.remove_ids:
-        parent_vars.ids = []
+    parent_vars.ids = []
 
     # Iterate over all layers of the group
     for layer in parent_vars.layers[geom_type]:
