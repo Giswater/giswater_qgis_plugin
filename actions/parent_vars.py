@@ -21,7 +21,6 @@ user_current_layer = None
 list_update = None
 
 # parent_manage.py
-xyCoordinates_conected = None
 snapped_point  = None
 x  = None
 y = None

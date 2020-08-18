@@ -324,7 +324,6 @@ def add_point():
     emit_point = QgsMapToolEmitPoint(global_vars.canvas)
     global_vars.canvas.setMapTool(emit_point)
     global_vars.canvas.xyCoordinates.connect(mouse_move)
-    parent_vars.xyCoordinates_conected = True
     emit_point.canvasClicked.connect(partial(get_xy, emit_point))
 
 
@@ -357,7 +356,6 @@ def get_xy(point, emit_point):
     global_vars.controller.show_info(message)
     emit_point.canvasClicked.disconnect()
     global_vars.canvas.xyCoordinates.disconnect()
-    parent_vars.xyCoordinates_conected = False
     global_vars.iface.mapCanvas().refreshAllLayers()
     parent_vars.vertex_marker.hide()
 

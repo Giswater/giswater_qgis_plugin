@@ -343,12 +343,7 @@ class GwVisitManager:
     def manage_rejected(self):
         """Do all action when closed the dialog with Cancel or X.
         e.g. all necessary rollbacks and cleanings."""
-
         try:
-            if hasattr(parent_vars, 'xyCoordinates_conected'):
-                if parent_vars.xyCoordinates_conected:
-                    self.canvas.xyCoordinates.disconnect()
-                    parent_vars.xyCoordinates_conected = False
             self.canvas.setMapTool(self.previous_map_tool)
             # removed current working visit. This should cascade removing of all related records
             if hasattr(self, 'it_is_new_visit') and self.it_is_new_visit:
