@@ -1316,9 +1316,9 @@ class GwAdmin:
         self.dlg_import_inp.progressBar.setVisible(False)
 
         if schema_type.lower() == 'ws':
-            extras = '"filterText":"Import inp epanet file"'
+            extras = '"function":2522'
         elif schema_type.lower() == 'ud':
-            extras = '"filterText":"Import inp swmm file"'
+            extras = '"function":2524'
         else:
             self.error_count = self.error_count + 1
             return
@@ -2523,7 +2523,9 @@ class GwAdmin:
 
 
     def execute_import_inp(self, accepted=False, schema_type=''):
-
+ 
+        is_test = False;
+	
         if accepted:
 
             # Set wait cursor
