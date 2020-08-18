@@ -608,8 +608,8 @@ class GwInfo(QObject):
         parent_vars.snapper_manager.store_snapping_options()
         parent_vars.snapper = parent_vars.snapper_manager.get_snapper()
         
-        parent_vars.layer_node = global_vars.controller.get_layer_by_tablename("v_edit_node")
-        global_vars.iface.setActiveLayer(parent_vars.layer_node)
+        self.layer_node = global_vars.controller.get_layer_by_tablename("v_edit_node")
+        global_vars.iface.setActiveLayer(self.layer_node)
         
         global_vars.canvas.xyCoordinates.connect(partial(self.mouse_move))
         ep.canvasClicked.connect(partial(self.snapping_node, ep, dlg_dtext, rb_interpolate))
@@ -631,7 +631,7 @@ class GwInfo(QObject):
         if parent_vars.snapper_manager.result_is_valid():
             layer = parent_vars.snapper_manager.get_snapped_layer(result)
             # Check feature
-            if layer == parent_vars.layer_node:
+            if layer == self.layer_node:
                 snapped_feat = parent_vars.snapper_manager.get_snapped_feature(result)
                 element_id = snapped_feat.attribute('node_id')
                 message = "Selected node"
@@ -728,7 +728,7 @@ class GwInfo(QObject):
         result = parent_vars.snapper_manager.snap_to_current_layer(event_point)
         if parent_vars.snapper_manager.result_is_valid():
             layer = parent_vars.snapper_manager.get_snapped_layer(result)
-            if layer == parent_vars.layer_node:
+            if layer == self.layer_node:
                 parent_vars.snapper_manager.add_marker(result, parent_vars.vertex_marker)
         else:
             parent_vars.vertex_marker.hide()
