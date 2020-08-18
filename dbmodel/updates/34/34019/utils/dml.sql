@@ -28,11 +28,19 @@ WHERE id = 'edit_upsert_elevation_from_dem';
 
 UPDATE sys_param_user SET layoutorder = layoutorder+1 WHERE layoutorder > 17 AND layoutname = 'lyt_other';
 
+
 INSERT INTO sys_param_user(id, formname, descript, sys_role,  label, isenabled, layoutorder, project_type, isparent, 
 isautoupdate, datatype, widgettype, ismandatory, layoutname, iseditable,  isdeprecated)
 VALUES ('edit_update_elevation_from_dem', 'config', 'If true, the the elevation will be automatically updated from the DEM raster',
 'role_edit', 'Update elevation from DEM:', TRUE, 18, 'utils', FALSE, FALSE, 'boolean', 'check', FALSE, 'lyt_other',
 TRUE, FALSE) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_param_user(id, formname, descript, sys_role, label, isenabled, layoutorder, project_type, isparent, 
+isautoupdate, datatype, widgettype, ismandatory, layoutname, iseditable, isdeprecated, vdefault)
+VALUES ('edit_element_doublegeom', 'config', 'If value, overwrites trigger element value to create double geometry in case elementcat_id is defined with this attribute',
+'role_edit', 'Doublegeometry value for element:', TRUE, 11, 'utils', FALSE, FALSE, 'boolean', 'check', FALSE, 'lyt_inventory',
+TRUE, FALSE, 2) ON CONFLICT (id) DO NOTHING;
+
 
 --2020/08/06
 INSERT INTO config_csv(fid, alias, descript, functionname, active, readheader)
