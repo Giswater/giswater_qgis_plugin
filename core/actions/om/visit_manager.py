@@ -101,8 +101,7 @@ class GwVisitManager:
         self.feature_type_parameter = None
 
         # Reset geometry
-        parent_vars.x = None
-        parent_vars.y = None
+        self.point_xy = {"x":None, "y":None}
 
         # Set icons
         set_icon(self.dlg_add_visit.btn_feature_insert, "111")
@@ -251,7 +250,7 @@ class GwVisitManager:
 
     def add_feature_clicked(self):
         self.previous_map_tool = global_vars.canvas.mapTool()
-        add_point()
+        self.point_xy = add_point()
 
 
     def set_locked_relation(self):
@@ -304,7 +303,7 @@ class GwVisitManager:
         remove_selection()
 
         # Update geometry field (if user have selected a point)
-        if parent_vars.x:
+        if self.point_xy['x'] is not None:
             self.update_geom()
 
         # If new visit, execute PG function
@@ -335,7 +334,7 @@ class GwVisitManager:
 
         srid = self.controller.plugin_settings_value('srid')
         sql = (f"UPDATE om_visit"
-               f" SET the_geom = ST_SetSRID(ST_MakePoint({parent_vars.x},{parent_vars.y}), {srid})"
+               f" SET the_geom = ST_SetSRID(ST_MakePoint({self.point_xy['x']},{self.point_xy['y']}), {srid})"
                f" WHERE id = {self.current_visit.id}")
         self.controller.execute_sql(sql)
 

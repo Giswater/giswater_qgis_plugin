@@ -302,6 +302,9 @@ def set_calendars(dialog, widget, table_name, value, parameter):
 def add_point():
     """ Create the appropriate map tool and connect to the corresponding signal """
 
+    # Declare return variable
+    return_point = {}
+
     active_layer = global_vars.iface.activeLayer()
     if active_layer is None:
         active_layer = global_vars.controller.get_layer_by_tablename('version')
@@ -324,8 +327,9 @@ def add_point():
     emit_point = QgsMapToolEmitPoint(global_vars.canvas)
     global_vars.canvas.setMapTool(emit_point)
     global_vars.canvas.xyCoordinates.connect(mouse_move)
-    emit_point.canvasClicked.connect(partial(get_xy, emit_point))
-
+    emit_point.canvasClicked.connect(partial(get_xy, emit_point, return_point))
+    
+    return return_point
 
 def mouse_move(point):
 
@@ -341,11 +345,13 @@ def mouse_move(point):
         parent_vars.vertex_marker.hide()
 
 
-def get_xy(point, emit_point):
+def get_xy(emit_point, return_point ,point):
     """ Get coordinates of selected point """
 
-    parent_vars.x = point.x()
-    parent_vars.y = point.y()
+    # Setting x, y coordinates from point
+    return_point['x'] = point.x()
+    return_point['y'] = point.y()
+
 
     message = "Geometry has been added!"
     global_vars.controller.show_info(message)
