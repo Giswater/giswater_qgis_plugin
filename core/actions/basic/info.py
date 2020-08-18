@@ -569,7 +569,7 @@ class GwInfo(QObject):
 
     def activate_snapping(self, complet_result, ep):
         
-        parent_vars.rb_interpolate = []
+        rb_interpolate = []
         parent_vars.interpolate_result = None
         resetRubberbands()
         dlg_dtext = DialogTextUi()
@@ -582,7 +582,7 @@ class GwInfo(QObject):
         dlg_dtext.btn_accept.clicked.connect(partial(self.chek_for_existing_values, dlg_dtext))
         dlg_dtext.btn_close.clicked.connect(partial(close_dialog, dlg_dtext))
         dlg_dtext.rejected.connect(partial(save_settings, dlg_dtext))
-        dlg_dtext.rejected.connect(partial(self.remove_interpolate_rb))
+        dlg_dtext.rejected.connect(partial(self.remove_interpolate_rb, rb_interpolate))
         
         open_dialog(dlg_dtext, dlg_name='dialog_text')
         
@@ -612,10 +612,10 @@ class GwInfo(QObject):
         global_vars.iface.setActiveLayer(parent_vars.layer_node)
         
         global_vars.canvas.xyCoordinates.connect(partial(self.mouse_move))
-        ep.canvasClicked.connect(partial(self.snapping_node, ep, dlg_dtext))
+        ep.canvasClicked.connect(partial(self.snapping_node, ep, dlg_dtext, rb_interpolate))
 
 
-    def snapping_node(self, ep, point, dlg_dtext, button):
+    def snapping_node(self, ep, dlg_dtext, rb_interpolate, point, button):
         """ Get id of selected nodes (node1 and node2) """
 
         if button == 2:
@@ -639,14 +639,14 @@ class GwInfo(QObject):
                     parent_vars.node1 = str(element_id)
                     rb = draw_point(QgsPointXY(result.point()), color=QColor(
                         0, 150, 55, 100), width=10, is_new=True)
-                    parent_vars.rb_interpolate.append(rb)
+                    rb_interpolate.append(rb)
                     dlg_dtext.lbl_text.setText(f"Node1: {parent_vars.node1}\nNode2:")
                     global_vars.controller.show_message(message, message_level=0, parameter=parent_vars.node1)
                 elif parent_vars.node1 != str(element_id):
                     parent_vars.node2 = str(element_id)
                     rb = draw_point(QgsPointXY(result.point()), color=QColor(
                         0, 150, 55, 100), width=10, is_new=True)
-                    parent_vars.rb_interpolate.append(rb)
+                    rb_interpolate.append(rb)
                     dlg_dtext.lbl_text.setText(f"Node1: {parent_vars.node1}\nNode2: {parent_vars.node2}")
                     global_vars.controller.show_message(message, message_level=0, parameter=parent_vars.node2)
     
@@ -712,10 +712,10 @@ class GwInfo(QObject):
             pass
 
 
-    def remove_interpolate_rb(self):
+    def remove_interpolate_rb(self, rb_interpolate):
 
         # Remove the circumferences made by the interpolate
-        for rb in parent_vars.rb_interpolate:
+        for rb in rb_interpolate:
             global_vars.iface.mapCanvas().scene().removeItem(rb)
     
     
