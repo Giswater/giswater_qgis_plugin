@@ -16,8 +16,6 @@ user_current_layer = None
 list_update = None
 
 # parent_manage.py
-x  = None
-y = None
 plan_om = None
 ids = None
 list_ids = None
