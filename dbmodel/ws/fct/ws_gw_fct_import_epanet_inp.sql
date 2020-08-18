@@ -76,6 +76,7 @@ v_result_line json;
 v_version json;
 v_path text;
 v_error_context text;
+v_record record;
 
 BEGIN
 
@@ -224,7 +225,7 @@ BEGIN
 	INSERT INTO sector(sector_id,name) VALUES(0,'undefined') ON CONFLICT (sector_id) DO NOTHING;
 	INSERT INTO dma(dma_id,name,expl_id) VALUES(0,'undefined',0) ON CONFLICT (dma_id) DO NOTHING;
 	INSERT INTO dqa(dqa_id,name,expl_id) VALUES(0,'undefined',0) ON CONFLICT (dqa_id) DO NOTHING;
-	INSERT INTO presszone(id,descript,expl_id) VALUES(0,'undefined',0) ON CONFLICT (id) DO NOTHING;
+	INSERT INTO presszone(presszone_id,name,expl_id) VALUES(0,'undefined',0) ON CONFLICT (presszone_id) DO NOTHING;
 
 	
 	INSERT INTO macroexploitation(macroexpl_id,name) VALUES(1,'macroexploitation1') ON CONFLICT (macroexpl_id) DO NOTHING;
@@ -232,7 +233,7 @@ BEGIN
 	INSERT INTO sector(sector_id,name) VALUES(1,'sector1') ON CONFLICT (sector_id) DO NOTHING;
 	INSERT INTO dma(dma_id,name,expl_id) VALUES(1,'dma1',1) ON CONFLICT (dma_id) DO NOTHING;
 	INSERT INTO dqa(dqa_id,name,expl_id) VALUES(1,'dqa1',1) ON CONFLICT (dqa_id) DO NOTHING;
-	INSERT INTO presszone(id,descript,expl_id) VALUES(1,'presszone1',1) ON CONFLICT (id) DO NOTHING;
+	INSERT INTO presszone(presszone_id,name,expl_id) VALUES(1,'presszone1',1) ON CONFLICT (presszone_id) DO NOTHING;
 	INSERT INTO ext_municipality(muni_id,name) VALUES(1,'municipality1') ON CONFLICT (muni_id) DO NOTHING;
 
 	-- SELECTORS
@@ -273,7 +274,7 @@ BEGIN
 
 	--arc_type
 	--arc
-	INSERT INTO cat_feature_arc VALUES ('EPAPIPE', 'PIPE', 'PIPE', 'man_pipe', 'inp_pipe',TRUE, TRUE) ON CONFLICT (id) DO NOTHING;
+	INSERT INTO cat_feature_arc VALUES ('EPAPIPE', 'PIPE', 'PIPE', 'man_pipe', 'inp_pipe') ON CONFLICT (id) DO NOTHING;
 	--nodarc
 	INSERT INTO cat_feature_arc VALUES ('EPACHV', 'VARC', 'PIPE', 'man_varc', 'inp_valve_importinp') ON CONFLICT (id) DO NOTHING;
 	INSERT INTO cat_feature_arc VALUES ('EPAFCV', 'VARC', 'VALVE', 'man_varc', 'inp_valve_importinp') ON CONFLICT (id) DO NOTHING;
@@ -285,16 +286,16 @@ BEGIN
 	INSERT INTO cat_feature_arc VALUES ('EPAPUMP', 'VARC', 'PIPE', 'man_varc', 'inp_pump_importinp') ON CONFLICT (id) DO NOTHING;
 	--cat_feature_node
 	--node
-	INSERT INTO cat_feature_node VALUES ('EPAJUN', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction',TRUE, TRUE, 2, FALSE) ON CONFLICT (id) DO NOTHING;
-	INSERT INTO cat_feature_node VALUES ('EPATAN', 'TANK', 'TANK', 'man_tank', 'inp_tank',TRUE, TRUE, 2, FALSE) ON CONFLICT (id) DO NOTHING;
-	INSERT INTO cat_feature_node VALUES ('EPARES', 'SOURCE', 'RESERVOIR', 'man_source', 'inp_reservoir',TRUE, TRUE, 2, FALSE) ON CONFLICT (id) DO NOTHING;
-	INSERT INTO cat_feature_node VALUES ('EPACHVA2N', 'VALVE', 'SHORTPIPE', 'man_valve', 'inp_shortpipe',TRUE, TRUE, 2, FALSE) ON CONFLICT (id) DO NOTHING;
-	INSERT INTO cat_feature_node VALUES ('EPAFCVA2N', 'VALVE', 'VALVE', 'man_valve', 'inp_valve' 2, FALSE) ON CONFLICT (id) DO NOTHING;
-	INSERT INTO cat_feature_node VALUES ('EPAGPVA2N', 'VALVE', 'VALVE', 'man_valve', 'inp_valve' 2, FALSE) ON CONFLICT (id) DO NOTHING;
-	INSERT INTO cat_feature_node VALUES ('EPAPBVA2N', 'VALVE', 'VALVE', 'man_valve', 'inp_valve' 2, FALSE) ON CONFLICT (id) DO NOTHING;
-	INSERT INTO cat_feature_node VALUES ('EPAPSVA2N', 'VALVE', 'VALVE', 'man_valve', 'inp_valve' 2, FALSE) ON CONFLICT (id) DO NOTHING;
-	INSERT INTO cat_feature_node VALUES ('EPATCVA2N', 'VALVE', 'VALVE', 'man_valve', 'inp_valve' 2, FALSE) ON CONFLICT (id) DO NOTHING;
-	INSERT INTO cat_feature_node VALUES ('EPAPRVA2N', 'VALVE', 'VALVE', 'man_valve', 'inp_valve' 2, FALSE) ON CONFLICT (id) DO NOTHING;
+	INSERT INTO cat_feature_node VALUES ('EPAJUN', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', 2, FALSE) ON CONFLICT (id) DO NOTHING;
+	INSERT INTO cat_feature_node VALUES ('EPATAN', 'TANK', 'TANK', 'man_tank', 'inp_tank', 2, FALSE) ON CONFLICT (id) DO NOTHING;
+	INSERT INTO cat_feature_node VALUES ('EPARES', 'SOURCE', 'RESERVOIR', 'man_source', 'inp_reservoir', 2, FALSE) ON CONFLICT (id) DO NOTHING;
+	INSERT INTO cat_feature_node VALUES ('EPACHVA2N', 'VALVE', 'SHORTPIPE', 'man_valve', 'inp_shortpipe', 2, FALSE) ON CONFLICT (id) DO NOTHING;
+	INSERT INTO cat_feature_node VALUES ('EPAFCVA2N', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', 2, FALSE) ON CONFLICT (id) DO NOTHING;
+	INSERT INTO cat_feature_node VALUES ('EPAGPVA2N', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', 2, FALSE) ON CONFLICT (id) DO NOTHING;
+	INSERT INTO cat_feature_node VALUES ('EPAPBVA2N', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', 2, FALSE) ON CONFLICT (id) DO NOTHING;
+	INSERT INTO cat_feature_node VALUES ('EPAPSVA2N', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', 2, FALSE) ON CONFLICT (id) DO NOTHING;
+	INSERT INTO cat_feature_node VALUES ('EPATCVA2N', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', 2, FALSE) ON CONFLICT (id) DO NOTHING;
+	INSERT INTO cat_feature_node VALUES ('EPAPRVA2N', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', 2, FALSE) ON CONFLICT (id) DO NOTHING;
 	INSERT INTO cat_feature_node VALUES ('EPAPUMPA2N', 'PUMP', 'PUMP', 'man_pump', 'inp_pump', 2, FALSE) ON CONFLICT (id) DO NOTHING;
 
 	ALTER TABLE cat_feature ENABLE TRIGGER gw_trg_cat_feature;
@@ -359,7 +360,8 @@ BEGIN
 
 
 	-- LOOPING THE EDITABLE VIEWS TO INSERT DATA
-	FOR v_rec_table IN SELECT * FROM config_fprocess WHERE reverse_fid=v_fid AND tablename NOT IN ('vi_pipes', 'vi_junctions') order by id
+
+	FOR v_rec_table IN SELECT * FROM config_fprocess WHERE fid2=v_fid AND tablename NOT IN ('vi_pipes', 'vi_junctions') order by orderby
 	LOOP
 		--identifing the number of fields of the editable view
 		FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns where table_name=v_rec_table.tablename AND table_schema='SCHEMA_NAME'
@@ -570,9 +572,10 @@ BEGIN
 		DELETE FROM node WHERE state=0;
 			
 		-- repair arcs
-		PERFORM gw_fct_arc_repair($${"client":{"device":4, "infoType":1,"lang":"ES"},"feature":{"id":
-		"SELECT array_to_json(array_agg(arc_id::text)) FROM arc WHERE arc_id IS NOT NULL "},
-		"data":{}}$$);
+		SELECT gw_fct_arc_repair(concat('{"client":{"device":4, "infoType":1, "lang":"ES"},"form":{}, 
+		"feature":{"tableName":"arc","featureType":"ARC", "id":["',arc_id,'"]},"data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"previousSelection","parameters":{}}}')::json)
+		FROM arc
+		INTO v_record;
 
 		-- restore default default values
 		UPDATE config_param_system SET value=0.1 where parameter = 'edit_arc_searchnodes';
