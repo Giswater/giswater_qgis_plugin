@@ -11,7 +11,7 @@ from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget
 import os
 import json
 import configparser
-from collections import OrderedDict
+from collections import OrderedDict, Counter
 import sys
 
 from .models.plugin_toolbar import PluginToolbar
@@ -259,19 +259,19 @@ class LoadProject(QObject):
             parser = self.init_user_config_file(path, toolbar_names)
         else:
             parser.read(path)
-            if not parser.has_section("toolbars_position"):
+            if not parser.has_section("toolbars_position") or not parser.has_option('toolbars_position', 'toolbars_order'):
                 parser = self.init_user_config_file(path, toolbar_names)
-
         parser.read(path)
+        
+        toolbars_order = parser['toolbars_position']['toolbars_order'].split(',')
+        
+        # Check if both arrays contain the same elements regardless of the order
+        if Counter(toolbars_order) != Counter(toolbar_names):
+            toolbars_order = toolbar_names
+        
         # Call each of the functions that configure the toolbars 'def toolbar_xxxxx(self, toolbar_id, x=0, y=0):'
-        for pos, tb in enumerate(toolbar_names):
-            # If not exists, add it and set it in last position
-            if not parser.has_option('toolbars_position', f'pos_{pos}'):
-                parser['toolbars_position'][f'pos_{pos}'] = f"{tb},{4000},{98}"
-
-            toolbar_id = parser.get("toolbars_position", f'pos_{pos}').split(',')
-            if toolbar_id:
-                self.create_toolbar(toolbar_id[0], toolbar_id[1], toolbar_id[2])
+        for tb in toolbars_order:
+            self.create_toolbar(tb)
 
         # Manage action group of every toolbar
         parent = self.iface.mainWindow()
@@ -312,7 +312,7 @@ class LoadProject(QObject):
         self.enable_toolbar("toc")
 
 
-    def create_toolbar(self, toolbar_id, x=None, y=None):
+    def create_toolbar(self, toolbar_id):
 
         list_actions = self.settings.value(f"toolbars/{toolbar_id}")
 
@@ -335,9 +335,6 @@ class LoadProject(QObject):
         plugin_toolbar.toolbar.setProperty('gw_name', toolbar_id)
         plugin_toolbar.list_actions = list_actions
         self.plugin_toolbars[toolbar_id] = plugin_toolbar
-
-        if x and y:
-            self.set_toolbar_position(toolbar_id, x, y)
 
 
     def manage_snapping_layers(self):
@@ -431,13 +428,6 @@ class LoadProject(QObject):
             self.buttons[key].action.setVisible(not hide)
 
 
-    def set_toolbar_position(self, toolbar_id, x, y):
-
-        toolbar = self.plugin_toolbars[toolbar_id].toolbar
-        if toolbar:
-            toolbar.move(int(x), int(y))
-
-
     def init_user_config_file(self, path, toolbar_names):
         """ Initialize UI config file with default values """
 
@@ -446,9 +436,9 @@ class LoadProject(QObject):
         # Create file and configure section 'toolbars_position'
         parser = configparser.RawConfigParser()
         parser.add_section('toolbars_position')
-        for pos, tb in enumerate(toolbar_names):
-            parser.set('toolbars_position', f'pos_{pos}', f'{tb}, {pos * 10}, 98')
 
+        parser.set('toolbars_position', 'toolbars_order', ",".join(toolbar_names))
+        
         # Writing our configuration file to 'user.config'
         with open(path, 'w') as configfile:
             parser.write(configfile)
