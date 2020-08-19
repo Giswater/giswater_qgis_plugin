@@ -6,6 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: latin-1 -*-
 from qgis.core import QgsLayoutItemMap, QgsPrintLayout, QgsLayoutItemLabel, QgsLayoutExporter
+from qgis.gui import QgsRubberBand
 from qgis.PyQt.QtGui import QRegExpValidator
 from qgis.PyQt.QtCore import QRegExp
 from qgis.PyQt.QtPrintSupport import QPrinter, QPrintDialog
@@ -34,6 +35,8 @@ class GwComposerTools:
 
         self.destroyed = False
         self.printer = None
+        
+        self.rubber_band = QgsRubberBand(global_vars.canvas)
 
 
     def composer(self):
@@ -174,9 +177,9 @@ class GwComposerTools:
     def destructor(self):
         self.iface.mapCanvas().setRotation(self.initial_rotation)
         self.destroyed = True
-        if self.rubber_polygon:
-            self.iface.mapCanvas().scene().removeItem(self.rubber_polygon)
-            self.rubber_polygon = None
+        if self.rubber_band:
+            self.iface.mapCanvas().scene().removeItem(self.rubber_band)
+            self.rubber_band = None
 
 
     def get_composer(self, removed=None):
@@ -308,7 +311,7 @@ class GwComposerTools:
             return False
 
         result = json_result['data']
-        draw_rectangle(result)
+        draw_rectangle(result, self.rubber_band)
         map_index = json_result['data']['mapIndex']
 
         maps = []

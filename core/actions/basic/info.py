@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: latin-1 -*-
 from qgis.core import QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, QgsPointXY
-from qgis.gui import QgsDateTimeEdit, QgsVertexMarker, QgsMapToolEmitPoint
+from qgis.gui import QgsDateTimeEdit, QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand
 from qgis.PyQt.QtCore import pyqtSignal, QDate, QObject, QRegExp, QStringListModel, Qt
 from qgis.PyQt.QtGui import QColor, QRegExpValidator, QStandardItem, QStandardItemModel
 from qgis.PyQt.QtSql import QSqlTableModel
@@ -66,6 +66,7 @@ class GwInfo(QObject):
         self.new_feature_id = None
         self.layer_new_feature = None
         self.tab_type = tab_type
+        self.rubber_band = QgsRubberBand(self.canvas, 0)
 
     
     def get_info_from_coordinates(self, point, tab_type):
@@ -301,7 +302,7 @@ class GwInfo(QObject):
 
     def open_generic_form(self, complet_result):
 
-        draw(complet_result, zoom=False)
+        draw(complet_result, self.rubber_band, zoom=False)
         self.hydro_info_dlg = InfoGenericUi()
         load_settings(self.hydro_info_dlg)
         self.hydro_info_dlg.btn_close.clicked.connect(partial(close_dialog, self.hydro_info_dlg))
@@ -313,7 +314,7 @@ class GwInfo(QObject):
 
         # Disable button accept for info on generic form
         self.hydro_info_dlg.btn_accept.setEnabled(False)
-        self.hydro_info_dlg.rejected.connect(partial(resetRubberbands))
+        self.hydro_info_dlg.rejected.connect(self.rubber_band.reset)
         # Open dialog
         open_dialog(self.hydro_info_dlg, dlg_name='info_generic')
 
@@ -548,7 +549,7 @@ class GwInfo(QObject):
             btn_accept.clicked.connect(partial(
                 self.accept, self.dlg_cf, self.complet_result[0], self.my_json))
             self.dlg_cf.dlg_closed.connect(self.roll_back)
-            self.dlg_cf.dlg_closed.connect(partial(resetRubberbands))
+            self.dlg_cf.dlg_closed.connect(self.rubber_band.reset)
             self.dlg_cf.dlg_closed.connect(partial(save_settings, self.dlg_cf))
             self.dlg_cf.dlg_closed.connect(partial(self.set_vdefault_edition))
             self.dlg_cf.key_pressed.connect(partial(close_dialog, self.dlg_cf))
@@ -572,7 +573,7 @@ class GwInfo(QObject):
         
         rb_interpolate = []
         self.interpolate_result = None
-        resetRubberbands()
+        self.rubber_band.reset()
         dlg_dtext = DialogTextUi()
         load_settings(dlg_dtext)
         
@@ -600,7 +601,7 @@ class GwInfo(QObject):
         
         global_vars.canvas.setMapTool(ep)
         # We redraw the selected feature because self.canvas.setMapTool(emit_point) erases it
-        draw(complet_result[0], None, False)
+        draw(complet_result[0], self.rubber_band, None, False)
         
         # Store user snapping configuration
         parent_vars.snapper_manager = SnappingConfigManager(global_vars.iface)
@@ -638,14 +639,14 @@ class GwInfo(QObject):
                 message = "Selected node"
                 if self.node1 is None:
                     self.node1 = str(element_id)
-                    rb = draw_point(QgsPointXY(result.point()), color=QColor(
+                    rb = draw_point(QgsPointXY(result.point()), self.rubber_band, color=QColor(
                         0, 150, 55, 100), width=10, is_new=True)
                     rb_interpolate.append(rb)
                     dlg_dtext.lbl_text.setText(f"Node1: {self.node1}\nNode2:")
                     global_vars.controller.show_message(message, message_level=0, parameter=self.node1)
                 elif self.node1 != str(element_id):
                     self.node2 = str(element_id)
-                    rb = draw_point(QgsPointXY(result.point()), color=QColor(
+                    rb = draw_point(QgsPointXY(result.point()), self.rubber_band, color=QColor(
                         0, 150, 55, 100), width=10, is_new=True)
                     rb_interpolate.append(rb)
                     dlg_dtext.lbl_text.setText(f"Node1: {self.node1}\nNode2: {self.node2}")
@@ -959,7 +960,7 @@ class GwInfo(QObject):
     def manage_docker_close(self):
 
         self.roll_back()
-        resetRubberbands()
+        self.rubber_band.reset()
         self.set_vdefault_edition()
 
 
@@ -1964,7 +1965,7 @@ class GwInfo(QObject):
             return
 
         margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
-        draw(complet_result[0], margin)
+        draw(complet_result[0], self.rubber_band, margin)
 
 
     """ FUNCTIONS RELATED WITH TAB CONNECTIONS """
@@ -2002,7 +2003,7 @@ class GwInfo(QObject):
             return
 
         margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
-        draw(complet_result[0], margin)
+        draw(complet_result[0], self.rubber_band, margin)
 
 
     """ FUNCTIONS RELATED WITH TAB HYDROMETER"""
@@ -2876,7 +2877,7 @@ class GwInfo(QObject):
             return
 
         margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
-        draw(complet_result[0], margin)
+        draw(complet_result[0], self.rubber_band, margin)
 
 
     """ FUNCTIONS RELATED WITH TAB PLAN """
@@ -3197,5 +3198,5 @@ class GwInfo(QObject):
             return
 
         margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
-        draw(complet_result[0], margin)
+        draw(complet_result[0], self.rubber_band, margin)
 

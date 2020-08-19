@@ -39,25 +39,6 @@ from . import parent_vars
 # self.plugin_version = self.get_plugin_version()
 
 
-def init_rubber_polygon():
-    
-    try:
-        parent_vars.rubber_polygon = QgsRubberBand(global_vars.canvas, 2)
-        parent_vars.rubber_polygon.setColor(Qt.darkRed)
-        parent_vars.rubber_polygon.setIconSize(20)
-    except:
-        pass
-
-
-def init_rubber_point():
-    try:
-        parent_vars.rubber_point = QgsRubberBand(global_vars.canvas, 0)
-        parent_vars.rubber_point.setColor(Qt.yellow)
-        parent_vars.rubber_point.setIconSize(10)
-    except:
-        pass
-
-
 def open_web_browser(dialog, widget=None):
     """ Display url using the default browser """
     
@@ -1130,7 +1111,7 @@ def get_points(list_coord=None):
     return points
 
 
-def draw(complet_result, margin=None, reset_rb=True, color=QColor(255, 0, 0, 100), width=3):
+def draw(complet_result, rubber_band, margin=None, reset_rb=True, color=QColor(255, 0, 0, 100), width=3):
     try:
         if complet_result['body']['feature']['geometry'] is None:
             return
@@ -1142,29 +1123,28 @@ def draw(complet_result, margin=None, reset_rb=True, color=QColor(255, 0, 0, 100
     max_x, max_y, min_x, min_y = get_max_rectangle_from_coords(list_coord)
     
     if reset_rb:
-        resetRubberbands()
+        rubber_band.reset()
     if str(max_x) == str(min_x) and str(max_y) == str(min_y):
         point = QgsPointXY(float(max_x), float(max_y))
-        draw_point(point, color, width)
+        draw_point(point, rubber_band, color, width)
     else:
         points = get_points(list_coord)
-        draw_polyline(points, color, width)
+        draw_polyline(points, rubber_band, color, width)
     if margin is not None:
         zoom_to_rectangle(max_x, max_y, min_x, min_y, margin)
 
 
-def draw_point(point, color=QColor(255, 0, 0, 100), width=3, duration_time=None, is_new=False):
+def draw_point(point, rubber_band, color=QColor(255, 0, 0, 100), width=3, duration_time=None, is_new=False):
     """
     :param duration_time: integer milliseconds ex: 3000 for 3 seconds
     """
     
-    if parent_vars.rubber_point is None:
-        init_rubber_point()
-    
     if is_new:
         rb = QgsRubberBand(global_vars.canvas, 0)
     else:
-        rb = parent_vars.rubber_point
+        rb = rubber_band
+    
+    rb.setIconSize(10)
     
     rb.setColor(color)
     rb.setWidth(width)
@@ -1172,15 +1152,15 @@ def draw_point(point, color=QColor(255, 0, 0, 100), width=3, duration_time=None,
     
     # wait to simulate a flashing effect
     if duration_time is not None:
-        QTimer.singleShot(duration_time, resetRubberbands)
+        QTimer.singleShot(duration_time, rb.reset)
     return rb
 
 
-def hilight_feature_by_id(qtable, layer_name, field_id, width, index):
+def hilight_feature_by_id(qtable, layer_name, field_id, rubber_band, width, index):
     """ Based on the received index and field_id, the id of the received field_id is searched within the table
      and is painted in red on the canvas """
-    
-    resetRubberbands()
+
+    rubber_band.reset()
     layer = global_vars.controller.get_layer_by_tablename(layer_name)
     if not layer: return
     
@@ -1190,23 +1170,21 @@ def hilight_feature_by_id(qtable, layer_name, field_id, width, index):
     feature = get_feature_by_id(layer, _id, field_id)
     try:
         geometry = feature.geometry()
-        parent_vars.rubber_polygon.setToGeometry(geometry, None)
-        parent_vars.rubber_polygon.setColor(QColor(255, 0, 0, 100))
-        parent_vars.rubber_polygon.setWidth(width)
-        parent_vars.rubber_polygon.show()
+        rubber_band.setToGeometry(geometry, None)
+        rubber_band.setColor(QColor(255, 0, 0, 100))
+        rubber_band.setWidth(width)
+        rubber_band.show()
     except AttributeError:
         pass
 
 
-def draw_polyline(points, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
+def draw_polyline(points, rubber_band, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
     """ Draw 'line' over canvas following list of points
      :param duration_time: integer milliseconds ex: 3000 for 3 seconds
      """
     
-    if parent_vars.rubber_polygon is None:
-        init_rubber_polygon()
-    
-    rb = parent_vars.rubber_polygon
+    rb = rubber_band
+    rb.setIconSize(20)
     polyline = QgsGeometry.fromPolylineXY(points)
     rb.setToGeometry(polyline, None)
     rb.setColor(color)
@@ -1215,18 +1193,15 @@ def draw_polyline(points, color=QColor(255, 0, 0, 100), width=5, duration_time=N
     
     # wait to simulate a flashing effect
     if duration_time is not None:
-        QTimer.singleShot(duration_time, resetRubberbands)
+        QTimer.singleShot(duration_time, rb.reset)
     
     return rb
 
 
-def resetRubberbands():
+def resetRubberbands(rubber_band):
     
-    if parent_vars.rubber_polygon is not None:
-        parent_vars.rubber_polygon.reset(2)
-    
-    if parent_vars.rubber_point is not None:
-        parent_vars.rubber_point.reset(0)
+    rubber_band.reset()
+
 
 
 def restore_user_layer(user_current_layer=None):
@@ -1299,7 +1274,7 @@ def set_style_mapzones():
                 lyr.triggerRepaint()
 
 
-def manage_return_manager(json_result, sql):
+def manage_return_manager(json_result, sql, rubber_band):
     """
     Manage options for layers (active, visible, zoom and indexing)
     :param json_result: Json result of a query (Json)
@@ -1329,7 +1304,7 @@ def manage_return_manager(json_result, sql):
                 color = QColor(color[0], color[1], color[2], opacity)
             if 'width' in return_manager['style']['ruberband']:
                 width = return_manager['style']['ruberband']['width']
-            draw(json_result, margin, color=color, width=width)
+            draw(json_result, rubber_band, margin, color=color, width=width)
         
         else:
             

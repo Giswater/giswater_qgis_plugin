@@ -30,7 +30,7 @@ from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 from ..ui_manager import DialogTextUi
 
 from . import parent_vars
-from .parent_functs import save_settings, create_body, init_rubber_polygon, resetRubberbands, load_settings, \
+from .parent_functs import save_settings, create_body, load_settings, \
     open_dialog, draw, draw_point, get_points, draw_polyline, open_file_path, set_style_mapzones
 from ..core.utils.layer_tools import manage_geometry, export_layer_to_db, delete_layer_from_toc, from_dxf_to_toc
 
@@ -643,16 +643,14 @@ def add_spinbox(field):
     return widget
 
 
-def draw_polygon(points, border=QColor(255, 0, 0, 100), width=3, duration_time=None, fill_color=None):
+def draw_polygon(points, rubber_band, border=QColor(255, 0, 0, 100), width=3, duration_time=None, fill_color=None):
     """ Draw 'polygon' over canvas following list of points
     :param duration_time: integer milliseconds ex: 3000 for 3 seconds
     """
 
-    if parent_vars.rubber_polygon is None:
-        init_rubber_polygon()
+    rubber_band.setIconSize(20)
 
-
-    rb = parent_vars.rubber_polygon
+    rb = rubber_band
     polygon = QgsGeometry.fromPolygonXY([points])
     rb.setToGeometry(polygon, None)
     rb.setColor(border)
@@ -663,7 +661,7 @@ def draw_polygon(points, border=QColor(255, 0, 0, 100), width=3, duration_time=N
 
     # wait to simulate a flashing effect
     if duration_time is not None:
-        QTimer.singleShot(duration_time, resetRubberbands)
+        QTimer.singleShot(duration_time, rubber_band.reset)
 
     return rb
 
@@ -1124,7 +1122,7 @@ def set_function_associated(dialog, widget, field):
 '''
 
 
-def draw_rectangle(result):
+def draw_rectangle(result, rubber_band):
     """ Draw lines based on geometry """
 
     if result['geometry'] is None:
@@ -1132,7 +1130,7 @@ def draw_rectangle(result):
 
     list_coord = re.search('\((.*)\)', str(result['geometry']['st_astext']))
     points = get_points(list_coord)
-    draw_polyline(points)
+    draw_polyline(points, rubber_band)
 
 
 def set_setStyleSheet(field, widget, wtype='label'):

@@ -47,7 +47,7 @@ class GwInfoButton(GwParentMapTool):
 		if event.key() == Qt.Key_Escape:
 			for rb in self.rubberband_list:
 				rb.reset()
-			resetRubberbands()
+			self.rubber_band.reset()
 			self.action.trigger()
 			return
 	
@@ -112,7 +112,7 @@ class GwInfoButton(GwParentMapTool):
 		for rb in self.rubberband_list:
 			rb.reset()
 		if hasattr(self, 'api_cf'):
-			resetRubberbands()
+			self.rubber_band.reset()
 		
 		super().deactivate()
 	
@@ -177,7 +177,7 @@ class GwInfoButton(GwParentMapTool):
 
 	def identify_all(self, complet_list, rb_list):
 		
-		resetRubberbands()
+		self.rubber_band.reset()
 		for rb in rb_list:
 			rb.reset()
 		for layer in complet_list['body']['data']['layersNames']:
@@ -210,7 +210,7 @@ class GwInfoButton(GwParentMapTool):
 		list_coord = re.search('\((.*)\)', str(feature['geometry']))
 		max_x, max_y, min_x, min_y = get_max_rectangle_from_coords(list_coord)
 		if reset_rb is True:
-			resetRubberbands()
+			self.rubber_band.reset()
 		if str(max_x) == str(min_x) and str(max_y) == str(min_y):
 			point = QgsPointXY(float(max_x), float(max_y))
 			draw_point(point)

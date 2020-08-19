@@ -4,8 +4,6 @@ from .. import global_vars
 
 snapper_manager = None
 snapper = None
-rubber_polygon = None
-rubber_point = None
 
 # parent_manage.py
 ids = None

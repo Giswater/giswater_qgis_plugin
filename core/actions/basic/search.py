@@ -6,6 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.core import QgsPointXY
+from qgis.gui import QgsRubberBand
 from qgis.PyQt.QtCore import QStringListModel, Qt
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtSql import QSqlTableModel
@@ -54,6 +55,8 @@ class GwSearch:
         self.lbl_visible = False
         self.dlg_search = None
         self.is_mincut = False
+        
+        self.rubber_band = QgsRubberBand(self.canvas)
 
 
     def init_dialog(self):
@@ -62,7 +65,7 @@ class GwSearch:
         self.dlg_search = SearchUi()
         load_settings(self.dlg_search)
         self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dlg_search)
-        self.dlg_search.dlg_closed.connect(self.reset_rubber_polygon)
+        self.dlg_search.dlg_closed.connect(self.reset_rubber_band)
         self.dlg_search.dlg_closed.connect(self.close_search)
 
 
@@ -134,10 +137,9 @@ class GwSearch:
             self.controller.manage_translation('search', self.dlg_search)
 
 
-    def reset_rubber_polygon(self):
+    def reset_rubber_band(self):
 
-        if parent_vars.rubber_polygon:
-            parent_vars.rubber_polygon.reset()
+        self.rubber_band.reset()
 
 
     def close_search(self):
@@ -203,8 +205,9 @@ class GwSearch:
                 return
 
             margin = float(complet_result[0]['body']['feature']['zoomCanvasMargin']['mts'])
-            draw(complet_result[0], margin)
-            resetRubberbands()
+            draw(complet_result[0], self.rubber_band, margin)
+            # TODO: This removes the draw? Intended behaviour?
+            self.rubber_band.reset()
 
         # Tab 'search'
         elif tab_selected == 'search':
@@ -250,8 +253,8 @@ class GwSearch:
                 self.controller.show_warning(msg)
                 return
             points = get_points(list_coord)
-            resetRubberbands()
-            draw_polygon(points, fill_color=QColor(255, 0, 255, 50))
+            self.rubber_band.reset()
+            draw_polygon(points, self.rubber_band, fill_color=QColor(255, 0, 255, 50))
             max_x, max_y, min_x, min_y = get_max_rectangle_from_coords(list_coord)
             zoom_to_rectangle(max_x, max_y, min_x, min_y)
             self.workcat_open_table_items(item)
@@ -261,14 +264,14 @@ class GwSearch:
         elif tab_selected == 'psector':
             list_coord = re.search('\(\((.*)\)\)', str(item['sys_geometry']))
             self.manage_new_psector.new_psector(item['sys_id'], 'plan', is_api=True)
-            self.manage_new_psector.dlg_plan_psector.rejected.connect(resetRubberbands)
+            self.manage_new_psector.dlg_plan_psector.rejected.connect(self.rubber_band.reset)
             if not list_coord:
                 msg = "Empty coordinate list"
                 self.controller.show_warning(msg)
                 return
             points = get_points(list_coord)
-            resetRubberbands()
-            draw_polygon(points, fill_color=QColor(255, 0, 255, 50))
+            self.rubber_band.reset()
+            draw_polygon(points, self.rubber_band, fill_color=QColor(255, 0, 255, 50))
             max_x, max_y, min_x, min_y = get_max_rectangle_from_coords(list_coord)
             zoom_to_rectangle(max_x, max_y, min_x, min_y, margin=50)
 
@@ -280,12 +283,12 @@ class GwSearch:
                 self.controller.show_warning(msg)
                 return
             max_x, max_y, min_x, min_y = get_max_rectangle_from_coords(list_coord)
-            resetRubberbands()
+            self.rubber_band.reset()
             point = QgsPointXY(float(max_x), float(max_y))
             draw_point(point)
             zoom_to_rectangle(max_x, max_y, min_x, min_y, margin=100)
             self.manage_visit.manage_visit(visit_id=item['sys_id'])
-            self.manage_visit.dlg_add_visit.rejected.connect(resetRubberbands)
+            self.manage_visit.dlg_add_visit.rejected.connect(self.rubber_band.reset)
             return
 
         self.lbl_visible = False
@@ -451,7 +454,7 @@ class GwSearch:
 
         self.hydro_info_dlg.btn_close.clicked.connect(partial(close_dialog, self.hydro_info_dlg))
         self.hydro_info_dlg.rejected.connect(partial(close_dialog, self.hydro_info_dlg))
-        self.hydro_info_dlg.rejected.connect(partial(resetRubberbands))
+        self.hydro_info_dlg.rejected.connect(self.rubber_band.reset)
         field_id = str(result[0]['body']['feature']['idName'])
         populate_basic_info(self.hydro_info_dlg, result, field_id)
 
@@ -521,7 +524,7 @@ class GwSearch:
         self.items_dialog.btn_path.clicked.connect(
             partial(self.get_folder_dialog, self.items_dialog, self.items_dialog.txt_path))
         self.items_dialog.rejected.connect(partial(close_dialog, self.items_dialog))
-        self.items_dialog.rejected.connect(partial(resetRubberbands))
+        self.items_dialog.rejected.connect(self.rubber_band.reset)
         self.items_dialog.btn_state1.clicked.connect(
             partial(self.force_state, self.items_dialog.btn_state1, 1, self.items_dialog.tbl_psm))
         self.items_dialog.btn_state0.clicked.connect(
@@ -788,7 +791,7 @@ class GwSearch:
         list_coord = re.search('\((.*)\)', str(complet_result[0]['body']['feature']['geometry']['st_astext']))
 
         points = get_points(list_coord)
-        self.reset_rubber_polygon()
+        self.reset_rubber_band()
         draw_polyline(points)
 
         max_x, max_y, min_x, min_y = get_max_rectangle_from_coords(list_coord)

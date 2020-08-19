@@ -5,6 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+from qgis.gui import QgsRubberBand
 from qgis.core import QgsLayoutExporter, QgsPointXY, QgsProject, QgsRectangle
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence
@@ -30,7 +31,7 @@ from ....actions import parent_vars
 
 from ....actions.parent_functs import load_settings, set_icon, hilight_feature_by_id, \
     select_features_by_expr, zoom_to_selected_features, document_open, document_delete, make_list_for_completer, \
-    set_completer_lineedit, set_restriction, open_dialog, get_folder_dialog, resetRubberbands
+    set_completer_lineedit, set_restriction, open_dialog, get_folder_dialog
 from ....actions.parent_manage_funct import set_selectionbehavior, reset_layers, reset_lists, remove_selection, \
     set_table_columns, check_expression, fill_table_object, insert_feature, delete_records, tab_feature_changed, \
     set_completer_feature_id, reload_qtable, refresh_map_canvas, close_dialog, disconnect_signal_selection_changed, \
@@ -46,6 +47,8 @@ class GwPsector:
         self.iface = global_vars.iface
         self.canvas = global_vars.canvas
         self.schema_name = global_vars.schema_name
+
+        self.rubber_band = QgsRubberBand(self.canvas)
 
 
     def new_psector(self, psector_id=None, plan_om=None, is_api=False):
@@ -265,26 +268,26 @@ class GwPsector:
             self.qtbl_arc.model().setFilter(expr)
             self.qtbl_arc.model().select()
             self.qtbl_arc.clicked.connect(
-                partial(hilight_feature_by_id, self.qtbl_arc, "v_edit_arc", "arc_id", 5))
+                partial(hilight_feature_by_id, self.qtbl_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
 
             expr = " psector_id = " + str(psector_id)
             self.qtbl_node.model().setFilter(expr)
             self.qtbl_node.model().select()
             self.qtbl_node.clicked.connect(
-                partial(hilight_feature_by_id, self.qtbl_node, "v_edit_node", "node_id", 1))
+                partial(hilight_feature_by_id, self.qtbl_node, "v_edit_node", "node_id", self.rubber_band, 1))
 
             expr = " psector_id = " + str(psector_id)
             self.qtbl_connec.model().setFilter(expr)
             self.qtbl_connec.model().select()
             self.qtbl_connec.clicked.connect(
-                partial(hilight_feature_by_id, self.qtbl_connec, "v_edit_connec", "connec_id", 1))
+                partial(hilight_feature_by_id, self.qtbl_connec, "v_edit_connec", "connec_id", self.rubber_band, 1))
 
             if self.project_type.upper() == 'UD':
                 expr = " psector_id = " + str(psector_id)
                 self.qtbl_gully.model().setFilter(expr)
                 self.qtbl_gully.model().select()
                 self.qtbl_gully.clicked.connect(
-                    partial(hilight_feature_by_id, self.qtbl_gully, "v_edit_gully", "gully_id", 1))
+                    partial(hilight_feature_by_id, self.qtbl_gully, "v_edit_gully", "gully_id", self.rubber_band, 1))
 
             self.populate_budget(self.dlg_plan_psector, psector_id)
             self.update = True
@@ -945,7 +948,7 @@ class GwPsector:
     def close_psector(self, cur_active_layer=None):
         """ Close dialog and disconnect snapping """
 
-        resetRubberbands()
+        self.rubber_band.reset()
         self.reload_states_selector()
         if cur_active_layer:
             self.iface.setActiveLayer(cur_active_layer)
