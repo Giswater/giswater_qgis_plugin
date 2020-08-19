@@ -7,5 +7,5 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-UPDATE config_param_system SET value ='{"status":false} WHERE parameter = 'edit_automatic_ccode_autofill';
+UPDATE config_param_system SET value ='{"status":false}' WHERE parameter = 'edit_automatic_ccode_autofill';
 UPDATE sys_fprocess SET project_type = 'utils' WHERE fid = 118;

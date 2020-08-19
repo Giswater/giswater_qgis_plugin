@@ -9,7 +9,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2124,'gw_fct_connect_to_network',NULL,'{"visible": ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_arc", "v_edit_link"]}',NULL);
+VALUES(2124,'gw_fct_connect_to_network',NULL,'{"visible": ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_arc", "v_edit_link"]}',NULL) ON CONFLICT (id) DO NOTHING;
 
 
 -- 2020/07/14
@@ -41,55 +41,56 @@ update config_form_fields SET columnname = 'staticpress2' where  columnname = 's
 
 
 -- 2020/07/20
-INSERT INTO config_table(id, style, group_layer) VALUES('v_edit_arc', 101, 'GW Layers');
-INSERT INTO config_table(id, style, group_layer) VALUES('v_edit_connec', 102, 'GW Layers');
-INSERT INTO config_table(id, style, group_layer) VALUES('v_edit_link', 103, 'GW Layers');
-INSERT INTO config_table(id, style, group_layer) VALUES('v_edit_node', 104, 'GW Layers');
+INSERT INTO config_table(id, style, group_layer) VALUES('v_edit_arc', 101, 'GW Layers') ON CONFLICT (id) DO NOTHING;
+INSERT INTO config_table(id, style, group_layer) VALUES('v_edit_connec', 102, 'GW Layers') ON CONFLICT (id) DO NOTHING;
+INSERT INTO config_table(id, style, group_layer) VALUES('v_edit_link', 103, 'GW Layers') ON CONFLICT (id) DO NOTHING;
+INSERT INTO config_table(id, style, group_layer) VALUES('v_edit_node', 104, 'GW Layers') ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO config_table(id, style) VALUES('Overlap affected arcs', 105);
-INSERT INTO config_table(id, style) VALUES('Overlap affected connecs', 106);
-INSERT INTO config_table(id, style) VALUES('Other mincuts whichs overlaps', 107);
+INSERT INTO config_table(id, style) VALUES('Overlap affected arcs', 105) ON CONFLICT (id) DO NOTHING;
+INSERT INTO config_table(id, style) VALUES('Overlap affected connecs', 106) ON CONFLICT (id) DO NOTHING;
+INSERT INTO config_table(id, style) VALUES('Other mincuts whichs overlaps', 107) ON CONFLICT (id) DO NOTHING;
 
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role)
-VALUES (2980, 'gw_fct_setmincut', 'utils', 'function', 'json', 'json', NULL, 'role_edit');
+VALUES (2980, 'gw_fct_setmincut', 'utils', 'function', 'json', 'json', NULL, 'role_edit') ON CONFLICT (id) DO NOTHING;
 
 
 
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2244,'gw_fct_mincut_result_overlap','{"style":{"point":{"style":"qml", "id":"106"},  "line":{"style":"qml", "id":"105"}, "polygon":{"style":"qml", "id":"107"}}}',NULL,NULL);
+VALUES(2244,'gw_fct_mincut_result_overlap','{"style":{"point":{"style":"qml", "id":"106"},  "line":{"style":"qml", "id":"105"}, "polygon":{"style":"qml", "id":"107"}}}',NULL,NULL) 
+ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
 VALUES(2302,'gw_fct_anl_node_topological_consistency','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
 "line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
-"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL);
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL,NULL) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
 VALUES(2430,'gw_fct_pg2epa_check_data','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
 "line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
-"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}', '{"zoom": {"layer":"v_edit_arc", "margin":20}}',NULL);
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}', '{"zoom": {"layer":"v_edit_arc", "margin":20}}',NULL) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2522,'gw_fct_import_epanet_inp',NULL,'{"visible": ["v_edit_arc", "v_edit_node"],"zoom": {"layer":"v_edit_arc", "margin":20}}',NULL);
+VALUES(2522,'gw_fct_import_epanet_inp',NULL,'{"visible": ["v_edit_arc", "v_edit_node"],"zoom": {"layer":"v_edit_arc", "margin":20}}',NULL) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
 VALUES(2706,'gw_fct_grafanalytics_minsector','{"style":{"point":{"style":"random","field":"fid","width":2,"transparency":0.5}},
 "line":{"style":"random","field":"fid","width":2,"transparency":0.5},
-"polygon":{"style":"random","field":"fid","width":2,"transparency":0.5}}',NULL,NULL);
+"polygon":{"style":"random","field":"fid","width":2,"transparency":0.5}}',NULL,NULL) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2710,'gw_fct_grafanalytics_mapzones',NULL, NULL,'["style_mapzones"]');
+VALUES(2710,'gw_fct_grafanalytics_mapzones',NULL, NULL,'["style_mapzones"]') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
 VALUES(2848,'gw_fct_pg2epa_check_result','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
 "line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
-"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL, NULL);
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',NULL, NULL) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
 VALUES(2850,'gw_fct_pg2epa_check_options','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
 "line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
-"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}', '{"zoom": {"layer":"v_edit_arc", "margin":20}}',NULL);
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}', '{"zoom": {"layer":"v_edit_arc", "margin":20}}',NULL) ON CONFLICT (id) DO NOTHING;
 
 
 
@@ -1332,8 +1333,8 @@ Sigue un ejemplo:
 from qgis.PyQt.QtWidgets import QWidget
 
 def my_form_open(dialog, layer, feature):
-	geom = feature.geometry()
-	control = dialog.findChild(QWidget, "MyLineEdit")
+  geom = feature.geometry()
+  control = dialog.findChild(QWidget, "MyLineEdit")
 ]]></editforminitcode>
   <featformsuppress>0</featformsuppress>
   <editorlayout>generatedlayout</editorlayout>
@@ -1492,7 +1493,7 @@ def my_form_open(dialog, layer, feature):
   <mapTip></mapTip>
   <layerGeometryType>1</layerGeometryType>
 </qgis>
-$$, true);
+$$, true) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_style (id, idval, styletype, stylevalue, active)
 VALUES('102', 'v_edit_connec', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
@@ -2693,8 +2694,8 @@ Sigue un ejemplo:
 from qgis.PyQt.QtWidgets import QWidget
 
 def my_form_open(dialog, layer, feature):
-	geom = feature.geometry()
-	control = dialog.findChild(QWidget, "MyLineEdit")
+  geom = feature.geometry()
+  control = dialog.findChild(QWidget, "MyLineEdit")
 ]]></editforminitcode>
   <featformsuppress>0</featformsuppress>
   <editorlayout>generatedlayout</editorlayout>
@@ -2851,7 +2852,7 @@ def my_form_open(dialog, layer, feature):
   <mapTip></mapTip>
   <layerGeometryType>0</layerGeometryType>
 </qgis>
-$$, true);
+$$, true) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_style (id, idval, styletype, stylevalue, active)
 VALUES('103', 'v_edit_link', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
@@ -3290,8 +3291,8 @@ An example follows:
 from PyQt4.QtGui import QWidget
 
 def my_form_open(dialog, layer, feature):
-	geom = feature.geometry()
-	control = dialog.findChild(QWidget, "MyLineEdit")
+  geom = feature.geometry()
+  control = dialog.findChild(QWidget, "MyLineEdit")
 ]]></editforminitcode>
   <featformsuppress>2</featformsuppress>
   <editorlayout>generatedlayout</editorlayout>
@@ -3338,7 +3339,7 @@ def my_form_open(dialog, layer, feature):
   <mapTip></mapTip>
   <layerGeometryType>1</layerGeometryType>
 </qgis>
-$$, true);
+$$, true) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_style (id, idval, styletype, stylevalue, active)
 VALUES('104', 'v_edit_node', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
@@ -5324,8 +5325,8 @@ Sigue un ejemplo:
 from qgis.PyQt.QtWidgets import QWidget
 
 def my_form_open(dialog, layer, feature):
-	geom = feature.geometry()
-	control = dialog.findChild(QWidget, "MyLineEdit")
+  geom = feature.geometry()
+  control = dialog.findChild(QWidget, "MyLineEdit")
 ]]></editforminitcode>
   <featformsuppress>0</featformsuppress>
   <editorlayout>generatedlayout</editorlayout>
@@ -5474,7 +5475,7 @@ def my_form_open(dialog, layer, feature):
   <mapTip></mapTip>
   <layerGeometryType>0</layerGeometryType>
 </qgis>
-$$, true);
+$$, true) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_style(id, idval, styletype, stylevalue, active)
 VALUES('105', 'Overlap affected arcs', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
@@ -5612,7 +5613,7 @@ VALUES('105', 'Overlap affected arcs', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mr
   <mapTip></mapTip>
   <layerGeometryType>1</layerGeometryType>
 </qgis>
-$$, true);
+$$, true) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_style(id, idval, styletype, stylevalue, active)
 VALUES('106', 'Overlap affected connecs', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
@@ -5754,7 +5755,7 @@ VALUES('106', 'Overlap affected connecs', 'qml', $$<!DOCTYPE qgis PUBLIC 'http:/
   <mapTip></mapTip>
   <layerGeometryType>0</layerGeometryType>
 </qgis>
-$$, true);
+$$, true) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_style(id, idval, styletype, stylevalue, active)
 VALUES('107', 'Other mincuts whichs overlaps', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
@@ -5862,7 +5863,7 @@ VALUES('107', 'Other mincuts whichs overlaps', 'qml', $$<!DOCTYPE qgis PUBLIC 'h
   <mapTip></mapTip>
   <layerGeometryType>2</layerGeometryType>
 </qgis>
-$$, true);
+$$, true) ON CONFLICT (id) DO NOTHING;
 
 
 
