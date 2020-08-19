@@ -4,7 +4,6 @@ from .. import global_vars
 
 snapper_manager = None
 snapper = None
-vertex_marker = None
 rubber_polygon = None
 add_layer = None
 rubber_point = None

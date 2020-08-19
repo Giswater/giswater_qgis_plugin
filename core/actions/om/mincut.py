@@ -398,7 +398,7 @@ class GwMincut:
         if action_pan:
             self.iface.actionPan().trigger()
         try:
-            parent_vars.vertex_marker.hide()
+            self.vertex_marker.hide()
         except AttributeError as e:
             self.controller.log_info(f"{type(e).__name__} --> {e}")
 
@@ -491,11 +491,11 @@ class GwMincut:
     def set_real_location(self):
 
         # Vertex marker
-        parent_vars.vertex_marker = QgsVertexMarker(self.canvas)
-        parent_vars.vertex_marker.setColor(QColor(255, 100, 255))
-        parent_vars.vertex_marker.setIconSize(15)
-        parent_vars.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
-        parent_vars.vertex_marker.setPenWidth(3)
+        self.vertex_marker = QgsVertexMarker(self.canvas)
+        self.vertex_marker.setColor(QColor(255, 100, 255))
+        self.vertex_marker.setIconSize(15)
+        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
+        self.vertex_marker.setPenWidth(3)
 
         # Activate snapping of node and arcs
         self.canvas.xyCoordinates.connect(self.mouse_move_node_arc)
@@ -1466,11 +1466,11 @@ class GwMincut:
         self.dlg_mincut.canceled = False
 
         # Vertex marker
-        parent_vars.vertex_marker = QgsVertexMarker(self.canvas)
-        parent_vars.vertex_marker.setColor(QColor(255, 100, 255))
-        parent_vars.vertex_marker.setIconSize(15)
-        parent_vars.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
-        parent_vars.vertex_marker.setPenWidth(3)
+        self.vertex_marker = QgsVertexMarker(self.canvas)
+        self.vertex_marker.setColor(QColor(255, 100, 255))
+        self.vertex_marker.setIconSize(15)
+        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
+        self.vertex_marker.setPenWidth(3)
 
         # On inserting work order
         self.action_add_connec.setDisabled(True)
@@ -1689,14 +1689,14 @@ class GwMincut:
         self.disconnect_snapping(False)
 
         # Vertex marker
-        parent_vars.vertex_marker = QgsVertexMarker(self.canvas)
-        parent_vars.vertex_marker.setColor(QColor(255, 100, 255))
-        parent_vars.vertex_marker.setIconSize(15)
-        parent_vars.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
-        parent_vars.vertex_marker.setPenWidth(3)
+        self.vertex_marker = QgsVertexMarker(self.canvas)
+        self.vertex_marker.setColor(QColor(255, 100, 255))
+        self.vertex_marker.setIconSize(15)
+        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
+        self.vertex_marker.setPenWidth(3)
 
         # Set snapping icon to circle
-        parent_vars.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
+        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
 
         # Set active layer
         viewname = 'v_om_mincut_valve'
@@ -1711,7 +1711,7 @@ class GwMincut:
     def mouse_move_valve(self, point):
 
         # Get clicked point
-        parent_vars.vertex_marker.hide()
+        self.vertex_marker.hide()
         event_point = parent_vars.snapper_manager.get_event_point(point=point)
 
         # Snapping
@@ -1721,7 +1721,7 @@ class GwMincut:
             # Check feature
             viewname = self.controller.get_layer_source_table_name(layer)
             if viewname == 'v_om_mincut_valve':
-                parent_vars.snapper_manager.add_marker(result, parent_vars.vertex_marker)
+                parent_vars.snapper_manager.add_marker(result, self.vertex_marker)
 
 
     def mouse_move_node_arc(self, point):
@@ -1733,7 +1733,7 @@ class GwMincut:
         self.iface.setActiveLayer(self.layer_arc)
 
         # Get clicked point
-        parent_vars.vertex_marker.hide()
+        self.vertex_marker.hide()
         event_point = parent_vars.snapper_manager.get_event_point(point=point)
 
         # Snapping
@@ -1743,7 +1743,7 @@ class GwMincut:
             # Check feature
             viewname = self.controller.get_layer_source_table_name(layer)
             if viewname == 'v_edit_arc':
-                parent_vars.snapper_manager.add_marker(result, parent_vars.vertex_marker)
+                parent_vars.snapper_manager.add_marker(result, self.vertex_marker)
 
 
     def custom_mincut_snapping(self, point, btn):

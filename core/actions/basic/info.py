@@ -589,11 +589,11 @@ class GwInfo(QObject):
         
         # Set circle vertex marker
         color = QColor(255, 100, 255)
-        parent_vars.vertex_marker = QgsVertexMarker(global_vars.canvas)
-        parent_vars.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
-        parent_vars.vertex_marker.setColor(color)
-        parent_vars.vertex_marker.setIconSize(15)
-        parent_vars.vertex_marker.setPenWidth(3)
+        self.vertex_marker = QgsVertexMarker(global_vars.canvas)
+        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
+        self.vertex_marker.setColor(color)
+        self.vertex_marker.setIconSize(15)
+        self.vertex_marker.setPenWidth(3)
         
         self.node1 = None
         self.node2 = None
@@ -656,7 +656,7 @@ class GwInfo(QObject):
             ep.canvasClicked.disconnect()
         
             global_vars.iface.setActiveLayer(self.layer)
-            global_vars.iface.mapCanvas().scene().removeItem(parent_vars.vertex_marker)
+            global_vars.iface.mapCanvas().scene().removeItem(self.vertex_marker)
             extras = f'"parameters":{{'
             extras += f'"x":{self.last_point[0]}, '
             extras += f'"y":{self.last_point[1]}, '
@@ -705,8 +705,8 @@ class GwInfo(QObject):
             global_vars.iface.mapCanvas().scene().removeItem(vertex)
         else:
             if hasattr(parent_vars, 'vertex_marker'):
-                if parent_vars.vertex_marker is not None:
-                    global_vars.iface.mapCanvas().scene().removeItem(parent_vars.vertex_marker)
+                if self.vertex_marker is not None:
+                    global_vars.iface.mapCanvas().scene().removeItem(self.vertex_marker)
         try:
             global_vars.canvas.xyCoordinates.disconnect()
         except:
@@ -730,9 +730,9 @@ class GwInfo(QObject):
         if parent_vars.snapper_manager.result_is_valid():
             layer = parent_vars.snapper_manager.get_snapped_layer(result)
             if layer == self.layer_node:
-                parent_vars.snapper_manager.add_marker(result, parent_vars.vertex_marker)
+                parent_vars.snapper_manager.add_marker(result, self.vertex_marker)
         else:
-            parent_vars.vertex_marker.hide()
+            self.vertex_marker.hide()
 
 
     def action_rotation(self, dialog):
@@ -825,14 +825,14 @@ class GwInfo(QObject):
     
         # Set marker
         color = QColor(255, 100, 255)
-        parent_vars.vertex_marker = QgsVertexMarker(global_vars.canvas)
+        self.vertex_marker = QgsVertexMarker(global_vars.canvas)
         if geom_type == 'node':
-            parent_vars.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
+            self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
         elif geom_type == 'arc':
-            parent_vars.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
-        parent_vars.vertex_marker.setColor(color)
-        parent_vars.vertex_marker.setIconSize(15)
-        parent_vars.vertex_marker.setPenWidth(3)
+            self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
+        self.vertex_marker.setColor(color)
+        self.vertex_marker.setIconSize(15)
+        self.vertex_marker.setPenWidth(3)
     
     
     def api_action_copy_paste_mouse_move(self, point):
@@ -841,7 +841,7 @@ class GwInfo(QObject):
         """
         
         # Hide marker and get coordinates
-        parent_vars.vertex_marker.hide()
+        self.vertex_marker.hide()
         event_point = parent_vars.snapper_manager.get_event_point(point=point)
         
         # Snapping
@@ -850,7 +850,7 @@ class GwInfo(QObject):
             return
         
         # Add marker to snapped feature
-        parent_vars.snapper_manager.add_marker(result, parent_vars.vertex_marker)
+        parent_vars.snapper_manager.add_marker(result, self.vertex_marker)
     
     
     def api_action_copy_paste_canvas_clicked(self, dialog, tab_type, emit_point, point, btn):
@@ -949,7 +949,7 @@ class GwInfo(QObject):
     
         try:
             parent_vars.snapper_manager.recover_snapping_options()
-            parent_vars.vertex_marker.hide()
+            self.vertex_marker.hide()
             global_vars.canvas.xyCoordinates.disconnect()
             emit_point.canvasClicked.disconnect()
         except:

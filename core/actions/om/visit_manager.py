@@ -5,6 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+from qgis.gui import QgsVertexMarker
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, pyqtSignal
 from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QAbstractItemView, QDialogButtonBox, QCompleter, QLineEdit, QFileDialog, QTableView, \
@@ -54,6 +55,8 @@ class GwVisitManager:
         self.geom_type = None
         self.event_parameter_id = None
         self.event_feature_type = None
+
+        self.vertex_marker = QgsVertexMarker(global_vars.canvas)
 
 
     def manage_visit(self, visit_id=None, geom_type=None, feature_id=None, single_tool=True, expl_id=None, tag=None,
@@ -250,7 +253,7 @@ class GwVisitManager:
 
     def add_feature_clicked(self):
         self.previous_map_tool = global_vars.canvas.mapTool()
-        self.point_xy = add_point()
+        self.point_xy = add_point(self.vertex_marker)
 
 
     def set_locked_relation(self):

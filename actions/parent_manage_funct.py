@@ -299,7 +299,7 @@ def set_calendars(dialog, widget, table_name, value, parameter):
     qt_tools.setCalendarDate(dialog, widget, date)
 
 
-def add_point():
+def add_point(vertex_marker):
     """ Create the appropriate map tool and connect to the corresponding signal """
 
     # Declare return variable
@@ -311,11 +311,10 @@ def add_point():
         global_vars.iface.setActiveLayer(active_layer)
 
     # Vertex marker
-    parent_vars.vertex_marker = QgsVertexMarker(global_vars.canvas)
-    parent_vars.vertex_marker.setColor(QColor(255, 100, 255))
-    parent_vars.vertex_marker.setIconSize(15)
-    parent_vars.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
-    parent_vars.vertex_marker.setPenWidth(3)
+    vertex_marker.setColor(QColor(255, 100, 255))
+    vertex_marker.setIconSize(15)
+    vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
+    vertex_marker.setPenWidth(3)
 
     # Snapper
     if parent_vars.snapper_manager is None:
@@ -326,26 +325,26 @@ def add_point():
 
     emit_point = QgsMapToolEmitPoint(global_vars.canvas)
     global_vars.canvas.setMapTool(emit_point)
-    global_vars.canvas.xyCoordinates.connect(mouse_move)
-    emit_point.canvasClicked.connect(partial(get_xy, emit_point, return_point))
+    global_vars.canvas.xyCoordinates.connect(partial(mouse_move, vertex_marker))
+    emit_point.canvasClicked.connect(partial(get_xy, vertex_marker, emit_point, return_point))
     
     return return_point
 
-def mouse_move(point):
+def mouse_move(vertex_marker, point):
 
     # Hide marker and get coordinates
-    parent_vars.vertex_marker.hide()
+    vertex_marker.hide()
     event_point = parent_vars.snapper_manager.get_event_point(point=point)
 
     # Snapping
     result = parent_vars.snapper_manager.snap_to_background_layers(event_point)
     if parent_vars.snapper_manager.result_is_valid():
-        parent_vars.snapper_manager.add_marker(result, parent_vars.vertex_marker)
+        parent_vars.snapper_manager.add_marker(result, vertex_marker)
     else:
-        parent_vars.vertex_marker.hide()
+        vertex_marker.hide()
 
 
-def get_xy(emit_point, return_point ,point):
+def get_xy(emit_point, vertex_marker, return_point ,point):
     """ Get coordinates of selected point """
 
     # Setting x, y coordinates from point
@@ -358,7 +357,7 @@ def get_xy(emit_point, return_point ,point):
     emit_point.canvasClicked.disconnect()
     global_vars.canvas.xyCoordinates.disconnect()
     global_vars.iface.mapCanvas().refreshAllLayers()
-    parent_vars.vertex_marker.hide()
+    vertex_marker.hide()
 
 
 def tab_feature_changed(dialog, table_object, excluded_layers=[]):

@@ -6,6 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView
+from qgis.gui import QgsVertexMarker
 
 from functools import partial
 
@@ -29,6 +30,8 @@ class GwElement:
         self.iface = global_vars.iface
         self.controller = global_vars.controller
         self.schema_name = global_vars.schema_name
+        
+        self.vertex_marker = QgsVertexMarker(global_vars.canvas)
 
 
     def manage_element(self, new_element_id=True, feature=None, geom_type=None):
@@ -107,7 +110,7 @@ class GwElement:
             partial(delete_records, self.dlg_add_element, table_object, geom_type=geom_type))
         self.dlg_add_element.btn_snapping.clicked.connect(
             partial(selection_init, self.dlg_add_element, table_object, geom_type=geom_type))
-        self.dlg_add_element.btn_add_geom.clicked.connect(add_point)
+        self.dlg_add_element.btn_add_geom.clicked.connect(partial(add_point, self.vertex_marker))
         self.dlg_add_element.state.currentIndexChanged.connect(partial(self.filter_state_type))
 
         # Fill combo boxes of the form and related events
