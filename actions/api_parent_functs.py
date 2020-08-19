@@ -719,8 +719,7 @@ def populate_basic_info(dialog, result, field_id, my_json=None, new_feature_id=N
             widget = set_data_type(field, widget)
             if field['widgettype'] == 'typeahead':
                 widget = manage_lineedit(field, dialog, widget, completer)
-            if widget.property('columnname') == field_id:
-                parent_vars.feature_id = widget.text()
+
         elif field['widgettype'] == 'datetime':
             widget = add_calendar(dialog, field, my_json, new_feature_id=new_feature_id, new_feature=new_feature,
                                   layer_new_feature=layer_new_feature, feature_id=feature_id, feature_type=feature_type,
@@ -780,7 +779,7 @@ def add_calendar(dialog, field, my_json=None, complet_result=None, new_feature_i
         _json = {}
         btn_calendar.clicked.connect(partial(get_values, dialog, widget, _json, layer))
         btn_calendar.clicked.connect(
-            partial(accept, dialog, complet_result[0], _json, p_widget=parent_vars.feature_id, clear_json=True,
+            partial(accept, dialog, complet_result[0], _json, p_widget=feature_id, clear_json=True,
                     close_dlg=False, new_feature_id=new_feature_id, new_feature=new_feature,
                     layer_new_feature=layer_new_feature, feature_id=feature_id, feature_type=feature_type))
     else:
@@ -809,7 +808,7 @@ def accept(dialog, complet_result, _json, p_widget=None, clear_json=False, close
         close_dialog(dialog)
         return
 
-    if None in (new_feature_id, new_feature_id, new_feature, layer_new_feature, feature_id, feature_type):
+    if None in (new_feature_id, new_feature, layer_new_feature, feature_id, feature_type):
         return
 
     p_table_id = complet_result['body']['feature']['tableName']
