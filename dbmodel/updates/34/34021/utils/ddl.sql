@@ -14,3 +14,16 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_element
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"element", "column":"pol_id", "dataType":"varchar(16)", "isUtils":"False"}}$$);
 
 DROP TABLE IF EXISTS config_form_groupbox;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"config_fprocess", "column":"fields", "newName":"querytext"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_check_data", "column":"count", "dataType":"integer", "isUtils":"False"}}$$);
+
+
+CREATE TABLE audit_fid_log
+(id serial NOT NULL  PRIMARY KEY,
+fid smallint,
+count integer,
+groupby text,
+criticity integer,
+tstamp timestamp without time zone DEFAULT now()
+);
