@@ -234,7 +234,7 @@ def set_widget_size(widget, field):
     return widget
 
 
-def add_button(dialog, field):
+def add_button(dialog, field, temp_layers_added=None):
 
     widget = QPushButton()
     widget.setObjectName(field['widgetname'])
@@ -257,7 +257,7 @@ def add_button(dialog, field):
             message = "Parameter button_function is null for button"
             global_vars.controller.show_message(message, 2, parameter=widget.objectName())
 
-    kwargs = {'dialog': dialog, 'widget': widget, 'message_level': 1, 'function_name': function_name}
+    kwargs = {'dialog': dialog, 'widget': widget, 'message_level': 1, 'function_name': function_name, 'temp_layers_added': temp_layers_added}
     widget.clicked.connect(partial(getattr(sys.modules[__name__], function_name), **kwargs))
 
     return widget
@@ -915,7 +915,7 @@ def reload_fields(dialog, result, p_widget):
             global_vars.controller.show_message(field['message']['text'], level)
 
 
-def construct_form_param_user(dialog, row, pos, _json):
+def construct_form_param_user(dialog, row, pos, _json, temp_layers_added=None):
 
     field_id = ''
     if 'fields' in row[pos]:
@@ -987,7 +987,7 @@ def construct_form_param_user(dialog, row, pos, _json):
                                             dialog, None, widget, field, _json))
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             elif field['widgettype'] == 'button':
-                widget = add_button(dialog, field)
+                widget = add_button(dialog, field, temp_layers_added)
                 widget = set_widget_size(widget, field)
 
             # Set editable/readonly
@@ -1186,10 +1186,11 @@ def gw_function_dxf(**kwargs):
 
     dialog = kwargs['dialog']
     widget = kwargs['widget']
+    temp_layers_added = kwargs['temp_layer_added']
     complet_result = manage_dxf(dialog, path, False, True)
 
     for layer in complet_result['temp_layers_added']:
-        parent_vars.temp_layers_added.append(layer)
+        temp_layers_added.append(layer)
     if complet_result is not False:
         widget.setText(complet_result['path'])
 

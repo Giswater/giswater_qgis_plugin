@@ -8,7 +8,6 @@ snapper = None
 vertex_marker = None
 rubber_polygon = None
 add_layer = None
-temp_layers_added = None
 rubber_point = None
 
 # parent_manage.py

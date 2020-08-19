@@ -21,7 +21,6 @@ from lib import qt_tools
 from ....ui_manager import ToolboxDockerUi, ToolboxUi
 
 from .... import global_vars
-from ....actions import parent_vars
 
 from ....actions.parent_functs import show_exceptions_msg
 from ....actions.api_parent_functs import create_body, load_settings, close_dialog, open_dialog, set_style_mapzones, \
@@ -41,6 +40,7 @@ class GwToolBox:
         self.rbt_checked = {}
         self.is_paramtetric = True
         self.no_clickable_items = ['Giswater']
+        self.temp_layers_added = []
 
 
     def open_toolbox(self):
@@ -127,8 +127,8 @@ class GwToolBox:
     def remove_layers(self):
 
         root = QgsProject.instance().layerTreeRoot()
-        for layer in reversed(parent_vars.temp_layers_added):
-            parent_vars.temp_layers_added.remove(layer)
+        for layer in reversed(self.temp_layers_added):
+            self.temp_layers_added.remove(layer)
             # Possible QGIS bug: Instead of returning None because it is not found in the TOC, it breaks
             try:
                 dem_raster = root.findLayer(layer.id())
@@ -448,7 +448,7 @@ class GwToolBox:
                     self.populate_cmb_type(feature_types)
                     self.dlg_functions.cmb_geom_type.currentIndexChanged.connect(partial(self.populate_layer_combo))
                     self.populate_layer_combo()
-                construct_form_param_user(dialog, function, 0, self.function_list)
+                construct_form_param_user(dialog, function, 0, self.function_list, self.temp_layers_added)
                 self.load_settings_values(dialog, function)
                 self.load_parametric_values(dialog, function)
                 status = True
