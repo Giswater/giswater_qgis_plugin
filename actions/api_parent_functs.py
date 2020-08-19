@@ -1177,7 +1177,8 @@ def set_open_url(widget):
 
 def gw_function_dxf(**kwargs):
     """ Function called in def add_button(self, dialog, field): -->
-            widget.clicked.connect(partial(getattr(self, function_name), dialog, widget)) """
+            widget.clicked.connect(partial(getattr(sys.modules[__name__], function_name), **kwargs))
+            widget.clicked.connect(partial(getattr(sys.modules[__name__], func_name), widget)) """
 
     path, filter_ = open_file_path(filter_="DXF Files (*.dxf)")
     if not path:
