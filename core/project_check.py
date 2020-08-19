@@ -14,10 +14,10 @@ from functools import partial
 from ..ui_manager import ProjectCheckUi
 
 from .. import global_vars
-from ..actions import parent_vars
 
 from ..actions.parent_functs import get_plugin_version, hide_void_groupbox
 from ..actions.api_parent_functs import create_body, load_settings, save_settings, open_dialog, close_dialog
+from .utils.layer_tools import add_temp_layer, from_postgres_to_toc, create_qml
 
 
 class GwProjectCheck:
@@ -116,7 +116,7 @@ class GwProjectCheck:
 
         # Populate info_log and missing layers
         critical_level = 0
-        text_result = parent_vars.add_layer.add_temp_layer(self.dlg_audit_project, result['body']['data'],
+        text_result = add_temp_layer(self.dlg_audit_project, result['body']['data'],
             'gw_fct_audit_check_project_result', True, False, 0, True, disable_tabs=False)
 
         if 'missingLayers' in result['body']['data']:
@@ -197,7 +197,7 @@ class GwProjectCheck:
                 group = layer_info['group_layer'] if layer_info['group_layer'] is not None else 'GW Layers'
                 style_id = layer_info['style_id']
 
-                parent_vars.add_layer.from_postgres_to_toc(layer_info['layer'], geom_field, pkey_field, None, group=group)
+                from_postgres_to_toc(layer_info['layer'], geom_field, pkey_field, None, group=group)
                 layer = None
                 qml = None
                 if style_id is not None:
@@ -209,7 +209,7 @@ class GwProjectCheck:
                         if 'styles' in style['body']:
                             if 'style' in style['body']['styles']:
                                 qml = style['body']['styles']['style']
-                            parent_vars.add_layer.create_qml(layer, qml)
+                            create_qml(layer, qml)
                 self.controller.set_layer_visible(layer)
 
         close_dialog(self.dlg_audit_project)

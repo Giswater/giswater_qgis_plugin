@@ -13,10 +13,10 @@ from lib import qt_tools
 from ....ui_manager import PsectorDuplicate
 
 from .... import global_vars
-from ....actions import parent_vars
 
 from ....actions.parent_functs import load_settings, open_dialog, create_body
 from ....actions.parent_manage_funct import close_dialog
+from ...utils.layer_tools import populate_info_text
 
 
 class GwPsectorDuplicate(QObject):
@@ -75,7 +75,7 @@ class GwPsectorDuplicate(QObject):
         data = complet_result['body']['data']
         for k, v in list(data.items()):
             if str(k) == "info":
-                change_tab = parent_vars.add_layer.populate_info_text(self.dlg_duplicate_psector, data)
+                change_tab = populate_info_text(self.dlg_duplicate_psector, data)
 
         # Close dialog
         if not change_tab:

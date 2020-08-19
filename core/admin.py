@@ -34,10 +34,10 @@ from ..ui_manager import MainUi, MainDbProjectUi, MainRenameProjUi, MainProjectI
     MainGisProjectUi, ToolboxUi, MainFields, MainVisitClass, MainVisitParam, MainSysFields, Credentials
 
 from .. import global_vars
-from ..actions import parent_vars
 
 from ..actions.parent_functs import get_folder_dialog, set_table_columns
 from ..actions.api_parent_functs import load_settings, open_dialog, create_body, save_settings, construct_form_param_user
+from .utils.layer_tools import populate_info_text
 
 
 class GwAdmin:
@@ -3396,7 +3396,7 @@ class GwAdmin:
 
         for k, v in list(data.items()):
             if str(k) == "info":
-                parent_vars.add_layer.populate_info_text(dialog, data)
+                populate_info_text(dialog, data)
 
 
     def manage_result_message(self, status, msg_ok=None, msg_error=None, parameter=None):

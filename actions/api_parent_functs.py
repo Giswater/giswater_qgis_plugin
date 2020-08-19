@@ -32,6 +32,7 @@ from ..ui_manager import DialogTextUi
 from . import parent_vars
 from .parent_functs import save_settings, create_body, init_rubber_polygon, resetRubberbands, load_settings, \
     open_dialog, draw, draw_point, get_points, draw_polyline, open_file_path, set_style_mapzones
+from ..core.utils.layer_tools import manage_geometry, export_layer_to_db, delete_layer_from_toc, from_dxf_to_toc
 
 
 def get_visible_layers(as_list=False):
@@ -1244,7 +1245,7 @@ def manage_dxf(dialog, dxf_path, export_to_db=False, toc=False, del_old_layers=T
                     sql += f'"{att}":null , '
                 else:
                     sql += f'"{att}":"{feature[att]}" , '
-            geometry = parent_vars.add_layer.manage_geometry(feature.geometry())
+            geometry = manage_geometry(feature.geometry())
             sql = sql[:-2] + f"}}', (SELECT ST_GeomFromText('{geometry}', {srid})));\n"
             if count != 0 and count % 500 == 0:
                 status = global_vars.controller.execute_sql(sql)
@@ -1258,14 +1259,14 @@ def manage_dxf(dialog, dxf_path, export_to_db=False, toc=False, del_old_layers=T
                 return False
 
         if export_to_db:
-            parent_vars.add_layer.export_layer_to_db(dxf_layer, crs)
+            export_layer_to_db(dxf_layer, crs)
 
         if del_old_layers:
-            parent_vars.add_layer.delete_layer_from_toc(dxf_layer.name())
+            delete_layer_from_toc(dxf_layer.name())
 
         if toc:
             if dxf_layer.isValid():
-                parent_vars.add_layer.from_dxf_to_toc(dxf_layer, dxf_output_filename)
+                from_dxf_to_toc(dxf_layer, dxf_output_filename)
                 temp_layers_added.append(dxf_layer)
 
     # Unlock signals

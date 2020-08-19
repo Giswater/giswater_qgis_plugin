@@ -22,7 +22,6 @@ from qgis.gui import QgsVertexMarker
 from qgis.PyQt.QtCore import Qt
 
 from ..parent_maptool import GwParentMapTool
-from ...actions.edit.layer_tools import GwLayerTools
 from ....ui_manager import DialogTextUi
 
 from ...utils.giswater_tools import populate_info_text, create_body, refresh_legend
@@ -154,7 +153,6 @@ class GwArcDivideButton(GwParentMapTool):
 			cur_layer = self.iface.activeLayer()
 			if cur_layer != self.layer_node:
 				self.iface.setActiveLayer(self.layer_node)
-			self.add_layer = GwLayerTools()
 			# Snapping
 			result = self.snapper_manager.snap_to_current_layer(event_point)
 			if self.snapper_manager.result_is_valid():

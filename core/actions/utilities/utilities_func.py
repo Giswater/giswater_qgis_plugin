@@ -22,9 +22,9 @@ from ..om.visit_manager import GwVisitManager
 from ....ui_manager import CsvUi
 
 from .... import global_vars
-from ....actions import parent_vars
 
 from ....actions.parent_functs import load_settings, close_dialog, open_dialog, create_body
+from ...utils.layer_tools import populate_info_text
 
 
 class GwUtilities:
@@ -249,7 +249,7 @@ class GwUtilities:
             return
         else:
             if result['status'] == "Accepted":
-                parent_vars.add_layer.populate_info_text(dialog, result['body']['data'])
+                populate_info_text(dialog, result['body']['data'])
             msg = result['message']['text']
             self.controller.show_info_box(msg)
 

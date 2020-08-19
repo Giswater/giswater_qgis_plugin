@@ -44,6 +44,7 @@ from ....actions.api_parent_functs import get_visible_layers, create_body, reset
     add_checkbox, get_values, add_calendar, add_button, add_hyperlink, add_horizontal_spacer, add_vertical_spacer, \
     add_textarea, add_spinbox, add_tableview, set_headers, populate_table, set_columns_config, set_completer_object, \
     fill_table, clear_gridlayout, add_frame, add_label, set_completer_object_api, draw_point
+from ...utils.layer_tools import populate_info_text
 
 class GwInfo(QObject):
 
@@ -663,7 +664,7 @@ class GwInfo(QObject):
             extras += f'"node2":"{self.node2}"}}'
             body = create_body(extras=extras)
             self.interpolate_result = global_vars.controller.get_json('gw_fct_node_interpolate', body, log_sql=True)
-            parent_vars.add_layer.populate_info_text(dlg_dtext, self.interpolate_result['body']['data'])
+            populate_info_text(dlg_dtext, self.interpolate_result['body']['data'])
     
     
     def chek_for_existing_values(self, dlg_dtext):

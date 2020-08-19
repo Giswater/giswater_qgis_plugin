@@ -14,11 +14,11 @@ from lib import qt_tools
 from ....ui_manager import FeatureDelete
 
 from .... import global_vars
-from ....actions import parent_vars
 
 from ....actions.parent_functs import set_icon, disconnect_signal_selection_changed
 from ....actions.api_parent_functs import load_settings, close_dialog, save_settings, open_dialog, \
     set_completer_object_api, create_body
+from ...utils.layer_tools import populate_info_text
 
 class GwFeatureDelete:
 
@@ -143,7 +143,7 @@ class GwFeatureDelete:
         data = complet_result['body']['data']
         for k, v in list(data.items()):
             if str(k) == "info":
-                change_tab = parent_vars.add_layer.populate_info_text(self.dlg_feature_delete, data)
+                change_tab = populate_info_text(self.dlg_feature_delete, data)
 
         self.dlg_feature_delete.btn_cancel.setText('Accept')
 

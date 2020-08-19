@@ -41,6 +41,7 @@ from ....actions.parent_functs import load_settings, set_icon, fill_table, set_t
     restore_user_layer, resetRubberbands, close_dialog, save_settings, refresh_map_canvas, create_body, \
     set_cursor_restore, get_cursor_multiple_selection, zoom_to_rectangle, disconnect_signal_selection_changed, \
     connect_signal_selection_changed, set_cursor_wait, get_composers_list, get_composer_index
+from ...utils.layer_tools import delete_layer_from_toc, populate_info_text
 
 
 class GwMincut:
@@ -116,9 +117,9 @@ class GwMincut:
 
         self.user_current_layer = self.iface.activeLayer()
         self.init_mincut_canvas()
-        parent_vars.add_layer.delete_layer_from_toc('Overlap affected arcs')
-        parent_vars.add_layer.delete_layer_from_toc('Other mincuts which overlaps')
-        parent_vars.add_layer.delete_layer_from_toc('Overlap affected connecs')
+        delete_layer_from_toc('Overlap affected arcs')
+        delete_layer_from_toc('Other mincuts which overlaps')
+        delete_layer_from_toc('Overlap affected connecs')
 
         self.dlg_mincut = Mincut()
         load_settings(self.dlg_mincut)
@@ -665,7 +666,7 @@ class GwMincut:
             self.dlg_dtext.btn_accept.clicked.connect(partial(close_dialog, self.dlg_dtext))
             self.dlg_dtext.btn_close.clicked.connect(partial(close_dialog, self.dlg_dtext))
 
-            parent_vars.add_layer.populate_info_text(self.dlg_dtext, result['body']['data'], False)
+            populate_info_text(self.dlg_dtext, result['body']['data'], False)
 
             open_dialog(self.dlg_dtext, dlg_name='dialog_text')
 
@@ -688,7 +689,7 @@ class GwMincut:
     def mincut_ok(self, result):
 
         # Manage result and force tab log
-        # self.add_layer.add_temp_layer(self.dlg_mincut, result['body']['data'], None, True, tab_idx=3)
+        # add_temp_layer(self.dlg_mincut, result['body']['data'], None, True, tab_idx=3)
 
         # Set tabs enabled(True/False)
         qtabwidget = self.dlg_mincut.findChild(QTabWidget, 'mainTab')

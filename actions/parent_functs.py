@@ -30,6 +30,7 @@ from functools import partial
 from .. import global_vars
 from lib import qt_tools
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
+from ..core.utils.layer_tools import populate_vlayer, categoryze_layer, create_qml, from_postgres_to_toc
 
 from ..ui_manager import DialogTextUi, GwDialog, GwMainWindow
 
@@ -1353,7 +1354,7 @@ def manage_return_manager(json_result, sql):
                     geometry_type = json_result['body']['data'][key]['geometryType']
                     v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", layer_name, 'memory')
 
-                    parent_vars.add_layer.populate_vlayer(v_layer, json_result['body']['data'], key, counter)
+                    populate_vlayer(v_layer, json_result['body']['data'], key, counter)
                     
                     # Get values for set layer style
                     opacity = 100
@@ -1368,7 +1369,7 @@ def manage_return_manager(json_result, sql):
                             color_values[item['id']] = color
                         cat_field = str(style_type[key]['field'])
                         size = style_type['width'] if 'width' in style_type and style_type['width'] else 2
-                        parent_vars.add_layer.categoryze_layer(v_layer, cat_field, size, color_values)
+                        categoryze_layer(v_layer, cat_field, size, color_values)
                     
                     elif style_type[key]['style'] == 'random':
                         size = style_type['width'] if 'width' in style_type and style_type['width'] else 2
@@ -1386,7 +1387,7 @@ def manage_return_manager(json_result, sql):
                         if 'styles' in style['body']:
                             if 'style' in style['body']['styles']:
                                 qml = style['body']['styles']['style']
-                                parent_vars.add_layer.create_qml(v_layer, qml)
+                                create_qml(v_layer, qml)
                     
                     elif style_type[key]['style'] == 'unique':
                         color = style_type[key]['values']['color']
@@ -1433,7 +1434,7 @@ def manage_layer_manager(json_result, sql):
                     else:
                         group = "GW Layers"
                     style_id = lyr[layer_name]['style_id']
-                    parent_vars.add_layer.from_postgres_to_toc(layer_name, the_geom, field_id, group=group, style_id=style_id)
+                    from_postgres_to_toc(layer_name, the_geom, field_id, group=group, style_id=style_id)
                 global_vars.controller.set_layer_visible(layer)
         
         # force reload dataProvider in order to reindex.

@@ -18,7 +18,6 @@ from collections import OrderedDict
 from functools import partial
 
 from lib import qt_tools
-from ..edit.layer_tools import GwLayerTools
 from ....ui_manager import ToolboxDockerUi, ToolboxUi
 
 from .... import global_vars
@@ -27,6 +26,7 @@ from ....actions import parent_vars
 from ....actions.parent_functs import show_exceptions_msg
 from ....actions.api_parent_functs import create_body, load_settings, close_dialog, open_dialog, set_style_mapzones, \
     construct_form_param_user
+from ...utils.layer_tools import add_temp_layer
 
 class GwToolBox:
 
@@ -37,7 +37,6 @@ class GwToolBox:
         self.iface = global_vars.iface
         self.plugin_dir = global_vars.plugin_dir
 
-        parent_vars.add_layer = GwLayerTools()
         self.function_list = []
         self.rbt_checked = {}
         self.is_paramtetric = True
@@ -412,7 +411,7 @@ class GwToolBox:
             return True
 
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-        parent_vars.add_layer.add_temp_layer(dialog, complet_result[0]['body']['data'], self.alias_function)
+        add_temp_layer(dialog, complet_result[0]['body']['data'], self.alias_function)
         dialog.progressBar.setFormat(f"Function {function_name} has finished.")
         dialog.progressBar.setAlignment(Qt.AlignCenter)
 

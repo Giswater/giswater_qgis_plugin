@@ -14,9 +14,10 @@ import os
 from functools import partial
 
 from .... import global_vars
-from ..edit.layer_tools import GwLayerTools
 from ...project_check import GwProjectCheck
 from ...tasks.tsk_config_layer import GwConfigLayerTask
+
+from ...utils.layer_tools import from_postgres_to_toc
 
 
 class GwManageLayers:
@@ -29,7 +30,6 @@ class GwManageLayers:
         self.controller = global_vars.controller
         self.plugin_dir = global_vars.plugin_dir
         self.available_layers = None
-        self.add_layer = GwLayerTools()
         self.project_type = global_vars.project_type
         self.schema_name = global_vars.schema_name
         self.project_vars = global_vars.qgis_tools.get_qgis_project_variables()
@@ -388,7 +388,7 @@ class GwManageLayers:
 
                 sub_menu.addAction(action)
                 if child_layer[0] == 'Load all':
-                    action.triggered.connect(partial(self.add_layer.from_postgres_to_toc, child_layers=child_layers))
+                    action.triggered.connect(partial(from_postgres_to_toc, child_layers=child_layers))
 
                 else:
                     layer_name = child_layer[0]
@@ -396,7 +396,7 @@ class GwManageLayers:
                     geom_field = child_layer[1]+"_id"
                     style_id = child_layer[3]
                     group = child_layer[4] if child_layer[4] is not None else 'GW Layers'
-                    action.triggered.connect(partial(self.add_layer.from_postgres_to_toc, layer_name, the_geom,
+                    action.triggered.connect(partial(from_postgres_to_toc, layer_name, the_geom,
                         geom_field, None, group, style_id))
 
         main_menu.exec_(click_point)
