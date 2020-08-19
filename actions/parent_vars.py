@@ -5,7 +5,6 @@ from .. import global_vars
 snapper_manager = None
 snapper = None
 rubber_polygon = None
-add_layer = None
 rubber_point = None
 
 # parent_manage.py
