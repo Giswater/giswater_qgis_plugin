@@ -44,6 +44,10 @@ class GwFeatureEnd:
         load_settings(self.dlg_work_end)
         self.set_edit_arc_downgrade_force('True')
 
+        # Set default geom_type and viewname
+        geom_type = "arc"
+        viewname = "v_edit_" + geom_type
+
         # Capture the current layer to return it at the end of the operation
         self.cur_active_layer = self.iface.activeLayer()
 
@@ -84,11 +88,11 @@ class GwFeatureEnd:
         self.dlg_work_end.workcat_id_end.editTextChanged.connect(partial(self.fill_workids))
         self.dlg_work_end.btn_new_workcat.clicked.connect(partial(self.new_workcat))
         self.dlg_work_end.btn_insert.clicked.connect(partial(insert_feature, self.dlg_work_end, self.table_object,
-                                                             geom_type=self.geom_type))
+                                                             geom_type=geom_type))
         self.dlg_work_end.btn_delete.clicked.connect(partial(delete_records, self.dlg_work_end, self.table_object,
-                                                             geom_type=self.geom_type))
+                                                             geom_type=geom_type))
         self.dlg_work_end.btn_snapping.clicked.connect(
-            partial(selection_init, self.dlg_work_end, self.table_object, geom_type=self.geom_type))
+            partial(selection_init, self.dlg_work_end, self.table_object, geom_type=geom_type))
         self.dlg_work_end.workcat_id_end.activated.connect(partial(self.fill_workids))
         self.dlg_work_end.tab_feature.currentChanged.connect(
             partial(tab_feature_changed, self.dlg_work_end, self.table_object, excluded_layers=["v_edit_element"]))
@@ -97,13 +101,10 @@ class GwFeatureEnd:
         self.fill_fields()
 
         # Adding auto-completion to a QLineEdit for default feature
-        geom_type = "arc"
-        viewname = "v_edit_" + geom_type
         set_completer_feature_id(self.dlg_work_end.feature_id, geom_type, viewname)
 
         # Set default tab 'arc'
         self.dlg_work_end.tab_feature.setCurrentIndex(0)
-        self.geom_type = "arc"
         tab_feature_changed(self.dlg_work_end, self.table_object, excluded_layers=["v_edit_element"])
 
         # Open dialog
