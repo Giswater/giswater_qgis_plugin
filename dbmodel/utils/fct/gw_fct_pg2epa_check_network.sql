@@ -120,12 +120,12 @@ BEGIN
 	IF v_count > 0  THEN
 		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom)
 		SELECT 238, node_id, nodecat_id, ''Orphan node'', the_geom FROM ', v_querytext);
-		INSERT INTO audit_check_data (fid, criticity, error_message)
+		INSERT INTO audit_check_data (fid, criticity, error_message, count)
 		VALUES (v_fid, 3, concat('ERROR: There is/are ',v_count,
-		' node''s orphan on this result. Some inconsistency may have been generated because state_type (238).'));
+		' node''s orphan on this result. Some inconsistency may have been generated because state_type (238).'),v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, v_result_id, 1, 'INFO: No node(s) orphan found on this result.');
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, count)
+		VALUES (v_fid, v_result_id, 1, 'INFO: No node(s) orphan found on this result.', v_count);
 	END IF;
 
 	
@@ -143,12 +143,12 @@ BEGIN
 
 	IF v_count > 0 THEN
 		EXECUTE 'INSERT INTO anl_arc (fid, arc_id, arccat_id, state, expl_id, the_geom, result_id, descript)'||v_querytext;
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, count)
 		VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ',v_count,
-		' arc(s) without start/end nodes on this result. Some inconsistency may have been generated because state_type.'));
+		' arc(s) without start/end nodes on this result. Some inconsistency may have been generated because state_type.'),v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, v_result_id, 1,'INFO: There is/are no arcs without start/end nodes on this result.');
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, count)
+		VALUES (v_fid, v_result_id, 1,'INFO: There is/are no arcs without start/end nodes on this result.',v_count);
 	END IF;
 	
 
@@ -213,14 +213,14 @@ BEGIN
 	SELECT count(*) FROM anl_arc INTO v_count WHERE fid = 139 AND cur_user=current_user;
 
 	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, count)
 		VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ',v_count,' arc(s) because topological disconnected from any ', v_boundaryelem
-		,'. Main reasons may be: state_type, epa_type, sector_id or expl_id or some node not connected'));
+		,'. Main reasons may be: state_type, epa_type, sector_id or expl_id or some node not connected'), v_count);
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 3, concat('HINT: Use toolbox function ''Check network topology for specific result'' for more information'));
 	ELSE
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, v_result_id, 1, concat('INFO: No arcs topological disconnected found on this result from any ', v_boundaryelem));
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, count)
+		VALUES (v_fid, v_result_id, 1, concat('INFO: No arcs topological disconnected found on this result from any ', v_boundaryelem),v_count);
 	END IF;
 
 	IF v_project_type = 'WS' THEN
@@ -277,13 +277,13 @@ BEGIN
 
 		--raise exception 'count %', v_count;
 		IF v_count > 0 THEN
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 2, concat('WARNING: There is/are ',v_count,' Dry arc(s) because closed elements'));
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, count)
+			VALUES (v_fid, v_result_id, 2, concat('WARNING: There is/are ',v_count,' Dry arc(s) because closed elements'), v_count);
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, v_result_id, 2, concat('HINT: Use toolbox function ''Check network for specific result'' for more information'));
 		ELSE
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 1, concat('INFO: No dry arcs found'));
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, count)
+			VALUES (v_fid, v_result_id, 1, concat('INFO: No dry arcs found'),v_count);
 		END IF;
 
 		-- insert into result table dry nodes with demands (error)
@@ -300,13 +300,13 @@ BEGIN
 		SELECT count(*) FROM anl_node INTO v_count WHERE fid = 233 AND cur_user=current_user;
 
 		IF v_count > 0 THEN
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ',v_count,' Dry nodes with demands'));
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, count)
+			VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ',v_count,' Dry nodes with demands'), v_count);
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, v_result_id, 3, concat('HINT: Use toolbox function ''Check network for specific result'' for more information'));
 		ELSE
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 1, concat('INFO: No dry nodes with demand found'));
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, count)
+			VALUES (v_fid, v_result_id, 1, concat('INFO: No dry nodes with demand found'), v_count);
 		END IF;
 	END IF;
 

@@ -112,16 +112,16 @@ BEGIN
 	IF v_count > 0 THEN
 		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom)
 			SELECT 208, node_id, nodecat_id, ''Node with ischange=1 without any variation of arcs in terms of diameter, pn or material'', the_geom FROM (', v_querytext,') b');
-		INSERT INTO audit_check_data (fid,  criticity, error_message)
-		VALUES (211, 2, concat('WARNING: There is/are ',v_count,' nodes with ischange on 1 (true) without any variation of arcs in terms of diameter, pn or material. Please, check your data before continue.'));
+		INSERT INTO audit_check_data (fid,  criticity, error_message, count)
+		VALUES (211, 2, concat('WARNING: There is/are ',v_count,' nodes with ischange on 1 (true) without any variation of arcs in terms of diameter, pn or material. Please, check your data before continue.'),v_count);
 
-		INSERT INTO audit_check_data (fid,  criticity, error_message)
-		VALUES (211, 2, concat('SELECT * FROM anl_node WHERE fprocescat_id = 208 AND cur_user = current_user.'));
+		INSERT INTO audit_check_data (fid,  criticity, error_message, count)
+		VALUES (211, 2, concat('SELECT * FROM anl_node WHERE fprocescat_id = 208 AND cur_user = current_user.'), v_count);
 
 	-- is defined as warning because error (3) will break topologic issues of mapzones
 	ELSE
-		INSERT INTO audit_check_data (fid, criticity, error_message)
-		VALUES (211, 1, 'INFO: No nodes ''ischange'' without real change have been found.');
+		INSERT INTO audit_check_data (fid, criticity, error_message, count)
+		VALUES (211, 1, 'INFO: No nodes ''ischange'' without real change have been found.',v_count);
 	END IF;
 			
 	-- Check if there are change of catalog with cat_feature_node 'ischange=0 (false)' (209)
@@ -135,14 +135,14 @@ BEGIN
 		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom)
 		SELECT 209, node_id, nodecat_id, concat(''Nodes with catalog changes without nodecat_id ischange:'',arccat_id), the_geom FROM (', v_querytext,') b');
 
-		INSERT INTO audit_check_data (fid,  criticity, error_message)
-		VALUES (211, 2, concat('WARNING: There is/are ',v_count,' nodes where arc catalog changes without nodecat with ischange on 0 or 2 (false or maybe). Please, check your data before continue.'));
+		INSERT INTO audit_check_data (fid,  criticity, error_message, count)
+		VALUES (211, 2, concat('WARNING: There is/are ',v_count,' nodes where arc catalog changes without nodecat with ischange on 0 or 2 (false or maybe). Please, check your data before continue.'),v_count);
 			-- is defined as warning because error (3) will break topologic issues of mapzones
-		INSERT INTO audit_check_data (fid,  criticity, error_message)
-		VALUES (211, 2, concat('SELECT * FROM anl_node WHERE fprocescat_id = 209 AND cur_user = current_user.'));
+		INSERT INTO audit_check_data (fid,  criticity, error_message, count)
+		VALUES (211, 2, concat('SELECT * FROM anl_node WHERE fprocescat_id = 209 AND cur_user = current_user.'),v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid, criticity, error_message)
-		VALUES (211, 1, 'INFO: No nodes without ''ischange'' where arc changes have been found');
+		INSERT INTO audit_check_data (fid, criticity, error_message, count)
+		VALUES (211, 1, 'INFO: No nodes without ''ischange'' where arc changes have been found',v_count);
 	END IF;
 
 	-- valves closed/broken with null values (176)
@@ -151,34 +151,34 @@ BEGIN
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 	IF v_count > 0 THEN
 		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom) SELECT 176, node_id, nodecat_id, ''valves closed/broken with null values'', the_geom FROM ', v_querytext);
-		INSERT INTO audit_check_data (fid, criticity, error_message)
-		VALUES (211, 3, concat('ERROR: There is/are ',v_count,' valve''s (state=1) with broken or closed with NULL values.'));
-		INSERT INTO audit_check_data (fid, criticity, error_message)
-		VALUES (211, 3, concat('SELECT * FROM anl_node WHERE fid=176 AND cur_user=current_user'));
+		INSERT INTO audit_check_data (fid, criticity, error_message, count)
+		VALUES (211, 3, concat('ERROR: There is/are ',v_count,' valve''s (state=1) with broken or closed with NULL values.'),v_count);
+		INSERT INTO audit_check_data (fid, criticity, error_message, count)
+		VALUES (211, 3, concat('SELECT * FROM anl_node WHERE fid=176 AND cur_user=current_user'),v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid, criticity, error_message)
-		VALUES (211, 1, 'INFO: No valves''s (state=1) with null values on closed and broken fields.');
+		INSERT INTO audit_check_data (fid, criticity, error_message, count)
+		VALUES (211, 1, 'INFO: No valves''s (state=1) with null values on closed and broken fields.',v_count);
 	END IF;
 
 	-- inlet_x_exploitation
 	SELECT count(*) INTO v_count FROM config_mincut_inlet WHERE expl_id NOT IN (SELECT expl_id FROM exploitation);
 	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fid, criticity, error_message)
+		INSERT INTO audit_check_data (fid, criticity, error_message, count)
 		VALUES (211, 3, concat('ERROR: There is/are at least ',v_count,' 
-		exploitation(s) bad configured on the config_mincut_inlet table. Please check your data before continue'));
+		exploitation(s) bad configured on the config_mincut_inlet table. Please check your data before continue'),v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid, criticity, error_message)
-		VALUES (211, 1, 'INFO: It seems config_mincut_inlet table is well configured. At least, table is filled with nodes from all exploitations.');
+		INSERT INTO audit_check_data (fid, criticity, error_message, count)
+		VALUES (211, 1, 'INFO: It seems config_mincut_inlet table is well configured. At least, table is filled with nodes from all exploitations.',v_count);
 	END IF;
 			
 	-- nodetype.grafdelimiter values
 	SELECT count(*) INTO v_count FROM cat_feature_node where graf_delimiter IS NULL;
 	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fid, criticity, error_message)
-		VALUES (211, 2, concat('WARNING: There is/are ',v_count,' rows on the cat_feature_node table with null values on graf_delimiter. Please check your data before continue'));
+		INSERT INTO audit_check_data (fid, criticity, error_message, count)
+		VALUES (211, 2, concat('WARNING: There is/are ',v_count,' rows on the cat_feature_node table with null values on graf_delimiter. Please check your data before continue'),v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid, criticity, error_message)
-		VALUES (211, 1, 'INFO: The graf_delimiter column on cat_feature_node table has values for all rows.');
+		INSERT INTO audit_check_data (fid, criticity, error_message, count)
+		VALUES (211, 1, 'INFO: The graf_delimiter column on cat_feature_node table has values for all rows.',v_count);
 	END IF;
 
 	-- grafanalytics sector
@@ -189,9 +189,9 @@ BEGIN
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
 		IF v_count > 0 THEN
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (211, 3, concat('ERROR: There is/are ',v_count, ' sectors on sector table with grafconfig not configured.'));
+			INSERT INTO audit_check_data (fid, criticity, error_message, count) VALUES (211, 3, concat('ERROR: There is/are ',v_count, ' sectors on sector table with grafconfig not configured.'),v_count);
 		ELSE
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (211, 1, 'INFO: All mapzones has grafconfig values not null.');
+			INSERT INTO audit_check_data (fid, criticity, error_message, count) VALUES (211, 1, 'INFO: All mapzones has grafconfig values not null.',v_count);
 		END IF;	
 
 		-- check coherence againts nodetype.grafdelimiter and nodeparent defined on sector.grafconfig (fid:  179)
@@ -205,14 +205,14 @@ BEGIN
 			EXECUTE concat 
 			('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom) SELECT 179, node_id, nodecat_id,
 			''The cat_feature_node.grafdelimiter of this node is SECTOR but it is not configured on sector.grafconfig'', the_geom FROM (', v_querytext,')a');
-			INSERT INTO audit_check_data (fid, criticity, error_message)
+			INSERT INTO audit_check_data (fid, criticity, error_message, count)
 			VALUES (211, 2, concat('WARNING: There is/are ',v_count,
-			' node(s) with cat_feature_node.graf_delimiter=''SECTOR'' not configured on the sector table.'));
-			INSERT INTO audit_check_data (fid, criticity, error_message)
-			VALUES (211, 2, concat('SELECT * FROM anl_node WHERE fid=179 AND cur_user=current_user'));
+			' node(s) with cat_feature_node.graf_delimiter=''SECTOR'' not configured on the sector table.'),v_count);
+			INSERT INTO audit_check_data (fid, criticity, error_message, count)
+			VALUES (211, 2, concat('SELECT * FROM anl_node WHERE fid=179 AND cur_user=current_user'),v_count);
 		ELSE
-			INSERT INTO audit_check_data (fid, criticity, error_message)
-			VALUES (211, 1, 'INFO: All nodes with cat_feature_node.grafdelimiter=''SECTOR'' are defined as nodeParent on sector.grafconfig');
+			INSERT INTO audit_check_data (fid, criticity, error_message, count)
+			VALUES (211, 1, 'INFO: All nodes with cat_feature_node.grafdelimiter=''SECTOR'' are defined as nodeParent on sector.grafconfig',v_count);
 		END IF;
 
 	END IF;
@@ -225,9 +225,9 @@ BEGIN
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
 		IF v_count > 0 THEN
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (211, 3, concat('ERROR: There is/are ',v_count, ' dma on dma table with grafconfig not configured.'));
+			INSERT INTO audit_check_data (fid, criticity, error_message, count) VALUES (211, 3, concat('ERROR: There is/are ',v_count, ' dma on dma table with grafconfig not configured.'),v_count);
 		ELSE
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (211, 1, 'INFO: All mapzones has grafconfig values not null.');
+			INSERT INTO audit_check_data (fid, criticity, error_message, count) VALUES (211, 1, 'INFO: All mapzones has grafconfig values not null.',v_count);
 		END IF;	
 		
 		-- dma : check coherence againts nodetype.grafdelimiter and nodeparent defined on dma.grafconfig (fid:  180)
@@ -241,14 +241,14 @@ BEGIN
 			EXECUTE concat 
 			('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom) SELECT 180, node_id, nodecat_id, ''cat_feature_node is DMA but node is not configured on dma.grafconfig'', the_geom FROM ('
 				, v_querytext,')a');
-			INSERT INTO audit_check_data (fid, criticity, error_message)
+			INSERT INTO audit_check_data (fid, criticity, error_message, count)
 			VALUES (211, 2, concat('WARNING: There is/are ',v_count,
-			' node(s) with cat_feature_node.graf_delimiter=''DMA'' not configured on the dma table.'));
-			INSERT INTO audit_check_data (fid, criticity, error_message)
-			VALUES (211, 2, concat('SELECT * FROM anl_node WHERE fid=180 AND cur_user=current_user'));
+			' node(s) with cat_feature_node.graf_delimiter=''DMA'' not configured on the dma table.'),v_count);
+			INSERT INTO audit_check_data (fid, criticity, error_message, count)
+			VALUES (211, 2, concat('SELECT * FROM anl_node WHERE fid=180 AND cur_user=current_user'),v_count);
 		ELSE
-			INSERT INTO audit_check_data (fid, criticity, error_message)
-			VALUES (211, 1, 'INFO: All nodes with cat_feature_node.grafdelimiter=''DMA'' are defined as nodeParent on dma.grafconfig');
+			INSERT INTO audit_check_data (fid, criticity, error_message, count)
+			VALUES (211, 1, 'INFO: All nodes with cat_feature_node.grafdelimiter=''DMA'' are defined as nodeParent on dma.grafconfig',v_count);
 		END IF;
 		
 		-- dma, toArc (fid:  84)
@@ -262,9 +262,9 @@ BEGIN
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
 		IF v_count > 0 THEN
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (211, 3, concat('ERROR: There is/are ',v_count, ' dqa on dqa table with grafconfig not configured.'));
+			INSERT INTO audit_check_data (fid, criticity, error_message, count) VALUES (211, 3, concat('ERROR: There is/are ',v_count, ' dqa on dqa table with grafconfig not configured.'),v_count);
 		ELSE
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (211, 1, 'INFO: All mapzones has grafconfig values not null.');
+			INSERT INTO audit_check_data (fid, criticity, error_message, count) VALUES (211, 1, 'INFO: All mapzones has grafconfig values not null.',v_count);
 		END IF;	
 
 		-- dqa : check coherence againts nodetype.grafdelimiter and nodeparent defined on dqa.grafconfig (fid:  181)
@@ -278,14 +278,14 @@ BEGIN
 		IF v_count > 0 THEN
 			EXECUTE concat 
 			('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom) SELECT 181, node_id, nodecat_id, ''cat_feature_node is DQA but node is not configured on dqa.grafconfig'', the_geom FROM (', v_querytext,')a');
-			INSERT INTO audit_check_data (fid, criticity, error_message)
+			INSERT INTO audit_check_data (fid, criticity, error_message, count)
 			VALUES (211, 2, concat('WARNING: There is/are ',v_count,
-			' node(s) with cat_feature_node.graf_delimiter=''DQA'' not configured on the dqa table.'));
-			INSERT INTO audit_check_data (fid, criticity, error_message)
-			VALUES (211, 2, concat('SELECT * FROM anl_node WHERE fid=181 AND cur_user=current_user'));
+			' node(s) with cat_feature_node.graf_delimiter=''DQA'' not configured on the dqa table.'),v_count);
+			INSERT INTO audit_check_data (fid, criticity, error_message, count)
+			VALUES (211, 2, concat('SELECT * FROM anl_node WHERE fid=181 AND cur_user=current_user'),v_count);
 		ELSE
-			INSERT INTO audit_check_data (fid, criticity, error_message)
-			VALUES (211, 1, 'INFO: All nodes with cat_feature_node.grafdelimiter=''DQA'' are defined as nodeParent on dqa.grafconfig');
+			INSERT INTO audit_check_data (fid, criticity, error_message, count)
+			VALUES (211, 1, 'INFO: All nodes with cat_feature_node.grafdelimiter=''DQA'' are defined as nodeParent on dqa.grafconfig',v_count);
 		END IF;
 
 		-- dqa, toArc (fid:  85)
@@ -299,9 +299,9 @@ BEGIN
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
 		IF v_count > 0 THEN
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (211, 4, concat('ERROR: There is/are ',v_count, ' presszone on presszone table with grafconfig not configured.'));
+			INSERT INTO audit_check_data (fid, criticity, error_message, count) VALUES (211, 4, concat('ERROR: There is/are ',v_count, ' presszone on presszone table with grafconfig not configured.'),v_count);
 		ELSE
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (211, 1, 'INFO: All mapzones has grafconfig values not null.');
+			INSERT INTO audit_check_data (fid, criticity, error_message, count) VALUES (211, 1, 'INFO: All mapzones has grafconfig values not null.',v_count);
 		END IF;	
 
 		-- presszone : check coherence againts nodetype.grafdelimiter and nodeparent defined on presszone.grafconfig (fid:  182)
@@ -314,14 +314,14 @@ BEGIN
 		IF v_count > 0 THEN
 			EXECUTE concat 
 			('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom) SELECT 182, node_id, nodecat_id, ''cat_feature_node is PRESSZONE but node is not configured on presszone.grafconfig'', the_geom FROM (', v_querytext,')a');
-			INSERT INTO audit_check_data (fid, criticity, error_message)
+			INSERT INTO audit_check_data (fid, criticity, error_message, count)
 			VALUES (211, 2, concat('WARNING: There is/are ',v_count,
-			' node(s) with cat_feature_node.graf_delimiter=''PRESSZONE'' not configured on the presszone table.'));
-			INSERT INTO audit_check_data (fid, criticity, error_message)
-			VALUES (211, 2, concat('SELECT * FROM anl_node WHERE fid=182 AND cur_user=current_user'));
+			' node(s) with cat_feature_node.graf_delimiter=''PRESSZONE'' not configured on the presszone table.'),v_count);
+			INSERT INTO audit_check_data (fid, criticity, error_message, count)
+			VALUES (211, 2, concat('SELECT * FROM anl_node WHERE fid=182 AND cur_user=current_user'),v_count);
 		ELSE
-			INSERT INTO audit_check_data (fid, criticity, error_message)
-			VALUES (211, 1, 'INFO: All nodes with cat_feature_node.grafdelimiter=''PRESSZONE'' are defined as nodeParent on presszone.grafconfig');
+			INSERT INTO audit_check_data (fid, criticity, error_message, count)
+			VALUES (211, 1, 'INFO: All nodes with cat_feature_node.grafdelimiter=''PRESSZONE'' are defined as nodeParent on presszone.grafconfig',v_count);
 		END IF;
 
 	END IF;

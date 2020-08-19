@@ -166,5 +166,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_fct_user_check_data(json)
-  OWNER TO postgres;
