@@ -36,7 +36,7 @@ from ....ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFull, GwMainW
 from ..edit.dimensioning import GwDimensioning
 
 from ....actions.parent_functs import set_icon, set_dates_from_to
-from ....actions.api_parent_functs import get_visible_layers, create_body, resetRubberbands, \
+from ....actions.api_parent_functs import get_visible_layers, create_body, \
     draw, load_settings, close_dialog, populate_basic_info, open_dialog, put_widgets, fill_child, \
     check_actions, action_open_url, api_action_help, save_settings, \
     get_feature_by_expr, set_setStyleSheet, set_data_type, add_lineedit, set_widget_size, manage_lineedit, add_combobox, \

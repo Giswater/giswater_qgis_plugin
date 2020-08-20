@@ -13,7 +13,7 @@ import re
 import os
 
 from ....actions.parent_functs import get_max_rectangle_from_coords
-from ....actions.api_parent_functs import resetRubberbands, create_body, get_visible_layers, draw_point, draw_polyline, \
+from ....actions.api_parent_functs import  create_body, get_visible_layers, draw_point, draw_polyline, \
 	get_points
 
 
