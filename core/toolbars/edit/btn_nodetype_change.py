@@ -193,13 +193,13 @@ class GwNodeTypeChangeButton(GwParentMapTool):
 			return
 		
 		# Get the click
-		event_point = self.snapper_manager.get_event_point(event)
+		event_point = self.qgis_tools.get_event_point(event)
 		
 		# Snapping
-		result = self.snapper_manager.snap_to_current_layer(event_point)
-		if self.snapper_manager.result_is_valid():
+		result = self.qgis_tools.snap_to_current_layer(event_point)
+		if self.qgis_tools.result_is_valid():
 			# Get the point
-			snapped_feat = self.snapper_manager.get_snapped_feature(result)
+			snapped_feat = self.qgis_tools.get_snapped_feature(result)
 			if snapped_feat:
 				self.node_id = snapped_feat.attribute('node_id')
 				# Change node type
@@ -212,10 +212,10 @@ class GwNodeTypeChangeButton(GwParentMapTool):
 		self.action.setChecked(True)
 		
 		# Store user snapping configuration
-		self.snapper_manager.store_snapping_options()
+		self.qgis_tools.store_snapping_options()
 		
 		# Clear snapping
-		self.snapper_manager.enable_snapping()
+		self.qgis_tools.enable_snapping()
 		self.current_layer = self.iface.activeLayer()
 		# Set active layer to 'v_edit_node'
 		self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")

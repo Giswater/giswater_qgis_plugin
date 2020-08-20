@@ -75,21 +75,21 @@ class GwConnectLinkButton(GwParentMapTool):
 		if event.button() == Qt.LeftButton:
 			
 			# Get coordinates
-			event_point = self.snapper_manager.get_event_point(event)
+			event_point = self.qgis_tools.get_event_point(event)
 			
 			# Simple selection
 			if not self.dragging:
 				
 				# Snap to connec or gully
-				result = self.snapper_manager.snap_to_background_layers(event_point)
-				if not self.snapper_manager.result_is_valid():
+				result = self.qgis_tools.snap_to_background_layers(event_point)
+				if not self.qgis_tools.result_is_valid():
 					return
 				
 				# Check if it belongs to 'connec' or 'gully' group
-				layer = self.snapper_manager.get_snapped_layer(result)
-				feature_id = self.snapper_manager.get_snapped_feature_id(result)
-				exist_connec = self.snapper_manager.check_connec_group(layer)
-				exist_gully = self.snapper_manager.check_gully_group(layer)
+				layer = self.qgis_tools.get_snapped_layer(result)
+				feature_id = self.qgis_tools.get_snapped_feature_id(result)
+				exist_connec = self.qgis_tools.check_connec_group(layer)
+				exist_gully = self.qgis_tools.check_gully_group(layer)
 				if exist_connec or exist_gully:
 					key = QApplication.keyboardModifiers()
 					# If Ctrl+Shift is clicked: deselect snapped feature
@@ -125,7 +125,7 @@ class GwConnectLinkButton(GwParentMapTool):
 			
 			# Check selected records
 			number_features = 0
-			layer = self.snapper_manager.layer_connec
+			layer = self.qgis_tools.layer_connec
 			if layer:
 				number_features += layer.selectedFeatureCount()
 			
@@ -138,7 +138,7 @@ class GwConnectLinkButton(GwParentMapTool):
 					self.link_selected_features('connec', layer)
 					self.cancel_map_tool()
 			
-			layer = self.snapper_manager.layer_gully
+			layer = self.qgis_tools.layer_gully
 			if layer:
 				# Check selected records
 				number_features = 0
@@ -167,16 +167,16 @@ class GwConnectLinkButton(GwParentMapTool):
 		self.rubber_band.reset()
 		
 		# Set main snapping layers
-		self.snapper_manager.set_snapping_layers()
+		self.qgis_tools.set_snapping_layers()
 		
 		# Store user snapping configuration
-		self.snapper_manager.store_snapping_options()
+		self.qgis_tools.store_snapping_options()
 		
 		# Clear snapping
-		self.snapper_manager.enable_snapping()
+		self.qgis_tools.enable_snapping()
 		
 		# Set snapping to 'connec' and 'gully'
-		self.snapper_manager.snap_to_connec_gully()
+		self.qgis_tools.snap_to_connec_gully()
 		
 		# Change cursor
 		cursor = get_cursor_multiple_selection()
@@ -273,11 +273,11 @@ class GwConnectLinkButton(GwParentMapTool):
 			behaviour = QgsVectorLayer.AddToSelection
 		
 		# Selection for all connec and gully layers
-		layer = self.snapper_manager.layer_connec
+		layer = self.qgis_tools.layer_connec
 		if layer:
 			layer.selectByRect(selectGeometry, behaviour)
 		
-		layer = self.snapper_manager.layer_gully
+		layer = self.qgis_tools.layer_gully
 		if layer:
 			layer.selectByRect(selectGeometry, behaviour)
 

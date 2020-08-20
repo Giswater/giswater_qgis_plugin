@@ -92,10 +92,10 @@ class GwArcDivideButton(GwParentMapTool):
 		self.action.setChecked(True)
 		
 		# Store user snapping configuration
-		self.snapper_manager.store_snapping_options()
+		self.qgis_tools.store_snapping_options()
 		
 		# Clear snapping
-		self.snapper_manager.enable_snapping()
+		self.qgis_tools.enable_snapping()
 		
 		# Get active layer
 		self.active_layer = self.iface.activeLayer()
@@ -144,7 +144,7 @@ class GwArcDivideButton(GwParentMapTool):
 		self.vertex_marker.hide()
 		x = event.pos().x()
 		y = event.pos().y()
-		event_point = self.snapper_manager.get_event_point(event)
+		event_point = self.qgis_tools.get_event_point(event)
 		
 		# Snap to node
 		if self.snapped_feat is None:
@@ -154,10 +154,10 @@ class GwArcDivideButton(GwParentMapTool):
 			if cur_layer != self.layer_node:
 				self.iface.setActiveLayer(self.layer_node)
 			# Snapping
-			result = self.snapper_manager.snap_to_current_layer(event_point)
-			if self.snapper_manager.result_is_valid():
+			result = self.qgis_tools.snap_to_current_layer(event_point)
+			if self.qgis_tools.result_is_valid():
 				# Get the point and add marker on it
-				point = self.snapper_manager.add_marker(result, self.vertex_marker)
+				point = self.qgis_tools.add_marker(result, self.vertex_marker)
 			else:
 				point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
 			
@@ -173,13 +173,13 @@ class GwArcDivideButton(GwParentMapTool):
 				self.iface.setActiveLayer(self.layer_arc)
 			
 			# Snapping
-			result = self.snapper_manager.snap_to_current_layer(event_point)
+			result = self.qgis_tools.snap_to_current_layer(event_point)
 			
 			# if result and result[0].snappedVertexNr == -1:
-			if self.snapper_manager.result_is_valid():
-				layer = self.snapper_manager.get_snapped_layer(result)
-				feature_id = self.snapper_manager.get_snapped_feature_id(result)
-				point = self.snapper_manager.add_marker(result, self.vertex_marker, QgsVertexMarker.ICON_CROSS)
+			if self.qgis_tools.result_is_valid():
+				layer = self.qgis_tools.get_snapped_layer(result)
+				feature_id = self.qgis_tools.get_snapped_feature_id(result)
+				point = self.qgis_tools.add_marker(result, self.vertex_marker, QgsVertexMarker.ICON_CROSS)
 				# Select the arc
 				layer.removeSelection()
 				layer.select([feature_id])
@@ -195,17 +195,17 @@ class GwArcDivideButton(GwParentMapTool):
 		
 		if event.button() == Qt.LeftButton:
 			
-			event_point = self.snapper_manager.get_event_point(event)
+			event_point = self.qgis_tools.get_event_point(event)
 			
 			# Snap to node
 			if self.snapped_feat is None:
 				
-				result = self.snapper_manager.snap_to_current_layer(event_point)
-				if not self.snapper_manager.result_is_valid():
+				result = self.qgis_tools.snap_to_current_layer(event_point)
+				if not self.qgis_tools.result_is_valid():
 					return
 				
-				self.snapped_feat = self.snapper_manager.get_snapped_feature(result)
-				point = self.snapper_manager.get_snapped_point(result)
+				self.snapped_feat = self.qgis_tools.get_snapped_feature(result)
+				point = self.qgis_tools.get_snapped_point(result)
 				
 				# Hide marker
 				self.vertex_marker.hide()
@@ -219,12 +219,12 @@ class GwArcDivideButton(GwParentMapTool):
 			# Snap to arc
 			else:
 				
-				result = self.snapper_manager.snap_to_current_layer(event_point)
-				if not self.snapper_manager.result_is_valid():
+				result = self.qgis_tools.snap_to_current_layer(event_point)
+				if not self.qgis_tools.result_is_valid():
 					return
 				
-				layer = self.snapper_manager.get_snapped_layer(result)
-				point = self.snapper_manager.get_snapped_point(result)
+				layer = self.qgis_tools.get_snapped_layer(result)
+				point = self.qgis_tools.get_snapped_point(result)
 				point = self.toLayerCoordinates(layer, point)
 				
 				# Get selected feature (at this moment it will have one and only one)

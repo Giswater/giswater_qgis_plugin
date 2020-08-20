@@ -108,16 +108,16 @@ class GwAuxCircleButton(GwParentMapTool):
 
         # Hide marker and get coordinates
         self.vertex_marker.hide()
-        event_point = self.snapper_manager.get_event_point(event)
+        event_point = self.qgis_tools.get_event_point(event)
 
         # Snapping
         if self.snap_to_selected_layer:
-            result = self.snapper_manager.snap_to_current_layer(event_point)
+            result = self.qgis_tools.snap_to_current_layer(event_point)
         else:
-            result = self.snapper_manager.snap_to_background_layers(event_point)
+            result = self.qgis_tools.snap_to_background_layers(event_point)
 
         # Add marker
-        self.snapper_manager.add_marker(result, self.vertex_marker)
+        self.qgis_tools.add_marker(result, self.vertex_marker)
 
 
     def canvasReleaseEvent(self, event):
@@ -127,11 +127,11 @@ class GwAuxCircleButton(GwParentMapTool):
             # Get coordinates
             x = event.pos().x()
             y = event.pos().y()
-            event_point = self.snapper_manager.get_event_point(event)
+            event_point = self.qgis_tools.get_event_point(event)
 
             # Create point with snap reference
-            result = self.snapper_manager.snap_to_background_layers(event_point)
-            point = self.snapper_manager.get_snapped_point(result)
+            result = self.qgis_tools.snap_to_background_layers(event_point)
+            point = self.qgis_tools.get_snapped_point(result)
 
             # Create point with mouse cursor reference
             if point is None:
@@ -165,7 +165,7 @@ class GwAuxCircleButton(GwParentMapTool):
             self.controller.show_info(message)
 
         # Store user snapping configuration
-        self.snapper_manager.store_snapping_options()
+        self.qgis_tools.store_snapping_options()
 
         # Get current layer
         self.current_layer = self.iface.activeLayer()

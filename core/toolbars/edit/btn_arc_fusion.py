@@ -53,13 +53,13 @@ class GwArcFusionButton(GwParentMapTool):
 			return
 		
 		# Get coordinates
-		event_point = self.snapper_manager.get_event_point(event)
+		event_point = self.qgis_tools.get_event_point(event)
 		
 		# Snapping
 		snapped_feat = None
-		result = self.snapper_manager.snap_to_current_layer(event_point)
-		if self.snapper_manager.result_is_valid():
-			snapped_feat = self.snapper_manager.get_snapped_feature(result)
+		result = self.qgis_tools.snap_to_current_layer(event_point)
+		if self.qgis_tools.result_is_valid():
+			snapped_feat = self.qgis_tools.get_snapped_feature(result)
 		
 		if snapped_feat:
 			self.node_id = snapped_feat.attribute('node_id')
@@ -114,10 +114,10 @@ class GwArcFusionButton(GwParentMapTool):
 		self.action.setChecked(True)
 		
 		# Store user snapping configuration
-		self.snapper_manager.store_snapping_options()
+		self.qgis_tools.store_snapping_options()
 		
 		# Clear snapping
-		self.snapper_manager.enable_snapping()
+		self.qgis_tools.enable_snapping()
 		
 		# Set active layer to 'v_edit_node'
 		self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
