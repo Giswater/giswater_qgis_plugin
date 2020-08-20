@@ -227,20 +227,20 @@ class GwDocument:
             sql += (f"\nDELETE FROM doc_x_gully"
                     f" WHERE doc_id = '{doc_id}';")
 
-        if self..list_ids['arc']:
-            for feature_id in self..list_ids['arc']:
+        if self.list_ids['arc']:
+            for feature_id in self.list_ids['arc']:
                 sql += (f"\nINSERT INTO doc_x_arc (doc_id, arc_id)"
                         f" VALUES ('{doc_id}', '{feature_id}');")
-        if self..list_ids['node']:
-            for feature_id in self..list_ids['node']:
+        if self.list_ids['node']:
+            for feature_id in self.list_ids['node']:
                 sql += (f"\nINSERT INTO doc_x_node (doc_id, node_id)"
                         f" VALUES ('{doc_id}', '{feature_id}');")
-        if self..list_ids['connec']:
-            for feature_id in self..list_ids['connec']:
+        if self.list_ids['connec']:
+            for feature_id in self.list_ids['connec']:
                 sql += (f"\nINSERT INTO doc_x_connec (doc_id, connec_id)"
                         f" VALUES ('{doc_id}', '{feature_id}');")
-        if self.project_type == 'ud' and self..list_ids['gully']:
-            for feature_id in self..list_ids['gully']:
+        if self.project_type == 'ud' and self.list_ids['gully']:
+            for feature_id in self.list_ids['gully']:
                 sql += (f"\nINSERT INTO doc_x_gully (doc_id, gully_id)"
                         f" VALUES ('{doc_id}', '{feature_id}');")
 
