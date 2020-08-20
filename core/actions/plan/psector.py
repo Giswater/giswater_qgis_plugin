@@ -27,7 +27,6 @@ from ....actions.multiple_selection import MultipleSelection
 from ..edit.document import GwDocument
 
 from .... import global_vars
-from ....actions import parent_vars
 
 from ....actions.parent_functs import load_settings, set_icon, hilight_feature_by_id, \
     select_features_by_expr, zoom_to_selected_features, document_open, document_delete, make_list_for_completer, \

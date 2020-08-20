@@ -16,7 +16,6 @@ from datetime import datetime
 from lib import qt_tools
 from ....ui_manager import FeatureEndUi, InfoWorkcatUi, FeatureEndConnecUi
 from .... import global_vars
-from ....actions import parent_vars
 
 from ....actions.parent_functs import load_settings, set_icon, open_dialog, save_settings, close_dialog
 from ....actions.parent_manage_funct import remove_selection, set_selectionbehavior, \

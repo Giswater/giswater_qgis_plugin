@@ -29,7 +29,6 @@ from ....ui_manager import VisitUi, VisitEvent, VisitEventRehab, LotVisitManager
 from ..edit.document import GwDocument
 
 from .... import global_vars
-from ....actions import parent_vars
 
 from ....actions.parent_functs import load_settings, set_icon, open_dialog, document_delete, document_open, create_body, \
     set_dates_from_to, get_values_from_catalog

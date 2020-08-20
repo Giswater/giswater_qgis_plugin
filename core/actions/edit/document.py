@@ -12,7 +12,6 @@ from functools import partial
 from lib import qt_tools
 from ....ui_manager import DocUi, DocManager
 from .... import global_vars
-from ....actions import parent_vars
 
 from ....actions.parent_functs import load_settings, set_icon, open_web_browser, get_file_dialog, open_dialog, close_dialog
 
