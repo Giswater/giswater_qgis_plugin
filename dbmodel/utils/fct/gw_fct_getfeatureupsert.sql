@@ -582,7 +582,7 @@ BEGIN
 
 				-- elevation from raster
 				WHEN 'elevation', 'top_elev' THEN 
-					IF v_sys_raster_dem AND v_edit_upsert_elevation_from_dem THEN
+					IF v_sys_raster_dem AND v_edit_insert_elevation_from_dem THEN
 						field_value = (SELECT ST_Value(rast,1, p_reduced_geometry, true) FROM v_ext_raster_dem WHERE 
 						id = (SELECT id FROM v_ext_raster_dem WHERE st_dwithin (envelope, p_reduced_geometry, 1) LIMIT 1))::numeric (12,3);
 					ELSE
