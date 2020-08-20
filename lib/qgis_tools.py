@@ -31,6 +31,8 @@ class QgisTools:
         self.iface = iface
         self.plugin_dir = plugin_dir
 
+        self.previous_snapping = None
+
         # Snapper
         self.snapping_config = self.get_snapping_options()
         self.snapping_config.setEnabled(True)
