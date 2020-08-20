@@ -27,11 +27,20 @@ BEGIN
 
 	FOR table_record IN SELECT * FROM sys_table WHERE isaudit  IS TRUE
 	LOOP 
-		EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_audit'||table_record.id||' ON '||table_record.id;
-		IF p_action='enable' THEN
-			EXECUTE 'CREATE TRIGGER gw_trg_audit'||table_record.id||' AFTER INSERT OR UPDATE OR DELETE ON '||v_schemaname||'.'
-			||table_record.id||' FOR EACH ROW EXECUTE PROCEDURE '||v_schemaname||'.gw_trg_audit()';
-		END IF;
+		IF table_record.id ilike 've_%' THEN
+			EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_audit'||table_record.id||' ON '||table_record.id;
+			IF p_action='enable' THEN
+				EXECUTE 'CREATE TRIGGER gw_trg_audit'||table_record.id||' INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_schemaname||'.'
+				||table_record.id||' FOR EACH ROW EXECUTE PROCEDURE '||v_schemaname||'.gw_trg_audit()';
+			END IF;
+		ELSE
+
+			EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_audit'||table_record.id||' ON '||table_record.id;
+			IF p_action='enable' THEN
+				EXECUTE 'CREATE TRIGGER gw_trg_audit'||table_record.id||' AFTER INSERT OR UPDATE OR DELETE ON '||v_schemaname||'.'
+				||table_record.id||' FOR EACH ROW EXECUTE PROCEDURE '||v_schemaname||'.gw_trg_audit()';
+			END IF;
+	END IF;
 	END LOOP;		
 
 return 0;
