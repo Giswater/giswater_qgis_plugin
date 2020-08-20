@@ -17,7 +17,6 @@ from lib import qt_tools
 from lib.qgis_tools import QgisTools
 from ....ui_manager import DimensioningUi
 from .... import global_vars
-from ....actions import parent_vars
 
 from ....actions.parent_functs import set_icon
 from ....actions.api_parent_functs import load_settings, save_settings, create_body, put_widgets, open_dialog, \

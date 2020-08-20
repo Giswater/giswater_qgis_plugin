@@ -24,7 +24,6 @@ from collections import OrderedDict
 from functools import partial
 
 from .... import global_vars
-from ....actions import parent_vars
 from lib import qt_tools
 from .catalog import GwCatalog
 from ..edit.document import GwDocument
@@ -700,13 +699,13 @@ class GwInfo(QObject):
 
     def dlg_destroyed(self, layer=None, vertex=None):
 
-        parent_vars.dlg_is_destroyed = True
+        self.dlg_is_destroyed = True
         if layer is not None:
             global_vars.iface.setActiveLayer(layer)
         if vertex is not None:
             global_vars.iface.mapCanvas().scene().removeItem(vertex)
         else:
-            if hasattr(parent_vars, 'vertex_marker'):
+            if hasattr(self, 'vertex_marker'):
                 if self.vertex_marker is not None:
                     global_vars.iface.mapCanvas().scene().removeItem(self.vertex_marker)
         try:
@@ -809,7 +808,7 @@ class GwInfo(QObject):
         global_vars.canvas.setMapTool(emit_point)
         global_vars.canvas.xyCoordinates.connect(self.api_action_copy_paste_mouse_move)
         emit_point.canvasClicked.connect(partial(self.api_action_copy_paste_canvas_clicked, dialog, tab_type, emit_point))
-        parent_vars.geom_type = geom_type
+        self.geom_type = geom_type
     
         # Store user snapping configuration
         if self.qgis_tools.controller is None:
@@ -876,7 +875,7 @@ class GwInfo(QObject):
         snapped_feature = self.qgis_tools.get_snapped_feature(result, True)
         snapped_feature_attr = snapped_feature.attributes()
         
-        aux = f'"{parent_vars.geom_type}_id" = '
+        aux = f'"{self.geom_type}_id" = '
         aux += f"'{self.feature_id}'"
         expr = QgsExpression(aux)
         if expr.hasParserError():
@@ -895,7 +894,7 @@ class GwInfo(QObject):
         
         # Select only first element of the feature list
         feature = feature_list[0]
-        feature_id = feature.attribute(str(parent_vars.geom_type) + '_id')
+        feature_id = feature.attribute(str(self.geom_type) + '_id')
         msg = (f"Selected snapped feature_id to copy values from: {snapped_feature_attr[0]}\n"
                f"Do you want to copy its values to the current node?\n\n")
         # Replace id because we don't have to copy it!
@@ -908,11 +907,11 @@ class GwInfo(QObject):
             if fields[i].name() == 'sector_id' or fields[i].name() == 'dma_id' or fields[i].name() == 'expl_id' \
                     or fields[i].name() == 'state' or fields[i].name() == 'state_type' \
                     or fields[i].name() == layername + '_workcat_id' or fields[i].name() == layername + '_builtdate' \
-                    or fields[i].name() == 'verified' or fields[i].name() == str(parent_vars.geom_type) + 'cat_id':
+                    or fields[i].name() == 'verified' or fields[i].name() == str(self.geom_type) + 'cat_id':
                 snapped_feature_attr_aux.append(snapped_feature_attr[i])
                 fields_aux.append(fields[i].name())
             if global_vars.project_type == 'ud':
-                if fields[i].name() == str(parent_vars.geom_type) + '_type':
+                if fields[i].name() == str(self.geom_type) + '_type':
                     snapped_feature_attr_aux.append(snapped_feature_attr[i])
                     fields_aux.append(fields[i].name())
         

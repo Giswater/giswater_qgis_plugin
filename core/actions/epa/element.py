@@ -110,7 +110,7 @@ class GwElement:
             partial(delete_records, self.dlg_add_element, table_object, geom_type=geom_type))
         self.dlg_add_element.btn_snapping.clicked.connect(
             partial(selection_init, self.dlg_add_element, table_object, geom_type=geom_type))
-        self.dlg_add_element.btn_add_geom.clicked.connect(partial(add_point, self.vertex_marker))
+        self.point_xy = self.dlg_add_element.btn_add_geom.clicked.connect(partial(add_point, self.vertex_marker))
         self.dlg_add_element.state.currentIndexChanged.connect(partial(self.filter_state_type))
 
         # Fill combo boxes of the form and related events
@@ -357,9 +357,9 @@ class GwElement:
             else:
                 sql_values += ", null"
 
-            if str(parent_vars.x) != "":
-                sql_values += f", ST_SetSRID(ST_MakePoint({parent_vars.x},{parent_vars.y}), {srid})"
-                parent_vars.x = ""
+            if str(self.point_xy['x']) != "":
+                sql_values += f", ST_SetSRID(ST_MakePoint({self.point_xy['x']},{self.point_xy['y']}), {srid})"
+                self.point_xy['x'] = ""
             else:
                 sql_values += ", null"
             if code:
@@ -419,8 +419,8 @@ class GwElement:
                 sql += f", verified = '{verified}'"
             else:
                 sql += ", verified = null"
-            if str(parent_vars.x) != "":
-                sql += f", the_geom = ST_SetSRID(ST_MakePoint({parent_vars.x},{parent_vars.y}), {srid})"
+            if str(self.point_xy['x']) != "":
+                sql += f", the_geom = ST_SetSRID(ST_MakePoint({self.point_xy['x']},{self.point_xy['y']}), {srid})"
 
             sql += f" WHERE element_id = '{element_id}';"
 
