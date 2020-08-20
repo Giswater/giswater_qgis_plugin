@@ -26,7 +26,7 @@ from lib import qt_tools
 from ...actions.basic.search import GwSearch
 from .mincut_manager import GwMincutManager
 from ....actions.multiple_selection import MultipleSelection
-from ....map_tools.snapping_utils_v3 import SnappingConfigManager
+from ....lib.qgis_tools import QgisTools
 from ....ui_manager import DialogTextUi
 from ....ui_manager import Mincut
 from ....ui_manager import MincutEndUi
@@ -72,6 +72,9 @@ class GwMincut:
         self.current_state = None
         self.is_new = True
 
+        # Get qgis_tools
+        self.qgis_tools = QgisTools(self.iface, self.plugin_dir)
+
 
     def set_states(self):
         """ Serialize data of mincut states """
@@ -96,9 +99,7 @@ class GwMincut:
         self.deleted_list = []
 
         # Snapper
-        parent_vars.snapper_manager = SnappingConfigManager(self.iface)
-        parent_vars.snapper_manager.set_controller(self.controller)
-        parent_vars.snapper = parent_vars.snapper_manager.get_snapper()
+        self.qgis_tools.set_controller(self.controller)
 
         # Refresh canvas, remove all old selections
         self.remove_selection()
@@ -1479,7 +1480,7 @@ class GwMincut:
         self.action_add_hydrometer.setDisabled(True)
 
         # Store user snapping configuration
-        parent_vars.snapper_manager.store_snapping_options()
+        self.qgis_tools.store_snapping_options()
 
         # Set signals
         self.canvas.xyCoordinates.connect(self.mouse_move_node_arc)
@@ -1490,7 +1491,7 @@ class GwMincut:
         """ Automatic mincut: Snapping to 'node' and 'arc' layers """
 
         # Get coordinates
-        event_point = parent_vars.snapper_manager.get_event_point(point=point)
+        event_point = self.qgis_tools.get_event_point(point=point)
 
         # Set active and current layer
         self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
@@ -1498,26 +1499,26 @@ class GwMincut:
         self.current_layer = self.layer_arc
 
         # Snapping
-        result = parent_vars.snapper_manager.snap_to_current_layer(event_point)
-        if not parent_vars.snapper_manager.result_is_valid():
+        result = self.qgis_tools.snap_to_current_layer(event_point)
+        if not self.qgis_tools.result_is_valid():
             return
 
         # Check feature
         elem_type = None
-        layer = parent_vars.snapper_manager.get_snapped_layer(result)
+        layer = self.qgis_tools.get_snapped_layer(result)
         if layer == self.layer_arc:
             elem_type = 'arc'
 
         if elem_type:
             # Get the point. Leave selection
-            snapped_feat = parent_vars.snapper_manager.get_snapped_feature(result)
-            feature_id = parent_vars.snapper_manager.get_snapped_feature_id(result)
-            snapped_point = parent_vars.snapper_manager.get_snapped_point(result)
+            snapped_feat = self.qgis_tools.get_snapped_feature(result)
+            feature_id = self.qgis_tools.get_snapped_feature_id(result)
+            snapped_point = self.qgis_tools.get_snapped_point(result)
             element_id = snapped_feat.attribute(elem_type + '_id')
             layer.select([feature_id])
             self.auto_mincut_execute(element_id, elem_type, snapped_point.x(), snapped_point.y())
             self.set_visible_mincut_layers()
-            parent_vars.snapper_manager.recover_snapping_options()
+            self.qgis_tools.recover_snapping_options()
 
 
 
@@ -1551,7 +1552,7 @@ class GwMincut:
     def snapping_node_arc_real_location(self, point, btn):  # @UnusedVariable
 
         # Get coordinates
-        event_point = parent_vars.snapper_manager.get_event_point(point=point)
+        event_point = self.qgis_tools.get_event_point(point=point)
 
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
         srid = self.controller.plugin_settings_value('srid')
@@ -1565,12 +1566,12 @@ class GwMincut:
             self.controller.show_info(message)
 
         # Snapping
-        result = parent_vars.snapper_manager.snap_to_background_layers(event_point)
-        if not parent_vars.snapper_manager.result_is_valid():
+        result = self.qgis_tools.snap_to_background_layers(event_point)
+        if not self.qgis_tools.result_is_valid():
             return
 
         self.disconnect_snapping(False)
-        layer = parent_vars.snapper_manager.get_snapped_layer(result)
+        layer = self.qgis_tools.get_snapped_layer(result)
         
         # Check feature
         layers_arc = self.controller.get_group_layers('arc')
@@ -1580,7 +1581,7 @@ class GwMincut:
 
         element_type = layer.name()
         if element_type in self.layernames_arc:
-            parent_vars.snapper_manager.get_snapped_feature(result, True)
+            self.qgis_tools.get_snapped_feature(result, True)
 
 
     def auto_mincut_execute(self, elem_id, elem_type, snapping_x, snapping_y):
@@ -1714,16 +1715,16 @@ class GwMincut:
 
         # Get clicked point
         self.vertex_marker.hide()
-        event_point = parent_vars.snapper_manager.get_event_point(point=point)
+        event_point = self.qgis_tools.get_event_point(point=point)
 
         # Snapping
-        result = parent_vars.snapper_manager.snap_to_current_layer(event_point)
-        if parent_vars.snapper_manager.result_is_valid():
-            layer = parent_vars.snapper_manager.get_snapped_layer(result)
+        result = self.qgis_tools.snap_to_current_layer(event_point)
+        if self.qgis_tools.result_is_valid():
+            layer = self.qgis_tools.get_snapped_layer(result)
             # Check feature
             viewname = self.controller.get_layer_source_table_name(layer)
             if viewname == 'v_om_mincut_valve':
-                parent_vars.snapper_manager.add_marker(result, self.vertex_marker)
+                self.qgis_tools.add_marker(result, self.vertex_marker)
 
 
     def mouse_move_node_arc(self, point):
@@ -1736,33 +1737,33 @@ class GwMincut:
 
         # Get clicked point
         self.vertex_marker.hide()
-        event_point = parent_vars.snapper_manager.get_event_point(point=point)
+        event_point = self.qgis_tools.get_event_point(point=point)
 
         # Snapping
-        result = parent_vars.snapper_manager.snap_to_current_layer(event_point)
-        if parent_vars.snapper_manager.result_is_valid():
-            layer = parent_vars.snapper_manager.get_snapped_layer(result)
+        result = self.qgis_tools.snap_to_current_layer(event_point)
+        if self.qgis_tools.result_is_valid():
+            layer = self.qgis_tools.get_snapped_layer(result)
             # Check feature
             viewname = self.controller.get_layer_source_table_name(layer)
             if viewname == 'v_edit_arc':
-                parent_vars.snapper_manager.add_marker(result, self.vertex_marker)
+                self.qgis_tools.add_marker(result, self.vertex_marker)
 
 
     def custom_mincut_snapping(self, point, btn):
         """ Custom mincut snapping function """
 
         # Get clicked point
-        event_point = parent_vars.snapper_manager.get_event_point(point=point)
+        event_point = self.qgis_tools.get_event_point(point=point)
 
         # Snapping
-        result = parent_vars.snapper_manager.snap_to_current_layer(event_point)
-        if parent_vars.snapper_manager.result_is_valid():
+        result = self.qgis_tools.snap_to_current_layer(event_point)
+        if self.qgis_tools.result_is_valid():
             # Check feature
-            layer = parent_vars.snapper_manager.get_snapped_layer(result)
+            layer = self.qgis_tools.get_snapped_layer(result)
             viewname = self.controller.get_layer_source_table_name(layer)
             if viewname == 'v_om_mincut_valve':
                 # Get the point. Leave selection
-                snapped_feat = parent_vars.snapper_manager.get_snapped_feature(result, True)
+                snapped_feat = self.qgis_tools.get_snapped_feature(result, True)
                 element_id = snapped_feat.attribute('node_id')
                 self.custom_mincut_execute(element_id)
                 self.set_visible_mincut_layers()

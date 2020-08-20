@@ -14,7 +14,7 @@ from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QGrid
 from functools import partial
 
 from lib import qt_tools
-from ....map_tools.snapping_utils_v3 import SnappingConfigManager
+from lib.qgis_tools import QgisTools
 from ....ui_manager import DimensioningUi
 from .... import global_vars
 from ....actions import parent_vars
@@ -36,10 +36,9 @@ class GwDimensioning:
         self.plugin_dir = global_vars.plugin_dir
         self.canvas = global_vars.canvas
 
-        # Snapper
-        self.snapper_manager = SnappingConfigManager(self.iface)
-        self.snapper_manager.set_controller(self.controller)
-        self.snapper = self.snapper_manager.get_snapper()
+        # Get qgis_tools
+        self.qgis_tools = QgisTools(self.iface, self.plugin_dir)
+        self.qgis_tools.set_controller(self.controller)
 
 
     def open_dimensioning_form(self, qgis_feature=None, layer=None, db_return=None, fid=None):
@@ -181,7 +180,7 @@ class GwDimensioning:
 
 
     def deactivate_signals(self, action, emit_point=None):
-        self.snapper_manager.remove_marker()
+        self.qgis_tools.remove_marker()
         try:
             self.canvas.xyCoordinates.disconnect()
         except TypeError:
@@ -205,13 +204,13 @@ class GwDimensioning:
         if self.deactivate_signals(action, emit_point):
             return
 
-        self.snapper_manager.set_snapping_layers()
-        self.snapper_manager.remove_marker()
-        self.snapper_manager.store_snapping_options()
-        self.snapper_manager.enable_snapping()
-        self.snapper_manager.snap_to_node()
-        self.snapper_manager.snap_to_connec_gully()
-        self.snapper_manager.set_snapping_mode()
+        self.qgis_tools.set_snapping_layers()
+        self.qgis_tools.remove_marker()
+        self.qgis_tools.store_snapping_options()
+        self.qgis_tools.enable_snapping()
+        self.qgis_tools.snap_to_node()
+        self.qgis_tools.snap_to_connec_gully()
+        self.qgis_tools.set_snapping_mode()
 
         self.dlg_dim.actionOrientation.setChecked(False)
         self.iface.setActiveLayer(self.layer_node)
@@ -222,16 +221,16 @@ class GwDimensioning:
     def mouse_move(self, point):
 
         # Hide marker and get coordinates
-        self.snapper_manager.remove_marker()
-        event_point = self.snapper_manager.get_event_point(point=point)
+        self.qgis_tools.remove_marker()
+        event_point = self.qgis_tools.get_event_point(point=point)
 
         # Snapping
-        result = self.snapper_manager.snap_to_background_layers(event_point)
-        if self.snapper_manager.result_is_valid():
-            layer = self.snapper_manager.get_snapped_layer(result)
+        result = self.qgis_tools.snap_to_background_layers(event_point)
+        if self.qgis_tools.result_is_valid():
+            layer = self.qgis_tools.get_snapped_layer(result)
             # Check feature
             if layer == self.layer_node or layer == self.layer_connec:
-                self.snapper_manager.add_marker(result)
+                self.qgis_tools.add_marker(result)
 
 
     def click_button_snapping(self, action, emit_point, point, btn):
@@ -250,13 +249,13 @@ class GwDimensioning:
         layer.startEditing()
 
         # Get coordinates
-        event_point = self.snapper_manager.get_event_point(point=point)
+        event_point = self.qgis_tools.get_event_point(point=point)
 
         # Snapping
-        result = self.snapper_manager.snap_to_background_layers(event_point)
-        if self.snapper_manager.result_is_valid():
+        result = self.qgis_tools.snap_to_background_layers(event_point)
+        if self.qgis_tools.result_is_valid():
 
-            layer = self.snapper_manager.get_snapped_layer(result)
+            layer = self.qgis_tools.get_snapped_layer(result)
             # Check feature
             if layer == self.layer_node:
                 feat_type = 'node'
@@ -266,8 +265,8 @@ class GwDimensioning:
                 return
 
             # Get the point
-            snapped_feat = self.snapper_manager.get_snapped_feature(result)
-            feature_id = self.snapper_manager.get_snapped_feature_id(result)
+            snapped_feat = self.qgis_tools.get_snapped_feature(result)
+            feature_id = self.qgis_tools.get_snapped_feature_id(result)
             element_id = snapped_feat.attribute(feat_type + '_id')
 
             # Leave selection
@@ -292,7 +291,7 @@ class GwDimensioning:
             qt_tools.setText(self.dlg_dim, "feature_id", element_id)
             qt_tools.setText(self.dlg_dim, "feature_type", feat_type.upper())
 
-            self.snapper_manager.recover_snapping_options()
+            self.qgis_tools.recover_snapping_options()
             self.deactivate_signals(action, emit_point)
             action.setChecked(False)
 
@@ -303,13 +302,13 @@ class GwDimensioning:
         if self.deactivate_signals(action, emit_point):
             return
 
-        self.snapper_manager.set_snapping_layers()
-        self.snapper_manager.remove_marker()
-        self.snapper_manager.store_snapping_options()
-        self.snapper_manager.enable_snapping()
-        self.snapper_manager.snap_to_node()
-        self.snapper_manager.snap_to_connec_gully()
-        self.snapper_manager.set_snapping_mode()
+        self.qgis_tools.set_snapping_layers()
+        self.qgis_tools.remove_marker()
+        self.qgis_tools.store_snapping_options()
+        self.qgis_tools.enable_snapping()
+        self.qgis_tools.snap_to_node()
+        self.qgis_tools.snap_to_connec_gully()
+        self.qgis_tools.set_snapping_mode()
 
         self.dlg_dim.actionSnapping.setChecked(False)
         emit_point.canvasClicked.connect(partial(self.click_button_orientation, action, emit_point))
@@ -332,7 +331,7 @@ class GwDimensioning:
         self.y_symbol = self.dlg_dim.findChild(QLineEdit, "y_symbol")
         self.y_symbol.setText(str(int(point.y())))
 
-        self.snapper_manager.recover_snapping_options()
+        self.qgis_tools.recover_snapping_options()
         self.deactivate_signals(action, emit_point)
         action.setChecked(False)
 

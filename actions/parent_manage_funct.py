@@ -23,6 +23,7 @@ from .parent_functs import check_expression, close_dialog, get_cursor_multiple_s
 
 
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
+from ..lib.qgis_tools import QgisTools
 
 
 def reset_lists():
@@ -317,29 +318,27 @@ def add_point(vertex_marker):
     vertex_marker.setPenWidth(3)
 
     # Snapper
-    if parent_vars.snapper_manager is None:
-        parent_vars.snapper_manager = SnappingConfigManager(global_vars.iface)
-        parent_vars.snapper = parent_vars.snapper_manager.get_snapper()
-        if parent_vars.snapper_manager.controller is None:
-            parent_vars.snapper_manager.set_controller(global_vars.controller)
+    qgis_tools = QgisTools(global_vars.iface, global_vars.plugin_dir)
+    if qgis_tools.controller is None:
+        qgis_tools.set_controller(global_vars.controller)
 
     emit_point = QgsMapToolEmitPoint(global_vars.canvas)
     global_vars.canvas.setMapTool(emit_point)
-    global_vars.canvas.xyCoordinates.connect(partial(mouse_move, vertex_marker))
+    global_vars.canvas.xyCoordinates.connect(partial(mouse_move, vertex_marker, qgis_tools=qgis_tools))
     emit_point.canvasClicked.connect(partial(get_xy, vertex_marker, emit_point, return_point))
     
     return return_point
 
-def mouse_move(vertex_marker, point):
+def mouse_move(vertex_marker, qgis_tools, point):
 
     # Hide marker and get coordinates
     vertex_marker.hide()
-    event_point = parent_vars.snapper_manager.get_event_point(point=point)
+    event_point = qgis_tools.get_event_point(point=point)
 
     # Snapping
-    result = parent_vars.snapper_manager.snap_to_background_layers(event_point)
-    if parent_vars.snapper_manager.result_is_valid():
-        parent_vars.snapper_manager.add_marker(result, vertex_marker)
+    result = qgis_tools.snap_to_background_layers(event_point)
+    if qgis_tools.result_is_valid():
+        qgis_tools.add_marker(result, vertex_marker)
     else:
         vertex_marker.hide()
 

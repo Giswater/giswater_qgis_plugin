@@ -31,7 +31,7 @@ from ..edit.document import GwDocument
 from ..epa.element import GwElement
 from ..om.visit_gallery import GwVisitGallery
 from ..om.visit_manager import GwVisitManager
-from ....map_tools.snapping_utils_v3 import SnappingConfigManager
+from ....lib.qgis_tools import QgisTools
 from ....ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFull, GwMainWindow, VisitDocument, InfoCrossectUi, \
     DialogTextUi
 from ..edit.dimensioning import GwDimensioning
@@ -67,6 +67,9 @@ class GwInfo(QObject):
         self.layer_new_feature = None
         self.tab_type = tab_type
         self.rubber_band = QgsRubberBand(self.canvas, 0)
+
+        # Get qgis_tools
+        self.qgis_tools = QgisTools(self.iface, self.plugin_dir)
 
     
     def get_info_from_coordinates(self, point, tab_type):
@@ -604,12 +607,10 @@ class GwInfo(QObject):
         draw(complet_result[0], self.rubber_band, None, False)
         
         # Store user snapping configuration
-        parent_vars.snapper_manager = SnappingConfigManager(global_vars.iface)
-        if parent_vars.snapper_manager.controller is None:
-            parent_vars.snapper_manager.set_controller(global_vars.controller)
-        parent_vars.snapper_manager.store_snapping_options()
-        parent_vars.snapper = parent_vars.snapper_manager.get_snapper()
-        
+        if self.qgis_tools.controller is None:
+            self.qgis_tools.set_controller(global_vars.controller)
+        self.qgis_tools.store_snapping_options()
+
         self.layer_node = global_vars.controller.get_layer_by_tablename("v_edit_node")
         global_vars.iface.setActiveLayer(self.layer_node)
         
@@ -625,16 +626,16 @@ class GwInfo(QObject):
             return
     
         # Get coordinates
-        event_point = parent_vars.snapper_manager.get_event_point(point=point)
+        event_point = self.qgis_tools.get_event_point(point=point)
         if not event_point:
             return
         # Snapping
-        result = parent_vars.snapper_manager.snap_to_current_layer(event_point)
-        if parent_vars.snapper_manager.result_is_valid():
-            layer = parent_vars.snapper_manager.get_snapped_layer(result)
+        result = self.qgis_tools.snap_to_current_layer(event_point)
+        if self.qgis_tools.result_is_valid():
+            layer = self.qgis_tools.get_snapped_layer(result)
             # Check feature
             if layer == self.layer_node:
-                snapped_feat = parent_vars.snapper_manager.get_snapped_feature(result)
+                snapped_feat = self.qgis_tools.get_snapped_feature(result)
                 element_id = snapped_feat.attribute('node_id')
                 message = "Selected node"
                 if self.node1 is None:
@@ -724,14 +725,14 @@ class GwInfo(QObject):
     def mouse_move(self, point):
         
         # Get clicked point
-        event_point = parent_vars.snapper_manager.get_event_point(point=point)
+        event_point = self.qgis_tools.get_event_point(point=point)
         
         # Snapping
-        result = parent_vars.snapper_manager.snap_to_current_layer(event_point)
-        if parent_vars.snapper_manager.result_is_valid():
-            layer = parent_vars.snapper_manager.get_snapped_layer(result)
+        result = self.qgis_tools.snap_to_current_layer(event_point)
+        if self.qgis_tools.result_is_valid():
+            layer = self.qgis_tools.get_snapped_layer(result)
             if layer == self.layer_node:
-                parent_vars.snapper_manager.add_marker(result, self.vertex_marker)
+                self.qgis_tools.add_marker(result, self.vertex_marker)
         else:
             self.vertex_marker.hide()
 
@@ -811,18 +812,16 @@ class GwInfo(QObject):
         parent_vars.geom_type = geom_type
     
         # Store user snapping configuration
-        parent_vars.snapper_manager = SnappingConfigManager(global_vars.iface)
-        if parent_vars.snapper_manager.controller is None:
-            parent_vars.snapper_manager.set_controller(global_vars.controller)
-        parent_vars.snapper_manager.store_snapping_options()
-        parent_vars.snapper = parent_vars.snapper_manager.get_snapper()
-    
+        if self.qgis_tools.controller is None:
+            self.qgis_tools.set_controller(global_vars.controller)
+        self.qgis_tools.store_snapping_options()
+
         # Clear snapping
-        parent_vars.snapper_manager.enable_snapping()
+        self.qgis_tools.enable_snapping()
     
         # Set snapping
         layer = global_vars.iface.activeLayer()
-        parent_vars.snapper_manager.snap_to_layer(layer)
+        self.qgis_tools.snap_to_layer(layer)
     
         # Set marker
         color = QColor(255, 100, 255)
@@ -843,15 +842,15 @@ class GwInfo(QObject):
         
         # Hide marker and get coordinates
         self.vertex_marker.hide()
-        event_point = parent_vars.snapper_manager.get_event_point(point=point)
+        event_point = self.qgis_tools.get_event_point(point=point)
         
         # Snapping
-        result = parent_vars.snapper_manager.snap_to_current_layer(event_point)
-        if not parent_vars.snapper_manager.result_is_valid():
+        result = self.qgis_tools.snap_to_current_layer(event_point)
+        if not self.qgis_tools.result_is_valid():
             return
         
         # Add marker to snapped feature
-        parent_vars.snapper_manager.add_marker(result, self.vertex_marker)
+        self.qgis_tools.add_marker(result, self.vertex_marker)
     
     
     def api_action_copy_paste_canvas_clicked(self, dialog, tab_type, emit_point, point, btn):
@@ -862,11 +861,11 @@ class GwInfo(QObject):
             return
         
         # Get clicked point
-        event_point = parent_vars.snapper_manager.get_event_point(point=point)
+        event_point = self.qgis_tools.get_event_point(point=point)
         
         # Snapping
-        result = parent_vars.snapper_manager.snap_to_current_layer(event_point)
-        if not parent_vars.snapper_manager.result_is_valid():
+        result = self.qgis_tools.snap_to_current_layer(event_point)
+        if not self.qgis_tools.result_is_valid():
             self.api_disable_copy_paste(dialog, emit_point)
             return
         
@@ -874,7 +873,7 @@ class GwInfo(QObject):
         layername = layer.name()
         
         # Get the point. Leave selection
-        snapped_feature = parent_vars.snapper_manager.get_snapped_feature(result, True)
+        snapped_feature = self.qgis_tools.get_snapped_feature(result, True)
         snapped_feature_attr = snapped_feature.attributes()
         
         aux = f'"{parent_vars.geom_type}_id" = '
@@ -949,7 +948,7 @@ class GwInfo(QObject):
             action_widget.setChecked(False)
     
         try:
-            parent_vars.snapper_manager.recover_snapping_options()
+            self.qgis_tools.recover_snapping_options()
             self.vertex_marker.hide()
             global_vars.canvas.xyCoordinates.disconnect()
             emit_point.canvasClicked.disconnect()
@@ -3076,24 +3075,22 @@ class GwInfo(QObject):
         self.vertex_marker.setPenWidth(3)
 
         # Snapper
-        self.snapper_manager = SnappingConfigManager(self.iface)
-        self.snapper_manager.set_controller(self.controller)
-        self.snapper = self.snapper_manager.get_snapper()
+        self.qgis_tools.set_controller(self.controller)
 
         # Store user snapping configuration
-        self.snapper_manager.store_snapping_options()
+        self.qgis_tools.store_snapping_options()
 
         # Disable snapping
-        self.snapper_manager.enable_snapping()
+        self.qgis_tools.enable_snapping()
 
         # Set snapping to 'arc' and 'node'
-        self.snapper_manager.set_snapping_layers()
+        self.qgis_tools.set_snapping_layers()
 
         # if we are doing info over connec or over node
         if option == 'arc':
-            self.snapper_manager.snap_to_arc()
+            self.qgis_tools.snap_to_arc()
         elif option == 'node':
-            self.snapper_manager.snap_to_node()
+            self.qgis_tools.snap_to_node()
 
         # Set signals
         self.canvas.xyCoordinates.connect(partial(self.mouse_moved, layer))
@@ -3111,16 +3108,16 @@ class GwInfo(QObject):
 
         # Get clicked point
         self.vertex_marker.hide()
-        event_point = self.snapper_manager.get_event_point(point=point)
+        event_point = self.qgis_tools.get_event_point(point=point)
 
         # Snapping
-        result = self.snapper_manager.snap_to_current_layer(event_point)
-        if self.snapper_manager.result_is_valid():
-            layer = self.snapper_manager.get_snapped_layer(result)
+        result = self.qgis_tools.snap_to_current_layer(event_point)
+        if self.qgis_tools.result_is_valid():
+            layer = self.qgis_tools.get_snapped_layer(result)
             # Check feature
             viewname = self.controller.get_layer_source_table_name(layer)
             if viewname == layer_name:
-                self.snapper_manager.add_marker(result, self.vertex_marker)
+                self.qgis_tools.add_marker(result, self.vertex_marker)
 
 
     def get_id(self, dialog, action, option, point, event):
@@ -3135,20 +3132,20 @@ class GwInfo(QObject):
             return
 
         # Get coordinates
-        event_point = self.snapper_manager.get_event_point(point=point)
+        event_point = self.qgis_tools.get_event_point(point=point)
 
         # Snapping
-        result = self.snapper_manager.snap_to_current_layer(event_point)
+        result = self.qgis_tools.snap_to_current_layer(event_point)
 
-        if not self.snapper_manager.result_is_valid():
+        if not self.qgis_tools.result_is_valid():
             return
         # Get the point. Leave selection
-        snapped_feat = self.snapper_manager.get_snapped_feature(result)
+        snapped_feat = self.qgis_tools.get_snapped_feature(result)
         feat_id = snapped_feat.attribute(f'{options[option][0]}')
         widget = dialog.findChild(QWidget, f"{options[option][1]}")
         widget.setFocus()
         qt_tools.setWidgetText(dialog, widget, str(feat_id))
-        self.snapper_manager.recover_snapping_options()
+        self.qgis_tools.recover_snapping_options()
         self.cancel_snapping_tool(dialog, action)
 
 

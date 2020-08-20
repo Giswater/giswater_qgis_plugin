@@ -29,7 +29,7 @@ from functools import partial
 
 from .. import global_vars
 from lib import qt_tools
-from ..map_tools.snapping_utils_v3 import SnappingConfigManager
+from ..lib.qgis_tools import QgisTools
 from ..core.utils.layer_tools import populate_vlayer, categoryze_layer, create_qml, from_postgres_to_toc
 
 from ..ui_manager import DialogTextUi, GwDialog, GwMainWindow
@@ -1440,25 +1440,25 @@ def manage_layer_manager(json_result, sql):
         
         # Set snnaping options
         if 'snnaping' in layermanager:
-            parent_vars.snapper_manager = SnappingConfigManager(global_vars.iface)
-            if parent_vars.snapper_manager.controller is None:
-                parent_vars.snapper_manager.set_controller(global_vars.controller)
+            qgis_tools = QgisTools(global_vars.iface, global_vars.plugin_dir)
+            if qgis_tools.controller is None:
+                qgis_tools.set_controller(global_vars.controller)
             for layer_name in layermanager['snnaping']:
                 layer = global_vars.controller.get_layer_by_tablename(layer_name)
                 if layer:
                     QgsProject.instance().blockSignals(True)
-                    layer_settings = parent_vars.snapper_manager.snap_to_layer(layer, QgsPointLocator.All, True)
+                    layer_settings = qgis_tools.snap_to_layer(layer, QgsPointLocator.All, True)
                     if layer_settings:
                         layer_settings.setType(2)
                         layer_settings.setTolerance(15)
                         layer_settings.setEnabled(True)
                     else:
                         layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 2, 15, 1)
-                    parent_vars.snapper_manager.snapping_config.setIndividualLayerSettings(layer, layer_settings)
+                    qgis_tools.snapping_config.setIndividualLayerSettings(layer, layer_settings)
                     QgsProject.instance().blockSignals(False)
                     QgsProject.instance().snappingConfigChanged.emit(
-                        parent_vars.snapper_manager.snapping_config)
-            parent_vars.snapper_manager.set_snapping_mode()
+                        qgis_tools.snapping_config)
+            qgis_tools.set_snapping_mode()
     
     
     except Exception as e:

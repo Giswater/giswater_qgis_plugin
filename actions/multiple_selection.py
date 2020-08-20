@@ -15,6 +15,7 @@ from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 
 from .parent_manage_funct import disconnect_signal_selection_changed, connect_signal_selection_changed
 from .. import global_vars
+from ..lib.qgis_tools import QgisTools
 
 
 class MultipleSelection(QgsMapTool):
@@ -43,9 +44,8 @@ class MultipleSelection(QgsMapTool):
         self.reset()
         self.selected_features = []
 
-        # Snapper
-        self.snapper_manager = SnappingConfigManager(self.iface)
-        self.snapper = self.snapper_manager.get_snapper()
+        # Get qgis_tools
+        self.qgis_tools = QgisTools(self.iface, self.plugin_dir)
 
 
     def reset(self):
@@ -113,11 +113,11 @@ class MultipleSelection(QgsMapTool):
 
             # Selection one by one
             else:
-                event_point = self.snapper_manager.get_event_point(event)
-                result = self.snapper_manager.snap_to_background_layers(event_point)
-                if self.snapper_manager.result_is_valid():
+                event_point = self.qgis_tools.get_event_point(event)
+                result = self.qgis_tools.snap_to_background_layers(event_point)
+                if self.qgis_tools.result_is_valid():
                     # Get the point. Leave selection
-                    self.snapper_manager.get_snapped_feature(result, True)
+                    self.qgis_tools.get_snapped_feature(result, True)
 
         self.rubber_band.hide()
 
