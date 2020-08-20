@@ -759,7 +759,8 @@ def selection_init(dialog, table_object, query=False, geom_type=None, layers=Non
     global_vars.canvas.setCursor(cursor)
 
 
-def selection_changed(dialog, table_object, geom_type, query=False, plan_om=None, layers=None, list_ids=None):
+def selection_changed(dialog, table_object, geom_type, query=False, plan_om=None, layers=None, list_ids=None,
+                      lazy_widget=None, lazy_init_function=None):
     """ Slot function for signal 'canvas.selectionChanged' """
 
     disconnect_signal_selection_changed()

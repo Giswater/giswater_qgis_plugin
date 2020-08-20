@@ -1609,7 +1609,9 @@ class GwVisitManager:
         # Adding auto-completion to a QLineEdit
         set_completer_feature_id(dialog.feature_id, self.geom_type, viewname)
         self.ids, self.layers, self.list_ids = selection_changed(dialog, widget_table, self.geom_type, False,
-                                                                 layers=self.layers, list_ids=self.list_ids)
+                                                                 layers=self.layers, list_ids=self.list_ids,
+                                                                 lazy_widget=self.lazy_widget,
+                                                                 lazy_init_function=self.lazy_init_function)
 
         try:
             self.iface.actionPan().trigger()
