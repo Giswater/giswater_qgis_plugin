@@ -150,7 +150,7 @@ BEGIN
 		IF v_edit IS NULL THEN 
 			v_querytext = '(SELECT a.arc_id, arccat_id, a.the_geom FROM arc a WHERE sys_slope < 0 AND state > 0 AND inverted_slope IS FALSE) a';
 		ELSE
-			v_querytext = '(SELECT a.arc_id, arccat_id, a.the_geom FROM v_edit_arc a WHERE sys_slope < 0 AND state > 0 AND inverted_slope IS FALSE) a';
+			v_querytext = '(SELECT a.arc_id, arccat_id, a.the_geom FROM v_edit_arc a WHERE slope < 0 AND state > 0 AND inverted_slope IS FALSE) a';
 		END IF;
 		
 		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
@@ -158,7 +158,7 @@ BEGIN
 			INSERT INTO audit_check_data (fid,  criticity, error_message, count)
 			VALUES (125, 3, concat('ERROR: There is/are ',v_count,' arcs with inverted slope false and slope negative values. Please, check your data before continue'),v_count);
 			INSERT INTO audit_check_data (fid, criticity, error_message, count)
-			VALUES (125, 3, concat('SELECT * FROM (v_edit)arc WHERE state > 0 AND sys_slope < 0 AND inverted_slope IS FALSE'),v_count);
+			VALUES (125, 3, concat('SELECT * FROM (v_edit)arc WHERE state > 0 AND slope < 0 AND inverted_slope IS FALSE'),v_count);
 		ELSE
 			INSERT INTO audit_check_data (fid, criticity, error_message, count)
 			VALUES (125, 1, 'INFO: No arcs with inverted slope checked found.',v_count);
