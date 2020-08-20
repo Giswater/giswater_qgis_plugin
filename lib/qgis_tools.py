@@ -5,9 +5,14 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsExpressionContextUtils, QgsProject
-from qgis.core import QgsPointLocator, QgsSnappingUtils, QgsTolerance
+from qgis.core import QgsExpressionContextUtils, QgsProject, QgsSnappingConfig, QgsVectorLayer, QgsPointLocator, \
+    QgsSnappingUtils, QgsTolerance, QgsPointXY, QgsFeatureRequest
+
+from qgis.gui import QgsMapCanvas
+
 from qgis.PyQt.QtWidgets import QDockWidget
+
+from qgis.PyQt.QtCore import QPoint
 
 import configparser
 import os.path
@@ -416,7 +421,7 @@ class QgisTools:
     def get_snapper(self):
         """ Return snapper """
 
-        snapper = QgsMapCanvas.snappingUtils(self.canvas)
+        snapper = QgsMapCanvas.snappingUtils(self.iface.mapCanvas())
         return snapper
 
 
