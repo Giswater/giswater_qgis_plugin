@@ -58,28 +58,30 @@ BEGIN
 			v_layermanager_array = (select array_agg(value) as list from  json_array_elements_text(v_layervisible));
 			
 			v_zoomed_exist = false;			
-			FOREACH v_rec IN ARRAY (v_layermanager_array) LOOP
-				IF v_layer_zoom = v_rec THEN v_zoomed_exist = true; END IF;
-                
-				v_geom_field = (SELECT gw_fct_getgeomfield(v_rec));
-				v_pkey_field = (SELECT gw_fct_getpkeyfield(v_rec));
-				EXECUTE 'SELECT jsonb_build_object ('''||v_rec||''',feature)
-					FROM	(
-					SELECT jsonb_build_object(
-					''geom_field'', '''||v_geom_field||''',
-					''pkey_field'', '''||v_pkey_field||''',
-					''style_id'', style, 
-					''group_layer'', group_layer
-					) AS feature
-					FROM (SELECT style, group_layer from sys_table 
-						LEFT JOIN config_table USING (id)
-						WHERE id = '''||v_rec||'''
-					) row) a;'
-				INTO v_result;
-				
-				SELECT array_append(v_json_array, v_result) into v_json_array;
-				v_layermanager = gw_fct_json_object_set_key((v_layermanager)::json, 'visible', v_json_array);
-			END LOOP;
+
+			IF v_layermanager_array IS NOT NULL THEN
+				FOREACH v_rec IN ARRAY (v_layermanager_array) LOOP
+					IF v_layer_zoom = v_rec THEN v_zoomed_exist = true; END IF;
+	                
+					v_geom_field = (SELECT gw_fct_getgeomfield(v_rec));
+					v_pkey_field = (SELECT gw_fct_getpkeyfield(v_rec));
+					EXECUTE 'SELECT jsonb_build_object ('''||v_rec||''',feature)
+						FROM	(
+						SELECT jsonb_build_object(
+						''geom_field'', '''||v_geom_field||''',
+						''pkey_field'', '''||v_pkey_field||''',
+						''style_id'', style, 
+						''group_layer'', group_layer
+						) AS feature
+						FROM (SELECT style, group_layer from sys_table 
+							LEFT JOIN config_table USING (id)
+							WHERE id = '''||v_rec||'''
+						) row) a;'
+					INTO v_result;
+					SELECT array_append(v_json_array, v_result) into v_json_array;
+					v_layermanager = gw_fct_json_object_set_key((v_layermanager)::json, 'visible', v_json_array);
+				END LOOP;
+			END IF;
 			-- If the layer we are going to zoom is not already in the json, we add it
 			IF v_layer_zoom IS NOT NULL AND v_zoomed_exist IS false THEN
 				v_geom_field = (SELECT gw_fct_getgeomfield(v_rec));
