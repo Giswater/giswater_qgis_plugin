@@ -34,7 +34,6 @@ from ..core.utils.layer_tools import populate_vlayer, categoryze_layer, create_q
 
 from ..ui_manager import DialogTextUi, GwDialog, GwMainWindow
 
-from . import parent_vars
 
 # self.plugin_version = self.get_plugin_version()
 

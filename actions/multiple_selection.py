@@ -11,7 +11,6 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QApplication
 from qgis.PyQt.QtGui import QColor
 
-from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 
 from .parent_manage_funct import disconnect_signal_selection_changed, connect_signal_selection_changed
 from .. import global_vars

@@ -6,10 +6,8 @@ from qgis.PyQt.QtCore import Qt
 
 import os
 
-from ...map_tools.snapping_utils_v3 import SnappingConfigManager
 from ...lib.qgis_tools import QgisTools
 from ... import global_vars
-from ...actions import parent_vars
 
 
 

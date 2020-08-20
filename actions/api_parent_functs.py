@@ -26,10 +26,8 @@ from functools import partial
 from .. import global_vars
 from lib import qt_tools
 from ..core.utils.hyperlink_label import GwHyperLinkLabel
-from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 from ..ui_manager import DialogTextUi
 
-from . import parent_vars
 from .parent_functs import save_settings, create_body, load_settings, \
     open_dialog, draw, draw_point, get_points, draw_polyline, open_file_path, set_style_mapzones
 from ..core.utils.layer_tools import manage_geometry, export_layer_to_db, delete_layer_from_toc, from_dxf_to_toc

@@ -22,7 +22,6 @@ from .parent_functs import check_expression, close_dialog, get_cursor_multiple_s
     refresh_map_canvas
 
 
-from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 from ..lib.qgis_tools import QgisTools
 
 

@@ -35,7 +35,6 @@ from ....ui_manager import MincutConnec
 from ....ui_manager import MincutComposer
 
 from .... import global_vars
-from ....actions import parent_vars
 
 from ....actions.parent_functs import load_settings, set_icon, fill_table, set_table_columns, open_dialog, \
     restore_user_layer, resetRubberbands, close_dialog, save_settings, refresh_map_canvas, create_body, \
