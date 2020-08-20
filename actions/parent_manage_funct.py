@@ -17,7 +17,6 @@ from functools import partial
 
 from lib import qt_tools
 from .. import global_vars
-from . import parent_vars
 from .parent_functs import check_expression, close_dialog, get_cursor_multiple_selection, set_table_columns, \
     refresh_map_canvas
 
