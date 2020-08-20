@@ -6,6 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import QSettings
+from functools import partial
 
 from ..basic.info import GwInfo
 from ..epa.element import GwElement
@@ -47,7 +48,7 @@ class GwEdit:
 			self.iface.setActiveLayer(layer)
 			layer.startEditing()
 			self.iface.actionAddFeature().trigger()
-			layer.featureAdded.connect(self.open_new_feature)
+			layer.featureAdded.connect(partial(self.open_new_feature, feature_cat.id, layer))
 		else:
 			message = "Layer not found"
 			self.controller.show_warning(message, parameter=feature_cat.parent_layer)
