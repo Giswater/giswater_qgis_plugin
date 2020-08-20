@@ -578,15 +578,15 @@ def set_table_model(dialog, table_object, geom_type, expr_filter):
     return expr
 
 
-def apply_lazy_init(widget):
+def apply_lazy_init(widget, lazy_widget=None, lazy_init_function=None):
     """Apply the init function related to the model. It's necessary
     a lazy init because model is changed everytime is loaded."""
 
-    if parent_vars.lazy_widget is None:
+    if lazy_widget is None:
         return
-    if widget != parent_vars.lazy_widget:
+    if widget != lazy_widget:
         return
-    parent_vars.lazy_init_function(parent_vars.lazy_widget)
+    lazy_init_function(lazy_widget)
 
 
 def lazy_configuration(widget, init_function):
@@ -594,8 +594,10 @@ def lazy_configuration(widget, init_function):
     This is necessary to allow a lazy setup of the events because set_table_events
     can create a table with a None model loosing any event connection."""
 
-    parent_vars.lazy_widget = widget
-    parent_vars.lazy_init_function = init_function
+    lazy_widget = widget
+    lazy_init_function = init_function
+
+    return lazy_widget, lazy_init_function
 
 
 def select_features_by_ids(geom_type, expr, layers=None):
@@ -617,7 +619,8 @@ def select_features_by_ids(geom_type, expr, layers=None):
                 layer.removeSelection()
 
 
-def delete_records(dialog, table_object, query=False, geom_type=None, layers=None, ids=None, list_ids=None):
+def delete_records(dialog, table_object, query=False, geom_type=None, layers=None, ids=None, list_ids=None,
+                   lazy_widget=None, lazy_init_function=None):
     """ Delete selected elements of the table """
 
     disconnect_signal_selection_changed()
@@ -698,7 +701,7 @@ def delete_records(dialog, table_object, query=False, geom_type=None, layers=Non
         reload_qtable(dialog, geom_type)
     else:
         reload_table(dialog, table_object, geom_type, expr_filter)
-        apply_lazy_init(table_object)
+        apply_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
     # Select features with previous filter
     # Build a list of feature id's and select them
@@ -810,7 +813,7 @@ def selection_changed(dialog, table_object, geom_type, query=False, plan_om=None
         reload_qtable(dialog, geom_type)
     else:
         reload_table(dialog, table_object, geom_type, expr_filter)
-        apply_lazy_init(table_object)
+        apply_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
     # Remove selection in generic 'v_edit' layers
     if plan_om == 'plan':
@@ -842,7 +845,7 @@ def enable_feature_type(dialog, widget_name='tbl_relation', ids=None):
 
 
 def insert_feature(dialog, table_object, query=False, remove_ids=True, geom_type=None, ids=None, layers=None,
-                   list_ids=None):
+                   list_ids=None, lazy_widget=None, lazy_init_function=None):
     """ Select feature with entered id. Set a model with selected filter.
         Attach that model to selected table
     """
@@ -912,7 +915,7 @@ def insert_feature(dialog, table_object, query=False, remove_ids=True, geom_type
         layers = remove_selection()
     else:
         reload_table(dialog, table_object, geom_type, expr_filter)
-        apply_lazy_init(table_object)
+        apply_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
     # Update list
     list_ids[geom_type] = ids

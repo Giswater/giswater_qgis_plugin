@@ -57,6 +57,9 @@ class GwVisitManager:
 
         self.vertex_marker = QgsVertexMarker(global_vars.canvas)
 
+        self.lazy_widget = None
+        self.lazy_init_function = None
+
 
     def manage_visit(self, visit_id=None, geom_type=None, feature_id=None, single_tool=True, expl_id=None, tag=None,
             open_dlg=True, is_new_from_cf=False):
@@ -680,11 +683,13 @@ class GwVisitManager:
             # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
             self.dlg_add_visit.btn_feature_insert.clicked.connect(
                 partial(insert_feature, self.dlg_add_visit, widget_table, geom_type=self.geom_type, ids=self.ids,
-                        layers=self.layers, list_ids=self.list_ids))
+                        layers=self.layers, list_ids=self.list_ids, lazy_widget=self.lazy_widget,
+                        lazy_init_function=self.lazy_init_function))
             # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
             self.dlg_add_visit.btn_feature_delete.clicked.connect(
                 partial(delete_records, self.dlg_add_visit, widget_table, geom_type=self.geom_type, layers=self.layers,
-                        ids=self.ids, list_ids=self.list_ids))
+                        ids=self.ids, list_ids=self.list_ids, lazy_widget=self.lazy_widget,
+                        lazy_init_function=self.lazy_init_function))
             self.dlg_add_visit.btn_feature_snapping.clicked.connect(
                 partial(self.feature_snapping_clicked, self.dlg_add_visit, widget_table))
 
@@ -745,7 +750,7 @@ class GwVisitManager:
         # its not possible to setup listener in this moment beacouse set_table_model without
         # a valid expression parameter return a None model => no events can be triggered
         widget_table = qt_tools.getWidget(dialog, widget_name)
-        lazy_configuration(widget_table, self.config_relation_table)
+        self.lazy_widget, self.lazy_init_function = lazy_configuration(widget_table, self.config_relation_table)
 
         # check if there are features related to the current visit
         if not self.visit_id.text():
@@ -1596,7 +1601,8 @@ class GwVisitManager:
             # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
             self.dlg_add_visit.btn_feature_delete.clicked.connect(
                 partial(delete_records, self.dlg_add_visit, widget_table, geom_type=self.geom_type, layers=self.layers,
-                        ids=self.ids, list_ids=self.list_ids))
+                        ids=self.ids, list_ids=self.list_ids, lazy_widget=self.lazy_widget,
+                        lazy_init_function=self.lazy_init_function))
             self.dlg_add_visit.btn_feature_snapping.clicked.connect(
                 partial(self.feature_snapping_clicked, self.dlg_add_visit, widget_table))
 
