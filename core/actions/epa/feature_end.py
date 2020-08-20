@@ -19,7 +19,7 @@ from .... import global_vars
 from ....actions import parent_vars
 
 from ....actions.parent_functs import load_settings, set_icon, open_dialog, save_settings, close_dialog
-from ....actions.parent_manage_funct import remove_selection, reset_lists, reset_layers, set_selectionbehavior, \
+from ....actions.parent_manage_funct import remove_selection, set_selectionbehavior, \
     set_completer_object, insert_feature, selection_init, delete_records, tab_feature_changed, set_completer_feature_id, \
     hide_generic_layers, disconnect_snapping, disconnect_signal_selection_changed, set_completer_widget
 
@@ -37,7 +37,7 @@ class GwFeatureEnd:
 
     def manage_workcat_end(self):
 
-        remove_selection(True)
+        self.layers = remove_selection(True, layers=self.layers)
 
         # Create the dialog and signals
         self.dlg_work_end = FeatureEndUi()
@@ -54,19 +54,35 @@ class GwFeatureEnd:
         set_selectionbehavior(self.dlg_work_end)
 
         # Get layers of every geom_type
-        reset_lists()
-        reset_layers()
-        parent_vars.layers['arc'] = self.controller.get_group_layers('arc')
-        parent_vars.layers['node'] = self.controller.get_group_layers('node')
-        parent_vars.layers['connec'] = self.controller.get_group_layers('connec')
-        parent_vars.layers['element'] = [self.controller.get_layer_by_tablename('v_edit_element')]
+
+        # Setting lists
+        self.ids = []
+        self.list_ids = {}
+        self.list_ids['arc'] = []
+        self.list_ids['node'] = []
+        self.list_ids['connec'] = []
+        self.list_ids['gully'] = []
+        self.list_ids['element'] = []
+
+        # Setting layers
+        self.layers = {}
+        self.layers['arc'] = []
+        self.layers['node'] = []
+        self.layers['connec'] = []
+        self.layers['gully'] = []
+        self.layers['element'] = []
+
+        self.layers['arc'] = self.controller.get_group_layers('arc')
+        self.layers['node'] = self.controller.get_group_layers('node')
+        self.layers['connec'] = self.controller.get_group_layers('connec')
+        self.layers['element'] = [self.controller.get_layer_by_tablename('v_edit_element')]
 
         # Remove 'gully' for 'WS'
         self.project_type = self.controller.get_project_type()
         if self.project_type == 'ws':
             self.dlg_work_end.tab_feature.removeTab(4)
         else:
-            parent_vars.layers['gully'] = self.controller.get_group_layers('gully')
+            layers['gully'] = self.controller.get_group_layers('gully')
 
         # Set icons
         set_icon(self.dlg_work_end.btn_insert, "111")
@@ -87,12 +103,17 @@ class GwFeatureEnd:
                                            self.table_object, self.cur_active_layer, force_downgrade=True, show_warning=True))
         self.dlg_work_end.workcat_id_end.editTextChanged.connect(partial(self.fill_workids))
         self.dlg_work_end.btn_new_workcat.clicked.connect(partial(self.new_workcat))
+        # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_work_end.btn_insert.clicked.connect(partial(insert_feature, self.dlg_work_end, self.table_object,
-                                                             geom_type=geom_type))
+                                                             geom_type=geom_type, ids=self.ids, layers=self.layers,
+                                                             list_ids=self.list_ids))
+        # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_work_end.btn_delete.clicked.connect(partial(delete_records, self.dlg_work_end, self.table_object,
-                                                             geom_type=geom_type))
+                                                             geom_type=geom_type, layers=self.layers, ids=self.ids,
+                                                            list_ids=self.list_ids))
+        # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_work_end.btn_snapping.clicked.connect(
-            partial(selection_init, self.dlg_work_end, self.table_object, geom_type=geom_type))
+            partial(selection_init, self.dlg_work_end, self.table_object, geom_type=geom_type, layers=self.layers))
         self.dlg_work_end.workcat_id_end.activated.connect(partial(self.fill_workids))
         self.dlg_work_end.tab_feature.currentChanged.connect(
             partial(tab_feature_changed, self.dlg_work_end, self.table_object, excluded_layers=["v_edit_element"]))

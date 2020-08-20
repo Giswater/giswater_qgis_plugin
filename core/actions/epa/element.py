@@ -17,7 +17,7 @@ from ....actions import parent_vars
 from .... import global_vars
 
 from ....actions.parent_functs import load_settings, set_icon, open_dialog, close_dialog
-from ....actions.parent_manage_funct import set_selectionbehavior, reset_layers, reset_lists, remove_selection, \
+from ....actions.parent_manage_funct import set_selectionbehavior, remove_selection, \
     set_completer_object, manage_close, tab_feature_changed, exist_object, insert_feature, delete_records, \
     selection_init, add_point, set_completer_feature_id, set_model_to_table, fill_table_object, set_table_columns, \
     filter_by_id, delete_selected_object
@@ -50,19 +50,35 @@ class GwElement:
         set_selectionbehavior(self.dlg_add_element)
 
         # Get layers of every geom_type
-        reset_lists()
-        reset_layers()
-        parent_vars.layers['arc'] = self.controller.get_group_layers('arc')
-        parent_vars.layers['node'] = self.controller.get_group_layers('node')
-        parent_vars.layers['connec'] = self.controller.get_group_layers('connec')
-        parent_vars.layers['element'] = self.controller.get_group_layers('element')
+
+        # Setting lists
+        self.ids = []
+        self.list_ids = {}
+        self.list_ids['arc'] = []
+        self.list_ids['node'] = []
+        self.list_ids['connec'] = []
+        self.list_ids['gully'] = []
+        self.list_ids['element'] = []
+
+        # Setting layers
+        self.layers = {}
+        self.layers['arc'] = []
+        self.layers['node'] = []
+        self.layers['connec'] = []
+        self.layers['gully'] = []
+        self.layers['element'] = []
+
+        self.layers['arc'] = self.controller.get_group_layers('arc')
+        self.layers['node'] = self.controller.get_group_layers('node')
+        self.layers['connec'] = self.controller.get_group_layers('connec')
+        self.layers['element'] = self.controller.get_group_layers('element')
 
         # Remove 'gully' for 'WS'
         self.project_type = self.controller.get_project_type()
         if self.project_type == 'ws':
             self.dlg_add_element.tab_feature.removeTab(3)
         else:
-            parent_vars.layers['gully'] = self.controller.get_group_layers('gully')
+            self.layers['gully'] = self.controller.get_group_layers('gully')
 
         # Set icons
         set_icon(self.dlg_add_element.btn_add_geom, "133")
@@ -71,7 +87,7 @@ class GwElement:
         set_icon(self.dlg_add_element.btn_snapping, "137")
 
         # Remove all previous selections
-        remove_selection(True)
+        self.layers = remove_selection(True, layers=self.layers)
         if feature:
             layer = self.iface.activeLayer()
             layer.selectByIds([feature.id()])
@@ -92,24 +108,35 @@ class GwElement:
         self.dlg_add_element.btn_accept.clicked.connect(partial(self.manage_element_accept, table_object))
         self.dlg_add_element.btn_accept.clicked.connect(
             partial(self.controller.set_layer_visible, layer_element, layer_is_visible))
+        # TODO: Set variable  self.layers using return parameters
         self.dlg_add_element.btn_cancel.clicked.connect(
-            partial(manage_close, self.dlg_add_element, table_object, cur_active_layer, excluded_layers=[]))
+            partial(manage_close, self.dlg_add_element, table_object, cur_active_layer, excluded_layers=[],
+                    layers=self.layers))
         self.dlg_add_element.btn_cancel.clicked.connect(
             partial(self.controller.set_layer_visible, layer_element, layer_is_visible))
+        # TODO: Set variable  self.layers using return parameters
         self.dlg_add_element.rejected.connect(
-            partial(manage_close, self.dlg_add_element, table_object, cur_active_layer, excluded_layers=[]))
+            partial(manage_close, self.dlg_add_element, table_object, cur_active_layer, excluded_layers=[],
+                    layers=self.layers))
         self.dlg_add_element.rejected.connect(
             partial(self.controller.set_layer_visible, layer_element, layer_is_visible))
         self.dlg_add_element.tab_feature.currentChanged.connect(
             partial(tab_feature_changed, self.dlg_add_element, table_object, []))
+        # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_add_element.element_id.textChanged.connect(
-            partial(exist_object, self.dlg_add_element, table_object))
+            partial(exist_object, self.dlg_add_element, table_object, layers=self.layers,
+                    ids=self.ids, list_ids=self.list_ids))
+        # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_add_element.btn_insert.clicked.connect(
-            partial(insert_feature, self.dlg_add_element, table_object, geom_type=geom_type))
+            partial(insert_feature, self.dlg_add_element, table_object, geom_type=geom_type, ids=self.ids,
+                    layers=self.layers, list_ids=self.list_ids))
+        # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_add_element.btn_delete.clicked.connect(
-            partial(delete_records, self.dlg_add_element, table_object, geom_type=geom_type))
+            partial(delete_records, self.dlg_add_element, table_object, geom_type=geom_type, layers=self.layers,
+                    ids=self.ids, list_ids=self.list_ids))
+        # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_add_element.btn_snapping.clicked.connect(
-            partial(selection_init, self.dlg_add_element, table_object, geom_type=geom_type))
+            partial(selection_init, self.dlg_add_element, table_object, geom_type=geom_type, layers=self.layers))
         self.point_xy = self.dlg_add_element.btn_add_geom.clicked.connect(partial(add_point, self.vertex_marker))
         self.dlg_add_element.state.currentIndexChanged.connect(partial(self.filter_state_type))
 
@@ -191,7 +218,8 @@ class GwElement:
 
         self.update_location_cmb()
         if not self.new_element_id:
-            exist_object(self.dlg_add_element, 'element')
+            self.ids, self.layers, self.list_ids = exist_object(self.dlg_add_element, 'element', layers=self.layers,
+                                                                ids=self.ids, list_ids=self.list_ids)
 
         # Open the dialog
         open_dialog(self.dlg_add_element, dlg_name='element', maximize_button=False)
@@ -432,23 +460,23 @@ class GwElement:
         sql += (f"\nDELETE FROM element_x_connec"
                f" WHERE element_id = '{element_id}';")
 
-        if parent_vars.list_ids['arc']:
-            for feature_id in parent_vars.list_ids['arc']:
+        if self.list_ids['arc']:
+            for feature_id in self.list_ids['arc']:
                 sql += (f"\nINSERT INTO element_x_arc (element_id, arc_id)"
                         f" VALUES ('{element_id}', '{feature_id}');")
-        if parent_vars.list_ids['node']:
-            for feature_id in parent_vars.list_ids['node']:
+        if self.list_ids['node']:
+            for feature_id in self.list_ids['node']:
                 sql += (f"\nINSERT INTO element_x_node (element_id, node_id)"
                        f" VALUES ('{element_id}', '{feature_id}');")
-        if parent_vars.list_ids['connec']:
-            for feature_id in parent_vars.list_ids['connec']:
+        if self.list_ids['connec']:
+            for feature_id in self.list_ids['connec']:
                 sql += (f"\nINSERT INTO element_x_connec (element_id, connec_id)"
                         f" VALUES ('{element_id}', '{feature_id}');")
 
         status = self.controller.execute_sql(sql, log_sql=True)
         if status:
             self.element_id = element_id
-            manage_close(self.dlg_add_element, table_object, excluded_layers=[])
+            self.layers = manage_close(self.dlg_add_element, table_object, excluded_layers=[], layers=self.layers)
 
 
     def filter_elementcat_id(self):

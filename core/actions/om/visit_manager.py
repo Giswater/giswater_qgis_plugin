@@ -33,7 +33,7 @@ from ....actions import parent_vars
 
 from ....actions.parent_functs import load_settings, set_icon, open_dialog, document_delete, document_open, create_body, \
     set_dates_from_to, get_values_from_catalog
-from ....actions.parent_manage_funct import reset_lists, reset_layers, set_selectionbehavior, close_dialog, add_point, \
+from ....actions.parent_manage_funct import set_selectionbehavior, close_dialog, add_point, \
     check_expression, disconnect_signal_selection_changed, connect_signal_selection_changed, remove_selection, \
     select_features_by_ids, refresh_map_canvas, fill_widget_with_fields, fill_table_object, enable_feature_type, \
     insert_feature, delete_records, selection_init, set_completer_feature_id, set_table_model, lazy_configuration, \
@@ -87,14 +87,30 @@ class GwVisitManager:
         self.expl_id = expl_id
 
         # Get layers of every geom_type
-        reset_lists()
-        reset_layers()
-        parent_vars.layers['arc'] = self.controller.get_group_layers('arc')
-        parent_vars.layers['node'] = self.controller.get_group_layers('node')
-        parent_vars.layers['connec'] = self.controller.get_group_layers('connec')
-        parent_vars.layers['element'] = self.controller.get_group_layers('element')
+
+        # Setting lists
+        self.ids = []
+        self.list_ids = {}
+        self.list_ids['arc'] = []
+        self.list_ids['node'] = []
+        self.list_ids['connec'] = []
+        self.list_ids['gully'] = []
+        self.list_ids['element'] = []
+
+        # Setting layers
+        self.layers = {}
+        self.layers['arc'] = []
+        self.layers['node'] = []
+        self.layers['connec'] = []
+        self.layers['gully'] = []
+        self.layers['element'] = []
+
+        self.layers['arc'] = self.controller.get_group_layers('arc')
+        self.layers['node'] = self.controller.get_group_layers('node')
+        self.layers['connec'] = self.controller.get_group_layers('connec')
+        self.layers['element'] = self.controller.get_group_layers('element')
         if self.controller.get_project_type() == 'ud':
-            parent_vars.layers['gully'] = self.controller.get_group_layers('gully')
+            self.layers['gully'] = self.controller.get_group_layers('gully')
 
         # Remove 'gully' for 'WS'
         if self.controller.get_project_type() == 'ws':
@@ -178,7 +194,7 @@ class GwVisitManager:
         self.event_feature_type_selected(self.dlg_add_visit, "arc")
 
         # Force tab_feature_changed
-        self.tab_feature_changed(self.dlg_add_visit, 'visit', excluded_layers=["v_edit_element"])
+        self.tab_feature_changed(self.dlg_add_visit, 'visit', excluded_layers=["v_edit_element"], layers=self.layers)
 
         # Manage relation locking
         if self.locked_geom_type:
@@ -303,7 +319,7 @@ class GwVisitManager:
 
         # Remove all previous selections
         disconnect_signal_selection_changed()
-        remove_selection()
+        self.layers = remove_selection(layers=self.layers)
 
         # Update geometry field (if user have selected a point)
         if self.point_xy['x'] is not None:
@@ -353,7 +369,7 @@ class GwVisitManager:
 
             # Remove all previous selections
             disconnect_signal_selection_changed()
-            remove_selection()
+            self.layers = remove_selection(layers=self.layers)
         except Exception as e:
             self.controller.log_info(f"manage_rejected: {e}")
 
@@ -480,7 +496,7 @@ class GwVisitManager:
             self.update_relations_geom_type(self.geom_type)
 
         widget_name = f"tbl_visit_x_{self.geom_type}"
-        enable_feature_type(dialog, widget_name)
+        enable_feature_type(dialog, widget_name, ids=self.ids)
 
 
     def delete_relations_geom_type(self, geom_type):
@@ -662,10 +678,14 @@ class GwVisitManager:
         except Exception as e:
             self.controller.log_info(f"manage_geom_type_selected exception: {e}")
         finally:
+            # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
             self.dlg_add_visit.btn_feature_insert.clicked.connect(
-                partial(insert_feature, self.dlg_add_visit, widget_table, geom_type=self.geom_type))
+                partial(insert_feature, self.dlg_add_visit, widget_table, geom_type=self.geom_type, ids=self.ids,
+                        layers=self.layers, list_ids=self.list_ids))
+            # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
             self.dlg_add_visit.btn_feature_delete.clicked.connect(
-                partial(delete_records, self.dlg_add_visit, widget_table, geom_type=self.geom_type))
+                partial(delete_records, self.dlg_add_visit, widget_table, geom_type=self.geom_type, layers=self.layers,
+                        ids=self.ids, list_ids=self.list_ids))
             self.dlg_add_visit.btn_feature_snapping.clicked.connect(
                 partial(self.feature_snapping_clicked, self.dlg_add_visit, widget_table))
 
@@ -1541,7 +1561,7 @@ class GwVisitManager:
         qt_tools.set_item_data(self.dlg_event.position_id, node_list, 1, True, False)
 
 
-    def tab_feature_changed(self, dialog, table_object='visit', excluded_layers=[]):
+    def tab_feature_changed(self, dialog, table_object='visit', excluded_layers=[], layers=None):
         """ Set geom_type and layer depending selected tab """
 
         # Get selected tab to set geometry type
@@ -1570,16 +1590,21 @@ class GwVisitManager:
         except Exception as e:
             self.controller.log_info(f"tab_feature_changed exception: {e}")
         finally:
+            # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
             self.dlg_add_visit.btn_feature_insert.clicked.connect(
-                partial(insert_feature, self.dlg_add_visit, widget_table, self.geom_type))
+                partial(insert_feature, self.dlg_add_visit, widget_table, self.geom_type, ids=self.ids,
+                        layers=self.layers, list_ids=self.list_ids))
+            # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
             self.dlg_add_visit.btn_feature_delete.clicked.connect(
-                partial(delete_records, self.dlg_add_visit, widget_table, self.geom_type))
+                partial(delete_records, self.dlg_add_visit, widget_table, geom_type=self.geom_type, layers=self.layers,
+                        ids=self.ids, list_ids=self.list_ids))
             self.dlg_add_visit.btn_feature_snapping.clicked.connect(
                 partial(self.feature_snapping_clicked, self.dlg_add_visit, widget_table))
 
         # Adding auto-completion to a QLineEdit
         set_completer_feature_id(dialog.feature_id, self.geom_type, viewname)
-        selection_changed(dialog, widget_table, self.geom_type, False)
+        self.ids, self.layers, self.list_ids = selection_changed(dialog, widget_table, self.geom_type, False,
+                                                                 layers=self.layers, list_ids=self.list_ids)
 
         try:
             self.iface.actionPan().trigger()
@@ -1589,7 +1614,7 @@ class GwVisitManager:
 
     def feature_snapping_clicked(self, dialog, table_object):
         self.previous_map_tool = global_vars.canvas.mapTool()
-        selection_init(dialog, table_object, geom_type=self.geom_type)
+        selection_init(dialog, table_object, geom_type=self.geom_type, layers=self.layers)
 
 
     def manage_visit_multifeature(self):

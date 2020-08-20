@@ -32,10 +32,11 @@ from ....actions import parent_vars
 from ....actions.parent_functs import load_settings, set_icon, hilight_feature_by_id, \
     select_features_by_expr, zoom_to_selected_features, document_open, document_delete, make_list_for_completer, \
     set_completer_lineedit, set_restriction, open_dialog, get_folder_dialog
-from ....actions.parent_manage_funct import set_selectionbehavior, reset_layers, reset_lists, remove_selection, \
+from ....actions.parent_manage_funct import set_selectionbehavior, remove_selection, \
     set_table_columns, check_expression, fill_table_object, insert_feature, delete_records, tab_feature_changed, \
     set_completer_feature_id, reload_qtable, refresh_map_canvas, close_dialog, disconnect_signal_selection_changed, \
-    get_cursor_multiple_selection, selection_changed, hide_generic_layers, set_completer_object, disconnect_snapping
+    get_cursor_multiple_selection, selection_changed, hide_generic_layers, set_completer_object, disconnect_snapping, \
+    selection_init
 
 
 class GwPsector:
@@ -70,20 +71,39 @@ class GwPsector:
 
         # Get layers of every geom_type
         self.list_elemets = {}
-        reset_lists()
-        reset_layers()
-        parent_vars.layers['arc'] = self.controller.get_group_layers('arc')
-        parent_vars.layers['node'] = self.controller.get_group_layers('node')
-        parent_vars.layers['connec'] = self.controller.get_group_layers('connec')
+
+        # Get layers of every geom_type
+
+        # Setting lists
+        self.ids = []
+        self.list_ids = {}
+        self.list_ids['arc'] = []
+        self.list_ids['node'] = []
+        self.list_ids['connec'] = []
+        self.list_ids['gully'] = []
+        self.list_ids['element'] = []
+
+        # Setting layers
+        self.layers = {}
+        self.layers['arc'] = []
+        self.layers['node'] = []
+        self.layers['connec'] = []
+        self.layers['gully'] = []
+        self.layers['element'] = []
+
+
+        self.layers['arc'] = self.controller.get_group_layers('arc')
+        self.layers['node'] = self.controller.get_group_layers('node')
+        self.layers['connec'] = self.controller.get_group_layers('connec')
         if self.project_type.upper() == 'UD':
-            parent_vars.layers['gully'] = self.controller.get_group_layers('gully')
+            self.layers['gully'] = self.controller.get_group_layers('gully')
         else:
             qt_tools.remove_tab_by_tabName(self.dlg_plan_psector.tab_feature, 'Gully')
 
         self.update = False  # if false: insert; if true: update
 
         # Remove all previous selections
-        remove_selection(True)
+        self.layers = remove_selection(True, layers=self.layers)
 
         # Set icons
         set_icon(self.dlg_plan_psector.btn_insert, "111")
@@ -372,13 +392,18 @@ class GwPsector:
             self.dlg_plan_psector, self.dlg_plan_psector.selected_rows))
         self.dlg_plan_psector.btn_unselect.clicked.connect(partial(self.update_total,
             self.dlg_plan_psector, self.dlg_plan_psector.selected_rows))
+        # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_plan_psector.btn_insert.clicked.connect(partial(insert_feature,
-            self.dlg_plan_psector, table_object, True, geom_type=self.geom_type))
+            self.dlg_plan_psector, table_object, True, geom_type=self.geom_type, ids=self.ids, layers=self.layers,
+                                                                 list_ids=self.list_ids))
+        # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_plan_psector.btn_delete.clicked.connect(partial(delete_records,
-            self.dlg_plan_psector, table_object, True, geom_type=self.geom_type))
+            self.dlg_plan_psector, table_object, True, geom_type=self.geom_type, layers=self.layers,
+                                                                 ids=self.ids, list_ids=self.list_ids))
         self.dlg_plan_psector.btn_delete.setShortcut(QKeySequence(Qt.Key_Delete))
-        self.dlg_plan_psector.btn_snapping.clicked.connect(partial(self.selection_init,
-            self.dlg_plan_psector, table_object, True, geom_type=self.geom_type))
+        # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
+        self.dlg_plan_psector.btn_snapping.clicked.connect(partial(selection_init,
+            self.dlg_plan_psector, table_object, True, geom_type=self.geom_type, layers=self.layers))
 
         self.dlg_plan_psector.btn_rapports.clicked.connect(partial(self.open_dlg_rapports))
         self.dlg_plan_psector.tab_feature.currentChanged.connect(partial(tab_feature_changed,
@@ -806,24 +831,15 @@ class GwPsector:
         restriction = ('role_basic', 'role_om', 'role_epa', 'role_om')
         set_restriction(self.dlg_plan_psector, widget_to_ignore, restriction)
 
-    def selection_init(self, dialog, table_object, query=True):
-        """ Set canvas map tool to an instance of class 'MultipleSelection' """
-
-        multiple_selection = MultipleSelection(self.iface, self.controller, parent_vars.layers[self.geom_type],
-                                               manage_new_psector=self, table_object=table_object)
-        disconnect_signal_selection_changed()
-        self.canvas.setMapTool(multiple_selection)
-        self.connect_signal_selection_changed(dialog, table_object, query)
-        cursor = get_cursor_multiple_selection()
-        self.canvas.setCursor(cursor)
-
 
     def connect_signal_selection_changed(self, dialog, table_object, query=True):
         """ Connect signal selectionChanged """
 
         try:
+            #TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
             self.canvas.selectionChanged.connect(
-                partial(selection_changed, dialog, table_object, self.geom_type, query, plan_om='plan'))
+                partial(selection_changed, dialog, table_object, self.geom_type, query, plan_om='plan',
+                        layers=self.layers, list_ids=self.list_ids))
         except Exception:
             pass
 
@@ -952,7 +968,7 @@ class GwPsector:
         self.reload_states_selector()
         if cur_active_layer:
             self.iface.setActiveLayer(cur_active_layer)
-        remove_selection(True)
+        self.layers = remove_selection(True, layers=self.layers)
         self.reset_model_psector("arc")
         self.reset_model_psector("node")
         self.reset_model_psector("connec")
