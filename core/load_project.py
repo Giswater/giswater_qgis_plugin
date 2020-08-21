@@ -23,14 +23,7 @@ from ..core.notify_tools import GwNotifyTools
 
 from .actions.basic.search import GwSearch
 
-from .toolbars.basic.basic import *
-from .toolbars.edit.edit import *
-from .toolbars.cad.cad import *
-from .toolbars.epa.epa import *
-from .toolbars.toc.toc import *
-from .toolbars.plan.plan import *
-from .toolbars.utilities.utilities import *
-from .toolbars.om.om import *
+from .toolbars import buttons
 
 
 class LoadProject(QObject):
@@ -279,7 +272,7 @@ class LoadProject(QObject):
                     text = self.translate(f'{index_action}_text')
 
                     icon_path = self.icon_folder + plugin_toolbar.toolbar_id + os.sep + index_action + ".png"
-                    button = getattr(sys.modules[__name__], button_def)(icon_path, text, plugin_toolbar.toolbar, ag)
+                    button = getattr(buttons, button_def)(icon_path, text, plugin_toolbar.toolbar, ag)
 
                     self.buttons[index_action] = button
 
