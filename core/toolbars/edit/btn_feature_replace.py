@@ -15,6 +15,8 @@ from datetime import datetime
 from ....ui_manager import FeatureReplace, InfoWorkcatUi
 from ...actions.basic.catalog import GwCatalog
 from ...utils.giswater_tools import *
+from ....lib.qgis_tools import get_event_point, snap_to_background_layers, get_snapped_layer, add_marker, \
+    get_snapped_feature, get_snapping_options, enable_snapping, snap_to_node, snap_to_connec_gully, set_snapping_mode
 
 from ..parent_maptool import GwParentMapTool
 
@@ -376,15 +378,15 @@ class GwFeatureReplaceButton(GwParentMapTool):
 
         # Hide marker and get coordinates
         self.vertex_marker.hide()
-        event_point = self.qgis_tools.get_event_point(event)
+        event_point = get_event_point(event)
 
         # Snapping layers 'v_edit_'
-        result = self.qgis_tools.snap_to_background_layers(event_point)
-        if self.qgis_tools.result_is_valid():
-            layer = self.qgis_tools.get_snapped_layer(result)
+        result = snap_to_background_layers(event_point)
+        if result.isValid():
+            layer = get_snapped_layer(result)
             tablename = self.controller.get_layer_source_table_name(layer)
             if tablename and 'v_edit' in tablename:
-                self.qgis_tools.add_marker(result, self.vertex_marker)
+                add_marker(result, self.vertex_marker)
 
 
     def canvasReleaseEvent(self, event):
@@ -393,17 +395,17 @@ class GwFeatureReplaceButton(GwParentMapTool):
             self.cancel_map_tool()
             return
 
-        event_point = self.qgis_tools.get_event_point(event)
+        event_point = get_event_point(event)
 
         # Snapping
-        result = self.qgis_tools.snap_to_background_layers(event_point)
-        if not self.qgis_tools.result_is_valid():
+        result = snap_to_background_layers(event_point)
+        if not result.isValid():
             return
 
         # Get snapped feature
-        snapped_feat = self.qgis_tools.get_snapped_feature(result)
+        snapped_feat = get_snapped_feature(result)
         if snapped_feat:
-            layer = self.qgis_tools.get_snapped_layer(result)
+            layer = get_snapped_layer(result)
             tablename = self.controller.get_layer_source_table_name(layer)
 
             if tablename and 'v_edit' in tablename:
@@ -432,20 +434,17 @@ class GwFeatureReplaceButton(GwParentMapTool):
         # Check button
         self.action.setChecked(True)
 
-        # Set main snapping layers
-        self.qgis_tools.set_snapping_layers()
-
         # Store user snapping configuration
-        self.qgis_tools.store_snapping_options()
+        self.previous_snapping = get_snapping_options()
 
         # Disable snapping
-        self.qgis_tools.enable_snapping()
+        enable_snapping()
 
         # Set snapping to 'node', 'connec' and 'gully'
-        self.qgis_tools.snap_to_node()
-        self.qgis_tools.snap_to_connec_gully()
+        snap_to_node()
+        snap_to_connec_gully()
 
-        self.qgis_tools.set_snapping_mode()
+        set_snapping_mode()
 
         # Change cursor
         self.canvas.setCursor(self.cursor)

@@ -29,6 +29,8 @@ from lib import os_tools, qt_tools
 from ..ui_manager import DialogTextUi, DockerUi
 
 from ..actions.parent_functs import manage_return_manager, manage_layer_manager, manage_actions
+from ..lib.qgis_tools import qgis_get_layer_by_tablename, qgis_get_layer_source, qgis_get_layer_source_table_name, \
+    qgis_get_layer_primary_key, qgis_get_layers
 
 
 class DaoController:
@@ -38,7 +40,6 @@ class DaoController:
 
         self.settings = global_vars.settings
         self.qgis_settings = global_vars.qgis_settings
-        self.qgis_tools = global_vars.qgis_tools
         self.plugin_name = plugin_name
         self.iface = iface
         self.translator = None
@@ -938,25 +939,25 @@ class DaoController:
     def get_layer_by_tablename(self, tablename, show_warning=False, log_info=False):
         """ Iterate over all layers and get the one with selected @tablename """
 
-        return self.qgis_tools.qgis_get_layer_by_tablename(tablename, show_warning, log_info)
+        return qgis_get_layer_by_tablename(tablename, show_warning, log_info)
 
 
     def get_layer_source(self, layer):
         """ Get database connection paramaters of @layer """
 
-        return self.qgis_tools.qgis_get_layer_source(layer)
+        return qgis_get_layer_source(layer)
 
 
     def get_layer_source_table_name(self, layer):
         """ Get table or view name of selected layer """
 
-        return self.qgis_tools.qgis_get_layer_source_table_name(layer)
+        return qgis_get_layer_source_table_name(layer)
 
 
     def get_layer_primary_key(self, layer=None):
         """ Get primary key of selected layer """
 
-        return self.qgis_tools.qgis_get_layer_primary_key(layer)
+        return qgis_get_layer_primary_key(layer)
 
 
     def get_project_user(self):
@@ -1448,7 +1449,7 @@ class DaoController:
     def get_layers(self):
         """ Return layers in the same order as listed in TOC """
 
-        return self.qgis_tools.qgis_get_layers()
+        return qgis_get_layers()
 
 
     def set_search_path(self, schema_name):

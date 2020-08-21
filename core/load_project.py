@@ -17,11 +17,11 @@ import sys
 from .models.plugin_toolbar import PluginToolbar
 from .utils.pg_man import PgMan
 from .. import global_vars
-from ..lib.qgis_tools import QgisTools
 from ..ui_manager import DialogTextUi
 from ..core.notify_tools import GwNotifyTools
 
 from .actions.basic.search import GwSearch
+from ..lib.qgis_tools import qgis_get_layer_source, get_qgis_project_variables, qgis_manage_snapping_layer
 
 from .toolbars import buttons
 
@@ -37,11 +37,10 @@ class LoadProject(QObject):
         self.settings = global_vars.settings
         self.controller = global_vars.controller
         self.plugin_dir = global_vars.plugin_dir
-        self.qgis_tools = QgisTools(self.iface, self.plugin_dir)
         self.pg_man = PgMan(global_vars.controller)
         self.plugin_toolbars = {}
         self.buttons_to_hide = []
-        self.plugin_name = self.qgis_tools.get_value_from_metadata('name', 'giswater')
+        self.plugin_name = global_vars.plugin_dir
         self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep
 
         self.buttons = {}
@@ -60,7 +59,7 @@ class LoadProject(QObject):
 
         # Manage schema name
         self.controller.get_current_user()
-        layer_source = self.qgis_tools.qgis_get_layer_source(self.layer_node)
+        layer_source = qgis_get_layer_source(self.layer_node)
         self.schema_name = layer_source['schema']
         self.schema_name = self.schema_name.replace('"', '')
         self.controller.plugin_settings_set_value("schema_name", self.schema_name)
@@ -86,7 +85,7 @@ class LoadProject(QObject):
         self.controller.plugin_settings_set_value("srid", srid)
 
         # Get variables from qgis project
-        self.project_vars = self.qgis_tools.get_qgis_project_variables()
+        self.project_vars = get_qgis_project_variables()
         global_vars.project_vars = self.project_vars
 
         # Check that there are no layers (v_edit_node) with the same view name, coming from different schemes
@@ -326,10 +325,10 @@ class LoadProject(QObject):
     def manage_snapping_layers(self):
         """ Manage snapping of layers """
 
-        self.qgis_tools.qgis_manage_snapping_layer('v_edit_arc', snapping_type=2)
-        self.qgis_tools.qgis_manage_snapping_layer('v_edit_connec', snapping_type=0)
-        self.qgis_tools.qgis_manage_snapping_layer('v_edit_node', snapping_type=0)
-        self.qgis_tools.qgis_manage_snapping_layer('v_edit_gully', snapping_type=0)
+        qgis_manage_snapping_layer('v_edit_arc', snapping_type=2)
+        qgis_manage_snapping_layer('v_edit_connec', snapping_type=0)
+        qgis_manage_snapping_layer('v_edit_node', snapping_type=0)
+        qgis_manage_snapping_layer('v_edit_gully', snapping_type=0)
 
 
     def check_user_roles(self):

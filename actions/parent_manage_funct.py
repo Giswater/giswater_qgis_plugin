@@ -21,7 +21,7 @@ from .parent_functs import check_expression, close_dialog, get_cursor_multiple_s
     refresh_map_canvas
 
 
-from ..lib.qgis_tools import QgisTools
+from ..lib.qgis_tools import snap_to_background_layers, get_event_point, add_marker
 
 
 def reset_lists(ids, list_ids):
@@ -326,27 +326,23 @@ def add_point(vertex_marker):
     vertex_marker.setPenWidth(3)
 
     # Snapper
-    qgis_tools = QgisTools(global_vars.iface, global_vars.plugin_dir)
-    if qgis_tools.controller is None:
-        qgis_tools.set_controller(global_vars.controller)
-
     emit_point = QgsMapToolEmitPoint(global_vars.canvas)
     global_vars.canvas.setMapTool(emit_point)
-    global_vars.canvas.xyCoordinates.connect(partial(mouse_move, vertex_marker, qgis_tools=qgis_tools))
+    global_vars.canvas.xyCoordinates.connect(partial(mouse_move, vertex_marker))
     emit_point.canvasClicked.connect(partial(get_xy, vertex_marker, emit_point, return_point))
     
     return return_point
 
-def mouse_move(vertex_marker, qgis_tools, point):
+def mouse_move(vertex_marker, point):
 
     # Hide marker and get coordinates
     vertex_marker.hide()
-    event_point = qgis_tools.get_event_point(point=point)
+    event_point = get_event_point(point=point)
 
     # Snapping
-    result = qgis_tools.snap_to_background_layers(event_point)
-    if qgis_tools.result_is_valid():
-        qgis_tools.add_marker(result, vertex_marker)
+    result = snap_to_background_layers(event_point)
+    if result.isValid():
+        add_marker(result, vertex_marker)
     else:
         vertex_marker.hide()
 

@@ -18,6 +18,7 @@ from ...project_check import GwProjectCheck
 from ...tasks.tsk_config_layer import GwConfigLayerTask
 
 from ...utils.layer_tools import from_postgres_to_toc
+from ....lib.qgis_tools import get_qgis_project_variables
 
 
 class GwManageLayers:
@@ -32,7 +33,7 @@ class GwManageLayers:
         self.available_layers = None
         self.project_type = global_vars.project_type
         self.schema_name = global_vars.schema_name
-        self.project_vars = global_vars.qgis_tools.get_qgis_project_variables()
+        self.project_vars = get_qgis_project_variables()
         self.qgis_project_infotype = self.project_vars['infotype']
         self.qgis_project_add_schema = self.project_vars['add_schema']
 

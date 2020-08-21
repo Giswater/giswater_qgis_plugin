@@ -13,7 +13,8 @@ from qgis.PyQt.QtCore import Qt
 
 import os
 
-from ...lib.qgis_tools import QgisTools
+from ...lib.qgis_tools import get_snapping_options, apply_snapping_options, enable_snapping, get_event_point, \
+	snap_to_current_layer, add_marker
 from ... import global_vars
 
 
@@ -31,8 +32,8 @@ class GwParentMapTool(QgsMapTool):
 		self.layer_connec = None
 		self.layer_gully = None
 		self.layer_node = None
-		self.qgis_tools = QgisTools(global_vars.iface, global_vars.plugin_dir)
-		self.qgis_tools.controller = global_vars.controller
+		
+		self.previous_snapping = get_snapping_options()
 		
 		self.canvas = global_vars.canvas
 		super().__init__(self.canvas)
@@ -96,10 +97,10 @@ class GwParentMapTool(QgsMapTool):
 		self.action.setChecked(False)
 		
 		# Restore previous snapping
-		self.qgis_tools.recover_snapping_options()
+		apply_snapping_options(self.previous_snapping)
 		
 		# Enable snapping
-		self.qgis_tools.enable_snapping(True)
+		enable_snapping(True)
 		
 		# Recover cursor
 		self.canvas.setCursor(self.std_cursor)
@@ -117,12 +118,12 @@ class GwParentMapTool(QgsMapTool):
 		
 		# Hide highlight and get coordinates
 		self.vertex_marker.hide()
-		event_point = self.qgis_tools.get_event_point(event)
+		event_point = get_event_point(event)
 		
 		# Snapping
-		result = self.qgis_tools.snap_to_current_layer(event_point)
-		if self.qgis_tools.result_is_valid():
-			self.qgis_tools.add_marker(result, self.vertex_marker)
+		result = snap_to_current_layer(event_point)
+		if result.isValid():
+			add_marker(result, self.vertex_marker)
 	
 	
 	def recover_previus_maptool(self):

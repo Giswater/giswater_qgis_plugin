@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: latin-1 -*-
 from qgis.core import QgsPointXY
-from qgis.gui import QgsMapToolEmitPoint, QgsMapTip
+from qgis.gui import QgsMapToolEmitPoint, QgsMapTip, QgsVertexMarker
 from qgis.PyQt.QtCore import Qt, QTimer
 from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QGridLayout, QLabel, QLineEdit, \
     QSizePolicy, QSpacerItem
@@ -14,7 +14,6 @@ from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QGrid
 from functools import partial
 
 from lib import qt_tools
-from lib.qgis_tools import QgisTools
 from ....ui_manager import DimensioningUi
 from .... import global_vars
 
@@ -23,6 +22,10 @@ from ....actions.api_parent_functs import load_settings, save_settings, create_b
     close_dialog, set_setStyleSheet, add_lineedit, set_widget_size, set_data_type, manage_lineedit, add_combobox, \
     add_checkbox, add_calendar, add_button, add_hyperlink, add_horizontal_spacer, add_vertical_spacer, add_textarea, \
     add_spinbox, add_tableview, set_headers, populate_table, set_columns_config
+from ....lib.qgis_tools import set_snapping_mode, remove_marker, get_snapping_options, enable_snapping,snap_to_node, \
+    snap_to_connec_gully, get_event_point, snap_to_background_layers, get_snapped_layer, add_marker, \
+    get_snapped_feature, get_snapped_feature_id, apply_snapping_options
+
 
 class GwDimensioning:
 
@@ -34,10 +37,8 @@ class GwDimensioning:
         self.controller = global_vars.controller
         self.plugin_dir = global_vars.plugin_dir
         self.canvas = global_vars.canvas
-
-        # Get qgis_tools
-        self.qgis_tools = QgisTools(self.iface, self.plugin_dir)
-        self.qgis_tools.set_controller(self.controller)
+        
+        self.vertex_marker = QgsVertexMarker(self.canvas)
 
 
     def open_dimensioning_form(self, qgis_feature=None, layer=None, db_return=None, fid=None):
@@ -179,7 +180,7 @@ class GwDimensioning:
 
 
     def deactivate_signals(self, action, emit_point=None):
-        self.qgis_tools.remove_marker()
+        self.vertex_marker.hide()
         try:
             self.canvas.xyCoordinates.disconnect()
         except TypeError:
@@ -203,13 +204,12 @@ class GwDimensioning:
         if self.deactivate_signals(action, emit_point):
             return
 
-        self.qgis_tools.set_snapping_layers()
-        self.qgis_tools.remove_marker()
-        self.qgis_tools.store_snapping_options()
-        self.qgis_tools.enable_snapping()
-        self.qgis_tools.snap_to_node()
-        self.qgis_tools.snap_to_connec_gully()
-        self.qgis_tools.set_snapping_mode()
+        remove_marker(self.vertex_marker)
+        self.previous_snapping = get_snapping_options()
+        enable_snapping()
+        snap_to_node()
+        snap_to_connec_gully()
+        set_snapping_mode()
 
         self.dlg_dim.actionOrientation.setChecked(False)
         self.iface.setActiveLayer(self.layer_node)
@@ -220,16 +220,16 @@ class GwDimensioning:
     def mouse_move(self, point):
 
         # Hide marker and get coordinates
-        self.qgis_tools.remove_marker()
-        event_point = self.qgis_tools.get_event_point(point=point)
+        self.vertex_marker.hide()
+        event_point = get_event_point(point=point)
 
         # Snapping
-        result = self.qgis_tools.snap_to_background_layers(event_point)
-        if self.qgis_tools.result_is_valid():
-            layer = self.qgis_tools.get_snapped_layer(result)
+        result = snap_to_background_layers(event_point)
+        if result.isValid():
+            layer = get_snapped_layer(result)
             # Check feature
             if layer == self.layer_node or layer == self.layer_connec:
-                self.qgis_tools.add_marker(result)
+                add_marker(result, self.vertex_marker)
 
 
     def click_button_snapping(self, action, emit_point, point, btn):
@@ -248,13 +248,13 @@ class GwDimensioning:
         layer.startEditing()
 
         # Get coordinates
-        event_point = self.qgis_tools.get_event_point(point=point)
+        event_point = get_event_point(point=point)
 
         # Snapping
-        result = self.qgis_tools.snap_to_background_layers(event_point)
-        if self.qgis_tools.result_is_valid():
+        result = snap_to_background_layers(event_point)
+        if result.isValid():
 
-            layer = self.qgis_tools.get_snapped_layer(result)
+            layer = get_snapped_layer(result)
             # Check feature
             if layer == self.layer_node:
                 feat_type = 'node'
@@ -264,8 +264,8 @@ class GwDimensioning:
                 return
 
             # Get the point
-            snapped_feat = self.qgis_tools.get_snapped_feature(result)
-            feature_id = self.qgis_tools.get_snapped_feature_id(result)
+            snapped_feat = get_snapped_feature(result)
+            feature_id = get_snapped_feature_id(result)
             element_id = snapped_feat.attribute(feat_type + '_id')
 
             # Leave selection
@@ -290,7 +290,7 @@ class GwDimensioning:
             qt_tools.setText(self.dlg_dim, "feature_id", element_id)
             qt_tools.setText(self.dlg_dim, "feature_type", feat_type.upper())
 
-            self.qgis_tools.recover_snapping_options()
+            apply_snapping_options(self.previous_snapping)
             self.deactivate_signals(action, emit_point)
             action.setChecked(False)
 
@@ -301,13 +301,12 @@ class GwDimensioning:
         if self.deactivate_signals(action, emit_point):
             return
 
-        self.qgis_tools.set_snapping_layers()
-        self.qgis_tools.remove_marker()
-        self.qgis_tools.store_snapping_options()
-        self.qgis_tools.enable_snapping()
-        self.qgis_tools.snap_to_node()
-        self.qgis_tools.snap_to_connec_gully()
-        self.qgis_tools.set_snapping_mode()
+        remove_marker(self.vertex_marker)
+        self.previous_snapping = get_snapping_options()
+        enable_snapping()
+        snap_to_node()
+        snap_to_connec_gully()
+        set_snapping_mode()
 
         self.dlg_dim.actionSnapping.setChecked(False)
         emit_point.canvasClicked.connect(partial(self.click_button_orientation, action, emit_point))
@@ -330,7 +329,7 @@ class GwDimensioning:
         self.y_symbol = self.dlg_dim.findChild(QLineEdit, "y_symbol")
         self.y_symbol.setText(str(int(point.y())))
 
-        self.qgis_tools.recover_snapping_options()
+        apply_snapping_options(self.previous_snapping)
         self.deactivate_signals(action, emit_point)
         action.setChecked(False)
 

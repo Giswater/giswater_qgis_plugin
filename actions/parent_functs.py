@@ -29,8 +29,8 @@ from functools import partial
 
 from .. import global_vars
 from lib import qt_tools
-from ..lib.qgis_tools import QgisTools
 from ..core.utils.layer_tools import populate_vlayer, categoryze_layer, create_qml, from_postgres_to_toc
+from ..lib.qgis_tools import snap_to_layer, set_snapping_mode, get_snapping_options
 
 from ..ui_manager import DialogTextUi, GwDialog, GwMainWindow
 
@@ -1439,25 +1439,23 @@ def manage_layer_manager(json_result, sql):
         
         # Set snnaping options
         if 'snnaping' in layermanager:
-            qgis_tools = QgisTools(global_vars.iface, global_vars.plugin_dir)
-            if qgis_tools.controller is None:
-                qgis_tools.set_controller(global_vars.controller)
             for layer_name in layermanager['snnaping']:
                 layer = global_vars.controller.get_layer_by_tablename(layer_name)
                 if layer:
                     QgsProject.instance().blockSignals(True)
-                    layer_settings = qgis_tools.snap_to_layer(layer, QgsPointLocator.All, True)
+                    layer_settings = snap_to_layer(layer, QgsPointLocator.All, True)
                     if layer_settings:
                         layer_settings.setType(2)
                         layer_settings.setTolerance(15)
                         layer_settings.setEnabled(True)
                     else:
                         layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 2, 15, 1)
-                    qgis_tools.snapping_config.setIndividualLayerSettings(layer, layer_settings)
+                    snapping_config = get_snapping_options()
+                    snapping_config.setIndividualLayerSettings(layer, layer_settings)
                     QgsProject.instance().blockSignals(False)
                     QgsProject.instance().snappingConfigChanged.emit(
-                        qgis_tools.snapping_config)
-            qgis_tools.set_snapping_mode()
+                        snapping_config)
+            set_snapping_mode()
     
     
     except Exception as e:

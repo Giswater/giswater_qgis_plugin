@@ -12,7 +12,6 @@ iface = None
 canvas = None
 plugin_dir = None
 plugin_name = None
-qgis_tools = None
 
 # TODO: Proper initialization
 schema_name = None
@@ -27,14 +26,13 @@ action_select_arc = None
 action_select_plot = None
 
 
-def init_global(p_iface, p_canvas, p_plugin_dir, p_plugin_name, p_qgis_tools):
+def init_global(p_iface, p_canvas, p_plugin_dir, p_plugin_name):
 
-    global iface, canvas, plugin_dir, plugin_name, qgis_tools
+    global iface, canvas, plugin_dir, plugin_name
     iface = p_iface
     canvas = p_canvas
     plugin_dir = p_plugin_dir
     plugin_name = p_plugin_name
-    qgis_tools = p_qgis_tools
 
 
 def init_settings(setting_file):

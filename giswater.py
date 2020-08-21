@@ -14,10 +14,11 @@ import os.path
 import sys
 
 from . import global_vars
-from .lib.qgis_tools import QgisTools
 from .core.load_project import LoadProject
 from .core.admin import GwAdmin
 from .dao.controller import DaoController
+
+from .lib.qgis_tools import get_value_from_metadata, enable_python_console
 
 
 class Giswater(QObject):
@@ -63,11 +64,12 @@ class Giswater(QObject):
 
         # Initialize plugin global variables
         self.plugin_dir = os.path.dirname(__file__)
-        self.qgis_tools = QgisTools(self.iface, self.plugin_dir)
-        self.plugin_name = self.qgis_tools.get_value_from_metadata('name', 'giswater')
+        global_vars.plugin_dir = self.plugin_dir
+        global_vars.iface = self.iface
+        self.plugin_name = get_value_from_metadata('name', 'giswater')
         self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep
 
-        global_vars.init_global(self.iface, self.iface.mapCanvas(), self.plugin_dir, self.plugin_name, self.qgis_tools)
+        global_vars.init_global(self.iface, self.iface.mapCanvas(), self.plugin_dir, self.plugin_name)
 
         # Check if config file exists
         setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name + '.config')
@@ -81,9 +83,9 @@ class Giswater(QObject):
         global_vars.init_qgis_settings(self.plugin_name)
 
         # Enable Python console and Log Messages panel if parameter 'enable_python_console' = True
-        enable_python_console = global_vars.settings.value('system_variables/enable_python_console', 'FALSE').upper()
-        if enable_python_console == 'TRUE':
-            self.qgis_tools.enable_python_console()
+        # python_enable_console = global_vars.settings.value('system_variables/enable_python_console', 'FALSE').upper()
+        # if python_enable_console == 'TRUE':
+        #     enable_python_console()
 
         # Define signals
         self.set_signals()

@@ -24,6 +24,8 @@ from ..parent_maptool import GwParentMapTool
 from ....ui_manager import Profile
 from ....ui_manager import ProfilesList
 from ...utils.giswater_tools import load_settings, save_settings, create_body, open_dialog, close_dialog
+from ....lib.qgis_tools import get_snapper, get_event_point, snap_to_current_layer, get_snapped_layer, add_marker, \
+    get_snapped_feature
 
 
 class NodeData:
@@ -294,7 +296,7 @@ class GwProfileButton(GwParentMapTool):
         # Create the appropriate map tool and connect the gotPoint() signal.
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
-        self.snapper = self.qgis_tools.get_snapper()
+        self.snapper = get_snapper()
         self.iface.setActiveLayer(self.layer_node)
         self.canvas.xyCoordinates.connect(self.mouse_move)
         self.emit_point.canvasClicked.connect(partial(self.snapping_node))
@@ -302,14 +304,14 @@ class GwProfileButton(GwParentMapTool):
 
     def mouse_move(self, point):
 
-        event_point = self.qgis_tools.get_event_point(point=point)
+        event_point = get_event_point(point=point)
 
         # Snapping
-        result = self.qgis_tools.snap_to_current_layer(event_point)
-        if self.qgis_tools.result_is_valid():
-            layer = self.qgis_tools.get_snapped_layer(result)
+        result = snap_to_current_layer(event_point)
+        if result.isValid():
+            layer = get_snapped_layer(result)
             if layer == self.layer_node:
-                self.qgis_tools.add_marker(result, self.vertex_marker)
+                add_marker(result, self.vertex_marker)
         else:
             self.vertex_marker.hide()
 
@@ -317,17 +319,17 @@ class GwProfileButton(GwParentMapTool):
     def snapping_node(self, point):   # @UnusedVariable
 
         # Get clicked point
-        event_point = self.qgis_tools.get_event_point(point=point)
+        event_point = get_event_point(point=point)
 
         # Snapping
-        result = self.qgis_tools.snap_to_current_layer(event_point)
+        result = snap_to_current_layer(event_point)
 
-        if self.qgis_tools.result_is_valid():
+        if result.isValid():
             # Check feature
-            layer = self.qgis_tools.get_snapped_layer(result)
+            layer = get_snapped_layer(result)
             if layer == self.layer_node:
                 # Get the point
-                snapped_feat = self.qgis_tools.get_snapped_feature(result)
+                snapped_feat = get_snapped_feature(result)
                 element_id = snapped_feat.attribute('node_id')
                 self.element_id = str(element_id)
 

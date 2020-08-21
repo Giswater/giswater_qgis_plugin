@@ -14,7 +14,7 @@ from qgis.PyQt.QtGui import QColor
 
 from .parent_manage_funct import disconnect_signal_selection_changed, connect_signal_selection_changed
 from .. import global_vars
-from ..lib.qgis_tools import QgisTools
+from ..lib.qgis_tools import get_event_point, snap_to_background_layers, get_snapped_feature
 
 
 class MultipleSelection(QgsMapTool):
@@ -42,9 +42,6 @@ class MultipleSelection(QgsMapTool):
         self.rubber_band.setWidth(1)
         self.reset()
         self.selected_features = []
-
-        # Get qgis_tools
-        self.qgis_tools = QgisTools(self.iface, self.plugin_dir)
 
 
     def reset(self):
@@ -112,11 +109,11 @@ class MultipleSelection(QgsMapTool):
 
             # Selection one by one
             else:
-                event_point = self.qgis_tools.get_event_point(event)
-                result = self.qgis_tools.snap_to_background_layers(event_point)
-                if self.qgis_tools.result_is_valid():
+                event_point = get_event_point(event)
+                result = snap_to_background_layers(event_point)
+                if result.isValid():
                     # Get the point. Leave selection
-                    self.qgis_tools.get_snapped_feature(result, True)
+                    get_snapped_feature(result, True)
 
         self.rubber_band.hide()
 
