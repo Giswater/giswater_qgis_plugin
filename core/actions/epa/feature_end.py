@@ -36,22 +36,6 @@ class GwFeatureEnd:
 
     def manage_workcat_end(self):
 
-        self.layers = remove_selection(True, layers=self.layers)
-
-        # Create the dialog and signals
-        self.dlg_work_end = FeatureEndUi()
-        load_settings(self.dlg_work_end)
-        self.set_edit_arc_downgrade_force('True')
-
-        # Set default geom_type and viewname
-        geom_type = "arc"
-        viewname = "v_edit_" + geom_type
-
-        # Capture the current layer to return it at the end of the operation
-        self.cur_active_layer = self.iface.activeLayer()
-
-        set_selectionbehavior(self.dlg_work_end)
-
         # Get layers of every geom_type
 
         # Setting lists
@@ -75,6 +59,22 @@ class GwFeatureEnd:
         self.layers['node'] = self.controller.get_group_layers('node')
         self.layers['connec'] = self.controller.get_group_layers('connec')
         self.layers['element'] = [self.controller.get_layer_by_tablename('v_edit_element')]
+
+        self.layers = remove_selection(True, layers=self.layers)
+
+        # Create the dialog and signals
+        self.dlg_work_end = FeatureEndUi()
+        load_settings(self.dlg_work_end)
+        self.set_edit_arc_downgrade_force('True')
+
+        # Set default geom_type and viewname
+        geom_type = "arc"
+        viewname = "v_edit_" + geom_type
+
+        # Capture the current layer to return it at the end of the operation
+        self.cur_active_layer = self.iface.activeLayer()
+
+        set_selectionbehavior(self.dlg_work_end)
 
         # Remove 'gully' for 'WS'
         self.project_type = self.controller.get_project_type()
