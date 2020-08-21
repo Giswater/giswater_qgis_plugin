@@ -231,7 +231,7 @@ class GwInfo(QObject):
             if self.lyr_dim:
                 self.api_dim = GwDimensioning()
                 feature_id = self.complet_result[0]['body']['feature']['id']
-                result, dialog = self.api_dim.open_form(None, self.lyr_dim, self.complet_result, feature_id)
+                result, dialog = self.api_dim.open_dimensioning_form(None, self.lyr_dim, self.complet_result, feature_id)
                 return result, dialog
 
         elif template == 'info_feature':
