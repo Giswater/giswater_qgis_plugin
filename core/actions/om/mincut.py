@@ -431,7 +431,7 @@ class GwMincut:
         self.dlg_fin = MincutEndUi()
         load_settings(self.dlg_fin)
 
-        api_search = GwSearch(self.iface, self.settings, self.controller, self.plugin_dir)
+        api_search = GwSearch()
         api_search.api_search(self.dlg_fin)
 
         # These widgets are put from the api, mysteriously if we do something like:
