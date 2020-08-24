@@ -32,7 +32,7 @@ from .parent_functs import save_settings, create_body, load_settings, \
     open_dialog, draw, draw_point, get_points, draw_polyline, open_file_path, set_style_mapzones
 from ..core.utils.layer_tools import manage_geometry, export_layer_to_db, delete_layer_from_toc, from_dxf_to_toc
 
-
+selector_vars = {}
 def get_visible_layers(as_list=False):
     """ Return string as {...} or [...] with name of table in DB of all visible layer in TOC """
 
@@ -1377,7 +1377,7 @@ def get_selector(dialog, selector_type, filter=False, widget=None, text_filter=N
                                                    widget=widget, current_tab=current_tab))
                 widget.textChanged.connect(partial(manage_filter, dialog, widget, 'save'))
                 widget.setLayoutDirection(Qt.RightToLeft)
-                setattr(self, f"var_txt_filter_{form_tab['tabName']}", '')
+                selector_vars[f"var_txt_filter_{form_tab['tabName']}"] = ''
             else:
                 widget = qt_tools.getWidget(dialog, 'txt_filter_' + str(form_tab['tabName']))
 
@@ -1439,7 +1439,7 @@ def get_selector(dialog, selector_type, filter=False, widget=None, text_filter=N
             widget.blockSignals(True)
             index = dialog.main_tab.currentIndex()
             tab_name = dialog.main_tab.widget(index).objectName()
-            value = getattr(self, f"var_txt_filter_{tab_name}")
+            value = selector_vars[f"var_txt_filter_{tab_name}"]
             qt_tools.setWidgetText(dialog, widget, f'{value}')
             widget.blockSignals(False)
 
@@ -1549,6 +1549,6 @@ def manage_filter(dialog, widget, action):
     index = dialog.main_tab.currentIndex()
     tab_name = dialog.main_tab.widget(index).objectName()
     if action == 'save':
-        setattr(self, f"var_txt_filter_{tab_name}", qt_tools.getWidgetText(dialog, widget))
+        selector_vars[f"var_txt_filter_{tab_name}"] = qt_tools.getWidgetText(dialog, widget)
     else:
-        setattr(self, f"var_txt_filter_{tab_name}", '')
+        selector_vars[f"var_txt_filter_{tab_name}"] = ''
