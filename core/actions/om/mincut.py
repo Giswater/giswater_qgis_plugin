@@ -388,10 +388,14 @@ class GwMincut:
             self.canvas.xyCoordinates.disconnect()
         except TypeError as e:
             self.controller.log_info(f"{type(e).__name__} --> {e}")
-
+        except AttributeError as e:
+            self.controller.log_info(f"{type(e).__name__} --> {e}")
+            
         try:
             self.emit_point.canvasClicked.disconnect()
         except TypeError as e:
+            self.controller.log_info(f"{type(e).__name__} --> {e}")
+        except AttributeError as e:
             self.controller.log_info(f"{type(e).__name__} --> {e}")
 
         if action_pan:
