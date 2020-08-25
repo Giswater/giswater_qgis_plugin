@@ -187,17 +187,16 @@ class GwInfo(QObject):
         if not row or row[0] is False:
             return False, None
 
+        # When insert feature failed
+        if 'status' in row[0] and row[0]['status'] == 'Failed':
+            return False, None
+
         # When something is wrong
-        if row[0]['message']:
+        if 'message' in row[0] and row[0]['message']:
             level = 1
             if 'level' in row[0]['message']:
                 level = int(row[0]['message']['level'])
             self.controller.show_message(row[0]['message']['text'], level)
-            return False, None
-
-        # When insert feature failed
-        if row[0]['status'] == "Failed":
-            self.controller.show_message(row[0]['message']['text'], 2)
             return False, None
 
         # Control fail when insert new feature
