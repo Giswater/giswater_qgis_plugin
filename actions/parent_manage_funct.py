@@ -190,7 +190,7 @@ def get_records_geom_type(dialog, table_object, geom_type, ids=None, list_ids=No
     exists = global_vars.controller.check_table(table_relation)
     if not exists:
         global_vars.controller.log_info(f"Not found: {table_relation}")
-        return
+        return ids, layers, list_ids
 
     sql = (f"SELECT {geom_type}_id "
            f"FROM {table_relation} "
