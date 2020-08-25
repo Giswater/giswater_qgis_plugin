@@ -4,6 +4,7 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QCursor, QPixmap
 from qgis.core import QgsProject, QgsExpression
 
+import configparser
 import os
 from functools import partial
 import sys
@@ -15,20 +16,29 @@ from ...ui_manager import GwDialog, GwMainWindow
 
 
 def load_settings(dialog, controller):
-	""" Load QGIS settings related with dialog position and size """
-	
+	""" Load user UI settings related with dialog position and size """
+
+	# Get user UI config file
+	parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
+	main_folder = os.path.join(os.path.expanduser("~"), controller.plugin_name)
+	path = main_folder + os.sep + "config" + os.sep + 'user.config'
+	if not os.path.exists(path):
+		return
+	parser.read(path)
 	try:
-		x = controller.plugin_settings_value(dialog.objectName() + "_x")
-		y = controller.plugin_settings_value(dialog.objectName() + "_y")
-		width = controller.plugin_settings_value(dialog.objectName() + "_width", dialog.property('width'))
-		height = controller.plugin_settings_value(dialog.objectName() + "_height", dialog.property('height'))
-		
-		if int(x) < 0 or int(y) < 0:
+		x = parser['dialogs_position'][f"{dialog.objectName()}_x"]
+		y = parser['dialogs_position'][f"{dialog.objectName()}_y"]
+		width = parser['dialogs_position'][f"{dialog.objectName()}_width"]
+		height = parser['dialogs_position'][f"{dialog.objectName()}_height"]
+
+		v_screens = ctypes.windll.user32
+		screen_x = v_screens.GetSystemMetrics(78)  # Width of virtual screen
+		screen_y = v_screens.GetSystemMetrics(79)  # Height of virtual screen
+		monitors = v_screens.GetSystemMetrics(80)  # Will return an integer of the number of display monitors present.
+
+		if (int(x) < 0 and monitors == 1) or (int(y) < 0 and monitors == 1):
 			dialog.resize(int(width), int(height))
 		else:
-			screens = ctypes.windll.user32
-			screen_x = screens.GetSystemMetrics(78)
-			screen_y = screens.GetSystemMetrics(79)
 			if int(x) > screen_x:
 				x = int(screen_x) - int(width)
 			if int(y) > screen_y:
@@ -39,13 +49,30 @@ def load_settings(dialog, controller):
 
 
 def save_settings(dialog, controller):
-	""" Save QGIS settings related with dialog position and size """
-	
-	controller.plugin_settings_set_value(dialog.objectName() + "_width", dialog.property('width'))
-	controller.plugin_settings_set_value(dialog.objectName() + "_height", dialog.property('height'))
-	controller.plugin_settings_set_value(dialog.objectName() + "_x", dialog.pos().x() + 8)
-	controller.plugin_settings_set_value(dialog.objectName() + "_y", dialog.pos().y() + 31)
-	
+	""" Save user UI related with dialog position and size """
+	try:
+		parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
+		main_folder = os.path.join(os.path.expanduser("~"), controller.plugin_name)
+		config_folder = main_folder + os.sep + "config" + os.sep
+		if not os.path.exists(config_folder):
+			os.makedirs(config_folder)
+		path = config_folder + 'user.config'
+		parser.read(path)
+		# Check if section dialogs_position exists in file
+		if 'dialogs_position' not in parser:
+			parser.add_section('dialogs_position')
+
+		parser['dialogs_position'][dialog.objectName() + "_width"] = f"{dialog.property('width')}"
+		parser['dialogs_position'][dialog.objectName() + "_height"] = f"{dialog.property('height')}"
+		parser['dialogs_position'][dialog.objectName() + "_x"] = f"{dialog.pos().x() + 8}"
+		parser['dialogs_position'][dialog.objectName() + "_y"] = f"{dialog.pos().y() + 31}"
+
+		with open(path, 'w') as configfile:
+			parser.write(configfile)
+			configfile.close()
+	except Exception as e:
+		pass
+
 
 def close_dialog(dlg, controller):
 	""" Close dialog """
