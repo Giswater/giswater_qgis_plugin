@@ -720,7 +720,6 @@ def populate_basic_info(dialog, result, field_id, my_json=None, new_feature_id=N
             widget = add_calendar(dialog, field, my_json, new_feature_id=new_feature_id, new_feature=new_feature,
                                   layer_new_feature=layer_new_feature, feature_id=feature_id, feature_type=feature_type,
                                   layer=layer)
-            widget = set_auto_update_dateedit(field, dialog, widget)
         elif field['widgettype'] == 'hyperlink':
             widget = add_hyperlink(field)
         elif field['widgettype'] == 'textarea':
