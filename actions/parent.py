@@ -182,44 +182,6 @@ class ParentAction(object):
             self.controller.plugin_settings_set_value(f"{dlg_name}_{selector_name}", tab_name)
 
 
-    def open_dialog(self, dlg, dlg_name=None, info=True, maximize_button=True, stay_on_top=True, title=None):
-        """ Open dialog """
-
-        # Check database connection before opening dialog
-        if not self.controller.check_db_connection():
-            return
-
-        # Set window title
-        if title is not None:
-            dlg.setWindowTitle(title)
-        else:
-            if dlg_name:
-                self.controller.manage_translation(dlg_name, dlg)
-
-        # Manage stay on top, maximize/minimize button and information button
-        # if info is True maximize flag will be ignored
-        # To enable maximize button you must set info to False
-        flags = Qt.WindowCloseButtonHint
-        if info:
-            flags |= Qt.WindowSystemMenuHint | Qt.WindowContextHelpButtonHint
-        else:
-            if maximize_button:
-                flags |= Qt.WindowMinMaxButtonsHint
-
-        if stay_on_top:
-            flags |= Qt.WindowStaysOnTopHint
-
-        dlg.setWindowFlags(flags)
-
-        # Open dialog
-        if issubclass(type(dlg), GwDialog):
-            dlg.open()
-        elif issubclass(type(dlg), GwMainWindow):
-            dlg.show()
-        else:
-            dlg.show()
-
-
     def multi_row_selector(self, dialog, tableleft, tableright, field_id_left, field_id_right, name='name',
                            hide_left=[0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
                                       23, 24, 25, 26, 27, 28, 29, 30], hide_right=[1, 2, 3], aql=""):
@@ -932,7 +894,7 @@ class ParentAction(object):
         self.dlg_info.btn_close.clicked.connect(partial(close_dialog, self.dlg_info))
         self.dlg_info.setWindowTitle(title)
         qt_tools.setWidgetText(self.dlg_info, self.dlg_info.txt_infolog, msg)
-        self.open_dialog(self.dlg_info, dlg_name='dialog_text')
+        open_dialog(self.dlg_info, dlg_name='dialog_text')
 
 
     def put_combobox(self, qtable, rows, field, widget_pos, combo_values):

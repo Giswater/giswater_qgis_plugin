@@ -56,7 +56,7 @@ class GwAuxPointButton(GwParentMapTool):
         else:
             self.dlg_create_point.rb_right.setChecked(True)
         
-        open_dialog(self.dlg_create_point, self.controller, dlg_name='auxpoint', maximize_button=False)
+        open_dialog(self.dlg_create_point, dlg_name='auxpoint', maximize_button=False)
 
 
     def get_values(self, point_1, point_2):

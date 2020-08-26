@@ -120,7 +120,7 @@ class GwProfileButton(GwParentMapTool):
             # self.controller.manage_translation('draw_profile', self.dlg_draw_profile)
             self.controller.dock_dialog(self.dlg_draw_profile)
         else:
-            open_dialog(self.dlg_draw_profile, self.controller)
+            open_dialog(self.dlg_draw_profile)
 
 
     def deactivate(self):
@@ -234,7 +234,7 @@ class GwProfileButton(GwParentMapTool):
             item_arc = QListWidgetItem(str(profile['profile_id']))
             self.dlg_load.tbl_profiles.addItem(item_arc)
 
-        open_dialog(self.dlg_load, self.controller)
+        open_dialog(self.dlg_load)
         self.deactivate()
 
 

@@ -1978,7 +1978,7 @@ class GwAdmin:
         # Set listeners
 
         # Open dialog
-        self.open_dialog(self.dlg_manage_visit_param, dlg_name='main_visitparam')
+        open_dialog(self.dlg_manage_visit_param, dlg_name='main_visitparam')
         return
 
 

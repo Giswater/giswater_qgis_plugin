@@ -81,7 +81,7 @@ class GwArcFusionButton(GwParentMapTool):
 			self.dlg_fusion.btn_accept.clicked.connect(self.exec_fusion)
 			self.dlg_fusion.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_fusion))
 			
-			open_dialog(self.dlg_fusion, self.controller, dlg_name='arc_fusion')
+			open_dialog(self.dlg_fusion, dlg_name='arc_fusion')
 	
 	
 	def exec_fusion(self):

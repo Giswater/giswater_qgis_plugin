@@ -146,7 +146,7 @@ class GwNodeTypeChangeButton(GwParentMapTool):
 		qt_tools.fillComboBox(self.dlg_chg_node_type, "node_node_type_new", rows)
 		
 		# Open dialog
-		open_dialog(self.dlg_chg_node_type, self.controller, dlg_name='nodetype_change', maximize_button=False)
+		open_dialog(self.dlg_chg_node_type, dlg_name='nodetype_change', maximize_button=False)
 	
 	
 	def filter_catalog(self):

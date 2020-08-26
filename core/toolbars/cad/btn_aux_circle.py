@@ -47,7 +47,7 @@ class GwAuxCircleButton(GwParentMapTool):
         self.dlg_create_circle.btn_cancel.clicked.connect(self.cancel)
         self.dlg_create_circle.radius.setFocus()
 
-        open_dialog(self.dlg_create_circle, self.controller, dlg_name='auxcircle')
+        open_dialog(self.dlg_create_circle, dlg_name='auxcircle')
 
 
     def get_radius(self, point):

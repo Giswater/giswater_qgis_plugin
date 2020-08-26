@@ -125,7 +125,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
         self.dlg_replace.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_replace))
         self.dlg_replace.rejected.connect(self.cancel_map_tool)
         # Open dialog
-        open_dialog(self.dlg_replace, self.controller, maximize_button=False)
+        open_dialog(self.dlg_replace, maximize_button=False)
 
 
     def open_catalog(self):
@@ -181,7 +181,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
         self.dlg_new_workcat.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_new_workcat))
 
         # Open dialog
-        open_dialog(self.dlg_new_workcat, self.controller, dlg_name='info_workcat')
+        open_dialog(self.dlg_new_workcat, dlg_name='info_workcat')
 
 
     def manage_new_workcat_accept(self, table_object):

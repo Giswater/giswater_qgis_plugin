@@ -227,7 +227,7 @@ class GwConnectLinkButton(GwParentMapTool):
 				self.dlg_dtext.btn_close.clicked.connect(partial(close_dialog, self.dlg_dtext))
 				self.dlg_dtext.rejected.connect(partial(close_dialog, self.dlg_dtext))
 				populate_info_text(self.dlg_dtext, result['body']['data'], False)
-				open_dialog(self.dlg_dtext, self.controller, dlg_name='dialog_text')
+				open_dialog(self.dlg_dtext, dlg_name='dialog_text')
 			
 			layer.removeSelection()
 		

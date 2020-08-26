@@ -89,11 +89,11 @@ def save_current_tab(dialog, tab_widget, selector_name, controller):
 		controller.plugin_settings_set_value(f"{dlg_name}_{selector_name}", tab_name)
 
 
-def open_dialog(dlg, controller, dlg_name=None, info=True, maximize_button=True, stay_on_top=True, title=None):
+def open_dialog(dlg, dlg_name=None, info=True, maximize_button=True, stay_on_top=True, title=None):
 	""" Open dialog """
 	
 	# Check database connection before opening dialog
-	if not controller.check_db_connection():
+	if not global_vars.controller.check_db_connection():
 		return
 	
 	
@@ -102,7 +102,7 @@ def open_dialog(dlg, controller, dlg_name=None, info=True, maximize_button=True,
 		dlg.setWindowTitle(title)
 	else:
 		if dlg_name:
-			controller.manage_translation(dlg_name, dlg)
+			global_vars.controller.manage_translation(dlg_name, dlg)
 	
 	# Manage stay on top, maximize/minimize button and information button
 	# if info is True maximize flag will be ignored
