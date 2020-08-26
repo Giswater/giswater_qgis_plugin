@@ -853,7 +853,7 @@ class GwMincut:
     def snapping_init_connec(self):
         """ Snap connec """
 
-        multiple_snapping = MultipleSelection(self.iface, self.controller, self.layers_connec, self)
+        multiple_snapping = MultipleSelection(self.layers_connec, mincut=self)
         self.canvas.setMapTool(multiple_snapping)
         self.canvas.selectionChanged.connect(partial(self.snapping_selection_connec))
         cursor = get_cursor_multiple_selection()
@@ -863,7 +863,7 @@ class GwMincut:
     def snapping_init_hydro(self):
         """ Snap also to connec (hydrometers has no geometry) """
 
-        multiple_snapping = MultipleSelection(self.iface, self.controller, self.layers_connec, self)
+        multiple_snapping = MultipleSelection(self.layers_connec, mincut=self)
         self.canvas.setMapTool(multiple_snapping)
         self.canvas.selectionChanged.connect(
             partial(self.snapping_selection_hydro, self.layers_connec, "rtc_hydrometer", "connec_id"))
