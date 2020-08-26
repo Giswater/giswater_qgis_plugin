@@ -73,9 +73,6 @@ class MultipleSelection(QgsMapTool):
 
         # Disconnect signal to enhance process
         # We will reconnect it when processing last layer of the group
-        if self.mincut:
-            self.mincut.disconnect_signal_selection_changed()
-            
         disconnect_signal_selection_changed()
         
         if self.manage_new_psector:
