@@ -41,7 +41,7 @@ from .... import global_vars
 from ....actions.parent_functs import  set_icon, fill_table, set_table_columns, \
     restore_user_layer, resetRubberbands, refresh_map_canvas, create_body, \
     set_cursor_restore, get_cursor_multiple_selection, zoom_to_rectangle, disconnect_signal_selection_changed, \
-    connect_signal_selection_changed, set_cursor_wait, get_composers_list, get_composer_index
+    set_cursor_wait, get_composers_list, get_composer_index
 from ...utils.layer_tools import delete_layer_from_toc, populate_info_text
 
 from ....lib.qgis_tools import get_event_point, snap_to_current_layer, get_snapped_layer, get_snapped_feature, \
@@ -1225,7 +1225,7 @@ class GwMincut:
         # Reload contents of table 'connec'
         self.reload_table_connec(expr_filter)
 
-        connect_signal_selection_changed("mincut_connec")
+        self.connect_signal_selection_changed("mincut_connec")
 
 
     def get_connec_id_from_customer_code(self, customer_code):
@@ -1360,7 +1360,7 @@ class GwMincut:
             id_list = [i.id() for i in it]
             layer.selectByIds(id_list)
 
-        connect_signal_selection_changed("mincut_connec")
+        self.connect_signal_selection_changed("mincut_connec")
 
 
     def delete_records_hydro(self):
@@ -1406,7 +1406,7 @@ class GwMincut:
         # Update model of the widget with selected expr_filter
         self.reload_table_hydro(expr_filter)
 
-        connect_signal_selection_changed("mincut_hydro")
+        self.connect_signal_selection_changed("mincut_hydro")
 
 
     def accept_connec(self, dlg, element):
@@ -1999,6 +1999,18 @@ class GwMincut:
         # Common Actions
         self.action_mincut_composer.setDisabled(False)
         return row
+
+
+    def connect_signal_selection_changed(self, option):
+        """ Connect signal selectionChanged """
+        
+        try:
+            if option == "mincut_connec":
+                global_vars.canvas.selectionChanged.connect(partial(self.snapping_selection_connec))
+            elif option == "mincut_hydro":
+                global_vars.canvas.selectionChanged.connect(partial(self.snapping_selection_hydro))
+        except Exception:
+            pass
 
 
     def open_mincut_manage_dates(self, row):

@@ -475,18 +475,6 @@ def set_table_columns(dialog, widget, table_name, sort_order=0, isQStandardItemM
     return widget
 
 
-def connect_signal_selection_changed(option):
-    """ Connect signal selectionChanged """
-    
-    try:
-        if option == "mincut_connec":
-            global_vars.canvas.selectionChanged.connect(partial(snapping_selection_connec))
-        elif option == "mincut_hydro":
-            global_vars.canvas.selectionChanged.connect(partial(snapping_selection_hydro))
-    except Exception:
-        pass
-
-
 def disconnect_signal_selection_changed():
     """ Disconnect signal selectionChanged """
     
