@@ -6,17 +6,48 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from ..parent_action import GwParentAction
+from functools import partial
 
-from ...actions.basic.basic_func import GwBasic
+from ...utils.giswater_tools import close_dialog, load_settings, open_dialog, save_settings
+from ....ui_manager import SelectorUi
+from .... import global_vars
+from ....actions.api_parent_functs import get_selector
+from ....actions.parent_functs import get_last_tab, save_current_tab
+
+# from ...actions.basic.basic_func import GwBasic
 
 class GwSelectorButton(GwParentAction):
 	
 	def __init__(self, icon_path, text, toolbar, action_group):
 		super().__init__(icon_path, text, toolbar, action_group)
 		
-		self.basic = GwBasic()
+		# self.basic = GwBasic()
 	
 	
 	def clicked_event(self):
-		self.basic.basic_filter_selectors()
+		
+		selector_values = '"selector_basic"'
+	
+		# Show form in docker?
+		global_vars.controller.init_docker('qgis_form_docker')
+		
+		dlg_selector = SelectorUi()
+		load_settings(dlg_selector)
+		
+		# Get the name of the last tab used by the user
+		selector_vars = {}
+		current_tab = get_last_tab(dlg_selector, 'basic')
+		get_selector(dlg_selector, selector_values, current_tab=current_tab, selector_vars=selector_vars)
+		
+		if global_vars.controller.dlg_docker:
+			global_vars.controller.dock_dialog(dlg_selector)
+			dlg_selector.btn_close.clicked.connect(global_vars.controller.close_docker)
+		else:
+			dlg_selector.btn_close.clicked.connect(partial(close_dialog, dlg_selector))
+			dlg_selector.rejected.connect(partial(save_settings, dlg_selector))
+			open_dialog(dlg_selector, dlg_name='selector', maximize_button=False)
+		
+		# Save the name of current tab used by the user
+		dlg_selector.rejected.connect(partial(
+			save_current_tab, dlg_selector, dlg_selector.main_tab, 'basic'))
 		
