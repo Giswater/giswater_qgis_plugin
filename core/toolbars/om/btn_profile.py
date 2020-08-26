@@ -23,6 +23,7 @@ from lib import qt_tools
 from ..parent_maptool import GwParentMapTool
 from ....ui_manager import Profile
 from ....ui_manager import ProfilesList
+from ....actions.parent_functs import set_icon
 from ...utils.giswater_tools import load_settings, save_settings, create_body, open_dialog, close_dialog
 from ....lib.qgis_tools import get_snapper, get_event_point, snap_to_current_layer, get_snapped_layer, add_marker, \
     get_snapped_feature
@@ -89,6 +90,7 @@ class GwProfileButton(GwParentMapTool):
 
         # Toolbar actions
         action = self.dlg_draw_profile.findChild(QAction, "actionProfile")
+        set_icon(action, "131")
         action.triggered.connect(partial(self.activate_snapping_node))
         self.action_profile = action
 
