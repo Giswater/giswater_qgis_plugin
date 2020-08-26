@@ -252,7 +252,8 @@ class GwMincutManager:
         self.dlg_selector.rejected.connect(partial(
             save_current_tab, self.dlg_selector, self.dlg_selector.main_tab, 'mincut'))
 
-        get_selector(self.dlg_selector, selector_values, current_tab=current_tab)
+        selector_vars = {}
+        get_selector(self.dlg_selector, selector_values, current_tab=current_tab, selector_vars=selector_vars)
 
         open_dialog(self.dlg_selector, dlg_name='selector', maximize_button=False)
 

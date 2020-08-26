@@ -31,10 +31,10 @@ class GwBasic:
 
         self.dlg_selector = SelectorUi()
         load_settings(self.dlg_selector)
-
+        selector_vars = {}
         # Get the name of the last tab used by the user
         current_tab = get_last_tab(self.dlg_selector, 'basic')
-        get_selector(self.dlg_selector, selector_values, current_tab=current_tab)
+        get_selector(self.dlg_selector, selector_values, current_tab=current_tab, selector_vars=selector_vars)
 
         if global_vars.controller.dlg_docker:
             global_vars.controller.dock_dialog(self.dlg_selector)

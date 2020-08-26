@@ -32,7 +32,7 @@ from .parent_functs import save_settings, create_body, load_settings, \
     open_dialog, draw, draw_point, get_points, draw_polyline, open_file_path, set_style_mapzones
 from ..core.utils.layer_tools import manage_geometry, export_layer_to_db, delete_layer_from_toc, from_dxf_to_toc
 
-selector_vars = {}
+
 def get_visible_layers(as_list=False):
     """ Return string as {...} or [...] with name of table in DB of all visible layer in TOC """
 
@@ -1283,7 +1283,7 @@ def manage_dxf(dialog, dxf_path, export_to_db=False, toc=False, del_old_layers=T
     return {"path": dxf_path, "result": result, "temp_layers_added": temp_layers_added}
 
 
-def manage_all(dialog, widget_all):
+def manage_all(dialog, widget_all, selector_vars):
 
     key_modifier = QApplication.keyboardModifiers()
     status = qt_tools.isChecked(dialog, widget_all)
@@ -1300,11 +1300,11 @@ def manage_all(dialog, widget_all):
         qt_tools.setChecked(dialog, widget, status)
         widget.blockSignals(False)
 
-    set_selector(dialog, widget_all, False)
+    set_selector(dialog, widget_all, False, selector_vars)
 
 
 def get_selector(dialog, selector_type, filter=False, widget=None, text_filter=None, current_tab=None,
-                 is_setselector=None):
+                 is_setselector=None, selector_vars={}):
     """ Ask to DB for selectors and make dialog
     :param dialog: Is a standard dialog, from file api_selectors.ui, where put widgets
     :param selector_type: list of selectors to ask DB ['exploitation', 'state', ...]
@@ -1373,11 +1373,12 @@ def get_selector(dialog, selector_type, filter=False, widget=None, text_filter=N
                 widget = QLineEdit()
                 widget.setObjectName('txt_filter_' + str(form_tab['tabName']))
                 widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-                widget.textChanged.connect(partial(get_selector, dialog, selector_type, filter=True,
-                                                   widget=widget, current_tab=current_tab))
-                widget.textChanged.connect(partial(manage_filter, dialog, widget, 'save'))
-                widget.setLayoutDirection(Qt.RightToLeft)
                 selector_vars[f"var_txt_filter_{form_tab['tabName']}"] = ''
+                widget.textChanged.connect(partial(get_selector, dialog, selector_type, filter=True,
+                                                   widget=widget, current_tab=current_tab, selector_vars=selector_vars))
+                widget.textChanged.connect(partial(manage_filter, dialog, widget, 'save', selector_vars))
+                widget.setLayoutDirection(Qt.RightToLeft)
+
             else:
                 widget = qt_tools.getWidget(dialog, 'txt_filter_' + str(form_tab['tabName']))
 
@@ -1399,7 +1400,7 @@ def get_selector(dialog, selector_type, filter=False, widget=None, text_filter=N
                 if qt_tools.getWidget(dialog, f"chk_all_{form_tab['tabName']}") is None:
                     widget = QCheckBox()
                     widget.setObjectName('chk_all_' + str(form_tab['tabName']))
-                    widget.stateChanged.connect(partial(manage_all, dialog, widget))
+                    widget.stateChanged.connect(partial(manage_all, dialog, widget, selector_vars))
                     widget.setLayoutDirection(Qt.RightToLeft)
 
                 else:
@@ -1416,7 +1417,7 @@ def get_selector(dialog, selector_type, filter=False, widget=None, text_filter=N
             label.setText(field['label'])
 
             widget = add_checkbox(field)
-            widget.stateChanged.connect(partial(set_selection_mode, dialog, widget, selection_mode))
+            widget.stateChanged.connect(partial(set_selection_mode, dialog, widget, selection_mode, selector_vars))
             widget.setLayoutDirection(Qt.RightToLeft)
 
             field['layoutname'] = gridlayout.objectName()
@@ -1444,7 +1445,7 @@ def get_selector(dialog, selector_type, filter=False, widget=None, text_filter=N
             widget.blockSignals(False)
 
 
-def set_selection_mode(dialog, widget, selection_mode):
+def set_selection_mode(dialog, widget, selection_mode, selector_vars):
     """ Manage selection mode
     :param dialog: QDialog where search all checkbox
     :param widget: QCheckBox that has changed status (QCheckBox)
@@ -1469,7 +1470,7 @@ def set_selection_mode(dialog, widget, selection_mode):
             widget_all.blockSignals(False)
         remove_previuos(dialog, widget, widget_all, widget_list)
 
-    set_selector(dialog, widget, is_alone)
+    set_selector(dialog, widget, is_alone, selector_vars)
 
 
 def remove_previuos(dialog, widget, widget_all, widget_list):
@@ -1496,7 +1497,7 @@ def remove_previuos(dialog, widget, widget_all, widget_list):
             checkbox.blockSignals(False)
 
 
-def set_selector(dialog, widget, is_alone):
+def set_selector(dialog, widget, is_alone, selector_vars):
     """  Send values to DB and reload selectors
     :param dialog: QDialog
     :param widget: QCheckBox that contains the information to generate the json (QCheckBox)
@@ -1538,14 +1539,14 @@ def set_selector(dialog, widget, is_alone):
     global_vars.controller.set_layer_index('v_edit_link')
     global_vars.controller.set_layer_index('v_edit_plan_psector')
 
-    get_selector(dialog, f'"{selector_type}"', is_setselector=json_result)
+    get_selector(dialog, f'"{selector_type}"', is_setselector=json_result, selector_vars=selector_vars)
 
     widget_filter = qt_tools.getWidget(dialog, f"txt_filter_{tab_name}")
     if widget_filter and qt_tools.getWidgetText(dialog, widget_filter, False, False) not in (None, ''):
         widget_filter.textChanged.emit(widget_filter.text())
 
 
-def manage_filter(dialog, widget, action):
+def manage_filter(dialog, widget, action, selector_vars):
     index = dialog.main_tab.currentIndex()
     tab_name = dialog.main_tab.widget(index).objectName()
     if action == 'save':
