@@ -27,10 +27,11 @@ from core.models.om_visit_x_gully import OmVisitXGully
 from core.models.om_visit_parameter import OmVisitParameter
 from ....ui_manager import VisitUi, VisitEvent, VisitEventRehab, LotVisitManagerUi
 from ..edit.document import GwDocument
+from ...utils.giswater_tools import close_dialog, load_settings, open_dialog, save_settings
 
 from .... import global_vars
 
-from ....actions.parent_functs import load_settings, set_icon, open_dialog, document_delete, document_open, create_body, \
+from ....actions.parent_functs import  set_icon, document_delete, document_open, create_body, \
     set_dates_from_to, get_values_from_catalog
 from ....actions.parent_manage_funct import set_selectionbehavior, close_dialog, add_point, \
     check_expression, disconnect_signal_selection_changed, connect_signal_selection_changed, remove_selection, \

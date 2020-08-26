@@ -13,11 +13,12 @@ from functools import partial
 from collections import OrderedDict
 
 from lib import qt_tools
+
+from ...utils.giswater_tools import load_settings, open_dialog, save_settings, close_dialog
+from .... import global_vars
+from ....actions.api_parent_functs import create_body
 from ....ui_manager import InfoCatalogUi
 
-from .... import global_vars
-
-from ....actions.api_parent_functs import create_body, load_settings, open_dialog, save_settings
 
 
 class GwCatalog:
@@ -50,7 +51,7 @@ class GwCatalog:
 
         self.dlg_catalog = InfoCatalogUi()
         load_settings(self.dlg_catalog)
-        self.dlg_catalog.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_catalog))
+        self.dlg_catalog.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_catalog))
         self.dlg_catalog.btn_accept.clicked.connect(partial(self.fill_geomcat_id, previous_dialog, widget_name))
 
         main_layout = self.dlg_catalog.widget.findChild(QGridLayout, 'main_layout')
@@ -201,16 +202,6 @@ class GwCatalog:
             self.populate_combo(child, combo_child)
 
 
-    def close_dialog(self, dlg=None):
-        """ Close dialog """
-        try:
-            save_settings(dlg)
-            dlg.close()
-
-        except AttributeError:
-            pass
-
-
     def add_combobox(self, dialog, field):
 
         widget = QComboBox()
@@ -260,5 +251,5 @@ class GwCatalog:
             message = "Widget not found"
             self.controller.show_message(message, 2, parameter=str(widget_name))
 
-        self.close_dialog(self.dlg_catalog)
+        close_dialog(self.dlg_catalog)
 

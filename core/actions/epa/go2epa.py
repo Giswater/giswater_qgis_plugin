@@ -21,8 +21,9 @@ from ..epa.go2epa_options import GwGo2EpaOptions
 from ...tasks.tsk_go2epa import GwGo2EpaTask
 from ...admin import GwAdmin
 from ....ui_manager import Go2EpaSelectorUi, EpaManager, Go2EpaUI, HydrologySelector, Multirow_selector
+from ...utils.giswater_tools import load_settings, open_dialog, save_settings, close_dialog
 
-from ....actions.api_parent_functs import load_settings, open_dialog, close_dialog, fill_table
+from ....actions.api_parent_functs import fill_table
 from ....actions.parent_functs import multi_row_selector, set_table_columns, multi_rows_delete
 
 

@@ -15,12 +15,12 @@ import operator
 from functools import partial
 
 from lib import qt_tools
-from ....ui_manager import ConfigUi
+from ...utils.giswater_tools import load_settings, open_dialog, save_settings, close_dialog
 
 from .... import global_vars
-
+from ....ui_manager import ConfigUi
 from ....actions.parent_functs import hide_void_groupbox
-from ....actions.api_parent_functs import create_body, close_dialog, load_settings, open_dialog
+from ....actions.api_parent_functs import create_body
 
 
 class GwConfig:

@@ -11,10 +11,12 @@ import json
 from functools import partial
 
 from lib import qt_tools
+from ...utils.giswater_tools import load_settings, open_dialog, save_settings, close_dialog
+
 from ....ui_manager import Go2EpaOptionsUi
 from .... import global_vars
 
-from ....actions.api_parent_functs import load_settings, create_body, construct_form_param_user, open_dialog, close_dialog, manage_child
+from ....actions.api_parent_functs import create_body, construct_form_param_user, manage_child
 
 
 class GwGo2EpaOptions:

@@ -18,14 +18,13 @@ from collections import OrderedDict
 from functools import partial
 
 from lib import qt_tools
-from ....ui_manager import ToolboxDockerUi, ToolboxUi
+from ...utils.giswater_tools import load_settings, open_dialog, save_settings, close_dialog
+from ...utils.layer_tools import add_temp_layer
 
 from .... import global_vars
-
 from ....actions.parent_functs import show_exceptions_msg
-from ....actions.api_parent_functs import create_body, load_settings, close_dialog, open_dialog, set_style_mapzones, \
-    construct_form_param_user
-from ...utils.layer_tools import add_temp_layer
+from ....actions.api_parent_functs import create_body, set_style_mapzones, construct_form_param_user
+from ....ui_manager import ToolboxDockerUi, ToolboxUi
 
 class GwToolBox:
 

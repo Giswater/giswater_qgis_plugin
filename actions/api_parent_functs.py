@@ -28,8 +28,9 @@ from lib import qt_tools
 from ..core.utils.hyperlink_label import GwHyperLinkLabel
 from ..ui_manager import DialogTextUi
 
-from .parent_functs import save_settings, create_body, load_settings, \
-    open_dialog, draw, draw_point, get_points, draw_polyline, open_file_path, set_style_mapzones
+from .parent_functs import create_body, draw, draw_point, get_points, draw_polyline, open_file_path, set_style_mapzones
+from ..core.utils.giswater_tools import close_dialog, save_settings
+
 from ..core.utils.layer_tools import manage_geometry, export_layer_to_db, delete_layer_from_toc, from_dxf_to_toc
 
 
@@ -117,16 +118,6 @@ def set_completer_object(dialog, table_object):
     model = QStringListModel()
     model.setStringList(rows)
     completer.setModel(model)
-
-
-def close_dialog(dlg=None):
-    """ Close dialog """
-
-    try:
-        save_settings(dlg)
-        dlg.close()
-    except Exception:
-        pass
 
 
 def check_expression(expr_filter, log_info=False):

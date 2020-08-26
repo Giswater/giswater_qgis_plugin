@@ -15,10 +15,12 @@ import urllib.parse
 from functools import partial
 
 from ...utils.extended_qlabel import GwExtendedQLabel
+from ...utils.giswater_tools import close_dialog, load_settings, open_dialog, save_settings
+
 from ....ui_manager import Gallery, GalleryZoom
 
 from .... import global_vars
-from ....actions.parent_functs import load_settings, set_icon, open_dialog
+from ....actions.parent_functs import set_icon
 from ....actions.parent_manage_funct import close_dialog
 
 class GwVisitGallery:

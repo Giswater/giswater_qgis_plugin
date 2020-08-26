@@ -221,11 +221,11 @@ class GwConnectLinkButton(GwParentMapTool):
 			result = self.controller.get_json('gw_fct_connect_to_network', body, log_sql=True)
 			if result:
 				self.dlg_dtext = DialogTextUi()
-				load_settings(self.dlg_dtext, self.controller)
+				load_settings(self.dlg_dtext)
 				self.dlg_dtext.btn_accept.hide()
 				self.dlg_dtext.setWindowTitle('Connect to network')
-				self.dlg_dtext.btn_close.clicked.connect(partial(close_dialog, self.dlg_dtext, self.controller))
-				self.dlg_dtext.rejected.connect(partial(close_dialog, self.dlg_dtext, self.controller))
+				self.dlg_dtext.btn_close.clicked.connect(partial(close_dialog, self.dlg_dtext))
+				self.dlg_dtext.rejected.connect(partial(close_dialog, self.dlg_dtext))
 				populate_info_text(self.dlg_dtext, result['body']['data'], False)
 				open_dialog(self.dlg_dtext, self.controller, dlg_name='dialog_text')
 			

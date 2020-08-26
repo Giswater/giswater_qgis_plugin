@@ -26,23 +26,27 @@ from functools import partial
 from .... import global_vars
 from lib import qt_tools
 from .catalog import GwCatalog
+from ..edit.dimensioning import GwDimensioning
 from ..edit.document import GwDocument
 from ..epa.element import GwElement
 from ..om.visit_gallery import GwVisitGallery
 from ..om.visit_manager import GwVisitManager
+
+from ...utils.giswater_tools import load_settings, open_dialog, save_settings, close_dialog
+from ...utils.layer_tools import populate_info_text
+
 from ....ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFull, GwMainWindow, VisitDocument, InfoCrossectUi, \
     DialogTextUi
-from ..edit.dimensioning import GwDimensioning
+
 
 from ....actions.parent_functs import set_icon, set_dates_from_to
 from ....actions.api_parent_functs import get_visible_layers, create_body, \
-    draw, load_settings, close_dialog, populate_basic_info, open_dialog, put_widgets, fill_child, \
-    check_actions, action_open_url, api_action_help, save_settings, \
+    draw, populate_basic_info,  put_widgets, fill_child, \
+    check_actions, action_open_url, api_action_help, \
     get_feature_by_expr, set_setStyleSheet, set_data_type, add_lineedit, set_widget_size, manage_lineedit, add_combobox, \
     add_checkbox, get_values, add_calendar, add_button, add_hyperlink, add_horizontal_spacer, add_vertical_spacer, \
     add_textarea, add_spinbox, add_tableview, set_headers, populate_table, set_columns_config, set_completer_object, \
     fill_table, clear_gridlayout, add_frame, add_label, set_completer_object_api, draw_point
-from ...utils.layer_tools import populate_info_text
 from ....lib.qgis_tools import get_snapping_options, get_event_point, snap_to_current_layer, get_snapped_layer, \
     get_snapped_feature, add_marker, enable_snapping, snap_to_layer, apply_snapping_options, snap_to_arc, snap_to_node
 

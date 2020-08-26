@@ -6,15 +6,19 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtWidgets import QCompleter
-from qgis.PyQt.QtCore import QDate, QStringListModel
+from qgis.PyQt.QtCore import QDate, QStringListModel, Qt
 
 import json
 from collections import OrderedDict
 from datetime import datetime
-
+from functools import partial
+from ....actions.api_parent_functs import create_body
 from ....ui_manager import FeatureReplace, InfoWorkcatUi
 from ...actions.basic.catalog import GwCatalog
-from ...utils.giswater_tools import *
+# from ...utils.giswater_tools import *
+from ...utils.layer_tools import populate_info_text
+from ...utils.giswater_tools import close_dialog, load_settings, open_dialog, refresh_legend, save_settings
+from ....lib import qt_tools
 from ....lib.qgis_tools import get_event_point, snap_to_background_layers, get_snapped_layer, add_marker, \
     get_snapped_feature, get_snapping_options, enable_snapping, snap_to_node, snap_to_connec_gully, set_snapping_mode
 
@@ -55,7 +59,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
 
         # Create the dialog and signals
         self.dlg_replace = FeatureReplace()
-        load_settings(self.dlg_replace, self.controller)
+        load_settings(self.dlg_replace)
 
         sql = "SELECT id FROM cat_work ORDER BY id"
         rows = self.controller.get_rows(sql)
@@ -118,7 +122,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
 
         self.dlg_replace.btn_new_workcat.clicked.connect(partial(self.new_workcat))
         self.dlg_replace.btn_accept.clicked.connect(partial(self.get_values, self.dlg_replace))
-        self.dlg_replace.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_replace, self.controller))
+        self.dlg_replace.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_replace))
         self.dlg_replace.rejected.connect(self.cancel_map_tool)
         # Open dialog
         open_dialog(self.dlg_replace, self.controller, maximize_button=False)
@@ -166,7 +170,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
     def new_workcat(self):
 
         self.dlg_new_workcat = InfoWorkcatUi()
-        load_settings(self.dlg_new_workcat, self.controller)
+        load_settings(self.dlg_new_workcat)
         qt_tools.setCalendarDate(self.dlg_new_workcat, self.dlg_new_workcat.builtdate, None, True)
 
         table_object = "cat_work"
@@ -174,7 +178,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
 
         # Set signals
         self.dlg_new_workcat.btn_accept.clicked.connect(partial(self.manage_new_workcat_accept, table_object))
-        self.dlg_new_workcat.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_new_workcat, self.controller))
+        self.dlg_new_workcat.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_new_workcat))
 
         # Open dialog
         open_dialog(self.dlg_new_workcat, self.controller, dlg_name='info_workcat')
@@ -234,7 +238,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
                         current_index = self.dlg_replace.workcat_id_end.findText(str(cat_work_id))
                         self.dlg_replace.workcat_id_end.setCurrentIndex(current_index)
 
-                    close_dialog(self.dlg_new_workcat, self.controller)
+                    close_dialog(self.dlg_new_workcat, self.controller.plugin_name)
                 else:
                     msg = "This Workcat is already exist"
                     self.controller.show_info_box(msg, "Warning")
@@ -304,7 +308,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
                 self.controller.show_warning(message)
                 self.deactivate()
                 self.set_action_pan()
-                close_dialog(dialog, self.controller, set_action_pan=False)
+                close_dialog(dialog, self.controller.plugin_name)
                 return
 
             complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]

@@ -7,12 +7,12 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from functools import partial
 
+from ...utils.giswater_tools import close_dialog, load_settings, open_dialog, save_settings
 from ....ui_manager import SelectorUi
-
 from .... import global_vars
-
-from ....actions.api_parent_functs import load_settings, get_selector, close_dialog, open_dialog, save_settings
+from ....actions.api_parent_functs import get_selector
 from ....actions.parent_functs import get_last_tab, save_current_tab
+
 
 class GwBasic:
 
@@ -31,8 +31,9 @@ class GwBasic:
 
         self.dlg_selector = SelectorUi()
         load_settings(self.dlg_selector)
-        selector_vars = {}
+
         # Get the name of the last tab used by the user
+        selector_vars = {}
         current_tab = get_last_tab(self.dlg_selector, 'basic')
         get_selector(self.dlg_selector, selector_values, current_tab=current_tab, selector_vars=selector_vars)
 

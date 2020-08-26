@@ -15,7 +15,7 @@ from ....ui_manager import NodeTypeChange
 from ...actions.basic.catalog import GwCatalog
 from ...actions.basic.info import GwInfo
 from ..parent_maptool import GwParentMapTool
-from ...utils.giswater_tools import load_settings, save_settings, open_dialog, check_expression
+from ...utils.giswater_tools import close_dialog, load_settings, save_settings, open_dialog, check_expression
 
 from ....actions.parent_functs import restore_user_layer
 from ....lib.qgis_tools import get_event_point, snap_to_current_layer, get_snapped_feature, get_snapping_options, \
@@ -86,7 +86,7 @@ class GwNodeTypeChangeButton(GwParentMapTool):
 			self.controller.show_warning(message)
 		
 		# Close form
-		self.close_dialog(self.dlg_chg_node_type)
+		close_dialog(self.dlg_chg_node_type)
 		
 		# Refresh map canvas
 		self.refresh_map_canvas()
@@ -120,7 +120,7 @@ class GwNodeTypeChangeButton(GwParentMapTool):
 		
 		# Create the dialog, fill node_type and define its signals
 		self.dlg_chg_node_type = NodeTypeChange()
-		load_settings(self.dlg_chg_node_type, self.controller)
+		load_settings(self.dlg_chg_node_type)
 		
 		# Get nodetype_id from current node
 		node_type = ""
@@ -137,7 +137,7 @@ class GwNodeTypeChangeButton(GwParentMapTool):
 		self.dlg_chg_node_type.node_node_type.setText(node_type)
 		self.dlg_chg_node_type.btn_catalog.clicked.connect(partial(self.open_catalog))
 		self.dlg_chg_node_type.btn_accept.clicked.connect(self.edit_change_elem_type_accept)
-		self.dlg_chg_node_type.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_chg_node_type))
+		self.dlg_chg_node_type.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_chg_node_type))
 		
 		# Fill 1st combo boxes-new system node type
 		sql = ("SELECT DISTINCT(id) FROM cat_feature WHERE active is True "
@@ -162,21 +162,7 @@ class GwNodeTypeChangeButton(GwParentMapTool):
 		rows = self.controller.get_rows(sql)
 		qt_tools.set_item_data(self.dlg_chg_node_type.node_nodecat_id, rows, 1)
 	
-	
-	def close_dialog(self, dlg):
-		""" Close dialog """
-		
-		try:
-			save_settings(dlg, self.controller)
-			dlg.close()
-			map_tool = self.canvas.mapTool()
-			# If selected map tool is from the plugin, set 'Pan' as current one
-			if map_tool.toolName() == '':
-				self.set_action_pan()
-		except AttributeError:
-			pass
-	
-	
+
 	""" QgsMapTools inherited event functions """
 	
 	def keyPressEvent(self, event):

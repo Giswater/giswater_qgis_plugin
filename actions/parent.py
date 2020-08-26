@@ -30,6 +30,8 @@ from functools import partial
 from .. import global_vars
 from lib import qt_tools
 from ..core.actions.edit.layer_tools import GwLayerTools
+from ..core.utils.giswater_tools import load_settings, open_dialog, save_settings, close_dialog
+
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 
 from ..ui_manager import DialogTextUi, GwDialog, GwMainWindow
@@ -154,39 +156,6 @@ class ParentAction(object):
             qt_tools.setWidgetText(dialog, widget, str(folder_path))
 
 
-    def load_settings(self, dialog):
-        """ Load QGIS settings related with dialog position and size """
-
-        try:
-            x = self.controller.plugin_settings_value(dialog.objectName() + "_x")
-            y = self.controller.plugin_settings_value(dialog.objectName() + "_y")
-            width = self.controller.plugin_settings_value(dialog.objectName() + "_width", dialog.property('width'))
-            height = self.controller.plugin_settings_value(dialog.objectName() + "_height", dialog.property('height'))
-
-            if int(x) < 0 or int(y) < 0:
-                dialog.resize(int(width), int(height))
-            else:
-                screens = ctypes.windll.user32
-                screen_x = screens.GetSystemMetrics(78)
-                screen_y = screens.GetSystemMetrics(79)
-                if int(x) > screen_x:
-                    x = int(screen_x) - int(width)
-                if int(y) > screen_y:
-                    y = int(screen_y)
-                dialog.setGeometry(int(x), int(y), int(width), int(height))
-        except:
-            pass
-
-
-    def save_settings(self, dialog):
-        """ Save QGIS settings related with dialog position and size """
-
-        self.controller.plugin_settings_set_value(dialog.objectName() + "_width", dialog.property('width'))
-        self.controller.plugin_settings_set_value(dialog.objectName() + "_height", dialog.property('height'))
-        self.controller.plugin_settings_set_value(dialog.objectName() + "_x", dialog.pos().x() + 8)
-        self.controller.plugin_settings_set_value(dialog.objectName() + "_y", dialog.pos().y() + 31)
-
-
     def get_last_tab(self, dialog, selector_name):
         """ Get the name of the last tab used by the user from QSettings()
         :param dialog: QDialog
@@ -249,22 +218,6 @@ class ParentAction(object):
             dlg.show()
         else:
             dlg.show()
-
-
-    def close_dialog(self, dlg):
-        """ Close dialog """
-
-        try:
-            self.save_settings(dlg)
-            dlg.close()
-            map_tool = self.canvas.mapTool()
-            # If selected map tool is from the plugin, set 'Pan' as current one
-            if map_tool.toolName() == '':
-                self.iface.actionPan().trigger()
-        except AttributeError:
-            pass
-        except Exception as e:
-            self.controller.log_info(type(e).__name__)
 
 
     def multi_row_selector(self, dialog, tableleft, tableright, field_id_left, field_id_right, name='name',
@@ -976,7 +929,7 @@ class ParentAction(object):
         cat_exception = {'KeyError': 'Key on returned json from ddbb is missed.'}
         self.dlg_info = DialogTextUi()
         self.dlg_info.btn_accept.setVisible(False)
-        self.dlg_info.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_info))
+        self.dlg_info.btn_close.clicked.connect(partial(close_dialog, self.dlg_info))
         self.dlg_info.setWindowTitle(title)
         qt_tools.setWidgetText(self.dlg_info, self.dlg_info.txt_infolog, msg)
         self.open_dialog(self.dlg_info, dlg_name='dialog_text')

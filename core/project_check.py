@@ -11,13 +11,12 @@ from qgis.PyQt.QtWidgets import QCheckBox, QGridLayout, QLabel, QSizePolicy
 import platform
 from functools import partial
 
-from ..ui_manager import ProjectCheckUi
-
-from .. import global_vars
-
-from ..actions.parent_functs import get_plugin_version, hide_void_groupbox
-from ..actions.api_parent_functs import create_body, load_settings, save_settings, open_dialog, close_dialog
+from .utils.giswater_tools import load_settings, open_dialog, save_settings, close_dialog
 from .utils.layer_tools import add_temp_layer, from_postgres_to_toc, create_qml
+from .. import global_vars
+from ..actions.parent_functs import get_plugin_version, hide_void_groupbox
+from ..actions.api_parent_functs import create_body
+from ..ui_manager import ProjectCheckUi
 
 
 class GwProjectCheck:

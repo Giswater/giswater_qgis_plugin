@@ -19,6 +19,7 @@ from lib import qt_tools
 from .parent import ParentAction
 from .multiple_selection import MultipleSelection
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
+from ..core.utils.giswater_tools import load_settings, open_dialog, save_settings, close_dialog
 
 
 class ParentManage(ParentAction, object):
@@ -754,7 +755,7 @@ class ParentManage(ParentAction, object):
         self.reset_model(dialog, table_object, "element")
         if self.project_type == 'ud':
             self.reset_model(dialog, table_object, "gully")
-        self.close_dialog(dialog)
+        close_dialog(dialog)
         self.hide_generic_layers(excluded_layers=excluded_layers)
         self.disconnect_snapping()
         self.disconnect_signal_selection_changed()

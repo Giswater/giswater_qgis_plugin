@@ -19,11 +19,13 @@ from ..om.composer_tools import GwComposerTools
 from ...project_check import GwProjectCheck
 from .toolbox import GwToolBox
 from ..om.visit_manager import GwVisitManager
+from ...utils.giswater_tools import close_dialog, load_settings, open_dialog, save_settings
+
 from ....ui_manager import CsvUi
 
 from .... import global_vars
 
-from ....actions.parent_functs import load_settings, close_dialog, open_dialog, create_body
+from ....actions.parent_functs import create_body
 from ...utils.layer_tools import populate_info_text
 
 

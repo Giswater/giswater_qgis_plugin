@@ -16,13 +16,14 @@ from functools import partial
 from lib import qt_tools
 # from ..om.visit_manager import GwVisitManager
 # from ..plan.psector import GwPsector
+from ...utils.giswater_tools import close_dialog, load_settings, open_dialog, save_settings
 # from ....actions.parent import ParentAction
 # from ....ui_manager import PsectorManagerUi
 from ....ui_manager import SelectorDate
 
 from .... import global_vars
 
-from ....actions.parent_functs import load_settings, close_dialog, open_dialog, refresh_map_canvas
+from ....actions.parent_functs import refresh_map_canvas
 
 class GwOm:
 

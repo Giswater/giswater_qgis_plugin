@@ -14,11 +14,13 @@ from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QGrid
 from functools import partial
 
 from lib import qt_tools
+from ...utils.giswater_tools import load_settings, open_dialog, save_settings
+
 from ....ui_manager import DimensioningUi
 from .... import global_vars
 
 from ....actions.parent_functs import set_icon
-from ....actions.api_parent_functs import load_settings, save_settings, create_body, put_widgets, open_dialog, \
+from ....actions.api_parent_functs import create_body, put_widgets,  \
     close_dialog, set_setStyleSheet, add_lineedit, set_widget_size, set_data_type, manage_lineedit, add_combobox, \
     add_checkbox, add_calendar, add_button, add_hyperlink, add_horizontal_spacer, add_vertical_spacer, add_textarea, \
     add_spinbox, add_tableview, set_headers, populate_table, set_columns_config

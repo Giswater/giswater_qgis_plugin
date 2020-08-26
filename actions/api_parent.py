@@ -28,6 +28,7 @@ from .parent import ParentAction
 from ..core.utils.hyperlink_label import GwHyperLinkLabel
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 from ..ui_manager import DialogTextUi
+from ..core.utils.giswater_tools import load_settings, open_dialog, save_settings, close_dialog
 
 
 class ApiParent(ParentAction):
@@ -126,16 +127,6 @@ class ApiParent(ParentAction):
         model = QStringListModel()
         model.setStringList(rows)
         self.completer.setModel(model)
-
-
-    def close_dialog(self, dlg=None):
-        """ Close dialog """
-
-        try:
-            self.save_settings(dlg)
-            dlg.close()
-        except Exception:
-            pass
 
 
     def check_expression(self, expr_filter, log_info=False):
@@ -1015,7 +1006,7 @@ class ApiParent(ParentAction):
 
     def manage_close_interpolate(self):
 
-        self.save_settings(self.dlg_dtext)
+        save_settings(self.dlg_dtext)
         self.remove_interpolate_rb()
 
 
@@ -1025,15 +1016,15 @@ class ApiParent(ParentAction):
         self.interpolate_result = None
         self.resetRubberbands()
         self.dlg_dtext = DialogTextUi()
-        self.load_settings(self.dlg_dtext)
+        load_settings(self.dlg_dtext)
 
         qt_tools.setWidgetText(self.dlg_dtext, self.dlg_dtext.txt_infolog, 'Interpolate tool')
         self.dlg_dtext.lbl_text.setText("Please, use the cursor to select two nodes to proceed with the "
                                         "interpolation\nNode1: \nNode2:")
 
         self.dlg_dtext.btn_accept.clicked.connect(partial(self.chek_for_existing_values))
-        self.dlg_dtext.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_dtext))
-        self.dlg_dtext.rejected.connect(partial(self.save_settings, self.dlg_dtext))
+        self.dlg_dtext.btn_close.clicked.connect(partial(close_dialog, self.dlg_dtext))
+        self.dlg_dtext.rejected.connect(partial(save_settings, self.dlg_dtext))
         self.dlg_dtext.rejected.connect(partial(self.remove_interpolate_rb))
 
         self.open_dialog(self.dlg_dtext, dlg_name='dialog_text')
@@ -1165,7 +1156,7 @@ class ApiParent(ParentAction):
                 widget.setStyleSheet(None)
                 qt_tools.setWidgetText(self.dlg_cf, widget, f'{v}')
                 widget.editingFinished.emit()
-        self.close_dialog(self.dlg_dtext)
+        close_dialog(self.dlg_dtext)
 
 
     def remove_interpolate_rb(self):

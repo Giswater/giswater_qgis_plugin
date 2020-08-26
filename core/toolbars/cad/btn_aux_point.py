@@ -39,7 +39,7 @@ class GwAuxPointButton(GwParentMapTool):
 
         # Create the dialog and signals
         self.dlg_create_point = AuxPoint()
-        load_settings(self.dlg_create_point, self.controller)
+        load_settings(self.dlg_create_point)
 
         validator = QDoubleValidator(-99999.99, 99999.999, 3)
         validator.setNotation(QDoubleValidator().StandardNotation)
@@ -73,7 +73,7 @@ class GwAuxPointButton(GwParentMapTool):
         self.delete_prev = qt_tools.isChecked(self.dlg_create_point, self.dlg_create_point.chk_delete_prev)
         if self.layer_points:
             self.layer_points.startEditing()
-            close_dialog(self.dlg_create_point, self.controller)
+            close_dialog(self.dlg_create_point)
             if self.dlg_create_point.rb_left.isChecked():
                 self.direction = 1
             else:
@@ -105,7 +105,7 @@ class GwAuxPointButton(GwParentMapTool):
         self.controller.plugin_settings_set_value(self.dlg_create_point.rb_left.objectName(),
                                                   self.dlg_create_point.rb_left.isChecked())
 
-        close_dialog(self.dlg_create_point, self.controller)
+        close_dialog(self.dlg_create_point)
         self.iface.setActiveLayer(self.current_layer)
         if self.layer_points:
             if self.layer_points.isEditable():

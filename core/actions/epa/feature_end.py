@@ -14,10 +14,12 @@ from functools import partial
 from datetime import datetime
 
 from lib import qt_tools
+from ...utils.giswater_tools import close_dialog, load_settings, open_dialog, save_settings
+
 from ....ui_manager import FeatureEndUi, InfoWorkcatUi, FeatureEndConnecUi
 from .... import global_vars
 
-from ....actions.parent_functs import load_settings, set_icon, open_dialog, save_settings, close_dialog
+from ....actions.parent_functs import set_icon
 from ....actions.parent_manage_funct import remove_selection, set_selectionbehavior, \
     set_completer_object, insert_feature, selection_init, delete_records, tab_feature_changed, set_completer_feature_id, \
     hide_generic_layers, disconnect_snapping, disconnect_signal_selection_changed, set_completer_widget
@@ -464,17 +466,7 @@ class GwFeatureEnd:
 
     def close_dialog_workcat_list(self, dlg=None):
         """ Close dialog """
-
-        try:
-            save_settings(dlg)
-            dlg.close()
-            map_tool = self.canvas.mapTool()
-            # If selected map tool is from the plugin, set 'Pan' as current one
-            if map_tool.toolName() == '':
-                self.iface.actionPan().trigger()
-        except AttributeError:
-            pass
-
+        close_dialog(dlg)
         open_dialog(self.dlg_work_end)
 
 

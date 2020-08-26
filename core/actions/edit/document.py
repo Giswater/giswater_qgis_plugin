@@ -10,10 +10,12 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView
 from functools import partial
 
 from lib import qt_tools
+from ...utils.giswater_tools import load_settings, open_dialog, save_settings
+
 from ....ui_manager import DocUi, DocManager
 from .... import global_vars
 
-from ....actions.parent_functs import load_settings, set_icon, open_web_browser, get_file_dialog, open_dialog, close_dialog
+from ....actions.parent_functs import set_icon, open_web_browser, get_file_dialog
 
 from ....actions.parent_manage_funct import set_selectionbehavior, remove_selection, \
     populate_combo, set_completer_object, set_completer_feature_id, manage_close, tab_feature_changed, exist_object, \

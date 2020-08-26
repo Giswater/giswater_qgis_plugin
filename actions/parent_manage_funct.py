@@ -17,12 +17,13 @@ from functools import partial
 
 from lib import qt_tools
 from .. import global_vars
-from .parent_functs import check_expression, close_dialog, get_cursor_multiple_selection, set_table_columns, \
+from .parent_functs import check_expression, get_cursor_multiple_selection, set_table_columns, \
     refresh_map_canvas
 
 
 from ..lib.qgis_tools import snap_to_background_layers, get_event_point, add_marker
 
+from ..core.utils.giswater_tools import close_dialog, load_settings, open_dialog, save_settings
 
 def reset_lists(ids, list_ids):
     """ Reset list of selected records """

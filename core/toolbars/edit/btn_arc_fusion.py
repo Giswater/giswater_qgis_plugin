@@ -66,7 +66,7 @@ class GwArcFusionButton(GwParentMapTool):
 		if snapped_feat:
 			self.node_id = snapped_feat.attribute('node_id')
 			self.dlg_fusion = ArcFusionUi()
-			load_settings(self.dlg_fusion, self.controller)
+			load_settings(self.dlg_fusion)
 			
 			# Fill ComboBox workcat_id_end
 			sql = "SELECT id FROM cat_work ORDER BY id"
@@ -79,7 +79,7 @@ class GwArcFusionButton(GwParentMapTool):
 			
 			# Set signals
 			self.dlg_fusion.btn_accept.clicked.connect(self.exec_fusion)
-			self.dlg_fusion.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_fusion, self.controller))
+			self.dlg_fusion.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_fusion))
 			
 			open_dialog(self.dlg_fusion, self.controller, dlg_name='arc_fusion')
 	

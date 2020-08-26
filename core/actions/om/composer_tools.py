@@ -16,14 +16,15 @@ import json, sys
 from functools import partial
 
 from lib import qt_tools
+from ...utils.giswater_tools import load_settings, open_dialog, save_settings, close_dialog
+
 from ....ui_manager import FastPrintUi
 
 from .... import global_vars
 
 from ....actions.parent_functs import hide_void_groupbox, get_composers_list
-from ....actions.api_parent_functs import load_settings, create_body, close_dialog, save_settings, open_dialog, \
-     put_widgets, get_values, draw_rectangle, set_setStyleSheet, add_lineedit, \
-    set_widget_size, set_data_type, add_combobox
+from ....actions.api_parent_functs import create_body, put_widgets, get_values, draw_rectangle, set_setStyleSheet, \
+    add_lineedit, set_widget_size, set_data_type, add_combobox
 
 
 class GwComposerTools:

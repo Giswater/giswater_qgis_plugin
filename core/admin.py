@@ -36,8 +36,10 @@ from ..ui_manager import MainUi, MainDbProjectUi, MainRenameProjUi, MainProjectI
 from .. import global_vars
 
 from ..actions.parent_functs import get_folder_dialog, set_table_columns
-from ..actions.api_parent_functs import load_settings, open_dialog, create_body, save_settings, construct_form_param_user
+from ..actions.api_parent_functs import create_body, construct_form_param_user
+from .utils.giswater_tools import load_settings, open_dialog, save_settings, close_dialog
 from .utils.layer_tools import populate_info_text
+
 
 
 class GwAdmin:
@@ -208,7 +210,7 @@ class GwAdmin:
     def set_signals(self):
         """ Set signals. Function has to be executed only once (during form initialization) """
 
-        self.dlg_readsql.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_readsql))
+        self.dlg_readsql.btn_close.clicked.connect(partial(self.close_dialog_admin, self.dlg_readsql))
         self.dlg_readsql.btn_schema_create.clicked.connect(partial(self.open_create_project))
         self.dlg_readsql.btn_custom_load_file.clicked.connect(
             partial(self.load_custom_sql_files, self.dlg_readsql, "custom_path_folder"))
@@ -377,7 +379,7 @@ class GwAdmin:
             settings.setValue('username', user_name)
             settings.endGroup()
 
-        self.close_dialog(dialog)
+        self.close_dialog_admin(dialog)
         self.init_sql(True)
 
 
@@ -418,8 +420,8 @@ class GwAdmin:
         result, qgs_path = gis.gis_project_database(gis_folder, gis_file, project_type, schema_name, export_passwd,
             roletype, sample, get_database_parameters)
 
-        self.close_dialog(self.dlg_create_gis_project)
-        self.close_dialog(self.dlg_readsql)
+        self.close_dialog_admin(self.dlg_create_gis_project)
+        self.close_dialog_admin(self.dlg_readsql)
         if result is True:
             self.open_project(qgs_path)
 
@@ -464,7 +466,7 @@ class GwAdmin:
         self.dlg_create_gis_project.btn_gis_folder.clicked.connect(
             partial(get_folder_dialog, self.dlg_create_gis_project, "txt_gis_folder"))
         self.dlg_create_gis_project.btn_accept.clicked.connect(partial(self.gis_create_project))
-        self.dlg_create_gis_project.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_create_gis_project))
+        self.dlg_create_gis_project.btn_close.clicked.connect(partial(self.close_dialog_admin, self.dlg_create_gis_project))
         self.dlg_create_gis_project.chk_is_sample.stateChanged.connect(partial(self.sample_state_changed))
 
         # Open MainWindow
@@ -1639,7 +1641,7 @@ class GwAdmin:
         self.manage_result_message(status, parameter="Create project")
         if status:
             self.controller.dao.commit()
-            self.close_dialog(self.dlg_readsql_create_project)
+            self.close_dialog_admin(self.dlg_readsql_create_project)
             if not is_test:
                 self.populate_data_schema_name(self.cmb_project_type)
                 if schema_name is not None:
@@ -1700,7 +1702,7 @@ class GwAdmin:
             self.event_change_connection()
             qt_tools.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name, str(self.schema))
             if close_dlg_rename:
-                self.close_dialog(self.dlg_readsql_rename)
+                self.close_dialog_admin(self.dlg_readsql_rename)
         else:
             self.controller.dao.rollback()
 
@@ -1750,7 +1752,7 @@ class GwAdmin:
         self.manage_result_message(status, parameter="Update project")
         if status:
             self.controller.dao.commit()
-            self.close_dialog(self.dlg_readsql_show_info)
+            self.close_dialog_admin(self.dlg_readsql_show_info)
         else:
             self.controller.dao.rollback()
 
@@ -1848,7 +1850,7 @@ class GwAdmin:
             credentials['db'], credentials['user'], credentials['password'], credentials['sslmode'])
 
         if not self.logged:
-            self.close_dialog(self.dlg_readsql)
+            self.close_dialog_admin(self.dlg_readsql)
             self.create_credentials_form(set_connection=connection_name)
         else:
             if str(self.plugin_version) > str(self.project_version):
@@ -1954,7 +1956,7 @@ class GwAdmin:
         return
         # Create the dialog and signals
         self.dlg_manage_visit_param = MainVisitParam()
-        self.load_settings(self.dlg_manage_visit_param)
+        load_settings(self.dlg_manage_visit_param)
 
         # Manage widgets
         sql = "SELECT id, id as idval FROM om_visit_parameter_type"
@@ -2006,7 +2008,7 @@ class GwAdmin:
             self.dlg_readsql_show_info.btn_update.setEnabled(False)
 
         # Set listeners
-        self.dlg_readsql_show_info.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_readsql_show_info))
+        self.dlg_readsql_show_info.btn_close.clicked.connect(partial(self.close_dialog_admin, self.dlg_readsql_show_info))
         self.dlg_readsql_show_info.btn_update.clicked.connect(partial(self.update, self.project_type_selected))
 
         # Open dialog
@@ -2035,19 +2037,9 @@ class GwAdmin:
         return True
 
 
-    def close_dialog(self, dlg):
+    def close_dialog_admin(self, dlg):
         """ Close dialog """
-
-        try:
-            save_settings(dlg)
-            dlg.close()
-            map_tool = self.canvas.mapTool()
-            # If selected map tool is from the plugin, set 'Pan' as current one
-            if map_tool.toolName() == '':
-                self.iface.actionPan().trigger()
-        except AttributeError:
-            pass
-
+        close_dialog(dlg)
         self.schema = None
 
 
@@ -2297,7 +2289,7 @@ class GwAdmin:
 
         self.dlg_readsql_create_project.btn_accept.clicked.connect(partial(self.create_project_data_schema))
         self.dlg_readsql_create_project.btn_close.clicked.connect(
-            partial(self.close_dialog, self.dlg_readsql_create_project))
+            partial(self.close_dialog_admin, self.dlg_readsql_create_project))
         self.dlg_readsql_create_project.btn_push_file.clicked.connect(partial(self.select_file_inp))
         self.cmb_create_project_type.currentIndexChanged.connect(
             partial(self.change_project_type, self.cmb_create_project_type))
@@ -2341,7 +2333,7 @@ class GwAdmin:
 
         # Set listeners
         self.dlg_readsql_rename.btn_accept.clicked.connect(partial(self.rename_project_data_schema, schema))
-        self.dlg_readsql_rename.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_readsql_rename))
+        self.dlg_readsql_rename.btn_cancel.clicked.connect(partial(self.close_dialog_admin, self.dlg_readsql_rename))
 
         # Open dialog
         self.dlg_readsql_rename.setWindowTitle(f'Rename project - {schema}')
@@ -2454,7 +2446,7 @@ class GwAdmin:
 
         # Set listeners
         self.dlg_readsql_copy.btn_accept.clicked.connect(partial(self.copy_project_data_schema, schema))
-        self.dlg_readsql_copy.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_readsql_copy))
+        self.dlg_readsql_copy.btn_cancel.clicked.connect(partial(self.close_dialog_admin, self.dlg_readsql_copy))
 
         # Open dialog
         self.dlg_readsql_copy.setWindowTitle('Copy project - ' + schema)
@@ -2494,7 +2486,7 @@ class GwAdmin:
             self.controller.dao.commit()
             self.event_change_connection()
             qt_tools.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name, str(new_schema_name))
-            self.close_dialog(self.dlg_readsql_copy)
+            self.close_dialog_admin(self.dlg_readsql_copy)
         else:
             self.controller.dao.rollback()
 
@@ -2579,8 +2571,8 @@ class GwAdmin:
             self.error_count = 0
 
         # Close dialog
-        self.close_dialog(self.dlg_import_inp)
-        self.close_dialog(self.dlg_readsql_create_project)
+        self.close_dialog_admin(self.dlg_import_inp)
+        self.close_dialog_admin(self.dlg_readsql_create_project)
 
 
     def create_qgis_template(self):
@@ -2843,8 +2835,8 @@ class GwAdmin:
         self.manage_update_field(self.dlg_manage_sys_fields, form_name_fields, tableview='ve_config_sysfields')
 
         # Set listeners
-        self.dlg_manage_sys_fields.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_manage_sys_fields))
-        self.dlg_manage_sys_fields.btn_accept.clicked.connect(partial(self.close_dialog, self.dlg_manage_sys_fields))
+        self.dlg_manage_sys_fields.btn_cancel.clicked.connect(partial(self.close_dialog_admin, self.dlg_manage_sys_fields))
+        self.dlg_manage_sys_fields.btn_accept.clicked.connect(partial(self.close_dialog_admin, self.dlg_manage_sys_fields))
         self.dlg_manage_sys_fields.tbl_update.doubleClicked.connect(
             partial(self.update_selected_sys_fild, self.dlg_manage_sys_fields.tbl_update))
         self.dlg_manage_sys_fields.btn_open.clicked.connect(
@@ -2887,7 +2879,7 @@ class GwAdmin:
         # Set listeners
         self.dlg_manage_fields.btn_accept.clicked.connect(
             partial(self.manage_accept, action, form_name_fields, self.model_update_table))
-        self.dlg_manage_fields.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_manage_fields))
+        self.dlg_manage_fields.btn_cancel.clicked.connect(partial(self.close_dialog_admin, self.dlg_manage_fields))
         self.dlg_manage_fields.tbl_update.doubleClicked.connect(
             partial(self.update_selected_addfild, self.dlg_manage_fields.tbl_update))
         self.dlg_manage_fields.btn_open.clicked.connect(
@@ -2908,7 +2900,7 @@ class GwAdmin:
             return
 
         # Create the dialog and signals
-        self.close_dialog(self.dlg_manage_sys_fields)
+        self.close_dialog_admin(self.dlg_manage_sys_fields)
         self.dlg_manage_sys_fields = MainSysFields()
         load_settings(self.dlg_manage_sys_fields)
         self.model_update_table = None
@@ -2958,7 +2950,7 @@ class GwAdmin:
             return
 
         # Create the dialog and signals
-        self.close_dialog(self.dlg_manage_fields)
+        self.close_dialog_admin(self.dlg_manage_fields)
         self.dlg_manage_fields = MainFields()
         load_settings(self.dlg_manage_fields)
         self.model_update_table = None
@@ -3091,7 +3083,7 @@ class GwAdmin:
 
     def manage_close_dlg(self, dlg_to_close):
 
-        self.close_dialog(dlg_to_close)
+        self.close_dialog_admin(dlg_to_close)
         if dlg_to_close.objectName() == 'dlg_man_sys_fields':
             self.update_sys_fields()
         elif dlg_to_close.objectName() == 'dlg_man_addfields':
@@ -3131,7 +3123,7 @@ class GwAdmin:
         self.controller.execute_sql(sql)
 
         # Close dialog
-        self.close_dialog(self.dlg_manage_sys_fields)
+        self.close_dialog_admin(self.dlg_manage_sys_fields)
         self.update_sys_fields()
 
 
@@ -3261,7 +3253,7 @@ class GwAdmin:
             self.manage_json_message(json_result, parameter="Delete function")
 
         # Close dialog
-        self.close_dialog(self.dlg_manage_fields)
+        self.close_dialog_admin(self.dlg_manage_fields)
 
         if action == 'update':
             self.open_manage_field('update')

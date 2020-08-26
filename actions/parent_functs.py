@@ -29,7 +29,10 @@ from functools import partial
 
 from .. import global_vars
 from lib import qt_tools
+
+from ..core.utils.giswater_tools import close_dialog, load_settings, open_dialog, save_settings
 from ..core.utils.layer_tools import populate_vlayer, categoryze_layer, create_qml, from_postgres_to_toc
+
 from ..lib.qgis_tools import snap_to_layer, set_snapping_mode, get_snapping_options
 
 from ..ui_manager import DialogTextUi, GwDialog, GwMainWindow
@@ -110,39 +113,6 @@ def get_folder_dialog(dialog, widget):
         qt_tools.setWidgetText(dialog, widget, str(folder_path))
 
 
-def load_settings(dialog):
-    """ Load QGIS settings related with dialog position and size """
-    
-    try:
-        x = global_vars.controller.plugin_settings_value(dialog.objectName() + "_x")
-        y = global_vars.controller.plugin_settings_value(dialog.objectName() + "_y")
-        width = global_vars.controller.plugin_settings_value(dialog.objectName() + "_width", dialog.property('width'))
-        height = global_vars.controller.plugin_settings_value(dialog.objectName() + "_height", dialog.property('height'))
-        
-        if int(x) < 0 or int(y) < 0:
-            dialog.resize(int(width), int(height))
-        else:
-            screens = ctypes.windll.user32
-            screen_x = screens.GetSystemMetrics(78)
-            screen_y = screens.GetSystemMetrics(79)
-            if int(x) > screen_x:
-                x = int(screen_x) - int(width)
-            if int(y) > screen_y:
-                y = int(screen_y)
-            dialog.setGeometry(int(x), int(y), int(width), int(height))
-    except:
-        pass
-
-
-def save_settings(dialog):
-    """ Save QGIS settings related with dialog position and size """
-    
-    global_vars.controller.plugin_settings_set_value(dialog.objectName() + "_width", dialog.property('width'))
-    global_vars.controller.plugin_settings_set_value(dialog.objectName() + "_height", dialog.property('height'))
-    global_vars.controller.plugin_settings_set_value(dialog.objectName() + "_x", dialog.pos().x() + 8)
-    global_vars.controller.plugin_settings_set_value(dialog.objectName() + "_y", dialog.pos().y() + 31)
-
-
 def get_last_tab(dialog, selector_name):
     """ Get the name of the last tab used by the user from QSettings()
     :param dialog: QDialog
@@ -167,60 +137,6 @@ def save_current_tab(dialog, tab_widget, selector_name):
         tab_name = tab.objectName()
         dlg_name = dialog.objectName()
         global_vars.controller.plugin_settings_set_value(f"{dlg_name}_{selector_name}", tab_name)
-
-
-def open_dialog(dlg, dlg_name=None, info=True, maximize_button=True, stay_on_top=True, title=None):
-    """ Open dialog """
-    
-    # Check database connection before opening dialog
-    if not global_vars.controller.check_db_connection():
-        return
-    
-    # Set window title
-    if title is not None:
-        dlg.setWindowTitle(title)
-    else:
-        if dlg_name:
-            global_vars.controller.manage_translation(dlg_name, dlg)
-    
-    # Manage stay on top, maximize/minimize button and information button
-    # if info is True maximize flag will be ignored
-    # To enable maximize button you must set info to False
-    flags = Qt.WindowCloseButtonHint
-    if info:
-        flags |= Qt.WindowSystemMenuHint | Qt.WindowContextHelpButtonHint
-    else:
-        if maximize_button:
-            flags |= Qt.WindowMinMaxButtonsHint
-    
-    if stay_on_top:
-        flags |= Qt.WindowStaysOnTopHint
-    
-    dlg.setWindowFlags(flags)
-    
-    # Open dialog
-    if issubclass(type(dlg), GwDialog):
-        dlg.open()
-    elif issubclass(type(dlg), GwMainWindow):
-        dlg.show()
-    else:
-        dlg.show()
-
-
-def close_dialog(dlg):
-    """ Close dialog """
-    
-    try:
-        save_settings(dlg)
-        dlg.close()
-        map_tool = global_vars.canvas.mapTool()
-        # If selected map tool is from the plugin, set 'Pan' as current one
-        if map_tool.toolName() == '':
-            global_vars.iface.actionPan().trigger()
-    except AttributeError:
-        pass
-    except Exception as e:
-        global_vars.controller.log_info(type(e).__name__)
 
 
 def multi_row_selector(dialog, tableleft, tableright, field_id_left, field_id_right, name='name',

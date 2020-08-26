@@ -37,7 +37,7 @@ class GwAuxCircleButton(GwParentMapTool):
 
         # Create the dialog and signals
         self.dlg_create_circle = AuxCircle()
-        load_settings(self.dlg_create_circle, self.controller)
+        load_settings(self.dlg_create_circle)
         self.cancel_circle = False
         validator = QDoubleValidator(0.00, 999.00, 3)
         validator.setNotation(QDoubleValidator().StandardNotation)
@@ -59,7 +59,7 @@ class GwAuxCircleButton(GwParentMapTool):
 
         if self.layer_circle:
             self.layer_circle.startEditing()
-            close_dialog(self.dlg_create_circle, self.controller)
+            close_dialog(self.dlg_create_circle)
             if self.delete_prev:
                 selection = self.layer_circle.getFeatures()
                 self.layer_circle.selectByIds([f.id() for f in selection])
@@ -88,7 +88,7 @@ class GwAuxCircleButton(GwParentMapTool):
 
     def cancel(self):
 
-        close_dialog(self.dlg_create_circle, self.controller)
+        close_dialog(self.dlg_create_circle)
         self.cancel_map_tool()
         if self.layer_circle:
             if self.layer_circle.isEditable():

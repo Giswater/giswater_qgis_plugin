@@ -15,11 +15,12 @@ from lib import qt_tools
 from .psector import GwPsector
 from ....ui_manager import PsectorManagerUi, PriceManagerUi
 from .psector_duplicate import GwPsectorDuplicate
+from ...utils.giswater_tools import close_dialog, load_settings, open_dialog, save_settings
 
 from .... import global_vars
 
-from ....actions.parent_functs import load_settings, close_dialog, fill_table, set_table_columns, \
-    set_label_current_psector, open_dialog, show_exceptions_msg
+from ....actions.parent_functs import fill_table, set_table_columns, \
+    set_label_current_psector,  show_exceptions_msg
 
 
 class GwPlan:
