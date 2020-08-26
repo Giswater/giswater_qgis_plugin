@@ -18,11 +18,12 @@ from collections import OrderedDict
 from functools import partial
 
 from lib import qt_tools
-from ...utils.giswater_tools import close_dialog, load_settings, open_dialog, save_settings
+from ...utils.giswater_tools import close_dialog, get_last_tab, load_settings, open_dialog, save_current_tab,\
+    save_settings
 from .... import global_vars
 from ....ui_manager import SelectorUi, MincutManagerUi
 from ....actions.api_parent_functs import get_selector
-from ....actions.parent_functs import set_dates_from_to, set_icon, set_table_columns, get_last_tab, save_current_tab
+from ....actions.parent_functs import set_dates_from_to, set_icon, set_table_columns
 
 
 class GwMincutManager:

@@ -16,15 +16,53 @@ from ...lib import qt_tools
 from ...ui_manager import GwDialog, GwMainWindow
 
 
+def get_parser_save(section):
+	""" Take the parser that we will use to save"""
+	try:
+		parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
+		main_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
+		config_folder = main_folder + os.sep + "config" + os.sep
+		if not os.path.exists(config_folder):
+			os.makedirs(config_folder)
+		path = config_folder + 'user.config'
+		parser.read(path)
+
+		# Check if section dialogs_position exists in file
+		if section not in parser:
+			parser.add_section(section)
+		return parser, path
+	except Exception as e:
+		return None, None
+
+
+def set_parser_save(parser, path):
+	""" Save the parser"""
+	try:
+		with open(path, 'w') as configfile:
+			parser.write(configfile)
+			configfile.close()
+	except Exception as e:
+		return None, None
+
+
+def get_parser_load():
+	""" Load the parser from where we will get the values """
+	try:
+		parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
+		main_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
+		path = main_folder + os.sep + "config" + os.sep + 'user.config'
+		if not os.path.exists(path):
+			return None, None
+		parser.read(path)
+		return parser
+	except Exception as e:
+		return None
+
+
 def load_settings(dialog):
 	""" Load user UI settings related with dialog position and size """
 	# Get user UI config file
-	parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
-	main_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
-	path = main_folder + os.sep + "config" + os.sep + 'user.config'
-	if not os.path.exists(path):
-		return
-	parser.read(path)
+	parser = get_parser_load()
 	try:
 		x = parser['dialogs_position'][f"{dialog.objectName()}_x"]
 		y = parser['dialogs_position'][f"{dialog.objectName()}_y"]
@@ -51,42 +89,50 @@ def load_settings(dialog):
 def save_settings(dialog):
 	""" Save user UI related with dialog position and size """
 	try:
-		parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
-		main_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
-		config_folder = main_folder + os.sep + "config" + os.sep
-		if not os.path.exists(config_folder):
-			os.makedirs(config_folder)
-		path = config_folder + 'user.config'
-		parser.read(path)
-		# Check if section dialogs_position exists in file
-		if 'dialogs_position' not in parser:
-			parser.add_section('dialogs_position')
+		parser, path = get_parser_save('dialogs_position')
+
 
 		parser['dialogs_position'][dialog.objectName() + "_width"] = f"{dialog.property('width')}"
 		parser['dialogs_position'][dialog.objectName() + "_height"] = f"{dialog.property('height')}"
 		parser['dialogs_position'][dialog.objectName() + "_x"] = f"{dialog.pos().x() + 8}"
 		parser['dialogs_position'][dialog.objectName() + "_y"] = f"{dialog.pos().y() + 31}"
-
-		with open(path, 'w') as configfile:
-			parser.write(configfile)
-			configfile.close()
+		set_parser_save(parser, path)
 	except Exception as e:
 		pass
 
 
-def save_current_tab(dialog, tab_widget, selector_name, controller):
+def get_last_tab(dialog, selector_name):
+	""" Get the name of the last tab used by the user from QSettings()
+	:param dialog: QDialog
+	:param selector_name: Name of the selector (String)
+	:return: Name of the last tab used by the user (string)
+	"""
+
+	parser = get_parser_load()
+	try:
+		tab_name = parser['last_tabs'][f"{dialog.objectName()}_{selector_name}"]
+		return tab_name
+	except Exception:
+		pass
+
+
+def save_current_tab(dialog, tab_widget, selector_name):
 	""" Save the name of current tab used by the user into QSettings()
 	:param dialog: QDialog
 	:param tab_widget:  QTabWidget
 	:param selector_name: Name of the selector (String)
 	"""
-	
-	index = tab_widget.currentIndex()
-	tab = tab_widget.widget(index)
-	if tab:
-		tab_name = tab.objectName()
-		dlg_name = dialog.objectName()
-		controller.plugin_settings_set_value(f"{dlg_name}_{selector_name}", tab_name)
+	try:
+		index = tab_widget.currentIndex()
+		tab = tab_widget.widget(index)
+		if tab:
+			tab_name = tab.objectName()
+			dlg_name = dialog.objectName()
+			parser, path = get_parser_save('last_tabs')
+			parser['last_tabs'][f"{dlg_name}_{selector_name}"] = f"{tab_name}"
+			set_parser_save(parser, path)
+	except Exception as e:
+		pass
 
 
 def open_dialog(dlg, dlg_name=None, info=True, maximize_button=True, stay_on_top=True, title=None):
@@ -95,8 +141,7 @@ def open_dialog(dlg, dlg_name=None, info=True, maximize_button=True, stay_on_top
 	# Check database connection before opening dialog
 	if not global_vars.controller.check_db_connection():
 		return
-	
-	
+
 	# Set window title
 	if title is not None:
 		dlg.setWindowTitle(title)
@@ -247,15 +292,7 @@ def get_cursor_multiple_selection():
 
 # Doesn't work because of hasattr and getattr
 '''
-def get_last_tab(dialog, selector_name, controller):
-	""" Get the name of the last tab used by the user from QSettings()
-	:param dialog: QDialog
-	:param selector_name: Name of the selector (String)
-	:return: Name of the last tab used by the user (string)
-	"""
-	
-	tab_name = controller.plugin_settings_value(f"{dialog.objectName()}_{selector_name}")
-	return tab_name
+
 
 
 def set_selector(dialog, widget, is_alone, controller):

@@ -113,32 +113,6 @@ def get_folder_dialog(dialog, widget):
         qt_tools.setWidgetText(dialog, widget, str(folder_path))
 
 
-def get_last_tab(dialog, selector_name):
-    """ Get the name of the last tab used by the user from QSettings()
-    :param dialog: QDialog
-    :param selector_name: Name of the selector (String)
-    :return: Name of the last tab used by the user (string)
-    """
-    
-    tab_name = global_vars.controller.plugin_settings_value(f"{dialog.objectName()}_{selector_name}")
-    return tab_name
-
-
-def save_current_tab(dialog, tab_widget, selector_name):
-    """ Save the name of current tab used by the user into QSettings()
-    :param dialog: QDialog
-    :param tab_widget:  QTabWidget
-    :param selector_name: Name of the selector (String)
-    """
-    
-    index = tab_widget.currentIndex()
-    tab = tab_widget.widget(index)
-    if tab:
-        tab_name = tab.objectName()
-        dlg_name = dialog.objectName()
-        global_vars.controller.plugin_settings_set_value(f"{dlg_name}_{selector_name}", tab_name)
-
-
 def multi_row_selector(dialog, tableleft, tableright, field_id_left, field_id_right, name='name',
                        hide_left=[0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
                                   23, 24, 25, 26, 27, 28, 29, 30], hide_right=[1, 2, 3], aql=""):
