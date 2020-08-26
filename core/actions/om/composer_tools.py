@@ -10,9 +10,9 @@ from qgis.gui import QgsRubberBand
 from qgis.PyQt.QtGui import QRegExpValidator
 from qgis.PyQt.QtCore import QRegExp
 from qgis.PyQt.QtPrintSupport import QPrinter, QPrintDialog
-from qgis.PyQt.QtWidgets import QLineEdit, QDialog
+from qgis.PyQt.QtWidgets import QDialog, QLabel, QLineEdit
 
-import json
+import json, sys
 from functools import partial
 
 from lib import qt_tools
@@ -22,7 +22,8 @@ from .... import global_vars
 
 from ....actions.parent_functs import hide_void_groupbox, get_composers_list
 from ....actions.api_parent_functs import load_settings, create_body, close_dialog, save_settings, open_dialog, \
-    set_widgets_into_composer, put_widgets, get_values, draw_rectangle
+     put_widgets, get_values, draw_rectangle, set_setStyleSheet, add_lineedit, \
+    set_widget_size, set_data_type, add_combobox
 
 
 class GwComposerTools:
@@ -203,9 +204,42 @@ class GwComposerTools:
     def create_dialog(self, dialog, fields):
 
         for field in fields['fields']:
-            label, widget = set_widgets_into_composer(dialog, field, self.my_json)
+            label, widget = self.set_widgets_into_composer(dialog, field, self.my_json)
             put_widgets(dialog, field, label, widget)
             get_values(dialog, widget, self.my_json)
+
+
+    def set_widgets_into_composer(self, dialog, field, my_json=None):
+
+        widget = None
+        label = None
+        if field['label']:
+            label = QLabel()
+            label.setObjectName('lbl_' + field['widgetname'])
+            label.setText(field['label'].capitalize())
+            if field['stylesheet'] is not None and 'label' in field['stylesheet']:
+                label = set_setStyleSheet(field, label)
+            if 'tooltip' in field:
+                label.setToolTip(field['tooltip'])
+            else:
+                label.setToolTip(field['label'].capitalize())
+        if field['widgettype'] == 'text' or field['widgettype'] == 'typeahead':
+            widget = add_lineedit(field)
+            widget = set_widget_size(widget, field)
+            widget = set_data_type(field, widget)
+            widget.editingFinished.connect(partial(get_values, dialog, widget, my_json))
+            widget.returnPressed.connect(partial(get_values, dialog, widget, my_json))
+        elif field['widgettype'] == 'combo':
+            widget = add_combobox(field)
+            widget = set_widget_size(widget, field)
+            widget.currentIndexChanged.connect(partial(get_values, dialog, widget, my_json))
+            if 'widgetfunction' in field:
+                if field['widgetfunction'] is not None:
+                    function_name = field['widgetfunction']
+                    # Call def set_print(self, dialog, my_json): of the class ApiManageComposer
+                    widget.currentIndexChanged.connect(partial(getattr(self, function_name), dialog, my_json))
+
+        return label, widget
 
 
     def get_current_composer(self):

@@ -1044,39 +1044,6 @@ def get_values_changed_param_user(dialog, chk, widget, field, list, value=None):
     global_vars.controller.log_info(str(list))
 
 
-def set_widgets_into_composer(dialog, field, my_json=None):
-
-    widget = None
-    label = None
-    if field['label']:
-        label = QLabel()
-        label.setObjectName('lbl_' + field['widgetname'])
-        label.setText(field['label'].capitalize())
-        if field['stylesheet'] is not None and 'label' in field['stylesheet']:
-            label = set_setStyleSheet(field, label)
-        if 'tooltip' in field:
-            label.setToolTip(field['tooltip'])
-        else:
-            label.setToolTip(field['label'].capitalize())
-    if field['widgettype'] == 'text' or field['widgettype'] == 'typeahead':
-        widget = add_lineedit(field)
-        widget = set_widget_size(widget, field)
-        widget = set_data_type(field, widget)
-        widget.editingFinished.connect(partial(get_values, dialog, widget, my_json))
-        widget.returnPressed.connect(partial(get_values, dialog, widget, my_json))
-    elif field['widgettype'] == 'combo':
-        widget = add_combobox(field)
-        widget = set_widget_size(widget, field)
-        widget.currentIndexChanged.connect(partial(get_values, dialog, widget, my_json))
-        if 'widgetfunction' in field:
-            if field['widgetfunction'] is not None:
-                function_name = field['widgetfunction']
-                # Call def gw_fct_setprint(self, dialog, my_json): of the class ApiManageComposer
-                widget.currentIndexChanged.connect(partial(getattr(sys.modules[__name__], function_name), dialog, my_json))
-
-    return label, widget
-
-
 def get_values(dialog, widget, _json=None, layer=None):
 
     value = None
@@ -1089,7 +1056,7 @@ def get_values(dialog, widget, _json=None, layer=None):
     elif type(widget) is QgsDateTimeEdit and widget.isEnabled():
         value = qt_tools.getCalendarDate(dialog, widget)
     # Only get values if layer is editable or if layer not exist(need for ApiManageComposer)
-    if layer is not None or layer.isEditable():
+    if layer is None or layer.isEditable():
         # If widget.isEditable(False) return None, here control it.
         if str(value) == '' or value is None:
             _json[str(widget.property('columnname'))] = None
