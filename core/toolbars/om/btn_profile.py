@@ -79,7 +79,7 @@ class GwProfileButton(GwParentMapTool):
 
         # Set dialog
         self.dlg_draw_profile = Profile()
-        load_settings(self.dlg_draw_profile, self.controller)
+        load_settings(self.dlg_draw_profile)
         self.dlg_draw_profile.setWindowFlags(Qt.WindowStaysOnTopHint)
 
         # Declare composer path widget
@@ -102,7 +102,7 @@ class GwProfileButton(GwParentMapTool):
         self.dlg_draw_profile.btn_save_profile.clicked.connect(self.save_profile)
         self.dlg_draw_profile.btn_load_profile.clicked.connect(self.open_profile)
         self.dlg_draw_profile.btn_clear_profile.clicked.connect(self.clear_profile)
-        self.dlg_draw_profile.dlg_closed.connect(partial(save_settings, self.dlg_draw_profile, self.controller))
+        self.dlg_draw_profile.dlg_closed.connect(partial(save_settings, self.dlg_draw_profile))
         self.dlg_draw_profile.dlg_closed.connect(partial(self.remove_selection, actionpan=True))
 
         # Set calendar date as today
@@ -215,7 +215,7 @@ class GwProfileButton(GwParentMapTool):
         """ Open dialog profile_list.ui """
 
         self.dlg_load = ProfilesList()
-        load_settings(self.dlg_load, self.controller)
+        load_settings(self.dlg_load)
 
         # Get profils on database
         body = create_body()
@@ -225,7 +225,7 @@ class GwProfileButton(GwParentMapTool):
         message = f"{result_profile['message']}"
         self.controller.show_info(message)
 
-        self.dlg_load.rejected.connect(partial(close_dialog, self.dlg_load.rejected, self.controller))
+        self.dlg_load.rejected.connect(partial(close_dialog, self.dlg_load.rejected))
         self.dlg_load.btn_open.clicked.connect(partial(self.load_profile, result_profile))
         self.dlg_load.btn_delete_profile.clicked.connect(partial(self.delete_profile))
 
@@ -247,7 +247,7 @@ class GwProfileButton(GwParentMapTool):
             self.controller.show_warning(message)
             return
 
-        close_dialog(self.dlg_load, self.controller)
+        close_dialog(self.dlg_load)
 
         profile_id = self.dlg_load.tbl_profiles.currentItem().text()
 

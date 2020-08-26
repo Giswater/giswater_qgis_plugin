@@ -5,6 +5,7 @@ from qgis.PyQt.QtGui import QCursor, QPixmap
 from qgis.core import QgsProject, QgsExpression
 
 import configparser
+from ... import global_vars
 import os
 from functools import partial
 import sys
@@ -15,12 +16,11 @@ from ...lib import qt_tools
 from ...ui_manager import GwDialog, GwMainWindow
 
 
-def load_settings(dialog, controller):
+def load_settings(dialog):
 	""" Load user UI settings related with dialog position and size """
-
 	# Get user UI config file
 	parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
-	main_folder = os.path.join(os.path.expanduser("~"), controller.plugin_name)
+	main_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
 	path = main_folder + os.sep + "config" + os.sep + 'user.config'
 	if not os.path.exists(path):
 		return
@@ -48,11 +48,11 @@ def load_settings(dialog, controller):
 		pass
 
 
-def save_settings(dialog, controller):
+def save_settings(dialog):
 	""" Save user UI related with dialog position and size """
 	try:
 		parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
-		main_folder = os.path.join(os.path.expanduser("~"), controller.plugin_name)
+		main_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
 		config_folder = main_folder + os.sep + "config" + os.sep
 		if not os.path.exists(config_folder):
 			os.makedirs(config_folder)
@@ -71,16 +71,6 @@ def save_settings(dialog, controller):
 			parser.write(configfile)
 			configfile.close()
 	except Exception as e:
-		pass
-
-
-def close_dialog(dlg, controller):
-	""" Close dialog """
-	
-	try:
-		save_settings(dlg, controller)
-		dlg.close()
-	except Exception:
 		pass
 
 
@@ -136,6 +126,22 @@ def open_dialog(dlg, controller, dlg_name=None, info=True, maximize_button=True,
 		dlg.show()
 	else:
 		dlg.show()
+
+
+def close_dialog(dlg):
+	""" Close dialog """
+
+	try:
+		save_settings(dlg)
+		dlg.close()
+		map_tool = global_vars.canvas.mapTool()
+		# If selected map tool is from the plugin, set 'Pan' as current one
+		if map_tool.toolName() == '':
+			global_vars.iface.actionPan().trigger()
+	except AttributeError:
+		pass
+
+	global_vars.schema = None
 
 
 def create_body(form='', feature='', filter_fields='', extras=None):

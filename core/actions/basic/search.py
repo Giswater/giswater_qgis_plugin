@@ -27,12 +27,13 @@ from ..edit.document import GwDocument
 from ..plan.psector import GwPsector
 from ..om.visit_manager import GwVisitManager
 from ....ui_manager import SearchUi, InfoGenericUi, SearchWorkcat
+from ...utils.giswater_tools import load_settings, open_dialog, save_settings, close_dialog
 
 from ....actions.parent_functs import zoom_to_rectangle, get_max_rectangle_from_coords, set_icon, \
     make_list_for_completer, set_completer_lineedit, document_insert, document_delete, document_open, \
     set_table_columns, refresh_map_canvas
-from ....actions.api_parent_functs import load_settings, create_body, add_lineedit, draw, draw_point, \
-    get_points, draw_polygon, set_completer_object_api, close_dialog, populate_basic_info, open_dialog, \
+from ....actions.api_parent_functs import create_body, add_lineedit, draw, draw_point, \
+    get_points, draw_polygon, set_completer_object_api, populate_basic_info,  \
     set_completer_object, draw_polyline
 
 
@@ -61,6 +62,7 @@ class GwSearch:
         """ Initialize dialog. Make it dockable in left dock widget area """
 
         self.dlg_search = SearchUi()
+        load_settings(self.dlg_search)
         self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dlg_search)
         self.dlg_search.dlg_closed.connect(self.reset_rubber_band)
         self.dlg_search.dlg_closed.connect(self.close_search)
