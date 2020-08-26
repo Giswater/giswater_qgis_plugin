@@ -239,7 +239,7 @@ class GwSearch:
             x1 = item['sys_x']
             y1 = item['sys_y']
             point = QgsPointXY(float(x1), float(y1))
-            draw_point(point)
+            draw_point(point, self.rubber_band)
             zoom_to_rectangle(x1, y1, x1, y1, margin=100)
             self.open_hydrometer_dialog(table_name=item['sys_table_id'], feature_id=item['sys_id'])
 
