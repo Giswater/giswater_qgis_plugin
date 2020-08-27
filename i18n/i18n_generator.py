@@ -17,7 +17,7 @@ from ..ui_manager import MainQtDialogUi
 
 from .. import global_vars
 from ..actions.parent_functs import get_plugin_version
-from ..core.utils.giswater_tools import close_dialog, load_settings, open_dialog, save_settings
+from ..core.utils.giswater_tools import close_dialog, get_parser_value, load_settings, open_dialog, save_settings, set_parser_value
 
 
 class GwI18NGenerator:
@@ -53,6 +53,7 @@ class GwI18NGenerator:
         user = qt_tools.getWidgetText(self.dlg_qm, self.dlg_qm.txt_user)
         password = qt_tools.getWidgetText(self.dlg_qm, self.dlg_qm.txt_pass)
         status = self.init_db(host, port, db, user, password)
+
         if not status:
             self.dlg_qm.btn_translate.setEnabled(False)
             qt_tools.setWidgetText(self.dlg_qm, 'lbl_info', self.last_error)
@@ -386,6 +387,7 @@ class GwI18NGenerator:
 
     def save_user_values(self):
         """ Save selected user values """
+
         host = qt_tools.getWidgetText(self.dlg_qm, self.dlg_qm.txt_host, return_string_null=False)
         port = qt_tools.getWidgetText(self.dlg_qm, self.dlg_qm.txt_port, return_string_null=False)
         db = qt_tools.getWidgetText(self.dlg_qm, self.dlg_qm.txt_db, return_string_null=False)
@@ -393,27 +395,26 @@ class GwI18NGenerator:
         language = qt_tools.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 0)
         py_msg = qt_tools.isChecked(self.dlg_qm, self.dlg_qm.chk_py_msg)
         db_msg = qt_tools.isChecked(self.dlg_qm, self.dlg_qm.chk_db_msg)
-        cur_user = self.controller.get_current_user()
-        self.controller.plugin_settings_set_value('qm_lang_host' + cur_user, host)
-        self.controller.plugin_settings_set_value('qm_lang_port' + cur_user, port)
-        self.controller.plugin_settings_set_value('qm_lang_db' + cur_user, db)
-        self.controller.plugin_settings_set_value('qm_lang_user' + cur_user, user)
-        self.controller.plugin_settings_set_value('qm_lang_language' + cur_user, language)
-        self.controller.plugin_settings_set_value('qm_lang_py_msg' + cur_user, py_msg)
-        self.controller.plugin_settings_set_value('qm_lang_db_msg' + cur_user, db_msg)
+        set_parser_value('i18n_generator', 'qm_lang_host', f"{host}")
+        set_parser_value('i18n_generator', 'qm_lang_port', f"{port}")
+        set_parser_value('i18n_generator', 'qm_lang_db', f"{db}")
+        set_parser_value('i18n_generator', 'qm_lang_user', f"{user}")
+        set_parser_value('i18n_generator', 'qm_lang_language', f"{language}")
+        set_parser_value('i18n_generator', 'qm_lang_py_msg', f"{py_msg}")
+        set_parser_value('i18n_generator', 'qm_lang_db_msg', f"{db_msg}")
 
 
     def load_user_values(self):
         """ Load last selected user values
         :return: Dictionary with values
         """
-        cur_user = self.controller.get_current_user()
-        host = self.controller.plugin_settings_value('qm_lang_host' + cur_user)
-        port = self.controller.plugin_settings_value('qm_lang_port' + cur_user)
-        db = self.controller.plugin_settings_value('qm_lang_db' + cur_user)
-        user = self.controller.plugin_settings_value('qm_lang_user' + cur_user)
-        py_msg = self.controller.plugin_settings_value('qm_lang_py_msg' + cur_user)
-        db_msg = self.controller.plugin_settings_value('qm_lang_db_msg' + cur_user)
+
+        host = get_parser_value('i18n_generator', 'qm_lang_host')
+        port = get_parser_value('i18n_generator', 'qm_lang_port')
+        db = get_parser_value('i18n_generator', 'qm_lang_db')
+        user = get_parser_value('i18n_generator', 'qm_lang_user')
+        py_msg = get_parser_value('i18n_generator', 'qm_lang_py_msg')
+        db_msg = get_parser_value('i18n_generator', 'qm_lang_db_msg')
         qt_tools.setWidgetText(self.dlg_qm, 'txt_host', host)
         qt_tools.setWidgetText(self.dlg_qm, 'txt_port', port)
         qt_tools.setWidgetText(self.dlg_qm, 'txt_db', db)

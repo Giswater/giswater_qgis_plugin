@@ -27,7 +27,7 @@ from ..edit.document import GwDocument
 from ..plan.psector import GwPsector
 from ..om.visit_manager import GwVisitManager
 from ....ui_manager import SearchUi, InfoGenericUi, SearchWorkcat
-from ...utils.giswater_tools import load_settings, open_dialog, save_settings, close_dialog
+from ...utils.giswater_tools import get_parser_save, get_parser_value, load_settings, open_dialog, set_parser_save, save_settings, set_parser_value, close_dialog
 
 from ....actions.parent_functs import zoom_to_rectangle, get_max_rectangle_from_coords, set_icon, \
     make_list_for_completer, set_completer_lineedit, document_insert, document_delete, document_open, \
@@ -486,7 +486,7 @@ class GwSearch:
         self.items_dialog.btn_state1.setEnabled(False)
         self.items_dialog.btn_state0.setEnabled(False)
 
-        search_csv_path = self.controller.plugin_settings_value('search_csv_path')
+        search_csv_path = get_parser_value('paths', 'search_csv_path')
         qt_tools.setWidgetText(self.items_dialog, self.items_dialog.txt_path, search_csv_path)
         qt_tools.setWidgetText(self.items_dialog, self.items_dialog.lbl_init, f"Filter by: {field_id}")
         qt_tools.setWidgetText(self.items_dialog, self.items_dialog.lbl_end, f"Filter by: {field_id}")
@@ -716,7 +716,7 @@ class GwSearch:
         with open(folder_path, "w") as output:
             writer = csv.writer(output, lineterminator='\n')
             writer.writerows(all_rows)
-        self.controller.plugin_settings_set_value("search_csv_path", qt_tools.getWidgetText(dialog, 'txt_path'))
+        set_parser_value('paths', 'search_csv_path', f"{qt_tools.getWidgetText(dialog, 'txt_path')}")
         message = "The csv file has been successfully exported"
         self.controller.show_info(message)
 

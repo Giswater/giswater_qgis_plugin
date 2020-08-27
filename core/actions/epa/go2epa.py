@@ -21,7 +21,7 @@ from ..epa.go2epa_options import GwGo2EpaOptions
 from ...tasks.tsk_go2epa import GwGo2EpaTask
 from ...admin import GwAdmin
 from ....ui_manager import Go2EpaSelectorUi, EpaManager, Go2EpaUI, HydrologySelector, Multirow_selector
-from ...utils.giswater_tools import load_settings, open_dialog, save_settings, close_dialog
+from ...utils.giswater_tools import close_dialog, get_parser_value, load_settings, open_dialog, save_settings, set_parser_value
 
 from ....actions.api_parent_functs import fill_table
 from ....actions.parent_functs import multi_row_selector, set_table_columns, multi_rows_delete
@@ -182,53 +182,45 @@ class GwGo2Epa:
     def load_user_values(self):
         """ Load QGIS settings related with file_manager """
 
-        cur_user = self.controller.get_current_user()
-
         self.dlg_go2epa.txt_result_name.setMaxLength(16)
-        self.result_name = self.controller.plugin_settings_value('go2epa_RESULT_NAME' + cur_user)
+        self.result_name = get_parser_value('go2epa', 'go2epa_RESULT_NAME')
         self.dlg_go2epa.txt_result_name.setText(self.result_name)
-        self.file_inp = self.controller.plugin_settings_value('go2epa_FILE_INP' + cur_user)
+        self.file_inp = get_parser_value('go2epa', 'go2epa_FILE_INP')
         self.dlg_go2epa.txt_file_inp.setText(self.file_inp)
-        self.file_rpt = self.controller.plugin_settings_value('go2epa_FILE_RPT' + cur_user)
+        self.file_rpt = get_parser_value('go2epa', 'go2epa_FILE_RPT')
         self.dlg_go2epa.txt_file_rpt.setText(self.file_rpt)
 
-        value = self.controller.plugin_settings_value('go2epa_chk_NETWORK_GEOM' + cur_user)
-        if str(value) == 'true':
-            qt_tools.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check, True)
-        value = self.controller.plugin_settings_value('go2epa_chk_INP' + cur_user)
-        if str(value) == 'true':
-            qt_tools.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export, True)
-        value = self.controller.plugin_settings_value('go2epa_chk_UD' + cur_user)
-        if str(value) == 'true':
-            qt_tools.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch, True)
-        value = self.controller.plugin_settings_value('go2epa_chk_EPA' + cur_user)
-        if str(value) == 'true':
-            qt_tools.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec, True)
-        value = self.controller.plugin_settings_value('go2epa_chk_RPT' + cur_user)
-        if str(value) == 'true':
-            qt_tools.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result, True)
+        value = get_parser_value('go2epa', 'go2epa_chk_NETWORK_GEOM')
+        qt_tools.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check, value)
+        value = get_parser_value('go2epa', 'go2epa_chk_INP')
+        qt_tools.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export, value)
+        value = get_parser_value('go2epa', 'go2epa_chk_UD')
+        qt_tools.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch, value)
+        value = get_parser_value('go2epa', 'go2epa_chk_EPA')
+        qt_tools.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec, value)
+        value = get_parser_value('go2epa', 'go2epa_chk_RPT')
+        qt_tools.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result, value)
 
 
     def save_user_values(self):
         """ Save QGIS settings related with file_manager """
 
-        cur_user = self.controller.get_current_user()
-        self.controller.plugin_settings_set_value('go2epa_RESULT_NAME' + cur_user,
-            qt_tools.getWidgetText(self.dlg_go2epa, 'txt_result_name', return_string_null=False))
-        self.controller.plugin_settings_set_value('go2epa_FILE_INP' + cur_user,
-            qt_tools.getWidgetText(self.dlg_go2epa, 'txt_file_inp', return_string_null=False))
-        self.controller.plugin_settings_set_value('go2epa_FILE_RPT' + cur_user,
-            qt_tools.getWidgetText(self.dlg_go2epa, 'txt_file_rpt', return_string_null=False))
-        self.controller.plugin_settings_set_value('go2epa_chk_NETWORK_GEOM' + cur_user,
-            qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check))
-        self.controller.plugin_settings_set_value('go2epa_chk_INP' + cur_user,
-            qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export))
-        self.controller.plugin_settings_set_value('go2epa_chk_UD' + cur_user,
-            qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch))
-        self.controller.plugin_settings_set_value('go2epa_chk_EPA' + cur_user,
-            qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec))
-        self.controller.plugin_settings_set_value('go2epa_chk_RPT' + cur_user,
-            qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result))
+        set_parser_value('go2epa', 'go2epa_RESULT_NAME',
+                         f"{qt_tools.getWidgetText(self.dlg_go2epa, 'txt_result_name', return_string_null=False)}")
+        set_parser_value('go2epa', 'go2epa_FILE_INP',
+                         f"{qt_tools.getWidgetText(self.dlg_go2epa, 'txt_file_inp', return_string_null=False)}")
+        set_parser_value('go2epa', 'go2epa_FILE_RPT',
+                         f"{qt_tools.getWidgetText(self.dlg_go2epa, 'txt_file_rpt', return_string_null=False)}")
+        set_parser_value('go2epa', 'go2epa_chk_NETWORK_GEOM',
+                         f"{qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check)}")
+        set_parser_value('go2epa', 'go2epa_chk_INP',
+                         f"{qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export)}")
+        set_parser_value('go2epa', 'go2epa_chk_UD',
+                         f"{qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch)}")
+        set_parser_value('go2epa', 'go2epa_chk_EPA',
+                         f"{qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec)}")
+        set_parser_value('go2epa', 'go2epa_chk_RPT',
+                         f"{qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result)}")
 
 
     def sector_selection(self, tableleft, tableright, field_id_left, field_id_right, aql=""):

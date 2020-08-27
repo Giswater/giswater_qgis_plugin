@@ -18,7 +18,7 @@ from collections import OrderedDict
 from functools import partial
 
 from lib import qt_tools
-from ...utils.giswater_tools import load_settings, open_dialog, save_settings, close_dialog
+from ...utils.giswater_tools import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
 from ...utils.layer_tools import add_temp_layer
 
 from .... import global_vars
@@ -167,81 +167,78 @@ class GwToolBox:
         self.rbt_checked['value'] = state
 
 
-    def load_settings_values(self, dialog, function):
-        """ Load QGIS settings related with toolbox options """
-
-        cur_user = self.controller.get_current_user()
-        function_name = function[0]['functionname']
-        if dialog.cmb_geom_type.property('selectedId') in (None, '', 'NULL'):
-            geom_type = self.controller.plugin_settings_value(f"{function_name}_{cur_user}_cmb_geom_type")
-        else:
-            geom_type = dialog.cmb_geom_type.property('selectedId')
-        qt_tools.set_combo_itemData(dialog.cmb_geom_type, geom_type, 0)
-        if dialog.cmb_layers.property('selectedId') in (None, '', 'NULL'):
-            layer = self.controller.plugin_settings_value(f"{function_name}_{cur_user}_cmb_layers")
-        else:
-            layer = dialog.cmb_layers.property('selectedId')
-        qt_tools.set_combo_itemData(dialog.cmb_layers, layer, 0)
-        if self.controller.plugin_settings_value(f"{function_name}_{cur_user}_rbt_previous") == 'true':
-            dialog.rbt_previous.setChecked(True)
-        else:
-            dialog.rbt_layer.setChecked(True)
-
-
     def load_parametric_values(self, dialog, function):
         """ Load QGIS settings related with parametric toolbox options """
 
-        cur_user = self.controller.get_current_user()
         function_name = function[0]['functionname']
         layout = dialog.findChild(QWidget, 'grb_parameters')
         widgets = layout.findChildren(QWidget)
+
         for widget in widgets:
-            if type(widget) not in (QCheckBox, QComboBox, QLineEdit):
+            if type(widget) not in (QCheckBox, QComboBox, QLineEdit, QRadioButton):
                 continue
-            if type(widget) is QCheckBox:
-                if self.controller.plugin_settings_value(f"{function_name}_{cur_user}_{widget.objectName()}"):
-                    widget.setChecked(True)
-                else:
-                    widget.setChecked(False)
+            if type(widget) in (QCheckBox, QRadioButton):
+                value = get_parser_value('toolbox', f"parametric_{function_name}_{widget.objectName()}")
+                qt_tools.setChecked(dialog, widget, value)
+
             elif type(widget) is QComboBox:
                 if widget.property('selectedId') in (None, '', 'NULL'):
-                    value = self.controller.plugin_settings_value(f"{function_name}_{cur_user}_{widget.objectName()}")
+                    value = get_parser_value('toolbox', f"parametric_{function_name}_{widget.objectName()}")
                 else:
                     value = widget.property('selectedId')
                 qt_tools.set_combo_itemData(widget, value, 0)
             elif type(widget) in (QLineEdit, QSpinBox):
-                value = self.controller.plugin_settings_value(f"{function_name}_{cur_user}_{widget.objectName()}")
+                value = get_parser_value('toolbox', f"parametric_{function_name}_{widget.objectName()}")
                 qt_tools.setWidgetText(dialog, widget, value)
-
-
-    def save_settings_values(self, dialog, function):
-        """ Save QGIS settings related with toolbox options """
-
-        cur_user = self.controller.get_current_user()
-        function_name = function[0]['functionname']
-        geom_type = qt_tools.get_item_data(dialog, dialog.cmb_geom_type, 0)
-        self.controller.plugin_settings_set_value(f"{function_name}_{cur_user}_cmb_geom_type", geom_type)
-        layer = qt_tools.get_item_data(dialog, dialog.cmb_layers, 0)
-        self.controller.plugin_settings_set_value(f"{function_name}_{cur_user}_cmb_layers", layer)
-        self.controller.plugin_settings_set_value(f"{function_name}_{cur_user}_rbt_previous", dialog.rbt_previous.isChecked())
 
 
     def save_parametric_values(self, dialog, function):
         """ Save QGIS settings related with parametric toolbox options """
 
-        cur_user = self.controller.get_current_user()
         function_name = function[0]['functionname']
         layout = dialog.findChild(QWidget, 'grb_parameters')
         widgets = layout.findChildren(QWidget)
         for widget in widgets:
             if type(widget) is QCheckBox:
-                self.controller.plugin_settings_set_value(f"{function_name}_{cur_user}_{widget.objectName()}", widget.isChecked())
+                set_parser_value('toolbox', f"parametric_{function_name}_{widget.objectName()}", f"{widget.isChecked()}")
             elif type(widget) is QComboBox:
                 value = qt_tools.get_item_data(dialog, widget, 0)
-                self.controller.plugin_settings_set_value(f"{function_name}_{cur_user}_{widget.objectName()}", value)
+                set_parser_value('toolbox', f"parametric_{function_name}_{widget.objectName()}", f"{value}")
             elif type(widget) in (QLineEdit, QSpinBox):
                 value = qt_tools.getWidgetText(dialog, widget, False, False)
-                self.controller.plugin_settings_set_value(f"{function_name}_{cur_user}_{widget.objectName()}", value)
+                set_parser_value('toolbox', f"parametric_{function_name}_{widget.objectName()}", f"{value}")
+
+
+    def load_settings_values(self, dialog, function):
+        """ Load QGIS settings related with toolbox options """
+
+        function_name = function[0]['functionname']
+        if dialog.cmb_geom_type.property('selectedId') in (None, '', 'NULL'):
+            geom_type = get_parser_value('toolbox', f"{function_name}_cmb_geom_type")
+        else:
+            geom_type = dialog.cmb_geom_type.property('selectedId')
+        qt_tools.set_combo_itemData(dialog.cmb_geom_type, geom_type, 0)
+        if dialog.cmb_layers.property('selectedId') in (None, '', 'NULL'):
+            layer = get_parser_value('toolbox', f"{function_name}_cmb_layers")
+        else:
+            layer = dialog.cmb_layers.property('selectedId')
+        qt_tools.set_combo_itemData(dialog.cmb_layers, layer, 0)
+
+        if get_parser_value('toolbox', f"{function_name}_rbt_previous") is True:
+            qt_tools.setChecked(dialog, 'rbt_previous', True)
+        else:
+            qt_tools.setChecked(dialog, 'rbt_layer', True)
+
+    def save_settings_values(self, dialog, function):
+        """ Save QGIS settings related with toolbox options """
+
+        function_name = function[0]['functionname']
+        geom_type = qt_tools.get_item_data(dialog, dialog.cmb_geom_type, 0)
+        set_parser_value('toolbox', f"{function_name}_cmb_geom_type", f"{geom_type}")
+        layer = qt_tools.get_item_data(dialog, dialog.cmb_layers, 0)
+        set_parser_value('toolbox', f"{function_name}_cmb_layers", f"{layer}")
+        set_parser_value('toolbox', f"{function_name}_rbt_previous", f"{dialog.rbt_previous.isChecked()}")
+        set_parser_value('toolbox', f"{function_name}_rbt_layer", f"{dialog.rbt_layer.isChecked()}")
 
 
     def execute_function(self, dialog, combo, result):

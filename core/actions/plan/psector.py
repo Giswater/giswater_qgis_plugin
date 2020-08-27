@@ -22,7 +22,7 @@ from collections import OrderedDict
 from functools import partial
 
 from lib import qt_tools
-from ...utils.giswater_tools import close_dialog, load_settings, open_dialog, save_settings
+from ...utils.giswater_tools import close_dialog, get_parser_value, load_settings, open_dialog, save_settings, set_parser_value
 
 from ....ui_manager import Plan_psector, PsectorRapportUi
 from ....actions.multiple_selection import MultipleSelection
@@ -534,14 +534,15 @@ class GwPsector:
         self.dlg_psector_rapport.btn_path.clicked.connect(partial(get_folder_dialog, self.dlg_psector_rapport,
             self.dlg_psector_rapport.txt_path))
 
-        qt_tools.setWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path,
-                               self.controller.plugin_settings_value('psector_rapport_path'))
-        qt_tools.setChecked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_composer,
-                            bool(self.controller.plugin_settings_value('psector_rapport_chk_composer')))
-        qt_tools.setChecked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv_detail,
-                            self.controller.plugin_settings_value('psector_rapport_chk_csv_detail'))
-        qt_tools.setChecked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv,
-                            self.controller.plugin_settings_value('psector_rapport_chk_csv'))
+        value = get_parser_value('psector_rapport', 'psector_rapport_path')
+        qt_tools.setWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path, value)
+        value = get_parser_value('psector_rapport', 'psector_rapport_chk_composer')
+        qt_tools.setChecked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_composer, value)
+        value = get_parser_value('psector_rapport', 'psector_rapport_chk_csv_detail')
+        qt_tools.setChecked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv_detail, value)
+        value = get_parser_value('psector_rapport', 'psector_rapport_chk_csv')
+        qt_tools.setChecked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv, value)
+
         if qt_tools.getWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path) == 'null':
             if 'nt' in sys.builtin_module_names:
                 plugin_dir = os.path.expanduser("~\Documents")
@@ -588,16 +589,15 @@ class GwPsector:
 
 
     def generate_rapports(self):
-        
-        self.controller.plugin_settings_set_value("psector_rapport_path",
-            qt_tools.getWidgetText(self.dlg_psector_rapport, 'txt_path'))
-        self.controller.plugin_settings_set_value("psector_rapport_chk_composer",
-            qt_tools.isChecked(self.dlg_psector_rapport, 'chk_composer'))
-        self.controller.plugin_settings_set_value("psector_rapport_chk_csv_detail",
-            qt_tools.isChecked(self.dlg_psector_rapport, 'chk_csv_detail'))
-        self.controller.plugin_settings_set_value("psector_rapport_chk_csv",
-            qt_tools.isChecked(self.dlg_psector_rapport, 'chk_csv'))
-        
+        set_parser_value('psector_rapport', 'psector_rapport_path',
+                         f"{qt_tools.getWidgetText(self.dlg_psector_rapport, 'txt_path')}")
+        set_parser_value('psector_rapport', 'psector_rapport_chk_composer',
+                         f"{qt_tools.isChecked(self.dlg_psector_rapport, 'chk_composer')}")
+        set_parser_value('psector_rapport', 'psector_rapport_chk_csv_detail',
+                         f"{qt_tools.isChecked(self.dlg_psector_rapport, 'chk_csv_detail')}")
+        set_parser_value('psector_rapport', 'psector_rapport_chk_csv',
+                         f"{qt_tools.isChecked(self.dlg_psector_rapport, 'chk_csv')}")
+
         folder_path = qt_tools.getWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path)
         if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path):
             get_folder_dialog(self.dlg_psector_rapport.txt_path)
