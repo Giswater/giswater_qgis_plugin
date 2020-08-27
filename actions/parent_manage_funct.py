@@ -747,7 +747,7 @@ def selection_init(dialog, table_object, query=False, geom_type=None, layers=Non
     
     if geom_type in ('all', None):
         geom_type = 'arc'
-    multiple_selection = MultipleSelection(layers[geom_type], parent_manage=None,
+    multiple_selection = MultipleSelection(layers, geom_type, parent_manage=None,
                                            table_object=table_object, dialog=dialog)
     disconnect_signal_selection_changed()
     global_vars.canvas.setMapTool(multiple_selection)
@@ -1087,14 +1087,14 @@ def hide_generic_layers(excluded_layers=[]):
             global_vars.controller.set_layer_visible(layer)
 
 
-def connect_signal_selection_changed(dialog, table_object, query=False, geom_type=None):
+def connect_signal_selection_changed(dialog, table_object, query=False, geom_type=None, layers=None):
     """ Connect signal selectionChanged """
 
     try:
         if geom_type in ('all', None):
             geom_type = 'arc'
         global_vars.canvas.selectionChanged.connect(
-            partial(selection_changed, dialog, table_object, geom_type, query))
+            partial(selection_changed, dialog, table_object, geom_type, query, layers=layers))
     except Exception as e:
         global_vars.controller.log_info(f"connect_signal_selection_changed: {e}")
 

@@ -19,15 +19,26 @@ from ..lib.qgis_tools import get_event_point, snap_to_background_layers, get_sna
 
 class MultipleSelection(QgsMapTool):
 
-    def __init__(self, layers,
+    def __init__(self, layers, geom_type,
                  mincut=None, parent_manage=None, manage_new_psector=None, table_object=None, dialog=None):
-        """ Class constructor """
-
+        """
+        Class constructor
+        :param layers: dict of list of layers {'arc': [v_edit_node, ...]}
+        :param geom_type:
+        :param mincut:
+        :param parent_manage:
+        :param manage_new_psector:
+        :param table_object:
+        :param dialog:
+        """
+        
+        
         self.layers = layers
+        self.geom_type = geom_type
         self.iface = global_vars.iface
         self.canvas = global_vars.canvas
         self.mincut = mincut
-        # self.parent_manage = parent_manage
+        self.parent_manage = parent_manage
         self.manage_new_psector = manage_new_psector
         self.table_object = table_object
         self.dialog = dialog
@@ -78,13 +89,13 @@ class MultipleSelection(QgsMapTool):
         if self.manage_new_psector:
             self.manage_new_psector.disconnect_signal_selection_changed()
 
-        for i in range(len(self.layers)):
-            layer = self.layers[i]
-            if i == len(self.layers) - 1:
+        for i, layer in enumerate(self.layers[self.geom_type]):
+            if i == len(self.layers[self.geom_type]) - 1:
                 if self.mincut:
                     self.mincut.connect_signal_selection_changed("mincut_connec")
-                    
-                connect_signal_selection_changed(self.dialog, self.table_object)
+                
+                if self.parent_manage:
+                    connect_signal_selection_changed(self.dialog, self.table_object, layers=self.layers)
                 
                 if self.manage_new_psector:
                     self.manage_new_psector.connect_signal_selection_changed(

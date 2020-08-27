@@ -64,6 +64,7 @@ class GwMincut:
 
         # Get layers of node, arc, connec group
         self.node_group = []
+        self.layers = dict()
         self.layers_connec = None
         self.arc_group = []
         self.hydro_list = []
@@ -104,7 +105,9 @@ class GwMincut:
         self.remove_selection()
 
         # Parametrize list of layers
-        self.layers_connec = self.controller.get_group_layers('connec')
+        self.layers['connec'] = self.controller.get_group_layers('connec')
+        self.layers_connec = self.layers['connec']
+        
         self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
 
         # Set active and current layer
@@ -855,7 +858,7 @@ class GwMincut:
     def snapping_init_connec(self):
         """ Snap connec """
 
-        multiple_snapping = MultipleSelection(self.layers_connec, mincut=self)
+        multiple_snapping = MultipleSelection(self.layers, 'connec', mincut=self)
         self.canvas.setMapTool(multiple_snapping)
         self.canvas.selectionChanged.connect(partial(self.snapping_selection_connec))
         cursor = get_cursor_multiple_selection()
@@ -865,10 +868,10 @@ class GwMincut:
     def snapping_init_hydro(self):
         """ Snap also to connec (hydrometers has no geometry) """
 
-        multiple_snapping = MultipleSelection(self.layers_connec, mincut=self)
+        multiple_snapping = MultipleSelection(self.layers, 'connec', mincut=self)
         self.canvas.setMapTool(multiple_snapping)
         self.canvas.selectionChanged.connect(
-            partial(self.snapping_selection_hydro, self.layers_connec, "rtc_hydrometer", "connec_id"))
+            partial(self.snapping_selection_hydro))
         cursor = get_cursor_multiple_selection()
         self.canvas.setCursor(cursor)
 
