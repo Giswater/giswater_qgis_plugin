@@ -17,8 +17,6 @@ from ...utils.giswater_tools import load_settings, open_dialog, save_settings, c
 
 from ....ui_manager import FeatureDelete
 
-from .... import global_vars
-
 from ....actions.parent_functs import set_icon, disconnect_signal_selection_changed
 from ....actions.api_parent_functs import set_completer_object_api, create_body
 from ...utils.layer_tools import populate_info_text
@@ -166,7 +164,7 @@ class GwDeleteFeatureButton(GwParentAction):
 		""" Connect signal selectionChanged """
 		
 		try:
-			global_vars.canvas.selectionChanged.connect(partial(self.manage_selection))
+			self.canvas.selectionChanged.connect(partial(self.manage_selection))
 		except:
 			pass
 	
