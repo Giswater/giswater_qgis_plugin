@@ -8,7 +8,7 @@ or (at your option) any later version.
 from ..parent_action import GwParentAction
 from functools import partial
 
-from ...utils.giswater_tools import close_dialog, get_last_tab, load_settings, open_dialog, save_current_tab, \
+from ...utils.giswater_tools import close_dialog, get_parser_value, load_settings, open_dialog, save_current_tab, \
     save_settings
 from ....ui_manager import SelectorUi
 from .... import global_vars
@@ -32,7 +32,7 @@ class GwSelectorButton(GwParentAction):
 
         # Get the name of the last tab used by the user
         selector_vars = {}
-        current_tab = get_last_tab(dlg_selector, 'basic')
+        current_tab = get_parser_value('last_tabs', f"{dlg_selector.objectName()}_basic")
         get_selector(dlg_selector, selector_values, current_tab=current_tab, selector_vars=selector_vars)
 
         if global_vars.controller.dlg_docker:

@@ -99,22 +99,8 @@ def save_settings(dialog):
 		pass
 
 
-def get_last_tab(dialog, selector_name):
-	""" Get the name of the last tab used by the user from QSettings()
-	:param dialog: QDialog
-	:param selector_name: Name of the selector (String)
-	:return: Name of the last tab used by the user (string)
-	"""
-
-	parser = get_parser_load()
-	try:
-		tab_name = parser['last_tabs'][f"{dialog.objectName()}_{selector_name}"]
-		return tab_name
-	except Exception:
-		pass
-
-
 def get_parser_value(section, parameter):
+	"""  Load simple parser value """
 	try:
 		parser = get_parser_load()
 		value = parser[section][parameter]
@@ -124,6 +110,7 @@ def get_parser_value(section, parameter):
 
 
 def set_parser_value(section, parameter, value):
+	"""  Save simple parser value """
 	parser, path = get_parser_save(section)
 	parser[section][parameter] = value
 	set_parser_save(parser, path)
@@ -141,9 +128,8 @@ def save_current_tab(dialog, tab_widget, selector_name):
 		if tab:
 			tab_name = tab.objectName()
 			dlg_name = dialog.objectName()
-			parser, path = get_parser_save('last_tabs')
-			parser['last_tabs'][f"{dlg_name}_{selector_name}"] = f"{tab_name}"
-			set_parser_save(parser, path)
+			set_parser_value('last_tabs', f"{dlg_name}_{selector_name}",  f"{tab_name}")
+
 	except Exception as e:
 		pass
 

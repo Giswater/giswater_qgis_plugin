@@ -18,7 +18,7 @@ from collections import OrderedDict
 from functools import partial
 
 from lib import qt_tools
-from ...utils.giswater_tools import close_dialog, get_last_tab, load_settings, open_dialog, save_current_tab,\
+from ...utils.giswater_tools import close_dialog, get_parser_value, load_settings, open_dialog, save_current_tab,\
     save_settings
 from .... import global_vars
 from ....ui_manager import SelectorUi, MincutManagerUi
@@ -246,7 +246,7 @@ class GwMincutManager:
         selector_values = f'"selector_mincut", "ids":{selected_mincuts}'
         self.dlg_selector = SelectorUi()
         load_settings(self.dlg_selector)
-        current_tab = get_last_tab(self.dlg_selector, 'mincut')
+        current_tab = get_parser_value('last_tabs', f"{self.dlg_selector.objectName()}_mincut")
         self.dlg_selector.btn_close.clicked.connect(partial(close_dialog, self.dlg_selector))
         self.dlg_selector.rejected.connect(partial(save_settings, self.dlg_selector))
         self.dlg_selector.rejected.connect(partial(
