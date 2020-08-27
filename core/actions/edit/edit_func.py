@@ -12,7 +12,6 @@ from ..basic.info import GwInfo
 from ..epa.element import GwElement
 from ..edit.document import GwDocument
 from ..epa.feature_end import GwFeatureEnd
-from ..edit.feature_delete import GwFeatureDelete
 
 from .... import global_vars
 
@@ -29,7 +28,6 @@ class GwEdit:
 		self.manage_document = GwDocument()
 		self.manage_element = GwElement()
 		self.manage_workcat_end = GwFeatureEnd()
-		self.delete_feature = GwFeatureDelete()
 		self.suppres_form = None
 	
 	
