@@ -33,8 +33,8 @@ class GwI18NGenerator:
         self.load_user_values()
 
         self.dlg_qm.btn_translate.setEnabled(False)
-
-        self.dlg_qm.btn_connection.clicked.connect(self.check_connection)
+        # Mysteriously without the partial the function check_connection is not called
+        self.dlg_qm.btn_connection.clicked.connect(partial(self.check_connection))
         self.dlg_qm.btn_translate.clicked.connect(self.check_translate_options)
         self.dlg_qm.btn_close.clicked.connect(partial(close_dialog, self.dlg_qm))
         self.dlg_qm.rejected.connect(self.save_user_values)
