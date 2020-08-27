@@ -229,7 +229,7 @@ class GwI18NGenerator:
         del ts_file
         lrelease_path = self.plugin_dir + os.sep + 'resources' + os.sep + 'lrelease.exe'
         status = subprocess.call([lrelease_path, ts_path], shell=False)
-        if status == 0:
+        if status == 1:
             return True
         else:
             return False
