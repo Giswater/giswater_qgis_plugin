@@ -90,8 +90,6 @@ def save_settings(dialog):
 	""" Save user UI related with dialog position and size """
 	try:
 		parser, path = get_parser_save('dialogs_position')
-
-
 		parser['dialogs_position'][dialog.objectName() + "_width"] = f"{dialog.property('width')}"
 		parser['dialogs_position'][dialog.objectName() + "_height"] = f"{dialog.property('height')}"
 		parser['dialogs_position'][dialog.objectName() + "_x"] = f"{dialog.pos().x() + 8}"
@@ -114,6 +112,21 @@ def get_last_tab(dialog, selector_name):
 		return tab_name
 	except Exception:
 		pass
+
+
+def get_parser_value(section, parameter):
+	try:
+		parser = get_parser_load()
+		value = parser[section][parameter]
+	except:
+		value = None
+	return value
+
+
+def set_parser_value(section, parameter, value):
+	parser, path = get_parser_save(section)
+	parser[section][parameter] = value
+	set_parser_save(parser, path)
 
 
 def save_current_tab(dialog, tab_widget, selector_name):
