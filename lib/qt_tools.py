@@ -221,6 +221,8 @@ def isChecked(dialog, widget):
 
     if type(widget) is str or type(widget) is str:
         widget = dialog.findChild(QCheckBox, widget)
+        if widget is None:
+            widget = dialog.findChild(QRadioButton, widget)
     checked = False
     if widget:
         checked = widget.isChecked()
