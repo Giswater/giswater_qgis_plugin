@@ -31,7 +31,7 @@ from ..ui_manager import DialogTextUi, DockerUi
 from ..actions.parent_functs import manage_return_manager, manage_layer_manager, manage_actions
 from ..lib.qgis_tools import qgis_get_layer_by_tablename, qgis_get_layer_source, qgis_get_layer_source_table_name, \
     qgis_get_layer_primary_key, qgis_get_layers
-
+from ..core.utils.giswater_tools import get_parser_value, set_parser_value
 
 class DaoController:
 
@@ -1759,15 +1759,14 @@ class DaoController:
 
         if self.dlg_docker:
             if not self.dlg_docker.isFloating():
-                cur_user = self.get_current_user()
                 docker_pos = self.iface.mainWindow().dockWidgetArea(self.dlg_docker)
-                self.plugin_settings_set_value(f"docker_info_{cur_user}", docker_pos)
                 widget = self.dlg_docker.widget()
                 if widget:
                     widget.close()
                     del widget
                     self.dlg_docker.setWidget(None)
                     self.docker_type = None
+                    set_parser_value('docker_info', 'position', f'{docker_pos}')
                 self.iface.removeDockWidget(self.dlg_docker)
 
 
@@ -1775,13 +1774,13 @@ class DaoController:
         """ Check if user want dock the dialog or not """
 
         # Load last docker position
-        cur_user = self.get_current_user()
-        pos = self.plugin_settings_value(f"docker_info_{cur_user}")
-
-        # Docker positions: 1=Left, 2=Right, 4=Top, 8=Bottom
-        self.dlg_docker.position = 2
-        if type(pos) is int and pos in (1, 2, 4, 8):
-            self.dlg_docker.position = pos
+        try:
+            # Docker positions: 1=Left, 2=Right, 4=Top, 8=Bottom
+            pos = int(get_parser_value('docker_info', 'position'))
+            if pos in (1, 2, 4, 8):
+                self.dlg_docker.position = pos
+        except:
+            self.dlg_docker.position = 2
 
         # TODO: Check this
         # If user want to dock the dialog, we reset rubberbands for each info

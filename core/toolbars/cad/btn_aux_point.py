@@ -15,7 +15,7 @@ from functools import partial
 from lib import qt_tools
 from ..parent_maptool import GwParentMapTool
 from ....ui_manager import AuxPoint
-from ...utils.giswater_tools import load_settings, open_dialog, close_dialog
+from ...utils.giswater_tools import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
 from ....lib.qgis_tools import get_event_point, snap_to_current_layer, snap_to_background_layers, add_marker, \
     get_snapping_options, get_snapped_point
 
@@ -50,8 +50,8 @@ class GwAuxPointButton(GwParentMapTool):
         self.dlg_create_point.dist_x.setFocus()
         self.dlg_create_point.btn_accept.clicked.connect(partial(self.get_values, point_1, point_2))
         self.dlg_create_point.btn_cancel.clicked.connect(self.cancel)
-        rb_left = self.controller.plugin_settings_value(self.dlg_create_point.rb_left.objectName())
-        if rb_left == 'true':
+
+        if get_parser_value('cadtools', f"{self.dlg_create_point.rb_left.objectName()}") == 'True':
             self.dlg_create_point.rb_left.setChecked(True)
         else:
             self.dlg_create_point.rb_right.setChecked(True)
@@ -60,9 +60,9 @@ class GwAuxPointButton(GwParentMapTool):
 
 
     def get_values(self, point_1, point_2):
-
-        self.controller.plugin_settings_set_value(self.dlg_create_point.rb_left.objectName(),
-                                                  self.dlg_create_point.rb_left.isChecked())
+        set_parser_value('cadtools', f"{self.dlg_create_point.rb_left.objectName()}", 
+                         f"{self.dlg_create_point.rb_left.isChecked()}")
+  
         self.dist_x = self.dlg_create_point.dist_x.text()
         if not self.dist_x:
             self.dist_x = 0
@@ -102,8 +102,8 @@ class GwAuxPointButton(GwParentMapTool):
 
     def cancel(self):
 
-        self.controller.plugin_settings_set_value(self.dlg_create_point.rb_left.objectName(),
-                                                  self.dlg_create_point.rb_left.isChecked())
+        set_parser_value('cadtools', f"{self.dlg_create_point.rb_left.objectName()}", 
+                         f"{self.dlg_create_point.rb_left.isChecked()}")
 
         close_dialog(self.dlg_create_point)
         self.iface.setActiveLayer(self.current_layer)

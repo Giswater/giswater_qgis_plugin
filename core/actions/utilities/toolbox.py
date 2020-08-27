@@ -224,7 +224,7 @@ class GwToolBox:
             layer = dialog.cmb_layers.property('selectedId')
         qt_tools.set_combo_itemData(dialog.cmb_layers, layer, 0)
 
-        if get_parser_value('toolbox', f"{function_name}_rbt_previous") is True:
+        if get_parser_value('toolbox', f"{function_name}_rbt_previous") == 'True':
             qt_tools.setChecked(dialog, 'rbt_previous', True)
         else:
             qt_tools.setChecked(dialog, 'rbt_layer', True)
@@ -238,7 +238,6 @@ class GwToolBox:
         layer = qt_tools.get_item_data(dialog, dialog.cmb_layers, 0)
         set_parser_value('toolbox', f"{function_name}_cmb_layers", f"{layer}")
         set_parser_value('toolbox', f"{function_name}_rbt_previous", f"{dialog.rbt_previous.isChecked()}")
-        set_parser_value('toolbox', f"{function_name}_rbt_layer", f"{dialog.rbt_layer.isChecked()}")
 
 
     def execute_function(self, dialog, combo, result):

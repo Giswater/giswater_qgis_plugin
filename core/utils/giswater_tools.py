@@ -99,8 +99,8 @@ def save_settings(dialog):
 		pass
 
 
-def get_parser_value(section, parameter):
-	"""  Load simple parser value """
+def get_parser_value(section: str, parameter: str) -> str:
+
 	try:
 		parser = get_parser_load()
 		value = parser[section][parameter]
@@ -109,8 +109,9 @@ def get_parser_value(section, parameter):
 	return value
 
 
-def set_parser_value(section, parameter, value):
+def set_parser_value(section: str, parameter: str, value: str):
 	"""  Save simple parser value """
+
 	parser, path = get_parser_save(section)
 	parser[section][parameter] = value
 	set_parser_save(parser, path)

@@ -24,7 +24,9 @@ from ..parent_maptool import GwParentMapTool
 from ....ui_manager import Profile
 from ....ui_manager import ProfilesList
 from ....actions.parent_functs import set_icon
-from ...utils.giswater_tools import load_settings, save_settings, create_body, open_dialog, close_dialog
+from ...utils.giswater_tools import close_dialog, create_body, get_parser_value, load_settings, open_dialog, \
+    save_settings, set_parser_value
+
 from ....lib.qgis_tools import get_snapper, get_event_point, snap_to_current_layer, get_snapped_layer, add_marker, \
     get_snapped_feature
 
@@ -110,9 +112,9 @@ class GwProfileButton(GwParentMapTool):
 
         # Set last parameters
         qt_tools.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance,
-                                     self.controller.plugin_settings_value('minDistanceProfile'))
+                            get_parser_value('btn_profile', 'minDistanceProfile'))
         qt_tools.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_title,
-                                     self.controller.plugin_settings_value('titleProfile'))
+                               get_parser_value('btn_profile', 'titleProfile'))
 
         # Show form in docker
         self.controller.init_docker('qgis_form_docker')
@@ -170,9 +172,9 @@ class GwProfileButton(GwParentMapTool):
                          self.profile_json['body']['data']['terrain'])
 
         # Save profile values
-        self.controller.plugin_settings_set_value("minDistanceProfile", links_distance)
-        self.controller.plugin_settings_set_value("titleProfile", qt_tools.getWidgetText(self.dlg_draw_profile,
-            self.dlg_draw_profile.txt_title))
+        set_parser_value('btn_profile', 'minDistanceProfile', f'{links_distance}')
+        set_parser_value('btn_profile', 'titleProfile',
+                         f'{qt_tools.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_title)}')
 
         # Maximize window (after drawing)
         self.plot.show()

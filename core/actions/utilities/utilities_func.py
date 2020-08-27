@@ -19,7 +19,7 @@ from ..om.composer_tools import GwComposerTools
 from ...project_check import GwProjectCheck
 from .toolbox import GwToolBox
 from ..om.visit_manager import GwVisitManager
-from ...utils.giswater_tools import close_dialog, load_settings, open_dialog, save_settings
+from ...utils.giswater_tools import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
 
 from ....ui_manager import CsvUi
 
@@ -115,33 +115,27 @@ class GwUtilities:
     def load_settings_values(self):
         """ Load QGIS settings related with csv options """
 
-        cur_user = self.controller.get_current_user()
-        qt_tools.setWidgetText(self.dlg_csv, self.dlg_csv.txt_file_csv,
-                               self.controller.plugin_settings_value('Csv2Pg_txt_file_csv_' + cur_user))
 
-        unicode = self.controller.plugin_settings_value('Csv2Pg_cmb_unicode_list_' + cur_user)
+        value = get_parser_value('csv2Pg', 'txt_file_csv')
+        qt_tools.setWidgetText(self.dlg_csv, self.dlg_csv.txt_file_csv, value)
+
+        unicode = get_parser_value('csv2Pg', 'cmb_unicode_list')
         if not unicode:
             unicode = 'latin1'
-
         qt_tools.setWidgetText(self.dlg_csv, self.dlg_csv.cmb_unicode_list, unicode)
-        if str(self.controller.plugin_settings_value('Csv2Pg_rb_comma_' + cur_user)).upper() == 'TRUE':
-            self.dlg_csv.rb_comma.setChecked(True)
-        else:
+
+        if get_parser_value('csv2Pg', 'rb_semicolon') == 'True':
             self.dlg_csv.rb_semicolon.setChecked(True)
+        else:
+            self.dlg_csv.rb_comma.setChecked(True)
 
 
     def save_settings_values(self):
         """ Save QGIS settings related with csv options """
 
-        cur_user = self.controller.get_current_user()
-        self.controller.plugin_settings_set_value("Csv2Pg_txt_file_csv_" + cur_user,
-                                                  qt_tools.getWidgetText(self.dlg_csv, 'txt_file_csv'))
-        self.controller.plugin_settings_set_value("Csv2Pg_cmb_unicode_list_" + cur_user,
-                                                  qt_tools.getWidgetText(self.dlg_csv, 'cmb_unicode_list'))
-        self.controller.plugin_settings_set_value("Csv2Pg_rb_comma_" + cur_user,
-            bool(self.dlg_csv.rb_comma.isChecked()))
-        self.controller.plugin_settings_set_value("Csv2Pg_rb_semicolon_" + cur_user,
-            bool(self.dlg_csv.rb_semicolon.isChecked()))
+        set_parser_value('csv2Pg', 'txt_file_csv', qt_tools.getWidgetText(self.dlg_csv, 'txt_file_csv'))
+        set_parser_value('csv2Pg', 'cmb_unicode_list', qt_tools.getWidgetText(self.dlg_csv, 'cmb_unicode_list'))
+        set_parser_value('csv2Pg', 'rb_semicolon', f"{self.dlg_csv.rb_semicolon.isChecked()}")
 
 
     def validate_params(self, dialog):
@@ -218,7 +212,7 @@ class GwUtilities:
 
     def write_csv(self, dialog, temp_tablename):
         """ Write csv in postgres and call gw_fct_utils_csv2pg function """
-
+        self.save_settings_values()
         insert_status = True
         if not self.validate_params(dialog):
             return
@@ -238,7 +232,6 @@ class GwUtilities:
         except Exception as e:
             self.controller.show_warning("EXCEPTION: " + str(e))
 
-        self.save_settings_values()
         if insert_status is False:
             return
 

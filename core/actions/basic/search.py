@@ -486,7 +486,7 @@ class GwSearch:
         self.items_dialog.btn_state1.setEnabled(False)
         self.items_dialog.btn_state0.setEnabled(False)
 
-        search_csv_path = get_parser_value('paths', 'search_csv_path')
+        search_csv_path = get_parser_value('search', 'search_csv_path')
         qt_tools.setWidgetText(self.items_dialog, self.items_dialog.txt_path, search_csv_path)
         qt_tools.setWidgetText(self.items_dialog, self.items_dialog.lbl_init, f"Filter by: {field_id}")
         qt_tools.setWidgetText(self.items_dialog, self.items_dialog.lbl_end, f"Filter by: {field_id}")
@@ -716,7 +716,7 @@ class GwSearch:
         with open(folder_path, "w") as output:
             writer = csv.writer(output, lineterminator='\n')
             writer.writerows(all_rows)
-        set_parser_value('paths', 'search_csv_path', f"{qt_tools.getWidgetText(dialog, 'txt_path')}")
+        set_parser_value('search', 'search_csv_path', f"{qt_tools.getWidgetText(dialog, 'txt_path')}")
         message = "The csv file has been successfully exported"
         self.controller.show_info(message)
 
