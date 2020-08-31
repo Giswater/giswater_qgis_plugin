@@ -14,7 +14,6 @@ from encodings.aliases import aliases
 from functools import partial
 
 from lib import qt_tools
-from .config import GwConfig
 from ..om.composer_tools import GwComposerTools
 from ...project_check import GwProjectCheck
 from .toolbox import GwToolBox
@@ -39,12 +38,6 @@ class GwUtilities:
         
         self.controller = global_vars.controller
         self.project_type = global_vars.project_type
-
-
-    def api_config(self):
-
-        self.config = GwConfig()
-        self.config.api_config()
 
 
     def utils_import_csv(self):
