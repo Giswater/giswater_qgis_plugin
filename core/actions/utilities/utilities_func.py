@@ -14,7 +14,6 @@ from encodings.aliases import aliases
 from functools import partial
 
 from lib import qt_tools
-from ..om.composer_tools import GwComposerTools
 from ...project_check import GwProjectCheck
 from .toolbox import GwToolBox
 from ..om.visit_manager import GwVisitManager
@@ -56,12 +55,6 @@ class GwUtilities:
     def utils_toolbox(self):
 
         self.toolbox.open_toolbox()
-        
-
-    def utils_print_composer(self):
-
-        self.api_composer = GwComposerTools()
-        self.api_composer.composer()
 
 
     def utils_show_check_project_result(self):
