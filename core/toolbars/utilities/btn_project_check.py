@@ -6,15 +6,17 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from ..parent_action import GwParentAction
-
-from ...actions.utilities.utilities_func import GwUtilities
+from ...project_check import GwProjectCheck
 
 class GwProjectCheckButton(GwParentAction):
 	def __init__(self, icon_path, text, toolbar, action_group):
 		super().__init__(icon_path, text, toolbar, action_group)
-		
-		self.utils = GwUtilities()
 	
 	
 	def clicked_event(self):
-		self.utils.utils_show_check_project_result()
+		
+		# Return layers in the same order as listed in TOC
+		layers = self.controller.get_layers()
+		
+		check_project_result = GwProjectCheck()
+		check_project_result.populate_audit_check_project(layers, "false")
