@@ -703,7 +703,7 @@ class GwMincut:
         qtabwidget = self.dlg_mincut.findChild(QTabWidget, 'mainTab')
         qtabwidget.widget(0).setEnabled(False)  # Tab plan
         qtabwidget.widget(1).setEnabled(True)   # Tab Exec
-        qtabwidget.widget(2).setEnabled(False)  # Tab Hydro
+        qtabwidget.widget(2).setEnabled(True)   # Tab Hydro
         qtabwidget.widget(3).setEnabled(False)  # Tab Log
 
         self.dlg_mincut.closeMainWin = False
