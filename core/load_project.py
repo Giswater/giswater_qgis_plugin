@@ -16,6 +16,7 @@ import sys
 
 from .models.plugin_toolbar import PluginToolbar
 from .utils.pg_man import PgMan
+from .utils.giswater_tools import set_parser_value
 from .. import global_vars
 from ..ui_manager import DialogTextUi
 from ..core.notify_tools import GwNotifyTools
