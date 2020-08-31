@@ -37,7 +37,7 @@ from .. import global_vars
 
 from ..actions.parent_functs import get_folder_dialog, set_table_columns
 from ..actions.api_parent_functs import create_body, construct_form_param_user
-from .utils.giswater_tools import load_settings, open_dialog, save_settings, close_dialog
+from .utils.giswater_tools import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
 from .utils.layer_tools import populate_info_text
 
 
@@ -336,13 +336,12 @@ class GwAdmin:
             qt_tools.dis_enable_dialog(self.dlg_readsql, True)
 
         # Load last schema name selected and project type
-        if str(self.controller.plugin_settings_value('last_project_type_selected')) != '':
+        if get_parser_value('admin', 'last_project_type_selected') not in ('', None):
             qt_tools.setWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type,
-                                   str(self.controller.plugin_settings_value('last_project_type_selected')))
-
-        if str(self.controller.plugin_settings_value('last_schema_name_selected')) != '':
+                                   get_parser_value('admin', 'last_project_type_selected'))
+        if get_parser_value('admin', 'last_schema_name_selected') not in ('', None):
             qt_tools.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name,
-                                   str(self.controller.plugin_settings_value('last_schema_name_selected')))
+                                   get_parser_value('admin', 'last_schema_name_selected'))
 
         if show_dialog:
             self.manage_docker()
@@ -1518,10 +1517,10 @@ class GwAdmin:
         self.project_issample = example_data
 
         # Save in settings
-        self.controller.plugin_settings_set_value('project_name_schema', project_name_schema)
-        self.controller.plugin_settings_set_value('project_title_schema', project_title_schema)
+        set_parser_value('admin', 'project_name_schema', f'{project_name_schema}')
+        set_parser_value('admin', 'project_title_schema', f'{project_title_schema}')
         inp_file_path = qt_tools.getWidgetText(self.dlg_readsql_create_project, 'data_file')
-        self.controller.plugin_settings_set_value('inp_file_path', inp_file_path)
+        set_parser_value('admin', 'inp_file_path', f'{inp_file_path}')
 
         # Check if project name is valid
         if not self.check_project_name(project_name_schema, project_title_schema):
@@ -1607,25 +1606,25 @@ class GwAdmin:
             # TODO:
             if not is_test:
                 self.task1.setProgress(100)
-            self.controller.plugin_settings_set_value('create_schema_type', 'rdb_import_data')
+            set_parser_value('admin', 'create_schema_type', 'rdb_import_data')
             msg = ("The sql files have been correctly executed."
                    "\nNow, a form will be opened to manage the import inp.")
             self.controller.show_info_box(msg, "Info")
             self.execute_import_data(schema_type=project_type)
             return
         elif self.rdb_sample.isChecked() and example_data:
-            self.controller.plugin_settings_set_value('create_schema_type', 'rdb_sample')
+            set_parser_value('admin', 'create_schema_type', 'rdb_sample')
             self.load_sample_data(project_type=project_type)
             if not is_test:
                 self.task1.setProgress(80)
         elif self.rdb_sample_dev.isChecked():
-            self.controller.plugin_settings_set_value('create_schema_type', 'rdb_sample_dev')
+            set_parser_value('admin', 'create_schema_type', 'rdb_sample_dev')
             self.load_sample_data(project_type=project_type)
             self.load_dev_data(project_type=project_type)
             if not is_test:
                 self.task1.setProgress(80)
         elif self.rdb_data.isChecked():
-            self.controller.plugin_settings_set_value('create_schema_type', 'rdb_data')
+            set_parser_value('admin', 'create_schema_type', 'rdb_data')
 
         self.manage_process_result(project_name_schema, is_test)
 
@@ -2238,14 +2237,13 @@ class GwAdmin:
         self.data_file = self.dlg_readsql_create_project.findChild(QLineEdit, 'data_file')
 
         # Load user values
-        self.project_name.setText(str(self.controller.plugin_settings_value('project_name_schema')))
-        self.project_title.setText(str(self.controller.plugin_settings_value('project_title_schema')))
-        create_schema_type = self.controller.plugin_settings_value('create_schema_type')
-        if create_schema_type:
+        self.project_name.setText(get_parser_value('admin', 'project_name_schema'))
+        self.project_title.setText(get_parser_value('admin', 'project_title_schema'))
+        create_schema_type = get_parser_value('admin', 'create_schema_type')
+        if create_schema_type == 'True':
             qt_tools.setChecked(self.dlg_readsql_create_project, str(create_schema_type))
-
-        if str(self.controller.plugin_settings_value('inp_file_path')) != 'null':
-            self.data_file.setText(str(self.controller.plugin_settings_value('inp_file_path')))
+        if get_parser_value('admin', 'inp_file_path') not in ('null', None):
+            self.data_file.setText(get_parser_value('admin', 'inp_file_path'))
 
         # TODO: do and call listener for buton + table -> temp_csv
         self.btn_push_file = self.dlg_readsql_create_project.findChild(QPushButton, 'btn_push_file')
@@ -3425,9 +3423,8 @@ class GwAdmin:
         # Save last Project schema name and type selected
         schema_name = qt_tools.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
         project_type = qt_tools.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
-
-        self.controller.plugin_settings_set_value('last_project_type_selected', project_type)
-        self.controller.plugin_settings_set_value('last_schema_name_selected', schema_name)
+        set_parser_value('admin', 'last_project_type_selected', f'{project_type}')
+        set_parser_value('admin', 'last_schema_name_selected', f'{schema_name}')
 
 
     def create_credentials_form(self, set_connection):

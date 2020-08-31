@@ -62,7 +62,7 @@ class LoadProject(QObject):
         layer_source = qgis_get_layer_source(self.layer_node)
         self.schema_name = layer_source['schema']
         self.schema_name = self.schema_name.replace('"', '')
-        self.controller.plugin_settings_set_value("schema_name", self.schema_name)
+        set_parser_value('load_project', 'schema_name', f'{self.schema_name}')
         self.controller.set_schema_name(self.schema_name)
         
         # TEMP
@@ -82,7 +82,7 @@ class LoadProject(QObject):
 
         # Get SRID from table node
         srid = self.controller.get_srid('v_edit_node', self.schema_name)
-        self.controller.plugin_settings_set_value("srid", srid)
+        set_parser_value('load_project', 'srid', f'{srid}')
 
         # Get variables from qgis project
         self.project_vars = get_qgis_project_variables()
