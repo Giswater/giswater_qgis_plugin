@@ -194,18 +194,6 @@ class DaoController:
 
         return value
 
-
-    def set_user_settings_value(self, parameter, value, section='system'):
-        """ Set @value from user settings file of selected @parameter located in @section """
-
-        if self.user_settings is None:
-            return value
-
-        self.check_user_settings(parameter, value)
-        self.user_settings.set(section, parameter, value)
-        self.save_user_settings()
-
-
     def save_user_settings(self):
         """ Save user settings file """
 

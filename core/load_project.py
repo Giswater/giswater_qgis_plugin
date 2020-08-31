@@ -121,8 +121,8 @@ class LoadProject(QObject):
             self.notify.start_listening(list_channels)
 
         # Open automatically 'search docker' depending its value in user settings
-        open_search = self.controller.get_user_setting_value('open_search', 'true')
-        if open_search == 'true':
+        open_search = get_parser_value('search', 'open_search')
+        if open_search == 'True':
             GwSearch().api_search()
 
         # call dynamic mapzones repaint

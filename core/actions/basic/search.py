@@ -81,8 +81,7 @@ class GwSearch:
         self.dlg_search.lbl_msg.setVisible(False)
         project_vars = global_vars.project_vars
         qgis_project_add_schema = project_vars['add_schema']
-
-        self.controller.set_user_settings_value('open_search', 'true')
+        set_parser_value('search', 'open_search', 'True')
 
         if qgis_project_add_schema is None:
             body = create_body(form=form)
@@ -144,7 +143,7 @@ class GwSearch:
     def close_search(self):
 
         self.dlg_search = None
-        self.controller.set_user_settings_value('open_search', 'false')
+        set_parser_value('search', 'open_search', 'False')
 
 
     def set_typeahead_completer(self, widget, completer=None):
