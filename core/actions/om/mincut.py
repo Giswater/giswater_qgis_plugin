@@ -1561,7 +1561,7 @@ class GwMincut:
         event_point = get_event_point(point=point)
 
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
-        srid = self.controller.plugin_settings_value('srid')
+        srid = global_vars.srid
 
         sql = (f"UPDATE om_mincut"
                f" SET exec_the_geom = ST_SetSRID(ST_Point({point.x()}, {point.y()}), {srid})"
@@ -1597,7 +1597,7 @@ class GwMincut:
         QgsApplication.taskManager().addTask(self.task1)
         self.task1.setProgress(0)
 
-        srid = self.controller.plugin_settings_value('srid')
+        srid = global_vars.srid
         real_mincut_id = qt_tools.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
         if self.is_new:
             self.set_id_val()

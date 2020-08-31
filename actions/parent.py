@@ -1223,7 +1223,7 @@ class ParentAction(object):
             return_manager = json_result['body']['returnManager']
         except KeyError:
             return
-        srid = self.controller.plugin_settings_value('srid')
+        srid = global_vars.srid
         try:
             margin = 1
             opacity = 100

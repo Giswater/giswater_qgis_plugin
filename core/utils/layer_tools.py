@@ -174,7 +174,7 @@ def add_temp_layer(dialog, data, layer_name, force_tab=True, reset_text=True, ta
 
     text_result = None
     temp_layers_added = []
-    srid = global_vars.controller.plugin_settings_value('srid')
+    srid = global_vars.srid
     for k, v in list(data.items()):
         if str(k) == "info":
             text_result = populate_info_text(dialog, data, force_tab, reset_text, tab_idx, disable_tabs)

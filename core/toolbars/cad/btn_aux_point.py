@@ -180,7 +180,7 @@ class GwAuxPointButton(GwParentMapTool):
 
         self.snap_to_selected_layer = False
         # Get SRID
-        self.srid = self.controller.plugin_settings_value('srid')
+        self.srid = global_vars.srid
 
         # Check button
         self.action.setChecked(True)

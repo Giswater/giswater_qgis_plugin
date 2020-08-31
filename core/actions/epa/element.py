@@ -331,7 +331,7 @@ class GwElement:
         expl_id = qt_tools.get_item_data(self.dlg_add_element, self.dlg_add_element.expl_id)
 
         # Get SRID
-        srid = self.controller.plugin_settings_value('srid')
+        srid = global_vars.srid
 
         # Check if this element already exists
         sql = (f"SELECT DISTINCT(element_id)"

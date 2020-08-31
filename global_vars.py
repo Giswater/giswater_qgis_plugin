@@ -13,6 +13,7 @@ canvas = None
 plugin_dir = None
 plugin_name = None
 
+
 # TODO: Proper initialization
 schema_name = None
 project_type = None
@@ -24,6 +25,7 @@ qgis_settings = None
 project_vars = {}
 action_select_arc = None
 action_select_plot = None
+srid = None
 
 
 def init_global(p_iface, p_canvas, p_plugin_dir, p_plugin_name):

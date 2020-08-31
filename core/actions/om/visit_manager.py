@@ -354,7 +354,7 @@ class GwVisitManager:
     def update_geom(self):
         """ Update geometry field """
 
-        srid = self.controller.plugin_settings_value('srid')
+        srid = global_vars.srid
         sql = (f"UPDATE om_visit"
                f" SET the_geom = ST_SetSRID(ST_MakePoint({self.point_xy['x']},{self.point_xy['y']}), {srid})"
                f" WHERE id = {self.current_visit.id}")

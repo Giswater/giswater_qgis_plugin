@@ -1160,7 +1160,7 @@ def manage_dxf(dialog, dxf_path, export_to_db=False, toc=False, del_old_layers=T
     :return:
     """
 
-    srid = global_vars.controller.plugin_settings_value('srid')
+    srid = global_vars.srid
     # Block the signals so that the window does not appear asking for crs / srid and / or alert message
     global_vars.iface.mainWindow().blockSignals(True)
     dialog.txt_infolog.clear()

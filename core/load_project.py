@@ -16,7 +16,7 @@ import sys
 
 from .models.plugin_toolbar import PluginToolbar
 from .utils.pg_man import PgMan
-from .utils.giswater_tools import set_parser_value
+from .utils.giswater_tools import set_parser_value, get_parser_value
 from .. import global_vars
 from ..ui_manager import DialogTextUi
 from ..core.notify_tools import GwNotifyTools
@@ -83,7 +83,7 @@ class LoadProject(QObject):
 
         # Get SRID from table node
         srid = self.controller.get_srid('v_edit_node', self.schema_name)
-        set_parser_value('load_project', 'srid', f'{srid}')
+        global_vars.srid = srid
 
         # Get variables from qgis project
         self.project_vars = get_qgis_project_variables()

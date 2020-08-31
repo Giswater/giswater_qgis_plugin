@@ -20,7 +20,7 @@
 from qgis.core import QgsMapToPixel
 from qgis.gui import QgsVertexMarker
 from qgis.PyQt.QtCore import Qt
-
+from .... import global_vars
 from ..parent_maptool import GwParentMapTool
 from ....ui_manager import DialogTextUi
 
@@ -43,7 +43,7 @@ class GwArcDivideButton(GwParentMapTool):
 	def move_node(self, node_id, point):
 		""" Move selected node to the current point """
 		
-		srid = self.controller.plugin_settings_value('srid')
+		srid = global_vars.srid
 		
 		# Update node geometry
 		the_geom = f"ST_GeomFromText('POINT({point.x()} {point.y()})', {srid})"

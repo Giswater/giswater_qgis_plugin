@@ -1496,7 +1496,7 @@ class ApiParent(ParentAction):
         :return:
         """
 
-        srid = self.controller.plugin_settings_value('srid')
+        srid = global_vars.srid
         # Block the signals so that the window does not appear asking for crs / srid and / or alert message
         self.iface.mainWindow().blockSignals(True)
         dialog.txt_infolog.clear()

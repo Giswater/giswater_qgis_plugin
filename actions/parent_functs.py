@@ -1162,7 +1162,7 @@ def manage_return_manager(json_result, sql, rubber_band):
         return_manager = json_result['body']['returnManager']
     except KeyError:
         return
-    srid = global_vars.controller.plugin_settings_value('srid')
+    srid = global_vars.srid
     try:
         margin = 1
         opacity = 100
