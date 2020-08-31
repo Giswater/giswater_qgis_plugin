@@ -28,6 +28,7 @@ class GwParentMapTool(QgsMapTool):
 		self.settings = global_vars.settings
 		self.controller = global_vars.controller
 		self.plugin_dir = global_vars.plugin_dir
+		self.project_type = global_vars.project_type
 		
 		self.show_help = bool(int(self.settings.value('status/show_help', 1)))
 		self.layer_arc = None
@@ -37,7 +38,6 @@ class GwParentMapTool(QgsMapTool):
 		
 		self.previous_snapping = get_snapping_options()
 		
-		self.canvas = global_vars.canvas
 		super().__init__(self.canvas)
 		
 		
