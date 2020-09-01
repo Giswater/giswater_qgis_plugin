@@ -1433,7 +1433,7 @@ class ParentAction(object):
                 try:
                     function_name = action['funcName']
                     params = action['params']
-                    getattr(self.controller.gw_actions, f"{function_name}")(**params)
+                    getattr(self.controller.gw_infotools, f"{function_name}")(**params)
                 except AttributeError as e:
                     # If function_name not exist as python function
                     self.controller.log_warning(f"Exception error: {e}")

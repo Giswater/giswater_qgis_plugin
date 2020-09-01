@@ -46,7 +46,6 @@ class Giswater(QObject):
         self.action = None
         self.action_info = None
         self.toolButton = None
-        self.gw_actions = None
 
 
     def initGui(self):

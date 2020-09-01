@@ -1369,7 +1369,7 @@ def manage_actions(json_result, sql):
             try:
                 function_name = action['funcName']
                 params = action['params']
-                getattr(global_vars.controller.gw_actions, f"{function_name}")(**params)
+                getattr(global_vars.controller.gw_infotools, f"{function_name}")(**params)
             except AttributeError as e:
                 # If function_name not exist as python function
                 global_vars.controller.log_warning(f"Exception error: {e}")

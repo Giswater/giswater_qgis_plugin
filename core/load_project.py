@@ -19,8 +19,9 @@ from .utils.pg_man import PgMan
 from .utils.giswater_tools import set_parser_value, get_parser_value
 from .. import global_vars
 from ..ui_manager import DialogTextUi
-from ..core.notify_tools import GwNotifyTools
+from ..core.info_tools import GwInfoTools
 
+from ..core.notify_tools import GwNotifyTools
 from .actions.basic.search import GwSearch
 from ..lib.qgis_tools import qgis_get_layer_source, get_qgis_project_variables, qgis_manage_snapping_layer
 
@@ -93,6 +94,8 @@ class LoadProject(QObject):
         status = self.check_layers_from_distinct_schema()
         if status is False:
             return
+
+        self.controller.gw_infotools = GwInfoTools()
 
         # Get water software from table 'version'
         self.project_type = self.controller.get_project_type()

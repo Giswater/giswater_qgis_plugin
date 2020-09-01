@@ -121,7 +121,7 @@ class GwNotifyTools:
 
     def execute_functions(self, complet_result):
         """
-        functions called in -> getattr(self.controller.gw_actions, function_name)(**params)
+        functions called in -> getattr(self.controller.gw_infotools, function_name)(**params)
             def set_layer_index(self, **kwargs)
             def refresh_attribute_table(self, **kwargs)
             def refresh_canvas(self, **kwargs)
@@ -134,7 +134,7 @@ class GwNotifyTools:
             params = function['parameters']
             try:
                 # getattr(self, function_name)(**params)
-                getattr(self.controller.gw_actions, function_name)(**params)
+                getattr(self.controller.gw_infotools, function_name)(**params)
             except AttributeError as e:
                 # If function_name not exist as python function
                 self.controller.log_warning(f"Exception error: {e}")
