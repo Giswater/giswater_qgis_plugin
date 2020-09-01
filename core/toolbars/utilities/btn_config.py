@@ -221,9 +221,12 @@ class GwConfigButton(GwParentAction):
 		for layer in layers:
 			layers_name += f"{layer.name()}, "
 			tables_name += f"{self.controller.get_layer_source_table_name(layer)}, "
-		
 		result = layers_name[:-2] + '}", ' + tables_name[:-2] + '}"}'
-		
+
+		# This statement is executed so that the gw_fct_getconfig function can collect the values​inserted in the
+		# temp_table and thus know which layers are loaded in the toc. Then with these values the QComboBox
+		# "CAD tools base layer" is filled. The layer selected in said QComboBox will be the layer used by default in
+		# the "aux_circle" and "aux_point" tools.
 		sql = f'INSERT INTO temp_table (fid, text_column, cur_user) VALUES (163, $${result}$$, current_user);'
 		self.controller.execute_sql(sql, log_sql=True)
 	
