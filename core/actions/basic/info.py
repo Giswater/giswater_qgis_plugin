@@ -522,7 +522,7 @@ class GwInfo(QObject):
         action_centered.triggered.connect(partial(self.api_action_centered, self.canvas, self.layer))
         action_zoom_out.triggered.connect(partial(self.api_action_zoom_out, self.canvas, self.layer))
         action_copy_paste.triggered.connect(partial(self.api_action_copy_paste, self.dlg_cf, self.geom_type, tab_type))
-        action_rotation.triggered.connect(partial(self.action_rotation, self.dlg_cf))
+        action_rotation.triggered.connect(partial(self.change_hemisphere, self.dlg_cf))
         action_link.triggered.connect(partial(action_open_url, self.dlg_cf, result))
         action_section.triggered.connect(partial(self.open_section_form))
         action_help.triggered.connect(partial(api_action_help, self.geom_type))
@@ -735,7 +735,7 @@ class GwInfo(QObject):
             self.vertex_marker.hide()
 
 
-    def action_rotation(self, dialog):
+    def change_hemisphere(self, dialog):
         
         # Set map tool emit point and signals
         emit_point = QgsMapToolEmitPoint(global_vars.canvas)
