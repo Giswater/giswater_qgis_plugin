@@ -1757,19 +1757,22 @@ class DaoController:
         """ Save QDockWidget position (1=Left, 2=Right, 4=Top, 8=Bottom),
             remove from iface and del class
         """
-
-        if self.dlg_docker:
-            if not self.dlg_docker.isFloating():
-                docker_pos = self.iface.mainWindow().dockWidgetArea(self.dlg_docker)
-                widget = self.dlg_docker.widget()
-                if widget:
-                    widget.close()
-                    del widget
-                    self.dlg_docker.setWidget(None)
-                    self.docker_type = None
-                    set_parser_value('docker_info', 'position', f'{docker_pos}')
-                self.iface.removeDockWidget(self.dlg_docker)
-                self.dlg_docker = None
+        try:
+            if self.dlg_docker:
+                if not self.dlg_docker.isFloating():
+                    docker_pos = self.iface.mainWindow().dockWidgetArea(self.dlg_docker)
+                    widget = self.dlg_docker.widget()
+                    if widget:
+                        widget.close()
+                        del widget
+                        self.dlg_docker.setWidget(None)
+                        self.docker_type = None
+                        set_parser_value('docker_info', 'position', f'{docker_pos}')
+                    self.iface.removeDockWidget(self.dlg_docker)
+                    self.dlg_docker = None
+        except AttributeError:
+            self.docker_type = None
+            self.dlg_docker = None
 
 
     def manage_docker_options(self):
