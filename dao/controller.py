@@ -1768,6 +1768,7 @@ class DaoController:
                     self.docker_type = None
                     set_parser_value('docker_info', 'position', f'{docker_pos}')
                 self.iface.removeDockWidget(self.dlg_docker)
+                self.dlg_docker = None
 
 
     def manage_docker_options(self):

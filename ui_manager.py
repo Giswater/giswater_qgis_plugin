@@ -79,8 +79,13 @@ class GwMainWindow(QMainWindow):
 
 
     def closeEvent(self, event):
-        self.dlg_closed.emit()
-        return super().closeEvent(event)
+        try:
+            self.dlg_closed.emit()
+            return super().closeEvent(event)
+        except RuntimeError:
+            # This exception jumps, for example, when closing the mincut dialog when it is in docker
+            # RuntimeError: wrapped C/C++ object of type Mincut has been deleted
+            pass
 
 
     def eventFilter(self, object, event):
