@@ -220,10 +220,12 @@ class GwInfoButton(GwParentMapTool):
 			self.rubber_band.reset()
 		if str(max_x) == str(min_x) and str(max_y) == str(min_y):
 			point = QgsPointXY(float(max_x), float(max_y))
-			draw_point(point)
+			self.rubber_band = QgsRubberBand(self.canvas, 0)
+			self.rubber_band = draw_point(point, self.rubber_band)
 		else:
 			points = get_points(list_coord)
-			draw_polyline(points)
+			self.rubber_band = QgsRubberBand(self.canvas, 2)
+			self.rubber_band = draw_polyline(points, self.rubber_band)
 
 
 	def get_info_from_selected_id(self, action, tab_type):

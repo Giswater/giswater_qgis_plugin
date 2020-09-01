@@ -230,7 +230,8 @@ class GwSearch:
             x1 = item['sys_x']
             y1 = item['sys_y']
             point = QgsPointXY(float(x1), float(y1))
-            draw_point(point, duration_time=5000)
+            self.rubber_band = QgsRubberBand(self.canvas, 0)
+            self.rubber_band = draw_point(point, self.rubber_band, duration_time=5000)
             zoom_to_rectangle(x1, y1, x1, y1, margin=100)
             self.canvas.refresh()
 
@@ -239,7 +240,8 @@ class GwSearch:
             x1 = item['sys_x']
             y1 = item['sys_y']
             point = QgsPointXY(float(x1), float(y1))
-            draw_point(point, self.rubber_band)
+            self.rubber_band = QgsRubberBand(self.canvas, 0)
+            self.rubber_band = draw_point(point, self.rubber_band)
             zoom_to_rectangle(x1, y1, x1, y1, margin=100)
             self.open_hydrometer_dialog(table_name=item['sys_table_id'], feature_id=item['sys_id'])
 
@@ -252,7 +254,8 @@ class GwSearch:
                 return
             points = get_points(list_coord)
             self.rubber_band.reset()
-            draw_polygon(points, self.rubber_band, fill_color=QColor(255, 0, 255, 50))
+            self.rubber_band = QgsRubberBand(self.canvas, 2)
+            self.rubber_band = draw_polygon(points, self.rubber_band, fill_color=QColor(255, 0, 255, 50))
             max_x, max_y, min_x, min_y = get_max_rectangle_from_coords(list_coord)
             zoom_to_rectangle(max_x, max_y, min_x, min_y)
             self.workcat_open_table_items(item)

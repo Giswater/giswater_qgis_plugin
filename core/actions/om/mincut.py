@@ -352,8 +352,7 @@ class GwMincut:
 
         restore_user_layer(self.user_current_layer)
         self.remove_selection()
-        # TODO: Check this class doesn't have rubber_band
-        # resetRubberbands()
+        resetRubberbands(self.api_search.rubber_band)
 
         # If client don't touch nothing just rejected dialog or press cancel
         if not self.dlg_mincut.closeMainWin and self.dlg_mincut.mincutCanceled:
@@ -729,7 +728,7 @@ class GwMincut:
         self.dlg_mincut.btn_cancel.clicked.connect(partial(restore_user_layer, self.user_current_layer))
         self.dlg_mincut.btn_cancel.clicked.connect(partial(self.remove_selection))
         # TODO: Check this class doesn't have rubber_band
-        self.dlg_mincut.btn_cancel.clicked.connect(partial(resetRubberbands))
+        self.dlg_mincut.btn_cancel.clicked.connect(partial(resetRubberbands, self.api_search.rubber_band))
         self.refresh_tab_hydro()
 
         self.action_mincut.setEnabled(False)
