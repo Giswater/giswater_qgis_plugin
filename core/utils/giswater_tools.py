@@ -84,6 +84,9 @@ def set_parser_value(section: str, parameter: str, value: str):
 		if section not in parser:
 			parser.add_section(section)
 		parser[section][parameter] = value
+		with open(path, 'w') as configfile:
+			parser.write(configfile)
+			configfile.close()
 	except Exception as e:
 		return None
 
