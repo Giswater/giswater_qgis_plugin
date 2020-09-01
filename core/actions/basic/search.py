@@ -27,7 +27,7 @@ from ..edit.document import GwDocument
 from ..plan.psector import GwPsector
 from ..om.visit_manager import GwVisitManager
 from ....ui_manager import SearchUi, InfoGenericUi, SearchWorkcat
-from ...utils.giswater_tools import get_parser_save, get_parser_value, load_settings, open_dialog, set_parser_save, save_settings, set_parser_value, close_dialog
+from ...utils.giswater_tools import get_parser_value, load_settings, open_dialog, save_settings, set_parser_value, close_dialog
 
 from ....actions.parent_functs import zoom_to_rectangle, get_max_rectangle_from_coords, set_icon, \
     make_list_for_completer, set_completer_lineedit, document_insert, document_delete, document_open, \

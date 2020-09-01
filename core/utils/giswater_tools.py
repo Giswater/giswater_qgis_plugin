@@ -16,58 +16,14 @@ from ...lib import qt_tools
 from ...ui_manager import GwDialog, GwMainWindow
 
 
-def get_parser_save(section):
-	""" Take the parser that we will use to save"""
-	try:
-		parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
-		main_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
-		config_folder = main_folder + os.sep + "config" + os.sep
-		if not os.path.exists(config_folder):
-			os.makedirs(config_folder)
-		path = config_folder + 'user.config'
-		parser.read(path)
-
-		# Check if section dialogs_position exists in file
-		if section not in parser:
-			parser.add_section(section)
-		return parser, path
-	except Exception as e:
-		return None, None
-
-
-def set_parser_save(parser, path):
-	""" Save the parser"""
-	try:
-		with open(path, 'w') as configfile:
-			parser.write(configfile)
-			configfile.close()
-	except Exception as e:
-		return None, None
-
-
-def get_parser_load():
-	""" Load the parser from where we will get the values """
-	try:
-		parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
-		main_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
-		path = main_folder + os.sep + "config" + os.sep + 'user.config'
-		if not os.path.exists(path):
-			return None, None
-		parser.read(path)
-		return parser
-	except Exception as e:
-		return None
-
-
 def load_settings(dialog):
 	""" Load user UI settings related with dialog position and size """
 	# Get user UI config file
-	parser = get_parser_load()
 	try:
-		x = parser['dialogs_position'][f"{dialog.objectName()}_x"]
-		y = parser['dialogs_position'][f"{dialog.objectName()}_y"]
-		width = parser['dialogs_position'][f"{dialog.objectName()}_width"]
-		height = parser['dialogs_position'][f"{dialog.objectName()}_height"]
+		x = get_parser_value('dialogs_position', f"{dialog.objectName()}_x")
+		y = get_parser_value('dialogs_position', f"{dialog.objectName()}_y")
+		width = get_parser_value('dialogs_position', f"{dialog.objectName()}_width")
+		height = get_parser_value('dialogs_position', f"{dialog.objectName()}_height")
 
 		v_screens = ctypes.windll.user32
 		screen_x = v_screens.GetSystemMetrics(78)  # Width of virtual screen
@@ -89,32 +45,47 @@ def load_settings(dialog):
 def save_settings(dialog):
 	""" Save user UI related with dialog position and size """
 	try:
-		parser, path = get_parser_save('dialogs_position')
-		parser['dialogs_position'][dialog.objectName() + "_width"] = f"{dialog.property('width')}"
-		parser['dialogs_position'][dialog.objectName() + "_height"] = f"{dialog.property('height')}"
-		parser['dialogs_position'][dialog.objectName() + "_x"] = f"{dialog.pos().x() + 8}"
-		parser['dialogs_position'][dialog.objectName() + "_y"] = f"{dialog.pos().y() + 31}"
-		set_parser_save(parser, path)
+		set_parser_value('dialogs_position', f"{dialog.objectName()}_width", f"{dialog.property('width')}")
+		set_parser_value('dialogs_position', f"{dialog.objectName()}_height", f"{dialog.property('height')}")
+		set_parser_value('dialogs_position', f"{dialog.objectName()}_x", f"{dialog.pos().x() + 8}")
+		set_parser_value('dialogs_position', f"{dialog.objectName()}_y", f"{dialog.pos().y() + 31}")
 	except Exception as e:
 		pass
 
 
 def get_parser_value(section: str, parameter: str) -> str:
-
+	""" Load a simple parser value """
+	value = None
 	try:
-		parser = get_parser_load()
+		parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
+		main_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
+		path = main_folder + os.sep + "config" + os.sep + 'user.config'
+		if not os.path.exists(path):
+			return value
+		parser.read(path)
 		value = parser[section][parameter]
 	except:
-		value = None
+		return value
 	return value
 
 
 def set_parser_value(section: str, parameter: str, value: str):
 	"""  Save simple parser value """
+	try:
+		parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
+		main_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
+		config_folder = main_folder + os.sep + "config" + os.sep
+		if not os.path.exists(config_folder):
+			os.makedirs(config_folder)
+		path = config_folder + 'user.config'
+		parser.read(path)
 
-	parser, path = get_parser_save(section)
-	parser[section][parameter] = value
-	set_parser_save(parser, path)
+		# Check if section dialogs_position exists in file
+		if section not in parser:
+			parser.add_section(section)
+		parser[section][parameter] = value
+	except Exception as e:
+		return None
 
 
 def save_current_tab(dialog, tab_widget, selector_name):
