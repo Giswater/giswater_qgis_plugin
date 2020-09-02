@@ -15,7 +15,16 @@ $BODY$
 /*
 delete from temp_anlgraf
 TO EXECUTE
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"exploitation":"[1,2]", "checkData": false, "usePsectors":"TRUE", "updateFeature":"TRUE", "updateMinsectorGeom":3 ,"geomParamUpdate":10}}}');
+--SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"exploitation":"[1]", "checkData": false, "usePsectors":"TRUE", "updateFeature":"TRUE", "updateMinsectorGeom":2 ,"geomParamUpdate":10}}}');
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"exploitation":"[11,12,13]", "checkData": false, "usePsectors":"TRUE", "updateFeature":"TRUE", "updateMinsectorGeom":2 ,"geomParamUpdate":10}}}');
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"exploitation":"[15,16,17]", "checkData": false, "usePsectors":"TRUE", "updateFeature":"TRUE", "updateMinsectorGeom":2 ,"geomParamUpdate":10}}}');
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"exploitation":"[21,23,24, 25, 26, 28, 29]", "checkData": false, "usePsectors":"TRUE", "updateFeature":"TRUE", "updateMinsectorGeom":2 ,"geomParamUpdate":10}}}');
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"exploitation":"[30, 31, 33, 34, 35, 37]", "checkData": false, "usePsectors":"TRUE", "updateFeature":"TRUE", "updateMinsectorGeom":2 ,"geomParamUpdate":10}}}');
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"exploitation":"[84,85,86,87,88,89]", "checkData": false, "usePsectors":"TRUE", "updateFeature":"TRUE", "updateMinsectorGeom":2 ,"geomParamUpdate":10}}}');
+
+
+
+select * from exploitation order by 1
 
 SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"arc":"2002", "checkQualityData": true, "usePsectors":"TRUE", "updateFeature":"TRUE", "updateMinsectorGeom":2, "geomParamUpdate":10}}}')
 
@@ -26,6 +35,8 @@ SELECT * FROM SCHEMA_NAME.anl_arc WHERE fid=134 AND cur_user=current_user
 SELECT * FROM SCHEMA_NAME.anl_node WHERE fid=134 AND cur_user=current_user
 SELECT * FROM SCHEMA_NAME.audit_log_data WHERE fid=134 AND cur_user=current_user
 
+SELECT distinct(minsector_id) FROM SCHEMA_NAME.v_edit_arc
+
 --fid: 125,134
 
 */
@@ -34,6 +45,7 @@ DECLARE
 
 v_affectedrows numeric;
 v_cont1 integer default 0;
+v_cont2 integer default 0;
 v_class text = 'MINSECTOR';
 v_feature record;
 v_expl json;
@@ -86,6 +98,7 @@ BEGIN
 	-- set variables
 	v_fid=134;
 	v_featuretype='arc';
+
 
 	-- data quality analysis
 	IF v_checkdata THEN
@@ -142,8 +155,7 @@ BEGIN
 	-- reset exploitation
 	IF v_expl IS NOT NULL THEN
 		DELETE FROM selector_expl WHERE cur_user=current_user;
-		INSERT INTO selector_expl (expl_id, cur_user) SELECT expl_id, current_user FROM exploitation where macroexpl_id IN
-		(SELECT distinct(macroexpl_id) FROM exploitation JOIN (SELECT (json_array_elements_text(v_expl))::integer AS expl)a  ON expl=expl_id);
+		INSERT INTO selector_expl (expl_id, cur_user) SELECT expl_id, current_user FROM exploitation JOIN (SELECT (json_array_elements_text(v_expl))::integer AS expl_id)a USING (expl_id) ;
 	END IF;
 
 	-- create graf
@@ -157,11 +169,15 @@ BEGIN
 	-- set boundary conditions of graf table	
 	UPDATE temp_anlgraf SET flag=2 FROM cat_feature_node a JOIN cat_node b ON a.id=nodetype_id JOIN node c ON nodecat_id=b.id 
 	WHERE c.node_id=temp_anlgraf.node_1 AND graf_delimiter !='NONE' ;
-			
-	-- starting process
+
+	select * from cat_feature_node
+
+	raise notice 'starting process';
+	
 	LOOP
 		EXIT WHEN v_cont1 = -1;
-		v_cont1 = 0;
+
+		v_cont2 = v_cont2 +1;
 
 		-- reset water flag
 		UPDATE temp_anlgraf SET water=0;
@@ -180,8 +196,14 @@ BEGIN
 		v_querytext = 'UPDATE temp_anlgraf SET flag=1, water=1, checkf=1 WHERE arc_id='||quote_literal(v_arc)||'';
 		EXECUTE v_querytext;
 
+		raise notice 'Minsector % - Arc % ', v_cont2, v_arc;	
+
+		-- init variable
+		v_cont1 = 0;
+
 		-- inundation process
 		LOOP	
+			raise notice 'Loop %', v_cont1;	
 			v_cont1 = v_cont1+1;
 			UPDATE temp_anlgraf n SET water= 1, flag=n.flag+1, checkf=1 FROM v_anl_graf a WHERE n.node_1 = a.node_1 AND n.arc_id = a.arc_id;
 			GET DIAGNOSTICS v_affectedrows =row_count;
@@ -222,7 +244,7 @@ BEGIN
 		UPDATE node SET minsector_id = a.descript::integer FROM anl_node a WHERE fid=134 AND a.node_id=node.node_id AND a.descript::integer >0 AND cur_user=current_user;
 	
 		-- update graf nodes on the border of minsectors
-		UPDATE node SET minsector_id = 0 FROM anl_node a JOIN v_edit_node USING (node_id) JOIN cat_feature_node c ON c.id=cat_feature_node 
+		UPDATE node SET minsector_id = 0 FROM anl_node a JOIN v_edit_node USING (node_id) JOIN cat_feature_node c ON c.id=node_type 
 		WHERE fid=134 AND a.node_id=node.node_id AND a.descript::integer =0 AND graf_delimiter!='NONE' AND cur_user=current_user;
 			
 		-- update non graf nodes (not connected) using arc_id parent on v_edit_node (not used node table because the exploitation filter).
@@ -233,8 +255,8 @@ BEGIN
 
 		-- insert into minsector table
 		DELETE FROM minsector WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=current_user);
-		INSERT INTO minsector (minsector_id, dma_id, dqa_id, presszone_id, sector_id, expl_id)
-		SELECT distinct ON (minsector_id) minsector_id, dma_id, dqa_id, presszone_id::integer, sector_id, expl_id FROM arc WHERE minsector_id is not null;
+		INSERT INTO minsector (minsector_id, dma_id, dqa_id, sector_id, expl_id)
+		SELECT distinct ON (minsector_id) minsector_id, dma_id, dqa_id, sector_id, expl_id FROM v_edit_arc WHERE minsector_id is not null;
 
 		-- update graf on minsector_graf
 		DELETE FROM minsector_graf;
@@ -317,10 +339,6 @@ BEGIN
 		VALUES (v_fid, 2, concat('WARNING: Geometry of mapzone ',v_class ,' have been modified by this process'));
 	END IF;
 	
-	-- set selector
-	DELETE FROM selector_audit WHERE cur_user=current_user;
-	INSERT INTO selector_audit (fid, cur_user) VALUES (v_fid, current_user);
-
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
