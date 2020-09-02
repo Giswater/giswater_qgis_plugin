@@ -224,8 +224,7 @@ class ManageVisit(ParentManage, QObject):
 
         index = self.tabs.currentIndex()
         self.manage_tab_changed(self.dlg_add_visit, index)
-		
-		
+
         # tab Visit
         if self.current_tab_index == self.tab_index('VisitTab'):
             self.manage_leave_visit_tab()

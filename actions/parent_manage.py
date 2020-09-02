@@ -821,7 +821,6 @@ class ParentManage(ParentAction, object):
         if self.plan_om == 'plan':
             self.remove_selection(False)
         self.enable_feature_type(dialog)
-        self.connect_signal_selection_changed(dialog, table_object)
 
 
     def delete_feature_at_plan(self, dialog, geom_type, list_id):
@@ -1112,7 +1111,7 @@ class ParentManage(ParentAction, object):
     
     def connect_signal_selection_changed(self, dialog, table_object, query=False):
         """ Connect signal selectionChanged """
-        
+
         try:
             self.canvas.selectionChanged.connect(partial(self.selection_changed, dialog,  table_object, self.geom_type, query))
         except Exception:    
