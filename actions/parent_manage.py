@@ -624,7 +624,10 @@ class ParentManage(ParentAction, object):
                 it = layer.getFeatures(QgsFeatureRequest(expr))
                 id_list = [i.id() for i in it]
                 if len(id_list) > 0:
-                    layer.selectByIds(id_list)   
+                    layer.selectByIds(id_list)
+                    box = layer.boundingBoxOfSelected()
+                    self.iface.mapCanvas().setExtent(box)
+                    self.iface.mapCanvas().refresh()
                 else:
                     layer.removeSelection()             
         
