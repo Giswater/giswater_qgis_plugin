@@ -14,7 +14,6 @@ import os
 import sys
 import subprocess
 import webbrowser
-from datetime import datetime
 from functools import partial
 
 from lib import qt_tools
@@ -132,17 +131,10 @@ class GwVisitManager(ParentManage, QObject):
 
         self.set_selectionbehavior(self.dlg_add_visit)
 
-        # Check the default dates, if it does not exist force today
-        _date = QDate.currentDate()
-        date_string = self.controller.get_config('visitstartdate_vdefault')
-        if date_string:
-            _date = datetime.strptime(date_string[0], '%Y/%m/%d')
-        self.dlg_add_visit.startdate.setDate(_date)
-
-        date_string = self.controller.get_config('visitenddate_vdefault')
-        if date_string is not None:
-            _date = datetime.strptime(date_string[0], '%Y/%m/%d')
-        self.dlg_add_visit.enddate.setDate(_date)
+        # Set current date and time
+        current_date = QDate.currentDate()
+        self.dlg_add_visit.startdate.setDate(current_date)
+        self.dlg_add_visit.enddate.setDate(current_date)
 
         # set User name get from controller login
         if self.controller.user and self.user_name:
@@ -551,10 +543,6 @@ class GwVisitManager(ParentManage, QObject):
         if rows:
             qt_tools.set_item_data(dialog.parameter_id, rows, 1)
 
-        parameter_id = self.controller.get_config('visitparameter_vdefault')
-        if parameter_id:
-            qt_tools.set_combo_itemData(self.dlg_add_visit.parameter_id, parameter_id[0], 0)
-
 
     def get_feature_type_of_parameter(self):
         """ Get feature type of selected parameter """
@@ -867,11 +855,6 @@ class GwVisitManager(ParentManage, QObject):
         rows = self.get_values_from_catalog('om_typevalue', 'visit_status')
         if rows:
             qt_tools.set_item_data(self.dlg_add_visit.status, rows, 1, sort_combo=True)
-
-            status = self.controller.get_config('visitstatus_vdefault')
-            if status:
-                qt_tools.set_combo_itemData(self.dlg_add_visit.status, str(status[0]), 0)
-
             if visit_id is not None:
                 sql = (f"SELECT status "
                        f"FROM om_visit "
@@ -1006,12 +989,6 @@ class GwVisitManager(ParentManage, QObject):
             message = "Unrecognised form type"
             self.controller.show_info_box(message, parameter=form_type)
             return
-
-        # form_type event_ud_arc_rehabit dont have widget value
-        if form_type != 'event_ud_arc_rehabit':
-            val = self.controller.get_config('visitparametervalue_vdefault')
-            if val:
-                qt_tools.setWidgetText(self.dlg_event, self.dlg_event.value, val[0])
 
         # Manage QTableView docx_x_event
         qt_tools.set_qtv_config(self.dlg_event.tbl_docs_x_event)
