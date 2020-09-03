@@ -14,10 +14,7 @@ RETURNS trigger AS
 $BODY$
 DECLARE 
 
-element_seq int8;
-expl_id_int integer;
 v_code_autofill_bool boolean;
-
 v_doublegeometry boolean;
 v_length float;
 v_width float;
