@@ -15,14 +15,10 @@ $BODY$
 /*
 delete from temp_anlgraf
 TO EXECUTE
---SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"exploitation":"[1]", "checkData": false, "usePsectors":"TRUE", "updateFeature":"TRUE", "updateMinsectorGeom":2 ,"geomParamUpdate":10}}}');
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"exploitation":"[11,12,13]", "checkData": false, "usePsectors":"TRUE", "updateFeature":"TRUE", "updateMinsectorGeom":2 ,"geomParamUpdate":10}}}');
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"exploitation":"[15,16,17]", "checkData": false, "usePsectors":"TRUE", "updateFeature":"TRUE", "updateMinsectorGeom":2 ,"geomParamUpdate":10}}}');
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"exploitation":"[21,23,24, 25, 26, 28, 29]", "checkData": false, "usePsectors":"TRUE", "updateFeature":"TRUE", "updateMinsectorGeom":2 ,"geomParamUpdate":10}}}');
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"exploitation":"[30, 31, 33, 34, 35, 37]", "checkData": false, "usePsectors":"TRUE", "updateFeature":"TRUE", "updateMinsectorGeom":2 ,"geomParamUpdate":10}}}');
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"exploitation":"[84,85,86,87,88,89]", "checkData": false, "usePsectors":"TRUE", "updateFeature":"TRUE", "updateMinsectorGeom":2 ,"geomParamUpdate":10}}}');
 
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"exploitation":"[1]", "MaxMinsectors":500, "checkData": false, "usePsectors":"TRUE", "updateFeature":"TRUE", "updateMinsectorGeom":2 ,"geomParamUpdate":10}}}');
 
+select distinct(sector_id) from SCHEMA_NAME.arc where expl_id=1
 
 select * from exploitation order by 1
 
@@ -39,12 +35,21 @@ SELECT distinct(minsector_id) FROM SCHEMA_NAME.v_edit_arc
 
 --fid: 125,134
 
+MAIN
+----
+This functions works with state_type isoperative (true and false)
+
+
+
+
 */
 
 DECLARE
 
-v_affectedrows numeric;
+v_affectedrow numeric;
 v_cont1 integer default 0;
+v_row1 numeric default 0;
+v_total numeric default 0;
 v_cont2 integer default 0;
 v_class text = 'MINSECTOR';
 v_feature record;
@@ -75,6 +80,7 @@ v_usepsectors boolean;
 v_concavehull float = 0.85;
 v_error_context text;
 v_checkdata boolean;
+v_maxmsector integer = 0;
 
 BEGIN
 
@@ -89,8 +95,8 @@ BEGIN
 	v_geomparamupdate = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'geomParamUpdate');
 	v_usepsectors = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'usePsectors');
 	v_checkdata = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'checkData');
-
-
+	v_maxmsector = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'MaxMinsectors');
+	
 	-- select config values
 	SELECT giswater, epsg INTO v_version, v_srid FROM sys_version order by 1 desc limit 1;
 	v_visible_layer = 'v_minsector';
@@ -159,36 +165,45 @@ BEGIN
 	END IF;
 
 	-- create graf
-	INSERT INTO temp_anlgraf ( arc_id, node_1, node_2, water, flag, checkf )
-	SELECT  arc_id, node_1, node_2, 0, 0, 0 FROM v_edit_arc JOIN value_state_type ON state_type=id 
-	WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE
-	UNION
-	SELECT  arc_id, node_2, node_1, 0, 0, 0 FROM v_edit_arc JOIN value_state_type ON state_type=id 
-	WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE;
+	IF v_maxmsector > 0 THEN
+		INSERT INTO temp_anlgraf ( arc_id, node_1, node_2, water, flag, checkf )
+		SELECT  arc_id, node_1, node_2, 0, 0, 0 FROM v_edit_arc
+		WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND minsector_id < 1 or minsector_id is null
+		UNION
+		SELECT  arc_id, node_2, node_1, 0, 0, 0 FROM v_edit_arc
+		WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND minsector_id < 1 or minsector_id is null;
+	ELSE
+		INSERT INTO temp_anlgraf ( arc_id, node_1, node_2, water, flag, checkf )
+		SELECT  arc_id, node_1, node_2, 0, 0, 0 FROM v_edit_arc
+		WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL
+		UNION
+		SELECT  arc_id, node_2, node_1, 0, 0, 0 FROM v_edit_arc
+		WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL;	
+	END IF;
+
+
+	SELECT count(*)/2 INTO v_total FROM temp_anlgraf;
 	
 	-- set boundary conditions of graf table	
 	UPDATE temp_anlgraf SET flag=2 FROM cat_feature_node a JOIN cat_node b ON a.id=nodetype_id JOIN node c ON nodecat_id=b.id 
 	WHERE c.node_id=temp_anlgraf.node_1 AND graf_delimiter !='NONE' ;
 
-	select * from cat_feature_node
+	raise notice 'Starting process - Number of arcs: %', v_total;
 
-	raise notice 'starting process';
-	
 	LOOP
+		-- reset water flag
+		UPDATE temp_anlgraf SET water=0;
+	
 		EXIT WHEN v_cont1 = -1;
 
 		v_cont2 = v_cont2 +1;
 
-		-- reset water flag
-		UPDATE temp_anlgraf SET water=0;
+		EXIT WHEN v_cont2 = v_maxmsector + 1;
+
 
 		------------------
 		-- starting engine
-		-- when arc_id is provided as a parameter
-		IF v_arcid IS NULL THEN
-			SELECT a.arc_id INTO v_arc FROM (SELECT arc_id, max(checkf) as checkf FROM temp_anlgraf GROUP by arc_id) a 
-			JOIN v_edit_arc b ON a.arc_id=b.arc_id WHERE checkf=0 LIMIT 1;
-		END IF;
+		SELECT a.arc_id INTO v_arc FROM (SELECT arc_id, max(checkf) as checkf FROM temp_anlgraf GROUP by arc_id) a WHERE checkf=0 LIMIT 1;
 
 		EXIT WHEN v_arc IS NULL;
 				
@@ -196,44 +211,46 @@ BEGIN
 		v_querytext = 'UPDATE temp_anlgraf SET flag=1, water=1, checkf=1 WHERE arc_id='||quote_literal(v_arc)||'';
 		EXECUTE v_querytext;
 
-		raise notice 'Minsector % - Arc % ', v_cont2, v_arc;	
-
 		-- init variable
 		v_cont1 = 0;
 
 		-- inundation process
 		LOOP	
-			raise notice 'Loop %', v_cont1;	
 			v_cont1 = v_cont1+1;
 			UPDATE temp_anlgraf n SET water= 1, flag=n.flag+1, checkf=1 FROM v_anl_graf a WHERE n.node_1 = a.node_1 AND n.arc_id = a.arc_id;
-			GET DIAGNOSTICS v_affectedrows =row_count;
-			EXIT WHEN v_affectedrows = 0;
+			GET DIAGNOSTICS v_affectedrow =row_count;
+			v_row1 = v_row1 + v_affectedrow;
+			EXIT WHEN v_affectedrow = 0;
 			EXIT WHEN v_cont1 = 200;
+			
 		END LOOP;
-		
+
 		-- finish engine
 		----------------
-		
 		-- insert arc results into audit table
-		EXECUTE 'INSERT INTO anl_arc (fid, arccat_id, arc_id, the_geom, descript)
-			SELECT DISTINCT ON (arc_id)'||v_fid||', arccat_id, a.arc_id, the_geom, '||(v_arc)||'
-			FROM (SELECT arc_id, max(water) as water FROM temp_anlgraf WHERE water=1 GROUP by arc_id) a JOIN v_edit_arc b ON a.arc_id=b.arc_id';
-	
-		-- insert node results into audit table
-		EXECUTE 'INSERT INTO anl_node (fid, nodecat_id, node_id, the_geom, descript)
-			SELECT DISTINCT ON (node_id) '||v_fid||', nodecat_id, b.node_id, the_geom, '||(v_arc)||' FROM (SELECT node_1 as node_id FROM
-			(SELECT node_1,water FROM temp_anlgraf UNION SELECT node_2,water FROM temp_anlgraf)a
-			GROUP BY node_1, water HAVING water=1)b JOIN v_edit_node c ON c.node_id=b.node_id';
+		INSERT INTO anl_arc (fid, arccat_id, arc_id, the_geom, descript)
+		SELECT DISTINCT ON (arc_id) 134, arccat_id, a.arc_id, the_geom, v_arc::text
+		FROM (SELECT arc_id, max(water) as water FROM temp_anlgraf WHERE water=1 GROUP by arc_id) a JOIN v_edit_arc b ON a.arc_id=b.arc_id;
+		GET DIAGNOSTICS v_affectedrow =row_count;
 
-		-- insert node delimiters into audit table
-		EXECUTE 'INSERT INTO anl_node (fid, nodecat_id, node_id, the_geom, descript)
-			SELECT DISTINCT ON (node_id) '||v_fid||', nodecat_id, b.node_id, the_geom, 0 FROM
-			(SELECT node_1 as node_id FROM (SELECT node_1,water FROM temp_anlgraf UNION ALL SELECT node_2,water FROM temp_anlgraf)a
-			GROUP BY node_1, water HAVING water=1 AND count(node_1)=2)b JOIN v_edit_node c ON c.node_id=b.node_id';
-		-- NOTE: node delimiter are inserted two times in table, as node from minsector trace and as node delimiter
+		SELECT count(*) INTO v_row1 FROM anl_arc WHERE fid = 134 AND cur_user =current_user;
 
-				
+		raise notice 'Expl: %, Minsector % - Arc % - ( % %%)', v_expl, v_cont2, v_arc, (100*v_row1/v_total)::numeric(12,2);	
+		
 	END LOOP;
+
+	-- insert node results into audit table
+	INSERT INTO anl_node (fid, nodecat_id, node_id, the_geom, descript)
+	SELECT DISTINCT ON (node_id) 134, nodecat_id, b.node_id, the_geom, arc_id FROM (SELECT node_1 as node_id FROM
+	(SELECT node_1,water FROM temp_anlgraf UNION SELECT node_2,water FROM temp_anlgraf)a
+	GROUP BY node_1, water HAVING water=1)b JOIN v_edit_node c ON c.node_id=b.node_id;
+
+	-- insert node delimiters into audit table
+	INSERT INTO anl_node (fid, nodecat_id, node_id, the_geom, descript)
+	SELECT DISTINCT ON (node_id) 134, nodecat_id, b.node_id, the_geom, 0 FROM
+	(SELECT node_1 as node_id FROM (SELECT node_1,water FROM temp_anlgraf UNION ALL SELECT node_2,water FROM temp_anlgraf)a
+	GROUP BY node_1, water HAVING water=1 AND count(node_1)=2)b JOIN v_edit_node c ON c.node_id=b.node_id;
+	-- NOTE: node delimiter are inserted two times in table, as node from minsector trace and as node delimiter
 	
 	IF v_updatefeature THEN 
 	
@@ -250,19 +267,14 @@ BEGIN
 		-- update non graf nodes (not connected) using arc_id parent on v_edit_node (not used node table because the exploitation filter).
 		UPDATE v_edit_node SET minsector_id = a.minsector_id FROM arc a WHERE a.arc_id=v_edit_node.arc_id;
 	
-		-- used v_edit_connec to the exploitation filter. Rows before is not neeeded because on table anl_* is data filtered by the process...
+		-- used v_edit_connec to the exploitation filter. Row before is not neeeded because on table anl_* is data filtered by the process...
 		UPDATE v_edit_connec SET minsector_id = a.minsector_id FROM arc a WHERE a.arc_id=v_edit_connec.arc_id;
 
 		-- insert into minsector table
 		DELETE FROM minsector WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=current_user);
 		INSERT INTO minsector (minsector_id, dma_id, dqa_id, sector_id, expl_id)
-		SELECT distinct ON (minsector_id) minsector_id, dma_id, dqa_id, sector_id, expl_id FROM v_edit_arc WHERE minsector_id is not null;
-
-		-- update graf on minsector_graf
-		DELETE FROM minsector_graf;
-		INSERT INTO minsector_graf 
-		SELECT DISTINCT ON (node_id) node_id, nodecat_id, a.minsector_id as minsector_1, b.minsector_id as minsector_2 
-		FROM node join arc a on a.node_1=node_id join arc b on b.node_2=node_id WHERE node.minsector_id=0 order by 1;
+		SELECT distinct ON (minsector_id) minsector_id, dma_id, dqa_id, sector_id, expl_id FROM v_edit_arc WHERE minsector_id is not null
+		ON CONFLICT (minsector_id) DO NOTHING;
 
 		-- message
 		INSERT INTO audit_check_data (fid, error_message)
