@@ -11,6 +11,7 @@ from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QAbstractItemView, QDialogButtonBox, QCompleter, QLineEdit, QFileDialog, QTableView
 from qgis.PyQt.QtWidgets import QTextEdit, QPushButton, QComboBox, QTabWidget
 import os
+import re
 import sys
 import subprocess
 import webbrowser
@@ -187,14 +188,25 @@ class ManageVisit(ParentManage, QObject):
         if self.locked_geom_type:
             self.set_locked_relation()
 
-        # Zoom to selected relations
-        for layer in self.layers[self.geom_type]:
-            box = layer.boundingBoxOfSelected()
-            if not box.isEmpty():
-                box.intersects(box)
-                box.set(box.xMinimum() - 10, box.yMinimum() - 10, box.xMaximum() + 10, box.yMaximum() + 10)
-                self.iface.mapCanvas().setExtent(box)
-                self.iface.mapCanvas().refresh()
+        # Zoom to selected geometry or relations
+        visit_geom = self.get_geom()
+        if visit_geom[0] is not None:
+            list_coord = re.search('\((.*)\)', str(visit_geom))
+            max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
+            self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
+        else:
+            for layer in self.layers[self.geom_type]:
+                box = layer.boundingBoxOfSelected()
+                # When it is a point, and only one, it must be converted into a rectangle to be able to zoom
+                if box.xMinimum() != 0 or box.xMaximum() != 0 or box.yMinimum() != 0 or box.yMaximum() != 0:
+                    if box.xMinimum() == box.xMaximum() and box.yMinimum() == box.yMaximum():
+                        box.setXMaximum(box.xMaximum() + 0.0001)
+                        box.setYMaximum(box.yMaximum() + 0.0001)
+                        box.setXMaximum(box.xMinimum() + 0.0001)
+                        box.setYMaximum(box.yMinimum() + 0.0001)
+                    box.set(box.xMinimum() - 10, box.yMinimum() - 10, box.xMaximum() + 10, box.yMaximum() + 10)
+                    self.iface.mapCanvas().setExtent(box)
+                    self.iface.mapCanvas().refresh()
 
         # Open the dialog
         self.open_dialog(self.dlg_add_visit, dlg_name="add_visit")
@@ -272,6 +284,12 @@ class ManageVisit(ParentManage, QObject):
                f" SET the_geom = ST_SetSRID(ST_MakePoint({self.x},{self.y}), {srid})"
                f" WHERE id = {self.current_visit.id}")
         self.controller.execute_sql(sql)
+
+
+    def get_geom(self):
+        sql = f"SELECT St_AsText((select the_geom from om_visit where id={self.current_visit.id})::text)"
+        row = self.controller.get_row(sql, log_sql=True)
+        return row
 
 
     def manage_rejected(self):
