@@ -187,6 +187,15 @@ class ManageVisit(ParentManage, QObject):
         if self.locked_geom_type:
             self.set_locked_relation()
 
+        # Zoom to selected relations
+        for layer in self.layers[self.geom_type]:
+            box = layer.boundingBoxOfSelected()
+            if not box.isEmpty():
+                box.intersects(box)
+                box.set(box.xMinimum() - 10, box.yMinimum() - 10, box.xMaximum() + 10, box.yMaximum() + 10)
+                self.iface.mapCanvas().setExtent(box)
+                self.iface.mapCanvas().refresh()
+
         # Open the dialog
         self.open_dialog(self.dlg_add_visit, dlg_name="add_visit")
 
