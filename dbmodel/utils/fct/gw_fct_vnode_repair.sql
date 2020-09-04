@@ -39,7 +39,7 @@ BEGIN
 		UPDATE link SET exit_id = v_id WHERE link_id = v_link.link_id;
 		UPDATE connec SET pjoint_id = v_id, pjoint_type = 'VNODE' WHERE connec_id = v_link.feature_id AND feature_type = 'CONNEC';
 		IF v_project_type = 'UD' THEN
-			UPDATE gully SET exit_id = v_id, exit_type = 'VNODE' WHERE gully_id = v_link.feature_id AND feature_type = 'GULLY';
+			UPDATE gully SET pjoint_id = v_id, pjoint_type = 'VNODE' WHERE gully_id = v_link.feature_id AND feature_type = 'GULLY';
 		END IF;
 	END LOOP;
 	
