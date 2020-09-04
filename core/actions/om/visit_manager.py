@@ -964,7 +964,7 @@ class GwVisitManager:
                 qt_tools.set_combo_itemData(self.dlg_add_visit.visitcat_id, str(row[1]), 1)
 
         # Fill ComboBox status
-        rows = get_values_from_catalog('om_typevalue', 'visit_status')
+        rows = get_values_from_catalog('om_typevalue', 'visit_cat_status')
         if rows:
             qt_tools.set_item_data(self.dlg_add_visit.status, rows, 1, sort_combo=True)
             status = self.controller.get_config('om_visit_status_vdefault')
