@@ -185,12 +185,38 @@ class GwVisitManager(ParentManage, QObject):
             self.dlg_add_visit.btn_feature_snapping.setEnabled(False)
             self.dlg_add_visit.tab_feature.setEnabled(False)
 
+        # Zoom to selected geometry or relations
+        if self.it_is_new_visit is False:
+            visit_layer = self.controller.get_layer_by_tablename('v_edit_om_visit')
+            if visit_layer:
+                visit_layer.selectByExpression(f'"id"={visit_id}')
+                box = visit_layer.boundingBoxOfSelected()
+                if not box.isNull():
+                    self.zoom_box(box)
+                else:
+                    for layer in self.layers[self.geom_type]:
+                        box = layer.boundingBoxOfSelected()
+                        self.zoom_box(box)
+
         # Open the dialog
         if open_dialog:
             # If the new visit dont come from info emit signal
             if is_new_from_cf is False:
                 self.feature_type.currentIndexChanged.emit(0)
             self.open_dialog(self.dlg_add_visit, dlg_name="visit")
+
+
+    def zoom_box(self, box):
+        # When it is a point, and only one, it must be converted into a rectangle to be able to zoom
+        if not box.isNull():
+            if box.xMinimum() == box.xMaximum() and box.yMinimum() == box.yMaximum():
+                box.setXMaximum(box.xMaximum() + 0.0001)
+                box.setYMaximum(box.yMaximum() + 0.0001)
+                box.setXMaximum(box.xMinimum() + 0.0001)
+                box.setYMaximum(box.yMinimum() + 0.0001)
+            box.set(box.xMinimum() - 10, box.yMinimum() - 10, box.xMaximum() + 10, box.yMaximum() + 10)
+            self.iface.mapCanvas().setExtent(box)
+            self.iface.mapCanvas().refresh()
 
 
     def set_signals(self):
@@ -304,6 +330,12 @@ class GwVisitManager(ParentManage, QObject):
                f" SET the_geom = ST_SetSRID(ST_MakePoint({self.x},{self.y}), {srid})"
                f" WHERE id = {self.current_visit.id}")
         self.controller.execute_sql(sql)
+
+
+    def get_geom(self):
+        sql = f"SELECT St_AsText((select the_geom from om_visit where id={self.current_visit.id})::text)"
+        row = self.controller.get_row(sql, log_sql=True)
+        return row
 
 
     def manage_rejected(self):
@@ -870,7 +902,7 @@ class GwVisitManager(ParentManage, QObject):
                 qt_tools.set_combo_itemData(self.dlg_add_visit.visitcat_id, str(row[1]), 1)
 
         # Fill ComboBox status
-        rows = self.get_values_from_catalog('om_typevalue', 'visit_status')
+        rows = self.get_values_from_catalog('om_typevalue', 'visit_cat_status')
         if rows:
             qt_tools.set_item_data(self.dlg_add_visit.status, rows, 1, sort_combo=True)
             status = self.controller.get_config('om_visit_status_vdefault')
@@ -1017,7 +1049,7 @@ class GwVisitManager(ParentManage, QObject):
             val = self.controller.get_config('om_visit_paramvalue_vdefault')
             if val:
                 qt_tools.setWidgetText(self.dlg_event, self.dlg_event.value, val[0])
-                
+
         # Manage QTableView docx_x_event
         qt_tools.set_qtv_config(self.dlg_event.tbl_docs_x_event)
         self.dlg_event.tbl_docs_x_event.doubleClicked.connect(self.open_file)
