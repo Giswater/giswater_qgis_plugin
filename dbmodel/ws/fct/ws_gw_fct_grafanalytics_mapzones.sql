@@ -42,6 +42,9 @@ TO EXECUTE
 ----------------
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation":[1], "macroExploitation":[1], "checkData":false, 
 "updateFeature":true, "updateMapZone":2, "geomParamUpdate":15,"debug":false, "usePlanPsector":false, "forceOpen":[1,2,3], "forceClosed":[2,3,4]}}}');
+
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "nodeHeader":"113952","exploitation":[1], "macroExploitation":[1], 
+"checkData":false, "updateFeature":true, "updateMapZone":2, "geomParamUpdate":15,"debug":false, "usePlanPsector":false, "forceOpen":[1,2,3], "forceClosed":[2,3,4]}}}');
 ----------------
 
 --SECTOR
@@ -147,6 +150,7 @@ v_usepsector boolean;
 v_currentmapzone integer;
 v_prevmapzone integer;
 v_error boolean = false;
+v_nodemapzone text;
 
 BEGIN
 	-- Search path
@@ -160,7 +164,7 @@ BEGIN
 
 	-- get variables
 	v_class = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'grafClass');
-	v_nodeid = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'node');
+	v_nodeid = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'nodeHeader');
 	v_updatetattributes = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateFeature');
 	v_updatemapzgeom = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
 	v_geomparamupdate = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'geomParamUpdate');
@@ -314,12 +318,23 @@ BEGIN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 1, '-------');
 
 			-- reset mapzones (update to 0)
-			v_querytext = 'UPDATE v_edit_arc SET '||quote_ident(v_field)||' = 0 ';
-			EXECUTE v_querytext;
-			v_querytext = 'UPDATE v_edit_node SET '||quote_ident(v_field)||' = 0 ';
-			EXECUTE v_querytext;
-			v_querytext = 'UPDATE v_edit_connec SET '||quote_ident(v_field)||' = 0 ';
-			EXECUTE v_querytext;
+			IF v_nodeid IS NULL THEN
+				v_querytext = 'UPDATE v_edit_arc SET '||quote_ident(v_field)||' = 0 ';
+				EXECUTE v_querytext;
+				v_querytext = 'UPDATE v_edit_node SET '||quote_ident(v_field)||' = 0 ';
+				EXECUTE v_querytext;
+				v_querytext = 'UPDATE v_edit_connec SET '||quote_ident(v_field)||' = 0 ';
+				EXECUTE v_querytext;
+			ELSE
+				EXECUTE 'SELECT '||quote_ident(v_field)||' FROM v_edit_node WHERE node_id = '||quote_literal(v_nodeid)
+				INTO v_nodemapzone;
+				v_querytext = 'UPDATE v_edit_arc SET '||quote_ident(v_field)||' = 0 WHERE '||quote_ident(v_field)||' = '||quote_literal(v_nodemapzone);
+				EXECUTE v_querytext;
+				v_querytext = 'UPDATE v_edit_node SET '||quote_ident(v_field)||' = 0 WHERE '||quote_ident(v_field)||' = '||quote_literal(v_nodemapzone);
+				EXECUTE v_querytext;
+				v_querytext = 'UPDATE v_edit_connec SET '||quote_ident(v_field)||' = 0 WHERE '||quote_ident(v_field)||' = '||quote_literal(v_nodemapzone);
+				EXECUTE v_querytext;
+			END IF;
 
 			-- fill the graf table
 			INSERT INTO temp_anlgraf (arc_id, node_1, node_2, water, flag, checkf)
