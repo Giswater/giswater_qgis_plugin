@@ -112,7 +112,8 @@ NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, TRUE);
 INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order,  datatype, widgettype, label, widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
 VALUES ('ve_arc', 'feature', 'tstamp', null, 'text', 'text', 'Insert tstamp', NULL, 'tstamp - Fecha de inserción del elemento a la base de datos', NULL, TRUE, NULL, TRUE, NULL, NULL, 
-NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, TRUE);
+NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, TRUE)
+ON CONFLICT (formname, formtype, column_id) DO NOTHING;
 
 INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order,  datatype, widgettype, label, widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -122,7 +123,8 @@ NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, TRUE);
 INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order,  datatype, widgettype, label, widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
 VALUES ('ve_node', 'feature', 'tstamp', null, 'text', 'text', 'Insert tstamp', NULL, 'tstamp - Fecha de inserción del elemento a la base de datos', NULL, TRUE, NULL, TRUE, NULL, NULL, 
-NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, TRUE);
+NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, TRUE)
+ON CONFLICT (formname, formtype, column_id) DO NOTHING;
 
 INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order,  datatype, widgettype, label, widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
@@ -132,7 +134,8 @@ NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, TRUE);
 INSERT INTO config_api_form_fields (formname, formtype, column_id, layout_order,  datatype, widgettype, label, widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, 
 dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcontrols, hidden) 
 VALUES ('ve_connec', 'feature', 'tstamp', null, 'text', 'text', 'Insert tstamp', NULL, 'tstamp - Fecha de inserción del elemento a la base de datos', NULL, TRUE, NULL, TRUE, NULL, NULL, 
-NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, TRUE);
+NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'data_1', NULL, TRUE)
+ON CONFLICT (formname, formtype, column_id) DO NOTHING;
 
 UPDATE config_api_form_fields SET hidden = true WHERE column_id = 'cat_arctype_id' and (formname  like '%ve_arc%' or formname  = 'v_edit_arc');
 UPDATE config_api_form_fields SET hidden = true WHERE column_id = 'nodetype_id' and (formname  like '%ve_node%' or formname  = 'v_edit_node');

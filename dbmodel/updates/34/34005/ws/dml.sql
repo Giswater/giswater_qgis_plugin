@@ -22,7 +22,7 @@ INSERT INTO edit_typevalue (typevalue, id, idval) VALUES ('valve_ordinarystatus'
 INSERT INTO edit_typevalue (typevalue, id, idval) VALUES ('valve_ordinarystatus', '1', 'opened') ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO edit_typevalue (typevalue, id, idval) VALUES ('valve_ordinarystatus', '2', 'maybe') ON CONFLICT (typevalue, id) DO NOTHING;
 
-INSERT INTO typevalue_fk (id,typevalue_table, typevalue_name, target_table, target_field) 
+INSERT INTO sys_foreignkey (id,typevalue_table, typevalue_name, target_table, target_field) 
 VALUES (52,'edit_typevalue', 'valve_ordinarystatus', 'man_valve', 'ordinarystatus') ON CONFLICT (id) DO NOTHING;
 
 

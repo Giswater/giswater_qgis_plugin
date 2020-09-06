@@ -7,6 +7,9 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+
+ALTER TABLE inp_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
+
 DELETE FROM inp_typevalue WHERE typevalue IN ('inp_value_demandtype','inp_value_patternmethod', 'inp_options_networkmode');
 
 INSERT INTO inp_typevalue VALUES ('inp_options_networkmode', '1', 'NODE (MANDATORY NODARCS)', NULL);

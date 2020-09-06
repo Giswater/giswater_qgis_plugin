@@ -7,5 +7,5 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
---2020/07/29
-UPDATE sys_param_user SET ismandatory=FALSE WHERE id='edit_gully_doublegeom';
+ALTER TABLE typevalue_fk RENAME TO sys_foreignkey;
+ALTER TABLE sys_typevalue_cat RENAME TO sys_typevalue;

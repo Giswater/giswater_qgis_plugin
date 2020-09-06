@@ -22,6 +22,7 @@ CREATE OR REPLACE VIEW vi_pollutants AS
    FROM inp_pollutant
   ORDER BY inp_pollutant.poll_id;
 
+/*
 
 --2020/02/21
 
@@ -332,3 +333,4 @@ CREATE OR REPLACE VIEW ve_connec AS
      LEFT JOIN dma ON connec.dma_id = dma.dma_id
      LEFT JOIN sector ON connec.sector_id = sector.sector_id
      LEFT JOIN connec_type ON connec.connec_type::text = connec_type.id::text;
+*/

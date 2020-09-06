@@ -10,12 +10,9 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 -- 2020/05/09
 ALTER TABLE sys_csv2pg_config RENAME TO config_csv_param;
 ALTER TABLE sys_fprocess_cat RENAME TO sys_fprocess;
-ALTER TABLE sys_typevalue_cat RENAME TO sys_typevalue;
 ALTER TABLE sys_csv2pg_cat RENAME TO config_csv;
-ALTER TABLE audit_cat_function RENAME TO sys_function;
 
 ALTER TABLE audit_cat_param_user RENAME TO sys_param_user;
-ALTER TABLE audit_cat_error RENAME TO sys_message;
 ALTER TABLE audit_cat_table RENAME TO sys_table;
 ALTER TABLE audit_cat_sequence RENAME TO sys_sequence;
 
@@ -47,7 +44,7 @@ ALTER TABLE audit_log_feature RENAME to _audit_log_feature_ ;
 ALTER TABLE audit_log_project RENAME to _audit_log_project_ ;
 ALTER TABLE audit_log_csv2pg RENAME to _audit_log_csv2pg_ ;
 ALTER TABLE audit_log_arc_traceability RENAME to audit_arc_traceability;
-ALTER TABLE typevalue_fk RENAME to sys_foreignkey;
+--ALTER TABLE typevalue_fk RENAME to sys_foreignkey;
 
 DROP TRIGGER gw_trg_typevalue_config_fk ON sys_foreignkey;
 CREATE TRIGGER gw_trg_typevalue_config_fk AFTER INSERT OR UPDATE ON sys_foreignkey
@@ -193,8 +190,6 @@ DROP SEQUENCE IF EXISTS SCHEMA_NAME.config_api_visit_cat_multievent_id_seq;
 
 ALTER TABLE config_toolbox ADD CONSTRAINT config_toolbox_id_fkey FOREIGN KEY (id)
 REFERENCES sys_function (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-
-ALTER TABLE sys_function ADD CONSTRAINT sys_function_function_name_unique UNIQUE (function_name, project_type);
 
 --2020/05/18
 ALTER TABLE value_verified RENAME TO _value_verified_;

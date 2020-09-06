@@ -21,27 +21,27 @@ vdefault, ismandatory, isdeprecated, layoutname, layout_order)  VALUES
 ('qgis_info_docker', 'config', 'Force use docker for info', 'role_basic', 'Force use docker for info', true, 'utils', false, false, 'boolean', 'check', 'false', true, false, 'lyt_other', 22)
 ON CONFLICT (id) DO NOTHING;
 
-UPDATE audit_cat_function SET
+UPDATE sys_function SET
 alias = ''
 WHERE function_name = 'gw_fct_debug';
 
-UPDATE audit_cat_function SET
+UPDATE sys_function SET
 function_type = 'trigger function'
 WHERE function_name = 'gw_trg_doc';
 
-UPDATE audit_cat_function SET 
+UPDATE sys_function SET 
 return_type  ='[]', 
 descript ='NO input parameters needed.
 The function allows the possibility to find errors and data inconsistency before exportation to EPA models.' 
 WHERE function_name = 'gw_fct_pg2epa_check_data';
 
-UPDATE audit_cat_function SET 
+UPDATE sys_function SET 
 return_type  ='[]', 
 descript ='NO input parameters needed.
 The function allows the possibility to find errors and data inconsistency for prices cheching catalog elements.'
 WHERE function_name = 'gw_fct_plan_check_data';
 
-UPDATE audit_cat_function SET
+UPDATE sys_function SET
 input_params = '{"featureType":[]}',
 function_type = 'function', 
 return_type = '[{"widgetname":"resultId", "label":"Result Id:","widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layout_order":1,"value":""}]',
@@ -51,7 +51,7 @@ descript ='This function analyze data quality for specific result.',
 alias = 'Check data quality for specific result'
 WHERE function_name = 'gw_fct_pg2epa_check_result';
 
-UPDATE audit_cat_function SET
+UPDATE sys_function SET
 input_params = '{"featureType":[]}',
 function_type = 'function',
 return_type = '[{"widgetname":"resultId", "label":"Result Id:","widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layout_order":1,"value":""}]',
@@ -61,29 +61,29 @@ descript ='This function analyze network topology for specific result. Nodes orp
 alias = 'Check network topology for specific result'
 WHERE function_name = 'gw_fct_pg2epa_check_network';
 
-INSERT INTO audit_cat_function VALUES (2850, 'gw_fct_pg2epa_check_options', 'utils', 'function', NULL, NULL, NULL, 'Check consistency options for epa result', 'role_epa', false) 
+INSERT INTO sys_function VALUES (2850, 'gw_fct_pg2epa_check_options', 'utils', 'function', NULL, NULL, NULL, 'Check consistency options for epa result', 'role_epa', false) 
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO audit_cat_function VALUES (2852, 'gw_fct_lot_psector_geom', 'utils', 'function', NULL, NULL, NULL, 'Generate lot geometry', 'role_om', false) 
+INSERT INTO sys_function VALUES (2852, 'gw_fct_lot_psector_geom', 'utils', 'function', NULL, NULL, NULL, 'Generate lot geometry', 'role_om', false) 
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO audit_cat_function VALUES (2854, 'gw_fct_pg2epa_manage_varc', 'utils', 'function', NULL, NULL, NULL, 'Manage varcs when export to epa', 'role_epa', false) 
+INSERT INTO sys_function VALUES (2854, 'gw_fct_pg2epa_manage_varc', 'utils', 'function', NULL, NULL, NULL, 'Manage varcs when export to epa', 'role_epa', false) 
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO audit_cat_function VALUES (2858, 'gw_api_get_combochilds', 'utils', 'function', NULL, NULL, NULL, 'Get combo childs', 'role_om', false) 
+INSERT INTO sys_function VALUES (2858, 'gw_api_get_combochilds', 'utils', 'function', NULL, NULL, NULL, 'Get combo childs', 'role_om', false) 
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO audit_cat_function VALUES (2860, 'gw_api_getselectors', 'utils', 'function', NULL, NULL, NULL, 'Get selectors', 'role_om', false) 
+INSERT INTO sys_function VALUES (2860, 'gw_api_getselectors', 'utils', 'function', NULL, NULL, NULL, 'Get selectors', 'role_om', false) 
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO audit_cat_function VALUES (2862, 'gw_api_setlot', 'utils', 'function', NULL, NULL, NULL, 'Set lot', 'role_om', false) 
+INSERT INTO sys_function VALUES (2862, 'gw_api_setlot', 'utils', 'function', NULL, NULL, NULL, 'Set lot', 'role_om', false) 
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO audit_cat_function VALUES (2864, 'gw_trg_manage_raster_dem', 'utils', 'trigger function', NULL, NULL, NULL, 'Trigger to manage raster', 'role_edit', false) 
+INSERT INTO sys_function VALUES (2864, 'gw_trg_manage_raster_dem', 'utils', 'trigger function', NULL, NULL, NULL, 'Trigger to manage raster', 'role_edit', false) 
 ON CONFLICT (id) DO NOTHING;
 
 
-UPDATE audit_cat_function SET
+UPDATE sys_function SET
 istoolbox= false 
 WHERE function_name = 'gw_fct_update_elevation_from_dem';
 
@@ -102,18 +102,18 @@ VALUES ('v_ext_raster_dem', 'table to external', 'Raster dem view', 'role_basic'
 -- put in order audit_cat_table
 UPDATE audit_cat_table SET id = 'gw_fct_rpt2pg_import_rpt'  WHERE id = 'gw_fct_utils_csv2pg_import_epanet_rpt';
 UPDATE audit_cat_table SET id = 'gw_fct_rpt2pg_import_rpt'  WHERE id = 'gw_fct_utils_csv2pg_import_swmm_rpt';
-DELETE FROM audit_cat_function WHERE function_name = 'gw_fct_pg2epa';
-DELETE FROM audit_cat_function WHERE function_name like '%join_virtual%';
-UPDATE audit_cat_function SET project_type = 'ws' WHERE id = 2800;
-UPDATE audit_cat_function SET function_name = 'gw_fct_pg2epa_nod2arc' WHERE id = 2224;
-UPDATE audit_cat_function SET function_type = 'function' WHERE id = 2224;
-DELETE FROM audit_cat_function WHERE function_name like 'gw_fct_pg2epa_export_epa';
-DELETE FROM audit_cat_function WHERE function_name like 'gw_fct_utils_csv2pg';
-UPDATE audit_cat_function SET function_name = 'gw_fct_pg2epa_export_inp' WHERE id = 2526;
-DELETE FROM audit_cat_function WHERE id = 2518;
-UPDATE audit_cat_function SET function_name = 'gw_fct_pg2epa_export_inp' WHERE id = 2528;
-UPDATE audit_cat_function SET function_name = 'gw_fct_pg2epa_import_rpt' WHERE id = 2536;
-UPDATE audit_cat_function SET function_name = 'gw_fct_pg2epa_import_rpt' WHERE id = 2530;
+DELETE FROM sys_function WHERE function_name = 'gw_fct_pg2epa';
+DELETE FROM sys_function WHERE function_name like '%join_virtual%';
+UPDATE sys_function SET project_type = 'ws' WHERE id = 2800;
+UPDATE sys_function SET function_name = 'gw_fct_pg2epa_nod2arc' WHERE id = 2224;
+UPDATE sys_function SET function_type = 'function' WHERE id = 2224;
+DELETE FROM sys_function WHERE function_name like 'gw_fct_pg2epa_export_epa';
+DELETE FROM sys_function WHERE function_name like 'gw_fct_utils_csv2pg';
+UPDATE sys_function SET function_name = 'gw_fct_pg2epa_export_inp' WHERE id = 2526;
+DELETE FROM sys_function WHERE id = 2518;
+UPDATE sys_function SET function_name = 'gw_fct_pg2epa_export_inp' WHERE id = 2528;
+UPDATE sys_function SET function_name = 'gw_fct_pg2epa_import_rpt' WHERE id = 2536;
+UPDATE sys_function SET function_name = 'gw_fct_pg2epa_import_rpt' WHERE id = 2530;
 
 UPDATE sys_csv2pg_cat SET isdeprecated = true WHERE id IN (10,11,12);
 

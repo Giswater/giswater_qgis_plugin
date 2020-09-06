@@ -262,7 +262,7 @@ CREATE OR REPLACE VIEW vi_curves AS
 		OR (a.curve_id::text IN ( SELECT vi_energy.energyvalue FROM vi_energy WHERE vi_energy.idval::text = 'EFFIC'::text)))
 		OR (SELECT value FROM config_param_user WHERE parameter = 'inp_options_buildup_mode' and cur_user=current_user)::integer = 1;
 
-
+/*
 
 --2020/02/21
 CREATE OR REPLACE VIEW ve_arc AS 
@@ -492,7 +492,7 @@ CREATE OR REPLACE VIEW ve_node AS
     v_node.lastupdate_user,
     v_node.insert_user
    FROM v_node;
-
+*/
    
    
 DROP VIEW v_edit_inp_virtualvalve;

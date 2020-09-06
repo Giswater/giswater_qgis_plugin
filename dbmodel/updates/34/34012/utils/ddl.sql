@@ -61,6 +61,10 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"anl_conn
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"anl_node", "column":"fprocesscat_id", "newName":"fid"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"temp_table", "column":"fprocesscat_id", "newName":"fid"}}$$);
 
+-- sys_foreignkey
+ALTER TABLE sys_foreignkey DROP constraint typevalue_fk_pkey ;
+ALTER TABLE sys_foreignkey ADD CONSTRAINT sys_foreingkey_pkey PRIMARY KEY (id);
+
 -- sys_typevalue
 ALTER TABLE sys_typevalue DROP constraint sys_typevalue_cat_pkey;
 ALTER TABLE sys_typevalue DROP constraint sys_typevalue_unique;

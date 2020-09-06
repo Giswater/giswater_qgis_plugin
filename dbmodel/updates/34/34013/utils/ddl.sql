@@ -7,6 +7,8 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+ALTER TABLE sys_function ADD CONSTRAINT sys_function_function_name_unique UNIQUE (function_name, project_type);
+
 
 DROP VIEW IF EXISTS v_om_current_psector;
 DROP VIEW IF EXISTS v_om_current_psector_budget;

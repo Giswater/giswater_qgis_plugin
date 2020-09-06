@@ -7,6 +7,10 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+ALTER TABLE audit_cat_error RENAME TO sys_message;
+ALTER TABLE audit_cat_function RENAME TO sys_function;
+
+
 CREATE INDEX anl_node_node_id_index ON anl_node USING btree (node_id);
 CREATE INDEX anl_node_fprocesscat_id_index ON anl_node USING btree (fprocesscat_id);
 

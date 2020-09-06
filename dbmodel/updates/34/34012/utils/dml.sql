@@ -8,8 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-DELETE FROM _temp_csv2pg_;
-
+--DELETE FROM _temp_csv2pg_;
 
 -- sys_param_user
 UPDATE sys_param_user SET dv_querytext = replace(dv_querytext, 'fprocesscat_id', 'fid') WHERE id = 'edit_cadtools_baselayer_vdefault';
@@ -129,6 +128,7 @@ UPDATE config_form_fields SET layoutname = concat('lyt_',layoutname) WHERE layou
 UPDATE config_form_fields SET layoutname = concat('lyt_',layoutname) WHERE layoutname  = 'data_2';
 UPDATE config_form_fields SET layoutname = concat('lyt_data_3') WHERE layoutname  = 'data_9';
 
+
 DELETE FROM config_typevalue WHERE typevalue = 'layout_name_typevalue' AND idval = 'data_1';
 DELETE FROM config_typevalue WHERE typevalue = 'layout_name_typevalue' AND idval = 'data_2';
 DELETE FROM config_typevalue WHERE typevalue = 'layout_name_typevalue' AND idval = 'data_9';
@@ -139,14 +139,10 @@ DELETE FROM config_typevalue WHERE typevalue = 'widgetfunction_typevalue' AND id
 
 UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'om_visit_class', 'config_visit_class')  WHERE dv_querytext like '%om_visit_class%';
 
+
 DELETE FROM config_typevalue WHERE id = 'get_catalog_id';
 
 DELETE FROM config_typevalue WHERE typevalue = 'mtype_typevalue';
-
-UPDATE config_form_fields SET datatype = 'string' WHERE datatype = 'text';
-
-
-DELETE FROM config_typevalue WHERE id = 'text' AND typevalue = 'datatype_typevalue';
 
 DELETE FROM config_typevalue WHERE id = 'character varying' AND typevalue = 'datatype_typevalue';
 
@@ -175,6 +171,7 @@ UPDATE config_typevalue set camelstyle = 'actionLink' WHERE id = 'action_link';
 UPDATE config_typevalue set camelstyle = 'actionWorkcat' WHERE id = 'action_workcat';
 UPDATE config_typevalue SET camelstyle = idval WHERE typevalue ='widgettype_typevalue';
 
+ 
 
 INSERT INTO config_typevalue VALUES ('infotype_typevalue','1','Complet info');
 INSERT INTO config_typevalue VALUES ('infotype_typevalue','2','Basic info');
@@ -259,18 +256,19 @@ UPDATE sys_foreignkey SET active=TRUE;
 INSERT INTO config_param_system (parameter, value, context,  descript, label, project_type, datatype, isdeprecated) 
 VALUES ('basic_selector_state', '{"table":"value_state", "selector":"selector_state", "table_id":"id",  "selector_id":"state_id",  "label":"id, '' - '', name", 
 "manageAll":true, "query_filter":""}', 'system', 'Select which label to display for selectors', 'Selector labels:', 'utils', 'json', FALSE);
- 
+
 
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle) 
 VALUES ('tabname_typevalue', 'tab_state', 'tabState', 'tabState');
 
 
 --2020/06/03
-INSERT INTO config_form_fields(formname, formtype, columnname, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, hidden)
-VALUES ('v_edit_dma','form_generic', 'stylesheet', 'string', 'text', 'stylesheet',false, false, true, false, false);
+INSERT INTO config_form_fields(formname, formtype, columnname, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, hidden, layoutname)
+VALUES ('v_edit_dma','form_generic', 'stylesheet', 'string', 'text', 'stylesheet',false, false, true, false, false, 'lyt_data_1');
 
-INSERT INTO config_form_fields(formname, formtype, columnname, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, hidden)
-VALUES ('v_edit_sector','form_generic', 'stylesheet', 'string', 'text', 'stylesheet',false, false, true, false, false);
+INSERT INTO config_form_fields(formname, formtype, columnname, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, hidden, layoutname)
+VALUES ('v_edit_sector','form_generic', 'stylesheet', 'string', 'text', 'stylesheet',false, false, true, false, false, 'lyt_data_1');
+
 
 
 --2020/06/03 
@@ -297,10 +295,11 @@ VALUES ('ve_connec','form_feature', 'district_id', 'integer', 'combo', 'district
 true) ON CONFLICT (formname, formtype, columnname) DO NOTHING;
 
 INSERT INTO config_form_fields(formname, formtype, columnname, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, 
-dv_querytext, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, tooltip, hidden)
+dv_querytext, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, layoutname, tooltip, hidden)
 VALUES ('v_edit_samplepoint','form_feature', 'district_id', 'integer', 'combo', 'district',false, false, true, false, 
 'SELECT a.district_id AS id, a.name AS idval FROM ext_district a JOIN ext_municipality m USING (muni_id) WHERE district_id IS NOT NULL ', true, 'muni_id', 'AND m.muni_id',
-'district_id - Identificador del barrio con el que se vincula el elemento. A escoger entre los disponibles en el desplegable (se filtra en función del municipio seleccionado)',
+'lyt_data_3', 'district_id - Identificador del barrio con el que se vincula el elemento. A escoger entre los disponibles en el desplegable (se filtra en función del municipio seleccionado)',
 true) ON CONFLICT (formname, formtype, columnname) DO NOTHING;
 
-
+UPDATE config_form_fields SET datatype = 'string' WHERE datatype = 'text';
+DELETE FROM config_typevalue WHERE id = 'text' AND typevalue = 'datatype_typevalue';

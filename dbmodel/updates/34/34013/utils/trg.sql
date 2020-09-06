@@ -17,4 +17,4 @@ FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_edit_samplepoint('samplepoint'
 DROP TRIGGER IF EXISTS gw_trg_ui_om_result_cat ON v_ui_om_result_cat;
 
 DROP FUNCTION IF EXISTS trg_visit_undone();
-DROP FUNCTION IF EXISTS gw_trg_ui_om_result_cat();
+DROP FUNCTION IF EXISTS gw_trg_ui_om_result_cat() CASCADE;
