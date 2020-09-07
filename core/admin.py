@@ -994,7 +994,7 @@ class GwAdmin:
 
     def load_sample_data(self, project_type=False):
 
-        sql = (f"UPDATE {self.schema}.sys_version SET sample=True ")
+        sql = f"UPDATE {self.schema}.sys_version SET sample = True"
         self.controller.execute_sql(sql, commit=False)
 
         if str(project_type) == 'ws' or str(project_type) == 'ud':

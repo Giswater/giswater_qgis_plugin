@@ -351,6 +351,7 @@ def add_tableview(complet_result, field):
                 return widget
 
     # Call def gw_api_open_rpt_result(self, widget, complet_result) of class ApiCf
+    # noinspection PyUnresolvedReferences
     widget.doubleClicked.connect(partial(getattr(sys.modules[__name__], function_name), widget, complet_result))
 
     return widget
@@ -966,6 +967,7 @@ def construct_form_param_user(dialog, row, pos, _json, temp_layers_added=None):
                 if 'value' in field and field['value'] not in(None, ""):
                     value = float(str(field['value']))
                     widget.setValue(value)
+                # noinspection PyUnresolvedReferences
                 widget.valueChanged.connect(partial(get_values_changed_param_user,
                                             dialog, None, widget, field, _json))
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)

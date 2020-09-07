@@ -583,6 +583,7 @@ class ApiParent(ParentAction):
                     return widget
 
         # Call def gw_api_open_rpt_result(self, widget, complet_result) of class ApiCf
+        # noinspection PyUnresolvedReferences
         widget.doubleClicked.connect(partial(getattr(self, function_name), widget, complet_result))
 
         return widget
@@ -1249,6 +1250,7 @@ class ApiParent(ParentAction):
                     if 'value' in field and field['value'] not in(None, ""):
                         value = float(str(field['value']))
                         widget.setValue(value)
+                    # noinspection PyUnresolvedReferences
                     widget.valueChanged.connect(partial(self.get_values_changed_param_user,
                                                 dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)

@@ -827,6 +827,7 @@ def put_combobox(qtable, rows, field, widget_pos, combo_values):
         # Get index and put QComboBox into QTableView at index position
         idx = qtable.model().index(x, widget_pos)
         qtable.setIndexWidget(idx, combo)
+        # noinspection PyUnresolvedReferences
         combo.currentIndexChanged.connect(partial(update_status, combo, qtable, x, widget_pos))
 
 

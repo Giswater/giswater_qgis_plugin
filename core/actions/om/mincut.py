@@ -848,6 +848,7 @@ class GwMincut:
         self.completer.setModel(model)
 
         if set_signal:
+            # noinspection PyUnresolvedReferences
             self.completer.activated.connect(self.auto_fill_hydro_id)
 
 

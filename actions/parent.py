@@ -886,6 +886,7 @@ class ParentAction(object):
             # Get index and put QComboBox into QTableView at index position
             idx = qtable.model().index(x, widget_pos)
             qtable.setIndexWidget(idx, combo)
+            # noinspection PyUnresolvedReferences
             combo.currentIndexChanged.connect(partial(self.update_status, combo, qtable, x, widget_pos))
 
 

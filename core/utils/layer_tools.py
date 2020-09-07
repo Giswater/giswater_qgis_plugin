@@ -316,7 +316,7 @@ def populate_info_text(dialog, data, force_tab=True, reset_text=True, tab_idx=1,
     :param force_tab: Force show tab (boolean)
     :param reset_text: Reset(or not) text for each iteration (boolean)
     :param tab_idx: index of tab to force (integer)
-    :param disable_tabs: set all tabs, except the last, enabled or disabled (boolean)
+    :param call_disable_tabs: set all tabs, except the last, enabled or disabled (boolean)
     :return: Text received from data (String)
     """
 

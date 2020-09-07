@@ -17,12 +17,8 @@ from functools import partial
 
 from lib import qt_tools
 from .. import global_vars
-from .parent_functs import check_expression, get_cursor_multiple_selection, set_table_columns, \
-    refresh_map_canvas
-
-
+from .parent_functs import check_expression, get_cursor_multiple_selection, set_table_columns, refresh_map_canvas
 from ..lib.qgis_tools import snap_to_background_layers, get_event_point, add_marker
-
 from ..core.utils.giswater_tools import close_dialog
 
 
@@ -373,6 +369,7 @@ def tab_feature_changed(dialog, table_object, excluded_layers=[]):
 
     # parent_vars.get_values_from_form(dialog)
     tab_position = dialog.tab_feature.currentIndex()
+    geom_type = "arc"
     if tab_position == 0:
         geom_type = "arc"
     elif tab_position == 1:
@@ -641,7 +638,7 @@ def delete_records(dialog, table_object, query=False, geom_type=None, layers=Non
     try:
         # Get selected rows
         selected_list = widget.selectionModel().selectedRows()
-    except AttributeError as e:
+    except AttributeError:
         selected_list = []
 
     if len(selected_list) == 0:

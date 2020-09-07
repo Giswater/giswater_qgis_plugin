@@ -399,6 +399,7 @@ class GwSearch:
         self.populate_combo(widget, field)
         if 'selectedId' in field:
             qt_tools.set_combo_itemData(widget, field['selectedId'], 0)
+        # noinspection PyUnresolvedReferences
         widget.currentIndexChanged.connect(partial(self.clear_lineedits))
 
         return widget

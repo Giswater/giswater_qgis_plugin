@@ -254,6 +254,7 @@ class GwConfigButton(GwParentAction):
         close_dialog(self.dlg_config)
 
 
+    # noinspection PyUnresolvedReferences
     def construct_form_param_user(self, row, pos):
 
         widget = None
@@ -359,6 +360,7 @@ class GwConfigButton(GwParentAction):
                     self.order_widgets(field, self.addfields_form, lbl, chk, widget)
 
 
+    # noinspection PyUnresolvedReferences
     def construct_form_param_system(self, row, pos):
 
         widget = None

@@ -11,7 +11,6 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QApplication
 from qgis.PyQt.QtGui import QColor
 
-
 from .parent_manage_funct import disconnect_signal_selection_changed, connect_signal_selection_changed
 from .. import global_vars
 from ..lib.qgis_tools import get_event_point, snap_to_background_layers, get_snapped_feature
