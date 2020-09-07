@@ -14,6 +14,7 @@ import os
 import sys
 import subprocess
 import webbrowser
+from datetime import datetime
 from functools import partial
 
 from .. import utils_giswater
@@ -48,7 +49,7 @@ class ManageVisit(ParentManage, QObject):
 
 
     def manage_visit(self, visit_id=None, geom_type=None, feature_id=None, single_tool=True, expl_id=None, tag=None,
-            open_dialog=True):
+                     open_dialog=True):
         """ Button 64. Add visit.
         if visit_id => load record related to the visit_id
         if geom_type => lock geom_type in relations tab
@@ -134,10 +135,18 @@ class ManageVisit(ParentManage, QObject):
 
         self.set_selectionbehavior(self.dlg_add_visit)
 
-        # Set current date and time
-        current_date = QDate.currentDate()
-        self.dlg_add_visit.startdate.setDate(current_date)
-        self.dlg_add_visit.enddate.setDate(current_date)
+        # Check the default dates, if it does not exist force today
+        _date = QDate.currentDate()
+        date_string = self.controller.get_config('om_visit_startdate_vdefault')
+        if date_string:
+            _date = datetime.strptime(date_string[0], '%Y/%m/%d')
+        self.dlg_add_visit.startdate.setDate(_date)
+
+        date_string = self.controller.get_config('om_visit_enddate_vdefault')
+        if date_string is not None:
+            _date = datetime.strptime(date_string[0], '%Y/%m/%d')
+        self.dlg_add_visit.enddate.setDate(_date)
+
 
         # set User name get from controller login
         if self.controller.user and self.user_name:
@@ -529,6 +538,10 @@ class ManageVisit(ParentManage, QObject):
 
         # manage arriving tab
         self.current_tab_index = index
+        # Set user devault parameter
+        parameter_id = self.controller.get_config('om_visit_parameter_vdefault')
+        if parameter_id:
+            utils_giswater.set_combo_itemData(self.dlg_add_visit.parameter_id, parameter_id[0], 0)
 
 
     def set_parameter_id_combo(self, dialog):
@@ -544,6 +557,11 @@ class ManageVisit(ParentManage, QObject):
         rows = self.controller.get_rows(sql)
         if rows:
             utils_giswater.set_item_data(dialog.parameter_id, rows, 1)
+
+        # Set user devault parameter
+        parameter_id = self.controller.get_config('om_visit_parameter_vdefault')
+        if parameter_id:
+            utils_giswater.set_combo_itemData(self.dlg_add_visit.parameter_id, parameter_id[0], 0)
 
 
     def get_feature_type_of_parameter(self):
@@ -860,6 +878,10 @@ class ManageVisit(ParentManage, QObject):
         rows = self.get_values_from_catalog('om_typevalue', 'visit_status')
         if rows:
             utils_giswater.set_item_data(self.dlg_add_visit.status, rows, 1, sort_combo=True)
+            status = self.controller.get_config('om_visit_status_vdefault')
+            if status:
+                utils_giswater.set_combo_itemData(self.dlg_add_visit.status, str(status[0]), 0)
+
             if visit_id is not None:
                 sql = (f"SELECT status "
                        f"FROM om_visit "
@@ -994,6 +1016,12 @@ class ManageVisit(ParentManage, QObject):
             message = "Unrecognised form type"
             self.controller.show_info_box(message, parameter=form_type)
             return
+
+        # form_type event_ud_arc_rehabit dont have widget value
+        if form_type != 'event_ud_arc_rehabit':
+            val = self.controller.get_config('om_visit_paramvalue_vdefault')
+            if val:
+                utils_giswater.setWidgetText(self.dlg_event, self.dlg_event.value, val[0])
 
         # Manage QTableView docx_x_event
         utils_giswater.set_qtv_config(self.dlg_event.tbl_docs_x_event)
